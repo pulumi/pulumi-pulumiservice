@@ -6,16 +6,16 @@ from . import _utilities
 import typing
 # Export this package's modules as members:
 from .provider import *
-from .random import *
+from .team import *
 _utilities.register(
     resource_modules="""
 [
  {
-  "pkg": "xyz",
+  "pkg": "pulumiservice",
   "mod": "index",
-  "fqn": "pulumi_xyz",
+  "fqn": "pulumi_pulumiservice",
   "classes": {
-   "xyz:index:Random": "Random"
+   "pulumiservice:index:Team": "Team"
   }
  }
 ]
@@ -23,9 +23,9 @@ _utilities.register(
     resource_packages="""
 [
  {
-  "pkg": "xyz",
-  "token": "pulumi:providers:xyz",
-  "fqn": "pulumi_xyz",
+  "pkg": "pulumiservice",
+  "token": "pulumi:providers:pulumiservice",
+  "fqn": "pulumi_pulumiservice",
   "class": "Provider"
  }
 ]

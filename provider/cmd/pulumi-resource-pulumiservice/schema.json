@@ -1,49 +1,75 @@
 {
-    "name": "pulumiservice",
-    "version": "0.0.1",
-    "resources": {
-        "pulumiservice:index:Random": {
-            "properties": {
-                "length": {
-                    "type": "integer"
-                },
-                "result": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "length",
-                "result"
-            ],
-            "inputProperties": {
-                "length": {
-                    "type": "integer"
-                }
-            },
-            "requiredInputs": [
-                "length"
-            ]
+  "name": "pulumiservice",
+  "version": "0.0.1",
+  "resources": {
+    "pulumiservice:index:Team": {
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "members": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "organisationName": {
+          "type": "string"
         }
-    },
-    "language": {
-        "csharp": {
-            "packageReferences": {
-                "Pulumi": "3.*"
-            }
+      },
+      "inputProperties": {
+        "type": {
+          "type": "string"
         },
-        "go": {
-            "generateResourceContainerTypes": true,
-            "importBasePath": "github.com/pierskarsenbarg/pulumi-pulumiservice/sdk/go/pulumiservice"
+        "name": {
+          "type": "string"
         },
-        "nodejs": {
-            "dependencies": {
-                "@pulumi/pulumi": "^3.0.0"
-            }
+        "displayName": {
+          "type": "string"
         },
-        "python": {
-            "requires": {
-                "pulumi": ">=3.0.0,<4.0.0"
-            }
+        "description": {
+          "type": "string"
+        },
+        "members": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "organisationName": {
+          "type": "string"
         }
+      }
     }
+  },
+  "language": {
+    "csharp": {
+      "packageReferences": {
+        "Pulumi": "3.*"
+      }
+    },
+    "go": {
+      "generateResourceContainerTypes": true,
+      "importBasePath": "github.com/pierskarsenbarg/pulumi-pulumiservice/sdk/go/pulumiservice"
+    },
+    "nodejs": {
+      "dependencies": {
+        "@pulumi/pulumi": "^3.0.0"
+      }
+    },
+    "python": {
+      "requires": {
+        "pulumi": ">=3.0.0,<4.0.0"
+      }
+    }
+  }
 }

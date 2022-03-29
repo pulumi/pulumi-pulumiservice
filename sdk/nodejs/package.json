@@ -1,9 +1,9 @@
 {
-    "name": "@pulumi/xyz",
+    "name": "@pulumi/pulumiservice",
     "version": "${VERSION}",
     "scripts": {
         "build": "tsc",
-        "install": "node scripts/install-pulumi-plugin.js resource xyz ${VERSION}"
+        "install": "node scripts/install-pulumi-plugin.js resource pulumiservice ${VERSION}"
     },
     "dependencies": {
         "@pulumi/pulumi": "^3.0.0"

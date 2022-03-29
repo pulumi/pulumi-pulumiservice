@@ -6,30 +6,30 @@ import * as utilities from "./utilities";
 
 // Export members:
 export * from "./provider";
-export * from "./random";
+export * from "./team";
 
 // Import resources to register:
-import { Random } from "./random";
+import { Team } from "./team";
 
 const _module = {
     version: utilities.getVersion(),
     construct: (name: string, type: string, urn: string): pulumi.Resource => {
         switch (type) {
-            case "xyz:index:Random":
-                return new Random(name, <any>undefined, { urn })
+            case "pulumiservice:index:Team":
+                return new Team(name, <any>undefined, { urn })
             default:
                 throw new Error(`unknown resource type ${type}`);
         }
     },
 };
-pulumi.runtime.registerResourceModule("xyz", "index", _module)
+pulumi.runtime.registerResourceModule("pulumiservice", "index", _module)
 
 import { Provider } from "./provider";
 
-pulumi.runtime.registerResourcePackage("xyz", {
+pulumi.runtime.registerResourcePackage("pulumiservice", {
     version: utilities.getVersion(),
     constructProvider: (name: string, type: string, urn: string): pulumi.ProviderResource => {
-        if (type !== "pulumi:providers:xyz") {
+        if (type !== "pulumi:providers:pulumiservice") {
             throw new Error(`unknown provider type ${type}`);
         }
         return new Provider(name, <any>undefined, { urn });

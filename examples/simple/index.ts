@@ -1,5 +1,10 @@
-import * as xyz from "@pulumi/xyz";
+import * as service from "@pulumi/pulumiservice";
 
-const random = new xyz.Random("my-random", { length: 24 });
-
-export const output = random.result;
+const team = new service.Team("team", {
+    description: "test from provider",
+    displayName: "my new team",
+    members: ["piers3"],
+    name: "providerteam",
+    organisationName: "pk-demo",
+    type: "pulumi"
+})

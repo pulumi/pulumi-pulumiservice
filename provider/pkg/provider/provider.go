@@ -16,6 +16,7 @@ package provider
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"math/rand"
 	"time"
@@ -30,6 +31,21 @@ import (
 
 	pbempty "github.com/golang/protobuf/ptypes/empty"
 )
+
+var PulumiResources = []PulumiServiceResource{
+	&PulumiServiceTeamResource{},
+}
+
+type PulumiServiceResource interface {
+	Configure(config PulumiServiceConfig)
+	Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error)
+	Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error)
+	Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error)
+	Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error)
+	Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error)
+	Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error)
+	Name() string
+}
 
 type pulumiserviceProvider struct {
 	host    *provider.HostClient
@@ -93,7 +109,7 @@ func (k *pulumiserviceProvider) StreamInvoke(req *pulumirpc.InvokeRequest, serve
 func (k *pulumiserviceProvider) Check(ctx context.Context, req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
 	urn := resource.URN(req.GetUrn())
 	ty := urn.Type()
-	if ty != "pulumiservice:index:Random" {
+	if ty != "pulumiservice:index:Team" {
 		return nil, fmt.Errorf("Unknown resource type '%s'", ty)
 	}
 	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: nil}, nil
@@ -103,7 +119,7 @@ func (k *pulumiserviceProvider) Check(ctx context.Context, req *pulumirpc.CheckR
 func (k *pulumiserviceProvider) Diff(ctx context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
 	urn := resource.URN(req.GetUrn())
 	ty := urn.Type()
-	if ty != "pulumiservice:index:Random" {
+	if ty != "pulumiservice:index:Team" {
 		return nil, fmt.Errorf("Unknown resource type '%s'", ty)
 	}
 
@@ -133,7 +149,7 @@ func (k *pulumiserviceProvider) Diff(ctx context.Context, req *pulumirpc.DiffReq
 func (k *pulumiserviceProvider) Create(ctx context.Context, req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	urn := resource.URN(req.GetUrn())
 	ty := urn.Type()
-	if ty != "pulumiservice:index:Random" {
+	if ty != "pulumiservice:index:Team" {
 		return nil, fmt.Errorf("Unknown resource type '%s'", ty)
 	}
 
@@ -235,4 +251,23 @@ func makeRandom(length int) string {
 		result[i] = charset[seededRand.Intn(len(charset))]
 	}
 	return string(result)
+}
+
+func getResourceNameFromRequest(req ResourceBase) string {
+	urn := resource.URN(req.GetUrn())
+	return urn.Type().String()
+}
+
+type ResourceBase interface {
+	GetUrn() string
+}
+
+func getPulumiServiceResource(name string) (PulumiServiceResource, error) {
+	for _, r := range PulumiResources {
+		if r.Name() == name {
+			return r, nil
+		}
+	}
+
+	return nil, errors.New("error message")
 }
