@@ -3,6 +3,7 @@ package provider
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	pbempty "github.com/golang/protobuf/ptypes/empty"
 	pulumiapi "github.com/pierskarsenbarg/pulumi-apiclient"
@@ -47,7 +48,7 @@ func (t *PulumiServiceTeamResource) ToPulumiServiceTeamInput(inputMap resource.P
 	}
 
 	if inputMap["displayName"].HasValue() && inputMap["displayName"].IsString() {
-		input.DisplayName = inputMap["displayname"].StringValue()
+		input.DisplayName = inputMap["displayName"].StringValue()
 	}
 
 	if inputMap["description"].HasValue() && inputMap["description"].IsString() {
@@ -62,7 +63,7 @@ func (t *PulumiServiceTeamResource) ToPulumiServiceTeamInput(inputMap resource.P
 		}
 	}
 
-	if inputMap["organisationName"].HasValue() && inputMap["organisationName"].IsArray() {
+	if inputMap["organisationName"].HasValue() && inputMap["organisationName"].IsString() {
 		input.OrganisationName = inputMap["organisationName"].StringValue()
 	}
 
@@ -78,23 +79,28 @@ func (t *PulumiServiceTeamResource) Configure(config PulumiServiceConfig) {
 }
 
 func (tr *PulumiServiceTeamResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	return nil, errors.New("Construct is not yet implemented")
+	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: nil}, nil
 }
 
 func (tr *PulumiServiceTeamResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	return nil, errors.New("Construct is not yet implemented")
+	err := tr.deleteTeam(req.Id)
+	if err != nil {
+		return &pbempty.Empty{}, err
+	}
+
+	return &pbempty.Empty{}, nil
 }
 
 func (tr *PulumiServiceTeamResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	return nil, errors.New("Construct is not yet implemented")
+	return nil, errors.New("Diff construct is not yet implemented")
 }
 
 func (tr *PulumiServiceTeamResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	return nil, errors.New("Construct is not yet implemented")
+	return nil, errors.New("Read construct is not yet implemented")
 }
 
 func (tr *PulumiServiceTeamResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	return nil, errors.New("Construct is not yet implemented")
+	return nil, errors.New("Update construct is not yet implemented")
 }
 
 func (tr *PulumiServiceTeamResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
@@ -133,10 +139,27 @@ func (t *PulumiServiceTeamResource) createTeam(input PulumiServiceTeamInput) (*s
 	}
 
 	c := pulumiapi.NewClient(*token)
-	team, err := c.CreateTeam(input.OrganisationName, input.Name, input.Type, input.DisplayName, input.Description)
+	_, err = c.CreateTeam(input.OrganisationName, input.Name, input.Type, input.DisplayName, input.Description)
 	if err != nil {
 		return nil, err
 	}
 
-	return &team.Name, nil
+	teamUrn := fmt.Sprintf("%s/%s", input.OrganisationName, input.Name)
+	return &teamUrn, nil
+}
+
+func (t *PulumiServiceTeamResource) deleteTeam(id string) error {
+	token, err := t.config.getPulumiAccessToken()
+	if err != nil {
+		return err
+	}
+
+	s := strings.Split(id, "/")
+
+	c := pulumiapi.NewClient(*token)
+	err = c.DeleteTeam(s[0], s[1])
+	if err != nil {
+		return err
+	}
+	return nil
 }
