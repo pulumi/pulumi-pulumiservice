@@ -1,7 +1,6 @@
 package provider
 
 import (
-	"errors"
 	"fmt"
 
 	pbempty "github.com/golang/protobuf/ptypes/empty"
@@ -70,7 +69,7 @@ func (c *PulumiServiceAccessTokenResource) Diff(req *pulumirpc.DiffRequest) (*pu
 		Changes:             changes,
 		Replaces:            []string{},
 		Stables:             []string{},
-		DeleteBeforeReplace: false,
+		DeleteBeforeReplace: true,
 	}, nil
 }
 
@@ -119,11 +118,11 @@ func (k *PulumiServiceAccessTokenResource) Check(req *pulumirpc.CheckRequest) (*
 }
 
 func (k *PulumiServiceAccessTokenResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	return nil, createUnknownResourceErrorFromRequest(req)
+	return &pulumirpc.UpdateResponse{}, nil
 }
 
 func (k *PulumiServiceAccessTokenResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	return nil, errors.New("error here read") //createUnknownResourceErrorFromRequest(req)
+	return &pulumirpc.ReadResponse{}, nil
 }
 
 func (f *PulumiServiceAccessTokenResource) Invoke(s *pulumiserviceProvider, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
