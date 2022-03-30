@@ -5,6 +5,7 @@
 from . import _utilities
 import typing
 # Export this package's modules as members:
+from .access_token import *
 from .provider import *
 from .team import *
 _utilities.register(
@@ -15,6 +16,7 @@ _utilities.register(
   "mod": "index",
   "fqn": "pulumi_pulumiservice",
   "classes": {
+   "pulumiservice:index:AccessToken": "AccessToken",
    "pulumiservice:index:Team": "Team"
   }
  }

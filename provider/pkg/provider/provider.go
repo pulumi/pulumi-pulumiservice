@@ -31,6 +31,7 @@ import (
 
 var PulumiResources = []PulumiServiceResource{
 	&PulumiServiceTeamResource{},
+	&PulumiServiceAccessTokenResource{},
 }
 
 type PulumiServiceResource interface {

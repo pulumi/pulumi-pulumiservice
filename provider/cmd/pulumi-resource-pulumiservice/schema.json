@@ -2,6 +2,21 @@
   "name": "pulumiservice",
   "version": "0.0.1",
   "resources": {
+    "pulumiservice:index:AccessToken": {
+      "properties": {
+        "tokenId": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "inputProperties": {
+        "description": {
+          "type": "string"
+        }
+      }
+    },
     "pulumiservice:index:Team": {
       "properties": {
         "type": {
