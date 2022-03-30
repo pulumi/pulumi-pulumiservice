@@ -92,7 +92,42 @@ func (tr *PulumiServiceTeamResource) Delete(req *pulumirpc.DeleteRequest) (*pbem
 }
 
 func (tr *PulumiServiceTeamResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	return nil, errors.New("Diff construct is not yet implemented")
+	olds, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
+	if err != nil {
+		return nil, err
+	}
+
+	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: false})
+	if err != nil {
+		return nil, err
+	}
+
+	diffs := olds["__inputs"].ObjectValue().Diff(news)
+	if diffs == nil {
+		return &pulumirpc.DiffResponse{
+			Changes:             pulumirpc.DiffResponse_DIFF_NONE,
+			Replaces:            []string{},
+			Stables:             []string{},
+			DeleteBeforeReplace: false,
+		}, nil
+	}
+
+	changes := pulumirpc.DiffResponse_DIFF_NONE
+	if diffs.Changed("type") ||
+		diffs.Changed("name") ||
+		diffs.Changed("displayName") ||
+		diffs.Changed("description") ||
+		diffs.Changed("members") ||
+		diffs.Changed("organisationName") {
+		changes = pulumirpc.DiffResponse_DIFF_SOME
+	}
+
+	return &pulumirpc.DiffResponse{
+		Changes:             changes,
+		Replaces:            []string{},
+		Stables:             []string{},
+		DeleteBeforeReplace: false,
+	}, nil
 }
 
 func (tr *PulumiServiceTeamResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
@@ -100,7 +135,55 @@ func (tr *PulumiServiceTeamResource) Read(req *pulumirpc.ReadRequest) (*pulumirp
 }
 
 func (tr *PulumiServiceTeamResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	return nil, errors.New("Update construct is not yet implemented")
+	inputsOld, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	if err != nil {
+		return nil, err
+	}
+	inputsNew, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	if err != nil {
+		return nil, err
+	}
+
+	teamOld := tr.ToPulumiServiceTeamInput(inputsOld["__inputs"].ObjectValue())
+	teamNew := tr.ToPulumiServiceTeamInput(inputsNew)
+
+	inputsChanged := teamOld
+	if teamOld.Description != teamNew.Description || teamOld.DisplayName != teamNew.Description {
+
+		inputsChanged.Description = teamNew.Description
+		inputsChanged.DisplayName = teamNew.DisplayName
+
+		tr.updateTeam(inputsChanged)
+	}
+
+	if !Equal(teamOld.Members, teamNew.Members) {
+		inputsChanged.Members = teamNew.Members
+		for _, usernameToDelete := range teamOld.Members {
+			if !InSlice(usernameToDelete, teamNew.Members) {
+				tr.deleteFromTeam(teamOld.OrganisationName, teamOld.Name, usernameToDelete)
+			}
+		}
+
+		for _, usernameToAdd := range teamNew.Members {
+			if !InSlice(usernameToAdd, teamOld.Members) {
+				tr.addToTeam(teamOld.OrganisationName, teamOld.Name, usernameToAdd)
+			}
+		}
+	}
+
+	outputStore := resource.PropertyMap{}
+	outputStore["__inputs"] = resource.NewObjectProperty(inputsChanged.ToPropertyMap())
+
+	outputProperties, err := plugin.MarshalProperties(
+		outputStore,
+		plugin.MarshalOptions{},
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &pulumirpc.UpdateResponse{
+		Properties: outputProperties,
+	}, nil
 }
 
 func (tr *PulumiServiceTeamResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
@@ -110,9 +193,16 @@ func (tr *PulumiServiceTeamResource) Create(req *pulumirpc.CreateRequest) (*pulu
 	}
 
 	inputsTeam := tr.ToPulumiServiceTeamInput(inputs)
-	channelId, err := tr.createTeam(inputsTeam)
+	team, err := tr.createTeam(inputsTeam)
 	if err != nil {
 		return nil, fmt.Errorf("error creating team '%s': %s", inputsTeam.Name, err.Error())
+	}
+
+	for _, memberToAdd := range inputsTeam.Members {
+		err = tr.addToTeam(inputsTeam.OrganisationName, inputsTeam.Name, memberToAdd)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	outputStore := resource.PropertyMap{}
@@ -127,9 +217,23 @@ func (tr *PulumiServiceTeamResource) Create(req *pulumirpc.CreateRequest) (*pulu
 	}
 
 	return &pulumirpc.CreateResponse{
-		Id:         *channelId,
+		Id:         *team,
 		Properties: outputProperties,
 	}, nil
+}
+
+func (t *PulumiServiceTeamResource) updateTeam(input PulumiServiceTeamInput) error {
+	token, err := t.config.getPulumiAccessToken()
+	if err != nil {
+		return err
+	}
+
+	c := pulumiapi.NewClient(*token)
+	_, err = c.UpdateTeam(input.OrganisationName, input.Name, input.DisplayName, input.Description)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (t *PulumiServiceTeamResource) createTeam(input PulumiServiceTeamInput) (*string, error) {
@@ -146,6 +250,60 @@ func (t *PulumiServiceTeamResource) createTeam(input PulumiServiceTeamInput) (*s
 
 	teamUrn := fmt.Sprintf("%s/%s", input.OrganisationName, input.Name)
 	return &teamUrn, nil
+}
+
+func (t *PulumiServiceTeamResource) deleteFromTeam(orgName string, teamName string, userName string) error {
+
+	if len(orgName) == 0 {
+		return errors.New("orgname must not be empty")
+	}
+
+	if len(teamName) == 0 {
+		return errors.New("teamname must not be empty")
+	}
+
+	if len(userName) == 0 {
+		return errors.New("username must not be empty")
+	}
+
+	token, err := t.config.getPulumiAccessToken()
+	if err != nil {
+		return err
+	}
+
+	c := pulumiapi.NewClient(*token)
+
+	err = c.DeleteMemberFromTeam(orgName, teamName, userName)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (t *PulumiServiceTeamResource) addToTeam(orgName string, teamName string, userName string) error {
+	if len(orgName) == 0 {
+		return errors.New("orgname must not be empty")
+	}
+
+	if len(teamName) == 0 {
+		return errors.New("teamname must not be empty")
+	}
+
+	if len(userName) == 0 {
+		return errors.New("username must not be empty")
+	}
+	token, err := t.config.getPulumiAccessToken()
+	if err != nil {
+		return err
+	}
+
+	c := pulumiapi.NewClient(*token)
+
+	err = c.AddMemberToTeam(orgName, teamName, userName)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (t *PulumiServiceTeamResource) deleteTeam(id string) error {
