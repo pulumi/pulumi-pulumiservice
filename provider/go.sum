@@ -548,12 +548,8 @@ github.com/pierrec/lz4 v2.0.5+incompatible/go.mod h1:pdkljMzZIN41W+lC3N2tnIh5sFi
 github.com/pierrec/lz4 v2.5.2+incompatible/go.mod h1:pdkljMzZIN41W+lC3N2tnIh5sFi+IEE17M5jbnwPHcY=
 github.com/pierrec/lz4 v2.6.0+incompatible h1:Ix9yFKn1nSPBLFl/yZknTp8TU5G4Ps0JDmguYK6iH1A=
 github.com/pierrec/lz4 v2.6.0+incompatible/go.mod h1:pdkljMzZIN41W+lC3N2tnIh5sFi+IEE17M5jbnwPHcY=
-github.com/pierskarsenbarg/pulumi-apiclient v0.0.0-20220330093155-94880274fd18 h1:7aEl9GPAV//GcmPIKWavhL+W/k13UMBfd7dAEmnch5c=
-github.com/pierskarsenbarg/pulumi-apiclient v0.0.0-20220330093155-94880274fd18/go.mod h1:RHwkxztNGTHakzdXBavU2ENy1JqERjLOVbmEtMUgkVk=
-github.com/pierskarsenbarg/pulumi-apiclient v0.0.0-20220330095804-12a76b4c5361 h1:HISEHI/BwBHMfGxdEN8LhYxj/+FTpcnRv8+vgeYHMsM=
-github.com/pierskarsenbarg/pulumi-apiclient v0.0.0-20220330095804-12a76b4c5361/go.mod h1:RHwkxztNGTHakzdXBavU2ENy1JqERjLOVbmEtMUgkVk=
-github.com/pierskarsenbarg/pulumi-apiclient v0.0.0-20220330105811-3b4c22ef723e h1:PlAMtudaav7Eg7lEXvhk2ABSoKabYGlolnl8dpGINck=
-github.com/pierskarsenbarg/pulumi-apiclient v0.0.0-20220330105811-3b4c22ef723e/go.mod h1:RHwkxztNGTHakzdXBavU2ENy1JqERjLOVbmEtMUgkVk=
+github.com/pierskarsenbarg/pulumi-apiclient v0.0.0-20220401125415-349b02068581 h1:dXU4SHMxG7+PqN/irj5XOi+cbOaJVKDxSYHCZIiEwZA=
+github.com/pierskarsenbarg/pulumi-apiclient v0.0.0-20220401125415-349b02068581/go.mod h1:RHwkxztNGTHakzdXBavU2ENy1JqERjLOVbmEtMUgkVk=
 github.com/pkg/diff v0.0.0-20210226163009-20ebb0f2a09e/go.mod h1:pJLUxLENpZxwdsKMEsNbx1VGcRFpLqf3715MtcvvzbA=
 github.com/pkg/errors v0.8.0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pkg/errors v0.8.1-0.20171018195549-f15c970de5b7/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=

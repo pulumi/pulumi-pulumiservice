@@ -228,7 +228,12 @@ func (t *PulumiServiceTeamResource) updateTeam(input PulumiServiceTeamInput) err
 		return err
 	}
 
-	c := pulumiapi.NewClient(*token)
+	url, err := t.config.getPulumiServiceUrl()
+	if err != nil {
+		return err
+	}
+
+	c := pulumiapi.NewClient(*token, *url)
 	_, err = c.UpdateTeam(input.OrganisationName, input.Name, input.DisplayName, input.Description)
 	if err != nil {
 		return err
@@ -242,7 +247,12 @@ func (t *PulumiServiceTeamResource) createTeam(input PulumiServiceTeamInput) (*s
 		return nil, err
 	}
 
-	c := pulumiapi.NewClient(*token)
+	url, err := t.config.getPulumiServiceUrl()
+	if err != nil {
+		return nil, err
+	}
+
+	c := pulumiapi.NewClient(*token, *url)
 	_, err = c.CreateTeam(input.OrganisationName, input.Name, input.Type, input.DisplayName, input.Description)
 	if err != nil {
 		return nil, err
@@ -271,7 +281,12 @@ func (t *PulumiServiceTeamResource) deleteFromTeam(orgName string, teamName stri
 		return err
 	}
 
-	c := pulumiapi.NewClient(*token)
+	url, err := t.config.getPulumiServiceUrl()
+	if err != nil {
+		return err
+	}
+
+	c := pulumiapi.NewClient(*token, *url)
 
 	err = c.DeleteMemberFromTeam(orgName, teamName, userName)
 	if err != nil {
@@ -297,7 +312,12 @@ func (t *PulumiServiceTeamResource) addToTeam(orgName string, teamName string, u
 		return err
 	}
 
-	c := pulumiapi.NewClient(*token)
+	url, err := t.config.getPulumiServiceUrl()
+	if err != nil {
+		return err
+	}
+
+	c := pulumiapi.NewClient(*token, *url)
 
 	err = c.AddMemberToTeam(orgName, teamName, userName)
 	if err != nil {
@@ -312,9 +332,14 @@ func (t *PulumiServiceTeamResource) deleteTeam(id string) error {
 		return err
 	}
 
+	url, err := t.config.getPulumiServiceUrl()
+	if err != nil {
+		return err
+	}
+
 	s := strings.Split(id, "/")
 
-	c := pulumiapi.NewClient(*token)
+	c := pulumiapi.NewClient(*token, *url)
 	err = c.DeleteTeam(s[0], s[1])
 	if err != nil {
 		return err

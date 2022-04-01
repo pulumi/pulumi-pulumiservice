@@ -139,7 +139,12 @@ func (at *PulumiServiceAccessTokenResource) createAccessToken(input PulumiServic
 		return nil, err
 	}
 
-	c := pulumiapi.NewClient(*token)
+	url, err := at.config.getPulumiServiceUrl()
+	if err != nil {
+		return nil, err
+	}
+
+	c := pulumiapi.NewClient(*token, *url)
 
 	accesstoken, err := c.CreateAccessToken(input.Description)
 	if err != nil {
@@ -155,7 +160,12 @@ func (at *PulumiServiceAccessTokenResource) deleteAccessToken(tokenId string) er
 		return err
 	}
 
-	c := pulumiapi.NewClient(*token)
+	url, err := at.config.getPulumiServiceUrl()
+	if err != nil {
+		return err
+	}
+
+	c := pulumiapi.NewClient(*token, *url)
 
 	err = c.DeleteAccessToken(tokenId)
 	if err != nil {
