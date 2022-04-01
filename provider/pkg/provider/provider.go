@@ -85,7 +85,7 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 	sc := PulumiServiceConfig{}
 	sc.Config = make(map[string]string)
 	for key, val := range req.GetVariables() {
-		sc.Config[strings.TrimPrefix(key, "pulumiservice:")] = val
+		sc.Config[strings.TrimPrefix(key, "pulumiservice:config:")] = val
 	}
 
 	for _, sr := range PulumiResources {
