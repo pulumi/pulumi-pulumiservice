@@ -2,6 +2,8 @@ module github.com/pierskarsenbarg/pulumi-pulumiservice/provider
 
 go 1.16
 
+require github.com/gogo/protobuf v1.3.2
+
 require (
 	cloud.google.com/go/iam v0.3.0 // indirect
 	cloud.google.com/go/kms v1.4.0 // indirect

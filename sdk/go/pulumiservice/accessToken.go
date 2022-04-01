@@ -24,6 +24,10 @@ func NewAccessToken(ctx *pulumi.Context,
 		args = &AccessTokenArgs{}
 	}
 
+	secrets := pulumi.AdditionalSecretOutputs([]string{
+		"value",
+	})
+	opts = append(opts, secrets)
 	var resource AccessToken
 	err := ctx.RegisterResource("pulumiservice:index:AccessToken", name, args, &resource, opts...)
 	if err != nil {
