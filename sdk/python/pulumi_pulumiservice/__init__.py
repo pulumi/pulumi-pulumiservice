@@ -8,6 +8,14 @@ import typing
 from .access_token import *
 from .provider import *
 from .team import *
+
+# Make subpackages available:
+if typing.TYPE_CHECKING:
+    import pulumi_pulumiservice.config as __config
+    config = __config
+else:
+    config = _utilities.lazy_import('pulumi_pulumiservice.config')
+
 _utilities.register(
     resource_modules="""
 [

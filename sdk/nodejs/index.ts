@@ -9,6 +9,13 @@ export * from "./accessToken";
 export * from "./provider";
 export * from "./team";
 
+// Export sub-modules:
+import * as config from "./config";
+
+export {
+    config,
+};
+
 // Import resources to register:
 import { AccessToken } from "./accessToken";
 import { Team } from "./team";

@@ -18,7 +18,7 @@ func (pc *PulumiServiceConfig) getConfig(configName, envName string) string {
 }
 
 func (pc *PulumiServiceConfig) getPulumiAccessToken() (*string, error) {
-	token := pc.getConfig("token", "PULUMI_ACCESS_TOKEN")
+	token := pc.getConfig("accessToken", "PULUMI_ACCESS_TOKEN")
 
 	if len(token) == 0 {
 		return nil, fmt.Errorf("no pulumi token found")
