@@ -12,11 +12,22 @@ __all__ = ['ProviderArgs', 'Provider']
 
 @pulumi.input_type
 class ProviderArgs:
-    def __init__(__self__):
+    def __init__(__self__, *,
+                 access_token: Optional[pulumi.Input[str]] = None):
         """
         The set of arguments for constructing a Provider resource.
         """
-        pass
+        if access_token is not None:
+            pulumi.set(__self__, "access_token", access_token)
+
+    @property
+    @pulumi.getter(name="accessToken")
+    def access_token(self) -> Optional[pulumi.Input[str]]:
+        return pulumi.get(self, "access_token")
+
+    @access_token.setter
+    def access_token(self, value: Optional[pulumi.Input[str]]):
+        pulumi.set(self, "access_token", value)
 
 
 class Provider(pulumi.ProviderResource):
@@ -24,6 +35,7 @@ class Provider(pulumi.ProviderResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 access_token: Optional[pulumi.Input[str]] = None,
                  __props__=None):
         """
         Create a Pulumiservice resource with the given unique name, props, and options.
@@ -53,6 +65,7 @@ class Provider(pulumi.ProviderResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 access_token: Optional[pulumi.Input[str]] = None,
                  __props__=None):
         if opts is None:
             opts = pulumi.ResourceOptions()
@@ -65,6 +78,7 @@ class Provider(pulumi.ProviderResource):
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
             __props__ = ProviderArgs.__new__(ProviderArgs)
 
+            __props__.__dict__["access_token"] = access_token
         super(Provider, __self__).__init__(
             'pulumiservice',
             resource_name,

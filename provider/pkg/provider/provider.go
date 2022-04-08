@@ -46,17 +46,19 @@ type PulumiServiceResource interface {
 }
 
 type pulumiserviceProvider struct {
-	host    *provider.HostClient
-	name    string
-	version string
+	host        *provider.HostClient
+	name        string
+	version     string
+	AccessToken string
 }
 
 func makeProvider(host *provider.HostClient, name, version string) (pulumirpc.ResourceProviderServer, error) {
 	// Return the new provider
 	return &pulumiserviceProvider{
-		host:    host,
-		name:    name,
-		version: version,
+		host:        host,
+		name:        name,
+		version:     version,
+		AccessToken: "",
 	}, nil
 }
 
@@ -88,9 +90,17 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 		sc.Config[strings.TrimPrefix(key, "pulumiservice:config:")] = val
 	}
 
+	// if len(k.AccessToken) > 0 {
+	// 	log.Printf("Access token from provider: %s", k.AccessToken)
+	// 	sc.Config["accessToken"] = k.AccessToken
+	// } else {
+	// 	log.Printf("Access token not set")
+	// }
+
 	for _, sr := range PulumiResources {
 		sr.Configure(sc)
 	}
+
 	return &pulumirpc.ConfigureResponse{}, nil
 }
 

@@ -53,10 +53,7 @@ func (c *PulumiServiceAccessTokenResource) Diff(req *pulumirpc.DiffRequest) (*pu
 	diffs := olds["__inputs"].ObjectValue().Diff(news)
 	if diffs == nil {
 		return &pulumirpc.DiffResponse{
-			Changes:             pulumirpc.DiffResponse_DIFF_NONE,
-			Replaces:            []string{},
-			Stables:             []string{},
-			DeleteBeforeReplace: false,
+			Changes: pulumirpc.DiffResponse_DIFF_NONE,
 		}, nil
 	}
 
@@ -66,10 +63,8 @@ func (c *PulumiServiceAccessTokenResource) Diff(req *pulumirpc.DiffRequest) (*pu
 	}
 
 	return &pulumirpc.DiffResponse{
-		Changes:             changes,
-		Replaces:            []string{},
-		Stables:             []string{},
-		DeleteBeforeReplace: true,
+		Changes:  changes,
+		Replaces: []string{"description"},
 	}, nil
 }
 

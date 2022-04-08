@@ -1,6 +1,21 @@
 {
   "name": "pulumiservice",
   "version": "0.0.1",
+  "config": {
+    "variables": {
+      "accessToken": {
+        "type": "string"
+      }
+    }
+  },
+  "provider": {
+    "type": "object",
+    "inputProperties": {
+      "accessToken": {
+        "type": "string"
+      }
+    }
+  },
   "resources": {
     "pulumiservice:index:AccessToken": {
       "properties": {
