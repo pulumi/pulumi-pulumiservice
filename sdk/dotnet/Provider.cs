@@ -39,6 +39,9 @@ namespace Pulumi.Pulumiservice
 
     public sealed class ProviderArgs : Pulumi.ResourceArgs
     {
+        [Input("accessToken")]
+        public Input<string>? AccessToken { get; set; }
+
         public ProviderArgs()
         {
         }

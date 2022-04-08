@@ -8,6 +8,14 @@
       }
     }
   },
+  "provider": {
+    "type": "object",
+    "inputProperties": {
+      "accessToken": {
+        "type": "string"
+      }
+    }
+  },
   "resources": {
     "pulumiservice:index:AccessToken": {
       "properties": {

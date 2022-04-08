@@ -30,10 +30,12 @@ func NewProvider(ctx *pulumi.Context,
 }
 
 type providerArgs struct {
+	AccessToken *string `pulumi:"accessToken"`
 }
 
 // The set of arguments for constructing a Provider resource.
 type ProviderArgs struct {
+	AccessToken pulumi.StringPtrInput
 }
 
 func (ProviderArgs) ElementType() reflect.Type {
