@@ -80,6 +80,47 @@
           "type": "string"
         }
       }
+    },
+    "pulumiservice:index:Webhook": {
+      "properties": {
+        "active": {
+          "type": "boolean"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "payloadUrl": {
+          "type": "string"
+        },
+        "secret": {
+          "type": "string",
+          "secret": true
+        },
+        "name": {
+          "type": "string"
+        },
+        "organizationName": {
+          "type": "string"
+        }
+      },
+      "inputProperties": {
+        "active": {
+          "type": "boolean"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "payloadUrl": {
+          "type": "string"
+        },
+        "secret": {
+          "type": "string",
+          "secret": true
+        },
+        "organizationName": {
+          "type": "string"
+        }
+      }
     }
   },
   "language": {

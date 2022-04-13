@@ -146,7 +146,7 @@ func (at *PulumiServiceAccessTokenResource) createAccessToken(input PulumiServic
 		return nil, err
 	}
 
-	return &accesstoken, nil
+	return accesstoken, nil
 }
 
 func (at *PulumiServiceAccessTokenResource) deleteAccessToken(tokenId string) error {

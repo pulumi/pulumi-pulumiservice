@@ -19,6 +19,7 @@
         "index.ts",
         "provider.ts",
         "team.ts",
-        "utilities.ts"
+        "utilities.ts",
+        "webhook.ts"
     ]
 }

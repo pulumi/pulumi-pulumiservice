@@ -8,6 +8,7 @@ import * as utilities from "./utilities";
 export * from "./accessToken";
 export * from "./provider";
 export * from "./team";
+export * from "./webhook";
 
 // Export sub-modules:
 import * as config from "./config";
@@ -19,6 +20,7 @@ export {
 // Import resources to register:
 import { AccessToken } from "./accessToken";
 import { Team } from "./team";
+import { Webhook } from "./webhook";
 
 const _module = {
     version: utilities.getVersion(),
@@ -28,6 +30,8 @@ const _module = {
                 return new AccessToken(name, <any>undefined, { urn })
             case "pulumiservice:index:Team":
                 return new Team(name, <any>undefined, { urn })
+            case "pulumiservice:index:Webhook":
+                return new Webhook(name, <any>undefined, { urn })
             default:
                 throw new Error(`unknown resource type ${type}`);
         }
