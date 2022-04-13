@@ -24,7 +24,6 @@ require (
 	github.com/docker/docker v20.10.14+incompatible // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/gofrs/uuid v4.2.0+incompatible // indirect
-	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang-jwt/jwt/v4 v4.4.1 // indirect
 	github.com/golang/glog v1.0.0 // indirect
 	github.com/golang/protobuf v1.5.2
@@ -51,7 +50,7 @@ require (
 	github.com/oklog/run v1.1.0 // indirect
 	github.com/opentracing/basictracer-go v1.1.0 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
-	github.com/pierskarsenbarg/pulumi-apiclient v0.0.0-20220401125415-349b02068581
+	github.com/pierskarsenbarg/pulumi-apiclient v0.0.0-20220413131243-591641df3073
 	github.com/pulumi/pulumi/pkg/v3 v3.27.0
 	github.com/pulumi/pulumi/sdk/v3 v3.27.0
 	github.com/sabhiram/go-gitignore v0.0.0-20210923224102-525f6e181f06 // indirect
