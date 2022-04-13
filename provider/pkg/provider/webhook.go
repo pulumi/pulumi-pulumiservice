@@ -3,7 +3,6 @@ package provider
 import (
 	"errors"
 	"fmt"
-	"log"
 	"strings"
 
 	pbempty "github.com/golang/protobuf/ptypes/empty"
@@ -245,8 +244,6 @@ func (wh *PulumiServiceWebhookResource) deleteWebhook(id string) error {
 	}
 
 	s := strings.Split(id, "/")
-
-	log.Printf("org: %s | name: %s", s[0], s[1])
 
 	c := pulumiapi.NewClient(*token, *url)
 	err = c.DeleteWebhook(s[0], s[1])
