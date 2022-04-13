@@ -35,7 +35,7 @@ export class Team extends pulumi.CustomResource {
     public readonly displayName!: pulumi.Output<string | undefined>;
     public readonly members!: pulumi.Output<string[] | undefined>;
     public readonly name!: pulumi.Output<string | undefined>;
-    public readonly organisationName!: pulumi.Output<string | undefined>;
+    public readonly organizationName!: pulumi.Output<string | undefined>;
     public readonly type!: pulumi.Output<string | undefined>;
 
     /**
@@ -53,14 +53,14 @@ export class Team extends pulumi.CustomResource {
             resourceInputs["displayName"] = args ? args.displayName : undefined;
             resourceInputs["members"] = args ? args.members : undefined;
             resourceInputs["name"] = args ? args.name : undefined;
-            resourceInputs["organisationName"] = args ? args.organisationName : undefined;
+            resourceInputs["organizationName"] = args ? args.organizationName : undefined;
             resourceInputs["type"] = args ? args.type : undefined;
         } else {
             resourceInputs["description"] = undefined /*out*/;
             resourceInputs["displayName"] = undefined /*out*/;
             resourceInputs["members"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
-            resourceInputs["organisationName"] = undefined /*out*/;
+            resourceInputs["organizationName"] = undefined /*out*/;
             resourceInputs["type"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
@@ -76,6 +76,6 @@ export interface TeamArgs {
     displayName?: pulumi.Input<string>;
     members?: pulumi.Input<pulumi.Input<string>[]>;
     name?: pulumi.Input<string>;
-    organisationName?: pulumi.Input<string>;
+    organizationName?: pulumi.Input<string>;
     type?: pulumi.Input<string>;
 }

@@ -21,7 +21,7 @@ type PulumiServiceTeamInput struct {
 	Name             string
 	DisplayName      string
 	Description      string
-	OrganisationName string
+	OrganizationName string
 	Members          []string
 }
 
@@ -32,7 +32,7 @@ func (i *PulumiServiceTeamInput) ToPropertyMap() resource.PropertyMap {
 	pm["displayName"] = resource.NewPropertyValue(i.DisplayName)
 	pm["description"] = resource.NewPropertyValue(i.Description)
 	pm["members"] = resource.NewPropertyValue(i.Members)
-	pm["organisationName"] = resource.NewPropertyValue(i.OrganisationName)
+	pm["organizationName"] = resource.NewPropertyValue(i.OrganizationName)
 	return pm
 }
 
@@ -63,8 +63,8 @@ func (t *PulumiServiceTeamResource) ToPulumiServiceTeamInput(inputMap resource.P
 		}
 	}
 
-	if inputMap["organisationName"].HasValue() && inputMap["organisationName"].IsString() {
-		input.OrganisationName = inputMap["organisationName"].StringValue()
+	if inputMap["organizationName"].HasValue() && inputMap["organizationName"].IsString() {
+		input.OrganizationName = inputMap["organizationName"].StringValue()
 	}
 
 	return input
@@ -118,7 +118,7 @@ func (tr *PulumiServiceTeamResource) Diff(req *pulumirpc.DiffRequest) (*pulumirp
 		diffs.Changed("displayName") ||
 		diffs.Changed("description") ||
 		diffs.Changed("members") ||
-		diffs.Changed("organisationName") {
+		diffs.Changed("organizationName") {
 		changes = pulumirpc.DiffResponse_DIFF_SOME
 	}
 
@@ -160,13 +160,13 @@ func (tr *PulumiServiceTeamResource) Update(req *pulumirpc.UpdateRequest) (*pulu
 		inputsChanged.Members = teamNew.Members
 		for _, usernameToDelete := range teamOld.Members {
 			if !InSlice(usernameToDelete, teamNew.Members) {
-				tr.deleteFromTeam(teamOld.OrganisationName, teamOld.Name, usernameToDelete)
+				tr.deleteFromTeam(teamOld.OrganizationName, teamOld.Name, usernameToDelete)
 			}
 		}
 
 		for _, usernameToAdd := range teamNew.Members {
 			if !InSlice(usernameToAdd, teamOld.Members) {
-				tr.addToTeam(teamOld.OrganisationName, teamOld.Name, usernameToAdd)
+				tr.addToTeam(teamOld.OrganizationName, teamOld.Name, usernameToAdd)
 			}
 		}
 	}
@@ -199,7 +199,7 @@ func (tr *PulumiServiceTeamResource) Create(req *pulumirpc.CreateRequest) (*pulu
 	}
 
 	for _, memberToAdd := range inputsTeam.Members {
-		err = tr.addToTeam(inputsTeam.OrganisationName, inputsTeam.Name, memberToAdd)
+		err = tr.addToTeam(inputsTeam.OrganizationName, inputsTeam.Name, memberToAdd)
 		if err != nil {
 			return nil, err
 		}
@@ -234,7 +234,7 @@ func (t *PulumiServiceTeamResource) updateTeam(input PulumiServiceTeamInput) err
 	}
 
 	c := pulumiapi.NewClient(*token, *url)
-	_, err = c.UpdateTeam(input.OrganisationName, input.Name, input.DisplayName, input.Description)
+	_, err = c.UpdateTeam(input.OrganizationName, input.Name, input.DisplayName, input.Description)
 	if err != nil {
 		return err
 	}
@@ -253,12 +253,12 @@ func (t *PulumiServiceTeamResource) createTeam(input PulumiServiceTeamInput) (*s
 	}
 
 	c := pulumiapi.NewClient(*token, *url)
-	_, err = c.CreateTeam(input.OrganisationName, input.Name, input.Type, input.DisplayName, input.Description)
+	_, err = c.CreateTeam(input.OrganizationName, input.Name, input.Type, input.DisplayName, input.Description)
 	if err != nil {
 		return nil, err
 	}
 
-	teamUrn := fmt.Sprintf("%s/%s", input.OrganisationName, input.Name)
+	teamUrn := fmt.Sprintf("%s/%s", input.OrganizationName, input.Name)
 	return &teamUrn, nil
 }
 

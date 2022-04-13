@@ -24,8 +24,8 @@ namespace Pulumi.Pulumiservice
         [Output("name")]
         public Output<string?> Name { get; private set; } = null!;
 
-        [Output("organisationName")]
-        public Output<string?> OrganisationName { get; private set; } = null!;
+        [Output("organizationName")]
+        public Output<string?> OrganizationName { get; private set; } = null!;
 
         [Output("type")]
         public Output<string?> Type { get; private set; } = null!;
@@ -92,8 +92,8 @@ namespace Pulumi.Pulumiservice
         [Input("name")]
         public Input<string>? Name { get; set; }
 
-        [Input("organisationName")]
-        public Input<string>? OrganisationName { get; set; }
+        [Input("organizationName")]
+        public Input<string>? OrganizationName { get; set; }
 
         [Input("type")]
         public Input<string>? Type { get; set; }

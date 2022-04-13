@@ -17,7 +17,7 @@ class TeamArgs:
                  display_name: Optional[pulumi.Input[str]] = None,
                  members: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None,
                  name: Optional[pulumi.Input[str]] = None,
-                 organisation_name: Optional[pulumi.Input[str]] = None,
+                 organization_name: Optional[pulumi.Input[str]] = None,
                  type: Optional[pulumi.Input[str]] = None):
         """
         The set of arguments for constructing a Team resource.
@@ -30,8 +30,8 @@ class TeamArgs:
             pulumi.set(__self__, "members", members)
         if name is not None:
             pulumi.set(__self__, "name", name)
-        if organisation_name is not None:
-            pulumi.set(__self__, "organisation_name", organisation_name)
+        if organization_name is not None:
+            pulumi.set(__self__, "organization_name", organization_name)
         if type is not None:
             pulumi.set(__self__, "type", type)
 
@@ -72,13 +72,13 @@ class TeamArgs:
         pulumi.set(self, "name", value)
 
     @property
-    @pulumi.getter(name="organisationName")
-    def organisation_name(self) -> Optional[pulumi.Input[str]]:
-        return pulumi.get(self, "organisation_name")
+    @pulumi.getter(name="organizationName")
+    def organization_name(self) -> Optional[pulumi.Input[str]]:
+        return pulumi.get(self, "organization_name")
 
-    @organisation_name.setter
-    def organisation_name(self, value: Optional[pulumi.Input[str]]):
-        pulumi.set(self, "organisation_name", value)
+    @organization_name.setter
+    def organization_name(self, value: Optional[pulumi.Input[str]]):
+        pulumi.set(self, "organization_name", value)
 
     @property
     @pulumi.getter
@@ -99,7 +99,7 @@ class Team(pulumi.CustomResource):
                  display_name: Optional[pulumi.Input[str]] = None,
                  members: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None,
                  name: Optional[pulumi.Input[str]] = None,
-                 organisation_name: Optional[pulumi.Input[str]] = None,
+                 organization_name: Optional[pulumi.Input[str]] = None,
                  type: Optional[pulumi.Input[str]] = None,
                  __props__=None):
         """
@@ -134,7 +134,7 @@ class Team(pulumi.CustomResource):
                  display_name: Optional[pulumi.Input[str]] = None,
                  members: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None,
                  name: Optional[pulumi.Input[str]] = None,
-                 organisation_name: Optional[pulumi.Input[str]] = None,
+                 organization_name: Optional[pulumi.Input[str]] = None,
                  type: Optional[pulumi.Input[str]] = None,
                  __props__=None):
         if opts is None:
@@ -152,7 +152,7 @@ class Team(pulumi.CustomResource):
             __props__.__dict__["display_name"] = display_name
             __props__.__dict__["members"] = members
             __props__.__dict__["name"] = name
-            __props__.__dict__["organisation_name"] = organisation_name
+            __props__.__dict__["organization_name"] = organization_name
             __props__.__dict__["type"] = type
         super(Team, __self__).__init__(
             'pulumiservice:index:Team',
@@ -180,7 +180,7 @@ class Team(pulumi.CustomResource):
         __props__.__dict__["display_name"] = None
         __props__.__dict__["members"] = None
         __props__.__dict__["name"] = None
-        __props__.__dict__["organisation_name"] = None
+        __props__.__dict__["organization_name"] = None
         __props__.__dict__["type"] = None
         return Team(resource_name, opts=opts, __props__=__props__)
 
@@ -205,9 +205,9 @@ class Team(pulumi.CustomResource):
         return pulumi.get(self, "name")
 
     @property
-    @pulumi.getter(name="organisationName")
-    def organisation_name(self) -> pulumi.Output[Optional[str]]:
-        return pulumi.get(self, "organisation_name")
+    @pulumi.getter(name="organizationName")
+    def organization_name(self) -> pulumi.Output[Optional[str]]:
+        return pulumi.get(self, "organization_name")
 
     @property
     @pulumi.getter

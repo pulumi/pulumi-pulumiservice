@@ -15,6 +15,6 @@ const team = new service.Team("team", {
     displayName: "Team Awesome",
     members: ["piers3"],
     name: "providerteam",
-    organisationName: "pk-demo",
+    organizationName: "pk-demo",
     type: "pulumi"
 }, { provider });

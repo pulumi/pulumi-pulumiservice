@@ -17,7 +17,7 @@ type Team struct {
 	DisplayName      pulumi.StringPtrOutput   `pulumi:"displayName"`
 	Members          pulumi.StringArrayOutput `pulumi:"members"`
 	Name             pulumi.StringPtrOutput   `pulumi:"name"`
-	OrganisationName pulumi.StringPtrOutput   `pulumi:"organisationName"`
+	OrganizationName pulumi.StringPtrOutput   `pulumi:"organizationName"`
 	Type             pulumi.StringPtrOutput   `pulumi:"type"`
 }
 
@@ -64,7 +64,7 @@ type teamArgs struct {
 	DisplayName      *string  `pulumi:"displayName"`
 	Members          []string `pulumi:"members"`
 	Name             *string  `pulumi:"name"`
-	OrganisationName *string  `pulumi:"organisationName"`
+	OrganizationName *string  `pulumi:"organizationName"`
 	Type             *string  `pulumi:"type"`
 }
 
@@ -74,7 +74,7 @@ type TeamArgs struct {
 	DisplayName      pulumi.StringPtrInput
 	Members          pulumi.StringArrayInput
 	Name             pulumi.StringPtrInput
-	OrganisationName pulumi.StringPtrInput
+	OrganizationName pulumi.StringPtrInput
 	Type             pulumi.StringPtrInput
 }
 
