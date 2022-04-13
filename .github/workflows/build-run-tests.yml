@@ -110,8 +110,8 @@ jobs:
         run: make gen
       - name: Build provider binary
         run: make provider
-      - name: Check worktree clean
-        run: ./ci-scripts/ci/check-worktree-is-clean
+      # - name: Check worktree clean
+      #   run: ./ci-scripts/ci/check-worktree-is-clean
       - run: git status --porcelain
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
