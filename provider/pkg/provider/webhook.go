@@ -254,5 +254,69 @@ func (wh *PulumiServiceWebhookResource) deleteWebhook(id string) error {
 }
 
 func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	return nil, errors.New("Read construct is not yet implemented")
+	inputs, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	if err != nil {
+		return nil, err
+	}
+
+	webhook, err := wh.getWebhook(req.Id)
+	if err != nil {
+		return &pulumirpc.ReadResponse{}, err
+	}
+
+	s := strings.Split(req.Id, "/")
+
+	webhookInput := PulumiServiceWebhookInput{
+		Active:           webhook.Active,
+		DisplayName:      webhook.DisplayName,
+		PayloadUrl:       webhook.PayloadUrl,
+		Secret:           webhook.Secret,
+		OrganizationName: s[0],
+		Name:             s[1],
+	}
+
+	properties, err := plugin.MarshalProperties(
+		webhookInput.ToPropertyMap(),
+		plugin.MarshalOptions{},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	inputProperties, err := plugin.MarshalProperties(
+		inputs,
+		plugin.MarshalOptions{},
+	)
+
+	return &pulumirpc.ReadResponse{
+		Id:         req.Id,
+		Properties: properties,
+		Inputs:     inputProperties,
+	}, nil
+}
+
+func (wh *PulumiServiceWebhookResource) getWebhook(id string) (*pulumiapi.Webhook, error) {
+	if len(id) == 0 {
+		return nil, errors.New("id must not be empty")
+	}
+
+	token, err := wh.config.getPulumiAccessToken()
+	if err != nil {
+		return nil, err
+	}
+
+	url, err := wh.config.getPulumiServiceUrl()
+	if err != nil {
+		return nil, err
+	}
+
+	s := strings.Split(id, "/")
+
+	c := pulumiapi.NewClient(*token, *url)
+	webhook, err := c.GetWebhook(s[0], s[1])
+	if err != nil {
+		return nil, err
+	}
+	return webhook, nil
 }
