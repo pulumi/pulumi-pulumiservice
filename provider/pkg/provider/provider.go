@@ -32,6 +32,7 @@ import (
 var PulumiResources = []PulumiServiceResource{
 	&PulumiServiceTeamResource{},
 	&PulumiServiceAccessTokenResource{},
+	&PulumiServiceWebhookResource{},
 }
 
 type PulumiServiceResource interface {

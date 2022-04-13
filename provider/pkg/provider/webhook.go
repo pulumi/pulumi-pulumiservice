@@ -1,7 +1,9 @@
 package provider
 
 import (
+	"errors"
 	"fmt"
+	"log"
 	"strings"
 
 	pbempty "github.com/golang/protobuf/ptypes/empty"
@@ -46,6 +48,10 @@ func (wh *PulumiServiceWebhookResource) ToPulumiServiceWebhookInput(inputMap res
 	}
 
 	if inputMap["payloadUrl"].HasValue() && inputMap["payloadUrl"].IsString() {
+		input.PayloadUrl = inputMap["payloadUrl"].StringValue()
+	}
+
+	if inputMap["secret"].HasValue() && inputMap["secret"].IsString() {
 		input.Secret = inputMap["secret"].StringValue()
 	}
 
@@ -75,13 +81,17 @@ func (wh *PulumiServiceWebhookResource) Create(req *pulumirpc.CreateRequest) (*p
 	}
 
 	inputsWebhook := wh.ToPulumiServiceWebhookInput(inputs)
+
 	webhookId, err := wh.createWebhook(inputsWebhook)
 	if err != nil {
 		return nil, err
 	}
 
+	s := strings.Split(*webhookId, "/")
+
 	outputStore := resource.PropertyMap{}
 	outputStore["__inputs"] = resource.NewObjectProperty(inputs)
+	outputStore["name"] = resource.NewPropertyValue(s[1])
 
 	outputProperties, err := plugin.MarshalProperties(
 		outputStore,
@@ -236,10 +246,16 @@ func (wh *PulumiServiceWebhookResource) deleteWebhook(id string) error {
 
 	s := strings.Split(id, "/")
 
+	log.Printf("org: %s | name: %s", s[0], s[1])
+
 	c := pulumiapi.NewClient(*token, *url)
-	err = c.DeleteTeam(s[0], s[1])
+	err = c.DeleteWebhook(s[0], s[1])
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
+	return nil, errors.New("Read construct is not yet implemented")
 }

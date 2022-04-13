@@ -8,6 +8,7 @@ import typing
 from .access_token import *
 from .provider import *
 from .team import *
+from .webhook import *
 
 # Make subpackages available:
 if typing.TYPE_CHECKING:
@@ -25,7 +26,8 @@ _utilities.register(
   "fqn": "pulumi_pulumiservice",
   "classes": {
    "pulumiservice:index:AccessToken": "AccessToken",
-   "pulumiservice:index:Team": "Team"
+   "pulumiservice:index:Team": "Team",
+   "pulumiservice:index:Webhook": "Webhook"
   }
  }
 ]
