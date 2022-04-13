@@ -1,4 +1,4 @@
-PROJECT_NAME := Pulumi Pulumi Service Resource Provider
+PROJECT_NAME := Pulumi Service Resource Provider
 
 PACK             := pulumiservice
 PACKDIR          := sdk
