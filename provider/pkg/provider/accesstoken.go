@@ -138,8 +138,6 @@ func (at *PulumiServiceAccessTokenResource) createAccessToken(input PulumiServic
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("Token: " + *token)
-	fmt.Println("URL: " + *url)
 
 	c := pulumiapi.NewClient(*token, *url)
 
