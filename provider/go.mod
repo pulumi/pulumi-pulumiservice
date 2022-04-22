@@ -1,4 +1,4 @@
-module github.com/pierskarsenbarg/pulumi-pulumiservice/provider
+module github.com/pulumi/pulumi-pulumi-service/provider
 
 go 1.16
 

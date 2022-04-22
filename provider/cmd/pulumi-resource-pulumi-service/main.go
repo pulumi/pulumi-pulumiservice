@@ -15,11 +15,11 @@
 package main
 
 import (
-	"github.com/pierskarsenbarg/pulumi-pulumiservice/provider/pkg/provider"
-	"github.com/pierskarsenbarg/pulumi-pulumiservice/provider/pkg/version"
+	"github.com/pulumi/pulumi-pulumi-service/provider/pkg/provider"
+	"github.com/pulumi/pulumi-pulumi-service/provider/pkg/version"
 )
 
-var providerName = "pulumiservice"
+var providerName = "pulumi-service"
 
 func main() {
 	provider.Serve(providerName, version.Version)

@@ -36,7 +36,7 @@ func (t *PulumiServiceAccessTokenResource) ToPulumiServiceAccessTokenInput(input
 }
 
 func (c PulumiServiceAccessTokenResource) Name() string {
-	return "pulumiservice:index:AccessToken"
+	return "pulumi-service:index:AccessToken"
 }
 
 func (c *PulumiServiceAccessTokenResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
@@ -138,6 +138,8 @@ func (at *PulumiServiceAccessTokenResource) createAccessToken(input PulumiServic
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println("Token: " + *token)
+	fmt.Println("URL: " + *url)
 
 	c := pulumiapi.NewClient(*token, *url)
 

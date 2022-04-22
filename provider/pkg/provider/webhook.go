@@ -62,7 +62,7 @@ func (wh *PulumiServiceWebhookResource) ToPulumiServiceWebhookInput(inputMap res
 }
 
 func (wh *PulumiServiceWebhookResource) Name() string {
-	return "pulumiservice:index:Webhook"
+	return "pulumi-service:index:Webhook"
 }
 
 func (wh *PulumiServiceWebhookResource) Configure(config PulumiServiceConfig) {

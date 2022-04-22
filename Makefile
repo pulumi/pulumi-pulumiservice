@@ -1,9 +1,9 @@
 PROJECT_NAME := Pulumi Service Resource Provider
 
-PACK             := pulumiservice
+PACK             := pulumi-service
 PACKDIR          := sdk
-PROJECT          := github.com/pierskarsenbarg/pulumi-pulumiservice
-NODE_MODULE_NAME := @pulumi/pulumiservice
+PROJECT          := github.com/pulumi/pulumi-pulumi-service
+NODE_MODULE_NAME := @pulumi/pulumi-service
 NUGET_PKG_NAME   := Pulumi.PulumiService
 
 PROVIDER        := pulumi-resource-${PACK}
@@ -12,7 +12,7 @@ VERSION         ?= $(shell pulumictl get version)
 PROVIDER_PATH   := provider
 VERSION_PATH     := ${PROVIDER_PATH}/pkg/version.Version
 
-SCHEMA_FILE     := provider/cmd/pulumi-resource-pulumiservice/schema.json
+SCHEMA_FILE     := provider/cmd/pulumi-resource-pulumi-service/schema.json
 GOPATH			:= $(shell go env GOPATH)
 
 WORKING_DIR     := $(shell pwd)
@@ -55,8 +55,8 @@ nodejs_sdk::
 	cd ${PACKDIR}/nodejs/ && \
 		yarn install && \
 		yarn run tsc
+	sed -i.bak -e 's/\$${VERSION}/$(VERSION)/g' ${PACKDIR}/nodejs/package.json
 	cp README.md LICENSE ${PACKDIR}/nodejs/package.json ${PACKDIR}/nodejs/yarn.lock ${PACKDIR}/nodejs/bin/
-	sed -i.bak 's/$${VERSION}/$(VERSION)/g' ${PACKDIR}/nodejs/bin/package.json
 
 python_sdk:: PYPI_VERSION := $(shell pulumictl get version --language python)
 python_sdk::

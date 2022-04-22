@@ -71,7 +71,7 @@ func (t *PulumiServiceTeamResource) ToPulumiServiceTeamInput(inputMap resource.P
 }
 
 func (t *PulumiServiceTeamResource) Name() string {
-	return "pulumiservice:index:Team"
+	return "pulumi-service:index:Team"
 }
 
 func (t *PulumiServiceTeamResource) Configure(config PulumiServiceConfig) {
