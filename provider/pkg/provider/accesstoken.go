@@ -36,7 +36,7 @@ func (t *PulumiServiceAccessTokenResource) ToPulumiServiceAccessTokenInput(input
 }
 
 func (c PulumiServiceAccessTokenResource) Name() string {
-	return "pulumiservice:index:AccessToken"
+	return "pulumi-service:index:AccessToken"
 }
 
 func (c *PulumiServiceAccessTokenResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {

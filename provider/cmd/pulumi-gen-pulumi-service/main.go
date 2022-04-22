@@ -22,7 +22,7 @@ import (
 	"os"
 	"path/filepath"
 
-	providerVersion "github.com/pierskarsenbarg/pulumi-pulumiservice/provider/pkg/version"
+	providerVersion "github.com/pulumi/pulumi-pulumi-service/provider/pkg/version"
 	dotnetgen "github.com/pulumi/pulumi/pkg/v3/codegen/dotnet"
 	gogen "github.com/pulumi/pulumi/pkg/v3/codegen/go"
 	nodejsgen "github.com/pulumi/pulumi/pkg/v3/codegen/nodejs"
