@@ -27,7 +27,7 @@ type AccessToken struct {
 	Description string `json:"description"`
 }
 
-type CreateTokenResponse struct {
+type createTokenResponse struct {
 	ID         string `json:"id"`
 	TokenValue string `json:"tokenValue"`
 }
@@ -43,7 +43,7 @@ func (c *Client) CreateAccessToken(ctx context.Context, description string) (*Ac
 		Description: description,
 	}
 
-	var createRes CreateTokenResponse
+	var createRes createTokenResponse
 
 	_, err := c.do(ctx, http.MethodPost, apiPath, createReq, &createRes)
 

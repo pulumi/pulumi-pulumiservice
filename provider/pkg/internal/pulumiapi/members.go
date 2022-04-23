@@ -86,7 +86,7 @@ func (c *Client) ListOrgMembers(ctx context.Context, orgName string) (*Members, 
 	var members Members
 	_, err = c.sendRequest(req, &members)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch organization members: %w", err)
+		return nil, fmt.Errorf("failed to list organization members: %w", err)
 	}
 
 	return &members, nil

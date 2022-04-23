@@ -7,11 +7,10 @@ import (
 	"path"
 )
 
-type Stack struct {
-	OrgName     string            `json:"orgName"`
-	ProjectName string            `json:"projectName"`
-	StackName   string            `json:"stackName"`
-	Tags        map[string]string `json:"tags"`
+type StackName struct {
+	OrgName     string `json:"orgName"`
+	ProjectName string `json:"projectName"`
+	StackName   string `json:"stackName"`
 }
 
 type StackTag struct {
@@ -19,9 +18,9 @@ type StackTag struct {
 	Value string `json:"value"`
 }
 
-func (c *Client) SetTags(ctx context.Context, stack Stack) error {
+func (c *Client) SetTags(ctx context.Context, stack StackName, tags map[string]string) error {
 	apiPath := path.Join("stacks", stack.OrgName, stack.ProjectName, stack.StackName, "tags")
-	for name, value := range stack.Tags {
+	for name, value := range tags {
 		tag := StackTag{
 			Name:  name,
 			Value: value,
@@ -35,9 +34,9 @@ func (c *Client) SetTags(ctx context.Context, stack Stack) error {
 	return nil
 }
 
-func (c *Client) DeleteTag(ctx context.Context, stack Stack, tagName string) error {
+func (c *Client) DeleteStackTag(ctx context.Context, stackName StackName, tagName string) error {
 	apiPath := path.Join(
-		"stacks", stack.OrgName, stack.ProjectName, stack.StackName, "tags", tagName,
+		"stacks", stackName.OrgName, stackName.ProjectName, stackName.StackName, "tags", tagName,
 	)
 	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
 	if err != nil {

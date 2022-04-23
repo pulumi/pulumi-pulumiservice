@@ -46,7 +46,7 @@ type updateWebhookRequest struct {
 	Active           bool   `json:"active"`
 }
 
-func (c *Client) CreateWebhook(ctx context.Context, orgName, displayName, payLoadUrl, secret string, active bool) (*Webhook, error) {
+func (c *Client) CreateWebhook(ctx context.Context, orgName, displayName, payloadURL, secret string, active bool) (*Webhook, error) {
 
 	if len(orgName) == 0 {
 		return nil, errors.New("orgname must not be empty")
@@ -56,7 +56,7 @@ func (c *Client) CreateWebhook(ctx context.Context, orgName, displayName, payLoa
 		return nil, errors.New("displayname must not be empty")
 	}
 
-	if len(payLoadUrl) == 0 {
+	if len(payloadURL) == 0 {
 		return nil, errors.New("payloadurl must not be empty")
 	}
 
@@ -65,7 +65,7 @@ func (c *Client) CreateWebhook(ctx context.Context, orgName, displayName, payLoa
 	createWebhookReq := createWebhookRequest{
 		OrganizationName: orgName,
 		DisplayName:      displayName,
-		PayloadURL:       payLoadUrl,
+		PayloadURL:       payloadURL,
 		Secret:           secret,
 		Active:           active,
 	}

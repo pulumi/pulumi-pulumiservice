@@ -22,44 +22,38 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"time"
 )
 
 type Client struct {
-	c       *http.Client
-	token   string
-	baseurl url.URL
+	httpClient *http.Client
+	token      string
+	baseurl    *url.URL
 }
 
-func NewClient(args ...string) *Client {
-	c := &http.Client{Timeout: time.Minute}
+func NewClient(client *http.Client, token, URL string) (*Client, error) {
 
-	var token string
-
-	var baseURL = url.URL{
+	var baseURL = &url.URL{
 		Scheme: "https",
 		Host:   "api.pulumi.com",
 		Path:   "/api/",
 	}
-
-	if len(args) == 0 {
-		token = ""
-	} else {
-		token = args[0]
-	}
-
-	if len(args) == 2 {
-		token = args[0]
-		baseURL.Host = args[1]
+	if len(URL) > 0 {
+		parsedURL, err := url.Parse(URL)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse URL (%q): %w", URL, err)
+		}
+		baseURL = parsedURL
+		baseURL.Path = "/api/"
 	}
 
 	return &Client{
-		c:       c,
-		token:   token,
-		baseurl: baseURL,
-	}
+		httpClient: client,
+		token:      token,
+		baseurl:    baseURL,
+	}, nil
 }
 
+// createRequest creates a *http.Request with standard headers set and reqBody marshalled into json.
 func (c *Client) createRequest(ctx context.Context, method, path string, reqBody interface{}) (*http.Request, error) {
 	var reqBodyReader io.Reader
 	if reqBody != nil {
@@ -83,10 +77,12 @@ func (c *Client) createRequest(ctx context.Context, method, path string, reqBody
 	return req, nil
 }
 
+// sendRequest executes req and unmarshals response json into resBody
+// returns attempts to unmarshal response into errorResponse if statusCode not 2XX
 func (c *Client) sendRequest(req *http.Request, resBody interface{}) (*http.Response, error) {
-	res, err := c.c.Do(req)
+	res, err := c.httpClient.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("failed to make request: %w", err)
+		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
 	defer res.Body.Close()
 	body, err := ioutil.ReadAll(res.Body)
@@ -101,6 +97,9 @@ func (c *Client) sendRequest(req *http.Request, resBody interface{}) (*http.Resp
 		if err != nil {
 			return res, fmt.Errorf("failed to parse response body, status code %d: %w", res.StatusCode, err)
 		}
+		if errRes.StatusCode == 0 {
+			errRes.StatusCode = res.StatusCode
+		}
 		return res, &errRes
 	}
 	if resBody != nil {
@@ -114,7 +113,7 @@ func (c *Client) sendRequest(req *http.Request, resBody interface{}) (*http.Resp
 
 // do execute an http request to the pulumi service at the configured url
 // Marshals reqBody and resBody to/from JSON. Applies appropriate headers as well
-// Returns statusCode or error. If err != nil, statusCode == 0
+// Returns http.Response, but Body will be closed
 func (c *Client) do(ctx context.Context, method, path string, reqBody interface{}, resBody interface{}) (*http.Response, error) {
 	req, err := c.createRequest(ctx, method, path, reqBody)
 	if err != nil {

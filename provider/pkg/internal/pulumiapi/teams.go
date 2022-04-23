@@ -66,13 +66,10 @@ func (c *Client) ListTeams(ctx context.Context, orgName string) ([]Team, error) 
 	apiUrl := path.Join("orgs", orgName, "teams")
 
 	var teamArray Teams
-	res, err := c.do(ctx, http.MethodGet, apiUrl, nil, &teamArray)
+	_, err := c.do(ctx, http.MethodGet, apiUrl, nil, &teamArray)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to list teams for %q: %w", orgName, err)
-	}
-	if !ok(res.StatusCode) {
-		return nil, fmt.Errorf("api returned %d status code", res.StatusCode)
 	}
 	return teamArray.Teams, nil
 }
@@ -196,7 +193,7 @@ func (c *Client) updateTeamMembership(ctx context.Context, orgName, teamName, us
 		return errors.New("value must be `add` or `remove`")
 	}
 
-	apiPath := path.Join("orgs", orgName, "teams", "teamName")
+	apiPath := path.Join("orgs", orgName, "teams", teamName)
 
 	updateMembershipReq := updateTeamMembershipRequest{
 		MemberAction: addOrRemove,
