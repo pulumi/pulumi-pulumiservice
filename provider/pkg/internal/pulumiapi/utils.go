@@ -13,13 +13,15 @@
 // limitations under the License.
 package pulumiapi
 
-import "fmt"
-
-type ErrorResponse struct {
-	StatusCode int `json:"code"`
-	Message    string
+func contains(s []string, e string) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
 }
 
-func (err *ErrorResponse) Error() string {
-	return fmt.Sprintf("%d API Error: %s", err.StatusCode, err.Message)
+func ok(code int) bool {
+	return code >= 200 && code < 300
 }
