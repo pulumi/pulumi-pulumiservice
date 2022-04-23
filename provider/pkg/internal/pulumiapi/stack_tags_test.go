@@ -8,40 +8,70 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+<<<<<<< HEAD
 func TestCreateStackTags(t *testing.T) {
+=======
+func TestSetStackTags(t *testing.T) {
+>>>>>>> d06708e (Add tests for api client library)
 	tagName := "tagName"
 	tagValue := "tagValue"
 	tag := StackTag{
 		Name:  tagName,
 		Value: tagValue,
 	}
+<<<<<<< HEAD
 	stackName := StackName{
+=======
+	stack := StackName{
+>>>>>>> d06708e (Add tests for api client library)
 		OrgName:     "organization",
 		ProjectName: "project",
 		StackName:   "stack",
 	}
+<<<<<<< HEAD
 	t.Run("Happy Path", func(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqPath:   fmt.Sprintf("/api/stacks/%s/%s/%s/tags", stackName.OrgName, stackName.ProjectName, stackName.StackName),
+=======
+	tagMap := map[string]string{
+		tagName: tagValue,
+	}
+	t.Run("Happy Path", func(t *testing.T) {
+		c, cleanup := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodPost,
+			ExpectedReqPath:   fmt.Sprintf("/api/stacks/%s/%s/%s/tags", stack.OrgName, stack.ProjectName, stack.StackName),
+>>>>>>> d06708e (Add tests for api client library)
 			ExpectedReqBody:   tag,
 			ResponseCode:      http.StatusNoContent,
 		})
 		defer cleanup()
+<<<<<<< HEAD
 		assert.NoError(t, c.CreateTag(ctx, stackName, tag))
+=======
+		assert.NoError(t, c.SetTags(ctx, stack, tagMap))
+>>>>>>> d06708e (Add tests for api client library)
 	})
 
 	t.Run("Error", func(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
+<<<<<<< HEAD
 			ExpectedReqPath:   fmt.Sprintf("/api/stacks/%s/%s/%s/tags", stackName.OrgName, stackName.ProjectName, stackName.StackName),
+=======
+			ExpectedReqPath:   fmt.Sprintf("/api/stacks/%s/%s/%s/tags", stack.OrgName, stack.ProjectName, stack.StackName),
+>>>>>>> d06708e (Add tests for api client library)
 			ResponseCode:      401,
 			ResponseBody: errorResponse{
 				Message: "unauthorized",
 			},
 		})
 		defer cleanup()
+<<<<<<< HEAD
 		err := c.CreateTag(ctx, stackName, tag)
+=======
+		err := c.SetTags(ctx, stack, tagMap)
+>>>>>>> d06708e (Add tests for api client library)
 		assert.EqualError(t, err, "failed to create tag (tagName=tagValue): 401 API error: unauthorized")
 	})
 }

@@ -41,7 +41,11 @@ func TestCreateWebhook(t *testing.T) {
 		assert.Equal(t, webhook, *actualWebhook)
 	})
 
+<<<<<<< HEAD
 	t.Run("Error", func(t *testing.T) {
+=======
+	t.Run("error", func(t *testing.T) {
+>>>>>>> d06708e (Add tests for api client library)
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqPath:   "/api/orgs/an-organization/hooks",
