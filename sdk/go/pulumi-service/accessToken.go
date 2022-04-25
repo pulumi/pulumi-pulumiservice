@@ -7,29 +7,38 @@ import (
 	"context"
 	"reflect"
 
+	"github.com/pkg/errors"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
+// Access tokens allow a user to authenticate against the Pulumi Service
 type AccessToken struct {
 	pulumi.CustomResourceState
 
+	// Description of the access token.
+	Description pulumi.StringPtrOutput `pulumi:"description"`
+	// The token identifier.
 	TokenId pulumi.StringPtrOutput `pulumi:"tokenId"`
-	Value   pulumi.StringPtrOutput `pulumi:"value"`
+	// The token's value.
+	Value pulumi.StringPtrOutput `pulumi:"value"`
 }
 
 // NewAccessToken registers a new resource with the given unique name, arguments, and options.
 func NewAccessToken(ctx *pulumi.Context,
 	name string, args *AccessTokenArgs, opts ...pulumi.ResourceOption) (*AccessToken, error) {
 	if args == nil {
-		args = &AccessTokenArgs{}
+		return nil, errors.New("missing one or more required arguments")
 	}
 
+	if args.Description == nil {
+		return nil, errors.New("invalid value for required argument 'Description'")
+	}
 	secrets := pulumi.AdditionalSecretOutputs([]string{
 		"value",
 	})
 	opts = append(opts, secrets)
 	var resource AccessToken
-	err := ctx.RegisterResource("pulumiservice:index:AccessToken", name, args, &resource, opts...)
+	err := ctx.RegisterResource("pulumi-service:index:AccessToken", name, args, &resource, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +50,7 @@ func NewAccessToken(ctx *pulumi.Context,
 func GetAccessToken(ctx *pulumi.Context,
 	name string, id pulumi.IDInput, state *AccessTokenState, opts ...pulumi.ResourceOption) (*AccessToken, error) {
 	var resource AccessToken
-	err := ctx.ReadResource("pulumiservice:index:AccessToken", name, id, state, &resource, opts...)
+	err := ctx.ReadResource("pulumi-service:index:AccessToken", name, id, state, &resource, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -60,12 +69,14 @@ func (AccessTokenState) ElementType() reflect.Type {
 }
 
 type accessTokenArgs struct {
-	Description *string `pulumi:"description"`
+	// Description of the access token.
+	Description string `pulumi:"description"`
 }
 
 // The set of arguments for constructing a AccessToken resource.
 type AccessTokenArgs struct {
-	Description pulumi.StringPtrInput
+	// Description of the access token.
+	Description pulumi.StringInput
 }
 
 func (AccessTokenArgs) ElementType() reflect.Type {
