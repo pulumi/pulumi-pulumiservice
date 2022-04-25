@@ -10,7 +10,7 @@ from .. import _utilities
 
 import types
 
-__config__ = pulumi.Config('pulumiservice')
+__config__ = pulumi.Config('pulumi-service')
 
 
 class _ExportableConfig(types.ModuleType):

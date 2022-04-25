@@ -13,64 +13,80 @@ __all__ = ['WebhookArgs', 'Webhook']
 @pulumi.input_type
 class WebhookArgs:
     def __init__(__self__, *,
-                 active: Optional[pulumi.Input[bool]] = None,
-                 display_name: Optional[pulumi.Input[str]] = None,
-                 organization_name: Optional[pulumi.Input[str]] = None,
-                 payload_url: Optional[pulumi.Input[str]] = None,
+                 active: pulumi.Input[bool],
+                 display_name: pulumi.Input[str],
+                 organization_name: pulumi.Input[str],
+                 payload_url: pulumi.Input[str],
                  secret: Optional[pulumi.Input[str]] = None):
         """
         The set of arguments for constructing a Webhook resource.
+        :param pulumi.Input[bool] active: Indicates whether this webhook is enabled or not.
+        :param pulumi.Input[str] display_name: The friendly name displayed in the Pulumi Service.
+        :param pulumi.Input[str] organization_name: Name of the organization.
+        :param pulumi.Input[str] payload_url: URL to send request to.
+        :param pulumi.Input[str] secret: Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.
         """
-        if active is not None:
-            pulumi.set(__self__, "active", active)
-        if display_name is not None:
-            pulumi.set(__self__, "display_name", display_name)
-        if organization_name is not None:
-            pulumi.set(__self__, "organization_name", organization_name)
-        if payload_url is not None:
-            pulumi.set(__self__, "payload_url", payload_url)
+        pulumi.set(__self__, "active", active)
+        pulumi.set(__self__, "display_name", display_name)
+        pulumi.set(__self__, "organization_name", organization_name)
+        pulumi.set(__self__, "payload_url", payload_url)
         if secret is not None:
             pulumi.set(__self__, "secret", secret)
 
     @property
     @pulumi.getter
-    def active(self) -> Optional[pulumi.Input[bool]]:
+    def active(self) -> pulumi.Input[bool]:
+        """
+        Indicates whether this webhook is enabled or not.
+        """
         return pulumi.get(self, "active")
 
     @active.setter
-    def active(self, value: Optional[pulumi.Input[bool]]):
+    def active(self, value: pulumi.Input[bool]):
         pulumi.set(self, "active", value)
 
     @property
     @pulumi.getter(name="displayName")
-    def display_name(self) -> Optional[pulumi.Input[str]]:
+    def display_name(self) -> pulumi.Input[str]:
+        """
+        The friendly name displayed in the Pulumi Service.
+        """
         return pulumi.get(self, "display_name")
 
     @display_name.setter
-    def display_name(self, value: Optional[pulumi.Input[str]]):
+    def display_name(self, value: pulumi.Input[str]):
         pulumi.set(self, "display_name", value)
 
     @property
     @pulumi.getter(name="organizationName")
-    def organization_name(self) -> Optional[pulumi.Input[str]]:
+    def organization_name(self) -> pulumi.Input[str]:
+        """
+        Name of the organization.
+        """
         return pulumi.get(self, "organization_name")
 
     @organization_name.setter
-    def organization_name(self, value: Optional[pulumi.Input[str]]):
+    def organization_name(self, value: pulumi.Input[str]):
         pulumi.set(self, "organization_name", value)
 
     @property
     @pulumi.getter(name="payloadUrl")
-    def payload_url(self) -> Optional[pulumi.Input[str]]:
+    def payload_url(self) -> pulumi.Input[str]:
+        """
+        URL to send request to.
+        """
         return pulumi.get(self, "payload_url")
 
     @payload_url.setter
-    def payload_url(self, value: Optional[pulumi.Input[str]]):
+    def payload_url(self, value: pulumi.Input[str]):
         pulumi.set(self, "payload_url", value)
 
     @property
     @pulumi.getter
     def secret(self) -> Optional[pulumi.Input[str]]:
+        """
+        Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.
+        """
         return pulumi.get(self, "secret")
 
     @secret.setter
@@ -90,18 +106,25 @@ class Webhook(pulumi.CustomResource):
                  secret: Optional[pulumi.Input[str]] = None,
                  __props__=None):
         """
-        Create a Webhook resource with the given unique name, props, and options.
+        Pulumi Webhooks allow you to notify external services of events happening within your Pulumi organization or stack. For example, you can trigger a notification whenever a stack is updated. Whenever an event occurs, Pulumi will send an HTTP POST request to all registered webhooks. The webhook can then be used to emit some notification, start running integration tests, or even update additional stacks.
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
+        :param pulumi.Input[bool] active: Indicates whether this webhook is enabled or not.
+        :param pulumi.Input[str] display_name: The friendly name displayed in the Pulumi Service.
+        :param pulumi.Input[str] organization_name: Name of the organization.
+        :param pulumi.Input[str] payload_url: URL to send request to.
+        :param pulumi.Input[str] secret: Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.
         """
         ...
     @overload
     def __init__(__self__,
                  resource_name: str,
-                 args: Optional[WebhookArgs] = None,
+                 args: WebhookArgs,
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
-        Create a Webhook resource with the given unique name, props, and options.
+        Pulumi Webhooks allow you to notify external services of events happening within your Pulumi organization or stack. For example, you can trigger a notification whenever a stack is updated. Whenever an event occurs, Pulumi will send an HTTP POST request to all registered webhooks. The webhook can then be used to emit some notification, start running integration tests, or even update additional stacks.
+
         :param str resource_name: The name of the resource.
         :param WebhookArgs args: The arguments to use to populate this resource's properties.
         :param pulumi.ResourceOptions opts: Options for the resource.
@@ -134,16 +157,24 @@ class Webhook(pulumi.CustomResource):
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
             __props__ = WebhookArgs.__new__(WebhookArgs)
 
+            if active is None and not opts.urn:
+                raise TypeError("Missing required property 'active'")
             __props__.__dict__["active"] = active
+            if display_name is None and not opts.urn:
+                raise TypeError("Missing required property 'display_name'")
             __props__.__dict__["display_name"] = display_name
+            if organization_name is None and not opts.urn:
+                raise TypeError("Missing required property 'organization_name'")
             __props__.__dict__["organization_name"] = organization_name
+            if payload_url is None and not opts.urn:
+                raise TypeError("Missing required property 'payload_url'")
             __props__.__dict__["payload_url"] = payload_url
             __props__.__dict__["secret"] = None if secret is None else pulumi.Output.secret(secret)
             __props__.__dict__["name"] = None
         secret_opts = pulumi.ResourceOptions(additional_secret_outputs=["secret"])
         opts = pulumi.ResourceOptions.merge(opts, secret_opts)
         super(Webhook, __self__).__init__(
-            'pulumiservice:index:Webhook',
+            'pulumi-service:index:Webhook',
             resource_name,
             __props__,
             opts)
@@ -175,30 +206,48 @@ class Webhook(pulumi.CustomResource):
     @property
     @pulumi.getter
     def active(self) -> pulumi.Output[Optional[bool]]:
+        """
+        Indicates whether this webhook is enabled or not.
+        """
         return pulumi.get(self, "active")
 
     @property
     @pulumi.getter(name="displayName")
     def display_name(self) -> pulumi.Output[Optional[str]]:
+        """
+        The friendly name displayed in the Pulumi Service.
+        """
         return pulumi.get(self, "display_name")
 
     @property
     @pulumi.getter
     def name(self) -> pulumi.Output[Optional[str]]:
+        """
+        Webhook identifier generated by pulumi service.
+        """
         return pulumi.get(self, "name")
 
     @property
     @pulumi.getter(name="organizationName")
     def organization_name(self) -> pulumi.Output[Optional[str]]:
+        """
+        Name of the organization.
+        """
         return pulumi.get(self, "organization_name")
 
     @property
     @pulumi.getter(name="payloadUrl")
     def payload_url(self) -> pulumi.Output[Optional[str]]:
+        """
+        URL to send request to.
+        """
         return pulumi.get(self, "payload_url")
 
     @property
     @pulumi.getter
     def secret(self) -> pulumi.Output[Optional[str]]:
+        """
+        Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.
+        """
         return pulumi.get(self, "secret")
 
