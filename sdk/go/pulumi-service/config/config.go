@@ -9,5 +9,5 @@ import (
 )
 
 func GetAccessToken(ctx *pulumi.Context) string {
-	return config.Get(ctx, "pulumiservice:accessToken")
+	return config.Get(ctx, "pulumi-service:accessToken")
 }

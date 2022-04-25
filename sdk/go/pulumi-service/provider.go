@@ -21,8 +21,11 @@ func NewProvider(ctx *pulumi.Context,
 		args = &ProviderArgs{}
 	}
 
+	if isZero(args.AccessToken) {
+		args.AccessToken = pulumi.StringPtr(getEnvOrDefault("", nil, "PULUMI_ACCESS_TOKEN").(string))
+	}
 	var resource Provider
-	err := ctx.RegisterResource("pulumi:providers:pulumiservice", name, args, &resource, opts...)
+	err := ctx.RegisterResource("pulumi:providers:pulumi-service", name, args, &resource, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -30,11 +33,13 @@ func NewProvider(ctx *pulumi.Context,
 }
 
 type providerArgs struct {
+	// Access Token to authenticate with Pulumi Service.
 	AccessToken *string `pulumi:"accessToken"`
 }
 
 // The set of arguments for constructing a Provider resource.
 type ProviderArgs struct {
+	// Access Token to authenticate with Pulumi Service.
 	AccessToken pulumi.StringPtrInput
 }
 

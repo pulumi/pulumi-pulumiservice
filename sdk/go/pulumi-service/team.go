@@ -7,29 +7,46 @@ import (
 	"context"
 	"reflect"
 
+	"github.com/pkg/errors"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
+// The Pulumi Service offers role-based access control (RBAC) using teams. Teams allow organization admins to assign a set of stack permissions to a group of users.
 type Team struct {
 	pulumi.CustomResourceState
 
-	Description      pulumi.StringPtrOutput   `pulumi:"description"`
-	DisplayName      pulumi.StringPtrOutput   `pulumi:"displayName"`
-	Members          pulumi.StringArrayOutput `pulumi:"members"`
-	Name             pulumi.StringPtrOutput   `pulumi:"name"`
-	OrganizationName pulumi.StringPtrOutput   `pulumi:"organizationName"`
-	Type             pulumi.StringPtrOutput   `pulumi:"type"`
+	// Optional. Team description.
+	Description pulumi.StringPtrOutput `pulumi:"description"`
+	// Optional. Team display name.
+	DisplayName pulumi.StringPtrOutput `pulumi:"displayName"`
+	// List of team members.
+	Members pulumi.StringArrayOutput `pulumi:"members"`
+	// The team name.
+	Name pulumi.StringPtrOutput `pulumi:"name"`
+	// The organization's name.
+	OrganizationName pulumi.StringPtrOutput `pulumi:"organizationName"`
+	// The type of team. Must be either `pulumi` or `github`.
+	Type pulumi.StringPtrOutput `pulumi:"type"`
 }
 
 // NewTeam registers a new resource with the given unique name, arguments, and options.
 func NewTeam(ctx *pulumi.Context,
 	name string, args *TeamArgs, opts ...pulumi.ResourceOption) (*Team, error) {
 	if args == nil {
-		args = &TeamArgs{}
+		return nil, errors.New("missing one or more required arguments")
 	}
 
+	if args.Name == nil {
+		return nil, errors.New("invalid value for required argument 'Name'")
+	}
+	if args.OrganizationName == nil {
+		return nil, errors.New("invalid value for required argument 'OrganizationName'")
+	}
+	if args.Type == nil {
+		return nil, errors.New("invalid value for required argument 'Type'")
+	}
 	var resource Team
-	err := ctx.RegisterResource("pulumiservice:index:Team", name, args, &resource, opts...)
+	err := ctx.RegisterResource("pulumi-service:index:Team", name, args, &resource, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +58,7 @@ func NewTeam(ctx *pulumi.Context,
 func GetTeam(ctx *pulumi.Context,
 	name string, id pulumi.IDInput, state *TeamState, opts ...pulumi.ResourceOption) (*Team, error) {
 	var resource Team
-	err := ctx.ReadResource("pulumiservice:index:Team", name, id, state, &resource, opts...)
+	err := ctx.ReadResource("pulumi-service:index:Team", name, id, state, &resource, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -60,22 +77,34 @@ func (TeamState) ElementType() reflect.Type {
 }
 
 type teamArgs struct {
-	Description      *string  `pulumi:"description"`
-	DisplayName      *string  `pulumi:"displayName"`
-	Members          []string `pulumi:"members"`
-	Name             *string  `pulumi:"name"`
-	OrganizationName *string  `pulumi:"organizationName"`
-	Type             *string  `pulumi:"type"`
+	// Optional. Team description.
+	Description *string `pulumi:"description"`
+	// Optional. Team display name.
+	DisplayName *string `pulumi:"displayName"`
+	// List of team members.
+	Members []string `pulumi:"members"`
+	// The team name.
+	Name string `pulumi:"name"`
+	// The organization's name.
+	OrganizationName string `pulumi:"organizationName"`
+	// The type of team. Must be either `pulumi` or `github`.
+	Type string `pulumi:"type"`
 }
 
 // The set of arguments for constructing a Team resource.
 type TeamArgs struct {
-	Description      pulumi.StringPtrInput
-	DisplayName      pulumi.StringPtrInput
-	Members          pulumi.StringArrayInput
-	Name             pulumi.StringPtrInput
-	OrganizationName pulumi.StringPtrInput
-	Type             pulumi.StringPtrInput
+	// Optional. Team description.
+	Description pulumi.StringPtrInput
+	// Optional. Team display name.
+	DisplayName pulumi.StringPtrInput
+	// List of team members.
+	Members pulumi.StringArrayInput
+	// The team name.
+	Name pulumi.StringInput
+	// The organization's name.
+	OrganizationName pulumi.StringInput
+	// The type of team. Must be either `pulumi` or `github`.
+	Type pulumi.StringInput
 }
 
 func (TeamArgs) ElementType() reflect.Type {
