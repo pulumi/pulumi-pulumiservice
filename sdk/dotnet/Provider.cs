@@ -7,9 +7,9 @@ using System.Collections.Immutable;
 using System.Threading.Tasks;
 using Pulumi.Serialization;
 
-namespace Pulumi.Pulumiservice
+namespace Pulumi.PulumiService
 {
-    [PulumiserviceResourceType("pulumi:providers:pulumiservice")]
+    [PulumiServiceResourceType("pulumi:providers:pulumi-service")]
     public partial class Provider : Pulumi.ProviderResource
     {
         /// <summary>
@@ -20,7 +20,7 @@ namespace Pulumi.Pulumiservice
         /// <param name="args">The arguments used to populate this resource's properties</param>
         /// <param name="options">A bag of options that control this resource's behavior</param>
         public Provider(string name, ProviderArgs? args = null, CustomResourceOptions? options = null)
-            : base("pulumiservice", name, args ?? new ProviderArgs(), MakeResourceOptions(options, ""))
+            : base("pulumi-service", name, args ?? new ProviderArgs(), MakeResourceOptions(options, ""))
         {
         }
 
@@ -39,11 +39,15 @@ namespace Pulumi.Pulumiservice
 
     public sealed class ProviderArgs : Pulumi.ResourceArgs
     {
+        /// <summary>
+        /// Access Token to authenticate with Pulumi Service.
+        /// </summary>
         [Input("accessToken")]
         public Input<string>? AccessToken { get; set; }
 
         public ProviderArgs()
         {
+            AccessToken = Utilities.GetEnv("PULUMI_ACCESS_TOKEN") ?? "";
         }
     }
 }

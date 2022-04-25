@@ -7,14 +7,29 @@ using System.Collections.Immutable;
 using System.Threading.Tasks;
 using Pulumi.Serialization;
 
-namespace Pulumi.Pulumiservice
+namespace Pulumi.PulumiService
 {
-    [PulumiserviceResourceType("pulumiservice:index:AccessToken")]
+    /// <summary>
+    /// Access tokens allow a user to authenticate against the Pulumi Service
+    /// </summary>
+    [PulumiServiceResourceType("pulumi-service:index:AccessToken")]
     public partial class AccessToken : Pulumi.CustomResource
     {
+        /// <summary>
+        /// Description of the access token.
+        /// </summary>
+        [Output("description")]
+        public Output<string?> Description { get; private set; } = null!;
+
+        /// <summary>
+        /// The token identifier.
+        /// </summary>
         [Output("tokenId")]
         public Output<string?> TokenId { get; private set; } = null!;
 
+        /// <summary>
+        /// The token's value.
+        /// </summary>
         [Output("value")]
         public Output<string?> Value { get; private set; } = null!;
 
@@ -26,13 +41,13 @@ namespace Pulumi.Pulumiservice
         /// <param name="name">The unique name of the resource</param>
         /// <param name="args">The arguments used to populate this resource's properties</param>
         /// <param name="options">A bag of options that control this resource's behavior</param>
-        public AccessToken(string name, AccessTokenArgs? args = null, CustomResourceOptions? options = null)
-            : base("pulumiservice:index:AccessToken", name, args ?? new AccessTokenArgs(), MakeResourceOptions(options, ""))
+        public AccessToken(string name, AccessTokenArgs args, CustomResourceOptions? options = null)
+            : base("pulumi-service:index:AccessToken", name, args ?? new AccessTokenArgs(), MakeResourceOptions(options, ""))
         {
         }
 
         private AccessToken(string name, Input<string> id, CustomResourceOptions? options = null)
-            : base("pulumiservice:index:AccessToken", name, null, MakeResourceOptions(options, id))
+            : base("pulumi-service:index:AccessToken", name, null, MakeResourceOptions(options, id))
         {
         }
 
@@ -67,8 +82,11 @@ namespace Pulumi.Pulumiservice
 
     public sealed class AccessTokenArgs : Pulumi.ResourceArgs
     {
-        [Input("description")]
-        public Input<string>? Description { get; set; }
+        /// <summary>
+        /// Description of the access token.
+        /// </summary>
+        [Input("description", required: true)]
+        public Input<string> Description { get; set; } = null!;
 
         public AccessTokenArgs()
         {

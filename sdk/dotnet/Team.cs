@@ -7,26 +7,47 @@ using System.Collections.Immutable;
 using System.Threading.Tasks;
 using Pulumi.Serialization;
 
-namespace Pulumi.Pulumiservice
+namespace Pulumi.PulumiService
 {
-    [PulumiserviceResourceType("pulumiservice:index:Team")]
+    /// <summary>
+    /// The Pulumi Service offers role-based access control (RBAC) using teams. Teams allow organization admins to assign a set of stack permissions to a group of users.
+    /// </summary>
+    [PulumiServiceResourceType("pulumi-service:index:Team")]
     public partial class Team : Pulumi.CustomResource
     {
+        /// <summary>
+        /// Optional. Team description.
+        /// </summary>
         [Output("description")]
         public Output<string?> Description { get; private set; } = null!;
 
+        /// <summary>
+        /// Optional. Team display name.
+        /// </summary>
         [Output("displayName")]
         public Output<string?> DisplayName { get; private set; } = null!;
 
+        /// <summary>
+        /// List of team members.
+        /// </summary>
         [Output("members")]
         public Output<ImmutableArray<string>> Members { get; private set; } = null!;
 
+        /// <summary>
+        /// The team name.
+        /// </summary>
         [Output("name")]
         public Output<string?> Name { get; private set; } = null!;
 
+        /// <summary>
+        /// The organization's name.
+        /// </summary>
         [Output("organizationName")]
         public Output<string?> OrganizationName { get; private set; } = null!;
 
+        /// <summary>
+        /// The type of team. Must be either `pulumi` or `github`.
+        /// </summary>
         [Output("type")]
         public Output<string?> Type { get; private set; } = null!;
 
@@ -38,13 +59,13 @@ namespace Pulumi.Pulumiservice
         /// <param name="name">The unique name of the resource</param>
         /// <param name="args">The arguments used to populate this resource's properties</param>
         /// <param name="options">A bag of options that control this resource's behavior</param>
-        public Team(string name, TeamArgs? args = null, CustomResourceOptions? options = null)
-            : base("pulumiservice:index:Team", name, args ?? new TeamArgs(), MakeResourceOptions(options, ""))
+        public Team(string name, TeamArgs args, CustomResourceOptions? options = null)
+            : base("pulumi-service:index:Team", name, args ?? new TeamArgs(), MakeResourceOptions(options, ""))
         {
         }
 
         private Team(string name, Input<string> id, CustomResourceOptions? options = null)
-            : base("pulumiservice:index:Team", name, null, MakeResourceOptions(options, id))
+            : base("pulumi-service:index:Team", name, null, MakeResourceOptions(options, id))
         {
         }
 
@@ -75,28 +96,47 @@ namespace Pulumi.Pulumiservice
 
     public sealed class TeamArgs : Pulumi.ResourceArgs
     {
+        /// <summary>
+        /// Optional. Team description.
+        /// </summary>
         [Input("description")]
         public Input<string>? Description { get; set; }
 
+        /// <summary>
+        /// Optional. Team display name.
+        /// </summary>
         [Input("displayName")]
         public Input<string>? DisplayName { get; set; }
 
         [Input("members")]
         private InputList<string>? _members;
+
+        /// <summary>
+        /// List of team members.
+        /// </summary>
         public InputList<string> Members
         {
             get => _members ?? (_members = new InputList<string>());
             set => _members = value;
         }
 
-        [Input("name")]
-        public Input<string>? Name { get; set; }
+        /// <summary>
+        /// The team name.
+        /// </summary>
+        [Input("name", required: true)]
+        public Input<string> Name { get; set; } = null!;
 
-        [Input("organizationName")]
-        public Input<string>? OrganizationName { get; set; }
+        /// <summary>
+        /// The organization's name.
+        /// </summary>
+        [Input("organizationName", required: true)]
+        public Input<string> OrganizationName { get; set; } = null!;
 
-        [Input("type")]
-        public Input<string>? Type { get; set; }
+        /// <summary>
+        /// The type of team. Must be either `pulumi` or `github`.
+        /// </summary>
+        [Input("type", required: true)]
+        public Input<string> Type { get; set; } = null!;
 
         public TeamArgs()
         {
