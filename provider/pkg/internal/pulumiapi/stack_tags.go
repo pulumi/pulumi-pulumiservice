@@ -19,6 +19,7 @@ type StackTag struct {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 func (c *Client) CreateTag(ctx context.Context, stack StackName, tag StackTag) error {
 	apiPath := path.Join("stacks", stack.OrgName, stack.ProjectName, stack.StackName, "tags")
 	_, err := c.do(ctx, http.MethodPost, apiPath, tag, nil)
@@ -38,6 +39,13 @@ func (c *Client) SetTags(ctx context.Context, stack StackName, tags map[string]s
 		}
 
 >>>>>>> d06708e (Add tests for api client library)
+=======
+func (c *Client) CreateTag(ctx context.Context, stack StackName, tag StackTag) error {
+	apiPath := path.Join("stacks", stack.OrgName, stack.ProjectName, stack.StackName, "tags")
+	_, err := c.do(ctx, http.MethodPost, apiPath, tag, nil)
+	if err != nil {
+		return fmt.Errorf("failed to create tag (%s=%s): %w", tag.Name, tag.Value, err)
+>>>>>>> 932b63e (rename SetStackTags to CreateStackTag to better match model)
 	}
 	return nil
 }

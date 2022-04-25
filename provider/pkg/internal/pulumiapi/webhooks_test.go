@@ -42,10 +42,14 @@ func TestCreateWebhook(t *testing.T) {
 	})
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	t.Run("Error", func(t *testing.T) {
 =======
 	t.Run("error", func(t *testing.T) {
 >>>>>>> d06708e (Add tests for api client library)
+=======
+	t.Run("Error", func(t *testing.T) {
+>>>>>>> 932b63e (rename SetStackTags to CreateStackTag to better match model)
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqPath:   "/api/orgs/an-organization/hooks",
