@@ -4,6 +4,9 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "./utilities";
 
+/**
+ * Access tokens allow a user to authenticate against the Pulumi Service
+ */
 export class AccessToken extends pulumi.CustomResource {
     /**
      * Get an existing AccessToken resource's state with the given name, ID, and optional extra
@@ -18,7 +21,7 @@ export class AccessToken extends pulumi.CustomResource {
     }
 
     /** @internal */
-    public static readonly __pulumiType = 'pulumiservice:index:AccessToken';
+    public static readonly __pulumiType = 'pulumi-service:index:AccessToken';
 
     /**
      * Returns true if the given object is an instance of AccessToken.  This is designed to work even
@@ -31,7 +34,17 @@ export class AccessToken extends pulumi.CustomResource {
         return obj['__pulumiType'] === AccessToken.__pulumiType;
     }
 
+    /**
+     * Description of the access token.
+     */
+    public readonly description!: pulumi.Output<string | undefined>;
+    /**
+     * The token identifier.
+     */
     public /*out*/ readonly tokenId!: pulumi.Output<string | undefined>;
+    /**
+     * The token's value.
+     */
     public /*out*/ readonly value!: pulumi.Output<string | undefined>;
 
     /**
@@ -41,14 +54,18 @@ export class AccessToken extends pulumi.CustomResource {
      * @param args The arguments to use to populate this resource's properties.
      * @param opts A bag of options that control this resource's behavior.
      */
-    constructor(name: string, args?: AccessTokenArgs, opts?: pulumi.CustomResourceOptions) {
+    constructor(name: string, args: AccessTokenArgs, opts?: pulumi.CustomResourceOptions) {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
+            if ((!args || args.description === undefined) && !opts.urn) {
+                throw new Error("Missing required property 'description'");
+            }
             resourceInputs["description"] = args ? args.description : undefined;
             resourceInputs["tokenId"] = undefined /*out*/;
             resourceInputs["value"] = undefined /*out*/;
         } else {
+            resourceInputs["description"] = undefined /*out*/;
             resourceInputs["tokenId"] = undefined /*out*/;
             resourceInputs["value"] = undefined /*out*/;
         }
@@ -63,5 +80,8 @@ export class AccessToken extends pulumi.CustomResource {
  * The set of arguments for constructing a AccessToken resource.
  */
 export interface AccessTokenArgs {
-    description?: pulumi.Input<string>;
+    /**
+     * Description of the access token.
+     */
+    description: pulumi.Input<string>;
 }

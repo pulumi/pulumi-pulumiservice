@@ -4,6 +4,9 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "./utilities";
 
+/**
+ * The Pulumi Service offers role-based access control (RBAC) using teams. Teams allow organization admins to assign a set of stack permissions to a group of users.
+ */
 export class Team extends pulumi.CustomResource {
     /**
      * Get an existing Team resource's state with the given name, ID, and optional extra
@@ -18,7 +21,7 @@ export class Team extends pulumi.CustomResource {
     }
 
     /** @internal */
-    public static readonly __pulumiType = 'pulumiservice:index:Team';
+    public static readonly __pulumiType = 'pulumi-service:index:Team';
 
     /**
      * Returns true if the given object is an instance of Team.  This is designed to work even
@@ -31,11 +34,29 @@ export class Team extends pulumi.CustomResource {
         return obj['__pulumiType'] === Team.__pulumiType;
     }
 
+    /**
+     * Optional. Team description.
+     */
     public readonly description!: pulumi.Output<string | undefined>;
+    /**
+     * Optional. Team display name.
+     */
     public readonly displayName!: pulumi.Output<string | undefined>;
+    /**
+     * List of team members.
+     */
     public readonly members!: pulumi.Output<string[] | undefined>;
+    /**
+     * The team name.
+     */
     public readonly name!: pulumi.Output<string | undefined>;
+    /**
+     * The organization's name.
+     */
     public readonly organizationName!: pulumi.Output<string | undefined>;
+    /**
+     * The type of team. Must be either `pulumi` or `github`.
+     */
     public readonly type!: pulumi.Output<string | undefined>;
 
     /**
@@ -45,10 +66,19 @@ export class Team extends pulumi.CustomResource {
      * @param args The arguments to use to populate this resource's properties.
      * @param opts A bag of options that control this resource's behavior.
      */
-    constructor(name: string, args?: TeamArgs, opts?: pulumi.CustomResourceOptions) {
+    constructor(name: string, args: TeamArgs, opts?: pulumi.CustomResourceOptions) {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
+            if ((!args || args.name === undefined) && !opts.urn) {
+                throw new Error("Missing required property 'name'");
+            }
+            if ((!args || args.organizationName === undefined) && !opts.urn) {
+                throw new Error("Missing required property 'organizationName'");
+            }
+            if ((!args || args.type === undefined) && !opts.urn) {
+                throw new Error("Missing required property 'type'");
+            }
             resourceInputs["description"] = args ? args.description : undefined;
             resourceInputs["displayName"] = args ? args.displayName : undefined;
             resourceInputs["members"] = args ? args.members : undefined;
@@ -72,10 +102,28 @@ export class Team extends pulumi.CustomResource {
  * The set of arguments for constructing a Team resource.
  */
 export interface TeamArgs {
+    /**
+     * Optional. Team description.
+     */
     description?: pulumi.Input<string>;
+    /**
+     * Optional. Team display name.
+     */
     displayName?: pulumi.Input<string>;
+    /**
+     * List of team members.
+     */
     members?: pulumi.Input<pulumi.Input<string>[]>;
-    name?: pulumi.Input<string>;
-    organizationName?: pulumi.Input<string>;
-    type?: pulumi.Input<string>;
+    /**
+     * The team name.
+     */
+    name: pulumi.Input<string>;
+    /**
+     * The organization's name.
+     */
+    organizationName: pulumi.Input<string>;
+    /**
+     * The type of team. Must be either `pulumi` or `github`.
+     */
+    type: pulumi.Input<string>;
 }
