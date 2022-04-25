@@ -41,7 +41,7 @@ func TestCreateWebhook(t *testing.T) {
 		assert.Equal(t, webhook, *actualWebhook)
 	})
 
-	t.Run("error", func(t *testing.T) {
+	t.Run("Error", func(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqPath:   "/api/orgs/an-organization/hooks",

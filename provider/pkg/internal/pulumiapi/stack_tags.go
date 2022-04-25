@@ -18,18 +18,11 @@ type StackTag struct {
 	Value string `json:"value"`
 }
 
-func (c *Client) SetTags(ctx context.Context, stack StackName, tags map[string]string) error {
+func (c *Client) CreateTag(ctx context.Context, stack StackName, tag StackTag) error {
 	apiPath := path.Join("stacks", stack.OrgName, stack.ProjectName, stack.StackName, "tags")
-	for name, value := range tags {
-		tag := StackTag{
-			Name:  name,
-			Value: value,
-		}
-		_, err := c.do(ctx, http.MethodPost, apiPath, tag, nil)
-		if err != nil {
-			return fmt.Errorf("failed to create tag (%s=%s): %w", name, value, err)
-		}
-
+	_, err := c.do(ctx, http.MethodPost, apiPath, tag, nil)
+	if err != nil {
+		return fmt.Errorf("failed to create tag (%s=%s): %w", tag.Name, tag.Value, err)
 	}
 	return nil
 }

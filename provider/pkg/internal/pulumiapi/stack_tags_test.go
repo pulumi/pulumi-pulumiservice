@@ -8,43 +8,40 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSetStackTags(t *testing.T) {
+func TestCreateStackTags(t *testing.T) {
 	tagName := "tagName"
 	tagValue := "tagValue"
 	tag := StackTag{
 		Name:  tagName,
 		Value: tagValue,
 	}
-	stack := StackName{
+	stackName := StackName{
 		OrgName:     "organization",
 		ProjectName: "project",
 		StackName:   "stack",
 	}
-	tagMap := map[string]string{
-		tagName: tagValue,
-	}
 	t.Run("Happy Path", func(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
-			ExpectedReqPath:   fmt.Sprintf("/api/stacks/%s/%s/%s/tags", stack.OrgName, stack.ProjectName, stack.StackName),
+			ExpectedReqPath:   fmt.Sprintf("/api/stacks/%s/%s/%s/tags", stackName.OrgName, stackName.ProjectName, stackName.StackName),
 			ExpectedReqBody:   tag,
 			ResponseCode:      http.StatusNoContent,
 		})
 		defer cleanup()
-		assert.NoError(t, c.SetTags(ctx, stack, tagMap))
+		assert.NoError(t, c.CreateTag(ctx, stackName, tag))
 	})
 
 	t.Run("Error", func(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
-			ExpectedReqPath:   fmt.Sprintf("/api/stacks/%s/%s/%s/tags", stack.OrgName, stack.ProjectName, stack.StackName),
+			ExpectedReqPath:   fmt.Sprintf("/api/stacks/%s/%s/%s/tags", stackName.OrgName, stackName.ProjectName, stackName.StackName),
 			ResponseCode:      401,
 			ResponseBody: errorResponse{
 				Message: "unauthorized",
 			},
 		})
 		defer cleanup()
-		err := c.SetTags(ctx, stack, tagMap)
+		err := c.CreateTag(ctx, stackName, tag)
 		assert.EqualError(t, err, "failed to create tag (tagName=tagValue): 401 API error: unauthorized")
 	})
 }
