@@ -18,36 +18,35 @@ type StackTag struct {
 	Value string `json:"value"`
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-func (c *Client) CreateTag(ctx context.Context, stack StackName, tag StackTag) error {
-	apiPath := path.Join("stacks", stack.OrgName, stack.ProjectName, stack.StackName, "tags")
-	_, err := c.do(ctx, http.MethodPost, apiPath, tag, nil)
-	if err != nil {
-		return fmt.Errorf("failed to create tag (%s=%s): %w", tag.Name, tag.Value, err)
-=======
-func (c *Client) SetTags(ctx context.Context, stack StackName, tags map[string]string) error {
-	apiPath := path.Join("stacks", stack.OrgName, stack.ProjectName, stack.StackName, "tags")
-	for name, value := range tags {
-		tag := StackTag{
-			Name:  name,
-			Value: value,
-		}
-		_, err := c.do(ctx, http.MethodPost, apiPath, tag, nil)
-		if err != nil {
-			return fmt.Errorf("failed to create tag (%s=%s): %w", name, value, err)
-		}
+// in order to retrieve stack tags, we have to get the entire stack. we only need to unmarshal the tags property
+type stack struct {
+	Tags map[string]string `json:"tags"`
+}
 
->>>>>>> d06708e (Add tests for api client library)
-=======
 func (c *Client) CreateTag(ctx context.Context, stack StackName, tag StackTag) error {
 	apiPath := path.Join("stacks", stack.OrgName, stack.ProjectName, stack.StackName, "tags")
 	_, err := c.do(ctx, http.MethodPost, apiPath, tag, nil)
 	if err != nil {
 		return fmt.Errorf("failed to create tag (%s=%s): %w", tag.Name, tag.Value, err)
->>>>>>> 932b63e (rename SetStackTags to CreateStackTag to better match model)
 	}
 	return nil
+}
+
+func (c *Client) GetStackTag(ctx context.Context, stackName StackName, tagName string) (*StackTag, error) {
+	apiPath := path.Join("stacks", stackName.OrgName, stackName.ProjectName, stackName.StackName)
+	var s stack
+	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &s)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get stack tag: %w", err)
+	}
+	tagValue, ok := s.Tags[tagName]
+	if !ok {
+		return nil, nil
+	}
+	return &StackTag{
+		Name:  tagName,
+		Value: tagValue,
+	}, nil
 }
 
 func (c *Client) DeleteStackTag(ctx context.Context, stackName StackName, tagName string) error {

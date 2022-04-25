@@ -1,12 +1,12 @@
 package provider
 
 import (
-	"errors"
+	"context"
 	"fmt"
 	"strings"
 
 	pbempty "github.com/golang/protobuf/ptypes/empty"
-	pulumiapi "github.com/pierskarsenbarg/pulumi-apiclient"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/pulumiapi"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
@@ -14,6 +14,7 @@ import (
 
 type PulumiServiceWebhookResource struct {
 	config PulumiServiceConfig
+	client *pulumiapi.Client
 }
 
 type PulumiServiceWebhookInput struct {
@@ -107,18 +108,8 @@ func (wh *PulumiServiceWebhookResource) Create(req *pulumirpc.CreateRequest) (*p
 }
 
 func (wh *PulumiServiceWebhookResource) createWebhook(input PulumiServiceWebhookInput) (*string, error) {
-	token, err := wh.config.getPulumiAccessToken()
-	if err != nil {
-		return nil, err
-	}
-
-	url, err := wh.config.getPulumiServiceUrl()
-	if err != nil {
-		return nil, err
-	}
-
-	c := pulumiapi.NewClient(*token, *url)
-	webhook, err := c.CreateWebhook(input.OrganizationName, input.DisplayName, input.PayloadUrl, input.Secret, input.Active)
+	ctx := context.Background()
+	webhook, err := wh.client.CreateWebhook(ctx, input.OrganizationName, input.DisplayName, input.PayloadUrl, input.Secret, input.Active)
 	if err != nil {
 		return nil, err
 	}
@@ -149,44 +140,50 @@ func (wh *PulumiServiceWebhookResource) Diff(req *pulumirpc.DiffRequest) (*pulum
 	}
 
 	changes := pulumirpc.DiffResponse_DIFF_NONE
+	replaceProperties := []string{"organizationName", "name"}
+	var replaces []string
+	for _, prop := range replaceProperties {
+		if diffs.Changed(resource.PropertyKey(prop)) {
+			replaces = append(replaces, prop)
+			changes = pulumirpc.DiffResponse_DIFF_SOME
+		}
+	}
+
 	if diffs.Changed("active") ||
 		diffs.Changed("displayName") ||
 		diffs.Changed("payloadUrl") ||
-		diffs.Changed("secret") ||
-		diffs.Changed("organizationName") ||
-		diffs.Changed("name") {
+		diffs.Changed("secret") {
 		changes = pulumirpc.DiffResponse_DIFF_SOME
 	}
 
 	return &pulumirpc.DiffResponse{
 		Changes:             changes,
-		Replaces:            []string{},
+		Replaces:            replaces,
 		Stables:             []string{},
 		DeleteBeforeReplace: false,
 	}, nil
 }
 
 func (wh *PulumiServiceWebhookResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	inputsOld, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
+	// we only care about news because we validated that everything was correctly set in Check() & Diff()
 	inputsNew, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
 	}
 
-	webhookOld := wh.ToPulumiServiceWebhookInput(inputsOld["__inputs"].ObjectValue())
 	webhookNew := wh.ToPulumiServiceWebhookInput(inputsNew)
 
-	if webhookOld.Active != webhookNew.Active ||
-		webhookOld.DisplayName != webhookNew.DisplayName ||
-		webhookOld.PayloadUrl != webhookNew.PayloadUrl ||
-		webhookOld.Secret != webhookNew.Secret {
-		err = wh.updateWebhook(webhookNew)
-		if err != nil {
-			return nil, err
-		}
+	err = wh.client.UpdateWebhook(
+		context.Background(),
+		webhookNew.Name,
+		webhookNew.OrganizationName,
+		webhookNew.DisplayName,
+		webhookNew.PayloadUrl,
+		webhookNew.Secret,
+		webhookNew.Active,
+	)
+	if err != nil {
+		return nil, err
 	}
 
 	outputStore := resource.PropertyMap{}
@@ -205,52 +202,17 @@ func (wh *PulumiServiceWebhookResource) Update(req *pulumirpc.UpdateRequest) (*p
 
 }
 
-func (wh *PulumiServiceWebhookResource) updateWebhook(input PulumiServiceWebhookInput) error {
-	token, err := wh.config.getPulumiAccessToken()
-	if err != nil {
-		return err
-	}
-
-	url, err := wh.config.getPulumiServiceUrl()
-	if err != nil {
-		return err
-	}
-
-	c := pulumiapi.NewClient(*token, *url)
-	_, err = c.UpdateWebhook(input.Name, input.OrganizationName, input.DisplayName, input.PayloadUrl, input.Secret, input.Active)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func (wh *PulumiServiceWebhookResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
 	err := wh.deleteWebhook(req.Id)
-	if err != nil {
-		return &pbempty.Empty{}, err
-	}
-	return &pbempty.Empty{}, nil
+	return &pbempty.Empty{}, err
 }
 
 func (wh *PulumiServiceWebhookResource) deleteWebhook(id string) error {
-	token, err := wh.config.getPulumiAccessToken()
+	orgName, webhookName, err := splitSingleSlashString(id)
 	if err != nil {
 		return err
 	}
-
-	url, err := wh.config.getPulumiServiceUrl()
-	if err != nil {
-		return err
-	}
-
-	s := strings.Split(id, "/")
-
-	c := pulumiapi.NewClient(*token, *url)
-	err = c.DeleteWebhook(s[0], s[1])
-	if err != nil {
-		return err
-	}
-	return nil
+	return wh.client.DeleteWebhook(context.Background(), orgName, webhookName)
 }
 
 func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
@@ -264,15 +226,18 @@ func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulum
 		return &pulumirpc.ReadResponse{}, err
 	}
 
-	s := strings.Split(req.Id, "/")
+	orgName, webhookName, err := splitSingleSlashString(req.Id)
+	if err != nil {
+		return nil, err
+	}
 
 	webhookInput := PulumiServiceWebhookInput{
 		Active:           webhook.Active,
 		DisplayName:      webhook.DisplayName,
 		PayloadUrl:       webhook.PayloadUrl,
 		Secret:           webhook.Secret,
-		OrganizationName: s[0],
-		Name:             s[1],
+		OrganizationName: orgName,
+		Name:             webhookName,
 	}
 
 	properties, err := plugin.MarshalProperties(
@@ -289,6 +254,10 @@ func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulum
 		plugin.MarshalOptions{},
 	)
 
+	if err != nil {
+		return nil, err
+	}
+
 	return &pulumirpc.ReadResponse{
 		Id:         req.Id,
 		Properties: properties,
@@ -297,26 +266,22 @@ func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulum
 }
 
 func (wh *PulumiServiceWebhookResource) getWebhook(id string) (*pulumiapi.Webhook, error) {
-	if len(id) == 0 {
-		return nil, errors.New("id must not be empty")
-	}
-
-	token, err := wh.config.getPulumiAccessToken()
+	org, webhookName, err := splitSingleSlashString(id)
 	if err != nil {
 		return nil, err
 	}
-
-	url, err := wh.config.getPulumiServiceUrl()
-	if err != nil {
-		return nil, err
-	}
-
-	s := strings.Split(id, "/")
-
-	c := pulumiapi.NewClient(*token, *url)
-	webhook, err := c.GetWebhook(s[0], s[1])
+	webhook, err := wh.client.GetWebhook(context.Background(), org, webhookName)
 	if err != nil {
 		return nil, err
 	}
 	return webhook, nil
+}
+
+func splitSingleSlashString(id string) (string, string, error) {
+	// format: organization/webhookName
+	s := strings.Split(id, "/")
+	if len(s) != 2 {
+		return "", "", fmt.Errorf("id %q is invalid, must contain a single slash ('/')", id)
+	}
+	return s[0], s[1], nil
 }
