@@ -13,20 +13,23 @@ __all__ = ['AccessTokenArgs', 'AccessToken']
 @pulumi.input_type
 class AccessTokenArgs:
     def __init__(__self__, *,
-                 description: Optional[pulumi.Input[str]] = None):
+                 description: pulumi.Input[str]):
         """
         The set of arguments for constructing a AccessToken resource.
+        :param pulumi.Input[str] description: Description of the access token.
         """
-        if description is not None:
-            pulumi.set(__self__, "description", description)
+        pulumi.set(__self__, "description", description)
 
     @property
     @pulumi.getter
-    def description(self) -> Optional[pulumi.Input[str]]:
+    def description(self) -> pulumi.Input[str]:
+        """
+        Description of the access token.
+        """
         return pulumi.get(self, "description")
 
     @description.setter
-    def description(self, value: Optional[pulumi.Input[str]]):
+    def description(self, value: pulumi.Input[str]):
         pulumi.set(self, "description", value)
 
 
@@ -38,18 +41,21 @@ class AccessToken(pulumi.CustomResource):
                  description: Optional[pulumi.Input[str]] = None,
                  __props__=None):
         """
-        Create a AccessToken resource with the given unique name, props, and options.
+        Access tokens allow a user to authenticate against the Pulumi Service
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
+        :param pulumi.Input[str] description: Description of the access token.
         """
         ...
     @overload
     def __init__(__self__,
                  resource_name: str,
-                 args: Optional[AccessTokenArgs] = None,
+                 args: AccessTokenArgs,
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
-        Create a AccessToken resource with the given unique name, props, and options.
+        Access tokens allow a user to authenticate against the Pulumi Service
+
         :param str resource_name: The name of the resource.
         :param AccessTokenArgs args: The arguments to use to populate this resource's properties.
         :param pulumi.ResourceOptions opts: Options for the resource.
@@ -78,13 +84,15 @@ class AccessToken(pulumi.CustomResource):
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
             __props__ = AccessTokenArgs.__new__(AccessTokenArgs)
 
+            if description is None and not opts.urn:
+                raise TypeError("Missing required property 'description'")
             __props__.__dict__["description"] = description
             __props__.__dict__["token_id"] = None
             __props__.__dict__["value"] = None
         secret_opts = pulumi.ResourceOptions(additional_secret_outputs=["value"])
         opts = pulumi.ResourceOptions.merge(opts, secret_opts)
         super(AccessToken, __self__).__init__(
-            'pulumiservice:index:AccessToken',
+            'pulumi-service:index:AccessToken',
             resource_name,
             __props__,
             opts)
@@ -105,17 +113,32 @@ class AccessToken(pulumi.CustomResource):
 
         __props__ = AccessTokenArgs.__new__(AccessTokenArgs)
 
+        __props__.__dict__["description"] = None
         __props__.__dict__["token_id"] = None
         __props__.__dict__["value"] = None
         return AccessToken(resource_name, opts=opts, __props__=__props__)
 
     @property
+    @pulumi.getter
+    def description(self) -> pulumi.Output[Optional[str]]:
+        """
+        Description of the access token.
+        """
+        return pulumi.get(self, "description")
+
+    @property
     @pulumi.getter(name="tokenId")
     def token_id(self) -> pulumi.Output[Optional[str]]:
+        """
+        The token identifier.
+        """
         return pulumi.get(self, "token_id")
 
     @property
     @pulumi.getter
     def value(self) -> pulumi.Output[Optional[str]]:
+        """
+        The token's value.
+        """
         return pulumi.get(self, "value")
 

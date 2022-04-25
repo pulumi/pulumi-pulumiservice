@@ -16,13 +16,19 @@ class ProviderArgs:
                  access_token: Optional[pulumi.Input[str]] = None):
         """
         The set of arguments for constructing a Provider resource.
+        :param pulumi.Input[str] access_token: Access Token to authenticate with Pulumi Service.
         """
+        if access_token is None:
+            access_token = (_utilities.get_env('PULUMI_ACCESS_TOKEN') or '')
         if access_token is not None:
             pulumi.set(__self__, "access_token", access_token)
 
     @property
     @pulumi.getter(name="accessToken")
     def access_token(self) -> Optional[pulumi.Input[str]]:
+        """
+        Access Token to authenticate with Pulumi Service.
+        """
         return pulumi.get(self, "access_token")
 
     @access_token.setter
@@ -38,9 +44,10 @@ class Provider(pulumi.ProviderResource):
                  access_token: Optional[pulumi.Input[str]] = None,
                  __props__=None):
         """
-        Create a Pulumiservice resource with the given unique name, props, and options.
+        Create a Pulumi-service resource with the given unique name, props, and options.
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
+        :param pulumi.Input[str] access_token: Access Token to authenticate with Pulumi Service.
         """
         ...
     @overload
@@ -49,7 +56,7 @@ class Provider(pulumi.ProviderResource):
                  args: Optional[ProviderArgs] = None,
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
-        Create a Pulumiservice resource with the given unique name, props, and options.
+        Create a Pulumi-service resource with the given unique name, props, and options.
         :param str resource_name: The name of the resource.
         :param ProviderArgs args: The arguments to use to populate this resource's properties.
         :param pulumi.ResourceOptions opts: Options for the resource.
@@ -78,9 +85,11 @@ class Provider(pulumi.ProviderResource):
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
             __props__ = ProviderArgs.__new__(ProviderArgs)
 
+            if access_token is None:
+                access_token = (_utilities.get_env('PULUMI_ACCESS_TOKEN') or '')
             __props__.__dict__["access_token"] = access_token
         super(Provider, __self__).__init__(
-            'pulumiservice',
+            'pulumi-service',
             resource_name,
             __props__,
             opts)

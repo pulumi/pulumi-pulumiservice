@@ -13,31 +13,73 @@ __all__ = ['TeamArgs', 'Team']
 @pulumi.input_type
 class TeamArgs:
     def __init__(__self__, *,
+                 name: pulumi.Input[str],
+                 organization_name: pulumi.Input[str],
+                 type: pulumi.Input[str],
                  description: Optional[pulumi.Input[str]] = None,
                  display_name: Optional[pulumi.Input[str]] = None,
-                 members: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None,
-                 name: Optional[pulumi.Input[str]] = None,
-                 organization_name: Optional[pulumi.Input[str]] = None,
-                 type: Optional[pulumi.Input[str]] = None):
+                 members: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None):
         """
         The set of arguments for constructing a Team resource.
+        :param pulumi.Input[str] name: The team name.
+        :param pulumi.Input[str] organization_name: The organization's name.
+        :param pulumi.Input[str] type: The type of team. Must be either `pulumi` or `github`.
+        :param pulumi.Input[str] description: Optional. Team description.
+        :param pulumi.Input[str] display_name: Optional. Team display name.
+        :param pulumi.Input[Sequence[pulumi.Input[str]]] members: List of team members.
         """
+        pulumi.set(__self__, "name", name)
+        pulumi.set(__self__, "organization_name", organization_name)
+        pulumi.set(__self__, "type", type)
         if description is not None:
             pulumi.set(__self__, "description", description)
         if display_name is not None:
             pulumi.set(__self__, "display_name", display_name)
         if members is not None:
             pulumi.set(__self__, "members", members)
-        if name is not None:
-            pulumi.set(__self__, "name", name)
-        if organization_name is not None:
-            pulumi.set(__self__, "organization_name", organization_name)
-        if type is not None:
-            pulumi.set(__self__, "type", type)
+
+    @property
+    @pulumi.getter
+    def name(self) -> pulumi.Input[str]:
+        """
+        The team name.
+        """
+        return pulumi.get(self, "name")
+
+    @name.setter
+    def name(self, value: pulumi.Input[str]):
+        pulumi.set(self, "name", value)
+
+    @property
+    @pulumi.getter(name="organizationName")
+    def organization_name(self) -> pulumi.Input[str]:
+        """
+        The organization's name.
+        """
+        return pulumi.get(self, "organization_name")
+
+    @organization_name.setter
+    def organization_name(self, value: pulumi.Input[str]):
+        pulumi.set(self, "organization_name", value)
+
+    @property
+    @pulumi.getter
+    def type(self) -> pulumi.Input[str]:
+        """
+        The type of team. Must be either `pulumi` or `github`.
+        """
+        return pulumi.get(self, "type")
+
+    @type.setter
+    def type(self, value: pulumi.Input[str]):
+        pulumi.set(self, "type", value)
 
     @property
     @pulumi.getter
     def description(self) -> Optional[pulumi.Input[str]]:
+        """
+        Optional. Team description.
+        """
         return pulumi.get(self, "description")
 
     @description.setter
@@ -47,6 +89,9 @@ class TeamArgs:
     @property
     @pulumi.getter(name="displayName")
     def display_name(self) -> Optional[pulumi.Input[str]]:
+        """
+        Optional. Team display name.
+        """
         return pulumi.get(self, "display_name")
 
     @display_name.setter
@@ -56,38 +101,14 @@ class TeamArgs:
     @property
     @pulumi.getter
     def members(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[str]]]]:
+        """
+        List of team members.
+        """
         return pulumi.get(self, "members")
 
     @members.setter
     def members(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]]):
         pulumi.set(self, "members", value)
-
-    @property
-    @pulumi.getter
-    def name(self) -> Optional[pulumi.Input[str]]:
-        return pulumi.get(self, "name")
-
-    @name.setter
-    def name(self, value: Optional[pulumi.Input[str]]):
-        pulumi.set(self, "name", value)
-
-    @property
-    @pulumi.getter(name="organizationName")
-    def organization_name(self) -> Optional[pulumi.Input[str]]:
-        return pulumi.get(self, "organization_name")
-
-    @organization_name.setter
-    def organization_name(self, value: Optional[pulumi.Input[str]]):
-        pulumi.set(self, "organization_name", value)
-
-    @property
-    @pulumi.getter
-    def type(self) -> Optional[pulumi.Input[str]]:
-        return pulumi.get(self, "type")
-
-    @type.setter
-    def type(self, value: Optional[pulumi.Input[str]]):
-        pulumi.set(self, "type", value)
 
 
 class Team(pulumi.CustomResource):
@@ -103,18 +124,26 @@ class Team(pulumi.CustomResource):
                  type: Optional[pulumi.Input[str]] = None,
                  __props__=None):
         """
-        Create a Team resource with the given unique name, props, and options.
+        The Pulumi Service offers role-based access control (RBAC) using teams. Teams allow organization admins to assign a set of stack permissions to a group of users.
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
+        :param pulumi.Input[str] description: Optional. Team description.
+        :param pulumi.Input[str] display_name: Optional. Team display name.
+        :param pulumi.Input[Sequence[pulumi.Input[str]]] members: List of team members.
+        :param pulumi.Input[str] name: The team name.
+        :param pulumi.Input[str] organization_name: The organization's name.
+        :param pulumi.Input[str] type: The type of team. Must be either `pulumi` or `github`.
         """
         ...
     @overload
     def __init__(__self__,
                  resource_name: str,
-                 args: Optional[TeamArgs] = None,
+                 args: TeamArgs,
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
-        Create a Team resource with the given unique name, props, and options.
+        The Pulumi Service offers role-based access control (RBAC) using teams. Teams allow organization admins to assign a set of stack permissions to a group of users.
+
         :param str resource_name: The name of the resource.
         :param TeamArgs args: The arguments to use to populate this resource's properties.
         :param pulumi.ResourceOptions opts: Options for the resource.
@@ -151,11 +180,17 @@ class Team(pulumi.CustomResource):
             __props__.__dict__["description"] = description
             __props__.__dict__["display_name"] = display_name
             __props__.__dict__["members"] = members
+            if name is None and not opts.urn:
+                raise TypeError("Missing required property 'name'")
             __props__.__dict__["name"] = name
+            if organization_name is None and not opts.urn:
+                raise TypeError("Missing required property 'organization_name'")
             __props__.__dict__["organization_name"] = organization_name
+            if type is None and not opts.urn:
+                raise TypeError("Missing required property 'type'")
             __props__.__dict__["type"] = type
         super(Team, __self__).__init__(
-            'pulumiservice:index:Team',
+            'pulumi-service:index:Team',
             resource_name,
             __props__,
             opts)
@@ -187,30 +222,48 @@ class Team(pulumi.CustomResource):
     @property
     @pulumi.getter
     def description(self) -> pulumi.Output[Optional[str]]:
+        """
+        Optional. Team description.
+        """
         return pulumi.get(self, "description")
 
     @property
     @pulumi.getter(name="displayName")
     def display_name(self) -> pulumi.Output[Optional[str]]:
+        """
+        Optional. Team display name.
+        """
         return pulumi.get(self, "display_name")
 
     @property
     @pulumi.getter
     def members(self) -> pulumi.Output[Optional[Sequence[str]]]:
+        """
+        List of team members.
+        """
         return pulumi.get(self, "members")
 
     @property
     @pulumi.getter
     def name(self) -> pulumi.Output[Optional[str]]:
+        """
+        The team name.
+        """
         return pulumi.get(self, "name")
 
     @property
     @pulumi.getter(name="organizationName")
     def organization_name(self) -> pulumi.Output[Optional[str]]:
+        """
+        The organization's name.
+        """
         return pulumi.get(self, "organization_name")
 
     @property
     @pulumi.getter
     def type(self) -> pulumi.Output[Optional[str]]:
+        """
+        The type of team. Must be either `pulumi` or `github`.
+        """
         return pulumi.get(self, "type")
 
