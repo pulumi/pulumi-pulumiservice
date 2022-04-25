@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Immutable;
 
-namespace Pulumi.Pulumiservice
+namespace Pulumi.PulumiService
 {
     public static class Config
     {
@@ -30,7 +30,7 @@ namespace Pulumi.Pulumiservice
             }
         }
 
-        private static readonly Pulumi.Config __config = new Pulumi.Config("pulumiservice");
+        private static readonly Pulumi.Config __config = new Pulumi.Config("pulumi-service");
 
         private static readonly __Value<string?> _accessToken = new __Value<string?>(() => __config.Get("accessToken"));
         public static string? AccessToken
