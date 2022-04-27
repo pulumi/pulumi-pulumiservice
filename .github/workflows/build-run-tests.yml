@@ -3,6 +3,7 @@ on:
   push: 
     branches:
       - main
+      - 'myles/**'
     tags-ignore:
       - v*
       - sdk/*
