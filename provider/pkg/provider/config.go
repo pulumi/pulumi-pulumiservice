@@ -30,7 +30,7 @@ func (pc *PulumiServiceConfig) getPulumiAccessToken() (*string, error) {
 func (pc *PulumiServiceConfig) getPulumiServiceUrl() (*string, error) {
 	url := pc.getConfig("apiurl", "PULUMI_BACKEND_URL")
 
-	baseurl := "api.pulumi.com"
+	baseurl := "https://api.pulumi.com"
 
 	if len(url) == 0 {
 		url = baseurl
