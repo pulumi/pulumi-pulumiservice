@@ -12,7 +12,7 @@ type PulumiServiceUnknownResource struct{}
 type PulumiServiceUnknownFunction struct{}
 
 func (c PulumiServiceUnknownResource) Name() string {
-	return "pulumi-service:index:Unknown"
+	return "pulumiservice:index:Unknown"
 }
 
 func (u *PulumiServiceUnknownResource) Configure(config PulumiServiceConfig) {
@@ -52,7 +52,7 @@ func (f *PulumiServiceUnknownResource) Invoke(s *pulumiserviceProvider, req *pul
 }
 
 func (f *PulumiServiceUnknownFunction) Name() string {
-	return "pulumi-service:index:Unknown"
+	return "pulumiservice:index:Unknown"
 }
 
 func (f *PulumiServiceUnknownFunction) Configure(config PulumiServiceConfig) {

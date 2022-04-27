@@ -1,9 +1,9 @@
 {
-  "name": "pulumi-service",
+  "name": "pulumiservice",
   "displayName": "Pulumi Service",
   "description": "A native Pulumi package for creating and managing Pulumi Service constructs",
   "homepage": "https://pulumi.com",
-  "repository": "https://github.com/pulumi/pulumi-pulumi-service",
+  "repository": "https://github.com/pulumi/pulumi-pulumiservice",
   "keywords": [
     "pulumi",
     "kind/native",
@@ -35,7 +35,7 @@
     }
   },
   "resources": {
-    "pulumi-service:index:AccessToken": {
+    "pulumiservice:index:AccessToken": {
       "description": "Access tokens allow a user to authenticate against the Pulumi Service",
       "properties": {
         "tokenId": {
@@ -62,7 +62,7 @@
         "description"
       ]
     },
-    "pulumi-service:index:Team": {
+    "pulumiservice:index:Team": {
       "description": "The Pulumi Service offers role-based access control (RBAC) using teams. Teams allow organization admins to assign a set of stack permissions to a group of users.",
       "properties": {
         "type": {
@@ -128,7 +128,7 @@
         "type"
       ]
     },
-    "pulumi-service:index:Webhook": {
+    "pulumiservice:index:Webhook": {
       "description": "Pulumi Webhooks allow you to notify external services of events happening within your Pulumi organization or stack. For example, you can trigger a notification whenever a stack is updated. Whenever an event occurs, Pulumi will send an HTTP POST request to all registered webhooks. The webhook can then be used to emit some notification, start running integration tests, or even update additional stacks.",
       "properties": {
         "name": {
@@ -191,7 +191,7 @@
   "language": {
     "csharp": {
       "namespaces": {
-        "pulumi-service": "PulumiService"
+        "pulumiservice": "PulumiService"
       },
       "packageReferences": {
         "Pulumi": "3.*"
@@ -199,14 +199,16 @@
     },
     "go": {
       "generateResourceContainerTypes": true,
-      "importBasePath": "github.com/pulumi/pulumi-pulumi-service/sdk/go/pulumi-service"
+      "importBasePath": "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice"
     },
     "nodejs": {
+      "packageName": "@pulumi/pulumi-service",
       "dependencies": {
         "@pulumi/pulumi": "^3.0.0"
       }
     },
     "python": {
+      "packageName": "pulumi_service",
       "requires": {
         "pulumi": ">=3.0.0,<4.0.0"
       }
