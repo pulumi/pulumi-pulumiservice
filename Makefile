@@ -1,8 +1,8 @@
 PROJECT_NAME := Pulumi Service Resource Provider
 
-PACK             := pulumi-service
+PACK             := pulumiservice
 PACKDIR          := sdk
-PROJECT          := github.com/pulumi/pulumi-pulumi-service
+PROJECT          := github.com/pulumi/pulumi-pulumiservice
 NODE_MODULE_NAME := @pulumi/pulumi-service
 NUGET_PKG_NAME   := Pulumi.PulumiService
 
@@ -12,7 +12,7 @@ VERSION         ?= $(shell pulumictl get version)
 PROVIDER_PATH   := provider
 VERSION_PATH     := ${PROVIDER_PATH}/pkg/version.Version
 
-SCHEMA_FILE     := provider/cmd/pulumi-resource-pulumi-service/schema.json
+SCHEMA_FILE     := provider/cmd/pulumi-resource-pulumiservice/schema.json
 GOPATH			:= $(shell go env GOPATH)
 
 WORKING_DIR     := $(shell pwd)
