@@ -23,7 +23,7 @@
     "type": "object",
     "inputProperties": {
       "accessToken": {
-        "description": "Access Token to authenticate with Pulumi Service.",
+        "description": "Access Token to authenticate with Pulumi Service",
         "type": "string",
         "default": "",
         "defaultInfo": {
