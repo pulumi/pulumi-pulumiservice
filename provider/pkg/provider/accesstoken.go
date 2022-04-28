@@ -1,18 +1,18 @@
 package provider
 
 import (
+	"context"
 	"fmt"
 
 	pbempty "github.com/golang/protobuf/ptypes/empty"
-	pulumiapi "github.com/pierskarsenbarg/pulumi-apiclient"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/pulumiapi"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
-	rpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
 type PulumiServiceAccessTokenResource struct {
-	config PulumiServiceConfig
+	client *pulumiapi.Client
 }
 
 type PulumiServiceAccessTokenInput struct {
@@ -69,7 +69,8 @@ func (c *PulumiServiceAccessTokenResource) Diff(req *pulumirpc.DiffRequest) (*pu
 }
 
 func (c *PulumiServiceAccessTokenResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	err := c.deleteAccessToken(req.Id)
+	ctx := context.Background()
+	err := c.deleteAccessToken(ctx, req.Id)
 	if err != nil {
 		return &pbempty.Empty{}, err
 	}
@@ -78,20 +79,21 @@ func (c *PulumiServiceAccessTokenResource) Delete(req *pulumirpc.DeleteRequest) 
 }
 
 func (at *PulumiServiceAccessTokenResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
+	ctx := context.Background()
 	inputs, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
 	}
 
 	inputsAccessToken := at.ToPulumiServiceAccessTokenInput(inputs)
-	accessToken, err := at.createAccessToken(inputsAccessToken)
+	accessToken, err := at.createAccessToken(ctx, inputsAccessToken)
 	if err != nil {
 		return nil, fmt.Errorf("error creating access token '%s': %s", inputsAccessToken.Description, err.Error())
 	}
 
 	outputStore := resource.PropertyMap{}
 	outputStore["__inputs"] = resource.NewObjectProperty(inputs)
-	outputStore["value"] = resource.NewPropertyValue(accessToken.Value)
+	outputStore["value"] = resource.NewPropertyValue(accessToken.TokenValue)
 
 	outputProperties, err := plugin.MarshalProperties(
 		outputStore,
@@ -102,7 +104,7 @@ func (at *PulumiServiceAccessTokenResource) Create(req *pulumirpc.CreateRequest)
 	}
 
 	return &pulumirpc.CreateResponse{
-		Id:         accessToken.Id,
+		Id:         accessToken.ID,
 		Properties: outputProperties,
 	}, nil
 
@@ -121,27 +123,15 @@ func (k *PulumiServiceAccessTokenResource) Read(req *pulumirpc.ReadRequest) (*pu
 }
 
 func (f *PulumiServiceAccessTokenResource) Invoke(s *pulumiserviceProvider, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
-	return &rpc.InvokeResponse{Return: nil}, fmt.Errorf("unknown function '%s'", req.Tok)
+	return &pulumirpc.InvokeResponse{Return: nil}, fmt.Errorf("unknown function '%s'", req.Tok)
 }
 
 func (at *PulumiServiceAccessTokenResource) Configure(config PulumiServiceConfig) {
-	at.config = config
 }
 
-func (at *PulumiServiceAccessTokenResource) createAccessToken(input PulumiServiceAccessTokenInput) (*pulumiapi.AccessToken, error) {
-	token, err := at.config.getPulumiAccessToken()
-	if err != nil {
-		return nil, err
-	}
+func (at *PulumiServiceAccessTokenResource) createAccessToken(ctx context.Context, input PulumiServiceAccessTokenInput) (*pulumiapi.AccessToken, error) {
 
-	url, err := at.config.getPulumiServiceUrl()
-	if err != nil {
-		return nil, err
-	}
-
-	c := pulumiapi.NewClient(*token, *url)
-
-	accesstoken, err := c.CreateAccessToken(input.Description)
+	accesstoken, err := at.client.CreateAccessToken(ctx, input.Description)
 	if err != nil {
 		return nil, err
 	}
@@ -149,23 +139,6 @@ func (at *PulumiServiceAccessTokenResource) createAccessToken(input PulumiServic
 	return accesstoken, nil
 }
 
-func (at *PulumiServiceAccessTokenResource) deleteAccessToken(tokenId string) error {
-	token, err := at.config.getPulumiAccessToken()
-	if err != nil {
-		return err
-	}
-
-	url, err := at.config.getPulumiServiceUrl()
-	if err != nil {
-		return err
-	}
-
-	c := pulumiapi.NewClient(*token, *url)
-
-	err = c.DeleteAccessToken(tokenId)
-	if err != nil {
-		return err
-	}
-
-	return nil
+func (at *PulumiServiceAccessTokenResource) deleteAccessToken(ctx context.Context, tokenId string) error {
+	return at.client.DeleteAccessToken(ctx, tokenId)
 }

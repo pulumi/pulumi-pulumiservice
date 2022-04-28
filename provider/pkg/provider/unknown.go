@@ -5,7 +5,6 @@ import (
 
 	pbempty "github.com/golang/protobuf/ptypes/empty"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
-	rpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
 type PulumiServiceUnknownResource struct{}
@@ -48,7 +47,7 @@ func createUnknownResourceErrorFromRequest(req ResourceBase) error {
 }
 
 func (f *PulumiServiceUnknownResource) Invoke(s *pulumiserviceProvider, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
-	return &rpc.InvokeResponse{Return: nil}, fmt.Errorf("unknown function '%s'", req.Tok)
+	return &pulumirpc.InvokeResponse{Return: nil}, fmt.Errorf("unknown function '%s'", req.Tok)
 }
 
 func (f *PulumiServiceUnknownFunction) Name() string {

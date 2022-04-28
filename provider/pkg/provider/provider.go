@@ -17,12 +17,16 @@ package provider
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"strings"
+	"time"
 
 	"github.com/pulumi/pulumi/pkg/v3/resource/provider"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/pulumiapi"
 
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 
@@ -47,10 +51,11 @@ type PulumiServiceResource interface {
 }
 
 type pulumiserviceProvider struct {
-	host        *provider.HostClient
-	name        string
-	version     string
-	AccessToken string
+	host            *provider.HostClient
+	name            string
+	version         string
+	pulumiResources []PulumiServiceResource
+	AccessToken     string
 }
 
 func makeProvider(host *provider.HostClient, name, version string) (pulumirpc.ResourceProviderServer, error) {
@@ -91,14 +96,39 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 		sc.Config[strings.TrimPrefix(key, "pulumiservice:config:")] = val
 	}
 
-	// if len(k.AccessToken) > 0 {
-	// 	log.Printf("Access token from provider: %s", k.AccessToken)
-	// 	sc.Config["accessToken"] = k.AccessToken
-	// } else {
-	// 	log.Printf("Access token not set")
-	// }
+	httpClient := http.Client{
+		Timeout: 60 * time.Second,
+	}
+	token, err := sc.getPulumiAccessToken()
+	if err != nil {
+		return nil, err
+	}
+	url, err := sc.getPulumiServiceUrl()
+	if err != nil {
+		return nil, err
+	}
+	client, err := pulumiapi.NewClient(&httpClient, *token, *url)
 
-	for _, sr := range PulumiResources {
+	if err != nil {
+		return nil, err
+	}
+
+	k.pulumiResources = []PulumiServiceResource{
+		&PulumiServiceTeamResource{
+			client: client,
+		},
+		&PulumiServiceAccessTokenResource{
+			client: client,
+		},
+		&PulumiServiceWebhookResource{
+			client: client,
+		},
+		&PulumiServiceStackTagResource{
+			client: client,
+		},
+	}
+
+	for _, sr := range k.pulumiResources {
 		sr.Configure(sc)
 	}
 
@@ -108,14 +138,14 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 // Invoke dynamically executes a built-in function in the provider.
 func (k *pulumiserviceProvider) Invoke(_ context.Context, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
 	tok := req.GetTok()
-	return nil, fmt.Errorf("Unknown Invoke token '%s'", tok)
+	return nil, fmt.Errorf("unknown Invoke token '%s'", tok)
 }
 
 // StreamInvoke dynamically executes a built-in function in the provider. The result is streamed
 // back as a series of messages.
 func (k *pulumiserviceProvider) StreamInvoke(req *pulumirpc.InvokeRequest, server pulumirpc.ResourceProvider_StreamInvokeServer) error {
 	tok := req.GetTok()
-	return fmt.Errorf("Unknown StreamInvoke token '%s'", tok)
+	return fmt.Errorf("unknown StreamInvoke token '%s'", tok)
 }
 
 // Check validates that the given property bag is valid for a resource of the given type and returns
@@ -126,35 +156,35 @@ func (k *pulumiserviceProvider) StreamInvoke(req *pulumirpc.InvokeRequest, serve
 // the provider inputs are using for detecting and rendering diffs.
 func (k *pulumiserviceProvider) Check(ctx context.Context, req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
 	rn := getResourceNameFromRequest(req)
-	res := getPulumiServiceResource(rn)
+	res := k.getPulumiServiceResource(rn)
 	return res.Check(req)
 }
 
 // Diff checks what impacts a hypothetical update will have on the resource's properties.
 func (k *pulumiserviceProvider) Diff(ctx context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
 	rn := getResourceNameFromRequest(req)
-	res := getPulumiServiceResource(rn)
+	res := k.getPulumiServiceResource(rn)
 	return res.Diff(req)
 }
 
 // Create allocates a new instance of the provided resource and returns its unique ID afterwards.
 func (k *pulumiserviceProvider) Create(ctx context.Context, req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	rn := getResourceNameFromRequest(req)
-	res := getPulumiServiceResource(rn)
+	res := k.getPulumiServiceResource(rn)
 	return res.Create(req)
 }
 
 // Read the current live state associated with a resource.
 func (k *pulumiserviceProvider) Read(ctx context.Context, req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
 	rn := getResourceNameFromRequest(req)
-	res := getPulumiServiceResource(rn)
+	res := k.getPulumiServiceResource(rn)
 	return res.Read(req)
 }
 
 // Update updates an existing resource with new values.
 func (k *pulumiserviceProvider) Update(ctx context.Context, req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
 	rn := getResourceNameFromRequest(req)
-	res := getPulumiServiceResource(rn)
+	res := k.getPulumiServiceResource(rn)
 	return res.Update(req)
 }
 
@@ -162,7 +192,7 @@ func (k *pulumiserviceProvider) Update(ctx context.Context, req *pulumirpc.Updat
 // to still exist.
 func (k *pulumiserviceProvider) Delete(ctx context.Context, req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
 	rn := getResourceNameFromRequest(req)
-	res := getPulumiServiceResource(rn)
+	res := k.getPulumiServiceResource(rn)
 	return res.Delete(req)
 }
 
@@ -188,6 +218,16 @@ func (k *pulumiserviceProvider) Cancel(context.Context, *pbempty.Empty) (*pbempt
 	return &pbempty.Empty{}, nil
 }
 
+func (k *pulumiserviceProvider) getPulumiServiceResource(name string) PulumiServiceResource {
+	for _, r := range k.pulumiResources {
+		if r.Name() == name {
+			return r
+		}
+	}
+
+	return &PulumiServiceUnknownResource{}
+}
+
 func getResourceNameFromRequest(req ResourceBase) string {
 	urn := resource.URN(req.GetUrn())
 	return urn.Type().String()
@@ -195,14 +235,4 @@ func getResourceNameFromRequest(req ResourceBase) string {
 
 type ResourceBase interface {
 	GetUrn() string
-}
-
-func getPulumiServiceResource(name string) PulumiServiceResource {
-	for _, r := range PulumiResources {
-		if r.Name() == name {
-			return r
-		}
-	}
-
-	return &PulumiServiceUnknownResource{}
 }
