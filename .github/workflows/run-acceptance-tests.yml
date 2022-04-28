@@ -20,7 +20,6 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
   PULUMI_BACKEND_URL: https://api.pulumi-staging.io
-  PULUMI_API: https://api.pulumi-staging.io
   PROVIDER: pulumiservice
 
 jobs:
