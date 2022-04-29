@@ -44,7 +44,7 @@ class Provider(pulumi.ProviderResource):
                  access_token: Optional[pulumi.Input[str]] = None,
                  __props__=None):
         """
-        Create a Pulumi-service resource with the given unique name, props, and options.
+        Create a Pulumiservice resource with the given unique name, props, and options.
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[str] access_token: Access Token to authenticate with Pulumi Service.
@@ -56,7 +56,7 @@ class Provider(pulumi.ProviderResource):
                  args: Optional[ProviderArgs] = None,
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
-        Create a Pulumi-service resource with the given unique name, props, and options.
+        Create a Pulumiservice resource with the given unique name, props, and options.
         :param str resource_name: The name of the resource.
         :param ProviderArgs args: The arguments to use to populate this resource's properties.
         :param pulumi.ResourceOptions opts: Options for the resource.
@@ -89,7 +89,7 @@ class Provider(pulumi.ProviderResource):
                 access_token = (_utilities.get_env('PULUMI_ACCESS_TOKEN') or '')
             __props__.__dict__["access_token"] = access_token
         super(Provider, __self__).__init__(
-            'pulumi-service',
+            'pulumiservice',
             resource_name,
             __props__,
             opts)

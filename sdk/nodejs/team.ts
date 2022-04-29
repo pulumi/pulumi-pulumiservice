@@ -21,7 +21,7 @@ export class Team extends pulumi.CustomResource {
     }
 
     /** @internal */
-    public static readonly __pulumiType = 'pulumi-service:index:Team';
+    public static readonly __pulumiType = 'pulumiservice:index:Team';
 
     /**
      * Returns true if the given object is an instance of Team.  This is designed to work even

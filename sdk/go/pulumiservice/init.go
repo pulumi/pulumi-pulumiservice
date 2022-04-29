@@ -20,11 +20,11 @@ func (m *module) Version() semver.Version {
 
 func (m *module) Construct(ctx *pulumi.Context, name, typ, urn string) (r pulumi.Resource, err error) {
 	switch typ {
-	case "pulumi-service:index:AccessToken":
+	case "pulumiservice:index:AccessToken":
 		r = &AccessToken{}
-	case "pulumi-service:index:Team":
+	case "pulumiservice:index:Team":
 		r = &Team{}
-	case "pulumi-service:index:Webhook":
+	case "pulumiservice:index:Webhook":
 		r = &Webhook{}
 	default:
 		return nil, fmt.Errorf("unknown resource type: %s", typ)
@@ -43,7 +43,7 @@ func (p *pkg) Version() semver.Version {
 }
 
 func (p *pkg) ConstructProvider(ctx *pulumi.Context, name, typ, urn string) (pulumi.ProviderResource, error) {
-	if typ != "pulumi:providers:pulumi-service" {
+	if typ != "pulumi:providers:pulumiservice" {
 		return nil, fmt.Errorf("unknown provider type: %s", typ)
 	}
 
@@ -55,12 +55,12 @@ func (p *pkg) ConstructProvider(ctx *pulumi.Context, name, typ, urn string) (pul
 func init() {
 	version, _ := PkgVersion()
 	pulumi.RegisterResourceModule(
-		"pulumi-service",
+		"pulumiservice",
 		"index",
 		&module{version},
 	)
 	pulumi.RegisterResourcePackage(
-		"pulumi-service",
+		"pulumiservice",
 		&pkg{version},
 	)
 }

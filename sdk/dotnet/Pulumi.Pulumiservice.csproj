@@ -7,7 +7,7 @@
     <Description>A native Pulumi package for creating and managing Pulumi Service constructs</Description>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://pulumi.com</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/pulumi/pulumi-pulumi-service</RepositoryUrl>
+    <RepositoryUrl>https://github.com/pulumi/pulumi-pulumiservice</RepositoryUrl>
     <PackageIcon>logo.png</PackageIcon>
 
     <TargetFramework>netcoreapp3.1</TargetFramework>

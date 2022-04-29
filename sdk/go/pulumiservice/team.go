@@ -46,7 +46,7 @@ func NewTeam(ctx *pulumi.Context,
 		return nil, errors.New("invalid value for required argument 'Type'")
 	}
 	var resource Team
-	err := ctx.RegisterResource("pulumi-service:index:Team", name, args, &resource, opts...)
+	err := ctx.RegisterResource("pulumiservice:index:Team", name, args, &resource, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +58,7 @@ func NewTeam(ctx *pulumi.Context,
 func GetTeam(ctx *pulumi.Context,
 	name string, id pulumi.IDInput, state *TeamState, opts ...pulumi.ResourceOption) (*Team, error) {
 	var resource Team
-	err := ctx.ReadResource("pulumi-service:index:Team", name, id, state, &resource, opts...)
+	err := ctx.ReadResource("pulumiservice:index:Team", name, id, state, &resource, opts...)
 	if err != nil {
 		return nil, err
 	}

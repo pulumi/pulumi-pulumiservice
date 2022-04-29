@@ -21,7 +21,7 @@ export class Webhook extends pulumi.CustomResource {
     }
 
     /** @internal */
-    public static readonly __pulumiType = 'pulumi-service:index:Webhook';
+    public static readonly __pulumiType = 'pulumiservice:index:Webhook';
 
     /**
      * Returns true if the given object is an instance of Webhook.  This is designed to work even

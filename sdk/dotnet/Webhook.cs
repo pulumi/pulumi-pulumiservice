@@ -12,7 +12,7 @@ namespace Pulumi.PulumiService
     /// <summary>
     /// Pulumi Webhooks allow you to notify external services of events happening within your Pulumi organization or stack. For example, you can trigger a notification whenever a stack is updated. Whenever an event occurs, Pulumi will send an HTTP POST request to all registered webhooks. The webhook can then be used to emit some notification, start running integration tests, or even update additional stacks.
     /// </summary>
-    [PulumiServiceResourceType("pulumi-service:index:Webhook")]
+    [PulumiServiceResourceType("pulumiservice:index:Webhook")]
     public partial class Webhook : Pulumi.CustomResource
     {
         /// <summary>
@@ -60,12 +60,12 @@ namespace Pulumi.PulumiService
         /// <param name="args">The arguments used to populate this resource's properties</param>
         /// <param name="options">A bag of options that control this resource's behavior</param>
         public Webhook(string name, WebhookArgs args, CustomResourceOptions? options = null)
-            : base("pulumi-service:index:Webhook", name, args ?? new WebhookArgs(), MakeResourceOptions(options, ""))
+            : base("pulumiservice:index:Webhook", name, args ?? new WebhookArgs(), MakeResourceOptions(options, ""))
         {
         }
 
         private Webhook(string name, Input<string> id, CustomResourceOptions? options = null)
-            : base("pulumi-service:index:Webhook", name, null, MakeResourceOptions(options, id))
+            : base("pulumiservice:index:Webhook", name, null, MakeResourceOptions(options, id))
         {
         }
 

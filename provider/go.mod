@@ -135,7 +135,6 @@ require (
 
 require (
 	github.com/golang/protobuf v1.5.2
-	github.com/pierskarsenbarg/pulumi-apiclient v0.0.1
 	github.com/pulumi/pulumi/pkg/v3 v3.29.0
 	github.com/pulumi/pulumi/sdk/v3 v3.29.0
 	github.com/stretchr/testify v1.7.1

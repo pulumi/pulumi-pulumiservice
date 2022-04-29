@@ -25,7 +25,7 @@ func NewProvider(ctx *pulumi.Context,
 		args.AccessToken = pulumi.StringPtr(getEnvOrDefault("", nil, "PULUMI_ACCESS_TOKEN").(string))
 	}
 	var resource Provider
-	err := ctx.RegisterResource("pulumi:providers:pulumi-service", name, args, &resource, opts...)
+	err := ctx.RegisterResource("pulumi:providers:pulumiservice", name, args, &resource, opts...)
 	if err != nil {
 		return nil, err
 	}
