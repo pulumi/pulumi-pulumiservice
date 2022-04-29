@@ -54,9 +54,9 @@ nodejs_sdk::
 	$(WORKING_DIR)/bin/$(CODEGEN) -version=${VERSION} nodejs $(SCHEMA_FILE) $(CURDIR)
 	cd ${PACKDIR}/nodejs/ && \
 		yarn install && \
-		yarn run tsc
-	sed -i.bak -e 's/\$${VERSION}/$(VERSION)/g' ${PACKDIR}/nodejs/package.json
-	cp README.md LICENSE ${PACKDIR}/nodejs/package.json ${PACKDIR}/nodejs/yarn.lock ${PACKDIR}/nodejs/bin/
+		yarn run tsc && \
+		cp ../../README.md ../../LICENSE package.json yarn.lock ./bin/ && \
+		sed -i.bak -e 's/\$${VERSION}/$(VERSION)/g' ./bin/package.json
 
 python_sdk:: PYPI_VERSION := $(shell pulumictl get version --language python)
 python_sdk::
