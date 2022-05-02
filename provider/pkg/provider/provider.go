@@ -123,6 +123,9 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 		&PulumiServiceWebhookResource{
 			client: client,
 		},
+		&PulumiServiceStackTagResource{
+			client: client,
+		},
 	}
 
 	for _, sr := range k.pulumiResources {

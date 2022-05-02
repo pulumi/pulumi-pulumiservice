@@ -186,6 +186,53 @@
         "organizationName",
         "payloadUrl"
       ]
+    },
+    "pulumiservice:index:StackTag": {
+      "description": "Stacks have associated metadata in the form of tags. Each tag consists of a name and value.",
+      "properties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "project": {
+          "description": "Project name.",
+          "type": "string"
+        },
+        "stack": {
+          "description": "Stack name.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Name of the tag. The 'key' part of the key=value pair",
+          "type": "string"
+        },
+        "value": {
+          "description": "Value of the tag. The 'value' part of the key=value pair",
+          "type": "string"
+        }
+      },
+      "inputProperties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "project": {
+          "description": "Project name.",
+          "type": "string"
+        },
+        "stack": {
+          "description": "Stack name.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Name of the tag. The 'key' part of the key=value pair",
+          "type": "string"
+        },
+        "value": {
+          "description": "Value of the tag. The 'value' part of the key=value pair",
+          "type": "string"
+        }
+      }
     }
   },
   "language": {
