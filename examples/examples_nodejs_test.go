@@ -26,9 +26,6 @@ func TestStackTagsExample(t *testing.T) {
 		Quick:       true,
 		SkipRefresh: true,
 		Dir:         path.Join(cwd, ".", "ts-stack-tags"),
-		Config: map[string]string{
-			"orgName": "service-provider-test-org",
-		},
 		Dependencies: []string{
 			"@pulumi/pulumiservice",
 		},

@@ -11,7 +11,7 @@ export const stackTags = {
 
 Object.entries(stackTags).forEach(([k, v]) => {
     new pulumiservice.StackTag(k, {
-        organization: config.require("orgName"),
+        organization: "pulumi",
         project: pulumi.getProject(),
         stack: pulumi.getStack(),
         name: k,
