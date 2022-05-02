@@ -92,7 +92,7 @@ class AccessToken(pulumi.CustomResource):
         secret_opts = pulumi.ResourceOptions(additional_secret_outputs=["value"])
         opts = pulumi.ResourceOptions.merge(opts, secret_opts)
         super(AccessToken, __self__).__init__(
-            'pulumi-service:index:AccessToken',
+            'pulumiservice:index:AccessToken',
             resource_name,
             __props__,
             opts)

@@ -7,13 +7,24 @@ on:
       - v*
       - sdk/*
       - '**'
+  pull_request:
+    branches:
+      - main
+    paths_ignore:
+      - CHANGELOG.md
+  repository_dispatch:
+    types:
+    - run-acceptance-tests-command
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+  PULUMI_BACKEND_URL: https://api.pulumi-staging.io
   PROVIDER: pulumiservice
 
 jobs:
   build_sdks:
+    if: github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
     name: build_sdks
     runs-on: ubuntu-latest
     needs: prerequisites
@@ -21,7 +32,7 @@ jobs:
       fail-fast: true
       matrix:
         dotnetversion: [ 3.1.301 ]
-        goversion: [ 1.16.x ]
+        goversion: [ 1.17.x ]
         language: [ nodejs, python, dotnet, go ]
         nodeversion: [ 14.x ]
         pythonversion: [ 3.7 ]
@@ -68,8 +79,8 @@ jobs:
           -exec chmod +x {} \;
       - name: Generate SDK
         run: make ${{ matrix.language }}_sdk
-      # - name: Check worktree clean
-      #   run: ./ci-scripts/ci/check-worktree-is-clean
+      - name: Check worktree clean
+        run: ./ci-scripts/ci/check-worktree-is-clean
       - run: git status --porcelain
       - name: Compress SDK folder
         run: tar -zcf sdk/${{ matrix.language }}.tar.gz -C sdk/${{ matrix.language }} .
@@ -83,7 +94,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        goversion: [1.16.x]
+        goversion: [1.17.x]
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v2
@@ -110,8 +121,8 @@ jobs:
         run: make gen
       - name: Build provider binary
         run: make provider
-      # - name: Check worktree clean
-      #   run: ./ci-scripts/ci/check-worktree-is-clean
+      - name: Check worktree clean
+        run: ./ci-scripts/ci/check-worktree-is-clean
       - run: git status --porcelain
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
@@ -128,7 +139,7 @@ jobs:
       fail-fast: true
       matrix:
         dotnetversion: [3.1.301]
-        goversion: [1.16.x]
+        goversion: [1.17.x]
         language: [nodejs]
         nodeversion: [14.x]
         pythonversion: [3.7]

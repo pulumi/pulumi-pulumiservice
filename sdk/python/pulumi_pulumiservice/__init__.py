@@ -12,22 +12,22 @@ from .webhook import *
 
 # Make subpackages available:
 if typing.TYPE_CHECKING:
-    import pulumi_pulumi_service.config as __config
+    import pulumi_pulumiservice.config as __config
     config = __config
 else:
-    config = _utilities.lazy_import('pulumi_pulumi_service.config')
+    config = _utilities.lazy_import('pulumi_pulumiservice.config')
 
 _utilities.register(
     resource_modules="""
 [
  {
-  "pkg": "pulumi-service",
+  "pkg": "pulumiservice",
   "mod": "index",
-  "fqn": "pulumi_pulumi_service",
+  "fqn": "pulumi_pulumiservice",
   "classes": {
-   "pulumi-service:index:AccessToken": "AccessToken",
-   "pulumi-service:index:Team": "Team",
-   "pulumi-service:index:Webhook": "Webhook"
+   "pulumiservice:index:AccessToken": "AccessToken",
+   "pulumiservice:index:Team": "Team",
+   "pulumiservice:index:Webhook": "Webhook"
   }
  }
 ]
@@ -35,9 +35,9 @@ _utilities.register(
     resource_packages="""
 [
  {
-  "pkg": "pulumi-service",
-  "token": "pulumi:providers:pulumi-service",
-  "fqn": "pulumi_pulumi_service",
+  "pkg": "pulumiservice",
+  "token": "pulumi:providers:pulumiservice",
+  "fqn": "pulumi_pulumiservice",
   "class": "Provider"
  }
 ]

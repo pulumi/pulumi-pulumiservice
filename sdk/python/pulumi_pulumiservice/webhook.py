@@ -174,7 +174,7 @@ class Webhook(pulumi.CustomResource):
         secret_opts = pulumi.ResourceOptions(additional_secret_outputs=["secret"])
         opts = pulumi.ResourceOptions.merge(opts, secret_opts)
         super(Webhook, __self__).__init__(
-            'pulumi-service:index:Webhook',
+            'pulumiservice:index:Webhook',
             resource_name,
             __props__,
             opts)

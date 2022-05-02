@@ -38,7 +38,7 @@ func NewAccessToken(ctx *pulumi.Context,
 	})
 	opts = append(opts, secrets)
 	var resource AccessToken
-	err := ctx.RegisterResource("pulumi-service:index:AccessToken", name, args, &resource, opts...)
+	err := ctx.RegisterResource("pulumiservice:index:AccessToken", name, args, &resource, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +50,7 @@ func NewAccessToken(ctx *pulumi.Context,
 func GetAccessToken(ctx *pulumi.Context,
 	name string, id pulumi.IDInput, state *AccessTokenState, opts ...pulumi.ResourceOption) (*AccessToken, error) {
 	var resource AccessToken
-	err := ctx.ReadResource("pulumi-service:index:AccessToken", name, id, state, &resource, opts...)
+	err := ctx.ReadResource("pulumiservice:index:AccessToken", name, id, state, &resource, opts...)
 	if err != nil {
 		return nil, err
 	}

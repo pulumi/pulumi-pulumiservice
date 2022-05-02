@@ -9,7 +9,7 @@ using Pulumi.Serialization;
 
 namespace Pulumi.PulumiService
 {
-    [PulumiServiceResourceType("pulumi:providers:pulumi-service")]
+    [PulumiServiceResourceType("pulumi:providers:pulumiservice")]
     public partial class Provider : Pulumi.ProviderResource
     {
         /// <summary>
@@ -20,7 +20,7 @@ namespace Pulumi.PulumiService
         /// <param name="args">The arguments used to populate this resource's properties</param>
         /// <param name="options">A bag of options that control this resource's behavior</param>
         public Provider(string name, ProviderArgs? args = null, CustomResourceOptions? options = null)
-            : base("pulumi-service", name, args ?? new ProviderArgs(), MakeResourceOptions(options, ""))
+            : base("pulumiservice", name, args ?? new ProviderArgs(), MakeResourceOptions(options, ""))
         {
         }
 

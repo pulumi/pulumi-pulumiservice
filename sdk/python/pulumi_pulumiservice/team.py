@@ -190,7 +190,7 @@ class Team(pulumi.CustomResource):
                 raise TypeError("Missing required property 'type'")
             __props__.__dict__["type"] = type
         super(Team, __self__).__init__(
-            'pulumi-service:index:Team',
+            'pulumiservice:index:Team',
             resource_name,
             __props__,
             opts)

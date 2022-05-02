@@ -12,7 +12,7 @@ namespace Pulumi.PulumiService
     /// <summary>
     /// Access tokens allow a user to authenticate against the Pulumi Service
     /// </summary>
-    [PulumiServiceResourceType("pulumi-service:index:AccessToken")]
+    [PulumiServiceResourceType("pulumiservice:index:AccessToken")]
     public partial class AccessToken : Pulumi.CustomResource
     {
         /// <summary>
@@ -42,12 +42,12 @@ namespace Pulumi.PulumiService
         /// <param name="args">The arguments used to populate this resource's properties</param>
         /// <param name="options">A bag of options that control this resource's behavior</param>
         public AccessToken(string name, AccessTokenArgs args, CustomResourceOptions? options = null)
-            : base("pulumi-service:index:AccessToken", name, args ?? new AccessTokenArgs(), MakeResourceOptions(options, ""))
+            : base("pulumiservice:index:AccessToken", name, args ?? new AccessTokenArgs(), MakeResourceOptions(options, ""))
         {
         }
 
         private AccessToken(string name, Input<string> id, CustomResourceOptions? options = null)
-            : base("pulumi-service:index:AccessToken", name, null, MakeResourceOptions(options, id))
+            : base("pulumiservice:index:AccessToken", name, null, MakeResourceOptions(options, id))
         {
         }
 

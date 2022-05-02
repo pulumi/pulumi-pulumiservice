@@ -202,13 +202,13 @@
       "importBasePath": "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice"
     },
     "nodejs": {
-      "packageName": "@pulumi/pulumi-service",
+      "packageName": "@pulumi/pulumiservice",
       "dependencies": {
         "@pulumi/pulumi": "^3.0.0"
       }
     },
     "python": {
-      "packageName": "pulumi_service",
+      "packageName": "pulumi_pulumiservice",
       "requires": {
         "pulumi": ">=3.0.0,<4.0.0"
       }

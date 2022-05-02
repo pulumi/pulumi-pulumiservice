@@ -56,7 +56,7 @@ func NewWebhook(ctx *pulumi.Context,
 	})
 	opts = append(opts, secrets)
 	var resource Webhook
-	err := ctx.RegisterResource("pulumi-service:index:Webhook", name, args, &resource, opts...)
+	err := ctx.RegisterResource("pulumiservice:index:Webhook", name, args, &resource, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func NewWebhook(ctx *pulumi.Context,
 func GetWebhook(ctx *pulumi.Context,
 	name string, id pulumi.IDInput, state *WebhookState, opts ...pulumi.ResourceOption) (*Webhook, error) {
 	var resource Webhook
-	err := ctx.ReadResource("pulumi-service:index:Webhook", name, id, state, &resource, opts...)
+	err := ctx.ReadResource("pulumiservice:index:Webhook", name, id, state, &resource, opts...)
 	if err != nil {
 		return nil, err
 	}

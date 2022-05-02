@@ -26,25 +26,25 @@ const _module = {
     version: utilities.getVersion(),
     construct: (name: string, type: string, urn: string): pulumi.Resource => {
         switch (type) {
-            case "pulumi-service:index:AccessToken":
+            case "pulumiservice:index:AccessToken":
                 return new AccessToken(name, <any>undefined, { urn })
-            case "pulumi-service:index:Team":
+            case "pulumiservice:index:Team":
                 return new Team(name, <any>undefined, { urn })
-            case "pulumi-service:index:Webhook":
+            case "pulumiservice:index:Webhook":
                 return new Webhook(name, <any>undefined, { urn })
             default:
                 throw new Error(`unknown resource type ${type}`);
         }
     },
 };
-pulumi.runtime.registerResourceModule("pulumi-service", "index", _module)
+pulumi.runtime.registerResourceModule("pulumiservice", "index", _module)
 
 import { Provider } from "./provider";
 
-pulumi.runtime.registerResourcePackage("pulumi-service", {
+pulumi.runtime.registerResourcePackage("pulumiservice", {
     version: utilities.getVersion(),
     constructProvider: (name: string, type: string, urn: string): pulumi.ProviderResource => {
-        if (type !== "pulumi:providers:pulumi-service") {
+        if (type !== "pulumi:providers:pulumiservice") {
             throw new Error(`unknown provider type ${type}`);
         }
         return new Provider(name, <any>undefined, { urn });
