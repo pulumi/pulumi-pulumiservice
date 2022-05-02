@@ -11,7 +11,7 @@ export const stackTags = {
 
 Object.entries(stackTags).forEach(([k, v]) => {
     new pulumiservice.StackTag(k, {
-        organization: "pulumi",
+        organization: "pulumi-bot",
         project: pulumi.getProject(),
         stack: pulumi.getStack(),
         name: k,
