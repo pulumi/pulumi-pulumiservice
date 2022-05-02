@@ -20,6 +20,8 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
   PULUMI_BACKEND_URL: https://api.pulumi-staging.io
+  # Required to create stack in specific org.
+  PULUMI_TEST_OWNER: service-provider-test-org
   PROVIDER: pulumiservice
 
 jobs:
