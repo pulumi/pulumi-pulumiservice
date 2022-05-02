@@ -34,7 +34,7 @@ func ToPropertyMap(obj interface{}, structTagName string) resource.PropertyMap {
 func FromPropertyMap(properties resource.PropertyMap, structTagName string, out interface{}) error {
 	v := reflect.ValueOf(out)
 	kind := v.Kind()
-	if kind == reflect.Pointer {
+	if kind == reflect.Ptr {
 		v = v.Elem()
 		kind = v.Kind()
 	}
