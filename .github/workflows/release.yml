@@ -35,7 +35,7 @@ env:
   PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
   TRAVIS_OS_NAME: linux
 jobs:
-  publish-binary:
+  publish_binary:
     name: publish
     runs-on: ubuntu-latest
     steps:
