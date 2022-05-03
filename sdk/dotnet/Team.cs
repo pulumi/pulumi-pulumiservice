@@ -48,8 +48,8 @@ namespace Pulumi.PulumiService
         /// <summary>
         /// The type of team. Must be either `pulumi` or `github`.
         /// </summary>
-        [Output("type")]
-        public Output<string?> Type { get; private set; } = null!;
+        [Output("teamType")]
+        public Output<string?> TeamType { get; private set; } = null!;
 
 
         /// <summary>
@@ -135,8 +135,8 @@ namespace Pulumi.PulumiService
         /// <summary>
         /// The type of team. Must be either `pulumi` or `github`.
         /// </summary>
-        [Input("type", required: true)]
-        public Input<string> Type { get; set; } = null!;
+        [Input("teamType", required: true)]
+        public Input<string> TeamType { get; set; } = null!;
 
         public TeamArgs()
         {

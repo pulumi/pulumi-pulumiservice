@@ -57,7 +57,7 @@ export class Team extends pulumi.CustomResource {
     /**
      * The type of team. Must be either `pulumi` or `github`.
      */
-    public readonly type!: pulumi.Output<string | undefined>;
+    public readonly teamType!: pulumi.Output<string | undefined>;
 
     /**
      * Create a Team resource with the given unique name, arguments, and options.
@@ -76,22 +76,22 @@ export class Team extends pulumi.CustomResource {
             if ((!args || args.organizationName === undefined) && !opts.urn) {
                 throw new Error("Missing required property 'organizationName'");
             }
-            if ((!args || args.type === undefined) && !opts.urn) {
-                throw new Error("Missing required property 'type'");
+            if ((!args || args.teamType === undefined) && !opts.urn) {
+                throw new Error("Missing required property 'teamType'");
             }
             resourceInputs["description"] = args ? args.description : undefined;
             resourceInputs["displayName"] = args ? args.displayName : undefined;
             resourceInputs["members"] = args ? args.members : undefined;
             resourceInputs["name"] = args ? args.name : undefined;
             resourceInputs["organizationName"] = args ? args.organizationName : undefined;
-            resourceInputs["type"] = args ? args.type : undefined;
+            resourceInputs["teamType"] = args ? args.teamType : undefined;
         } else {
             resourceInputs["description"] = undefined /*out*/;
             resourceInputs["displayName"] = undefined /*out*/;
             resourceInputs["members"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
             resourceInputs["organizationName"] = undefined /*out*/;
-            resourceInputs["type"] = undefined /*out*/;
+            resourceInputs["teamType"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         super(Team.__pulumiType, name, resourceInputs, opts);
@@ -125,5 +125,5 @@ export interface TeamArgs {
     /**
      * The type of team. Must be either `pulumi` or `github`.
      */
-    type: pulumi.Input<string>;
+    teamType: pulumi.Input<string>;
 }

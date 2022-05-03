@@ -211,6 +211,11 @@ func (c *Client) updateTeamMembership(ctx context.Context, orgName, teamName, us
 func (c *Client) AddMemberToTeam(ctx context.Context, orgName, teamName, userName string) error {
 	err := c.updateTeamMembership(ctx, orgName, teamName, userName, "add")
 	if err != nil {
+		var errResp *errorResponse
+		if errors.As(err, &errResp) && errResp.StatusCode == http.StatusConflict {
+			// ignore 409 since that means the team member is already added
+			return nil
+		}
 		return err
 	} else {
 		return nil

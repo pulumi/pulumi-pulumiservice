@@ -31,3 +31,15 @@ func TestStackTagsExample(t *testing.T) {
 		},
 	})
 }
+
+func TestTeamsExample(t *testing.T) {
+	cwd, _ := os.Getwd()
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Quick:       true,
+		SkipRefresh: true,
+		Dir:         path.Join(cwd, ".", "ts-teams"),
+		Dependencies: []string{
+			"@pulumi/pulumiservice",
+		},
+	})
+}

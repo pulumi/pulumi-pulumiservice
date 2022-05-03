@@ -65,7 +65,7 @@
     "pulumiservice:index:Team": {
       "description": "The Pulumi Service offers role-based access control (RBAC) using teams. Teams allow organization admins to assign a set of stack permissions to a group of users.",
       "properties": {
-        "type": {
+        "teamType": {
           "description": "The type of team. Must be either `pulumi` or `github`.",
           "type": "string"
         },
@@ -94,7 +94,7 @@
         }
       },
       "inputProperties": {
-        "type": {
+        "teamType": {
           "description": "The type of team. Must be either `pulumi` or `github`.",
           "type": "string"
         },
@@ -125,7 +125,7 @@
       "requiredInputs": [
         "name",
         "organizationName",
-        "type"
+        "teamType"
       ]
     },
     "pulumiservice:index:Webhook": {

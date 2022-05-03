@@ -28,7 +28,7 @@ type PulumiServiceTeamInput struct {
 
 func (i *PulumiServiceTeamInput) ToPropertyMap() resource.PropertyMap {
 	pm := resource.PropertyMap{}
-	pm["type"] = resource.NewPropertyValue(i.Type)
+	pm["teamType"] = resource.NewPropertyValue(i.Type)
 	pm["name"] = resource.NewPropertyValue(i.Name)
 	pm["displayName"] = resource.NewPropertyValue(i.DisplayName)
 	pm["description"] = resource.NewPropertyValue(i.Description)
@@ -44,8 +44,8 @@ func (t *PulumiServiceTeamResource) ToPulumiServiceTeamInput(inputMap resource.P
 		input.Name = inputMap["name"].StringValue()
 	}
 
-	if inputMap["type"].HasValue() && inputMap["type"].IsString() {
-		input.Type = inputMap["type"].StringValue()
+	if inputMap["teamType"].HasValue() && inputMap["teamType"].IsString() {
+		input.Type = inputMap["teamType"].StringValue()
 	}
 
 	if inputMap["displayName"].HasValue() && inputMap["displayName"].IsString() {
@@ -114,7 +114,7 @@ func (tr *PulumiServiceTeamResource) Diff(req *pulumirpc.DiffRequest) (*pulumirp
 	}
 
 	changes := pulumirpc.DiffResponse_DIFF_NONE
-	if diffs.Changed("type") ||
+	if diffs.Changed("teamType") ||
 		diffs.Changed("name") ||
 		diffs.Changed("displayName") ||
 		diffs.Changed("description") ||
