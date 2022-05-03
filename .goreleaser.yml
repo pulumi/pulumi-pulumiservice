@@ -5,7 +5,7 @@ before:
   hooks:
     - make gen
 builds:
-  - binary: pulumi-resource-xyz
+  - binary: pulumi-resource-pulumiservice
     dir: provider
     env:
       - CGO_ENABLED=0
