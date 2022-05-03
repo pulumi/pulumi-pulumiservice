@@ -26,7 +26,7 @@ type Team struct {
 	// The organization's name.
 	OrganizationName pulumi.StringPtrOutput `pulumi:"organizationName"`
 	// The type of team. Must be either `pulumi` or `github`.
-	Type pulumi.StringPtrOutput `pulumi:"type"`
+	TeamType pulumi.StringPtrOutput `pulumi:"teamType"`
 }
 
 // NewTeam registers a new resource with the given unique name, arguments, and options.
@@ -42,8 +42,8 @@ func NewTeam(ctx *pulumi.Context,
 	if args.OrganizationName == nil {
 		return nil, errors.New("invalid value for required argument 'OrganizationName'")
 	}
-	if args.Type == nil {
-		return nil, errors.New("invalid value for required argument 'Type'")
+	if args.TeamType == nil {
+		return nil, errors.New("invalid value for required argument 'TeamType'")
 	}
 	var resource Team
 	err := ctx.RegisterResource("pulumiservice:index:Team", name, args, &resource, opts...)
@@ -88,7 +88,7 @@ type teamArgs struct {
 	// The organization's name.
 	OrganizationName string `pulumi:"organizationName"`
 	// The type of team. Must be either `pulumi` or `github`.
-	Type string `pulumi:"type"`
+	TeamType string `pulumi:"teamType"`
 }
 
 // The set of arguments for constructing a Team resource.
@@ -104,7 +104,7 @@ type TeamArgs struct {
 	// The organization's name.
 	OrganizationName pulumi.StringInput
 	// The type of team. Must be either `pulumi` or `github`.
-	Type pulumi.StringInput
+	TeamType pulumi.StringInput
 }
 
 func (TeamArgs) ElementType() reflect.Type {
