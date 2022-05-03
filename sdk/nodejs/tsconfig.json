@@ -18,6 +18,7 @@
         "config/vars.ts",
         "index.ts",
         "provider.ts",
+        "stackTag.ts",
         "team.ts",
         "utilities.ts",
         "webhook.ts"

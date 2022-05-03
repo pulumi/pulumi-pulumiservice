@@ -7,6 +7,7 @@ import typing
 # Export this package's modules as members:
 from .access_token import *
 from .provider import *
+from .stack_tag import *
 from .team import *
 from .webhook import *
 
@@ -26,6 +27,7 @@ _utilities.register(
   "fqn": "pulumi_pulumiservice",
   "classes": {
    "pulumiservice:index:AccessToken": "AccessToken",
+   "pulumiservice:index:StackTag": "StackTag",
    "pulumiservice:index:Team": "Team",
    "pulumiservice:index:Webhook": "Webhook"
   }

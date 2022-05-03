@@ -19,3 +19,15 @@ func TestAccessTokenExample(t *testing.T) {
 		},
 	})
 }
+
+func TestStackTagsExample(t *testing.T) {
+	cwd, _ := os.Getwd()
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Quick:       true,
+		SkipRefresh: true,
+		Dir:         path.Join(cwd, ".", "ts-stack-tags"),
+		Dependencies: []string{
+			"@pulumi/pulumiservice",
+		},
+	})
+}
