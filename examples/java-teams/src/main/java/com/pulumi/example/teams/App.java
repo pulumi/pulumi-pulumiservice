@@ -9,7 +9,7 @@ public class App {
        Pulumi.run(ctx -> {
            var team = new Team("Team", TeamArgs
                    .builder()
-                   .name("brand-new-team")
+                   .name("brand-new-java-team")
                    .description("This was created with Pulumi")
                    .displayName("PulumiUP Team")
                    .organizationName("service-provider-test-org")
