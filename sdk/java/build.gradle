@@ -77,6 +77,14 @@ test {
 }
 
 publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId = 'com.pulumi'
+            artifactId = 'pulumiservice'
+            version = System.getenv("VERSION") ?: "0.1.0"
+            from components.java
+        }
+    }
     // from https://docs.github.com/en/actions/publishing-packages/publishing-java-packages-with-gradle
     repositories {
         maven {
