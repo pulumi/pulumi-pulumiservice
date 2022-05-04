@@ -191,11 +191,13 @@ jobs:
           echo "done publishing packages"
       - name: Publish Provider Java SDK
         if: ${{ matrix.language == 'java' && env.PUBLISH_MAVEN == 'true' }}
-        uses: gradle/gradle-build-action@4137be6a8bf7d7133955359dbd952c0ca73b1021
+        uses: gradle/gradle-build-action@v2
         with:
           arguments: publish
           build-root-directory: sdk/java
           gradle-version: 7.4.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     strategy:
       fail-fast: true
       matrix:
