@@ -21,6 +21,8 @@ env:
   PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
   PULUMI_BACKEND_URL: https://api.pulumi-staging.io
   PROVIDER: pulumiservice
+  # Need to pin this as 0.1.0 until codegen is updated
+  PULUMI_JAVA_SDK_VERSION: 0.1.0
 
 jobs:
   build_sdks:
@@ -33,9 +35,10 @@ jobs:
       matrix:
         dotnetversion: [ 3.1.301 ]
         goversion: [ 1.17.x ]
-        language: [ nodejs, python, dotnet, go ]
+        language: [ nodejs, python, dotnet, go, java ]
         nodeversion: [ 14.x ]
         pythonversion: [ 3.7 ]
+        javaversion: [ 11 ]
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v2
@@ -63,6 +66,16 @@ jobs:
         uses: actions/setup-python@v1
         with:
           python-version: ${{matrix.pythonversion}}
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        if: ${{ matrix.language == 'java' }}
+        with:
+          java-version: ${{matrix.javaversion}}
+          distribution: 'adopt'
+          cache: 'gradle'
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@e6e38bacfdf1a337459f332974bb2327a31aaf4b
+        if: ${{ matrix.language == 'java' }}
       - name: Install pulumictl
         uses: jaxxstorm/action-install-gh-release@v1.1.0
         with:
@@ -140,9 +153,10 @@ jobs:
       matrix:
         dotnetversion: [3.1.301]
         goversion: [1.17.x]
-        language: [nodejs]
+        language: [nodejs, java]
         nodeversion: [14.x]
         pythonversion: [3.7]
+        javaversion: [11]
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v2
