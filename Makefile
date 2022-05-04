@@ -73,15 +73,15 @@ python_sdk::
 
 java_sdk:: RESOURCE_FOLDER := src/main/resources/com/pulumi/pulumiservice
 java_sdk::
-	rm -rf sdk/java/
+	rm -rf sdk/java/{.gradle,build,src}
 	$(WORKING_DIR)/bin/$(CODEGEN) -version=${VERSION} java $(SCHEMA_FILE) $(CURDIR)
 	cd sdk/java && \
       mkdir -p $(RESOURCE_FOLDER) && \
 	  # Dirty hacks until the codegen library supports this out of the box
 	  echo "$(VERSION)" > $(RESOURCE_FOLDER)/version.txt && \
 	  echo '{"resource": true,"name": "pulumiservice","version": "$(VERSION)"}' > $(RESOURCE_FOLDER)/plugin.json && \
-	  PULUMI_JAVA_SDK_VERSION=0.1.0 gradle --console=plain build && \
-	  PULUMI_JAVA_SDK_VERSION=0.1.0 gradle --console=plain publishToMavenLocal
+	  PULUMI_JAVA_SDK_VERSION=0.1.0 ./gradlew --console=plain build && \
+	  PULUMI_JAVA_SDK_VERSION=0.1.0 ./gradlew --console=plain publishToMavenLocal
 
 .PHONY: build
 build:: gen provider dotnet_sdk go_sdk nodejs_sdk python_sdk java_sdk
