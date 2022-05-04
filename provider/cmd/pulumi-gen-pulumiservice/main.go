@@ -22,6 +22,7 @@ import (
 	"os"
 	"path/filepath"
 
+	javagen "github.com/pulumi/pulumi-java/pkg/codegen/java"
 	providerVersion "github.com/pulumi/pulumi-pulumiservice/provider/pkg/version"
 	dotnetgen "github.com/pulumi/pulumi/pkg/v3/codegen/dotnet"
 	gogen "github.com/pulumi/pulumi/pkg/v3/codegen/go"
@@ -45,6 +46,7 @@ const (
 	Go     Language = "go"
 	NodeJS Language = "nodejs"
 	Python Language = "python"
+	Java   Language = "java"
 )
 
 func main() {
@@ -84,6 +86,8 @@ func main() {
 	case Go:
 		templateDir := filepath.Join(TemplateDir, "_go-templates")
 		writeGoClient(readSchema(inputFile, version), outdir, templateDir)
+	case Java:
+		writeJavaClient(readSchema(inputFile, version), outdir)
 	default:
 		panic(fmt.Sprintf("Unrecognized language '%s'", language))
 	}
@@ -172,6 +176,14 @@ func writeGoClient(pkg *schema.Package, outdir string, templateDir string) {
 		panic(err)
 	}
 
+	mustWriteFiles(outdir, files)
+}
+
+func writeJavaClient(pkg *schema.Package, outdir string) {
+	files, err := javagen.GeneratePackage("pulumi-java-gen", pkg, nil)
+	if err != nil {
+		panic(err)
+	}
 	mustWriteFiles(outdir, files)
 }
 

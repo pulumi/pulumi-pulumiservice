@@ -25,6 +25,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/pulumiapi"
 
@@ -56,6 +57,11 @@ type pulumiserviceProvider struct {
 	version         string
 	pulumiResources []PulumiServiceResource
 	AccessToken     string
+}
+
+// Attach implements pulumirpc.ResourceProviderServer
+func (*pulumiserviceProvider) Attach(context.Context, *pulumirpc.PluginAttach) (*emptypb.Empty, error) {
+	return &emptypb.Empty{}, nil
 }
 
 func makeProvider(host *provider.HostClient, name, version string) (pulumirpc.ResourceProviderServer, error) {
