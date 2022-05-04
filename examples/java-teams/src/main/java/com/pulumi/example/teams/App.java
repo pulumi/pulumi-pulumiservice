@@ -9,12 +9,12 @@ public class App {
        Pulumi.run(ctx -> {
            var team = new Team("Team", TeamArgs
                    .builder()
-                   .name("pulumi-up-team")
+                   .name("brand-new-team")
                    .description("This was created with Pulumi")
                    .displayName("PulumiUP Team")
-                   .organizationName("pulumi-up")
+                   .organizationName("service-provider-test-org")
                    .teamType("pulumi")
-                   .members("piers", "myles", "meagan")
+                   .members("pulumi-bot", "service-provider-example-user")
                    .build());
            ctx.export("members", team.members());
        });
