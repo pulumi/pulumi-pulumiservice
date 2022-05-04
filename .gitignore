@@ -11,4 +11,3 @@ yarn.lock
 ci-scripts
 /nuget/
 **/version.txt
-sdk/python/README.md
