@@ -1,10 +1,10 @@
 # Pulumi Service Provider
 
 [![Slack](http://www.pulumi.com/images/docs/badges/slack.svg)](https://slack.pulumi.com)
-[![NPM version](https://badge.fury.io/js/%40pulumi%2Faws.svg)](https://www.npmjs.com/package/@pulumi/pulumiservice)
-[![Python version](https://badge.fury.io/py/pulumi-aws.svg)](https://pypi.org/project/pulumi-pulumiservice)
-[![NuGet version](https://badge.fury.io/nu/pulumi.aws.svg)](https://badge.fury.io/nu/pulumi.pulumiservice)
-[![PkgGoDev](https://pkg.go.dev/badge/github.com/pulumi/pulumi-aws/sdk/v5/go)](https://pkg.go.dev/github.com/pulumi/pulumi-pulumiservice/sdk/go)
+[![NPM version](https://badge.fury.io/js/%40pulumi%2Fpulumiservice.svg)](https://www.npmjs.com/package/@pulumi/pulumiservice)
+[![Python version](https://badge.fury.io/py/pulumi-pulumiservice.svg)](https://pypi.org/project/pulumi-pulumiservice)
+[![NuGet version](https://badge.fury.io/nu/pulumi.pulumiservice.svg)](https://badge.fury.io/nu/pulumi.pulumiservice)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice)](https://pkg.go.dev/github.com/pulumi/pulumi-pulumiservice/sdk/go)
 [![License](https://img.shields.io/npm/l/%40pulumi%2Fpulumi.svg)](https://github.com/pulumi/pulumi-pulumiservice/blob/main/LICENSE)
 
 A Pulumi Resource Provider for The Pulumi Service.
