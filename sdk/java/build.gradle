@@ -10,7 +10,7 @@ var gprToken = project.findProperty("gpr.token") ?: System.getenv("GPR_TOKEN")
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(11)
     }
 }
 
@@ -81,7 +81,7 @@ publishing {
         mavenJava(MavenPublication) {
             groupId = 'com.pulumi'
             artifactId = 'pulumiservice'
-            version = '0.1.0'
+            version = project.version
 
             from components.java
         }

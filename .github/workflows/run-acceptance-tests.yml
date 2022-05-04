@@ -21,6 +21,8 @@ env:
   PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
   PULUMI_BACKEND_URL: https://api.pulumi-staging.io
   PROVIDER: pulumiservice
+  # Need to pin this as 0.1.0 until codegen is updated
+  PULUMI_JAVA_SDK_VERSION: 0.1.0
 
 jobs:
   build_sdks:
