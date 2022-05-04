@@ -49,7 +49,6 @@
         <dependency>
             <groupId>com.pulumi</groupId>
             <artifactId>pulumiservice</artifactId>
-            <version>0.1.0</version>
         </dependency>
     </dependencies>
 
