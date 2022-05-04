@@ -35,6 +35,20 @@ env:
   PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
   TRAVIS_OS_NAME: linux
 jobs:
+  create_docs_build:
+    name: create_docs_build
+    needs: tag_sdk
+    runs-on: ubuntu-latest
+    steps:
+    - name: Install pulumictl
+      uses: jaxxstorm/action-install-gh-release@v1.2.0
+      with:
+        repo: pulumi/pulumictl
+    - env:
+        GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
+      name: Dispatch Event
+      run: pulumictl create docs-build pulumi-${{ env.PROVIDER }}
+        ${GITHUB_REF#refs/tags/}
   publish_binary:
     name: publish
     runs-on: ubuntu-latest
@@ -61,6 +75,20 @@ jobs:
       matrix:
         goversion:
         - 1.17.x
+  tag_sdk:
+    name: tag_sdk
+    needs: publish_sdk
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v2
+    - name: Install pulumictl
+      uses: jaxxstorm/action-install-gh-release@v1.2.0
+      with:
+        repo: pulumi/pulumictl
+    - name: Add SDK version tag
+      run: git tag sdk/v$(pulumictl get version --language generic) && git push origin
+        sdk/v$(pulumictl get version --language generic)
   publish_sdk:
     name: Publish SDKs
     runs-on: ubuntu-latest
