@@ -5,6 +5,10 @@
 **/.vs
 **/.idea
 **/.ionide
+**/build
+**/target
+**/.gradle
+sdk/java/**/plugin.json
 .pulumi
 Pulumi.*.yaml
 yarn.lock

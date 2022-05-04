@@ -136,7 +136,9 @@ require (
 
 require (
 	github.com/golang/protobuf v1.5.2
-	github.com/pulumi/pulumi/pkg/v3 v3.29.0
-	github.com/pulumi/pulumi/sdk/v3 v3.29.0
+	github.com/pulumi/pulumi/pkg/v3 v3.30.1-0.20220425233152-77eb530a1117
+	github.com/pulumi/pulumi/sdk/v3 v3.30.1-0.20220425233152-77eb530a1117
 	google.golang.org/grpc v1.45.0
 )
+
+require github.com/pulumi/pulumi-java/pkg v0.1.0 // indirect
