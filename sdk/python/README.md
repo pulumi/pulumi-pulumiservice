@@ -15,9 +15,11 @@ The Pulumi Service Provider is built on top of the [Pulumi Service REST API](htt
 #### Supported Resources
 
 * [Webhooks](https://pulumi.com/docs/intro/pulumi-service/webhooks)
-* [Teams]({{https://pulumi.com/docs/intro/pulumi-service/teams)
+* [Teams](https://pulumi.com/docs/intro/pulumi-service/teams)
 * [StackTags](https://pulumi.com/docs/reference/cli/pulumi_stack_tag)
 * [AccessTokens](https://pulumi.com/docs/intro/pulumi-service/accounts)
+
+For reference documentation, visit the [Pulumi Service API Documentation](https://www.pulumi.com/registry/packages/pulumiservice/api-docs/) on the [Pulumi Registry](https://www.pulumi.com/registry/packages/pulumiservice/)
 
 
 ## Installing
