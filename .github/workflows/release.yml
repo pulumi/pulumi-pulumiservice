@@ -34,6 +34,26 @@ env:
 
   PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
   TRAVIS_OS_NAME: linux
+
+  PUBLISH_MAVEN: true
+  OSSRH_REPO_URL: https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/
+  OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+  OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+
+  # Include only last 8 hex digits of the key ID included, due to
+  # limitations of gradle.
+  SIGNING_KEY_ID: ${{ secrets.SIGNING_KEY_ID }}
+
+  # Obtained by `gpg --armor --export-secret-key support@pulumi.com`.
+  SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+
+  # Aka passphrase for the GPG key.
+  SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+
+  GPR_USER: ${{ secrets.GPR_USER }}
+  GPR_TOKEN: ${{ secrets.GPR_TOKEN }}
+  # Need to pin this until codegen gets updated
+  PULUMI_JAVA_SDK_VERSION: 0.1.0
 jobs:
   create_docs_build:
     name: create_docs_build
@@ -121,6 +141,16 @@ jobs:
         uses: actions/setup-python@v1
         with:
           python-version: ${{matrix.pythonversion}}
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        if: ${{ matrix.language == 'java' }}
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+          cache: 'gradle'
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@e6e38bacfdf1a337459f332974bb2327a31aaf4b
+        if: ${{ matrix.language == 'java' }}
       - name: Build gen and provider binary
         run: make gen provider
       - name: Generate SDK
@@ -159,6 +189,13 @@ jobs:
         run: |
           dotnet nuget push ${{github.workspace}}/sdk/dotnet/bin/Debug/*.nupkg -s ${{ env.NUGET_FEED_URL }} -k ${{ env.NUGET_PUBLISH_KEY }}
           echo "done publishing packages"
+      - name: Publish Provider Java SDK
+        if: ${{ matrix.language == 'java' && env.PUBLISH_MAVEN == 'true' }}
+        uses: gradle/gradle-build-action@4137be6a8bf7d7133955359dbd952c0ca73b1021
+        with:
+          arguments: publish
+          build-root-directory: sdk/java
+          gradle-version: 7.4.1
     strategy:
       fail-fast: true
       matrix:
@@ -171,7 +208,10 @@ jobs:
           - python
           - dotnet
           - go
+          - java
         nodeversion:
           - 14.x
         pythonversion:
           - "3.9"
+        javaversion:
+          - "11"

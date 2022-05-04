@@ -123,7 +123,7 @@ require (
 	google.golang.org/api v0.46.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20210506142907-4a47615972c2 // indirect
-	google.golang.org/protobuf v1.26.0 // indirect
+	google.golang.org/protobuf v1.26.0
 	gopkg.in/AlecAivazis/survey.v1 v1.8.9-0.20200217094205-6773bdf39b7f // indirect
 	gopkg.in/square/go-jose.v2 v2.5.1 // indirect
 	gopkg.in/src-d/go-billy.v4 v4.3.2 // indirect
@@ -136,7 +136,9 @@ require (
 
 require (
 	github.com/golang/protobuf v1.5.2
-	github.com/pulumi/pulumi/pkg/v3 v3.29.0
-	github.com/pulumi/pulumi/sdk/v3 v3.29.0
+	github.com/pulumi/pulumi/pkg/v3 v3.30.1-0.20220425233152-77eb530a1117
+	github.com/pulumi/pulumi/sdk/v3 v3.30.1-0.20220425233152-77eb530a1117
 	google.golang.org/grpc v1.45.0
 )
+
+require github.com/pulumi/pulumi-java/pkg v0.1.0
