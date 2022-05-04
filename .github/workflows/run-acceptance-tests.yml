@@ -36,6 +36,7 @@ jobs:
         language: [ nodejs, python, dotnet, go ]
         nodeversion: [ 14.x ]
         pythonversion: [ 3.7 ]
+        javaversion: [ 11 ]
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v2
