@@ -89,7 +89,7 @@ const team = new service.Team("team", {
     displayName: "PulumiUP Team",
     description: "This was created with Pulumi",
     organizationName: "pulumi-up",
-    type: "pulumi",
+    teamType: "pulumi",
     members: [
         "piers",
         "myles",
