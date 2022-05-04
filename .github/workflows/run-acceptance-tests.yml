@@ -33,7 +33,7 @@ jobs:
       matrix:
         dotnetversion: [ 3.1.301 ]
         goversion: [ 1.17.x ]
-        language: [ nodejs, python, dotnet, go ]
+        language: [ nodejs, python, dotnet, go, java ]
         nodeversion: [ 14.x ]
         pythonversion: [ 3.7 ]
         javaversion: [ 11 ]
