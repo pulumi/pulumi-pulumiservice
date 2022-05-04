@@ -1,3 +1,6 @@
+//go:build java
+// +build java
+
 package examples
 
 import (

@@ -52,6 +52,8 @@ env:
 
   GPR_USER: ${{ secrets.GPR_USER }}
   GPR_TOKEN: ${{ secrets.GPR_TOKEN }}
+  # Need to pin this until codegen gets updated
+  PULUMI_JAVA_SDK_VERSION: 0.1.0
 jobs:
   create_docs_build:
     name: create_docs_build
