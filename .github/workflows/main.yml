@@ -62,7 +62,7 @@ jobs:
     - name: Update path
       run: echo "${{ github.workspace }}/bin" >> $GITHUB_PATH
     - name: Build SDK
-      run: make build_${{ matrix.language }}
+      run: make ${{ matrix.language }}_sdk
     - name: Check worktree clean
       run: ./ci-scripts/ci/check-worktree-is-clean
     - name: Compress SDK folder
