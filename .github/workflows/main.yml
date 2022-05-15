@@ -118,8 +118,8 @@ jobs:
       uses: jaxxstorm/action-install-gh-release@v1.2.0
       with:
         repo: mikhailshilkov/schema-tools
-    - name: Build provider binaries
-      run: make provider
+    - name: Build provider + gen binaries
+      run: make gen provider
     - name: Tar provider binaries
       run: tar -zcf ${{ github.workspace }}/bin/provider.tar.gz -C ${{ github.workspace
         }}/bin/ pulumi-resource-${{ env.PROVIDER }} pulumi-gen-${{ env.PROVIDER }}
