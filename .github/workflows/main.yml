@@ -329,6 +329,10 @@ jobs:
         PULUMI_JAVA_SDK_VERSION: '0.1.0'
     - name: Run tests
       run: cd examples && go test -v -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 .
+      # TODO: When we add all languages, remove this block
+      # Necessary because go test reports an error if no tests match build tag
+      # We could also use continue-on-error but this way we get to visually see that we've
+      # skipped this step.
       if: ${{ matrix.language == 'nodejs' || matrix.language == 'java' }}
     strategy:
       fail-fast: true
