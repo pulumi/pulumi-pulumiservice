@@ -80,22 +80,12 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        dotnetversion:
-        - 3.1.301
-        goversion:
-        - 1.17.x
-        language:
-        - nodejs
-        - python
-        - dotnet
-        - java
-        - go
-        nodeversion:
-        - 14.x
-        pythonversion:
-        - "3.7"
-        javaversion:
-        - '11'
+        dotnetversion: [3.1.301]
+        goversion: [1.17.x]
+        language: [nodejs, python, dotnet, java, go]
+        nodeversion: [14.x]
+        pythonversion: ["3.7"]
+        javaversion: ["11"]
   prerequisites:
     name: prerequisites
     runs-on: ubuntu-latest
@@ -138,8 +128,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        goversion:
-        - 1.17.x
+        goversion: [1.17.x]
   publish:
     name: publish
     needs: test
@@ -261,16 +250,11 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        dotnetversion:
-        - 3.1.301
-        goversion:
-        - 1.17.x
-        nodeversion:
-        - 14.x
-        pythonversion:
-        - "3.7"
-        javaversion:
-        - '11'
+        dotnetversion: [3.1.301]
+        goversion: [1.17.x]
+        nodeversion: [14.x]
+        pythonversion: ["3.7"]
+        javaversion: ["11"]
   test:
     name: test
     needs: build_sdk
@@ -349,21 +333,12 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        dotnetversion:
-        - 3.1.301
-        goversion:
-        - 1.17.x
-        language:
-        - nodejs
-        - java
-        - python
-        - dotnet
-        - go
-        nodeversion:
-        - 14.x
-        pythonversion:
-        - "3.7"
-        javaversion: ['11']
+        dotnetversion: [3.1.301]
+        goversion: [1.17.x]
+        language: [nodejs, java, python, dotnet, go]
+        nodeversion: [14.x]
+        pythonversion: ["3.7"]
+        javaversion: ["11"]
 name: main
 "on":
   push:
