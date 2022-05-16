@@ -1,16 +1,39 @@
 env:
+  PROVIDER: pulumiservice
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+  NPM_REGISTRY_URL: https://registry.npmjs.org
+  PUBLISH_NPM: true
+
   NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}
-  PROVIDER: pulumiservice
-  PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
-  PULUMI_BACKEND_URL: https://app.pulumi-staging.io
-  PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
+  NUGET_FEED_URL: https://api.nuget.org/v3/index.json
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
+
+  PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+  PULUMI_BACKEND_URL: https://api.pulumi-staging.io
+  PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
+
   PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-  PYPI_USERNAME: "__token__"
+  PYPI_USERNAME: pulumi
+  PUBLISH_PYPI: true
   TRAVIS_OS_NAME: linux
+
+  PUBLISH_MAVEN: true
+  OSSRH_REPO_URL: https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/
+  OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+  OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+  # Include only last 8 hex digits of the key ID included, due to
+  # limitations of gradle.
+  SIGNING_KEY_ID: ${{ secrets.SIGNING_KEY_ID }}
+  # Obtained by `gpg --armor --export-secret-key support@pulumi.com`.
+  SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+  # Aka passphrase for the GPG key.
+  SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+
+  GPR_USER: ${{ secrets.GPR_USER }}
+  GPR_TOKEN: ${{ secrets.GPR_TOKEN }}
 jobs:
   build_sdk:
     name: build_sdk
@@ -23,8 +46,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         path: ci-scripts
-        repository: jaxxstorm/scripts
-        ref: third_party
+        repository: pulumi/scripts
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
     - name: Install Go
@@ -50,6 +72,11 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{matrix.pythonversion}}
+    - name: Setup java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'adopt' # could also be 'temurin'
+        java-version: ${{matrix.javaversion}}
     - name: Download provider binaries
       uses: actions/download-artifact@v2
       with:
@@ -76,19 +103,12 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        dotnetversion:
-        - 3.1.301
-        goversion:
-        - 1.17.x
-        language:
-        - nodejs
-        - python
-        - dotnet
-        - go
-        nodeversion:
-        - 14.x
-        pythonversion:
-        - "3.7"
+        dotnetversion: [3.1.301]
+        goversion: [1.17.x]
+        language: [nodejs, python, dotnet, java, go]
+        nodeversion: [14.x]
+        pythonversion: ["3.7"]
+        javaversion: ["11"]
   prerequisites:
     name: prerequisites
     runs-on: ubuntu-latest
@@ -118,8 +138,8 @@ jobs:
       uses: jaxxstorm/action-install-gh-release@v1.2.0
       with:
         repo: mikhailshilkov/schema-tools
-    - name: Build provider binaries
-      run: make provider
+    - name: Build provider + gen binaries
+      run: make gen provider
     - name: Tar provider binaries
       run: tar -zcf ${{ github.workspace }}/bin/provider.tar.gz -C ${{ github.workspace
         }}/bin/ pulumi-resource-${{ env.PROVIDER }} pulumi-gen-${{ env.PROVIDER }}
@@ -131,14 +151,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        dotnetversion:
-        - 3.1.301
-        goversion:
-        - 1.17.x
-        nodeversion:
-        - 14.x
-        pythonversion:
-        - "3.7"
+        goversion: [1.17.x]
   publish:
     name: publish
     needs: test
@@ -158,6 +171,16 @@ jobs:
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
       uses: pulumi/action-install-pulumi-cli@v2
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-region: us-east-2
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        role-duration-seconds: 3600
+        role-external-id: upload-pulumi-release
+        role-session-name: ${{ env.PROVIDER}}@githubActions
+        role-to-assume: ${{ secrets.AWS_UPLOAD_ROLE_ARN }}
     - name: Set PreRelease Version
       run: echo "GORELEASER_CURRENT_TAG=v$(pulumictl get version --language generic)" >> $GITHUB_ENV
     - name: Run GoReleaser
@@ -169,14 +192,8 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        dotnetversion:
-        - 3.1.301
         goversion:
         - 1.17.x
-        nodeversion:
-        - 14.x
-        pythonversion:
-        - "3.7"
   publish_sdk:
     name: publish_sdk
     needs: publish
@@ -215,6 +232,11 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{matrix.pythonversion}}
+    - name: Setup java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'adopt' # could also be 'temurin'
+        java-version: ${{matrix.javaversion}}
     - name: Download python SDK
       uses: actions/download-artifact@v2
       with:
@@ -236,6 +258,13 @@ jobs:
         path: ${{ github.workspace}}/sdk/
     - name: Uncompress nodejs SDK
       run: tar -zxf ${{github.workspace}}/sdk/nodejs.tar.gz -C ${{github.workspace}}/sdk/nodejs
+    - name: download java sdk
+      uses: actions/download-artifact@v2
+      with:
+        name: java-sdk.tar.gz
+        path: ${{ github.workspace }}/sdk/
+    - name: uncompress java sdk
+      run: tar -zxf ${{github.workspace}}/sdk/java.tar.gz -C ${{github.workspace}}/sdk/java
     - run: python -m pip install pip twine
     - env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -244,14 +273,11 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        dotnetversion:
-        - 3.1.301
-        goversion:
-        - 1.17.x
-        nodeversion:
-        - 14.x
-        pythonversion:
-        - "3.7"
+        dotnetversion: [3.1.301]
+        goversion: [1.17.x]
+        nodeversion: [14.x]
+        pythonversion: ["3.7"]
+        javaversion: ["11"]
   test:
     name: test
     needs: build_sdk
@@ -290,6 +316,11 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{matrix.pythonversion}}
+    - name: Setup java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'adopt' # could also be 'temurin'
+        java-version: ${{matrix.javaversion}}
     - name: Download provider binaries
       uses: actions/download-artifact@v2
       with:
@@ -316,24 +347,25 @@ jobs:
         pip3 install pipenv
     - name: Install dependencies
       run: make install_${{ matrix.language}}_sdk
+      env:
+        # Right now we pin this, we should add a way to automatically upgrade
+        PULUMI_JAVA_SDK_VERSION: '0.1.0'
     - name: Run tests
       run: cd examples && go test -v -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 .
+      # TODO: When we add all languages, remove this block
+      # Necessary because go test reports an error if no tests match build tag
+      # We could also use continue-on-error but this way we get to visually see that we've
+      # skipped this step.
+      if: ${{ matrix.language == 'nodejs' || matrix.language == 'java' }}
     strategy:
       fail-fast: true
       matrix:
-        dotnetversion:
-        - 3.1.301
-        goversion:
-        - 1.17.x
-        language:
-        - nodejs
-        - python
-        - dotnet
-        - go
-        nodeversion:
-        - 14.x
-        pythonversion:
-        - "3.7"
+        dotnetversion: [3.1.301]
+        goversion: [1.17.x]
+        language: [nodejs, java, python, dotnet, go]
+        nodeversion: [14.x]
+        pythonversion: ["3.7"]
+        javaversion: ["11"]
 name: main
 "on":
   push:
