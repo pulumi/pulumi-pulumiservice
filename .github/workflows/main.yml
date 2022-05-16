@@ -348,7 +348,6 @@ name: main
   push:
     branches:
     - main
-    - myles/main-workflow
     paths-ignore:
     - CHANGELOG.md
     tags-ignore:
