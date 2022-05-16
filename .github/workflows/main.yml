@@ -325,7 +325,7 @@ jobs:
     - name: Install dependencies
       run: make install_${{ matrix.language}}_sdk
       env:
-        # TODO: Figure out how to inject up to date version of this 
+        # Right now we pin this, we should add a way to automatically upgrade
         PULUMI_JAVA_SDK_VERSION: '0.1.0'
     - name: Run tests
       run: cd examples && go test -v -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 .
