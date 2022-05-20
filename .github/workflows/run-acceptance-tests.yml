@@ -207,7 +207,6 @@ jobs:
           path: ${{ github.workspace}}/sdk
       - name: Uncompress SDK folder
         if: ${{ matrix.language != 'yaml' }}
-        uses: actions/download-artifact@v2
         run: tar -zxf ${{ github.workspace}}/sdk/${{ matrix.language}}.tar.gz -C ${{ github.workspace}}/sdk/${{ matrix.language}}
       - name: Update path
         run: echo "${{ github.workspace }}/bin" >> $GITHUB_PATH
