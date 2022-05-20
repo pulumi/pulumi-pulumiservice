@@ -1,4 +1,4 @@
-// go:build yaml
+//go:build yaml
 
 package examples
 
