@@ -332,11 +332,13 @@ jobs:
         find ${{ github.workspace }} -name "pulumi-*-${{ env.PROVIDER }}" -print -exec chmod +x {} \;
     - run: dotnet nuget add source ${{ github.workspace }}/nuget
     - name: Download SDK
+      if: ${{ matrix.language != 'yaml' }}
       uses: actions/download-artifact@v2
       with:
         name: ${{ matrix.language }}-sdk.tar.gz
         path: ${{ github.workspace}}/sdk/
     - name: Uncompress SDK folder
+      if: ${{ matrix.language != 'yaml' }}
       run: tar -zxf ${{ github.workspace }}/sdk/${{ matrix.language }}.tar.gz -C ${{
         github.workspace }}/sdk/${{ matrix.language }}
     - name: Update path
@@ -346,6 +348,7 @@ jobs:
         pip3 install virtualenv==20.0.23
         pip3 install pipenv
     - name: Install dependencies
+      if: ${{ matrix.language != 'yaml' }}
       run: make install_${{ matrix.language}}_sdk
       env:
         # Right now we pin this, we should add a way to automatically upgrade
@@ -356,13 +359,14 @@ jobs:
       # Necessary because go test reports an error if no tests match build tag
       # We could also use continue-on-error but this way we get to visually see that we've
       # skipped this step.
-      if: ${{ matrix.language == 'nodejs' || matrix.language == 'java' }}
+      if: ${{ matrix.language == 'nodejs' || matrix.language == 'java' || matrix.language == 'yaml' }}
     strategy:
       fail-fast: true
       matrix:
+        language: [nodejs, java, python, dotnet, go, yaml]
+
         dotnetversion: [3.1.301]
         goversion: [1.17.x]
-        language: [nodejs, java, python, dotnet, go]
         nodeversion: [14.x]
         pythonversion: ["3.7"]
         javaversion: ["11"]

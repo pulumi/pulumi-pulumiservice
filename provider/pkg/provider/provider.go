@@ -16,16 +16,17 @@ package provider
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
 	"time"
 
+	"github.com/pulumi/pulumi/pkg/v3/codegen/schema"
 	"github.com/pulumi/pulumi/pkg/v3/resource/provider"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/emptypb"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/pulumiapi"
 
@@ -33,12 +34,6 @@ import (
 
 	pbempty "github.com/golang/protobuf/ptypes/empty"
 )
-
-var PulumiResources = []PulumiServiceResource{
-	&PulumiServiceTeamResource{},
-	&PulumiServiceAccessTokenResource{},
-	&PulumiServiceWebhookResource{},
-}
 
 type PulumiServiceResource interface {
 	Configure(config PulumiServiceConfig)
@@ -55,20 +50,19 @@ type pulumiserviceProvider struct {
 	host            *provider.HostClient
 	name            string
 	version         string
+	schema          string
 	pulumiResources []PulumiServiceResource
 	AccessToken     string
 }
 
-// Attach implements pulumirpc.ResourceProviderServer
-func (*pulumiserviceProvider) Attach(context.Context, *pulumirpc.PluginAttach) (*emptypb.Empty, error) {
-	return &emptypb.Empty{}, nil
-}
-
-func makeProvider(host *provider.HostClient, name, version string) (pulumirpc.ResourceProviderServer, error) {
+func makeProvider(host *provider.HostClient, name, version, schema string) (pulumirpc.ResourceProviderServer, error) {
+	// inject version into schema
+	versionedSchema := mustSetSchemaVersion(schema, version)
 	// Return the new provider
 	return &pulumiserviceProvider{
 		host:        host,
 		name:        name,
+		schema:      versionedSchema,
 		version:     version,
 		AccessToken: "",
 	}, nil
@@ -77,6 +71,11 @@ func makeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 // Call dynamically executes a method in the provider associated with a component resource.
 func (k *pulumiserviceProvider) Call(ctx context.Context, req *pulumirpc.CallRequest) (*pulumirpc.CallResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "Call is not yet implemented")
+}
+
+// Attach implements pulumirpc.ResourceProviderServer
+func (k *pulumiserviceProvider) Attach(_ context.Context, req *pulumirpc.PluginAttach) (*pbempty.Empty, error) {
+	return &pbempty.Empty{}, nil
 }
 
 // Construct creates a new component resource.
@@ -91,11 +90,13 @@ func (k *pulumiserviceProvider) CheckConfig(ctx context.Context, req *pulumirpc.
 
 // DiffConfig diffs the configuration for this provider.
 func (k *pulumiserviceProvider) DiffConfig(ctx context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+
 	return &pulumirpc.DiffResponse{}, nil
 }
 
 // Configure configures the resource provider with "globals" that control its behavior.
 func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.ConfigureRequest) (*pulumirpc.ConfigureResponse, error) {
+
 	sc := PulumiServiceConfig{}
 	sc.Config = make(map[string]string)
 	for key, val := range req.GetVariables() {
@@ -211,7 +212,9 @@ func (k *pulumiserviceProvider) GetPluginInfo(context.Context, *pbempty.Empty) (
 
 // GetSchema returns the JSON-serialized schema for the provider.
 func (k *pulumiserviceProvider) GetSchema(ctx context.Context, req *pulumirpc.GetSchemaRequest) (*pulumirpc.GetSchemaResponse, error) {
-	return &pulumirpc.GetSchemaResponse{}, nil
+	return &pulumirpc.GetSchemaResponse{
+		Schema: k.schema,
+	}, nil
 }
 
 // Cancel signals the provider to gracefully shut down and abort any ongoing resource operations.
@@ -237,6 +240,21 @@ func (k *pulumiserviceProvider) getPulumiServiceResource(name string) PulumiServ
 func getResourceNameFromRequest(req ResourceBase) string {
 	urn := resource.URN(req.GetUrn())
 	return urn.Type().String()
+}
+
+// mustSetSchemaVersion deserializes schemaStr from json, sets Version field
+// then serializes back to json string
+func mustSetSchemaVersion(schemaStr string, version string) string {
+	var spec schema.PackageSpec
+	if err := json.Unmarshal([]byte(schemaStr), &spec); err != nil {
+		panic(fmt.Errorf("failed to parse schema: %w", err))
+	}
+	spec.Version = version
+	bytes, err := json.Marshal(spec)
+	if err != nil {
+		panic(fmt.Errorf("failed to serialize versioned schema: %w", err))
+	}
+	return string(bytes)
 }
 
 type ResourceBase interface {
