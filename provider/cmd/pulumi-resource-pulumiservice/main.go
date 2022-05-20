@@ -15,12 +15,19 @@
 package main
 
 import (
+	_ "embed"
+
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/provider"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/version"
 )
 
 var providerName = "pulumiservice"
 
+// embed schema.json directly into resource binary so that we can properly serve the schema
+// directly from the resource provider
+//go:embed schema.json
+var schema string
+
 func main() {
-	provider.Serve(providerName, version.Version)
+	provider.Serve(providerName, version.Version, schema)
 }

@@ -151,9 +151,10 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
+        language: [nodejs, java, yaml]
+
         dotnetversion: [3.1.301]
         goversion: [1.17.x]
-        language: [nodejs, java]
         nodeversion: [14.x]
         pythonversion: [3.7]
         javaversion: [11]
@@ -199,11 +200,14 @@ jobs:
         run: find ${{ github.workspace }} -name "pulumi-*-${{ env.PROVIDER }}" -print
           -exec chmod +x {} \;
       - name: Download SDK
+        if: ${{ matrix.language != 'yaml' }}
         uses: actions/download-artifact@v2
         with:
           name: ${{ matrix.language  }}-sdk.tar.gz
           path: ${{ github.workspace}}/sdk
       - name: Uncompress SDK folder
+        if: ${{ matrix.language != 'yaml' }}
+        uses: actions/download-artifact@v2
         run: tar -zxf ${{ github.workspace}}/sdk/${{ matrix.language}}.tar.gz -C ${{ github.workspace}}/sdk/${{ matrix.language}}
       - name: Update path
         run: echo "${{ github.workspace }}/bin" >> $GITHUB_PATH
@@ -215,6 +219,7 @@ jobs:
           pip3 install virtualenv==20.0.23
           pip3 install pipenv
       - name: Install dependencies
+        if: ${{ matrix.language != 'yaml' }}
         run: make install_${{ matrix.language}}_sdk
       - name: Set up gotestfmt
         uses: haveyoudebuggedit/gotestfmt-action@v2

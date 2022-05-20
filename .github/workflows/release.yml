@@ -211,6 +211,7 @@ jobs:
           - dotnet
           - go
           - java
+          # yaml doesn't need an sdk :)
         nodeversion:
           - 14.x
         pythonversion:
