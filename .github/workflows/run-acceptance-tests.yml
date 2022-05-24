@@ -20,6 +20,8 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
   PULUMI_BACKEND_URL: https://api.pulumi-staging.io
+  # Required to properly write "go mod edit -replace=.." when running go examples
+  PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
   PROVIDER: pulumiservice
   # Need to pin this as 0.1.0 until codegen is updated
   PULUMI_JAVA_SDK_VERSION: 0.1.0
@@ -151,7 +153,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        language: [nodejs, java, yaml]
+        language: [nodejs, java, yaml, go]
 
         dotnetversion: [3.1.301]
         goversion: [1.17.x]

@@ -1,4 +1,4 @@
-module github.com/pierskarsenbarg/pulumi-pulumiservice/examples
+module github.com/pulumi/pulumi-pulumiservice/examples
 
 go 1.17
 
@@ -117,6 +117,7 @@ require (
 	github.com/pierrec/lz4 v2.6.1+incompatible // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/pulumi/pulumi-pulumiservice v0.1.2
 	github.com/pulumi/pulumi/sdk/v3 v3.27.0 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/rjeczalik/notify v0.9.2 // indirect
