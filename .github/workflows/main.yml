@@ -347,6 +347,10 @@ jobs:
       run: |-
         pip3 install virtualenv==20.0.23
         pip3 install pipenv
+    - name: Set up gotestfmt
+      uses: haveyoudebuggedit/gotestfmt-action@v2
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
     - name: Install dependencies
       if: ${{ matrix.language != 'yaml' }}
       run: make install_${{ matrix.language}}_sdk
@@ -354,12 +358,15 @@ jobs:
         # Right now we pin this, we should add a way to automatically upgrade
         PULUMI_JAVA_SDK_VERSION: '0.1.0'
     - name: Run tests
-      run: cd examples && go test -v -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 .
+      run: |
+        set -euo pipefail
+        cd examples && go test -json  -v -count=1 -cover -timeout 2h -tags=${{ matrix.language
+        }} -parallel 4 . 2>&1 | tee /tmp/gotest.log | gotestfmt 
       # TODO: When we add all languages, remove this block
       # Necessary because go test reports an error if no tests match build tag
       # We could also use continue-on-error but this way we get to visually see that we've
       # skipped this step.
-      if: ${{ matrix.language == 'nodejs' || matrix.language == 'java' || matrix.language == 'yaml' }}
+      if: ${{ matrix.language == 'nodejs' || matrix.language == 'java' || matrix.language == 'yaml' || matrix.language == 'go' }}
     strategy:
       fail-fast: true
       matrix:
@@ -375,6 +382,7 @@ name: main
   push:
     branches:
     - main
+    - myles/go-language-example
     paths-ignore:
     - CHANGELOG.md
     tags-ignore:

@@ -151,7 +151,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        language: [nodejs, java, yaml]
+        language: [nodejs, java, yaml, go]
 
         dotnetversion: [3.1.301]
         goversion: [1.17.x]
