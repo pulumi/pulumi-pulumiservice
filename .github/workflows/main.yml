@@ -382,7 +382,6 @@ name: main
   push:
     branches:
     - main
-    - myles/go-language-example
     paths-ignore:
     - CHANGELOG.md
     tags-ignore:
