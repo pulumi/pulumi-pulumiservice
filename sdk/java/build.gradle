@@ -81,7 +81,7 @@ publishing {
         mavenJava(MavenPublication) {
             groupId = 'com.pulumi'
             artifactId = 'pulumiservice'
-            version = System.getenv("VERSION") ?: "0.1.0"
+            version = System.getenv("SDK_VERSION") ?: "0.0.0-unset"
             from components.java
         }
     }

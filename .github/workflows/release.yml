@@ -126,6 +126,8 @@ jobs:
         uses: jaxxstorm/action-install-gh-release@v1.5.0
         with:
           repo: pulumi/pulumictl
+      - name: Add version to environment
+        run: printf "SDK_VERSION=%s" $(pulumictl get version --language generic) >> $GITHUB_ENV
       - name: Install Pulumi CLI
         uses: pulumi/action-install-pulumi-cli@v2.0.0
       - name: Setup Node
@@ -198,6 +200,7 @@ jobs:
           gradle-version: 7.4.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SDK_VERSION: ${{ env.SDK_VERSION }}
     strategy:
       fail-fast: true
       matrix:
