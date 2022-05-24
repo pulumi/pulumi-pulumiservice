@@ -34,7 +34,9 @@
           <dependency>
             <groupId>com.pulumi</groupId>
             <artifactId>pulumiservice</artifactId>
-            <version>0.1.0</version>
+            <!-- Allow any version. We need to depend on our locally built sdk which only has a real version when tagged -->
+            <!-- Pin to specific version if you are copying this pom.xml for a real application -->
+            <version>[0.0.0,)</version>
           </dependency>
         </dependencies>
       </profile>
@@ -49,7 +51,9 @@
         <dependency>
             <groupId>com.pulumi</groupId>
             <artifactId>pulumiservice</artifactId>
-            <version>0.1.0</version>
+            <!-- Allow any version. We need to depend on our locally built sdk which only has a real version when tagged -->
+            <!-- Pin to specific version if you are copying this pom.xml for a real application -->
+            <version>[0.0.0,)</version>
         </dependency>
     </dependencies>
 
