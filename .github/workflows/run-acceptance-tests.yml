@@ -26,6 +26,9 @@ env:
   # Need to pin this as 0.1.0 until codegen is updated
   PULUMI_JAVA_SDK_VERSION: 0.1.0
 
+  # Lookup nuget packages from this directory as well as default nuget directories
+  PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
+
 jobs:
   build_sdks:
     if: github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
