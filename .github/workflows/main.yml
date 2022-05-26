@@ -362,11 +362,6 @@ jobs:
         set -euo pipefail
         cd examples && go test -json  -v -count=1 -cover -timeout 2h -tags=${{ matrix.language
         }} -parallel 4 . 2>&1 | tee /tmp/gotest.log | gotestfmt 
-      # TODO: When we add all languages, remove this block
-      # Necessary because go test reports an error if no tests match build tag
-      # We could also use continue-on-error but this way we get to visually see that we've
-      # skipped this step.
-      if: ${{ matrix.language == 'nodejs' || matrix.language == 'java' || matrix.language == 'yaml' || matrix.language == 'go' || matrix.language == 'dotnet' }}
     strategy:
       fail-fast: true
       matrix:
