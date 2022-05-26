@@ -1,11 +1,10 @@
-//go:build java
-// +build java
+//go:build java || all
+// +build java all
 
 package examples
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"testing"
 
@@ -35,14 +34,6 @@ func getJavaBase(t *testing.T, dir string, testSpecificOptions integration.Progr
 	}
 	opts = opts.With(getBaseOptions()).With(testSpecificOptions)
 	return opts
-}
-
-func getCwd(t *testing.T) string {
-	cwd, err := os.Getwd()
-	if err != nil {
-		t.FailNow()
-	}
-	return cwd
 }
 
 func getBaseOptions() integration.ProgramTestOptions {

@@ -4,10 +4,10 @@
 package examples
 
 import (
-	"github.com/pulumi/pulumi/pkg/v3/testing/integration"
-	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/pulumi/pulumi/pkg/v3/testing/integration"
 )
 
 func TestGoTeamsExample(t *testing.T) {
@@ -25,12 +25,4 @@ func getGoBaseOptions(t *testing.T) integration.ProgramTestOptions {
 			"github.com/pulumi/pulumi-pulumiservice/sdk",
 		},
 	}
-}
-
-func getCwd(t *testing.T) string {
-	cwd, err := os.Getwd()
-	if err != nil {
-		t.FailNow()
-	}
-	return cwd
 }

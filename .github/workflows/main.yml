@@ -366,11 +366,11 @@ jobs:
       # Necessary because go test reports an error if no tests match build tag
       # We could also use continue-on-error but this way we get to visually see that we've
       # skipped this step.
-      if: ${{ matrix.language == 'nodejs' || matrix.language == 'java' || matrix.language == 'yaml' || matrix.language == 'go' }}
+      if: ${{ matrix.language == 'nodejs' || matrix.language == 'java' || matrix.language == 'yaml' || matrix.language == 'go' || matrix.language == 'dotnet' }}
     strategy:
       fail-fast: true
       matrix:
-        language: [nodejs, java, python, dotnet, go, yaml]
+        language: [nodejs, java, python, dotnet, go, yaml, dotnet]
 
         dotnetversion: [3.1.301]
         goversion: [1.17.x]
