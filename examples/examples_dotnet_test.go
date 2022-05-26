@@ -11,7 +11,8 @@ import (
 
 func TestDotnetTeamsExamples(t *testing.T) {
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Dir: path.Join(getCwd(t), "cs-teams"),
+		Dir:         path.Join(getCwd(t), "cs-teams"),
+		SkipRefresh: true,
 		Dependencies: []string{
 			"Pulumi.PulumiService",
 		},
