@@ -13,7 +13,6 @@ func TestDotnetTeamsExamples(t *testing.T) {
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		Dir: path.Join(getCwd(t), "cs-teams"),
 		Dependencies: []string{
-			"Pulumi.Random",
 			"Pulumi.PulumiService",
 		},
 	})
