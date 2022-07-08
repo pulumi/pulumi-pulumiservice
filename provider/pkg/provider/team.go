@@ -17,6 +17,12 @@ type PulumiServiceTeamResource struct {
 	client *pulumiapi.Client
 }
 
+type PulumiServiceTeamStackPermission struct {
+	ProjectName string
+	StackName   string
+	Permission  int
+}
+
 type PulumiServiceTeamInput struct {
 	Type             string
 	Name             string
@@ -24,6 +30,12 @@ type PulumiServiceTeamInput struct {
 	Description      string
 	OrganizationName string
 	Members          []string
+	StackPermissions []PulumiServiceTeamStackPermission
+}
+
+func EqualStackPermissions(a, b []PulumiServiceTeamStackPermission) bool {
+	// todo compare stack permissions
+	return true
 }
 
 func (i *PulumiServiceTeamInput) ToPropertyMap() resource.PropertyMap {
@@ -34,6 +46,7 @@ func (i *PulumiServiceTeamInput) ToPropertyMap() resource.PropertyMap {
 	pm["description"] = resource.NewPropertyValue(i.Description)
 	pm["members"] = resource.NewPropertyValue(i.Members)
 	pm["organizationName"] = resource.NewPropertyValue(i.OrganizationName)
+	pm["stackPermissions"] = resource.NewPropertyValue(i.StackPermissions)
 	return pm
 }
 
@@ -66,6 +79,17 @@ func (t *PulumiServiceTeamResource) ToPulumiServiceTeamInput(inputMap resource.P
 
 	if inputMap["organizationName"].HasValue() && inputMap["organizationName"].IsString() {
 		input.OrganizationName = inputMap["organizationName"].StringValue()
+	}
+
+	if inputMap["stackPermissions"].HasValue() && inputMap["stackPermissions"].IsArray() {
+		for _, stackPermission := range inputMap["stackPermissions"].ArrayValue() {
+			pulumiServiceTeamStackPermission := PulumiServiceTeamStackPermission{
+				ProjectName: stackPermission.ObjectValue()["projectName"].StringValue(),
+				StackName:   stackPermission.ObjectValue()["stackName"].StringValue(),
+				Permission:  int(stackPermission.ObjectValue()["permission"].NumberValue()),
+			}
+			input.StackPermissions = append(input.StackPermissions, pulumiServiceTeamStackPermission)
+		}
 	}
 
 	return input
@@ -119,7 +143,8 @@ func (tr *PulumiServiceTeamResource) Diff(req *pulumirpc.DiffRequest) (*pulumirp
 		diffs.Changed("displayName") ||
 		diffs.Changed("description") ||
 		diffs.Changed("members") ||
-		diffs.Changed("organizationName") {
+		diffs.Changed("organizationName") ||
+		diffs.Changed("stackPermissions") {
 		changes = pulumirpc.DiffResponse_DIFF_SOME
 	}
 
@@ -173,6 +198,21 @@ func (tr *PulumiServiceTeamResource) Update(req *pulumirpc.UpdateRequest) (*pulu
 		}
 	}
 
+	if !EqualStackPermissions(teamOld.StackPermissions, teamNew.StackPermissions) {
+		// inputsChanged.Members = teamNew.Members
+		// for _, usernameToDelete := range teamOld.Members {
+		// 	if !InSlice(usernameToDelete, teamNew.Members) {
+		// 		tr.deleteFromTeam(ctx, teamOld.OrganizationName, teamOld.Name, usernameToDelete)
+		// 	}
+		// }
+
+		// for _, usernameToAdd := range teamNew.Members {
+		// 	if !InSlice(usernameToAdd, teamOld.Members) {
+		// 		tr.addToTeam(ctx, teamOld.OrganizationName, teamOld.Name, usernameToAdd)
+		// 	}
+		// }
+	}
+
 	outputStore := resource.PropertyMap{}
 	outputStore["__inputs"] = resource.NewObjectProperty(inputsChanged.ToPropertyMap())
 
@@ -203,6 +243,13 @@ func (tr *PulumiServiceTeamResource) Create(req *pulumirpc.CreateRequest) (*pulu
 
 	for _, memberToAdd := range inputsTeam.Members {
 		err = tr.addToTeam(ctx, inputsTeam.OrganizationName, inputsTeam.Name, memberToAdd)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	for _, stackPermission := range inputsTeam.StackPermissions {
+		err = tr.addStackPermissionToTeam(ctx, inputsTeam.OrganizationName, inputsTeam.Name, stackPermission.ProjectName, stackPermission.StackName, stackPermission.Permission)
 		if err != nil {
 			return nil, err
 		}
@@ -263,6 +310,10 @@ func (t *PulumiServiceTeamResource) deleteFromTeam(ctx context.Context, orgName 
 
 func (t *PulumiServiceTeamResource) addToTeam(ctx context.Context, orgName string, teamName string, userName string) error {
 	return t.client.AddMemberToTeam(ctx, orgName, teamName, userName)
+}
+
+func (t *PulumiServiceTeamResource) addStackPermissionToTeam(ctx context.Context, orgName string, teamName string, projectName, stackname string, permission int) error {
+	return t.client.UpdateStackAccessToTeam(ctx, orgName, teamName, projectName, stackname, permission)
 }
 
 func (t *PulumiServiceTeamResource) deleteTeam(ctx context.Context, id string) error {
