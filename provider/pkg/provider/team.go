@@ -199,18 +199,7 @@ func (tr *PulumiServiceTeamResource) Update(req *pulumirpc.UpdateRequest) (*pulu
 	}
 
 	if !EqualStackPermissions(teamOld.StackPermissions, teamNew.StackPermissions) {
-		// inputsChanged.Members = teamNew.Members
-		// for _, usernameToDelete := range teamOld.Members {
-		// 	if !InSlice(usernameToDelete, teamNew.Members) {
-		// 		tr.deleteFromTeam(ctx, teamOld.OrganizationName, teamOld.Name, usernameToDelete)
-		// 	}
-		// }
-
-		// for _, usernameToAdd := range teamNew.Members {
-		// 	if !InSlice(usernameToAdd, teamOld.Members) {
-		// 		tr.addToTeam(ctx, teamOld.OrganizationName, teamOld.Name, usernameToAdd)
-		// 	}
-		// }
+		// todo
 	}
 
 	outputStore := resource.PropertyMap{}

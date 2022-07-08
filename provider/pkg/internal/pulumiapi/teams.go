@@ -241,6 +241,7 @@ func (c *Client) DeleteMemberFromTeam(ctx context.Context, orgName, teamName, us
 	}
 }
 
+// todo, delete stack access
 func (c *Client) UpdateStackAccessToTeam(ctx context.Context, orgName, teamName, projectName, stackName string, permission int) error {
 	if len(orgName) == 0 {
 		return errors.New("orgname must not be empty")
@@ -263,26 +264,3 @@ func (c *Client) UpdateStackAccessToTeam(ctx context.Context, orgName, teamName,
 	}
 	return nil
 }
-
-// func (c *Client) AddMemberToTeam(ctx context.Context, orgName, teamName, userName string) error {
-// 	err := c.updateTeamMembership(ctx, orgName, teamName, userName, "add")
-// 	if err != nil {
-// 		var errResp *errorResponse
-// 		if errors.As(err, &errResp) && errResp.StatusCode == http.StatusConflict {
-// 			// ignore 409 since that means the team member is already added
-// 			return nil
-// 		}
-// 		return err
-// 	} else {
-// 		return nil
-// 	}
-// }
-
-// func (c *Client) DeleteMemberFromTeam(ctx context.Context, orgName, teamName, userName string) error {
-// 	err := c.updateTeamMembership(ctx, orgName, teamName, userName, "remove")
-// 	if err != nil {
-// 		return err
-// 	} else {
-// 		return nil
-// 	}
-// }
