@@ -87,15 +87,20 @@ import * as pulumi from "@pulumi/pulumi";
 import * as service from "@pulumi/pulumiservice";
 
 const team = new service.Team("team", {
-    name: "pulumi-up-team",
-    displayName: "PulumiUP Team",
-    description: "This was created with Pulumi",
-    organizationName: "pulumi-up",
+    name: "pulumi-service-team",
+    displayName: "Pulumi Service",
+    description: "The Pulumi Service Team",
+    organizationName: "pulumi",
     teamType: "pulumi",
     members: [
         "piers",
-        "myles",
+        "bryce",
+        "casey"
+        "evan",
+        "devon",
         "meagan"
+        "myles",
+        "steve"
     ],
 });
 
