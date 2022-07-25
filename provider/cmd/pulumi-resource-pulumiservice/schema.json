@@ -91,6 +91,24 @@
         "organizationName": {
           "description": "The organization's name.",
           "type": "string"
+        },
+        "stackPermissions": {
+          "description": "A list of stacks to give the team access to",
+          "type": "array",
+          "items": {
+            "type":"object",
+            "properties": {
+              "projectName": {
+                "type": "string"
+              },
+              "stackName": {
+                "type": "string"
+              },
+              "permission": {
+                "type": "number"
+              }
+            }
+          }
         }
       },
       "inputProperties": {
@@ -120,6 +138,24 @@
         "organizationName": {
           "description": "The organization's name.",
           "type": "string"
+        },
+        "stackPermissions": {
+          "description": "A list of stacks to give the team access to",
+          "type": "array",
+          "items": {
+            "type":"object",
+            "properties": {
+              "projectName": {
+                "type": "string"
+              },
+              "stackName": {
+                "type": "string"
+              },
+              "permission": {
+                "type": "number"
+              }
+            }
+          }
         }
       },
       "requiredInputs": [

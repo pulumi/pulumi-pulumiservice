@@ -58,6 +58,16 @@ type updateTeamMembershipRequest struct {
 	Member       string `json:"member"`
 }
 
+type AddStackPermission struct {
+	ProjectName string `json:"projectName"`
+	StackName   string `json:"stackName"`
+	Permission  int    `json:"permission"`
+}
+
+type addStackPermissionRequest struct {
+	AddStackPermission AddStackPermission `json:"addStackPermission"`
+}
+
 func (c *Client) ListTeams(ctx context.Context, orgName string) ([]Team, error) {
 	if len(orgName) == 0 {
 		return nil, errors.New("empty orgName")
@@ -229,4 +239,28 @@ func (c *Client) DeleteMemberFromTeam(ctx context.Context, orgName, teamName, us
 	} else {
 		return nil
 	}
+}
+
+// todo, delete stack access
+func (c *Client) UpdateStackAccessToTeam(ctx context.Context, orgName, teamName, projectName, stackName string, permission int) error {
+	if len(orgName) == 0 {
+		return errors.New("orgname must not be empty")
+	}
+
+	if len(teamName) == 0 {
+		return errors.New("teamname must not be empty")
+	}
+
+	apiPath := path.Join("orgs", orgName, "teams", teamName)
+
+	addStackPermissionRequest := addStackPermissionRequest{
+		AddStackPermission: AddStackPermission{ProjectName: projectName, StackName: stackName, Permission: permission},
+	}
+
+	_, err := c.do(ctx, http.MethodPatch, apiPath, addStackPermissionRequest, nil)
+
+	if err != nil {
+		return fmt.Errorf("failed to update stack permission for team: %w", err)
+	}
+	return nil
 }

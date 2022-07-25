@@ -18,7 +18,8 @@ class TeamArgs:
                  team_type: pulumi.Input[str],
                  description: Optional[pulumi.Input[str]] = None,
                  display_name: Optional[pulumi.Input[str]] = None,
-                 members: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None):
+                 members: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None,
+                 stack_permissions: Optional[pulumi.Input[Sequence[pulumi.Input[Mapping[str, pulumi.Input[str]]]]]] = None):
         """
         The set of arguments for constructing a Team resource.
         :param pulumi.Input[str] name: The team name.
@@ -27,6 +28,7 @@ class TeamArgs:
         :param pulumi.Input[str] description: Optional. Team description.
         :param pulumi.Input[str] display_name: Optional. Team display name.
         :param pulumi.Input[Sequence[pulumi.Input[str]]] members: List of team members.
+        :param pulumi.Input[Sequence[pulumi.Input[Mapping[str, pulumi.Input[str]]]]] stack_permissions: A list of stacks to give the team access to
         """
         pulumi.set(__self__, "name", name)
         pulumi.set(__self__, "organization_name", organization_name)
@@ -37,6 +39,8 @@ class TeamArgs:
             pulumi.set(__self__, "display_name", display_name)
         if members is not None:
             pulumi.set(__self__, "members", members)
+        if stack_permissions is not None:
+            pulumi.set(__self__, "stack_permissions", stack_permissions)
 
     @property
     @pulumi.getter
@@ -110,6 +114,18 @@ class TeamArgs:
     def members(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]]):
         pulumi.set(self, "members", value)
 
+    @property
+    @pulumi.getter(name="stackPermissions")
+    def stack_permissions(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[Mapping[str, pulumi.Input[str]]]]]]:
+        """
+        A list of stacks to give the team access to
+        """
+        return pulumi.get(self, "stack_permissions")
+
+    @stack_permissions.setter
+    def stack_permissions(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[Mapping[str, pulumi.Input[str]]]]]]):
+        pulumi.set(self, "stack_permissions", value)
+
 
 class Team(pulumi.CustomResource):
     @overload
@@ -121,6 +137,7 @@ class Team(pulumi.CustomResource):
                  members: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None,
                  name: Optional[pulumi.Input[str]] = None,
                  organization_name: Optional[pulumi.Input[str]] = None,
+                 stack_permissions: Optional[pulumi.Input[Sequence[pulumi.Input[Mapping[str, pulumi.Input[str]]]]]] = None,
                  team_type: Optional[pulumi.Input[str]] = None,
                  __props__=None):
         """
@@ -133,6 +150,7 @@ class Team(pulumi.CustomResource):
         :param pulumi.Input[Sequence[pulumi.Input[str]]] members: List of team members.
         :param pulumi.Input[str] name: The team name.
         :param pulumi.Input[str] organization_name: The organization's name.
+        :param pulumi.Input[Sequence[pulumi.Input[Mapping[str, pulumi.Input[str]]]]] stack_permissions: A list of stacks to give the team access to
         :param pulumi.Input[str] team_type: The type of team. Must be either `pulumi` or `github`.
         """
         ...
@@ -164,6 +182,7 @@ class Team(pulumi.CustomResource):
                  members: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None,
                  name: Optional[pulumi.Input[str]] = None,
                  organization_name: Optional[pulumi.Input[str]] = None,
+                 stack_permissions: Optional[pulumi.Input[Sequence[pulumi.Input[Mapping[str, pulumi.Input[str]]]]]] = None,
                  team_type: Optional[pulumi.Input[str]] = None,
                  __props__=None):
         if opts is None:
@@ -186,6 +205,7 @@ class Team(pulumi.CustomResource):
             if organization_name is None and not opts.urn:
                 raise TypeError("Missing required property 'organization_name'")
             __props__.__dict__["organization_name"] = organization_name
+            __props__.__dict__["stack_permissions"] = stack_permissions
             if team_type is None and not opts.urn:
                 raise TypeError("Missing required property 'team_type'")
             __props__.__dict__["team_type"] = team_type
@@ -216,6 +236,7 @@ class Team(pulumi.CustomResource):
         __props__.__dict__["members"] = None
         __props__.__dict__["name"] = None
         __props__.__dict__["organization_name"] = None
+        __props__.__dict__["stack_permissions"] = None
         __props__.__dict__["team_type"] = None
         return Team(resource_name, opts=opts, __props__=__props__)
 
@@ -258,6 +279,14 @@ class Team(pulumi.CustomResource):
         The organization's name.
         """
         return pulumi.get(self, "organization_name")
+
+    @property
+    @pulumi.getter(name="stackPermissions")
+    def stack_permissions(self) -> pulumi.Output[Optional[Sequence[Mapping[str, str]]]]:
+        """
+        A list of stacks to give the team access to
+        """
+        return pulumi.get(self, "stack_permissions")
 
     @property
     @pulumi.getter(name="teamType")
