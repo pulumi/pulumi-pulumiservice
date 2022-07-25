@@ -30,7 +30,7 @@ func ToPropertyMap(obj interface{}, structTagName string) resource.PropertyMap {
 	return properties
 }
 
-// FromPropertyMap unmarshals a resource.PropertyMap into via
+// FromPropertyMap unmarshals properties into out.
 func FromPropertyMap(properties resource.PropertyMap, structTagName string, out interface{}) error {
 	v := reflect.ValueOf(out)
 	kind := v.Kind()
@@ -47,7 +47,12 @@ func FromPropertyMap(properties resource.PropertyMap, structTagName string, out 
 		if !ok {
 			continue
 		}
-		mapVal := properties[resource.PropertyKey(fieldName)]
+		mapVal, ok := properties[resource.PropertyKey(fieldName)]
+		if !ok {
+			// skip fields that aren't in property map. callers can validate that fields on out are
+			// set properly
+			continue
+		}
 		err := set(fv, mapVal.V)
 		if err != nil {
 			return err
@@ -102,6 +107,9 @@ func set(v reflect.Value, value interface{}) error {
 	valueValue := reflect.ValueOf(value)
 	valueKind := valueValue.Kind()
 	var floatValue *float64
+	if valueKind == reflect.Invalid {
+		return nil
+	}
 	if valueKind == reflect.Float64 {
 		fv := valueValue.Float()
 		floatValue = &fv
