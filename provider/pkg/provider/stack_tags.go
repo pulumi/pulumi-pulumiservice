@@ -104,6 +104,29 @@ func (st *PulumiServiceStackTagResource) Check(req *pulumirpc.CheckRequest) (*pu
 }
 
 func (st *PulumiServiceStackTagResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+	ctx := context.Background()
+	var inputs PulumiServiceStackTagInput
+	err := serde.FromProperties(req.GetNews(), structTagKey, &inputs)
+	if err != nil {
+		return nil, err
+	}
+	stackName := pulumiapi.StackName{
+		OrgName:     inputs.Organization,
+		ProjectName: inputs.Project,
+		StackName:   inputs.Stack,
+	}
+	stackTag := pulumiapi.StackTag{
+		Name:  inputs.Name,
+		Value: inputs.Value,
+	}
+	err = st.client.DeleteStackTag(ctx, stackName, stackTag.Name)
+	if err != nil {
+		return nil, err
+	}
+	err = st.client.CreateTag(ctx, stackName, stackTag)
+	if err != nil {
+		return nil, err
+	}
 	return &pulumirpc.UpdateResponse{}, nil
 }
 
