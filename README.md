@@ -94,8 +94,13 @@ const team = new service.Team("team", {
     teamType: "pulumi",
     members: [
         "piers",
-        "myles",
+        "bryce",
+        "casey"
+        "evan",
+        "devon",
         "meagan"
+        "myles",
+        "steve"
     ],
 });
 
