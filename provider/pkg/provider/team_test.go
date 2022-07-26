@@ -62,7 +62,7 @@ func TestTeamResourceCreate(t *testing.T) {
 			wantCall := wantCalls[callNum]
 			callNum++
 
-			// assert that the actual
+			// assert that the actual request matches what we want
 			assert.Equal(t, wantCall.ReqMethod, r.Method)
 			assert.Equal(t, wantCall.ReqPath, r.URL.Path, r.Method)
 			w.WriteHeader(wantCall.RespStatus)
