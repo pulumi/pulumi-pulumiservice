@@ -201,10 +201,20 @@ func (tr *PulumiServiceTeamResource) Create(req *pulumirpc.CreateRequest) (*pulu
 		return nil, fmt.Errorf("error creating team '%s': %s", inputsTeam.Name, err.Error())
 	}
 
+	// If we get an error after creating the team, delete the team.
+	// We don't want to leave a partially created team
+	deleteTeamOnErr := func(err error) error {
+		dErr := tr.deleteTeam(ctx, *team)
+		if dErr != nil {
+			return fmt.Errorf("failed to roll back team creation: %v (source err: %v)", dErr, err)
+		}
+		return err
+	}
+
 	for _, memberToAdd := range inputsTeam.Members {
 		err = tr.addToTeam(ctx, inputsTeam.OrganizationName, inputsTeam.Name, memberToAdd)
 		if err != nil {
-			return nil, err
+			return nil, deleteTeamOnErr(err)
 		}
 	}
 
@@ -216,7 +226,7 @@ func (tr *PulumiServiceTeamResource) Create(req *pulumirpc.CreateRequest) (*pulu
 		plugin.MarshalOptions{},
 	)
 	if err != nil {
-		return nil, err
+		return nil, deleteTeamOnErr(err)
 	}
 
 	return &pulumirpc.CreateResponse{
