@@ -39,6 +39,7 @@ func TestYamlTeamsExample(t *testing.T) {
 		teamName := uuid.NewString()
 		projectName := "yaml-teams-fail-" + uuid.NewString()[0:10]
 
+		// this function writes out a Pulumi.yaml file to a temp directory
 		writeTeamProgram := func(members []string) string {
 			prog := YamlProgram{
 				Name:    projectName,
@@ -66,8 +67,6 @@ func TestYamlTeamsExample(t *testing.T) {
 		notFoundDir := writeTeamProgram([]string{pulumiBot, providerUser, "not-found-user"})
 		correctUpdateDir := writeTeamProgram([]string{pulumiBot, providerUser})
 
-		os.Setenv("PATH", "~/.pulumi-dev/bin:"+os.Getenv("PATH"))
-
 		first := &strings.Builder{}
 		firstOut := io.MultiWriter(os.Stdout, first)
 
@@ -87,12 +86,14 @@ func TestYamlTeamsExample(t *testing.T) {
 			},
 			EditDirs: []integration.EditDir{
 				{
-					Dir:      correctUpdateDir,
-					Additive: true,
+					Dir: correctUpdateDir,
+					// Additive specifies that we're copying our directory on top of the previous one.
+					// This overwrites the previous Pulumi.yaml.
+					Additive: false,
 					Verbose:  true,
 					Stdout:   secondOut,
 					Stderr:   secondOut,
-					// we do not expect a failure
+					// explicitly do not expect a failure
 					ExpectFailure: false,
 				},
 			},
