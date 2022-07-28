@@ -202,7 +202,7 @@ func (tr *PulumiServiceTeamResource) Create(req *pulumirpc.CreateRequest) (*pulu
 
 	// We have now created a team.  It is very important to ensure that from this point on, any other error
 	// below returns the ID using the `pulumirpc.ErrorResourceInitFailed` error details annotation.  Otherwise,
-	// we very easily leak teams.  We ensure that we wrap any initialization errors are returned as a partial error to the RPC.
+	// we leak a team resource. We ensure that we wrap any errors in a partial error and return that to the RPC.
 
 	// make copy of input so we can safely modify output without affecting input
 	inProgTeam := ToPulumiServiceTeamInput(inputsTeam.ToPropertyMap())
