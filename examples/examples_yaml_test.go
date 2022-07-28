@@ -89,7 +89,7 @@ func TestYamlTeamsExample(t *testing.T) {
 					Dir: correctUpdateDir,
 					// Additive specifies that we're copying our directory on top of the previous one.
 					// This overwrites the previous Pulumi.yaml.
-					Additive: false,
+					Additive: true,
 					Verbose:  true,
 					Stdout:   secondOut,
 					Stderr:   secondOut,
