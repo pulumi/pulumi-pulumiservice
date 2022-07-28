@@ -117,9 +117,6 @@ func (tr *PulumiServiceTeamResource) Diff(req *pulumirpc.DiffRequest) (*pulumirp
 	newTeam := ToPulumiServiceTeamInput(news)
 
 	changes := pulumirpc.DiffResponse_DIFF_NONE
-	if !Equal(oldTeam.Members, newTeam.Members) {
-		changes = pulumirpc.DiffResponse_DIFF_SOME
-	}
 
 	if !reflect.DeepEqual(oldTeam, newTeam) {
 		changes = pulumirpc.DiffResponse_DIFF_SOME
