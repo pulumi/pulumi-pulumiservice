@@ -3,7 +3,6 @@ package provider
 import (
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/pulumi/pulumi/sdk/v3/go/common/workspace"
 )
