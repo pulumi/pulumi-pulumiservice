@@ -20,7 +20,7 @@ type PulumiServiceConfig struct {
 }
 
 func (pc *PulumiServiceConfig) getConfig(configName, envName string) string {
-	if val, ok := pc.Config[strings.ToLower(configName)]; ok {
+	if val, ok := pc.Config[configName]; ok {
 		return val
 	}
 
