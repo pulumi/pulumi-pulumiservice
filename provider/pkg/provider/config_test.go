@@ -39,7 +39,6 @@ func TestGetPulumiAccessToken(t *testing.T) {
 	})
 
 	t.Run("Uses Environment Variable", func(t *testing.T) {
-
 		c := PulumiServiceConfig{}
 		defer setEnv(EnvVarPulumiAccessToken, wantToken)()
 
