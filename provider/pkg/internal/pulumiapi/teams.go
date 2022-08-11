@@ -250,7 +250,6 @@ func (c *Client) DeleteMemberFromTeam(ctx context.Context, orgName, teamName, us
 	}
 }
 
-// todo, delete stack access
 func (c *Client) AddStackPermission(ctx context.Context, stack StackName, teamName string, permission int) error {
 	if len(stack.OrgName) == 0 {
 		return errors.New("orgname must not be empty")
