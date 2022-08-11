@@ -1,0 +1,12 @@
+name: yaml-stack-tags-example
+runtime: yaml
+description: A minimal Pulumi YAML program
+resources:
+  testing-tag:
+    type: pulumiservice:StackTag
+    properties:
+      organization: pulumi-bot
+      project: yaml-stack-tags-example
+      stack: test-stack
+      name: testing-tag
+      value: bar

@@ -16,7 +16,7 @@ func TestAccessTokenExample(t *testing.T) {
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		Quick:       true,
 		SkipRefresh: true,
-		Dir:         path.Join(cwd, ".", "access-tokens"),
+		Dir:         path.Join(cwd, ".", "ts-access-tokens"),
 		Dependencies: []string{
 			"@pulumi/pulumiservice",
 		},

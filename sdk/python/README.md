@@ -56,28 +56,16 @@ To use from .NET, install using `dotnet add package`:
 
 ## Setup
 
-To provision resources with the Pulumi Service provider, you need to have Pulumi Service credentials. Pulumi Service maintains documentation on how to create access tokens [here](https://www.pulumi.com/docs/intro/pulumi-service/accounts/#access-tokens). 
-
-While you can use this provider to provision access tokens, you'll still need to have an access token available to generate an access token with the provider.
-
-### Set environment variables
-
-Once you have an access token, its easy to set the environment variables. The Pulumi Service Provider uses the same environment variables as Pulumi does.
-
-```bash
-$ export PULUMI_ACCESS_TOKEN=<PULUMI_ACCESS_TOKEN>
-
-$ export PULUMI_BACKEND_URL=<PULUMI_BACKEND_URL> # For self hosted customers. defaults to https://api.pulumi.com
-```
+Ensure that you have ran `pulumi login`. Run `pulumi whoami` to verify that you are logged in.
 
 ### Configuration Options
 
 Use `pulumi config set pulumiservice:<option>` or pass options to the [constructor of `new pulumiservice.Provider`](https://pulumi.com/registry/packages/pulumiservice/api-docs/provider).
 
-| Option | Required/Optional | Description |
-|-----|------|----|
-| `accessToken`| Required | [Pulumi Service Access Tokens](https://www.pulumi.com/docs/intro/pulumi-service/accounts/#access-tokens) |
-| `apiUrl`| Optional | Allows overriding default [Pulumi Service API URL](https://www.pulumi.com/docs/reference/service-rest-api) for [self hosted customers](https://www.pulumi.com/docs/guides/self-hosted/).
+| Option | Environment Variable Name | Required/Optional | Description |
+|-----|------|----|----|
+| `accessToken`| `PULUMI_ACCESS_TOKEN` |Optional | Overrides [Pulumi Service Access Tokens](https://www.pulumi.com/docs/intro/pulumi-service/accounts/#access-tokens) |
+| `apiUrl`| `PULUMI_BACKEND_URL` | Optional | Allows overriding default [Pulumi Service API URL](https://www.pulumi.com/docs/reference/service-rest-api) for [self hosted customers](https://www.pulumi.com/docs/guides/self-hosted/).
 
 
 ## Examples
@@ -87,15 +75,20 @@ import * as pulumi from "@pulumi/pulumi";
 import * as service from "@pulumi/pulumiservice";
 
 const team = new service.Team("team", {
-    name: "pulumi-up-team",
-    displayName: "PulumiUP Team",
-    description: "This was created with Pulumi",
-    organizationName: "pulumi-up",
+    name: "pulumi-service-team",
+    displayName: "Pulumi Service",
+    description: "The Pulumi Service Team",
+    organizationName: "pulumi",
     teamType: "pulumi",
     members: [
         "piers",
-        "myles",
+        "bryce",
+        "casey"
+        "evan",
+        "devon",
         "meagan"
+        "myles",
+        "steve"
     ],
 });
 

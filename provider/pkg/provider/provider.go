@@ -75,6 +75,11 @@ func (k *pulumiserviceProvider) Call(ctx context.Context, req *pulumirpc.CallReq
 
 // Attach implements pulumirpc.ResourceProviderServer
 func (k *pulumiserviceProvider) Attach(_ context.Context, req *pulumirpc.PluginAttach) (*pbempty.Empty, error) {
+	host, err := provider.NewHostClient(req.Address)
+	if err != nil {
+		return nil, err
+	}
+	k.host = host
 	return &pbempty.Empty{}, nil
 }
 
@@ -90,7 +95,6 @@ func (k *pulumiserviceProvider) CheckConfig(ctx context.Context, req *pulumirpc.
 
 // DiffConfig diffs the configuration for this provider.
 func (k *pulumiserviceProvider) DiffConfig(ctx context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-
 	return &pulumirpc.DiffResponse{}, nil
 }
 

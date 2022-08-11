@@ -4,12 +4,16 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"reflect"
 
 	pbempty "github.com/golang/protobuf/ptypes/empty"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/pulumiapi"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/util/rpcutil/rpcerror"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 type PulumiServiceTeamResource struct {
@@ -43,7 +47,13 @@ func (i *PulumiServiceTeamInput) ToPropertyMap() resource.PropertyMap {
 	return pm
 }
 
-func (t *PulumiServiceTeamResource) ToPulumiServiceTeamInput(inputMap resource.PropertyMap) PulumiServiceTeamInput {
+func (i *PulumiServiceTeamInput) ToRpc() (*structpb.Struct, error) {
+	return plugin.MarshalProperties(i.ToPropertyMap(), plugin.MarshalOptions{
+		KeepOutputValues: true,
+	})
+}
+
+func ToPulumiServiceTeamInput(inputMap resource.PropertyMap) PulumiServiceTeamInput {
 	input := PulumiServiceTeamInput{}
 
 	if inputMap["name"].HasValue() && inputMap["name"].IsString() {
@@ -109,24 +119,12 @@ func (tr *PulumiServiceTeamResource) Diff(req *pulumirpc.DiffRequest) (*pulumirp
 		return nil, err
 	}
 
-	diffs := olds["__inputs"].ObjectValue().Diff(news)
-	if diffs == nil {
-		return &pulumirpc.DiffResponse{
-			Changes:             pulumirpc.DiffResponse_DIFF_NONE,
-			Replaces:            []string{},
-			Stables:             []string{},
-			DeleteBeforeReplace: false,
-		}, nil
-	}
+	oldTeam := ToPulumiServiceTeamInput(olds)
+	newTeam := ToPulumiServiceTeamInput(news)
 
 	changes := pulumirpc.DiffResponse_DIFF_NONE
-	if diffs.Changed("teamType") ||
-		diffs.Changed("name") ||
-		diffs.Changed("displayName") ||
-		diffs.Changed("description") ||
-		diffs.Changed("members") ||
-		diffs.Changed("organizationName") ||
-		diffs.Changed("stackPermissions") {
+
+	if !reflect.DeepEqual(oldTeam, newTeam) {
 		changes = pulumirpc.DiffResponse_DIFF_SOME
 	}
 
@@ -153,8 +151,8 @@ func (tr *PulumiServiceTeamResource) Update(req *pulumirpc.UpdateRequest) (*pulu
 		return nil, err
 	}
 
-	teamOld := tr.ToPulumiServiceTeamInput(inputsOld["__inputs"].ObjectValue())
-	teamNew := tr.ToPulumiServiceTeamInput(inputsNew)
+	teamOld := ToPulumiServiceTeamInput(inputsOld)
+	teamNew := ToPulumiServiceTeamInput(inputsNew)
 
 	inputsChanged := teamOld
 	if teamOld.Description != teamNew.Description || teamOld.DisplayName != teamNew.Description {
@@ -169,23 +167,24 @@ func (tr *PulumiServiceTeamResource) Update(req *pulumirpc.UpdateRequest) (*pulu
 		inputsChanged.Members = teamNew.Members
 		for _, usernameToDelete := range teamOld.Members {
 			if !InSlice(usernameToDelete, teamNew.Members) {
-				tr.deleteFromTeam(ctx, teamOld.OrganizationName, teamOld.Name, usernameToDelete)
+				err := tr.deleteFromTeam(ctx, teamNew.OrganizationName, teamNew.Name, usernameToDelete)
+				if err != nil {
+					return nil, err
+				}
 			}
 		}
 
 		for _, usernameToAdd := range teamNew.Members {
 			if !InSlice(usernameToAdd, teamOld.Members) {
-				tr.addToTeam(ctx, teamOld.OrganizationName, teamOld.Name, usernameToAdd)
+				err := tr.addToTeam(ctx, teamNew.OrganizationName, teamNew.Name, usernameToAdd)
+				if err != nil {
+					return nil, err
+				}
 			}
 		}
 	}
-	outputStore := resource.PropertyMap{}
-	outputStore["__inputs"] = resource.NewObjectProperty(inputsChanged.ToPropertyMap())
 
-	outputProperties, err := plugin.MarshalProperties(
-		outputStore,
-		plugin.MarshalOptions{},
-	)
+	outputProperties, err := teamNew.ToRpc()
 	if err != nil {
 		return nil, err
 	}
@@ -201,28 +200,33 @@ func (tr *PulumiServiceTeamResource) Create(req *pulumirpc.CreateRequest) (*pulu
 		return nil, err
 	}
 
-	inputsTeam := tr.ToPulumiServiceTeamInput(inputs)
+	inputsTeam := ToPulumiServiceTeamInput(inputs)
 	team, err := tr.createTeam(ctx, inputsTeam)
 	if err != nil {
 		return nil, fmt.Errorf("error creating team '%s': %s", inputsTeam.Name, err.Error())
 	}
 
+	// We have now created a team.  It is very important to ensure that from this point on, any other error
+	// below returns the ID using the `pulumirpc.ErrorResourceInitFailed` error details annotation.  Otherwise,
+	// we leak a team resource. We ensure that we wrap any errors in a partial error and return that to the RPC.
+
+	// make copy of input so we can safely modify output without affecting input
+	inProgTeam := ToPulumiServiceTeamInput(inputsTeam.ToPropertyMap())
+	inProgTeam.Members = nil
+
 	for _, memberToAdd := range inputsTeam.Members {
-		err = tr.addToTeam(ctx, inputsTeam.OrganizationName, inputsTeam.Name, memberToAdd)
+		err := tr.addToTeam(ctx, inputsTeam.OrganizationName, inputsTeam.Name, memberToAdd)
 		if err != nil {
-			return nil, err
+			return nil, partialError(*team, err, inProgTeam, inputsTeam)
 		}
+		// if we've successfully added member to team, save them to the state we're going to return
+		// so that a re-run can detect the left over members to add via Update
+		inProgTeam.Members = append(inProgTeam.Members, memberToAdd)
 	}
 
-	outputStore := resource.PropertyMap{}
-	outputStore["__inputs"] = resource.NewObjectProperty(inputs)
-
-	outputProperties, err := plugin.MarshalProperties(
-		outputStore,
-		plugin.MarshalOptions{},
-	)
+	outputProperties, err := inProgTeam.ToRpc()
 	if err != nil {
-		return nil, err
+		return nil, partialError(*team, err, inProgTeam, inputsTeam)
 	}
 
 	return &pulumirpc.CreateResponse{
@@ -281,4 +285,26 @@ func (t *PulumiServiceTeamResource) deleteTeam(ctx context.Context, id string) e
 		return err
 	}
 	return nil
+}
+
+// partialError creates an error for resources that did not complete an operation in progress.
+// The last known state of the object is included in the error so that it can be checkpointed.
+func partialError(id string, err error, state PulumiServiceTeamInput, inputs PulumiServiceTeamInput) error {
+	stateRpc, stateSerErr := state.ToRpc()
+	inputRpc, inputSerErr := inputs.ToRpc()
+
+	// combine errors if we can't serialize state or inputs for some reason
+	if stateSerErr != nil {
+		err = fmt.Errorf("err serializing state: %v, (src error: %v)", stateSerErr, err)
+	}
+	if inputSerErr != nil {
+		err = fmt.Errorf("err serializing inputs: %v (src error: %v)", inputSerErr, err)
+	}
+	detail := pulumirpc.ErrorResourceInitFailed{
+		Id:         id,
+		Properties: stateRpc,
+		Reasons:    []string{err.Error()},
+		Inputs:     inputRpc,
+	}
+	return rpcerror.WithDetails(rpcerror.New(codes.Unknown, err.Error()), &detail)
 }
