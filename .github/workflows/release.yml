@@ -94,7 +94,7 @@ jobs:
       fail-fast: true
       matrix:
         goversion:
-        - 1.17.x
+        - 1.19.x
   tag_sdk:
     name: tag_sdk
     needs: publish_sdk
@@ -207,7 +207,7 @@ jobs:
         dotnetversion:
           - 3.1.301
         goversion:
-          - 1.17.x
+          - 1.19.x
         language:
           - nodejs
           - python
