@@ -13,7 +13,7 @@ namespace Pulumi.PulumiService
     /// The Pulumi Service offers role-based access control (RBAC) using teams. Teams allow organization admins to assign a set of stack permissions to a group of users.
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:index:Team")]
-    public partial class Team : Pulumi.CustomResource
+    public partial class Team : global::Pulumi.CustomResource
     {
         /// <summary>
         /// Optional. Team description.
@@ -94,7 +94,7 @@ namespace Pulumi.PulumiService
         }
     }
 
-    public sealed class TeamArgs : Pulumi.ResourceArgs
+    public sealed class TeamArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
         /// Optional. Team description.
@@ -141,5 +141,6 @@ namespace Pulumi.PulumiService
         public TeamArgs()
         {
         }
+        public static new TeamArgs Empty => new TeamArgs();
     }
 }

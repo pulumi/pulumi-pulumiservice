@@ -13,7 +13,7 @@ namespace Pulumi.PulumiService
     /// Stacks have associated metadata in the form of tags. Each tag consists of a name and value.
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:index:StackTag")]
-    public partial class StackTag : Pulumi.CustomResource
+    public partial class StackTag : global::Pulumi.CustomResource
     {
         /// <summary>
         /// Name of the tag. The 'key' part of the key=value pair
@@ -88,7 +88,7 @@ namespace Pulumi.PulumiService
         }
     }
 
-    public sealed class StackTagArgs : Pulumi.ResourceArgs
+    public sealed class StackTagArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
         /// Name of the tag. The 'key' part of the key=value pair
@@ -123,5 +123,6 @@ namespace Pulumi.PulumiService
         public StackTagArgs()
         {
         }
+        public static new StackTagArgs Empty => new StackTagArgs();
     }
 }

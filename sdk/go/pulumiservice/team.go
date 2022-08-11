@@ -133,7 +133,7 @@ func (i *Team) ToTeamOutputWithContext(ctx context.Context) TeamOutput {
 // TeamArrayInput is an input type that accepts TeamArray and TeamArrayOutput values.
 // You can construct a concrete instance of `TeamArrayInput` via:
 //
-//          TeamArray{ TeamArgs{...} }
+//	TeamArray{ TeamArgs{...} }
 type TeamArrayInput interface {
 	pulumi.Input
 
@@ -158,7 +158,7 @@ func (i TeamArray) ToTeamArrayOutputWithContext(ctx context.Context) TeamArrayOu
 // TeamMapInput is an input type that accepts TeamMap and TeamMapOutput values.
 // You can construct a concrete instance of `TeamMapInput` via:
 //
-//          TeamMap{ "key": TeamArgs{...} }
+//	TeamMap{ "key": TeamArgs{...} }
 type TeamMapInput interface {
 	pulumi.Input
 
@@ -192,6 +192,36 @@ func (o TeamOutput) ToTeamOutput() TeamOutput {
 
 func (o TeamOutput) ToTeamOutputWithContext(ctx context.Context) TeamOutput {
 	return o
+}
+
+// Optional. Team description.
+func (o TeamOutput) Description() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *Team) pulumi.StringPtrOutput { return v.Description }).(pulumi.StringPtrOutput)
+}
+
+// Optional. Team display name.
+func (o TeamOutput) DisplayName() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *Team) pulumi.StringPtrOutput { return v.DisplayName }).(pulumi.StringPtrOutput)
+}
+
+// List of team members.
+func (o TeamOutput) Members() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v *Team) pulumi.StringArrayOutput { return v.Members }).(pulumi.StringArrayOutput)
+}
+
+// The team name.
+func (o TeamOutput) Name() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *Team) pulumi.StringPtrOutput { return v.Name }).(pulumi.StringPtrOutput)
+}
+
+// The organization's name.
+func (o TeamOutput) OrganizationName() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *Team) pulumi.StringPtrOutput { return v.OrganizationName }).(pulumi.StringPtrOutput)
+}
+
+// The type of team. Must be either `pulumi` or `github`.
+func (o TeamOutput) TeamType() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *Team) pulumi.StringPtrOutput { return v.TeamType }).(pulumi.StringPtrOutput)
 }
 
 type TeamArrayOutput struct{ *pulumi.OutputState }

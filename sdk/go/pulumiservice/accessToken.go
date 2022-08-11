@@ -105,7 +105,7 @@ func (i *AccessToken) ToAccessTokenOutputWithContext(ctx context.Context) Access
 // AccessTokenArrayInput is an input type that accepts AccessTokenArray and AccessTokenArrayOutput values.
 // You can construct a concrete instance of `AccessTokenArrayInput` via:
 //
-//          AccessTokenArray{ AccessTokenArgs{...} }
+//	AccessTokenArray{ AccessTokenArgs{...} }
 type AccessTokenArrayInput interface {
 	pulumi.Input
 
@@ -130,7 +130,7 @@ func (i AccessTokenArray) ToAccessTokenArrayOutputWithContext(ctx context.Contex
 // AccessTokenMapInput is an input type that accepts AccessTokenMap and AccessTokenMapOutput values.
 // You can construct a concrete instance of `AccessTokenMapInput` via:
 //
-//          AccessTokenMap{ "key": AccessTokenArgs{...} }
+//	AccessTokenMap{ "key": AccessTokenArgs{...} }
 type AccessTokenMapInput interface {
 	pulumi.Input
 
@@ -164,6 +164,21 @@ func (o AccessTokenOutput) ToAccessTokenOutput() AccessTokenOutput {
 
 func (o AccessTokenOutput) ToAccessTokenOutputWithContext(ctx context.Context) AccessTokenOutput {
 	return o
+}
+
+// Description of the access token.
+func (o AccessTokenOutput) Description() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *AccessToken) pulumi.StringPtrOutput { return v.Description }).(pulumi.StringPtrOutput)
+}
+
+// The token identifier.
+func (o AccessTokenOutput) TokenId() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *AccessToken) pulumi.StringPtrOutput { return v.TokenId }).(pulumi.StringPtrOutput)
+}
+
+// The token's value.
+func (o AccessTokenOutput) Value() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *AccessToken) pulumi.StringPtrOutput { return v.Value }).(pulumi.StringPtrOutput)
 }
 
 type AccessTokenArrayOutput struct{ *pulumi.OutputState }

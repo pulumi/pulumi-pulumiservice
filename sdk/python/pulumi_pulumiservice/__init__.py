@@ -5,10 +5,12 @@
 from . import _utilities
 import typing
 # Export this package's modules as members:
+from ._enums import *
 from .access_token import *
 from .provider import *
 from .stack_tag import *
 from .team import *
+from .team_stack_permission import *
 from .webhook import *
 
 # Make subpackages available:
@@ -29,6 +31,7 @@ _utilities.register(
    "pulumiservice:index:AccessToken": "AccessToken",
    "pulumiservice:index:StackTag": "StackTag",
    "pulumiservice:index:Team": "Team",
+   "pulumiservice:index:TeamStackPermission": "TeamStackPermission",
    "pulumiservice:index:Webhook": "Webhook"
   }
  }

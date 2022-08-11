@@ -13,7 +13,7 @@ namespace Pulumi.PulumiService
     /// Access tokens allow a user to authenticate against the Pulumi Service
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:index:AccessToken")]
-    public partial class AccessToken : Pulumi.CustomResource
+    public partial class AccessToken : global::Pulumi.CustomResource
     {
         /// <summary>
         /// Description of the access token.
@@ -80,7 +80,7 @@ namespace Pulumi.PulumiService
         }
     }
 
-    public sealed class AccessTokenArgs : Pulumi.ResourceArgs
+    public sealed class AccessTokenArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
         /// Description of the access token.
@@ -91,5 +91,6 @@ namespace Pulumi.PulumiService
         public AccessTokenArgs()
         {
         }
+        public static new AccessTokenArgs Empty => new AccessTokenArgs();
     }
 }
