@@ -4,6 +4,7 @@ import (
 	"context"
 
 	pbempty "github.com/golang/protobuf/ptypes/empty"
+	"github.com/google/uuid"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/pulumiapi"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/serde"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
@@ -11,7 +12,6 @@ import (
 )
 
 type TeamStackPermissionResource struct {
-	config PulumiServiceConfig
 	client *pulumiapi.Client
 }
 
@@ -24,12 +24,30 @@ type TeamStackPermissionInput struct {
 }
 
 func (i *TeamStackPermissionInput) ToPropertyMap() resource.PropertyMap {
-	return serde.ToPropertyMap(i, structTagKey)
+	return serde.ToPropertyMap(*i, structTagKey)
 }
 
 func (t *TeamStackPermissionResource) ToPulumiServiceTeamInput(inputMap resource.PropertyMap) (*TeamStackPermissionInput, error) {
 	input := TeamStackPermissionInput{}
 	return &input, serde.FromPropertyMap(inputMap, structTagKey, &input)
+}
+
+func (t *TeamStackPermissionResource) Name() string {
+	return "pulumiservice:index:TeamStackPermission"
+}
+
+func (ts *TeamStackPermissionResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
+	return &pulumirpc.CheckResponse{
+		Inputs: req.GetNews(),
+	}, nil
+}
+
+func (ts *TeamStackPermissionResource) Configure(config PulumiServiceConfig) {
+
+}
+
+func (ts *TeamStackPermissionResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
+	return &pulumirpc.ReadResponse{}, nil
 }
 
 func (ts *TeamStackPermissionResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
@@ -51,6 +69,7 @@ func (ts *TeamStackPermissionResource) Create(req *pulumirpc.CreateRequest) (*pu
 	}
 
 	return &pulumirpc.CreateResponse{
+		Id:         uuid.NewString(),
 		Properties: req.GetProperties(),
 	}, nil
 }
@@ -75,7 +94,7 @@ func (ts *TeamStackPermissionResource) Delete(req *pulumirpc.DeleteRequest) (*pb
 }
 
 func (ts *TeamStackPermissionResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	changedKeys, err := serde.DiffOldsAndNews(req) 
+	changedKeys, err := serde.DiffOldsAndNews(req)
 	if err != nil {
 		return nil, err
 	}
@@ -84,12 +103,12 @@ func (ts *TeamStackPermissionResource) Diff(req *pulumirpc.DiffRequest) (*pulumi
 		changes = pulumirpc.DiffResponse_DIFF_SOME
 	}
 	return &pulumirpc.DiffResponse{
-		Changes: changes,
+		Changes:  changes,
 		Replaces: changedKeys,
 	}, nil
 }
 
+// Update does nothing because we always do a replace on changes, never an update
 func (ts *TeamStackPermissionResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
 	return &pulumirpc.UpdateResponse{}, nil
 }
-

@@ -137,6 +137,9 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 		&PulumiServiceStackTagResource{
 			client: client,
 		},
+		&TeamStackPermissionResource{
+			client: client,
+		},
 	}
 
 	for _, sr := range k.pulumiResources {

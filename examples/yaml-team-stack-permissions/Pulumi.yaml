@@ -1,4 +1,4 @@
-name: pulumi-service-teams-example-yaml
+name: yaml-team-stack-example
 runtime: yaml
 description: An example of using python to create a team
 resources:
@@ -11,16 +11,20 @@ resources:
   team:
     type: pulumiservice:index:Team
     properties:
-      name: team-permissions-${rand.result}
+      name: yaml-team-${rand.result}
       organizationName: service-provider-test-org
-      displayName: PulumiUP Team
+      displayName: Team Stack Permission Example
       teamType: pulumi
       members:
         - pulumi-bot
         - service-provider-example-user
-  stack-perms:
-    type: pulumiservice:index:Team
+  # grant access to *this* stack to the team we're creating
+  stack-permissions:
+    type: pulumiservice:index:TeamStackPermission
     properties:
       organization: ${team.organizationName}
+      project: yaml-team-stack-example
+      stack: dev
       team: ${team.name}
+      # edit access
       permission: 102

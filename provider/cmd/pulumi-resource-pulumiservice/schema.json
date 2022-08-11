@@ -295,8 +295,7 @@
       "packageName": "@pulumi/pulumiservice",
       "dependencies": {
         "@pulumi/pulumi": "^3.0.0"
-      },
-      "disableUnionOutputTypes": true
+      }
     },
     "python": {
       "packageName": "pulumi_pulumiservice",

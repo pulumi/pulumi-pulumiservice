@@ -150,6 +150,18 @@ func TestYamlStackTagsExample(t *testing.T) {
 	})
 }
 
+func TestYamlTeamStackPermissionsExample(t *testing.T) {
+	cwd, _ := os.Getwd()
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Quick:       true,
+		SkipRefresh: true,
+		Dir:         path.Join(cwd, ".", "yaml-team-stack-permissions"),
+		PrepareProject: func(_ *engine.Projinfo) error {
+			return nil
+		},
+	})
+}
+
 func writePulumiYaml(t *testing.T, yamlContents interface{}) string {
 	tmpdir := t.TempDir()
 	b, err := yaml.Marshal(yamlContents)
