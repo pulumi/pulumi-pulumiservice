@@ -157,6 +157,7 @@ func TestYamlStackTagsExample(t *testing.T) {
 
 func TestYamlTeamStackPermissionsExample(t *testing.T) {
 	cwd, _ := os.Getwd()
+	os.Setenv("PULUMI_TEST_OWNER", ServiceProviderTestOrg)
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		// set the owner to test org so that we properly create this stack in the right place
 		Env:         []string{fmt.Sprintf("PULUMI_TEST_OWNER=%s", ServiceProviderTestOrg)},
