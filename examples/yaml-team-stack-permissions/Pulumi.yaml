@@ -1,8 +1,6 @@
 name: yaml-team-stack-example
 runtime: yaml
 description: An example of using python to create a team
-variables:
-  orgName: pulumi-bot
 resources:
   rand:
     type: random:RandomString
@@ -14,7 +12,7 @@ resources:
     type: pulumiservice:index:Team
     properties:
       name: yaml-team-${rand.result}
-      organizationName: ${orgName}
+      organizationName: service-provider-test-org
       displayName: Team Stack Permission Example
       teamType: pulumi
       members:

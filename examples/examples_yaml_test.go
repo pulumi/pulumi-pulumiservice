@@ -27,6 +27,10 @@ type YamlProgram struct {
 	Resources   map[string]Resource `yaml:"resources"`
 }
 
+const (
+	ServiceProviderTestOrg = "service-provider-test-org"
+)
+
 func TestYamlTeamsExample(t *testing.T) {
 
 	// This test builds a repro of https://github.com/pulumi/pulumi-pulumiservice/issues/73.
@@ -51,7 +55,7 @@ func TestYamlTeamsExample(t *testing.T) {
 							"name":             teamName,
 							"teamType":         "pulumi",
 							"displayName":      teamName,
-							"organizationName": "service-provider-test-org",
+							"organizationName": ServiceProviderTestOrg,
 							"members":          members,
 						},
 					},
@@ -153,11 +157,13 @@ func TestYamlStackTagsExample(t *testing.T) {
 func TestYamlTeamStackPermissionsExample(t *testing.T) {
 	cwd, _ := os.Getwd()
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		// set the owner to test org so that we properly create this stack in the right place
+		Env:         []string{fmt.Sprintf("PULUMI_TEST_OWNER=%s", ServiceProviderTestOrg)},
 		Quick:       true,
 		SkipRefresh: true,
 		// Name is specified in yaml-team-stack-permissions/Pulumi.yaml, so this has to be consistent
 		StackName: "dev",
-		Dir:         path.Join(cwd, ".", "yaml-team-stack-permissions"),
+		Dir:       path.Join(cwd, ".", "yaml-team-stack-permissions"),
 		PrepareProject: func(_ *engine.Projinfo) error {
 			return nil
 		},
