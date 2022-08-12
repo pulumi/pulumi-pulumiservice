@@ -9,19 +9,26 @@ export * from "./accessToken";
 export * from "./provider";
 export * from "./stackTag";
 export * from "./team";
+export * from "./teamStackPermission";
 export * from "./webhook";
+
+// Export enums:
+export * from "./types/enums";
 
 // Export sub-modules:
 import * as config from "./config";
+import * as types from "./types";
 
 export {
     config,
+    types,
 };
 
 // Import resources to register:
 import { AccessToken } from "./accessToken";
 import { StackTag } from "./stackTag";
 import { Team } from "./team";
+import { TeamStackPermission } from "./teamStackPermission";
 import { Webhook } from "./webhook";
 
 const _module = {
@@ -34,6 +41,8 @@ const _module = {
                 return new StackTag(name, <any>undefined, { urn })
             case "pulumiservice:index:Team":
                 return new Team(name, <any>undefined, { urn })
+            case "pulumiservice:index:TeamStackPermission":
+                return new TeamStackPermission(name, <any>undefined, { urn })
             case "pulumiservice:index:Webhook":
                 return new Webhook(name, <any>undefined, { urn })
             default:

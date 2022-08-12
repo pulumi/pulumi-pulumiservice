@@ -26,6 +26,8 @@ func (m *module) Construct(ctx *pulumi.Context, name, typ, urn string) (r pulumi
 		r = &StackTag{}
 	case "pulumiservice:index:Team":
 		r = &Team{}
+	case "pulumiservice:index:TeamStackPermission":
+		r = &TeamStackPermission{}
 	case "pulumiservice:index:Webhook":
 		r = &Webhook{}
 	default:

@@ -10,7 +10,7 @@ using Pulumi.Serialization;
 namespace Pulumi.PulumiService
 {
     [PulumiServiceResourceType("pulumi:providers:pulumiservice")]
-    public partial class Provider : Pulumi.ProviderResource
+    public partial class Provider : global::Pulumi.ProviderResource
     {
         /// <summary>
         /// Create a Provider resource with the given unique name, arguments, and options.
@@ -37,7 +37,7 @@ namespace Pulumi.PulumiService
         }
     }
 
-    public sealed class ProviderArgs : Pulumi.ResourceArgs
+    public sealed class ProviderArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
         /// Access Token to authenticate with Pulumi Service.
@@ -49,5 +49,6 @@ namespace Pulumi.PulumiService
         {
             AccessToken = Utilities.GetEnv("PULUMI_ACCESS_TOKEN") ?? "";
         }
+        public static new ProviderArgs Empty => new ProviderArgs();
     }
 }

@@ -117,7 +117,7 @@ func (i *StackTag) ToStackTagOutputWithContext(ctx context.Context) StackTagOutp
 // StackTagArrayInput is an input type that accepts StackTagArray and StackTagArrayOutput values.
 // You can construct a concrete instance of `StackTagArrayInput` via:
 //
-//          StackTagArray{ StackTagArgs{...} }
+//	StackTagArray{ StackTagArgs{...} }
 type StackTagArrayInput interface {
 	pulumi.Input
 
@@ -142,7 +142,7 @@ func (i StackTagArray) ToStackTagArrayOutputWithContext(ctx context.Context) Sta
 // StackTagMapInput is an input type that accepts StackTagMap and StackTagMapOutput values.
 // You can construct a concrete instance of `StackTagMapInput` via:
 //
-//          StackTagMap{ "key": StackTagArgs{...} }
+//	StackTagMap{ "key": StackTagArgs{...} }
 type StackTagMapInput interface {
 	pulumi.Input
 
@@ -176,6 +176,31 @@ func (o StackTagOutput) ToStackTagOutput() StackTagOutput {
 
 func (o StackTagOutput) ToStackTagOutputWithContext(ctx context.Context) StackTagOutput {
 	return o
+}
+
+// Name of the tag. The 'key' part of the key=value pair
+func (o StackTagOutput) Name() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *StackTag) pulumi.StringPtrOutput { return v.Name }).(pulumi.StringPtrOutput)
+}
+
+// Organization name.
+func (o StackTagOutput) Organization() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *StackTag) pulumi.StringPtrOutput { return v.Organization }).(pulumi.StringPtrOutput)
+}
+
+// Project name.
+func (o StackTagOutput) Project() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *StackTag) pulumi.StringPtrOutput { return v.Project }).(pulumi.StringPtrOutput)
+}
+
+// Stack name.
+func (o StackTagOutput) Stack() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *StackTag) pulumi.StringPtrOutput { return v.Stack }).(pulumi.StringPtrOutput)
+}
+
+// Value of the tag. The 'value' part of the key=value pair
+func (o StackTagOutput) Value() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *StackTag) pulumi.StringPtrOutput { return v.Value }).(pulumi.StringPtrOutput)
 }
 
 type StackTagArrayOutput struct{ *pulumi.OutputState }

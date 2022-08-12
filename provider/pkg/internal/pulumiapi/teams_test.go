@@ -187,3 +187,54 @@ func TestAddMemberToTeam(t *testing.T) {
 		)
 	})
 }
+
+func TestAddStackPermission(t *testing.T) {
+	teamName := "a-team"
+	stack := StackName{
+		OrgName:     "an-organization",
+		ProjectName: "a-project",
+		StackName:   "a-stack",
+	}
+	permission := 101
+	t.Run("Happy Path", func(t *testing.T) {
+		c, cleanup := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodPatch,
+			ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team",
+			ExpectedReqBody: addStackPermissionRequest{
+				AddStackPermission: AddStackPermission{
+					ProjectName: stack.ProjectName,
+					StackName:   stack.StackName,
+					Permission:  permission,
+				},
+			},
+			ResponseCode: 204,
+		})
+		defer cleanup()
+		assert.NoError(t, c.AddStackPermission(ctx, stack, teamName, permission))
+	})
+}
+
+
+func TestRemoveStackPermission(t *testing.T) {
+	teamName := "a-team"
+	stack := StackName{
+		OrgName:     "an-organization",
+		ProjectName: "a-project",
+		StackName:   "a-stack",
+	}
+	t.Run("Happy Path", func(t *testing.T) {
+		c, cleanup := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodPatch,
+			ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team",
+			ExpectedReqBody: removeStackPermissionRequest{
+				RemoveStackPermission: RemoveStackPermission{
+					ProjectName: stack.ProjectName,
+					StackName:   stack.StackName,
+				},
+			},
+			ResponseCode: 204,
+		})
+		defer cleanup()
+		assert.NoError(t, c.RemoveStackPermission(ctx, stack, teamName))
+	})
+}

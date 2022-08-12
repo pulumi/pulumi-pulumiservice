@@ -21,6 +21,12 @@ type PulumiServiceTeamResource struct {
 	client *pulumiapi.Client
 }
 
+type PulumiServiceTeamStackPermission struct {
+	ProjectName string
+	StackName   string
+	Permission  int
+}
+
 type PulumiServiceTeamInput struct {
 	Type             string
 	Name             string

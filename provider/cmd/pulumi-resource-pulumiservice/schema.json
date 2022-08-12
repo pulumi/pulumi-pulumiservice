@@ -4,11 +4,7 @@
   "description": "A native Pulumi package for creating and managing Pulumi Service constructs",
   "homepage": "https://pulumi.com",
   "repository": "https://github.com/pulumi/pulumi-pulumiservice",
-  "keywords": [
-    "pulumi",
-    "kind/native",
-    "category/infrastructure"
-  ],
+  "keywords": ["pulumi", "kind/native", "category/infrastructure"],
   "license": "Apache-2.0",
   "publisher": "Pulumi",
   "config": {
@@ -27,11 +23,31 @@
         "type": "string",
         "default": "",
         "defaultInfo": {
-          "environment": [
-            "PULUMI_ACCESS_TOKEN"
-          ]
+          "environment": ["PULUMI_ACCESS_TOKEN"]
         }
       }
+    }
+  },
+  "types": {
+    "pulumiservice:index:TeamStackPermissionScope": {
+      "type": "number",
+      "enum": [
+        {
+          "name": "read",
+          "description": "Grants read permissions to stack.",
+          "value": 101
+        },
+        {
+          "name": "edit",
+          "description": "Grants edit permissions to stack.",
+          "value": 102
+        },
+        {
+          "name": "admin",
+          "description": "Grants admin permissions to stack.",
+          "value": 103
+        }
+      ]
     }
   },
   "resources": {
@@ -58,9 +74,7 @@
           "type": "string"
         }
       },
-      "requiredInputs": [
-        "description"
-      ]
+      "requiredInputs": ["description"]
     },
     "pulumiservice:index:Team": {
       "description": "The Pulumi Service offers role-based access control (RBAC) using teams. Teams allow organization admins to assign a set of stack permissions to a group of users.",
@@ -122,11 +136,7 @@
           "type": "string"
         }
       },
-      "requiredInputs": [
-        "name",
-        "organizationName",
-        "teamType"
-      ]
+      "requiredInputs": ["name", "organizationName", "teamType"]
     },
     "pulumiservice:index:Webhook": {
       "description": "Pulumi Webhooks allow you to notify external services of events happening within your Pulumi organization or stack. For example, you can trigger a notification whenever a stack is updated. Whenever an event occurs, Pulumi will send an HTTP POST request to all registered webhooks. The webhook can then be used to emit some notification, start running integration tests, or even update additional stacks.",
@@ -233,6 +243,39 @@
           "type": "string"
         }
       }
+    },
+    "pulumiservice:index:TeamStackPermission": {
+      "description": "Grants a team permissions to the specified stack.",
+      "inputProperties": {
+        "team": {
+          "description": "The name of the team to grant this stack permissions to. This is not the display name.",
+          "type": "string"
+        },
+        "organization": {
+          "description": "The organization or the personal account name of the stack.",
+          "type": "string"
+        },
+        "project": {
+          "description": "The project name for this stack.",
+          "type": "string"
+        },
+        "stack": {
+          "description": "The name of the stack that the team will be granted permissions to.",
+          "type": "string"
+        },
+        "permission": {
+          "$ref": "#/types/pulumiservice:index:TeamStackPermissionScope",
+          "plain": true,
+          "description": "Sets the permission level that this team will be granted to the stack."
+        }
+      },
+      "requiredInputs": [
+        "team",
+        "organization",
+        "project",
+        "stack",
+        "permission"
+      ]
     }
   },
   "language": {

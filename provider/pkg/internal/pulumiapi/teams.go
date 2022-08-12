@@ -58,6 +58,25 @@ type updateTeamMembershipRequest struct {
 	Member       string `json:"member"`
 }
 
+type AddStackPermission struct {
+	ProjectName string `json:"projectName"`
+	StackName   string `json:"stackName"`
+	Permission  int    `json:"permission"`
+}
+
+type addStackPermissionRequest struct {
+	AddStackPermission AddStackPermission `json:"addStackPermission"`
+}
+
+type RemoveStackPermission struct {
+	ProjectName string `json:"projectName"`
+	StackName   string `json:"stackName"`
+}
+
+type removeStackPermissionRequest struct {
+	RemoveStackPermission RemoveStackPermission `json:"removeStack"`
+}
+
 func (c *Client) ListTeams(ctx context.Context, orgName string) ([]Team, error) {
 	if len(orgName) == 0 {
 		return nil, errors.New("empty orgName")
@@ -229,4 +248,50 @@ func (c *Client) DeleteMemberFromTeam(ctx context.Context, orgName, teamName, us
 	} else {
 		return nil
 	}
+}
+
+func (c *Client) AddStackPermission(ctx context.Context, stack StackName, teamName string, permission int) error {
+	if len(stack.OrgName) == 0 {
+		return errors.New("orgname must not be empty")
+	}
+
+	if len(teamName) == 0 {
+		return errors.New("teamname must not be empty")
+	}
+
+	apiPath := path.Join("orgs", stack.OrgName, "teams", teamName)
+
+	addStackPermissionRequest := addStackPermissionRequest{
+		AddStackPermission: AddStackPermission{ProjectName: stack.ProjectName, StackName: stack.StackName, Permission: permission},
+	}
+
+	_, err := c.do(ctx, http.MethodPatch, apiPath, addStackPermissionRequest, nil)
+
+	if err != nil {
+		return fmt.Errorf("failed to add stack permission for team: %w", err)
+	}
+	return nil
+}
+
+func (c *Client) RemoveStackPermission(ctx context.Context, stack StackName, teamName string) error {
+	if len(stack.OrgName) == 0 {
+		return errors.New("orgname must not be empty")
+	}
+
+	if len(teamName) == 0 {
+		return errors.New("teamname must not be empty")
+	}
+
+	apiPath := path.Join("orgs", stack.OrgName, "teams", teamName)
+
+	removeStackPermissionRequest := removeStackPermissionRequest{
+		RemoveStackPermission: RemoveStackPermission{ProjectName: stack.ProjectName, StackName: stack.StackName},
+	}
+
+	_, err := c.do(ctx, http.MethodPatch, apiPath, removeStackPermissionRequest, nil)
+
+	if err != nil {
+		return fmt.Errorf("failed to remove stack permission for team: %w", err)
+	}
+	return nil
 }

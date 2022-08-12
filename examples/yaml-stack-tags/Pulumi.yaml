@@ -5,7 +5,7 @@ resources:
   testing-tag:
     type: pulumiservice:StackTag
     properties:
-      organization: pulumi-bot
+      organization: service-provider-test-org
       project: yaml-stack-tags-example
       stack: test-stack
       name: testing-tag
