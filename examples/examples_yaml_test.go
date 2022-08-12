@@ -155,6 +155,8 @@ func TestYamlTeamStackPermissionsExample(t *testing.T) {
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		Quick:       true,
 		SkipRefresh: true,
+		// Name is specified in yaml-team-stack-permissions/Pulumi.yaml, so this has to be consistent
+		StackName: "dev",
 		Dir:         path.Join(cwd, ".", "yaml-team-stack-permissions"),
 		PrepareProject: func(_ *engine.Projinfo) error {
 			return nil
