@@ -12,5 +12,5 @@ resources:
       payloadUrl: "https://google.com"
 
 outputs:
-  # export the value of the access token
+  # export the name of the webhook
   name: ${webhook.name}
