@@ -1,0 +1,16 @@
+name: yaml-webhooks
+runtime: yaml
+description: A minimal example of provisioning access token via Pulumi YAML
+
+resources:
+  webhook:
+    type: pulumiservice:index:Webhook
+    properties:
+      active: true
+      displayName: yaml-webhook
+      organizationName: service-provider-test-org
+      payloadUrl: "https://google.com"
+
+outputs:
+  # export the value of the access token
+  name: ${webhook.name}

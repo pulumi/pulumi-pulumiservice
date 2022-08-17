@@ -18,7 +18,7 @@ func TestCreateWebhook(t *testing.T) {
 		Name:        webhookName,
 		DisplayName: displayName,
 		PayloadUrl:  payloadURL,
-		Secret:      secret,
+		Secret:      &secret,
 		Active:      active,
 	}
 	t.Run("Happy Path", func(t *testing.T) {
@@ -29,14 +29,14 @@ func TestCreateWebhook(t *testing.T) {
 				OrganizationName: orgName,
 				DisplayName:      displayName,
 				PayloadURL:       payloadURL,
-				Secret:           secret,
+				Secret:           &secret,
 				Active:           active,
 			},
 			ResponseCode: 201,
 			ResponseBody: webhook,
 		})
 		defer cleanup()
-		actualWebhook, err := c.CreateWebhook(ctx, orgName, displayName, payloadURL, secret, active)
+		actualWebhook, err := c.CreateWebhook(ctx, orgName, displayName, payloadURL, &secret, active)
 		assert.NoError(t, err)
 		assert.Equal(t, webhook, *actualWebhook)
 	})
@@ -49,7 +49,7 @@ func TestCreateWebhook(t *testing.T) {
 				OrganizationName: orgName,
 				DisplayName:      displayName,
 				PayloadURL:       payloadURL,
-				Secret:           secret,
+				Secret:           &secret,
 				Active:           active,
 			},
 			ResponseCode: 401,
@@ -58,7 +58,7 @@ func TestCreateWebhook(t *testing.T) {
 			},
 		})
 		defer cleanup()
-		actualWebhook, err := c.CreateWebhook(ctx, orgName, displayName, payloadURL, secret, active)
+		actualWebhook, err := c.CreateWebhook(ctx, orgName, displayName, payloadURL, &secret, active)
 		assert.Nil(t, actualWebhook, "webhook should be nil since error was returned")
 		assert.EqualError(t, err, "failed to create webhook: 401 API error: unauthorized")
 	})
@@ -75,7 +75,7 @@ func TestListWebhooks(t *testing.T) {
 		Name:        webhookName,
 		DisplayName: displayName,
 		PayloadUrl:  payloadURL,
-		Secret:      secret,
+		Secret:      &secret,
 		Active:      active,
 	}
 	webhooks := []Webhook{webhook}
@@ -119,7 +119,7 @@ func TestGetWebhook(t *testing.T) {
 		Name:        webhookName,
 		DisplayName: displayName,
 		PayloadUrl:  payloadURL,
-		Secret:      secret,
+		Secret:      &secret,
 		Active:      active,
 	}
 	t.Run("Happy Path", func(t *testing.T) {
@@ -162,7 +162,7 @@ func TestUpdateWebhook(t *testing.T) {
 		Name:        webhookName,
 		DisplayName: displayName,
 		PayloadUrl:  payloadURL,
-		Secret:      secret,
+		Secret:      &secret,
 		Active:      active,
 	}
 	t.Run("Happy Path", func(t *testing.T) {
@@ -174,14 +174,14 @@ func TestUpdateWebhook(t *testing.T) {
 				OrganizationName: orgName,
 				DisplayName:      displayName,
 				PayloadURL:       payloadURL,
-				Secret:           secret,
+				Secret:           &secret,
 				Active:           active,
 			},
 			ResponseCode: 201,
 			ResponseBody: webhook,
 		})
 		defer cleanup()
-		err := c.UpdateWebhook(ctx, webhookName, orgName, displayName, payloadURL, secret, active)
+		err := c.UpdateWebhook(ctx, webhookName, orgName, displayName, payloadURL, &secret, active)
 		assert.NoError(t, err)
 	})
 
@@ -194,7 +194,7 @@ func TestUpdateWebhook(t *testing.T) {
 				OrganizationName: orgName,
 				DisplayName:      displayName,
 				PayloadURL:       payloadURL,
-				Secret:           secret,
+				Secret:           &secret,
 				Active:           active,
 			},
 			ResponseCode: 401,
@@ -203,7 +203,7 @@ func TestUpdateWebhook(t *testing.T) {
 			},
 		})
 		defer cleanup()
-		err := c.UpdateWebhook(ctx, webhookName, orgName, displayName, payloadURL, secret, active)
+		err := c.UpdateWebhook(ctx, webhookName, orgName, displayName, payloadURL, &secret, active)
 		assert.EqualError(t, err, "failed to update webhook: 401 API error: unauthorized")
 	})
 }

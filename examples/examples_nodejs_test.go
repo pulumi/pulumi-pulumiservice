@@ -46,3 +46,13 @@ func TestTeamsExample(t *testing.T) {
 		},
 	})
 }
+
+func TestNodejsWebhookExample(t *testing.T) {
+	cwd := getCwd(t)
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Dir: path.Join(cwd, ".", "ts-webhooks"),
+		Dependencies: []string{
+			"@pulumi/pulumiservice",
+		},
+	})
+}
