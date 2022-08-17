@@ -173,6 +173,9 @@ func TestYamlWebhookExample(t *testing.T) {
 	cwd := getCwd(t)
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		Dir: path.Join(cwd, ".", "yaml-webhooks"),
+		PrepareProject: func(p *engine.Projinfo) error {
+			return nil
+		},
 	})
 }
 
