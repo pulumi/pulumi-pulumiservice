@@ -139,6 +139,8 @@ func TestYamlStackTagsExample(t *testing.T) {
 	tmpdir := writePulumiYaml(t, newProgram)
 
 	cwd, _ := os.Getwd()
+
+	os.Setenv("PULUMI_TEST_OWNER", ServiceProviderTestOrg)
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		Quick:       true,
 		SkipRefresh: true,
@@ -150,6 +152,11 @@ func TestYamlStackTagsExample(t *testing.T) {
 		EditDirs: []integration.EditDir{
 			{
 				Dir: tmpdir,
+			},
+			// Reapply the same thing again, except this time we expect there to be no changes
+			{
+				Dir: tmpdir,
+				ExpectNoChanges: true,
 			},
 		},
 	})
