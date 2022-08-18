@@ -42,7 +42,7 @@ type updateWebhookRequest struct {
 	OrganizationName string `json:"organizationName"`
 	DisplayName      string `json:"displayName"`
 	PayloadURL       string `json:"payloadUrl"`
-	Secret           *string `json:"secret"`
+	Secret           *string `json:"secret,omitempty"`
 	Active           bool   `json:"active"`
 }
 
