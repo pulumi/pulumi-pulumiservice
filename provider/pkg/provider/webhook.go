@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"sort"
 	"strings"
 
 	pbempty "github.com/golang/protobuf/ptypes/empty"
@@ -21,7 +22,7 @@ type PulumiServiceWebhookInput struct {
 	Active           bool
 	DisplayName      string
 	PayloadUrl       string
-	Secret           string
+	Secret           *string
 	Name             string
 	OrganizationName string
 }
@@ -31,8 +32,12 @@ func (i *PulumiServiceWebhookInput) ToPropertyMap() resource.PropertyMap {
 	pm["active"] = resource.NewPropertyValue(i.Active)
 	pm["displayName"] = resource.NewPropertyValue(i.DisplayName)
 	pm["payloadUrl"] = resource.NewPropertyValue(i.PayloadUrl)
-	pm["secret"] = resource.NewPropertyValue(i.Secret)
+	if i.Secret != nil {
+		pm["secret"] = resource.NewPropertyValue(*i.Secret)
+	}
+
 	pm["organizationName"] = resource.NewPropertyValue(i.OrganizationName)
+	pm["name"] = resource.NewPropertyValue(i.Name)
 	return pm
 }
 
@@ -51,12 +56,17 @@ func (wh *PulumiServiceWebhookResource) ToPulumiServiceWebhookInput(inputMap res
 		input.PayloadUrl = inputMap["payloadUrl"].StringValue()
 	}
 
-	if inputMap["secret"].HasValue() && inputMap["secret"].IsString() {
-		input.Secret = inputMap["secret"].StringValue()
+	if secretVal := inputMap["secret"]; secretVal.HasValue() && secretVal.IsString() {
+		secretStr := secretVal.StringValue()
+		input.Secret = &secretStr
 	}
 
 	if inputMap["organizationName"].HasValue() && inputMap["organizationName"].IsString() {
 		input.OrganizationName = inputMap["organizationName"].StringValue()
+	}
+
+	if nameVal, ok := inputMap["name"]; ok && nameVal.IsString() {
+		input.Name = nameVal.StringValue()
 	}
 
 	return input
@@ -87,15 +97,19 @@ func (wh *PulumiServiceWebhookResource) Create(req *pulumirpc.CreateRequest) (*p
 		return nil, err
 	}
 
-	s := strings.Split(*webhookId, "/")
+	_, webhookName, err := splitSingleSlashString(*webhookId) 
+	if err != nil {
+		return nil, err
+	}
 
-	outputStore := resource.PropertyMap{}
-	outputStore["__inputs"] = resource.NewObjectProperty(inputs)
-	outputStore["name"] = resource.NewPropertyValue(s[1])
+	inputsWebhook.Name = webhookName
 
 	outputProperties, err := plugin.MarshalProperties(
-		outputStore,
-		plugin.MarshalOptions{},
+		inputsWebhook.ToPropertyMap(),
+		plugin.MarshalOptions{
+			KeepUnknowns: true,
+			SkipNulls:    true,
+		},
 	)
 	if err != nil {
 		return nil, err
@@ -124,42 +138,51 @@ func (wh *PulumiServiceWebhookResource) Diff(req *pulumirpc.DiffRequest) (*pulum
 		return nil, err
 	}
 
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: false})
+	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
 	}
 
-	diffs := olds["__inputs"].ObjectValue().Diff(news)
-	if diffs == nil {
-		return &pulumirpc.DiffResponse{
-			Changes:             pulumirpc.DiffResponse_DIFF_NONE,
-			Replaces:            []string{},
-			Stables:             []string{},
-			DeleteBeforeReplace: false,
-		}, nil
-	}
-
-	changes := pulumirpc.DiffResponse_DIFF_NONE
-	replaceProperties := []string{"organizationName", "name"}
-	var replaces []string
-	for _, prop := range replaceProperties {
-		if diffs.Changed(resource.PropertyKey(prop)) {
-			replaces = append(replaces, prop)
-			changes = pulumirpc.DiffResponse_DIFF_SOME
+	// previous versions of the provider used "__inputs" key to store inputs in output properties
+	// to maintain backwards compatibility, we still need to handle this case 
+	// so we just lift up those values to the top level 
+	if oldInputs, ok := olds["__inputs"]; ok && oldInputs.IsObject() {
+		for k, v := range oldInputs.ObjectValue() {
+			olds[k] = v
 		}
 	}
 
-	if diffs.Changed("active") ||
-		diffs.Changed("displayName") ||
-		diffs.Changed("payloadUrl") ||
-		diffs.Changed("secret") {
-		changes = pulumirpc.DiffResponse_DIFF_SOME
+	changes := pulumirpc.DiffResponse_DIFF_NONE
+	var diffs, replaces []string
+	properties := map[string]bool{
+		"active":           false,
+		"displayName":      false,
+		"payloadUrl":       false,
+		"secret":           false,
+		"organizationName": true,
+	}
+	if d := olds.Diff(news); d != nil {
+		for key, replace := range properties {
+			i := sort.SearchStrings(req.IgnoreChanges, key)
+			if i < len(req.IgnoreChanges) && req.IgnoreChanges[i] == key {
+				continue
+			}
+
+			if d.Changed(resource.PropertyKey(key)) {
+				changes = pulumirpc.DiffResponse_DIFF_SOME
+				diffs = append(diffs, key)
+
+				if replace {
+					replaces = append(replaces, key)
+				}
+			}
+		}
 	}
 
 	return &pulumirpc.DiffResponse{
-		Changes:             changes,
-		Replaces:            replaces,
-		Stables:             []string{},
+		Diffs:    diffs,
+		Changes:  changes,
+		Replaces: replaces,
 		DeleteBeforeReplace: false,
 	}, nil
 }
@@ -172,6 +195,13 @@ func (wh *PulumiServiceWebhookResource) Update(req *pulumirpc.UpdateRequest) (*p
 	}
 
 	webhookNew := wh.ToPulumiServiceWebhookInput(inputsNew)
+
+	// ignore orgName because if that changed, we would have done a replace, so update would never have been called
+	_, webhookName, err := splitSingleSlashString(req.GetId())
+	if err != nil {
+		return nil, fmt.Errorf("invalid resource id: %v", err)
+	}
+	webhookNew.Name = webhookName
 
 	err = wh.client.UpdateWebhook(
 		context.Background(),
@@ -186,8 +216,7 @@ func (wh *PulumiServiceWebhookResource) Update(req *pulumirpc.UpdateRequest) (*p
 		return nil, err
 	}
 
-	outputStore := resource.PropertyMap{}
-	outputStore["__inputs"] = resource.NewObjectProperty(webhookNew.ToPropertyMap())
+	outputStore := webhookNew.ToPropertyMap()
 
 	outputProperties, err := plugin.MarshalProperties(
 		outputStore,
@@ -223,7 +252,7 @@ func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulum
 
 	webhook, err := wh.getWebhook(req.Id)
 	if err != nil {
-		return &pulumirpc.ReadResponse{}, err
+		return nil, err
 	}
 
 	orgName, webhookName, err := splitSingleSlashString(req.Id)

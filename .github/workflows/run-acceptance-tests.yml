@@ -29,6 +29,8 @@ env:
   # Lookup nuget packages from this directory as well as default nuget directories
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
 
+  PULUMI_TEST_OWNER: service-provider-test-org
+
 jobs:
   build_sdks:
     if: github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository

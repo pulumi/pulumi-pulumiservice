@@ -3,7 +3,6 @@
 package examples
 
 import (
-	"fmt"
 	"io"
 	"os"
 	"path"
@@ -140,7 +139,6 @@ func TestYamlStackTagsExample(t *testing.T) {
 
 	cwd, _ := os.Getwd()
 
-	t.Setenv("PULUMI_TEST_OWNER", ServiceProviderTestOrg)
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		Quick:       true,
 		SkipRefresh: true,
@@ -164,16 +162,23 @@ func TestYamlStackTagsExample(t *testing.T) {
 
 func TestYamlTeamStackPermissionsExample(t *testing.T) {
 	cwd, _ := os.Getwd()
-	os.Setenv("PULUMI_TEST_OWNER", ServiceProviderTestOrg)
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		// set the owner to test org so that we properly create this stack in the right place
-		Env:         []string{fmt.Sprintf("PULUMI_TEST_OWNER=%s", ServiceProviderTestOrg)},
 		Quick:       true,
 		SkipRefresh: true,
 		// Name is specified in yaml-team-stack-permissions/Pulumi.yaml, so this has to be consistent
 		StackName: "dev",
 		Dir:       path.Join(cwd, ".", "yaml-team-stack-permissions"),
 		PrepareProject: func(_ *engine.Projinfo) error {
+			return nil
+		},
+	})
+}
+
+func TestYamlWebhookExample(t *testing.T) {
+	cwd := getCwd(t)
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Dir: path.Join(cwd, ".", "yaml-webhooks"),
+		PrepareProject: func(p *engine.Projinfo) error {
 			return nil
 		},
 	})
