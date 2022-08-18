@@ -140,7 +140,7 @@ func TestYamlStackTagsExample(t *testing.T) {
 
 	cwd, _ := os.Getwd()
 
-	os.Setenv("PULUMI_TEST_OWNER", ServiceProviderTestOrg)
+	t.Setenv("PULUMI_TEST_OWNER", ServiceProviderTestOrg)
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		Quick:       true,
 		SkipRefresh: true,
