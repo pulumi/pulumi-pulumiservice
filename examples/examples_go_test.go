@@ -15,10 +15,6 @@ func TestGoTeamsExample(t *testing.T) {
 		Verbose:     true,
 		Dir:         filepath.Join(getCwd(t), "go-teams"),
 		SkipRefresh: true,
-		Dependencies: []string{
-			"github.com/pulumi/pulumi-pulumiservice/sdk",
-			"github.com/pulumi/pulumi-random/sdk/v4",
-		},
 	})
 	integration.ProgramTest(t, &testOpts)
 }
