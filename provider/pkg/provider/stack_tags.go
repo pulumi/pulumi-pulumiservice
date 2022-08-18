@@ -50,6 +50,7 @@ func (st *PulumiServiceStackTagResource) Diff(req *pulumirpc.DiffRequest) (*pulu
 		changes = pulumirpc.DiffResponse_DIFF_SOME
 	}
 	return &pulumirpc.DiffResponse{
+
 		Changes: changes,
 	}, nil
 }
@@ -127,7 +128,10 @@ func (st *PulumiServiceStackTagResource) Update(req *pulumirpc.UpdateRequest) (*
 	if err != nil {
 		return nil, err
 	}
-	return &pulumirpc.UpdateResponse{}, nil
+
+	return &pulumirpc.UpdateResponse{
+		Properties: req.GetNews(),
+	}, nil
 }
 
 func (st *PulumiServiceStackTagResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
