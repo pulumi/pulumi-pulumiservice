@@ -6,6 +6,7 @@ on:
       - '!v*.*.*-**'
 env:
   PROVIDER: pulumiservice
+  AWS_REGION: us-west-2
   PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
   # THIS GITHUB_TOKEN IS A REQUIREMENT TO BE ABLE TO WRITE TO GH RELEASES
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
