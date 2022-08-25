@@ -6,6 +6,7 @@ on:
       - '!v*.*.*-**'
 env:
   PROVIDER: pulumiservice
+  AWS_REGION: us-west-2
   PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
   # THIS GITHUB_TOKEN IS A REQUIREMENT TO BE ABLE TO WRITE TO GH RELEASES
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -85,6 +86,16 @@ jobs:
       uses: jaxxstorm/action-install-gh-release@v1.5.0
       with:
         repo: pulumi/pulumictl
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-region: us-east-2
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        role-duration-seconds: 7200
+        role-session-name: ${{ env.PROVIDER }}@githubActions
+        role-external-id: upload-pulumi-release
+        role-to-assume: ${{ secrets.AWS_UPLOAD_ROLE_ARN }}
     - name: Run GoReleaser
       uses: goreleaser/goreleaser-action@v2
       with:
