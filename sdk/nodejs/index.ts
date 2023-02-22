@@ -9,6 +9,7 @@ export * from "./accessToken";
 export * from "./provider";
 export * from "./stackTag";
 export * from "./team";
+export * from "./teamAccessToken";
 export * from "./teamStackPermission";
 export * from "./webhook";
 
@@ -28,6 +29,7 @@ export {
 import { AccessToken } from "./accessToken";
 import { StackTag } from "./stackTag";
 import { Team } from "./team";
+import { TeamAccessToken } from "./teamAccessToken";
 import { TeamStackPermission } from "./teamStackPermission";
 import { Webhook } from "./webhook";
 
@@ -41,6 +43,8 @@ const _module = {
                 return new StackTag(name, <any>undefined, { urn })
             case "pulumiservice:index:Team":
                 return new Team(name, <any>undefined, { urn })
+            case "pulumiservice:index:TeamAccessToken":
+                return new TeamAccessToken(name, <any>undefined, { urn })
             case "pulumiservice:index:TeamStackPermission":
                 return new TeamStackPermission(name, <any>undefined, { urn })
             case "pulumiservice:index:Webhook":

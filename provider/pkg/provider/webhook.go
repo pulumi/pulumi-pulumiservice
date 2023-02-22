@@ -314,3 +314,13 @@ func splitSingleSlashString(id string) (string, string, error) {
 	}
 	return s[0], s[1], nil
 }
+
+// FIXME: we can likely convert the above method into a better one that can be used for all resources
+func splitTeamAccessTokenId(id string) (string, string, string, error) {
+	// format: organization/teamName/tokenName
+	s := strings.Split(id, "/")
+	if len(s) != 3 {
+		return "", "", "", fmt.Errorf("%q is invalid, must contain a single slash ('/')", id)
+	}
+	return s[0], s[1], s[2], nil
+}

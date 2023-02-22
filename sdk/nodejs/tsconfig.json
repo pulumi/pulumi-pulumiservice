@@ -20,6 +20,7 @@
         "provider.ts",
         "stackTag.ts",
         "team.ts",
+        "teamAccessToken.ts",
         "teamStackPermission.ts",
         "types/enums/index.ts",
         "types/index.ts",

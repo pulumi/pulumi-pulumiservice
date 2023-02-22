@@ -8,7 +8,7 @@ resources:
     properties:
       active: true
       displayName: yaml-webhook
-      organizationName: service-provider-test-org
+      organizationName: lbrlabs
       payloadUrl: "https://google.com"
 
 outputs:
