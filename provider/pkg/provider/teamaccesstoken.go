@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	pbempty "github.com/golang/protobuf/ptypes/empty"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/pulumiapi"
@@ -163,4 +164,14 @@ func (at *PulumiServiceTeamAccessTokenResource) deleteTeamAccessToken(ctx contex
 	}
 	return at.client.DeleteTeamAccessToken(ctx, tokenId, orgName, teamName)
 
+}
+
+// FIXME: we can likely create a util that will work for all cases
+func splitTeamAccessTokenId(id string) (string, string, string, error) {
+	// format: organization/teamName/tokenName
+	s := strings.Split(id, "/")
+	if len(s) != 3 {
+		return "", "", "", fmt.Errorf("%q is invalid, must contain a single slash ('/')", id)
+	}
+	return s[0], s[1], s[2], nil
 }
