@@ -3,16 +3,16 @@
 package examples
 
 import (
-	"io"
+	//"io"
 	"os"
 	"path"
-	"strings"
+	//"strings"
 	"testing"
 
-	"github.com/google/uuid"
+	//"github.com/google/uuid"
 	"github.com/pulumi/pulumi/pkg/v3/engine"
 	"github.com/pulumi/pulumi/pkg/v3/testing/integration"
-	"github.com/stretchr/testify/assert"
+	//"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v2"
 )
 
