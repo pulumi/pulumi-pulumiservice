@@ -75,8 +75,9 @@ func TestCreateOrgAccessToken(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqPath:   "/api/orgs/anOrg/tokens",
-			ExpectedReqBody: createTokenRequest{
+			ExpectedReqBody: createOrgTokenRequest{
 				Description: desc,
+				Name: name,
 			},
 			ResponseCode: 401,
 			ResponseBody: errorResponse{
