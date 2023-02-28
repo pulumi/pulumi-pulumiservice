@@ -11,9 +11,9 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 
 
-public final class TeamAccessTokenArgs extends com.pulumi.resources.ResourceArgs {
+public final class OrgAccessTokenArgs extends com.pulumi.resources.ResourceArgs {
 
-    public static final TeamAccessTokenArgs Empty = new TeamAccessTokenArgs();
+    public static final OrgAccessTokenArgs Empty = new OrgAccessTokenArgs();
 
     /**
      * Optional. Team description.
@@ -60,46 +60,30 @@ public final class TeamAccessTokenArgs extends com.pulumi.resources.ResourceArgs
         return this.organizationName;
     }
 
-    /**
-     * The team name.
-     * 
-     */
-    @Import(name="teamName", required=true)
-    private Output<String> teamName;
+    private OrgAccessTokenArgs() {}
 
-    /**
-     * @return The team name.
-     * 
-     */
-    public Output<String> teamName() {
-        return this.teamName;
-    }
-
-    private TeamAccessTokenArgs() {}
-
-    private TeamAccessTokenArgs(TeamAccessTokenArgs $) {
+    private OrgAccessTokenArgs(OrgAccessTokenArgs $) {
         this.description = $.description;
         this.name = $.name;
         this.organizationName = $.organizationName;
-        this.teamName = $.teamName;
     }
 
     public static Builder builder() {
         return new Builder();
     }
-    public static Builder builder(TeamAccessTokenArgs defaults) {
+    public static Builder builder(OrgAccessTokenArgs defaults) {
         return new Builder(defaults);
     }
 
     public static final class Builder {
-        private TeamAccessTokenArgs $;
+        private OrgAccessTokenArgs $;
 
         public Builder() {
-            $ = new TeamAccessTokenArgs();
+            $ = new OrgAccessTokenArgs();
         }
 
-        public Builder(TeamAccessTokenArgs defaults) {
-            $ = new TeamAccessTokenArgs(Objects.requireNonNull(defaults));
+        public Builder(OrgAccessTokenArgs defaults) {
+            $ = new OrgAccessTokenArgs(Objects.requireNonNull(defaults));
         }
 
         /**
@@ -165,31 +149,9 @@ public final class TeamAccessTokenArgs extends com.pulumi.resources.ResourceArgs
             return organizationName(Output.of(organizationName));
         }
 
-        /**
-         * @param teamName The team name.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder teamName(Output<String> teamName) {
-            $.teamName = teamName;
-            return this;
-        }
-
-        /**
-         * @param teamName The team name.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder teamName(String teamName) {
-            return teamName(Output.of(teamName));
-        }
-
-        public TeamAccessTokenArgs build() {
+        public OrgAccessTokenArgs build() {
             $.name = Objects.requireNonNull($.name, "expected parameter 'name' to be non-null");
             $.organizationName = Objects.requireNonNull($.organizationName, "expected parameter 'organizationName' to be non-null");
-            $.teamName = Objects.requireNonNull($.teamName, "expected parameter 'teamName' to be non-null");
             return $;
         }
     }

@@ -6,6 +6,7 @@ import * as utilities from "./utilities";
 
 // Export members:
 export * from "./accessToken";
+export * from "./orgAccessToken";
 export * from "./provider";
 export * from "./stackTag";
 export * from "./team";
@@ -27,6 +28,7 @@ export {
 
 // Import resources to register:
 import { AccessToken } from "./accessToken";
+import { OrgAccessToken } from "./orgAccessToken";
 import { StackTag } from "./stackTag";
 import { Team } from "./team";
 import { TeamAccessToken } from "./teamAccessToken";
@@ -39,6 +41,8 @@ const _module = {
         switch (type) {
             case "pulumiservice:index:AccessToken":
                 return new AccessToken(name, <any>undefined, { urn })
+            case "pulumiservice:index:OrgAccessToken":
+                return new OrgAccessToken(name, <any>undefined, { urn })
             case "pulumiservice:index:StackTag":
                 return new StackTag(name, <any>undefined, { urn })
             case "pulumiservice:index:Team":

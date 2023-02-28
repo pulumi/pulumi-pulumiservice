@@ -9,25 +9,22 @@ import pulumi.runtime
 from typing import Any, Mapping, Optional, Sequence, Union, overload
 from . import _utilities
 
-__all__ = ['TeamAccessTokenArgs', 'TeamAccessToken']
+__all__ = ['OrgAccessTokenArgs', 'OrgAccessToken']
 
 @pulumi.input_type
-class TeamAccessTokenArgs:
+class OrgAccessTokenArgs:
     def __init__(__self__, *,
                  name: pulumi.Input[str],
                  organization_name: pulumi.Input[str],
-                 team_name: pulumi.Input[str],
                  description: Optional[pulumi.Input[str]] = None):
         """
-        The set of arguments for constructing a TeamAccessToken resource.
+        The set of arguments for constructing a OrgAccessToken resource.
         :param pulumi.Input[str] name: The name for the token.
         :param pulumi.Input[str] organization_name: The organization's name.
-        :param pulumi.Input[str] team_name: The team name.
         :param pulumi.Input[str] description: Optional. Team description.
         """
         pulumi.set(__self__, "name", name)
         pulumi.set(__self__, "organization_name", organization_name)
-        pulumi.set(__self__, "team_name", team_name)
         if description is not None:
             pulumi.set(__self__, "description", description)
 
@@ -56,18 +53,6 @@ class TeamAccessTokenArgs:
         pulumi.set(self, "organization_name", value)
 
     @property
-    @pulumi.getter(name="teamName")
-    def team_name(self) -> pulumi.Input[str]:
-        """
-        The team name.
-        """
-        return pulumi.get(self, "team_name")
-
-    @team_name.setter
-    def team_name(self, value: pulumi.Input[str]):
-        pulumi.set(self, "team_name", value)
-
-    @property
     @pulumi.getter
     def description(self) -> Optional[pulumi.Input[str]]:
         """
@@ -80,7 +65,7 @@ class TeamAccessTokenArgs:
         pulumi.set(self, "description", value)
 
 
-class TeamAccessToken(pulumi.CustomResource):
+class OrgAccessToken(pulumi.CustomResource):
     @overload
     def __init__(__self__,
                  resource_name: str,
@@ -88,34 +73,32 @@ class TeamAccessToken(pulumi.CustomResource):
                  description: Optional[pulumi.Input[str]] = None,
                  name: Optional[pulumi.Input[str]] = None,
                  organization_name: Optional[pulumi.Input[str]] = None,
-                 team_name: Optional[pulumi.Input[str]] = None,
                  __props__=None):
         """
-        The Pulumi Service allows users to create access tokens scoped to team. Team access tokens is a resource to create them and assign them to a team
+        The Pulumi Service allows users to create access tokens scoped to orgs. Org access tokens is a resource to create them and assign them to an org
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[str] description: Optional. Team description.
         :param pulumi.Input[str] name: The name for the token.
         :param pulumi.Input[str] organization_name: The organization's name.
-        :param pulumi.Input[str] team_name: The team name.
         """
         ...
     @overload
     def __init__(__self__,
                  resource_name: str,
-                 args: TeamAccessTokenArgs,
+                 args: OrgAccessTokenArgs,
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
-        The Pulumi Service allows users to create access tokens scoped to team. Team access tokens is a resource to create them and assign them to a team
+        The Pulumi Service allows users to create access tokens scoped to orgs. Org access tokens is a resource to create them and assign them to an org
 
         :param str resource_name: The name of the resource.
-        :param TeamAccessTokenArgs args: The arguments to use to populate this resource's properties.
+        :param OrgAccessTokenArgs args: The arguments to use to populate this resource's properties.
         :param pulumi.ResourceOptions opts: Options for the resource.
         """
         ...
     def __init__(__self__, resource_name: str, *args, **kwargs):
-        resource_args, opts = _utilities.get_resource_args_opts(TeamAccessTokenArgs, pulumi.ResourceOptions, *args, **kwargs)
+        resource_args, opts = _utilities.get_resource_args_opts(OrgAccessTokenArgs, pulumi.ResourceOptions, *args, **kwargs)
         if resource_args is not None:
             __self__._internal_init(resource_name, opts, **resource_args.__dict__)
         else:
@@ -127,7 +110,6 @@ class TeamAccessToken(pulumi.CustomResource):
                  description: Optional[pulumi.Input[str]] = None,
                  name: Optional[pulumi.Input[str]] = None,
                  organization_name: Optional[pulumi.Input[str]] = None,
-                 team_name: Optional[pulumi.Input[str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
@@ -135,7 +117,7 @@ class TeamAccessToken(pulumi.CustomResource):
         if opts.id is None:
             if __props__ is not None:
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
-            __props__ = TeamAccessTokenArgs.__new__(TeamAccessTokenArgs)
+            __props__ = OrgAccessTokenArgs.__new__(OrgAccessTokenArgs)
 
             __props__.__dict__["description"] = description
             if name is None and not opts.urn:
@@ -144,11 +126,8 @@ class TeamAccessToken(pulumi.CustomResource):
             if organization_name is None and not opts.urn:
                 raise TypeError("Missing required property 'organization_name'")
             __props__.__dict__["organization_name"] = organization_name
-            if team_name is None and not opts.urn:
-                raise TypeError("Missing required property 'team_name'")
-            __props__.__dict__["team_name"] = team_name
-        super(TeamAccessToken, __self__).__init__(
-            'pulumiservice:index:TeamAccessToken',
+        super(OrgAccessToken, __self__).__init__(
+            'pulumiservice:index:OrgAccessToken',
             resource_name,
             __props__,
             opts)
@@ -156,9 +135,9 @@ class TeamAccessToken(pulumi.CustomResource):
     @staticmethod
     def get(resource_name: str,
             id: pulumi.Input[str],
-            opts: Optional[pulumi.ResourceOptions] = None) -> 'TeamAccessToken':
+            opts: Optional[pulumi.ResourceOptions] = None) -> 'OrgAccessToken':
         """
-        Get an existing TeamAccessToken resource's state with the given name, id, and optional extra
+        Get an existing OrgAccessToken resource's state with the given name, id, and optional extra
         properties used to qualify the lookup.
 
         :param str resource_name: The unique name of the resulting resource.
@@ -167,13 +146,12 @@ class TeamAccessToken(pulumi.CustomResource):
         """
         opts = pulumi.ResourceOptions.merge(opts, pulumi.ResourceOptions(id=id))
 
-        __props__ = TeamAccessTokenArgs.__new__(TeamAccessTokenArgs)
+        __props__ = OrgAccessTokenArgs.__new__(OrgAccessTokenArgs)
 
         __props__.__dict__["description"] = None
         __props__.__dict__["name"] = None
         __props__.__dict__["organization_name"] = None
-        __props__.__dict__["team_name"] = None
-        return TeamAccessToken(resource_name, opts=opts, __props__=__props__)
+        return OrgAccessToken(resource_name, opts=opts, __props__=__props__)
 
     @property
     @pulumi.getter
@@ -198,12 +176,4 @@ class TeamAccessToken(pulumi.CustomResource):
         The organization's name.
         """
         return pulumi.get(self, "organization_name")
-
-    @property
-    @pulumi.getter(name="teamName")
-    def team_name(self) -> pulumi.Output[Optional[str]]:
-        """
-        The team name.
-        """
-        return pulumi.get(self, "team_name")
 

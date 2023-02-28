@@ -10,10 +10,10 @@ using Pulumi.Serialization;
 namespace Pulumi.PulumiService
 {
     /// <summary>
-    /// The Pulumi Service allows users to create access tokens scoped to team. Team access tokens is a resource to create them and assign them to a team
+    /// The Pulumi Service allows users to create access tokens scoped to orgs. Org access tokens is a resource to create them and assign them to an org
     /// </summary>
-    [PulumiServiceResourceType("pulumiservice:index:TeamAccessToken")]
-    public partial class TeamAccessToken : global::Pulumi.CustomResource
+    [PulumiServiceResourceType("pulumiservice:index:OrgAccessToken")]
+    public partial class OrgAccessToken : global::Pulumi.CustomResource
     {
         /// <summary>
         /// Optional. Description for the token.
@@ -33,27 +33,21 @@ namespace Pulumi.PulumiService
         [Output("organizationName")]
         public Output<string?> OrganizationName { get; private set; } = null!;
 
-        /// <summary>
-        /// The team name.
-        /// </summary>
-        [Output("teamName")]
-        public Output<string?> TeamName { get; private set; } = null!;
-
 
         /// <summary>
-        /// Create a TeamAccessToken resource with the given unique name, arguments, and options.
+        /// Create a OrgAccessToken resource with the given unique name, arguments, and options.
         /// </summary>
         ///
         /// <param name="name">The unique name of the resource</param>
         /// <param name="args">The arguments used to populate this resource's properties</param>
         /// <param name="options">A bag of options that control this resource's behavior</param>
-        public TeamAccessToken(string name, TeamAccessTokenArgs args, CustomResourceOptions? options = null)
-            : base("pulumiservice:index:TeamAccessToken", name, args ?? new TeamAccessTokenArgs(), MakeResourceOptions(options, ""))
+        public OrgAccessToken(string name, OrgAccessTokenArgs args, CustomResourceOptions? options = null)
+            : base("pulumiservice:index:OrgAccessToken", name, args ?? new OrgAccessTokenArgs(), MakeResourceOptions(options, ""))
         {
         }
 
-        private TeamAccessToken(string name, Input<string> id, CustomResourceOptions? options = null)
-            : base("pulumiservice:index:TeamAccessToken", name, null, MakeResourceOptions(options, id))
+        private OrgAccessToken(string name, Input<string> id, CustomResourceOptions? options = null)
+            : base("pulumiservice:index:OrgAccessToken", name, null, MakeResourceOptions(options, id))
         {
         }
 
@@ -69,20 +63,20 @@ namespace Pulumi.PulumiService
             return merged;
         }
         /// <summary>
-        /// Get an existing TeamAccessToken resource's state with the given name, ID, and optional extra
+        /// Get an existing OrgAccessToken resource's state with the given name, ID, and optional extra
         /// properties used to qualify the lookup.
         /// </summary>
         ///
         /// <param name="name">The unique name of the resulting resource.</param>
         /// <param name="id">The unique provider ID of the resource to lookup.</param>
         /// <param name="options">A bag of options that control this resource's behavior</param>
-        public static TeamAccessToken Get(string name, Input<string> id, CustomResourceOptions? options = null)
+        public static OrgAccessToken Get(string name, Input<string> id, CustomResourceOptions? options = null)
         {
-            return new TeamAccessToken(name, id, options);
+            return new OrgAccessToken(name, id, options);
         }
     }
 
-    public sealed class TeamAccessTokenArgs : global::Pulumi.ResourceArgs
+    public sealed class OrgAccessTokenArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
         /// Optional. Team description.
@@ -102,15 +96,9 @@ namespace Pulumi.PulumiService
         [Input("organizationName", required: true)]
         public Input<string> OrganizationName { get; set; } = null!;
 
-        /// <summary>
-        /// The team name.
-        /// </summary>
-        [Input("teamName", required: true)]
-        public Input<string> TeamName { get; set; } = null!;
-
-        public TeamAccessTokenArgs()
+        public OrgAccessTokenArgs()
         {
         }
-        public static new TeamAccessTokenArgs Empty => new TeamAccessTokenArgs();
+        public static new OrgAccessTokenArgs Empty => new OrgAccessTokenArgs();
     }
 }

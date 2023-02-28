@@ -17,6 +17,8 @@ type TeamAccessToken struct {
 
 	// Optional. Description for the token.
 	Description pulumi.StringPtrOutput `pulumi:"description"`
+	// The name for the token.
+	Name pulumi.StringPtrOutput `pulumi:"name"`
 	// The organization's name.
 	OrganizationName pulumi.StringPtrOutput `pulumi:"organizationName"`
 	// The team name.
@@ -30,6 +32,9 @@ func NewTeamAccessToken(ctx *pulumi.Context,
 		return nil, errors.New("missing one or more required arguments")
 	}
 
+	if args.Name == nil {
+		return nil, errors.New("invalid value for required argument 'Name'")
+	}
 	if args.OrganizationName == nil {
 		return nil, errors.New("invalid value for required argument 'OrganizationName'")
 	}
@@ -70,6 +75,8 @@ func (TeamAccessTokenState) ElementType() reflect.Type {
 type teamAccessTokenArgs struct {
 	// Optional. Team description.
 	Description *string `pulumi:"description"`
+	// The name for the token.
+	Name string `pulumi:"name"`
 	// The organization's name.
 	OrganizationName string `pulumi:"organizationName"`
 	// The team name.
@@ -80,6 +87,8 @@ type teamAccessTokenArgs struct {
 type TeamAccessTokenArgs struct {
 	// Optional. Team description.
 	Description pulumi.StringPtrInput
+	// The name for the token.
+	Name pulumi.StringInput
 	// The organization's name.
 	OrganizationName pulumi.StringInput
 	// The team name.
@@ -176,6 +185,11 @@ func (o TeamAccessTokenOutput) ToTeamAccessTokenOutputWithContext(ctx context.Co
 // Optional. Description for the token.
 func (o TeamAccessTokenOutput) Description() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *TeamAccessToken) pulumi.StringPtrOutput { return v.Description }).(pulumi.StringPtrOutput)
+}
+
+// The name for the token.
+func (o TeamAccessTokenOutput) Name() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *TeamAccessToken) pulumi.StringPtrOutput { return v.Name }).(pulumi.StringPtrOutput)
 }
 
 // The organization's name.

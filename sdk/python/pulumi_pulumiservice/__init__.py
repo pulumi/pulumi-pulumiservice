@@ -7,6 +7,7 @@ import typing
 # Export this package's modules as members:
 from ._enums import *
 from .access_token import *
+from .org_access_token import *
 from .provider import *
 from .stack_tag import *
 from .team import *
@@ -30,6 +31,7 @@ _utilities.register(
   "fqn": "pulumi_pulumiservice",
   "classes": {
    "pulumiservice:index:AccessToken": "AccessToken",
+   "pulumiservice:index:OrgAccessToken": "OrgAccessToken",
    "pulumiservice:index:StackTag": "StackTag",
    "pulumiservice:index:Team": "Team",
    "pulumiservice:index:TeamAccessToken": "TeamAccessToken",
