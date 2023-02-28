@@ -47,7 +47,7 @@ func TestCreateTeamAccessToken(t *testing.T) {
 	orgName := "anOrg"
 	teamName := "aTeam"
 	desc := "token description"
-	tokenName := "aToken"
+	tokenName := "aTeamToken"
 	t.Run("Happy Path", func(t *testing.T) {
 		resp := createTokenResponse{
 			ID:         "token_id",
@@ -55,7 +55,8 @@ func TestCreateTeamAccessToken(t *testing.T) {
 		}
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
-			ExpectedReqBody: createTokenRequest{
+			ExpectedReqBody: createTeamTokenRequest{
+				Name:        tokenName,
 				Description: desc,
 			},
 			ExpectedReqPath: "/api/orgs/anOrg/teams/aTeam/tokens",
@@ -76,8 +77,9 @@ func TestCreateTeamAccessToken(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqPath:   "/api/orgs/anOrg/teams/aTeam/tokens",
-			ExpectedReqBody: createTokenRequest{
+			ExpectedReqBody: createTeamTokenRequest{
 				Description: desc,
+				Name:        tokenName,
 			},
 			ResponseCode: 401,
 			ResponseBody: errorResponse{

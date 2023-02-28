@@ -44,7 +44,7 @@ func TestDeleteOrgAccessToken(t *testing.T) {
 
 func TestCreateOrgAccessToken(t *testing.T) {
 	orgName := "anOrg"
-	name := "aName"
+	name := "anOrgToken"
 	desc := "token description"
 	t.Run("Happy Path", func(t *testing.T) {
 		resp := createTokenResponse{
@@ -53,8 +53,9 @@ func TestCreateOrgAccessToken(t *testing.T) {
 		}
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
-			ExpectedReqBody: createTokenRequest{
+			ExpectedReqBody: createOrgTokenRequest{
 				Description: desc,
+				Name:        name,
 			},
 			ExpectedReqPath: "/api/orgs/anOrg/tokens",
 			ResponseCode:    201,
