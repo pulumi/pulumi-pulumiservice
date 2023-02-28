@@ -75,6 +75,14 @@ func (c *Client) DeleteTeamAccessToken(ctx context.Context, tokenId string, orgN
 		return errors.New("tokenid length must be greater than zero")
 	}
 
+	if len(teamName) == 0 {
+		return errors.New("teamName length must be greater than zero")
+	}
+
+	if len(orgName) == 0 {
+		return errors.New("orgName length must be greater than zero")
+	}
+
 	apiPath := path.Join("orgs", orgName, "teams", teamName, "tokens", tokenId)
 
 	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)

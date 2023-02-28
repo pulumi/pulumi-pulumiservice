@@ -75,6 +75,10 @@ func (c *Client) DeleteOrgAccessToken(ctx context.Context, tokenId string, orgNa
 		return errors.New("tokenid length must be greater than zero")
 	}
 
+	if len(orgName) == 0 {
+		return errors.New("orgname length must be greater than zero")
+	}
+
 	apiPath := path.Join("orgs", orgName, "tokens", tokenId)
 
 	fmt.Println(apiPath)
