@@ -141,6 +141,10 @@
     "pulumiservice:index:TeamAccessToken": {
       "description": "The Pulumi Service allows users to create access tokens scoped to team. Team access tokens is a resource to create them and assign them to a team",
       "properties": {
+        "name": {
+          "description": "The name for the token.",
+          "type": "string"
+        },
         "teamName": {
           "description": "The team name.",
           "type": "string"
@@ -155,6 +159,10 @@
         }
       },
       "inputProperties": {
+        "name": {
+          "description": "The name for the token.",
+          "type": "string"
+        },
         "teamName": {
           "description": "The team name.",
           "type": "string"
@@ -168,7 +176,39 @@
           "type": "string"
         }
       },
-      "requiredInputs": ["teamName", "organizationName"]
+      "requiredInputs": ["name", "teamName", "organizationName"]
+    },
+    "pulumiservice:index:OrgAccessToken": {
+      "description": "The Pulumi Service allows users to create access tokens scoped to orgs. Org access tokens is a resource to create them and assign them to an org",
+      "properties": {
+        "name": {
+          "description": "The name for the token.",
+          "type": "string"
+        },
+        "description": {
+          "description": "Optional. Description for the token.",
+          "type": "string"
+        },
+        "organizationName": {
+          "description": "The organization's name.",
+          "type": "string"
+        }
+      },
+      "inputProperties": {
+        "name": {
+          "description": "The name for the token.",
+          "type": "string"
+        },
+        "description": {
+          "description": "Optional. Team description.",
+          "type": "string"
+        },
+        "organizationName": {
+          "description": "The organization's name.",
+          "type": "string"
+        }
+      },
+      "requiredInputs": ["name", "organizationName"]
     },
     "pulumiservice:index:Webhook": {
       "description": "Pulumi Webhooks allow you to notify external services of events happening within your Pulumi organization or stack. For example, you can trigger a notification whenever a stack is updated. Whenever an event occurs, Pulumi will send an HTTP POST request to all registered webhooks. The webhook can then be used to emit some notification, start running integration tests, or even update additional stacks.",

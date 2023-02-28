@@ -21,40 +21,40 @@ import (
 	"path"
 )
 
-type TeamAccessToken struct {
+type OrgAccessToken struct {
 	ID          string `json:"id"`
 	TokenValue  string `json:"tokenValue"`
 	Description string `json:"description"`
 }
 
-type createTeamTokenResponse struct {
+type createOrgTokenResponse struct {
 	ID         string `json:"id"`
 	TokenValue string `json:"tokenValue"`
 }
 
-type createTeamTokenRequest struct {
-	Name        string `json:"name"`
+type createOrgTokenRequest struct {
 	Description string `json:"description"`
+	Name       string `json:"name"`
 }
 
-func (c *Client) CreateTeamAccessToken(ctx context.Context, name string, orgName string, teamName string, description string) (*AccessToken, error) {
+func (c *Client) CreateOrgAccessToken(ctx context.Context, name string, orgName string, description string) (*AccessToken, error) {
 
 	if len(orgName) == 0 {
 		return nil, errors.New("empty orgName")
 	}
 
-	if len(teamName) == 0 {
-		return nil, errors.New("empty teamName")
+	if len(name) == 0 {
+		return nil, errors.New("empty name")
 	}
 
-	apiPath := path.Join("orgs", orgName, "teams", teamName, "tokens")
+	apiPath := path.Join("orgs", orgName, "tokens")
 
-	createReq := createTeamTokenRequest{
-		Name:        name,
+	createReq := createOrgTokenRequest{
+		Name: name,
 		Description: description,
 	}
 
-	var createRes createTeamTokenResponse
+	var createRes createOrgTokenResponse
 
 	_, err := c.do(ctx, http.MethodPost, apiPath, createReq, &createRes)
 
@@ -70,12 +70,14 @@ func (c *Client) CreateTeamAccessToken(ctx context.Context, name string, orgName
 
 }
 
-func (c *Client) DeleteTeamAccessToken(ctx context.Context, tokenId string, orgName string, teamName string) error {
+func (c *Client) DeleteOrgAccessToken(ctx context.Context, tokenId string, orgName string) error {
 	if len(tokenId) == 0 {
 		return errors.New("tokenid length must be greater than zero")
 	}
 
-	apiPath := path.Join("orgs", orgName, "teams", teamName, "tokens", tokenId)
+	apiPath := path.Join("orgs", orgName, "tokens", tokenId)
+
+	fmt.Println(apiPath)
 
 	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
 	if err != nil {

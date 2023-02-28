@@ -143,6 +143,9 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 		&PulumiServiceTeamAccessTokenResource{
 			client: client,
 		},
+		&PulumiServiceOrgAccessTokenResource{
+			client: client,
+		},
 	}
 
 	for _, sr := range k.pulumiResources {
