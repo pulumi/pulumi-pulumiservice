@@ -47,6 +47,7 @@ func TestCreateTeamAccessToken(t *testing.T) {
 	orgName := "anOrg"
 	teamName := "aTeam"
 	desc := "token description"
+	tokenName := "aToken"
 	t.Run("Happy Path", func(t *testing.T) {
 		resp := createTokenResponse{
 			ID:         "token_id",
@@ -62,7 +63,7 @@ func TestCreateTeamAccessToken(t *testing.T) {
 			ResponseBody:    resp,
 		})
 		defer cleanup()
-		token, err := c.CreateTeamAccessToken(teamCtx, orgName, teamName, desc)
+		token, err := c.CreateTeamAccessToken(teamCtx, tokenName, orgName, teamName, desc)
 		assert.NoError(t, err)
 		assert.Equal(t, &AccessToken{
 			ID:          resp.ID,
@@ -85,7 +86,7 @@ func TestCreateTeamAccessToken(t *testing.T) {
 			},
 		})
 		defer cleanup()
-		token, err := c.CreateTeamAccessToken(teamCtx, orgName, teamName, desc)
+		token, err := c.CreateTeamAccessToken(teamCtx, tokenName, orgName, teamName, desc)
 		assert.Nil(t, token, "token should be nil")
 		assert.EqualError(t,
 			err,
