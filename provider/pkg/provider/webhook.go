@@ -314,5 +314,3 @@ func splitSingleSlashString(id string) (string, string, error) {
 	}
 	return s[0], s[1], nil
 }
-
-
