@@ -33,6 +33,11 @@
           </dependency>
           <dependency>
             <groupId>com.pulumi</groupId>
+            <artifactId>random</artifactId>
+            <version>4.11.2</version>
+          </dependency>
+          <dependency>
+            <groupId>com.pulumi</groupId>
             <artifactId>pulumiservice</artifactId>
             <!-- Allow any version. We need to depend on our locally built sdk which only has a real version when tagged -->
             <!-- Pin to specific version if you are copying this pom.xml for a real application -->
@@ -43,6 +48,11 @@
     </profiles>
 
     <dependencies>
+        <dependency>
+            <groupId>com.pulumi</groupId>
+            <artifactId>random</artifactId>
+            <version>4.11.2</version>
+        </dependency>
         <dependency>
             <groupId>com.pulumi</groupId>
             <artifactId>pulumi</artifactId>
