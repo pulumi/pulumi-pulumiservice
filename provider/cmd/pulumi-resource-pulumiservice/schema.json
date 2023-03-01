@@ -160,7 +160,7 @@
       },
       "inputProperties": {
         "name": {
-          "description": "The name for the token.",
+          "description": "The name for the token. This must be unique amongst all machine tokens within your organization.",
           "type": "string"
         },
         "teamName": {
