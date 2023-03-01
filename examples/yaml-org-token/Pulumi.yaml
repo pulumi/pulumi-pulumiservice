@@ -1,0 +1,16 @@
+name: pulumi-service-teams-access-token-yaml
+runtime: yaml
+description: An example of using python to create a team
+resources:
+  rand:
+    type: random:RandomString
+    properties:
+      length: 5
+      # team names may only contain alphanumeric, hyphens, underscores, or periods
+      special: false
+  token:
+    type: pulumiservice:index:OrgAccessToken
+    properties:
+      name: test-${rand.result}
+      organizationName: lbrlabs
+      description: "example org access token"
