@@ -12,8 +12,7 @@ resources:
     type: pulumiservice:index:Team
     properties:
       name: brand-new-yaml-team-${rand.result}
-      organizationName: lbrlabs
-      #organizationName: service-provider-test-org
+      organizationName: service-provider-test-org
       displayName: PulumiUP Team
       teamType: pulumi
   token:
@@ -21,6 +20,5 @@ resources:
     properties:
       name: test-${rand.result}
       teamName: ${team.name}
-      organizationName: lbrlabs
-      #organizationName: service-provider-test-org
+      organizationName: service-provider-test-org
       description: "example team access token"
