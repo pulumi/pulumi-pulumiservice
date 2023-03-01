@@ -142,7 +142,7 @@
       "description": "The Pulumi Service allows users to create access tokens scoped to team. Team access tokens is a resource to create them and assign them to a team",
       "properties": {
         "name": {
-          "description": "The name for the token.",
+          "description": "The name for the token. This must be unique amongst all machine tokens within your organization.",
           "type": "string"
         },
         "teamName": {
