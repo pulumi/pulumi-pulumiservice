@@ -22,7 +22,7 @@ namespace Pulumi.PulumiService
         public Output<string?> Description { get; private set; } = null!;
 
         /// <summary>
-        /// The name for the token.
+        /// The name for the token. This must be unique amongst all machine tokens within your organization.
         /// </summary>
         [Output("name")]
         public Output<string?> Name { get; private set; } = null!;
@@ -91,7 +91,7 @@ namespace Pulumi.PulumiService
         public Input<string>? Description { get; set; }
 
         /// <summary>
-        /// The name for the token.
+        /// The name for the token. This must be unique amongst all machine tokens within your organization.
         /// </summary>
         [Input("name", required: true)]
         public Input<string> Name { get; set; } = null!;

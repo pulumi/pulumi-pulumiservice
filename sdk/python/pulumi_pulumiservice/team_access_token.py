@@ -20,7 +20,7 @@ class TeamAccessTokenArgs:
                  description: Optional[pulumi.Input[str]] = None):
         """
         The set of arguments for constructing a TeamAccessToken resource.
-        :param pulumi.Input[str] name: The name for the token.
+        :param pulumi.Input[str] name: The name for the token. This must be unique amongst all machine tokens within your organization.
         :param pulumi.Input[str] organization_name: The organization's name.
         :param pulumi.Input[str] team_name: The team name.
         :param pulumi.Input[str] description: Optional. Team description.
@@ -35,7 +35,7 @@ class TeamAccessTokenArgs:
     @pulumi.getter
     def name(self) -> pulumi.Input[str]:
         """
-        The name for the token.
+        The name for the token. This must be unique amongst all machine tokens within your organization.
         """
         return pulumi.get(self, "name")
 
@@ -96,7 +96,7 @@ class TeamAccessToken(pulumi.CustomResource):
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[str] description: Optional. Team description.
-        :param pulumi.Input[str] name: The name for the token.
+        :param pulumi.Input[str] name: The name for the token. This must be unique amongst all machine tokens within your organization.
         :param pulumi.Input[str] organization_name: The organization's name.
         :param pulumi.Input[str] team_name: The team name.
         """
@@ -187,7 +187,7 @@ class TeamAccessToken(pulumi.CustomResource):
     @pulumi.getter
     def name(self) -> pulumi.Output[Optional[str]]:
         """
-        The name for the token.
+        The name for the token. This must be unique amongst all machine tokens within your organization.
         """
         return pulumi.get(self, "name")
 

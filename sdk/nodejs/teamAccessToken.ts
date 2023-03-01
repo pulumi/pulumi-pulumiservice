@@ -39,7 +39,7 @@ export class TeamAccessToken extends pulumi.CustomResource {
      */
     public readonly description!: pulumi.Output<string | undefined>;
     /**
-     * The name for the token.
+     * The name for the token. This must be unique amongst all machine tokens within your organization.
      */
     public readonly name!: pulumi.Output<string | undefined>;
     /**
@@ -95,7 +95,7 @@ export interface TeamAccessTokenArgs {
      */
     description?: pulumi.Input<string>;
     /**
-     * The name for the token.
+     * The name for the token. This must be unique amongst all machine tokens within your organization.
      */
     name: pulumi.Input<string>;
     /**

@@ -17,7 +17,7 @@ type TeamAccessToken struct {
 
 	// Optional. Description for the token.
 	Description pulumi.StringPtrOutput `pulumi:"description"`
-	// The name for the token.
+	// The name for the token. This must be unique amongst all machine tokens within your organization.
 	Name pulumi.StringPtrOutput `pulumi:"name"`
 	// The organization's name.
 	OrganizationName pulumi.StringPtrOutput `pulumi:"organizationName"`
@@ -75,7 +75,7 @@ func (TeamAccessTokenState) ElementType() reflect.Type {
 type teamAccessTokenArgs struct {
 	// Optional. Team description.
 	Description *string `pulumi:"description"`
-	// The name for the token.
+	// The name for the token. This must be unique amongst all machine tokens within your organization.
 	Name string `pulumi:"name"`
 	// The organization's name.
 	OrganizationName string `pulumi:"organizationName"`
@@ -87,7 +87,7 @@ type teamAccessTokenArgs struct {
 type TeamAccessTokenArgs struct {
 	// Optional. Team description.
 	Description pulumi.StringPtrInput
-	// The name for the token.
+	// The name for the token. This must be unique amongst all machine tokens within your organization.
 	Name pulumi.StringInput
 	// The organization's name.
 	OrganizationName pulumi.StringInput
@@ -187,7 +187,7 @@ func (o TeamAccessTokenOutput) Description() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *TeamAccessToken) pulumi.StringPtrOutput { return v.Description }).(pulumi.StringPtrOutput)
 }
 
-// The name for the token.
+// The name for the token. This must be unique amongst all machine tokens within your organization.
 func (o TeamAccessTokenOutput) Name() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *TeamAccessToken) pulumi.StringPtrOutput { return v.Name }).(pulumi.StringPtrOutput)
 }

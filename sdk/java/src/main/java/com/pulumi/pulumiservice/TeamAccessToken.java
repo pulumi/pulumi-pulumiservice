@@ -34,14 +34,14 @@ public class TeamAccessToken extends com.pulumi.resources.CustomResource {
         return Codegen.optional(this.description);
     }
     /**
-     * The name for the token.
+     * The name for the token. This must be unique amongst all machine tokens within your organization.
      * 
      */
     @Export(name="name", type=String.class, parameters={})
     private Output</* @Nullable */ String> name;
 
     /**
-     * @return The name for the token.
+     * @return The name for the token. This must be unique amongst all machine tokens within your organization.
      * 
      */
     public Output<Optional<String>> name() {

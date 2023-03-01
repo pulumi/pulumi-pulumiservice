@@ -31,14 +31,14 @@ public final class TeamAccessTokenArgs extends com.pulumi.resources.ResourceArgs
     }
 
     /**
-     * The name for the token.
+     * The name for the token. This must be unique amongst all machine tokens within your organization.
      * 
      */
     @Import(name="name", required=true)
     private Output<String> name;
 
     /**
-     * @return The name for the token.
+     * @return The name for the token. This must be unique amongst all machine tokens within your organization.
      * 
      */
     public Output<String> name() {
@@ -124,7 +124,7 @@ public final class TeamAccessTokenArgs extends com.pulumi.resources.ResourceArgs
         }
 
         /**
-         * @param name The name for the token.
+         * @param name The name for the token. This must be unique amongst all machine tokens within your organization.
          * 
          * @return builder
          * 
@@ -135,7 +135,7 @@ public final class TeamAccessTokenArgs extends com.pulumi.resources.ResourceArgs
         }
 
         /**
-         * @param name The name for the token.
+         * @param name The name for the token. This must be unique amongst all machine tokens within your organization.
          * 
          * @return builder
          * 
