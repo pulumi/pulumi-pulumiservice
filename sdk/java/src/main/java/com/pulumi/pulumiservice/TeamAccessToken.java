@@ -23,7 +23,7 @@ public class TeamAccessToken extends com.pulumi.resources.CustomResource {
      * Optional. Description for the token.
      * 
      */
-    @Export(name="description", type=String.class, parameters={})
+    @Export(name="description", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> description;
 
     /**
@@ -37,7 +37,7 @@ public class TeamAccessToken extends com.pulumi.resources.CustomResource {
      * The name for the token. This must be unique amongst all machine tokens within your organization.
      * 
      */
-    @Export(name="name", type=String.class, parameters={})
+    @Export(name="name", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> name;
 
     /**
@@ -51,7 +51,7 @@ public class TeamAccessToken extends com.pulumi.resources.CustomResource {
      * The organization&#39;s name.
      * 
      */
-    @Export(name="organizationName", type=String.class, parameters={})
+    @Export(name="organizationName", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> organizationName;
 
     /**
@@ -65,7 +65,7 @@ public class TeamAccessToken extends com.pulumi.resources.CustomResource {
      * The team name.
      * 
      */
-    @Export(name="teamName", type=String.class, parameters={})
+    @Export(name="teamName", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> teamName;
 
     /**

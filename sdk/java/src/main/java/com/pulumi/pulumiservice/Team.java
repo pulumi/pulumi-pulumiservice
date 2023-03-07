@@ -24,7 +24,7 @@ public class Team extends com.pulumi.resources.CustomResource {
      * Optional. Team description.
      * 
      */
-    @Export(name="description", type=String.class, parameters={})
+    @Export(name="description", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> description;
 
     /**
@@ -38,7 +38,7 @@ public class Team extends com.pulumi.resources.CustomResource {
      * Optional. Team display name.
      * 
      */
-    @Export(name="displayName", type=String.class, parameters={})
+    @Export(name="displayName", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> displayName;
 
     /**
@@ -52,7 +52,7 @@ public class Team extends com.pulumi.resources.CustomResource {
      * List of team members.
      * 
      */
-    @Export(name="members", type=List.class, parameters={String.class})
+    @Export(name="members", refs={List.class,String.class}, tree="[0,1]")
     private Output</* @Nullable */ List<String>> members;
 
     /**
@@ -66,7 +66,7 @@ public class Team extends com.pulumi.resources.CustomResource {
      * The team name.
      * 
      */
-    @Export(name="name", type=String.class, parameters={})
+    @Export(name="name", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> name;
 
     /**
@@ -80,7 +80,7 @@ public class Team extends com.pulumi.resources.CustomResource {
      * The organization&#39;s name.
      * 
      */
-    @Export(name="organizationName", type=String.class, parameters={})
+    @Export(name="organizationName", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> organizationName;
 
     /**
@@ -94,7 +94,7 @@ public class Team extends com.pulumi.resources.CustomResource {
      * The type of team. Must be either `pulumi` or `github`.
      * 
      */
-    @Export(name="teamType", type=String.class, parameters={})
+    @Export(name="teamType", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> teamType;
 
     /**

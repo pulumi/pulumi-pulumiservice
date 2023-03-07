@@ -23,7 +23,7 @@ public class StackTag extends com.pulumi.resources.CustomResource {
      * Name of the tag. The &#39;key&#39; part of the key=value pair
      * 
      */
-    @Export(name="name", type=String.class, parameters={})
+    @Export(name="name", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> name;
 
     /**
@@ -37,7 +37,7 @@ public class StackTag extends com.pulumi.resources.CustomResource {
      * Organization name.
      * 
      */
-    @Export(name="organization", type=String.class, parameters={})
+    @Export(name="organization", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> organization;
 
     /**
@@ -51,7 +51,7 @@ public class StackTag extends com.pulumi.resources.CustomResource {
      * Project name.
      * 
      */
-    @Export(name="project", type=String.class, parameters={})
+    @Export(name="project", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> project;
 
     /**
@@ -65,7 +65,7 @@ public class StackTag extends com.pulumi.resources.CustomResource {
      * Stack name.
      * 
      */
-    @Export(name="stack", type=String.class, parameters={})
+    @Export(name="stack", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> stack;
 
     /**
@@ -79,7 +79,7 @@ public class StackTag extends com.pulumi.resources.CustomResource {
      * Value of the tag. The &#39;value&#39; part of the key=value pair
      * 
      */
-    @Export(name="value", type=String.class, parameters={})
+    @Export(name="value", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> value;
 
     /**
