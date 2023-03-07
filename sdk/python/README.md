@@ -9,7 +9,7 @@
 
 A Pulumi Resource Provider for The Pulumi Service.
 
-The Pulumi Service Provider is built on top of the [Pulumi Service REST API](https://pulumi.com/docs/reference/service-rest-api) which is another feature available to our customers to programmatically configuring the Pulumi Service. The Pulumi Service REST API includes functionality to interact with and manipulate any kind of metadata managed by Pulumi. That includes Projects and Stacks, Previews and Updates, Organizations and Audit Logs. We have already seen Cloud Engineering teams using the Pulumi REST API to build all sorts of custom functionality. These new capabilities are especially powerful when used in combination with the [Automation API](https://pulumi.com/automation).
+The Pulumi Service Provider is built on top of the [Pulumi Service REST API](https://pulumi.com/docs/reference/service-rest-api) which is another feature available to our customers to programmatically configuring the Pulumi Service. The Pulumi Service REST API includes functionality to interact with and manipulate any kind of metadata managed by Pulumi. That includes Projects and Stacks, Previews and Updates, Organizations and Audit Logs. We have already seen Cloud Engineering teams using the Pulumi REST API to build all sorts of custom functionality. These new capabilities are especially powerful when used in combination with [Automation API](https://pulumi.com/automation).
 
 #### Supported Resources
 
@@ -62,7 +62,7 @@ Ensure that you have ran `pulumi login`. Run `pulumi whoami` to verify that you 
 Use `pulumi config set pulumiservice:<option>` or pass options to the [constructor of `new pulumiservice.Provider`](https://pulumi.com/registry/packages/pulumiservice/api-docs/provider).
 
 | Option        | Environment Variable Name | Required/Optional | Description                                                                                                                                                                              |
-| ------------- | ------------------------- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|---------------|---------------------------|-------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `accessToken` | `PULUMI_ACCESS_TOKEN`     | Optional          | Overrides [Pulumi Service Access Tokens](https://www.pulumi.com/docs/intro/pulumi-service/accounts/#access-tokens)                                                                       |
 | `apiUrl`      | `PULUMI_BACKEND_URL`      | Optional          | Allows overriding default [Pulumi Service API URL](https://www.pulumi.com/docs/reference/service-rest-api) for [self hosted customers](https://www.pulumi.com/docs/guides/self-hosted/). |
 
@@ -82,10 +82,10 @@ const team = new service.Team("team", {
     members: [
         "piers",
         "bryce",
-        "casey"
+        "casey",
         "evan",
         "devon",
-        "meagan"
+        "meagan",
         "myles",
         "steve"
     ],
@@ -94,4 +94,4 @@ const team = new service.Team("team", {
 export const members = team.members;
 ```
 
-Check out the [examples/](examples/) directory for more examples.
+Check out the [examples/](examples) directory for more examples.
