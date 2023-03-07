@@ -24,7 +24,7 @@ public class OrgAccessToken extends com.pulumi.resources.CustomResource {
      * Optional. Description for the token.
      * 
      */
-    @Export(name="description", type=String.class, parameters={})
+    @Export(name="description", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> description;
 
     /**
@@ -38,7 +38,7 @@ public class OrgAccessToken extends com.pulumi.resources.CustomResource {
      * The name for the token.
      * 
      */
-    @Export(name="name", type=String.class, parameters={})
+    @Export(name="name", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> name;
 
     /**
@@ -52,7 +52,7 @@ public class OrgAccessToken extends com.pulumi.resources.CustomResource {
      * The organization&#39;s name.
      * 
      */
-    @Export(name="organizationName", type=String.class, parameters={})
+    @Export(name="organizationName", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> organizationName;
 
     /**

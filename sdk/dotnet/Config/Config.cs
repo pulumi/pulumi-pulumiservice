@@ -30,7 +30,7 @@ namespace Pulumi.PulumiService
             }
         }
 
-        private static readonly Pulumi.Config __config = new Pulumi.Config("pulumiservice");
+        private static readonly global::Pulumi.Config __config = new global::Pulumi.Config("pulumiservice");
 
         private static readonly __Value<string?> _accessToken = new __Value<string?>(() => __config.Get("accessToken"));
         public static string? AccessToken
