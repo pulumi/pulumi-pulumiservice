@@ -47,6 +47,8 @@ type PulumiServiceResource interface {
 }
 
 type pulumiserviceProvider struct {
+	pulumirpc.UnimplementedResourceProviderServer
+
 	host            *provider.HostClient
 	name            string
 	version         string
