@@ -22,10 +22,14 @@ func (m *module) Construct(ctx *pulumi.Context, name, typ, urn string) (r pulumi
 	switch typ {
 	case "pulumiservice:index:AccessToken":
 		r = &AccessToken{}
+	case "pulumiservice:index:OrgAccessToken":
+		r = &OrgAccessToken{}
 	case "pulumiservice:index:StackTag":
 		r = &StackTag{}
 	case "pulumiservice:index:Team":
 		r = &Team{}
+	case "pulumiservice:index:TeamAccessToken":
+		r = &TeamAccessToken{}
 	case "pulumiservice:index:TeamStackPermission":
 		r = &TeamStackPermission{}
 	case "pulumiservice:index:Webhook":

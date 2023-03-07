@@ -6,9 +6,11 @@ import * as utilities from "./utilities";
 
 // Export members:
 export * from "./accessToken";
+export * from "./orgAccessToken";
 export * from "./provider";
 export * from "./stackTag";
 export * from "./team";
+export * from "./teamAccessToken";
 export * from "./teamStackPermission";
 export * from "./webhook";
 
@@ -26,8 +28,10 @@ export {
 
 // Import resources to register:
 import { AccessToken } from "./accessToken";
+import { OrgAccessToken } from "./orgAccessToken";
 import { StackTag } from "./stackTag";
 import { Team } from "./team";
+import { TeamAccessToken } from "./teamAccessToken";
 import { TeamStackPermission } from "./teamStackPermission";
 import { Webhook } from "./webhook";
 
@@ -37,10 +41,14 @@ const _module = {
         switch (type) {
             case "pulumiservice:index:AccessToken":
                 return new AccessToken(name, <any>undefined, { urn })
+            case "pulumiservice:index:OrgAccessToken":
+                return new OrgAccessToken(name, <any>undefined, { urn })
             case "pulumiservice:index:StackTag":
                 return new StackTag(name, <any>undefined, { urn })
             case "pulumiservice:index:Team":
                 return new Team(name, <any>undefined, { urn })
+            case "pulumiservice:index:TeamAccessToken":
+                return new TeamAccessToken(name, <any>undefined, { urn })
             case "pulumiservice:index:TeamStackPermission":
                 return new TeamStackPermission(name, <any>undefined, { urn })
             case "pulumiservice:index:Webhook":
