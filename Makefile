@@ -79,8 +79,8 @@ java_sdk::
       mkdir -p $(RESOURCE_FOLDER) && \
 	  echo "$(VERSION)" > $(RESOURCE_FOLDER)/version.txt && \
 	  echo '{"resource": true,"name": "pulumiservice","version": "$(VERSION)"}' > $(RESOURCE_FOLDER)/plugin.json && \
-	  PULUMI_JAVA_SDK_VERSION=0.1.0 ./gradlew --console=plain build && \
-	  PULUMI_JAVA_SDK_VERSION=0.1.0 ./gradlew --console=plain publishToMavenLocal
+	  PULUMI_JAVA_SDK_VERSION=0.7.1 ./gradlew --console=plain build && \
+	  PULUMI_JAVA_SDK_VERSION=0.7.1 ./gradlew --console=plain publishToMavenLocal
 
 .PHONY: build
 build:: gen provider dotnet_sdk go_sdk nodejs_sdk python_sdk java_sdk
