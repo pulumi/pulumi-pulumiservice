@@ -1,13 +1,27 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as service from "@pulumi/pulumiservice";
-import * as aws from "@pulumi/aws";
+// team:
+//     type: pulumiservice:index:Team
+// properties:
+//     name: yaml-team-${rand.result}
+//     organizationName: service-provider-test-org
+// displayName: Team Stack Permission Example
+// teamType: pulumi
+// members:
+//     - pulumi-bot
+//     - service-provider-example-user
 
-new aws.Ec2();
+const team = new service.Team("team", {
+  organizationName: "service-provider-test-org",
+  name: "pulumi-service-team",
+  teamType: "pulumi",
+  members: ["pulumi-bot", "service-provider-example-user"]
+});
 
 new service.TeamStackPermission("team-permission", {
   organization: "service-provider-test-org",
   project: pulumi.getProject(),
   stack: pulumi.getStack(),
-  team: "pulumi-service-team",
+  team: team.name as pulumi.Output<string>,
   permission: service.TeamStackPermissionScope.Admin,
 });
