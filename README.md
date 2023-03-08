@@ -82,10 +82,10 @@ const team = new service.Team("team", {
     members: [
         "piers",
         "bryce",
-        "casey"
+        "casey",
         "evan",
         "devon",
-        "meagan"
+        "meagan",
         "myles",
         "steve"
     ],
