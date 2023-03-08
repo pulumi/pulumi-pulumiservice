@@ -5,14 +5,46 @@ import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "./utilities";
 
 // Export members:
-export * from "./accessToken";
-export * from "./orgAccessToken";
-export * from "./provider";
-export * from "./stackTag";
-export * from "./team";
-export * from "./teamAccessToken";
-export * from "./teamStackPermission";
-export * from "./webhook";
+export { AccessTokenArgs } from "./accessToken";
+export type AccessToken = import("./accessToken").AccessToken;
+export const AccessToken: typeof import("./accessToken").AccessToken = null as any;
+utilities.lazyLoad(exports, ["AccessToken"], () => require("./accessToken"));
+
+export { OrgAccessTokenArgs } from "./orgAccessToken";
+export type OrgAccessToken = import("./orgAccessToken").OrgAccessToken;
+export const OrgAccessToken: typeof import("./orgAccessToken").OrgAccessToken = null as any;
+utilities.lazyLoad(exports, ["OrgAccessToken"], () => require("./orgAccessToken"));
+
+export { ProviderArgs } from "./provider";
+export type Provider = import("./provider").Provider;
+export const Provider: typeof import("./provider").Provider = null as any;
+utilities.lazyLoad(exports, ["Provider"], () => require("./provider"));
+
+export { StackTagArgs } from "./stackTag";
+export type StackTag = import("./stackTag").StackTag;
+export const StackTag: typeof import("./stackTag").StackTag = null as any;
+utilities.lazyLoad(exports, ["StackTag"], () => require("./stackTag"));
+
+export { TeamArgs } from "./team";
+export type Team = import("./team").Team;
+export const Team: typeof import("./team").Team = null as any;
+utilities.lazyLoad(exports, ["Team"], () => require("./team"));
+
+export { TeamAccessTokenArgs } from "./teamAccessToken";
+export type TeamAccessToken = import("./teamAccessToken").TeamAccessToken;
+export const TeamAccessToken: typeof import("./teamAccessToken").TeamAccessToken = null as any;
+utilities.lazyLoad(exports, ["TeamAccessToken"], () => require("./teamAccessToken"));
+
+export { TeamStackPermissionArgs } from "./teamStackPermission";
+export type TeamStackPermission = import("./teamStackPermission").TeamStackPermission;
+export const TeamStackPermission: typeof import("./teamStackPermission").TeamStackPermission = null as any;
+utilities.lazyLoad(exports, ["TeamStackPermission"], () => require("./teamStackPermission"));
+
+export { WebhookArgs } from "./webhook";
+export type Webhook = import("./webhook").Webhook;
+export const Webhook: typeof import("./webhook").Webhook = null as any;
+utilities.lazyLoad(exports, ["Webhook"], () => require("./webhook"));
+
 
 // Export enums:
 export * from "./types/enums";
@@ -25,15 +57,6 @@ export {
     config,
     types,
 };
-
-// Import resources to register:
-import { AccessToken } from "./accessToken";
-import { OrgAccessToken } from "./orgAccessToken";
-import { StackTag } from "./stackTag";
-import { Team } from "./team";
-import { TeamAccessToken } from "./teamAccessToken";
-import { TeamStackPermission } from "./teamStackPermission";
-import { Webhook } from "./webhook";
 
 const _module = {
     version: utilities.getVersion(),
@@ -59,9 +82,6 @@ const _module = {
     },
 };
 pulumi.runtime.registerResourceModule("pulumiservice", "index", _module)
-
-import { Provider } from "./provider";
-
 pulumi.runtime.registerResourcePackage("pulumiservice", {
     version: utilities.getVersion(),
     constructProvider: (name: string, type: string, urn: string): pulumi.ProviderResource => {
