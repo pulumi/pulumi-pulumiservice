@@ -1,6 +1,6 @@
 name: Build and run tests
 on:
-  push: 
+  push:
     branches:
       - main
     tags-ignore:
@@ -23,8 +23,8 @@ env:
   # Required to properly write "go mod edit -replace=.." when running go examples
   PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
   PROVIDER: pulumiservice
-  # Need to pin this as 0.1.0 until codegen is updated
-  PULUMI_JAVA_SDK_VERSION: 0.1.0
+  # Need to pin this as 0.5.3 until codegen is updated
+  PULUMI_JAVA_SDK_VERSION: 0.5.3
 
   # Lookup nuget packages from this directory as well as default nuget directories
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget

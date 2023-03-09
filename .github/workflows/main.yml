@@ -359,12 +359,12 @@ jobs:
       run: make install_${{ matrix.language}}_sdk
       env:
         # Right now we pin this, we should add a way to automatically upgrade
-        PULUMI_JAVA_SDK_VERSION: '0.1.0'
+        PULUMI_JAVA_SDK_VERSION: '0.5.3'
     - name: Run tests
       run: |
         set -euo pipefail
         cd examples && go test -json  -v -count=1 -cover -timeout 2h -tags=${{ matrix.language
-        }} -parallel 4 . 2>&1 | tee /tmp/gotest.log | gotestfmt 
+        }} -parallel 4 . 2>&1 | tee /tmp/gotest.log | gotestfmt
     strategy:
       fail-fast: true
       matrix:
