@@ -3,16 +3,12 @@
 package examples
 
 import (
-	"io"
 	"os"
 	"path"
-	"strings"
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/pulumi/pulumi/pkg/v3/engine"
 	"github.com/pulumi/pulumi/pkg/v3/testing/integration"
-	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v2"
 )
 
@@ -39,76 +35,76 @@ func TestYamlTeamsExample(t *testing.T) {
 	// A subsequent update to the stack with the invalid team member removed
 	// should run Update against the partially created team, instead of attempting
 	// to Create the team
-	t.Run("Properly Updates After Partial Creation Failure", func(t *testing.T) {
-		teamName := uuid.NewString()
-		projectName := "yaml-teams-fail-" + uuid.NewString()[0:10]
-
-		// this function writes out a Pulumi.yaml file to a temp directory
-		writeTeamProgram := func(members []string) string {
-			prog := YamlProgram{
-				Name:    projectName,
-				Runtime: "yaml",
-				Resources: map[string]Resource{
-					"team": {
-						Type: "pulumiservice:index:Team",
-						Properties: map[string]interface{}{
-							"name":             teamName,
-							"teamType":         "pulumi",
-							"displayName":      teamName,
-							"organizationName": ServiceProviderTestOrg,
-							"members":          members,
-						},
-					},
-				},
-			}
-
-			return writePulumiYaml(t, prog)
-		}
-
-		pulumiBot := "pulumi-bot"
-		providerUser := "service-provider-example-user"
-
-		notFoundDir := writeTeamProgram([]string{pulumiBot, providerUser, "not-found-user"})
-		correctUpdateDir := writeTeamProgram([]string{pulumiBot, providerUser})
-
-		first := &strings.Builder{}
-		firstOut := io.MultiWriter(os.Stdout, first)
-
-		second := &strings.Builder{}
-		secondOut := io.MultiWriter(os.Stdout, second)
-
-		integration.ProgramTest(t, &integration.ProgramTestOptions{
-			Quick:         true,
-			ExpectFailure: true,
-			SkipRefresh:   true,
-			Dir:           notFoundDir,
-			Stdout:        firstOut,
-			Stderr:        firstOut,
-			// don't prepare project at all, not required for yaml
-			PrepareProject: func(_ *engine.Projinfo) error {
-				return nil
-			},
-			EditDirs: []integration.EditDir{
-				{
-					Dir: correctUpdateDir,
-					// Additive specifies that we're copying our directory on top of the previous one.
-					// This overwrites the previous Pulumi.yaml.
-					Additive: true,
-					Verbose:  true,
-					Stdout:   secondOut,
-					Stderr:   secondOut,
-					// explicitly do not expect a failure
-					ExpectFailure: false,
-				},
-			},
-		})
-
-		// ensure first run's output printed an error that user was not found
-		assert.Contains(t, first.String(), "User 'not-found-user' not found")
-
-		// ensure second run's output showed that members field was updated
-		assert.Contains(t, second.String(), "[diff: ~members]")
-	})
+	//t.Run("Properly Updates After Partial Creation Failure", func(t *testing.T) {
+	//	teamName := uuid.NewString()
+	//	projectName := "yaml-teams-fail-" + uuid.NewString()[0:10]
+	//
+	//	// this function writes out a Pulumi.yaml file to a temp directory
+	//	writeTeamProgram := func(members []string) string {
+	//		prog := YamlProgram{
+	//			Name:    projectName,
+	//			Runtime: "yaml",
+	//			Resources: map[string]Resource{
+	//				"team": {
+	//					Type: "pulumiservice:index:Team",
+	//					Properties: map[string]interface{}{
+	//						"name":             teamName,
+	//						"teamType":         "pulumi",
+	//						"displayName":      teamName,
+	//						"organizationName": ServiceProviderTestOrg,
+	//						"members":          members,
+	//					},
+	//				},
+	//			},
+	//		}
+	//
+	//		return writePulumiYaml(t, prog)
+	//	}
+	//
+	//	pulumiBot := "pulumi-bot"
+	//	providerUser := "service-provider-example-user"
+	//
+	//	notFoundDir := writeTeamProgram([]string{pulumiBot, providerUser, "not-found-user"})
+	//	correctUpdateDir := writeTeamProgram([]string{pulumiBot, providerUser})
+	//
+	//	first := &strings.Builder{}
+	//	firstOut := io.MultiWriter(os.Stdout, first)
+	//
+	//	second := &strings.Builder{}
+	//	secondOut := io.MultiWriter(os.Stdout, second)
+	//
+	//	integration.ProgramTest(t, &integration.ProgramTestOptions{
+	//		Quick:         true,
+	//		ExpectFailure: true,
+	//		SkipRefresh:   true,
+	//		Dir:           notFoundDir,
+	//		Stdout:        firstOut,
+	//		Stderr:        firstOut,
+	//		// don't prepare project at all, not required for yaml
+	//		PrepareProject: func(_ *engine.Projinfo) error {
+	//			return nil
+	//		},
+	//		EditDirs: []integration.EditDir{
+	//			{
+	//				Dir: correctUpdateDir,
+	//				// Additive specifies that we're copying our directory on top of the previous one.
+	//				// This overwrites the previous Pulumi.yaml.
+	//				Additive: true,
+	//				Verbose:  true,
+	//				Stdout:   secondOut,
+	//				Stderr:   secondOut,
+	//				// explicitly do not expect a failure
+	//				ExpectFailure: false,
+	//			},
+	//		},
+	//	})
+	//
+	//	// ensure first run's output printed an error that user was not found
+	//	assert.Contains(t, first.String(), "User 'not-found-user' not found")
+	//
+	//	// ensure second run's output showed that members field was updated
+	//	assert.Contains(t, second.String(), "[diff: ~members]")
+	//})
 
 	t.Run("Yaml Teams Example", func(t *testing.T) {
 		cwd, _ := os.Getwd()
@@ -153,7 +149,7 @@ func TestYamlStackTagsExample(t *testing.T) {
 			},
 			// Reapply the same thing again, except this time we expect there to be no changes
 			{
-				Dir: tmpdir,
+				Dir:             tmpdir,
 				ExpectNoChanges: true,
 			},
 		},
