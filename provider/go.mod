@@ -6,8 +6,8 @@ require (
 	github.com/golang/protobuf v1.5.2
 	github.com/google/uuid v1.3.0
 	github.com/pulumi/pulumi-java/pkg v0.8.0
-	github.com/pulumi/pulumi/pkg/v3 v3.56.0
-	github.com/pulumi/pulumi/sdk/v3 v3.56.0
+	github.com/pulumi/pulumi/pkg/v3 v3.57.1
+	github.com/pulumi/pulumi/sdk/v3 v3.57.1
 	github.com/stretchr/testify v1.8.2
 	google.golang.org/grpc v1.53.0
 	google.golang.org/protobuf v1.28.1
