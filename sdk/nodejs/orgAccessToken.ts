@@ -46,6 +46,10 @@ export class OrgAccessToken extends pulumi.CustomResource {
      * The organization's name.
      */
     public readonly organizationName!: pulumi.Output<string | undefined>;
+    /**
+     * The token's value.
+     */
+    public /*out*/ readonly value!: pulumi.Output<string | undefined>;
 
     /**
      * Create a OrgAccessToken resource with the given unique name, arguments, and options.
@@ -67,12 +71,16 @@ export class OrgAccessToken extends pulumi.CustomResource {
             resourceInputs["description"] = args ? args.description : undefined;
             resourceInputs["name"] = args ? args.name : undefined;
             resourceInputs["organizationName"] = args ? args.organizationName : undefined;
+            resourceInputs["value"] = undefined /*out*/;
         } else {
             resourceInputs["description"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
             resourceInputs["organizationName"] = undefined /*out*/;
+            resourceInputs["value"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const secretOpts = { additionalSecretOutputs: ["value"] };
+        opts = pulumi.mergeOptions(opts, secretOpts);
         super(OrgAccessToken.__pulumiType, name, resourceInputs, opts);
     }
 }

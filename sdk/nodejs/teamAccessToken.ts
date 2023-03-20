@@ -50,6 +50,10 @@ export class TeamAccessToken extends pulumi.CustomResource {
      * The team name.
      */
     public readonly teamName!: pulumi.Output<string | undefined>;
+    /**
+     * The token's value.
+     */
+    public /*out*/ readonly value!: pulumi.Output<string | undefined>;
 
     /**
      * Create a TeamAccessToken resource with the given unique name, arguments, and options.
@@ -75,13 +79,17 @@ export class TeamAccessToken extends pulumi.CustomResource {
             resourceInputs["name"] = args ? args.name : undefined;
             resourceInputs["organizationName"] = args ? args.organizationName : undefined;
             resourceInputs["teamName"] = args ? args.teamName : undefined;
+            resourceInputs["value"] = undefined /*out*/;
         } else {
             resourceInputs["description"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
             resourceInputs["organizationName"] = undefined /*out*/;
             resourceInputs["teamName"] = undefined /*out*/;
+            resourceInputs["value"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const secretOpts = { additionalSecretOutputs: ["value"] };
+        opts = pulumi.mergeOptions(opts, secretOpts);
         super(TeamAccessToken.__pulumiType, name, resourceInputs, opts);
     }
 }

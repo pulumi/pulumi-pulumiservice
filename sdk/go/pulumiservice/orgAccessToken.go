@@ -21,6 +21,8 @@ type OrgAccessToken struct {
 	Name pulumi.StringPtrOutput `pulumi:"name"`
 	// The organization's name.
 	OrganizationName pulumi.StringPtrOutput `pulumi:"organizationName"`
+	// The token's value.
+	Value pulumi.StringPtrOutput `pulumi:"value"`
 }
 
 // NewOrgAccessToken registers a new resource with the given unique name, arguments, and options.
@@ -36,6 +38,10 @@ func NewOrgAccessToken(ctx *pulumi.Context,
 	if args.OrganizationName == nil {
 		return nil, errors.New("invalid value for required argument 'OrganizationName'")
 	}
+	secrets := pulumi.AdditionalSecretOutputs([]string{
+		"value",
+	})
+	opts = append(opts, secrets)
 	var resource OrgAccessToken
 	err := ctx.RegisterResource("pulumiservice:index:OrgAccessToken", name, args, &resource, opts...)
 	if err != nil {
@@ -186,6 +192,11 @@ func (o OrgAccessTokenOutput) Name() pulumi.StringPtrOutput {
 // The organization's name.
 func (o OrgAccessTokenOutput) OrganizationName() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *OrgAccessToken) pulumi.StringPtrOutput { return v.OrganizationName }).(pulumi.StringPtrOutput)
+}
+
+// The token's value.
+func (o OrgAccessTokenOutput) Value() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *OrgAccessToken) pulumi.StringPtrOutput { return v.Value }).(pulumi.StringPtrOutput)
 }
 
 type OrgAccessTokenArrayOutput struct{ *pulumi.OutputState }

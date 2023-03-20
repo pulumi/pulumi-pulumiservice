@@ -39,6 +39,12 @@ namespace Pulumi.PulumiService
         [Output("teamName")]
         public Output<string?> TeamName { get; private set; } = null!;
 
+        /// <summary>
+        /// The token's value.
+        /// </summary>
+        [Output("value")]
+        public Output<string?> Value { get; private set; } = null!;
+
 
         /// <summary>
         /// Create a TeamAccessToken resource with the given unique name, arguments, and options.
@@ -62,6 +68,10 @@ namespace Pulumi.PulumiService
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
+                AdditionalSecretOutputs =
+                {
+                    "value",
+                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.

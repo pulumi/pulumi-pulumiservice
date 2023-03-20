@@ -10,6 +10,7 @@ import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.OrgAccessTokenArgs;
 import com.pulumi.pulumiservice.Utilities;
 import java.lang.String;
+import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
 
@@ -61,6 +62,20 @@ public class OrgAccessToken extends com.pulumi.resources.CustomResource {
     public Output<Optional<String>> organizationName() {
         return Codegen.optional(this.organizationName);
     }
+    /**
+     * The token&#39;s value.
+     * 
+     */
+    @Export(name="value", type=String.class, parameters={})
+    private Output</* @Nullable */ String> value;
+
+    /**
+     * @return The token&#39;s value.
+     * 
+     */
+    public Output<Optional<String>> value() {
+        return Codegen.optional(this.value);
+    }
 
     /**
      *
@@ -94,6 +109,9 @@ public class OrgAccessToken extends com.pulumi.resources.CustomResource {
     private static com.pulumi.resources.CustomResourceOptions makeResourceOptions(@Nullable com.pulumi.resources.CustomResourceOptions options, @Nullable Output<String> id) {
         var defaultOptions = com.pulumi.resources.CustomResourceOptions.builder()
             .version(Utilities.getVersion())
+            .additionalSecretOutputs(List.of(
+                "value"
+            ))
             .build();
         return com.pulumi.resources.CustomResourceOptions.merge(defaultOptions, options, id);
     }
