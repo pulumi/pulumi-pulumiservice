@@ -147,6 +147,9 @@ class TeamAccessToken(pulumi.CustomResource):
             if team_name is None and not opts.urn:
                 raise TypeError("Missing required property 'team_name'")
             __props__.__dict__["team_name"] = team_name
+            __props__.__dict__["value"] = None
+        secret_opts = pulumi.ResourceOptions(additional_secret_outputs=["value"])
+        opts = pulumi.ResourceOptions.merge(opts, secret_opts)
         super(TeamAccessToken, __self__).__init__(
             'pulumiservice:index:TeamAccessToken',
             resource_name,
@@ -173,6 +176,7 @@ class TeamAccessToken(pulumi.CustomResource):
         __props__.__dict__["name"] = None
         __props__.__dict__["organization_name"] = None
         __props__.__dict__["team_name"] = None
+        __props__.__dict__["value"] = None
         return TeamAccessToken(resource_name, opts=opts, __props__=__props__)
 
     @property
@@ -206,4 +210,12 @@ class TeamAccessToken(pulumi.CustomResource):
         The team name.
         """
         return pulumi.get(self, "team_name")
+
+    @property
+    @pulumi.getter
+    def value(self) -> pulumi.Output[Optional[str]]:
+        """
+        The token's value.
+        """
+        return pulumi.get(self, "value")
 

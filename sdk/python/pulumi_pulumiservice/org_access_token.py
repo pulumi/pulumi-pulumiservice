@@ -126,6 +126,9 @@ class OrgAccessToken(pulumi.CustomResource):
             if organization_name is None and not opts.urn:
                 raise TypeError("Missing required property 'organization_name'")
             __props__.__dict__["organization_name"] = organization_name
+            __props__.__dict__["value"] = None
+        secret_opts = pulumi.ResourceOptions(additional_secret_outputs=["value"])
+        opts = pulumi.ResourceOptions.merge(opts, secret_opts)
         super(OrgAccessToken, __self__).__init__(
             'pulumiservice:index:OrgAccessToken',
             resource_name,
@@ -151,6 +154,7 @@ class OrgAccessToken(pulumi.CustomResource):
         __props__.__dict__["description"] = None
         __props__.__dict__["name"] = None
         __props__.__dict__["organization_name"] = None
+        __props__.__dict__["value"] = None
         return OrgAccessToken(resource_name, opts=opts, __props__=__props__)
 
     @property
@@ -176,4 +180,12 @@ class OrgAccessToken(pulumi.CustomResource):
         The organization's name.
         """
         return pulumi.get(self, "organization_name")
+
+    @property
+    @pulumi.getter
+    def value(self) -> pulumi.Output[Optional[str]]:
+        """
+        The token's value.
+        """
+        return pulumi.get(self, "value")
 

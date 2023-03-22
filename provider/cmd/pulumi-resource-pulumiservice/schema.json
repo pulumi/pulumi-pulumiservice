@@ -156,6 +156,11 @@
         "organizationName": {
           "description": "The organization's name.",
           "type": "string"
+        },
+        "value": {
+          "description": "The token's value.",
+          "type": "string",
+          "secret": true
         }
       },
       "inputProperties": {
@@ -192,6 +197,11 @@
         "organizationName": {
           "description": "The organization's name.",
           "type": "string"
+        },
+        "value": {
+          "description": "The token's value.",
+          "type": "string",
+          "secret": true
         }
       },
       "inputProperties": {

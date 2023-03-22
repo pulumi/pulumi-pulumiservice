@@ -23,6 +23,8 @@ type TeamAccessToken struct {
 	OrganizationName pulumi.StringPtrOutput `pulumi:"organizationName"`
 	// The team name.
 	TeamName pulumi.StringPtrOutput `pulumi:"teamName"`
+	// The token's value.
+	Value pulumi.StringPtrOutput `pulumi:"value"`
 }
 
 // NewTeamAccessToken registers a new resource with the given unique name, arguments, and options.
@@ -41,6 +43,10 @@ func NewTeamAccessToken(ctx *pulumi.Context,
 	if args.TeamName == nil {
 		return nil, errors.New("invalid value for required argument 'TeamName'")
 	}
+	secrets := pulumi.AdditionalSecretOutputs([]string{
+		"value",
+	})
+	opts = append(opts, secrets)
 	var resource TeamAccessToken
 	err := ctx.RegisterResource("pulumiservice:index:TeamAccessToken", name, args, &resource, opts...)
 	if err != nil {
@@ -200,6 +206,11 @@ func (o TeamAccessTokenOutput) OrganizationName() pulumi.StringPtrOutput {
 // The team name.
 func (o TeamAccessTokenOutput) TeamName() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *TeamAccessToken) pulumi.StringPtrOutput { return v.TeamName }).(pulumi.StringPtrOutput)
+}
+
+// The token's value.
+func (o TeamAccessTokenOutput) Value() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *TeamAccessToken) pulumi.StringPtrOutput { return v.Value }).(pulumi.StringPtrOutput)
 }
 
 type TeamAccessTokenArrayOutput struct{ *pulumi.OutputState }
