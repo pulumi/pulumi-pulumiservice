@@ -125,54 +125,54 @@ func TestYamlTeamsExample(t *testing.T) {
 
 }
 
-//func TestYamlStackTagsExample(t *testing.T) {
-//
-//	// Set up tmpdir with a Pulumi.yml with no resources
-//	// mimicking the deletion of resource
-//	newProgram := YamlProgram{
-//		Name:        "yaml-stack-tags-example",
-//		Runtime:     "yaml",
-//		Description: "A minimal Pulumi YAML program",
-//	}
-//
-//	tmpdir := writePulumiYaml(t, newProgram)
-//
-//	cwd, _ := os.Getwd()
-//
-//	integration.ProgramTest(t, &integration.ProgramTestOptions{
-//		Quick:       true,
-//		SkipRefresh: true,
-//		Dir:         path.Join(cwd, ".", "yaml-stack-tags"),
-//		StackName:   "test-stack",
-//		PrepareProject: func(_ *engine.Projinfo) error {
-//			return nil
-//		},
-//		EditDirs: []integration.EditDir{
-//			{
-//				Dir: tmpdir,
-//			},
-//			// Reapply the same thing again, except this time we expect there to be no changes
-//			{
-//				Dir:             tmpdir,
-//				ExpectNoChanges: true,
-//			},
-//		},
-//	})
-//}
-//
-//func TestYamlTeamStackPermissionsExample(t *testing.T) {
-//	cwd, _ := os.Getwd()
-//	integration.ProgramTest(t, &integration.ProgramTestOptions{
-//		Quick:       true,
-//		SkipRefresh: true,
-//		// Name is specified in yaml-team-stack-permissions/Pulumi.yaml, so this has to be consistent
-//		StackName: "dev",
-//		Dir:       path.Join(cwd, ".", "yaml-team-stack-permissions"),
-//		PrepareProject: func(_ *engine.Projinfo) error {
-//			return nil
-//		},
-//	})
-//}
+func TestYamlStackTagsExample(t *testing.T) {
+
+	// Set up tmpdir with a Pulumi.yml with no resources
+	// mimicking the deletion of resource
+	newProgram := YamlProgram{
+		Name:        "yaml-stack-tags-example",
+		Runtime:     "yaml",
+		Description: "A minimal Pulumi YAML program",
+	}
+
+	tmpdir := writePulumiYaml(t, newProgram)
+
+	cwd, _ := os.Getwd()
+
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Quick:       true,
+		SkipRefresh: true,
+		Dir:         path.Join(cwd, ".", "yaml-stack-tags"),
+		StackName:   fmt.Sprintf("%s/%s", ServiceProviderTestOrg, "test-stack"),
+		PrepareProject: func(_ *engine.Projinfo) error {
+			return nil
+		},
+		EditDirs: []integration.EditDir{
+			{
+				Dir: tmpdir,
+			},
+			// Reapply the same thing again, except this time we expect there to be no changes
+			{
+				Dir:             tmpdir,
+				ExpectNoChanges: true,
+			},
+		},
+	})
+}
+
+func TestYamlTeamStackPermissionsExample(t *testing.T) {
+	cwd, _ := os.Getwd()
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Quick:       true,
+		SkipRefresh: true,
+		// Name is specified in yaml-team-stack-permissions/Pulumi.yaml, so this has to be consistent
+		StackName: fmt.Sprintf("%s/%s", ServiceProviderTestOrg, "dev"),
+		Dir:       path.Join(cwd, ".", "yaml-team-stack-permissions"),
+		PrepareProject: func(_ *engine.Projinfo) error {
+			return nil
+		},
+	})
+}
 
 func TestYamlWebhookExample(t *testing.T) {
 	cwd := getCwd(t)
