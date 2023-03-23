@@ -3,7 +3,6 @@
 package examples
 
 import (
-	"fmt"
 	"io"
 	"os"
 	"path"
@@ -144,7 +143,7 @@ func TestYamlStackTagsExample(t *testing.T) {
 		Quick:       true,
 		SkipRefresh: true,
 		Dir:         path.Join(cwd, ".", "yaml-stack-tags"),
-		StackName:   fmt.Sprintf("%s/%s", ServiceProviderTestOrg, "test-stack"),
+		StackName:   "test-stack",
 		PrepareProject: func(_ *engine.Projinfo) error {
 			return nil
 		},
@@ -167,7 +166,7 @@ func TestYamlTeamStackPermissionsExample(t *testing.T) {
 		Quick:       true,
 		SkipRefresh: true,
 		// Name is specified in yaml-team-stack-permissions/Pulumi.yaml, so this has to be consistent
-		StackName: fmt.Sprintf("%s/%s", ServiceProviderTestOrg, "dev"),
+		StackName: "dev",
 		Dir:       path.Join(cwd, ".", "yaml-team-stack-permissions"),
 		PrepareProject: func(_ *engine.Projinfo) error {
 			return nil
