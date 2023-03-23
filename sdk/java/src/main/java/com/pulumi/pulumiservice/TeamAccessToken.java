@@ -80,7 +80,7 @@ public class TeamAccessToken extends com.pulumi.resources.CustomResource {
      * The token&#39;s value.
      * 
      */
-    @Export(name="value", type=String.class, parameters={})
+    @Export(name="value", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> value;
 
     /**
