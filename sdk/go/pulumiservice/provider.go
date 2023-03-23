@@ -21,7 +21,7 @@ func NewProvider(ctx *pulumi.Context,
 		args = &ProviderArgs{}
 	}
 
-	if isZero(args.AccessToken) {
+	if args.AccessToken == nil {
 		args.AccessToken = pulumi.StringPtr(getEnvOrDefault("", nil, "PULUMI_ACCESS_TOKEN").(string))
 	}
 	var resource Provider

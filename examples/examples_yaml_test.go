@@ -153,7 +153,7 @@ func TestYamlStackTagsExample(t *testing.T) {
 			},
 			// Reapply the same thing again, except this time we expect there to be no changes
 			{
-				Dir: tmpdir,
+				Dir:             tmpdir,
 				ExpectNoChanges: true,
 			},
 		},
