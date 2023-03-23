@@ -3,6 +3,7 @@
 package examples
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"path"
