@@ -24,7 +24,7 @@ public class AccessToken extends com.pulumi.resources.CustomResource {
      * Description of the access token.
      * 
      */
-    @Export(name="description", type=String.class, parameters={})
+    @Export(name="description", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> description;
 
     /**
@@ -38,7 +38,7 @@ public class AccessToken extends com.pulumi.resources.CustomResource {
      * The token identifier.
      * 
      */
-    @Export(name="tokenId", type=String.class, parameters={})
+    @Export(name="tokenId", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> tokenId;
 
     /**
@@ -52,7 +52,7 @@ public class AccessToken extends com.pulumi.resources.CustomResource {
      * The token&#39;s value.
      * 
      */
-    @Export(name="value", type=String.class, parameters={})
+    @Export(name="value", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> value;
 
     /**

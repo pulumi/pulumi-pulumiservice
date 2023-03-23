@@ -35,6 +35,18 @@ func TestStackTagsExample(t *testing.T) {
 	})
 }
 
+func TestTeamStackPermissionsExample(t *testing.T) {
+	cwd, _ := os.Getwd()
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Quick:       true,
+		SkipRefresh: true,
+		Dir:         path.Join(cwd, ".", "ts-team-stack-permissions"),
+		Dependencies: []string{
+			"@pulumi/pulumiservice",
+		},
+	})
+}
+
 func TestTeamsExample(t *testing.T) {
 	cwd, _ := os.Getwd()
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
