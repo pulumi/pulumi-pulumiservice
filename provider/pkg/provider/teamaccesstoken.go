@@ -154,7 +154,7 @@ func (at *PulumiServiceTeamAccessTokenResource) Configure(config PulumiServiceCo
 
 func (at *PulumiServiceTeamAccessTokenResource) createTeamAccessToken(ctx context.Context, input PulumiServiceTeamAccessTokenInput) (*pulumiapi.AccessToken, error) {
 
-	accesstoken, err := at.client.CreateTeamAccessToken(ctx, input.TeamName, input.OrgName, input.TeamName, input.Description)
+	accesstoken, err := at.client.CreateTeamAccessToken(ctx, input.Name, input.OrgName, input.TeamName, input.Description)
 	if err != nil {
 		return nil, err
 	}
