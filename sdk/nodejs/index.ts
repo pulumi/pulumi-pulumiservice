@@ -10,6 +10,11 @@ export type AccessToken = import("./accessToken").AccessToken;
 export const AccessToken: typeof import("./accessToken").AccessToken = null as any;
 utilities.lazyLoad(exports, ["AccessToken"], () => require("./accessToken"));
 
+export { DeploymentSettingsArgs } from "./deploymentSettings";
+export type DeploymentSettings = import("./deploymentSettings").DeploymentSettings;
+export const DeploymentSettings: typeof import("./deploymentSettings").DeploymentSettings = null as any;
+utilities.lazyLoad(exports, ["DeploymentSettings"], () => require("./deploymentSettings"));
+
 export { OrgAccessTokenArgs } from "./orgAccessToken";
 export type OrgAccessToken = import("./orgAccessToken").OrgAccessToken;
 export const OrgAccessToken: typeof import("./orgAccessToken").OrgAccessToken = null as any;
@@ -64,6 +69,8 @@ const _module = {
         switch (type) {
             case "pulumiservice:index:AccessToken":
                 return new AccessToken(name, <any>undefined, { urn })
+            case "pulumiservice:index:DeploymentSettings":
+                return new DeploymentSettings(name, <any>undefined, { urn })
             case "pulumiservice:index:OrgAccessToken":
                 return new OrgAccessToken(name, <any>undefined, { urn })
             case "pulumiservice:index:StackTag":

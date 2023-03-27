@@ -7,6 +7,7 @@ import typing
 # Export this package's modules as members:
 from ._enums import *
 from .access_token import *
+from .deployment_settings import *
 from .org_access_token import *
 from .provider import *
 from .stack_tag import *
@@ -14,6 +15,7 @@ from .team import *
 from .team_access_token import *
 from .team_stack_permission import *
 from .webhook import *
+from ._inputs import *
 
 # Make subpackages available:
 if typing.TYPE_CHECKING:
@@ -31,6 +33,7 @@ _utilities.register(
   "fqn": "pulumi_pulumiservice",
   "classes": {
    "pulumiservice:index:AccessToken": "AccessToken",
+   "pulumiservice:index:DeploymentSettings": "DeploymentSettings",
    "pulumiservice:index:OrgAccessToken": "OrgAccessToken",
    "pulumiservice:index:StackTag": "StackTag",
    "pulumiservice:index:Team": "Team",

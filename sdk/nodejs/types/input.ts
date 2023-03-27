@@ -6,3 +6,106 @@ import * as inputs from "../types/input";
 import * as outputs from "../types/output";
 import * as enums from "../types/enums";
 
+/**
+ * The executor context defines information about the executor where the deployment is executed. If unspecified, the default 'pulumi/pulumi' image is used.
+ */
+export interface DeploymentSettingsExecutorContextArgs {
+    /**
+     * Allows overriding the default executor image with a custom image. E.g. 'pulumi/pulumi-nodejs:latest'
+     */
+    executorImage: pulumi.Input<string>;
+}
+
+/**
+ * Git source settings for a deployment.
+ */
+export interface DeploymentSettingsGitAuthBasicAuthArgs {
+    /**
+     * Password for git basic authentication
+     */
+    password: pulumi.Input<string>;
+    /**
+     * User name for git basic authentication
+     */
+    username: pulumi.Input<string>;
+}
+
+/**
+ * Git source settings for a deployment.
+ */
+export interface DeploymentSettingsGitAuthSSHAuthArgs {
+    /**
+     * Optional password for SSH authentication
+     */
+    password?: pulumi.Input<string>;
+    /**
+     * SSH private key
+     */
+    sshPrivateKey: pulumi.Input<string>;
+}
+
+/**
+ * Git source settings for a deployment.
+ */
+export interface DeploymentSettingsGitSourceArgs {
+    /**
+     * The branch to deploy. One of either `branch` or `commit` must be specified.
+     */
+    branch?: pulumi.Input<string>;
+    /**
+     * The commit to deploy. One of either `branch` or `commit` must be specified.
+     */
+    commit?: pulumi.Input<string>;
+    /**
+     * Git authentication configuration for this deployment. Should not be specified if there are `gitHub` settings for this deployment.
+     */
+    gitAuth?: pulumi.Input<inputs.DeploymentSettingsGitSourceGitAuthArgs>;
+    /**
+     * The directory within the repository where the Pulumi.yaml is located.
+     */
+    repoDir?: pulumi.Input<string>;
+    /**
+     * The repository URL to use for git settings. Should not be specified if there are `gitHub` settings for this deployment.
+     */
+    repoUrl?: pulumi.Input<string>;
+}
+
+/**
+ * Git source settings for a deployment.
+ */
+export interface DeploymentSettingsGitSourceGitAuthArgs {
+    /**
+     * Basic auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
+     */
+    basicAuth?: pulumi.Input<inputs.DeploymentSettingsGitAuthBasicAuthArgs>;
+    /**
+     * Personal access token for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
+     */
+    personalAccessToken?: pulumi.Input<string>;
+    /**
+     * SSH auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
+     */
+    sshAuth?: pulumi.Input<inputs.DeploymentSettingsGitAuthSSHAuthArgs>;
+}
+
+/**
+ * GitHub settings for the deployment.
+ */
+export interface DeploymentSettingsGithubArgs {
+}
+
+/**
+ * Settings related to the Pulumi operation environment during the deployment.
+ */
+export interface DeploymentSettingsOperationContextArgs {
+}
+
+/**
+ * Settings related to the source of the deployment.
+ */
+export interface DeploymentSettingsSourceContextArgs {
+    /**
+     * Git source settings for a deployment.
+     */
+    git?: pulumi.Input<inputs.DeploymentSettingsGitSourceArgs>;
+}
