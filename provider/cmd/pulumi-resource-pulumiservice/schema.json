@@ -48,6 +48,149 @@
           "value": 103
         }
       ]
+    },
+    "pulumiservice:index:DeploymentSettingsExecutorContext": {
+      "description":"The executor context defines information about the executor where the deployment is executed. If unspecified, the default 'pulumi/pulumi' image is used.",
+      "properties": {
+        "executorImage": {
+          "type": "string",
+          "description": "Allows overriding the default executor image with a custom image. E.g. 'pulumi/pulumi-nodejs:latest'"
+        }
+      },
+      "type": "object",
+      "required": [
+        "executorImage"
+      ],
+      "language": {
+        "nodejs": {
+          "requiredOutputs": [
+            "executorImage"
+          ]
+        }
+      }
+    },
+    "pulumiservice:index:DeploymentSettingsSourceContext": {
+      "description":"Settings related to the source of the deployment.",
+      "properties": {
+        "git": {
+          "$ref": "#/types/pulumiservice:index:DeploymentSettingsGitSource",
+          "description": "Git source settings for a deployment."
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:index:DeploymentSettingsGitSource": {
+      "description":"Git source settings for a deployment.",
+      "properties": {
+        "repoUrl": {
+          "type": "string",
+          "description": "The repository URL to use for git settings. Should not be specified if there are `gitHub` settings for this deployment."
+        },
+        "gitAuth": {
+          "$ref": "#/types/pulumiservice:index:DeploymentSettingsGitSourceGitAuth",
+          "description": "Git authentication configuration for this deployment. Should not be specified if there are `gitHub` settings for this deployment."
+        },
+        "branch": {
+          "type": "string",
+          "description": "The branch to deploy. One of either `branch` or `commit` must be specified."
+        },
+        "commit": {
+          "type": "string",
+          "description": "The commit to deploy. One of either `branch` or `commit` must be specified."
+        },
+        "repoDir": {
+          "type": "string",
+          "description": "The directory within the repository where the Pulumi.yaml is located."
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:index:DeploymentSettingsGitSourceGitAuth":  {
+      "description":"Git source settings for a deployment.",
+      "properties": {
+        "personalAccessToken": {
+          "type": "string",
+          "secret": true,
+          "description": "Personal access token for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined."
+        },
+        "sshAuth": {
+          "$ref": "#/types/pulumiservice:index:DeploymentSettingsGitAuthSSHAuth",
+          "description": "SSH auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined."
+        },
+        "basicAuth": {
+          "$ref": "#/types/pulumiservice:index:DeploymentSettingsGitAuthBasicAuth",
+          "description": "Basic auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined."
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:index:DeploymentSettingsGitAuthSSHAuth": {
+      "description": "Git source settings for a deployment.",
+      "type": "object",
+      "properties": {
+        "sshPrivateKey": {
+          "type": "string",
+          "secret": true,
+          "description": "SSH private key"
+        },
+        "password": {
+          "type": "string",
+          "secret": true,
+          "description": "Optional password for SSH authentication"
+        }
+      },
+      "required": [
+        "sshPrivateKey"
+      ],
+      "language": {
+        "nodejs": {
+          "requiredOutputs": [
+            "sshPrivateKey"
+          ]
+        }
+      }
+    },
+    "pulumiservice:index:DeploymentSettingsGitAuthBasicAuth": {
+      "description": "Git source settings for a deployment.",
+      "properties": {
+        "username": {
+          "type": "string",
+          "secret": true,
+          "description": "User name for git basic authentication"
+        },
+        "password": {
+          "type": "string",
+          "secret": true,
+          "description": "Password for git basic authentication"
+        }
+      },
+      "required": [
+        "username",
+        "password"
+      ],
+      "language": {
+        "nodejs": {
+          "requiredOutputs": [
+            "username",
+            "password"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:index:DeploymentSettingsGithub": {
+      "description": "GitHub settings for the deployment.",
+      "properties": {
+
+      },
+      "type": "object"
+    },
+    "pulumiservice:index:DeploymentSettingsOperationContext": {
+      "description": "Settings related to the Pulumi operation environment during the deployment.",
+      "properties": {
+
+      },
+      "type": "object"
     }
   },
   "resources": {
@@ -278,6 +421,53 @@
         "organizationName",
         "payloadUrl"
       ]
+    },
+    "pulumiservice:index:DeploymentSettings": {
+      "description": "Deployment settings configure Pulumi Deployments for a stack",
+      "properties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "project": {
+          "description": "Project name.",
+          "type": "string"
+        },
+        "stack": {
+          "description": "Stack name.",
+          "type": "string"
+        }
+      },
+      "inputProperties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "project": {
+          "description": "Project name.",
+          "type": "string"
+        },
+        "stack": {
+          "description": "Stack name.",
+          "type": "string"
+        },
+        "executorContext": {
+          "$ref": "#/types/pulumiservice:index:DeploymentSettingsExecutorContext",
+          "description": "Settings related to the deployment executor."
+        },
+        "sourceContext": {
+          "$ref": "#/types/pulumiservice:index:DeploymentSettingsSourceContext",
+          "description": "Settings related to the source of the deployment."
+        },
+        "gitHub": {
+          "$ref": "#/types/pulumiservice:index:DeploymentSettingsGithub",
+          "description": "GitHub settings for the deployment."
+        },
+        "operationContext": {
+          "$ref": "#/types/pulumiservice:index:DeploymentSettingsOperationContext",
+          "description": "Settings related to the Pulumi operation environment during the deployment."
+        }
+      }
     },
     "pulumiservice:index:StackTag": {
       "description": "Stacks have associated metadata in the form of tags. Each tag consists of a name and value.",
