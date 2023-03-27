@@ -19,7 +19,7 @@ namespace Pulumi.PulumiService.Inputs
         private Input<string>? _password;
 
         /// <summary>
-        /// Optional password for SSH authentication
+        /// Optional password for SSH authentication.
         /// </summary>
         public Input<string>? Password
         {
@@ -35,7 +35,7 @@ namespace Pulumi.PulumiService.Inputs
         private Input<string>? _sshPrivateKey;
 
         /// <summary>
-        /// SSH private key
+        /// SSH private key.
         /// </summary>
         public Input<string>? SshPrivateKey
         {

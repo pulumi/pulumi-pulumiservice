@@ -10,6 +10,375 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
+type AWSOIDCConfiguration struct {
+	// Duration of the assume-role session
+	Duration *int `pulumi:"duration"`
+	// Optional set of IAM policy ARNs that further restrict the assume-role session
+	PolicyARNs []string `pulumi:"policyARNs"`
+	// The ARN of the role to assume using the OIDC token.
+	RoleARN string `pulumi:"roleARN"`
+	// The name of the assume-role session.
+	SessionName *string `pulumi:"sessionName"`
+}
+
+// AWSOIDCConfigurationInput is an input type that accepts AWSOIDCConfigurationArgs and AWSOIDCConfigurationOutput values.
+// You can construct a concrete instance of `AWSOIDCConfigurationInput` via:
+//
+//	AWSOIDCConfigurationArgs{...}
+type AWSOIDCConfigurationInput interface {
+	pulumi.Input
+
+	ToAWSOIDCConfigurationOutput() AWSOIDCConfigurationOutput
+	ToAWSOIDCConfigurationOutputWithContext(context.Context) AWSOIDCConfigurationOutput
+}
+
+type AWSOIDCConfigurationArgs struct {
+	// Duration of the assume-role session
+	Duration pulumi.IntPtrInput `pulumi:"duration"`
+	// Optional set of IAM policy ARNs that further restrict the assume-role session
+	PolicyARNs pulumi.StringArrayInput `pulumi:"policyARNs"`
+	// The ARN of the role to assume using the OIDC token.
+	RoleARN pulumi.StringInput `pulumi:"roleARN"`
+	// The name of the assume-role session.
+	SessionName pulumi.StringPtrInput `pulumi:"sessionName"`
+}
+
+func (AWSOIDCConfigurationArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*AWSOIDCConfiguration)(nil)).Elem()
+}
+
+func (i AWSOIDCConfigurationArgs) ToAWSOIDCConfigurationOutput() AWSOIDCConfigurationOutput {
+	return i.ToAWSOIDCConfigurationOutputWithContext(context.Background())
+}
+
+func (i AWSOIDCConfigurationArgs) ToAWSOIDCConfigurationOutputWithContext(ctx context.Context) AWSOIDCConfigurationOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(AWSOIDCConfigurationOutput)
+}
+
+func (i AWSOIDCConfigurationArgs) ToAWSOIDCConfigurationPtrOutput() AWSOIDCConfigurationPtrOutput {
+	return i.ToAWSOIDCConfigurationPtrOutputWithContext(context.Background())
+}
+
+func (i AWSOIDCConfigurationArgs) ToAWSOIDCConfigurationPtrOutputWithContext(ctx context.Context) AWSOIDCConfigurationPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(AWSOIDCConfigurationOutput).ToAWSOIDCConfigurationPtrOutputWithContext(ctx)
+}
+
+// AWSOIDCConfigurationPtrInput is an input type that accepts AWSOIDCConfigurationArgs, AWSOIDCConfigurationPtr and AWSOIDCConfigurationPtrOutput values.
+// You can construct a concrete instance of `AWSOIDCConfigurationPtrInput` via:
+//
+//	        AWSOIDCConfigurationArgs{...}
+//
+//	or:
+//
+//	        nil
+type AWSOIDCConfigurationPtrInput interface {
+	pulumi.Input
+
+	ToAWSOIDCConfigurationPtrOutput() AWSOIDCConfigurationPtrOutput
+	ToAWSOIDCConfigurationPtrOutputWithContext(context.Context) AWSOIDCConfigurationPtrOutput
+}
+
+type awsoidcconfigurationPtrType AWSOIDCConfigurationArgs
+
+func AWSOIDCConfigurationPtr(v *AWSOIDCConfigurationArgs) AWSOIDCConfigurationPtrInput {
+	return (*awsoidcconfigurationPtrType)(v)
+}
+
+func (*awsoidcconfigurationPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**AWSOIDCConfiguration)(nil)).Elem()
+}
+
+func (i *awsoidcconfigurationPtrType) ToAWSOIDCConfigurationPtrOutput() AWSOIDCConfigurationPtrOutput {
+	return i.ToAWSOIDCConfigurationPtrOutputWithContext(context.Background())
+}
+
+func (i *awsoidcconfigurationPtrType) ToAWSOIDCConfigurationPtrOutputWithContext(ctx context.Context) AWSOIDCConfigurationPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(AWSOIDCConfigurationPtrOutput)
+}
+
+type AWSOIDCConfigurationOutput struct{ *pulumi.OutputState }
+
+func (AWSOIDCConfigurationOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*AWSOIDCConfiguration)(nil)).Elem()
+}
+
+func (o AWSOIDCConfigurationOutput) ToAWSOIDCConfigurationOutput() AWSOIDCConfigurationOutput {
+	return o
+}
+
+func (o AWSOIDCConfigurationOutput) ToAWSOIDCConfigurationOutputWithContext(ctx context.Context) AWSOIDCConfigurationOutput {
+	return o
+}
+
+func (o AWSOIDCConfigurationOutput) ToAWSOIDCConfigurationPtrOutput() AWSOIDCConfigurationPtrOutput {
+	return o.ToAWSOIDCConfigurationPtrOutputWithContext(context.Background())
+}
+
+func (o AWSOIDCConfigurationOutput) ToAWSOIDCConfigurationPtrOutputWithContext(ctx context.Context) AWSOIDCConfigurationPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v AWSOIDCConfiguration) *AWSOIDCConfiguration {
+		return &v
+	}).(AWSOIDCConfigurationPtrOutput)
+}
+
+// Duration of the assume-role session
+func (o AWSOIDCConfigurationOutput) Duration() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v AWSOIDCConfiguration) *int { return v.Duration }).(pulumi.IntPtrOutput)
+}
+
+// Optional set of IAM policy ARNs that further restrict the assume-role session
+func (o AWSOIDCConfigurationOutput) PolicyARNs() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v AWSOIDCConfiguration) []string { return v.PolicyARNs }).(pulumi.StringArrayOutput)
+}
+
+// The ARN of the role to assume using the OIDC token.
+func (o AWSOIDCConfigurationOutput) RoleARN() pulumi.StringOutput {
+	return o.ApplyT(func(v AWSOIDCConfiguration) string { return v.RoleARN }).(pulumi.StringOutput)
+}
+
+// The name of the assume-role session.
+func (o AWSOIDCConfigurationOutput) SessionName() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v AWSOIDCConfiguration) *string { return v.SessionName }).(pulumi.StringPtrOutput)
+}
+
+type AWSOIDCConfigurationPtrOutput struct{ *pulumi.OutputState }
+
+func (AWSOIDCConfigurationPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**AWSOIDCConfiguration)(nil)).Elem()
+}
+
+func (o AWSOIDCConfigurationPtrOutput) ToAWSOIDCConfigurationPtrOutput() AWSOIDCConfigurationPtrOutput {
+	return o
+}
+
+func (o AWSOIDCConfigurationPtrOutput) ToAWSOIDCConfigurationPtrOutputWithContext(ctx context.Context) AWSOIDCConfigurationPtrOutput {
+	return o
+}
+
+func (o AWSOIDCConfigurationPtrOutput) Elem() AWSOIDCConfigurationOutput {
+	return o.ApplyT(func(v *AWSOIDCConfiguration) AWSOIDCConfiguration {
+		if v != nil {
+			return *v
+		}
+		var ret AWSOIDCConfiguration
+		return ret
+	}).(AWSOIDCConfigurationOutput)
+}
+
+// Duration of the assume-role session
+func (o AWSOIDCConfigurationPtrOutput) Duration() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *AWSOIDCConfiguration) *int {
+		if v == nil {
+			return nil
+		}
+		return v.Duration
+	}).(pulumi.IntPtrOutput)
+}
+
+// Optional set of IAM policy ARNs that further restrict the assume-role session
+func (o AWSOIDCConfigurationPtrOutput) PolicyARNs() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v *AWSOIDCConfiguration) []string {
+		if v == nil {
+			return nil
+		}
+		return v.PolicyARNs
+	}).(pulumi.StringArrayOutput)
+}
+
+// The ARN of the role to assume using the OIDC token.
+func (o AWSOIDCConfigurationPtrOutput) RoleARN() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *AWSOIDCConfiguration) *string {
+		if v == nil {
+			return nil
+		}
+		return &v.RoleARN
+	}).(pulumi.StringPtrOutput)
+}
+
+// The name of the assume-role session.
+func (o AWSOIDCConfigurationPtrOutput) SessionName() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *AWSOIDCConfiguration) *string {
+		if v == nil {
+			return nil
+		}
+		return v.SessionName
+	}).(pulumi.StringPtrOutput)
+}
+
+type AzureOIDCConfiguration struct {
+	// The client ID of the federated workload identity.
+	ClientId *string `pulumi:"clientId"`
+	// The subscription ID of the federated workload identity.
+	SubscriptionID *string `pulumi:"subscriptionID"`
+	// The tenant ID of the federated workload identity.
+	TenantId *string `pulumi:"tenantId"`
+}
+
+// AzureOIDCConfigurationInput is an input type that accepts AzureOIDCConfigurationArgs and AzureOIDCConfigurationOutput values.
+// You can construct a concrete instance of `AzureOIDCConfigurationInput` via:
+//
+//	AzureOIDCConfigurationArgs{...}
+type AzureOIDCConfigurationInput interface {
+	pulumi.Input
+
+	ToAzureOIDCConfigurationOutput() AzureOIDCConfigurationOutput
+	ToAzureOIDCConfigurationOutputWithContext(context.Context) AzureOIDCConfigurationOutput
+}
+
+type AzureOIDCConfigurationArgs struct {
+	// The client ID of the federated workload identity.
+	ClientId pulumi.StringPtrInput `pulumi:"clientId"`
+	// The subscription ID of the federated workload identity.
+	SubscriptionID pulumi.StringPtrInput `pulumi:"subscriptionID"`
+	// The tenant ID of the federated workload identity.
+	TenantId pulumi.StringPtrInput `pulumi:"tenantId"`
+}
+
+func (AzureOIDCConfigurationArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*AzureOIDCConfiguration)(nil)).Elem()
+}
+
+func (i AzureOIDCConfigurationArgs) ToAzureOIDCConfigurationOutput() AzureOIDCConfigurationOutput {
+	return i.ToAzureOIDCConfigurationOutputWithContext(context.Background())
+}
+
+func (i AzureOIDCConfigurationArgs) ToAzureOIDCConfigurationOutputWithContext(ctx context.Context) AzureOIDCConfigurationOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(AzureOIDCConfigurationOutput)
+}
+
+func (i AzureOIDCConfigurationArgs) ToAzureOIDCConfigurationPtrOutput() AzureOIDCConfigurationPtrOutput {
+	return i.ToAzureOIDCConfigurationPtrOutputWithContext(context.Background())
+}
+
+func (i AzureOIDCConfigurationArgs) ToAzureOIDCConfigurationPtrOutputWithContext(ctx context.Context) AzureOIDCConfigurationPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(AzureOIDCConfigurationOutput).ToAzureOIDCConfigurationPtrOutputWithContext(ctx)
+}
+
+// AzureOIDCConfigurationPtrInput is an input type that accepts AzureOIDCConfigurationArgs, AzureOIDCConfigurationPtr and AzureOIDCConfigurationPtrOutput values.
+// You can construct a concrete instance of `AzureOIDCConfigurationPtrInput` via:
+//
+//	        AzureOIDCConfigurationArgs{...}
+//
+//	or:
+//
+//	        nil
+type AzureOIDCConfigurationPtrInput interface {
+	pulumi.Input
+
+	ToAzureOIDCConfigurationPtrOutput() AzureOIDCConfigurationPtrOutput
+	ToAzureOIDCConfigurationPtrOutputWithContext(context.Context) AzureOIDCConfigurationPtrOutput
+}
+
+type azureOIDCConfigurationPtrType AzureOIDCConfigurationArgs
+
+func AzureOIDCConfigurationPtr(v *AzureOIDCConfigurationArgs) AzureOIDCConfigurationPtrInput {
+	return (*azureOIDCConfigurationPtrType)(v)
+}
+
+func (*azureOIDCConfigurationPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**AzureOIDCConfiguration)(nil)).Elem()
+}
+
+func (i *azureOIDCConfigurationPtrType) ToAzureOIDCConfigurationPtrOutput() AzureOIDCConfigurationPtrOutput {
+	return i.ToAzureOIDCConfigurationPtrOutputWithContext(context.Background())
+}
+
+func (i *azureOIDCConfigurationPtrType) ToAzureOIDCConfigurationPtrOutputWithContext(ctx context.Context) AzureOIDCConfigurationPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(AzureOIDCConfigurationPtrOutput)
+}
+
+type AzureOIDCConfigurationOutput struct{ *pulumi.OutputState }
+
+func (AzureOIDCConfigurationOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*AzureOIDCConfiguration)(nil)).Elem()
+}
+
+func (o AzureOIDCConfigurationOutput) ToAzureOIDCConfigurationOutput() AzureOIDCConfigurationOutput {
+	return o
+}
+
+func (o AzureOIDCConfigurationOutput) ToAzureOIDCConfigurationOutputWithContext(ctx context.Context) AzureOIDCConfigurationOutput {
+	return o
+}
+
+func (o AzureOIDCConfigurationOutput) ToAzureOIDCConfigurationPtrOutput() AzureOIDCConfigurationPtrOutput {
+	return o.ToAzureOIDCConfigurationPtrOutputWithContext(context.Background())
+}
+
+func (o AzureOIDCConfigurationOutput) ToAzureOIDCConfigurationPtrOutputWithContext(ctx context.Context) AzureOIDCConfigurationPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v AzureOIDCConfiguration) *AzureOIDCConfiguration {
+		return &v
+	}).(AzureOIDCConfigurationPtrOutput)
+}
+
+// The client ID of the federated workload identity.
+func (o AzureOIDCConfigurationOutput) ClientId() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v AzureOIDCConfiguration) *string { return v.ClientId }).(pulumi.StringPtrOutput)
+}
+
+// The subscription ID of the federated workload identity.
+func (o AzureOIDCConfigurationOutput) SubscriptionID() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v AzureOIDCConfiguration) *string { return v.SubscriptionID }).(pulumi.StringPtrOutput)
+}
+
+// The tenant ID of the federated workload identity.
+func (o AzureOIDCConfigurationOutput) TenantId() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v AzureOIDCConfiguration) *string { return v.TenantId }).(pulumi.StringPtrOutput)
+}
+
+type AzureOIDCConfigurationPtrOutput struct{ *pulumi.OutputState }
+
+func (AzureOIDCConfigurationPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**AzureOIDCConfiguration)(nil)).Elem()
+}
+
+func (o AzureOIDCConfigurationPtrOutput) ToAzureOIDCConfigurationPtrOutput() AzureOIDCConfigurationPtrOutput {
+	return o
+}
+
+func (o AzureOIDCConfigurationPtrOutput) ToAzureOIDCConfigurationPtrOutputWithContext(ctx context.Context) AzureOIDCConfigurationPtrOutput {
+	return o
+}
+
+func (o AzureOIDCConfigurationPtrOutput) Elem() AzureOIDCConfigurationOutput {
+	return o.ApplyT(func(v *AzureOIDCConfiguration) AzureOIDCConfiguration {
+		if v != nil {
+			return *v
+		}
+		var ret AzureOIDCConfiguration
+		return ret
+	}).(AzureOIDCConfigurationOutput)
+}
+
+// The client ID of the federated workload identity.
+func (o AzureOIDCConfigurationPtrOutput) ClientId() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *AzureOIDCConfiguration) *string {
+		if v == nil {
+			return nil
+		}
+		return v.ClientId
+	}).(pulumi.StringPtrOutput)
+}
+
+// The subscription ID of the federated workload identity.
+func (o AzureOIDCConfigurationPtrOutput) SubscriptionID() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *AzureOIDCConfiguration) *string {
+		if v == nil {
+			return nil
+		}
+		return v.SubscriptionID
+	}).(pulumi.StringPtrOutput)
+}
+
+// The tenant ID of the federated workload identity.
+func (o AzureOIDCConfigurationPtrOutput) TenantId() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *AzureOIDCConfiguration) *string {
+		if v == nil {
+			return nil
+		}
+		return v.TenantId
+	}).(pulumi.StringPtrOutput)
+}
+
 // The executor context defines information about the executor where the deployment is executed. If unspecified, the default 'pulumi/pulumi' image is used.
 type DeploymentSettingsExecutorContext struct {
 	// Allows overriding the default executor image with a custom image. E.g. 'pulumi/pulumi-nodejs:latest'
@@ -152,9 +521,9 @@ func (o DeploymentSettingsExecutorContextPtrOutput) ExecutorImage() pulumi.Strin
 
 // Git source settings for a deployment.
 type DeploymentSettingsGitAuthBasicAuth struct {
-	// Password for git basic authentication
+	// Password for git basic authentication.
 	Password string `pulumi:"password"`
-	// User name for git basic authentication
+	// User name for git basic authentication.
 	Username string `pulumi:"username"`
 }
 
@@ -171,9 +540,9 @@ type DeploymentSettingsGitAuthBasicAuthInput interface {
 
 // Git source settings for a deployment.
 type DeploymentSettingsGitAuthBasicAuthArgs struct {
-	// Password for git basic authentication
+	// Password for git basic authentication.
 	Password pulumi.StringInput `pulumi:"password"`
-	// User name for git basic authentication
+	// User name for git basic authentication.
 	Username pulumi.StringInput `pulumi:"username"`
 }
 
@@ -255,12 +624,12 @@ func (o DeploymentSettingsGitAuthBasicAuthOutput) ToDeploymentSettingsGitAuthBas
 	}).(DeploymentSettingsGitAuthBasicAuthPtrOutput)
 }
 
-// Password for git basic authentication
+// Password for git basic authentication.
 func (o DeploymentSettingsGitAuthBasicAuthOutput) Password() pulumi.StringOutput {
 	return o.ApplyT(func(v DeploymentSettingsGitAuthBasicAuth) string { return v.Password }).(pulumi.StringOutput)
 }
 
-// User name for git basic authentication
+// User name for git basic authentication.
 func (o DeploymentSettingsGitAuthBasicAuthOutput) Username() pulumi.StringOutput {
 	return o.ApplyT(func(v DeploymentSettingsGitAuthBasicAuth) string { return v.Username }).(pulumi.StringOutput)
 }
@@ -289,7 +658,7 @@ func (o DeploymentSettingsGitAuthBasicAuthPtrOutput) Elem() DeploymentSettingsGi
 	}).(DeploymentSettingsGitAuthBasicAuthOutput)
 }
 
-// Password for git basic authentication
+// Password for git basic authentication.
 func (o DeploymentSettingsGitAuthBasicAuthPtrOutput) Password() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *DeploymentSettingsGitAuthBasicAuth) *string {
 		if v == nil {
@@ -299,7 +668,7 @@ func (o DeploymentSettingsGitAuthBasicAuthPtrOutput) Password() pulumi.StringPtr
 	}).(pulumi.StringPtrOutput)
 }
 
-// User name for git basic authentication
+// User name for git basic authentication.
 func (o DeploymentSettingsGitAuthBasicAuthPtrOutput) Username() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *DeploymentSettingsGitAuthBasicAuth) *string {
 		if v == nil {
@@ -311,9 +680,9 @@ func (o DeploymentSettingsGitAuthBasicAuthPtrOutput) Username() pulumi.StringPtr
 
 // Git source settings for a deployment.
 type DeploymentSettingsGitAuthSSHAuth struct {
-	// Optional password for SSH authentication
+	// Optional password for SSH authentication.
 	Password *string `pulumi:"password"`
-	// SSH private key
+	// SSH private key.
 	SshPrivateKey string `pulumi:"sshPrivateKey"`
 }
 
@@ -330,9 +699,9 @@ type DeploymentSettingsGitAuthSSHAuthInput interface {
 
 // Git source settings for a deployment.
 type DeploymentSettingsGitAuthSSHAuthArgs struct {
-	// Optional password for SSH authentication
+	// Optional password for SSH authentication.
 	Password pulumi.StringPtrInput `pulumi:"password"`
-	// SSH private key
+	// SSH private key.
 	SshPrivateKey pulumi.StringInput `pulumi:"sshPrivateKey"`
 }
 
@@ -414,12 +783,12 @@ func (o DeploymentSettingsGitAuthSSHAuthOutput) ToDeploymentSettingsGitAuthSSHAu
 	}).(DeploymentSettingsGitAuthSSHAuthPtrOutput)
 }
 
-// Optional password for SSH authentication
+// Optional password for SSH authentication.
 func (o DeploymentSettingsGitAuthSSHAuthOutput) Password() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v DeploymentSettingsGitAuthSSHAuth) *string { return v.Password }).(pulumi.StringPtrOutput)
 }
 
-// SSH private key
+// SSH private key.
 func (o DeploymentSettingsGitAuthSSHAuthOutput) SshPrivateKey() pulumi.StringOutput {
 	return o.ApplyT(func(v DeploymentSettingsGitAuthSSHAuth) string { return v.SshPrivateKey }).(pulumi.StringOutput)
 }
@@ -448,7 +817,7 @@ func (o DeploymentSettingsGitAuthSSHAuthPtrOutput) Elem() DeploymentSettingsGitA
 	}).(DeploymentSettingsGitAuthSSHAuthOutput)
 }
 
-// Optional password for SSH authentication
+// Optional password for SSH authentication.
 func (o DeploymentSettingsGitAuthSSHAuthPtrOutput) Password() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *DeploymentSettingsGitAuthSSHAuth) *string {
 		if v == nil {
@@ -458,7 +827,7 @@ func (o DeploymentSettingsGitAuthSSHAuthPtrOutput) Password() pulumi.StringPtrOu
 	}).(pulumi.StringPtrOutput)
 }
 
-// SSH private key
+// SSH private key.
 func (o DeploymentSettingsGitAuthSSHAuthPtrOutput) SshPrivateKey() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *DeploymentSettingsGitAuthSSHAuth) *string {
 		if v == nil {
@@ -864,6 +1233,31 @@ func (o DeploymentSettingsGitSourceGitAuthPtrOutput) SshAuth() DeploymentSetting
 
 // GitHub settings for the deployment.
 type DeploymentSettingsGithub struct {
+	// Trigger a deployment running `pulumi up` on commit.
+	DeployCommits *bool `pulumi:"deployCommits"`
+	// The paths within the repo that deployments should be filtered to.
+	Paths []string `pulumi:"paths"`
+	// Trigger a deployment running `pulumi preview` when a PR is opened.
+	PreviewPullRequests *bool `pulumi:"previewPullRequests"`
+	// The GitHub repository in the format org/repo.
+	Repository *string `pulumi:"repository"`
+}
+
+// Defaults sets the appropriate defaults for DeploymentSettingsGithub
+func (val *DeploymentSettingsGithub) Defaults() *DeploymentSettingsGithub {
+	if val == nil {
+		return nil
+	}
+	tmp := *val
+	if tmp.DeployCommits == nil {
+		deployCommits_ := true
+		tmp.DeployCommits = &deployCommits_
+	}
+	if tmp.PreviewPullRequests == nil {
+		previewPullRequests_ := true
+		tmp.PreviewPullRequests = &previewPullRequests_
+	}
+	return &tmp
 }
 
 // DeploymentSettingsGithubInput is an input type that accepts DeploymentSettingsGithubArgs and DeploymentSettingsGithubOutput values.
@@ -879,8 +1273,30 @@ type DeploymentSettingsGithubInput interface {
 
 // GitHub settings for the deployment.
 type DeploymentSettingsGithubArgs struct {
+	// Trigger a deployment running `pulumi up` on commit.
+	DeployCommits pulumi.BoolPtrInput `pulumi:"deployCommits"`
+	// The paths within the repo that deployments should be filtered to.
+	Paths pulumi.StringArrayInput `pulumi:"paths"`
+	// Trigger a deployment running `pulumi preview` when a PR is opened.
+	PreviewPullRequests pulumi.BoolPtrInput `pulumi:"previewPullRequests"`
+	// The GitHub repository in the format org/repo.
+	Repository pulumi.StringPtrInput `pulumi:"repository"`
 }
 
+// Defaults sets the appropriate defaults for DeploymentSettingsGithubArgs
+func (val *DeploymentSettingsGithubArgs) Defaults() *DeploymentSettingsGithubArgs {
+	if val == nil {
+		return nil
+	}
+	tmp := *val
+	if tmp.DeployCommits == nil {
+		tmp.DeployCommits = pulumi.BoolPtr(true)
+	}
+	if tmp.PreviewPullRequests == nil {
+		tmp.PreviewPullRequests = pulumi.BoolPtr(true)
+	}
+	return &tmp
+}
 func (DeploymentSettingsGithubArgs) ElementType() reflect.Type {
 	return reflect.TypeOf((*DeploymentSettingsGithub)(nil)).Elem()
 }
@@ -959,6 +1375,26 @@ func (o DeploymentSettingsGithubOutput) ToDeploymentSettingsGithubPtrOutputWithC
 	}).(DeploymentSettingsGithubPtrOutput)
 }
 
+// Trigger a deployment running `pulumi up` on commit.
+func (o DeploymentSettingsGithubOutput) DeployCommits() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v DeploymentSettingsGithub) *bool { return v.DeployCommits }).(pulumi.BoolPtrOutput)
+}
+
+// The paths within the repo that deployments should be filtered to.
+func (o DeploymentSettingsGithubOutput) Paths() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v DeploymentSettingsGithub) []string { return v.Paths }).(pulumi.StringArrayOutput)
+}
+
+// Trigger a deployment running `pulumi preview` when a PR is opened.
+func (o DeploymentSettingsGithubOutput) PreviewPullRequests() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v DeploymentSettingsGithub) *bool { return v.PreviewPullRequests }).(pulumi.BoolPtrOutput)
+}
+
+// The GitHub repository in the format org/repo.
+func (o DeploymentSettingsGithubOutput) Repository() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v DeploymentSettingsGithub) *string { return v.Repository }).(pulumi.StringPtrOutput)
+}
+
 type DeploymentSettingsGithubPtrOutput struct{ *pulumi.OutputState }
 
 func (DeploymentSettingsGithubPtrOutput) ElementType() reflect.Type {
@@ -983,8 +1419,58 @@ func (o DeploymentSettingsGithubPtrOutput) Elem() DeploymentSettingsGithubOutput
 	}).(DeploymentSettingsGithubOutput)
 }
 
+// Trigger a deployment running `pulumi up` on commit.
+func (o DeploymentSettingsGithubPtrOutput) DeployCommits() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *DeploymentSettingsGithub) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.DeployCommits
+	}).(pulumi.BoolPtrOutput)
+}
+
+// The paths within the repo that deployments should be filtered to.
+func (o DeploymentSettingsGithubPtrOutput) Paths() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v *DeploymentSettingsGithub) []string {
+		if v == nil {
+			return nil
+		}
+		return v.Paths
+	}).(pulumi.StringArrayOutput)
+}
+
+// Trigger a deployment running `pulumi preview` when a PR is opened.
+func (o DeploymentSettingsGithubPtrOutput) PreviewPullRequests() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *DeploymentSettingsGithub) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.PreviewPullRequests
+	}).(pulumi.BoolPtrOutput)
+}
+
+// The GitHub repository in the format org/repo.
+func (o DeploymentSettingsGithubPtrOutput) Repository() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *DeploymentSettingsGithub) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Repository
+	}).(pulumi.StringPtrOutput)
+}
+
 // Settings related to the Pulumi operation environment during the deployment.
 type DeploymentSettingsOperationContext struct {
+	// Environment variables to set for the deployment.
+	EnvironmentVariables map[string]string `pulumi:"environmentVariables"`
+	// OIDC configuration to use during the deployment.
+	Oidc *OperationContextOIDC `pulumi:"oidc"`
+	// The Pulumi operation to run during the deployment.
+	Operation PulumiOperation `pulumi:"operation"`
+	// Options to override default behavior during the deployment.
+	Options *OperationContextOptions `pulumi:"options"`
+	// Shell commands to run before the Pulumi operation executes.
+	PreRunCommands []string `pulumi:"preRunCommands"`
 }
 
 // DeploymentSettingsOperationContextInput is an input type that accepts DeploymentSettingsOperationContextArgs and DeploymentSettingsOperationContextOutput values.
@@ -1000,6 +1486,16 @@ type DeploymentSettingsOperationContextInput interface {
 
 // Settings related to the Pulumi operation environment during the deployment.
 type DeploymentSettingsOperationContextArgs struct {
+	// Environment variables to set for the deployment.
+	EnvironmentVariables pulumi.StringMapInput `pulumi:"environmentVariables"`
+	// OIDC configuration to use during the deployment.
+	Oidc OperationContextOIDCPtrInput `pulumi:"oidc"`
+	// The Pulumi operation to run during the deployment.
+	Operation PulumiOperationInput `pulumi:"operation"`
+	// Options to override default behavior during the deployment.
+	Options OperationContextOptionsPtrInput `pulumi:"options"`
+	// Shell commands to run before the Pulumi operation executes.
+	PreRunCommands pulumi.StringArrayInput `pulumi:"preRunCommands"`
 }
 
 func (DeploymentSettingsOperationContextArgs) ElementType() reflect.Type {
@@ -1080,6 +1576,31 @@ func (o DeploymentSettingsOperationContextOutput) ToDeploymentSettingsOperationC
 	}).(DeploymentSettingsOperationContextPtrOutput)
 }
 
+// Environment variables to set for the deployment.
+func (o DeploymentSettingsOperationContextOutput) EnvironmentVariables() pulumi.StringMapOutput {
+	return o.ApplyT(func(v DeploymentSettingsOperationContext) map[string]string { return v.EnvironmentVariables }).(pulumi.StringMapOutput)
+}
+
+// OIDC configuration to use during the deployment.
+func (o DeploymentSettingsOperationContextOutput) Oidc() OperationContextOIDCPtrOutput {
+	return o.ApplyT(func(v DeploymentSettingsOperationContext) *OperationContextOIDC { return v.Oidc }).(OperationContextOIDCPtrOutput)
+}
+
+// The Pulumi operation to run during the deployment.
+func (o DeploymentSettingsOperationContextOutput) Operation() PulumiOperationOutput {
+	return o.ApplyT(func(v DeploymentSettingsOperationContext) PulumiOperation { return v.Operation }).(PulumiOperationOutput)
+}
+
+// Options to override default behavior during the deployment.
+func (o DeploymentSettingsOperationContextOutput) Options() OperationContextOptionsPtrOutput {
+	return o.ApplyT(func(v DeploymentSettingsOperationContext) *OperationContextOptions { return v.Options }).(OperationContextOptionsPtrOutput)
+}
+
+// Shell commands to run before the Pulumi operation executes.
+func (o DeploymentSettingsOperationContextOutput) PreRunCommands() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v DeploymentSettingsOperationContext) []string { return v.PreRunCommands }).(pulumi.StringArrayOutput)
+}
+
 type DeploymentSettingsOperationContextPtrOutput struct{ *pulumi.OutputState }
 
 func (DeploymentSettingsOperationContextPtrOutput) ElementType() reflect.Type {
@@ -1102,6 +1623,56 @@ func (o DeploymentSettingsOperationContextPtrOutput) Elem() DeploymentSettingsOp
 		var ret DeploymentSettingsOperationContext
 		return ret
 	}).(DeploymentSettingsOperationContextOutput)
+}
+
+// Environment variables to set for the deployment.
+func (o DeploymentSettingsOperationContextPtrOutput) EnvironmentVariables() pulumi.StringMapOutput {
+	return o.ApplyT(func(v *DeploymentSettingsOperationContext) map[string]string {
+		if v == nil {
+			return nil
+		}
+		return v.EnvironmentVariables
+	}).(pulumi.StringMapOutput)
+}
+
+// OIDC configuration to use during the deployment.
+func (o DeploymentSettingsOperationContextPtrOutput) Oidc() OperationContextOIDCPtrOutput {
+	return o.ApplyT(func(v *DeploymentSettingsOperationContext) *OperationContextOIDC {
+		if v == nil {
+			return nil
+		}
+		return v.Oidc
+	}).(OperationContextOIDCPtrOutput)
+}
+
+// The Pulumi operation to run during the deployment.
+func (o DeploymentSettingsOperationContextPtrOutput) Operation() PulumiOperationPtrOutput {
+	return o.ApplyT(func(v *DeploymentSettingsOperationContext) *PulumiOperation {
+		if v == nil {
+			return nil
+		}
+		return &v.Operation
+	}).(PulumiOperationPtrOutput)
+}
+
+// Options to override default behavior during the deployment.
+func (o DeploymentSettingsOperationContextPtrOutput) Options() OperationContextOptionsPtrOutput {
+	return o.ApplyT(func(v *DeploymentSettingsOperationContext) *OperationContextOptions {
+		if v == nil {
+			return nil
+		}
+		return v.Options
+	}).(OperationContextOptionsPtrOutput)
+}
+
+// Shell commands to run before the Pulumi operation executes.
+func (o DeploymentSettingsOperationContextPtrOutput) PreRunCommands() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v *DeploymentSettingsOperationContext) []string {
+		if v == nil {
+			return nil
+		}
+		return v.PreRunCommands
+	}).(pulumi.StringArrayOutput)
 }
 
 // Settings related to the source of the deployment.
@@ -1244,7 +1815,574 @@ func (o DeploymentSettingsSourceContextPtrOutput) Git() DeploymentSettingsGitSou
 	}).(DeploymentSettingsGitSourcePtrOutput)
 }
 
+type GCPOIDCConfiguration struct {
+	// The numerical ID of the GCP project.
+	ProjectId *string `pulumi:"projectId"`
+	// The ID of the identity provider associated with the workload pool.
+	ProviderId *string `pulumi:"providerId"`
+	// The region of the GCP project.
+	Region *string `pulumi:"region"`
+	// The email address of the service account to use.
+	ServiceAccount *string `pulumi:"serviceAccount"`
+	// The lifetime of the temporary credentials.
+	TokenLifetime *int `pulumi:"tokenLifetime"`
+	// The ID of the workload pool to use.
+	WorkloadPoolId *string `pulumi:"workloadPoolId"`
+}
+
+// GCPOIDCConfigurationInput is an input type that accepts GCPOIDCConfigurationArgs and GCPOIDCConfigurationOutput values.
+// You can construct a concrete instance of `GCPOIDCConfigurationInput` via:
+//
+//	GCPOIDCConfigurationArgs{...}
+type GCPOIDCConfigurationInput interface {
+	pulumi.Input
+
+	ToGCPOIDCConfigurationOutput() GCPOIDCConfigurationOutput
+	ToGCPOIDCConfigurationOutputWithContext(context.Context) GCPOIDCConfigurationOutput
+}
+
+type GCPOIDCConfigurationArgs struct {
+	// The numerical ID of the GCP project.
+	ProjectId pulumi.StringPtrInput `pulumi:"projectId"`
+	// The ID of the identity provider associated with the workload pool.
+	ProviderId pulumi.StringPtrInput `pulumi:"providerId"`
+	// The region of the GCP project.
+	Region pulumi.StringPtrInput `pulumi:"region"`
+	// The email address of the service account to use.
+	ServiceAccount pulumi.StringPtrInput `pulumi:"serviceAccount"`
+	// The lifetime of the temporary credentials.
+	TokenLifetime pulumi.IntPtrInput `pulumi:"tokenLifetime"`
+	// The ID of the workload pool to use.
+	WorkloadPoolId pulumi.StringPtrInput `pulumi:"workloadPoolId"`
+}
+
+func (GCPOIDCConfigurationArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*GCPOIDCConfiguration)(nil)).Elem()
+}
+
+func (i GCPOIDCConfigurationArgs) ToGCPOIDCConfigurationOutput() GCPOIDCConfigurationOutput {
+	return i.ToGCPOIDCConfigurationOutputWithContext(context.Background())
+}
+
+func (i GCPOIDCConfigurationArgs) ToGCPOIDCConfigurationOutputWithContext(ctx context.Context) GCPOIDCConfigurationOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(GCPOIDCConfigurationOutput)
+}
+
+func (i GCPOIDCConfigurationArgs) ToGCPOIDCConfigurationPtrOutput() GCPOIDCConfigurationPtrOutput {
+	return i.ToGCPOIDCConfigurationPtrOutputWithContext(context.Background())
+}
+
+func (i GCPOIDCConfigurationArgs) ToGCPOIDCConfigurationPtrOutputWithContext(ctx context.Context) GCPOIDCConfigurationPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(GCPOIDCConfigurationOutput).ToGCPOIDCConfigurationPtrOutputWithContext(ctx)
+}
+
+// GCPOIDCConfigurationPtrInput is an input type that accepts GCPOIDCConfigurationArgs, GCPOIDCConfigurationPtr and GCPOIDCConfigurationPtrOutput values.
+// You can construct a concrete instance of `GCPOIDCConfigurationPtrInput` via:
+//
+//	        GCPOIDCConfigurationArgs{...}
+//
+//	or:
+//
+//	        nil
+type GCPOIDCConfigurationPtrInput interface {
+	pulumi.Input
+
+	ToGCPOIDCConfigurationPtrOutput() GCPOIDCConfigurationPtrOutput
+	ToGCPOIDCConfigurationPtrOutputWithContext(context.Context) GCPOIDCConfigurationPtrOutput
+}
+
+type gcpoidcconfigurationPtrType GCPOIDCConfigurationArgs
+
+func GCPOIDCConfigurationPtr(v *GCPOIDCConfigurationArgs) GCPOIDCConfigurationPtrInput {
+	return (*gcpoidcconfigurationPtrType)(v)
+}
+
+func (*gcpoidcconfigurationPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**GCPOIDCConfiguration)(nil)).Elem()
+}
+
+func (i *gcpoidcconfigurationPtrType) ToGCPOIDCConfigurationPtrOutput() GCPOIDCConfigurationPtrOutput {
+	return i.ToGCPOIDCConfigurationPtrOutputWithContext(context.Background())
+}
+
+func (i *gcpoidcconfigurationPtrType) ToGCPOIDCConfigurationPtrOutputWithContext(ctx context.Context) GCPOIDCConfigurationPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(GCPOIDCConfigurationPtrOutput)
+}
+
+type GCPOIDCConfigurationOutput struct{ *pulumi.OutputState }
+
+func (GCPOIDCConfigurationOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*GCPOIDCConfiguration)(nil)).Elem()
+}
+
+func (o GCPOIDCConfigurationOutput) ToGCPOIDCConfigurationOutput() GCPOIDCConfigurationOutput {
+	return o
+}
+
+func (o GCPOIDCConfigurationOutput) ToGCPOIDCConfigurationOutputWithContext(ctx context.Context) GCPOIDCConfigurationOutput {
+	return o
+}
+
+func (o GCPOIDCConfigurationOutput) ToGCPOIDCConfigurationPtrOutput() GCPOIDCConfigurationPtrOutput {
+	return o.ToGCPOIDCConfigurationPtrOutputWithContext(context.Background())
+}
+
+func (o GCPOIDCConfigurationOutput) ToGCPOIDCConfigurationPtrOutputWithContext(ctx context.Context) GCPOIDCConfigurationPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v GCPOIDCConfiguration) *GCPOIDCConfiguration {
+		return &v
+	}).(GCPOIDCConfigurationPtrOutput)
+}
+
+// The numerical ID of the GCP project.
+func (o GCPOIDCConfigurationOutput) ProjectId() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v GCPOIDCConfiguration) *string { return v.ProjectId }).(pulumi.StringPtrOutput)
+}
+
+// The ID of the identity provider associated with the workload pool.
+func (o GCPOIDCConfigurationOutput) ProviderId() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v GCPOIDCConfiguration) *string { return v.ProviderId }).(pulumi.StringPtrOutput)
+}
+
+// The region of the GCP project.
+func (o GCPOIDCConfigurationOutput) Region() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v GCPOIDCConfiguration) *string { return v.Region }).(pulumi.StringPtrOutput)
+}
+
+// The email address of the service account to use.
+func (o GCPOIDCConfigurationOutput) ServiceAccount() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v GCPOIDCConfiguration) *string { return v.ServiceAccount }).(pulumi.StringPtrOutput)
+}
+
+// The lifetime of the temporary credentials.
+func (o GCPOIDCConfigurationOutput) TokenLifetime() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v GCPOIDCConfiguration) *int { return v.TokenLifetime }).(pulumi.IntPtrOutput)
+}
+
+// The ID of the workload pool to use.
+func (o GCPOIDCConfigurationOutput) WorkloadPoolId() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v GCPOIDCConfiguration) *string { return v.WorkloadPoolId }).(pulumi.StringPtrOutput)
+}
+
+type GCPOIDCConfigurationPtrOutput struct{ *pulumi.OutputState }
+
+func (GCPOIDCConfigurationPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**GCPOIDCConfiguration)(nil)).Elem()
+}
+
+func (o GCPOIDCConfigurationPtrOutput) ToGCPOIDCConfigurationPtrOutput() GCPOIDCConfigurationPtrOutput {
+	return o
+}
+
+func (o GCPOIDCConfigurationPtrOutput) ToGCPOIDCConfigurationPtrOutputWithContext(ctx context.Context) GCPOIDCConfigurationPtrOutput {
+	return o
+}
+
+func (o GCPOIDCConfigurationPtrOutput) Elem() GCPOIDCConfigurationOutput {
+	return o.ApplyT(func(v *GCPOIDCConfiguration) GCPOIDCConfiguration {
+		if v != nil {
+			return *v
+		}
+		var ret GCPOIDCConfiguration
+		return ret
+	}).(GCPOIDCConfigurationOutput)
+}
+
+// The numerical ID of the GCP project.
+func (o GCPOIDCConfigurationPtrOutput) ProjectId() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *GCPOIDCConfiguration) *string {
+		if v == nil {
+			return nil
+		}
+		return v.ProjectId
+	}).(pulumi.StringPtrOutput)
+}
+
+// The ID of the identity provider associated with the workload pool.
+func (o GCPOIDCConfigurationPtrOutput) ProviderId() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *GCPOIDCConfiguration) *string {
+		if v == nil {
+			return nil
+		}
+		return v.ProviderId
+	}).(pulumi.StringPtrOutput)
+}
+
+// The region of the GCP project.
+func (o GCPOIDCConfigurationPtrOutput) Region() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *GCPOIDCConfiguration) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Region
+	}).(pulumi.StringPtrOutput)
+}
+
+// The email address of the service account to use.
+func (o GCPOIDCConfigurationPtrOutput) ServiceAccount() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *GCPOIDCConfiguration) *string {
+		if v == nil {
+			return nil
+		}
+		return v.ServiceAccount
+	}).(pulumi.StringPtrOutput)
+}
+
+// The lifetime of the temporary credentials.
+func (o GCPOIDCConfigurationPtrOutput) TokenLifetime() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *GCPOIDCConfiguration) *int {
+		if v == nil {
+			return nil
+		}
+		return v.TokenLifetime
+	}).(pulumi.IntPtrOutput)
+}
+
+// The ID of the workload pool to use.
+func (o GCPOIDCConfigurationPtrOutput) WorkloadPoolId() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *GCPOIDCConfiguration) *string {
+		if v == nil {
+			return nil
+		}
+		return v.WorkloadPoolId
+	}).(pulumi.StringPtrOutput)
+}
+
+type OperationContextOIDC struct {
+	// AWS-specific OIDC configuration.
+	Aws *AWSOIDCConfiguration `pulumi:"aws"`
+	// Azure-specific OIDC configuration.
+	Azure *AzureOIDCConfiguration `pulumi:"azure"`
+	// GCP-specific OIDC configuration.
+	Gcp *GCPOIDCConfiguration `pulumi:"gcp"`
+}
+
+// OperationContextOIDCInput is an input type that accepts OperationContextOIDCArgs and OperationContextOIDCOutput values.
+// You can construct a concrete instance of `OperationContextOIDCInput` via:
+//
+//	OperationContextOIDCArgs{...}
+type OperationContextOIDCInput interface {
+	pulumi.Input
+
+	ToOperationContextOIDCOutput() OperationContextOIDCOutput
+	ToOperationContextOIDCOutputWithContext(context.Context) OperationContextOIDCOutput
+}
+
+type OperationContextOIDCArgs struct {
+	// AWS-specific OIDC configuration.
+	Aws AWSOIDCConfigurationPtrInput `pulumi:"aws"`
+	// Azure-specific OIDC configuration.
+	Azure AzureOIDCConfigurationPtrInput `pulumi:"azure"`
+	// GCP-specific OIDC configuration.
+	Gcp GCPOIDCConfigurationPtrInput `pulumi:"gcp"`
+}
+
+func (OperationContextOIDCArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*OperationContextOIDC)(nil)).Elem()
+}
+
+func (i OperationContextOIDCArgs) ToOperationContextOIDCOutput() OperationContextOIDCOutput {
+	return i.ToOperationContextOIDCOutputWithContext(context.Background())
+}
+
+func (i OperationContextOIDCArgs) ToOperationContextOIDCOutputWithContext(ctx context.Context) OperationContextOIDCOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(OperationContextOIDCOutput)
+}
+
+func (i OperationContextOIDCArgs) ToOperationContextOIDCPtrOutput() OperationContextOIDCPtrOutput {
+	return i.ToOperationContextOIDCPtrOutputWithContext(context.Background())
+}
+
+func (i OperationContextOIDCArgs) ToOperationContextOIDCPtrOutputWithContext(ctx context.Context) OperationContextOIDCPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(OperationContextOIDCOutput).ToOperationContextOIDCPtrOutputWithContext(ctx)
+}
+
+// OperationContextOIDCPtrInput is an input type that accepts OperationContextOIDCArgs, OperationContextOIDCPtr and OperationContextOIDCPtrOutput values.
+// You can construct a concrete instance of `OperationContextOIDCPtrInput` via:
+//
+//	        OperationContextOIDCArgs{...}
+//
+//	or:
+//
+//	        nil
+type OperationContextOIDCPtrInput interface {
+	pulumi.Input
+
+	ToOperationContextOIDCPtrOutput() OperationContextOIDCPtrOutput
+	ToOperationContextOIDCPtrOutputWithContext(context.Context) OperationContextOIDCPtrOutput
+}
+
+type operationContextOIDCPtrType OperationContextOIDCArgs
+
+func OperationContextOIDCPtr(v *OperationContextOIDCArgs) OperationContextOIDCPtrInput {
+	return (*operationContextOIDCPtrType)(v)
+}
+
+func (*operationContextOIDCPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**OperationContextOIDC)(nil)).Elem()
+}
+
+func (i *operationContextOIDCPtrType) ToOperationContextOIDCPtrOutput() OperationContextOIDCPtrOutput {
+	return i.ToOperationContextOIDCPtrOutputWithContext(context.Background())
+}
+
+func (i *operationContextOIDCPtrType) ToOperationContextOIDCPtrOutputWithContext(ctx context.Context) OperationContextOIDCPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(OperationContextOIDCPtrOutput)
+}
+
+type OperationContextOIDCOutput struct{ *pulumi.OutputState }
+
+func (OperationContextOIDCOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*OperationContextOIDC)(nil)).Elem()
+}
+
+func (o OperationContextOIDCOutput) ToOperationContextOIDCOutput() OperationContextOIDCOutput {
+	return o
+}
+
+func (o OperationContextOIDCOutput) ToOperationContextOIDCOutputWithContext(ctx context.Context) OperationContextOIDCOutput {
+	return o
+}
+
+func (o OperationContextOIDCOutput) ToOperationContextOIDCPtrOutput() OperationContextOIDCPtrOutput {
+	return o.ToOperationContextOIDCPtrOutputWithContext(context.Background())
+}
+
+func (o OperationContextOIDCOutput) ToOperationContextOIDCPtrOutputWithContext(ctx context.Context) OperationContextOIDCPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v OperationContextOIDC) *OperationContextOIDC {
+		return &v
+	}).(OperationContextOIDCPtrOutput)
+}
+
+// AWS-specific OIDC configuration.
+func (o OperationContextOIDCOutput) Aws() AWSOIDCConfigurationPtrOutput {
+	return o.ApplyT(func(v OperationContextOIDC) *AWSOIDCConfiguration { return v.Aws }).(AWSOIDCConfigurationPtrOutput)
+}
+
+// Azure-specific OIDC configuration.
+func (o OperationContextOIDCOutput) Azure() AzureOIDCConfigurationPtrOutput {
+	return o.ApplyT(func(v OperationContextOIDC) *AzureOIDCConfiguration { return v.Azure }).(AzureOIDCConfigurationPtrOutput)
+}
+
+// GCP-specific OIDC configuration.
+func (o OperationContextOIDCOutput) Gcp() GCPOIDCConfigurationPtrOutput {
+	return o.ApplyT(func(v OperationContextOIDC) *GCPOIDCConfiguration { return v.Gcp }).(GCPOIDCConfigurationPtrOutput)
+}
+
+type OperationContextOIDCPtrOutput struct{ *pulumi.OutputState }
+
+func (OperationContextOIDCPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**OperationContextOIDC)(nil)).Elem()
+}
+
+func (o OperationContextOIDCPtrOutput) ToOperationContextOIDCPtrOutput() OperationContextOIDCPtrOutput {
+	return o
+}
+
+func (o OperationContextOIDCPtrOutput) ToOperationContextOIDCPtrOutputWithContext(ctx context.Context) OperationContextOIDCPtrOutput {
+	return o
+}
+
+func (o OperationContextOIDCPtrOutput) Elem() OperationContextOIDCOutput {
+	return o.ApplyT(func(v *OperationContextOIDC) OperationContextOIDC {
+		if v != nil {
+			return *v
+		}
+		var ret OperationContextOIDC
+		return ret
+	}).(OperationContextOIDCOutput)
+}
+
+// AWS-specific OIDC configuration.
+func (o OperationContextOIDCPtrOutput) Aws() AWSOIDCConfigurationPtrOutput {
+	return o.ApplyT(func(v *OperationContextOIDC) *AWSOIDCConfiguration {
+		if v == nil {
+			return nil
+		}
+		return v.Aws
+	}).(AWSOIDCConfigurationPtrOutput)
+}
+
+// Azure-specific OIDC configuration.
+func (o OperationContextOIDCPtrOutput) Azure() AzureOIDCConfigurationPtrOutput {
+	return o.ApplyT(func(v *OperationContextOIDC) *AzureOIDCConfiguration {
+		if v == nil {
+			return nil
+		}
+		return v.Azure
+	}).(AzureOIDCConfigurationPtrOutput)
+}
+
+// GCP-specific OIDC configuration.
+func (o OperationContextOIDCPtrOutput) Gcp() GCPOIDCConfigurationPtrOutput {
+	return o.ApplyT(func(v *OperationContextOIDC) *GCPOIDCConfiguration {
+		if v == nil {
+			return nil
+		}
+		return v.Gcp
+	}).(GCPOIDCConfigurationPtrOutput)
+}
+
+type OperationContextOptions struct {
+	// The shell to use to run commands during the deployment. Defaults to 'bash'.
+	Shell *string `pulumi:"shell"`
+	// Skip the default dependency installation step - use this to customize the dependency installation (e.g. if using yarn or poetry)
+	SkipInstallDependencies *bool `pulumi:"skipInstallDependencies"`
+}
+
+// OperationContextOptionsInput is an input type that accepts OperationContextOptionsArgs and OperationContextOptionsOutput values.
+// You can construct a concrete instance of `OperationContextOptionsInput` via:
+//
+//	OperationContextOptionsArgs{...}
+type OperationContextOptionsInput interface {
+	pulumi.Input
+
+	ToOperationContextOptionsOutput() OperationContextOptionsOutput
+	ToOperationContextOptionsOutputWithContext(context.Context) OperationContextOptionsOutput
+}
+
+type OperationContextOptionsArgs struct {
+	// The shell to use to run commands during the deployment. Defaults to 'bash'.
+	Shell pulumi.StringPtrInput `pulumi:"shell"`
+	// Skip the default dependency installation step - use this to customize the dependency installation (e.g. if using yarn or poetry)
+	SkipInstallDependencies pulumi.BoolPtrInput `pulumi:"skipInstallDependencies"`
+}
+
+func (OperationContextOptionsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*OperationContextOptions)(nil)).Elem()
+}
+
+func (i OperationContextOptionsArgs) ToOperationContextOptionsOutput() OperationContextOptionsOutput {
+	return i.ToOperationContextOptionsOutputWithContext(context.Background())
+}
+
+func (i OperationContextOptionsArgs) ToOperationContextOptionsOutputWithContext(ctx context.Context) OperationContextOptionsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(OperationContextOptionsOutput)
+}
+
+func (i OperationContextOptionsArgs) ToOperationContextOptionsPtrOutput() OperationContextOptionsPtrOutput {
+	return i.ToOperationContextOptionsPtrOutputWithContext(context.Background())
+}
+
+func (i OperationContextOptionsArgs) ToOperationContextOptionsPtrOutputWithContext(ctx context.Context) OperationContextOptionsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(OperationContextOptionsOutput).ToOperationContextOptionsPtrOutputWithContext(ctx)
+}
+
+// OperationContextOptionsPtrInput is an input type that accepts OperationContextOptionsArgs, OperationContextOptionsPtr and OperationContextOptionsPtrOutput values.
+// You can construct a concrete instance of `OperationContextOptionsPtrInput` via:
+//
+//	        OperationContextOptionsArgs{...}
+//
+//	or:
+//
+//	        nil
+type OperationContextOptionsPtrInput interface {
+	pulumi.Input
+
+	ToOperationContextOptionsPtrOutput() OperationContextOptionsPtrOutput
+	ToOperationContextOptionsPtrOutputWithContext(context.Context) OperationContextOptionsPtrOutput
+}
+
+type operationContextOptionsPtrType OperationContextOptionsArgs
+
+func OperationContextOptionsPtr(v *OperationContextOptionsArgs) OperationContextOptionsPtrInput {
+	return (*operationContextOptionsPtrType)(v)
+}
+
+func (*operationContextOptionsPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**OperationContextOptions)(nil)).Elem()
+}
+
+func (i *operationContextOptionsPtrType) ToOperationContextOptionsPtrOutput() OperationContextOptionsPtrOutput {
+	return i.ToOperationContextOptionsPtrOutputWithContext(context.Background())
+}
+
+func (i *operationContextOptionsPtrType) ToOperationContextOptionsPtrOutputWithContext(ctx context.Context) OperationContextOptionsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(OperationContextOptionsPtrOutput)
+}
+
+type OperationContextOptionsOutput struct{ *pulumi.OutputState }
+
+func (OperationContextOptionsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*OperationContextOptions)(nil)).Elem()
+}
+
+func (o OperationContextOptionsOutput) ToOperationContextOptionsOutput() OperationContextOptionsOutput {
+	return o
+}
+
+func (o OperationContextOptionsOutput) ToOperationContextOptionsOutputWithContext(ctx context.Context) OperationContextOptionsOutput {
+	return o
+}
+
+func (o OperationContextOptionsOutput) ToOperationContextOptionsPtrOutput() OperationContextOptionsPtrOutput {
+	return o.ToOperationContextOptionsPtrOutputWithContext(context.Background())
+}
+
+func (o OperationContextOptionsOutput) ToOperationContextOptionsPtrOutputWithContext(ctx context.Context) OperationContextOptionsPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v OperationContextOptions) *OperationContextOptions {
+		return &v
+	}).(OperationContextOptionsPtrOutput)
+}
+
+// The shell to use to run commands during the deployment. Defaults to 'bash'.
+func (o OperationContextOptionsOutput) Shell() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v OperationContextOptions) *string { return v.Shell }).(pulumi.StringPtrOutput)
+}
+
+// Skip the default dependency installation step - use this to customize the dependency installation (e.g. if using yarn or poetry)
+func (o OperationContextOptionsOutput) SkipInstallDependencies() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v OperationContextOptions) *bool { return v.SkipInstallDependencies }).(pulumi.BoolPtrOutput)
+}
+
+type OperationContextOptionsPtrOutput struct{ *pulumi.OutputState }
+
+func (OperationContextOptionsPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**OperationContextOptions)(nil)).Elem()
+}
+
+func (o OperationContextOptionsPtrOutput) ToOperationContextOptionsPtrOutput() OperationContextOptionsPtrOutput {
+	return o
+}
+
+func (o OperationContextOptionsPtrOutput) ToOperationContextOptionsPtrOutputWithContext(ctx context.Context) OperationContextOptionsPtrOutput {
+	return o
+}
+
+func (o OperationContextOptionsPtrOutput) Elem() OperationContextOptionsOutput {
+	return o.ApplyT(func(v *OperationContextOptions) OperationContextOptions {
+		if v != nil {
+			return *v
+		}
+		var ret OperationContextOptions
+		return ret
+	}).(OperationContextOptionsOutput)
+}
+
+// The shell to use to run commands during the deployment. Defaults to 'bash'.
+func (o OperationContextOptionsPtrOutput) Shell() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *OperationContextOptions) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Shell
+	}).(pulumi.StringPtrOutput)
+}
+
+// Skip the default dependency installation step - use this to customize the dependency installation (e.g. if using yarn or poetry)
+func (o OperationContextOptionsPtrOutput) SkipInstallDependencies() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *OperationContextOptions) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.SkipInstallDependencies
+	}).(pulumi.BoolPtrOutput)
+}
+
 func init() {
+	pulumi.RegisterInputType(reflect.TypeOf((*AWSOIDCConfigurationInput)(nil)).Elem(), AWSOIDCConfigurationArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*AWSOIDCConfigurationPtrInput)(nil)).Elem(), AWSOIDCConfigurationArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*AzureOIDCConfigurationInput)(nil)).Elem(), AzureOIDCConfigurationArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*AzureOIDCConfigurationPtrInput)(nil)).Elem(), AzureOIDCConfigurationArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsExecutorContextInput)(nil)).Elem(), DeploymentSettingsExecutorContextArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsExecutorContextPtrInput)(nil)).Elem(), DeploymentSettingsExecutorContextArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsGitAuthBasicAuthInput)(nil)).Elem(), DeploymentSettingsGitAuthBasicAuthArgs{})
@@ -1261,6 +2399,16 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsOperationContextPtrInput)(nil)).Elem(), DeploymentSettingsOperationContextArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsSourceContextInput)(nil)).Elem(), DeploymentSettingsSourceContextArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsSourceContextPtrInput)(nil)).Elem(), DeploymentSettingsSourceContextArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*GCPOIDCConfigurationInput)(nil)).Elem(), GCPOIDCConfigurationArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*GCPOIDCConfigurationPtrInput)(nil)).Elem(), GCPOIDCConfigurationArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*OperationContextOIDCInput)(nil)).Elem(), OperationContextOIDCArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*OperationContextOIDCPtrInput)(nil)).Elem(), OperationContextOIDCArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*OperationContextOptionsInput)(nil)).Elem(), OperationContextOptionsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*OperationContextOptionsPtrInput)(nil)).Elem(), OperationContextOptionsArgs{})
+	pulumi.RegisterOutputType(AWSOIDCConfigurationOutput{})
+	pulumi.RegisterOutputType(AWSOIDCConfigurationPtrOutput{})
+	pulumi.RegisterOutputType(AzureOIDCConfigurationOutput{})
+	pulumi.RegisterOutputType(AzureOIDCConfigurationPtrOutput{})
 	pulumi.RegisterOutputType(DeploymentSettingsExecutorContextOutput{})
 	pulumi.RegisterOutputType(DeploymentSettingsExecutorContextPtrOutput{})
 	pulumi.RegisterOutputType(DeploymentSettingsGitAuthBasicAuthOutput{})
@@ -1277,4 +2425,10 @@ func init() {
 	pulumi.RegisterOutputType(DeploymentSettingsOperationContextPtrOutput{})
 	pulumi.RegisterOutputType(DeploymentSettingsSourceContextOutput{})
 	pulumi.RegisterOutputType(DeploymentSettingsSourceContextPtrOutput{})
+	pulumi.RegisterOutputType(GCPOIDCConfigurationOutput{})
+	pulumi.RegisterOutputType(GCPOIDCConfigurationPtrOutput{})
+	pulumi.RegisterOutputType(OperationContextOIDCOutput{})
+	pulumi.RegisterOutputType(OperationContextOIDCPtrOutput{})
+	pulumi.RegisterOutputType(OperationContextOptionsOutput{})
+	pulumi.RegisterOutputType(OperationContextOptionsPtrOutput{})
 }

@@ -87,8 +87,8 @@ namespace Pulumi.PulumiService
         /// <summary>
         /// GitHub settings for the deployment.
         /// </summary>
-        [Input("gitHub")]
-        public Input<Inputs.DeploymentSettingsGithubArgs>? GitHub { get; set; }
+        [Input("github")]
+        public Input<Inputs.DeploymentSettingsGithubArgs>? Github { get; set; }
 
         /// <summary>
         /// Settings related to the Pulumi operation environment during the deployment.

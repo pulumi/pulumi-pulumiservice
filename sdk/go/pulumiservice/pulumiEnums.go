@@ -3,6 +3,183 @@
 
 package pulumiservice
 
+import (
+	"context"
+	"reflect"
+
+	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
+)
+
+type PulumiOperation string
+
+const (
+	// Pulumi `up` operation
+	PulumiOperationUpdate = PulumiOperation("update")
+	// Pulumi `preview` operation
+	PulumiOperationPreview = PulumiOperation("preview")
+	// Pulumi `destroy` operation
+	PulumiOperationDestroy = PulumiOperation("destroy")
+	// Pulumi `refresh` operation
+	PulumiOperationRefresh = PulumiOperation("refresh")
+)
+
+func (PulumiOperation) ElementType() reflect.Type {
+	return reflect.TypeOf((*PulumiOperation)(nil)).Elem()
+}
+
+func (e PulumiOperation) ToPulumiOperationOutput() PulumiOperationOutput {
+	return pulumi.ToOutput(e).(PulumiOperationOutput)
+}
+
+func (e PulumiOperation) ToPulumiOperationOutputWithContext(ctx context.Context) PulumiOperationOutput {
+	return pulumi.ToOutputWithContext(ctx, e).(PulumiOperationOutput)
+}
+
+func (e PulumiOperation) ToPulumiOperationPtrOutput() PulumiOperationPtrOutput {
+	return e.ToPulumiOperationPtrOutputWithContext(context.Background())
+}
+
+func (e PulumiOperation) ToPulumiOperationPtrOutputWithContext(ctx context.Context) PulumiOperationPtrOutput {
+	return PulumiOperation(e).ToPulumiOperationOutputWithContext(ctx).ToPulumiOperationPtrOutputWithContext(ctx)
+}
+
+func (e PulumiOperation) ToStringOutput() pulumi.StringOutput {
+	return pulumi.ToOutput(pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e PulumiOperation) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return pulumi.ToOutputWithContext(ctx, pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e PulumiOperation) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringPtrOutputWithContext(context.Background())
+}
+
+func (e PulumiOperation) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringOutputWithContext(ctx).ToStringPtrOutputWithContext(ctx)
+}
+
+type PulumiOperationOutput struct{ *pulumi.OutputState }
+
+func (PulumiOperationOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*PulumiOperation)(nil)).Elem()
+}
+
+func (o PulumiOperationOutput) ToPulumiOperationOutput() PulumiOperationOutput {
+	return o
+}
+
+func (o PulumiOperationOutput) ToPulumiOperationOutputWithContext(ctx context.Context) PulumiOperationOutput {
+	return o
+}
+
+func (o PulumiOperationOutput) ToPulumiOperationPtrOutput() PulumiOperationPtrOutput {
+	return o.ToPulumiOperationPtrOutputWithContext(context.Background())
+}
+
+func (o PulumiOperationOutput) ToPulumiOperationPtrOutputWithContext(ctx context.Context) PulumiOperationPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v PulumiOperation) *PulumiOperation {
+		return &v
+	}).(PulumiOperationPtrOutput)
+}
+
+func (o PulumiOperationOutput) ToStringOutput() pulumi.StringOutput {
+	return o.ToStringOutputWithContext(context.Background())
+}
+
+func (o PulumiOperationOutput) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e PulumiOperation) string {
+		return string(e)
+	}).(pulumi.StringOutput)
+}
+
+func (o PulumiOperationOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o PulumiOperationOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e PulumiOperation) *string {
+		v := string(e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+type PulumiOperationPtrOutput struct{ *pulumi.OutputState }
+
+func (PulumiOperationPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**PulumiOperation)(nil)).Elem()
+}
+
+func (o PulumiOperationPtrOutput) ToPulumiOperationPtrOutput() PulumiOperationPtrOutput {
+	return o
+}
+
+func (o PulumiOperationPtrOutput) ToPulumiOperationPtrOutputWithContext(ctx context.Context) PulumiOperationPtrOutput {
+	return o
+}
+
+func (o PulumiOperationPtrOutput) Elem() PulumiOperationOutput {
+	return o.ApplyT(func(v *PulumiOperation) PulumiOperation {
+		if v != nil {
+			return *v
+		}
+		var ret PulumiOperation
+		return ret
+	}).(PulumiOperationOutput)
+}
+
+func (o PulumiOperationPtrOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o PulumiOperationPtrOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e *PulumiOperation) *string {
+		if e == nil {
+			return nil
+		}
+		v := string(*e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+// PulumiOperationInput is an input type that accepts PulumiOperationArgs and PulumiOperationOutput values.
+// You can construct a concrete instance of `PulumiOperationInput` via:
+//
+//	PulumiOperationArgs{...}
+type PulumiOperationInput interface {
+	pulumi.Input
+
+	ToPulumiOperationOutput() PulumiOperationOutput
+	ToPulumiOperationOutputWithContext(context.Context) PulumiOperationOutput
+}
+
+var pulumiOperationPtrType = reflect.TypeOf((**PulumiOperation)(nil)).Elem()
+
+type PulumiOperationPtrInput interface {
+	pulumi.Input
+
+	ToPulumiOperationPtrOutput() PulumiOperationPtrOutput
+	ToPulumiOperationPtrOutputWithContext(context.Context) PulumiOperationPtrOutput
+}
+
+type pulumiOperationPtr string
+
+func PulumiOperationPtr(v string) PulumiOperationPtrInput {
+	return (*pulumiOperationPtr)(&v)
+}
+
+func (*pulumiOperationPtr) ElementType() reflect.Type {
+	return pulumiOperationPtrType
+}
+
+func (in *pulumiOperationPtr) ToPulumiOperationPtrOutput() PulumiOperationPtrOutput {
+	return pulumi.ToOutput(in).(PulumiOperationPtrOutput)
+}
+
+func (in *pulumiOperationPtr) ToPulumiOperationPtrOutputWithContext(ctx context.Context) PulumiOperationPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, in).(PulumiOperationPtrOutput)
+}
+
 type TeamStackPermissionScope float64
 
 const (
@@ -15,4 +192,8 @@ const (
 )
 
 func init() {
+	pulumi.RegisterInputType(reflect.TypeOf((*PulumiOperationInput)(nil)).Elem(), PulumiOperation("update"))
+	pulumi.RegisterInputType(reflect.TypeOf((*PulumiOperationPtrInput)(nil)).Elem(), PulumiOperation("update"))
+	pulumi.RegisterOutputType(PulumiOperationOutput{})
+	pulumi.RegisterOutputType(PulumiOperationPtrOutput{})
 }

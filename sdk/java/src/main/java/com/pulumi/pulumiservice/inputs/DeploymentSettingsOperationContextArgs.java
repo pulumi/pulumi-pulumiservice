@@ -3,7 +3,17 @@
 
 package com.pulumi.pulumiservice.inputs;
 
-
+import com.pulumi.core.Output;
+import com.pulumi.core.annotations.Import;
+import com.pulumi.pulumiservice.enums.PulumiOperation;
+import com.pulumi.pulumiservice.inputs.OperationContextOIDCArgs;
+import com.pulumi.pulumiservice.inputs.OperationContextOptionsArgs;
+import java.lang.String;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import javax.annotation.Nullable;
 
 
 /**
@@ -14,8 +24,96 @@ public final class DeploymentSettingsOperationContextArgs extends com.pulumi.res
 
     public static final DeploymentSettingsOperationContextArgs Empty = new DeploymentSettingsOperationContextArgs();
 
+    /**
+     * Environment variables to set for the deployment.
+     * 
+     */
+    @Import(name="environmentVariables")
+    private @Nullable Output<Map<String,String>> environmentVariables;
+
+    /**
+     * @return Environment variables to set for the deployment.
+     * 
+     */
+    public Optional<Output<Map<String,String>>> environmentVariables() {
+        return Optional.ofNullable(this.environmentVariables);
+    }
+
+    /**
+     * OIDC configuration to use during the deployment.
+     * 
+     */
+    @Import(name="oidc")
+    private @Nullable Output<OperationContextOIDCArgs> oidc;
+
+    /**
+     * @return OIDC configuration to use during the deployment.
+     * 
+     */
+    public Optional<Output<OperationContextOIDCArgs>> oidc() {
+        return Optional.ofNullable(this.oidc);
+    }
+
+    /**
+     * The Pulumi operation to run during the deployment.
+     * 
+     */
+    @Import(name="operation", required=true)
+    private Output<PulumiOperation> operation;
+
+    /**
+     * @return The Pulumi operation to run during the deployment.
+     * 
+     */
+    public Output<PulumiOperation> operation() {
+        return this.operation;
+    }
+
+    /**
+     * Options to override default behavior during the deployment.
+     * 
+     */
+    @Import(name="options")
+    private @Nullable Output<OperationContextOptionsArgs> options;
+
+    /**
+     * @return Options to override default behavior during the deployment.
+     * 
+     */
+    public Optional<Output<OperationContextOptionsArgs>> options() {
+        return Optional.ofNullable(this.options);
+    }
+
+    /**
+     * Shell commands to run before the Pulumi operation executes.
+     * 
+     */
+    @Import(name="preRunCommands")
+    private @Nullable Output<List<String>> preRunCommands;
+
+    /**
+     * @return Shell commands to run before the Pulumi operation executes.
+     * 
+     */
+    public Optional<Output<List<String>>> preRunCommands() {
+        return Optional.ofNullable(this.preRunCommands);
+    }
+
+    private DeploymentSettingsOperationContextArgs() {}
+
+    private DeploymentSettingsOperationContextArgs(DeploymentSettingsOperationContextArgs $) {
+        this.environmentVariables = $.environmentVariables;
+        this.oidc = $.oidc;
+        this.operation = $.operation;
+        this.options = $.options;
+        this.preRunCommands = $.preRunCommands;
+    }
+
     public static Builder builder() {
         return new Builder();
+    }
+    public static Builder builder(DeploymentSettingsOperationContextArgs defaults) {
+        return new Builder(defaults);
     }
 
     public static final class Builder {
@@ -24,7 +122,128 @@ public final class DeploymentSettingsOperationContextArgs extends com.pulumi.res
         public Builder() {
             $ = new DeploymentSettingsOperationContextArgs();
         }
+
+        public Builder(DeploymentSettingsOperationContextArgs defaults) {
+            $ = new DeploymentSettingsOperationContextArgs(Objects.requireNonNull(defaults));
+        }
+
+        /**
+         * @param environmentVariables Environment variables to set for the deployment.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder environmentVariables(@Nullable Output<Map<String,String>> environmentVariables) {
+            $.environmentVariables = environmentVariables;
+            return this;
+        }
+
+        /**
+         * @param environmentVariables Environment variables to set for the deployment.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder environmentVariables(Map<String,String> environmentVariables) {
+            return environmentVariables(Output.of(environmentVariables));
+        }
+
+        /**
+         * @param oidc OIDC configuration to use during the deployment.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder oidc(@Nullable Output<OperationContextOIDCArgs> oidc) {
+            $.oidc = oidc;
+            return this;
+        }
+
+        /**
+         * @param oidc OIDC configuration to use during the deployment.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder oidc(OperationContextOIDCArgs oidc) {
+            return oidc(Output.of(oidc));
+        }
+
+        /**
+         * @param operation The Pulumi operation to run during the deployment.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder operation(Output<PulumiOperation> operation) {
+            $.operation = operation;
+            return this;
+        }
+
+        /**
+         * @param operation The Pulumi operation to run during the deployment.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder operation(PulumiOperation operation) {
+            return operation(Output.of(operation));
+        }
+
+        /**
+         * @param options Options to override default behavior during the deployment.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder options(@Nullable Output<OperationContextOptionsArgs> options) {
+            $.options = options;
+            return this;
+        }
+
+        /**
+         * @param options Options to override default behavior during the deployment.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder options(OperationContextOptionsArgs options) {
+            return options(Output.of(options));
+        }
+
+        /**
+         * @param preRunCommands Shell commands to run before the Pulumi operation executes.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder preRunCommands(@Nullable Output<List<String>> preRunCommands) {
+            $.preRunCommands = preRunCommands;
+            return this;
+        }
+
+        /**
+         * @param preRunCommands Shell commands to run before the Pulumi operation executes.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder preRunCommands(List<String> preRunCommands) {
+            return preRunCommands(Output.of(preRunCommands));
+        }
+
+        /**
+         * @param preRunCommands Shell commands to run before the Pulumi operation executes.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder preRunCommands(String... preRunCommands) {
+            return preRunCommands(List.of(preRunCommands));
+        }
+
         public DeploymentSettingsOperationContextArgs build() {
+            $.operation = Objects.requireNonNull($.operation, "expected parameter 'operation' to be non-null");
             return $;
         }
     }

@@ -2,6 +2,27 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 
+export const PulumiOperation = {
+    /**
+     * Pulumi `up` operation
+     */
+    Update: "update",
+    /**
+     * Pulumi `preview` operation
+     */
+    Preview: "preview",
+    /**
+     * Pulumi `destroy` operation
+     */
+    Destroy: "destroy",
+    /**
+     * Pulumi `refresh` operation
+     */
+    Refresh: "refresh",
+} as const;
+
+export type PulumiOperation = (typeof PulumiOperation)[keyof typeof PulumiOperation];
+
 export const TeamStackPermissionScope = {
     /**
      * Grants read permissions to stack.

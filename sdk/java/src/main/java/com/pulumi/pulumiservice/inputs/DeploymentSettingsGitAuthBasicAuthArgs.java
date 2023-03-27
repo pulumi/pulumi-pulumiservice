@@ -18,14 +18,14 @@ public final class DeploymentSettingsGitAuthBasicAuthArgs extends com.pulumi.res
     public static final DeploymentSettingsGitAuthBasicAuthArgs Empty = new DeploymentSettingsGitAuthBasicAuthArgs();
 
     /**
-     * Password for git basic authentication
+     * Password for git basic authentication.
      * 
      */
     @Import(name="password", required=true)
     private Output<String> password;
 
     /**
-     * @return Password for git basic authentication
+     * @return Password for git basic authentication.
      * 
      */
     public Output<String> password() {
@@ -33,14 +33,14 @@ public final class DeploymentSettingsGitAuthBasicAuthArgs extends com.pulumi.res
     }
 
     /**
-     * User name for git basic authentication
+     * User name for git basic authentication.
      * 
      */
     @Import(name="username", required=true)
     private Output<String> username;
 
     /**
-     * @return User name for git basic authentication
+     * @return User name for git basic authentication.
      * 
      */
     public Output<String> username() {
@@ -73,7 +73,7 @@ public final class DeploymentSettingsGitAuthBasicAuthArgs extends com.pulumi.res
         }
 
         /**
-         * @param password Password for git basic authentication
+         * @param password Password for git basic authentication.
          * 
          * @return builder
          * 
@@ -84,7 +84,7 @@ public final class DeploymentSettingsGitAuthBasicAuthArgs extends com.pulumi.res
         }
 
         /**
-         * @param password Password for git basic authentication
+         * @param password Password for git basic authentication.
          * 
          * @return builder
          * 
@@ -94,7 +94,7 @@ public final class DeploymentSettingsGitAuthBasicAuthArgs extends com.pulumi.res
         }
 
         /**
-         * @param username User name for git basic authentication
+         * @param username User name for git basic authentication.
          * 
          * @return builder
          * 
@@ -105,7 +105,7 @@ public final class DeploymentSettingsGitAuthBasicAuthArgs extends com.pulumi.res
         }
 
         /**
-         * @param username User name for git basic authentication
+         * @param username User name for git basic authentication.
          * 
          * @return builder
          * 

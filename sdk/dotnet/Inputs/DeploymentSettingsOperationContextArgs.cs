@@ -15,6 +15,48 @@ namespace Pulumi.PulumiService.Inputs
     /// </summary>
     public sealed class DeploymentSettingsOperationContextArgs : global::Pulumi.ResourceArgs
     {
+        [Input("environmentVariables")]
+        private InputMap<string>? _environmentVariables;
+
+        /// <summary>
+        /// Environment variables to set for the deployment.
+        /// </summary>
+        public InputMap<string> EnvironmentVariables
+        {
+            get => _environmentVariables ?? (_environmentVariables = new InputMap<string>());
+            set => _environmentVariables = value;
+        }
+
+        /// <summary>
+        /// OIDC configuration to use during the deployment.
+        /// </summary>
+        [Input("oidc")]
+        public Input<Inputs.OperationContextOIDCArgs>? Oidc { get; set; }
+
+        /// <summary>
+        /// The Pulumi operation to run during the deployment.
+        /// </summary>
+        [Input("operation", required: true)]
+        public Input<Pulumi.PulumiService.PulumiOperation> Operation { get; set; } = null!;
+
+        /// <summary>
+        /// Options to override default behavior during the deployment.
+        /// </summary>
+        [Input("options")]
+        public Input<Inputs.OperationContextOptionsArgs>? Options { get; set; }
+
+        [Input("preRunCommands")]
+        private InputList<string>? _preRunCommands;
+
+        /// <summary>
+        /// Shell commands to run before the Pulumi operation executes.
+        /// </summary>
+        public InputList<string> PreRunCommands
+        {
+            get => _preRunCommands ?? (_preRunCommands = new InputList<string>());
+            set => _preRunCommands = value;
+        }
+
         public DeploymentSettingsOperationContextArgs()
         {
         }

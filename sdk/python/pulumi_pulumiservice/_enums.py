@@ -5,8 +5,28 @@
 from enum import Enum
 
 __all__ = [
+    'PulumiOperation',
     'TeamStackPermissionScope',
 ]
+
+
+class PulumiOperation(str, Enum):
+    UPDATE = "update"
+    """
+    Pulumi `up` operation
+    """
+    PREVIEW = "preview"
+    """
+    Pulumi `preview` operation
+    """
+    DESTROY = "destroy"
+    """
+    Pulumi `destroy` operation
+    """
+    REFRESH = "refresh"
+    """
+    Pulumi `refresh` operation
+    """
 
 
 class TeamStackPermissionScope(float, Enum):

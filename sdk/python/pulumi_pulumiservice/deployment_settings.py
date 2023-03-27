@@ -8,6 +8,7 @@ import pulumi
 import pulumi.runtime
 from typing import Any, Mapping, Optional, Sequence, Union, overload
 from . import _utilities
+from ._enums import *
 from ._inputs import *
 
 __all__ = ['DeploymentSettingsArgs', 'DeploymentSettings']
@@ -16,7 +17,7 @@ __all__ = ['DeploymentSettingsArgs', 'DeploymentSettings']
 class DeploymentSettingsArgs:
     def __init__(__self__, *,
                  executor_context: Optional[pulumi.Input['DeploymentSettingsExecutorContextArgs']] = None,
-                 git_hub: Optional[pulumi.Input['DeploymentSettingsGithubArgs']] = None,
+                 github: Optional[pulumi.Input['DeploymentSettingsGithubArgs']] = None,
                  operation_context: Optional[pulumi.Input['DeploymentSettingsOperationContextArgs']] = None,
                  organization: Optional[pulumi.Input[str]] = None,
                  project: Optional[pulumi.Input[str]] = None,
@@ -25,7 +26,7 @@ class DeploymentSettingsArgs:
         """
         The set of arguments for constructing a DeploymentSettings resource.
         :param pulumi.Input['DeploymentSettingsExecutorContextArgs'] executor_context: Settings related to the deployment executor.
-        :param pulumi.Input['DeploymentSettingsGithubArgs'] git_hub: GitHub settings for the deployment.
+        :param pulumi.Input['DeploymentSettingsGithubArgs'] github: GitHub settings for the deployment.
         :param pulumi.Input['DeploymentSettingsOperationContextArgs'] operation_context: Settings related to the Pulumi operation environment during the deployment.
         :param pulumi.Input[str] organization: Organization name.
         :param pulumi.Input[str] project: Project name.
@@ -34,8 +35,8 @@ class DeploymentSettingsArgs:
         """
         if executor_context is not None:
             pulumi.set(__self__, "executor_context", executor_context)
-        if git_hub is not None:
-            pulumi.set(__self__, "git_hub", git_hub)
+        if github is not None:
+            pulumi.set(__self__, "github", github)
         if operation_context is not None:
             pulumi.set(__self__, "operation_context", operation_context)
         if organization is not None:
@@ -60,16 +61,16 @@ class DeploymentSettingsArgs:
         pulumi.set(self, "executor_context", value)
 
     @property
-    @pulumi.getter(name="gitHub")
-    def git_hub(self) -> Optional[pulumi.Input['DeploymentSettingsGithubArgs']]:
+    @pulumi.getter
+    def github(self) -> Optional[pulumi.Input['DeploymentSettingsGithubArgs']]:
         """
         GitHub settings for the deployment.
         """
-        return pulumi.get(self, "git_hub")
+        return pulumi.get(self, "github")
 
-    @git_hub.setter
-    def git_hub(self, value: Optional[pulumi.Input['DeploymentSettingsGithubArgs']]):
-        pulumi.set(self, "git_hub", value)
+    @github.setter
+    def github(self, value: Optional[pulumi.Input['DeploymentSettingsGithubArgs']]):
+        pulumi.set(self, "github", value)
 
     @property
     @pulumi.getter(name="operationContext")
@@ -138,7 +139,7 @@ class DeploymentSettings(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  executor_context: Optional[pulumi.Input[pulumi.InputType['DeploymentSettingsExecutorContextArgs']]] = None,
-                 git_hub: Optional[pulumi.Input[pulumi.InputType['DeploymentSettingsGithubArgs']]] = None,
+                 github: Optional[pulumi.Input[pulumi.InputType['DeploymentSettingsGithubArgs']]] = None,
                  operation_context: Optional[pulumi.Input[pulumi.InputType['DeploymentSettingsOperationContextArgs']]] = None,
                  organization: Optional[pulumi.Input[str]] = None,
                  project: Optional[pulumi.Input[str]] = None,
@@ -151,7 +152,7 @@ class DeploymentSettings(pulumi.CustomResource):
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[pulumi.InputType['DeploymentSettingsExecutorContextArgs']] executor_context: Settings related to the deployment executor.
-        :param pulumi.Input[pulumi.InputType['DeploymentSettingsGithubArgs']] git_hub: GitHub settings for the deployment.
+        :param pulumi.Input[pulumi.InputType['DeploymentSettingsGithubArgs']] github: GitHub settings for the deployment.
         :param pulumi.Input[pulumi.InputType['DeploymentSettingsOperationContextArgs']] operation_context: Settings related to the Pulumi operation environment during the deployment.
         :param pulumi.Input[str] organization: Organization name.
         :param pulumi.Input[str] project: Project name.
@@ -183,7 +184,7 @@ class DeploymentSettings(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  executor_context: Optional[pulumi.Input[pulumi.InputType['DeploymentSettingsExecutorContextArgs']]] = None,
-                 git_hub: Optional[pulumi.Input[pulumi.InputType['DeploymentSettingsGithubArgs']]] = None,
+                 github: Optional[pulumi.Input[pulumi.InputType['DeploymentSettingsGithubArgs']]] = None,
                  operation_context: Optional[pulumi.Input[pulumi.InputType['DeploymentSettingsOperationContextArgs']]] = None,
                  organization: Optional[pulumi.Input[str]] = None,
                  project: Optional[pulumi.Input[str]] = None,
@@ -199,7 +200,7 @@ class DeploymentSettings(pulumi.CustomResource):
             __props__ = DeploymentSettingsArgs.__new__(DeploymentSettingsArgs)
 
             __props__.__dict__["executor_context"] = executor_context
-            __props__.__dict__["git_hub"] = git_hub
+            __props__.__dict__["github"] = github
             __props__.__dict__["operation_context"] = operation_context
             __props__.__dict__["organization"] = organization
             __props__.__dict__["project"] = project

@@ -6,6 +6,42 @@ import * as inputs from "../types/input";
 import * as outputs from "../types/output";
 import * as enums from "../types/enums";
 
+import * as utilities from "../utilities";
+
+export interface AWSOIDCConfigurationArgs {
+    /**
+     * Duration of the assume-role session
+     */
+    duration?: pulumi.Input<number>;
+    /**
+     * Optional set of IAM policy ARNs that further restrict the assume-role session
+     */
+    policyARNs?: pulumi.Input<pulumi.Input<string>[]>;
+    /**
+     * The ARN of the role to assume using the OIDC token.
+     */
+    roleARN: pulumi.Input<string>;
+    /**
+     * The name of the assume-role session.
+     */
+    sessionName?: pulumi.Input<string>;
+}
+
+export interface AzureOIDCConfigurationArgs {
+    /**
+     * The client ID of the federated workload identity.
+     */
+    clientId?: pulumi.Input<string>;
+    /**
+     * The subscription ID of the federated workload identity.
+     */
+    subscriptionID?: pulumi.Input<string>;
+    /**
+     * The tenant ID of the federated workload identity.
+     */
+    tenantId?: pulumi.Input<string>;
+}
+
 /**
  * The executor context defines information about the executor where the deployment is executed. If unspecified, the default 'pulumi/pulumi' image is used.
  */
@@ -21,11 +57,11 @@ export interface DeploymentSettingsExecutorContextArgs {
  */
 export interface DeploymentSettingsGitAuthBasicAuthArgs {
     /**
-     * Password for git basic authentication
+     * Password for git basic authentication.
      */
     password: pulumi.Input<string>;
     /**
-     * User name for git basic authentication
+     * User name for git basic authentication.
      */
     username: pulumi.Input<string>;
 }
@@ -35,11 +71,11 @@ export interface DeploymentSettingsGitAuthBasicAuthArgs {
  */
 export interface DeploymentSettingsGitAuthSSHAuthArgs {
     /**
-     * Optional password for SSH authentication
+     * Optional password for SSH authentication.
      */
     password?: pulumi.Input<string>;
     /**
-     * SSH private key
+     * SSH private key.
      */
     sshPrivateKey: pulumi.Input<string>;
 }
@@ -92,12 +128,58 @@ export interface DeploymentSettingsGitSourceGitAuthArgs {
  * GitHub settings for the deployment.
  */
 export interface DeploymentSettingsGithubArgs {
+    /**
+     * Trigger a deployment running `pulumi up` on commit.
+     */
+    deployCommits?: pulumi.Input<boolean>;
+    /**
+     * The paths within the repo that deployments should be filtered to.
+     */
+    paths?: pulumi.Input<pulumi.Input<string>[]>;
+    /**
+     * Trigger a deployment running `pulumi preview` when a PR is opened.
+     */
+    previewPullRequests?: pulumi.Input<boolean>;
+    /**
+     * The GitHub repository in the format org/repo.
+     */
+    repository?: pulumi.Input<string>;
+}
+/**
+ * deploymentSettingsGithubArgsProvideDefaults sets the appropriate defaults for DeploymentSettingsGithubArgs
+ */
+export function deploymentSettingsGithubArgsProvideDefaults(val: DeploymentSettingsGithubArgs): DeploymentSettingsGithubArgs {
+    return {
+        ...val,
+        deployCommits: (val.deployCommits) ?? true,
+        previewPullRequests: (val.previewPullRequests) ?? true,
+    };
 }
 
 /**
  * Settings related to the Pulumi operation environment during the deployment.
  */
 export interface DeploymentSettingsOperationContextArgs {
+    /**
+     * Environment variables to set for the deployment.
+     */
+    environmentVariables?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
+    /**
+     * OIDC configuration to use during the deployment.
+     */
+    oidc?: pulumi.Input<inputs.OperationContextOIDCArgs>;
+    /**
+     * The Pulumi operation to run during the deployment.
+     */
+    operation: pulumi.Input<enums.PulumiOperation>;
+    /**
+     * Options to override default behavior during the deployment.
+     */
+    options?: pulumi.Input<inputs.OperationContextOptionsArgs>;
+    /**
+     * Shell commands to run before the Pulumi operation executes.
+     */
+    preRunCommands?: pulumi.Input<pulumi.Input<string>[]>;
 }
 
 /**
@@ -108,4 +190,57 @@ export interface DeploymentSettingsSourceContextArgs {
      * Git source settings for a deployment.
      */
     git?: pulumi.Input<inputs.DeploymentSettingsGitSourceArgs>;
+}
+
+export interface GCPOIDCConfigurationArgs {
+    /**
+     * The numerical ID of the GCP project.
+     */
+    projectId?: pulumi.Input<string>;
+    /**
+     * The ID of the identity provider associated with the workload pool.
+     */
+    providerId?: pulumi.Input<string>;
+    /**
+     * The region of the GCP project.
+     */
+    region?: pulumi.Input<string>;
+    /**
+     * The email address of the service account to use.
+     */
+    serviceAccount?: pulumi.Input<string>;
+    /**
+     * The lifetime of the temporary credentials.
+     */
+    tokenLifetime?: pulumi.Input<number>;
+    /**
+     * The ID of the workload pool to use.
+     */
+    workloadPoolId?: pulumi.Input<string>;
+}
+
+export interface OperationContextOIDCArgs {
+    /**
+     * AWS-specific OIDC configuration.
+     */
+    aws?: pulumi.Input<inputs.AWSOIDCConfigurationArgs>;
+    /**
+     * Azure-specific OIDC configuration.
+     */
+    azure?: pulumi.Input<inputs.AzureOIDCConfigurationArgs>;
+    /**
+     * GCP-specific OIDC configuration.
+     */
+    gcp?: pulumi.Input<inputs.GCPOIDCConfigurationArgs>;
+}
+
+export interface OperationContextOptionsArgs {
+    /**
+     * The shell to use to run commands during the deployment. Defaults to 'bash'.
+     */
+    shell?: pulumi.Input<string>;
+    /**
+     * Skip the default dependency installation step - use this to customize the dependency installation (e.g. if using yarn or poetry)
+     */
+    skipInstallDependencies?: pulumi.Input<boolean>;
 }

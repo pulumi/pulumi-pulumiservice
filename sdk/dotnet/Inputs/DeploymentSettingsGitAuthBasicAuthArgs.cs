@@ -19,7 +19,7 @@ namespace Pulumi.PulumiService.Inputs
         private Input<string>? _password;
 
         /// <summary>
-        /// Password for git basic authentication
+        /// Password for git basic authentication.
         /// </summary>
         public Input<string>? Password
         {
@@ -35,7 +35,7 @@ namespace Pulumi.PulumiService.Inputs
         private Input<string>? _username;
 
         /// <summary>
-        /// User name for git basic authentication
+        /// User name for git basic authentication.
         /// </summary>
         public Input<string>? Username
         {

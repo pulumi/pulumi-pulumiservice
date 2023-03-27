@@ -62,7 +62,7 @@ export class DeploymentSettings extends pulumi.CustomResource {
         opts = opts || {};
         if (!opts.id) {
             resourceInputs["executorContext"] = args ? args.executorContext : undefined;
-            resourceInputs["gitHub"] = args ? args.gitHub : undefined;
+            resourceInputs["github"] = args ? (args.github ? pulumi.output(args.github).apply(inputs.deploymentSettingsGithubArgsProvideDefaults) : undefined) : undefined;
             resourceInputs["operationContext"] = args ? args.operationContext : undefined;
             resourceInputs["organization"] = args ? args.organization : undefined;
             resourceInputs["project"] = args ? args.project : undefined;
@@ -89,7 +89,7 @@ export interface DeploymentSettingsArgs {
     /**
      * GitHub settings for the deployment.
      */
-    gitHub?: pulumi.Input<inputs.DeploymentSettingsGithubArgs>;
+    github?: pulumi.Input<inputs.DeploymentSettingsGithubArgs>;
     /**
      * Settings related to the Pulumi operation environment during the deployment.
      */

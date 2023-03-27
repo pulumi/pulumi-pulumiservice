@@ -15,8 +15,40 @@ namespace Pulumi.PulumiService.Inputs
     /// </summary>
     public sealed class DeploymentSettingsGithubArgs : global::Pulumi.ResourceArgs
     {
+        /// <summary>
+        /// Trigger a deployment running `pulumi up` on commit.
+        /// </summary>
+        [Input("deployCommits")]
+        public Input<bool>? DeployCommits { get; set; }
+
+        [Input("paths")]
+        private InputList<string>? _paths;
+
+        /// <summary>
+        /// The paths within the repo that deployments should be filtered to.
+        /// </summary>
+        public InputList<string> Paths
+        {
+            get => _paths ?? (_paths = new InputList<string>());
+            set => _paths = value;
+        }
+
+        /// <summary>
+        /// Trigger a deployment running `pulumi preview` when a PR is opened.
+        /// </summary>
+        [Input("previewPullRequests")]
+        public Input<bool>? PreviewPullRequests { get; set; }
+
+        /// <summary>
+        /// The GitHub repository in the format org/repo.
+        /// </summary>
+        [Input("repository")]
+        public Input<string>? Repository { get; set; }
+
         public DeploymentSettingsGithubArgs()
         {
+            DeployCommits = true;
+            PreviewPullRequests = true;
         }
         public static new DeploymentSettingsGithubArgs Empty => new DeploymentSettingsGithubArgs();
     }

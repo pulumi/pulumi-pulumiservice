@@ -38,15 +38,15 @@ public final class DeploymentSettingsArgs extends com.pulumi.resources.ResourceA
      * GitHub settings for the deployment.
      * 
      */
-    @Import(name="gitHub")
-    private @Nullable Output<DeploymentSettingsGithubArgs> gitHub;
+    @Import(name="github")
+    private @Nullable Output<DeploymentSettingsGithubArgs> github;
 
     /**
      * @return GitHub settings for the deployment.
      * 
      */
-    public Optional<Output<DeploymentSettingsGithubArgs>> gitHub() {
-        return Optional.ofNullable(this.gitHub);
+    public Optional<Output<DeploymentSettingsGithubArgs>> github() {
+        return Optional.ofNullable(this.github);
     }
 
     /**
@@ -128,7 +128,7 @@ public final class DeploymentSettingsArgs extends com.pulumi.resources.ResourceA
 
     private DeploymentSettingsArgs(DeploymentSettingsArgs $) {
         this.executorContext = $.executorContext;
-        this.gitHub = $.gitHub;
+        this.github = $.github;
         this.operationContext = $.operationContext;
         this.organization = $.organization;
         this.project = $.project;
@@ -176,24 +176,24 @@ public final class DeploymentSettingsArgs extends com.pulumi.resources.ResourceA
         }
 
         /**
-         * @param gitHub GitHub settings for the deployment.
+         * @param github GitHub settings for the deployment.
          * 
          * @return builder
          * 
          */
-        public Builder gitHub(@Nullable Output<DeploymentSettingsGithubArgs> gitHub) {
-            $.gitHub = gitHub;
+        public Builder github(@Nullable Output<DeploymentSettingsGithubArgs> github) {
+            $.github = github;
             return this;
         }
 
         /**
-         * @param gitHub GitHub settings for the deployment.
+         * @param github GitHub settings for the deployment.
          * 
          * @return builder
          * 
          */
-        public Builder gitHub(DeploymentSettingsGithubArgs gitHub) {
-            return gitHub(Output.of(gitHub));
+        public Builder github(DeploymentSettingsGithubArgs github) {
+            return github(Output.of(github));
         }
 
         /**

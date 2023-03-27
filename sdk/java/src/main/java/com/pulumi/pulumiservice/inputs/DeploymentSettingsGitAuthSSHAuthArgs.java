@@ -20,14 +20,14 @@ public final class DeploymentSettingsGitAuthSSHAuthArgs extends com.pulumi.resou
     public static final DeploymentSettingsGitAuthSSHAuthArgs Empty = new DeploymentSettingsGitAuthSSHAuthArgs();
 
     /**
-     * Optional password for SSH authentication
+     * Optional password for SSH authentication.
      * 
      */
     @Import(name="password")
     private @Nullable Output<String> password;
 
     /**
-     * @return Optional password for SSH authentication
+     * @return Optional password for SSH authentication.
      * 
      */
     public Optional<Output<String>> password() {
@@ -35,14 +35,14 @@ public final class DeploymentSettingsGitAuthSSHAuthArgs extends com.pulumi.resou
     }
 
     /**
-     * SSH private key
+     * SSH private key.
      * 
      */
     @Import(name="sshPrivateKey", required=true)
     private Output<String> sshPrivateKey;
 
     /**
-     * @return SSH private key
+     * @return SSH private key.
      * 
      */
     public Output<String> sshPrivateKey() {
@@ -75,7 +75,7 @@ public final class DeploymentSettingsGitAuthSSHAuthArgs extends com.pulumi.resou
         }
 
         /**
-         * @param password Optional password for SSH authentication
+         * @param password Optional password for SSH authentication.
          * 
          * @return builder
          * 
@@ -86,7 +86,7 @@ public final class DeploymentSettingsGitAuthSSHAuthArgs extends com.pulumi.resou
         }
 
         /**
-         * @param password Optional password for SSH authentication
+         * @param password Optional password for SSH authentication.
          * 
          * @return builder
          * 
@@ -96,7 +96,7 @@ public final class DeploymentSettingsGitAuthSSHAuthArgs extends com.pulumi.resou
         }
 
         /**
-         * @param sshPrivateKey SSH private key
+         * @param sshPrivateKey SSH private key.
          * 
          * @return builder
          * 
@@ -107,7 +107,7 @@ public final class DeploymentSettingsGitAuthSSHAuthArgs extends com.pulumi.resou
         }
 
         /**
-         * @param sshPrivateKey SSH private key
+         * @param sshPrivateKey SSH private key.
          * 
          * @return builder
          * 

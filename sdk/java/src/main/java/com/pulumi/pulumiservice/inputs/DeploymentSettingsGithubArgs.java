@@ -3,7 +3,15 @@
 
 package com.pulumi.pulumiservice.inputs;
 
-
+import com.pulumi.core.Output;
+import com.pulumi.core.annotations.Import;
+import com.pulumi.core.internal.Codegen;
+import java.lang.Boolean;
+import java.lang.String;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import javax.annotation.Nullable;
 
 
 /**
@@ -14,8 +22,80 @@ public final class DeploymentSettingsGithubArgs extends com.pulumi.resources.Res
 
     public static final DeploymentSettingsGithubArgs Empty = new DeploymentSettingsGithubArgs();
 
+    /**
+     * Trigger a deployment running `pulumi up` on commit.
+     * 
+     */
+    @Import(name="deployCommits")
+    private @Nullable Output<Boolean> deployCommits;
+
+    /**
+     * @return Trigger a deployment running `pulumi up` on commit.
+     * 
+     */
+    public Optional<Output<Boolean>> deployCommits() {
+        return Optional.ofNullable(this.deployCommits);
+    }
+
+    /**
+     * The paths within the repo that deployments should be filtered to.
+     * 
+     */
+    @Import(name="paths")
+    private @Nullable Output<List<String>> paths;
+
+    /**
+     * @return The paths within the repo that deployments should be filtered to.
+     * 
+     */
+    public Optional<Output<List<String>>> paths() {
+        return Optional.ofNullable(this.paths);
+    }
+
+    /**
+     * Trigger a deployment running `pulumi preview` when a PR is opened.
+     * 
+     */
+    @Import(name="previewPullRequests")
+    private @Nullable Output<Boolean> previewPullRequests;
+
+    /**
+     * @return Trigger a deployment running `pulumi preview` when a PR is opened.
+     * 
+     */
+    public Optional<Output<Boolean>> previewPullRequests() {
+        return Optional.ofNullable(this.previewPullRequests);
+    }
+
+    /**
+     * The GitHub repository in the format org/repo.
+     * 
+     */
+    @Import(name="repository")
+    private @Nullable Output<String> repository;
+
+    /**
+     * @return The GitHub repository in the format org/repo.
+     * 
+     */
+    public Optional<Output<String>> repository() {
+        return Optional.ofNullable(this.repository);
+    }
+
+    private DeploymentSettingsGithubArgs() {}
+
+    private DeploymentSettingsGithubArgs(DeploymentSettingsGithubArgs $) {
+        this.deployCommits = $.deployCommits;
+        this.paths = $.paths;
+        this.previewPullRequests = $.previewPullRequests;
+        this.repository = $.repository;
+    }
+
     public static Builder builder() {
         return new Builder();
+    }
+    public static Builder builder(DeploymentSettingsGithubArgs defaults) {
+        return new Builder(defaults);
     }
 
     public static final class Builder {
@@ -24,7 +104,108 @@ public final class DeploymentSettingsGithubArgs extends com.pulumi.resources.Res
         public Builder() {
             $ = new DeploymentSettingsGithubArgs();
         }
+
+        public Builder(DeploymentSettingsGithubArgs defaults) {
+            $ = new DeploymentSettingsGithubArgs(Objects.requireNonNull(defaults));
+        }
+
+        /**
+         * @param deployCommits Trigger a deployment running `pulumi up` on commit.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder deployCommits(@Nullable Output<Boolean> deployCommits) {
+            $.deployCommits = deployCommits;
+            return this;
+        }
+
+        /**
+         * @param deployCommits Trigger a deployment running `pulumi up` on commit.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder deployCommits(Boolean deployCommits) {
+            return deployCommits(Output.of(deployCommits));
+        }
+
+        /**
+         * @param paths The paths within the repo that deployments should be filtered to.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder paths(@Nullable Output<List<String>> paths) {
+            $.paths = paths;
+            return this;
+        }
+
+        /**
+         * @param paths The paths within the repo that deployments should be filtered to.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder paths(List<String> paths) {
+            return paths(Output.of(paths));
+        }
+
+        /**
+         * @param paths The paths within the repo that deployments should be filtered to.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder paths(String... paths) {
+            return paths(List.of(paths));
+        }
+
+        /**
+         * @param previewPullRequests Trigger a deployment running `pulumi preview` when a PR is opened.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder previewPullRequests(@Nullable Output<Boolean> previewPullRequests) {
+            $.previewPullRequests = previewPullRequests;
+            return this;
+        }
+
+        /**
+         * @param previewPullRequests Trigger a deployment running `pulumi preview` when a PR is opened.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder previewPullRequests(Boolean previewPullRequests) {
+            return previewPullRequests(Output.of(previewPullRequests));
+        }
+
+        /**
+         * @param repository The GitHub repository in the format org/repo.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder repository(@Nullable Output<String> repository) {
+            $.repository = repository;
+            return this;
+        }
+
+        /**
+         * @param repository The GitHub repository in the format org/repo.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder repository(String repository) {
+            return repository(Output.of(repository));
+        }
+
         public DeploymentSettingsGithubArgs build() {
+            $.deployCommits = Codegen.booleanProp("deployCommits").output().arg($.deployCommits).def(true).getNullable();
+            $.previewPullRequests = Codegen.booleanProp("previewPullRequests").output().arg($.previewPullRequests).def(true).getNullable();
             return $;
         }
     }

@@ -29,6 +29,9 @@ func NewDeploymentSettings(ctx *pulumi.Context,
 		args = &DeploymentSettingsArgs{}
 	}
 
+	if args.Github != nil {
+		args.Github = args.Github.ToDeploymentSettingsGithubPtrOutput().ApplyT(func(v *DeploymentSettingsGithub) *DeploymentSettingsGithub { return v.Defaults() }).(DeploymentSettingsGithubPtrOutput)
+	}
 	var resource DeploymentSettings
 	err := ctx.RegisterResource("pulumiservice:index:DeploymentSettings", name, args, &resource, opts...)
 	if err != nil {
@@ -64,7 +67,7 @@ type deploymentSettingsArgs struct {
 	// Settings related to the deployment executor.
 	ExecutorContext *DeploymentSettingsExecutorContext `pulumi:"executorContext"`
 	// GitHub settings for the deployment.
-	GitHub *DeploymentSettingsGithub `pulumi:"gitHub"`
+	Github *DeploymentSettingsGithub `pulumi:"github"`
 	// Settings related to the Pulumi operation environment during the deployment.
 	OperationContext *DeploymentSettingsOperationContext `pulumi:"operationContext"`
 	// Organization name.
@@ -82,7 +85,7 @@ type DeploymentSettingsArgs struct {
 	// Settings related to the deployment executor.
 	ExecutorContext DeploymentSettingsExecutorContextPtrInput
 	// GitHub settings for the deployment.
-	GitHub DeploymentSettingsGithubPtrInput
+	Github DeploymentSettingsGithubPtrInput
 	// Settings related to the Pulumi operation environment during the deployment.
 	OperationContext DeploymentSettingsOperationContextPtrInput
 	// Organization name.
