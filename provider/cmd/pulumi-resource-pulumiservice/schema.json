@@ -49,6 +49,27 @@
         }
       ]
     },
+    "pulumiservice:index:PulumiOperation": {
+      "type": "string",
+      "enum": [
+        {
+          "value": "update",
+          "description": "Pulumi `up` operation"
+        },
+        {
+          "description": "Pulumi `preview` operation",
+          "value": "preview"
+        },
+        {
+          "description": "Pulumi `destroy` operation",
+          "value": "destroy"
+        },
+        {
+          "description": "Pulumi `refresh` operation",
+          "value": "refresh"
+        }
+      ]
+    },
     "pulumiservice:index:DeploymentSettingsExecutorContext": {
       "description":"The executor context defines information about the executor where the deployment is executed. If unspecified, the default 'pulumi/pulumi' image is used.",
       "properties": {
@@ -60,14 +81,7 @@
       "type": "object",
       "required": [
         "executorImage"
-      ],
-      "language": {
-        "nodejs": {
-          "requiredOutputs": [
-            "executorImage"
-          ]
-        }
-      }
+      ]
     },
     "pulumiservice:index:DeploymentSettingsSourceContext": {
       "description":"Settings related to the source of the deployment.",
@@ -131,24 +145,17 @@
         "sshPrivateKey": {
           "type": "string",
           "secret": true,
-          "description": "SSH private key"
+          "description": "SSH private key."
         },
         "password": {
           "type": "string",
           "secret": true,
-          "description": "Optional password for SSH authentication"
+          "description": "Optional password for SSH authentication."
         }
       },
       "required": [
         "sshPrivateKey"
-      ],
-      "language": {
-        "nodejs": {
-          "requiredOutputs": [
-            "sshPrivateKey"
-          ]
-        }
-      }
+      ]
     },
     "pulumiservice:index:DeploymentSettingsGitAuthBasicAuth": {
       "description": "Git source settings for a deployment.",
@@ -156,41 +163,179 @@
         "username": {
           "type": "string",
           "secret": true,
-          "description": "User name for git basic authentication"
+          "description": "User name for git basic authentication."
         },
         "password": {
           "type": "string",
           "secret": true,
-          "description": "Password for git basic authentication"
+          "description": "Password for git basic authentication."
         }
       },
       "required": [
         "username",
         "password"
       ],
-      "language": {
-        "nodejs": {
-          "requiredOutputs": [
-            "username",
-            "password"
-          ]
-        }
-      },
       "type": "object"
     },
     "pulumiservice:index:DeploymentSettingsGithub": {
       "description": "GitHub settings for the deployment.",
       "properties": {
-
+        "repository": {
+          "type": "string",
+          "description": "The GitHub repository in the format org/repo."
+        },
+        "deployCommits": {
+          "type": "boolean",
+          "description": "Trigger a deployment running `pulumi up` on commit."
+        },
+        "previewPullRequests": {
+          "type": "boolean",
+          "description": "Trigger a deployment running `pulumi preview` when a PR is opened."
+        },
+        "paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The paths within the repo that deployments should be filtered to."
+        }
       },
       "type": "object"
     },
     "pulumiservice:index:DeploymentSettingsOperationContext": {
       "description": "Settings related to the Pulumi operation environment during the deployment.",
       "properties": {
-
+        "preRunCommands": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Shell commands to run before the Pulumi operation executes."
+        },
+        "operation": {
+          "$ref": "#/types/pulumiservice:index:PulumiOperation",
+          "description": "The Pulumi operation to run during the deployment."
+        },
+        "environmentVariables": {
+          "type": "object",
+          "description": "Environment variables to set for the deployment."
+        },
+        "options": {
+          "$ref": "#/types/pulumiservice:index:OperationContextOptions",
+          "description": "Options to override default behavior during the deployment."
+        },
+        "oidc": {
+          "$ref": "#/types/pulumiservice:index:OperationContextOIDC",
+          "description": "OIDC configuration to use during the deployment."
+        }
       },
+      "required": [
+        "operation"
+      ],
       "type": "object"
+    },
+    "pulumiservice:index:OperationContextOptions": {
+      "type": "object",
+      "properties": {
+        "skipInstallDependencies": {
+          "type": "boolean",
+          "description": "Skip the default dependency installation step - use this to customize the dependency installation (e.g. if using yarn or poetry)"
+        },
+        "shell": {
+          "type": "string",
+          "description": "The shell to use to run commands during the deployment. Defaults to 'bash'."
+        }
+      }
+    },
+    "pulumiservice:index:OperationContextOIDC": {
+      "type": "object",
+      "properties": {
+        "aws": {
+          "$ref": "#/types/pulumiservice:index:AWSOIDCConfiguration",
+          "description": "AWS-specific OIDC configuration."
+        },
+        "gcp": {
+          "$ref": "#/types/pulumiservice:index:GCPOIDCConfiguration",
+          "description": "GCP-specific OIDC configuration."
+        },
+        "azure": {
+          "$ref": "#/types/pulumiservice:index:AzureOIDCConfiguration",
+          "description": "Azure-specific OIDC configuration."
+        }
+      }
+    },
+    "pulumiservice:index:AWSOIDCConfiguration": {
+      "type": "object",
+      "properties": {
+        "duration": {
+          "type": "integer",
+          "description": "Duration of the assume-role session"
+        },
+        "policyARNs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Optional set of IAM policy ARNs that further restrict the assume-role session"
+        },
+        "roleARN": {
+          "type": "string",
+          "description": "The ARN of the role to assume using the OIDC token."
+        },
+        "sessionName": {
+          "type": "string",
+          "description": "The name of the assume-role session."
+        }
+      },
+      "required": [
+        "roleARN"
+      ]
+    },
+    "pulumiservice:index:GCPOIDCConfiguration": {
+      "type": "object",
+      "properties": {
+        "projectId": {
+          "type": "string",
+          "description": "The numerical ID of the GCP project."
+        },
+        "region": {
+          "type": "string",
+          "description": "The region of the GCP project."
+        },
+        "workloadPoolId": {
+          "type": "string",
+          "description": "The ID of the workload pool to use."
+        },
+        "providerId": {
+          "type": "string",
+          "description": "The ID of the identity provider associated with the workload pool."
+        },
+        "serviceAccount": {
+          "type": "string",
+          "description": "The email address of the service account to use."
+        },
+        "tokenLifetime": {
+          "type": "integer",
+          "description": "The lifetime of the temporary credentials."
+        }
+      }
+    },
+    "pulumiservice:index:AzureOIDCConfiguration": {
+      "type": "object",
+      "properties": {
+        "clientId": {
+          "type": "string",
+          "description": "The client ID of the federated workload identity."
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "The tenant ID of the federated workload identity."
+        },
+        "subscriptionID": {
+          "type": "string",
+          "description": "The subscription ID of the federated workload identity."
+        }
+      }
     }
   },
   "resources": {
@@ -459,7 +604,7 @@
           "$ref": "#/types/pulumiservice:index:DeploymentSettingsSourceContext",
           "description": "Settings related to the source of the deployment."
         },
-        "gitHub": {
+        "github": {
           "$ref": "#/types/pulumiservice:index:DeploymentSettingsGithub",
           "description": "GitHub settings for the deployment."
         },
