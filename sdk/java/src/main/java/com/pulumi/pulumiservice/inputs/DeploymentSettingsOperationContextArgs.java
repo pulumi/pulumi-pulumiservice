@@ -5,7 +5,6 @@ package com.pulumi.pulumiservice.inputs;
 
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
-import com.pulumi.pulumiservice.enums.PulumiOperation;
 import com.pulumi.pulumiservice.inputs.OperationContextOIDCArgs;
 import com.pulumi.pulumiservice.inputs.OperationContextOptionsArgs;
 import java.lang.String;
@@ -55,21 +54,6 @@ public final class DeploymentSettingsOperationContextArgs extends com.pulumi.res
     }
 
     /**
-     * The Pulumi operation to run during the deployment.
-     * 
-     */
-    @Import(name="operation", required=true)
-    private Output<PulumiOperation> operation;
-
-    /**
-     * @return The Pulumi operation to run during the deployment.
-     * 
-     */
-    public Output<PulumiOperation> operation() {
-        return this.operation;
-    }
-
-    /**
      * Options to override default behavior during the deployment.
      * 
      */
@@ -104,7 +88,6 @@ public final class DeploymentSettingsOperationContextArgs extends com.pulumi.res
     private DeploymentSettingsOperationContextArgs(DeploymentSettingsOperationContextArgs $) {
         this.environmentVariables = $.environmentVariables;
         this.oidc = $.oidc;
-        this.operation = $.operation;
         this.options = $.options;
         this.preRunCommands = $.preRunCommands;
     }
@@ -170,27 +153,6 @@ public final class DeploymentSettingsOperationContextArgs extends com.pulumi.res
         }
 
         /**
-         * @param operation The Pulumi operation to run during the deployment.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder operation(Output<PulumiOperation> operation) {
-            $.operation = operation;
-            return this;
-        }
-
-        /**
-         * @param operation The Pulumi operation to run during the deployment.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder operation(PulumiOperation operation) {
-            return operation(Output.of(operation));
-        }
-
-        /**
          * @param options Options to override default behavior during the deployment.
          * 
          * @return builder
@@ -243,7 +205,6 @@ public final class DeploymentSettingsOperationContextArgs extends com.pulumi.res
         }
 
         public DeploymentSettingsOperationContextArgs build() {
-            $.operation = Objects.requireNonNull($.operation, "expected parameter 'operation' to be non-null");
             return $;
         }
     }

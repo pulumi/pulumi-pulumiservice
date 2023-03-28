@@ -68,60 +68,60 @@ public final class DeploymentSettingsArgs extends com.pulumi.resources.ResourceA
      * Organization name.
      * 
      */
-    @Import(name="organization")
-    private @Nullable Output<String> organization;
+    @Import(name="organization", required=true)
+    private Output<String> organization;
 
     /**
      * @return Organization name.
      * 
      */
-    public Optional<Output<String>> organization() {
-        return Optional.ofNullable(this.organization);
+    public Output<String> organization() {
+        return this.organization;
     }
 
     /**
      * Project name.
      * 
      */
-    @Import(name="project")
-    private @Nullable Output<String> project;
+    @Import(name="project", required=true)
+    private Output<String> project;
 
     /**
      * @return Project name.
      * 
      */
-    public Optional<Output<String>> project() {
-        return Optional.ofNullable(this.project);
+    public Output<String> project() {
+        return this.project;
     }
 
     /**
      * Settings related to the source of the deployment.
      * 
      */
-    @Import(name="sourceContext")
-    private @Nullable Output<DeploymentSettingsSourceContextArgs> sourceContext;
+    @Import(name="sourceContext", required=true)
+    private Output<DeploymentSettingsSourceContextArgs> sourceContext;
 
     /**
      * @return Settings related to the source of the deployment.
      * 
      */
-    public Optional<Output<DeploymentSettingsSourceContextArgs>> sourceContext() {
-        return Optional.ofNullable(this.sourceContext);
+    public Output<DeploymentSettingsSourceContextArgs> sourceContext() {
+        return this.sourceContext;
     }
 
     /**
      * Stack name.
      * 
      */
-    @Import(name="stack")
-    private @Nullable Output<String> stack;
+    @Import(name="stack", required=true)
+    private Output<String> stack;
 
     /**
      * @return Stack name.
      * 
      */
-    public Optional<Output<String>> stack() {
-        return Optional.ofNullable(this.stack);
+    public Output<String> stack() {
+        return this.stack;
     }
 
     private DeploymentSettingsArgs() {}
@@ -223,7 +223,7 @@ public final class DeploymentSettingsArgs extends com.pulumi.resources.ResourceA
          * @return builder
          * 
          */
-        public Builder organization(@Nullable Output<String> organization) {
+        public Builder organization(Output<String> organization) {
             $.organization = organization;
             return this;
         }
@@ -244,7 +244,7 @@ public final class DeploymentSettingsArgs extends com.pulumi.resources.ResourceA
          * @return builder
          * 
          */
-        public Builder project(@Nullable Output<String> project) {
+        public Builder project(Output<String> project) {
             $.project = project;
             return this;
         }
@@ -265,7 +265,7 @@ public final class DeploymentSettingsArgs extends com.pulumi.resources.ResourceA
          * @return builder
          * 
          */
-        public Builder sourceContext(@Nullable Output<DeploymentSettingsSourceContextArgs> sourceContext) {
+        public Builder sourceContext(Output<DeploymentSettingsSourceContextArgs> sourceContext) {
             $.sourceContext = sourceContext;
             return this;
         }
@@ -286,7 +286,7 @@ public final class DeploymentSettingsArgs extends com.pulumi.resources.ResourceA
          * @return builder
          * 
          */
-        public Builder stack(@Nullable Output<String> stack) {
+        public Builder stack(Output<String> stack) {
             $.stack = stack;
             return this;
         }
@@ -302,6 +302,10 @@ public final class DeploymentSettingsArgs extends com.pulumi.resources.ResourceA
         }
 
         public DeploymentSettingsArgs build() {
+            $.organization = Objects.requireNonNull($.organization, "expected parameter 'organization' to be non-null");
+            $.project = Objects.requireNonNull($.project, "expected parameter 'project' to be non-null");
+            $.sourceContext = Objects.requireNonNull($.sourceContext, "expected parameter 'sourceContext' to be non-null");
+            $.stack = Objects.requireNonNull($.stack, "expected parameter 'stack' to be non-null");
             return $;
         }
     }

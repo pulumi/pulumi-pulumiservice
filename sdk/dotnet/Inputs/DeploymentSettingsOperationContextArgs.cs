@@ -34,12 +34,6 @@ namespace Pulumi.PulumiService.Inputs
         public Input<Inputs.OperationContextOIDCArgs>? Oidc { get; set; }
 
         /// <summary>
-        /// The Pulumi operation to run during the deployment.
-        /// </summary>
-        [Input("operation", required: true)]
-        public Input<Pulumi.PulumiService.PulumiOperation> Operation { get; set; } = null!;
-
-        /// <summary>
         /// Options to override default behavior during the deployment.
         /// </summary>
         [Input("options")]

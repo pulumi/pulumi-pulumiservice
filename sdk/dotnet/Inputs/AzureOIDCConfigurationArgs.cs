@@ -21,8 +21,8 @@ namespace Pulumi.PulumiService.Inputs
         /// <summary>
         /// The subscription ID of the federated workload identity.
         /// </summary>
-        [Input("subscriptionID")]
-        public Input<string>? SubscriptionID { get; set; }
+        [Input("subscriptionId")]
+        public Input<string>? SubscriptionId { get; set; }
 
         /// <summary>
         /// The tenant ID of the federated workload identity.

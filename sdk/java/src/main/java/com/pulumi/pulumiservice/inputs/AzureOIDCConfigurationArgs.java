@@ -34,15 +34,15 @@ public final class AzureOIDCConfigurationArgs extends com.pulumi.resources.Resou
      * The subscription ID of the federated workload identity.
      * 
      */
-    @Import(name="subscriptionID")
-    private @Nullable Output<String> subscriptionID;
+    @Import(name="subscriptionId")
+    private @Nullable Output<String> subscriptionId;
 
     /**
      * @return The subscription ID of the federated workload identity.
      * 
      */
-    public Optional<Output<String>> subscriptionID() {
-        return Optional.ofNullable(this.subscriptionID);
+    public Optional<Output<String>> subscriptionId() {
+        return Optional.ofNullable(this.subscriptionId);
     }
 
     /**
@@ -64,7 +64,7 @@ public final class AzureOIDCConfigurationArgs extends com.pulumi.resources.Resou
 
     private AzureOIDCConfigurationArgs(AzureOIDCConfigurationArgs $) {
         this.clientId = $.clientId;
-        this.subscriptionID = $.subscriptionID;
+        this.subscriptionId = $.subscriptionId;
         this.tenantId = $.tenantId;
     }
 
@@ -108,24 +108,24 @@ public final class AzureOIDCConfigurationArgs extends com.pulumi.resources.Resou
         }
 
         /**
-         * @param subscriptionID The subscription ID of the federated workload identity.
+         * @param subscriptionId The subscription ID of the federated workload identity.
          * 
          * @return builder
          * 
          */
-        public Builder subscriptionID(@Nullable Output<String> subscriptionID) {
-            $.subscriptionID = subscriptionID;
+        public Builder subscriptionId(@Nullable Output<String> subscriptionId) {
+            $.subscriptionId = subscriptionId;
             return this;
         }
 
         /**
-         * @param subscriptionID The subscription ID of the federated workload identity.
+         * @param subscriptionId The subscription ID of the federated workload identity.
          * 
          * @return builder
          * 
          */
-        public Builder subscriptionID(String subscriptionID) {
-            return subscriptionID(Output.of(subscriptionID));
+        public Builder subscriptionId(String subscriptionId) {
+            return subscriptionId(Output.of(subscriptionId));
         }
 
         /**

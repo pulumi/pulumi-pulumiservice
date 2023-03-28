@@ -57,10 +57,22 @@ export class DeploymentSettings extends pulumi.CustomResource {
      * @param args The arguments to use to populate this resource's properties.
      * @param opts A bag of options that control this resource's behavior.
      */
-    constructor(name: string, args?: DeploymentSettingsArgs, opts?: pulumi.CustomResourceOptions) {
+    constructor(name: string, args: DeploymentSettingsArgs, opts?: pulumi.CustomResourceOptions) {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
+            if ((!args || args.organization === undefined) && !opts.urn) {
+                throw new Error("Missing required property 'organization'");
+            }
+            if ((!args || args.project === undefined) && !opts.urn) {
+                throw new Error("Missing required property 'project'");
+            }
+            if ((!args || args.sourceContext === undefined) && !opts.urn) {
+                throw new Error("Missing required property 'sourceContext'");
+            }
+            if ((!args || args.stack === undefined) && !opts.urn) {
+                throw new Error("Missing required property 'stack'");
+            }
             resourceInputs["executorContext"] = args ? args.executorContext : undefined;
             resourceInputs["github"] = args ? (args.github ? pulumi.output(args.github).apply(inputs.deploymentSettingsGithubArgsProvideDefaults) : undefined) : undefined;
             resourceInputs["operationContext"] = args ? args.operationContext : undefined;
@@ -97,17 +109,17 @@ export interface DeploymentSettingsArgs {
     /**
      * Organization name.
      */
-    organization?: pulumi.Input<string>;
+    organization: pulumi.Input<string>;
     /**
      * Project name.
      */
-    project?: pulumi.Input<string>;
+    project: pulumi.Input<string>;
     /**
      * Settings related to the source of the deployment.
      */
-    sourceContext?: pulumi.Input<inputs.DeploymentSettingsSourceContextArgs>;
+    sourceContext: pulumi.Input<inputs.DeploymentSettingsSourceContextArgs>;
     /**
      * Stack name.
      */
-    stack?: pulumi.Input<string>;
+    stack: pulumi.Input<string>;
 }

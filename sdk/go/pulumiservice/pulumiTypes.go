@@ -208,7 +208,7 @@ type AzureOIDCConfiguration struct {
 	// The client ID of the federated workload identity.
 	ClientId *string `pulumi:"clientId"`
 	// The subscription ID of the federated workload identity.
-	SubscriptionID *string `pulumi:"subscriptionID"`
+	SubscriptionId *string `pulumi:"subscriptionId"`
 	// The tenant ID of the federated workload identity.
 	TenantId *string `pulumi:"tenantId"`
 }
@@ -228,7 +228,7 @@ type AzureOIDCConfigurationArgs struct {
 	// The client ID of the federated workload identity.
 	ClientId pulumi.StringPtrInput `pulumi:"clientId"`
 	// The subscription ID of the federated workload identity.
-	SubscriptionID pulumi.StringPtrInput `pulumi:"subscriptionID"`
+	SubscriptionId pulumi.StringPtrInput `pulumi:"subscriptionId"`
 	// The tenant ID of the federated workload identity.
 	TenantId pulumi.StringPtrInput `pulumi:"tenantId"`
 }
@@ -316,8 +316,8 @@ func (o AzureOIDCConfigurationOutput) ClientId() pulumi.StringPtrOutput {
 }
 
 // The subscription ID of the federated workload identity.
-func (o AzureOIDCConfigurationOutput) SubscriptionID() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v AzureOIDCConfiguration) *string { return v.SubscriptionID }).(pulumi.StringPtrOutput)
+func (o AzureOIDCConfigurationOutput) SubscriptionId() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v AzureOIDCConfiguration) *string { return v.SubscriptionId }).(pulumi.StringPtrOutput)
 }
 
 // The tenant ID of the federated workload identity.
@@ -360,12 +360,12 @@ func (o AzureOIDCConfigurationPtrOutput) ClientId() pulumi.StringPtrOutput {
 }
 
 // The subscription ID of the federated workload identity.
-func (o AzureOIDCConfigurationPtrOutput) SubscriptionID() pulumi.StringPtrOutput {
+func (o AzureOIDCConfigurationPtrOutput) SubscriptionId() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *AzureOIDCConfiguration) *string {
 		if v == nil {
 			return nil
 		}
-		return v.SubscriptionID
+		return v.SubscriptionId
 	}).(pulumi.StringPtrOutput)
 }
 
@@ -1465,8 +1465,6 @@ type DeploymentSettingsOperationContext struct {
 	EnvironmentVariables map[string]string `pulumi:"environmentVariables"`
 	// OIDC configuration to use during the deployment.
 	Oidc *OperationContextOIDC `pulumi:"oidc"`
-	// The Pulumi operation to run during the deployment.
-	Operation PulumiOperation `pulumi:"operation"`
 	// Options to override default behavior during the deployment.
 	Options *OperationContextOptions `pulumi:"options"`
 	// Shell commands to run before the Pulumi operation executes.
@@ -1490,8 +1488,6 @@ type DeploymentSettingsOperationContextArgs struct {
 	EnvironmentVariables pulumi.StringMapInput `pulumi:"environmentVariables"`
 	// OIDC configuration to use during the deployment.
 	Oidc OperationContextOIDCPtrInput `pulumi:"oidc"`
-	// The Pulumi operation to run during the deployment.
-	Operation PulumiOperationInput `pulumi:"operation"`
 	// Options to override default behavior during the deployment.
 	Options OperationContextOptionsPtrInput `pulumi:"options"`
 	// Shell commands to run before the Pulumi operation executes.
@@ -1586,11 +1582,6 @@ func (o DeploymentSettingsOperationContextOutput) Oidc() OperationContextOIDCPtr
 	return o.ApplyT(func(v DeploymentSettingsOperationContext) *OperationContextOIDC { return v.Oidc }).(OperationContextOIDCPtrOutput)
 }
 
-// The Pulumi operation to run during the deployment.
-func (o DeploymentSettingsOperationContextOutput) Operation() PulumiOperationOutput {
-	return o.ApplyT(func(v DeploymentSettingsOperationContext) PulumiOperation { return v.Operation }).(PulumiOperationOutput)
-}
-
 // Options to override default behavior during the deployment.
 func (o DeploymentSettingsOperationContextOutput) Options() OperationContextOptionsPtrOutput {
 	return o.ApplyT(func(v DeploymentSettingsOperationContext) *OperationContextOptions { return v.Options }).(OperationContextOptionsPtrOutput)
@@ -1643,16 +1634,6 @@ func (o DeploymentSettingsOperationContextPtrOutput) Oidc() OperationContextOIDC
 		}
 		return v.Oidc
 	}).(OperationContextOIDCPtrOutput)
-}
-
-// The Pulumi operation to run during the deployment.
-func (o DeploymentSettingsOperationContextPtrOutput) Operation() PulumiOperationPtrOutput {
-	return o.ApplyT(func(v *DeploymentSettingsOperationContext) *PulumiOperation {
-		if v == nil {
-			return nil
-		}
-		return &v.Operation
-	}).(PulumiOperationPtrOutput)
 }
 
 // Options to override default behavior during the deployment.
@@ -1710,47 +1691,6 @@ func (i DeploymentSettingsSourceContextArgs) ToDeploymentSettingsSourceContextOu
 	return pulumi.ToOutputWithContext(ctx, i).(DeploymentSettingsSourceContextOutput)
 }
 
-func (i DeploymentSettingsSourceContextArgs) ToDeploymentSettingsSourceContextPtrOutput() DeploymentSettingsSourceContextPtrOutput {
-	return i.ToDeploymentSettingsSourceContextPtrOutputWithContext(context.Background())
-}
-
-func (i DeploymentSettingsSourceContextArgs) ToDeploymentSettingsSourceContextPtrOutputWithContext(ctx context.Context) DeploymentSettingsSourceContextPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(DeploymentSettingsSourceContextOutput).ToDeploymentSettingsSourceContextPtrOutputWithContext(ctx)
-}
-
-// DeploymentSettingsSourceContextPtrInput is an input type that accepts DeploymentSettingsSourceContextArgs, DeploymentSettingsSourceContextPtr and DeploymentSettingsSourceContextPtrOutput values.
-// You can construct a concrete instance of `DeploymentSettingsSourceContextPtrInput` via:
-//
-//	        DeploymentSettingsSourceContextArgs{...}
-//
-//	or:
-//
-//	        nil
-type DeploymentSettingsSourceContextPtrInput interface {
-	pulumi.Input
-
-	ToDeploymentSettingsSourceContextPtrOutput() DeploymentSettingsSourceContextPtrOutput
-	ToDeploymentSettingsSourceContextPtrOutputWithContext(context.Context) DeploymentSettingsSourceContextPtrOutput
-}
-
-type deploymentSettingsSourceContextPtrType DeploymentSettingsSourceContextArgs
-
-func DeploymentSettingsSourceContextPtr(v *DeploymentSettingsSourceContextArgs) DeploymentSettingsSourceContextPtrInput {
-	return (*deploymentSettingsSourceContextPtrType)(v)
-}
-
-func (*deploymentSettingsSourceContextPtrType) ElementType() reflect.Type {
-	return reflect.TypeOf((**DeploymentSettingsSourceContext)(nil)).Elem()
-}
-
-func (i *deploymentSettingsSourceContextPtrType) ToDeploymentSettingsSourceContextPtrOutput() DeploymentSettingsSourceContextPtrOutput {
-	return i.ToDeploymentSettingsSourceContextPtrOutputWithContext(context.Background())
-}
-
-func (i *deploymentSettingsSourceContextPtrType) ToDeploymentSettingsSourceContextPtrOutputWithContext(ctx context.Context) DeploymentSettingsSourceContextPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(DeploymentSettingsSourceContextPtrOutput)
-}
-
 // Settings related to the source of the deployment.
 type DeploymentSettingsSourceContextOutput struct{ *pulumi.OutputState }
 
@@ -1766,53 +1706,9 @@ func (o DeploymentSettingsSourceContextOutput) ToDeploymentSettingsSourceContext
 	return o
 }
 
-func (o DeploymentSettingsSourceContextOutput) ToDeploymentSettingsSourceContextPtrOutput() DeploymentSettingsSourceContextPtrOutput {
-	return o.ToDeploymentSettingsSourceContextPtrOutputWithContext(context.Background())
-}
-
-func (o DeploymentSettingsSourceContextOutput) ToDeploymentSettingsSourceContextPtrOutputWithContext(ctx context.Context) DeploymentSettingsSourceContextPtrOutput {
-	return o.ApplyTWithContext(ctx, func(_ context.Context, v DeploymentSettingsSourceContext) *DeploymentSettingsSourceContext {
-		return &v
-	}).(DeploymentSettingsSourceContextPtrOutput)
-}
-
 // Git source settings for a deployment.
 func (o DeploymentSettingsSourceContextOutput) Git() DeploymentSettingsGitSourcePtrOutput {
 	return o.ApplyT(func(v DeploymentSettingsSourceContext) *DeploymentSettingsGitSource { return v.Git }).(DeploymentSettingsGitSourcePtrOutput)
-}
-
-type DeploymentSettingsSourceContextPtrOutput struct{ *pulumi.OutputState }
-
-func (DeploymentSettingsSourceContextPtrOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((**DeploymentSettingsSourceContext)(nil)).Elem()
-}
-
-func (o DeploymentSettingsSourceContextPtrOutput) ToDeploymentSettingsSourceContextPtrOutput() DeploymentSettingsSourceContextPtrOutput {
-	return o
-}
-
-func (o DeploymentSettingsSourceContextPtrOutput) ToDeploymentSettingsSourceContextPtrOutputWithContext(ctx context.Context) DeploymentSettingsSourceContextPtrOutput {
-	return o
-}
-
-func (o DeploymentSettingsSourceContextPtrOutput) Elem() DeploymentSettingsSourceContextOutput {
-	return o.ApplyT(func(v *DeploymentSettingsSourceContext) DeploymentSettingsSourceContext {
-		if v != nil {
-			return *v
-		}
-		var ret DeploymentSettingsSourceContext
-		return ret
-	}).(DeploymentSettingsSourceContextOutput)
-}
-
-// Git source settings for a deployment.
-func (o DeploymentSettingsSourceContextPtrOutput) Git() DeploymentSettingsGitSourcePtrOutput {
-	return o.ApplyT(func(v *DeploymentSettingsSourceContext) *DeploymentSettingsGitSource {
-		if v == nil {
-			return nil
-		}
-		return v.Git
-	}).(DeploymentSettingsGitSourcePtrOutput)
 }
 
 type GCPOIDCConfiguration struct {
@@ -2398,7 +2294,6 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsOperationContextInput)(nil)).Elem(), DeploymentSettingsOperationContextArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsOperationContextPtrInput)(nil)).Elem(), DeploymentSettingsOperationContextArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsSourceContextInput)(nil)).Elem(), DeploymentSettingsSourceContextArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsSourceContextPtrInput)(nil)).Elem(), DeploymentSettingsSourceContextArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*GCPOIDCConfigurationInput)(nil)).Elem(), GCPOIDCConfigurationArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*GCPOIDCConfigurationPtrInput)(nil)).Elem(), GCPOIDCConfigurationArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*OperationContextOIDCInput)(nil)).Elem(), OperationContextOIDCArgs{})
@@ -2424,7 +2319,6 @@ func init() {
 	pulumi.RegisterOutputType(DeploymentSettingsOperationContextOutput{})
 	pulumi.RegisterOutputType(DeploymentSettingsOperationContextPtrOutput{})
 	pulumi.RegisterOutputType(DeploymentSettingsSourceContextOutput{})
-	pulumi.RegisterOutputType(DeploymentSettingsSourceContextPtrOutput{})
 	pulumi.RegisterOutputType(GCPOIDCConfigurationOutput{})
 	pulumi.RegisterOutputType(GCPOIDCConfigurationPtrOutput{})
 	pulumi.RegisterOutputType(OperationContextOIDCOutput{})

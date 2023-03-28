@@ -49,27 +49,6 @@
         }
       ]
     },
-    "pulumiservice:index:PulumiOperation": {
-      "type": "string",
-      "enum": [
-        {
-          "value": "update",
-          "description": "Pulumi `up` operation"
-        },
-        {
-          "description": "Pulumi `preview` operation",
-          "value": "preview"
-        },
-        {
-          "description": "Pulumi `destroy` operation",
-          "value": "destroy"
-        },
-        {
-          "description": "Pulumi `refresh` operation",
-          "value": "refresh"
-        }
-      ]
-    },
     "pulumiservice:index:DeploymentSettingsExecutorContext": {
       "description":"The executor context defines information about the executor where the deployment is executed. If unspecified, the default 'pulumi/pulumi' image is used.",
       "properties": {
@@ -186,11 +165,13 @@
         },
         "deployCommits": {
           "type": "boolean",
-          "description": "Trigger a deployment running `pulumi up` on commit."
+          "description": "Trigger a deployment running `pulumi up` on commit.",
+          "default": true
         },
         "previewPullRequests": {
           "type": "boolean",
-          "description": "Trigger a deployment running `pulumi preview` when a PR is opened."
+          "description": "Trigger a deployment running `pulumi preview` when a PR is opened.",
+          "default": true
         },
         "paths": {
           "type": "array",
@@ -212,12 +193,11 @@
           },
           "description": "Shell commands to run before the Pulumi operation executes."
         },
-        "operation": {
-          "$ref": "#/types/pulumiservice:index:PulumiOperation",
-          "description": "The Pulumi operation to run during the deployment."
-        },
         "environmentVariables": {
           "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
           "description": "Environment variables to set for the deployment."
         },
         "options": {
@@ -229,9 +209,6 @@
           "description": "OIDC configuration to use during the deployment."
         }
       },
-      "required": [
-        "operation"
-      ],
       "type": "object"
     },
     "pulumiservice:index:OperationContextOptions": {
@@ -331,7 +308,7 @@
           "type": "string",
           "description": "The tenant ID of the federated workload identity."
         },
-        "subscriptionID": {
+        "subscriptionId": {
           "type": "string",
           "description": "The subscription ID of the federated workload identity."
         }
@@ -612,7 +589,13 @@
           "$ref": "#/types/pulumiservice:index:DeploymentSettingsOperationContext",
           "description": "Settings related to the Pulumi operation environment during the deployment."
         }
-      }
+      },
+      "requiredInputs": [
+        "organization",
+        "project",
+        "stack",
+        "sourceContext"
+      ]
     },
     "pulumiservice:index:StackTag": {
       "description": "Stacks have associated metadata in the form of tags. Each tag consists of a name and value.",

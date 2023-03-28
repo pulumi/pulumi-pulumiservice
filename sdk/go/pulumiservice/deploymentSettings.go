@@ -7,6 +7,7 @@ import (
 	"context"
 	"reflect"
 
+	"errors"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
@@ -26,9 +27,21 @@ type DeploymentSettings struct {
 func NewDeploymentSettings(ctx *pulumi.Context,
 	name string, args *DeploymentSettingsArgs, opts ...pulumi.ResourceOption) (*DeploymentSettings, error) {
 	if args == nil {
-		args = &DeploymentSettingsArgs{}
+		return nil, errors.New("missing one or more required arguments")
 	}
 
+	if args.Organization == nil {
+		return nil, errors.New("invalid value for required argument 'Organization'")
+	}
+	if args.Project == nil {
+		return nil, errors.New("invalid value for required argument 'Project'")
+	}
+	if args.SourceContext == nil {
+		return nil, errors.New("invalid value for required argument 'SourceContext'")
+	}
+	if args.Stack == nil {
+		return nil, errors.New("invalid value for required argument 'Stack'")
+	}
 	if args.Github != nil {
 		args.Github = args.Github.ToDeploymentSettingsGithubPtrOutput().ApplyT(func(v *DeploymentSettingsGithub) *DeploymentSettingsGithub { return v.Defaults() }).(DeploymentSettingsGithubPtrOutput)
 	}
@@ -71,13 +84,13 @@ type deploymentSettingsArgs struct {
 	// Settings related to the Pulumi operation environment during the deployment.
 	OperationContext *DeploymentSettingsOperationContext `pulumi:"operationContext"`
 	// Organization name.
-	Organization *string `pulumi:"organization"`
+	Organization string `pulumi:"organization"`
 	// Project name.
-	Project *string `pulumi:"project"`
+	Project string `pulumi:"project"`
 	// Settings related to the source of the deployment.
-	SourceContext *DeploymentSettingsSourceContext `pulumi:"sourceContext"`
+	SourceContext DeploymentSettingsSourceContext `pulumi:"sourceContext"`
 	// Stack name.
-	Stack *string `pulumi:"stack"`
+	Stack string `pulumi:"stack"`
 }
 
 // The set of arguments for constructing a DeploymentSettings resource.
@@ -89,13 +102,13 @@ type DeploymentSettingsArgs struct {
 	// Settings related to the Pulumi operation environment during the deployment.
 	OperationContext DeploymentSettingsOperationContextPtrInput
 	// Organization name.
-	Organization pulumi.StringPtrInput
+	Organization pulumi.StringInput
 	// Project name.
-	Project pulumi.StringPtrInput
+	Project pulumi.StringInput
 	// Settings related to the source of the deployment.
-	SourceContext DeploymentSettingsSourceContextPtrInput
+	SourceContext DeploymentSettingsSourceContextInput
 	// Stack name.
-	Stack pulumi.StringPtrInput
+	Stack pulumi.StringInput
 }
 
 func (DeploymentSettingsArgs) ElementType() reflect.Type {

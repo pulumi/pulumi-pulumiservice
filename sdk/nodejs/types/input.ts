@@ -35,7 +35,7 @@ export interface AzureOIDCConfigurationArgs {
     /**
      * The subscription ID of the federated workload identity.
      */
-    subscriptionID?: pulumi.Input<string>;
+    subscriptionId?: pulumi.Input<string>;
     /**
      * The tenant ID of the federated workload identity.
      */
@@ -168,10 +168,6 @@ export interface DeploymentSettingsOperationContextArgs {
      * OIDC configuration to use during the deployment.
      */
     oidc?: pulumi.Input<inputs.OperationContextOIDCArgs>;
-    /**
-     * The Pulumi operation to run during the deployment.
-     */
-    operation: pulumi.Input<enums.PulumiOperation>;
     /**
      * Options to override default behavior during the deployment.
      */

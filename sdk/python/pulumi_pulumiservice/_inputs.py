@@ -127,7 +127,7 @@ class AzureOIDCConfigurationArgs:
         pulumi.set(self, "client_id", value)
 
     @property
-    @pulumi.getter(name="subscriptionID")
+    @pulumi.getter(name="subscriptionId")
     def subscription_id(self) -> Optional[pulumi.Input[str]]:
         """
         The subscription ID of the federated workload identity.
@@ -474,20 +474,17 @@ class DeploymentSettingsGithubArgs:
 @pulumi.input_type
 class DeploymentSettingsOperationContextArgs:
     def __init__(__self__, *,
-                 operation: pulumi.Input['PulumiOperation'],
                  environment_variables: Optional[pulumi.Input[Mapping[str, pulumi.Input[str]]]] = None,
                  oidc: Optional[pulumi.Input['OperationContextOIDCArgs']] = None,
                  options: Optional[pulumi.Input['OperationContextOptionsArgs']] = None,
                  pre_run_commands: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None):
         """
         Settings related to the Pulumi operation environment during the deployment.
-        :param pulumi.Input['PulumiOperation'] operation: The Pulumi operation to run during the deployment.
         :param pulumi.Input[Mapping[str, pulumi.Input[str]]] environment_variables: Environment variables to set for the deployment.
         :param pulumi.Input['OperationContextOIDCArgs'] oidc: OIDC configuration to use during the deployment.
         :param pulumi.Input['OperationContextOptionsArgs'] options: Options to override default behavior during the deployment.
         :param pulumi.Input[Sequence[pulumi.Input[str]]] pre_run_commands: Shell commands to run before the Pulumi operation executes.
         """
-        pulumi.set(__self__, "operation", operation)
         if environment_variables is not None:
             pulumi.set(__self__, "environment_variables", environment_variables)
         if oidc is not None:
@@ -496,18 +493,6 @@ class DeploymentSettingsOperationContextArgs:
             pulumi.set(__self__, "options", options)
         if pre_run_commands is not None:
             pulumi.set(__self__, "pre_run_commands", pre_run_commands)
-
-    @property
-    @pulumi.getter
-    def operation(self) -> pulumi.Input['PulumiOperation']:
-        """
-        The Pulumi operation to run during the deployment.
-        """
-        return pulumi.get(self, "operation")
-
-    @operation.setter
-    def operation(self, value: pulumi.Input['PulumiOperation']):
-        pulumi.set(self, "operation", value)
 
     @property
     @pulumi.getter(name="environmentVariables")

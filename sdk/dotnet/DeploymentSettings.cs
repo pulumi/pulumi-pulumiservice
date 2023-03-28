@@ -41,7 +41,7 @@ namespace Pulumi.PulumiService
         /// <param name="name">The unique name of the resource</param>
         /// <param name="args">The arguments used to populate this resource's properties</param>
         /// <param name="options">A bag of options that control this resource's behavior</param>
-        public DeploymentSettings(string name, DeploymentSettingsArgs? args = null, CustomResourceOptions? options = null)
+        public DeploymentSettings(string name, DeploymentSettingsArgs args, CustomResourceOptions? options = null)
             : base("pulumiservice:index:DeploymentSettings", name, args ?? new DeploymentSettingsArgs(), MakeResourceOptions(options, ""))
         {
         }
@@ -99,26 +99,26 @@ namespace Pulumi.PulumiService
         /// <summary>
         /// Organization name.
         /// </summary>
-        [Input("organization")]
-        public Input<string>? Organization { get; set; }
+        [Input("organization", required: true)]
+        public Input<string> Organization { get; set; } = null!;
 
         /// <summary>
         /// Project name.
         /// </summary>
-        [Input("project")]
-        public Input<string>? Project { get; set; }
+        [Input("project", required: true)]
+        public Input<string> Project { get; set; } = null!;
 
         /// <summary>
         /// Settings related to the source of the deployment.
         /// </summary>
-        [Input("sourceContext")]
-        public Input<Inputs.DeploymentSettingsSourceContextArgs>? SourceContext { get; set; }
+        [Input("sourceContext", required: true)]
+        public Input<Inputs.DeploymentSettingsSourceContextArgs> SourceContext { get; set; } = null!;
 
         /// <summary>
         /// Stack name.
         /// </summary>
-        [Input("stack")]
-        public Input<string>? Stack { get; set; }
+        [Input("stack", required: true)]
+        public Input<string> Stack { get; set; } = null!;
 
         public DeploymentSettingsArgs()
         {
