@@ -1,13 +1,49 @@
 package pulumiapi
 
-//func (c *Client) CreateDeploymentSettings(ctx context.Context, stack StackName, tag StackTag) error {
-//	apiPath := path.Join("stacks", stack.OrgName, stack.ProjectName, stack.StackName, "tags")
-//	_, err := c.do(ctx, http.MethodPost, apiPath, tag, nil)
-//	if err != nil {
-//		return fmt.Errorf("failed to create tag (%s=%s): %w", tag.Name, tag.Value, err)
-//	}
-//	return nil
-//}
+import (
+	"context"
+	"fmt"
+	"net/http"
+	"path"
+
+	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
+)
+
+type DeploymentSettings struct {
+	OperationContext *OperationContext        `json:"operationContext,omitempty"`
+	GitHub           *GitHubConfiguration     `json:"gitHub,omitempty"`
+	SourceContext    *apitype.SourceContext   `json:"sourceContext,omitempty"`
+	ExecutorContext  *apitype.ExecutorContext `json:"executorContext,omitempty"`
+}
+
+type OperationContext struct {
+	Options              *OperationContextOptions `json:"options,omitempty"`
+	PreRunCommands       []string                 `json:"PreRunCommands,omitempty"`
+	EnvironmentVariables map[string]string        `json:"environmentVariables"`
+	//OIDC                 *OIDCConfiguration       `json:"oidc"`
+}
+
+type OperationContextOptions struct {
+	SkipInstallDependencies bool   `json:"skipInstallDependencies,omitempty"`
+	Shell                   string `json:"shell"`
+}
+
+type GitHubConfiguration struct {
+	Repository          string   `json:"repository,omitempty"`
+	DeployCommits       bool     `json:"deployCommits,omitempty"`
+	PreviewPullRequests bool     `json:"previewPullRequests,omitempty"`
+	Paths               []string `json:"paths,omitempty"`
+}
+
+func (c *Client) CreateDeploymentSettings(ctx context.Context, stack StackName, ds DeploymentSettings) error {
+	apiPath := path.Join("preview", stack.OrgName, stack.ProjectName, stack.StackName, "deployment", "settings")
+	_, err := c.do(ctx, http.MethodPost, apiPath, ds, nil)
+	if err != nil {
+		return fmt.Errorf("failed to create deployment settings for stack (%s/%s/%s): %w", stack.OrgName, stack.ProjectName, stack.StackName, err)
+	}
+	return nil
+}
+
 //
 //func (c *Client) GetDeploymentSettings(ctx context.Context, stackName StackName, tagName string) (*StackTag, error) {
 //	apiPath := path.Join(
@@ -27,14 +63,14 @@ package pulumiapi
 //		Value: tagValue,
 //	}, nil
 //}
-//
-//func (c *Client) DeleteDeploymentSettings(ctx context.Context, stackName StackName) error {
-//	apiPath := path.Join(
-//		"stacks", stackName.OrgName, stackName.ProjectName, stackName.StackName, "deployment", "settings",
-//	)
-//	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
-//	if err != nil {
-//		return fmt.Errorf("failed to make request: %w", err)
-//	}
-//	return nil
-//}
+
+func (c *Client) DeleteDeploymentSettings(ctx context.Context, stackName StackName) error {
+	apiPath := path.Join(
+		"preview", stackName.OrgName, stackName.ProjectName, stackName.StackName, "deployment", "settings",
+	)
+	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
+	if err != nil {
+		return fmt.Errorf("failed to make request: %w", err)
+	}
+	return nil
+}

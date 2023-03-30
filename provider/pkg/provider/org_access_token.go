@@ -30,7 +30,7 @@ func (i *PulumiServiceOrgAccessTokenInput) ToPropertyMap() resource.PropertyMap 
 	return pm
 }
 
-func (t *PulumiServiceOrgAccessTokenResource) ToPulumiServiceOrgAccessTokenInput(inputMap resource.PropertyMap) PulumiServiceOrgAccessTokenInput {
+func (ot *PulumiServiceOrgAccessTokenResource) ToPulumiServiceOrgAccessTokenInput(inputMap resource.PropertyMap) PulumiServiceOrgAccessTokenInput {
 	input := PulumiServiceOrgAccessTokenInput{}
 
 	if inputMap["name"].HasValue() && inputMap["name"].IsString() {
@@ -48,11 +48,11 @@ func (t *PulumiServiceOrgAccessTokenResource) ToPulumiServiceOrgAccessTokenInput
 	return input
 }
 
-func (c PulumiServiceOrgAccessTokenResource) Name() string {
+func (ot *PulumiServiceOrgAccessTokenResource) Name() string {
 	return "pulumiservice:index:OrgAccessToken"
 }
 
-func (c *PulumiServiceOrgAccessTokenResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+func (ot *PulumiServiceOrgAccessTokenResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
 	olds, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
 	if err != nil {
 		return nil, err
@@ -81,9 +81,9 @@ func (c *PulumiServiceOrgAccessTokenResource) Diff(req *pulumirpc.DiffRequest) (
 	}, nil
 }
 
-func (c *PulumiServiceOrgAccessTokenResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
+func (ot *PulumiServiceOrgAccessTokenResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
 	ctx := context.Background()
-	err := c.deleteOrgAccessToken(ctx, req.Id)
+	err := ot.deleteOrgAccessToken(ctx, req.Id)
 
 	if err != nil {
 		return &pbempty.Empty{}, err
@@ -92,16 +92,16 @@ func (c *PulumiServiceOrgAccessTokenResource) Delete(req *pulumirpc.DeleteReques
 	return &pbempty.Empty{}, nil
 }
 
-func (at *PulumiServiceOrgAccessTokenResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
+func (ot *PulumiServiceOrgAccessTokenResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	ctx := context.Background()
 	inputs, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
 	}
 
-	inputsAccessToken := at.ToPulumiServiceOrgAccessTokenInput(inputs)
+	inputsAccessToken := ot.ToPulumiServiceOrgAccessTokenInput(inputs)
 
-	accessToken, err := at.createOrgAccessToken(ctx, inputsAccessToken)
+	accessToken, err := ot.createOrgAccessToken(ctx, inputsAccessToken)
 	if err != nil {
 		return nil, fmt.Errorf("error creating access token '%s': %s", inputsAccessToken.Name, err.Error())
 	}
@@ -127,28 +127,28 @@ func (at *PulumiServiceOrgAccessTokenResource) Create(req *pulumirpc.CreateReque
 
 }
 
-func (k *PulumiServiceOrgAccessTokenResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
+func (ot *PulumiServiceOrgAccessTokenResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
 	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: nil}, nil
 }
 
-func (k *PulumiServiceOrgAccessTokenResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+func (ot *PulumiServiceOrgAccessTokenResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
 	return &pulumirpc.UpdateResponse{}, nil
 }
 
-func (k *PulumiServiceOrgAccessTokenResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
+func (ot *PulumiServiceOrgAccessTokenResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
 	return &pulumirpc.ReadResponse{}, nil
 }
 
-func (f *PulumiServiceOrgAccessTokenResource) Invoke(s *pulumiserviceProvider, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
+func (ot *PulumiServiceOrgAccessTokenResource) Invoke(s *pulumiserviceProvider, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
 	return &pulumirpc.InvokeResponse{Return: nil}, fmt.Errorf("unknown function '%s'", req.Tok)
 }
 
-func (at *PulumiServiceOrgAccessTokenResource) Configure(config PulumiServiceConfig) {
+func (ot *PulumiServiceOrgAccessTokenResource) Configure(config PulumiServiceConfig) {
 }
 
-func (at *PulumiServiceOrgAccessTokenResource) createOrgAccessToken(ctx context.Context, input PulumiServiceOrgAccessTokenInput) (*pulumiapi.AccessToken, error) {
+func (ot *PulumiServiceOrgAccessTokenResource) createOrgAccessToken(ctx context.Context, input PulumiServiceOrgAccessTokenInput) (*pulumiapi.AccessToken, error) {
 
-	accesstoken, err := at.client.CreateOrgAccessToken(ctx, input.Name, input.OrgName, input.Description)
+	accesstoken, err := ot.client.CreateOrgAccessToken(ctx, input.Name, input.OrgName, input.Description)
 	if err != nil {
 		return nil, err
 	}
@@ -156,13 +156,13 @@ func (at *PulumiServiceOrgAccessTokenResource) createOrgAccessToken(ctx context.
 	return accesstoken, nil
 }
 
-func (at *PulumiServiceOrgAccessTokenResource) deleteOrgAccessToken(ctx context.Context, id string) error {
+func (ot *PulumiServiceOrgAccessTokenResource) deleteOrgAccessToken(ctx context.Context, id string) error {
 	// we don't need the token name when we delete
 	orgName, _, tokenId, err := splitOrgAccessTokenId(id)
 	if err != nil {
 		return err
 	}
-	return at.client.DeleteOrgAccessToken(ctx, tokenId, orgName)
+	return ot.client.DeleteOrgAccessToken(ctx, tokenId, orgName)
 
 }
 

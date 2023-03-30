@@ -18,6 +18,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/ryboe/q"
 	"net/http"
 	"strings"
 	"time"
@@ -148,6 +149,9 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 		&PulumiServiceOrgAccessTokenResource{
 			client: client,
 		},
+		&PulumiServiceDeploymentSettingsResource{
+			client: client,
+		},
 	}
 
 	for _, sr := range k.pulumiResources {
@@ -177,6 +181,7 @@ func (k *pulumiserviceProvider) StreamInvoke(req *pulumirpc.InvokeRequest, serve
 // required for correctness, violations thereof can negatively impact the end-user experience, as
 // the provider inputs are using for detecting and rendering diffs.
 func (k *pulumiserviceProvider) Check(ctx context.Context, req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
+	q.Q("CHECK")
 	rn := getResourceNameFromRequest(req)
 	res := k.getPulumiServiceResource(rn)
 	return res.Check(req)
@@ -184,6 +189,7 @@ func (k *pulumiserviceProvider) Check(ctx context.Context, req *pulumirpc.CheckR
 
 // Diff checks what impacts a hypothetical update will have on the resource's properties.
 func (k *pulumiserviceProvider) Diff(ctx context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+	q.Q("DIFF")
 	rn := getResourceNameFromRequest(req)
 	res := k.getPulumiServiceResource(rn)
 	return res.Diff(req)
@@ -191,13 +197,17 @@ func (k *pulumiserviceProvider) Diff(ctx context.Context, req *pulumirpc.DiffReq
 
 // Create allocates a new instance of the provided resource and returns its unique ID afterwards.
 func (k *pulumiserviceProvider) Create(ctx context.Context, req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
+	q.Q("CREATE")
+	q.Q(req.Properties)
 	rn := getResourceNameFromRequest(req)
 	res := k.getPulumiServiceResource(rn)
+	q.Q(res)
 	return res.Create(req)
 }
 
 // Read the current live state associated with a resource.
 func (k *pulumiserviceProvider) Read(ctx context.Context, req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
+	q.Q("READ")
 	rn := getResourceNameFromRequest(req)
 	res := k.getPulumiServiceResource(rn)
 	return res.Read(req)
@@ -205,6 +215,7 @@ func (k *pulumiserviceProvider) Read(ctx context.Context, req *pulumirpc.ReadReq
 
 // Update updates an existing resource with new values.
 func (k *pulumiserviceProvider) Update(ctx context.Context, req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+	q.Q("UPDATE")
 	rn := getResourceNameFromRequest(req)
 	res := k.getPulumiServiceResource(rn)
 	return res.Update(req)
@@ -213,6 +224,7 @@ func (k *pulumiserviceProvider) Update(ctx context.Context, req *pulumirpc.Updat
 // Delete tears down an existing resource with the given ID.  If it fails, the resource is assumed
 // to still exist.
 func (k *pulumiserviceProvider) Delete(ctx context.Context, req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
+	q.Q("DELETE")
 	rn := getResourceNameFromRequest(req)
 	res := k.getPulumiServiceResource(rn)
 	return res.Delete(req)

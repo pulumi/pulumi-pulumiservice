@@ -27,30 +27,30 @@ func (i *TeamStackPermissionInput) ToPropertyMap() resource.PropertyMap {
 	return serde.ToPropertyMap(*i, structTagKey)
 }
 
-func (t *TeamStackPermissionResource) ToPulumiServiceTeamInput(inputMap resource.PropertyMap) (*TeamStackPermissionInput, error) {
+func (tp *TeamStackPermissionResource) ToPulumiServiceTeamInput(inputMap resource.PropertyMap) (*TeamStackPermissionInput, error) {
 	input := TeamStackPermissionInput{}
 	return &input, serde.FromPropertyMap(inputMap, structTagKey, &input)
 }
 
-func (t *TeamStackPermissionResource) Name() string {
+func (tp *TeamStackPermissionResource) Name() string {
 	return "pulumiservice:index:TeamStackPermission"
 }
 
-func (ts *TeamStackPermissionResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
+func (tp *TeamStackPermissionResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
 	return &pulumirpc.CheckResponse{
 		Inputs: req.GetNews(),
 	}, nil
 }
 
-func (ts *TeamStackPermissionResource) Configure(config PulumiServiceConfig) {
+func (tp *TeamStackPermissionResource) Configure(config PulumiServiceConfig) {
 
 }
 
-func (ts *TeamStackPermissionResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
+func (tp *TeamStackPermissionResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
 	return &pulumirpc.ReadResponse{}, nil
 }
 
-func (ts *TeamStackPermissionResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
+func (tp *TeamStackPermissionResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	ctx := context.Background()
 	var inputs TeamStackPermissionInput
 	err := serde.FromProperties(req.GetProperties(), structTagKey, &inputs)
@@ -63,7 +63,7 @@ func (ts *TeamStackPermissionResource) Create(req *pulumirpc.CreateRequest) (*pu
 		StackName:   inputs.Stack,
 	}
 
-	err = ts.client.AddStackPermission(ctx, stackName, inputs.Team, inputs.Permission)
+	err = tp.client.AddStackPermission(ctx, stackName, inputs.Team, inputs.Permission)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func (ts *TeamStackPermissionResource) Create(req *pulumirpc.CreateRequest) (*pu
 	}, nil
 }
 
-func (ts *TeamStackPermissionResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
+func (tp *TeamStackPermissionResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
 	ctx := context.Background()
 	var inputs TeamStackPermissionInput
 	err := serde.FromProperties(req.GetProperties(), structTagKey, &inputs)
@@ -86,14 +86,14 @@ func (ts *TeamStackPermissionResource) Delete(req *pulumirpc.DeleteRequest) (*pb
 		ProjectName: inputs.Project,
 		StackName:   inputs.Stack,
 	}
-	err = ts.client.RemoveStackPermission(ctx, stackName, inputs.Team)
+	err = tp.client.RemoveStackPermission(ctx, stackName, inputs.Team)
 	if err != nil {
 		return nil, err
 	}
 	return &pbempty.Empty{}, nil
 }
 
-func (ts *TeamStackPermissionResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+func (tp *TeamStackPermissionResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
 	changedKeys, err := serde.DiffOldsAndNews(req)
 	if err != nil {
 		return nil, err
@@ -109,6 +109,6 @@ func (ts *TeamStackPermissionResource) Diff(req *pulumirpc.DiffRequest) (*pulumi
 }
 
 // Update does nothing because we always do a replace on changes, never an update
-func (ts *TeamStackPermissionResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+func (tp *TeamStackPermissionResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
 	return &pulumirpc.UpdateResponse{}, nil
 }

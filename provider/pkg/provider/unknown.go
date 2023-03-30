@@ -10,34 +10,34 @@ import (
 type PulumiServiceUnknownResource struct{}
 type PulumiServiceUnknownFunction struct{}
 
-func (c PulumiServiceUnknownResource) Name() string {
+func (u *PulumiServiceUnknownResource) Name() string {
 	return "pulumiservice:index:Unknown"
 }
 
 func (u *PulumiServiceUnknownResource) Configure(config PulumiServiceConfig) {
 }
 
-func (c *PulumiServiceUnknownResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+func (u *PulumiServiceUnknownResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
 	return nil, createUnknownResourceErrorFromRequest(req)
 }
 
-func (c *PulumiServiceUnknownResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
+func (u *PulumiServiceUnknownResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
 	return nil, createUnknownResourceErrorFromRequest(req)
 }
 
-func (c *PulumiServiceUnknownResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
+func (u *PulumiServiceUnknownResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	return nil, createUnknownResourceErrorFromRequest(req)
 }
 
-func (k *PulumiServiceUnknownResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
+func (u *PulumiServiceUnknownResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
 	return nil, createUnknownResourceErrorFromRequest(req)
 }
 
-func (k *PulumiServiceUnknownResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+func (u *PulumiServiceUnknownResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
 	return nil, createUnknownResourceErrorFromRequest(req)
 }
 
-func (k *PulumiServiceUnknownResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
+func (u *PulumiServiceUnknownResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
 	return nil, createUnknownResourceErrorFromRequest(req)
 }
 
@@ -46,7 +46,7 @@ func createUnknownResourceErrorFromRequest(req ResourceBase) error {
 	return fmt.Errorf("unknown resource type '%s'", rn)
 }
 
-func (f *PulumiServiceUnknownResource) Invoke(s *pulumiserviceProvider, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
+func (u *PulumiServiceUnknownResource) Invoke(s *pulumiserviceProvider, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
 	return &pulumirpc.InvokeResponse{Return: nil}, fmt.Errorf("unknown function '%s'", req.Tok)
 }
 

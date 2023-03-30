@@ -95,12 +95,12 @@ func (t *PulumiServiceTeamResource) Configure(config PulumiServiceConfig) {
 	t.config = config
 }
 
-func (tr *PulumiServiceTeamResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
+func (t *PulumiServiceTeamResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
 	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: nil}, nil
 }
 
-func (tr *PulumiServiceTeamResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	err := tr.deleteTeam(context.Background(), req.Id)
+func (t *PulumiServiceTeamResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
+	err := t.deleteTeam(context.Background(), req.Id)
 	if err != nil {
 		return &pbempty.Empty{}, err
 	}
@@ -108,7 +108,7 @@ func (tr *PulumiServiceTeamResource) Delete(req *pulumirpc.DeleteRequest) (*pbem
 	return &pbempty.Empty{}, nil
 }
 
-func (tr *PulumiServiceTeamResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+func (t *PulumiServiceTeamResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
 	olds, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
 	if err != nil {
 		return nil, err
@@ -136,11 +136,11 @@ func (tr *PulumiServiceTeamResource) Diff(req *pulumirpc.DiffRequest) (*pulumirp
 	}, nil
 }
 
-func (tr *PulumiServiceTeamResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
+func (t *PulumiServiceTeamResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
 	return nil, errors.New("Read construct is not yet implemented")
 }
 
-func (tr *PulumiServiceTeamResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+func (t *PulumiServiceTeamResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
 	ctx := context.Background()
 	inputsOld, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
@@ -160,14 +160,14 @@ func (tr *PulumiServiceTeamResource) Update(req *pulumirpc.UpdateRequest) (*pulu
 		inputsChanged.Description = teamNew.Description
 		inputsChanged.DisplayName = teamNew.DisplayName
 
-		tr.updateTeam(context.Background(), inputsChanged)
+		t.updateTeam(context.Background(), inputsChanged)
 	}
 
 	if !Equal(teamOld.Members, teamNew.Members) {
 		inputsChanged.Members = teamNew.Members
 		for _, usernameToDelete := range teamOld.Members {
 			if !InSlice(usernameToDelete, teamNew.Members) {
-				err := tr.deleteFromTeam(ctx, teamNew.OrganizationName, teamNew.Name, usernameToDelete)
+				err := t.deleteFromTeam(ctx, teamNew.OrganizationName, teamNew.Name, usernameToDelete)
 				if err != nil {
 					return nil, err
 				}
@@ -176,7 +176,7 @@ func (tr *PulumiServiceTeamResource) Update(req *pulumirpc.UpdateRequest) (*pulu
 
 		for _, usernameToAdd := range teamNew.Members {
 			if !InSlice(usernameToAdd, teamOld.Members) {
-				err := tr.addToTeam(ctx, teamNew.OrganizationName, teamNew.Name, usernameToAdd)
+				err := t.addToTeam(ctx, teamNew.OrganizationName, teamNew.Name, usernameToAdd)
 				if err != nil {
 					return nil, err
 				}
@@ -193,7 +193,7 @@ func (tr *PulumiServiceTeamResource) Update(req *pulumirpc.UpdateRequest) (*pulu
 	}, nil
 }
 
-func (tr *PulumiServiceTeamResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
+func (t *PulumiServiceTeamResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	ctx := context.Background()
 	inputs, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
@@ -201,7 +201,7 @@ func (tr *PulumiServiceTeamResource) Create(req *pulumirpc.CreateRequest) (*pulu
 	}
 
 	inputsTeam := ToPulumiServiceTeamInput(inputs)
-	team, err := tr.createTeam(ctx, inputsTeam)
+	team, err := t.createTeam(ctx, inputsTeam)
 	if err != nil {
 		return nil, fmt.Errorf("error creating team '%s': %s", inputsTeam.Name, err.Error())
 	}
@@ -215,7 +215,7 @@ func (tr *PulumiServiceTeamResource) Create(req *pulumirpc.CreateRequest) (*pulu
 	inProgTeam.Members = nil
 
 	for _, memberToAdd := range inputsTeam.Members {
-		err := tr.addToTeam(ctx, inputsTeam.OrganizationName, inputsTeam.Name, memberToAdd)
+		err := t.addToTeam(ctx, inputsTeam.OrganizationName, inputsTeam.Name, memberToAdd)
 		if err != nil {
 			return nil, partialError(*team, err, inProgTeam, inputsTeam)
 		}
