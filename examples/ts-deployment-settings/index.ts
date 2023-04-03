@@ -16,9 +16,13 @@ const settings = new service.DeploymentSettings("deployment_settings", {
     project: "test-deployment-settings-proj",
     stack: "dev",
     operationContext: {
+        preRunCommands: ["yarn"],
         environmentVariables: {
             TEST_VAR: "foo",
             SECRET_VAR: config.requireSecret("my_secret"),
+        },
+        options: {
+            skipInstallDependencies: true,
         }
     },
     sourceContext: {

@@ -17,9 +17,9 @@ type DeploymentSettings struct {
 }
 
 type OperationContext struct {
-	Options              *OperationContextOptions `json:"options,omitempty"`
-	PreRunCommands       []string                 `json:"PreRunCommands,omitempty"`
-	EnvironmentVariables map[string]string        `json:"environmentVariables"`
+	Options              *OperationContextOptions       `json:"options,omitempty"`
+	PreRunCommands       []string                       `json:"PreRunCommands,omitempty"`
+	EnvironmentVariables map[string]apitype.SecretValue `json:"environmentVariables"`
 	//OIDC                 *OIDCConfiguration       `json:"oidc"`
 }
 

@@ -2,111 +2,28 @@ package provider
 
 import (
 	"context"
+	"path"
+
 	pbempty "github.com/golang/protobuf/ptypes/empty"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/pulumiapi"
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/serde"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 	"github.com/ryboe/q"
-	"path"
 )
 
 type PulumiServiceDeploymentSettingsInput struct {
-	Organization     string                `pulumi:"organization"`
-	Project          string                `pulumi:"project"`
-	Stack            string                `pulumi:"stack"`
-	SourceContext    SourceContextInput    `pulumi:"sourceContext"`
-	ExecutorContext  ExecutorContextInput  `pulumi:"executorContext"`
-	OperationContext OperationContextInput `pulumi:"operationContext"`
-	GitHub           GitHubInput           `pulumi:"github"`
-}
-
-type SourceContextInput struct {
-	Git GitSourceInput `pulumi:"git"`
-}
-
-type GitSourceInput struct {
-	RepoURL string       `pulumi:"repoUrl"`
-	Branch  string       `pulumi:"branch"`
-	Commit  string       `pulumi:"commit"`
-	RepoDir string       `pulumi:"repoDir"`
-	GitAuth GitAuthInput `pulumi:"gitAuth"`
-}
-
-type GitAuthInput struct {
-	PersonalAccessToken string                `pulumi:"personalAccessToken"`
-	SSHAuth             GitAuthSSHAuthInput   `pulumi:"sshAuth"`
-	BasicAuth           GitAuthBasicAuthInput `pulumi:"basicAuth"`
-}
-
-type GitAuthSSHAuthInput struct {
-	SSHPrivateKey string `pulumi:"sshPrivateKey"`
-	Password      string `pulumi:"password"`
-}
-
-type GitAuthBasicAuthInput struct {
-	Username string `pulumi:"username"`
-	Password string `pulumi:"password"`
-}
-
-type ExecutorContextInput struct {
-	ExecutorImage string `pulumi:"executorImage"`
-}
-
-type OperationContextInput struct {
-	Options              OperationContextOptionsInput `pulumi:"options"`
-	PreRunCommands       []string                     `pulumi:"preRunCommands"`
-	EnvironmentVariables map[string]string            `pulumi:"environmentVariables"`
-	OIDC                 OperationContextOIDCInput    `pulumi:"oidc"`
-}
-
-type OperationContextOIDCInput struct {
-	AWS   AWSOIDCInput   `pulumi:"aws"`
-	GCP   GCPOIDCInput   `pulumi:"gcp"`
-	Azure AzureOIDCInput `pulumi:"azure"`
-}
-
-type AWSOIDCInput struct {
-	Duration    int      `pulumi:"duration"`
-	PolicyARNs  []string `pulumi:"policyARNs"`
-	RoleARN     string   `pulumi:"roleARN"`
-	SessionName string   `pulumi:"sessionName"`
-}
-
-type GCPOIDCInput struct {
-	ProjectID      string `pulumi:"projectId"`
-	Region         string `pulumi:"region"`
-	WorkloadPoolID string `pulumi:"workloadPoolId"`
-	ProviderID     string `pulumi:"providerId"`
-	ServiceAccount string `pulumi:"serviceAccount"`
-	TokenLifetime  int    `pulumi:"tokenLifetime"`
-}
-
-type AzureOIDCInput struct {
-	ClientID       string `pulumi:"clientId"`
-	TenantID       string `pulumi:"tenantId"`
-	SubscriptionID string `pulumi:"subscriptionId"`
-}
-
-type OperationContextOptionsInput struct {
-	SkipInstallDependencies bool   `pulumi:"skipInstallDependencies"`
-	Shell                   string `pulumi:"shell"`
-}
-
-type GitHubInput struct {
-	Repository          string   `pulumi:"repository"`
-	DeployCommits       bool     `pulumi:"deployCommits"`
-	PreviewPullRequests bool     `pulumi:"previewPullRequests"`
-	Paths               []string `pulumi:"paths"`
+	pulumiapi.DeploymentSettings
+	Stack pulumiapi.StackName
 }
 
 func (i *PulumiServiceDeploymentSettingsInput) ToPropertyMap() resource.PropertyMap {
 	pm := resource.PropertyMap{}
-	pm["organization"] = resource.NewPropertyValue(i.Organization)
-	pm["project"] = resource.NewPropertyValue(i.Project)
-	pm["stack"] = resource.NewPropertyValue(i.Stack)
-	return serde.ToPropertyMap(*i, structTagKey)
+	pm["organization"] = resource.NewPropertyValue(i.Stack.OrgName)
+	pm["project"] = resource.NewPropertyValue(i.Stack.ProjectName)
+	pm["stack"] = resource.NewPropertyValue(i.Stack.StackName)
+	return pm
 }
 
 type PulumiServiceDeploymentSettingsResource struct {
@@ -117,15 +34,90 @@ func (ds *PulumiServiceDeploymentSettingsResource) ToPulumiServiceDeploymentSett
 	input := PulumiServiceDeploymentSettingsInput{}
 
 	if inputMap["organization"].HasValue() && inputMap["organization"].IsString() {
-		input.Organization = inputMap["organization"].StringValue()
+		input.Stack.OrgName = inputMap["organization"].StringValue()
+	}
+	if inputMap["project"].HasValue() && inputMap["project"].IsString() {
+		input.Stack.ProjectName = inputMap["project"].StringValue()
+	}
+	if inputMap["stack"].HasValue() && inputMap["stack"].IsString() {
+		input.Stack.StackName = inputMap["stack"].StringValue()
 	}
 
-	if inputMap["description"].HasValue() && inputMap["description"].IsString() {
-		input.Project = inputMap["project"].StringValue()
+	if inputMap["sourceContext"].HasValue() && inputMap["sourceContext"].IsObject() {
+		scInput := inputMap["sourceContext"].ObjectValue()
+		var sc apitype.SourceContext
+
+		if scInput["git"].HasValue() && scInput["git"].IsObject() {
+			gitInput := scInput["git"].ObjectValue()
+			var g apitype.SourceContextGit
+
+			if gitInput["repoUrl"].HasValue() && gitInput["repoUrl"].IsString() {
+				g.RepoURL = gitInput["repoUrl"].StringValue()
+			}
+			if gitInput["branch"].HasValue() && gitInput["branch"].IsString() {
+				g.Branch = gitInput["branch"].StringValue()
+			}
+			if gitInput["repoDir"].HasValue() && gitInput["repoDir"].IsString() {
+				g.RepoDir = gitInput["repoDir"].StringValue()
+			}
+
+			sc.Git = &g
+		}
+
+		input.SourceContext = &sc
 	}
 
-	if inputMap["organizationName"].HasValue() && inputMap["organizationName"].IsString() {
-		input.Stack = inputMap["stack"].StringValue()
+	if inputMap["operationContext"].HasValue() && inputMap["operationContext"].IsObject() {
+		ocInput := inputMap["operationContext"].ObjectValue()
+		var oc pulumiapi.OperationContext
+
+		if ocInput["environmentVariables"].HasValue() && ocInput["environmentVariables"].IsObject() {
+			ev := map[string]apitype.SecretValue{}
+			evInput := ocInput["environmentVariables"].ObjectValue()
+
+			// TODO: Fix secrets
+			for k, v := range evInput {
+				if v.IsSecret() {
+					q.Q("Found a secret: %s", k)
+					ev[string(k)] = apitype.SecretValue{Secret: true, Value: v.StringValue()}
+				} else {
+					q.Q("Not a secret: %s", k)
+					ev[string(k)] = apitype.SecretValue{Secret: false, Value: v.StringValue()}
+				}
+			}
+
+			oc.EnvironmentVariables = ev
+		}
+
+		if ocInput["preRunCommands"].HasValue() && ocInput["preRunCommands"].IsArray() {
+			pcInput := ocInput["preRunCommands"].ArrayValue()
+			pc := make([]string, len(pcInput))
+
+			for i, v := range pcInput {
+				if v.IsString() {
+					pc[i] = v.StringValue()
+				}
+			}
+
+			oc.PreRunCommands = pc
+		}
+
+		if ocInput["options"].HasValue() && ocInput["options"].IsObject() {
+			oInput := ocInput["options"].ObjectValue()
+			var o pulumiapi.OperationContextOptions
+
+			if oInput["skipInstallDependencies"].HasValue() && oInput["skipInstallDependencies"].IsBool() {
+				o.SkipInstallDependencies = oInput["skipInstallDependencies"].BoolValue()
+			}
+
+			if oInput["Shell"].HasValue() && oInput["Shell"].IsString() {
+				o.Shell = oInput["Shell"].StringValue()
+			}
+
+			oc.Options = &o
+		}
+
+		input.OperationContext = &oc
 	}
 
 	return input
@@ -143,7 +135,7 @@ func (ds *PulumiServiceDeploymentSettingsResource) Diff(req *pulumirpc.DiffReque
 	}
 	q.Q(olds, news)
 
-	diffs := olds["__inputs"].ObjectValue().Diff(news)
+	diffs := olds.Diff(news)
 	q.Q(diffs)
 	if diffs == nil {
 		return &pulumirpc.DiffResponse{
@@ -151,13 +143,15 @@ func (ds *PulumiServiceDeploymentSettingsResource) Diff(req *pulumirpc.DiffReque
 		}, nil
 	}
 
-	changes := pulumirpc.DiffResponse_DIFF_NONE
-	if diffs.AnyChanges() {
-		changes = pulumirpc.DiffResponse_DIFF_SOME
+	replaces := make([]string, len(diffs.ChangedKeys()))
+	for i, k := range diffs.ChangedKeys() {
+		replaces[i] = string(k)
 	}
 
 	return &pulumirpc.DiffResponse{
-		Changes: changes,
+		Changes:             pulumirpc.DiffResponse_DIFF_SOME,
+		Replaces:            replaces,
+		DeleteBeforeReplace: true,
 	}, nil
 }
 
@@ -173,17 +167,15 @@ func (ds *PulumiServiceDeploymentSettingsResource) Read(req *pulumirpc.ReadReque
 
 func (ds *PulumiServiceDeploymentSettingsResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
 	ctx := context.Background()
-	var inputs PulumiServiceDeploymentSettingsInput
-	err := serde.FromProperties(req.GetProperties(), structTagKey, &inputs)
+	inputsMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
 	}
-	stackName := pulumiapi.StackName{
-		OrgName:     inputs.Organization,
-		ProjectName: inputs.Project,
-		StackName:   inputs.Stack,
+	inputs := ds.ToPulumiServiceDeploymentSettingsInput(inputsMap)
+	if err != nil {
+		return nil, err
 	}
-	err = ds.client.DeleteDeploymentSettings(ctx, stackName)
+	err = ds.client.DeleteDeploymentSettings(ctx, inputs.Stack)
 	if err != nil {
 		return nil, err
 	}
@@ -199,23 +191,15 @@ func (ds *PulumiServiceDeploymentSettingsResource) Create(req *pulumirpc.CreateR
 	}
 	q.Q(inputsMap)
 	inputs := ds.ToPulumiServiceDeploymentSettingsInput(inputsMap)
-	stack := pulumiapi.StackName{
-		OrgName:     inputs.Organization,
-		ProjectName: inputs.Project,
-		StackName:   inputs.Stack,
-	}
-	settings := pulumiapi.DeploymentSettings{
-		OperationContext: &pulumiapi.OperationContext{
-			PreRunCommands: []string{"yarn"},
-		},
-	}
-	err = ds.client.CreateDeploymentSettings(ctx, stack, settings)
+	q.Q(inputs)
+	settings := inputs.DeploymentSettings
+	err = ds.client.CreateDeploymentSettings(ctx, inputs.Stack, settings)
 	if err != nil {
 		return nil, err
 	}
 	q.Q(req.GetProperties(), inputs)
 	return &pulumirpc.CreateResponse{
-		Id:         path.Join(stack.OrgName, stack.ProjectName, stack.StackName),
+		Id:         path.Join(inputs.Stack.OrgName, inputs.Stack.ProjectName, inputs.Stack.StackName),
 		Properties: req.GetProperties(),
 	}, nil
 }
