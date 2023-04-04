@@ -10,9 +10,9 @@ import * as utilities from "../utilities";
 
 export interface AWSOIDCConfigurationArgs {
     /**
-     * Duration of the assume-role session
+     * Duration of the assume-role session in “XhYmZs” format
      */
-    duration?: pulumi.Input<number>;
+    duration?: pulumi.Input<string>;
     /**
      * Optional set of IAM policy ARNs that further restrict the assume-role session
      */
@@ -24,22 +24,22 @@ export interface AWSOIDCConfigurationArgs {
     /**
      * The name of the assume-role session.
      */
-    sessionName?: pulumi.Input<string>;
+    sessionName: pulumi.Input<string>;
 }
 
 export interface AzureOIDCConfigurationArgs {
     /**
      * The client ID of the federated workload identity.
      */
-    clientId?: pulumi.Input<string>;
+    clientId: pulumi.Input<string>;
     /**
      * The subscription ID of the federated workload identity.
      */
-    subscriptionId?: pulumi.Input<string>;
+    subscriptionId: pulumi.Input<string>;
     /**
      * The tenant ID of the federated workload identity.
      */
-    tenantId?: pulumi.Input<string>;
+    tenantId: pulumi.Input<string>;
 }
 
 /**
@@ -115,10 +115,6 @@ export interface DeploymentSettingsGitSourceGitAuthArgs {
      */
     basicAuth?: pulumi.Input<inputs.DeploymentSettingsGitAuthBasicAuthArgs>;
     /**
-     * Personal access token for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
-     */
-    personalAccessToken?: pulumi.Input<string>;
-    /**
      * SSH auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
      */
     sshAuth?: pulumi.Input<inputs.DeploymentSettingsGitAuthSSHAuthArgs>;
@@ -192,11 +188,11 @@ export interface GCPOIDCConfigurationArgs {
     /**
      * The numerical ID of the GCP project.
      */
-    projectId?: pulumi.Input<string>;
+    projectId: pulumi.Input<string>;
     /**
      * The ID of the identity provider associated with the workload pool.
      */
-    providerId?: pulumi.Input<string>;
+    providerId: pulumi.Input<string>;
     /**
      * The region of the GCP project.
      */
@@ -204,15 +200,15 @@ export interface GCPOIDCConfigurationArgs {
     /**
      * The email address of the service account to use.
      */
-    serviceAccount?: pulumi.Input<string>;
+    serviceAccount: pulumi.Input<string>;
     /**
-     * The lifetime of the temporary credentials.
+     * The lifetime of the temporary credentials in “XhYmZs” format.
      */
-    tokenLifetime?: pulumi.Input<number>;
+    tokenLifetime?: pulumi.Input<string>;
     /**
      * The ID of the workload pool to use.
      */
-    workloadPoolId?: pulumi.Input<string>;
+    workloadPoolId: pulumi.Input<string>;
 }
 
 export interface OperationContextOIDCArgs {

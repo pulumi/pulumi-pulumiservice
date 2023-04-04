@@ -11,14 +11,14 @@ import (
 )
 
 type AWSOIDCConfiguration struct {
-	// Duration of the assume-role session
-	Duration *int `pulumi:"duration"`
+	// Duration of the assume-role session in “XhYmZs” format
+	Duration *string `pulumi:"duration"`
 	// Optional set of IAM policy ARNs that further restrict the assume-role session
 	PolicyARNs []string `pulumi:"policyARNs"`
 	// The ARN of the role to assume using the OIDC token.
 	RoleARN string `pulumi:"roleARN"`
 	// The name of the assume-role session.
-	SessionName *string `pulumi:"sessionName"`
+	SessionName string `pulumi:"sessionName"`
 }
 
 // AWSOIDCConfigurationInput is an input type that accepts AWSOIDCConfigurationArgs and AWSOIDCConfigurationOutput values.
@@ -33,14 +33,14 @@ type AWSOIDCConfigurationInput interface {
 }
 
 type AWSOIDCConfigurationArgs struct {
-	// Duration of the assume-role session
-	Duration pulumi.IntPtrInput `pulumi:"duration"`
+	// Duration of the assume-role session in “XhYmZs” format
+	Duration pulumi.StringPtrInput `pulumi:"duration"`
 	// Optional set of IAM policy ARNs that further restrict the assume-role session
 	PolicyARNs pulumi.StringArrayInput `pulumi:"policyARNs"`
 	// The ARN of the role to assume using the OIDC token.
 	RoleARN pulumi.StringInput `pulumi:"roleARN"`
 	// The name of the assume-role session.
-	SessionName pulumi.StringPtrInput `pulumi:"sessionName"`
+	SessionName pulumi.StringInput `pulumi:"sessionName"`
 }
 
 func (AWSOIDCConfigurationArgs) ElementType() reflect.Type {
@@ -120,9 +120,9 @@ func (o AWSOIDCConfigurationOutput) ToAWSOIDCConfigurationPtrOutputWithContext(c
 	}).(AWSOIDCConfigurationPtrOutput)
 }
 
-// Duration of the assume-role session
-func (o AWSOIDCConfigurationOutput) Duration() pulumi.IntPtrOutput {
-	return o.ApplyT(func(v AWSOIDCConfiguration) *int { return v.Duration }).(pulumi.IntPtrOutput)
+// Duration of the assume-role session in “XhYmZs” format
+func (o AWSOIDCConfigurationOutput) Duration() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v AWSOIDCConfiguration) *string { return v.Duration }).(pulumi.StringPtrOutput)
 }
 
 // Optional set of IAM policy ARNs that further restrict the assume-role session
@@ -136,8 +136,8 @@ func (o AWSOIDCConfigurationOutput) RoleARN() pulumi.StringOutput {
 }
 
 // The name of the assume-role session.
-func (o AWSOIDCConfigurationOutput) SessionName() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v AWSOIDCConfiguration) *string { return v.SessionName }).(pulumi.StringPtrOutput)
+func (o AWSOIDCConfigurationOutput) SessionName() pulumi.StringOutput {
+	return o.ApplyT(func(v AWSOIDCConfiguration) string { return v.SessionName }).(pulumi.StringOutput)
 }
 
 type AWSOIDCConfigurationPtrOutput struct{ *pulumi.OutputState }
@@ -164,14 +164,14 @@ func (o AWSOIDCConfigurationPtrOutput) Elem() AWSOIDCConfigurationOutput {
 	}).(AWSOIDCConfigurationOutput)
 }
 
-// Duration of the assume-role session
-func (o AWSOIDCConfigurationPtrOutput) Duration() pulumi.IntPtrOutput {
-	return o.ApplyT(func(v *AWSOIDCConfiguration) *int {
+// Duration of the assume-role session in “XhYmZs” format
+func (o AWSOIDCConfigurationPtrOutput) Duration() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *AWSOIDCConfiguration) *string {
 		if v == nil {
 			return nil
 		}
 		return v.Duration
-	}).(pulumi.IntPtrOutput)
+	}).(pulumi.StringPtrOutput)
 }
 
 // Optional set of IAM policy ARNs that further restrict the assume-role session
@@ -200,17 +200,17 @@ func (o AWSOIDCConfigurationPtrOutput) SessionName() pulumi.StringPtrOutput {
 		if v == nil {
 			return nil
 		}
-		return v.SessionName
+		return &v.SessionName
 	}).(pulumi.StringPtrOutput)
 }
 
 type AzureOIDCConfiguration struct {
 	// The client ID of the federated workload identity.
-	ClientId *string `pulumi:"clientId"`
+	ClientId string `pulumi:"clientId"`
 	// The subscription ID of the federated workload identity.
-	SubscriptionId *string `pulumi:"subscriptionId"`
+	SubscriptionId string `pulumi:"subscriptionId"`
 	// The tenant ID of the federated workload identity.
-	TenantId *string `pulumi:"tenantId"`
+	TenantId string `pulumi:"tenantId"`
 }
 
 // AzureOIDCConfigurationInput is an input type that accepts AzureOIDCConfigurationArgs and AzureOIDCConfigurationOutput values.
@@ -226,11 +226,11 @@ type AzureOIDCConfigurationInput interface {
 
 type AzureOIDCConfigurationArgs struct {
 	// The client ID of the federated workload identity.
-	ClientId pulumi.StringPtrInput `pulumi:"clientId"`
+	ClientId pulumi.StringInput `pulumi:"clientId"`
 	// The subscription ID of the federated workload identity.
-	SubscriptionId pulumi.StringPtrInput `pulumi:"subscriptionId"`
+	SubscriptionId pulumi.StringInput `pulumi:"subscriptionId"`
 	// The tenant ID of the federated workload identity.
-	TenantId pulumi.StringPtrInput `pulumi:"tenantId"`
+	TenantId pulumi.StringInput `pulumi:"tenantId"`
 }
 
 func (AzureOIDCConfigurationArgs) ElementType() reflect.Type {
@@ -311,18 +311,18 @@ func (o AzureOIDCConfigurationOutput) ToAzureOIDCConfigurationPtrOutputWithConte
 }
 
 // The client ID of the federated workload identity.
-func (o AzureOIDCConfigurationOutput) ClientId() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v AzureOIDCConfiguration) *string { return v.ClientId }).(pulumi.StringPtrOutput)
+func (o AzureOIDCConfigurationOutput) ClientId() pulumi.StringOutput {
+	return o.ApplyT(func(v AzureOIDCConfiguration) string { return v.ClientId }).(pulumi.StringOutput)
 }
 
 // The subscription ID of the federated workload identity.
-func (o AzureOIDCConfigurationOutput) SubscriptionId() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v AzureOIDCConfiguration) *string { return v.SubscriptionId }).(pulumi.StringPtrOutput)
+func (o AzureOIDCConfigurationOutput) SubscriptionId() pulumi.StringOutput {
+	return o.ApplyT(func(v AzureOIDCConfiguration) string { return v.SubscriptionId }).(pulumi.StringOutput)
 }
 
 // The tenant ID of the federated workload identity.
-func (o AzureOIDCConfigurationOutput) TenantId() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v AzureOIDCConfiguration) *string { return v.TenantId }).(pulumi.StringPtrOutput)
+func (o AzureOIDCConfigurationOutput) TenantId() pulumi.StringOutput {
+	return o.ApplyT(func(v AzureOIDCConfiguration) string { return v.TenantId }).(pulumi.StringOutput)
 }
 
 type AzureOIDCConfigurationPtrOutput struct{ *pulumi.OutputState }
@@ -355,7 +355,7 @@ func (o AzureOIDCConfigurationPtrOutput) ClientId() pulumi.StringPtrOutput {
 		if v == nil {
 			return nil
 		}
-		return v.ClientId
+		return &v.ClientId
 	}).(pulumi.StringPtrOutput)
 }
 
@@ -365,7 +365,7 @@ func (o AzureOIDCConfigurationPtrOutput) SubscriptionId() pulumi.StringPtrOutput
 		if v == nil {
 			return nil
 		}
-		return v.SubscriptionId
+		return &v.SubscriptionId
 	}).(pulumi.StringPtrOutput)
 }
 
@@ -375,7 +375,7 @@ func (o AzureOIDCConfigurationPtrOutput) TenantId() pulumi.StringPtrOutput {
 		if v == nil {
 			return nil
 		}
-		return v.TenantId
+		return &v.TenantId
 	}).(pulumi.StringPtrOutput)
 }
 
@@ -1057,8 +1057,6 @@ func (o DeploymentSettingsGitSourcePtrOutput) RepoUrl() pulumi.StringPtrOutput {
 type DeploymentSettingsGitSourceGitAuth struct {
 	// Basic auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
 	BasicAuth *DeploymentSettingsGitAuthBasicAuth `pulumi:"basicAuth"`
-	// Personal access token for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
-	PersonalAccessToken *string `pulumi:"personalAccessToken"`
 	// SSH auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
 	SshAuth *DeploymentSettingsGitAuthSSHAuth `pulumi:"sshAuth"`
 }
@@ -1078,8 +1076,6 @@ type DeploymentSettingsGitSourceGitAuthInput interface {
 type DeploymentSettingsGitSourceGitAuthArgs struct {
 	// Basic auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
 	BasicAuth DeploymentSettingsGitAuthBasicAuthPtrInput `pulumi:"basicAuth"`
-	// Personal access token for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
-	PersonalAccessToken pulumi.StringPtrInput `pulumi:"personalAccessToken"`
 	// SSH auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
 	SshAuth DeploymentSettingsGitAuthSSHAuthPtrInput `pulumi:"sshAuth"`
 }
@@ -1167,11 +1163,6 @@ func (o DeploymentSettingsGitSourceGitAuthOutput) BasicAuth() DeploymentSettings
 	return o.ApplyT(func(v DeploymentSettingsGitSourceGitAuth) *DeploymentSettingsGitAuthBasicAuth { return v.BasicAuth }).(DeploymentSettingsGitAuthBasicAuthPtrOutput)
 }
 
-// Personal access token for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
-func (o DeploymentSettingsGitSourceGitAuthOutput) PersonalAccessToken() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v DeploymentSettingsGitSourceGitAuth) *string { return v.PersonalAccessToken }).(pulumi.StringPtrOutput)
-}
-
 // SSH auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
 func (o DeploymentSettingsGitSourceGitAuthOutput) SshAuth() DeploymentSettingsGitAuthSSHAuthPtrOutput {
 	return o.ApplyT(func(v DeploymentSettingsGitSourceGitAuth) *DeploymentSettingsGitAuthSSHAuth { return v.SshAuth }).(DeploymentSettingsGitAuthSSHAuthPtrOutput)
@@ -1209,16 +1200,6 @@ func (o DeploymentSettingsGitSourceGitAuthPtrOutput) BasicAuth() DeploymentSetti
 		}
 		return v.BasicAuth
 	}).(DeploymentSettingsGitAuthBasicAuthPtrOutput)
-}
-
-// Personal access token for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
-func (o DeploymentSettingsGitSourceGitAuthPtrOutput) PersonalAccessToken() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *DeploymentSettingsGitSourceGitAuth) *string {
-		if v == nil {
-			return nil
-		}
-		return v.PersonalAccessToken
-	}).(pulumi.StringPtrOutput)
 }
 
 // SSH auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
@@ -1713,17 +1694,17 @@ func (o DeploymentSettingsSourceContextOutput) Git() DeploymentSettingsGitSource
 
 type GCPOIDCConfiguration struct {
 	// The numerical ID of the GCP project.
-	ProjectId *string `pulumi:"projectId"`
+	ProjectId string `pulumi:"projectId"`
 	// The ID of the identity provider associated with the workload pool.
-	ProviderId *string `pulumi:"providerId"`
+	ProviderId string `pulumi:"providerId"`
 	// The region of the GCP project.
 	Region *string `pulumi:"region"`
 	// The email address of the service account to use.
-	ServiceAccount *string `pulumi:"serviceAccount"`
-	// The lifetime of the temporary credentials.
-	TokenLifetime *int `pulumi:"tokenLifetime"`
+	ServiceAccount string `pulumi:"serviceAccount"`
+	// The lifetime of the temporary credentials in “XhYmZs” format.
+	TokenLifetime *string `pulumi:"tokenLifetime"`
 	// The ID of the workload pool to use.
-	WorkloadPoolId *string `pulumi:"workloadPoolId"`
+	WorkloadPoolId string `pulumi:"workloadPoolId"`
 }
 
 // GCPOIDCConfigurationInput is an input type that accepts GCPOIDCConfigurationArgs and GCPOIDCConfigurationOutput values.
@@ -1739,17 +1720,17 @@ type GCPOIDCConfigurationInput interface {
 
 type GCPOIDCConfigurationArgs struct {
 	// The numerical ID of the GCP project.
-	ProjectId pulumi.StringPtrInput `pulumi:"projectId"`
+	ProjectId pulumi.StringInput `pulumi:"projectId"`
 	// The ID of the identity provider associated with the workload pool.
-	ProviderId pulumi.StringPtrInput `pulumi:"providerId"`
+	ProviderId pulumi.StringInput `pulumi:"providerId"`
 	// The region of the GCP project.
 	Region pulumi.StringPtrInput `pulumi:"region"`
 	// The email address of the service account to use.
-	ServiceAccount pulumi.StringPtrInput `pulumi:"serviceAccount"`
-	// The lifetime of the temporary credentials.
-	TokenLifetime pulumi.IntPtrInput `pulumi:"tokenLifetime"`
+	ServiceAccount pulumi.StringInput `pulumi:"serviceAccount"`
+	// The lifetime of the temporary credentials in “XhYmZs” format.
+	TokenLifetime pulumi.StringPtrInput `pulumi:"tokenLifetime"`
 	// The ID of the workload pool to use.
-	WorkloadPoolId pulumi.StringPtrInput `pulumi:"workloadPoolId"`
+	WorkloadPoolId pulumi.StringInput `pulumi:"workloadPoolId"`
 }
 
 func (GCPOIDCConfigurationArgs) ElementType() reflect.Type {
@@ -1830,13 +1811,13 @@ func (o GCPOIDCConfigurationOutput) ToGCPOIDCConfigurationPtrOutputWithContext(c
 }
 
 // The numerical ID of the GCP project.
-func (o GCPOIDCConfigurationOutput) ProjectId() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v GCPOIDCConfiguration) *string { return v.ProjectId }).(pulumi.StringPtrOutput)
+func (o GCPOIDCConfigurationOutput) ProjectId() pulumi.StringOutput {
+	return o.ApplyT(func(v GCPOIDCConfiguration) string { return v.ProjectId }).(pulumi.StringOutput)
 }
 
 // The ID of the identity provider associated with the workload pool.
-func (o GCPOIDCConfigurationOutput) ProviderId() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v GCPOIDCConfiguration) *string { return v.ProviderId }).(pulumi.StringPtrOutput)
+func (o GCPOIDCConfigurationOutput) ProviderId() pulumi.StringOutput {
+	return o.ApplyT(func(v GCPOIDCConfiguration) string { return v.ProviderId }).(pulumi.StringOutput)
 }
 
 // The region of the GCP project.
@@ -1845,18 +1826,18 @@ func (o GCPOIDCConfigurationOutput) Region() pulumi.StringPtrOutput {
 }
 
 // The email address of the service account to use.
-func (o GCPOIDCConfigurationOutput) ServiceAccount() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v GCPOIDCConfiguration) *string { return v.ServiceAccount }).(pulumi.StringPtrOutput)
+func (o GCPOIDCConfigurationOutput) ServiceAccount() pulumi.StringOutput {
+	return o.ApplyT(func(v GCPOIDCConfiguration) string { return v.ServiceAccount }).(pulumi.StringOutput)
 }
 
-// The lifetime of the temporary credentials.
-func (o GCPOIDCConfigurationOutput) TokenLifetime() pulumi.IntPtrOutput {
-	return o.ApplyT(func(v GCPOIDCConfiguration) *int { return v.TokenLifetime }).(pulumi.IntPtrOutput)
+// The lifetime of the temporary credentials in “XhYmZs” format.
+func (o GCPOIDCConfigurationOutput) TokenLifetime() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v GCPOIDCConfiguration) *string { return v.TokenLifetime }).(pulumi.StringPtrOutput)
 }
 
 // The ID of the workload pool to use.
-func (o GCPOIDCConfigurationOutput) WorkloadPoolId() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v GCPOIDCConfiguration) *string { return v.WorkloadPoolId }).(pulumi.StringPtrOutput)
+func (o GCPOIDCConfigurationOutput) WorkloadPoolId() pulumi.StringOutput {
+	return o.ApplyT(func(v GCPOIDCConfiguration) string { return v.WorkloadPoolId }).(pulumi.StringOutput)
 }
 
 type GCPOIDCConfigurationPtrOutput struct{ *pulumi.OutputState }
@@ -1889,7 +1870,7 @@ func (o GCPOIDCConfigurationPtrOutput) ProjectId() pulumi.StringPtrOutput {
 		if v == nil {
 			return nil
 		}
-		return v.ProjectId
+		return &v.ProjectId
 	}).(pulumi.StringPtrOutput)
 }
 
@@ -1899,7 +1880,7 @@ func (o GCPOIDCConfigurationPtrOutput) ProviderId() pulumi.StringPtrOutput {
 		if v == nil {
 			return nil
 		}
-		return v.ProviderId
+		return &v.ProviderId
 	}).(pulumi.StringPtrOutput)
 }
 
@@ -1919,18 +1900,18 @@ func (o GCPOIDCConfigurationPtrOutput) ServiceAccount() pulumi.StringPtrOutput {
 		if v == nil {
 			return nil
 		}
-		return v.ServiceAccount
+		return &v.ServiceAccount
 	}).(pulumi.StringPtrOutput)
 }
 
-// The lifetime of the temporary credentials.
-func (o GCPOIDCConfigurationPtrOutput) TokenLifetime() pulumi.IntPtrOutput {
-	return o.ApplyT(func(v *GCPOIDCConfiguration) *int {
+// The lifetime of the temporary credentials in “XhYmZs” format.
+func (o GCPOIDCConfigurationPtrOutput) TokenLifetime() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *GCPOIDCConfiguration) *string {
 		if v == nil {
 			return nil
 		}
 		return v.TokenLifetime
-	}).(pulumi.IntPtrOutput)
+	}).(pulumi.StringPtrOutput)
 }
 
 // The ID of the workload pool to use.
@@ -1939,7 +1920,7 @@ func (o GCPOIDCConfigurationPtrOutput) WorkloadPoolId() pulumi.StringPtrOutput {
 		if v == nil {
 			return nil
 		}
-		return v.WorkloadPoolId
+		return &v.WorkloadPoolId
 	}).(pulumi.StringPtrOutput)
 }
 

@@ -7,7 +7,6 @@ import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.pulumiservice.inputs.DeploymentSettingsGitAuthBasicAuthArgs;
 import com.pulumi.pulumiservice.inputs.DeploymentSettingsGitAuthSSHAuthArgs;
-import java.lang.String;
 import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -37,21 +36,6 @@ public final class DeploymentSettingsGitSourceGitAuthArgs extends com.pulumi.res
     }
 
     /**
-     * Personal access token for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
-     * 
-     */
-    @Import(name="personalAccessToken")
-    private @Nullable Output<String> personalAccessToken;
-
-    /**
-     * @return Personal access token for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
-     * 
-     */
-    public Optional<Output<String>> personalAccessToken() {
-        return Optional.ofNullable(this.personalAccessToken);
-    }
-
-    /**
      * SSH auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
      * 
      */
@@ -70,7 +54,6 @@ public final class DeploymentSettingsGitSourceGitAuthArgs extends com.pulumi.res
 
     private DeploymentSettingsGitSourceGitAuthArgs(DeploymentSettingsGitSourceGitAuthArgs $) {
         this.basicAuth = $.basicAuth;
-        this.personalAccessToken = $.personalAccessToken;
         this.sshAuth = $.sshAuth;
     }
 
@@ -111,27 +94,6 @@ public final class DeploymentSettingsGitSourceGitAuthArgs extends com.pulumi.res
          */
         public Builder basicAuth(DeploymentSettingsGitAuthBasicAuthArgs basicAuth) {
             return basicAuth(Output.of(basicAuth));
-        }
-
-        /**
-         * @param personalAccessToken Personal access token for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder personalAccessToken(@Nullable Output<String> personalAccessToken) {
-            $.personalAccessToken = personalAccessToken;
-            return this;
-        }
-
-        /**
-         * @param personalAccessToken Personal access token for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder personalAccessToken(String personalAccessToken) {
-            return personalAccessToken(Output.of(personalAccessToken));
         }
 
         /**

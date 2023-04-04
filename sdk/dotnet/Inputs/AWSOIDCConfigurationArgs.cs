@@ -13,10 +13,10 @@ namespace Pulumi.PulumiService.Inputs
     public sealed class AWSOIDCConfigurationArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
-        /// Duration of the assume-role session
+        /// Duration of the assume-role session in “XhYmZs” format
         /// </summary>
         [Input("duration")]
-        public Input<int>? Duration { get; set; }
+        public Input<string>? Duration { get; set; }
 
         [Input("policyARNs")]
         private InputList<string>? _policyARNs;
@@ -39,8 +39,8 @@ namespace Pulumi.PulumiService.Inputs
         /// <summary>
         /// The name of the assume-role session.
         /// </summary>
-        [Input("sessionName")]
-        public Input<string>? SessionName { get; set; }
+        [Input("sessionName", required: true)]
+        public Input<string> SessionName { get; set; } = null!;
 
         public AWSOIDCConfigurationArgs()
         {

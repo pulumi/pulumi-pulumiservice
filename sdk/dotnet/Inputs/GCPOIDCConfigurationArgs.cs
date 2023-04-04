@@ -15,14 +15,14 @@ namespace Pulumi.PulumiService.Inputs
         /// <summary>
         /// The numerical ID of the GCP project.
         /// </summary>
-        [Input("projectId")]
-        public Input<string>? ProjectId { get; set; }
+        [Input("projectId", required: true)]
+        public Input<string> ProjectId { get; set; } = null!;
 
         /// <summary>
         /// The ID of the identity provider associated with the workload pool.
         /// </summary>
-        [Input("providerId")]
-        public Input<string>? ProviderId { get; set; }
+        [Input("providerId", required: true)]
+        public Input<string> ProviderId { get; set; } = null!;
 
         /// <summary>
         /// The region of the GCP project.
@@ -33,20 +33,20 @@ namespace Pulumi.PulumiService.Inputs
         /// <summary>
         /// The email address of the service account to use.
         /// </summary>
-        [Input("serviceAccount")]
-        public Input<string>? ServiceAccount { get; set; }
+        [Input("serviceAccount", required: true)]
+        public Input<string> ServiceAccount { get; set; } = null!;
 
         /// <summary>
-        /// The lifetime of the temporary credentials.
+        /// The lifetime of the temporary credentials in “XhYmZs” format.
         /// </summary>
         [Input("tokenLifetime")]
-        public Input<int>? TokenLifetime { get; set; }
+        public Input<string>? TokenLifetime { get; set; }
 
         /// <summary>
         /// The ID of the workload pool to use.
         /// </summary>
-        [Input("workloadPoolId")]
-        public Input<string>? WorkloadPoolId { get; set; }
+        [Input("workloadPoolId", required: true)]
+        public Input<string> WorkloadPoolId { get; set; } = null!;
 
         public GCPOIDCConfigurationArgs()
         {

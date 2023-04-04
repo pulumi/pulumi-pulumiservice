@@ -21,22 +21,6 @@ namespace Pulumi.PulumiService.Inputs
         [Input("basicAuth")]
         public Input<Inputs.DeploymentSettingsGitAuthBasicAuthArgs>? BasicAuth { get; set; }
 
-        [Input("personalAccessToken")]
-        private Input<string>? _personalAccessToken;
-
-        /// <summary>
-        /// Personal access token for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
-        /// </summary>
-        public Input<string>? PersonalAccessToken
-        {
-            get => _personalAccessToken;
-            set
-            {
-                var emptySecret = Output.CreateSecret(0);
-                _personalAccessToken = Output.Tuple<Input<string>?, int>(value, emptySecret).Apply(t => t.Item1);
-            }
-        }
-
         /// <summary>
         /// SSH auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
         /// </summary>

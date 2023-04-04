@@ -18,14 +18,6 @@ type PulumiServiceDeploymentSettingsInput struct {
 	Stack pulumiapi.StackName
 }
 
-func (i *PulumiServiceDeploymentSettingsInput) ToPropertyMap() resource.PropertyMap {
-	pm := resource.PropertyMap{}
-	pm["organization"] = resource.NewPropertyValue(i.Stack.OrgName)
-	pm["project"] = resource.NewPropertyValue(i.Stack.ProjectName)
-	pm["stack"] = resource.NewPropertyValue(i.Stack.StackName)
-	return pm
-}
-
 type PulumiServiceDeploymentSettingsResource struct {
 	client *pulumiapi.Client
 }
@@ -41,6 +33,44 @@ func (ds *PulumiServiceDeploymentSettingsResource) ToPulumiServiceDeploymentSett
 	}
 	if inputMap["stack"].HasValue() && inputMap["stack"].IsString() {
 		input.Stack.StackName = inputMap["stack"].StringValue()
+	}
+
+	if inputMap["executorContext"].HasValue() && inputMap["executorContext"].IsObject() {
+		ecInput := inputMap["executorContext"].ObjectValue()
+		var ec apitype.ExecutorContext
+
+		if ecInput["executorImage"].HasValue() && ecInput["executorImage"].IsString() {
+			ec.ExecutorImage = ecInput["executorImage"].StringValue()
+		}
+
+		input.ExecutorContext = &ec
+	}
+
+	if inputMap["github"].HasValue() && inputMap["github"].IsObject() {
+		githubInput := inputMap["github"].ObjectValue()
+		var github pulumiapi.GitHubConfiguration
+
+		if githubInput["repository"].HasValue() && githubInput["repository"].IsString() {
+			github.Repository = githubInput["repository"].StringValue()
+		}
+		if githubInput["deployCommits"].HasValue() && githubInput["deployCommits"].IsBool() {
+			github.DeployCommits = githubInput["deployCommits"].BoolValue()
+		}
+		if githubInput["previewPullRequests"].HasValue() && githubInput["previewPullRequests"].IsBool() {
+			github.PreviewPullRequests = githubInput["deployPullRequests"].BoolValue()
+		}
+		if githubInput["paths"].HasValue() && githubInput["paths"].IsArray() {
+			pathsInput := githubInput["paths"].ArrayValue()
+			paths := make([]string, len(pathsInput))
+
+			for i, v := range pathsInput {
+				if v.IsString() {
+					paths[i] = v.StringValue()
+				}
+			}
+
+			github.Paths = paths
+		}
 	}
 
 	if inputMap["sourceContext"].HasValue() && inputMap["sourceContext"].IsObject() {
@@ -59,6 +89,53 @@ func (ds *PulumiServiceDeploymentSettingsResource) ToPulumiServiceDeploymentSett
 			}
 			if gitInput["repoDir"].HasValue() && gitInput["repoDir"].IsString() {
 				g.RepoDir = gitInput["repoDir"].StringValue()
+			}
+
+			if gitInput["gitAuth"].HasValue() && gitInput["gitAuth"].IsObject() {
+				authInput := gitInput["gitAuth"].ObjectValue()
+				var a apitype.GitAuthConfig
+
+				if authInput["sshAuth"].HasValue() && authInput["sshAuth"].IsObject() {
+					sshInput := authInput["sshAuth"].ObjectValue()
+					var s apitype.SSHAuth
+
+					if sshInput["sshPrivateKey"].HasValue() && sshInput["sshPrivateKey"].IsString() {
+						s.SSHPrivateKey = apitype.SecretValue{
+							Value:  sshInput["sshPrivateKey"].StringValue(),
+							Secret: true,
+						}
+					}
+					if sshInput["password"].HasValue() && sshInput["password"].IsSecret() {
+						s.Password = &apitype.SecretValue{
+							Value:  sshInput["password"].StringValue(),
+							Secret: true,
+						}
+					}
+
+					a.SSHAuth = &s
+				}
+
+				if authInput["basicAuth"].HasValue() && authInput["basicAuth"].IsObject() {
+					basicInput := authInput["basicAuth"].ObjectValue()
+					var b apitype.BasicAuth
+
+					if basicInput["username"].HasValue() && basicInput["username"].IsString() {
+						b.UserName = apitype.SecretValue{
+							Value:  basicInput["username"].StringValue(),
+							Secret: false,
+						}
+					}
+					if basicInput["password"].HasValue() && basicInput["password"].IsString() {
+						b.Password = apitype.SecretValue{
+							Value:  basicInput["password"].StringValue(),
+							Secret: true,
+						}
+					}
+
+					a.BasicAuth = &b
+				}
+
+				g.GitAuth = &a
 			}
 
 			sc.Git = &g
@@ -117,6 +194,85 @@ func (ds *PulumiServiceDeploymentSettingsResource) ToPulumiServiceDeploymentSett
 			oc.Options = &o
 		}
 
+		if ocInput["oidc"].HasValue() && ocInput["oidc"].IsObject() {
+			oidcInput := ocInput["oidc"].ObjectValue()
+			var oidc pulumiapi.OIDCConfiguration
+
+			if oidcInput["aws"].HasValue() && oidcInput["aws"].IsObject() {
+				awsInput := oidcInput["aws"].ObjectValue()
+				var aws pulumiapi.AWSOIDCConfiguration
+
+				if awsInput["roleARN"].HasValue() && awsInput["roleARN"].IsString() {
+					aws.RoleARN = awsInput["roleARN"].StringValue()
+				}
+				if awsInput["duration"].HasValue() && awsInput["duration"].IsString() {
+					aws.Duration = awsInput["duration"].StringValue()
+				}
+				if awsInput["sessionName"].HasValue() && awsInput["sessionName"].IsString() {
+					aws.SessionName = awsInput["sessionName"].StringValue()
+				}
+				if awsInput["policyARNs"].HasValue() && awsInput["policyARNs"].IsArray() {
+					policyARNsInput := awsInput["policyARNs"].ArrayValue()
+					policyARNs := make([]string, len(policyARNsInput))
+
+					for i, v := range policyARNsInput {
+						if v.IsString() {
+							policyARNs[i] = v.StringValue()
+						}
+					}
+
+					aws.PolicyARNs = policyARNs
+				}
+
+				oidc.AWS = &aws
+			}
+
+			if oidcInput["gcp"].HasValue() && oidcInput["gcp"].IsObject() {
+				gcpInput := oidcInput["gcp"].ObjectValue()
+				var gcp pulumiapi.GCPOIDCConfiguration
+
+				if gcpInput["projectId"].HasValue() && gcpInput["projectId"].IsString() {
+					gcp.ProjectID = gcpInput["projectId"].StringValue()
+				}
+				if gcpInput["region"].HasValue() && gcpInput["region"].IsString() {
+					gcp.Region = gcpInput["region"].StringValue()
+				}
+				if gcpInput["workloadPoolId"].HasValue() && gcpInput["workloadPoolId"].IsString() {
+					gcp.WorkloadPoolID = gcpInput["workloadPoolId"].StringValue()
+				}
+				if gcpInput["providerId"].HasValue() && gcpInput["providerId"].IsString() {
+					gcp.ProviderID = gcpInput["providerId"].StringValue()
+				}
+				if gcpInput["serviceAccount"].HasValue() && gcpInput["serviceAccount"].IsString() {
+					gcp.ServiceAccount = gcpInput["serviceAccount"].StringValue()
+				}
+				if gcpInput["tokenLifetime"].HasValue() && gcpInput["tokenLifetime"].IsString() {
+					gcp.TokenLifetime = gcpInput["tokenLifetime"].StringValue()
+				}
+
+				oidc.GCP = &gcp
+			}
+
+			if oidcInput["azure"].HasValue() && oidcInput["azure"].IsObject() {
+				azureInput := oidcInput["azure"].ObjectValue()
+				var azure pulumiapi.AzureOIDCConfiguration
+
+				if azureInput["tenantId"].HasValue() && azureInput["tenantId"].IsString() {
+					azure.TenantID = azureInput["tenantId"].StringValue()
+				}
+				if azureInput["clientId"].HasValue() && azureInput["clientId"].IsString() {
+					azure.ClientID = azureInput["clientId"].StringValue()
+				}
+				if azureInput["subscriptionId"].HasValue() && azureInput["subscriptionId"].IsString() {
+					azure.SubscriptionID = azureInput["subscriptionId"].StringValue()
+				}
+
+				oidc.Azure = &azure
+			}
+
+			oc.OIDC = &oidc
+		}
+
 		input.OperationContext = &oc
 	}
 
@@ -133,10 +289,8 @@ func (ds *PulumiServiceDeploymentSettingsResource) Diff(req *pulumirpc.DiffReque
 	if err != nil {
 		return nil, err
 	}
-	q.Q(olds, news)
 
 	diffs := olds.Diff(news)
-	q.Q(diffs)
 	if diffs == nil {
 		return &pulumirpc.DiffResponse{
 			Changes: pulumirpc.DiffResponse_DIFF_NONE,
@@ -205,6 +359,7 @@ func (ds *PulumiServiceDeploymentSettingsResource) Create(req *pulumirpc.CreateR
 }
 
 func (ds *PulumiServiceDeploymentSettingsResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+	// For simplicity, all updates are destructive, so we just call Create.
 	return &pulumirpc.UpdateResponse{}, nil
 }
 

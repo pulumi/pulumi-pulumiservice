@@ -101,11 +101,6 @@
     "pulumiservice:index:DeploymentSettingsGitSourceGitAuth":  {
       "description":"Git source settings for a deployment.",
       "properties": {
-        "personalAccessToken": {
-          "type": "string",
-          "secret": true,
-          "description": "Personal access token for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined."
-        },
         "sshAuth": {
           "$ref": "#/types/pulumiservice:index:DeploymentSettingsGitAuthSSHAuth",
           "description": "SSH auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined."
@@ -245,8 +240,8 @@
       "type": "object",
       "properties": {
         "duration": {
-          "type": "integer",
-          "description": "Duration of the assume-role session"
+          "type": "string",
+          "description": "Duration of the assume-role session in “XhYmZs” format"
         },
         "policyARNs": {
           "type": "array",
@@ -265,7 +260,8 @@
         }
       },
       "required": [
-        "roleARN"
+        "roleARN",
+        "sessionName"
       ]
     },
     "pulumiservice:index:GCPOIDCConfiguration": {
@@ -292,10 +288,16 @@
           "description": "The email address of the service account to use."
         },
         "tokenLifetime": {
-          "type": "integer",
-          "description": "The lifetime of the temporary credentials."
+          "type": "string",
+          "description": "The lifetime of the temporary credentials in “XhYmZs” format."
         }
-      }
+      },
+      "required": [
+        "projectId",
+        "workloadPoolId",
+        "providerId",
+        "serviceAccount"
+      ]
     },
     "pulumiservice:index:AzureOIDCConfiguration": {
       "type": "object",
@@ -312,7 +314,12 @@
           "type": "string",
           "description": "The subscription ID of the federated workload identity."
         }
-      }
+      },
+      "required": [
+        "clientId",
+        "tenantId",
+        "subscriptionId"
+      ]
     }
   },
   "resources": {

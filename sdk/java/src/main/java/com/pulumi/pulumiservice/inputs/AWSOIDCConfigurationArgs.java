@@ -5,7 +5,6 @@ package com.pulumi.pulumiservice.inputs;
 
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
-import java.lang.Integer;
 import java.lang.String;
 import java.util.List;
 import java.util.Objects;
@@ -18,17 +17,17 @@ public final class AWSOIDCConfigurationArgs extends com.pulumi.resources.Resourc
     public static final AWSOIDCConfigurationArgs Empty = new AWSOIDCConfigurationArgs();
 
     /**
-     * Duration of the assume-role session
+     * Duration of the assume-role session in “XhYmZs” format
      * 
      */
     @Import(name="duration")
-    private @Nullable Output<Integer> duration;
+    private @Nullable Output<String> duration;
 
     /**
-     * @return Duration of the assume-role session
+     * @return Duration of the assume-role session in “XhYmZs” format
      * 
      */
-    public Optional<Output<Integer>> duration() {
+    public Optional<Output<String>> duration() {
         return Optional.ofNullable(this.duration);
     }
 
@@ -66,15 +65,15 @@ public final class AWSOIDCConfigurationArgs extends com.pulumi.resources.Resourc
      * The name of the assume-role session.
      * 
      */
-    @Import(name="sessionName")
-    private @Nullable Output<String> sessionName;
+    @Import(name="sessionName", required=true)
+    private Output<String> sessionName;
 
     /**
      * @return The name of the assume-role session.
      * 
      */
-    public Optional<Output<String>> sessionName() {
-        return Optional.ofNullable(this.sessionName);
+    public Output<String> sessionName() {
+        return this.sessionName;
     }
 
     private AWSOIDCConfigurationArgs() {}
@@ -105,23 +104,23 @@ public final class AWSOIDCConfigurationArgs extends com.pulumi.resources.Resourc
         }
 
         /**
-         * @param duration Duration of the assume-role session
+         * @param duration Duration of the assume-role session in “XhYmZs” format
          * 
          * @return builder
          * 
          */
-        public Builder duration(@Nullable Output<Integer> duration) {
+        public Builder duration(@Nullable Output<String> duration) {
             $.duration = duration;
             return this;
         }
 
         /**
-         * @param duration Duration of the assume-role session
+         * @param duration Duration of the assume-role session in “XhYmZs” format
          * 
          * @return builder
          * 
          */
-        public Builder duration(Integer duration) {
+        public Builder duration(String duration) {
             return duration(Output.of(duration));
         }
 
@@ -183,7 +182,7 @@ public final class AWSOIDCConfigurationArgs extends com.pulumi.resources.Resourc
          * @return builder
          * 
          */
-        public Builder sessionName(@Nullable Output<String> sessionName) {
+        public Builder sessionName(Output<String> sessionName) {
             $.sessionName = sessionName;
             return this;
         }
@@ -200,6 +199,7 @@ public final class AWSOIDCConfigurationArgs extends com.pulumi.resources.Resourc
 
         public AWSOIDCConfigurationArgs build() {
             $.roleARN = Objects.requireNonNull($.roleARN, "expected parameter 'roleARN' to be non-null");
+            $.sessionName = Objects.requireNonNull($.sessionName, "expected parameter 'sessionName' to be non-null");
             return $;
         }
     }

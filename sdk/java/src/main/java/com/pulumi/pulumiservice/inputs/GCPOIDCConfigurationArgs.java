@@ -5,7 +5,6 @@ package com.pulumi.pulumiservice.inputs;
 
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
-import java.lang.Integer;
 import java.lang.String;
 import java.util.Objects;
 import java.util.Optional;
@@ -20,30 +19,30 @@ public final class GCPOIDCConfigurationArgs extends com.pulumi.resources.Resourc
      * The numerical ID of the GCP project.
      * 
      */
-    @Import(name="projectId")
-    private @Nullable Output<String> projectId;
+    @Import(name="projectId", required=true)
+    private Output<String> projectId;
 
     /**
      * @return The numerical ID of the GCP project.
      * 
      */
-    public Optional<Output<String>> projectId() {
-        return Optional.ofNullable(this.projectId);
+    public Output<String> projectId() {
+        return this.projectId;
     }
 
     /**
      * The ID of the identity provider associated with the workload pool.
      * 
      */
-    @Import(name="providerId")
-    private @Nullable Output<String> providerId;
+    @Import(name="providerId", required=true)
+    private Output<String> providerId;
 
     /**
      * @return The ID of the identity provider associated with the workload pool.
      * 
      */
-    public Optional<Output<String>> providerId() {
-        return Optional.ofNullable(this.providerId);
+    public Output<String> providerId() {
+        return this.providerId;
     }
 
     /**
@@ -65,29 +64,29 @@ public final class GCPOIDCConfigurationArgs extends com.pulumi.resources.Resourc
      * The email address of the service account to use.
      * 
      */
-    @Import(name="serviceAccount")
-    private @Nullable Output<String> serviceAccount;
+    @Import(name="serviceAccount", required=true)
+    private Output<String> serviceAccount;
 
     /**
      * @return The email address of the service account to use.
      * 
      */
-    public Optional<Output<String>> serviceAccount() {
-        return Optional.ofNullable(this.serviceAccount);
+    public Output<String> serviceAccount() {
+        return this.serviceAccount;
     }
 
     /**
-     * The lifetime of the temporary credentials.
+     * The lifetime of the temporary credentials in “XhYmZs” format.
      * 
      */
     @Import(name="tokenLifetime")
-    private @Nullable Output<Integer> tokenLifetime;
+    private @Nullable Output<String> tokenLifetime;
 
     /**
-     * @return The lifetime of the temporary credentials.
+     * @return The lifetime of the temporary credentials in “XhYmZs” format.
      * 
      */
-    public Optional<Output<Integer>> tokenLifetime() {
+    public Optional<Output<String>> tokenLifetime() {
         return Optional.ofNullable(this.tokenLifetime);
     }
 
@@ -95,15 +94,15 @@ public final class GCPOIDCConfigurationArgs extends com.pulumi.resources.Resourc
      * The ID of the workload pool to use.
      * 
      */
-    @Import(name="workloadPoolId")
-    private @Nullable Output<String> workloadPoolId;
+    @Import(name="workloadPoolId", required=true)
+    private Output<String> workloadPoolId;
 
     /**
      * @return The ID of the workload pool to use.
      * 
      */
-    public Optional<Output<String>> workloadPoolId() {
-        return Optional.ofNullable(this.workloadPoolId);
+    public Output<String> workloadPoolId() {
+        return this.workloadPoolId;
     }
 
     private GCPOIDCConfigurationArgs() {}
@@ -141,7 +140,7 @@ public final class GCPOIDCConfigurationArgs extends com.pulumi.resources.Resourc
          * @return builder
          * 
          */
-        public Builder projectId(@Nullable Output<String> projectId) {
+        public Builder projectId(Output<String> projectId) {
             $.projectId = projectId;
             return this;
         }
@@ -162,7 +161,7 @@ public final class GCPOIDCConfigurationArgs extends com.pulumi.resources.Resourc
          * @return builder
          * 
          */
-        public Builder providerId(@Nullable Output<String> providerId) {
+        public Builder providerId(Output<String> providerId) {
             $.providerId = providerId;
             return this;
         }
@@ -204,7 +203,7 @@ public final class GCPOIDCConfigurationArgs extends com.pulumi.resources.Resourc
          * @return builder
          * 
          */
-        public Builder serviceAccount(@Nullable Output<String> serviceAccount) {
+        public Builder serviceAccount(Output<String> serviceAccount) {
             $.serviceAccount = serviceAccount;
             return this;
         }
@@ -220,23 +219,23 @@ public final class GCPOIDCConfigurationArgs extends com.pulumi.resources.Resourc
         }
 
         /**
-         * @param tokenLifetime The lifetime of the temporary credentials.
+         * @param tokenLifetime The lifetime of the temporary credentials in “XhYmZs” format.
          * 
          * @return builder
          * 
          */
-        public Builder tokenLifetime(@Nullable Output<Integer> tokenLifetime) {
+        public Builder tokenLifetime(@Nullable Output<String> tokenLifetime) {
             $.tokenLifetime = tokenLifetime;
             return this;
         }
 
         /**
-         * @param tokenLifetime The lifetime of the temporary credentials.
+         * @param tokenLifetime The lifetime of the temporary credentials in “XhYmZs” format.
          * 
          * @return builder
          * 
          */
-        public Builder tokenLifetime(Integer tokenLifetime) {
+        public Builder tokenLifetime(String tokenLifetime) {
             return tokenLifetime(Output.of(tokenLifetime));
         }
 
@@ -246,7 +245,7 @@ public final class GCPOIDCConfigurationArgs extends com.pulumi.resources.Resourc
          * @return builder
          * 
          */
-        public Builder workloadPoolId(@Nullable Output<String> workloadPoolId) {
+        public Builder workloadPoolId(Output<String> workloadPoolId) {
             $.workloadPoolId = workloadPoolId;
             return this;
         }
@@ -262,6 +261,10 @@ public final class GCPOIDCConfigurationArgs extends com.pulumi.resources.Resourc
         }
 
         public GCPOIDCConfigurationArgs build() {
+            $.projectId = Objects.requireNonNull($.projectId, "expected parameter 'projectId' to be non-null");
+            $.providerId = Objects.requireNonNull($.providerId, "expected parameter 'providerId' to be non-null");
+            $.serviceAccount = Objects.requireNonNull($.serviceAccount, "expected parameter 'serviceAccount' to be non-null");
+            $.workloadPoolId = Objects.requireNonNull($.workloadPoolId, "expected parameter 'workloadPoolId' to be non-null");
             return $;
         }
     }

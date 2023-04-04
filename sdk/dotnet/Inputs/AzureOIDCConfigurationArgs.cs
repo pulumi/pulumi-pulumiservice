@@ -15,20 +15,20 @@ namespace Pulumi.PulumiService.Inputs
         /// <summary>
         /// The client ID of the federated workload identity.
         /// </summary>
-        [Input("clientId")]
-        public Input<string>? ClientId { get; set; }
+        [Input("clientId", required: true)]
+        public Input<string> ClientId { get; set; } = null!;
 
         /// <summary>
         /// The subscription ID of the federated workload identity.
         /// </summary>
-        [Input("subscriptionId")]
-        public Input<string>? SubscriptionId { get; set; }
+        [Input("subscriptionId", required: true)]
+        public Input<string> SubscriptionId { get; set; } = null!;
 
         /// <summary>
         /// The tenant ID of the federated workload identity.
         /// </summary>
-        [Input("tenantId")]
-        public Input<string>? TenantId { get; set; }
+        [Input("tenantId", required: true)]
+        public Input<string> TenantId { get; set; } = null!;
 
         public AzureOIDCConfigurationArgs()
         {

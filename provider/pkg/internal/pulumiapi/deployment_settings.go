@@ -20,7 +20,35 @@ type OperationContext struct {
 	Options              *OperationContextOptions       `json:"options,omitempty"`
 	PreRunCommands       []string                       `json:"PreRunCommands,omitempty"`
 	EnvironmentVariables map[string]apitype.SecretValue `json:"environmentVariables"`
-	//OIDC                 *OIDCConfiguration       `json:"oidc"`
+	OIDC                 *OIDCConfiguration             `json:"oidc"`
+}
+
+type OIDCConfiguration struct {
+	AWS   *AWSOIDCConfiguration   `json:"aws,omitempty"`
+	GCP   *GCPOIDCConfiguration   `json:"gcp,omitempty"`
+	Azure *AzureOIDCConfiguration `json:"azure,omitempty"`
+}
+
+type AWSOIDCConfiguration struct {
+	Duration    string   `json:"duration,omitempty"`
+	PolicyARNs  []string `json:"policyArns,omitempty"`
+	RoleARN     string   `json:"roleArn"`
+	SessionName string   `json:"sessionName"`
+}
+
+type GCPOIDCConfiguration struct {
+	ProjectID      string `json:"projectId,omitempty"`
+	Region         string `json:"region"`
+	WorkloadPoolID string `json:"workloadPoolId,omitempty"`
+	ProviderID     string `json:"providerId,omitempty"`
+	ServiceAccount string `json:"serviceAccount,omitempty"`
+	TokenLifetime  string `json:"tokenLifetime"`
+}
+
+type AzureOIDCConfiguration struct {
+	ClientID       string `json:"clientId"`
+	TenantID       string `json:"tenantId"`
+	SubscriptionID string `json:"subscriptionId"`
 }
 
 type OperationContextOptions struct {

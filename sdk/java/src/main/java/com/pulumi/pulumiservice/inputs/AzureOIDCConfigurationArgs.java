@@ -7,8 +7,6 @@ import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import java.lang.String;
 import java.util.Objects;
-import java.util.Optional;
-import javax.annotation.Nullable;
 
 
 public final class AzureOIDCConfigurationArgs extends com.pulumi.resources.ResourceArgs {
@@ -19,45 +17,45 @@ public final class AzureOIDCConfigurationArgs extends com.pulumi.resources.Resou
      * The client ID of the federated workload identity.
      * 
      */
-    @Import(name="clientId")
-    private @Nullable Output<String> clientId;
+    @Import(name="clientId", required=true)
+    private Output<String> clientId;
 
     /**
      * @return The client ID of the federated workload identity.
      * 
      */
-    public Optional<Output<String>> clientId() {
-        return Optional.ofNullable(this.clientId);
+    public Output<String> clientId() {
+        return this.clientId;
     }
 
     /**
      * The subscription ID of the federated workload identity.
      * 
      */
-    @Import(name="subscriptionId")
-    private @Nullable Output<String> subscriptionId;
+    @Import(name="subscriptionId", required=true)
+    private Output<String> subscriptionId;
 
     /**
      * @return The subscription ID of the federated workload identity.
      * 
      */
-    public Optional<Output<String>> subscriptionId() {
-        return Optional.ofNullable(this.subscriptionId);
+    public Output<String> subscriptionId() {
+        return this.subscriptionId;
     }
 
     /**
      * The tenant ID of the federated workload identity.
      * 
      */
-    @Import(name="tenantId")
-    private @Nullable Output<String> tenantId;
+    @Import(name="tenantId", required=true)
+    private Output<String> tenantId;
 
     /**
      * @return The tenant ID of the federated workload identity.
      * 
      */
-    public Optional<Output<String>> tenantId() {
-        return Optional.ofNullable(this.tenantId);
+    public Output<String> tenantId() {
+        return this.tenantId;
     }
 
     private AzureOIDCConfigurationArgs() {}
@@ -92,7 +90,7 @@ public final class AzureOIDCConfigurationArgs extends com.pulumi.resources.Resou
          * @return builder
          * 
          */
-        public Builder clientId(@Nullable Output<String> clientId) {
+        public Builder clientId(Output<String> clientId) {
             $.clientId = clientId;
             return this;
         }
@@ -113,7 +111,7 @@ public final class AzureOIDCConfigurationArgs extends com.pulumi.resources.Resou
          * @return builder
          * 
          */
-        public Builder subscriptionId(@Nullable Output<String> subscriptionId) {
+        public Builder subscriptionId(Output<String> subscriptionId) {
             $.subscriptionId = subscriptionId;
             return this;
         }
@@ -134,7 +132,7 @@ public final class AzureOIDCConfigurationArgs extends com.pulumi.resources.Resou
          * @return builder
          * 
          */
-        public Builder tenantId(@Nullable Output<String> tenantId) {
+        public Builder tenantId(Output<String> tenantId) {
             $.tenantId = tenantId;
             return this;
         }
@@ -150,6 +148,9 @@ public final class AzureOIDCConfigurationArgs extends com.pulumi.resources.Resou
         }
 
         public AzureOIDCConfigurationArgs build() {
+            $.clientId = Objects.requireNonNull($.clientId, "expected parameter 'clientId' to be non-null");
+            $.subscriptionId = Objects.requireNonNull($.subscriptionId, "expected parameter 'subscriptionId' to be non-null");
+            $.tenantId = Objects.requireNonNull($.tenantId, "expected parameter 'tenantId' to be non-null");
             return $;
         }
     }

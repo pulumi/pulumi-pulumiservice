@@ -30,22 +30,21 @@ __all__ = [
 class AWSOIDCConfigurationArgs:
     def __init__(__self__, *,
                  role_arn: pulumi.Input[str],
-                 duration: Optional[pulumi.Input[int]] = None,
-                 policy_arns: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None,
-                 session_name: Optional[pulumi.Input[str]] = None):
+                 session_name: pulumi.Input[str],
+                 duration: Optional[pulumi.Input[str]] = None,
+                 policy_arns: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None):
         """
         :param pulumi.Input[str] role_arn: The ARN of the role to assume using the OIDC token.
-        :param pulumi.Input[int] duration: Duration of the assume-role session
-        :param pulumi.Input[Sequence[pulumi.Input[str]]] policy_arns: Optional set of IAM policy ARNs that further restrict the assume-role session
         :param pulumi.Input[str] session_name: The name of the assume-role session.
+        :param pulumi.Input[str] duration: Duration of the assume-role session in “XhYmZs” format
+        :param pulumi.Input[Sequence[pulumi.Input[str]]] policy_arns: Optional set of IAM policy ARNs that further restrict the assume-role session
         """
         pulumi.set(__self__, "role_arn", role_arn)
+        pulumi.set(__self__, "session_name", session_name)
         if duration is not None:
             pulumi.set(__self__, "duration", duration)
         if policy_arns is not None:
             pulumi.set(__self__, "policy_arns", policy_arns)
-        if session_name is not None:
-            pulumi.set(__self__, "session_name", session_name)
 
     @property
     @pulumi.getter(name="roleARN")
@@ -60,15 +59,27 @@ class AWSOIDCConfigurationArgs:
         pulumi.set(self, "role_arn", value)
 
     @property
-    @pulumi.getter
-    def duration(self) -> Optional[pulumi.Input[int]]:
+    @pulumi.getter(name="sessionName")
+    def session_name(self) -> pulumi.Input[str]:
         """
-        Duration of the assume-role session
+        The name of the assume-role session.
+        """
+        return pulumi.get(self, "session_name")
+
+    @session_name.setter
+    def session_name(self, value: pulumi.Input[str]):
+        pulumi.set(self, "session_name", value)
+
+    @property
+    @pulumi.getter
+    def duration(self) -> Optional[pulumi.Input[str]]:
+        """
+        Duration of the assume-role session in “XhYmZs” format
         """
         return pulumi.get(self, "duration")
 
     @duration.setter
-    def duration(self, value: Optional[pulumi.Input[int]]):
+    def duration(self, value: Optional[pulumi.Input[str]]):
         pulumi.set(self, "duration", value)
 
     @property
@@ -83,71 +94,56 @@ class AWSOIDCConfigurationArgs:
     def policy_arns(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]]):
         pulumi.set(self, "policy_arns", value)
 
-    @property
-    @pulumi.getter(name="sessionName")
-    def session_name(self) -> Optional[pulumi.Input[str]]:
-        """
-        The name of the assume-role session.
-        """
-        return pulumi.get(self, "session_name")
-
-    @session_name.setter
-    def session_name(self, value: Optional[pulumi.Input[str]]):
-        pulumi.set(self, "session_name", value)
-
 
 @pulumi.input_type
 class AzureOIDCConfigurationArgs:
     def __init__(__self__, *,
-                 client_id: Optional[pulumi.Input[str]] = None,
-                 subscription_id: Optional[pulumi.Input[str]] = None,
-                 tenant_id: Optional[pulumi.Input[str]] = None):
+                 client_id: pulumi.Input[str],
+                 subscription_id: pulumi.Input[str],
+                 tenant_id: pulumi.Input[str]):
         """
         :param pulumi.Input[str] client_id: The client ID of the federated workload identity.
         :param pulumi.Input[str] subscription_id: The subscription ID of the federated workload identity.
         :param pulumi.Input[str] tenant_id: The tenant ID of the federated workload identity.
         """
-        if client_id is not None:
-            pulumi.set(__self__, "client_id", client_id)
-        if subscription_id is not None:
-            pulumi.set(__self__, "subscription_id", subscription_id)
-        if tenant_id is not None:
-            pulumi.set(__self__, "tenant_id", tenant_id)
+        pulumi.set(__self__, "client_id", client_id)
+        pulumi.set(__self__, "subscription_id", subscription_id)
+        pulumi.set(__self__, "tenant_id", tenant_id)
 
     @property
     @pulumi.getter(name="clientId")
-    def client_id(self) -> Optional[pulumi.Input[str]]:
+    def client_id(self) -> pulumi.Input[str]:
         """
         The client ID of the federated workload identity.
         """
         return pulumi.get(self, "client_id")
 
     @client_id.setter
-    def client_id(self, value: Optional[pulumi.Input[str]]):
+    def client_id(self, value: pulumi.Input[str]):
         pulumi.set(self, "client_id", value)
 
     @property
     @pulumi.getter(name="subscriptionId")
-    def subscription_id(self) -> Optional[pulumi.Input[str]]:
+    def subscription_id(self) -> pulumi.Input[str]:
         """
         The subscription ID of the federated workload identity.
         """
         return pulumi.get(self, "subscription_id")
 
     @subscription_id.setter
-    def subscription_id(self, value: Optional[pulumi.Input[str]]):
+    def subscription_id(self, value: pulumi.Input[str]):
         pulumi.set(self, "subscription_id", value)
 
     @property
     @pulumi.getter(name="tenantId")
-    def tenant_id(self) -> Optional[pulumi.Input[str]]:
+    def tenant_id(self) -> pulumi.Input[str]:
         """
         The tenant ID of the federated workload identity.
         """
         return pulumi.get(self, "tenant_id")
 
     @tenant_id.setter
-    def tenant_id(self, value: Optional[pulumi.Input[str]]):
+    def tenant_id(self, value: pulumi.Input[str]):
         pulumi.set(self, "tenant_id", value)
 
 
@@ -255,18 +251,14 @@ class DeploymentSettingsGitAuthSSHAuthArgs:
 class DeploymentSettingsGitSourceGitAuthArgs:
     def __init__(__self__, *,
                  basic_auth: Optional[pulumi.Input['DeploymentSettingsGitAuthBasicAuthArgs']] = None,
-                 personal_access_token: Optional[pulumi.Input[str]] = None,
                  ssh_auth: Optional[pulumi.Input['DeploymentSettingsGitAuthSSHAuthArgs']] = None):
         """
         Git source settings for a deployment.
         :param pulumi.Input['DeploymentSettingsGitAuthBasicAuthArgs'] basic_auth: Basic auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
-        :param pulumi.Input[str] personal_access_token: Personal access token for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
         :param pulumi.Input['DeploymentSettingsGitAuthSSHAuthArgs'] ssh_auth: SSH auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
         """
         if basic_auth is not None:
             pulumi.set(__self__, "basic_auth", basic_auth)
-        if personal_access_token is not None:
-            pulumi.set(__self__, "personal_access_token", personal_access_token)
         if ssh_auth is not None:
             pulumi.set(__self__, "ssh_auth", ssh_auth)
 
@@ -281,18 +273,6 @@ class DeploymentSettingsGitSourceGitAuthArgs:
     @basic_auth.setter
     def basic_auth(self, value: Optional[pulumi.Input['DeploymentSettingsGitAuthBasicAuthArgs']]):
         pulumi.set(self, "basic_auth", value)
-
-    @property
-    @pulumi.getter(name="personalAccessToken")
-    def personal_access_token(self) -> Optional[pulumi.Input[str]]:
-        """
-        Personal access token for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
-        """
-        return pulumi.get(self, "personal_access_token")
-
-    @personal_access_token.setter
-    def personal_access_token(self, value: Optional[pulumi.Input[str]]):
-        pulumi.set(self, "personal_access_token", value)
 
     @property
     @pulumi.getter(name="sshAuth")
@@ -570,56 +550,76 @@ class DeploymentSettingsSourceContextArgs:
 @pulumi.input_type
 class GCPOIDCConfigurationArgs:
     def __init__(__self__, *,
-                 project_id: Optional[pulumi.Input[str]] = None,
-                 provider_id: Optional[pulumi.Input[str]] = None,
+                 project_id: pulumi.Input[str],
+                 provider_id: pulumi.Input[str],
+                 service_account: pulumi.Input[str],
+                 workload_pool_id: pulumi.Input[str],
                  region: Optional[pulumi.Input[str]] = None,
-                 service_account: Optional[pulumi.Input[str]] = None,
-                 token_lifetime: Optional[pulumi.Input[int]] = None,
-                 workload_pool_id: Optional[pulumi.Input[str]] = None):
+                 token_lifetime: Optional[pulumi.Input[str]] = None):
         """
         :param pulumi.Input[str] project_id: The numerical ID of the GCP project.
         :param pulumi.Input[str] provider_id: The ID of the identity provider associated with the workload pool.
-        :param pulumi.Input[str] region: The region of the GCP project.
         :param pulumi.Input[str] service_account: The email address of the service account to use.
-        :param pulumi.Input[int] token_lifetime: The lifetime of the temporary credentials.
         :param pulumi.Input[str] workload_pool_id: The ID of the workload pool to use.
+        :param pulumi.Input[str] region: The region of the GCP project.
+        :param pulumi.Input[str] token_lifetime: The lifetime of the temporary credentials in “XhYmZs” format.
         """
-        if project_id is not None:
-            pulumi.set(__self__, "project_id", project_id)
-        if provider_id is not None:
-            pulumi.set(__self__, "provider_id", provider_id)
+        pulumi.set(__self__, "project_id", project_id)
+        pulumi.set(__self__, "provider_id", provider_id)
+        pulumi.set(__self__, "service_account", service_account)
+        pulumi.set(__self__, "workload_pool_id", workload_pool_id)
         if region is not None:
             pulumi.set(__self__, "region", region)
-        if service_account is not None:
-            pulumi.set(__self__, "service_account", service_account)
         if token_lifetime is not None:
             pulumi.set(__self__, "token_lifetime", token_lifetime)
-        if workload_pool_id is not None:
-            pulumi.set(__self__, "workload_pool_id", workload_pool_id)
 
     @property
     @pulumi.getter(name="projectId")
-    def project_id(self) -> Optional[pulumi.Input[str]]:
+    def project_id(self) -> pulumi.Input[str]:
         """
         The numerical ID of the GCP project.
         """
         return pulumi.get(self, "project_id")
 
     @project_id.setter
-    def project_id(self, value: Optional[pulumi.Input[str]]):
+    def project_id(self, value: pulumi.Input[str]):
         pulumi.set(self, "project_id", value)
 
     @property
     @pulumi.getter(name="providerId")
-    def provider_id(self) -> Optional[pulumi.Input[str]]:
+    def provider_id(self) -> pulumi.Input[str]:
         """
         The ID of the identity provider associated with the workload pool.
         """
         return pulumi.get(self, "provider_id")
 
     @provider_id.setter
-    def provider_id(self, value: Optional[pulumi.Input[str]]):
+    def provider_id(self, value: pulumi.Input[str]):
         pulumi.set(self, "provider_id", value)
+
+    @property
+    @pulumi.getter(name="serviceAccount")
+    def service_account(self) -> pulumi.Input[str]:
+        """
+        The email address of the service account to use.
+        """
+        return pulumi.get(self, "service_account")
+
+    @service_account.setter
+    def service_account(self, value: pulumi.Input[str]):
+        pulumi.set(self, "service_account", value)
+
+    @property
+    @pulumi.getter(name="workloadPoolId")
+    def workload_pool_id(self) -> pulumi.Input[str]:
+        """
+        The ID of the workload pool to use.
+        """
+        return pulumi.get(self, "workload_pool_id")
+
+    @workload_pool_id.setter
+    def workload_pool_id(self, value: pulumi.Input[str]):
+        pulumi.set(self, "workload_pool_id", value)
 
     @property
     @pulumi.getter
@@ -634,40 +634,16 @@ class GCPOIDCConfigurationArgs:
         pulumi.set(self, "region", value)
 
     @property
-    @pulumi.getter(name="serviceAccount")
-    def service_account(self) -> Optional[pulumi.Input[str]]:
-        """
-        The email address of the service account to use.
-        """
-        return pulumi.get(self, "service_account")
-
-    @service_account.setter
-    def service_account(self, value: Optional[pulumi.Input[str]]):
-        pulumi.set(self, "service_account", value)
-
-    @property
     @pulumi.getter(name="tokenLifetime")
-    def token_lifetime(self) -> Optional[pulumi.Input[int]]:
+    def token_lifetime(self) -> Optional[pulumi.Input[str]]:
         """
-        The lifetime of the temporary credentials.
+        The lifetime of the temporary credentials in “XhYmZs” format.
         """
         return pulumi.get(self, "token_lifetime")
 
     @token_lifetime.setter
-    def token_lifetime(self, value: Optional[pulumi.Input[int]]):
+    def token_lifetime(self, value: Optional[pulumi.Input[str]]):
         pulumi.set(self, "token_lifetime", value)
-
-    @property
-    @pulumi.getter(name="workloadPoolId")
-    def workload_pool_id(self) -> Optional[pulumi.Input[str]]:
-        """
-        The ID of the workload pool to use.
-        """
-        return pulumi.get(self, "workload_pool_id")
-
-    @workload_pool_id.setter
-    def workload_pool_id(self, value: Optional[pulumi.Input[str]]):
-        pulumi.set(self, "workload_pool_id", value)
 
 
 @pulumi.input_type
