@@ -54,8 +54,8 @@ const settings = new service.DeploymentSettings("deployment_settings", {
             branch: "refs/heads/main",
             repoDir: "pulumi-programs/simple-resource",
             gitAuth: {
-                basicAuth: {
-                    username: "my-username",
+                sshAuth: {
+                    sshPrivateKey: "key",
                     password: config.requireSecret("password"),
                 }
             }

@@ -158,7 +158,9 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 		sr.Configure(sc)
 	}
 
-	return &pulumirpc.ConfigureResponse{}, nil
+	return &pulumirpc.ConfigureResponse{
+		AcceptSecrets: true,
+	}, nil
 }
 
 // Invoke dynamically executes a built-in function in the provider.
