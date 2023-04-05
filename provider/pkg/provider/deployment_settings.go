@@ -11,7 +11,6 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
-	"github.com/ryboe/q"
 )
 
 type PulumiServiceDeploymentSettingsInput struct {
@@ -19,11 +18,159 @@ type PulumiServiceDeploymentSettingsInput struct {
 	Stack pulumiapi.StackName
 }
 
+const FixMe = "FIX ME"
+
 func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap() resource.PropertyMap {
 	pm := resource.PropertyMap{}
 	pm["organization"] = resource.NewPropertyValue(ds.Stack.OrgName)
 	pm["project"] = resource.NewPropertyValue(ds.Stack.ProjectName)
 	pm["stack"] = resource.NewPropertyValue(ds.Stack.StackName)
+
+	if ds.SourceContext != nil {
+		scMap := resource.PropertyMap{}
+		if ds.SourceContext.Git != nil {
+			gitPropertyMap := resource.PropertyMap{}
+			if ds.SourceContext.Git.RepoURL != "" {
+				gitPropertyMap["repoUrl"] = resource.NewPropertyValue(ds.SourceContext.Git.RepoURL)
+			}
+			if ds.SourceContext.Git.Commit != "" {
+				gitPropertyMap["commit"] = resource.NewPropertyValue(ds.SourceContext.Git.Commit)
+			}
+			if ds.SourceContext.Git.Branch != "" {
+				gitPropertyMap["branch"] = resource.NewPropertyValue(ds.SourceContext.Git.Branch)
+			}
+			if ds.SourceContext.Git.GitAuth != nil {
+				gitAuthPropertyMap := resource.PropertyMap{}
+				if ds.SourceContext.Git.GitAuth.SSHAuth != nil {
+					sshAuthPropertyMap := resource.PropertyMap{}
+					if ds.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey.Value != "" {
+						sshAuthPropertyMap["sshPrivateKey"] = resource.NewPropertyValue(FixMe)
+					}
+					if ds.SourceContext.Git.GitAuth.SSHAuth.Password.Value != "" {
+						sshAuthPropertyMap["password"] = resource.NewPropertyValue(FixMe)
+					}
+					gitAuthPropertyMap["sshAuth"] = resource.PropertyValue{V: sshAuthPropertyMap}
+				}
+				if ds.SourceContext.Git.GitAuth.BasicAuth != nil {
+					basicAuthPropertyMap := resource.PropertyMap{}
+					if ds.SourceContext.Git.GitAuth.BasicAuth.UserName.Value != "" {
+						basicAuthPropertyMap["username"] = resource.NewPropertyValue(ds.SourceContext.Git.GitAuth.BasicAuth.UserName.Value)
+					}
+					if ds.SourceContext.Git.GitAuth.BasicAuth.Password.Value != "" {
+						basicAuthPropertyMap["password"] = resource.NewPropertyValue("fix me")
+					}
+					gitAuthPropertyMap["basicAuth"] = resource.NewPropertyValue(basicAuthPropertyMap)
+				}
+				gitPropertyMap["gitAuth"] = resource.PropertyValue{V: gitAuthPropertyMap}
+			}
+			scMap["git"] = resource.PropertyValue{V: gitPropertyMap}
+		}
+		pm["sourceContext"] = resource.PropertyValue{V: scMap}
+	}
+
+	if ds.OperationContext != nil {
+		ocMap := resource.PropertyMap{}
+		if ds.OperationContext.PreRunCommands != nil {
+			ocMap["preRunCommands"] = resource.NewPropertyValue(ds.OperationContext.PreRunCommands)
+		}
+		if ds.OperationContext.EnvironmentVariables != nil {
+			evMap := resource.PropertyMap{}
+			for k, v := range ds.OperationContext.EnvironmentVariables {
+				if v.Secret {
+					evMap[resource.PropertyKey(k)] = resource.NewPropertyValue(FixMe)
+				} else {
+					evMap[resource.PropertyKey(k)] = resource.NewPropertyValue(v.Value)
+				}
+			}
+			ocMap["environmentVariables"] = resource.PropertyValue{V: evMap}
+		}
+		if ds.OperationContext.Options != nil {
+			optionsMap := resource.PropertyMap{}
+			if ds.OperationContext.Options.Shell != "" {
+				optionsMap["shell"] = resource.NewPropertyValue(ds.OperationContext.Options.Shell)
+			}
+			if ds.OperationContext.Options.SkipInstallDependencies {
+				optionsMap["skipInstallDependencies"] = resource.NewPropertyValue(true)
+			}
+			ocMap["options"] = resource.PropertyValue{V: optionsMap}
+		}
+		if ds.OperationContext.OIDC != nil {
+			if ds.OperationContext.OIDC.AWS != nil || ds.OperationContext.OIDC.GCP != nil || ds.OperationContext.OIDC.Azure != nil {
+				oidcMap := resource.PropertyMap{}
+				if ds.OperationContext.OIDC.AWS != nil {
+					awsMap := resource.PropertyMap{}
+					if ds.OperationContext.OIDC.AWS.RoleARN != "" {
+						awsMap["roleARN"] = resource.NewPropertyValue(ds.OperationContext.OIDC.AWS.RoleARN)
+					}
+					if ds.OperationContext.OIDC.AWS.SessionName != "" {
+						awsMap["sessionName"] = resource.NewPropertyValue(ds.OperationContext.OIDC.AWS.SessionName)
+					}
+					if ds.OperationContext.OIDC.AWS.PolicyARNs != nil {
+						awsMap["policyARNs"] = resource.NewPropertyValue(ds.OperationContext.OIDC.AWS.PolicyARNs)
+					}
+					if ds.OperationContext.OIDC.AWS.Duration != "" {
+						awsMap["duration"] = resource.NewPropertyValue(ds.OperationContext.OIDC.AWS.Duration)
+					}
+					oidcMap["aws"] = resource.PropertyValue{V: awsMap}
+				}
+				if ds.OperationContext.OIDC.GCP != nil {
+					gcpMap := resource.PropertyMap{}
+					if ds.OperationContext.OIDC.GCP.ProviderID != "" {
+						gcpMap["providerId"] = resource.NewPropertyValue(ds.OperationContext.OIDC.GCP.ProviderID)
+					}
+					if ds.OperationContext.OIDC.GCP.ServiceAccount != "" {
+						gcpMap["serviceAccount"] = resource.NewPropertyValue(ds.OperationContext.OIDC.GCP.ServiceAccount)
+					}
+					if ds.OperationContext.OIDC.GCP.Region != "" {
+						gcpMap["region"] = resource.NewPropertyValue(ds.OperationContext.OIDC.GCP.Region)
+					}
+					if ds.OperationContext.OIDC.GCP.WorkloadPoolID != "" {
+						gcpMap["workloadPoolId"] = resource.NewPropertyValue(ds.OperationContext.OIDC.GCP.WorkloadPoolID)
+					}
+					if ds.OperationContext.OIDC.GCP.ProjectID != "" {
+						gcpMap["projectId"] = resource.NewPropertyValue(ds.OperationContext.OIDC.GCP.ProjectID)
+					}
+					if ds.OperationContext.OIDC.GCP.TokenLifetime != "" {
+						gcpMap["tokenLifetime"] = resource.NewPropertyValue(ds.OperationContext.OIDC.GCP.TokenLifetime)
+					}
+					oidcMap["gcp"] = resource.PropertyValue{V: gcpMap}
+				}
+				if ds.OperationContext.OIDC.Azure != nil {
+					azureMap := resource.PropertyMap{}
+					if ds.OperationContext.OIDC.Azure.TenantID != "" {
+						azureMap["tenantId"] = resource.NewPropertyValue(ds.OperationContext.OIDC.Azure.TenantID)
+					}
+					if ds.OperationContext.OIDC.Azure.ClientID != "" {
+						azureMap["clientId"] = resource.NewPropertyValue(ds.OperationContext.OIDC.Azure.ClientID)
+					}
+					if ds.OperationContext.OIDC.Azure.SubscriptionID != "" {
+						azureMap["subscriptionId"] = resource.NewPropertyValue(ds.OperationContext.OIDC.Azure.SubscriptionID)
+					}
+				}
+				ocMap["oidc"] = resource.PropertyValue{V: oidcMap}
+			}
+		}
+		pm["operationContext"] = resource.PropertyValue{V: ocMap}
+	}
+
+	if ds.GitHub != nil {
+		githubMap := resource.PropertyMap{}
+		githubMap["previewPullRequests"] = resource.NewPropertyValue(ds.GitHub.PreviewPullRequests)
+		githubMap["deployCommits"] = resource.NewPropertyValue(ds.GitHub.DeployCommits)
+		if ds.GitHub.Repository != "" {
+			githubMap["repository"] = resource.NewPropertyValue(ds.GitHub.Repository)
+		}
+		if len(ds.GitHub.Paths) > 0 {
+			githubMap["paths"] = resource.NewPropertyValue(ds.GitHub.Paths)
+		}
+		pm["github"] = resource.PropertyValue{V: githubMap}
+	}
+
+	if ds.ExecutorContext != nil && ds.ExecutorContext.ExecutorImage != "" {
+		ecMap := resource.PropertyMap{}
+		ecMap["executorImage"] = resource.NewPropertyValue(ds.ExecutorContext.ExecutorImage)
+		pm["executorContext"] = resource.PropertyValue{V: ecMap}
+	}
 	return pm
 }
 
@@ -361,12 +508,7 @@ func (ds *PulumiServiceDeploymentSettingsResource) Configure(config PulumiServic
 
 func (ds *PulumiServiceDeploymentSettingsResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
 	ctx := context.Background()
-	inputs, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
 
-	q.Q(req.Id)
 	var stack pulumiapi.StackName
 	if err := stack.FromID(req.Id); err != nil {
 		return nil, err
@@ -390,19 +532,10 @@ func (ds *PulumiServiceDeploymentSettingsResource) Read(req *pulumirpc.ReadReque
 		return nil, err
 	}
 
-	inputProperties, err := plugin.MarshalProperties(
-		inputs,
-		plugin.MarshalOptions{},
-	)
-
-	if err != nil {
-		return nil, err
-	}
-
 	return &pulumirpc.ReadResponse{
 		Id:         req.Id,
 		Properties: properties,
-		Inputs:     inputProperties,
+		Inputs:     properties,
 	}, nil
 }
 
@@ -430,9 +563,7 @@ func (ds *PulumiServiceDeploymentSettingsResource) Create(req *pulumirpc.CreateR
 	if err != nil {
 		return nil, err
 	}
-	q.Q(inputsMap)
 	inputs := ds.ToPulumiServiceDeploymentSettingsInput(inputsMap)
-	q.Q(inputs)
 	settings := inputs.DeploymentSettings
 	err = ds.client.CreateDeploymentSettings(ctx, inputs.Stack, settings)
 	if err != nil {
