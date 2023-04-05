@@ -1,0 +1,25 @@
+name: yaml-deployment-settings-example
+runtime: yaml
+description: Deployment settings test
+resources:
+  my_settings:
+    type: pulumiservice:DeploymentSettings
+    properties:
+      organization: service-provider-test-org
+      project: yaml-deployment-settings-example
+      stack: test-stack
+      executorContext:
+        executorImage: "pulumi/pulumi-nodejs:latest"
+      sourceContext:
+        git:
+          repoUrl: "https://github.com/pulumi/deploy-demos.git"
+          branch: "refs/heads/main"
+          repoDir: "pulumi-programs/simple-resource"
+      operationContext:
+        preRunCommands:
+          - yarn
+          - ls -al
+        environmentVariables:
+          TEST_VAR: "test-value"
+        options:
+          skipInstallDependencies: true
