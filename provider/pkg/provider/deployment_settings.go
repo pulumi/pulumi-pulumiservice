@@ -18,7 +18,7 @@ type PulumiServiceDeploymentSettingsInput struct {
 	Stack pulumiapi.StackName
 }
 
-const FixMe = "FIX ME"
+const FixMe = "<value is secret and must be replaced>"
 
 func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap() resource.PropertyMap {
 	pm := resource.PropertyMap{}
@@ -473,15 +473,22 @@ func (ds *PulumiServiceDeploymentSettingsResource) Diff(req *pulumirpc.DiffReque
 		}, nil
 	}
 
-	replaces := make([]string, len(diffs.ChangedKeys()))
-	for i, k := range diffs.ChangedKeys() {
-		replaces[i] = string(k)
+	dd := plugin.NewDetailedDiffFromObjectDiff(diffs)
+
+	detailedDiffs := map[string]*pulumirpc.PropertyDiff{}
+	for k, v := range dd {
+		v.Kind = v.Kind.AsReplace()
+		detailedDiffs[k] = &pulumirpc.PropertyDiff{
+			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind),
+			InputDiff: v.InputDiff,
+		}
 	}
 
 	return &pulumirpc.DiffResponse{
 		Changes:             pulumirpc.DiffResponse_DIFF_SOME,
-		Replaces:            replaces,
+		DetailedDiff:        detailedDiffs,
 		DeleteBeforeReplace: true,
+		HasDetailedDiff:     true,
 	}, nil
 }
 
@@ -577,7 +584,7 @@ func (ds *PulumiServiceDeploymentSettingsResource) Create(req *pulumirpc.CreateR
 
 func (ds *PulumiServiceDeploymentSettingsResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
 	// For simplicity, all updates are destructive, so we just call Create.
-	return &pulumirpc.UpdateResponse{}, nil
+	return nil, fmt.Errorf("unexpected call to update, expected create to be called instead")
 }
 
 func (ds *PulumiServiceDeploymentSettingsResource) Name() string {
