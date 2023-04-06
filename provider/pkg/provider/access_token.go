@@ -25,7 +25,7 @@ func (i *PulumiServiceAccessTokenInput) ToPropertyMap() resource.PropertyMap {
 	return pm
 }
 
-func (t *PulumiServiceAccessTokenResource) ToPulumiServiceAccessTokenInput(inputMap resource.PropertyMap) PulumiServiceAccessTokenInput {
+func (at *PulumiServiceAccessTokenResource) ToPulumiServiceAccessTokenInput(inputMap resource.PropertyMap) PulumiServiceAccessTokenInput {
 	input := PulumiServiceAccessTokenInput{}
 
 	if inputMap["description"].HasValue() && inputMap["description"].IsString() {
@@ -35,11 +35,11 @@ func (t *PulumiServiceAccessTokenResource) ToPulumiServiceAccessTokenInput(input
 	return input
 }
 
-func (c PulumiServiceAccessTokenResource) Name() string {
+func (at *PulumiServiceAccessTokenResource) Name() string {
 	return "pulumiservice:index:AccessToken"
 }
 
-func (c *PulumiServiceAccessTokenResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+func (at *PulumiServiceAccessTokenResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
 	olds, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
 	if err != nil {
 		return nil, err
@@ -68,9 +68,9 @@ func (c *PulumiServiceAccessTokenResource) Diff(req *pulumirpc.DiffRequest) (*pu
 	}, nil
 }
 
-func (c *PulumiServiceAccessTokenResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
+func (at *PulumiServiceAccessTokenResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
 	ctx := context.Background()
-	err := c.deleteAccessToken(ctx, req.Id)
+	err := at.deleteAccessToken(ctx, req.Id)
 	if err != nil {
 		return &pbempty.Empty{}, err
 	}
@@ -110,19 +110,19 @@ func (at *PulumiServiceAccessTokenResource) Create(req *pulumirpc.CreateRequest)
 
 }
 
-func (k *PulumiServiceAccessTokenResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
+func (at *PulumiServiceAccessTokenResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
 	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: nil}, nil
 }
 
-func (k *PulumiServiceAccessTokenResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+func (at *PulumiServiceAccessTokenResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
 	return &pulumirpc.UpdateResponse{}, nil
 }
 
-func (k *PulumiServiceAccessTokenResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
+func (at *PulumiServiceAccessTokenResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
 	return &pulumirpc.ReadResponse{}, nil
 }
 
-func (f *PulumiServiceAccessTokenResource) Invoke(s *pulumiserviceProvider, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
+func (at *PulumiServiceAccessTokenResource) Invoke(s *pulumiserviceProvider, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
 	return &pulumirpc.InvokeResponse{Return: nil}, fmt.Errorf("unknown function '%s'", req.Tok)
 }
 

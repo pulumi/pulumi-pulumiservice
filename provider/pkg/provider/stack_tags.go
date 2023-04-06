@@ -36,7 +36,7 @@ func (st *PulumiServiceStackTagResource) ToPulumiServiceStackTagInput(inputMap r
 	return input
 }
 
-func (s *PulumiServiceStackTagResource) Name() string {
+func (st *PulumiServiceStackTagResource) Name() string {
 	return "pulumiservice:index:StackTag"
 }
 

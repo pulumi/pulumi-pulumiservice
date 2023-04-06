@@ -35,6 +35,22 @@ func TestStackTagsExample(t *testing.T) {
 	})
 }
 
+func TestDeploymentSettingsExample(t *testing.T) {
+	cwd, _ := os.Getwd()
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Config: map[string]string{
+			"my_secret": "my_secret_value",
+			"password":  "my_password",
+		},
+		Quick:       true,
+		SkipRefresh: true,
+		Dir:         path.Join(cwd, ".", "ts-deployment-settings"),
+		Dependencies: []string{
+			"@pulumi/pulumiservice",
+		},
+	})
+}
+
 func TestTeamStackPermissionsExample(t *testing.T) {
 	cwd, _ := os.Getwd()
 	integration.ProgramTest(t, &integration.ProgramTestOptions{

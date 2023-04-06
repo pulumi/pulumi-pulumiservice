@@ -5,12 +5,28 @@ import (
 	"fmt"
 	"net/http"
 	"path"
+	"strings"
 )
 
 type StackName struct {
 	OrgName     string `json:"orgName"`
 	ProjectName string `json:"projectName"`
 	StackName   string `json:"stackName"`
+}
+
+func (s *StackName) String() string {
+	return fmt.Sprintf("%s/%s/%s", s.OrgName, s.ProjectName, s.StackName)
+}
+
+func (s *StackName) FromID(id string) error {
+	splitID := strings.Split(id, "/")
+	if len(splitID) != 3 {
+		return fmt.Errorf("invalid stack id: %s", id)
+	}
+	s.OrgName = splitID[0]
+	s.ProjectName = splitID[1]
+	s.StackName = splitID[2]
+	return nil
 }
 
 type StackTag struct {

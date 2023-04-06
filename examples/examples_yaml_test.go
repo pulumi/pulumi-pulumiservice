@@ -160,6 +160,41 @@ func TestYamlStackTagsExample(t *testing.T) {
 	})
 }
 
+func TestYamlDeploymentSettingsExample(t *testing.T) {
+
+	// Set up tmpdir with a Pulumi.yml with no resources
+	// mimicking the deletion of resource
+	newProgram := YamlProgram{
+		Name:        "yaml-deployment-settings-example",
+		Runtime:     "yaml",
+		Description: "Deployment settings test",
+	}
+
+	tmpdir := writePulumiYaml(t, newProgram)
+
+	cwd, _ := os.Getwd()
+
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Quick:       true,
+		SkipRefresh: true,
+		Dir:         path.Join(cwd, ".", "yaml-deployment-settings"),
+		StackName:   "test-stack",
+		PrepareProject: func(_ *engine.Projinfo) error {
+			return nil
+		},
+		EditDirs: []integration.EditDir{
+			{
+				Dir: tmpdir,
+			},
+			// Reapply the same thing again, except this time we expect there to be no changes
+			{
+				Dir:             tmpdir,
+				ExpectNoChanges: true,
+			},
+		},
+	})
+}
+
 func TestYamlTeamStackPermissionsExample(t *testing.T) {
 	cwd, _ := os.Getwd()
 	integration.ProgramTest(t, &integration.ProgramTestOptions{

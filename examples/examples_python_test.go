@@ -19,3 +19,16 @@ func TestPythonTeamsExample(t *testing.T) {
 		},
 	})
 }
+
+func TestPythonDeploymentSettingsExample(t *testing.T) {
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Dir:         path.Join(getCwd(t), "py-deployment-settings"),
+		SkipRefresh: true,
+		Config: map[string]string{
+			"my-secret": "my-secret-value",
+		},
+		Dependencies: []string{
+			filepath.Join("..", "sdk", "python", "bin"),
+		},
+	})
+}

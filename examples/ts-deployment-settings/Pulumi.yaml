@@ -1,0 +1,3 @@
+name: test-deployment-settings-proj
+runtime: nodejs
+description: A minimal example of managing a stack's deployment settings in typescript
