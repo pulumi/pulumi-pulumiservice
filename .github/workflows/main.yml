@@ -17,6 +17,7 @@ env:
   PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
 
   PULUMI_TEST_OWNER: service-provider-test-org
+  PULUMI_TEST_USE_SERVICE: true
 
   PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
   PYPI_USERNAME: pulumi
