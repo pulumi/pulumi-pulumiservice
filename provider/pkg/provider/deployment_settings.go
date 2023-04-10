@@ -224,7 +224,7 @@ func toGitHubConfig(inputMap resource.PropertyMap) *pulumiapi.GitHubConfiguratio
 		github.DeployCommits = githubInput["deployCommits"].BoolValue()
 	}
 	if githubInput["previewPullRequests"].HasValue() && githubInput["previewPullRequests"].IsBool() {
-		github.PreviewPullRequests = githubInput["deployPullRequests"].BoolValue()
+		github.PreviewPullRequests = githubInput["previewPullRequests"].BoolValue()
 	}
 	if githubInput["paths"].HasValue() && githubInput["paths"].IsArray() {
 		pathsInput := githubInput["paths"].ArrayValue()
