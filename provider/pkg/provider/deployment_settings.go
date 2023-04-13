@@ -39,6 +39,9 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap() resource.Propert
 			if ds.SourceContext.Git.Branch != "" {
 				gitPropertyMap["branch"] = resource.NewPropertyValue(ds.SourceContext.Git.Branch)
 			}
+			if ds.SourceContext.Git.RepoDir != "" {
+				gitPropertyMap["repoDir"] = resource.NewPropertyValue(ds.SourceContext.Git.RepoDir)
+			}
 			if ds.SourceContext.Git.GitAuth != nil {
 				gitAuthPropertyMap := resource.PropertyMap{}
 				if ds.SourceContext.Git.GitAuth.SSHAuth != nil {
