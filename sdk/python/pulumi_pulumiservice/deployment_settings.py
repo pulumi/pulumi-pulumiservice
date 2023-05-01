@@ -8,6 +8,7 @@ import pulumi
 import pulumi.runtime
 from typing import Any, Mapping, Optional, Sequence, Union, overload
 from . import _utilities
+from . import outputs
 from ._inputs import *
 
 __all__ = ['DeploymentSettingsArgs', 'DeploymentSettings']
@@ -209,6 +210,8 @@ class DeploymentSettings(pulumi.CustomResource):
             if stack is None and not opts.urn:
                 raise TypeError("Missing required property 'stack'")
             __props__.__dict__["stack"] = stack
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["organization", "project", "stack"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(DeploymentSettings, __self__).__init__(
             'pulumiservice:index:DeploymentSettings',
             resource_name,
@@ -231,10 +234,38 @@ class DeploymentSettings(pulumi.CustomResource):
 
         __props__ = DeploymentSettingsArgs.__new__(DeploymentSettingsArgs)
 
+        __props__.__dict__["executor_context"] = None
+        __props__.__dict__["github"] = None
+        __props__.__dict__["operation_context"] = None
         __props__.__dict__["organization"] = None
         __props__.__dict__["project"] = None
+        __props__.__dict__["source_context"] = None
         __props__.__dict__["stack"] = None
         return DeploymentSettings(resource_name, opts=opts, __props__=__props__)
+
+    @property
+    @pulumi.getter(name="executorContext")
+    def executor_context(self) -> pulumi.Output[Optional['outputs.DeploymentSettingsExecutorContext']]:
+        """
+        Settings related to the deployment executor.
+        """
+        return pulumi.get(self, "executor_context")
+
+    @property
+    @pulumi.getter
+    def github(self) -> pulumi.Output[Optional['outputs.DeploymentSettingsGithub']]:
+        """
+        GitHub settings for the deployment.
+        """
+        return pulumi.get(self, "github")
+
+    @property
+    @pulumi.getter(name="operationContext")
+    def operation_context(self) -> pulumi.Output[Optional['outputs.DeploymentSettingsOperationContext']]:
+        """
+        Settings related to the Pulumi operation environment during the deployment.
+        """
+        return pulumi.get(self, "operation_context")
 
     @property
     @pulumi.getter
@@ -251,6 +282,14 @@ class DeploymentSettings(pulumi.CustomResource):
         Project name.
         """
         return pulumi.get(self, "project")
+
+    @property
+    @pulumi.getter(name="sourceContext")
+    def source_context(self) -> pulumi.Output[Optional['outputs.DeploymentSettingsSourceContext']]:
+        """
+        Settings related to the source of the deployment.
+        """
+        return pulumi.get(self, "source_context")
 
     @property
     @pulumi.getter

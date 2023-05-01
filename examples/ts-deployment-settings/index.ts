@@ -13,7 +13,7 @@ const settings = new service.DeploymentSettings("deployment_settings", {
     operationContext: {
         preRunCommands: ["yarn"],
         environmentVariables: {
-            TEST_VAR: "foo",
+            TEST_VAR: "bar",
             SECRET_VAR: config.requireSecret("my_secret"),
         },
         options: {

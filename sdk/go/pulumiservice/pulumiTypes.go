@@ -1692,6 +1692,40 @@ func (o DeploymentSettingsSourceContextOutput) Git() DeploymentSettingsGitSource
 	return o.ApplyT(func(v DeploymentSettingsSourceContext) *DeploymentSettingsGitSource { return v.Git }).(DeploymentSettingsGitSourcePtrOutput)
 }
 
+type DeploymentSettingsSourceContextPtrOutput struct{ *pulumi.OutputState }
+
+func (DeploymentSettingsSourceContextPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**DeploymentSettingsSourceContext)(nil)).Elem()
+}
+
+func (o DeploymentSettingsSourceContextPtrOutput) ToDeploymentSettingsSourceContextPtrOutput() DeploymentSettingsSourceContextPtrOutput {
+	return o
+}
+
+func (o DeploymentSettingsSourceContextPtrOutput) ToDeploymentSettingsSourceContextPtrOutputWithContext(ctx context.Context) DeploymentSettingsSourceContextPtrOutput {
+	return o
+}
+
+func (o DeploymentSettingsSourceContextPtrOutput) Elem() DeploymentSettingsSourceContextOutput {
+	return o.ApplyT(func(v *DeploymentSettingsSourceContext) DeploymentSettingsSourceContext {
+		if v != nil {
+			return *v
+		}
+		var ret DeploymentSettingsSourceContext
+		return ret
+	}).(DeploymentSettingsSourceContextOutput)
+}
+
+// Git source settings for a deployment.
+func (o DeploymentSettingsSourceContextPtrOutput) Git() DeploymentSettingsGitSourcePtrOutput {
+	return o.ApplyT(func(v *DeploymentSettingsSourceContext) *DeploymentSettingsGitSource {
+		if v == nil {
+			return nil
+		}
+		return v.Git
+	}).(DeploymentSettingsGitSourcePtrOutput)
+}
+
 type GCPOIDCConfiguration struct {
 	// The numerical ID of the GCP project.
 	ProjectId string `pulumi:"projectId"`
@@ -2300,6 +2334,7 @@ func init() {
 	pulumi.RegisterOutputType(DeploymentSettingsOperationContextOutput{})
 	pulumi.RegisterOutputType(DeploymentSettingsOperationContextPtrOutput{})
 	pulumi.RegisterOutputType(DeploymentSettingsSourceContextOutput{})
+	pulumi.RegisterOutputType(DeploymentSettingsSourceContextPtrOutput{})
 	pulumi.RegisterOutputType(GCPOIDCConfigurationOutput{})
 	pulumi.RegisterOutputType(GCPOIDCConfigurationPtrOutput{})
 	pulumi.RegisterOutputType(OperationContextOIDCOutput{})

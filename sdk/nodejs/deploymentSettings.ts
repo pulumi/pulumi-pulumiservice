@@ -38,6 +38,18 @@ export class DeploymentSettings extends pulumi.CustomResource {
     }
 
     /**
+     * Settings related to the deployment executor.
+     */
+    public readonly executorContext!: pulumi.Output<outputs.DeploymentSettingsExecutorContext | undefined>;
+    /**
+     * GitHub settings for the deployment.
+     */
+    public readonly github!: pulumi.Output<outputs.DeploymentSettingsGithub | undefined>;
+    /**
+     * Settings related to the Pulumi operation environment during the deployment.
+     */
+    public readonly operationContext!: pulumi.Output<outputs.DeploymentSettingsOperationContext | undefined>;
+    /**
      * Organization name.
      */
     public readonly organization!: pulumi.Output<string | undefined>;
@@ -45,6 +57,10 @@ export class DeploymentSettings extends pulumi.CustomResource {
      * Project name.
      */
     public readonly project!: pulumi.Output<string | undefined>;
+    /**
+     * Settings related to the source of the deployment.
+     */
+    public readonly sourceContext!: pulumi.Output<outputs.DeploymentSettingsSourceContext | undefined>;
     /**
      * Stack name.
      */
@@ -81,11 +97,17 @@ export class DeploymentSettings extends pulumi.CustomResource {
             resourceInputs["sourceContext"] = args ? args.sourceContext : undefined;
             resourceInputs["stack"] = args ? args.stack : undefined;
         } else {
+            resourceInputs["executorContext"] = undefined /*out*/;
+            resourceInputs["github"] = undefined /*out*/;
+            resourceInputs["operationContext"] = undefined /*out*/;
             resourceInputs["organization"] = undefined /*out*/;
             resourceInputs["project"] = undefined /*out*/;
+            resourceInputs["sourceContext"] = undefined /*out*/;
             resourceInputs["stack"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["organization", "project", "stack"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(DeploymentSettings.__pulumiType, name, resourceInputs, opts);
     }
 }

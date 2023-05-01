@@ -15,10 +15,18 @@ import (
 type DeploymentSettings struct {
 	pulumi.CustomResourceState
 
+	// Settings related to the deployment executor.
+	ExecutorContext DeploymentSettingsExecutorContextPtrOutput `pulumi:"executorContext"`
+	// GitHub settings for the deployment.
+	Github DeploymentSettingsGithubPtrOutput `pulumi:"github"`
+	// Settings related to the Pulumi operation environment during the deployment.
+	OperationContext DeploymentSettingsOperationContextPtrOutput `pulumi:"operationContext"`
 	// Organization name.
 	Organization pulumi.StringPtrOutput `pulumi:"organization"`
 	// Project name.
 	Project pulumi.StringPtrOutput `pulumi:"project"`
+	// Settings related to the source of the deployment.
+	SourceContext DeploymentSettingsSourceContextPtrOutput `pulumi:"sourceContext"`
 	// Stack name.
 	Stack pulumi.StringPtrOutput `pulumi:"stack"`
 }
@@ -45,6 +53,12 @@ func NewDeploymentSettings(ctx *pulumi.Context,
 	if args.Github != nil {
 		args.Github = args.Github.ToDeploymentSettingsGithubPtrOutput().ApplyT(func(v *DeploymentSettingsGithub) *DeploymentSettingsGithub { return v.Defaults() }).(DeploymentSettingsGithubPtrOutput)
 	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"organization",
+		"project",
+		"stack",
+	})
+	opts = append(opts, replaceOnChanges)
 	var resource DeploymentSettings
 	err := ctx.RegisterResource("pulumiservice:index:DeploymentSettings", name, args, &resource, opts...)
 	if err != nil {
@@ -198,6 +212,21 @@ func (o DeploymentSettingsOutput) ToDeploymentSettingsOutputWithContext(ctx cont
 	return o
 }
 
+// Settings related to the deployment executor.
+func (o DeploymentSettingsOutput) ExecutorContext() DeploymentSettingsExecutorContextPtrOutput {
+	return o.ApplyT(func(v *DeploymentSettings) DeploymentSettingsExecutorContextPtrOutput { return v.ExecutorContext }).(DeploymentSettingsExecutorContextPtrOutput)
+}
+
+// GitHub settings for the deployment.
+func (o DeploymentSettingsOutput) Github() DeploymentSettingsGithubPtrOutput {
+	return o.ApplyT(func(v *DeploymentSettings) DeploymentSettingsGithubPtrOutput { return v.Github }).(DeploymentSettingsGithubPtrOutput)
+}
+
+// Settings related to the Pulumi operation environment during the deployment.
+func (o DeploymentSettingsOutput) OperationContext() DeploymentSettingsOperationContextPtrOutput {
+	return o.ApplyT(func(v *DeploymentSettings) DeploymentSettingsOperationContextPtrOutput { return v.OperationContext }).(DeploymentSettingsOperationContextPtrOutput)
+}
+
 // Organization name.
 func (o DeploymentSettingsOutput) Organization() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *DeploymentSettings) pulumi.StringPtrOutput { return v.Organization }).(pulumi.StringPtrOutput)
@@ -206,6 +235,11 @@ func (o DeploymentSettingsOutput) Organization() pulumi.StringPtrOutput {
 // Project name.
 func (o DeploymentSettingsOutput) Project() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *DeploymentSettings) pulumi.StringPtrOutput { return v.Project }).(pulumi.StringPtrOutput)
+}
+
+// Settings related to the source of the deployment.
+func (o DeploymentSettingsOutput) SourceContext() DeploymentSettingsSourceContextPtrOutput {
+	return o.ApplyT(func(v *DeploymentSettings) DeploymentSettingsSourceContextPtrOutput { return v.SourceContext }).(DeploymentSettingsSourceContextPtrOutput)
 }
 
 // Stack name.

@@ -480,7 +480,6 @@ func (ds *PulumiServiceDeploymentSettingsResource) Diff(req *pulumirpc.DiffReque
 
 	detailedDiffs := map[string]*pulumirpc.PropertyDiff{}
 	for k, v := range dd {
-		v.Kind = v.Kind.AsReplace()
 		detailedDiffs[k] = &pulumirpc.PropertyDiff{
 			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind),
 			InputDiff: v.InputDiff,
@@ -586,8 +585,21 @@ func (ds *PulumiServiceDeploymentSettingsResource) Create(req *pulumirpc.CreateR
 }
 
 func (ds *PulumiServiceDeploymentSettingsResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	// For simplicity, all updates are destructive, so we just call Create.
-	return nil, fmt.Errorf("unexpected call to update, expected create to be called instead")
+	ctx := context.Background()
+	inputsMap, err := plugin.UnmarshalProperties(req.GetNews(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
+	if err != nil {
+		return nil, err
+	}
+	inputs := ds.ToPulumiServiceDeploymentSettingsInput(inputsMap)
+	settings := inputs.DeploymentSettings
+	err = ds.client.CreateDeploymentSettings(ctx, inputs.Stack, settings)
+	if err != nil {
+		return nil, err
+	}
+	return &pulumirpc.UpdateResponse{
+		Properties: req.GetNews(),
+	}, nil
 }
 
 func (ds *PulumiServiceDeploymentSettingsResource) Name() string {

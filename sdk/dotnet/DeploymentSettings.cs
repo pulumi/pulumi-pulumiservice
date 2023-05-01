@@ -16,6 +16,24 @@ namespace Pulumi.PulumiService
     public partial class DeploymentSettings : global::Pulumi.CustomResource
     {
         /// <summary>
+        /// Settings related to the deployment executor.
+        /// </summary>
+        [Output("executorContext")]
+        public Output<Outputs.DeploymentSettingsExecutorContext?> ExecutorContext { get; private set; } = null!;
+
+        /// <summary>
+        /// GitHub settings for the deployment.
+        /// </summary>
+        [Output("github")]
+        public Output<Outputs.DeploymentSettingsGithub?> Github { get; private set; } = null!;
+
+        /// <summary>
+        /// Settings related to the Pulumi operation environment during the deployment.
+        /// </summary>
+        [Output("operationContext")]
+        public Output<Outputs.DeploymentSettingsOperationContext?> OperationContext { get; private set; } = null!;
+
+        /// <summary>
         /// Organization name.
         /// </summary>
         [Output("organization")]
@@ -26,6 +44,12 @@ namespace Pulumi.PulumiService
         /// </summary>
         [Output("project")]
         public Output<string?> Project { get; private set; } = null!;
+
+        /// <summary>
+        /// Settings related to the source of the deployment.
+        /// </summary>
+        [Output("sourceContext")]
+        public Output<Outputs.DeploymentSettingsSourceContext?> SourceContext { get; private set; } = null!;
 
         /// <summary>
         /// Stack name.
@@ -56,6 +80,12 @@ namespace Pulumi.PulumiService
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
+                ReplaceOnChanges =
+                {
+                    "organization",
+                    "project",
+                    "stack",
+                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.
