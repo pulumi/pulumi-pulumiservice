@@ -519,6 +519,14 @@
         "organizationName": {
           "description": "Name of the organization.",
           "type": "string"
+        },
+        "projectName": {
+            "description": "Name of the project. Only specified if this is a stack webhook.",
+            "type": "string"
+        },
+        "stackName": {
+            "description": "Name of the stack. Only specified if this is a stack webhook.",
+            "type": "string"
         }
       },
       "inputProperties": {
@@ -541,6 +549,14 @@
         },
         "organizationName": {
           "description": "Name of the organization.",
+          "type": "string"
+        },
+        "projectName": {
+          "description": "Name of the project. Only needed if this is a stack webhook.",
+          "type": "string"
+        },
+        "stackName": {
+          "description": "Name of the stack. Only needed if this is a stack webhook.",
           "type": "string"
         }
       },

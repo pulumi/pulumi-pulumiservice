@@ -2,7 +2,7 @@ package pulumiapi
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -38,7 +38,7 @@ func startTestServer(t *testing.T, config testServerConfig) (client *Client, cle
 		// if we expected a request body, unmarshal the body and
 		if config.ExpectedReqBody != nil {
 			expectedBody, _ := json.Marshal(config.ExpectedReqBody)
-			actualBody, _ := ioutil.ReadAll(r.Body)
+			actualBody, _ := io.ReadAll(r.Body)
 			assert.JSONEq(t, string(expectedBody), string(actualBody))
 		}
 		w.WriteHeader(config.ResponseCode)

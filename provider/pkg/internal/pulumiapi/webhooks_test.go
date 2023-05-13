@@ -13,30 +13,30 @@ func TestCreateWebhook(t *testing.T) {
 	displayName := "A Webhook"
 	payloadURL := "https://example.com/webhook"
 	secret := "{...}"
-	active := true
 	webhook := Webhook{
 		Name:        webhookName,
 		DisplayName: displayName,
 		PayloadUrl:  payloadURL,
 		Secret:      &secret,
-		Active:      active,
+		Active:      true,
+	}
+	createReq := CreateWebhookRequest{
+		OrganizationName: orgName,
+		DisplayName:      displayName,
+		PayloadURL:       payloadURL,
+		Secret:           &secret,
+		Active:           true,
 	}
 	t.Run("Happy Path", func(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqPath:   "/api/orgs/an-organization/hooks",
-			ExpectedReqBody: createWebhookRequest{
-				OrganizationName: orgName,
-				DisplayName:      displayName,
-				PayloadURL:       payloadURL,
-				Secret:           &secret,
-				Active:           active,
-			},
-			ResponseCode: 201,
-			ResponseBody: webhook,
+			ExpectedReqBody:   createReq,
+			ResponseCode:      201,
+			ResponseBody:      webhook,
 		})
 		defer cleanup()
-		actualWebhook, err := c.CreateWebhook(ctx, orgName, displayName, payloadURL, &secret, active)
+		actualWebhook, err := c.CreateWebhook(ctx, createReq)
 		assert.NoError(t, err)
 		assert.Equal(t, webhook, *actualWebhook)
 	})
@@ -45,20 +45,14 @@ func TestCreateWebhook(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqPath:   "/api/orgs/an-organization/hooks",
-			ExpectedReqBody: createWebhookRequest{
-				OrganizationName: orgName,
-				DisplayName:      displayName,
-				PayloadURL:       payloadURL,
-				Secret:           &secret,
-				Active:           active,
-			},
-			ResponseCode: 401,
+			ExpectedReqBody:   createReq,
+			ResponseCode:      401,
 			ResponseBody: errorResponse{
 				Message: "unauthorized",
 			},
 		})
 		defer cleanup()
-		actualWebhook, err := c.CreateWebhook(ctx, orgName, displayName, payloadURL, &secret, active)
+		actualWebhook, err := c.CreateWebhook(ctx, createReq)
 		assert.Nil(t, actualWebhook, "webhook should be nil since error was returned")
 		assert.EqualError(t, err, "failed to create webhook: 401 API error: unauthorized")
 	})
@@ -70,13 +64,12 @@ func TestListWebhooks(t *testing.T) {
 	displayName := "A Webhook"
 	payloadURL := "https://example.com/webhook"
 	secret := "{...}"
-	active := true
 	webhook := Webhook{
 		Name:        webhookName,
 		DisplayName: displayName,
 		PayloadUrl:  payloadURL,
 		Secret:      &secret,
-		Active:      active,
+		Active:      true,
 	}
 	webhooks := []Webhook{webhook}
 	t.Run("Happy Path", func(t *testing.T) {
@@ -87,7 +80,7 @@ func TestListWebhooks(t *testing.T) {
 			ResponseBody:      webhooks,
 		})
 		defer cleanup()
-		actualWebhooks, err := c.ListWebhooks(ctx, orgName)
+		actualWebhooks, err := c.ListWebhooks(ctx, orgName, nil, nil)
 		assert.NoError(t, err)
 		assert.Equal(t, webhooks, actualWebhooks)
 	})
@@ -102,7 +95,7 @@ func TestListWebhooks(t *testing.T) {
 			},
 		})
 		defer cleanup()
-		actualWebhooks, err := c.ListWebhooks(ctx, orgName)
+		actualWebhooks, err := c.ListWebhooks(ctx, orgName, nil, nil)
 		assert.Nil(t, actualWebhooks, "webhooks should be nil since error was returned")
 		assert.EqualError(t, err, "failed to list webhooks: 401 API error: unauthorized")
 	})
@@ -114,13 +107,12 @@ func TestGetWebhook(t *testing.T) {
 	displayName := "A Webhook"
 	payloadURL := "https://example.com/webhook"
 	secret := "{...}"
-	active := true
 	webhook := Webhook{
 		Name:        webhookName,
 		DisplayName: displayName,
 		PayloadUrl:  payloadURL,
 		Secret:      &secret,
-		Active:      active,
+		Active:      true,
 	}
 	t.Run("Happy Path", func(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
@@ -130,7 +122,7 @@ func TestGetWebhook(t *testing.T) {
 			ResponseBody:      webhook,
 		})
 		defer cleanup()
-		actualWebhook, err := c.GetWebhook(ctx, orgName, webhookName)
+		actualWebhook, err := c.GetWebhook(ctx, orgName, nil, nil, webhookName)
 		assert.NoError(t, err)
 		assert.Equal(t, webhook, *actualWebhook)
 	})
@@ -145,7 +137,7 @@ func TestGetWebhook(t *testing.T) {
 			},
 		})
 		defer cleanup()
-		actualWebhook, err := c.GetWebhook(ctx, orgName, webhookName)
+		actualWebhook, err := c.GetWebhook(ctx, orgName, nil, nil, webhookName)
 		assert.Nil(t, actualWebhook, "webhooks should be nil since error was returned")
 		assert.EqualError(t, err, "failed to get webhook: 401 API error: unauthorized")
 	})
@@ -157,31 +149,31 @@ func TestUpdateWebhook(t *testing.T) {
 	displayName := "A Webhook"
 	payloadURL := "https://example.com/webhook"
 	secret := "{...}"
-	active := true
 	webhook := Webhook{
 		Name:        webhookName,
 		DisplayName: displayName,
 		PayloadUrl:  payloadURL,
 		Secret:      &secret,
-		Active:      active,
+		Active:      true,
+	}
+	updateReq := UpdateWebhookRequest{
+		Name:             webhookName,
+		OrganizationName: orgName,
+		DisplayName:      displayName,
+		PayloadURL:       payloadURL,
+		Secret:           &secret,
+		Active:           true,
 	}
 	t.Run("Happy Path", func(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPatch,
 			ExpectedReqPath:   "/api/orgs/an-organization/hooks/a-webhook",
-			ExpectedReqBody: updateWebhookRequest{
-				Name:             webhookName,
-				OrganizationName: orgName,
-				DisplayName:      displayName,
-				PayloadURL:       payloadURL,
-				Secret:           &secret,
-				Active:           active,
-			},
-			ResponseCode: 201,
-			ResponseBody: webhook,
+			ExpectedReqBody:   updateReq,
+			ResponseCode:      201,
+			ResponseBody:      webhook,
 		})
 		defer cleanup()
-		err := c.UpdateWebhook(ctx, webhookName, orgName, displayName, payloadURL, &secret, active)
+		err := c.UpdateWebhook(ctx, updateReq)
 		assert.NoError(t, err)
 	})
 
@@ -189,21 +181,14 @@ func TestUpdateWebhook(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPatch,
 			ExpectedReqPath:   "/api/orgs/an-organization/hooks/a-webhook",
-			ExpectedReqBody: updateWebhookRequest{
-				Name:             webhookName,
-				OrganizationName: orgName,
-				DisplayName:      displayName,
-				PayloadURL:       payloadURL,
-				Secret:           &secret,
-				Active:           active,
-			},
-			ResponseCode: 401,
+			ExpectedReqBody:   updateReq,
+			ResponseCode:      401,
 			ResponseBody: errorResponse{
 				Message: "unauthorized",
 			},
 		})
 		defer cleanup()
-		err := c.UpdateWebhook(ctx, webhookName, orgName, displayName, payloadURL, &secret, active)
+		err := c.UpdateWebhook(ctx, updateReq)
 		assert.EqualError(t, err, "failed to update webhook: 401 API error: unauthorized")
 	})
 }
@@ -218,7 +203,7 @@ func TestDeleteWebhook(t *testing.T) {
 			ResponseCode:      201,
 		})
 		defer cleanup()
-		err := c.DeleteWebhook(ctx, orgName, webhookName)
+		err := c.DeleteWebhook(ctx, orgName, nil, nil, webhookName)
 		assert.NoError(t, err)
 	})
 
@@ -232,7 +217,7 @@ func TestDeleteWebhook(t *testing.T) {
 			},
 		})
 		defer cleanup()
-		err := c.DeleteWebhook(ctx, orgName, webhookName)
+		err := c.DeleteWebhook(ctx, orgName, nil, nil, webhookName)
 		assert.EqualError(t, err, "failed to delete webhook: 401 API error: unauthorized")
 	})
 }

@@ -92,6 +92,20 @@ public class Webhook extends com.pulumi.resources.CustomResource {
         return Codegen.optional(this.payloadUrl);
     }
     /**
+     * Name of the project. Only specified if this is a stack webhook.
+     * 
+     */
+    @Export(name="projectName", refs={String.class}, tree="[0]")
+    private Output</* @Nullable */ String> projectName;
+
+    /**
+     * @return Name of the project. Only specified if this is a stack webhook.
+     * 
+     */
+    public Output<Optional<String>> projectName() {
+        return Codegen.optional(this.projectName);
+    }
+    /**
      * Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.
      * 
      */
@@ -104,6 +118,20 @@ public class Webhook extends com.pulumi.resources.CustomResource {
      */
     public Output<Optional<String>> secret() {
         return Codegen.optional(this.secret);
+    }
+    /**
+     * Name of the stack. Only specified if this is a stack webhook.
+     * 
+     */
+    @Export(name="stackName", refs={String.class}, tree="[0]")
+    private Output</* @Nullable */ String> stackName;
+
+    /**
+     * @return Name of the stack. Only specified if this is a stack webhook.
+     * 
+     */
+    public Output<Optional<String>> stackName() {
+        return Codegen.optional(this.stackName);
     }
 
     /**

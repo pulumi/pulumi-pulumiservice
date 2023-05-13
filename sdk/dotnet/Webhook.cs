@@ -46,10 +46,22 @@ namespace Pulumi.PulumiService
         public Output<string?> PayloadUrl { get; private set; } = null!;
 
         /// <summary>
+        /// Name of the project. Only specified if this is a stack webhook.
+        /// </summary>
+        [Output("projectName")]
+        public Output<string?> ProjectName { get; private set; } = null!;
+
+        /// <summary>
         /// Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.
         /// </summary>
         [Output("secret")]
         public Output<string?> Secret { get; private set; } = null!;
+
+        /// <summary>
+        /// Name of the stack. Only specified if this is a stack webhook.
+        /// </summary>
+        [Output("stackName")]
+        public Output<string?> StackName { get; private set; } = null!;
 
 
         /// <summary>
@@ -124,6 +136,12 @@ namespace Pulumi.PulumiService
         [Input("payloadUrl", required: true)]
         public Input<string> PayloadUrl { get; set; } = null!;
 
+        /// <summary>
+        /// Name of the project. Only needed if this is a stack webhook.
+        /// </summary>
+        [Input("projectName")]
+        public Input<string>? ProjectName { get; set; }
+
         [Input("secret")]
         private Input<string>? _secret;
 
@@ -139,6 +157,12 @@ namespace Pulumi.PulumiService
                 _secret = Output.Tuple<Input<string>?, int>(value, emptySecret).Apply(t => t.Item1);
             }
         }
+
+        /// <summary>
+        /// Name of the stack. Only needed if this is a stack webhook.
+        /// </summary>
+        [Input("stackName")]
+        public Input<string>? StackName { get; set; }
 
         public WebhookArgs()
         {

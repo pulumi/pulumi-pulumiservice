@@ -25,8 +25,12 @@ type Webhook struct {
 	OrganizationName pulumi.StringPtrOutput `pulumi:"organizationName"`
 	// URL to send request to.
 	PayloadUrl pulumi.StringPtrOutput `pulumi:"payloadUrl"`
+	// Name of the project. Only specified if this is a stack webhook.
+	ProjectName pulumi.StringPtrOutput `pulumi:"projectName"`
 	// Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.
 	Secret pulumi.StringPtrOutput `pulumi:"secret"`
+	// Name of the stack. Only specified if this is a stack webhook.
+	StackName pulumi.StringPtrOutput `pulumi:"stackName"`
 }
 
 // NewWebhook registers a new resource with the given unique name, arguments, and options.
@@ -95,8 +99,12 @@ type webhookArgs struct {
 	OrganizationName string `pulumi:"organizationName"`
 	// URL to send request to.
 	PayloadUrl string `pulumi:"payloadUrl"`
+	// Name of the project. Only needed if this is a stack webhook.
+	ProjectName *string `pulumi:"projectName"`
 	// Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.
 	Secret *string `pulumi:"secret"`
+	// Name of the stack. Only needed if this is a stack webhook.
+	StackName *string `pulumi:"stackName"`
 }
 
 // The set of arguments for constructing a Webhook resource.
@@ -109,8 +117,12 @@ type WebhookArgs struct {
 	OrganizationName pulumi.StringInput
 	// URL to send request to.
 	PayloadUrl pulumi.StringInput
+	// Name of the project. Only needed if this is a stack webhook.
+	ProjectName pulumi.StringPtrInput
 	// Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.
 	Secret pulumi.StringPtrInput
+	// Name of the stack. Only needed if this is a stack webhook.
+	StackName pulumi.StringPtrInput
 }
 
 func (WebhookArgs) ElementType() reflect.Type {
@@ -225,9 +237,19 @@ func (o WebhookOutput) PayloadUrl() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *Webhook) pulumi.StringPtrOutput { return v.PayloadUrl }).(pulumi.StringPtrOutput)
 }
 
+// Name of the project. Only specified if this is a stack webhook.
+func (o WebhookOutput) ProjectName() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *Webhook) pulumi.StringPtrOutput { return v.ProjectName }).(pulumi.StringPtrOutput)
+}
+
 // Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.
 func (o WebhookOutput) Secret() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *Webhook) pulumi.StringPtrOutput { return v.Secret }).(pulumi.StringPtrOutput)
+}
+
+// Name of the stack. Only specified if this is a stack webhook.
+func (o WebhookOutput) StackName() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *Webhook) pulumi.StringPtrOutput { return v.StackName }).(pulumi.StringPtrOutput)
 }
 
 type WebhookArrayOutput struct{ *pulumi.OutputState }

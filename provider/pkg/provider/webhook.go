@@ -25,6 +25,8 @@ type PulumiServiceWebhookInput struct {
 	Secret           *string
 	Name             string
 	OrganizationName string
+	ProjectName      *string
+	StackName        *string
 }
 
 func (i *PulumiServiceWebhookInput) ToPropertyMap() resource.PropertyMap {
@@ -37,6 +39,14 @@ func (i *PulumiServiceWebhookInput) ToPropertyMap() resource.PropertyMap {
 	}
 
 	pm["organizationName"] = resource.NewPropertyValue(i.OrganizationName)
+
+	if i.ProjectName != nil {
+		pm["projectName"] = resource.NewPropertyValue(*i.ProjectName)
+	}
+	if i.StackName != nil {
+		pm["stackName"] = resource.NewPropertyValue(*i.StackName)
+	}
+
 	pm["name"] = resource.NewPropertyValue(i.Name)
 	return pm
 }
@@ -63,6 +73,14 @@ func (wh *PulumiServiceWebhookResource) ToPulumiServiceWebhookInput(inputMap res
 
 	if inputMap["organizationName"].HasValue() && inputMap["organizationName"].IsString() {
 		input.OrganizationName = inputMap["organizationName"].StringValue()
+	}
+	if inputMap["projectName"].HasValue() && inputMap["projectName"].IsString() {
+		projectNameStr := inputMap["projectName"].StringValue()
+		input.ProjectName = &projectNameStr
+	}
+	if inputMap["stackName"].HasValue() && inputMap["stackName"].IsString() {
+		stackNameStr := inputMap["stackName"].StringValue()
+		input.StackName = &stackNameStr
 	}
 
 	if nameVal, ok := inputMap["name"]; ok && nameVal.IsString() {
@@ -92,17 +110,17 @@ func (wh *PulumiServiceWebhookResource) Create(req *pulumirpc.CreateRequest) (*p
 
 	inputsWebhook := wh.ToPulumiServiceWebhookInput(inputs)
 
-	webhookId, err := wh.createWebhook(inputsWebhook)
+	idString, err := wh.createWebhook(inputsWebhook)
 	if err != nil {
 		return nil, err
 	}
 
-	_, webhookName, err := splitSingleSlashString(*webhookId) 
+	hookID, err := splitWebhookID(*idString)
 	if err != nil {
 		return nil, err
 	}
 
-	inputsWebhook.Name = webhookName
+	inputsWebhook.Name = hookID.webhookName
 
 	outputProperties, err := plugin.MarshalProperties(
 		inputsWebhook.ToPropertyMap(),
@@ -116,20 +134,36 @@ func (wh *PulumiServiceWebhookResource) Create(req *pulumirpc.CreateRequest) (*p
 	}
 
 	return &pulumirpc.CreateResponse{
-		Id:         *webhookId,
+		Id:         *idString,
 		Properties: outputProperties,
 	}, nil
 }
 
 func (wh *PulumiServiceWebhookResource) createWebhook(input PulumiServiceWebhookInput) (*string, error) {
 	ctx := context.Background()
-	webhook, err := wh.client.CreateWebhook(ctx, input.OrganizationName, input.DisplayName, input.PayloadUrl, input.Secret, input.Active)
+	req := pulumiapi.CreateWebhookRequest{
+		OrganizationName: input.OrganizationName,
+		ProjectName:      input.ProjectName,
+		StackName:        input.StackName,
+		DisplayName:      input.DisplayName,
+		PayloadURL:       input.PayloadUrl,
+		Secret:           input.Secret,
+		Active:           input.Active,
+	}
+	webhook, err := wh.client.CreateWebhook(ctx, req)
 	if err != nil {
 		return nil, err
 	}
 
-	webhookId := fmt.Sprintf("%s/%s", input.OrganizationName, webhook.Name)
-	return &webhookId, nil
+	var webhookID string
+	if input.ProjectName != nil && input.StackName != nil {
+		webhookID = fmt.Sprintf("%s/%s/%s/%s", input.OrganizationName, *input.ProjectName, *input.StackName,
+			webhook.Name)
+	} else {
+		webhookID = fmt.Sprintf("%s/%s", input.OrganizationName, webhook.Name)
+	}
+
+	return &webhookID, nil
 }
 
 func (wh *PulumiServiceWebhookResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
@@ -144,8 +178,8 @@ func (wh *PulumiServiceWebhookResource) Diff(req *pulumirpc.DiffRequest) (*pulum
 	}
 
 	// previous versions of the provider used "__inputs" key to store inputs in output properties
-	// to maintain backwards compatibility, we still need to handle this case 
-	// so we just lift up those values to the top level 
+	// to maintain backwards compatibility, we still need to handle this case
+	// so we just lift up those values to the top level
 	if oldInputs, ok := olds["__inputs"]; ok && oldInputs.IsObject() {
 		for k, v := range oldInputs.ObjectValue() {
 			olds[k] = v
@@ -180,9 +214,9 @@ func (wh *PulumiServiceWebhookResource) Diff(req *pulumirpc.DiffRequest) (*pulum
 	}
 
 	return &pulumirpc.DiffResponse{
-		Diffs:    diffs,
-		Changes:  changes,
-		Replaces: replaces,
+		Diffs:               diffs,
+		Changes:             changes,
+		Replaces:            replaces,
 		DeleteBeforeReplace: false,
 	}, nil
 }
@@ -197,21 +231,23 @@ func (wh *PulumiServiceWebhookResource) Update(req *pulumirpc.UpdateRequest) (*p
 	webhookNew := wh.ToPulumiServiceWebhookInput(inputsNew)
 
 	// ignore orgName because if that changed, we would have done a replace, so update would never have been called
-	_, webhookName, err := splitSingleSlashString(req.GetId())
+	hookID, err := splitWebhookID(req.GetId())
 	if err != nil {
 		return nil, fmt.Errorf("invalid resource id: %v", err)
 	}
-	webhookNew.Name = webhookName
+	webhookNew.Name = hookID.webhookName
 
-	err = wh.client.UpdateWebhook(
-		context.Background(),
-		webhookNew.Name,
-		webhookNew.OrganizationName,
-		webhookNew.DisplayName,
-		webhookNew.PayloadUrl,
-		webhookNew.Secret,
-		webhookNew.Active,
-	)
+	updateReq := pulumiapi.UpdateWebhookRequest{
+		OrganizationName: webhookNew.OrganizationName,
+		ProjectName:      webhookNew.ProjectName,
+		StackName:        webhookNew.StackName,
+		DisplayName:      webhookNew.DisplayName,
+		PayloadURL:       webhookNew.PayloadUrl,
+		Secret:           webhookNew.Secret,
+		Active:           webhookNew.Active,
+		Name:             webhookNew.Name,
+	}
+	err = wh.client.UpdateWebhook(context.Background(), updateReq)
 	if err != nil {
 		return nil, err
 	}
@@ -237,11 +273,12 @@ func (wh *PulumiServiceWebhookResource) Delete(req *pulumirpc.DeleteRequest) (*p
 }
 
 func (wh *PulumiServiceWebhookResource) deleteWebhook(id string) error {
-	orgName, webhookName, err := splitSingleSlashString(id)
+	hookID, err := splitWebhookID(id)
 	if err != nil {
 		return err
 	}
-	return wh.client.DeleteWebhook(context.Background(), orgName, webhookName)
+	return wh.client.DeleteWebhook(context.Background(), hookID.organizationName,
+		hookID.projectName, hookID.stackName, hookID.webhookName)
 }
 
 func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
@@ -255,7 +292,7 @@ func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulum
 		return nil, err
 	}
 
-	orgName, webhookName, err := splitSingleSlashString(req.Id)
+	hookID, err := splitWebhookID(req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -265,8 +302,10 @@ func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulum
 		DisplayName:      webhook.DisplayName,
 		PayloadUrl:       webhook.PayloadUrl,
 		Secret:           webhook.Secret,
-		OrganizationName: orgName,
-		Name:             webhookName,
+		OrganizationName: hookID.organizationName,
+		ProjectName:      hookID.projectName,
+		StackName:        hookID.stackName,
+		Name:             hookID.webhookName,
 	}
 
 	properties, err := plugin.MarshalProperties(
@@ -295,22 +334,42 @@ func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulum
 }
 
 func (wh *PulumiServiceWebhookResource) getWebhook(id string) (*pulumiapi.Webhook, error) {
-	org, webhookName, err := splitSingleSlashString(id)
+	hookID, err := splitWebhookID(id)
 	if err != nil {
 		return nil, err
 	}
-	webhook, err := wh.client.GetWebhook(context.Background(), org, webhookName)
+	webhook, err := wh.client.GetWebhook(context.Background(),
+		hookID.organizationName, hookID.projectName, hookID.stackName, hookID.webhookName)
 	if err != nil {
 		return nil, err
 	}
 	return webhook, nil
 }
 
-func splitSingleSlashString(id string) (string, string, error) {
-	// format: organization/webhookName
+func splitWebhookID(id string) (*webhookID, error) {
+	// format: organization/project/stack/webhookName (stack webhook) or organization/webhookName (org webhook)
 	s := strings.Split(id, "/")
-	if len(s) != 2 {
-		return "", "", fmt.Errorf("%q is invalid, must contain a single slash ('/')", id)
+	switch len(s) {
+	case 2:
+		return &webhookID{
+			organizationName: s[0],
+			webhookName:      s[1],
+		}, nil
+	case 4:
+		return &webhookID{
+			organizationName: s[0],
+			projectName:      &s[1],
+			stackName:        &s[2],
+			webhookName:      s[3],
+		}, nil
+	default:
+		return nil, fmt.Errorf("%q is an invalid ID", id)
 	}
-	return s[0], s[1], nil
+}
+
+type webhookID struct {
+	organizationName string
+	projectName      *string
+	stackName        *string
+	webhookName      string
 }
