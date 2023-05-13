@@ -236,3 +236,34 @@ export interface OperationContextOptionsArgs {
      */
     skipInstallDependencies?: pulumi.Input<boolean>;
 }
+
+/**
+ * Deployment settings used for a stack
+ */
+export interface StackDeploymentSettingsArgs {
+    /**
+     * Settings related to the deployment executor.
+     */
+    executorContext?: pulumi.Input<inputs.DeploymentSettingsExecutorContextArgs>;
+    /**
+     * GitHub settings for the deployment.
+     */
+    github?: pulumi.Input<inputs.DeploymentSettingsGithubArgs>;
+    /**
+     * Settings related to the Pulumi operation environment during the deployment.
+     */
+    operationContext?: pulumi.Input<inputs.DeploymentSettingsOperationContextArgs>;
+    /**
+     * Settings related to the source of the deployment.
+     */
+    sourceContext?: pulumi.Input<inputs.DeploymentSettingsSourceContextArgs>;
+}
+/**
+ * stackDeploymentSettingsArgsProvideDefaults sets the appropriate defaults for StackDeploymentSettingsArgs
+ */
+export function stackDeploymentSettingsArgsProvideDefaults(val: StackDeploymentSettingsArgs): StackDeploymentSettingsArgs {
+    return {
+        ...val,
+        github: (val.github ? pulumi.output(val.github).apply(inputs.deploymentSettingsGithubArgsProvideDefaults) : undefined),
+    };
+}

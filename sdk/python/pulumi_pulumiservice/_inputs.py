@@ -24,6 +24,7 @@ __all__ = [
     'GCPOIDCConfigurationArgs',
     'OperationContextOIDCArgs',
     'OperationContextOptionsArgs',
+    'StackDeploymentSettingsArgs',
 ]
 
 @pulumi.input_type
@@ -738,5 +739,77 @@ class OperationContextOptionsArgs:
     @skip_install_dependencies.setter
     def skip_install_dependencies(self, value: Optional[pulumi.Input[bool]]):
         pulumi.set(self, "skip_install_dependencies", value)
+
+
+@pulumi.input_type
+class StackDeploymentSettingsArgs:
+    def __init__(__self__, *,
+                 executor_context: Optional[pulumi.Input['DeploymentSettingsExecutorContextArgs']] = None,
+                 github: Optional[pulumi.Input['DeploymentSettingsGithubArgs']] = None,
+                 operation_context: Optional[pulumi.Input['DeploymentSettingsOperationContextArgs']] = None,
+                 source_context: Optional[pulumi.Input['DeploymentSettingsSourceContextArgs']] = None):
+        """
+        Deployment settings used for a stack
+        :param pulumi.Input['DeploymentSettingsExecutorContextArgs'] executor_context: Settings related to the deployment executor.
+        :param pulumi.Input['DeploymentSettingsGithubArgs'] github: GitHub settings for the deployment.
+        :param pulumi.Input['DeploymentSettingsOperationContextArgs'] operation_context: Settings related to the Pulumi operation environment during the deployment.
+        :param pulumi.Input['DeploymentSettingsSourceContextArgs'] source_context: Settings related to the source of the deployment.
+        """
+        if executor_context is not None:
+            pulumi.set(__self__, "executor_context", executor_context)
+        if github is not None:
+            pulumi.set(__self__, "github", github)
+        if operation_context is not None:
+            pulumi.set(__self__, "operation_context", operation_context)
+        if source_context is not None:
+            pulumi.set(__self__, "source_context", source_context)
+
+    @property
+    @pulumi.getter(name="executorContext")
+    def executor_context(self) -> Optional[pulumi.Input['DeploymentSettingsExecutorContextArgs']]:
+        """
+        Settings related to the deployment executor.
+        """
+        return pulumi.get(self, "executor_context")
+
+    @executor_context.setter
+    def executor_context(self, value: Optional[pulumi.Input['DeploymentSettingsExecutorContextArgs']]):
+        pulumi.set(self, "executor_context", value)
+
+    @property
+    @pulumi.getter
+    def github(self) -> Optional[pulumi.Input['DeploymentSettingsGithubArgs']]:
+        """
+        GitHub settings for the deployment.
+        """
+        return pulumi.get(self, "github")
+
+    @github.setter
+    def github(self, value: Optional[pulumi.Input['DeploymentSettingsGithubArgs']]):
+        pulumi.set(self, "github", value)
+
+    @property
+    @pulumi.getter(name="operationContext")
+    def operation_context(self) -> Optional[pulumi.Input['DeploymentSettingsOperationContextArgs']]:
+        """
+        Settings related to the Pulumi operation environment during the deployment.
+        """
+        return pulumi.get(self, "operation_context")
+
+    @operation_context.setter
+    def operation_context(self, value: Optional[pulumi.Input['DeploymentSettingsOperationContextArgs']]):
+        pulumi.set(self, "operation_context", value)
+
+    @property
+    @pulumi.getter(name="sourceContext")
+    def source_context(self) -> Optional[pulumi.Input['DeploymentSettingsSourceContextArgs']]:
+        """
+        Settings related to the source of the deployment.
+        """
+        return pulumi.get(self, "source_context")
+
+    @source_context.setter
+    def source_context(self, value: Optional[pulumi.Input['DeploymentSettingsSourceContextArgs']]):
+        pulumi.set(self, "source_context", value)
 
 

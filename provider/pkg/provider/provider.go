@@ -54,10 +54,14 @@ type pulumiserviceProvider struct {
 	version         string
 	schema          string
 	pulumiResources []PulumiServiceResource
+	cancelCtx       context.Context
+	cancel          func()
 	AccessToken     string
 }
 
 func makeProvider(host *provider.HostClient, name, version, schema string) (pulumirpc.ResourceProviderServer, error) {
+	cancelCtx, cancel := context.WithCancel(context.Background())
+
 	// inject version into schema
 	versionedSchema := mustSetSchemaVersion(schema, version)
 	// Return the new provider
@@ -66,6 +70,8 @@ func makeProvider(host *provider.HostClient, name, version, schema string) (pulu
 		name:        name,
 		schema:      versionedSchema,
 		version:     version,
+		cancelCtx:   cancelCtx,
+		cancel:      cancel,
 		AccessToken: "",
 	}, nil
 }
@@ -150,6 +156,14 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 		},
 		&PulumiServiceDeploymentSettingsResource{
 			client: client,
+		},
+		&PulumiServiceStackResource{
+			client: client,
+		},
+		&PulumiServiceDeploymentResource{
+			cancelCtx: k.cancelCtx,
+			host:      k.host,
+			client:    client,
 		},
 	}
 
@@ -244,6 +258,7 @@ func (k *pulumiserviceProvider) GetSchema(ctx context.Context, req *pulumirpc.Ge
 // hard-closing any gRPC connection.
 func (k *pulumiserviceProvider) Cancel(context.Context, *pbempty.Empty) (*pbempty.Empty, error) {
 	// TODO
+	k.cancel()
 	return &pbempty.Empty{}, nil
 }
 

@@ -1,6 +1,6 @@
 module github.com/pulumi/pulumi-pulumiservice/provider
 
-go 1.18
+go 1.20
 
 require (
 	github.com/golang/protobuf v1.5.2
@@ -9,6 +9,7 @@ require (
 	github.com/pulumi/pulumi/pkg/v3 v3.56.0
 	github.com/pulumi/pulumi/sdk/v3 v3.56.0
 	github.com/stretchr/testify v1.8.2
+	golang.org/x/exp v0.0.0-20230510235704-dd950f8aeaea
 	google.golang.org/grpc v1.53.0
 	google.golang.org/protobuf v1.28.1
 )

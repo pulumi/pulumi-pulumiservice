@@ -10,6 +10,11 @@ export type AccessToken = import("./accessToken").AccessToken;
 export const AccessToken: typeof import("./accessToken").AccessToken = null as any;
 utilities.lazyLoad(exports, ["AccessToken"], () => require("./accessToken"));
 
+export { DeploymentArgs } from "./deployment";
+export type Deployment = import("./deployment").Deployment;
+export const Deployment: typeof import("./deployment").Deployment = null as any;
+utilities.lazyLoad(exports, ["Deployment"], () => require("./deployment"));
+
 export { DeploymentSettingsArgs } from "./deploymentSettings";
 export type DeploymentSettings = import("./deploymentSettings").DeploymentSettings;
 export const DeploymentSettings: typeof import("./deploymentSettings").DeploymentSettings = null as any;
@@ -24,6 +29,11 @@ export { ProviderArgs } from "./provider";
 export type Provider = import("./provider").Provider;
 export const Provider: typeof import("./provider").Provider = null as any;
 utilities.lazyLoad(exports, ["Provider"], () => require("./provider"));
+
+export { StackArgs } from "./stack";
+export type Stack = import("./stack").Stack;
+export const Stack: typeof import("./stack").Stack = null as any;
+utilities.lazyLoad(exports, ["Stack"], () => require("./stack"));
 
 export { StackTagArgs } from "./stackTag";
 export type StackTag = import("./stackTag").StackTag;
@@ -69,10 +79,14 @@ const _module = {
         switch (type) {
             case "pulumiservice:index:AccessToken":
                 return new AccessToken(name, <any>undefined, { urn })
+            case "pulumiservice:index:Deployment":
+                return new Deployment(name, <any>undefined, { urn })
             case "pulumiservice:index:DeploymentSettings":
                 return new DeploymentSettings(name, <any>undefined, { urn })
             case "pulumiservice:index:OrgAccessToken":
                 return new OrgAccessToken(name, <any>undefined, { urn })
+            case "pulumiservice:index:Stack":
+                return new Stack(name, <any>undefined, { urn })
             case "pulumiservice:index:StackTag":
                 return new StackTag(name, <any>undefined, { urn })
             case "pulumiservice:index:Team":

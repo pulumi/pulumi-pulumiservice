@@ -20,12 +20,8 @@ type PulumiServiceDeploymentSettingsInput struct {
 
 const FixMe = "<value is secret and must be replaced>"
 
-func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap() resource.PropertyMap {
+func deploymentSettingsToPropertyMap(ds pulumiapi.DeploymentSettings) resource.PropertyMap {
 	pm := resource.PropertyMap{}
-	pm["organization"] = resource.NewPropertyValue(ds.Stack.OrgName)
-	pm["project"] = resource.NewPropertyValue(ds.Stack.ProjectName)
-	pm["stack"] = resource.NewPropertyValue(ds.Stack.StackName)
-
 	if ds.SourceContext != nil {
 		scMap := resource.PropertyMap{}
 		if ds.SourceContext.Git != nil {
@@ -174,6 +170,18 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap() resource.Propert
 		ecMap["executorImage"] = resource.NewPropertyValue(ds.ExecutorContext.ExecutorImage)
 		pm["executorContext"] = resource.PropertyValue{V: ecMap}
 	}
+
+	return pm
+}
+
+func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap() resource.PropertyMap {
+	pm := resource.PropertyMap{}
+	pm["organization"] = resource.NewPropertyValue(ds.Stack.OrgName)
+	pm["project"] = resource.NewPropertyValue(ds.Stack.ProjectName)
+	pm["stack"] = resource.NewPropertyValue(ds.Stack.StackName)
+	for k, v := range deploymentSettingsToPropertyMap(ds.DeploymentSettings) {
+		pm[k] = v
+	}
 	return pm
 }
 
@@ -188,12 +196,17 @@ func (ds *PulumiServiceDeploymentSettingsResource) ToPulumiServiceDeploymentSett
 	input.Stack.ProjectName = getSecretOrStringValue(inputMap["project"])
 	input.Stack.StackName = getSecretOrStringValue(inputMap["stack"])
 
-	input.ExecutorContext = toExecutorContext(inputMap)
-	input.GitHub = toGitHubConfig(inputMap)
-	input.SourceContext = toSourceContext(inputMap)
-	input.OperationContext = toOperationContext(inputMap)
-
+	input.DeploymentSettings = toDeploymentSettings(inputMap)
 	return input
+}
+
+func toDeploymentSettings(inputMap resource.PropertyMap) pulumiapi.DeploymentSettings {
+	return pulumiapi.DeploymentSettings{
+		OperationContext: toOperationContext(inputMap),
+		GitHub:           toGitHubConfig(inputMap),
+		SourceContext:    toSourceContext(inputMap),
+		ExecutorContext:  toExecutorContext(inputMap),
+	}
 }
 
 func toExecutorContext(inputMap resource.PropertyMap) *apitype.ExecutorContext {
@@ -456,6 +469,56 @@ func getSecretOrStringValue(prop resource.PropertyValue) string {
 	default:
 		return prop.StringValue()
 	}
+}
+
+func tryValue[T bool | float64 | string | []resource.PropertyValue | resource.PropertyMap](prop resource.PropertyValue) (T, bool) {
+	if prop.IsSecret() {
+		return tryValue[T](prop.SecretValue().Element)
+	}
+
+	var zero T
+	switch any(zero).(type) {
+	case bool:
+		if !prop.IsBool() {
+			return zero, false
+		}
+		return any(prop.BoolValue()).(T), true
+	case float64:
+		if !prop.IsNumber() {
+			return zero, false
+		}
+		return any(prop.NumberValue()).(T), true
+	case string:
+		if !prop.IsString() {
+			return zero, false
+		}
+		return any(prop.StringValue()).(T), true
+	case []resource.PropertyValue:
+		if !prop.IsArray() {
+			return zero, false
+		}
+		return any(prop.ArrayValue()).(T), true
+	case resource.PropertyMap:
+		if !prop.IsObject() {
+			return zero, false
+		}
+		return any(prop.ObjectValue()).(T), true
+	default:
+		return zero, false
+	}
+}
+
+func mustValue[T bool | float64 | string | []resource.PropertyValue | resource.PropertyMap](prop resource.PropertyValue) T {
+	v, ok := tryValue[T](prop)
+	if !ok {
+		panic(fmt.Errorf("expected a %T, not a %T", v, prop.V))
+	}
+	return v
+}
+
+func isType[T bool | float64 | string | []resource.PropertyValue | resource.PropertyMap](prop resource.PropertyValue) bool {
+	_, ok := tryValue[T](prop)
+	return ok
 }
 
 func (ds *PulumiServiceDeploymentSettingsResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {

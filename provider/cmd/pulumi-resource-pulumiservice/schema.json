@@ -320,6 +320,28 @@
         "tenantId",
         "subscriptionId"
       ]
+    },
+    "pulumiservice:index:StackDeploymentSettings": {
+      "type": "object",
+      "description": "Deployment settings used for a stack",
+      "properties": {
+        "executorContext": {
+          "$ref": "#/types/pulumiservice:index:DeploymentSettingsExecutorContext",
+          "description": "Settings related to the deployment executor."
+        },
+        "sourceContext": {
+          "$ref": "#/types/pulumiservice:index:DeploymentSettingsSourceContext",
+          "description": "Settings related to the source of the deployment."
+        },
+        "github": {
+          "$ref": "#/types/pulumiservice:index:DeploymentSettingsGithub",
+          "description": "GitHub settings for the deployment."
+        },
+        "operationContext": {
+          "$ref": "#/types/pulumiservice:index:DeploymentSettingsOperationContext",
+          "description": "Settings related to the Pulumi operation environment during the deployment."
+        }
+      }
     }
   },
   "resources": {
@@ -683,6 +705,81 @@
         "stack",
         "permission"
       ]
+    },
+    "pulumiservice:index:Stack": {
+      "description": "A stack manages Pulumi resources.",
+      "properties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "project": {
+          "description": "Project name.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Stack name.",
+          "type": "string"
+        }
+      },
+      "inputProperties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "project": {
+          "description": "Project name.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Stack name.",
+          "type": "string"
+        }
+      },
+      "requiredInputs": [
+        "organization",
+        "project",
+        "name"
+      ]
+    },
+    "pulumiservice:index:Deployment": {
+      "description": "A deployment deploys a stack. Deployments will always have changes.",
+      "properties": {
+        "stack": {
+          "description": "The fully-qualified name of the stack to deploy.",
+          "type": "string"
+        },
+        "version": {
+          "description": "The version of the deployed stack.",
+          "type": "integer"
+        },
+        "outputs": {
+          "description": "The outputs of the deployed stack.",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "pulumi.json#/Any"
+          }
+        }
+      },
+      "inputProperties": {
+        "stack": {
+          "description": "The fully-qualified name of the stack to deploy.",
+          "type": "string"
+        },
+        "config": {
+          "description": "The stack configuration to use for the deployment.",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "pulumi.json#/Any"
+          }
+        },
+        "settings": {
+          "description": "The settings to use for the deployment.",
+          "$ref": "#/types/pulumiservice:index:StackDeploymentSettings"
+        }
+      },
+      "requiredInputs": [ "stack" ],
+      "required": [ "stack", "version", "outputs" ]
     }
   },
   "language": {

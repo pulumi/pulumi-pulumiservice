@@ -7,9 +7,11 @@ import typing
 # Export this package's modules as members:
 from ._enums import *
 from .access_token import *
+from .deployment import *
 from .deployment_settings import *
 from .org_access_token import *
 from .provider import *
+from .stack import *
 from .stack_tag import *
 from .team import *
 from .team_access_token import *
@@ -33,8 +35,10 @@ _utilities.register(
   "fqn": "pulumi_pulumiservice",
   "classes": {
    "pulumiservice:index:AccessToken": "AccessToken",
+   "pulumiservice:index:Deployment": "Deployment",
    "pulumiservice:index:DeploymentSettings": "DeploymentSettings",
    "pulumiservice:index:OrgAccessToken": "OrgAccessToken",
+   "pulumiservice:index:Stack": "Stack",
    "pulumiservice:index:StackTag": "StackTag",
    "pulumiservice:index:Team": "Team",
    "pulumiservice:index:TeamAccessToken": "TeamAccessToken",
