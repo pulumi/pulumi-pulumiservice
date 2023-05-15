@@ -5,8 +5,11 @@ package com.pulumi.pulumiservice;
 
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
+import com.pulumi.pulumiservice.enums.WebhookFilters;
+import com.pulumi.pulumiservice.enums.WebhookFormat;
 import java.lang.Boolean;
 import java.lang.String;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -44,6 +47,36 @@ public final class WebhookArgs extends com.pulumi.resources.ResourceArgs {
      */
     public Output<String> displayName() {
         return this.displayName;
+    }
+
+    /**
+     * Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.
+     * 
+     */
+    @Import(name="filters")
+    private @Nullable Output<List<WebhookFilters>> filters;
+
+    /**
+     * @return Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.
+     * 
+     */
+    public Optional<Output<List<WebhookFilters>>> filters() {
+        return Optional.ofNullable(this.filters);
+    }
+
+    /**
+     * Format of the webhook payload. Can be either `raw` or `slack`. Defaults to `raw`.
+     * 
+     */
+    @Import(name="format")
+    private @Nullable Output<WebhookFormat> format;
+
+    /**
+     * @return Format of the webhook payload. Can be either `raw` or `slack`. Defaults to `raw`.
+     * 
+     */
+    public Optional<Output<WebhookFormat>> format() {
+        return Optional.ofNullable(this.format);
     }
 
     /**
@@ -126,6 +159,8 @@ public final class WebhookArgs extends com.pulumi.resources.ResourceArgs {
     private WebhookArgs(WebhookArgs $) {
         this.active = $.active;
         this.displayName = $.displayName;
+        this.filters = $.filters;
+        this.format = $.format;
         this.organizationName = $.organizationName;
         this.payloadUrl = $.payloadUrl;
         this.projectName = $.projectName;
@@ -191,6 +226,58 @@ public final class WebhookArgs extends com.pulumi.resources.ResourceArgs {
          */
         public Builder displayName(String displayName) {
             return displayName(Output.of(displayName));
+        }
+
+        /**
+         * @param filters Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder filters(@Nullable Output<List<WebhookFilters>> filters) {
+            $.filters = filters;
+            return this;
+        }
+
+        /**
+         * @param filters Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder filters(List<WebhookFilters> filters) {
+            return filters(Output.of(filters));
+        }
+
+        /**
+         * @param filters Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder filters(WebhookFilters... filters) {
+            return filters(List.of(filters));
+        }
+
+        /**
+         * @param format Format of the webhook payload. Can be either `raw` or `slack`. Defaults to `raw`.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder format(@Nullable Output<WebhookFormat> format) {
+            $.format = format;
+            return this;
+        }
+
+        /**
+         * @param format Format of the webhook payload. Can be either `raw` or `slack`. Defaults to `raw`.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder format(WebhookFormat format) {
+            return format(Output.of(format));
         }
 
         /**

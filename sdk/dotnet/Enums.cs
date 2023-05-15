@@ -44,4 +44,120 @@ namespace Pulumi.PulumiService
 
         public override string ToString() => _value.ToString();
     }
+
+    [EnumType]
+    public readonly struct WebhookFilters : IEquatable<WebhookFilters>
+    {
+        private readonly string _value;
+
+        private WebhookFilters(string value)
+        {
+            _value = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        /// <summary>
+        /// Trigger a webhook when a stack is created. Only valid for org webhooks.
+        /// </summary>
+        public static WebhookFilters StackCreated { get; } = new WebhookFilters("stack_created");
+        /// <summary>
+        /// Trigger a webhook when a stack is deleted. Only valid for org webhooks.
+        /// </summary>
+        public static WebhookFilters StackDeleted { get; } = new WebhookFilters("stack_deleted");
+        /// <summary>
+        /// Trigger a webhook when a stack update succeeds.
+        /// </summary>
+        public static WebhookFilters UpdateSucceeded { get; } = new WebhookFilters("update_succeeded");
+        /// <summary>
+        /// Trigger a webhook when a stack update fails.
+        /// </summary>
+        public static WebhookFilters UpdateFailed { get; } = new WebhookFilters("update_failed");
+        /// <summary>
+        /// Trigger a webhook when a stack preview succeeds.
+        /// </summary>
+        public static WebhookFilters PreviewSucceeded { get; } = new WebhookFilters("preview_succeeded");
+        /// <summary>
+        /// Trigger a webhook when a stack preview fails.
+        /// </summary>
+        public static WebhookFilters PreviewFailed { get; } = new WebhookFilters("preview_failed");
+        /// <summary>
+        /// Trigger a webhook when a stack destroy succeeds.
+        /// </summary>
+        public static WebhookFilters DestroySucceeded { get; } = new WebhookFilters("destroy_succeeded");
+        /// <summary>
+        /// Trigger a webhook when a stack destroy fails.
+        /// </summary>
+        public static WebhookFilters DestroyFailed { get; } = new WebhookFilters("destroy_failed");
+        /// <summary>
+        /// Trigger a webhook when a stack refresh succeeds.
+        /// </summary>
+        public static WebhookFilters RefreshSucceeded { get; } = new WebhookFilters("refresh_succeeded");
+        /// <summary>
+        /// Trigger a webhook when a stack refresh fails.
+        /// </summary>
+        public static WebhookFilters RefreshFailed { get; } = new WebhookFilters("refresh_failed");
+        /// <summary>
+        /// Trigger a webhook when a deployment is queued.
+        /// </summary>
+        public static WebhookFilters DeploymentQueued { get; } = new WebhookFilters("deployment_queued");
+        /// <summary>
+        /// Trigger a webhook when a deployment starts running.
+        /// </summary>
+        public static WebhookFilters DeploymentStarted { get; } = new WebhookFilters("deployment_started");
+        /// <summary>
+        /// Trigger a webhook when a deployment succeeds.
+        /// </summary>
+        public static WebhookFilters DeploymentSucceeded { get; } = new WebhookFilters("deployment_succeeded");
+        /// <summary>
+        /// Trigger a webhook when a deployment fails.
+        /// </summary>
+        public static WebhookFilters DeploymentFailed { get; } = new WebhookFilters("deployment_failed");
+
+        public static bool operator ==(WebhookFilters left, WebhookFilters right) => left.Equals(right);
+        public static bool operator !=(WebhookFilters left, WebhookFilters right) => !left.Equals(right);
+
+        public static explicit operator string(WebhookFilters value) => value._value;
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override bool Equals(object? obj) => obj is WebhookFilters other && Equals(other);
+        public bool Equals(WebhookFilters other) => string.Equals(_value, other._value, StringComparison.Ordinal);
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+
+        public override string ToString() => _value;
+    }
+
+    [EnumType]
+    public readonly struct WebhookFormat : IEquatable<WebhookFormat>
+    {
+        private readonly string _value;
+
+        private WebhookFormat(string value)
+        {
+            _value = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        /// <summary>
+        /// The default webhook format.
+        /// </summary>
+        public static WebhookFormat Raw { get; } = new WebhookFormat("raw");
+        /// <summary>
+        /// Messages formatted for consumption by Slack incoming webhooks.
+        /// </summary>
+        public static WebhookFormat Slack { get; } = new WebhookFormat("slack");
+
+        public static bool operator ==(WebhookFormat left, WebhookFormat right) => left.Equals(right);
+        public static bool operator !=(WebhookFormat left, WebhookFormat right) => !left.Equals(right);
+
+        public static explicit operator string(WebhookFormat value) => value._value;
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override bool Equals(object? obj) => obj is WebhookFormat other && Equals(other);
+        public bool Equals(WebhookFormat other) => string.Equals(_value, other._value, StringComparison.Ordinal);
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+
+        public override string ToString() => _value;
+    }
 }
