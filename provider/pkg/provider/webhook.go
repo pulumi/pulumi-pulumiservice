@@ -27,6 +27,8 @@ type PulumiServiceWebhookInput struct {
 	OrganizationName string
 	ProjectName      *string
 	StackName        *string
+	Format           *string
+	Filters          []string
 }
 
 func (i *PulumiServiceWebhookInput) ToPropertyMap() resource.PropertyMap {
@@ -45,6 +47,9 @@ func (i *PulumiServiceWebhookInput) ToPropertyMap() resource.PropertyMap {
 	}
 	if i.StackName != nil {
 		pm["stackName"] = resource.NewPropertyValue(*i.StackName)
+	}
+	if i.Format != nil {
+		pm["format"] = resource.NewPropertyValue(*i.Format)
 	}
 
 	pm["name"] = resource.NewPropertyValue(i.Name)
@@ -81,6 +86,20 @@ func (wh *PulumiServiceWebhookResource) ToPulumiServiceWebhookInput(inputMap res
 	if inputMap["stackName"].HasValue() && inputMap["stackName"].IsString() {
 		stackNameStr := inputMap["stackName"].StringValue()
 		input.StackName = &stackNameStr
+	}
+	if inputMap["format"].HasValue() && inputMap["format"].IsString() {
+		formatStr := inputMap["format"].StringValue()
+		input.Format = &formatStr
+	}
+	if inputMap["filters"].HasValue() && inputMap["filters"].IsArray() {
+		filtersInput := inputMap["filters"].ArrayValue()
+		filters := make([]string, len(filtersInput))
+
+		for i, v := range filtersInput {
+			filters[i] = getSecretOrStringValue(v)
+		}
+
+		input.Filters = filters
 	}
 
 	if nameVal, ok := inputMap["name"]; ok && nameVal.IsString() {
@@ -178,21 +197,23 @@ func (wh *PulumiServiceWebhookResource) createWebhook(input PulumiServiceWebhook
 		PayloadURL:       input.PayloadUrl,
 		Secret:           input.Secret,
 		Active:           input.Active,
+		Format:           input.Format,
+		Filters:          input.Filters,
 	}
 	webhook, err := wh.client.CreateWebhook(ctx, req)
 	if err != nil {
 		return nil, err
 	}
 
-	var webhookID string
+	var hookID string
 	if input.ProjectName != nil && input.StackName != nil {
-		webhookID = fmt.Sprintf("%s/%s/%s/%s", input.OrganizationName, *input.ProjectName, *input.StackName,
+		hookID = fmt.Sprintf("%s/%s/%s/%s", input.OrganizationName, *input.ProjectName, *input.StackName,
 			webhook.Name)
 	} else {
-		webhookID = fmt.Sprintf("%s/%s", input.OrganizationName, webhook.Name)
+		hookID = fmt.Sprintf("%s/%s", input.OrganizationName, webhook.Name)
 	}
 
-	return &webhookID, nil
+	return &hookID, nil
 }
 
 func (wh *PulumiServiceWebhookResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
@@ -269,14 +290,18 @@ func (wh *PulumiServiceWebhookResource) Update(req *pulumirpc.UpdateRequest) (*p
 	webhookNew.Name = hookID.webhookName
 
 	updateReq := pulumiapi.UpdateWebhookRequest{
-		OrganizationName: webhookNew.OrganizationName,
-		ProjectName:      webhookNew.ProjectName,
-		StackName:        webhookNew.StackName,
-		DisplayName:      webhookNew.DisplayName,
-		PayloadURL:       webhookNew.PayloadUrl,
-		Secret:           webhookNew.Secret,
-		Active:           webhookNew.Active,
-		Name:             webhookNew.Name,
+		CreateWebhookRequest: pulumiapi.CreateWebhookRequest{
+			OrganizationName: webhookNew.OrganizationName,
+			ProjectName:      webhookNew.ProjectName,
+			StackName:        webhookNew.StackName,
+			DisplayName:      webhookNew.DisplayName,
+			PayloadURL:       webhookNew.PayloadUrl,
+			Secret:           webhookNew.Secret,
+			Active:           webhookNew.Active,
+			Format:           webhookNew.Format,
+			Filters:          webhookNew.Filters,
+		},
+		Name: webhookNew.Name,
 	}
 	err = wh.client.UpdateWebhook(context.Background(), updateReq)
 	if err != nil {

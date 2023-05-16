@@ -30,24 +30,20 @@ type Webhook struct {
 }
 
 type CreateWebhookRequest struct {
-	OrganizationName string  `json:"organizationName"`
-	ProjectName      *string `json:"projectName,omitempty"`
-	StackName        *string `json:"stackName,omitempty"`
-	DisplayName      string  `json:"displayName"`
-	PayloadURL       string  `json:"payloadUrl"`
-	Secret           *string `json:"secret,omitempty"`
-	Active           bool    `json:"active"`
+	OrganizationName string   `json:"organizationName"`
+	ProjectName      *string  `json:"projectName,omitempty"`
+	StackName        *string  `json:"stackName,omitempty"`
+	DisplayName      string   `json:"displayName"`
+	PayloadURL       string   `json:"payloadUrl"`
+	Secret           *string  `json:"secret,omitempty"`
+	Active           bool     `json:"active"`
+	Format           *string  `json:"format,omitempty"`
+	Filters          []string `json:"filters,omitempty"`
 }
 
 type UpdateWebhookRequest struct {
-	Name             string  `json:"name"`
-	OrganizationName string  `json:"organizationName"`
-	ProjectName      *string `json:"projectName,omitempty"`
-	StackName        *string `json:"stackName,omitempty"`
-	DisplayName      string  `json:"displayName"`
-	PayloadURL       string  `json:"payloadUrl"`
-	Secret           *string `json:"secret,omitempty"`
-	Active           bool    `json:"active"`
+	CreateWebhookRequest
+	Name string `json:"name"`
 }
 
 func (c *Client) CreateWebhook(ctx context.Context, req CreateWebhookRequest) (*Webhook, error) {

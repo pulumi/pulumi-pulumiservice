@@ -157,12 +157,14 @@ func TestUpdateWebhook(t *testing.T) {
 		Active:      true,
 	}
 	updateReq := UpdateWebhookRequest{
-		Name:             webhookName,
-		OrganizationName: orgName,
-		DisplayName:      displayName,
-		PayloadURL:       payloadURL,
-		Secret:           &secret,
-		Active:           true,
+		Name: webhookName,
+		CreateWebhookRequest: CreateWebhookRequest{
+			OrganizationName: orgName,
+			DisplayName:      displayName,
+			PayloadURL:       payloadURL,
+			Secret:           &secret,
+			Active:           true,
+		},
 	}
 	t.Run("Happy Path", func(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
