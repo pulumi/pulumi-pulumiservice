@@ -99,7 +99,36 @@ func (wh *PulumiServiceWebhookResource) Configure(config PulumiServiceConfig) {
 }
 
 func (wh *PulumiServiceWebhookResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: nil}, nil
+	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	if err != nil {
+		return nil, err
+	}
+
+	var failures []*pulumirpc.CheckFailure
+	for _, p := range []resource.PropertyKey{"organizationName", "payloadUrl", "displayName", "active"} {
+		if !news[(p)].HasValue() {
+			failures = append(failures, &pulumirpc.CheckFailure{
+				Reason:   fmt.Sprintf("missing required property '%s'", p),
+				Property: string(p),
+			})
+		}
+	}
+
+	stackWebhookError := "both projectName and stackName must both be specified for stack webhooks, or both unspecified for org webhooks"
+	if !news["projectName"].HasValue() && news["stackName"].HasValue() {
+		failures = append(failures, &pulumirpc.CheckFailure{
+			Reason:   stackWebhookError,
+			Property: "projectName",
+		})
+	}
+	if news["projectName"].HasValue() && !news["stackName"].HasValue() {
+		failures = append(failures, &pulumirpc.CheckFailure{
+			Reason:   stackWebhookError,
+			Property: "stackName",
+		})
+	}
+
+	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: failures}, nil
 }
 
 func (wh *PulumiServiceWebhookResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
@@ -194,6 +223,8 @@ func (wh *PulumiServiceWebhookResource) Diff(req *pulumirpc.DiffRequest) (*pulum
 		"payloadUrl":       false,
 		"secret":           false,
 		"organizationName": true,
+		"projectName":      true,
+		"stackName":        true,
 	}
 	if d := olds.Diff(news); d != nil {
 		for key, replace := range properties {
@@ -363,7 +394,7 @@ func splitWebhookID(id string) (*webhookID, error) {
 			webhookName:      s[3],
 		}, nil
 	default:
-		return nil, fmt.Errorf("%q is an invalid ID", id)
+		return nil, fmt.Errorf("%q is not a valid webhook ID", id)
 	}
 }
 
