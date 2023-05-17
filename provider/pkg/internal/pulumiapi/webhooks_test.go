@@ -20,7 +20,7 @@ func TestCreateWebhook(t *testing.T) {
 		Secret:      &secret,
 		Active:      true,
 	}
-	createReq := CreateWebhookRequest{
+	createReq := WebhookRequest{
 		OrganizationName: orgName,
 		DisplayName:      displayName,
 		PayloadURL:       payloadURL,
@@ -158,7 +158,7 @@ func TestUpdateWebhook(t *testing.T) {
 	}
 	updateReq := UpdateWebhookRequest{
 		Name: webhookName,
-		CreateWebhookRequest: CreateWebhookRequest{
+		WebhookRequest: WebhookRequest{
 			OrganizationName: orgName,
 			DisplayName:      displayName,
 			PayloadURL:       payloadURL,

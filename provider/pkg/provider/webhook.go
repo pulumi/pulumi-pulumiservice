@@ -189,7 +189,7 @@ func (wh *PulumiServiceWebhookResource) Create(req *pulumirpc.CreateRequest) (*p
 
 func (wh *PulumiServiceWebhookResource) createWebhook(input PulumiServiceWebhookInput) (*string, error) {
 	ctx := context.Background()
-	req := pulumiapi.CreateWebhookRequest{
+	req := pulumiapi.WebhookRequest{
 		OrganizationName: input.OrganizationName,
 		ProjectName:      input.ProjectName,
 		StackName:        input.StackName,
@@ -243,6 +243,8 @@ func (wh *PulumiServiceWebhookResource) Diff(req *pulumirpc.DiffRequest) (*pulum
 		"displayName":      false,
 		"payloadUrl":       false,
 		"secret":           false,
+		"format":           false,
+		"filters":          false,
 		"organizationName": true,
 		"projectName":      true,
 		"stackName":        true,
@@ -290,7 +292,7 @@ func (wh *PulumiServiceWebhookResource) Update(req *pulumirpc.UpdateRequest) (*p
 	webhookNew.Name = hookID.webhookName
 
 	updateReq := pulumiapi.UpdateWebhookRequest{
-		CreateWebhookRequest: pulumiapi.CreateWebhookRequest{
+		WebhookRequest: pulumiapi.WebhookRequest{
 			OrganizationName: webhookNew.OrganizationName,
 			ProjectName:      webhookNew.ProjectName,
 			StackName:        webhookNew.StackName,

@@ -27,9 +27,11 @@ type Webhook struct {
 	PayloadUrl  string
 	Secret      *string
 	Name        string
+	Format      string
+	Filters     []string
 }
 
-type CreateWebhookRequest struct {
+type WebhookRequest struct {
 	OrganizationName string   `json:"organizationName"`
 	ProjectName      *string  `json:"projectName,omitempty"`
 	StackName        *string  `json:"stackName,omitempty"`
@@ -42,11 +44,11 @@ type CreateWebhookRequest struct {
 }
 
 type UpdateWebhookRequest struct {
-	CreateWebhookRequest
+	WebhookRequest
 	Name string `json:"name"`
 }
 
-func (c *Client) CreateWebhook(ctx context.Context, req CreateWebhookRequest) (*Webhook, error) {
+func (c *Client) CreateWebhook(ctx context.Context, req WebhookRequest) (*Webhook, error) {
 	orgName := req.OrganizationName
 	projectName := req.ProjectName
 	stackName := req.StackName
