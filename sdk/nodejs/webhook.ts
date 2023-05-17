@@ -55,9 +55,17 @@ export class Webhook extends pulumi.CustomResource {
      */
     public readonly payloadUrl!: pulumi.Output<string | undefined>;
     /**
+     * Name of the project. Only specified if this is a stack webhook.
+     */
+    public readonly projectName!: pulumi.Output<string | undefined>;
+    /**
      * Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.
      */
     public readonly secret!: pulumi.Output<string | undefined>;
+    /**
+     * Name of the stack. Only specified if this is a stack webhook.
+     */
+    public readonly stackName!: pulumi.Output<string | undefined>;
 
     /**
      * Create a Webhook resource with the given unique name, arguments, and options.
@@ -86,7 +94,9 @@ export class Webhook extends pulumi.CustomResource {
             resourceInputs["displayName"] = args ? args.displayName : undefined;
             resourceInputs["organizationName"] = args ? args.organizationName : undefined;
             resourceInputs["payloadUrl"] = args ? args.payloadUrl : undefined;
+            resourceInputs["projectName"] = args ? args.projectName : undefined;
             resourceInputs["secret"] = args?.secret ? pulumi.secret(args.secret) : undefined;
+            resourceInputs["stackName"] = args ? args.stackName : undefined;
             resourceInputs["name"] = undefined /*out*/;
         } else {
             resourceInputs["active"] = undefined /*out*/;
@@ -94,7 +104,9 @@ export class Webhook extends pulumi.CustomResource {
             resourceInputs["name"] = undefined /*out*/;
             resourceInputs["organizationName"] = undefined /*out*/;
             resourceInputs["payloadUrl"] = undefined /*out*/;
+            resourceInputs["projectName"] = undefined /*out*/;
             resourceInputs["secret"] = undefined /*out*/;
+            resourceInputs["stackName"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         const secretOpts = { additionalSecretOutputs: ["secret"] };
@@ -124,7 +136,15 @@ export interface WebhookArgs {
      */
     payloadUrl: pulumi.Input<string>;
     /**
+     * Name of the project. Only needed if this is a stack webhook.
+     */
+    projectName?: pulumi.Input<string>;
+    /**
      * Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.
      */
     secret?: pulumi.Input<string>;
+    /**
+     * Name of the stack. Only needed if this is a stack webhook.
+     */
+    stackName?: pulumi.Input<string>;
 }

@@ -77,6 +77,21 @@ public final class WebhookArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
+     * Name of the project. Only needed if this is a stack webhook.
+     * 
+     */
+    @Import(name="projectName")
+    private @Nullable Output<String> projectName;
+
+    /**
+     * @return Name of the project. Only needed if this is a stack webhook.
+     * 
+     */
+    public Optional<Output<String>> projectName() {
+        return Optional.ofNullable(this.projectName);
+    }
+
+    /**
      * Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.
      * 
      */
@@ -91,6 +106,21 @@ public final class WebhookArgs extends com.pulumi.resources.ResourceArgs {
         return Optional.ofNullable(this.secret);
     }
 
+    /**
+     * Name of the stack. Only needed if this is a stack webhook.
+     * 
+     */
+    @Import(name="stackName")
+    private @Nullable Output<String> stackName;
+
+    /**
+     * @return Name of the stack. Only needed if this is a stack webhook.
+     * 
+     */
+    public Optional<Output<String>> stackName() {
+        return Optional.ofNullable(this.stackName);
+    }
+
     private WebhookArgs() {}
 
     private WebhookArgs(WebhookArgs $) {
@@ -98,7 +128,9 @@ public final class WebhookArgs extends com.pulumi.resources.ResourceArgs {
         this.displayName = $.displayName;
         this.organizationName = $.organizationName;
         this.payloadUrl = $.payloadUrl;
+        this.projectName = $.projectName;
         this.secret = $.secret;
+        this.stackName = $.stackName;
     }
 
     public static Builder builder() {
@@ -204,6 +236,27 @@ public final class WebhookArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
+         * @param projectName Name of the project. Only needed if this is a stack webhook.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder projectName(@Nullable Output<String> projectName) {
+            $.projectName = projectName;
+            return this;
+        }
+
+        /**
+         * @param projectName Name of the project. Only needed if this is a stack webhook.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder projectName(String projectName) {
+            return projectName(Output.of(projectName));
+        }
+
+        /**
          * @param secret Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.
          * 
          * @return builder
@@ -222,6 +275,27 @@ public final class WebhookArgs extends com.pulumi.resources.ResourceArgs {
          */
         public Builder secret(String secret) {
             return secret(Output.of(secret));
+        }
+
+        /**
+         * @param stackName Name of the stack. Only needed if this is a stack webhook.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder stackName(@Nullable Output<String> stackName) {
+            $.stackName = stackName;
+            return this;
+        }
+
+        /**
+         * @param stackName Name of the stack. Only needed if this is a stack webhook.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder stackName(String stackName) {
+            return stackName(Output.of(stackName));
         }
 
         public WebhookArgs build() {

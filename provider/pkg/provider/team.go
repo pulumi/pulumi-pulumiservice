@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"strings"
 
 	pbempty "github.com/golang/protobuf/ptypes/empty"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/pulumiapi"
@@ -307,4 +308,13 @@ func partialError(id string, err error, state PulumiServiceTeamInput, inputs Pul
 		Inputs:     inputRpc,
 	}
 	return rpcerror.WithDetails(rpcerror.New(codes.Unknown, err.Error()), &detail)
+}
+
+func splitSingleSlashString(id string) (string, string, error) {
+	// format: organization/webhookName
+	s := strings.Split(id, "/")
+	if len(s) != 2 {
+		return "", "", fmt.Errorf("%q is invalid, must contain a single slash ('/')", id)
+	}
+	return s[0], s[1], nil
 }

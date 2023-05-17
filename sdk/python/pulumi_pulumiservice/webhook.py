@@ -18,21 +18,29 @@ class WebhookArgs:
                  display_name: pulumi.Input[str],
                  organization_name: pulumi.Input[str],
                  payload_url: pulumi.Input[str],
-                 secret: Optional[pulumi.Input[str]] = None):
+                 project_name: Optional[pulumi.Input[str]] = None,
+                 secret: Optional[pulumi.Input[str]] = None,
+                 stack_name: Optional[pulumi.Input[str]] = None):
         """
         The set of arguments for constructing a Webhook resource.
         :param pulumi.Input[bool] active: Indicates whether this webhook is enabled or not.
         :param pulumi.Input[str] display_name: The friendly name displayed in the Pulumi Service.
         :param pulumi.Input[str] organization_name: Name of the organization.
         :param pulumi.Input[str] payload_url: URL to send request to.
+        :param pulumi.Input[str] project_name: Name of the project. Only needed if this is a stack webhook.
         :param pulumi.Input[str] secret: Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.
+        :param pulumi.Input[str] stack_name: Name of the stack. Only needed if this is a stack webhook.
         """
         pulumi.set(__self__, "active", active)
         pulumi.set(__self__, "display_name", display_name)
         pulumi.set(__self__, "organization_name", organization_name)
         pulumi.set(__self__, "payload_url", payload_url)
+        if project_name is not None:
+            pulumi.set(__self__, "project_name", project_name)
         if secret is not None:
             pulumi.set(__self__, "secret", secret)
+        if stack_name is not None:
+            pulumi.set(__self__, "stack_name", stack_name)
 
     @property
     @pulumi.getter
@@ -83,6 +91,18 @@ class WebhookArgs:
         pulumi.set(self, "payload_url", value)
 
     @property
+    @pulumi.getter(name="projectName")
+    def project_name(self) -> Optional[pulumi.Input[str]]:
+        """
+        Name of the project. Only needed if this is a stack webhook.
+        """
+        return pulumi.get(self, "project_name")
+
+    @project_name.setter
+    def project_name(self, value: Optional[pulumi.Input[str]]):
+        pulumi.set(self, "project_name", value)
+
+    @property
     @pulumi.getter
     def secret(self) -> Optional[pulumi.Input[str]]:
         """
@@ -94,6 +114,18 @@ class WebhookArgs:
     def secret(self, value: Optional[pulumi.Input[str]]):
         pulumi.set(self, "secret", value)
 
+    @property
+    @pulumi.getter(name="stackName")
+    def stack_name(self) -> Optional[pulumi.Input[str]]:
+        """
+        Name of the stack. Only needed if this is a stack webhook.
+        """
+        return pulumi.get(self, "stack_name")
+
+    @stack_name.setter
+    def stack_name(self, value: Optional[pulumi.Input[str]]):
+        pulumi.set(self, "stack_name", value)
+
 
 class Webhook(pulumi.CustomResource):
     @overload
@@ -104,7 +136,9 @@ class Webhook(pulumi.CustomResource):
                  display_name: Optional[pulumi.Input[str]] = None,
                  organization_name: Optional[pulumi.Input[str]] = None,
                  payload_url: Optional[pulumi.Input[str]] = None,
+                 project_name: Optional[pulumi.Input[str]] = None,
                  secret: Optional[pulumi.Input[str]] = None,
+                 stack_name: Optional[pulumi.Input[str]] = None,
                  __props__=None):
         """
         Pulumi Webhooks allow you to notify external services of events happening within your Pulumi organization or stack. For example, you can trigger a notification whenever a stack is updated. Whenever an event occurs, Pulumi will send an HTTP POST request to all registered webhooks. The webhook can then be used to emit some notification, start running integration tests, or even update additional stacks.
@@ -115,7 +149,9 @@ class Webhook(pulumi.CustomResource):
         :param pulumi.Input[str] display_name: The friendly name displayed in the Pulumi Service.
         :param pulumi.Input[str] organization_name: Name of the organization.
         :param pulumi.Input[str] payload_url: URL to send request to.
+        :param pulumi.Input[str] project_name: Name of the project. Only needed if this is a stack webhook.
         :param pulumi.Input[str] secret: Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.
+        :param pulumi.Input[str] stack_name: Name of the stack. Only needed if this is a stack webhook.
         """
         ...
     @overload
@@ -145,7 +181,9 @@ class Webhook(pulumi.CustomResource):
                  display_name: Optional[pulumi.Input[str]] = None,
                  organization_name: Optional[pulumi.Input[str]] = None,
                  payload_url: Optional[pulumi.Input[str]] = None,
+                 project_name: Optional[pulumi.Input[str]] = None,
                  secret: Optional[pulumi.Input[str]] = None,
+                 stack_name: Optional[pulumi.Input[str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
@@ -167,7 +205,9 @@ class Webhook(pulumi.CustomResource):
             if payload_url is None and not opts.urn:
                 raise TypeError("Missing required property 'payload_url'")
             __props__.__dict__["payload_url"] = payload_url
+            __props__.__dict__["project_name"] = project_name
             __props__.__dict__["secret"] = None if secret is None else pulumi.Output.secret(secret)
+            __props__.__dict__["stack_name"] = stack_name
             __props__.__dict__["name"] = None
         secret_opts = pulumi.ResourceOptions(additional_secret_outputs=["secret"])
         opts = pulumi.ResourceOptions.merge(opts, secret_opts)
@@ -198,7 +238,9 @@ class Webhook(pulumi.CustomResource):
         __props__.__dict__["name"] = None
         __props__.__dict__["organization_name"] = None
         __props__.__dict__["payload_url"] = None
+        __props__.__dict__["project_name"] = None
         __props__.__dict__["secret"] = None
+        __props__.__dict__["stack_name"] = None
         return Webhook(resource_name, opts=opts, __props__=__props__)
 
     @property
@@ -242,10 +284,26 @@ class Webhook(pulumi.CustomResource):
         return pulumi.get(self, "payload_url")
 
     @property
+    @pulumi.getter(name="projectName")
+    def project_name(self) -> pulumi.Output[Optional[str]]:
+        """
+        Name of the project. Only specified if this is a stack webhook.
+        """
+        return pulumi.get(self, "project_name")
+
+    @property
     @pulumi.getter
     def secret(self) -> pulumi.Output[Optional[str]]:
         """
         Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.
         """
         return pulumi.get(self, "secret")
+
+    @property
+    @pulumi.getter(name="stackName")
+    def stack_name(self) -> pulumi.Output[Optional[str]]:
+        """
+        Name of the stack. Only specified if this is a stack webhook.
+        """
+        return pulumi.get(self, "stack_name")
 
