@@ -5,6 +5,7 @@ package com.pulumi.pulumiservice;
 
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
+import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.enums.WebhookFilters;
 import com.pulumi.pulumiservice.enums.WebhookFormat;
 import java.lang.Boolean;
@@ -388,6 +389,7 @@ public final class WebhookArgs extends com.pulumi.resources.ResourceArgs {
         public WebhookArgs build() {
             $.active = Objects.requireNonNull($.active, "expected parameter 'active' to be non-null");
             $.displayName = Objects.requireNonNull($.displayName, "expected parameter 'displayName' to be non-null");
+            $.format = Codegen.objectProp("format", WebhookFormat.class).output().arg($.format).def(WebhookFormat.Raw).getNullable();
             $.organizationName = Objects.requireNonNull($.organizationName, "expected parameter 'organizationName' to be non-null");
             $.payloadUrl = Objects.requireNonNull($.payloadUrl, "expected parameter 'payloadUrl' to be non-null");
             return $;

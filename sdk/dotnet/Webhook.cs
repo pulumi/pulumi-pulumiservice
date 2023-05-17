@@ -196,6 +196,7 @@ namespace Pulumi.PulumiService
 
         public WebhookArgs()
         {
+            Format = Pulumi.PulumiService.WebhookFormat.Raw;
         }
         public static new WebhookArgs Empty => new WebhookArgs();
     }

@@ -104,7 +104,7 @@ export class Webhook extends pulumi.CustomResource {
             resourceInputs["active"] = args ? args.active : undefined;
             resourceInputs["displayName"] = args ? args.displayName : undefined;
             resourceInputs["filters"] = args ? args.filters : undefined;
-            resourceInputs["format"] = args ? args.format : undefined;
+            resourceInputs["format"] = (args ? args.format : undefined) ?? "raw";
             resourceInputs["organizationName"] = args ? args.organizationName : undefined;
             resourceInputs["payloadUrl"] = args ? args.payloadUrl : undefined;
             resourceInputs["projectName"] = args ? args.projectName : undefined;

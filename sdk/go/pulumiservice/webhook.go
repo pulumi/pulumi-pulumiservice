@@ -56,6 +56,9 @@ func NewWebhook(ctx *pulumi.Context,
 	if args.PayloadUrl == nil {
 		return nil, errors.New("invalid value for required argument 'PayloadUrl'")
 	}
+	if args.Format == nil {
+		args.Format = WebhookFormat("raw")
+	}
 	if args.Secret != nil {
 		args.Secret = pulumi.ToSecret(args.Secret).(pulumi.StringPtrInput)
 	}

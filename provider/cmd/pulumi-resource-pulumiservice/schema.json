@@ -660,7 +660,8 @@
         },
         "format": {
           "description": "Format of the webhook payload. Can be either `raw` or `slack`. Defaults to `raw`.",
-          "$ref": "#/types/pulumiservice:index:WebhookFormat"
+          "$ref": "#/types/pulumiservice:index:WebhookFormat",
+          "default": "raw"
         },
         "filters": {
           "description": "Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.",

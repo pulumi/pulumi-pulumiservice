@@ -363,6 +363,8 @@ func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulum
 		DisplayName:      webhook.DisplayName,
 		PayloadUrl:       webhook.PayloadUrl,
 		Secret:           webhook.Secret,
+		Format:           &webhook.Format,
+		Filters:          webhook.Filters,
 		OrganizationName: hookID.organizationName,
 		ProjectName:      hookID.projectName,
 		StackName:        hookID.stackName,

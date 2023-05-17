@@ -42,6 +42,8 @@ class WebhookArgs:
         pulumi.set(__self__, "payload_url", payload_url)
         if filters is not None:
             pulumi.set(__self__, "filters", filters)
+        if format is None:
+            format = 'raw'
         if format is not None:
             pulumi.set(__self__, "format", format)
         if project_name is not None:
@@ -239,6 +241,8 @@ class Webhook(pulumi.CustomResource):
                 raise TypeError("Missing required property 'display_name'")
             __props__.__dict__["display_name"] = display_name
             __props__.__dict__["filters"] = filters
+            if format is None:
+                format = 'raw'
             __props__.__dict__["format"] = format
             if organization_name is None and not opts.urn:
                 raise TypeError("Missing required property 'organization_name'")
