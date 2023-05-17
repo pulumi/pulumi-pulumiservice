@@ -51,6 +51,9 @@ func (i *PulumiServiceWebhookInput) ToPropertyMap() resource.PropertyMap {
 	if i.Format != nil {
 		pm["format"] = resource.NewPropertyValue(*i.Format)
 	}
+	if len(i.Filters) > 0 {
+		pm["filters"] = resource.NewPropertyValue(i.Filters)
+	}
 
 	pm["name"] = resource.NewPropertyValue(i.Name)
 	return pm
