@@ -114,7 +114,7 @@ func (wh *PulumiServiceWebhookResource) Check(req *pulumirpc.CheckRequest) (*pul
 		}
 	}
 
-	stackWebhookError := "both projectName and stackName must both be specified for stack webhooks, or both unspecified for org webhooks"
+	stackWebhookError := "projectName and stackName must both be specified for stack webhooks, or both unspecified for org webhooks"
 	if !news["projectName"].HasValue() && news["stackName"].HasValue() {
 		failures = append(failures, &pulumirpc.CheckFailure{
 			Reason:   stackWebhookError,
