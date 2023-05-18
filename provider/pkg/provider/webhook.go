@@ -369,7 +369,7 @@ func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulum
 		return nil, err
 	}
 
-	webhookInput := PulumiServiceWebhookInput{
+	outputs := PulumiServiceWebhookInput{
 		Active:           webhook.Active,
 		DisplayName:      webhook.DisplayName,
 		PayloadUrl:       webhook.PayloadUrl,
@@ -383,14 +383,20 @@ func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulum
 	}
 
 	properties, err := plugin.MarshalProperties(
-		webhookInput.ToPropertyMap(),
+		outputs.ToPropertyMap(),
 		plugin.MarshalOptions{},
 	)
-
 	if err != nil {
 		return nil, err
 	}
 
+	// drop the name for the inputs
+	webhookInput := outputs
+	webhookInput.Name = ""
+	inputs, err := plugin.MarshalProperties(
+		webhookInput.ToPropertyMap(),
+		plugin.MarshalOptions{},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -398,7 +404,7 @@ func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulum
 	return &pulumirpc.ReadResponse{
 		Id:         req.Id,
 		Properties: properties,
-		Inputs:     properties,
+		Inputs:     inputs,
 	}, nil
 }
 
