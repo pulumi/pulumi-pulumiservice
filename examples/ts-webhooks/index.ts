@@ -1,22 +1,24 @@
 import * as pulumi from "@pulumi/pulumi";
-import * as service from "@pulumi/pulumiservice";
+import { Webhook, WebhookFormat, WebhookFilters } from "@pulumi/pulumiservice";
 
 const serviceOrg = "service-provider-test-org";
 
-const webhook = new service.Webhook("wh", {
+const webhook = new Webhook("wh", {
   active: true,
   displayName: "webhook-from-provider",
   organizationName: serviceOrg,
   payloadUrl: "https://google.com",
+  filters: [WebhookFilters.DeploymentStarted, WebhookFilters.DeploymentSucceeded],
 });
 
-const stackWebhook = new service.Webhook("stack-webhook", {
+const stackWebhook = new Webhook("stack-webhook", {
   active: true,
   displayName: "stack-webhook",
   organizationName: serviceOrg,
   projectName: pulumi.getProject(),
   stackName: pulumi.getStack(),
   payloadUrl: "https://example.com",
+  format: WebhookFormat.Slack,
 })
 
 export const orgName = webhook.organizationName;

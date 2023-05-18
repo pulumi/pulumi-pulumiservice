@@ -49,6 +49,94 @@
         }
       ]
     },
+    "pulumiservice:index:WebhookFormat": {
+      "type": "string",
+      "enum": [
+        {
+          "description": "The default webhook format.",
+          "value": "raw"
+        },
+        {
+          "description": "Messages formatted for consumption by Slack incoming webhooks.",
+          "value": "slack"
+        }
+      ]
+    },
+    "pulumiservice:index:WebhookFilters": {
+      "type": "string",
+      "enum": [
+        {
+          "value": "stack_created",
+          "description": "Trigger a webhook when a stack is created. Only valid for org webhooks.",
+          "name": "StackCreated"
+        },
+        {
+          "value": "stack_deleted",
+          "description": "Trigger a webhook when a stack is deleted. Only valid for org webhooks.",
+            "name": "StackDeleted"
+        },
+        {
+          "value": "update_succeeded",
+          "description": "Trigger a webhook when a stack update succeeds.",
+            "name": "UpdateSucceeded"
+        },
+        {
+          "value": "update_failed",
+          "description": "Trigger a webhook when a stack update fails.",
+            "name": "UpdateFailed"
+        },
+        {
+          "value": "preview_succeeded",
+          "description": "Trigger a webhook when a stack preview succeeds.",
+            "name": "PreviewSucceeded"
+        },
+        {
+          "value": "preview_failed",
+          "description": "Trigger a webhook when a stack preview fails.",
+            "name": "PreviewFailed"
+        },
+        {
+          "value": "destroy_succeeded",
+          "description": "Trigger a webhook when a stack destroy succeeds.",
+            "name": "DestroySucceeded"
+        },
+        {
+          "value": "destroy_failed",
+          "description": "Trigger a webhook when a stack destroy fails.",
+            "name": "DestroyFailed"
+        },
+        {
+          "value": "refresh_succeeded",
+          "description": "Trigger a webhook when a stack refresh succeeds.",
+            "name": "RefreshSucceeded"
+        },
+        {
+          "value": "refresh_failed",
+          "description": "Trigger a webhook when a stack refresh fails.",
+            "name": "RefreshFailed"
+        },
+        {
+          "value": "deployment_queued",
+          "description": "Trigger a webhook when a deployment is queued.",
+            "name": "DeploymentQueued"
+        },
+        {
+          "value": "deployment_started",
+          "description": "Trigger a webhook when a deployment starts running.",
+            "name": "DeploymentStarted"
+        },
+        {
+          "value": "deployment_succeeded",
+          "description": "Trigger a webhook when a deployment succeeds.",
+            "name": "DeploymentSucceeded"
+        },
+        {
+          "value": "deployment_failed",
+          "description": "Trigger a webhook when a deployment fails.",
+            "name": "DeploymentFailed"
+        }
+      ]
+    },
     "pulumiservice:index:DeploymentSettingsExecutorContext": {
       "description":"The executor context defines information about the executor where the deployment is executed. If unspecified, the default 'pulumi/pulumi' image is used.",
       "properties": {
@@ -527,6 +615,17 @@
         "stackName": {
             "description": "Name of the stack. Only specified if this is a stack webhook.",
             "type": "string"
+        },
+        "format": {
+            "description": "Format of the webhook payload. Can be either `raw` or `slack`. Defaults to `raw`.",
+            "$ref": "#/types/pulumiservice:index:WebhookFormat"
+        },
+        "filters": {
+            "description": "Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.",
+            "type": "array",
+            "items": {
+              "$ref": "#/types/pulumiservice:index:WebhookFilters"
+            }
         }
       },
       "inputProperties": {
@@ -558,6 +657,18 @@
         "stackName": {
           "description": "Name of the stack. Only needed if this is a stack webhook.",
           "type": "string"
+        },
+        "format": {
+          "description": "Format of the webhook payload. Can be either `raw` or `slack`. Defaults to `raw`.",
+          "$ref": "#/types/pulumiservice:index:WebhookFormat",
+          "default": "raw"
+        },
+        "filters": {
+          "description": "Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.",
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:index:WebhookFilters"
+          }
         }
       },
       "requiredInputs": [

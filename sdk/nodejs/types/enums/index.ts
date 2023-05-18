@@ -18,3 +18,77 @@ export const TeamStackPermissionScope = {
 } as const;
 
 export type TeamStackPermissionScope = (typeof TeamStackPermissionScope)[keyof typeof TeamStackPermissionScope];
+
+export const WebhookFilters = {
+    /**
+     * Trigger a webhook when a stack is created. Only valid for org webhooks.
+     */
+    StackCreated: "stack_created",
+    /**
+     * Trigger a webhook when a stack is deleted. Only valid for org webhooks.
+     */
+    StackDeleted: "stack_deleted",
+    /**
+     * Trigger a webhook when a stack update succeeds.
+     */
+    UpdateSucceeded: "update_succeeded",
+    /**
+     * Trigger a webhook when a stack update fails.
+     */
+    UpdateFailed: "update_failed",
+    /**
+     * Trigger a webhook when a stack preview succeeds.
+     */
+    PreviewSucceeded: "preview_succeeded",
+    /**
+     * Trigger a webhook when a stack preview fails.
+     */
+    PreviewFailed: "preview_failed",
+    /**
+     * Trigger a webhook when a stack destroy succeeds.
+     */
+    DestroySucceeded: "destroy_succeeded",
+    /**
+     * Trigger a webhook when a stack destroy fails.
+     */
+    DestroyFailed: "destroy_failed",
+    /**
+     * Trigger a webhook when a stack refresh succeeds.
+     */
+    RefreshSucceeded: "refresh_succeeded",
+    /**
+     * Trigger a webhook when a stack refresh fails.
+     */
+    RefreshFailed: "refresh_failed",
+    /**
+     * Trigger a webhook when a deployment is queued.
+     */
+    DeploymentQueued: "deployment_queued",
+    /**
+     * Trigger a webhook when a deployment starts running.
+     */
+    DeploymentStarted: "deployment_started",
+    /**
+     * Trigger a webhook when a deployment succeeds.
+     */
+    DeploymentSucceeded: "deployment_succeeded",
+    /**
+     * Trigger a webhook when a deployment fails.
+     */
+    DeploymentFailed: "deployment_failed",
+} as const;
+
+export type WebhookFilters = (typeof WebhookFilters)[keyof typeof WebhookFilters];
+
+export const WebhookFormat = {
+    /**
+     * The default webhook format.
+     */
+    Raw: "raw",
+    /**
+     * Messages formatted for consumption by Slack incoming webhooks.
+     */
+    Slack: "slack",
+} as const;
+
+export type WebhookFormat = (typeof WebhookFormat)[keyof typeof WebhookFormat];

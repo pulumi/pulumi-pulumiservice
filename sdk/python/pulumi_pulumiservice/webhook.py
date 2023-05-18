@@ -8,6 +8,7 @@ import pulumi
 import pulumi.runtime
 from typing import Any, Mapping, Optional, Sequence, Union, overload
 from . import _utilities
+from ._enums import *
 
 __all__ = ['WebhookArgs', 'Webhook']
 
@@ -18,6 +19,8 @@ class WebhookArgs:
                  display_name: pulumi.Input[str],
                  organization_name: pulumi.Input[str],
                  payload_url: pulumi.Input[str],
+                 filters: Optional[pulumi.Input[Sequence[pulumi.Input['WebhookFilters']]]] = None,
+                 format: Optional[pulumi.Input['WebhookFormat']] = None,
                  project_name: Optional[pulumi.Input[str]] = None,
                  secret: Optional[pulumi.Input[str]] = None,
                  stack_name: Optional[pulumi.Input[str]] = None):
@@ -27,6 +30,8 @@ class WebhookArgs:
         :param pulumi.Input[str] display_name: The friendly name displayed in the Pulumi Service.
         :param pulumi.Input[str] organization_name: Name of the organization.
         :param pulumi.Input[str] payload_url: URL to send request to.
+        :param pulumi.Input[Sequence[pulumi.Input['WebhookFilters']]] filters: Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.
+        :param pulumi.Input['WebhookFormat'] format: Format of the webhook payload. Can be either `raw` or `slack`. Defaults to `raw`.
         :param pulumi.Input[str] project_name: Name of the project. Only needed if this is a stack webhook.
         :param pulumi.Input[str] secret: Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.
         :param pulumi.Input[str] stack_name: Name of the stack. Only needed if this is a stack webhook.
@@ -35,6 +40,12 @@ class WebhookArgs:
         pulumi.set(__self__, "display_name", display_name)
         pulumi.set(__self__, "organization_name", organization_name)
         pulumi.set(__self__, "payload_url", payload_url)
+        if filters is not None:
+            pulumi.set(__self__, "filters", filters)
+        if format is None:
+            format = 'raw'
+        if format is not None:
+            pulumi.set(__self__, "format", format)
         if project_name is not None:
             pulumi.set(__self__, "project_name", project_name)
         if secret is not None:
@@ -91,6 +102,30 @@ class WebhookArgs:
         pulumi.set(self, "payload_url", value)
 
     @property
+    @pulumi.getter
+    def filters(self) -> Optional[pulumi.Input[Sequence[pulumi.Input['WebhookFilters']]]]:
+        """
+        Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.
+        """
+        return pulumi.get(self, "filters")
+
+    @filters.setter
+    def filters(self, value: Optional[pulumi.Input[Sequence[pulumi.Input['WebhookFilters']]]]):
+        pulumi.set(self, "filters", value)
+
+    @property
+    @pulumi.getter
+    def format(self) -> Optional[pulumi.Input['WebhookFormat']]:
+        """
+        Format of the webhook payload. Can be either `raw` or `slack`. Defaults to `raw`.
+        """
+        return pulumi.get(self, "format")
+
+    @format.setter
+    def format(self, value: Optional[pulumi.Input['WebhookFormat']]):
+        pulumi.set(self, "format", value)
+
+    @property
     @pulumi.getter(name="projectName")
     def project_name(self) -> Optional[pulumi.Input[str]]:
         """
@@ -134,6 +169,8 @@ class Webhook(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None,
                  active: Optional[pulumi.Input[bool]] = None,
                  display_name: Optional[pulumi.Input[str]] = None,
+                 filters: Optional[pulumi.Input[Sequence[pulumi.Input['WebhookFilters']]]] = None,
+                 format: Optional[pulumi.Input['WebhookFormat']] = None,
                  organization_name: Optional[pulumi.Input[str]] = None,
                  payload_url: Optional[pulumi.Input[str]] = None,
                  project_name: Optional[pulumi.Input[str]] = None,
@@ -147,6 +184,8 @@ class Webhook(pulumi.CustomResource):
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[bool] active: Indicates whether this webhook is enabled or not.
         :param pulumi.Input[str] display_name: The friendly name displayed in the Pulumi Service.
+        :param pulumi.Input[Sequence[pulumi.Input['WebhookFilters']]] filters: Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.
+        :param pulumi.Input['WebhookFormat'] format: Format of the webhook payload. Can be either `raw` or `slack`. Defaults to `raw`.
         :param pulumi.Input[str] organization_name: Name of the organization.
         :param pulumi.Input[str] payload_url: URL to send request to.
         :param pulumi.Input[str] project_name: Name of the project. Only needed if this is a stack webhook.
@@ -179,6 +218,8 @@ class Webhook(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None,
                  active: Optional[pulumi.Input[bool]] = None,
                  display_name: Optional[pulumi.Input[str]] = None,
+                 filters: Optional[pulumi.Input[Sequence[pulumi.Input['WebhookFilters']]]] = None,
+                 format: Optional[pulumi.Input['WebhookFormat']] = None,
                  organization_name: Optional[pulumi.Input[str]] = None,
                  payload_url: Optional[pulumi.Input[str]] = None,
                  project_name: Optional[pulumi.Input[str]] = None,
@@ -199,6 +240,10 @@ class Webhook(pulumi.CustomResource):
             if display_name is None and not opts.urn:
                 raise TypeError("Missing required property 'display_name'")
             __props__.__dict__["display_name"] = display_name
+            __props__.__dict__["filters"] = filters
+            if format is None:
+                format = 'raw'
+            __props__.__dict__["format"] = format
             if organization_name is None and not opts.urn:
                 raise TypeError("Missing required property 'organization_name'")
             __props__.__dict__["organization_name"] = organization_name
@@ -235,6 +280,8 @@ class Webhook(pulumi.CustomResource):
 
         __props__.__dict__["active"] = None
         __props__.__dict__["display_name"] = None
+        __props__.__dict__["filters"] = None
+        __props__.__dict__["format"] = None
         __props__.__dict__["name"] = None
         __props__.__dict__["organization_name"] = None
         __props__.__dict__["payload_url"] = None
@@ -258,6 +305,22 @@ class Webhook(pulumi.CustomResource):
         The friendly name displayed in the Pulumi Service.
         """
         return pulumi.get(self, "display_name")
+
+    @property
+    @pulumi.getter
+    def filters(self) -> pulumi.Output[Optional[Sequence['WebhookFilters']]]:
+        """
+        Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.
+        """
+        return pulumi.get(self, "filters")
+
+    @property
+    @pulumi.getter
+    def format(self) -> pulumi.Output[Optional['WebhookFormat']]:
+        """
+        Format of the webhook payload. Can be either `raw` or `slack`. Defaults to `raw`.
+        """
+        return pulumi.get(self, "format")
 
     @property
     @pulumi.getter
