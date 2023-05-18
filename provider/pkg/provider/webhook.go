@@ -150,6 +150,12 @@ func (wh *PulumiServiceWebhookResource) Check(req *pulumirpc.CheckRequest) (*pul
 		})
 	}
 
+	// Fill in the `format` property with the default `raw` value if it's not specified.
+	// This should happen automatically, but is currently broken for yaml.
+	if !news["format"].HasValue() {
+		news["format"] = resource.NewStringProperty("raw")
+	}
+
 	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: failures}, nil
 }
 
