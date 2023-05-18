@@ -150,7 +150,23 @@ func (wh *PulumiServiceWebhookResource) Check(req *pulumirpc.CheckRequest) (*pul
 		})
 	}
 
-	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: failures}, nil
+	// if the format is not specified, default to raw
+	// this should work automatically because we have set the default in the schema,
+	// but it isn't respected by the yaml provider
+	// https://github.com/pulumi/pulumi-yaml/issues/458
+	if !news["format"].HasValue() {
+		news["format"] = resource.NewPropertyValue("raw")
+	}
+
+	inputNews, err := plugin.MarshalProperties(
+		news,
+		plugin.MarshalOptions{},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pulumirpc.CheckResponse{Inputs: inputNews, Failures: failures}, nil
 }
 
 func (wh *PulumiServiceWebhookResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
@@ -369,15 +385,6 @@ func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulum
 		ProjectName:      hookID.projectName,
 		StackName:        hookID.stackName,
 		Name:             hookID.webhookName,
-	}
-
-	// if the format is raw, and it's not in the input already, we don't want it to
-	// cause a diff since it's a default.
-	// this should work automatically because we have set the default in the schema
-	// but isn't respected by the yaml provider
-	// https://github.com/pulumi/pulumi-yaml/issues/458
-	if webhook.Format == "raw" && !inputs.HasValue("format") {
-		webhookInput.Format = nil
 	}
 
 	properties, err := plugin.MarshalProperties(
