@@ -23,12 +23,16 @@ type PulumiServiceWebhookInput struct {
 	DisplayName      string
 	PayloadUrl       string
 	Secret           *string
-	Name             string
 	OrganizationName string
 	ProjectName      *string
 	StackName        *string
 	Format           *string
 	Filters          []string
+}
+
+type PulumiServiceWebhookProperties struct {
+	PulumiServiceWebhookInput
+	Name string
 }
 
 func (i *PulumiServiceWebhookInput) ToPropertyMap() resource.PropertyMap {
@@ -55,61 +59,67 @@ func (i *PulumiServiceWebhookInput) ToPropertyMap() resource.PropertyMap {
 		pm["filters"] = resource.NewPropertyValue(i.Filters)
 	}
 
+	return pm
+}
+
+func (i *PulumiServiceWebhookProperties) ToPropertyMap() resource.PropertyMap {
+	pm := i.PulumiServiceWebhookInput.ToPropertyMap()
+
 	pm["name"] = resource.NewPropertyValue(i.Name)
 	return pm
 }
 
-func (wh *PulumiServiceWebhookResource) ToPulumiServiceWebhookInput(inputMap resource.PropertyMap) PulumiServiceWebhookInput {
-	input := PulumiServiceWebhookInput{}
+func (wh *PulumiServiceWebhookResource) ToPulumiServiceWebhookProperties(propMap resource.PropertyMap) PulumiServiceWebhookProperties {
+	props := PulumiServiceWebhookProperties{}
 
-	if inputMap["active"].HasValue() && inputMap["active"].IsBool() {
-		input.Active = inputMap["active"].BoolValue()
+	if propMap["active"].HasValue() && propMap["active"].IsBool() {
+		props.Active = propMap["active"].BoolValue()
 	}
 
-	if inputMap["displayName"].HasValue() && inputMap["displayName"].IsString() {
-		input.DisplayName = inputMap["displayName"].StringValue()
+	if propMap["displayName"].HasValue() && propMap["displayName"].IsString() {
+		props.DisplayName = propMap["displayName"].StringValue()
 	}
 
-	if inputMap["payloadUrl"].HasValue() && inputMap["payloadUrl"].IsString() {
-		input.PayloadUrl = inputMap["payloadUrl"].StringValue()
+	if propMap["payloadUrl"].HasValue() && propMap["payloadUrl"].IsString() {
+		props.PayloadUrl = propMap["payloadUrl"].StringValue()
 	}
 
-	if secretVal := inputMap["secret"]; secretVal.HasValue() && secretVal.IsString() {
+	if secretVal := propMap["secret"]; secretVal.HasValue() && secretVal.IsString() {
 		secretStr := secretVal.StringValue()
-		input.Secret = &secretStr
+		props.Secret = &secretStr
 	}
 
-	if inputMap["organizationName"].HasValue() && inputMap["organizationName"].IsString() {
-		input.OrganizationName = inputMap["organizationName"].StringValue()
+	if propMap["organizationName"].HasValue() && propMap["organizationName"].IsString() {
+		props.OrganizationName = propMap["organizationName"].StringValue()
 	}
-	if inputMap["projectName"].HasValue() && inputMap["projectName"].IsString() {
-		projectNameStr := inputMap["projectName"].StringValue()
-		input.ProjectName = &projectNameStr
+	if propMap["projectName"].HasValue() && propMap["projectName"].IsString() {
+		projectNameStr := propMap["projectName"].StringValue()
+		props.ProjectName = &projectNameStr
 	}
-	if inputMap["stackName"].HasValue() && inputMap["stackName"].IsString() {
-		stackNameStr := inputMap["stackName"].StringValue()
-		input.StackName = &stackNameStr
+	if propMap["stackName"].HasValue() && propMap["stackName"].IsString() {
+		stackNameStr := propMap["stackName"].StringValue()
+		props.StackName = &stackNameStr
 	}
-	if inputMap["format"].HasValue() && inputMap["format"].IsString() {
-		formatStr := inputMap["format"].StringValue()
-		input.Format = &formatStr
+	if propMap["format"].HasValue() && propMap["format"].IsString() {
+		formatStr := propMap["format"].StringValue()
+		props.Format = &formatStr
 	}
-	if inputMap["filters"].HasValue() && inputMap["filters"].IsArray() {
-		filtersInput := inputMap["filters"].ArrayValue()
+	if propMap["filters"].HasValue() && propMap["filters"].IsArray() {
+		filtersInput := propMap["filters"].ArrayValue()
 		filters := make([]string, len(filtersInput))
 
 		for i, v := range filtersInput {
 			filters[i] = getSecretOrStringValue(v)
 		}
 
-		input.Filters = filters
+		props.Filters = filters
 	}
 
-	if nameVal, ok := inputMap["name"]; ok && nameVal.IsString() {
-		input.Name = nameVal.StringValue()
+	if nameVal, ok := propMap["name"]; ok && nameVal.IsString() {
+		props.Name = nameVal.StringValue()
 	}
 
-	return input
+	return props
 }
 
 func (wh *PulumiServiceWebhookResource) Name() string {
@@ -175,9 +185,9 @@ func (wh *PulumiServiceWebhookResource) Create(req *pulumirpc.CreateRequest) (*p
 		return nil, err
 	}
 
-	inputsWebhook := wh.ToPulumiServiceWebhookInput(inputs)
+	props := wh.ToPulumiServiceWebhookProperties(inputs)
 
-	idString, err := wh.createWebhook(inputsWebhook)
+	idString, err := wh.createWebhook(props.PulumiServiceWebhookInput)
 	if err != nil {
 		return nil, err
 	}
@@ -187,10 +197,10 @@ func (wh *PulumiServiceWebhookResource) Create(req *pulumirpc.CreateRequest) (*p
 		return nil, err
 	}
 
-	inputsWebhook.Name = hookID.webhookName
+	props.Name = hookID.webhookName
 
 	outputProperties, err := plugin.MarshalProperties(
-		inputsWebhook.ToPropertyMap(),
+		props.ToPropertyMap(),
 		plugin.MarshalOptions{
 			KeepUnknowns: true,
 			SkipNulls:    true,
@@ -301,7 +311,7 @@ func (wh *PulumiServiceWebhookResource) Update(req *pulumirpc.UpdateRequest) (*p
 		return nil, err
 	}
 
-	webhookNew := wh.ToPulumiServiceWebhookInput(inputsNew)
+	webhookNew := wh.ToPulumiServiceWebhookProperties(inputsNew)
 
 	// ignore orgName because if that changed, we would have done a replace, so update would never have been called
 	hookID, err := splitWebhookID(req.GetId())
@@ -369,32 +379,31 @@ func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulum
 		return nil, err
 	}
 
-	outputs := PulumiServiceWebhookInput{
-		Active:           webhook.Active,
-		DisplayName:      webhook.DisplayName,
-		PayloadUrl:       webhook.PayloadUrl,
-		Secret:           webhook.Secret,
-		Format:           &webhook.Format,
-		Filters:          webhook.Filters,
-		OrganizationName: hookID.organizationName,
-		ProjectName:      hookID.projectName,
-		StackName:        hookID.stackName,
-		Name:             hookID.webhookName,
+	properties := PulumiServiceWebhookProperties{
+		PulumiServiceWebhookInput: PulumiServiceWebhookInput{
+			Active:           webhook.Active,
+			DisplayName:      webhook.DisplayName,
+			PayloadUrl:       webhook.PayloadUrl,
+			Secret:           webhook.Secret,
+			Format:           &webhook.Format,
+			Filters:          webhook.Filters,
+			OrganizationName: hookID.organizationName,
+			ProjectName:      hookID.projectName,
+			StackName:        hookID.stackName,
+		},
+		Name: hookID.webhookName,
 	}
 
-	properties, err := plugin.MarshalProperties(
-		outputs.ToPropertyMap(),
+	outputs, err := plugin.MarshalProperties(
+		properties.ToPropertyMap(),
 		plugin.MarshalOptions{},
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	// drop the name for the inputs
-	webhookInput := outputs
-	webhookInput.Name = ""
 	inputs, err := plugin.MarshalProperties(
-		webhookInput.ToPropertyMap(),
+		properties.PulumiServiceWebhookInput.ToPropertyMap(),
 		plugin.MarshalOptions{},
 	)
 	if err != nil {
@@ -403,7 +412,7 @@ func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulum
 
 	return &pulumirpc.ReadResponse{
 		Id:         req.Id,
-		Properties: properties,
+		Properties: outputs,
 		Inputs:     inputs,
 	}, nil
 }
