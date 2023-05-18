@@ -10,7 +10,6 @@ resources:
       displayName: yaml-webhook
       organizationName: service-provider-test-org
       payloadUrl: "https://google.com"
-      format: slack
 
 outputs:
   # export the name of the webhook

@@ -371,6 +371,15 @@ func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulum
 		Name:             hookID.webhookName,
 	}
 
+	// if the format is raw, and it's not in the input already, we don't want it to
+	// cause a diff since it's a default.
+	// this should work automatically because we have set the default in the schema
+	// but isn't respected by the yaml provider
+	// https://github.com/pulumi/pulumi-yaml/issues/458
+	if webhook.Format == "raw" && !inputs.HasValue("format") {
+		webhookInput.Format = nil
+	}
+
 	properties, err := plugin.MarshalProperties(
 		webhookInput.ToPropertyMap(),
 		plugin.MarshalOptions{},
