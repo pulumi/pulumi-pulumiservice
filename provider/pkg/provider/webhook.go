@@ -359,11 +359,6 @@ func (wh *PulumiServiceWebhookResource) deleteWebhook(id string) error {
 }
 
 func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	inputs, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
-
 	webhook, err := wh.getWebhook(req.Id)
 	if err != nil {
 		return nil, err
@@ -396,11 +391,6 @@ func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulum
 		return nil, err
 	}
 
-	inputProperties, err := plugin.MarshalProperties(
-		inputs,
-		plugin.MarshalOptions{},
-	)
-
 	if err != nil {
 		return nil, err
 	}
@@ -408,7 +398,7 @@ func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulum
 	return &pulumirpc.ReadResponse{
 		Id:         req.Id,
 		Properties: properties,
-		Inputs:     inputProperties,
+		Inputs:     properties,
 	}, nil
 }
 
