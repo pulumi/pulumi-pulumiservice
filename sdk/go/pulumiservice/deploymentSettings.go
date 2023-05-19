@@ -11,7 +11,17 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-// Deployment settings configure Pulumi Deployments for a stack
+// Deployment settings configure Pulumi Deployments for a stack.
+//
+// ### Import
+//
+// Deployment settings can be imported using the `id`, which for deployment settings is {org}/{project}/{stack} e.g.,
+//
+// ```sh
+//
+//	$ pulumi import pulumiservice:index:DeploymentSettings my_settings `my-org/my-project/my-stack`
+//
+// ```
 type DeploymentSettings struct {
 	pulumi.CustomResourceState
 

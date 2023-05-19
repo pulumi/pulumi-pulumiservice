@@ -9,6 +9,14 @@ import * as utilities from "./utilities";
 
 /**
  * Pulumi Webhooks allow you to notify external services of events happening within your Pulumi organization or stack. For example, you can trigger a notification whenever a stack is updated. Whenever an event occurs, Pulumi will send an HTTP POST request to all registered webhooks. The webhook can then be used to emit some notification, start running integration tests, or even update additional stacks.
+ *
+ * ### Import
+ *
+ * Pulumi webhooks can be imported using the `id`, which for webhooks is `{org}/{project}/{stack}/{webhook-name}` e.g.,
+ *
+ * ```sh
+ *  $ pulumi import pulumiservice:index:Webhook my_webhook my-org/my-project/my-stack/4b0d0671
+ * ```
  */
 export class Webhook extends pulumi.CustomResource {
     /**

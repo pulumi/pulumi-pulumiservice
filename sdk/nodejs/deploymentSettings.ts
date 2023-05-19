@@ -8,7 +8,15 @@ import * as enums from "./types/enums";
 import * as utilities from "./utilities";
 
 /**
- * Deployment settings configure Pulumi Deployments for a stack
+ * Deployment settings configure Pulumi Deployments for a stack.
+ *
+ * ### Import
+ *
+ * Deployment settings can be imported using the `id`, which for deployment settings is {org}/{project}/{stack} e.g.,
+ *
+ * ```sh
+ *  $ pulumi import pulumiservice:index:DeploymentSettings my_settings `my-org/my-project/my-stack`
+ * ```
  */
 export class DeploymentSettings extends pulumi.CustomResource {
     /**
