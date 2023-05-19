@@ -142,7 +142,15 @@ class DeploymentSettings(pulumi.CustomResource):
                  stack: Optional[pulumi.Input[str]] = None,
                  __props__=None):
         """
-        Deployment settings configure Pulumi Deployments for a stack
+        Deployment settings configure Pulumi Deployments for a stack.
+
+        ### Import
+
+        Deployment settings can be imported using the `id`, which for deployment settings is {org}/{project}/{stack} e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:DeploymentSettings my_settings `my-org/my-project/my-stack`
+        ```
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
@@ -161,7 +169,15 @@ class DeploymentSettings(pulumi.CustomResource):
                  args: DeploymentSettingsArgs,
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
-        Deployment settings configure Pulumi Deployments for a stack
+        Deployment settings configure Pulumi Deployments for a stack.
+
+        ### Import
+
+        Deployment settings can be imported using the `id`, which for deployment settings is {org}/{project}/{stack} e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:DeploymentSettings my_settings `my-org/my-project/my-stack`
+        ```
 
         :param str resource_name: The name of the resource.
         :param DeploymentSettingsArgs args: The arguments to use to populate this resource's properties.

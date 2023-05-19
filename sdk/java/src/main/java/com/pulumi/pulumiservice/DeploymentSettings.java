@@ -14,7 +14,15 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 
 /**
- * Deployment settings configure Pulumi Deployments for a stack
+ * Deployment settings configure Pulumi Deployments for a stack.
+ * 
+ * ### Import
+ * 
+ * Deployment settings can be imported using the `id`, which for deployment settings is {org}/{project}/{stack} e.g.,
+ * 
+ * ```sh
+ *  $ pulumi import pulumiservice:index:DeploymentSettings my_settings `my-org/my-project/my-stack`
+ * ```
  * 
  */
 @ResourceType(type="pulumiservice:index:DeploymentSettings")

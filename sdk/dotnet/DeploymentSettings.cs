@@ -10,7 +10,15 @@ using Pulumi.Serialization;
 namespace Pulumi.PulumiService
 {
     /// <summary>
-    /// Deployment settings configure Pulumi Deployments for a stack
+    /// Deployment settings configure Pulumi Deployments for a stack.
+    /// 
+    /// ### Import
+    /// 
+    /// Deployment settings can be imported using the `id`, which for deployment settings is {org}/{project}/{stack} e.g.,
+    /// 
+    /// ```sh
+    ///  $ pulumi import pulumiservice:index:DeploymentSettings my_settings `my-org/my-project/my-stack`
+    /// ```
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:index:DeploymentSettings")]
     public partial class DeploymentSettings : global::Pulumi.CustomResource
