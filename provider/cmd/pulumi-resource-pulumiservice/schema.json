@@ -679,7 +679,7 @@
       ]
     },
     "pulumiservice:index:DeploymentSettings": {
-      "description": "Deployment settings configure Pulumi Deployments for a stack.\n\n### Import\n\nDeployment settings can be imported using the `id`, which for deployment settings is {org}/{project}/{stack} e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:DeploymentSettings my_settings `my-org/my-project/my-stack`\n```\n\n",
+      "description": "Deployment settings configure Pulumi Deployments for a stack.\n\n### Import\n\nDeployment settings can be imported using the `id`, which for deployment settings is `{org}/{project}/{stack}` e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:DeploymentSettings my_settings my-org/my-project/my-stack\n```\n\n",
       "properties": {
         "organization": {
           "description": "Organization name.",

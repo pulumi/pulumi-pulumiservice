@@ -146,10 +146,10 @@ class DeploymentSettings(pulumi.CustomResource):
 
         ### Import
 
-        Deployment settings can be imported using the `id`, which for deployment settings is {org}/{project}/{stack} e.g.,
+        Deployment settings can be imported using the `id`, which for deployment settings is `{org}/{project}/{stack}` e.g.,
 
         ```sh
-         $ pulumi import pulumiservice:index:DeploymentSettings my_settings `my-org/my-project/my-stack`
+         $ pulumi import pulumiservice:index:DeploymentSettings my_settings my-org/my-project/my-stack
         ```
 
         :param str resource_name: The name of the resource.
@@ -173,10 +173,10 @@ class DeploymentSettings(pulumi.CustomResource):
 
         ### Import
 
-        Deployment settings can be imported using the `id`, which for deployment settings is {org}/{project}/{stack} e.g.,
+        Deployment settings can be imported using the `id`, which for deployment settings is `{org}/{project}/{stack}` e.g.,
 
         ```sh
-         $ pulumi import pulumiservice:index:DeploymentSettings my_settings `my-org/my-project/my-stack`
+         $ pulumi import pulumiservice:index:DeploymentSettings my_settings my-org/my-project/my-stack
         ```
 
         :param str resource_name: The name of the resource.
