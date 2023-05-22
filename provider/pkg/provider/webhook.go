@@ -251,6 +251,11 @@ func (wh *PulumiServiceWebhookResource) Diff(req *pulumirpc.DiffRequest) (*pulum
 		return nil, err
 	}
 
+	// preprocess olds to remove the `name` property since it's only an output and shouldn't cause a diff
+	if olds["name"].HasValue() {
+		delete(olds, "name")
+	}
+
 	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
@@ -281,10 +286,6 @@ func (wh *PulumiServiceWebhookResource) Diff(req *pulumirpc.DiffRequest) (*pulum
 		"stackName":        true,
 	}
 	for k, v := range dd {
-		// we don't care about the name property because it is only an output
-		if v.Kind == 2 && k == "name" {
-			continue
-		}
 		if _, ok := replaceProperties[k]; ok {
 			v.Kind = v.Kind.AsReplace()
 		}
