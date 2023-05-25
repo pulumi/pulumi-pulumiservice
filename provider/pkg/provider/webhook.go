@@ -3,7 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
-	"sort"
+
 	"strings"
 
 	pbempty "github.com/golang/protobuf/ptypes/empty"
@@ -251,6 +251,11 @@ func (wh *PulumiServiceWebhookResource) Diff(req *pulumirpc.DiffRequest) (*pulum
 		return nil, err
 	}
 
+	// preprocess olds to remove the `name` property since it's only an output and shouldn't cause a diff
+	if olds["name"].HasValue() {
+		delete(olds, "name")
+	}
+
 	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
@@ -265,42 +270,39 @@ func (wh *PulumiServiceWebhookResource) Diff(req *pulumirpc.DiffRequest) (*pulum
 		}
 	}
 
-	changes := pulumirpc.DiffResponse_DIFF_NONE
-	var diffs, replaces []string
-	properties := map[string]bool{
-		"active":           false,
-		"displayName":      false,
-		"payloadUrl":       false,
-		"secret":           false,
-		"format":           false,
-		"filters":          false,
+	diffs := olds.Diff(news)
+	if diffs == nil {
+		return &pulumirpc.DiffResponse{
+			Changes: pulumirpc.DiffResponse_DIFF_NONE,
+		}, nil
+	}
+
+	dd := plugin.NewDetailedDiffFromObjectDiff(diffs)
+
+	detailedDiffs := map[string]*pulumirpc.PropertyDiff{}
+	replaceProperties := map[string]bool{
 		"organizationName": true,
 		"projectName":      true,
 		"stackName":        true,
 	}
-	if d := olds.Diff(news); d != nil {
-		for key, replace := range properties {
-			i := sort.SearchStrings(req.IgnoreChanges, key)
-			if i < len(req.IgnoreChanges) && req.IgnoreChanges[i] == key {
-				continue
-			}
-
-			if d.Changed(resource.PropertyKey(key)) {
-				changes = pulumirpc.DiffResponse_DIFF_SOME
-				diffs = append(diffs, key)
-
-				if replace {
-					replaces = append(replaces, key)
-				}
-			}
+	for k, v := range dd {
+		if _, ok := replaceProperties[k]; ok {
+			v.Kind = v.Kind.AsReplace()
+		}
+		detailedDiffs[k] = &pulumirpc.PropertyDiff{
+			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind),
+			InputDiff: v.InputDiff,
 		}
 	}
 
+	changes := pulumirpc.DiffResponse_DIFF_NONE
+	if len(detailedDiffs) > 0 {
+		changes = pulumirpc.DiffResponse_DIFF_SOME
+	}
 	return &pulumirpc.DiffResponse{
-		Diffs:               diffs,
-		Changes:             changes,
-		Replaces:            replaces,
-		DeleteBeforeReplace: false,
+		Changes:         changes,
+		DetailedDiff:    detailedDiffs,
+		HasDetailedDiff: true,
 	}, nil
 }
 

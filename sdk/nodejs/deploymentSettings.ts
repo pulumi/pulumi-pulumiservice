@@ -12,10 +12,10 @@ import * as utilities from "./utilities";
  *
  * ### Import
  *
- * Deployment settings can be imported using the `id`, which for deployment settings is {org}/{project}/{stack} e.g.,
+ * Deployment settings can be imported using the `id`, which for deployment settings is `{org}/{project}/{stack}` e.g.,
  *
  * ```sh
- *  $ pulumi import pulumiservice:index:DeploymentSettings my_settings `my-org/my-project/my-stack`
+ *  $ pulumi import pulumiservice:index:DeploymentSettings my_settings my-org/my-project/my-stack
  * ```
  */
 export class DeploymentSettings extends pulumi.CustomResource {
