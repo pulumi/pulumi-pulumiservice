@@ -145,6 +145,10 @@ namespace Pulumi.PulumiService
         /// Messages formatted for consumption by Slack incoming webhooks.
         /// </summary>
         public static WebhookFormat Slack { get; } = new WebhookFormat("slack");
+        /// <summary>
+        /// Initiate deployments on a stack from a Pulumi Cloud webhook.
+        /// </summary>
+        public static WebhookFormat PulumiDeployments { get; } = new WebhookFormat("pulumi_deployments");
 
         public static bool operator ==(WebhookFormat left, WebhookFormat right) => left.Equals(right);
         public static bool operator !=(WebhookFormat left, WebhookFormat right) => !left.Equals(right);

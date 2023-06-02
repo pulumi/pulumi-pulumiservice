@@ -89,6 +89,10 @@ export const WebhookFormat = {
      * Messages formatted for consumption by Slack incoming webhooks.
      */
     Slack: "slack",
+    /**
+     * Initiate deployments on a stack from a Pulumi Cloud webhook.
+     */
+    PulumiDeployments: "pulumi_deployments",
 } as const;
 
 export type WebhookFormat = (typeof WebhookFormat)[keyof typeof WebhookFormat];
