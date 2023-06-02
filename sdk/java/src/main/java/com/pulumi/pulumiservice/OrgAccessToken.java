@@ -15,7 +15,7 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 
 /**
- * The Pulumi Service allows users to create access tokens scoped to orgs. Org access tokens is a resource to create them and assign them to an org
+ * The Pulumi Cloud allows users to create access tokens scoped to orgs. Org access tokens is a resource to create them and assign them to an org
  * 
  */
 @ResourceType(type="pulumiservice:index:OrgAccessToken")

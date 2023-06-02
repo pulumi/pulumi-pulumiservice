@@ -10,7 +10,7 @@ using Pulumi.Serialization;
 namespace Pulumi.PulumiService
 {
     /// <summary>
-    /// The Pulumi Service allows users to create access tokens scoped to team. Team access tokens is a resource to create them and assign them to a team
+    /// The Pulumi Cloud allows users to create access tokens scoped to team. Team access tokens is a resource to create them and assign them to a team
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:index:TeamAccessToken")]
     public partial class TeamAccessToken : global::Pulumi.CustomResource

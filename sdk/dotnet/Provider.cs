@@ -40,7 +40,7 @@ namespace Pulumi.PulumiService
     public sealed class ProviderArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
-        /// Access Token to authenticate with Pulumi Service.
+        /// Access Token to authenticate with Pulumi Cloud.
         /// </summary>
         [Input("accessToken")]
         public Input<string>? AccessToken { get; set; }

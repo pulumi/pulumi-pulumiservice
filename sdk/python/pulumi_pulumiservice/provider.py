@@ -17,7 +17,7 @@ class ProviderArgs:
                  access_token: Optional[pulumi.Input[str]] = None):
         """
         The set of arguments for constructing a Provider resource.
-        :param pulumi.Input[str] access_token: Access Token to authenticate with Pulumi Service.
+        :param pulumi.Input[str] access_token: Access Token to authenticate with Pulumi Cloud.
         """
         if access_token is None:
             access_token = (_utilities.get_env('PULUMI_ACCESS_TOKEN') or '')
@@ -28,7 +28,7 @@ class ProviderArgs:
     @pulumi.getter(name="accessToken")
     def access_token(self) -> Optional[pulumi.Input[str]]:
         """
-        Access Token to authenticate with Pulumi Service.
+        Access Token to authenticate with Pulumi Cloud.
         """
         return pulumi.get(self, "access_token")
 
@@ -48,7 +48,7 @@ class Provider(pulumi.ProviderResource):
         Create a Pulumiservice resource with the given unique name, props, and options.
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
-        :param pulumi.Input[str] access_token: Access Token to authenticate with Pulumi Service.
+        :param pulumi.Input[str] access_token: Access Token to authenticate with Pulumi Cloud.
         """
         ...
     @overload

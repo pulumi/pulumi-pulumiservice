@@ -11,7 +11,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-// The Pulumi Service allows users to create access tokens scoped to orgs. Org access tokens is a resource to create them and assign them to an org
+// The Pulumi Cloud allows users to create access tokens scoped to orgs. Org access tokens is a resource to create them and assign them to an org
 type OrgAccessToken struct {
 	pulumi.CustomResourceState
 

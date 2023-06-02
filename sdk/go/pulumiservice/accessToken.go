@@ -11,7 +11,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-// Access tokens allow a user to authenticate against the Pulumi Service
+// Access tokens allow a user to authenticate against the Pulumi Cloud
 type AccessToken struct {
 	pulumi.CustomResourceState
 

@@ -42,7 +42,7 @@ class AccessToken(pulumi.CustomResource):
                  description: Optional[pulumi.Input[str]] = None,
                  __props__=None):
         """
-        Access tokens allow a user to authenticate against the Pulumi Service
+        Access tokens allow a user to authenticate against the Pulumi Cloud
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
@@ -55,7 +55,7 @@ class AccessToken(pulumi.CustomResource):
                  args: AccessTokenArgs,
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
-        Access tokens allow a user to authenticate against the Pulumi Service
+        Access tokens allow a user to authenticate against the Pulumi Cloud
 
         :param str resource_name: The name of the resource.
         :param AccessTokenArgs args: The arguments to use to populate this resource's properties.

@@ -10,7 +10,7 @@ using Pulumi.Serialization;
 namespace Pulumi.PulumiService
 {
     /// <summary>
-    /// The Pulumi Service allows users to create access tokens scoped to orgs. Org access tokens is a resource to create them and assign them to an org
+    /// The Pulumi Cloud allows users to create access tokens scoped to orgs. Org access tokens is a resource to create them and assign them to an org
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:index:OrgAccessToken")]
     public partial class OrgAccessToken : global::Pulumi.CustomResource

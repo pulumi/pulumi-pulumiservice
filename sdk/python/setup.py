@@ -39,7 +39,7 @@ def readme():
 
 setup(name='pulumi_pulumiservice',
       version=VERSION,
-      description="A native Pulumi package for creating and managing Pulumi Service constructs",
+      description="A native Pulumi package for creating and managing Pulumi Cloud constructs",
       long_description=readme(),
       long_description_content_type='text/markdown',
       cmdclass={
