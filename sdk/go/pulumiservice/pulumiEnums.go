@@ -263,6 +263,8 @@ const (
 	WebhookFormatRaw = WebhookFormat("raw")
 	// Messages formatted for consumption by Slack incoming webhooks.
 	WebhookFormatSlack = WebhookFormat("slack")
+	// Initiate deployments on a stack from a Pulumi Cloud webhook.
+	WebhookFormatPulumiDeployments = WebhookFormat("pulumi_deployments")
 )
 
 func (WebhookFormat) ElementType() reflect.Type {

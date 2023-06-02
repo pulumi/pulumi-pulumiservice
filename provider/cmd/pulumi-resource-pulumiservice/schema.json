@@ -59,6 +59,11 @@
         {
           "description": "Messages formatted for consumption by Slack incoming webhooks.",
           "value": "slack"
+        },
+        {
+          "value": "pulumi_deployments",
+          "description": "Initiate deployments on a stack from a Pulumi Cloud webhook.",
+          "name": "PulumiDeployments"
         }
       ]
     },

@@ -94,3 +94,7 @@ class WebhookFormat(str, Enum):
     """
     Messages formatted for consumption by Slack incoming webhooks.
     """
+    PULUMI_DEPLOYMENTS = "pulumi_deployments"
+    """
+    Initiate deployments on a stack from a Pulumi Cloud webhook.
+    """

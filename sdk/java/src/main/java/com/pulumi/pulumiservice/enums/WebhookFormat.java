@@ -19,7 +19,12 @@ import java.util.StringJoiner;
          * Messages formatted for consumption by Slack incoming webhooks.
          * 
          */
-        Slack("slack");
+        Slack("slack"),
+        /**
+         * Initiate deployments on a stack from a Pulumi Cloud webhook.
+         * 
+         */
+        PulumiDeployments("pulumi_deployments");
 
         private final String value;
 
