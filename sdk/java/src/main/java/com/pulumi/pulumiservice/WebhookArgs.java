@@ -36,14 +36,14 @@ public final class WebhookArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * The friendly name displayed in the Pulumi Service.
+     * The friendly name displayed in the Pulumi Cloud.
      * 
      */
     @Import(name="displayName", required=true)
     private Output<String> displayName;
 
     /**
-     * @return The friendly name displayed in the Pulumi Service.
+     * @return The friendly name displayed in the Pulumi Cloud.
      * 
      */
     public Output<String> displayName() {
@@ -209,7 +209,7 @@ public final class WebhookArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param displayName The friendly name displayed in the Pulumi Service.
+         * @param displayName The friendly name displayed in the Pulumi Cloud.
          * 
          * @return builder
          * 
@@ -220,7 +220,7 @@ public final class WebhookArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param displayName The friendly name displayed in the Pulumi Service.
+         * @param displayName The friendly name displayed in the Pulumi Cloud.
          * 
          * @return builder
          * 

@@ -5,7 +5,7 @@ import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "./utilities";
 
 /**
- * The Pulumi Service allows users to create access tokens scoped to team. Team access tokens is a resource to create them and assign them to a team
+ * The Pulumi Cloud allows users to create access tokens scoped to team. Team access tokens is a resource to create them and assign them to a team
  */
 export class TeamAccessToken extends pulumi.CustomResource {
     /**

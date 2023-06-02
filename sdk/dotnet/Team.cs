@@ -10,7 +10,7 @@ using Pulumi.Serialization;
 namespace Pulumi.PulumiService
 {
     /// <summary>
-    /// The Pulumi Service offers role-based access control (RBAC) using teams. Teams allow organization admins to assign a set of stack permissions to a group of users.
+    /// The Pulumi Cloud offers role-based access control (RBAC) using teams. Teams allow organization admins to assign a set of stack permissions to a group of users.
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:index:Team")]
     public partial class Team : global::Pulumi.CustomResource

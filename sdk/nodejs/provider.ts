@@ -43,7 +43,7 @@ export class Provider extends pulumi.ProviderResource {
  */
 export interface ProviderArgs {
     /**
-     * Access Token to authenticate with Pulumi Service.
+     * Access Token to authenticate with Pulumi Cloud.
      */
     accessToken?: pulumi.Input<string>;
 }
