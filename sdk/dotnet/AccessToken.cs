@@ -10,7 +10,7 @@ using Pulumi.Serialization;
 namespace Pulumi.PulumiService
 {
     /// <summary>
-    /// Access tokens allow a user to authenticate against the Pulumi Service
+    /// Access tokens allow a user to authenticate against the Pulumi Cloud
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:index:AccessToken")]
     public partial class AccessToken : global::Pulumi.CustomResource

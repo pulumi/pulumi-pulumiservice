@@ -1,1 +1,1 @@
-A native Pulumi package for creating and managing Pulumi Service constructs
+A native Pulumi package for creating and managing Pulumi Cloud constructs

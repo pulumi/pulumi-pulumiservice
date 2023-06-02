@@ -17,14 +17,14 @@ public final class ProviderArgs extends com.pulumi.resources.ResourceArgs {
     public static final ProviderArgs Empty = new ProviderArgs();
 
     /**
-     * Access Token to authenticate with Pulumi Service.
+     * Access Token to authenticate with Pulumi Cloud.
      * 
      */
     @Import(name="accessToken")
     private @Nullable Output<String> accessToken;
 
     /**
-     * @return Access Token to authenticate with Pulumi Service.
+     * @return Access Token to authenticate with Pulumi Cloud.
      * 
      */
     public Optional<Output<String>> accessToken() {
@@ -56,7 +56,7 @@ public final class ProviderArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param accessToken Access Token to authenticate with Pulumi Service.
+         * @param accessToken Access Token to authenticate with Pulumi Cloud.
          * 
          * @return builder
          * 
@@ -67,7 +67,7 @@ public final class ProviderArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param accessToken Access Token to authenticate with Pulumi Service.
+         * @param accessToken Access Token to authenticate with Pulumi Cloud.
          * 
          * @return builder
          * 

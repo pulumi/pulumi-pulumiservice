@@ -15,7 +15,7 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 
 /**
- * Access tokens allow a user to authenticate against the Pulumi Service
+ * Access tokens allow a user to authenticate against the Pulumi Cloud
  * 
  */
 @ResourceType(type="pulumiservice:index:AccessToken")

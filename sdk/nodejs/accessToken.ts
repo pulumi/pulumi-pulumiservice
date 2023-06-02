@@ -5,7 +5,7 @@ import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "./utilities";
 
 /**
- * Access tokens allow a user to authenticate against the Pulumi Service
+ * Access tokens allow a user to authenticate against the Pulumi Cloud
  */
 export class AccessToken extends pulumi.CustomResource {
     /**

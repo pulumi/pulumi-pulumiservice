@@ -4,7 +4,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Pulumi</Authors>
     <Company>Pulumi</Company>
-    <Description>A native Pulumi package for creating and managing Pulumi Service constructs</Description>
+    <Description>A native Pulumi package for creating and managing Pulumi Cloud constructs</Description>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://pulumi.com</PackageProjectUrl>
     <RepositoryUrl>https://github.com/pulumi/pulumi-pulumiservice</RepositoryUrl>

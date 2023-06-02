@@ -33,13 +33,13 @@ func NewProvider(ctx *pulumi.Context,
 }
 
 type providerArgs struct {
-	// Access Token to authenticate with Pulumi Service.
+	// Access Token to authenticate with Pulumi Cloud.
 	AccessToken *string `pulumi:"accessToken"`
 }
 
 // The set of arguments for constructing a Provider resource.
 type ProviderArgs struct {
-	// Access Token to authenticate with Pulumi Service.
+	// Access Token to authenticate with Pulumi Cloud.
 	AccessToken pulumi.StringPtrInput
 }
 
