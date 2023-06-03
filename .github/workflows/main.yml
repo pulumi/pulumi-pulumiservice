@@ -188,6 +188,12 @@ jobs:
         role-to-assume: ${{ secrets.AWS_UPLOAD_ROLE_ARN }}
     - name: Set PreRelease Version
       run: echo "GORELEASER_CURRENT_TAG=v$(pulumictl get version --language generic)" >> $GITHUB_ENV
+    - name: Check PreRelease Version and Exit if not Alpha, Beta, or RC
+      run: |
+        if [[ ! "${GORELEASER_CURRENT_TAG}" =~ -(alpha|beta|rc) ]]; then
+          echo "Error: GORELEASER_CURRENT_TAG does not contain -alpha, -beta, or -rc"
+          exit 1
+        fi
     - name: Run GoReleaser
       uses: goreleaser/goreleaser-action@v2
       with:
