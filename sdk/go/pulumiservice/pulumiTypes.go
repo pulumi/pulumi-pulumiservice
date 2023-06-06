@@ -1220,6 +1220,8 @@ type DeploymentSettingsGithub struct {
 	Paths []string `pulumi:"paths"`
 	// Trigger a deployment running `pulumi preview` when a PR is opened.
 	PreviewPullRequests *bool `pulumi:"previewPullRequests"`
+	// Use this stack as a template for pull request review stacks.
+	PullRequestTemplate *bool `pulumi:"pullRequestTemplate"`
 	// The GitHub repository in the format org/repo.
 	Repository *string `pulumi:"repository"`
 }
@@ -1237,6 +1239,10 @@ func (val *DeploymentSettingsGithub) Defaults() *DeploymentSettingsGithub {
 	if tmp.PreviewPullRequests == nil {
 		previewPullRequests_ := true
 		tmp.PreviewPullRequests = &previewPullRequests_
+	}
+	if tmp.PullRequestTemplate == nil {
+		pullRequestTemplate_ := false
+		tmp.PullRequestTemplate = &pullRequestTemplate_
 	}
 	return &tmp
 }
@@ -1260,6 +1266,8 @@ type DeploymentSettingsGithubArgs struct {
 	Paths pulumi.StringArrayInput `pulumi:"paths"`
 	// Trigger a deployment running `pulumi preview` when a PR is opened.
 	PreviewPullRequests pulumi.BoolPtrInput `pulumi:"previewPullRequests"`
+	// Use this stack as a template for pull request review stacks.
+	PullRequestTemplate pulumi.BoolPtrInput `pulumi:"pullRequestTemplate"`
 	// The GitHub repository in the format org/repo.
 	Repository pulumi.StringPtrInput `pulumi:"repository"`
 }
@@ -1275,6 +1283,9 @@ func (val *DeploymentSettingsGithubArgs) Defaults() *DeploymentSettingsGithubArg
 	}
 	if tmp.PreviewPullRequests == nil {
 		tmp.PreviewPullRequests = pulumi.BoolPtr(true)
+	}
+	if tmp.PullRequestTemplate == nil {
+		tmp.PullRequestTemplate = pulumi.BoolPtr(false)
 	}
 	return &tmp
 }
@@ -1371,6 +1382,11 @@ func (o DeploymentSettingsGithubOutput) PreviewPullRequests() pulumi.BoolPtrOutp
 	return o.ApplyT(func(v DeploymentSettingsGithub) *bool { return v.PreviewPullRequests }).(pulumi.BoolPtrOutput)
 }
 
+// Use this stack as a template for pull request review stacks.
+func (o DeploymentSettingsGithubOutput) PullRequestTemplate() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v DeploymentSettingsGithub) *bool { return v.PullRequestTemplate }).(pulumi.BoolPtrOutput)
+}
+
 // The GitHub repository in the format org/repo.
 func (o DeploymentSettingsGithubOutput) Repository() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v DeploymentSettingsGithub) *string { return v.Repository }).(pulumi.StringPtrOutput)
@@ -1427,6 +1443,16 @@ func (o DeploymentSettingsGithubPtrOutput) PreviewPullRequests() pulumi.BoolPtrO
 			return nil
 		}
 		return v.PreviewPullRequests
+	}).(pulumi.BoolPtrOutput)
+}
+
+// Use this stack as a template for pull request review stacks.
+func (o DeploymentSettingsGithubPtrOutput) PullRequestTemplate() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *DeploymentSettingsGithub) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.PullRequestTemplate
 	}).(pulumi.BoolPtrOutput)
 }
 

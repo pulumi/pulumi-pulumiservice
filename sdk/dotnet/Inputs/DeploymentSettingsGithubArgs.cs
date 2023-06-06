@@ -40,6 +40,12 @@ namespace Pulumi.PulumiService.Inputs
         public Input<bool>? PreviewPullRequests { get; set; }
 
         /// <summary>
+        /// Use this stack as a template for pull request review stacks.
+        /// </summary>
+        [Input("pullRequestTemplate")]
+        public Input<bool>? PullRequestTemplate { get; set; }
+
+        /// <summary>
         /// The GitHub repository in the format org/repo.
         /// </summary>
         [Input("repository")]
@@ -49,6 +55,7 @@ namespace Pulumi.PulumiService.Inputs
         {
             DeployCommits = true;
             PreviewPullRequests = true;
+            PullRequestTemplate = false;
         }
         public static new DeploymentSettingsGithubArgs Empty => new DeploymentSettingsGithubArgs();
     }

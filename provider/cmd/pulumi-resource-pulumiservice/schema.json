@@ -261,6 +261,11 @@
           "description": "Trigger a deployment running `pulumi preview` when a PR is opened.",
           "default": true
         },
+        "pullRequestTemplate": {
+          "type": "boolean",
+          "description": "Use this stack as a template for pull request review stacks.",
+          "default": false
+        },
         "paths": {
           "type": "array",
           "items": {

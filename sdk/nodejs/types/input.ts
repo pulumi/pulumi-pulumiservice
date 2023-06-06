@@ -137,6 +137,10 @@ export interface DeploymentSettingsGithubArgs {
      */
     previewPullRequests?: pulumi.Input<boolean>;
     /**
+     * Use this stack as a template for pull request review stacks.
+     */
+    pullRequestTemplate?: pulumi.Input<boolean>;
+    /**
      * The GitHub repository in the format org/repo.
      */
     repository?: pulumi.Input<string>;
@@ -149,6 +153,7 @@ export function deploymentSettingsGithubArgsProvideDefaults(val: DeploymentSetti
         ...val,
         deployCommits: (val.deployCommits) ?? true,
         previewPullRequests: (val.previewPullRequests) ?? true,
+        pullRequestTemplate: (val.pullRequestTemplate) ?? false,
     };
 }
 
