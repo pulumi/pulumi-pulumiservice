@@ -21,6 +21,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 )
 
 type Client struct {
@@ -54,6 +55,12 @@ func NewClient(client *http.Client, token, URL string) (*Client, error) {
 
 // createRequest creates a *http.Request with standard headers set and reqBody marshalled into json.
 func (c *Client) createRequest(ctx context.Context, method, path string, reqBody interface{}) (*http.Request, error) {
+	parsedPath, err := url.Parse(path)
+	if err != nil {
+		return nil, fmt.Errorf("parsing path: %w", err)
+	}
+	endpoint := c.baseurl.ResolveReference(parsedPath)
+
 	var reqBodyReader io.Reader
 	if reqBody != nil {
 		data, err := json.Marshal(reqBody)
@@ -62,7 +69,6 @@ func (c *Client) createRequest(ctx context.Context, method, path string, reqBody
 		}
 		reqBodyReader = bytes.NewBuffer(data)
 	}
-	endpoint := c.baseurl.ResolveReference(&url.URL{Path: path})
 
 	req, err := http.NewRequestWithContext(ctx, method, endpoint.String(), reqBodyReader)
 	if err != nil {
@@ -94,6 +100,7 @@ func (c *Client) sendRequest(req *http.Request, resBody interface{}) (*http.Resp
 		var errRes errorResponse
 		err = json.Unmarshal(body, &errRes)
 		if err != nil {
+			fmt.Fprintf(os.Stderr, "url: %v\nbody: %q\n", req.URL, body)
 			return res, fmt.Errorf("failed to parse response body, status code %d: %w", res.StatusCode, err)
 		}
 		if errRes.StatusCode == 0 {

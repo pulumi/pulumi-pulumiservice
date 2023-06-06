@@ -9,6 +9,7 @@ import (
 	pbempty "github.com/golang/protobuf/ptypes/empty"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/pulumiapi"
 	"github.com/pulumi/pulumi/pkg/v3/resource/provider"
+	"github.com/pulumi/pulumi/pkg/v3/resource/stack"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/diag"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
@@ -86,7 +87,7 @@ func (d *PulumiServiceDeploymentResource) Check(req *pulumirpc.CheckRequest) (*p
 				Property: "stack",
 			})
 		}
-	} else {
+	} else if !stack.ContainsUnknowns() {
 		failures = append(failures, &pulumirpc.CheckFailure{
 			Reason:   fmt.Sprintf("expected a string, not a %v", stack.TypeString()),
 			Property: "stack",
@@ -120,6 +121,7 @@ func (d *PulumiServiceDeploymentResource) Diff(req *pulumirpc.DiffRequest) (*pul
 	if err != nil {
 		return nil, err
 	}
+	news["outputs"] = resource.MakeComputed(resource.NewObjectProperty(nil))
 
 	diffs := olds.Diff(news)
 	dd := plugin.NewDetailedDiffFromObjectDiff(diffs)
@@ -191,7 +193,7 @@ func sortedKeys[M ~map[K]V, K constraints.Ordered, V any](m M) []K {
 	return keys
 }
 
-func makeConfigCommands(config resource.PropertyMap) ([]string, map[string]apitype.SecretValue) {
+func makeConfigCommands(stackName string, config resource.PropertyMap) ([]string, map[string]apitype.SecretValue) {
 	m := map[string]apitype.SecretValue{}
 	for k, v := range config {
 		flattenConfigValue(m, string(k), v)
@@ -203,10 +205,10 @@ func makeConfigCommands(config resource.PropertyMap) ([]string, map[string]apity
 		secretFlag, configValue := "", v.Value
 		if v.Secret {
 			env := fmt.Sprintf("PULUMI_SECRET_%v", i)
-			secretFlag, secrets[env], configValue = " --secret", v, env
+			secretFlag, secrets[env], configValue = "--secret ", v, env
 		}
 
-		commands[i] = fmt.Sprintf("pulumi config set%v --path \"%q\" %q", secretFlag, path, configValue)
+		commands[i] = fmt.Sprintf("pulumi config set --stack %q %s--path %q %q", stackName, secretFlag, path, configValue)
 	}
 	return commands, secrets
 }
@@ -219,7 +221,7 @@ func (d *PulumiServiceDeploymentResource) prepareDeployment(ctx context.Context,
 
 	// apply config as part of precommands.
 	if len(inputs.Config) != 0 {
-		configCommands, additionalSecrets := makeConfigCommands(inputs.Config)
+		configCommands, additionalSecrets := makeConfigCommands(inputs.Stack.OrgName+"/"+inputs.Stack.StackName, inputs.Config)
 
 		// fetch any existing pre-run commands
 		var preRunCommands []string
@@ -231,7 +233,7 @@ func (d *PulumiServiceDeploymentResource) prepareDeployment(ctx context.Context,
 			if err != nil {
 				return nil, err
 			}
-			if settings.OperationContext != nil {
+			if settings != nil && settings.OperationContext != nil {
 				preRunCommands = settings.OperationContext.PreRunCommands
 			}
 		}
@@ -263,6 +265,13 @@ func (d *PulumiServiceDeploymentResource) runDeployment(ctx context.Context, urn
 		return "", nil, err
 	}
 	id, state := inputs.Stack.String(), inputsMap.Copy()
+
+	// poke empty settings into the service. BUG: this should not be necessary. maybe a bad interaction
+	// between inheritsettings and stacks with no settings?
+	err = d.client.CreateDeploymentSettings(ctx, inputs.Stack, pulumiapi.DeploymentSettings{})
+	if err != nil {
+		return "", nil, err
+	}
 
 	createResp, err := d.client.CreateDeployment(ctx, inputs.Stack, pulumiapi.CreateDeploymentRequest{
 		DeploymentSettings: inputs.Settings,
@@ -299,12 +308,49 @@ func (d *PulumiServiceDeploymentResource) runDeployment(ctx context.Context, urn
 	}
 	switch getResp.Status {
 	case "succeeded":
-		return id, state, nil
+		// OK
 	case "failed":
-		return id, state, fmt.Errorf("deployment failed")
+		// OK
 	default:
 		return id, state, fmt.Errorf("unexpected deployment status %v" + getResp.Status)
 	}
+
+	updates, err := d.client.GetDeploymentUpdates(ctx, inputs.Stack, deploymentID)
+	if err != nil {
+		return id, state, fmt.Errorf("getting stack outputs: %w", err)
+	}
+	if len(updates) == 0 {
+		return id, state, fmt.Errorf("no updates associated with deployment")
+	}
+
+	var version int
+	for _, u := range updates {
+		if u.Version > version {
+			version = u.Version
+		}
+	}
+
+	untyped, err := d.client.ExportStackVersion(ctx, inputs.Stack, version)
+	if err != nil {
+		return id, state, fmt.Errorf("getting stack outputs: %w", err)
+	}
+	snap, err := stack.DeserializeUntypedDeployment(ctx, untyped, stack.DefaultSecretsProvider)
+	if err != nil {
+		return id, state, fmt.Errorf("getting stack outputs: %w", err)
+	}
+
+	outputs := resource.PropertyMap{}
+	for _, r := range snap.Resources {
+		if r.Type == "pulumi:pulumi:Stack" {
+			outputs = r.Outputs
+		}
+	}
+	state["outputs"] = resource.NewObjectProperty(outputs)
+
+	if getResp.Status == "failed" {
+		return id, state, fmt.Errorf("deployment failed")
+	}
+	return id, state, nil
 }
 
 func (d *PulumiServiceDeploymentResource) runUpdateDeployment(ctx context.Context, urn resource.URN, rpcInputs *structpb.Struct, timeout float64) (string, *structpb.Struct, error) {

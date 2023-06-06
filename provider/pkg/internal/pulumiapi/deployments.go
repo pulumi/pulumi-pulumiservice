@@ -55,6 +55,10 @@ type DeploymentLogs struct {
 	NextToken string              `json:"nextToken,omitempty"`
 }
 
+type UpdateInfo struct {
+	Version int `json:"version"`
+}
+
 func (c *Client) CreateDeployment(ctx context.Context, stack StackName, req CreateDeploymentRequest) (*CreateDeploymentResponse, error) {
 	apiPath := path.Join("preview", stack.OrgName, stack.ProjectName, stack.StackName, "deployments")
 	var resp CreateDeploymentResponse
@@ -98,4 +102,18 @@ func (c *Client) GetDeploymentLogs(ctx context.Context, stack StackName, deploym
 		return nil, fmt.Errorf("failed to get deployment logs (%s): %w", deploymentID, err)
 	}
 	return &resp, nil
+}
+
+func (c *Client) GetDeploymentUpdates(ctx context.Context, stack StackName, deploymentID string) ([]UpdateInfo, error) {
+	apiPath := path.Join("preview", stack.OrgName, stack.ProjectName, stack.StackName, "deployments", deploymentID, "updates")
+	var resp []UpdateInfo
+	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &resp)
+	if err != nil {
+		var errResp *errorResponse
+		if errors.As(err, &errResp) && errResp.StatusCode == http.StatusNotFound {
+			return nil, fmt.Errorf("deployment (%s) not found", stack.String())
+		}
+		return nil, fmt.Errorf("failed to get deployment (%s): %w", deploymentID, err)
+	}
+	return resp, nil
 }

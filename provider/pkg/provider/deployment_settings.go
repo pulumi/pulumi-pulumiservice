@@ -592,8 +592,10 @@ func (ds *PulumiServiceDeploymentSettingsResource) Read(req *pulumirpc.ReadReque
 	}
 
 	dsInput := PulumiServiceDeploymentSettingsInput{
-		Stack:              stack,
-		DeploymentSettings: *settings,
+		Stack: stack,
+	}
+	if settings != nil {
+		dsInput.DeploymentSettings = *settings
 	}
 
 	properties, err := plugin.MarshalProperties(

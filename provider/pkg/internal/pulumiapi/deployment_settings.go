@@ -82,7 +82,7 @@ func (c *Client) GetDeploymentSettings(ctx context.Context, stack StackName) (*D
 	if err != nil {
 		var errResp *errorResponse
 		if errors.As(err, &errResp) && errResp.StatusCode == http.StatusNotFound {
-			return nil, fmt.Errorf("deployment settings for stack (%s) not found", stack.String())
+			return nil, nil
 		}
 		return nil, fmt.Errorf("failed to get deployment settings for stack (%s): %w", stack.String(), err)
 	}

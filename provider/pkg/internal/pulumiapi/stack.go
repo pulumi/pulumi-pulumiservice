@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"net/http"
 	"path"
+	"strconv"
+
+	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
 )
 
 type CreateStackRequest struct {
@@ -48,4 +51,18 @@ func (c *Client) DeleteStack(ctx context.Context, stack StackName) error {
 		return fmt.Errorf("failed to delete stack (%v): %w", stack, err)
 	}
 	return nil
+}
+
+func (c *Client) ExportStackVersion(ctx context.Context, stack StackName, version int) (*apitype.UntypedDeployment, error) {
+	apiPath := path.Join("stacks", stack.OrgName, stack.ProjectName, stack.StackName, "export", strconv.FormatInt(int64(version), 10))
+	var resp apitype.UntypedDeployment
+	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &resp)
+	if err != nil {
+		var errResp *errorResponse
+		if errors.As(err, &errResp) && errResp.StatusCode == http.StatusNotFound {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("failed to export stack version (%v, %v): %w", stack, version, err)
+	}
+	return &resp, nil
 }
