@@ -381,12 +381,14 @@ class DeploymentSettingsGithubArgs:
                  deploy_commits: Optional[pulumi.Input[bool]] = None,
                  paths: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None,
                  preview_pull_requests: Optional[pulumi.Input[bool]] = None,
+                 pull_request_template: Optional[pulumi.Input[bool]] = None,
                  repository: Optional[pulumi.Input[str]] = None):
         """
         GitHub settings for the deployment.
         :param pulumi.Input[bool] deploy_commits: Trigger a deployment running `pulumi up` on commit.
         :param pulumi.Input[Sequence[pulumi.Input[str]]] paths: The paths within the repo that deployments should be filtered to.
         :param pulumi.Input[bool] preview_pull_requests: Trigger a deployment running `pulumi preview` when a PR is opened.
+        :param pulumi.Input[bool] pull_request_template: Use this stack as a template for pull request review stacks.
         :param pulumi.Input[str] repository: The GitHub repository in the format org/repo.
         """
         if deploy_commits is None:
@@ -399,6 +401,10 @@ class DeploymentSettingsGithubArgs:
             preview_pull_requests = True
         if preview_pull_requests is not None:
             pulumi.set(__self__, "preview_pull_requests", preview_pull_requests)
+        if pull_request_template is None:
+            pull_request_template = False
+        if pull_request_template is not None:
+            pulumi.set(__self__, "pull_request_template", pull_request_template)
         if repository is not None:
             pulumi.set(__self__, "repository", repository)
 
@@ -437,6 +443,18 @@ class DeploymentSettingsGithubArgs:
     @preview_pull_requests.setter
     def preview_pull_requests(self, value: Optional[pulumi.Input[bool]]):
         pulumi.set(self, "preview_pull_requests", value)
+
+    @property
+    @pulumi.getter(name="pullRequestTemplate")
+    def pull_request_template(self) -> Optional[pulumi.Input[bool]]:
+        """
+        Use this stack as a template for pull request review stacks.
+        """
+        return pulumi.get(self, "pull_request_template")
+
+    @pull_request_template.setter
+    def pull_request_template(self, value: Optional[pulumi.Input[bool]]):
+        pulumi.set(self, "pull_request_template", value)
 
     @property
     @pulumi.getter

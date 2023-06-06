@@ -61,6 +61,7 @@ type GitHubConfiguration struct {
 	Repository          string   `json:"repository,omitempty"`
 	DeployCommits       bool     `json:"deployCommits,omitempty"`
 	PreviewPullRequests bool     `json:"previewPullRequests,omitempty"`
+	PullRequestTemplate bool     `json:"pullRequestTemplate,omitempty"`
 	Paths               []string `json:"paths,omitempty"`
 }
 

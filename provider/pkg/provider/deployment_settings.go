@@ -160,6 +160,7 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap() resource.Propert
 		githubMap := resource.PropertyMap{}
 		githubMap["previewPullRequests"] = resource.NewPropertyValue(ds.GitHub.PreviewPullRequests)
 		githubMap["deployCommits"] = resource.NewPropertyValue(ds.GitHub.DeployCommits)
+		githubMap["pullRequestTemplate"] = resource.NewPropertyValue(ds.GitHub.PullRequestTemplate)
 		if ds.GitHub.Repository != "" {
 			githubMap["repository"] = resource.NewPropertyValue(ds.GitHub.Repository)
 		}
@@ -228,6 +229,9 @@ func toGitHubConfig(inputMap resource.PropertyMap) *pulumiapi.GitHubConfiguratio
 	}
 	if githubInput["previewPullRequests"].HasValue() && githubInput["previewPullRequests"].IsBool() {
 		github.PreviewPullRequests = githubInput["previewPullRequests"].BoolValue()
+	}
+	if githubInput["pullRequestTemplate"].HasValue() && githubInput["pullRequestTemplate"].IsBool() {
+		github.PullRequestTemplate = githubInput["pullRequestTemplate"].BoolValue()
 	}
 	if githubInput["paths"].HasValue() && githubInput["paths"].IsArray() {
 		pathsInput := githubInput["paths"].ArrayValue()

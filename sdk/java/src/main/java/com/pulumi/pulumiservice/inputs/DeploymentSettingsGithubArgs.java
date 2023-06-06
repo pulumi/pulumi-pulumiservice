@@ -68,6 +68,21 @@ public final class DeploymentSettingsGithubArgs extends com.pulumi.resources.Res
     }
 
     /**
+     * Use this stack as a template for pull request review stacks.
+     * 
+     */
+    @Import(name="pullRequestTemplate")
+    private @Nullable Output<Boolean> pullRequestTemplate;
+
+    /**
+     * @return Use this stack as a template for pull request review stacks.
+     * 
+     */
+    public Optional<Output<Boolean>> pullRequestTemplate() {
+        return Optional.ofNullable(this.pullRequestTemplate);
+    }
+
+    /**
      * The GitHub repository in the format org/repo.
      * 
      */
@@ -88,6 +103,7 @@ public final class DeploymentSettingsGithubArgs extends com.pulumi.resources.Res
         this.deployCommits = $.deployCommits;
         this.paths = $.paths;
         this.previewPullRequests = $.previewPullRequests;
+        this.pullRequestTemplate = $.pullRequestTemplate;
         this.repository = $.repository;
     }
 
@@ -183,6 +199,27 @@ public final class DeploymentSettingsGithubArgs extends com.pulumi.resources.Res
         }
 
         /**
+         * @param pullRequestTemplate Use this stack as a template for pull request review stacks.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder pullRequestTemplate(@Nullable Output<Boolean> pullRequestTemplate) {
+            $.pullRequestTemplate = pullRequestTemplate;
+            return this;
+        }
+
+        /**
+         * @param pullRequestTemplate Use this stack as a template for pull request review stacks.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder pullRequestTemplate(Boolean pullRequestTemplate) {
+            return pullRequestTemplate(Output.of(pullRequestTemplate));
+        }
+
+        /**
          * @param repository The GitHub repository in the format org/repo.
          * 
          * @return builder
@@ -206,6 +243,7 @@ public final class DeploymentSettingsGithubArgs extends com.pulumi.resources.Res
         public DeploymentSettingsGithubArgs build() {
             $.deployCommits = Codegen.booleanProp("deployCommits").output().arg($.deployCommits).def(true).getNullable();
             $.previewPullRequests = Codegen.booleanProp("previewPullRequests").output().arg($.previewPullRequests).def(true).getNullable();
+            $.pullRequestTemplate = Codegen.booleanProp("pullRequestTemplate").output().arg($.pullRequestTemplate).def(false).getNullable();
             return $;
         }
     }
