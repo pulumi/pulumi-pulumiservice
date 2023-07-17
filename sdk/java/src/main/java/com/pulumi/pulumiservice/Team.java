@@ -9,6 +9,7 @@ import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.TeamArgs;
 import com.pulumi.pulumiservice.Utilities;
+import java.lang.Double;
 import java.lang.String;
 import java.util.List;
 import java.util.Optional;
@@ -47,6 +48,20 @@ public class Team extends com.pulumi.resources.CustomResource {
      */
     public Output<Optional<String>> displayName() {
         return Codegen.optional(this.displayName);
+    }
+    /**
+     * The GitHub ID of the team to mirror. This is the only required parameter when creating a GitHub team -- all other parameters are taken from GitHub directly. Must be in the same GitHub organization that the Pulumi org is backed by.
+     * 
+     */
+    @Export(name="githubTeamID", refs={Double.class}, tree="[0]")
+    private Output</* @Nullable */ Double> githubTeamID;
+
+    /**
+     * @return The GitHub ID of the team to mirror. This is the only required parameter when creating a GitHub team -- all other parameters are taken from GitHub directly. Must be in the same GitHub organization that the Pulumi org is backed by.
+     * 
+     */
+    public Output<Optional<Double>> githubTeamID() {
+        return Codegen.optional(this.githubTeamID);
     }
     /**
      * List of team members.

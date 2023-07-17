@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//	http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -46,6 +46,7 @@ type createTeamRequest struct {
 	Name         string `json:"name"`
 	DisplayName  string `json:"displayName"`
 	Description  string `json:"description"`
+	GitHubTeamID int64 `json:"githubTeamID,omitempty"`
 }
 
 type updateTeamRequest struct {
@@ -86,7 +87,6 @@ func (c *Client) ListTeams(ctx context.Context, orgName string) ([]Team, error) 
 
 	var teamArray Teams
 	_, err := c.do(ctx, http.MethodGet, apiUrl, nil, &teamArray)
-
 	if err != nil {
 		return nil, fmt.Errorf("failed to list teams for %q: %w", orgName, err)
 	}
@@ -113,12 +113,12 @@ func (c *Client) GetTeam(ctx context.Context, orgName string, teamName string) (
 	return &team, nil
 }
 
-func (c *Client) CreateTeam(ctx context.Context, orgName, teamName, teamType, displayName, description string) (*Team, error) {
+func (c *Client) CreateTeam(ctx context.Context, orgName, teamName, teamType, displayName, description string, teamID int64) (*Team, error) {
 	if len(orgName) == 0 {
 		return nil, errors.New("orgname must not be empty")
 	}
 
-	if len(teamName) == 0 {
+	if len(teamName) == 0 && teamType != "github" {
 		return nil, errors.New("teamname must not be empty")
 	}
 
@@ -139,11 +139,11 @@ func (c *Client) CreateTeam(ctx context.Context, orgName, teamName, teamType, di
 		Name:         teamName,
 		DisplayName:  displayName,
 		Description:  description,
+		GitHubTeamID: teamID,
 	}
 
 	var team Team
 	_, err := c.do(ctx, http.MethodPost, apiPath, createReq, &team)
-
 	if err != nil {
 		return nil, fmt.Errorf("failed to create team: %w", err)
 	}
@@ -168,7 +168,6 @@ func (c *Client) UpdateTeam(ctx context.Context, orgName, teamName, displayName,
 	}
 
 	_, err := c.do(ctx, "PATCH", apiPath, updateReq, nil)
-
 	if err != nil {
 		return fmt.Errorf("failed to update team: %w", err)
 	}
@@ -176,7 +175,6 @@ func (c *Client) UpdateTeam(ctx context.Context, orgName, teamName, displayName,
 }
 
 func (c *Client) DeleteTeam(ctx context.Context, orgName, teamName string) error {
-
 	if len(orgName) == 0 {
 		return errors.New("orgname must not be empty")
 	}
@@ -220,7 +218,6 @@ func (c *Client) updateTeamMembership(ctx context.Context, orgName, teamName, us
 	}
 
 	_, err := c.do(ctx, http.MethodPatch, apiPath, updateMembershipReq, nil)
-
 	if err != nil {
 		return fmt.Errorf("failed to update team membership: %w", err)
 	}
@@ -266,7 +263,6 @@ func (c *Client) AddStackPermission(ctx context.Context, stack StackName, teamNa
 	}
 
 	_, err := c.do(ctx, http.MethodPatch, apiPath, addStackPermissionRequest, nil)
-
 	if err != nil {
 		return fmt.Errorf("failed to add stack permission for team: %w", err)
 	}
@@ -289,7 +285,6 @@ func (c *Client) RemoveStackPermission(ctx context.Context, stack StackName, tea
 	}
 
 	_, err := c.do(ctx, http.MethodPatch, apiPath, removeStackPermissionRequest, nil)
-
 	if err != nil {
 		return fmt.Errorf("failed to remove stack permission for team: %w", err)
 	}

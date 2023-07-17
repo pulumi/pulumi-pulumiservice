@@ -122,7 +122,7 @@ func TestCreateTeam(t *testing.T) {
 			ResponseCode: 201,
 		})
 		defer cleanup()
-		actualTeam, err := c.CreateTeam(ctx, orgName, teamName, teamType, displayName, description)
+		actualTeam, err := c.CreateTeam(ctx, orgName, teamName, teamType, displayName, description, 0)
 		assert.NoError(t, err)
 		assert.Equal(t, team, *actualTeam)
 	})
@@ -143,7 +143,7 @@ func TestCreateTeam(t *testing.T) {
 			},
 		})
 		defer cleanup()
-		team, err := c.CreateTeam(ctx, orgName, teamName, teamType, displayName, description)
+		team, err := c.CreateTeam(ctx, orgName, teamName, teamType, displayName, description, 0)
 		assert.Nil(t, team, "team should be nil since error was returned")
 		assert.EqualError(t, err, "failed to create team: 401 API error: unauthorized")
 	})

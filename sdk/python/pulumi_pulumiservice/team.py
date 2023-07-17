@@ -187,6 +187,7 @@ class Team(pulumi.CustomResource):
             if team_type is None and not opts.urn:
                 raise TypeError("Missing required property 'team_type'")
             __props__.__dict__["team_type"] = team_type
+            __props__.__dict__["github_team_id"] = None
         super(Team, __self__).__init__(
             'pulumiservice:index:Team',
             resource_name,
@@ -211,6 +212,7 @@ class Team(pulumi.CustomResource):
 
         __props__.__dict__["description"] = None
         __props__.__dict__["display_name"] = None
+        __props__.__dict__["github_team_id"] = None
         __props__.__dict__["members"] = None
         __props__.__dict__["name"] = None
         __props__.__dict__["organization_name"] = None
@@ -232,6 +234,14 @@ class Team(pulumi.CustomResource):
         Optional. Team display name.
         """
         return pulumi.get(self, "display_name")
+
+    @property
+    @pulumi.getter(name="githubTeamID")
+    def github_team_id(self) -> pulumi.Output[Optional[float]]:
+        """
+        The GitHub ID of the team to mirror. This is the only required parameter when creating a GitHub team -- all other parameters are taken from GitHub directly. Must be in the same GitHub organization that the Pulumi org is backed by.
+        """
+        return pulumi.get(self, "github_team_id")
 
     @property
     @pulumi.getter

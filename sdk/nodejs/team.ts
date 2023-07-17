@@ -43,6 +43,10 @@ export class Team extends pulumi.CustomResource {
      */
     public readonly displayName!: pulumi.Output<string | undefined>;
     /**
+     * The GitHub ID of the team to mirror. This is the only required parameter when creating a GitHub team -- all other parameters are taken from GitHub directly. Must be in the same GitHub organization that the Pulumi org is backed by.
+     */
+    public /*out*/ readonly githubTeamID!: pulumi.Output<number | undefined>;
+    /**
      * List of team members.
      */
     public readonly members!: pulumi.Output<string[] | undefined>;
@@ -85,9 +89,11 @@ export class Team extends pulumi.CustomResource {
             resourceInputs["name"] = args ? args.name : undefined;
             resourceInputs["organizationName"] = args ? args.organizationName : undefined;
             resourceInputs["teamType"] = args ? args.teamType : undefined;
+            resourceInputs["githubTeamID"] = undefined /*out*/;
         } else {
             resourceInputs["description"] = undefined /*out*/;
             resourceInputs["displayName"] = undefined /*out*/;
+            resourceInputs["githubTeamID"] = undefined /*out*/;
             resourceInputs["members"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
             resourceInputs["organizationName"] = undefined /*out*/;

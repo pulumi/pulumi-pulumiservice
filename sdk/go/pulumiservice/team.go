@@ -19,6 +19,8 @@ type Team struct {
 	Description pulumi.StringPtrOutput `pulumi:"description"`
 	// Optional. Team display name.
 	DisplayName pulumi.StringPtrOutput `pulumi:"displayName"`
+	// The GitHub ID of the team to mirror. This is the only required parameter when creating a GitHub team -- all other parameters are taken from GitHub directly. Must be in the same GitHub organization that the Pulumi org is backed by.
+	GithubTeamID pulumi.Float64PtrOutput `pulumi:"githubTeamID"`
 	// List of team members.
 	Members pulumi.StringArrayOutput `pulumi:"members"`
 	// The team name.
@@ -202,6 +204,11 @@ func (o TeamOutput) Description() pulumi.StringPtrOutput {
 // Optional. Team display name.
 func (o TeamOutput) DisplayName() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *Team) pulumi.StringPtrOutput { return v.DisplayName }).(pulumi.StringPtrOutput)
+}
+
+// The GitHub ID of the team to mirror. This is the only required parameter when creating a GitHub team -- all other parameters are taken from GitHub directly. Must be in the same GitHub organization that the Pulumi org is backed by.
+func (o TeamOutput) GithubTeamID() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v *Team) pulumi.Float64PtrOutput { return v.GithubTeamID }).(pulumi.Float64PtrOutput)
 }
 
 // List of team members.

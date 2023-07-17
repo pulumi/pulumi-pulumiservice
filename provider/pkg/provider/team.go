@@ -35,6 +35,7 @@ type PulumiServiceTeamInput struct {
 	Description      string
 	OrganizationName string
 	Members          []string
+	GitHubTeamID     int64
 }
 
 func (i *PulumiServiceTeamInput) ToPropertyMap() resource.PropertyMap {
@@ -45,6 +46,7 @@ func (i *PulumiServiceTeamInput) ToPropertyMap() resource.PropertyMap {
 	pm["description"] = resource.NewPropertyValue(i.Description)
 	pm["members"] = resource.NewPropertyValue(i.Members)
 	pm["organizationName"] = resource.NewPropertyValue(i.OrganizationName)
+	pm["githubTeamID"] = resource.NewPropertyValue(i.GitHubTeamID)
 	return pm
 }
 
@@ -83,6 +85,10 @@ func ToPulumiServiceTeamInput(inputMap resource.PropertyMap) PulumiServiceTeamIn
 
 	if inputMap["organizationName"].HasValue() && inputMap["organizationName"].IsString() {
 		input.OrganizationName = inputMap["organizationName"].StringValue()
+	}
+
+	if inputMap["githubTeamID"].HasValue() && inputMap["githubTeamID"].IsNumber() {
+		input.GitHubTeamID = int64(inputMap["githubTeamID"].NumberValue())
 	}
 
 	return input
@@ -245,7 +251,7 @@ func (t *PulumiServiceTeamResource) updateTeam(ctx context.Context, input Pulumi
 }
 
 func (t *PulumiServiceTeamResource) createTeam(ctx context.Context, input PulumiServiceTeamInput) (*string, error) {
-	_, err := t.client.CreateTeam(ctx, input.OrganizationName, input.Name, input.Type, input.DisplayName, input.Description)
+	_, err := t.client.CreateTeam(ctx, input.OrganizationName, input.Name, input.Type, input.DisplayName, input.Description, input.GitHubTeamID)
 	if err != nil {
 		return nil, err
 	}
@@ -255,7 +261,6 @@ func (t *PulumiServiceTeamResource) createTeam(ctx context.Context, input Pulumi
 }
 
 func (t *PulumiServiceTeamResource) deleteFromTeam(ctx context.Context, orgName string, teamName string, userName string) error {
-
 	if len(orgName) == 0 {
 		return errors.New("orgname must not be empty")
 	}
@@ -269,7 +274,6 @@ func (t *PulumiServiceTeamResource) deleteFromTeam(ctx context.Context, orgName 
 	}
 
 	return t.client.DeleteMemberFromTeam(ctx, orgName, teamName, userName)
-
 }
 
 func (t *PulumiServiceTeamResource) addToTeam(ctx context.Context, orgName string, teamName string, userName string) error {
