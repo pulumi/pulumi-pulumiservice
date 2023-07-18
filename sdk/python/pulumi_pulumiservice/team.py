@@ -14,23 +14,24 @@ __all__ = ['TeamArgs', 'Team']
 @pulumi.input_type
 class TeamArgs:
     def __init__(__self__, *,
+                 name: pulumi.Input[str],
                  organization_name: pulumi.Input[str],
                  team_type: pulumi.Input[str],
                  description: Optional[pulumi.Input[str]] = None,
                  display_name: Optional[pulumi.Input[str]] = None,
                  github_team_id: Optional[pulumi.Input[float]] = None,
-                 members: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None,
-                 name: Optional[pulumi.Input[str]] = None):
+                 members: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None):
         """
         The set of arguments for constructing a Team resource.
+        :param pulumi.Input[str] name: The team name.
         :param pulumi.Input[str] organization_name: The name of the Pulumi organization the team belongs to.
         :param pulumi.Input[str] team_type: The type of team. Must be either `pulumi` or `github`.
         :param pulumi.Input[str] description: Optional. Team description.
         :param pulumi.Input[str] display_name: Optional. Team display name.
         :param pulumi.Input[float] github_team_id: The GitHub ID of the team to mirror. This is the only required parameter when creating a GitHub team -- all other parameters are taken from GitHub directly. Must be in the same GitHub organization that the Pulumi org is backed by.
         :param pulumi.Input[Sequence[pulumi.Input[str]]] members: List of team members.
-        :param pulumi.Input[str] name: The team name. Required for "pulumi" teams.
         """
+        pulumi.set(__self__, "name", name)
         pulumi.set(__self__, "organization_name", organization_name)
         pulumi.set(__self__, "team_type", team_type)
         if description is not None:
@@ -41,8 +42,18 @@ class TeamArgs:
             pulumi.set(__self__, "github_team_id", github_team_id)
         if members is not None:
             pulumi.set(__self__, "members", members)
-        if name is not None:
-            pulumi.set(__self__, "name", name)
+
+    @property
+    @pulumi.getter
+    def name(self) -> pulumi.Input[str]:
+        """
+        The team name.
+        """
+        return pulumi.get(self, "name")
+
+    @name.setter
+    def name(self, value: pulumi.Input[str]):
+        pulumi.set(self, "name", value)
 
     @property
     @pulumi.getter(name="organizationName")
@@ -116,18 +127,6 @@ class TeamArgs:
     def members(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]]):
         pulumi.set(self, "members", value)
 
-    @property
-    @pulumi.getter
-    def name(self) -> Optional[pulumi.Input[str]]:
-        """
-        The team name. Required for "pulumi" teams.
-        """
-        return pulumi.get(self, "name")
-
-    @name.setter
-    def name(self, value: Optional[pulumi.Input[str]]):
-        pulumi.set(self, "name", value)
-
 
 class Team(pulumi.CustomResource):
     @overload
@@ -151,7 +150,7 @@ class Team(pulumi.CustomResource):
         :param pulumi.Input[str] display_name: Optional. Team display name.
         :param pulumi.Input[float] github_team_id: The GitHub ID of the team to mirror. This is the only required parameter when creating a GitHub team -- all other parameters are taken from GitHub directly. Must be in the same GitHub organization that the Pulumi org is backed by.
         :param pulumi.Input[Sequence[pulumi.Input[str]]] members: List of team members.
-        :param pulumi.Input[str] name: The team name. Required for "pulumi" teams.
+        :param pulumi.Input[str] name: The team name.
         :param pulumi.Input[str] organization_name: The name of the Pulumi organization the team belongs to.
         :param pulumi.Input[str] team_type: The type of team. Must be either `pulumi` or `github`.
         """
@@ -199,6 +198,8 @@ class Team(pulumi.CustomResource):
             __props__.__dict__["display_name"] = display_name
             __props__.__dict__["github_team_id"] = github_team_id
             __props__.__dict__["members"] = members
+            if name is None and not opts.urn:
+                raise TypeError("Missing required property 'name'")
             __props__.__dict__["name"] = name
             if organization_name is None and not opts.urn:
                 raise TypeError("Missing required property 'organization_name'")

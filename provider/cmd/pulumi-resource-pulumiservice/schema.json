@@ -487,7 +487,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The team name. Required for \"pulumi\" teams.",
+          "description": "The team name.",
           "type": "string"
         },
         "displayName": {
@@ -514,7 +514,7 @@
             "type": "number"
         }
       },
-      "requiredInputs": ["organizationName", "teamType"]
+      "requiredInputs": ["name", "organizationName", "teamType"]
     },
     "pulumiservice:index:TeamAccessToken": {
       "description": "The Pulumi Cloud allows users to create access tokens scoped to team. Team access tokens is a resource to create them and assign them to a team",

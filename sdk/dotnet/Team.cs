@@ -133,10 +133,10 @@ namespace Pulumi.PulumiService
         }
 
         /// <summary>
-        /// The team name. Required for "pulumi" teams.
+        /// The team name.
         /// </summary>
-        [Input("name")]
-        public Input<string>? Name { get; set; }
+        [Input("name", required: true)]
+        public Input<string> Name { get; set; } = null!;
 
         /// <summary>
         /// The name of the Pulumi organization the team belongs to.
