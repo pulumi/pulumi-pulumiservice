@@ -46,7 +46,7 @@ type createTeamRequest struct {
 	Name         string `json:"name"`
 	DisplayName  string `json:"displayName"`
 	Description  string `json:"description"`
-	GitHubTeamID int64 `json:"githubTeamID,omitempty"`
+	GitHubTeamID int64  `json:"githubTeamID,omitempty"`
 }
 
 type updateTeamRequest struct {
@@ -114,6 +114,11 @@ func (c *Client) GetTeam(ctx context.Context, orgName string, teamName string) (
 }
 
 func (c *Client) CreateTeam(ctx context.Context, orgName, teamName, teamType, displayName, description string, teamID int64) (*Team, error) {
+	teamtypeList := []string{"github", "pulumi"}
+	if !contains(teamtypeList, teamType) {
+		return nil, fmt.Errorf("teamtype must be one of %v, got %q", teamtypeList, teamType)
+	}
+
 	if len(orgName) == 0 {
 		return nil, errors.New("orgname must not be empty")
 	}
@@ -122,13 +127,8 @@ func (c *Client) CreateTeam(ctx context.Context, orgName, teamName, teamType, di
 		return nil, errors.New("teamname must not be empty")
 	}
 
-	if len(teamType) == 0 {
-		return nil, errors.New("teamtype must not be empty")
-	}
-
-	teamtypeList := []string{"github", "pulumi"}
-	if !contains(teamtypeList, teamType) {
-		return nil, fmt.Errorf("teamtype must be one of %v, got %q", teamtypeList, teamType)
+	if teamType == "github" && teamID == 0 {
+		return nil, errors.New("github teams require a githubTeamID")
 	}
 
 	apiPath := path.Join("orgs", orgName, "teams", teamType)

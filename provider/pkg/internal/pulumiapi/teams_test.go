@@ -98,41 +98,63 @@ func TestGetTeam(t *testing.T) {
 func TestCreateTeam(t *testing.T) {
 	orgName := "an-organization"
 	teamName := "a-team"
-	teamType := "pulumi"
 	displayName := "A Team"
 	description := "The A Team"
-	team := Team{
-		Type:        teamType,
-		Name:        teamName,
-		DisplayName: displayName,
-		Description: description,
-	}
-	t.Run("Happy Path", func(t *testing.T) {
+	t.Run("Happy Path (pulumi team)", func(t *testing.T) {
+		expected := Team{
+			Type:        "pulumi",
+			Name:        teamName,
+			DisplayName: displayName,
+			Description: description,
+		}
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqPath:   "/api/orgs/an-organization/teams/pulumi",
 			ExpectedReqBody: createTeamRequest{
 				Organization: orgName,
-				TeamType:     teamType,
+				TeamType:     "pulumi",
 				Name:         teamName,
 				DisplayName:  displayName,
 				Description:  description,
 			},
-			ResponseBody: team,
+			ResponseBody: expected,
 			ResponseCode: 201,
 		})
 		defer cleanup()
-		actualTeam, err := c.CreateTeam(ctx, orgName, teamName, teamType, displayName, description, 0)
+		actualTeam, err := c.CreateTeam(ctx, orgName, teamName, "pulumi", displayName, description, 0)
 		assert.NoError(t, err)
-		assert.Equal(t, team, *actualTeam)
+		assert.Equal(t, expected, *actualTeam)
 	})
-	t.Run("Error", func(t *testing.T) {
+	t.Run("Happy Path (github team)", func(t *testing.T) {
+		expected := Team{
+			Type:        "github",
+			Name:        teamName,
+			DisplayName: displayName,
+			Description: description,
+		}
+		c, cleanup := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodPost,
+			ExpectedReqPath:   "/api/orgs/an-organization/teams/github",
+			ExpectedReqBody: createTeamRequest{
+				TeamType:     "github",
+				Organization: orgName,
+				GitHubTeamID: 1,
+			},
+			ResponseBody: expected,
+			ResponseCode: 201,
+		})
+		defer cleanup()
+		actualTeam, err := c.CreateTeam(ctx, orgName, "", "github", "", "", 1)
+		assert.NoError(t, err)
+		assert.Equal(t, expected, *actualTeam)
+	})
+	t.Run("Error (pulumi team)", func(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqPath:   "/api/orgs/an-organization/teams/pulumi",
 			ExpectedReqBody: createTeamRequest{
 				Organization: orgName,
-				TeamType:     teamType,
+				TeamType:     "pulumi",
 				Name:         teamName,
 				DisplayName:  displayName,
 				Description:  description,
@@ -143,9 +165,33 @@ func TestCreateTeam(t *testing.T) {
 			},
 		})
 		defer cleanup()
-		team, err := c.CreateTeam(ctx, orgName, teamName, teamType, displayName, description, 0)
+		team, err := c.CreateTeam(ctx, orgName, teamName, "pulumi", displayName, description, 0)
 		assert.Nil(t, team, "team should be nil since error was returned")
 		assert.EqualError(t, err, "failed to create team: 401 API error: unauthorized")
+	})
+	t.Run("Error (github team missing ID)", func(t *testing.T) {
+		c, cleanup := startTestServer(t, testServerConfig{})
+		defer cleanup()
+		_, err := c.CreateTeam(ctx, orgName, "", "github", "", "", 0)
+		assert.EqualError(t, err, "github teams require a githubTeamID")
+	})
+	t.Run("Error (invalid team type)", func(t *testing.T) {
+		c, cleanup := startTestServer(t, testServerConfig{})
+		defer cleanup()
+		_, err := c.CreateTeam(ctx, orgName, "", "foo", "", "", 0)
+		assert.EqualError(t, err, "teamtype must be one of [github pulumi], got \"foo\"")
+	})
+	t.Run("Error (invalid team name for pulumi team)", func(t *testing.T) {
+		c, cleanup := startTestServer(t, testServerConfig{})
+		defer cleanup()
+		_, err := c.CreateTeam(ctx, orgName, "", "pulumi", "", "", 0)
+		assert.EqualError(t, err, "teamname must not be empty")
+	})
+	t.Run("Error (missing org name)", func(t *testing.T) {
+		c, cleanup := startTestServer(t, testServerConfig{})
+		defer cleanup()
+		_, err := c.CreateTeam(ctx, "", "", "pulumi", "", "", 0)
+		assert.EqualError(t, err, "orgname must not be empty")
 	})
 }
 
@@ -213,7 +259,6 @@ func TestAddStackPermission(t *testing.T) {
 		assert.NoError(t, c.AddStackPermission(ctx, stack, teamName, permission))
 	})
 }
-
 
 func TestRemoveStackPermission(t *testing.T) {
 	teamName := "a-team"
