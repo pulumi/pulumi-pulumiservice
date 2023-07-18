@@ -53,15 +53,15 @@ public class Team extends com.pulumi.resources.CustomResource {
      * The GitHub ID of the team to mirror. This is the only required parameter when creating a GitHub team -- all other parameters are taken from GitHub directly. Must be in the same GitHub organization that the Pulumi org is backed by.
      * 
      */
-    @Export(name="githubTeamID", refs={Double.class}, tree="[0]")
-    private Output</* @Nullable */ Double> githubTeamID;
+    @Export(name="githubTeamId", refs={Double.class}, tree="[0]")
+    private Output</* @Nullable */ Double> githubTeamId;
 
     /**
      * @return The GitHub ID of the team to mirror. This is the only required parameter when creating a GitHub team -- all other parameters are taken from GitHub directly. Must be in the same GitHub organization that the Pulumi org is backed by.
      * 
      */
-    public Output<Optional<Double>> githubTeamID() {
-        return Codegen.optional(this.githubTeamID);
+    public Output<Optional<Double>> githubTeamId() {
+        return Codegen.optional(this.githubTeamId);
     }
     /**
      * List of team members.

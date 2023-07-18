@@ -45,7 +45,7 @@ export class Team extends pulumi.CustomResource {
     /**
      * The GitHub ID of the team to mirror. This is the only required parameter when creating a GitHub team -- all other parameters are taken from GitHub directly. Must be in the same GitHub organization that the Pulumi org is backed by.
      */
-    public readonly githubTeamID!: pulumi.Output<number | undefined>;
+    public readonly githubTeamId!: pulumi.Output<number | undefined>;
     /**
      * List of team members.
      */
@@ -82,7 +82,7 @@ export class Team extends pulumi.CustomResource {
             }
             resourceInputs["description"] = args ? args.description : undefined;
             resourceInputs["displayName"] = args ? args.displayName : undefined;
-            resourceInputs["githubTeamID"] = args ? args.githubTeamID : undefined;
+            resourceInputs["githubTeamId"] = args ? args.githubTeamId : undefined;
             resourceInputs["members"] = args ? args.members : undefined;
             resourceInputs["name"] = args ? args.name : undefined;
             resourceInputs["organizationName"] = args ? args.organizationName : undefined;
@@ -90,7 +90,7 @@ export class Team extends pulumi.CustomResource {
         } else {
             resourceInputs["description"] = undefined /*out*/;
             resourceInputs["displayName"] = undefined /*out*/;
-            resourceInputs["githubTeamID"] = undefined /*out*/;
+            resourceInputs["githubTeamId"] = undefined /*out*/;
             resourceInputs["members"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
             resourceInputs["organizationName"] = undefined /*out*/;
@@ -116,7 +116,7 @@ export interface TeamArgs {
     /**
      * The GitHub ID of the team to mirror. This is the only required parameter when creating a GitHub team -- all other parameters are taken from GitHub directly. Must be in the same GitHub organization that the Pulumi org is backed by.
      */
-    githubTeamID?: pulumi.Input<number>;
+    githubTeamId?: pulumi.Input<number>;
     /**
      * List of team members.
      */

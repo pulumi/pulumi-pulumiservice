@@ -93,7 +93,7 @@ class TeamArgs:
         pulumi.set(self, "display_name", value)
 
     @property
-    @pulumi.getter(name="githubTeamID")
+    @pulumi.getter(name="githubTeamId")
     def github_team_id(self) -> Optional[pulumi.Input[float]]:
         """
         The GitHub ID of the team to mirror. This is the only required parameter when creating a GitHub team -- all other parameters are taken from GitHub directly. Must be in the same GitHub organization that the Pulumi org is backed by.
@@ -254,7 +254,7 @@ class Team(pulumi.CustomResource):
         return pulumi.get(self, "display_name")
 
     @property
-    @pulumi.getter(name="githubTeamID")
+    @pulumi.getter(name="githubTeamId")
     def github_team_id(self) -> pulumi.Output[Optional[float]]:
         """
         The GitHub ID of the team to mirror. This is the only required parameter when creating a GitHub team -- all other parameters are taken from GitHub directly. Must be in the same GitHub organization that the Pulumi org is backed by.

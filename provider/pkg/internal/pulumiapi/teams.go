@@ -46,7 +46,7 @@ type createTeamRequest struct {
 	Name         string `json:"name"`
 	DisplayName  string `json:"displayName"`
 	Description  string `json:"description"`
-	GitHubTeamID int64  `json:"githubTeamID,omitempty"`
+	GitHubTeamID int64  `json:"githubTeamId,omitempty"`
 }
 
 type updateTeamRequest struct {
@@ -128,7 +128,7 @@ func (c *Client) CreateTeam(ctx context.Context, orgName, teamName, teamType, di
 	}
 
 	if teamType == "github" && teamID == 0 {
-		return nil, errors.New("github teams require a githubTeamID")
+		return nil, errors.New("github teams require a githubTeamId")
 	}
 
 	apiPath := path.Join("orgs", orgName, "teams", teamType)

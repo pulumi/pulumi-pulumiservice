@@ -20,7 +20,7 @@ type Team struct {
 	// Optional. Team display name.
 	DisplayName pulumi.StringPtrOutput `pulumi:"displayName"`
 	// The GitHub ID of the team to mirror. This is the only required parameter when creating a GitHub team -- all other parameters are taken from GitHub directly. Must be in the same GitHub organization that the Pulumi org is backed by.
-	GithubTeamID pulumi.Float64PtrOutput `pulumi:"githubTeamID"`
+	GithubTeamId pulumi.Float64PtrOutput `pulumi:"githubTeamId"`
 	// List of team members.
 	Members pulumi.StringArrayOutput `pulumi:"members"`
 	// The team name.
@@ -81,7 +81,7 @@ type teamArgs struct {
 	// Optional. Team display name.
 	DisplayName *string `pulumi:"displayName"`
 	// The GitHub ID of the team to mirror. This is the only required parameter when creating a GitHub team -- all other parameters are taken from GitHub directly. Must be in the same GitHub organization that the Pulumi org is backed by.
-	GithubTeamID *float64 `pulumi:"githubTeamID"`
+	GithubTeamId *float64 `pulumi:"githubTeamId"`
 	// List of team members.
 	Members []string `pulumi:"members"`
 	// The team name. Required for "pulumi" teams.
@@ -99,7 +99,7 @@ type TeamArgs struct {
 	// Optional. Team display name.
 	DisplayName pulumi.StringPtrInput
 	// The GitHub ID of the team to mirror. This is the only required parameter when creating a GitHub team -- all other parameters are taken from GitHub directly. Must be in the same GitHub organization that the Pulumi org is backed by.
-	GithubTeamID pulumi.Float64PtrInput
+	GithubTeamId pulumi.Float64PtrInput
 	// List of team members.
 	Members pulumi.StringArrayInput
 	// The team name. Required for "pulumi" teams.
@@ -208,8 +208,8 @@ func (o TeamOutput) DisplayName() pulumi.StringPtrOutput {
 }
 
 // The GitHub ID of the team to mirror. This is the only required parameter when creating a GitHub team -- all other parameters are taken from GitHub directly. Must be in the same GitHub organization that the Pulumi org is backed by.
-func (o TeamOutput) GithubTeamID() pulumi.Float64PtrOutput {
-	return o.ApplyT(func(v *Team) pulumi.Float64PtrOutput { return v.GithubTeamID }).(pulumi.Float64PtrOutput)
+func (o TeamOutput) GithubTeamId() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v *Team) pulumi.Float64PtrOutput { return v.GithubTeamId }).(pulumi.Float64PtrOutput)
 }
 
 // List of team members.

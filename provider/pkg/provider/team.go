@@ -46,7 +46,7 @@ func (i *PulumiServiceTeamInput) ToPropertyMap() resource.PropertyMap {
 	pm["description"] = resource.NewPropertyValue(i.Description)
 	pm["members"] = resource.NewPropertyValue(i.Members)
 	pm["organizationName"] = resource.NewPropertyValue(i.OrganizationName)
-	pm["githubTeamID"] = resource.NewPropertyValue(i.GitHubTeamID)
+	pm["githubTeamId"] = resource.NewPropertyValue(i.GitHubTeamID)
 	return pm
 }
 
@@ -87,8 +87,8 @@ func ToPulumiServiceTeamInput(inputMap resource.PropertyMap) PulumiServiceTeamIn
 		input.OrganizationName = inputMap["organizationName"].StringValue()
 	}
 
-	if inputMap["githubTeamID"].HasValue() && inputMap["githubTeamID"].IsNumber() {
-		input.GitHubTeamID = int64(inputMap["githubTeamID"].NumberValue())
+	if inputMap["githubTeamId"].HasValue() && inputMap["githubTeamId"].IsNumber() {
+		input.GitHubTeamID = int64(inputMap["githubTeamId"].NumberValue())
 	}
 
 	return input

@@ -51,15 +51,15 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
      * The GitHub ID of the team to mirror. This is the only required parameter when creating a GitHub team -- all other parameters are taken from GitHub directly. Must be in the same GitHub organization that the Pulumi org is backed by.
      * 
      */
-    @Import(name="githubTeamID")
-    private @Nullable Output<Double> githubTeamID;
+    @Import(name="githubTeamId")
+    private @Nullable Output<Double> githubTeamId;
 
     /**
      * @return The GitHub ID of the team to mirror. This is the only required parameter when creating a GitHub team -- all other parameters are taken from GitHub directly. Must be in the same GitHub organization that the Pulumi org is backed by.
      * 
      */
-    public Optional<Output<Double>> githubTeamID() {
-        return Optional.ofNullable(this.githubTeamID);
+    public Optional<Output<Double>> githubTeamId() {
+        return Optional.ofNullable(this.githubTeamId);
     }
 
     /**
@@ -127,7 +127,7 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
     private TeamArgs(TeamArgs $) {
         this.description = $.description;
         this.displayName = $.displayName;
-        this.githubTeamID = $.githubTeamID;
+        this.githubTeamId = $.githubTeamId;
         this.members = $.members;
         this.name = $.name;
         this.organizationName = $.organizationName;
@@ -195,24 +195,24 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param githubTeamID The GitHub ID of the team to mirror. This is the only required parameter when creating a GitHub team -- all other parameters are taken from GitHub directly. Must be in the same GitHub organization that the Pulumi org is backed by.
+         * @param githubTeamId The GitHub ID of the team to mirror. This is the only required parameter when creating a GitHub team -- all other parameters are taken from GitHub directly. Must be in the same GitHub organization that the Pulumi org is backed by.
          * 
          * @return builder
          * 
          */
-        public Builder githubTeamID(@Nullable Output<Double> githubTeamID) {
-            $.githubTeamID = githubTeamID;
+        public Builder githubTeamId(@Nullable Output<Double> githubTeamId) {
+            $.githubTeamId = githubTeamId;
             return this;
         }
 
         /**
-         * @param githubTeamID The GitHub ID of the team to mirror. This is the only required parameter when creating a GitHub team -- all other parameters are taken from GitHub directly. Must be in the same GitHub organization that the Pulumi org is backed by.
+         * @param githubTeamId The GitHub ID of the team to mirror. This is the only required parameter when creating a GitHub team -- all other parameters are taken from GitHub directly. Must be in the same GitHub organization that the Pulumi org is backed by.
          * 
          * @return builder
          * 
          */
-        public Builder githubTeamID(Double githubTeamID) {
-            return githubTeamID(Output.of(githubTeamID));
+        public Builder githubTeamId(Double githubTeamId) {
+            return githubTeamId(Output.of(githubTeamId));
         }
 
         /**

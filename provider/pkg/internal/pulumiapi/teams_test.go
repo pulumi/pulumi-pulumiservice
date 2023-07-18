@@ -173,7 +173,7 @@ func TestCreateTeam(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{})
 		defer cleanup()
 		_, err := c.CreateTeam(ctx, orgName, "", "github", "", "", 0)
-		assert.EqualError(t, err, "github teams require a githubTeamID")
+		assert.EqualError(t, err, "github teams require a githubTeamId")
 	})
 	t.Run("Error (invalid team type)", func(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{})
