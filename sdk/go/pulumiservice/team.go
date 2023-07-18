@@ -25,7 +25,7 @@ type Team struct {
 	Members pulumi.StringArrayOutput `pulumi:"members"`
 	// The team name.
 	Name pulumi.StringPtrOutput `pulumi:"name"`
-	// The organization's name.
+	// The name of the Pulumi organization the team belongs to.
 	OrganizationName pulumi.StringPtrOutput `pulumi:"organizationName"`
 	// The type of team. Must be either `pulumi` or `github`.
 	TeamType pulumi.StringPtrOutput `pulumi:"teamType"`
@@ -38,9 +38,6 @@ func NewTeam(ctx *pulumi.Context,
 		return nil, errors.New("missing one or more required arguments")
 	}
 
-	if args.Name == nil {
-		return nil, errors.New("invalid value for required argument 'Name'")
-	}
 	if args.OrganizationName == nil {
 		return nil, errors.New("invalid value for required argument 'OrganizationName'")
 	}
@@ -83,11 +80,13 @@ type teamArgs struct {
 	Description *string `pulumi:"description"`
 	// Optional. Team display name.
 	DisplayName *string `pulumi:"displayName"`
+	// The GitHub ID of the team to mirror. This is the only required parameter when creating a GitHub team -- all other parameters are taken from GitHub directly. Must be in the same GitHub organization that the Pulumi org is backed by.
+	GithubTeamID *float64 `pulumi:"githubTeamID"`
 	// List of team members.
 	Members []string `pulumi:"members"`
-	// The team name.
-	Name string `pulumi:"name"`
-	// The organization's name.
+	// The team name. Required for "pulumi" teams.
+	Name *string `pulumi:"name"`
+	// The name of the Pulumi organization the team belongs to.
 	OrganizationName string `pulumi:"organizationName"`
 	// The type of team. Must be either `pulumi` or `github`.
 	TeamType string `pulumi:"teamType"`
@@ -99,11 +98,13 @@ type TeamArgs struct {
 	Description pulumi.StringPtrInput
 	// Optional. Team display name.
 	DisplayName pulumi.StringPtrInput
+	// The GitHub ID of the team to mirror. This is the only required parameter when creating a GitHub team -- all other parameters are taken from GitHub directly. Must be in the same GitHub organization that the Pulumi org is backed by.
+	GithubTeamID pulumi.Float64PtrInput
 	// List of team members.
 	Members pulumi.StringArrayInput
-	// The team name.
-	Name pulumi.StringInput
-	// The organization's name.
+	// The team name. Required for "pulumi" teams.
+	Name pulumi.StringPtrInput
+	// The name of the Pulumi organization the team belongs to.
 	OrganizationName pulumi.StringInput
 	// The type of team. Must be either `pulumi` or `github`.
 	TeamType pulumi.StringInput
@@ -221,7 +222,7 @@ func (o TeamOutput) Name() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *Team) pulumi.StringPtrOutput { return v.Name }).(pulumi.StringPtrOutput)
 }
 
-// The organization's name.
+// The name of the Pulumi organization the team belongs to.
 func (o TeamOutput) OrganizationName() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *Team) pulumi.StringPtrOutput { return v.OrganizationName }).(pulumi.StringPtrOutput)
 }

@@ -92,14 +92,14 @@ public class Team extends com.pulumi.resources.CustomResource {
         return Codegen.optional(this.name);
     }
     /**
-     * The organization&#39;s name.
+     * The name of the Pulumi organization the team belongs to.
      * 
      */
     @Export(name="organizationName", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> organizationName;
 
     /**
-     * @return The organization&#39;s name.
+     * @return The name of the Pulumi organization the team belongs to.
      * 
      */
     public Output<Optional<String>> organizationName() {
