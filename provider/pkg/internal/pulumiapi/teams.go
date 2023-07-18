@@ -46,7 +46,7 @@ type createTeamRequest struct {
 	Name         string `json:"name"`
 	DisplayName  string `json:"displayName"`
 	Description  string `json:"description"`
-	GitHubTeamID int64  `json:"githubTeamId,omitempty"`
+	GitHubTeamID int64  `json:"githubTeamID,omitempty"`
 }
 
 type updateTeamRequest struct {
