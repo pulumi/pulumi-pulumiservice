@@ -144,7 +144,45 @@ func (t *PulumiServiceTeamResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc
 }
 
 func (t *PulumiServiceTeamResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	return nil, errors.New("Read construct is not yet implemented")
+	ctx := context.Background()
+
+	inputsMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	if err != nil {
+		return nil, err
+	}
+
+	orgName := inputsMap["organizationName"].StringValue()
+	teamName := inputsMap["name"].StringValue()
+	githubTeamID := int64(inputsMap["githubTeamId"].NumberValue())
+
+	team, err := t.client.GetTeam(ctx, orgName, teamName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read Team (%q): %w", req.Id, err)
+	}
+	if team == nil {
+		return &pulumirpc.ReadResponse{}, nil
+	}
+	inputs := PulumiServiceTeamInput{
+		Description:      team.Description,
+		DisplayName:      team.DisplayName,
+		Name:             team.Name,
+		Type:             team.Type,
+		OrganizationName: orgName,
+	}
+	if githubTeamID != 0 {
+		inputs.GitHubTeamID = githubTeamID
+	}
+	for _, m := range team.Members {
+		inputs.Members = append(inputs.Members, m.Name)
+	}
+	props, err := plugin.MarshalProperties(inputs.ToPropertyMap(), plugin.MarshalOptions{})
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal inputs to properties: %w", err)
+	}
+	return &pulumirpc.ReadResponse{
+		Id:         req.Id,
+		Properties: props,
+	}, nil
 }
 
 func (t *PulumiServiceTeamResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
