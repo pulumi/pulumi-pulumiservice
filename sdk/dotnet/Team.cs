@@ -28,7 +28,7 @@ namespace Pulumi.PulumiService
         public Output<string?> DisplayName { get; private set; } = null!;
 
         /// <summary>
-        /// The GitHub ID of the team to mirror. This is the only required parameter when creating a GitHub team -- all other parameters are taken from GitHub directly. Must be in the same GitHub organization that the Pulumi org is backed by.
+        /// The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by.
         /// </summary>
         [Output("githubTeamId")]
         public Output<double?> GithubTeamId { get; private set; } = null!;
@@ -115,7 +115,7 @@ namespace Pulumi.PulumiService
         public Input<string>? DisplayName { get; set; }
 
         /// <summary>
-        /// The GitHub ID of the team to mirror. This is the only required parameter when creating a GitHub team -- all other parameters are taken from GitHub directly. Must be in the same GitHub organization that the Pulumi org is backed by.
+        /// The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by.
         /// </summary>
         [Input("githubTeamId")]
         public Input<double>? GithubTeamId { get; set; }
