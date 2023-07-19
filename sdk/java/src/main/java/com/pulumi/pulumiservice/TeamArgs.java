@@ -48,14 +48,14 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by.
+     * The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for &#34;github&#34; teams.
      * 
      */
     @Import(name="githubTeamId")
     private @Nullable Output<Double> githubTeamId;
 
     /**
-     * @return The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by.
+     * @return The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for &#34;github&#34; teams.
      * 
      */
     public Optional<Output<Double>> githubTeamId() {
@@ -195,7 +195,7 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param githubTeamId The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by.
+         * @param githubTeamId The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for &#34;github&#34; teams.
          * 
          * @return builder
          * 
@@ -206,7 +206,7 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param githubTeamId The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by.
+         * @param githubTeamId The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for &#34;github&#34; teams.
          * 
          * @return builder
          * 

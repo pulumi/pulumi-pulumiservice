@@ -103,7 +103,41 @@ func (t *PulumiServiceTeamResource) Configure(config PulumiServiceConfig) {
 }
 
 func (t *PulumiServiceTeamResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: nil}, nil
+	news := req.GetNews()
+	newsMap, err := plugin.UnmarshalProperties(news, plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	if err != nil {
+		return nil, err
+	}
+
+	var failures []*pulumirpc.CheckFailure
+
+	var teamType string
+	if newsMap["teamType"].HasValue() {
+		teamType = newsMap["teamType"].StringValue()
+	}
+
+	if teamType != "github" && teamType != "pulumi" {
+		failures = append(failures, &pulumirpc.CheckFailure{
+			Reason:   fmt.Sprintf("found %q instead of 'pulumi' or 'github'", teamType),
+			Property: "type",
+		})
+	}
+
+	if teamType == "github" && !newsMap["githubTeamId"].HasValue() {
+		failures = append(failures, &pulumirpc.CheckFailure{
+			Reason:   "github teams require a githubTeamId",
+			Property: "githubTeamId",
+		})
+	}
+
+	if teamType == "pulumi" && !newsMap["name"].HasValue() {
+		failures = append(failures, &pulumirpc.CheckFailure{
+			Reason:   "pulumi teams require a name",
+			Property: "name",
+		})
+	}
+
+	return &pulumirpc.CheckResponse{Inputs: news, Failures: failures}, nil
 }
 
 func (t *PulumiServiceTeamResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {

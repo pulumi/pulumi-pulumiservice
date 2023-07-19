@@ -477,7 +477,7 @@
           "type": "string"
         },
         "githubTeamId": {
-            "description": "The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by.",
+            "description": "The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for \"github\" teams.",
             "type": "number"
         }
       },
@@ -510,7 +510,7 @@
           "type": "string"
         },
         "githubTeamId": {
-            "description": "The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by.",
+            "description": "The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for \"github\" teams.",
             "type": "number"
         }
       },

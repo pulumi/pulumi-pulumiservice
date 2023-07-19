@@ -27,7 +27,7 @@ class TeamArgs:
         :param pulumi.Input[str] team_type: The type of team. Must be either `pulumi` or `github`.
         :param pulumi.Input[str] description: Optional. Team description.
         :param pulumi.Input[str] display_name: Optional. Team display name.
-        :param pulumi.Input[float] github_team_id: The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by.
+        :param pulumi.Input[float] github_team_id: The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for "github" teams.
         :param pulumi.Input[Sequence[pulumi.Input[str]]] members: List of team members.
         :param pulumi.Input[str] name: The team's name. Required for "pulumi" teams.
         """
@@ -96,7 +96,7 @@ class TeamArgs:
     @pulumi.getter(name="githubTeamId")
     def github_team_id(self) -> Optional[pulumi.Input[float]]:
         """
-        The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by.
+        The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for "github" teams.
         """
         return pulumi.get(self, "github_team_id")
 
@@ -149,7 +149,7 @@ class Team(pulumi.CustomResource):
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[str] description: Optional. Team description.
         :param pulumi.Input[str] display_name: Optional. Team display name.
-        :param pulumi.Input[float] github_team_id: The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by.
+        :param pulumi.Input[float] github_team_id: The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for "github" teams.
         :param pulumi.Input[Sequence[pulumi.Input[str]]] members: List of team members.
         :param pulumi.Input[str] name: The team's name. Required for "pulumi" teams.
         :param pulumi.Input[str] organization_name: The name of the Pulumi organization the team belongs to.
@@ -257,7 +257,7 @@ class Team(pulumi.CustomResource):
     @pulumi.getter(name="githubTeamId")
     def github_team_id(self) -> pulumi.Output[Optional[float]]:
         """
-        The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by.
+        The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for "github" teams.
         """
         return pulumi.get(self, "github_team_id")
 
