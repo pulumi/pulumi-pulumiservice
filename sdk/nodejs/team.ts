@@ -51,7 +51,7 @@ export class Team extends pulumi.CustomResource {
      */
     public readonly members!: pulumi.Output<string[] | undefined>;
     /**
-     * The team name.
+     * The team's name. Required for "pulumi" teams.
      */
     public readonly name!: pulumi.Output<string | undefined>;
     /**
@@ -74,9 +74,6 @@ export class Team extends pulumi.CustomResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
-            if ((!args || args.name === undefined) && !opts.urn) {
-                throw new Error("Missing required property 'name'");
-            }
             if ((!args || args.organizationName === undefined) && !opts.urn) {
                 throw new Error("Missing required property 'organizationName'");
             }
@@ -125,9 +122,9 @@ export interface TeamArgs {
      */
     members?: pulumi.Input<pulumi.Input<string>[]>;
     /**
-     * The team name.
+     * The team's name. Required for "pulumi" teams.
      */
-    name: pulumi.Input<string>;
+    name?: pulumi.Input<string>;
     /**
      * The name of the Pulumi organization the team belongs to.
      */

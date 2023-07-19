@@ -23,7 +23,7 @@ type Team struct {
 	GithubTeamId pulumi.Float64PtrOutput `pulumi:"githubTeamId"`
 	// List of team members.
 	Members pulumi.StringArrayOutput `pulumi:"members"`
-	// The team name.
+	// The team's name. Required for "pulumi" teams.
 	Name pulumi.StringPtrOutput `pulumi:"name"`
 	// The name of the Pulumi organization the team belongs to.
 	OrganizationName pulumi.StringPtrOutput `pulumi:"organizationName"`
@@ -38,9 +38,6 @@ func NewTeam(ctx *pulumi.Context,
 		return nil, errors.New("missing one or more required arguments")
 	}
 
-	if args.Name == nil {
-		return nil, errors.New("invalid value for required argument 'Name'")
-	}
 	if args.OrganizationName == nil {
 		return nil, errors.New("invalid value for required argument 'OrganizationName'")
 	}
@@ -87,8 +84,8 @@ type teamArgs struct {
 	GithubTeamId *float64 `pulumi:"githubTeamId"`
 	// List of team members.
 	Members []string `pulumi:"members"`
-	// The team name.
-	Name string `pulumi:"name"`
+	// The team's name. Required for "pulumi" teams.
+	Name *string `pulumi:"name"`
 	// The name of the Pulumi organization the team belongs to.
 	OrganizationName string `pulumi:"organizationName"`
 	// The type of team. Must be either `pulumi` or `github`.
@@ -105,8 +102,8 @@ type TeamArgs struct {
 	GithubTeamId pulumi.Float64PtrInput
 	// List of team members.
 	Members pulumi.StringArrayInput
-	// The team name.
-	Name pulumi.StringInput
+	// The team's name. Required for "pulumi" teams.
+	Name pulumi.StringPtrInput
 	// The name of the Pulumi organization the team belongs to.
 	OrganizationName pulumi.StringInput
 	// The type of team. Must be either `pulumi` or `github`.
@@ -220,7 +217,7 @@ func (o TeamOutput) Members() pulumi.StringArrayOutput {
 	return o.ApplyT(func(v *Team) pulumi.StringArrayOutput { return v.Members }).(pulumi.StringArrayOutput)
 }
 
-// The team name.
+// The team's name. Required for "pulumi" teams.
 func (o TeamOutput) Name() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *Team) pulumi.StringPtrOutput { return v.Name }).(pulumi.StringPtrOutput)
 }

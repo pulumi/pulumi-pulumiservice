@@ -146,14 +146,10 @@ func (t *PulumiServiceTeamResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc
 func (t *PulumiServiceTeamResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
 	ctx := context.Background()
 
-	inputsMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	orgName, teamName, err := splitSingleSlashString(req.Id)
 	if err != nil {
 		return nil, err
 	}
-
-	orgName := inputsMap["organizationName"].StringValue()
-	teamName := inputsMap["name"].StringValue()
-	githubTeamID := int64(inputsMap["githubTeamId"].NumberValue())
 
 	team, err := t.client.GetTeam(ctx, orgName, teamName)
 	if err != nil {
@@ -169,11 +165,8 @@ func (t *PulumiServiceTeamResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc
 		Type:             team.Type,
 		OrganizationName: orgName,
 	}
-	if githubTeamID != 0 {
-		inputs.GitHubTeamID = githubTeamID
-	}
 	for _, m := range team.Members {
-		inputs.Members = append(inputs.Members, m.Name)
+		inputs.Members = append(inputs.Members, m.GithubLogin)
 	}
 	props, err := plugin.MarshalProperties(inputs.ToPropertyMap(), plugin.MarshalOptions{})
 	if err != nil {
@@ -208,7 +201,8 @@ func (t *PulumiServiceTeamResource) Update(req *pulumirpc.UpdateRequest) (*pulum
 		t.updateTeam(context.Background(), inputsChanged)
 	}
 
-	if !Equal(teamOld.Members, teamNew.Members) {
+	// github teams can't manage membership.
+	if !Equal(teamOld.Members, teamNew.Members) && teamNew.Type != "github" {
 		inputsChanged.Members = teamNew.Members
 		for _, usernameToDelete := range teamOld.Members {
 			if !InSlice(usernameToDelete, teamNew.Members) {
@@ -289,12 +283,12 @@ func (t *PulumiServiceTeamResource) updateTeam(ctx context.Context, input Pulumi
 }
 
 func (t *PulumiServiceTeamResource) createTeam(ctx context.Context, input PulumiServiceTeamInput) (*string, error) {
-	_, err := t.client.CreateTeam(ctx, input.OrganizationName, input.Name, input.Type, input.DisplayName, input.Description, input.GitHubTeamID)
+	team, err := t.client.CreateTeam(ctx, input.OrganizationName, input.Name, input.Type, input.DisplayName, input.Description, input.GitHubTeamID)
 	if err != nil {
 		return nil, err
 	}
 
-	teamUrn := fmt.Sprintf("%s/%s", input.OrganizationName, input.Name)
+	teamUrn := fmt.Sprintf("%s/%s", input.OrganizationName, team.Name)
 	return &teamUrn, nil
 }
 

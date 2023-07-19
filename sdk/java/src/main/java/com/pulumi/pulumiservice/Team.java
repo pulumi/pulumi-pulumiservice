@@ -78,14 +78,14 @@ public class Team extends com.pulumi.resources.CustomResource {
         return Codegen.optional(this.members);
     }
     /**
-     * The team name.
+     * The team&#39;s name. Required for &#34;pulumi&#34; teams.
      * 
      */
     @Export(name="name", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> name;
 
     /**
-     * @return The team name.
+     * @return The team&#39;s name. Required for &#34;pulumi&#34; teams.
      * 
      */
     public Output<Optional<String>> name() {
