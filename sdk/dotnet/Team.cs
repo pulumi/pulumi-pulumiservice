@@ -28,19 +28,25 @@ namespace Pulumi.PulumiService
         public Output<string?> DisplayName { get; private set; } = null!;
 
         /// <summary>
+        /// The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for "github" teams.
+        /// </summary>
+        [Output("githubTeamId")]
+        public Output<double?> GithubTeamId { get; private set; } = null!;
+
+        /// <summary>
         /// List of team members.
         /// </summary>
         [Output("members")]
         public Output<ImmutableArray<string>> Members { get; private set; } = null!;
 
         /// <summary>
-        /// The team name.
+        /// The team's name. Required for "pulumi" teams.
         /// </summary>
         [Output("name")]
         public Output<string?> Name { get; private set; } = null!;
 
         /// <summary>
-        /// The organization's name.
+        /// The name of the Pulumi organization the team belongs to.
         /// </summary>
         [Output("organizationName")]
         public Output<string?> OrganizationName { get; private set; } = null!;
@@ -108,6 +114,12 @@ namespace Pulumi.PulumiService
         [Input("displayName")]
         public Input<string>? DisplayName { get; set; }
 
+        /// <summary>
+        /// The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for "github" teams.
+        /// </summary>
+        [Input("githubTeamId")]
+        public Input<double>? GithubTeamId { get; set; }
+
         [Input("members")]
         private InputList<string>? _members;
 
@@ -121,13 +133,13 @@ namespace Pulumi.PulumiService
         }
 
         /// <summary>
-        /// The team name.
+        /// The team's name. Required for "pulumi" teams.
         /// </summary>
-        [Input("name", required: true)]
-        public Input<string> Name { get; set; } = null!;
+        [Input("name")]
+        public Input<string>? Name { get; set; }
 
         /// <summary>
-        /// The organization's name.
+        /// The name of the Pulumi organization the team belongs to.
         /// </summary>
         [Input("organizationName", required: true)]
         public Input<string> OrganizationName { get; set; } = null!;

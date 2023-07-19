@@ -454,7 +454,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The team name.",
+          "description": "The team's name. Required for \"pulumi\" teams.",
           "type": "string"
         },
         "displayName": {
@@ -473,8 +473,12 @@
           }
         },
         "organizationName": {
-          "description": "The organization's name.",
+          "description": "The name of the Pulumi organization the team belongs to.",
           "type": "string"
+        },
+        "githubTeamId": {
+            "description": "The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for \"github\" teams.",
+            "type": "number"
         }
       },
       "inputProperties": {
@@ -483,7 +487,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The team name.",
+          "description": "The team's name. Required for \"pulumi\" teams.",
           "type": "string"
         },
         "displayName": {
@@ -502,11 +506,15 @@
           }
         },
         "organizationName": {
-          "description": "The organization's name.",
+          "description": "The name of the Pulumi organization the team belongs to.",
           "type": "string"
+        },
+        "githubTeamId": {
+            "description": "The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for \"github\" teams.",
+            "type": "number"
         }
       },
-      "requiredInputs": ["name", "organizationName", "teamType"]
+      "requiredInputs": ["organizationName", "teamType"]
     },
     "pulumiservice:index:TeamAccessToken": {
       "description": "The Pulumi Cloud allows users to create access tokens scoped to team. Team access tokens is a resource to create them and assign them to a team",

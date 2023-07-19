@@ -9,6 +9,7 @@ import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.TeamArgs;
 import com.pulumi.pulumiservice.Utilities;
+import java.lang.Double;
 import java.lang.String;
 import java.util.List;
 import java.util.Optional;
@@ -49,6 +50,20 @@ public class Team extends com.pulumi.resources.CustomResource {
         return Codegen.optional(this.displayName);
     }
     /**
+     * The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for &#34;github&#34; teams.
+     * 
+     */
+    @Export(name="githubTeamId", refs={Double.class}, tree="[0]")
+    private Output</* @Nullable */ Double> githubTeamId;
+
+    /**
+     * @return The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for &#34;github&#34; teams.
+     * 
+     */
+    public Output<Optional<Double>> githubTeamId() {
+        return Codegen.optional(this.githubTeamId);
+    }
+    /**
      * List of team members.
      * 
      */
@@ -63,28 +78,28 @@ public class Team extends com.pulumi.resources.CustomResource {
         return Codegen.optional(this.members);
     }
     /**
-     * The team name.
+     * The team&#39;s name. Required for &#34;pulumi&#34; teams.
      * 
      */
     @Export(name="name", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> name;
 
     /**
-     * @return The team name.
+     * @return The team&#39;s name. Required for &#34;pulumi&#34; teams.
      * 
      */
     public Output<Optional<String>> name() {
         return Codegen.optional(this.name);
     }
     /**
-     * The organization&#39;s name.
+     * The name of the Pulumi organization the team belongs to.
      * 
      */
     @Export(name="organizationName", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> organizationName;
 
     /**
-     * @return The organization&#39;s name.
+     * @return The name of the Pulumi organization the team belongs to.
      * 
      */
     public Output<Optional<String>> organizationName() {

@@ -35,6 +35,7 @@ type PulumiServiceTeamInput struct {
 	Description      string
 	OrganizationName string
 	Members          []string
+	GitHubTeamID     int64
 }
 
 func (i *PulumiServiceTeamInput) ToPropertyMap() resource.PropertyMap {
@@ -45,6 +46,7 @@ func (i *PulumiServiceTeamInput) ToPropertyMap() resource.PropertyMap {
 	pm["description"] = resource.NewPropertyValue(i.Description)
 	pm["members"] = resource.NewPropertyValue(i.Members)
 	pm["organizationName"] = resource.NewPropertyValue(i.OrganizationName)
+	pm["githubTeamId"] = resource.NewPropertyValue(i.GitHubTeamID)
 	return pm
 }
 
@@ -85,6 +87,10 @@ func ToPulumiServiceTeamInput(inputMap resource.PropertyMap) PulumiServiceTeamIn
 		input.OrganizationName = inputMap["organizationName"].StringValue()
 	}
 
+	if inputMap["githubTeamId"].HasValue() && inputMap["githubTeamId"].IsNumber() {
+		input.GitHubTeamID = int64(inputMap["githubTeamId"].NumberValue())
+	}
+
 	return input
 }
 
@@ -97,7 +103,41 @@ func (t *PulumiServiceTeamResource) Configure(config PulumiServiceConfig) {
 }
 
 func (t *PulumiServiceTeamResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: nil}, nil
+	news := req.GetNews()
+	newsMap, err := plugin.UnmarshalProperties(news, plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	if err != nil {
+		return nil, err
+	}
+
+	var failures []*pulumirpc.CheckFailure
+
+	var teamType string
+	if newsMap["teamType"].HasValue() {
+		teamType = newsMap["teamType"].StringValue()
+	}
+
+	if teamType != "github" && teamType != "pulumi" {
+		failures = append(failures, &pulumirpc.CheckFailure{
+			Reason:   fmt.Sprintf("found %q instead of 'pulumi' or 'github'", teamType),
+			Property: "type",
+		})
+	}
+
+	if teamType == "github" && !newsMap["githubTeamId"].HasValue() {
+		failures = append(failures, &pulumirpc.CheckFailure{
+			Reason:   "github teams require a githubTeamId",
+			Property: "githubTeamId",
+		})
+	}
+
+	if teamType == "pulumi" && !newsMap["name"].HasValue() {
+		failures = append(failures, &pulumirpc.CheckFailure{
+			Reason:   "pulumi teams require a name",
+			Property: "name",
+		})
+	}
+
+	return &pulumirpc.CheckResponse{Inputs: news, Failures: failures}, nil
 }
 
 func (t *PulumiServiceTeamResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
@@ -138,7 +178,38 @@ func (t *PulumiServiceTeamResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc
 }
 
 func (t *PulumiServiceTeamResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	return nil, errors.New("Read construct is not yet implemented")
+	ctx := context.Background()
+
+	orgName, teamName, err := splitSingleSlashString(req.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	team, err := t.client.GetTeam(ctx, orgName, teamName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read Team (%q): %w", req.Id, err)
+	}
+	if team == nil {
+		return &pulumirpc.ReadResponse{}, nil
+	}
+	inputs := PulumiServiceTeamInput{
+		Description:      team.Description,
+		DisplayName:      team.DisplayName,
+		Name:             team.Name,
+		Type:             team.Type,
+		OrganizationName: orgName,
+	}
+	for _, m := range team.Members {
+		inputs.Members = append(inputs.Members, m.GithubLogin)
+	}
+	props, err := plugin.MarshalProperties(inputs.ToPropertyMap(), plugin.MarshalOptions{})
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal inputs to properties: %w", err)
+	}
+	return &pulumirpc.ReadResponse{
+		Id:         req.Id,
+		Properties: props,
+	}, nil
 }
 
 func (t *PulumiServiceTeamResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
@@ -164,7 +235,8 @@ func (t *PulumiServiceTeamResource) Update(req *pulumirpc.UpdateRequest) (*pulum
 		t.updateTeam(context.Background(), inputsChanged)
 	}
 
-	if !Equal(teamOld.Members, teamNew.Members) {
+	// github teams can't manage membership.
+	if !Equal(teamOld.Members, teamNew.Members) && teamNew.Type != "github" {
 		inputsChanged.Members = teamNew.Members
 		for _, usernameToDelete := range teamOld.Members {
 			if !InSlice(usernameToDelete, teamNew.Members) {
@@ -245,17 +317,16 @@ func (t *PulumiServiceTeamResource) updateTeam(ctx context.Context, input Pulumi
 }
 
 func (t *PulumiServiceTeamResource) createTeam(ctx context.Context, input PulumiServiceTeamInput) (*string, error) {
-	_, err := t.client.CreateTeam(ctx, input.OrganizationName, input.Name, input.Type, input.DisplayName, input.Description)
+	team, err := t.client.CreateTeam(ctx, input.OrganizationName, input.Name, input.Type, input.DisplayName, input.Description, input.GitHubTeamID)
 	if err != nil {
 		return nil, err
 	}
 
-	teamUrn := fmt.Sprintf("%s/%s", input.OrganizationName, input.Name)
+	teamUrn := fmt.Sprintf("%s/%s", input.OrganizationName, team.Name)
 	return &teamUrn, nil
 }
 
 func (t *PulumiServiceTeamResource) deleteFromTeam(ctx context.Context, orgName string, teamName string, userName string) error {
-
 	if len(orgName) == 0 {
 		return errors.New("orgname must not be empty")
 	}
@@ -269,7 +340,6 @@ func (t *PulumiServiceTeamResource) deleteFromTeam(ctx context.Context, orgName 
 	}
 
 	return t.client.DeleteMemberFromTeam(ctx, orgName, teamName, userName)
-
 }
 
 func (t *PulumiServiceTeamResource) addToTeam(ctx context.Context, orgName string, teamName string, userName string) error {

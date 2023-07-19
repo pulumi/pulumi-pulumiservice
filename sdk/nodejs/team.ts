@@ -43,15 +43,19 @@ export class Team extends pulumi.CustomResource {
      */
     public readonly displayName!: pulumi.Output<string | undefined>;
     /**
+     * The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for "github" teams.
+     */
+    public readonly githubTeamId!: pulumi.Output<number | undefined>;
+    /**
      * List of team members.
      */
     public readonly members!: pulumi.Output<string[] | undefined>;
     /**
-     * The team name.
+     * The team's name. Required for "pulumi" teams.
      */
     public readonly name!: pulumi.Output<string | undefined>;
     /**
-     * The organization's name.
+     * The name of the Pulumi organization the team belongs to.
      */
     public readonly organizationName!: pulumi.Output<string | undefined>;
     /**
@@ -70,9 +74,6 @@ export class Team extends pulumi.CustomResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
-            if ((!args || args.name === undefined) && !opts.urn) {
-                throw new Error("Missing required property 'name'");
-            }
             if ((!args || args.organizationName === undefined) && !opts.urn) {
                 throw new Error("Missing required property 'organizationName'");
             }
@@ -81,6 +82,7 @@ export class Team extends pulumi.CustomResource {
             }
             resourceInputs["description"] = args ? args.description : undefined;
             resourceInputs["displayName"] = args ? args.displayName : undefined;
+            resourceInputs["githubTeamId"] = args ? args.githubTeamId : undefined;
             resourceInputs["members"] = args ? args.members : undefined;
             resourceInputs["name"] = args ? args.name : undefined;
             resourceInputs["organizationName"] = args ? args.organizationName : undefined;
@@ -88,6 +90,7 @@ export class Team extends pulumi.CustomResource {
         } else {
             resourceInputs["description"] = undefined /*out*/;
             resourceInputs["displayName"] = undefined /*out*/;
+            resourceInputs["githubTeamId"] = undefined /*out*/;
             resourceInputs["members"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
             resourceInputs["organizationName"] = undefined /*out*/;
@@ -111,15 +114,19 @@ export interface TeamArgs {
      */
     displayName?: pulumi.Input<string>;
     /**
+     * The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for "github" teams.
+     */
+    githubTeamId?: pulumi.Input<number>;
+    /**
      * List of team members.
      */
     members?: pulumi.Input<pulumi.Input<string>[]>;
     /**
-     * The team name.
+     * The team's name. Required for "pulumi" teams.
      */
-    name: pulumi.Input<string>;
+    name?: pulumi.Input<string>;
     /**
-     * The organization's name.
+     * The name of the Pulumi organization the team belongs to.
      */
     organizationName: pulumi.Input<string>;
     /**

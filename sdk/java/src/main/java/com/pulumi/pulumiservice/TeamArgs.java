@@ -5,6 +5,7 @@ package com.pulumi.pulumiservice;
 
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
+import java.lang.Double;
 import java.lang.String;
 import java.util.List;
 import java.util.Objects;
@@ -47,6 +48,21 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
+     * The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for &#34;github&#34; teams.
+     * 
+     */
+    @Import(name="githubTeamId")
+    private @Nullable Output<Double> githubTeamId;
+
+    /**
+     * @return The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for &#34;github&#34; teams.
+     * 
+     */
+    public Optional<Output<Double>> githubTeamId() {
+        return Optional.ofNullable(this.githubTeamId);
+    }
+
+    /**
      * List of team members.
      * 
      */
@@ -62,29 +78,29 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * The team name.
+     * The team&#39;s name. Required for &#34;pulumi&#34; teams.
      * 
      */
-    @Import(name="name", required=true)
-    private Output<String> name;
+    @Import(name="name")
+    private @Nullable Output<String> name;
 
     /**
-     * @return The team name.
+     * @return The team&#39;s name. Required for &#34;pulumi&#34; teams.
      * 
      */
-    public Output<String> name() {
-        return this.name;
+    public Optional<Output<String>> name() {
+        return Optional.ofNullable(this.name);
     }
 
     /**
-     * The organization&#39;s name.
+     * The name of the Pulumi organization the team belongs to.
      * 
      */
     @Import(name="organizationName", required=true)
     private Output<String> organizationName;
 
     /**
-     * @return The organization&#39;s name.
+     * @return The name of the Pulumi organization the team belongs to.
      * 
      */
     public Output<String> organizationName() {
@@ -111,6 +127,7 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
     private TeamArgs(TeamArgs $) {
         this.description = $.description;
         this.displayName = $.displayName;
+        this.githubTeamId = $.githubTeamId;
         this.members = $.members;
         this.name = $.name;
         this.organizationName = $.organizationName;
@@ -178,6 +195,27 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
+         * @param githubTeamId The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for &#34;github&#34; teams.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder githubTeamId(@Nullable Output<Double> githubTeamId) {
+            $.githubTeamId = githubTeamId;
+            return this;
+        }
+
+        /**
+         * @param githubTeamId The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for &#34;github&#34; teams.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder githubTeamId(Double githubTeamId) {
+            return githubTeamId(Output.of(githubTeamId));
+        }
+
+        /**
          * @param members List of team members.
          * 
          * @return builder
@@ -209,18 +247,18 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param name The team name.
+         * @param name The team&#39;s name. Required for &#34;pulumi&#34; teams.
          * 
          * @return builder
          * 
          */
-        public Builder name(Output<String> name) {
+        public Builder name(@Nullable Output<String> name) {
             $.name = name;
             return this;
         }
 
         /**
-         * @param name The team name.
+         * @param name The team&#39;s name. Required for &#34;pulumi&#34; teams.
          * 
          * @return builder
          * 
@@ -230,7 +268,7 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param organizationName The organization&#39;s name.
+         * @param organizationName The name of the Pulumi organization the team belongs to.
          * 
          * @return builder
          * 
@@ -241,7 +279,7 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param organizationName The organization&#39;s name.
+         * @param organizationName The name of the Pulumi organization the team belongs to.
          * 
          * @return builder
          * 
@@ -272,7 +310,6 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         public TeamArgs build() {
-            $.name = Objects.requireNonNull($.name, "expected parameter 'name' to be non-null");
             $.organizationName = Objects.requireNonNull($.organizationName, "expected parameter 'organizationName' to be non-null");
             $.teamType = Objects.requireNonNull($.teamType, "expected parameter 'teamType' to be non-null");
             return $;
