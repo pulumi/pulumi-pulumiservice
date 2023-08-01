@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"path"
 
 	pbempty "github.com/golang/protobuf/ptypes/empty"
@@ -529,7 +530,15 @@ func (ds *PulumiServiceDeploymentSettingsResource) Read(req *pulumirpc.ReadReque
 	}
 	settings, err := ds.client.GetDeploymentSettings(ctx, stack)
 	if err != nil {
+		statusCode := pulumiapi.GetErrorStatusCode(err)
+		if statusCode == http.StatusNotFound {
+			// deleteResponse causes the resource to be deleted from the state.
+			var deleteResponse = &pulumirpc.ReadResponse{Id: "", Properties: nil}
+			// If it's a 404 error, this resource was probably deleted.
+			return deleteResponse, nil
+		}
 		return nil, err
+
 	}
 
 	dsInput := PulumiServiceDeploymentSettingsInput{

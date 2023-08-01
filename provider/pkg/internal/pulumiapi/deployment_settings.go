@@ -2,7 +2,6 @@ package pulumiapi
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/http"
 	"path"
@@ -81,9 +80,11 @@ func (c *Client) GetDeploymentSettings(ctx context.Context, stack StackName) (*D
 	var ds DeploymentSettings
 	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &ds)
 	if err != nil {
-		var errResp *errorResponse
-		if errors.As(err, &errResp) && errResp.StatusCode == http.StatusNotFound {
-			return nil, fmt.Errorf("deployment settings for stack (%s) not found", stack.String())
+		statusCode := GetErrorStatusCode(err)
+		if statusCode == http.StatusNotFound {
+			// Important: do now wrap this error so the provider knows to handle it as a
+			// deleted resource
+			return nil, err
 		}
 		return nil, fmt.Errorf("failed to get deployment settings for stack (%s): %w", stack.String(), err)
 	}
