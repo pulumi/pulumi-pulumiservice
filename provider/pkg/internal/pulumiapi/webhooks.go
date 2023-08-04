@@ -21,6 +21,14 @@ import (
 	"path"
 )
 
+type WebhookClient interface {
+	CreateWebhook(ctx context.Context, req WebhookRequest) (*Webhook, error)
+	ListWebhooks(ctx context.Context, orgName string, projectName, stackName *string) ([]Webhook, error)
+	GetWebhook(ctx context.Context, orgName string, projectName, stackName *string, webhookName string) (*Webhook, error)
+	UpdateWebhook(ctx context.Context, req UpdateWebhookRequest) error
+	DeleteWebhook(ctx context.Context, orgName string, projectName, stackName *string, name string) error
+}
+
 type Webhook struct {
 	Active      bool
 	DisplayName string
@@ -121,6 +129,11 @@ func (c *Client) GetWebhook(ctx context.Context,
 	var webhook Webhook
 	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &webhook)
 	if err != nil {
+		statusCode := GetErrorStatusCode(err)
+		if statusCode == http.StatusNotFound {
+			// Important: we return nil here to hint it was not found
+			return nil, nil
+		}
 		return nil, fmt.Errorf("failed to get webhook: %w", err)
 	}
 	return &webhook, nil

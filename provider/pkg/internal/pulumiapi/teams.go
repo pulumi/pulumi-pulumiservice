@@ -21,6 +21,18 @@ import (
 	"path"
 )
 
+type TeamClient interface {
+	ListTeams(ctx context.Context, orgName string) ([]Team, error)
+	GetTeam(ctx context.Context, orgName string, teamName string) (*Team, error)
+	CreateTeam(ctx context.Context, orgName, teamName, teamType, displayName, description string, teamID int64) (*Team, error)
+	UpdateTeam(ctx context.Context, orgName, teamName, displayName, description string) error
+	DeleteTeam(ctx context.Context, orgName, teamName string) error
+	AddMemberToTeam(ctx context.Context, orgName, teamName, userName string) error
+	DeleteMemberFromTeam(ctx context.Context, orgName, teamName, userName string) error
+	AddStackPermission(ctx context.Context, stack StackName, teamName string, permission int) error
+	RemoveStackPermission(ctx context.Context, stack StackName, teamName string) error
+}
+
 type Teams struct {
 	Teams []Team
 }
@@ -107,6 +119,11 @@ func (c *Client) GetTeam(ctx context.Context, orgName string, teamName string) (
 	var team Team
 	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &team)
 	if err != nil {
+		statusCode := GetErrorStatusCode(err)
+		if statusCode == http.StatusNotFound {
+			// Important: we return nil here to hint it was not found
+			return nil, nil
+		}
 		return nil, fmt.Errorf("failed to get team: %w", err)
 	}
 

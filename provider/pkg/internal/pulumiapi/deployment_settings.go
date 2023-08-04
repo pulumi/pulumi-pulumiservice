@@ -9,6 +9,12 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
 )
 
+type DeploymentSettingsClient interface {
+	CreateDeploymentSettings(ctx context.Context, stack StackName, ds DeploymentSettings) error
+	GetDeploymentSettings(ctx context.Context, stack StackName) (*DeploymentSettings, error)
+	DeleteDeploymentSettings(ctx context.Context, stack StackName) error
+}
+
 type DeploymentSettings struct {
 	OperationContext *OperationContext        `json:"operationContext,omitempty"`
 	GitHub           *GitHubConfiguration     `json:"gitHub,omitempty"`
@@ -82,9 +88,8 @@ func (c *Client) GetDeploymentSettings(ctx context.Context, stack StackName) (*D
 	if err != nil {
 		statusCode := GetErrorStatusCode(err)
 		if statusCode == http.StatusNotFound {
-			// Important: do now wrap this error so the provider knows to handle it as a
-			// deleted resource
-			return nil, err
+			// Important: we return nil here to hint it was not found
+			return nil, nil
 		}
 		return nil, fmt.Errorf("failed to get deployment settings for stack (%s): %w", stack.String(), err)
 	}
