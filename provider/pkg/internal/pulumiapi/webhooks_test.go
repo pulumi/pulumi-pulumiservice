@@ -141,6 +141,22 @@ func TestGetWebhook(t *testing.T) {
 		assert.Nil(t, actualWebhook, "webhooks should be nil since error was returned")
 		assert.EqualError(t, err, "failed to get webhook: 401 API error: unauthorized")
 	})
+
+	t.Run("404", func(t *testing.T) {
+		c, cleanup := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodGet,
+			ExpectedReqPath:   "/api/orgs/an-organization/hooks/a-webhook",
+			ResponseCode:      404,
+			ResponseBody: errorResponse{
+				StatusCode: 404,
+				Message:    "not found",
+			},
+		})
+		defer cleanup()
+		actualWebhook, err := c.GetWebhook(ctx, orgName, nil, nil, webhookName)
+		assert.Nil(t, actualWebhook, "webhook should be nil since error was returned")
+		assert.Nil(t, err, "err should be nil since error was returned")
+	})
 }
 
 func TestUpdateWebhook(t *testing.T) {
