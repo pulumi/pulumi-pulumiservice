@@ -19,7 +19,7 @@ import (
 
 type PulumiServiceTeamResource struct {
 	config PulumiServiceConfig
-	client *pulumiapi.Client
+	client pulumiapi.TeamClient
 }
 
 type PulumiServiceTeamStackPermission struct {

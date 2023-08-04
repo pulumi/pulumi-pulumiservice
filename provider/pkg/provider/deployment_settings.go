@@ -179,7 +179,7 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap() resource.Propert
 }
 
 type PulumiServiceDeploymentSettingsResource struct {
-	client *pulumiapi.Client
+	client pulumiapi.DeploymentSettingsClient
 }
 
 func (ds *PulumiServiceDeploymentSettingsResource) ToPulumiServiceDeploymentSettingsInput(inputMap resource.PropertyMap) PulumiServiceDeploymentSettingsInput {
@@ -530,6 +530,11 @@ func (ds *PulumiServiceDeploymentSettingsResource) Read(req *pulumirpc.ReadReque
 	settings, err := ds.client.GetDeploymentSettings(ctx, stack)
 	if err != nil {
 		return nil, err
+	}
+
+	if settings == nil {
+		// Empty response causes the resource to be deleted from the state.
+		return &pulumirpc.ReadResponse{Id: "", Properties: nil}, nil
 	}
 
 	dsInput := PulumiServiceDeploymentSettingsInput{

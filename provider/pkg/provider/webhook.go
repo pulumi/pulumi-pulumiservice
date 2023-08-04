@@ -15,7 +15,7 @@ import (
 
 type PulumiServiceWebhookResource struct {
 	config PulumiServiceConfig
-	client *pulumiapi.Client
+	client pulumiapi.WebhookClient
 }
 
 type PulumiServiceWebhookInput struct {
@@ -374,6 +374,10 @@ func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulum
 	webhook, err := wh.getWebhook(req.Id)
 	if err != nil {
 		return nil, err
+	}
+
+	if webhook == nil {
+		return &pulumirpc.ReadResponse{}, nil
 	}
 
 	hookID, err := splitWebhookID(req.Id)

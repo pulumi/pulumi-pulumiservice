@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//	http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,7 +13,10 @@
 // limitations under the License.
 package pulumiapi
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 // errorResponse is returned from pulumi service api when there's been an error
 type errorResponse struct {
@@ -23,4 +26,12 @@ type errorResponse struct {
 
 func (err *errorResponse) Error() string {
 	return fmt.Sprintf("%d API error: %s", err.StatusCode, err.Message)
+}
+
+func GetErrorStatusCode(err error) int {
+	var errResp *errorResponse
+	if errors.As(err, &errResp) {
+		return errResp.StatusCode
+	}
+	return 0
 }

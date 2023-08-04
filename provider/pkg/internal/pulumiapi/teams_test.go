@@ -93,6 +93,22 @@ func TestGetTeam(t *testing.T) {
 		assert.Nil(t, team, "team should be nil since error was returned")
 		assert.EqualError(t, err, "failed to get team: 401 API error: unauthorized")
 	})
+
+	t.Run("404", func(t *testing.T) {
+		c, cleanup := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodGet,
+			ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team",
+			ResponseCode:      404,
+			ResponseBody: errorResponse{
+				StatusCode: 404,
+				Message:    "not found",
+			},
+		})
+		defer cleanup()
+		team, err := c.GetTeam(ctx, orgName, teamName)
+		assert.Nil(t, team, "team should be nil since 404 was returned")
+		assert.Nil(t, err, "err should be nil since 404 was returned")
+	})
 }
 
 func TestCreateTeam(t *testing.T) {
