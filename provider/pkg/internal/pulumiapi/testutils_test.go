@@ -34,6 +34,7 @@ func startTestServer(t *testing.T, config testServerConfig) (client *Client, cle
 		assert.Equal(t, "token "+token, r.Header.Get("Authorization"))
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 		assert.Equal(t, "application/vnd.pulumi+8", r.Header.Get("Accept"))
+		assert.Equal(t, "provider", r.Header.Get("X-Pulumi-Source"))
 
 		// if we expected a request body, unmarshal the body and
 		if config.ExpectedReqBody != nil {

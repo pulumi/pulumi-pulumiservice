@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestDeploymentSettings(t *testing.T) {
+func TestGetDeploymentSettings(t *testing.T) {
 
 	orgName := "an-organization"
 	projectName := "a-project"
@@ -61,5 +61,37 @@ func TestDeploymentSettings(t *testing.T) {
 
 		assert.Nil(t, ds, "deployment settings should be nil since error was returned")
 		assert.Nil(t, err, "err should be nil since error was returned")
+	})
+}
+
+func TestCreateDeploymentSettings(t *testing.T) {
+
+	orgName := "an-organization"
+	projectName := "a-project"
+	stackName := "a-stack"
+
+	t.Run("Happy Path", func(t *testing.T) {
+		dsValue := DeploymentSettings{
+			OperationContext: &OperationContext{},
+			GitHub:           &GitHubConfiguration{},
+			SourceContext:    &apitype.SourceContext{},
+			ExecutorContext:  &apitype.ExecutorContext{},
+		}
+
+		c, cleanup := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodPost,
+			ExpectedReqPath:   "/" + path.Join("api", "preview", orgName, projectName, stackName, "deployment", "settings"),
+			ResponseCode:      201,
+			ExpectedReqBody:   dsValue,
+		})
+		defer cleanup()
+
+		err := c.CreateDeploymentSettings(ctx, StackName{
+			OrgName:     orgName,
+			ProjectName: projectName,
+			StackName:   stackName,
+		}, dsValue)
+
+		assert.Nil(t, err)
 	})
 }

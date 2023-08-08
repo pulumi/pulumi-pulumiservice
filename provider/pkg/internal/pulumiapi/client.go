@@ -70,9 +70,11 @@ func (c *Client) createRequest(ctx context.Context, method, path string, reqBody
 	}
 
 	// add default headers
+	req.Header.Add("X-Pulumi-Source", "provider")
 	req.Header.Add("Accept", "application/vnd.pulumi+8")
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Authorization", "token "+c.token)
+
 	return req, nil
 }
 
