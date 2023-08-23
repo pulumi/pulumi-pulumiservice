@@ -24,6 +24,12 @@ namespace Pulumi.PulumiService.Inputs
         [Input("skipInstallDependencies")]
         public Input<bool>? SkipInstallDependencies { get; set; }
 
+        /// <summary>
+        /// Skip duplicated queued operations (it will only execute the last deployment of the same type)
+        /// </summary>
+        [Input("skipIntermediateDeployments")]
+        public Input<bool>? SkipIntermediateDeployments { get; set; }
+
         public OperationContextOptionsArgs()
         {
         }

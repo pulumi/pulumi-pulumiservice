@@ -95,6 +95,9 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap() resource.Propert
 			if ds.OperationContext.Options.SkipInstallDependencies {
 				optionsMap["skipInstallDependencies"] = resource.NewPropertyValue(true)
 			}
+			if ds.OperationContext.Options.SkipIntermediateDeployments {
+				optionsMap["skipIntermediateDeployments"] = resource.NewPropertyValue(true)
+			}
 			ocMap["options"] = resource.PropertyValue{V: optionsMap}
 		}
 		if ds.OperationContext.OIDC != nil {
@@ -364,6 +367,10 @@ func toOperationContext(inputMap resource.PropertyMap) *pulumiapi.OperationConte
 
 		if oInput["skipInstallDependencies"].HasValue() && oInput["skipInstallDependencies"].IsBool() {
 			o.SkipInstallDependencies = oInput["skipInstallDependencies"].BoolValue()
+		}
+
+		if oInput["skipIntermediateDeployments"].HasValue() && oInput["skipIntermediateDeployments"].IsBool() {
+			o.SkipIntermediateDeployments = oInput["skipIntermediateDeployments"].BoolValue()
 		}
 
 		if oInput["Shell"].HasValue() && oInput["Shell"].IsString() {

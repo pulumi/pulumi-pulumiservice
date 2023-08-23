@@ -4,7 +4,11 @@
   "description": "A native Pulumi package for creating and managing Pulumi Cloud constructs",
   "homepage": "https://pulumi.com",
   "repository": "https://github.com/pulumi/pulumi-pulumiservice",
-  "keywords": ["pulumi", "kind/native", "category/infrastructure"],
+  "keywords": [
+    "pulumi",
+    "kind/native",
+    "category/infrastructure"
+  ],
   "license": "Apache-2.0",
   "publisher": "Pulumi",
   "config": {
@@ -23,7 +27,9 @@
         "type": "string",
         "default": "",
         "defaultInfo": {
-          "environment": ["PULUMI_ACCESS_TOKEN"]
+          "environment": [
+            "PULUMI_ACCESS_TOKEN"
+          ]
         }
       }
     }
@@ -78,72 +84,72 @@
         {
           "value": "stack_deleted",
           "description": "Trigger a webhook when a stack is deleted. Only valid for org webhooks.",
-            "name": "StackDeleted"
+          "name": "StackDeleted"
         },
         {
           "value": "update_succeeded",
           "description": "Trigger a webhook when a stack update succeeds.",
-            "name": "UpdateSucceeded"
+          "name": "UpdateSucceeded"
         },
         {
           "value": "update_failed",
           "description": "Trigger a webhook when a stack update fails.",
-            "name": "UpdateFailed"
+          "name": "UpdateFailed"
         },
         {
           "value": "preview_succeeded",
           "description": "Trigger a webhook when a stack preview succeeds.",
-            "name": "PreviewSucceeded"
+          "name": "PreviewSucceeded"
         },
         {
           "value": "preview_failed",
           "description": "Trigger a webhook when a stack preview fails.",
-            "name": "PreviewFailed"
+          "name": "PreviewFailed"
         },
         {
           "value": "destroy_succeeded",
           "description": "Trigger a webhook when a stack destroy succeeds.",
-            "name": "DestroySucceeded"
+          "name": "DestroySucceeded"
         },
         {
           "value": "destroy_failed",
           "description": "Trigger a webhook when a stack destroy fails.",
-            "name": "DestroyFailed"
+          "name": "DestroyFailed"
         },
         {
           "value": "refresh_succeeded",
           "description": "Trigger a webhook when a stack refresh succeeds.",
-            "name": "RefreshSucceeded"
+          "name": "RefreshSucceeded"
         },
         {
           "value": "refresh_failed",
           "description": "Trigger a webhook when a stack refresh fails.",
-            "name": "RefreshFailed"
+          "name": "RefreshFailed"
         },
         {
           "value": "deployment_queued",
           "description": "Trigger a webhook when a deployment is queued.",
-            "name": "DeploymentQueued"
+          "name": "DeploymentQueued"
         },
         {
           "value": "deployment_started",
           "description": "Trigger a webhook when a deployment starts running.",
-            "name": "DeploymentStarted"
+          "name": "DeploymentStarted"
         },
         {
           "value": "deployment_succeeded",
           "description": "Trigger a webhook when a deployment succeeds.",
-            "name": "DeploymentSucceeded"
+          "name": "DeploymentSucceeded"
         },
         {
           "value": "deployment_failed",
           "description": "Trigger a webhook when a deployment fails.",
-            "name": "DeploymentFailed"
+          "name": "DeploymentFailed"
         }
       ]
     },
     "pulumiservice:index:DeploymentSettingsExecutorContext": {
-      "description":"The executor context defines information about the executor where the deployment is executed. If unspecified, the default 'pulumi/pulumi' image is used.",
+      "description": "The executor context defines information about the executor where the deployment is executed. If unspecified, the default 'pulumi/pulumi' image is used.",
       "properties": {
         "executorImage": {
           "type": "string",
@@ -156,7 +162,7 @@
       ]
     },
     "pulumiservice:index:DeploymentSettingsSourceContext": {
-      "description":"Settings related to the source of the deployment.",
+      "description": "Settings related to the source of the deployment.",
       "properties": {
         "git": {
           "$ref": "#/types/pulumiservice:index:DeploymentSettingsGitSource",
@@ -166,7 +172,7 @@
       "type": "object"
     },
     "pulumiservice:index:DeploymentSettingsGitSource": {
-      "description":"Git source settings for a deployment.",
+      "description": "Git source settings for a deployment.",
       "properties": {
         "repoUrl": {
           "type": "string",
@@ -191,8 +197,8 @@
       },
       "type": "object"
     },
-    "pulumiservice:index:DeploymentSettingsGitSourceGitAuth":  {
-      "description":"Git source settings for a deployment.",
+    "pulumiservice:index:DeploymentSettingsGitSourceGitAuth": {
+      "description": "Git source settings for a deployment.",
       "properties": {
         "sshAuth": {
           "$ref": "#/types/pulumiservice:index:DeploymentSettingsGitAuthSSHAuth",
@@ -310,6 +316,10 @@
         "skipInstallDependencies": {
           "type": "boolean",
           "description": "Skip the default dependency installation step - use this to customize the dependency installation (e.g. if using yarn or poetry)"
+        },
+        "skipIntermediateDeployments": {
+          "type": "boolean",
+          "description": "Skip duplicated queued operations (it will only execute the last deployment of the same type)"
         },
         "shell": {
           "type": "string",
@@ -444,7 +454,9 @@
           "type": "string"
         }
       },
-      "requiredInputs": ["description"]
+      "requiredInputs": [
+        "description"
+      ]
     },
     "pulumiservice:index:Team": {
       "description": "The Pulumi Cloud offers role-based access control (RBAC) using teams. Teams allow organization admins to assign a set of stack permissions to a group of users.",
@@ -477,8 +489,8 @@
           "type": "string"
         },
         "githubTeamId": {
-            "description": "The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for \"github\" teams.",
-            "type": "number"
+          "description": "The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for \"github\" teams.",
+          "type": "number"
         }
       },
       "inputProperties": {
@@ -510,11 +522,14 @@
           "type": "string"
         },
         "githubTeamId": {
-            "description": "The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for \"github\" teams.",
-            "type": "number"
+          "description": "The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for \"github\" teams.",
+          "type": "number"
         }
       },
-      "requiredInputs": ["organizationName", "teamType"]
+      "requiredInputs": [
+        "organizationName",
+        "teamType"
+      ]
     },
     "pulumiservice:index:TeamAccessToken": {
       "description": "The Pulumi Cloud allows users to create access tokens scoped to team. Team access tokens is a resource to create them and assign them to a team",
@@ -559,7 +574,11 @@
           "type": "string"
         }
       },
-      "requiredInputs": ["name", "teamName", "organizationName"]
+      "requiredInputs": [
+        "name",
+        "teamName",
+        "organizationName"
+      ]
     },
     "pulumiservice:index:OrgAccessToken": {
       "description": "The Pulumi Cloud allows users to create access tokens scoped to orgs. Org access tokens is a resource to create them and assign them to an org",
@@ -596,7 +615,10 @@
           "type": "string"
         }
       },
-      "requiredInputs": ["name", "organizationName"]
+      "requiredInputs": [
+        "name",
+        "organizationName"
+      ]
     },
     "pulumiservice:index:Webhook": {
       "description": "Pulumi Webhooks allow you to notify external services of events happening within your Pulumi organization or stack. For example, you can trigger a notification whenever a stack is updated. Whenever an event occurs, Pulumi will send an HTTP POST request to all registered webhooks. The webhook can then be used to emit some notification, start running integration tests, or even update additional stacks.\n\n### Import\n\nPulumi webhooks can be imported using the `id`, which for webhooks is `{org}/{project}/{stack}/{webhook-name}` e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:Webhook my_webhook my-org/my-project/my-stack/4b0d0671\n```\n\n",
@@ -627,23 +649,23 @@
           "type": "string"
         },
         "projectName": {
-            "description": "Name of the project. Only specified if this is a stack webhook.",
-            "type": "string"
+          "description": "Name of the project. Only specified if this is a stack webhook.",
+          "type": "string"
         },
         "stackName": {
-            "description": "Name of the stack. Only specified if this is a stack webhook.",
-            "type": "string"
+          "description": "Name of the stack. Only specified if this is a stack webhook.",
+          "type": "string"
         },
         "format": {
-            "description": "Format of the webhook payload. Can be either `raw` or `slack`. Defaults to `raw`.",
-            "$ref": "#/types/pulumiservice:index:WebhookFormat"
+          "description": "Format of the webhook payload. Can be either `raw` or `slack`. Defaults to `raw`.",
+          "$ref": "#/types/pulumiservice:index:WebhookFormat"
         },
         "filters": {
-            "description": "Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.",
-            "type": "array",
-            "items": {
-              "$ref": "#/types/pulumiservice:index:WebhookFilters"
-            }
+          "description": "Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.",
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:index:WebhookFilters"
+          }
         }
       },
       "inputProperties": {

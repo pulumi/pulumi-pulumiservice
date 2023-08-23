@@ -58,8 +58,9 @@ type AzureOIDCConfiguration struct {
 }
 
 type OperationContextOptions struct {
-	SkipInstallDependencies bool   `json:"skipInstallDependencies,omitempty"`
-	Shell                   string `json:"shell,omitempty"`
+	SkipInstallDependencies     bool   `json:"skipInstallDependencies,omitempty"`
+	SkipIntermediateDeployments bool   `json:"skipIntermediateDeployments,omitempty"`
+	Shell                       string `json:"shell,omitempty"`
 }
 
 type GitHubConfiguration struct {

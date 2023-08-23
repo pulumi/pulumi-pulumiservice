@@ -46,11 +46,27 @@ public final class OperationContextOptionsArgs extends com.pulumi.resources.Reso
         return Optional.ofNullable(this.skipInstallDependencies);
     }
 
+    /**
+     * Skip duplicated queued operations (it will only execute the last deployment of the same type)
+     * 
+     */
+    @Import(name="skipIntermediateDeployments")
+    private @Nullable Output<Boolean> skipIntermediateDeployments;
+
+    /**
+     * @return Skip duplicated queued operations (it will only execute the last deployment of the same type)
+     * 
+     */
+    public Optional<Output<Boolean>> skipIntermediateDeployments() {
+        return Optional.ofNullable(this.skipIntermediateDeployments);
+    }
+
     private OperationContextOptionsArgs() {}
 
     private OperationContextOptionsArgs(OperationContextOptionsArgs $) {
         this.shell = $.shell;
         this.skipInstallDependencies = $.skipInstallDependencies;
+        this.skipIntermediateDeployments = $.skipIntermediateDeployments;
     }
 
     public static Builder builder() {
@@ -111,6 +127,27 @@ public final class OperationContextOptionsArgs extends com.pulumi.resources.Reso
          */
         public Builder skipInstallDependencies(Boolean skipInstallDependencies) {
             return skipInstallDependencies(Output.of(skipInstallDependencies));
+        }
+
+        /**
+         * @param skipIntermediateDeployments Skip duplicated queued operations (it will only execute the last deployment of the same type)
+         * 
+         * @return builder
+         * 
+         */
+        public Builder skipIntermediateDeployments(@Nullable Output<Boolean> skipIntermediateDeployments) {
+            $.skipIntermediateDeployments = skipIntermediateDeployments;
+            return this;
+        }
+
+        /**
+         * @param skipIntermediateDeployments Skip duplicated queued operations (it will only execute the last deployment of the same type)
+         * 
+         * @return builder
+         * 
+         */
+        public Builder skipIntermediateDeployments(Boolean skipIntermediateDeployments) {
+            return skipIntermediateDeployments(Output.of(skipIntermediateDeployments));
         }
 
         public OperationContextOptionsArgs build() {

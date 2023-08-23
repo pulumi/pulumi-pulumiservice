@@ -240,4 +240,8 @@ export interface OperationContextOptionsArgs {
      * Skip the default dependency installation step - use this to customize the dependency installation (e.g. if using yarn or poetry)
      */
     skipInstallDependencies?: pulumi.Input<boolean>;
+    /**
+     * Skip duplicated queued operations (it will only execute the last deployment of the same type)
+     */
+    skipIntermediateDeployments?: pulumi.Input<boolean>;
 }

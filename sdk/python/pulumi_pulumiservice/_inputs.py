@@ -723,15 +723,19 @@ class OperationContextOIDCArgs:
 class OperationContextOptionsArgs:
     def __init__(__self__, *,
                  shell: Optional[pulumi.Input[str]] = None,
-                 skip_install_dependencies: Optional[pulumi.Input[bool]] = None):
+                 skip_install_dependencies: Optional[pulumi.Input[bool]] = None,
+                 skip_intermediate_deployments: Optional[pulumi.Input[bool]] = None):
         """
         :param pulumi.Input[str] shell: The shell to use to run commands during the deployment. Defaults to 'bash'.
         :param pulumi.Input[bool] skip_install_dependencies: Skip the default dependency installation step - use this to customize the dependency installation (e.g. if using yarn or poetry)
+        :param pulumi.Input[bool] skip_intermediate_deployments: Skip duplicated queued operations (it will only execute the last deployment of the same type)
         """
         if shell is not None:
             pulumi.set(__self__, "shell", shell)
         if skip_install_dependencies is not None:
             pulumi.set(__self__, "skip_install_dependencies", skip_install_dependencies)
+        if skip_intermediate_deployments is not None:
+            pulumi.set(__self__, "skip_intermediate_deployments", skip_intermediate_deployments)
 
     @property
     @pulumi.getter
@@ -756,5 +760,17 @@ class OperationContextOptionsArgs:
     @skip_install_dependencies.setter
     def skip_install_dependencies(self, value: Optional[pulumi.Input[bool]]):
         pulumi.set(self, "skip_install_dependencies", value)
+
+    @property
+    @pulumi.getter(name="skipIntermediateDeployments")
+    def skip_intermediate_deployments(self) -> Optional[pulumi.Input[bool]]:
+        """
+        Skip duplicated queued operations (it will only execute the last deployment of the same type)
+        """
+        return pulumi.get(self, "skip_intermediate_deployments")
+
+    @skip_intermediate_deployments.setter
+    def skip_intermediate_deployments(self, value: Optional[pulumi.Input[bool]]):
+        pulumi.set(self, "skip_intermediate_deployments", value)
 
 
