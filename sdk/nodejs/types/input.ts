@@ -241,7 +241,7 @@ export interface OperationContextOptionsArgs {
      */
     skipInstallDependencies?: pulumi.Input<boolean>;
     /**
-     * Skip pending deployments (Consolidate multiple deployments of the same type into one deployment)
+     * Skip intermediate deployments (Consolidate multiple deployments of the same type into one deployment)
      */
     skipIntermediateDeployments?: pulumi.Input<boolean>;
 }

@@ -47,14 +47,14 @@ public final class OperationContextOptionsArgs extends com.pulumi.resources.Reso
     }
 
     /**
-     * Skip pending deployments (Consolidate multiple deployments of the same type into one deployment)
+     * Skip intermediate deployments (Consolidate multiple deployments of the same type into one deployment)
      * 
      */
     @Import(name="skipIntermediateDeployments")
     private @Nullable Output<Boolean> skipIntermediateDeployments;
 
     /**
-     * @return Skip pending deployments (Consolidate multiple deployments of the same type into one deployment)
+     * @return Skip intermediate deployments (Consolidate multiple deployments of the same type into one deployment)
      * 
      */
     public Optional<Output<Boolean>> skipIntermediateDeployments() {
@@ -130,7 +130,7 @@ public final class OperationContextOptionsArgs extends com.pulumi.resources.Reso
         }
 
         /**
-         * @param skipIntermediateDeployments Skip pending deployments (Consolidate multiple deployments of the same type into one deployment)
+         * @param skipIntermediateDeployments Skip intermediate deployments (Consolidate multiple deployments of the same type into one deployment)
          * 
          * @return builder
          * 
@@ -141,7 +141,7 @@ public final class OperationContextOptionsArgs extends com.pulumi.resources.Reso
         }
 
         /**
-         * @param skipIntermediateDeployments Skip pending deployments (Consolidate multiple deployments of the same type into one deployment)
+         * @param skipIntermediateDeployments Skip intermediate deployments (Consolidate multiple deployments of the same type into one deployment)
          * 
          * @return builder
          * 
