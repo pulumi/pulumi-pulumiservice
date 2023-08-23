@@ -728,7 +728,7 @@ class OperationContextOptionsArgs:
         """
         :param pulumi.Input[str] shell: The shell to use to run commands during the deployment. Defaults to 'bash'.
         :param pulumi.Input[bool] skip_install_dependencies: Skip the default dependency installation step - use this to customize the dependency installation (e.g. if using yarn or poetry)
-        :param pulumi.Input[bool] skip_intermediate_deployments: Skip duplicated queued operations (it will only execute the last deployment of the same type)
+        :param pulumi.Input[bool] skip_intermediate_deployments: Skip pending deployments (Consolidate multiple deployments of the same type into one deployment)
         """
         if shell is not None:
             pulumi.set(__self__, "shell", shell)
@@ -765,7 +765,7 @@ class OperationContextOptionsArgs:
     @pulumi.getter(name="skipIntermediateDeployments")
     def skip_intermediate_deployments(self) -> Optional[pulumi.Input[bool]]:
         """
-        Skip duplicated queued operations (it will only execute the last deployment of the same type)
+        Skip pending deployments (Consolidate multiple deployments of the same type into one deployment)
         """
         return pulumi.get(self, "skip_intermediate_deployments")
 

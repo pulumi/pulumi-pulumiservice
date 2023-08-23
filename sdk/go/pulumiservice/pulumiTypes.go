@@ -2130,7 +2130,7 @@ type OperationContextOptions struct {
 	Shell *string `pulumi:"shell"`
 	// Skip the default dependency installation step - use this to customize the dependency installation (e.g. if using yarn or poetry)
 	SkipInstallDependencies *bool `pulumi:"skipInstallDependencies"`
-	// Skip duplicated queued operations (it will only execute the last deployment of the same type)
+	// Skip pending deployments (Consolidate multiple deployments of the same type into one deployment)
 	SkipIntermediateDeployments *bool `pulumi:"skipIntermediateDeployments"`
 }
 
@@ -2150,7 +2150,7 @@ type OperationContextOptionsArgs struct {
 	Shell pulumi.StringPtrInput `pulumi:"shell"`
 	// Skip the default dependency installation step - use this to customize the dependency installation (e.g. if using yarn or poetry)
 	SkipInstallDependencies pulumi.BoolPtrInput `pulumi:"skipInstallDependencies"`
-	// Skip duplicated queued operations (it will only execute the last deployment of the same type)
+	// Skip pending deployments (Consolidate multiple deployments of the same type into one deployment)
 	SkipIntermediateDeployments pulumi.BoolPtrInput `pulumi:"skipIntermediateDeployments"`
 }
 
@@ -2241,7 +2241,7 @@ func (o OperationContextOptionsOutput) SkipInstallDependencies() pulumi.BoolPtrO
 	return o.ApplyT(func(v OperationContextOptions) *bool { return v.SkipInstallDependencies }).(pulumi.BoolPtrOutput)
 }
 
-// Skip duplicated queued operations (it will only execute the last deployment of the same type)
+// Skip pending deployments (Consolidate multiple deployments of the same type into one deployment)
 func (o OperationContextOptionsOutput) SkipIntermediateDeployments() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v OperationContextOptions) *bool { return v.SkipIntermediateDeployments }).(pulumi.BoolPtrOutput)
 }
@@ -2290,7 +2290,7 @@ func (o OperationContextOptionsPtrOutput) SkipInstallDependencies() pulumi.BoolP
 	}).(pulumi.BoolPtrOutput)
 }
 
-// Skip duplicated queued operations (it will only execute the last deployment of the same type)
+// Skip pending deployments (Consolidate multiple deployments of the same type into one deployment)
 func (o OperationContextOptionsPtrOutput) SkipIntermediateDeployments() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v *OperationContextOptions) *bool {
 		if v == nil {

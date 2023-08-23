@@ -319,7 +319,7 @@
         },
         "skipIntermediateDeployments": {
           "type": "boolean",
-          "description": "Skip duplicated queued operations (it will only execute the last deployment of the same type)"
+          "description": "Skip pending deployments (Consolidate multiple deployments of the same type into one deployment)"
         },
         "shell": {
           "type": "string",
