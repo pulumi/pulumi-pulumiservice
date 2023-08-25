@@ -149,6 +149,10 @@ namespace Pulumi.PulumiService
         /// Initiate deployments on a stack from a Pulumi Cloud webhook.
         /// </summary>
         public static WebhookFormat PulumiDeployments { get; } = new WebhookFormat("pulumi_deployments");
+        /// <summary>
+        /// Messages formatted for consumption by Microsoft Teams incoming webhooks.
+        /// </summary>
+        public static WebhookFormat MicrosoftTeams { get; } = new WebhookFormat("ms_teams");
 
         public static bool operator ==(WebhookFormat left, WebhookFormat right) => left.Equals(right);
         public static bool operator !=(WebhookFormat left, WebhookFormat right) => !left.Equals(right);

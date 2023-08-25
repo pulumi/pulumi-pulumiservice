@@ -265,6 +265,8 @@ const (
 	WebhookFormatSlack = WebhookFormat("slack")
 	// Initiate deployments on a stack from a Pulumi Cloud webhook.
 	WebhookFormatPulumiDeployments = WebhookFormat("pulumi_deployments")
+	// Messages formatted for consumption by Microsoft Teams incoming webhooks.
+	WebhookFormatMicrosoftTeams = WebhookFormat("ms_teams")
 )
 
 func (WebhookFormat) ElementType() reflect.Type {

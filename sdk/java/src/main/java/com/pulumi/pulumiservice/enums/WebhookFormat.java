@@ -24,7 +24,12 @@ import java.util.StringJoiner;
          * Initiate deployments on a stack from a Pulumi Cloud webhook.
          * 
          */
-        PulumiDeployments("pulumi_deployments");
+        PulumiDeployments("pulumi_deployments"),
+        /**
+         * Messages formatted for consumption by Microsoft Teams incoming webhooks.
+         * 
+         */
+        MicrosoftTeams("ms_teams");
 
         private final String value;
 

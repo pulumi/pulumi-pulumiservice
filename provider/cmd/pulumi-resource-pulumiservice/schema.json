@@ -64,6 +64,11 @@
           "value": "pulumi_deployments",
           "description": "Initiate deployments on a stack from a Pulumi Cloud webhook.",
           "name": "PulumiDeployments"
+        },
+        {
+          "value": "ms_teams",
+          "description": "Messages formatted for consumption by Microsoft Teams incoming webhooks.",
+          "name": "MicrosoftTeams"
         }
       ]
     },

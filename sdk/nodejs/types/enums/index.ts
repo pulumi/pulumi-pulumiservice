@@ -93,6 +93,10 @@ export const WebhookFormat = {
      * Initiate deployments on a stack from a Pulumi Cloud webhook.
      */
     PulumiDeployments: "pulumi_deployments",
+    /**
+     * Messages formatted for consumption by Microsoft Teams incoming webhooks.
+     */
+    MicrosoftTeams: "ms_teams",
 } as const;
 
 export type WebhookFormat = (typeof WebhookFormat)[keyof typeof WebhookFormat];
