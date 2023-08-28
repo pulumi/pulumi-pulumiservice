@@ -98,3 +98,7 @@ class WebhookFormat(str, Enum):
     """
     Initiate deployments on a stack from a Pulumi Cloud webhook.
     """
+    MICROSOFT_TEAMS = "ms_teams"
+    """
+    Messages formatted for consumption by Microsoft Teams incoming webhooks.
+    """
