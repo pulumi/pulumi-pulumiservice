@@ -24,6 +24,12 @@ namespace Pulumi.PulumiService.Inputs
         [Input("skipInstallDependencies")]
         public Input<bool>? SkipInstallDependencies { get; set; }
 
+        /// <summary>
+        /// Skip intermediate deployments (Consolidate multiple deployments of the same type into one deployment)
+        /// </summary>
+        [Input("skipIntermediateDeployments")]
+        public Input<bool>? SkipIntermediateDeployments { get; set; }
+
         public OperationContextOptionsArgs()
         {
         }

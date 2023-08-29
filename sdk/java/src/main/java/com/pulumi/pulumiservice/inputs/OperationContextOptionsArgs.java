@@ -46,11 +46,27 @@ public final class OperationContextOptionsArgs extends com.pulumi.resources.Reso
         return Optional.ofNullable(this.skipInstallDependencies);
     }
 
+    /**
+     * Skip intermediate deployments (Consolidate multiple deployments of the same type into one deployment)
+     * 
+     */
+    @Import(name="skipIntermediateDeployments")
+    private @Nullable Output<Boolean> skipIntermediateDeployments;
+
+    /**
+     * @return Skip intermediate deployments (Consolidate multiple deployments of the same type into one deployment)
+     * 
+     */
+    public Optional<Output<Boolean>> skipIntermediateDeployments() {
+        return Optional.ofNullable(this.skipIntermediateDeployments);
+    }
+
     private OperationContextOptionsArgs() {}
 
     private OperationContextOptionsArgs(OperationContextOptionsArgs $) {
         this.shell = $.shell;
         this.skipInstallDependencies = $.skipInstallDependencies;
+        this.skipIntermediateDeployments = $.skipIntermediateDeployments;
     }
 
     public static Builder builder() {
@@ -111,6 +127,27 @@ public final class OperationContextOptionsArgs extends com.pulumi.resources.Reso
          */
         public Builder skipInstallDependencies(Boolean skipInstallDependencies) {
             return skipInstallDependencies(Output.of(skipInstallDependencies));
+        }
+
+        /**
+         * @param skipIntermediateDeployments Skip intermediate deployments (Consolidate multiple deployments of the same type into one deployment)
+         * 
+         * @return builder
+         * 
+         */
+        public Builder skipIntermediateDeployments(@Nullable Output<Boolean> skipIntermediateDeployments) {
+            $.skipIntermediateDeployments = skipIntermediateDeployments;
+            return this;
+        }
+
+        /**
+         * @param skipIntermediateDeployments Skip intermediate deployments (Consolidate multiple deployments of the same type into one deployment)
+         * 
+         * @return builder
+         * 
+         */
+        public Builder skipIntermediateDeployments(Boolean skipIntermediateDeployments) {
+            return skipIntermediateDeployments(Output.of(skipIntermediateDeployments));
         }
 
         public OperationContextOptionsArgs build() {
