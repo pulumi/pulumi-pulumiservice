@@ -42,7 +42,7 @@ namespace Pulumi.PulumiService
         public Output<ImmutableArray<Pulumi.PulumiService.WebhookFilters>> Filters { get; private set; } = null!;
 
         /// <summary>
-        /// Format of the webhook payload. Can be either `raw` or `slack`. Defaults to `raw`.
+        /// Format of the webhook payload. Can be either `raw`, `slack`, `ms_team` or `pulumi_deployments`. Defaults to `raw`.
         /// </summary>
         [Output("format")]
         public Output<Pulumi.PulumiService.WebhookFormat?> Format { get; private set; } = null!;
