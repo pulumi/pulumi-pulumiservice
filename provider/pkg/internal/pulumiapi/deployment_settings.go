@@ -72,7 +72,7 @@ type GitHubConfiguration struct {
 }
 
 func (c *Client) CreateDeploymentSettings(ctx context.Context, stack StackName, ds DeploymentSettings) error {
-	apiPath := path.Join("preview", stack.OrgName, stack.ProjectName, stack.StackName, "deployment", "settings")
+	apiPath := path.Join("preview", stack.String(), "deployment", "settings")
 	_, err := c.do(ctx, http.MethodPost, apiPath, ds, nil)
 	if err != nil {
 		return fmt.Errorf("failed to create deployment settings for stack (%s): %w", stack.String(), err)

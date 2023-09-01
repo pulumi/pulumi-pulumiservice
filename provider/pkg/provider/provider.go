@@ -46,6 +46,11 @@ type PulumiServiceResource interface {
 	Name() string
 }
 
+type PulumiServiceFunction interface {
+	Invoke(req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error)
+	Name() string
+}
+
 type pulumiserviceProvider struct {
 	pulumirpc.UnimplementedResourceProviderServer
 
@@ -54,6 +59,7 @@ type pulumiserviceProvider struct {
 	version         string
 	schema          string
 	pulumiResources []PulumiServiceResource
+	pulumiFunctions []PulumiServiceFunction
 	AccessToken     string
 }
 
@@ -153,6 +159,15 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 		},
 	}
 
+	k.pulumiFunctions = []PulumiServiceFunction{
+		&PulumiServiceRunDeploymentFunction{
+			client: client,
+		},
+		&PulumiServiceGetDeploymentFunction{
+			client: client,
+		},
+	}
+
 	for _, sr := range k.pulumiResources {
 		sr.Configure(sc)
 	}
@@ -163,9 +178,10 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 }
 
 // Invoke dynamically executes a built-in function in the provider.
-func (k *pulumiserviceProvider) Invoke(_ context.Context, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
+func (k *pulumiserviceProvider) Invoke(ctx context.Context, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
 	tok := req.GetTok()
-	return nil, fmt.Errorf("unknown Invoke token '%s'", tok)
+	function := k.getPulumiServiceFunction(tok)
+	return function.Invoke(req)
 }
 
 // StreamInvoke dynamically executes a built-in function in the provider. The result is streamed
@@ -255,6 +271,16 @@ func (k *pulumiserviceProvider) getPulumiServiceResource(name string) PulumiServ
 	}
 
 	return &PulumiServiceUnknownResource{}
+}
+
+func (k *pulumiserviceProvider) getPulumiServiceFunction(name string) PulumiServiceFunction {
+	for _, r := range k.pulumiFunctions {
+		if r.Name() == name {
+			return r
+		}
+	}
+
+	return &PulumiServiceUnknownFunction{}
 }
 
 func getResourceNameFromRequest(req ResourceBase) string {

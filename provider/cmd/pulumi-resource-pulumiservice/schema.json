@@ -857,6 +857,83 @@
       ]
     }
   },
+  "functions": {
+    "pulumiservice:index:RunDeployment": {
+      "description": "Runs a deployment on a stack.",
+      "inputs": {
+        "properties": {
+          "organization": {
+            "type": "string"
+          },
+          "project": {
+              "type": "string"
+          },
+          "stack": {
+              "type": "string"
+          }
+        },
+        "type": "object",
+        "required": [
+          "organization",
+          "project",
+          "stack"
+        ]
+      },
+      "outputs": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "number"
+          },
+          "consoleUrl": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "version",
+          "consoleUrl"
+        ]
+      }
+    },
+    "pulumiservice:index:GetDeployment": {
+      "description": "Gets information about a deployment.",
+      "inputs": {
+        "properties": {
+          "deploymentId": {
+            "type": "string"
+          },
+          "organization": {
+            "type": "string"
+          },
+          "project": {
+              "type": "string"
+          },
+          "stack": {
+              "type": "string"
+          }
+        },
+        "type": "object",
+        "required": [
+          "organization",
+          "project",
+          "stack",
+          "deploymentId"
+        ]
+      },
+      "outputs": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
   "language": {
     "csharp": {
       "namespaces": {
