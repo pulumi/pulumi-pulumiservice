@@ -10,6 +10,16 @@ export type AccessToken = import("./accessToken").AccessToken;
 export const AccessToken: typeof import("./accessToken").AccessToken = null as any;
 utilities.lazyLoad(exports, ["AccessToken"], () => require("./accessToken"));
 
+export { CreateDeploymentArgs, CreateDeploymentResult, CreateDeploymentOutputArgs } from "./createDeployment";
+export const createDeployment: typeof import("./createDeployment").createDeployment = null as any;
+export const createDeploymentOutput: typeof import("./createDeployment").createDeploymentOutput = null as any;
+utilities.lazyLoad(exports, ["createDeployment","createDeploymentOutput"], () => require("./createDeployment"));
+
+export { DeployArgs, DeployResult, DeployOutputArgs } from "./deploy";
+export const deploy: typeof import("./deploy").deploy = null as any;
+export const deployOutput: typeof import("./deploy").deployOutput = null as any;
+utilities.lazyLoad(exports, ["deploy","deployOutput"], () => require("./deploy"));
+
 export { DeploymentSettingsArgs } from "./deploymentSettings";
 export type DeploymentSettings = import("./deploymentSettings").DeploymentSettings;
 export const DeploymentSettings: typeof import("./deploymentSettings").DeploymentSettings = null as any;
@@ -29,11 +39,6 @@ export { ProviderArgs } from "./provider";
 export type Provider = import("./provider").Provider;
 export const Provider: typeof import("./provider").Provider = null as any;
 utilities.lazyLoad(exports, ["Provider"], () => require("./provider"));
-
-export { RunDeploymentArgs, RunDeploymentResult, RunDeploymentOutputArgs } from "./runDeployment";
-export const runDeployment: typeof import("./runDeployment").runDeployment = null as any;
-export const runDeploymentOutput: typeof import("./runDeployment").runDeploymentOutput = null as any;
-utilities.lazyLoad(exports, ["runDeployment","runDeploymentOutput"], () => require("./runDeployment"));
 
 export { StackTagArgs } from "./stackTag";
 export type StackTag = import("./stackTag").StackTag;

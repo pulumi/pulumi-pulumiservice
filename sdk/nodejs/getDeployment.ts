@@ -15,14 +15,16 @@ export function getDeployment(args: GetDeploymentArgs, opts?: pulumi.InvokeOptio
         "organization": args.organization,
         "project": args.project,
         "stack": args.stack,
+        "version": args.version,
     }, opts);
 }
 
 export interface GetDeploymentArgs {
-    deploymentId: string;
+    deploymentId?: string;
     organization: string;
     project: string;
     stack: string;
+    version?: number;
 }
 
 export interface GetDeploymentResult {
@@ -36,8 +38,9 @@ export function getDeploymentOutput(args: GetDeploymentOutputArgs, opts?: pulumi
 }
 
 export interface GetDeploymentOutputArgs {
-    deploymentId: pulumi.Input<string>;
+    deploymentId?: pulumi.Input<string>;
     organization: pulumi.Input<string>;
     project: pulumi.Input<string>;
     stack: pulumi.Input<string>;
+    version?: pulumi.Input<number>;
 }

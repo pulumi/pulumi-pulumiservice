@@ -8,15 +8,74 @@ import com.pulumi.core.TypeShape;
 import com.pulumi.deployment.Deployment;
 import com.pulumi.deployment.InvokeOptions;
 import com.pulumi.pulumiservice.Utilities;
+import com.pulumi.pulumiservice.inputs.CreateDeploymentArgs;
+import com.pulumi.pulumiservice.inputs.CreateDeploymentPlainArgs;
+import com.pulumi.pulumiservice.inputs.DeployArgs;
+import com.pulumi.pulumiservice.inputs.DeployPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetDeploymentArgs;
 import com.pulumi.pulumiservice.inputs.GetDeploymentPlainArgs;
-import com.pulumi.pulumiservice.inputs.RunDeploymentArgs;
-import com.pulumi.pulumiservice.inputs.RunDeploymentPlainArgs;
+import com.pulumi.pulumiservice.outputs.CreateDeploymentResult;
+import com.pulumi.pulumiservice.outputs.DeployResult;
 import com.pulumi.pulumiservice.outputs.GetDeploymentResult;
-import com.pulumi.pulumiservice.outputs.RunDeploymentResult;
 import java.util.concurrent.CompletableFuture;
 
 public final class PulumiserviceFunctions {
+    /**
+     * Creates a deployment on a stack. This is an async operation and will return immediately after the deployment is created, not waiting for the deployment to complete.
+     * 
+     */
+    public static Output<CreateDeploymentResult> createDeployment(CreateDeploymentArgs args) {
+        return createDeployment(args, InvokeOptions.Empty);
+    }
+    /**
+     * Creates a deployment on a stack. This is an async operation and will return immediately after the deployment is created, not waiting for the deployment to complete.
+     * 
+     */
+    public static CompletableFuture<CreateDeploymentResult> createDeploymentPlain(CreateDeploymentPlainArgs args) {
+        return createDeploymentPlain(args, InvokeOptions.Empty);
+    }
+    /**
+     * Creates a deployment on a stack. This is an async operation and will return immediately after the deployment is created, not waiting for the deployment to complete.
+     * 
+     */
+    public static Output<CreateDeploymentResult> createDeployment(CreateDeploymentArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:CreateDeployment", TypeShape.of(CreateDeploymentResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Creates a deployment on a stack. This is an async operation and will return immediately after the deployment is created, not waiting for the deployment to complete.
+     * 
+     */
+    public static CompletableFuture<CreateDeploymentResult> createDeploymentPlain(CreateDeploymentPlainArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invokeAsync("pulumiservice:index:CreateDeployment", TypeShape.of(CreateDeploymentResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Runs a deployment on a stack and waits until it returns a final status (succeeded/failed).
+     * 
+     */
+    public static Output<DeployResult> deploy(DeployArgs args) {
+        return deploy(args, InvokeOptions.Empty);
+    }
+    /**
+     * Runs a deployment on a stack and waits until it returns a final status (succeeded/failed).
+     * 
+     */
+    public static CompletableFuture<DeployResult> deployPlain(DeployPlainArgs args) {
+        return deployPlain(args, InvokeOptions.Empty);
+    }
+    /**
+     * Runs a deployment on a stack and waits until it returns a final status (succeeded/failed).
+     * 
+     */
+    public static Output<DeployResult> deploy(DeployArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:Deploy", TypeShape.of(DeployResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Runs a deployment on a stack and waits until it returns a final status (succeeded/failed).
+     * 
+     */
+    public static CompletableFuture<DeployResult> deployPlain(DeployPlainArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invokeAsync("pulumiservice:index:Deploy", TypeShape.of(DeployResult.class), args, Utilities.withVersion(options));
+    }
     /**
      * Gets information about a deployment.
      * 
@@ -44,33 +103,5 @@ public final class PulumiserviceFunctions {
      */
     public static CompletableFuture<GetDeploymentResult> getDeploymentPlain(GetDeploymentPlainArgs args, InvokeOptions options) {
         return Deployment.getInstance().invokeAsync("pulumiservice:index:GetDeployment", TypeShape.of(GetDeploymentResult.class), args, Utilities.withVersion(options));
-    }
-    /**
-     * Runs a deployment on a stack.
-     * 
-     */
-    public static Output<RunDeploymentResult> runDeployment(RunDeploymentArgs args) {
-        return runDeployment(args, InvokeOptions.Empty);
-    }
-    /**
-     * Runs a deployment on a stack.
-     * 
-     */
-    public static CompletableFuture<RunDeploymentResult> runDeploymentPlain(RunDeploymentPlainArgs args) {
-        return runDeploymentPlain(args, InvokeOptions.Empty);
-    }
-    /**
-     * Runs a deployment on a stack.
-     * 
-     */
-    public static Output<RunDeploymentResult> runDeployment(RunDeploymentArgs args, InvokeOptions options) {
-        return Deployment.getInstance().invoke("pulumiservice:index:RunDeployment", TypeShape.of(RunDeploymentResult.class), args, Utilities.withVersion(options));
-    }
-    /**
-     * Runs a deployment on a stack.
-     * 
-     */
-    public static CompletableFuture<RunDeploymentResult> runDeploymentPlain(RunDeploymentPlainArgs args, InvokeOptions options) {
-        return Deployment.getInstance().invokeAsync("pulumiservice:index:RunDeployment", TypeShape.of(RunDeploymentResult.class), args, Utilities.withVersion(options));
     }
 }

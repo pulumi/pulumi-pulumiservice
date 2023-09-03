@@ -21,10 +21,11 @@ func GetDeployment(ctx *pulumi.Context, args *GetDeploymentArgs, opts ...pulumi.
 }
 
 type GetDeploymentArgs struct {
-	DeploymentId string `pulumi:"deploymentId"`
-	Organization string `pulumi:"organization"`
-	Project      string `pulumi:"project"`
-	Stack        string `pulumi:"stack"`
+	DeploymentId *string  `pulumi:"deploymentId"`
+	Organization string   `pulumi:"organization"`
+	Project      string   `pulumi:"project"`
+	Stack        string   `pulumi:"stack"`
+	Version      *float64 `pulumi:"version"`
 }
 
 type GetDeploymentResult struct {
@@ -45,10 +46,11 @@ func GetDeploymentOutput(ctx *pulumi.Context, args GetDeploymentOutputArgs, opts
 }
 
 type GetDeploymentOutputArgs struct {
-	DeploymentId pulumi.StringInput `pulumi:"deploymentId"`
-	Organization pulumi.StringInput `pulumi:"organization"`
-	Project      pulumi.StringInput `pulumi:"project"`
-	Stack        pulumi.StringInput `pulumi:"stack"`
+	DeploymentId pulumi.StringPtrInput  `pulumi:"deploymentId"`
+	Organization pulumi.StringInput     `pulumi:"organization"`
+	Project      pulumi.StringInput     `pulumi:"project"`
+	Stack        pulumi.StringInput     `pulumi:"stack"`
+	Version      pulumi.Float64PtrInput `pulumi:"version"`
 }
 
 func (GetDeploymentOutputArgs) ElementType() reflect.Type {

@@ -9,12 +9,12 @@ import java.lang.String;
 import java.util.Objects;
 
 @CustomType
-public final class RunDeploymentResult {
+public final class CreateDeploymentResult {
     private String consoleUrl;
     private String id;
     private Double version;
 
-    private RunDeploymentResult() {}
+    private CreateDeploymentResult() {}
     public String consoleUrl() {
         return this.consoleUrl;
     }
@@ -29,7 +29,7 @@ public final class RunDeploymentResult {
         return new Builder();
     }
 
-    public static Builder builder(RunDeploymentResult defaults) {
+    public static Builder builder(CreateDeploymentResult defaults) {
         return new Builder(defaults);
     }
     @CustomType.Builder
@@ -38,7 +38,7 @@ public final class RunDeploymentResult {
         private String id;
         private Double version;
         public Builder() {}
-        public Builder(RunDeploymentResult defaults) {
+        public Builder(CreateDeploymentResult defaults) {
     	      Objects.requireNonNull(defaults);
     	      this.consoleUrl = defaults.consoleUrl;
     	      this.id = defaults.id;
@@ -60,8 +60,8 @@ public final class RunDeploymentResult {
             this.version = Objects.requireNonNull(version);
             return this;
         }
-        public RunDeploymentResult build() {
-            final var o = new RunDeploymentResult();
+        public CreateDeploymentResult build() {
+            final var o = new CreateDeploymentResult();
             o.consoleUrl = consoleUrl;
             o.id = id;
             o.version = version;

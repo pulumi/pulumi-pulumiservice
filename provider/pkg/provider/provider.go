@@ -22,17 +22,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pulumi/pulumi/pkg/v3/codegen/schema"
-	"github.com/pulumi/pulumi/pkg/v3/resource/provider"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/pulumiapi"
-
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
-
 	pbempty "github.com/golang/protobuf/ptypes/empty"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/pulumiapi"
+	"github.com/pulumi/pulumi/pkg/v3/codegen/schema"
+	"github.com/pulumi/pulumi/pkg/v3/resource/provider"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
+	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
 type PulumiServiceResource interface {
@@ -47,7 +46,7 @@ type PulumiServiceResource interface {
 }
 
 type PulumiServiceFunction interface {
-	Invoke(req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error)
+	Invoke(ctx context.Context, inputsMap resource.PropertyMap) (*pulumirpc.InvokeResponse, error)
 	Name() string
 }
 
@@ -160,7 +159,10 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 	}
 
 	k.pulumiFunctions = []PulumiServiceFunction{
-		&PulumiServiceRunDeploymentFunction{
+		&PulumiServiceDeployFunction{
+			client: client,
+		},
+		&PulumiServiceCreateDeploymentFunction{
 			client: client,
 		},
 		&PulumiServiceGetDeploymentFunction{
@@ -180,8 +182,16 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 // Invoke dynamically executes a built-in function in the provider.
 func (k *pulumiserviceProvider) Invoke(ctx context.Context, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
 	tok := req.GetTok()
+
+	label := fmt.Sprintf("Invoke(%s)", tok)
+	inputsMap, err := plugin.UnmarshalProperties(
+		req.GetArgs(), plugin.MarshalOptions{Label: label, KeepUnknowns: true})
+	if err != nil {
+		return nil, fmt.Errorf("failed to unmarshal %v args during an Invoke call: %w", tok, err)
+	}
+
 	function := k.getPulumiServiceFunction(tok)
-	return function.Invoke(req)
+	return function.Invoke(ctx, inputsMap)
 }
 
 // StreamInvoke dynamically executes a built-in function in the provider. The result is streamed

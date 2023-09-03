@@ -858,8 +858,8 @@
     }
   },
   "functions": {
-    "pulumiservice:index:RunDeployment": {
-      "description": "Runs a deployment on a stack.",
+    "pulumiservice:index:Deploy": {
+      "description": "Runs a deployment on a stack and waits until it returns a final status (succeeded/failed).",
       "inputs": {
         "properties": {
           "organization": {
@@ -870,6 +870,67 @@
           },
           "stack": {
               "type": "string"
+          },
+          "inheritSettings": {
+            "type": "boolean",
+            "default": true
+          },
+          "operation": {
+            "type": "string",
+            "default": "update"
+          }
+        },
+        "type": "object",
+        "required": [
+          "organization",
+          "project",
+          "stack"
+        ]
+      },
+      "outputs": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "number"
+          },
+          "consoleUrl": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "version",
+          "consoleUrl",
+          "status"
+        ]
+      }
+    },
+    "pulumiservice:index:CreateDeployment": {
+      "description": "Creates a deployment on a stack. This is an async operation and will return immediately after the deployment is created, not waiting for the deployment to complete.",
+      "inputs": {
+        "properties": {
+          "organization": {
+            "type": "string"
+          },
+          "project": {
+            "type": "string"
+          },
+          "stack": {
+            "type": "string"
+          },
+          "inheritSettings": {
+            "type": "boolean",
+            "default": true
+          },
+          "operation": {
+            "type": "string",
+            "default": "update"
           }
         },
         "type": "object",
@@ -906,6 +967,9 @@
           "deploymentId": {
             "type": "string"
           },
+          "version": {
+            "type": "number"
+          },
           "organization": {
             "type": "string"
           },
@@ -920,8 +984,7 @@
         "required": [
           "organization",
           "project",
-          "stack",
-          "deploymentId"
+          "stack"
         ]
       },
       "outputs": {

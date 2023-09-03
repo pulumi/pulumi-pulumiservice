@@ -4,22 +4,30 @@
 package com.pulumi.pulumiservice.inputs;
 
 import com.pulumi.core.annotations.Import;
-import java.lang.Double;
+import com.pulumi.core.internal.Codegen;
+import java.lang.Boolean;
 import java.lang.String;
 import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
 
 
-public final class GetDeploymentPlainArgs extends com.pulumi.resources.InvokeArgs {
+public final class DeployPlainArgs extends com.pulumi.resources.InvokeArgs {
 
-    public static final GetDeploymentPlainArgs Empty = new GetDeploymentPlainArgs();
+    public static final DeployPlainArgs Empty = new DeployPlainArgs();
 
-    @Import(name="deploymentId")
-    private @Nullable String deploymentId;
+    @Import(name="inheritSettings")
+    private @Nullable Boolean inheritSettings;
 
-    public Optional<String> deploymentId() {
-        return Optional.ofNullable(this.deploymentId);
+    public Optional<Boolean> inheritSettings() {
+        return Optional.ofNullable(this.inheritSettings);
+    }
+
+    @Import(name="operation")
+    private @Nullable String operation;
+
+    public Optional<String> operation() {
+        return Optional.ofNullable(this.operation);
     }
 
     @Import(name="organization", required=true)
@@ -43,43 +51,41 @@ public final class GetDeploymentPlainArgs extends com.pulumi.resources.InvokeArg
         return this.stack;
     }
 
-    @Import(name="version")
-    private @Nullable Double version;
+    private DeployPlainArgs() {}
 
-    public Optional<Double> version() {
-        return Optional.ofNullable(this.version);
-    }
-
-    private GetDeploymentPlainArgs() {}
-
-    private GetDeploymentPlainArgs(GetDeploymentPlainArgs $) {
-        this.deploymentId = $.deploymentId;
+    private DeployPlainArgs(DeployPlainArgs $) {
+        this.inheritSettings = $.inheritSettings;
+        this.operation = $.operation;
         this.organization = $.organization;
         this.project = $.project;
         this.stack = $.stack;
-        this.version = $.version;
     }
 
     public static Builder builder() {
         return new Builder();
     }
-    public static Builder builder(GetDeploymentPlainArgs defaults) {
+    public static Builder builder(DeployPlainArgs defaults) {
         return new Builder(defaults);
     }
 
     public static final class Builder {
-        private GetDeploymentPlainArgs $;
+        private DeployPlainArgs $;
 
         public Builder() {
-            $ = new GetDeploymentPlainArgs();
+            $ = new DeployPlainArgs();
         }
 
-        public Builder(GetDeploymentPlainArgs defaults) {
-            $ = new GetDeploymentPlainArgs(Objects.requireNonNull(defaults));
+        public Builder(DeployPlainArgs defaults) {
+            $ = new DeployPlainArgs(Objects.requireNonNull(defaults));
         }
 
-        public Builder deploymentId(@Nullable String deploymentId) {
-            $.deploymentId = deploymentId;
+        public Builder inheritSettings(@Nullable Boolean inheritSettings) {
+            $.inheritSettings = inheritSettings;
+            return this;
+        }
+
+        public Builder operation(@Nullable String operation) {
+            $.operation = operation;
             return this;
         }
 
@@ -98,12 +104,9 @@ public final class GetDeploymentPlainArgs extends com.pulumi.resources.InvokeArg
             return this;
         }
 
-        public Builder version(@Nullable Double version) {
-            $.version = version;
-            return this;
-        }
-
-        public GetDeploymentPlainArgs build() {
+        public DeployPlainArgs build() {
+            $.inheritSettings = Codegen.booleanProp("inheritSettings").arg($.inheritSettings).def(true).getNullable();
+            $.operation = Codegen.stringProp("operation").arg($.operation).def("update").getNullable();
             $.organization = Objects.requireNonNull($.organization, "expected parameter 'organization' to be non-null");
             $.project = Objects.requireNonNull($.project, "expected parameter 'project' to be non-null");
             $.stack = Objects.requireNonNull($.stack, "expected parameter 'stack' to be non-null");

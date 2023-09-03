@@ -27,8 +27,8 @@ namespace Pulumi.PulumiService
 
     public sealed class GetDeploymentArgs : global::Pulumi.InvokeArgs
     {
-        [Input("deploymentId", required: true)]
-        public string DeploymentId { get; set; } = null!;
+        [Input("deploymentId")]
+        public string? DeploymentId { get; set; }
 
         [Input("organization", required: true)]
         public string Organization { get; set; } = null!;
@@ -39,6 +39,9 @@ namespace Pulumi.PulumiService
         [Input("stack", required: true)]
         public string Stack { get; set; } = null!;
 
+        [Input("version")]
+        public double? Version { get; set; }
+
         public GetDeploymentArgs()
         {
         }
@@ -47,8 +50,8 @@ namespace Pulumi.PulumiService
 
     public sealed class GetDeploymentInvokeArgs : global::Pulumi.InvokeArgs
     {
-        [Input("deploymentId", required: true)]
-        public Input<string> DeploymentId { get; set; } = null!;
+        [Input("deploymentId")]
+        public Input<string>? DeploymentId { get; set; }
 
         [Input("organization", required: true)]
         public Input<string> Organization { get; set; } = null!;
@@ -58,6 +61,9 @@ namespace Pulumi.PulumiService
 
         [Input("stack", required: true)]
         public Input<string> Stack { get; set; } = null!;
+
+        [Input("version")]
+        public Input<double>? Version { get; set; }
 
         public GetDeploymentInvokeArgs()
         {

@@ -7,11 +7,12 @@ import typing
 # Export this package's modules as members:
 from ._enums import *
 from .access_token import *
+from .create_deployment import *
+from .deploy import *
 from .deployment_settings import *
 from .get_deployment import *
 from .org_access_token import *
 from .provider import *
-from .run_deployment import *
 from .stack_tag import *
 from .team import *
 from .team_access_token import *

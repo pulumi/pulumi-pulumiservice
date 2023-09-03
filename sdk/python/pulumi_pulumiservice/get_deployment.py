@@ -42,6 +42,7 @@ def get_deployment(deployment_id: Optional[str] = None,
                    organization: Optional[str] = None,
                    project: Optional[str] = None,
                    stack: Optional[str] = None,
+                   version: Optional[float] = None,
                    opts: Optional[pulumi.InvokeOptions] = None) -> AwaitableGetDeploymentResult:
     """
     Gets information about a deployment.
@@ -51,6 +52,7 @@ def get_deployment(deployment_id: Optional[str] = None,
     __args__['organization'] = organization
     __args__['project'] = project
     __args__['stack'] = stack
+    __args__['version'] = version
     opts = pulumi.InvokeOptions.merge(_utilities.get_invoke_opts_defaults(), opts)
     __ret__ = pulumi.runtime.invoke('pulumiservice:index:GetDeployment', __args__, opts=opts, typ=GetDeploymentResult).value
 
@@ -59,10 +61,11 @@ def get_deployment(deployment_id: Optional[str] = None,
 
 
 @_utilities.lift_output_func(get_deployment)
-def get_deployment_output(deployment_id: Optional[pulumi.Input[str]] = None,
+def get_deployment_output(deployment_id: Optional[pulumi.Input[Optional[str]]] = None,
                           organization: Optional[pulumi.Input[str]] = None,
                           project: Optional[pulumi.Input[str]] = None,
                           stack: Optional[pulumi.Input[str]] = None,
+                          version: Optional[pulumi.Input[Optional[float]]] = None,
                           opts: Optional[pulumi.InvokeOptions] = None) -> pulumi.Output[GetDeploymentResult]:
     """
     Gets information about a deployment.

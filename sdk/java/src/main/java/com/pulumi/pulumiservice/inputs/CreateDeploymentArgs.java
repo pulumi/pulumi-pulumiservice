@@ -5,13 +5,31 @@ package com.pulumi.pulumiservice.inputs;
 
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
+import com.pulumi.core.internal.Codegen;
+import java.lang.Boolean;
 import java.lang.String;
 import java.util.Objects;
+import java.util.Optional;
+import javax.annotation.Nullable;
 
 
-public final class RunDeploymentArgs extends com.pulumi.resources.InvokeArgs {
+public final class CreateDeploymentArgs extends com.pulumi.resources.InvokeArgs {
 
-    public static final RunDeploymentArgs Empty = new RunDeploymentArgs();
+    public static final CreateDeploymentArgs Empty = new CreateDeploymentArgs();
+
+    @Import(name="inheritSettings")
+    private @Nullable Output<Boolean> inheritSettings;
+
+    public Optional<Output<Boolean>> inheritSettings() {
+        return Optional.ofNullable(this.inheritSettings);
+    }
+
+    @Import(name="operation")
+    private @Nullable Output<String> operation;
+
+    public Optional<Output<String>> operation() {
+        return Optional.ofNullable(this.operation);
+    }
 
     @Import(name="organization", required=true)
     private Output<String> organization;
@@ -34,9 +52,11 @@ public final class RunDeploymentArgs extends com.pulumi.resources.InvokeArgs {
         return this.stack;
     }
 
-    private RunDeploymentArgs() {}
+    private CreateDeploymentArgs() {}
 
-    private RunDeploymentArgs(RunDeploymentArgs $) {
+    private CreateDeploymentArgs(CreateDeploymentArgs $) {
+        this.inheritSettings = $.inheritSettings;
+        this.operation = $.operation;
         this.organization = $.organization;
         this.project = $.project;
         this.stack = $.stack;
@@ -45,19 +65,37 @@ public final class RunDeploymentArgs extends com.pulumi.resources.InvokeArgs {
     public static Builder builder() {
         return new Builder();
     }
-    public static Builder builder(RunDeploymentArgs defaults) {
+    public static Builder builder(CreateDeploymentArgs defaults) {
         return new Builder(defaults);
     }
 
     public static final class Builder {
-        private RunDeploymentArgs $;
+        private CreateDeploymentArgs $;
 
         public Builder() {
-            $ = new RunDeploymentArgs();
+            $ = new CreateDeploymentArgs();
         }
 
-        public Builder(RunDeploymentArgs defaults) {
-            $ = new RunDeploymentArgs(Objects.requireNonNull(defaults));
+        public Builder(CreateDeploymentArgs defaults) {
+            $ = new CreateDeploymentArgs(Objects.requireNonNull(defaults));
+        }
+
+        public Builder inheritSettings(@Nullable Output<Boolean> inheritSettings) {
+            $.inheritSettings = inheritSettings;
+            return this;
+        }
+
+        public Builder inheritSettings(Boolean inheritSettings) {
+            return inheritSettings(Output.of(inheritSettings));
+        }
+
+        public Builder operation(@Nullable Output<String> operation) {
+            $.operation = operation;
+            return this;
+        }
+
+        public Builder operation(String operation) {
+            return operation(Output.of(operation));
         }
 
         public Builder organization(Output<String> organization) {
@@ -87,7 +125,9 @@ public final class RunDeploymentArgs extends com.pulumi.resources.InvokeArgs {
             return stack(Output.of(stack));
         }
 
-        public RunDeploymentArgs build() {
+        public CreateDeploymentArgs build() {
+            $.inheritSettings = Codegen.booleanProp("inheritSettings").output().arg($.inheritSettings).def(true).getNullable();
+            $.operation = Codegen.stringProp("operation").output().arg($.operation).def("update").getNullable();
             $.organization = Objects.requireNonNull($.organization, "expected parameter 'organization' to be non-null");
             $.project = Objects.requireNonNull($.project, "expected parameter 'project' to be non-null");
             $.stack = Objects.requireNonNull($.stack, "expected parameter 'stack' to be non-null");

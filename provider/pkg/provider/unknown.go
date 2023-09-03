@@ -1,14 +1,15 @@
 package provider
 
 import (
+	"context"
 	"fmt"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 
 	pbempty "github.com/golang/protobuf/ptypes/empty"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
 type PulumiServiceUnknownResource struct{}
-type PulumiServiceUnknownFunction struct{}
 
 func (u *PulumiServiceUnknownResource) Name() string {
 	return "pulumiservice:index:Unknown"
@@ -46,13 +47,12 @@ func createUnknownResourceErrorFromRequest(req ResourceBase) error {
 	return fmt.Errorf("unknown resource type '%s'", rn)
 }
 
+type PulumiServiceUnknownFunction struct{}
+
 func (f *PulumiServiceUnknownFunction) Name() string {
 	return "pulumiservice:index:Unknown"
 }
 
-func (f *PulumiServiceUnknownFunction) Configure(config PulumiServiceConfig) {
-}
-
-func (f *PulumiServiceUnknownFunction) Invoke(req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
-	return &pulumirpc.InvokeResponse{Return: nil}, fmt.Errorf("unknown function '%s'", req.Tok)
+func (f *PulumiServiceUnknownFunction) Invoke(_ context.Context, _ resource.PropertyMap) (*pulumirpc.InvokeResponse, error) {
+	return &pulumirpc.InvokeResponse{Return: nil}, fmt.Errorf("unknown function '%s'", f.Name())
 }

@@ -10,14 +10,14 @@ from typing import Any, Mapping, Optional, Sequence, Union, overload
 from . import _utilities
 
 __all__ = [
-    'RunDeploymentResult',
-    'AwaitableRunDeploymentResult',
-    'run_deployment',
-    'run_deployment_output',
+    'CreateDeploymentResult',
+    'AwaitableCreateDeploymentResult',
+    'create_deployment',
+    'create_deployment_output',
 ]
 
 @pulumi.output_type
-class RunDeploymentResult:
+class CreateDeploymentResult:
     def __init__(__self__, console_url=None, id=None, version=None):
         if console_url and not isinstance(console_url, str):
             raise TypeError("Expected argument 'console_url' to be a str")
@@ -45,43 +45,49 @@ class RunDeploymentResult:
         return pulumi.get(self, "version")
 
 
-class AwaitableRunDeploymentResult(RunDeploymentResult):
+class AwaitableCreateDeploymentResult(CreateDeploymentResult):
     # pylint: disable=using-constant-test
     def __await__(self):
         if False:
             yield self
-        return RunDeploymentResult(
+        return CreateDeploymentResult(
             console_url=self.console_url,
             id=self.id,
             version=self.version)
 
 
-def run_deployment(organization: Optional[str] = None,
-                   project: Optional[str] = None,
-                   stack: Optional[str] = None,
-                   opts: Optional[pulumi.InvokeOptions] = None) -> AwaitableRunDeploymentResult:
+def create_deployment(inherit_settings: Optional[bool] = None,
+                      operation: Optional[str] = None,
+                      organization: Optional[str] = None,
+                      project: Optional[str] = None,
+                      stack: Optional[str] = None,
+                      opts: Optional[pulumi.InvokeOptions] = None) -> AwaitableCreateDeploymentResult:
     """
-    Runs a deployment on a stack.
+    Creates a deployment on a stack. This is an async operation and will return immediately after the deployment is created, not waiting for the deployment to complete.
     """
     __args__ = dict()
+    __args__['inheritSettings'] = inherit_settings
+    __args__['operation'] = operation
     __args__['organization'] = organization
     __args__['project'] = project
     __args__['stack'] = stack
     opts = pulumi.InvokeOptions.merge(_utilities.get_invoke_opts_defaults(), opts)
-    __ret__ = pulumi.runtime.invoke('pulumiservice:index:RunDeployment', __args__, opts=opts, typ=RunDeploymentResult).value
+    __ret__ = pulumi.runtime.invoke('pulumiservice:index:CreateDeployment', __args__, opts=opts, typ=CreateDeploymentResult).value
 
-    return AwaitableRunDeploymentResult(
+    return AwaitableCreateDeploymentResult(
         console_url=__ret__.console_url,
         id=__ret__.id,
         version=__ret__.version)
 
 
-@_utilities.lift_output_func(run_deployment)
-def run_deployment_output(organization: Optional[pulumi.Input[str]] = None,
-                          project: Optional[pulumi.Input[str]] = None,
-                          stack: Optional[pulumi.Input[str]] = None,
-                          opts: Optional[pulumi.InvokeOptions] = None) -> pulumi.Output[RunDeploymentResult]:
+@_utilities.lift_output_func(create_deployment)
+def create_deployment_output(inherit_settings: Optional[pulumi.Input[Optional[bool]]] = None,
+                             operation: Optional[pulumi.Input[Optional[str]]] = None,
+                             organization: Optional[pulumi.Input[str]] = None,
+                             project: Optional[pulumi.Input[str]] = None,
+                             stack: Optional[pulumi.Input[str]] = None,
+                             opts: Optional[pulumi.InvokeOptions] = None) -> pulumi.Output[CreateDeploymentResult]:
     """
-    Runs a deployment on a stack.
+    Creates a deployment on a stack. This is an async operation and will return immediately after the deployment is created, not waiting for the deployment to complete.
     """
     ...

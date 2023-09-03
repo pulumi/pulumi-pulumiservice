@@ -5,22 +5,30 @@ package com.pulumi.pulumiservice.inputs;
 
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
-import java.lang.Double;
+import com.pulumi.core.internal.Codegen;
+import java.lang.Boolean;
 import java.lang.String;
 import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
 
 
-public final class GetDeploymentArgs extends com.pulumi.resources.InvokeArgs {
+public final class DeployArgs extends com.pulumi.resources.InvokeArgs {
 
-    public static final GetDeploymentArgs Empty = new GetDeploymentArgs();
+    public static final DeployArgs Empty = new DeployArgs();
 
-    @Import(name="deploymentId")
-    private @Nullable Output<String> deploymentId;
+    @Import(name="inheritSettings")
+    private @Nullable Output<Boolean> inheritSettings;
 
-    public Optional<Output<String>> deploymentId() {
-        return Optional.ofNullable(this.deploymentId);
+    public Optional<Output<Boolean>> inheritSettings() {
+        return Optional.ofNullable(this.inheritSettings);
+    }
+
+    @Import(name="operation")
+    private @Nullable Output<String> operation;
+
+    public Optional<Output<String>> operation() {
+        return Optional.ofNullable(this.operation);
     }
 
     @Import(name="organization", required=true)
@@ -44,48 +52,50 @@ public final class GetDeploymentArgs extends com.pulumi.resources.InvokeArgs {
         return this.stack;
     }
 
-    @Import(name="version")
-    private @Nullable Output<Double> version;
+    private DeployArgs() {}
 
-    public Optional<Output<Double>> version() {
-        return Optional.ofNullable(this.version);
-    }
-
-    private GetDeploymentArgs() {}
-
-    private GetDeploymentArgs(GetDeploymentArgs $) {
-        this.deploymentId = $.deploymentId;
+    private DeployArgs(DeployArgs $) {
+        this.inheritSettings = $.inheritSettings;
+        this.operation = $.operation;
         this.organization = $.organization;
         this.project = $.project;
         this.stack = $.stack;
-        this.version = $.version;
     }
 
     public static Builder builder() {
         return new Builder();
     }
-    public static Builder builder(GetDeploymentArgs defaults) {
+    public static Builder builder(DeployArgs defaults) {
         return new Builder(defaults);
     }
 
     public static final class Builder {
-        private GetDeploymentArgs $;
+        private DeployArgs $;
 
         public Builder() {
-            $ = new GetDeploymentArgs();
+            $ = new DeployArgs();
         }
 
-        public Builder(GetDeploymentArgs defaults) {
-            $ = new GetDeploymentArgs(Objects.requireNonNull(defaults));
+        public Builder(DeployArgs defaults) {
+            $ = new DeployArgs(Objects.requireNonNull(defaults));
         }
 
-        public Builder deploymentId(@Nullable Output<String> deploymentId) {
-            $.deploymentId = deploymentId;
+        public Builder inheritSettings(@Nullable Output<Boolean> inheritSettings) {
+            $.inheritSettings = inheritSettings;
             return this;
         }
 
-        public Builder deploymentId(String deploymentId) {
-            return deploymentId(Output.of(deploymentId));
+        public Builder inheritSettings(Boolean inheritSettings) {
+            return inheritSettings(Output.of(inheritSettings));
+        }
+
+        public Builder operation(@Nullable Output<String> operation) {
+            $.operation = operation;
+            return this;
+        }
+
+        public Builder operation(String operation) {
+            return operation(Output.of(operation));
         }
 
         public Builder organization(Output<String> organization) {
@@ -115,16 +125,9 @@ public final class GetDeploymentArgs extends com.pulumi.resources.InvokeArgs {
             return stack(Output.of(stack));
         }
 
-        public Builder version(@Nullable Output<Double> version) {
-            $.version = version;
-            return this;
-        }
-
-        public Builder version(Double version) {
-            return version(Output.of(version));
-        }
-
-        public GetDeploymentArgs build() {
+        public DeployArgs build() {
+            $.inheritSettings = Codegen.booleanProp("inheritSettings").output().arg($.inheritSettings).def(true).getNullable();
+            $.operation = Codegen.stringProp("operation").output().arg($.operation).def("update").getNullable();
             $.organization = Objects.requireNonNull($.organization, "expected parameter 'organization' to be non-null");
             $.project = Objects.requireNonNull($.project, "expected parameter 'project' to be non-null");
             $.stack = Objects.requireNonNull($.stack, "expected parameter 'stack' to be non-null");
