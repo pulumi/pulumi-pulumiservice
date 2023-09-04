@@ -2,6 +2,9 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
+import * as inputs from "./types/input";
+import * as outputs from "./types/output";
+import * as enums from "./types/enums";
 import * as utilities from "./utilities";
 
 /**
@@ -11,6 +14,7 @@ export function deploy(args: DeployArgs, opts?: pulumi.InvokeOptions): Promise<D
 
     opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts || {});
     return pulumi.runtime.invoke("pulumiservice:index:Deploy", {
+        "dependsOn": args.dependsOn,
         "inheritSettings": args.inheritSettings,
         "operation": args.operation,
         "organization": args.organization,
@@ -20,6 +24,7 @@ export function deploy(args: DeployArgs, opts?: pulumi.InvokeOptions): Promise<D
 }
 
 export interface DeployArgs {
+    dependsOn?: inputs.DeployResponse[];
     inheritSettings?: boolean;
     operation?: string;
     organization: string;
@@ -41,6 +46,7 @@ export function deployOutput(args: DeployOutputArgs, opts?: pulumi.InvokeOptions
 }
 
 export interface DeployOutputArgs {
+    dependsOn?: pulumi.Input<pulumi.Input<inputs.DeployResponseArgs>[]>;
     inheritSettings?: pulumi.Input<boolean>;
     operation?: pulumi.Input<string>;
     organization: pulumi.Input<string>;

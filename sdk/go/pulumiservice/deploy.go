@@ -21,11 +21,12 @@ func Deploy(ctx *pulumi.Context, args *DeployArgs, opts ...pulumi.InvokeOption) 
 }
 
 type DeployArgs struct {
-	InheritSettings *bool   `pulumi:"inheritSettings"`
-	Operation       *string `pulumi:"operation"`
-	Organization    string  `pulumi:"organization"`
-	Project         string  `pulumi:"project"`
-	Stack           string  `pulumi:"stack"`
+	DependsOn       []DeployResponse `pulumi:"dependsOn"`
+	InheritSettings *bool            `pulumi:"inheritSettings"`
+	Operation       *string          `pulumi:"operation"`
+	Organization    string           `pulumi:"organization"`
+	Project         string           `pulumi:"project"`
+	Stack           string           `pulumi:"stack"`
 }
 
 // Defaults sets the appropriate defaults for DeployArgs
@@ -66,11 +67,12 @@ func DeployOutput(ctx *pulumi.Context, args DeployOutputArgs, opts ...pulumi.Inv
 }
 
 type DeployOutputArgs struct {
-	InheritSettings pulumi.BoolPtrInput   `pulumi:"inheritSettings"`
-	Operation       pulumi.StringPtrInput `pulumi:"operation"`
-	Organization    pulumi.StringInput    `pulumi:"organization"`
-	Project         pulumi.StringInput    `pulumi:"project"`
-	Stack           pulumi.StringInput    `pulumi:"stack"`
+	DependsOn       DeployResponseArrayInput `pulumi:"dependsOn"`
+	InheritSettings pulumi.BoolPtrInput      `pulumi:"inheritSettings"`
+	Operation       pulumi.StringPtrInput    `pulumi:"operation"`
+	Organization    pulumi.StringInput       `pulumi:"organization"`
+	Project         pulumi.StringInput       `pulumi:"project"`
+	Stack           pulumi.StringInput       `pulumi:"stack"`
 }
 
 func (DeployOutputArgs) ElementType() reflect.Type {

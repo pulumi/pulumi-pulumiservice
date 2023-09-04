@@ -35,6 +35,29 @@
     }
   },
   "types": {
+    "pulumiservice:index:DeployResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "version": {
+          "type": "number"
+        },
+        "consoleUrl": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "consoleUrl",
+        "status"
+      ]
+    },
     "pulumiservice:index:TeamStackPermissionScope": {
       "type": "number",
       "enum": [
@@ -862,6 +885,12 @@
       "description": "Runs a deployment on a stack and waits until it returns a final status (succeeded/failed).",
       "inputs": {
         "properties": {
+          "dependsOn": {
+            "type": "array",
+            "items": {
+              "$ref": "#/types/pulumiservice:index:DeployResponse"
+            }
+          },
           "organization": {
             "type": "string"
           },

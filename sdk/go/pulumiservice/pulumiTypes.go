@@ -379,6 +379,118 @@ func (o AzureOIDCConfigurationPtrOutput) TenantId() pulumi.StringPtrOutput {
 	}).(pulumi.StringPtrOutput)
 }
 
+type DeployResponse struct {
+	ConsoleUrl string  `pulumi:"consoleUrl"`
+	Id         string  `pulumi:"id"`
+	Status     string  `pulumi:"status"`
+	Version    float64 `pulumi:"version"`
+}
+
+// DeployResponseInput is an input type that accepts DeployResponseArgs and DeployResponseOutput values.
+// You can construct a concrete instance of `DeployResponseInput` via:
+//
+//	DeployResponseArgs{...}
+type DeployResponseInput interface {
+	pulumi.Input
+
+	ToDeployResponseOutput() DeployResponseOutput
+	ToDeployResponseOutputWithContext(context.Context) DeployResponseOutput
+}
+
+type DeployResponseArgs struct {
+	ConsoleUrl pulumi.StringInput  `pulumi:"consoleUrl"`
+	Id         pulumi.StringInput  `pulumi:"id"`
+	Status     pulumi.StringInput  `pulumi:"status"`
+	Version    pulumi.Float64Input `pulumi:"version"`
+}
+
+func (DeployResponseArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*DeployResponse)(nil)).Elem()
+}
+
+func (i DeployResponseArgs) ToDeployResponseOutput() DeployResponseOutput {
+	return i.ToDeployResponseOutputWithContext(context.Background())
+}
+
+func (i DeployResponseArgs) ToDeployResponseOutputWithContext(ctx context.Context) DeployResponseOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(DeployResponseOutput)
+}
+
+// DeployResponseArrayInput is an input type that accepts DeployResponseArray and DeployResponseArrayOutput values.
+// You can construct a concrete instance of `DeployResponseArrayInput` via:
+//
+//	DeployResponseArray{ DeployResponseArgs{...} }
+type DeployResponseArrayInput interface {
+	pulumi.Input
+
+	ToDeployResponseArrayOutput() DeployResponseArrayOutput
+	ToDeployResponseArrayOutputWithContext(context.Context) DeployResponseArrayOutput
+}
+
+type DeployResponseArray []DeployResponseInput
+
+func (DeployResponseArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]DeployResponse)(nil)).Elem()
+}
+
+func (i DeployResponseArray) ToDeployResponseArrayOutput() DeployResponseArrayOutput {
+	return i.ToDeployResponseArrayOutputWithContext(context.Background())
+}
+
+func (i DeployResponseArray) ToDeployResponseArrayOutputWithContext(ctx context.Context) DeployResponseArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(DeployResponseArrayOutput)
+}
+
+type DeployResponseOutput struct{ *pulumi.OutputState }
+
+func (DeployResponseOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*DeployResponse)(nil)).Elem()
+}
+
+func (o DeployResponseOutput) ToDeployResponseOutput() DeployResponseOutput {
+	return o
+}
+
+func (o DeployResponseOutput) ToDeployResponseOutputWithContext(ctx context.Context) DeployResponseOutput {
+	return o
+}
+
+func (o DeployResponseOutput) ConsoleUrl() pulumi.StringOutput {
+	return o.ApplyT(func(v DeployResponse) string { return v.ConsoleUrl }).(pulumi.StringOutput)
+}
+
+func (o DeployResponseOutput) Id() pulumi.StringOutput {
+	return o.ApplyT(func(v DeployResponse) string { return v.Id }).(pulumi.StringOutput)
+}
+
+func (o DeployResponseOutput) Status() pulumi.StringOutput {
+	return o.ApplyT(func(v DeployResponse) string { return v.Status }).(pulumi.StringOutput)
+}
+
+func (o DeployResponseOutput) Version() pulumi.Float64Output {
+	return o.ApplyT(func(v DeployResponse) float64 { return v.Version }).(pulumi.Float64Output)
+}
+
+type DeployResponseArrayOutput struct{ *pulumi.OutputState }
+
+func (DeployResponseArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]DeployResponse)(nil)).Elem()
+}
+
+func (o DeployResponseArrayOutput) ToDeployResponseArrayOutput() DeployResponseArrayOutput {
+	return o
+}
+
+func (o DeployResponseArrayOutput) ToDeployResponseArrayOutputWithContext(ctx context.Context) DeployResponseArrayOutput {
+	return o
+}
+
+func (o DeployResponseArrayOutput) Index(i pulumi.IntInput) DeployResponseOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) DeployResponse {
+		return vs[0].([]DeployResponse)[vs[1].(int)]
+	}).(DeployResponseOutput)
+}
+
 // The executor context defines information about the executor where the deployment is executed. If unspecified, the default 'pulumi/pulumi' image is used.
 type DeploymentSettingsExecutorContext struct {
 	// Allows overriding the default executor image with a custom image. E.g. 'pulumi/pulumi-nodejs:latest'
@@ -2305,6 +2417,8 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*AWSOIDCConfigurationPtrInput)(nil)).Elem(), AWSOIDCConfigurationArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*AzureOIDCConfigurationInput)(nil)).Elem(), AzureOIDCConfigurationArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*AzureOIDCConfigurationPtrInput)(nil)).Elem(), AzureOIDCConfigurationArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*DeployResponseInput)(nil)).Elem(), DeployResponseArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*DeployResponseArrayInput)(nil)).Elem(), DeployResponseArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsExecutorContextInput)(nil)).Elem(), DeploymentSettingsExecutorContextArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsExecutorContextPtrInput)(nil)).Elem(), DeploymentSettingsExecutorContextArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsGitAuthBasicAuthInput)(nil)).Elem(), DeploymentSettingsGitAuthBasicAuthArgs{})
@@ -2330,6 +2444,8 @@ func init() {
 	pulumi.RegisterOutputType(AWSOIDCConfigurationPtrOutput{})
 	pulumi.RegisterOutputType(AzureOIDCConfigurationOutput{})
 	pulumi.RegisterOutputType(AzureOIDCConfigurationPtrOutput{})
+	pulumi.RegisterOutputType(DeployResponseOutput{})
+	pulumi.RegisterOutputType(DeployResponseArrayOutput{})
 	pulumi.RegisterOutputType(DeploymentSettingsExecutorContextOutput{})
 	pulumi.RegisterOutputType(DeploymentSettingsExecutorContextPtrOutput{})
 	pulumi.RegisterOutputType(DeploymentSettingsGitAuthBasicAuthOutput{})

@@ -27,6 +27,14 @@ namespace Pulumi.PulumiService
 
     public sealed class DeployArgs : global::Pulumi.InvokeArgs
     {
+        [Input("dependsOn")]
+        private List<Inputs.DeployResponse>? _dependsOn;
+        public List<Inputs.DeployResponse> DependsOn
+        {
+            get => _dependsOn ?? (_dependsOn = new List<Inputs.DeployResponse>());
+            set => _dependsOn = value;
+        }
+
         [Input("inheritSettings")]
         public bool? InheritSettings { get; set; }
 
@@ -52,6 +60,14 @@ namespace Pulumi.PulumiService
 
     public sealed class DeployInvokeArgs : global::Pulumi.InvokeArgs
     {
+        [Input("dependsOn")]
+        private InputList<Inputs.DeployResponseArgs>? _dependsOn;
+        public InputList<Inputs.DeployResponseArgs> DependsOn
+        {
+            get => _dependsOn ?? (_dependsOn = new InputList<Inputs.DeployResponseArgs>());
+            set => _dependsOn = value;
+        }
+
         [Input("inheritSettings")]
         public Input<bool>? InheritSettings { get; set; }
 

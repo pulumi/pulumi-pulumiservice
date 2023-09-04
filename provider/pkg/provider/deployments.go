@@ -23,7 +23,15 @@ func (f *PulumiServiceDeployFunction) Name() string {
 
 type PulumiServiceDeployInput struct {
 	pulumiapi.CreateDeploymentRequest
-	Stack pulumiapi.StackName
+	Stack     pulumiapi.StackName
+	DependsOn []PulumiServiceDeployOutput
+}
+
+type PulumiServiceDeployOutput struct {
+	ID         string
+	Version    int
+	ConsoleURL string
+	Status     string
 }
 
 func (f *PulumiServiceDeployFunction) ToPulumiServiceDeployInput(inputMap resource.PropertyMap) PulumiServiceDeployInput {
@@ -40,6 +48,16 @@ func (f *PulumiServiceDeployFunction) ToPulumiServiceDeployInput(inputMap resour
 	} else {
 		input.Operation = apitype.Update
 	}
+	if inputMap.HasValue("dependsOn") {
+		for _, v := range inputMap["dependsOn"].ArrayValue() {
+			input.DependsOn = append(input.DependsOn, PulumiServiceDeployOutput{
+				ID:         v.ObjectValue()["id"].StringValue(),
+				Version:    int(v.ObjectValue()["version"].NumberValue()),
+				ConsoleURL: v.ObjectValue()["consoleUrl"].StringValue(),
+				Status:     v.ObjectValue()["status"].StringValue(),
+			})
+		}
+	}
 
 	input.Stack.StackName = inputMap["stack"].StringValue()
 	input.Stack.ProjectName = inputMap["project"].StringValue()
@@ -48,8 +66,77 @@ func (f *PulumiServiceDeployFunction) ToPulumiServiceDeployInput(inputMap resour
 	return input
 }
 
+func (f *PulumiServiceDeployFunction) StreamInvoke(inputsMap resource.PropertyMap, server pulumirpc.ResourceProvider_StreamInvokeServer) error {
+	ctx := context.Background()
+
+	inputs := f.ToPulumiServiceDeployInput(inputsMap)
+	args := inputs.CreateDeploymentRequest
+
+	resp, err := f.client.CreateDeployment(ctx, inputs.Stack, args)
+	if err != nil {
+		return fmt.Errorf("failed to create deployment for stack (%s): %w", inputs.Stack.String(), err)
+	}
+	r, err := plugin.MarshalProperties(resource.NewPropertyMapFromMap(map[string]interface{}{
+		"id":         resp.ID,
+		"version":    resp.Version,
+		"consoleUrl": resp.ConsoleURL,
+		"status":     "not-started",
+	}), plugin.MarshalOptions{})
+	err = server.Send(&pulumirpc.InvokeResponse{Return: r})
+	if err != nil {
+		return err
+	}
+
+	// Wait for the deployment to complete
+	for {
+		getDeploymentResponse, err := f.client.GetDeployment(ctx, inputs.Stack, resp.ID)
+		if err != nil {
+			return fmt.Errorf("failed to get deployment for stack (%s): %w", inputs.Stack.String(), err)
+		}
+
+		r, err := plugin.MarshalProperties(resource.NewPropertyMapFromMap(map[string]interface{}{
+			"id":         resp.ID,
+			"version":    resp.Version,
+			"consoleUrl": resp.ConsoleURL,
+			"status":     getDeploymentResponse.Status,
+		}), plugin.MarshalOptions{})
+
+		err = server.Send(&pulumirpc.InvokeResponse{Return: r})
+		if err != nil {
+			return err
+		}
+
+		// Check if the deployment has completed (successfully or not)
+		if getDeploymentResponse.Status == "succeeded" || getDeploymentResponse.Status == "failed" {
+			break // Exit the loop if so
+		}
+
+		// If we haven't reached the end of the deployment, sleep for 3 seconds before trying again
+		time.Sleep(3 * time.Second)
+	}
+
+	return nil
+}
+
 func (f *PulumiServiceDeployFunction) Invoke(ctx context.Context, inputsMap resource.PropertyMap) (*pulumirpc.InvokeResponse, error) {
 	inputs := f.ToPulumiServiceDeployInput(inputsMap)
+
+	// Check if any of the dependencies are not in a succeeded state
+	if inputs.DependsOn != nil && len(inputs.DependsOn) > 0 {
+		for _, v := range inputs.DependsOn {
+			if v.Status != "succeeded" {
+				return &pulumirpc.InvokeResponse{
+					Failures: []*pulumirpc.CheckFailure{
+						{
+							Reason:   fmt.Sprintf("Dependency %s is not in a succeeded state", v.ID),
+							Property: "dependsOn",
+						},
+					},
+				}, nil
+			}
+		}
+	}
+
 	args := inputs.CreateDeploymentRequest
 	resp, err := f.client.CreateDeployment(ctx, inputs.Stack, args)
 	if err != nil {
