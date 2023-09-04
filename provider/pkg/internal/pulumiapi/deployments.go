@@ -7,7 +7,6 @@ import (
 	"path"
 
 	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
-	"github.com/ryboe/q"
 )
 
 type CreateDeploymentRequest struct {
@@ -30,7 +29,6 @@ type GetDeploymentResponse struct {
 func (c *Client) CreateDeployment(ctx context.Context, stack StackName, args CreateDeploymentRequest) (*CreateDeploymentResponse, error) {
 	apiPath := path.Join("preview", stack.String(), "deployments")
 	var resp CreateDeploymentResponse
-	q.Q(apiPath, args)
 	_, err := c.do(ctx, http.MethodPost, apiPath, args, &resp)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create deployment for stack (%s): %w", stack.String(), err)
@@ -40,7 +38,6 @@ func (c *Client) CreateDeployment(ctx context.Context, stack StackName, args Cre
 
 func (c *Client) GetDeployment(ctx context.Context, stack StackName, identifier string) (*GetDeploymentResponse, error) {
 	apiPath := path.Join("preview", stack.String(), "deployments", identifier)
-	q.Q(apiPath, identifier)
 	var resp GetDeploymentResponse
 	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &resp)
 	if err != nil {

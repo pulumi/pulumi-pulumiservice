@@ -197,20 +197,7 @@ func (k *pulumiserviceProvider) Invoke(ctx context.Context, req *pulumirpc.Invok
 // back as a series of messages.
 func (k *pulumiserviceProvider) StreamInvoke(req *pulumirpc.InvokeRequest, server pulumirpc.ResourceProvider_StreamInvokeServer) error {
 	tok := req.GetTok()
-	label := fmt.Sprintf("StreamInvoke(%s)", tok)
-	inputsMap, err := plugin.UnmarshalProperties(
-		req.GetArgs(), plugin.MarshalOptions{Label: label, KeepUnknowns: true})
-	if err != nil {
-		return fmt.Errorf("failed to unmarshal %v args during a StreamInvoke call: %w", tok, err)
-	}
-
-	function := k.getPulumiServiceFunction(tok)
-	switch tok {
-	case "pulumiservice:index:Deploy":
-		return function.(*PulumiServiceDeployFunction).StreamInvoke(inputsMap, server)
-	default:
-		return fmt.Errorf("unknown StreamInvoke token '%s'", tok)
-	}
+	return fmt.Errorf("unknown StreamInvoke token '%s'", tok)
 }
 
 // Check validates that the given property bag is valid for a resource of the given type and returns

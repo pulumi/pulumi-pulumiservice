@@ -18,7 +18,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/ryboe/q"
 	"io"
 	"net/http"
 	"net/url"
@@ -92,7 +91,6 @@ func (c *Client) sendRequest(req *http.Request, resBody interface{}) (*http.Resp
 		return nil, fmt.Errorf("failed to read response body: %w", err)
 	}
 	if !ok(res.StatusCode) {
-		q.Q(res.StatusCode, string(body))
 		// if we didn't get an 2XX status code, unmarshal the response as an errorResponse
 		// and return an error
 		var errRes errorResponse
