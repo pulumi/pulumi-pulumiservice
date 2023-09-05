@@ -75,10 +75,10 @@ namespace Pulumi.PulumiService
     [OutputType]
     public sealed class GetDeploymentResult
     {
-        public readonly string? Status;
+        public readonly Pulumi.PulumiService.DeploymentStatus? Status;
 
         [OutputConstructor]
-        private GetDeploymentResult(string? status)
+        private GetDeploymentResult(Pulumi.PulumiService.DeploymentStatus? status)
         {
             Status = status;
         }

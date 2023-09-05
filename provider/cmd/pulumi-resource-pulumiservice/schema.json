@@ -35,29 +35,6 @@
     }
   },
   "types": {
-    "pulumiservice:index:DeployResponse": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "version": {
-          "type": "number"
-        },
-        "consoleUrl": {
-          "type": "string"
-        },
-        "status": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "version",
-        "consoleUrl",
-        "status"
-      ]
-    },
     "pulumiservice:index:TeamStackPermissionScope": {
       "type": "number",
       "enum": [
@@ -75,6 +52,26 @@
           "name": "admin",
           "description": "Grants admin permissions to stack.",
           "value": 103
+        }
+      ]
+    },
+    "pulumiservice:index:DeploymentStatus": {
+      "type": "string",
+      "enum": [
+        {
+          "value": "succeeded"
+        },
+        {
+          "value": "failed"
+        },
+        {
+          "value": "not-started"
+        },
+        {
+          "value": "accepted"
+        },
+        {
+          "value": "running"
         }
       ]
     },
@@ -885,12 +882,6 @@
       "description": "Runs a deployment on a stack and waits until it returns a final status (succeeded/failed).",
       "inputs": {
         "properties": {
-          "dependsOn": {
-            "type": "array",
-            "items": {
-              "$ref": "#/types/pulumiservice:index:DeployResponse"
-            }
-          },
           "organization": {
             "type": "string"
           },
@@ -929,7 +920,7 @@
             "type": "string"
           },
           "status": {
-            "type": "string"
+            "$ref": "#/types/pulumiservice:index:DeploymentStatus"
           }
         },
         "required": [
@@ -1020,7 +1011,7 @@
         "type": "object",
         "properties": {
           "status": {
-            "type": "string"
+            "$ref": "#/types/pulumiservice:index:DeploymentStatus"
           }
         }
       }

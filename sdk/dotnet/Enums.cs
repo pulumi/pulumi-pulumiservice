@@ -8,6 +8,37 @@ using Pulumi;
 namespace Pulumi.PulumiService
 {
     [EnumType]
+    public readonly struct DeploymentStatus : IEquatable<DeploymentStatus>
+    {
+        private readonly string _value;
+
+        private DeploymentStatus(string value)
+        {
+            _value = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        public static DeploymentStatus Succeeded { get; } = new DeploymentStatus("succeeded");
+        public static DeploymentStatus Failed { get; } = new DeploymentStatus("failed");
+        public static DeploymentStatus Not_started { get; } = new DeploymentStatus("not-started");
+        public static DeploymentStatus Accepted { get; } = new DeploymentStatus("accepted");
+        public static DeploymentStatus Running { get; } = new DeploymentStatus("running");
+
+        public static bool operator ==(DeploymentStatus left, DeploymentStatus right) => left.Equals(right);
+        public static bool operator !=(DeploymentStatus left, DeploymentStatus right) => !left.Equals(right);
+
+        public static explicit operator string(DeploymentStatus value) => value._value;
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override bool Equals(object? obj) => obj is DeploymentStatus other && Equals(other);
+        public bool Equals(DeploymentStatus other) => string.Equals(_value, other._value, StringComparison.Ordinal);
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+
+        public override string ToString() => _value;
+    }
+
+    [EnumType]
     public readonly struct TeamStackPermissionScope : IEquatable<TeamStackPermissionScope>
     {
         private readonly double _value;

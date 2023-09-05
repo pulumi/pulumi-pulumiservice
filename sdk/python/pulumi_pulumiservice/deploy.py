@@ -8,7 +8,7 @@ import pulumi
 import pulumi.runtime
 from typing import Any, Mapping, Optional, Sequence, Union, overload
 from . import _utilities
-from ._inputs import *
+from ._enums import *
 
 __all__ = [
     'DeployResult',
@@ -45,7 +45,7 @@ class DeployResult:
 
     @property
     @pulumi.getter
-    def status(self) -> str:
+    def status(self) -> 'DeploymentStatus':
         return pulumi.get(self, "status")
 
     @property
@@ -66,8 +66,7 @@ class AwaitableDeployResult(DeployResult):
             version=self.version)
 
 
-def deploy(depends_on: Optional[Sequence[pulumi.InputType['DeployResponse']]] = None,
-           inherit_settings: Optional[bool] = None,
+def deploy(inherit_settings: Optional[bool] = None,
            operation: Optional[str] = None,
            organization: Optional[str] = None,
            project: Optional[str] = None,
@@ -77,7 +76,6 @@ def deploy(depends_on: Optional[Sequence[pulumi.InputType['DeployResponse']]] = 
     Runs a deployment on a stack and waits until it returns a final status (succeeded/failed).
     """
     __args__ = dict()
-    __args__['dependsOn'] = depends_on
     __args__['inheritSettings'] = inherit_settings
     __args__['operation'] = operation
     __args__['organization'] = organization
@@ -94,8 +92,7 @@ def deploy(depends_on: Optional[Sequence[pulumi.InputType['DeployResponse']]] = 
 
 
 @_utilities.lift_output_func(deploy)
-def deploy_output(depends_on: Optional[pulumi.Input[Optional[Sequence[pulumi.InputType['DeployResponse']]]]] = None,
-                  inherit_settings: Optional[pulumi.Input[Optional[bool]]] = None,
+def deploy_output(inherit_settings: Optional[pulumi.Input[Optional[bool]]] = None,
                   operation: Optional[pulumi.Input[Optional[str]]] = None,
                   organization: Optional[pulumi.Input[str]] = None,
                   project: Optional[pulumi.Input[str]] = None,

@@ -21,12 +21,11 @@ func Deploy(ctx *pulumi.Context, args *DeployArgs, opts ...pulumi.InvokeOption) 
 }
 
 type DeployArgs struct {
-	DependsOn       []DeployResponse `pulumi:"dependsOn"`
-	InheritSettings *bool            `pulumi:"inheritSettings"`
-	Operation       *string          `pulumi:"operation"`
-	Organization    string           `pulumi:"organization"`
-	Project         string           `pulumi:"project"`
-	Stack           string           `pulumi:"stack"`
+	InheritSettings *bool   `pulumi:"inheritSettings"`
+	Operation       *string `pulumi:"operation"`
+	Organization    string  `pulumi:"organization"`
+	Project         string  `pulumi:"project"`
+	Stack           string  `pulumi:"stack"`
 }
 
 // Defaults sets the appropriate defaults for DeployArgs
@@ -47,10 +46,10 @@ func (val *DeployArgs) Defaults() *DeployArgs {
 }
 
 type DeployResult struct {
-	ConsoleUrl string  `pulumi:"consoleUrl"`
-	Id         string  `pulumi:"id"`
-	Status     string  `pulumi:"status"`
-	Version    float64 `pulumi:"version"`
+	ConsoleUrl string           `pulumi:"consoleUrl"`
+	Id         string           `pulumi:"id"`
+	Status     DeploymentStatus `pulumi:"status"`
+	Version    float64          `pulumi:"version"`
 }
 
 func DeployOutput(ctx *pulumi.Context, args DeployOutputArgs, opts ...pulumi.InvokeOption) DeployResultOutput {
@@ -67,12 +66,11 @@ func DeployOutput(ctx *pulumi.Context, args DeployOutputArgs, opts ...pulumi.Inv
 }
 
 type DeployOutputArgs struct {
-	DependsOn       DeployResponseArrayInput `pulumi:"dependsOn"`
-	InheritSettings pulumi.BoolPtrInput      `pulumi:"inheritSettings"`
-	Operation       pulumi.StringPtrInput    `pulumi:"operation"`
-	Organization    pulumi.StringInput       `pulumi:"organization"`
-	Project         pulumi.StringInput       `pulumi:"project"`
-	Stack           pulumi.StringInput       `pulumi:"stack"`
+	InheritSettings pulumi.BoolPtrInput   `pulumi:"inheritSettings"`
+	Operation       pulumi.StringPtrInput `pulumi:"operation"`
+	Organization    pulumi.StringInput    `pulumi:"organization"`
+	Project         pulumi.StringInput    `pulumi:"project"`
+	Stack           pulumi.StringInput    `pulumi:"stack"`
 }
 
 func (DeployOutputArgs) ElementType() reflect.Type {
@@ -101,8 +99,8 @@ func (o DeployResultOutput) Id() pulumi.StringOutput {
 	return o.ApplyT(func(v DeployResult) string { return v.Id }).(pulumi.StringOutput)
 }
 
-func (o DeployResultOutput) Status() pulumi.StringOutput {
-	return o.ApplyT(func(v DeployResult) string { return v.Status }).(pulumi.StringOutput)
+func (o DeployResultOutput) Status() DeploymentStatusOutput {
+	return o.ApplyT(func(v DeployResult) DeploymentStatus { return v.Status }).(DeploymentStatusOutput)
 }
 
 func (o DeployResultOutput) Version() pulumi.Float64Output {

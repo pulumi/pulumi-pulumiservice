@@ -8,6 +8,7 @@ import pulumi
 import pulumi.runtime
 from typing import Any, Mapping, Optional, Sequence, Union, overload
 from . import _utilities
+from ._enums import *
 
 __all__ = [
     'GetDeploymentResult',
@@ -25,7 +26,7 @@ class GetDeploymentResult:
 
     @property
     @pulumi.getter
-    def status(self) -> Optional[str]:
+    def status(self) -> Optional['DeploymentStatus']:
         return pulumi.get(self, "status")
 
 

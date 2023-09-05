@@ -4,6 +4,7 @@
 package com.pulumi.pulumiservice.outputs;
 
 import com.pulumi.core.annotations.CustomType;
+import com.pulumi.pulumiservice.enums.DeploymentStatus;
 import java.lang.Double;
 import java.lang.String;
 import java.util.Objects;
@@ -12,7 +13,7 @@ import java.util.Objects;
 public final class DeployResult {
     private String consoleUrl;
     private String id;
-    private String status;
+    private DeploymentStatus status;
     private Double version;
 
     private DeployResult() {}
@@ -22,7 +23,7 @@ public final class DeployResult {
     public String id() {
         return this.id;
     }
-    public String status() {
+    public DeploymentStatus status() {
         return this.status;
     }
     public Double version() {
@@ -40,7 +41,7 @@ public final class DeployResult {
     public static final class Builder {
         private String consoleUrl;
         private String id;
-        private String status;
+        private DeploymentStatus status;
         private Double version;
         public Builder() {}
         public Builder(DeployResult defaults) {
@@ -62,7 +63,7 @@ public final class DeployResult {
             return this;
         }
         @CustomType.Setter
-        public Builder status(String status) {
+        public Builder status(DeploymentStatus status) {
             this.status = Objects.requireNonNull(status);
             return this;
         }

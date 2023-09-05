@@ -14,7 +14,6 @@ export function deploy(args: DeployArgs, opts?: pulumi.InvokeOptions): Promise<D
 
     opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts || {});
     return pulumi.runtime.invoke("pulumiservice:index:Deploy", {
-        "dependsOn": args.dependsOn,
         "inheritSettings": args.inheritSettings,
         "operation": args.operation,
         "organization": args.organization,
@@ -24,7 +23,6 @@ export function deploy(args: DeployArgs, opts?: pulumi.InvokeOptions): Promise<D
 }
 
 export interface DeployArgs {
-    dependsOn?: inputs.DeployResponse[];
     inheritSettings?: boolean;
     operation?: string;
     organization: string;
@@ -35,7 +33,7 @@ export interface DeployArgs {
 export interface DeployResult {
     readonly consoleUrl: string;
     readonly id: string;
-    readonly status: string;
+    readonly status: enums.DeploymentStatus;
     readonly version: number;
 }
 /**
@@ -46,7 +44,6 @@ export function deployOutput(args: DeployOutputArgs, opts?: pulumi.InvokeOptions
 }
 
 export interface DeployOutputArgs {
-    dependsOn?: pulumi.Input<pulumi.Input<inputs.DeployResponseArgs>[]>;
     inheritSettings?: pulumi.Input<boolean>;
     operation?: pulumi.Input<string>;
     organization: pulumi.Input<string>;

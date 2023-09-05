@@ -29,7 +29,7 @@ type GetDeploymentArgs struct {
 }
 
 type GetDeploymentResult struct {
-	Status *string `pulumi:"status"`
+	Status *DeploymentStatus `pulumi:"status"`
 }
 
 func GetDeploymentOutput(ctx *pulumi.Context, args GetDeploymentOutputArgs, opts ...pulumi.InvokeOption) GetDeploymentResultOutput {
@@ -71,8 +71,8 @@ func (o GetDeploymentResultOutput) ToGetDeploymentResultOutputWithContext(ctx co
 	return o
 }
 
-func (o GetDeploymentResultOutput) Status() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v GetDeploymentResult) *string { return v.Status }).(pulumi.StringPtrOutput)
+func (o GetDeploymentResultOutput) Status() DeploymentStatusPtrOutput {
+	return o.ApplyT(func(v GetDeploymentResult) *DeploymentStatus { return v.Status }).(DeploymentStatusPtrOutput)
 }
 
 func init() {

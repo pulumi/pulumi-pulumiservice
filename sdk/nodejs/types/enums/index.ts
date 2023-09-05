@@ -2,6 +2,16 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 
+export const DeploymentStatus = {
+    Succeeded: "succeeded",
+    Failed: "failed",
+    Not_started: "not-started",
+    Accepted: "accepted",
+    Running: "running",
+} as const;
+
+export type DeploymentStatus = (typeof DeploymentStatus)[keyof typeof DeploymentStatus];
+
 export const TeamStackPermissionScope = {
     /**
      * Grants read permissions to stack.

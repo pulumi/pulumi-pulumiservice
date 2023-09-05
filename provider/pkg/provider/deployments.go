@@ -23,8 +23,7 @@ func (f *PulumiServiceDeployFunction) Name() string {
 
 type PulumiServiceDeployInput struct {
 	pulumiapi.CreateDeploymentRequest
-	Stack     pulumiapi.StackName
-	DependsOn []PulumiServiceDeployOutput
+	Stack pulumiapi.StackName
 }
 
 type PulumiServiceDeployOutput struct {
@@ -48,16 +47,6 @@ func (f *PulumiServiceDeployFunction) ToPulumiServiceDeployInput(inputMap resour
 	} else {
 		input.Operation = apitype.Update
 	}
-	if inputMap.HasValue("dependsOn") {
-		for _, v := range inputMap["dependsOn"].ArrayValue() {
-			input.DependsOn = append(input.DependsOn, PulumiServiceDeployOutput{
-				ID:         v.ObjectValue()["id"].StringValue(),
-				Version:    int(v.ObjectValue()["version"].NumberValue()),
-				ConsoleURL: v.ObjectValue()["consoleUrl"].StringValue(),
-				Status:     v.ObjectValue()["status"].StringValue(),
-			})
-		}
-	}
 
 	input.Stack.StackName = inputMap["stack"].StringValue()
 	input.Stack.ProjectName = inputMap["project"].StringValue()
@@ -68,22 +57,6 @@ func (f *PulumiServiceDeployFunction) ToPulumiServiceDeployInput(inputMap resour
 
 func (f *PulumiServiceDeployFunction) Invoke(ctx context.Context, inputsMap resource.PropertyMap) (*pulumirpc.InvokeResponse, error) {
 	inputs := f.ToPulumiServiceDeployInput(inputsMap)
-
-	// Check if any of the dependencies are not in a succeeded state
-	if inputs.DependsOn != nil && len(inputs.DependsOn) > 0 {
-		for _, v := range inputs.DependsOn {
-			if v.Status != "succeeded" {
-				return &pulumirpc.InvokeResponse{
-					Failures: []*pulumirpc.CheckFailure{
-						{
-							Reason:   fmt.Sprintf("A dependency is not in a succeeded state:\n%s", v.ConsoleURL),
-							Property: "dependsOn",
-						},
-					},
-				}, nil
-			}
-		}
-	}
 
 	args := inputs.CreateDeploymentRequest
 	resp, err := f.client.CreateDeployment(ctx, inputs.Stack, args)

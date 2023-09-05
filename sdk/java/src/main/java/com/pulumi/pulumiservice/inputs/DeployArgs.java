@@ -6,10 +6,8 @@ package com.pulumi.pulumiservice.inputs;
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.core.internal.Codegen;
-import com.pulumi.pulumiservice.inputs.DeployResponseArgs;
 import java.lang.Boolean;
 import java.lang.String;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -18,13 +16,6 @@ import javax.annotation.Nullable;
 public final class DeployArgs extends com.pulumi.resources.InvokeArgs {
 
     public static final DeployArgs Empty = new DeployArgs();
-
-    @Import(name="dependsOn")
-    private @Nullable Output<List<DeployResponseArgs>> dependsOn;
-
-    public Optional<Output<List<DeployResponseArgs>>> dependsOn() {
-        return Optional.ofNullable(this.dependsOn);
-    }
 
     @Import(name="inheritSettings")
     private @Nullable Output<Boolean> inheritSettings;
@@ -64,7 +55,6 @@ public final class DeployArgs extends com.pulumi.resources.InvokeArgs {
     private DeployArgs() {}
 
     private DeployArgs(DeployArgs $) {
-        this.dependsOn = $.dependsOn;
         this.inheritSettings = $.inheritSettings;
         this.operation = $.operation;
         this.organization = $.organization;
@@ -88,19 +78,6 @@ public final class DeployArgs extends com.pulumi.resources.InvokeArgs {
 
         public Builder(DeployArgs defaults) {
             $ = new DeployArgs(Objects.requireNonNull(defaults));
-        }
-
-        public Builder dependsOn(@Nullable Output<List<DeployResponseArgs>> dependsOn) {
-            $.dependsOn = dependsOn;
-            return this;
-        }
-
-        public Builder dependsOn(List<DeployResponseArgs> dependsOn) {
-            return dependsOn(Output.of(dependsOn));
-        }
-
-        public Builder dependsOn(DeployResponseArgs... dependsOn) {
-            return dependsOn(List.of(dependsOn));
         }
 
         public Builder inheritSettings(@Nullable Output<Boolean> inheritSettings) {

@@ -13,7 +13,6 @@ from ._enums import *
 __all__ = [
     'AWSOIDCConfigurationArgs',
     'AzureOIDCConfigurationArgs',
-    'DeployResponse',
     'DeploymentSettingsExecutorContextArgs',
     'DeploymentSettingsGitAuthBasicAuthArgs',
     'DeploymentSettingsGitAuthSSHAuthArgs',
@@ -146,55 +145,6 @@ class AzureOIDCConfigurationArgs:
     @tenant_id.setter
     def tenant_id(self, value: pulumi.Input[str]):
         pulumi.set(self, "tenant_id", value)
-
-
-@pulumi.input_type
-class DeployResponse:
-    def __init__(__self__, *,
-                 console_url: str,
-                 id: str,
-                 status: str,
-                 version: float):
-        pulumi.set(__self__, "console_url", console_url)
-        pulumi.set(__self__, "id", id)
-        pulumi.set(__self__, "status", status)
-        pulumi.set(__self__, "version", version)
-
-    @property
-    @pulumi.getter(name="consoleUrl")
-    def console_url(self) -> str:
-        return pulumi.get(self, "console_url")
-
-    @console_url.setter
-    def console_url(self, value: str):
-        pulumi.set(self, "console_url", value)
-
-    @property
-    @pulumi.getter
-    def id(self) -> str:
-        return pulumi.get(self, "id")
-
-    @id.setter
-    def id(self, value: str):
-        pulumi.set(self, "id", value)
-
-    @property
-    @pulumi.getter
-    def status(self) -> str:
-        return pulumi.get(self, "status")
-
-    @status.setter
-    def status(self, value: str):
-        pulumi.set(self, "status", value)
-
-    @property
-    @pulumi.getter
-    def version(self) -> float:
-        return pulumi.get(self, "version")
-
-    @version.setter
-    def version(self, value: float):
-        pulumi.set(self, "version", value)
 
 
 @pulumi.input_type

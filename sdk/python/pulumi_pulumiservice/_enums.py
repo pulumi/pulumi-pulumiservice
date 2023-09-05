@@ -5,10 +5,19 @@
 from enum import Enum
 
 __all__ = [
+    'DeploymentStatus',
     'TeamStackPermissionScope',
     'WebhookFilters',
     'WebhookFormat',
 ]
+
+
+class DeploymentStatus(str, Enum):
+    SUCCEEDED = "succeeded"
+    FAILED = "failed"
+    NOT_STARTED = "not-started"
+    ACCEPTED = "accepted"
+    RUNNING = "running"
 
 
 class TeamStackPermissionScope(float, Enum):

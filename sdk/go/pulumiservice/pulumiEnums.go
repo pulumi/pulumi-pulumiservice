@@ -10,6 +10,99 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
+type DeploymentStatus string
+
+const (
+	DeploymentStatusSucceeded    = DeploymentStatus("succeeded")
+	DeploymentStatusFailed       = DeploymentStatus("failed")
+	DeploymentStatus_Not_Started = DeploymentStatus("not-started")
+	DeploymentStatusAccepted     = DeploymentStatus("accepted")
+	DeploymentStatusRunning      = DeploymentStatus("running")
+)
+
+type DeploymentStatusOutput struct{ *pulumi.OutputState }
+
+func (DeploymentStatusOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*DeploymentStatus)(nil)).Elem()
+}
+
+func (o DeploymentStatusOutput) ToDeploymentStatusOutput() DeploymentStatusOutput {
+	return o
+}
+
+func (o DeploymentStatusOutput) ToDeploymentStatusOutputWithContext(ctx context.Context) DeploymentStatusOutput {
+	return o
+}
+
+func (o DeploymentStatusOutput) ToDeploymentStatusPtrOutput() DeploymentStatusPtrOutput {
+	return o.ToDeploymentStatusPtrOutputWithContext(context.Background())
+}
+
+func (o DeploymentStatusOutput) ToDeploymentStatusPtrOutputWithContext(ctx context.Context) DeploymentStatusPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v DeploymentStatus) *DeploymentStatus {
+		return &v
+	}).(DeploymentStatusPtrOutput)
+}
+
+func (o DeploymentStatusOutput) ToStringOutput() pulumi.StringOutput {
+	return o.ToStringOutputWithContext(context.Background())
+}
+
+func (o DeploymentStatusOutput) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e DeploymentStatus) string {
+		return string(e)
+	}).(pulumi.StringOutput)
+}
+
+func (o DeploymentStatusOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o DeploymentStatusOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e DeploymentStatus) *string {
+		v := string(e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+type DeploymentStatusPtrOutput struct{ *pulumi.OutputState }
+
+func (DeploymentStatusPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**DeploymentStatus)(nil)).Elem()
+}
+
+func (o DeploymentStatusPtrOutput) ToDeploymentStatusPtrOutput() DeploymentStatusPtrOutput {
+	return o
+}
+
+func (o DeploymentStatusPtrOutput) ToDeploymentStatusPtrOutputWithContext(ctx context.Context) DeploymentStatusPtrOutput {
+	return o
+}
+
+func (o DeploymentStatusPtrOutput) Elem() DeploymentStatusOutput {
+	return o.ApplyT(func(v *DeploymentStatus) DeploymentStatus {
+		if v != nil {
+			return *v
+		}
+		var ret DeploymentStatus
+		return ret
+	}).(DeploymentStatusOutput)
+}
+
+func (o DeploymentStatusPtrOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o DeploymentStatusPtrOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e *DeploymentStatus) *string {
+		if e == nil {
+			return nil
+		}
+		v := string(*e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
 type TeamStackPermissionScope float64
 
 const (
@@ -432,6 +525,8 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*WebhookFiltersArrayInput)(nil)).Elem(), WebhookFiltersArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*WebhookFormatInput)(nil)).Elem(), WebhookFormat("raw"))
 	pulumi.RegisterInputType(reflect.TypeOf((*WebhookFormatPtrInput)(nil)).Elem(), WebhookFormat("raw"))
+	pulumi.RegisterOutputType(DeploymentStatusOutput{})
+	pulumi.RegisterOutputType(DeploymentStatusPtrOutput{})
 	pulumi.RegisterOutputType(WebhookFiltersOutput{})
 	pulumi.RegisterOutputType(WebhookFiltersPtrOutput{})
 	pulumi.RegisterOutputType(WebhookFiltersArrayOutput{})

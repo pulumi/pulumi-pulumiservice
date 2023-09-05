@@ -42,20 +42,6 @@ export interface AzureOIDCConfigurationArgs {
     tenantId: pulumi.Input<string>;
 }
 
-export interface DeployResponse {
-    consoleUrl: string;
-    id: string;
-    status: string;
-    version: number;
-}
-
-export interface DeployResponseArgs {
-    consoleUrl: pulumi.Input<string>;
-    id: pulumi.Input<string>;
-    status: pulumi.Input<string>;
-    version: pulumi.Input<number>;
-}
-
 /**
  * The executor context defines information about the executor where the deployment is executed. If unspecified, the default 'pulumi/pulumi' image is used.
  */

@@ -4,17 +4,17 @@
 package com.pulumi.pulumiservice.outputs;
 
 import com.pulumi.core.annotations.CustomType;
-import java.lang.String;
+import com.pulumi.pulumiservice.enums.DeploymentStatus;
 import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
 
 @CustomType
 public final class GetDeploymentResult {
-    private @Nullable String status;
+    private @Nullable DeploymentStatus status;
 
     private GetDeploymentResult() {}
-    public Optional<String> status() {
+    public Optional<DeploymentStatus> status() {
         return Optional.ofNullable(this.status);
     }
 
@@ -27,7 +27,7 @@ public final class GetDeploymentResult {
     }
     @CustomType.Builder
     public static final class Builder {
-        private @Nullable String status;
+        private @Nullable DeploymentStatus status;
         public Builder() {}
         public Builder(GetDeploymentResult defaults) {
     	      Objects.requireNonNull(defaults);
@@ -35,7 +35,7 @@ public final class GetDeploymentResult {
         }
 
         @CustomType.Setter
-        public Builder status(@Nullable String status) {
+        public Builder status(@Nullable DeploymentStatus status) {
             this.status = status;
             return this;
         }
