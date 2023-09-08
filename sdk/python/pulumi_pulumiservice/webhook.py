@@ -334,7 +334,7 @@ class Webhook(pulumi.CustomResource):
     @pulumi.getter
     def format(self) -> pulumi.Output[Optional['WebhookFormat']]:
         """
-        Format of the webhook payload. Can be either `raw` or `slack`. Defaults to `raw`.
+        Format of the webhook payload. Can be either `raw`, `slack`, `ms_teams` or `pulumi_deployments`. Defaults to `raw`.
         """
         return pulumi.get(self, "format")
 

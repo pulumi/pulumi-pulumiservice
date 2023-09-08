@@ -58,7 +58,7 @@ export class Webhook extends pulumi.CustomResource {
      */
     public readonly filters!: pulumi.Output<enums.WebhookFilters[] | undefined>;
     /**
-     * Format of the webhook payload. Can be either `raw` or `slack`. Defaults to `raw`.
+     * Format of the webhook payload. Can be either `raw`, `slack`, `ms_teams` or `pulumi_deployments`. Defaults to `raw`.
      */
     public readonly format!: pulumi.Output<enums.WebhookFormat | undefined>;
     /**
