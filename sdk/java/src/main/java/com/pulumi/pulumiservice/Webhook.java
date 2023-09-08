@@ -74,14 +74,14 @@ public class Webhook extends com.pulumi.resources.CustomResource {
         return Codegen.optional(this.filters);
     }
     /**
-     * Format of the webhook payload. Can be either `raw`, `slack`, `ms_team` or `pulumi_deployments`. Defaults to `raw`.
+     * Format of the webhook payload. Can be either `raw`, `slack`, `ms_teams` or `pulumi_deployments`. Defaults to `raw`.
      * 
      */
     @Export(name="format", refs={WebhookFormat.class}, tree="[0]")
     private Output</* @Nullable */ WebhookFormat> format;
 
     /**
-     * @return Format of the webhook payload. Can be either `raw`, `slack`, `ms_team` or `pulumi_deployments`. Defaults to `raw`.
+     * @return Format of the webhook payload. Can be either `raw`, `slack`, `ms_teams` or `pulumi_deployments`. Defaults to `raw`.
      * 
      */
     public Output<Optional<WebhookFormat>> format() {
