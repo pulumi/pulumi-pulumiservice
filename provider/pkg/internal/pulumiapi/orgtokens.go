@@ -34,10 +34,11 @@ type createOrgTokenResponse struct {
 
 type createOrgTokenRequest struct {
 	Description string `json:"description"`
-	Name       string `json:"name"`
+	Name        string `json:"name"`
+	Admin       bool   `json:"admin"`
 }
 
-func (c *Client) CreateOrgAccessToken(ctx context.Context, name string, orgName string, description string) (*AccessToken, error) {
+func (c *Client) CreateOrgAccessToken(ctx context.Context, name string, orgName string, description string, admin bool) (*AccessToken, error) {
 
 	if len(orgName) == 0 {
 		return nil, errors.New("empty orgName")
@@ -50,8 +51,9 @@ func (c *Client) CreateOrgAccessToken(ctx context.Context, name string, orgName 
 	apiPath := path.Join("orgs", orgName, "tokens")
 
 	createReq := createOrgTokenRequest{
-		Name: name,
+		Name:        name,
 		Description: description,
+		Admin:       admin,
 	}
 
 	var createRes createOrgTokenResponse

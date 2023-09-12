@@ -5,6 +5,7 @@ package com.pulumi.pulumiservice;
 
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
+import java.lang.Boolean;
 import java.lang.String;
 import java.util.Objects;
 import java.util.Optional;
@@ -14,6 +15,21 @@ import javax.annotation.Nullable;
 public final class OrgAccessTokenArgs extends com.pulumi.resources.ResourceArgs {
 
     public static final OrgAccessTokenArgs Empty = new OrgAccessTokenArgs();
+
+    /**
+     * Optional. True if this is an admin token.
+     * 
+     */
+    @Import(name="admin")
+    private @Nullable Output<Boolean> admin;
+
+    /**
+     * @return Optional. True if this is an admin token.
+     * 
+     */
+    public Optional<Output<Boolean>> admin() {
+        return Optional.ofNullable(this.admin);
+    }
 
     /**
      * Optional. Team description.
@@ -63,6 +79,7 @@ public final class OrgAccessTokenArgs extends com.pulumi.resources.ResourceArgs 
     private OrgAccessTokenArgs() {}
 
     private OrgAccessTokenArgs(OrgAccessTokenArgs $) {
+        this.admin = $.admin;
         this.description = $.description;
         this.name = $.name;
         this.organizationName = $.organizationName;
@@ -84,6 +101,27 @@ public final class OrgAccessTokenArgs extends com.pulumi.resources.ResourceArgs 
 
         public Builder(OrgAccessTokenArgs defaults) {
             $ = new OrgAccessTokenArgs(Objects.requireNonNull(defaults));
+        }
+
+        /**
+         * @param admin Optional. True if this is an admin token.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder admin(@Nullable Output<Boolean> admin) {
+            $.admin = admin;
+            return this;
+        }
+
+        /**
+         * @param admin Optional. True if this is an admin token.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder admin(Boolean admin) {
+            return admin(Output.of(admin));
         }
 
         /**
