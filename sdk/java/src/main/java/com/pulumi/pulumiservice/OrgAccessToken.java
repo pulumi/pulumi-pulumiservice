@@ -9,6 +9,7 @@ import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.OrgAccessTokenArgs;
 import com.pulumi.pulumiservice.Utilities;
+import java.lang.Boolean;
 import java.lang.String;
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +21,20 @@ import javax.annotation.Nullable;
  */
 @ResourceType(type="pulumiservice:index:OrgAccessToken")
 public class OrgAccessToken extends com.pulumi.resources.CustomResource {
+    /**
+     * Optional. True if this is an admin token.
+     * 
+     */
+    @Export(name="admin", refs={Boolean.class}, tree="[0]")
+    private Output</* @Nullable */ Boolean> admin;
+
+    /**
+     * @return Optional. True if this is an admin token.
+     * 
+     */
+    public Output<Optional<Boolean>> admin() {
+        return Codegen.optional(this.admin);
+    }
     /**
      * Optional. Description for the token.
      * 

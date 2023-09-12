@@ -20,6 +20,7 @@ type PulumiServiceOrgAccessTokenInput struct {
 	OrgName     string
 	Description string
 	Name        string
+	Admin       bool
 }
 
 func (i *PulumiServiceOrgAccessTokenInput) ToPropertyMap() resource.PropertyMap {
@@ -27,6 +28,7 @@ func (i *PulumiServiceOrgAccessTokenInput) ToPropertyMap() resource.PropertyMap 
 	pm["name"] = resource.NewPropertyValue(i.Name)
 	pm["description"] = resource.NewPropertyValue(i.Description)
 	pm["organizationName"] = resource.NewPropertyValue(i.OrgName)
+	pm["admin"] = resource.NewPropertyValue(i.Admin)
 	return pm
 }
 
@@ -43,6 +45,10 @@ func (ot *PulumiServiceOrgAccessTokenResource) ToPulumiServiceOrgAccessTokenInpu
 
 	if inputMap["organizationName"].HasValue() && inputMap["organizationName"].IsString() {
 		input.OrgName = inputMap["organizationName"].StringValue()
+	}
+
+	if inputMap["admin"].HasValue() && inputMap["admin"].IsBool() {
+		input.Admin = inputMap["admin"].BoolValue()
 	}
 
 	return input
@@ -70,14 +76,17 @@ func (ot *PulumiServiceOrgAccessTokenResource) Diff(req *pulumirpc.DiffRequest) 
 		}, nil
 	}
 
-	changes := pulumirpc.DiffResponse_DIFF_NONE
+	changes, replaces := pulumirpc.DiffResponse_DIFF_NONE, []string(nil)
 	if diffs.Changed("description") {
-		changes = pulumirpc.DiffResponse_DIFF_SOME
+		changes, replaces = pulumirpc.DiffResponse_DIFF_SOME, append(replaces, "description")
+	}
+	if diffs.Changed("admin") {
+		changes, replaces = pulumirpc.DiffResponse_DIFF_SOME, append(replaces, "admin")
 	}
 
 	return &pulumirpc.DiffResponse{
 		Changes:  changes,
-		Replaces: []string{"description"},
+		Replaces: replaces,
 	}, nil
 }
 
@@ -108,6 +117,10 @@ func (ot *PulumiServiceOrgAccessTokenResource) Create(req *pulumirpc.CreateReque
 
 	outputStore := resource.PropertyMap{}
 	outputStore["__inputs"] = resource.NewObjectProperty(inputs)
+	outputStore["name"] = inputs["name"]
+	outputStore["organizationName"] = inputs["organizationName"]
+	outputStore["description"] = inputs["description"]
+	outputStore["admin"] = inputs["admin"]
 	outputStore["value"] = resource.NewPropertyValue(accessToken.TokenValue)
 
 	outputProperties, err := plugin.MarshalProperties(
@@ -148,7 +161,7 @@ func (ot *PulumiServiceOrgAccessTokenResource) Configure(config PulumiServiceCon
 
 func (ot *PulumiServiceOrgAccessTokenResource) createOrgAccessToken(ctx context.Context, input PulumiServiceOrgAccessTokenInput) (*pulumiapi.AccessToken, error) {
 
-	accesstoken, err := ot.client.CreateOrgAccessToken(ctx, input.Name, input.OrgName, input.Description)
+	accesstoken, err := ot.client.CreateOrgAccessToken(ctx, input.Name, input.OrgName, input.Description, input.Admin)
 	if err != nil {
 		return nil, err
 	}

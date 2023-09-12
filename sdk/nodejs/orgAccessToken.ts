@@ -35,6 +35,10 @@ export class OrgAccessToken extends pulumi.CustomResource {
     }
 
     /**
+     * Optional. True if this is an admin token.
+     */
+    public readonly admin!: pulumi.Output<boolean | undefined>;
+    /**
      * Optional. Description for the token.
      */
     public readonly description!: pulumi.Output<string | undefined>;
@@ -68,11 +72,13 @@ export class OrgAccessToken extends pulumi.CustomResource {
             if ((!args || args.organizationName === undefined) && !opts.urn) {
                 throw new Error("Missing required property 'organizationName'");
             }
+            resourceInputs["admin"] = args ? args.admin : undefined;
             resourceInputs["description"] = args ? args.description : undefined;
             resourceInputs["name"] = args ? args.name : undefined;
             resourceInputs["organizationName"] = args ? args.organizationName : undefined;
             resourceInputs["value"] = undefined /*out*/;
         } else {
+            resourceInputs["admin"] = undefined /*out*/;
             resourceInputs["description"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
             resourceInputs["organizationName"] = undefined /*out*/;
@@ -89,6 +95,10 @@ export class OrgAccessToken extends pulumi.CustomResource {
  * The set of arguments for constructing a OrgAccessToken resource.
  */
 export interface OrgAccessTokenArgs {
+    /**
+     * Optional. True if this is an admin token.
+     */
+    admin?: pulumi.Input<boolean>;
     /**
      * Optional. Team description.
      */

@@ -16,15 +16,19 @@ class OrgAccessTokenArgs:
     def __init__(__self__, *,
                  name: pulumi.Input[str],
                  organization_name: pulumi.Input[str],
+                 admin: Optional[pulumi.Input[bool]] = None,
                  description: Optional[pulumi.Input[str]] = None):
         """
         The set of arguments for constructing a OrgAccessToken resource.
         :param pulumi.Input[str] name: The name for the token.
         :param pulumi.Input[str] organization_name: The organization's name.
+        :param pulumi.Input[bool] admin: Optional. True if this is an admin token.
         :param pulumi.Input[str] description: Optional. Team description.
         """
         pulumi.set(__self__, "name", name)
         pulumi.set(__self__, "organization_name", organization_name)
+        if admin is not None:
+            pulumi.set(__self__, "admin", admin)
         if description is not None:
             pulumi.set(__self__, "description", description)
 
@@ -54,6 +58,18 @@ class OrgAccessTokenArgs:
 
     @property
     @pulumi.getter
+    def admin(self) -> Optional[pulumi.Input[bool]]:
+        """
+        Optional. True if this is an admin token.
+        """
+        return pulumi.get(self, "admin")
+
+    @admin.setter
+    def admin(self, value: Optional[pulumi.Input[bool]]):
+        pulumi.set(self, "admin", value)
+
+    @property
+    @pulumi.getter
     def description(self) -> Optional[pulumi.Input[str]]:
         """
         Optional. Team description.
@@ -70,6 +86,7 @@ class OrgAccessToken(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 admin: Optional[pulumi.Input[bool]] = None,
                  description: Optional[pulumi.Input[str]] = None,
                  name: Optional[pulumi.Input[str]] = None,
                  organization_name: Optional[pulumi.Input[str]] = None,
@@ -79,6 +96,7 @@ class OrgAccessToken(pulumi.CustomResource):
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
+        :param pulumi.Input[bool] admin: Optional. True if this is an admin token.
         :param pulumi.Input[str] description: Optional. Team description.
         :param pulumi.Input[str] name: The name for the token.
         :param pulumi.Input[str] organization_name: The organization's name.
@@ -107,6 +125,7 @@ class OrgAccessToken(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 admin: Optional[pulumi.Input[bool]] = None,
                  description: Optional[pulumi.Input[str]] = None,
                  name: Optional[pulumi.Input[str]] = None,
                  organization_name: Optional[pulumi.Input[str]] = None,
@@ -119,6 +138,7 @@ class OrgAccessToken(pulumi.CustomResource):
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
             __props__ = OrgAccessTokenArgs.__new__(OrgAccessTokenArgs)
 
+            __props__.__dict__["admin"] = admin
             __props__.__dict__["description"] = description
             if name is None and not opts.urn:
                 raise TypeError("Missing required property 'name'")
@@ -151,11 +171,20 @@ class OrgAccessToken(pulumi.CustomResource):
 
         __props__ = OrgAccessTokenArgs.__new__(OrgAccessTokenArgs)
 
+        __props__.__dict__["admin"] = None
         __props__.__dict__["description"] = None
         __props__.__dict__["name"] = None
         __props__.__dict__["organization_name"] = None
         __props__.__dict__["value"] = None
         return OrgAccessToken(resource_name, opts=opts, __props__=__props__)
+
+    @property
+    @pulumi.getter
+    def admin(self) -> pulumi.Output[Optional[bool]]:
+        """
+        Optional. True if this is an admin token.
+        """
+        return pulumi.get(self, "admin")
 
     @property
     @pulumi.getter

@@ -15,6 +15,8 @@ import (
 type OrgAccessToken struct {
 	pulumi.CustomResourceState
 
+	// Optional. True if this is an admin token.
+	Admin pulumi.BoolPtrOutput `pulumi:"admin"`
 	// Optional. Description for the token.
 	Description pulumi.StringPtrOutput `pulumi:"description"`
 	// The name for the token.
@@ -74,6 +76,8 @@ func (OrgAccessTokenState) ElementType() reflect.Type {
 }
 
 type orgAccessTokenArgs struct {
+	// Optional. True if this is an admin token.
+	Admin *bool `pulumi:"admin"`
 	// Optional. Team description.
 	Description *string `pulumi:"description"`
 	// The name for the token.
@@ -84,6 +88,8 @@ type orgAccessTokenArgs struct {
 
 // The set of arguments for constructing a OrgAccessToken resource.
 type OrgAccessTokenArgs struct {
+	// Optional. True if this is an admin token.
+	Admin pulumi.BoolPtrInput
 	// Optional. Team description.
 	Description pulumi.StringPtrInput
 	// The name for the token.
@@ -177,6 +183,11 @@ func (o OrgAccessTokenOutput) ToOrgAccessTokenOutput() OrgAccessTokenOutput {
 
 func (o OrgAccessTokenOutput) ToOrgAccessTokenOutputWithContext(ctx context.Context) OrgAccessTokenOutput {
 	return o
+}
+
+// Optional. True if this is an admin token.
+func (o OrgAccessTokenOutput) Admin() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *OrgAccessToken) pulumi.BoolPtrOutput { return v.Admin }).(pulumi.BoolPtrOutput)
 }
 
 // Optional. Description for the token.
