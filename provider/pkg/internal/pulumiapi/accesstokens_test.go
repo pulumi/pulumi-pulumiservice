@@ -89,3 +89,59 @@ func TestCreateAccessToken(t *testing.T) {
 		)
 	})
 }
+
+func TestGetAccessToken(t *testing.T) {
+	id := "uuid"
+	desc := "token description"
+	lastUsed := 123
+	t.Run("Happy Path", func(t *testing.T) {
+		resp := listTokenResponse{
+			Tokens: []accessTokenResponse{
+				accessTokenResponse{
+					ID:          id,
+					Description: desc,
+					LastUsed:    lastUsed,
+				},
+				accessTokenResponse{
+					ID:          "other",
+					Description: desc,
+					LastUsed:    lastUsed,
+				},
+			},
+		}
+		c, cleanup := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodGet,
+			ExpectedReqBody:   nil,
+			ExpectedReqPath:   "/api/user/tokens",
+			ResponseCode:      200,
+			ResponseBody:      resp,
+		})
+		defer cleanup()
+		token, err := c.GetAccessToken(ctx, id)
+		assert.NoError(t, err)
+		assert.Equal(t, &AccessToken{
+			ID:          id,
+			Description: desc,
+		}, token)
+	})
+
+	t.Run("Error", func(t *testing.T) {
+		c, cleanup := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodGet,
+			ExpectedReqPath:   "/api/user/tokens",
+			ExpectedReqBody:   nil,
+			ResponseCode:      401,
+			ResponseBody: errorResponse{
+				StatusCode: 401,
+				Message:    "unauthorized",
+			},
+		})
+		defer cleanup()
+		token, err := c.GetAccessToken(ctx, id)
+		assert.Nil(t, token, "token should be nil")
+		assert.EqualError(t,
+			err,
+			`failed to list access tokens: 401 API error: unauthorized`,
+		)
+	})
+}

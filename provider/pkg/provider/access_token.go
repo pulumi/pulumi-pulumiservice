@@ -119,7 +119,21 @@ func (at *PulumiServiceAccessTokenResource) Update(req *pulumirpc.UpdateRequest)
 }
 
 func (at *PulumiServiceAccessTokenResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	return &pulumirpc.ReadResponse{}, nil
+	ctx := context.Background()
+
+	// the access token is immutable; if we get nil it got deleted, otherwise all data is the same
+	accesstoken, err := at.getAccessToken(ctx, req.GetId())
+	if err != nil {
+		return nil, err
+	}
+	if accesstoken == nil {
+		return &pulumirpc.ReadResponse{}, nil
+	}
+
+	return &pulumirpc.ReadResponse{
+		Id:         req.GetId(),
+		Properties: req.GetProperties(),
+	}, nil
 }
 
 func (at *PulumiServiceAccessTokenResource) Invoke(s *pulumiserviceProvider, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
@@ -141,4 +155,13 @@ func (at *PulumiServiceAccessTokenResource) createAccessToken(ctx context.Contex
 
 func (at *PulumiServiceAccessTokenResource) deleteAccessToken(ctx context.Context, tokenId string) error {
 	return at.client.DeleteAccessToken(ctx, tokenId)
+}
+
+func (at *PulumiServiceAccessTokenResource) getAccessToken(ctx context.Context, id string) (*pulumiapi.AccessToken, error) {
+	accesstoken, err := at.client.GetAccessToken(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return accesstoken, nil
 }
