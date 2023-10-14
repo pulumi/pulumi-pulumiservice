@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//	http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -34,6 +34,16 @@ type createTokenResponse struct {
 
 type createTokenRequest struct {
 	Description string `json:"description"`
+}
+
+type accessTokenResponse struct {
+	ID          string `json:"id"`
+	Description string `json:"description"`
+	LastUsed    int    `json:"lastUsed"`
+}
+
+type listTokenResponse struct {
+	Tokens []accessTokenResponse `json:"tokens"`
 }
 
 func (c *Client) CreateAccessToken(ctx context.Context, description string) (*AccessToken, error) {
@@ -72,4 +82,28 @@ func (c *Client) DeleteAccessToken(ctx context.Context, tokenId string) error {
 	}
 
 	return nil
+}
+
+func (c *Client) GetAccessToken(ctx context.Context, id string) (*AccessToken, error) {
+	apiPath := path.Join("user", "tokens")
+
+	var listRes listTokenResponse
+
+	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &listRes)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to list access tokens: %w", err)
+	}
+
+	for i := 0; i < len(listRes.Tokens); i++ {
+		token := listRes.Tokens[i]
+		if token.ID == id {
+			return &AccessToken{
+				ID:          token.ID,
+				Description: token.Description,
+			}, nil
+		}
+	}
+
+	return nil, nil
 }
