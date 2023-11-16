@@ -138,11 +138,29 @@ func (t *PulumiServiceTeamAccessTokenResource) Check(req *pulumirpc.CheckRequest
 }
 
 func (t *PulumiServiceTeamAccessTokenResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	return &pulumirpc.UpdateResponse{}, nil
+	// all updates are destructive, so we just call Create.
+	return nil, fmt.Errorf("unexpected call to update, expected create to be called instead")
 }
 
 func (t *PulumiServiceTeamAccessTokenResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	return &pulumirpc.ReadResponse{}, nil
+	ctx := context.Background()
+	urn := req.GetId()
+
+	orgName, teamName, _, tokenId, err := splitTeamAccessTokenId(urn)
+
+	// the team access token is immutable; if we get nil it got deleted, otherwise all data is the same
+	accesstoken, err := t.client.GetTeamAccessToken(ctx, tokenId, orgName, teamName)
+	if err != nil {
+		return nil, err
+	}
+	if accesstoken == nil {
+		return &pulumirpc.ReadResponse{}, nil
+	}
+
+	return &pulumirpc.ReadResponse{
+		Id:         req.GetId(),
+		Properties: req.GetProperties(),
+	}, nil
 }
 
 func (t *PulumiServiceTeamAccessTokenResource) Invoke(s *pulumiserviceProvider, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {

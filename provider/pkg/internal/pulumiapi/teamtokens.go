@@ -21,12 +21,6 @@ import (
 	"path"
 )
 
-type TeamAccessToken struct {
-	ID          string `json:"id"`
-	TokenValue  string `json:"tokenValue"`
-	Description string `json:"description"`
-}
-
 type createTeamTokenResponse struct {
 	ID         string `json:"id"`
 	TokenValue string `json:"tokenValue"`
@@ -91,4 +85,28 @@ func (c *Client) DeleteTeamAccessToken(ctx context.Context, tokenId string, orgN
 	}
 
 	return nil
+}
+
+func (c *Client) GetTeamAccessToken(ctx context.Context, tokenId string, orgName string, teamName string) (*AccessToken, error) {
+	apiPath := path.Join("orgs", orgName, "teams", teamName, "tokens", tokenId)
+
+	var listRes listTokenResponse
+
+	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &listRes)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to list team access tokens: %w", err)
+	}
+
+	for i := 0; i < len(listRes.Tokens); i++ {
+		token := listRes.Tokens[i]
+		if token.ID == tokenId {
+			return &AccessToken{
+				ID:          token.ID,
+				Description: token.Description,
+			}, nil
+		}
+	}
+
+	return nil, nil
 }
