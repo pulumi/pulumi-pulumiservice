@@ -14,11 +14,11 @@ __all__ = ['StackTagArgs', 'StackTag']
 @pulumi.input_type
 class StackTagArgs:
     def __init__(__self__, *,
-                 name: Optional[pulumi.Input[str]] = None,
-                 organization: Optional[pulumi.Input[str]] = None,
-                 project: Optional[pulumi.Input[str]] = None,
-                 stack: Optional[pulumi.Input[str]] = None,
-                 value: Optional[pulumi.Input[str]] = None):
+                 name: pulumi.Input[str],
+                 organization: pulumi.Input[str],
+                 project: pulumi.Input[str],
+                 stack: pulumi.Input[str],
+                 value: pulumi.Input[str]):
         """
         The set of arguments for constructing a StackTag resource.
         :param pulumi.Input[str] name: Name of the tag. The 'key' part of the key=value pair
@@ -27,75 +27,70 @@ class StackTagArgs:
         :param pulumi.Input[str] stack: Stack name.
         :param pulumi.Input[str] value: Value of the tag. The 'value' part of the key=value pair
         """
-        if name is not None:
-            pulumi.set(__self__, "name", name)
-        if organization is not None:
-            pulumi.set(__self__, "organization", organization)
-        if project is not None:
-            pulumi.set(__self__, "project", project)
-        if stack is not None:
-            pulumi.set(__self__, "stack", stack)
-        if value is not None:
-            pulumi.set(__self__, "value", value)
+        pulumi.set(__self__, "name", name)
+        pulumi.set(__self__, "organization", organization)
+        pulumi.set(__self__, "project", project)
+        pulumi.set(__self__, "stack", stack)
+        pulumi.set(__self__, "value", value)
 
     @property
     @pulumi.getter
-    def name(self) -> Optional[pulumi.Input[str]]:
+    def name(self) -> pulumi.Input[str]:
         """
         Name of the tag. The 'key' part of the key=value pair
         """
         return pulumi.get(self, "name")
 
     @name.setter
-    def name(self, value: Optional[pulumi.Input[str]]):
+    def name(self, value: pulumi.Input[str]):
         pulumi.set(self, "name", value)
 
     @property
     @pulumi.getter
-    def organization(self) -> Optional[pulumi.Input[str]]:
+    def organization(self) -> pulumi.Input[str]:
         """
         Organization name.
         """
         return pulumi.get(self, "organization")
 
     @organization.setter
-    def organization(self, value: Optional[pulumi.Input[str]]):
+    def organization(self, value: pulumi.Input[str]):
         pulumi.set(self, "organization", value)
 
     @property
     @pulumi.getter
-    def project(self) -> Optional[pulumi.Input[str]]:
+    def project(self) -> pulumi.Input[str]:
         """
         Project name.
         """
         return pulumi.get(self, "project")
 
     @project.setter
-    def project(self, value: Optional[pulumi.Input[str]]):
+    def project(self, value: pulumi.Input[str]):
         pulumi.set(self, "project", value)
 
     @property
     @pulumi.getter
-    def stack(self) -> Optional[pulumi.Input[str]]:
+    def stack(self) -> pulumi.Input[str]:
         """
         Stack name.
         """
         return pulumi.get(self, "stack")
 
     @stack.setter
-    def stack(self, value: Optional[pulumi.Input[str]]):
+    def stack(self, value: pulumi.Input[str]):
         pulumi.set(self, "stack", value)
 
     @property
     @pulumi.getter
-    def value(self) -> Optional[pulumi.Input[str]]:
+    def value(self) -> pulumi.Input[str]:
         """
         Value of the tag. The 'value' part of the key=value pair
         """
         return pulumi.get(self, "value")
 
     @value.setter
-    def value(self, value: Optional[pulumi.Input[str]]):
+    def value(self, value: pulumi.Input[str]):
         pulumi.set(self, "value", value)
 
 
@@ -125,7 +120,7 @@ class StackTag(pulumi.CustomResource):
     @overload
     def __init__(__self__,
                  resource_name: str,
-                 args: Optional[StackTagArgs] = None,
+                 args: StackTagArgs,
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Stacks have associated metadata in the form of tags. Each tag consists of a name and value.
@@ -159,10 +154,20 @@ class StackTag(pulumi.CustomResource):
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
             __props__ = StackTagArgs.__new__(StackTagArgs)
 
+            if name is None and not opts.urn:
+                raise TypeError("Missing required property 'name'")
             __props__.__dict__["name"] = name
+            if organization is None and not opts.urn:
+                raise TypeError("Missing required property 'organization'")
             __props__.__dict__["organization"] = organization
+            if project is None and not opts.urn:
+                raise TypeError("Missing required property 'project'")
             __props__.__dict__["project"] = project
+            if stack is None and not opts.urn:
+                raise TypeError("Missing required property 'stack'")
             __props__.__dict__["stack"] = stack
+            if value is None and not opts.urn:
+                raise TypeError("Missing required property 'value'")
             __props__.__dict__["value"] = value
         super(StackTag, __self__).__init__(
             'pulumiservice:index:StackTag',
@@ -195,7 +200,7 @@ class StackTag(pulumi.CustomResource):
 
     @property
     @pulumi.getter
-    def name(self) -> pulumi.Output[Optional[str]]:
+    def name(self) -> pulumi.Output[str]:
         """
         Name of the tag. The 'key' part of the key=value pair
         """
@@ -203,7 +208,7 @@ class StackTag(pulumi.CustomResource):
 
     @property
     @pulumi.getter
-    def organization(self) -> pulumi.Output[Optional[str]]:
+    def organization(self) -> pulumi.Output[str]:
         """
         Organization name.
         """
@@ -211,7 +216,7 @@ class StackTag(pulumi.CustomResource):
 
     @property
     @pulumi.getter
-    def project(self) -> pulumi.Output[Optional[str]]:
+    def project(self) -> pulumi.Output[str]:
         """
         Project name.
         """
@@ -219,7 +224,7 @@ class StackTag(pulumi.CustomResource):
 
     @property
     @pulumi.getter
-    def stack(self) -> pulumi.Output[Optional[str]]:
+    def stack(self) -> pulumi.Output[str]:
         """
         Stack name.
         """
@@ -227,7 +232,7 @@ class StackTag(pulumi.CustomResource):
 
     @property
     @pulumi.getter
-    def value(self) -> pulumi.Output[Optional[str]]:
+    def value(self) -> pulumi.Output[str]:
         """
         Value of the tag. The 'value' part of the key=value pair
         """

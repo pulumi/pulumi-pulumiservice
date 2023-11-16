@@ -189,7 +189,7 @@ class TeamAccessToken(pulumi.CustomResource):
 
     @property
     @pulumi.getter
-    def name(self) -> pulumi.Output[Optional[str]]:
+    def name(self) -> pulumi.Output[str]:
         """
         The name for the token. This must be unique amongst all machine tokens within your organization.
         """
@@ -197,7 +197,7 @@ class TeamAccessToken(pulumi.CustomResource):
 
     @property
     @pulumi.getter(name="organizationName")
-    def organization_name(self) -> pulumi.Output[Optional[str]]:
+    def organization_name(self) -> pulumi.Output[str]:
         """
         The organization's name.
         """
@@ -205,7 +205,7 @@ class TeamAccessToken(pulumi.CustomResource):
 
     @property
     @pulumi.getter(name="teamName")
-    def team_name(self) -> pulumi.Output[Optional[str]]:
+    def team_name(self) -> pulumi.Output[str]:
         """
         The team name.
         """
@@ -213,7 +213,7 @@ class TeamAccessToken(pulumi.CustomResource):
 
     @property
     @pulumi.getter
-    def value(self) -> pulumi.Output[Optional[str]]:
+    def value(self) -> pulumi.Output[str]:
         """
         The token's value.
         """

@@ -254,7 +254,7 @@ class DeploymentSettings(pulumi.CustomResource):
 
     @property
     @pulumi.getter
-    def organization(self) -> pulumi.Output[Optional[str]]:
+    def organization(self) -> pulumi.Output[str]:
         """
         Organization name.
         """
@@ -262,7 +262,7 @@ class DeploymentSettings(pulumi.CustomResource):
 
     @property
     @pulumi.getter
-    def project(self) -> pulumi.Output[Optional[str]]:
+    def project(self) -> pulumi.Output[str]:
         """
         Project name.
         """
@@ -270,7 +270,7 @@ class DeploymentSettings(pulumi.CustomResource):
 
     @property
     @pulumi.getter
-    def stack(self) -> pulumi.Output[Optional[str]]:
+    def stack(self) -> pulumi.Output[str]:
         """
         Stack name.
         """

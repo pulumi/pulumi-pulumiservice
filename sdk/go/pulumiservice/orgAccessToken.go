@@ -20,11 +20,11 @@ type OrgAccessToken struct {
 	// Optional. Description for the token.
 	Description pulumi.StringPtrOutput `pulumi:"description"`
 	// The name for the token.
-	Name pulumi.StringPtrOutput `pulumi:"name"`
+	Name pulumi.StringOutput `pulumi:"name"`
 	// The organization's name.
-	OrganizationName pulumi.StringPtrOutput `pulumi:"organizationName"`
+	OrganizationName pulumi.StringOutput `pulumi:"organizationName"`
 	// The token's value.
-	Value pulumi.StringPtrOutput `pulumi:"value"`
+	Value pulumi.StringOutput `pulumi:"value"`
 }
 
 // NewOrgAccessToken registers a new resource with the given unique name, arguments, and options.
@@ -196,18 +196,18 @@ func (o OrgAccessTokenOutput) Description() pulumi.StringPtrOutput {
 }
 
 // The name for the token.
-func (o OrgAccessTokenOutput) Name() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *OrgAccessToken) pulumi.StringPtrOutput { return v.Name }).(pulumi.StringPtrOutput)
+func (o OrgAccessTokenOutput) Name() pulumi.StringOutput {
+	return o.ApplyT(func(v *OrgAccessToken) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
 }
 
 // The organization's name.
-func (o OrgAccessTokenOutput) OrganizationName() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *OrgAccessToken) pulumi.StringPtrOutput { return v.OrganizationName }).(pulumi.StringPtrOutput)
+func (o OrgAccessTokenOutput) OrganizationName() pulumi.StringOutput {
+	return o.ApplyT(func(v *OrgAccessToken) pulumi.StringOutput { return v.OrganizationName }).(pulumi.StringOutput)
 }
 
 // The token's value.
-func (o OrgAccessTokenOutput) Value() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *OrgAccessToken) pulumi.StringPtrOutput { return v.Value }).(pulumi.StringPtrOutput)
+func (o OrgAccessTokenOutput) Value() pulumi.StringOutput {
+	return o.ApplyT(func(v *OrgAccessToken) pulumi.StringOutput { return v.Value }).(pulumi.StringOutput)
 }
 
 type OrgAccessTokenArrayOutput struct{ *pulumi.OutputState }

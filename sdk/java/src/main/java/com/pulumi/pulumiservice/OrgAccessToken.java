@@ -54,42 +54,42 @@ public class OrgAccessToken extends com.pulumi.resources.CustomResource {
      * 
      */
     @Export(name="name", refs={String.class}, tree="[0]")
-    private Output</* @Nullable */ String> name;
+    private Output<String> name;
 
     /**
      * @return The name for the token.
      * 
      */
-    public Output<Optional<String>> name() {
-        return Codegen.optional(this.name);
+    public Output<String> name() {
+        return this.name;
     }
     /**
      * The organization&#39;s name.
      * 
      */
     @Export(name="organizationName", refs={String.class}, tree="[0]")
-    private Output</* @Nullable */ String> organizationName;
+    private Output<String> organizationName;
 
     /**
      * @return The organization&#39;s name.
      * 
      */
-    public Output<Optional<String>> organizationName() {
-        return Codegen.optional(this.organizationName);
+    public Output<String> organizationName() {
+        return this.organizationName;
     }
     /**
      * The token&#39;s value.
      * 
      */
     @Export(name="value", refs={String.class}, tree="[0]")
-    private Output</* @Nullable */ String> value;
+    private Output<String> value;
 
     /**
      * @return The token&#39;s value.
      * 
      */
-    public Output<Optional<String>> value() {
-        return Codegen.optional(this.value);
+    public Output<String> value() {
+        return this.value;
     }
 
     /**

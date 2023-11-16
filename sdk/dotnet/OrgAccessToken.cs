@@ -31,19 +31,19 @@ namespace Pulumi.PulumiService
         /// The name for the token.
         /// </summary>
         [Output("name")]
-        public Output<string?> Name { get; private set; } = null!;
+        public Output<string> Name { get; private set; } = null!;
 
         /// <summary>
         /// The organization's name.
         /// </summary>
         [Output("organizationName")]
-        public Output<string?> OrganizationName { get; private set; } = null!;
+        public Output<string> OrganizationName { get; private set; } = null!;
 
         /// <summary>
         /// The token's value.
         /// </summary>
         [Output("value")]
-        public Output<string?> Value { get; private set; } = null!;
+        public Output<string> Value { get; private set; } = null!;
 
 
         /// <summary>

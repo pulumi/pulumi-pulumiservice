@@ -18,13 +18,13 @@ type TeamAccessToken struct {
 	// Optional. Description for the token.
 	Description pulumi.StringPtrOutput `pulumi:"description"`
 	// The name for the token. This must be unique amongst all machine tokens within your organization.
-	Name pulumi.StringPtrOutput `pulumi:"name"`
+	Name pulumi.StringOutput `pulumi:"name"`
 	// The organization's name.
-	OrganizationName pulumi.StringPtrOutput `pulumi:"organizationName"`
+	OrganizationName pulumi.StringOutput `pulumi:"organizationName"`
 	// The team name.
-	TeamName pulumi.StringPtrOutput `pulumi:"teamName"`
+	TeamName pulumi.StringOutput `pulumi:"teamName"`
 	// The token's value.
-	Value pulumi.StringPtrOutput `pulumi:"value"`
+	Value pulumi.StringOutput `pulumi:"value"`
 }
 
 // NewTeamAccessToken registers a new resource with the given unique name, arguments, and options.
@@ -194,23 +194,23 @@ func (o TeamAccessTokenOutput) Description() pulumi.StringPtrOutput {
 }
 
 // The name for the token. This must be unique amongst all machine tokens within your organization.
-func (o TeamAccessTokenOutput) Name() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *TeamAccessToken) pulumi.StringPtrOutput { return v.Name }).(pulumi.StringPtrOutput)
+func (o TeamAccessTokenOutput) Name() pulumi.StringOutput {
+	return o.ApplyT(func(v *TeamAccessToken) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
 }
 
 // The organization's name.
-func (o TeamAccessTokenOutput) OrganizationName() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *TeamAccessToken) pulumi.StringPtrOutput { return v.OrganizationName }).(pulumi.StringPtrOutput)
+func (o TeamAccessTokenOutput) OrganizationName() pulumi.StringOutput {
+	return o.ApplyT(func(v *TeamAccessToken) pulumi.StringOutput { return v.OrganizationName }).(pulumi.StringOutput)
 }
 
 // The team name.
-func (o TeamAccessTokenOutput) TeamName() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *TeamAccessToken) pulumi.StringPtrOutput { return v.TeamName }).(pulumi.StringPtrOutput)
+func (o TeamAccessTokenOutput) TeamName() pulumi.StringOutput {
+	return o.ApplyT(func(v *TeamAccessToken) pulumi.StringOutput { return v.TeamName }).(pulumi.StringOutput)
 }
 
 // The token's value.
-func (o TeamAccessTokenOutput) Value() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *TeamAccessToken) pulumi.StringPtrOutput { return v.Value }).(pulumi.StringPtrOutput)
+func (o TeamAccessTokenOutput) Value() pulumi.StringOutput {
+	return o.ApplyT(func(v *TeamAccessToken) pulumi.StringOutput { return v.Value }).(pulumi.StringOutput)
 }
 
 type TeamAccessTokenArrayOutput struct{ *pulumi.OutputState }

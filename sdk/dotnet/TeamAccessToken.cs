@@ -25,25 +25,25 @@ namespace Pulumi.PulumiService
         /// The name for the token. This must be unique amongst all machine tokens within your organization.
         /// </summary>
         [Output("name")]
-        public Output<string?> Name { get; private set; } = null!;
+        public Output<string> Name { get; private set; } = null!;
 
         /// <summary>
         /// The organization's name.
         /// </summary>
         [Output("organizationName")]
-        public Output<string?> OrganizationName { get; private set; } = null!;
+        public Output<string> OrganizationName { get; private set; } = null!;
 
         /// <summary>
         /// The team name.
         /// </summary>
         [Output("teamName")]
-        public Output<string?> TeamName { get; private set; } = null!;
+        public Output<string> TeamName { get; private set; } = null!;
 
         /// <summary>
         /// The token's value.
         /// </summary>
         [Output("value")]
-        public Output<string?> Value { get; private set; } = null!;
+        public Output<string> Value { get; private set; } = null!;
 
 
         /// <summary>

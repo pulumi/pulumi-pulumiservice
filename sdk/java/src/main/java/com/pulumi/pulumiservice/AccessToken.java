@@ -11,7 +11,6 @@ import com.pulumi.pulumiservice.AccessTokenArgs;
 import com.pulumi.pulumiservice.Utilities;
 import java.lang.String;
 import java.util.List;
-import java.util.Optional;
 import javax.annotation.Nullable;
 
 /**
@@ -25,42 +24,42 @@ public class AccessToken extends com.pulumi.resources.CustomResource {
      * 
      */
     @Export(name="description", refs={String.class}, tree="[0]")
-    private Output</* @Nullable */ String> description;
+    private Output<String> description;
 
     /**
      * @return Description of the access token.
      * 
      */
-    public Output<Optional<String>> description() {
-        return Codegen.optional(this.description);
+    public Output<String> description() {
+        return this.description;
     }
     /**
      * The token identifier.
      * 
      */
     @Export(name="tokenId", refs={String.class}, tree="[0]")
-    private Output</* @Nullable */ String> tokenId;
+    private Output<String> tokenId;
 
     /**
      * @return The token identifier.
      * 
      */
-    public Output<Optional<String>> tokenId() {
-        return Codegen.optional(this.tokenId);
+    public Output<String> tokenId() {
+        return this.tokenId;
     }
     /**
      * The token&#39;s value.
      * 
      */
     @Export(name="value", refs={String.class}, tree="[0]")
-    private Output</* @Nullable */ String> value;
+    private Output<String> value;
 
     /**
      * @return The token&#39;s value.
      * 
      */
-    public Output<Optional<String>> value() {
-        return Codegen.optional(this.value);
+    public Output<String> value() {
+        return this.value;
     }
 
     /**

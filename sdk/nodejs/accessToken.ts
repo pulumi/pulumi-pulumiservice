@@ -37,15 +37,15 @@ export class AccessToken extends pulumi.CustomResource {
     /**
      * Description of the access token.
      */
-    public readonly description!: pulumi.Output<string | undefined>;
+    public readonly description!: pulumi.Output<string>;
     /**
      * The token identifier.
      */
-    public /*out*/ readonly tokenId!: pulumi.Output<string | undefined>;
+    public /*out*/ readonly tokenId!: pulumi.Output<string>;
     /**
      * The token's value.
      */
-    public /*out*/ readonly value!: pulumi.Output<string | undefined>;
+    public /*out*/ readonly value!: pulumi.Output<string>;
 
     /**
      * Create a AccessToken resource with the given unique name, arguments, and options.
