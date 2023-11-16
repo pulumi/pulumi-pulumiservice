@@ -16,11 +16,11 @@ type AccessToken struct {
 	pulumi.CustomResourceState
 
 	// Description of the access token.
-	Description pulumi.StringPtrOutput `pulumi:"description"`
+	Description pulumi.StringOutput `pulumi:"description"`
 	// The token identifier.
-	TokenId pulumi.StringPtrOutput `pulumi:"tokenId"`
+	TokenId pulumi.StringOutput `pulumi:"tokenId"`
 	// The token's value.
-	Value pulumi.StringPtrOutput `pulumi:"value"`
+	Value pulumi.StringOutput `pulumi:"value"`
 }
 
 // NewAccessToken registers a new resource with the given unique name, arguments, and options.
@@ -167,18 +167,18 @@ func (o AccessTokenOutput) ToAccessTokenOutputWithContext(ctx context.Context) A
 }
 
 // Description of the access token.
-func (o AccessTokenOutput) Description() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *AccessToken) pulumi.StringPtrOutput { return v.Description }).(pulumi.StringPtrOutput)
+func (o AccessTokenOutput) Description() pulumi.StringOutput {
+	return o.ApplyT(func(v *AccessToken) pulumi.StringOutput { return v.Description }).(pulumi.StringOutput)
 }
 
 // The token identifier.
-func (o AccessTokenOutput) TokenId() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *AccessToken) pulumi.StringPtrOutput { return v.TokenId }).(pulumi.StringPtrOutput)
+func (o AccessTokenOutput) TokenId() pulumi.StringOutput {
+	return o.ApplyT(func(v *AccessToken) pulumi.StringOutput { return v.TokenId }).(pulumi.StringOutput)
 }
 
 // The token's value.
-func (o AccessTokenOutput) Value() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *AccessToken) pulumi.StringPtrOutput { return v.Value }).(pulumi.StringPtrOutput)
+func (o AccessTokenOutput) Value() pulumi.StringOutput {
+	return o.ApplyT(func(v *AccessToken) pulumi.StringOutput { return v.Value }).(pulumi.StringOutput)
 }
 
 type AccessTokenArrayOutput struct{ *pulumi.OutputState }

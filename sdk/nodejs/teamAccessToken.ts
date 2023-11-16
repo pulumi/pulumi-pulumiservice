@@ -41,19 +41,19 @@ export class TeamAccessToken extends pulumi.CustomResource {
     /**
      * The name for the token. This must be unique amongst all machine tokens within your organization.
      */
-    public readonly name!: pulumi.Output<string | undefined>;
+    public readonly name!: pulumi.Output<string>;
     /**
      * The organization's name.
      */
-    public readonly organizationName!: pulumi.Output<string | undefined>;
+    public readonly organizationName!: pulumi.Output<string>;
     /**
      * The team name.
      */
-    public readonly teamName!: pulumi.Output<string | undefined>;
+    public readonly teamName!: pulumi.Output<string>;
     /**
      * The token's value.
      */
-    public /*out*/ readonly value!: pulumi.Output<string | undefined>;
+    public /*out*/ readonly value!: pulumi.Output<string>;
 
     /**
      * Create a TeamAccessToken resource with the given unique name, arguments, and options.

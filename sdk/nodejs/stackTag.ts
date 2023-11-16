@@ -37,23 +37,23 @@ export class StackTag extends pulumi.CustomResource {
     /**
      * Name of the tag. The 'key' part of the key=value pair
      */
-    public readonly name!: pulumi.Output<string | undefined>;
+    public readonly name!: pulumi.Output<string>;
     /**
      * Organization name.
      */
-    public readonly organization!: pulumi.Output<string | undefined>;
+    public readonly organization!: pulumi.Output<string>;
     /**
      * Project name.
      */
-    public readonly project!: pulumi.Output<string | undefined>;
+    public readonly project!: pulumi.Output<string>;
     /**
      * Stack name.
      */
-    public readonly stack!: pulumi.Output<string | undefined>;
+    public readonly stack!: pulumi.Output<string>;
     /**
      * Value of the tag. The 'value' part of the key=value pair
      */
-    public readonly value!: pulumi.Output<string | undefined>;
+    public readonly value!: pulumi.Output<string>;
 
     /**
      * Create a StackTag resource with the given unique name, arguments, and options.
@@ -62,10 +62,25 @@ export class StackTag extends pulumi.CustomResource {
      * @param args The arguments to use to populate this resource's properties.
      * @param opts A bag of options that control this resource's behavior.
      */
-    constructor(name: string, args?: StackTagArgs, opts?: pulumi.CustomResourceOptions) {
+    constructor(name: string, args: StackTagArgs, opts?: pulumi.CustomResourceOptions) {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
+            if ((!args || args.name === undefined) && !opts.urn) {
+                throw new Error("Missing required property 'name'");
+            }
+            if ((!args || args.organization === undefined) && !opts.urn) {
+                throw new Error("Missing required property 'organization'");
+            }
+            if ((!args || args.project === undefined) && !opts.urn) {
+                throw new Error("Missing required property 'project'");
+            }
+            if ((!args || args.stack === undefined) && !opts.urn) {
+                throw new Error("Missing required property 'stack'");
+            }
+            if ((!args || args.value === undefined) && !opts.urn) {
+                throw new Error("Missing required property 'value'");
+            }
             resourceInputs["name"] = args ? args.name : undefined;
             resourceInputs["organization"] = args ? args.organization : undefined;
             resourceInputs["project"] = args ? args.project : undefined;
@@ -90,21 +105,21 @@ export interface StackTagArgs {
     /**
      * Name of the tag. The 'key' part of the key=value pair
      */
-    name?: pulumi.Input<string>;
+    name: pulumi.Input<string>;
     /**
      * Organization name.
      */
-    organization?: pulumi.Input<string>;
+    organization: pulumi.Input<string>;
     /**
      * Project name.
      */
-    project?: pulumi.Input<string>;
+    project: pulumi.Input<string>;
     /**
      * Stack name.
      */
-    stack?: pulumi.Input<string>;
+    stack: pulumi.Input<string>;
     /**
      * Value of the tag. The 'value' part of the key=value pair
      */
-    value?: pulumi.Input<string>;
+    value: pulumi.Input<string>;
 }

@@ -263,7 +263,7 @@ class Team(pulumi.CustomResource):
 
     @property
     @pulumi.getter
-    def members(self) -> pulumi.Output[Optional[Sequence[str]]]:
+    def members(self) -> pulumi.Output[Sequence[str]]:
         """
         List of team members.
         """
@@ -279,7 +279,7 @@ class Team(pulumi.CustomResource):
 
     @property
     @pulumi.getter(name="organizationName")
-    def organization_name(self) -> pulumi.Output[Optional[str]]:
+    def organization_name(self) -> pulumi.Output[str]:
         """
         The name of the Pulumi organization the team belongs to.
         """
@@ -287,7 +287,7 @@ class Team(pulumi.CustomResource):
 
     @property
     @pulumi.getter(name="teamType")
-    def team_type(self) -> pulumi.Output[Optional[str]]:
+    def team_type(self) -> pulumi.Output[str]:
         """
         The type of team. Must be either `pulumi` or `github`.
         """

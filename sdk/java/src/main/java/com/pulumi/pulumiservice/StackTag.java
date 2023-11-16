@@ -10,7 +10,6 @@ import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.StackTagArgs;
 import com.pulumi.pulumiservice.Utilities;
 import java.lang.String;
-import java.util.Optional;
 import javax.annotation.Nullable;
 
 /**
@@ -24,70 +23,70 @@ public class StackTag extends com.pulumi.resources.CustomResource {
      * 
      */
     @Export(name="name", refs={String.class}, tree="[0]")
-    private Output</* @Nullable */ String> name;
+    private Output<String> name;
 
     /**
      * @return Name of the tag. The &#39;key&#39; part of the key=value pair
      * 
      */
-    public Output<Optional<String>> name() {
-        return Codegen.optional(this.name);
+    public Output<String> name() {
+        return this.name;
     }
     /**
      * Organization name.
      * 
      */
     @Export(name="organization", refs={String.class}, tree="[0]")
-    private Output</* @Nullable */ String> organization;
+    private Output<String> organization;
 
     /**
      * @return Organization name.
      * 
      */
-    public Output<Optional<String>> organization() {
-        return Codegen.optional(this.organization);
+    public Output<String> organization() {
+        return this.organization;
     }
     /**
      * Project name.
      * 
      */
     @Export(name="project", refs={String.class}, tree="[0]")
-    private Output</* @Nullable */ String> project;
+    private Output<String> project;
 
     /**
      * @return Project name.
      * 
      */
-    public Output<Optional<String>> project() {
-        return Codegen.optional(this.project);
+    public Output<String> project() {
+        return this.project;
     }
     /**
      * Stack name.
      * 
      */
     @Export(name="stack", refs={String.class}, tree="[0]")
-    private Output</* @Nullable */ String> stack;
+    private Output<String> stack;
 
     /**
      * @return Stack name.
      * 
      */
-    public Output<Optional<String>> stack() {
-        return Codegen.optional(this.stack);
+    public Output<String> stack() {
+        return this.stack;
     }
     /**
      * Value of the tag. The &#39;value&#39; part of the key=value pair
      * 
      */
     @Export(name="value", refs={String.class}, tree="[0]")
-    private Output</* @Nullable */ String> value;
+    private Output<String> value;
 
     /**
      * @return Value of the tag. The &#39;value&#39; part of the key=value pair
      * 
      */
-    public Output<Optional<String>> value() {
-        return Codegen.optional(this.value);
+    public Output<String> value() {
+        return this.value;
     }
 
     /**
@@ -102,7 +101,7 @@ public class StackTag extends com.pulumi.resources.CustomResource {
      * @param name The _unique_ name of the resulting resource.
      * @param args The arguments to use to populate this resource's properties.
      */
-    public StackTag(String name, @Nullable StackTagArgs args) {
+    public StackTag(String name, StackTagArgs args) {
         this(name, args, null);
     }
     /**
@@ -111,7 +110,7 @@ public class StackTag extends com.pulumi.resources.CustomResource {
      * @param args The arguments to use to populate this resource's properties.
      * @param options A bag of options that control this resource's behavior.
      */
-    public StackTag(String name, @Nullable StackTagArgs args, @Nullable com.pulumi.resources.CustomResourceOptions options) {
+    public StackTag(String name, StackTagArgs args, @Nullable com.pulumi.resources.CustomResourceOptions options) {
         super("pulumiservice:index:StackTag", name, args == null ? StackTagArgs.Empty : args, makeResourceOptions(options, Codegen.empty()));
     }
 

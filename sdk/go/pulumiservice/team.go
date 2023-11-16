@@ -26,9 +26,9 @@ type Team struct {
 	// The team's name. Required for "pulumi" teams.
 	Name pulumi.StringPtrOutput `pulumi:"name"`
 	// The name of the Pulumi organization the team belongs to.
-	OrganizationName pulumi.StringPtrOutput `pulumi:"organizationName"`
+	OrganizationName pulumi.StringOutput `pulumi:"organizationName"`
 	// The type of team. Must be either `pulumi` or `github`.
-	TeamType pulumi.StringPtrOutput `pulumi:"teamType"`
+	TeamType pulumi.StringOutput `pulumi:"teamType"`
 }
 
 // NewTeam registers a new resource with the given unique name, arguments, and options.
@@ -223,13 +223,13 @@ func (o TeamOutput) Name() pulumi.StringPtrOutput {
 }
 
 // The name of the Pulumi organization the team belongs to.
-func (o TeamOutput) OrganizationName() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *Team) pulumi.StringPtrOutput { return v.OrganizationName }).(pulumi.StringPtrOutput)
+func (o TeamOutput) OrganizationName() pulumi.StringOutput {
+	return o.ApplyT(func(v *Team) pulumi.StringOutput { return v.OrganizationName }).(pulumi.StringOutput)
 }
 
 // The type of team. Must be either `pulumi` or `github`.
-func (o TeamOutput) TeamType() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *Team) pulumi.StringPtrOutput { return v.TeamType }).(pulumi.StringPtrOutput)
+func (o TeamOutput) TeamType() pulumi.StringOutput {
+	return o.ApplyT(func(v *Team) pulumi.StringOutput { return v.TeamType }).(pulumi.StringOutput)
 }
 
 type TeamArrayOutput struct{ *pulumi.OutputState }
