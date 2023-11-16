@@ -453,6 +453,11 @@
           "secret": true
         }
       },
+      "required": [
+        "tokenId",
+        "description",
+        "value"
+      ],
       "inputProperties": {
         "description": {
           "description": "Description of the access token.",
@@ -498,6 +503,11 @@
           "type": "number"
         }
       },
+      "required": [
+        "organizationName",
+        "teamType",
+        "members"
+      ],
       "inputProperties": {
         "teamType": {
           "description": "The type of team. Must be either `pulumi` or `github`.",
@@ -561,6 +571,12 @@
           "secret": true
         }
       },
+      "required": [
+        "name",
+        "teamName",
+        "organizationName",
+        "value"
+      ],
       "inputProperties": {
         "name": {
           "description": "The name for the token. This must be unique amongst all machine tokens within your organization.",
@@ -610,6 +626,11 @@
           "secret": true
         }
       },
+      "required": [
+        "name",
+        "organizationName",
+        "value"
+      ],
       "inputProperties": {
         "name": {
           "description": "The name for the token.",
@@ -681,6 +702,14 @@
           }
         }
       },
+      "required": [
+        "active",
+        "displayName",
+        "organizationName",
+        "payloadUrl",
+        "name",
+        "format"
+      ],
       "inputProperties": {
         "active": {
           "description": "Indicates whether this webhook is enabled or not.",
@@ -747,6 +776,11 @@
           "type": "string"
         }
       },
+      "required": [
+        "organization",
+        "project",
+        "stack"
+      ],
       "inputProperties": {
         "organization": {
           "description": "Organization name.",
@@ -808,6 +842,13 @@
           "type": "string"
         }
       },
+      "required": [
+        "organization",
+        "project",
+        "stack",
+        "name",
+        "value"
+      ],
       "inputProperties": {
         "organization": {
           "description": "Organization name.",
@@ -829,7 +870,14 @@
           "description": "Value of the tag. The 'value' part of the key=value pair",
           "type": "string"
         }
-      }
+      },
+      "requiredInputs": [
+        "organization",
+        "project",
+        "stack",
+        "name",
+        "value"
+      ]
     },
     "pulumiservice:index:TeamStackPermission": {
       "description": "Grants a team permissions to the specified stack.",
