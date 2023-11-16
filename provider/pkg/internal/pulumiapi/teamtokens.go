@@ -31,7 +31,7 @@ type createTeamTokenRequest struct {
 	Description string `json:"description"`
 }
 
-func (c *Client) CreateTeamAccessToken(ctx context.Context, name string, orgName string, teamName string, description string) (*AccessToken, error) {
+func (c *Client) CreateTeamAccessToken(ctx context.Context, name, orgName, teamName, description string) (*AccessToken, error) {
 
 	if len(orgName) == 0 {
 		return nil, errors.New("empty orgName")
@@ -64,7 +64,7 @@ func (c *Client) CreateTeamAccessToken(ctx context.Context, name string, orgName
 
 }
 
-func (c *Client) DeleteTeamAccessToken(ctx context.Context, tokenId string, orgName string, teamName string) error {
+func (c *Client) DeleteTeamAccessToken(ctx context.Context, tokenId, orgName, teamName string) error {
 	if len(tokenId) == 0 {
 		return errors.New("tokenid length must be greater than zero")
 	}
@@ -87,7 +87,7 @@ func (c *Client) DeleteTeamAccessToken(ctx context.Context, tokenId string, orgN
 	return nil
 }
 
-func (c *Client) GetTeamAccessToken(ctx context.Context, tokenId string, orgName string, teamName string) (*AccessToken, error) {
+func (c *Client) GetTeamAccessToken(ctx context.Context, tokenId, orgName, teamName string) (*AccessToken, error) {
 	apiPath := path.Join("orgs", orgName, "teams", teamName, "tokens", tokenId)
 
 	var listRes listTokenResponse
