@@ -27,19 +27,19 @@ namespace Pulumi.PulumiService
         /// Organization name.
         /// </summary>
         [Output("organization")]
-        public Output<string?> Organization { get; private set; } = null!;
+        public Output<string> Organization { get; private set; } = null!;
 
         /// <summary>
         /// Project name.
         /// </summary>
         [Output("project")]
-        public Output<string?> Project { get; private set; } = null!;
+        public Output<string> Project { get; private set; } = null!;
 
         /// <summary>
         /// Stack name.
         /// </summary>
         [Output("stack")]
-        public Output<string?> Stack { get; private set; } = null!;
+        public Output<string> Stack { get; private set; } = null!;
 
 
         /// <summary>

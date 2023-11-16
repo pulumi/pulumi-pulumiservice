@@ -19,31 +19,31 @@ namespace Pulumi.PulumiService
         /// Name of the tag. The 'key' part of the key=value pair
         /// </summary>
         [Output("name")]
-        public Output<string?> Name { get; private set; } = null!;
+        public Output<string> Name { get; private set; } = null!;
 
         /// <summary>
         /// Organization name.
         /// </summary>
         [Output("organization")]
-        public Output<string?> Organization { get; private set; } = null!;
+        public Output<string> Organization { get; private set; } = null!;
 
         /// <summary>
         /// Project name.
         /// </summary>
         [Output("project")]
-        public Output<string?> Project { get; private set; } = null!;
+        public Output<string> Project { get; private set; } = null!;
 
         /// <summary>
         /// Stack name.
         /// </summary>
         [Output("stack")]
-        public Output<string?> Stack { get; private set; } = null!;
+        public Output<string> Stack { get; private set; } = null!;
 
         /// <summary>
         /// Value of the tag. The 'value' part of the key=value pair
         /// </summary>
         [Output("value")]
-        public Output<string?> Value { get; private set; } = null!;
+        public Output<string> Value { get; private set; } = null!;
 
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace Pulumi.PulumiService
         /// <param name="name">The unique name of the resource</param>
         /// <param name="args">The arguments used to populate this resource's properties</param>
         /// <param name="options">A bag of options that control this resource's behavior</param>
-        public StackTag(string name, StackTagArgs? args = null, CustomResourceOptions? options = null)
+        public StackTag(string name, StackTagArgs args, CustomResourceOptions? options = null)
             : base("pulumiservice:index:StackTag", name, args ?? new StackTagArgs(), MakeResourceOptions(options, ""))
         {
         }
@@ -93,32 +93,32 @@ namespace Pulumi.PulumiService
         /// <summary>
         /// Name of the tag. The 'key' part of the key=value pair
         /// </summary>
-        [Input("name")]
-        public Input<string>? Name { get; set; }
+        [Input("name", required: true)]
+        public Input<string> Name { get; set; } = null!;
 
         /// <summary>
         /// Organization name.
         /// </summary>
-        [Input("organization")]
-        public Input<string>? Organization { get; set; }
+        [Input("organization", required: true)]
+        public Input<string> Organization { get; set; } = null!;
 
         /// <summary>
         /// Project name.
         /// </summary>
-        [Input("project")]
-        public Input<string>? Project { get; set; }
+        [Input("project", required: true)]
+        public Input<string> Project { get; set; } = null!;
 
         /// <summary>
         /// Stack name.
         /// </summary>
-        [Input("stack")]
-        public Input<string>? Stack { get; set; }
+        [Input("stack", required: true)]
+        public Input<string> Stack { get; set; } = null!;
 
         /// <summary>
         /// Value of the tag. The 'value' part of the key=value pair
         /// </summary>
-        [Input("value")]
-        public Input<string>? Value { get; set; }
+        [Input("value", required: true)]
+        public Input<string> Value { get; set; } = null!;
 
         public StackTagArgs()
         {

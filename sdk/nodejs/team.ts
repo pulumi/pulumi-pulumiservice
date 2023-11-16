@@ -49,7 +49,7 @@ export class Team extends pulumi.CustomResource {
     /**
      * List of team members.
      */
-    public readonly members!: pulumi.Output<string[] | undefined>;
+    public readonly members!: pulumi.Output<string[]>;
     /**
      * The team's name. Required for "pulumi" teams.
      */
@@ -57,11 +57,11 @@ export class Team extends pulumi.CustomResource {
     /**
      * The name of the Pulumi organization the team belongs to.
      */
-    public readonly organizationName!: pulumi.Output<string | undefined>;
+    public readonly organizationName!: pulumi.Output<string>;
     /**
      * The type of team. Must be either `pulumi` or `github`.
      */
-    public readonly teamType!: pulumi.Output<string | undefined>;
+    public readonly teamType!: pulumi.Output<string>;
 
     /**
      * Create a Team resource with the given unique name, arguments, and options.

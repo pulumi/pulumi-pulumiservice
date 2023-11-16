@@ -45,15 +45,15 @@ export class OrgAccessToken extends pulumi.CustomResource {
     /**
      * The name for the token.
      */
-    public readonly name!: pulumi.Output<string | undefined>;
+    public readonly name!: pulumi.Output<string>;
     /**
      * The organization's name.
      */
-    public readonly organizationName!: pulumi.Output<string | undefined>;
+    public readonly organizationName!: pulumi.Output<string>;
     /**
      * The token's value.
      */
-    public /*out*/ readonly value!: pulumi.Output<string | undefined>;
+    public /*out*/ readonly value!: pulumi.Output<string>;
 
     /**
      * Create a OrgAccessToken resource with the given unique name, arguments, and options.

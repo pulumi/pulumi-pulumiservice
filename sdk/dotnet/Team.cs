@@ -49,13 +49,13 @@ namespace Pulumi.PulumiService
         /// The name of the Pulumi organization the team belongs to.
         /// </summary>
         [Output("organizationName")]
-        public Output<string?> OrganizationName { get; private set; } = null!;
+        public Output<string> OrganizationName { get; private set; } = null!;
 
         /// <summary>
         /// The type of team. Must be either `pulumi` or `github`.
         /// </summary>
         [Output("teamType")]
-        public Output<string?> TeamType { get; private set; } = null!;
+        public Output<string> TeamType { get; private set; } = null!;
 
 
         /// <summary>

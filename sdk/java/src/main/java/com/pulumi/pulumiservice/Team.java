@@ -68,14 +68,14 @@ public class Team extends com.pulumi.resources.CustomResource {
      * 
      */
     @Export(name="members", refs={List.class,String.class}, tree="[0,1]")
-    private Output</* @Nullable */ List<String>> members;
+    private Output<List<String>> members;
 
     /**
      * @return List of team members.
      * 
      */
-    public Output<Optional<List<String>>> members() {
-        return Codegen.optional(this.members);
+    public Output<List<String>> members() {
+        return this.members;
     }
     /**
      * The team&#39;s name. Required for &#34;pulumi&#34; teams.
@@ -96,28 +96,28 @@ public class Team extends com.pulumi.resources.CustomResource {
      * 
      */
     @Export(name="organizationName", refs={String.class}, tree="[0]")
-    private Output</* @Nullable */ String> organizationName;
+    private Output<String> organizationName;
 
     /**
      * @return The name of the Pulumi organization the team belongs to.
      * 
      */
-    public Output<Optional<String>> organizationName() {
-        return Codegen.optional(this.organizationName);
+    public Output<String> organizationName() {
+        return this.organizationName;
     }
     /**
      * The type of team. Must be either `pulumi` or `github`.
      * 
      */
     @Export(name="teamType", refs={String.class}, tree="[0]")
-    private Output</* @Nullable */ String> teamType;
+    private Output<String> teamType;
 
     /**
      * @return The type of team. Must be either `pulumi` or `github`.
      * 
      */
-    public Output<Optional<String>> teamType() {
-        return Codegen.optional(this.teamType);
+    public Output<String> teamType() {
+        return this.teamType;
     }
 
     /**

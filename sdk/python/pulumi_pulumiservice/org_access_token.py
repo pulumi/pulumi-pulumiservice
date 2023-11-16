@@ -196,7 +196,7 @@ class OrgAccessToken(pulumi.CustomResource):
 
     @property
     @pulumi.getter
-    def name(self) -> pulumi.Output[Optional[str]]:
+    def name(self) -> pulumi.Output[str]:
         """
         The name for the token.
         """
@@ -204,7 +204,7 @@ class OrgAccessToken(pulumi.CustomResource):
 
     @property
     @pulumi.getter(name="organizationName")
-    def organization_name(self) -> pulumi.Output[Optional[str]]:
+    def organization_name(self) -> pulumi.Output[str]:
         """
         The organization's name.
         """
@@ -212,7 +212,7 @@ class OrgAccessToken(pulumi.CustomResource):
 
     @property
     @pulumi.getter
-    def value(self) -> pulumi.Output[Optional[str]]:
+    def value(self) -> pulumi.Output[str]:
         """
         The token's value.
         """

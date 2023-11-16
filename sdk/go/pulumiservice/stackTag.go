@@ -7,6 +7,7 @@ import (
 	"context"
 	"reflect"
 
+	"errors"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
@@ -15,24 +16,39 @@ type StackTag struct {
 	pulumi.CustomResourceState
 
 	// Name of the tag. The 'key' part of the key=value pair
-	Name pulumi.StringPtrOutput `pulumi:"name"`
+	Name pulumi.StringOutput `pulumi:"name"`
 	// Organization name.
-	Organization pulumi.StringPtrOutput `pulumi:"organization"`
+	Organization pulumi.StringOutput `pulumi:"organization"`
 	// Project name.
-	Project pulumi.StringPtrOutput `pulumi:"project"`
+	Project pulumi.StringOutput `pulumi:"project"`
 	// Stack name.
-	Stack pulumi.StringPtrOutput `pulumi:"stack"`
+	Stack pulumi.StringOutput `pulumi:"stack"`
 	// Value of the tag. The 'value' part of the key=value pair
-	Value pulumi.StringPtrOutput `pulumi:"value"`
+	Value pulumi.StringOutput `pulumi:"value"`
 }
 
 // NewStackTag registers a new resource with the given unique name, arguments, and options.
 func NewStackTag(ctx *pulumi.Context,
 	name string, args *StackTagArgs, opts ...pulumi.ResourceOption) (*StackTag, error) {
 	if args == nil {
-		args = &StackTagArgs{}
+		return nil, errors.New("missing one or more required arguments")
 	}
 
+	if args.Name == nil {
+		return nil, errors.New("invalid value for required argument 'Name'")
+	}
+	if args.Organization == nil {
+		return nil, errors.New("invalid value for required argument 'Organization'")
+	}
+	if args.Project == nil {
+		return nil, errors.New("invalid value for required argument 'Project'")
+	}
+	if args.Stack == nil {
+		return nil, errors.New("invalid value for required argument 'Stack'")
+	}
+	if args.Value == nil {
+		return nil, errors.New("invalid value for required argument 'Value'")
+	}
 	var resource StackTag
 	err := ctx.RegisterResource("pulumiservice:index:StackTag", name, args, &resource, opts...)
 	if err != nil {
@@ -66,29 +82,29 @@ func (StackTagState) ElementType() reflect.Type {
 
 type stackTagArgs struct {
 	// Name of the tag. The 'key' part of the key=value pair
-	Name *string `pulumi:"name"`
+	Name string `pulumi:"name"`
 	// Organization name.
-	Organization *string `pulumi:"organization"`
+	Organization string `pulumi:"organization"`
 	// Project name.
-	Project *string `pulumi:"project"`
+	Project string `pulumi:"project"`
 	// Stack name.
-	Stack *string `pulumi:"stack"`
+	Stack string `pulumi:"stack"`
 	// Value of the tag. The 'value' part of the key=value pair
-	Value *string `pulumi:"value"`
+	Value string `pulumi:"value"`
 }
 
 // The set of arguments for constructing a StackTag resource.
 type StackTagArgs struct {
 	// Name of the tag. The 'key' part of the key=value pair
-	Name pulumi.StringPtrInput
+	Name pulumi.StringInput
 	// Organization name.
-	Organization pulumi.StringPtrInput
+	Organization pulumi.StringInput
 	// Project name.
-	Project pulumi.StringPtrInput
+	Project pulumi.StringInput
 	// Stack name.
-	Stack pulumi.StringPtrInput
+	Stack pulumi.StringInput
 	// Value of the tag. The 'value' part of the key=value pair
-	Value pulumi.StringPtrInput
+	Value pulumi.StringInput
 }
 
 func (StackTagArgs) ElementType() reflect.Type {
@@ -179,28 +195,28 @@ func (o StackTagOutput) ToStackTagOutputWithContext(ctx context.Context) StackTa
 }
 
 // Name of the tag. The 'key' part of the key=value pair
-func (o StackTagOutput) Name() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *StackTag) pulumi.StringPtrOutput { return v.Name }).(pulumi.StringPtrOutput)
+func (o StackTagOutput) Name() pulumi.StringOutput {
+	return o.ApplyT(func(v *StackTag) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
 }
 
 // Organization name.
-func (o StackTagOutput) Organization() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *StackTag) pulumi.StringPtrOutput { return v.Organization }).(pulumi.StringPtrOutput)
+func (o StackTagOutput) Organization() pulumi.StringOutput {
+	return o.ApplyT(func(v *StackTag) pulumi.StringOutput { return v.Organization }).(pulumi.StringOutput)
 }
 
 // Project name.
-func (o StackTagOutput) Project() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *StackTag) pulumi.StringPtrOutput { return v.Project }).(pulumi.StringPtrOutput)
+func (o StackTagOutput) Project() pulumi.StringOutput {
+	return o.ApplyT(func(v *StackTag) pulumi.StringOutput { return v.Project }).(pulumi.StringOutput)
 }
 
 // Stack name.
-func (o StackTagOutput) Stack() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *StackTag) pulumi.StringPtrOutput { return v.Stack }).(pulumi.StringPtrOutput)
+func (o StackTagOutput) Stack() pulumi.StringOutput {
+	return o.ApplyT(func(v *StackTag) pulumi.StringOutput { return v.Stack }).(pulumi.StringOutput)
 }
 
 // Value of the tag. The 'value' part of the key=value pair
-func (o StackTagOutput) Value() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *StackTag) pulumi.StringPtrOutput { return v.Value }).(pulumi.StringPtrOutput)
+func (o StackTagOutput) Value() pulumi.StringOutput {
+	return o.ApplyT(func(v *StackTag) pulumi.StringOutput { return v.Value }).(pulumi.StringOutput)
 }
 
 type StackTagArrayOutput struct{ *pulumi.OutputState }

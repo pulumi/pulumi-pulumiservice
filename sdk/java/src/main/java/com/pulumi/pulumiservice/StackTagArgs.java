@@ -7,8 +7,6 @@ import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import java.lang.String;
 import java.util.Objects;
-import java.util.Optional;
-import javax.annotation.Nullable;
 
 
 public final class StackTagArgs extends com.pulumi.resources.ResourceArgs {
@@ -19,75 +17,75 @@ public final class StackTagArgs extends com.pulumi.resources.ResourceArgs {
      * Name of the tag. The &#39;key&#39; part of the key=value pair
      * 
      */
-    @Import(name="name")
-    private @Nullable Output<String> name;
+    @Import(name="name", required=true)
+    private Output<String> name;
 
     /**
      * @return Name of the tag. The &#39;key&#39; part of the key=value pair
      * 
      */
-    public Optional<Output<String>> name() {
-        return Optional.ofNullable(this.name);
+    public Output<String> name() {
+        return this.name;
     }
 
     /**
      * Organization name.
      * 
      */
-    @Import(name="organization")
-    private @Nullable Output<String> organization;
+    @Import(name="organization", required=true)
+    private Output<String> organization;
 
     /**
      * @return Organization name.
      * 
      */
-    public Optional<Output<String>> organization() {
-        return Optional.ofNullable(this.organization);
+    public Output<String> organization() {
+        return this.organization;
     }
 
     /**
      * Project name.
      * 
      */
-    @Import(name="project")
-    private @Nullable Output<String> project;
+    @Import(name="project", required=true)
+    private Output<String> project;
 
     /**
      * @return Project name.
      * 
      */
-    public Optional<Output<String>> project() {
-        return Optional.ofNullable(this.project);
+    public Output<String> project() {
+        return this.project;
     }
 
     /**
      * Stack name.
      * 
      */
-    @Import(name="stack")
-    private @Nullable Output<String> stack;
+    @Import(name="stack", required=true)
+    private Output<String> stack;
 
     /**
      * @return Stack name.
      * 
      */
-    public Optional<Output<String>> stack() {
-        return Optional.ofNullable(this.stack);
+    public Output<String> stack() {
+        return this.stack;
     }
 
     /**
      * Value of the tag. The &#39;value&#39; part of the key=value pair
      * 
      */
-    @Import(name="value")
-    private @Nullable Output<String> value;
+    @Import(name="value", required=true)
+    private Output<String> value;
 
     /**
      * @return Value of the tag. The &#39;value&#39; part of the key=value pair
      * 
      */
-    public Optional<Output<String>> value() {
-        return Optional.ofNullable(this.value);
+    public Output<String> value() {
+        return this.value;
     }
 
     private StackTagArgs() {}
@@ -124,7 +122,7 @@ public final class StackTagArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder name(@Nullable Output<String> name) {
+        public Builder name(Output<String> name) {
             $.name = name;
             return this;
         }
@@ -145,7 +143,7 @@ public final class StackTagArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder organization(@Nullable Output<String> organization) {
+        public Builder organization(Output<String> organization) {
             $.organization = organization;
             return this;
         }
@@ -166,7 +164,7 @@ public final class StackTagArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder project(@Nullable Output<String> project) {
+        public Builder project(Output<String> project) {
             $.project = project;
             return this;
         }
@@ -187,7 +185,7 @@ public final class StackTagArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder stack(@Nullable Output<String> stack) {
+        public Builder stack(Output<String> stack) {
             $.stack = stack;
             return this;
         }
@@ -208,7 +206,7 @@ public final class StackTagArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder value(@Nullable Output<String> value) {
+        public Builder value(Output<String> value) {
             $.value = value;
             return this;
         }
@@ -224,6 +222,11 @@ public final class StackTagArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         public StackTagArgs build() {
+            $.name = Objects.requireNonNull($.name, "expected parameter 'name' to be non-null");
+            $.organization = Objects.requireNonNull($.organization, "expected parameter 'organization' to be non-null");
+            $.project = Objects.requireNonNull($.project, "expected parameter 'project' to be non-null");
+            $.stack = Objects.requireNonNull($.stack, "expected parameter 'stack' to be non-null");
+            $.value = Objects.requireNonNull($.value, "expected parameter 'value' to be non-null");
             return $;
         }
     }

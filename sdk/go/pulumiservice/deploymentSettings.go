@@ -26,11 +26,11 @@ type DeploymentSettings struct {
 	pulumi.CustomResourceState
 
 	// Organization name.
-	Organization pulumi.StringPtrOutput `pulumi:"organization"`
+	Organization pulumi.StringOutput `pulumi:"organization"`
 	// Project name.
-	Project pulumi.StringPtrOutput `pulumi:"project"`
+	Project pulumi.StringOutput `pulumi:"project"`
 	// Stack name.
-	Stack pulumi.StringPtrOutput `pulumi:"stack"`
+	Stack pulumi.StringOutput `pulumi:"stack"`
 }
 
 // NewDeploymentSettings registers a new resource with the given unique name, arguments, and options.
@@ -209,18 +209,18 @@ func (o DeploymentSettingsOutput) ToDeploymentSettingsOutputWithContext(ctx cont
 }
 
 // Organization name.
-func (o DeploymentSettingsOutput) Organization() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *DeploymentSettings) pulumi.StringPtrOutput { return v.Organization }).(pulumi.StringPtrOutput)
+func (o DeploymentSettingsOutput) Organization() pulumi.StringOutput {
+	return o.ApplyT(func(v *DeploymentSettings) pulumi.StringOutput { return v.Organization }).(pulumi.StringOutput)
 }
 
 // Project name.
-func (o DeploymentSettingsOutput) Project() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *DeploymentSettings) pulumi.StringPtrOutput { return v.Project }).(pulumi.StringPtrOutput)
+func (o DeploymentSettingsOutput) Project() pulumi.StringOutput {
+	return o.ApplyT(func(v *DeploymentSettings) pulumi.StringOutput { return v.Project }).(pulumi.StringOutput)
 }
 
 // Stack name.
-func (o DeploymentSettingsOutput) Stack() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *DeploymentSettings) pulumi.StringPtrOutput { return v.Stack }).(pulumi.StringPtrOutput)
+func (o DeploymentSettingsOutput) Stack() pulumi.StringOutput {
+	return o.ApplyT(func(v *DeploymentSettings) pulumi.StringOutput { return v.Stack }).(pulumi.StringOutput)
 }
 
 type DeploymentSettingsArrayOutput struct{ *pulumi.OutputState }
