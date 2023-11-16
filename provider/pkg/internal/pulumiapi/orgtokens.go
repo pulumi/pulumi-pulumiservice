@@ -88,7 +88,7 @@ func (c *Client) DeleteOrgAccessToken(ctx context.Context, tokenId, orgName stri
 }
 
 func (c *Client) GetOrgAccessToken(ctx context.Context, tokenId, orgName string) (*AccessToken, error) {
-	apiPath := path.Join("orgs", orgName, "tokens", tokenId)
+	apiPath := path.Join("orgs", orgName, "tokens")
 
 	var listRes listTokenResponse
 

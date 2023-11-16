@@ -127,7 +127,7 @@ func TestGetTeamAccessToken(t *testing.T) {
 			ResponseBody:      resp,
 		})
 		defer cleanup()
-		token, err := c.GetTeamAccessToken(ctx, org, team, id)
+		token, err := c.GetTeamAccessToken(ctx, id, org, team)
 		assert.NoError(t, err)
 		assert.Equal(t, &AccessToken{
 			ID:          id,
@@ -147,7 +147,7 @@ func TestGetTeamAccessToken(t *testing.T) {
 			},
 		})
 		defer cleanup()
-		token, err := c.GetTeamAccessToken(ctx, org, team, id)
+		token, err := c.GetTeamAccessToken(ctx, id, org, team)
 		assert.Nil(t, token, "token should be nil")
 		assert.EqualError(t,
 			err,

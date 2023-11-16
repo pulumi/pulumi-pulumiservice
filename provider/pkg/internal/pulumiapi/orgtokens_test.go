@@ -1,15 +1,12 @@
 package pulumiapi
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
-
-var orgCtx = context.Background()
 
 func TestDeleteOrgAccessToken(t *testing.T) {
 	orgName := "anOrg"
@@ -151,7 +148,7 @@ func TestGetOrgAccessToken(t *testing.T) {
 			ResponseBody:      resp,
 		})
 		defer cleanup()
-		token, err := c.GetOrgAccessToken(ctx, org, id)
+		token, err := c.GetOrgAccessToken(ctx, id, org)
 		assert.NoError(t, err)
 		assert.Equal(t, &AccessToken{
 			ID:          id,
@@ -171,7 +168,7 @@ func TestGetOrgAccessToken(t *testing.T) {
 			},
 		})
 		defer cleanup()
-		token, err := c.GetOrgAccessToken(ctx, org, id)
+		token, err := c.GetOrgAccessToken(ctx, id, org)
 		assert.Nil(t, token, "token should be nil")
 		assert.EqualError(t,
 			err,
