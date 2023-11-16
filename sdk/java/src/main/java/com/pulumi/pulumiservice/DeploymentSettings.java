@@ -10,7 +10,6 @@ import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.DeploymentSettingsArgs;
 import com.pulumi.pulumiservice.Utilities;
 import java.lang.String;
-import java.util.Optional;
 import javax.annotation.Nullable;
 
 /**
@@ -32,42 +31,42 @@ public class DeploymentSettings extends com.pulumi.resources.CustomResource {
      * 
      */
     @Export(name="organization", refs={String.class}, tree="[0]")
-    private Output</* @Nullable */ String> organization;
+    private Output<String> organization;
 
     /**
      * @return Organization name.
      * 
      */
-    public Output<Optional<String>> organization() {
-        return Codegen.optional(this.organization);
+    public Output<String> organization() {
+        return this.organization;
     }
     /**
      * Project name.
      * 
      */
     @Export(name="project", refs={String.class}, tree="[0]")
-    private Output</* @Nullable */ String> project;
+    private Output<String> project;
 
     /**
      * @return Project name.
      * 
      */
-    public Output<Optional<String>> project() {
-        return Codegen.optional(this.project);
+    public Output<String> project() {
+        return this.project;
     }
     /**
      * Stack name.
      * 
      */
     @Export(name="stack", refs={String.class}, tree="[0]")
-    private Output</* @Nullable */ String> stack;
+    private Output<String> stack;
 
     /**
      * @return Stack name.
      * 
      */
-    public Output<Optional<String>> stack() {
-        return Codegen.optional(this.stack);
+    public Output<String> stack() {
+        return this.stack;
     }
 
     /**

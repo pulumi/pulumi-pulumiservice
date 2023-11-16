@@ -48,15 +48,15 @@ export class DeploymentSettings extends pulumi.CustomResource {
     /**
      * Organization name.
      */
-    public readonly organization!: pulumi.Output<string | undefined>;
+    public readonly organization!: pulumi.Output<string>;
     /**
      * Project name.
      */
-    public readonly project!: pulumi.Output<string | undefined>;
+    public readonly project!: pulumi.Output<string>;
     /**
      * Stack name.
      */
-    public readonly stack!: pulumi.Output<string | undefined>;
+    public readonly stack!: pulumi.Output<string>;
 
     /**
      * Create a DeploymentSettings resource with the given unique name, arguments, and options.

@@ -118,7 +118,7 @@ class AccessToken(pulumi.CustomResource):
 
     @property
     @pulumi.getter
-    def description(self) -> pulumi.Output[Optional[str]]:
+    def description(self) -> pulumi.Output[str]:
         """
         Description of the access token.
         """
@@ -126,7 +126,7 @@ class AccessToken(pulumi.CustomResource):
 
     @property
     @pulumi.getter(name="tokenId")
-    def token_id(self) -> pulumi.Output[Optional[str]]:
+    def token_id(self) -> pulumi.Output[str]:
         """
         The token identifier.
         """
@@ -134,7 +134,7 @@ class AccessToken(pulumi.CustomResource):
 
     @property
     @pulumi.getter
-    def value(self) -> pulumi.Output[Optional[str]]:
+    def value(self) -> pulumi.Output[str]:
         """
         The token's value.
         """

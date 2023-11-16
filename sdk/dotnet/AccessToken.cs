@@ -19,19 +19,19 @@ namespace Pulumi.PulumiService
         /// Description of the access token.
         /// </summary>
         [Output("description")]
-        public Output<string?> Description { get; private set; } = null!;
+        public Output<string> Description { get; private set; } = null!;
 
         /// <summary>
         /// The token identifier.
         /// </summary>
         [Output("tokenId")]
-        public Output<string?> TokenId { get; private set; } = null!;
+        public Output<string> TokenId { get; private set; } = null!;
 
         /// <summary>
         /// The token's value.
         /// </summary>
         [Output("value")]
-        public Output<string?> Value { get; private set; } = null!;
+        public Output<string> Value { get; private set; } = null!;
 
 
         /// <summary>
