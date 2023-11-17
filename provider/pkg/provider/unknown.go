@@ -3,7 +3,8 @@ package provider
 import (
 	"fmt"
 
-	pbempty "github.com/golang/protobuf/ptypes/empty"
+	pbempty "google.golang.org/protobuf/types/known/emptypb"
+
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 

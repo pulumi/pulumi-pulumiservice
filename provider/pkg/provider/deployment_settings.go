@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"path"
 
-	pbempty "github.com/golang/protobuf/ptypes/empty"
+	pbempty "google.golang.org/protobuf/types/known/emptypb"
+
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/pulumiapi"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
