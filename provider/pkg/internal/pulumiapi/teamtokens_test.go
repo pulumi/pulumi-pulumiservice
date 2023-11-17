@@ -2,6 +2,7 @@ package pulumiapi
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"testing"
 
@@ -93,6 +94,64 @@ func TestCreateTeamAccessToken(t *testing.T) {
 		assert.EqualError(t,
 			err,
 			`failed to create access token: 401 API error: unauthorized`,
+		)
+	})
+}
+
+func TestGetTeamAccessToken(t *testing.T) {
+	id := "uuid"
+	desc := "token description"
+	org := "anOrg"
+	team := "aTeam"
+	lastUsed := 123
+	t.Run("Happy Path", func(t *testing.T) {
+		resp := listTokenResponse{
+			Tokens: []accessTokenResponse{
+				{
+					ID:          id,
+					Description: desc,
+					LastUsed:    lastUsed,
+				},
+				{
+					ID:          "other",
+					Description: desc,
+					LastUsed:    lastUsed,
+				},
+			},
+		}
+		c, cleanup := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodGet,
+			ExpectedReqBody:   nil,
+			ExpectedReqPath:   fmt.Sprintf("/api/orgs/%s/teams/%s/tokens", org, team),
+			ResponseCode:      200,
+			ResponseBody:      resp,
+		})
+		defer cleanup()
+		token, err := c.GetTeamAccessToken(ctx, id, org, team)
+		assert.NoError(t, err)
+		assert.Equal(t, &AccessToken{
+			ID:          id,
+			Description: desc,
+		}, token)
+	})
+
+	t.Run("Error", func(t *testing.T) {
+		c, cleanup := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodGet,
+			ExpectedReqPath:   fmt.Sprintf("/api/orgs/%s/teams/%s/tokens", org, team),
+			ExpectedReqBody:   nil,
+			ResponseCode:      401,
+			ResponseBody: errorResponse{
+				StatusCode: 401,
+				Message:    "unauthorized",
+			},
+		})
+		defer cleanup()
+		token, err := c.GetTeamAccessToken(ctx, id, org, team)
+		assert.Nil(t, token, "token should be nil")
+		assert.EqualError(t,
+			err,
+			`failed to list team access tokens: 401 API error: unauthorized`,
 		)
 	})
 }

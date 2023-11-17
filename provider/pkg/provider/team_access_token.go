@@ -59,32 +59,7 @@ func (t *PulumiServiceTeamAccessTokenResource) Name() string {
 }
 
 func (t *PulumiServiceTeamAccessTokenResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
-
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: false})
-	if err != nil {
-		return nil, err
-	}
-
-	diffs := olds["__inputs"].ObjectValue().Diff(news)
-	if diffs == nil {
-		return &pulumirpc.DiffResponse{
-			Changes: pulumirpc.DiffResponse_DIFF_NONE,
-		}, nil
-	}
-
-	changes := pulumirpc.DiffResponse_DIFF_NONE
-	if diffs.Changed("description") {
-		changes = pulumirpc.DiffResponse_DIFF_SOME
-	}
-
-	return &pulumirpc.DiffResponse{
-		Changes:  changes,
-		Replaces: []string{"description"},
-	}, nil
+	return considerAllChangesReplaces(req)
 }
 
 func (t *PulumiServiceTeamAccessTokenResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
@@ -137,29 +112,47 @@ func (t *PulumiServiceTeamAccessTokenResource) Check(req *pulumirpc.CheckRequest
 	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: nil}, nil
 }
 
-func (t *PulumiServiceTeamAccessTokenResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	return &pulumirpc.UpdateResponse{}, nil
+func (t *PulumiServiceTeamAccessTokenResource) Update(_ *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+	// all updates are destructive, so we just call Create.
+	return nil, fmt.Errorf("unexpected call to update, expected create to be called instead")
 }
 
 func (t *PulumiServiceTeamAccessTokenResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	return &pulumirpc.ReadResponse{}, nil
+	ctx := context.Background()
+	urn := req.GetId()
+
+	orgName, teamName, _, tokenId, err := splitTeamAccessTokenId(urn)
+
+	// the team access token is immutable; if we get nil it got deleted, otherwise all data is the same
+	accessToken, err := t.client.GetTeamAccessToken(ctx, tokenId, orgName, teamName)
+	if err != nil {
+		return nil, err
+	}
+	if accessToken == nil {
+		return &pulumirpc.ReadResponse{}, nil
+	}
+
+	return &pulumirpc.ReadResponse{
+		Id:         req.GetId(),
+		Properties: req.GetProperties(),
+	}, nil
 }
 
-func (t *PulumiServiceTeamAccessTokenResource) Invoke(s *pulumiserviceProvider, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
+func (t *PulumiServiceTeamAccessTokenResource) Invoke(_ *pulumiserviceProvider, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
 	return &pulumirpc.InvokeResponse{Return: nil}, fmt.Errorf("unknown function '%s'", req.Tok)
 }
 
-func (t *PulumiServiceTeamAccessTokenResource) Configure(config PulumiServiceConfig) {
+func (t *PulumiServiceTeamAccessTokenResource) Configure(_ PulumiServiceConfig) {
 }
 
 func (t *PulumiServiceTeamAccessTokenResource) createTeamAccessToken(ctx context.Context, input PulumiServiceTeamAccessTokenInput) (*pulumiapi.AccessToken, error) {
 
-	accesstoken, err := t.client.CreateTeamAccessToken(ctx, input.Name, input.OrgName, input.TeamName, input.Description)
+	accessToken, err := t.client.CreateTeamAccessToken(ctx, input.Name, input.OrgName, input.TeamName, input.Description)
 	if err != nil {
 		return nil, err
 	}
 
-	return accesstoken, nil
+	return accessToken, nil
 }
 
 func (t *PulumiServiceTeamAccessTokenResource) deleteTeamAccessToken(ctx context.Context, id string) error {
