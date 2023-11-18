@@ -21,12 +21,6 @@ import (
 	"path"
 )
 
-type TeamAccessToken struct {
-	ID          string `json:"id"`
-	TokenValue  string `json:"tokenValue"`
-	Description string `json:"description"`
-}
-
 type createTeamTokenResponse struct {
 	ID         string `json:"id"`
 	TokenValue string `json:"tokenValue"`
@@ -37,7 +31,7 @@ type createTeamTokenRequest struct {
 	Description string `json:"description"`
 }
 
-func (c *Client) CreateTeamAccessToken(ctx context.Context, name string, orgName string, teamName string, description string) (*AccessToken, error) {
+func (c *Client) CreateTeamAccessToken(ctx context.Context, name, orgName, teamName, description string) (*AccessToken, error) {
 
 	if len(orgName) == 0 {
 		return nil, errors.New("empty orgName")
@@ -70,7 +64,7 @@ func (c *Client) CreateTeamAccessToken(ctx context.Context, name string, orgName
 
 }
 
-func (c *Client) DeleteTeamAccessToken(ctx context.Context, tokenId string, orgName string, teamName string) error {
+func (c *Client) DeleteTeamAccessToken(ctx context.Context, tokenId, orgName, teamName string) error {
 	if len(tokenId) == 0 {
 		return errors.New("tokenid length must be greater than zero")
 	}
@@ -91,4 +85,28 @@ func (c *Client) DeleteTeamAccessToken(ctx context.Context, tokenId string, orgN
 	}
 
 	return nil
+}
+
+func (c *Client) GetTeamAccessToken(ctx context.Context, tokenId, orgName, teamName string) (*AccessToken, error) {
+	apiPath := path.Join("orgs", orgName, "teams", teamName, "tokens")
+
+	var listRes listTokenResponse
+
+	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &listRes)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to list team access tokens: %w", err)
+	}
+
+	for i := 0; i < len(listRes.Tokens); i++ {
+		token := listRes.Tokens[i]
+		if token.ID == tokenId {
+			return &AccessToken{
+				ID:          token.ID,
+				Description: token.Description,
+			}, nil
+		}
+	}
+
+	return nil, nil
 }

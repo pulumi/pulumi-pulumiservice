@@ -470,40 +470,7 @@ func getSecretOrStringValue(prop resource.PropertyValue) string {
 }
 
 func (ds *PulumiServiceDeploymentSettingsResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
-
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
-
-	diffs := olds.Diff(news)
-	if diffs == nil {
-		return &pulumirpc.DiffResponse{
-			Changes: pulumirpc.DiffResponse_DIFF_NONE,
-		}, nil
-	}
-
-	dd := plugin.NewDetailedDiffFromObjectDiff(diffs)
-
-	detailedDiffs := map[string]*pulumirpc.PropertyDiff{}
-	for k, v := range dd {
-		v.Kind = v.Kind.AsReplace()
-		detailedDiffs[k] = &pulumirpc.PropertyDiff{
-			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind),
-			InputDiff: v.InputDiff,
-		}
-	}
-
-	return &pulumirpc.DiffResponse{
-		Changes:             pulumirpc.DiffResponse_DIFF_SOME,
-		DetailedDiff:        detailedDiffs,
-		DeleteBeforeReplace: true,
-		HasDetailedDiff:     true,
-	}, nil
+	return considerAllChangesReplaces(req)
 }
 
 func (ds *PulumiServiceDeploymentSettingsResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
@@ -525,7 +492,7 @@ func (ds *PulumiServiceDeploymentSettingsResource) Check(req *pulumirpc.CheckReq
 	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: failures}, nil
 }
 
-func (ds *PulumiServiceDeploymentSettingsResource) Configure(config PulumiServiceConfig) {}
+func (ds *PulumiServiceDeploymentSettingsResource) Configure(_ PulumiServiceConfig) {}
 
 func (ds *PulumiServiceDeploymentSettingsResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
 	ctx := context.Background()
@@ -601,11 +568,48 @@ func (ds *PulumiServiceDeploymentSettingsResource) Create(req *pulumirpc.CreateR
 	}, nil
 }
 
-func (ds *PulumiServiceDeploymentSettingsResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+func (ds *PulumiServiceDeploymentSettingsResource) Update(_ *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
 	// For simplicity, all updates are destructive, so we just call Create.
 	return nil, fmt.Errorf("unexpected call to update, expected create to be called instead")
 }
 
 func (ds *PulumiServiceDeploymentSettingsResource) Name() string {
 	return "pulumiservice:index:DeploymentSettings"
+}
+
+func considerAllChangesReplaces(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+	olds, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
+	if err != nil {
+		return nil, err
+	}
+
+	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	if err != nil {
+		return nil, err
+	}
+
+	diffs := olds.Diff(news)
+	if diffs == nil {
+		return &pulumirpc.DiffResponse{
+			Changes: pulumirpc.DiffResponse_DIFF_NONE,
+		}, nil
+	}
+
+	dd := plugin.NewDetailedDiffFromObjectDiff(diffs)
+
+	detailedDiffs := map[string]*pulumirpc.PropertyDiff{}
+	for k, v := range dd {
+		v.Kind = v.Kind.AsReplace()
+		detailedDiffs[k] = &pulumirpc.PropertyDiff{
+			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind),
+			InputDiff: v.InputDiff,
+		}
+	}
+
+	return &pulumirpc.DiffResponse{
+		Changes:             pulumirpc.DiffResponse_DIFF_SOME,
+		DetailedDiff:        detailedDiffs,
+		DeleteBeforeReplace: true,
+		HasDetailedDiff:     true,
+	}, nil
 }
