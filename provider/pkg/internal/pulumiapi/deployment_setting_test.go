@@ -25,7 +25,7 @@ func TestGetDeploymentSettings(t *testing.T) {
 
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
-			ExpectedReqPath:   "/" + path.Join("api", "preview", orgName, projectName, stackName, "deployment", "settings"),
+			ExpectedReqPath:   "/" + path.Join("api", "stacks", orgName, projectName, stackName, "deployments", "settings"),
 			ResponseCode:      200,
 			ResponseBody:      dsValue,
 		})
@@ -44,7 +44,7 @@ func TestGetDeploymentSettings(t *testing.T) {
 	t.Run("404", func(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
-			ExpectedReqPath:   "/" + path.Join("api", "preview", orgName, projectName, stackName, "deployment", "settings"),
+			ExpectedReqPath:   "/" + path.Join("api", "stacks", orgName, projectName, stackName, "deployments", "settings"),
 			ResponseCode:      404,
 			ResponseBody: errorResponse{
 				StatusCode: 404,
@@ -80,7 +80,7 @@ func TestCreateDeploymentSettings(t *testing.T) {
 
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
-			ExpectedReqPath:   "/" + path.Join("api", "preview", orgName, projectName, stackName, "deployment", "settings"),
+			ExpectedReqPath:   "/" + path.Join("api", "stacks", orgName, projectName, stackName, "deployments", "settings"),
 			ResponseCode:      201,
 			ExpectedReqBody:   dsValue,
 		})

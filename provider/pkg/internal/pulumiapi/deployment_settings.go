@@ -72,7 +72,7 @@ type GitHubConfiguration struct {
 }
 
 func (c *Client) CreateDeploymentSettings(ctx context.Context, stack StackName, ds DeploymentSettings) error {
-	apiPath := path.Join("preview", stack.OrgName, stack.ProjectName, stack.StackName, "deployment", "settings")
+	apiPath := path.Join("stacks", stack.OrgName, stack.ProjectName, stack.StackName, "deployments", "settings")
 	_, err := c.do(ctx, http.MethodPost, apiPath, ds, nil)
 	if err != nil {
 		return fmt.Errorf("failed to create deployment settings for stack (%s): %w", stack.String(), err)
@@ -82,7 +82,7 @@ func (c *Client) CreateDeploymentSettings(ctx context.Context, stack StackName, 
 
 func (c *Client) GetDeploymentSettings(ctx context.Context, stack StackName) (*DeploymentSettings, error) {
 	apiPath := path.Join(
-		"preview", stack.OrgName, stack.ProjectName, stack.StackName, "deployment", "settings",
+		"stacks", stack.OrgName, stack.ProjectName, stack.StackName, "deployments", "settings",
 	)
 	var ds DeploymentSettings
 	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &ds)
@@ -99,7 +99,7 @@ func (c *Client) GetDeploymentSettings(ctx context.Context, stack StackName) (*D
 
 func (c *Client) DeleteDeploymentSettings(ctx context.Context, stack StackName) error {
 	apiPath := path.Join(
-		"preview", stack.OrgName, stack.ProjectName, stack.StackName, "deployment", "settings",
+		"stacks", stack.OrgName, stack.ProjectName, stack.StackName, "deployments", "settings",
 	)
 	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
 	if err != nil {
