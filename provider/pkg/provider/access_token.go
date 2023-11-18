@@ -41,7 +41,7 @@ func (at *PulumiServiceAccessTokenResource) Name() string {
 }
 
 func (at *PulumiServiceAccessTokenResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	return considerAllChangesReplaces(req)
+	return diffImplForTokens(req)
 }
 
 func (at *PulumiServiceAccessTokenResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
