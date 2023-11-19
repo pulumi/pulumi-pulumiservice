@@ -114,7 +114,7 @@ func TestYamlTeamsExample(t *testing.T) {
 		cwd, _ := os.Getwd()
 		integration.ProgramTest(t, &integration.ProgramTestOptions{
 			Quick:       true,
-			SkipRefresh: true,
+			SkipRefresh: false,
 			Dir:         path.Join(cwd, ".", "yaml-teams"),
 			// don't prepare project at all, not required for yaml
 			PrepareProject: func(_ *engine.Projinfo) error {
@@ -191,6 +191,30 @@ func TestYamlDeploymentSettingsExample(t *testing.T) {
 				Dir:             tmpdir,
 				ExpectNoChanges: true,
 			},
+		},
+	})
+}
+
+func TestYamlTeamAccessTokenExample(t *testing.T) {
+	cwd, _ := os.Getwd()
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Quick:       true,
+		SkipRefresh: false,
+		Dir:         path.Join(cwd, ".", "yaml-team-token"),
+		PrepareProject: func(_ *engine.Projinfo) error {
+			return nil
+		},
+	})
+}
+
+func TestYamlOrgAccessTokenExample(t *testing.T) {
+	cwd, _ := os.Getwd()
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Quick:       true,
+		SkipRefresh: false,
+		Dir:         path.Join(cwd, ".", "yaml-org-token"),
+		PrepareProject: func(_ *engine.Projinfo) error {
+			return nil
 		},
 	})
 }
