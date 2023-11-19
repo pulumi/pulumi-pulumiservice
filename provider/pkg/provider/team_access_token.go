@@ -60,7 +60,7 @@ func (t *PulumiServiceTeamAccessTokenResource) Name() string {
 }
 
 func (t *PulumiServiceTeamAccessTokenResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	return diffImplForTokens(req)
+	return diffAccessTokenProperties(req, []string{"name", "organizationName", "teamName", "description"})
 }
 
 func (t *PulumiServiceTeamAccessTokenResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
@@ -165,7 +165,6 @@ func (t *PulumiServiceTeamAccessTokenResource) deleteTeamAccessToken(ctx context
 
 }
 
-// FIXME: we can likely create a util that will work for all cases
 func splitTeamAccessTokenId(id string) (string, string, string, string, error) {
 	// format: organization/teamName/tokenName/tokenId
 	s := strings.Split(id, "/")
@@ -173,33 +172,4 @@ func splitTeamAccessTokenId(id string) (string, string, string, string, error) {
 		return "", "", "", "", fmt.Errorf("%q is invalid, must contain a single slash ('/')", id)
 	}
 	return s[0], s[1], s[2], s[3], nil
-}
-
-func diffImplForTokens(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
-
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: false})
-	if err != nil {
-		return nil, err
-	}
-
-	diffs := olds["__inputs"].ObjectValue().Diff(news)
-	if diffs == nil {
-		return &pulumirpc.DiffResponse{
-			Changes: pulumirpc.DiffResponse_DIFF_NONE,
-		}, nil
-	}
-
-	changes := pulumirpc.DiffResponse_DIFF_NONE
-	if diffs.Changed("description") {
-		changes = pulumirpc.DiffResponse_DIFF_SOME
-	}
-
-	return &pulumirpc.DiffResponse{
-		Changes:  changes,
-		Replaces: []string{"description"},
-	}, nil
 }
