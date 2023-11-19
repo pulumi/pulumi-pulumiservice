@@ -41,7 +41,7 @@ func (at *PulumiServiceAccessTokenResource) Name() string {
 }
 
 func (at *PulumiServiceAccessTokenResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	return diffImplForTokens(req)
+	return diffAccessTokenProperties(req, []string{"description"})
 }
 
 func (at *PulumiServiceAccessTokenResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
@@ -132,4 +132,36 @@ func (at *PulumiServiceAccessTokenResource) createAccessToken(ctx context.Contex
 
 func (at *PulumiServiceAccessTokenResource) deleteAccessToken(ctx context.Context, tokenId string) error {
 	return at.client.DeleteAccessToken(ctx, tokenId)
+}
+
+func diffAccessTokenProperties(req *pulumirpc.DiffRequest, replaceProps []string) (*pulumirpc.DiffResponse, error) {
+	olds, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
+	if err != nil {
+		return nil, err
+	}
+
+	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: false})
+	if err != nil {
+		return nil, err
+	}
+
+	diffs := olds["__inputs"].ObjectValue().Diff(news)
+	if diffs == nil {
+		return &pulumirpc.DiffResponse{
+			Changes: pulumirpc.DiffResponse_DIFF_NONE,
+		}, nil
+	}
+
+	changes, replaces := pulumirpc.DiffResponse_DIFF_NONE, []string(nil)
+	for _, k := range replaceProps {
+		if diffs.Changed(resource.PropertyKey(k)) {
+			changes = pulumirpc.DiffResponse_DIFF_SOME
+			replaces = append(replaces, k)
+		}
+	}
+
+	return &pulumirpc.DiffResponse{
+		Changes:  changes,
+		Replaces: replaces,
+	}, nil
 }
