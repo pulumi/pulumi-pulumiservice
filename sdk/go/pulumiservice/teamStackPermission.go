@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"errors"
+	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/internal"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
@@ -35,6 +36,7 @@ func NewTeamStackPermission(ctx *pulumi.Context,
 	if args.Team == nil {
 		return nil, errors.New("invalid value for required argument 'Team'")
 	}
+	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource TeamStackPermission
 	err := ctx.RegisterResource("pulumiservice:index:TeamStackPermission", name, args, &resource, opts...)
 	if err != nil {

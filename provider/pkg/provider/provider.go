@@ -22,17 +22,15 @@ import (
 	"strings"
 	"time"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	pbempty "google.golang.org/protobuf/types/known/emptypb"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/pulumiapi"
 	"github.com/pulumi/pulumi/pkg/v3/codegen/schema"
 	"github.com/pulumi/pulumi/pkg/v3/resource/provider"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/pulumiapi"
-
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
-
-	pbempty "github.com/golang/protobuf/ptypes/empty"
 )
 
 type PulumiServiceResource interface {

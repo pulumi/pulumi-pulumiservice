@@ -3,10 +3,10 @@ package provider
 import (
 	"context"
 	"fmt"
-
 	"strings"
 
-	pbempty "github.com/golang/protobuf/ptypes/empty"
+	pbempty "google.golang.org/protobuf/types/known/emptypb"
+
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/pulumiapi"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
@@ -277,7 +277,7 @@ func (wh *PulumiServiceWebhookResource) Diff(req *pulumirpc.DiffRequest) (*pulum
 		}, nil
 	}
 
-	dd := plugin.NewDetailedDiffFromObjectDiff(diffs)
+	dd := plugin.NewDetailedDiffFromObjectDiff(diffs, false)
 
 	detailedDiffs := map[string]*pulumirpc.PropertyDiff{}
 	replaceProperties := map[string]bool{

@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
+	"github.com/pulumi/pulumi/sdk/v3/go/pulumix"
 )
 
 type TeamStackPermissionScope float64
@@ -209,6 +210,12 @@ func (in *webhookFiltersPtr) ToWebhookFiltersPtrOutput() WebhookFiltersPtrOutput
 
 func (in *webhookFiltersPtr) ToWebhookFiltersPtrOutputWithContext(ctx context.Context) WebhookFiltersPtrOutput {
 	return pulumi.ToOutputWithContext(ctx, in).(WebhookFiltersPtrOutput)
+}
+
+func (in *webhookFiltersPtr) ToOutput(ctx context.Context) pulumix.Output[*WebhookFilters] {
+	return pulumix.Output[*WebhookFilters]{
+		OutputState: in.ToWebhookFiltersPtrOutputWithContext(ctx).OutputState,
+	}
 }
 
 // WebhookFiltersArrayInput is an input type that accepts WebhookFiltersArray and WebhookFiltersArrayOutput values.
@@ -424,6 +431,12 @@ func (in *webhookFormatPtr) ToWebhookFormatPtrOutput() WebhookFormatPtrOutput {
 
 func (in *webhookFormatPtr) ToWebhookFormatPtrOutputWithContext(ctx context.Context) WebhookFormatPtrOutput {
 	return pulumi.ToOutputWithContext(ctx, in).(WebhookFormatPtrOutput)
+}
+
+func (in *webhookFormatPtr) ToOutput(ctx context.Context) pulumix.Output[*WebhookFormat] {
+	return pulumix.Output[*WebhookFormat]{
+		OutputState: in.ToWebhookFormatPtrOutputWithContext(ctx).OutputState,
+	}
 }
 
 func init() {

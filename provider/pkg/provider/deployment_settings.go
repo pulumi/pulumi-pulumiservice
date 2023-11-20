@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"path"
 
-	pbempty "github.com/golang/protobuf/ptypes/empty"
+	pbempty "google.golang.org/protobuf/types/known/emptypb"
+
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/pulumiapi"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
@@ -595,7 +596,7 @@ func considerAllChangesReplaces(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResp
 		}, nil
 	}
 
-	dd := plugin.NewDetailedDiffFromObjectDiff(diffs)
+	dd := plugin.NewDetailedDiffFromObjectDiff(diffs, false)
 
 	detailedDiffs := map[string]*pulumirpc.PropertyDiff{}
 	for k, v := range dd {

@@ -1,8 +1,8 @@
 package serde
 
 import (
-	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 func FromProperties(props *structpb.Struct, structTagName string, out interface{}) error {
