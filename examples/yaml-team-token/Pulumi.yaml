@@ -17,6 +17,7 @@ resources:
       teamType: pulumi
       members:
         - pulumi-bot
+        - service-provider-example-user
   token:
     type: pulumiservice:index:TeamAccessToken
     properties:
