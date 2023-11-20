@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"strings"
 
+	"golang.org/x/exp/slices"
 	"google.golang.org/grpc/codes"
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -82,6 +83,9 @@ func ToPulumiServiceTeamInput(inputMap resource.PropertyMap) PulumiServiceTeamIn
 				input.Members = append(input.Members, m.StringValue())
 			}
 		}
+
+		// Sort the members so the order is deterministic
+		slices.Sort(input.Members)
 	}
 
 	if inputMap["organizationName"].HasValue() && inputMap["organizationName"].IsString() {
@@ -203,6 +207,8 @@ func (t *PulumiServiceTeamResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc
 	for _, m := range team.Members {
 		inputs.Members = append(inputs.Members, m.GithubLogin)
 	}
+	// Sort the members so the order is deterministic
+	slices.Sort(inputs.Members)
 	props, err := plugin.MarshalProperties(inputs.ToPropertyMap(), plugin.MarshalOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal inputs to properties: %w", err)
@@ -233,14 +239,17 @@ func (t *PulumiServiceTeamResource) Update(req *pulumirpc.UpdateRequest) (*pulum
 		inputsChanged.Description = teamNew.Description
 		inputsChanged.DisplayName = teamNew.DisplayName
 
-		t.updateTeam(context.Background(), inputsChanged)
+		err = t.updateTeam(context.Background(), inputsChanged)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// github teams can't manage membership.
-	if !Equal(teamOld.Members, teamNew.Members) && teamNew.Type != "github" {
+	if !slices.Equal(teamOld.Members, teamNew.Members) && teamNew.Type != "github" {
 		inputsChanged.Members = teamNew.Members
 		for _, usernameToDelete := range teamOld.Members {
-			if !InSlice(usernameToDelete, teamNew.Members) {
+			if !slices.Contains(teamNew.Members, usernameToDelete) {
 				err := t.deleteFromTeam(ctx, teamNew.OrganizationName, teamNew.Name, usernameToDelete)
 				if err != nil {
 					return nil, err
@@ -249,7 +258,7 @@ func (t *PulumiServiceTeamResource) Update(req *pulumirpc.UpdateRequest) (*pulum
 		}
 
 		for _, usernameToAdd := range teamNew.Members {
-			if !InSlice(usernameToAdd, teamOld.Members) {
+			if !slices.Contains(teamOld.Members, usernameToAdd) {
 				err := t.addToTeam(ctx, teamNew.OrganizationName, teamNew.Name, usernameToAdd)
 				if err != nil {
 					return nil, err

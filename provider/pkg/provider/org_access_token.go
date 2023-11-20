@@ -60,7 +60,7 @@ func (ot *PulumiServiceOrgAccessTokenResource) Name() string {
 }
 
 func (ot *PulumiServiceOrgAccessTokenResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	return considerAllChangesReplaces(req)
+	return diffAccessTokenProperties(req, []string{"name", "organizationName", "description", "admin"})
 }
 
 func (ot *PulumiServiceOrgAccessTokenResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
@@ -170,7 +170,6 @@ func (ot *PulumiServiceOrgAccessTokenResource) deleteOrgAccessToken(ctx context.
 
 }
 
-// FIXME: we can likely create a util that will work for all cases
 func splitOrgAccessTokenId(id string) (string, string, string, error) {
 	// format: organization/name/tokenId
 	s := strings.Split(id, "/")
