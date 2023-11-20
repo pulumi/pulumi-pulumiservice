@@ -145,7 +145,11 @@ func diffAccessTokenProperties(req *pulumirpc.DiffRequest, replaceProps []string
 		return nil, err
 	}
 
-	diffs := olds["__inputs"].ObjectValue().Diff(news)
+	inputs, ok := olds["__inputs"]
+	if !ok {
+		return nil, fmt.Errorf("missing __inputs property")
+	}
+	diffs := inputs.ObjectValue().Diff(news)
 	if diffs == nil {
 		return &pulumirpc.DiffResponse{
 			Changes: pulumirpc.DiffResponse_DIFF_NONE,
