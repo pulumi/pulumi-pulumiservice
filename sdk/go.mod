@@ -1,6 +1,6 @@
 module github.com/pulumi/pulumi-pulumiservice/sdk
 
-go 1.18
+go 1.20
 
 require (
 	github.com/blang/semver v3.5.1+incompatible
@@ -22,6 +22,7 @@ require (
 	github.com/gofrs/uuid v4.2.0+incompatible // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/glog v1.1.2 // indirect
+	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/grpc-ecosystem/grpc-opentracing v0.0.0-20180507213350-8e809c8a8645 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
