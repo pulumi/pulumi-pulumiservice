@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"errors"
+	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/internal"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
@@ -47,6 +48,7 @@ func NewTeamAccessToken(ctx *pulumi.Context,
 		"value",
 	})
 	opts = append(opts, secrets)
+	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource TeamAccessToken
 	err := ctx.RegisterResource("pulumiservice:index:TeamAccessToken", name, args, &resource, opts...)
 	if err != nil {

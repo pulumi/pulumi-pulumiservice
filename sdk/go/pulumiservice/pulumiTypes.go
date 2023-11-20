@@ -7,8 +7,11 @@ import (
 	"context"
 	"reflect"
 
+	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/internal"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
+
+var _ = internal.GetEnvOrDefault
 
 type AWSOIDCConfiguration struct {
 	// Duration of the assume-role session in “XhYmZs” format

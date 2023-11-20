@@ -596,7 +596,7 @@ func considerAllChangesReplaces(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResp
 		}, nil
 	}
 
-	dd := plugin.NewDetailedDiffFromObjectDiff(diffs)
+	dd := plugin.NewDetailedDiffFromObjectDiff(diffs, false)
 
 	detailedDiffs := map[string]*pulumirpc.PropertyDiff{}
 	for k, v := range dd {

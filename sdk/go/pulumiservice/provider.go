@@ -7,6 +7,7 @@ import (
 	"context"
 	"reflect"
 
+	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/internal"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
@@ -22,8 +23,11 @@ func NewProvider(ctx *pulumi.Context,
 	}
 
 	if args.AccessToken == nil {
-		args.AccessToken = pulumi.StringPtr(getEnvOrDefault("", nil, "PULUMI_ACCESS_TOKEN").(string))
+		if d := internal.GetEnvOrDefault("", nil, "PULUMI_ACCESS_TOKEN"); d != nil {
+			args.AccessToken = pulumi.StringPtr(d.(string))
+		}
 	}
+	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Provider
 	err := ctx.RegisterResource("pulumi:providers:pulumiservice", name, args, &resource, opts...)
 	if err != nil {

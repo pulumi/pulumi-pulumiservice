@@ -277,7 +277,7 @@ func (wh *PulumiServiceWebhookResource) Diff(req *pulumirpc.DiffRequest) (*pulum
 		}, nil
 	}
 
-	dd := plugin.NewDetailedDiffFromObjectDiff(diffs)
+	dd := plugin.NewDetailedDiffFromObjectDiff(diffs, false)
 
 	detailedDiffs := map[string]*pulumirpc.PropertyDiff{}
 	replaceProperties := map[string]bool{

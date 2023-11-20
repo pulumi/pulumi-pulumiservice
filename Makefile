@@ -55,7 +55,6 @@ nodejs_sdk::
 	cd ${PACKDIR}/nodejs/ && \
 		yarn install && \
 		yarn run tsc && \
-		cp -R scripts/ bin && \
 		cp ../../README.md ../../LICENSE package.json yarn.lock ./bin/ && \
 		sed -i.bak -e 's/\$${VERSION}/$(VERSION)/g' ./bin/package.json
 
@@ -113,7 +112,6 @@ install_go_sdk::
 install_nodejs_sdk::
 	-yarn unlink --cwd $(WORKING_DIR)/sdk/nodejs/bin
 	yarn link --cwd $(WORKING_DIR)/sdk/nodejs/bin
-	cp -r sdk/nodejs/scripts sdk/nodejs/bin
 
 install_java_sdk::
 	cd sdk/java && ./gradlew publishToMavenLocal

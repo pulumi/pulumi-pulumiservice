@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"errors"
+	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/internal"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
@@ -55,6 +56,7 @@ func NewDeploymentSettings(ctx *pulumi.Context,
 	if args.Github != nil {
 		args.Github = args.Github.ToDeploymentSettingsGithubPtrOutput().ApplyT(func(v *DeploymentSettingsGithub) *DeploymentSettingsGithub { return v.Defaults() }).(DeploymentSettingsGithubPtrOutput)
 	}
+	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource DeploymentSettings
 	err := ctx.RegisterResource("pulumiservice:index:DeploymentSettings", name, args, &resource, opts...)
 	if err != nil {

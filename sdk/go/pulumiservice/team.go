@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"errors"
+	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/internal"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
@@ -44,6 +45,7 @@ func NewTeam(ctx *pulumi.Context,
 	if args.TeamType == nil {
 		return nil, errors.New("invalid value for required argument 'TeamType'")
 	}
+	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Team
 	err := ctx.RegisterResource("pulumiservice:index:Team", name, args, &resource, opts...)
 	if err != nil {
