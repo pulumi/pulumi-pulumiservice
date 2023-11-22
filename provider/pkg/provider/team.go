@@ -130,14 +130,14 @@ func (t *PulumiServiceTeamResource) Check(req *pulumirpc.CheckRequest) (*pulumir
 
 	if teamType == "github" && !newsMap["githubTeamId"].HasValue() {
 		failures = append(failures, &pulumirpc.CheckFailure{
-			Reason:   "github teams require a githubTeamId",
+			Reason:   "teams with teamType 'github' require a githubTeamId",
 			Property: "githubTeamId",
 		})
 	}
 
 	if teamType == "pulumi" && !newsMap["name"].HasValue() {
 		failures = append(failures, &pulumirpc.CheckFailure{
-			Reason:   "pulumi teams require a name",
+			Reason:   "teams with teamType 'pulumi' require a name",
 			Property: "name",
 		})
 	}
