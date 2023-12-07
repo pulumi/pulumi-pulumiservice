@@ -78,18 +78,18 @@ public class Team extends com.pulumi.resources.CustomResource {
         return this.members;
     }
     /**
-     * The team&#39;s name. Required for &#34;pulumi&#34; teams.
+     * The team&#39;s name.
      * 
      */
     @Export(name="name", refs={String.class}, tree="[0]")
-    private Output</* @Nullable */ String> name;
+    private Output<String> name;
 
     /**
-     * @return The team&#39;s name. Required for &#34;pulumi&#34; teams.
+     * @return The team&#39;s name.
      * 
      */
-    public Output<Optional<String>> name() {
-        return Codegen.optional(this.name);
+    public Output<String> name() {
+        return this.name;
     }
     /**
      * The name of the Pulumi organization the team belongs to.

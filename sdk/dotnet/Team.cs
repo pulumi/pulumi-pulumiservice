@@ -40,10 +40,10 @@ namespace Pulumi.PulumiService
         public Output<ImmutableArray<string>> Members { get; private set; } = null!;
 
         /// <summary>
-        /// The team's name. Required for "pulumi" teams.
+        /// The team's name.
         /// </summary>
         [Output("name")]
-        public Output<string?> Name { get; private set; } = null!;
+        public Output<string> Name { get; private set; } = null!;
 
         /// <summary>
         /// The name of the Pulumi organization the team belongs to.

@@ -271,9 +271,9 @@ class Team(pulumi.CustomResource):
 
     @property
     @pulumi.getter
-    def name(self) -> pulumi.Output[Optional[str]]:
+    def name(self) -> pulumi.Output[str]:
         """
-        The team's name. Required for "pulumi" teams.
+        The team's name.
         """
         return pulumi.get(self, "name")
 

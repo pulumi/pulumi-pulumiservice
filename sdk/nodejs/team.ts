@@ -51,9 +51,9 @@ export class Team extends pulumi.CustomResource {
      */
     public readonly members!: pulumi.Output<string[]>;
     /**
-     * The team's name. Required for "pulumi" teams.
+     * The team's name.
      */
-    public readonly name!: pulumi.Output<string | undefined>;
+    public readonly name!: pulumi.Output<string>;
     /**
      * The name of the Pulumi organization the team belongs to.
      */

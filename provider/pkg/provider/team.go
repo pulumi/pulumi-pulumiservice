@@ -288,6 +288,9 @@ func (t *PulumiServiceTeamResource) Create(req *pulumirpc.CreateRequest) (*pulum
 	if err != nil {
 		return nil, fmt.Errorf("error creating team '%s': %s", inputsTeam.Name, err.Error())
 	}
+	if inputsTeam.Name == "" {
+		inputsTeam.Name = strings.Split(*team, "/")[1]
+	}
 
 	// We have now created a team.  It is very important to ensure that from this point on, any other error
 	// below returns the ID using the `pulumirpc.ErrorResourceInitFailed` error details annotation.  Otherwise,

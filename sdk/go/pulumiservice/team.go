@@ -24,8 +24,8 @@ type Team struct {
 	GithubTeamId pulumi.Float64PtrOutput `pulumi:"githubTeamId"`
 	// List of team members.
 	Members pulumi.StringArrayOutput `pulumi:"members"`
-	// The team's name. Required for "pulumi" teams.
-	Name pulumi.StringPtrOutput `pulumi:"name"`
+	// The team's name.
+	Name pulumi.StringOutput `pulumi:"name"`
 	// The name of the Pulumi organization the team belongs to.
 	OrganizationName pulumi.StringOutput `pulumi:"organizationName"`
 	// The type of team. Must be either `pulumi` or `github`.
@@ -219,9 +219,9 @@ func (o TeamOutput) Members() pulumi.StringArrayOutput {
 	return o.ApplyT(func(v *Team) pulumi.StringArrayOutput { return v.Members }).(pulumi.StringArrayOutput)
 }
 
-// The team's name. Required for "pulumi" teams.
-func (o TeamOutput) Name() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *Team) pulumi.StringPtrOutput { return v.Name }).(pulumi.StringPtrOutput)
+// The team's name.
+func (o TeamOutput) Name() pulumi.StringOutput {
+	return o.ApplyT(func(v *Team) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
 }
 
 // The name of the Pulumi organization the team belongs to.

@@ -476,7 +476,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The team's name. Required for \"pulumi\" teams.",
+          "description": "The team's name.",
           "type": "string"
         },
         "displayName": {
@@ -506,7 +506,8 @@
       "required": [
         "organizationName",
         "teamType",
-        "members"
+        "members",
+        "name"
       ],
       "inputProperties": {
         "teamType": {
