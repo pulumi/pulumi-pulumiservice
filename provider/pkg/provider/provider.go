@@ -139,6 +139,7 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 		},
 		&TeamStackPermissionResource{
 			client: client,
+			host:   k.host,
 		},
 		&PulumiServiceTeamAccessTokenResource{
 			client: client,
