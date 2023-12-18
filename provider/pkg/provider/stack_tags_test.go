@@ -12,7 +12,7 @@ import (
 )
 
 func TestStackTagsUpdate(t *testing.T) {
-	t.Run("Calls Delete then Create on Resource", func(t *testing.T) {
+	t.Run("Calls to Update return an error", func(t *testing.T) {
 		var gotMethods []string
 
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
