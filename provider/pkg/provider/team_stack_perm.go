@@ -9,8 +9,6 @@ import (
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/pulumiapi"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/serde"
-	"github.com/pulumi/pulumi/pkg/v3/resource/provider"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/diag"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
@@ -18,7 +16,6 @@ import (
 
 type TeamStackPermissionResource struct {
 	client *pulumiapi.Client
-	host   *provider.HostClient
 }
 
 type TeamStackPermissionInput struct {
@@ -59,15 +56,11 @@ func (tp *TeamStackPermissionResource) Read(req *pulumirpc.ReadRequest) (*pulumi
 	permId, err := splitTeamStackPermissionId(id)
 	if err != nil {
 		if strings.Contains(err.Error(), "expected 4 parts") {
-			// Keep existing behavior for stack permissions created before this change.
+			// Return an error if attempting to refresh stack permissions created before this change.
 			// We return a warning and an empty response, which will cause the resource to be deleted on refresh,
 			// forcing the user to recreate it with the updated version.
-			err = tp.host.Log(ctx, diag.Warning, resource.URN(req.Urn), fmt.Sprintf("TeamStackPermission resources created before v0.17.0 do not support refresh and will be deleted on refresh, maintaining existing behavior. "+
-				"Once recreated with >v0.17.0, refresh will be supported."))
-			if err != nil {
-				return nil, err
-			}
-			return &pulumirpc.ReadResponse{}, nil
+			return nil, fmt.Errorf("TeamStackPermission resources created before v0.17.0 do not support refresh. " +
+				"You will need to destroy and recreate this resource with >v0.17.0 to successfully refresh.")
 		}
 		return nil, err
 	}
