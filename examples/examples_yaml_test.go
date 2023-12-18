@@ -219,8 +219,7 @@ func TestYamlOrgAccessTokenExample(t *testing.T) {
 func TestYamlTeamStackPermissionsExample(t *testing.T) {
 	cwd, _ := os.Getwd()
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Quick:       true,
-		SkipRefresh: true,
+		Quick: true,
 		// Name is specified in yaml-team-stack-permissions/Pulumi.yaml, so this has to be consistent
 		StackName: "dev",
 		Dir:       path.Join(cwd, ".", "yaml-team-stack-permissions"),

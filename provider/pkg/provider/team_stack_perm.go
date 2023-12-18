@@ -2,13 +2,15 @@ package provider
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
-	"github.com/google/uuid"
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/pulumiapi"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/serde"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
@@ -43,12 +45,55 @@ func (tp *TeamStackPermissionResource) Check(req *pulumirpc.CheckRequest) (*pulu
 	}, nil
 }
 
-func (tp *TeamStackPermissionResource) Configure(config PulumiServiceConfig) {
+func (tp *TeamStackPermissionResource) Configure(_ PulumiServiceConfig) {
 
 }
 
 func (tp *TeamStackPermissionResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	return &pulumirpc.ReadResponse{}, nil
+	ctx := context.Background()
+	id := req.GetId()
+
+	permId, err := splitTeamStackPermissionId(id)
+	if err != nil {
+		if strings.Contains(err.Error(), "expected 4 parts") {
+			// Return an error if attempting to refresh stack permissions created before this change.
+			// We return a warning and an empty response, which will cause the resource to be deleted on refresh,
+			// forcing the user to recreate it with the updated version.
+			return nil, fmt.Errorf("TeamStackPermission resources created before v0.17.0 do not support refresh. " +
+				"You will need to destroy and recreate this resource with >v0.17.0 to successfully refresh.")
+		}
+		return nil, err
+	}
+
+	permission, err := tp.client.GetTeamStackPermission(ctx, pulumiapi.StackName{
+		OrgName:     permId.Organization,
+		ProjectName: permId.Project,
+		StackName:   permId.Stack,
+	}, permId.Team)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get team stack permission: %w", err)
+	}
+	if permission == nil {
+		return &pulumirpc.ReadResponse{}, nil
+	}
+
+	inputs := TeamStackPermissionInput{
+		Organization: permId.Organization,
+		Project:      permId.Project,
+		Stack:        permId.Stack,
+		Team:         permId.Team,
+		Permission:   *permission,
+	}
+
+	properties, err := plugin.MarshalProperties(inputs.ToPropertyMap(), plugin.MarshalOptions{})
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal inputs to properties: %w", err)
+	}
+	return &pulumirpc.ReadResponse{
+		Id:         req.Id,
+		Properties: properties,
+		Inputs:     properties,
+	}, nil
 }
 
 func (tp *TeamStackPermissionResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
@@ -69,8 +114,10 @@ func (tp *TeamStackPermissionResource) Create(req *pulumirpc.CreateRequest) (*pu
 		return nil, err
 	}
 
+	stackPermissionId := fmt.Sprintf("%s/%s", stackName.String(), inputs.Team)
+
 	return &pulumirpc.CreateResponse{
-		Id:         uuid.NewString(),
+		Id:         stackPermissionId,
 		Properties: req.GetProperties(),
 	}, nil
 }
@@ -109,7 +156,27 @@ func (tp *TeamStackPermissionResource) Diff(req *pulumirpc.DiffRequest) (*pulumi
 	}, nil
 }
 
-// Update does nothing because we always do a replace on changes, never an update
-func (tp *TeamStackPermissionResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	return &pulumirpc.UpdateResponse{}, nil
+// Update does nothing because we always replace on changes, never an update
+func (tp *TeamStackPermissionResource) Update(_ *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+	return nil, fmt.Errorf("unexpected call to update, expected create to be called instead")
+}
+
+type teamStackPermissionId struct {
+	Organization string
+	Project      string
+	Stack        string
+	Team         string
+}
+
+func splitTeamStackPermissionId(id string) (teamStackPermissionId, error) {
+	split := strings.Split(id, "/")
+	if len(split) != 4 {
+		return teamStackPermissionId{}, fmt.Errorf("invalid id %q, expected 4 parts", id)
+	}
+	return teamStackPermissionId{
+		Organization: split[0],
+		Project:      split[1],
+		Stack:        split[2],
+		Team:         split[3],
+	}, nil
 }

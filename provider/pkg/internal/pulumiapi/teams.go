@@ -38,11 +38,13 @@ type Teams struct {
 }
 
 type Team struct {
-	Type        string `json:"kind"`
-	Name        string
-	DisplayName string
-	Description string
-	Members     []TeamMember
+	Type         string `json:"kind"`
+	Name         string
+	DisplayName  string
+	Description  string
+	Members      []TeamMember
+	Stacks       []TeamStackPermission
+	Environments []TeamEnvironmentPermission
 }
 
 type TeamMember struct {
@@ -50,6 +52,17 @@ type TeamMember struct {
 	GithubLogin string
 	AvatarUrl   string
 	Role        string
+}
+
+type TeamStackPermission struct {
+	ProjectName string `json:"projectName"`
+	StackName   string `json:"stackName"`
+	Permission  int    `json:"permission"`
+}
+
+type TeamEnvironmentPermission struct {
+	EnvName    string `json:"envName"`
+	Permission string `json:"permission"`
 }
 
 type createTeamRequest struct {
@@ -306,4 +319,30 @@ func (c *Client) RemoveStackPermission(ctx context.Context, stack StackName, tea
 		return fmt.Errorf("failed to remove stack permission for team: %w", err)
 	}
 	return nil
+}
+
+func (c *Client) GetTeamStackPermission(ctx context.Context, stack StackName, teamName string) (*int, error) {
+	if len(stack.OrgName) == 0 {
+		return nil, errors.New("orgname must not be empty")
+	}
+
+	if len(teamName) == 0 {
+		return nil, errors.New("teamname must not be empty")
+	}
+
+	apiPath := path.Join("orgs", stack.OrgName, "teams", teamName)
+
+	var team Team
+	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &team)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get team: %w", err)
+	}
+
+	for _, stackPermission := range team.Stacks {
+		if stackPermission.ProjectName == stack.ProjectName && stackPermission.StackName == stack.StackName {
+			return &stackPermission.Permission, nil
+		}
+	}
+
+	return nil, nil
 }
