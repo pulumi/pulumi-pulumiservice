@@ -12,7 +12,7 @@ import (
 )
 
 func TestStackTagsUpdate(t *testing.T) {
-	t.Run("Calls Delete then Create on Resource", func(t *testing.T) {
+	t.Run("Calls to Update return an error", func(t *testing.T) {
 		var gotMethods []string
 
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -50,14 +50,7 @@ func TestStackTagsUpdate(t *testing.T) {
 		}
 
 		_, err = st.Update(&upReq)
-		if err != nil {
-			t.Error(err)
-		}
-
-		// expect DELETE first, then POST
-		wantMethods := []string{http.MethodDelete, http.MethodPost}
-		assert.Equal(t, wantMethods, gotMethods)
-
+		assert.ErrorContains(t, err, "unexpected call to update, expected create to be called instead")
 	})
 
 }

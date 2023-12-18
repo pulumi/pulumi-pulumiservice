@@ -10,6 +10,7 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/pulumiapi"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/serde"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
@@ -42,17 +43,39 @@ func (st *PulumiServiceStackTagResource) Name() string {
 }
 
 func (st *PulumiServiceStackTagResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	changed, err := serde.DiffOldsAndNews(req)
+	olds, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
 	if err != nil {
 		return nil, err
 	}
-	changes := pulumirpc.DiffResponse_DIFF_NONE
-	if len(changed) > 0 {
-		changes = pulumirpc.DiffResponse_DIFF_SOME
-	}
-	return &pulumirpc.DiffResponse{
 
-		Changes: changes,
+	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	if err != nil {
+		return nil, err
+	}
+
+	diffs := olds.Diff(news)
+	if diffs == nil {
+		return &pulumirpc.DiffResponse{
+			Changes: pulumirpc.DiffResponse_DIFF_NONE,
+		}, nil
+	}
+
+	dd := plugin.NewDetailedDiffFromObjectDiff(diffs, false)
+
+	detailedDiffs := map[string]*pulumirpc.PropertyDiff{}
+	for k, v := range dd {
+		v.Kind = v.Kind.AsReplace()
+		detailedDiffs[k] = &pulumirpc.PropertyDiff{
+			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind),
+			InputDiff: v.InputDiff,
+		}
+	}
+
+	return &pulumirpc.DiffResponse{
+		Changes:             pulumirpc.DiffResponse_DIFF_SOME,
+		DetailedDiff:        detailedDiffs,
+		DeleteBeforeReplace: true,
+		HasDetailedDiff:     true,
 	}, nil
 }
 
@@ -106,33 +129,8 @@ func (st *PulumiServiceStackTagResource) Check(req *pulumirpc.CheckRequest) (*pu
 }
 
 func (st *PulumiServiceStackTagResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	ctx := context.Background()
-	var inputs PulumiServiceStackTagInput
-	err := serde.FromProperties(req.GetNews(), structTagKey, &inputs)
-	if err != nil {
-		return nil, err
-	}
-	stackName := pulumiapi.StackName{
-		OrgName:     inputs.Organization,
-		ProjectName: inputs.Project,
-		StackName:   inputs.Stack,
-	}
-	stackTag := pulumiapi.StackTag{
-		Name:  inputs.Name,
-		Value: inputs.Value,
-	}
-	err = st.client.DeleteStackTag(ctx, stackName, stackTag.Name)
-	if err != nil {
-		return nil, err
-	}
-	err = st.client.CreateTag(ctx, stackName, stackTag)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.UpdateResponse{
-		Properties: req.GetNews(),
-	}, nil
+	// all updates are destructive, so we just call Create.
+	return nil, fmt.Errorf("unexpected call to update, expected create to be called instead")
 }
 
 func (st *PulumiServiceStackTagResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
@@ -163,12 +161,9 @@ func (st *PulumiServiceStackTagResource) Read(req *pulumirpc.ReadRequest) (*pulu
 	return &pulumirpc.ReadResponse{
 		Id:         req.Id,
 		Properties: props,
+		Inputs:     props,
 	}, nil
 }
 
-func (st *PulumiServiceStackTagResource) Invoke(s *pulumiserviceProvider, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
-	return &pulumirpc.InvokeResponse{Return: nil}, fmt.Errorf("unknown function '%s'", req.Tok)
-}
-
-func (st *PulumiServiceStackTagResource) Configure(config PulumiServiceConfig) {
+func (st *PulumiServiceStackTagResource) Configure(_ PulumiServiceConfig) {
 }
