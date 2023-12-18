@@ -44,11 +44,17 @@ func (i *PulumiServiceTeamInput) ToPropertyMap() resource.PropertyMap {
 	pm := resource.PropertyMap{}
 	pm["teamType"] = resource.NewPropertyValue(i.Type)
 	pm["name"] = resource.NewPropertyValue(i.Name)
-	pm["displayName"] = resource.NewPropertyValue(i.DisplayName)
-	pm["description"] = resource.NewPropertyValue(i.Description)
 	pm["members"] = resource.NewPropertyValue(i.Members)
 	pm["organizationName"] = resource.NewPropertyValue(i.OrganizationName)
-	pm["githubTeamId"] = resource.NewPropertyValue(i.GitHubTeamID)
+	if i.Description != "" {
+		pm["description"] = resource.NewPropertyValue(i.Description)
+	}
+	if i.GitHubTeamID != 0 {
+		pm["githubTeamId"] = resource.NewPropertyValue(i.GitHubTeamID)
+	}
+	if i.DisplayName != "" {
+		pm["displayName"] = resource.NewPropertyValue(i.DisplayName)
+	}
 	return pm
 }
 
@@ -216,6 +222,7 @@ func (t *PulumiServiceTeamResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc
 	return &pulumirpc.ReadResponse{
 		Id:         req.Id,
 		Properties: props,
+		Inputs:     props,
 	}, nil
 }
 
