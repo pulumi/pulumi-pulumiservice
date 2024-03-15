@@ -1,0 +1,15 @@
+name: yaml-agent-pools
+runtime: yaml
+description: A minimal example of provisioning agent pool via Pulumi YAML
+
+resources:
+  agent-pool:
+    type: pulumiservice:index:AgentPool
+    properties:
+      organizationName: service-provider-test-org
+      name: test-agent-pool
+      description: Test agent pool
+
+outputs:
+  # export the value of the access token
+  token: ${agent-pool.tokenValue}

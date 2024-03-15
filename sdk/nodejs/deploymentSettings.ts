@@ -81,6 +81,7 @@ export class DeploymentSettings extends pulumi.CustomResource {
             if ((!args || args.stack === undefined) && !opts.urn) {
                 throw new Error("Missing required property 'stack'");
             }
+            resourceInputs["agentPoolId"] = args ? args.agentPoolId : undefined;
             resourceInputs["executorContext"] = args ? args.executorContext : undefined;
             resourceInputs["github"] = args ? (args.github ? pulumi.output(args.github).apply(inputs.deploymentSettingsGithubArgsProvideDefaults) : undefined) : undefined;
             resourceInputs["operationContext"] = args ? args.operationContext : undefined;
@@ -102,6 +103,10 @@ export class DeploymentSettings extends pulumi.CustomResource {
  * The set of arguments for constructing a DeploymentSettings resource.
  */
 export interface DeploymentSettingsArgs {
+    /**
+     * The agent pool identifier to use for the deployment.
+     */
+    agentPoolId?: pulumi.Input<string>;
     /**
      * Settings related to the deployment executor.
      */

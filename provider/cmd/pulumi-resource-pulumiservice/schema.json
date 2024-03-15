@@ -436,6 +436,58 @@
     }
   },
   "resources": {
+    "pulumiservice:index:AgentPool": {
+      "description": "Agent Pool for customer manager deployments",
+      "properties": {
+        "agentPoolId": {
+          "description": "The agent pool identifier.",
+          "type": "string"
+        },
+        "name": {
+          "description": "The name of the agent pool.",
+          "type": "string"
+        },
+        "description": {
+          "description": "Description of the agent pool.",
+          "type": "string"
+        },
+        "organizationName": {
+          "description": "The organization's name.",
+          "type": "string"
+        },
+        "tokenValue": {
+          "description": "The agent pool's token's value.",
+          "type": "string",
+          "secret": true
+        }
+      },
+      "required": [
+        "agentPoolId",
+        "name",
+        "description",
+        "organizationName",
+        "tokenValue"
+      ],
+      "inputProperties": {
+        "name": {
+          "description": "Name of the agent pool.",
+          "type": "string"
+        },
+        "description": {
+          "description": "Description of the agent pool.",
+          "type": "string"
+        },
+        "organizationName": {
+          "description": "The organization's name.",
+          "type": "string"
+        }
+      },
+      "requiredInputs": [
+        "name",
+        "description",
+        "organizationName"
+      ]
+    },
     "pulumiservice:index:AccessToken": {
       "description": "Access tokens allow a user to authenticate against the Pulumi Cloud",
       "properties": {
@@ -809,6 +861,10 @@
         "operationContext": {
           "$ref": "#/types/pulumiservice:index:DeploymentSettingsOperationContext",
           "description": "Settings related to the Pulumi operation environment during the deployment."
+        },
+        "agentPoolId": {
+          "description": "The agent pool identifier to use for the deployment.",
+          "type": "string"
         }
       },
       "requiredInputs": [

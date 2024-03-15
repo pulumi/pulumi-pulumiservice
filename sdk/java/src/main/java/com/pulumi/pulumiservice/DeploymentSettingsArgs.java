@@ -20,6 +20,21 @@ public final class DeploymentSettingsArgs extends com.pulumi.resources.ResourceA
     public static final DeploymentSettingsArgs Empty = new DeploymentSettingsArgs();
 
     /**
+     * The agent pool identifier to use for the deployment.
+     * 
+     */
+    @Import(name="agentPoolId")
+    private @Nullable Output<String> agentPoolId;
+
+    /**
+     * @return The agent pool identifier to use for the deployment.
+     * 
+     */
+    public Optional<Output<String>> agentPoolId() {
+        return Optional.ofNullable(this.agentPoolId);
+    }
+
+    /**
      * Settings related to the deployment executor.
      * 
      */
@@ -127,6 +142,7 @@ public final class DeploymentSettingsArgs extends com.pulumi.resources.ResourceA
     private DeploymentSettingsArgs() {}
 
     private DeploymentSettingsArgs(DeploymentSettingsArgs $) {
+        this.agentPoolId = $.agentPoolId;
         this.executorContext = $.executorContext;
         this.github = $.github;
         this.operationContext = $.operationContext;
@@ -152,6 +168,27 @@ public final class DeploymentSettingsArgs extends com.pulumi.resources.ResourceA
 
         public Builder(DeploymentSettingsArgs defaults) {
             $ = new DeploymentSettingsArgs(Objects.requireNonNull(defaults));
+        }
+
+        /**
+         * @param agentPoolId The agent pool identifier to use for the deployment.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder agentPoolId(@Nullable Output<String> agentPoolId) {
+            $.agentPoolId = agentPoolId;
+            return this;
+        }
+
+        /**
+         * @param agentPoolId The agent pool identifier to use for the deployment.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder agentPoolId(String agentPoolId) {
+            return agentPoolId(Output.of(agentPoolId));
         }
 
         /**
