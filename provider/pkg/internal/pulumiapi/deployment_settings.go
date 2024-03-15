@@ -20,6 +20,7 @@ type DeploymentSettings struct {
 	GitHub           *GitHubConfiguration     `json:"gitHub,omitempty"`
 	SourceContext    *apitype.SourceContext   `json:"sourceContext,omitempty"`
 	ExecutorContext  *apitype.ExecutorContext `json:"executorContext,omitempty"`
+	AgentPoolId      string                   `json:"agentPoolId,omitempty"`
 }
 
 type OperationContext struct {

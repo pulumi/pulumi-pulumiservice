@@ -89,6 +89,8 @@ func (DeploymentSettingsState) ElementType() reflect.Type {
 }
 
 type deploymentSettingsArgs struct {
+	// The agent pool identifier to use for the deployment.
+	AgentPoolId *string `pulumi:"agentPoolId"`
 	// Settings related to the deployment executor.
 	ExecutorContext *DeploymentSettingsExecutorContext `pulumi:"executorContext"`
 	// GitHub settings for the deployment.
@@ -107,6 +109,8 @@ type deploymentSettingsArgs struct {
 
 // The set of arguments for constructing a DeploymentSettings resource.
 type DeploymentSettingsArgs struct {
+	// The agent pool identifier to use for the deployment.
+	AgentPoolId pulumi.StringPtrInput
 	// Settings related to the deployment executor.
 	ExecutorContext DeploymentSettingsExecutorContextPtrInput
 	// GitHub settings for the deployment.

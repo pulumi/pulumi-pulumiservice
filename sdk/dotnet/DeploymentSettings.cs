@@ -87,6 +87,12 @@ namespace Pulumi.PulumiService
     public sealed class DeploymentSettingsArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
+        /// The agent pool identifier to use for the deployment.
+        /// </summary>
+        [Input("agentPoolId")]
+        public Input<string>? AgentPoolId { get; set; }
+
+        /// <summary>
         /// Settings related to the deployment executor.
         /// </summary>
         [Input("executorContext")]
