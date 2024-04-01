@@ -7,6 +7,8 @@ import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import java.lang.String;
 import java.util.Objects;
+import java.util.Optional;
+import javax.annotation.Nullable;
 
 
 public final class AgentPoolArgs extends com.pulumi.resources.ResourceArgs {
@@ -17,15 +19,15 @@ public final class AgentPoolArgs extends com.pulumi.resources.ResourceArgs {
      * Description of the agent pool.
      * 
      */
-    @Import(name="description", required=true)
-    private Output<String> description;
+    @Import(name="description")
+    private @Nullable Output<String> description;
 
     /**
      * @return Description of the agent pool.
      * 
      */
-    public Output<String> description() {
-        return this.description;
+    public Optional<Output<String>> description() {
+        return Optional.ofNullable(this.description);
     }
 
     /**
@@ -90,7 +92,7 @@ public final class AgentPoolArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder description(Output<String> description) {
+        public Builder description(@Nullable Output<String> description) {
             $.description = description;
             return this;
         }
@@ -148,7 +150,6 @@ public final class AgentPoolArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         public AgentPoolArgs build() {
-            $.description = Objects.requireNonNull($.description, "expected parameter 'description' to be non-null");
             $.name = Objects.requireNonNull($.name, "expected parameter 'name' to be non-null");
             $.organizationName = Objects.requireNonNull($.organizationName, "expected parameter 'organizationName' to be non-null");
             return $;

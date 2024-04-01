@@ -25,7 +25,7 @@ namespace Pulumi.PulumiService
         /// Description of the agent pool.
         /// </summary>
         [Output("description")]
-        public Output<string> Description { get; private set; } = null!;
+        public Output<string?> Description { get; private set; } = null!;
 
         /// <summary>
         /// The name of the agent pool.
@@ -97,8 +97,8 @@ namespace Pulumi.PulumiService
         /// <summary>
         /// Description of the agent pool.
         /// </summary>
-        [Input("description", required: true)]
-        public Input<string> Description { get; set; } = null!;
+        [Input("description")]
+        public Input<string>? Description { get; set; }
 
         /// <summary>
         /// Name of the agent pool.

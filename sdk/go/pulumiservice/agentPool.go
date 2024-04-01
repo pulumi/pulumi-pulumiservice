@@ -19,7 +19,7 @@ type AgentPool struct {
 	// The agent pool identifier.
 	AgentPoolId pulumi.StringOutput `pulumi:"agentPoolId"`
 	// Description of the agent pool.
-	Description pulumi.StringOutput `pulumi:"description"`
+	Description pulumi.StringPtrOutput `pulumi:"description"`
 	// The name of the agent pool.
 	Name pulumi.StringOutput `pulumi:"name"`
 	// The organization's name.
@@ -35,9 +35,6 @@ func NewAgentPool(ctx *pulumi.Context,
 		return nil, errors.New("missing one or more required arguments")
 	}
 
-	if args.Description == nil {
-		return nil, errors.New("invalid value for required argument 'Description'")
-	}
 	if args.Name == nil {
 		return nil, errors.New("invalid value for required argument 'Name'")
 	}
@@ -82,7 +79,7 @@ func (AgentPoolState) ElementType() reflect.Type {
 
 type agentPoolArgs struct {
 	// Description of the agent pool.
-	Description string `pulumi:"description"`
+	Description *string `pulumi:"description"`
 	// Name of the agent pool.
 	Name string `pulumi:"name"`
 	// The organization's name.
@@ -92,7 +89,7 @@ type agentPoolArgs struct {
 // The set of arguments for constructing a AgentPool resource.
 type AgentPoolArgs struct {
 	// Description of the agent pool.
-	Description pulumi.StringInput
+	Description pulumi.StringPtrInput
 	// Name of the agent pool.
 	Name pulumi.StringInput
 	// The organization's name.
@@ -192,8 +189,8 @@ func (o AgentPoolOutput) AgentPoolId() pulumi.StringOutput {
 }
 
 // Description of the agent pool.
-func (o AgentPoolOutput) Description() pulumi.StringOutput {
-	return o.ApplyT(func(v *AgentPool) pulumi.StringOutput { return v.Description }).(pulumi.StringOutput)
+func (o AgentPoolOutput) Description() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *AgentPool) pulumi.StringPtrOutput { return v.Description }).(pulumi.StringPtrOutput)
 }
 
 // The name of the agent pool.

@@ -14,30 +14,19 @@ __all__ = ['AgentPoolArgs', 'AgentPool']
 @pulumi.input_type
 class AgentPoolArgs:
     def __init__(__self__, *,
-                 description: pulumi.Input[str],
                  name: pulumi.Input[str],
-                 organization_name: pulumi.Input[str]):
+                 organization_name: pulumi.Input[str],
+                 description: Optional[pulumi.Input[str]] = None):
         """
         The set of arguments for constructing a AgentPool resource.
-        :param pulumi.Input[str] description: Description of the agent pool.
         :param pulumi.Input[str] name: Name of the agent pool.
         :param pulumi.Input[str] organization_name: The organization's name.
+        :param pulumi.Input[str] description: Description of the agent pool.
         """
-        pulumi.set(__self__, "description", description)
         pulumi.set(__self__, "name", name)
         pulumi.set(__self__, "organization_name", organization_name)
-
-    @property
-    @pulumi.getter
-    def description(self) -> pulumi.Input[str]:
-        """
-        Description of the agent pool.
-        """
-        return pulumi.get(self, "description")
-
-    @description.setter
-    def description(self, value: pulumi.Input[str]):
-        pulumi.set(self, "description", value)
+        if description is not None:
+            pulumi.set(__self__, "description", description)
 
     @property
     @pulumi.getter
@@ -62,6 +51,18 @@ class AgentPoolArgs:
     @organization_name.setter
     def organization_name(self, value: pulumi.Input[str]):
         pulumi.set(self, "organization_name", value)
+
+    @property
+    @pulumi.getter
+    def description(self) -> Optional[pulumi.Input[str]]:
+        """
+        Description of the agent pool.
+        """
+        return pulumi.get(self, "description")
+
+    @description.setter
+    def description(self, value: Optional[pulumi.Input[str]]):
+        pulumi.set(self, "description", value)
 
 
 class AgentPool(pulumi.CustomResource):
@@ -118,8 +119,6 @@ class AgentPool(pulumi.CustomResource):
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
             __props__ = AgentPoolArgs.__new__(AgentPoolArgs)
 
-            if description is None and not opts.urn:
-                raise TypeError("Missing required property 'description'")
             __props__.__dict__["description"] = description
             if name is None and not opts.urn:
                 raise TypeError("Missing required property 'name'")
@@ -170,7 +169,7 @@ class AgentPool(pulumi.CustomResource):
 
     @property
     @pulumi.getter
-    def description(self) -> pulumi.Output[str]:
+    def description(self) -> pulumi.Output[Optional[str]]:
         """
         Description of the agent pool.
         """
