@@ -5,6 +5,7 @@ package com.pulumi.pulumiservice.inputs;
 
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
+import com.pulumi.exceptions.MissingRequiredPropertyException;
 import java.lang.String;
 import java.util.Objects;
 
@@ -148,9 +149,15 @@ public final class AzureOIDCConfigurationArgs extends com.pulumi.resources.Resou
         }
 
         public AzureOIDCConfigurationArgs build() {
-            $.clientId = Objects.requireNonNull($.clientId, "expected parameter 'clientId' to be non-null");
-            $.subscriptionId = Objects.requireNonNull($.subscriptionId, "expected parameter 'subscriptionId' to be non-null");
-            $.tenantId = Objects.requireNonNull($.tenantId, "expected parameter 'tenantId' to be non-null");
+            if ($.clientId == null) {
+                throw new MissingRequiredPropertyException("AzureOIDCConfigurationArgs", "clientId");
+            }
+            if ($.subscriptionId == null) {
+                throw new MissingRequiredPropertyException("AzureOIDCConfigurationArgs", "subscriptionId");
+            }
+            if ($.tenantId == null) {
+                throw new MissingRequiredPropertyException("AzureOIDCConfigurationArgs", "tenantId");
+            }
             return $;
         }
     }

@@ -5,6 +5,7 @@ package com.pulumi.pulumiservice;
 
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
+import com.pulumi.exceptions.MissingRequiredPropertyException;
 import com.pulumi.pulumiservice.enums.TeamStackPermissionScope;
 import java.lang.String;
 import java.util.Objects;
@@ -213,11 +214,21 @@ public final class TeamStackPermissionArgs extends com.pulumi.resources.Resource
         }
 
         public TeamStackPermissionArgs build() {
-            $.organization = Objects.requireNonNull($.organization, "expected parameter 'organization' to be non-null");
-            $.permission = Objects.requireNonNull($.permission, "expected parameter 'permission' to be non-null");
-            $.project = Objects.requireNonNull($.project, "expected parameter 'project' to be non-null");
-            $.stack = Objects.requireNonNull($.stack, "expected parameter 'stack' to be non-null");
-            $.team = Objects.requireNonNull($.team, "expected parameter 'team' to be non-null");
+            if ($.organization == null) {
+                throw new MissingRequiredPropertyException("TeamStackPermissionArgs", "organization");
+            }
+            if ($.permission == null) {
+                throw new MissingRequiredPropertyException("TeamStackPermissionArgs", "permission");
+            }
+            if ($.project == null) {
+                throw new MissingRequiredPropertyException("TeamStackPermissionArgs", "project");
+            }
+            if ($.stack == null) {
+                throw new MissingRequiredPropertyException("TeamStackPermissionArgs", "stack");
+            }
+            if ($.team == null) {
+                throw new MissingRequiredPropertyException("TeamStackPermissionArgs", "team");
+            }
             return $;
         }
     }

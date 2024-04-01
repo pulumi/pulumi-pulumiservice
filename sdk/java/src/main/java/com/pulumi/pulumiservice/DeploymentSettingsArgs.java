@@ -5,6 +5,7 @@ package com.pulumi.pulumiservice;
 
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
+import com.pulumi.exceptions.MissingRequiredPropertyException;
 import com.pulumi.pulumiservice.inputs.DeploymentSettingsExecutorContextArgs;
 import com.pulumi.pulumiservice.inputs.DeploymentSettingsGithubArgs;
 import com.pulumi.pulumiservice.inputs.DeploymentSettingsOperationContextArgs;
@@ -339,10 +340,18 @@ public final class DeploymentSettingsArgs extends com.pulumi.resources.ResourceA
         }
 
         public DeploymentSettingsArgs build() {
-            $.organization = Objects.requireNonNull($.organization, "expected parameter 'organization' to be non-null");
-            $.project = Objects.requireNonNull($.project, "expected parameter 'project' to be non-null");
-            $.sourceContext = Objects.requireNonNull($.sourceContext, "expected parameter 'sourceContext' to be non-null");
-            $.stack = Objects.requireNonNull($.stack, "expected parameter 'stack' to be non-null");
+            if ($.organization == null) {
+                throw new MissingRequiredPropertyException("DeploymentSettingsArgs", "organization");
+            }
+            if ($.project == null) {
+                throw new MissingRequiredPropertyException("DeploymentSettingsArgs", "project");
+            }
+            if ($.sourceContext == null) {
+                throw new MissingRequiredPropertyException("DeploymentSettingsArgs", "sourceContext");
+            }
+            if ($.stack == null) {
+                throw new MissingRequiredPropertyException("DeploymentSettingsArgs", "stack");
+            }
             return $;
         }
     }

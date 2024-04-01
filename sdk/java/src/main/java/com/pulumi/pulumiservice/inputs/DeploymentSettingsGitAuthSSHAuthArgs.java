@@ -5,6 +5,7 @@ package com.pulumi.pulumiservice.inputs;
 
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
+import com.pulumi.exceptions.MissingRequiredPropertyException;
 import java.lang.String;
 import java.util.Objects;
 import java.util.Optional;
@@ -117,7 +118,9 @@ public final class DeploymentSettingsGitAuthSSHAuthArgs extends com.pulumi.resou
         }
 
         public DeploymentSettingsGitAuthSSHAuthArgs build() {
-            $.sshPrivateKey = Objects.requireNonNull($.sshPrivateKey, "expected parameter 'sshPrivateKey' to be non-null");
+            if ($.sshPrivateKey == null) {
+                throw new MissingRequiredPropertyException("DeploymentSettingsGitAuthSSHAuthArgs", "sshPrivateKey");
+            }
             return $;
         }
     }

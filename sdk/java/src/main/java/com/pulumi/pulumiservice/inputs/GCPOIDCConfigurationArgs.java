@@ -5,6 +5,7 @@ package com.pulumi.pulumiservice.inputs;
 
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
+import com.pulumi.exceptions.MissingRequiredPropertyException;
 import java.lang.String;
 import java.util.Objects;
 import java.util.Optional;
@@ -261,10 +262,18 @@ public final class GCPOIDCConfigurationArgs extends com.pulumi.resources.Resourc
         }
 
         public GCPOIDCConfigurationArgs build() {
-            $.projectId = Objects.requireNonNull($.projectId, "expected parameter 'projectId' to be non-null");
-            $.providerId = Objects.requireNonNull($.providerId, "expected parameter 'providerId' to be non-null");
-            $.serviceAccount = Objects.requireNonNull($.serviceAccount, "expected parameter 'serviceAccount' to be non-null");
-            $.workloadPoolId = Objects.requireNonNull($.workloadPoolId, "expected parameter 'workloadPoolId' to be non-null");
+            if ($.projectId == null) {
+                throw new MissingRequiredPropertyException("GCPOIDCConfigurationArgs", "projectId");
+            }
+            if ($.providerId == null) {
+                throw new MissingRequiredPropertyException("GCPOIDCConfigurationArgs", "providerId");
+            }
+            if ($.serviceAccount == null) {
+                throw new MissingRequiredPropertyException("GCPOIDCConfigurationArgs", "serviceAccount");
+            }
+            if ($.workloadPoolId == null) {
+                throw new MissingRequiredPropertyException("GCPOIDCConfigurationArgs", "workloadPoolId");
+            }
             return $;
         }
     }
