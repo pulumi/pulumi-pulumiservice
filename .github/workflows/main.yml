@@ -109,7 +109,7 @@ jobs:
       fail-fast: true
       matrix:
         dotnetversion: [3.1.301]
-        goversion: [1.20.x]
+        goversion: [1.21.x]
         language: [nodejs, python, dotnet, java, go]
         nodeversion: [20.x]
         pythonversion: ["3.11"]
@@ -156,7 +156,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        goversion: [1.20.x]
+        goversion: [1.21.x]
   publish:
     name: publish
     needs: test
@@ -204,7 +204,7 @@ jobs:
       fail-fast: true
       matrix:
         goversion:
-        - 1.20.x
+        - 1.21.x
   publish_sdk:
     name: publish_sdk
     needs: publish
@@ -285,7 +285,7 @@ jobs:
       fail-fast: true
       matrix:
         dotnetversion: [3.1.301]
-        goversion: [1.20.x]
+        goversion: [1.21.x]
         nodeversion: [20.x]
         pythonversion: ["3.11"]
         javaversion: ["11"]
@@ -379,7 +379,7 @@ jobs:
         language: [nodejs, java, python, dotnet, go, yaml, dotnet]
 
         dotnetversion: [3.1.301]
-        goversion: [1.20.x]
+        goversion: [1.21.x]
         nodeversion: [20.x]
         pythonversion: ["3.11"]
         javaversion: ["11"]
