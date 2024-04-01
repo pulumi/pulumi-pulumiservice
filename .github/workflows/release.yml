@@ -228,8 +228,8 @@ jobs:
           - java
           # yaml doesn't need an sdk :)
         nodeversion:
-          - 14.x
+          - 20.x
         pythonversion:
-          - "3.9"
+          - "3.11"
         javaversion:
           - "11"

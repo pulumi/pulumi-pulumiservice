@@ -111,8 +111,8 @@ jobs:
         dotnetversion: [3.1.301]
         goversion: [1.20.x]
         language: [nodejs, python, dotnet, java, go]
-        nodeversion: [14.x]
-        pythonversion: ["3.7"]
+        nodeversion: [20.x]
+        pythonversion: ["3.11"]
         javaversion: ["11"]
   prerequisites:
     name: prerequisites
@@ -286,8 +286,8 @@ jobs:
       matrix:
         dotnetversion: [3.1.301]
         goversion: [1.20.x]
-        nodeversion: [14.x]
-        pythonversion: ["3.7"]
+        nodeversion: [20.x]
+        pythonversion: ["3.11"]
         javaversion: ["11"]
   test:
     name: test
@@ -380,8 +380,8 @@ jobs:
 
         dotnetversion: [3.1.301]
         goversion: [1.20.x]
-        nodeversion: [14.x]
-        pythonversion: ["3.7"]
+        nodeversion: [20.x]
+        pythonversion: ["3.11"]
         javaversion: ["11"]
 name: main
 "on":
