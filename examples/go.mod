@@ -1,6 +1,6 @@
 module github.com/pulumi/pulumi-pulumiservice/examples
 
-go 1.20
+go 1.21.0
 
 require github.com/pulumi/pulumi/pkg/v3 v3.112.0
 
