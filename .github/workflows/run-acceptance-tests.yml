@@ -44,8 +44,8 @@ jobs:
         dotnetversion: [ 3.1.301 ]
         goversion: [ 1.20.x ]
         language: [ nodejs, python, dotnet, go, java ]
-        nodeversion: [ 14.x ]
-        pythonversion: [ 3.7 ]
+        nodeversion: [ 20.x ]
+        pythonversion: [ 3.11 ]
         javaversion: [ 11 ]
     steps:
       - name: Checkout Repo
@@ -165,8 +165,8 @@ jobs:
 
         dotnetversion: [3.1.301]
         goversion: [1.20.x]
-        nodeversion: [14.x]
-        pythonversion: [3.7]
+        nodeversion: [20.x]
+        pythonversion: [3.11]
         javaversion: [11]
     steps:
       - name: Checkout Repo
