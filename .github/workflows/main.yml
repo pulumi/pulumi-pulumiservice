@@ -367,7 +367,7 @@ jobs:
       run: make install_${{ matrix.language}}_sdk
       env:
         # Right now we pin this, we should add a way to automatically upgrade
-        PULUMI_JAVA_SDK_VERSION: '0.8.0'
+        PULUMI_JAVA_SDK_VERSION: '0.10.0'
     - name: Run tests
       run: |
         set -euo pipefail
