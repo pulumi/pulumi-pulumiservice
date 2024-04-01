@@ -35,20 +35,6 @@ type AgentPool struct {
 	TokenValue  string `json:"tokenValue"`
 }
 
-type agentPoolResponse struct {
-	ID             string `json:"id"`
-	Name           string `json:"name"`
-	Description    string `json:"description"`
-	Created        int    `json:"created"`
-	LastSeen       int    `json:"lastSeen"`
-	LastDeployment int    `json:"lastDeployment"`
-	Status         string `json:"status"`
-}
-
-type listAgentPoolResponse struct {
-	AgentPools []agentPoolResponse `json:"agentPools"`
-}
-
 type createAgentPoolResponse struct {
 	ID         string `json:"id"`
 	TokenValue string `json:"tokenValue"`
@@ -131,8 +117,6 @@ func (c *Client) DeleteAgentPool(ctx context.Context, agentPoolId, orgName strin
 
 	apiPath := path.Join("orgs", orgName, "agent-pools", agentPoolId)
 
-	fmt.Println(apiPath)
-
 	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
 	if err != nil {
 		return fmt.Errorf("failed to delete agent pool %q: %w", agentPoolId, err)
@@ -142,26 +126,18 @@ func (c *Client) DeleteAgentPool(ctx context.Context, agentPoolId, orgName strin
 }
 
 func (c *Client) GetAgentPool(ctx context.Context, agentPoolId, orgName string) (*AgentPool, error) {
-	apiPath := path.Join("orgs", orgName, "agent-pools")
+	apiPath := path.Join("orgs", orgName, "agent-pools", agentPoolId)
 
-	var listRes listAgentPoolResponse
-
-	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &listRes)
-
+	var pool AgentPool
+	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &pool)
 	if err != nil {
-		return nil, fmt.Errorf("failed to list agent pools: %w", err)
-	}
-
-	for i := 0; i < len(listRes.AgentPools); i++ {
-		agentPool := listRes.AgentPools[i]
-		if agentPool.ID == agentPoolId {
-			return &AgentPool{
-				ID:          agentPool.ID,
-				Name:        agentPool.Name,
-				Description: agentPool.Description,
-			}, nil
+		statusCode := GetErrorStatusCode(err)
+		if statusCode == http.StatusNotFound {
+			// Important: we return nil here to hint it was not found
+			return nil, nil
 		}
+		return nil, fmt.Errorf("failed to get agent pool: %w", err)
 	}
 
-	return nil, nil
+	return &pool, nil
 }

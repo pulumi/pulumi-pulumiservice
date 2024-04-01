@@ -100,28 +100,16 @@ func TestGetAgentPool(t *testing.T) {
 	name := "Pool 1"
 	desc := "agent pool description"
 	org := "anOrg"
-	created := 123
 	t.Run("Happy Path", func(t *testing.T) {
-		resp := listAgentPoolResponse{
-			AgentPools: []agentPoolResponse{
-				{
-					ID:          id,
-					Name:        name,
-					Description: desc,
-					Created:     created,
-				},
-				{
-					ID:          "other",
-					Name:        "Pool 2",
-					Description: desc,
-					Created:     created,
-				},
-			},
+		resp := AgentPool{
+			ID:          id,
+			Name:        name,
+			Description: desc,
 		}
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
 			ExpectedReqBody:   nil,
-			ExpectedReqPath:   fmt.Sprintf("/api/orgs/%s/agent-pools", org),
+			ExpectedReqPath:   fmt.Sprintf("/api/orgs/%s/agent-pools/%s", org, id),
 			ResponseCode:      200,
 			ResponseBody:      resp,
 		})
@@ -138,7 +126,7 @@ func TestGetAgentPool(t *testing.T) {
 	t.Run("Error", func(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
-			ExpectedReqPath:   fmt.Sprintf("/api/orgs/%s/agent-pools", org),
+			ExpectedReqPath:   fmt.Sprintf("/api/orgs/%s/agent-pools/%s", org, id),
 			ExpectedReqBody:   nil,
 			ResponseCode:      401,
 			ResponseBody: errorResponse{
@@ -151,7 +139,7 @@ func TestGetAgentPool(t *testing.T) {
 		assert.Nil(t, token, "agent pool should be nil")
 		assert.EqualError(t,
 			err,
-			`failed to list agent pools: 401 API error: unauthorized`,
+			`failed to get agent pool: 401 API error: unauthorized`,
 		)
 	})
 }
