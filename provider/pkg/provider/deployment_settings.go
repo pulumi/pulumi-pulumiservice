@@ -215,7 +215,9 @@ func toExecutorContext(inputMap resource.PropertyMap) *apitype.ExecutorContext {
 	var ec apitype.ExecutorContext
 
 	if ecInput["executorImage"].HasValue() {
-		ec.ExecutorImage.Reference = getSecretOrStringValue(ecInput["executorImage"])
+		ec.ExecutorImage = &apitype.DockerImage{
+			Reference: getSecretOrStringValue(ecInput["executorImage"]),
+		}
 	}
 
 	return &ec
