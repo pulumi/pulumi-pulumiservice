@@ -5,6 +5,7 @@ package com.pulumi.pulumiservice.inputs;
 
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
+import com.pulumi.exceptions.MissingRequiredPropertyException;
 import java.lang.String;
 import java.util.List;
 import java.util.Objects;
@@ -198,8 +199,12 @@ public final class AWSOIDCConfigurationArgs extends com.pulumi.resources.Resourc
         }
 
         public AWSOIDCConfigurationArgs build() {
-            $.roleARN = Objects.requireNonNull($.roleARN, "expected parameter 'roleARN' to be non-null");
-            $.sessionName = Objects.requireNonNull($.sessionName, "expected parameter 'sessionName' to be non-null");
+            if ($.roleARN == null) {
+                throw new MissingRequiredPropertyException("AWSOIDCConfigurationArgs", "roleARN");
+            }
+            if ($.sessionName == null) {
+                throw new MissingRequiredPropertyException("AWSOIDCConfigurationArgs", "sessionName");
+            }
             return $;
         }
     }

@@ -18,7 +18,7 @@ def readme():
 
 
 setup(name='pulumi_pulumiservice',
-      python_requires='>=3.7',
+      python_requires='>=3.8',
       version=VERSION,
       description="A native Pulumi package for creating and managing Pulumi Cloud constructs",
       long_description=readme(),

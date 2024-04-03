@@ -175,7 +175,7 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap() resource.Propert
 		pm["github"] = resource.PropertyValue{V: githubMap}
 	}
 
-	if ds.ExecutorContext != nil && ds.ExecutorContext.ExecutorImage != "" {
+	if ds.ExecutorContext != nil && ds.ExecutorContext.ExecutorImage != nil && ds.ExecutorContext.ExecutorImage.Reference != "" {
 		ecMap := resource.PropertyMap{}
 		ecMap["executorImage"] = resource.NewPropertyValue(ds.ExecutorContext.ExecutorImage)
 		pm["executorContext"] = resource.PropertyValue{V: ecMap}
@@ -215,7 +215,9 @@ func toExecutorContext(inputMap resource.PropertyMap) *apitype.ExecutorContext {
 	var ec apitype.ExecutorContext
 
 	if ecInput["executorImage"].HasValue() {
-		ec.ExecutorImage = getSecretOrStringValue(ecInput["executorImage"])
+		ec.ExecutorImage = &apitype.DockerImage{
+			Reference: getSecretOrStringValue(ecInput["executorImage"]),
+		}
 	}
 
 	return &ec

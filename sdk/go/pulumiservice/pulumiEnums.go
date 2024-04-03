@@ -8,7 +8,6 @@ import (
 	"reflect"
 
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
-	"github.com/pulumi/pulumi/sdk/v3/go/pulumix"
 )
 
 type TeamStackPermissionScope float64
@@ -174,10 +173,23 @@ func (o WebhookFiltersPtrOutput) ToStringPtrOutputWithContext(ctx context.Contex
 	}).(pulumi.StringPtrOutput)
 }
 
-// WebhookFiltersInput is an input type that accepts WebhookFiltersArgs and WebhookFiltersOutput values.
-// You can construct a concrete instance of `WebhookFiltersInput` via:
+// WebhookFiltersInput is an input type that accepts values of the WebhookFilters enum
+// A concrete instance of `WebhookFiltersInput` can be one of the following:
 //
-//	WebhookFiltersArgs{...}
+//	WebhookFiltersStackCreated
+//	WebhookFiltersStackDeleted
+//	WebhookFiltersUpdateSucceeded
+//	WebhookFiltersUpdateFailed
+//	WebhookFiltersPreviewSucceeded
+//	WebhookFiltersPreviewFailed
+//	WebhookFiltersDestroySucceeded
+//	WebhookFiltersDestroyFailed
+//	WebhookFiltersRefreshSucceeded
+//	WebhookFiltersRefreshFailed
+//	WebhookFiltersDeploymentQueued
+//	WebhookFiltersDeploymentStarted
+//	WebhookFiltersDeploymentSucceeded
+//	WebhookFiltersDeploymentFailed
 type WebhookFiltersInput interface {
 	pulumi.Input
 
@@ -210,12 +222,6 @@ func (in *webhookFiltersPtr) ToWebhookFiltersPtrOutput() WebhookFiltersPtrOutput
 
 func (in *webhookFiltersPtr) ToWebhookFiltersPtrOutputWithContext(ctx context.Context) WebhookFiltersPtrOutput {
 	return pulumi.ToOutputWithContext(ctx, in).(WebhookFiltersPtrOutput)
-}
-
-func (in *webhookFiltersPtr) ToOutput(ctx context.Context) pulumix.Output[*WebhookFilters] {
-	return pulumix.Output[*WebhookFilters]{
-		OutputState: in.ToWebhookFiltersPtrOutputWithContext(ctx).OutputState,
-	}
 }
 
 // WebhookFiltersArrayInput is an input type that accepts WebhookFiltersArray and WebhookFiltersArrayOutput values.
@@ -395,10 +401,13 @@ func (o WebhookFormatPtrOutput) ToStringPtrOutputWithContext(ctx context.Context
 	}).(pulumi.StringPtrOutput)
 }
 
-// WebhookFormatInput is an input type that accepts WebhookFormatArgs and WebhookFormatOutput values.
-// You can construct a concrete instance of `WebhookFormatInput` via:
+// WebhookFormatInput is an input type that accepts values of the WebhookFormat enum
+// A concrete instance of `WebhookFormatInput` can be one of the following:
 //
-//	WebhookFormatArgs{...}
+//	WebhookFormatRaw
+//	WebhookFormatSlack
+//	WebhookFormatPulumiDeployments
+//	WebhookFormatMicrosoftTeams
 type WebhookFormatInput interface {
 	pulumi.Input
 
@@ -431,12 +440,6 @@ func (in *webhookFormatPtr) ToWebhookFormatPtrOutput() WebhookFormatPtrOutput {
 
 func (in *webhookFormatPtr) ToWebhookFormatPtrOutputWithContext(ctx context.Context) WebhookFormatPtrOutput {
 	return pulumi.ToOutputWithContext(ctx, in).(WebhookFormatPtrOutput)
-}
-
-func (in *webhookFormatPtr) ToOutput(ctx context.Context) pulumix.Output[*WebhookFormat] {
-	return pulumix.Output[*WebhookFormat]{
-		OutputState: in.ToWebhookFormatPtrOutputWithContext(ctx).OutputState,
-	}
 }
 
 func init() {

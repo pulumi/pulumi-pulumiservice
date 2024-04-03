@@ -5,6 +5,7 @@ package com.pulumi.pulumiservice;
 
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
+import com.pulumi.exceptions.MissingRequiredPropertyException;
 import java.lang.String;
 import java.util.Objects;
 
@@ -74,7 +75,9 @@ public final class AccessTokenArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         public AccessTokenArgs build() {
-            $.description = Objects.requireNonNull($.description, "expected parameter 'description' to be non-null");
+            if ($.description == null) {
+                throw new MissingRequiredPropertyException("AccessTokenArgs", "description");
+            }
             return $;
         }
     }

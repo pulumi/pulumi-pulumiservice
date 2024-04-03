@@ -54,7 +54,7 @@ env:
   GPR_USER: ${{ secrets.GPR_USER }}
   GPR_TOKEN: ${{ secrets.GPR_TOKEN }}
   # Need to pin this until codegen gets updated
-  PULUMI_JAVA_SDK_VERSION: 0.8.0
+  PULUMI_JAVA_SDK_VERSION: 0.10.0
 jobs:
   create_docs_build:
     name: create_docs_build
@@ -106,7 +106,7 @@ jobs:
       fail-fast: true
       matrix:
         goversion:
-        - 1.20.x
+        - 1.21.x
   tag_sdk:
     name: tag_sdk
     needs: publish_sdk
@@ -219,7 +219,7 @@ jobs:
         dotnetversion:
           - 3.1.301
         goversion:
-          - 1.20.x
+          - 1.21.x
         language:
           - nodejs
           - python
