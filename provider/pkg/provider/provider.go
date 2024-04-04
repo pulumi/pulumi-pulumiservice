@@ -15,19 +15,12 @@
 package provider
 
 import (
-	"context"
-	"net/http"
-	"strings"
-	"time"
-
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
 
 	p "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi-go-provider/infer"
 	"github.com/pulumi/pulumi-go-provider/middleware/schema"
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/pulumiapi"
 	"github.com/pulumi/pulumi/pkg/v3/resource/provider"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
@@ -93,7 +86,9 @@ func makeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 			Publisher:  "Pulumi",
 			License:    "Apache-2.0",
 		},
-		Config:    infer.Config[Config](),
-		Resources: []infer.InferredResource{},
+		Config: infer.Config[Config](),
+		Resources: []infer.InferredResource{
+			infer.Resource[*AgentPool](),
+		},
 	}))(nil)
 }

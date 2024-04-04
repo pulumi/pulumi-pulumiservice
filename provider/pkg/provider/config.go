@@ -25,7 +25,7 @@ func GetConfig(ctx p.Context) Config { return infer.GetConfig[Config](ctx) }
 type Config struct {
 	AccessToken string `pulumi:"accessToken,optional"`
 	ServiceURL  string `pulumi:"serviceURL,optional"`
-	Client      pulumiapi.TeamClient
+	Client      *pulumiapi.Client
 }
 
 var (
