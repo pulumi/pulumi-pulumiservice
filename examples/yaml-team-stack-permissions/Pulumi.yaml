@@ -24,7 +24,7 @@ resources:
     properties:
       organization: ${team.organizationName}
       project: yaml-team-stack-example
-      stack: dev
+      stack: ${pulumi.stack}
       team: ${team.name}
       # edit access
       permission: 102
