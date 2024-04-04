@@ -14,7 +14,6 @@ import (
 )
 
 type PulumiServiceWebhookResource struct {
-	config PulumiServiceConfig
 	client pulumiapi.WebhookClient
 }
 
@@ -124,10 +123,6 @@ func (wh *PulumiServiceWebhookResource) ToPulumiServiceWebhookProperties(propMap
 
 func (wh *PulumiServiceWebhookResource) Name() string {
 	return "pulumiservice:index:Webhook"
-}
-
-func (wh *PulumiServiceWebhookResource) Configure(config PulumiServiceConfig) {
-	wh.config = config
 }
 
 func (wh *PulumiServiceWebhookResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {

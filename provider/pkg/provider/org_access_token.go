@@ -147,9 +147,6 @@ func (ot *PulumiServiceOrgAccessTokenResource) Invoke(_ *pulumiserviceProvider, 
 	return &pulumirpc.InvokeResponse{Return: nil}, fmt.Errorf("unknown function '%s'", req.Tok)
 }
 
-func (ot *PulumiServiceOrgAccessTokenResource) Configure(_ PulumiServiceConfig) {
-}
-
 func (ot *PulumiServiceOrgAccessTokenResource) createOrgAccessToken(ctx context.Context, input PulumiServiceOrgAccessTokenInput) (*pulumiapi.AccessToken, error) {
 
 	accessToken, err := ot.client.CreateOrgAccessToken(ctx, input.Name, input.OrgName, input.Description, input.Admin)

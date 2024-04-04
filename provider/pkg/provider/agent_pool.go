@@ -228,9 +228,6 @@ func (ap *PulumiServiceAgentPoolResource) Invoke(_ *pulumiserviceProvider, req *
 	return &pulumirpc.InvokeResponse{Return: nil}, fmt.Errorf("unknown function '%s'", req.Tok)
 }
 
-func (ap *PulumiServiceAgentPoolResource) Configure(_ PulumiServiceConfig) {
-}
-
 func (ap *PulumiServiceAgentPoolResource) createAgentPool(ctx context.Context, input PulumiServiceAgentPoolInput) (*pulumiapi.AgentPool, error) {
 	agentPool, err := ap.client.CreateAgentPool(ctx, input.OrgName, input.Name, input.Description)
 	if err != nil {

@@ -143,9 +143,6 @@ func (t *PulumiServiceTeamAccessTokenResource) Invoke(_ *pulumiserviceProvider, 
 	return &pulumirpc.InvokeResponse{Return: nil}, fmt.Errorf("unknown function '%s'", req.Tok)
 }
 
-func (t *PulumiServiceTeamAccessTokenResource) Configure(_ PulumiServiceConfig) {
-}
-
 func (t *PulumiServiceTeamAccessTokenResource) createTeamAccessToken(ctx context.Context, input PulumiServiceTeamAccessTokenInput) (*pulumiapi.AccessToken, error) {
 
 	accessToken, err := t.client.CreateTeamAccessToken(ctx, input.Name, input.OrgName, input.TeamName, input.Description)

@@ -500,8 +500,6 @@ func (ds *PulumiServiceDeploymentSettingsResource) Check(req *pulumirpc.CheckReq
 	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: failures}, nil
 }
 
-func (ds *PulumiServiceDeploymentSettingsResource) Configure(_ PulumiServiceConfig) {}
-
 func (ds *PulumiServiceDeploymentSettingsResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
 	ctx := context.Background()
 

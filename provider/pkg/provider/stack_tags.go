@@ -164,6 +164,3 @@ func (st *PulumiServiceStackTagResource) Read(req *pulumirpc.ReadRequest) (*pulu
 		Inputs:     props,
 	}, nil
 }
-
-func (st *PulumiServiceStackTagResource) Configure(_ PulumiServiceConfig) {
-}

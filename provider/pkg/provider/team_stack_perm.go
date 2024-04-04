@@ -45,10 +45,6 @@ func (tp *TeamStackPermissionResource) Check(req *pulumirpc.CheckRequest) (*pulu
 	}, nil
 }
 
-func (tp *TeamStackPermissionResource) Configure(_ PulumiServiceConfig) {
-
-}
-
 func (tp *TeamStackPermissionResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
 	ctx := context.Background()
 	id := req.GetId()

@@ -15,9 +15,6 @@ func (u *PulumiServiceUnknownResource) Name() string {
 	return "pulumiservice:index:Unknown"
 }
 
-func (u *PulumiServiceUnknownResource) Configure(config PulumiServiceConfig) {
-}
-
 func (u *PulumiServiceUnknownResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
 	return nil, createUnknownResourceErrorFromRequest(req)
 }
@@ -53,7 +50,4 @@ func (u *PulumiServiceUnknownResource) Invoke(s *pulumiserviceProvider, req *pul
 
 func (f *PulumiServiceUnknownFunction) Name() string {
 	return "pulumiservice:index:Unknown"
-}
-
-func (f *PulumiServiceUnknownFunction) Configure(config PulumiServiceConfig) {
 }

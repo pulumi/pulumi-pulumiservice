@@ -117,9 +117,6 @@ func (at *PulumiServiceAccessTokenResource) Invoke(_ *pulumiserviceProvider, req
 	return &pulumirpc.InvokeResponse{Return: nil}, fmt.Errorf("unknown function '%s'", req.Tok)
 }
 
-func (at *PulumiServiceAccessTokenResource) Configure(_ PulumiServiceConfig) {
-}
-
 func (at *PulumiServiceAccessTokenResource) createAccessToken(ctx context.Context, input PulumiServiceAccessTokenInput) (*pulumiapi.AccessToken, error) {
 
 	accessToken, err := at.client.CreateAccessToken(ctx, input.Description)

@@ -20,7 +20,6 @@ import (
 )
 
 type PulumiServiceTeamResource struct {
-	config PulumiServiceConfig
 	client pulumiapi.TeamClient
 }
 
@@ -107,10 +106,6 @@ func ToPulumiServiceTeamInput(inputMap resource.PropertyMap) PulumiServiceTeamIn
 
 func (t *PulumiServiceTeamResource) Name() string {
 	return "pulumiservice:index:Team"
-}
-
-func (t *PulumiServiceTeamResource) Configure(config PulumiServiceConfig) {
-	t.config = config
 }
 
 func (t *PulumiServiceTeamResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
