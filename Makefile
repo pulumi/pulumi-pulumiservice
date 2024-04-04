@@ -77,16 +77,20 @@ python_sdk: gen_sdk_prerequisites
 		rm ./bin/setup.py.bak && \
 		cd ./bin && python3 setup.py build sdist
 
+GRADLE_DIR := $(WORKING_DIR)/.gradle
+GRADLE := $(GRADLE_DIR)/gradlew
 java_sdk: RESOURCE_FOLDER := src/main/resources/com/pulumi/pulumiservice
 java_sdk: gen_sdk_prerequisites
 	rm -rf sdk/java/{.gradle,build,src}
 	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language java
+	cp $(GRADLE_DIR)/settings.gradle sdk/java/settings.gradle
+	cp $(GRADLE_DIR)/build.gradle sdk/java/build.gradle
 	cd sdk/java && \
 	mkdir -p $(RESOURCE_FOLDER) && \
 	  echo "$(VERSION)" > $(RESOURCE_FOLDER)/version.txt && \
 	  echo '{"resource": true,"name": "pulumiservice","version": "$(VERSION)"}' > $(RESOURCE_FOLDER)/plugin.json && \
-	  PULUMI_JAVA_SDK_VERSION=0.10.0 ./gradlew --console=plain build && \
-	  PULUMI_JAVA_SDK_VERSION=0.10.0 ./gradlew --console=plain publishToMavenLocal
+	  PULUMI_JAVA_SDK_VERSION=0.10.0 $(GRADLE) --console=plain build && \
+	  PULUMI_JAVA_SDK_VERSION=0.10.0 $(GRADLE) --console=plain publishToMavenLocal
 
 .PHONY: build
 build:: gen provider dotnet_sdk go_sdk nodejs_sdk python_sdk java_sdk
@@ -121,7 +125,7 @@ install_nodejs_sdk::
 	yarn link --cwd $(WORKING_DIR)/sdk/nodejs/bin
 
 install_java_sdk::
-	cd sdk/java && ./gradlew publishToMavenLocal
+	cd sdk/java && $(GRADLE) publishToMavenLocal
 
 
 # Keep the version of the pulumi binary used for code generation in sync with the version
