@@ -1,168 +1,89 @@
 package provider
 
 import (
-	"context"
-	"fmt"
-
-	pbempty "google.golang.org/protobuf/types/known/emptypb"
-
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/pulumiapi"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
+	p "github.com/pulumi/pulumi-go-provider"
+	"github.com/pulumi/pulumi-go-provider/infer"
 )
 
-type PulumiServiceAccessTokenResource struct {
-	client *pulumiapi.Client
+var (
+	// Life-cycle participation
+	_ infer.CustomResource[AccessTokenInput, AccessTokenState] = (*AccessToken)(nil)
+	_ infer.CustomDelete[AccessTokenState]                     = (*AccessToken)(nil)
+	_ infer.CustomRead[AccessTokenInput, AccessTokenState]     = (*AccessToken)(nil)
+
+	// Schema documentation
+	_ infer.Annotated = (*AccessToken)(nil)
+	_ infer.Annotated = (*AccessTokenInput)(nil)
+	_ infer.Annotated = (*AccessTokenState)(nil)
+
+	// Secret values
+	_ infer.ExplicitDependencies[AccessTokenInput, AccessTokenState] = (*AccessToken)(nil)
+)
+
+type AccessToken struct{}
+
+func (p *AccessToken) Annotate(a infer.Annotator) {
+	a.Describe(p, "Access tokens allow a user to authenticate against the Pulumi Cloud")
 }
 
-type PulumiServiceAccessTokenInput struct {
-	Description string
+type AccessTokenInput struct {
+	Description string `pulumi:"description" provider:"replaceOnChanges"`
 }
 
-func (i *PulumiServiceAccessTokenInput) ToPropertyMap() resource.PropertyMap {
-	pm := resource.PropertyMap{}
-	pm["description"] = resource.NewPropertyValue(i.Description)
-	return pm
+func (p *AccessTokenInput) Annotate(a infer.Annotator) {
+	a.Describe(&p.Description, "Description of the access token.")
 }
 
-func (at *PulumiServiceAccessTokenResource) ToPulumiServiceAccessTokenInput(inputMap resource.PropertyMap) PulumiServiceAccessTokenInput {
-	input := PulumiServiceAccessTokenInput{}
-
-	if inputMap["description"].HasValue() && inputMap["description"].IsString() {
-		input.Description = inputMap["description"].StringValue()
-	}
-
-	return input
+type AccessTokenState struct {
+	AccessTokenInput
+	TokenID string `pulumi:"tokenId"`
+	Value   string `pulumi:"value"`
 }
 
-func (at *PulumiServiceAccessTokenResource) Name() string {
-	return "pulumiservice:index:AccessToken"
+func (p *AccessTokenState) Annotate(a infer.Annotator) {
+	a.Describe(&p.TokenID, "The token identifier.")
+	a.Describe(&p.Value, "The token's value.")
 }
 
-func (at *PulumiServiceAccessTokenResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	return diffAccessTokenProperties(req, []string{"description"})
+func (*AccessToken) WireDependencies(f infer.FieldSelector, args *AccessTokenInput, state *AccessTokenState) {
+	f.OutputField(&state.Value).AlwaysSecret()
 }
 
-func (at *PulumiServiceAccessTokenResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	ctx := context.Background()
-	err := at.deleteAccessToken(ctx, req.Id)
+func (*AccessToken) Delete(ctx p.Context, id string, props AccessTokenState) error {
+	return GetConfig(ctx).Client.DeleteAccessToken(ctx, props.TokenID)
+}
+
+func (*AccessToken) Create(ctx p.Context, name string, input AccessTokenInput, preview bool) (id string, output AccessTokenState, err error) {
+	tk, err := GetConfig(ctx).Client.CreateAccessToken(ctx, input.Description)
 	if err != nil {
-		return &pbempty.Empty{}, err
+		return "", AccessTokenState{}, err
 	}
-
-	return &pbempty.Empty{}, nil
-}
-
-func (at *PulumiServiceAccessTokenResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
-	ctx := context.Background()
-	inputs, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
-
-	inputsAccessToken := at.ToPulumiServiceAccessTokenInput(inputs)
-	accessToken, err := at.createAccessToken(ctx, inputsAccessToken)
-	if err != nil {
-		return nil, fmt.Errorf("error creating access token '%s': %s", inputsAccessToken.Description, err.Error())
-	}
-
-	outputStore := resource.PropertyMap{}
-	outputStore["__inputs"] = resource.NewObjectProperty(inputs)
-	outputStore["value"] = resource.NewPropertyValue(accessToken.TokenValue)
-
-	outputProperties, err := plugin.MarshalProperties(
-		outputStore,
-		plugin.MarshalOptions{},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.CreateResponse{
-		Id:         accessToken.ID,
-		Properties: outputProperties,
+	return tk.ID, AccessTokenState{
+		AccessTokenInput: input,
+		TokenID:          id,
+		Value:            tk.TokenValue,
 	}, nil
-
 }
 
-func (at *PulumiServiceAccessTokenResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: nil}, nil
-}
-
-func (at *PulumiServiceAccessTokenResource) Update(_ *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	// all updates are destructive, so we just call Create.
-	return nil, fmt.Errorf("unexpected call to update, expected create to be called instead")
-}
-
-func (at *PulumiServiceAccessTokenResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	ctx := context.Background()
-
+func (*AccessToken) Read(
+	ctx p.Context, id string, _ AccessTokenInput, _ AccessTokenState,
+) (string, AccessTokenInput, AccessTokenState, error) {
 	// the access token is immutable; if we get nil it got deleted, otherwise all data is the same
-	accessToken, err := at.client.GetAccessToken(ctx, req.GetId())
+	accessToken, err := GetConfig(ctx).Client.GetAccessToken(ctx, id)
 	if err != nil {
-		return nil, err
+		return "", AccessTokenInput{}, AccessTokenState{}, err
 	}
 	if accessToken == nil {
-		return &pulumirpc.ReadResponse{}, nil
+		return "", AccessTokenInput{}, AccessTokenState{}, nil
 	}
 
-	return &pulumirpc.ReadResponse{
-		Id:         req.GetId(),
-		Properties: req.GetProperties(),
-	}, nil
-}
-
-func (at *PulumiServiceAccessTokenResource) Invoke(_ *pulumiserviceProvider, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
-	return &pulumirpc.InvokeResponse{Return: nil}, fmt.Errorf("unknown function '%s'", req.Tok)
-}
-
-func (at *PulumiServiceAccessTokenResource) createAccessToken(ctx context.Context, input PulumiServiceAccessTokenInput) (*pulumiapi.AccessToken, error) {
-
-	accessToken, err := at.client.CreateAccessToken(ctx, input.Description)
-	if err != nil {
-		return nil, err
+	inputs := AccessTokenInput{
+		Description: accessToken.Description,
 	}
 
-	return accessToken, nil
-}
-
-func (at *PulumiServiceAccessTokenResource) deleteAccessToken(ctx context.Context, tokenId string) error {
-	return at.client.DeleteAccessToken(ctx, tokenId)
-}
-
-func diffAccessTokenProperties(req *pulumirpc.DiffRequest, replaceProps []string) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
-
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: false})
-	if err != nil {
-		return nil, err
-	}
-
-	inputs, ok := olds["__inputs"]
-	if !ok {
-		return nil, fmt.Errorf("missing __inputs property")
-	}
-	diffs := inputs.ObjectValue().Diff(news)
-	if diffs == nil {
-		return &pulumirpc.DiffResponse{
-			Changes: pulumirpc.DiffResponse_DIFF_NONE,
-		}, nil
-	}
-
-	changes, replaces := pulumirpc.DiffResponse_DIFF_NONE, []string(nil)
-	for _, k := range replaceProps {
-		if diffs.Changed(resource.PropertyKey(k)) {
-			changes = pulumirpc.DiffResponse_DIFF_SOME
-			replaces = append(replaces, k)
-		}
-	}
-
-	return &pulumirpc.DiffResponse{
-		Changes:  changes,
-		Replaces: replaces,
-	}, nil
+	return id, inputs, AccessTokenState{
+		AccessTokenInput: inputs,
+		TokenID:          accessToken.ID,
+		Value:            accessToken.TokenValue,
+	}, err
 }
