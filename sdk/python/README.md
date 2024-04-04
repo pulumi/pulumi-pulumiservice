@@ -59,12 +59,13 @@ Ensure that you have ran `pulumi login`. Run `pulumi whoami` to verify that you 
 
 ### Configuration Options
 
-Use `pulumi config set pulumiservice:<option>` or pass options to the [constructor of `new pulumiservice.Provider`](https://pulumi.com/registry/packages/pulumiservice/api-docs/provider).
+Use `pulumi config set pulumiservice:<option>` or pass options to the [constructor of `new pulumiservice.Provider`][1].
 
-| Option        | Environment Variable Name | Required/Optional | Description                                                                                                                                                                              |
-| ------------- | ------------------------- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `accessToken` | `PULUMI_ACCESS_TOKEN`     | Optional          | Overrides [Pulumi Service Access Tokens](https://www.pulumi.com/docs/intro/pulumi-service/accounts/#access-tokens)                                                                       |
-| `apiUrl`      | `PULUMI_BACKEND_URL`      | Optional          | Allows overriding default [Pulumi Service API URL](https://www.pulumi.com/docs/reference/service-rest-api) for [self hosted customers](https://www.pulumi.com/docs/guides/self-hosted/). |
+| Option        | Environment Variable Name | Required/Optional | Description                                                                           |
+|---------------|---------------------------|-------------------|---------------------------------------------------------------------------------------|
+| `accessToken` | `PULUMI_ACCESS_TOKEN`     | Optional          | Overrides [Pulumi Service Access Tokens][2]                                           |
+| `apiUrl`      | `PULUMI_BACKEND_URL`      | Optional          | Allows overriding default [Pulumi Service API URL][3] for [self hosted customers][4]. |
+|               |                           |                   |                                                                                       |
 
 ## Examples
 
@@ -95,3 +96,8 @@ export const members = team.members;
 ```
 
 Check out the [examples/](examples/) directory for more examples.
+
+[1]: https://pulumi.com/registry/packages/pulumiservice/api-docs/provider
+[2]: https://www.pulumi.com/docs/intro/pulumi-service/accounts/#access-tokens
+[3]: https://www.pulumi.com/docs/reference/service-rest-api
+[4]: https://www.pulumi.com/docs/guides/self-hosted/
