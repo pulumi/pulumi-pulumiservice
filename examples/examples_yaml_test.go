@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -127,8 +128,9 @@ func TestYamlTeamsExample(t *testing.T) {
 
 func TestYamlStackTagsExample(t *testing.T) {
 
-	// Set up tmpdir with a Pulumi.yml with no resources
-	// mimicking the deletion of resource
+	// yaml-stack-tags-example applies tags to it's own stack. To do this, we need to
+	// first create an empty stack, then add the stack tag.
+
 	tmpdir := writePulumiYaml(t, YamlProgram{
 		Name:        "yaml-stack-tags-example",
 		Runtime:     "yaml",
@@ -141,16 +143,30 @@ func TestYamlStackTagsExample(t *testing.T) {
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		Quick:       true,
 		SkipRefresh: true,
-		Dir:         path.Join(cwd, ".", "yaml-stack-tags"),
+		Dir:         tmpdir,
 		EditDirs: []integration.EditDir{
 			{
-				Dir: tmpdir,
+				Dir: path.Join(cwd, ".", "yaml-stack-tags"),
 			},
 			// Reapply the same thing again, except this time we expect there to be no changes
 			{
-				Dir:             tmpdir,
+				Dir:             path.Join(cwd, ".", "yaml-stack-tags"),
 				ExpectNoChanges: true,
 			},
+		},
+
+		// Setting Config and PrepareProject works around the bug introduced in
+		// https://github.com/pulumi/pulumi/pull/14695:
+		//
+		// - Setting a config value ensures that the stack file is created.
+		//
+		// - PrepareProject is used to force the bookkeeping file to be created.
+		//
+		// Once https://github.com/pulumi/pulumi/pull/15863 merges, both fields
+		// can be removed.
+		Config: map[string]string{"ensure-config": "true"},
+		PrepareProject: func(info *engine.Projinfo) error {
+			return os.MkdirAll(filepath.Join(info.Root, ".pulumi"), 0700)
 		},
 	})
 }

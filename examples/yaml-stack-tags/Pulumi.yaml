@@ -6,7 +6,7 @@ resources:
     type: pulumiservice:StackTag
     properties:
       organization: service-provider-test-org
-      project: yaml-stack-tags-example
+      project: ${pulumi.project}
       stack: ${pulumi.stack}
       name: testing-tag
       value: bar
