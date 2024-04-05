@@ -1,165 +1,130 @@
 package provider
 
 import (
-	"context"
 	"fmt"
 	"strings"
 
-	pbempty "google.golang.org/protobuf/types/known/emptypb"
-
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/pulumiapi"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
+	p "github.com/pulumi/pulumi-go-provider"
+	"github.com/pulumi/pulumi-go-provider/infer"
 )
 
-type PulumiServiceTeamAccessTokenResource struct {
-	client *pulumiapi.Client
+var (
+	// Life-cycle participation
+	_ infer.CustomResource[TeamAccessTokenInput, TeamAccessTokenState] = (*TeamAccessToken)(nil)
+	_ infer.CustomDelete[TeamAccessTokenState]                         = (*TeamAccessToken)(nil)
+	_ infer.CustomRead[TeamAccessTokenInput, TeamAccessTokenState]     = (*TeamAccessToken)(nil)
+
+	// Schema documentation
+	_ infer.Annotated = (*TeamAccessToken)(nil)
+	_ infer.Annotated = (*TeamAccessTokenInput)(nil)
+	_ infer.Annotated = (*TeamAccessTokenState)(nil)
+
+	// Secret values
+	_ infer.ExplicitDependencies[TeamAccessTokenInput, TeamAccessTokenState] = (*TeamAccessToken)(nil)
+)
+
+type TeamAccessToken struct{}
+
+func (p *TeamAccessToken) Annotate(a infer.Annotator) {
+	a.Describe(p, "The Pulumi Cloud allows users to create access tokens scoped to team. "+
+		"Team access tokens is a resource to create them and assign them to a team")
 }
 
-type PulumiServiceTeamAccessTokenInput struct {
-	Name        string
-	OrgName     string
-	TeamName    string
-	Description string
+func (p *TeamAccessToken) WireDependencies(
+	f infer.FieldSelector, args *TeamAccessTokenInput, state *TeamAccessTokenState,
+) {
+	f.OutputField(&state.Value).AlwaysSecret()
 }
 
-func (i *PulumiServiceTeamAccessTokenInput) ToPropertyMap() resource.PropertyMap {
-	pm := resource.PropertyMap{}
-	pm["name"] = resource.NewPropertyValue(i.Name)
-	pm["description"] = resource.NewPropertyValue(i.Description)
-	pm["organizationName"] = resource.NewPropertyValue(i.OrgName)
-	pm["teamName"] = resource.NewPropertyValue(i.TeamName)
-	return pm
+type TeamAccessTokenInput struct {
+	Name        string `pulumi:"name"`
+	OrgName     string `pulumi:"organizationName"`
+	TeamName    string `pulumi:"teamName"`
+	Description string `pulumi:"description,optional"`
 }
 
-func (t *PulumiServiceTeamAccessTokenResource) ToPulumiServiceAccessTokenInput(inputMap resource.PropertyMap) PulumiServiceTeamAccessTokenInput {
-	input := PulumiServiceTeamAccessTokenInput{}
-
-	if inputMap["name"].HasValue() && inputMap["name"].IsString() {
-		input.Name = inputMap["name"].StringValue()
-	}
-
-	if inputMap["description"].HasValue() && inputMap["description"].IsString() {
-		input.Description = inputMap["description"].StringValue()
-	}
-
-	if inputMap["teamName"].HasValue() && inputMap["teamName"].IsString() {
-		input.TeamName = inputMap["teamName"].StringValue()
-	}
-
-	if inputMap["organizationName"].HasValue() && inputMap["organizationName"].IsString() {
-		input.OrgName = inputMap["organizationName"].StringValue()
-	}
-
-	return input
+func (p *TeamAccessTokenInput) Annotate(a infer.Annotator) {
+	// TODO: Fix typo in description
+	a.Describe(&p.Name, "The name for the token. "+
+		"This must be unique amongst all machine tokens within your organization.")
+	a.Describe(&p.OrgName, "The organization's name.")
+	a.Describe(&p.TeamName, "The team name.")
+	a.Describe(&p.Description, "Optional. Description for the token.")
 }
 
-func (t *PulumiServiceTeamAccessTokenResource) Name() string {
-	return "pulumiservice:index:TeamAccessToken"
+type TeamAccessTokenState struct {
+	TeamAccessTokenInput
+
+	Value string `pulumi:"value"`
 }
 
-func (t *PulumiServiceTeamAccessTokenResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	return diffAccessTokenProperties(req, []string{"name", "organizationName", "teamName", "description"})
+func (p *TeamAccessTokenState) Annotate(a infer.Annotator) {
+	a.Describe(&p.Value, "The token's value.")
 }
 
-func (t *PulumiServiceTeamAccessTokenResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	ctx := context.Background()
-	err := t.deleteTeamAccessToken(ctx, req.Id)
-
-	if err != nil {
-		return &pbempty.Empty{}, err
-	}
-
-	return &pbempty.Empty{}, nil
-}
-
-func (t *PulumiServiceTeamAccessTokenResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
-	ctx := context.Background()
-	inputs, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
-
-	inputsAccessToken := t.ToPulumiServiceAccessTokenInput(inputs)
-
-	accessToken, err := t.createTeamAccessToken(ctx, inputsAccessToken)
-	if err != nil {
-		return nil, fmt.Errorf("error creating access token '%s': %s", inputsAccessToken.Description, err.Error())
-	}
-
-	outputStore := resource.PropertyMap{}
-	outputStore["__inputs"] = resource.NewObjectProperty(inputs)
-	outputStore["value"] = resource.NewPropertyValue(accessToken.TokenValue)
-
-	outputProperties, err := plugin.MarshalProperties(
-		outputStore,
-		plugin.MarshalOptions{},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	urn := fmt.Sprintf(inputsAccessToken.OrgName + "/" + inputsAccessToken.TeamName + "/" + inputsAccessToken.Name + "/" + accessToken.ID)
-
-	return &pulumirpc.CreateResponse{
-		Id:         urn,
-		Properties: outputProperties,
-	}, nil
-
-}
-
-func (t *PulumiServiceTeamAccessTokenResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: nil}, nil
-}
-
-func (t *PulumiServiceTeamAccessTokenResource) Update(_ *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	// all updates are destructive, so we just call Create.
-	return nil, fmt.Errorf("unexpected call to update, expected create to be called instead")
-}
-
-func (t *PulumiServiceTeamAccessTokenResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	ctx := context.Background()
-	urn := req.GetId()
-
-	orgName, teamName, _, tokenId, err := splitTeamAccessTokenId(urn)
-
-	// the team access token is immutable; if we get nil it got deleted, otherwise all data is the same
-	accessToken, err := t.client.GetTeamAccessToken(ctx, tokenId, orgName, teamName)
-	if err != nil {
-		return nil, err
-	}
-	if accessToken == nil {
-		return &pulumirpc.ReadResponse{}, nil
-	}
-
-	return &pulumirpc.ReadResponse{
-		Id:         req.GetId(),
-		Properties: req.GetProperties(),
-	}, nil
-}
-
-func (t *PulumiServiceTeamAccessTokenResource) Invoke(_ *pulumiserviceProvider, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
-	return &pulumirpc.InvokeResponse{Return: nil}, fmt.Errorf("unknown function '%s'", req.Tok)
-}
-
-func (t *PulumiServiceTeamAccessTokenResource) createTeamAccessToken(ctx context.Context, input PulumiServiceTeamAccessTokenInput) (*pulumiapi.AccessToken, error) {
-
-	accessToken, err := t.client.CreateTeamAccessToken(ctx, input.Name, input.OrgName, input.TeamName, input.Description)
-	if err != nil {
-		return nil, err
-	}
-
-	return accessToken, nil
-}
-
-func (t *PulumiServiceTeamAccessTokenResource) deleteTeamAccessToken(ctx context.Context, id string) error {
-	orgName, teamName, _, tokenId, err := splitTeamAccessTokenId(id)
+func (*TeamAccessToken) Delete(ctx p.Context, id string, state TeamAccessTokenState) error {
+	_, _, _, tokenId, err := splitTeamAccessTokenId(id)
 	if err != nil {
 		return err
 	}
-	return t.client.DeleteTeamAccessToken(ctx, tokenId, orgName, teamName)
+	return GetConfig(ctx).Client.DeleteTeamAccessToken(ctx, tokenId, state.OrgName, state.TeamName)
+}
 
+func (*TeamAccessToken) Create(
+	ctx p.Context, name string, input TeamAccessTokenInput, preview bool,
+) (string, TeamAccessTokenState, error) {
+	if preview {
+		return "", TeamAccessTokenState{TeamAccessTokenInput: input}, nil
+	}
+
+	accessToken, err := GetConfig(ctx).Client.CreateTeamAccessToken(ctx,
+		input.Name, input.OrgName, input.TeamName, input.Description)
+	if err != nil {
+		return "", TeamAccessTokenState{}, err
+	}
+
+	id := fmt.Sprintf(input.OrgName + "/" + input.TeamName + "/" + input.Name + "/" + accessToken.ID)
+
+	return id, TeamAccessTokenState{
+		TeamAccessTokenInput: input,
+		Value:                accessToken.TokenValue,
+	}, nil
+
+}
+
+func (*TeamAccessToken) Read(
+	ctx p.Context, id string, inputs TeamAccessTokenInput, state TeamAccessTokenState,
+) (string, TeamAccessTokenInput, TeamAccessTokenState, error) {
+
+	orgName, teamName, tokenName, tokenId, err := splitTeamAccessTokenId(id)
+	if err != nil {
+		return "", TeamAccessTokenInput{}, TeamAccessTokenState{}, err
+	}
+
+	// the team access token is immutable; if we get nil it got deleted
+	accessToken, err := GetConfig(ctx).Client.GetTeamAccessToken(ctx, tokenId, orgName, teamName)
+	if err != nil || accessToken == nil {
+		return "", TeamAccessTokenInput{}, TeamAccessTokenState{}, err
+	}
+
+	input := TeamAccessTokenInput{
+		Name:        tokenName,
+		OrgName:     orgName,
+		TeamName:    teamName,
+		Description: accessToken.Description,
+	}
+
+	return id, input, TeamAccessTokenState{
+		TeamAccessTokenInput: input,
+
+		// TODO[BUG]: GetTeamAccessToken doesn't set the token value. Since the
+		// value is immutable, this works for Refresh. This does not work for
+		// import.
+		//
+		// TODO[DOCS]: That .Value is invalid after import should at least be
+		// mentioned in the docs.
+		Value: state.Value,
+	}, nil
 }
 
 func splitTeamAccessTokenId(id string) (string, string, string, string, error) {
