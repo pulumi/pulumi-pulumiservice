@@ -5,228 +5,200 @@ import (
 	"fmt"
 	"strings"
 
-	pbempty "google.golang.org/protobuf/types/known/emptypb"
+	p "github.com/pulumi/pulumi-go-provider"
+	"github.com/pulumi/pulumi-go-provider/infer"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/util/contract"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/pulumiapi"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
-type PulumiServiceWebhookResource struct {
-	client pulumiapi.WebhookClient
+var (
+	// Life-cycle participation
+	_ infer.CustomCheck[WebhookInput]                  = (*Webhook)(nil)
+	_ infer.CustomResource[WebhookInput, WebhookState] = (*Webhook)(nil)
+	_ infer.CustomUpdate[WebhookInput, WebhookState]   = (*Webhook)(nil)
+	_ infer.CustomRead[WebhookInput, WebhookState]     = (*Webhook)(nil)
+	_ infer.CustomDelete[WebhookState]                 = (*Webhook)(nil)
+
+	// Schema documentation
+	_ infer.Annotated = (*Webhook)(nil)
+	_ infer.Annotated = (*WebhookInput)(nil)
+	_ infer.Annotated = (*WebhookState)(nil)
+)
+
+type Webhook struct{}
+
+func (p *Webhook) Annotate(a infer.Annotator) {
+	a.Describe(p, ` Pulumi Webhooks allow you to notify external services of events happening within your Pulumi organization or stack. For example, you can trigger a notification whenever a stack is updated. Whenever an event occurs, Pulumi will send an HTTP POST request to all registered webhooks. The webhook can then be used to emit some notification, start running integration tests, or even update additional stacks.
+
+### Import
+
+`+"Pulumi webhooks can be imported using the `id`, which for webhooks is `{org}/{project}/{stack}/{webhook-name}` e.g.,"+`
+
+`+"```sh"+`
+ $ pulumi import pulumiservice:index:Webhook my_webhook my-org/my-project/my-stack/4b0d0671
+`+"```\n")
 }
 
-type PulumiServiceWebhookInput struct {
-	Active           bool
-	DisplayName      string
-	PayloadUrl       string
-	Secret           *string
-	OrganizationName string
-	ProjectName      *string
-	StackName        *string
-	Format           *string
-	Filters          []string
+type WebhookInput struct {
+	Active           bool             `pulumi:"active"`
+	DisplayName      string           `pulumi:"displayName"`
+	PayloadUrl       string           `pulumi:"payloadUrl"`
+	Secret           *string          `pulumi:"secret,optional" provider:"secret"`
+	OrganizationName string           `pulumi:"organizationName" provider:"replaceOnChanges"`
+	ProjectName      *string          `pulumi:"projectName,optional" provider:"replaceOnChanges"`
+	StackName        *string          `pulumi:"stackName,optional" provider:"replaceOnChanges"`
+	Format           *string          `pulumi:"format,optional"` // TODO[FEAT]: Format should be an enum
+	Filters          []WebhookFilters `pulumi:"filters,optional"`
 }
 
-type PulumiServiceWebhookProperties struct {
-	PulumiServiceWebhookInput
-	Name string
+func (p *WebhookInput) Annotate(a infer.Annotator) {
+	a.Describe(&p.Active, "Indicates whether this webhook is enabled or not.")
+	a.Describe(&p.DisplayName, "The friendly name displayed in the Pulumi Cloud.")
+	a.Describe(&p.PayloadUrl, "URL to send request to.")
+	a.Describe(&p.Secret, "Optional. secret used as the HMAC key. See "+
+		"[webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) "+
+		"for more information.")
+	a.Describe(&p.OrganizationName, "Name of the organization.")
+	a.Describe(&p.ProjectName, "Name of the project. Only needed if this is a stack webhook.")
+	a.Describe(&p.StackName, "Name of the stack. Only needed if this is a stack webhook.")
+	// TODO[INVESTAGATE]: This says format is oneOf(slack,raw), but the output description gives 4 options.
+	//
+	// Is that correct, you can set 2 with the API but 4 are available?
+	a.Describe(&p.Format, "Format of the webhook payload. Can be either `raw` or `slack`. Defaults to `raw`.")
+	a.SetDefault(&p.Format, "raw")
+	a.Describe(&p.Filters, "Optional set of filters to apply to the webhook. See "+
+		"[webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) "+
+		"for more information.")
 }
 
-func (i *PulumiServiceWebhookInput) ToPropertyMap() resource.PropertyMap {
-	pm := resource.PropertyMap{}
-	pm["active"] = resource.NewPropertyValue(i.Active)
-	pm["displayName"] = resource.NewPropertyValue(i.DisplayName)
-	pm["payloadUrl"] = resource.NewPropertyValue(i.PayloadUrl)
-	if i.Secret != nil {
-		pm["secret"] = resource.NewPropertyValue(*i.Secret)
-	}
+type WebhookState struct {
+	WebhookInput
 
-	pm["organizationName"] = resource.NewPropertyValue(i.OrganizationName)
-
-	if i.ProjectName != nil {
-		pm["projectName"] = resource.NewPropertyValue(*i.ProjectName)
-	}
-	if i.StackName != nil {
-		pm["stackName"] = resource.NewPropertyValue(*i.StackName)
-	}
-	if i.Format != nil {
-		pm["format"] = resource.NewPropertyValue(*i.Format)
-	}
-	if len(i.Filters) > 0 {
-		pm["filters"] = resource.NewPropertyValue(i.Filters)
-	}
-
-	return pm
+	Name   string `pulumi:"name"`
+	Format string `pulumi:"format"`
 }
 
-func (i *PulumiServiceWebhookProperties) ToPropertyMap() resource.PropertyMap {
-	pm := i.PulumiServiceWebhookInput.ToPropertyMap()
-
-	pm["name"] = resource.NewPropertyValue(i.Name)
-	return pm
+func (p *WebhookState) Annotate(a infer.Annotator) {
+	a.Describe(&p.Name, "Webhook identifier generated by Pulumi Cloud.")
+	a.Describe(&p.Format, "Format of the webhook payload. Can be either `raw`, `slack`, `ms_teams` or `pulumi_deployments`. Defaults to `raw`.")
 }
 
-func (wh *PulumiServiceWebhookResource) ToPulumiServiceWebhookProperties(propMap resource.PropertyMap) PulumiServiceWebhookProperties {
-	props := PulumiServiceWebhookProperties{}
+var _ infer.Enum[string] = WebhookFilters("")
 
-	if propMap["active"].HasValue() && propMap["active"].IsBool() {
-		props.Active = propMap["active"].BoolValue()
-	}
+type WebhookFilters string
 
-	if propMap["displayName"].HasValue() && propMap["displayName"].IsString() {
-		props.DisplayName = propMap["displayName"].StringValue()
+func (WebhookFilters) Values() []infer.EnumValue[string] {
+	return []infer.EnumValue[string]{
+		{
+			Value:       "stack_created",
+			Description: "Trigger a webhook when a stack is created. Only valid for org webhooks.",
+			Name:        "StackCreated",
+		},
+		{
+			Value:       "stack_deleted",
+			Description: "Trigger a webhook when a stack is deleted. Only valid for org webhooks.",
+			Name:        "StackDeleted",
+		},
+		{
+			Value:       "update_succeeded",
+			Description: "Trigger a webhook when a stack update succeeds.",
+			Name:        "UpdateSucceeded",
+		},
+		{
+			Value:       "update_failed",
+			Description: "Trigger a webhook when a stack update fails.",
+			Name:        "UpdateFailed",
+		},
+		{
+			Value:       "preview_succeeded",
+			Description: "Trigger a webhook when a stack preview succeeds.",
+			Name:        "PreviewSucceeded",
+		},
+		{
+			Value:       "preview_failed",
+			Description: "Trigger a webhook when a stack preview fails.",
+			Name:        "PreviewFailed",
+		},
+		{
+			Value:       "destroy_succeeded",
+			Description: "Trigger a webhook when a stack destroy succeeds.",
+			Name:        "DestroySucceeded",
+		},
+		{
+			Value:       "destroy_failed",
+			Description: "Trigger a webhook when a stack destroy fails.",
+			Name:        "DestroyFailed",
+		},
+		{
+			Value:       "refresh_succeeded",
+			Description: "Trigger a webhook when a stack refresh succeeds.",
+			Name:        "RefreshSucceeded",
+		},
+		{
+			Value:       "refresh_failed",
+			Description: "Trigger a webhook when a stack refresh fails.",
+			Name:        "RefreshFailed",
+		},
+		{
+			Value:       "deployment_queued",
+			Description: "Trigger a webhook when a deployment is queued.",
+			Name:        "DeploymentQueued",
+		},
+		{
+			Value:       "deployment_started",
+			Description: "Trigger a webhook when a deployment starts running.",
+			Name:        "DeploymentStarted",
+		},
+		{
+			Value:       "deployment_succeeded",
+			Description: "Trigger a webhook when a deployment succeeds.",
+			Name:        "DeploymentSucceeded",
+		},
+		{
+			Value:       "deployment_failed",
+			Description: "Trigger a webhook when a deployment fails.",
+			Name:        "DeploymentFailed",
+		},
 	}
-
-	if propMap["payloadUrl"].HasValue() && propMap["payloadUrl"].IsString() {
-		props.PayloadUrl = propMap["payloadUrl"].StringValue()
-	}
-
-	if secretVal := propMap["secret"]; secretVal.HasValue() && secretVal.IsString() {
-		secretStr := secretVal.StringValue()
-		props.Secret = &secretStr
-	}
-
-	if propMap["organizationName"].HasValue() && propMap["organizationName"].IsString() {
-		props.OrganizationName = propMap["organizationName"].StringValue()
-	}
-	if propMap["projectName"].HasValue() && propMap["projectName"].IsString() {
-		projectNameStr := propMap["projectName"].StringValue()
-		props.ProjectName = &projectNameStr
-	}
-	if propMap["stackName"].HasValue() && propMap["stackName"].IsString() {
-		stackNameStr := propMap["stackName"].StringValue()
-		props.StackName = &stackNameStr
-	}
-	if propMap["format"].HasValue() && propMap["format"].IsString() {
-		formatStr := propMap["format"].StringValue()
-		props.Format = &formatStr
-	}
-	if propMap["filters"].HasValue() && propMap["filters"].IsArray() {
-		filtersInput := propMap["filters"].ArrayValue()
-		filters := make([]string, len(filtersInput))
-
-		for i, v := range filtersInput {
-			filters[i] = getSecretOrStringValue(v)
-		}
-
-		props.Filters = filters
-	}
-
-	if nameVal, ok := propMap["name"]; ok && nameVal.IsString() {
-		props.Name = nameVal.StringValue()
-	}
-
-	return props
 }
 
-func (wh *PulumiServiceWebhookResource) Name() string {
-	return "pulumiservice:index:Webhook"
-}
-
-func (wh *PulumiServiceWebhookResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
-
-	var failures []*pulumirpc.CheckFailure
-	for _, p := range []resource.PropertyKey{"organizationName", "payloadUrl", "displayName", "active"} {
-		if !news[(p)].HasValue() {
-			failures = append(failures, &pulumirpc.CheckFailure{
-				Reason:   fmt.Sprintf("missing required property '%s'", p),
-				Property: string(p),
-			})
-		}
+func (*Webhook) Check(
+	ctx p.Context, name string, _ resource.PropertyMap, uncheckedInputs resource.PropertyMap,
+) (WebhookInput, []p.CheckFailure, error) {
+	inputs, failures, err := infer.DefaultCheck[WebhookInput](uncheckedInputs)
+	if len(failures) > 0 || err != nil {
+		return inputs, failures, nil
 	}
 
 	stackWebhookError := "projectName and stackName must both be specified for stack webhooks, or both unspecified for org webhooks"
-	if !news["projectName"].HasValue() && news["stackName"].HasValue() {
-		failures = append(failures, &pulumirpc.CheckFailure{
+	if inputs.ProjectName == nil && inputs.StackName != nil {
+		failures = append(failures, p.CheckFailure{
 			Reason:   stackWebhookError,
 			Property: "projectName",
 		})
 	}
-	if news["projectName"].HasValue() && !news["stackName"].HasValue() {
-		failures = append(failures, &pulumirpc.CheckFailure{
+	if inputs.ProjectName != nil && inputs.StackName == nil {
+		failures = append(failures, p.CheckFailure{
 			Reason:   stackWebhookError,
 			Property: "stackName",
 		})
 	}
 
-	// if the format is not specified, default to raw
-	// this should work automatically because we have set the default in the schema,
-	// but it isn't respected by the yaml provider
-	// https://github.com/pulumi/pulumi-yaml/issues/458
-	if !news["format"].HasValue() {
-		news["format"] = resource.NewPropertyValue("raw")
-	}
-
-	inputNews, err := plugin.MarshalProperties(
-		news,
-		plugin.MarshalOptions{},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.CheckResponse{Inputs: inputNews, Failures: failures}, nil
+	return inputs, failures, nil
 }
 
-func (wh *PulumiServiceWebhookResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
-	inputs, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
-	if err != nil {
-		return nil, err
+func (*Webhook) Create(
+	ctx p.Context, name string, input WebhookInput, preview bool,
+) (string, WebhookState, error) {
+	if preview {
+		return "", WebhookState{WebhookInput: input}, nil
 	}
 
-	props := wh.ToPulumiServiceWebhookProperties(inputs)
-
-	idString, err := wh.createWebhook(props.PulumiServiceWebhookInput)
+	webhook, err := GetConfig(ctx).Client.CreateWebhook(ctx, input.asRequest())
 	if err != nil {
-		return nil, err
-	}
-
-	hookID, err := splitWebhookID(*idString)
-	if err != nil {
-		return nil, err
-	}
-
-	props.Name = hookID.webhookName
-
-	outputProperties, err := plugin.MarshalProperties(
-		props.ToPropertyMap(),
-		plugin.MarshalOptions{
-			KeepUnknowns: true,
-			SkipNulls:    true,
-		},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.CreateResponse{
-		Id:         *idString,
-		Properties: outputProperties,
-	}, nil
-}
-
-func (wh *PulumiServiceWebhookResource) createWebhook(input PulumiServiceWebhookInput) (*string, error) {
-	ctx := context.Background()
-	req := pulumiapi.WebhookRequest{
-		OrganizationName: input.OrganizationName,
-		ProjectName:      input.ProjectName,
-		StackName:        input.StackName,
-		DisplayName:      input.DisplayName,
-		PayloadURL:       input.PayloadUrl,
-		Secret:           input.Secret,
-		Active:           input.Active,
-		Format:           input.Format,
-		Filters:          input.Filters,
-	}
-	webhook, err := wh.client.CreateWebhook(ctx, req)
-	if err != nil {
-		return nil, err
+		return "", WebhookState{}, err
 	}
 
 	var hookID string
@@ -237,218 +209,120 @@ func (wh *PulumiServiceWebhookResource) createWebhook(input PulumiServiceWebhook
 		hookID = fmt.Sprintf("%s/%s", input.OrganizationName, webhook.Name)
 	}
 
-	return &hookID, nil
-}
-
-func (wh *PulumiServiceWebhookResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
-
-	// preprocess olds to remove the `name` property since it's only an output and shouldn't cause a diff
-	if olds["name"].HasValue() {
-		delete(olds, "name")
-	}
-
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
-
-	// previous versions of the provider used "__inputs" key to store inputs in output properties
-	// to maintain backwards compatibility, we still need to handle this case
-	// so we just lift up those values to the top level
-	if oldInputs, ok := olds["__inputs"]; ok && oldInputs.IsObject() {
-		for k, v := range oldInputs.ObjectValue() {
-			olds[k] = v
-		}
-	}
-
-	diffs := olds.Diff(news)
-	if diffs == nil {
-		return &pulumirpc.DiffResponse{
-			Changes: pulumirpc.DiffResponse_DIFF_NONE,
-		}, nil
-	}
-
-	dd := plugin.NewDetailedDiffFromObjectDiff(diffs, false)
-
-	detailedDiffs := map[string]*pulumirpc.PropertyDiff{}
-	replaceProperties := map[string]bool{
-		"organizationName": true,
-		"projectName":      true,
-		"stackName":        true,
-	}
-	for k, v := range dd {
-		if _, ok := replaceProperties[k]; ok {
-			v.Kind = v.Kind.AsReplace()
-		}
-		detailedDiffs[k] = &pulumirpc.PropertyDiff{
-			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind),
-			InputDiff: v.InputDiff,
-		}
-	}
-
-	changes := pulumirpc.DiffResponse_DIFF_NONE
-	if len(detailedDiffs) > 0 {
-		changes = pulumirpc.DiffResponse_DIFF_SOME
-	}
-	return &pulumirpc.DiffResponse{
-		Changes:         changes,
-		DetailedDiff:    detailedDiffs,
-		HasDetailedDiff: true,
+	return hookID, WebhookState{
+		WebhookInput: input,
+		Name:         webhook.Name,
+		Format:       webhook.Format,
 	}, nil
 }
 
-func (wh *PulumiServiceWebhookResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	// we only care about news because we validated that everything was correctly set in Check() & Diff()
-	inputsNew, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+func (*Webhook) Update(
+	ctx p.Context, id string, state WebhookState, news WebhookInput, preview bool,
+) (WebhookState, error) {
+	if preview {
+		return WebhookState{WebhookInput: news}, nil
+	}
+
+	contract.Assertf(state.OrganizationName == news.OrganizationName,
+		"We should have done a replace here if OrganizationName changed")
+
+	hookID, err := splitWebhookID(id)
 	if err != nil {
-		return nil, err
+		return WebhookState{}, fmt.Errorf("invalid resource id: %v", err)
 	}
 
-	webhookNew := wh.ToPulumiServiceWebhookProperties(inputsNew)
-
-	// ignore orgName because if that changed, we would have done a replace, so update would never have been called
-	hookID, err := splitWebhookID(req.GetId())
+	err = GetConfig(ctx).Client.UpdateWebhook(ctx, pulumiapi.UpdateWebhookRequest{
+		WebhookRequest: news.asRequest(),
+		Name:           hookID.webhookName,
+	})
 	if err != nil {
-		return nil, fmt.Errorf("invalid resource id: %v", err)
-	}
-	webhookNew.Name = hookID.webhookName
-
-	updateReq := pulumiapi.UpdateWebhookRequest{
-		WebhookRequest: pulumiapi.WebhookRequest{
-			OrganizationName: webhookNew.OrganizationName,
-			ProjectName:      webhookNew.ProjectName,
-			StackName:        webhookNew.StackName,
-			DisplayName:      webhookNew.DisplayName,
-			PayloadURL:       webhookNew.PayloadUrl,
-			Secret:           webhookNew.Secret,
-			Active:           webhookNew.Active,
-			Format:           webhookNew.Format,
-			Filters:          webhookNew.Filters,
-		},
-		Name: webhookNew.Name,
-	}
-	err = wh.client.UpdateWebhook(context.Background(), updateReq)
-	if err != nil {
-		return nil, err
+		return WebhookState{}, err
 	}
 
-	outputStore := webhookNew.ToPropertyMap()
-
-	outputProperties, err := plugin.MarshalProperties(
-		outputStore,
-		plugin.MarshalOptions{},
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &pulumirpc.UpdateResponse{
-		Properties: outputProperties,
-	}, nil
-
+	// We need to perform another GET because the user might not have set Format but
+	// the service will have.
+	//
+	// This is because Format is optional as an input but required as an output.
+	return getWebhook(ctx, hookID)
 }
 
-func (wh *PulumiServiceWebhookResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	err := wh.deleteWebhook(req.Id)
-	return &pbempty.Empty{}, err
-}
-
-func (wh *PulumiServiceWebhookResource) deleteWebhook(id string) error {
+func (*Webhook) Delete(ctx p.Context, id string, props WebhookState) error {
 	hookID, err := splitWebhookID(id)
 	if err != nil {
 		return err
 	}
-	return wh.client.DeleteWebhook(context.Background(), hookID.organizationName,
+
+	return GetConfig(ctx).Client.DeleteWebhook(ctx, hookID.organizationName,
 		hookID.projectName, hookID.stackName, hookID.webhookName)
 }
 
-func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	webhook, err := wh.getWebhook(req.Id)
+func (*Webhook) Read(
+	ctx p.Context, id string, _ WebhookInput, _ WebhookState,
+) (string, WebhookInput, WebhookState, error) {
+	hookID, err := splitWebhookID(id)
 	if err != nil {
-		return nil, err
+		return "", WebhookInput{}, WebhookState{}, err
 	}
 
-	if webhook == nil {
-		return &pulumirpc.ReadResponse{}, nil
-	}
+	state, err := getWebhook(ctx, hookID)
+	return id, state.WebhookInput, state, nil
+}
 
-	hookID, err := splitWebhookID(req.Id)
+func getWebhook(ctx p.Context, hookID webhookID) (WebhookState, error) {
+	webhook, err := GetConfig(ctx).Client.GetWebhook(context.Background(),
+		hookID.organizationName, hookID.projectName, hookID.stackName, hookID.webhookName)
 	if err != nil {
-		return nil, err
+		return WebhookState{}, err
 	}
 
-	properties := PulumiServiceWebhookProperties{
-		PulumiServiceWebhookInput: PulumiServiceWebhookInput{
-			Active:           webhook.Active,
-			DisplayName:      webhook.DisplayName,
-			PayloadUrl:       webhook.PayloadUrl,
-			Secret:           webhook.Secret,
-			Format:           &webhook.Format,
-			Filters:          webhook.Filters,
-			OrganizationName: hookID.organizationName,
-			ProjectName:      hookID.projectName,
-			StackName:        hookID.stackName,
-		},
-		Name: hookID.webhookName,
+	input := WebhookInput{
+		Active:           webhook.Active,
+		DisplayName:      webhook.DisplayName,
+		PayloadUrl:       webhook.PayloadUrl,
+		Secret:           webhook.Secret,
+		OrganizationName: hookID.organizationName,
+		ProjectName:      hookID.projectName,
+		StackName:        hookID.stackName,
+		Format:           &webhook.Format,
+		Filters: sliceMap(webhook.Filters, func(v string) WebhookFilters {
+			// TODO: Validate that each filter is OneOf(WebhookFilters.Values)
+			return WebhookFilters(v)
+		}),
 	}
 
-	outputs, err := plugin.MarshalProperties(
-		properties.ToPropertyMap(),
-		plugin.MarshalOptions{},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	inputs, err := plugin.MarshalProperties(
-		properties.PulumiServiceWebhookInput.ToPropertyMap(),
-		plugin.MarshalOptions{},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.ReadResponse{
-		Id:         req.Id,
-		Properties: outputs,
-		Inputs:     inputs,
+	return WebhookState{
+		WebhookInput: input,
+		Name:         hookID.webhookName,
+		Format:       webhook.Format,
 	}, nil
 }
 
-func (wh *PulumiServiceWebhookResource) getWebhook(id string) (*pulumiapi.Webhook, error) {
-	hookID, err := splitWebhookID(id)
-	if err != nil {
-		return nil, err
+func sliceMap[S ~[]E, E any, O any](slice S, f func(E) O) []O {
+	result := make([]O, len(slice))
+	for i, v := range slice {
+		result[i] = f(v)
 	}
-	webhook, err := wh.client.GetWebhook(context.Background(),
-		hookID.organizationName, hookID.projectName, hookID.stackName, hookID.webhookName)
-	if err != nil {
-		return nil, err
-	}
-	return webhook, nil
+	return result
 }
 
-func splitWebhookID(id string) (*webhookID, error) {
+func splitWebhookID(id string) (webhookID, error) {
 	// format: organization/project/stack/webhookName (stack webhook) or organization/webhookName (org webhook)
 	s := strings.Split(id, "/")
 	switch len(s) {
 	case 2:
-		return &webhookID{
+		return webhookID{
 			organizationName: s[0],
 			webhookName:      s[1],
 		}, nil
 	case 4:
-		return &webhookID{
+		return webhookID{
 			organizationName: s[0],
 			projectName:      &s[1],
 			stackName:        &s[2],
 			webhookName:      s[3],
 		}, nil
 	default:
-		return nil, fmt.Errorf("%q is not a valid webhook ID", id)
+		return webhookID{}, fmt.Errorf("%q is not a valid webhook ID", id)
 	}
 }
 
@@ -457,4 +331,23 @@ type webhookID struct {
 	projectName      *string
 	stackName        *string
 	webhookName      string
+}
+
+func (input WebhookInput) asRequest() pulumiapi.WebhookRequest {
+	filters := make([]string, len(input.Filters))
+	for i, f := range input.Filters {
+		filters[i] = string(f)
+	}
+
+	return pulumiapi.WebhookRequest{
+		OrganizationName: input.OrganizationName,
+		ProjectName:      input.ProjectName,
+		StackName:        input.StackName,
+		DisplayName:      input.DisplayName,
+		PayloadURL:       input.PayloadUrl,
+		Secret:           input.Secret,
+		Active:           input.Active,
+		Format:           input.Format,
+		Filters:          filters,
+	}
 }

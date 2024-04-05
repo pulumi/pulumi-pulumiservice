@@ -18,9 +18,6 @@ var (
 	_ infer.Annotated = (*OrgAccessToken)(nil)
 	_ infer.Annotated = (*OrgAccessTokenInput)(nil)
 	_ infer.Annotated = (*OrgAccessTokenState)(nil)
-
-	// Secret values
-	_ infer.ExplicitDependencies[OrgAccessTokenInput, OrgAccessTokenState] = (*OrgAccessToken)(nil)
 )
 
 type OrgAccessToken struct{}
@@ -28,12 +25,6 @@ type OrgAccessToken struct{}
 func (p *OrgAccessToken) Annotate(a infer.Annotator) {
 	a.Describe(p, "The Pulumi Cloud allows users to create access tokens scoped to orgs. "+
 		"Org access tokens is a resource to create them and assign them to an org")
-}
-
-func (p *OrgAccessToken) WireDependencies(
-	f infer.FieldSelector, args *OrgAccessTokenInput, state *OrgAccessTokenState,
-) {
-	f.OutputField(&state.Value).AlwaysSecret()
 }
 
 type OrgAccessTokenInput struct {
@@ -52,7 +43,7 @@ func (p *OrgAccessTokenInput) Annotate(a infer.Annotator) {
 
 type OrgAccessTokenState struct {
 	OrgAccessTokenInput
-	Value string `pulumi:"value"`
+	Value string `pulumi:"value" provider:"secret"`
 }
 
 func (p *OrgAccessTokenState) Annotate(a infer.Annotator) {

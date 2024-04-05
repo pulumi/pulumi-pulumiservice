@@ -25,9 +25,6 @@ var (
 	_ infer.Annotated = (*AgentPool)(nil)
 	_ infer.Annotated = (*AgentPoolInput)(nil)
 	_ infer.Annotated = (*AgentPoolState)(nil)
-
-	// Secret values
-	_ infer.ExplicitDependencies[AgentPoolInput, AgentPoolState] = (*AgentPool)(nil)
 )
 
 func (p *AgentPool) Annotate(a infer.Annotator) {
@@ -49,16 +46,12 @@ func (p *AgentPoolInput) Annotate(a infer.Annotator) {
 type AgentPoolState struct {
 	AgentPoolInput
 	AgentPoolID string `pulumi:"agentPoolId"`
-	TokenValue  string `pulumi:"tokenValue"`
+	TokenValue  string `pulumi:"tokenValue" provider:"secret"`
 }
 
 func (p *AgentPoolState) Annotate(a infer.Annotator) {
 	a.Describe(&p.AgentPoolID, "The agent pool identifier.")
 	a.Describe(&p.TokenValue, "The agent pool's token's value.")
-}
-
-func (*AgentPool) WireDependencies(f infer.FieldSelector, args *AgentPoolInput, state *AgentPoolState) {
-	f.OutputField(&state.TokenValue).AlwaysSecret()
 }
 
 func (*AgentPool) Delete(ctx p.Context, id string, props AgentPoolState) error {

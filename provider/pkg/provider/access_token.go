@@ -15,9 +15,6 @@ var (
 	_ infer.Annotated = (*AccessToken)(nil)
 	_ infer.Annotated = (*AccessTokenInput)(nil)
 	_ infer.Annotated = (*AccessTokenState)(nil)
-
-	// Secret values
-	_ infer.ExplicitDependencies[AccessTokenInput, AccessTokenState] = (*AccessToken)(nil)
 )
 
 type AccessToken struct{}
@@ -37,16 +34,12 @@ func (p *AccessTokenInput) Annotate(a infer.Annotator) {
 type AccessTokenState struct {
 	AccessTokenInput
 	TokenID string `pulumi:"tokenId"`
-	Value   string `pulumi:"value"`
+	Value   string `pulumi:"value" provider:"secret"`
 }
 
 func (p *AccessTokenState) Annotate(a infer.Annotator) {
 	a.Describe(&p.TokenID, "The token identifier.")
 	a.Describe(&p.Value, "The token's value.")
-}
-
-func (*AccessToken) WireDependencies(f infer.FieldSelector, args *AccessTokenInput, state *AccessTokenState) {
-	f.OutputField(&state.Value).AlwaysSecret()
 }
 
 func (*AccessToken) Delete(ctx p.Context, id string, props AccessTokenState) error {

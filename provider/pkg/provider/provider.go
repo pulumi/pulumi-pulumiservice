@@ -15,35 +15,12 @@
 package provider
 
 import (
-	pbempty "google.golang.org/protobuf/types/known/emptypb"
-
 	p "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi-go-provider/infer"
 	"github.com/pulumi/pulumi-go-provider/middleware/schema"
 	"github.com/pulumi/pulumi/pkg/v3/resource/provider"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
-
-type PulumiServiceResource interface {
-	Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error)
-	Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error)
-	Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error)
-	Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error)
-	Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error)
-	Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error)
-	Name() string
-}
-
-type pulumiserviceProvider struct {
-	pulumirpc.UnimplementedResourceProviderServer
-
-	host            *provider.HostClient
-	name            string
-	version         string
-	schema          string
-	pulumiResources []PulumiServiceResource
-	AccessToken     string
-}
 
 func makeProvider(host *provider.HostClient, name, version string) (pulumirpc.ResourceProviderServer, error) {
 	return p.RawServer(name, version, infer.Provider(infer.Options{
@@ -93,6 +70,7 @@ func makeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 			infer.Resource[*Team](),
 			infer.Resource[*TeamAccessToken](),
 			infer.Resource[*OrgAccessToken](),
+			infer.Resource[*Webhook](),
 		},
 	}))(nil)
 }

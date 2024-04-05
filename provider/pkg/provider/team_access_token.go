@@ -18,9 +18,6 @@ var (
 	_ infer.Annotated = (*TeamAccessToken)(nil)
 	_ infer.Annotated = (*TeamAccessTokenInput)(nil)
 	_ infer.Annotated = (*TeamAccessTokenState)(nil)
-
-	// Secret values
-	_ infer.ExplicitDependencies[TeamAccessTokenInput, TeamAccessTokenState] = (*TeamAccessToken)(nil)
 )
 
 type TeamAccessToken struct{}
@@ -28,12 +25,6 @@ type TeamAccessToken struct{}
 func (p *TeamAccessToken) Annotate(a infer.Annotator) {
 	a.Describe(p, "The Pulumi Cloud allows users to create access tokens scoped to team. "+
 		"Team access tokens is a resource to create them and assign them to a team")
-}
-
-func (p *TeamAccessToken) WireDependencies(
-	f infer.FieldSelector, args *TeamAccessTokenInput, state *TeamAccessTokenState,
-) {
-	f.OutputField(&state.Value).AlwaysSecret()
 }
 
 type TeamAccessTokenInput struct {
@@ -55,7 +46,7 @@ func (p *TeamAccessTokenInput) Annotate(a infer.Annotator) {
 type TeamAccessTokenState struct {
 	TeamAccessTokenInput
 
-	Value string `pulumi:"value"`
+	Value string `pulumi:"value" provider:"secret"`
 }
 
 func (p *TeamAccessTokenState) Annotate(a infer.Annotator) {
