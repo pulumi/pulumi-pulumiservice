@@ -92,6 +92,7 @@ func makeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 			infer.Resource[*AccessToken](),
 			infer.Resource[*Team](),
 			infer.Resource[*TeamAccessToken](),
+			infer.Resource[*OrgAccessToken](),
 		},
 	}))(nil)
 }
