@@ -3,7 +3,7 @@ module github.com/pulumi/pulumi-pulumiservice/provider
 go 1.21.0
 
 require (
-	github.com/pulumi/pulumi-go-provider v0.15.0
+	github.com/pulumi/pulumi-go-provider v0.15.1-0.20240405114145-84f8012dbfe8
 	github.com/pulumi/pulumi/pkg/v3 v3.112.0
 	github.com/pulumi/pulumi/sdk/v3 v3.112.0
 	github.com/stretchr/testify v1.9.0

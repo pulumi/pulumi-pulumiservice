@@ -90,6 +90,7 @@ func makeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 		Resources: []infer.InferredResource{
 			infer.Resource[*AgentPool](),
 			infer.Resource[*AccessToken](),
+			infer.Resource[*Team](),
 		},
 	}))(nil)
 }
