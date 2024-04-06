@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -13,6 +14,7 @@ import (
 	"github.com/pulumi/pulumi/pkg/v3/engine"
 	"github.com/pulumi/pulumi/pkg/v3/testing/integration"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v2"
 )
 
@@ -126,35 +128,45 @@ func TestYamlTeamsExample(t *testing.T) {
 
 func TestYamlStackTagsExample(t *testing.T) {
 
-	// Set up tmpdir with a Pulumi.yml with no resources
-	// mimicking the deletion of resource
-	newProgram := YamlProgram{
+	// yaml-stack-tags-example applies tags to it's own stack. To do this, we need to
+	// first create an empty stack, then add the stack tag.
+
+	tmpdir := writePulumiYaml(t, YamlProgram{
 		Name:        "yaml-stack-tags-example",
 		Runtime:     "yaml",
 		Description: "A minimal Pulumi YAML program",
-	}
+	})
 
-	tmpdir := writePulumiYaml(t, newProgram)
-
-	cwd, _ := os.Getwd()
+	cwd, err := os.Getwd()
+	require.NoError(t, err)
 
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		Quick:       true,
 		SkipRefresh: true,
-		Dir:         path.Join(cwd, ".", "yaml-stack-tags"),
-		StackName:   "test-stack",
-		PrepareProject: func(_ *engine.Projinfo) error {
-			return nil
-		},
+		Dir:         tmpdir,
 		EditDirs: []integration.EditDir{
 			{
-				Dir: tmpdir,
+				Dir: path.Join(cwd, ".", "yaml-stack-tags"),
 			},
 			// Reapply the same thing again, except this time we expect there to be no changes
 			{
-				Dir:             tmpdir,
+				Dir:             path.Join(cwd, ".", "yaml-stack-tags"),
 				ExpectNoChanges: true,
 			},
+		},
+
+		// Setting Config and PrepareProject works around the bug introduced in
+		// https://github.com/pulumi/pulumi/pull/14695:
+		//
+		// - Setting a config value ensures that the stack file is created.
+		//
+		// - PrepareProject is used to force the bookkeeping file to be created.
+		//
+		// Once https://github.com/pulumi/pulumi/pull/15863 merges, both fields
+		// can be removed.
+		Config: map[string]string{"ensure-config": "true"},
+		PrepareProject: func(info *engine.Projinfo) error {
+			return os.MkdirAll(filepath.Join(info.Root, ".pulumi"), 0700)
 		},
 	})
 }
@@ -220,12 +232,7 @@ func TestYamlTeamStackPermissionsExample(t *testing.T) {
 	cwd, _ := os.Getwd()
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		Quick: true,
-		// Name is specified in yaml-team-stack-permissions/Pulumi.yaml, so this has to be consistent
-		StackName: "dev",
-		Dir:       path.Join(cwd, ".", "yaml-team-stack-permissions"),
-		PrepareProject: func(_ *engine.Projinfo) error {
-			return nil
-		},
+		Dir:   path.Join(cwd, ".", "yaml-team-stack-permissions"),
 	})
 }
 

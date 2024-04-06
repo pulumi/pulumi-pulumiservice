@@ -7,7 +7,6 @@ NODE_MODULE_NAME := @pulumi/pulumi-service
 NUGET_PKG_NAME   := Pulumi.PulumiService
 
 PROVIDER        := pulumi-resource-${PACK}
-CODEGEN         := pulumi-gen-${PACK}
 VERSION         ?= $(shell pulumictl get version)
 PROVIDER_PATH   := provider
 VERSION_PATH     := ${PROVIDER_PATH}/pkg/version.Version
@@ -18,13 +17,21 @@ GOPATH			:= $(shell go env GOPATH)
 WORKING_DIR     := $(shell pwd)
 TESTPARALLELISM := 4
 
+# The pulumi binary to use during generation
+PULUMI := .pulumi/bin/pulumi
+
+export PULUMI_IGNORE_AMBIENT_PLUGINS = true
+
 ensure::
 	cd provider && go mod tidy
 	cd sdk && go mod tidy
 	cd examples && go mod tidy
 
 gen::
-	(cd provider && go build -o $(WORKING_DIR)/bin/${CODEGEN} -ldflags "-X ${PROJECT}/${VERSION_PATH}=${VERSION}" ${PROJECT}/${PROVIDER_PATH}/cmd/$(CODEGEN))
+
+build_sdks: dotnet_sdk go_sdk nodejs_sdk python_sdk java_sdk
+
+gen_sdk_prerequisites: $(PULUMI)
 
 provider::
 	(cd provider && VERSION=${VERSION} go generate cmd/${PROVIDER}/main.go)
@@ -36,32 +43,32 @@ provider_debug::
 test_provider::
 	cd provider/pkg && go test -short -v -count=1 -cover -timeout 2h -parallel ${TESTPARALLELISM} ./...
 
-dotnet_sdk:: DOTNET_VERSION := $(shell pulumictl get version --language dotnet)
-dotnet_sdk::
+dotnet_sdk: DOTNET_VERSION := $(shell pulumictl get version --language dotnet)
+dotnet_sdk: gen_sdk_prerequisites
 	rm -rf sdk/dotnet
-	$(WORKING_DIR)/bin/$(CODEGEN) -version=${DOTNET_VERSION} dotnet $(SCHEMA_FILE) $(CURDIR)
+	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language dotnet
 	cd ${PACKDIR}/dotnet/&& \
 		echo "${DOTNET_VERSION}" >version.txt && \
 		dotnet build /p:Version=${DOTNET_VERSION}
 
-go_sdk::
+go_sdk: gen_sdk_prerequisites
 	rm -rf sdk/go
-	$(WORKING_DIR)/bin/$(CODEGEN) -version=${VERSION} go $(SCHEMA_FILE) $(CURDIR)
+	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language go
 
-nodejs_sdk:: VERSION := $(shell pulumictl get version --language javascript)
-nodejs_sdk::
+nodejs_sdk: VERSION := $(shell pulumictl get version --language javascript)
+nodejs_sdk: gen_sdk_prerequisites
 	rm -rf sdk/nodejs
-	$(WORKING_DIR)/bin/$(CODEGEN) -version=${VERSION} nodejs $(SCHEMA_FILE) $(CURDIR)
+	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language nodejs
 	cd ${PACKDIR}/nodejs/ && \
 		yarn install && \
 		yarn run tsc && \
 		cp ../../README.md ../../LICENSE package.json yarn.lock ./bin/ && \
 		sed -i.bak -e 's/\$${VERSION}/$(VERSION)/g' ./bin/package.json
 
-python_sdk:: PYPI_VERSION := $(shell pulumictl get version --language python)
-python_sdk::
+python_sdk: PYPI_VERSION := $(shell pulumictl get version --language python)
+python_sdk: gen_sdk_prerequisites
 	rm -rf sdk/python
-	$(WORKING_DIR)/bin/$(CODEGEN) -version=${VERSION} python $(SCHEMA_FILE) $(CURDIR)
+	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language python
 	cp README.md ${PACKDIR}/python/
 	cd ${PACKDIR}/python/ && \
 		python3 setup.py clean --all 2>/dev/null && \
@@ -70,16 +77,20 @@ python_sdk::
 		rm ./bin/setup.py.bak && \
 		cd ./bin && python3 setup.py build sdist
 
-java_sdk:: RESOURCE_FOLDER := src/main/resources/com/pulumi/pulumiservice
-java_sdk::
+GRADLE_DIR := $(WORKING_DIR)/.gradle
+GRADLE := $(GRADLE_DIR)/gradlew
+java_sdk: RESOURCE_FOLDER := src/main/resources/com/pulumi/pulumiservice
+java_sdk: gen_sdk_prerequisites
 	rm -rf sdk/java/{.gradle,build,src}
-	$(WORKING_DIR)/bin/$(CODEGEN) -version=${VERSION} java $(SCHEMA_FILE) $(CURDIR)
+	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language java
+	cp $(GRADLE_DIR)/settings.gradle sdk/java/settings.gradle
+	cp $(GRADLE_DIR)/build.gradle sdk/java/build.gradle
 	cd sdk/java && \
-      mkdir -p $(RESOURCE_FOLDER) && \
+	mkdir -p $(RESOURCE_FOLDER) && \
 	  echo "$(VERSION)" > $(RESOURCE_FOLDER)/version.txt && \
 	  echo '{"resource": true,"name": "pulumiservice","version": "$(VERSION)"}' > $(RESOURCE_FOLDER)/plugin.json && \
-	  PULUMI_JAVA_SDK_VERSION=0.10.0 ./gradlew --console=plain build && \
-	  PULUMI_JAVA_SDK_VERSION=0.10.0 ./gradlew --console=plain publishToMavenLocal
+	  PULUMI_JAVA_SDK_VERSION=0.10.0 $(GRADLE) --console=plain build && \
+	  PULUMI_JAVA_SDK_VERSION=0.10.0 $(GRADLE) --console=plain publishToMavenLocal
 
 .PHONY: build
 build:: gen provider dotnet_sdk go_sdk nodejs_sdk python_sdk java_sdk
@@ -96,7 +107,7 @@ lint::
 install:: install_nodejs_sdk install_dotnet_sdk
 	cp $(WORKING_DIR)/bin/${PROVIDER} ${GOPATH}/bin
 
-GO_TEST 	 := go test -v -count=1 -cover -timeout 2h -parallel ${TESTPARALLELISM}
+GO_TEST := go test -v -count=1 -cover -timeout 2h -parallel ${TESTPARALLELISM}
 
 install_dotnet_sdk::
 	rm -rf $(WORKING_DIR)/nuget/$(NUGET_PKG_NAME).*.nupkg
@@ -114,4 +125,22 @@ install_nodejs_sdk::
 	yarn link --cwd $(WORKING_DIR)/sdk/nodejs/bin
 
 install_java_sdk::
-	cd sdk/java && ./gradlew publishToMavenLocal
+	cd sdk/java && $(GRADLE) publishToMavenLocal
+
+
+# Keep the version of the pulumi binary used for code generation in sync with the version
+# of the dependency used by github.com/pulumi/pulumi-pulumiservice/provider
+
+$(PULUMI): HOME := $(WORKING_DIR)
+$(PULUMI): provider/go.mod
+	@ PULUMI_VERSION="$$(cd provider && go list -m github.com/pulumi/pulumi/pkg/v3 | awk '{print $$2}')"; \
+	if [ -x $(PULUMI) ]; then \
+		CURRENT_VERSION="$$($(PULUMI) version)"; \
+		if [ "$${CURRENT_VERSION}" != "$${PULUMI_VERSION}" ]; then \
+			echo "Upgrading $(PULUMI) from $${CURRENT_VERSION} to $${PULUMI_VERSION}"; \
+			rm $(PULUMI); \
+		fi; \
+	fi; \
+	if ! [ -x $(PULUMI) ]; then \
+		curl -fsSL https://get.pulumi.com | sh -s -- --version "$${PULUMI_VERSION#v}"; \
+	fi
