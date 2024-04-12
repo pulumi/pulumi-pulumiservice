@@ -722,20 +722,36 @@ class OperationContextOIDCArgs:
 @pulumi.input_type
 class OperationContextOptionsArgs:
     def __init__(__self__, *,
+                 delete_after_destroy: Optional[pulumi.Input[bool]] = None,
                  shell: Optional[pulumi.Input[str]] = None,
                  skip_install_dependencies: Optional[pulumi.Input[bool]] = None,
                  skip_intermediate_deployments: Optional[pulumi.Input[bool]] = None):
         """
+        :param pulumi.Input[bool] delete_after_destroy: Whether the stack should be deleted after it is destroyed.
         :param pulumi.Input[str] shell: The shell to use to run commands during the deployment. Defaults to 'bash'.
         :param pulumi.Input[bool] skip_install_dependencies: Skip the default dependency installation step - use this to customize the dependency installation (e.g. if using yarn or poetry)
         :param pulumi.Input[bool] skip_intermediate_deployments: Skip intermediate deployments (Consolidate multiple deployments of the same type into one deployment)
         """
+        if delete_after_destroy is not None:
+            pulumi.set(__self__, "delete_after_destroy", delete_after_destroy)
         if shell is not None:
             pulumi.set(__self__, "shell", shell)
         if skip_install_dependencies is not None:
             pulumi.set(__self__, "skip_install_dependencies", skip_install_dependencies)
         if skip_intermediate_deployments is not None:
             pulumi.set(__self__, "skip_intermediate_deployments", skip_intermediate_deployments)
+
+    @property
+    @pulumi.getter(name="deleteAfterDestroy")
+    def delete_after_destroy(self) -> Optional[pulumi.Input[bool]]:
+        """
+        Whether the stack should be deleted after it is destroyed.
+        """
+        return pulumi.get(self, "delete_after_destroy")
+
+    @delete_after_destroy.setter
+    def delete_after_destroy(self, value: Optional[pulumi.Input[bool]]):
+        pulumi.set(self, "delete_after_destroy", value)
 
     @property
     @pulumi.getter

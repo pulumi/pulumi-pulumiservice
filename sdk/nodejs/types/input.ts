@@ -233,6 +233,10 @@ export interface OperationContextOIDCArgs {
 
 export interface OperationContextOptionsArgs {
     /**
+     * Whether the stack should be deleted after it is destroyed.
+     */
+    deleteAfterDestroy?: pulumi.Input<boolean>;
+    /**
      * The shell to use to run commands during the deployment. Defaults to 'bash'.
      */
     shell?: pulumi.Input<string>;

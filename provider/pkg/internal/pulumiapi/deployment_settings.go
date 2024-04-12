@@ -62,6 +62,7 @@ type OperationContextOptions struct {
 	SkipInstallDependencies     bool   `json:"skipInstallDependencies,omitempty"`
 	SkipIntermediateDeployments bool   `json:"skipIntermediateDeployments,omitempty"`
 	Shell                       string `json:"shell,omitempty"`
+	DeleteAfterDestroy          bool   `json:"deleteAfterDestroy,omitempty"`
 }
 
 type GitHubConfiguration struct {
