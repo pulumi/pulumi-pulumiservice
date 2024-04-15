@@ -329,6 +329,10 @@
         "shell": {
           "type": "string",
           "description": "The shell to use to run commands during the deployment. Defaults to 'bash'."
+        },
+        "deleteAfterDestroy": {
+          "type": "boolean",
+          "description": "Whether the stack should be deleted after it is destroyed."
         }
       }
     },

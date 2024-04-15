@@ -100,6 +100,9 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap() resource.Propert
 			if ds.OperationContext.Options.SkipIntermediateDeployments {
 				optionsMap["skipIntermediateDeployments"] = resource.NewPropertyValue(true)
 			}
+			if ds.OperationContext.Options.DeleteAfterDestroy {
+				optionsMap["deleteAfterDestroy"] = resource.NewPropertyValue(true)
+			}
 			ocMap["options"] = resource.PropertyValue{V: optionsMap}
 		}
 		if ds.OperationContext.OIDC != nil {
@@ -383,6 +386,10 @@ func toOperationContext(inputMap resource.PropertyMap) *pulumiapi.OperationConte
 
 		if oInput["Shell"].HasValue() && oInput["Shell"].IsString() {
 			o.Shell = oInput["Shell"].StringValue()
+		}
+
+		if oInput["deleteAfterDestroy"].HasValue() && oInput["deleteAfterDestroy"].IsBool() {
+			o.DeleteAfterDestroy = oInput["deleteAfterDestroy"].BoolValue()
 		}
 
 		oc.Options = &o
