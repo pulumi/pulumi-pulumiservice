@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+## 0.19.0
+
+### Improvements
+
+- Support `deleteAfterDestroy` option for the `DeploymentSettings` resource. [#244](https://github.com/pulumi/pulumi-pulumiservice/pull/244)
+
 ## 0.18.0
 
 ### Improvements
