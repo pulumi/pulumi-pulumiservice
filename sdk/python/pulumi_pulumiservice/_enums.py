@@ -5,10 +5,30 @@
 from enum import Enum
 
 __all__ = [
+    'PulumiOperation',
     'TeamStackPermissionScope',
     'WebhookFilters',
     'WebhookFormat',
 ]
+
+
+class PulumiOperation(str, Enum):
+    UPDATE = "update"
+    """
+    Analogous to `pulumi up` command.
+    """
+    PREVIEW = "preview"
+    """
+    Analogous to `pulumi preview` command.
+    """
+    REFRESH = "refresh"
+    """
+    Analogous to `pulumi refresh` command.
+    """
+    DESTROY = "destroy"
+    """
+    Analogous to `pulumi destroy` command.
+    """
 
 
 class TeamStackPermissionScope(float, Enum):

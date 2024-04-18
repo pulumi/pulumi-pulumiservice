@@ -25,6 +25,8 @@ func (m *module) Construct(ctx *pulumi.Context, name, typ, urn string) (r pulumi
 		r = &AccessToken{}
 	case "pulumiservice:index:AgentPool":
 		r = &AgentPool{}
+	case "pulumiservice:index:DeploymentSchedule":
+		r = &DeploymentSchedule{}
 	case "pulumiservice:index:DeploymentSettings":
 		r = &DeploymentSettings{}
 	case "pulumiservice:index:OrgAccessToken":

@@ -437,6 +437,27 @@
         "tenantId",
         "subscriptionId"
       ]
+    }, 
+    "pulumiservice:index:PulumiOperation": {
+      "type": "string",
+      "enum": [
+        {
+          "description": "Analogous to `pulumi up` command.",
+          "value": "update"
+        },
+        {
+          "description": "Analogous to `pulumi preview` command.",
+          "value": "preview"
+        },
+        {
+          "description": "Analogous to `pulumi refresh` command.",
+          "value": "refresh"
+        },
+        {
+          "description": "Analogous to `pulumi destroy` command.",
+          "value": "destroy"
+        }
+      ]
     }
   },
   "resources": {
@@ -968,6 +989,78 @@
         "project",
         "stack",
         "permission"
+      ]
+    },
+    "pulumiservice:index:DeploymentSchedule": {
+      "description": "A scheduled recurring or single time run of a pulumi command.",
+      "properties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "project": {
+          "description": "Project name.",
+          "type": "string"
+        },
+        "stack": {
+          "description": "Stack name.",
+          "type": "string"
+        },
+        "scheduleCron": {
+          "description": "Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.",
+          "type": "string"
+        },
+        "timestamp": {
+          "description": "When to run the pulumi command, in ISO format like this 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.",
+          "type": "string"
+        },
+        "pulumiOperation": {
+          "description": "Which operation to run.",
+          "$ref": "#/types/pulumiservice:index:PulumiOperation"
+        },
+        "scheduleID": {
+          "description": "Schedule ID of the created schedule, assigned by Pulumi Cloud.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "organization",
+        "project",
+        "stack",
+        "pulumiOperation",
+        "scheduleID"
+      ],
+      "inputProperties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "project": {
+          "description": "Project name.",
+          "type": "string"
+        },
+        "stack": {
+          "description": "Stack name.",
+          "type": "string"
+        },
+        "scheduleCron": {
+          "description": "Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.",
+          "type": "string"
+        },
+        "timestamp": {
+          "description": "When to run the pulumi command, in ISO format like this 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.",
+          "type": "string"
+        },
+        "pulumiOperation": {
+          "description": "Which command to run.",
+          "$ref": "#/types/pulumiservice:index:PulumiOperation"
+        }
+      },
+      "requiredInputs": [
+        "organization",
+        "project",
+        "stack",
+        "pulumiOperation"
       ]
     }
   },
