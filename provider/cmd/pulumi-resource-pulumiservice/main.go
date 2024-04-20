@@ -17,17 +17,25 @@ package main
 import (
 	_ "embed"
 
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/provider"
+	p "github.com/pulumi/pulumi-go-provider"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/util/cmdutil"
+
+	pulumiservice "github.com/pulumi/pulumi-pulumiservice/provider/pkg/provider"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/version"
 )
 
 var providerName = "pulumiservice"
 
-// embed schema.json directly into resource binary so that we can properly serve the schema
-// directly from the resource provider
-//go:embed schema.json
-var schema string
+// embed legacy-schema.json directly into resource binary so that we can properly serve
+// the hand-written part of the schema directly from the resource provider.
+//
+//go:embed legacy-schema.json
+var legacySchema string
 
 func main() {
-	provider.Serve(providerName, version.Version, schema)
+	err := p.RunProvider(providerName, version.Version,
+		pulumiservice.Provider(providerName, version.Version, legacySchema))
+	if err != nil {
+		cmdutil.ExitError(err.Error())
+	}
 }

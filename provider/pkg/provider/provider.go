@@ -26,12 +26,67 @@ import (
 	"google.golang.org/grpc/status"
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
 
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/pulumiapi"
+	"github.com/pulumi/pulumi-go-provider/infer"
+	inferSchema "github.com/pulumi/pulumi-go-provider/middleware/schema"
 	"github.com/pulumi/pulumi/pkg/v3/codegen/schema"
 	"github.com/pulumi/pulumi/pkg/v3/resource/provider"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/tokens"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/pulumiapi"
 )
+
+func inferProvider() infer.Options {
+	return infer.Options{
+		Metadata: inferSchema.Metadata{
+			DisplayName: "Pulumi Cloud",
+			Description: "A native Pulumi package for creating and managing Pulumi Cloud constructs",
+			LanguageMap: map[string]any{
+				"csharp": map[string]any{
+					"namespaces": map[string]any{
+						"pulumiservice": "PulumiService",
+					},
+					"packageReferences": map[string]any{
+						"Pulumi": "3.*",
+					},
+				},
+				"go": map[string]any{
+					"generateResourceContainerTypes": true,
+					"importBasePath":                 "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice",
+				},
+				"nodejs": map[string]any{
+					"packageName": "@pulumi/pulumiservice",
+					"dependencies": map[string]any{
+						"@pulumi/pulumi": "^3.0.0",
+					},
+				},
+				"python": map[string]any{
+					"packageName": "pulumi_pulumiservice",
+					"requires": map[string]any{
+						"pulumi": ">=3.0.0,<4.0.0",
+					},
+				},
+			},
+			Keywords: []string{
+				"pulumi",
+				"kind/native",
+				"category/infrastructure",
+			},
+			Homepage:   "https://pulumi.com",
+			Repository: "https://github.com/pulumi/pulumi-pulumiservice",
+			Publisher:  "Pulumi",
+			License:    "Apache-2.0",
+		},
+		Resources:  []infer.InferredResource{},
+		Components: []infer.InferredComponent{},
+		Functions:  []infer.InferredFunction{},
+		Config:     nil,
+		ModuleMap: map[tokens.ModuleName]tokens.ModuleName{
+			"provider": "index",
+		},
+	}
+}
 
 type PulumiServiceResource interface {
 	Configure(config PulumiServiceConfig)
@@ -53,19 +108,6 @@ type pulumiserviceProvider struct {
 	schema          string
 	pulumiResources []PulumiServiceResource
 	AccessToken     string
-}
-
-func makeProvider(host *provider.HostClient, name, version, schema string) (pulumirpc.ResourceProviderServer, error) {
-	// inject version into schema
-	versionedSchema := mustSetSchemaVersion(schema, version)
-	// Return the new provider
-	return &pulumiserviceProvider{
-		host:        host,
-		name:        name,
-		schema:      versionedSchema,
-		version:     version,
-		AccessToken: "",
-	}, nil
 }
 
 // Call dynamically executes a method in the provider associated with a component resource.

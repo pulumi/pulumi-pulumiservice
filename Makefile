@@ -33,7 +33,15 @@ build_sdks: dotnet_sdk go_sdk nodejs_sdk python_sdk java_sdk
 
 gen_sdk_prerequisites: $(PULUMI)
 
-provider::
+schema: $(SCHEMA_FILE) # schema is human remember-able alias for $(SCHEMA_FILE)
+
+.PHONY: $(SCHEMA_FILE)
+$(SCHEMA_FILE): provider
+	$(PULUMI) package get-schema $(WORKING_DIR)/bin/${PROVIDER} | \
+		jq 'del(.version)' > $(SCHEMA_FILE)
+
+.PHONY: provider
+provider:
 	(cd provider && VERSION=${VERSION} go generate cmd/${PROVIDER}/main.go)
 	(cd provider && go build -o $(WORKING_DIR)/bin/${PROVIDER} -ldflags "-X ${PROJECT}/${VERSION_PATH}=${VERSION}" $(PROJECT)/${PROVIDER_PATH}/cmd/$(PROVIDER))
 

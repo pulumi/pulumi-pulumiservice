@@ -1,0 +1,1208 @@
+{
+  "config": {
+    "variables": {
+      "accessToken": {
+        "type": "string",
+        "secret": true
+      }
+    }
+  },
+  "provider": {
+    "type": "object",
+    "inputProperties": {
+      "accessToken": {
+        "description": "Access Token to authenticate with Pulumi Cloud.",
+        "type": "string",
+        "default": "",
+        "defaultInfo": {
+          "environment": [
+            "PULUMI_ACCESS_TOKEN"
+          ]
+        }
+      }
+    }
+  },
+  "types": {
+    "pulumiservice:index:TeamStackPermissionScope": {
+      "type": "number",
+      "enum": [
+        {
+          "name": "read",
+          "description": "Grants read permissions to stack.",
+          "value": 101
+        },
+        {
+          "name": "edit",
+          "description": "Grants edit permissions to stack.",
+          "value": 102
+        },
+        {
+          "name": "admin",
+          "description": "Grants admin permissions to stack.",
+          "value": 103
+        }
+      ]
+    },
+    "pulumiservice:index:WebhookFormat": {
+      "type": "string",
+      "enum": [
+        {
+          "description": "The default webhook format.",
+          "value": "raw"
+        },
+        {
+          "description": "Messages formatted for consumption by Slack incoming webhooks.",
+          "value": "slack"
+        },
+        {
+          "value": "pulumi_deployments",
+          "description": "Initiate deployments on a stack from a Pulumi Cloud webhook.",
+          "name": "PulumiDeployments"
+        },
+        {
+          "value": "ms_teams",
+          "description": "Messages formatted for consumption by Microsoft Teams incoming webhooks.",
+          "name": "MicrosoftTeams"
+        }
+      ]
+    },
+    "pulumiservice:index:WebhookFilters": {
+      "type": "string",
+      "enum": [
+        {
+          "value": "stack_created",
+          "description": "Trigger a webhook when a stack is created. Only valid for org webhooks.",
+          "name": "StackCreated"
+        },
+        {
+          "value": "stack_deleted",
+          "description": "Trigger a webhook when a stack is deleted. Only valid for org webhooks.",
+          "name": "StackDeleted"
+        },
+        {
+          "value": "update_succeeded",
+          "description": "Trigger a webhook when a stack update succeeds.",
+          "name": "UpdateSucceeded"
+        },
+        {
+          "value": "update_failed",
+          "description": "Trigger a webhook when a stack update fails.",
+          "name": "UpdateFailed"
+        },
+        {
+          "value": "preview_succeeded",
+          "description": "Trigger a webhook when a stack preview succeeds.",
+          "name": "PreviewSucceeded"
+        },
+        {
+          "value": "preview_failed",
+          "description": "Trigger a webhook when a stack preview fails.",
+          "name": "PreviewFailed"
+        },
+        {
+          "value": "destroy_succeeded",
+          "description": "Trigger a webhook when a stack destroy succeeds.",
+          "name": "DestroySucceeded"
+        },
+        {
+          "value": "destroy_failed",
+          "description": "Trigger a webhook when a stack destroy fails.",
+          "name": "DestroyFailed"
+        },
+        {
+          "value": "refresh_succeeded",
+          "description": "Trigger a webhook when a stack refresh succeeds.",
+          "name": "RefreshSucceeded"
+        },
+        {
+          "value": "refresh_failed",
+          "description": "Trigger a webhook when a stack refresh fails.",
+          "name": "RefreshFailed"
+        },
+        {
+          "value": "deployment_queued",
+          "description": "Trigger a webhook when a deployment is queued.",
+          "name": "DeploymentQueued"
+        },
+        {
+          "value": "deployment_started",
+          "description": "Trigger a webhook when a deployment starts running.",
+          "name": "DeploymentStarted"
+        },
+        {
+          "value": "deployment_succeeded",
+          "description": "Trigger a webhook when a deployment succeeds.",
+          "name": "DeploymentSucceeded"
+        },
+        {
+          "value": "deployment_failed",
+          "description": "Trigger a webhook when a deployment fails.",
+          "name": "DeploymentFailed"
+        },
+        {
+          "value": "drift_detected",
+          "description": "Trigger a webhook when drift is detected.",
+          "name": "DriftDetected"
+        },
+        {
+          "value": "drift_detection_succeeded",
+          "description": "Trigger a webhook when a drift detection run succeeds, regardless of whether drift is detected.",
+          "name": "DriftDetectionSucceeded"
+        },
+        {
+          "value": "drift_detection_failed",
+          "description": "Trigger a webhook when a drift detection run fails.",
+          "name": "DriftDetectionFailed"
+        },
+        {
+          "value": "drift_remediation_succeeded",
+          "description": "Trigger a webhook when a drift remediation run succeeds.",
+          "name": "DriftRemediationSucceeded"
+        },
+        {
+          "value": "drift_remediation_failed",
+          "description": "Trigger a webhook when a drift remediation run fails.",
+          "name": "DriftRemediationFailed"
+        }
+      ]
+    },
+    "pulumiservice:index:DeploymentSettingsExecutorContext": {
+      "description": "The executor context defines information about the executor where the deployment is executed. If unspecified, the default 'pulumi/pulumi' image is used.",
+      "properties": {
+        "executorImage": {
+          "type": "string",
+          "description": "Allows overriding the default executor image with a custom image. E.g. 'pulumi/pulumi-nodejs:latest'"
+        }
+      },
+      "type": "object",
+      "required": [
+        "executorImage"
+      ]
+    },
+    "pulumiservice:index:DeploymentSettingsSourceContext": {
+      "description": "Settings related to the source of the deployment.",
+      "properties": {
+        "git": {
+          "$ref": "#/types/pulumiservice:index:DeploymentSettingsGitSource",
+          "description": "Git source settings for a deployment."
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:index:DeploymentSettingsGitSource": {
+      "description": "Git source settings for a deployment.",
+      "properties": {
+        "repoUrl": {
+          "type": "string",
+          "description": "The repository URL to use for git settings. Should not be specified if there are `gitHub` settings for this deployment."
+        },
+        "gitAuth": {
+          "$ref": "#/types/pulumiservice:index:DeploymentSettingsGitSourceGitAuth",
+          "description": "Git authentication configuration for this deployment. Should not be specified if there are `gitHub` settings for this deployment."
+        },
+        "branch": {
+          "type": "string",
+          "description": "The branch to deploy. One of either `branch` or `commit` must be specified."
+        },
+        "commit": {
+          "type": "string",
+          "description": "The commit to deploy. One of either `branch` or `commit` must be specified."
+        },
+        "repoDir": {
+          "type": "string",
+          "description": "The directory within the repository where the Pulumi.yaml is located."
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:index:DeploymentSettingsGitSourceGitAuth": {
+      "description": "Git source settings for a deployment.",
+      "properties": {
+        "sshAuth": {
+          "$ref": "#/types/pulumiservice:index:DeploymentSettingsGitAuthSSHAuth",
+          "description": "SSH auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined."
+        },
+        "basicAuth": {
+          "$ref": "#/types/pulumiservice:index:DeploymentSettingsGitAuthBasicAuth",
+          "description": "Basic auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined."
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:index:DeploymentSettingsGitAuthSSHAuth": {
+      "description": "Git source settings for a deployment.",
+      "type": "object",
+      "properties": {
+        "sshPrivateKey": {
+          "type": "string",
+          "secret": true,
+          "description": "SSH private key."
+        },
+        "password": {
+          "type": "string",
+          "secret": true,
+          "description": "Optional password for SSH authentication."
+        }
+      },
+      "required": [
+        "sshPrivateKey"
+      ]
+    },
+    "pulumiservice:index:DeploymentSettingsGitAuthBasicAuth": {
+      "description": "Git source settings for a deployment.",
+      "properties": {
+        "username": {
+          "type": "string",
+          "secret": true,
+          "description": "User name for git basic authentication."
+        },
+        "password": {
+          "type": "string",
+          "secret": true,
+          "description": "Password for git basic authentication."
+        }
+      },
+      "required": [
+        "username",
+        "password"
+      ],
+      "type": "object"
+    },
+    "pulumiservice:index:DeploymentSettingsGithub": {
+      "description": "GitHub settings for the deployment.",
+      "properties": {
+        "repository": {
+          "type": "string",
+          "description": "The GitHub repository in the format org/repo."
+        },
+        "deployCommits": {
+          "type": "boolean",
+          "description": "Trigger a deployment running `pulumi up` on commit.",
+          "default": true
+        },
+        "previewPullRequests": {
+          "type": "boolean",
+          "description": "Trigger a deployment running `pulumi preview` when a PR is opened.",
+          "default": true
+        },
+        "pullRequestTemplate": {
+          "type": "boolean",
+          "description": "Use this stack as a template for pull request review stacks.",
+          "default": false
+        },
+        "paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The paths within the repo that deployments should be filtered to."
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:index:DeploymentSettingsOperationContext": {
+      "description": "Settings related to the Pulumi operation environment during the deployment.",
+      "properties": {
+        "preRunCommands": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Shell commands to run before the Pulumi operation executes."
+        },
+        "environmentVariables": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Environment variables to set for the deployment."
+        },
+        "options": {
+          "$ref": "#/types/pulumiservice:index:OperationContextOptions",
+          "description": "Options to override default behavior during the deployment."
+        },
+        "oidc": {
+          "$ref": "#/types/pulumiservice:index:OperationContextOIDC",
+          "description": "OIDC configuration to use during the deployment."
+        }
+      },
+      "type": "object"
+    },
+    "pulumiservice:index:OperationContextOptions": {
+      "type": "object",
+      "properties": {
+        "skipInstallDependencies": {
+          "type": "boolean",
+          "description": "Skip the default dependency installation step - use this to customize the dependency installation (e.g. if using yarn or poetry)"
+        },
+        "skipIntermediateDeployments": {
+          "type": "boolean",
+          "description": "Skip intermediate deployments (Consolidate multiple deployments of the same type into one deployment)"
+        },
+        "shell": {
+          "type": "string",
+          "description": "The shell to use to run commands during the deployment. Defaults to 'bash'."
+        },
+        "deleteAfterDestroy": {
+          "type": "boolean",
+          "description": "Whether the stack should be deleted after it is destroyed."
+        }
+      }
+    },
+    "pulumiservice:index:OperationContextOIDC": {
+      "type": "object",
+      "properties": {
+        "aws": {
+          "$ref": "#/types/pulumiservice:index:AWSOIDCConfiguration",
+          "description": "AWS-specific OIDC configuration."
+        },
+        "gcp": {
+          "$ref": "#/types/pulumiservice:index:GCPOIDCConfiguration",
+          "description": "GCP-specific OIDC configuration."
+        },
+        "azure": {
+          "$ref": "#/types/pulumiservice:index:AzureOIDCConfiguration",
+          "description": "Azure-specific OIDC configuration."
+        }
+      }
+    },
+    "pulumiservice:index:AWSOIDCConfiguration": {
+      "type": "object",
+      "properties": {
+        "duration": {
+          "type": "string",
+          "description": "Duration of the assume-role session in “XhYmZs” format"
+        },
+        "policyARNs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Optional set of IAM policy ARNs that further restrict the assume-role session"
+        },
+        "roleARN": {
+          "type": "string",
+          "description": "The ARN of the role to assume using the OIDC token."
+        },
+        "sessionName": {
+          "type": "string",
+          "description": "The name of the assume-role session."
+        }
+      },
+      "required": [
+        "roleARN",
+        "sessionName"
+      ]
+    },
+    "pulumiservice:index:GCPOIDCConfiguration": {
+      "type": "object",
+      "properties": {
+        "projectId": {
+          "type": "string",
+          "description": "The numerical ID of the GCP project."
+        },
+        "region": {
+          "type": "string",
+          "description": "The region of the GCP project."
+        },
+        "workloadPoolId": {
+          "type": "string",
+          "description": "The ID of the workload pool to use."
+        },
+        "providerId": {
+          "type": "string",
+          "description": "The ID of the identity provider associated with the workload pool."
+        },
+        "serviceAccount": {
+          "type": "string",
+          "description": "The email address of the service account to use."
+        },
+        "tokenLifetime": {
+          "type": "string",
+          "description": "The lifetime of the temporary credentials in “XhYmZs” format."
+        }
+      },
+      "required": [
+        "projectId",
+        "workloadPoolId",
+        "providerId",
+        "serviceAccount"
+      ]
+    },
+    "pulumiservice:index:AzureOIDCConfiguration": {
+      "type": "object",
+      "properties": {
+        "clientId": {
+          "type": "string",
+          "description": "The client ID of the federated workload identity."
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "The tenant ID of the federated workload identity."
+        },
+        "subscriptionId": {
+          "type": "string",
+          "description": "The subscription ID of the federated workload identity."
+        }
+      },
+      "required": [
+        "clientId",
+        "tenantId",
+        "subscriptionId"
+      ]
+    },
+    "pulumiservice:index:PulumiOperation": {
+      "type": "string",
+      "enum": [
+        {
+          "description": "Analogous to `pulumi up` command.",
+          "value": "update"
+        },
+        {
+          "description": "Analogous to `pulumi preview` command.",
+          "value": "preview"
+        },
+        {
+          "description": "Analogous to `pulumi refresh` command.",
+          "value": "refresh"
+        },
+        {
+          "description": "Analogous to `pulumi destroy` command.",
+          "value": "destroy"
+        }
+      ]
+    }
+  },
+  "resources": {
+    "pulumiservice:index:AgentPool": {
+      "description": "Agent Pool for customer manager deployments",
+      "properties": {
+        "agentPoolId": {
+          "description": "The agent pool identifier.",
+          "type": "string"
+        },
+        "name": {
+          "description": "The name of the agent pool.",
+          "type": "string"
+        },
+        "description": {
+          "description": "Description of the agent pool.",
+          "type": "string"
+        },
+        "organizationName": {
+          "description": "The organization's name.",
+          "type": "string"
+        },
+        "tokenValue": {
+          "description": "The agent pool's token's value.",
+          "type": "string",
+          "secret": true
+        }
+      },
+      "required": [
+        "agentPoolId",
+        "name",
+        "organizationName",
+        "tokenValue"
+      ],
+      "inputProperties": {
+        "name": {
+          "description": "Name of the agent pool.",
+          "type": "string"
+        },
+        "description": {
+          "description": "Description of the agent pool.",
+          "type": "string"
+        },
+        "organizationName": {
+          "description": "The organization's name.",
+          "type": "string"
+        }
+      },
+      "requiredInputs": [
+        "name",
+        "organizationName"
+      ]
+    },
+    "pulumiservice:index:AccessToken": {
+      "description": "Access tokens allow a user to authenticate against the Pulumi Cloud",
+      "properties": {
+        "tokenId": {
+          "description": "The token identifier.",
+          "type": "string"
+        },
+        "description": {
+          "description": "Description of the access token.",
+          "type": "string"
+        },
+        "value": {
+          "description": "The token's value.",
+          "type": "string",
+          "secret": true
+        }
+      },
+      "required": [
+        "tokenId",
+        "description",
+        "value"
+      ],
+      "inputProperties": {
+        "description": {
+          "description": "Description of the access token.",
+          "type": "string"
+        }
+      },
+      "requiredInputs": [
+        "description"
+      ]
+    },
+    "pulumiservice:index:Team": {
+      "description": "The Pulumi Cloud offers role-based access control (RBAC) using teams. Teams allow organization admins to assign a set of stack permissions to a group of users.",
+      "properties": {
+        "teamType": {
+          "description": "The type of team. Must be either `pulumi` or `github`.",
+          "type": "string"
+        },
+        "name": {
+          "description": "The team's name. Required for \"pulumi\" teams.",
+          "type": "string"
+        },
+        "displayName": {
+          "description": "Optional. Team display name.",
+          "type": "string"
+        },
+        "description": {
+          "description": "Optional. Team description.",
+          "type": "string"
+        },
+        "members": {
+          "description": "List of team members.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "organizationName": {
+          "description": "The name of the Pulumi organization the team belongs to.",
+          "type": "string"
+        },
+        "githubTeamId": {
+          "description": "The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for \"github\" teams.",
+          "type": "number"
+        }
+      },
+      "required": [
+        "organizationName",
+        "teamType",
+        "members"
+      ],
+      "inputProperties": {
+        "teamType": {
+          "description": "The type of team. Must be either `pulumi` or `github`.",
+          "type": "string"
+        },
+        "name": {
+          "description": "The team's name. Required for \"pulumi\" teams.",
+          "type": "string"
+        },
+        "displayName": {
+          "description": "Optional. Team display name.",
+          "type": "string"
+        },
+        "description": {
+          "description": "Optional. Team description.",
+          "type": "string"
+        },
+        "members": {
+          "description": "List of team members.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "organizationName": {
+          "description": "The name of the Pulumi organization the team belongs to.",
+          "type": "string"
+        },
+        "githubTeamId": {
+          "description": "The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for \"github\" teams.",
+          "type": "number"
+        }
+      },
+      "requiredInputs": [
+        "organizationName",
+        "teamType"
+      ]
+    },
+    "pulumiservice:index:TeamAccessToken": {
+      "description": "The Pulumi Cloud allows users to create access tokens scoped to team. Team access tokens is a resource to create them and assign them to a team",
+      "properties": {
+        "name": {
+          "description": "The name for the token. This must be unique amongst all machine tokens within your organization.",
+          "type": "string"
+        },
+        "teamName": {
+          "description": "The team name.",
+          "type": "string"
+        },
+        "description": {
+          "description": "Optional. Description for the token.",
+          "type": "string"
+        },
+        "organizationName": {
+          "description": "The organization's name.",
+          "type": "string"
+        },
+        "value": {
+          "description": "The token's value.",
+          "type": "string",
+          "secret": true
+        }
+      },
+      "required": [
+        "name",
+        "teamName",
+        "organizationName",
+        "value"
+      ],
+      "inputProperties": {
+        "name": {
+          "description": "The name for the token. This must be unique amongst all machine tokens within your organization.",
+          "type": "string"
+        },
+        "teamName": {
+          "description": "The team name.",
+          "type": "string"
+        },
+        "description": {
+          "description": "Optional. Team description.",
+          "type": "string"
+        },
+        "organizationName": {
+          "description": "The organization's name.",
+          "type": "string"
+        }
+      },
+      "requiredInputs": [
+        "name",
+        "teamName",
+        "organizationName"
+      ]
+    },
+    "pulumiservice:index:OrgAccessToken": {
+      "description": "The Pulumi Cloud allows users to create access tokens scoped to orgs. Org access tokens is a resource to create them and assign them to an org",
+      "properties": {
+        "name": {
+          "description": "The name for the token.",
+          "type": "string"
+        },
+        "description": {
+          "description": "Optional. Description for the token.",
+          "type": "string"
+        },
+        "organizationName": {
+          "description": "The organization's name.",
+          "type": "string"
+        },
+        "admin": {
+          "description": "Optional. True if this is an admin token.",
+          "type": "boolean"
+        },
+        "value": {
+          "description": "The token's value.",
+          "type": "string",
+          "secret": true
+        }
+      },
+      "required": [
+        "name",
+        "organizationName",
+        "value"
+      ],
+      "inputProperties": {
+        "name": {
+          "description": "The name for the token.",
+          "type": "string"
+        },
+        "description": {
+          "description": "Optional. Team description.",
+          "type": "string"
+        },
+        "organizationName": {
+          "description": "The organization's name.",
+          "type": "string"
+        },
+        "admin": {
+          "description": "Optional. True if this is an admin token.",
+          "type": "boolean"
+        }
+      },
+      "requiredInputs": [
+        "name",
+        "organizationName"
+      ]
+    },
+    "pulumiservice:index:Webhook": {
+      "description": "Pulumi Webhooks allow you to notify external services of events happening within your Pulumi organization or stack. For example, you can trigger a notification whenever a stack is updated. Whenever an event occurs, Pulumi will send an HTTP POST request to all registered webhooks. The webhook can then be used to emit some notification, start running integration tests, or even update additional stacks.\n\n### Import\n\nPulumi webhooks can be imported using the `id`, which for webhooks is `{org}/{project}/{stack}/{webhook-name}` e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:Webhook my_webhook my-org/my-project/my-stack/4b0d0671\n```\n\n",
+      "properties": {
+        "name": {
+          "description": "Webhook identifier generated by Pulumi Cloud.",
+          "type": "string"
+        },
+        "active": {
+          "description": "Indicates whether this webhook is enabled or not.",
+          "type": "boolean"
+        },
+        "displayName": {
+          "description": "The friendly name displayed in the Pulumi Cloud.",
+          "type": "string"
+        },
+        "payloadUrl": {
+          "description": "URL to send request to.",
+          "type": "string"
+        },
+        "secret": {
+          "description": "Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.",
+          "type": "string",
+          "secret": true
+        },
+        "organizationName": {
+          "description": "Name of the organization.",
+          "type": "string"
+        },
+        "projectName": {
+          "description": "Name of the project. Only specified if this is a stack webhook.",
+          "type": "string"
+        },
+        "stackName": {
+          "description": "Name of the stack. Only specified if this is a stack webhook.",
+          "type": "string"
+        },
+        "format": {
+          "description": "Format of the webhook payload. Can be either `raw`, `slack`, `ms_teams` or `pulumi_deployments`. Defaults to `raw`.",
+          "$ref": "#/types/pulumiservice:index:WebhookFormat"
+        },
+        "filters": {
+          "description": "Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.",
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:index:WebhookFilters"
+          }
+        }
+      },
+      "required": [
+        "active",
+        "displayName",
+        "organizationName",
+        "payloadUrl",
+        "name",
+        "format"
+      ],
+      "inputProperties": {
+        "active": {
+          "description": "Indicates whether this webhook is enabled or not.",
+          "type": "boolean"
+        },
+        "displayName": {
+          "description": "The friendly name displayed in the Pulumi Cloud.",
+          "type": "string"
+        },
+        "payloadUrl": {
+          "description": "URL to send request to.",
+          "type": "string"
+        },
+        "secret": {
+          "description": "Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.",
+          "type": "string",
+          "secret": true
+        },
+        "organizationName": {
+          "description": "Name of the organization.",
+          "type": "string"
+        },
+        "projectName": {
+          "description": "Name of the project. Only needed if this is a stack webhook.",
+          "type": "string"
+        },
+        "stackName": {
+          "description": "Name of the stack. Only needed if this is a stack webhook.",
+          "type": "string"
+        },
+        "format": {
+          "description": "Format of the webhook payload. Can be either `raw` or `slack`. Defaults to `raw`.",
+          "$ref": "#/types/pulumiservice:index:WebhookFormat",
+          "default": "raw"
+        },
+        "filters": {
+          "description": "Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.",
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:index:WebhookFilters"
+          }
+        }
+      },
+      "requiredInputs": [
+        "active",
+        "displayName",
+        "organizationName",
+        "payloadUrl"
+      ]
+    },
+    "pulumiservice:index:DeploymentSettings": {
+      "description": "Deployment settings configure Pulumi Deployments for a stack.\n\n### Import\n\nDeployment settings can be imported using the `id`, which for deployment settings is `{org}/{project}/{stack}` e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:DeploymentSettings my_settings my-org/my-project/my-stack\n```\n\n",
+      "properties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "project": {
+          "description": "Project name.",
+          "type": "string"
+        },
+        "stack": {
+          "description": "Stack name.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "organization",
+        "project",
+        "stack"
+      ],
+      "inputProperties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "project": {
+          "description": "Project name.",
+          "type": "string"
+        },
+        "stack": {
+          "description": "Stack name.",
+          "type": "string"
+        },
+        "executorContext": {
+          "$ref": "#/types/pulumiservice:index:DeploymentSettingsExecutorContext",
+          "description": "Settings related to the deployment executor."
+        },
+        "sourceContext": {
+          "$ref": "#/types/pulumiservice:index:DeploymentSettingsSourceContext",
+          "description": "Settings related to the source of the deployment."
+        },
+        "github": {
+          "$ref": "#/types/pulumiservice:index:DeploymentSettingsGithub",
+          "description": "GitHub settings for the deployment."
+        },
+        "operationContext": {
+          "$ref": "#/types/pulumiservice:index:DeploymentSettingsOperationContext",
+          "description": "Settings related to the Pulumi operation environment during the deployment."
+        },
+        "agentPoolId": {
+          "description": "The agent pool identifier to use for the deployment.",
+          "type": "string"
+        }
+      },
+      "requiredInputs": [
+        "organization",
+        "project",
+        "stack",
+        "sourceContext"
+      ]
+    },
+    "pulumiservice:index:StackTag": {
+      "description": "Stacks have associated metadata in the form of tags. Each tag consists of a name and value.",
+      "properties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "project": {
+          "description": "Project name.",
+          "type": "string"
+        },
+        "stack": {
+          "description": "Stack name.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Name of the tag. The 'key' part of the key=value pair",
+          "type": "string"
+        },
+        "value": {
+          "description": "Value of the tag. The 'value' part of the key=value pair",
+          "type": "string"
+        }
+      },
+      "required": [
+        "organization",
+        "project",
+        "stack",
+        "name",
+        "value"
+      ],
+      "inputProperties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "project": {
+          "description": "Project name.",
+          "type": "string"
+        },
+        "stack": {
+          "description": "Stack name.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Name of the tag. The 'key' part of the key=value pair",
+          "type": "string"
+        },
+        "value": {
+          "description": "Value of the tag. The 'value' part of the key=value pair",
+          "type": "string"
+        }
+      },
+      "requiredInputs": [
+        "organization",
+        "project",
+        "stack",
+        "name",
+        "value"
+      ]
+    },
+    "pulumiservice:index:TeamStackPermission": {
+      "description": "Grants a team permissions to the specified stack.",
+      "inputProperties": {
+        "team": {
+          "description": "The name of the team to grant this stack permissions to. This is not the display name.",
+          "type": "string"
+        },
+        "organization": {
+          "description": "The organization or the personal account name of the stack.",
+          "type": "string"
+        },
+        "project": {
+          "description": "The project name for this stack.",
+          "type": "string"
+        },
+        "stack": {
+          "description": "The name of the stack that the team will be granted permissions to.",
+          "type": "string"
+        },
+        "permission": {
+          "$ref": "#/types/pulumiservice:index:TeamStackPermissionScope",
+          "plain": true,
+          "description": "Sets the permission level that this team will be granted to the stack."
+        }
+      },
+      "requiredInputs": [
+        "team",
+        "organization",
+        "project",
+        "stack",
+        "permission"
+      ]
+    },
+    "pulumiservice:index:DeploymentSchedule": {
+      "description": "A scheduled recurring or single time run of a pulumi command.",
+      "properties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "project": {
+          "description": "Project name.",
+          "type": "string"
+        },
+        "stack": {
+          "description": "Stack name.",
+          "type": "string"
+        },
+        "scheduleCron": {
+          "description": "Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.",
+          "type": "string"
+        },
+        "timestamp": {
+          "description": "The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.",
+          "type": "string"
+        },
+        "pulumiOperation": {
+          "description": "Which operation to run.",
+          "$ref": "#/types/pulumiservice:index:PulumiOperation"
+        },
+        "scheduleId": {
+          "description": "Schedule ID of the created schedule, assigned by Pulumi Cloud.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "organization",
+        "project",
+        "stack",
+        "pulumiOperation",
+        "scheduleId"
+      ],
+      "inputProperties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "project": {
+          "description": "Project name.",
+          "type": "string"
+        },
+        "stack": {
+          "description": "Stack name.",
+          "type": "string"
+        },
+        "scheduleCron": {
+          "description": "Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.",
+          "type": "string"
+        },
+        "timestamp": {
+          "description": "The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.",
+          "type": "string"
+        },
+        "pulumiOperation": {
+          "description": "Which command to run.",
+          "$ref": "#/types/pulumiservice:index:PulumiOperation"
+        }
+      },
+      "requiredInputs": [
+        "organization",
+        "project",
+        "stack",
+        "pulumiOperation"
+      ]
+    },
+    "pulumiservice:index:DriftSchedule": {
+      "description": "A cron schedule to run drift detection.",
+      "properties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "project": {
+          "description": "Project name.",
+          "type": "string"
+        },
+        "stack": {
+          "description": "Stack name.",
+          "type": "string"
+        },
+        "scheduleCron": {
+          "description": "Cron expression for when to run drift detection.",
+          "type": "string"
+        },
+        "autoRemediate": {
+          "description": "Whether any drift detected should be remediated after a drift run.",
+          "type": "boolean"
+        },
+        "scheduleId": {
+          "description": "Schedule ID of the created schedule, assigned by Pulumi Cloud.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "organization",
+        "project",
+        "stack",
+        "scheduleCron",
+        "scheduleId"
+      ],
+      "inputProperties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "project": {
+          "description": "Project name.",
+          "type": "string"
+        },
+        "stack": {
+          "description": "Stack name.",
+          "type": "string"
+        },
+        "scheduleCron": {
+          "description": "Cron expression for when to run drift detection.",
+          "type": "string"
+        },
+        "autoRemediate": {
+          "description": "Whether any drift detected should be remediated after a drift run.",
+          "type": "boolean"
+        }
+      },
+      "requiredInputs": [
+        "organization",
+        "project",
+        "stack",
+        "scheduleCron"
+      ]
+    },
+    "pulumiservice:index:TtlSchedule": {
+      "description": "A scheduled stack destory run.",
+      "properties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "project": {
+          "description": "Project name.",
+          "type": "string"
+        },
+        "stack": {
+          "description": "Stack name.",
+          "type": "string"
+        },
+        "timestamp": {
+          "description": "The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.",
+          "type": "string"
+        },
+        "deleteAfterDestroy": {
+          "description": "True if the stack and all associated history and settings should be deleted.",
+          "type": "boolean"
+        },
+        "scheduleId": {
+          "description": "Schedule ID of the created schedule, assigned by Pulumi Cloud.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "organization",
+        "project",
+        "stack",
+        "timestamp",
+        "scheduleId"
+      ],
+      "inputProperties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "project": {
+          "description": "Project name.",
+          "type": "string"
+        },
+        "stack": {
+          "description": "Stack name.",
+          "type": "string"
+        },
+        "timestamp": {
+          "description": "The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.",
+          "type": "string"
+        },
+        "deleteAfterDestroy": {
+          "description": "True if the stack and all associated history and settings should be deleted.",
+          "type": "boolean"
+        }
+      },
+      "requiredInputs": [
+        "organization",
+        "project",
+        "stack",
+        "timestamp"
+      ]
+    }
+  }
+}
