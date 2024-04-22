@@ -1062,6 +1062,130 @@
         "stack",
         "pulumiOperation"
       ]
+    },
+    "pulumiservice:index:DriftSchedule": {
+      "description": "A cron schedule to run drift detection.",
+      "properties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "project": {
+          "description": "Project name.",
+          "type": "string"
+        },
+        "stack": {
+          "description": "Stack name.",
+          "type": "string"
+        },
+        "scheduleCron": {
+          "description": "Cron expression for when to run drift detection.",
+          "type": "string"
+        },
+        "autoRemediate": {
+          "description": "Whether any drift detected should be remediated after a drift run.",
+          "type": "boolean"
+        },
+        "scheduleID": {
+          "description": "Schedule ID of the created schedule, assigned by Pulumi Cloud.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "organization",
+        "project",
+        "stack",
+        "scheduleCron",
+        "scheduleID"
+      ],
+      "inputProperties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "project": {
+          "description": "Project name.",
+          "type": "string"
+        },
+        "stack": {
+          "description": "Stack name.",
+          "type": "string"
+        },
+        "scheduleCron": {
+          "description": "Cron expression for when to run drift detection.",
+          "type": "string"
+        },
+        "autoRemediate": {
+          "description": "Whether any drift detected should be remediated after a drift run.",
+          "type": "boolean"
+        }
+      },
+      "requiredInputs": [
+        "organization",
+        "project",
+        "stack",
+        "scheduleCron"
+      ]
+    },
+    "pulumiservice:index:TtlSchedule": {
+      "description": "A scheduled stack destory run.",
+      "properties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "project": {
+          "description": "Project name.",
+          "type": "string"
+        },
+        "stack": {
+          "description": "Stack name.",
+          "type": "string"
+        },
+        "timestamp": {
+          "description": "When to run the destroy command, in ISO format like this 2020-01-01T00:00:00Z.",
+          "type": "string"
+        },
+        "scheduleID": {
+          "description": "Schedule ID of the created schedule, assigned by Pulumi Cloud.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "organization",
+        "project",
+        "stack",
+        "timestamp",
+        "scheduleID"
+      ],
+      "inputProperties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "project": {
+          "description": "Project name.",
+          "type": "string"
+        },
+        "stack": {
+          "description": "Stack name.",
+          "type": "string"
+        },
+        "timestamp": {
+          "description": "When to run the destroy command, in ISO format like this 2020-01-01T00:00:00Z.",
+          "type": "string"
+        },
+        "deleteAfterDestroy": {
+          "description": "Whether the stack should be deleted after it is destroyed.",
+          "type": "boolean"
+        }
+      },
+      "requiredInputs": [
+        "organization",
+        "project",
+        "stack",
+        "timestamp"
+      ]
     }
   },
   "language": {

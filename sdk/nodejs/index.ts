@@ -25,6 +25,11 @@ export type DeploymentSettings = import("./deploymentSettings").DeploymentSettin
 export const DeploymentSettings: typeof import("./deploymentSettings").DeploymentSettings = null as any;
 utilities.lazyLoad(exports, ["DeploymentSettings"], () => require("./deploymentSettings"));
 
+export { DriftScheduleArgs } from "./driftSchedule";
+export type DriftSchedule = import("./driftSchedule").DriftSchedule;
+export const DriftSchedule: typeof import("./driftSchedule").DriftSchedule = null as any;
+utilities.lazyLoad(exports, ["DriftSchedule"], () => require("./driftSchedule"));
+
 export { OrgAccessTokenArgs } from "./orgAccessToken";
 export type OrgAccessToken = import("./orgAccessToken").OrgAccessToken;
 export const OrgAccessToken: typeof import("./orgAccessToken").OrgAccessToken = null as any;
@@ -54,6 +59,11 @@ export { TeamStackPermissionArgs } from "./teamStackPermission";
 export type TeamStackPermission = import("./teamStackPermission").TeamStackPermission;
 export const TeamStackPermission: typeof import("./teamStackPermission").TeamStackPermission = null as any;
 utilities.lazyLoad(exports, ["TeamStackPermission"], () => require("./teamStackPermission"));
+
+export { TtlScheduleArgs } from "./ttlSchedule";
+export type TtlSchedule = import("./ttlSchedule").TtlSchedule;
+export const TtlSchedule: typeof import("./ttlSchedule").TtlSchedule = null as any;
+utilities.lazyLoad(exports, ["TtlSchedule"], () => require("./ttlSchedule"));
 
 export { WebhookArgs } from "./webhook";
 export type Webhook = import("./webhook").Webhook;
@@ -85,6 +95,8 @@ const _module = {
                 return new DeploymentSchedule(name, <any>undefined, { urn })
             case "pulumiservice:index:DeploymentSettings":
                 return new DeploymentSettings(name, <any>undefined, { urn })
+            case "pulumiservice:index:DriftSchedule":
+                return new DriftSchedule(name, <any>undefined, { urn })
             case "pulumiservice:index:OrgAccessToken":
                 return new OrgAccessToken(name, <any>undefined, { urn })
             case "pulumiservice:index:StackTag":
@@ -95,6 +107,8 @@ const _module = {
                 return new TeamAccessToken(name, <any>undefined, { urn })
             case "pulumiservice:index:TeamStackPermission":
                 return new TeamStackPermission(name, <any>undefined, { urn })
+            case "pulumiservice:index:TtlSchedule":
+                return new TtlSchedule(name, <any>undefined, { urn })
             case "pulumiservice:index:Webhook":
                 return new Webhook(name, <any>undefined, { urn })
             default:
