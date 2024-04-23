@@ -152,6 +152,9 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 		&PulumiServiceAgentPoolResource{
 			client: client,
 		},
+		&PulumiServiceDeploymentScheduleResource{
+			client: client,
+		},
 	}
 
 	for _, sr := range k.pulumiResources {

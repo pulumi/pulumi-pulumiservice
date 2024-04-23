@@ -13,6 +13,12 @@ namespace Pulumi.PulumiService.Inputs
     public sealed class OperationContextOptionsArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
+        /// Whether the stack should be deleted after it is destroyed.
+        /// </summary>
+        [Input("deleteAfterDestroy")]
+        public Input<bool>? DeleteAfterDestroy { get; set; }
+
+        /// <summary>
         /// The shell to use to run commands during the deployment. Defaults to 'bash'.
         /// </summary>
         [Input("shell")]

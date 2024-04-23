@@ -8,6 +8,48 @@ using Pulumi;
 namespace Pulumi.PulumiService
 {
     [EnumType]
+    public readonly struct PulumiOperation : IEquatable<PulumiOperation>
+    {
+        private readonly string _value;
+
+        private PulumiOperation(string value)
+        {
+            _value = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        /// <summary>
+        /// Analogous to `pulumi up` command.
+        /// </summary>
+        public static PulumiOperation Update { get; } = new PulumiOperation("update");
+        /// <summary>
+        /// Analogous to `pulumi preview` command.
+        /// </summary>
+        public static PulumiOperation Preview { get; } = new PulumiOperation("preview");
+        /// <summary>
+        /// Analogous to `pulumi refresh` command.
+        /// </summary>
+        public static PulumiOperation Refresh { get; } = new PulumiOperation("refresh");
+        /// <summary>
+        /// Analogous to `pulumi destroy` command.
+        /// </summary>
+        public static PulumiOperation Destroy { get; } = new PulumiOperation("destroy");
+
+        public static bool operator ==(PulumiOperation left, PulumiOperation right) => left.Equals(right);
+        public static bool operator !=(PulumiOperation left, PulumiOperation right) => !left.Equals(right);
+
+        public static explicit operator string(PulumiOperation value) => value._value;
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override bool Equals(object? obj) => obj is PulumiOperation other && Equals(other);
+        public bool Equals(PulumiOperation other) => string.Equals(_value, other._value, StringComparison.Ordinal);
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+
+        public override string ToString() => _value;
+    }
+
+    [EnumType]
     public readonly struct TeamStackPermissionScope : IEquatable<TeamStackPermissionScope>
     {
         private readonly double _value;
