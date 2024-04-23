@@ -2,41 +2,42 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
-import * as inputs from "./types/input";
-import * as outputs from "./types/output";
-import * as enums from "./types/enums";
 import * as utilities from "./utilities";
 
 /**
- * A scheduled recurring or single time run of a pulumi command.
+ * A scheduled stack destory run.
  */
-export class DeploymentSchedule extends pulumi.CustomResource {
+export class TtlSchedule extends pulumi.CustomResource {
     /**
-     * Get an existing DeploymentSchedule resource's state with the given name, ID, and optional extra
+     * Get an existing TtlSchedule resource's state with the given name, ID, and optional extra
      * properties used to qualify the lookup.
      *
      * @param name The _unique_ name of the resulting resource.
      * @param id The _unique_ provider ID of the resource to lookup.
      * @param opts Optional settings to control the behavior of the CustomResource.
      */
-    public static get(name: string, id: pulumi.Input<pulumi.ID>, opts?: pulumi.CustomResourceOptions): DeploymentSchedule {
-        return new DeploymentSchedule(name, undefined as any, { ...opts, id: id });
+    public static get(name: string, id: pulumi.Input<pulumi.ID>, opts?: pulumi.CustomResourceOptions): TtlSchedule {
+        return new TtlSchedule(name, undefined as any, { ...opts, id: id });
     }
 
     /** @internal */
-    public static readonly __pulumiType = 'pulumiservice:index:DeploymentSchedule';
+    public static readonly __pulumiType = 'pulumiservice:index:TtlSchedule';
 
     /**
-     * Returns true if the given object is an instance of DeploymentSchedule.  This is designed to work even
+     * Returns true if the given object is an instance of TtlSchedule.  This is designed to work even
      * when multiple copies of the Pulumi SDK have been loaded into the same process.
      */
-    public static isInstance(obj: any): obj is DeploymentSchedule {
+    public static isInstance(obj: any): obj is TtlSchedule {
         if (obj === undefined || obj === null) {
             return false;
         }
-        return obj['__pulumiType'] === DeploymentSchedule.__pulumiType;
+        return obj['__pulumiType'] === TtlSchedule.__pulumiType;
     }
 
+    /**
+     * True if the stack and all associated history and settings should be deleted.
+     */
+    public readonly deleteAfterDestroy!: pulumi.Output<boolean | undefined>;
     /**
      * Organization name.
      */
@@ -46,14 +47,6 @@ export class DeploymentSchedule extends pulumi.CustomResource {
      */
     public readonly project!: pulumi.Output<string>;
     /**
-     * Which operation to run.
-     */
-    public readonly pulumiOperation!: pulumi.Output<enums.PulumiOperation>;
-    /**
-     * Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.
-     */
-    public readonly scheduleCron!: pulumi.Output<string | undefined>;
-    /**
      * Schedule ID of the created schedule, assigned by Pulumi Cloud.
      */
     public /*out*/ readonly scheduleId!: pulumi.Output<string>;
@@ -62,18 +55,18 @@ export class DeploymentSchedule extends pulumi.CustomResource {
      */
     public readonly stack!: pulumi.Output<string>;
     /**
-     * The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+     * The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.
      */
-    public readonly timestamp!: pulumi.Output<string | undefined>;
+    public readonly timestamp!: pulumi.Output<string>;
 
     /**
-     * Create a DeploymentSchedule resource with the given unique name, arguments, and options.
+     * Create a TtlSchedule resource with the given unique name, arguments, and options.
      *
      * @param name The _unique_ name of the resource.
      * @param args The arguments to use to populate this resource's properties.
      * @param opts A bag of options that control this resource's behavior.
      */
-    constructor(name: string, args: DeploymentScheduleArgs, opts?: pulumi.CustomResourceOptions) {
+    constructor(name: string, args: TtlScheduleArgs, opts?: pulumi.CustomResourceOptions) {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
@@ -83,37 +76,39 @@ export class DeploymentSchedule extends pulumi.CustomResource {
             if ((!args || args.project === undefined) && !opts.urn) {
                 throw new Error("Missing required property 'project'");
             }
-            if ((!args || args.pulumiOperation === undefined) && !opts.urn) {
-                throw new Error("Missing required property 'pulumiOperation'");
-            }
             if ((!args || args.stack === undefined) && !opts.urn) {
                 throw new Error("Missing required property 'stack'");
             }
+            if ((!args || args.timestamp === undefined) && !opts.urn) {
+                throw new Error("Missing required property 'timestamp'");
+            }
+            resourceInputs["deleteAfterDestroy"] = args ? args.deleteAfterDestroy : undefined;
             resourceInputs["organization"] = args ? args.organization : undefined;
             resourceInputs["project"] = args ? args.project : undefined;
-            resourceInputs["pulumiOperation"] = args ? args.pulumiOperation : undefined;
-            resourceInputs["scheduleCron"] = args ? args.scheduleCron : undefined;
             resourceInputs["stack"] = args ? args.stack : undefined;
             resourceInputs["timestamp"] = args ? args.timestamp : undefined;
             resourceInputs["scheduleId"] = undefined /*out*/;
         } else {
+            resourceInputs["deleteAfterDestroy"] = undefined /*out*/;
             resourceInputs["organization"] = undefined /*out*/;
             resourceInputs["project"] = undefined /*out*/;
-            resourceInputs["pulumiOperation"] = undefined /*out*/;
-            resourceInputs["scheduleCron"] = undefined /*out*/;
             resourceInputs["scheduleId"] = undefined /*out*/;
             resourceInputs["stack"] = undefined /*out*/;
             resourceInputs["timestamp"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
-        super(DeploymentSchedule.__pulumiType, name, resourceInputs, opts);
+        super(TtlSchedule.__pulumiType, name, resourceInputs, opts);
     }
 }
 
 /**
- * The set of arguments for constructing a DeploymentSchedule resource.
+ * The set of arguments for constructing a TtlSchedule resource.
  */
-export interface DeploymentScheduleArgs {
+export interface TtlScheduleArgs {
+    /**
+     * True if the stack and all associated history and settings should be deleted.
+     */
+    deleteAfterDestroy?: pulumi.Input<boolean>;
     /**
      * Organization name.
      */
@@ -123,19 +118,11 @@ export interface DeploymentScheduleArgs {
      */
     project: pulumi.Input<string>;
     /**
-     * Which command to run.
-     */
-    pulumiOperation: pulumi.Input<enums.PulumiOperation>;
-    /**
-     * Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.
-     */
-    scheduleCron?: pulumi.Input<string>;
-    /**
      * Stack name.
      */
     stack: pulumi.Input<string>;
     /**
-     * The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+     * The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.
      */
-    timestamp?: pulumi.Input<string>;
+    timestamp: pulumi.Input<string>;
 }

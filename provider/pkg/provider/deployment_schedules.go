@@ -25,16 +25,21 @@ type PulumiServiceDeploymentScheduleInput struct {
 	PulumiOperation string     `pulumi:"pulumiOperation"`
 }
 
-type PulumiServiceDeploymentScheduleOutput struct {
-	Input      PulumiServiceDeploymentScheduleInput
-	ScheduleID string `pulumi:"scheduleID"`
+type PulumiServiceSharedScheduleOutput struct {
+	Stack      pulumiapi.StackName
+	ScheduleID string `pulumi:"scheduleId"`
+}
+
+func StackToPropertyMap(stack pulumiapi.StackName) resource.PropertyMap {
+	propertyMap := resource.PropertyMap{}
+	propertyMap["organization"] = resource.NewPropertyValue(stack.OrgName)
+	propertyMap["project"] = resource.NewPropertyValue(stack.ProjectName)
+	propertyMap["stack"] = resource.NewPropertyValue(stack.StackName)
+	return propertyMap
 }
 
 func (i *PulumiServiceDeploymentScheduleInput) ToPropertyMap() resource.PropertyMap {
-	propertyMap := resource.PropertyMap{}
-	propertyMap["organization"] = resource.NewPropertyValue(i.Stack.OrgName)
-	propertyMap["project"] = resource.NewPropertyValue(i.Stack.ProjectName)
-	propertyMap["stack"] = resource.NewPropertyValue(i.Stack.StackName)
+	propertyMap := StackToPropertyMap(i.Stack)
 
 	if i.ScheduleCron != nil {
 		propertyMap["scheduleCron"] = resource.NewPropertyValue(i.ScheduleCron)
@@ -47,20 +52,12 @@ func (i *PulumiServiceDeploymentScheduleInput) ToPropertyMap() resource.Property
 	return propertyMap
 }
 
-func (i *PulumiServiceDeploymentScheduleInput) ToOutputPropertyMap(scheduleID string) resource.PropertyMap {
-	propertyMap := i.ToPropertyMap()
-	propertyMap["scheduleID"] = resource.NewPropertyValue(scheduleID)
+func AddScheduleIdToPropertyMap(scheduleID string, propertyMap resource.PropertyMap) resource.PropertyMap {
+	propertyMap["scheduleId"] = resource.NewPropertyValue(scheduleID)
 	return propertyMap
 }
 
-func (st *PulumiServiceDeploymentScheduleResource) ToPulumiServiceDeploymentScheduleInput(properties *structpb.Struct) (*PulumiServiceDeploymentScheduleInput, error) {
-	inputMap, err := plugin.UnmarshalProperties(properties, plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
-
-	input := PulumiServiceDeploymentScheduleInput{}
-
+func ParseStack(inputMap resource.PropertyMap) (*pulumiapi.StackName, error) {
 	var stack pulumiapi.StackName
 	if inputMap["organization"].HasValue() && inputMap["organization"].IsString() {
 		organization := inputMap["organization"].StringValue()
@@ -80,7 +77,21 @@ func (st *PulumiServiceDeploymentScheduleResource) ToPulumiServiceDeploymentSche
 	} else {
 		return nil, fmt.Errorf("failed to unmarshal stackName value from properties: %s", inputMap)
 	}
-	input.Stack = stack
+	return &stack, nil
+}
+
+func ToPulumiServiceDeploymentScheduleInput(properties *structpb.Struct) (*PulumiServiceDeploymentScheduleInput, error) {
+	inputMap, err := plugin.UnmarshalProperties(properties, plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	if err != nil {
+		return nil, err
+	}
+
+	input := PulumiServiceDeploymentScheduleInput{}
+	stack, err := ParseStack(inputMap)
+	if err != nil {
+		return nil, err
+	}
+	input.Stack = *stack
 
 	if inputMap["pulumiOperation"].HasValue() && inputMap["pulumiOperation"].IsString() {
 		pulumiOperation := inputMap["pulumiOperation"].StringValue()
@@ -105,36 +116,35 @@ func (st *PulumiServiceDeploymentScheduleResource) ToPulumiServiceDeploymentSche
 	return &input, nil
 }
 
-func (st *PulumiServiceDeploymentScheduleResource) ToPulumiServiceDeploymentScheduleOutput(properties *structpb.Struct) (*PulumiServiceDeploymentScheduleOutput, error) {
-	input, err := st.ToPulumiServiceDeploymentScheduleInput(properties)
-	if err != nil {
-		return nil, err
-	}
-
+func ToPulumiServiceSharedScheduleOutput(properties *structpb.Struct) (*PulumiServiceSharedScheduleOutput, error) {
 	inputMap, err := plugin.UnmarshalProperties(properties, plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
 	}
+	stack, err := ParseStack(inputMap)
+	if err != nil {
+		return nil, err
+	}
 
-	output := PulumiServiceDeploymentScheduleOutput{}
-	output.Input = *input
+	output := PulumiServiceSharedScheduleOutput{}
+	output.Stack = *stack
 
-	if inputMap["scheduleID"].HasValue() && inputMap["scheduleID"].IsString() {
-		output.ScheduleID = inputMap["scheduleID"].StringValue()
+	if inputMap["scheduleId"].HasValue() && inputMap["scheduleId"].IsString() {
+		output.ScheduleID = inputMap["scheduleId"].StringValue()
 	}
 
 	return &output, nil
 }
 
-func (st *PulumiServiceDeploymentScheduleResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+func ScheduleSharedDiff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
 	olds, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
 	if err != nil {
 		return nil, err
 	}
 
-	// preprocess olds to remove the `scheduleID` property since it's only an output and shouldn't cause a diff
-	if olds["scheduleID"].HasValue() {
-		delete(olds, "scheduleID")
+	// preprocess olds to remove the `scheduleId` property since it's only an output and shouldn't cause a diff
+	if olds["scheduleId"].HasValue() {
+		delete(olds, "scheduleId")
 	}
 
 	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
@@ -182,21 +192,29 @@ func (st *PulumiServiceDeploymentScheduleResource) Diff(req *pulumirpc.DiffReque
 	}, nil
 }
 
-func (st *PulumiServiceDeploymentScheduleResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	output, err := st.ToPulumiServiceDeploymentScheduleOutput(req.GetProperties())
+func (st *PulumiServiceDeploymentScheduleResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+	return ScheduleSharedDiff(req)
+}
+
+func ScheduleSharedDelete(req *pulumirpc.DeleteRequest, client pulumiapi.ScheduleClient) (*pbempty.Empty, error) {
+	output, err := ToPulumiServiceSharedScheduleOutput(req.GetProperties())
 	if err != nil {
 		return nil, err
 	}
 
-	err = st.client.DeleteSchedule(context.Background(), output.Input.Stack, output.ScheduleID)
+	err = client.DeleteSchedule(context.Background(), output.Stack, output.ScheduleID)
 	if err != nil {
 		return nil, err
 	}
 	return &pbempty.Empty{}, nil
 }
 
+func (st *PulumiServiceDeploymentScheduleResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
+	return ScheduleSharedDelete(req, st.client)
+}
+
 func (st *PulumiServiceDeploymentScheduleResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
-	input, err := st.ToPulumiServiceDeploymentScheduleInput(req.GetProperties())
+	input, err := ToPulumiServiceDeploymentScheduleInput(req.GetProperties())
 	if err != nil {
 		return nil, err
 	}
@@ -214,7 +232,7 @@ func (st *PulumiServiceDeploymentScheduleResource) Create(req *pulumirpc.CreateR
 	}
 
 	outputProperties, err := plugin.MarshalProperties(
-		input.ToOutputPropertyMap(*scheduleID),
+		AddScheduleIdToPropertyMap(*scheduleID, input.ToPropertyMap()),
 		plugin.MarshalOptions{
 			KeepUnknowns: true,
 			SkipNulls:    true,
@@ -268,11 +286,11 @@ func (st *PulumiServiceDeploymentScheduleResource) Check(req *pulumirpc.CheckReq
 }
 
 func (st *PulumiServiceDeploymentScheduleResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	previousOutput, err := st.ToPulumiServiceDeploymentScheduleOutput(req.GetOlds())
+	previousOutput, err := ToPulumiServiceSharedScheduleOutput(req.GetOlds())
 	if err != nil {
 		return nil, err
 	}
-	input, err := st.ToPulumiServiceDeploymentScheduleInput(req.GetNews())
+	input, err := ToPulumiServiceDeploymentScheduleInput(req.GetNews())
 	if err != nil {
 		return nil, err
 	}
@@ -290,7 +308,7 @@ func (st *PulumiServiceDeploymentScheduleResource) Update(req *pulumirpc.UpdateR
 	}
 
 	outputProperties, err := plugin.MarshalProperties(
-		input.ToOutputPropertyMap(*scheduleID),
+		AddScheduleIdToPropertyMap(*scheduleID, input.ToPropertyMap()),
 		plugin.MarshalOptions{
 			KeepUnknowns: true,
 			SkipNulls:    true,
@@ -305,12 +323,16 @@ func (st *PulumiServiceDeploymentScheduleResource) Update(req *pulumirpc.UpdateR
 }
 
 func (st *PulumiServiceDeploymentScheduleResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	output, err := st.ToPulumiServiceDeploymentScheduleOutput(req.GetProperties())
+	output, err := ToPulumiServiceSharedScheduleOutput(req.GetProperties())
+	if err != nil {
+		return nil, err
+	}
+	input, err := ToPulumiServiceDeploymentScheduleInput(req.GetProperties())
 	if err != nil {
 		return nil, err
 	}
 
-	scheduleID, err := st.client.GetSchedule(context.Background(), output.Input.Stack, output.ScheduleID)
+	scheduleID, err := st.client.GetSchedule(context.Background(), output.Stack, output.ScheduleID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read DeploymentSchedule (%q): %w", req.Id, err)
 	}
@@ -320,7 +342,7 @@ func (st *PulumiServiceDeploymentScheduleResource) Read(req *pulumirpc.ReadReque
 	}
 
 	outputProperties, err := plugin.MarshalProperties(
-		output.Input.ToPropertyMap(),
+		input.ToPropertyMap(),
 		plugin.MarshalOptions{
 			KeepUnknowns: true,
 			SkipNulls:    true,

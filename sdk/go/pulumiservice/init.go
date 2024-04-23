@@ -29,6 +29,8 @@ func (m *module) Construct(ctx *pulumi.Context, name, typ, urn string) (r pulumi
 		r = &DeploymentSchedule{}
 	case "pulumiservice:index:DeploymentSettings":
 		r = &DeploymentSettings{}
+	case "pulumiservice:index:DriftSchedule":
+		r = &DriftSchedule{}
 	case "pulumiservice:index:OrgAccessToken":
 		r = &OrgAccessToken{}
 	case "pulumiservice:index:StackTag":
@@ -39,6 +41,8 @@ func (m *module) Construct(ctx *pulumi.Context, name, typ, urn string) (r pulumi
 		r = &TeamAccessToken{}
 	case "pulumiservice:index:TeamStackPermission":
 		r = &TeamStackPermission{}
+	case "pulumiservice:index:TtlSchedule":
+		r = &TtlSchedule{}
 	case "pulumiservice:index:Webhook":
 		r = &Webhook{}
 	default:

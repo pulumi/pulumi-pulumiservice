@@ -8,36 +8,31 @@ import pulumi
 import pulumi.runtime
 from typing import Any, Mapping, Optional, Sequence, Union, overload
 from . import _utilities
-from ._enums import *
 
-__all__ = ['DeploymentScheduleArgs', 'DeploymentSchedule']
+__all__ = ['DriftScheduleArgs', 'DriftSchedule']
 
 @pulumi.input_type
-class DeploymentScheduleArgs:
+class DriftScheduleArgs:
     def __init__(__self__, *,
                  organization: pulumi.Input[str],
                  project: pulumi.Input[str],
-                 pulumi_operation: pulumi.Input['PulumiOperation'],
+                 schedule_cron: pulumi.Input[str],
                  stack: pulumi.Input[str],
-                 schedule_cron: Optional[pulumi.Input[str]] = None,
-                 timestamp: Optional[pulumi.Input[str]] = None):
+                 auto_remediate: Optional[pulumi.Input[bool]] = None):
         """
-        The set of arguments for constructing a DeploymentSchedule resource.
+        The set of arguments for constructing a DriftSchedule resource.
         :param pulumi.Input[str] organization: Organization name.
         :param pulumi.Input[str] project: Project name.
-        :param pulumi.Input['PulumiOperation'] pulumi_operation: Which command to run.
+        :param pulumi.Input[str] schedule_cron: Cron expression for when to run drift detection.
         :param pulumi.Input[str] stack: Stack name.
-        :param pulumi.Input[str] schedule_cron: Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.
-        :param pulumi.Input[str] timestamp: The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+        :param pulumi.Input[bool] auto_remediate: Whether any drift detected should be remediated after a drift run.
         """
         pulumi.set(__self__, "organization", organization)
         pulumi.set(__self__, "project", project)
-        pulumi.set(__self__, "pulumi_operation", pulumi_operation)
+        pulumi.set(__self__, "schedule_cron", schedule_cron)
         pulumi.set(__self__, "stack", stack)
-        if schedule_cron is not None:
-            pulumi.set(__self__, "schedule_cron", schedule_cron)
-        if timestamp is not None:
-            pulumi.set(__self__, "timestamp", timestamp)
+        if auto_remediate is not None:
+            pulumi.set(__self__, "auto_remediate", auto_remediate)
 
     @property
     @pulumi.getter
@@ -64,16 +59,16 @@ class DeploymentScheduleArgs:
         pulumi.set(self, "project", value)
 
     @property
-    @pulumi.getter(name="pulumiOperation")
-    def pulumi_operation(self) -> pulumi.Input['PulumiOperation']:
+    @pulumi.getter(name="scheduleCron")
+    def schedule_cron(self) -> pulumi.Input[str]:
         """
-        Which command to run.
+        Cron expression for when to run drift detection.
         """
-        return pulumi.get(self, "pulumi_operation")
+        return pulumi.get(self, "schedule_cron")
 
-    @pulumi_operation.setter
-    def pulumi_operation(self, value: pulumi.Input['PulumiOperation']):
-        pulumi.set(self, "pulumi_operation", value)
+    @schedule_cron.setter
+    def schedule_cron(self, value: pulumi.Input[str]):
+        pulumi.set(self, "schedule_cron", value)
 
     @property
     @pulumi.getter
@@ -88,70 +83,56 @@ class DeploymentScheduleArgs:
         pulumi.set(self, "stack", value)
 
     @property
-    @pulumi.getter(name="scheduleCron")
-    def schedule_cron(self) -> Optional[pulumi.Input[str]]:
+    @pulumi.getter(name="autoRemediate")
+    def auto_remediate(self) -> Optional[pulumi.Input[bool]]:
         """
-        Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.
+        Whether any drift detected should be remediated after a drift run.
         """
-        return pulumi.get(self, "schedule_cron")
+        return pulumi.get(self, "auto_remediate")
 
-    @schedule_cron.setter
-    def schedule_cron(self, value: Optional[pulumi.Input[str]]):
-        pulumi.set(self, "schedule_cron", value)
-
-    @property
-    @pulumi.getter
-    def timestamp(self) -> Optional[pulumi.Input[str]]:
-        """
-        The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
-        """
-        return pulumi.get(self, "timestamp")
-
-    @timestamp.setter
-    def timestamp(self, value: Optional[pulumi.Input[str]]):
-        pulumi.set(self, "timestamp", value)
+    @auto_remediate.setter
+    def auto_remediate(self, value: Optional[pulumi.Input[bool]]):
+        pulumi.set(self, "auto_remediate", value)
 
 
-class DeploymentSchedule(pulumi.CustomResource):
+class DriftSchedule(pulumi.CustomResource):
     @overload
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 auto_remediate: Optional[pulumi.Input[bool]] = None,
                  organization: Optional[pulumi.Input[str]] = None,
                  project: Optional[pulumi.Input[str]] = None,
-                 pulumi_operation: Optional[pulumi.Input['PulumiOperation']] = None,
                  schedule_cron: Optional[pulumi.Input[str]] = None,
                  stack: Optional[pulumi.Input[str]] = None,
-                 timestamp: Optional[pulumi.Input[str]] = None,
                  __props__=None):
         """
-        A scheduled recurring or single time run of a pulumi command.
+        A cron schedule to run drift detection.
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
+        :param pulumi.Input[bool] auto_remediate: Whether any drift detected should be remediated after a drift run.
         :param pulumi.Input[str] organization: Organization name.
         :param pulumi.Input[str] project: Project name.
-        :param pulumi.Input['PulumiOperation'] pulumi_operation: Which command to run.
-        :param pulumi.Input[str] schedule_cron: Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.
+        :param pulumi.Input[str] schedule_cron: Cron expression for when to run drift detection.
         :param pulumi.Input[str] stack: Stack name.
-        :param pulumi.Input[str] timestamp: The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
         """
         ...
     @overload
     def __init__(__self__,
                  resource_name: str,
-                 args: DeploymentScheduleArgs,
+                 args: DriftScheduleArgs,
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
-        A scheduled recurring or single time run of a pulumi command.
+        A cron schedule to run drift detection.
 
         :param str resource_name: The name of the resource.
-        :param DeploymentScheduleArgs args: The arguments to use to populate this resource's properties.
+        :param DriftScheduleArgs args: The arguments to use to populate this resource's properties.
         :param pulumi.ResourceOptions opts: Options for the resource.
         """
         ...
     def __init__(__self__, resource_name: str, *args, **kwargs):
-        resource_args, opts = _utilities.get_resource_args_opts(DeploymentScheduleArgs, pulumi.ResourceOptions, *args, **kwargs)
+        resource_args, opts = _utilities.get_resource_args_opts(DriftScheduleArgs, pulumi.ResourceOptions, *args, **kwargs)
         if resource_args is not None:
             __self__._internal_init(resource_name, opts, **resource_args.__dict__)
         else:
@@ -160,12 +141,11 @@ class DeploymentSchedule(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 auto_remediate: Optional[pulumi.Input[bool]] = None,
                  organization: Optional[pulumi.Input[str]] = None,
                  project: Optional[pulumi.Input[str]] = None,
-                 pulumi_operation: Optional[pulumi.Input['PulumiOperation']] = None,
                  schedule_cron: Optional[pulumi.Input[str]] = None,
                  stack: Optional[pulumi.Input[str]] = None,
-                 timestamp: Optional[pulumi.Input[str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
@@ -173,25 +153,24 @@ class DeploymentSchedule(pulumi.CustomResource):
         if opts.id is None:
             if __props__ is not None:
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
-            __props__ = DeploymentScheduleArgs.__new__(DeploymentScheduleArgs)
+            __props__ = DriftScheduleArgs.__new__(DriftScheduleArgs)
 
+            __props__.__dict__["auto_remediate"] = auto_remediate
             if organization is None and not opts.urn:
                 raise TypeError("Missing required property 'organization'")
             __props__.__dict__["organization"] = organization
             if project is None and not opts.urn:
                 raise TypeError("Missing required property 'project'")
             __props__.__dict__["project"] = project
-            if pulumi_operation is None and not opts.urn:
-                raise TypeError("Missing required property 'pulumi_operation'")
-            __props__.__dict__["pulumi_operation"] = pulumi_operation
+            if schedule_cron is None and not opts.urn:
+                raise TypeError("Missing required property 'schedule_cron'")
             __props__.__dict__["schedule_cron"] = schedule_cron
             if stack is None and not opts.urn:
                 raise TypeError("Missing required property 'stack'")
             __props__.__dict__["stack"] = stack
-            __props__.__dict__["timestamp"] = timestamp
             __props__.__dict__["schedule_id"] = None
-        super(DeploymentSchedule, __self__).__init__(
-            'pulumiservice:index:DeploymentSchedule',
+        super(DriftSchedule, __self__).__init__(
+            'pulumiservice:index:DriftSchedule',
             resource_name,
             __props__,
             opts)
@@ -199,9 +178,9 @@ class DeploymentSchedule(pulumi.CustomResource):
     @staticmethod
     def get(resource_name: str,
             id: pulumi.Input[str],
-            opts: Optional[pulumi.ResourceOptions] = None) -> 'DeploymentSchedule':
+            opts: Optional[pulumi.ResourceOptions] = None) -> 'DriftSchedule':
         """
-        Get an existing DeploymentSchedule resource's state with the given name, id, and optional extra
+        Get an existing DriftSchedule resource's state with the given name, id, and optional extra
         properties used to qualify the lookup.
 
         :param str resource_name: The unique name of the resulting resource.
@@ -210,16 +189,23 @@ class DeploymentSchedule(pulumi.CustomResource):
         """
         opts = pulumi.ResourceOptions.merge(opts, pulumi.ResourceOptions(id=id))
 
-        __props__ = DeploymentScheduleArgs.__new__(DeploymentScheduleArgs)
+        __props__ = DriftScheduleArgs.__new__(DriftScheduleArgs)
 
+        __props__.__dict__["auto_remediate"] = None
         __props__.__dict__["organization"] = None
         __props__.__dict__["project"] = None
-        __props__.__dict__["pulumi_operation"] = None
         __props__.__dict__["schedule_cron"] = None
         __props__.__dict__["schedule_id"] = None
         __props__.__dict__["stack"] = None
-        __props__.__dict__["timestamp"] = None
-        return DeploymentSchedule(resource_name, opts=opts, __props__=__props__)
+        return DriftSchedule(resource_name, opts=opts, __props__=__props__)
+
+    @property
+    @pulumi.getter(name="autoRemediate")
+    def auto_remediate(self) -> pulumi.Output[Optional[bool]]:
+        """
+        Whether any drift detected should be remediated after a drift run.
+        """
+        return pulumi.get(self, "auto_remediate")
 
     @property
     @pulumi.getter
@@ -238,18 +224,10 @@ class DeploymentSchedule(pulumi.CustomResource):
         return pulumi.get(self, "project")
 
     @property
-    @pulumi.getter(name="pulumiOperation")
-    def pulumi_operation(self) -> pulumi.Output['PulumiOperation']:
-        """
-        Which operation to run.
-        """
-        return pulumi.get(self, "pulumi_operation")
-
-    @property
     @pulumi.getter(name="scheduleCron")
-    def schedule_cron(self) -> pulumi.Output[Optional[str]]:
+    def schedule_cron(self) -> pulumi.Output[str]:
         """
-        Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.
+        Cron expression for when to run drift detection.
         """
         return pulumi.get(self, "schedule_cron")
 
@@ -268,12 +246,4 @@ class DeploymentSchedule(pulumi.CustomResource):
         Stack name.
         """
         return pulumi.get(self, "stack")
-
-    @property
-    @pulumi.getter
-    def timestamp(self) -> pulumi.Output[Optional[str]]:
-        """
-        The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
-        """
-        return pulumi.get(self, "timestamp")
 

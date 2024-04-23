@@ -7,19 +7,33 @@ import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Export;
 import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
-import com.pulumi.pulumiservice.DeploymentScheduleArgs;
+import com.pulumi.pulumiservice.TtlScheduleArgs;
 import com.pulumi.pulumiservice.Utilities;
-import com.pulumi.pulumiservice.enums.PulumiOperation;
+import java.lang.Boolean;
 import java.lang.String;
 import java.util.Optional;
 import javax.annotation.Nullable;
 
 /**
- * A scheduled recurring or single time run of a pulumi command.
+ * A scheduled stack destory run.
  * 
  */
-@ResourceType(type="pulumiservice:index:DeploymentSchedule")
-public class DeploymentSchedule extends com.pulumi.resources.CustomResource {
+@ResourceType(type="pulumiservice:index:TtlSchedule")
+public class TtlSchedule extends com.pulumi.resources.CustomResource {
+    /**
+     * True if the stack and all associated history and settings should be deleted.
+     * 
+     */
+    @Export(name="deleteAfterDestroy", refs={Boolean.class}, tree="[0]")
+    private Output</* @Nullable */ Boolean> deleteAfterDestroy;
+
+    /**
+     * @return True if the stack and all associated history and settings should be deleted.
+     * 
+     */
+    public Output<Optional<Boolean>> deleteAfterDestroy() {
+        return Codegen.optional(this.deleteAfterDestroy);
+    }
     /**
      * Organization name.
      * 
@@ -47,34 +61,6 @@ public class DeploymentSchedule extends com.pulumi.resources.CustomResource {
      */
     public Output<String> project() {
         return this.project;
-    }
-    /**
-     * Which operation to run.
-     * 
-     */
-    @Export(name="pulumiOperation", refs={PulumiOperation.class}, tree="[0]")
-    private Output<PulumiOperation> pulumiOperation;
-
-    /**
-     * @return Which operation to run.
-     * 
-     */
-    public Output<PulumiOperation> pulumiOperation() {
-        return this.pulumiOperation;
-    }
-    /**
-     * Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.
-     * 
-     */
-    @Export(name="scheduleCron", refs={String.class}, tree="[0]")
-    private Output</* @Nullable */ String> scheduleCron;
-
-    /**
-     * @return Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.
-     * 
-     */
-    public Output<Optional<String>> scheduleCron() {
-        return Codegen.optional(this.scheduleCron);
     }
     /**
      * Schedule ID of the created schedule, assigned by Pulumi Cloud.
@@ -105,33 +91,33 @@ public class DeploymentSchedule extends com.pulumi.resources.CustomResource {
         return this.stack;
     }
     /**
-     * The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+     * The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.
      * 
      */
     @Export(name="timestamp", refs={String.class}, tree="[0]")
-    private Output</* @Nullable */ String> timestamp;
+    private Output<String> timestamp;
 
     /**
-     * @return The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+     * @return The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.
      * 
      */
-    public Output<Optional<String>> timestamp() {
-        return Codegen.optional(this.timestamp);
+    public Output<String> timestamp() {
+        return this.timestamp;
     }
 
     /**
      *
      * @param name The _unique_ name of the resulting resource.
      */
-    public DeploymentSchedule(String name) {
-        this(name, DeploymentScheduleArgs.Empty);
+    public TtlSchedule(String name) {
+        this(name, TtlScheduleArgs.Empty);
     }
     /**
      *
      * @param name The _unique_ name of the resulting resource.
      * @param args The arguments to use to populate this resource's properties.
      */
-    public DeploymentSchedule(String name, DeploymentScheduleArgs args) {
+    public TtlSchedule(String name, TtlScheduleArgs args) {
         this(name, args, null);
     }
     /**
@@ -140,12 +126,12 @@ public class DeploymentSchedule extends com.pulumi.resources.CustomResource {
      * @param args The arguments to use to populate this resource's properties.
      * @param options A bag of options that control this resource's behavior.
      */
-    public DeploymentSchedule(String name, DeploymentScheduleArgs args, @Nullable com.pulumi.resources.CustomResourceOptions options) {
-        super("pulumiservice:index:DeploymentSchedule", name, args == null ? DeploymentScheduleArgs.Empty : args, makeResourceOptions(options, Codegen.empty()));
+    public TtlSchedule(String name, TtlScheduleArgs args, @Nullable com.pulumi.resources.CustomResourceOptions options) {
+        super("pulumiservice:index:TtlSchedule", name, args == null ? TtlScheduleArgs.Empty : args, makeResourceOptions(options, Codegen.empty()));
     }
 
-    private DeploymentSchedule(String name, Output<String> id, @Nullable com.pulumi.resources.CustomResourceOptions options) {
-        super("pulumiservice:index:DeploymentSchedule", name, null, makeResourceOptions(options, id));
+    private TtlSchedule(String name, Output<String> id, @Nullable com.pulumi.resources.CustomResourceOptions options) {
+        super("pulumiservice:index:TtlSchedule", name, null, makeResourceOptions(options, id));
     }
 
     private static com.pulumi.resources.CustomResourceOptions makeResourceOptions(@Nullable com.pulumi.resources.CustomResourceOptions options, @Nullable Output<String> id) {
@@ -163,7 +149,7 @@ public class DeploymentSchedule extends com.pulumi.resources.CustomResource {
      * @param id The _unique_ provider ID of the resource to lookup.
      * @param options Optional settings to control the behavior of the CustomResource.
      */
-    public static DeploymentSchedule get(String name, Output<String> id, @Nullable com.pulumi.resources.CustomResourceOptions options) {
-        return new DeploymentSchedule(name, id, options);
+    public static TtlSchedule get(String name, Output<String> id, @Nullable com.pulumi.resources.CustomResourceOptions options) {
+        return new TtlSchedule(name, id, options);
     }
 }

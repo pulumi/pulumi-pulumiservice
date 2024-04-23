@@ -10,11 +10,17 @@ using Pulumi.Serialization;
 namespace Pulumi.PulumiService
 {
     /// <summary>
-    /// A scheduled recurring or single time run of a pulumi command.
+    /// A cron schedule to run drift detection.
     /// </summary>
-    [PulumiServiceResourceType("pulumiservice:index:DeploymentSchedule")]
-    public partial class DeploymentSchedule : global::Pulumi.CustomResource
+    [PulumiServiceResourceType("pulumiservice:index:DriftSchedule")]
+    public partial class DriftSchedule : global::Pulumi.CustomResource
     {
+        /// <summary>
+        /// Whether any drift detected should be remediated after a drift run.
+        /// </summary>
+        [Output("autoRemediate")]
+        public Output<bool?> AutoRemediate { get; private set; } = null!;
+
         /// <summary>
         /// Organization name.
         /// </summary>
@@ -28,16 +34,10 @@ namespace Pulumi.PulumiService
         public Output<string> Project { get; private set; } = null!;
 
         /// <summary>
-        /// Which operation to run.
-        /// </summary>
-        [Output("pulumiOperation")]
-        public Output<Pulumi.PulumiService.PulumiOperation> PulumiOperation { get; private set; } = null!;
-
-        /// <summary>
-        /// Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.
+        /// Cron expression for when to run drift detection.
         /// </summary>
         [Output("scheduleCron")]
-        public Output<string?> ScheduleCron { get; private set; } = null!;
+        public Output<string> ScheduleCron { get; private set; } = null!;
 
         /// <summary>
         /// Schedule ID of the created schedule, assigned by Pulumi Cloud.
@@ -51,27 +51,21 @@ namespace Pulumi.PulumiService
         [Output("stack")]
         public Output<string> Stack { get; private set; } = null!;
 
-        /// <summary>
-        /// The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
-        /// </summary>
-        [Output("timestamp")]
-        public Output<string?> Timestamp { get; private set; } = null!;
-
 
         /// <summary>
-        /// Create a DeploymentSchedule resource with the given unique name, arguments, and options.
+        /// Create a DriftSchedule resource with the given unique name, arguments, and options.
         /// </summary>
         ///
         /// <param name="name">The unique name of the resource</param>
         /// <param name="args">The arguments used to populate this resource's properties</param>
         /// <param name="options">A bag of options that control this resource's behavior</param>
-        public DeploymentSchedule(string name, DeploymentScheduleArgs args, CustomResourceOptions? options = null)
-            : base("pulumiservice:index:DeploymentSchedule", name, args ?? new DeploymentScheduleArgs(), MakeResourceOptions(options, ""))
+        public DriftSchedule(string name, DriftScheduleArgs args, CustomResourceOptions? options = null)
+            : base("pulumiservice:index:DriftSchedule", name, args ?? new DriftScheduleArgs(), MakeResourceOptions(options, ""))
         {
         }
 
-        private DeploymentSchedule(string name, Input<string> id, CustomResourceOptions? options = null)
-            : base("pulumiservice:index:DeploymentSchedule", name, null, MakeResourceOptions(options, id))
+        private DriftSchedule(string name, Input<string> id, CustomResourceOptions? options = null)
+            : base("pulumiservice:index:DriftSchedule", name, null, MakeResourceOptions(options, id))
         {
         }
 
@@ -87,21 +81,27 @@ namespace Pulumi.PulumiService
             return merged;
         }
         /// <summary>
-        /// Get an existing DeploymentSchedule resource's state with the given name, ID, and optional extra
+        /// Get an existing DriftSchedule resource's state with the given name, ID, and optional extra
         /// properties used to qualify the lookup.
         /// </summary>
         ///
         /// <param name="name">The unique name of the resulting resource.</param>
         /// <param name="id">The unique provider ID of the resource to lookup.</param>
         /// <param name="options">A bag of options that control this resource's behavior</param>
-        public static DeploymentSchedule Get(string name, Input<string> id, CustomResourceOptions? options = null)
+        public static DriftSchedule Get(string name, Input<string> id, CustomResourceOptions? options = null)
         {
-            return new DeploymentSchedule(name, id, options);
+            return new DriftSchedule(name, id, options);
         }
     }
 
-    public sealed class DeploymentScheduleArgs : global::Pulumi.ResourceArgs
+    public sealed class DriftScheduleArgs : global::Pulumi.ResourceArgs
     {
+        /// <summary>
+        /// Whether any drift detected should be remediated after a drift run.
+        /// </summary>
+        [Input("autoRemediate")]
+        public Input<bool>? AutoRemediate { get; set; }
+
         /// <summary>
         /// Organization name.
         /// </summary>
@@ -115,16 +115,10 @@ namespace Pulumi.PulumiService
         public Input<string> Project { get; set; } = null!;
 
         /// <summary>
-        /// Which command to run.
+        /// Cron expression for when to run drift detection.
         /// </summary>
-        [Input("pulumiOperation", required: true)]
-        public Input<Pulumi.PulumiService.PulumiOperation> PulumiOperation { get; set; } = null!;
-
-        /// <summary>
-        /// Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.
-        /// </summary>
-        [Input("scheduleCron")]
-        public Input<string>? ScheduleCron { get; set; }
+        [Input("scheduleCron", required: true)]
+        public Input<string> ScheduleCron { get; set; } = null!;
 
         /// <summary>
         /// Stack name.
@@ -132,15 +126,9 @@ namespace Pulumi.PulumiService
         [Input("stack", required: true)]
         public Input<string> Stack { get; set; } = null!;
 
-        /// <summary>
-        /// The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
-        /// </summary>
-        [Input("timestamp")]
-        public Input<string>? Timestamp { get; set; }
-
-        public DeploymentScheduleArgs()
+        public DriftScheduleArgs()
         {
         }
-        public static new DeploymentScheduleArgs Empty => new DeploymentScheduleArgs();
+        public static new DriftScheduleArgs Empty => new DriftScheduleArgs();
     }
 }

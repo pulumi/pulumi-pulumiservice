@@ -24,7 +24,23 @@ func (c *ScheduleClientMock) CreateDeploymentSchedule(ctx context.Context, stack
 	return nil, nil
 }
 
+func (c *ScheduleClientMock) CreateDriftSchedule(ctx context.Context, stack pulumiapi.StackName, req pulumiapi.CreateDriftScheduleRequest) (*string, error) {
+	return nil, nil
+}
+
+func (c *ScheduleClientMock) CreateTtlSchedule(ctx context.Context, stack pulumiapi.StackName, req pulumiapi.CreateTtlScheduleRequest) (*string, error) {
+	return nil, nil
+}
+
 func (c *ScheduleClientMock) UpdateDeploymentSchedule(ctx context.Context, stack pulumiapi.StackName, req pulumiapi.CreateDeploymentScheduleRequest, scheduleID string) (*string, error) {
+	return nil, nil
+}
+
+func (c *ScheduleClientMock) UpdateDriftSchedule(ctx context.Context, stack pulumiapi.StackName, req pulumiapi.CreateDriftScheduleRequest, scheduleID string) (*string, error) {
+	return nil, nil
+}
+
+func (c *ScheduleClientMock) UpdateTtlSchedule(ctx context.Context, stack pulumiapi.StackName, req pulumiapi.CreateTtlScheduleRequest, scheduleID string) (*string, error) {
 	return nil, nil
 }
 
@@ -61,7 +77,7 @@ func TestDeploymentSchedule(t *testing.T) {
 		scheduleID := "fake-schedule-id"
 
 		outputProperties, _ := plugin.MarshalProperties(
-			input.ToOutputPropertyMap(scheduleID),
+			AddScheduleIdToPropertyMap(scheduleID, input.ToPropertyMap()),
 			plugin.MarshalOptions{
 				KeepUnknowns: true,
 				SkipNulls:    true,
@@ -104,7 +120,7 @@ func TestDeploymentSchedule(t *testing.T) {
 		scheduleID := "fake-schedule-id"
 
 		outputProperties, _ := plugin.MarshalProperties(
-			input.ToOutputPropertyMap(scheduleID),
+			AddScheduleIdToPropertyMap(scheduleID, input.ToPropertyMap()),
 			plugin.MarshalOptions{
 				KeepUnknowns: true,
 				SkipNulls:    true,

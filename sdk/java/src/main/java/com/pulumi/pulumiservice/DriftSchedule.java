@@ -7,19 +7,33 @@ import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Export;
 import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
-import com.pulumi.pulumiservice.DeploymentScheduleArgs;
+import com.pulumi.pulumiservice.DriftScheduleArgs;
 import com.pulumi.pulumiservice.Utilities;
-import com.pulumi.pulumiservice.enums.PulumiOperation;
+import java.lang.Boolean;
 import java.lang.String;
 import java.util.Optional;
 import javax.annotation.Nullable;
 
 /**
- * A scheduled recurring or single time run of a pulumi command.
+ * A cron schedule to run drift detection.
  * 
  */
-@ResourceType(type="pulumiservice:index:DeploymentSchedule")
-public class DeploymentSchedule extends com.pulumi.resources.CustomResource {
+@ResourceType(type="pulumiservice:index:DriftSchedule")
+public class DriftSchedule extends com.pulumi.resources.CustomResource {
+    /**
+     * Whether any drift detected should be remediated after a drift run.
+     * 
+     */
+    @Export(name="autoRemediate", refs={Boolean.class}, tree="[0]")
+    private Output</* @Nullable */ Boolean> autoRemediate;
+
+    /**
+     * @return Whether any drift detected should be remediated after a drift run.
+     * 
+     */
+    public Output<Optional<Boolean>> autoRemediate() {
+        return Codegen.optional(this.autoRemediate);
+    }
     /**
      * Organization name.
      * 
@@ -49,32 +63,18 @@ public class DeploymentSchedule extends com.pulumi.resources.CustomResource {
         return this.project;
     }
     /**
-     * Which operation to run.
-     * 
-     */
-    @Export(name="pulumiOperation", refs={PulumiOperation.class}, tree="[0]")
-    private Output<PulumiOperation> pulumiOperation;
-
-    /**
-     * @return Which operation to run.
-     * 
-     */
-    public Output<PulumiOperation> pulumiOperation() {
-        return this.pulumiOperation;
-    }
-    /**
-     * Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.
+     * Cron expression for when to run drift detection.
      * 
      */
     @Export(name="scheduleCron", refs={String.class}, tree="[0]")
-    private Output</* @Nullable */ String> scheduleCron;
+    private Output<String> scheduleCron;
 
     /**
-     * @return Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.
+     * @return Cron expression for when to run drift detection.
      * 
      */
-    public Output<Optional<String>> scheduleCron() {
-        return Codegen.optional(this.scheduleCron);
+    public Output<String> scheduleCron() {
+        return this.scheduleCron;
     }
     /**
      * Schedule ID of the created schedule, assigned by Pulumi Cloud.
@@ -104,34 +104,20 @@ public class DeploymentSchedule extends com.pulumi.resources.CustomResource {
     public Output<String> stack() {
         return this.stack;
     }
-    /**
-     * The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
-     * 
-     */
-    @Export(name="timestamp", refs={String.class}, tree="[0]")
-    private Output</* @Nullable */ String> timestamp;
-
-    /**
-     * @return The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
-     * 
-     */
-    public Output<Optional<String>> timestamp() {
-        return Codegen.optional(this.timestamp);
-    }
 
     /**
      *
      * @param name The _unique_ name of the resulting resource.
      */
-    public DeploymentSchedule(String name) {
-        this(name, DeploymentScheduleArgs.Empty);
+    public DriftSchedule(String name) {
+        this(name, DriftScheduleArgs.Empty);
     }
     /**
      *
      * @param name The _unique_ name of the resulting resource.
      * @param args The arguments to use to populate this resource's properties.
      */
-    public DeploymentSchedule(String name, DeploymentScheduleArgs args) {
+    public DriftSchedule(String name, DriftScheduleArgs args) {
         this(name, args, null);
     }
     /**
@@ -140,12 +126,12 @@ public class DeploymentSchedule extends com.pulumi.resources.CustomResource {
      * @param args The arguments to use to populate this resource's properties.
      * @param options A bag of options that control this resource's behavior.
      */
-    public DeploymentSchedule(String name, DeploymentScheduleArgs args, @Nullable com.pulumi.resources.CustomResourceOptions options) {
-        super("pulumiservice:index:DeploymentSchedule", name, args == null ? DeploymentScheduleArgs.Empty : args, makeResourceOptions(options, Codegen.empty()));
+    public DriftSchedule(String name, DriftScheduleArgs args, @Nullable com.pulumi.resources.CustomResourceOptions options) {
+        super("pulumiservice:index:DriftSchedule", name, args == null ? DriftScheduleArgs.Empty : args, makeResourceOptions(options, Codegen.empty()));
     }
 
-    private DeploymentSchedule(String name, Output<String> id, @Nullable com.pulumi.resources.CustomResourceOptions options) {
-        super("pulumiservice:index:DeploymentSchedule", name, null, makeResourceOptions(options, id));
+    private DriftSchedule(String name, Output<String> id, @Nullable com.pulumi.resources.CustomResourceOptions options) {
+        super("pulumiservice:index:DriftSchedule", name, null, makeResourceOptions(options, id));
     }
 
     private static com.pulumi.resources.CustomResourceOptions makeResourceOptions(@Nullable com.pulumi.resources.CustomResourceOptions options, @Nullable Output<String> id) {
@@ -163,7 +149,7 @@ public class DeploymentSchedule extends com.pulumi.resources.CustomResource {
      * @param id The _unique_ provider ID of the resource to lookup.
      * @param options Optional settings to control the behavior of the CustomResource.
      */
-    public static DeploymentSchedule get(String name, Output<String> id, @Nullable com.pulumi.resources.CustomResourceOptions options) {
-        return new DeploymentSchedule(name, id, options);
+    public static DriftSchedule get(String name, Output<String> id, @Nullable com.pulumi.resources.CustomResourceOptions options) {
+        return new DriftSchedule(name, id, options);
     }
 }

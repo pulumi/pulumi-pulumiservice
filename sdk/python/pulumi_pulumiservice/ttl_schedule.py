@@ -8,36 +8,31 @@ import pulumi
 import pulumi.runtime
 from typing import Any, Mapping, Optional, Sequence, Union, overload
 from . import _utilities
-from ._enums import *
 
-__all__ = ['DeploymentScheduleArgs', 'DeploymentSchedule']
+__all__ = ['TtlScheduleArgs', 'TtlSchedule']
 
 @pulumi.input_type
-class DeploymentScheduleArgs:
+class TtlScheduleArgs:
     def __init__(__self__, *,
                  organization: pulumi.Input[str],
                  project: pulumi.Input[str],
-                 pulumi_operation: pulumi.Input['PulumiOperation'],
                  stack: pulumi.Input[str],
-                 schedule_cron: Optional[pulumi.Input[str]] = None,
-                 timestamp: Optional[pulumi.Input[str]] = None):
+                 timestamp: pulumi.Input[str],
+                 delete_after_destroy: Optional[pulumi.Input[bool]] = None):
         """
-        The set of arguments for constructing a DeploymentSchedule resource.
+        The set of arguments for constructing a TtlSchedule resource.
         :param pulumi.Input[str] organization: Organization name.
         :param pulumi.Input[str] project: Project name.
-        :param pulumi.Input['PulumiOperation'] pulumi_operation: Which command to run.
         :param pulumi.Input[str] stack: Stack name.
-        :param pulumi.Input[str] schedule_cron: Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.
-        :param pulumi.Input[str] timestamp: The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+        :param pulumi.Input[str] timestamp: The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.
+        :param pulumi.Input[bool] delete_after_destroy: True if the stack and all associated history and settings should be deleted.
         """
         pulumi.set(__self__, "organization", organization)
         pulumi.set(__self__, "project", project)
-        pulumi.set(__self__, "pulumi_operation", pulumi_operation)
         pulumi.set(__self__, "stack", stack)
-        if schedule_cron is not None:
-            pulumi.set(__self__, "schedule_cron", schedule_cron)
-        if timestamp is not None:
-            pulumi.set(__self__, "timestamp", timestamp)
+        pulumi.set(__self__, "timestamp", timestamp)
+        if delete_after_destroy is not None:
+            pulumi.set(__self__, "delete_after_destroy", delete_after_destroy)
 
     @property
     @pulumi.getter
@@ -64,18 +59,6 @@ class DeploymentScheduleArgs:
         pulumi.set(self, "project", value)
 
     @property
-    @pulumi.getter(name="pulumiOperation")
-    def pulumi_operation(self) -> pulumi.Input['PulumiOperation']:
-        """
-        Which command to run.
-        """
-        return pulumi.get(self, "pulumi_operation")
-
-    @pulumi_operation.setter
-    def pulumi_operation(self, value: pulumi.Input['PulumiOperation']):
-        pulumi.set(self, "pulumi_operation", value)
-
-    @property
     @pulumi.getter
     def stack(self) -> pulumi.Input[str]:
         """
@@ -88,70 +71,68 @@ class DeploymentScheduleArgs:
         pulumi.set(self, "stack", value)
 
     @property
-    @pulumi.getter(name="scheduleCron")
-    def schedule_cron(self) -> Optional[pulumi.Input[str]]:
-        """
-        Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.
-        """
-        return pulumi.get(self, "schedule_cron")
-
-    @schedule_cron.setter
-    def schedule_cron(self, value: Optional[pulumi.Input[str]]):
-        pulumi.set(self, "schedule_cron", value)
-
-    @property
     @pulumi.getter
-    def timestamp(self) -> Optional[pulumi.Input[str]]:
+    def timestamp(self) -> pulumi.Input[str]:
         """
-        The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+        The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.
         """
         return pulumi.get(self, "timestamp")
 
     @timestamp.setter
-    def timestamp(self, value: Optional[pulumi.Input[str]]):
+    def timestamp(self, value: pulumi.Input[str]):
         pulumi.set(self, "timestamp", value)
 
+    @property
+    @pulumi.getter(name="deleteAfterDestroy")
+    def delete_after_destroy(self) -> Optional[pulumi.Input[bool]]:
+        """
+        True if the stack and all associated history and settings should be deleted.
+        """
+        return pulumi.get(self, "delete_after_destroy")
 
-class DeploymentSchedule(pulumi.CustomResource):
+    @delete_after_destroy.setter
+    def delete_after_destroy(self, value: Optional[pulumi.Input[bool]]):
+        pulumi.set(self, "delete_after_destroy", value)
+
+
+class TtlSchedule(pulumi.CustomResource):
     @overload
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 delete_after_destroy: Optional[pulumi.Input[bool]] = None,
                  organization: Optional[pulumi.Input[str]] = None,
                  project: Optional[pulumi.Input[str]] = None,
-                 pulumi_operation: Optional[pulumi.Input['PulumiOperation']] = None,
-                 schedule_cron: Optional[pulumi.Input[str]] = None,
                  stack: Optional[pulumi.Input[str]] = None,
                  timestamp: Optional[pulumi.Input[str]] = None,
                  __props__=None):
         """
-        A scheduled recurring or single time run of a pulumi command.
+        A scheduled stack destory run.
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
+        :param pulumi.Input[bool] delete_after_destroy: True if the stack and all associated history and settings should be deleted.
         :param pulumi.Input[str] organization: Organization name.
         :param pulumi.Input[str] project: Project name.
-        :param pulumi.Input['PulumiOperation'] pulumi_operation: Which command to run.
-        :param pulumi.Input[str] schedule_cron: Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.
         :param pulumi.Input[str] stack: Stack name.
-        :param pulumi.Input[str] timestamp: The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+        :param pulumi.Input[str] timestamp: The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.
         """
         ...
     @overload
     def __init__(__self__,
                  resource_name: str,
-                 args: DeploymentScheduleArgs,
+                 args: TtlScheduleArgs,
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
-        A scheduled recurring or single time run of a pulumi command.
+        A scheduled stack destory run.
 
         :param str resource_name: The name of the resource.
-        :param DeploymentScheduleArgs args: The arguments to use to populate this resource's properties.
+        :param TtlScheduleArgs args: The arguments to use to populate this resource's properties.
         :param pulumi.ResourceOptions opts: Options for the resource.
         """
         ...
     def __init__(__self__, resource_name: str, *args, **kwargs):
-        resource_args, opts = _utilities.get_resource_args_opts(DeploymentScheduleArgs, pulumi.ResourceOptions, *args, **kwargs)
+        resource_args, opts = _utilities.get_resource_args_opts(TtlScheduleArgs, pulumi.ResourceOptions, *args, **kwargs)
         if resource_args is not None:
             __self__._internal_init(resource_name, opts, **resource_args.__dict__)
         else:
@@ -160,10 +141,9 @@ class DeploymentSchedule(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 delete_after_destroy: Optional[pulumi.Input[bool]] = None,
                  organization: Optional[pulumi.Input[str]] = None,
                  project: Optional[pulumi.Input[str]] = None,
-                 pulumi_operation: Optional[pulumi.Input['PulumiOperation']] = None,
-                 schedule_cron: Optional[pulumi.Input[str]] = None,
                  stack: Optional[pulumi.Input[str]] = None,
                  timestamp: Optional[pulumi.Input[str]] = None,
                  __props__=None):
@@ -173,25 +153,24 @@ class DeploymentSchedule(pulumi.CustomResource):
         if opts.id is None:
             if __props__ is not None:
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
-            __props__ = DeploymentScheduleArgs.__new__(DeploymentScheduleArgs)
+            __props__ = TtlScheduleArgs.__new__(TtlScheduleArgs)
 
+            __props__.__dict__["delete_after_destroy"] = delete_after_destroy
             if organization is None and not opts.urn:
                 raise TypeError("Missing required property 'organization'")
             __props__.__dict__["organization"] = organization
             if project is None and not opts.urn:
                 raise TypeError("Missing required property 'project'")
             __props__.__dict__["project"] = project
-            if pulumi_operation is None and not opts.urn:
-                raise TypeError("Missing required property 'pulumi_operation'")
-            __props__.__dict__["pulumi_operation"] = pulumi_operation
-            __props__.__dict__["schedule_cron"] = schedule_cron
             if stack is None and not opts.urn:
                 raise TypeError("Missing required property 'stack'")
             __props__.__dict__["stack"] = stack
+            if timestamp is None and not opts.urn:
+                raise TypeError("Missing required property 'timestamp'")
             __props__.__dict__["timestamp"] = timestamp
             __props__.__dict__["schedule_id"] = None
-        super(DeploymentSchedule, __self__).__init__(
-            'pulumiservice:index:DeploymentSchedule',
+        super(TtlSchedule, __self__).__init__(
+            'pulumiservice:index:TtlSchedule',
             resource_name,
             __props__,
             opts)
@@ -199,9 +178,9 @@ class DeploymentSchedule(pulumi.CustomResource):
     @staticmethod
     def get(resource_name: str,
             id: pulumi.Input[str],
-            opts: Optional[pulumi.ResourceOptions] = None) -> 'DeploymentSchedule':
+            opts: Optional[pulumi.ResourceOptions] = None) -> 'TtlSchedule':
         """
-        Get an existing DeploymentSchedule resource's state with the given name, id, and optional extra
+        Get an existing TtlSchedule resource's state with the given name, id, and optional extra
         properties used to qualify the lookup.
 
         :param str resource_name: The unique name of the resulting resource.
@@ -210,16 +189,23 @@ class DeploymentSchedule(pulumi.CustomResource):
         """
         opts = pulumi.ResourceOptions.merge(opts, pulumi.ResourceOptions(id=id))
 
-        __props__ = DeploymentScheduleArgs.__new__(DeploymentScheduleArgs)
+        __props__ = TtlScheduleArgs.__new__(TtlScheduleArgs)
 
+        __props__.__dict__["delete_after_destroy"] = None
         __props__.__dict__["organization"] = None
         __props__.__dict__["project"] = None
-        __props__.__dict__["pulumi_operation"] = None
-        __props__.__dict__["schedule_cron"] = None
         __props__.__dict__["schedule_id"] = None
         __props__.__dict__["stack"] = None
         __props__.__dict__["timestamp"] = None
-        return DeploymentSchedule(resource_name, opts=opts, __props__=__props__)
+        return TtlSchedule(resource_name, opts=opts, __props__=__props__)
+
+    @property
+    @pulumi.getter(name="deleteAfterDestroy")
+    def delete_after_destroy(self) -> pulumi.Output[Optional[bool]]:
+        """
+        True if the stack and all associated history and settings should be deleted.
+        """
+        return pulumi.get(self, "delete_after_destroy")
 
     @property
     @pulumi.getter
@@ -236,22 +222,6 @@ class DeploymentSchedule(pulumi.CustomResource):
         Project name.
         """
         return pulumi.get(self, "project")
-
-    @property
-    @pulumi.getter(name="pulumiOperation")
-    def pulumi_operation(self) -> pulumi.Output['PulumiOperation']:
-        """
-        Which operation to run.
-        """
-        return pulumi.get(self, "pulumi_operation")
-
-    @property
-    @pulumi.getter(name="scheduleCron")
-    def schedule_cron(self) -> pulumi.Output[Optional[str]]:
-        """
-        Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.
-        """
-        return pulumi.get(self, "schedule_cron")
 
     @property
     @pulumi.getter(name="scheduleId")
@@ -271,9 +241,9 @@ class DeploymentSchedule(pulumi.CustomResource):
 
     @property
     @pulumi.getter
-    def timestamp(self) -> pulumi.Output[Optional[str]]:
+    def timestamp(self) -> pulumi.Output[str]:
         """
-        The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+        The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.
         """
         return pulumi.get(self, "timestamp")
 

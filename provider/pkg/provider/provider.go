@@ -155,6 +155,12 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 		&PulumiServiceDeploymentScheduleResource{
 			client: client,
 		},
+		&PulumiServiceDriftScheduleResource{
+			client: client,
+		},
+		&PulumiServiceTtlScheduleResource{
+			client: client,
+		},
 	}
 
 	for _, sr := range k.pulumiResources {

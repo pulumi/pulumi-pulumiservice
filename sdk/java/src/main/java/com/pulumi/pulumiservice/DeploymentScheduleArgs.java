@@ -93,14 +93,14 @@ public final class DeploymentScheduleArgs extends com.pulumi.resources.ResourceA
     }
 
     /**
-     * When to run the pulumi command, in ISO format like this 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+     * The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
      * 
      */
     @Import(name="timestamp")
     private @Nullable Output<String> timestamp;
 
     /**
-     * @return When to run the pulumi command, in ISO format like this 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+     * @return The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
      * 
      */
     public Optional<Output<String>> timestamp() {
@@ -242,7 +242,7 @@ public final class DeploymentScheduleArgs extends com.pulumi.resources.ResourceA
         }
 
         /**
-         * @param timestamp When to run the pulumi command, in ISO format like this 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+         * @param timestamp The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
          * 
          * @return builder
          * 
@@ -253,7 +253,7 @@ public final class DeploymentScheduleArgs extends com.pulumi.resources.ResourceA
         }
 
         /**
-         * @param timestamp When to run the pulumi command, in ISO format like this 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+         * @param timestamp The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
          * 
          * @return builder
          * 

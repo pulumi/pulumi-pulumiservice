@@ -10,12 +10,14 @@ from .access_token import *
 from .agent_pool import *
 from .deployment_schedule import *
 from .deployment_settings import *
+from .drift_schedule import *
 from .org_access_token import *
 from .provider import *
 from .stack_tag import *
 from .team import *
 from .team_access_token import *
 from .team_stack_permission import *
+from .ttl_schedule import *
 from .webhook import *
 from ._inputs import *
 
@@ -38,11 +40,13 @@ _utilities.register(
    "pulumiservice:index:AgentPool": "AgentPool",
    "pulumiservice:index:DeploymentSchedule": "DeploymentSchedule",
    "pulumiservice:index:DeploymentSettings": "DeploymentSettings",
+   "pulumiservice:index:DriftSchedule": "DriftSchedule",
    "pulumiservice:index:OrgAccessToken": "OrgAccessToken",
    "pulumiservice:index:StackTag": "StackTag",
    "pulumiservice:index:Team": "Team",
    "pulumiservice:index:TeamAccessToken": "TeamAccessToken",
    "pulumiservice:index:TeamStackPermission": "TeamStackPermission",
+   "pulumiservice:index:TtlSchedule": "TtlSchedule",
    "pulumiservice:index:Webhook": "Webhook"
   }
  }

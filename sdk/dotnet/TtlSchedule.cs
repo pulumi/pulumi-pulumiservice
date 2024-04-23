@@ -10,11 +10,17 @@ using Pulumi.Serialization;
 namespace Pulumi.PulumiService
 {
     /// <summary>
-    /// A scheduled recurring or single time run of a pulumi command.
+    /// A scheduled stack destory run.
     /// </summary>
-    [PulumiServiceResourceType("pulumiservice:index:DeploymentSchedule")]
-    public partial class DeploymentSchedule : global::Pulumi.CustomResource
+    [PulumiServiceResourceType("pulumiservice:index:TtlSchedule")]
+    public partial class TtlSchedule : global::Pulumi.CustomResource
     {
+        /// <summary>
+        /// True if the stack and all associated history and settings should be deleted.
+        /// </summary>
+        [Output("deleteAfterDestroy")]
+        public Output<bool?> DeleteAfterDestroy { get; private set; } = null!;
+
         /// <summary>
         /// Organization name.
         /// </summary>
@@ -26,18 +32,6 @@ namespace Pulumi.PulumiService
         /// </summary>
         [Output("project")]
         public Output<string> Project { get; private set; } = null!;
-
-        /// <summary>
-        /// Which operation to run.
-        /// </summary>
-        [Output("pulumiOperation")]
-        public Output<Pulumi.PulumiService.PulumiOperation> PulumiOperation { get; private set; } = null!;
-
-        /// <summary>
-        /// Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.
-        /// </summary>
-        [Output("scheduleCron")]
-        public Output<string?> ScheduleCron { get; private set; } = null!;
 
         /// <summary>
         /// Schedule ID of the created schedule, assigned by Pulumi Cloud.
@@ -52,26 +46,26 @@ namespace Pulumi.PulumiService
         public Output<string> Stack { get; private set; } = null!;
 
         /// <summary>
-        /// The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+        /// The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.
         /// </summary>
         [Output("timestamp")]
-        public Output<string?> Timestamp { get; private set; } = null!;
+        public Output<string> Timestamp { get; private set; } = null!;
 
 
         /// <summary>
-        /// Create a DeploymentSchedule resource with the given unique name, arguments, and options.
+        /// Create a TtlSchedule resource with the given unique name, arguments, and options.
         /// </summary>
         ///
         /// <param name="name">The unique name of the resource</param>
         /// <param name="args">The arguments used to populate this resource's properties</param>
         /// <param name="options">A bag of options that control this resource's behavior</param>
-        public DeploymentSchedule(string name, DeploymentScheduleArgs args, CustomResourceOptions? options = null)
-            : base("pulumiservice:index:DeploymentSchedule", name, args ?? new DeploymentScheduleArgs(), MakeResourceOptions(options, ""))
+        public TtlSchedule(string name, TtlScheduleArgs args, CustomResourceOptions? options = null)
+            : base("pulumiservice:index:TtlSchedule", name, args ?? new TtlScheduleArgs(), MakeResourceOptions(options, ""))
         {
         }
 
-        private DeploymentSchedule(string name, Input<string> id, CustomResourceOptions? options = null)
-            : base("pulumiservice:index:DeploymentSchedule", name, null, MakeResourceOptions(options, id))
+        private TtlSchedule(string name, Input<string> id, CustomResourceOptions? options = null)
+            : base("pulumiservice:index:TtlSchedule", name, null, MakeResourceOptions(options, id))
         {
         }
 
@@ -87,21 +81,27 @@ namespace Pulumi.PulumiService
             return merged;
         }
         /// <summary>
-        /// Get an existing DeploymentSchedule resource's state with the given name, ID, and optional extra
+        /// Get an existing TtlSchedule resource's state with the given name, ID, and optional extra
         /// properties used to qualify the lookup.
         /// </summary>
         ///
         /// <param name="name">The unique name of the resulting resource.</param>
         /// <param name="id">The unique provider ID of the resource to lookup.</param>
         /// <param name="options">A bag of options that control this resource's behavior</param>
-        public static DeploymentSchedule Get(string name, Input<string> id, CustomResourceOptions? options = null)
+        public static TtlSchedule Get(string name, Input<string> id, CustomResourceOptions? options = null)
         {
-            return new DeploymentSchedule(name, id, options);
+            return new TtlSchedule(name, id, options);
         }
     }
 
-    public sealed class DeploymentScheduleArgs : global::Pulumi.ResourceArgs
+    public sealed class TtlScheduleArgs : global::Pulumi.ResourceArgs
     {
+        /// <summary>
+        /// True if the stack and all associated history and settings should be deleted.
+        /// </summary>
+        [Input("deleteAfterDestroy")]
+        public Input<bool>? DeleteAfterDestroy { get; set; }
+
         /// <summary>
         /// Organization name.
         /// </summary>
@@ -115,32 +115,20 @@ namespace Pulumi.PulumiService
         public Input<string> Project { get; set; } = null!;
 
         /// <summary>
-        /// Which command to run.
-        /// </summary>
-        [Input("pulumiOperation", required: true)]
-        public Input<Pulumi.PulumiService.PulumiOperation> PulumiOperation { get; set; } = null!;
-
-        /// <summary>
-        /// Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.
-        /// </summary>
-        [Input("scheduleCron")]
-        public Input<string>? ScheduleCron { get; set; }
-
-        /// <summary>
         /// Stack name.
         /// </summary>
         [Input("stack", required: true)]
         public Input<string> Stack { get; set; } = null!;
 
         /// <summary>
-        /// The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+        /// The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.
         /// </summary>
-        [Input("timestamp")]
-        public Input<string>? Timestamp { get; set; }
+        [Input("timestamp", required: true)]
+        public Input<string> Timestamp { get; set; } = null!;
 
-        public DeploymentScheduleArgs()
+        public TtlScheduleArgs()
         {
         }
-        public static new DeploymentScheduleArgs Empty => new DeploymentScheduleArgs();
+        public static new TtlScheduleArgs Empty => new TtlScheduleArgs();
     }
 }

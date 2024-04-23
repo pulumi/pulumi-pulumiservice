@@ -25,10 +25,10 @@ type DeploymentSchedule struct {
 	// Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.
 	ScheduleCron pulumi.StringPtrOutput `pulumi:"scheduleCron"`
 	// Schedule ID of the created schedule, assigned by Pulumi Cloud.
-	ScheduleID pulumi.StringOutput `pulumi:"scheduleID"`
+	ScheduleId pulumi.StringOutput `pulumi:"scheduleId"`
 	// Stack name.
 	Stack pulumi.StringOutput `pulumi:"stack"`
-	// When to run the pulumi command, in ISO format like this 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+	// The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
 	Timestamp pulumi.StringPtrOutput `pulumi:"timestamp"`
 }
 
@@ -94,7 +94,7 @@ type deploymentScheduleArgs struct {
 	ScheduleCron *string `pulumi:"scheduleCron"`
 	// Stack name.
 	Stack string `pulumi:"stack"`
-	// When to run the pulumi command, in ISO format like this 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+	// The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
 	Timestamp *string `pulumi:"timestamp"`
 }
 
@@ -110,7 +110,7 @@ type DeploymentScheduleArgs struct {
 	ScheduleCron pulumi.StringPtrInput
 	// Stack name.
 	Stack pulumi.StringInput
-	// When to run the pulumi command, in ISO format like this 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+	// The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
 	Timestamp pulumi.StringPtrInput
 }
 
@@ -222,8 +222,8 @@ func (o DeploymentScheduleOutput) ScheduleCron() pulumi.StringPtrOutput {
 }
 
 // Schedule ID of the created schedule, assigned by Pulumi Cloud.
-func (o DeploymentScheduleOutput) ScheduleID() pulumi.StringOutput {
-	return o.ApplyT(func(v *DeploymentSchedule) pulumi.StringOutput { return v.ScheduleID }).(pulumi.StringOutput)
+func (o DeploymentScheduleOutput) ScheduleId() pulumi.StringOutput {
+	return o.ApplyT(func(v *DeploymentSchedule) pulumi.StringOutput { return v.ScheduleId }).(pulumi.StringOutput)
 }
 
 // Stack name.
@@ -231,7 +231,7 @@ func (o DeploymentScheduleOutput) Stack() pulumi.StringOutput {
 	return o.ApplyT(func(v *DeploymentSchedule) pulumi.StringOutput { return v.Stack }).(pulumi.StringOutput)
 }
 
-// When to run the pulumi command, in ISO format like this 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+// The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
 func (o DeploymentScheduleOutput) Timestamp() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *DeploymentSchedule) pulumi.StringPtrOutput { return v.Timestamp }).(pulumi.StringPtrOutput)
 }
