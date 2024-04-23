@@ -19,8 +19,8 @@ env:
   PULUMI_TEST_OWNER: service-provider-test-org
   PULUMI_TEST_USE_SERVICE: true
 
-  PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-  PYPI_USERNAME: pulumi
+  PYPI_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+  PYPI_USERNAME: __token__
   PUBLISH_PYPI: true
   TRAVIS_OS_NAME: linux
 
