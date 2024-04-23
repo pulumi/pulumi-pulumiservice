@@ -147,7 +147,7 @@ jobs:
       run: make gen provider
     - name: Tar provider binaries
       run: tar -zcf ${{ github.workspace }}/bin/provider.tar.gz -C ${{ github.workspace
-        }}/bin/ pulumi-resource-${{ env.PROVIDER }} pulumi-gen-${{ env.PROVIDER }}
+        }}/bin/ pulumi-resource-${{ env.PROVIDER }}
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
       with:
