@@ -79,7 +79,32 @@ import java.util.StringJoiner;
          * Trigger a webhook when a deployment fails.
          * 
          */
-        DeploymentFailed("deployment_failed");
+        DeploymentFailed("deployment_failed"),
+        /**
+         * Trigger a webhook when drift is detected.
+         * 
+         */
+        DriftDetected("drift_detected"),
+        /**
+         * Trigger a webhook when a drift detection run succeeds, regardless of whether drift is detected.
+         * 
+         */
+        DriftDetectionSucceeded("drift_detection_succeeded"),
+        /**
+         * Trigger a webhook when a drift detection run fails.
+         * 
+         */
+        DriftDetectionFailed("drift_detection_failed"),
+        /**
+         * Trigger a webhook when a drift remediation run succeeds.
+         * 
+         */
+        DriftRemediationSucceeded("drift_remediation_succeeded"),
+        /**
+         * Trigger a webhook when a drift remediation run fails.
+         * 
+         */
+        DriftRemediationFailed("drift_remediation_failed");
 
         private final String value;
 

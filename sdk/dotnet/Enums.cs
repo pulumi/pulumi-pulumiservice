@@ -153,6 +153,26 @@ namespace Pulumi.PulumiService
         /// Trigger a webhook when a deployment fails.
         /// </summary>
         public static WebhookFilters DeploymentFailed { get; } = new WebhookFilters("deployment_failed");
+        /// <summary>
+        /// Trigger a webhook when drift is detected.
+        /// </summary>
+        public static WebhookFilters DriftDetected { get; } = new WebhookFilters("drift_detected");
+        /// <summary>
+        /// Trigger a webhook when a drift detection run succeeds, regardless of whether drift is detected.
+        /// </summary>
+        public static WebhookFilters DriftDetectionSucceeded { get; } = new WebhookFilters("drift_detection_succeeded");
+        /// <summary>
+        /// Trigger a webhook when a drift detection run fails.
+        /// </summary>
+        public static WebhookFilters DriftDetectionFailed { get; } = new WebhookFilters("drift_detection_failed");
+        /// <summary>
+        /// Trigger a webhook when a drift remediation run succeeds.
+        /// </summary>
+        public static WebhookFilters DriftRemediationSucceeded { get; } = new WebhookFilters("drift_remediation_succeeded");
+        /// <summary>
+        /// Trigger a webhook when a drift remediation run fails.
+        /// </summary>
+        public static WebhookFilters DriftRemediationFailed { get; } = new WebhookFilters("drift_remediation_failed");
 
         public static bool operator ==(WebhookFilters left, WebhookFilters right) => left.Equals(right);
         public static bool operator !=(WebhookFilters left, WebhookFilters right) => !left.Equals(right);

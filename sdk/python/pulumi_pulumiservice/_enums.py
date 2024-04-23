@@ -103,6 +103,26 @@ class WebhookFilters(str, Enum):
     """
     Trigger a webhook when a deployment fails.
     """
+    DRIFT_DETECTED = "drift_detected"
+    """
+    Trigger a webhook when drift is detected.
+    """
+    DRIFT_DETECTION_SUCCEEDED = "drift_detection_succeeded"
+    """
+    Trigger a webhook when a drift detection run succeeds, regardless of whether drift is detected.
+    """
+    DRIFT_DETECTION_FAILED = "drift_detection_failed"
+    """
+    Trigger a webhook when a drift detection run fails.
+    """
+    DRIFT_REMEDIATION_SUCCEEDED = "drift_remediation_succeeded"
+    """
+    Trigger a webhook when a drift remediation run succeeds.
+    """
+    DRIFT_REMEDIATION_FAILED = "drift_remediation_failed"
+    """
+    Trigger a webhook when a drift remediation run fails.
+    """
 
 
 class WebhookFormat(str, Enum):

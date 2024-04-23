@@ -225,6 +225,16 @@ const (
 	WebhookFiltersDeploymentSucceeded = WebhookFilters("deployment_succeeded")
 	// Trigger a webhook when a deployment fails.
 	WebhookFiltersDeploymentFailed = WebhookFilters("deployment_failed")
+	// Trigger a webhook when drift is detected.
+	WebhookFiltersDriftDetected = WebhookFilters("drift_detected")
+	// Trigger a webhook when a drift detection run succeeds, regardless of whether drift is detected.
+	WebhookFiltersDriftDetectionSucceeded = WebhookFilters("drift_detection_succeeded")
+	// Trigger a webhook when a drift detection run fails.
+	WebhookFiltersDriftDetectionFailed = WebhookFilters("drift_detection_failed")
+	// Trigger a webhook when a drift remediation run succeeds.
+	WebhookFiltersDriftRemediationSucceeded = WebhookFilters("drift_remediation_succeeded")
+	// Trigger a webhook when a drift remediation run fails.
+	WebhookFiltersDriftRemediationFailed = WebhookFilters("drift_remediation_failed")
 )
 
 func (WebhookFilters) ElementType() reflect.Type {
@@ -363,6 +373,11 @@ func (o WebhookFiltersPtrOutput) ToStringPtrOutputWithContext(ctx context.Contex
 //	WebhookFiltersDeploymentStarted
 //	WebhookFiltersDeploymentSucceeded
 //	WebhookFiltersDeploymentFailed
+//	WebhookFiltersDriftDetected
+//	WebhookFiltersDriftDetectionSucceeded
+//	WebhookFiltersDriftDetectionFailed
+//	WebhookFiltersDriftRemediationSucceeded
+//	WebhookFiltersDriftRemediationFailed
 type WebhookFiltersInput interface {
 	pulumi.Input
 
