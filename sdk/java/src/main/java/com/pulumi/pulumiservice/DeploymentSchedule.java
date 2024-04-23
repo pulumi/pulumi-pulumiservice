@@ -80,15 +80,15 @@ public class DeploymentSchedule extends com.pulumi.resources.CustomResource {
      * Schedule ID of the created schedule, assigned by Pulumi Cloud.
      * 
      */
-    @Export(name="scheduleID", refs={String.class}, tree="[0]")
-    private Output<String> scheduleID;
+    @Export(name="scheduleId", refs={String.class}, tree="[0]")
+    private Output<String> scheduleId;
 
     /**
      * @return Schedule ID of the created schedule, assigned by Pulumi Cloud.
      * 
      */
-    public Output<String> scheduleID() {
-        return this.scheduleID;
+    public Output<String> scheduleId() {
+        return this.scheduleId;
     }
     /**
      * Stack name.
@@ -105,14 +105,14 @@ public class DeploymentSchedule extends com.pulumi.resources.CustomResource {
         return this.stack;
     }
     /**
-     * When to run the pulumi command, in ISO format like this 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+     * The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
      * 
      */
     @Export(name="timestamp", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> timestamp;
 
     /**
-     * @return When to run the pulumi command, in ISO format like this 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+     * @return The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
      * 
      */
     public Output<Optional<String>> timestamp() {

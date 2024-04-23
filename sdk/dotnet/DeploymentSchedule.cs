@@ -42,8 +42,8 @@ namespace Pulumi.PulumiService
         /// <summary>
         /// Schedule ID of the created schedule, assigned by Pulumi Cloud.
         /// </summary>
-        [Output("scheduleID")]
-        public Output<string> ScheduleID { get; private set; } = null!;
+        [Output("scheduleId")]
+        public Output<string> ScheduleId { get; private set; } = null!;
 
         /// <summary>
         /// Stack name.
@@ -52,7 +52,7 @@ namespace Pulumi.PulumiService
         public Output<string> Stack { get; private set; } = null!;
 
         /// <summary>
-        /// When to run the pulumi command, in ISO format like this 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+        /// The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
         /// </summary>
         [Output("timestamp")]
         public Output<string?> Timestamp { get; private set; } = null!;
@@ -133,7 +133,7 @@ namespace Pulumi.PulumiService
         public Input<string> Stack { get; set; } = null!;
 
         /// <summary>
-        /// When to run the pulumi command, in ISO format like this 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+        /// The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
         /// </summary>
         [Input("timestamp")]
         public Input<string>? Timestamp { get; set; }

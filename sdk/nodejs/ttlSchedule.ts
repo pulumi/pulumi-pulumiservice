@@ -35,6 +35,10 @@ export class TtlSchedule extends pulumi.CustomResource {
     }
 
     /**
+     * True if the stack and all associated history and settings should be deleted.
+     */
+    public readonly deleteAfterDestroy!: pulumi.Output<boolean | undefined>;
+    /**
      * Organization name.
      */
     public readonly organization!: pulumi.Output<string>;
@@ -45,13 +49,13 @@ export class TtlSchedule extends pulumi.CustomResource {
     /**
      * Schedule ID of the created schedule, assigned by Pulumi Cloud.
      */
-    public /*out*/ readonly scheduleID!: pulumi.Output<string>;
+    public /*out*/ readonly scheduleId!: pulumi.Output<string>;
     /**
      * Stack name.
      */
     public readonly stack!: pulumi.Output<string>;
     /**
-     * When to run the destroy command, in ISO format like this 2020-01-01T00:00:00Z.
+     * The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.
      */
     public readonly timestamp!: pulumi.Output<string>;
 
@@ -83,11 +87,12 @@ export class TtlSchedule extends pulumi.CustomResource {
             resourceInputs["project"] = args ? args.project : undefined;
             resourceInputs["stack"] = args ? args.stack : undefined;
             resourceInputs["timestamp"] = args ? args.timestamp : undefined;
-            resourceInputs["scheduleID"] = undefined /*out*/;
+            resourceInputs["scheduleId"] = undefined /*out*/;
         } else {
+            resourceInputs["deleteAfterDestroy"] = undefined /*out*/;
             resourceInputs["organization"] = undefined /*out*/;
             resourceInputs["project"] = undefined /*out*/;
-            resourceInputs["scheduleID"] = undefined /*out*/;
+            resourceInputs["scheduleId"] = undefined /*out*/;
             resourceInputs["stack"] = undefined /*out*/;
             resourceInputs["timestamp"] = undefined /*out*/;
         }
@@ -101,7 +106,7 @@ export class TtlSchedule extends pulumi.CustomResource {
  */
 export interface TtlScheduleArgs {
     /**
-     * Whether the stack should be deleted after it is destroyed.
+     * True if the stack and all associated history and settings should be deleted.
      */
     deleteAfterDestroy?: pulumi.Input<boolean>;
     /**
@@ -117,7 +122,7 @@ export interface TtlScheduleArgs {
      */
     stack: pulumi.Input<string>;
     /**
-     * When to run the destroy command, in ISO format like this 2020-01-01T00:00:00Z.
+     * The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.
      */
     timestamp: pulumi.Input<string>;
 }

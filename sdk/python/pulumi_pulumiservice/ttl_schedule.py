@@ -24,8 +24,8 @@ class TtlScheduleArgs:
         :param pulumi.Input[str] organization: Organization name.
         :param pulumi.Input[str] project: Project name.
         :param pulumi.Input[str] stack: Stack name.
-        :param pulumi.Input[str] timestamp: When to run the destroy command, in ISO format like this 2020-01-01T00:00:00Z.
-        :param pulumi.Input[bool] delete_after_destroy: Whether the stack should be deleted after it is destroyed.
+        :param pulumi.Input[str] timestamp: The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.
+        :param pulumi.Input[bool] delete_after_destroy: True if the stack and all associated history and settings should be deleted.
         """
         pulumi.set(__self__, "organization", organization)
         pulumi.set(__self__, "project", project)
@@ -74,7 +74,7 @@ class TtlScheduleArgs:
     @pulumi.getter
     def timestamp(self) -> pulumi.Input[str]:
         """
-        When to run the destroy command, in ISO format like this 2020-01-01T00:00:00Z.
+        The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.
         """
         return pulumi.get(self, "timestamp")
 
@@ -86,7 +86,7 @@ class TtlScheduleArgs:
     @pulumi.getter(name="deleteAfterDestroy")
     def delete_after_destroy(self) -> Optional[pulumi.Input[bool]]:
         """
-        Whether the stack should be deleted after it is destroyed.
+        True if the stack and all associated history and settings should be deleted.
         """
         return pulumi.get(self, "delete_after_destroy")
 
@@ -111,11 +111,11 @@ class TtlSchedule(pulumi.CustomResource):
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
-        :param pulumi.Input[bool] delete_after_destroy: Whether the stack should be deleted after it is destroyed.
+        :param pulumi.Input[bool] delete_after_destroy: True if the stack and all associated history and settings should be deleted.
         :param pulumi.Input[str] organization: Organization name.
         :param pulumi.Input[str] project: Project name.
         :param pulumi.Input[str] stack: Stack name.
-        :param pulumi.Input[str] timestamp: When to run the destroy command, in ISO format like this 2020-01-01T00:00:00Z.
+        :param pulumi.Input[str] timestamp: The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.
         """
         ...
     @overload
@@ -191,12 +191,21 @@ class TtlSchedule(pulumi.CustomResource):
 
         __props__ = TtlScheduleArgs.__new__(TtlScheduleArgs)
 
+        __props__.__dict__["delete_after_destroy"] = None
         __props__.__dict__["organization"] = None
         __props__.__dict__["project"] = None
         __props__.__dict__["schedule_id"] = None
         __props__.__dict__["stack"] = None
         __props__.__dict__["timestamp"] = None
         return TtlSchedule(resource_name, opts=opts, __props__=__props__)
+
+    @property
+    @pulumi.getter(name="deleteAfterDestroy")
+    def delete_after_destroy(self) -> pulumi.Output[Optional[bool]]:
+        """
+        True if the stack and all associated history and settings should be deleted.
+        """
+        return pulumi.get(self, "delete_after_destroy")
 
     @property
     @pulumi.getter
@@ -215,7 +224,7 @@ class TtlSchedule(pulumi.CustomResource):
         return pulumi.get(self, "project")
 
     @property
-    @pulumi.getter(name="scheduleID")
+    @pulumi.getter(name="scheduleId")
     def schedule_id(self) -> pulumi.Output[str]:
         """
         Schedule ID of the created schedule, assigned by Pulumi Cloud.
@@ -234,7 +243,7 @@ class TtlSchedule(pulumi.CustomResource):
     @pulumi.getter
     def timestamp(self) -> pulumi.Output[str]:
         """
-        When to run the destroy command, in ISO format like this 2020-01-01T00:00:00Z.
+        The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.
         """
         return pulumi.get(self, "timestamp")
 

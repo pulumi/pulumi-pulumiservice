@@ -28,7 +28,7 @@ class DeploymentScheduleArgs:
         :param pulumi.Input['PulumiOperation'] pulumi_operation: Which command to run.
         :param pulumi.Input[str] stack: Stack name.
         :param pulumi.Input[str] schedule_cron: Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.
-        :param pulumi.Input[str] timestamp: When to run the pulumi command, in ISO format like this 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+        :param pulumi.Input[str] timestamp: The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
         """
         pulumi.set(__self__, "organization", organization)
         pulumi.set(__self__, "project", project)
@@ -103,7 +103,7 @@ class DeploymentScheduleArgs:
     @pulumi.getter
     def timestamp(self) -> Optional[pulumi.Input[str]]:
         """
-        When to run the pulumi command, in ISO format like this 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+        The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
         """
         return pulumi.get(self, "timestamp")
 
@@ -134,7 +134,7 @@ class DeploymentSchedule(pulumi.CustomResource):
         :param pulumi.Input['PulumiOperation'] pulumi_operation: Which command to run.
         :param pulumi.Input[str] schedule_cron: Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.
         :param pulumi.Input[str] stack: Stack name.
-        :param pulumi.Input[str] timestamp: When to run the pulumi command, in ISO format like this 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+        :param pulumi.Input[str] timestamp: The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
         """
         ...
     @overload
@@ -254,7 +254,7 @@ class DeploymentSchedule(pulumi.CustomResource):
         return pulumi.get(self, "schedule_cron")
 
     @property
-    @pulumi.getter(name="scheduleID")
+    @pulumi.getter(name="scheduleId")
     def schedule_id(self) -> pulumi.Output[str]:
         """
         Schedule ID of the created schedule, assigned by Pulumi Cloud.
@@ -273,7 +273,7 @@ class DeploymentSchedule(pulumi.CustomResource):
     @pulumi.getter
     def timestamp(self) -> pulumi.Output[Optional[str]]:
         """
-        When to run the pulumi command, in ISO format like this 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+        The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
         """
         return pulumi.get(self, "timestamp")
 

@@ -16,6 +16,12 @@ namespace Pulumi.PulumiService
     public partial class TtlSchedule : global::Pulumi.CustomResource
     {
         /// <summary>
+        /// True if the stack and all associated history and settings should be deleted.
+        /// </summary>
+        [Output("deleteAfterDestroy")]
+        public Output<bool?> DeleteAfterDestroy { get; private set; } = null!;
+
+        /// <summary>
         /// Organization name.
         /// </summary>
         [Output("organization")]
@@ -30,8 +36,8 @@ namespace Pulumi.PulumiService
         /// <summary>
         /// Schedule ID of the created schedule, assigned by Pulumi Cloud.
         /// </summary>
-        [Output("scheduleID")]
-        public Output<string> ScheduleID { get; private set; } = null!;
+        [Output("scheduleId")]
+        public Output<string> ScheduleId { get; private set; } = null!;
 
         /// <summary>
         /// Stack name.
@@ -40,7 +46,7 @@ namespace Pulumi.PulumiService
         public Output<string> Stack { get; private set; } = null!;
 
         /// <summary>
-        /// When to run the destroy command, in ISO format like this 2020-01-01T00:00:00Z.
+        /// The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.
         /// </summary>
         [Output("timestamp")]
         public Output<string> Timestamp { get; private set; } = null!;
@@ -91,7 +97,7 @@ namespace Pulumi.PulumiService
     public sealed class TtlScheduleArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
-        /// Whether the stack should be deleted after it is destroyed.
+        /// True if the stack and all associated history and settings should be deleted.
         /// </summary>
         [Input("deleteAfterDestroy")]
         public Input<bool>? DeleteAfterDestroy { get; set; }
@@ -115,7 +121,7 @@ namespace Pulumi.PulumiService
         public Input<string> Stack { get; set; } = null!;
 
         /// <summary>
-        /// When to run the destroy command, in ISO format like this 2020-01-01T00:00:00Z.
+        /// The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.
         /// </summary>
         [Input("timestamp", required: true)]
         public Input<string> Timestamp { get; set; } = null!;

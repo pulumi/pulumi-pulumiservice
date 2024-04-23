@@ -56,13 +56,13 @@ export class DeploymentSchedule extends pulumi.CustomResource {
     /**
      * Schedule ID of the created schedule, assigned by Pulumi Cloud.
      */
-    public /*out*/ readonly scheduleID!: pulumi.Output<string>;
+    public /*out*/ readonly scheduleId!: pulumi.Output<string>;
     /**
      * Stack name.
      */
     public readonly stack!: pulumi.Output<string>;
     /**
-     * When to run the pulumi command, in ISO format like this 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+     * The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
      */
     public readonly timestamp!: pulumi.Output<string | undefined>;
 
@@ -95,13 +95,13 @@ export class DeploymentSchedule extends pulumi.CustomResource {
             resourceInputs["scheduleCron"] = args ? args.scheduleCron : undefined;
             resourceInputs["stack"] = args ? args.stack : undefined;
             resourceInputs["timestamp"] = args ? args.timestamp : undefined;
-            resourceInputs["scheduleID"] = undefined /*out*/;
+            resourceInputs["scheduleId"] = undefined /*out*/;
         } else {
             resourceInputs["organization"] = undefined /*out*/;
             resourceInputs["project"] = undefined /*out*/;
             resourceInputs["pulumiOperation"] = undefined /*out*/;
             resourceInputs["scheduleCron"] = undefined /*out*/;
-            resourceInputs["scheduleID"] = undefined /*out*/;
+            resourceInputs["scheduleId"] = undefined /*out*/;
             resourceInputs["stack"] = undefined /*out*/;
             resourceInputs["timestamp"] = undefined /*out*/;
         }
@@ -135,7 +135,7 @@ export interface DeploymentScheduleArgs {
      */
     stack: pulumi.Input<string>;
     /**
-     * When to run the pulumi command, in ISO format like this 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+     * The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
      */
     timestamp?: pulumi.Input<string>;
 }

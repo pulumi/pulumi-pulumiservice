@@ -42,8 +42,8 @@ namespace Pulumi.PulumiService
         /// <summary>
         /// Schedule ID of the created schedule, assigned by Pulumi Cloud.
         /// </summary>
-        [Output("scheduleID")]
-        public Output<string> ScheduleID { get; private set; } = null!;
+        [Output("scheduleId")]
+        public Output<string> ScheduleId { get; private set; } = null!;
 
         /// <summary>
         /// Stack name.

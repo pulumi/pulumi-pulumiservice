@@ -18,14 +18,14 @@ public final class TtlScheduleArgs extends com.pulumi.resources.ResourceArgs {
     public static final TtlScheduleArgs Empty = new TtlScheduleArgs();
 
     /**
-     * Whether the stack should be deleted after it is destroyed.
+     * True if the stack and all associated history and settings should be deleted.
      * 
      */
     @Import(name="deleteAfterDestroy")
     private @Nullable Output<Boolean> deleteAfterDestroy;
 
     /**
-     * @return Whether the stack should be deleted after it is destroyed.
+     * @return True if the stack and all associated history and settings should be deleted.
      * 
      */
     public Optional<Output<Boolean>> deleteAfterDestroy() {
@@ -78,14 +78,14 @@ public final class TtlScheduleArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * When to run the destroy command, in ISO format like this 2020-01-01T00:00:00Z.
+     * The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.
      * 
      */
     @Import(name="timestamp", required=true)
     private Output<String> timestamp;
 
     /**
-     * @return When to run the destroy command, in ISO format like this 2020-01-01T00:00:00Z.
+     * @return The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.
      * 
      */
     public Output<String> timestamp() {
@@ -121,7 +121,7 @@ public final class TtlScheduleArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param deleteAfterDestroy Whether the stack should be deleted after it is destroyed.
+         * @param deleteAfterDestroy True if the stack and all associated history and settings should be deleted.
          * 
          * @return builder
          * 
@@ -132,7 +132,7 @@ public final class TtlScheduleArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param deleteAfterDestroy Whether the stack should be deleted after it is destroyed.
+         * @param deleteAfterDestroy True if the stack and all associated history and settings should be deleted.
          * 
          * @return builder
          * 
@@ -205,7 +205,7 @@ public final class TtlScheduleArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param timestamp When to run the destroy command, in ISO format like this 2020-01-01T00:00:00Z.
+         * @param timestamp The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.
          * 
          * @return builder
          * 
@@ -216,7 +216,7 @@ public final class TtlScheduleArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param timestamp When to run the destroy command, in ISO format like this 2020-01-01T00:00:00Z.
+         * @param timestamp The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.
          * 
          * @return builder
          * 

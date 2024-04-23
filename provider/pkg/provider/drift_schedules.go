@@ -19,21 +19,19 @@ type PulumiServiceDriftScheduleResource struct {
 
 type PulumiServiceDriftScheduleInput struct {
 	Stack         pulumiapi.StackName
-	ScheduleCron  *string `pulumi:"scheduleCron"`
-	AutoRemediate bool    `pulumi:"autoRemediate"`
+	ScheduleCron  string `pulumi:"scheduleCron"`
+	AutoRemediate bool   `pulumi:"autoRemediate"`
 }
 
 type PulumiServiceDriftScheduleOutput struct {
 	Input      PulumiServiceDriftScheduleInput
-	ScheduleID string `pulumi:"scheduleID"`
+	ScheduleID string `pulumi:"scheduleId"`
 }
 
 func (i *PulumiServiceDriftScheduleInput) ToPropertyMap() resource.PropertyMap {
 	propertyMap := StackToPropertyMap(i.Stack)
 
-	if i.ScheduleCron != nil {
-		propertyMap["scheduleCron"] = resource.NewPropertyValue(i.ScheduleCron)
-	}
+	propertyMap["scheduleCron"] = resource.NewPropertyValue(i.ScheduleCron)
 	propertyMap["autoRemediate"] = resource.NewPropertyValue(i.AutoRemediate)
 
 	return propertyMap
@@ -54,7 +52,7 @@ func ToPulumiServiceDriftScheduleInput(properties *structpb.Struct) (*PulumiServ
 
 	if inputMap["scheduleCron"].HasValue() && inputMap["scheduleCron"].IsString() {
 		scheduleCron := inputMap["scheduleCron"].StringValue()
-		input.ScheduleCron = &scheduleCron
+		input.ScheduleCron = scheduleCron
 	}
 
 	if inputMap["autoRemediate"].HasValue() && inputMap["autoRemediate"].IsBool() {

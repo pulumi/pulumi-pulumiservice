@@ -27,7 +27,7 @@ type PulumiServiceDeploymentScheduleInput struct {
 
 type PulumiServiceSharedScheduleOutput struct {
 	Stack      pulumiapi.StackName
-	ScheduleID string `pulumi:"scheduleID"`
+	ScheduleID string `pulumi:"scheduleId"`
 }
 
 func StackToPropertyMap(stack pulumiapi.StackName) resource.PropertyMap {
@@ -53,7 +53,7 @@ func (i *PulumiServiceDeploymentScheduleInput) ToPropertyMap() resource.Property
 }
 
 func AddScheduleIdToPropertyMap(scheduleID string, propertyMap resource.PropertyMap) resource.PropertyMap {
-	propertyMap["scheduleID"] = resource.NewPropertyValue(scheduleID)
+	propertyMap["scheduleId"] = resource.NewPropertyValue(scheduleID)
 	return propertyMap
 }
 
@@ -129,8 +129,8 @@ func ToPulumiServiceSharedScheduleOutput(properties *structpb.Struct) (*PulumiSe
 	output := PulumiServiceSharedScheduleOutput{}
 	output.Stack = *stack
 
-	if inputMap["scheduleID"].HasValue() && inputMap["scheduleID"].IsString() {
-		output.ScheduleID = inputMap["scheduleID"].StringValue()
+	if inputMap["scheduleId"].HasValue() && inputMap["scheduleId"].IsString() {
+		output.ScheduleID = inputMap["scheduleId"].StringValue()
 	}
 
 	return &output, nil
@@ -142,9 +142,9 @@ func ScheduleSharedDiff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, er
 		return nil, err
 	}
 
-	// preprocess olds to remove the `scheduleID` property since it's only an output and shouldn't cause a diff
-	if olds["scheduleID"].HasValue() {
-		delete(olds, "scheduleID")
+	// preprocess olds to remove the `scheduleId` property since it's only an output and shouldn't cause a diff
+	if olds["scheduleId"].HasValue() {
+		delete(olds, "scheduleId")
 	}
 
 	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})

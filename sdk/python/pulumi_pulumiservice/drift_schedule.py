@@ -232,7 +232,7 @@ class DriftSchedule(pulumi.CustomResource):
         return pulumi.get(self, "schedule_cron")
 
     @property
-    @pulumi.getter(name="scheduleID")
+    @pulumi.getter(name="scheduleId")
     def schedule_id(self) -> pulumi.Output[str]:
         """
         Schedule ID of the created schedule, assigned by Pulumi Cloud.

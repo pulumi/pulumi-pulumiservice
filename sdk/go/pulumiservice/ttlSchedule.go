@@ -16,15 +16,17 @@ import (
 type TtlSchedule struct {
 	pulumi.CustomResourceState
 
+	// True if the stack and all associated history and settings should be deleted.
+	DeleteAfterDestroy pulumi.BoolPtrOutput `pulumi:"deleteAfterDestroy"`
 	// Organization name.
 	Organization pulumi.StringOutput `pulumi:"organization"`
 	// Project name.
 	Project pulumi.StringOutput `pulumi:"project"`
 	// Schedule ID of the created schedule, assigned by Pulumi Cloud.
-	ScheduleID pulumi.StringOutput `pulumi:"scheduleID"`
+	ScheduleId pulumi.StringOutput `pulumi:"scheduleId"`
 	// Stack name.
 	Stack pulumi.StringOutput `pulumi:"stack"`
-	// When to run the destroy command, in ISO format like this 2020-01-01T00:00:00Z.
+	// The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.
 	Timestamp pulumi.StringOutput `pulumi:"timestamp"`
 }
 
@@ -80,7 +82,7 @@ func (TtlScheduleState) ElementType() reflect.Type {
 }
 
 type ttlScheduleArgs struct {
-	// Whether the stack should be deleted after it is destroyed.
+	// True if the stack and all associated history and settings should be deleted.
 	DeleteAfterDestroy *bool `pulumi:"deleteAfterDestroy"`
 	// Organization name.
 	Organization string `pulumi:"organization"`
@@ -88,13 +90,13 @@ type ttlScheduleArgs struct {
 	Project string `pulumi:"project"`
 	// Stack name.
 	Stack string `pulumi:"stack"`
-	// When to run the destroy command, in ISO format like this 2020-01-01T00:00:00Z.
+	// The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.
 	Timestamp string `pulumi:"timestamp"`
 }
 
 // The set of arguments for constructing a TtlSchedule resource.
 type TtlScheduleArgs struct {
-	// Whether the stack should be deleted after it is destroyed.
+	// True if the stack and all associated history and settings should be deleted.
 	DeleteAfterDestroy pulumi.BoolPtrInput
 	// Organization name.
 	Organization pulumi.StringInput
@@ -102,7 +104,7 @@ type TtlScheduleArgs struct {
 	Project pulumi.StringInput
 	// Stack name.
 	Stack pulumi.StringInput
-	// When to run the destroy command, in ISO format like this 2020-01-01T00:00:00Z.
+	// The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.
 	Timestamp pulumi.StringInput
 }
 
@@ -193,6 +195,11 @@ func (o TtlScheduleOutput) ToTtlScheduleOutputWithContext(ctx context.Context) T
 	return o
 }
 
+// True if the stack and all associated history and settings should be deleted.
+func (o TtlScheduleOutput) DeleteAfterDestroy() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *TtlSchedule) pulumi.BoolPtrOutput { return v.DeleteAfterDestroy }).(pulumi.BoolPtrOutput)
+}
+
 // Organization name.
 func (o TtlScheduleOutput) Organization() pulumi.StringOutput {
 	return o.ApplyT(func(v *TtlSchedule) pulumi.StringOutput { return v.Organization }).(pulumi.StringOutput)
@@ -204,8 +211,8 @@ func (o TtlScheduleOutput) Project() pulumi.StringOutput {
 }
 
 // Schedule ID of the created schedule, assigned by Pulumi Cloud.
-func (o TtlScheduleOutput) ScheduleID() pulumi.StringOutput {
-	return o.ApplyT(func(v *TtlSchedule) pulumi.StringOutput { return v.ScheduleID }).(pulumi.StringOutput)
+func (o TtlScheduleOutput) ScheduleId() pulumi.StringOutput {
+	return o.ApplyT(func(v *TtlSchedule) pulumi.StringOutput { return v.ScheduleId }).(pulumi.StringOutput)
 }
 
 // Stack name.
@@ -213,7 +220,7 @@ func (o TtlScheduleOutput) Stack() pulumi.StringOutput {
 	return o.ApplyT(func(v *TtlSchedule) pulumi.StringOutput { return v.Stack }).(pulumi.StringOutput)
 }
 
-// When to run the destroy command, in ISO format like this 2020-01-01T00:00:00Z.
+// The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.
 func (o TtlScheduleOutput) Timestamp() pulumi.StringOutput {
 	return o.ApplyT(func(v *TtlSchedule) pulumi.StringOutput { return v.Timestamp }).(pulumi.StringOutput)
 }

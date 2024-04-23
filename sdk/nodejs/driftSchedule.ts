@@ -53,7 +53,7 @@ export class DriftSchedule extends pulumi.CustomResource {
     /**
      * Schedule ID of the created schedule, assigned by Pulumi Cloud.
      */
-    public /*out*/ readonly scheduleID!: pulumi.Output<string>;
+    public /*out*/ readonly scheduleId!: pulumi.Output<string>;
     /**
      * Stack name.
      */
@@ -87,13 +87,13 @@ export class DriftSchedule extends pulumi.CustomResource {
             resourceInputs["project"] = args ? args.project : undefined;
             resourceInputs["scheduleCron"] = args ? args.scheduleCron : undefined;
             resourceInputs["stack"] = args ? args.stack : undefined;
-            resourceInputs["scheduleID"] = undefined /*out*/;
+            resourceInputs["scheduleId"] = undefined /*out*/;
         } else {
             resourceInputs["autoRemediate"] = undefined /*out*/;
             resourceInputs["organization"] = undefined /*out*/;
             resourceInputs["project"] = undefined /*out*/;
             resourceInputs["scheduleCron"] = undefined /*out*/;
-            resourceInputs["scheduleID"] = undefined /*out*/;
+            resourceInputs["scheduleId"] = undefined /*out*/;
             resourceInputs["stack"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);

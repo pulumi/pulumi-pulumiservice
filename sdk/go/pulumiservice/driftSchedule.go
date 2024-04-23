@@ -25,7 +25,7 @@ type DriftSchedule struct {
 	// Cron expression for when to run drift detection.
 	ScheduleCron pulumi.StringOutput `pulumi:"scheduleCron"`
 	// Schedule ID of the created schedule, assigned by Pulumi Cloud.
-	ScheduleID pulumi.StringOutput `pulumi:"scheduleID"`
+	ScheduleId pulumi.StringOutput `pulumi:"scheduleId"`
 	// Stack name.
 	Stack pulumi.StringOutput `pulumi:"stack"`
 }
@@ -216,8 +216,8 @@ func (o DriftScheduleOutput) ScheduleCron() pulumi.StringOutput {
 }
 
 // Schedule ID of the created schedule, assigned by Pulumi Cloud.
-func (o DriftScheduleOutput) ScheduleID() pulumi.StringOutput {
-	return o.ApplyT(func(v *DriftSchedule) pulumi.StringOutput { return v.ScheduleID }).(pulumi.StringOutput)
+func (o DriftScheduleOutput) ScheduleId() pulumi.StringOutput {
+	return o.ApplyT(func(v *DriftSchedule) pulumi.StringOutput { return v.ScheduleId }).(pulumi.StringOutput)
 }
 
 // Stack name.

@@ -9,7 +9,9 @@ import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.TtlScheduleArgs;
 import com.pulumi.pulumiservice.Utilities;
+import java.lang.Boolean;
 import java.lang.String;
+import java.util.Optional;
 import javax.annotation.Nullable;
 
 /**
@@ -18,6 +20,20 @@ import javax.annotation.Nullable;
  */
 @ResourceType(type="pulumiservice:index:TtlSchedule")
 public class TtlSchedule extends com.pulumi.resources.CustomResource {
+    /**
+     * True if the stack and all associated history and settings should be deleted.
+     * 
+     */
+    @Export(name="deleteAfterDestroy", refs={Boolean.class}, tree="[0]")
+    private Output</* @Nullable */ Boolean> deleteAfterDestroy;
+
+    /**
+     * @return True if the stack and all associated history and settings should be deleted.
+     * 
+     */
+    public Output<Optional<Boolean>> deleteAfterDestroy() {
+        return Codegen.optional(this.deleteAfterDestroy);
+    }
     /**
      * Organization name.
      * 
@@ -50,15 +66,15 @@ public class TtlSchedule extends com.pulumi.resources.CustomResource {
      * Schedule ID of the created schedule, assigned by Pulumi Cloud.
      * 
      */
-    @Export(name="scheduleID", refs={String.class}, tree="[0]")
-    private Output<String> scheduleID;
+    @Export(name="scheduleId", refs={String.class}, tree="[0]")
+    private Output<String> scheduleId;
 
     /**
      * @return Schedule ID of the created schedule, assigned by Pulumi Cloud.
      * 
      */
-    public Output<String> scheduleID() {
-        return this.scheduleID;
+    public Output<String> scheduleId() {
+        return this.scheduleId;
     }
     /**
      * Stack name.
@@ -75,14 +91,14 @@ public class TtlSchedule extends com.pulumi.resources.CustomResource {
         return this.stack;
     }
     /**
-     * When to run the destroy command, in ISO format like this 2020-01-01T00:00:00Z.
+     * The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.
      * 
      */
     @Export(name="timestamp", refs={String.class}, tree="[0]")
     private Output<String> timestamp;
 
     /**
-     * @return When to run the destroy command, in ISO format like this 2020-01-01T00:00:00Z.
+     * @return The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.
      * 
      */
     public Output<String> timestamp() {

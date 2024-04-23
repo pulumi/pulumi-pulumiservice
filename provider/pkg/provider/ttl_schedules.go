@@ -20,21 +20,19 @@ type PulumiServiceTtlScheduleResource struct {
 
 type PulumiServiceTtlScheduleInput struct {
 	Stack              pulumiapi.StackName
-	Timestamp          *time.Time `pulumi:"timestamp"`
-	DeleteAfterDestroy bool       `pulumi:"deleteAfterDestroy"`
+	Timestamp          time.Time `pulumi:"timestamp"`
+	DeleteAfterDestroy bool      `pulumi:"deleteAfterDestroy"`
 }
 
 type PulumiServiceTtlScheduleOutput struct {
 	Input      PulumiServiceTtlScheduleInput
-	ScheduleID string `pulumi:"scheduleID"`
+	ScheduleID string `pulumi:"scheduleId"`
 }
 
 func (i *PulumiServiceTtlScheduleInput) ToPropertyMap() resource.PropertyMap {
 	propertyMap := StackToPropertyMap(i.Stack)
 
-	if i.Timestamp != nil {
-		propertyMap["timestamp"] = resource.NewPropertyValue(i.Timestamp.Format(time.RFC3339))
-	}
+	propertyMap["timestamp"] = resource.NewPropertyValue(i.Timestamp.Format(time.RFC3339))
 	propertyMap["deleteAfterDestroy"] = resource.NewPropertyValue(i.DeleteAfterDestroy)
 
 	return propertyMap
@@ -58,7 +56,7 @@ func ToPulumiServiceTtlScheduleInput(properties *structpb.Struct) (*PulumiServic
 		if err != nil {
 			return nil, err
 		}
-		input.Timestamp = &timestamp
+		input.Timestamp = timestamp
 	}
 
 	if inputMap["deleteAfterDestroy"].HasValue() && inputMap["deleteAfterDestroy"].IsBool() {

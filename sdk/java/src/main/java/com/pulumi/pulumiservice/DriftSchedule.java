@@ -80,15 +80,15 @@ public class DriftSchedule extends com.pulumi.resources.CustomResource {
      * Schedule ID of the created schedule, assigned by Pulumi Cloud.
      * 
      */
-    @Export(name="scheduleID", refs={String.class}, tree="[0]")
-    private Output<String> scheduleID;
+    @Export(name="scheduleId", refs={String.class}, tree="[0]")
+    private Output<String> scheduleId;
 
     /**
      * @return Schedule ID of the created schedule, assigned by Pulumi Cloud.
      * 
      */
-    public Output<String> scheduleID() {
-        return this.scheduleID;
+    public Output<String> scheduleId() {
+        return this.scheduleId;
     }
     /**
      * Stack name.
