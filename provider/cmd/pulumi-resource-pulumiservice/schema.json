@@ -150,6 +150,31 @@
           "value": "deployment_failed",
           "description": "Trigger a webhook when a deployment fails.",
           "name": "DeploymentFailed"
+        },
+        {
+          "value": "drift_detected",
+          "description": "Trigger a webhook when drift is detected.",
+          "name": "DriftDetected"
+        },
+        {
+          "value": "drift_detection_succeeded",
+          "description": "Trigger a webhook when a drift detection run succeeds, regardless of whether drift is detected.",
+          "name": "DriftDetectionSucceeded"
+        },
+        {
+          "value": "drift_detection_failed",
+          "description": "Trigger a webhook when a drift detection run fails.",
+          "name": "DriftDetectionFailed"
+        },
+        {
+          "value": "drift_remediation_succeeded",
+          "description": "Trigger a webhook when a drift remediation run succeeds.",
+          "name": "DriftRemediationSucceeded"
+        },
+        {
+          "value": "drift_remediation_failed",
+          "description": "Trigger a webhook when a drift remediation run fails.",
+          "name": "DriftRemediationFailed"
         }
       ]
     },
@@ -437,7 +462,7 @@
         "tenantId",
         "subscriptionId"
       ]
-    }, 
+    },
     "pulumiservice:index:PulumiOperation": {
       "type": "string",
       "enum": [
