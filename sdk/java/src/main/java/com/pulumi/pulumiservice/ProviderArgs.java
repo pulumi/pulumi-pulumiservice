@@ -31,10 +31,26 @@ public final class ProviderArgs extends com.pulumi.resources.ResourceArgs {
         return Optional.ofNullable(this.accessToken);
     }
 
+    /**
+     * The service URL used to reach Pulumi Cloud.
+     * 
+     */
+    @Import(name="serviceURL")
+    private @Nullable Output<String> serviceURL;
+
+    /**
+     * @return The service URL used to reach Pulumi Cloud.
+     * 
+     */
+    public Optional<Output<String>> serviceURL() {
+        return Optional.ofNullable(this.serviceURL);
+    }
+
     private ProviderArgs() {}
 
     private ProviderArgs(ProviderArgs $) {
         this.accessToken = $.accessToken;
+        this.serviceURL = $.serviceURL;
     }
 
     public static Builder builder() {
@@ -76,8 +92,30 @@ public final class ProviderArgs extends com.pulumi.resources.ResourceArgs {
             return accessToken(Output.of(accessToken));
         }
 
+        /**
+         * @param serviceURL The service URL used to reach Pulumi Cloud.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder serviceURL(@Nullable Output<String> serviceURL) {
+            $.serviceURL = serviceURL;
+            return this;
+        }
+
+        /**
+         * @param serviceURL The service URL used to reach Pulumi Cloud.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder serviceURL(String serviceURL) {
+            return serviceURL(Output.of(serviceURL));
+        }
+
         public ProviderArgs build() {
-            $.accessToken = Codegen.stringProp("accessToken").output().arg($.accessToken).env("PULUMI_ACCESS_TOKEN").def("").getNullable();
+            $.accessToken = Codegen.stringProp("accessToken").secret().arg($.accessToken).env("PULUMI_ACCESS_TOKEN").getNullable();
+            $.serviceURL = Codegen.stringProp("serviceURL").output().arg($.serviceURL).env("PULUMI_BACKEND_URL").def("https://api.pulumi.com").getNullable();
             return $;
         }
     }

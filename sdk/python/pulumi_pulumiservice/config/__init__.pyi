@@ -10,4 +10,12 @@ from typing import Any, Mapping, Optional, Sequence, Union, overload
 from .. import _utilities
 
 accessToken: Optional[str]
+"""
+Access Token to authenticate with Pulumi Cloud.
+"""
+
+serviceURL: str
+"""
+The service URL used to reach Pulumi Cloud.
+"""
 

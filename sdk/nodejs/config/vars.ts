@@ -7,10 +7,24 @@ import * as utilities from "../utilities";
 declare var exports: any;
 const __config = new pulumi.Config("pulumiservice");
 
+/**
+ * Access Token to authenticate with Pulumi Cloud.
+ */
 export declare const accessToken: string | undefined;
 Object.defineProperty(exports, "accessToken", {
     get() {
-        return __config.get("accessToken");
+        return __config.get("accessToken") ?? utilities.getEnv("PULUMI_ACCESS_TOKEN");
+    },
+    enumerable: true,
+});
+
+/**
+ * The service URL used to reach Pulumi Cloud.
+ */
+export declare const serviceURL: string;
+Object.defineProperty(exports, "serviceURL", {
+    get() {
+        return __config.get("serviceURL") ?? (utilities.getEnv("PULUMI_BACKEND_URL") || "https://api.pulumi.com");
     },
     enumerable: true,
 });

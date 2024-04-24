@@ -32,11 +32,24 @@ namespace Pulumi.PulumiService
 
         private static readonly global::Pulumi.Config __config = new global::Pulumi.Config("pulumiservice");
 
-        private static readonly __Value<string?> _accessToken = new __Value<string?>(() => __config.Get("accessToken"));
+        private static readonly __Value<string?> _accessToken = new __Value<string?>(() => __config.Get("accessToken") ?? Utilities.GetEnv("PULUMI_ACCESS_TOKEN"));
+        /// <summary>
+        /// Access Token to authenticate with Pulumi Cloud.
+        /// </summary>
         public static string? AccessToken
         {
             get => _accessToken.Get();
             set => _accessToken.Set(value);
+        }
+
+        private static readonly __Value<string?> _serviceURL = new __Value<string?>(() => __config.Get("serviceURL") ?? Utilities.GetEnv("PULUMI_BACKEND_URL") ?? "https://api.pulumi.com");
+        /// <summary>
+        /// The service URL used to reach Pulumi Cloud.
+        /// </summary>
+        public static string? ServiceURL
+        {
+            get => _serviceURL.Get();
+            set => _serviceURL.Set(value);
         }
 
     }

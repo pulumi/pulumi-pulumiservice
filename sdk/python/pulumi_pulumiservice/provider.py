@@ -14,15 +14,21 @@ __all__ = ['ProviderArgs', 'Provider']
 @pulumi.input_type
 class ProviderArgs:
     def __init__(__self__, *,
-                 access_token: Optional[pulumi.Input[str]] = None):
+                 access_token: Optional[pulumi.Input[str]] = None,
+                 service_url: Optional[pulumi.Input[str]] = None):
         """
         The set of arguments for constructing a Provider resource.
         :param pulumi.Input[str] access_token: Access Token to authenticate with Pulumi Cloud.
+        :param pulumi.Input[str] service_url: The service URL used to reach Pulumi Cloud.
         """
         if access_token is None:
-            access_token = (_utilities.get_env('PULUMI_ACCESS_TOKEN') or '')
+            access_token = _utilities.get_env('PULUMI_ACCESS_TOKEN')
         if access_token is not None:
             pulumi.set(__self__, "access_token", access_token)
+        if service_url is None:
+            service_url = (_utilities.get_env('PULUMI_BACKEND_URL') or 'https://api.pulumi.com')
+        if service_url is not None:
+            pulumi.set(__self__, "service_url", service_url)
 
     @property
     @pulumi.getter(name="accessToken")
@@ -36,6 +42,18 @@ class ProviderArgs:
     def access_token(self, value: Optional[pulumi.Input[str]]):
         pulumi.set(self, "access_token", value)
 
+    @property
+    @pulumi.getter(name="serviceURL")
+    def service_url(self) -> Optional[pulumi.Input[str]]:
+        """
+        The service URL used to reach Pulumi Cloud.
+        """
+        return pulumi.get(self, "service_url")
+
+    @service_url.setter
+    def service_url(self, value: Optional[pulumi.Input[str]]):
+        pulumi.set(self, "service_url", value)
+
 
 class Provider(pulumi.ProviderResource):
     @overload
@@ -43,12 +61,14 @@ class Provider(pulumi.ProviderResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  access_token: Optional[pulumi.Input[str]] = None,
+                 service_url: Optional[pulumi.Input[str]] = None,
                  __props__=None):
         """
         Create a Pulumiservice resource with the given unique name, props, and options.
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[str] access_token: Access Token to authenticate with Pulumi Cloud.
+        :param pulumi.Input[str] service_url: The service URL used to reach Pulumi Cloud.
         """
         ...
     @overload
@@ -74,6 +94,7 @@ class Provider(pulumi.ProviderResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  access_token: Optional[pulumi.Input[str]] = None,
+                 service_url: Optional[pulumi.Input[str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
@@ -84,11 +105,32 @@ class Provider(pulumi.ProviderResource):
             __props__ = ProviderArgs.__new__(ProviderArgs)
 
             if access_token is None:
-                access_token = (_utilities.get_env('PULUMI_ACCESS_TOKEN') or '')
-            __props__.__dict__["access_token"] = access_token
+                access_token = _utilities.get_env('PULUMI_ACCESS_TOKEN')
+            __props__.__dict__["access_token"] = None if access_token is None else pulumi.Output.secret(access_token)
+            if service_url is None:
+                service_url = (_utilities.get_env('PULUMI_BACKEND_URL') or 'https://api.pulumi.com')
+            __props__.__dict__["service_url"] = service_url
+        secret_opts = pulumi.ResourceOptions(additional_secret_outputs=["accessToken"])
+        opts = pulumi.ResourceOptions.merge(opts, secret_opts)
         super(Provider, __self__).__init__(
             'pulumiservice',
             resource_name,
             __props__,
             opts)
+
+    @property
+    @pulumi.getter(name="accessToken")
+    def access_token(self) -> pulumi.Output[Optional[str]]:
+        """
+        Access Token to authenticate with Pulumi Cloud.
+        """
+        return pulumi.get(self, "access_token")
+
+    @property
+    @pulumi.getter(name="serviceURL")
+    def service_url(self) -> pulumi.Output[Optional[str]]:
+        """
+        The service URL used to reach Pulumi Cloud.
+        """
+        return pulumi.get(self, "service_url")
 

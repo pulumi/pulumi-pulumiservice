@@ -13,6 +13,19 @@ namespace Pulumi.PulumiService
     public partial class Provider : global::Pulumi.ProviderResource
     {
         /// <summary>
+        /// Access Token to authenticate with Pulumi Cloud.
+        /// </summary>
+        [Output("accessToken")]
+        public Output<string?> AccessToken { get; private set; } = null!;
+
+        /// <summary>
+        /// The service URL used to reach Pulumi Cloud.
+        /// </summary>
+        [Output("serviceURL")]
+        public Output<string?> ServiceURL { get; private set; } = null!;
+
+
+        /// <summary>
         /// Create a Provider resource with the given unique name, arguments, and options.
         /// </summary>
         ///
@@ -29,6 +42,10 @@ namespace Pulumi.PulumiService
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
+                AdditionalSecretOutputs =
+                {
+                    "accessToken",
+                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.
@@ -39,15 +56,32 @@ namespace Pulumi.PulumiService
 
     public sealed class ProviderArgs : global::Pulumi.ResourceArgs
     {
+        [Input("accessToken")]
+        private Input<string>? _accessToken;
+
         /// <summary>
         /// Access Token to authenticate with Pulumi Cloud.
         /// </summary>
-        [Input("accessToken")]
-        public Input<string>? AccessToken { get; set; }
+        public Input<string>? AccessToken
+        {
+            get => _accessToken;
+            set
+            {
+                var emptySecret = Output.CreateSecret(0);
+                _accessToken = Output.Tuple<Input<string>?, int>(value, emptySecret).Apply(t => t.Item1);
+            }
+        }
+
+        /// <summary>
+        /// The service URL used to reach Pulumi Cloud.
+        /// </summary>
+        [Input("serviceURL")]
+        public Input<string>? ServiceURL { get; set; }
 
         public ProviderArgs()
         {
-            AccessToken = Utilities.GetEnv("PULUMI_ACCESS_TOKEN") ?? "";
+            AccessToken = Utilities.GetEnv("PULUMI_ACCESS_TOKEN");
+            ServiceURL = Utilities.GetEnv("PULUMI_BACKEND_URL") ?? "https://api.pulumi.com";
         }
         public static new ProviderArgs Empty => new ProviderArgs();
     }
