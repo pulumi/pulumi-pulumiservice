@@ -26,9 +26,7 @@ func TestStackTagsUpdate(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		st := &PulumiServiceStackTagResource{
-			client: apiClient,
-		}
+		st := &PulumiServiceStackTagResource{}
 
 		input := PulumiServiceStackTagInput{
 			Organization: "org",
@@ -49,7 +47,7 @@ func TestStackTagsUpdate(t *testing.T) {
 			News: properties,
 		}
 
-		_, err = st.Update(&upReq)
+		_, err = st.Update(WithClient(apiClient), &upReq)
 		assert.ErrorContains(t, err, "unexpected call to update, expected create to be called instead")
 	})
 

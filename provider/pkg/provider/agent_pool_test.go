@@ -40,16 +40,15 @@ func TestAgentPool(t *testing.T) {
 			func() (*pulumiapi.AgentPool, error) { return nil, nil },
 		)
 
-		provider := PulumiServiceAgentPoolResource{
-			client: mockedClient,
-		}
+		provider := PulumiServiceAgentPoolResource{}
 
 		req := pulumirpc.ReadRequest{
 			Id:  "org/abc/123",
 			Urn: "urn:123",
 		}
 
-		resp, err := provider.Read(&req)
+		resp, err := provider.Read(context.WithValue(context.Background(),
+			TestClientKey, mockedClient), &req)
 
 		assert.NoError(t, err)
 		assert.Equal(t, resp.Id, "")
@@ -66,16 +65,15 @@ func TestAgentPool(t *testing.T) {
 			},
 		)
 
-		provider := PulumiServiceAgentPoolResource{
-			client: mockedClient,
-		}
+		provider := PulumiServiceAgentPoolResource{}
 
 		req := pulumirpc.ReadRequest{
 			Id:  "org/abc/123",
 			Urn: "urn:123",
 		}
 
-		resp, err := provider.Read(&req)
+		resp, err := provider.Read(context.WithValue(context.Background(),
+			TestClientKey, mockedClient), &req)
 
 		assert.NoError(t, err)
 		assert.Equal(t, resp.Id, "org/abc/123")

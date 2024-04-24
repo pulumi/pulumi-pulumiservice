@@ -54,16 +54,14 @@ func TestTeam(t *testing.T) {
 			func() (*pulumiapi.Team, error) { return nil, nil },
 		)
 
-		provider := PulumiServiceTeamResource{
-			client: mockedClient,
-		}
+		provider := PulumiServiceTeamResource{}
 
 		req := pulumirpc.ReadRequest{
 			Id:  "abc/123",
 			Urn: "urn:123",
 		}
 
-		resp, err := provider.Read(&req)
+		resp, err := provider.Read(WithClient(mockedClient), &req)
 
 		assert.NoError(t, err)
 		assert.Equal(t, resp.Id, "")
@@ -86,16 +84,14 @@ func TestTeam(t *testing.T) {
 			},
 		)
 
-		provider := PulumiServiceTeamResource{
-			client: mockedClient,
-		}
+		provider := PulumiServiceTeamResource{}
 
 		req := pulumirpc.ReadRequest{
 			Id:  "abc/123",
 			Urn: "urn:123",
 		}
 
-		resp, err := provider.Read(&req)
+		resp, err := provider.Read(WithClient(mockedClient), &req)
 
 		assert.NoError(t, err)
 		assert.Equal(t, resp.Id, "abc/123")

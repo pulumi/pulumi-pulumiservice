@@ -39,16 +39,14 @@ func TestDeploymentSettings(t *testing.T) {
 			func() (*pulumiapi.DeploymentSettings, error) { return nil, nil },
 		)
 
-		provider := PulumiServiceDeploymentSettingsResource{
-			client: mockedClient,
-		}
+		provider := PulumiServiceDeploymentSettingsResource{}
 
 		req := pulumirpc.ReadRequest{
 			Id:  "abc/def/123",
 			Urn: "urn:123",
 		}
 
-		resp, err := provider.Read(&req)
+		resp, err := provider.Read(WithClient(mockedClient), &req)
 
 		assert.NoError(t, err)
 		assert.Equal(t, resp.Id, "")
@@ -67,16 +65,14 @@ func TestDeploymentSettings(t *testing.T) {
 			},
 		)
 
-		provider := PulumiServiceDeploymentSettingsResource{
-			client: mockedClient,
-		}
+		provider := PulumiServiceDeploymentSettingsResource{}
 
 		req := pulumirpc.ReadRequest{
 			Id:  "abc/def/123",
 			Urn: "urn:123",
 		}
 
-		resp, err := provider.Read(&req)
+		resp, err := provider.Read(WithClient(mockedClient), &req)
 
 		assert.NoError(t, err)
 		assert.Equal(t, resp.Id, "abc/def/123")

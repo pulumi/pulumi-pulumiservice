@@ -47,16 +47,14 @@ func TestWebhook(t *testing.T) {
 			func() (*pulumiapi.Webhook, error) { return nil, nil },
 		)
 
-		provider := PulumiServiceWebhookResource{
-			client: mockedClient,
-		}
+		provider := PulumiServiceWebhookResource{}
 
 		req := pulumirpc.ReadRequest{
 			Id:  "abc/def/ghi/123",
 			Urn: "urn:123",
 		}
 
-		resp, err := provider.Read(&req)
+		resp, err := provider.Read(WithClient(mockedClient), &req)
 
 		assert.NoError(t, err)
 		assert.Equal(t, resp.Id, "")
@@ -75,16 +73,14 @@ func TestWebhook(t *testing.T) {
 			},
 		)
 
-		provider := PulumiServiceWebhookResource{
-			client: mockedClient,
-		}
+		provider := PulumiServiceWebhookResource{}
 
 		req := pulumirpc.ReadRequest{
 			Id:  "abc/def/ghi/123",
 			Urn: "urn:123",
 		}
 
-		resp, err := provider.Read(&req)
+		resp, err := provider.Read(WithClient(mockedClient), &req)
 
 		assert.NoError(t, err)
 		assert.Equal(t, resp.Id, "abc/def/ghi/123")
