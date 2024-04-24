@@ -13,10 +13,7 @@ import (
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
-type PulumiServiceWebhookResource struct {
-	config PulumiServiceConfig
-	client pulumiapi.WebhookClient
-}
+type PulumiServiceWebhookResource struct{}
 
 type PulumiServiceWebhookInput struct {
 	Active           bool
@@ -126,11 +123,7 @@ func (wh *PulumiServiceWebhookResource) Name() string {
 	return "pulumiservice:index:Webhook"
 }
 
-func (wh *PulumiServiceWebhookResource) Configure(config PulumiServiceConfig) {
-	wh.config = config
-}
-
-func (wh *PulumiServiceWebhookResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
+func (wh *PulumiServiceWebhookResource) Check(_ context.Context, req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
 	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
@@ -179,7 +172,7 @@ func (wh *PulumiServiceWebhookResource) Check(req *pulumirpc.CheckRequest) (*pul
 	return &pulumirpc.CheckResponse{Inputs: inputNews, Failures: failures}, nil
 }
 
-func (wh *PulumiServiceWebhookResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
+func (wh *PulumiServiceWebhookResource) Create(ctx context.Context, req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	inputs, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
@@ -187,7 +180,7 @@ func (wh *PulumiServiceWebhookResource) Create(req *pulumirpc.CreateRequest) (*p
 
 	props := wh.ToPulumiServiceWebhookProperties(inputs)
 
-	idString, err := wh.createWebhook(props.PulumiServiceWebhookInput)
+	idString, err := wh.createWebhook(ctx, props.PulumiServiceWebhookInput)
 	if err != nil {
 		return nil, err
 	}
@@ -216,8 +209,7 @@ func (wh *PulumiServiceWebhookResource) Create(req *pulumirpc.CreateRequest) (*p
 	}, nil
 }
 
-func (wh *PulumiServiceWebhookResource) createWebhook(input PulumiServiceWebhookInput) (*string, error) {
-	ctx := context.Background()
+func (wh *PulumiServiceWebhookResource) createWebhook(ctx context.Context, input PulumiServiceWebhookInput) (*string, error) {
 	req := pulumiapi.WebhookRequest{
 		OrganizationName: input.OrganizationName,
 		ProjectName:      input.ProjectName,
@@ -229,7 +221,7 @@ func (wh *PulumiServiceWebhookResource) createWebhook(input PulumiServiceWebhook
 		Format:           input.Format,
 		Filters:          input.Filters,
 	}
-	webhook, err := wh.client.CreateWebhook(ctx, req)
+	webhook, err := GetClient[pulumiapi.WebhookClient](ctx).CreateWebhook(ctx, req)
 	if err != nil {
 		return nil, err
 	}
@@ -245,7 +237,7 @@ func (wh *PulumiServiceWebhookResource) createWebhook(input PulumiServiceWebhook
 	return &hookID, nil
 }
 
-func (wh *PulumiServiceWebhookResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+func (wh *PulumiServiceWebhookResource) Diff(_ context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
 	olds, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
 	if err != nil {
 		return nil, err
@@ -306,7 +298,7 @@ func (wh *PulumiServiceWebhookResource) Diff(req *pulumirpc.DiffRequest) (*pulum
 	}, nil
 }
 
-func (wh *PulumiServiceWebhookResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+func (wh *PulumiServiceWebhookResource) Update(ctx context.Context, req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
 	// we only care about news because we validated that everything was correctly set in Check() & Diff()
 	inputsNew, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
@@ -336,7 +328,7 @@ func (wh *PulumiServiceWebhookResource) Update(req *pulumirpc.UpdateRequest) (*p
 		},
 		Name: webhookNew.Name,
 	}
-	err = wh.client.UpdateWebhook(context.Background(), updateReq)
+	err = GetClient[pulumiapi.WebhookClient](ctx).UpdateWebhook(ctx, updateReq)
 	if err != nil {
 		return nil, err
 	}
@@ -356,22 +348,21 @@ func (wh *PulumiServiceWebhookResource) Update(req *pulumirpc.UpdateRequest) (*p
 
 }
 
-func (wh *PulumiServiceWebhookResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	err := wh.deleteWebhook(req.Id)
-	return &pbempty.Empty{}, err
+func (wh *PulumiServiceWebhookResource) Delete(ctx context.Context, req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
+	return &pbempty.Empty{}, wh.deleteWebhook(ctx, req.Id)
 }
 
-func (wh *PulumiServiceWebhookResource) deleteWebhook(id string) error {
+func (wh *PulumiServiceWebhookResource) deleteWebhook(ctx context.Context, id string) error {
 	hookID, err := splitWebhookID(id)
 	if err != nil {
 		return err
 	}
-	return wh.client.DeleteWebhook(context.Background(), hookID.organizationName,
+	return GetClient[pulumiapi.WebhookClient](ctx).DeleteWebhook(ctx, hookID.organizationName,
 		hookID.projectName, hookID.stackName, hookID.webhookName)
 }
 
-func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	webhook, err := wh.getWebhook(req.Id)
+func (wh *PulumiServiceWebhookResource) Read(ctx context.Context, req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
+	webhook, err := wh.getWebhook(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -423,12 +414,12 @@ func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulum
 	}, nil
 }
 
-func (wh *PulumiServiceWebhookResource) getWebhook(id string) (*pulumiapi.Webhook, error) {
+func (wh *PulumiServiceWebhookResource) getWebhook(ctx context.Context, id string) (*pulumiapi.Webhook, error) {
 	hookID, err := splitWebhookID(id)
 	if err != nil {
 		return nil, err
 	}
-	webhook, err := wh.client.GetWebhook(context.Background(),
+	webhook, err := GetClient[pulumiapi.WebhookClient](ctx).GetWebhook(ctx,
 		hookID.organizationName, hookID.projectName, hookID.stackName, hookID.webhookName)
 	if err != nil {
 		return nil, err

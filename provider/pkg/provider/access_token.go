@@ -12,9 +12,7 @@ import (
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
-type PulumiServiceAccessTokenResource struct {
-	client *pulumiapi.Client
-}
+type PulumiServiceAccessTokenResource struct{}
 
 type PulumiServiceAccessTokenInput struct {
 	Description string
@@ -40,12 +38,11 @@ func (at *PulumiServiceAccessTokenResource) Name() string {
 	return "pulumiservice:index:AccessToken"
 }
 
-func (at *PulumiServiceAccessTokenResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+func (at *PulumiServiceAccessTokenResource) Diff(_ context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
 	return diffAccessTokenProperties(req, []string{"description"})
 }
 
-func (at *PulumiServiceAccessTokenResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	ctx := context.Background()
+func (at *PulumiServiceAccessTokenResource) Delete(ctx context.Context, req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
 	err := at.deleteAccessToken(ctx, req.Id)
 	if err != nil {
 		return &pbempty.Empty{}, err
@@ -54,8 +51,7 @@ func (at *PulumiServiceAccessTokenResource) Delete(req *pulumirpc.DeleteRequest)
 	return &pbempty.Empty{}, nil
 }
 
-func (at *PulumiServiceAccessTokenResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
-	ctx := context.Background()
+func (at *PulumiServiceAccessTokenResource) Create(ctx context.Context, req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	inputs, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
@@ -86,20 +82,18 @@ func (at *PulumiServiceAccessTokenResource) Create(req *pulumirpc.CreateRequest)
 
 }
 
-func (at *PulumiServiceAccessTokenResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
+func (at *PulumiServiceAccessTokenResource) Check(_ context.Context, req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
 	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: nil}, nil
 }
 
-func (at *PulumiServiceAccessTokenResource) Update(_ *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+func (at *PulumiServiceAccessTokenResource) Update(_ context.Context, _ *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
 	// all updates are destructive, so we just call Create.
 	return nil, fmt.Errorf("unexpected call to update, expected create to be called instead")
 }
 
-func (at *PulumiServiceAccessTokenResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	ctx := context.Background()
-
+func (at *PulumiServiceAccessTokenResource) Read(ctx context.Context, req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
 	// the access token is immutable; if we get nil it got deleted, otherwise all data is the same
-	accessToken, err := at.client.GetAccessToken(ctx, req.GetId())
+	accessToken, err := GetClient[*pulumiapi.Client](ctx).GetAccessToken(ctx, req.GetId())
 	if err != nil {
 		return nil, err
 	}
@@ -117,12 +111,8 @@ func (at *PulumiServiceAccessTokenResource) Invoke(_ *pulumiserviceProvider, req
 	return &pulumirpc.InvokeResponse{Return: nil}, fmt.Errorf("unknown function '%s'", req.Tok)
 }
 
-func (at *PulumiServiceAccessTokenResource) Configure(_ PulumiServiceConfig) {
-}
-
 func (at *PulumiServiceAccessTokenResource) createAccessToken(ctx context.Context, input PulumiServiceAccessTokenInput) (*pulumiapi.AccessToken, error) {
-
-	accessToken, err := at.client.CreateAccessToken(ctx, input.Description)
+	accessToken, err := GetClient[*pulumiapi.Client](ctx).CreateAccessToken(ctx, input.Description)
 	if err != nil {
 		return nil, err
 	}
@@ -131,7 +121,7 @@ func (at *PulumiServiceAccessTokenResource) createAccessToken(ctx context.Contex
 }
 
 func (at *PulumiServiceAccessTokenResource) deleteAccessToken(ctx context.Context, tokenId string) error {
-	return at.client.DeleteAccessToken(ctx, tokenId)
+	return GetClient[*pulumiapi.Client](ctx).DeleteAccessToken(ctx, tokenId)
 }
 
 func diffAccessTokenProperties(req *pulumirpc.DiffRequest, replaceProps []string) (*pulumirpc.DiffResponse, error) {

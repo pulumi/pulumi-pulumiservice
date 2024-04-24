@@ -14,9 +14,7 @@ import (
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
-type PulumiServiceStackTagResource struct {
-	client *pulumiapi.Client
-}
+type PulumiServiceStackTagResource struct{}
 
 type PulumiServiceStackTagInput struct {
 	Organization string `pulumi:"organization"`
@@ -42,7 +40,7 @@ func (st *PulumiServiceStackTagResource) Name() string {
 	return "pulumiservice:index:StackTag"
 }
 
-func (st *PulumiServiceStackTagResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+func (st *PulumiServiceStackTagResource) Diff(_ context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
 	olds, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
 	if err != nil {
 		return nil, err
@@ -79,8 +77,7 @@ func (st *PulumiServiceStackTagResource) Diff(req *pulumirpc.DiffRequest) (*pulu
 	}, nil
 }
 
-func (st *PulumiServiceStackTagResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	ctx := context.Background()
+func (st *PulumiServiceStackTagResource) Delete(ctx context.Context, req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
 	var inputs PulumiServiceStackTagInput
 	err := serde.FromProperties(req.GetProperties(), structTagKey, &inputs)
 	if err != nil {
@@ -91,15 +88,14 @@ func (st *PulumiServiceStackTagResource) Delete(req *pulumirpc.DeleteRequest) (*
 		ProjectName: inputs.Project,
 		StackName:   inputs.Stack,
 	}
-	err = st.client.DeleteStackTag(ctx, stackName, inputs.Name)
+	err = GetClient[*pulumiapi.Client](ctx).DeleteStackTag(ctx, stackName, inputs.Name)
 	if err != nil {
 		return nil, err
 	}
 	return &pbempty.Empty{}, nil
 }
 
-func (st *PulumiServiceStackTagResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
-	ctx := context.Background()
+func (st *PulumiServiceStackTagResource) Create(ctx context.Context, req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	var inputs PulumiServiceStackTagInput
 	err := serde.FromProperties(req.GetProperties(), structTagKey, &inputs)
 	if err != nil {
@@ -114,7 +110,7 @@ func (st *PulumiServiceStackTagResource) Create(req *pulumirpc.CreateRequest) (*
 		Name:  inputs.Name,
 		Value: inputs.Value,
 	}
-	err = st.client.CreateTag(ctx, stackName, stackTag)
+	err = GetClient[*pulumiapi.Client](ctx).CreateTag(ctx, stackName, stackTag)
 	if err != nil {
 		return nil, err
 	}
@@ -124,17 +120,16 @@ func (st *PulumiServiceStackTagResource) Create(req *pulumirpc.CreateRequest) (*
 	}, nil
 }
 
-func (st *PulumiServiceStackTagResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
+func (st *PulumiServiceStackTagResource) Check(_ context.Context, req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
 	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: nil}, nil
 }
 
-func (st *PulumiServiceStackTagResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+func (st *PulumiServiceStackTagResource) Update(_ context.Context, req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
 	// all updates are destructive, so we just call Create.
 	return nil, fmt.Errorf("unexpected call to update, expected create to be called instead")
 }
 
-func (st *PulumiServiceStackTagResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	ctx := context.Background()
+func (st *PulumiServiceStackTagResource) Read(ctx context.Context, req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
 	var inputs PulumiServiceStackTagInput
 	err := serde.FromProperties(req.GetProperties(), structTagKey, &inputs)
 	if err != nil {
@@ -145,7 +140,7 @@ func (st *PulumiServiceStackTagResource) Read(req *pulumirpc.ReadRequest) (*pulu
 		ProjectName: inputs.Project,
 		StackName:   inputs.Stack,
 	}
-	tag, err := st.client.GetStackTag(ctx, stackName, inputs.Name)
+	tag, err := GetClient[*pulumiapi.Client](ctx).GetStackTag(ctx, stackName, inputs.Name)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read StackTag (%q): %w", req.Id, err)
 	}
@@ -163,7 +158,4 @@ func (st *PulumiServiceStackTagResource) Read(req *pulumirpc.ReadRequest) (*pulu
 		Properties: props,
 		Inputs:     props,
 	}, nil
-}
-
-func (st *PulumiServiceStackTagResource) Configure(_ PulumiServiceConfig) {
 }

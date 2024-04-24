@@ -1,57 +1,80 @@
 package provider
 
 import (
+	"context"
 	"fmt"
-	"os"
+	"net/http"
+	"time"
 
+	"github.com/pulumi/pulumi-go-provider/infer"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/workspace"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/pulumiapi"
 )
 
 const (
 	EnvVarPulumiAccessToken = "PULUMI_ACCESS_TOKEN"
-	EnvVarPulumiBackendUrl = "PULUMI_BACKEND_URL"
+	EnvVarPulumiBackendUrl  = "PULUMI_BACKEND_URL"
 )
 
 var ErrAccessTokenNotFound = fmt.Errorf("pulumi access token not found")
 
-type PulumiServiceConfig struct {
-	Config map[string]string
+type testClientKey struct{}
+
+// TestClientKey is the key used during client lookups to override the normal key.
+var TestClientKey = testClientKey{}
+
+// GetClient gets the client for a particular service, or a test client if it is
+// available.
+func GetClient[T any](ctx context.Context) T {
+	if v := ctx.Value(TestClientKey); v != nil {
+		return v.(T)
+	}
+
+	return any(GetConfig(ctx).client).(T)
 }
 
-func (pc *PulumiServiceConfig) getConfig(configName, envName string) string {
-	if val, ok := pc.Config[configName]; ok {
-		return val
-	}
+// GetConfig accesses the config associated with the current request.
+func GetConfig(ctx context.Context) Config { return infer.GetConfig[Config](ctx) }
 
-	return os.Getenv(envName)
+type Config struct {
+	AccessToken string `pulumi:"accessToken,optional"`
+	ServiceURL  string `pulumi:"serviceURL,optional"`
+	client      *pulumiapi.Client
 }
 
-func (pc *PulumiServiceConfig) getPulumiAccessToken() (*string, error) {
-	token := pc.getConfig("accessToken", EnvVarPulumiAccessToken)
+var (
+	_ infer.Annotated       = (*Config)(nil)
+	_ infer.CustomConfigure = (*Config)(nil)
+)
 
-	if len(token) > 0 {
-		// found the token
-		return &token, nil
-	}
+func (c *Config) Annotate(a infer.Annotator) {
+	a.Describe(&c.AccessToken, "Access Token to authenticate with Pulumi Cloud.")
+	a.SetDefault(nil, EnvVarPulumiAccessToken)
 
-	// attempt to grab credentials directly from the pulumi configuration on the machine
-	creds, err := workspace.GetStoredCredentials()
-	if err != nil {
-		return nil, ErrAccessTokenNotFound
-	}
-	if token, ok := creds.AccessTokens[creds.Current]; ok {
-		return &token, nil
-	}
-	return nil, ErrAccessTokenNotFound
+	a.Describe(&c.ServiceURL, "The service URL used to reach Pulumi Cloud.")
+	a.SetDefault("https://api.pulumi.com", EnvVarPulumiBackendUrl)
 }
 
-func (pc *PulumiServiceConfig) getPulumiServiceUrl() (*string, error) {
-	url := pc.getConfig("apiUrl", EnvVarPulumiBackendUrl)
-	baseurl := "https://api.pulumi.com"
-
-	if len(url) == 0 {
-		url = baseurl
+func (c *Config) Configure(context.Context) error {
+	// Ensure that we have an access token
+	if len(c.AccessToken) == 0 {
+		creds, err := workspace.GetStoredCredentials()
+		if err != nil {
+			return ErrAccessTokenNotFound
+		}
+		if token, ok := creds.AccessTokens[creds.Current]; ok {
+			c.AccessToken = token
+		} else {
+			return ErrAccessTokenNotFound
+		}
 	}
 
-	return &url, nil
+	// Construct the PulumiService client
+	client, err := pulumiapi.NewClient(&http.Client{
+		Timeout: 60 * time.Second,
+	}, c.AccessToken, c.ServiceURL)
+
+	c.client = client
+	return err
 }

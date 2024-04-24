@@ -18,9 +18,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"net/http"
-	"strings"
-	"time"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -33,8 +30,6 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/tokens"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
-
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/pulumiapi"
 )
 
 func inferProvider() infer.Options {
@@ -81,7 +76,7 @@ func inferProvider() infer.Options {
 		Resources:  []infer.InferredResource{},
 		Components: []infer.InferredComponent{},
 		Functions:  []infer.InferredFunction{},
-		Config:     nil,
+		Config:     infer.Config[Config](),
 		ModuleMap: map[tokens.ModuleName]tokens.ModuleName{
 			"provider": "index",
 		},
@@ -89,13 +84,12 @@ func inferProvider() infer.Options {
 }
 
 type PulumiServiceResource interface {
-	Configure(config PulumiServiceConfig)
-	Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error)
-	Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error)
-	Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error)
-	Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error)
-	Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error)
-	Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error)
+	Diff(context.Context, *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error)
+	Create(context.Context, *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error)
+	Delete(context.Context, *pulumirpc.DeleteRequest) (*pbempty.Empty, error)
+	Check(context.Context, *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error)
+	Update(context.Context, *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error)
+	Read(context.Context, *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error)
 	Name() string
 }
 
@@ -141,77 +135,8 @@ func (k *pulumiserviceProvider) DiffConfig(ctx context.Context, req *pulumirpc.D
 }
 
 // Configure configures the resource provider with "globals" that control its behavior.
-func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.ConfigureRequest) (*pulumirpc.ConfigureResponse, error) {
-
-	sc := PulumiServiceConfig{}
-	sc.Config = make(map[string]string)
-	for key, val := range req.GetVariables() {
-		sc.Config[strings.TrimPrefix(key, "pulumiservice:config:")] = val
-	}
-
-	httpClient := http.Client{
-		Timeout: 60 * time.Second,
-	}
-	token, err := sc.getPulumiAccessToken()
-	if err != nil {
-		return nil, err
-	}
-	url, err := sc.getPulumiServiceUrl()
-	if err != nil {
-		return nil, err
-	}
-	client, err := pulumiapi.NewClient(&httpClient, *token, *url)
-
-	if err != nil {
-		return nil, err
-	}
-
-	k.pulumiResources = []PulumiServiceResource{
-		&PulumiServiceTeamResource{
-			client: client,
-		},
-		&PulumiServiceAccessTokenResource{
-			client: client,
-		},
-		&PulumiServiceWebhookResource{
-			client: client,
-		},
-		&PulumiServiceStackTagResource{
-			client: client,
-		},
-		&TeamStackPermissionResource{
-			client: client,
-		},
-		&PulumiServiceTeamAccessTokenResource{
-			client: client,
-		},
-		&PulumiServiceOrgAccessTokenResource{
-			client: client,
-		},
-		&PulumiServiceDeploymentSettingsResource{
-			client: client,
-		},
-		&PulumiServiceAgentPoolResource{
-			client: client,
-		},
-		&PulumiServiceDeploymentScheduleResource{
-			client: client,
-		},
-		&PulumiServiceDriftScheduleResource{
-			client: client,
-		},
-		&PulumiServiceTtlScheduleResource{
-			client: client,
-		},
-	}
-
-	for _, sr := range k.pulumiResources {
-		sr.Configure(sc)
-	}
-
-	return &pulumirpc.ConfigureResponse{
-		AcceptSecrets: true,
-	}, nil
+func (k *pulumiserviceProvider) Configure(context.Context, *pulumirpc.ConfigureRequest) (*pulumirpc.ConfigureResponse, error) {
+	return &pulumirpc.ConfigureResponse{AcceptSecrets: true}, nil
 }
 
 // Invoke dynamically executes a built-in function in the provider.
@@ -236,35 +161,35 @@ func (k *pulumiserviceProvider) StreamInvoke(req *pulumirpc.InvokeRequest, serve
 func (k *pulumiserviceProvider) Check(ctx context.Context, req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
 	rn := getResourceNameFromRequest(req)
 	res := k.getPulumiServiceResource(rn)
-	return res.Check(req)
+	return res.Check(ctx, req)
 }
 
 // Diff checks what impacts a hypothetical update will have on the resource's properties.
 func (k *pulumiserviceProvider) Diff(ctx context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
 	rn := getResourceNameFromRequest(req)
 	res := k.getPulumiServiceResource(rn)
-	return res.Diff(req)
+	return res.Diff(ctx, req)
 }
 
 // Create allocates a new instance of the provided resource and returns its unique ID afterwards.
 func (k *pulumiserviceProvider) Create(ctx context.Context, req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	rn := getResourceNameFromRequest(req)
 	res := k.getPulumiServiceResource(rn)
-	return res.Create(req)
+	return res.Create(ctx, req)
 }
 
 // Read the current live state associated with a resource.
 func (k *pulumiserviceProvider) Read(ctx context.Context, req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
 	rn := getResourceNameFromRequest(req)
 	res := k.getPulumiServiceResource(rn)
-	return res.Read(req)
+	return res.Read(ctx, req)
 }
 
 // Update updates an existing resource with new values.
 func (k *pulumiserviceProvider) Update(ctx context.Context, req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
 	rn := getResourceNameFromRequest(req)
 	res := k.getPulumiServiceResource(rn)
-	return res.Update(req)
+	return res.Update(ctx, req)
 }
 
 // Delete tears down an existing resource with the given ID.  If it fails, the resource is assumed
@@ -272,7 +197,7 @@ func (k *pulumiserviceProvider) Update(ctx context.Context, req *pulumirpc.Updat
 func (k *pulumiserviceProvider) Delete(ctx context.Context, req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
 	rn := getResourceNameFromRequest(req)
 	res := k.getPulumiServiceResource(rn)
-	return res.Delete(req)
+	return res.Delete(ctx, req)
 }
 
 // GetPluginInfo returns generic information about this plugin, like its version.

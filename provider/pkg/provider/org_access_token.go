@@ -13,9 +13,7 @@ import (
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
-type PulumiServiceOrgAccessTokenResource struct {
-	client *pulumiapi.Client
-}
+type PulumiServiceOrgAccessTokenResource struct{}
 
 type PulumiServiceOrgAccessTokenInput struct {
 	OrgName     string
@@ -59,12 +57,11 @@ func (ot *PulumiServiceOrgAccessTokenResource) Name() string {
 	return "pulumiservice:index:OrgAccessToken"
 }
 
-func (ot *PulumiServiceOrgAccessTokenResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+func (ot *PulumiServiceOrgAccessTokenResource) Diff(_ context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
 	return diffAccessTokenProperties(req, []string{"name", "organizationName", "description", "admin"})
 }
 
-func (ot *PulumiServiceOrgAccessTokenResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	ctx := context.Background()
+func (ot *PulumiServiceOrgAccessTokenResource) Delete(ctx context.Context, req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
 	err := ot.deleteOrgAccessToken(ctx, req.Id)
 
 	if err != nil {
@@ -74,8 +71,7 @@ func (ot *PulumiServiceOrgAccessTokenResource) Delete(req *pulumirpc.DeleteReque
 	return &pbempty.Empty{}, nil
 }
 
-func (ot *PulumiServiceOrgAccessTokenResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
-	ctx := context.Background()
+func (ot *PulumiServiceOrgAccessTokenResource) Create(ctx context.Context, req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	inputs, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
@@ -113,23 +109,22 @@ func (ot *PulumiServiceOrgAccessTokenResource) Create(req *pulumirpc.CreateReque
 
 }
 
-func (ot *PulumiServiceOrgAccessTokenResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
+func (ot *PulumiServiceOrgAccessTokenResource) Check(_ context.Context, req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
 	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: nil}, nil
 }
 
-func (ot *PulumiServiceOrgAccessTokenResource) Update(_ *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+func (ot *PulumiServiceOrgAccessTokenResource) Update(context.Context, *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
 	// all updates are destructive, so we just call Create.
 	return nil, fmt.Errorf("unexpected call to update, expected create to be called instead")
 }
 
-func (ot *PulumiServiceOrgAccessTokenResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	ctx := context.Background()
+func (ot *PulumiServiceOrgAccessTokenResource) Read(ctx context.Context, req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
 	urn := req.GetId()
 
 	orgName, _, tokenId, err := splitOrgAccessTokenId(urn)
 
 	// the org access token is immutable; if we get nil it got deleted, otherwise all data is the same
-	accessToken, err := ot.client.GetOrgAccessToken(ctx, tokenId, orgName)
+	accessToken, err := GetClient[*pulumiapi.Client](ctx).GetOrgAccessToken(ctx, tokenId, orgName)
 	if err != nil {
 		return nil, err
 	}
@@ -147,12 +142,9 @@ func (ot *PulumiServiceOrgAccessTokenResource) Invoke(_ *pulumiserviceProvider, 
 	return &pulumirpc.InvokeResponse{Return: nil}, fmt.Errorf("unknown function '%s'", req.Tok)
 }
 
-func (ot *PulumiServiceOrgAccessTokenResource) Configure(_ PulumiServiceConfig) {
-}
-
 func (ot *PulumiServiceOrgAccessTokenResource) createOrgAccessToken(ctx context.Context, input PulumiServiceOrgAccessTokenInput) (*pulumiapi.AccessToken, error) {
 
-	accessToken, err := ot.client.CreateOrgAccessToken(ctx, input.Name, input.OrgName, input.Description, input.Admin)
+	accessToken, err := GetClient[*pulumiapi.Client](ctx).CreateOrgAccessToken(ctx, input.Name, input.OrgName, input.Description, input.Admin)
 	if err != nil {
 		return nil, err
 	}
@@ -166,7 +158,7 @@ func (ot *PulumiServiceOrgAccessTokenResource) deleteOrgAccessToken(ctx context.
 	if err != nil {
 		return err
 	}
-	return ot.client.DeleteOrgAccessToken(ctx, tokenId, orgName)
+	return GetClient[*pulumiapi.Client](ctx).DeleteOrgAccessToken(ctx, tokenId, orgName)
 
 }
 

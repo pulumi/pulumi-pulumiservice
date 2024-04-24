@@ -26,5 +26,19 @@ func Provider(name, version, legacySchema string) p.Provider {
 		schema:      legacySchema,
 		version:     version,
 		AccessToken: "",
+		pulumiResources: []PulumiServiceResource{
+			&PulumiServiceTeamResource{},
+			&PulumiServiceAccessTokenResource{},
+			&PulumiServiceWebhookResource{},
+			&PulumiServiceStackTagResource{},
+			&TeamStackPermissionResource{},
+			&PulumiServiceTeamAccessTokenResource{},
+			&PulumiServiceOrgAccessTokenResource{},
+			&PulumiServiceDeploymentSettingsResource{},
+			&PulumiServiceAgentPoolResource{},
+			&PulumiServiceDeploymentScheduleResource{},
+			&PulumiServiceDriftScheduleResource{},
+			&PulumiServiceTtlScheduleResource{},
+		},
 	}), inferProvider())
 }

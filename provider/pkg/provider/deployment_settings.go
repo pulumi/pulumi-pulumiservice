@@ -186,9 +186,7 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap() resource.Propert
 	return pm
 }
 
-type PulumiServiceDeploymentSettingsResource struct {
-	client pulumiapi.DeploymentSettingsClient
-}
+type PulumiServiceDeploymentSettingsResource struct{}
 
 func (ds *PulumiServiceDeploymentSettingsResource) ToPulumiServiceDeploymentSettingsInput(inputMap resource.PropertyMap) PulumiServiceDeploymentSettingsInput {
 	input := PulumiServiceDeploymentSettingsInput{}
@@ -484,11 +482,11 @@ func getSecretOrStringValue(prop resource.PropertyValue) string {
 	}
 }
 
-func (ds *PulumiServiceDeploymentSettingsResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+func (ds *PulumiServiceDeploymentSettingsResource) Diff(_ context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
 	return considerAllChangesReplaces(req)
 }
 
-func (ds *PulumiServiceDeploymentSettingsResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
+func (ds *PulumiServiceDeploymentSettingsResource) Check(_ context.Context, req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
 	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
@@ -507,16 +505,12 @@ func (ds *PulumiServiceDeploymentSettingsResource) Check(req *pulumirpc.CheckReq
 	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: failures}, nil
 }
 
-func (ds *PulumiServiceDeploymentSettingsResource) Configure(_ PulumiServiceConfig) {}
-
-func (ds *PulumiServiceDeploymentSettingsResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	ctx := context.Background()
-
+func (ds *PulumiServiceDeploymentSettingsResource) Read(ctx context.Context, req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
 	var stack pulumiapi.StackName
 	if err := stack.FromID(req.Id); err != nil {
 		return nil, err
 	}
-	settings, err := ds.client.GetDeploymentSettings(ctx, stack)
+	settings, err := GetClient[pulumiapi.DeploymentSettingsClient](ctx).GetDeploymentSettings(ctx, stack)
 	if err != nil {
 		return nil, err
 	}
@@ -547,8 +541,7 @@ func (ds *PulumiServiceDeploymentSettingsResource) Read(req *pulumirpc.ReadReque
 	}, nil
 }
 
-func (ds *PulumiServiceDeploymentSettingsResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	ctx := context.Background()
+func (ds *PulumiServiceDeploymentSettingsResource) Delete(ctx context.Context, req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
 	inputsMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
@@ -557,15 +550,14 @@ func (ds *PulumiServiceDeploymentSettingsResource) Delete(req *pulumirpc.DeleteR
 	if err != nil {
 		return nil, err
 	}
-	err = ds.client.DeleteDeploymentSettings(ctx, inputs.Stack)
+	err = GetClient[pulumiapi.DeploymentSettingsClient](ctx).DeleteDeploymentSettings(ctx, inputs.Stack)
 	if err != nil {
 		return nil, err
 	}
 	return &pbempty.Empty{}, nil
 }
 
-func (ds *PulumiServiceDeploymentSettingsResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
-	ctx := context.Background()
+func (ds *PulumiServiceDeploymentSettingsResource) Create(ctx context.Context, req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	inputsMap, err := plugin.UnmarshalProperties(req.GetProperties(),
 		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
 	if err != nil {
@@ -573,7 +565,7 @@ func (ds *PulumiServiceDeploymentSettingsResource) Create(req *pulumirpc.CreateR
 	}
 	inputs := ds.ToPulumiServiceDeploymentSettingsInput(inputsMap)
 	settings := inputs.DeploymentSettings
-	err = ds.client.CreateDeploymentSettings(ctx, inputs.Stack, settings)
+	err = GetClient[pulumiapi.DeploymentSettingsClient](ctx).CreateDeploymentSettings(ctx, inputs.Stack, settings)
 	if err != nil {
 		return nil, err
 	}
@@ -583,7 +575,7 @@ func (ds *PulumiServiceDeploymentSettingsResource) Create(req *pulumirpc.CreateR
 	}, nil
 }
 
-func (ds *PulumiServiceDeploymentSettingsResource) Update(_ *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+func (ds *PulumiServiceDeploymentSettingsResource) Update(context.Context, *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
 	// For simplicity, all updates are destructive, so we just call Create.
 	return nil, fmt.Errorf("unexpected call to update, expected create to be called instead")
 }
