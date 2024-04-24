@@ -38,7 +38,7 @@ func GetClient[T any](ctx context.Context) T {
 func GetConfig(ctx context.Context) Config { return infer.GetConfig[Config](ctx) }
 
 type Config struct {
-	AccessToken string `pulumi:"accessToken,optional"`
+	AccessToken string `pulumi:"accessToken,optional" provider:"secret"`
 	ServiceURL  string `pulumi:"serviceURL,optional"`
 	client      *pulumiapi.Client
 }
@@ -50,10 +50,10 @@ var (
 
 func (c *Config) Annotate(a infer.Annotator) {
 	a.Describe(&c.AccessToken, "Access Token to authenticate with Pulumi Cloud.")
-	a.SetDefault(nil, EnvVarPulumiAccessToken)
+	a.SetDefault(&c.AccessToken, nil, EnvVarPulumiAccessToken)
 
 	a.Describe(&c.ServiceURL, "The service URL used to reach Pulumi Cloud.")
-	a.SetDefault("https://api.pulumi.com", EnvVarPulumiBackendUrl)
+	a.SetDefault(&c.ServiceURL, "https://api.pulumi.com", EnvVarPulumiBackendUrl)
 }
 
 func (c *Config) Configure(context.Context) error {

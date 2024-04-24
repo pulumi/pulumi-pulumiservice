@@ -60,9 +60,7 @@ func TestDeploymentSchedule(t *testing.T) {
 			func() (*string, error) { return nil, nil },
 		)
 
-		provider := PulumiServiceDeploymentScheduleResource{
-			client: mockedClient,
-		}
+		provider := PulumiServiceDeploymentScheduleResource{}
 
 		input := PulumiServiceDeploymentScheduleInput{
 			Stack: pulumiapi.StackName{
@@ -88,7 +86,7 @@ func TestDeploymentSchedule(t *testing.T) {
 			Properties: outputProperties,
 		}
 
-		resp, err := provider.Read(&req)
+		resp, err := provider.Read(WithClient(mockedClient), &req)
 
 		assert.NoError(t, err)
 		assert.Equal(t, resp.Id, "")
@@ -103,9 +101,7 @@ func TestDeploymentSchedule(t *testing.T) {
 			},
 		)
 
-		provider := PulumiServiceDeploymentScheduleResource{
-			client: mockedClient,
-		}
+		provider := PulumiServiceDeploymentScheduleResource{}
 
 		input := PulumiServiceDeploymentScheduleInput{
 			Stack: pulumiapi.StackName{
@@ -131,7 +127,7 @@ func TestDeploymentSchedule(t *testing.T) {
 			Properties: outputProperties,
 		}
 
-		resp, err := provider.Read(&req)
+		resp, err := provider.Read(WithClient(mockedClient), &req)
 
 		assert.NoError(t, err)
 		assert.Equal(t, resp.Id, "org/project/stack/fake-schedule-id")
