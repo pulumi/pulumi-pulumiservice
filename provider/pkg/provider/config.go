@@ -35,7 +35,7 @@ func GetClient[T any](ctx context.Context) T {
 }
 
 // GetConfig accesses the config associated with the current request.
-func GetConfig(ctx context.Context) Config { return infer.GetConfig[Config](ctx) }
+func GetConfig(ctx context.Context) Config { return *infer.GetConfig[*Config](ctx) }
 
 type Config struct {
 	AccessToken string `pulumi:"accessToken,optional" provider:"secret"`

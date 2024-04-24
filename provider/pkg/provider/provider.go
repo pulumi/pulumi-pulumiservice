@@ -76,7 +76,7 @@ func inferProvider() infer.Options {
 		Resources:  []infer.InferredResource{},
 		Components: []infer.InferredComponent{},
 		Functions:  []infer.InferredFunction{},
-		Config:     infer.Config[Config](),
+		Config:     infer.Config[*Config](),
 		ModuleMap: map[tokens.ModuleName]tokens.ModuleName{
 			"provider": "index",
 		},
@@ -209,9 +209,7 @@ func (k *pulumiserviceProvider) GetPluginInfo(context.Context, *pbempty.Empty) (
 
 // GetSchema returns the JSON-serialized schema for the provider.
 func (k *pulumiserviceProvider) GetSchema(ctx context.Context, req *pulumirpc.GetSchemaRequest) (*pulumirpc.GetSchemaResponse, error) {
-	return &pulumirpc.GetSchemaResponse{
-		Schema: k.schema,
-	}, nil
+	return &pulumirpc.GetSchemaResponse{Schema: k.schema}, nil
 }
 
 // Cancel signals the provider to gracefully shut down and abort any ongoing resource operations.
