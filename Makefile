@@ -12,7 +12,7 @@ PROVIDER_PATH   := provider
 VERSION_PATH     := ${PROVIDER_PATH}/pkg/version.Version
 
 SCHEMA_FILE     := provider/cmd/pulumi-resource-pulumiservice/schema.json
-GOPATH			:= $(shell go env GOPATH)
+export GOPATH	:= $(shell go env GOPATH)
 
 WORKING_DIR     := $(shell pwd)
 TESTPARALLELISM := 4
