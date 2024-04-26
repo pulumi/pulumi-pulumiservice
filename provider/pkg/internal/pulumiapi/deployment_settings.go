@@ -86,8 +86,11 @@ func (c *Client) GetDeploymentSettings(ctx context.Context, stack StackName) (*D
 	apiPath := path.Join(
 		"stacks", stack.OrgName, stack.ProjectName, stack.StackName, "deployments", "settings",
 	)
+	queryParams := map[string]string{
+		"seeSecrets": "true",
+	}
 	var ds DeploymentSettings
-	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &ds)
+	_, err := c.doWithQuery(ctx, http.MethodGet, apiPath, queryParams, &ds)
 	if err != nil {
 		statusCode := GetErrorStatusCode(err)
 		if statusCode == http.StatusNotFound {

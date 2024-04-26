@@ -53,7 +53,7 @@ func NewClient(client *http.Client, token, URL string) (*Client, error) {
 }
 
 // createRequest creates a *http.Request with standard headers set and reqBody marshalled into json.
-func (c *Client) createRequest(ctx context.Context, method, path string, reqBody interface{}) (*http.Request, error) {
+func (c *Client) createRequest(ctx context.Context, method, path string, reqBody interface{}, queryParams map[string]string) (*http.Request, error) {
 	var reqBodyReader io.Reader
 	if reqBody != nil {
 		data, err := json.Marshal(reqBody)
@@ -62,7 +62,15 @@ func (c *Client) createRequest(ctx context.Context, method, path string, reqBody
 		}
 		reqBodyReader = bytes.NewBuffer(data)
 	}
-	endpoint := c.baseurl.ResolveReference(&url.URL{Path: path})
+	url := url.URL{Path: path}
+	q := url.Query()
+	if queryParams != nil {
+		for k, v := range queryParams {
+			q.Add(k, v)
+		}
+	}
+	url.RawQuery = q.Encode()
+	endpoint := c.baseurl.ResolveReference(&url)
 
 	req, err := http.NewRequestWithContext(ctx, method, endpoint.String(), reqBodyReader)
 	if err != nil {
@@ -116,7 +124,19 @@ func (c *Client) sendRequest(req *http.Request, resBody interface{}) (*http.Resp
 // Marshals reqBody and resBody to/from JSON. Applies appropriate headers as well
 // Returns http.Response, but Body will be closed
 func (c *Client) do(ctx context.Context, method, path string, reqBody interface{}, resBody interface{}) (*http.Response, error) {
-	req, err := c.createRequest(ctx, method, path, reqBody)
+	req, err := c.createRequest(ctx, method, path, reqBody, nil)
+	if err != nil {
+		return nil, err
+	}
+	return c.sendRequest(req, resBody)
+}
+
+// do execute an http request to the pulumi service at the configured url
+// Marshals resBody to/from JSON. Applies appropriate headers as well
+// Adds provided query parameters to the URL (This method is primarily for GET requests)
+// Returns http.Response, but Body will be closed
+func (c *Client) doWithQuery(ctx context.Context, method, path string, queryParams map[string]string, resBody interface{}) (*http.Response, error) {
+	req, err := c.createRequest(ctx, method, path, nil, queryParams)
 	if err != nil {
 		return nil, err
 	}

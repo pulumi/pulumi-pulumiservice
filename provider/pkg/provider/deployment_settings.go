@@ -19,14 +19,14 @@ type PulumiServiceDeploymentSettingsInput struct {
 	Stack pulumiapi.StackName
 }
 
-const FixMe = "<value is secret and must be replaced>"
-
 func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap() resource.PropertyMap {
 	pm := resource.PropertyMap{}
 	pm["organization"] = resource.NewPropertyValue(ds.Stack.OrgName)
 	pm["project"] = resource.NewPropertyValue(ds.Stack.ProjectName)
 	pm["stack"] = resource.NewPropertyValue(ds.Stack.StackName)
-	pm["agentPoolId"] = resource.NewPropertyValue(ds.AgentPoolId)
+	if ds.AgentPoolId != "" {
+		pm["agentPoolId"] = resource.NewPropertyValue(ds.AgentPoolId)
+	}
 
 	if ds.SourceContext != nil {
 		scMap := resource.PropertyMap{}
@@ -49,22 +49,22 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap() resource.Propert
 				if ds.SourceContext.Git.GitAuth.SSHAuth != nil {
 					sshAuthPropertyMap := resource.PropertyMap{}
 					if ds.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey.Value != "" {
-						sshAuthPropertyMap["sshPrivateKey"] = resource.NewPropertyValue(FixMe)
+						sshAuthPropertyMap["sshPrivateKey"] = resource.MakeSecret(resource.NewPropertyValue(ds.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey.Value))
 					}
 					if ds.SourceContext.Git.GitAuth.SSHAuth.Password.Value != "" {
-						sshAuthPropertyMap["password"] = resource.NewPropertyValue(FixMe)
+						sshAuthPropertyMap["password"] = resource.MakeSecret(resource.NewPropertyValue(ds.SourceContext.Git.GitAuth.SSHAuth.Password.Value))
 					}
 					gitAuthPropertyMap["sshAuth"] = resource.PropertyValue{V: sshAuthPropertyMap}
 				}
 				if ds.SourceContext.Git.GitAuth.BasicAuth != nil {
 					basicAuthPropertyMap := resource.PropertyMap{}
 					if ds.SourceContext.Git.GitAuth.BasicAuth.UserName.Value != "" {
-						basicAuthPropertyMap["username"] = resource.NewPropertyValue(ds.SourceContext.Git.GitAuth.BasicAuth.UserName.Value)
+						basicAuthPropertyMap["username"] = resource.MakeSecret(resource.NewPropertyValue(ds.SourceContext.Git.GitAuth.BasicAuth.UserName.Value))
 					}
 					if ds.SourceContext.Git.GitAuth.BasicAuth.Password.Value != "" {
-						basicAuthPropertyMap["password"] = resource.NewPropertyValue("fix me")
+						basicAuthPropertyMap["password"] = resource.MakeSecret(resource.NewPropertyValue(ds.SourceContext.Git.GitAuth.BasicAuth.Password.Value))
 					}
-					gitAuthPropertyMap["basicAuth"] = resource.NewPropertyValue(basicAuthPropertyMap)
+					gitAuthPropertyMap["basicAuth"] = resource.PropertyValue{V: basicAuthPropertyMap}
 				}
 				gitPropertyMap["gitAuth"] = resource.PropertyValue{V: gitAuthPropertyMap}
 			}
@@ -82,7 +82,7 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap() resource.Propert
 			evMap := resource.PropertyMap{}
 			for k, v := range ds.OperationContext.EnvironmentVariables {
 				if v.Secret {
-					evMap[resource.PropertyKey(k)] = resource.NewPropertyValue(FixMe)
+					evMap[resource.PropertyKey(k)] = resource.MakeSecret(resource.NewPropertyValue(v.Value))
 				} else {
 					evMap[resource.PropertyKey(k)] = resource.NewPropertyValue(v.Value)
 				}
@@ -103,7 +103,9 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap() resource.Propert
 			if ds.OperationContext.Options.DeleteAfterDestroy {
 				optionsMap["deleteAfterDestroy"] = resource.NewPropertyValue(true)
 			}
-			ocMap["options"] = resource.PropertyValue{V: optionsMap}
+			if len(optionsMap.StableKeys()) != 0 {
+				ocMap["options"] = resource.PropertyValue{V: optionsMap}
+			}
 		}
 		if ds.OperationContext.OIDC != nil {
 			if ds.OperationContext.OIDC.AWS != nil || ds.OperationContext.OIDC.GCP != nil || ds.OperationContext.OIDC.Azure != nil {
@@ -349,11 +351,8 @@ func toOperationContext(inputMap resource.PropertyMap) *pulumiapi.OperationConte
 		evInput := ocInput["environmentVariables"].ObjectValue()
 
 		for k, v := range evInput {
-			if v.IsSecret() {
-				ev[string(k)] = apitype.SecretValue{Secret: true, Value: v.SecretValue().Element.StringValue()}
-			} else {
-				ev[string(k)] = apitype.SecretValue{Secret: false, Value: v.StringValue()}
-			}
+			// This hardcodes all env vars created via provider as secret. Schema change would be needed for optional secrecy
+			ev[string(k)] = apitype.SecretValue{Secret: true, Value: v.StringValue()}
 		}
 
 		oc.EnvironmentVariables = ev
@@ -533,7 +532,7 @@ func (ds *PulumiServiceDeploymentSettingsResource) Read(req *pulumirpc.ReadReque
 
 	properties, err := plugin.MarshalProperties(
 		dsInput.ToPropertyMap(),
-		plugin.MarshalOptions{},
+		plugin.MarshalOptions{KeepSecrets: true, SkipNulls: true},
 	)
 
 	if err != nil {
@@ -577,9 +576,18 @@ func (ds *PulumiServiceDeploymentSettingsResource) Create(req *pulumirpc.CreateR
 	if err != nil {
 		return nil, err
 	}
+
+	properties, err := plugin.MarshalProperties(
+		inputs.ToPropertyMap(),
+		plugin.MarshalOptions{KeepSecrets: true},
+	)
+	if err != nil {
+		return nil, err
+	}
+
 	return &pulumirpc.CreateResponse{
 		Id:         path.Join(inputs.Stack.OrgName, inputs.Stack.ProjectName, inputs.Stack.StackName),
-		Properties: req.GetProperties(),
+		Properties: properties,
 	}, nil
 }
 
