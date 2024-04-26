@@ -15,3 +15,5 @@ yarn.lock
 ci-scripts
 /nuget/
 **/version.txt
+.mono
+go
