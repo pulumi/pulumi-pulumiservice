@@ -82,7 +82,7 @@ export class DriftSchedule extends pulumi.CustomResource {
             if ((!args || args.stack === undefined) && !opts.urn) {
                 throw new Error("Missing required property 'stack'");
             }
-            resourceInputs["autoRemediate"] = args ? args.autoRemediate : undefined;
+            resourceInputs["autoRemediate"] = (args ? args.autoRemediate : undefined) ?? false;
             resourceInputs["organization"] = args ? args.organization : undefined;
             resourceInputs["project"] = args ? args.project : undefined;
             resourceInputs["scheduleCron"] = args ? args.scheduleCron : undefined;

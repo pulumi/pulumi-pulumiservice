@@ -1109,7 +1109,8 @@
         },
         "autoRemediate": {
           "description": "Whether any drift detected should be remediated after a drift run.",
-          "type": "boolean"
+          "type": "boolean",
+          "default": false
         },
         "scheduleId": {
           "description": "Schedule ID of the created schedule, assigned by Pulumi Cloud.",
@@ -1142,7 +1143,8 @@
         },
         "autoRemediate": {
           "description": "Whether any drift detected should be remediated after a drift run.",
-          "type": "boolean"
+          "type": "boolean",
+          "default": false
         }
       },
       "requiredInputs": [
@@ -1173,7 +1175,8 @@
         },
         "deleteAfterDestroy": {
           "description": "True if the stack and all associated history and settings should be deleted.",
-          "type": "boolean"
+          "type": "boolean",
+          "default": false
         },
         "scheduleId": {
           "description": "Schedule ID of the created schedule, assigned by Pulumi Cloud.",
@@ -1206,7 +1209,8 @@
         },
         "deleteAfterDestroy": {
           "description": "True if the stack and all associated history and settings should be deleted.",
-          "type": "boolean"
+          "type": "boolean",
+          "default": false
         }
       },
       "requiredInputs": [

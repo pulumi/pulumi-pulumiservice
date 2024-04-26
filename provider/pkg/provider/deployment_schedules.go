@@ -142,14 +142,18 @@ func ScheduleSharedDiff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, er
 		return nil, err
 	}
 
-	// preprocess olds to remove the `scheduleId` property since it's only an output and shouldn't cause a diff
-	if olds["scheduleId"].HasValue() {
-		delete(olds, "scheduleId")
-	}
-
 	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
+	}
+
+	return ScheduleSharedDiffMaps(olds, news)
+}
+
+func ScheduleSharedDiffMaps(olds resource.PropertyMap, news resource.PropertyMap) (*pulumirpc.DiffResponse, error) {
+	// preprocess olds to remove the `scheduleId` property since it's only an output and shouldn't cause a diff
+	if olds["scheduleId"].HasValue() {
+		delete(olds, "scheduleId")
 	}
 
 	diffs := olds.Diff(news)
@@ -342,7 +346,7 @@ func (st *PulumiServiceDeploymentScheduleResource) Read(req *pulumirpc.ReadReque
 	}
 
 	outputProperties, err := plugin.MarshalProperties(
-		input.ToPropertyMap(),
+		AddScheduleIdToPropertyMap(*scheduleID, input.ToPropertyMap()),
 		plugin.MarshalOptions{
 			KeepUnknowns: true,
 			SkipNulls:    true,

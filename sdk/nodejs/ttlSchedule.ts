@@ -82,7 +82,7 @@ export class TtlSchedule extends pulumi.CustomResource {
             if ((!args || args.timestamp === undefined) && !opts.urn) {
                 throw new Error("Missing required property 'timestamp'");
             }
-            resourceInputs["deleteAfterDestroy"] = args ? args.deleteAfterDestroy : undefined;
+            resourceInputs["deleteAfterDestroy"] = (args ? args.deleteAfterDestroy : undefined) ?? false;
             resourceInputs["organization"] = args ? args.organization : undefined;
             resourceInputs["project"] = args ? args.project : undefined;
             resourceInputs["stack"] = args ? args.stack : undefined;

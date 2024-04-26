@@ -128,6 +128,7 @@ namespace Pulumi.PulumiService
 
         public TtlScheduleArgs()
         {
+            DeleteAfterDestroy = false;
         }
         public static new TtlScheduleArgs Empty => new TtlScheduleArgs();
     }

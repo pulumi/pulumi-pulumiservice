@@ -63,7 +63,21 @@ func ToPulumiServiceDriftScheduleInput(properties *structpb.Struct) (*PulumiServ
 }
 
 func (st *PulumiServiceDriftScheduleResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	return ScheduleSharedDiff(req)
+	olds, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
+	if err != nil {
+		return nil, err
+	}
+
+	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	if err != nil {
+		return nil, err
+	}
+
+	if !news["autoRemediate"].HasValue() {
+		news["autoRemediate"] = resource.NewBoolProperty(false)
+	}
+
+	return ScheduleSharedDiffMaps(olds, news)
 }
 
 func (st *PulumiServiceDriftScheduleResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
@@ -182,7 +196,7 @@ func (st *PulumiServiceDriftScheduleResource) Read(req *pulumirpc.ReadRequest) (
 	}
 
 	outputProperties, err := plugin.MarshalProperties(
-		input.ToPropertyMap(),
+		AddScheduleIdToPropertyMap(*scheduleID, input.ToPropertyMap()),
 		plugin.MarshalOptions{
 			KeepUnknowns: true,
 			SkipNulls:    true,
