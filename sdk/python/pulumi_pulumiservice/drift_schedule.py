@@ -31,6 +31,8 @@ class DriftScheduleArgs:
         pulumi.set(__self__, "project", project)
         pulumi.set(__self__, "schedule_cron", schedule_cron)
         pulumi.set(__self__, "stack", stack)
+        if auto_remediate is None:
+            auto_remediate = False
         if auto_remediate is not None:
             pulumi.set(__self__, "auto_remediate", auto_remediate)
 
@@ -155,6 +157,8 @@ class DriftSchedule(pulumi.CustomResource):
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
             __props__ = DriftScheduleArgs.__new__(DriftScheduleArgs)
 
+            if auto_remediate is None:
+                auto_remediate = False
             __props__.__dict__["auto_remediate"] = auto_remediate
             if organization is None and not opts.urn:
                 raise TypeError("Missing required property 'organization'")

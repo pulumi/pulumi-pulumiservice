@@ -128,6 +128,7 @@ namespace Pulumi.PulumiService
 
         public DriftScheduleArgs()
         {
+            AutoRemediate = false;
         }
         public static new DriftScheduleArgs Empty => new DriftScheduleArgs();
     }

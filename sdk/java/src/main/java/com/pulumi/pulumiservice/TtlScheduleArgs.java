@@ -5,6 +5,7 @@ package com.pulumi.pulumiservice;
 
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
+import com.pulumi.core.internal.Codegen;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
 import java.lang.Boolean;
 import java.lang.String;
@@ -226,6 +227,7 @@ public final class TtlScheduleArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         public TtlScheduleArgs build() {
+            $.deleteAfterDestroy = Codegen.booleanProp("deleteAfterDestroy").output().arg($.deleteAfterDestroy).def(false).getNullable();
             if ($.organization == null) {
                 throw new MissingRequiredPropertyException("TtlScheduleArgs", "organization");
             }

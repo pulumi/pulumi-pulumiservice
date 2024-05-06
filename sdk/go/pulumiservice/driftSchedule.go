@@ -49,6 +49,9 @@ func NewDriftSchedule(ctx *pulumi.Context,
 	if args.Stack == nil {
 		return nil, errors.New("invalid value for required argument 'Stack'")
 	}
+	if args.AutoRemediate == nil {
+		args.AutoRemediate = pulumi.BoolPtr(false)
+	}
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource DriftSchedule
 	err := ctx.RegisterResource("pulumiservice:index:DriftSchedule", name, args, &resource, opts...)

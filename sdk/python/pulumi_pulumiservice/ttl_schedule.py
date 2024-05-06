@@ -31,6 +31,8 @@ class TtlScheduleArgs:
         pulumi.set(__self__, "project", project)
         pulumi.set(__self__, "stack", stack)
         pulumi.set(__self__, "timestamp", timestamp)
+        if delete_after_destroy is None:
+            delete_after_destroy = False
         if delete_after_destroy is not None:
             pulumi.set(__self__, "delete_after_destroy", delete_after_destroy)
 
@@ -155,6 +157,8 @@ class TtlSchedule(pulumi.CustomResource):
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
             __props__ = TtlScheduleArgs.__new__(TtlScheduleArgs)
 
+            if delete_after_destroy is None:
+                delete_after_destroy = False
             __props__.__dict__["delete_after_destroy"] = delete_after_destroy
             if organization is None and not opts.urn:
                 raise TypeError("Missing required property 'organization'")
