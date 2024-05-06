@@ -17,3 +17,4 @@ ci-scripts
 **/version.txt
 .mono
 go
+*.sln

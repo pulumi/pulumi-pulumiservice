@@ -180,7 +180,7 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap() resource.Propert
 
 	if ds.ExecutorContext != nil && ds.ExecutorContext.ExecutorImage != nil && ds.ExecutorContext.ExecutorImage.Reference != "" {
 		ecMap := resource.PropertyMap{}
-		ecMap["executorImage"] = resource.NewPropertyValue(ds.ExecutorContext.ExecutorImage)
+		ecMap["executorImage"] = resource.NewPropertyValue(ds.ExecutorContext.ExecutorImage.Reference)
 		pm["executorContext"] = resource.PropertyValue{V: ecMap}
 	}
 	return pm
