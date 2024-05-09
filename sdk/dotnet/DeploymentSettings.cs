@@ -24,6 +24,30 @@ namespace Pulumi.PulumiService
     public partial class DeploymentSettings : global::Pulumi.CustomResource
     {
         /// <summary>
+        /// The agent pool identifier to use for the deployment.
+        /// </summary>
+        [Output("agentPoolId")]
+        public Output<string?> AgentPoolId { get; private set; } = null!;
+
+        /// <summary>
+        /// Settings related to the deployment executor.
+        /// </summary>
+        [Output("executorContext")]
+        public Output<Outputs.DeploymentSettingsExecutorContext?> ExecutorContext { get; private set; } = null!;
+
+        /// <summary>
+        /// GitHub settings for the deployment.
+        /// </summary>
+        [Output("github")]
+        public Output<Outputs.DeploymentSettingsGithub?> Github { get; private set; } = null!;
+
+        /// <summary>
+        /// Settings related to the Pulumi operation environment during the deployment.
+        /// </summary>
+        [Output("operationContext")]
+        public Output<Outputs.DeploymentSettingsOperationContext?> OperationContext { get; private set; } = null!;
+
+        /// <summary>
         /// Organization name.
         /// </summary>
         [Output("organization")]
@@ -34,6 +58,12 @@ namespace Pulumi.PulumiService
         /// </summary>
         [Output("project")]
         public Output<string> Project { get; private set; } = null!;
+
+        /// <summary>
+        /// Settings related to the source of the deployment.
+        /// </summary>
+        [Output("sourceContext")]
+        public Output<Outputs.DeploymentSettingsSourceContext> SourceContext { get; private set; } = null!;
 
         /// <summary>
         /// Stack name.

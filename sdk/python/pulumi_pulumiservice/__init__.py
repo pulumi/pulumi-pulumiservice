@@ -20,6 +20,7 @@ from .team_stack_permission import *
 from .ttl_schedule import *
 from .webhook import *
 from ._inputs import *
+from . import outputs
 
 # Make subpackages available:
 if typing.TYPE_CHECKING:
