@@ -84,3 +84,14 @@ func TestNodejsWebhookExample(t *testing.T) {
 		},
 	})
 }
+
+func TestNodejsSchedulesExample(t *testing.T) {
+	cwd := getCwd(t)
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Dir:       path.Join(cwd, ".", "ts-schedules"),
+		StackName: "test-stack",
+		Dependencies: []string{
+			"@pulumi/pulumiservice",
+		},
+	})
+}

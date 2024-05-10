@@ -18,3 +18,14 @@ func TestDotnetTeamsExamples(t *testing.T) {
 		},
 	})
 }
+
+func TestDotnetSchedulesExamples(t *testing.T) {
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Dir:         path.Join(getCwd(t), "cs-schedules"),
+		StackName:   "test-stack",
+		SkipRefresh: true,
+		Dependencies: []string{
+			"Pulumi.PulumiService",
+		},
+	})
+}
