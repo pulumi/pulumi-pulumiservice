@@ -34,7 +34,11 @@ func (i *PulumiServiceEnvironmentInput) ToPropertyMap() (resource.PropertyMap, e
 	if err != nil {
 		return nil, err
 	}
+<<<<<<< HEAD
 	propertyMap["yaml"] = resource.MakeSecret(resource.NewAssetProperty(yamlAsset))
+=======
+	propertyMap["yaml"] = resource.NewAssetProperty(yamlAsset)
+>>>>>>> bdaf4b8 (Adding Environment Resource)
 
 	return propertyMap, nil
 }
@@ -163,9 +167,13 @@ func (st *PulumiServiceEnvironmentResource) Create(req *pulumirpc.CreateRequest)
 	}
 	outputProperties, err := plugin.MarshalProperties(
 		propertyMap,
+<<<<<<< HEAD
 		plugin.MarshalOptions{
 			KeepSecrets: true,
 		},
+=======
+		plugin.MarshalOptions{},
+>>>>>>> bdaf4b8 (Adding Environment Resource)
 	)
 	if err != nil {
 		return nil, err
@@ -216,9 +224,13 @@ func (st *PulumiServiceEnvironmentResource) Update(req *pulumirpc.UpdateRequest)
 	}
 	outputProperties, err := plugin.MarshalProperties(
 		propertyMap,
+<<<<<<< HEAD
 		plugin.MarshalOptions{
 			KeepSecrets: true,
 		},
+=======
+		plugin.MarshalOptions{},
+>>>>>>> bdaf4b8 (Adding Environment Resource)
 	)
 	if err != nil {
 		return nil, err
@@ -252,9 +264,13 @@ func (st *PulumiServiceEnvironmentResource) Read(req *pulumirpc.ReadRequest) (*p
 	}
 	properties, err := plugin.MarshalProperties(
 		propertyMap,
+<<<<<<< HEAD
 		plugin.MarshalOptions{
 			KeepSecrets: true,
 		},
+=======
+		plugin.MarshalOptions{},
+>>>>>>> bdaf4b8 (Adding Environment Resource)
 	)
 	if err != nil {
 		return nil, err
