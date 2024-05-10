@@ -20,6 +20,7 @@
         "deploymentSchedule.ts",
         "deploymentSettings.ts",
         "driftSchedule.ts",
+        "environment.ts",
         "index.ts",
         "orgAccessToken.ts",
         "provider.ts",
