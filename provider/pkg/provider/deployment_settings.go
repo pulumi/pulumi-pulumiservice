@@ -26,7 +26,10 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap() resource.Propert
 	pm["organization"] = resource.NewPropertyValue(ds.Stack.OrgName)
 	pm["project"] = resource.NewPropertyValue(ds.Stack.ProjectName)
 	pm["stack"] = resource.NewPropertyValue(ds.Stack.StackName)
-	pm["agentPoolId"] = resource.NewPropertyValue(ds.AgentPoolId)
+
+	if ds.AgentPoolId != "" {
+		pm["agentPoolId"] = resource.NewPropertyValue(ds.AgentPoolId)
+	}
 
 	if ds.SourceContext != nil {
 		scMap := resource.PropertyMap{}

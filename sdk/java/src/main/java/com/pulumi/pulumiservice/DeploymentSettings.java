@@ -9,7 +9,12 @@ import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.DeploymentSettingsArgs;
 import com.pulumi.pulumiservice.Utilities;
+import com.pulumi.pulumiservice.outputs.DeploymentSettingsExecutorContext;
+import com.pulumi.pulumiservice.outputs.DeploymentSettingsGithub;
+import com.pulumi.pulumiservice.outputs.DeploymentSettingsOperationContext;
+import com.pulumi.pulumiservice.outputs.DeploymentSettingsSourceContext;
 import java.lang.String;
+import java.util.Optional;
 import javax.annotation.Nullable;
 
 /**
@@ -26,6 +31,62 @@ import javax.annotation.Nullable;
  */
 @ResourceType(type="pulumiservice:index:DeploymentSettings")
 public class DeploymentSettings extends com.pulumi.resources.CustomResource {
+    /**
+     * The agent pool identifier to use for the deployment.
+     * 
+     */
+    @Export(name="agentPoolId", refs={String.class}, tree="[0]")
+    private Output</* @Nullable */ String> agentPoolId;
+
+    /**
+     * @return The agent pool identifier to use for the deployment.
+     * 
+     */
+    public Output<Optional<String>> agentPoolId() {
+        return Codegen.optional(this.agentPoolId);
+    }
+    /**
+     * Settings related to the deployment executor.
+     * 
+     */
+    @Export(name="executorContext", refs={DeploymentSettingsExecutorContext.class}, tree="[0]")
+    private Output</* @Nullable */ DeploymentSettingsExecutorContext> executorContext;
+
+    /**
+     * @return Settings related to the deployment executor.
+     * 
+     */
+    public Output<Optional<DeploymentSettingsExecutorContext>> executorContext() {
+        return Codegen.optional(this.executorContext);
+    }
+    /**
+     * GitHub settings for the deployment.
+     * 
+     */
+    @Export(name="github", refs={DeploymentSettingsGithub.class}, tree="[0]")
+    private Output</* @Nullable */ DeploymentSettingsGithub> github;
+
+    /**
+     * @return GitHub settings for the deployment.
+     * 
+     */
+    public Output<Optional<DeploymentSettingsGithub>> github() {
+        return Codegen.optional(this.github);
+    }
+    /**
+     * Settings related to the Pulumi operation environment during the deployment.
+     * 
+     */
+    @Export(name="operationContext", refs={DeploymentSettingsOperationContext.class}, tree="[0]")
+    private Output</* @Nullable */ DeploymentSettingsOperationContext> operationContext;
+
+    /**
+     * @return Settings related to the Pulumi operation environment during the deployment.
+     * 
+     */
+    public Output<Optional<DeploymentSettingsOperationContext>> operationContext() {
+        return Codegen.optional(this.operationContext);
+    }
     /**
      * Organization name.
      * 
@@ -53,6 +114,20 @@ public class DeploymentSettings extends com.pulumi.resources.CustomResource {
      */
     public Output<String> project() {
         return this.project;
+    }
+    /**
+     * Settings related to the source of the deployment.
+     * 
+     */
+    @Export(name="sourceContext", refs={DeploymentSettingsSourceContext.class}, tree="[0]")
+    private Output<DeploymentSettingsSourceContext> sourceContext;
+
+    /**
+     * @return Settings related to the source of the deployment.
+     * 
+     */
+    public Output<DeploymentSettingsSourceContext> sourceContext() {
+        return this.sourceContext;
     }
     /**
      * Stack name.
