@@ -874,12 +874,33 @@
         "stack": {
           "description": "Stack name.",
           "type": "string"
+        },
+        "executorContext": {
+          "$ref": "#/types/pulumiservice:index:DeploymentSettingsExecutorContext",
+          "description": "Settings related to the deployment executor."
+        },
+        "sourceContext": {
+          "$ref": "#/types/pulumiservice:index:DeploymentSettingsSourceContext",
+          "description": "Settings related to the source of the deployment."
+        },
+        "github": {
+          "$ref": "#/types/pulumiservice:index:DeploymentSettingsGithub",
+          "description": "GitHub settings for the deployment."
+        },
+        "operationContext": {
+          "$ref": "#/types/pulumiservice:index:DeploymentSettingsOperationContext",
+          "description": "Settings related to the Pulumi operation environment during the deployment."
+        },
+        "agentPoolId": {
+          "description": "The agent pool identifier to use for the deployment.",
+          "type": "string"
         }
       },
       "required": [
         "organization",
         "project",
-        "stack"
+        "stack",
+        "sourceContext"
       ],
       "inputProperties": {
         "organization": {
