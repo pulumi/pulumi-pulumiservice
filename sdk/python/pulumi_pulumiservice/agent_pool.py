@@ -75,7 +75,7 @@ class AgentPool(pulumi.CustomResource):
                  organization_name: Optional[pulumi.Input[str]] = None,
                  __props__=None):
         """
-        Agent Pool for customer manager deployments
+        Agent Pool for customer managed deployments
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
@@ -90,7 +90,7 @@ class AgentPool(pulumi.CustomResource):
                  args: AgentPoolArgs,
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
-        Agent Pool for customer manager deployments
+        Agent Pool for customer managed deployments
 
         :param str resource_name: The name of the resource.
         :param AgentPoolArgs args: The arguments to use to populate this resource's properties.

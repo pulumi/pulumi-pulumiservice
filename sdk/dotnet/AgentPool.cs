@@ -10,7 +10,7 @@ using Pulumi.Serialization;
 namespace Pulumi.PulumiService
 {
     /// <summary>
-    /// Agent Pool for customer manager deployments
+    /// Agent Pool for customer managed deployments
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:index:AgentPool")]
     public partial class AgentPool : global::Pulumi.CustomResource

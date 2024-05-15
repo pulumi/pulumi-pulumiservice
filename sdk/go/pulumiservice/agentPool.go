@@ -12,7 +12,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-// Agent Pool for customer manager deployments
+// Agent Pool for customer managed deployments
 type AgentPool struct {
 	pulumi.CustomResourceState
 
