@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+## 0.20.2
+
+### Bug Fixes
+
+- Prevent noisy drift if agentPoolId is empty [#268](https://github.com/pulumi/pulumi-pulumiservice/issues/268)
+- Add missing DeploymentSettings output properties [#267](https://github.com/pulumi/pulumi-pulumiservice/issues/267)
+
 ## 0.20.1
 
 ### Bug Fixes
