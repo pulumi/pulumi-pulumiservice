@@ -246,6 +246,17 @@ func TestYamlWebhookExample(t *testing.T) {
 	})
 }
 
+func TestYamlSchedulesExample(t *testing.T) {
+	cwd := getCwd(t)
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Dir:       path.Join(cwd, ".", "yaml-schedules"),
+		StackName: "test-stack",
+		PrepareProject: func(p *engine.Projinfo) error {
+			return nil
+		},
+	})
+}
+
 func writePulumiYaml(t *testing.T, yamlContents interface{}) string {
 	tmpdir := t.TempDir()
 	b, err := yaml.Marshal(yamlContents)
