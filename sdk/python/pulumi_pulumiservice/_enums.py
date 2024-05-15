@@ -5,11 +5,35 @@
 from enum import Enum
 
 __all__ = [
+    'EnvironmentPermission',
     'PulumiOperation',
     'TeamStackPermissionScope',
     'WebhookFilters',
     'WebhookFormat',
 ]
+
+
+class EnvironmentPermission(str, Enum):
+    NONE = "none"
+    """
+    No permissions.
+    """
+    READ = "read"
+    """
+    Permission to read environment definition only.
+    """
+    OPEN = "open"
+    """
+    Permission to open and read the environment.
+    """
+    WRITE = "write"
+    """
+    Permission to open, read and update the environment.
+    """
+    ADMIN = "admin"
+    """
+    Permission for all operations on the environment.
+    """
 
 
 class PulumiOperation(str, Enum):

@@ -16,6 +16,7 @@ from .provider import *
 from .stack_tag import *
 from .team import *
 from .team_access_token import *
+from .team_environment_permission import *
 from .team_stack_permission import *
 from .ttl_schedule import *
 from .webhook import *
@@ -46,6 +47,7 @@ _utilities.register(
    "pulumiservice:index:StackTag": "StackTag",
    "pulumiservice:index:Team": "Team",
    "pulumiservice:index:TeamAccessToken": "TeamAccessToken",
+   "pulumiservice:index:TeamEnvironmentPermission": "TeamEnvironmentPermission",
    "pulumiservice:index:TeamStackPermission": "TeamStackPermission",
    "pulumiservice:index:TtlSchedule": "TtlSchedule",
    "pulumiservice:index:Webhook": "Webhook"
