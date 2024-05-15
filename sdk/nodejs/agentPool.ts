@@ -5,7 +5,7 @@ import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "./utilities";
 
 /**
- * Agent Pool for customer manager deployments
+ * Agent Pool for customer managed deployments
  */
 export class AgentPool extends pulumi.CustomResource {
     /**

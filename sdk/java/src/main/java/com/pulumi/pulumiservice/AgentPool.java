@@ -15,7 +15,7 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 
 /**
- * Agent Pool for customer manager deployments
+ * Agent Pool for customer managed deployments
  * 
  */
 @ResourceType(type="pulumiservice:index:AgentPool")
