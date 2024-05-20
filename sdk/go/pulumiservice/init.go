@@ -39,6 +39,8 @@ func (m *module) Construct(ctx *pulumi.Context, name, typ, urn string) (r pulumi
 		r = &Team{}
 	case "pulumiservice:index:TeamAccessToken":
 		r = &TeamAccessToken{}
+	case "pulumiservice:index:TeamEnvironmentPermission":
+		r = &TeamEnvironmentPermission{}
 	case "pulumiservice:index:TeamStackPermission":
 		r = &TeamStackPermission{}
 	case "pulumiservice:index:TtlSchedule":

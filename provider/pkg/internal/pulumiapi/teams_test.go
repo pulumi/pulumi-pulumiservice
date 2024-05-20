@@ -299,3 +299,54 @@ func TestRemoveStackPermission(t *testing.T) {
 		assert.NoError(t, c.RemoveStackPermission(ctx, stack, teamName))
 	})
 }
+
+func TestAddEnvironmentPermission(t *testing.T) {
+	teamName := "a-team"
+	permission := "admin"
+	organization := "an-organization"
+	environment := "an-environment"
+	t.Run("Happy Path", func(t *testing.T) {
+		c, cleanup := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodPatch,
+			ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team",
+			ExpectedReqBody: addEnvironmentPermissionRequest{
+				AddEnvironmentPermission: AddEnvironmentPermission{
+					EnvName:    environment,
+					Permission: permission,
+				},
+			},
+			ResponseCode: 204,
+		})
+		defer cleanup()
+		assert.NoError(t, c.AddEnvironmentPermission(ctx, CreateTeamEnvironmentPermissionRequest{
+			TeamEnvironmentPermissionRequest: TeamEnvironmentPermissionRequest{
+				Organization: organization,
+				Environment:  environment,
+				Team:         teamName,
+			},
+			Permission: permission,
+		}))
+	})
+}
+
+func TestRemoveEnvironmentPermission(t *testing.T) {
+	teamName := "a-team"
+	organization := "an-organization"
+	environment := "an-environment"
+	t.Run("Happy Path", func(t *testing.T) {
+		c, cleanup := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodPatch,
+			ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team",
+			ExpectedReqBody: removeEnvironmentPermissionRequest{
+				RemoveEnvironment: environment,
+			},
+			ResponseCode: 204,
+		})
+		defer cleanup()
+		assert.NoError(t, c.RemoveEnvironmentPermission(ctx, TeamEnvironmentPermissionRequest{
+			Organization: organization,
+			Team:         teamName,
+			Environment:  environment,
+		}))
+	})
+}

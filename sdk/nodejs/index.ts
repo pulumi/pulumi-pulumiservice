@@ -55,6 +55,11 @@ export type TeamAccessToken = import("./teamAccessToken").TeamAccessToken;
 export const TeamAccessToken: typeof import("./teamAccessToken").TeamAccessToken = null as any;
 utilities.lazyLoad(exports, ["TeamAccessToken"], () => require("./teamAccessToken"));
 
+export { TeamEnvironmentPermissionArgs } from "./teamEnvironmentPermission";
+export type TeamEnvironmentPermission = import("./teamEnvironmentPermission").TeamEnvironmentPermission;
+export const TeamEnvironmentPermission: typeof import("./teamEnvironmentPermission").TeamEnvironmentPermission = null as any;
+utilities.lazyLoad(exports, ["TeamEnvironmentPermission"], () => require("./teamEnvironmentPermission"));
+
 export { TeamStackPermissionArgs } from "./teamStackPermission";
 export type TeamStackPermission = import("./teamStackPermission").TeamStackPermission;
 export const TeamStackPermission: typeof import("./teamStackPermission").TeamStackPermission = null as any;
@@ -105,6 +110,8 @@ const _module = {
                 return new Team(name, <any>undefined, { urn })
             case "pulumiservice:index:TeamAccessToken":
                 return new TeamAccessToken(name, <any>undefined, { urn })
+            case "pulumiservice:index:TeamEnvironmentPermission":
+                return new TeamEnvironmentPermission(name, <any>undefined, { urn })
             case "pulumiservice:index:TeamStackPermission":
                 return new TeamStackPermission(name, <any>undefined, { urn })
             case "pulumiservice:index:TtlSchedule":

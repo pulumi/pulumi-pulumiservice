@@ -31,6 +31,10 @@ type TeamClient interface {
 	DeleteMemberFromTeam(ctx context.Context, orgName, teamName, userName string) error
 	AddStackPermission(ctx context.Context, stack StackName, teamName string, permission int) error
 	RemoveStackPermission(ctx context.Context, stack StackName, teamName string) error
+	GetTeamStackPermission(ctx context.Context, stack StackName, teamName string) (*int, error)
+	AddEnvironmentPermission(ctx context.Context, req CreateTeamEnvironmentPermissionRequest) error
+	RemoveEnvironmentPermission(ctx context.Context, req TeamEnvironmentPermissionRequest) error
+	GetTeamEnvironmentPermission(ctx context.Context, req TeamEnvironmentPermissionRequest) (*string, error)
 }
 
 type Teams struct {
@@ -101,6 +105,30 @@ type RemoveStackPermission struct {
 
 type removeStackPermissionRequest struct {
 	RemoveStackPermission RemoveStackPermission `json:"removeStack"`
+}
+
+type CreateTeamEnvironmentPermissionRequest struct {
+	TeamEnvironmentPermissionRequest
+	Permission string `json:"permission,omitempty"`
+}
+
+type TeamEnvironmentPermissionRequest struct {
+	Organization string `json:"organization,omitempty"`
+	Team         string `json:"team,omitempty"`
+	Environment  string `json:"environment,omitempty"`
+}
+
+type AddEnvironmentPermission struct {
+	EnvName    string `json:"envName"`
+	Permission string `json:"permission"`
+}
+
+type addEnvironmentPermissionRequest struct {
+	AddEnvironmentPermission AddEnvironmentPermission `json:"addEnvironmentPermission"`
+}
+
+type removeEnvironmentPermissionRequest struct {
+	RemoveEnvironment string `json:"removeEnvironment"`
 }
 
 func (c *Client) ListTeams(ctx context.Context, orgName string) ([]Team, error) {
@@ -341,6 +369,82 @@ func (c *Client) GetTeamStackPermission(ctx context.Context, stack StackName, te
 	for _, stackPermission := range team.Stacks {
 		if stackPermission.ProjectName == stack.ProjectName && stackPermission.StackName == stack.StackName {
 			return &stackPermission.Permission, nil
+		}
+	}
+
+	return nil, nil
+}
+
+func (c *Client) AddEnvironmentPermission(ctx context.Context, req CreateTeamEnvironmentPermissionRequest) error {
+	if len(req.Organization) == 0 {
+		return errors.New("organization name must not be empty")
+	}
+	if len(req.Team) == 0 {
+		return errors.New("team name must not be empty")
+	}
+	if len(req.Environment) == 0 {
+		return errors.New("environment name must not be empty")
+	}
+
+	apiPath := path.Join("orgs", req.Organization, "teams", req.Team)
+
+	addEnvironmentPermissionRequest := addEnvironmentPermissionRequest{
+		AddEnvironmentPermission: AddEnvironmentPermission{EnvName: req.Environment, Permission: req.Permission},
+	}
+
+	_, err := c.do(ctx, http.MethodPatch, apiPath, addEnvironmentPermissionRequest, nil)
+	if err != nil {
+		return fmt.Errorf("failed to add permission %s for environment %s to team %s due to error: %w", req.Permission, req.Environment, req.Team, err)
+	}
+	return nil
+}
+
+func (c *Client) RemoveEnvironmentPermission(ctx context.Context, req TeamEnvironmentPermissionRequest) error {
+	if len(req.Organization) == 0 {
+		return errors.New("organization name must not be empty")
+	}
+	if len(req.Team) == 0 {
+		return errors.New("team name must not be empty")
+	}
+	if len(req.Environment) == 0 {
+		return errors.New("environment name must not be empty")
+	}
+
+	apiPath := path.Join("orgs", req.Organization, "teams", req.Team)
+
+	removeEnvironmentPermissionRequest := removeEnvironmentPermissionRequest{
+		RemoveEnvironment: req.Environment,
+	}
+
+	_, err := c.do(ctx, http.MethodPatch, apiPath, removeEnvironmentPermissionRequest, nil)
+	if err != nil {
+		return fmt.Errorf("failed to remove permissions for environment %s from team %s due to error: %w", req.Environment, req.Team, err)
+	}
+	return nil
+}
+
+func (c *Client) GetTeamEnvironmentPermission(ctx context.Context, req TeamEnvironmentPermissionRequest) (*string, error) {
+	if len(req.Organization) == 0 {
+		return nil, errors.New("organization name must not be empty")
+	}
+	if len(req.Team) == 0 {
+		return nil, errors.New("team name must not be empty")
+	}
+	if len(req.Environment) == 0 {
+		return nil, errors.New("environment name must not be empty")
+	}
+
+	apiPath := path.Join("orgs", req.Organization, "teams", req.Team)
+
+	var team Team
+	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &team)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get team environment permission: %w", err)
+	}
+
+	for _, envPermission := range team.Environments {
+		if envPermission.EnvName == req.Environment {
+			return &envPermission.Permission, nil
 		}
 	}
 

@@ -10,6 +10,182 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
+type EnvironmentPermission string
+
+const (
+	// No permissions.
+	EnvironmentPermissionNone = EnvironmentPermission("none")
+	// Permission to read environment definition only.
+	EnvironmentPermissionRead = EnvironmentPermission("read")
+	// Permission to open and read the environment.
+	EnvironmentPermissionOpen = EnvironmentPermission("open")
+	// Permission to open, read and update the environment.
+	EnvironmentPermissionWrite = EnvironmentPermission("write")
+	// Permission for all operations on the environment.
+	EnvironmentPermissionAdmin = EnvironmentPermission("admin")
+)
+
+func (EnvironmentPermission) ElementType() reflect.Type {
+	return reflect.TypeOf((*EnvironmentPermission)(nil)).Elem()
+}
+
+func (e EnvironmentPermission) ToEnvironmentPermissionOutput() EnvironmentPermissionOutput {
+	return pulumi.ToOutput(e).(EnvironmentPermissionOutput)
+}
+
+func (e EnvironmentPermission) ToEnvironmentPermissionOutputWithContext(ctx context.Context) EnvironmentPermissionOutput {
+	return pulumi.ToOutputWithContext(ctx, e).(EnvironmentPermissionOutput)
+}
+
+func (e EnvironmentPermission) ToEnvironmentPermissionPtrOutput() EnvironmentPermissionPtrOutput {
+	return e.ToEnvironmentPermissionPtrOutputWithContext(context.Background())
+}
+
+func (e EnvironmentPermission) ToEnvironmentPermissionPtrOutputWithContext(ctx context.Context) EnvironmentPermissionPtrOutput {
+	return EnvironmentPermission(e).ToEnvironmentPermissionOutputWithContext(ctx).ToEnvironmentPermissionPtrOutputWithContext(ctx)
+}
+
+func (e EnvironmentPermission) ToStringOutput() pulumi.StringOutput {
+	return pulumi.ToOutput(pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e EnvironmentPermission) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return pulumi.ToOutputWithContext(ctx, pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e EnvironmentPermission) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringPtrOutputWithContext(context.Background())
+}
+
+func (e EnvironmentPermission) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringOutputWithContext(ctx).ToStringPtrOutputWithContext(ctx)
+}
+
+type EnvironmentPermissionOutput struct{ *pulumi.OutputState }
+
+func (EnvironmentPermissionOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*EnvironmentPermission)(nil)).Elem()
+}
+
+func (o EnvironmentPermissionOutput) ToEnvironmentPermissionOutput() EnvironmentPermissionOutput {
+	return o
+}
+
+func (o EnvironmentPermissionOutput) ToEnvironmentPermissionOutputWithContext(ctx context.Context) EnvironmentPermissionOutput {
+	return o
+}
+
+func (o EnvironmentPermissionOutput) ToEnvironmentPermissionPtrOutput() EnvironmentPermissionPtrOutput {
+	return o.ToEnvironmentPermissionPtrOutputWithContext(context.Background())
+}
+
+func (o EnvironmentPermissionOutput) ToEnvironmentPermissionPtrOutputWithContext(ctx context.Context) EnvironmentPermissionPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v EnvironmentPermission) *EnvironmentPermission {
+		return &v
+	}).(EnvironmentPermissionPtrOutput)
+}
+
+func (o EnvironmentPermissionOutput) ToStringOutput() pulumi.StringOutput {
+	return o.ToStringOutputWithContext(context.Background())
+}
+
+func (o EnvironmentPermissionOutput) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e EnvironmentPermission) string {
+		return string(e)
+	}).(pulumi.StringOutput)
+}
+
+func (o EnvironmentPermissionOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o EnvironmentPermissionOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e EnvironmentPermission) *string {
+		v := string(e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+type EnvironmentPermissionPtrOutput struct{ *pulumi.OutputState }
+
+func (EnvironmentPermissionPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**EnvironmentPermission)(nil)).Elem()
+}
+
+func (o EnvironmentPermissionPtrOutput) ToEnvironmentPermissionPtrOutput() EnvironmentPermissionPtrOutput {
+	return o
+}
+
+func (o EnvironmentPermissionPtrOutput) ToEnvironmentPermissionPtrOutputWithContext(ctx context.Context) EnvironmentPermissionPtrOutput {
+	return o
+}
+
+func (o EnvironmentPermissionPtrOutput) Elem() EnvironmentPermissionOutput {
+	return o.ApplyT(func(v *EnvironmentPermission) EnvironmentPermission {
+		if v != nil {
+			return *v
+		}
+		var ret EnvironmentPermission
+		return ret
+	}).(EnvironmentPermissionOutput)
+}
+
+func (o EnvironmentPermissionPtrOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o EnvironmentPermissionPtrOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e *EnvironmentPermission) *string {
+		if e == nil {
+			return nil
+		}
+		v := string(*e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+// EnvironmentPermissionInput is an input type that accepts values of the EnvironmentPermission enum
+// A concrete instance of `EnvironmentPermissionInput` can be one of the following:
+//
+//	EnvironmentPermissionNone
+//	EnvironmentPermissionRead
+//	EnvironmentPermissionOpen
+//	EnvironmentPermissionWrite
+//	EnvironmentPermissionAdmin
+type EnvironmentPermissionInput interface {
+	pulumi.Input
+
+	ToEnvironmentPermissionOutput() EnvironmentPermissionOutput
+	ToEnvironmentPermissionOutputWithContext(context.Context) EnvironmentPermissionOutput
+}
+
+var environmentPermissionPtrType = reflect.TypeOf((**EnvironmentPermission)(nil)).Elem()
+
+type EnvironmentPermissionPtrInput interface {
+	pulumi.Input
+
+	ToEnvironmentPermissionPtrOutput() EnvironmentPermissionPtrOutput
+	ToEnvironmentPermissionPtrOutputWithContext(context.Context) EnvironmentPermissionPtrOutput
+}
+
+type environmentPermissionPtr string
+
+func EnvironmentPermissionPtr(v string) EnvironmentPermissionPtrInput {
+	return (*environmentPermissionPtr)(&v)
+}
+
+func (*environmentPermissionPtr) ElementType() reflect.Type {
+	return environmentPermissionPtrType
+}
+
+func (in *environmentPermissionPtr) ToEnvironmentPermissionPtrOutput() EnvironmentPermissionPtrOutput {
+	return pulumi.ToOutput(in).(EnvironmentPermissionPtrOutput)
+}
+
+func (in *environmentPermissionPtr) ToEnvironmentPermissionPtrOutputWithContext(ctx context.Context) EnvironmentPermissionPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, in).(EnvironmentPermissionPtrOutput)
+}
+
 type PulumiOperation string
 
 const (
@@ -631,6 +807,8 @@ func (in *webhookFormatPtr) ToWebhookFormatPtrOutputWithContext(ctx context.Cont
 }
 
 func init() {
+	pulumi.RegisterInputType(reflect.TypeOf((*EnvironmentPermissionInput)(nil)).Elem(), EnvironmentPermission("none"))
+	pulumi.RegisterInputType(reflect.TypeOf((*EnvironmentPermissionPtrInput)(nil)).Elem(), EnvironmentPermission("none"))
 	pulumi.RegisterInputType(reflect.TypeOf((*PulumiOperationInput)(nil)).Elem(), PulumiOperation("update"))
 	pulumi.RegisterInputType(reflect.TypeOf((*PulumiOperationPtrInput)(nil)).Elem(), PulumiOperation("update"))
 	pulumi.RegisterInputType(reflect.TypeOf((*WebhookFiltersInput)(nil)).Elem(), WebhookFilters("stack_created"))
@@ -638,6 +816,8 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*WebhookFiltersArrayInput)(nil)).Elem(), WebhookFiltersArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*WebhookFormatInput)(nil)).Elem(), WebhookFormat("raw"))
 	pulumi.RegisterInputType(reflect.TypeOf((*WebhookFormatPtrInput)(nil)).Elem(), WebhookFormat("raw"))
+	pulumi.RegisterOutputType(EnvironmentPermissionOutput{})
+	pulumi.RegisterOutputType(EnvironmentPermissionPtrOutput{})
 	pulumi.RegisterOutputType(PulumiOperationOutput{})
 	pulumi.RegisterOutputType(PulumiOperationPtrOutput{})
 	pulumi.RegisterOutputType(WebhookFiltersOutput{})

@@ -26,6 +26,7 @@
         "stackTag.ts",
         "team.ts",
         "teamAccessToken.ts",
+        "teamEnvironmentPermission.ts",
         "teamStackPermission.ts",
         "ttlSchedule.ts",
         "types/enums/index.ts",

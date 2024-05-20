@@ -8,6 +8,52 @@ using Pulumi;
 namespace Pulumi.PulumiService
 {
     [EnumType]
+    public readonly struct EnvironmentPermission : IEquatable<EnvironmentPermission>
+    {
+        private readonly string _value;
+
+        private EnvironmentPermission(string value)
+        {
+            _value = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        /// <summary>
+        /// No permissions.
+        /// </summary>
+        public static EnvironmentPermission None { get; } = new EnvironmentPermission("none");
+        /// <summary>
+        /// Permission to read environment definition only.
+        /// </summary>
+        public static EnvironmentPermission Read { get; } = new EnvironmentPermission("read");
+        /// <summary>
+        /// Permission to open and read the environment.
+        /// </summary>
+        public static EnvironmentPermission Open { get; } = new EnvironmentPermission("open");
+        /// <summary>
+        /// Permission to open, read and update the environment.
+        /// </summary>
+        public static EnvironmentPermission Write { get; } = new EnvironmentPermission("write");
+        /// <summary>
+        /// Permission for all operations on the environment.
+        /// </summary>
+        public static EnvironmentPermission Admin { get; } = new EnvironmentPermission("admin");
+
+        public static bool operator ==(EnvironmentPermission left, EnvironmentPermission right) => left.Equals(right);
+        public static bool operator !=(EnvironmentPermission left, EnvironmentPermission right) => !left.Equals(right);
+
+        public static explicit operator string(EnvironmentPermission value) => value._value;
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override bool Equals(object? obj) => obj is EnvironmentPermission other && Equals(other);
+        public bool Equals(EnvironmentPermission other) => string.Equals(_value, other._value, StringComparison.Ordinal);
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+
+        public override string ToString() => _value;
+    }
+
+    [EnumType]
     public readonly struct PulumiOperation : IEquatable<PulumiOperation>
     {
         private readonly string _value;

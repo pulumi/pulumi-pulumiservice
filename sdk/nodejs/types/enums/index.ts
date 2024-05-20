@@ -2,6 +2,31 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 
+export const EnvironmentPermission = {
+    /**
+     * No permissions.
+     */
+    None: "none",
+    /**
+     * Permission to read environment definition only.
+     */
+    Read: "read",
+    /**
+     * Permission to open and read the environment.
+     */
+    Open: "open",
+    /**
+     * Permission to open, read and update the environment.
+     */
+    Write: "write",
+    /**
+     * Permission for all operations on the environment.
+     */
+    Admin: "admin",
+} as const;
+
+export type EnvironmentPermission = (typeof EnvironmentPermission)[keyof typeof EnvironmentPermission];
+
 export const PulumiOperation = {
     /**
      * Analogous to `pulumi up` command.
