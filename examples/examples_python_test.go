@@ -32,3 +32,13 @@ func TestPythonDeploymentSettingsExample(t *testing.T) {
 		},
 	})
 }
+
+func TestPythonEnvironmentsExample(t *testing.T) {
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Dir:         path.Join(getCwd(t), "py-environments"),
+		SkipRefresh: true,
+		Dependencies: []string{
+			filepath.Join("..", "sdk", "python", "bin"),
+		},
+	})
+}

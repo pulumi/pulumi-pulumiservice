@@ -1,0 +1,3 @@
+name: cs-environments
+runtime: dotnet
+description: A minimal C# Pulumi Environments Example

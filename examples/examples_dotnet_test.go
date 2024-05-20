@@ -29,3 +29,13 @@ func TestDotnetSchedulesExamples(t *testing.T) {
 		},
 	})
 }
+
+func TestDotnetEnvironmentsExamples(t *testing.T) {
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Dir:         path.Join(getCwd(t), "cs-environments"),
+		SkipRefresh: true,
+		Dependencies: []string{
+			"Pulumi.PulumiService",
+		},
+	})
+}

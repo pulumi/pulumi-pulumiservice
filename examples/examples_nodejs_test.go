@@ -95,3 +95,13 @@ func TestNodejsSchedulesExample(t *testing.T) {
 		},
 	})
 }
+
+func TestNodejsEnvironmentsExample(t *testing.T) {
+	cwd := getCwd(t)
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Dir: path.Join(cwd, ".", "ts-environments"),
+		Dependencies: []string{
+			"@pulumi/pulumiservice",
+		},
+	})
+}
