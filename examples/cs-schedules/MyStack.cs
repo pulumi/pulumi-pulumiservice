@@ -7,6 +7,9 @@ class MyStack : Stack
 {
     public MyStack()
     {
+        var config = new Pulumi.Config();
+        var stackName = "test-stack-" + config.Require("digits");
+
         // Deployment Settings are required to be setup before schedules can be
         // Note the `DependsOn` option in all of the schedules
         var settings = new DeploymentSettings(
@@ -14,7 +17,7 @@ class MyStack : Stack
             new DeploymentSettingsArgs{
                 Organization = "service-provider-test-org",
                 Project = "cs-schedules",
-                Stack = "test-stack",
+                Stack = stackName,
                 SourceContext = new DeploymentSettingsSourceContextArgs{
                     Git = new DeploymentSettingsGitSourceArgs{
                         RepoUrl = "https://github.com/example.git",
@@ -31,7 +34,7 @@ class MyStack : Stack
             {
                 Organization = "service-provider-test-org",
                 Project = "cs-schedules",
-                Stack = "test-stack",
+                Stack = stackName,
                 ScheduleCron = "0 0 * * 0",
                 AutoRemediate = false
             }, 
@@ -47,7 +50,7 @@ class MyStack : Stack
             new TtlScheduleArgs{
                 Organization = "service-provider-test-org",
                 Project = "cs-schedules",
-                Stack = "test-stack",
+                Stack = stackName,
                 Timestamp = "2026-01-01T00:00:00Z",
                 DeleteAfterDestroy = false
             }, 
@@ -63,7 +66,7 @@ class MyStack : Stack
             new DeploymentScheduleArgs{
                 Organization = "service-provider-test-org",
                 Project = "cs-schedules",
-                Stack = "test-stack",
+                Stack = stackName,
                 ScheduleCron = "0 0 * * 0",
                 PulumiOperation = PulumiOperation.Update
             }, 
@@ -79,7 +82,7 @@ class MyStack : Stack
             new DeploymentScheduleArgs{
                 Organization = "service-provider-test-org",
                 Project = "cs-schedules",
-                Stack = "test-stack",
+                Stack = stackName,
                 Timestamp = "2026-01-01T00:00:00Z",
                 PulumiOperation = PulumiOperation.Preview
             }, 
