@@ -30,6 +30,11 @@ export type DriftSchedule = import("./driftSchedule").DriftSchedule;
 export const DriftSchedule: typeof import("./driftSchedule").DriftSchedule = null as any;
 utilities.lazyLoad(exports, ["DriftSchedule"], () => require("./driftSchedule"));
 
+export { EnvironmentArgs } from "./environment";
+export type Environment = import("./environment").Environment;
+export const Environment: typeof import("./environment").Environment = null as any;
+utilities.lazyLoad(exports, ["Environment"], () => require("./environment"));
+
 export { OrgAccessTokenArgs } from "./orgAccessToken";
 export type OrgAccessToken = import("./orgAccessToken").OrgAccessToken;
 export const OrgAccessToken: typeof import("./orgAccessToken").OrgAccessToken = null as any;
@@ -102,6 +107,8 @@ const _module = {
                 return new DeploymentSettings(name, <any>undefined, { urn })
             case "pulumiservice:index:DriftSchedule":
                 return new DriftSchedule(name, <any>undefined, { urn })
+            case "pulumiservice:index:Environment":
+                return new Environment(name, <any>undefined, { urn })
             case "pulumiservice:index:OrgAccessToken":
                 return new OrgAccessToken(name, <any>undefined, { urn })
             case "pulumiservice:index:StackTag":

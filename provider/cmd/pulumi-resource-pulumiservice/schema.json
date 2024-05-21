@@ -1266,6 +1266,47 @@
         "timestamp"
       ]
     },
+    "pulumiservice:index:Environment": {
+      "description": "An ESC Environment.",
+      "properties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Environment name.",
+          "type": "string"
+        },
+        "yaml": {
+          "description": "Environment's yaml file.",
+          "$ref": "pulumi.json#/Asset"
+        }
+      },
+      "required": [
+        "organization",
+        "name",
+        "yaml"
+      ],
+      "inputProperties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Environment name.",
+          "type": "string"
+        },
+        "yaml": {
+          "description": "Environment's yaml file.",
+          "$ref": "pulumi.json#/Asset"
+        }
+      },
+      "requiredInputs": [
+        "organization",
+        "name",
+        "yaml"
+      ]
+    },
     "pulumiservice:index:TeamEnvironmentPermission": {
       "description": "A permission for a team to use an environment.",
       "properties": {

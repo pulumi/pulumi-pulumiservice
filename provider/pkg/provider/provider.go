@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"runtime"
 	"strings"
 	"time"
 
@@ -26,6 +27,8 @@ import (
 	"google.golang.org/grpc/status"
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
 
+	esc_client "github.com/pulumi/esc/cmd/esc/cli/client"
+	"github.com/pulumi/esc/cmd/esc/cli/version"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/pulumiapi"
 	"github.com/pulumi/pulumi/pkg/v3/codegen/schema"
 	"github.com/pulumi/pulumi/pkg/v3/resource/provider"
@@ -120,6 +123,8 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 	}
 	client, err := pulumiapi.NewClient(&httpClient, *token, *url)
 
+	escClient := esc_client.New(fmt.Sprintf("provider-pulumiservice/1 (%s; %s)", version.Version, runtime.GOOS), *url, *token, false)
+
 	if err != nil {
 		return nil, err
 	}
@@ -160,6 +165,9 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 		},
 		&PulumiServiceTtlScheduleResource{
 			client: client,
+		},
+		&PulumiServiceEnvironmentResource{
+			client: escClient,
 		},
 		&PulumiServiceTeamEnvironmentPermissionResource{
 			client: client,

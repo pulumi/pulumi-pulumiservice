@@ -11,6 +11,7 @@ from .agent_pool import *
 from .deployment_schedule import *
 from .deployment_settings import *
 from .drift_schedule import *
+from .environment import *
 from .org_access_token import *
 from .provider import *
 from .stack_tag import *
@@ -43,6 +44,7 @@ _utilities.register(
    "pulumiservice:index:DeploymentSchedule": "DeploymentSchedule",
    "pulumiservice:index:DeploymentSettings": "DeploymentSettings",
    "pulumiservice:index:DriftSchedule": "DriftSchedule",
+   "pulumiservice:index:Environment": "Environment",
    "pulumiservice:index:OrgAccessToken": "OrgAccessToken",
    "pulumiservice:index:StackTag": "StackTag",
    "pulumiservice:index:Team": "Team",

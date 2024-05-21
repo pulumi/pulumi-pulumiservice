@@ -31,6 +31,8 @@ func (m *module) Construct(ctx *pulumi.Context, name, typ, urn string) (r pulumi
 		r = &DeploymentSettings{}
 	case "pulumiservice:index:DriftSchedule":
 		r = &DriftSchedule{}
+	case "pulumiservice:index:Environment":
+		r = &Environment{}
 	case "pulumiservice:index:OrgAccessToken":
 		r = &OrgAccessToken{}
 	case "pulumiservice:index:StackTag":
