@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+## 0.21
+
+### Improvements
+
+- Add TeamEnvironmentPermission resource [#179](https://github.com/pulumi/pulumi-pulumiservice/issues/179)
+- Add support for Environment resource [#255](https://github.com/pulumi/pulumi-pulumiservice/issues/255)
+
 ## 0.20.2
 
 ### Bug Fixes
