@@ -1,11 +1,15 @@
+import * as pulumi from "@pulumi/pulumi";
 import * as service from "@pulumi/pulumiservice";
+
+let config = new pulumi.Config();
+let stackName = "test-stack-" + config.require("digits");
 
 // Deployment Settings are required to be setup before schedules can be
 // Note the `DependsOn` option in all of the schedules
 var settings = new service.DeploymentSettings("deployment-settings", {
     organization: "service-provider-test-org",
     project: "pulumi-service-schedules-example-ts",
-    stack: "test-stack",
+    stack: stackName,
     sourceContext: {
         git: {
             repoUrl: "https://github.com/example.git",
@@ -18,7 +22,7 @@ var settings = new service.DeploymentSettings("deployment-settings", {
 var drift = new service.DriftSchedule("drift-schedule", {
     organization: "service-provider-test-org",
     project: "pulumi-service-schedules-example-ts",
-    stack: "test-stack",
+    stack: stackName,
     scheduleCron: "0 0 * * 0",
     autoRemediate: false
 }, { dependsOn: settings })
@@ -27,7 +31,7 @@ var drift = new service.DriftSchedule("drift-schedule", {
 var ttl = new service.TtlSchedule("ttl-schedule", {
     organization: "service-provider-test-org",
     project: "pulumi-service-schedules-example-ts",
-    stack: "test-stack",
+    stack: stackName,
     timestamp: "2026-01-01T00:00:00Z",
     deleteAfterDestroy: false
 }, { dependsOn: settings })
@@ -36,7 +40,7 @@ var ttl = new service.TtlSchedule("ttl-schedule", {
 var deployment_up = new service.DeploymentSchedule("deployment-schedule-up", {
     organization: "service-provider-test-org",
     project: "pulumi-service-schedules-example-ts",
-    stack: "test-stack",
+    stack: stackName,
     scheduleCron: "0 0 * * 0",
     pulumiOperation: service.PulumiOperation.Update
 }, { dependsOn: settings })
@@ -45,7 +49,7 @@ var deployment_up = new service.DeploymentSchedule("deployment-schedule-up", {
 var deployment_preview = new service.DeploymentSchedule("deployment-schedule-preview", {
     organization: "service-provider-test-org",
     project: "pulumi-service-schedules-example-ts",
-    stack: "test-stack",
+    stack: stackName,
     timestamp: "2026-01-01T00:00:00Z",
     pulumiOperation: service.PulumiOperation.Preview
 }, { dependsOn: settings })

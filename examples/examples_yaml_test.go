@@ -184,12 +184,16 @@ func TestYamlDeploymentSettingsExample(t *testing.T) {
 	tmpdir := writePulumiYaml(t, newProgram)
 
 	cwd, _ := os.Getwd()
+	digits := generateRandomFiveDigits()
 
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		Quick:       true,
 		SkipRefresh: true,
 		Dir:         path.Join(cwd, ".", "yaml-deployment-settings"),
-		StackName:   "test-stack",
+		StackName:   "test-stack-" + digits,
+		Config: map[string]string{
+			"digits": digits,
+		},
 		PrepareProject: func(_ *engine.Projinfo) error {
 			return nil
 		},
@@ -248,9 +252,13 @@ func TestYamlWebhookExample(t *testing.T) {
 
 func TestYamlSchedulesExample(t *testing.T) {
 	cwd := getCwd(t)
+	digits := generateRandomFiveDigits()
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		Dir:       path.Join(cwd, ".", "yaml-schedules"),
-		StackName: "test-stack",
+		StackName: "test-stack-" + digits,
+		Config: map[string]string{
+			"digits": digits,
+		},
 		PrepareProject: func(p *engine.Projinfo) error {
 			return nil
 		},

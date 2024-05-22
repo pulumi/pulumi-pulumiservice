@@ -20,10 +20,14 @@ func TestDotnetTeamsExamples(t *testing.T) {
 }
 
 func TestDotnetSchedulesExamples(t *testing.T) {
+	digits := generateRandomFiveDigits()
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		Dir:         path.Join(getCwd(t), "cs-schedules"),
-		StackName:   "test-stack",
+		StackName:   "test-stack-" + digits,
 		SkipRefresh: true,
+		Config: map[string]string{
+			"digits": digits,
+		},
 		Dependencies: []string{
 			"Pulumi.PulumiService",
 		},
