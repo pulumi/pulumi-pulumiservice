@@ -257,6 +257,16 @@ func TestYamlSchedulesExample(t *testing.T) {
 	})
 }
 
+func TestYamlEnvironmentsExample(t *testing.T) {
+	cwd := getCwd(t)
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Dir: path.Join(cwd, ".", "yaml-environments"),
+		PrepareProject: func(p *engine.Projinfo) error {
+			return nil
+		},
+	})
+}
+
 func writePulumiYaml(t *testing.T, yamlContents interface{}) string {
 	tmpdir := t.TempDir()
 	b, err := yaml.Marshal(yamlContents)

@@ -1,0 +1,16 @@
+name: yaml-environments-example
+runtime: yaml
+description: A minimal Pulumi YAML program
+resources:
+  testing-environment:
+    type: pulumiservice:Environment
+    properties:
+      organization: service-provider-test-org
+      name: testing-environment-yaml
+      yaml:
+        fn::stringAsset: >
+          values:
+            myKey1: "myValue1"
+            myNestedKey:
+              myKey2: "myValue2"
+              myNumber: 1
