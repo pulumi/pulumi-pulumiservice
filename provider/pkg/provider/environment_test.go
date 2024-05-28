@@ -14,14 +14,26 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type getEnvironmentFunc func(ctx context.Context, orgName string, envName string, decrypt bool) (yaml []byte, etag string, err error)
+type getEnvironmentFunc func(ctx context.Context, orgName string, envName string, version string, decrypt bool) (yaml []byte, etag string, revision int, err error)
 
 type EscClientMock struct {
 	getEnvironmentFunc getEnvironmentFunc
 }
 
-func (c *EscClientMock) GetEnvironment(ctx context.Context, orgName string, envName string, decrypt bool) (yaml []byte, etag string, err error) {
-	return c.getEnvironmentFunc(ctx, orgName, envName, decrypt)
+func (c *EscClientMock) GetEnvironment(ctx context.Context, orgName string, envName string, version string, decrypt bool) (yaml []byte, etag string, revision int, err error) {
+	return c.getEnvironmentFunc(ctx, orgName, envName, version, decrypt)
+}
+
+func (c *EscClientMock) GetEnvironmentRevision(ctx context.Context, orgName, envName string, revision int) (*client.EnvironmentRevision, error) {
+	return nil, nil
+}
+
+func (c *EscClientMock) GetEnvironmentRevisionTag(ctx context.Context, orgName, envName, tagName string) (*client.EnvironmentRevisionTag, error) {
+	return nil, nil
+}
+
+func (c *EscClientMock) GetRevisionNumber(ctx context.Context, orgName, envName, version string) (int, error) {
+	return 0, nil
 }
 
 func (c *EscClientMock) CheckYAMLEnvironment(context.Context, string, []byte) (*esc.Environment, []client.EnvironmentDiagnostic, error) {
@@ -52,7 +64,15 @@ func (c *EscClientMock) ListEnvironments(context.Context, string, string) ([]cli
 	return nil, "", nil
 }
 
-func (c *EscClientMock) OpenEnvironment(context.Context, string, string, time.Duration) (string, []client.EnvironmentDiagnostic, error) {
+func (c *EscClientMock) ListEnvironmentRevisions(ctx context.Context, orgName string, envName string, options client.ListEnvironmentRevisionsOptions) ([]client.EnvironmentRevision, error) {
+	return nil, nil
+}
+
+func (c *EscClientMock) ListEnvironmentRevisionTags(ctx context.Context, orgName string, envName string, options client.ListEnvironmentRevisionTagsOptions) ([]client.EnvironmentRevisionTag, error) {
+	return nil, nil
+}
+
+func (c *EscClientMock) OpenEnvironment(context.Context, string, string, string, time.Duration) (string, []client.EnvironmentDiagnostic, error) {
 	return "", nil, nil
 }
 
@@ -62,6 +82,22 @@ func (c *EscClientMock) OpenYAMLEnvironment(context.Context, string, []byte, tim
 
 func (c *EscClientMock) UpdateEnvironment(context.Context, string, string, []byte, string) ([]client.EnvironmentDiagnostic, error) {
 	return nil, nil
+}
+
+func (c *EscClientMock) UpdateEnvironmentRevisionTag(ctx context.Context, orgName, envName, tagName string, revision *int) error {
+	return nil
+}
+
+func (c *EscClientMock) UpdateEnvironmentWithRevision(ctx context.Context, orgName string, envName string, yaml []byte, etag string) ([]client.EnvironmentDiagnostic, int, error) {
+	return nil, 0, nil
+}
+
+func (c *EscClientMock) CreateEnvironmentRevisionTag(ctx context.Context, orgName, envName, tagName string, revision *int) error {
+	return nil
+}
+
+func (c *EscClientMock) DeleteEnvironmentRevisionTag(ctx context.Context, orgName, envName, tagName string) error {
+	return nil
 }
 
 func (c *EscClientMock) Insecure() bool {
@@ -81,8 +117,8 @@ func buildEscClientMock(getEnvironmentFunc getEnvironmentFunc) *EscClientMock {
 func TestEnvironment(t *testing.T) {
 	t.Run("Read when the resource is not found", func(t *testing.T) {
 		mockedClient := buildEscClientMock(
-			func(ctx context.Context, orgName string, envName string, decrypt bool) (yaml []byte, etag string, err error) {
-				return nil, "", fmt.Errorf("not found")
+			func(ctx context.Context, orgName string, envName string, version string, decrypt bool) (yaml []byte, etag string, revision int, err error) {
+				return nil, "", 0, fmt.Errorf("not found")
 			},
 		)
 
@@ -118,8 +154,8 @@ func TestEnvironment(t *testing.T) {
 
 	t.Run("Read when the resource is found", func(t *testing.T) {
 		mockedClient := buildEscClientMock(
-			func(ctx context.Context, orgName string, envName string, decrypt bool) (yaml []byte, etag string, err error) {
-				return nil, "", nil
+			func(ctx context.Context, orgName string, envName string, version string, decrypt bool) (yaml []byte, etag string, revision int, err error) {
+				return nil, "", 0, nil
 			},
 		)
 

@@ -127,6 +127,7 @@ class Environment(pulumi.CustomResource):
             if yaml is None and not opts.urn:
                 raise TypeError("Missing required property 'yaml'")
             __props__.__dict__["yaml"] = yaml
+            __props__.__dict__["revision"] = None
         super(Environment, __self__).__init__(
             'pulumiservice:index:Environment',
             resource_name,
@@ -151,6 +152,7 @@ class Environment(pulumi.CustomResource):
 
         __props__.__dict__["name"] = None
         __props__.__dict__["organization"] = None
+        __props__.__dict__["revision"] = None
         __props__.__dict__["yaml"] = None
         return Environment(resource_name, opts=opts, __props__=__props__)
 
@@ -169,6 +171,14 @@ class Environment(pulumi.CustomResource):
         Organization name.
         """
         return pulumi.get(self, "organization")
+
+    @property
+    @pulumi.getter
+    def revision(self) -> pulumi.Output[int]:
+        """
+        Revision number of the latest version.
+        """
+        return pulumi.get(self, "revision")
 
     @property
     @pulumi.getter

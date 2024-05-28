@@ -28,6 +28,12 @@ namespace Pulumi.PulumiService
         public Output<string> Organization { get; private set; } = null!;
 
         /// <summary>
+        /// Revision number of the latest version.
+        /// </summary>
+        [Output("revision")]
+        public Output<int> Revision { get; private set; } = null!;
+
+        /// <summary>
         /// Environment's yaml file.
         /// </summary>
         [Output("yaml")]
