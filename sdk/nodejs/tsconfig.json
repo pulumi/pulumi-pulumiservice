@@ -21,6 +21,7 @@
         "deploymentSettings.ts",
         "driftSchedule.ts",
         "environment.ts",
+        "environmentVersionTag.ts",
         "index.ts",
         "orgAccessToken.ts",
         "provider.ts",

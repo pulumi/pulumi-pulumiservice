@@ -15,9 +15,11 @@ import (
 )
 
 type getEnvironmentFunc func(ctx context.Context, orgName string, envName string, version string, decrypt bool) (yaml []byte, etag string, revision int, err error)
+type getEnvironmentRevisionTagFunc func(ctx context.Context, orgName, envName, tagName string) (*client.EnvironmentRevisionTag, error)
 
 type EscClientMock struct {
-	getEnvironmentFunc getEnvironmentFunc
+	getEnvironmentFunc            getEnvironmentFunc
+	getEnvironmentRevisionTagFunc getEnvironmentRevisionTagFunc
 }
 
 func (c *EscClientMock) GetEnvironment(ctx context.Context, orgName string, envName string, version string, decrypt bool) (yaml []byte, etag string, revision int, err error) {
@@ -29,7 +31,7 @@ func (c *EscClientMock) GetEnvironmentRevision(ctx context.Context, orgName, env
 }
 
 func (c *EscClientMock) GetEnvironmentRevisionTag(ctx context.Context, orgName, envName, tagName string) (*client.EnvironmentRevisionTag, error) {
-	return nil, nil
+	return c.getEnvironmentRevisionTagFunc(ctx, orgName, envName, tagName)
 }
 
 func (c *EscClientMock) GetRevisionNumber(ctx context.Context, orgName, envName, version string) (int, error) {
@@ -108,9 +110,10 @@ func (c *EscClientMock) URL() string {
 	return ""
 }
 
-func buildEscClientMock(getEnvironmentFunc getEnvironmentFunc) *EscClientMock {
+func buildEscClientMock(getEnvironmentFunc getEnvironmentFunc, getEnvironmentRevisionTagFunc getEnvironmentRevisionTagFunc) *EscClientMock {
 	return &EscClientMock{
 		getEnvironmentFunc,
+		getEnvironmentRevisionTagFunc,
 	}
 }
 
@@ -119,6 +122,9 @@ func TestEnvironment(t *testing.T) {
 		mockedClient := buildEscClientMock(
 			func(ctx context.Context, orgName string, envName string, version string, decrypt bool) (yaml []byte, etag string, revision int, err error) {
 				return nil, "", 0, fmt.Errorf("not found")
+			},
+			func(ctx context.Context, orgName, envName, tagName string) (*client.EnvironmentRevisionTag, error) {
+				return nil, nil
 			},
 		)
 
@@ -157,6 +163,9 @@ func TestEnvironment(t *testing.T) {
 			func(ctx context.Context, orgName string, envName string, version string, decrypt bool) (yaml []byte, etag string, revision int, err error) {
 				return nil, "", 0, nil
 			},
+			func(ctx context.Context, orgName, envName, tagName string) (*client.EnvironmentRevisionTag, error) {
+				return nil, nil
+			},
 		)
 
 		provider := PulumiServiceEnvironmentResource{
@@ -186,5 +195,90 @@ func TestEnvironment(t *testing.T) {
 
 		assert.NoError(t, err)
 		assert.Equal(t, resp.Id, "org/env")
+	})
+}
+
+func TestEnvironmentVersionTag(t *testing.T) {
+	t.Run("Read when the resource is not found", func(t *testing.T) {
+		mockedClient := buildEscClientMock(
+			func(ctx context.Context, orgName string, envName string, version string, decrypt bool) (yaml []byte, etag string, revision int, err error) {
+				return nil, "", 0, nil
+			},
+			func(ctx context.Context, orgName, envName, tagName string) (*client.EnvironmentRevisionTag, error) {
+				return nil, nil
+			},
+		)
+
+		provider := PulumiServiceEnvironmentVersionTagResource{
+			client: mockedClient,
+		}
+
+		input := PulumiServiceEnvironmentVersionTagInput{
+			Organization: "org",
+			Environment:  "env",
+			TagName:      "tag",
+			Revision:     1,
+		}
+
+		propertyMap := input.ToPropertyMap()
+		outputProperties, _ := plugin.MarshalProperties(
+			propertyMap,
+			plugin.MarshalOptions{
+				KeepUnknowns: true,
+				SkipNulls:    true,
+			},
+		)
+		req := pulumirpc.ReadRequest{
+			Id:         "org/env/tag/1",
+			Properties: outputProperties,
+		}
+
+		resp, err := provider.Read(&req)
+
+		assert.NoError(t, err)
+		assert.Equal(t, resp.Id, "")
+		assert.Nil(t, resp.Properties)
+	})
+
+	t.Run("Read when the resource is found", func(t *testing.T) {
+		mockedClient := buildEscClientMock(
+			func(ctx context.Context, orgName string, envName string, version string, decrypt bool) (yaml []byte, etag string, revision int, err error) {
+				return nil, "", 0, nil
+			},
+			func(ctx context.Context, orgName, envName, tagName string) (*client.EnvironmentRevisionTag, error) {
+				return &client.EnvironmentRevisionTag{
+					Revision: 1,
+				}, nil
+			},
+		)
+
+		provider := PulumiServiceEnvironmentVersionTagResource{
+			client: mockedClient,
+		}
+
+		input := PulumiServiceEnvironmentVersionTagInput{
+			Organization: "org",
+			Environment:  "env",
+			TagName:      "tag",
+			Revision:     1,
+		}
+
+		propertyMap := input.ToPropertyMap()
+		outputProperties, _ := plugin.MarshalProperties(
+			propertyMap,
+			plugin.MarshalOptions{
+				KeepUnknowns: true,
+				SkipNulls:    true,
+			},
+		)
+		req := pulumirpc.ReadRequest{
+			Id:         "org/env/tag/1",
+			Properties: outputProperties,
+		}
+
+		resp, err := provider.Read(&req)
+
+		assert.NoError(t, err)
+		assert.Equal(t, resp.Id, "org/env/tag/1")
 	})
 }

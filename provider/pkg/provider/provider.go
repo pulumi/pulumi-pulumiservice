@@ -172,6 +172,9 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 		&PulumiServiceTeamEnvironmentPermissionResource{
 			client: client,
 		},
+		&PulumiServiceEnvironmentVersionTagResource{
+			client: escClient,
+		},
 	}
 
 	for _, sr := range k.pulumiResources {
