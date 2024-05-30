@@ -25,6 +25,11 @@ type PulumiServiceEnvironmentInput struct {
 	Yaml    []byte
 }
 
+type PulumiServiceEnvironmentOutput struct {
+	input    PulumiServiceEnvironmentInput
+	revision int
+}
+
 func (i *PulumiServiceEnvironmentInput) ToPropertyMap() (resource.PropertyMap, error) {
 	propertyMap := resource.PropertyMap{}
 	propertyMap["organization"] = resource.NewPropertyValue(i.OrgName)
@@ -35,6 +40,17 @@ func (i *PulumiServiceEnvironmentInput) ToPropertyMap() (resource.PropertyMap, e
 		return nil, err
 	}
 	propertyMap["yaml"] = resource.MakeSecret(resource.NewAssetProperty(yamlAsset))
+
+	return propertyMap, nil
+}
+
+func (i *PulumiServiceEnvironmentOutput) ToPropertyMap() (resource.PropertyMap, error) {
+	propertyMap, err := i.input.ToPropertyMap()
+	if err != nil {
+		return nil, err
+	}
+
+	propertyMap["revision"] = resource.NewPropertyValue(i.revision)
 
 	return propertyMap, nil
 }
@@ -74,6 +90,11 @@ func (st *PulumiServiceEnvironmentResource) Diff(req *pulumirpc.DiffRequest) (*p
 	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{})
 	if err != nil {
 		return nil, err
+	}
+
+	// preprocess olds to remove the `revision` property since it's only an output and shouldn't cause a diff
+	if olds["revision"].HasValue() {
+		delete(olds, "revision")
 	}
 
 	diffs := olds.Diff(news)
@@ -148,7 +169,7 @@ func (st *PulumiServiceEnvironmentResource) Create(req *pulumirpc.CreateRequest)
 	if err != nil {
 		return nil, err
 	}
-	diagnostics, err = st.client.UpdateEnvironment(context.Background(), input.OrgName, input.EnvName, input.Yaml, "")
+	diagnostics, revision, err := st.client.UpdateEnvironmentWithRevision(context.Background(), input.OrgName, input.EnvName, input.Yaml, "")
 	if err != nil {
 		return nil, err
 	}
@@ -157,7 +178,12 @@ func (st *PulumiServiceEnvironmentResource) Create(req *pulumirpc.CreateRequest)
 			"This should never happen, if you're seeing this message there's likely a bug in ESC APIs", diagnostics)
 	}
 
-	propertyMap, err := input.ToPropertyMap()
+	output := PulumiServiceEnvironmentOutput{
+		input:    *input,
+		revision: revision,
+	}
+
+	propertyMap, err := output.ToPropertyMap()
 	if err != nil {
 		return nil, err
 	}
@@ -202,7 +228,7 @@ func (st *PulumiServiceEnvironmentResource) Update(req *pulumirpc.UpdateRequest)
 		return nil, err
 	}
 
-	diagnostics, err := st.client.UpdateEnvironment(context.Background(), input.OrgName, input.EnvName, input.Yaml, "")
+	diagnostics, revision, err := st.client.UpdateEnvironmentWithRevision(context.Background(), input.OrgName, input.EnvName, input.Yaml, "")
 	if err != nil {
 		return nil, err
 	}
@@ -210,7 +236,12 @@ func (st *PulumiServiceEnvironmentResource) Update(req *pulumirpc.UpdateRequest)
 		return nil, fmt.Errorf("failed to update environment, yaml code failed following checks: %+v", diagnostics)
 	}
 
-	propertyMap, err := input.ToPropertyMap()
+	output := PulumiServiceEnvironmentOutput{
+		input:    *input,
+		revision: revision,
+	}
+
+	propertyMap, err := output.ToPropertyMap()
 	if err != nil {
 		return nil, err
 	}
@@ -235,15 +266,18 @@ func (st *PulumiServiceEnvironmentResource) Read(req *pulumirpc.ReadRequest) (*p
 		return nil, err
 	}
 
-	retrievedYaml, _, err := st.client.GetEnvironment(context.Background(), input.OrgName, input.EnvName, false)
+	retrievedYaml, _, revision, err := st.client.GetEnvironment(context.Background(), input.OrgName, input.EnvName, "", false)
 	if err != nil {
 		return &pulumirpc.ReadResponse{Id: "", Properties: nil}, nil
 	}
 
-	result := PulumiServiceEnvironmentInput{
-		OrgName: input.OrgName,
-		EnvName: input.EnvName,
-		Yaml:    retrievedYaml,
+	result := PulumiServiceEnvironmentOutput{
+		input: PulumiServiceEnvironmentInput{
+			OrgName: input.OrgName,
+			EnvName: input.EnvName,
+			Yaml:    retrievedYaml,
+		},
+		revision: revision,
 	}
 
 	propertyMap, err := result.ToPropertyMap()

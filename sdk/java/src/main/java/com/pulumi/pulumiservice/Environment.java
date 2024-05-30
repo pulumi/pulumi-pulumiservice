@@ -10,6 +10,7 @@ import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.EnvironmentArgs;
 import com.pulumi.pulumiservice.Utilities;
+import java.lang.Integer;
 import java.lang.String;
 import javax.annotation.Nullable;
 
@@ -46,6 +47,20 @@ public class Environment extends com.pulumi.resources.CustomResource {
      */
     public Output<String> organization() {
         return this.organization;
+    }
+    /**
+     * Revision number of the latest version.
+     * 
+     */
+    @Export(name="revision", refs={Integer.class}, tree="[0]")
+    private Output<Integer> revision;
+
+    /**
+     * @return Revision number of the latest version.
+     * 
+     */
+    public Output<Integer> revision() {
+        return this.revision;
     }
     /**
      * Environment&#39;s yaml file.

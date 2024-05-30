@@ -1280,12 +1280,17 @@
         "yaml": {
           "description": "Environment's yaml file.",
           "$ref": "pulumi.json#/Asset"
+        },
+        "revision": {
+          "description": "Revision number of the latest version.",
+          "type": "integer"
         }
       },
       "required": [
         "organization",
         "name",
-        "yaml"
+        "yaml",
+        "revision"
       ],
       "inputProperties": {
         "organization": {

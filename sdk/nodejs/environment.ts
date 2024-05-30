@@ -43,6 +43,10 @@ export class Environment extends pulumi.CustomResource {
      */
     public readonly organization!: pulumi.Output<string>;
     /**
+     * Revision number of the latest version.
+     */
+    public /*out*/ readonly revision!: pulumi.Output<number>;
+    /**
      * Environment's yaml file.
      */
     public readonly yaml!: pulumi.Output<pulumi.asset.Asset | pulumi.asset.Archive>;
@@ -70,9 +74,11 @@ export class Environment extends pulumi.CustomResource {
             resourceInputs["name"] = args ? args.name : undefined;
             resourceInputs["organization"] = args ? args.organization : undefined;
             resourceInputs["yaml"] = args ? args.yaml : undefined;
+            resourceInputs["revision"] = undefined /*out*/;
         } else {
             resourceInputs["name"] = undefined /*out*/;
             resourceInputs["organization"] = undefined /*out*/;
+            resourceInputs["revision"] = undefined /*out*/;
             resourceInputs["yaml"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
