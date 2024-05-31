@@ -82,12 +82,12 @@ func ToPulumiServiceEnvironmentInput(properties *structpb.Struct) (*PulumiServic
 }
 
 func (st *PulumiServiceEnvironmentResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{})
+	olds, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
 	}
 
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{})
+	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
 	}
@@ -204,7 +204,7 @@ func (st *PulumiServiceEnvironmentResource) Create(req *pulumirpc.CreateRequest)
 }
 
 func (st *PulumiServiceEnvironmentResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	inputMap, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{})
+	inputMap, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
 	}
