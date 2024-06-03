@@ -8,9 +8,25 @@ resources:
       organization: service-provider-test-org
       name: testing-environment-yaml
       yaml:
-        fn::stringAsset: >
+        fn::stringAsset: |-
           values:
             myKey1: "myValue1"
             myNestedKey:
               myKey2: "myValue2"
               myNumber: 1
+  stableTag:
+    type: pulumiservice:EnvironmentVersionTag
+    properties:
+      organization: ${testing-environment.organization}
+      environment: ${testing-environment.name}
+      tagName: stable
+      revision: ${testing-environment.revision}
+  versionTag:
+    type: pulumiservice:EnvironmentVersionTag
+    properties:
+      organization: ${testing-environment.organization}
+      environment: ${testing-environment.name}
+      tagName: v${testing-environment.revision}
+      revision: ${testing-environment.revision}
+    options:
+      retainOnDelete: true
