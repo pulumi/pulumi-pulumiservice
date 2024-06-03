@@ -1347,6 +1347,30 @@
     },
     "pulumiservice:index:EnvironmentVersionTag": {
       "description": "A tag on a specific revision of an environment.",
+      "properties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "environment": {
+          "description": "Environment name.",
+          "type": "string"
+        },
+        "tagName": {
+          "description": "Tag name.",
+          "type": "string"
+        },
+        "revision": {
+          "description": "Revision number.",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "organization",
+        "environment",
+        "tagName",
+        "revision"
+      ],
       "inputProperties": {
         "organization": {
           "description": "Organization name.",

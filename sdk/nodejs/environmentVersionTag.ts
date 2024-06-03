@@ -34,6 +34,22 @@ export class EnvironmentVersionTag extends pulumi.CustomResource {
         return obj['__pulumiType'] === EnvironmentVersionTag.__pulumiType;
     }
 
+    /**
+     * Environment name.
+     */
+    public readonly environment!: pulumi.Output<string>;
+    /**
+     * Organization name.
+     */
+    public readonly organization!: pulumi.Output<string>;
+    /**
+     * Revision number.
+     */
+    public readonly revision!: pulumi.Output<number>;
+    /**
+     * Tag name.
+     */
+    public readonly tagName!: pulumi.Output<string>;
 
     /**
      * Create a EnvironmentVersionTag resource with the given unique name, arguments, and options.
@@ -63,6 +79,10 @@ export class EnvironmentVersionTag extends pulumi.CustomResource {
             resourceInputs["revision"] = args ? args.revision : undefined;
             resourceInputs["tagName"] = args ? args.tagName : undefined;
         } else {
+            resourceInputs["environment"] = undefined /*out*/;
+            resourceInputs["organization"] = undefined /*out*/;
+            resourceInputs["revision"] = undefined /*out*/;
+            resourceInputs["tagName"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         super(EnvironmentVersionTag.__pulumiType, name, resourceInputs, opts);

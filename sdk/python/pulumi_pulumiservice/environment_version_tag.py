@@ -170,5 +170,41 @@ class EnvironmentVersionTag(pulumi.CustomResource):
 
         __props__ = EnvironmentVersionTagArgs.__new__(EnvironmentVersionTagArgs)
 
+        __props__.__dict__["environment"] = None
+        __props__.__dict__["organization"] = None
+        __props__.__dict__["revision"] = None
+        __props__.__dict__["tag_name"] = None
         return EnvironmentVersionTag(resource_name, opts=opts, __props__=__props__)
+
+    @property
+    @pulumi.getter
+    def environment(self) -> pulumi.Output[str]:
+        """
+        Environment name.
+        """
+        return pulumi.get(self, "environment")
+
+    @property
+    @pulumi.getter
+    def organization(self) -> pulumi.Output[str]:
+        """
+        Organization name.
+        """
+        return pulumi.get(self, "organization")
+
+    @property
+    @pulumi.getter
+    def revision(self) -> pulumi.Output[int]:
+        """
+        Revision number.
+        """
+        return pulumi.get(self, "revision")
+
+    @property
+    @pulumi.getter(name="tagName")
+    def tag_name(self) -> pulumi.Output[str]:
+        """
+        Tag name.
+        """
+        return pulumi.get(self, "tag_name")
 

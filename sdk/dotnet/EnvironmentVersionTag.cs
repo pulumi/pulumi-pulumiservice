@@ -16,6 +16,31 @@ namespace Pulumi.PulumiService
     public partial class EnvironmentVersionTag : global::Pulumi.CustomResource
     {
         /// <summary>
+        /// Environment name.
+        /// </summary>
+        [Output("environment")]
+        public Output<string> Environment { get; private set; } = null!;
+
+        /// <summary>
+        /// Organization name.
+        /// </summary>
+        [Output("organization")]
+        public Output<string> Organization { get; private set; } = null!;
+
+        /// <summary>
+        /// Revision number.
+        /// </summary>
+        [Output("revision")]
+        public Output<int> Revision { get; private set; } = null!;
+
+        /// <summary>
+        /// Tag name.
+        /// </summary>
+        [Output("tagName")]
+        public Output<string> TagName { get; private set; } = null!;
+
+
+        /// <summary>
         /// Create a EnvironmentVersionTag resource with the given unique name, arguments, and options.
         /// </summary>
         ///

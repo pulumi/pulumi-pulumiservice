@@ -4,10 +4,13 @@
 package com.pulumi.pulumiservice;
 
 import com.pulumi.core.Output;
+import com.pulumi.core.annotations.Export;
 import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.EnvironmentVersionTagArgs;
 import com.pulumi.pulumiservice.Utilities;
+import java.lang.Integer;
+import java.lang.String;
 import javax.annotation.Nullable;
 
 /**
@@ -16,6 +19,63 @@ import javax.annotation.Nullable;
  */
 @ResourceType(type="pulumiservice:index:EnvironmentVersionTag")
 public class EnvironmentVersionTag extends com.pulumi.resources.CustomResource {
+    /**
+     * Environment name.
+     * 
+     */
+    @Export(name="environment", refs={String.class}, tree="[0]")
+    private Output<String> environment;
+
+    /**
+     * @return Environment name.
+     * 
+     */
+    public Output<String> environment() {
+        return this.environment;
+    }
+    /**
+     * Organization name.
+     * 
+     */
+    @Export(name="organization", refs={String.class}, tree="[0]")
+    private Output<String> organization;
+
+    /**
+     * @return Organization name.
+     * 
+     */
+    public Output<String> organization() {
+        return this.organization;
+    }
+    /**
+     * Revision number.
+     * 
+     */
+    @Export(name="revision", refs={Integer.class}, tree="[0]")
+    private Output<Integer> revision;
+
+    /**
+     * @return Revision number.
+     * 
+     */
+    public Output<Integer> revision() {
+        return this.revision;
+    }
+    /**
+     * Tag name.
+     * 
+     */
+    @Export(name="tagName", refs={String.class}, tree="[0]")
+    private Output<String> tagName;
+
+    /**
+     * @return Tag name.
+     * 
+     */
+    public Output<String> tagName() {
+        return this.tagName;
+    }
+
     /**
      *
      * @param name The _unique_ name of the resulting resource.
