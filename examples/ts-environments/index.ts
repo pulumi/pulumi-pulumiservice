@@ -12,3 +12,21 @@ var environment = new service.Environment("testing-environment", {
     myNumber: 1`
   )
 })
+
+// A tag that will always be placed on the latest revision of the environment
+var stableTag = new service.EnvironmentVersionTag("StableTag", {
+  organization: environment.organization,
+  environment: environment.name,
+  tagName: "stable",
+  revision: environment.revision
+})
+
+// A tag that will be placed on each new version, and remain on old revisions
+var versionTag = new service.EnvironmentVersionTag("VersionTag", {
+  organization: environment.organization,
+  environment: environment.name,
+  tagName: environment.revision.apply((rev: number) => "v"+rev),
+  revision: environment.revision
+}, {
+  retainOnDelete: true
+})
