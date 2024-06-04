@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+## 0.21.1
+
+### Improvements
+
+- Added revision field to Environment resource [#290](https://github.com/pulumi/pulumi-pulumiservice/issues/290)
+- Added EnvironmentVersionTag resource [#291](https://github.com/pulumi/pulumi-pulumiservice/issues/291)
+
 ## 0.21
 
 ### Improvements
