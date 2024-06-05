@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+## 0.21.2
+
+### Bug Fixes
+
+- Version bump of `github.com/pulumi/esc` package to v0.9.1 as old one no longer works, which broke EnvironmentVersionTag resource
+
 ## 0.21.1
 
 ### Improvements
