@@ -102,6 +102,10 @@ func (c *EscClientMock) DeleteEnvironmentRevisionTag(ctx context.Context, orgNam
 	return nil
 }
 
+func (c *EscClientMock) RetractEnvironmentRevision(ctx context.Context, orgName string, envName string, version string, replacement *int, reason string) error {
+	return nil
+}
+
 func (c *EscClientMock) Insecure() bool {
 	return false
 }
