@@ -5,12 +5,14 @@ import (
 
 	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
+	"github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
 )
 
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
+		conf := config.New(ctx, "")
 		environment, err := pulumiservice.NewEnvironment(ctx, "testing-environment", &pulumiservice.EnvironmentArgs{
-			Name:         pulumi.String("testing-environment-go"),
+			Name:         pulumi.String("testing-environment-go-" + conf.Require("digits")),
 			Organization: pulumi.String("service-provider-test-org"),
 			Yaml: pulumi.NewStringAsset(`
             values:

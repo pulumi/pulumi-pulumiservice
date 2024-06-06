@@ -6,6 +6,7 @@ class MyStack : Stack
 {
     public MyStack()
     {
+        var config = new Pulumi.Config();
         String yaml = """
         values:
           myKey1: "myValue1"
@@ -18,7 +19,7 @@ class MyStack : Stack
             "testing-environment",
             new EnvironmentArgs {
                 Organization = "service-provider-test-org",
-                Name = "testing-environment-cs",
+                Name = "testing-environment-cs-" + config.Require("digits"),
                 Yaml = new StringAsset(yaml)
             }
         );

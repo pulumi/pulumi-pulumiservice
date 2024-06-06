@@ -34,9 +34,13 @@ func TestPythonDeploymentSettingsExample(t *testing.T) {
 }
 
 func TestPythonEnvironmentsExample(t *testing.T) {
+	digits := generateRandomFiveDigits()
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		Dir:         path.Join(getCwd(t), "py-environments"),
 		SkipRefresh: true,
+		Config: map[string]string{
+			"digits": digits,
+		},
 		Dependencies: []string{
 			filepath.Join("..", "sdk", "python", "bin"),
 		},

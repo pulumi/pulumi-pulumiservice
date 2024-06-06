@@ -267,8 +267,12 @@ func TestYamlSchedulesExample(t *testing.T) {
 
 func TestYamlEnvironmentsExample(t *testing.T) {
 	cwd := getCwd(t)
+	digits := generateRandomFiveDigits()
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		Dir: path.Join(cwd, ".", "yaml-environments"),
+		Config: map[string]string{
+			"digits": digits,
+		},
 		PrepareProject: func(p *engine.Projinfo) error {
 			return nil
 		},

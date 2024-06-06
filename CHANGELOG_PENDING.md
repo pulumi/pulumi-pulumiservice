@@ -4,4 +4,6 @@
 
 ### Bug Fixes
 
+- Fixed environment tests breaking due to name collision [#296](https://github.com/pulumi/pulumi-pulumiservice/issues/296)
+
 ### Miscellaneous
