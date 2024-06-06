@@ -4,10 +4,12 @@ import pulumi
 from pulumi_pulumiservice import Environment, EnvironmentVersionTag
 from pulumi import ResourceOptions
 
+config = pulumi.Config()
+
 environment = Environment(
     "testing-environment",
     organization="service-provider-test-org",
-    name="testing-environment-py",
+    name="testing-environment-py-"+config.require('digits'),
     yaml=pulumi.StringAsset("""
         values:
           myKey1: "myValue1"

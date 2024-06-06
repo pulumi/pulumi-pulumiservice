@@ -102,8 +102,12 @@ func TestNodejsSchedulesExample(t *testing.T) {
 
 func TestNodejsEnvironmentsExample(t *testing.T) {
 	cwd := getCwd(t)
+	digits := generateRandomFiveDigits()
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		Dir: path.Join(cwd, ".", "ts-environments"),
+		Config: map[string]string{
+			"digits": digits,
+		},
 		Dependencies: []string{
 			"@pulumi/pulumiservice",
 		},
