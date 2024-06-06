@@ -11,6 +11,7 @@ import (
 
 type DeploymentSettingsClient interface {
 	CreateDeploymentSettings(ctx context.Context, stack StackName, ds DeploymentSettings) error
+	UpdateDeploymentSettings(ctx context.Context, stack StackName, ds DeploymentSettings) error
 	GetDeploymentSettings(ctx context.Context, stack StackName) (*DeploymentSettings, error)
 	DeleteDeploymentSettings(ctx context.Context, stack StackName) error
 }
@@ -78,6 +79,15 @@ func (c *Client) CreateDeploymentSettings(ctx context.Context, stack StackName, 
 	_, err := c.do(ctx, http.MethodPost, apiPath, ds, nil)
 	if err != nil {
 		return fmt.Errorf("failed to create deployment settings for stack (%s): %w", stack.String(), err)
+	}
+	return nil
+}
+
+func (c *Client) UpdateDeploymentSettings(ctx context.Context, stack StackName, ds DeploymentSettings) error {
+	apiPath := path.Join("stacks", stack.OrgName, stack.ProjectName, stack.StackName, "deployments", "settings")
+	_, err := c.do(ctx, http.MethodPut, apiPath, ds, nil)
+	if err != nil {
+		return fmt.Errorf("failed to update deployment settings for stack (%s): %w", stack.String(), err)
 	}
 	return nil
 }
