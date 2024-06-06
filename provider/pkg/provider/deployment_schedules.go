@@ -137,7 +137,7 @@ func ToPulumiServiceSharedScheduleOutput(properties *structpb.Struct) (*PulumiSe
 }
 
 func ScheduleSharedDiff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
+	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
 	if err != nil {
 		return nil, err
 	}
@@ -151,11 +151,6 @@ func ScheduleSharedDiff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, er
 }
 
 func ScheduleSharedDiffMaps(olds resource.PropertyMap, news resource.PropertyMap) (*pulumirpc.DiffResponse, error) {
-	// preprocess olds to remove the `scheduleId` property since it's only an output and shouldn't cause a diff
-	if olds["scheduleId"].HasValue() {
-		delete(olds, "scheduleId")
-	}
-
 	diffs := olds.Diff(news)
 	if diffs == nil {
 		return &pulumirpc.DiffResponse{

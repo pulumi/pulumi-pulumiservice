@@ -82,7 +82,7 @@ func ToPulumiServiceEnvironmentInput(properties *structpb.Struct) (*PulumiServic
 }
 
 func (st *PulumiServiceEnvironmentResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
 	}
@@ -90,11 +90,6 @@ func (st *PulumiServiceEnvironmentResource) Diff(req *pulumirpc.DiffRequest) (*p
 	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
-	}
-
-	// preprocess olds to remove the `revision` property since it's only an output and shouldn't cause a diff
-	if olds["revision"].HasValue() {
-		delete(olds, "revision")
 	}
 
 	diffs := olds.Diff(news)
