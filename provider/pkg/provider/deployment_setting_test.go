@@ -20,6 +20,9 @@ type DeploymentSettingsClientMock struct {
 func (c *DeploymentSettingsClientMock) CreateDeploymentSettings(ctx context.Context, stack pulumiapi.StackName, ds pulumiapi.DeploymentSettings) error {
 	return nil
 }
+func (c *DeploymentSettingsClientMock) UpdateDeploymentSettings(ctx context.Context, stack pulumiapi.StackName, ds pulumiapi.DeploymentSettings) error {
+	return nil
+}
 func (c *DeploymentSettingsClientMock) GetDeploymentSettings(ctx context.Context, stack pulumiapi.StackName) (*pulumiapi.DeploymentSettings, error) {
 	return c.getDeploymentSettingsFunc()
 }

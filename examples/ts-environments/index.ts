@@ -1,9 +1,11 @@
 import * as service from "@pulumi/pulumiservice";
 import * as pulumi from "@pulumi/pulumi";
 
+let config = new pulumi.Config();
+
 var environment = new service.Environment("testing-environment", {
   organization: "service-provider-test-org",
-  name: "testing-environment-ts",
+  name: "testing-environment-ts-"+config.require("digits"),
   yaml: new pulumi.asset.StringAsset(
 `values:
   myKey1: "myValue1"

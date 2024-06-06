@@ -6,7 +6,7 @@ resources:
     type: pulumiservice:Environment
     properties:
       organization: service-provider-test-org
-      name: testing-environment-yaml
+      name: testing-environment-yaml-${digits}
       yaml:
         fn::stringAsset: |-
           values:

@@ -35,9 +35,13 @@ func TestDotnetSchedulesExamples(t *testing.T) {
 }
 
 func TestDotnetEnvironmentsExamples(t *testing.T) {
+	digits := generateRandomFiveDigits()
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		Dir:         path.Join(getCwd(t), "cs-environments"),
 		SkipRefresh: true,
+		Config: map[string]string{
+			"digits": digits,
+		},
 		Dependencies: []string{
 			"Pulumi.PulumiService",
 		},
