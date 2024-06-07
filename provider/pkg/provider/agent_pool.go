@@ -54,16 +54,9 @@ func (ap *PulumiServiceAgentPoolResource) Name() string {
 }
 
 func (ap *PulumiServiceAgentPoolResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
+	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
 	if err != nil {
 		return nil, err
-	}
-
-	// preprocess olds to remove the `tokenValue & agentPoolId` property since it's only an output and shouldn't cause a diff
-	for _, p := range []resource.PropertyKey{"tokenValue", "agentPoolId"} {
-		if olds[p].HasValue() {
-			delete(olds, p)
-		}
 	}
 
 	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
@@ -167,7 +160,7 @@ func (ap *PulumiServiceAgentPoolResource) Update(req *pulumirpc.UpdateRequest) (
 		return nil, fmt.Errorf("invalid resource id: %v", err)
 	}
 
-	olds, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
 	}
