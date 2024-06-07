@@ -10,13 +10,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type getDeploymentScheduleFunc func() (*string, error)
+type getDeploymentScheduleFunc func() (*pulumiapi.ScheduleResponse, error)
 
 type ScheduleClientMock struct {
 	getDeploymentScheduleFunc getDeploymentScheduleFunc
 }
 
-func (c *ScheduleClientMock) GetSchedule(ctx context.Context, stack pulumiapi.StackName, scheduleID string) (*string, error) {
+func (c *ScheduleClientMock) GetSchedule(ctx context.Context, stack pulumiapi.StackName, scheduleID string) (*pulumiapi.ScheduleResponse, error) {
 	return c.getDeploymentScheduleFunc()
 }
 
@@ -57,7 +57,7 @@ func buildScheduleClientMock(getDeploymentScheduleFunc getDeploymentScheduleFunc
 func TestDeploymentSchedule(t *testing.T) {
 	t.Run("Read when the resource is not found", func(t *testing.T) {
 		mockedClient := buildScheduleClientMock(
-			func() (*string, error) { return nil, nil },
+			func() (*pulumiapi.ScheduleResponse, error) { return nil, nil },
 		)
 
 		provider := PulumiServiceDeploymentScheduleResource{
@@ -97,9 +97,24 @@ func TestDeploymentSchedule(t *testing.T) {
 
 	t.Run("Read when the resource is found", func(t *testing.T) {
 		mockedClient := buildScheduleClientMock(
-			func() (*string, error) {
-				scheduleID := "fake-schedule-id"
-				return &scheduleID, nil
+			func() (*pulumiapi.ScheduleResponse, error) {
+				timeString := "2026-06-06 00:00:00.000"
+				return &pulumiapi.ScheduleResponse{
+					ID:           "fake-id",
+					ScheduleOnce: &timeString,
+					ScheduleCron: nil,
+					Definition: pulumiapi.ScheduleDefinition{
+						Request: pulumiapi.CreateDeploymentRequest{
+							PulumiOperation: "update",
+							OperationContext: pulumiapi.ScheduleOperationContext{
+								Options: pulumiapi.ScheduleOperationContextOptions{
+									AutoRemediate:      true,
+									DeleteAfterDestroy: false,
+								},
+							},
+						},
+					},
+				}, nil
 			},
 		)
 
