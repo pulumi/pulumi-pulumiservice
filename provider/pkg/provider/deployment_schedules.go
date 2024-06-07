@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"path"
+	"strings"
 	"time"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/pulumiapi"
@@ -322,22 +323,33 @@ func (st *PulumiServiceDeploymentScheduleResource) Update(req *pulumirpc.UpdateR
 }
 
 func (st *PulumiServiceDeploymentScheduleResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	output, err := ToPulumiServiceSharedScheduleOutput(req.GetProperties())
-	if err != nil {
-		return nil, err
-	}
-	input, err := ToPulumiServiceDeploymentScheduleInput(req.GetProperties())
+	stack, scheduleID, err := ParseScheduleID(req.Id, "")
 	if err != nil {
 		return nil, err
 	}
 
-	scheduleID, err := st.client.GetSchedule(context.Background(), output.Stack, output.ScheduleID)
+	scheduleResponse, err := st.client.GetSchedule(context.Background(), *stack, *scheduleID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read DeploymentSchedule (%q): %w", req.Id, err)
 	}
-	if scheduleID == nil {
-		// if the tag doesn't exist, then return empty response
+	if scheduleResponse == nil {
+		// if schedule doesn't exist, then return empty response to delete it from state
 		return &pulumirpc.ReadResponse{}, nil
+	}
+
+	var scheduleOnce *time.Time = nil
+	if scheduleResponse.ScheduleOnce != nil {
+		parsed, err := time.Parse(time.DateTime, *scheduleResponse.ScheduleOnce)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read DeploymentSchedule (%q): %w", req.Id, err)
+		}
+		scheduleOnce = &parsed
+	}
+	input := PulumiServiceDeploymentScheduleInput{
+		Stack:           *stack,
+		ScheduleCron:    scheduleResponse.ScheduleCron,
+		ScheduleOnce:    scheduleOnce,
+		PulumiOperation: scheduleResponse.Definition.Request.PulumiOperation,
 	}
 
 	outputProperties, err := plugin.MarshalProperties(
@@ -363,4 +375,26 @@ func (st *PulumiServiceDeploymentScheduleResource) Name() string {
 }
 
 func (st *PulumiServiceDeploymentScheduleResource) Configure(_ PulumiServiceConfig) {
+}
+
+func ParseScheduleID(id string, scheduleType string) (*pulumiapi.StackName, *string, error) {
+	splitID := strings.Split(id, "/")
+	if len(splitID) < 4 {
+		return nil, nil, fmt.Errorf("invalid stack id: %s", id)
+	}
+	stack := pulumiapi.StackName{
+		OrgName:     splitID[0],
+		ProjectName: splitID[1],
+		StackName:   splitID[2],
+	}
+	if scheduleType == "" {
+		if len(splitID) != 4 {
+			return nil, nil, fmt.Errorf("invalid schedule id: %s", id)
+		}
+		return &stack, &splitID[3], nil
+	}
+	if len(splitID) != 5 || splitID[3] != scheduleType {
+		return nil, nil, fmt.Errorf("invalid schedule id: %s", id)
+	}
+	return &stack, &splitID[4], nil
 }

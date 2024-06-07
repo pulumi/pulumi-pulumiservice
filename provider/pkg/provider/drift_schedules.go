@@ -177,22 +177,24 @@ func (st *PulumiServiceDriftScheduleResource) Update(req *pulumirpc.UpdateReques
 }
 
 func (st *PulumiServiceDriftScheduleResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	output, err := ToPulumiServiceSharedScheduleOutput(req.GetProperties())
-	if err != nil {
-		return nil, err
-	}
-	input, err := ToPulumiServiceDriftScheduleInput(req.GetProperties())
+	stack, scheduleID, err := ParseScheduleID(req.Id, "drift")
 	if err != nil {
 		return nil, err
 	}
 
-	scheduleID, err := st.client.GetSchedule(context.Background(), output.Stack, output.ScheduleID)
+	scheduleResponse, err := st.client.GetSchedule(context.Background(), *stack, *scheduleID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read DriftSchedule (%q): %w", req.Id, err)
 	}
-	if scheduleID == nil {
-		// if the tag doesn't exist, then return empty response
+	if scheduleResponse == nil {
+		// if schedule doesn't exist, then return empty response to delete it from state
 		return &pulumirpc.ReadResponse{}, nil
+	}
+
+	input := PulumiServiceDriftScheduleInput{
+		Stack:         *stack,
+		ScheduleCron:  *scheduleResponse.ScheduleCron,
+		AutoRemediate: scheduleResponse.Definition.Request.OperationContext.Options.AutoRemediate,
 	}
 
 	outputProperties, err := plugin.MarshalProperties(

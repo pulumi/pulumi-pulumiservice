@@ -32,7 +32,14 @@ var createTtlScheduleReq = CreateTtlScheduleRequest{
 	DeleteAfterDestroy: true,
 }
 var testResponse = ScheduleResponse{
-	ID: testScheduleID,
+	ID:           testScheduleID,
+	ScheduleOnce: nil,
+	ScheduleCron: &cron,
+	Definition: ScheduleDefinition{
+		Request: CreateDeploymentRequest{
+			PulumiOperation: "update",
+		},
+	},
 }
 
 func TestCreateDeploymentSchedule(t *testing.T) {
@@ -78,9 +85,9 @@ func TestGetDeploymentSchedule(t *testing.T) {
 			ResponseBody:      testResponse,
 		})
 		defer cleanup()
-		expectedScheduleID, err := c.GetSchedule(ctx, testStack, testScheduleID)
+		response, err := c.GetSchedule(ctx, testStack, testScheduleID)
 		assert.NoError(t, err)
-		assert.Equal(t, testScheduleID, *expectedScheduleID)
+		assert.Equal(t, testResponse, *response)
 	})
 
 	t.Run("Error", func(t *testing.T) {

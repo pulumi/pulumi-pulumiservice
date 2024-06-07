@@ -181,22 +181,28 @@ func (st *PulumiServiceTtlScheduleResource) Update(req *pulumirpc.UpdateRequest)
 }
 
 func (st *PulumiServiceTtlScheduleResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	output, err := ToPulumiServiceSharedScheduleOutput(req.GetProperties())
-	if err != nil {
-		return nil, err
-	}
-	input, err := ToPulumiServiceTtlScheduleInput(req.GetProperties())
+	stack, scheduleID, err := ParseScheduleID(req.Id, "ttl")
 	if err != nil {
 		return nil, err
 	}
 
-	scheduleID, err := st.client.GetSchedule(context.Background(), output.Stack, output.ScheduleID)
+	scheduleResponse, err := st.client.GetSchedule(context.Background(), *stack, *scheduleID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read TtlSchedule (%q): %w", req.Id, err)
 	}
-	if scheduleID == nil {
-		// if the tag doesn't exist, then return empty response
+	if scheduleResponse == nil {
+		// if schedule doesn't exist, then return empty response to delete it from state
 		return &pulumirpc.ReadResponse{}, nil
+	}
+
+	timestamp, err := time.Parse(time.DateTime, *scheduleResponse.ScheduleOnce)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read DeploymentSchedule (%q): %w", req.Id, err)
+	}
+	input := PulumiServiceTtlScheduleInput{
+		Stack:              *stack,
+		Timestamp:          timestamp,
+		DeleteAfterDestroy: scheduleResponse.Definition.Request.OperationContext.Options.DeleteAfterDestroy,
 	}
 
 	outputProperties, err := plugin.MarshalProperties(

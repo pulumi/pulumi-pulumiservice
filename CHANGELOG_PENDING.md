@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 - Fixed environment tests breaking due to name collision [#296](https://github.com/pulumi/pulumi-pulumiservice/issues/296)
+- Fixed import for Schedules [#270](https://github.com/pulumi/pulumi-pulumiservice/issues/270)
 
 ### Miscellaneous
 
