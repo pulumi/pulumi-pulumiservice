@@ -13,7 +13,6 @@ resources:
     properties:
       name: brand-new-yaml-team-${rand.result}
       organizationName: service-provider-test-org
-      displayName: PulumiUP Team
       teamType: pulumi
       members:
         - pulumi-bot
