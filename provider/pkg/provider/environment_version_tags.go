@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"path"
+	"strings"
 
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
 
@@ -163,8 +164,8 @@ func (evt *PulumiServiceEnvironmentVersionTagResource) Read(req *pulumirpc.ReadR
 	}
 
 	tag, err := evt.client.GetEnvironmentRevisionTag(ctx, input.Organization, input.Environment, input.TagName)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read StackTag (%q): %w", req.Id, err)
+	if err != nil && !strings.Contains(err.Error(), "404") {
+		return nil, fmt.Errorf("failed to read EnvironmentVersionTag (%q): %w", req.Id, err)
 	}
 	if tag == nil {
 		// if the tag doesn't exist, then return empty response
