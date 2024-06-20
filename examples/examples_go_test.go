@@ -12,9 +12,8 @@ import (
 
 func TestGoTeamsExample(t *testing.T) {
 	testOpts := getGoBaseOptions(t).With(integration.ProgramTestOptions{
-		Verbose:     true,
-		Dir:         filepath.Join(getCwd(t), "go-teams"),
-		SkipRefresh: true,
+		Verbose: true,
+		Dir:     filepath.Join(getCwd(t), "go-teams"),
 	})
 	integration.ProgramTest(t, &testOpts)
 }
@@ -22,9 +21,8 @@ func TestGoTeamsExample(t *testing.T) {
 func TestGoEnvironmentsExample(t *testing.T) {
 	digits := generateRandomFiveDigits()
 	testOpts := getGoBaseOptions(t).With(integration.ProgramTestOptions{
-		Verbose:     true,
-		Dir:         filepath.Join(getCwd(t), "go-environments"),
-		SkipRefresh: true,
+		Verbose: true,
+		Dir:     filepath.Join(getCwd(t), "go-environments"),
 		Config: map[string]string{
 			"digits": digits,
 		},
