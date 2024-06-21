@@ -148,7 +148,16 @@ func (t *PulumiServiceTeamResource) Check(req *pulumirpc.CheckRequest) (*pulumir
 		})
 	}
 
-	return &pulumirpc.CheckResponse{Inputs: news, Failures: failures}, nil
+	if !newsMap["displayName"].HasValue() {
+		newsMap["displayName"] = newsMap["name"]
+	}
+
+	inputs, err := plugin.MarshalProperties(newsMap, plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	if err != nil {
+		return nil, err
+	}
+
+	return &pulumirpc.CheckResponse{Inputs: inputs, Failures: failures}, nil
 }
 
 func (t *PulumiServiceTeamResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
