@@ -23,7 +23,19 @@ type PulumiServiceDeploymentSettingsInput struct {
 	Stack pulumiapi.StackName
 }
 
-func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(plaintextSettings *pulumiapi.DeploymentSettings, oldCipherSettings *pulumiapi.DeploymentSettings, isInput bool) resource.PropertyMap {
+// plaintextInputSettings are the latest inputs of the resource, containing plaintext values wrapped in Secrets
+// currentStateCipherSettings are the latest outputs/properties of the resource, containing ciphertext strings of secret values
+// isInput is a flag that selects whether to generating an input PropertyMap that contains plaintext (true) or an output PropertyMap that contains ciphertext (false)
+func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(plaintextInputSettings *pulumiapi.DeploymentSettings, currentStateCipherSettings *pulumiapi.DeploymentSettings, isInput bool) resource.PropertyMap {
+	// Below flags are used throughout this method and direct the serialization of twin value secrets
+	// Twin value secrets are values whose plaintext cannot be retrieved from the API, thus forcing the development of this fairly complex system
+	// When plaintextInputSettings is passed in, but currentStateCipherSettings is not, that means the resource is being created or updated
+	createMode := plaintextInputSettings != nil && currentStateCipherSettings == nil
+	// When both plaintextInputSettings and currentStateCipherSettings are passed in, that means an existing resource is being refreshed, and it's necessary to merge values
+	// In case we are merging, but some of the properties don't previously exist, we will merge with empty value, setting plaintext to be empty string
+	mergeMode := plaintextInputSettings != nil && currentStateCipherSettings != nil
+	// If neither one is passed in, we are importing an existing resource into the state
+
 	pm := resource.PropertyMap{}
 	pm["organization"] = resource.NewPropertyValue(ds.Stack.OrgName)
 	pm["project"] = resource.NewPropertyValue(ds.Stack.ProjectName)
@@ -54,46 +66,42 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(plaintextSettings 
 				if ds.SourceContext.Git.GitAuth.SSHAuth != nil {
 					sshAuthPropertyMap := resource.PropertyMap{}
 					if ds.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey.Value != "" {
-						if plaintextSettings == nil {
-							importSecretValue(sshAuthPropertyMap, "sshPrivateKey", ds.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey, isInput)
-						} else {
-							if oldCipherSettings == nil {
-								createSecretValue(sshAuthPropertyMap, "sshPrivateKey", ds.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey,
-									plaintextSettings.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey, isInput)
-							} else {
-								if oldCipherSettings.SourceContext != nil &&
-									oldCipherSettings.SourceContext.Git != nil &&
-									oldCipherSettings.SourceContext.Git.GitAuth != nil &&
-									oldCipherSettings.SourceContext.Git.GitAuth.SSHAuth != nil {
-									mergeSecretValue(sshAuthPropertyMap, "sshPrivateKey", ds.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey,
-										plaintextSettings.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey,
-										oldCipherSettings.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey, isInput)
-								} else {
-									importSecretValue(sshAuthPropertyMap, "sshPrivateKey", ds.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey, isInput)
-								}
+						if mergeMode {
+							var plaintextValue *pulumiapi.SecretValue
+							var currentCipherValue *pulumiapi.SecretValue
+							if currentStateCipherSettings.SourceContext != nil &&
+								currentStateCipherSettings.SourceContext.Git != nil &&
+								currentStateCipherSettings.SourceContext.Git.GitAuth != nil &&
+								currentStateCipherSettings.SourceContext.Git.GitAuth.SSHAuth != nil {
+								plaintextValue = &plaintextInputSettings.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey
+								currentCipherValue = &currentStateCipherSettings.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey
 							}
+							mergeSecretValue(sshAuthPropertyMap, "sshPrivateKey", ds.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey, plaintextValue, currentCipherValue, isInput)
+						} else if createMode {
+							createSecretValue(sshAuthPropertyMap, "sshPrivateKey", ds.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey,
+								plaintextInputSettings.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey, isInput)
+						} else {
+							importSecretValue(sshAuthPropertyMap, "sshPrivateKey", ds.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey, isInput)
 						}
 					}
 					if ds.SourceContext.Git.GitAuth.SSHAuth.Password.Value != "" {
-						if plaintextSettings == nil {
-							importSecretValue(sshAuthPropertyMap, "password", *ds.SourceContext.Git.GitAuth.SSHAuth.Password, isInput)
-						} else {
-							if oldCipherSettings == nil {
-								createSecretValue(sshAuthPropertyMap, "password", *ds.SourceContext.Git.GitAuth.SSHAuth.Password,
-									*plaintextSettings.SourceContext.Git.GitAuth.SSHAuth.Password, isInput)
-							} else {
-								if oldCipherSettings.SourceContext != nil &&
-									oldCipherSettings.SourceContext.Git != nil &&
-									oldCipherSettings.SourceContext.Git.GitAuth != nil &&
-									oldCipherSettings.SourceContext.Git.GitAuth.SSHAuth != nil &&
-									oldCipherSettings.SourceContext.Git.GitAuth.SSHAuth.Password != nil {
-									mergeSecretValue(sshAuthPropertyMap, "password", *ds.SourceContext.Git.GitAuth.SSHAuth.Password,
-										*plaintextSettings.SourceContext.Git.GitAuth.SSHAuth.Password,
-										*oldCipherSettings.SourceContext.Git.GitAuth.SSHAuth.Password, isInput)
-								} else {
-									importSecretValue(sshAuthPropertyMap, "password", *ds.SourceContext.Git.GitAuth.SSHAuth.Password, isInput)
-								}
+						if mergeMode {
+							var plaintextValue *pulumiapi.SecretValue
+							var currentCipherValue *pulumiapi.SecretValue
+							if currentStateCipherSettings.SourceContext != nil &&
+								currentStateCipherSettings.SourceContext.Git != nil &&
+								currentStateCipherSettings.SourceContext.Git.GitAuth != nil &&
+								currentStateCipherSettings.SourceContext.Git.GitAuth.SSHAuth != nil &&
+								currentStateCipherSettings.SourceContext.Git.GitAuth.SSHAuth.Password != nil {
+								plaintextValue = plaintextInputSettings.SourceContext.Git.GitAuth.SSHAuth.Password
+								currentCipherValue = currentStateCipherSettings.SourceContext.Git.GitAuth.SSHAuth.Password
 							}
+							mergeSecretValue(sshAuthPropertyMap, "password", *ds.SourceContext.Git.GitAuth.SSHAuth.Password, plaintextValue, currentCipherValue, isInput)
+						} else if createMode {
+							createSecretValue(sshAuthPropertyMap, "password", *ds.SourceContext.Git.GitAuth.SSHAuth.Password,
+								*plaintextInputSettings.SourceContext.Git.GitAuth.SSHAuth.Password, isInput)
+						} else {
+							importSecretValue(sshAuthPropertyMap, "password", *ds.SourceContext.Git.GitAuth.SSHAuth.Password, isInput)
 						}
 					}
 					gitAuthPropertyMap["sshAuth"] = resource.PropertyValue{V: sshAuthPropertyMap}
@@ -104,24 +112,22 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(plaintextSettings 
 						basicAuthPropertyMap["username"] = resource.NewPropertyValue(ds.SourceContext.Git.GitAuth.BasicAuth.UserName.Value)
 					}
 					if ds.SourceContext.Git.GitAuth.BasicAuth.Password.Value != "" {
-						if plaintextSettings == nil {
-							importSecretValue(basicAuthPropertyMap, "password", ds.SourceContext.Git.GitAuth.BasicAuth.Password, isInput)
-						} else {
-							if oldCipherSettings == nil {
-								createSecretValue(basicAuthPropertyMap, "password", ds.SourceContext.Git.GitAuth.BasicAuth.Password,
-									plaintextSettings.SourceContext.Git.GitAuth.BasicAuth.Password, isInput)
-							} else {
-								if oldCipherSettings.SourceContext != nil &&
-									oldCipherSettings.SourceContext.Git != nil &&
-									oldCipherSettings.SourceContext.Git.GitAuth != nil &&
-									oldCipherSettings.SourceContext.Git.GitAuth.BasicAuth != nil {
-									mergeSecretValue(basicAuthPropertyMap, "password", ds.SourceContext.Git.GitAuth.BasicAuth.Password,
-										plaintextSettings.SourceContext.Git.GitAuth.BasicAuth.Password,
-										oldCipherSettings.SourceContext.Git.GitAuth.BasicAuth.Password, isInput)
-								} else {
-									importSecretValue(basicAuthPropertyMap, "password", ds.SourceContext.Git.GitAuth.BasicAuth.Password, isInput)
-								}
+						if mergeMode {
+							var plaintextValue *pulumiapi.SecretValue
+							var currentCipherValue *pulumiapi.SecretValue
+							if currentStateCipherSettings.SourceContext != nil &&
+								currentStateCipherSettings.SourceContext.Git != nil &&
+								currentStateCipherSettings.SourceContext.Git.GitAuth != nil &&
+								currentStateCipherSettings.SourceContext.Git.GitAuth.BasicAuth != nil {
+								plaintextValue = &plaintextInputSettings.SourceContext.Git.GitAuth.BasicAuth.Password
+								currentCipherValue = &currentStateCipherSettings.SourceContext.Git.GitAuth.BasicAuth.Password
 							}
+							mergeSecretValue(basicAuthPropertyMap, "password", ds.SourceContext.Git.GitAuth.BasicAuth.Password, plaintextValue, currentCipherValue, isInput)
+						} else if createMode {
+							createSecretValue(basicAuthPropertyMap, "password", ds.SourceContext.Git.GitAuth.BasicAuth.Password,
+								plaintextInputSettings.SourceContext.Git.GitAuth.BasicAuth.Password, isInput)
+						} else {
+							importSecretValue(basicAuthPropertyMap, "password", ds.SourceContext.Git.GitAuth.BasicAuth.Password, isInput)
 						}
 					}
 					gitAuthPropertyMap["basicAuth"] = resource.PropertyValue{V: basicAuthPropertyMap}
@@ -142,21 +148,19 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(plaintextSettings 
 			evMap := resource.PropertyMap{}
 			for k, v := range ds.OperationContext.EnvironmentVariables {
 				if v.Secret {
-					if plaintextSettings == nil {
-						importSecretValue(evMap, k, v, isInput)
-					} else {
-						if oldCipherSettings == nil {
-							createSecretValue(evMap, k, v,
-								plaintextSettings.OperationContext.EnvironmentVariables[k], isInput)
-						} else {
-							if oldCipherSettings.OperationContext != nil {
-								mergeSecretValue(evMap, k, v,
-									plaintextSettings.OperationContext.EnvironmentVariables[k],
-									oldCipherSettings.OperationContext.EnvironmentVariables[k], isInput)
-							} else {
-								importSecretValue(evMap, k, v, isInput)
-							}
+					if mergeMode {
+						var plaintextValue pulumiapi.SecretValue
+						var currentCipherValue pulumiapi.SecretValue
+						if currentStateCipherSettings.OperationContext != nil {
+							plaintextValue = plaintextInputSettings.OperationContext.EnvironmentVariables[k]
+							currentCipherValue = currentStateCipherSettings.OperationContext.EnvironmentVariables[k]
 						}
+						mergeSecretValue(evMap, k, v, &plaintextValue, &currentCipherValue, isInput)
+					} else if createMode {
+						createSecretValue(evMap, k, v,
+							plaintextInputSettings.OperationContext.EnvironmentVariables[k], isInput)
+					} else {
+						importSecretValue(evMap, k, v, isInput)
 					}
 				} else {
 					evMap[resource.PropertyKey(k)] = resource.NewPropertyValue(v.Value)
@@ -261,6 +265,8 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(plaintextSettings 
 	return pm
 }
 
+// All imported inputs will have a dummy value, asking to be replaced in real code
+// All imported properties are just set to ciphertext read from Pulumi Service
 func importSecretValue(propertyMap resource.PropertyMap, propertyName string, cipherValue pulumiapi.SecretValue, isInput bool) {
 	if isInput {
 		propertyMap[resource.PropertyKey(propertyName)] = resource.MakeSecret(resource.NewPropertyValue(replaceMe))
@@ -269,6 +275,8 @@ func importSecretValue(propertyMap resource.PropertyMap, propertyName string, ci
 	}
 }
 
+// On Create or Update, inputs already have a plaintext value, just set it
+// Properties are just set to ciphertext returned from Pulumi Service
 func createSecretValue(propertyMap resource.PropertyMap, propertyName string, cipherValue pulumiapi.SecretValue, plaintextValue pulumiapi.SecretValue, isInput bool) {
 	if isInput {
 		propertyMap[resource.PropertyKey(propertyName)] = resource.MakeSecret(resource.NewPropertyValue(plaintextValue.Value))
@@ -277,9 +285,15 @@ func createSecretValue(propertyMap resource.PropertyMap, propertyName string, ci
 	}
 }
 
-func mergeSecretValue(propertyMap resource.PropertyMap, propertyName string, cipherValue pulumiapi.SecretValue, plaintextValue pulumiapi.SecretValue, oldCipherValue pulumiapi.SecretValue, isInput bool) {
+// Merge happens when existing resource is refreshed from Pulumi Service
+// Output properties are just replaced with ciphertext retrieved from Pulumi Service
+// Inputs are more complicated :
+// If ciphertext never changed, keep existing plaintext value
+// If ciphertext is different, set plaintext to empty string
+// If retrieved state has a value that current state does not have, pass in nil, which will fill plaintext with empty string
+func mergeSecretValue(propertyMap resource.PropertyMap, propertyName string, cipherValue pulumiapi.SecretValue, plaintextValue *pulumiapi.SecretValue, oldCipherValue *pulumiapi.SecretValue, isInput bool) {
 	if isInput {
-		if cipherValue.Value == oldCipherValue.Value {
+		if oldCipherValue != nil && cipherValue.Value == oldCipherValue.Value {
 			propertyMap[resource.PropertyKey(propertyName)] = resource.MakeSecret(resource.NewPropertyValue(plaintextValue.Value))
 		} else {
 			propertyMap[resource.PropertyKey(propertyName)] = resource.MakeSecret(resource.NewPropertyValue(""))
@@ -676,8 +690,8 @@ func (ds *PulumiServiceDeploymentSettingsResource) Read(req *pulumirpc.ReadReque
 		DeploymentSettings: *settings,
 	}
 
-	var plaintextSettings *pulumiapi.DeploymentSettings = nil
-	var ciphertextSettings *pulumiapi.DeploymentSettings = nil
+	var plaintextSettings *pulumiapi.DeploymentSettings
+	var ciphertextSettings *pulumiapi.DeploymentSettings
 	propertyMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
 	if err != nil {
 		return nil, err
