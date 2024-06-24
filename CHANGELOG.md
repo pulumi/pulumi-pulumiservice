@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+## 0.21.4
+
+### Bug Fixes
+
+- Fixed Environment Get function by fixing the resource's Read method [#319](https://github.com/pulumi/pulumi-pulumiservice/issues/319)
+
+### Miscellaneous
+
+- Fixed integ tests [#328](https://github.com/pulumi/pulumi-pulumiservice/issues/328)
+
 ## 0.21.3
 
 ### Improvements
