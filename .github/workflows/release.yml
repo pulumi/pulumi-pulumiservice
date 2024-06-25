@@ -141,7 +141,7 @@ jobs:
       - name: Add version to environment
         run: printf "SDK_VERSION=%s" $(pulumictl get version --language generic) >> $GITHUB_ENV
       - name: Install Pulumi CLI
-        uses: pulumi/action-install-pulumi-cli@v2.0.0
+        uses: pulumi/actions@v5
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
