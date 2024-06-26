@@ -19,7 +19,7 @@ func TestGetDeploymentSettings(t *testing.T) {
 		dsValue := DeploymentSettings{
 			OperationContext: &OperationContext{},
 			GitHub:           &GitHubConfiguration{},
-			SourceContext:    &apitype.SourceContext{},
+			SourceContext:    &SourceContext{},
 			ExecutorContext:  &apitype.ExecutorContext{},
 		}
 
@@ -74,24 +74,26 @@ func TestCreateDeploymentSettings(t *testing.T) {
 		dsValue := DeploymentSettings{
 			OperationContext: &OperationContext{},
 			GitHub:           &GitHubConfiguration{},
-			SourceContext:    &apitype.SourceContext{},
+			SourceContext:    &SourceContext{},
 			ExecutorContext:  &apitype.ExecutorContext{},
 		}
 
 		c, cleanup := startTestServer(t, testServerConfig{
-			ExpectedReqMethod: http.MethodPost,
+			ExpectedReqMethod: http.MethodPut,
 			ExpectedReqPath:   "/" + path.Join("api", "stacks", orgName, projectName, stackName, "deployments", "settings"),
 			ResponseCode:      201,
 			ExpectedReqBody:   dsValue,
+			ResponseBody:      dsValue,
 		})
 		defer cleanup()
 
-		err := c.CreateDeploymentSettings(ctx, StackName{
+		response, err := c.CreateDeploymentSettings(ctx, StackName{
 			OrgName:     orgName,
 			ProjectName: projectName,
 			StackName:   stackName,
 		}, dsValue)
 
 		assert.Nil(t, err)
+		assert.Equal(t, dsValue, *response)
 	})
 }
