@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/pulumiapi"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
@@ -23,12 +24,30 @@ type PulumiServiceAgentPoolInput struct {
 	Name        string
 }
 
-func (i *PulumiServiceAgentPoolInput) ToPropertyMap() resource.PropertyMap {
-	pm := resource.PropertyMap{}
-	pm["name"] = resource.NewPropertyValue(i.Name)
-	pm["description"] = resource.NewPropertyValue(i.Description)
-	pm["organizationName"] = resource.NewPropertyValue(i.OrgName)
-	return pm
+func GenerateAgentPoolProperties(input PulumiServiceAgentPoolInput, agentPool pulumiapi.AgentPool) (outputs *structpb.Struct, inputs *structpb.Struct, err error) {
+	inputMap := resource.PropertyMap{}
+	inputMap["name"] = resource.NewPropertyValue(input.Name)
+	inputMap["description"] = resource.NewPropertyValue(input.Description)
+	inputMap["organizationName"] = resource.NewPropertyValue(input.OrgName)
+
+	outputMap := resource.PropertyMap{}
+	outputMap["agentPoolId"] = resource.NewPropertyValue(agentPool.ID)
+	outputMap["name"] = inputMap["name"]
+	outputMap["organizationName"] = inputMap["organizationName"]
+	outputMap["description"] = inputMap["description"]
+	outputMap["tokenValue"] = resource.NewPropertyValue(agentPool.TokenValue)
+
+	inputs, err = plugin.MarshalProperties(inputMap, plugin.MarshalOptions{})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	outputs, err = plugin.MarshalProperties(outputMap, plugin.MarshalOptions{})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return outputs, inputs, err
 }
 
 func (ap *PulumiServiceAgentPoolResource) ToPulumiServiceAgentPoolInput(inputMap resource.PropertyMap) PulumiServiceAgentPoolInput {
@@ -111,37 +130,24 @@ func (ap *PulumiServiceAgentPoolResource) Delete(req *pulumirpc.DeleteRequest) (
 
 func (ap *PulumiServiceAgentPoolResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	ctx := context.Background()
-	inputs, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	inputMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
 	}
 
-	inputsAgentPool := ap.ToPulumiServiceAgentPoolInput(inputs)
-
-	agentPool, err := ap.createAgentPool(ctx, inputsAgentPool)
+	input := ap.ToPulumiServiceAgentPoolInput(inputMap)
+	agentPool, err := ap.createAgentPool(ctx, input)
 	if err != nil {
-		return nil, fmt.Errorf("error creating access token '%s': %s", inputsAgentPool.Name, err.Error())
+		return nil, fmt.Errorf("error creating agent pool '%s': %s", input.Name, err.Error())
 	}
 
-	outputStore := resource.PropertyMap{}
-	outputStore["agentPoolId"] = resource.NewPropertyValue(agentPool.ID)
-	outputStore["name"] = inputs["name"]
-	outputStore["organizationName"] = inputs["organizationName"]
-	outputStore["description"] = inputs["description"]
-	outputStore["tokenValue"] = resource.NewPropertyValue(agentPool.TokenValue)
-
-	outputProperties, err := plugin.MarshalProperties(
-		outputStore,
-		plugin.MarshalOptions{},
-	)
+	outputProperties, _, err := GenerateAgentPoolProperties(input, *agentPool)
 	if err != nil {
 		return nil, err
 	}
-
-	urn := fmt.Sprintf(inputsAgentPool.OrgName + "/" + inputsAgentPool.Name + "/" + agentPool.ID)
 
 	return &pulumirpc.CreateResponse{
-		Id:         urn,
+		Id:         input.OrgName + "/" + input.Name + "/" + agentPool.ID,
 		Properties: outputProperties,
 	}, nil
 
@@ -211,9 +217,20 @@ func (ap *PulumiServiceAgentPoolResource) Read(req *pulumirpc.ReadRequest) (*pul
 		return &pulumirpc.ReadResponse{}, nil
 	}
 
+	input := PulumiServiceAgentPoolInput{
+		OrgName:     orgName,
+		Description: agentPool.Description,
+		Name:        agentPool.Name,
+	}
+	outputProperties, inputs, err := GenerateAgentPoolProperties(input, *agentPool)
+	if err != nil {
+		return nil, err
+	}
+
 	return &pulumirpc.ReadResponse{
 		Id:         req.GetId(),
-		Properties: req.GetProperties(),
+		Properties: outputProperties,
+		Inputs:     inputs,
 	}, nil
 }
 
