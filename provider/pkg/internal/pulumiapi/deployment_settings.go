@@ -2,6 +2,7 @@ package pulumiapi
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"path"
@@ -10,8 +11,8 @@ import (
 )
 
 type DeploymentSettingsClient interface {
-	CreateDeploymentSettings(ctx context.Context, stack StackName, ds DeploymentSettings) error
-	UpdateDeploymentSettings(ctx context.Context, stack StackName, ds DeploymentSettings) error
+	CreateDeploymentSettings(ctx context.Context, stack StackName, ds DeploymentSettings) (*DeploymentSettings, error)
+	UpdateDeploymentSettings(ctx context.Context, stack StackName, ds DeploymentSettings) (*DeploymentSettings, error)
 	GetDeploymentSettings(ctx context.Context, stack StackName) (*DeploymentSettings, error)
 	DeleteDeploymentSettings(ctx context.Context, stack StackName) error
 }
@@ -19,16 +20,17 @@ type DeploymentSettingsClient interface {
 type DeploymentSettings struct {
 	OperationContext *OperationContext        `json:"operationContext,omitempty"`
 	GitHub           *GitHubConfiguration     `json:"gitHub,omitempty"`
-	SourceContext    *apitype.SourceContext   `json:"sourceContext,omitempty"`
+	SourceContext    *SourceContext           `json:"sourceContext,omitempty"`
 	ExecutorContext  *apitype.ExecutorContext `json:"executorContext,omitempty"`
 	AgentPoolId      string                   `json:"agentPoolId,omitempty"`
+	Source           *string                  `json:"source,omitempty"`
 }
 
 type OperationContext struct {
-	Options              *OperationContextOptions       `json:"options,omitempty"`
-	PreRunCommands       []string                       `json:"PreRunCommands,omitempty"`
-	EnvironmentVariables map[string]apitype.SecretValue `json:"environmentVariables,omitempty"`
-	OIDC                 *OIDCConfiguration             `json:"oidc,omitempty"`
+	Options              *OperationContextOptions `json:"options,omitempty"`
+	PreRunCommands       []string                 `json:"PreRunCommands,omitempty"`
+	EnvironmentVariables map[string]SecretValue   `json:"environmentVariables,omitempty"`
+	OIDC                 *OIDCConfiguration       `json:"oidc,omitempty"`
 }
 
 type OIDCConfiguration struct {
@@ -74,22 +76,87 @@ type GitHubConfiguration struct {
 	Paths               []string `json:"paths,omitempty"`
 }
 
-func (c *Client) CreateDeploymentSettings(ctx context.Context, stack StackName, ds DeploymentSettings) error {
-	apiPath := path.Join("stacks", stack.OrgName, stack.ProjectName, stack.StackName, "deployments", "settings")
-	_, err := c.do(ctx, http.MethodPost, apiPath, ds, nil)
-	if err != nil {
-		return fmt.Errorf("failed to create deployment settings for stack (%s): %w", stack.String(), err)
+type SourceContext struct {
+	Git *SourceContextGit `json:"git,omitempty"`
+}
+
+type SourceContextGit struct {
+	RepoURL string         `json:"repoURL"`
+	Branch  string         `json:"branch"`
+	RepoDir string         `json:"repoDir,omitempty"`
+	Commit  string         `json:"commit,omitempty"`
+	GitAuth *GitAuthConfig `json:"gitAuth,omitempty"`
+}
+
+type GitAuthConfig struct {
+	PersonalAccessToken *SecretValue `json:"accessToken,omitempty"`
+	SSHAuth             *SSHAuth     `json:"sshAuth,omitempty"`
+	BasicAuth           *BasicAuth   `json:"basicAuth,omitempty"`
+}
+
+type SSHAuth struct {
+	SSHPrivateKey SecretValue  `json:"sshPrivateKey"`
+	Password      *SecretValue `json:"password,omitempty"`
+}
+
+type BasicAuth struct {
+	UserName SecretValue `json:"userName"`
+	Password SecretValue `json:"password"`
+}
+
+type SecretValue struct {
+	Value  string // Plaintext if Secret is false; ciphertext otherwise.
+	Secret bool
+}
+
+type secretCiphertextValue struct {
+	Ciphertext string `json:"ciphertext"`
+}
+
+type secretWorkflowValue struct {
+	Secret string `json:"secret" yaml:"secret"`
+}
+
+func (v SecretValue) MarshalJSON() ([]byte, error) {
+	if v.Secret {
+		return json.Marshal(secretWorkflowValue{Secret: v.Value})
 	}
+	return json.Marshal(v.Value)
+}
+
+func (v *SecretValue) UnmarshalJSON(bytes []byte) error {
+	var secret secretCiphertextValue
+	if err := json.Unmarshal(bytes, &secret); err == nil {
+		v.Value, v.Secret = secret.Ciphertext, true
+		return nil
+	}
+
+	var plaintext string
+	if err := json.Unmarshal(bytes, &plaintext); err != nil {
+		return err
+	}
+	v.Value, v.Secret = plaintext, false
 	return nil
 }
 
-func (c *Client) UpdateDeploymentSettings(ctx context.Context, stack StackName, ds DeploymentSettings) error {
+func (c *Client) CreateDeploymentSettings(ctx context.Context, stack StackName, ds DeploymentSettings) (*DeploymentSettings, error) {
 	apiPath := path.Join("stacks", stack.OrgName, stack.ProjectName, stack.StackName, "deployments", "settings")
-	_, err := c.do(ctx, http.MethodPut, apiPath, ds, nil)
+	var resultDS = &DeploymentSettings{}
+	_, err := c.do(ctx, http.MethodPut, apiPath, ds, resultDS)
 	if err != nil {
-		return fmt.Errorf("failed to update deployment settings for stack (%s): %w", stack.String(), err)
+		return nil, fmt.Errorf("failed to create deployment settings for stack (%s): %w", stack.String(), err)
 	}
-	return nil
+	return resultDS, nil
+}
+
+func (c *Client) UpdateDeploymentSettings(ctx context.Context, stack StackName, ds DeploymentSettings) (*DeploymentSettings, error) {
+	apiPath := path.Join("stacks", stack.OrgName, stack.ProjectName, stack.StackName, "deployments", "settings")
+	var resultDS = &DeploymentSettings{}
+	_, err := c.do(ctx, http.MethodPut, apiPath, ds, resultDS)
+	if err != nil {
+		return nil, fmt.Errorf("failed to update deployment settings for stack (%s): %w", stack.String(), err)
+	}
+	return resultDS, nil
 }
 
 func (c *Client) GetDeploymentSettings(ctx context.Context, stack StackName) (*DeploymentSettings, error) {

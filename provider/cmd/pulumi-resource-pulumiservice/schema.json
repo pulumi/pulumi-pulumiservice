@@ -564,10 +564,6 @@
     "pulumiservice:index:AccessToken": {
       "description": "Access tokens allow a user to authenticate against the Pulumi Cloud",
       "properties": {
-        "tokenId": {
-          "description": "The token identifier.",
-          "type": "string"
-        },
         "description": {
           "description": "Description of the access token.",
           "type": "string"
@@ -579,7 +575,6 @@
         }
       },
       "required": [
-        "tokenId",
         "description",
         "value"
       ],

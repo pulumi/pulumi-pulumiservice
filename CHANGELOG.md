@@ -1,6 +1,23 @@
 CHANGELOG
 =========
 
+## 0.22.0
+
+### Bug Fixes
+- DeploymentSettings resource will now successfully store secrets, but outputs for secret values became ciphertext. [#123](https://github.com/pulumi/pulumi-pulumiservice/issues/123)
+- DeploymentSettings will no longer have noisy diff on update and refresh [#123](https://github.com/pulumi/pulumi-pulumiservice/issues/123)
+- DeploymentSettings can now be successfully imported [#123](https://github.com/pulumi/pulumi-pulumiservice/issues/123)
+
+## 0.21.4
+
+### Bug Fixes
+
+- Fixed Environment Get function by fixing the resource's Read method [#319](https://github.com/pulumi/pulumi-pulumiservice/issues/319)
+
+### Miscellaneous
+
+- Fixed integ tests [#328](https://github.com/pulumi/pulumi-pulumiservice/issues/328)
+
 ## 0.21.3
 
 ### Improvements

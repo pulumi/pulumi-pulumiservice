@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/pulumiapi"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
@@ -20,10 +21,31 @@ type PulumiServiceAccessTokenInput struct {
 	Description string
 }
 
-func (i *PulumiServiceAccessTokenInput) ToPropertyMap() resource.PropertyMap {
-	pm := resource.PropertyMap{}
-	pm["description"] = resource.NewPropertyValue(i.Description)
-	return pm
+// AccessToken uses outdated way of storing input in internal __inputs property
+func GenerateProperties(input PulumiServiceAccessTokenInput, accessToken pulumiapi.AccessToken) (outputs *structpb.Struct, inputs *structpb.Struct, err error) {
+	inputMap := resource.PropertyMap{}
+	inputMap["description"] = resource.NewPropertyValue(input.Description)
+	outputStore := resource.PropertyMap{}
+	outputStore["__inputs"] = resource.NewObjectProperty(inputMap)
+	outputStore["value"] = resource.NewPropertyValue(accessToken.TokenValue)
+
+	inputs, err = plugin.MarshalProperties(
+		inputMap,
+		plugin.MarshalOptions{},
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	outputs, err = plugin.MarshalProperties(
+		outputStore,
+		plugin.MarshalOptions{},
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return outputs, inputs, err
 }
 
 func (at *PulumiServiceAccessTokenResource) ToPulumiServiceAccessTokenInput(inputMap resource.PropertyMap) PulumiServiceAccessTokenInput {
@@ -56,25 +78,18 @@ func (at *PulumiServiceAccessTokenResource) Delete(req *pulumirpc.DeleteRequest)
 
 func (at *PulumiServiceAccessTokenResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	ctx := context.Background()
-	inputs, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	inputMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
 	}
 
-	inputsAccessToken := at.ToPulumiServiceAccessTokenInput(inputs)
-	accessToken, err := at.createAccessToken(ctx, inputsAccessToken)
+	input := at.ToPulumiServiceAccessTokenInput(inputMap)
+	accessToken, err := at.createAccessToken(ctx, input)
 	if err != nil {
-		return nil, fmt.Errorf("error creating access token '%s': %s", inputsAccessToken.Description, err.Error())
+		return nil, fmt.Errorf("error creating access token '%s': %s", input.Description, err.Error())
 	}
 
-	outputStore := resource.PropertyMap{}
-	outputStore["__inputs"] = resource.NewObjectProperty(inputs)
-	outputStore["value"] = resource.NewPropertyValue(accessToken.TokenValue)
-
-	outputProperties, err := plugin.MarshalProperties(
-		outputStore,
-		plugin.MarshalOptions{},
-	)
+	outputProperties, _, err := GenerateProperties(input, *accessToken)
 	if err != nil {
 		return nil, err
 	}
@@ -107,9 +122,18 @@ func (at *PulumiServiceAccessTokenResource) Read(req *pulumirpc.ReadRequest) (*p
 		return &pulumirpc.ReadResponse{}, nil
 	}
 
+	input := PulumiServiceAccessTokenInput{
+		Description: accessToken.Description,
+	}
+	outputProperties, inputs, err := GenerateProperties(input, *accessToken)
+	if err != nil {
+		return nil, err
+	}
+
 	return &pulumirpc.ReadResponse{
-		Id:         req.GetId(),
-		Properties: req.GetProperties(),
+		Id:         accessToken.ID,
+		Properties: outputProperties,
+		Inputs:     inputs,
 	}, nil
 }
 
