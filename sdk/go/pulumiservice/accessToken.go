@@ -18,8 +18,6 @@ type AccessToken struct {
 
 	// Description of the access token.
 	Description pulumi.StringOutput `pulumi:"description"`
-	// The token identifier.
-	TokenId pulumi.StringOutput `pulumi:"tokenId"`
 	// The token's value.
 	Value pulumi.StringOutput `pulumi:"value"`
 }
@@ -171,11 +169,6 @@ func (o AccessTokenOutput) ToAccessTokenOutputWithContext(ctx context.Context) A
 // Description of the access token.
 func (o AccessTokenOutput) Description() pulumi.StringOutput {
 	return o.ApplyT(func(v *AccessToken) pulumi.StringOutput { return v.Description }).(pulumi.StringOutput)
-}
-
-// The token identifier.
-func (o AccessTokenOutput) TokenId() pulumi.StringOutput {
-	return o.ApplyT(func(v *AccessToken) pulumi.StringOutput { return v.TokenId }).(pulumi.StringOutput)
 }
 
 // The token's value.

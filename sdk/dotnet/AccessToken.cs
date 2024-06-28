@@ -22,12 +22,6 @@ namespace Pulumi.PulumiService
         public Output<string> Description { get; private set; } = null!;
 
         /// <summary>
-        /// The token identifier.
-        /// </summary>
-        [Output("tokenId")]
-        public Output<string> TokenId { get; private set; } = null!;
-
-        /// <summary>
         /// The token's value.
         /// </summary>
         [Output("value")]
