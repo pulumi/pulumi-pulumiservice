@@ -256,23 +256,41 @@ func (st *PulumiServiceEnvironmentResource) Update(req *pulumirpc.UpdateRequest)
 }
 
 func (st *PulumiServiceEnvironmentResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	input, err := ToPulumiServiceEnvironmentInput(req.GetProperties())
-	if err != nil {
-		return nil, err
+	splitID := strings.Split(req.Id, "/")
+	if len(splitID) < 2 {
+		return nil, fmt.Errorf("invalid environment id: %s", req.Id)
 	}
+	orgName := splitID[0]
+	envName := splitID[1]
 
-	retrievedYaml, _, revision, err := st.client.GetEnvironment(context.Background(), input.OrgName, input.EnvName, "", false)
+	retrievedYaml, _, revision, err := st.client.GetEnvironment(context.Background(), orgName, envName, "", false)
 	if err != nil {
 		return &pulumirpc.ReadResponse{Id: "", Properties: nil}, nil
 	}
 
+	input := PulumiServiceEnvironmentInput{
+		OrgName: orgName,
+		EnvName: envName,
+		Yaml:    retrievedYaml,
+	}
+
 	result := PulumiServiceEnvironmentOutput{
-		input: PulumiServiceEnvironmentInput{
-			OrgName: input.OrgName,
-			EnvName: input.EnvName,
-			Yaml:    retrievedYaml,
-		},
+		input:    input,
 		revision: revision,
+	}
+
+	inputMap, err := input.ToPropertyMap()
+	if err != nil {
+		return nil, err
+	}
+	inputs, err := plugin.MarshalProperties(
+		inputMap,
+		plugin.MarshalOptions{
+			KeepSecrets: true,
+		},
+	)
+	if err != nil {
+		return nil, err
 	}
 
 	propertyMap, err := result.ToPropertyMap()
@@ -292,7 +310,7 @@ func (st *PulumiServiceEnvironmentResource) Read(req *pulumirpc.ReadRequest) (*p
 	return &pulumirpc.ReadResponse{
 		Id:         req.Id,
 		Properties: properties,
-		Inputs:     properties,
+		Inputs:     inputs,
 	}, nil
 }
 

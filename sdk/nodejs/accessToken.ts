@@ -39,10 +39,6 @@ export class AccessToken extends pulumi.CustomResource {
      */
     public readonly description!: pulumi.Output<string>;
     /**
-     * The token identifier.
-     */
-    public /*out*/ readonly tokenId!: pulumi.Output<string>;
-    /**
      * The token's value.
      */
     public /*out*/ readonly value!: pulumi.Output<string>;
@@ -62,11 +58,9 @@ export class AccessToken extends pulumi.CustomResource {
                 throw new Error("Missing required property 'description'");
             }
             resourceInputs["description"] = args ? args.description : undefined;
-            resourceInputs["tokenId"] = undefined /*out*/;
             resourceInputs["value"] = undefined /*out*/;
         } else {
             resourceInputs["description"] = undefined /*out*/;
-            resourceInputs["tokenId"] = undefined /*out*/;
             resourceInputs["value"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);

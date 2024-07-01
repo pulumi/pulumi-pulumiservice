@@ -12,7 +12,7 @@ class MyStack : Stack
           myKey1: "myValue1"
           myNestedKey:
             myKey2: "myValue2"
-            myNumber: 1 
+            myNumber: 1
         """;
 
         var environment = new Pulumi.PulumiService.Environment(

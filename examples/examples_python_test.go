@@ -12,8 +12,7 @@ import (
 
 func TestPythonTeamsExample(t *testing.T) {
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Dir:         path.Join(getCwd(t), "py-teams"),
-		SkipRefresh: true,
+		Dir: path.Join(getCwd(t), "py-teams"),
 		Dependencies: []string{
 			filepath.Join("..", "sdk", "python", "bin"),
 		},
@@ -36,8 +35,7 @@ func TestPythonDeploymentSettingsExample(t *testing.T) {
 func TestPythonEnvironmentsExample(t *testing.T) {
 	digits := generateRandomFiveDigits()
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Dir:         path.Join(getCwd(t), "py-environments"),
-		SkipRefresh: true,
+		Dir: path.Join(getCwd(t), "py-environments"),
 		Config: map[string]string{
 			"digits": digits,
 		},

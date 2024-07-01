@@ -10,13 +10,11 @@ environment = Environment(
     "testing-environment",
     organization="service-provider-test-org",
     name="testing-environment-py-"+config.require('digits'),
-    yaml=pulumi.StringAsset("""
-        values:
-          myKey1: "myValue1"
-          myNestedKey:
-            myKey2: "myValue2"
-            myNumber: 1
-    """)
+    yaml=pulumi.StringAsset("""values:
+  myKey1: "myValue1"
+  myNestedKey:
+    myKey2: "myValue2"
+    myNumber: 1""")
 )
 
 # A tag that will always be placed on the latest revision of the environment

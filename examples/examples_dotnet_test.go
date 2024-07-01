@@ -11,8 +11,7 @@ import (
 
 func TestDotnetTeamsExamples(t *testing.T) {
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Dir:         path.Join(getCwd(t), "cs-teams"),
-		SkipRefresh: true,
+		Dir: path.Join(getCwd(t), "cs-teams"),
 		Dependencies: []string{
 			"Pulumi.PulumiService",
 		},
@@ -22,9 +21,8 @@ func TestDotnetTeamsExamples(t *testing.T) {
 func TestDotnetSchedulesExamples(t *testing.T) {
 	digits := generateRandomFiveDigits()
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Dir:         path.Join(getCwd(t), "cs-schedules"),
-		StackName:   "test-stack-" + digits,
-		SkipRefresh: true,
+		Dir:       path.Join(getCwd(t), "cs-schedules"),
+		StackName: "test-stack-" + digits,
 		Config: map[string]string{
 			"digits": digits,
 		},
@@ -37,8 +35,7 @@ func TestDotnetSchedulesExamples(t *testing.T) {
 func TestDotnetEnvironmentsExamples(t *testing.T) {
 	digits := generateRandomFiveDigits()
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Dir:         path.Join(getCwd(t), "cs-environments"),
-		SkipRefresh: true,
+		Dir: path.Join(getCwd(t), "cs-environments"),
 		Config: map[string]string{
 			"digits": digits,
 		},
