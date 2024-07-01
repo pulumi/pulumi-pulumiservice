@@ -352,6 +352,16 @@ func (st *PulumiServiceDeploymentScheduleResource) Read(req *pulumirpc.ReadReque
 		PulumiOperation: scheduleResponse.Definition.Request.PulumiOperation,
 	}
 
+	inputs, err := plugin.MarshalProperties(
+		input.ToPropertyMap(),
+		plugin.MarshalOptions{
+			KeepUnknowns: true,
+			SkipNulls:    true,
+		},
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read DeploymentSchedule (%q): %w", req.Id, err)
+	}
 	outputProperties, err := plugin.MarshalProperties(
 		AddScheduleIdToPropertyMap(*scheduleID, input.ToPropertyMap()),
 		plugin.MarshalOptions{
@@ -366,7 +376,7 @@ func (st *PulumiServiceDeploymentScheduleResource) Read(req *pulumirpc.ReadReque
 	return &pulumirpc.ReadResponse{
 		Id:         req.Id,
 		Properties: outputProperties,
-		Inputs:     outputProperties,
+		Inputs:     inputs,
 	}, nil
 }
 

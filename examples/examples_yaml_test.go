@@ -141,9 +141,8 @@ func TestYamlStackTagsExample(t *testing.T) {
 	require.NoError(t, err)
 
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Quick:       true,
-		SkipRefresh: true,
-		Dir:         tmpdir,
+		Quick: true,
+		Dir:   tmpdir,
 		EditDirs: []integration.EditDir{
 			{
 				Dir: path.Join(cwd, ".", "yaml-stack-tags"),

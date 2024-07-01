@@ -34,20 +34,6 @@ public class AccessToken extends com.pulumi.resources.CustomResource {
         return this.description;
     }
     /**
-     * The token identifier.
-     * 
-     */
-    @Export(name="tokenId", refs={String.class}, tree="[0]")
-    private Output<String> tokenId;
-
-    /**
-     * @return The token identifier.
-     * 
-     */
-    public Output<String> tokenId() {
-        return this.tokenId;
-    }
-    /**
      * The token&#39;s value.
      * 
      */

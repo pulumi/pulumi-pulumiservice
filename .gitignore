@@ -16,5 +16,5 @@ ci-scripts
 /nuget/
 **/version.txt
 .mono
-go
+/go/
 *.sln

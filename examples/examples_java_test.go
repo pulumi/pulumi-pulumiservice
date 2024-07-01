@@ -13,9 +13,7 @@ import (
 )
 
 func TestJavaTeamsExamples(t *testing.T) {
-	test := getJavaBase(t, "java-teams", integration.ProgramTestOptions{
-		SkipRefresh: true,
-	})
+	test := getJavaBase(t, "java-teams", integration.ProgramTestOptions{})
 
 	integration.ProgramTest(t, &test)
 }

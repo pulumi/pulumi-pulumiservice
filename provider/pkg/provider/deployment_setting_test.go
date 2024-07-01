@@ -17,11 +17,11 @@ type DeploymentSettingsClientMock struct {
 	getDeploymentSettingsFunc getDeploymentSettingsFunc
 }
 
-func (c *DeploymentSettingsClientMock) CreateDeploymentSettings(ctx context.Context, stack pulumiapi.StackName, ds pulumiapi.DeploymentSettings) error {
-	return nil
+func (c *DeploymentSettingsClientMock) CreateDeploymentSettings(ctx context.Context, stack pulumiapi.StackName, ds pulumiapi.DeploymentSettings) (*pulumiapi.DeploymentSettings, error) {
+	return nil, nil
 }
-func (c *DeploymentSettingsClientMock) UpdateDeploymentSettings(ctx context.Context, stack pulumiapi.StackName, ds pulumiapi.DeploymentSettings) error {
-	return nil
+func (c *DeploymentSettingsClientMock) UpdateDeploymentSettings(ctx context.Context, stack pulumiapi.StackName, ds pulumiapi.DeploymentSettings) (*pulumiapi.DeploymentSettings, error) {
+	return nil, nil
 }
 func (c *DeploymentSettingsClientMock) GetDeploymentSettings(ctx context.Context, stack pulumiapi.StackName) (*pulumiapi.DeploymentSettings, error) {
 	return c.getDeploymentSettingsFunc()
@@ -64,7 +64,7 @@ func TestDeploymentSettings(t *testing.T) {
 				return &pulumiapi.DeploymentSettings{
 					OperationContext: &pulumiapi.OperationContext{},
 					GitHub:           &pulumiapi.GitHubConfiguration{},
-					SourceContext:    &apitype.SourceContext{},
+					SourceContext:    &pulumiapi.SourceContext{},
 					ExecutorContext:  &apitype.ExecutorContext{},
 				}, nil
 			},
