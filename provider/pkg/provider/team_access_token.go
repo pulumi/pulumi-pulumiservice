@@ -123,6 +123,9 @@ func (t *PulumiServiceTeamAccessTokenResource) Read(req *pulumirpc.ReadRequest) 
 	urn := req.GetId()
 
 	orgName, teamName, _, tokenId, err := splitTeamAccessTokenId(urn)
+	if err != nil {
+		return nil, err
+	}
 
 	// the team access token is immutable; if we get nil it got deleted, otherwise all data is the same
 	accessToken, err := t.client.GetTeamAccessToken(ctx, tokenId, orgName, teamName)
@@ -136,6 +139,7 @@ func (t *PulumiServiceTeamAccessTokenResource) Read(req *pulumirpc.ReadRequest) 
 	return &pulumirpc.ReadResponse{
 		Id:         req.GetId(),
 		Properties: req.GetProperties(),
+		Inputs:     req.GetProperties(),
 	}, nil
 }
 

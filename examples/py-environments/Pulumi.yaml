@@ -1,0 +1,6 @@
+name: py-environments
+runtime:
+  name: python
+  options:
+    virtualenv: venv
+description: A minimal Python Environments Example

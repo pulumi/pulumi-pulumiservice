@@ -15,7 +15,7 @@ import (
 )
 
 type TeamStackPermissionResource struct {
-	client *pulumiapi.Client
+	client pulumiapi.TeamClient
 }
 
 type TeamStackPermissionInput struct {

@@ -246,14 +246,9 @@ func (wh *PulumiServiceWebhookResource) createWebhook(input PulumiServiceWebhook
 }
 
 func (wh *PulumiServiceWebhookResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
+	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
 	if err != nil {
 		return nil, err
-	}
-
-	// preprocess olds to remove the `name` property since it's only an output and shouldn't cause a diff
-	if olds["name"].HasValue() {
-		delete(olds, "name")
 	}
 
 	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})

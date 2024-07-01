@@ -148,7 +148,16 @@ func (t *PulumiServiceTeamResource) Check(req *pulumirpc.CheckRequest) (*pulumir
 		})
 	}
 
-	return &pulumirpc.CheckResponse{Inputs: news, Failures: failures}, nil
+	if !newsMap["displayName"].HasValue() {
+		newsMap["displayName"] = newsMap["name"]
+	}
+
+	inputs, err := plugin.MarshalProperties(newsMap, plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	if err != nil {
+		return nil, err
+	}
+
+	return &pulumirpc.CheckResponse{Inputs: inputs, Failures: failures}, nil
 }
 
 func (t *PulumiServiceTeamResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
@@ -161,7 +170,7 @@ func (t *PulumiServiceTeamResource) Delete(req *pulumirpc.DeleteRequest) (*pbemp
 }
 
 func (t *PulumiServiceTeamResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
+	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
 	if err != nil {
 		return nil, err
 	}
@@ -291,14 +300,14 @@ func (t *PulumiServiceTeamResource) Create(req *pulumirpc.CreateRequest) (*pulum
 	}
 
 	inputsTeam := ToPulumiServiceTeamInput(inputs)
-	team, err := t.createTeam(ctx, inputsTeam)
+	teamUrn, err := t.createTeam(ctx, inputsTeam)
 	if err != nil {
-		return nil, fmt.Errorf("error creating team '%s': %s", inputsTeam.Name, err.Error())
+		return nil, fmt.Errorf("error creating teamUrn '%s': %s", inputsTeam.Name, err.Error())
 	}
 
-	// We have now created a team.  It is very important to ensure that from this point on, any other error
+	// We have now created a teamUrn.  It is very important to ensure that from this point on, any other error
 	// below returns the ID using the `pulumirpc.ErrorResourceInitFailed` error details annotation.  Otherwise,
-	// we leak a team resource. We ensure that we wrap any errors in a partial error and return that to the RPC.
+	// we leak a teamUrn resource. We ensure that we wrap any errors in a partial error and return that to the RPC.
 
 	// make copy of input so we can safely modify output without affecting input
 	inProgTeam := ToPulumiServiceTeamInput(inputsTeam.ToPropertyMap())
@@ -307,20 +316,37 @@ func (t *PulumiServiceTeamResource) Create(req *pulumirpc.CreateRequest) (*pulum
 	for _, memberToAdd := range inputsTeam.Members {
 		err := t.addToTeam(ctx, inputsTeam.OrganizationName, inputsTeam.Name, memberToAdd)
 		if err != nil {
-			return nil, partialError(*team, err, inProgTeam, inputsTeam)
+			return nil, partialError(*teamUrn, err, inProgTeam, inputsTeam)
 		}
-		// if we've successfully added member to team, save them to the state we're going to return
-		// so that a re-run can detect the left over members to add via Update
-		inProgTeam.Members = append(inProgTeam.Members, memberToAdd)
 	}
 
-	outputProperties, err := inProgTeam.ToRpc()
+	// Outputs should be the result of a GetTeam call, so we can return the full teamUrn object with fidelity
+	// including all new members that were added.
+	team, err := t.client.GetTeam(ctx, inputsTeam.OrganizationName, inputsTeam.Name)
 	if err != nil {
-		return nil, partialError(*team, err, inProgTeam, inputsTeam)
+		return nil, partialError(*teamUrn, err, inProgTeam, inputsTeam)
+	}
+	outputs := PulumiServiceTeamInput{
+		Description:      team.Description,
+		DisplayName:      team.DisplayName,
+		Name:             team.Name,
+		Type:             team.Type,
+		OrganizationName: inputsTeam.OrganizationName,
+	}
+	for _, m := range team.Members {
+		outputs.Members = append(outputs.Members, m.GithubLogin)
+	}
+
+	// Sort the members so the order is deterministic
+	slices.Sort(outputs.Members)
+
+	outputProperties, err := outputs.ToRpc()
+	if err != nil {
+		return nil, partialError(*teamUrn, err, outputs, inputsTeam)
 	}
 
 	return &pulumirpc.CreateResponse{
-		Id:         *team,
+		Id:         *teamUrn,
 		Properties: outputProperties,
 	}, nil
 }

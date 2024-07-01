@@ -1,6 +1,8 @@
 package examples
 
 import (
+	"fmt"
+	"math/rand"
 	"os"
 	"testing"
 )
@@ -11,4 +13,8 @@ func getCwd(t *testing.T) string {
 		t.FailNow()
 	}
 	return cwd
+}
+
+func generateRandomFiveDigits() string {
+	return fmt.Sprintf("%05d", rand.Intn(100000))
 }

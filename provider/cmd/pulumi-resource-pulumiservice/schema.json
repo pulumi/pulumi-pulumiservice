@@ -150,6 +150,31 @@
           "value": "deployment_failed",
           "description": "Trigger a webhook when a deployment fails.",
           "name": "DeploymentFailed"
+        },
+        {
+          "value": "drift_detected",
+          "description": "Trigger a webhook when drift is detected.",
+          "name": "DriftDetected"
+        },
+        {
+          "value": "drift_detection_succeeded",
+          "description": "Trigger a webhook when a drift detection run succeeds, regardless of whether drift is detected.",
+          "name": "DriftDetectionSucceeded"
+        },
+        {
+          "value": "drift_detection_failed",
+          "description": "Trigger a webhook when a drift detection run fails.",
+          "name": "DriftDetectionFailed"
+        },
+        {
+          "value": "drift_remediation_succeeded",
+          "description": "Trigger a webhook when a drift remediation run succeeds.",
+          "name": "DriftRemediationSucceeded"
+        },
+        {
+          "value": "drift_remediation_failed",
+          "description": "Trigger a webhook when a drift remediation run fails.",
+          "name": "DriftRemediationFailed"
         }
       ]
     },
@@ -329,6 +354,10 @@
         "shell": {
           "type": "string",
           "description": "The shell to use to run commands during the deployment. Defaults to 'bash'."
+        },
+        "deleteAfterDestroy": {
+          "type": "boolean",
+          "description": "Whether the stack should be deleted after it is destroyed."
         }
       }
     },
@@ -433,11 +462,57 @@
         "tenantId",
         "subscriptionId"
       ]
+    },
+    "pulumiservice:index:PulumiOperation": {
+      "type": "string",
+      "enum": [
+        {
+          "description": "Analogous to `pulumi up` command.",
+          "value": "update"
+        },
+        {
+          "description": "Analogous to `pulumi preview` command.",
+          "value": "preview"
+        },
+        {
+          "description": "Analogous to `pulumi refresh` command.",
+          "value": "refresh"
+        },
+        {
+          "description": "Analogous to `pulumi destroy` command.",
+          "value": "destroy"
+        }
+      ]
+    },
+    "pulumiservice:index:EnvironmentPermission": {
+      "type": "string",
+      "enum": [
+        {
+          "description": "No permissions.",
+          "value": "none"
+        },
+        {
+          "description": "Permission to read environment definition only.",
+          "value": "read"
+        },
+        {
+          "description": "Permission to open and read the environment.",
+          "value": "open"
+        },
+        {
+          "description": "Permission to open, read and update the environment.",
+          "value": "write"
+        },
+        {
+          "description": "Permission for all operations on the environment.",
+          "value": "admin"
+        }
+      ]
     }
   },
   "resources": {
     "pulumiservice:index:AgentPool": {
-      "description": "Agent Pool for customer manager deployments",
+      "description": "Agent Pool for customer managed deployments",
       "properties": {
         "agentPoolId": {
           "description": "The agent pool identifier.",
@@ -489,10 +564,6 @@
     "pulumiservice:index:AccessToken": {
       "description": "Access tokens allow a user to authenticate against the Pulumi Cloud",
       "properties": {
-        "tokenId": {
-          "description": "The token identifier.",
-          "type": "string"
-        },
         "description": {
           "description": "Description of the access token.",
           "type": "string"
@@ -504,7 +575,6 @@
         }
       },
       "required": [
-        "tokenId",
         "description",
         "value"
       ],
@@ -824,12 +894,33 @@
         "stack": {
           "description": "Stack name.",
           "type": "string"
+        },
+        "executorContext": {
+          "$ref": "#/types/pulumiservice:index:DeploymentSettingsExecutorContext",
+          "description": "Settings related to the deployment executor."
+        },
+        "sourceContext": {
+          "$ref": "#/types/pulumiservice:index:DeploymentSettingsSourceContext",
+          "description": "Settings related to the source of the deployment."
+        },
+        "github": {
+          "$ref": "#/types/pulumiservice:index:DeploymentSettingsGithub",
+          "description": "GitHub settings for the deployment."
+        },
+        "operationContext": {
+          "$ref": "#/types/pulumiservice:index:DeploymentSettingsOperationContext",
+          "description": "Settings related to the Pulumi operation environment during the deployment."
+        },
+        "agentPoolId": {
+          "description": "The agent pool identifier to use for the deployment.",
+          "type": "string"
         }
       },
       "required": [
         "organization",
         "project",
-        "stack"
+        "stack",
+        "sourceContext"
       ],
       "inputProperties": {
         "organization": {
@@ -964,6 +1055,340 @@
         "project",
         "stack",
         "permission"
+      ]
+    },
+    "pulumiservice:index:DeploymentSchedule": {
+      "description": "A scheduled recurring or single time run of a pulumi command.",
+      "properties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "project": {
+          "description": "Project name.",
+          "type": "string"
+        },
+        "stack": {
+          "description": "Stack name.",
+          "type": "string"
+        },
+        "scheduleCron": {
+          "description": "Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.",
+          "type": "string"
+        },
+        "timestamp": {
+          "description": "The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.",
+          "type": "string"
+        },
+        "pulumiOperation": {
+          "description": "Which operation to run.",
+          "$ref": "#/types/pulumiservice:index:PulumiOperation"
+        },
+        "scheduleId": {
+          "description": "Schedule ID of the created schedule, assigned by Pulumi Cloud.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "organization",
+        "project",
+        "stack",
+        "pulumiOperation",
+        "scheduleId"
+      ],
+      "inputProperties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "project": {
+          "description": "Project name.",
+          "type": "string"
+        },
+        "stack": {
+          "description": "Stack name.",
+          "type": "string"
+        },
+        "scheduleCron": {
+          "description": "Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.",
+          "type": "string"
+        },
+        "timestamp": {
+          "description": "The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.",
+          "type": "string"
+        },
+        "pulumiOperation": {
+          "description": "Which command to run.",
+          "$ref": "#/types/pulumiservice:index:PulumiOperation"
+        }
+      },
+      "requiredInputs": [
+        "organization",
+        "project",
+        "stack",
+        "pulumiOperation"
+      ]
+    },
+    "pulumiservice:index:DriftSchedule": {
+      "description": "A cron schedule to run drift detection.",
+      "properties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "project": {
+          "description": "Project name.",
+          "type": "string"
+        },
+        "stack": {
+          "description": "Stack name.",
+          "type": "string"
+        },
+        "scheduleCron": {
+          "description": "Cron expression for when to run drift detection.",
+          "type": "string"
+        },
+        "autoRemediate": {
+          "description": "Whether any drift detected should be remediated after a drift run.",
+          "type": "boolean",
+          "default": false
+        },
+        "scheduleId": {
+          "description": "Schedule ID of the created schedule, assigned by Pulumi Cloud.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "organization",
+        "project",
+        "stack",
+        "scheduleCron",
+        "scheduleId"
+      ],
+      "inputProperties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "project": {
+          "description": "Project name.",
+          "type": "string"
+        },
+        "stack": {
+          "description": "Stack name.",
+          "type": "string"
+        },
+        "scheduleCron": {
+          "description": "Cron expression for when to run drift detection.",
+          "type": "string"
+        },
+        "autoRemediate": {
+          "description": "Whether any drift detected should be remediated after a drift run.",
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "requiredInputs": [
+        "organization",
+        "project",
+        "stack",
+        "scheduleCron"
+      ]
+    },
+    "pulumiservice:index:TtlSchedule": {
+      "description": "A scheduled stack destory run.",
+      "properties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "project": {
+          "description": "Project name.",
+          "type": "string"
+        },
+        "stack": {
+          "description": "Stack name.",
+          "type": "string"
+        },
+        "timestamp": {
+          "description": "The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.",
+          "type": "string"
+        },
+        "deleteAfterDestroy": {
+          "description": "True if the stack and all associated history and settings should be deleted.",
+          "type": "boolean",
+          "default": false
+        },
+        "scheduleId": {
+          "description": "Schedule ID of the created schedule, assigned by Pulumi Cloud.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "organization",
+        "project",
+        "stack",
+        "timestamp",
+        "scheduleId"
+      ],
+      "inputProperties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "project": {
+          "description": "Project name.",
+          "type": "string"
+        },
+        "stack": {
+          "description": "Stack name.",
+          "type": "string"
+        },
+        "timestamp": {
+          "description": "The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.",
+          "type": "string"
+        },
+        "deleteAfterDestroy": {
+          "description": "True if the stack and all associated history and settings should be deleted.",
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "requiredInputs": [
+        "organization",
+        "project",
+        "stack",
+        "timestamp"
+      ]
+    },
+    "pulumiservice:index:Environment": {
+      "description": "An ESC Environment.",
+      "properties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Environment name.",
+          "type": "string"
+        },
+        "yaml": {
+          "description": "Environment's yaml file.",
+          "$ref": "pulumi.json#/Asset"
+        },
+        "revision": {
+          "description": "Revision number of the latest version.",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "organization",
+        "name",
+        "yaml",
+        "revision"
+      ],
+      "inputProperties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Environment name.",
+          "type": "string"
+        },
+        "yaml": {
+          "description": "Environment's yaml file.",
+          "$ref": "pulumi.json#/Asset"
+        }
+      },
+      "requiredInputs": [
+        "organization",
+        "name",
+        "yaml"
+      ]
+    },
+    "pulumiservice:index:TeamEnvironmentPermission": {
+      "description": "A permission for a team to use an environment.",
+      "properties": {
+        "permission": {
+          "description": "Which permission level to grant to the specified team.",
+          "$ref": "#/types/pulumiservice:index:EnvironmentPermission"
+        }
+      },
+      "inputProperties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "team": {
+          "description": "Team name.",
+          "type": "string"
+        },
+        "environment": {
+          "description": "Environment name.",
+          "type": "string"
+        },
+        "permission": {
+          "description": "Which permission level to grant to the specified team.",
+          "$ref": "#/types/pulumiservice:index:EnvironmentPermission"
+        }
+      },
+      "requiredInputs": [
+        "organization",
+        "team",
+        "environment",
+        "permission"
+      ]
+    },
+    "pulumiservice:index:EnvironmentVersionTag": {
+      "description": "A tag on a specific revision of an environment.",
+      "properties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "environment": {
+          "description": "Environment name.",
+          "type": "string"
+        },
+        "tagName": {
+          "description": "Tag name.",
+          "type": "string"
+        },
+        "revision": {
+          "description": "Revision number.",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "organization",
+        "environment",
+        "tagName",
+        "revision"
+      ],
+      "inputProperties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "environment": {
+          "description": "Environment name.",
+          "type": "string"
+        },
+        "tagName": {
+          "description": "Tag name.",
+          "type": "string"
+        },
+        "revision": {
+          "description": "Revision number.",
+          "type": "integer"
+        }
+      },
+      "requiredInputs": [
+        "organization",
+        "environment",
+        "tagName",
+        "revision"
       ]
     }
   },

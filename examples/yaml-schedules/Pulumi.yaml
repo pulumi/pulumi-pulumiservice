@@ -1,0 +1,69 @@
+name: pulumi-service-schedules-example-yaml
+runtime: yaml
+description: An example of using yaml to create schedules
+resources:
+  rand:
+    type: random:RandomString
+    properties:
+      length: 5
+      special: false
+  # Deployment Settings are required to be setup before schedules can be
+  # Note the `DependsOn` option in all of the schedules
+  settings:
+    type: pulumiservice:DeploymentSettings
+    properties:
+      organization: service-provider-test-org
+      project: pulumi-service-schedules-example-yaml
+      stack: test-stack-${digits}
+      sourceContext:
+        git:
+          repoUrl: "https://github.com/example.git"
+          branch: "refs/heads/main"
+  # Schedule that runs drift every Sunday midnight, but does NOT remediate it
+  drift-schedule-${rand.result}:
+    type: pulumiservice:DriftSchedule
+    properties:
+      organization: service-provider-test-org
+      project: pulumi-service-schedules-example-yaml
+      stack: test-stack-${digits}
+      scheduleCron: "0 0 * * 0"
+      autoRemediate: false
+    options:
+      dependsOn:
+        - ${settings}
+  # Schedule to destroy stack resources on Jan 1, 2026, but NOT delete the stack itself
+  ttl-schedule-${rand.result}:
+    type: pulumiservice:TtlSchedule
+    properties:
+      organization: service-provider-test-org
+      project: pulumi-service-schedules-example-yaml
+      stack: test-stack-${digits}
+      timestamp: "2026-01-01T00:00:00Z"
+      deleteAfterDestroy: false
+    options:
+      dependsOn:
+        - ${settings}
+  # Schedule that runs `pulumi up` every Sunday midnight
+  deployment-schedule-up-${rand.result}:
+    type: pulumiservice:DeploymentSchedule
+    properties:
+      organization: service-provider-test-org
+      project: pulumi-service-schedules-example-yaml
+      stack: test-stack-${digits}
+      scheduleCron: "0 0 * * 0"
+      pulumiOperation: update
+    options:
+      dependsOn:
+        - ${settings}
+  # Schedule that runs `pulumi preview` once on Jan 1, 2026
+  deployment-schedule-preview-${rand.result}:
+    type: pulumiservice:DeploymentSchedule
+    properties:
+      organization: service-provider-test-org
+      project: pulumi-service-schedules-example-yaml
+      stack: test-stack-${digits}
+      timestamp: "2026-01-01T00:00:00Z"
+      pulumiOperation: preview
+    options:
+      dependsOn:
+        - ${settings}

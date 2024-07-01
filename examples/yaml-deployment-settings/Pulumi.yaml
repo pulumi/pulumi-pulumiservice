@@ -7,7 +7,7 @@ resources:
     properties:
       organization: service-provider-test-org
       project: yaml-deployment-settings-example
-      stack: test-stack
+      stack: test-stack-${digits}
       executorContext:
         executorImage: "pulumi/pulumi-nodejs:latest"
       sourceContext:

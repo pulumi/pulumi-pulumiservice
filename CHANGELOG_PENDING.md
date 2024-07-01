@@ -1,10 +1,6 @@
 ### Improvements
-- Support `AgentPool` resource. [#228](https://github.com/pulumi/pulumi-pulumiservice/pull/228)
-- Support `agentPoolId` for the `Deployment Settings` resource. [#228](https://github.com/pulumi/pulumi-pulumiservice/pull/228)
 
 ### Bug Fixes
-
+- Fixed import by refactoring Read method of AccessToken resource + minor refactor [#311](https://github.com/pulumi/pulumi-pulumiservice/issues/311)
 
 ### Miscellaneous
-
-- Updated pulumi/pulumi and other dependencies to latest versions. [#233](https://github.com/pulumi/pulumi-pulumiservice/pull/233)

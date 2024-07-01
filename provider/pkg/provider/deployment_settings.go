@@ -14,19 +14,36 @@ import (
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
+// This is a value for imported secrets, to hint that value needs to be replaced
+// in generated code
+const replaceMe = "<REPLACE WITH ACTUAL SECRET VALUE>"
+
 type PulumiServiceDeploymentSettingsInput struct {
 	pulumiapi.DeploymentSettings
 	Stack pulumiapi.StackName
 }
 
-const FixMe = "<value is secret and must be replaced>"
+// plaintextInputSettings are the latest inputs of the resource, containing plaintext values wrapped in Secrets
+// currentStateCipherSettings are the latest outputs/properties of the resource, containing ciphertext strings of secret values
+// isInput is a flag that selects whether to generating an input PropertyMap that contains plaintext (true) or an output PropertyMap that contains ciphertext (false)
+func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(plaintextInputSettings *pulumiapi.DeploymentSettings, currentStateCipherSettings *pulumiapi.DeploymentSettings, isInput bool) resource.PropertyMap {
+	// Below flags are used throughout this method and direct the serialization of twin value secrets
+	// Twin value secrets are values whose plaintext cannot be retrieved from the API, thus forcing the development of this fairly complex system
+	// When plaintextInputSettings is passed in, but currentStateCipherSettings is not, that means the resource is being created or updated
+	createMode := plaintextInputSettings != nil && currentStateCipherSettings == nil
+	// When both plaintextInputSettings and currentStateCipherSettings are passed in, that means an existing resource is being refreshed, and it's necessary to merge values
+	// In case we are merging, but some of the properties don't previously exist, we will merge with empty value, setting plaintext to be empty string
+	mergeMode := plaintextInputSettings != nil && currentStateCipherSettings != nil
+	// If neither one is passed in, we are importing an existing resource into the state
 
-func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap() resource.PropertyMap {
 	pm := resource.PropertyMap{}
 	pm["organization"] = resource.NewPropertyValue(ds.Stack.OrgName)
 	pm["project"] = resource.NewPropertyValue(ds.Stack.ProjectName)
 	pm["stack"] = resource.NewPropertyValue(ds.Stack.StackName)
-	pm["agentPoolId"] = resource.NewPropertyValue(ds.AgentPoolId)
+
+	if ds.AgentPoolId != "" {
+		pm["agentPoolId"] = resource.NewPropertyValue(ds.AgentPoolId)
+	}
 
 	if ds.SourceContext != nil {
 		scMap := resource.PropertyMap{}
@@ -49,10 +66,43 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap() resource.Propert
 				if ds.SourceContext.Git.GitAuth.SSHAuth != nil {
 					sshAuthPropertyMap := resource.PropertyMap{}
 					if ds.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey.Value != "" {
-						sshAuthPropertyMap["sshPrivateKey"] = resource.NewPropertyValue(FixMe)
+						if mergeMode {
+							var plaintextValue *pulumiapi.SecretValue
+							var currentCipherValue *pulumiapi.SecretValue
+							if currentStateCipherSettings.SourceContext != nil &&
+								currentStateCipherSettings.SourceContext.Git != nil &&
+								currentStateCipherSettings.SourceContext.Git.GitAuth != nil &&
+								currentStateCipherSettings.SourceContext.Git.GitAuth.SSHAuth != nil {
+								plaintextValue = &plaintextInputSettings.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey
+								currentCipherValue = &currentStateCipherSettings.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey
+							}
+							mergeSecretValue(sshAuthPropertyMap, "sshPrivateKey", ds.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey, plaintextValue, currentCipherValue, isInput)
+						} else if createMode {
+							createSecretValue(sshAuthPropertyMap, "sshPrivateKey", ds.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey,
+								plaintextInputSettings.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey, isInput)
+						} else {
+							importSecretValue(sshAuthPropertyMap, "sshPrivateKey", ds.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey, isInput)
+						}
 					}
 					if ds.SourceContext.Git.GitAuth.SSHAuth.Password.Value != "" {
-						sshAuthPropertyMap["password"] = resource.NewPropertyValue(FixMe)
+						if mergeMode {
+							var plaintextValue *pulumiapi.SecretValue
+							var currentCipherValue *pulumiapi.SecretValue
+							if currentStateCipherSettings.SourceContext != nil &&
+								currentStateCipherSettings.SourceContext.Git != nil &&
+								currentStateCipherSettings.SourceContext.Git.GitAuth != nil &&
+								currentStateCipherSettings.SourceContext.Git.GitAuth.SSHAuth != nil &&
+								currentStateCipherSettings.SourceContext.Git.GitAuth.SSHAuth.Password != nil {
+								plaintextValue = plaintextInputSettings.SourceContext.Git.GitAuth.SSHAuth.Password
+								currentCipherValue = currentStateCipherSettings.SourceContext.Git.GitAuth.SSHAuth.Password
+							}
+							mergeSecretValue(sshAuthPropertyMap, "password", *ds.SourceContext.Git.GitAuth.SSHAuth.Password, plaintextValue, currentCipherValue, isInput)
+						} else if createMode {
+							createSecretValue(sshAuthPropertyMap, "password", *ds.SourceContext.Git.GitAuth.SSHAuth.Password,
+								*plaintextInputSettings.SourceContext.Git.GitAuth.SSHAuth.Password, isInput)
+						} else {
+							importSecretValue(sshAuthPropertyMap, "password", *ds.SourceContext.Git.GitAuth.SSHAuth.Password, isInput)
+						}
 					}
 					gitAuthPropertyMap["sshAuth"] = resource.PropertyValue{V: sshAuthPropertyMap}
 				}
@@ -62,9 +112,25 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap() resource.Propert
 						basicAuthPropertyMap["username"] = resource.NewPropertyValue(ds.SourceContext.Git.GitAuth.BasicAuth.UserName.Value)
 					}
 					if ds.SourceContext.Git.GitAuth.BasicAuth.Password.Value != "" {
-						basicAuthPropertyMap["password"] = resource.NewPropertyValue("fix me")
+						if mergeMode {
+							var plaintextValue *pulumiapi.SecretValue
+							var currentCipherValue *pulumiapi.SecretValue
+							if currentStateCipherSettings.SourceContext != nil &&
+								currentStateCipherSettings.SourceContext.Git != nil &&
+								currentStateCipherSettings.SourceContext.Git.GitAuth != nil &&
+								currentStateCipherSettings.SourceContext.Git.GitAuth.BasicAuth != nil {
+								plaintextValue = &plaintextInputSettings.SourceContext.Git.GitAuth.BasicAuth.Password
+								currentCipherValue = &currentStateCipherSettings.SourceContext.Git.GitAuth.BasicAuth.Password
+							}
+							mergeSecretValue(basicAuthPropertyMap, "password", ds.SourceContext.Git.GitAuth.BasicAuth.Password, plaintextValue, currentCipherValue, isInput)
+						} else if createMode {
+							createSecretValue(basicAuthPropertyMap, "password", ds.SourceContext.Git.GitAuth.BasicAuth.Password,
+								plaintextInputSettings.SourceContext.Git.GitAuth.BasicAuth.Password, isInput)
+						} else {
+							importSecretValue(basicAuthPropertyMap, "password", ds.SourceContext.Git.GitAuth.BasicAuth.Password, isInput)
+						}
 					}
-					gitAuthPropertyMap["basicAuth"] = resource.NewPropertyValue(basicAuthPropertyMap)
+					gitAuthPropertyMap["basicAuth"] = resource.PropertyValue{V: basicAuthPropertyMap}
 				}
 				gitPropertyMap["gitAuth"] = resource.PropertyValue{V: gitAuthPropertyMap}
 			}
@@ -82,7 +148,20 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap() resource.Propert
 			evMap := resource.PropertyMap{}
 			for k, v := range ds.OperationContext.EnvironmentVariables {
 				if v.Secret {
-					evMap[resource.PropertyKey(k)] = resource.NewPropertyValue(FixMe)
+					if mergeMode {
+						var plaintextValue pulumiapi.SecretValue
+						var currentCipherValue pulumiapi.SecretValue
+						if currentStateCipherSettings.OperationContext != nil {
+							plaintextValue = plaintextInputSettings.OperationContext.EnvironmentVariables[k]
+							currentCipherValue = currentStateCipherSettings.OperationContext.EnvironmentVariables[k]
+						}
+						mergeSecretValue(evMap, k, v, &plaintextValue, &currentCipherValue, isInput)
+					} else if createMode {
+						createSecretValue(evMap, k, v,
+							plaintextInputSettings.OperationContext.EnvironmentVariables[k], isInput)
+					} else {
+						importSecretValue(evMap, k, v, isInput)
+					}
 				} else {
 					evMap[resource.PropertyKey(k)] = resource.NewPropertyValue(v.Value)
 				}
@@ -99,6 +178,9 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap() resource.Propert
 			}
 			if ds.OperationContext.Options.SkipIntermediateDeployments {
 				optionsMap["skipIntermediateDeployments"] = resource.NewPropertyValue(true)
+			}
+			if ds.OperationContext.Options.DeleteAfterDestroy {
+				optionsMap["deleteAfterDestroy"] = resource.NewPropertyValue(true)
 			}
 			ocMap["options"] = resource.PropertyValue{V: optionsMap}
 		}
@@ -177,10 +259,48 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap() resource.Propert
 
 	if ds.ExecutorContext != nil && ds.ExecutorContext.ExecutorImage != nil && ds.ExecutorContext.ExecutorImage.Reference != "" {
 		ecMap := resource.PropertyMap{}
-		ecMap["executorImage"] = resource.NewPropertyValue(ds.ExecutorContext.ExecutorImage)
+		ecMap["executorImage"] = resource.NewPropertyValue(ds.ExecutorContext.ExecutorImage.Reference)
 		pm["executorContext"] = resource.PropertyValue{V: ecMap}
 	}
 	return pm
+}
+
+// All imported inputs will have a dummy value, asking to be replaced in real code
+// All imported properties are just set to ciphertext read from Pulumi Service
+func importSecretValue(propertyMap resource.PropertyMap, propertyName string, cipherValue pulumiapi.SecretValue, isInput bool) {
+	if isInput {
+		propertyMap[resource.PropertyKey(propertyName)] = resource.MakeSecret(resource.NewPropertyValue(replaceMe))
+	} else {
+		propertyMap[resource.PropertyKey(propertyName)] = resource.NewPropertyValue(cipherValue.Value)
+	}
+}
+
+// On Create or Update, inputs already have a plaintext value, just set it
+// Properties are just set to ciphertext returned from Pulumi Service
+func createSecretValue(propertyMap resource.PropertyMap, propertyName string, cipherValue pulumiapi.SecretValue, plaintextValue pulumiapi.SecretValue, isInput bool) {
+	if isInput {
+		propertyMap[resource.PropertyKey(propertyName)] = resource.MakeSecret(resource.NewPropertyValue(plaintextValue.Value))
+	} else {
+		propertyMap[resource.PropertyKey(propertyName)] = resource.NewPropertyValue(cipherValue.Value)
+	}
+}
+
+// Merge happens when existing resource is refreshed from Pulumi Service
+// Output properties are just replaced with ciphertext retrieved from Pulumi Service
+// Inputs are more complicated :
+// If ciphertext never changed, keep existing plaintext value
+// If ciphertext is different, set plaintext to empty string
+// If retrieved state has a value that current state does not have, pass in nil, which will fill plaintext with empty string
+func mergeSecretValue(propertyMap resource.PropertyMap, propertyName string, cipherValue pulumiapi.SecretValue, plaintextValue *pulumiapi.SecretValue, oldCipherValue *pulumiapi.SecretValue, isInput bool) {
+	if isInput {
+		if oldCipherValue != nil && cipherValue.Value == oldCipherValue.Value {
+			propertyMap[resource.PropertyKey(propertyName)] = resource.MakeSecret(resource.NewPropertyValue(plaintextValue.Value))
+		} else {
+			propertyMap[resource.PropertyKey(propertyName)] = resource.MakeSecret(resource.NewPropertyValue(""))
+		}
+	} else {
+		propertyMap[resource.PropertyKey(propertyName)] = resource.NewPropertyValue(cipherValue.Value)
+	}
 }
 
 type PulumiServiceDeploymentSettingsResource struct {
@@ -258,17 +378,17 @@ func toGitHubConfig(inputMap resource.PropertyMap) *pulumiapi.GitHubConfiguratio
 	return &github
 }
 
-func toSourceContext(inputMap resource.PropertyMap) *apitype.SourceContext {
+func toSourceContext(inputMap resource.PropertyMap) *pulumiapi.SourceContext {
 	if !inputMap["sourceContext"].HasValue() || !inputMap["sourceContext"].IsObject() {
 		return nil
 	}
 
 	scInput := inputMap["sourceContext"].ObjectValue()
-	var sc apitype.SourceContext
+	var sc pulumiapi.SourceContext
 
 	if scInput["git"].HasValue() && scInput["git"].IsObject() {
 		gitInput := scInput["git"].ObjectValue()
-		var g apitype.SourceContextGit
+		var g pulumiapi.SourceContextGit
 
 		if gitInput["repoUrl"].HasValue() {
 			g.RepoURL = getSecretOrStringValue(gitInput["repoUrl"])
@@ -282,20 +402,20 @@ func toSourceContext(inputMap resource.PropertyMap) *apitype.SourceContext {
 
 		if gitInput["gitAuth"].HasValue() && gitInput["gitAuth"].IsObject() {
 			authInput := gitInput["gitAuth"].ObjectValue()
-			var a apitype.GitAuthConfig
+			var a pulumiapi.GitAuthConfig
 
 			if authInput["sshAuth"].HasValue() && authInput["sshAuth"].IsObject() {
 				sshInput := authInput["sshAuth"].ObjectValue()
-				var s apitype.SSHAuth
+				var s pulumiapi.SSHAuth
 
-				if sshInput["sshPrivateKey"].HasValue() {
-					s.SSHPrivateKey = apitype.SecretValue{
+				if sshInput["sshPrivateKey"].HasValue() || sshInput["sshPrivateKeyCipher"].HasValue() {
+					s.SSHPrivateKey = pulumiapi.SecretValue{
 						Secret: true,
 						Value:  getSecretOrStringValue(sshInput["sshPrivateKey"]),
 					}
 				}
-				if sshInput["password"].HasValue() {
-					s.Password = &apitype.SecretValue{
+				if sshInput["password"].HasValue() || sshInput["passwordCipher"].HasValue() {
+					s.Password = &pulumiapi.SecretValue{
 						Secret: true,
 						Value:  getSecretOrStringValue(sshInput["password"]),
 					}
@@ -306,16 +426,16 @@ func toSourceContext(inputMap resource.PropertyMap) *apitype.SourceContext {
 
 			if authInput["basicAuth"].HasValue() && authInput["basicAuth"].IsObject() {
 				basicInput := authInput["basicAuth"].ObjectValue()
-				var b apitype.BasicAuth
+				var b pulumiapi.BasicAuth
 
 				if basicInput["username"].HasValue() {
-					b.UserName = apitype.SecretValue{
+					b.UserName = pulumiapi.SecretValue{
 						Value:  getSecretOrStringValue(basicInput["username"]),
 						Secret: false,
 					}
 				}
-				if basicInput["password"].HasValue() {
-					b.Password = apitype.SecretValue{
+				if basicInput["password"].HasValue() || basicInput["passwordCipher"].HasValue() {
+					b.Password = pulumiapi.SecretValue{
 						Value:  getSecretOrStringValue(basicInput["password"]),
 						Secret: true,
 					}
@@ -342,15 +462,12 @@ func toOperationContext(inputMap resource.PropertyMap) *pulumiapi.OperationConte
 	var oc pulumiapi.OperationContext
 
 	if ocInput["environmentVariables"].HasValue() && ocInput["environmentVariables"].IsObject() {
-		ev := map[string]apitype.SecretValue{}
+		ev := map[string]pulumiapi.SecretValue{}
 		evInput := ocInput["environmentVariables"].ObjectValue()
 
 		for k, v := range evInput {
-			if v.IsSecret() {
-				ev[string(k)] = apitype.SecretValue{Secret: true, Value: v.SecretValue().Element.StringValue()}
-			} else {
-				ev[string(k)] = apitype.SecretValue{Secret: false, Value: v.StringValue()}
-			}
+			value := getSecretOrStringValue(v)
+			ev[string(k)] = pulumiapi.SecretValue{Secret: v.IsSecret(), Value: value}
 		}
 
 		oc.EnvironmentVariables = ev
@@ -383,6 +500,10 @@ func toOperationContext(inputMap resource.PropertyMap) *pulumiapi.OperationConte
 
 		if oInput["Shell"].HasValue() && oInput["Shell"].IsString() {
 			o.Shell = oInput["Shell"].StringValue()
+		}
+
+		if oInput["deleteAfterDestroy"].HasValue() && oInput["deleteAfterDestroy"].IsBool() {
+			o.DeleteAfterDestroy = oInput["deleteAfterDestroy"].BoolValue()
 		}
 
 		oc.Options = &o
@@ -472,13 +593,58 @@ func getSecretOrStringValue(prop resource.PropertyValue) string {
 	switch prop.V.(type) {
 	case *resource.Secret:
 		return prop.SecretValue().Element.StringValue()
+	case nil:
+		return ""
 	default:
 		return prop.StringValue()
 	}
 }
 
 func (ds *PulumiServiceDeploymentSettingsResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	return considerAllChangesReplaces(req)
+	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	if err != nil {
+		return nil, err
+	}
+
+	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	if err != nil {
+		return nil, err
+	}
+
+	diffs := olds.Diff(news)
+	if diffs == nil {
+		return &pulumirpc.DiffResponse{
+			Changes: pulumirpc.DiffResponse_DIFF_NONE,
+		}, nil
+	}
+
+	dd := plugin.NewDetailedDiffFromObjectDiff(diffs, false)
+
+	detailedDiffs := map[string]*pulumirpc.PropertyDiff{}
+	replaces := []string(nil)
+	replaceProperties := map[string]bool{
+		"organization": true,
+		"project":      true,
+		"stack":        true,
+	}
+	for k, v := range dd {
+		if _, ok := replaceProperties[k]; ok {
+			v.Kind = v.Kind.AsReplace()
+			replaces = append(replaces, k)
+		}
+		detailedDiffs[k] = &pulumirpc.PropertyDiff{
+			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind),
+			InputDiff: v.InputDiff,
+		}
+	}
+
+	return &pulumirpc.DiffResponse{
+		Changes:             pulumirpc.DiffResponse_DIFF_SOME,
+		Replaces:            replaces,
+		DetailedDiff:        detailedDiffs,
+		HasDetailedDiff:     true,
+		DeleteBeforeReplace: true,
+	}, nil
 }
 
 func (ds *PulumiServiceDeploymentSettingsResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
@@ -524,11 +690,43 @@ func (ds *PulumiServiceDeploymentSettingsResource) Read(req *pulumirpc.ReadReque
 		DeploymentSettings: *settings,
 	}
 
-	properties, err := plugin.MarshalProperties(
-		dsInput.ToPropertyMap(),
-		plugin.MarshalOptions{},
-	)
+	var plaintextSettings *pulumiapi.DeploymentSettings
+	var ciphertextSettings *pulumiapi.DeploymentSettings
+	propertyMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
+	if err != nil {
+		return nil, err
+	}
+	inputMap, err := plugin.UnmarshalProperties(req.GetInputs(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
+	if err != nil {
+		return nil, err
+	}
+	if propertyMap["stack"].HasValue() {
+		tempPlain := ds.ToPulumiServiceDeploymentSettingsInput(inputMap)
+		plaintextSettings = &tempPlain.DeploymentSettings
+		tempCipher := ds.ToPulumiServiceDeploymentSettingsInput(propertyMap)
+		ciphertextSettings = &tempCipher.DeploymentSettings
+	}
 
+	properties, err := plugin.MarshalProperties(
+		dsInput.ToPropertyMap(plaintextSettings, ciphertextSettings, false),
+		plugin.MarshalOptions{
+			KeepUnknowns: true,
+			SkipNulls:    true,
+			KeepSecrets:  true,
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	inputs, err := plugin.MarshalProperties(
+		dsInput.ToPropertyMap(plaintextSettings, ciphertextSettings, true),
+		plugin.MarshalOptions{
+			KeepUnknowns: true,
+			SkipNulls:    true,
+			KeepSecrets:  true,
+		},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -536,21 +734,18 @@ func (ds *PulumiServiceDeploymentSettingsResource) Read(req *pulumirpc.ReadReque
 	return &pulumirpc.ReadResponse{
 		Id:         req.Id,
 		Properties: properties,
-		Inputs:     properties,
+		Inputs:     inputs,
 	}, nil
 }
 
 func (ds *PulumiServiceDeploymentSettingsResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
 	ctx := context.Background()
-	inputsMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
-	if err != nil {
+	var stack pulumiapi.StackName
+	if err := stack.FromID(req.Id); err != nil {
 		return nil, err
 	}
-	inputs := ds.ToPulumiServiceDeploymentSettingsInput(inputsMap)
-	if err != nil {
-		return nil, err
-	}
-	err = ds.client.DeleteDeploymentSettings(ctx, inputs.Stack)
+
+	err := ds.client.DeleteDeploymentSettings(ctx, stack)
 	if err != nil {
 		return nil, err
 	}
@@ -564,60 +759,74 @@ func (ds *PulumiServiceDeploymentSettingsResource) Create(req *pulumirpc.CreateR
 	if err != nil {
 		return nil, err
 	}
-	inputs := ds.ToPulumiServiceDeploymentSettingsInput(inputsMap)
-	settings := inputs.DeploymentSettings
-	err = ds.client.CreateDeploymentSettings(ctx, inputs.Stack, settings)
+
+	input := ds.ToPulumiServiceDeploymentSettingsInput(inputsMap)
+	settings := input.DeploymentSettings
+	response, err := ds.client.CreateDeploymentSettings(ctx, input.Stack, settings)
 	if err != nil {
 		return nil, err
 	}
+
+	responseInput := PulumiServiceDeploymentSettingsInput{
+		DeploymentSettings: *response,
+		Stack:              input.Stack,
+	}
+
+	outputProperties, err := plugin.MarshalProperties(
+		responseInput.ToPropertyMap(&input.DeploymentSettings, nil, false),
+		plugin.MarshalOptions{
+			KeepUnknowns: true,
+			SkipNulls:    true,
+			KeepSecrets:  true,
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
 	return &pulumirpc.CreateResponse{
-		Id:         path.Join(inputs.Stack.OrgName, inputs.Stack.ProjectName, inputs.Stack.StackName),
-		Properties: req.GetProperties(),
+		Id:         path.Join(input.Stack.OrgName, input.Stack.ProjectName, input.Stack.StackName),
+		Properties: outputProperties,
 	}, nil
 }
 
-func (ds *PulumiServiceDeploymentSettingsResource) Update(_ *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	// For simplicity, all updates are destructive, so we just call Create.
-	return nil, fmt.Errorf("unexpected call to update, expected create to be called instead")
+func (ds *PulumiServiceDeploymentSettingsResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+	ctx := context.Background()
+	inputsMap, err := plugin.UnmarshalProperties(req.GetNews(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
+	if err != nil {
+		return nil, err
+	}
+
+	input := ds.ToPulumiServiceDeploymentSettingsInput(inputsMap)
+	settings := input.DeploymentSettings
+	response, err := ds.client.UpdateDeploymentSettings(ctx, input.Stack, settings)
+	if err != nil {
+		return nil, err
+	}
+
+	responseInput := PulumiServiceDeploymentSettingsInput{
+		DeploymentSettings: *response,
+		Stack:              input.Stack,
+	}
+
+	outputProperties, err := plugin.MarshalProperties(
+		responseInput.ToPropertyMap(&input.DeploymentSettings, nil, false),
+		plugin.MarshalOptions{
+			KeepUnknowns: true,
+			SkipNulls:    true,
+			KeepSecrets:  true,
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pulumirpc.UpdateResponse{
+		Properties: outputProperties,
+	}, nil
 }
 
 func (ds *PulumiServiceDeploymentSettingsResource) Name() string {
 	return "pulumiservice:index:DeploymentSettings"
-}
-
-func considerAllChangesReplaces(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
-
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
-
-	diffs := olds.Diff(news)
-	if diffs == nil {
-		return &pulumirpc.DiffResponse{
-			Changes: pulumirpc.DiffResponse_DIFF_NONE,
-		}, nil
-	}
-
-	dd := plugin.NewDetailedDiffFromObjectDiff(diffs, false)
-
-	detailedDiffs := map[string]*pulumirpc.PropertyDiff{}
-	for k, v := range dd {
-		v.Kind = v.Kind.AsReplace()
-		detailedDiffs[k] = &pulumirpc.PropertyDiff{
-			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind),
-			InputDiff: v.InputDiff,
-		}
-	}
-
-	return &pulumirpc.DiffResponse{
-		Changes:             pulumirpc.DiffResponse_DIFF_SOME,
-		DetailedDiff:        detailedDiffs,
-		DeleteBeforeReplace: true,
-		HasDetailedDiff:     true,
-	}, nil
 }

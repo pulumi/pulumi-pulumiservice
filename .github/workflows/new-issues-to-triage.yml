@@ -12,7 +12,7 @@ jobs:
         steps:
             - name: Get project data
               env:
-                  GITHUB_TOKEN: ${{ secrets.TRIAGE_WORKFLOW_TOKEN }}
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   ORGANIZATION: pulumi
                   PROJECT_NUMBER: 33
               run: |
