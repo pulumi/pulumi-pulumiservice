@@ -22,7 +22,7 @@ type PulumiServiceAccessTokenInput struct {
 }
 
 // AccessToken uses outdated way of storing input in internal __inputs property
-func GenerateProperties(input PulumiServiceAccessTokenInput, accessToken pulumiapi.AccessToken) (outputs *structpb.Struct, inputs *structpb.Struct, err error) {
+func GenerateAcessTokenProperties(input PulumiServiceAccessTokenInput, accessToken pulumiapi.AccessToken) (outputs *structpb.Struct, inputs *structpb.Struct, err error) {
 	inputMap := resource.PropertyMap{}
 	inputMap["description"] = resource.NewPropertyValue(input.Description)
 	outputStore := resource.PropertyMap{}
@@ -89,7 +89,7 @@ func (at *PulumiServiceAccessTokenResource) Create(req *pulumirpc.CreateRequest)
 		return nil, fmt.Errorf("error creating access token '%s': %s", input.Description, err.Error())
 	}
 
-	outputProperties, _, err := GenerateProperties(input, *accessToken)
+	outputProperties, _, err := GenerateAcessTokenProperties(input, *accessToken)
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +125,7 @@ func (at *PulumiServiceAccessTokenResource) Read(req *pulumirpc.ReadRequest) (*p
 	input := PulumiServiceAccessTokenInput{
 		Description: accessToken.Description,
 	}
-	outputProperties, inputs, err := GenerateProperties(input, *accessToken)
+	outputProperties, inputs, err := GenerateAcessTokenProperties(input, *accessToken)
 	if err != nil {
 		return nil, err
 	}
