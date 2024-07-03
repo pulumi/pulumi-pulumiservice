@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"path"
+	"time"
 
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
 
@@ -236,6 +237,7 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(plaintextInputSett
 					if ds.OperationContext.OIDC.Azure.SubscriptionID != "" {
 						azureMap["subscriptionId"] = resource.NewPropertyValue(ds.OperationContext.OIDC.Azure.SubscriptionID)
 					}
+					oidcMap["azure"] = resource.PropertyValue{V: azureMap}
 				}
 				ocMap["oidc"] = resource.PropertyValue{V: oidcMap}
 			}
@@ -663,7 +665,35 @@ func (ds *PulumiServiceDeploymentSettingsResource) Check(req *pulumirpc.CheckReq
 		}
 	}
 
-	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: failures}, nil
+	// Normalizing duration input
+	if news["operationContext"].HasValue() && news["operationContext"].IsObject() {
+		operationContext := news["operationContext"].ObjectValue()
+		if operationContext["oidc"].HasValue() && operationContext["oidc"].IsObject() {
+			oidc := operationContext["oidc"].ObjectValue()
+			if oidc["aws"].HasValue() && oidc["aws"].IsObject() {
+				aws := oidc["aws"].ObjectValue()
+				if aws["duration"].HasValue() && aws["duration"].IsString() {
+					durationString := aws["duration"].StringValue()
+					normalized, err := normalizeDurationString(durationString)
+					if err != nil {
+						failures = append(failures, &pulumirpc.CheckFailure{
+							Reason:   fmt.Sprintf("Failed to normalize duration string due to error: %s", err.Error()),
+							Property: string("operationContext.oidc.aws.duration"),
+						})
+					} else {
+						aws["duration"] = resource.NewStringProperty(*normalized)
+					}
+				}
+			}
+		}
+	}
+
+	checkedNews, err := plugin.MarshalProperties(news, plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	if err != nil {
+		return nil, err
+	}
+
+	return &pulumirpc.CheckResponse{Inputs: checkedNews, Failures: failures}, nil
 }
 
 func (ds *PulumiServiceDeploymentSettingsResource) Configure(_ PulumiServiceConfig) {}
@@ -829,4 +859,17 @@ func (ds *PulumiServiceDeploymentSettingsResource) Update(req *pulumirpc.UpdateR
 
 func (ds *PulumiServiceDeploymentSettingsResource) Name() string {
 	return "pulumiservice:index:DeploymentSettings"
+}
+
+func normalizeDurationString(input string) (*string, error) {
+	if input == "" {
+		return nil, fmt.Errorf("empty value provided for duration string")
+	}
+	duration, err := time.ParseDuration(input)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse duration string `%s` due to error: %w", input, err)
+	}
+	result := duration.String()
+
+	return &result, nil
 }
