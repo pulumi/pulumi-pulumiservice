@@ -392,6 +392,7 @@ name: main
     - main
     paths-ignore:
     - CHANGELOG.md
+    - CHANGELOG_PENDING.md
     tags-ignore:
     - v*
     - sdk/*
