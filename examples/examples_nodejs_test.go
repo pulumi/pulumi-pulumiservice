@@ -40,9 +40,8 @@ func TestDeploymentSettingsExample(t *testing.T) {
 			"my_secret": "my_secret_value",
 			"password":  "my_password",
 		},
-		Quick:       true,
-		SkipRefresh: true,
-		Dir:         path.Join(cwd, ".", "ts-deployment-settings"),
+		Quick: true,
+		Dir:   path.Join(cwd, ".", "ts-deployment-settings"),
 		Dependencies: []string{
 			"@pulumi/pulumiservice",
 		},
