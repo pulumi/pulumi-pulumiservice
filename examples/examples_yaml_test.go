@@ -186,10 +186,9 @@ func TestYamlDeploymentSettingsExample(t *testing.T) {
 	digits := generateRandomFiveDigits()
 
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Quick:       true,
-		SkipRefresh: true,
-		Dir:         path.Join(cwd, ".", "yaml-deployment-settings"),
-		StackName:   "test-stack-" + digits,
+		Quick:     true,
+		Dir:       path.Join(cwd, ".", "yaml-deployment-settings"),
+		StackName: "test-stack-" + digits,
 		Config: map[string]string{
 			"digits": digits,
 		},
