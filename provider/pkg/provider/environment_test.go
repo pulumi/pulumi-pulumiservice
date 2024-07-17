@@ -233,7 +233,7 @@ func TestEnvironmentVersionTag(t *testing.T) {
 			},
 		)
 		req := pulumirpc.ReadRequest{
-			Id:         "org/env/tag/1",
+			Id:         "org/env/tag",
 			Properties: outputProperties,
 		}
 
@@ -276,13 +276,13 @@ func TestEnvironmentVersionTag(t *testing.T) {
 			},
 		)
 		req := pulumirpc.ReadRequest{
-			Id:         "org/env/tag/1",
+			Id:         "org/env/tag",
 			Properties: outputProperties,
 		}
 
 		resp, err := provider.Read(&req)
 
 		assert.NoError(t, err)
-		assert.Equal(t, resp.Id, "org/env/tag/1")
+		assert.Equal(t, resp.Id, "org/env/tag")
 	})
 }
