@@ -39,15 +39,24 @@ namespace Pulumi.PulumiService
 
     public sealed class ProviderArgs : global::Pulumi.ResourceArgs
     {
+        [Input("accessToken")]
+        private Input<string>? _accessToken;
+
         /// <summary>
         /// Access Token to authenticate with Pulumi Cloud.
         /// </summary>
-        [Input("accessToken")]
-        public Input<string>? AccessToken { get; set; }
+        public Input<string>? AccessToken
+        {
+            get => _accessToken;
+            set
+            {
+                var emptySecret = Output.CreateSecret(0);
+                _accessToken = Output.Tuple<Input<string>?, int>(value, emptySecret).Apply(t => t.Item1);
+            }
+        }
 
         public ProviderArgs()
         {
-            AccessToken = Utilities.GetEnv("PULUMI_ACCESS_TOKEN") ?? "";
         }
         public static new ProviderArgs Empty => new ProviderArgs();
     }
