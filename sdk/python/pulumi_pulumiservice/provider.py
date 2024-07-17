@@ -19,8 +19,6 @@ class ProviderArgs:
         The set of arguments for constructing a Provider resource.
         :param pulumi.Input[str] access_token: Access Token to authenticate with Pulumi Cloud.
         """
-        if access_token is None:
-            access_token = (_utilities.get_env('PULUMI_ACCESS_TOKEN') or '')
         if access_token is not None:
             pulumi.set(__self__, "access_token", access_token)
 
@@ -83,9 +81,7 @@ class Provider(pulumi.ProviderResource):
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
             __props__ = ProviderArgs.__new__(ProviderArgs)
 
-            if access_token is None:
-                access_token = (_utilities.get_env('PULUMI_ACCESS_TOKEN') or '')
-            __props__.__dict__["access_token"] = access_token
+            __props__.__dict__["access_token"] = None if access_token is None else pulumi.Output.secret(access_token)
         super(Provider, __self__).__init__(
             'pulumiservice',
             resource_name,

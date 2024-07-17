@@ -25,12 +25,7 @@
       "accessToken": {
         "description": "Access Token to authenticate with Pulumi Cloud.",
         "type": "string",
-        "default": "",
-        "defaultInfo": {
-          "environment": [
-            "PULUMI_ACCESS_TOKEN"
-          ]
-        }
+        "secret": true
       }
     }
   },
