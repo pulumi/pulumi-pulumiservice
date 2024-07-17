@@ -157,13 +157,13 @@ func (evt *PulumiServiceEnvironmentVersionTagResource) Update(req *pulumirpc.Upd
 
 func (evt *PulumiServiceEnvironmentVersionTagResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
 	ctx := context.Background()
-	var input PulumiServiceEnvironmentVersionTagInput
-	err := serde.FromProperties(req.GetProperties(), structTagKey, &input)
+
+	orgName, environmentName, tagName, err := splitEnvironmentTagId(req.Id)
 	if err != nil {
 		return nil, err
 	}
 
-	tag, err := evt.client.GetEnvironmentRevisionTag(ctx, input.Organization, input.Environment, input.TagName)
+	tag, err := evt.client.GetEnvironmentRevisionTag(ctx, orgName, environmentName, tagName)
 	if err != nil && !strings.Contains(err.Error(), "404") {
 		return nil, fmt.Errorf("failed to read EnvironmentVersionTag (%q): %w", req.Id, err)
 	}
@@ -171,9 +171,12 @@ func (evt *PulumiServiceEnvironmentVersionTagResource) Read(req *pulumirpc.ReadR
 		// if the tag doesn't exist, then return empty response
 		return &pulumirpc.ReadResponse{}, nil
 	}
-	if tag.Revision != input.Revision {
-		// if the tag revision doesn't match, then return empty response
-		return &pulumirpc.ReadResponse{}, nil
+
+	input := PulumiServiceEnvironmentVersionTagInput{
+		Organization: orgName,
+		Environment:  environmentName,
+		TagName:      tagName,
+		Revision:     tag.Revision,
 	}
 
 	props, err := serde.ToProperties(input, structTagKey)
@@ -188,4 +191,13 @@ func (evt *PulumiServiceEnvironmentVersionTagResource) Read(req *pulumirpc.ReadR
 }
 
 func (evt *PulumiServiceEnvironmentVersionTagResource) Configure(_ PulumiServiceConfig) {
+}
+
+func splitEnvironmentTagId(id string) (string, string, string, error) {
+	// format: organization/environment/tag
+	s := strings.Split(id, "/")
+	if len(s) != 3 {
+		return "", "", "", fmt.Errorf("%q is invalid, must be in the format: organization/environment/tag", id)
+	}
+	return s[0], s[1], s[2], nil
 }
