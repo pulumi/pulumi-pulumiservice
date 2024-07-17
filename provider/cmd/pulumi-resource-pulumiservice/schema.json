@@ -761,7 +761,8 @@
         },
         "admin": {
           "description": "Optional. True if this is an admin token.",
-          "type": "boolean"
+          "type": "boolean",
+          "default": false
         }
       },
       "requiredInputs": [

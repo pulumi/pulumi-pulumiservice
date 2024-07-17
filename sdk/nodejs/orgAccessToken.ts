@@ -72,7 +72,7 @@ export class OrgAccessToken extends pulumi.CustomResource {
             if ((!args || args.organizationName === undefined) && !opts.urn) {
                 throw new Error("Missing required property 'organizationName'");
             }
-            resourceInputs["admin"] = args ? args.admin : undefined;
+            resourceInputs["admin"] = (args ? args.admin : undefined) ?? false;
             resourceInputs["description"] = args ? args.description : undefined;
             resourceInputs["name"] = args ? args.name : undefined;
             resourceInputs["organizationName"] = args ? args.organizationName : undefined;

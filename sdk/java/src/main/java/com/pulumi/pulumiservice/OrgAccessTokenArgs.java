@@ -5,6 +5,7 @@ package com.pulumi.pulumiservice;
 
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
+import com.pulumi.core.internal.Codegen;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
 import java.lang.Boolean;
 import java.lang.String;
@@ -189,6 +190,7 @@ public final class OrgAccessTokenArgs extends com.pulumi.resources.ResourceArgs 
         }
 
         public OrgAccessTokenArgs build() {
+            $.admin = Codegen.booleanProp("admin").output().arg($.admin).def(false).getNullable();
             if ($.name == null) {
                 throw new MissingRequiredPropertyException("OrgAccessTokenArgs", "name");
             }

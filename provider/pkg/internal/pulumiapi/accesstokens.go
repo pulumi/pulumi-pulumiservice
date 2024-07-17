@@ -23,8 +23,10 @@ import (
 
 type AccessToken struct {
 	ID          string `json:"id"`
+	Name        string `json:"name"`
 	TokenValue  string `json:"tokenValue"`
 	Description string `json:"description"`
+	Admin       bool   `json:"admin"`
 }
 
 type createTokenResponse struct {
@@ -38,8 +40,10 @@ type createTokenRequest struct {
 
 type accessTokenResponse struct {
 	ID          string `json:"id"`
+	Name        string `json:"name"`
 	Description string `json:"description"`
 	LastUsed    int    `json:"lastUsed"`
+	Admin       bool   `json:"admin"`
 }
 
 type listTokenResponse struct {

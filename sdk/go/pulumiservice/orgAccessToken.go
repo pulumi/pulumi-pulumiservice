@@ -41,6 +41,9 @@ func NewOrgAccessToken(ctx *pulumi.Context,
 	if args.OrganizationName == nil {
 		return nil, errors.New("invalid value for required argument 'OrganizationName'")
 	}
+	if args.Admin == nil {
+		args.Admin = pulumi.BoolPtr(false)
+	}
 	secrets := pulumi.AdditionalSecretOutputs([]string{
 		"value",
 	})

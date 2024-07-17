@@ -27,6 +27,8 @@ class OrgAccessTokenArgs:
         """
         pulumi.set(__self__, "name", name)
         pulumi.set(__self__, "organization_name", organization_name)
+        if admin is None:
+            admin = False
         if admin is not None:
             pulumi.set(__self__, "admin", admin)
         if description is not None:
@@ -138,6 +140,8 @@ class OrgAccessToken(pulumi.CustomResource):
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
             __props__ = OrgAccessTokenArgs.__new__(OrgAccessTokenArgs)
 
+            if admin is None:
+                admin = False
             __props__.__dict__["admin"] = admin
             __props__.__dict__["description"] = description
             if name is None and not opts.urn:
