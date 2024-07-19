@@ -85,7 +85,7 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(plaintextInputSett
 							importSecretValue(sshAuthPropertyMap, "sshPrivateKey", ds.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey, isInput)
 						}
 					}
-					if ds.SourceContext.Git.GitAuth.SSHAuth.Password.Value != "" {
+					if ds.SourceContext.Git.GitAuth.SSHAuth.Password != nil && ds.SourceContext.Git.GitAuth.SSHAuth.Password.Value != "" {
 						if mergeMode {
 							var plaintextValue *pulumiapi.SecretValue
 							var currentCipherValue *pulumiapi.SecretValue
