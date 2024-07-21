@@ -53,7 +53,7 @@ func NewClient(client *http.Client, token, URL string) (*Client, error) {
 }
 
 // createRequest creates a *http.Request with standard headers set and reqBody marshalled into json.
-func (c *Client) createRequest(ctx context.Context, method, path string, reqBody interface{}) (*http.Request, error) {
+func (c *Client) createRequest(ctx context.Context, method string, url *url.URL, reqBody interface{}) (*http.Request, error) {
 	var reqBodyReader io.Reader
 	if reqBody != nil {
 		data, err := json.Marshal(reqBody)
@@ -62,7 +62,7 @@ func (c *Client) createRequest(ctx context.Context, method, path string, reqBody
 		}
 		reqBodyReader = bytes.NewBuffer(data)
 	}
-	endpoint := c.baseurl.ResolveReference(&url.URL{Path: path})
+	endpoint := c.baseurl.ResolveReference(url)
 
 	req, err := http.NewRequestWithContext(ctx, method, endpoint.String(), reqBodyReader)
 	if err != nil {
@@ -96,7 +96,8 @@ func (c *Client) sendRequest(req *http.Request, resBody interface{}) (*http.Resp
 		var errRes errorResponse
 		err = json.Unmarshal(body, &errRes)
 		if err != nil {
-			return res, fmt.Errorf("failed to parse response body, status code %d: %w", res.StatusCode, err)
+			return res, fmt.Errorf("failed to parse response body from url %q, status code %d: %w\n\n%s\n",
+				req.URL.String(), res.StatusCode, err, body)
 		}
 		if errRes.StatusCode == 0 {
 			errRes.StatusCode = res.StatusCode
@@ -116,7 +117,17 @@ func (c *Client) sendRequest(req *http.Request, resBody interface{}) (*http.Resp
 // Marshals reqBody and resBody to/from JSON. Applies appropriate headers as well
 // Returns http.Response, but Body will be closed
 func (c *Client) do(ctx context.Context, method, path string, reqBody interface{}, resBody interface{}) (*http.Response, error) {
-	req, err := c.createRequest(ctx, method, path, reqBody)
+	req, err := c.createRequest(ctx, method, &url.URL{Path: path}, reqBody)
+	if err != nil {
+		return nil, err
+	}
+	return c.sendRequest(req, resBody)
+}
+
+func (c *Client) doWithQuery(ctx context.Context, method, path string, query url.Values, reqBody interface{}, resBody interface{}) (*http.Response, error) {
+	reqURL := &url.URL{Path: path}
+	reqURL.RawQuery = query.Encode()
+	req, err := c.createRequest(ctx, method, reqURL, reqBody)
 	if err != nil {
 		return nil, err
 	}

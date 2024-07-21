@@ -3,10 +3,17 @@ import * as service from "@pulumi/pulumiservice";
 
 const config = new pulumi.Config();
 
+const stack = new service.Stack("my_stack", {
+    organizationName: "service-provider-test-org",
+    projectName: "my-new-project",
+    stackName: "my-new-stack",
+
+})
+
 const settings = new service.DeploymentSettings("deployment_settings", {
     organization: "service-provider-test-org",
-    project: pulumi.getProject(),
-    stack: pulumi.getStack(),
+    project: stack.projectName,
+    stack: stack.stackName,
     executorContext: {
         executorImage: "pulumi-cli",
     },

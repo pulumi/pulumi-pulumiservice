@@ -15,6 +15,7 @@ from .environment import *
 from .environment_version_tag import *
 from .org_access_token import *
 from .provider import *
+from .stack import *
 from .stack_tag import *
 from .team import *
 from .team_access_token import *
@@ -48,6 +49,7 @@ _utilities.register(
    "pulumiservice:index:Environment": "Environment",
    "pulumiservice:index:EnvironmentVersionTag": "EnvironmentVersionTag",
    "pulumiservice:index:OrgAccessToken": "OrgAccessToken",
+   "pulumiservice:index:Stack": "Stack",
    "pulumiservice:index:StackTag": "StackTag",
    "pulumiservice:index:Team": "Team",
    "pulumiservice:index:TeamAccessToken": "TeamAccessToken",

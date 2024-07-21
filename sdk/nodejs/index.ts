@@ -50,6 +50,11 @@ export type Provider = import("./provider").Provider;
 export const Provider: typeof import("./provider").Provider = null as any;
 utilities.lazyLoad(exports, ["Provider"], () => require("./provider"));
 
+export { StackArgs } from "./stack";
+export type Stack = import("./stack").Stack;
+export const Stack: typeof import("./stack").Stack = null as any;
+utilities.lazyLoad(exports, ["Stack"], () => require("./stack"));
+
 export { StackTagArgs } from "./stackTag";
 export type StackTag = import("./stackTag").StackTag;
 export const StackTag: typeof import("./stackTag").StackTag = null as any;
@@ -118,6 +123,8 @@ const _module = {
                 return new EnvironmentVersionTag(name, <any>undefined, { urn })
             case "pulumiservice:index:OrgAccessToken":
                 return new OrgAccessToken(name, <any>undefined, { urn })
+            case "pulumiservice:index:Stack":
+                return new Stack(name, <any>undefined, { urn })
             case "pulumiservice:index:StackTag":
                 return new StackTag(name, <any>undefined, { urn })
             case "pulumiservice:index:Team":
