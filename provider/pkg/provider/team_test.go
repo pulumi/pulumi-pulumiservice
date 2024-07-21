@@ -35,13 +35,13 @@ func (c *TeamClientMock) AddMemberToTeam(ctx context.Context, orgName, teamName,
 func (c *TeamClientMock) DeleteMemberFromTeam(ctx context.Context, orgName, teamName, userName string) error {
 	return nil
 }
-func (c *TeamClientMock) AddStackPermission(ctx context.Context, stack pulumiapi.StackName, teamName string, permission int) error {
+func (c *TeamClientMock) AddStackPermission(ctx context.Context, stack pulumiapi.StackIdentifier, teamName string, permission int) error {
 	return nil
 }
-func (c *TeamClientMock) RemoveStackPermission(ctx context.Context, stack pulumiapi.StackName, teamName string) error {
+func (c *TeamClientMock) RemoveStackPermission(ctx context.Context, stack pulumiapi.StackIdentifier, teamName string) error {
 	return nil
 }
-func (c *TeamClientMock) GetTeamStackPermission(ctx context.Context, stack pulumiapi.StackName, teamName string) (*int, error) {
+func (c *TeamClientMock) GetTeamStackPermission(ctx context.Context, stack pulumiapi.StackIdentifier, teamName string) (*int, error) {
 	return nil, nil
 }
 func (c *TeamClientMock) AddEnvironmentPermission(ctx context.Context, req pulumiapi.CreateTeamEnvironmentPermissionRequest) error {

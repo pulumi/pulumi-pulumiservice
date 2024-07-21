@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var testStack = StackName{
+var testStack = StackIdentifier{
 	OrgName:     "org",
 	ProjectName: "project",
 	StackName:   "stack",

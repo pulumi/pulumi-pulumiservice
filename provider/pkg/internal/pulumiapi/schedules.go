@@ -9,14 +9,14 @@ import (
 )
 
 type ScheduleClient interface {
-	CreateDeploymentSchedule(ctx context.Context, stack StackName, req CreateDeploymentScheduleRequest) (*string, error)
-	CreateDriftSchedule(ctx context.Context, stack StackName, req CreateDriftScheduleRequest) (*string, error)
-	CreateTtlSchedule(ctx context.Context, stack StackName, req CreateTtlScheduleRequest) (*string, error)
-	GetSchedule(ctx context.Context, stack StackName, scheduleID string) (*ScheduleResponse, error)
-	UpdateDeploymentSchedule(ctx context.Context, stack StackName, req CreateDeploymentScheduleRequest, scheduleID string) (*string, error)
-	UpdateDriftSchedule(ctx context.Context, stack StackName, req CreateDriftScheduleRequest, scheduleID string) (*string, error)
-	UpdateTtlSchedule(ctx context.Context, stack StackName, req CreateTtlScheduleRequest, scheduleID string) (*string, error)
-	DeleteSchedule(ctx context.Context, stack StackName, scheduleID string) error
+	CreateDeploymentSchedule(ctx context.Context, stack StackIdentifier, req CreateDeploymentScheduleRequest) (*string, error)
+	CreateDriftSchedule(ctx context.Context, stack StackIdentifier, req CreateDriftScheduleRequest) (*string, error)
+	CreateTtlSchedule(ctx context.Context, stack StackIdentifier, req CreateTtlScheduleRequest) (*string, error)
+	GetSchedule(ctx context.Context, stack StackIdentifier, scheduleID string) (*ScheduleResponse, error)
+	UpdateDeploymentSchedule(ctx context.Context, stack StackIdentifier, req CreateDeploymentScheduleRequest, scheduleID string) (*string, error)
+	UpdateDriftSchedule(ctx context.Context, stack StackIdentifier, req CreateDriftScheduleRequest, scheduleID string) (*string, error)
+	UpdateTtlSchedule(ctx context.Context, stack StackIdentifier, req CreateTtlScheduleRequest, scheduleID string) (*string, error)
+	DeleteSchedule(ctx context.Context, stack StackIdentifier, scheduleID string) error
 }
 
 type CreateDeploymentRequest struct {
@@ -60,7 +60,7 @@ type ScheduleResponse struct {
 	Definition   ScheduleDefinition `json:"definition,omitempty"`
 }
 
-func (c *Client) CreateDeploymentSchedule(ctx context.Context, stack StackName, scheduleReq CreateDeploymentScheduleRequest) (*string, error) {
+func (c *Client) CreateDeploymentSchedule(ctx context.Context, stack StackIdentifier, scheduleReq CreateDeploymentScheduleRequest) (*string, error) {
 	apiPath := path.Join("stacks", stack.OrgName, stack.ProjectName, stack.StackName, "deployments", "schedules")
 	var scheduleResponse ScheduleResponse
 	_, err := c.do(ctx, http.MethodPost, apiPath, scheduleReq, &scheduleResponse)
@@ -77,7 +77,7 @@ func (c *Client) CreateDeploymentSchedule(ctx context.Context, stack StackName, 
 	return &scheduleResponse.ID, nil
 }
 
-func (c *Client) CreateDriftSchedule(ctx context.Context, stack StackName, scheduleReq CreateDriftScheduleRequest) (*string, error) {
+func (c *Client) CreateDriftSchedule(ctx context.Context, stack StackIdentifier, scheduleReq CreateDriftScheduleRequest) (*string, error) {
 	apiPath := path.Join("stacks", stack.OrgName, stack.ProjectName, stack.StackName, "deployments", "drift", "schedules")
 	var scheduleResponse ScheduleResponse
 	_, err := c.do(ctx, http.MethodPost, apiPath, scheduleReq, &scheduleResponse)
@@ -88,7 +88,7 @@ func (c *Client) CreateDriftSchedule(ctx context.Context, stack StackName, sched
 	return &scheduleResponse.ID, nil
 }
 
-func (c *Client) CreateTtlSchedule(ctx context.Context, stack StackName, scheduleReq CreateTtlScheduleRequest) (*string, error) {
+func (c *Client) CreateTtlSchedule(ctx context.Context, stack StackIdentifier, scheduleReq CreateTtlScheduleRequest) (*string, error) {
 	apiPath := path.Join("stacks", stack.OrgName, stack.ProjectName, stack.StackName, "deployments", "ttl", "schedules")
 	var scheduleResponse ScheduleResponse
 	_, err := c.do(ctx, http.MethodPost, apiPath, scheduleReq, &scheduleResponse)
@@ -99,7 +99,7 @@ func (c *Client) CreateTtlSchedule(ctx context.Context, stack StackName, schedul
 	return &scheduleResponse.ID, nil
 }
 
-func (c *Client) GetSchedule(ctx context.Context, stack StackName, scheduleID string) (*ScheduleResponse, error) {
+func (c *Client) GetSchedule(ctx context.Context, stack StackIdentifier, scheduleID string) (*ScheduleResponse, error) {
 	apiPath := path.Join("stacks", stack.OrgName, stack.ProjectName, stack.StackName, "deployments", "schedules", scheduleID)
 	var scheduleResponse ScheduleResponse
 	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &scheduleResponse)
@@ -109,7 +109,7 @@ func (c *Client) GetSchedule(ctx context.Context, stack StackName, scheduleID st
 	return &scheduleResponse, nil
 }
 
-func (c *Client) UpdateDeploymentSchedule(ctx context.Context, stack StackName, scheduleReq CreateDeploymentScheduleRequest, scheduleID string) (*string, error) {
+func (c *Client) UpdateDeploymentSchedule(ctx context.Context, stack StackIdentifier, scheduleReq CreateDeploymentScheduleRequest, scheduleID string) (*string, error) {
 	apiPath := path.Join("stacks", stack.OrgName, stack.ProjectName, stack.StackName, "deployments", "schedules", scheduleID)
 	var scheduleResponse ScheduleResponse
 	_, err := c.do(ctx, http.MethodPost, apiPath, scheduleReq, &scheduleResponse)
@@ -126,7 +126,7 @@ func (c *Client) UpdateDeploymentSchedule(ctx context.Context, stack StackName, 
 	return &scheduleResponse.ID, nil
 }
 
-func (c *Client) UpdateDriftSchedule(ctx context.Context, stack StackName, scheduleReq CreateDriftScheduleRequest, scheduleID string) (*string, error) {
+func (c *Client) UpdateDriftSchedule(ctx context.Context, stack StackIdentifier, scheduleReq CreateDriftScheduleRequest, scheduleID string) (*string, error) {
 	apiPath := path.Join("stacks", stack.OrgName, stack.ProjectName, stack.StackName, "deployments", "drift", "schedules", scheduleID)
 	var scheduleResponse ScheduleResponse
 	_, err := c.do(ctx, http.MethodPost, apiPath, scheduleReq, &scheduleResponse)
@@ -137,7 +137,7 @@ func (c *Client) UpdateDriftSchedule(ctx context.Context, stack StackName, sched
 	return &scheduleResponse.ID, nil
 }
 
-func (c *Client) UpdateTtlSchedule(ctx context.Context, stack StackName, scheduleReq CreateTtlScheduleRequest, scheduleID string) (*string, error) {
+func (c *Client) UpdateTtlSchedule(ctx context.Context, stack StackIdentifier, scheduleReq CreateTtlScheduleRequest, scheduleID string) (*string, error) {
 	apiPath := path.Join("stacks", stack.OrgName, stack.ProjectName, stack.StackName, "deployments", "ttl", "schedules", scheduleID)
 	var scheduleResponse ScheduleResponse
 	_, err := c.do(ctx, http.MethodPost, apiPath, scheduleReq, &scheduleResponse)
@@ -148,7 +148,7 @@ func (c *Client) UpdateTtlSchedule(ctx context.Context, stack StackName, schedul
 	return &scheduleResponse.ID, nil
 }
 
-func (c *Client) DeleteSchedule(ctx context.Context, stack StackName, scheduleID string) error {
+func (c *Client) DeleteSchedule(ctx context.Context, stack StackIdentifier, scheduleID string) error {
 	apiPath := path.Join("stacks", stack.OrgName, stack.ProjectName, stack.StackName, "deployments", "schedules", scheduleID)
 	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
 	if err != nil {

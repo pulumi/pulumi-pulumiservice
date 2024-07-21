@@ -20,18 +20,18 @@ type PulumiServiceDeploymentScheduleResource struct {
 }
 
 type PulumiServiceDeploymentScheduleInput struct {
-	Stack           pulumiapi.StackName
+	Stack           pulumiapi.StackIdentifier
 	ScheduleCron    *string    `pulumi:"scheduleCron"`
 	ScheduleOnce    *time.Time `pulumi:"scheduleOnce"`
 	PulumiOperation string     `pulumi:"pulumiOperation"`
 }
 
 type PulumiServiceSharedScheduleOutput struct {
-	Stack      pulumiapi.StackName
+	Stack      pulumiapi.StackIdentifier
 	ScheduleID string `pulumi:"scheduleId"`
 }
 
-func StackToPropertyMap(stack pulumiapi.StackName) resource.PropertyMap {
+func StackToPropertyMap(stack pulumiapi.StackIdentifier) resource.PropertyMap {
 	propertyMap := resource.PropertyMap{}
 	propertyMap["organization"] = resource.NewPropertyValue(stack.OrgName)
 	propertyMap["project"] = resource.NewPropertyValue(stack.ProjectName)
@@ -58,8 +58,8 @@ func AddScheduleIdToPropertyMap(scheduleID string, propertyMap resource.Property
 	return propertyMap
 }
 
-func ParseStack(inputMap resource.PropertyMap) (*pulumiapi.StackName, error) {
-	var stack pulumiapi.StackName
+func ParseStack(inputMap resource.PropertyMap) (*pulumiapi.StackIdentifier, error) {
+	var stack pulumiapi.StackIdentifier
 	if inputMap["organization"].HasValue() && inputMap["organization"].IsString() {
 		organization := inputMap["organization"].StringValue()
 		stack.OrgName = organization
@@ -387,12 +387,12 @@ func (st *PulumiServiceDeploymentScheduleResource) Name() string {
 func (st *PulumiServiceDeploymentScheduleResource) Configure(_ PulumiServiceConfig) {
 }
 
-func ParseScheduleID(id string, scheduleType string) (*pulumiapi.StackName, *string, error) {
+func ParseScheduleID(id string, scheduleType string) (*pulumiapi.StackIdentifier, *string, error) {
 	splitID := strings.Split(id, "/")
 	if len(splitID) < 4 {
 		return nil, nil, fmt.Errorf("invalid stack id: %s", id)
 	}
-	stack := pulumiapi.StackName{
+	stack := pulumiapi.StackIdentifier{
 		OrgName:     splitID[0],
 		ProjectName: splitID[1],
 		StackName:   splitID[2],

@@ -18,7 +18,7 @@ type PulumiServiceDriftScheduleResource struct {
 }
 
 type PulumiServiceDriftScheduleInput struct {
-	Stack         pulumiapi.StackName
+	Stack         pulumiapi.StackIdentifier
 	ScheduleCron  string `pulumi:"scheduleCron"`
 	AutoRemediate bool   `pulumi:"autoRemediate"`
 }

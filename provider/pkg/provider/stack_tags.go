@@ -86,7 +86,7 @@ func (st *PulumiServiceStackTagResource) Delete(req *pulumirpc.DeleteRequest) (*
 	if err != nil {
 		return nil, err
 	}
-	stackName := pulumiapi.StackName{
+	stackName := pulumiapi.StackIdentifier{
 		OrgName:     inputs.Organization,
 		ProjectName: inputs.Project,
 		StackName:   inputs.Stack,
@@ -105,7 +105,7 @@ func (st *PulumiServiceStackTagResource) Create(req *pulumirpc.CreateRequest) (*
 	if err != nil {
 		return nil, err
 	}
-	stackName := pulumiapi.StackName{
+	stackName := pulumiapi.StackIdentifier{
 		OrgName:     inputs.Organization,
 		ProjectName: inputs.Project,
 		StackName:   inputs.Stack,
@@ -140,7 +140,7 @@ func (st *PulumiServiceStackTagResource) Read(req *pulumirpc.ReadRequest) (*pulu
 	if err != nil {
 		return nil, err
 	}
-	stackName := pulumiapi.StackName{
+	stackName := pulumiapi.StackIdentifier{
 		OrgName:     inputs.Organization,
 		ProjectName: inputs.Project,
 		StackName:   inputs.Stack,

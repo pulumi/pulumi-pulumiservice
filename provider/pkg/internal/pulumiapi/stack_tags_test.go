@@ -15,7 +15,7 @@ func TestCreateStackTags(t *testing.T) {
 		Name:  tagName,
 		Value: tagValue,
 	}
-	stackName := StackName{
+	stackName := StackIdentifier{
 		OrgName:     "organization",
 		ProjectName: "project",
 		StackName:   "stack",
@@ -47,7 +47,7 @@ func TestCreateStackTags(t *testing.T) {
 }
 
 func TestDeleteStackTags(t *testing.T) {
-	stackName := StackName{
+	stackName := StackIdentifier{
 		OrgName:     "organization",
 		ProjectName: "project",
 		StackName:   "stack",

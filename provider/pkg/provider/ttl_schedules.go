@@ -19,7 +19,7 @@ type PulumiServiceTtlScheduleResource struct {
 }
 
 type PulumiServiceTtlScheduleInput struct {
-	Stack              pulumiapi.StackName
+	Stack              pulumiapi.StackIdentifier
 	Timestamp          time.Time `pulumi:"timestamp"`
 	DeleteAfterDestroy bool      `pulumi:"deleteAfterDestroy"`
 }
