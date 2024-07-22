@@ -17,16 +17,16 @@ type DeploymentSettingsClientMock struct {
 	getDeploymentSettingsFunc getDeploymentSettingsFunc
 }
 
-func (c *DeploymentSettingsClientMock) CreateDeploymentSettings(ctx context.Context, stack pulumiapi.StackName, ds pulumiapi.DeploymentSettings) (*pulumiapi.DeploymentSettings, error) {
+func (c *DeploymentSettingsClientMock) CreateDeploymentSettings(ctx context.Context, stack pulumiapi.StackIdentifier, ds pulumiapi.DeploymentSettings) (*pulumiapi.DeploymentSettings, error) {
 	return nil, nil
 }
-func (c *DeploymentSettingsClientMock) UpdateDeploymentSettings(ctx context.Context, stack pulumiapi.StackName, ds pulumiapi.DeploymentSettings) (*pulumiapi.DeploymentSettings, error) {
+func (c *DeploymentSettingsClientMock) UpdateDeploymentSettings(ctx context.Context, stack pulumiapi.StackIdentifier, ds pulumiapi.DeploymentSettings) (*pulumiapi.DeploymentSettings, error) {
 	return nil, nil
 }
-func (c *DeploymentSettingsClientMock) GetDeploymentSettings(ctx context.Context, stack pulumiapi.StackName) (*pulumiapi.DeploymentSettings, error) {
+func (c *DeploymentSettingsClientMock) GetDeploymentSettings(ctx context.Context, stack pulumiapi.StackIdentifier) (*pulumiapi.DeploymentSettings, error) {
 	return c.getDeploymentSettingsFunc()
 }
-func (c *DeploymentSettingsClientMock) DeleteDeploymentSettings(ctx context.Context, stack pulumiapi.StackName) error {
+func (c *DeploymentSettingsClientMock) DeleteDeploymentSettings(ctx context.Context, stack pulumiapi.StackIdentifier) error {
 	return nil
 }
 

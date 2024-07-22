@@ -21,7 +21,7 @@ const replaceMe = "<REPLACE WITH ACTUAL SECRET VALUE>"
 
 type PulumiServiceDeploymentSettingsInput struct {
 	pulumiapi.DeploymentSettings
-	Stack pulumiapi.StackName
+	Stack pulumiapi.StackIdentifier
 }
 
 // plaintextInputSettings are the latest inputs of the resource, containing plaintext values wrapped in Secrets
@@ -701,7 +701,7 @@ func (ds *PulumiServiceDeploymentSettingsResource) Configure(_ PulumiServiceConf
 func (ds *PulumiServiceDeploymentSettingsResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
 	ctx := context.Background()
 
-	var stack pulumiapi.StackName
+	var stack pulumiapi.StackIdentifier
 	if err := stack.FromID(req.Id); err != nil {
 		return nil, err
 	}
@@ -770,7 +770,7 @@ func (ds *PulumiServiceDeploymentSettingsResource) Read(req *pulumirpc.ReadReque
 
 func (ds *PulumiServiceDeploymentSettingsResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
 	ctx := context.Background()
-	var stack pulumiapi.StackName
+	var stack pulumiapi.StackIdentifier
 	if err := stack.FromID(req.Id); err != nil {
 		return nil, err
 	}
