@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"path"
+	"strings"
 
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
 
@@ -135,17 +136,18 @@ func (st *PulumiServiceStackTagResource) Update(req *pulumirpc.UpdateRequest) (*
 
 func (st *PulumiServiceStackTagResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
 	ctx := context.Background()
-	var inputs PulumiServiceStackTagInput
-	err := serde.FromProperties(req.GetProperties(), structTagKey, &inputs)
+
+	organization, project, stack, tagName, err := splitStackTagId(req.Id)
 	if err != nil {
 		return nil, err
 	}
+
 	stackName := pulumiapi.StackIdentifier{
-		OrgName:     inputs.Organization,
-		ProjectName: inputs.Project,
-		StackName:   inputs.Stack,
+		OrgName:     organization,
+		ProjectName: project,
+		StackName:   stack,
 	}
-	tag, err := st.client.GetStackTag(ctx, stackName, inputs.Name)
+	tag, err := st.client.GetStackTag(ctx, stackName, tagName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read StackTag (%q): %w", req.Id, err)
 	}
@@ -153,8 +155,15 @@ func (st *PulumiServiceStackTagResource) Read(req *pulumirpc.ReadRequest) (*pulu
 		// if the tag doesn't exist, then return empty response
 		return &pulumirpc.ReadResponse{}, nil
 	}
-	inputs.Value = tag.Value
-	props, err := serde.ToProperties(inputs, structTagKey)
+
+	input := PulumiServiceStackTagInput{
+		Organization: organization,
+		Project:      project,
+		Stack:        stack,
+		Name:         tag.Name,
+		Value:        tag.Value,
+	}
+	props, err := serde.ToProperties(input, structTagKey)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal inputs to properties: %w", err)
 	}
@@ -166,4 +175,13 @@ func (st *PulumiServiceStackTagResource) Read(req *pulumirpc.ReadRequest) (*pulu
 }
 
 func (st *PulumiServiceStackTagResource) Configure(_ PulumiServiceConfig) {
+}
+
+func splitStackTagId(id string) (organization string, project string, stack string, tagName string, err error) {
+	// format: organization/project/stack/tagName
+	s := strings.Split(id, "/")
+	if len(s) != 4 {
+		return "", "", "", "", fmt.Errorf("%q is invalid, must be in organization/project/stack/tagName format", id)
+	}
+	return s[0], s[1], s[2], s[3], nil
 }
