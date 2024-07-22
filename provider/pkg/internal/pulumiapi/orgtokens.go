@@ -103,7 +103,9 @@ func (c *Client) GetOrgAccessToken(ctx context.Context, tokenId, orgName string)
 		if token.ID == tokenId {
 			return &AccessToken{
 				ID:          token.ID,
+				Name:        token.Name,
 				Description: token.Description,
+				Admin:       token.Admin,
 			}, nil
 		}
 	}

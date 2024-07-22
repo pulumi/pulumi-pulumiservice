@@ -14,3 +14,4 @@ resources:
       name: test-${rand.result}
       organizationName: service-provider-test-org
       description: "example org access token"
+      admin: false

@@ -120,6 +120,7 @@ namespace Pulumi.PulumiService
 
         public OrgAccessTokenArgs()
         {
+            Admin = false;
         }
         public static new OrgAccessTokenArgs Empty => new OrgAccessTokenArgs();
     }
