@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/pulumiapi"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
@@ -22,6 +23,26 @@ type PulumiServiceTeamAccessTokenInput struct {
 	OrgName     string
 	TeamName    string
 	Description string
+}
+
+func GenerateTeamAccessTokenProperties(input PulumiServiceTeamAccessTokenInput, teamAccessToken pulumiapi.AccessToken) (outputs *structpb.Struct, inputs *structpb.Struct, err error) {
+	inputMap := input.ToPropertyMap()
+
+	outputMap := inputMap.Copy()
+	outputMap["__inputs"] = resource.NewObjectProperty(inputMap)
+	outputMap["value"] = resource.MakeSecret(resource.NewPropertyValue(teamAccessToken.TokenValue))
+
+	inputs, err = plugin.MarshalProperties(inputMap, plugin.MarshalOptions{})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	outputs, err = plugin.MarshalProperties(outputMap, plugin.MarshalOptions{})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return outputs, inputs, err
 }
 
 func (i *PulumiServiceTeamAccessTokenInput) ToPropertyMap() resource.PropertyMap {
@@ -76,37 +97,27 @@ func (t *PulumiServiceTeamAccessTokenResource) Delete(req *pulumirpc.DeleteReque
 
 func (t *PulumiServiceTeamAccessTokenResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	ctx := context.Background()
-	inputs, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	inputMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
 	}
 
-	inputsAccessToken := t.ToPulumiServiceAccessTokenInput(inputs)
+	input := t.ToPulumiServiceAccessTokenInput(inputMap)
 
-	accessToken, err := t.createTeamAccessToken(ctx, inputsAccessToken)
+	accessToken, err := t.createTeamAccessToken(ctx, input)
 	if err != nil {
-		return nil, fmt.Errorf("error creating access token '%s': %s", inputsAccessToken.Description, err.Error())
+		return nil, fmt.Errorf("error creating access token '%s': %s", input.Name, err.Error())
 	}
 
-	outputStore := resource.PropertyMap{}
-	outputStore["__inputs"] = resource.NewObjectProperty(inputs)
-	outputStore["value"] = resource.NewPropertyValue(accessToken.TokenValue)
-
-	outputProperties, err := plugin.MarshalProperties(
-		outputStore,
-		plugin.MarshalOptions{},
-	)
+	outputs, _, err := GenerateTeamAccessTokenProperties(input, *accessToken)
 	if err != nil {
 		return nil, err
 	}
-
-	urn := fmt.Sprintf(inputsAccessToken.OrgName + "/" + inputsAccessToken.TeamName + "/" + inputsAccessToken.Name + "/" + accessToken.ID)
 
 	return &pulumirpc.CreateResponse{
-		Id:         urn,
-		Properties: outputProperties,
+		Id:         fmt.Sprintf("%s/%s/%s/%s", input.OrgName, input.TeamName, input.Name, accessToken.ID),
+		Properties: outputs,
 	}, nil
-
 }
 
 func (t *PulumiServiceTeamAccessTokenResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
@@ -122,7 +133,7 @@ func (t *PulumiServiceTeamAccessTokenResource) Read(req *pulumirpc.ReadRequest) 
 	ctx := context.Background()
 	urn := req.GetId()
 
-	orgName, teamName, _, tokenId, err := splitTeamAccessTokenId(urn)
+	orgName, teamName, tokenName, tokenId, err := splitTeamAccessTokenId(urn)
 	if err != nil {
 		return nil, err
 	}
@@ -136,10 +147,30 @@ func (t *PulumiServiceTeamAccessTokenResource) Read(req *pulumirpc.ReadRequest) 
 		return &pulumirpc.ReadResponse{}, nil
 	}
 
+	var input = PulumiServiceTeamAccessTokenInput{
+		Name:        tokenName,
+		OrgName:     orgName,
+		Description: accessToken.Description,
+		TeamName:    teamName,
+	}
+
+	propertyMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
+	if err != nil {
+		return nil, err
+	}
+	if propertyMap["value"].HasValue() {
+		accessToken.TokenValue = getSecretOrStringValue(propertyMap["value"])
+	}
+
+	outputs, inputs, err := GenerateTeamAccessTokenProperties(input, *accessToken)
+	if err != nil {
+		return nil, err
+	}
+
 	return &pulumirpc.ReadResponse{
 		Id:         req.GetId(),
-		Properties: req.GetProperties(),
-		Inputs:     req.GetProperties(),
+		Properties: outputs,
+		Inputs:     inputs,
 	}, nil
 }
 
