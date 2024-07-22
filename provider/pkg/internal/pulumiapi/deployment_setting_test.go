@@ -31,7 +31,7 @@ func TestGetDeploymentSettings(t *testing.T) {
 		})
 		defer cleanup()
 
-		ds, err := c.GetDeploymentSettings(ctx, StackName{
+		ds, err := c.GetDeploymentSettings(ctx, StackIdentifier{
 			OrgName:     orgName,
 			ProjectName: projectName,
 			StackName:   stackName,
@@ -53,7 +53,7 @@ func TestGetDeploymentSettings(t *testing.T) {
 		})
 		defer cleanup()
 
-		ds, err := c.GetDeploymentSettings(ctx, StackName{
+		ds, err := c.GetDeploymentSettings(ctx, StackIdentifier{
 			OrgName:     orgName,
 			ProjectName: projectName,
 			StackName:   stackName,
@@ -87,7 +87,7 @@ func TestCreateDeploymentSettings(t *testing.T) {
 		})
 		defer cleanup()
 
-		response, err := c.CreateDeploymentSettings(ctx, StackName{
+		response, err := c.CreateDeploymentSettings(ctx, StackIdentifier{
 			OrgName:     orgName,
 			ProjectName: projectName,
 			StackName:   stackName,

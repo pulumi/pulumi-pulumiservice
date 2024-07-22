@@ -252,7 +252,7 @@ func TestAddMemberToTeam(t *testing.T) {
 
 func TestAddStackPermission(t *testing.T) {
 	teamName := "a-team"
-	stack := StackName{
+	stack := StackIdentifier{
 		OrgName:     "an-organization",
 		ProjectName: "a-project",
 		StackName:   "a-stack",
@@ -278,7 +278,7 @@ func TestAddStackPermission(t *testing.T) {
 
 func TestRemoveStackPermission(t *testing.T) {
 	teamName := "a-team"
-	stack := StackName{
+	stack := StackIdentifier{
 		OrgName:     "an-organization",
 		ProjectName: "a-project",
 		StackName:   "a-stack",

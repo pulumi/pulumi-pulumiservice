@@ -65,7 +65,7 @@ func (tp *TeamStackPermissionResource) Read(req *pulumirpc.ReadRequest) (*pulumi
 		return nil, err
 	}
 
-	permission, err := tp.client.GetTeamStackPermission(ctx, pulumiapi.StackName{
+	permission, err := tp.client.GetTeamStackPermission(ctx, pulumiapi.StackIdentifier{
 		OrgName:     permId.Organization,
 		ProjectName: permId.Project,
 		StackName:   permId.Stack,
@@ -103,7 +103,7 @@ func (tp *TeamStackPermissionResource) Create(req *pulumirpc.CreateRequest) (*pu
 	if err != nil {
 		return nil, err
 	}
-	stackName := pulumiapi.StackName{
+	stackName := pulumiapi.StackIdentifier{
 		OrgName:     inputs.Organization,
 		ProjectName: inputs.Project,
 		StackName:   inputs.Stack,
@@ -129,7 +129,7 @@ func (tp *TeamStackPermissionResource) Delete(req *pulumirpc.DeleteRequest) (*pb
 	if err != nil {
 		return nil, err
 	}
-	stackName := pulumiapi.StackName{
+	stackName := pulumiapi.StackIdentifier{
 		OrgName:     inputs.Organization,
 		ProjectName: inputs.Project,
 		StackName:   inputs.Stack,

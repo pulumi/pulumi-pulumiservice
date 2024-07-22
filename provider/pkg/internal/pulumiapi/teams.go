@@ -29,9 +29,9 @@ type TeamClient interface {
 	DeleteTeam(ctx context.Context, orgName, teamName string) error
 	AddMemberToTeam(ctx context.Context, orgName, teamName, userName string) error
 	DeleteMemberFromTeam(ctx context.Context, orgName, teamName, userName string) error
-	AddStackPermission(ctx context.Context, stack StackName, teamName string, permission int) error
-	RemoveStackPermission(ctx context.Context, stack StackName, teamName string) error
-	GetTeamStackPermission(ctx context.Context, stack StackName, teamName string) (*int, error)
+	AddStackPermission(ctx context.Context, stack StackIdentifier, teamName string, permission int) error
+	RemoveStackPermission(ctx context.Context, stack StackIdentifier, teamName string) error
+	GetTeamStackPermission(ctx context.Context, stack StackIdentifier, teamName string) (*int, error)
 	AddEnvironmentPermission(ctx context.Context, req CreateTeamEnvironmentPermissionRequest) error
 	RemoveEnvironmentPermission(ctx context.Context, req TeamEnvironmentPermissionRequest) error
 	GetTeamEnvironmentPermission(ctx context.Context, req TeamEnvironmentPermissionRequest) (*string, error)
@@ -305,7 +305,7 @@ func (c *Client) DeleteMemberFromTeam(ctx context.Context, orgName, teamName, us
 	}
 }
 
-func (c *Client) AddStackPermission(ctx context.Context, stack StackName, teamName string, permission int) error {
+func (c *Client) AddStackPermission(ctx context.Context, stack StackIdentifier, teamName string, permission int) error {
 	if len(stack.OrgName) == 0 {
 		return errors.New("orgname must not be empty")
 	}
@@ -327,7 +327,7 @@ func (c *Client) AddStackPermission(ctx context.Context, stack StackName, teamNa
 	return nil
 }
 
-func (c *Client) RemoveStackPermission(ctx context.Context, stack StackName, teamName string) error {
+func (c *Client) RemoveStackPermission(ctx context.Context, stack StackIdentifier, teamName string) error {
 	if len(stack.OrgName) == 0 {
 		return errors.New("orgname must not be empty")
 	}
@@ -349,7 +349,7 @@ func (c *Client) RemoveStackPermission(ctx context.Context, stack StackName, tea
 	return nil
 }
 
-func (c *Client) GetTeamStackPermission(ctx context.Context, stack StackName, teamName string) (*int, error) {
+func (c *Client) GetTeamStackPermission(ctx context.Context, stack StackIdentifier, teamName string) (*int, error) {
 	if len(stack.OrgName) == 0 {
 		return nil, errors.New("orgname must not be empty")
 	}
