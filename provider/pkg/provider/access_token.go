@@ -27,7 +27,8 @@ func GenerateAcessTokenProperties(input PulumiServiceAccessTokenInput, accessTok
 	inputMap["description"] = resource.NewPropertyValue(input.Description)
 	outputStore := resource.PropertyMap{}
 	outputStore["__inputs"] = resource.NewObjectProperty(inputMap)
-	outputStore["value"] = resource.NewPropertyValue(accessToken.TokenValue)
+	outputStore["description"] = resource.NewPropertyValue(input.Description)
+	outputStore["value"] = resource.MakeSecret(resource.NewPropertyValue(accessToken.TokenValue))
 
 	inputs, err = plugin.MarshalProperties(
 		inputMap,
@@ -120,6 +121,14 @@ func (at *PulumiServiceAccessTokenResource) Read(req *pulumirpc.ReadRequest) (*p
 	}
 	if accessToken == nil {
 		return &pulumirpc.ReadResponse{}, nil
+	}
+
+	propertyMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{})
+	if err != nil {
+		return nil, err
+	}
+	if propertyMap["value"].HasValue() {
+		accessToken.TokenValue = getSecretOrStringValue(propertyMap["value"])
 	}
 
 	input := PulumiServiceAccessTokenInput{

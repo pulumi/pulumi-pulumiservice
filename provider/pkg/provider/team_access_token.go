@@ -154,7 +154,7 @@ func (t *PulumiServiceTeamAccessTokenResource) Read(req *pulumirpc.ReadRequest) 
 		TeamName:    teamName,
 	}
 
-	propertyMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
+	propertyMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{})
 	if err != nil {
 		return nil, err
 	}
