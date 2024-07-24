@@ -2,7 +2,7 @@ using Pulumi;
 using Pulumi.PulumiService;
 using Pulumi.Random;
 
-class MyStack : Stack
+class MyStack : Pulumi.Stack
 {
     public MyStack()
     {

@@ -2,7 +2,7 @@ using Pulumi;
 using Pulumi.PulumiService;
 using System;
 
-class MyStack : Stack
+class MyStack : Pulumi.Stack
 {
     public MyStack()
     {
