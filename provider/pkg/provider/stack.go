@@ -8,7 +8,6 @@ import (
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/pulumiapi"
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/serde"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
@@ -151,29 +150,34 @@ func (s *PulumiServiceStackResource) Update(_ *pulumirpc.UpdateRequest) (*pulumi
 
 func (s *PulumiServiceStackResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
 	ctx := context.Background()
-	var inputs PulumiServiceStack
-	err := serde.FromProperties(req.GetProperties(), structTagKey, &inputs)
+	stack, err := pulumiapi.NewStackIdentifier(req.GetId())
 	if err != nil {
 		return nil, err
 	}
-	exists, err := s.client.StackExists(ctx, inputs.StackIdentifier)
+	exists, err := s.client.StackExists(ctx, stack)
 	if err != nil {
 		return nil, fmt.Errorf("failure while checking if stack %q exists: %w", req.Id, err)
 	}
 	if !exists {
-		return &pulumirpc.ReadResponse{
-			Id:         "",
-			Properties: nil,
-		}, nil
+		return &pulumirpc.ReadResponse{}, nil
 	}
-	props, err := serde.ToProperties(inputs, structTagKey)
+
+	props := PulumiServiceStack{
+		StackIdentifier: stack,
+	}
+
+	outputs, err := plugin.MarshalProperties(
+		props.ToPropertyMap(),
+		plugin.MarshalOptions{},
+	)
 	if err != nil {
-		return nil, fmt.Errorf("failed to marshal inputs to properties: %w", err)
+		return nil, err
 	}
+
 	return &pulumirpc.ReadResponse{
 		Id:         req.Id,
-		Properties: props,
-		Inputs:     props,
+		Properties: outputs,
+		Inputs:     outputs,
 	}, nil
 }
 

@@ -24,6 +24,9 @@ func (c *Client) CreateStack(ctx context.Context, stack StackIdentifier) error {
 }
 
 func (c *Client) StackExists(ctx context.Context, stackName StackIdentifier) (bool, error) {
+	if stackName.OrgName == "" || stackName.ProjectName == "" || stackName.StackName == "" {
+		return false, fmt.Errorf("invalid stack identifier: %v", stackName)
+	}
 	apiPath := path.Join("stacks", stackName.OrgName, stackName.ProjectName, stackName.StackName)
 	var s stack
 	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &s)

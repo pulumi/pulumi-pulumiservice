@@ -701,8 +701,8 @@ func (ds *PulumiServiceDeploymentSettingsResource) Configure(_ PulumiServiceConf
 func (ds *PulumiServiceDeploymentSettingsResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
 	ctx := context.Background()
 
-	var stack pulumiapi.StackIdentifier
-	if err := stack.FromID(req.Id); err != nil {
+	stack, err := pulumiapi.NewStackIdentifier(req.GetId())
+	if err != nil {
 		return nil, err
 	}
 	settings, err := ds.client.GetDeploymentSettings(ctx, stack)
@@ -770,12 +770,12 @@ func (ds *PulumiServiceDeploymentSettingsResource) Read(req *pulumirpc.ReadReque
 
 func (ds *PulumiServiceDeploymentSettingsResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
 	ctx := context.Background()
-	var stack pulumiapi.StackIdentifier
-	if err := stack.FromID(req.Id); err != nil {
+	stack, err := pulumiapi.NewStackIdentifier(req.GetId())
+	if err != nil {
 		return nil, err
 	}
 
-	err := ds.client.DeleteDeploymentSettings(ctx, stack)
+	err = ds.client.DeleteDeploymentSettings(ctx, stack)
 	if err != nil {
 		return nil, err
 	}
