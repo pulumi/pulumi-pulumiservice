@@ -25,6 +25,7 @@
         "index.ts",
         "orgAccessToken.ts",
         "provider.ts",
+        "stack.ts",
         "stackTag.ts",
         "team.ts",
         "teamAccessToken.ts",

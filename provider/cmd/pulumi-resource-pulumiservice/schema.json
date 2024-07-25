@@ -506,6 +506,55 @@
     }
   },
   "resources": {
+    "pulumiservice:index:Stack": {
+      "description": "A stack is a collection of resources that share a common lifecycle. Stacks are uniquely identified by their name and the project they belong to.",
+        "properties": {
+            "organizationName": {
+              "description": "The name of the organization.",
+              "type": "string"
+            },
+            "projectName": {
+              "description": "The name of the project.",
+              "type": "string"
+            },
+            "stackName": {
+              "description": "The name of the stack.",
+              "type": "string"
+            },
+            "forceDestroy": {
+              "description": "Optional. Flag indicating whether to delete the stack even if it still contains resources.",
+              "type": "boolean"
+            }
+        },
+        "required": [
+            "organizationName",
+            "projectName",
+            "stackName"
+        ],
+        "inputProperties": {
+          "organizationName": {
+            "description": "The name of the organization.",
+            "type": "string"
+          },
+          "projectName": {
+            "description": "The name of the project.",
+            "type": "string"
+          },
+          "stackName": {
+            "description": "The name of the stack.",
+            "type": "string"
+          },
+          "forceDestroy": {
+            "description": "Optional. Flag indicating whether to delete the stack even if it still contains resources.",
+            "type": "boolean"
+          }
+        },
+        "requiredInputs": [
+            "organizationName",
+            "projectName",
+            "stackName"
+        ]
+    },
     "pulumiservice:index:AgentPool": {
       "description": "Agent Pool for customer managed deployments",
       "properties": {

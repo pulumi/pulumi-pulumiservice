@@ -14,19 +14,20 @@ type StackIdentifier struct {
 	StackName   string `json:"stackName"`
 }
 
-func (s *StackIdentifier) String() string {
+func (s StackIdentifier) String() string {
 	return fmt.Sprintf("%s/%s/%s", s.OrgName, s.ProjectName, s.StackName)
 }
 
-func (s *StackIdentifier) FromID(id string) error {
+func NewStackIdentifier(id string) (StackIdentifier, error) {
 	splitID := strings.Split(id, "/")
 	if len(splitID) != 3 {
-		return fmt.Errorf("invalid stack id: %s", id)
+		return StackIdentifier{}, fmt.Errorf("invalid stack id: %s", id)
 	}
-	s.OrgName = splitID[0]
-	s.ProjectName = splitID[1]
-	s.StackName = splitID[2]
-	return nil
+	return StackIdentifier{
+		OrgName:     splitID[0],
+		ProjectName: splitID[1],
+		StackName:   splitID[2],
+	}, nil
 }
 
 type StackTag struct {

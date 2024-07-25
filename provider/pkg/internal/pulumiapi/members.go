@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//	http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,6 +18,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"path"
 )
 
@@ -77,14 +78,8 @@ func (c *Client) ListOrgMembers(ctx context.Context, orgName string) (*Members, 
 
 	apiPath := path.Join("orgs", orgName, "members")
 
-	req, err := c.createRequest(ctx, http.MethodGet, apiPath, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
-	}
-	req.URL.RawQuery = "type=backend"
-
 	var members Members
-	_, err = c.sendRequest(req, &members)
+	_, err := c.doWithQuery(ctx, http.MethodGet, apiPath, url.Values{"type": []string{"backend"}}, nil, &members)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list organization members: %w", err)
 	}

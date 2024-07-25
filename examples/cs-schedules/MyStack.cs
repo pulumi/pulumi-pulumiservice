@@ -3,7 +3,7 @@ using Pulumi.PulumiService;
 using Pulumi.PulumiService.Inputs;
 using Pulumi.Random;
 
-class MyStack : Stack
+class MyStack : Pulumi.Stack
 {
     public MyStack()
     {
@@ -37,7 +37,7 @@ class MyStack : Stack
                 Stack = stackName,
                 ScheduleCron = "0 0 * * 0",
                 AutoRemediate = false
-            }, 
+            },
             new CustomResourceOptions
             {
               DependsOn = { settings }
@@ -53,13 +53,13 @@ class MyStack : Stack
                 Stack = stackName,
                 Timestamp = "2026-01-01T00:00:00Z",
                 DeleteAfterDestroy = false
-            }, 
+            },
             new CustomResourceOptions
             {
               DependsOn = { settings }
             }
         );
-        
+
         // Schedule that runs `pulumi up` every Sunday midnight
         var deploymentUp = new DeploymentSchedule(
             "deployment-schedule-up",
@@ -69,7 +69,7 @@ class MyStack : Stack
                 Stack = stackName,
                 ScheduleCron = "0 0 * * 0",
                 PulumiOperation = PulumiOperation.Update
-            }, 
+            },
             new CustomResourceOptions
             {
               DependsOn = { settings }
@@ -85,7 +85,7 @@ class MyStack : Stack
                 Stack = stackName,
                 Timestamp = "2026-01-01T00:00:00Z",
                 PulumiOperation = PulumiOperation.Preview
-            }, 
+            },
             new CustomResourceOptions
             {
               DependsOn = { settings }
