@@ -1,13 +1,15 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as service from "@pulumi/pulumiservice";
+import * as uuid from "uuid";
 
 const config = new pulumi.Config();
+
+const id = uuid.v4();
 
 const stack = new service.Stack("my_stack", {
     organizationName: "service-provider-test-org",
     projectName: "my-new-project",
-    stackName: "my-new-stack",
-
+    stackName: id,
 })
 
 const settings = new service.DeploymentSettings("deployment_settings", {
