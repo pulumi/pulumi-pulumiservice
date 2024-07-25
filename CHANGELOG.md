@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+## 0.23.0
+
+### Improvements
+
+- Add a Stack Resource [#357](https://github.com/pulumi/pulumi-pulumiservice/pull/357)
+
 ## 0.22.3
 
 ### Bug Fixes
