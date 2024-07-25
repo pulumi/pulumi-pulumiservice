@@ -3,6 +3,7 @@ package pulumiapi
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -32,7 +33,7 @@ func TestCreateStack(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqPath:   fmt.Sprintf("/api/stacks/%s/%s", s.OrgName, s.ProjectName),
-			ResponseCode:      401,
+			ResponseCode:      http.StatusUnauthorized,
 			ResponseBody: errorResponse{
 				Message: "unauthorized",
 			},
@@ -52,18 +53,29 @@ func TestDeleteStack(t *testing.T) {
 	t.Run("Happy Path", func(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
-			ExpectedReqPath:   "/api/stacks/organization/project/stack",
-			ResponseCode:      204,
+			ExpectedReqPath:   fmt.Sprintf("/api/stacks/%s/%s/%s", s.OrgName, s.ProjectName, s.StackName),
+			ResponseCode:      http.StatusNoContent,
 		})
 		defer cleanup()
 		assert.NoError(t, c.DeleteStack(ctx, s, false))
+	})
+
+	t.Run("Force destroy", func(t *testing.T) {
+		c, cleanup := startTestServer(t, testServerConfig{
+			ExpectedReqMethod:   http.MethodDelete,
+			ExpectedReqPath:     fmt.Sprintf("/api/stacks/%s/%s/%s", s.OrgName, s.ProjectName, s.StackName),
+			ExpectedQueryParams: url.Values{"forceDestroy": {"true"}},
+			ResponseCode:        http.StatusNoContent,
+		})
+		defer cleanup()
+		assert.NoError(t, c.DeleteStack(ctx, s, true))
 	})
 
 	t.Run("Error", func(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
 			ExpectedReqPath:   "/api/stacks/organization/project/stack",
-			ResponseCode:      401,
+			ResponseCode:      http.StatusUnauthorized,
 			ResponseBody: errorResponse{
 				Message: "unauthorized",
 			},

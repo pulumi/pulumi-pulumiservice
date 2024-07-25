@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 	"time"
 
@@ -12,11 +13,12 @@ import (
 )
 
 type testServerConfig struct {
-	ExpectedReqMethod string
-	ExpectedReqBody   interface{}
-	ExpectedReqPath   string
-	ResponseBody      interface{}
-	ResponseCode      int
+	ExpectedReqMethod   string
+	ExpectedReqBody     interface{}
+	ExpectedReqPath     string
+	ExpectedQueryParams url.Values
+	ResponseBody        interface{}
+	ResponseCode        int
 }
 
 func startTestServer(t *testing.T, config testServerConfig) (client *Client, cleanup func()) {
@@ -29,6 +31,9 @@ func startTestServer(t *testing.T, config testServerConfig) (client *Client, cle
 		// ensure that proper http verb was used as well as the path
 		assert.Equal(t, config.ExpectedReqMethod, r.Method)
 		assert.Equal(t, config.ExpectedReqPath, r.URL.Path)
+		if config.ExpectedQueryParams != nil {
+			assert.Equal(t, config.ExpectedQueryParams, r.URL.Query())
+		}
 
 		// these should always be set, so always test for them
 		assert.Equal(t, "token "+token, r.Header.Get("Authorization"))
