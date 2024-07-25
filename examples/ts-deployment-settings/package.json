@@ -2,10 +2,12 @@
     "name": "ts-deployment-settings",
     "main": "index.ts",
     "devDependencies": {
-        "@types/node": "^16"
+        "@types/node": "^16",
+        "@types/uuid": "^10.0.0"
     },
     "dependencies": {
         "@pulumi/pulumi": "^3.0.0",
-        "@pulumi/pulumiservice": "^0.4.0"
+        "@pulumi/pulumiservice": "^0.22.0",
+        "uuid": "^10.0.0"
     }
 }
