@@ -131,7 +131,7 @@ func (wh *PulumiServiceWebhookResource) Configure(config PulumiServiceConfig) {
 }
 
 func (wh *PulumiServiceWebhookResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
 	if err != nil {
 		return nil, err
 	}
@@ -170,7 +170,7 @@ func (wh *PulumiServiceWebhookResource) Check(req *pulumirpc.CheckRequest) (*pul
 
 	inputNews, err := plugin.MarshalProperties(
 		news,
-		plugin.MarshalOptions{},
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true},
 	)
 	if err != nil {
 		return nil, err
@@ -397,7 +397,7 @@ func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulum
 
 	outputs, err := plugin.MarshalProperties(
 		properties.ToPropertyMap(),
-		plugin.MarshalOptions{},
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true},
 	)
 	if err != nil {
 		return nil, err
@@ -405,7 +405,7 @@ func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulum
 
 	inputs, err := plugin.MarshalProperties(
 		properties.PulumiServiceWebhookInput.ToPropertyMap(),
-		plugin.MarshalOptions{},
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true},
 	)
 	if err != nil {
 		return nil, err
