@@ -1118,11 +1118,11 @@
           "type": "string"
         },
         "scheduleCron": {
-          "description": "Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.",
+          "description": "Cron expression for recurring scheduled runs. If you are supplying this, do not supply timestamp.",
           "type": "string"
         },
         "timestamp": {
-          "description": "The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.",
+          "description": "The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are supplying this, do not supply scheduleCron.",
           "type": "string"
         },
         "pulumiOperation": {
@@ -1155,11 +1155,11 @@
           "type": "string"
         },
         "scheduleCron": {
-          "description": "Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.",
+          "description": "Cron expression for recurring scheduled runs. If you are supplying this, do not supply timestamp.",
           "type": "string"
         },
         "timestamp": {
-          "description": "The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.",
+          "description": "The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are supplying this, do not supply scheduleCron.",
           "type": "string"
         },
         "pulumiOperation": {
@@ -1241,7 +1241,7 @@
       ]
     },
     "pulumiservice:index:TtlSchedule": {
-      "description": "A scheduled stack destory run.",
+      "description": "A scheduled stack destroy run.",
       "properties": {
         "organization": {
           "description": "Organization name.",

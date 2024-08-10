@@ -15,7 +15,7 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 
 /**
- * A scheduled stack destory run.
+ * A scheduled stack destroy run.
  * 
  */
 @ResourceType(type="pulumiservice:index:TtlSchedule")

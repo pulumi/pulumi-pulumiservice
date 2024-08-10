@@ -63,14 +63,14 @@ public class DeploymentSchedule extends com.pulumi.resources.CustomResource {
         return this.pulumiOperation;
     }
     /**
-     * Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.
+     * Cron expression for recurring scheduled runs. If you are supplying this, do not supply timestamp.
      * 
      */
     @Export(name="scheduleCron", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> scheduleCron;
 
     /**
-     * @return Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.
+     * @return Cron expression for recurring scheduled runs. If you are supplying this, do not supply timestamp.
      * 
      */
     public Output<Optional<String>> scheduleCron() {
@@ -105,14 +105,14 @@ public class DeploymentSchedule extends com.pulumi.resources.CustomResource {
         return this.stack;
     }
     /**
-     * The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+     * The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are supplying this, do not supply scheduleCron.
      * 
      */
     @Export(name="timestamp", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> timestamp;
 
     /**
-     * @return The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+     * @return The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are supplying this, do not supply scheduleCron.
      * 
      */
     public Output<Optional<String>> timestamp() {

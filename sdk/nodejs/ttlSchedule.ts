@@ -5,7 +5,7 @@ import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "./utilities";
 
 /**
- * A scheduled stack destory run.
+ * A scheduled stack destroy run.
  */
 export class TtlSchedule extends pulumi.CustomResource {
     /**

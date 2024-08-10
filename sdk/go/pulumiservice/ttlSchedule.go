@@ -12,7 +12,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-// A scheduled stack destory run.
+// A scheduled stack destroy run.
 type TtlSchedule struct {
 	pulumi.CustomResourceState
 

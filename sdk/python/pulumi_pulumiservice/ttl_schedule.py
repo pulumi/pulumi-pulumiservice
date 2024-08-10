@@ -109,7 +109,7 @@ class TtlSchedule(pulumi.CustomResource):
                  timestamp: Optional[pulumi.Input[str]] = None,
                  __props__=None):
         """
-        A scheduled stack destory run.
+        A scheduled stack destroy run.
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
@@ -126,7 +126,7 @@ class TtlSchedule(pulumi.CustomResource):
                  args: TtlScheduleArgs,
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
-        A scheduled stack destory run.
+        A scheduled stack destroy run.
 
         :param str resource_name: The name of the resource.
         :param TtlScheduleArgs args: The arguments to use to populate this resource's properties.
