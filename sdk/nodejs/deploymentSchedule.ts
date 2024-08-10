@@ -50,7 +50,7 @@ export class DeploymentSchedule extends pulumi.CustomResource {
      */
     public readonly pulumiOperation!: pulumi.Output<enums.PulumiOperation>;
     /**
-     * Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.
+     * Cron expression for recurring scheduled runs. If you are supplying this, do not supply timestamp.
      */
     public readonly scheduleCron!: pulumi.Output<string | undefined>;
     /**
@@ -62,7 +62,7 @@ export class DeploymentSchedule extends pulumi.CustomResource {
      */
     public readonly stack!: pulumi.Output<string>;
     /**
-     * The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+     * The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are supplying this, do not supply scheduleCron.
      */
     public readonly timestamp!: pulumi.Output<string | undefined>;
 
@@ -127,7 +127,7 @@ export interface DeploymentScheduleArgs {
      */
     pulumiOperation: pulumi.Input<enums.PulumiOperation>;
     /**
-     * Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.
+     * Cron expression for recurring scheduled runs. If you are supplying this, do not supply timestamp.
      */
     scheduleCron?: pulumi.Input<string>;
     /**
@@ -135,7 +135,7 @@ export interface DeploymentScheduleArgs {
      */
     stack: pulumi.Input<string>;
     /**
-     * The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+     * The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are supplying this, do not supply scheduleCron.
      */
     timestamp?: pulumi.Input<string>;
 }

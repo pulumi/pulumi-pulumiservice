@@ -10,7 +10,7 @@ using Pulumi.Serialization;
 namespace Pulumi.PulumiService
 {
     /// <summary>
-    /// A scheduled stack destory run.
+    /// A scheduled stack destroy run.
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:index:TtlSchedule")]
     public partial class TtlSchedule : global::Pulumi.CustomResource

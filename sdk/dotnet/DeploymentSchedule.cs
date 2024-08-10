@@ -34,7 +34,7 @@ namespace Pulumi.PulumiService
         public Output<Pulumi.PulumiService.PulumiOperation> PulumiOperation { get; private set; } = null!;
 
         /// <summary>
-        /// Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.
+        /// Cron expression for recurring scheduled runs. If you are supplying this, do not supply timestamp.
         /// </summary>
         [Output("scheduleCron")]
         public Output<string?> ScheduleCron { get; private set; } = null!;
@@ -52,7 +52,7 @@ namespace Pulumi.PulumiService
         public Output<string> Stack { get; private set; } = null!;
 
         /// <summary>
-        /// The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+        /// The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are supplying this, do not supply scheduleCron.
         /// </summary>
         [Output("timestamp")]
         public Output<string?> Timestamp { get; private set; } = null!;
@@ -121,7 +121,7 @@ namespace Pulumi.PulumiService
         public Input<Pulumi.PulumiService.PulumiOperation> PulumiOperation { get; set; } = null!;
 
         /// <summary>
-        /// Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.
+        /// Cron expression for recurring scheduled runs. If you are supplying this, do not supply timestamp.
         /// </summary>
         [Input("scheduleCron")]
         public Input<string>? ScheduleCron { get; set; }
@@ -133,7 +133,7 @@ namespace Pulumi.PulumiService
         public Input<string> Stack { get; set; } = null!;
 
         /// <summary>
-        /// The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+        /// The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are supplying this, do not supply scheduleCron.
         /// </summary>
         [Input("timestamp")]
         public Input<string>? Timestamp { get; set; }

@@ -63,14 +63,14 @@ public final class DeploymentScheduleArgs extends com.pulumi.resources.ResourceA
     }
 
     /**
-     * Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.
+     * Cron expression for recurring scheduled runs. If you are supplying this, do not supply timestamp.
      * 
      */
     @Import(name="scheduleCron")
     private @Nullable Output<String> scheduleCron;
 
     /**
-     * @return Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.
+     * @return Cron expression for recurring scheduled runs. If you are supplying this, do not supply timestamp.
      * 
      */
     public Optional<Output<String>> scheduleCron() {
@@ -93,14 +93,14 @@ public final class DeploymentScheduleArgs extends com.pulumi.resources.ResourceA
     }
 
     /**
-     * The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+     * The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are supplying this, do not supply scheduleCron.
      * 
      */
     @Import(name="timestamp")
     private @Nullable Output<String> timestamp;
 
     /**
-     * @return The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+     * @return The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are supplying this, do not supply scheduleCron.
      * 
      */
     public Optional<Output<String>> timestamp() {
@@ -200,7 +200,7 @@ public final class DeploymentScheduleArgs extends com.pulumi.resources.ResourceA
         }
 
         /**
-         * @param scheduleCron Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.
+         * @param scheduleCron Cron expression for recurring scheduled runs. If you are supplying this, do not supply timestamp.
          * 
          * @return builder
          * 
@@ -211,7 +211,7 @@ public final class DeploymentScheduleArgs extends com.pulumi.resources.ResourceA
         }
 
         /**
-         * @param scheduleCron Cron expression for recurring scheduled runs. If you are suppling this, do not supply timestamp.
+         * @param scheduleCron Cron expression for recurring scheduled runs. If you are supplying this, do not supply timestamp.
          * 
          * @return builder
          * 
@@ -242,7 +242,7 @@ public final class DeploymentScheduleArgs extends com.pulumi.resources.ResourceA
         }
 
         /**
-         * @param timestamp The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+         * @param timestamp The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are supplying this, do not supply scheduleCron.
          * 
          * @return builder
          * 
@@ -253,7 +253,7 @@ public final class DeploymentScheduleArgs extends com.pulumi.resources.ResourceA
         }
 
         /**
-         * @param timestamp The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are suppling this, do not supply scheduleCron.
+         * @param timestamp The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are supplying this, do not supply scheduleCron.
          * 
          * @return builder
          * 
