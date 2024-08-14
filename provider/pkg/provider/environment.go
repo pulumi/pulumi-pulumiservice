@@ -152,25 +152,25 @@ func (st *PulumiServiceEnvironmentResource) Create(req *pulumirpc.CreateRequest)
 
 	// First check if yaml is valid
 	_, diagnostics, err := st.client.CheckYAMLEnvironment(context.Background(), input.OrgName, input.Yaml)
-	if err != nil {
-		return nil, err
-	}
 	if diagnostics != nil {
-		return nil, fmt.Errorf("failed to create environment, yaml code failed following checks: %+v", diagnostics)
+		return nil, fmt.Errorf("failed to check environment, yaml code failed following checks: %+v", diagnostics)
+	}
+	if err != nil {
+		return nil, fmt.Errorf("failed to check environment due to error: %+v", err)
 	}
 
 	// Then create environment, and update it with yaml provided. ESC API architecture doesn't let you do it in one call
 	err = st.client.CreateEnvironment(context.Background(), input.OrgName, input.EnvName)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create new environment due to error: %+v", err)
 	}
 	diagnostics, revision, err := st.client.UpdateEnvironmentWithRevision(context.Background(), input.OrgName, input.EnvName, input.Yaml, "")
-	if err != nil {
-		return nil, err
-	}
 	if diagnostics != nil {
 		return nil, fmt.Errorf("failed to update brand new environment with pre-checked yaml, due to failing the following checks: %+v \n"+
 			"This should never happen, if you're seeing this message there's likely a bug in ESC APIs", diagnostics)
+	}
+	if err != nil {
+		return nil, fmt.Errorf("failed to push yaml into environment due to error: %+v", err)
 	}
 
 	output := PulumiServiceEnvironmentOutput{
@@ -211,6 +211,11 @@ func (st *PulumiServiceEnvironmentResource) Check(req *pulumirpc.CheckRequest) (
 				Reason:   fmt.Sprintf("missing required property '%s'", p),
 				Property: string(p),
 			})
+		} else if p != "yaml" && strings.Contains(inputMap[(p)].StringValue(), "/") {
+			failures = append(failures, &pulumirpc.CheckFailure{
+				Reason:   fmt.Sprintf("'%s' property contains `/` illegal character", p),
+				Property: string(p),
+			})
 		}
 	}
 
@@ -224,11 +229,11 @@ func (st *PulumiServiceEnvironmentResource) Update(req *pulumirpc.UpdateRequest)
 	}
 
 	diagnostics, revision, err := st.client.UpdateEnvironmentWithRevision(context.Background(), input.OrgName, input.EnvName, input.Yaml, "")
-	if err != nil {
-		return nil, err
-	}
 	if diagnostics != nil {
 		return nil, fmt.Errorf("failed to update environment, yaml code failed following checks: %+v", diagnostics)
+	}
+	if err != nil {
+		return nil, fmt.Errorf("failed to update environment due to error: %+v", err)
 	}
 
 	output := PulumiServiceEnvironmentOutput{
