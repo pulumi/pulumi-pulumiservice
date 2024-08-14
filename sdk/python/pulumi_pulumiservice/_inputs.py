@@ -24,6 +24,7 @@ __all__ = [
     'GCPOIDCConfigurationArgs',
     'OperationContextOIDCArgs',
     'OperationContextOptionsArgs',
+    'TemplateSourceDestinationArgs',
 ]
 
 @pulumi.input_type
@@ -788,5 +789,28 @@ class OperationContextOptionsArgs:
     @skip_intermediate_deployments.setter
     def skip_intermediate_deployments(self, value: Optional[pulumi.Input[bool]]):
         pulumi.set(self, "skip_intermediate_deployments", value)
+
+
+@pulumi.input_type
+class TemplateSourceDestinationArgs:
+    def __init__(__self__, *,
+                 url: Optional[pulumi.Input[str]] = None):
+        """
+        :param pulumi.Input[str] url: Destination URL that gets filled in on new project creation.
+        """
+        if url is not None:
+            pulumi.set(__self__, "url", url)
+
+    @property
+    @pulumi.getter
+    def url(self) -> Optional[pulumi.Input[str]]:
+        """
+        Destination URL that gets filled in on new project creation.
+        """
+        return pulumi.get(self, "url")
+
+    @url.setter
+    def url(self, value: Optional[pulumi.Input[str]]):
+        pulumi.set(self, "url", value)
 
 

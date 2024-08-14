@@ -2322,6 +2322,143 @@ func (o OperationContextOptionsPtrOutput) SkipIntermediateDeployments() pulumi.B
 	}).(pulumi.BoolPtrOutput)
 }
 
+type TemplateSourceDestination struct {
+	// Destination URL that gets filled in on new project creation.
+	Url *string `pulumi:"url"`
+}
+
+// TemplateSourceDestinationInput is an input type that accepts TemplateSourceDestinationArgs and TemplateSourceDestinationOutput values.
+// You can construct a concrete instance of `TemplateSourceDestinationInput` via:
+//
+//	TemplateSourceDestinationArgs{...}
+type TemplateSourceDestinationInput interface {
+	pulumi.Input
+
+	ToTemplateSourceDestinationOutput() TemplateSourceDestinationOutput
+	ToTemplateSourceDestinationOutputWithContext(context.Context) TemplateSourceDestinationOutput
+}
+
+type TemplateSourceDestinationArgs struct {
+	// Destination URL that gets filled in on new project creation.
+	Url pulumi.StringPtrInput `pulumi:"url"`
+}
+
+func (TemplateSourceDestinationArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*TemplateSourceDestination)(nil)).Elem()
+}
+
+func (i TemplateSourceDestinationArgs) ToTemplateSourceDestinationOutput() TemplateSourceDestinationOutput {
+	return i.ToTemplateSourceDestinationOutputWithContext(context.Background())
+}
+
+func (i TemplateSourceDestinationArgs) ToTemplateSourceDestinationOutputWithContext(ctx context.Context) TemplateSourceDestinationOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(TemplateSourceDestinationOutput)
+}
+
+func (i TemplateSourceDestinationArgs) ToTemplateSourceDestinationPtrOutput() TemplateSourceDestinationPtrOutput {
+	return i.ToTemplateSourceDestinationPtrOutputWithContext(context.Background())
+}
+
+func (i TemplateSourceDestinationArgs) ToTemplateSourceDestinationPtrOutputWithContext(ctx context.Context) TemplateSourceDestinationPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(TemplateSourceDestinationOutput).ToTemplateSourceDestinationPtrOutputWithContext(ctx)
+}
+
+// TemplateSourceDestinationPtrInput is an input type that accepts TemplateSourceDestinationArgs, TemplateSourceDestinationPtr and TemplateSourceDestinationPtrOutput values.
+// You can construct a concrete instance of `TemplateSourceDestinationPtrInput` via:
+//
+//	        TemplateSourceDestinationArgs{...}
+//
+//	or:
+//
+//	        nil
+type TemplateSourceDestinationPtrInput interface {
+	pulumi.Input
+
+	ToTemplateSourceDestinationPtrOutput() TemplateSourceDestinationPtrOutput
+	ToTemplateSourceDestinationPtrOutputWithContext(context.Context) TemplateSourceDestinationPtrOutput
+}
+
+type templateSourceDestinationPtrType TemplateSourceDestinationArgs
+
+func TemplateSourceDestinationPtr(v *TemplateSourceDestinationArgs) TemplateSourceDestinationPtrInput {
+	return (*templateSourceDestinationPtrType)(v)
+}
+
+func (*templateSourceDestinationPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**TemplateSourceDestination)(nil)).Elem()
+}
+
+func (i *templateSourceDestinationPtrType) ToTemplateSourceDestinationPtrOutput() TemplateSourceDestinationPtrOutput {
+	return i.ToTemplateSourceDestinationPtrOutputWithContext(context.Background())
+}
+
+func (i *templateSourceDestinationPtrType) ToTemplateSourceDestinationPtrOutputWithContext(ctx context.Context) TemplateSourceDestinationPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(TemplateSourceDestinationPtrOutput)
+}
+
+type TemplateSourceDestinationOutput struct{ *pulumi.OutputState }
+
+func (TemplateSourceDestinationOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*TemplateSourceDestination)(nil)).Elem()
+}
+
+func (o TemplateSourceDestinationOutput) ToTemplateSourceDestinationOutput() TemplateSourceDestinationOutput {
+	return o
+}
+
+func (o TemplateSourceDestinationOutput) ToTemplateSourceDestinationOutputWithContext(ctx context.Context) TemplateSourceDestinationOutput {
+	return o
+}
+
+func (o TemplateSourceDestinationOutput) ToTemplateSourceDestinationPtrOutput() TemplateSourceDestinationPtrOutput {
+	return o.ToTemplateSourceDestinationPtrOutputWithContext(context.Background())
+}
+
+func (o TemplateSourceDestinationOutput) ToTemplateSourceDestinationPtrOutputWithContext(ctx context.Context) TemplateSourceDestinationPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v TemplateSourceDestination) *TemplateSourceDestination {
+		return &v
+	}).(TemplateSourceDestinationPtrOutput)
+}
+
+// Destination URL that gets filled in on new project creation.
+func (o TemplateSourceDestinationOutput) Url() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v TemplateSourceDestination) *string { return v.Url }).(pulumi.StringPtrOutput)
+}
+
+type TemplateSourceDestinationPtrOutput struct{ *pulumi.OutputState }
+
+func (TemplateSourceDestinationPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**TemplateSourceDestination)(nil)).Elem()
+}
+
+func (o TemplateSourceDestinationPtrOutput) ToTemplateSourceDestinationPtrOutput() TemplateSourceDestinationPtrOutput {
+	return o
+}
+
+func (o TemplateSourceDestinationPtrOutput) ToTemplateSourceDestinationPtrOutputWithContext(ctx context.Context) TemplateSourceDestinationPtrOutput {
+	return o
+}
+
+func (o TemplateSourceDestinationPtrOutput) Elem() TemplateSourceDestinationOutput {
+	return o.ApplyT(func(v *TemplateSourceDestination) TemplateSourceDestination {
+		if v != nil {
+			return *v
+		}
+		var ret TemplateSourceDestination
+		return ret
+	}).(TemplateSourceDestinationOutput)
+}
+
+// Destination URL that gets filled in on new project creation.
+func (o TemplateSourceDestinationPtrOutput) Url() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *TemplateSourceDestination) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Url
+	}).(pulumi.StringPtrOutput)
+}
+
 func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*AWSOIDCConfigurationInput)(nil)).Elem(), AWSOIDCConfigurationArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*AWSOIDCConfigurationPtrInput)(nil)).Elem(), AWSOIDCConfigurationArgs{})
@@ -2348,6 +2485,8 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*OperationContextOIDCPtrInput)(nil)).Elem(), OperationContextOIDCArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*OperationContextOptionsInput)(nil)).Elem(), OperationContextOptionsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*OperationContextOptionsPtrInput)(nil)).Elem(), OperationContextOptionsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*TemplateSourceDestinationInput)(nil)).Elem(), TemplateSourceDestinationArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*TemplateSourceDestinationPtrInput)(nil)).Elem(), TemplateSourceDestinationArgs{})
 	pulumi.RegisterOutputType(AWSOIDCConfigurationOutput{})
 	pulumi.RegisterOutputType(AWSOIDCConfigurationPtrOutput{})
 	pulumi.RegisterOutputType(AzureOIDCConfigurationOutput{})
@@ -2373,4 +2512,6 @@ func init() {
 	pulumi.RegisterOutputType(OperationContextOIDCPtrOutput{})
 	pulumi.RegisterOutputType(OperationContextOptionsOutput{})
 	pulumi.RegisterOutputType(OperationContextOptionsPtrOutput{})
+	pulumi.RegisterOutputType(TemplateSourceDestinationOutput{})
+	pulumi.RegisterOutputType(TemplateSourceDestinationPtrOutput{})
 }

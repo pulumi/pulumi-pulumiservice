@@ -503,6 +503,15 @@
           "value": "admin"
         }
       ]
+    }, 
+    "pulumiservice:index:TemplateSourceDestination": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string",
+          "description": "Destination URL that gets filled in on new project creation."
+        }
+      }
     }
   },
   "resources": {
@@ -1434,6 +1443,55 @@
         "environment",
         "tagName",
         "revision"
+      ]
+    },
+    "pulumiservice:index:TemplateSource": {
+      "description": "A source for Pulumi templates",
+      "properties": {
+        "organizationName": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "sourceName": {
+          "description": "Source name.",
+          "type": "string"
+        },
+        "sourceURL": {
+          "description": "Github URL of the repository from which to grab templates.",
+          "type": "string"
+        },
+        "destination": {
+          "description": "Settings that get filled in on new project creation.",
+          "$ref": "#/types/pulumiservice:index:TemplateSourceDestination"
+        }
+      },
+      "required": [
+        "organizationName",
+        "sourceName",
+        "sourceURL"
+      ],
+      "inputProperties": {
+        "organizationName": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "sourceName": {
+          "description": "Source name.",
+          "type": "string"
+        },
+        "sourceURL": {
+          "description": "Github URL of the repository from which to grab templates.",
+          "type": "string"
+        },
+        "destination": {
+          "description": "Settings that get filled in on new project creation.",
+          "$ref": "#/types/pulumiservice:index:TemplateSourceDestination"
+        }
+      },
+      "requiredInputs": [
+        "organizationName",
+        "sourceName",
+        "sourceURL"
       ]
     }
   },

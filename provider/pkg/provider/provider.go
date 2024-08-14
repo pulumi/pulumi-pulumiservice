@@ -178,6 +178,9 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 		&PulumiServiceStackResource{
 			client: client,
 		},
+		&PulumiServiceTemplateSourceResource{
+			client: client,
+		},
 	}
 
 	for _, sr := range k.pulumiResources {

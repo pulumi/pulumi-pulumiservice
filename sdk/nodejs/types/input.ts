@@ -249,3 +249,10 @@ export interface OperationContextOptionsArgs {
      */
     skipIntermediateDeployments?: pulumi.Input<boolean>;
 }
+
+export interface TemplateSourceDestinationArgs {
+    /**
+     * Destination URL that gets filled in on new project creation.
+     */
+    url?: pulumi.Input<string>;
+}

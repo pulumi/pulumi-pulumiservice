@@ -108,3 +108,13 @@ func TestNodejsEnvironmentsExample(t *testing.T) {
 		},
 	})
 }
+
+func TestNodejsTemplateSourcesExample(t *testing.T) {
+	cwd := getCwd(t)
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Dir: path.Join(cwd, ".", "ts-template-source"),
+		Dependencies: []string{
+			"@pulumi/pulumiservice",
+		},
+	})
+}

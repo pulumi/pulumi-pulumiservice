@@ -250,3 +250,10 @@ export interface OperationContextOptions {
     skipIntermediateDeployments?: boolean;
 }
 
+export interface TemplateSourceDestination {
+    /**
+     * Destination URL that gets filled in on new project creation.
+     */
+    url?: string;
+}
+
