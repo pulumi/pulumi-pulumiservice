@@ -650,7 +650,7 @@ func (ds *PulumiServiceDeploymentSettingsResource) Diff(req *pulumirpc.DiffReque
 }
 
 func (ds *PulumiServiceDeploymentSettingsResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
 	if err != nil {
 		return nil, err
 	}
@@ -688,7 +688,7 @@ func (ds *PulumiServiceDeploymentSettingsResource) Check(req *pulumirpc.CheckReq
 		}
 	}
 
-	checkedNews, err := plugin.MarshalProperties(news, plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	checkedNews, err := plugin.MarshalProperties(news, plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
 	if err != nil {
 		return nil, err
 	}
