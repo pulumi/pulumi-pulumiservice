@@ -18,14 +18,14 @@ public final class TemplateSourceArgs extends com.pulumi.resources.ResourceArgs 
     public static final TemplateSourceArgs Empty = new TemplateSourceArgs();
 
     /**
-     * Settings that get filled in on new project creation.
+     * The default destination for projects using templates from this source.
      * 
      */
     @Import(name="destination")
     private @Nullable Output<TemplateSourceDestinationArgs> destination;
 
     /**
-     * @return Settings that get filled in on new project creation.
+     * @return The default destination for projects using templates from this source.
      * 
      */
     public Optional<Output<TemplateSourceDestinationArgs>> destination() {
@@ -105,7 +105,7 @@ public final class TemplateSourceArgs extends com.pulumi.resources.ResourceArgs 
         }
 
         /**
-         * @param destination Settings that get filled in on new project creation.
+         * @param destination The default destination for projects using templates from this source.
          * 
          * @return builder
          * 
@@ -116,7 +116,7 @@ public final class TemplateSourceArgs extends com.pulumi.resources.ResourceArgs 
         }
 
         /**
-         * @param destination Settings that get filled in on new project creation.
+         * @param destination The default destination for projects using templates from this source.
          * 
          * @return builder
          * 

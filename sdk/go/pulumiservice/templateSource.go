@@ -16,7 +16,7 @@ import (
 type TemplateSource struct {
 	pulumi.CustomResourceState
 
-	// Settings that get filled in on new project creation.
+	// The default destination for projects using templates from this source.
 	Destination TemplateSourceDestinationPtrOutput `pulumi:"destination"`
 	// Organization name.
 	OrganizationName pulumi.StringOutput `pulumi:"organizationName"`
@@ -75,7 +75,7 @@ func (TemplateSourceState) ElementType() reflect.Type {
 }
 
 type templateSourceArgs struct {
-	// Settings that get filled in on new project creation.
+	// The default destination for projects using templates from this source.
 	Destination *TemplateSourceDestination `pulumi:"destination"`
 	// Organization name.
 	OrganizationName string `pulumi:"organizationName"`
@@ -87,7 +87,7 @@ type templateSourceArgs struct {
 
 // The set of arguments for constructing a TemplateSource resource.
 type TemplateSourceArgs struct {
-	// Settings that get filled in on new project creation.
+	// The default destination for projects using templates from this source.
 	Destination TemplateSourceDestinationPtrInput
 	// Organization name.
 	OrganizationName pulumi.StringInput
@@ -184,7 +184,7 @@ func (o TemplateSourceOutput) ToTemplateSourceOutputWithContext(ctx context.Cont
 	return o
 }
 
-// Settings that get filled in on new project creation.
+// The default destination for projects using templates from this source.
 func (o TemplateSourceOutput) Destination() TemplateSourceDestinationPtrOutput {
 	return o.ApplyT(func(v *TemplateSource) TemplateSourceDestinationPtrOutput { return v.Destination }).(TemplateSourceDestinationPtrOutput)
 }

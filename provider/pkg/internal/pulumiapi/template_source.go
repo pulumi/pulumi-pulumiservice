@@ -52,6 +52,7 @@ func (c *Client) UpdateTemplateSource(ctx context.Context, organizationName stri
 func (c *Client) GetTemplateSource(ctx context.Context, organizationName string, templateID string) (*TemplateSourceResponse, error) {
 	// This sucks, but there's not Get API for Template Sources
 	// Thus, using a List and then finding by ID
+	// TODO issue to improve this - https://github.com/pulumi/pulumi-service/issues/21637
 
 	apiPath := path.Join("orgs", organizationName, "templates/sources")
 	var templateSources ListResponse

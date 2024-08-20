@@ -38,7 +38,7 @@ export class TemplateSource extends pulumi.CustomResource {
     }
 
     /**
-     * Settings that get filled in on new project creation.
+     * The default destination for projects using templates from this source.
      */
     public readonly destination!: pulumi.Output<outputs.TemplateSourceDestination | undefined>;
     /**
@@ -94,7 +94,7 @@ export class TemplateSource extends pulumi.CustomResource {
  */
 export interface TemplateSourceArgs {
     /**
-     * Settings that get filled in on new project creation.
+     * The default destination for projects using templates from this source.
      */
     destination?: pulumi.Input<inputs.TemplateSourceDestinationArgs>;
     /**

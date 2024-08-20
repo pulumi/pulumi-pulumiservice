@@ -1461,7 +1461,7 @@
           "type": "string"
         },
         "destination": {
-          "description": "Settings that get filled in on new project creation.",
+          "description": "The default destination for projects using templates from this source.",
           "$ref": "#/types/pulumiservice:index:TemplateSourceDestination"
         }
       },
@@ -1484,7 +1484,7 @@
           "type": "string"
         },
         "destination": {
-          "description": "Settings that get filled in on new project creation.",
+          "description": "The default destination for projects using templates from this source.",
           "$ref": "#/types/pulumiservice:index:TemplateSourceDestination"
         }
       },

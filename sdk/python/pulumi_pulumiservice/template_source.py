@@ -25,7 +25,7 @@ class TemplateSourceArgs:
         :param pulumi.Input[str] organization_name: Organization name.
         :param pulumi.Input[str] source_name: Source name.
         :param pulumi.Input[str] source_url: Github URL of the repository from which to grab templates.
-        :param pulumi.Input['TemplateSourceDestinationArgs'] destination: Settings that get filled in on new project creation.
+        :param pulumi.Input['TemplateSourceDestinationArgs'] destination: The default destination for projects using templates from this source.
         """
         pulumi.set(__self__, "organization_name", organization_name)
         pulumi.set(__self__, "source_name", source_name)
@@ -73,7 +73,7 @@ class TemplateSourceArgs:
     @pulumi.getter
     def destination(self) -> Optional[pulumi.Input['TemplateSourceDestinationArgs']]:
         """
-        Settings that get filled in on new project creation.
+        The default destination for projects using templates from this source.
         """
         return pulumi.get(self, "destination")
 
@@ -97,7 +97,7 @@ class TemplateSource(pulumi.CustomResource):
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
-        :param pulumi.Input[pulumi.InputType['TemplateSourceDestinationArgs']] destination: Settings that get filled in on new project creation.
+        :param pulumi.Input[pulumi.InputType['TemplateSourceDestinationArgs']] destination: The default destination for projects using templates from this source.
         :param pulumi.Input[str] organization_name: Organization name.
         :param pulumi.Input[str] source_name: Source name.
         :param pulumi.Input[str] source_url: Github URL of the repository from which to grab templates.
@@ -181,7 +181,7 @@ class TemplateSource(pulumi.CustomResource):
     @pulumi.getter
     def destination(self) -> pulumi.Output[Optional['outputs.TemplateSourceDestination']]:
         """
-        Settings that get filled in on new project creation.
+        The default destination for projects using templates from this source.
         """
         return pulumi.get(self, "destination")
 

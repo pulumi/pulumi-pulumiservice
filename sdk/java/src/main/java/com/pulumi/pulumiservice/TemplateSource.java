@@ -21,14 +21,14 @@ import javax.annotation.Nullable;
 @ResourceType(type="pulumiservice:index:TemplateSource")
 public class TemplateSource extends com.pulumi.resources.CustomResource {
     /**
-     * Settings that get filled in on new project creation.
+     * The default destination for projects using templates from this source.
      * 
      */
     @Export(name="destination", refs={TemplateSourceDestination.class}, tree="[0]")
     private Output</* @Nullable */ TemplateSourceDestination> destination;
 
     /**
-     * @return Settings that get filled in on new project creation.
+     * @return The default destination for projects using templates from this source.
      * 
      */
     public Output<Optional<TemplateSourceDestination>> destination() {

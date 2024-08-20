@@ -16,7 +16,7 @@ namespace Pulumi.PulumiService
     public partial class TemplateSource : global::Pulumi.CustomResource
     {
         /// <summary>
-        /// Settings that get filled in on new project creation.
+        /// The default destination for projects using templates from this source.
         /// </summary>
         [Output("destination")]
         public Output<Outputs.TemplateSourceDestination?> Destination { get; private set; } = null!;
@@ -85,7 +85,7 @@ namespace Pulumi.PulumiService
     public sealed class TemplateSourceArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
-        /// Settings that get filled in on new project creation.
+        /// The default destination for projects using templates from this source.
         /// </summary>
         [Input("destination")]
         public Input<Inputs.TemplateSourceDestinationArgs>? Destination { get; set; }
