@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/asset"
 	"testing"
 	"time"
 
@@ -135,11 +136,13 @@ func TestEnvironment(t *testing.T) {
 		provider := PulumiServiceEnvironmentResource{
 			client: mockedClient,
 		}
+		yamlAsset, err := asset.FromText("test-environment")
+		assert.NoError(t, err)
 
 		input := PulumiServiceEnvironmentInput{
 			OrgName: "org",
 			EnvName: "env",
-			Yaml:    []byte("test-environment"),
+			Yaml:    yamlAsset,
 		}
 
 		propertyMap, _ := input.ToPropertyMap()
@@ -176,10 +179,13 @@ func TestEnvironment(t *testing.T) {
 			client: mockedClient,
 		}
 
+		yamlAsset, err := asset.FromText("test-environment")
+		assert.NoError(t, err)
+
 		input := PulumiServiceEnvironmentInput{
 			OrgName: "org",
 			EnvName: "project",
-			Yaml:    []byte("test-environment"),
+			Yaml:    yamlAsset,
 		}
 
 		propertyMap, _ := input.ToPropertyMap()
