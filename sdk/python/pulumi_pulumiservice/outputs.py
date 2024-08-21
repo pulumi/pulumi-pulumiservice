@@ -25,6 +25,7 @@ __all__ = [
     'GCPOIDCConfiguration',
     'OperationContextOIDC',
     'OperationContextOptions',
+    'TemplateSourceDestination',
 ]
 
 @pulumi.output_type
@@ -847,5 +848,24 @@ class OperationContextOptions(dict):
         Skip intermediate deployments (Consolidate multiple deployments of the same type into one deployment)
         """
         return pulumi.get(self, "skip_intermediate_deployments")
+
+
+@pulumi.output_type
+class TemplateSourceDestination(dict):
+    def __init__(__self__, *,
+                 url: Optional[str] = None):
+        """
+        :param str url: Destination URL that gets filled in on new project creation.
+        """
+        if url is not None:
+            pulumi.set(__self__, "url", url)
+
+    @property
+    @pulumi.getter
+    def url(self) -> Optional[str]:
+        """
+        Destination URL that gets filled in on new project creation.
+        """
+        return pulumi.get(self, "url")
 
 

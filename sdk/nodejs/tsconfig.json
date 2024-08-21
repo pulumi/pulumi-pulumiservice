@@ -31,6 +31,7 @@
         "teamAccessToken.ts",
         "teamEnvironmentPermission.ts",
         "teamStackPermission.ts",
+        "templateSource.ts",
         "ttlSchedule.ts",
         "types/enums/index.ts",
         "types/index.ts",

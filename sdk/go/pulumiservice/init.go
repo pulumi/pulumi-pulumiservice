@@ -49,6 +49,8 @@ func (m *module) Construct(ctx *pulumi.Context, name, typ, urn string) (r pulumi
 		r = &TeamEnvironmentPermission{}
 	case "pulumiservice:index:TeamStackPermission":
 		r = &TeamStackPermission{}
+	case "pulumiservice:index:TemplateSource":
+		r = &TemplateSource{}
 	case "pulumiservice:index:TtlSchedule":
 		r = &TtlSchedule{}
 	case "pulumiservice:index:Webhook":

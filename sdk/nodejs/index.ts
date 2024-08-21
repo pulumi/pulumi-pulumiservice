@@ -80,6 +80,11 @@ export type TeamStackPermission = import("./teamStackPermission").TeamStackPermi
 export const TeamStackPermission: typeof import("./teamStackPermission").TeamStackPermission = null as any;
 utilities.lazyLoad(exports, ["TeamStackPermission"], () => require("./teamStackPermission"));
 
+export { TemplateSourceArgs } from "./templateSource";
+export type TemplateSource = import("./templateSource").TemplateSource;
+export const TemplateSource: typeof import("./templateSource").TemplateSource = null as any;
+utilities.lazyLoad(exports, ["TemplateSource"], () => require("./templateSource"));
+
 export { TtlScheduleArgs } from "./ttlSchedule";
 export type TtlSchedule = import("./ttlSchedule").TtlSchedule;
 export const TtlSchedule: typeof import("./ttlSchedule").TtlSchedule = null as any;
@@ -135,6 +140,8 @@ const _module = {
                 return new TeamEnvironmentPermission(name, <any>undefined, { urn })
             case "pulumiservice:index:TeamStackPermission":
                 return new TeamStackPermission(name, <any>undefined, { urn })
+            case "pulumiservice:index:TemplateSource":
+                return new TemplateSource(name, <any>undefined, { urn })
             case "pulumiservice:index:TtlSchedule":
                 return new TtlSchedule(name, <any>undefined, { urn })
             case "pulumiservice:index:Webhook":
