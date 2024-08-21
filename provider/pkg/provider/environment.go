@@ -62,21 +62,9 @@ func ToPulumiServiceEnvironmentInput(properties *structpb.Struct) (*PulumiServic
 	}
 
 	input := PulumiServiceEnvironmentInput{}
-	if inputMap["organization"].HasValue() && inputMap["organization"].IsString() {
-		input.OrgName = inputMap["organization"].StringValue()
-	} else {
-		return nil, fmt.Errorf("failed to unmarshal organization value from properties: %s", inputMap)
-	}
-	if inputMap["name"].HasValue() && inputMap["name"].IsString() {
-		input.EnvName = inputMap["name"].StringValue()
-	} else {
-		return nil, fmt.Errorf("failed to unmarshal environment name value from properties: %s", inputMap)
-	}
-	if inputMap["yaml"].HasValue() && inputMap["yaml"].IsAsset() {
-		input.Yaml = []byte(inputMap["yaml"].AssetValue().Text)
-	} else {
-		return nil, fmt.Errorf("failed to unmarshal yaml value from properties: %s", inputMap)
-	}
+	input.OrgName = inputMap["organization"].StringValue()
+	input.EnvName = inputMap["name"].StringValue()
+	input.Yaml = []byte(inputMap["yaml"].AssetValue().Text)
 
 	return &input, nil
 }
@@ -217,6 +205,12 @@ func (st *PulumiServiceEnvironmentResource) Check(req *pulumirpc.CheckRequest) (
 				Property: string(p),
 			})
 		}
+	}
+
+	if !inputMap["yaml"].IsAsset() {
+		failures = append(failures, &pulumirpc.CheckFailure{
+			Reason: "property 'yaml' must be an Asset type",
+		})
 	}
 
 	return &pulumirpc.CheckResponse{Inputs: req.GetNews(), Failures: failures}, nil
