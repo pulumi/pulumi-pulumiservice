@@ -43,6 +43,10 @@ export class EnvironmentVersionTag extends pulumi.CustomResource {
      */
     public readonly organization!: pulumi.Output<string>;
     /**
+     * Project name.
+     */
+    public readonly project!: pulumi.Output<string>;
+    /**
      * Revision number.
      */
     public readonly revision!: pulumi.Output<number>;
@@ -76,11 +80,13 @@ export class EnvironmentVersionTag extends pulumi.CustomResource {
             }
             resourceInputs["environment"] = args ? args.environment : undefined;
             resourceInputs["organization"] = args ? args.organization : undefined;
+            resourceInputs["project"] = args ? args.project : undefined;
             resourceInputs["revision"] = args ? args.revision : undefined;
             resourceInputs["tagName"] = args ? args.tagName : undefined;
         } else {
             resourceInputs["environment"] = undefined /*out*/;
             resourceInputs["organization"] = undefined /*out*/;
+            resourceInputs["project"] = undefined /*out*/;
             resourceInputs["revision"] = undefined /*out*/;
             resourceInputs["tagName"] = undefined /*out*/;
         }
@@ -101,6 +107,10 @@ export interface EnvironmentVersionTagArgs {
      * Organization name.
      */
     organization: pulumi.Input<string>;
+    /**
+     * Project name.
+     */
+    project?: pulumi.Input<string>;
     /**
      * Revision number.
      */

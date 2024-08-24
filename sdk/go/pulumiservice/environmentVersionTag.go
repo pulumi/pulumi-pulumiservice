@@ -20,6 +20,8 @@ type EnvironmentVersionTag struct {
 	Environment pulumi.StringOutput `pulumi:"environment"`
 	// Organization name.
 	Organization pulumi.StringOutput `pulumi:"organization"`
+	// Project name.
+	Project pulumi.StringOutput `pulumi:"project"`
 	// Revision number.
 	Revision pulumi.IntOutput `pulumi:"revision"`
 	// Tag name.
@@ -82,6 +84,8 @@ type environmentVersionTagArgs struct {
 	Environment string `pulumi:"environment"`
 	// Organization name.
 	Organization string `pulumi:"organization"`
+	// Project name.
+	Project *string `pulumi:"project"`
 	// Revision number.
 	Revision int `pulumi:"revision"`
 	// Tag name.
@@ -94,6 +98,8 @@ type EnvironmentVersionTagArgs struct {
 	Environment pulumi.StringInput
 	// Organization name.
 	Organization pulumi.StringInput
+	// Project name.
+	Project pulumi.StringPtrInput
 	// Revision number.
 	Revision pulumi.IntInput
 	// Tag name.
@@ -195,6 +201,11 @@ func (o EnvironmentVersionTagOutput) Environment() pulumi.StringOutput {
 // Organization name.
 func (o EnvironmentVersionTagOutput) Organization() pulumi.StringOutput {
 	return o.ApplyT(func(v *EnvironmentVersionTag) pulumi.StringOutput { return v.Organization }).(pulumi.StringOutput)
+}
+
+// Project name.
+func (o EnvironmentVersionTagOutput) Project() pulumi.StringOutput {
+	return o.ApplyT(func(v *EnvironmentVersionTag) pulumi.StringOutput { return v.Project }).(pulumi.StringOutput)
 }
 
 // Revision number.

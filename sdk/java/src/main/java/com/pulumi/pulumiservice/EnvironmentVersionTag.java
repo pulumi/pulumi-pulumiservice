@@ -48,6 +48,20 @@ public class EnvironmentVersionTag extends com.pulumi.resources.CustomResource {
         return this.organization;
     }
     /**
+     * Project name.
+     * 
+     */
+    @Export(name="project", refs={String.class}, tree="[0]")
+    private Output<String> project;
+
+    /**
+     * @return Project name.
+     * 
+     */
+    public Output<String> project() {
+        return this.project;
+    }
+    /**
      * Revision number.
      * 
      */
@@ -80,7 +94,7 @@ public class EnvironmentVersionTag extends com.pulumi.resources.CustomResource {
      *
      * @param name The _unique_ name of the resulting resource.
      */
-    public EnvironmentVersionTag(String name) {
+    public EnvironmentVersionTag(java.lang.String name) {
         this(name, EnvironmentVersionTagArgs.Empty);
     }
     /**
@@ -88,7 +102,7 @@ public class EnvironmentVersionTag extends com.pulumi.resources.CustomResource {
      * @param name The _unique_ name of the resulting resource.
      * @param args The arguments to use to populate this resource's properties.
      */
-    public EnvironmentVersionTag(String name, EnvironmentVersionTagArgs args) {
+    public EnvironmentVersionTag(java.lang.String name, EnvironmentVersionTagArgs args) {
         this(name, args, null);
     }
     /**
@@ -97,15 +111,22 @@ public class EnvironmentVersionTag extends com.pulumi.resources.CustomResource {
      * @param args The arguments to use to populate this resource's properties.
      * @param options A bag of options that control this resource's behavior.
      */
-    public EnvironmentVersionTag(String name, EnvironmentVersionTagArgs args, @Nullable com.pulumi.resources.CustomResourceOptions options) {
-        super("pulumiservice:index:EnvironmentVersionTag", name, args == null ? EnvironmentVersionTagArgs.Empty : args, makeResourceOptions(options, Codegen.empty()));
+    public EnvironmentVersionTag(java.lang.String name, EnvironmentVersionTagArgs args, @Nullable com.pulumi.resources.CustomResourceOptions options) {
+        super("pulumiservice:index:EnvironmentVersionTag", name, makeArgs(args, options), makeResourceOptions(options, Codegen.empty()), false);
     }
 
-    private EnvironmentVersionTag(String name, Output<String> id, @Nullable com.pulumi.resources.CustomResourceOptions options) {
-        super("pulumiservice:index:EnvironmentVersionTag", name, null, makeResourceOptions(options, id));
+    private EnvironmentVersionTag(java.lang.String name, Output<java.lang.String> id, @Nullable com.pulumi.resources.CustomResourceOptions options) {
+        super("pulumiservice:index:EnvironmentVersionTag", name, null, makeResourceOptions(options, id), false);
     }
 
-    private static com.pulumi.resources.CustomResourceOptions makeResourceOptions(@Nullable com.pulumi.resources.CustomResourceOptions options, @Nullable Output<String> id) {
+    private static EnvironmentVersionTagArgs makeArgs(EnvironmentVersionTagArgs args, @Nullable com.pulumi.resources.CustomResourceOptions options) {
+        if (options != null && options.getUrn().isPresent()) {
+            return null;
+        }
+        return args == null ? EnvironmentVersionTagArgs.Empty : args;
+    }
+
+    private static com.pulumi.resources.CustomResourceOptions makeResourceOptions(@Nullable com.pulumi.resources.CustomResourceOptions options, @Nullable Output<java.lang.String> id) {
         var defaultOptions = com.pulumi.resources.CustomResourceOptions.builder()
             .version(Utilities.getVersion())
             .build();
@@ -120,7 +141,7 @@ public class EnvironmentVersionTag extends com.pulumi.resources.CustomResource {
      * @param id The _unique_ provider ID of the resource to lookup.
      * @param options Optional settings to control the behavior of the CustomResource.
      */
-    public static EnvironmentVersionTag get(String name, Output<String> id, @Nullable com.pulumi.resources.CustomResourceOptions options) {
+    public static EnvironmentVersionTag get(java.lang.String name, Output<java.lang.String> id, @Nullable com.pulumi.resources.CustomResourceOptions options) {
         return new EnvironmentVersionTag(name, id, options);
     }
 }

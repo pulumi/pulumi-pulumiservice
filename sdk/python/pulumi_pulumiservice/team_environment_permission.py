@@ -18,18 +18,22 @@ class TeamEnvironmentPermissionArgs:
                  environment: pulumi.Input[str],
                  organization: pulumi.Input[str],
                  permission: pulumi.Input['EnvironmentPermission'],
-                 team: pulumi.Input[str]):
+                 team: pulumi.Input[str],
+                 project: Optional[pulumi.Input[str]] = None):
         """
         The set of arguments for constructing a TeamEnvironmentPermission resource.
         :param pulumi.Input[str] environment: Environment name.
         :param pulumi.Input[str] organization: Organization name.
         :param pulumi.Input['EnvironmentPermission'] permission: Which permission level to grant to the specified team.
         :param pulumi.Input[str] team: Team name.
+        :param pulumi.Input[str] project: Project name.
         """
         pulumi.set(__self__, "environment", environment)
         pulumi.set(__self__, "organization", organization)
         pulumi.set(__self__, "permission", permission)
         pulumi.set(__self__, "team", team)
+        if project is not None:
+            pulumi.set(__self__, "project", project)
 
     @property
     @pulumi.getter
@@ -79,6 +83,18 @@ class TeamEnvironmentPermissionArgs:
     def team(self, value: pulumi.Input[str]):
         pulumi.set(self, "team", value)
 
+    @property
+    @pulumi.getter
+    def project(self) -> Optional[pulumi.Input[str]]:
+        """
+        Project name.
+        """
+        return pulumi.get(self, "project")
+
+    @project.setter
+    def project(self, value: Optional[pulumi.Input[str]]):
+        pulumi.set(self, "project", value)
+
 
 class TeamEnvironmentPermission(pulumi.CustomResource):
     @overload
@@ -88,6 +104,7 @@ class TeamEnvironmentPermission(pulumi.CustomResource):
                  environment: Optional[pulumi.Input[str]] = None,
                  organization: Optional[pulumi.Input[str]] = None,
                  permission: Optional[pulumi.Input['EnvironmentPermission']] = None,
+                 project: Optional[pulumi.Input[str]] = None,
                  team: Optional[pulumi.Input[str]] = None,
                  __props__=None):
         """
@@ -98,6 +115,7 @@ class TeamEnvironmentPermission(pulumi.CustomResource):
         :param pulumi.Input[str] environment: Environment name.
         :param pulumi.Input[str] organization: Organization name.
         :param pulumi.Input['EnvironmentPermission'] permission: Which permission level to grant to the specified team.
+        :param pulumi.Input[str] project: Project name.
         :param pulumi.Input[str] team: Team name.
         """
         ...
@@ -127,6 +145,7 @@ class TeamEnvironmentPermission(pulumi.CustomResource):
                  environment: Optional[pulumi.Input[str]] = None,
                  organization: Optional[pulumi.Input[str]] = None,
                  permission: Optional[pulumi.Input['EnvironmentPermission']] = None,
+                 project: Optional[pulumi.Input[str]] = None,
                  team: Optional[pulumi.Input[str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
@@ -146,6 +165,7 @@ class TeamEnvironmentPermission(pulumi.CustomResource):
             if permission is None and not opts.urn:
                 raise TypeError("Missing required property 'permission'")
             __props__.__dict__["permission"] = permission
+            __props__.__dict__["project"] = project
             if team is None and not opts.urn:
                 raise TypeError("Missing required property 'team'")
             __props__.__dict__["team"] = team

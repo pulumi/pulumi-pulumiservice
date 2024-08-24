@@ -16,16 +16,20 @@ class EnvironmentArgs:
     def __init__(__self__, *,
                  name: pulumi.Input[str],
                  organization: pulumi.Input[str],
-                 yaml: pulumi.Input[Union[pulumi.Asset, pulumi.Archive]]):
+                 yaml: pulumi.Input[Union[pulumi.Asset, pulumi.Archive]],
+                 project: Optional[pulumi.Input[str]] = None):
         """
         The set of arguments for constructing a Environment resource.
         :param pulumi.Input[str] name: Environment name.
         :param pulumi.Input[str] organization: Organization name.
         :param pulumi.Input[Union[pulumi.Asset, pulumi.Archive]] yaml: Environment's yaml file.
+        :param pulumi.Input[str] project: Project name.
         """
         pulumi.set(__self__, "name", name)
         pulumi.set(__self__, "organization", organization)
         pulumi.set(__self__, "yaml", yaml)
+        if project is not None:
+            pulumi.set(__self__, "project", project)
 
     @property
     @pulumi.getter
@@ -63,6 +67,18 @@ class EnvironmentArgs:
     def yaml(self, value: pulumi.Input[Union[pulumi.Asset, pulumi.Archive]]):
         pulumi.set(self, "yaml", value)
 
+    @property
+    @pulumi.getter
+    def project(self) -> Optional[pulumi.Input[str]]:
+        """
+        Project name.
+        """
+        return pulumi.get(self, "project")
+
+    @project.setter
+    def project(self, value: Optional[pulumi.Input[str]]):
+        pulumi.set(self, "project", value)
+
 
 class Environment(pulumi.CustomResource):
     @overload
@@ -71,6 +87,7 @@ class Environment(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None,
                  name: Optional[pulumi.Input[str]] = None,
                  organization: Optional[pulumi.Input[str]] = None,
+                 project: Optional[pulumi.Input[str]] = None,
                  yaml: Optional[pulumi.Input[Union[pulumi.Asset, pulumi.Archive]]] = None,
                  __props__=None):
         """
@@ -80,6 +97,7 @@ class Environment(pulumi.CustomResource):
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[str] name: Environment name.
         :param pulumi.Input[str] organization: Organization name.
+        :param pulumi.Input[str] project: Project name.
         :param pulumi.Input[Union[pulumi.Asset, pulumi.Archive]] yaml: Environment's yaml file.
         """
         ...
@@ -108,6 +126,7 @@ class Environment(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None,
                  name: Optional[pulumi.Input[str]] = None,
                  organization: Optional[pulumi.Input[str]] = None,
+                 project: Optional[pulumi.Input[str]] = None,
                  yaml: Optional[pulumi.Input[Union[pulumi.Asset, pulumi.Archive]]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
@@ -124,6 +143,7 @@ class Environment(pulumi.CustomResource):
             if organization is None and not opts.urn:
                 raise TypeError("Missing required property 'organization'")
             __props__.__dict__["organization"] = organization
+            __props__.__dict__["project"] = project
             if yaml is None and not opts.urn:
                 raise TypeError("Missing required property 'yaml'")
             __props__.__dict__["yaml"] = yaml
@@ -152,6 +172,7 @@ class Environment(pulumi.CustomResource):
 
         __props__.__dict__["name"] = None
         __props__.__dict__["organization"] = None
+        __props__.__dict__["project"] = None
         __props__.__dict__["revision"] = None
         __props__.__dict__["yaml"] = None
         return Environment(resource_name, opts=opts, __props__=__props__)
@@ -171,6 +192,14 @@ class Environment(pulumi.CustomResource):
         Organization name.
         """
         return pulumi.get(self, "organization")
+
+    @property
+    @pulumi.getter
+    def project(self) -> pulumi.Output[str]:
+        """
+        Project name.
+        """
+        return pulumi.get(self, "project")
 
     @property
     @pulumi.getter

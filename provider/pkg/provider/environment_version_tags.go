@@ -21,6 +21,7 @@ type PulumiServiceEnvironmentVersionTagResource struct {
 
 type PulumiServiceEnvironmentVersionTagInput struct {
 	Organization string `pulumi:"organization"`
+	Project      string `pulumi:"project"`
 	Environment  string `pulumi:"environment"`
 	TagName      string `pulumi:"tagName"`
 	Revision     int    `pulumi:"revision"`
@@ -64,6 +65,7 @@ func (evt *PulumiServiceEnvironmentVersionTagResource) Diff(req *pulumirpc.DiffR
 	replaces := []string(nil)
 	replaceProperties := map[string]bool{
 		"organization": true,
+		"project":      true,
 		"environment":  true,
 		"tagName":      true,
 	}
@@ -94,7 +96,7 @@ func (evt *PulumiServiceEnvironmentVersionTagResource) Delete(req *pulumirpc.Del
 	if err != nil {
 		return nil, err
 	}
-	err = evt.client.DeleteEnvironmentRevisionTag(ctx, input.Organization, input.Environment, input.TagName)
+	err = evt.client.DeleteEnvironmentRevisionTag(ctx, input.Organization, input.Project, input.Environment, input.TagName)
 	if err != nil {
 		return nil, err
 	}
@@ -108,12 +110,12 @@ func (evt *PulumiServiceEnvironmentVersionTagResource) Create(req *pulumirpc.Cre
 	if err != nil {
 		return nil, err
 	}
-	err = evt.client.CreateEnvironmentRevisionTag(ctx, input.Organization, input.Environment, input.TagName, &input.Revision)
+	err = evt.client.CreateEnvironmentRevisionTag(ctx, input.Organization, input.Project, input.Environment, input.TagName, &input.Revision)
 	if err != nil {
 		return nil, err
 	}
 	return &pulumirpc.CreateResponse{
-		Id:         path.Join(input.Organization, input.Environment, input.TagName),
+		Id:         path.Join(input.Organization, input.Project, input.Environment, input.TagName),
 		Properties: req.GetProperties(),
 	}, nil
 }
@@ -145,7 +147,7 @@ func (evt *PulumiServiceEnvironmentVersionTagResource) Update(req *pulumirpc.Upd
 		return nil, err
 	}
 
-	err = evt.client.UpdateEnvironmentRevisionTag(ctx, input.Organization, input.Environment, input.TagName, &input.Revision)
+	err = evt.client.UpdateEnvironmentRevisionTag(ctx, input.Organization, input.Project, input.Environment, input.TagName, &input.Revision)
 	if err != nil {
 		return nil, err
 	}
@@ -158,12 +160,13 @@ func (evt *PulumiServiceEnvironmentVersionTagResource) Update(req *pulumirpc.Upd
 func (evt *PulumiServiceEnvironmentVersionTagResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
 	ctx := context.Background()
 
-	orgName, environmentName, tagName, err := splitEnvironmentTagId(req.Id)
+	envTagID, err := splitEnvironmentTagId(req.Id)
 	if err != nil {
 		return nil, err
 	}
 
-	tag, err := evt.client.GetEnvironmentRevisionTag(ctx, orgName, environmentName, tagName)
+	tag, err := evt.client.GetEnvironmentRevisionTag(ctx, envTagID.Organization, envTagID.Project,
+		envTagID.Environment, envTagID.TagName)
 	if err != nil && !strings.Contains(err.Error(), "404") {
 		return nil, fmt.Errorf("failed to read EnvironmentVersionTag (%q): %w", req.Id, err)
 	}
@@ -173,9 +176,10 @@ func (evt *PulumiServiceEnvironmentVersionTagResource) Read(req *pulumirpc.ReadR
 	}
 
 	input := PulumiServiceEnvironmentVersionTagInput{
-		Organization: orgName,
-		Environment:  environmentName,
-		TagName:      tagName,
+		Organization: envTagID.Organization,
+		Project:      envTagID.Project,
+		Environment:  envTagID.Environment,
+		TagName:      envTagID.TagName,
 		Revision:     tag.Revision,
 	}
 
@@ -190,14 +194,26 @@ func (evt *PulumiServiceEnvironmentVersionTagResource) Read(req *pulumirpc.ReadR
 	}, nil
 }
 
+type environmentTagID struct {
+	Organization string
+	Project      string
+	Environment  string
+	TagName      string
+}
+
 func (evt *PulumiServiceEnvironmentVersionTagResource) Configure(_ PulumiServiceConfig) {
 }
 
-func splitEnvironmentTagId(id string) (string, string, string, error) {
-	// format: organization/environment/tag
+func splitEnvironmentTagId(id string) (*environmentTagID, error) {
+	// format: organization/project/environment/tag
 	s := strings.Split(id, "/")
-	if len(s) != 3 {
-		return "", "", "", fmt.Errorf("%q is invalid, must be in the format: organization/environment/tag", id)
+	if len(s) != 4 {
+		return nil, fmt.Errorf("%q is invalid, must be in the format: organization/project/environment/tag", id)
 	}
-	return s[0], s[1], s[2], nil
+	return &environmentTagID{
+		Organization: s[0],
+		Project:      s[1],
+		Environment:  s[2],
+		TagName:      s[3],
+	}, nil
 }

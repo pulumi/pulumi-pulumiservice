@@ -503,7 +503,7 @@
           "value": "admin"
         }
       ]
-    }, 
+    },
     "pulumiservice:index:TemplateSourceDestination": {
       "type": "object",
       "properties": {
@@ -1322,6 +1322,10 @@
           "description": "Organization name.",
           "type": "string"
         },
+        "project": {
+            "description": "Project name.",
+            "type": "string"
+        },
         "name": {
           "description": "Environment name.",
           "type": "string"
@@ -1337,6 +1341,7 @@
       },
       "required": [
         "organization",
+        "project",
         "name",
         "yaml",
         "revision"
@@ -1344,6 +1349,10 @@
       "inputProperties": {
         "organization": {
           "description": "Organization name.",
+          "type": "string"
+        },
+        "project": {
+          "description": "Project name.",
           "type": "string"
         },
         "name": {
@@ -1374,12 +1383,16 @@
           "description": "Organization name.",
           "type": "string"
         },
-        "team": {
-          "description": "Team name.",
+        "project": {
+          "description": "Project name.",
           "type": "string"
         },
         "environment": {
           "description": "Environment name.",
+          "type": "string"
+        },
+        "team": {
+          "description": "Team name.",
           "type": "string"
         },
         "permission": {
@@ -1401,6 +1414,10 @@
           "description": "Organization name.",
           "type": "string"
         },
+        "project": {
+          "description": "Project name.",
+          "type": "string"
+        },
         "environment": {
           "description": "Environment name.",
           "type": "string"
@@ -1416,6 +1433,7 @@
       },
       "required": [
         "organization",
+        "project",
         "environment",
         "tagName",
         "revision"
@@ -1423,6 +1441,10 @@
       "inputProperties": {
         "organization": {
           "description": "Organization name.",
+          "type": "string"
+        },
+        "project": {
+          "description": "Project name.",
           "type": "string"
         },
         "environment": {

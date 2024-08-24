@@ -78,6 +78,8 @@ type teamEnvironmentPermissionArgs struct {
 	Organization string `pulumi:"organization"`
 	// Which permission level to grant to the specified team.
 	Permission EnvironmentPermission `pulumi:"permission"`
+	// Project name.
+	Project *string `pulumi:"project"`
 	// Team name.
 	Team string `pulumi:"team"`
 }
@@ -90,6 +92,8 @@ type TeamEnvironmentPermissionArgs struct {
 	Organization pulumi.StringInput
 	// Which permission level to grant to the specified team.
 	Permission EnvironmentPermissionInput
+	// Project name.
+	Project pulumi.StringPtrInput
 	// Team name.
 	Team pulumi.StringInput
 }

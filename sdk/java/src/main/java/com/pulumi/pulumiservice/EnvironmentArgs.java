@@ -9,6 +9,8 @@ import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
 import java.lang.String;
 import java.util.Objects;
+import java.util.Optional;
+import javax.annotation.Nullable;
 
 
 public final class EnvironmentArgs extends com.pulumi.resources.ResourceArgs {
@@ -46,6 +48,21 @@ public final class EnvironmentArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
+     * Project name.
+     * 
+     */
+    @Import(name="project")
+    private @Nullable Output<String> project;
+
+    /**
+     * @return Project name.
+     * 
+     */
+    public Optional<Output<String>> project() {
+        return Optional.ofNullable(this.project);
+    }
+
+    /**
      * Environment&#39;s yaml file.
      * 
      */
@@ -65,6 +82,7 @@ public final class EnvironmentArgs extends com.pulumi.resources.ResourceArgs {
     private EnvironmentArgs(EnvironmentArgs $) {
         this.name = $.name;
         this.organization = $.organization;
+        this.project = $.project;
         this.yaml = $.yaml;
     }
 
@@ -126,6 +144,27 @@ public final class EnvironmentArgs extends com.pulumi.resources.ResourceArgs {
          */
         public Builder organization(String organization) {
             return organization(Output.of(organization));
+        }
+
+        /**
+         * @param project Project name.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder project(@Nullable Output<String> project) {
+            $.project = project;
+            return this;
+        }
+
+        /**
+         * @param project Project name.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder project(String project) {
+            return project(Output.of(project));
         }
 
         /**
