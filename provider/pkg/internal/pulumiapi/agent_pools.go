@@ -31,7 +31,7 @@ type AgentPoolClient interface {
 type AgentPool struct {
 	ID          string `json:"id"`
 	Name        string `json:"name"`
-	Description string `json:"description"`
+	Description string `json:"description,omitempty"`
 	TokenValue  string `json:"tokenValue"`
 }
 
@@ -42,7 +42,7 @@ type createAgentPoolResponse struct {
 
 type createUpdateAgentPoolRequest struct {
 	Name        string `json:"name"`
-	Description string `json:"description"`
+	Description string `json:"description,omitempty"`
 }
 
 func (c *Client) CreateAgentPool(ctx context.Context, orgName, name, description string) (*AgentPool, error) {

@@ -7,7 +7,7 @@ resources:
     type: pulumiservice:index:AgentPool
     properties:
       organizationName: service-provider-test-org
-      name: test-agent-pool
+      name: test-agent-pool-${digits}
       description: Test agent pool
 
 outputs:
