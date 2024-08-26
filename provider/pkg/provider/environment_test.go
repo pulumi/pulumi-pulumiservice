@@ -139,7 +139,9 @@ func TestEnvironment(t *testing.T) {
 		input := PulumiServiceEnvironmentInput{
 			OrgName: "org",
 			EnvName: "env",
-			Yaml:    []byte("test-environment"),
+			Yaml: `values:
+	foo: bar
+`,
 		}
 
 		propertyMap, _ := input.ToPropertyMap()
@@ -179,7 +181,9 @@ func TestEnvironment(t *testing.T) {
 		input := PulumiServiceEnvironmentInput{
 			OrgName: "org",
 			EnvName: "project",
-			Yaml:    []byte("test-environment"),
+			Yaml: `values:
+	foo: bar
+`,
 		}
 
 		propertyMap, _ := input.ToPropertyMap()
