@@ -27,15 +27,19 @@ type PulumiServiceAgentPoolInput struct {
 func GenerateAgentPoolProperties(input PulumiServiceAgentPoolInput, agentPool pulumiapi.AgentPool) (outputs *structpb.Struct, inputs *structpb.Struct, err error) {
 	inputMap := resource.PropertyMap{}
 	inputMap["name"] = resource.NewPropertyValue(input.Name)
-	inputMap["description"] = resource.NewPropertyValue(input.Description)
 	inputMap["organizationName"] = resource.NewPropertyValue(input.OrgName)
+	if input.Description != "" {
+		inputMap["description"] = resource.NewPropertyValue(input.Description)
+	}
 
 	outputMap := resource.PropertyMap{}
 	outputMap["agentPoolId"] = resource.NewPropertyValue(agentPool.ID)
 	outputMap["name"] = inputMap["name"]
 	outputMap["organizationName"] = inputMap["organizationName"]
-	outputMap["description"] = inputMap["description"]
 	outputMap["tokenValue"] = resource.NewPropertyValue(agentPool.TokenValue)
+	if input.Description != "" {
+		outputMap["description"] = inputMap["description"]
+	}
 
 	inputs, err = plugin.MarshalProperties(inputMap, plugin.MarshalOptions{})
 	if err != nil {
