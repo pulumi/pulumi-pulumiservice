@@ -23,7 +23,7 @@ type PulumiServiceEnvironmentResource struct {
 type PulumiServiceEnvironmentInput struct {
 	OrgName string
 	EnvName string
-	Yaml    *asset.Asset
+	Yaml    string
 }
 
 type PulumiServiceEnvironmentOutput struct {
@@ -35,7 +35,7 @@ func (i *PulumiServiceEnvironmentInput) ToPropertyMap() (resource.PropertyMap, e
 	propertyMap := resource.PropertyMap{}
 	propertyMap["organization"] = resource.NewPropertyValue(i.OrgName)
 	propertyMap["name"] = resource.NewPropertyValue(i.EnvName)
-	propertyMap["yaml"] = resource.MakeSecret(resource.NewAssetProperty(i.Yaml))
+	propertyMap["yaml"] = resource.MakeSecret(resource.NewStringProperty(i.Yaml))
 
 	return propertyMap, nil
 }
@@ -60,7 +60,7 @@ func ToPulumiServiceEnvironmentInput(properties *structpb.Struct) (*PulumiServic
 	input := PulumiServiceEnvironmentInput{}
 	input.OrgName = inputMap["organization"].StringValue()
 	input.EnvName = inputMap["name"].StringValue()
-	input.Yaml = inputMap["yaml"].AssetValue()
+	input.Yaml = inputMap["yaml"].StringValue()
 
 	return &input, nil
 }
@@ -144,24 +144,14 @@ func (st *PulumiServiceEnvironmentResource) Create(req *pulumirpc.CreateRequest)
 	}
 
 	// First check if yaml is valid
-	yamlBytes, err := getBytesFromAsset(input.Yaml)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read yaml asset: %w", err)
-	}
-	_, diagnostics, err := st.client.CheckYAMLEnvironment(context.Background(), input.OrgName, yamlBytes)
-	if err != nil {
-		return nil, err
-	}
-	if diagnostics != nil {
-		return nil, fmt.Errorf("failed to create environment, yaml code failed following checks: %+v", diagnostics)
-	}
+	_, diagnostics, err := st.client.CheckYAMLEnvironment(context.Background(), input.OrgName, []byte(input.Yaml))
 
 	// Then create environment, and update it with yaml provided. ESC API architecture doesn't let you do it in one call
 	err = st.client.CreateEnvironment(context.Background(), input.OrgName, input.EnvName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create new environment due to error: %+v", err)
 	}
-	diagnostics, revision, err := st.client.UpdateEnvironmentWithRevision(context.Background(), input.OrgName, input.EnvName, yamlBytes, "")
+	diagnostics, revision, err := st.client.UpdateEnvironmentWithRevision(context.Background(), input.OrgName, input.EnvName, []byte(input.Yaml), "")
 	if diagnostics != nil {
 		return nil, fmt.Errorf("failed to update brand new environment with pre-checked yaml, due to failing the following checks: %+v \n"+
 			"This should never happen, if you're seeing this message there's likely a bug in ESC APIs", diagnostics)
@@ -216,13 +206,20 @@ func (st *PulumiServiceEnvironmentResource) Check(req *pulumirpc.CheckRequest) (
 		}
 	}
 
-	if !inputMap["yaml"].IsAsset() {
-		failures = append(failures, &pulumirpc.CheckFailure{
-			Reason: "property 'yaml' must be an Asset type",
-		})
+	yamlBytes, err := getBytesFromAsset(inputMap["yaml"].AssetValue())
+	if err != nil {
+		return nil, err
+	}
+	stringYaml := string(yamlBytes)
+	trimmedYaml := strings.TrimSpace(stringYaml)
+	inputMap["yaml"] = resource.MakeSecret(resource.NewStringProperty(trimmedYaml))
+
+	inputs, err := plugin.MarshalProperties(inputMap, plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	if err != nil {
+		return nil, err
 	}
 
-	return &pulumirpc.CheckResponse{Inputs: req.GetNews(), Failures: failures}, nil
+	return &pulumirpc.CheckResponse{Inputs: inputs, Failures: failures}, nil
 }
 
 func (st *PulumiServiceEnvironmentResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
@@ -231,11 +228,7 @@ func (st *PulumiServiceEnvironmentResource) Update(req *pulumirpc.UpdateRequest)
 		return nil, err
 	}
 
-	yamlBytes, err := getBytesFromAsset(input.Yaml)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read yaml asset: %w", err)
-	}
-	diagnostics, revision, err := st.client.UpdateEnvironmentWithRevision(context.Background(), input.OrgName, input.EnvName, yamlBytes, "")
+	diagnostics, revision, err := st.client.UpdateEnvironmentWithRevision(context.Background(), input.OrgName, input.EnvName, []byte(input.Yaml), "")
 	if err != nil {
 		return nil, err
 	}
@@ -280,15 +273,13 @@ func (st *PulumiServiceEnvironmentResource) Read(req *pulumirpc.ReadRequest) (*p
 		return &pulumirpc.ReadResponse{Id: "", Properties: nil}, nil
 	}
 
-	yamlAsset, err := asset.FromText(string(retrievedYaml))
-	if err != nil {
-		return nil, fmt.Errorf("failed to create asset from yaml: %w", err)
-	}
+	stringYaml := string(retrievedYaml)
+	trimmedYaml := strings.TrimSpace(stringYaml)
 
 	input := PulumiServiceEnvironmentInput{
 		OrgName: orgName,
 		EnvName: envName,
-		Yaml:    yamlAsset,
+		Yaml:    trimmedYaml,
 	}
 
 	result := PulumiServiceEnvironmentOutput{
