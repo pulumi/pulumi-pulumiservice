@@ -217,6 +217,14 @@ func (ap *PulumiServiceAgentPoolResource) Read(req *pulumirpc.ReadRequest) (*pul
 		return &pulumirpc.ReadResponse{}, nil
 	}
 
+	propertyMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepSecrets: true})
+	if err != nil {
+		return nil, err
+	}
+	if propertyMap["tokenValue"].HasValue() {
+		agentPool.TokenValue = getSecretOrStringValue(propertyMap["tokenValue"])
+	}
+
 	input := PulumiServiceAgentPoolInput{
 		OrgName:     orgName,
 		Description: agentPool.Description,
