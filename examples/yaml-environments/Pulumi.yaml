@@ -6,6 +6,7 @@ resources:
     type: pulumiservice:Environment
     properties:
       organization: service-provider-test-org
+      project: my-project
       name: testing-environment-yaml-${digits}
       yaml:
         fn::stringAsset: |-
@@ -18,6 +19,7 @@ resources:
     type: pulumiservice:EnvironmentVersionTag
     properties:
       organization: ${testing-environment.organization}
+      project: ${testing-environment.project}
       environment: ${testing-environment.name}
       tagName: stable
       revision: ${testing-environment.revision}
@@ -25,6 +27,7 @@ resources:
     type: pulumiservice:EnvironmentVersionTag
     properties:
       organization: ${testing-environment.organization}
+      project: ${testing-environment.project}
       environment: ${testing-environment.name}
       tagName: v${testing-environment.revision}
       revision: ${testing-environment.revision}

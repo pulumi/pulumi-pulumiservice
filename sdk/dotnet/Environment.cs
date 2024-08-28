@@ -28,6 +28,12 @@ namespace Pulumi.PulumiService
         public Output<string> Organization { get; private set; } = null!;
 
         /// <summary>
+        /// Project name.
+        /// </summary>
+        [Output("project")]
+        public Output<string> Project { get; private set; } = null!;
+
+        /// <summary>
         /// Revision number of the latest version.
         /// </summary>
         [Output("revision")]
@@ -97,6 +103,12 @@ namespace Pulumi.PulumiService
         public Input<string> Organization { get; set; } = null!;
 
         /// <summary>
+        /// Project name.
+        /// </summary>
+        [Input("project")]
+        public Input<string>? Project { get; set; }
+
+        /// <summary>
         /// Environment's yaml file.
         /// </summary>
         [Input("yaml", required: true)]
@@ -104,6 +116,7 @@ namespace Pulumi.PulumiService
 
         public EnvironmentArgs()
         {
+            Project = "default";
         }
         public static new EnvironmentArgs Empty => new EnvironmentArgs();
     }

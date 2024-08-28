@@ -48,6 +48,20 @@ public class EnvironmentVersionTag extends com.pulumi.resources.CustomResource {
         return this.organization;
     }
     /**
+     * Project name.
+     * 
+     */
+    @Export(name="project", refs={String.class}, tree="[0]")
+    private Output<String> project;
+
+    /**
+     * @return Project name.
+     * 
+     */
+    public Output<String> project() {
+        return this.project;
+    }
+    /**
      * Revision number.
      * 
      */

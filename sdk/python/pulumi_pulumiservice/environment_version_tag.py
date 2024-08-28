@@ -17,18 +17,24 @@ class EnvironmentVersionTagArgs:
                  environment: pulumi.Input[str],
                  organization: pulumi.Input[str],
                  revision: pulumi.Input[int],
-                 tag_name: pulumi.Input[str]):
+                 tag_name: pulumi.Input[str],
+                 project: Optional[pulumi.Input[str]] = None):
         """
         The set of arguments for constructing a EnvironmentVersionTag resource.
         :param pulumi.Input[str] environment: Environment name.
         :param pulumi.Input[str] organization: Organization name.
         :param pulumi.Input[int] revision: Revision number.
         :param pulumi.Input[str] tag_name: Tag name.
+        :param pulumi.Input[str] project: Project name.
         """
         pulumi.set(__self__, "environment", environment)
         pulumi.set(__self__, "organization", organization)
         pulumi.set(__self__, "revision", revision)
         pulumi.set(__self__, "tag_name", tag_name)
+        if project is None:
+            project = 'default'
+        if project is not None:
+            pulumi.set(__self__, "project", project)
 
     @property
     @pulumi.getter
@@ -78,6 +84,18 @@ class EnvironmentVersionTagArgs:
     def tag_name(self, value: pulumi.Input[str]):
         pulumi.set(self, "tag_name", value)
 
+    @property
+    @pulumi.getter
+    def project(self) -> Optional[pulumi.Input[str]]:
+        """
+        Project name.
+        """
+        return pulumi.get(self, "project")
+
+    @project.setter
+    def project(self, value: Optional[pulumi.Input[str]]):
+        pulumi.set(self, "project", value)
+
 
 class EnvironmentVersionTag(pulumi.CustomResource):
     @overload
@@ -86,6 +104,7 @@ class EnvironmentVersionTag(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None,
                  environment: Optional[pulumi.Input[str]] = None,
                  organization: Optional[pulumi.Input[str]] = None,
+                 project: Optional[pulumi.Input[str]] = None,
                  revision: Optional[pulumi.Input[int]] = None,
                  tag_name: Optional[pulumi.Input[str]] = None,
                  __props__=None):
@@ -96,6 +115,7 @@ class EnvironmentVersionTag(pulumi.CustomResource):
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[str] environment: Environment name.
         :param pulumi.Input[str] organization: Organization name.
+        :param pulumi.Input[str] project: Project name.
         :param pulumi.Input[int] revision: Revision number.
         :param pulumi.Input[str] tag_name: Tag name.
         """
@@ -125,6 +145,7 @@ class EnvironmentVersionTag(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None,
                  environment: Optional[pulumi.Input[str]] = None,
                  organization: Optional[pulumi.Input[str]] = None,
+                 project: Optional[pulumi.Input[str]] = None,
                  revision: Optional[pulumi.Input[int]] = None,
                  tag_name: Optional[pulumi.Input[str]] = None,
                  __props__=None):
@@ -142,6 +163,9 @@ class EnvironmentVersionTag(pulumi.CustomResource):
             if organization is None and not opts.urn:
                 raise TypeError("Missing required property 'organization'")
             __props__.__dict__["organization"] = organization
+            if project is None:
+                project = 'default'
+            __props__.__dict__["project"] = project
             if revision is None and not opts.urn:
                 raise TypeError("Missing required property 'revision'")
             __props__.__dict__["revision"] = revision
@@ -172,6 +196,7 @@ class EnvironmentVersionTag(pulumi.CustomResource):
 
         __props__.__dict__["environment"] = None
         __props__.__dict__["organization"] = None
+        __props__.__dict__["project"] = None
         __props__.__dict__["revision"] = None
         __props__.__dict__["tag_name"] = None
         return EnvironmentVersionTag(resource_name, opts=opts, __props__=__props__)
@@ -191,6 +216,14 @@ class EnvironmentVersionTag(pulumi.CustomResource):
         Organization name.
         """
         return pulumi.get(self, "organization")
+
+    @property
+    @pulumi.getter
+    def project(self) -> pulumi.Output[str]:
+        """
+        Project name.
+        """
+        return pulumi.get(self, "project")
 
     @property
     @pulumi.getter

@@ -20,6 +20,8 @@ type Environment struct {
 	Name pulumi.StringOutput `pulumi:"name"`
 	// Organization name.
 	Organization pulumi.StringOutput `pulumi:"organization"`
+	// Project name.
+	Project pulumi.StringOutput `pulumi:"project"`
 	// Revision number of the latest version.
 	Revision pulumi.IntOutput `pulumi:"revision"`
 	// Environment's yaml file.
@@ -41,6 +43,9 @@ func NewEnvironment(ctx *pulumi.Context,
 	}
 	if args.Yaml == nil {
 		return nil, errors.New("invalid value for required argument 'Yaml'")
+	}
+	if args.Project == nil {
+		args.Project = pulumi.StringPtr("default")
 	}
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Environment
@@ -79,6 +84,8 @@ type environmentArgs struct {
 	Name string `pulumi:"name"`
 	// Organization name.
 	Organization string `pulumi:"organization"`
+	// Project name.
+	Project *string `pulumi:"project"`
 	// Environment's yaml file.
 	Yaml pulumi.AssetOrArchive `pulumi:"yaml"`
 }
@@ -89,6 +96,8 @@ type EnvironmentArgs struct {
 	Name pulumi.StringInput
 	// Organization name.
 	Organization pulumi.StringInput
+	// Project name.
+	Project pulumi.StringPtrInput
 	// Environment's yaml file.
 	Yaml pulumi.AssetOrArchiveInput
 }
@@ -188,6 +197,11 @@ func (o EnvironmentOutput) Name() pulumi.StringOutput {
 // Organization name.
 func (o EnvironmentOutput) Organization() pulumi.StringOutput {
 	return o.ApplyT(func(v *Environment) pulumi.StringOutput { return v.Organization }).(pulumi.StringOutput)
+}
+
+// Project name.
+func (o EnvironmentOutput) Project() pulumi.StringOutput {
+	return o.ApplyT(func(v *Environment) pulumi.StringOutput { return v.Project }).(pulumi.StringOutput)
 }
 
 // Revision number of the latest version.
