@@ -60,7 +60,13 @@ func ToPulumiServiceEnvironmentInput(properties *structpb.Struct) (*PulumiServic
 	input := PulumiServiceEnvironmentInput{}
 	input.OrgName = inputMap["organization"].StringValue()
 	input.EnvName = inputMap["name"].StringValue()
-	input.Yaml = inputMap["yaml"].StringValue()
+
+	inputYaml := inputMap["yaml"]
+	if inputYaml.IsAsset() {
+		input.Yaml = inputYaml.AssetValue().Text
+	} else {
+		input.Yaml = inputYaml.StringValue()
+	}
 
 	return &input, nil
 }
