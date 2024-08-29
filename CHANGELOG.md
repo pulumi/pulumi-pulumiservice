@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+## 0.24.1
+
+### Bug Fixes
+
+- Fixes type error panic with environments [#400](https://github.com/pulumi/pulumi-pulumiservice/issues/400)
+
 ## 0.24.0
 
 ### Improvements
