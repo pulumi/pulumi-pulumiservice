@@ -1,9 +1,19 @@
-"""A Python Pulumi Service Teams program"""
-
 import pulumi
-from pulumi_pulumiservice import DeploymentSettings, DeploymentSettingsOperationContextArgs, DeploymentSettingsSourceContextArgs, DeploymentSettingsGitSourceArgs
+from pulumi_pulumiservice import (
+    AgentPool,
+    DeploymentSettings,
+    DeploymentSettingsOperationContextArgs,
+    DeploymentSettingsSourceContextArgs,
+    DeploymentSettingsGitSourceArgs,
+)
 
 config = pulumi.Config()
+
+agent_pool = AgentPool(
+    "my-agent-pool",
+    organization_name="service-provider-test-org",
+    name="my-test-pool",
+)
 
 settings = DeploymentSettings(
     "my-settings",
@@ -23,5 +33,6 @@ settings = DeploymentSettings(
             branch="main",
             repo_dir="pulumi-programs/simple-resource"
         )
-    )
+    ),
+    agent_pool_id=agent_pool.agent_pool_id,
 )
