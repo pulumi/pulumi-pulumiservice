@@ -34,6 +34,5 @@ settings = DeploymentSettings(
             repo_dir="pulumi-programs/simple-resource"
         )
     ),
-    # Re-enable when https://github.com/pulumi/pulumi-pulumiservice/issues/378 is fixed
-    # agent_pool_id=agent_pool.agent_pool_id,
+    agent_pool_id=agent_pool.agent_pool_id,
 )
