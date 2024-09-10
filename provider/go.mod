@@ -3,15 +3,9 @@ module github.com/pulumi/pulumi-pulumiservice/provider
 go 1.21.0
 
 require (
-<<<<<<< HEAD
 	github.com/pulumi/esc v0.9.2-0.20240910221656-328d3204100f
 	github.com/pulumi/pulumi/pkg/v3 v3.131.0
 	github.com/pulumi/pulumi/sdk/v3 v3.131.0
-=======
-	github.com/pulumi/esc v0.9.2-0.20240821222338-4f71a476d870
-	github.com/pulumi/pulumi/pkg/v3 v3.112.0
-	github.com/pulumi/pulumi/sdk/v3 v3.115.3-0.20240507143413-cffdfd1fa489
->>>>>>> 99efdeb (Add ESC Projects (#398))
 	github.com/stretchr/testify v1.9.0
 	golang.org/x/exp v0.0.0-20240604190554-fc45aab8b7f8
 	google.golang.org/grpc v1.63.2
