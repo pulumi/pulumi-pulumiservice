@@ -50,10 +50,13 @@ func (c *EscClientMock) CreateEnvironmentWithProject(context.Context, string, st
 	return nil
 }
 
+<<<<<<< HEAD
 func (c *EscClientMock) CloneEnvironment(context.Context, string, string, string, client.CloneEnvironmentRequest) error {
 	return nil
 }
 
+=======
+>>>>>>> 99efdeb (Add ESC Projects (#398))
 func (c *EscClientMock) DeleteEnvironment(context.Context, string, string, string) error {
 	return nil
 }
@@ -62,10 +65,13 @@ func (c *EscClientMock) EnvironmentExists(context.Context, string, string, strin
 	return false, nil
 }
 
+<<<<<<< HEAD
 func (c *EscClientMock) GetAnonymousOpenEnvironment(context.Context, string, string) (*esc.Environment, error) {
 	return nil, nil
 }
 
+=======
+>>>>>>> 99efdeb (Add ESC Projects (#398))
 func (c *EscClientMock) GetOpenEnvironment(context.Context, string, string, string) (*esc.Environment, error) {
 	return nil, nil
 }
@@ -74,10 +80,13 @@ func (c *EscClientMock) GetOpenEnvironmentWithProject(context.Context, string, s
 	return nil, nil
 }
 
+<<<<<<< HEAD
 func (c *EscClientMock) GetAnonymousOpenProperty(context.Context, string, string, string) (*esc.Value, error) {
 	return nil, nil
 }
 
+=======
+>>>>>>> 99efdeb (Add ESC Projects (#398))
 func (c *EscClientMock) GetOpenProperty(context.Context, string, string, string, string, string) (*esc.Value, error) {
 	return nil, nil
 }
