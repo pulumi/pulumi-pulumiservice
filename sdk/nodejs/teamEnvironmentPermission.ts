@@ -68,6 +68,7 @@ export class TeamEnvironmentPermission extends pulumi.CustomResource {
             resourceInputs["environment"] = args ? args.environment : undefined;
             resourceInputs["organization"] = args ? args.organization : undefined;
             resourceInputs["permission"] = args ? args.permission : undefined;
+            resourceInputs["project"] = (args ? args.project : undefined) ?? "default";
             resourceInputs["team"] = args ? args.team : undefined;
         } else {
             resourceInputs["permission"] = undefined /*out*/;
@@ -93,6 +94,10 @@ export interface TeamEnvironmentPermissionArgs {
      * Which permission level to grant to the specified team.
      */
     permission: pulumi.Input<enums.EnvironmentPermission>;
+    /**
+     * Project name.
+     */
+    project?: pulumi.Input<string>;
     /**
      * Team name.
      */

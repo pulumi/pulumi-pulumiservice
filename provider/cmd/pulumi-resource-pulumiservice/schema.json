@@ -1326,6 +1326,10 @@
           "description": "Environment name.",
           "type": "string"
         },
+        "project": {
+          "description": "Project name.",
+          "type": "string"
+        },
         "yaml": {
           "description": "Environment's yaml file.",
           "$ref": "pulumi.json#/Asset"
@@ -1337,6 +1341,7 @@
       },
       "required": [
         "organization",
+        "project",
         "name",
         "yaml",
         "revision"
@@ -1344,6 +1349,11 @@
       "inputProperties": {
         "organization": {
           "description": "Organization name.",
+          "type": "string"
+        },
+        "project": {
+          "description": "Project name.",
+          "default": "default",
           "type": "string"
         },
         "name": {
@@ -1378,6 +1388,11 @@
           "description": "Team name.",
           "type": "string"
         },
+        "project": {
+          "description": "Project name.",
+          "default": "default",
+          "type": "string"
+        },
         "environment": {
           "description": "Environment name.",
           "type": "string"
@@ -1401,6 +1416,10 @@
           "description": "Organization name.",
           "type": "string"
         },
+        "project": {
+          "description": "Project name.",
+          "type": "string"
+        },
         "environment": {
           "description": "Environment name.",
           "type": "string"
@@ -1416,6 +1435,7 @@
       },
       "required": [
         "organization",
+        "project",
         "environment",
         "tagName",
         "revision"
@@ -1423,6 +1443,11 @@
       "inputProperties": {
         "organization": {
           "description": "Organization name.",
+          "type": "string"
+        },
+        "project": {
+          "description": "Project name.",
+          "default": "default",
           "type": "string"
         },
         "environment": {
