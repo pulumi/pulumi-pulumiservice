@@ -20,7 +20,7 @@ public class TeamStackPermission extends com.pulumi.resources.CustomResource {
      *
      * @param name The _unique_ name of the resulting resource.
      */
-    public TeamStackPermission(String name) {
+    public TeamStackPermission(java.lang.String name) {
         this(name, TeamStackPermissionArgs.Empty);
     }
     /**
@@ -28,7 +28,7 @@ public class TeamStackPermission extends com.pulumi.resources.CustomResource {
      * @param name The _unique_ name of the resulting resource.
      * @param args The arguments to use to populate this resource's properties.
      */
-    public TeamStackPermission(String name, TeamStackPermissionArgs args) {
+    public TeamStackPermission(java.lang.String name, TeamStackPermissionArgs args) {
         this(name, args, null);
     }
     /**
@@ -37,15 +37,22 @@ public class TeamStackPermission extends com.pulumi.resources.CustomResource {
      * @param args The arguments to use to populate this resource's properties.
      * @param options A bag of options that control this resource's behavior.
      */
-    public TeamStackPermission(String name, TeamStackPermissionArgs args, @Nullable com.pulumi.resources.CustomResourceOptions options) {
-        super("pulumiservice:index:TeamStackPermission", name, args == null ? TeamStackPermissionArgs.Empty : args, makeResourceOptions(options, Codegen.empty()));
+    public TeamStackPermission(java.lang.String name, TeamStackPermissionArgs args, @Nullable com.pulumi.resources.CustomResourceOptions options) {
+        super("pulumiservice:index:TeamStackPermission", name, makeArgs(args, options), makeResourceOptions(options, Codegen.empty()), false);
     }
 
-    private TeamStackPermission(String name, Output<String> id, @Nullable com.pulumi.resources.CustomResourceOptions options) {
-        super("pulumiservice:index:TeamStackPermission", name, null, makeResourceOptions(options, id));
+    private TeamStackPermission(java.lang.String name, Output<java.lang.String> id, @Nullable com.pulumi.resources.CustomResourceOptions options) {
+        super("pulumiservice:index:TeamStackPermission", name, null, makeResourceOptions(options, id), false);
     }
 
-    private static com.pulumi.resources.CustomResourceOptions makeResourceOptions(@Nullable com.pulumi.resources.CustomResourceOptions options, @Nullable Output<String> id) {
+    private static TeamStackPermissionArgs makeArgs(TeamStackPermissionArgs args, @Nullable com.pulumi.resources.CustomResourceOptions options) {
+        if (options != null && options.getUrn().isPresent()) {
+            return null;
+        }
+        return args == null ? TeamStackPermissionArgs.Empty : args;
+    }
+
+    private static com.pulumi.resources.CustomResourceOptions makeResourceOptions(@Nullable com.pulumi.resources.CustomResourceOptions options, @Nullable Output<java.lang.String> id) {
         var defaultOptions = com.pulumi.resources.CustomResourceOptions.builder()
             .version(Utilities.getVersion())
             .build();
@@ -60,7 +67,7 @@ public class TeamStackPermission extends com.pulumi.resources.CustomResource {
      * @param id The _unique_ provider ID of the resource to lookup.
      * @param options Optional settings to control the behavior of the CustomResource.
      */
-    public static TeamStackPermission get(String name, Output<String> id, @Nullable com.pulumi.resources.CustomResourceOptions options) {
+    public static TeamStackPermission get(java.lang.String name, Output<java.lang.String> id, @Nullable com.pulumi.resources.CustomResourceOptions options) {
         return new TeamStackPermission(name, id, options);
     }
 }

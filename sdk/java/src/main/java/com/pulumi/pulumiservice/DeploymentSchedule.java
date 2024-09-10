@@ -123,7 +123,7 @@ public class DeploymentSchedule extends com.pulumi.resources.CustomResource {
      *
      * @param name The _unique_ name of the resulting resource.
      */
-    public DeploymentSchedule(String name) {
+    public DeploymentSchedule(java.lang.String name) {
         this(name, DeploymentScheduleArgs.Empty);
     }
     /**
@@ -131,7 +131,7 @@ public class DeploymentSchedule extends com.pulumi.resources.CustomResource {
      * @param name The _unique_ name of the resulting resource.
      * @param args The arguments to use to populate this resource's properties.
      */
-    public DeploymentSchedule(String name, DeploymentScheduleArgs args) {
+    public DeploymentSchedule(java.lang.String name, DeploymentScheduleArgs args) {
         this(name, args, null);
     }
     /**
@@ -140,15 +140,22 @@ public class DeploymentSchedule extends com.pulumi.resources.CustomResource {
      * @param args The arguments to use to populate this resource's properties.
      * @param options A bag of options that control this resource's behavior.
      */
-    public DeploymentSchedule(String name, DeploymentScheduleArgs args, @Nullable com.pulumi.resources.CustomResourceOptions options) {
-        super("pulumiservice:index:DeploymentSchedule", name, args == null ? DeploymentScheduleArgs.Empty : args, makeResourceOptions(options, Codegen.empty()));
+    public DeploymentSchedule(java.lang.String name, DeploymentScheduleArgs args, @Nullable com.pulumi.resources.CustomResourceOptions options) {
+        super("pulumiservice:index:DeploymentSchedule", name, makeArgs(args, options), makeResourceOptions(options, Codegen.empty()), false);
     }
 
-    private DeploymentSchedule(String name, Output<String> id, @Nullable com.pulumi.resources.CustomResourceOptions options) {
-        super("pulumiservice:index:DeploymentSchedule", name, null, makeResourceOptions(options, id));
+    private DeploymentSchedule(java.lang.String name, Output<java.lang.String> id, @Nullable com.pulumi.resources.CustomResourceOptions options) {
+        super("pulumiservice:index:DeploymentSchedule", name, null, makeResourceOptions(options, id), false);
     }
 
-    private static com.pulumi.resources.CustomResourceOptions makeResourceOptions(@Nullable com.pulumi.resources.CustomResourceOptions options, @Nullable Output<String> id) {
+    private static DeploymentScheduleArgs makeArgs(DeploymentScheduleArgs args, @Nullable com.pulumi.resources.CustomResourceOptions options) {
+        if (options != null && options.getUrn().isPresent()) {
+            return null;
+        }
+        return args == null ? DeploymentScheduleArgs.Empty : args;
+    }
+
+    private static com.pulumi.resources.CustomResourceOptions makeResourceOptions(@Nullable com.pulumi.resources.CustomResourceOptions options, @Nullable Output<java.lang.String> id) {
         var defaultOptions = com.pulumi.resources.CustomResourceOptions.builder()
             .version(Utilities.getVersion())
             .build();
@@ -163,7 +170,7 @@ public class DeploymentSchedule extends com.pulumi.resources.CustomResource {
      * @param id The _unique_ provider ID of the resource to lookup.
      * @param options Optional settings to control the behavior of the CustomResource.
      */
-    public static DeploymentSchedule get(String name, Output<String> id, @Nullable com.pulumi.resources.CustomResourceOptions options) {
+    public static DeploymentSchedule get(java.lang.String name, Output<java.lang.String> id, @Nullable com.pulumi.resources.CustomResourceOptions options) {
         return new DeploymentSchedule(name, id, options);
     }
 }

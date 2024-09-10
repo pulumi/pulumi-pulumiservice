@@ -5,6 +5,7 @@ let config = new pulumi.Config();
 
 var environment = new service.Environment("testing-environment", {
   organization: "service-provider-test-org",
+  project: "my-project",
   name: "testing-environment-ts-"+config.require("digits"),
   yaml: new pulumi.asset.StringAsset(
 `values:
@@ -19,6 +20,7 @@ var environment = new service.Environment("testing-environment", {
 var stableTag = new service.EnvironmentVersionTag("StableTag", {
   organization: environment.organization,
   environment: environment.name,
+  project: environment.project,
   tagName: "stable",
   revision: environment.revision
 })
@@ -27,6 +29,7 @@ var stableTag = new service.EnvironmentVersionTag("StableTag", {
 var versionTag = new service.EnvironmentVersionTag("VersionTag", {
   organization: environment.organization,
   environment: environment.name,
+  project: environment.project,
   tagName: environment.revision.apply((rev: number) => "v"+rev),
   revision: environment.revision
 }, {

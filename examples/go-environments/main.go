@@ -19,6 +19,7 @@ func main() {
 
 		environment, err := pulumiservice.NewEnvironment(ctx, "testing-environment", &pulumiservice.EnvironmentArgs{
 			Name:         pulumi.String("testing-environment-go-" + conf.Require("digits")),
+			Project:      pulumi.String("my-project"),
 			Organization: pulumi.String("service-provider-test-org"),
 			Yaml:         pulumi.NewStringAsset(yaml),
 		})
@@ -29,6 +30,7 @@ func main() {
 		// A tag that will always be placed on the latest revision of the environment
 		_, err = pulumiservice.NewEnvironmentVersionTag(ctx, "StableTag", &pulumiservice.EnvironmentVersionTagArgs{
 			Organization: environment.Organization,
+			Project:      environment.Project,
 			Environment:  environment.Name,
 			TagName:      pulumi.String("stable"),
 			Revision:     environment.Revision,
@@ -40,6 +42,7 @@ func main() {
 		// A tag that will be placed on each new version, and remain on old revisions
 		_, err = pulumiservice.NewEnvironmentVersionTag(ctx, "VersionTag", &pulumiservice.EnvironmentVersionTagArgs{
 			Organization: environment.Organization,
+			Project:      environment.Project,
 			Environment:  environment.Name,
 			TagName: environment.Revision.ApplyT(func(rev int) (string, error) {
 				return "v" + strconv.Itoa(rev), nil

@@ -118,7 +118,7 @@ import java.util.StringJoiner;
         }
 
         @Override
-        public String toString() {
+        public java.lang.String toString() {
             return new StringJoiner(", ", "WebhookFilters[", "]")
                 .add("value='" + this.value + "'")
                 .toString();

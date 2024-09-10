@@ -39,6 +39,9 @@ func NewTeamEnvironmentPermission(ctx *pulumi.Context,
 	if args.Team == nil {
 		return nil, errors.New("invalid value for required argument 'Team'")
 	}
+	if args.Project == nil {
+		args.Project = pulumi.StringPtr("default")
+	}
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource TeamEnvironmentPermission
 	err := ctx.RegisterResource("pulumiservice:index:TeamEnvironmentPermission", name, args, &resource, opts...)
@@ -78,6 +81,8 @@ type teamEnvironmentPermissionArgs struct {
 	Organization string `pulumi:"organization"`
 	// Which permission level to grant to the specified team.
 	Permission EnvironmentPermission `pulumi:"permission"`
+	// Project name.
+	Project *string `pulumi:"project"`
 	// Team name.
 	Team string `pulumi:"team"`
 }
@@ -90,6 +95,8 @@ type TeamEnvironmentPermissionArgs struct {
 	Organization pulumi.StringInput
 	// Which permission level to grant to the specified team.
 	Permission EnvironmentPermissionInput
+	// Project name.
+	Project pulumi.StringPtrInput
 	// Team name.
 	Team pulumi.StringInput
 }

@@ -9,6 +9,7 @@ config = pulumi.Config()
 environment = Environment(
     "testing-environment",
     organization="service-provider-test-org",
+    project="my-project",
     name="testing-environment-py-"+config.require('digits'),
     yaml=pulumi.StringAsset("""values:
   myKey1: "myValue1"
@@ -21,6 +22,7 @@ environment = Environment(
 stableTag = EnvironmentVersionTag(
   "StableTag",
 	organization=environment.organization,
+	project=environment.project,
 	environment=environment.name,
 	tag_name="stable",
 	revision=environment.revision,
@@ -30,6 +32,7 @@ stableTag = EnvironmentVersionTag(
 versionTag = EnvironmentVersionTag(
   "VersionTag",
 	organization=environment.organization,
+  project=environment.project,
 	environment=environment.name,
 	tag_name=environment.revision.apply(
     lambda revision: "v" + str(revision)

@@ -19,6 +19,7 @@ class MyStack : Pulumi.Stack
             "testing-environment",
             new EnvironmentArgs {
                 Organization = "service-provider-test-org",
+                Project = "my-project",
                 Name = "testing-environment-cs-" + config.Require("digits"),
                 Yaml = new StringAsset(yaml)
             }
@@ -29,6 +30,7 @@ class MyStack : Pulumi.Stack
             "StableTag",
             new EnvironmentVersionTagArgs {
                 Organization = environment.Organization,
+                Project = environment.Project,
                 Environment = environment.Name,
                 TagName = "stable",
                 Revision = environment.Revision
@@ -40,6 +42,7 @@ class MyStack : Pulumi.Stack
             "VersionTag",
             new EnvironmentVersionTagArgs {
                 Organization = environment.Organization,
+                Project = environment.Project,
                 Environment = environment.Name,
                 TagName = environment.Revision.Apply(rev => "v"+rev),
                 Revision = environment.Revision

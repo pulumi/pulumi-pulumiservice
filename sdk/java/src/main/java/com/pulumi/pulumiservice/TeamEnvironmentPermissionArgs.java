@@ -5,10 +5,13 @@ package com.pulumi.pulumiservice;
 
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
+import com.pulumi.core.internal.Codegen;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
 import com.pulumi.pulumiservice.enums.EnvironmentPermission;
 import java.lang.String;
 import java.util.Objects;
+import java.util.Optional;
+import javax.annotation.Nullable;
 
 
 public final class TeamEnvironmentPermissionArgs extends com.pulumi.resources.ResourceArgs {
@@ -61,6 +64,21 @@ public final class TeamEnvironmentPermissionArgs extends com.pulumi.resources.Re
     }
 
     /**
+     * Project name.
+     * 
+     */
+    @Import(name="project")
+    private @Nullable Output<String> project;
+
+    /**
+     * @return Project name.
+     * 
+     */
+    public Optional<Output<String>> project() {
+        return Optional.ofNullable(this.project);
+    }
+
+    /**
      * Team name.
      * 
      */
@@ -81,6 +99,7 @@ public final class TeamEnvironmentPermissionArgs extends com.pulumi.resources.Re
         this.environment = $.environment;
         this.organization = $.organization;
         this.permission = $.permission;
+        this.project = $.project;
         this.team = $.team;
     }
 
@@ -166,6 +185,27 @@ public final class TeamEnvironmentPermissionArgs extends com.pulumi.resources.Re
         }
 
         /**
+         * @param project Project name.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder project(@Nullable Output<String> project) {
+            $.project = project;
+            return this;
+        }
+
+        /**
+         * @param project Project name.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder project(String project) {
+            return project(Output.of(project));
+        }
+
+        /**
          * @param team Team name.
          * 
          * @return builder
@@ -196,6 +236,7 @@ public final class TeamEnvironmentPermissionArgs extends com.pulumi.resources.Re
             if ($.permission == null) {
                 throw new MissingRequiredPropertyException("TeamEnvironmentPermissionArgs", "permission");
             }
+            $.project = Codegen.stringProp("project").output().arg($.project).def("default").getNullable();
             if ($.team == null) {
                 throw new MissingRequiredPropertyException("TeamEnvironmentPermissionArgs", "team");
             }

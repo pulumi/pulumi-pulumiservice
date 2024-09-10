@@ -16,14 +16,17 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 )
 
+const defaultProject = "default"
+
 type PulumiServiceEnvironmentResource struct {
 	client esc_client.Client
 }
 
 type PulumiServiceEnvironmentInput struct {
-	OrgName string
-	EnvName string
-	Yaml    string
+	OrgName     string
+	ProjectName string
+	EnvName     string
+	Yaml        string
 }
 
 type PulumiServiceEnvironmentOutput struct {
@@ -34,6 +37,7 @@ type PulumiServiceEnvironmentOutput struct {
 func (i *PulumiServiceEnvironmentInput) ToPropertyMap() (resource.PropertyMap, error) {
 	propertyMap := resource.PropertyMap{}
 	propertyMap["organization"] = resource.NewPropertyValue(i.OrgName)
+	propertyMap["project"] = resource.NewPropertyValue(i.ProjectName)
 	propertyMap["name"] = resource.NewPropertyValue(i.EnvName)
 	propertyMap["yaml"] = resource.MakeSecret(resource.NewStringProperty(i.Yaml))
 
@@ -66,6 +70,14 @@ func ToPulumiServiceEnvironmentInput(properties *structpb.Struct) (*PulumiServic
 		input.Yaml = inputYaml.AssetValue().Text
 	} else {
 		input.Yaml = inputYaml.StringValue()
+	}
+
+	// Set project to "default" if not in input
+	input.ProjectName = defaultProject
+
+	inputProject := inputMap["project"]
+	if inputProject.HasValue() && inputProject.IsString() {
+		input.ProjectName = inputProject.StringValue()
 	}
 
 	return &input, nil
@@ -104,6 +116,7 @@ func (st *PulumiServiceEnvironmentResource) Diff(req *pulumirpc.DiffRequest) (*p
 	replaces := []string(nil)
 	replaceProperties := map[string]bool{
 		"organization": true,
+		"project":      true,
 		"name":         true,
 	}
 	for k, v := range dd {
@@ -136,7 +149,7 @@ func (st *PulumiServiceEnvironmentResource) Delete(req *pulumirpc.DeleteRequest)
 		return nil, err
 	}
 
-	err = st.client.DeleteEnvironment(context.Background(), input.OrgName, input.EnvName)
+	err = st.client.DeleteEnvironment(context.Background(), input.OrgName, input.ProjectName, input.EnvName)
 	if err != nil {
 		return nil, err
 	}
@@ -150,14 +163,27 @@ func (st *PulumiServiceEnvironmentResource) Create(req *pulumirpc.CreateRequest)
 	}
 
 	// First check if yaml is valid
-	_, diagnostics, err := st.client.CheckYAMLEnvironment(context.Background(), input.OrgName, []byte(input.Yaml))
+	_, diagnostics, err := st.client.CheckYAMLEnvironment(context.Background(), input.OrgName, []byte(input.Yaml), esc_client.CheckYAMLOption{})
+	if diagnostics != nil {
+		return nil, fmt.Errorf("failed to check environment, yaml code failed following checks: %+v", diagnostics)
+	}
+	if err != nil {
+		return nil, fmt.Errorf("failed to check environment due to error: %+v", err)
+	}
 
 	// Then create environment, and update it with yaml provided. ESC API architecture doesn't let you do it in one call
-	err = st.client.CreateEnvironment(context.Background(), input.OrgName, input.EnvName)
+	err = st.client.CreateEnvironmentWithProject(context.Background(), input.OrgName, input.ProjectName, input.EnvName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create new environment due to error: %+v", err)
 	}
-	diagnostics, revision, err := st.client.UpdateEnvironmentWithRevision(context.Background(), input.OrgName, input.EnvName, []byte(input.Yaml), "")
+	diagnostics, revision, err := st.client.UpdateEnvironmentWithRevision(
+		context.Background(),
+		input.OrgName,
+		input.ProjectName,
+		input.EnvName,
+		[]byte(input.Yaml),
+		"",
+	)
 	if diagnostics != nil {
 		return nil, fmt.Errorf("failed to update brand new environment with pre-checked yaml, due to failing the following checks: %+v \n"+
 			"This should never happen, if you're seeing this message there's likely a bug in ESC APIs", diagnostics)
@@ -186,7 +212,7 @@ func (st *PulumiServiceEnvironmentResource) Create(req *pulumirpc.CreateRequest)
 	}
 
 	return &pulumirpc.CreateResponse{
-		Id:         path.Join(input.OrgName, input.EnvName),
+		Id:         path.Join(input.OrgName, input.ProjectName, input.EnvName),
 		Properties: outputProperties,
 	}, nil
 }
@@ -198,7 +224,7 @@ func (st *PulumiServiceEnvironmentResource) Check(req *pulumirpc.CheckRequest) (
 	}
 
 	var failures []*pulumirpc.CheckFailure
-	for _, p := range []resource.PropertyKey{"organization", "name", "yaml"} {
+	for _, p := range []resource.PropertyKey{"organization", "project", "name", "yaml"} {
 		if !inputMap[(p)].HasValue() {
 			failures = append(failures, &pulumirpc.CheckFailure{
 				Reason:   fmt.Sprintf("missing required property '%s'", p),
@@ -234,10 +260,14 @@ func (st *PulumiServiceEnvironmentResource) Update(req *pulumirpc.UpdateRequest)
 		return nil, err
 	}
 
-	diagnostics, revision, err := st.client.UpdateEnvironmentWithRevision(context.Background(), input.OrgName, input.EnvName, []byte(input.Yaml), "")
-	if err != nil {
-		return nil, err
-	}
+	diagnostics, revision, err := st.client.UpdateEnvironmentWithRevision(
+		context.Background(),
+		input.OrgName,
+		input.ProjectName,
+		input.EnvName,
+		[]byte(input.Yaml),
+		"",
+	)
 	if diagnostics != nil {
 		return nil, fmt.Errorf("failed to update environment, yaml code failed following checks: %+v", diagnostics)
 	}
@@ -267,14 +297,27 @@ func (st *PulumiServiceEnvironmentResource) Update(req *pulumirpc.UpdateRequest)
 }
 
 func (st *PulumiServiceEnvironmentResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
+	// Split Id into either:
+	//   <org>/<project>/<env> or
+	//   <org>/<env> (legacy pattern)
+	var orgName, projectName, envName string
+
 	splitID := strings.Split(req.Id, "/")
-	if len(splitID) < 2 {
+	switch len(splitID) {
+	case 3:
+		orgName = splitID[0]
+		projectName = splitID[1]
+		envName = splitID[2]
+	case 2:
+		// Legacy pattern. Assume "default" project
+		orgName = splitID[0]
+		projectName = defaultProject
+		envName = splitID[1]
+	default:
 		return nil, fmt.Errorf("invalid environment id: %s", req.Id)
 	}
-	orgName := splitID[0]
-	envName := splitID[1]
 
-	retrievedYaml, _, revision, err := st.client.GetEnvironment(context.Background(), orgName, envName, "", false)
+	retrievedYaml, _, revision, err := st.client.GetEnvironment(context.Background(), orgName, projectName, envName, "", false)
 	if err != nil {
 		return &pulumirpc.ReadResponse{Id: "", Properties: nil}, nil
 	}
@@ -283,9 +326,10 @@ func (st *PulumiServiceEnvironmentResource) Read(req *pulumirpc.ReadRequest) (*p
 	trimmedYaml := strings.TrimSpace(stringYaml)
 
 	input := PulumiServiceEnvironmentInput{
-		OrgName: orgName,
-		EnvName: envName,
-		Yaml:    trimmedYaml,
+		OrgName:     orgName,
+		ProjectName: projectName,
+		EnvName:     envName,
+		Yaml:        trimmedYaml,
 	}
 
 	result := PulumiServiceEnvironmentOutput{

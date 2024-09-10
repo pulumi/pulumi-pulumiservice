@@ -85,6 +85,12 @@ namespace Pulumi.PulumiService
         public Input<Pulumi.PulumiService.EnvironmentPermission> Permission { get; set; } = null!;
 
         /// <summary>
+        /// Project name.
+        /// </summary>
+        [Input("project")]
+        public Input<string>? Project { get; set; }
+
+        /// <summary>
         /// Team name.
         /// </summary>
         [Input("team", required: true)]
@@ -92,6 +98,7 @@ namespace Pulumi.PulumiService
 
         public TeamEnvironmentPermissionArgs()
         {
+            Project = "default";
         }
         public static new TeamEnvironmentPermissionArgs Empty => new TeamEnvironmentPermissionArgs();
     }

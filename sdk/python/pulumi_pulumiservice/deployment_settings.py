@@ -151,12 +151,12 @@ class DeploymentSettings(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  agent_pool_id: Optional[pulumi.Input[str]] = None,
-                 executor_context: Optional[pulumi.Input[pulumi.InputType['DeploymentSettingsExecutorContextArgs']]] = None,
-                 github: Optional[pulumi.Input[pulumi.InputType['DeploymentSettingsGithubArgs']]] = None,
-                 operation_context: Optional[pulumi.Input[pulumi.InputType['DeploymentSettingsOperationContextArgs']]] = None,
+                 executor_context: Optional[pulumi.Input[Union['DeploymentSettingsExecutorContextArgs', 'DeploymentSettingsExecutorContextArgsDict']]] = None,
+                 github: Optional[pulumi.Input[Union['DeploymentSettingsGithubArgs', 'DeploymentSettingsGithubArgsDict']]] = None,
+                 operation_context: Optional[pulumi.Input[Union['DeploymentSettingsOperationContextArgs', 'DeploymentSettingsOperationContextArgsDict']]] = None,
                  organization: Optional[pulumi.Input[str]] = None,
                  project: Optional[pulumi.Input[str]] = None,
-                 source_context: Optional[pulumi.Input[pulumi.InputType['DeploymentSettingsSourceContextArgs']]] = None,
+                 source_context: Optional[pulumi.Input[Union['DeploymentSettingsSourceContextArgs', 'DeploymentSettingsSourceContextArgsDict']]] = None,
                  stack: Optional[pulumi.Input[str]] = None,
                  __props__=None):
         """
@@ -173,12 +173,12 @@ class DeploymentSettings(pulumi.CustomResource):
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[str] agent_pool_id: The agent pool identifier to use for the deployment.
-        :param pulumi.Input[pulumi.InputType['DeploymentSettingsExecutorContextArgs']] executor_context: Settings related to the deployment executor.
-        :param pulumi.Input[pulumi.InputType['DeploymentSettingsGithubArgs']] github: GitHub settings for the deployment.
-        :param pulumi.Input[pulumi.InputType['DeploymentSettingsOperationContextArgs']] operation_context: Settings related to the Pulumi operation environment during the deployment.
+        :param pulumi.Input[Union['DeploymentSettingsExecutorContextArgs', 'DeploymentSettingsExecutorContextArgsDict']] executor_context: Settings related to the deployment executor.
+        :param pulumi.Input[Union['DeploymentSettingsGithubArgs', 'DeploymentSettingsGithubArgsDict']] github: GitHub settings for the deployment.
+        :param pulumi.Input[Union['DeploymentSettingsOperationContextArgs', 'DeploymentSettingsOperationContextArgsDict']] operation_context: Settings related to the Pulumi operation environment during the deployment.
         :param pulumi.Input[str] organization: Organization name.
         :param pulumi.Input[str] project: Project name.
-        :param pulumi.Input[pulumi.InputType['DeploymentSettingsSourceContextArgs']] source_context: Settings related to the source of the deployment.
+        :param pulumi.Input[Union['DeploymentSettingsSourceContextArgs', 'DeploymentSettingsSourceContextArgsDict']] source_context: Settings related to the source of the deployment.
         :param pulumi.Input[str] stack: Stack name.
         """
         ...
@@ -214,12 +214,12 @@ class DeploymentSettings(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  agent_pool_id: Optional[pulumi.Input[str]] = None,
-                 executor_context: Optional[pulumi.Input[pulumi.InputType['DeploymentSettingsExecutorContextArgs']]] = None,
-                 github: Optional[pulumi.Input[pulumi.InputType['DeploymentSettingsGithubArgs']]] = None,
-                 operation_context: Optional[pulumi.Input[pulumi.InputType['DeploymentSettingsOperationContextArgs']]] = None,
+                 executor_context: Optional[pulumi.Input[Union['DeploymentSettingsExecutorContextArgs', 'DeploymentSettingsExecutorContextArgsDict']]] = None,
+                 github: Optional[pulumi.Input[Union['DeploymentSettingsGithubArgs', 'DeploymentSettingsGithubArgsDict']]] = None,
+                 operation_context: Optional[pulumi.Input[Union['DeploymentSettingsOperationContextArgs', 'DeploymentSettingsOperationContextArgsDict']]] = None,
                  organization: Optional[pulumi.Input[str]] = None,
                  project: Optional[pulumi.Input[str]] = None,
-                 source_context: Optional[pulumi.Input[pulumi.InputType['DeploymentSettingsSourceContextArgs']]] = None,
+                 source_context: Optional[pulumi.Input[Union['DeploymentSettingsSourceContextArgs', 'DeploymentSettingsSourceContextArgsDict']]] = None,
                  stack: Optional[pulumi.Input[str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)

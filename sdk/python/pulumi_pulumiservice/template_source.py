@@ -87,7 +87,7 @@ class TemplateSource(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 destination: Optional[pulumi.Input[pulumi.InputType['TemplateSourceDestinationArgs']]] = None,
+                 destination: Optional[pulumi.Input[Union['TemplateSourceDestinationArgs', 'TemplateSourceDestinationArgsDict']]] = None,
                  organization_name: Optional[pulumi.Input[str]] = None,
                  source_name: Optional[pulumi.Input[str]] = None,
                  source_url: Optional[pulumi.Input[str]] = None,
@@ -97,7 +97,7 @@ class TemplateSource(pulumi.CustomResource):
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
-        :param pulumi.Input[pulumi.InputType['TemplateSourceDestinationArgs']] destination: The default destination for projects using templates from this source.
+        :param pulumi.Input[Union['TemplateSourceDestinationArgs', 'TemplateSourceDestinationArgsDict']] destination: The default destination for projects using templates from this source.
         :param pulumi.Input[str] organization_name: Organization name.
         :param pulumi.Input[str] source_name: Source name.
         :param pulumi.Input[str] source_url: Github URL of the repository from which to grab templates.
@@ -126,7 +126,7 @@ class TemplateSource(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 destination: Optional[pulumi.Input[pulumi.InputType['TemplateSourceDestinationArgs']]] = None,
+                 destination: Optional[pulumi.Input[Union['TemplateSourceDestinationArgs', 'TemplateSourceDestinationArgsDict']]] = None,
                  organization_name: Optional[pulumi.Input[str]] = None,
                  source_name: Optional[pulumi.Input[str]] = None,
                  source_url: Optional[pulumi.Input[str]] = None,
