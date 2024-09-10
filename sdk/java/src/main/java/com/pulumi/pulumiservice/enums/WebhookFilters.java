@@ -104,7 +104,62 @@ import java.util.StringJoiner;
          * Trigger a webhook when a drift remediation run fails.
          * 
          */
-        DriftRemediationFailed("drift_remediation_failed");
+        DriftRemediationFailed("drift_remediation_failed"),
+        /**
+         * Trigger a webhook when a new environment is created.
+         * 
+         */
+        EnvironmentCreated("environment_created"),
+        /**
+         * Trigger a webhook when an environment is deleted.
+         * 
+         */
+        EnvironmentDeleted("environment_deleted"),
+        /**
+         * Trigger a webhook when a new revision is created on an environment.
+         * 
+         */
+        EnvironmentRevisionCreated("environment_revision_created"),
+        /**
+         * Trigger a webhook when a revision is retracted on an environment.
+         * 
+         */
+        EnvironmentRevisionRetracted("environment_revision_retracted"),
+        /**
+         * Trigger a webhook when a revision tag is created on an environment.
+         * 
+         */
+        EnvironmentRevisionTagCreated("environment_revision_tag_created"),
+        /**
+         * Trigger a webhook when a revision tag is deleted on an environment.
+         * 
+         */
+        EnvironmentRevisionTagDeleted("environment_revision_tag_deleted"),
+        /**
+         * Trigger a webhook when a revision tag is updated on an environment.
+         * 
+         */
+        EnvironmentRevisionTagUpdated("environment_revision_tag_updated"),
+        /**
+         * Trigger a webhook when an environment tag is created.
+         * 
+         */
+        EnvironmentTagCreated("environment_tag_created"),
+        /**
+         * Trigger a webhook when an environment tag is deleted.
+         * 
+         */
+        EnvironmentTagDeleted("environment_tag_deleted"),
+        /**
+         * Trigger a webhook when an environment tag is updated.
+         * 
+         */
+        EnvironmentTagUpdated("environment_tag_updated"),
+        /**
+         * Trigger a webhook when an imported environment has changed.
+         * 
+         */
+        ImportedEnvironmentChanged("imported_environment_changed");
 
         private final String value;
 

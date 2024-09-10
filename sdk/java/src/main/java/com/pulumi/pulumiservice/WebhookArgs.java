@@ -9,6 +9,7 @@ import com.pulumi.core.internal.Codegen;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
 import com.pulumi.pulumiservice.enums.WebhookFilters;
 import com.pulumi.pulumiservice.enums.WebhookFormat;
+import com.pulumi.pulumiservice.enums.WebhookGroup;
 import java.lang.Boolean;
 import java.lang.String;
 import java.util.List;
@@ -52,6 +53,21 @@ public final class WebhookArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
+     * Name of the environment. Only specified if this is an environment webhook.
+     * 
+     */
+    @Import(name="environmentName")
+    private @Nullable Output<String> environmentName;
+
+    /**
+     * @return Name of the environment. Only specified if this is an environment webhook.
+     * 
+     */
+    public Optional<Output<String>> environmentName() {
+        return Optional.ofNullable(this.environmentName);
+    }
+
+    /**
      * Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.
      * 
      */
@@ -79,6 +95,21 @@ public final class WebhookArgs extends com.pulumi.resources.ResourceArgs {
      */
     public Optional<Output<WebhookFormat>> format() {
         return Optional.ofNullable(this.format);
+    }
+
+    /**
+     * Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#groups) for more information.
+     * 
+     */
+    @Import(name="groups")
+    private @Nullable Output<List<WebhookGroup>> groups;
+
+    /**
+     * @return Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#groups) for more information.
+     * 
+     */
+    public Optional<Output<List<WebhookGroup>>> groups() {
+        return Optional.ofNullable(this.groups);
     }
 
     /**
@@ -112,14 +143,14 @@ public final class WebhookArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * Name of the project. Only needed if this is a stack webhook.
+     * Name of the project. Only specified if this is a stack or environment webhook.
      * 
      */
     @Import(name="projectName")
     private @Nullable Output<String> projectName;
 
     /**
-     * @return Name of the project. Only needed if this is a stack webhook.
+     * @return Name of the project. Only specified if this is a stack or environment webhook.
      * 
      */
     public Optional<Output<String>> projectName() {
@@ -161,8 +192,10 @@ public final class WebhookArgs extends com.pulumi.resources.ResourceArgs {
     private WebhookArgs(WebhookArgs $) {
         this.active = $.active;
         this.displayName = $.displayName;
+        this.environmentName = $.environmentName;
         this.filters = $.filters;
         this.format = $.format;
+        this.groups = $.groups;
         this.organizationName = $.organizationName;
         this.payloadUrl = $.payloadUrl;
         this.projectName = $.projectName;
@@ -231,6 +264,27 @@ public final class WebhookArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
+         * @param environmentName Name of the environment. Only specified if this is an environment webhook.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder environmentName(@Nullable Output<String> environmentName) {
+            $.environmentName = environmentName;
+            return this;
+        }
+
+        /**
+         * @param environmentName Name of the environment. Only specified if this is an environment webhook.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder environmentName(String environmentName) {
+            return environmentName(Output.of(environmentName));
+        }
+
+        /**
          * @param filters Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.
          * 
          * @return builder
@@ -283,6 +337,37 @@ public final class WebhookArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
+         * @param groups Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#groups) for more information.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder groups(@Nullable Output<List<WebhookGroup>> groups) {
+            $.groups = groups;
+            return this;
+        }
+
+        /**
+         * @param groups Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#groups) for more information.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder groups(List<WebhookGroup> groups) {
+            return groups(Output.of(groups));
+        }
+
+        /**
+         * @param groups Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#groups) for more information.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder groups(WebhookGroup... groups) {
+            return groups(List.of(groups));
+        }
+
+        /**
          * @param organizationName Name of the organization.
          * 
          * @return builder
@@ -325,7 +410,7 @@ public final class WebhookArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param projectName Name of the project. Only needed if this is a stack webhook.
+         * @param projectName Name of the project. Only specified if this is a stack or environment webhook.
          * 
          * @return builder
          * 
@@ -336,7 +421,7 @@ public final class WebhookArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param projectName Name of the project. Only needed if this is a stack webhook.
+         * @param projectName Name of the project. Only specified if this is a stack or environment webhook.
          * 
          * @return builder
          * 

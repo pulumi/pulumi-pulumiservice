@@ -219,6 +219,50 @@ namespace Pulumi.PulumiService
         /// Trigger a webhook when a drift remediation run fails.
         /// </summary>
         public static WebhookFilters DriftRemediationFailed { get; } = new WebhookFilters("drift_remediation_failed");
+        /// <summary>
+        /// Trigger a webhook when a new environment is created.
+        /// </summary>
+        public static WebhookFilters EnvironmentCreated { get; } = new WebhookFilters("environment_created");
+        /// <summary>
+        /// Trigger a webhook when an environment is deleted.
+        /// </summary>
+        public static WebhookFilters EnvironmentDeleted { get; } = new WebhookFilters("environment_deleted");
+        /// <summary>
+        /// Trigger a webhook when a new revision is created on an environment.
+        /// </summary>
+        public static WebhookFilters EnvironmentRevisionCreated { get; } = new WebhookFilters("environment_revision_created");
+        /// <summary>
+        /// Trigger a webhook when a revision is retracted on an environment.
+        /// </summary>
+        public static WebhookFilters EnvironmentRevisionRetracted { get; } = new WebhookFilters("environment_revision_retracted");
+        /// <summary>
+        /// Trigger a webhook when a revision tag is created on an environment.
+        /// </summary>
+        public static WebhookFilters EnvironmentRevisionTagCreated { get; } = new WebhookFilters("environment_revision_tag_created");
+        /// <summary>
+        /// Trigger a webhook when a revision tag is deleted on an environment.
+        /// </summary>
+        public static WebhookFilters EnvironmentRevisionTagDeleted { get; } = new WebhookFilters("environment_revision_tag_deleted");
+        /// <summary>
+        /// Trigger a webhook when a revision tag is updated on an environment.
+        /// </summary>
+        public static WebhookFilters EnvironmentRevisionTagUpdated { get; } = new WebhookFilters("environment_revision_tag_updated");
+        /// <summary>
+        /// Trigger a webhook when an environment tag is created.
+        /// </summary>
+        public static WebhookFilters EnvironmentTagCreated { get; } = new WebhookFilters("environment_tag_created");
+        /// <summary>
+        /// Trigger a webhook when an environment tag is deleted.
+        /// </summary>
+        public static WebhookFilters EnvironmentTagDeleted { get; } = new WebhookFilters("environment_tag_deleted");
+        /// <summary>
+        /// Trigger a webhook when an environment tag is updated.
+        /// </summary>
+        public static WebhookFilters EnvironmentTagUpdated { get; } = new WebhookFilters("environment_tag_updated");
+        /// <summary>
+        /// Trigger a webhook when an imported environment has changed.
+        /// </summary>
+        public static WebhookFilters ImportedEnvironmentChanged { get; } = new WebhookFilters("imported_environment_changed");
 
         public static bool operator ==(WebhookFilters left, WebhookFilters right) => left.Equals(right);
         public static bool operator !=(WebhookFilters left, WebhookFilters right) => !left.Equals(right);
@@ -270,6 +314,44 @@ namespace Pulumi.PulumiService
         [EditorBrowsable(EditorBrowsableState.Never)]
         public override bool Equals(object? obj) => obj is WebhookFormat other && Equals(other);
         public bool Equals(WebhookFormat other) => string.Equals(_value, other._value, StringComparison.Ordinal);
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+
+        public override string ToString() => _value;
+    }
+
+    [EnumType]
+    public readonly struct WebhookGroup : IEquatable<WebhookGroup>
+    {
+        private readonly string _value;
+
+        private WebhookGroup(string value)
+        {
+            _value = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        /// <summary>
+        /// A group of webhooks containing all stack events.
+        /// </summary>
+        public static WebhookGroup Stacks { get; } = new WebhookGroup("stacks");
+        /// <summary>
+        /// A group of webhooks containing all deployment events.
+        /// </summary>
+        public static WebhookGroup Deployments { get; } = new WebhookGroup("deployments");
+        /// <summary>
+        /// A group of webhooks containing all environment events.
+        /// </summary>
+        public static WebhookGroup Environments { get; } = new WebhookGroup("environments");
+
+        public static bool operator ==(WebhookGroup left, WebhookGroup right) => left.Equals(right);
+        public static bool operator !=(WebhookGroup left, WebhookGroup right) => !left.Equals(right);
+
+        public static explicit operator string(WebhookGroup value) => value._value;
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override bool Equals(object? obj) => obj is WebhookGroup other && Equals(other);
+        public bool Equals(WebhookGroup other) => string.Equals(_value, other._value, StringComparison.Ordinal);
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public override int GetHashCode() => _value?.GetHashCode() ?? 0;

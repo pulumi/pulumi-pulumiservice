@@ -72,8 +72,12 @@ func TestTeamsExample(t *testing.T) {
 
 func TestNodejsWebhookExample(t *testing.T) {
 	cwd := getCwd(t)
+	digits := generateRandomFiveDigits()
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		Dir: path.Join(cwd, ".", "ts-webhooks"),
+		Config: map[string]string{
+			"digits": digits,
+		},
 		Dependencies: []string{
 			"@pulumi/pulumiservice",
 		},
