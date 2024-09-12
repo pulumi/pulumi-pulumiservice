@@ -507,7 +507,7 @@ func splitWebhookID(id string) (*webhookID, error) {
 	// format:
 	// organization/project/stack/webhookName (stack webhook)
 	// organization/webhookName (org webhook)
-	// organization/environment/project/stack/webhookName (stack webhook)
+	// organization/environment/projectName/environmentName/webhookName (environment webhook)
 	s := strings.Split(id, "/")
 	switch len(s) {
 	case 2:
