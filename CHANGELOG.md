@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+## 0.25.0
+
+### Improvements
+
+- Added support for ESC Projects [#401](https://github.com/pulumi/pulumi-pulumiservice/issues/401)
+
 ## 0.24.1
 
 ### Bug Fixes
