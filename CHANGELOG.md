@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+## 0.26.0
+
+### Improvements
+
+- Added support for ESC Webhooks and Webhook Groups [#401](https://github.com/pulumi/pulumi-pulumiservice/issues/409)
+
 ## 0.25.0
 
 ### Improvements
