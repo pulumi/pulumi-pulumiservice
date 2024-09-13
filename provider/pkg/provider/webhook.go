@@ -303,7 +303,7 @@ func (wh *PulumiServiceWebhookResource) createWebhook(input PulumiServiceWebhook
 			webhook.Name)
 	} else if input.ProjectName != nil && input.EnvironmentName != nil {
 		// This is not ideal, but inserting "environment" string to distinguish from stack webhooks
-		hookID = fmt.Sprintf("%s/%s/%s/%s/%s", input.OrganizationName, "environment", *input.ProjectName, *input.EnvironmentName,
+		hookID = fmt.Sprintf("%s/environment/%s/%s/%s", input.OrganizationName, *input.ProjectName, *input.EnvironmentName,
 			webhook.Name)
 	} else {
 		hookID = fmt.Sprintf("%s/%s", input.OrganizationName, webhook.Name)
