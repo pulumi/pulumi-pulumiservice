@@ -73,6 +73,26 @@
         }
       ]
     },
+    "pulumiservice:index:WebhookGroup": {
+      "type": "string",
+      "enum": [
+        {
+          "value": "stacks",
+          "description": "A group of webhooks containing all stack events.",
+          "name": "Stacks"
+        },
+        {
+          "value": "deployments",
+          "description": "A group of webhooks containing all deployment events.",
+          "name": "Deployments"
+        },
+        {
+          "value": "environments",
+          "description": "A group of webhooks containing all environment events.",
+          "name": "Environments"
+        }
+      ]
+    },
     "pulumiservice:index:WebhookFilters": {
       "type": "string",
       "enum": [
@@ -170,6 +190,61 @@
           "value": "drift_remediation_failed",
           "description": "Trigger a webhook when a drift remediation run fails.",
           "name": "DriftRemediationFailed"
+        },
+        {
+          "value": "environment_created",
+          "description": "Trigger a webhook when a new environment is created.",
+          "name": "EnvironmentCreated"
+        },
+        {
+          "value": "environment_deleted",
+          "description": "Trigger a webhook when an environment is deleted.",
+          "name": "EnvironmentDeleted"
+        },
+        {
+          "value": "environment_revision_created",
+          "description": "Trigger a webhook when a new revision is created on an environment.",
+          "name": "EnvironmentRevisionCreated"
+        },
+        {
+          "value": "environment_revision_retracted",
+          "description": "Trigger a webhook when a revision is retracted on an environment.",
+          "name": "EnvironmentRevisionRetracted"
+        },
+        {
+          "value": "environment_revision_tag_created",
+          "description": "Trigger a webhook when a revision tag is created on an environment.",
+          "name": "EnvironmentRevisionTagCreated"
+        },
+        {
+          "value": "environment_revision_tag_deleted",
+          "description": "Trigger a webhook when a revision tag is deleted on an environment.",
+          "name": "EnvironmentRevisionTagDeleted"
+        },
+        {
+          "value": "environment_revision_tag_updated",
+          "description": "Trigger a webhook when a revision tag is updated on an environment.",
+          "name": "EnvironmentRevisionTagUpdated"
+        },
+        {
+          "value": "environment_tag_created",
+          "description": "Trigger a webhook when an environment tag is created.",
+          "name": "EnvironmentTagCreated"
+        },
+        {
+          "value": "environment_tag_deleted",
+          "description": "Trigger a webhook when an environment tag is deleted.",
+          "name": "EnvironmentTagDeleted"
+        },
+        {
+          "value": "environment_tag_updated",
+          "description": "Trigger a webhook when an environment tag is updated.",
+          "name": "EnvironmentTagUpdated"
+        },
+        {
+          "value": "imported_environment_changed",
+          "description": "Trigger a webhook when an imported environment has changed.",
+          "name": "ImportedEnvironmentChanged"
         }
       ]
     },
@@ -857,11 +932,15 @@
           "type": "string"
         },
         "projectName": {
-          "description": "Name of the project. Only specified if this is a stack webhook.",
+          "description": "Name of the project. Only specified if this is a stack or environment webhook.",
           "type": "string"
         },
         "stackName": {
           "description": "Name of the stack. Only specified if this is a stack webhook.",
+          "type": "string"
+        },
+        "environmentName": {
+          "description": "Name of the environment. Only specified if this is an environment webhook.",
           "type": "string"
         },
         "format": {
@@ -873,6 +952,13 @@
           "type": "array",
           "items": {
             "$ref": "#/types/pulumiservice:index:WebhookFilters"
+          }
+        },
+        "groups": {
+          "description": "Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#groups) for more information.",
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:index:WebhookGroup"
           }
         }
       },
@@ -907,11 +993,15 @@
           "type": "string"
         },
         "projectName": {
-          "description": "Name of the project. Only needed if this is a stack webhook.",
+          "description": "Name of the project. Only specified if this is a stack or environment webhook.",
           "type": "string"
         },
         "stackName": {
           "description": "Name of the stack. Only needed if this is a stack webhook.",
+          "type": "string"
+        },
+        "environmentName": {
+          "description": "Name of the environment. Only specified if this is an environment webhook.",
           "type": "string"
         },
         "format": {
@@ -924,6 +1014,13 @@
           "type": "array",
           "items": {
             "$ref": "#/types/pulumiservice:index:WebhookFilters"
+          }
+        },
+        "groups": {
+          "description": "Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#groups) for more information.",
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:index:WebhookGroup"
           }
         }
       },

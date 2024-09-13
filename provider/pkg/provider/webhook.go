@@ -13,6 +13,13 @@ import (
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
+// Not the best to create a second source of truth here, but this will likely not change for years
+var defaultWebhookGroups = map[string][]string{
+	"organization": {"deployments", "environments", "stacks"},
+	"stack":        {"deployments", "stacks"},
+	"environment":  {"environments"},
+}
+
 type PulumiServiceWebhookResource struct {
 	config PulumiServiceConfig
 	client pulumiapi.WebhookClient
@@ -26,8 +33,10 @@ type PulumiServiceWebhookInput struct {
 	OrganizationName string
 	ProjectName      *string
 	StackName        *string
+	EnvironmentName  *string
 	Format           *string
 	Filters          []string
+	Groups           []string
 }
 
 type PulumiServiceWebhookProperties struct {
@@ -52,11 +61,17 @@ func (i *PulumiServiceWebhookInput) ToPropertyMap() resource.PropertyMap {
 	if i.StackName != nil {
 		pm["stackName"] = resource.NewPropertyValue(*i.StackName)
 	}
+	if i.EnvironmentName != nil {
+		pm["environmentName"] = resource.NewPropertyValue(*i.EnvironmentName)
+	}
 	if i.Format != nil {
 		pm["format"] = resource.NewPropertyValue(*i.Format)
 	}
 	if len(i.Filters) > 0 {
 		pm["filters"] = resource.NewPropertyValue(i.Filters)
+	}
+	if len(i.Groups) > 0 {
+		pm["groups"] = resource.NewPropertyValue(i.Groups)
 	}
 
 	return pm
@@ -100,6 +115,10 @@ func (wh *PulumiServiceWebhookResource) ToPulumiServiceWebhookProperties(propMap
 		stackNameStr := propMap["stackName"].StringValue()
 		props.StackName = &stackNameStr
 	}
+	if propMap["environmentName"].HasValue() && propMap["environmentName"].IsString() {
+		environmentNameStr := propMap["environmentName"].StringValue()
+		props.EnvironmentName = &environmentNameStr
+	}
 	if propMap["format"].HasValue() && propMap["format"].IsString() {
 		formatStr := propMap["format"].StringValue()
 		props.Format = &formatStr
@@ -113,6 +132,16 @@ func (wh *PulumiServiceWebhookResource) ToPulumiServiceWebhookProperties(propMap
 		}
 
 		props.Filters = filters
+	}
+	if propMap["groups"].HasValue() && propMap["groups"].IsArray() {
+		groupsInput := propMap["groups"].ArrayValue()
+		groups := make([]string, len(groupsInput))
+
+		for i, v := range groupsInput {
+			groups[i] = getSecretOrStringValue(v)
+		}
+
+		props.Groups = groups
 	}
 
 	if nameVal, ok := propMap["name"]; ok && nameVal.IsString() {
@@ -146,17 +175,30 @@ func (wh *PulumiServiceWebhookResource) Check(req *pulumirpc.CheckRequest) (*pul
 		}
 	}
 
-	stackWebhookError := "projectName and stackName must both be specified for stack webhooks, or both unspecified for org webhooks"
-	if !news["projectName"].HasValue() && news["stackName"].HasValue() {
+	if news["stackName"].HasValue() && !news["projectName"].HasValue() {
 		failures = append(failures, &pulumirpc.CheckFailure{
-			Reason:   stackWebhookError,
+			Reason:   "projectName and stackName must both be specified for stack webhooks",
 			Property: "projectName",
 		})
 	}
-	if news["projectName"].HasValue() && !news["stackName"].HasValue() {
+	if news["environmentName"].HasValue() && !news["projectName"].HasValue() {
 		failures = append(failures, &pulumirpc.CheckFailure{
-			Reason:   stackWebhookError,
+			Reason:   "projectName and environmentName must both be specified for environment webhooks",
+			Property: "projectName",
+		})
+	}
+	if news["environmentName"].HasValue() && news["stackName"].HasValue() {
+		failures = append(failures, &pulumirpc.CheckFailure{
+			Reason: "stackName needs to be empty if this is meant to be an environment webhook; " +
+				"environmentName needs to be empty if this is meant to be a stack webhook",
 			Property: "stackName",
+		})
+	}
+	if news["projectName"].HasValue() && !news["stackName"].HasValue() && !news["environmentName"].HasValue() {
+		failures = append(failures, &pulumirpc.CheckFailure{
+			Reason: "projectName needs to be empty if this is meant to be an organization webhook; " +
+				"otherwise provide stackName for stack webhook or environmentName for environment webhook",
+			Property: "projectName",
 		})
 	}
 
@@ -166,6 +208,25 @@ func (wh *PulumiServiceWebhookResource) Check(req *pulumirpc.CheckRequest) (*pul
 	// https://github.com/pulumi/pulumi-yaml/issues/458
 	if !news["format"].HasValue() {
 		news["format"] = resource.NewPropertyValue("raw")
+	}
+
+	// if neither filters nor groups are specified, set default groups
+	if !news["filters"].HasValue() && !news["groups"].HasValue() {
+		var groups []string
+		if news["stackName"].HasValue() {
+			groups = defaultWebhookGroups["stack"]
+		} else if news["environmentName"].HasValue() {
+			groups = defaultWebhookGroups["environment"]
+		} else {
+			groups = defaultWebhookGroups["organization"]
+		}
+
+		var groupProps []resource.PropertyValue
+		for _, group := range groups {
+			groupProps = append(groupProps, resource.NewStringProperty(group))
+		}
+
+		news["groups"] = resource.NewArrayProperty(groupProps)
 	}
 
 	inputNews, err := plugin.MarshalProperties(
@@ -222,12 +283,14 @@ func (wh *PulumiServiceWebhookResource) createWebhook(input PulumiServiceWebhook
 		OrganizationName: input.OrganizationName,
 		ProjectName:      input.ProjectName,
 		StackName:        input.StackName,
+		EnvironmentName:  input.EnvironmentName,
 		DisplayName:      input.DisplayName,
 		PayloadURL:       input.PayloadUrl,
 		Secret:           input.Secret,
 		Active:           input.Active,
 		Format:           input.Format,
 		Filters:          input.Filters,
+		Groups:           input.Groups,
 	}
 	webhook, err := wh.client.CreateWebhook(ctx, req)
 	if err != nil {
@@ -237,6 +300,10 @@ func (wh *PulumiServiceWebhookResource) createWebhook(input PulumiServiceWebhook
 	var hookID string
 	if input.ProjectName != nil && input.StackName != nil {
 		hookID = fmt.Sprintf("%s/%s/%s/%s", input.OrganizationName, *input.ProjectName, *input.StackName,
+			webhook.Name)
+	} else if input.ProjectName != nil && input.EnvironmentName != nil {
+		// This is not ideal, but inserting "environment" string to distinguish from stack webhooks
+		hookID = fmt.Sprintf("%s/environment/%s/%s/%s", input.OrganizationName, *input.ProjectName, *input.EnvironmentName,
 			webhook.Name)
 	} else {
 		hookID = fmt.Sprintf("%s/%s", input.OrganizationName, webhook.Name)
@@ -279,6 +346,7 @@ func (wh *PulumiServiceWebhookResource) Diff(req *pulumirpc.DiffRequest) (*pulum
 		"organizationName": true,
 		"projectName":      true,
 		"stackName":        true,
+		"environmentName":  true,
 	}
 	for k, v := range dd {
 		if _, ok := replaceProperties[k]; ok {
@@ -322,12 +390,14 @@ func (wh *PulumiServiceWebhookResource) Update(req *pulumirpc.UpdateRequest) (*p
 			OrganizationName: webhookNew.OrganizationName,
 			ProjectName:      webhookNew.ProjectName,
 			StackName:        webhookNew.StackName,
+			EnvironmentName:  webhookNew.EnvironmentName,
 			DisplayName:      webhookNew.DisplayName,
 			PayloadURL:       webhookNew.PayloadUrl,
 			Secret:           webhookNew.Secret,
 			Active:           webhookNew.Active,
 			Format:           webhookNew.Format,
 			Filters:          webhookNew.Filters,
+			Groups:           webhookNew.Groups,
 		},
 		Name: webhookNew.Name,
 	}
@@ -362,7 +432,7 @@ func (wh *PulumiServiceWebhookResource) deleteWebhook(id string) error {
 		return err
 	}
 	return wh.client.DeleteWebhook(context.Background(), hookID.organizationName,
-		hookID.projectName, hookID.stackName, hookID.webhookName)
+		hookID.projectName, hookID.stackName, hookID.environmentName, hookID.webhookName)
 }
 
 func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
@@ -388,9 +458,11 @@ func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulum
 			Secret:           webhook.Secret,
 			Format:           &webhook.Format,
 			Filters:          webhook.Filters,
+			Groups:           webhook.Groups,
 			OrganizationName: hookID.organizationName,
 			ProjectName:      hookID.projectName,
 			StackName:        hookID.stackName,
+			EnvironmentName:  hookID.environmentName,
 		},
 		Name: hookID.webhookName,
 	}
@@ -424,7 +496,7 @@ func (wh *PulumiServiceWebhookResource) getWebhook(id string) (*pulumiapi.Webhoo
 		return nil, err
 	}
 	webhook, err := wh.client.GetWebhook(context.Background(),
-		hookID.organizationName, hookID.projectName, hookID.stackName, hookID.webhookName)
+		hookID.organizationName, hookID.projectName, hookID.stackName, hookID.environmentName, hookID.webhookName)
 	if err != nil {
 		return nil, err
 	}
@@ -432,7 +504,10 @@ func (wh *PulumiServiceWebhookResource) getWebhook(id string) (*pulumiapi.Webhoo
 }
 
 func splitWebhookID(id string) (*webhookID, error) {
-	// format: organization/project/stack/webhookName (stack webhook) or organization/webhookName (org webhook)
+	// format:
+	// organization/project/stack/webhookName (stack webhook)
+	// organization/webhookName (org webhook)
+	// organization/environment/projectName/environmentName/webhookName (environment webhook)
 	s := strings.Split(id, "/")
 	switch len(s) {
 	case 2:
@@ -447,6 +522,13 @@ func splitWebhookID(id string) (*webhookID, error) {
 			stackName:        &s[2],
 			webhookName:      s[3],
 		}, nil
+	case 5:
+		return &webhookID{
+			organizationName: s[0],
+			projectName:      &s[2],
+			environmentName:  &s[3],
+			webhookName:      s[4],
+		}, nil
 	default:
 		return nil, fmt.Errorf("%q is not a valid webhook ID", id)
 	}
@@ -456,5 +538,6 @@ type webhookID struct {
 	organizationName string
 	projectName      *string
 	stackName        *string
+	environmentName  *string
 	webhookName      string
 }

@@ -411,6 +411,28 @@ const (
 	WebhookFiltersDriftRemediationSucceeded = WebhookFilters("drift_remediation_succeeded")
 	// Trigger a webhook when a drift remediation run fails.
 	WebhookFiltersDriftRemediationFailed = WebhookFilters("drift_remediation_failed")
+	// Trigger a webhook when a new environment is created.
+	WebhookFiltersEnvironmentCreated = WebhookFilters("environment_created")
+	// Trigger a webhook when an environment is deleted.
+	WebhookFiltersEnvironmentDeleted = WebhookFilters("environment_deleted")
+	// Trigger a webhook when a new revision is created on an environment.
+	WebhookFiltersEnvironmentRevisionCreated = WebhookFilters("environment_revision_created")
+	// Trigger a webhook when a revision is retracted on an environment.
+	WebhookFiltersEnvironmentRevisionRetracted = WebhookFilters("environment_revision_retracted")
+	// Trigger a webhook when a revision tag is created on an environment.
+	WebhookFiltersEnvironmentRevisionTagCreated = WebhookFilters("environment_revision_tag_created")
+	// Trigger a webhook when a revision tag is deleted on an environment.
+	WebhookFiltersEnvironmentRevisionTagDeleted = WebhookFilters("environment_revision_tag_deleted")
+	// Trigger a webhook when a revision tag is updated on an environment.
+	WebhookFiltersEnvironmentRevisionTagUpdated = WebhookFilters("environment_revision_tag_updated")
+	// Trigger a webhook when an environment tag is created.
+	WebhookFiltersEnvironmentTagCreated = WebhookFilters("environment_tag_created")
+	// Trigger a webhook when an environment tag is deleted.
+	WebhookFiltersEnvironmentTagDeleted = WebhookFilters("environment_tag_deleted")
+	// Trigger a webhook when an environment tag is updated.
+	WebhookFiltersEnvironmentTagUpdated = WebhookFilters("environment_tag_updated")
+	// Trigger a webhook when an imported environment has changed.
+	WebhookFiltersImportedEnvironmentChanged = WebhookFilters("imported_environment_changed")
 )
 
 func (WebhookFilters) ElementType() reflect.Type {
@@ -554,6 +576,17 @@ func (o WebhookFiltersPtrOutput) ToStringPtrOutputWithContext(ctx context.Contex
 //	WebhookFiltersDriftDetectionFailed
 //	WebhookFiltersDriftRemediationSucceeded
 //	WebhookFiltersDriftRemediationFailed
+//	WebhookFiltersEnvironmentCreated
+//	WebhookFiltersEnvironmentDeleted
+//	WebhookFiltersEnvironmentRevisionCreated
+//	WebhookFiltersEnvironmentRevisionRetracted
+//	WebhookFiltersEnvironmentRevisionTagCreated
+//	WebhookFiltersEnvironmentRevisionTagDeleted
+//	WebhookFiltersEnvironmentRevisionTagUpdated
+//	WebhookFiltersEnvironmentTagCreated
+//	WebhookFiltersEnvironmentTagDeleted
+//	WebhookFiltersEnvironmentTagUpdated
+//	WebhookFiltersImportedEnvironmentChanged
 type WebhookFiltersInput interface {
 	pulumi.Input
 
@@ -806,6 +839,221 @@ func (in *webhookFormatPtr) ToWebhookFormatPtrOutputWithContext(ctx context.Cont
 	return pulumi.ToOutputWithContext(ctx, in).(WebhookFormatPtrOutput)
 }
 
+type WebhookGroup string
+
+const (
+	// A group of webhooks containing all stack events.
+	WebhookGroupStacks = WebhookGroup("stacks")
+	// A group of webhooks containing all deployment events.
+	WebhookGroupDeployments = WebhookGroup("deployments")
+	// A group of webhooks containing all environment events.
+	WebhookGroupEnvironments = WebhookGroup("environments")
+)
+
+func (WebhookGroup) ElementType() reflect.Type {
+	return reflect.TypeOf((*WebhookGroup)(nil)).Elem()
+}
+
+func (e WebhookGroup) ToWebhookGroupOutput() WebhookGroupOutput {
+	return pulumi.ToOutput(e).(WebhookGroupOutput)
+}
+
+func (e WebhookGroup) ToWebhookGroupOutputWithContext(ctx context.Context) WebhookGroupOutput {
+	return pulumi.ToOutputWithContext(ctx, e).(WebhookGroupOutput)
+}
+
+func (e WebhookGroup) ToWebhookGroupPtrOutput() WebhookGroupPtrOutput {
+	return e.ToWebhookGroupPtrOutputWithContext(context.Background())
+}
+
+func (e WebhookGroup) ToWebhookGroupPtrOutputWithContext(ctx context.Context) WebhookGroupPtrOutput {
+	return WebhookGroup(e).ToWebhookGroupOutputWithContext(ctx).ToWebhookGroupPtrOutputWithContext(ctx)
+}
+
+func (e WebhookGroup) ToStringOutput() pulumi.StringOutput {
+	return pulumi.ToOutput(pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e WebhookGroup) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return pulumi.ToOutputWithContext(ctx, pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e WebhookGroup) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringPtrOutputWithContext(context.Background())
+}
+
+func (e WebhookGroup) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringOutputWithContext(ctx).ToStringPtrOutputWithContext(ctx)
+}
+
+type WebhookGroupOutput struct{ *pulumi.OutputState }
+
+func (WebhookGroupOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*WebhookGroup)(nil)).Elem()
+}
+
+func (o WebhookGroupOutput) ToWebhookGroupOutput() WebhookGroupOutput {
+	return o
+}
+
+func (o WebhookGroupOutput) ToWebhookGroupOutputWithContext(ctx context.Context) WebhookGroupOutput {
+	return o
+}
+
+func (o WebhookGroupOutput) ToWebhookGroupPtrOutput() WebhookGroupPtrOutput {
+	return o.ToWebhookGroupPtrOutputWithContext(context.Background())
+}
+
+func (o WebhookGroupOutput) ToWebhookGroupPtrOutputWithContext(ctx context.Context) WebhookGroupPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v WebhookGroup) *WebhookGroup {
+		return &v
+	}).(WebhookGroupPtrOutput)
+}
+
+func (o WebhookGroupOutput) ToStringOutput() pulumi.StringOutput {
+	return o.ToStringOutputWithContext(context.Background())
+}
+
+func (o WebhookGroupOutput) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e WebhookGroup) string {
+		return string(e)
+	}).(pulumi.StringOutput)
+}
+
+func (o WebhookGroupOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o WebhookGroupOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e WebhookGroup) *string {
+		v := string(e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+type WebhookGroupPtrOutput struct{ *pulumi.OutputState }
+
+func (WebhookGroupPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**WebhookGroup)(nil)).Elem()
+}
+
+func (o WebhookGroupPtrOutput) ToWebhookGroupPtrOutput() WebhookGroupPtrOutput {
+	return o
+}
+
+func (o WebhookGroupPtrOutput) ToWebhookGroupPtrOutputWithContext(ctx context.Context) WebhookGroupPtrOutput {
+	return o
+}
+
+func (o WebhookGroupPtrOutput) Elem() WebhookGroupOutput {
+	return o.ApplyT(func(v *WebhookGroup) WebhookGroup {
+		if v != nil {
+			return *v
+		}
+		var ret WebhookGroup
+		return ret
+	}).(WebhookGroupOutput)
+}
+
+func (o WebhookGroupPtrOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o WebhookGroupPtrOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e *WebhookGroup) *string {
+		if e == nil {
+			return nil
+		}
+		v := string(*e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+// WebhookGroupInput is an input type that accepts values of the WebhookGroup enum
+// A concrete instance of `WebhookGroupInput` can be one of the following:
+//
+//	WebhookGroupStacks
+//	WebhookGroupDeployments
+//	WebhookGroupEnvironments
+type WebhookGroupInput interface {
+	pulumi.Input
+
+	ToWebhookGroupOutput() WebhookGroupOutput
+	ToWebhookGroupOutputWithContext(context.Context) WebhookGroupOutput
+}
+
+var webhookGroupPtrType = reflect.TypeOf((**WebhookGroup)(nil)).Elem()
+
+type WebhookGroupPtrInput interface {
+	pulumi.Input
+
+	ToWebhookGroupPtrOutput() WebhookGroupPtrOutput
+	ToWebhookGroupPtrOutputWithContext(context.Context) WebhookGroupPtrOutput
+}
+
+type webhookGroupPtr string
+
+func WebhookGroupPtr(v string) WebhookGroupPtrInput {
+	return (*webhookGroupPtr)(&v)
+}
+
+func (*webhookGroupPtr) ElementType() reflect.Type {
+	return webhookGroupPtrType
+}
+
+func (in *webhookGroupPtr) ToWebhookGroupPtrOutput() WebhookGroupPtrOutput {
+	return pulumi.ToOutput(in).(WebhookGroupPtrOutput)
+}
+
+func (in *webhookGroupPtr) ToWebhookGroupPtrOutputWithContext(ctx context.Context) WebhookGroupPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, in).(WebhookGroupPtrOutput)
+}
+
+// WebhookGroupArrayInput is an input type that accepts WebhookGroupArray and WebhookGroupArrayOutput values.
+// You can construct a concrete instance of `WebhookGroupArrayInput` via:
+//
+//	WebhookGroupArray{ WebhookGroupArgs{...} }
+type WebhookGroupArrayInput interface {
+	pulumi.Input
+
+	ToWebhookGroupArrayOutput() WebhookGroupArrayOutput
+	ToWebhookGroupArrayOutputWithContext(context.Context) WebhookGroupArrayOutput
+}
+
+type WebhookGroupArray []WebhookGroup
+
+func (WebhookGroupArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]WebhookGroup)(nil)).Elem()
+}
+
+func (i WebhookGroupArray) ToWebhookGroupArrayOutput() WebhookGroupArrayOutput {
+	return i.ToWebhookGroupArrayOutputWithContext(context.Background())
+}
+
+func (i WebhookGroupArray) ToWebhookGroupArrayOutputWithContext(ctx context.Context) WebhookGroupArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(WebhookGroupArrayOutput)
+}
+
+type WebhookGroupArrayOutput struct{ *pulumi.OutputState }
+
+func (WebhookGroupArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]WebhookGroup)(nil)).Elem()
+}
+
+func (o WebhookGroupArrayOutput) ToWebhookGroupArrayOutput() WebhookGroupArrayOutput {
+	return o
+}
+
+func (o WebhookGroupArrayOutput) ToWebhookGroupArrayOutputWithContext(ctx context.Context) WebhookGroupArrayOutput {
+	return o
+}
+
+func (o WebhookGroupArrayOutput) Index(i pulumi.IntInput) WebhookGroupOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) WebhookGroup {
+		return vs[0].([]WebhookGroup)[vs[1].(int)]
+	}).(WebhookGroupOutput)
+}
+
 func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*EnvironmentPermissionInput)(nil)).Elem(), EnvironmentPermission("none"))
 	pulumi.RegisterInputType(reflect.TypeOf((*EnvironmentPermissionPtrInput)(nil)).Elem(), EnvironmentPermission("none"))
@@ -816,6 +1064,9 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*WebhookFiltersArrayInput)(nil)).Elem(), WebhookFiltersArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*WebhookFormatInput)(nil)).Elem(), WebhookFormat("raw"))
 	pulumi.RegisterInputType(reflect.TypeOf((*WebhookFormatPtrInput)(nil)).Elem(), WebhookFormat("raw"))
+	pulumi.RegisterInputType(reflect.TypeOf((*WebhookGroupInput)(nil)).Elem(), WebhookGroup("stacks"))
+	pulumi.RegisterInputType(reflect.TypeOf((*WebhookGroupPtrInput)(nil)).Elem(), WebhookGroup("stacks"))
+	pulumi.RegisterInputType(reflect.TypeOf((*WebhookGroupArrayInput)(nil)).Elem(), WebhookGroupArray{})
 	pulumi.RegisterOutputType(EnvironmentPermissionOutput{})
 	pulumi.RegisterOutputType(EnvironmentPermissionPtrOutput{})
 	pulumi.RegisterOutputType(PulumiOperationOutput{})
@@ -825,4 +1076,7 @@ func init() {
 	pulumi.RegisterOutputType(WebhookFiltersArrayOutput{})
 	pulumi.RegisterOutputType(WebhookFormatOutput{})
 	pulumi.RegisterOutputType(WebhookFormatPtrOutput{})
+	pulumi.RegisterOutputType(WebhookGroupOutput{})
+	pulumi.RegisterOutputType(WebhookGroupPtrOutput{})
+	pulumi.RegisterOutputType(WebhookGroupArrayOutput{})
 }

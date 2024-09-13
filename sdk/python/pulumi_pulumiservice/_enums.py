@@ -10,6 +10,7 @@ __all__ = [
     'TeamStackPermissionScope',
     'WebhookFilters',
     'WebhookFormat',
+    'WebhookGroup',
 ]
 
 
@@ -147,6 +148,50 @@ class WebhookFilters(str, Enum):
     """
     Trigger a webhook when a drift remediation run fails.
     """
+    ENVIRONMENT_CREATED = "environment_created"
+    """
+    Trigger a webhook when a new environment is created.
+    """
+    ENVIRONMENT_DELETED = "environment_deleted"
+    """
+    Trigger a webhook when an environment is deleted.
+    """
+    ENVIRONMENT_REVISION_CREATED = "environment_revision_created"
+    """
+    Trigger a webhook when a new revision is created on an environment.
+    """
+    ENVIRONMENT_REVISION_RETRACTED = "environment_revision_retracted"
+    """
+    Trigger a webhook when a revision is retracted on an environment.
+    """
+    ENVIRONMENT_REVISION_TAG_CREATED = "environment_revision_tag_created"
+    """
+    Trigger a webhook when a revision tag is created on an environment.
+    """
+    ENVIRONMENT_REVISION_TAG_DELETED = "environment_revision_tag_deleted"
+    """
+    Trigger a webhook when a revision tag is deleted on an environment.
+    """
+    ENVIRONMENT_REVISION_TAG_UPDATED = "environment_revision_tag_updated"
+    """
+    Trigger a webhook when a revision tag is updated on an environment.
+    """
+    ENVIRONMENT_TAG_CREATED = "environment_tag_created"
+    """
+    Trigger a webhook when an environment tag is created.
+    """
+    ENVIRONMENT_TAG_DELETED = "environment_tag_deleted"
+    """
+    Trigger a webhook when an environment tag is deleted.
+    """
+    ENVIRONMENT_TAG_UPDATED = "environment_tag_updated"
+    """
+    Trigger a webhook when an environment tag is updated.
+    """
+    IMPORTED_ENVIRONMENT_CHANGED = "imported_environment_changed"
+    """
+    Trigger a webhook when an imported environment has changed.
+    """
 
 
 class WebhookFormat(str, Enum):
@@ -165,4 +210,19 @@ class WebhookFormat(str, Enum):
     MICROSOFT_TEAMS = "ms_teams"
     """
     Messages formatted for consumption by Microsoft Teams incoming webhooks.
+    """
+
+
+class WebhookGroup(str, Enum):
+    STACKS = "stacks"
+    """
+    A group of webhooks containing all stack events.
+    """
+    DEPLOYMENTS = "deployments"
+    """
+    A group of webhooks containing all deployment events.
+    """
+    ENVIRONMENTS = "environments"
+    """
+    A group of webhooks containing all environment events.
     """

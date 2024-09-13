@@ -80,7 +80,7 @@ func TestListWebhooks(t *testing.T) {
 			ResponseBody:      webhooks,
 		})
 		defer cleanup()
-		actualWebhooks, err := c.ListWebhooks(ctx, orgName, nil, nil)
+		actualWebhooks, err := c.ListWebhooks(ctx, orgName, nil, nil, nil)
 		assert.NoError(t, err)
 		assert.Equal(t, webhooks, actualWebhooks)
 	})
@@ -95,7 +95,7 @@ func TestListWebhooks(t *testing.T) {
 			},
 		})
 		defer cleanup()
-		actualWebhooks, err := c.ListWebhooks(ctx, orgName, nil, nil)
+		actualWebhooks, err := c.ListWebhooks(ctx, orgName, nil, nil, nil)
 		assert.Nil(t, actualWebhooks, "webhooks should be nil since error was returned")
 		assert.EqualError(t, err, "failed to list webhooks: 401 API error: unauthorized")
 	})
@@ -122,7 +122,7 @@ func TestGetWebhook(t *testing.T) {
 			ResponseBody:      webhook,
 		})
 		defer cleanup()
-		actualWebhook, err := c.GetWebhook(ctx, orgName, nil, nil, webhookName)
+		actualWebhook, err := c.GetWebhook(ctx, orgName, nil, nil, nil, webhookName)
 		assert.NoError(t, err)
 		assert.Equal(t, webhook, *actualWebhook)
 	})
@@ -137,7 +137,7 @@ func TestGetWebhook(t *testing.T) {
 			},
 		})
 		defer cleanup()
-		actualWebhook, err := c.GetWebhook(ctx, orgName, nil, nil, webhookName)
+		actualWebhook, err := c.GetWebhook(ctx, orgName, nil, nil, nil, webhookName)
 		assert.Nil(t, actualWebhook, "webhooks should be nil since error was returned")
 		assert.EqualError(t, err, "failed to get webhook: 401 API error: unauthorized")
 	})
@@ -153,7 +153,7 @@ func TestGetWebhook(t *testing.T) {
 			},
 		})
 		defer cleanup()
-		actualWebhook, err := c.GetWebhook(ctx, orgName, nil, nil, webhookName)
+		actualWebhook, err := c.GetWebhook(ctx, orgName, nil, nil, nil, webhookName)
 		assert.Nil(t, actualWebhook, "webhook should be nil since error was returned")
 		assert.Nil(t, err, "err should be nil since error was returned")
 	})
@@ -221,7 +221,7 @@ func TestDeleteWebhook(t *testing.T) {
 			ResponseCode:      201,
 		})
 		defer cleanup()
-		err := c.DeleteWebhook(ctx, orgName, nil, nil, webhookName)
+		err := c.DeleteWebhook(ctx, orgName, nil, nil, nil, webhookName)
 		assert.NoError(t, err)
 	})
 
@@ -235,7 +235,7 @@ func TestDeleteWebhook(t *testing.T) {
 			},
 		})
 		defer cleanup()
-		err := c.DeleteWebhook(ctx, orgName, nil, nil, webhookName)
+		err := c.DeleteWebhook(ctx, orgName, nil, nil, nil, webhookName)
 		assert.EqualError(t, err, "failed to delete webhook: 401 API error: unauthorized")
 	})
 }

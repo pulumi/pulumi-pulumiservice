@@ -23,10 +23,10 @@ import (
 
 type WebhookClient interface {
 	CreateWebhook(ctx context.Context, req WebhookRequest) (*Webhook, error)
-	ListWebhooks(ctx context.Context, orgName string, projectName, stackName *string) ([]Webhook, error)
-	GetWebhook(ctx context.Context, orgName string, projectName, stackName *string, webhookName string) (*Webhook, error)
+	ListWebhooks(ctx context.Context, orgName string, projectName, stackName, environmentName *string) ([]Webhook, error)
+	GetWebhook(ctx context.Context, orgName string, projectName, stackName, environmentName *string, webhookName string) (*Webhook, error)
 	UpdateWebhook(ctx context.Context, req UpdateWebhookRequest) error
-	DeleteWebhook(ctx context.Context, orgName string, projectName, stackName *string, name string) error
+	DeleteWebhook(ctx context.Context, orgName string, projectName, stackName, environmentName *string, name string) error
 }
 
 type Webhook struct {
@@ -37,18 +37,21 @@ type Webhook struct {
 	Name        string
 	Format      string
 	Filters     []string
+	Groups      []string
 }
 
 type WebhookRequest struct {
 	OrganizationName string   `json:"organizationName"`
 	ProjectName      *string  `json:"projectName,omitempty"`
 	StackName        *string  `json:"stackName,omitempty"`
+	EnvironmentName  *string  `json:"envName,omitempty"`
 	DisplayName      string   `json:"displayName"`
 	PayloadURL       string   `json:"payloadUrl"`
 	Secret           *string  `json:"secret,omitempty"`
 	Active           bool     `json:"active"`
 	Format           *string  `json:"format,omitempty"`
 	Filters          []string `json:"filters,omitempty"`
+	Groups           []string `json:"groups,omitempty"`
 }
 
 type UpdateWebhookRequest struct {
@@ -57,11 +60,7 @@ type UpdateWebhookRequest struct {
 }
 
 func (c *Client) CreateWebhook(ctx context.Context, req WebhookRequest) (*Webhook, error) {
-	orgName := req.OrganizationName
-	projectName := req.ProjectName
-	stackName := req.StackName
-
-	if len(orgName) == 0 {
+	if len(req.OrganizationName) == 0 {
 		return nil, errors.New("orgname must not be empty")
 	}
 
@@ -73,12 +72,7 @@ func (c *Client) CreateWebhook(ctx context.Context, req WebhookRequest) (*Webhoo
 		return nil, errors.New("payloadurl must not be empty")
 	}
 
-	var apiPath string
-	if projectName != nil && stackName != nil {
-		apiPath = path.Join("stacks", orgName, *projectName, *stackName, "hooks")
-	} else {
-		apiPath = path.Join("orgs", orgName, "hooks")
-	}
+	apiPath := constructApiPath(req.OrganizationName, req.ProjectName, req.StackName, req.EnvironmentName)
 
 	var webhook Webhook
 	_, err := c.do(ctx, http.MethodPost, apiPath, req, &webhook)
@@ -88,17 +82,12 @@ func (c *Client) CreateWebhook(ctx context.Context, req WebhookRequest) (*Webhoo
 	return &webhook, nil
 }
 
-func (c *Client) ListWebhooks(ctx context.Context, orgName string, projectName, stackName *string) ([]Webhook, error) {
+func (c *Client) ListWebhooks(ctx context.Context, orgName string, projectName, stackName, environmentName *string) ([]Webhook, error) {
 	if len(orgName) == 0 {
 		return nil, errors.New("orgName must not be empty")
 	}
 
-	var apiPath string
-	if projectName != nil && stackName != nil {
-		path.Join("stacks", orgName, *projectName, *stackName, "hooks")
-	} else {
-		apiPath = path.Join("orgs", orgName, "hooks")
-	}
+	apiPath := constructApiPath(orgName, projectName, stackName, environmentName)
 
 	var webhooks []Webhook
 	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &webhooks)
@@ -110,7 +99,7 @@ func (c *Client) ListWebhooks(ctx context.Context, orgName string, projectName, 
 }
 
 func (c *Client) GetWebhook(ctx context.Context,
-	orgName string, projectName, stackName *string, webhookName string) (*Webhook, error) {
+	orgName string, projectName, stackName, environmentName *string, webhookName string) (*Webhook, error) {
 	if len(orgName) == 0 {
 		return nil, errors.New("orgname must not be empty")
 	}
@@ -119,12 +108,7 @@ func (c *Client) GetWebhook(ctx context.Context,
 		return nil, errors.New("webhookname must not be empty")
 	}
 
-	var apiPath string
-	if projectName != nil && stackName != nil {
-		apiPath = path.Join("stacks", orgName, *projectName, *stackName, "hooks", webhookName)
-	} else {
-		apiPath = path.Join("orgs", orgName, "hooks", webhookName)
-	}
+	apiPath := constructApiPath(orgName, projectName, stackName, environmentName) + "/" + webhookName
 
 	var webhook Webhook
 	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &webhook)
@@ -140,15 +124,10 @@ func (c *Client) GetWebhook(ctx context.Context,
 }
 
 func (c *Client) UpdateWebhook(ctx context.Context, req UpdateWebhookRequest) error {
-	orgName := req.OrganizationName
-	projectName := req.ProjectName
-	stackName := req.StackName
-	name := req.Name
-
-	if len(name) == 0 {
+	if len(req.Name) == 0 {
 		return errors.New("name must not be empty")
 	}
-	if len(orgName) == 0 {
+	if len(req.OrganizationName) == 0 {
 		return errors.New("orgname must not be empty")
 	}
 	if len(req.DisplayName) == 0 {
@@ -158,12 +137,7 @@ func (c *Client) UpdateWebhook(ctx context.Context, req UpdateWebhookRequest) er
 		return errors.New("payloadurl must not be empty")
 	}
 
-	var apiPath string
-	if projectName != nil && stackName != nil {
-		apiPath = path.Join("stacks", orgName, *projectName, *stackName, "hooks", name)
-	} else {
-		apiPath = path.Join("orgs", orgName, "hooks", name)
-	}
+	apiPath := constructApiPath(req.OrganizationName, req.ProjectName, req.StackName, req.EnvironmentName) + "/" + req.Name
 
 	_, err := c.do(ctx, http.MethodPatch, apiPath, req, nil)
 	if err != nil {
@@ -172,7 +146,7 @@ func (c *Client) UpdateWebhook(ctx context.Context, req UpdateWebhookRequest) er
 	return nil
 }
 
-func (c *Client) DeleteWebhook(ctx context.Context, orgName string, projectName, stackName *string, name string) error {
+func (c *Client) DeleteWebhook(ctx context.Context, orgName string, projectName, stackName, environmentName *string, name string) error {
 	if len(name) == 0 {
 		return errors.New("name must not be empty")
 	}
@@ -180,16 +154,20 @@ func (c *Client) DeleteWebhook(ctx context.Context, orgName string, projectName,
 		return errors.New("orgname must not be empty")
 	}
 
-	var apiPath string
-	if projectName != nil && stackName != nil {
-		apiPath = path.Join("stacks", orgName, *projectName, *stackName, "hooks", name)
-	} else {
-		apiPath = path.Join("orgs", orgName, "hooks", name)
-	}
+	apiPath := constructApiPath(orgName, projectName, stackName, environmentName) + "/" + name
 
 	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
 	if err != nil {
 		return fmt.Errorf("failed to delete webhook: %w", err)
 	}
 	return nil
+}
+
+func constructApiPath(orgName string, projectName, stackName, environmentName *string) string {
+	if projectName != nil && stackName != nil {
+		return path.Join("stacks", orgName, *projectName, *stackName, "hooks")
+	} else if projectName != nil && environmentName != nil {
+		return path.Join("esc", "environments", orgName, *projectName, *environmentName, "hooks")
+	}
+	return path.Join("orgs", orgName, "hooks")
 }
