@@ -205,8 +205,14 @@ func (ot *PulumiServiceOrgAccessTokenResource) deleteOrgAccessToken(ctx context.
 func splitOrgAccessTokenId(id string) (string, string, string, error) {
 	// format: organization/name/tokenId
 	s := strings.Split(id, "/")
-	if len(s) != 3 {
+	if len(s) < 3 {
 		return "", "", "", fmt.Errorf("%q is invalid, must contain a single slash ('/')", id)
 	}
-	return s[0], s[1], s[2], nil
+
+	org := s[0]
+	tokenId := s[len(s)-1]
+	// Name can contain slashes so this joins the split parts except for first and last
+	name := strings.Join(s[1:len(s)-1], "/")
+
+	return org, name, tokenId, nil
 }
