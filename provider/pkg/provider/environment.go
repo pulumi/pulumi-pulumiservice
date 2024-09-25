@@ -238,10 +238,14 @@ func (st *PulumiServiceEnvironmentResource) Check(req *pulumirpc.CheckRequest) (
 		}
 	}
 
-	yamlBytes, err := getBytesFromAsset(inputMap["yaml"].AssetValue())
-	if err != nil {
-		return nil, err
+	yamlBytes := []byte{}
+	if !inputMap["yaml"].IsComputed() {
+		yamlBytes, err = getBytesFromAsset(inputMap["yaml"].AssetValue())
+		if err != nil {
+			return nil, err
+		}
 	}
+
 	stringYaml := string(yamlBytes)
 	trimmedYaml := strings.TrimSpace(stringYaml)
 	inputMap["yaml"] = resource.MakeSecret(resource.NewStringProperty(trimmedYaml))

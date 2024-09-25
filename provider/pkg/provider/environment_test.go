@@ -8,6 +8,8 @@ import (
 
 	"github.com/pulumi/esc"
 	"github.com/pulumi/esc/cmd/esc/cli/client"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/asset"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/workspace"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
@@ -167,6 +169,63 @@ func buildEscClientMock(getEnvironmentFunc getEnvironmentFunc, getEnvironmentRev
 		getEnvironmentFunc,
 		getEnvironmentRevisionTagFunc,
 	}
+}
+
+func TestEnvironmentCheck(t *testing.T) {
+	mockedClient := buildEscClientMock(
+		func(ctx context.Context, orgName string, envName string, version string, decrypt bool) (yaml []byte, etag string, revision int, err error) {
+			return nil, "", 0, fmt.Errorf("not found")
+		},
+		func(ctx context.Context, orgName, envName, tagName string) (*client.EnvironmentRevisionTag, error) {
+			return nil, nil
+		},
+	)
+	provider := PulumiServiceEnvironmentResource{
+		client: mockedClient,
+	}
+
+	envDef := `values:
+foo: bar
+`
+	propertyMap := resource.PropertyMap{}
+	propertyMap["organization"] = resource.NewPropertyValue("org")
+	propertyMap["project"] = resource.NewPropertyValue("project")
+	propertyMap["name"] = resource.NewPropertyValue("env")
+	propertyMap["yaml"] = resource.NewAssetProperty(&asset.Asset{Text: envDef})
+
+	t.Run("Check", func(t *testing.T) {
+		properties, _ := plugin.MarshalProperties(
+			propertyMap,
+			plugin.MarshalOptions{
+				KeepUnknowns: true,
+				SkipNulls:    true,
+			},
+		)
+		req := pulumirpc.CheckRequest{
+			News: properties,
+		}
+
+		_, err := provider.Check(&req)
+		assert.NoError(t, err)
+	})
+
+	t.Run("Check when yaml contains computed resource", func(t *testing.T) {
+		propertyMap["yaml"] = resource.NewComputedProperty(resource.Computed{Element: resource.NewStringProperty("")})
+
+		properties, _ := plugin.MarshalProperties(
+			propertyMap,
+			plugin.MarshalOptions{
+				KeepUnknowns: true,
+				SkipNulls:    true,
+			},
+		)
+		req := pulumirpc.CheckRequest{
+			News: properties,
+		}
+
+		_, err := provider.Check(&req)
+		assert.NoError(t, err)
+	})
 }
 
 func TestEnvironment(t *testing.T) {
