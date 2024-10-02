@@ -316,8 +316,8 @@ func (ds *PulumiServiceDeploymentSettingsResource) ToPulumiServiceDeploymentSett
 	input.Stack.ProjectName = getSecretOrStringValue(inputMap["project"])
 	input.Stack.StackName = getSecretOrStringValue(inputMap["stack"])
 
-	if inputMap["agentPoolId"].HasValue() && inputMap["agentPoolId"].IsString() {
-		input.AgentPoolId = inputMap["agentPoolId"].StringValue()
+	if inputMap["agentPoolId"].HasValue() {
+		input.AgentPoolId = getSecretOrStringValue(inputMap["agentPoolId"])
 	}
 
 	input.ExecutorContext = toExecutorContext(inputMap)
@@ -603,12 +603,12 @@ func getSecretOrStringValue(prop resource.PropertyValue) string {
 }
 
 func (ds *PulumiServiceDeploymentSettingsResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
 	if err != nil {
 		return nil, err
 	}
 
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
 	if err != nil {
 		return nil, err
 	}
