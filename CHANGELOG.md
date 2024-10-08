@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+## 0.26.2
+
+### Bug Fixes
+
+- Fix panic in environment definition [#418](https://github.com/pulumi/pulumi-pulumiservice/issues/418)
+
 ## 0.26.1
 
 ### Bug Fixes
