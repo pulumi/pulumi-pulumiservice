@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+## 0.26.3
+
+### Bug Fixes
+
+- Fix panic when using computed values in environment properties [#423](https://github.com/pulumi/pulumi-pulumiservice/issues/423)
+
 ## 0.26.2
 
 ### Bug Fixes
