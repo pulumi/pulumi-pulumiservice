@@ -225,12 +225,14 @@ func (st *PulumiServiceEnvironmentResource) Check(req *pulumirpc.CheckRequest) (
 
 	var failures []*pulumirpc.CheckFailure
 	for _, p := range []resource.PropertyKey{"organization", "project", "name", "yaml"} {
-		if !inputMap[(p)].HasValue() {
+		input := inputMap[(p)]
+
+		if !input.HasValue() {
 			failures = append(failures, &pulumirpc.CheckFailure{
 				Reason:   fmt.Sprintf("missing required property '%s'", p),
 				Property: string(p),
 			})
-		} else if p != "yaml" && strings.Contains(inputMap[(p)].StringValue(), "/") {
+		} else if p != "yaml" && !input.IsComputed() && strings.Contains(input.StringValue(), "/") {
 			failures = append(failures, &pulumirpc.CheckFailure{
 				Reason:   fmt.Sprintf("'%s' property contains `/` illegal character", p),
 				Property: string(p),
