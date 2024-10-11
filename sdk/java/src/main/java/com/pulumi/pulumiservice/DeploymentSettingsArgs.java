@@ -114,15 +114,15 @@ public final class DeploymentSettingsArgs extends com.pulumi.resources.ResourceA
      * Settings related to the source of the deployment.
      * 
      */
-    @Import(name="sourceContext", required=true)
-    private Output<DeploymentSettingsSourceContextArgs> sourceContext;
+    @Import(name="sourceContext")
+    private @Nullable Output<DeploymentSettingsSourceContextArgs> sourceContext;
 
     /**
      * @return Settings related to the source of the deployment.
      * 
      */
-    public Output<DeploymentSettingsSourceContextArgs> sourceContext() {
-        return this.sourceContext;
+    public Optional<Output<DeploymentSettingsSourceContextArgs>> sourceContext() {
+        return Optional.ofNullable(this.sourceContext);
     }
 
     /**
@@ -303,7 +303,7 @@ public final class DeploymentSettingsArgs extends com.pulumi.resources.ResourceA
          * @return builder
          * 
          */
-        public Builder sourceContext(Output<DeploymentSettingsSourceContextArgs> sourceContext) {
+        public Builder sourceContext(@Nullable Output<DeploymentSettingsSourceContextArgs> sourceContext) {
             $.sourceContext = sourceContext;
             return this;
         }
@@ -345,9 +345,6 @@ public final class DeploymentSettingsArgs extends com.pulumi.resources.ResourceA
             }
             if ($.project == null) {
                 throw new MissingRequiredPropertyException("DeploymentSettingsArgs", "project");
-            }
-            if ($.sourceContext == null) {
-                throw new MissingRequiredPropertyException("DeploymentSettingsArgs", "sourceContext");
             }
             if ($.stack == null) {
                 throw new MissingRequiredPropertyException("DeploymentSettingsArgs", "stack");

@@ -1701,6 +1701,47 @@ func (i DeploymentSettingsSourceContextArgs) ToDeploymentSettingsSourceContextOu
 	return pulumi.ToOutputWithContext(ctx, i).(DeploymentSettingsSourceContextOutput)
 }
 
+func (i DeploymentSettingsSourceContextArgs) ToDeploymentSettingsSourceContextPtrOutput() DeploymentSettingsSourceContextPtrOutput {
+	return i.ToDeploymentSettingsSourceContextPtrOutputWithContext(context.Background())
+}
+
+func (i DeploymentSettingsSourceContextArgs) ToDeploymentSettingsSourceContextPtrOutputWithContext(ctx context.Context) DeploymentSettingsSourceContextPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(DeploymentSettingsSourceContextOutput).ToDeploymentSettingsSourceContextPtrOutputWithContext(ctx)
+}
+
+// DeploymentSettingsSourceContextPtrInput is an input type that accepts DeploymentSettingsSourceContextArgs, DeploymentSettingsSourceContextPtr and DeploymentSettingsSourceContextPtrOutput values.
+// You can construct a concrete instance of `DeploymentSettingsSourceContextPtrInput` via:
+//
+//	        DeploymentSettingsSourceContextArgs{...}
+//
+//	or:
+//
+//	        nil
+type DeploymentSettingsSourceContextPtrInput interface {
+	pulumi.Input
+
+	ToDeploymentSettingsSourceContextPtrOutput() DeploymentSettingsSourceContextPtrOutput
+	ToDeploymentSettingsSourceContextPtrOutputWithContext(context.Context) DeploymentSettingsSourceContextPtrOutput
+}
+
+type deploymentSettingsSourceContextPtrType DeploymentSettingsSourceContextArgs
+
+func DeploymentSettingsSourceContextPtr(v *DeploymentSettingsSourceContextArgs) DeploymentSettingsSourceContextPtrInput {
+	return (*deploymentSettingsSourceContextPtrType)(v)
+}
+
+func (*deploymentSettingsSourceContextPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**DeploymentSettingsSourceContext)(nil)).Elem()
+}
+
+func (i *deploymentSettingsSourceContextPtrType) ToDeploymentSettingsSourceContextPtrOutput() DeploymentSettingsSourceContextPtrOutput {
+	return i.ToDeploymentSettingsSourceContextPtrOutputWithContext(context.Background())
+}
+
+func (i *deploymentSettingsSourceContextPtrType) ToDeploymentSettingsSourceContextPtrOutputWithContext(ctx context.Context) DeploymentSettingsSourceContextPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(DeploymentSettingsSourceContextPtrOutput)
+}
+
 // Settings related to the source of the deployment.
 type DeploymentSettingsSourceContextOutput struct{ *pulumi.OutputState }
 
@@ -1716,9 +1757,53 @@ func (o DeploymentSettingsSourceContextOutput) ToDeploymentSettingsSourceContext
 	return o
 }
 
+func (o DeploymentSettingsSourceContextOutput) ToDeploymentSettingsSourceContextPtrOutput() DeploymentSettingsSourceContextPtrOutput {
+	return o.ToDeploymentSettingsSourceContextPtrOutputWithContext(context.Background())
+}
+
+func (o DeploymentSettingsSourceContextOutput) ToDeploymentSettingsSourceContextPtrOutputWithContext(ctx context.Context) DeploymentSettingsSourceContextPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v DeploymentSettingsSourceContext) *DeploymentSettingsSourceContext {
+		return &v
+	}).(DeploymentSettingsSourceContextPtrOutput)
+}
+
 // Git source settings for a deployment.
 func (o DeploymentSettingsSourceContextOutput) Git() DeploymentSettingsGitSourcePtrOutput {
 	return o.ApplyT(func(v DeploymentSettingsSourceContext) *DeploymentSettingsGitSource { return v.Git }).(DeploymentSettingsGitSourcePtrOutput)
+}
+
+type DeploymentSettingsSourceContextPtrOutput struct{ *pulumi.OutputState }
+
+func (DeploymentSettingsSourceContextPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**DeploymentSettingsSourceContext)(nil)).Elem()
+}
+
+func (o DeploymentSettingsSourceContextPtrOutput) ToDeploymentSettingsSourceContextPtrOutput() DeploymentSettingsSourceContextPtrOutput {
+	return o
+}
+
+func (o DeploymentSettingsSourceContextPtrOutput) ToDeploymentSettingsSourceContextPtrOutputWithContext(ctx context.Context) DeploymentSettingsSourceContextPtrOutput {
+	return o
+}
+
+func (o DeploymentSettingsSourceContextPtrOutput) Elem() DeploymentSettingsSourceContextOutput {
+	return o.ApplyT(func(v *DeploymentSettingsSourceContext) DeploymentSettingsSourceContext {
+		if v != nil {
+			return *v
+		}
+		var ret DeploymentSettingsSourceContext
+		return ret
+	}).(DeploymentSettingsSourceContextOutput)
+}
+
+// Git source settings for a deployment.
+func (o DeploymentSettingsSourceContextPtrOutput) Git() DeploymentSettingsGitSourcePtrOutput {
+	return o.ApplyT(func(v *DeploymentSettingsSourceContext) *DeploymentSettingsGitSource {
+		if v == nil {
+			return nil
+		}
+		return v.Git
+	}).(DeploymentSettingsGitSourcePtrOutput)
 }
 
 type GCPOIDCConfiguration struct {
@@ -2479,6 +2564,7 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsOperationContextInput)(nil)).Elem(), DeploymentSettingsOperationContextArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsOperationContextPtrInput)(nil)).Elem(), DeploymentSettingsOperationContextArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsSourceContextInput)(nil)).Elem(), DeploymentSettingsSourceContextArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsSourceContextPtrInput)(nil)).Elem(), DeploymentSettingsSourceContextArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*GCPOIDCConfigurationInput)(nil)).Elem(), GCPOIDCConfigurationArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*GCPOIDCConfigurationPtrInput)(nil)).Elem(), GCPOIDCConfigurationArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*OperationContextOIDCInput)(nil)).Elem(), OperationContextOIDCArgs{})
@@ -2506,6 +2592,7 @@ func init() {
 	pulumi.RegisterOutputType(DeploymentSettingsOperationContextOutput{})
 	pulumi.RegisterOutputType(DeploymentSettingsOperationContextPtrOutput{})
 	pulumi.RegisterOutputType(DeploymentSettingsSourceContextOutput{})
+	pulumi.RegisterOutputType(DeploymentSettingsSourceContextPtrOutput{})
 	pulumi.RegisterOutputType(GCPOIDCConfigurationOutput{})
 	pulumi.RegisterOutputType(GCPOIDCConfigurationPtrOutput{})
 	pulumi.RegisterOutputType(OperationContextOIDCOutput{})

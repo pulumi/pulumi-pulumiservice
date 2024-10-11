@@ -72,7 +72,7 @@ export class DeploymentSettings extends pulumi.CustomResource {
     /**
      * Settings related to the source of the deployment.
      */
-    public readonly sourceContext!: pulumi.Output<outputs.DeploymentSettingsSourceContext>;
+    public readonly sourceContext!: pulumi.Output<outputs.DeploymentSettingsSourceContext | undefined>;
     /**
      * Stack name.
      */
@@ -94,9 +94,6 @@ export class DeploymentSettings extends pulumi.CustomResource {
             }
             if ((!args || args.project === undefined) && !opts.urn) {
                 throw new Error("Missing required property 'project'");
-            }
-            if ((!args || args.sourceContext === undefined) && !opts.urn) {
-                throw new Error("Missing required property 'sourceContext'");
             }
             if ((!args || args.stack === undefined) && !opts.urn) {
                 throw new Error("Missing required property 'stack'");
@@ -155,7 +152,7 @@ export interface DeploymentSettingsArgs {
     /**
      * Settings related to the source of the deployment.
      */
-    sourceContext: pulumi.Input<inputs.DeploymentSettingsSourceContextArgs>;
+    sourceContext?: pulumi.Input<inputs.DeploymentSettingsSourceContextArgs>;
     /**
      * Stack name.
      */

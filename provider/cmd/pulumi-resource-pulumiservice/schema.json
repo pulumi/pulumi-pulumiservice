@@ -578,7 +578,7 @@
           "value": "admin"
         }
       ]
-    }, 
+    },
     "pulumiservice:index:TemplateSourceDestination": {
       "type": "object",
       "properties": {
@@ -1070,8 +1070,7 @@
       "required": [
         "organization",
         "project",
-        "stack",
-        "sourceContext"
+        "stack"
       ],
       "inputProperties": {
         "organization": {
@@ -1110,8 +1109,7 @@
       "requiredInputs": [
         "organization",
         "project",
-        "stack",
-        "sourceContext"
+        "stack"
       ]
     },
     "pulumiservice:index:StackTag": {

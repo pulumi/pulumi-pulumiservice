@@ -39,7 +39,7 @@ type DeploymentSettings struct {
 	// Project name.
 	Project pulumi.StringOutput `pulumi:"project"`
 	// Settings related to the source of the deployment.
-	SourceContext DeploymentSettingsSourceContextOutput `pulumi:"sourceContext"`
+	SourceContext DeploymentSettingsSourceContextPtrOutput `pulumi:"sourceContext"`
 	// Stack name.
 	Stack pulumi.StringOutput `pulumi:"stack"`
 }
@@ -56,9 +56,6 @@ func NewDeploymentSettings(ctx *pulumi.Context,
 	}
 	if args.Project == nil {
 		return nil, errors.New("invalid value for required argument 'Project'")
-	}
-	if args.SourceContext == nil {
-		return nil, errors.New("invalid value for required argument 'SourceContext'")
 	}
 	if args.Stack == nil {
 		return nil, errors.New("invalid value for required argument 'Stack'")
@@ -112,7 +109,7 @@ type deploymentSettingsArgs struct {
 	// Project name.
 	Project string `pulumi:"project"`
 	// Settings related to the source of the deployment.
-	SourceContext DeploymentSettingsSourceContext `pulumi:"sourceContext"`
+	SourceContext *DeploymentSettingsSourceContext `pulumi:"sourceContext"`
 	// Stack name.
 	Stack string `pulumi:"stack"`
 }
@@ -132,7 +129,7 @@ type DeploymentSettingsArgs struct {
 	// Project name.
 	Project pulumi.StringInput
 	// Settings related to the source of the deployment.
-	SourceContext DeploymentSettingsSourceContextInput
+	SourceContext DeploymentSettingsSourceContextPtrInput
 	// Stack name.
 	Stack pulumi.StringInput
 }
@@ -255,8 +252,8 @@ func (o DeploymentSettingsOutput) Project() pulumi.StringOutput {
 }
 
 // Settings related to the source of the deployment.
-func (o DeploymentSettingsOutput) SourceContext() DeploymentSettingsSourceContextOutput {
-	return o.ApplyT(func(v *DeploymentSettings) DeploymentSettingsSourceContextOutput { return v.SourceContext }).(DeploymentSettingsSourceContextOutput)
+func (o DeploymentSettingsOutput) SourceContext() DeploymentSettingsSourceContextPtrOutput {
+	return o.ApplyT(func(v *DeploymentSettings) DeploymentSettingsSourceContextPtrOutput { return v.SourceContext }).(DeploymentSettingsSourceContextPtrOutput)
 }
 
 // Stack name.

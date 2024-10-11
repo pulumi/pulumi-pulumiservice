@@ -63,7 +63,7 @@ namespace Pulumi.PulumiService
         /// Settings related to the source of the deployment.
         /// </summary>
         [Output("sourceContext")]
-        public Output<Outputs.DeploymentSettingsSourceContext> SourceContext { get; private set; } = null!;
+        public Output<Outputs.DeploymentSettingsSourceContext?> SourceContext { get; private set; } = null!;
 
         /// <summary>
         /// Stack name.
@@ -155,8 +155,8 @@ namespace Pulumi.PulumiService
         /// <summary>
         /// Settings related to the source of the deployment.
         /// </summary>
-        [Input("sourceContext", required: true)]
-        public Input<Inputs.DeploymentSettingsSourceContextArgs> SourceContext { get; set; } = null!;
+        [Input("sourceContext")]
+        public Input<Inputs.DeploymentSettingsSourceContextArgs>? SourceContext { get; set; }
 
         /// <summary>
         /// Stack name.
