@@ -18,26 +18,25 @@ class DeploymentSettingsArgs:
     def __init__(__self__, *,
                  organization: pulumi.Input[str],
                  project: pulumi.Input[str],
-                 source_context: pulumi.Input['DeploymentSettingsSourceContextArgs'],
                  stack: pulumi.Input[str],
                  agent_pool_id: Optional[pulumi.Input[str]] = None,
                  executor_context: Optional[pulumi.Input['DeploymentSettingsExecutorContextArgs']] = None,
                  github: Optional[pulumi.Input['DeploymentSettingsGithubArgs']] = None,
-                 operation_context: Optional[pulumi.Input['DeploymentSettingsOperationContextArgs']] = None):
+                 operation_context: Optional[pulumi.Input['DeploymentSettingsOperationContextArgs']] = None,
+                 source_context: Optional[pulumi.Input['DeploymentSettingsSourceContextArgs']] = None):
         """
         The set of arguments for constructing a DeploymentSettings resource.
         :param pulumi.Input[str] organization: Organization name.
         :param pulumi.Input[str] project: Project name.
-        :param pulumi.Input['DeploymentSettingsSourceContextArgs'] source_context: Settings related to the source of the deployment.
         :param pulumi.Input[str] stack: Stack name.
         :param pulumi.Input[str] agent_pool_id: The agent pool identifier to use for the deployment.
         :param pulumi.Input['DeploymentSettingsExecutorContextArgs'] executor_context: Settings related to the deployment executor.
         :param pulumi.Input['DeploymentSettingsGithubArgs'] github: GitHub settings for the deployment.
         :param pulumi.Input['DeploymentSettingsOperationContextArgs'] operation_context: Settings related to the Pulumi operation environment during the deployment.
+        :param pulumi.Input['DeploymentSettingsSourceContextArgs'] source_context: Settings related to the source of the deployment.
         """
         pulumi.set(__self__, "organization", organization)
         pulumi.set(__self__, "project", project)
-        pulumi.set(__self__, "source_context", source_context)
         pulumi.set(__self__, "stack", stack)
         if agent_pool_id is not None:
             pulumi.set(__self__, "agent_pool_id", agent_pool_id)
@@ -47,6 +46,8 @@ class DeploymentSettingsArgs:
             pulumi.set(__self__, "github", github)
         if operation_context is not None:
             pulumi.set(__self__, "operation_context", operation_context)
+        if source_context is not None:
+            pulumi.set(__self__, "source_context", source_context)
 
     @property
     @pulumi.getter
@@ -71,18 +72,6 @@ class DeploymentSettingsArgs:
     @project.setter
     def project(self, value: pulumi.Input[str]):
         pulumi.set(self, "project", value)
-
-    @property
-    @pulumi.getter(name="sourceContext")
-    def source_context(self) -> pulumi.Input['DeploymentSettingsSourceContextArgs']:
-        """
-        Settings related to the source of the deployment.
-        """
-        return pulumi.get(self, "source_context")
-
-    @source_context.setter
-    def source_context(self, value: pulumi.Input['DeploymentSettingsSourceContextArgs']):
-        pulumi.set(self, "source_context", value)
 
     @property
     @pulumi.getter
@@ -143,6 +132,18 @@ class DeploymentSettingsArgs:
     @operation_context.setter
     def operation_context(self, value: Optional[pulumi.Input['DeploymentSettingsOperationContextArgs']]):
         pulumi.set(self, "operation_context", value)
+
+    @property
+    @pulumi.getter(name="sourceContext")
+    def source_context(self) -> Optional[pulumi.Input['DeploymentSettingsSourceContextArgs']]:
+        """
+        Settings related to the source of the deployment.
+        """
+        return pulumi.get(self, "source_context")
+
+    @source_context.setter
+    def source_context(self, value: Optional[pulumi.Input['DeploymentSettingsSourceContextArgs']]):
+        pulumi.set(self, "source_context", value)
 
 
 class DeploymentSettings(pulumi.CustomResource):
@@ -240,8 +241,6 @@ class DeploymentSettings(pulumi.CustomResource):
             if project is None and not opts.urn:
                 raise TypeError("Missing required property 'project'")
             __props__.__dict__["project"] = project
-            if source_context is None and not opts.urn:
-                raise TypeError("Missing required property 'source_context'")
             __props__.__dict__["source_context"] = source_context
             if stack is None and not opts.urn:
                 raise TypeError("Missing required property 'stack'")
@@ -328,7 +327,7 @@ class DeploymentSettings(pulumi.CustomResource):
 
     @property
     @pulumi.getter(name="sourceContext")
-    def source_context(self) -> pulumi.Output['outputs.DeploymentSettingsSourceContext']:
+    def source_context(self) -> pulumi.Output[Optional['outputs.DeploymentSettingsSourceContext']]:
         """
         Settings related to the source of the deployment.
         """

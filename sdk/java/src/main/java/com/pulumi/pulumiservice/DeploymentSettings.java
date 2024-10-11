@@ -120,14 +120,14 @@ public class DeploymentSettings extends com.pulumi.resources.CustomResource {
      * 
      */
     @Export(name="sourceContext", refs={DeploymentSettingsSourceContext.class}, tree="[0]")
-    private Output<DeploymentSettingsSourceContext> sourceContext;
+    private Output</* @Nullable */ DeploymentSettingsSourceContext> sourceContext;
 
     /**
      * @return Settings related to the source of the deployment.
      * 
      */
-    public Output<DeploymentSettingsSourceContext> sourceContext() {
-        return this.sourceContext;
+    public Output<Optional<DeploymentSettingsSourceContext>> sourceContext() {
+        return Codegen.optional(this.sourceContext);
     }
     /**
      * Stack name.
