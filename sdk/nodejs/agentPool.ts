@@ -43,6 +43,10 @@ export class AgentPool extends pulumi.CustomResource {
      */
     public readonly description!: pulumi.Output<string | undefined>;
     /**
+     * Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.
+     */
+    public readonly forceDestroy!: pulumi.Output<boolean | undefined>;
+    /**
      * The name of the agent pool.
      */
     public readonly name!: pulumi.Output<string>;
@@ -73,6 +77,7 @@ export class AgentPool extends pulumi.CustomResource {
                 throw new Error("Missing required property 'organizationName'");
             }
             resourceInputs["description"] = args ? args.description : undefined;
+            resourceInputs["forceDestroy"] = args ? args.forceDestroy : undefined;
             resourceInputs["name"] = args ? args.name : undefined;
             resourceInputs["organizationName"] = args ? args.organizationName : undefined;
             resourceInputs["agentPoolId"] = undefined /*out*/;
@@ -80,6 +85,7 @@ export class AgentPool extends pulumi.CustomResource {
         } else {
             resourceInputs["agentPoolId"] = undefined /*out*/;
             resourceInputs["description"] = undefined /*out*/;
+            resourceInputs["forceDestroy"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
             resourceInputs["organizationName"] = undefined /*out*/;
             resourceInputs["tokenValue"] = undefined /*out*/;
@@ -99,6 +105,10 @@ export interface AgentPoolArgs {
      * Description of the agent pool.
      */
     description?: pulumi.Input<string>;
+    /**
+     * Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.
+     */
+    forceDestroy?: pulumi.Input<boolean>;
     /**
      * Name of the agent pool.
      */

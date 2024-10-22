@@ -28,6 +28,12 @@ namespace Pulumi.PulumiService
         public Output<string?> Description { get; private set; } = null!;
 
         /// <summary>
+        /// Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.
+        /// </summary>
+        [Output("forceDestroy")]
+        public Output<bool?> ForceDestroy { get; private set; } = null!;
+
+        /// <summary>
         /// The name of the agent pool.
         /// </summary>
         [Output("name")]
@@ -99,6 +105,12 @@ namespace Pulumi.PulumiService
         /// </summary>
         [Input("description")]
         public Input<string>? Description { get; set; }
+
+        /// <summary>
+        /// Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.
+        /// </summary>
+        [Input("forceDestroy")]
+        public Input<bool>? ForceDestroy { get; set; }
 
         /// <summary>
         /// Name of the agent pool.

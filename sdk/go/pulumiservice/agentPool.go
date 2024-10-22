@@ -20,6 +20,8 @@ type AgentPool struct {
 	AgentPoolId pulumi.StringOutput `pulumi:"agentPoolId"`
 	// Description of the agent pool.
 	Description pulumi.StringPtrOutput `pulumi:"description"`
+	// Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.
+	ForceDestroy pulumi.BoolPtrOutput `pulumi:"forceDestroy"`
 	// The name of the agent pool.
 	Name pulumi.StringOutput `pulumi:"name"`
 	// The organization's name.
@@ -80,6 +82,8 @@ func (AgentPoolState) ElementType() reflect.Type {
 type agentPoolArgs struct {
 	// Description of the agent pool.
 	Description *string `pulumi:"description"`
+	// Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.
+	ForceDestroy *bool `pulumi:"forceDestroy"`
 	// Name of the agent pool.
 	Name string `pulumi:"name"`
 	// The organization's name.
@@ -90,6 +94,8 @@ type agentPoolArgs struct {
 type AgentPoolArgs struct {
 	// Description of the agent pool.
 	Description pulumi.StringPtrInput
+	// Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.
+	ForceDestroy pulumi.BoolPtrInput
 	// Name of the agent pool.
 	Name pulumi.StringInput
 	// The organization's name.
@@ -191,6 +197,11 @@ func (o AgentPoolOutput) AgentPoolId() pulumi.StringOutput {
 // Description of the agent pool.
 func (o AgentPoolOutput) Description() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *AgentPool) pulumi.StringPtrOutput { return v.Description }).(pulumi.StringPtrOutput)
+}
+
+// Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.
+func (o AgentPoolOutput) ForceDestroy() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *AgentPool) pulumi.BoolPtrOutput { return v.ForceDestroy }).(pulumi.BoolPtrOutput)
 }
 
 // The name of the agent pool.
