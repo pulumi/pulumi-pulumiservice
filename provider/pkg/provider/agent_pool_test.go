@@ -24,7 +24,7 @@ func (c *AgentPoolClientMock) CreateAgentPool(ctx context.Context, name, orgName
 func (c *AgentPoolClientMock) UpdateAgentPool(ctx context.Context, agentPoolId, name, orgName, description string) error {
 	return nil
 }
-func (c *AgentPoolClientMock) DeleteAgentPool(ctx context.Context, agentPoolId, orgName string) error {
+func (c *AgentPoolClientMock) DeleteAgentPool(ctx context.Context, agentPoolId, orgName string, forceDestroy bool) error {
 	return nil
 }
 

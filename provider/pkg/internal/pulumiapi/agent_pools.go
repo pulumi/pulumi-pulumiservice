@@ -18,13 +18,14 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"path"
 )
 
 type AgentPoolClient interface {
 	CreateAgentPool(ctx context.Context, orgName, name, description string) (*AgentPool, error)
 	UpdateAgentPool(ctx context.Context, agentPoolId, orgName, name, description string) error
-	DeleteAgentPool(ctx context.Context, agentPoolId, orgName string) error
+	DeleteAgentPool(ctx context.Context, agentPoolId, orgName string, forceDestroy bool) error
 	GetAgentPool(ctx context.Context, agentPoolId, orgName string) (*AgentPool, error)
 }
 
@@ -106,18 +107,23 @@ func (c *Client) UpdateAgentPool(ctx context.Context, agentPoolId, orgName, name
 	return nil
 }
 
-func (c *Client) DeleteAgentPool(ctx context.Context, agentPoolId, orgName string) error {
+func (c *Client) DeleteAgentPool(ctx context.Context, agentPoolId, orgName string, forceDestroy bool) error {
 	if len(agentPoolId) == 0 {
 		return errors.New("agentPoolId length must be greater than zero")
 	}
 
 	if len(orgName) == 0 {
-		return errors.New("orgname length must be greater than zero")
+		return errors.New("orgName length must be greater than zero")
 	}
 
 	apiPath := path.Join("orgs", orgName, "agent-pools", agentPoolId)
 
-	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
+	var err error
+	if forceDestroy {
+		_, err = c.doWithQuery(ctx, http.MethodDelete, apiPath, url.Values{"force": []string{"true"}}, nil, nil)
+	} else {
+		_, err = c.do(ctx, http.MethodDelete, apiPath, nil, nil)
+	}
 	if err != nil {
 		return fmt.Errorf("failed to delete agent pool %q: %w", agentPoolId, err)
 	}
