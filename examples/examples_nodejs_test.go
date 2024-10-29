@@ -50,9 +50,13 @@ func TestDeploymentSettingsExample(t *testing.T) {
 
 func TestTeamStackPermissionsExample(t *testing.T) {
 	cwd, _ := os.Getwd()
+	digits := generateRandomFiveDigits()
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		Quick: true,
 		Dir:   path.Join(cwd, ".", "ts-team-stack-permissions"),
+		Config: map[string]string{
+			"digits": digits,
+		},
 		Dependencies: []string{
 			"@pulumi/pulumiservice",
 		},

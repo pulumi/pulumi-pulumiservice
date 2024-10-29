@@ -51,5 +51,26 @@ class MyStack : Pulumi.Stack
                 RetainOnDelete = true
             }
         );
+
+        var team = new Team("team", new TeamArgs
+        {
+            Name = "brand-new-dotnet-team-" + config.Require("digits"),
+            OrganizationName = environment.Organization,
+            DisplayName = "PulumiUP Dotnet Team",
+            TeamType = "pulumi",
+            Members = {
+                "pulumi-bot",
+                "service-provider-example-user",
+            }
+        });
+
+        var teamEnvironmentPermission = new TeamEnvironmentPermission("teamEnvironmentPermission", new TeamEnvironmentPermissionArgs
+        {
+            Organization = environment.Organization,
+            Team = team.Name.Apply(name => name!),
+            Environment = environment.Name,
+            Project = environment.Project,
+            Permission = EnvironmentPermission.Admin
+        });
     }
 }

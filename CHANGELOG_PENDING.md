@@ -6,5 +6,6 @@
   the source code from a different source, you may not want to specify a `SourceContext` in your `DeploymentSettings`.
 
 ### Bug Fixes
+- Fixing TeamEnvironmentPermission, project field was not working [#429](https://github.com/pulumi/pulumi-pulumiservice/issues/429)
 
 ### Miscellaneous

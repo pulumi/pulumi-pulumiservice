@@ -53,6 +53,35 @@ func main() {
 			return err
 		}
 
+		// A team to use for TeamEnvironmentPermission
+		team, err := pulumiservice.NewTeam(ctx, "team", &pulumiservice.TeamArgs{
+			Name:             pulumi.Sprintf("brand-new-go-team-%s", conf.Require("digits")),
+			Description:      pulumi.String("This was created with Pulumi"),
+			DisplayName:      pulumi.String("PulumiUP Team"),
+			OrganizationName: environment.Organization,
+			TeamType:         pulumi.String("pulumi"),
+			Members: pulumi.ToStringArray([]string{
+				"pulumi-bot",
+				"service-provider-example-user",
+			}),
+		})
+		if err != nil {
+			return err
+		}
+
+		_, err = pulumiservice.NewTeamEnvironmentPermission(ctx, "teamEnvironmentPermission", &pulumiservice.TeamEnvironmentPermissionArgs{
+			Organization: environment.Organization,
+			Team: team.Name.ApplyT(func(name *string) (string, error) {
+				return *name, nil
+			}).(pulumi.StringOutput),
+			Environment: environment.Name,
+			Project:     environment.Project,
+			Permission:  pulumiservice.EnvironmentPermissionAdmin,
+		})
+		if err != nil {
+			return err
+		}
+
 		return nil
 	})
 }

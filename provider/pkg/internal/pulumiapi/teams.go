@@ -65,8 +65,9 @@ type TeamStackPermission struct {
 }
 
 type TeamEnvironmentPermission struct {
-	EnvName    string `json:"envName"`
-	Permission string `json:"permission"`
+	EnvName     string `json:"envName"`
+	ProjectName string `json:"projectName"`
+	Permission  string `json:"permission"`
 }
 
 type createTeamRequest struct {
@@ -116,19 +117,26 @@ type TeamEnvironmentPermissionRequest struct {
 	Organization string `json:"organization,omitempty"`
 	Team         string `json:"team,omitempty"`
 	Environment  string `json:"environment,omitempty"`
+	Project      string `json:"project,omitempty"`
 }
 
 type AddEnvironmentPermission struct {
-	EnvName    string `json:"envName"`
-	Permission string `json:"permission"`
+	EnvName     string `json:"envName"`
+	ProjectName string `json:"projectName"`
+	Permission  string `json:"permission"`
 }
 
 type addEnvironmentPermissionRequest struct {
 	AddEnvironmentPermission AddEnvironmentPermission `json:"addEnvironmentPermission"`
 }
 
+type RemoveEnvironmentPermission struct {
+	EnvName     string `json:"envName"`
+	ProjectName string `json:"projectName"`
+}
+
 type removeEnvironmentPermissionRequest struct {
-	RemoveEnvironment string `json:"removeEnvironment"`
+	RemoveEnvironment RemoveEnvironmentPermission `json:"removeEnvironment"`
 }
 
 func (c *Client) ListTeams(ctx context.Context, orgName string) ([]Team, error) {
@@ -389,7 +397,11 @@ func (c *Client) AddEnvironmentPermission(ctx context.Context, req CreateTeamEnv
 	apiPath := path.Join("orgs", req.Organization, "teams", req.Team)
 
 	addEnvironmentPermissionRequest := addEnvironmentPermissionRequest{
-		AddEnvironmentPermission: AddEnvironmentPermission{EnvName: req.Environment, Permission: req.Permission},
+		AddEnvironmentPermission: AddEnvironmentPermission{
+			ProjectName: req.Project,
+			EnvName:     req.Environment,
+			Permission:  req.Permission,
+		},
 	}
 
 	_, err := c.do(ctx, http.MethodPatch, apiPath, addEnvironmentPermissionRequest, nil)
@@ -413,7 +425,10 @@ func (c *Client) RemoveEnvironmentPermission(ctx context.Context, req TeamEnviro
 	apiPath := path.Join("orgs", req.Organization, "teams", req.Team)
 
 	removeEnvironmentPermissionRequest := removeEnvironmentPermissionRequest{
-		RemoveEnvironment: req.Environment,
+		RemoveEnvironment: RemoveEnvironmentPermission{
+			ProjectName: req.Project,
+			EnvName:     req.Environment,
+		},
 	}
 
 	_, err := c.do(ctx, http.MethodPatch, apiPath, removeEnvironmentPermissionRequest, nil)
