@@ -35,3 +35,20 @@ var versionTag = new service.EnvironmentVersionTag("VersionTag", {
 }, {
   retainOnDelete: true
 })
+
+const team = new service.Team("team", {
+  description: "This was created with Pulumi",
+  name: "ts-team-needing-permissions",
+  displayName: "PulumiUP Team",
+  organizationName: environment.organization,
+  members: ["pulumi-bot", "service-provider-example-user"],
+  teamType: "pulumi"
+});
+
+const teamEnvironmentPermission = new service.TeamEnvironmentPermission("teamEnvironmentPermission", {
+  organization: environment.organization,
+  team: team.name.apply((name: any) => name!!),
+  environment: environment.name,
+  project: environment.project,
+  permission: "admin"
+});

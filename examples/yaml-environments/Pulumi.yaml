@@ -33,3 +33,20 @@ resources:
       revision: ${testing-environment.revision}
     options:
       retainOnDelete: true
+  team:
+    type: pulumiservice:index:Team
+    properties:
+      name: brand-new-yaml-team-${digits}
+      organizationName: ${testing-environment.organization}
+      teamType: pulumi
+      members:
+        - pulumi-bot
+  teamEnvPermission:
+    type: pulumiservice:index:TeamEnvironmentPermission
+    properties:
+      organization: ${testing-environment.organization}
+      team: ${team.name}
+      environment: ${testing-environment.name}
+      project: ${testing-environment.project}
+      permission: "admin"
+

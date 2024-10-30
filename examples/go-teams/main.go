@@ -9,8 +9,8 @@ import (
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
 		rand, err := random.NewRandomString(ctx, "random", &random.RandomStringArgs{
-			Length:          pulumi.Int(5),
-			Special:         pulumi.Bool(false),
+			Length:  pulumi.Int(5),
+			Special: pulumi.Bool(false),
 		})
 		if err != nil {
 			return err

@@ -304,6 +304,7 @@ func TestAddEnvironmentPermission(t *testing.T) {
 	teamName := "a-team"
 	permission := "admin"
 	organization := "an-organization"
+	project := "a-project"
 	environment := "an-environment"
 	t.Run("Happy Path", func(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
@@ -311,8 +312,9 @@ func TestAddEnvironmentPermission(t *testing.T) {
 			ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team",
 			ExpectedReqBody: addEnvironmentPermissionRequest{
 				AddEnvironmentPermission: AddEnvironmentPermission{
-					EnvName:    environment,
-					Permission: permission,
+					ProjectName: project,
+					EnvName:     environment,
+					Permission:  permission,
 				},
 			},
 			ResponseCode: 204,
@@ -321,6 +323,7 @@ func TestAddEnvironmentPermission(t *testing.T) {
 		assert.NoError(t, c.AddEnvironmentPermission(ctx, CreateTeamEnvironmentPermissionRequest{
 			TeamEnvironmentPermissionRequest: TeamEnvironmentPermissionRequest{
 				Organization: organization,
+				Project:      project,
 				Environment:  environment,
 				Team:         teamName,
 			},
@@ -332,13 +335,17 @@ func TestAddEnvironmentPermission(t *testing.T) {
 func TestRemoveEnvironmentPermission(t *testing.T) {
 	teamName := "a-team"
 	organization := "an-organization"
+	project := "a-project"
 	environment := "an-environment"
 	t.Run("Happy Path", func(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPatch,
 			ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team",
 			ExpectedReqBody: removeEnvironmentPermissionRequest{
-				RemoveEnvironment: environment,
+				RemoveEnvironment: RemoveEnvironmentPermission{
+					ProjectName: project,
+					EnvName:     environment,
+				},
 			},
 			ResponseCode: 204,
 		})
@@ -346,6 +353,7 @@ func TestRemoveEnvironmentPermission(t *testing.T) {
 		assert.NoError(t, c.RemoveEnvironmentPermission(ctx, TeamEnvironmentPermissionRequest{
 			Organization: organization,
 			Team:         teamName,
+			Project:      project,
 			Environment:  environment,
 		}))
 	})

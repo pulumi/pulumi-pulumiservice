@@ -22,6 +22,7 @@ type TeamEnvironmentPermissionInput struct {
 	Organization string `pulumi:"organization"`
 	Team         string `pulumi:"team"`
 	Environment  string `pulumi:"environment"`
+	Project      string `pulumi:"project"`
 	Permission   string `pulumi:"permission"`
 }
 
@@ -44,9 +45,7 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Check(req *pulumirpc.C
 	}, nil
 }
 
-func (tp *PulumiServiceTeamEnvironmentPermissionResource) Configure(_ PulumiServiceConfig) {
-
-}
+func (tp *PulumiServiceTeamEnvironmentPermissionResource) Configure(_ PulumiServiceConfig) {}
 
 func (tp *PulumiServiceTeamEnvironmentPermissionResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
 	ctx := context.Background()
@@ -59,6 +58,7 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Read(req *pulumirpc.Re
 		Organization: permId.Organization,
 		Team:         permId.Team,
 		Environment:  permId.Environment,
+		Project:      permId.Project,
 	}
 	permission, err := tp.client.GetTeamEnvironmentPermission(ctx, request)
 	if err != nil {
@@ -71,6 +71,7 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Read(req *pulumirpc.Re
 	inputs := TeamEnvironmentPermissionInput{
 		Organization: permId.Organization,
 		Team:         permId.Team,
+		Project:      permId.Project,
 		Environment:  permId.Environment,
 		Permission:   *permission,
 	}
@@ -97,6 +98,7 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Create(req *pulumirpc.
 		TeamEnvironmentPermissionRequest: pulumiapi.TeamEnvironmentPermissionRequest{
 			Organization: inputs.Organization,
 			Team:         inputs.Team,
+			Project:      inputs.Project,
 			Environment:  inputs.Environment,
 		},
 		Permission: inputs.Permission,
@@ -110,6 +112,7 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Create(req *pulumirpc.
 	environmentPermissionId := teamEnvironmentPermissionId{
 		Organization: inputs.Organization,
 		Team:         inputs.Team,
+		Project:      inputs.Project,
 		Environment:  inputs.Environment,
 	}
 
@@ -129,6 +132,7 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Delete(req *pulumirpc.
 	request := pulumiapi.TeamEnvironmentPermissionRequest{
 		Organization: inputs.Organization,
 		Team:         inputs.Team,
+		Project:      inputs.Project,
 		Environment:  inputs.Environment,
 	}
 	err = tp.client.RemoveEnvironmentPermission(ctx, request)
@@ -161,11 +165,12 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Update(_ *pulumirpc.Up
 type teamEnvironmentPermissionId struct {
 	Organization string
 	Team         string
+	Project      string
 	Environment  string
 }
 
 func (s *teamEnvironmentPermissionId) String() string {
-	return fmt.Sprintf("%s/%s/%s", s.Organization, s.Team, s.Environment)
+	return fmt.Sprintf("%s/%s/%s+%s", s.Organization, s.Team, s.Project, s.Environment)
 }
 
 func splitTeamEnvironmentPermissionId(id string) (teamEnvironmentPermissionId, error) {
@@ -173,9 +178,24 @@ func splitTeamEnvironmentPermissionId(id string) (teamEnvironmentPermissionId, e
 	if len(split) != 3 {
 		return teamEnvironmentPermissionId{}, fmt.Errorf("invalid id %q, expected 3 parts", id)
 	}
-	return teamEnvironmentPermissionId{
-		Organization: split[0],
-		Team:         split[1],
-		Environment:  split[2],
-	}, nil
+
+	splitProjectEnv := strings.Split(split[2], "+")
+	if len(splitProjectEnv) == 1 {
+		return teamEnvironmentPermissionId{
+			Organization: split[0],
+			Team:         split[1],
+			Project:      "default",
+			Environment:  splitProjectEnv[0],
+		}, nil
+	}
+	if len(splitProjectEnv) == 2 {
+		return teamEnvironmentPermissionId{
+			Organization: split[0],
+			Team:         split[1],
+			Project:      splitProjectEnv[0],
+			Environment:  splitProjectEnv[1],
+		}, nil
+	}
+
+	return teamEnvironmentPermissionId{}, fmt.Errorf("invalid id %q, expected environment name or project/environment in last part", id)
 }

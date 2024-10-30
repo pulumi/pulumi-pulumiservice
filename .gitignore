@@ -18,3 +18,5 @@ ci-scripts
 .mono
 /go/
 *.sln
+dist
+pulumi_pulumiservice.egg-info
