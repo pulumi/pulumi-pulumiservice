@@ -70,15 +70,15 @@ python_sdk: gen_sdk_prerequisites
 	rm -rf sdk/python
 	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language python
 	cp README.md ${PACKDIR}/python/
-	sudo python3 -m venv temp-venv
-	sudo temp-venv/bin/pip install setuptools 
-	temp-venv/bin/python3 ${PACKDIR}/python/setup.py clean --all 
-	rm -rf ${PACKDIR}/python/bin ${PACKDIR}/python.bin/ 
-	cp -R ${PACKDIR}/python ${PACKDIR}/python.bin && mv ${PACKDIR}/python.bin ${PACKDIR}/python/bin 
-	sed -i.bak -e 's/^VERSION = .*/VERSION = "$(PYPI_VERSION)"/g' -e 's/^PLUGIN_VERSION = .*/PLUGIN_VERSION = "$(VERSION)"/g' ${PACKDIR}/python/bin/setup.py 
-	rm ${PACKDIR}/python/bin/setup.py.bak 
-	temp-venv/bin/python3 ${PACKDIR}/python/bin/setup.py build sdist 
-	sudo rm -rf temp-venv
+	cd ${PACKDIR}/python/ && \
+		python3 -m venv venv && \
+		. ./venv/bin/activate && \
+		python -m pip install setuptools && \
+		python setup.py clean --all && \
+		rm -rf ./bin/ ../python.bin/ && cp -R . ../python.bin && mv ../python.bin ./bin && \
+		sed -i.bak -e 's/^VERSION = .*/VERSION = "$(PYPI_VERSION)"/g' -e 's/^PLUGIN_VERSION = .*/PLUGIN_VERSION = "$(VERSION)"/g' ./bin/setup.py && \
+		rm ./bin/setup.py.bak && \
+		cd ./bin && python3 setup.py build sdist
 
 GRADLE_DIR := $(WORKING_DIR)/.gradle
 GRADLE := $(GRADLE_DIR)/gradlew
