@@ -28,8 +28,6 @@ builds:
       # The line below MUST align with the module in current provider/go.mod
       - -X github.com/pulumi/pulumi-pulumiservice/provider/pkg/version.Version={{.Tag }}
     main: ./cmd/pulumi-resource-pulumiservice/
-changelog:
-  disable: true
 release:
   disable: false
   prerelease: auto
