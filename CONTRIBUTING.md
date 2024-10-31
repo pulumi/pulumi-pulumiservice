@@ -57,10 +57,6 @@ Please ensure that you nest your branches under a unique identifier such as your
 This section is for Pulumi employees only. 
 
 To release a new version of the provider, follow the procedure below:
-1. Codefreeze
-   - Move all the items from `CHANGELOG_PENDING.md` to `CHANGELOG.md`, under a new version that you are releasing
-   - Make a PR like [this example](https://github.com/pulumi/pulumi-pulumiservice/pull/255)
-   - Get an approval and merge it in
 1. Create a release
    - Run below commands, replacing `X.XX.XX` with your new version. This will use your codefreeze commit as source for the new release. 
         ```
@@ -73,6 +69,11 @@ To release a new version of the provider, follow the procedure below:
         ```
     - Github Actions will automatically build, test and then publish the new release to all the various package managers
     - Once that is done, you will see your version in [Releases](https://github.com/pulumi/pulumi-pulumiservice/releases)
+    - The version will have a description from `CHANGELOG_PENDING.md`
+1. Codefreeze
+   - Move all the items from `CHANGELOG_PENDING.md` to `CHANGELOG.md`, under a new version that you are releasing
+   - Make a PR like [this example](https://github.com/pulumi/pulumi-pulumiservice/pull/255)
+   - Get an approval and merge it in
 
 ## Getting Help
 
