@@ -18,18 +18,18 @@ import (
 	"fmt"
 )
 
-// errorResponse is returned from pulumi service api when there's been an error
-type errorResponse struct {
+// ErrorResponse is returned from pulumi service api when there's been an error
+type ErrorResponse struct {
 	StatusCode int    `json:"code"`
 	Message    string `json:"message"`
 }
 
-func (err *errorResponse) Error() string {
+func (err *ErrorResponse) Error() string {
 	return fmt.Sprintf("%d API error: %s", err.StatusCode, err.Message)
 }
 
 func GetErrorStatusCode(err error) int {
-	var errResp *errorResponse
+	var errResp *ErrorResponse
 	if errors.As(err, &errResp) {
 		return errResp.StatusCode
 	}

@@ -27,7 +27,7 @@ func TestDeleteAccessToken(t *testing.T) {
 			ExpectedReqMethod: http.MethodDelete,
 			ExpectedReqPath:   "/api/user/tokens/" + tokenId,
 			ResponseCode:      404,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				StatusCode: 404,
 				Message:    "token not found",
 			},
@@ -75,7 +75,7 @@ func TestCreateAccessToken(t *testing.T) {
 				Description: desc,
 			},
 			ResponseCode: 401,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				StatusCode: 401,
 				Message:    "unauthorized",
 			},
@@ -131,7 +131,7 @@ func TestGetAccessToken(t *testing.T) {
 			ExpectedReqPath:   "/api/user/tokens",
 			ExpectedReqBody:   nil,
 			ResponseCode:      401,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				StatusCode: 401,
 				Message:    "unauthorized",
 			},

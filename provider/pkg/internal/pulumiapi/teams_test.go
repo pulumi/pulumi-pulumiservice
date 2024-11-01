@@ -42,7 +42,7 @@ func TestListTeams(t *testing.T) {
 			ExpectedReqMethod: http.MethodGet,
 			ExpectedReqPath:   "/api/orgs/an-organization/teams",
 			ResponseCode:      401,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				Message: "unauthorized",
 			},
 		})
@@ -84,7 +84,7 @@ func TestGetTeam(t *testing.T) {
 			ExpectedReqMethod: http.MethodGet,
 			ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team",
 			ResponseCode:      401,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				Message: "unauthorized",
 			},
 		})
@@ -99,7 +99,7 @@ func TestGetTeam(t *testing.T) {
 			ExpectedReqMethod: http.MethodGet,
 			ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team",
 			ResponseCode:      404,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				StatusCode: 404,
 				Message:    "not found",
 			},
@@ -176,7 +176,7 @@ func TestCreateTeam(t *testing.T) {
 				Description:  description,
 			},
 			ResponseCode: 401,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				Message: "unauthorized",
 			},
 		})
@@ -238,7 +238,7 @@ func TestAddMemberToTeam(t *testing.T) {
 				Member:       userName,
 			},
 			ResponseCode: 401,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				Message: "unauthorized",
 			},
 		})

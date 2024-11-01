@@ -18,7 +18,7 @@ func TestDeleteAgentPool(t *testing.T) {
 			ResponseCode:      204,
 		})
 		defer cleanup()
-		assert.NoError(t, c.DeleteAgentPool(teamCtx, agentPoolId, orgName))
+		assert.NoError(t, c.DeleteAgentPool(teamCtx, agentPoolId, orgName, false))
 	})
 
 	t.Run("Error", func(t *testing.T) {
@@ -26,14 +26,14 @@ func TestDeleteAgentPool(t *testing.T) {
 			ExpectedReqMethod: http.MethodDelete,
 			ExpectedReqPath:   "/api/orgs/anOrg/agent-pools/" + agentPoolId,
 			ResponseCode:      404,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				StatusCode: 404,
 				Message:    "agent pool not found",
 			},
 		})
 		defer cleanup()
 		assert.EqualError(t,
-			c.DeleteAgentPool(teamCtx, agentPoolId, orgName),
+			c.DeleteAgentPool(teamCtx, agentPoolId, orgName, false),
 			`failed to delete agent pool "abcdegh": 404 API error: agent pool not found`,
 		)
 	})
@@ -80,7 +80,7 @@ func TestCreateAgentPool(t *testing.T) {
 				Name:        name,
 			},
 			ResponseCode: 401,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				StatusCode: 401,
 				Message:    "unauthorized",
 			},
@@ -129,7 +129,7 @@ func TestGetAgentPool(t *testing.T) {
 			ExpectedReqPath:   fmt.Sprintf("/api/orgs/%s/agent-pools/%s", org, id),
 			ExpectedReqBody:   nil,
 			ResponseCode:      401,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				StatusCode: 401,
 				Message:    "unauthorized",
 			},

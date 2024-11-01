@@ -36,7 +36,7 @@ func TestCreateStackTags(t *testing.T) {
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqPath:   fmt.Sprintf("/api/stacks/%s/%s/%s/tags", stackName.OrgName, stackName.ProjectName, stackName.StackName),
 			ResponseCode:      401,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				Message: "unauthorized",
 			},
 		})
@@ -68,7 +68,7 @@ func TestDeleteStackTags(t *testing.T) {
 			ExpectedReqMethod: http.MethodDelete,
 			ExpectedReqPath:   "/api/stacks/organization/project/stack/tags/tagName",
 			ResponseCode:      401,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				Message: "unauthorized",
 			},
 		})
