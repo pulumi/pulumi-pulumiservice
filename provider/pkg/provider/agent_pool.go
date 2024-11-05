@@ -204,6 +204,7 @@ func (ap *PulumiServiceAgentPoolResource) Update(req *pulumirpc.UpdateRequest) (
 	changedInputs := olds
 	changedInputs["name"] = news["name"]
 	changedInputs["description"] = news["description"]
+	changedInputs["forceDestroy"] = news["forceDestroy"]
 
 	inputsAgentPool := ap.ToPulumiServiceAgentPoolInput(changedInputs)
 	err = ap.updateAgentPool(ctx, agentPoolId, inputsAgentPool)

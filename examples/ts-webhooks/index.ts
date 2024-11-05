@@ -39,7 +39,7 @@ const stackWebhook = new service.Webhook("stack-webhook", {
   organizationName: serviceOrg,
   projectName: pulumi.getProject(),
   stackName: pulumi.getStack(),
-  payloadUrl: "https://example.com",
+  payloadUrl: "https://hooks.slack.com/blahblah",
   format: WebhookFormat.Slack,
   groups: [ WebhookGroup.Stacks ],
   filters: [WebhookFilters.DeploymentStarted, WebhookFilters.DeploymentSucceeded],
