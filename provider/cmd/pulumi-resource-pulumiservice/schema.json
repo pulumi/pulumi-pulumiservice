@@ -554,6 +554,17 @@
         }
       ]
     },
+    "pulumiservice:index:DeploymentSettingsCacheOptions": {
+      "description": "Dependency cache settings for the deployment",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable dependency caching",
+          "default": false
+        }
+      },
+      "type": "object"
+    },
     "pulumiservice:index:EnvironmentPermission": {
       "type": "string",
       "enum": [
@@ -1065,6 +1076,10 @@
         "agentPoolId": {
           "description": "The agent pool identifier to use for the deployment.",
           "type": "string"
+        },
+        "cacheOptions": {
+          "$ref": "#/types/pulumiservice:index:DeploymentSettingsCacheOptions",
+          "description": "Dependency cache settings for the deployment"
         }
       },
       "required": [
@@ -1104,6 +1119,10 @@
         "agentPoolId": {
           "description": "The agent pool identifier to use for the deployment.",
           "type": "string"
+        },
+        "cacheOptions": {
+          "$ref": "#/types/pulumiservice:index:DeploymentSettingsCacheOptions",
+          "description": "Dependency cache settings for the deployment"
         }
       },
       "requiredInputs": [
