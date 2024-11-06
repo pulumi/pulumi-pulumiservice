@@ -382,6 +382,170 @@ func (o AzureOIDCConfigurationPtrOutput) TenantId() pulumi.StringPtrOutput {
 	}).(pulumi.StringPtrOutput)
 }
 
+// Dependency cache settings for the deployment
+type DeploymentSettingsCacheOptions struct {
+	// Enable dependency caching
+	Enabled *bool `pulumi:"enabled"`
+}
+
+// Defaults sets the appropriate defaults for DeploymentSettingsCacheOptions
+func (val *DeploymentSettingsCacheOptions) Defaults() *DeploymentSettingsCacheOptions {
+	if val == nil {
+		return nil
+	}
+	tmp := *val
+	if tmp.Enabled == nil {
+		enabled_ := false
+		tmp.Enabled = &enabled_
+	}
+	return &tmp
+}
+
+// DeploymentSettingsCacheOptionsInput is an input type that accepts DeploymentSettingsCacheOptionsArgs and DeploymentSettingsCacheOptionsOutput values.
+// You can construct a concrete instance of `DeploymentSettingsCacheOptionsInput` via:
+//
+//	DeploymentSettingsCacheOptionsArgs{...}
+type DeploymentSettingsCacheOptionsInput interface {
+	pulumi.Input
+
+	ToDeploymentSettingsCacheOptionsOutput() DeploymentSettingsCacheOptionsOutput
+	ToDeploymentSettingsCacheOptionsOutputWithContext(context.Context) DeploymentSettingsCacheOptionsOutput
+}
+
+// Dependency cache settings for the deployment
+type DeploymentSettingsCacheOptionsArgs struct {
+	// Enable dependency caching
+	Enabled pulumi.BoolPtrInput `pulumi:"enabled"`
+}
+
+// Defaults sets the appropriate defaults for DeploymentSettingsCacheOptionsArgs
+func (val *DeploymentSettingsCacheOptionsArgs) Defaults() *DeploymentSettingsCacheOptionsArgs {
+	if val == nil {
+		return nil
+	}
+	tmp := *val
+	if tmp.Enabled == nil {
+		tmp.Enabled = pulumi.BoolPtr(false)
+	}
+	return &tmp
+}
+func (DeploymentSettingsCacheOptionsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*DeploymentSettingsCacheOptions)(nil)).Elem()
+}
+
+func (i DeploymentSettingsCacheOptionsArgs) ToDeploymentSettingsCacheOptionsOutput() DeploymentSettingsCacheOptionsOutput {
+	return i.ToDeploymentSettingsCacheOptionsOutputWithContext(context.Background())
+}
+
+func (i DeploymentSettingsCacheOptionsArgs) ToDeploymentSettingsCacheOptionsOutputWithContext(ctx context.Context) DeploymentSettingsCacheOptionsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(DeploymentSettingsCacheOptionsOutput)
+}
+
+func (i DeploymentSettingsCacheOptionsArgs) ToDeploymentSettingsCacheOptionsPtrOutput() DeploymentSettingsCacheOptionsPtrOutput {
+	return i.ToDeploymentSettingsCacheOptionsPtrOutputWithContext(context.Background())
+}
+
+func (i DeploymentSettingsCacheOptionsArgs) ToDeploymentSettingsCacheOptionsPtrOutputWithContext(ctx context.Context) DeploymentSettingsCacheOptionsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(DeploymentSettingsCacheOptionsOutput).ToDeploymentSettingsCacheOptionsPtrOutputWithContext(ctx)
+}
+
+// DeploymentSettingsCacheOptionsPtrInput is an input type that accepts DeploymentSettingsCacheOptionsArgs, DeploymentSettingsCacheOptionsPtr and DeploymentSettingsCacheOptionsPtrOutput values.
+// You can construct a concrete instance of `DeploymentSettingsCacheOptionsPtrInput` via:
+//
+//	        DeploymentSettingsCacheOptionsArgs{...}
+//
+//	or:
+//
+//	        nil
+type DeploymentSettingsCacheOptionsPtrInput interface {
+	pulumi.Input
+
+	ToDeploymentSettingsCacheOptionsPtrOutput() DeploymentSettingsCacheOptionsPtrOutput
+	ToDeploymentSettingsCacheOptionsPtrOutputWithContext(context.Context) DeploymentSettingsCacheOptionsPtrOutput
+}
+
+type deploymentSettingsCacheOptionsPtrType DeploymentSettingsCacheOptionsArgs
+
+func DeploymentSettingsCacheOptionsPtr(v *DeploymentSettingsCacheOptionsArgs) DeploymentSettingsCacheOptionsPtrInput {
+	return (*deploymentSettingsCacheOptionsPtrType)(v)
+}
+
+func (*deploymentSettingsCacheOptionsPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**DeploymentSettingsCacheOptions)(nil)).Elem()
+}
+
+func (i *deploymentSettingsCacheOptionsPtrType) ToDeploymentSettingsCacheOptionsPtrOutput() DeploymentSettingsCacheOptionsPtrOutput {
+	return i.ToDeploymentSettingsCacheOptionsPtrOutputWithContext(context.Background())
+}
+
+func (i *deploymentSettingsCacheOptionsPtrType) ToDeploymentSettingsCacheOptionsPtrOutputWithContext(ctx context.Context) DeploymentSettingsCacheOptionsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(DeploymentSettingsCacheOptionsPtrOutput)
+}
+
+// Dependency cache settings for the deployment
+type DeploymentSettingsCacheOptionsOutput struct{ *pulumi.OutputState }
+
+func (DeploymentSettingsCacheOptionsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*DeploymentSettingsCacheOptions)(nil)).Elem()
+}
+
+func (o DeploymentSettingsCacheOptionsOutput) ToDeploymentSettingsCacheOptionsOutput() DeploymentSettingsCacheOptionsOutput {
+	return o
+}
+
+func (o DeploymentSettingsCacheOptionsOutput) ToDeploymentSettingsCacheOptionsOutputWithContext(ctx context.Context) DeploymentSettingsCacheOptionsOutput {
+	return o
+}
+
+func (o DeploymentSettingsCacheOptionsOutput) ToDeploymentSettingsCacheOptionsPtrOutput() DeploymentSettingsCacheOptionsPtrOutput {
+	return o.ToDeploymentSettingsCacheOptionsPtrOutputWithContext(context.Background())
+}
+
+func (o DeploymentSettingsCacheOptionsOutput) ToDeploymentSettingsCacheOptionsPtrOutputWithContext(ctx context.Context) DeploymentSettingsCacheOptionsPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v DeploymentSettingsCacheOptions) *DeploymentSettingsCacheOptions {
+		return &v
+	}).(DeploymentSettingsCacheOptionsPtrOutput)
+}
+
+// Enable dependency caching
+func (o DeploymentSettingsCacheOptionsOutput) Enabled() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v DeploymentSettingsCacheOptions) *bool { return v.Enabled }).(pulumi.BoolPtrOutput)
+}
+
+type DeploymentSettingsCacheOptionsPtrOutput struct{ *pulumi.OutputState }
+
+func (DeploymentSettingsCacheOptionsPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**DeploymentSettingsCacheOptions)(nil)).Elem()
+}
+
+func (o DeploymentSettingsCacheOptionsPtrOutput) ToDeploymentSettingsCacheOptionsPtrOutput() DeploymentSettingsCacheOptionsPtrOutput {
+	return o
+}
+
+func (o DeploymentSettingsCacheOptionsPtrOutput) ToDeploymentSettingsCacheOptionsPtrOutputWithContext(ctx context.Context) DeploymentSettingsCacheOptionsPtrOutput {
+	return o
+}
+
+func (o DeploymentSettingsCacheOptionsPtrOutput) Elem() DeploymentSettingsCacheOptionsOutput {
+	return o.ApplyT(func(v *DeploymentSettingsCacheOptions) DeploymentSettingsCacheOptions {
+		if v != nil {
+			return *v
+		}
+		var ret DeploymentSettingsCacheOptions
+		return ret
+	}).(DeploymentSettingsCacheOptionsOutput)
+}
+
+// Enable dependency caching
+func (o DeploymentSettingsCacheOptionsPtrOutput) Enabled() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *DeploymentSettingsCacheOptions) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.Enabled
+	}).(pulumi.BoolPtrOutput)
+}
+
 // The executor context defines information about the executor where the deployment is executed. If unspecified, the default 'pulumi/pulumi' image is used.
 type DeploymentSettingsExecutorContext struct {
 	// Allows overriding the default executor image with a custom image. E.g. 'pulumi/pulumi-nodejs:latest'
@@ -2549,6 +2713,8 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*AWSOIDCConfigurationPtrInput)(nil)).Elem(), AWSOIDCConfigurationArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*AzureOIDCConfigurationInput)(nil)).Elem(), AzureOIDCConfigurationArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*AzureOIDCConfigurationPtrInput)(nil)).Elem(), AzureOIDCConfigurationArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsCacheOptionsInput)(nil)).Elem(), DeploymentSettingsCacheOptionsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsCacheOptionsPtrInput)(nil)).Elem(), DeploymentSettingsCacheOptionsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsExecutorContextInput)(nil)).Elem(), DeploymentSettingsExecutorContextArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsExecutorContextPtrInput)(nil)).Elem(), DeploymentSettingsExecutorContextArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsGitAuthBasicAuthInput)(nil)).Elem(), DeploymentSettingsGitAuthBasicAuthArgs{})
@@ -2577,6 +2743,8 @@ func init() {
 	pulumi.RegisterOutputType(AWSOIDCConfigurationPtrOutput{})
 	pulumi.RegisterOutputType(AzureOIDCConfigurationOutput{})
 	pulumi.RegisterOutputType(AzureOIDCConfigurationPtrOutput{})
+	pulumi.RegisterOutputType(DeploymentSettingsCacheOptionsOutput{})
+	pulumi.RegisterOutputType(DeploymentSettingsCacheOptionsPtrOutput{})
 	pulumi.RegisterOutputType(DeploymentSettingsExecutorContextOutput{})
 	pulumi.RegisterOutputType(DeploymentSettingsExecutorContextPtrOutput{})
 	pulumi.RegisterOutputType(DeploymentSettingsGitAuthBasicAuthOutput{})

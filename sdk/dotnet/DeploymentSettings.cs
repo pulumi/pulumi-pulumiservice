@@ -30,6 +30,12 @@ namespace Pulumi.PulumiService
         public Output<string?> AgentPoolId { get; private set; } = null!;
 
         /// <summary>
+        /// Dependency cache settings for the deployment
+        /// </summary>
+        [Output("cacheOptions")]
+        public Output<Outputs.DeploymentSettingsCacheOptions?> CacheOptions { get; private set; } = null!;
+
+        /// <summary>
         /// Settings related to the deployment executor.
         /// </summary>
         [Output("executorContext")]
@@ -121,6 +127,12 @@ namespace Pulumi.PulumiService
         /// </summary>
         [Input("agentPoolId")]
         public Input<string>? AgentPoolId { get; set; }
+
+        /// <summary>
+        /// Dependency cache settings for the deployment
+        /// </summary>
+        [Input("cacheOptions")]
+        public Input<Inputs.DeploymentSettingsCacheOptionsArgs>? CacheOptions { get; set; }
 
         /// <summary>
         /// Settings related to the deployment executor.

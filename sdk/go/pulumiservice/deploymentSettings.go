@@ -28,6 +28,8 @@ type DeploymentSettings struct {
 
 	// The agent pool identifier to use for the deployment.
 	AgentPoolId pulumi.StringPtrOutput `pulumi:"agentPoolId"`
+	// Dependency cache settings for the deployment
+	CacheOptions DeploymentSettingsCacheOptionsPtrOutput `pulumi:"cacheOptions"`
 	// Settings related to the deployment executor.
 	ExecutorContext DeploymentSettingsExecutorContextPtrOutput `pulumi:"executorContext"`
 	// GitHub settings for the deployment.
@@ -59,6 +61,9 @@ func NewDeploymentSettings(ctx *pulumi.Context,
 	}
 	if args.Stack == nil {
 		return nil, errors.New("invalid value for required argument 'Stack'")
+	}
+	if args.CacheOptions != nil {
+		args.CacheOptions = args.CacheOptions.ToDeploymentSettingsCacheOptionsPtrOutput().ApplyT(func(v *DeploymentSettingsCacheOptions) *DeploymentSettingsCacheOptions { return v.Defaults() }).(DeploymentSettingsCacheOptionsPtrOutput)
 	}
 	if args.Github != nil {
 		args.Github = args.Github.ToDeploymentSettingsGithubPtrOutput().ApplyT(func(v *DeploymentSettingsGithub) *DeploymentSettingsGithub { return v.Defaults() }).(DeploymentSettingsGithubPtrOutput)
@@ -98,6 +103,8 @@ func (DeploymentSettingsState) ElementType() reflect.Type {
 type deploymentSettingsArgs struct {
 	// The agent pool identifier to use for the deployment.
 	AgentPoolId *string `pulumi:"agentPoolId"`
+	// Dependency cache settings for the deployment
+	CacheOptions *DeploymentSettingsCacheOptions `pulumi:"cacheOptions"`
 	// Settings related to the deployment executor.
 	ExecutorContext *DeploymentSettingsExecutorContext `pulumi:"executorContext"`
 	// GitHub settings for the deployment.
@@ -118,6 +125,8 @@ type deploymentSettingsArgs struct {
 type DeploymentSettingsArgs struct {
 	// The agent pool identifier to use for the deployment.
 	AgentPoolId pulumi.StringPtrInput
+	// Dependency cache settings for the deployment
+	CacheOptions DeploymentSettingsCacheOptionsPtrInput
 	// Settings related to the deployment executor.
 	ExecutorContext DeploymentSettingsExecutorContextPtrInput
 	// GitHub settings for the deployment.
@@ -224,6 +233,11 @@ func (o DeploymentSettingsOutput) ToDeploymentSettingsOutputWithContext(ctx cont
 // The agent pool identifier to use for the deployment.
 func (o DeploymentSettingsOutput) AgentPoolId() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *DeploymentSettings) pulumi.StringPtrOutput { return v.AgentPoolId }).(pulumi.StringPtrOutput)
+}
+
+// Dependency cache settings for the deployment
+func (o DeploymentSettingsOutput) CacheOptions() DeploymentSettingsCacheOptionsPtrOutput {
+	return o.ApplyT(func(v *DeploymentSettings) DeploymentSettingsCacheOptionsPtrOutput { return v.CacheOptions }).(DeploymentSettingsCacheOptionsPtrOutput)
 }
 
 // Settings related to the deployment executor.

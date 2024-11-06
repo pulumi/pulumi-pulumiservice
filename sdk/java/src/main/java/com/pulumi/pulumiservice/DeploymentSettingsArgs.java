@@ -6,6 +6,7 @@ package com.pulumi.pulumiservice;
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
+import com.pulumi.pulumiservice.inputs.DeploymentSettingsCacheOptionsArgs;
 import com.pulumi.pulumiservice.inputs.DeploymentSettingsExecutorContextArgs;
 import com.pulumi.pulumiservice.inputs.DeploymentSettingsGithubArgs;
 import com.pulumi.pulumiservice.inputs.DeploymentSettingsOperationContextArgs;
@@ -33,6 +34,21 @@ public final class DeploymentSettingsArgs extends com.pulumi.resources.ResourceA
      */
     public Optional<Output<String>> agentPoolId() {
         return Optional.ofNullable(this.agentPoolId);
+    }
+
+    /**
+     * Dependency cache settings for the deployment
+     * 
+     */
+    @Import(name="cacheOptions")
+    private @Nullable Output<DeploymentSettingsCacheOptionsArgs> cacheOptions;
+
+    /**
+     * @return Dependency cache settings for the deployment
+     * 
+     */
+    public Optional<Output<DeploymentSettingsCacheOptionsArgs>> cacheOptions() {
+        return Optional.ofNullable(this.cacheOptions);
     }
 
     /**
@@ -144,6 +160,7 @@ public final class DeploymentSettingsArgs extends com.pulumi.resources.ResourceA
 
     private DeploymentSettingsArgs(DeploymentSettingsArgs $) {
         this.agentPoolId = $.agentPoolId;
+        this.cacheOptions = $.cacheOptions;
         this.executorContext = $.executorContext;
         this.github = $.github;
         this.operationContext = $.operationContext;
@@ -190,6 +207,27 @@ public final class DeploymentSettingsArgs extends com.pulumi.resources.ResourceA
          */
         public Builder agentPoolId(String agentPoolId) {
             return agentPoolId(Output.of(agentPoolId));
+        }
+
+        /**
+         * @param cacheOptions Dependency cache settings for the deployment
+         * 
+         * @return builder
+         * 
+         */
+        public Builder cacheOptions(@Nullable Output<DeploymentSettingsCacheOptionsArgs> cacheOptions) {
+            $.cacheOptions = cacheOptions;
+            return this;
+        }
+
+        /**
+         * @param cacheOptions Dependency cache settings for the deployment
+         * 
+         * @return builder
+         * 
+         */
+        public Builder cacheOptions(DeploymentSettingsCacheOptionsArgs cacheOptions) {
+            return cacheOptions(Output.of(cacheOptions));
         }
 
         /**

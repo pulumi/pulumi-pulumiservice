@@ -20,6 +20,7 @@ class DeploymentSettingsArgs:
                  project: pulumi.Input[str],
                  stack: pulumi.Input[str],
                  agent_pool_id: Optional[pulumi.Input[str]] = None,
+                 cache_options: Optional[pulumi.Input['DeploymentSettingsCacheOptionsArgs']] = None,
                  executor_context: Optional[pulumi.Input['DeploymentSettingsExecutorContextArgs']] = None,
                  github: Optional[pulumi.Input['DeploymentSettingsGithubArgs']] = None,
                  operation_context: Optional[pulumi.Input['DeploymentSettingsOperationContextArgs']] = None,
@@ -30,6 +31,7 @@ class DeploymentSettingsArgs:
         :param pulumi.Input[str] project: Project name.
         :param pulumi.Input[str] stack: Stack name.
         :param pulumi.Input[str] agent_pool_id: The agent pool identifier to use for the deployment.
+        :param pulumi.Input['DeploymentSettingsCacheOptionsArgs'] cache_options: Dependency cache settings for the deployment
         :param pulumi.Input['DeploymentSettingsExecutorContextArgs'] executor_context: Settings related to the deployment executor.
         :param pulumi.Input['DeploymentSettingsGithubArgs'] github: GitHub settings for the deployment.
         :param pulumi.Input['DeploymentSettingsOperationContextArgs'] operation_context: Settings related to the Pulumi operation environment during the deployment.
@@ -40,6 +42,8 @@ class DeploymentSettingsArgs:
         pulumi.set(__self__, "stack", stack)
         if agent_pool_id is not None:
             pulumi.set(__self__, "agent_pool_id", agent_pool_id)
+        if cache_options is not None:
+            pulumi.set(__self__, "cache_options", cache_options)
         if executor_context is not None:
             pulumi.set(__self__, "executor_context", executor_context)
         if github is not None:
@@ -98,6 +102,18 @@ class DeploymentSettingsArgs:
         pulumi.set(self, "agent_pool_id", value)
 
     @property
+    @pulumi.getter(name="cacheOptions")
+    def cache_options(self) -> Optional[pulumi.Input['DeploymentSettingsCacheOptionsArgs']]:
+        """
+        Dependency cache settings for the deployment
+        """
+        return pulumi.get(self, "cache_options")
+
+    @cache_options.setter
+    def cache_options(self, value: Optional[pulumi.Input['DeploymentSettingsCacheOptionsArgs']]):
+        pulumi.set(self, "cache_options", value)
+
+    @property
     @pulumi.getter(name="executorContext")
     def executor_context(self) -> Optional[pulumi.Input['DeploymentSettingsExecutorContextArgs']]:
         """
@@ -152,6 +168,7 @@ class DeploymentSettings(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  agent_pool_id: Optional[pulumi.Input[str]] = None,
+                 cache_options: Optional[pulumi.Input[Union['DeploymentSettingsCacheOptionsArgs', 'DeploymentSettingsCacheOptionsArgsDict']]] = None,
                  executor_context: Optional[pulumi.Input[Union['DeploymentSettingsExecutorContextArgs', 'DeploymentSettingsExecutorContextArgsDict']]] = None,
                  github: Optional[pulumi.Input[Union['DeploymentSettingsGithubArgs', 'DeploymentSettingsGithubArgsDict']]] = None,
                  operation_context: Optional[pulumi.Input[Union['DeploymentSettingsOperationContextArgs', 'DeploymentSettingsOperationContextArgsDict']]] = None,
@@ -174,6 +191,7 @@ class DeploymentSettings(pulumi.CustomResource):
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[str] agent_pool_id: The agent pool identifier to use for the deployment.
+        :param pulumi.Input[Union['DeploymentSettingsCacheOptionsArgs', 'DeploymentSettingsCacheOptionsArgsDict']] cache_options: Dependency cache settings for the deployment
         :param pulumi.Input[Union['DeploymentSettingsExecutorContextArgs', 'DeploymentSettingsExecutorContextArgsDict']] executor_context: Settings related to the deployment executor.
         :param pulumi.Input[Union['DeploymentSettingsGithubArgs', 'DeploymentSettingsGithubArgsDict']] github: GitHub settings for the deployment.
         :param pulumi.Input[Union['DeploymentSettingsOperationContextArgs', 'DeploymentSettingsOperationContextArgsDict']] operation_context: Settings related to the Pulumi operation environment during the deployment.
@@ -215,6 +233,7 @@ class DeploymentSettings(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  agent_pool_id: Optional[pulumi.Input[str]] = None,
+                 cache_options: Optional[pulumi.Input[Union['DeploymentSettingsCacheOptionsArgs', 'DeploymentSettingsCacheOptionsArgsDict']]] = None,
                  executor_context: Optional[pulumi.Input[Union['DeploymentSettingsExecutorContextArgs', 'DeploymentSettingsExecutorContextArgsDict']]] = None,
                  github: Optional[pulumi.Input[Union['DeploymentSettingsGithubArgs', 'DeploymentSettingsGithubArgsDict']]] = None,
                  operation_context: Optional[pulumi.Input[Union['DeploymentSettingsOperationContextArgs', 'DeploymentSettingsOperationContextArgsDict']]] = None,
@@ -232,6 +251,7 @@ class DeploymentSettings(pulumi.CustomResource):
             __props__ = DeploymentSettingsArgs.__new__(DeploymentSettingsArgs)
 
             __props__.__dict__["agent_pool_id"] = agent_pool_id
+            __props__.__dict__["cache_options"] = cache_options
             __props__.__dict__["executor_context"] = executor_context
             __props__.__dict__["github"] = github
             __props__.__dict__["operation_context"] = operation_context
@@ -268,6 +288,7 @@ class DeploymentSettings(pulumi.CustomResource):
         __props__ = DeploymentSettingsArgs.__new__(DeploymentSettingsArgs)
 
         __props__.__dict__["agent_pool_id"] = None
+        __props__.__dict__["cache_options"] = None
         __props__.__dict__["executor_context"] = None
         __props__.__dict__["github"] = None
         __props__.__dict__["operation_context"] = None
@@ -284,6 +305,14 @@ class DeploymentSettings(pulumi.CustomResource):
         The agent pool identifier to use for the deployment.
         """
         return pulumi.get(self, "agent_pool_id")
+
+    @property
+    @pulumi.getter(name="cacheOptions")
+    def cache_options(self) -> pulumi.Output[Optional['outputs.DeploymentSettingsCacheOptions']]:
+        """
+        Dependency cache settings for the deployment
+        """
+        return pulumi.get(self, "cache_options")
 
     @property
     @pulumi.getter(name="executorContext")

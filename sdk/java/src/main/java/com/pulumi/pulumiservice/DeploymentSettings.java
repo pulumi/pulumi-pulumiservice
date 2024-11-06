@@ -9,6 +9,7 @@ import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.DeploymentSettingsArgs;
 import com.pulumi.pulumiservice.Utilities;
+import com.pulumi.pulumiservice.outputs.DeploymentSettingsCacheOptions;
 import com.pulumi.pulumiservice.outputs.DeploymentSettingsExecutorContext;
 import com.pulumi.pulumiservice.outputs.DeploymentSettingsGithub;
 import com.pulumi.pulumiservice.outputs.DeploymentSettingsOperationContext;
@@ -44,6 +45,20 @@ public class DeploymentSettings extends com.pulumi.resources.CustomResource {
      */
     public Output<Optional<String>> agentPoolId() {
         return Codegen.optional(this.agentPoolId);
+    }
+    /**
+     * Dependency cache settings for the deployment
+     * 
+     */
+    @Export(name="cacheOptions", refs={DeploymentSettingsCacheOptions.class}, tree="[0]")
+    private Output</* @Nullable */ DeploymentSettingsCacheOptions> cacheOptions;
+
+    /**
+     * @return Dependency cache settings for the deployment
+     * 
+     */
+    public Output<Optional<DeploymentSettingsCacheOptions>> cacheOptions() {
+        return Codegen.optional(this.cacheOptions);
     }
     /**
      * Settings related to the deployment executor.

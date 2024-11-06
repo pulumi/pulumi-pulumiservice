@@ -14,6 +14,7 @@ from ._enums import *
 __all__ = [
     'AWSOIDCConfiguration',
     'AzureOIDCConfiguration',
+    'DeploymentSettingsCacheOptions',
     'DeploymentSettingsExecutorContext',
     'DeploymentSettingsGitAuthBasicAuth',
     'DeploymentSettingsGitAuthSSHAuth',
@@ -161,6 +162,31 @@ class AzureOIDCConfiguration(dict):
         The tenant ID of the federated workload identity.
         """
         return pulumi.get(self, "tenant_id")
+
+
+@pulumi.output_type
+class DeploymentSettingsCacheOptions(dict):
+    """
+    Dependency cache settings for the deployment
+    """
+    def __init__(__self__, *,
+                 enabled: Optional[bool] = None):
+        """
+        Dependency cache settings for the deployment
+        :param bool enabled: Enable dependency caching
+        """
+        if enabled is None:
+            enabled = False
+        if enabled is not None:
+            pulumi.set(__self__, "enabled", enabled)
+
+    @property
+    @pulumi.getter
+    def enabled(self) -> Optional[bool]:
+        """
+        Enable dependency caching
+        """
+        return pulumi.get(self, "enabled")
 
 
 @pulumi.output_type
