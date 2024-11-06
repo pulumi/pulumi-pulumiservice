@@ -26,7 +26,7 @@ func TestDeleteOrgAccessToken(t *testing.T) {
 			ExpectedReqMethod: http.MethodDelete,
 			ExpectedReqPath:   "/api/orgs/anOrg/tokens/" + tokenId,
 			ResponseCode:      404,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				StatusCode: 404,
 				Message:    "token not found",
 			},
@@ -105,7 +105,7 @@ func TestCreateOrgAccessToken(t *testing.T) {
 				Name:        name,
 			},
 			ResponseCode: 401,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				StatusCode: 401,
 				Message:    "unauthorized",
 			},
@@ -162,7 +162,7 @@ func TestGetOrgAccessToken(t *testing.T) {
 			ExpectedReqPath:   fmt.Sprintf("/api/orgs/%s/tokens", org),
 			ExpectedReqBody:   nil,
 			ResponseCode:      401,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				StatusCode: 401,
 				Message:    "unauthorized",
 			},

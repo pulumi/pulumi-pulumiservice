@@ -9,6 +9,7 @@ import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.AgentPoolArgs;
 import com.pulumi.pulumiservice.Utilities;
+import java.lang.Boolean;
 import java.lang.String;
 import java.util.List;
 import java.util.Optional;
@@ -47,6 +48,20 @@ public class AgentPool extends com.pulumi.resources.CustomResource {
      */
     public Output<Optional<String>> description() {
         return Codegen.optional(this.description);
+    }
+    /**
+     * Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.
+     * 
+     */
+    @Export(name="forceDestroy", refs={Boolean.class}, tree="[0]")
+    private Output</* @Nullable */ Boolean> forceDestroy;
+
+    /**
+     * @return Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.
+     * 
+     */
+    public Output<Optional<Boolean>> forceDestroy() {
+        return Codegen.optional(this.forceDestroy);
     }
     /**
      * The name of the agent pool.
