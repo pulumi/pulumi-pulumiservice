@@ -264,6 +264,13 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(plaintextInputSett
 		ecMap["executorImage"] = resource.NewPropertyValue(ds.ExecutorContext.ExecutorImage.Reference)
 		pm["executorContext"] = resource.PropertyValue{V: ecMap}
 	}
+
+	if ds.CacheOptions != nil {
+		coMap := resource.PropertyMap{}
+		coMap["enabled"] = resource.NewPropertyValue(ds.CacheOptions.Enable)
+		pm["cacheOptions"] = resource.PropertyValue{coMap}
+	}
+
 	return pm
 }
 
@@ -324,6 +331,7 @@ func (ds *PulumiServiceDeploymentSettingsResource) ToPulumiServiceDeploymentSett
 	input.GitHub = toGitHubConfig(inputMap)
 	input.SourceContext = toSourceContext(inputMap)
 	input.OperationContext = toOperationContext(inputMap)
+	input.CacheOptions = toCacheOptions(inputMap)
 
 	return input
 }
@@ -589,6 +597,21 @@ func toOperationContext(inputMap resource.PropertyMap) *pulumiapi.OperationConte
 	}
 
 	return &oc
+}
+
+func toCacheOptions(inputMap resource.PropertyMap) *pulumiapi.CacheOptions {
+	if !inputMap["cacheOptions"].HasValue() || !inputMap["cacheOptions"].IsObject() {
+		return nil
+	}
+
+	coInput := inputMap["cacheOptions"].ObjectValue()
+	var co pulumiapi.CacheOptions
+
+	if coInput["enabled"].HasValue() && coInput["enabled"].IsBool() {
+		co.Enable = coInput["enabled"].BoolValue()
+	}
+
+	return &co
 }
 
 func getSecretOrStringValue(prop resource.PropertyValue) string {
