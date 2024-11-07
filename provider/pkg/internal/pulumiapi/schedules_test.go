@@ -64,7 +64,7 @@ func TestCreateDeploymentSchedule(t *testing.T) {
 			ExpectedReqPath:   "/api/stacks/org/project/stack/deployments/schedules",
 			ExpectedReqBody:   createDeploymentScheduleReq,
 			ResponseCode:      401,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				Message: "unauthorized",
 			},
 		})
@@ -95,7 +95,7 @@ func TestGetDeploymentSchedule(t *testing.T) {
 			ExpectedReqMethod: http.MethodGet,
 			ExpectedReqPath:   "/api/stacks/org/project/stack/deployments/schedules/" + testScheduleID,
 			ResponseCode:      401,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				Message: "unauthorized",
 			},
 		})
@@ -110,7 +110,7 @@ func TestGetDeploymentSchedule(t *testing.T) {
 			ExpectedReqMethod: http.MethodGet,
 			ExpectedReqPath:   "/api/stacks/org/project/stack/deployments/schedules/" + testScheduleID,
 			ResponseCode:      404,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				StatusCode: 404,
 				Message:    "not found",
 			},
@@ -144,7 +144,7 @@ func TestUpdateDeploymentSchedule(t *testing.T) {
 			ExpectedReqPath:   "/api/stacks/org/project/stack/deployments/schedules/" + testScheduleID,
 			ExpectedReqBody:   createDeploymentScheduleReq,
 			ResponseCode:      401,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				Message: "unauthorized",
 			},
 		})
@@ -172,7 +172,7 @@ func TestDeleteSchedule(t *testing.T) {
 			ExpectedReqMethod: http.MethodDelete,
 			ExpectedReqPath:   "/api/stacks/org/project/stack/deployments/schedules/" + testScheduleID,
 			ResponseCode:      401,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				Message: "unauthorized",
 			},
 		})
@@ -204,7 +204,7 @@ func TestCreateDriftSchedule(t *testing.T) {
 			ExpectedReqPath:   "/api/stacks/org/project/stack/deployments/drift/schedules",
 			ExpectedReqBody:   createDriftScheduleReq,
 			ResponseCode:      401,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				Message: "unauthorized",
 			},
 		})
@@ -237,7 +237,7 @@ func TestUpdateDriftSchedule(t *testing.T) {
 			ExpectedReqPath:   "/api/stacks/org/project/stack/deployments/drift/schedules/" + testScheduleID,
 			ExpectedReqBody:   createDriftScheduleReq,
 			ResponseCode:      401,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				Message: "unauthorized",
 			},
 		})
@@ -270,7 +270,7 @@ func TestCreateTtlSchedule(t *testing.T) {
 			ExpectedReqPath:   "/api/stacks/org/project/stack/deployments/ttl/schedules",
 			ExpectedReqBody:   createTtlScheduleReq,
 			ResponseCode:      401,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				Message: "unauthorized",
 			},
 		})
@@ -303,7 +303,7 @@ func TestUpdateTtlSchedule(t *testing.T) {
 			ExpectedReqPath:   "/api/stacks/org/project/stack/deployments/ttl/schedules/" + testScheduleID,
 			ExpectedReqBody:   createTtlScheduleReq,
 			ResponseCode:      401,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				Message: "unauthorized",
 			},
 		})

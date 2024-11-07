@@ -79,7 +79,7 @@ func (c *Client) createRequest(ctx context.Context, method string, url *url.URL,
 }
 
 // sendRequest executes req and unmarshals response json into resBody
-// returns attempts to unmarshal response into errorResponse if statusCode not 2XX
+// returns attempts to unmarshal response into ErrorResponse if statusCode not 2XX
 func (c *Client) sendRequest(req *http.Request, resBody interface{}) (*http.Response, error) {
 	res, err := c.httpClient.Do(req)
 	if err != nil {
@@ -91,9 +91,9 @@ func (c *Client) sendRequest(req *http.Request, resBody interface{}) (*http.Resp
 		return nil, fmt.Errorf("failed to read response body: %w", err)
 	}
 	if !ok(res.StatusCode) {
-		// if we didn't get an 2XX status code, unmarshal the response as an errorResponse
+		// if we didn't get an 2XX status code, unmarshal the response as an ErrorResponse
 		// and return an error
-		var errRes errorResponse
+		var errRes ErrorResponse
 		err = json.Unmarshal(body, &errRes)
 		if err != nil {
 			return res, fmt.Errorf("failed to parse response body from url %q, status code %d: %w\n\n%s\n",

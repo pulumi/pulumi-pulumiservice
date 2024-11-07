@@ -47,7 +47,7 @@ func TestCreateWebhook(t *testing.T) {
 			ExpectedReqPath:   "/api/orgs/an-organization/hooks",
 			ExpectedReqBody:   createReq,
 			ResponseCode:      401,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				Message: "unauthorized",
 			},
 		})
@@ -90,7 +90,7 @@ func TestListWebhooks(t *testing.T) {
 			ExpectedReqMethod: http.MethodGet,
 			ExpectedReqPath:   "/api/orgs/an-organization/hooks",
 			ResponseCode:      401,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				Message: "unauthorized",
 			},
 		})
@@ -132,7 +132,7 @@ func TestGetWebhook(t *testing.T) {
 			ExpectedReqMethod: http.MethodGet,
 			ExpectedReqPath:   "/api/orgs/an-organization/hooks/a-webhook",
 			ResponseCode:      401,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				Message: "unauthorized",
 			},
 		})
@@ -147,7 +147,7 @@ func TestGetWebhook(t *testing.T) {
 			ExpectedReqMethod: http.MethodGet,
 			ExpectedReqPath:   "/api/orgs/an-organization/hooks/a-webhook",
 			ResponseCode:      404,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				StatusCode: 404,
 				Message:    "not found",
 			},
@@ -201,7 +201,7 @@ func TestUpdateWebhook(t *testing.T) {
 			ExpectedReqPath:   "/api/orgs/an-organization/hooks/a-webhook",
 			ExpectedReqBody:   updateReq,
 			ResponseCode:      401,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				Message: "unauthorized",
 			},
 		})
@@ -230,7 +230,7 @@ func TestDeleteWebhook(t *testing.T) {
 			ExpectedReqMethod: http.MethodDelete,
 			ExpectedReqPath:   "/api/orgs/an-organization/hooks/a-webhook",
 			ResponseCode:      401,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				Message: "unauthorized",
 			},
 		})

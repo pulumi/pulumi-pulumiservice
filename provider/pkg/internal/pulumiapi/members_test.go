@@ -33,7 +33,7 @@ func TestAddMemberToOrg(t *testing.T) {
 				Role: role,
 			},
 			ResponseCode: 401,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				Message: "unauthorized",
 			},
 		})
@@ -75,7 +75,7 @@ func TestListOrgMembers(t *testing.T) {
 			ExpectedReqMethod: http.MethodGet,
 			ExpectedReqPath:   "/api/orgs/an-organization/members",
 			ResponseCode:      401,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				Message: "unauthorized",
 			},
 		})
@@ -105,7 +105,7 @@ func TestDeleteMemberFromOrg(t *testing.T) {
 			ExpectedReqMethod: http.MethodDelete,
 			ExpectedReqPath:   "/api/orgs/an-organization/members/a-user",
 			ResponseCode:      401,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				Message: "unauthorized",
 			},
 		})

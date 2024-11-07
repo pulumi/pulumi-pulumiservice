@@ -30,7 +30,7 @@ func TestDeleteTeamAccessToken(t *testing.T) {
 			ExpectedReqMethod: http.MethodDelete,
 			ExpectedReqPath:   "/api/orgs/anOrg/teams/aTeam/tokens/" + tokenId,
 			ResponseCode:      404,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				StatusCode: 404,
 				Message:    "token not found",
 			},
@@ -83,7 +83,7 @@ func TestCreateTeamAccessToken(t *testing.T) {
 				Name:        tokenName,
 			},
 			ResponseCode: 401,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				StatusCode: 401,
 				Message:    "unauthorized",
 			},
@@ -141,7 +141,7 @@ func TestGetTeamAccessToken(t *testing.T) {
 			ExpectedReqPath:   fmt.Sprintf("/api/orgs/%s/teams/%s/tokens", org, team),
 			ExpectedReqBody:   nil,
 			ResponseCode:      401,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				StatusCode: 401,
 				Message:    "unauthorized",
 			},

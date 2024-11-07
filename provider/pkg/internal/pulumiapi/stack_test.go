@@ -34,7 +34,7 @@ func TestCreateStack(t *testing.T) {
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqPath:   fmt.Sprintf("/api/stacks/%s/%s", s.OrgName, s.ProjectName),
 			ResponseCode:      http.StatusUnauthorized,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				Message: "unauthorized",
 			},
 		})
@@ -76,7 +76,7 @@ func TestDeleteStack(t *testing.T) {
 			ExpectedReqMethod: http.MethodDelete,
 			ExpectedReqPath:   "/api/stacks/organization/project/stack",
 			ResponseCode:      http.StatusUnauthorized,
-			ResponseBody: errorResponse{
+			ResponseBody: ErrorResponse{
 				Message: "unauthorized",
 			},
 		})

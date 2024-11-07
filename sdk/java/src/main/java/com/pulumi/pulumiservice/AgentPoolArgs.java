@@ -6,6 +6,7 @@ package com.pulumi.pulumiservice;
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
+import java.lang.Boolean;
 import java.lang.String;
 import java.util.Objects;
 import java.util.Optional;
@@ -29,6 +30,21 @@ public final class AgentPoolArgs extends com.pulumi.resources.ResourceArgs {
      */
     public Optional<Output<String>> description() {
         return Optional.ofNullable(this.description);
+    }
+
+    /**
+     * Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.
+     * 
+     */
+    @Import(name="forceDestroy")
+    private @Nullable Output<Boolean> forceDestroy;
+
+    /**
+     * @return Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.
+     * 
+     */
+    public Optional<Output<Boolean>> forceDestroy() {
+        return Optional.ofNullable(this.forceDestroy);
     }
 
     /**
@@ -65,6 +81,7 @@ public final class AgentPoolArgs extends com.pulumi.resources.ResourceArgs {
 
     private AgentPoolArgs(AgentPoolArgs $) {
         this.description = $.description;
+        this.forceDestroy = $.forceDestroy;
         this.name = $.name;
         this.organizationName = $.organizationName;
     }
@@ -106,6 +123,27 @@ public final class AgentPoolArgs extends com.pulumi.resources.ResourceArgs {
          */
         public Builder description(String description) {
             return description(Output.of(description));
+        }
+
+        /**
+         * @param forceDestroy Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder forceDestroy(@Nullable Output<Boolean> forceDestroy) {
+            $.forceDestroy = forceDestroy;
+            return this;
+        }
+
+        /**
+         * @param forceDestroy Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder forceDestroy(Boolean forceDestroy) {
+            return forceDestroy(Output.of(forceDestroy));
         }
 
         /**

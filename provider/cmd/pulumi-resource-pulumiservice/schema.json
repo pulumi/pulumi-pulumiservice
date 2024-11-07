@@ -673,6 +673,10 @@
           "description": "The agent pool's token's value.",
           "type": "string",
           "secret": true
+        },
+        "forceDestroy": {
+          "description": "Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.",
+          "type": "boolean"
         }
       },
       "required": [
@@ -693,6 +697,10 @@
         "organizationName": {
           "description": "The organization's name.",
           "type": "string"
+        },
+        "forceDestroy": {
+          "description": "Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.",
+          "type": "boolean"
         }
       },
       "requiredInputs": [
