@@ -24,21 +24,21 @@ public final class DeploymentSettingsCacheOptionsArgs extends com.pulumi.resourc
      * Enable dependency caching
      * 
      */
-    @Import(name="enabled")
-    private @Nullable Output<Boolean> enabled;
+    @Import(name="enable")
+    private @Nullable Output<Boolean> enable;
 
     /**
      * @return Enable dependency caching
      * 
      */
-    public Optional<Output<Boolean>> enabled() {
-        return Optional.ofNullable(this.enabled);
+    public Optional<Output<Boolean>> enable() {
+        return Optional.ofNullable(this.enable);
     }
 
     private DeploymentSettingsCacheOptionsArgs() {}
 
     private DeploymentSettingsCacheOptionsArgs(DeploymentSettingsCacheOptionsArgs $) {
-        this.enabled = $.enabled;
+        this.enable = $.enable;
     }
 
     public static Builder builder() {
@@ -60,28 +60,28 @@ public final class DeploymentSettingsCacheOptionsArgs extends com.pulumi.resourc
         }
 
         /**
-         * @param enabled Enable dependency caching
+         * @param enable Enable dependency caching
          * 
          * @return builder
          * 
          */
-        public Builder enabled(@Nullable Output<Boolean> enabled) {
-            $.enabled = enabled;
+        public Builder enable(@Nullable Output<Boolean> enable) {
+            $.enable = enable;
             return this;
         }
 
         /**
-         * @param enabled Enable dependency caching
+         * @param enable Enable dependency caching
          * 
          * @return builder
          * 
          */
-        public Builder enabled(Boolean enabled) {
-            return enabled(Output.of(enabled));
+        public Builder enable(Boolean enable) {
+            return enable(Output.of(enable));
         }
 
         public DeploymentSettingsCacheOptionsArgs build() {
-            $.enabled = Codegen.booleanProp("enabled").output().arg($.enabled).def(false).getNullable();
+            $.enable = Codegen.booleanProp("enable").output().arg($.enable).def(false).getNullable();
             return $;
         }
     }

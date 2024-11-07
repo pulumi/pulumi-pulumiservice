@@ -49,7 +49,7 @@ export interface DeploymentSettingsCacheOptions {
     /**
      * Enable dependency caching
      */
-    enabled?: boolean;
+    enable?: boolean;
 }
 /**
  * deploymentSettingsCacheOptionsProvideDefaults sets the appropriate defaults for DeploymentSettingsCacheOptions
@@ -57,7 +57,7 @@ export interface DeploymentSettingsCacheOptions {
 export function deploymentSettingsCacheOptionsProvideDefaults(val: DeploymentSettingsCacheOptions): DeploymentSettingsCacheOptions {
     return {
         ...val,
-        enabled: (val.enabled) ?? false,
+        enable: (val.enable) ?? false,
     };
 }
 

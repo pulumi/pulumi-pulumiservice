@@ -267,7 +267,7 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(plaintextInputSett
 
 	if ds.CacheOptions != nil {
 		coMap := resource.PropertyMap{}
-		coMap["enabled"] = resource.NewPropertyValue(ds.CacheOptions.Enable)
+		coMap["enable"] = resource.NewPropertyValue(ds.CacheOptions.Enable)
 		pm["cacheOptions"] = resource.PropertyValue{coMap}
 	}
 
@@ -607,8 +607,8 @@ func toCacheOptions(inputMap resource.PropertyMap) *pulumiapi.CacheOptions {
 	coInput := inputMap["cacheOptions"].ObjectValue()
 	var co pulumiapi.CacheOptions
 
-	if coInput["enabled"].HasValue() && coInput["enabled"].IsBool() {
-		co.Enable = coInput["enabled"].BoolValue()
+	if coInput["enable"].HasValue() && coInput["enable"].IsBool() {
+		co.Enable = coInput["enable"].BoolValue()
 	}
 
 	return &co

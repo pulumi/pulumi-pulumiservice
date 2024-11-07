@@ -557,7 +557,7 @@
     "pulumiservice:index:DeploymentSettingsCacheOptions": {
       "description": "Dependency cache settings for the deployment",
       "properties": {
-        "enabled": {
+        "enable": {
           "type": "boolean",
           "description": "Enable dependency caching",
           "default": false

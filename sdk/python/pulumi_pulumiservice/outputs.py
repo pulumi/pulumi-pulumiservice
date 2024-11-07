@@ -170,23 +170,23 @@ class DeploymentSettingsCacheOptions(dict):
     Dependency cache settings for the deployment
     """
     def __init__(__self__, *,
-                 enabled: Optional[bool] = None):
+                 enable: Optional[bool] = None):
         """
         Dependency cache settings for the deployment
-        :param bool enabled: Enable dependency caching
+        :param bool enable: Enable dependency caching
         """
-        if enabled is None:
-            enabled = False
-        if enabled is not None:
-            pulumi.set(__self__, "enabled", enabled)
+        if enable is None:
+            enable = False
+        if enable is not None:
+            pulumi.set(__self__, "enable", enable)
 
     @property
     @pulumi.getter
-    def enabled(self) -> Optional[bool]:
+    def enable(self) -> Optional[bool]:
         """
         Enable dependency caching
         """
-        return pulumi.get(self, "enabled")
+        return pulumi.get(self, "enable")
 
 
 @pulumi.output_type

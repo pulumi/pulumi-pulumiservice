@@ -152,27 +152,27 @@ class AzureOIDCConfigurationArgs:
 @pulumi.input_type
 class DeploymentSettingsCacheOptionsArgs:
     def __init__(__self__, *,
-                 enabled: Optional[pulumi.Input[bool]] = None):
+                 enable: Optional[pulumi.Input[bool]] = None):
         """
         Dependency cache settings for the deployment
-        :param pulumi.Input[bool] enabled: Enable dependency caching
+        :param pulumi.Input[bool] enable: Enable dependency caching
         """
-        if enabled is None:
-            enabled = False
-        if enabled is not None:
-            pulumi.set(__self__, "enabled", enabled)
+        if enable is None:
+            enable = False
+        if enable is not None:
+            pulumi.set(__self__, "enable", enable)
 
     @property
     @pulumi.getter
-    def enabled(self) -> Optional[pulumi.Input[bool]]:
+    def enable(self) -> Optional[pulumi.Input[bool]]:
         """
         Enable dependency caching
         """
-        return pulumi.get(self, "enabled")
+        return pulumi.get(self, "enable")
 
-    @enabled.setter
-    def enabled(self, value: Optional[pulumi.Input[bool]]):
-        pulumi.set(self, "enabled", value)
+    @enable.setter
+    def enable(self, value: Optional[pulumi.Input[bool]]):
+        pulumi.set(self, "enable", value)
 
 
 @pulumi.input_type

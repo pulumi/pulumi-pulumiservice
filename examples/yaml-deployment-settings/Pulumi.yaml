@@ -24,4 +24,4 @@ resources:
         options:
           skipInstallDependencies: true
       cacheOptions:
-        enabled: true
+        enable: true

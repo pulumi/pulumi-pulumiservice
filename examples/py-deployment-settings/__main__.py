@@ -37,6 +37,6 @@ settings = DeploymentSettings(
     ),
     agent_pool_id=agent_pool.agent_pool_id,
     cache_options=DeploymentSettingsCacheOptionsArgs(
-        enabled=True,
+        enable=True,
     )
 )

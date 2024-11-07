@@ -18,12 +18,12 @@ namespace Pulumi.PulumiService.Inputs
         /// <summary>
         /// Enable dependency caching
         /// </summary>
-        [Input("enabled")]
-        public Input<bool>? Enabled { get; set; }
+        [Input("enable")]
+        public Input<bool>? Enable { get; set; }
 
         public DeploymentSettingsCacheOptionsArgs()
         {
-            Enabled = false;
+            Enable = false;
         }
         public static new DeploymentSettingsCacheOptionsArgs Empty => new DeploymentSettingsCacheOptionsArgs();
     }

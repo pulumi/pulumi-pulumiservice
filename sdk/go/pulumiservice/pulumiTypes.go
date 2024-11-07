@@ -385,7 +385,7 @@ func (o AzureOIDCConfigurationPtrOutput) TenantId() pulumi.StringPtrOutput {
 // Dependency cache settings for the deployment
 type DeploymentSettingsCacheOptions struct {
 	// Enable dependency caching
-	Enabled *bool `pulumi:"enabled"`
+	Enable *bool `pulumi:"enable"`
 }
 
 // Defaults sets the appropriate defaults for DeploymentSettingsCacheOptions
@@ -394,9 +394,9 @@ func (val *DeploymentSettingsCacheOptions) Defaults() *DeploymentSettingsCacheOp
 		return nil
 	}
 	tmp := *val
-	if tmp.Enabled == nil {
-		enabled_ := false
-		tmp.Enabled = &enabled_
+	if tmp.Enable == nil {
+		enable_ := false
+		tmp.Enable = &enable_
 	}
 	return &tmp
 }
@@ -415,7 +415,7 @@ type DeploymentSettingsCacheOptionsInput interface {
 // Dependency cache settings for the deployment
 type DeploymentSettingsCacheOptionsArgs struct {
 	// Enable dependency caching
-	Enabled pulumi.BoolPtrInput `pulumi:"enabled"`
+	Enable pulumi.BoolPtrInput `pulumi:"enable"`
 }
 
 // Defaults sets the appropriate defaults for DeploymentSettingsCacheOptionsArgs
@@ -424,8 +424,8 @@ func (val *DeploymentSettingsCacheOptionsArgs) Defaults() *DeploymentSettingsCac
 		return nil
 	}
 	tmp := *val
-	if tmp.Enabled == nil {
-		tmp.Enabled = pulumi.BoolPtr(false)
+	if tmp.Enable == nil {
+		tmp.Enable = pulumi.BoolPtr(false)
 	}
 	return &tmp
 }
@@ -508,8 +508,8 @@ func (o DeploymentSettingsCacheOptionsOutput) ToDeploymentSettingsCacheOptionsPt
 }
 
 // Enable dependency caching
-func (o DeploymentSettingsCacheOptionsOutput) Enabled() pulumi.BoolPtrOutput {
-	return o.ApplyT(func(v DeploymentSettingsCacheOptions) *bool { return v.Enabled }).(pulumi.BoolPtrOutput)
+func (o DeploymentSettingsCacheOptionsOutput) Enable() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v DeploymentSettingsCacheOptions) *bool { return v.Enable }).(pulumi.BoolPtrOutput)
 }
 
 type DeploymentSettingsCacheOptionsPtrOutput struct{ *pulumi.OutputState }
@@ -537,12 +537,12 @@ func (o DeploymentSettingsCacheOptionsPtrOutput) Elem() DeploymentSettingsCacheO
 }
 
 // Enable dependency caching
-func (o DeploymentSettingsCacheOptionsPtrOutput) Enabled() pulumi.BoolPtrOutput {
+func (o DeploymentSettingsCacheOptionsPtrOutput) Enable() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v *DeploymentSettingsCacheOptions) *bool {
 		if v == nil {
 			return nil
 		}
-		return v.Enabled
+		return v.Enable
 	}).(pulumi.BoolPtrOutput)
 }
 

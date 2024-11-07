@@ -19,12 +19,12 @@ namespace Pulumi.PulumiService.Outputs
         /// <summary>
         /// Enable dependency caching
         /// </summary>
-        public readonly bool? Enabled;
+        public readonly bool? Enable;
 
         [OutputConstructor]
-        private DeploymentSettingsCacheOptions(bool? enabled)
+        private DeploymentSettingsCacheOptions(bool? enable)
         {
-            Enabled = enabled;
+            Enable = enable;
         }
     }
 }

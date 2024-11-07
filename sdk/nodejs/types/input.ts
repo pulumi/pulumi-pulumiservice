@@ -49,7 +49,7 @@ export interface DeploymentSettingsCacheOptionsArgs {
     /**
      * Enable dependency caching
      */
-    enabled?: pulumi.Input<boolean>;
+    enable?: pulumi.Input<boolean>;
 }
 /**
  * deploymentSettingsCacheOptionsArgsProvideDefaults sets the appropriate defaults for DeploymentSettingsCacheOptionsArgs
@@ -57,7 +57,7 @@ export interface DeploymentSettingsCacheOptionsArgs {
 export function deploymentSettingsCacheOptionsArgsProvideDefaults(val: DeploymentSettingsCacheOptionsArgs): DeploymentSettingsCacheOptionsArgs {
     return {
         ...val,
-        enabled: (val.enabled) ?? false,
+        enable: (val.enable) ?? false,
     };
 }
 

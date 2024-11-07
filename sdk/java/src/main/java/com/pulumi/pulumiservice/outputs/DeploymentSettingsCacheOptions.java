@@ -15,15 +15,15 @@ public final class DeploymentSettingsCacheOptions {
      * @return Enable dependency caching
      * 
      */
-    private @Nullable Boolean enabled;
+    private @Nullable Boolean enable;
 
     private DeploymentSettingsCacheOptions() {}
     /**
      * @return Enable dependency caching
      * 
      */
-    public Optional<Boolean> enabled() {
-        return Optional.ofNullable(this.enabled);
+    public Optional<Boolean> enable() {
+        return Optional.ofNullable(this.enable);
     }
 
     public static Builder builder() {
@@ -35,22 +35,22 @@ public final class DeploymentSettingsCacheOptions {
     }
     @CustomType.Builder
     public static final class Builder {
-        private @Nullable Boolean enabled;
+        private @Nullable Boolean enable;
         public Builder() {}
         public Builder(DeploymentSettingsCacheOptions defaults) {
     	      Objects.requireNonNull(defaults);
-    	      this.enabled = defaults.enabled;
+    	      this.enable = defaults.enable;
         }
 
         @CustomType.Setter
-        public Builder enabled(@Nullable Boolean enabled) {
+        public Builder enable(@Nullable Boolean enable) {
 
-            this.enabled = enabled;
+            this.enable = enable;
             return this;
         }
         public DeploymentSettingsCacheOptions build() {
             final var _resultValue = new DeploymentSettingsCacheOptions();
-            _resultValue.enabled = enabled;
+            _resultValue.enable = enable;
             return _resultValue;
         }
     }
