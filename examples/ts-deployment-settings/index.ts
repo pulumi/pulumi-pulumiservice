@@ -61,5 +61,8 @@ const settings = new service.DeploymentSettings("deployment_settings", {
                 }
             }
         }
+    },
+    cacheOptions: {
+        enabled: true,
     }
 });

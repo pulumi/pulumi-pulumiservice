@@ -23,3 +23,5 @@ resources:
           TEST_VAR: "test-value"
         options:
           skipInstallDependencies: true
+      cacheOptions:
+        enabled: true
