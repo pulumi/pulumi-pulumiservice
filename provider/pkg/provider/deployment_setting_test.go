@@ -85,3 +85,17 @@ func TestDeploymentSettings(t *testing.T) {
 		assert.Equal(t, resp.Id, "abc/def/123")
 	})
 }
+
+func TestDeploymentSettingsRoundtrip(t *testing.T) {
+	initial := PulumiServiceDeploymentSettingsInput{
+		DeploymentSettings: pulumiapi.DeploymentSettings{
+			CacheOptions: &pulumiapi.CacheOptions{
+				Enable: true,
+			},
+		}}
+
+	encoded := initial.ToPropertyMap(nil, nil, true)
+	decoded := (&PulumiServiceDeploymentSettingsResource{}).ToPulumiServiceDeploymentSettingsInput(encoded)
+
+	assert.EqualValues(t, initial, decoded)
+}
