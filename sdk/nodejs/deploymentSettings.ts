@@ -50,6 +50,10 @@ export class DeploymentSettings extends pulumi.CustomResource {
      */
     public readonly agentPoolId!: pulumi.Output<string | undefined>;
     /**
+     * Dependency cache settings for the deployment
+     */
+    public readonly cacheOptions!: pulumi.Output<outputs.DeploymentSettingsCacheOptions | undefined>;
+    /**
      * Settings related to the deployment executor.
      */
     public readonly executorContext!: pulumi.Output<outputs.DeploymentSettingsExecutorContext | undefined>;
@@ -99,6 +103,7 @@ export class DeploymentSettings extends pulumi.CustomResource {
                 throw new Error("Missing required property 'stack'");
             }
             resourceInputs["agentPoolId"] = args ? args.agentPoolId : undefined;
+            resourceInputs["cacheOptions"] = args ? (args.cacheOptions ? pulumi.output(args.cacheOptions).apply(inputs.deploymentSettingsCacheOptionsArgsProvideDefaults) : undefined) : undefined;
             resourceInputs["executorContext"] = args ? args.executorContext : undefined;
             resourceInputs["github"] = args ? (args.github ? pulumi.output(args.github).apply(inputs.deploymentSettingsGithubArgsProvideDefaults) : undefined) : undefined;
             resourceInputs["operationContext"] = args ? args.operationContext : undefined;
@@ -108,6 +113,7 @@ export class DeploymentSettings extends pulumi.CustomResource {
             resourceInputs["stack"] = args ? args.stack : undefined;
         } else {
             resourceInputs["agentPoolId"] = undefined /*out*/;
+            resourceInputs["cacheOptions"] = undefined /*out*/;
             resourceInputs["executorContext"] = undefined /*out*/;
             resourceInputs["github"] = undefined /*out*/;
             resourceInputs["operationContext"] = undefined /*out*/;
@@ -129,6 +135,10 @@ export interface DeploymentSettingsArgs {
      * The agent pool identifier to use for the deployment.
      */
     agentPoolId?: pulumi.Input<string>;
+    /**
+     * Dependency cache settings for the deployment
+     */
+    cacheOptions?: pulumi.Input<inputs.DeploymentSettingsCacheOptionsArgs>;
     /**
      * Settings related to the deployment executor.
      */

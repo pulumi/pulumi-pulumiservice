@@ -76,6 +76,7 @@ func TestCreateDeploymentSettings(t *testing.T) {
 			GitHub:           &GitHubConfiguration{},
 			SourceContext:    &SourceContext{},
 			ExecutorContext:  &apitype.ExecutorContext{},
+			CacheOptions:     &CacheOptions{},
 		}
 
 		c, cleanup := startTestServer(t, testServerConfig{

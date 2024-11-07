@@ -24,6 +24,7 @@ type DeploymentSettings struct {
 	ExecutorContext  *apitype.ExecutorContext `json:"executorContext,omitempty"`
 	AgentPoolId      string                   `json:"agentPoolId,omitempty"`
 	Source           *string                  `json:"source,omitempty"`
+	CacheOptions     *CacheOptions            `json:"cacheOptions,omitempty"`
 }
 
 type OperationContext struct {
@@ -107,6 +108,10 @@ type BasicAuth struct {
 type SecretValue struct {
 	Value  string // Plaintext if Secret is false; ciphertext otherwise.
 	Secret bool
+}
+
+type CacheOptions struct {
+	Enable bool `json:"enable"`
 }
 
 type secretCiphertextValue struct {

@@ -43,6 +43,25 @@ export interface AzureOIDCConfiguration {
 }
 
 /**
+ * Dependency cache settings for the deployment
+ */
+export interface DeploymentSettingsCacheOptions {
+    /**
+     * Enable dependency caching
+     */
+    enable?: boolean;
+}
+/**
+ * deploymentSettingsCacheOptionsProvideDefaults sets the appropriate defaults for DeploymentSettingsCacheOptions
+ */
+export function deploymentSettingsCacheOptionsProvideDefaults(val: DeploymentSettingsCacheOptions): DeploymentSettingsCacheOptions {
+    return {
+        ...val,
+        enable: (val.enable) ?? false,
+    };
+}
+
+/**
  * The executor context defines information about the executor where the deployment is executed. If unspecified, the default 'pulumi/pulumi' image is used.
  */
 export interface DeploymentSettingsExecutorContext {

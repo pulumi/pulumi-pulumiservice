@@ -13,6 +13,7 @@ from ._enums import *
 __all__ = [
     'AWSOIDCConfigurationArgs',
     'AzureOIDCConfigurationArgs',
+    'DeploymentSettingsCacheOptionsArgs',
     'DeploymentSettingsExecutorContextArgs',
     'DeploymentSettingsGitAuthBasicAuthArgs',
     'DeploymentSettingsGitAuthSSHAuthArgs',
@@ -146,6 +147,32 @@ class AzureOIDCConfigurationArgs:
     @tenant_id.setter
     def tenant_id(self, value: pulumi.Input[str]):
         pulumi.set(self, "tenant_id", value)
+
+
+@pulumi.input_type
+class DeploymentSettingsCacheOptionsArgs:
+    def __init__(__self__, *,
+                 enable: Optional[pulumi.Input[bool]] = None):
+        """
+        Dependency cache settings for the deployment
+        :param pulumi.Input[bool] enable: Enable dependency caching
+        """
+        if enable is None:
+            enable = False
+        if enable is not None:
+            pulumi.set(__self__, "enable", enable)
+
+    @property
+    @pulumi.getter
+    def enable(self) -> Optional[pulumi.Input[bool]]:
+        """
+        Enable dependency caching
+        """
+        return pulumi.get(self, "enable")
+
+    @enable.setter
+    def enable(self, value: Optional[pulumi.Input[bool]]):
+        pulumi.set(self, "enable", value)
 
 
 @pulumi.input_type
