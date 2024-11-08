@@ -5,4 +5,6 @@
 
 ### Bug Fixes
 
+- Generate TypedDict types for the Python SDK [#437](https://github.com/pulumi/pulumi-pulumiservice/pull/437)
+
 ### Miscellaneous
