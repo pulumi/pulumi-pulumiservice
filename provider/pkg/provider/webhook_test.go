@@ -27,8 +27,8 @@ func (c *WebhookClientMock) ListWebhooks(ctx context.Context, orgName string, pr
 	return nil, nil
 }
 
-func (c *WebhookClientMock) UpdateWebhook(ctx context.Context, req pulumiapi.UpdateWebhookRequest) error {
-	return nil
+func (c *WebhookClientMock) UpdateWebhook(ctx context.Context, req pulumiapi.UpdateWebhookRequest) (*pulumiapi.Webhook, error) {
+	return nil, nil
 }
 
 func (c *WebhookClientMock) DeleteWebhook(ctx context.Context, orgName string, projectName, stackName, environmentName *string, name string) error {
