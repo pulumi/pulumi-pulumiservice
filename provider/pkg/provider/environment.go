@@ -218,7 +218,7 @@ func (st *PulumiServiceEnvironmentResource) Create(req *pulumirpc.CreateRequest)
 }
 
 func (st *PulumiServiceEnvironmentResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	inputMap, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	inputMap, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
 	if err != nil {
 		return nil, err
 	}
@@ -232,7 +232,7 @@ func (st *PulumiServiceEnvironmentResource) Check(req *pulumirpc.CheckRequest) (
 				Reason:   fmt.Sprintf("missing required property '%s'", p),
 				Property: string(p),
 			})
-		} else if p != "yaml" && !input.IsComputed() && strings.Contains(input.StringValue(), "/") {
+		} else if p != "yaml" && !input.IsComputed() && strings.Contains(getSecretOrStringValue(input), "/") {
 			failures = append(failures, &pulumirpc.CheckFailure{
 				Reason:   fmt.Sprintf("'%s' property contains `/` illegal character", p),
 				Property: string(p),
@@ -243,6 +243,10 @@ func (st *PulumiServiceEnvironmentResource) Check(req *pulumirpc.CheckRequest) (
 	var stringYaml string
 	inputYaml := inputMap["yaml"]
 	if !inputYaml.IsComputed() {
+		if inputYaml.IsSecret() {
+			inputYaml = inputYaml.SecretValue().Element
+		}
+
 		if inputYaml.IsAsset() {
 			yamlBytes, err := getBytesFromAsset(inputYaml.AssetValue())
 			if err != nil {
@@ -257,7 +261,7 @@ func (st *PulumiServiceEnvironmentResource) Check(req *pulumirpc.CheckRequest) (
 	trimmedYaml := strings.TrimSpace(stringYaml)
 	inputMap["yaml"] = resource.MakeSecret(resource.NewStringProperty(trimmedYaml))
 
-	inputs, err := plugin.MarshalProperties(inputMap, plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	inputs, err := plugin.MarshalProperties(inputMap, plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
 	if err != nil {
 		return nil, err
 	}
