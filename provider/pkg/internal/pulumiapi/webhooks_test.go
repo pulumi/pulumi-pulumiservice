@@ -191,8 +191,9 @@ func TestUpdateWebhook(t *testing.T) {
 			ResponseBody:      webhook,
 		})
 		defer cleanup()
-		err := c.UpdateWebhook(ctx, updateReq)
+		response, err := c.UpdateWebhook(ctx, updateReq)
 		assert.NoError(t, err)
+		assert.EqualValues(t, webhook, *response)
 	})
 
 	t.Run("error", func(t *testing.T) {
@@ -206,7 +207,7 @@ func TestUpdateWebhook(t *testing.T) {
 			},
 		})
 		defer cleanup()
-		err := c.UpdateWebhook(ctx, updateReq)
+		_, err := c.UpdateWebhook(ctx, updateReq)
 		assert.EqualError(t, err, "failed to update webhook: 401 API error: unauthorized")
 	})
 }

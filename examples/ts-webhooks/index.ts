@@ -21,6 +21,7 @@ const webhookAllEvents = new service.Webhook("org-webhook-all", {
   displayName: "webhook-from-provider",
   organizationName: serviceOrg,
   payloadUrl: "https://google.com",
+  secret: config.require("digits"),
 });
 
 // Organization webhook only subscribed to environments and stacks groups
@@ -29,7 +30,8 @@ const webhook = new service.Webhook("org-webhook-groups", {
   displayName: "webhook-from-provider",
   organizationName: serviceOrg,
   payloadUrl: "https://google.com",
-  groups: [ WebhookGroup.Environments, WebhookGroup.Stacks ]
+  groups: [ WebhookGroup.Environments, WebhookGroup.Stacks ],
+  secret: config.require("digits"),
 });
 
 // Stack webhook subscribed to a group and specific filters
@@ -43,6 +45,7 @@ const stackWebhook = new service.Webhook("stack-webhook", {
   format: WebhookFormat.Slack,
   groups: [ WebhookGroup.Stacks ],
   filters: [WebhookFilters.DeploymentStarted, WebhookFilters.DeploymentSucceeded],
+  secret: config.require("digits"),
 })
 
 // Environment webhook subscribed to specific filters only
@@ -54,4 +57,5 @@ const environmentWebhook = new service.Webhook("env-webhook", {
   environmentName: environment.name,
   payloadUrl: "https://example.com",
   filters: [WebhookFilters.EnvironmentRevisionCreated, WebhookFilters.ImportedEnvironmentChanged],
+  secret: config.require("digits"),
 })

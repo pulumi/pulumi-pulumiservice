@@ -29,7 +29,7 @@ type PulumiServiceWebhookInput struct {
 	Active           bool
 	DisplayName      string
 	PayloadUrl       string
-	Secret           *string
+	Secret           *pulumiapi.SecretValue
 	OrganizationName string
 	ProjectName      *string
 	StackName        *string
@@ -44,15 +44,14 @@ type PulumiServiceWebhookProperties struct {
 	Name string
 }
 
-func (i *PulumiServiceWebhookInput) ToPropertyMap() resource.PropertyMap {
+func (i *PulumiServiceWebhookInput) ToPropertyMap(plaintextSecret *pulumiapi.SecretValue, cipherSecret *pulumiapi.SecretValue, isInput bool) resource.PropertyMap {
+	createMode := plaintextSecret != nil && cipherSecret == nil
+	mergeMode := plaintextSecret != nil && cipherSecret != nil
+
 	pm := resource.PropertyMap{}
 	pm["active"] = resource.NewPropertyValue(i.Active)
 	pm["displayName"] = resource.NewPropertyValue(i.DisplayName)
 	pm["payloadUrl"] = resource.NewPropertyValue(i.PayloadUrl)
-	if i.Secret != nil {
-		pm["secret"] = resource.NewPropertyValue(*i.Secret)
-	}
-
 	pm["organizationName"] = resource.NewPropertyValue(i.OrganizationName)
 
 	if i.ProjectName != nil {
@@ -74,55 +73,45 @@ func (i *PulumiServiceWebhookInput) ToPropertyMap() resource.PropertyMap {
 		pm["groups"] = resource.NewPropertyValue(i.Groups)
 	}
 
+	if i.Secret != nil {
+		if mergeMode {
+			mergeSecretValue(pm, "secret", *i.Secret, plaintextSecret, cipherSecret, isInput)
+		} else if createMode {
+			createSecretValue(pm, "secret", *i.Secret, *plaintextSecret, isInput)
+		} else {
+			importSecretValue(pm, "secret", *i.Secret, isInput)
+		}
+	}
+
 	return pm
 }
 
-func (i *PulumiServiceWebhookProperties) ToPropertyMap() resource.PropertyMap {
-	pm := i.PulumiServiceWebhookInput.ToPropertyMap()
+func (i *PulumiServiceWebhookProperties) ToPropertyMap(plaintextSecret *pulumiapi.SecretValue, cipherSecret *pulumiapi.SecretValue, isInput bool) resource.PropertyMap {
+	pm := i.PulumiServiceWebhookInput.ToPropertyMap(plaintextSecret, cipherSecret, isInput)
 
-	pm["name"] = resource.NewPropertyValue(i.Name)
+	if !isInput {
+		pm["name"] = resource.NewPropertyValue(i.Name)
+	}
+
 	return pm
 }
 
 func (wh *PulumiServiceWebhookResource) ToPulumiServiceWebhookProperties(propMap resource.PropertyMap) PulumiServiceWebhookProperties {
 	props := PulumiServiceWebhookProperties{}
 
+	props.DisplayName = getSecretOrStringValue(propMap["displayName"])
+	props.PayloadUrl = getSecretOrStringValue(propMap["payloadUrl"])
+	props.OrganizationName = getSecretOrStringValue(propMap["organizationName"])
+	props.ProjectName = getSecretOrStringNullableValue(propMap["projectName"])
+	props.StackName = getSecretOrStringNullableValue(propMap["stackName"])
+	props.EnvironmentName = getSecretOrStringNullableValue(propMap["environmentName"])
+	props.Format = getSecretOrStringNullableValue(propMap["format"])
+	props.Name = getSecretOrStringValue(propMap["name"])
+
 	if propMap["active"].HasValue() && propMap["active"].IsBool() {
 		props.Active = propMap["active"].BoolValue()
 	}
 
-	if propMap["displayName"].HasValue() && propMap["displayName"].IsString() {
-		props.DisplayName = propMap["displayName"].StringValue()
-	}
-
-	if propMap["payloadUrl"].HasValue() && propMap["payloadUrl"].IsString() {
-		props.PayloadUrl = propMap["payloadUrl"].StringValue()
-	}
-
-	if secretVal := propMap["secret"]; secretVal.HasValue() && secretVal.IsString() {
-		secretStr := secretVal.StringValue()
-		props.Secret = &secretStr
-	}
-
-	if propMap["organizationName"].HasValue() && propMap["organizationName"].IsString() {
-		props.OrganizationName = propMap["organizationName"].StringValue()
-	}
-	if propMap["projectName"].HasValue() && propMap["projectName"].IsString() {
-		projectNameStr := propMap["projectName"].StringValue()
-		props.ProjectName = &projectNameStr
-	}
-	if propMap["stackName"].HasValue() && propMap["stackName"].IsString() {
-		stackNameStr := propMap["stackName"].StringValue()
-		props.StackName = &stackNameStr
-	}
-	if propMap["environmentName"].HasValue() && propMap["environmentName"].IsString() {
-		environmentNameStr := propMap["environmentName"].StringValue()
-		props.EnvironmentName = &environmentNameStr
-	}
-	if propMap["format"].HasValue() && propMap["format"].IsString() {
-		formatStr := propMap["format"].StringValue()
-		props.Format = &formatStr
-	}
 	if propMap["filters"].HasValue() && propMap["filters"].IsArray() {
 		filtersInput := propMap["filters"].ArrayValue()
 		filters := make([]string, len(filtersInput))
@@ -133,6 +122,7 @@ func (wh *PulumiServiceWebhookResource) ToPulumiServiceWebhookProperties(propMap
 
 		props.Filters = filters
 	}
+
 	if propMap["groups"].HasValue() && propMap["groups"].IsArray() {
 		groupsInput := propMap["groups"].ArrayValue()
 		groups := make([]string, len(groupsInput))
@@ -144,8 +134,11 @@ func (wh *PulumiServiceWebhookResource) ToPulumiServiceWebhookProperties(propMap
 		props.Groups = groups
 	}
 
-	if nameVal, ok := propMap["name"]; ok && nameVal.IsString() {
-		props.Name = nameVal.StringValue()
+	if propMap["secret"].HasValue() || propMap["secretCipher"].HasValue() {
+		props.Secret = &pulumiapi.SecretValue{
+			Secret: true,
+			Value:  getSecretOrStringValue(propMap["secret"]),
+		}
 	}
 
 	return props
@@ -241,27 +234,44 @@ func (wh *PulumiServiceWebhookResource) Check(req *pulumirpc.CheckRequest) (*pul
 }
 
 func (wh *PulumiServiceWebhookResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
-	inputs, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	ctx := context.Background()
+	inputMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
 	if err != nil {
 		return nil, err
 	}
 
-	props := wh.ToPulumiServiceWebhookProperties(inputs)
+	inputProps := wh.ToPulumiServiceWebhookProperties(inputMap)
 
-	idString, err := wh.createWebhook(props.PulumiServiceWebhookInput)
+	var secretStr *string = nil
+	if inputProps.Secret != nil {
+		secretStr = &inputProps.Secret.Value
+	}
+
+	request := pulumiapi.WebhookRequest{
+		OrganizationName: inputProps.OrganizationName,
+		ProjectName:      inputProps.ProjectName,
+		StackName:        inputProps.StackName,
+		EnvironmentName:  inputProps.EnvironmentName,
+		DisplayName:      inputProps.DisplayName,
+		PayloadURL:       inputProps.PayloadUrl,
+		Secret:           secretStr,
+		Active:           inputProps.Active,
+		Format:           inputProps.Format,
+		Filters:          inputProps.Filters,
+		Groups:           inputProps.Groups,
+	}
+	webhook, err := wh.client.CreateWebhook(ctx, request)
 	if err != nil {
 		return nil, err
 	}
-
-	hookID, err := splitWebhookID(*idString)
-	if err != nil {
-		return nil, err
+	props := inputProps
+	props.Name = webhook.Name
+	if secretStr != nil && webhook.HasSecret {
+		props.Secret.Value = webhook.SecretCiphertext
 	}
 
-	props.Name = hookID.webhookName
-
-	outputProperties, err := plugin.MarshalProperties(
-		props.ToPropertyMap(),
+	properties, err := plugin.MarshalProperties(
+		props.ToPropertyMap(inputProps.Secret, nil, false),
 		plugin.MarshalOptions{
 			KeepUnknowns: true,
 			SkipNulls:    true,
@@ -272,44 +282,9 @@ func (wh *PulumiServiceWebhookResource) Create(req *pulumirpc.CreateRequest) (*p
 	}
 
 	return &pulumirpc.CreateResponse{
-		Id:         *idString,
-		Properties: outputProperties,
+		Id:         generateWebhookID(props.PulumiServiceWebhookInput, *webhook),
+		Properties: properties,
 	}, nil
-}
-
-func (wh *PulumiServiceWebhookResource) createWebhook(input PulumiServiceWebhookInput) (*string, error) {
-	ctx := context.Background()
-	req := pulumiapi.WebhookRequest{
-		OrganizationName: input.OrganizationName,
-		ProjectName:      input.ProjectName,
-		StackName:        input.StackName,
-		EnvironmentName:  input.EnvironmentName,
-		DisplayName:      input.DisplayName,
-		PayloadURL:       input.PayloadUrl,
-		Secret:           input.Secret,
-		Active:           input.Active,
-		Format:           input.Format,
-		Filters:          input.Filters,
-		Groups:           input.Groups,
-	}
-	webhook, err := wh.client.CreateWebhook(ctx, req)
-	if err != nil {
-		return nil, err
-	}
-
-	var hookID string
-	if input.ProjectName != nil && input.StackName != nil {
-		hookID = fmt.Sprintf("%s/%s/%s/%s", input.OrganizationName, *input.ProjectName, *input.StackName,
-			webhook.Name)
-	} else if input.ProjectName != nil && input.EnvironmentName != nil {
-		// This is not ideal, but inserting "environment" string to distinguish from stack webhooks
-		hookID = fmt.Sprintf("%s/environment/%s/%s/%s", input.OrganizationName, *input.ProjectName, *input.EnvironmentName,
-			webhook.Name)
-	} else {
-		hookID = fmt.Sprintf("%s/%s", input.OrganizationName, webhook.Name)
-	}
-
-	return &hookID, nil
 }
 
 func (wh *PulumiServiceWebhookResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
@@ -370,128 +345,80 @@ func (wh *PulumiServiceWebhookResource) Diff(req *pulumirpc.DiffRequest) (*pulum
 }
 
 func (wh *PulumiServiceWebhookResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	// we only care about news because we validated that everything was correctly set in Check() & Diff()
-	inputsNew, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	inputMap, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
 	}
 
-	webhookNew := wh.ToPulumiServiceWebhookProperties(inputsNew)
+	inputProps := wh.ToPulumiServiceWebhookProperties(inputMap)
 
-	// ignore orgName because if that changed, we would have done a replace, so update would never have been called
 	hookID, err := splitWebhookID(req.GetId())
 	if err != nil {
 		return nil, fmt.Errorf("invalid resource id: %v", err)
 	}
-	webhookNew.Name = hookID.webhookName
+
+	var secretStr *string = nil
+	if inputProps.Secret != nil {
+		secretStr = &inputProps.Secret.Value
+	}
 
 	updateReq := pulumiapi.UpdateWebhookRequest{
 		WebhookRequest: pulumiapi.WebhookRequest{
-			OrganizationName: webhookNew.OrganizationName,
-			ProjectName:      webhookNew.ProjectName,
-			StackName:        webhookNew.StackName,
-			EnvironmentName:  webhookNew.EnvironmentName,
-			DisplayName:      webhookNew.DisplayName,
-			PayloadURL:       webhookNew.PayloadUrl,
-			Secret:           webhookNew.Secret,
-			Active:           webhookNew.Active,
-			Format:           webhookNew.Format,
-			Filters:          webhookNew.Filters,
-			Groups:           webhookNew.Groups,
+			OrganizationName: inputProps.OrganizationName,
+			ProjectName:      inputProps.ProjectName,
+			StackName:        inputProps.StackName,
+			EnvironmentName:  inputProps.EnvironmentName,
+			DisplayName:      inputProps.DisplayName,
+			PayloadURL:       inputProps.PayloadUrl,
+			Secret:           secretStr,
+			Active:           inputProps.Active,
+			Format:           inputProps.Format,
+			Filters:          inputProps.Filters,
+			Groups:           inputProps.Groups,
 		},
-		Name: webhookNew.Name,
+		Name: hookID.webhookName,
 	}
-	err = wh.client.UpdateWebhook(context.Background(), updateReq)
+	webhook, err := wh.client.UpdateWebhook(context.Background(), updateReq)
 	if err != nil {
 		return nil, err
 	}
+	props := inputProps
 
-	outputStore := webhookNew.ToPropertyMap()
+	if secretStr != nil && webhook.HasSecret {
+		props.Secret.Value = webhook.SecretCiphertext
+	}
 
-	outputProperties, err := plugin.MarshalProperties(
-		outputStore,
-		plugin.MarshalOptions{},
+	properties, err := plugin.MarshalProperties(
+		props.ToPropertyMap(inputProps.Secret, nil, false),
+		plugin.MarshalOptions{
+			KeepUnknowns: true,
+			SkipNulls:    true,
+			KeepSecrets:  true,
+		},
 	)
 	if err != nil {
 		return nil, err
 	}
 	return &pulumirpc.UpdateResponse{
-		Properties: outputProperties,
+		Properties: properties,
 	}, nil
 
 }
 
 func (wh *PulumiServiceWebhookResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	err := wh.deleteWebhook(req.Id)
-	return &pbempty.Empty{}, err
-}
-
-func (wh *PulumiServiceWebhookResource) deleteWebhook(id string) error {
-	hookID, err := splitWebhookID(id)
-	if err != nil {
-		return err
-	}
-	return wh.client.DeleteWebhook(context.Background(), hookID.organizationName,
-		hookID.projectName, hookID.stackName, hookID.environmentName, hookID.webhookName)
-}
-
-func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	webhook, err := wh.getWebhook(req.Id)
-	if err != nil {
-		return nil, err
-	}
-
-	if webhook == nil {
-		return &pulumirpc.ReadResponse{}, nil
-	}
-
 	hookID, err := splitWebhookID(req.Id)
 	if err != nil {
 		return nil, err
 	}
 
-	properties := PulumiServiceWebhookProperties{
-		PulumiServiceWebhookInput: PulumiServiceWebhookInput{
-			Active:           webhook.Active,
-			DisplayName:      webhook.DisplayName,
-			PayloadUrl:       webhook.PayloadUrl,
-			Secret:           webhook.Secret,
-			Format:           &webhook.Format,
-			Filters:          webhook.Filters,
-			Groups:           webhook.Groups,
-			OrganizationName: hookID.organizationName,
-			ProjectName:      hookID.projectName,
-			StackName:        hookID.stackName,
-			EnvironmentName:  hookID.environmentName,
-		},
-		Name: hookID.webhookName,
-	}
+	err = wh.client.DeleteWebhook(context.Background(), hookID.organizationName,
+		hookID.projectName, hookID.stackName, hookID.environmentName, hookID.webhookName)
 
-	outputs, err := plugin.MarshalProperties(
-		properties.ToPropertyMap(),
-		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	inputs, err := plugin.MarshalProperties(
-		properties.PulumiServiceWebhookInput.ToPropertyMap(),
-		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.ReadResponse{
-		Id:         req.Id,
-		Properties: outputs,
-		Inputs:     inputs,
-	}, nil
+	return &pbempty.Empty{}, err
 }
 
-func (wh *PulumiServiceWebhookResource) getWebhook(id string) (*pulumiapi.Webhook, error) {
-	hookID, err := splitWebhookID(id)
+func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
+	hookID, err := splitWebhookID(req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -500,7 +427,84 @@ func (wh *PulumiServiceWebhookResource) getWebhook(id string) (*pulumiapi.Webhoo
 	if err != nil {
 		return nil, err
 	}
-	return webhook, nil
+
+	if webhook == nil {
+		return &pulumirpc.ReadResponse{}, nil
+	}
+
+	var secret *pulumiapi.SecretValue = nil
+	if webhook.HasSecret {
+		secret = &pulumiapi.SecretValue{
+			Value:  webhook.SecretCiphertext,
+			Secret: true,
+		}
+	}
+
+	retrievedProperties := PulumiServiceWebhookProperties{
+		PulumiServiceWebhookInput: PulumiServiceWebhookInput{
+			Active:           webhook.Active,
+			DisplayName:      webhook.DisplayName,
+			PayloadUrl:       webhook.PayloadUrl,
+			Secret:           secret,
+			Format:           &webhook.Format,
+			Filters:          webhook.Filters,
+			Groups:           webhook.Groups,
+			OrganizationName: hookID.organizationName,
+			ProjectName:      hookID.projectName,
+			StackName:        hookID.stackName,
+			EnvironmentName:  hookID.environmentName,
+		},
+		Name: webhook.Name,
+	}
+
+	var plaintextSecret *pulumiapi.SecretValue
+	var ciphertextSecret *pulumiapi.SecretValue
+	propertyMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
+	if err != nil {
+		return nil, err
+	}
+	inputMap, err := plugin.UnmarshalProperties(req.GetInputs(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
+	if err != nil {
+		return nil, err
+	}
+	if propertyMap["secret"].HasValue() {
+		plaintextSecret = wh.ToPulumiServiceWebhookProperties(inputMap).Secret
+		ciphertextSecret = wh.ToPulumiServiceWebhookProperties(propertyMap).Secret
+	}
+
+	properties, err := plugin.MarshalProperties(
+		retrievedProperties.ToPropertyMap(plaintextSecret, ciphertextSecret, false),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	inputs, err := plugin.MarshalProperties(
+		retrievedProperties.ToPropertyMap(plaintextSecret, ciphertextSecret, true),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pulumirpc.ReadResponse{
+		Id:         req.Id,
+		Properties: properties,
+		Inputs:     inputs,
+	}, nil
+}
+
+func generateWebhookID(input PulumiServiceWebhookInput, webhook pulumiapi.Webhook) string {
+	if input.ProjectName != nil && input.StackName != nil {
+		return fmt.Sprintf("%s/%s/%s/%s", input.OrganizationName, *input.ProjectName, *input.StackName,
+			webhook.Name)
+	} else if input.ProjectName != nil && input.EnvironmentName != nil {
+		// This is not ideal, but inserting "environment" string to distinguish from stack webhooks
+		return fmt.Sprintf("%s/environment/%s/%s/%s", input.OrganizationName, *input.ProjectName, *input.EnvironmentName,
+			webhook.Name)
+	}
+	return fmt.Sprintf("%s/%s", input.OrganizationName, webhook.Name)
 }
 
 func splitWebhookID(id string) (*webhookID, error) {

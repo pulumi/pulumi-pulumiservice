@@ -25,19 +25,21 @@ type WebhookClient interface {
 	CreateWebhook(ctx context.Context, req WebhookRequest) (*Webhook, error)
 	ListWebhooks(ctx context.Context, orgName string, projectName, stackName, environmentName *string) ([]Webhook, error)
 	GetWebhook(ctx context.Context, orgName string, projectName, stackName, environmentName *string, webhookName string) (*Webhook, error)
-	UpdateWebhook(ctx context.Context, req UpdateWebhookRequest) error
+	UpdateWebhook(ctx context.Context, req UpdateWebhookRequest) (*Webhook, error)
 	DeleteWebhook(ctx context.Context, orgName string, projectName, stackName, environmentName *string, name string) error
 }
 
 type Webhook struct {
-	Active      bool
-	DisplayName string
-	PayloadUrl  string
-	Secret      *string
-	Name        string
-	Format      string
-	Filters     []string
-	Groups      []string
+	Active           bool
+	DisplayName      string
+	PayloadUrl       string
+	Secret           *string
+	Name             string
+	Format           string
+	Filters          []string
+	Groups           []string
+	HasSecret        bool
+	SecretCiphertext string
 }
 
 type WebhookRequest struct {
@@ -123,27 +125,28 @@ func (c *Client) GetWebhook(ctx context.Context,
 	return &webhook, nil
 }
 
-func (c *Client) UpdateWebhook(ctx context.Context, req UpdateWebhookRequest) error {
+func (c *Client) UpdateWebhook(ctx context.Context, req UpdateWebhookRequest) (*Webhook, error) {
 	if len(req.Name) == 0 {
-		return errors.New("name must not be empty")
+		return nil, errors.New("name must not be empty")
 	}
 	if len(req.OrganizationName) == 0 {
-		return errors.New("orgname must not be empty")
+		return nil, errors.New("orgname must not be empty")
 	}
 	if len(req.DisplayName) == 0 {
-		return errors.New("displayname must not be empty")
+		return nil, errors.New("displayname must not be empty")
 	}
 	if len(req.PayloadURL) == 0 {
-		return errors.New("payloadurl must not be empty")
+		return nil, errors.New("payloadurl must not be empty")
 	}
 
 	apiPath := constructApiPath(req.OrganizationName, req.ProjectName, req.StackName, req.EnvironmentName) + "/" + req.Name
 
-	_, err := c.do(ctx, http.MethodPatch, apiPath, req, nil)
+	var webhook Webhook
+	_, err := c.do(ctx, http.MethodPatch, apiPath, req, &webhook)
 	if err != nil {
-		return fmt.Errorf("failed to update webhook: %w", err)
+		return nil, fmt.Errorf("failed to update webhook: %w", err)
 	}
-	return nil
+	return &webhook, nil
 }
 
 func (c *Client) DeleteWebhook(ctx context.Context, orgName string, projectName, stackName, environmentName *string, name string) error {

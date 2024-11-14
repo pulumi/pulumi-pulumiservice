@@ -10,6 +10,7 @@ resources:
       displayName: yaml-webhook
       organizationName: service-provider-test-org
       payloadUrl: "https://google.com"
+      secret: super-secret
 
 outputs:
   # export the name of the webhook
