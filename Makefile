@@ -23,9 +23,8 @@ PULUMI := .pulumi/bin/pulumi
 export PULUMI_IGNORE_AMBIENT_PLUGINS = true
 
 ensure::
-	cd provider && go mod tidy
+	go mod tidy
 	cd sdk && go mod tidy
-	cd examples && go mod tidy
 
 gen::
 
@@ -135,7 +134,7 @@ install_java_sdk::
 # of the dependency used by github.com/pulumi/pulumi-pulumiservice/provider
 
 $(PULUMI): HOME := $(WORKING_DIR)
-$(PULUMI): provider/go.mod
+$(PULUMI): go.mod
 	@ PULUMI_VERSION="$$(cd provider && go list -m github.com/pulumi/pulumi/pkg/v3 | awk '{print $$2}')"; \
 	if [ -x $(PULUMI) ]; then \
 		CURRENT_VERSION="$$($(PULUMI) version)"; \
