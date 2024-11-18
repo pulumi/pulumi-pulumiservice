@@ -198,5 +198,12 @@ provider_dist: provider_dist-linux-amd64 provider_dist-linux-arm64 provider_dist
 
 install_sdks: install_nodejs_sdk install_dotnet_sdk install_go_sdk install_python_sdk install_java_sdk
 
+build_nodejs: nodejs_sdk
+build_python: python_sdk
+build_java: java_sdk
+build_dotnet: dotnet_sdk
+build_go: go_sdk
+
 # Schema is manually maintained.
 schema:
+
