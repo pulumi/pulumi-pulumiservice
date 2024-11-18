@@ -34,7 +34,7 @@ func (i *PulumiServiceEnvironmentVersionTagInput) ToPropertyMap() resource.Prope
 
 func (evt *PulumiServiceEnvironmentVersionTagResource) ToPulumiServiceEnvironmentVersionTagInput(properties *structpb.Struct) PulumiServiceEnvironmentVersionTagInput {
 	input := PulumiServiceEnvironmentVersionTagInput{}
-	serde.FromProperties(properties, structTagKey, &input)
+	_ = serde.FromProperties(properties, structTagKey, &input)
 
 	if input.Project == "" {
 		input.Project = defaultProject

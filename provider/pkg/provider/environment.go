@@ -275,7 +275,7 @@ func (st *PulumiServiceEnvironmentResource) Update(req *pulumirpc.UpdateRequest)
 		return nil, err
 	}
 
-	diagnostics, revision, err := st.client.UpdateEnvironmentWithRevision(
+	diagnostics, revision, _ := st.client.UpdateEnvironmentWithRevision(
 		context.Background(),
 		input.OrgName,
 		input.ProjectName,

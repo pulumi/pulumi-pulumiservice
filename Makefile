@@ -172,3 +172,6 @@ provider_dist-darwin-arm64: dist/${GZIP_PREFIX}-darwin-arm64.tar.gz
 provider_dist-windows-amd64: dist/${GZIP_PREFIX}-windows-amd64.tar.gz
 
 install_sdks: install_nodejs_sdk install_dotnet_sdk install_go_sdk install_python_sdk install_java_sdk
+
+# Schema is manually maintained.
+schema:

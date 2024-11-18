@@ -35,7 +35,7 @@ func (i *PulumiServiceStackTagInput) ToPropertyMap() resource.PropertyMap {
 
 func (st *PulumiServiceStackTagResource) ToPulumiServiceStackTagInput(inputMap resource.PropertyMap) PulumiServiceStackTagInput {
 	input := PulumiServiceStackTagInput{}
-	serde.FromPropertyMap(inputMap, structTagKey, &input)
+	_ = serde.FromPropertyMap(inputMap, structTagKey, &input)
 	return input
 }
 
