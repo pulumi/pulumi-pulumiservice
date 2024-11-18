@@ -164,11 +164,37 @@ install_plugins: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
 install_plugins: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
 install_plugins: .pulumi/bin/pulumi
 
-provider_dist-linux-amd64: dist/${GZIP_PREFIX}-linux-amd64.tar.gz
-provider_dist-linux-arm64: dist/${GZIP_PREFIX}-linux-arm64.tar.gz
-provider_dist-darwin-amd64: dist/${GZIP_PREFIX}-darwin-amd64.tar.gz
-provider_dist-darwin-arm64: dist/${GZIP_PREFIX}-darwin-arm64.tar.gz
-provider_dist-windows-amd64: dist/${GZIP_PREFIX}-windows-amd64.tar.gz
+bin/linux-amd64/$(PROVIDER): TARGET := linux-amd64
+bin/linux-arm64/$(PROVIDER): TARGET := linux-arm64
+bin/darwin-amd64/$(PROVIDER): TARGET := darwin-amd64
+bin/darwin-arm64/$(PROVIDER): TARGET := darwin-arm64
+bin/windows-amd64/$(PROVIDER).exe: TARGET := windows-amd64
+bin/%/$(PROVIDER) bin/%/$(PROVIDER).exe:
+	@# check the TARGET is set
+	test $(TARGET)
+	cd provider && \
+		export GOOS=$$(echo "$(TARGET)" | cut -d "-" -f 1) && \
+		export GOARCH=$$(echo "$(TARGET)" | cut -d "-" -f 2) && \
+		export CGO_ENABLED=0 && \
+		go build -o "${WORKING_DIR}/$@" $(PULUMI_PROVIDER_BUILD_PARALLELISM) -ldflags "$(LDFLAGS)" "$(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER)"
+
+bin/$(PROVIDER)-v$(VERSION_GENERIC)-linux-amd64.tar.gz: bin/linux-amd64/$(PROVIDER)
+bin/$(PROVIDER)-v$(VERSION_GENERIC)-linux-arm64.tar.gz: bin/linux-arm64/$(PROVIDER)
+bin/$(PROVIDER)-v$(VERSION_GENERIC)-darwin-amd64.tar.gz: bin/darwin-amd64/$(PROVIDER)
+bin/$(PROVIDER)-v$(VERSION_GENERIC)-darwin-arm64.tar.gz: bin/darwin-arm64/$(PROVIDER)
+bin/$(PROVIDER)-v$(VERSION_GENERIC)-windows-amd64.tar.gz: bin/windows-amd64/$(PROVIDER).exe
+bin/$(PROVIDER)-v$(VERSION_GENERIC)-%.tar.gz:
+	@mkdir -p dist
+	@# $< is the last dependency (the binary path from above) e.g. bin/linux-amd64/pulumi-resource-xyz
+	@# $@ is the current target e.g. bin/pulumi-resource-xyz-v1.2.3-linux-amd64.tar.gz
+	tar --gzip -cf $@ README.md LICENSE -C $$(dirname $<) .
+
+provider_dist-linux-amd64: bin/$(PROVIDER)-v$(VERSION_GENERIC)-linux-amd64.tar.gz
+provider_dist-linux-arm64: bin/$(PROVIDER)-v$(VERSION_GENERIC)-linux-arm64.tar.gz
+provider_dist-darwin-amd64: bin/$(PROVIDER)-v$(VERSION_GENERIC)-darwin-amd64.tar.gz
+provider_dist-darwin-arm64: bin/$(PROVIDER)-v$(VERSION_GENERIC)-darwin-arm64.tar.gz
+provider_dist-windows-amd64: bin/$(PROVIDER)-v$(VERSION_GENERIC)-windows-amd64.tar.gz
+provider_dist: provider_dist-linux-amd64 provider_dist-linux-arm64 provider_dist-darwin-amd64 provider_dist-darwin-arm64 provider_dist-windows-amd64
 
 install_sdks: install_nodejs_sdk install_dotnet_sdk install_go_sdk install_python_sdk install_java_sdk
 
