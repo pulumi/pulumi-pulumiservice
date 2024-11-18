@@ -147,3 +147,28 @@ $(PULUMI): provider/go.mod
 	if ! [ -x $(PULUMI) ]; then \
 		curl -fsSL https://get.pulumi.com | sh -s -- --version "$${PULUMI_VERSION#v}"; \
 	fi
+
+######################
+# ci-mgmt onboarding #
+######################
+
+# TODO(https://github.com/pulumi/ci-mgmt/issues/1131): Use default target implementations.
+
+shard:
+	@(cd examples && go run github.com/blampe/shard@latest --total $(TOTAL) --index $(INDEX) --output env) >> "$(GITHUB_ENV)"
+
+test_shard:
+	cd examples && \
+		go test -tags=all -v -count=1 -coverprofile="coverage.txt" -coverpkg=./... -timeout 3h -parallel ${TESTPARALLELISM} -run "$(SHARD_TESTS)" $(SHARD_PATHS)
+
+install_plugins: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
+install_plugins: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
+install_plugins: .pulumi/bin/pulumi
+
+provider_dist-linux-amd64: dist/${GZIP_PREFIX}-linux-amd64.tar.gz
+provider_dist-linux-arm64: dist/${GZIP_PREFIX}-linux-arm64.tar.gz
+provider_dist-darwin-amd64: dist/${GZIP_PREFIX}-darwin-amd64.tar.gz
+provider_dist-darwin-arm64: dist/${GZIP_PREFIX}-darwin-arm64.tar.gz
+provider_dist-windows-amd64: dist/${GZIP_PREFIX}-windows-amd64.tar.gz
+
+install_sdks: install_nodejs_sdk install_dotnet_sdk install_go_sdk install_python_sdk install_java_sdk
