@@ -79,6 +79,7 @@ jobs:
         language: java
     - name: Update path
       run: echo "${{ github.workspace }}/bin" >> "$GITHUB_PATH"
+    - run: which pulumi-resource-pulumiservice
     - name: Install Python deps
       run: |-
         pip3 install virtualenv==20.0.23
