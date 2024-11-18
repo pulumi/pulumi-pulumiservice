@@ -7,7 +7,11 @@ NODE_MODULE_NAME := @pulumi/pulumi-service
 NUGET_PKG_NAME   := Pulumi.PulumiService
 
 PROVIDER        := pulumi-resource-${PACK}
-VERSION         ?= $(shell pulumictl get version)
+# Override during CI using `make [TARGET] PROVIDER_VERSION=""` or by setting a PROVIDER_VERSION environment variable
+# Local & branch builds will just used this fixed default version unless specified
+PROVIDER_VERSION ?= 3.0.0-alpha.0+dev
+# Use this normalised version everywhere rather than the raw input to ensure consistency.
+VERSION_GENERIC = $(shell pulumictl convert-version --language generic --version "$(PROVIDER_VERSION)")
 PROVIDER_PATH   := provider
 VERSION_PATH     := ${PROVIDER_PATH}/pkg/version.Version
 
@@ -33,16 +37,16 @@ build_sdks: dotnet_sdk go_sdk nodejs_sdk python_sdk java_sdk
 gen_sdk_prerequisites: $(PULUMI)
 
 provider::
-	(cd provider && VERSION=${VERSION} go generate cmd/${PROVIDER}/main.go)
-	(cd provider && go build -o $(WORKING_DIR)/bin/${PROVIDER} -ldflags "-X ${PROJECT}/${VERSION_PATH}=${VERSION}" $(PROJECT)/${PROVIDER_PATH}/cmd/$(PROVIDER))
+	(cd provider && VERSION=${VERSION_GENERIC} go generate cmd/${PROVIDER}/main.go)
+	(cd provider && go build -o $(WORKING_DIR)/bin/${PROVIDER} -ldflags "-X ${PROJECT}/${VERSION_PATH}=${VERSION_GENERIC}" $(PROJECT)/${PROVIDER_PATH}/cmd/$(PROVIDER))
 
 provider_debug::
-	(cd provider && go build -o $(WORKING_DIR)/bin/${PROVIDER} -gcflags="all=-N -l" -ldflags "-X ${PROJECT}/${VERSION_PATH}=${VERSION}" $(PROJECT)/${PROVIDER_PATH}/cmd/$(PROVIDER))
+	(cd provider && go build -o $(WORKING_DIR)/bin/${PROVIDER} -gcflags="all=-N -l" -ldflags "-X ${PROJECT}/${VERSION_PATH}=${VERSION_GENERIC}" $(PROJECT)/${PROVIDER_PATH}/cmd/$(PROVIDER))
 
 test_provider::
 	cd provider/pkg && go test -short -v -count=1 -cover -timeout 2h -parallel ${TESTPARALLELISM} ./...
 
-dotnet_sdk: DOTNET_VERSION := $(shell pulumictl get version --language dotnet)
+dotnet_sdk: DOTNET_VERSION := $(VERSION_GENERIC)
 dotnet_sdk: gen_sdk_prerequisites
 	rm -rf sdk/dotnet
 	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language dotnet
@@ -54,7 +58,7 @@ go_sdk: gen_sdk_prerequisites
 	rm -rf sdk/go
 	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language go
 
-nodejs_sdk: VERSION := $(shell pulumictl get version --language javascript)
+nodejs_sdk: VERSION := $(VERSION_GENERIC)
 nodejs_sdk: gen_sdk_prerequisites
 	rm -rf sdk/nodejs
 	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language nodejs
@@ -64,7 +68,7 @@ nodejs_sdk: gen_sdk_prerequisites
 		cp ../../README.md ../../LICENSE package.json yarn.lock ./bin/ && \
 		sed -i.bak -e 's/\$${VERSION}/$(VERSION)/g' ./bin/package.json
 
-python_sdk: PYPI_VERSION := $(shell pulumictl get version --language python)
+python_sdk: PYPI_VERSION := $(VERSION_GENERIC)
 python_sdk: gen_sdk_prerequisites
 	rm -rf sdk/python
 	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language python
@@ -90,7 +94,7 @@ java_sdk: gen_sdk_prerequisites
 	cd sdk/java && \
 	mkdir -p $(RESOURCE_FOLDER) && \
 	  echo "$(VERSION)" > $(RESOURCE_FOLDER)/version.txt && \
-	  echo '{"resource": true,"name": "pulumiservice","version": "$(VERSION)"}' > $(RESOURCE_FOLDER)/plugin.json && \
+	  echo '{"resource": true,"name": "pulumiservice","version": "$(VERSION_GENERIC)"}' > $(RESOURCE_FOLDER)/plugin.json && \
 	  PULUMI_JAVA_SDK_VERSION=0.10.0 $(GRADLE) --console=plain build && \
 	  PULUMI_JAVA_SDK_VERSION=0.10.0 $(GRADLE) --console=plain publishToMavenLocal
 
