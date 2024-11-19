@@ -47,57 +47,46 @@ provider_debug::
 test_provider::
 	cd provider/pkg && go test -short -v -count=1 -cover -timeout 2h -parallel ${TESTPARALLELISM} ./...
 
-dotnet_sdk: DOTNET_VERSION := $(VERSION_GENERIC)
 dotnet_sdk: gen_sdk_prerequisites
 	rm -rf sdk/dotnet
 	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language dotnet
-	cd ${PACKDIR}/dotnet/&& \
-		echo "${DOTNET_VERSION}" >version.txt && \
-		dotnet build /p:Version=${DOTNET_VERSION}
+	cd sdk/dotnet/ && \
+		echo "module fake_dotnet_module // Exclude this directory from Go tools\n\ngo 1.17" > go.mod && \
+		echo "${VERSION_GENERIC}" >version.txt && \
+		dotnet build
 
 go_sdk: gen_sdk_prerequisites
 	rm -rf sdk/go
 	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language go
 
-nodejs_sdk: VERSION := $(VERSION_GENERIC)
 nodejs_sdk: gen_sdk_prerequisites
 	rm -rf sdk/nodejs
 	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language nodejs
-	cd ${PACKDIR}/nodejs/ && \
-		yarn install && \
-		yarn run tsc && \
-		cp ../../README.md ../../LICENSE package.json yarn.lock ./bin/ && \
-		sed -i.bak -e 's/\$${VERSION}/$(VERSION)/g' ./bin/package.json
+	cd sdk/nodejs && \
+		yarn install --no-progress && \
+		yarn run build && \
+		cp package.json yarn.lock ./bin/
 
-python_sdk: PYPI_VERSION := $(VERSION_GENERIC)
 python_sdk: gen_sdk_prerequisites
 	rm -rf sdk/python
 	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language python
-	cp README.md ${PACKDIR}/python/
-	cd ${PACKDIR}/python/ && \
-		python3 -m venv venv && \
-		. ./venv/bin/activate && \
-		python -m pip install setuptools && \
-		python setup.py clean --all && \
+	cd sdk/python/ && \
+		echo "module fake_python_module // Exclude this directory from Go tools\n\ngo 1.17" > go.mod && \
+		cp ../../README.md . && \
 		rm -rf ./bin/ ../python.bin/ && cp -R . ../python.bin && mv ../python.bin ./bin && \
-		sed -i.bak -e 's/^VERSION = .*/VERSION = "$(PYPI_VERSION)"/g' -e 's/^PLUGIN_VERSION = .*/PLUGIN_VERSION = "$(VERSION)"/g' ./bin/setup.py && \
-		rm ./bin/setup.py.bak && \
-		cd ./bin && python3 setup.py build sdist
+		python3 -m venv venv && \
+		./venv/bin/python -m pip install build && \
+		cd ./bin && \
+		../venv/bin/python -m build .
 
 GRADLE_DIR := $(WORKING_DIR)/.gradle
 GRADLE := $(GRADLE_DIR)/gradlew
-java_sdk: RESOURCE_FOLDER := src/main/resources/com/pulumi/pulumiservice
 java_sdk: gen_sdk_prerequisites
-	rm -rf sdk/java/{.gradle,build,src}
+	rm -rf sdk/java
 	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language java
-	cp $(GRADLE_DIR)/settings.gradle sdk/java/settings.gradle
-	cp $(GRADLE_DIR)/build.gradle sdk/java/build.gradle
 	cd sdk/java && \
-	mkdir -p $(RESOURCE_FOLDER) && \
-	  echo "$(VERSION)" > $(RESOURCE_FOLDER)/version.txt && \
-	  echo '{"resource": true,"name": "pulumiservice","version": "$(VERSION_GENERIC)"}' > $(RESOURCE_FOLDER)/plugin.json && \
-	  PULUMI_JAVA_SDK_VERSION=0.10.0 $(GRADLE) --console=plain build && \
-	  PULUMI_JAVA_SDK_VERSION=0.10.0 $(GRADLE) --console=plain publishToMavenLocal
+		echo "module fake_java_module // Exclude this directory from Go tools\n\ngo 1.17" > go.mod && \
+		$(GRADLE) --console=plain build
 
 .PHONY: build
 build:: gen provider dotnet_sdk go_sdk nodejs_sdk python_sdk java_sdk
@@ -161,7 +150,7 @@ $(PULUMI): go.mod
 shard:
 	@(cd examples && go run github.com/blampe/shard@latest --total $(TOTAL) --index $(INDEX) --output env) >> "$(GITHUB_ENV)"
 
-test_shard: install
+test_shard:
 	which pulumi-resource-pulumiservice
 	cd examples && \
 		go test -tags=all -v -count=1 -coverprofile="coverage.txt" -coverpkg=./... -timeout 3h -parallel ${TESTPARALLELISM} -run "$(SHARD_TESTS)" $(SHARD_PATHS)
