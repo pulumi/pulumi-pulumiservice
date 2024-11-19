@@ -25,6 +25,7 @@ TESTPARALLELISM := 4
 PULUMI := .pulumi/bin/pulumi
 
 export PULUMI_IGNORE_AMBIENT_PLUGINS = true
+export PULUMI_DISABLE_AUTOMATIC_PLUGIN_ACQUISITION = true
 
 ensure::
 	go mod tidy
@@ -166,7 +167,8 @@ test_shard:
 		go test -tags=all -v -count=1 -coverprofile="coverage.txt" -coverpkg=./... -timeout 3h -parallel ${TESTPARALLELISM} -run "$(SHARD_TESTS)" $(SHARD_PATHS)
 
 install_plugins: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
-install_plugins: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
+install_plugins: export PATH := "$(WORKING_DIR)/.pulumi/bin:$(PATH)"
+install_plugins: install
 install_plugins: .pulumi/bin/pulumi
 
 bin/linux-amd64/$(PROVIDER): TARGET := linux-amd64
