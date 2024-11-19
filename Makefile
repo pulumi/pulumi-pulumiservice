@@ -44,6 +44,7 @@ provider_debug::
 test_provider::
 	cd provider/pkg && go test -short -v -count=1 -cover -timeout 2h -parallel ${TESTPARALLELISM} ./...
 
+dotnet_sdk: PULUMI_IGNORE_AMBIENT_PLUGINS := true
 dotnet_sdk: gen_sdk_prerequisites
 	rm -rf sdk/dotnet
 	$(PULUMI) package gen-sdk bin/$(PROVIDER) --language dotnet
@@ -52,21 +53,24 @@ dotnet_sdk: gen_sdk_prerequisites
 		echo "${VERSION_GENERIC}" >version.txt && \
 		dotnet build
 
+go_sdk: PULUMI_IGNORE_AMBIENT_PLUGINS := true
 go_sdk: gen_sdk_prerequisites
 	rm -rf sdk/go
-	$(PULUMI) package gen-sdk bin/$(PROVIDER) --language go
+	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language go --version $(VERSION_GENERIC)
 
+nodejs_sdk: PULUMI_IGNORE_AMBIENT_PLUGINS := true
 nodejs_sdk: gen_sdk_prerequisites
 	rm -rf sdk/nodejs
-	$(PULUMI) package gen-sdk bin/$(PROVIDER) --language nodejs
+	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language nodejs --version $(VERSION_GENERIC)
 	cd sdk/nodejs && \
 		yarn install --no-progress && \
 		yarn run build && \
 		cp package.json yarn.lock ./bin/
 
+python_sdk: PULUMI_IGNORE_AMBIENT_PLUGINS := true
 python_sdk: gen_sdk_prerequisites
 	rm -rf sdk/python
-	$(PULUMI) package gen-sdk bin/$(PROVIDER) --language python
+	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language python --version $(VERSION_GENERIC)
 	cd sdk/python/ && \
 		echo "module fake_python_module // Exclude this directory from Go tools\n\ngo 1.17" > go.mod && \
 		cp ../../README.md . && \
@@ -76,10 +80,10 @@ python_sdk: gen_sdk_prerequisites
 		cd ./bin && \
 		../venv/bin/python -m build .
 
-PACKAGE_VERSION := ${VERSION_GENERIC}
+java_sdk: PULUMI_IGNORE_AMBIENT_PLUGINS := true
 java_sdk: gen_sdk_prerequisites
 	rm -rf sdk/java
-	$(PULUMI) package gen-sdk bin/$(PROVIDER) --language java
+	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language java --version $(VERSION_GENERIC)
 	cd sdk/java && \
 		echo "module fake_java_module // Exclude this directory from Go tools\n\ngo 1.17" > go.mod && \
 		gradle --console=plain build
