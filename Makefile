@@ -24,8 +24,6 @@ TESTPARALLELISM := 4
 # The pulumi binary to use during generation
 PULUMI := .pulumi/bin/pulumi
 
-export PULUMI_IGNORE_AMBIENT_PLUGINS = true
-
 ensure::
 	go mod tidy
 	cd sdk && go mod tidy
@@ -148,8 +146,7 @@ $(PULUMI): go.mod
 shard:
 	@(cd examples && go run github.com/blampe/shard@latest --total $(TOTAL) --index $(INDEX) --output env) >> "$(GITHUB_ENV)"
 
-test_shard: install
-	which pulumi-resource-pulumiservice
+test_shard:
 	cd examples && \
 		go test -tags=all -v -count=1 -coverprofile="coverage.txt" -coverpkg=./... -timeout 3h -parallel ${TESTPARALLELISM} -run "$(SHARD_TESTS)" $(SHARD_PATHS)
 
