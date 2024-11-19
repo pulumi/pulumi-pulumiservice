@@ -24,9 +24,6 @@ TESTPARALLELISM := 4
 # The pulumi binary to use during generation
 PULUMI := .pulumi/bin/pulumi
 
-PULUMI_TEST_OWNER ?= service-provider-test-org
-PULUMI_TEST_USE_SERVICE ?= true
-
 ensure::
 	go mod tidy
 	cd sdk && go mod tidy
