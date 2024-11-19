@@ -24,8 +24,6 @@ TESTPARALLELISM := 4
 # The pulumi binary to use during generation
 PULUMI := .pulumi/bin/pulumi
 
-export PULUMI_IGNORE_AMBIENT_PLUGINS = true
-
 ensure::
 	go mod tidy
 	cd sdk && go mod tidy
@@ -54,10 +52,12 @@ dotnet_sdk: gen_sdk_prerequisites
 		echo "${VERSION_GENERIC}" >version.txt && \
 		dotnet build
 
+go_sdk: export PULUMI_IGNORE_AMBIENT_PLUGINS = true
 go_sdk: gen_sdk_prerequisites
 	rm -rf sdk/go
 	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language go --version $(VERSION_GENERIC)
 
+nodejs_sdk: export PULUMI_IGNORE_AMBIENT_PLUGINS = true
 nodejs_sdk: gen_sdk_prerequisites
 	rm -rf sdk/nodejs
 	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language nodejs --version $(VERSION_GENERIC)
@@ -66,6 +66,7 @@ nodejs_sdk: gen_sdk_prerequisites
 		yarn run build && \
 		cp package.json yarn.lock ./bin/
 
+python_sdk: export PULUMI_IGNORE_AMBIENT_PLUGINS = true
 python_sdk: gen_sdk_prerequisites
 	rm -rf sdk/python
 	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language python --version $(VERSION_GENERIC)
@@ -78,6 +79,7 @@ python_sdk: gen_sdk_prerequisites
 		cd ./bin && \
 		../venv/bin/python -m build .
 
+java_sdk: export PULUMI_IGNORE_AMBIENT_PLUGINS = true
 java_sdk: gen_sdk_prerequisites
 	rm -rf sdk/java
 	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language java
@@ -147,7 +149,7 @@ $(PULUMI): go.mod
 shard:
 	@(cd examples && go run github.com/blampe/shard@latest --total $(TOTAL) --index $(INDEX) --output env) >> "$(GITHUB_ENV)"
 
-test_shard: install
+test_shard:
 	cd examples && \
 		go test -tags=all -v -count=1 -coverprofile="coverage.txt" -coverpkg=./... -timeout 3h -parallel ${TESTPARALLELISM} -run "$(SHARD_TESTS)" $(SHARD_PATHS)
 

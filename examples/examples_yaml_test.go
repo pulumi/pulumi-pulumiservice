@@ -87,10 +87,6 @@ func TestYamlTeamsExample(t *testing.T) {
 			Dir:           notFoundDir,
 			Stdout:        firstOut,
 			Stderr:        firstOut,
-			// don't prepare project at all, not required for yaml
-			PrepareProject: func(_ *engine.Projinfo) error {
-				return nil
-			},
 			EditDirs: []integration.EditDir{
 				{
 					Dir: correctUpdateDir,
@@ -118,10 +114,6 @@ func TestYamlTeamsExample(t *testing.T) {
 		integration.ProgramTest(t, &integration.ProgramTestOptions{
 			Quick: true,
 			Dir:   path.Join(cwd, ".", "yaml-teams"),
-			// don't prepare project at all, not required for yaml
-			PrepareProject: func(_ *engine.Projinfo) error {
-				return nil
-			},
 		})
 	})
 
@@ -154,20 +146,6 @@ func TestYamlStackTagsExample(t *testing.T) {
 				ExpectNoChanges: true,
 			},
 		},
-
-		// Setting Config and PrepareProject works around the bug introduced in
-		// https://github.com/pulumi/pulumi/pull/14695:
-		//
-		// - Setting a config value ensures that the stack file is created.
-		//
-		// - PrepareProject is used to force the bookkeeping file to be created.
-		//
-		// Once https://github.com/pulumi/pulumi/pull/15863 merges, both fields
-		// can be removed.
-		Config: map[string]string{"ensure-config": "true"},
-		PrepareProject: func(info *engine.Projinfo) error {
-			return os.MkdirAll(filepath.Join(info.Root, ".pulumi"), 0700)
-		},
 	})
 }
 
@@ -192,9 +170,6 @@ func TestYamlDeploymentSettingsExample(t *testing.T) {
 		StackName: "test-stack-" + digits,
 		Config: map[string]string{
 			"digits": digits,
-		},
-		PrepareProject: func(_ *engine.Projinfo) error {
-			return nil
 		},
 		EditDirs: []integration.EditDir{
 			{
@@ -230,9 +205,6 @@ func TestYamlDeploymentSettingsNoSourceExample(t *testing.T) {
 		Config: map[string]string{
 			"digits": digits,
 		},
-		PrepareProject: func(_ *engine.Projinfo) error {
-			return nil
-		},
 		EditDirs: []integration.EditDir{
 			{
 				Dir: tmpdir,
@@ -251,9 +223,6 @@ func TestYamlTeamAccessTokenExample(t *testing.T) {
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		Quick: true,
 		Dir:   path.Join(cwd, ".", "yaml-team-token"),
-		PrepareProject: func(_ *engine.Projinfo) error {
-			return nil
-		},
 	})
 }
 
@@ -262,9 +231,6 @@ func TestYamlOrgAccessTokenExample(t *testing.T) {
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		Quick: true,
 		Dir:   path.Join(cwd, ".", "yaml-org-token"),
-		PrepareProject: func(_ *engine.Projinfo) error {
-			return nil
-		},
 	})
 }
 
@@ -280,9 +246,6 @@ func TestYamlWebhookExample(t *testing.T) {
 	cwd := getCwd(t)
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		Dir: path.Join(cwd, ".", "yaml-webhooks"),
-		PrepareProject: func(p *engine.Projinfo) error {
-			return nil
-		},
 	})
 }
 
@@ -295,9 +258,6 @@ func TestYamlSchedulesExample(t *testing.T) {
 		Config: map[string]string{
 			"digits": digits,
 		},
-		PrepareProject: func(p *engine.Projinfo) error {
-			return nil
-		},
 	})
 }
 
@@ -308,9 +268,6 @@ func TestYamlEnvironmentsExample(t *testing.T) {
 		Dir: path.Join(cwd, ".", "yaml-environments"),
 		Config: map[string]string{
 			"digits": digits,
-		},
-		PrepareProject: func(p *engine.Projinfo) error {
-			return nil
 		},
 	})
 }
@@ -323,9 +280,6 @@ func TestYamlAgentPoolsExample(t *testing.T) {
 		Config: map[string]string{
 			"digits": digits,
 		},
-		PrepareProject: func(p *engine.Projinfo) error {
-			return nil
-		},
 	})
 }
 
@@ -333,9 +287,6 @@ func TestYamlTemplateSourcesExample(t *testing.T) {
 	cwd := getCwd(t)
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		Dir: path.Join(cwd, ".", "yaml-template-sources"),
-		PrepareProject: func(p *engine.Projinfo) error {
-			return nil
-		},
 	})
 }
 
