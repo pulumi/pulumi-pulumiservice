@@ -79,14 +79,13 @@ python_sdk: gen_sdk_prerequisites
 		cd ./bin && \
 		../venv/bin/python -m build .
 
-GRADLE_DIR := $(WORKING_DIR)/.gradle
-GRADLE := $(GRADLE_DIR)/gradlew
+PACKAGE_VERSION := ${VERSION_GENERIC}
 java_sdk: gen_sdk_prerequisites
 	rm -rf sdk/java
 	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language java
 	cd sdk/java && \
 		echo "module fake_java_module // Exclude this directory from Go tools\n\ngo 1.17" > go.mod && \
-		$(GRADLE) --console=plain build
+		gradle --console=plain build
 
 .PHONY: build
 build:: gen provider dotnet_sdk go_sdk nodejs_sdk python_sdk java_sdk
@@ -121,7 +120,7 @@ install_nodejs_sdk::
 	yarn link --cwd $(WORKING_DIR)/sdk/nodejs/bin
 
 install_java_sdk::
-	cd sdk/java && $(GRADLE) publishToMavenLocal
+	cd sdk/java && gradle publishToMavenLocal
 
 
 # Keep the version of the pulumi binary used for code generation in sync with the version

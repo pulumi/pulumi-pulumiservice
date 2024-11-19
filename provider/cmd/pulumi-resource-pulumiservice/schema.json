@@ -1655,6 +1655,17 @@
       "generateResourceContainerTypes": true,
       "importBasePath": "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice"
     },
+    "java": {
+      "basePackage": "",
+      "buildFiles": "gradle",
+      "dependencies": {
+        "com.google.code.findbugs:jsr305": "3.0.2",
+        "com.google.code.gson:gson": "2.8.9",
+        "com.pulumi:pulumi": "0.9.9"
+      },
+      "gradleNexusPublishPluginVersion": "1.1.0",
+      "gradleTest": ""
+    },
     "nodejs": {
       "packageName": "@pulumi/pulumiservice",
       "dependencies": {
