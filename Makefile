@@ -3,7 +3,7 @@ PROJECT_NAME := Pulumi Service Resource Provider
 PACK             := pulumiservice
 PACKDIR          := sdk
 PROJECT          := github.com/pulumi/pulumi-pulumiservice
-NODE_MODULE_NAME := @pulumi/pulumi-service
+NODE_MODULE_NAME := @pulumi/pulumiservice
 NUGET_PKG_NAME   := Pulumi.PulumiService
 
 PROVIDER        := pulumi-resource-${PACK}
@@ -13,7 +13,7 @@ PROVIDER_VERSION ?= 1.0.0-alpha.0+dev
 # Use this normalised version everywhere rather than the raw input to ensure consistency.
 VERSION_GENERIC = $(shell pulumictl convert-version --language generic --version "$(PROVIDER_VERSION)")
 PROVIDER_PATH   := provider
-VERSION_PATH     := ${PROVIDER_PATH}/pkg/version.Version
+VERSION_PATH     := provider/pkg/version.Version
 
 SCHEMA_FILE     := provider/cmd/pulumi-resource-pulumiservice/schema.json
 GOPATH			:= $(shell go env GOPATH)
@@ -46,7 +46,7 @@ test_provider::
 
 dotnet_sdk: gen_sdk_prerequisites
 	rm -rf sdk/dotnet
-	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language dotnet
+	$(PULUMI) package gen-sdk bin/$(PROVIDER) --language dotnet
 	cd sdk/dotnet/ && \
 		echo "module fake_dotnet_module // Exclude this directory from Go tools\n\ngo 1.17" > go.mod && \
 		echo "${VERSION_GENERIC}" >version.txt && \
@@ -54,11 +54,11 @@ dotnet_sdk: gen_sdk_prerequisites
 
 go_sdk: gen_sdk_prerequisites
 	rm -rf sdk/go
-	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language go
+	$(PULUMI) package gen-sdk bin/$(PROVIDER) --language go
 
 nodejs_sdk: gen_sdk_prerequisites
 	rm -rf sdk/nodejs
-	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language nodejs
+	$(PULUMI) package gen-sdk bin/$(PROVIDER) --language nodejs
 	cd sdk/nodejs && \
 		yarn install --no-progress && \
 		yarn run build && \
@@ -66,7 +66,7 @@ nodejs_sdk: gen_sdk_prerequisites
 
 python_sdk: gen_sdk_prerequisites
 	rm -rf sdk/python
-	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language python
+	$(PULUMI) package gen-sdk bin/$(PROVIDER) --language python
 	cd sdk/python/ && \
 		echo "module fake_python_module // Exclude this directory from Go tools\n\ngo 1.17" > go.mod && \
 		cp ../../README.md . && \
@@ -79,7 +79,7 @@ python_sdk: gen_sdk_prerequisites
 PACKAGE_VERSION := ${VERSION_GENERIC}
 java_sdk: gen_sdk_prerequisites
 	rm -rf sdk/java
-	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language java
+	$(PULUMI) package gen-sdk bin/$(PROVIDER) --language java
 	cd sdk/java && \
 		echo "module fake_java_module // Exclude this directory from Go tools\n\ngo 1.17" > go.mod && \
 		gradle --console=plain build

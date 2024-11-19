@@ -4,72 +4,29 @@
 
 import copy
 import warnings
-import sys
 import pulumi
 import pulumi.runtime
 from typing import Any, Mapping, Optional, Sequence, Union, overload
-if sys.version_info >= (3, 11):
-    from typing import NotRequired, TypedDict, TypeAlias
-else:
-    from typing_extensions import NotRequired, TypedDict, TypeAlias
 from . import _utilities
 from ._enums import *
 
 __all__ = [
     'AWSOIDCConfigurationArgs',
-    'AWSOIDCConfigurationArgsDict',
     'AzureOIDCConfigurationArgs',
-    'AzureOIDCConfigurationArgsDict',
     'DeploymentSettingsCacheOptionsArgs',
-    'DeploymentSettingsCacheOptionsArgsDict',
     'DeploymentSettingsExecutorContextArgs',
-    'DeploymentSettingsExecutorContextArgsDict',
     'DeploymentSettingsGitAuthBasicAuthArgs',
-    'DeploymentSettingsGitAuthBasicAuthArgsDict',
     'DeploymentSettingsGitAuthSSHAuthArgs',
-    'DeploymentSettingsGitAuthSSHAuthArgsDict',
     'DeploymentSettingsGitSourceGitAuthArgs',
-    'DeploymentSettingsGitSourceGitAuthArgsDict',
     'DeploymentSettingsGitSourceArgs',
-    'DeploymentSettingsGitSourceArgsDict',
     'DeploymentSettingsGithubArgs',
-    'DeploymentSettingsGithubArgsDict',
     'DeploymentSettingsOperationContextArgs',
-    'DeploymentSettingsOperationContextArgsDict',
     'DeploymentSettingsSourceContextArgs',
-    'DeploymentSettingsSourceContextArgsDict',
     'GCPOIDCConfigurationArgs',
-    'GCPOIDCConfigurationArgsDict',
     'OperationContextOIDCArgs',
-    'OperationContextOIDCArgsDict',
     'OperationContextOptionsArgs',
-    'OperationContextOptionsArgsDict',
     'TemplateSourceDestinationArgs',
-    'TemplateSourceDestinationArgsDict',
 ]
-
-MYPY = False
-
-if not MYPY:
-    class AWSOIDCConfigurationArgsDict(TypedDict):
-        role_arn: pulumi.Input[str]
-        """
-        The ARN of the role to assume using the OIDC token.
-        """
-        session_name: pulumi.Input[str]
-        """
-        The name of the assume-role session.
-        """
-        duration: NotRequired[pulumi.Input[str]]
-        """
-        Duration of the assume-role session in “XhYmZs” format
-        """
-        policy_arns: NotRequired[pulumi.Input[Sequence[pulumi.Input[str]]]]
-        """
-        Optional set of IAM policy ARNs that further restrict the assume-role session
-        """
-elif False:
-    AWSOIDCConfigurationArgsDict: TypeAlias = Mapping[str, Any]
 
 @pulumi.input_type
 class AWSOIDCConfigurationArgs:
@@ -140,23 +97,6 @@ class AWSOIDCConfigurationArgs:
         pulumi.set(self, "policy_arns", value)
 
 
-if not MYPY:
-    class AzureOIDCConfigurationArgsDict(TypedDict):
-        client_id: pulumi.Input[str]
-        """
-        The client ID of the federated workload identity.
-        """
-        subscription_id: pulumi.Input[str]
-        """
-        The subscription ID of the federated workload identity.
-        """
-        tenant_id: pulumi.Input[str]
-        """
-        The tenant ID of the federated workload identity.
-        """
-elif False:
-    AzureOIDCConfigurationArgsDict: TypeAlias = Mapping[str, Any]
-
 @pulumi.input_type
 class AzureOIDCConfigurationArgs:
     def __init__(__self__, *,
@@ -209,18 +149,6 @@ class AzureOIDCConfigurationArgs:
         pulumi.set(self, "tenant_id", value)
 
 
-if not MYPY:
-    class DeploymentSettingsCacheOptionsArgsDict(TypedDict):
-        """
-        Dependency cache settings for the deployment
-        """
-        enable: NotRequired[pulumi.Input[bool]]
-        """
-        Enable dependency caching
-        """
-elif False:
-    DeploymentSettingsCacheOptionsArgsDict: TypeAlias = Mapping[str, Any]
-
 @pulumi.input_type
 class DeploymentSettingsCacheOptionsArgs:
     def __init__(__self__, *,
@@ -247,18 +175,6 @@ class DeploymentSettingsCacheOptionsArgs:
         pulumi.set(self, "enable", value)
 
 
-if not MYPY:
-    class DeploymentSettingsExecutorContextArgsDict(TypedDict):
-        """
-        The executor context defines information about the executor where the deployment is executed. If unspecified, the default 'pulumi/pulumi' image is used.
-        """
-        executor_image: pulumi.Input[str]
-        """
-        Allows overriding the default executor image with a custom image. E.g. 'pulumi/pulumi-nodejs:latest'
-        """
-elif False:
-    DeploymentSettingsExecutorContextArgsDict: TypeAlias = Mapping[str, Any]
-
 @pulumi.input_type
 class DeploymentSettingsExecutorContextArgs:
     def __init__(__self__, *,
@@ -281,22 +197,6 @@ class DeploymentSettingsExecutorContextArgs:
     def executor_image(self, value: pulumi.Input[str]):
         pulumi.set(self, "executor_image", value)
 
-
-if not MYPY:
-    class DeploymentSettingsGitAuthBasicAuthArgsDict(TypedDict):
-        """
-        Git source settings for a deployment.
-        """
-        password: pulumi.Input[str]
-        """
-        Password for git basic authentication.
-        """
-        username: pulumi.Input[str]
-        """
-        User name for git basic authentication.
-        """
-elif False:
-    DeploymentSettingsGitAuthBasicAuthArgsDict: TypeAlias = Mapping[str, Any]
 
 @pulumi.input_type
 class DeploymentSettingsGitAuthBasicAuthArgs:
@@ -335,22 +235,6 @@ class DeploymentSettingsGitAuthBasicAuthArgs:
     def username(self, value: pulumi.Input[str]):
         pulumi.set(self, "username", value)
 
-
-if not MYPY:
-    class DeploymentSettingsGitAuthSSHAuthArgsDict(TypedDict):
-        """
-        Git source settings for a deployment.
-        """
-        ssh_private_key: pulumi.Input[str]
-        """
-        SSH private key.
-        """
-        password: NotRequired[pulumi.Input[str]]
-        """
-        Optional password for SSH authentication.
-        """
-elif False:
-    DeploymentSettingsGitAuthSSHAuthArgsDict: TypeAlias = Mapping[str, Any]
 
 @pulumi.input_type
 class DeploymentSettingsGitAuthSSHAuthArgs:
@@ -391,22 +275,6 @@ class DeploymentSettingsGitAuthSSHAuthArgs:
         pulumi.set(self, "password", value)
 
 
-if not MYPY:
-    class DeploymentSettingsGitSourceGitAuthArgsDict(TypedDict):
-        """
-        Git source settings for a deployment.
-        """
-        basic_auth: NotRequired[pulumi.Input['DeploymentSettingsGitAuthBasicAuthArgsDict']]
-        """
-        Basic auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
-        """
-        ssh_auth: NotRequired[pulumi.Input['DeploymentSettingsGitAuthSSHAuthArgsDict']]
-        """
-        SSH auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
-        """
-elif False:
-    DeploymentSettingsGitSourceGitAuthArgsDict: TypeAlias = Mapping[str, Any]
-
 @pulumi.input_type
 class DeploymentSettingsGitSourceGitAuthArgs:
     def __init__(__self__, *,
@@ -446,34 +314,6 @@ class DeploymentSettingsGitSourceGitAuthArgs:
     def ssh_auth(self, value: Optional[pulumi.Input['DeploymentSettingsGitAuthSSHAuthArgs']]):
         pulumi.set(self, "ssh_auth", value)
 
-
-if not MYPY:
-    class DeploymentSettingsGitSourceArgsDict(TypedDict):
-        """
-        Git source settings for a deployment.
-        """
-        branch: NotRequired[pulumi.Input[str]]
-        """
-        The branch to deploy. One of either `branch` or `commit` must be specified.
-        """
-        commit: NotRequired[pulumi.Input[str]]
-        """
-        The commit to deploy. One of either `branch` or `commit` must be specified.
-        """
-        git_auth: NotRequired[pulumi.Input['DeploymentSettingsGitSourceGitAuthArgsDict']]
-        """
-        Git authentication configuration for this deployment. Should not be specified if there are `gitHub` settings for this deployment.
-        """
-        repo_dir: NotRequired[pulumi.Input[str]]
-        """
-        The directory within the repository where the Pulumi.yaml is located.
-        """
-        repo_url: NotRequired[pulumi.Input[str]]
-        """
-        The repository URL to use for git settings. Should not be specified if there are `gitHub` settings for this deployment.
-        """
-elif False:
-    DeploymentSettingsGitSourceArgsDict: TypeAlias = Mapping[str, Any]
 
 @pulumi.input_type
 class DeploymentSettingsGitSourceArgs:
@@ -562,34 +402,6 @@ class DeploymentSettingsGitSourceArgs:
     def repo_url(self, value: Optional[pulumi.Input[str]]):
         pulumi.set(self, "repo_url", value)
 
-
-if not MYPY:
-    class DeploymentSettingsGithubArgsDict(TypedDict):
-        """
-        GitHub settings for the deployment.
-        """
-        deploy_commits: NotRequired[pulumi.Input[bool]]
-        """
-        Trigger a deployment running `pulumi up` on commit.
-        """
-        paths: NotRequired[pulumi.Input[Sequence[pulumi.Input[str]]]]
-        """
-        The paths within the repo that deployments should be filtered to.
-        """
-        preview_pull_requests: NotRequired[pulumi.Input[bool]]
-        """
-        Trigger a deployment running `pulumi preview` when a PR is opened.
-        """
-        pull_request_template: NotRequired[pulumi.Input[bool]]
-        """
-        Use this stack as a template for pull request review stacks.
-        """
-        repository: NotRequired[pulumi.Input[str]]
-        """
-        The GitHub repository in the format org/repo.
-        """
-elif False:
-    DeploymentSettingsGithubArgsDict: TypeAlias = Mapping[str, Any]
 
 @pulumi.input_type
 class DeploymentSettingsGithubArgs:
@@ -685,30 +497,6 @@ class DeploymentSettingsGithubArgs:
         pulumi.set(self, "repository", value)
 
 
-if not MYPY:
-    class DeploymentSettingsOperationContextArgsDict(TypedDict):
-        """
-        Settings related to the Pulumi operation environment during the deployment.
-        """
-        environment_variables: NotRequired[pulumi.Input[Mapping[str, pulumi.Input[str]]]]
-        """
-        Environment variables to set for the deployment.
-        """
-        oidc: NotRequired[pulumi.Input['OperationContextOIDCArgsDict']]
-        """
-        OIDC configuration to use during the deployment.
-        """
-        options: NotRequired[pulumi.Input['OperationContextOptionsArgsDict']]
-        """
-        Options to override default behavior during the deployment.
-        """
-        pre_run_commands: NotRequired[pulumi.Input[Sequence[pulumi.Input[str]]]]
-        """
-        Shell commands to run before the Pulumi operation executes.
-        """
-elif False:
-    DeploymentSettingsOperationContextArgsDict: TypeAlias = Mapping[str, Any]
-
 @pulumi.input_type
 class DeploymentSettingsOperationContextArgs:
     def __init__(__self__, *,
@@ -781,18 +569,6 @@ class DeploymentSettingsOperationContextArgs:
         pulumi.set(self, "pre_run_commands", value)
 
 
-if not MYPY:
-    class DeploymentSettingsSourceContextArgsDict(TypedDict):
-        """
-        Settings related to the source of the deployment.
-        """
-        git: NotRequired[pulumi.Input['DeploymentSettingsGitSourceArgsDict']]
-        """
-        Git source settings for a deployment.
-        """
-elif False:
-    DeploymentSettingsSourceContextArgsDict: TypeAlias = Mapping[str, Any]
-
 @pulumi.input_type
 class DeploymentSettingsSourceContextArgs:
     def __init__(__self__, *,
@@ -816,35 +592,6 @@ class DeploymentSettingsSourceContextArgs:
     def git(self, value: Optional[pulumi.Input['DeploymentSettingsGitSourceArgs']]):
         pulumi.set(self, "git", value)
 
-
-if not MYPY:
-    class GCPOIDCConfigurationArgsDict(TypedDict):
-        project_id: pulumi.Input[str]
-        """
-        The numerical ID of the GCP project.
-        """
-        provider_id: pulumi.Input[str]
-        """
-        The ID of the identity provider associated with the workload pool.
-        """
-        service_account: pulumi.Input[str]
-        """
-        The email address of the service account to use.
-        """
-        workload_pool_id: pulumi.Input[str]
-        """
-        The ID of the workload pool to use.
-        """
-        region: NotRequired[pulumi.Input[str]]
-        """
-        The region of the GCP project.
-        """
-        token_lifetime: NotRequired[pulumi.Input[str]]
-        """
-        The lifetime of the temporary credentials in “XhYmZs” format.
-        """
-elif False:
-    GCPOIDCConfigurationArgsDict: TypeAlias = Mapping[str, Any]
 
 @pulumi.input_type
 class GCPOIDCConfigurationArgs:
@@ -945,23 +692,6 @@ class GCPOIDCConfigurationArgs:
         pulumi.set(self, "token_lifetime", value)
 
 
-if not MYPY:
-    class OperationContextOIDCArgsDict(TypedDict):
-        aws: NotRequired[pulumi.Input['AWSOIDCConfigurationArgsDict']]
-        """
-        AWS-specific OIDC configuration.
-        """
-        azure: NotRequired[pulumi.Input['AzureOIDCConfigurationArgsDict']]
-        """
-        Azure-specific OIDC configuration.
-        """
-        gcp: NotRequired[pulumi.Input['GCPOIDCConfigurationArgsDict']]
-        """
-        GCP-specific OIDC configuration.
-        """
-elif False:
-    OperationContextOIDCArgsDict: TypeAlias = Mapping[str, Any]
-
 @pulumi.input_type
 class OperationContextOIDCArgs:
     def __init__(__self__, *,
@@ -1016,27 +746,6 @@ class OperationContextOIDCArgs:
     def gcp(self, value: Optional[pulumi.Input['GCPOIDCConfigurationArgs']]):
         pulumi.set(self, "gcp", value)
 
-
-if not MYPY:
-    class OperationContextOptionsArgsDict(TypedDict):
-        delete_after_destroy: NotRequired[pulumi.Input[bool]]
-        """
-        Whether the stack should be deleted after it is destroyed.
-        """
-        shell: NotRequired[pulumi.Input[str]]
-        """
-        The shell to use to run commands during the deployment. Defaults to 'bash'.
-        """
-        skip_install_dependencies: NotRequired[pulumi.Input[bool]]
-        """
-        Skip the default dependency installation step - use this to customize the dependency installation (e.g. if using yarn or poetry)
-        """
-        skip_intermediate_deployments: NotRequired[pulumi.Input[bool]]
-        """
-        Skip intermediate deployments (Consolidate multiple deployments of the same type into one deployment)
-        """
-elif False:
-    OperationContextOptionsArgsDict: TypeAlias = Mapping[str, Any]
 
 @pulumi.input_type
 class OperationContextOptionsArgs:
@@ -1108,15 +817,6 @@ class OperationContextOptionsArgs:
     def skip_intermediate_deployments(self, value: Optional[pulumi.Input[bool]]):
         pulumi.set(self, "skip_intermediate_deployments", value)
 
-
-if not MYPY:
-    class TemplateSourceDestinationArgsDict(TypedDict):
-        url: NotRequired[pulumi.Input[str]]
-        """
-        Destination URL that gets filled in on new project creation.
-        """
-elif False:
-    TemplateSourceDestinationArgsDict: TypeAlias = Mapping[str, Any]
 
 @pulumi.input_type
 class TemplateSourceDestinationArgs:
