@@ -80,7 +80,7 @@ python_sdk: gen_sdk_prerequisites
 
 java_sdk: gen_sdk_prerequisites
 	rm -rf sdk/java
-	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language java --version $(VERSION_GENERIC)
+	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language java
 	cd sdk/java && \
 		echo "module fake_java_module // Exclude this directory from Go tools\n\ngo 1.17" > go.mod && \
 		gradle --console=plain build
