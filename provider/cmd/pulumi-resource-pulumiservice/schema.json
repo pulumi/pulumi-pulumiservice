@@ -1649,11 +1649,13 @@
       },
       "packageReferences": {
         "Pulumi": "3.*"
-      }
+      },
+      "respectSchemaVersion": true
     },
     "go": {
       "generateResourceContainerTypes": true,
-      "importBasePath": "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice"
+      "importBasePath": "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice",
+      "respectSchemaVersion": true
     },
     "java": {
       "basePackage": "",
@@ -1670,13 +1672,15 @@
       "packageName": "@pulumi/pulumiservice",
       "dependencies": {
         "@pulumi/pulumi": "^3.0.0"
-      }
+      },
+      "respectSchemaVersion": true
     },
     "python": {
       "packageName": "pulumi_pulumiservice",
       "requires": {
         "pulumi": ">=3.0.0,<4.0.0"
-      }
+      },
+      "respectSchemaVersion": true
     }
   }
 }
