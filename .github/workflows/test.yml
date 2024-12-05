@@ -18,7 +18,6 @@ env:
   PUBLISH_REPO_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
   PUBLISH_REPO_USERNAME: ${{ secrets.OSSRH_USERNAME }}
   PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
-  PULUMI_API: https://api.pulumi-staging.io
   PULUMI_BACKEND_URL: https://api.pulumi-staging.io
   PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
   PULUMI_JAVA_SDK_VERSION: 0.10.0
@@ -89,6 +88,6 @@ jobs:
       run: |
         cd examples && go test -v -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 .
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         language: [nodejs, java, yaml, go, dotnet, python]
