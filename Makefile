@@ -146,13 +146,6 @@ $(PULUMI): go.mod
 
 # TODO(https://github.com/pulumi/ci-mgmt/issues/1131): Use default target implementations.
 
-shard:
-	@(cd examples && go run github.com/blampe/shard@latest --total $(TOTAL) --index $(INDEX) --output env) >> "$(GITHUB_ENV)"
-
-test_shard:
-	cd examples && \
-		go test -tags=all -v -count=1 -coverprofile="coverage.txt" -coverpkg=./... -timeout 3h -parallel ${TESTPARALLELISM} -run "$(SHARD_TESTS)" $(SHARD_PATHS)
-
 install_plugins: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
 install_plugins: export PATH := "$(WORKING_DIR)/.pulumi/bin:$(PATH)"
 install_plugins: .pulumi/bin/pulumi
