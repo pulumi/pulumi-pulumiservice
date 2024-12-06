@@ -3,13 +3,17 @@ PROJECT_NAME := Pulumi Service Resource Provider
 PACK             := pulumiservice
 PACKDIR          := sdk
 PROJECT          := github.com/pulumi/pulumi-pulumiservice
-NODE_MODULE_NAME := @pulumi/pulumi-service
+NODE_MODULE_NAME := @pulumi/pulumiservice
 NUGET_PKG_NAME   := Pulumi.PulumiService
 
 PROVIDER        := pulumi-resource-${PACK}
-VERSION         ?= $(shell pulumictl get version)
+# Override during CI using `make [TARGET] PROVIDER_VERSION=""` or by setting a PROVIDER_VERSION environment variable
+# Local & branch builds will just used this fixed default version unless specified
+PROVIDER_VERSION ?= 1.0.0-alpha.0+dev
+# Use this normalised version everywhere rather than the raw input to ensure consistency.
+VERSION_GENERIC = $(shell pulumictl convert-version --language generic --version "$(PROVIDER_VERSION)")
 PROVIDER_PATH   := provider
-VERSION_PATH     := ${PROVIDER_PATH}/pkg/version.Version
+VERSION_PATH     := provider/pkg/version.Version
 
 SCHEMA_FILE     := provider/cmd/pulumi-resource-pulumiservice/schema.json
 GOPATH			:= $(shell go env GOPATH)
@@ -20,12 +24,9 @@ TESTPARALLELISM := 4
 # The pulumi binary to use during generation
 PULUMI := .pulumi/bin/pulumi
 
-export PULUMI_IGNORE_AMBIENT_PLUGINS = true
-
 ensure::
-	cd provider && go mod tidy
+	go mod tidy
 	cd sdk && go mod tidy
-	cd examples && go mod tidy
 
 gen::
 
@@ -34,66 +35,57 @@ build_sdks: dotnet_sdk go_sdk nodejs_sdk python_sdk java_sdk
 gen_sdk_prerequisites: $(PULUMI)
 
 provider::
-	(cd provider && VERSION=${VERSION} go generate cmd/${PROVIDER}/main.go)
-	(cd provider && go build -o $(WORKING_DIR)/bin/${PROVIDER} -ldflags "-X ${PROJECT}/${VERSION_PATH}=${VERSION}" $(PROJECT)/${PROVIDER_PATH}/cmd/$(PROVIDER))
+	(cd provider && VERSION=${VERSION_GENERIC} go generate cmd/${PROVIDER}/main.go)
+	(cd provider && go build -o $(WORKING_DIR)/bin/${PROVIDER} -ldflags "-X ${PROJECT}/${VERSION_PATH}=${VERSION_GENERIC}" $(PROJECT)/${PROVIDER_PATH}/cmd/$(PROVIDER))
 
 provider_debug::
-	(cd provider && go build -o $(WORKING_DIR)/bin/${PROVIDER} -gcflags="all=-N -l" -ldflags "-X ${PROJECT}/${VERSION_PATH}=${VERSION}" $(PROJECT)/${PROVIDER_PATH}/cmd/$(PROVIDER))
+	(cd provider && go build -o $(WORKING_DIR)/bin/${PROVIDER} -gcflags="all=-N -l" -ldflags "-X ${PROJECT}/${VERSION_PATH}=${VERSION_GENERIC}" $(PROJECT)/${PROVIDER_PATH}/cmd/$(PROVIDER))
 
 test_provider::
 	cd provider/pkg && go test -short -v -count=1 -cover -timeout 2h -parallel ${TESTPARALLELISM} ./...
 
-dotnet_sdk: DOTNET_VERSION := $(shell pulumictl get version --language dotnet)
 dotnet_sdk: gen_sdk_prerequisites
 	rm -rf sdk/dotnet
-	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language dotnet
-	cd ${PACKDIR}/dotnet/&& \
-		echo "${DOTNET_VERSION}" >version.txt && \
-		dotnet build /p:Version=${DOTNET_VERSION}
+	$(PULUMI) package gen-sdk bin/$(PROVIDER) --language dotnet
+	cd sdk/dotnet/ && \
+		echo "module fake_dotnet_module // Exclude this directory from Go tools\n\ngo 1.17" > go.mod && \
+		echo "${VERSION_GENERIC}" >version.txt && \
+		dotnet build
 
+go_sdk: export PULUMI_IGNORE_AMBIENT_PLUGINS = true
 go_sdk: gen_sdk_prerequisites
 	rm -rf sdk/go
-	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language go
+	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language go --version $(VERSION_GENERIC)
 
-nodejs_sdk: VERSION := $(shell pulumictl get version --language javascript)
+nodejs_sdk: export PULUMI_IGNORE_AMBIENT_PLUGINS = true
 nodejs_sdk: gen_sdk_prerequisites
 	rm -rf sdk/nodejs
-	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language nodejs
-	cd ${PACKDIR}/nodejs/ && \
-		yarn install && \
-		yarn run tsc && \
-		cp ../../README.md ../../LICENSE package.json yarn.lock ./bin/ && \
-		sed -i.bak -e 's/\$${VERSION}/$(VERSION)/g' ./bin/package.json
+	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language nodejs --version $(VERSION_GENERIC)
+	cd sdk/nodejs && \
+		yarn install --no-progress && \
+		yarn run build && \
+		cp package.json yarn.lock ./bin/
 
-python_sdk: PYPI_VERSION := $(shell pulumictl get version --language python)
+python_sdk: export PULUMI_IGNORE_AMBIENT_PLUGINS = true
 python_sdk: gen_sdk_prerequisites
 	rm -rf sdk/python
-	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language python
-	cp README.md ${PACKDIR}/python/
-	cd ${PACKDIR}/python/ && \
-		python3 -m venv venv && \
-		. ./venv/bin/activate && \
-		python -m pip install setuptools && \
-		python setup.py clean --all && \
+	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language python --version $(VERSION_GENERIC)
+	cd sdk/python/ && \
+		echo "module fake_python_module // Exclude this directory from Go tools\n\ngo 1.17" > go.mod && \
+		cp ../../README.md . && \
 		rm -rf ./bin/ ../python.bin/ && cp -R . ../python.bin && mv ../python.bin ./bin && \
-		sed -i.bak -e 's/^VERSION = .*/VERSION = "$(PYPI_VERSION)"/g' -e 's/^PLUGIN_VERSION = .*/PLUGIN_VERSION = "$(VERSION)"/g' ./bin/setup.py && \
-		rm ./bin/setup.py.bak && \
-		cd ./bin && python3 setup.py build sdist
+		python3 -m venv venv && \
+		./venv/bin/python -m pip install build && \
+		cd ./bin && \
+		../venv/bin/python -m build .
 
-GRADLE_DIR := $(WORKING_DIR)/.gradle
-GRADLE := $(GRADLE_DIR)/gradlew
-java_sdk: RESOURCE_FOLDER := src/main/resources/com/pulumi/pulumiservice
+java_sdk: export PULUMI_IGNORE_AMBIENT_PLUGINS = true
 java_sdk: gen_sdk_prerequisites
-	rm -rf sdk/java/{.gradle,build,src}
+	rm -rf sdk/java
 	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language java
-	cp $(GRADLE_DIR)/settings.gradle sdk/java/settings.gradle
-	cp $(GRADLE_DIR)/build.gradle sdk/java/build.gradle
 	cd sdk/java && \
-	mkdir -p $(RESOURCE_FOLDER) && \
-	  echo "$(VERSION)" > $(RESOURCE_FOLDER)/version.txt && \
-	  echo '{"resource": true,"name": "pulumiservice","version": "$(VERSION)"}' > $(RESOURCE_FOLDER)/plugin.json && \
-	  PULUMI_JAVA_SDK_VERSION=0.10.0 $(GRADLE) --console=plain build && \
-	  PULUMI_JAVA_SDK_VERSION=0.10.0 $(GRADLE) --console=plain publishToMavenLocal
+		echo "module fake_java_module // Exclude this directory from Go tools\n\ngo 1.17" > go.mod && \
+		gradle --console=plain build
 
 .PHONY: build
 build:: gen provider dotnet_sdk go_sdk nodejs_sdk python_sdk java_sdk
@@ -128,14 +120,14 @@ install_nodejs_sdk::
 	yarn link --cwd $(WORKING_DIR)/sdk/nodejs/bin
 
 install_java_sdk::
-	cd sdk/java && $(GRADLE) publishToMavenLocal
+	cd sdk/java && gradle publishToMavenLocal
 
 
 # Keep the version of the pulumi binary used for code generation in sync with the version
 # of the dependency used by github.com/pulumi/pulumi-pulumiservice/provider
 
 $(PULUMI): HOME := $(WORKING_DIR)
-$(PULUMI): provider/go.mod
+$(PULUMI): go.mod
 	@ PULUMI_VERSION="$$(cd provider && go list -m github.com/pulumi/pulumi/pkg/v3 | awk '{print $$2}')"; \
 	if [ -x $(PULUMI) ]; then \
 		CURRENT_VERSION="$$($(PULUMI) version)"; \
@@ -147,3 +139,64 @@ $(PULUMI): provider/go.mod
 	if ! [ -x $(PULUMI) ]; then \
 		curl -fsSL https://get.pulumi.com | sh -s -- --version "$${PULUMI_VERSION#v}"; \
 	fi
+
+######################
+# ci-mgmt onboarding #
+######################
+
+# TODO(https://github.com/pulumi/ci-mgmt/issues/1131): Use default target implementations.
+
+shard:
+	@(cd examples && go run github.com/blampe/shard@latest --total $(TOTAL) --index $(INDEX) --output env) >> "$(GITHUB_ENV)"
+
+test_shard:
+	cd examples && \
+		go test -tags=all -v -count=1 -coverprofile="coverage.txt" -coverpkg=./... -timeout 3h -parallel ${TESTPARALLELISM} -run "$(SHARD_TESTS)" $(SHARD_PATHS)
+
+install_plugins: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
+install_plugins: export PATH := "$(WORKING_DIR)/.pulumi/bin:$(PATH)"
+install_plugins: .pulumi/bin/pulumi
+
+bin/linux-amd64/$(PROVIDER): TARGET := linux-amd64
+bin/linux-arm64/$(PROVIDER): TARGET := linux-arm64
+bin/darwin-amd64/$(PROVIDER): TARGET := darwin-amd64
+bin/darwin-arm64/$(PROVIDER): TARGET := darwin-arm64
+bin/windows-amd64/$(PROVIDER).exe: TARGET := windows-amd64
+bin/%/$(PROVIDER) bin/%/$(PROVIDER).exe:
+	@# check the TARGET is set
+	test $(TARGET)
+	cd provider && \
+		export GOOS=$$(echo "$(TARGET)" | cut -d "-" -f 1) && \
+		export GOARCH=$$(echo "$(TARGET)" | cut -d "-" -f 2) && \
+		export CGO_ENABLED=0 && \
+		go build -o "${WORKING_DIR}/$@" $(PULUMI_PROVIDER_BUILD_PARALLELISM) -ldflags "$(LDFLAGS)" "$(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER)"
+
+bin/$(PROVIDER)-v$(VERSION_GENERIC)-linux-amd64.tar.gz: bin/linux-amd64/$(PROVIDER)
+bin/$(PROVIDER)-v$(VERSION_GENERIC)-linux-arm64.tar.gz: bin/linux-arm64/$(PROVIDER)
+bin/$(PROVIDER)-v$(VERSION_GENERIC)-darwin-amd64.tar.gz: bin/darwin-amd64/$(PROVIDER)
+bin/$(PROVIDER)-v$(VERSION_GENERIC)-darwin-arm64.tar.gz: bin/darwin-arm64/$(PROVIDER)
+bin/$(PROVIDER)-v$(VERSION_GENERIC)-windows-amd64.tar.gz: bin/windows-amd64/$(PROVIDER).exe
+bin/$(PROVIDER)-v$(VERSION_GENERIC)-%.tar.gz:
+	@mkdir -p dist
+	@# $< is the last dependency (the binary path from above) e.g. bin/linux-amd64/pulumi-resource-xyz
+	@# $@ is the current target e.g. bin/pulumi-resource-xyz-v1.2.3-linux-amd64.tar.gz
+	tar --gzip -cf $@ README.md LICENSE -C $$(dirname $<) .
+
+provider_dist-linux-amd64: bin/$(PROVIDER)-v$(VERSION_GENERIC)-linux-amd64.tar.gz
+provider_dist-linux-arm64: bin/$(PROVIDER)-v$(VERSION_GENERIC)-linux-arm64.tar.gz
+provider_dist-darwin-amd64: bin/$(PROVIDER)-v$(VERSION_GENERIC)-darwin-amd64.tar.gz
+provider_dist-darwin-arm64: bin/$(PROVIDER)-v$(VERSION_GENERIC)-darwin-arm64.tar.gz
+provider_dist-windows-amd64: bin/$(PROVIDER)-v$(VERSION_GENERIC)-windows-amd64.tar.gz
+provider_dist: provider_dist-linux-amd64 provider_dist-linux-arm64 provider_dist-darwin-amd64 provider_dist-darwin-arm64 provider_dist-windows-amd64
+
+install_sdks: install_nodejs_sdk install_dotnet_sdk install_go_sdk install_python_sdk install_java_sdk
+
+build_nodejs: nodejs_sdk
+build_python: python_sdk
+build_java: java_sdk
+build_dotnet: dotnet_sdk
+build_go: go_sdk
+
+# Schema is manually maintained.
+schema:
+
