@@ -22,27 +22,23 @@ env:
   SIGNING_PASSWORD: ${{ secrets.JAVA_SIGNING_PASSWORD }}
   TF_APPEND_USER_AGENT: pulumi
 jobs:
-  command-dispatch-for-testing:
-    name: command-dispatch-for-testing
+  comment-on-pr:
+    if: github.event.pull_request.head.repo.full_name != github.repository
+    name: comment-on-pr
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v4
       with:
         persist-credentials: false
-    - uses: peter-evans/slash-command-dispatch@v4
+    - name: Comment PR
+      uses: thollander/actions-comment-pull-request@v2
       with:
-        commands: |
-          run-acceptance-tests
-          release
-        issue-type: pull-request
-        permission: write
-        reaction-token: ${{ secrets.GITHUB_TOKEN }}
-        repository: pulumi/pulumi-pulumiservice
-        token: ${{ secrets.PULUMI_BOT_TOKEN }}
-name: command-dispatch
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        message: >
+          PR is now waiting for a maintainer to run the acceptance tests.
+
+          **Note for the maintainer:** To run the acceptance tests, please comment */run-acceptance-tests* on the PR
+name: pull-request
 on:
-  issue_comment:
-    types:
-    - created
-    - edited
+  pull_request_target: {}

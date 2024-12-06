@@ -1,6 +1,6 @@
 {
     "name": "@pulumi/pulumiservice",
-    "version": "${VERSION}",
+    "version": "1.0.0-alpha.0+dev",
     "keywords": [
         "pulumi",
         "kind/native",
@@ -21,6 +21,7 @@
     },
     "pulumi": {
         "resource": true,
-        "name": "pulumiservice"
+        "name": "pulumiservice",
+        "version": "1.0.0-alpha.0+dev"
     }
 }
