@@ -15,5 +15,6 @@ env:
 
   PULUMI_TEST_OWNER: service-provider-test-org
   PULUMI_TEST_USE_SERVICE: true
+defaultBranch: main
 template: generic
 shards: 6
