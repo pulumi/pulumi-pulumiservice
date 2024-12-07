@@ -106,6 +106,8 @@ export class DeploymentSchedule extends pulumi.CustomResource {
             resourceInputs["timestamp"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["timestamp"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(DeploymentSchedule.__pulumiType, name, resourceInputs, opts);
     }
 }

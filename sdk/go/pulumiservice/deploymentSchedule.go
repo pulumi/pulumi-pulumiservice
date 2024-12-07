@@ -51,6 +51,10 @@ func NewDeploymentSchedule(ctx *pulumi.Context,
 	if args.Stack == nil {
 		return nil, errors.New("invalid value for required argument 'Stack'")
 	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"timestamp",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource DeploymentSchedule
 	err := ctx.RegisterResource("pulumiservice:index:DeploymentSchedule", name, args, &resource, opts...)
