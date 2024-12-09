@@ -1255,7 +1255,7 @@
         "timestamp": {
           "description": "The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are supplying this, do not supply scheduleCron.",
           "type": "string",
-          "replaceOnChanges": true
+          "willReplaceOnChanges": true
         },
         "pulumiOperation": {
           "description": "Which operation to run.",
@@ -1293,7 +1293,7 @@
         "timestamp": {
           "description": "The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are supplying this, do not supply scheduleCron.",
           "type": "string",
-          "replaceOnChanges": true
+          "willReplaceOnChanges": true
         },
         "pulumiOperation": {
           "description": "Which command to run.",
@@ -1391,7 +1391,7 @@
         "timestamp": {
           "description": "The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.",
           "type": "string",
-          "replaceOnChanges": true
+          "willReplaceOnChanges": true
         },
         "deleteAfterDestroy": {
           "description": "True if the stack and all associated history and settings should be deleted.",
@@ -1426,7 +1426,7 @@
         "timestamp": {
           "description": "The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.",
           "type": "string",
-          "replaceOnChanges": true
+          "willReplaceOnChanges": true
         },
         "deleteAfterDestroy": {
           "description": "True if the stack and all associated history and settings should be deleted.",

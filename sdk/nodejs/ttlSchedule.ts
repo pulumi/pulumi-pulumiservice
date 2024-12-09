@@ -97,8 +97,6 @@ export class TtlSchedule extends pulumi.CustomResource {
             resourceInputs["timestamp"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
-        const replaceOnChanges = { replaceOnChanges: ["timestamp"] };
-        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(TtlSchedule.__pulumiType, name, resourceInputs, opts);
     }
 }

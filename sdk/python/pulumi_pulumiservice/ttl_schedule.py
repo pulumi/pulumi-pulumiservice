@@ -178,8 +178,6 @@ class TtlSchedule(pulumi.CustomResource):
                 raise TypeError("Missing required property 'timestamp'")
             __props__.__dict__["timestamp"] = timestamp
             __props__.__dict__["schedule_id"] = None
-        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["timestamp"])
-        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(TtlSchedule, __self__).__init__(
             'pulumiservice:index:TtlSchedule',
             resource_name,

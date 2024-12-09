@@ -195,8 +195,6 @@ class DeploymentSchedule(pulumi.CustomResource):
             __props__.__dict__["stack"] = stack
             __props__.__dict__["timestamp"] = timestamp
             __props__.__dict__["schedule_id"] = None
-        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["timestamp"])
-        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(DeploymentSchedule, __self__).__init__(
             'pulumiservice:index:DeploymentSchedule',
             resource_name,

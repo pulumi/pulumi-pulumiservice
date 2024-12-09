@@ -52,10 +52,6 @@ func NewTtlSchedule(ctx *pulumi.Context,
 	if args.DeleteAfterDestroy == nil {
 		args.DeleteAfterDestroy = pulumi.BoolPtr(false)
 	}
-	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
-		"timestamp",
-	})
-	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource TtlSchedule
 	err := ctx.RegisterResource("pulumiservice:index:TtlSchedule", name, args, &resource, opts...)
