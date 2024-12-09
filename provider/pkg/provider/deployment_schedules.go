@@ -167,6 +167,7 @@ func ScheduleSharedDiffMaps(olds resource.PropertyMap, news resource.PropertyMap
 		"organization": true,
 		"project":      true,
 		"stack":        true,
+		"timestamp":    true,
 	}
 	for k, v := range dd {
 		if _, ok := replaceProperties[k]; ok {

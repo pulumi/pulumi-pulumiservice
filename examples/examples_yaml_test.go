@@ -9,6 +9,7 @@ import (
 	"path"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/pulumi/pulumi/pkg/v3/testing/integration"
@@ -20,6 +21,7 @@ import (
 type Resource struct {
 	Type       string                 `yaml:"type"`
 	Properties map[string]interface{} `yaml:"properties"`
+	Options    map[string]interface{} `yaml:"options"`
 }
 type YamlProgram struct {
 	Name        string              `yaml:"name"`
@@ -248,14 +250,92 @@ func TestYamlWebhookExample(t *testing.T) {
 }
 
 func TestYamlSchedulesExample(t *testing.T) {
-	cwd := getCwd(t)
-	digits := generateRandomFiveDigits()
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Dir:       path.Join(cwd, ".", "yaml-schedules"),
-		StackName: "test-stack-" + digits,
-		Config: map[string]string{
-			"digits": digits,
-		},
+
+	t.Run("Yaml Schedules Example", func(t *testing.T) {
+		cwd := getCwd(t)
+		digits := generateRandomFiveDigits()
+		integration.ProgramTest(t, &integration.ProgramTestOptions{
+			Dir:       path.Join(cwd, ".", "yaml-schedules"),
+			StackName: "test-stack-" + digits,
+			Config: map[string]string{
+				"digits": digits,
+			},
+		})
+	})
+
+	t.Run("Schedules are replaced on timestamp update", func(t *testing.T) {
+		writeScheduleProgram := func(timestamp time.Time) string {
+			return writePulumiYaml(t, YamlProgram{
+				Name:    "yaml-schedule-reschedule",
+				Runtime: "yaml",
+				Resources: map[string]Resource{
+					"settings": {
+						// deployment settings are required to be setup before schedules
+						Type: "pulumiservice:DeploymentSettings",
+						Properties: map[string]any{
+							"organization": ServiceProviderTestOrg,
+							"project":      "${pulumi.project}",
+							"stack":        "${pulumi.stack}",
+						},
+					},
+					"deployment-schedule": {
+						Type: "pulumiservice:DeploymentSchedule",
+						Properties: map[string]any{
+							"organization":    ServiceProviderTestOrg,
+							"project":         "${pulumi.project}",
+							"stack":           "${pulumi.stack}",
+							"timestamp":       timestamp.Format(time.RFC3339),
+							"pulumiOperation": "refresh",
+						},
+						Options: map[string]any{
+							"dependsOn": []string{"${settings}"},
+						},
+					},
+					"ttl-schedule": {
+						Type: "pulumiservice:TtlSchedule",
+						Properties: map[string]any{
+							"organization":       ServiceProviderTestOrg,
+							"project":            "${pulumi.project}",
+							"stack":              "${pulumi.stack}",
+							"timestamp":          timestamp.Format(time.RFC3339),
+							"deleteAfterDestroy": false,
+						},
+						Options: map[string]any{
+							"dependsOn": []string{"${settings}"},
+						},
+					},
+				},
+			})
+		}
+
+		// create some initial one-time schedules
+		initialDir := writeScheduleProgram(time.Now().Add(1 * time.Hour))
+		// and then reschedule them
+		rescheduleDir := writeScheduleProgram(time.Now().Add(2 * time.Hour))
+
+		update := &strings.Builder{}
+		updateOut := io.MultiWriter(os.Stdout, update)
+
+		integration.ProgramTest(t, &integration.ProgramTestOptions{
+			StackName:   "test-stack-" + generateRandomFiveDigits(),
+			Dir:         initialDir,
+			Quick:       true,
+			SkipRefresh: true,
+			EditDirs: []integration.EditDir{
+				{
+					Dir:             rescheduleDir,
+					Additive:        true,
+					Stdout:          updateOut,
+					Stderr:          updateOut,
+					Verbose:         true,
+					ExpectNoChanges: false,
+				},
+			},
+		})
+
+		// expect the update to cause schedule replacements
+		assert.Contains(t, update.String(), "deployment-schedule replaced")
+		assert.Contains(t, update.String(), "ttl-schedule replaced")
 	})
 }
 
