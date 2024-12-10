@@ -1,0 +1,21 @@
+name: yaml-deployment-settings-commit-example
+runtime: yaml
+description: Deployment settings test
+resources:
+  my_settings:
+    type: pulumiservice:DeploymentSettings
+    properties:
+      organization: service-provider-test-org
+      project: yaml-deployment-settings-commit-example
+      stack: test-stack-${digits}
+      operationContext:
+        preRunCommands:
+          - yarn
+          - ls -al
+        environmentVariables:
+          TEST_VAR: "test-value"
+      sourceContext:
+        git:
+          repoUrl: "https://github.com/pulumi/deploy-demos.git"
+          commit: "2e4ecb3c9278fbe1e39a34bbf43e4e6e40f50c18"
+          repoDir: "pulumi-programs/simple-resource"
