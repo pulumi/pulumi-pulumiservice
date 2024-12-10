@@ -368,6 +368,9 @@ func toSourceContext(inputMap resource.PropertyMap) *pulumiapi.SourceContext {
 		if gitInput["branch"].HasValue() {
 			g.Branch = getSecretOrStringValue(gitInput["branch"])
 		}
+		if gitInput["commit"].HasValue() {
+			g.Commit = getSecretOrStringValue(gitInput["commit"])
+		}
 		if gitInput["repoDir"].HasValue() {
 			g.RepoDir = getSecretOrStringValue(gitInput["repoDir"])
 		}

@@ -218,6 +218,40 @@ func TestYamlDeploymentSettingsNoSourceExample(t *testing.T) {
 	})
 }
 
+func TestYamlDeploymentSettingsCommitExample(t *testing.T) {
+
+	// Set up tmpdir with a Pulumi.yml with no resources
+	// mimicking the deletion of resource
+	newProgram := YamlProgram{
+		Name:    "yaml-deployment-settings-commit-example",
+		Runtime: "yaml",
+	}
+
+	tmpdir := writePulumiYaml(t, newProgram)
+
+	cwd, _ := os.Getwd()
+	digits := generateRandomFiveDigits()
+
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Quick:     true,
+		Dir:       path.Join(cwd, ".", "yaml-deployment-settings-commit"),
+		StackName: "test-stack-" + digits,
+		Config: map[string]string{
+			"digits": digits,
+		},
+		EditDirs: []integration.EditDir{
+			{
+				Dir: tmpdir,
+			},
+			// Reapply the same thing again, except this time we expect there to be no changes
+			{
+				Dir:             tmpdir,
+				ExpectNoChanges: true,
+			},
+		},
+	})
+}
+
 func TestYamlTeamAccessTokenExample(t *testing.T) {
 	cwd, _ := os.Getwd()
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
