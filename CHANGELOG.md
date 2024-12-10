@@ -1,5 +1,12 @@
 CHANGELOG
 =========
+
+## 0.27.3
+
+### Bug Fixes
+
+- Ensure the `commit` property on DeploymentSettings is propagated through the provider. [#470](https://github.com/pulumi/pulumi-pulumiservice/pull/470)
+
 ## 0.27.2
 
 ### Bug Fixes
