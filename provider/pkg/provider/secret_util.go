@@ -29,6 +29,33 @@ func getSecretOrStringNullableValue(prop resource.PropertyValue) *string {
 	return &resultString
 }
 
+func getSecretOrBoolValue(prop resource.PropertyValue) bool {
+	switch prop.V.(type) {
+	case *resource.Secret:
+		return prop.SecretValue().Element.BoolValue()
+	default:
+		return prop.BoolValue()
+	}
+}
+
+func getSecretOrArrayValue(prop resource.PropertyValue) []resource.PropertyValue {
+	switch prop.V.(type) {
+	case *resource.Secret:
+		return prop.SecretValue().Element.ArrayValue()
+	default:
+		return prop.ArrayValue()
+	}
+}
+
+func getSecretOrObjectValue(prop resource.PropertyValue) resource.PropertyMap {
+	switch prop.V.(type) {
+	case *resource.Secret:
+		return prop.SecretValue().Element.ObjectValue()
+	default:
+		return prop.ObjectValue()
+	}
+}
+
 // All imported inputs will have a dummy value, asking to be replaced in real code
 // All imported properties are just set to ciphertext read from Pulumi Service
 func importSecretValue(propertyMap resource.PropertyMap, propertyName string, cipherValue pulumiapi.SecretValue, isInput bool) {

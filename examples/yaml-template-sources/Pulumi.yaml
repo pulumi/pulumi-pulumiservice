@@ -6,7 +6,7 @@ resources:
     type: pulumiservice:index:TemplateSource
     properties:
       organizationName: service-provider-test-org
-      sourceName: bootstrap
+      sourceName: bootstrap-${digits}
       sourceURL: "https://github.com/pulumi/pulumi-pulumiservice"
       destination:
         url: "https://github.com/pulumi/pulumi-pulumiservice"
