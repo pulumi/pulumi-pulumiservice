@@ -1,4 +1,4 @@
-name: yaml-deployment-settings-example
+name: yaml-deployment-settings-commit-example
 runtime: yaml
 description: Deployment settings test
 resources:
