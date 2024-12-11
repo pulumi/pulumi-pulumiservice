@@ -578,12 +578,12 @@ func toCacheOptions(inputMap resource.PropertyMap) *pulumiapi.CacheOptions {
 }
 
 func (ds *PulumiServiceDeploymentSettingsResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), StandardUnmarshal)
 	if err != nil {
 		return nil, err
 	}
 
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	news, err := plugin.UnmarshalProperties(req.GetNews(), StandardUnmarshal)
 	if err != nil {
 		return nil, err
 	}
@@ -625,7 +625,7 @@ func (ds *PulumiServiceDeploymentSettingsResource) Diff(req *pulumirpc.DiffReque
 }
 
 func (ds *PulumiServiceDeploymentSettingsResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
+	news, err := plugin.UnmarshalProperties(req.GetNews(), KeepSecretsUnmarshal)
 	if err != nil {
 		return nil, err
 	}
@@ -641,14 +641,14 @@ func (ds *PulumiServiceDeploymentSettingsResource) Check(req *pulumirpc.CheckReq
 	}
 
 	// Normalizing duration input
-	if news["operationContext"].HasValue() && news["operationContext"].IsObject() {
-		operationContext := news["operationContext"].ObjectValue()
-		if operationContext["oidc"].HasValue() && operationContext["oidc"].IsObject() {
-			oidc := operationContext["oidc"].ObjectValue()
-			if oidc["aws"].HasValue() && oidc["aws"].IsObject() {
-				aws := oidc["aws"].ObjectValue()
-				if aws["duration"].HasValue() && aws["duration"].IsString() {
-					durationString := aws["duration"].StringValue()
+	if news["operationContext"].HasValue() {
+		operationContext := getSecretOrObjectValue(news["operationContext"])
+		if operationContext["oidc"].HasValue() {
+			oidc := getSecretOrObjectValue(operationContext["oidc"])
+			if oidc["aws"].HasValue() {
+				aws := getSecretOrObjectValue(oidc["aws"])
+				if aws["duration"].HasValue() {
+					durationString := getSecretOrStringValue(aws["duration"])
 					normalized, err := normalizeDurationString(durationString)
 					if err != nil {
 						failures = append(failures, &pulumirpc.CheckFailure{
@@ -656,14 +656,18 @@ func (ds *PulumiServiceDeploymentSettingsResource) Check(req *pulumirpc.CheckReq
 							Property: string("operationContext.oidc.aws.duration"),
 						})
 					} else {
-						aws["duration"] = resource.NewStringProperty(*normalized)
+						if aws["duration"].IsSecret() {
+							aws["duration"] = resource.MakeSecret(resource.NewStringProperty(*normalized))
+						} else {
+							aws["duration"] = resource.NewStringProperty(*normalized)
+						}
 					}
 				}
 			}
 		}
 	}
 
-	checkedNews, err := plugin.MarshalProperties(news, plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
+	checkedNews, err := plugin.MarshalProperties(news, StandardMarshal)
 	if err != nil {
 		return nil, err
 	}
@@ -697,11 +701,11 @@ func (ds *PulumiServiceDeploymentSettingsResource) Read(req *pulumirpc.ReadReque
 
 	var plaintextSettings *pulumiapi.DeploymentSettings
 	var ciphertextSettings *pulumiapi.DeploymentSettings
-	propertyMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
+	propertyMap, err := plugin.UnmarshalProperties(req.GetProperties(), KeepSecretsUnmarshal)
 	if err != nil {
 		return nil, err
 	}
-	inputMap, err := plugin.UnmarshalProperties(req.GetInputs(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
+	inputMap, err := plugin.UnmarshalProperties(req.GetInputs(), KeepSecretsUnmarshal)
 	if err != nil {
 		return nil, err
 	}
@@ -713,24 +717,14 @@ func (ds *PulumiServiceDeploymentSettingsResource) Read(req *pulumirpc.ReadReque
 	}
 
 	properties, err := plugin.MarshalProperties(
-		dsInput.ToPropertyMap(plaintextSettings, ciphertextSettings, false),
-		plugin.MarshalOptions{
-			KeepUnknowns: true,
-			SkipNulls:    true,
-			KeepSecrets:  true,
-		},
+		dsInput.ToPropertyMap(plaintextSettings, ciphertextSettings, false), StandardMarshal,
 	)
 	if err != nil {
 		return nil, err
 	}
 
 	inputs, err := plugin.MarshalProperties(
-		dsInput.ToPropertyMap(plaintextSettings, ciphertextSettings, true),
-		plugin.MarshalOptions{
-			KeepUnknowns: true,
-			SkipNulls:    true,
-			KeepSecrets:  true,
-		},
+		dsInput.ToPropertyMap(plaintextSettings, ciphertextSettings, true), StandardMarshal,
 	)
 	if err != nil {
 		return nil, err
@@ -759,8 +753,7 @@ func (ds *PulumiServiceDeploymentSettingsResource) Delete(req *pulumirpc.DeleteR
 
 func (ds *PulumiServiceDeploymentSettingsResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	ctx := context.Background()
-	inputsMap, err := plugin.UnmarshalProperties(req.GetProperties(),
-		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
+	inputsMap, err := plugin.UnmarshalProperties(req.GetProperties(), KeepSecretsUnmarshal)
 	if err != nil {
 		return nil, err
 	}
@@ -778,12 +771,7 @@ func (ds *PulumiServiceDeploymentSettingsResource) Create(req *pulumirpc.CreateR
 	}
 
 	outputProperties, err := plugin.MarshalProperties(
-		responseInput.ToPropertyMap(&input.DeploymentSettings, nil, false),
-		plugin.MarshalOptions{
-			KeepUnknowns: true,
-			SkipNulls:    true,
-			KeepSecrets:  true,
-		},
+		responseInput.ToPropertyMap(&input.DeploymentSettings, nil, false), StandardMarshal,
 	)
 	if err != nil {
 		return nil, err
@@ -797,8 +785,7 @@ func (ds *PulumiServiceDeploymentSettingsResource) Create(req *pulumirpc.CreateR
 
 func (ds *PulumiServiceDeploymentSettingsResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
 	ctx := context.Background()
-	inputsMap, err := plugin.UnmarshalProperties(req.GetNews(),
-		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
+	inputsMap, err := plugin.UnmarshalProperties(req.GetNews(), KeepSecretsUnmarshal)
 	if err != nil {
 		return nil, err
 	}
@@ -816,12 +803,7 @@ func (ds *PulumiServiceDeploymentSettingsResource) Update(req *pulumirpc.UpdateR
 	}
 
 	outputProperties, err := plugin.MarshalProperties(
-		responseInput.ToPropertyMap(&input.DeploymentSettings, nil, false),
-		plugin.MarshalOptions{
-			KeepUnknowns: true,
-			SkipNulls:    true,
-			KeepSecrets:  true,
-		},
+		responseInput.ToPropertyMap(&input.DeploymentSettings, nil, false), StandardMarshal,
 	)
 	if err != nil {
 		return nil, err
