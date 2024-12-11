@@ -119,8 +119,12 @@ func TestNodejsEnvironmentsExample(t *testing.T) {
 
 func TestNodejsTemplateSourcesExample(t *testing.T) {
 	cwd := getCwd(t)
+	digits := generateRandomFiveDigits()
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		Dir: path.Join(cwd, ".", "ts-template-source"),
+		Config: map[string]string{
+			"digits": digits,
+		},
 		Dependencies: []string{
 			"@pulumi/pulumiservice",
 		},

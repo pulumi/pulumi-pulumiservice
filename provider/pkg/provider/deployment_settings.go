@@ -285,8 +285,8 @@ func (ds *PulumiServiceDeploymentSettingsResource) ToPulumiServiceDeploymentSett
 	input.Stack.ProjectName = getSecretOrStringValue(inputMap["project"])
 	input.Stack.StackName = getSecretOrStringValue(inputMap["stack"])
 
-	if inputMap["agentPoolId"].HasValue() && inputMap["agentPoolId"].IsString() {
-		input.AgentPoolId = inputMap["agentPoolId"].StringValue()
+	if inputMap["agentPoolId"].HasValue() {
+		input.AgentPoolId = getSecretOrStringValue(inputMap["agentPoolId"])
 	}
 
 	input.ExecutorContext = toExecutorContext(inputMap)
@@ -299,11 +299,11 @@ func (ds *PulumiServiceDeploymentSettingsResource) ToPulumiServiceDeploymentSett
 }
 
 func toExecutorContext(inputMap resource.PropertyMap) *apitype.ExecutorContext {
-	if !inputMap["executorContext"].HasValue() || !inputMap["executorContext"].IsObject() {
+	if !inputMap["executorContext"].HasValue() {
 		return nil
 	}
 
-	ecInput := inputMap["executorContext"].ObjectValue()
+	ecInput := getSecretOrObjectValue(inputMap["executorContext"])
 	var ec apitype.ExecutorContext
 
 	if ecInput["executorImage"].HasValue() {
@@ -316,28 +316,28 @@ func toExecutorContext(inputMap resource.PropertyMap) *apitype.ExecutorContext {
 }
 
 func toGitHubConfig(inputMap resource.PropertyMap) *pulumiapi.GitHubConfiguration {
-	if !inputMap["github"].HasValue() || !inputMap["github"].IsObject() {
+	if !inputMap["github"].HasValue() {
 		return nil
 	}
 
-	githubInput := inputMap["github"].ObjectValue()
+	githubInput := getSecretOrObjectValue(inputMap["github"])
 	var github pulumiapi.GitHubConfiguration
 
 	if githubInput["repository"].HasValue() {
 		github.Repository = getSecretOrStringValue(githubInput["repository"])
 	}
 
-	if githubInput["deployCommits"].HasValue() && githubInput["deployCommits"].IsBool() {
-		github.DeployCommits = githubInput["deployCommits"].BoolValue()
+	if githubInput["deployCommits"].HasValue() {
+		github.DeployCommits = getSecretOrBoolValue(githubInput["deployCommits"])
 	}
-	if githubInput["previewPullRequests"].HasValue() && githubInput["previewPullRequests"].IsBool() {
-		github.PreviewPullRequests = githubInput["previewPullRequests"].BoolValue()
+	if githubInput["previewPullRequests"].HasValue() {
+		github.PreviewPullRequests = getSecretOrBoolValue(githubInput["previewPullRequests"])
 	}
-	if githubInput["pullRequestTemplate"].HasValue() && githubInput["pullRequestTemplate"].IsBool() {
-		github.PullRequestTemplate = githubInput["pullRequestTemplate"].BoolValue()
+	if githubInput["pullRequestTemplate"].HasValue() {
+		github.PullRequestTemplate = getSecretOrBoolValue(githubInput["pullRequestTemplate"])
 	}
-	if githubInput["paths"].HasValue() && githubInput["paths"].IsArray() {
-		pathsInput := githubInput["paths"].ArrayValue()
+	if githubInput["paths"].HasValue() {
+		pathsInput := getSecretOrArrayValue(githubInput["paths"])
 		paths := make([]string, len(pathsInput))
 
 		for i, v := range pathsInput {
@@ -351,15 +351,15 @@ func toGitHubConfig(inputMap resource.PropertyMap) *pulumiapi.GitHubConfiguratio
 }
 
 func toSourceContext(inputMap resource.PropertyMap) *pulumiapi.SourceContext {
-	if !inputMap["sourceContext"].HasValue() || !inputMap["sourceContext"].IsObject() {
+	if !inputMap["sourceContext"].HasValue() {
 		return nil
 	}
 
-	scInput := inputMap["sourceContext"].ObjectValue()
+	scInput := getSecretOrObjectValue(inputMap["sourceContext"])
 	var sc pulumiapi.SourceContext
 
-	if scInput["git"].HasValue() && scInput["git"].IsObject() {
-		gitInput := scInput["git"].ObjectValue()
+	if scInput["git"].HasValue() {
+		gitInput := getSecretOrObjectValue(scInput["git"])
 		var g pulumiapi.SourceContextGit
 
 		if gitInput["repoUrl"].HasValue() {
@@ -375,12 +375,12 @@ func toSourceContext(inputMap resource.PropertyMap) *pulumiapi.SourceContext {
 			g.RepoDir = getSecretOrStringValue(gitInput["repoDir"])
 		}
 
-		if gitInput["gitAuth"].HasValue() && gitInput["gitAuth"].IsObject() {
-			authInput := gitInput["gitAuth"].ObjectValue()
+		if gitInput["gitAuth"].HasValue() {
+			authInput := getSecretOrObjectValue(gitInput["gitAuth"])
 			var a pulumiapi.GitAuthConfig
 
-			if authInput["sshAuth"].HasValue() && authInput["sshAuth"].IsObject() {
-				sshInput := authInput["sshAuth"].ObjectValue()
+			if authInput["sshAuth"].HasValue() {
+				sshInput := getSecretOrObjectValue(authInput["sshAuth"])
 				var s pulumiapi.SSHAuth
 
 				if sshInput["sshPrivateKey"].HasValue() || sshInput["sshPrivateKeyCipher"].HasValue() {
@@ -399,8 +399,8 @@ func toSourceContext(inputMap resource.PropertyMap) *pulumiapi.SourceContext {
 				a.SSHAuth = &s
 			}
 
-			if authInput["basicAuth"].HasValue() && authInput["basicAuth"].IsObject() {
-				basicInput := authInput["basicAuth"].ObjectValue()
+			if authInput["basicAuth"].HasValue() {
+				basicInput := getSecretOrObjectValue(authInput["basicAuth"])
 				var b pulumiapi.BasicAuth
 
 				if basicInput["username"].HasValue() {
@@ -429,16 +429,16 @@ func toSourceContext(inputMap resource.PropertyMap) *pulumiapi.SourceContext {
 }
 
 func toOperationContext(inputMap resource.PropertyMap) *pulumiapi.OperationContext {
-	if !inputMap["operationContext"].HasValue() || !inputMap["operationContext"].IsObject() {
+	if !inputMap["operationContext"].HasValue() {
 		return nil
 	}
 
-	ocInput := inputMap["operationContext"].ObjectValue()
+	ocInput := getSecretOrObjectValue(inputMap["operationContext"])
 	var oc pulumiapi.OperationContext
 
-	if ocInput["environmentVariables"].HasValue() && ocInput["environmentVariables"].IsObject() {
+	if ocInput["environmentVariables"].HasValue() {
 		ev := map[string]pulumiapi.SecretValue{}
-		evInput := ocInput["environmentVariables"].ObjectValue()
+		evInput := getSecretOrObjectValue(ocInput["environmentVariables"])
 
 		for k, v := range evInput {
 			value := getSecretOrStringValue(v)
@@ -448,48 +448,46 @@ func toOperationContext(inputMap resource.PropertyMap) *pulumiapi.OperationConte
 		oc.EnvironmentVariables = ev
 	}
 
-	if ocInput["preRunCommands"].HasValue() && ocInput["preRunCommands"].IsArray() {
-		pcInput := ocInput["preRunCommands"].ArrayValue()
+	if ocInput["preRunCommands"].HasValue() {
+		pcInput := getSecretOrArrayValue(ocInput["preRunCommands"])
 		pc := make([]string, len(pcInput))
 
 		for i, v := range pcInput {
-			if v.IsString() {
-				pc[i] = v.StringValue()
-			}
+			pc[i] = getSecretOrStringValue(v)
 		}
 
 		oc.PreRunCommands = pc
 	}
 
-	if ocInput["options"].HasValue() && ocInput["options"].IsObject() {
-		oInput := ocInput["options"].ObjectValue()
+	if ocInput["options"].HasValue() {
+		oInput := getSecretOrObjectValue(ocInput["options"])
 		var o pulumiapi.OperationContextOptions
 
-		if oInput["skipInstallDependencies"].HasValue() && oInput["skipInstallDependencies"].IsBool() {
-			o.SkipInstallDependencies = oInput["skipInstallDependencies"].BoolValue()
+		if oInput["skipInstallDependencies"].HasValue() {
+			o.SkipInstallDependencies = getSecretOrBoolValue(oInput["skipInstallDependencies"])
 		}
 
-		if oInput["skipIntermediateDeployments"].HasValue() && oInput["skipIntermediateDeployments"].IsBool() {
-			o.SkipIntermediateDeployments = oInput["skipIntermediateDeployments"].BoolValue()
+		if oInput["skipIntermediateDeployments"].HasValue() {
+			o.SkipIntermediateDeployments = getSecretOrBoolValue(oInput["skipIntermediateDeployments"])
 		}
 
-		if oInput["Shell"].HasValue() && oInput["Shell"].IsString() {
-			o.Shell = oInput["Shell"].StringValue()
+		if oInput["Shell"].HasValue() {
+			o.Shell = getSecretOrStringValue(oInput["Shell"])
 		}
 
-		if oInput["deleteAfterDestroy"].HasValue() && oInput["deleteAfterDestroy"].IsBool() {
-			o.DeleteAfterDestroy = oInput["deleteAfterDestroy"].BoolValue()
+		if oInput["deleteAfterDestroy"].HasValue() {
+			o.DeleteAfterDestroy = getSecretOrBoolValue(oInput["deleteAfterDestroy"])
 		}
 
 		oc.Options = &o
 	}
 
-	if ocInput["oidc"].HasValue() && ocInput["oidc"].IsObject() {
-		oidcInput := ocInput["oidc"].ObjectValue()
+	if ocInput["oidc"].HasValue() {
+		oidcInput := getSecretOrObjectValue(ocInput["oidc"])
 		var oidc pulumiapi.OIDCConfiguration
 
-		if oidcInput["aws"].HasValue() && oidcInput["aws"].IsObject() {
-			awsInput := oidcInput["aws"].ObjectValue()
+		if oidcInput["aws"].HasValue() {
+			awsInput := getSecretOrObjectValue(oidcInput["aws"])
 			var aws pulumiapi.AWSOIDCConfiguration
 
 			if awsInput["roleARN"].HasValue() {
@@ -501,8 +499,8 @@ func toOperationContext(inputMap resource.PropertyMap) *pulumiapi.OperationConte
 			if awsInput["sessionName"].HasValue() {
 				aws.SessionName = getSecretOrStringValue(awsInput["sessionName"])
 			}
-			if awsInput["policyARNs"].HasValue() && awsInput["policyARNs"].IsArray() {
-				policyARNsInput := awsInput["policyARNs"].ArrayValue()
+			if awsInput["policyARNs"].HasValue() {
+				policyARNsInput := getSecretOrArrayValue(awsInput["policyARNs"])
 				policyARNs := make([]string, len(policyARNsInput))
 
 				for i, v := range policyARNsInput {
@@ -515,8 +513,8 @@ func toOperationContext(inputMap resource.PropertyMap) *pulumiapi.OperationConte
 			oidc.AWS = &aws
 		}
 
-		if oidcInput["gcp"].HasValue() && oidcInput["gcp"].IsObject() {
-			gcpInput := oidcInput["gcp"].ObjectValue()
+		if oidcInput["gcp"].HasValue() {
+			gcpInput := getSecretOrObjectValue(oidcInput["gcp"])
 			var gcp pulumiapi.GCPOIDCConfiguration
 
 			if gcpInput["projectId"].HasValue() {
@@ -541,8 +539,8 @@ func toOperationContext(inputMap resource.PropertyMap) *pulumiapi.OperationConte
 			oidc.GCP = &gcp
 		}
 
-		if oidcInput["azure"].HasValue() && oidcInput["azure"].IsObject() {
-			azureInput := oidcInput["azure"].ObjectValue()
+		if oidcInput["azure"].HasValue() {
+			azureInput := getSecretOrObjectValue(oidcInput["azure"])
 			var azure pulumiapi.AzureOIDCConfiguration
 
 			if azureInput["tenantId"].HasValue() {
@@ -565,27 +563,27 @@ func toOperationContext(inputMap resource.PropertyMap) *pulumiapi.OperationConte
 }
 
 func toCacheOptions(inputMap resource.PropertyMap) *pulumiapi.CacheOptions {
-	if !inputMap["cacheOptions"].HasValue() || !inputMap["cacheOptions"].IsObject() {
+	if !inputMap["cacheOptions"].HasValue() {
 		return nil
 	}
 
-	coInput := inputMap["cacheOptions"].ObjectValue()
+	coInput := getSecretOrObjectValue(inputMap["cacheOptions"])
 	var co pulumiapi.CacheOptions
 
-	if coInput["enable"].HasValue() && coInput["enable"].IsBool() {
-		co.Enable = coInput["enable"].BoolValue()
+	if coInput["enable"].HasValue() {
+		co.Enable = getSecretOrBoolValue(coInput["enable"])
 	}
 
 	return &co
 }
 
 func (ds *PulumiServiceDeploymentSettingsResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), StandardUnmarshal)
 	if err != nil {
 		return nil, err
 	}
 
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	news, err := plugin.UnmarshalProperties(req.GetNews(), StandardUnmarshal)
 	if err != nil {
 		return nil, err
 	}
@@ -627,7 +625,7 @@ func (ds *PulumiServiceDeploymentSettingsResource) Diff(req *pulumirpc.DiffReque
 }
 
 func (ds *PulumiServiceDeploymentSettingsResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
+	news, err := plugin.UnmarshalProperties(req.GetNews(), KeepSecretsUnmarshal)
 	if err != nil {
 		return nil, err
 	}
@@ -643,14 +641,14 @@ func (ds *PulumiServiceDeploymentSettingsResource) Check(req *pulumirpc.CheckReq
 	}
 
 	// Normalizing duration input
-	if news["operationContext"].HasValue() && news["operationContext"].IsObject() {
-		operationContext := news["operationContext"].ObjectValue()
-		if operationContext["oidc"].HasValue() && operationContext["oidc"].IsObject() {
-			oidc := operationContext["oidc"].ObjectValue()
-			if oidc["aws"].HasValue() && oidc["aws"].IsObject() {
-				aws := oidc["aws"].ObjectValue()
-				if aws["duration"].HasValue() && aws["duration"].IsString() {
-					durationString := aws["duration"].StringValue()
+	if news["operationContext"].HasValue() {
+		operationContext := getSecretOrObjectValue(news["operationContext"])
+		if operationContext["oidc"].HasValue() {
+			oidc := getSecretOrObjectValue(operationContext["oidc"])
+			if oidc["aws"].HasValue() {
+				aws := getSecretOrObjectValue(oidc["aws"])
+				if aws["duration"].HasValue() {
+					durationString := getSecretOrStringValue(aws["duration"])
 					normalized, err := normalizeDurationString(durationString)
 					if err != nil {
 						failures = append(failures, &pulumirpc.CheckFailure{
@@ -658,14 +656,18 @@ func (ds *PulumiServiceDeploymentSettingsResource) Check(req *pulumirpc.CheckReq
 							Property: string("operationContext.oidc.aws.duration"),
 						})
 					} else {
-						aws["duration"] = resource.NewStringProperty(*normalized)
+						if aws["duration"].IsSecret() {
+							aws["duration"] = resource.MakeSecret(resource.NewStringProperty(*normalized))
+						} else {
+							aws["duration"] = resource.NewStringProperty(*normalized)
+						}
 					}
 				}
 			}
 		}
 	}
 
-	checkedNews, err := plugin.MarshalProperties(news, plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
+	checkedNews, err := plugin.MarshalProperties(news, StandardMarshal)
 	if err != nil {
 		return nil, err
 	}
@@ -699,11 +701,11 @@ func (ds *PulumiServiceDeploymentSettingsResource) Read(req *pulumirpc.ReadReque
 
 	var plaintextSettings *pulumiapi.DeploymentSettings
 	var ciphertextSettings *pulumiapi.DeploymentSettings
-	propertyMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
+	propertyMap, err := plugin.UnmarshalProperties(req.GetProperties(), KeepSecretsUnmarshal)
 	if err != nil {
 		return nil, err
 	}
-	inputMap, err := plugin.UnmarshalProperties(req.GetInputs(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
+	inputMap, err := plugin.UnmarshalProperties(req.GetInputs(), KeepSecretsUnmarshal)
 	if err != nil {
 		return nil, err
 	}
@@ -715,24 +717,14 @@ func (ds *PulumiServiceDeploymentSettingsResource) Read(req *pulumirpc.ReadReque
 	}
 
 	properties, err := plugin.MarshalProperties(
-		dsInput.ToPropertyMap(plaintextSettings, ciphertextSettings, false),
-		plugin.MarshalOptions{
-			KeepUnknowns: true,
-			SkipNulls:    true,
-			KeepSecrets:  true,
-		},
+		dsInput.ToPropertyMap(plaintextSettings, ciphertextSettings, false), StandardMarshal,
 	)
 	if err != nil {
 		return nil, err
 	}
 
 	inputs, err := plugin.MarshalProperties(
-		dsInput.ToPropertyMap(plaintextSettings, ciphertextSettings, true),
-		plugin.MarshalOptions{
-			KeepUnknowns: true,
-			SkipNulls:    true,
-			KeepSecrets:  true,
-		},
+		dsInput.ToPropertyMap(plaintextSettings, ciphertextSettings, true), StandardMarshal,
 	)
 	if err != nil {
 		return nil, err
@@ -761,8 +753,7 @@ func (ds *PulumiServiceDeploymentSettingsResource) Delete(req *pulumirpc.DeleteR
 
 func (ds *PulumiServiceDeploymentSettingsResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	ctx := context.Background()
-	inputsMap, err := plugin.UnmarshalProperties(req.GetProperties(),
-		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
+	inputsMap, err := plugin.UnmarshalProperties(req.GetProperties(), KeepSecretsUnmarshal)
 	if err != nil {
 		return nil, err
 	}
@@ -780,12 +771,7 @@ func (ds *PulumiServiceDeploymentSettingsResource) Create(req *pulumirpc.CreateR
 	}
 
 	outputProperties, err := plugin.MarshalProperties(
-		responseInput.ToPropertyMap(&input.DeploymentSettings, nil, false),
-		plugin.MarshalOptions{
-			KeepUnknowns: true,
-			SkipNulls:    true,
-			KeepSecrets:  true,
-		},
+		responseInput.ToPropertyMap(&input.DeploymentSettings, nil, false), StandardMarshal,
 	)
 	if err != nil {
 		return nil, err
@@ -799,8 +785,7 @@ func (ds *PulumiServiceDeploymentSettingsResource) Create(req *pulumirpc.CreateR
 
 func (ds *PulumiServiceDeploymentSettingsResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
 	ctx := context.Background()
-	inputsMap, err := plugin.UnmarshalProperties(req.GetNews(),
-		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
+	inputsMap, err := plugin.UnmarshalProperties(req.GetNews(), KeepSecretsUnmarshal)
 	if err != nil {
 		return nil, err
 	}
@@ -818,12 +803,7 @@ func (ds *PulumiServiceDeploymentSettingsResource) Update(req *pulumirpc.UpdateR
 	}
 
 	outputProperties, err := plugin.MarshalProperties(
-		responseInput.ToPropertyMap(&input.DeploymentSettings, nil, false),
-		plugin.MarshalOptions{
-			KeepUnknowns: true,
-			SkipNulls:    true,
-			KeepSecrets:  true,
-		},
+		responseInput.ToPropertyMap(&input.DeploymentSettings, nil, false), StandardMarshal,
 	)
 	if err != nil {
 		return nil, err
