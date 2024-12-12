@@ -3,7 +3,25 @@ package provider
 import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/pulumiapi"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 )
+
+var StandardUnmarshal plugin.MarshalOptions = plugin.MarshalOptions{
+	KeepUnknowns: false,
+	SkipNulls:    true,
+	KeepSecrets:  false,
+}
+
+var StandardMarshal plugin.MarshalOptions = plugin.MarshalOptions{
+	KeepUnknowns: false,
+	SkipNulls:    true,
+	KeepSecrets:  true,
+}
+
+// These options should be used when we need to know whether a field was a secret or not.
+// These should also be always used in Check() method, otherwise secrets leak on preview
+// If you do use it, make sure all the methods use getSecretOrBlankValue() methods found below
+var KeepSecretsUnmarshal plugin.MarshalOptions = StandardMarshal
 
 func getSecretOrStringValue(prop resource.PropertyValue) string {
 	switch prop.V.(type) {
@@ -27,6 +45,33 @@ func getSecretOrStringNullableValue(prop resource.PropertyValue) *string {
 		resultString = prop.StringValue()
 	}
 	return &resultString
+}
+
+func getSecretOrBoolValue(prop resource.PropertyValue) bool {
+	switch prop.V.(type) {
+	case *resource.Secret:
+		return prop.SecretValue().Element.BoolValue()
+	default:
+		return prop.BoolValue()
+	}
+}
+
+func getSecretOrArrayValue(prop resource.PropertyValue) []resource.PropertyValue {
+	switch prop.V.(type) {
+	case *resource.Secret:
+		return prop.SecretValue().Element.ArrayValue()
+	default:
+		return prop.ArrayValue()
+	}
+}
+
+func getSecretOrObjectValue(prop resource.PropertyValue) resource.PropertyMap {
+	switch prop.V.(type) {
+	case *resource.Secret:
+		return prop.SecretValue().Element.ObjectValue()
+	default:
+		return prop.ObjectValue()
+	}
 }
 
 // All imported inputs will have a dummy value, asking to be replaced in real code

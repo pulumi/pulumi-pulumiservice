@@ -25,3 +25,5 @@ ci-scripts
 .mono
 /go/
 *.sln
+.config/
+.gradle/
