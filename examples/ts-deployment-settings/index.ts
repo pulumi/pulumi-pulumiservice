@@ -63,6 +63,6 @@ const settings = new service.DeploymentSettings("deployment_settings", {
         }
     },
     cacheOptions: {
-        enable: true,
+        enable: pulumi.secret(true),
     }
 });
