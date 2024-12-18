@@ -7,6 +7,6 @@ resources:
     properties:
       organizationName: service-provider-test-org
       sourceName: bootstrap-${digits}
-      sourceURL: "https://github.com/pulumi/pulumi-pulumiservice"
+      sourceURL: "https://github.com/pulumi/pulumi"
       destination:
-        url: "https://github.com/pulumi/pulumi-pulumiservice"
+        url: "https://github.com/pulumi/pulumi"
