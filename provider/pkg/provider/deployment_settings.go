@@ -356,10 +356,12 @@ func toSourceContext(inputMap resource.PropertyMap) *pulumiapi.SourceContext {
 	}
 
 	scInput := getSecretOrObjectValue(inputMap["sourceContext"])
+	cascadeSecret := inputMap["sourceContext"].IsSecret()
 	var sc pulumiapi.SourceContext
 
 	if scInput["git"].HasValue() {
 		gitInput := getSecretOrObjectValue(scInput["git"])
+		cascadeSecret = cascadeSecret || scInput["git"].IsSecret()
 		var g pulumiapi.SourceContextGit
 
 		if gitInput["repoUrl"].HasValue() {
@@ -377,6 +379,7 @@ func toSourceContext(inputMap resource.PropertyMap) *pulumiapi.SourceContext {
 
 		if gitInput["gitAuth"].HasValue() {
 			authInput := getSecretOrObjectValue(gitInput["gitAuth"])
+			cascadeSecret = cascadeSecret || gitInput["gitAuth"].IsSecret()
 			var a pulumiapi.GitAuthConfig
 
 			if authInput["sshAuth"].HasValue() {
@@ -401,12 +404,13 @@ func toSourceContext(inputMap resource.PropertyMap) *pulumiapi.SourceContext {
 
 			if authInput["basicAuth"].HasValue() {
 				basicInput := getSecretOrObjectValue(authInput["basicAuth"])
+				cascadeSecret = cascadeSecret || authInput["basicAuth"].IsSecret()
 				var b pulumiapi.BasicAuth
 
 				if basicInput["username"].HasValue() {
 					b.UserName = pulumiapi.SecretValue{
 						Value:  getSecretOrStringValue(basicInput["username"]),
-						Secret: false,
+						Secret: cascadeSecret || basicInput["username"].IsSecret(),
 					}
 				}
 				if basicInput["password"].HasValue() || basicInput["passwordCipher"].HasValue() {
@@ -434,15 +438,17 @@ func toOperationContext(inputMap resource.PropertyMap) *pulumiapi.OperationConte
 	}
 
 	ocInput := getSecretOrObjectValue(inputMap["operationContext"])
+	cascadeSecret := inputMap["operationContext"].IsSecret()
 	var oc pulumiapi.OperationContext
 
 	if ocInput["environmentVariables"].HasValue() {
 		ev := map[string]pulumiapi.SecretValue{}
 		evInput := getSecretOrObjectValue(ocInput["environmentVariables"])
+		cascadeSecret = cascadeSecret || ocInput["environmentVariables"].IsSecret()
 
 		for k, v := range evInput {
 			value := getSecretOrStringValue(v)
-			ev[string(k)] = pulumiapi.SecretValue{Secret: v.IsSecret(), Value: value}
+			ev[string(k)] = pulumiapi.SecretValue{Secret: v.IsSecret() || cascadeSecret, Value: value}
 		}
 
 		oc.EnvironmentVariables = ev
