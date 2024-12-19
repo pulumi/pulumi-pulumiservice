@@ -44,7 +44,7 @@ You should also test changes manually using a Pulumi program that uses the updat
 
 For contributors we use the [standard fork based workflow](https://gist.github.com/Chaser324/ce0505fbed06b947d962): Fork this repository, create a topic branch, and when ready, open a pull request from your fork.
 
-We require a changelog entry for pretty much all PRs. Add a line in `CHANGELOG_PENDING.md` describing your change and link to an issue. See `CHANGELOG.md` for examples. In rare cases where your PR is a minor change, like formatting or a typo fix, apply `impact/no-changelog-required` label to your PR instead.
+We require a changelog entry for pretty much all PRs. Add a line in `CHANGELOG.md` describing your change and link to an issue. In rare cases where your PR is a minor change, like formatting or a typo fix, apply `impact/no-changelog-required` label to your PR instead.
 
 ### Pulumi employees
 
@@ -56,24 +56,18 @@ Please ensure that you nest your branches under a unique identifier such as your
 
 This section is for Pulumi employees only. 
 
-To release a new version of the provider, follow the procedure below:
-1. Create a release
-   - Run below commands, replacing `X.XX.XX` with your new version. This will use your codefreeze commit as source for the new release. 
-        ```
-        git checkout main
-        git pull
-        git tag sdk/vX.XX.XX
-        git tag vX.XX.XX
-        git push origin vX.XX.XX
-        git push origin sdk/vX.XX.XX
-        ```
-    - Github Actions will automatically build, test and then publish the new release to all the various package managers
-    - Once that is done, you will see your version in [Releases](https://github.com/pulumi/pulumi-pulumiservice/releases)
-    - The version will have a description from `CHANGELOG_PENDING.md`
-1. Codefreeze
-   - Move all the items from `CHANGELOG_PENDING.md` to `CHANGELOG.md`, under a new version that you are releasing
-   - Make a PR like [this example](https://github.com/pulumi/pulumi-pulumiservice/pull/255)
-   - Get an approval and merge it in
+To release a new version of the provider, follow steps below:
+- Run release commands, replacing `X.XX.XX` with your new version.
+     ```
+     git checkout main
+     git pull
+     git tag sdk/vX.XX.XX
+     git tag vX.XX.XX
+     git push origin vX.XX.XX
+     git push origin sdk/vX.XX.XX
+     ```
+- Github Actions will automatically build, test and then publish the new release to all the various package managers
+- Once that is done, you will see your version in [Releases](https://github.com/pulumi/pulumi-pulumiservice/releases)
 
 ## Getting Help
 
