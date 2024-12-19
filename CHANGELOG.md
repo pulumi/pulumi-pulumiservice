@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+## 0.27.4
+
+### Improvements
+
+- Added secret support for all fields in DeploymentSettings [#467](https://github.com/pulumi/pulumi-pulumiservice/pull/467)
+- Added cascading secrets to Deployment settings [#475](https://github.com/pulumi/pulumi-pulumiservice/pull/475)
+
 ## 0.27.3
 
 ### Bug Fixes
