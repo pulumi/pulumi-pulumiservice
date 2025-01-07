@@ -8,6 +8,116 @@ using Pulumi;
 namespace Pulumi.PulumiService
 {
     [EnumType]
+    public readonly struct AuthPolicyDecision : IEquatable<AuthPolicyDecision>
+    {
+        private readonly string _value;
+
+        private AuthPolicyDecision(string value)
+        {
+            _value = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        /// <summary>
+        /// A deny rule for Oidc Issuer Policy.
+        /// </summary>
+        public static AuthPolicyDecision Deny { get; } = new AuthPolicyDecision("deny");
+        /// <summary>
+        /// An allow rule for Oidc Issuer Policy.
+        /// </summary>
+        public static AuthPolicyDecision Allow { get; } = new AuthPolicyDecision("allow");
+
+        public static bool operator ==(AuthPolicyDecision left, AuthPolicyDecision right) => left.Equals(right);
+        public static bool operator !=(AuthPolicyDecision left, AuthPolicyDecision right) => !left.Equals(right);
+
+        public static explicit operator string(AuthPolicyDecision value) => value._value;
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override bool Equals(object? obj) => obj is AuthPolicyDecision other && Equals(other);
+        public bool Equals(AuthPolicyDecision other) => string.Equals(_value, other._value, StringComparison.Ordinal);
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+
+        public override string ToString() => _value;
+    }
+
+    [EnumType]
+    public readonly struct AuthPolicyPermissionLevel : IEquatable<AuthPolicyPermissionLevel>
+    {
+        private readonly string _value;
+
+        private AuthPolicyPermissionLevel(string value)
+        {
+            _value = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        /// <summary>
+        /// Standard level of permissions.
+        /// </summary>
+        public static AuthPolicyPermissionLevel Standard { get; } = new AuthPolicyPermissionLevel("standard");
+        /// <summary>
+        /// Admin level of permissions.
+        /// </summary>
+        public static AuthPolicyPermissionLevel Admin { get; } = new AuthPolicyPermissionLevel("admin");
+
+        public static bool operator ==(AuthPolicyPermissionLevel left, AuthPolicyPermissionLevel right) => left.Equals(right);
+        public static bool operator !=(AuthPolicyPermissionLevel left, AuthPolicyPermissionLevel right) => !left.Equals(right);
+
+        public static explicit operator string(AuthPolicyPermissionLevel value) => value._value;
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override bool Equals(object? obj) => obj is AuthPolicyPermissionLevel other && Equals(other);
+        public bool Equals(AuthPolicyPermissionLevel other) => string.Equals(_value, other._value, StringComparison.Ordinal);
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+
+        public override string ToString() => _value;
+    }
+
+    [EnumType]
+    public readonly struct AuthPolicyTokenType : IEquatable<AuthPolicyTokenType>
+    {
+        private readonly string _value;
+
+        private AuthPolicyTokenType(string value)
+        {
+            _value = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        /// <summary>
+        /// Personal Pulumi token. Requires userLogin field to be filled.
+        /// </summary>
+        public static AuthPolicyTokenType Personal { get; } = new AuthPolicyTokenType("personal");
+        /// <summary>
+        /// Team Pulumi token. Requires teamName field to be filled.
+        /// </summary>
+        public static AuthPolicyTokenType Team { get; } = new AuthPolicyTokenType("team");
+        /// <summary>
+        /// Organization Pulumi token. Requires authorizedPermissions field to be filled.
+        /// </summary>
+        public static AuthPolicyTokenType Organization { get; } = new AuthPolicyTokenType("organization");
+        /// <summary>
+        /// Deployment Runner Pulumi token. Requires runnerID field to be filled.
+        /// </summary>
+        public static AuthPolicyTokenType Runner { get; } = new AuthPolicyTokenType("runner");
+
+        public static bool operator ==(AuthPolicyTokenType left, AuthPolicyTokenType right) => left.Equals(right);
+        public static bool operator !=(AuthPolicyTokenType left, AuthPolicyTokenType right) => !left.Equals(right);
+
+        public static explicit operator string(AuthPolicyTokenType value) => value._value;
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override bool Equals(object? obj) => obj is AuthPolicyTokenType other && Equals(other);
+        public bool Equals(AuthPolicyTokenType other) => string.Equals(_value, other._value, StringComparison.Ordinal);
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+
+        public override string ToString() => _value;
+    }
+
+    [EnumType]
     public readonly struct EnvironmentPermission : IEquatable<EnvironmentPermission>
     {
         private readonly string _value;

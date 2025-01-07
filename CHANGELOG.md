@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+## 0.28.0 (WIP)
+
+### Improvements
+- Added OIDC Issuer resource [#349](https://github.com/pulumi/pulumi-pulumiservice/issues/349)
+
 ## 0.27.4
 
 ### Improvements

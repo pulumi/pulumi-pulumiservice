@@ -18,6 +18,8 @@ from ._enums import *
 __all__ = [
     'AWSOIDCConfigurationArgs',
     'AWSOIDCConfigurationArgsDict',
+    'AuthPolicyDefinitionArgs',
+    'AuthPolicyDefinitionArgsDict',
     'AzureOIDCConfigurationArgs',
     'AzureOIDCConfigurationArgsDict',
     'DeploymentSettingsCacheOptionsArgs',
@@ -138,6 +140,155 @@ class AWSOIDCConfigurationArgs:
     @policy_arns.setter
     def policy_arns(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]]):
         pulumi.set(self, "policy_arns", value)
+
+
+if not MYPY:
+    class AuthPolicyDefinitionArgsDict(TypedDict):
+        decision: pulumi.Input['AuthPolicyDecision']
+        """
+        The rule type of this policy definition
+        """
+        rules: pulumi.Input[Mapping[str, pulumi.Input[str]]]
+        """
+        OIDC rules to set for this policy.
+        """
+        token_type: pulumi.Input['AuthPolicyTokenType']
+        """
+        The token type for this policy definition
+        """
+        authorized_permissions: NotRequired[pulumi.Input[Sequence[pulumi.Input['AuthPolicyPermissionLevel']]]]
+        """
+        The permission level for organization tokens.
+        """
+        runner_id: NotRequired[pulumi.Input[str]]
+        """
+        The runner ID for deployment runner tokens.
+        """
+        team_name: NotRequired[pulumi.Input[str]]
+        """
+        The team name for team tokens.
+        """
+        user_login: NotRequired[pulumi.Input[str]]
+        """
+        The user login for personal tokens.
+        """
+elif False:
+    AuthPolicyDefinitionArgsDict: TypeAlias = Mapping[str, Any]
+
+@pulumi.input_type
+class AuthPolicyDefinitionArgs:
+    def __init__(__self__, *,
+                 decision: pulumi.Input['AuthPolicyDecision'],
+                 rules: pulumi.Input[Mapping[str, pulumi.Input[str]]],
+                 token_type: pulumi.Input['AuthPolicyTokenType'],
+                 authorized_permissions: Optional[pulumi.Input[Sequence[pulumi.Input['AuthPolicyPermissionLevel']]]] = None,
+                 runner_id: Optional[pulumi.Input[str]] = None,
+                 team_name: Optional[pulumi.Input[str]] = None,
+                 user_login: Optional[pulumi.Input[str]] = None):
+        """
+        :param pulumi.Input['AuthPolicyDecision'] decision: The rule type of this policy definition
+        :param pulumi.Input[Mapping[str, pulumi.Input[str]]] rules: OIDC rules to set for this policy.
+        :param pulumi.Input['AuthPolicyTokenType'] token_type: The token type for this policy definition
+        :param pulumi.Input[Sequence[pulumi.Input['AuthPolicyPermissionLevel']]] authorized_permissions: The permission level for organization tokens.
+        :param pulumi.Input[str] runner_id: The runner ID for deployment runner tokens.
+        :param pulumi.Input[str] team_name: The team name for team tokens.
+        :param pulumi.Input[str] user_login: The user login for personal tokens.
+        """
+        pulumi.set(__self__, "decision", decision)
+        pulumi.set(__self__, "rules", rules)
+        pulumi.set(__self__, "token_type", token_type)
+        if authorized_permissions is not None:
+            pulumi.set(__self__, "authorized_permissions", authorized_permissions)
+        if runner_id is not None:
+            pulumi.set(__self__, "runner_id", runner_id)
+        if team_name is not None:
+            pulumi.set(__self__, "team_name", team_name)
+        if user_login is not None:
+            pulumi.set(__self__, "user_login", user_login)
+
+    @property
+    @pulumi.getter
+    def decision(self) -> pulumi.Input['AuthPolicyDecision']:
+        """
+        The rule type of this policy definition
+        """
+        return pulumi.get(self, "decision")
+
+    @decision.setter
+    def decision(self, value: pulumi.Input['AuthPolicyDecision']):
+        pulumi.set(self, "decision", value)
+
+    @property
+    @pulumi.getter
+    def rules(self) -> pulumi.Input[Mapping[str, pulumi.Input[str]]]:
+        """
+        OIDC rules to set for this policy.
+        """
+        return pulumi.get(self, "rules")
+
+    @rules.setter
+    def rules(self, value: pulumi.Input[Mapping[str, pulumi.Input[str]]]):
+        pulumi.set(self, "rules", value)
+
+    @property
+    @pulumi.getter(name="tokenType")
+    def token_type(self) -> pulumi.Input['AuthPolicyTokenType']:
+        """
+        The token type for this policy definition
+        """
+        return pulumi.get(self, "token_type")
+
+    @token_type.setter
+    def token_type(self, value: pulumi.Input['AuthPolicyTokenType']):
+        pulumi.set(self, "token_type", value)
+
+    @property
+    @pulumi.getter(name="authorizedPermissions")
+    def authorized_permissions(self) -> Optional[pulumi.Input[Sequence[pulumi.Input['AuthPolicyPermissionLevel']]]]:
+        """
+        The permission level for organization tokens.
+        """
+        return pulumi.get(self, "authorized_permissions")
+
+    @authorized_permissions.setter
+    def authorized_permissions(self, value: Optional[pulumi.Input[Sequence[pulumi.Input['AuthPolicyPermissionLevel']]]]):
+        pulumi.set(self, "authorized_permissions", value)
+
+    @property
+    @pulumi.getter(name="runnerID")
+    def runner_id(self) -> Optional[pulumi.Input[str]]:
+        """
+        The runner ID for deployment runner tokens.
+        """
+        return pulumi.get(self, "runner_id")
+
+    @runner_id.setter
+    def runner_id(self, value: Optional[pulumi.Input[str]]):
+        pulumi.set(self, "runner_id", value)
+
+    @property
+    @pulumi.getter(name="teamName")
+    def team_name(self) -> Optional[pulumi.Input[str]]:
+        """
+        The team name for team tokens.
+        """
+        return pulumi.get(self, "team_name")
+
+    @team_name.setter
+    def team_name(self, value: Optional[pulumi.Input[str]]):
+        pulumi.set(self, "team_name", value)
+
+    @property
+    @pulumi.getter(name="userLogin")
+    def user_login(self) -> Optional[pulumi.Input[str]]:
+        """
+        The user login for personal tokens.
+        """
+        return pulumi.get(self, "user_login")
+
+    @user_login.setter
+    def user_login(self, value: Optional[pulumi.Input[str]]):
+        pulumi.set(self, "user_login", value)
 
 
 if not MYPY:

@@ -18,6 +18,7 @@ from ._enums import *
 
 __all__ = [
     'AWSOIDCConfiguration',
+    'AuthPolicyDefinition',
     'AzureOIDCConfiguration',
     'DeploymentSettingsCacheOptions',
     'DeploymentSettingsExecutorContext',
@@ -106,6 +107,119 @@ class AWSOIDCConfiguration(dict):
         Optional set of IAM policy ARNs that further restrict the assume-role session
         """
         return pulumi.get(self, "policy_arns")
+
+
+@pulumi.output_type
+class AuthPolicyDefinition(dict):
+    @staticmethod
+    def __key_warning(key: str):
+        suggest = None
+        if key == "tokenType":
+            suggest = "token_type"
+        elif key == "authorizedPermissions":
+            suggest = "authorized_permissions"
+        elif key == "runnerID":
+            suggest = "runner_id"
+        elif key == "teamName":
+            suggest = "team_name"
+        elif key == "userLogin":
+            suggest = "user_login"
+
+        if suggest:
+            pulumi.log.warn(f"Key '{key}' not found in AuthPolicyDefinition. Access the value via the '{suggest}' property getter instead.")
+
+    def __getitem__(self, key: str) -> Any:
+        AuthPolicyDefinition.__key_warning(key)
+        return super().__getitem__(key)
+
+    def get(self, key: str, default = None) -> Any:
+        AuthPolicyDefinition.__key_warning(key)
+        return super().get(key, default)
+
+    def __init__(__self__, *,
+                 decision: 'AuthPolicyDecision',
+                 rules: Mapping[str, str],
+                 token_type: 'AuthPolicyTokenType',
+                 authorized_permissions: Optional[Sequence['AuthPolicyPermissionLevel']] = None,
+                 runner_id: Optional[str] = None,
+                 team_name: Optional[str] = None,
+                 user_login: Optional[str] = None):
+        """
+        :param 'AuthPolicyDecision' decision: The rule type of this policy definition
+        :param Mapping[str, str] rules: OIDC rules to set for this policy.
+        :param 'AuthPolicyTokenType' token_type: The token type for this policy definition
+        :param Sequence['AuthPolicyPermissionLevel'] authorized_permissions: The permission level for organization tokens.
+        :param str runner_id: The runner ID for deployment runner tokens.
+        :param str team_name: The team name for team tokens.
+        :param str user_login: The user login for personal tokens.
+        """
+        pulumi.set(__self__, "decision", decision)
+        pulumi.set(__self__, "rules", rules)
+        pulumi.set(__self__, "token_type", token_type)
+        if authorized_permissions is not None:
+            pulumi.set(__self__, "authorized_permissions", authorized_permissions)
+        if runner_id is not None:
+            pulumi.set(__self__, "runner_id", runner_id)
+        if team_name is not None:
+            pulumi.set(__self__, "team_name", team_name)
+        if user_login is not None:
+            pulumi.set(__self__, "user_login", user_login)
+
+    @property
+    @pulumi.getter
+    def decision(self) -> 'AuthPolicyDecision':
+        """
+        The rule type of this policy definition
+        """
+        return pulumi.get(self, "decision")
+
+    @property
+    @pulumi.getter
+    def rules(self) -> Mapping[str, str]:
+        """
+        OIDC rules to set for this policy.
+        """
+        return pulumi.get(self, "rules")
+
+    @property
+    @pulumi.getter(name="tokenType")
+    def token_type(self) -> 'AuthPolicyTokenType':
+        """
+        The token type for this policy definition
+        """
+        return pulumi.get(self, "token_type")
+
+    @property
+    @pulumi.getter(name="authorizedPermissions")
+    def authorized_permissions(self) -> Optional[Sequence['AuthPolicyPermissionLevel']]:
+        """
+        The permission level for organization tokens.
+        """
+        return pulumi.get(self, "authorized_permissions")
+
+    @property
+    @pulumi.getter(name="runnerID")
+    def runner_id(self) -> Optional[str]:
+        """
+        The runner ID for deployment runner tokens.
+        """
+        return pulumi.get(self, "runner_id")
+
+    @property
+    @pulumi.getter(name="teamName")
+    def team_name(self) -> Optional[str]:
+        """
+        The team name for team tokens.
+        """
+        return pulumi.get(self, "team_name")
+
+    @property
+    @pulumi.getter(name="userLogin")
+    def user_login(self) -> Optional[str]:
+        """
+        The user login for personal tokens.
+        """
+        return pulumi.get(self, "user_login")
 
 
 @pulumi.output_type

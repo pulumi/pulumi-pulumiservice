@@ -2,6 +2,53 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 
+export const AuthPolicyDecision = {
+    /**
+     * A deny rule for Oidc Issuer Policy.
+     */
+    Deny: "deny",
+    /**
+     * An allow rule for Oidc Issuer Policy.
+     */
+    Allow: "allow",
+} as const;
+
+export type AuthPolicyDecision = (typeof AuthPolicyDecision)[keyof typeof AuthPolicyDecision];
+
+export const AuthPolicyPermissionLevel = {
+    /**
+     * Standard level of permissions.
+     */
+    Standard: "standard",
+    /**
+     * Admin level of permissions.
+     */
+    Admin: "admin",
+} as const;
+
+export type AuthPolicyPermissionLevel = (typeof AuthPolicyPermissionLevel)[keyof typeof AuthPolicyPermissionLevel];
+
+export const AuthPolicyTokenType = {
+    /**
+     * Personal Pulumi token. Requires userLogin field to be filled.
+     */
+    Personal: "personal",
+    /**
+     * Team Pulumi token. Requires teamName field to be filled.
+     */
+    Team: "team",
+    /**
+     * Organization Pulumi token. Requires authorizedPermissions field to be filled.
+     */
+    Organization: "organization",
+    /**
+     * Deployment Runner Pulumi token. Requires runnerID field to be filled.
+     */
+    Runner: "runner",
+} as const;
+
+export type AuthPolicyTokenType = (typeof AuthPolicyTokenType)[keyof typeof AuthPolicyTokenType];
+
 export const EnvironmentPermission = {
     /**
      * No permissions.
