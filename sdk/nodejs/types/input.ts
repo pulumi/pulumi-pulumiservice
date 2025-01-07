@@ -27,6 +27,37 @@ export interface AWSOIDCConfigurationArgs {
     sessionName: pulumi.Input<string>;
 }
 
+export interface AuthPolicyDefinitionArgs {
+    /**
+     * The permission level for organization tokens.
+     */
+    authorizedPermissions?: pulumi.Input<pulumi.Input<enums.AuthPolicyPermissionLevel>[]>;
+    /**
+     * The rule type of this policy definition
+     */
+    decision: pulumi.Input<enums.AuthPolicyDecision>;
+    /**
+     * OIDC rules to set for this policy.
+     */
+    rules: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
+    /**
+     * The runner ID for deployment runner tokens.
+     */
+    runnerID?: pulumi.Input<string>;
+    /**
+     * The team name for team tokens.
+     */
+    teamName?: pulumi.Input<string>;
+    /**
+     * The token type for this policy definition
+     */
+    tokenType: pulumi.Input<enums.AuthPolicyTokenType>;
+    /**
+     * The user login for personal tokens.
+     */
+    userLogin?: pulumi.Input<string>;
+}
+
 export interface AzureOIDCConfigurationArgs {
     /**
      * The client ID of the federated workload identity.

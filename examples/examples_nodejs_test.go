@@ -144,3 +144,13 @@ func TestNodejsEnvironmentsFileAssetExample(t *testing.T) {
 		},
 	})
 }
+
+func TestNodejsOidcIssuerExample(t *testing.T) {
+	cwd := getCwd(t)
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Dir: path.Join(cwd, ".", "ts-oidc-issuer"),
+		Dependencies: []string{
+			"@pulumi/pulumiservice",
+		},
+	})
+}

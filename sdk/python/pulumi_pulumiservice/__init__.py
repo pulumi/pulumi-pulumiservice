@@ -13,6 +13,7 @@ from .deployment_settings import *
 from .drift_schedule import *
 from .environment import *
 from .environment_version_tag import *
+from .oidc_issuer import *
 from .org_access_token import *
 from .provider import *
 from .stack import *
@@ -49,6 +50,7 @@ _utilities.register(
    "pulumiservice:index:DriftSchedule": "DriftSchedule",
    "pulumiservice:index:Environment": "Environment",
    "pulumiservice:index:EnvironmentVersionTag": "EnvironmentVersionTag",
+   "pulumiservice:index:OidcIssuer": "OidcIssuer",
    "pulumiservice:index:OrgAccessToken": "OrgAccessToken",
    "pulumiservice:index:Stack": "Stack",
    "pulumiservice:index:StackTag": "StackTag",

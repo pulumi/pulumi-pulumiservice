@@ -40,6 +40,11 @@ export type EnvironmentVersionTag = import("./environmentVersionTag").Environmen
 export const EnvironmentVersionTag: typeof import("./environmentVersionTag").EnvironmentVersionTag = null as any;
 utilities.lazyLoad(exports, ["EnvironmentVersionTag"], () => require("./environmentVersionTag"));
 
+export { OidcIssuerArgs } from "./oidcIssuer";
+export type OidcIssuer = import("./oidcIssuer").OidcIssuer;
+export const OidcIssuer: typeof import("./oidcIssuer").OidcIssuer = null as any;
+utilities.lazyLoad(exports, ["OidcIssuer"], () => require("./oidcIssuer"));
+
 export { OrgAccessTokenArgs } from "./orgAccessToken";
 export type OrgAccessToken = import("./orgAccessToken").OrgAccessToken;
 export const OrgAccessToken: typeof import("./orgAccessToken").OrgAccessToken = null as any;
@@ -126,6 +131,8 @@ const _module = {
                 return new Environment(name, <any>undefined, { urn })
             case "pulumiservice:index:EnvironmentVersionTag":
                 return new EnvironmentVersionTag(name, <any>undefined, { urn })
+            case "pulumiservice:index:OidcIssuer":
+                return new OidcIssuer(name, <any>undefined, { urn })
             case "pulumiservice:index:OrgAccessToken":
                 return new OrgAccessToken(name, <any>undefined, { urn })
             case "pulumiservice:index:Stack":
