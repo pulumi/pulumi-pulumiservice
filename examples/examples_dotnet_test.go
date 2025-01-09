@@ -45,3 +45,12 @@ func TestDotnetEnvironmentsExamples(t *testing.T) {
 		},
 	})
 }
+
+func TestDotnetOidcIssuerExamples(t *testing.T) {
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Dir: path.Join(getCwd(t), "cs-oidc-issuer"),
+		Dependencies: []string{
+			"Pulumi.PulumiService",
+		},
+	})
+}

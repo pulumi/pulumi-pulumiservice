@@ -27,6 +27,37 @@ export interface AWSOIDCConfiguration {
     sessionName: string;
 }
 
+export interface AuthPolicyDefinition {
+    /**
+     * The permission level for organization tokens.
+     */
+    authorizedPermissions?: enums.AuthPolicyPermissionLevel[];
+    /**
+     * The rule type of this policy definition
+     */
+    decision: enums.AuthPolicyDecision;
+    /**
+     * OIDC rules to set for this policy.
+     */
+    rules: {[key: string]: string};
+    /**
+     * The runner ID for deployment runner tokens.
+     */
+    runnerID?: string;
+    /**
+     * The team name for team tokens.
+     */
+    teamName?: string;
+    /**
+     * The token type for this policy definition
+     */
+    tokenType: enums.AuthPolicyTokenType;
+    /**
+     * The user login for personal tokens.
+     */
+    userLogin?: string;
+}
+
 export interface AzureOIDCConfiguration {
     /**
      * The client ID of the federated workload identity.

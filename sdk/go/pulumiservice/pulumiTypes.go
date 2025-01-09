@@ -207,6 +207,157 @@ func (o AWSOIDCConfigurationPtrOutput) SessionName() pulumi.StringPtrOutput {
 	}).(pulumi.StringPtrOutput)
 }
 
+type AuthPolicyDefinition struct {
+	// The permission level for organization tokens.
+	AuthorizedPermissions []AuthPolicyPermissionLevel `pulumi:"authorizedPermissions"`
+	// The rule type of this policy definition
+	Decision AuthPolicyDecision `pulumi:"decision"`
+	// OIDC rules to set for this policy.
+	Rules map[string]string `pulumi:"rules"`
+	// The runner ID for deployment runner tokens.
+	RunnerID *string `pulumi:"runnerID"`
+	// The team name for team tokens.
+	TeamName *string `pulumi:"teamName"`
+	// The token type for this policy definition
+	TokenType AuthPolicyTokenType `pulumi:"tokenType"`
+	// The user login for personal tokens.
+	UserLogin *string `pulumi:"userLogin"`
+}
+
+// AuthPolicyDefinitionInput is an input type that accepts AuthPolicyDefinitionArgs and AuthPolicyDefinitionOutput values.
+// You can construct a concrete instance of `AuthPolicyDefinitionInput` via:
+//
+//	AuthPolicyDefinitionArgs{...}
+type AuthPolicyDefinitionInput interface {
+	pulumi.Input
+
+	ToAuthPolicyDefinitionOutput() AuthPolicyDefinitionOutput
+	ToAuthPolicyDefinitionOutputWithContext(context.Context) AuthPolicyDefinitionOutput
+}
+
+type AuthPolicyDefinitionArgs struct {
+	// The permission level for organization tokens.
+	AuthorizedPermissions AuthPolicyPermissionLevelArrayInput `pulumi:"authorizedPermissions"`
+	// The rule type of this policy definition
+	Decision AuthPolicyDecisionInput `pulumi:"decision"`
+	// OIDC rules to set for this policy.
+	Rules pulumi.StringMapInput `pulumi:"rules"`
+	// The runner ID for deployment runner tokens.
+	RunnerID pulumi.StringPtrInput `pulumi:"runnerID"`
+	// The team name for team tokens.
+	TeamName pulumi.StringPtrInput `pulumi:"teamName"`
+	// The token type for this policy definition
+	TokenType AuthPolicyTokenTypeInput `pulumi:"tokenType"`
+	// The user login for personal tokens.
+	UserLogin pulumi.StringPtrInput `pulumi:"userLogin"`
+}
+
+func (AuthPolicyDefinitionArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*AuthPolicyDefinition)(nil)).Elem()
+}
+
+func (i AuthPolicyDefinitionArgs) ToAuthPolicyDefinitionOutput() AuthPolicyDefinitionOutput {
+	return i.ToAuthPolicyDefinitionOutputWithContext(context.Background())
+}
+
+func (i AuthPolicyDefinitionArgs) ToAuthPolicyDefinitionOutputWithContext(ctx context.Context) AuthPolicyDefinitionOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(AuthPolicyDefinitionOutput)
+}
+
+// AuthPolicyDefinitionArrayInput is an input type that accepts AuthPolicyDefinitionArray and AuthPolicyDefinitionArrayOutput values.
+// You can construct a concrete instance of `AuthPolicyDefinitionArrayInput` via:
+//
+//	AuthPolicyDefinitionArray{ AuthPolicyDefinitionArgs{...} }
+type AuthPolicyDefinitionArrayInput interface {
+	pulumi.Input
+
+	ToAuthPolicyDefinitionArrayOutput() AuthPolicyDefinitionArrayOutput
+	ToAuthPolicyDefinitionArrayOutputWithContext(context.Context) AuthPolicyDefinitionArrayOutput
+}
+
+type AuthPolicyDefinitionArray []AuthPolicyDefinitionInput
+
+func (AuthPolicyDefinitionArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]AuthPolicyDefinition)(nil)).Elem()
+}
+
+func (i AuthPolicyDefinitionArray) ToAuthPolicyDefinitionArrayOutput() AuthPolicyDefinitionArrayOutput {
+	return i.ToAuthPolicyDefinitionArrayOutputWithContext(context.Background())
+}
+
+func (i AuthPolicyDefinitionArray) ToAuthPolicyDefinitionArrayOutputWithContext(ctx context.Context) AuthPolicyDefinitionArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(AuthPolicyDefinitionArrayOutput)
+}
+
+type AuthPolicyDefinitionOutput struct{ *pulumi.OutputState }
+
+func (AuthPolicyDefinitionOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*AuthPolicyDefinition)(nil)).Elem()
+}
+
+func (o AuthPolicyDefinitionOutput) ToAuthPolicyDefinitionOutput() AuthPolicyDefinitionOutput {
+	return o
+}
+
+func (o AuthPolicyDefinitionOutput) ToAuthPolicyDefinitionOutputWithContext(ctx context.Context) AuthPolicyDefinitionOutput {
+	return o
+}
+
+// The permission level for organization tokens.
+func (o AuthPolicyDefinitionOutput) AuthorizedPermissions() AuthPolicyPermissionLevelArrayOutput {
+	return o.ApplyT(func(v AuthPolicyDefinition) []AuthPolicyPermissionLevel { return v.AuthorizedPermissions }).(AuthPolicyPermissionLevelArrayOutput)
+}
+
+// The rule type of this policy definition
+func (o AuthPolicyDefinitionOutput) Decision() AuthPolicyDecisionOutput {
+	return o.ApplyT(func(v AuthPolicyDefinition) AuthPolicyDecision { return v.Decision }).(AuthPolicyDecisionOutput)
+}
+
+// OIDC rules to set for this policy.
+func (o AuthPolicyDefinitionOutput) Rules() pulumi.StringMapOutput {
+	return o.ApplyT(func(v AuthPolicyDefinition) map[string]string { return v.Rules }).(pulumi.StringMapOutput)
+}
+
+// The runner ID for deployment runner tokens.
+func (o AuthPolicyDefinitionOutput) RunnerID() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v AuthPolicyDefinition) *string { return v.RunnerID }).(pulumi.StringPtrOutput)
+}
+
+// The team name for team tokens.
+func (o AuthPolicyDefinitionOutput) TeamName() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v AuthPolicyDefinition) *string { return v.TeamName }).(pulumi.StringPtrOutput)
+}
+
+// The token type for this policy definition
+func (o AuthPolicyDefinitionOutput) TokenType() AuthPolicyTokenTypeOutput {
+	return o.ApplyT(func(v AuthPolicyDefinition) AuthPolicyTokenType { return v.TokenType }).(AuthPolicyTokenTypeOutput)
+}
+
+// The user login for personal tokens.
+func (o AuthPolicyDefinitionOutput) UserLogin() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v AuthPolicyDefinition) *string { return v.UserLogin }).(pulumi.StringPtrOutput)
+}
+
+type AuthPolicyDefinitionArrayOutput struct{ *pulumi.OutputState }
+
+func (AuthPolicyDefinitionArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]AuthPolicyDefinition)(nil)).Elem()
+}
+
+func (o AuthPolicyDefinitionArrayOutput) ToAuthPolicyDefinitionArrayOutput() AuthPolicyDefinitionArrayOutput {
+	return o
+}
+
+func (o AuthPolicyDefinitionArrayOutput) ToAuthPolicyDefinitionArrayOutputWithContext(ctx context.Context) AuthPolicyDefinitionArrayOutput {
+	return o
+}
+
+func (o AuthPolicyDefinitionArrayOutput) Index(i pulumi.IntInput) AuthPolicyDefinitionOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) AuthPolicyDefinition {
+		return vs[0].([]AuthPolicyDefinition)[vs[1].(int)]
+	}).(AuthPolicyDefinitionOutput)
+}
+
 type AzureOIDCConfiguration struct {
 	// The client ID of the federated workload identity.
 	ClientId string `pulumi:"clientId"`
@@ -2711,6 +2862,8 @@ func (o TemplateSourceDestinationPtrOutput) Url() pulumi.StringPtrOutput {
 func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*AWSOIDCConfigurationInput)(nil)).Elem(), AWSOIDCConfigurationArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*AWSOIDCConfigurationPtrInput)(nil)).Elem(), AWSOIDCConfigurationArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*AuthPolicyDefinitionInput)(nil)).Elem(), AuthPolicyDefinitionArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*AuthPolicyDefinitionArrayInput)(nil)).Elem(), AuthPolicyDefinitionArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*AzureOIDCConfigurationInput)(nil)).Elem(), AzureOIDCConfigurationArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*AzureOIDCConfigurationPtrInput)(nil)).Elem(), AzureOIDCConfigurationArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsCacheOptionsInput)(nil)).Elem(), DeploymentSettingsCacheOptionsArgs{})
@@ -2741,6 +2894,8 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*TemplateSourceDestinationPtrInput)(nil)).Elem(), TemplateSourceDestinationArgs{})
 	pulumi.RegisterOutputType(AWSOIDCConfigurationOutput{})
 	pulumi.RegisterOutputType(AWSOIDCConfigurationPtrOutput{})
+	pulumi.RegisterOutputType(AuthPolicyDefinitionOutput{})
+	pulumi.RegisterOutputType(AuthPolicyDefinitionArrayOutput{})
 	pulumi.RegisterOutputType(AzureOIDCConfigurationOutput{})
 	pulumi.RegisterOutputType(AzureOIDCConfigurationPtrOutput{})
 	pulumi.RegisterOutputType(DeploymentSettingsCacheOptionsOutput{})

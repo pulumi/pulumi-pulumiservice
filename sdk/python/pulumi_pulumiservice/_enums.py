@@ -5,6 +5,9 @@
 from enum import Enum
 
 __all__ = [
+    'AuthPolicyDecision',
+    'AuthPolicyPermissionLevel',
+    'AuthPolicyTokenType',
     'EnvironmentPermission',
     'PulumiOperation',
     'TeamStackPermissionScope',
@@ -12,6 +15,47 @@ __all__ = [
     'WebhookFormat',
     'WebhookGroup',
 ]
+
+
+class AuthPolicyDecision(str, Enum):
+    DENY = "deny"
+    """
+    A deny rule for Oidc Issuer Policy.
+    """
+    ALLOW = "allow"
+    """
+    An allow rule for Oidc Issuer Policy.
+    """
+
+
+class AuthPolicyPermissionLevel(str, Enum):
+    STANDARD = "standard"
+    """
+    Standard level of permissions.
+    """
+    ADMIN = "admin"
+    """
+    Admin level of permissions.
+    """
+
+
+class AuthPolicyTokenType(str, Enum):
+    PERSONAL = "personal"
+    """
+    Personal Pulumi token. Requires userLogin field to be filled.
+    """
+    TEAM = "team"
+    """
+    Team Pulumi token. Requires teamName field to be filled.
+    """
+    ORGANIZATION = "organization"
+    """
+    Organization Pulumi token. Requires authorizedPermissions field to be filled.
+    """
+    RUNNER = "runner"
+    """
+    Deployment Runner Pulumi token. Requires runnerID field to be filled.
+    """
 
 
 class EnvironmentPermission(str, Enum):

@@ -598,6 +598,97 @@
           "description": "Destination URL that gets filled in on new project creation."
         }
       }
+    },
+    "pulumiservice:index:AuthPolicyDefinition": {
+      "type": "object",
+      "properties": {
+        "decision": {
+          "$ref": "#/types/pulumiservice:index:AuthPolicyDecision",
+          "description": "The rule type of this policy definition"
+        },
+        "tokenType": {
+          "$ref": "#/types/pulumiservice:index:AuthPolicyTokenType",
+          "description": "The token type for this policy definition"
+        },
+        "teamName": {
+          "type": "string",
+          "description": "The team name for team tokens."
+        },
+        "userLogin": {
+          "type": "string",
+          "description": "The user login for personal tokens."
+        },
+        "runnerID": {
+          "type": "string",
+          "description": "The runner ID for deployment runner tokens."
+        },
+        "authorizedPermissions": {
+          "description": "The permission level for organization tokens.",
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:index:AuthPolicyPermissionLevel"
+          }
+        },
+        "rules": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "OIDC rules to set for this policy."
+        }
+      },
+      "required": [
+        "decision",
+        "tokenType",
+        "rules"
+      ]
+    },
+    "pulumiservice:index:AuthPolicyDecision": {
+      "type": "string",
+      "enum": [
+        {
+          "description": "A deny rule for Oidc Issuer Policy.",
+          "value": "deny"
+        },
+        {
+          "description": "An allow rule for Oidc Issuer Policy.",
+          "value": "allow"
+        }
+      ]
+    },
+    "pulumiservice:index:AuthPolicyTokenType": {
+      "type": "string",
+      "enum": [
+        {
+          "description": "Personal Pulumi token. Requires userLogin field to be filled.",
+          "value": "personal"
+        },
+        {
+          "description": "Team Pulumi token. Requires teamName field to be filled.",
+          "value": "team"
+        },
+        {
+          "description": "Organization Pulumi token. Requires authorizedPermissions field to be filled.",
+          "value": "organization"
+        },
+        {
+          "description": "Deployment Runner Pulumi token. Requires runnerID field to be filled.",
+          "value": "runner"
+        }
+      ]
+    },
+    "pulumiservice:index:AuthPolicyPermissionLevel": {
+      "type": "string",
+      "enum": [
+        {
+          "description": "Standard level of permissions.",
+          "value": "standard"
+        },
+        {
+          "description": "Admin level of permissions.",
+          "value": "admin"
+        }
+      ]
     }
   },
   "resources": {
@@ -1643,6 +1734,89 @@
         "organizationName",
         "sourceName",
         "sourceURL"
+      ]
+    },
+    "pulumiservice:index:OidcIssuer": {
+      "description": "An OIDC issuer registration with Pulumi.",
+      "properties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string",
+          "replaceOnChanges": true
+        },
+        "name": {
+          "description": "Issuer name.",
+          "type": "string"
+        },
+        "url": {
+          "description": "The OIDC issuer URL.",
+          "type": "string",
+          "replaceOnChanges": true
+        },
+        "maxExpirationSeconds": {
+          "description": "The maximum duration of the Pulumi access token working after an exchange, specified in seconds.",
+          "type": "integer"
+        },
+        "thumbprints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The thumbprints of issuer's TLS certificates. By default, Pulumi will store the thumbprint of the certificate used to serve the OpenID configuration. If the provider uses multiple certificates to serve content, it is required to manually configure these."
+        },
+        "policies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:index:AuthPolicyDefinition"
+          },
+          "description": "The authorization policies for this Oidc Issuer."
+        }
+      },
+      "required": [
+        "organization",
+        "name",
+        "url",
+        "thumbprints",
+        "policies"
+      ],
+      "inputProperties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string",
+          "replaceOnChanges": true
+        },
+        "name": {
+          "description": "Issuer name.",
+          "type": "string"
+        },
+        "url": {
+          "description": "The OIDC issuer URL.",
+          "type": "string",
+          "replaceOnChanges": true
+        },
+        "maxExpirationSeconds": {
+          "description": "The maximum duration of the Pulumi access token working after an exchange, specified in seconds.",
+          "type": "integer"
+        },
+        "thumbprints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The thumbprints of issuer's TLS certificates. By default, Pulumi will store the thumbprint of the certificate used to serve the OpenID configuration. If the provider uses multiple certificates to serve content, it is required to manually configure these."
+        },
+        "policies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:index:AuthPolicyDefinition"
+          },
+          "description": "The auth policies for this Oidc Issuer."
+        }
+      },
+      "requiredInputs": [
+        "organization",
+        "name",
+        "url"
       ]
     }
   },
