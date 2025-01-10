@@ -12,8 +12,8 @@ PROVIDER        := pulumi-resource-${PACK}
 PROVIDER_VERSION ?= 1.0.0-alpha.0+dev
 # Use this normalised version everywhere rather than the raw input to ensure consistency.
 VERSION_GENERIC = $(shell pulumictl convert-version --language generic --version "$(PROVIDER_VERSION)")
-PROVIDER_PATH   := provider
-VERSION_PATH     := provider/pkg/version.Version
+LDFLAGS         := "-X main.Version=$(VERSION_GENERIC)"
+BUILD_PATH      := $(PROJECT)/provider/cmd/$(PROVIDER)
 
 SCHEMA_FILE     := provider/cmd/pulumi-resource-pulumiservice/schema.json
 GOPATH			:= $(shell go env GOPATH)
@@ -28,18 +28,16 @@ ensure::
 	go mod tidy
 	cd sdk && go mod tidy
 
-gen::
-
 build_sdks: dotnet_sdk go_sdk nodejs_sdk python_sdk java_sdk
 
 gen_sdk_prerequisites: $(PULUMI)
 
 provider::
 	(cd provider && VERSION=${VERSION_GENERIC} go generate cmd/${PROVIDER}/main.go)
-	(cd provider && go build -o $(WORKING_DIR)/bin/${PROVIDER} -ldflags "-X ${PROJECT}/${VERSION_PATH}=${VERSION_GENERIC}" $(PROJECT)/${PROVIDER_PATH}/cmd/$(PROVIDER))
+	(cd provider && go build -o $(WORKING_DIR)/bin/${PROVIDER} -ldflags $(LDFLAGS) $(BUILD_PATH))
 
 provider_debug::
-	(cd provider && go build -o $(WORKING_DIR)/bin/${PROVIDER} -gcflags="all=-N -l" -ldflags "-X ${PROJECT}/${VERSION_PATH}=${VERSION_GENERIC}" $(PROJECT)/${PROVIDER_PATH}/cmd/$(PROVIDER))
+	(cd provider && go build -o $(WORKING_DIR)/bin/${PROVIDER} -gcflags="all=-N -l" -ldflags $(LDFLAGS) $(BUILD_PATH))
 
 test_provider::
 	cd provider/pkg && go test -short -v -count=1 -cover -timeout 2h -parallel ${TESTPARALLELISM} ./...
@@ -82,13 +80,13 @@ python_sdk: gen_sdk_prerequisites
 java_sdk: export PULUMI_IGNORE_AMBIENT_PLUGINS = true
 java_sdk: gen_sdk_prerequisites
 	rm -rf sdk/java
-	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language java
+	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language java --version $(VERSION_GENERIC)
 	cd sdk/java && \
 		echo "module fake_java_module // Exclude this directory from Go tools\n\ngo 1.17" > go.mod && \
 		gradle --console=plain build
 
 .PHONY: build
-build:: gen provider dotnet_sdk go_sdk nodejs_sdk python_sdk java_sdk
+build:: provider dotnet_sdk go_sdk nodejs_sdk python_sdk java_sdk
 
 # Required for the codegen action that runs in pulumi/pulumi
 only_build:: build
@@ -169,7 +167,7 @@ bin/%/$(PROVIDER) bin/%/$(PROVIDER).exe:
 		export GOOS=$$(echo "$(TARGET)" | cut -d "-" -f 1) && \
 		export GOARCH=$$(echo "$(TARGET)" | cut -d "-" -f 2) && \
 		export CGO_ENABLED=0 && \
-		go build -o "${WORKING_DIR}/$@" $(PULUMI_PROVIDER_BUILD_PARALLELISM) -ldflags "$(LDFLAGS)" "$(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER)"
+		go build -o "${WORKING_DIR}/$@" $(PULUMI_PROVIDER_BUILD_PARALLELISM) -ldflags $(LDFLAGS) $(BUILD_PATH)
 
 bin/$(PROVIDER)-v$(VERSION_GENERIC)-linux-amd64.tar.gz: bin/linux-amd64/$(PROVIDER)
 bin/$(PROVIDER)-v$(VERSION_GENERIC)-linux-arm64.tar.gz: bin/linux-arm64/$(PROVIDER)
