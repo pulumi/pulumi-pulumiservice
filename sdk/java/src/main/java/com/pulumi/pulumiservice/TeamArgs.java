@@ -64,14 +64,14 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * List of team members.
+     * List of Pulumi Cloud usernames of team members.
      * 
      */
     @Import(name="members")
     private @Nullable Output<List<String>> members;
 
     /**
-     * @return List of team members.
+     * @return List of Pulumi Cloud usernames of team members.
      * 
      */
     public Optional<Output<List<String>>> members() {
@@ -217,7 +217,7 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param members List of team members.
+         * @param members List of Pulumi Cloud usernames of team members.
          * 
          * @return builder
          * 
@@ -228,7 +228,7 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param members List of team members.
+         * @param members List of Pulumi Cloud usernames of team members.
          * 
          * @return builder
          * 
@@ -238,7 +238,7 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param members List of team members.
+         * @param members List of Pulumi Cloud usernames of team members.
          * 
          * @return builder
          * 

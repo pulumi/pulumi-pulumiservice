@@ -33,7 +33,7 @@ class TeamArgs:
         :param pulumi.Input[str] description: Optional. Team description.
         :param pulumi.Input[str] display_name: Optional. Team display name.
         :param pulumi.Input[float] github_team_id: The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for "github" teams.
-        :param pulumi.Input[Sequence[pulumi.Input[str]]] members: List of team members.
+        :param pulumi.Input[Sequence[pulumi.Input[str]]] members: List of Pulumi Cloud usernames of team members.
         :param pulumi.Input[str] name: The team's name. Required for "pulumi" teams.
         """
         pulumi.set(__self__, "organization_name", organization_name)
@@ -113,7 +113,7 @@ class TeamArgs:
     @pulumi.getter
     def members(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[str]]]]:
         """
-        List of team members.
+        List of Pulumi Cloud usernames of team members.
         """
         return pulumi.get(self, "members")
 
@@ -155,7 +155,7 @@ class Team(pulumi.CustomResource):
         :param pulumi.Input[str] description: Optional. Team description.
         :param pulumi.Input[str] display_name: Optional. Team display name.
         :param pulumi.Input[float] github_team_id: The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for "github" teams.
-        :param pulumi.Input[Sequence[pulumi.Input[str]]] members: List of team members.
+        :param pulumi.Input[Sequence[pulumi.Input[str]]] members: List of Pulumi Cloud usernames of team members.
         :param pulumi.Input[str] name: The team's name. Required for "pulumi" teams.
         :param pulumi.Input[str] organization_name: The name of the Pulumi organization the team belongs to.
         :param pulumi.Input[str] team_type: The type of team. Must be either `pulumi` or `github`.
@@ -270,7 +270,7 @@ class Team(pulumi.CustomResource):
     @pulumi.getter
     def members(self) -> pulumi.Output[Sequence[str]]:
         """
-        List of team members.
+        List of Pulumi Cloud usernames of team members.
         """
         return pulumi.get(self, "members")
 

@@ -22,7 +22,7 @@ type Team struct {
 	DisplayName pulumi.StringPtrOutput `pulumi:"displayName"`
 	// The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for "github" teams.
 	GithubTeamId pulumi.Float64PtrOutput `pulumi:"githubTeamId"`
-	// List of team members.
+	// List of Pulumi Cloud usernames of team members.
 	Members pulumi.StringArrayOutput `pulumi:"members"`
 	// The team's name. Required for "pulumi" teams.
 	Name pulumi.StringPtrOutput `pulumi:"name"`
@@ -84,7 +84,7 @@ type teamArgs struct {
 	DisplayName *string `pulumi:"displayName"`
 	// The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for "github" teams.
 	GithubTeamId *float64 `pulumi:"githubTeamId"`
-	// List of team members.
+	// List of Pulumi Cloud usernames of team members.
 	Members []string `pulumi:"members"`
 	// The team's name. Required for "pulumi" teams.
 	Name *string `pulumi:"name"`
@@ -102,7 +102,7 @@ type TeamArgs struct {
 	DisplayName pulumi.StringPtrInput
 	// The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for "github" teams.
 	GithubTeamId pulumi.Float64PtrInput
-	// List of team members.
+	// List of Pulumi Cloud usernames of team members.
 	Members pulumi.StringArrayInput
 	// The team's name. Required for "pulumi" teams.
 	Name pulumi.StringPtrInput
@@ -214,7 +214,7 @@ func (o TeamOutput) GithubTeamId() pulumi.Float64PtrOutput {
 	return o.ApplyT(func(v *Team) pulumi.Float64PtrOutput { return v.GithubTeamId }).(pulumi.Float64PtrOutput)
 }
 
-// List of team members.
+// List of Pulumi Cloud usernames of team members.
 func (o TeamOutput) Members() pulumi.StringArrayOutput {
 	return o.ApplyT(func(v *Team) pulumi.StringArrayOutput { return v.Members }).(pulumi.StringArrayOutput)
 }

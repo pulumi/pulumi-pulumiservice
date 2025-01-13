@@ -755,7 +755,7 @@
           "type": "string"
         },
         "members": {
-          "description": "List of team members.",
+          "description": "List of Pulumi Cloud usernames of team members.",
           "type": "array",
           "items": {
             "type": "string"
@@ -793,7 +793,7 @@
           "type": "string"
         },
         "members": {
-          "description": "List of team members.",
+          "description": "List of Pulumi Cloud usernames of team members.",
           "type": "array",
           "items": {
             "type": "string"

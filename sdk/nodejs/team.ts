@@ -47,7 +47,7 @@ export class Team extends pulumi.CustomResource {
      */
     public readonly githubTeamId!: pulumi.Output<number | undefined>;
     /**
-     * List of team members.
+     * List of Pulumi Cloud usernames of team members.
      */
     public readonly members!: pulumi.Output<string[]>;
     /**
@@ -118,7 +118,7 @@ export interface TeamArgs {
      */
     githubTeamId?: pulumi.Input<number>;
     /**
-     * List of team members.
+     * List of Pulumi Cloud usernames of team members.
      */
     members?: pulumi.Input<pulumi.Input<string>[]>;
     /**
