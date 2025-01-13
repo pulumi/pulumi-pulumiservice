@@ -64,14 +64,14 @@ public class Team extends com.pulumi.resources.CustomResource {
         return Codegen.optional(this.githubTeamId);
     }
     /**
-     * List of team members.
+     * List of Pulumi Cloud usernames of team members.
      * 
      */
     @Export(name="members", refs={List.class,String.class}, tree="[0,1]")
     private Output<List<String>> members;
 
     /**
-     * @return List of team members.
+     * @return List of Pulumi Cloud usernames of team members.
      * 
      */
     public Output<List<String>> members() {

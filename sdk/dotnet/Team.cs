@@ -34,7 +34,7 @@ namespace Pulumi.PulumiService
         public Output<double?> GithubTeamId { get; private set; } = null!;
 
         /// <summary>
-        /// List of team members.
+        /// List of Pulumi Cloud usernames of team members.
         /// </summary>
         [Output("members")]
         public Output<ImmutableArray<string>> Members { get; private set; } = null!;
@@ -124,7 +124,7 @@ namespace Pulumi.PulumiService
         private InputList<string>? _members;
 
         /// <summary>
-        /// List of team members.
+        /// List of Pulumi Cloud usernames of team members.
         /// </summary>
         public InputList<string> Members
         {
