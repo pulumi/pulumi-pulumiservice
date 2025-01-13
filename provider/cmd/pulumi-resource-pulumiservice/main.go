@@ -17,17 +17,29 @@ package main
 import (
 	_ "embed"
 
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/provider"
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/version"
+	psp "github.com/pulumi/pulumi-pulumiservice/provider/pkg/provider"
+	"github.com/pulumi/pulumi/pkg/v3/resource/provider"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/util/cmdutil"
+	rpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
 var providerName = "pulumiservice"
 
 // embed schema.json directly into resource binary so that we can properly serve the schema
 // directly from the resource provider
+//
 //go:embed schema.json
 var schema string
 
+// The version needs to be replaced using LDFLAGS on build
+var Version string = "REPLACE_ON_BUILD"
+
 func main() {
-	provider.Serve(providerName, version.Version, schema)
+	// Start gRPC service for the pulumiservice provider
+	err := provider.Main(providerName, func(host *provider.HostClient) (rpc.ResourceProviderServer, error) {
+		return psp.MakeProvider(host, providerName, Version, schema)
+	})
+	if err != nil {
+		cmdutil.ExitError(err.Error())
+	}
 }

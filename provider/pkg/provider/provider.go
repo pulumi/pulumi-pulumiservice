@@ -58,7 +58,7 @@ type pulumiserviceProvider struct {
 	AccessToken     string
 }
 
-func makeProvider(host *provider.HostClient, name, version, schema string) (pulumirpc.ResourceProviderServer, error) {
+func MakeProvider(host *provider.HostClient, name, version, schema string) (pulumirpc.ResourceProviderServer, error) {
 	// inject version into schema
 	versionedSchema := mustSetSchemaVersion(schema, version)
 	// Return the new provider
