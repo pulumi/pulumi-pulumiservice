@@ -10,6 +10,558 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
+type AuthPolicyDecision string
+
+const (
+	// A deny rule for Oidc Issuer Policy.
+	AuthPolicyDecisionDeny = AuthPolicyDecision("deny")
+	// An allow rule for Oidc Issuer Policy.
+	AuthPolicyDecisionAllow = AuthPolicyDecision("allow")
+)
+
+func (AuthPolicyDecision) ElementType() reflect.Type {
+	return reflect.TypeOf((*AuthPolicyDecision)(nil)).Elem()
+}
+
+func (e AuthPolicyDecision) ToAuthPolicyDecisionOutput() AuthPolicyDecisionOutput {
+	return pulumi.ToOutput(e).(AuthPolicyDecisionOutput)
+}
+
+func (e AuthPolicyDecision) ToAuthPolicyDecisionOutputWithContext(ctx context.Context) AuthPolicyDecisionOutput {
+	return pulumi.ToOutputWithContext(ctx, e).(AuthPolicyDecisionOutput)
+}
+
+func (e AuthPolicyDecision) ToAuthPolicyDecisionPtrOutput() AuthPolicyDecisionPtrOutput {
+	return e.ToAuthPolicyDecisionPtrOutputWithContext(context.Background())
+}
+
+func (e AuthPolicyDecision) ToAuthPolicyDecisionPtrOutputWithContext(ctx context.Context) AuthPolicyDecisionPtrOutput {
+	return AuthPolicyDecision(e).ToAuthPolicyDecisionOutputWithContext(ctx).ToAuthPolicyDecisionPtrOutputWithContext(ctx)
+}
+
+func (e AuthPolicyDecision) ToStringOutput() pulumi.StringOutput {
+	return pulumi.ToOutput(pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e AuthPolicyDecision) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return pulumi.ToOutputWithContext(ctx, pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e AuthPolicyDecision) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringPtrOutputWithContext(context.Background())
+}
+
+func (e AuthPolicyDecision) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringOutputWithContext(ctx).ToStringPtrOutputWithContext(ctx)
+}
+
+type AuthPolicyDecisionOutput struct{ *pulumi.OutputState }
+
+func (AuthPolicyDecisionOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*AuthPolicyDecision)(nil)).Elem()
+}
+
+func (o AuthPolicyDecisionOutput) ToAuthPolicyDecisionOutput() AuthPolicyDecisionOutput {
+	return o
+}
+
+func (o AuthPolicyDecisionOutput) ToAuthPolicyDecisionOutputWithContext(ctx context.Context) AuthPolicyDecisionOutput {
+	return o
+}
+
+func (o AuthPolicyDecisionOutput) ToAuthPolicyDecisionPtrOutput() AuthPolicyDecisionPtrOutput {
+	return o.ToAuthPolicyDecisionPtrOutputWithContext(context.Background())
+}
+
+func (o AuthPolicyDecisionOutput) ToAuthPolicyDecisionPtrOutputWithContext(ctx context.Context) AuthPolicyDecisionPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v AuthPolicyDecision) *AuthPolicyDecision {
+		return &v
+	}).(AuthPolicyDecisionPtrOutput)
+}
+
+func (o AuthPolicyDecisionOutput) ToStringOutput() pulumi.StringOutput {
+	return o.ToStringOutputWithContext(context.Background())
+}
+
+func (o AuthPolicyDecisionOutput) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e AuthPolicyDecision) string {
+		return string(e)
+	}).(pulumi.StringOutput)
+}
+
+func (o AuthPolicyDecisionOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o AuthPolicyDecisionOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e AuthPolicyDecision) *string {
+		v := string(e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+type AuthPolicyDecisionPtrOutput struct{ *pulumi.OutputState }
+
+func (AuthPolicyDecisionPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**AuthPolicyDecision)(nil)).Elem()
+}
+
+func (o AuthPolicyDecisionPtrOutput) ToAuthPolicyDecisionPtrOutput() AuthPolicyDecisionPtrOutput {
+	return o
+}
+
+func (o AuthPolicyDecisionPtrOutput) ToAuthPolicyDecisionPtrOutputWithContext(ctx context.Context) AuthPolicyDecisionPtrOutput {
+	return o
+}
+
+func (o AuthPolicyDecisionPtrOutput) Elem() AuthPolicyDecisionOutput {
+	return o.ApplyT(func(v *AuthPolicyDecision) AuthPolicyDecision {
+		if v != nil {
+			return *v
+		}
+		var ret AuthPolicyDecision
+		return ret
+	}).(AuthPolicyDecisionOutput)
+}
+
+func (o AuthPolicyDecisionPtrOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o AuthPolicyDecisionPtrOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e *AuthPolicyDecision) *string {
+		if e == nil {
+			return nil
+		}
+		v := string(*e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+// AuthPolicyDecisionInput is an input type that accepts values of the AuthPolicyDecision enum
+// A concrete instance of `AuthPolicyDecisionInput` can be one of the following:
+//
+//	AuthPolicyDecisionDeny
+//	AuthPolicyDecisionAllow
+type AuthPolicyDecisionInput interface {
+	pulumi.Input
+
+	ToAuthPolicyDecisionOutput() AuthPolicyDecisionOutput
+	ToAuthPolicyDecisionOutputWithContext(context.Context) AuthPolicyDecisionOutput
+}
+
+var authPolicyDecisionPtrType = reflect.TypeOf((**AuthPolicyDecision)(nil)).Elem()
+
+type AuthPolicyDecisionPtrInput interface {
+	pulumi.Input
+
+	ToAuthPolicyDecisionPtrOutput() AuthPolicyDecisionPtrOutput
+	ToAuthPolicyDecisionPtrOutputWithContext(context.Context) AuthPolicyDecisionPtrOutput
+}
+
+type authPolicyDecisionPtr string
+
+func AuthPolicyDecisionPtr(v string) AuthPolicyDecisionPtrInput {
+	return (*authPolicyDecisionPtr)(&v)
+}
+
+func (*authPolicyDecisionPtr) ElementType() reflect.Type {
+	return authPolicyDecisionPtrType
+}
+
+func (in *authPolicyDecisionPtr) ToAuthPolicyDecisionPtrOutput() AuthPolicyDecisionPtrOutput {
+	return pulumi.ToOutput(in).(AuthPolicyDecisionPtrOutput)
+}
+
+func (in *authPolicyDecisionPtr) ToAuthPolicyDecisionPtrOutputWithContext(ctx context.Context) AuthPolicyDecisionPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, in).(AuthPolicyDecisionPtrOutput)
+}
+
+type AuthPolicyPermissionLevel string
+
+const (
+	// Standard level of permissions.
+	AuthPolicyPermissionLevelStandard = AuthPolicyPermissionLevel("standard")
+	// Admin level of permissions.
+	AuthPolicyPermissionLevelAdmin = AuthPolicyPermissionLevel("admin")
+)
+
+func (AuthPolicyPermissionLevel) ElementType() reflect.Type {
+	return reflect.TypeOf((*AuthPolicyPermissionLevel)(nil)).Elem()
+}
+
+func (e AuthPolicyPermissionLevel) ToAuthPolicyPermissionLevelOutput() AuthPolicyPermissionLevelOutput {
+	return pulumi.ToOutput(e).(AuthPolicyPermissionLevelOutput)
+}
+
+func (e AuthPolicyPermissionLevel) ToAuthPolicyPermissionLevelOutputWithContext(ctx context.Context) AuthPolicyPermissionLevelOutput {
+	return pulumi.ToOutputWithContext(ctx, e).(AuthPolicyPermissionLevelOutput)
+}
+
+func (e AuthPolicyPermissionLevel) ToAuthPolicyPermissionLevelPtrOutput() AuthPolicyPermissionLevelPtrOutput {
+	return e.ToAuthPolicyPermissionLevelPtrOutputWithContext(context.Background())
+}
+
+func (e AuthPolicyPermissionLevel) ToAuthPolicyPermissionLevelPtrOutputWithContext(ctx context.Context) AuthPolicyPermissionLevelPtrOutput {
+	return AuthPolicyPermissionLevel(e).ToAuthPolicyPermissionLevelOutputWithContext(ctx).ToAuthPolicyPermissionLevelPtrOutputWithContext(ctx)
+}
+
+func (e AuthPolicyPermissionLevel) ToStringOutput() pulumi.StringOutput {
+	return pulumi.ToOutput(pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e AuthPolicyPermissionLevel) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return pulumi.ToOutputWithContext(ctx, pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e AuthPolicyPermissionLevel) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringPtrOutputWithContext(context.Background())
+}
+
+func (e AuthPolicyPermissionLevel) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringOutputWithContext(ctx).ToStringPtrOutputWithContext(ctx)
+}
+
+type AuthPolicyPermissionLevelOutput struct{ *pulumi.OutputState }
+
+func (AuthPolicyPermissionLevelOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*AuthPolicyPermissionLevel)(nil)).Elem()
+}
+
+func (o AuthPolicyPermissionLevelOutput) ToAuthPolicyPermissionLevelOutput() AuthPolicyPermissionLevelOutput {
+	return o
+}
+
+func (o AuthPolicyPermissionLevelOutput) ToAuthPolicyPermissionLevelOutputWithContext(ctx context.Context) AuthPolicyPermissionLevelOutput {
+	return o
+}
+
+func (o AuthPolicyPermissionLevelOutput) ToAuthPolicyPermissionLevelPtrOutput() AuthPolicyPermissionLevelPtrOutput {
+	return o.ToAuthPolicyPermissionLevelPtrOutputWithContext(context.Background())
+}
+
+func (o AuthPolicyPermissionLevelOutput) ToAuthPolicyPermissionLevelPtrOutputWithContext(ctx context.Context) AuthPolicyPermissionLevelPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v AuthPolicyPermissionLevel) *AuthPolicyPermissionLevel {
+		return &v
+	}).(AuthPolicyPermissionLevelPtrOutput)
+}
+
+func (o AuthPolicyPermissionLevelOutput) ToStringOutput() pulumi.StringOutput {
+	return o.ToStringOutputWithContext(context.Background())
+}
+
+func (o AuthPolicyPermissionLevelOutput) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e AuthPolicyPermissionLevel) string {
+		return string(e)
+	}).(pulumi.StringOutput)
+}
+
+func (o AuthPolicyPermissionLevelOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o AuthPolicyPermissionLevelOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e AuthPolicyPermissionLevel) *string {
+		v := string(e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+type AuthPolicyPermissionLevelPtrOutput struct{ *pulumi.OutputState }
+
+func (AuthPolicyPermissionLevelPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**AuthPolicyPermissionLevel)(nil)).Elem()
+}
+
+func (o AuthPolicyPermissionLevelPtrOutput) ToAuthPolicyPermissionLevelPtrOutput() AuthPolicyPermissionLevelPtrOutput {
+	return o
+}
+
+func (o AuthPolicyPermissionLevelPtrOutput) ToAuthPolicyPermissionLevelPtrOutputWithContext(ctx context.Context) AuthPolicyPermissionLevelPtrOutput {
+	return o
+}
+
+func (o AuthPolicyPermissionLevelPtrOutput) Elem() AuthPolicyPermissionLevelOutput {
+	return o.ApplyT(func(v *AuthPolicyPermissionLevel) AuthPolicyPermissionLevel {
+		if v != nil {
+			return *v
+		}
+		var ret AuthPolicyPermissionLevel
+		return ret
+	}).(AuthPolicyPermissionLevelOutput)
+}
+
+func (o AuthPolicyPermissionLevelPtrOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o AuthPolicyPermissionLevelPtrOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e *AuthPolicyPermissionLevel) *string {
+		if e == nil {
+			return nil
+		}
+		v := string(*e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+// AuthPolicyPermissionLevelInput is an input type that accepts values of the AuthPolicyPermissionLevel enum
+// A concrete instance of `AuthPolicyPermissionLevelInput` can be one of the following:
+//
+//	AuthPolicyPermissionLevelStandard
+//	AuthPolicyPermissionLevelAdmin
+type AuthPolicyPermissionLevelInput interface {
+	pulumi.Input
+
+	ToAuthPolicyPermissionLevelOutput() AuthPolicyPermissionLevelOutput
+	ToAuthPolicyPermissionLevelOutputWithContext(context.Context) AuthPolicyPermissionLevelOutput
+}
+
+var authPolicyPermissionLevelPtrType = reflect.TypeOf((**AuthPolicyPermissionLevel)(nil)).Elem()
+
+type AuthPolicyPermissionLevelPtrInput interface {
+	pulumi.Input
+
+	ToAuthPolicyPermissionLevelPtrOutput() AuthPolicyPermissionLevelPtrOutput
+	ToAuthPolicyPermissionLevelPtrOutputWithContext(context.Context) AuthPolicyPermissionLevelPtrOutput
+}
+
+type authPolicyPermissionLevelPtr string
+
+func AuthPolicyPermissionLevelPtr(v string) AuthPolicyPermissionLevelPtrInput {
+	return (*authPolicyPermissionLevelPtr)(&v)
+}
+
+func (*authPolicyPermissionLevelPtr) ElementType() reflect.Type {
+	return authPolicyPermissionLevelPtrType
+}
+
+func (in *authPolicyPermissionLevelPtr) ToAuthPolicyPermissionLevelPtrOutput() AuthPolicyPermissionLevelPtrOutput {
+	return pulumi.ToOutput(in).(AuthPolicyPermissionLevelPtrOutput)
+}
+
+func (in *authPolicyPermissionLevelPtr) ToAuthPolicyPermissionLevelPtrOutputWithContext(ctx context.Context) AuthPolicyPermissionLevelPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, in).(AuthPolicyPermissionLevelPtrOutput)
+}
+
+// AuthPolicyPermissionLevelArrayInput is an input type that accepts AuthPolicyPermissionLevelArray and AuthPolicyPermissionLevelArrayOutput values.
+// You can construct a concrete instance of `AuthPolicyPermissionLevelArrayInput` via:
+//
+//	AuthPolicyPermissionLevelArray{ AuthPolicyPermissionLevelArgs{...} }
+type AuthPolicyPermissionLevelArrayInput interface {
+	pulumi.Input
+
+	ToAuthPolicyPermissionLevelArrayOutput() AuthPolicyPermissionLevelArrayOutput
+	ToAuthPolicyPermissionLevelArrayOutputWithContext(context.Context) AuthPolicyPermissionLevelArrayOutput
+}
+
+type AuthPolicyPermissionLevelArray []AuthPolicyPermissionLevel
+
+func (AuthPolicyPermissionLevelArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]AuthPolicyPermissionLevel)(nil)).Elem()
+}
+
+func (i AuthPolicyPermissionLevelArray) ToAuthPolicyPermissionLevelArrayOutput() AuthPolicyPermissionLevelArrayOutput {
+	return i.ToAuthPolicyPermissionLevelArrayOutputWithContext(context.Background())
+}
+
+func (i AuthPolicyPermissionLevelArray) ToAuthPolicyPermissionLevelArrayOutputWithContext(ctx context.Context) AuthPolicyPermissionLevelArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(AuthPolicyPermissionLevelArrayOutput)
+}
+
+type AuthPolicyPermissionLevelArrayOutput struct{ *pulumi.OutputState }
+
+func (AuthPolicyPermissionLevelArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]AuthPolicyPermissionLevel)(nil)).Elem()
+}
+
+func (o AuthPolicyPermissionLevelArrayOutput) ToAuthPolicyPermissionLevelArrayOutput() AuthPolicyPermissionLevelArrayOutput {
+	return o
+}
+
+func (o AuthPolicyPermissionLevelArrayOutput) ToAuthPolicyPermissionLevelArrayOutputWithContext(ctx context.Context) AuthPolicyPermissionLevelArrayOutput {
+	return o
+}
+
+func (o AuthPolicyPermissionLevelArrayOutput) Index(i pulumi.IntInput) AuthPolicyPermissionLevelOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) AuthPolicyPermissionLevel {
+		return vs[0].([]AuthPolicyPermissionLevel)[vs[1].(int)]
+	}).(AuthPolicyPermissionLevelOutput)
+}
+
+type AuthPolicyTokenType string
+
+const (
+	// Personal Pulumi token. Requires userLogin field to be filled.
+	AuthPolicyTokenTypePersonal = AuthPolicyTokenType("personal")
+	// Team Pulumi token. Requires teamName field to be filled.
+	AuthPolicyTokenTypeTeam = AuthPolicyTokenType("team")
+	// Organization Pulumi token. Requires authorizedPermissions field to be filled.
+	AuthPolicyTokenTypeOrganization = AuthPolicyTokenType("organization")
+	// Deployment Runner Pulumi token. Requires runnerID field to be filled.
+	AuthPolicyTokenTypeRunner = AuthPolicyTokenType("runner")
+)
+
+func (AuthPolicyTokenType) ElementType() reflect.Type {
+	return reflect.TypeOf((*AuthPolicyTokenType)(nil)).Elem()
+}
+
+func (e AuthPolicyTokenType) ToAuthPolicyTokenTypeOutput() AuthPolicyTokenTypeOutput {
+	return pulumi.ToOutput(e).(AuthPolicyTokenTypeOutput)
+}
+
+func (e AuthPolicyTokenType) ToAuthPolicyTokenTypeOutputWithContext(ctx context.Context) AuthPolicyTokenTypeOutput {
+	return pulumi.ToOutputWithContext(ctx, e).(AuthPolicyTokenTypeOutput)
+}
+
+func (e AuthPolicyTokenType) ToAuthPolicyTokenTypePtrOutput() AuthPolicyTokenTypePtrOutput {
+	return e.ToAuthPolicyTokenTypePtrOutputWithContext(context.Background())
+}
+
+func (e AuthPolicyTokenType) ToAuthPolicyTokenTypePtrOutputWithContext(ctx context.Context) AuthPolicyTokenTypePtrOutput {
+	return AuthPolicyTokenType(e).ToAuthPolicyTokenTypeOutputWithContext(ctx).ToAuthPolicyTokenTypePtrOutputWithContext(ctx)
+}
+
+func (e AuthPolicyTokenType) ToStringOutput() pulumi.StringOutput {
+	return pulumi.ToOutput(pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e AuthPolicyTokenType) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return pulumi.ToOutputWithContext(ctx, pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e AuthPolicyTokenType) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringPtrOutputWithContext(context.Background())
+}
+
+func (e AuthPolicyTokenType) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringOutputWithContext(ctx).ToStringPtrOutputWithContext(ctx)
+}
+
+type AuthPolicyTokenTypeOutput struct{ *pulumi.OutputState }
+
+func (AuthPolicyTokenTypeOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*AuthPolicyTokenType)(nil)).Elem()
+}
+
+func (o AuthPolicyTokenTypeOutput) ToAuthPolicyTokenTypeOutput() AuthPolicyTokenTypeOutput {
+	return o
+}
+
+func (o AuthPolicyTokenTypeOutput) ToAuthPolicyTokenTypeOutputWithContext(ctx context.Context) AuthPolicyTokenTypeOutput {
+	return o
+}
+
+func (o AuthPolicyTokenTypeOutput) ToAuthPolicyTokenTypePtrOutput() AuthPolicyTokenTypePtrOutput {
+	return o.ToAuthPolicyTokenTypePtrOutputWithContext(context.Background())
+}
+
+func (o AuthPolicyTokenTypeOutput) ToAuthPolicyTokenTypePtrOutputWithContext(ctx context.Context) AuthPolicyTokenTypePtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v AuthPolicyTokenType) *AuthPolicyTokenType {
+		return &v
+	}).(AuthPolicyTokenTypePtrOutput)
+}
+
+func (o AuthPolicyTokenTypeOutput) ToStringOutput() pulumi.StringOutput {
+	return o.ToStringOutputWithContext(context.Background())
+}
+
+func (o AuthPolicyTokenTypeOutput) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e AuthPolicyTokenType) string {
+		return string(e)
+	}).(pulumi.StringOutput)
+}
+
+func (o AuthPolicyTokenTypeOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o AuthPolicyTokenTypeOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e AuthPolicyTokenType) *string {
+		v := string(e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+type AuthPolicyTokenTypePtrOutput struct{ *pulumi.OutputState }
+
+func (AuthPolicyTokenTypePtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**AuthPolicyTokenType)(nil)).Elem()
+}
+
+func (o AuthPolicyTokenTypePtrOutput) ToAuthPolicyTokenTypePtrOutput() AuthPolicyTokenTypePtrOutput {
+	return o
+}
+
+func (o AuthPolicyTokenTypePtrOutput) ToAuthPolicyTokenTypePtrOutputWithContext(ctx context.Context) AuthPolicyTokenTypePtrOutput {
+	return o
+}
+
+func (o AuthPolicyTokenTypePtrOutput) Elem() AuthPolicyTokenTypeOutput {
+	return o.ApplyT(func(v *AuthPolicyTokenType) AuthPolicyTokenType {
+		if v != nil {
+			return *v
+		}
+		var ret AuthPolicyTokenType
+		return ret
+	}).(AuthPolicyTokenTypeOutput)
+}
+
+func (o AuthPolicyTokenTypePtrOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o AuthPolicyTokenTypePtrOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e *AuthPolicyTokenType) *string {
+		if e == nil {
+			return nil
+		}
+		v := string(*e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+// AuthPolicyTokenTypeInput is an input type that accepts values of the AuthPolicyTokenType enum
+// A concrete instance of `AuthPolicyTokenTypeInput` can be one of the following:
+//
+//	AuthPolicyTokenTypePersonal
+//	AuthPolicyTokenTypeTeam
+//	AuthPolicyTokenTypeOrganization
+//	AuthPolicyTokenTypeRunner
+type AuthPolicyTokenTypeInput interface {
+	pulumi.Input
+
+	ToAuthPolicyTokenTypeOutput() AuthPolicyTokenTypeOutput
+	ToAuthPolicyTokenTypeOutputWithContext(context.Context) AuthPolicyTokenTypeOutput
+}
+
+var authPolicyTokenTypePtrType = reflect.TypeOf((**AuthPolicyTokenType)(nil)).Elem()
+
+type AuthPolicyTokenTypePtrInput interface {
+	pulumi.Input
+
+	ToAuthPolicyTokenTypePtrOutput() AuthPolicyTokenTypePtrOutput
+	ToAuthPolicyTokenTypePtrOutputWithContext(context.Context) AuthPolicyTokenTypePtrOutput
+}
+
+type authPolicyTokenTypePtr string
+
+func AuthPolicyTokenTypePtr(v string) AuthPolicyTokenTypePtrInput {
+	return (*authPolicyTokenTypePtr)(&v)
+}
+
+func (*authPolicyTokenTypePtr) ElementType() reflect.Type {
+	return authPolicyTokenTypePtrType
+}
+
+func (in *authPolicyTokenTypePtr) ToAuthPolicyTokenTypePtrOutput() AuthPolicyTokenTypePtrOutput {
+	return pulumi.ToOutput(in).(AuthPolicyTokenTypePtrOutput)
+}
+
+func (in *authPolicyTokenTypePtr) ToAuthPolicyTokenTypePtrOutputWithContext(ctx context.Context) AuthPolicyTokenTypePtrOutput {
+	return pulumi.ToOutputWithContext(ctx, in).(AuthPolicyTokenTypePtrOutput)
+}
+
 type EnvironmentPermission string
 
 const (
@@ -1055,6 +1607,13 @@ func (o WebhookGroupArrayOutput) Index(i pulumi.IntInput) WebhookGroupOutput {
 }
 
 func init() {
+	pulumi.RegisterInputType(reflect.TypeOf((*AuthPolicyDecisionInput)(nil)).Elem(), AuthPolicyDecision("deny"))
+	pulumi.RegisterInputType(reflect.TypeOf((*AuthPolicyDecisionPtrInput)(nil)).Elem(), AuthPolicyDecision("deny"))
+	pulumi.RegisterInputType(reflect.TypeOf((*AuthPolicyPermissionLevelInput)(nil)).Elem(), AuthPolicyPermissionLevel("standard"))
+	pulumi.RegisterInputType(reflect.TypeOf((*AuthPolicyPermissionLevelPtrInput)(nil)).Elem(), AuthPolicyPermissionLevel("standard"))
+	pulumi.RegisterInputType(reflect.TypeOf((*AuthPolicyPermissionLevelArrayInput)(nil)).Elem(), AuthPolicyPermissionLevelArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*AuthPolicyTokenTypeInput)(nil)).Elem(), AuthPolicyTokenType("personal"))
+	pulumi.RegisterInputType(reflect.TypeOf((*AuthPolicyTokenTypePtrInput)(nil)).Elem(), AuthPolicyTokenType("personal"))
 	pulumi.RegisterInputType(reflect.TypeOf((*EnvironmentPermissionInput)(nil)).Elem(), EnvironmentPermission("none"))
 	pulumi.RegisterInputType(reflect.TypeOf((*EnvironmentPermissionPtrInput)(nil)).Elem(), EnvironmentPermission("none"))
 	pulumi.RegisterInputType(reflect.TypeOf((*PulumiOperationInput)(nil)).Elem(), PulumiOperation("update"))
@@ -1067,6 +1626,13 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*WebhookGroupInput)(nil)).Elem(), WebhookGroup("stacks"))
 	pulumi.RegisterInputType(reflect.TypeOf((*WebhookGroupPtrInput)(nil)).Elem(), WebhookGroup("stacks"))
 	pulumi.RegisterInputType(reflect.TypeOf((*WebhookGroupArrayInput)(nil)).Elem(), WebhookGroupArray{})
+	pulumi.RegisterOutputType(AuthPolicyDecisionOutput{})
+	pulumi.RegisterOutputType(AuthPolicyDecisionPtrOutput{})
+	pulumi.RegisterOutputType(AuthPolicyPermissionLevelOutput{})
+	pulumi.RegisterOutputType(AuthPolicyPermissionLevelPtrOutput{})
+	pulumi.RegisterOutputType(AuthPolicyPermissionLevelArrayOutput{})
+	pulumi.RegisterOutputType(AuthPolicyTokenTypeOutput{})
+	pulumi.RegisterOutputType(AuthPolicyTokenTypePtrOutput{})
 	pulumi.RegisterOutputType(EnvironmentPermissionOutput{})
 	pulumi.RegisterOutputType(EnvironmentPermissionPtrOutput{})
 	pulumi.RegisterOutputType(PulumiOperationOutput{})

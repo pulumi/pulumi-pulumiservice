@@ -23,6 +23,7 @@
         "environment.ts",
         "environmentVersionTag.ts",
         "index.ts",
+        "oidcIssuer.ts",
         "orgAccessToken.ts",
         "provider.ts",
         "stack.ts",

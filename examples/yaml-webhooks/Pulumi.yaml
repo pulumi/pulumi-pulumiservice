@@ -1,6 +1,6 @@
 name: yaml-webhooks
 runtime: yaml
-description: A minimal example of provisioning access token via Pulumi YAML
+description: A minimal example of provisioning webhooks via Pulumi YAML
 
 resources:
   webhook:
