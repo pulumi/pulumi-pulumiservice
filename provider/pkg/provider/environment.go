@@ -168,7 +168,7 @@ func (st *PulumiServiceEnvironmentResource) Create(req *pulumirpc.CreateRequest)
 		return nil, fmt.Errorf("failed to check environment, yaml code failed following checks: %+v", diagnostics)
 	}
 	if err != nil {
-		return nil, fmt.Errorf("failed to check environment due to error: %+v", err)
+		return nil, fmt.Errorf("failed to check  environment due to error: %+v", err)
 	}
 
 	// Then create environment, and update it with yaml provided. ESC API architecture doesn't let you do it in one call
