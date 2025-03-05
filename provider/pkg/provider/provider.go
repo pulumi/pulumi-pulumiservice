@@ -29,7 +29,8 @@ import (
 
 	esc_client "github.com/pulumi/esc/cmd/esc/cli/client"
 	"github.com/pulumi/esc/cmd/esc/cli/version"
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/internal/pulumiapi"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/resources"
 	"github.com/pulumi/pulumi/pkg/v3/codegen/schema"
 	"github.com/pulumi/pulumi/pkg/v3/resource/provider"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
@@ -37,7 +38,6 @@ import (
 )
 
 type PulumiServiceResource interface {
-	Configure(config PulumiServiceConfig)
 	Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error)
 	Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error)
 	Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error)
@@ -130,64 +130,60 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 	}
 
 	k.pulumiResources = []PulumiServiceResource{
-		&PulumiServiceTeamResource{
-			client: client,
+		&resources.PulumiServiceTeamResource{
+			Client: client,
 		},
-		&PulumiServiceAccessTokenResource{
-			client: client,
+		&resources.PulumiServiceAccessTokenResource{
+			Client: client,
 		},
-		&PulumiServiceWebhookResource{
-			client: client,
+		&resources.PulumiServiceWebhookResource{
+			Client: client,
 		},
-		&PulumiServiceStackTagResource{
-			client: client,
+		&resources.PulumiServiceStackTagResource{
+			Client: client,
 		},
-		&TeamStackPermissionResource{
-			client: client,
+		&resources.TeamStackPermissionResource{
+			Client: client,
 		},
-		&PulumiServiceTeamAccessTokenResource{
-			client: client,
+		&resources.PulumiServiceTeamAccessTokenResource{
+			Client: client,
 		},
-		&PulumiServiceOrgAccessTokenResource{
-			client: client,
+		&resources.PulumiServiceOrgAccessTokenResource{
+			Client: client,
 		},
-		&PulumiServiceDeploymentSettingsResource{
-			client: client,
+		&resources.PulumiServiceDeploymentSettingsResource{
+			Client: client,
 		},
-		&PulumiServiceAgentPoolResource{
-			client: client,
+		&resources.PulumiServiceAgentPoolResource{
+			Client: client,
 		},
-		&PulumiServiceDeploymentScheduleResource{
-			client: client,
+		&resources.PulumiServiceDeploymentScheduleResource{
+			Client: client,
 		},
-		&PulumiServiceDriftScheduleResource{
-			client: client,
+		&resources.PulumiServiceDriftScheduleResource{
+			Client: client,
 		},
-		&PulumiServiceTtlScheduleResource{
-			client: client,
+		&resources.PulumiServiceTtlScheduleResource{
+			Client: client,
 		},
-		&PulumiServiceEnvironmentResource{
-			client: escClient,
+		&resources.PulumiServiceEnvironmentResource{
+			Client: escClient,
 		},
-		&PulumiServiceTeamEnvironmentPermissionResource{
-			client: client,
+		&resources.PulumiServiceTeamEnvironmentPermissionResource{
+			Client: client,
 		},
-		&PulumiServiceEnvironmentVersionTagResource{
-			client: escClient,
+		&resources.PulumiServiceEnvironmentVersionTagResource{
+			Client: escClient,
 		},
-		&PulumiServiceStackResource{
-			client: client,
+		&resources.PulumiServiceStackResource{
+			Client: client,
 		},
-		&PulumiServiceTemplateSourceResource{
-			client: client,
+		&resources.PulumiServiceTemplateSourceResource{
+			Client: client,
 		},
-		&PulumiServiceOidcIssuerResource{
-			client: client,
+		&resources.PulumiServiceOidcIssuerResource{
+			Client: client,
 		},
-	}
-
-	for _, sr := range k.pulumiResources {
-		sr.Configure(sc)
 	}
 
 	return &pulumirpc.ConfigureResponse{
