@@ -46,11 +46,6 @@ func NewOidcIssuer(ctx *pulumi.Context,
 	if args.Url == nil {
 		return nil, errors.New("invalid value for required argument 'Url'")
 	}
-	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
-		"organization",
-		"url",
-	})
-	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource OidcIssuer
 	err := ctx.RegisterResource("pulumiservice:index:OidcIssuer", name, args, &resource, opts...)

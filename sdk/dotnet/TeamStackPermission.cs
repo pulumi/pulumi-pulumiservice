@@ -16,6 +16,37 @@ namespace Pulumi.PulumiService
     public partial class TeamStackPermission : global::Pulumi.CustomResource
     {
         /// <summary>
+        /// The organization or the personal account name of the stack.
+        /// </summary>
+        [Output("organization")]
+        public Output<string> Organization { get; private set; } = null!;
+
+        /// <summary>
+        /// Sets the permission level that this team will be granted to the stack.
+        /// </summary>
+        [Output("permission")]
+        public Output<Pulumi.PulumiService.TeamStackPermissionScope> Permission { get; private set; } = null!;
+
+        /// <summary>
+        /// The project name for this stack.
+        /// </summary>
+        [Output("project")]
+        public Output<string> Project { get; private set; } = null!;
+
+        /// <summary>
+        /// The name of the stack that the team will be granted permissions to.
+        /// </summary>
+        [Output("stack")]
+        public Output<string> Stack { get; private set; } = null!;
+
+        /// <summary>
+        /// The name of the team to grant this stack permissions to. This is not the display name.
+        /// </summary>
+        [Output("team")]
+        public Output<string> Team { get; private set; } = null!;
+
+
+        /// <summary>
         /// Create a TeamStackPermission resource with the given unique name, arguments, and options.
         /// </summary>
         ///

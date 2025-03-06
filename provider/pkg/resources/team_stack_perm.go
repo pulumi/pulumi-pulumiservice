@@ -138,18 +138,7 @@ func (tp *TeamStackPermissionResource) Delete(req *pulumirpc.DeleteRequest) (*pb
 }
 
 func (tp *TeamStackPermissionResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	changedKeys, err := util.DiffOldsAndNews(req)
-	if err != nil {
-		return nil, err
-	}
-	changes := pulumirpc.DiffResponse_DIFF_NONE
-	if len(changedKeys) > 0 {
-		changes = pulumirpc.DiffResponse_DIFF_SOME
-	}
-	return &pulumirpc.DiffResponse{
-		Changes:  changes,
-		Replaces: changedKeys,
-	}, nil
+	return util.StandardDiff(req, []string{}, true)
 }
 
 // Update does nothing because we always replace on changes, never an update

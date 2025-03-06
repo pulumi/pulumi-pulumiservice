@@ -581,50 +581,7 @@ func toCacheOptions(inputMap resource.PropertyMap) *pulumiapi.CacheOptions {
 }
 
 func (ds *PulumiServiceDeploymentSettingsResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), util.StandardUnmarshal)
-	if err != nil {
-		return nil, err
-	}
-
-	news, err := plugin.UnmarshalProperties(req.GetNews(), util.StandardUnmarshal)
-	if err != nil {
-		return nil, err
-	}
-
-	diffs := olds.Diff(news)
-	if diffs == nil {
-		return &pulumirpc.DiffResponse{
-			Changes: pulumirpc.DiffResponse_DIFF_NONE,
-		}, nil
-	}
-
-	dd := plugin.NewDetailedDiffFromObjectDiff(diffs, false)
-
-	detailedDiffs := map[string]*pulumirpc.PropertyDiff{}
-	replaces := []string(nil)
-	replaceProperties := map[string]bool{
-		"organization": true,
-		"project":      true,
-		"stack":        true,
-	}
-	for k, v := range dd {
-		if _, ok := replaceProperties[k]; ok {
-			v.Kind = v.Kind.AsReplace()
-			replaces = append(replaces, k)
-		}
-		detailedDiffs[k] = &pulumirpc.PropertyDiff{
-			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind),
-			InputDiff: v.InputDiff,
-		}
-	}
-
-	return &pulumirpc.DiffResponse{
-		Changes:             pulumirpc.DiffResponse_DIFF_SOME,
-		Replaces:            replaces,
-		DetailedDiff:        detailedDiffs,
-		HasDetailedDiff:     true,
-		DeleteBeforeReplace: true,
-	}, nil
+	return util.StandardDiff(req, []string{"organization", "project", "stack"}, false)
 }
 
 func (ds *PulumiServiceDeploymentSettingsResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {

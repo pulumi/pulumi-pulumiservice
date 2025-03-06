@@ -1,7 +1,12 @@
 CHANGELOG
 =========
 
-## 0.28.0 (WIP)
+## 0.29.1
+
+### Improvements
+- Standardized Diff methods for all resources [#481](https://github.com/pulumi/pulumi-pulumiservice/issues/481)
+
+## 0.28.0
 
 ### Improvements
 - Added OIDC Issuer resource [#349](https://github.com/pulumi/pulumi-pulumiservice/issues/349)

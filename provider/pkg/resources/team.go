@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"reflect"
 	"strings"
 
 	"golang.org/x/exp/slices"
@@ -13,6 +12,7 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/util/rpcutil/rpcerror"
@@ -165,31 +165,7 @@ func (t *PulumiServiceTeamResource) Delete(req *pulumirpc.DeleteRequest) (*pbemp
 }
 
 func (t *PulumiServiceTeamResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
-
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: false})
-	if err != nil {
-		return nil, err
-	}
-
-	oldTeam := ToPulumiServiceTeamInput(olds)
-	newTeam := ToPulumiServiceTeamInput(news)
-
-	changes := pulumirpc.DiffResponse_DIFF_NONE
-
-	if !reflect.DeepEqual(oldTeam, newTeam) {
-		changes = pulumirpc.DiffResponse_DIFF_SOME
-	}
-
-	return &pulumirpc.DiffResponse{
-		Changes:             changes,
-		Replaces:            []string{},
-		Stables:             []string{},
-		DeleteBeforeReplace: false,
-	}, nil
+	return util.StandardDiff(req, []string{"name", "organizationName", "teamType"}, false)
 }
 
 func (t *PulumiServiceTeamResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
