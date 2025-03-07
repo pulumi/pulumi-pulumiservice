@@ -97,8 +97,6 @@ export class OidcIssuer extends pulumi.CustomResource {
             resourceInputs["url"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
-        const replaceOnChanges = { replaceOnChanges: ["organization", "url"] };
-        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(OidcIssuer.__pulumiType, name, resourceInputs, opts);
     }
 }
