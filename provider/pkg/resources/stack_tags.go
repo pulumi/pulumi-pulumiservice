@@ -10,7 +10,6 @@ import (
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
@@ -26,18 +25,6 @@ type PulumiServiceStackTagInput struct {
 	Value        string `pulumi:"value"`
 }
 
-const structTagKey = "pulumi" // could also be "json"
-
-func (i *PulumiServiceStackTagInput) ToPropertyMap() resource.PropertyMap {
-	return util.ToPropertyMap(*i, structTagKey)
-}
-
-func (st *PulumiServiceStackTagResource) ToPulumiServiceStackTagInput(inputMap resource.PropertyMap) PulumiServiceStackTagInput {
-	input := PulumiServiceStackTagInput{}
-	_ = util.FromPropertyMap(inputMap, structTagKey, &input)
-	return input
-}
-
 func (st *PulumiServiceStackTagResource) Name() string {
 	return "pulumiservice:index:StackTag"
 }
@@ -49,7 +36,7 @@ func (st *PulumiServiceStackTagResource) Diff(req *pulumirpc.DiffRequest) (*pulu
 func (st *PulumiServiceStackTagResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
 	ctx := context.Background()
 	var input PulumiServiceStackTagInput
-	err := util.FromProperties(req.GetProperties(), structTagKey, &input)
+	err := util.FromProperties(req.GetProperties(), &input)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +55,7 @@ func (st *PulumiServiceStackTagResource) Delete(req *pulumirpc.DeleteRequest) (*
 func (st *PulumiServiceStackTagResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	ctx := context.Background()
 	var input PulumiServiceStackTagInput
-	err := util.FromProperties(req.GetProperties(), structTagKey, &input)
+	err := util.FromProperties(req.GetProperties(), &input)
 	if err != nil {
 		return nil, err
 	}
@@ -129,9 +116,9 @@ func (st *PulumiServiceStackTagResource) Read(req *pulumirpc.ReadRequest) (*pulu
 		Name:         tag.Name,
 		Value:        tag.Value,
 	}
-	props, err := util.ToProperties(input, structTagKey)
+	props, err := util.ToProperties(input)
 	if err != nil {
-		return nil, fmt.Errorf("failed to marshal inputs to properties: %w", err)
+		return nil, err
 	}
 	return &pulumirpc.ReadResponse{
 		Id:         req.Id,

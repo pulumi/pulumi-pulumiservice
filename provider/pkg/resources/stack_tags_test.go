@@ -38,7 +38,7 @@ func TestStackTagsUpdate(t *testing.T) {
 			Value:        "tag_value",
 		}
 
-		properties, err := util.ToProperties(input, "pulumi")
+		properties, err := util.ToProperties(input)
 
 		if err != nil {
 			t.Fatal(err)

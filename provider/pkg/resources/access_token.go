@@ -50,16 +50,6 @@ func GenerateAcessTokenProperties(input PulumiServiceAccessTokenInput, accessTok
 	return outputs, inputs, err
 }
 
-func (at *PulumiServiceAccessTokenResource) ToPulumiServiceAccessTokenInput(inputMap resource.PropertyMap) PulumiServiceAccessTokenInput {
-	input := PulumiServiceAccessTokenInput{}
-
-	if inputMap["description"].HasValue() && inputMap["description"].IsString() {
-		input.Description = inputMap["description"].StringValue()
-	}
-
-	return input
-}
-
 func (at *PulumiServiceAccessTokenResource) Name() string {
 	return "pulumiservice:index:AccessToken"
 }
@@ -85,12 +75,13 @@ func (at *PulumiServiceAccessTokenResource) Delete(req *pulumirpc.DeleteRequest)
 
 func (at *PulumiServiceAccessTokenResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	ctx := context.Background()
-	inputMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+
+	var input PulumiServiceAccessTokenInput
+	err := util.FromProperties(req.GetProperties(), &input)
 	if err != nil {
 		return nil, err
 	}
 
-	input := at.ToPulumiServiceAccessTokenInput(inputMap)
 	accessToken, err := at.createAccessToken(ctx, input)
 	if err != nil {
 		return nil, fmt.Errorf("error creating access token '%s': %s", input.Description, err.Error())

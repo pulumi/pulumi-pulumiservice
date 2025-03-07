@@ -9,8 +9,6 @@ import (
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
@@ -24,15 +22,6 @@ type TeamEnvironmentPermissionInput struct {
 	Environment  string `pulumi:"environment"`
 	Project      string `pulumi:"project"`
 	Permission   string `pulumi:"permission"`
-}
-
-func (i *TeamEnvironmentPermissionInput) ToPropertyMap() resource.PropertyMap {
-	return util.ToPropertyMap(*i, structTagKey)
-}
-
-func (tp *PulumiServiceTeamEnvironmentPermissionResource) ToPulumiServiceTeamInput(inputMap resource.PropertyMap) (*TeamEnvironmentPermissionInput, error) {
-	input := TeamEnvironmentPermissionInput{}
-	return &input, util.FromPropertyMap(inputMap, structTagKey, &input)
 }
 
 func (tp *PulumiServiceTeamEnvironmentPermissionResource) Name() string {
@@ -66,7 +55,7 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Read(req *pulumirpc.Re
 		return &pulumirpc.ReadResponse{}, nil
 	}
 
-	inputs := TeamEnvironmentPermissionInput{
+	input := TeamEnvironmentPermissionInput{
 		Organization: permId.Organization,
 		Team:         permId.Team,
 		Project:      permId.Project,
@@ -74,9 +63,9 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Read(req *pulumirpc.Re
 		Permission:   *permission,
 	}
 
-	properties, err := plugin.MarshalProperties(inputs.ToPropertyMap(), plugin.MarshalOptions{})
+	properties, err := util.ToProperties(input)
 	if err != nil {
-		return nil, fmt.Errorf("failed to marshal inputs to properties: %w", err)
+		return nil, err
 	}
 	return &pulumirpc.ReadResponse{
 		Id:         req.Id,
@@ -88,7 +77,7 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Read(req *pulumirpc.Re
 func (tp *PulumiServiceTeamEnvironmentPermissionResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	ctx := context.Background()
 	var input TeamEnvironmentPermissionInput
-	err := util.FromProperties(req.GetProperties(), structTagKey, &input)
+	err := util.FromProperties(req.GetProperties(), &input)
 	if err != nil {
 		return nil, err
 	}
@@ -123,7 +112,7 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Create(req *pulumirpc.
 func (tp *PulumiServiceTeamEnvironmentPermissionResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
 	ctx := context.Background()
 	var input TeamEnvironmentPermissionInput
-	err := util.FromProperties(req.GetProperties(), structTagKey, &input)
+	err := util.FromProperties(req.GetProperties(), &input)
 	if err != nil {
 		return nil, err
 	}

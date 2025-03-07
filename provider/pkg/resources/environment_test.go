@@ -8,6 +8,7 @@ import (
 
 	"github.com/pulumi/esc"
 	"github.com/pulumi/esc/cmd/esc/cli/client"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/asset"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
@@ -336,7 +337,7 @@ func TestEnvironmentVersionTag(t *testing.T) {
 			Revision:     1,
 		}
 
-		propertyMap := input.ToPropertyMap()
+		propertyMap := util.ToPropertyMap(input)
 		outputProperties, _ := plugin.MarshalProperties(
 			propertyMap,
 			plugin.MarshalOptions{
@@ -379,7 +380,7 @@ func TestEnvironmentVersionTag(t *testing.T) {
 			Revision:     1,
 		}
 
-		propertyMap := input.ToPropertyMap()
+		propertyMap := util.ToPropertyMap(input)
 		outputProperties, _ := plugin.MarshalProperties(
 			propertyMap,
 			plugin.MarshalOptions{

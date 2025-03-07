@@ -8,9 +8,8 @@ import (
 )
 
 // ToPropertyMap marshals a struct into a resource.PropertyMap. It obtains
-// the resource.PropertyKey() values for each struct field by grabbing
-// value of the structTagKey
-func ToPropertyMap(obj interface{}, structTagName string) resource.PropertyMap {
+// the resource.PropertyKey() values for each struct field
+func ToPropertyMap(obj interface{}) resource.PropertyMap {
 	v := reflect.ValueOf(obj)
 	kind := v.Kind()
 	if kind != reflect.Struct {
@@ -19,7 +18,7 @@ func ToPropertyMap(obj interface{}, structTagName string) resource.PropertyMap {
 	properties := resource.PropertyMap{}
 	for i := 0; i < v.NumField(); i++ {
 		fv := v.Field(i)
-		fieldName, ok := getTagValue(v.Type().Field(i).Tag, structTagName)
+		fieldName, ok := getTagValue(v.Type().Field(i).Tag, "pulumi")
 		if !ok {
 			continue
 		}
@@ -29,7 +28,7 @@ func ToPropertyMap(obj interface{}, structTagName string) resource.PropertyMap {
 }
 
 // FromPropertyMap unmarshals properties into out.
-func FromPropertyMap(properties resource.PropertyMap, structTagName string, out interface{}) error {
+func FromPropertyMap(properties resource.PropertyMap, out interface{}) {
 	v := reflect.ValueOf(out)
 	kind := v.Kind()
 	if kind == reflect.Ptr {
@@ -41,7 +40,7 @@ func FromPropertyMap(properties resource.PropertyMap, structTagName string, out 
 	}
 	for i := 0; i < v.NumField(); i++ {
 		fv := v.Field(i)
-		fieldName, ok := getTagValue(v.Type().Field(i).Tag, structTagName)
+		fieldName, ok := getTagValue(v.Type().Field(i).Tag, "pulumi")
 		if !ok {
 			continue
 		}
@@ -51,13 +50,8 @@ func FromPropertyMap(properties resource.PropertyMap, structTagName string, out 
 			// set properly
 			continue
 		}
-		err := set(fv, mapVal.V)
-		if err != nil {
-			return err
-		}
-
+		_ = set(fv, mapVal.V)
 	}
-	return nil
 }
 
 // get returns the value depending on the kind

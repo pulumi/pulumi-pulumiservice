@@ -9,8 +9,6 @@ import (
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
@@ -24,15 +22,6 @@ type TeamStackPermissionInput struct {
 	Stack        string `pulumi:"stack"`
 	Team         string `pulumi:"team"`
 	Permission   int    `pulumi:"permission"`
-}
-
-func (i *TeamStackPermissionInput) ToPropertyMap() resource.PropertyMap {
-	return util.ToPropertyMap(*i, structTagKey)
-}
-
-func (tp *TeamStackPermissionResource) ToPulumiServiceTeamInput(inputMap resource.PropertyMap) (*TeamStackPermissionInput, error) {
-	input := TeamStackPermissionInput{}
-	return &input, util.FromPropertyMap(inputMap, structTagKey, &input)
 }
 
 func (tp *TeamStackPermissionResource) Name() string {
@@ -73,7 +62,7 @@ func (tp *TeamStackPermissionResource) Read(req *pulumirpc.ReadRequest) (*pulumi
 		return &pulumirpc.ReadResponse{}, nil
 	}
 
-	inputs := TeamStackPermissionInput{
+	input := TeamStackPermissionInput{
 		Organization: permId.Organization,
 		Project:      permId.Project,
 		Stack:        permId.Stack,
@@ -81,9 +70,9 @@ func (tp *TeamStackPermissionResource) Read(req *pulumirpc.ReadRequest) (*pulumi
 		Permission:   *permission,
 	}
 
-	properties, err := plugin.MarshalProperties(inputs.ToPropertyMap(), plugin.MarshalOptions{})
+	properties, err := util.ToProperties(input)
 	if err != nil {
-		return nil, fmt.Errorf("failed to marshal inputs to properties: %w", err)
+		return nil, err
 	}
 	return &pulumirpc.ReadResponse{
 		Id:         req.Id,
@@ -95,7 +84,7 @@ func (tp *TeamStackPermissionResource) Read(req *pulumirpc.ReadRequest) (*pulumi
 func (tp *TeamStackPermissionResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	ctx := context.Background()
 	var input TeamStackPermissionInput
-	err := util.FromProperties(req.GetProperties(), structTagKey, &input)
+	err := util.FromProperties(req.GetProperties(), &input)
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +110,7 @@ func (tp *TeamStackPermissionResource) Create(req *pulumirpc.CreateRequest) (*pu
 func (tp *TeamStackPermissionResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
 	ctx := context.Background()
 	var input TeamStackPermissionInput
-	err := util.FromProperties(req.GetProperties(), structTagKey, &input)
+	err := util.FromProperties(req.GetProperties(), &input)
 	if err != nil {
 		return nil, err
 	}
