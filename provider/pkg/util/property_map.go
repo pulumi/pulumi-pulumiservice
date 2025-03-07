@@ -5,14 +5,11 @@ import (
 	"reflect"
 
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
 // ToPropertyMap marshals a struct into a resource.PropertyMap. It obtains
-// the resource.PropertyKey() values for each struct field by grabbing
-// value of the structTagKey
-func ToPropertyMap(obj interface{}, structTagName string) resource.PropertyMap {
+// the resource.PropertyKey() values for each struct field
+func ToPropertyMap(obj interface{}) resource.PropertyMap {
 	v := reflect.ValueOf(obj)
 	kind := v.Kind()
 	if kind != reflect.Struct {
@@ -21,7 +18,7 @@ func ToPropertyMap(obj interface{}, structTagName string) resource.PropertyMap {
 	properties := resource.PropertyMap{}
 	for i := 0; i < v.NumField(); i++ {
 		fv := v.Field(i)
-		fieldName, ok := getTagValue(v.Type().Field(i).Tag, structTagName)
+		fieldName, ok := getTagValue(v.Type().Field(i).Tag, "pulumi")
 		if !ok {
 			continue
 		}
@@ -31,7 +28,7 @@ func ToPropertyMap(obj interface{}, structTagName string) resource.PropertyMap {
 }
 
 // FromPropertyMap unmarshals properties into out.
-func FromPropertyMap(properties resource.PropertyMap, structTagName string, out interface{}) error {
+func FromPropertyMap(properties resource.PropertyMap, out interface{}) {
 	v := reflect.ValueOf(out)
 	kind := v.Kind()
 	if kind == reflect.Ptr {
@@ -43,7 +40,7 @@ func FromPropertyMap(properties resource.PropertyMap, structTagName string, out 
 	}
 	for i := 0; i < v.NumField(); i++ {
 		fv := v.Field(i)
-		fieldName, ok := getTagValue(v.Type().Field(i).Tag, structTagName)
+		fieldName, ok := getTagValue(v.Type().Field(i).Tag, "pulumi")
 		if !ok {
 			continue
 		}
@@ -53,32 +50,8 @@ func FromPropertyMap(properties resource.PropertyMap, structTagName string, out 
 			// set properly
 			continue
 		}
-		err := set(fv, mapVal.V)
-		if err != nil {
-			return err
-		}
-
+		_ = set(fv, mapVal.V)
 	}
-	return nil
-}
-
-// DiffOldsAndNews unmarshals a DiffRequest and runs a diff on them. It returns any keys changed
-func DiffOldsAndNews(req *pulumirpc.DiffRequest) ([]string, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
-
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: false})
-	if err != nil {
-		return nil, err
-	}
-	d := olds.Diff(news)
-	var diffs []string
-	for _, key := range d.ChangedKeys() {
-		diffs = append(diffs, string(key))
-	}
-	return diffs, nil
 }
 
 // get returns the value depending on the kind

@@ -50,22 +50,17 @@ func GenerateAcessTokenProperties(input PulumiServiceAccessTokenInput, accessTok
 	return outputs, inputs, err
 }
 
-func (at *PulumiServiceAccessTokenResource) ToPulumiServiceAccessTokenInput(inputMap resource.PropertyMap) PulumiServiceAccessTokenInput {
-	input := PulumiServiceAccessTokenInput{}
-
-	if inputMap["description"].HasValue() && inputMap["description"].IsString() {
-		input.Description = inputMap["description"].StringValue()
-	}
-
-	return input
-}
-
 func (at *PulumiServiceAccessTokenResource) Name() string {
 	return "pulumiservice:index:AccessToken"
 }
 
 func (at *PulumiServiceAccessTokenResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	return diffAccessTokenProperties(req, []string{"description"})
+	olds, news, err := util.DeprecatedOldNews(req)
+	if err != nil {
+		return nil, err
+	}
+
+	return util.DeprecatedInputDiff(olds, news, []string{"description"}, false)
 }
 
 func (at *PulumiServiceAccessTokenResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
@@ -80,12 +75,13 @@ func (at *PulumiServiceAccessTokenResource) Delete(req *pulumirpc.DeleteRequest)
 
 func (at *PulumiServiceAccessTokenResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	ctx := context.Background()
-	inputMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+
+	var input PulumiServiceAccessTokenInput
+	err := util.FromProperties(req.GetProperties(), &input)
 	if err != nil {
 		return nil, err
 	}
 
-	input := at.ToPulumiServiceAccessTokenInput(inputMap)
 	accessToken, err := at.createAccessToken(ctx, input)
 	if err != nil {
 		return nil, fmt.Errorf("error creating access token '%s': %s", input.Description, err.Error())
@@ -159,40 +155,4 @@ func (at *PulumiServiceAccessTokenResource) createAccessToken(ctx context.Contex
 
 func (at *PulumiServiceAccessTokenResource) deleteAccessToken(ctx context.Context, tokenId string) error {
 	return at.Client.DeleteAccessToken(ctx, tokenId)
-}
-
-func diffAccessTokenProperties(req *pulumirpc.DiffRequest, replaceProps []string) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
-
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: false})
-	if err != nil {
-		return nil, err
-	}
-
-	inputs, ok := olds["__inputs"]
-	if !ok {
-		return nil, fmt.Errorf("missing __inputs property")
-	}
-	diffs := inputs.ObjectValue().Diff(news)
-	if diffs == nil {
-		return &pulumirpc.DiffResponse{
-			Changes: pulumirpc.DiffResponse_DIFF_NONE,
-		}, nil
-	}
-
-	changes, replaces := pulumirpc.DiffResponse_DIFF_NONE, []string(nil)
-	for _, k := range replaceProps {
-		if diffs.Changed(resource.PropertyKey(k)) {
-			changes = pulumirpc.DiffResponse_DIFF_SOME
-			replaces = append(replaces, k)
-		}
-	}
-
-	return &pulumirpc.DiffResponse{
-		Changes:  changes,
-		Replaces: replaces,
-	}, nil
 }
