@@ -200,28 +200,8 @@ class TeamEnvironmentPermission(pulumi.CustomResource):
 
         __props__ = TeamEnvironmentPermissionArgs.__new__(TeamEnvironmentPermissionArgs)
 
-        __props__.__dict__["environment"] = None
-        __props__.__dict__["organization"] = None
         __props__.__dict__["permission"] = None
-        __props__.__dict__["project"] = None
-        __props__.__dict__["team"] = None
         return TeamEnvironmentPermission(resource_name, opts=opts, __props__=__props__)
-
-    @property
-    @pulumi.getter
-    def environment(self) -> pulumi.Output[Optional[str]]:
-        """
-        Environment name.
-        """
-        return pulumi.get(self, "environment")
-
-    @property
-    @pulumi.getter
-    def organization(self) -> pulumi.Output[Optional[str]]:
-        """
-        Organization name.
-        """
-        return pulumi.get(self, "organization")
 
     @property
     @pulumi.getter
@@ -230,20 +210,4 @@ class TeamEnvironmentPermission(pulumi.CustomResource):
         Which permission level to grant to the specified team.
         """
         return pulumi.get(self, "permission")
-
-    @property
-    @pulumi.getter
-    def project(self) -> pulumi.Output[Optional[str]]:
-        """
-        Project name.
-        """
-        return pulumi.get(self, "project")
-
-    @property
-    @pulumi.getter
-    def team(self) -> pulumi.Output[Optional[str]]:
-        """
-        Team name.
-        """
-        return pulumi.get(self, "team")
 

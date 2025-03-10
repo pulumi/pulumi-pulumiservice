@@ -38,25 +38,9 @@ export class TeamEnvironmentPermission extends pulumi.CustomResource {
     }
 
     /**
-     * Environment name.
-     */
-    public readonly environment!: pulumi.Output<string | undefined>;
-    /**
-     * Organization name.
-     */
-    public readonly organization!: pulumi.Output<string | undefined>;
-    /**
      * Which permission level to grant to the specified team.
      */
     public readonly permission!: pulumi.Output<enums.EnvironmentPermission | undefined>;
-    /**
-     * Project name.
-     */
-    public readonly project!: pulumi.Output<string | undefined>;
-    /**
-     * Team name.
-     */
-    public readonly team!: pulumi.Output<string | undefined>;
 
     /**
      * Create a TeamEnvironmentPermission resource with the given unique name, arguments, and options.
@@ -87,11 +71,7 @@ export class TeamEnvironmentPermission extends pulumi.CustomResource {
             resourceInputs["project"] = (args ? args.project : undefined) ?? "default";
             resourceInputs["team"] = args ? args.team : undefined;
         } else {
-            resourceInputs["environment"] = undefined /*out*/;
-            resourceInputs["organization"] = undefined /*out*/;
             resourceInputs["permission"] = undefined /*out*/;
-            resourceInputs["project"] = undefined /*out*/;
-            resourceInputs["team"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         super(TeamEnvironmentPermission.__pulumiType, name, resourceInputs, opts);

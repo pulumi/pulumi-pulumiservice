@@ -1322,36 +1322,6 @@
         "project",
         "stack",
         "permission"
-      ],
-      "properties": {
-        "team": {
-          "description": "The name of the team to grant this stack permissions to. This is not the display name.",
-          "type": "string"
-        },
-        "organization": {
-          "description": "The organization or the personal account name of the stack.",
-          "type": "string"
-        },
-        "project": {
-          "description": "The project name for this stack.",
-          "type": "string"
-        },
-        "stack": {
-          "description": "The name of the stack that the team will be granted permissions to.",
-          "type": "string"
-        },
-        "permission": {
-          "$ref": "#/types/pulumiservice:index:TeamStackPermissionScope",
-          "plain": true,
-          "description": "Sets the permission level that this team will be granted to the stack."
-        }
-      },
-      "required": [
-        "team",
-        "organization",
-        "project",
-        "stack",
-        "permission"
       ]
     },
     "pulumiservice:index:DeploymentSchedule": {
@@ -1375,7 +1345,8 @@
         },
         "timestamp": {
           "description": "The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are supplying this, do not supply scheduleCron.",
-          "type": "string"
+          "type": "string",
+          "willReplaceOnChanges": true
         },
         "pulumiOperation": {
           "description": "Which operation to run.",
@@ -1412,7 +1383,8 @@
         },
         "timestamp": {
           "description": "The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are supplying this, do not supply scheduleCron.",
-          "type": "string"
+          "type": "string",
+          "willReplaceOnChanges": true
         },
         "pulumiOperation": {
           "description": "Which command to run.",
@@ -1509,7 +1481,8 @@
         },
         "timestamp": {
           "description": "The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.",
-          "type": "string"
+          "type": "string",
+          "willReplaceOnChanges": true
         },
         "deleteAfterDestroy": {
           "description": "True if the stack and all associated history and settings should be deleted.",
@@ -1543,7 +1516,8 @@
         },
         "timestamp": {
           "description": "The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.",
-          "type": "string"
+          "type": "string",
+          "willReplaceOnChanges": true
         },
         "deleteAfterDestroy": {
           "description": "True if the stack and all associated history and settings should be deleted.",
@@ -1617,23 +1591,6 @@
     "pulumiservice:index:TeamEnvironmentPermission": {
       "description": "A permission for a team to use an environment.",
       "properties": {
-        "organization": {
-          "description": "Organization name.",
-          "type": "string"
-        },
-        "team": {
-          "description": "Team name.",
-          "type": "string"
-        },
-        "project": {
-          "description": "Project name.",
-          "default": "default",
-          "type": "string"
-        },
-        "environment": {
-          "description": "Environment name.",
-          "type": "string"
-        },
         "permission": {
           "description": "Which permission level to grant to the specified team.",
           "$ref": "#/types/pulumiservice:index:EnvironmentPermission"
@@ -1784,7 +1741,8 @@
       "properties": {
         "organization": {
           "description": "Organization name.",
-          "type": "string"
+          "type": "string",
+          "replaceOnChanges": true
         },
         "name": {
           "description": "Issuer name.",
@@ -1792,7 +1750,8 @@
         },
         "url": {
           "description": "The OIDC issuer URL.",
-          "type": "string"
+          "type": "string",
+          "replaceOnChanges": true
         },
         "maxExpirationSeconds": {
           "description": "The maximum duration of the Pulumi access token working after an exchange, specified in seconds.",
@@ -1823,7 +1782,8 @@
       "inputProperties": {
         "organization": {
           "description": "Organization name.",
-          "type": "string"
+          "type": "string",
+          "replaceOnChanges": true
         },
         "name": {
           "description": "Issuer name.",
@@ -1831,7 +1791,8 @@
         },
         "url": {
           "description": "The OIDC issuer URL.",
-          "type": "string"
+          "type": "string",
+          "replaceOnChanges": true
         },
         "maxExpirationSeconds": {
           "description": "The maximum duration of the Pulumi access token working after an exchange, specified in seconds.",

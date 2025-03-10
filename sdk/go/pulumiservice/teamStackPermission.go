@@ -15,17 +15,6 @@ import (
 // Grants a team permissions to the specified stack.
 type TeamStackPermission struct {
 	pulumi.CustomResourceState
-
-	// The organization or the personal account name of the stack.
-	Organization pulumi.StringOutput `pulumi:"organization"`
-	// Sets the permission level that this team will be granted to the stack.
-	Permission TeamStackPermissionScopeOutput `pulumi:"permission"`
-	// The project name for this stack.
-	Project pulumi.StringOutput `pulumi:"project"`
-	// The name of the stack that the team will be granted permissions to.
-	Stack pulumi.StringOutput `pulumi:"stack"`
-	// The name of the team to grant this stack permissions to. This is not the display name.
-	Team pulumi.StringOutput `pulumi:"team"`
 }
 
 // NewTeamStackPermission registers a new resource with the given unique name, arguments, and options.
@@ -191,31 +180,6 @@ func (o TeamStackPermissionOutput) ToTeamStackPermissionOutput() TeamStackPermis
 
 func (o TeamStackPermissionOutput) ToTeamStackPermissionOutputWithContext(ctx context.Context) TeamStackPermissionOutput {
 	return o
-}
-
-// The organization or the personal account name of the stack.
-func (o TeamStackPermissionOutput) Organization() pulumi.StringOutput {
-	return o.ApplyT(func(v *TeamStackPermission) pulumi.StringOutput { return v.Organization }).(pulumi.StringOutput)
-}
-
-// Sets the permission level that this team will be granted to the stack.
-func (o TeamStackPermissionOutput) Permission() TeamStackPermissionScopeOutput {
-	return o.ApplyT(func(v *TeamStackPermission) TeamStackPermissionScopeOutput { return v.Permission }).(TeamStackPermissionScopeOutput)
-}
-
-// The project name for this stack.
-func (o TeamStackPermissionOutput) Project() pulumi.StringOutput {
-	return o.ApplyT(func(v *TeamStackPermission) pulumi.StringOutput { return v.Project }).(pulumi.StringOutput)
-}
-
-// The name of the stack that the team will be granted permissions to.
-func (o TeamStackPermissionOutput) Stack() pulumi.StringOutput {
-	return o.ApplyT(func(v *TeamStackPermission) pulumi.StringOutput { return v.Stack }).(pulumi.StringOutput)
-}
-
-// The name of the team to grant this stack permissions to. This is not the display name.
-func (o TeamStackPermissionOutput) Team() pulumi.StringOutput {
-	return o.ApplyT(func(v *TeamStackPermission) pulumi.StringOutput { return v.Team }).(pulumi.StringOutput)
 }
 
 type TeamStackPermissionArrayOutput struct{ *pulumi.OutputState }

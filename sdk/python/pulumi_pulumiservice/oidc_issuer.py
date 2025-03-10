@@ -195,6 +195,8 @@ class OidcIssuer(pulumi.CustomResource):
             if url is None and not opts.urn:
                 raise TypeError("Missing required property 'url'")
             __props__.__dict__["url"] = url
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["organization", "url"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(OidcIssuer, __self__).__init__(
             'pulumiservice:index:OidcIssuer',
             resource_name,

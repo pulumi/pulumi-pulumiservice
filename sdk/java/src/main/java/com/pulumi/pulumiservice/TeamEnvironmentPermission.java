@@ -10,7 +10,6 @@ import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.TeamEnvironmentPermissionArgs;
 import com.pulumi.pulumiservice.Utilities;
 import com.pulumi.pulumiservice.enums.EnvironmentPermission;
-import java.lang.String;
 import java.util.Optional;
 import javax.annotation.Nullable;
 
@@ -20,34 +19,6 @@ import javax.annotation.Nullable;
  */
 @ResourceType(type="pulumiservice:index:TeamEnvironmentPermission")
 public class TeamEnvironmentPermission extends com.pulumi.resources.CustomResource {
-    /**
-     * Environment name.
-     * 
-     */
-    @Export(name="environment", refs={String.class}, tree="[0]")
-    private Output</* @Nullable */ String> environment;
-
-    /**
-     * @return Environment name.
-     * 
-     */
-    public Output<Optional<String>> environment() {
-        return Codegen.optional(this.environment);
-    }
-    /**
-     * Organization name.
-     * 
-     */
-    @Export(name="organization", refs={String.class}, tree="[0]")
-    private Output</* @Nullable */ String> organization;
-
-    /**
-     * @return Organization name.
-     * 
-     */
-    public Output<Optional<String>> organization() {
-        return Codegen.optional(this.organization);
-    }
     /**
      * Which permission level to grant to the specified team.
      * 
@@ -61,34 +32,6 @@ public class TeamEnvironmentPermission extends com.pulumi.resources.CustomResour
      */
     public Output<Optional<EnvironmentPermission>> permission() {
         return Codegen.optional(this.permission);
-    }
-    /**
-     * Project name.
-     * 
-     */
-    @Export(name="project", refs={String.class}, tree="[0]")
-    private Output</* @Nullable */ String> project;
-
-    /**
-     * @return Project name.
-     * 
-     */
-    public Output<Optional<String>> project() {
-        return Codegen.optional(this.project);
-    }
-    /**
-     * Team name.
-     * 
-     */
-    @Export(name="team", refs={String.class}, tree="[0]")
-    private Output</* @Nullable */ String> team;
-
-    /**
-     * @return Team name.
-     * 
-     */
-    public Output<Optional<String>> team() {
-        return Codegen.optional(this.team);
     }
 
     /**

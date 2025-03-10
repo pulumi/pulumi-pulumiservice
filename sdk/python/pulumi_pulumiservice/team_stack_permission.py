@@ -197,50 +197,5 @@ class TeamStackPermission(pulumi.CustomResource):
 
         __props__ = TeamStackPermissionArgs.__new__(TeamStackPermissionArgs)
 
-        __props__.__dict__["organization"] = None
-        __props__.__dict__["permission"] = None
-        __props__.__dict__["project"] = None
-        __props__.__dict__["stack"] = None
-        __props__.__dict__["team"] = None
         return TeamStackPermission(resource_name, opts=opts, __props__=__props__)
-
-    @property
-    @pulumi.getter
-    def organization(self) -> pulumi.Output[str]:
-        """
-        The organization or the personal account name of the stack.
-        """
-        return pulumi.get(self, "organization")
-
-    @property
-    @pulumi.getter
-    def permission(self) -> pulumi.Output['TeamStackPermissionScope']:
-        """
-        Sets the permission level that this team will be granted to the stack.
-        """
-        return pulumi.get(self, "permission")
-
-    @property
-    @pulumi.getter
-    def project(self) -> pulumi.Output[str]:
-        """
-        The project name for this stack.
-        """
-        return pulumi.get(self, "project")
-
-    @property
-    @pulumi.getter
-    def stack(self) -> pulumi.Output[str]:
-        """
-        The name of the stack that the team will be granted permissions to.
-        """
-        return pulumi.get(self, "stack")
-
-    @property
-    @pulumi.getter
-    def team(self) -> pulumi.Output[str]:
-        """
-        The name of the team to grant this stack permissions to. This is not the display name.
-        """
-        return pulumi.get(self, "team")
 

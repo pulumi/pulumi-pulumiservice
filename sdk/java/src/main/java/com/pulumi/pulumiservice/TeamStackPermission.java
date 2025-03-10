@@ -4,13 +4,10 @@
 package com.pulumi.pulumiservice;
 
 import com.pulumi.core.Output;
-import com.pulumi.core.annotations.Export;
 import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.TeamStackPermissionArgs;
 import com.pulumi.pulumiservice.Utilities;
-import com.pulumi.pulumiservice.enums.TeamStackPermissionScope;
-import java.lang.String;
 import javax.annotation.Nullable;
 
 /**
@@ -19,77 +16,6 @@ import javax.annotation.Nullable;
  */
 @ResourceType(type="pulumiservice:index:TeamStackPermission")
 public class TeamStackPermission extends com.pulumi.resources.CustomResource {
-    /**
-     * The organization or the personal account name of the stack.
-     * 
-     */
-    @Export(name="organization", refs={String.class}, tree="[0]")
-    private Output<String> organization;
-
-    /**
-     * @return The organization or the personal account name of the stack.
-     * 
-     */
-    public Output<String> organization() {
-        return this.organization;
-    }
-    /**
-     * Sets the permission level that this team will be granted to the stack.
-     * 
-     */
-    @Export(name="permission", refs={TeamStackPermissionScope.class}, tree="[0]")
-    private Output<TeamStackPermissionScope> permission;
-
-    /**
-     * @return Sets the permission level that this team will be granted to the stack.
-     * 
-     */
-    public Output<TeamStackPermissionScope> permission() {
-        return this.permission;
-    }
-    /**
-     * The project name for this stack.
-     * 
-     */
-    @Export(name="project", refs={String.class}, tree="[0]")
-    private Output<String> project;
-
-    /**
-     * @return The project name for this stack.
-     * 
-     */
-    public Output<String> project() {
-        return this.project;
-    }
-    /**
-     * The name of the stack that the team will be granted permissions to.
-     * 
-     */
-    @Export(name="stack", refs={String.class}, tree="[0]")
-    private Output<String> stack;
-
-    /**
-     * @return The name of the stack that the team will be granted permissions to.
-     * 
-     */
-    public Output<String> stack() {
-        return this.stack;
-    }
-    /**
-     * The name of the team to grant this stack permissions to. This is not the display name.
-     * 
-     */
-    @Export(name="team", refs={String.class}, tree="[0]")
-    private Output<String> team;
-
-    /**
-     * @return The name of the team to grant this stack permissions to. This is not the display name.
-     * 
-     */
-    public Output<String> team() {
-        return this.team;
-    }
-
     /**
      *
      * @param name The _unique_ name of the resulting resource.
