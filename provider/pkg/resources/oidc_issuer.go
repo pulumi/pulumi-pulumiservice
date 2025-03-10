@@ -122,12 +122,7 @@ func (oir *PulumiServiceOidcIssuerResource) Name() string {
 }
 
 func (oir *PulumiServiceOidcIssuerResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	replaceProperties := map[string]bool{
-		"organization": true,
-		"url":          true,
-	}
-
-	return util.StandardDiff(req, replaceProperties)
+	return util.StandardDiff(req, []string{"organization", "url"}, false)
 }
 
 func (oir *PulumiServiceOidcIssuerResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
