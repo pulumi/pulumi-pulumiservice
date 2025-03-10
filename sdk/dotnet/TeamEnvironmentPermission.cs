@@ -16,10 +16,34 @@ namespace Pulumi.PulumiService
     public partial class TeamEnvironmentPermission : global::Pulumi.CustomResource
     {
         /// <summary>
+        /// Environment name.
+        /// </summary>
+        [Output("environment")]
+        public Output<string?> Environment { get; private set; } = null!;
+
+        /// <summary>
+        /// Organization name.
+        /// </summary>
+        [Output("organization")]
+        public Output<string?> Organization { get; private set; } = null!;
+
+        /// <summary>
         /// Which permission level to grant to the specified team.
         /// </summary>
         [Output("permission")]
         public Output<Pulumi.PulumiService.EnvironmentPermission?> Permission { get; private set; } = null!;
+
+        /// <summary>
+        /// Project name.
+        /// </summary>
+        [Output("project")]
+        public Output<string?> Project { get; private set; } = null!;
+
+        /// <summary>
+        /// Team name.
+        /// </summary>
+        [Output("team")]
+        public Output<string?> Team { get; private set; } = null!;
 
 
         /// <summary>

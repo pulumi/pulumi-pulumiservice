@@ -16,8 +16,16 @@ import (
 type TeamEnvironmentPermission struct {
 	pulumi.CustomResourceState
 
+	// Environment name.
+	Environment pulumi.StringPtrOutput `pulumi:"environment"`
+	// Organization name.
+	Organization pulumi.StringPtrOutput `pulumi:"organization"`
 	// Which permission level to grant to the specified team.
 	Permission EnvironmentPermissionPtrOutput `pulumi:"permission"`
+	// Project name.
+	Project pulumi.StringPtrOutput `pulumi:"project"`
+	// Team name.
+	Team pulumi.StringPtrOutput `pulumi:"team"`
 }
 
 // NewTeamEnvironmentPermission registers a new resource with the given unique name, arguments, and options.
@@ -188,9 +196,29 @@ func (o TeamEnvironmentPermissionOutput) ToTeamEnvironmentPermissionOutputWithCo
 	return o
 }
 
+// Environment name.
+func (o TeamEnvironmentPermissionOutput) Environment() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *TeamEnvironmentPermission) pulumi.StringPtrOutput { return v.Environment }).(pulumi.StringPtrOutput)
+}
+
+// Organization name.
+func (o TeamEnvironmentPermissionOutput) Organization() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *TeamEnvironmentPermission) pulumi.StringPtrOutput { return v.Organization }).(pulumi.StringPtrOutput)
+}
+
 // Which permission level to grant to the specified team.
 func (o TeamEnvironmentPermissionOutput) Permission() EnvironmentPermissionPtrOutput {
 	return o.ApplyT(func(v *TeamEnvironmentPermission) EnvironmentPermissionPtrOutput { return v.Permission }).(EnvironmentPermissionPtrOutput)
+}
+
+// Project name.
+func (o TeamEnvironmentPermissionOutput) Project() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *TeamEnvironmentPermission) pulumi.StringPtrOutput { return v.Project }).(pulumi.StringPtrOutput)
+}
+
+// Team name.
+func (o TeamEnvironmentPermissionOutput) Team() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *TeamEnvironmentPermission) pulumi.StringPtrOutput { return v.Team }).(pulumi.StringPtrOutput)
 }
 
 type TeamEnvironmentPermissionArrayOutput struct{ *pulumi.OutputState }

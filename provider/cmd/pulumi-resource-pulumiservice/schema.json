@@ -720,15 +720,18 @@
         "inputProperties": {
           "organizationName": {
             "description": "The name of the organization.",
-            "type": "string"
+            "type": "string",
+            "willReplaceOnChanges": true
           },
           "projectName": {
             "description": "The name of the project.",
-            "type": "string"
+            "type": "string",
+            "willReplaceOnChanges": true
           },
           "stackName": {
             "description": "The name of the stack.",
-            "type": "string"
+            "type": "string",
+            "willReplaceOnChanges": true
           },
           "forceDestroy": {
             "description": "Optional. Flag indicating whether to delete the stack even if it still contains resources.",
@@ -779,7 +782,8 @@
       "inputProperties": {
         "name": {
           "description": "Name of the agent pool.",
-          "type": "string"
+          "type": "string",
+          "willReplaceOnChanges": true
         },
         "description": {
           "description": "Description of the agent pool.",
@@ -787,7 +791,8 @@
         },
         "organizationName": {
           "description": "The organization's name.",
-          "type": "string"
+          "type": "string",
+          "willReplaceOnChanges": true
         },
         "forceDestroy": {
           "description": "Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.",
@@ -869,11 +874,13 @@
       "inputProperties": {
         "teamType": {
           "description": "The type of team. Must be either `pulumi` or `github`.",
-          "type": "string"
+          "type": "string",
+          "willReplaceOnChanges": true
         },
         "name": {
           "description": "The team's name. Required for \"pulumi\" teams.",
-          "type": "string"
+          "type": "string",
+          "willReplaceOnChanges": true
         },
         "displayName": {
           "description": "Optional. Team display name.",
@@ -892,7 +899,8 @@
         },
         "organizationName": {
           "description": "The name of the Pulumi organization the team belongs to.",
-          "type": "string"
+          "type": "string",
+          "willReplaceOnChanges": true
         },
         "githubTeamId": {
           "description": "The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for \"github\" teams.",
@@ -938,11 +946,13 @@
       "inputProperties": {
         "name": {
           "description": "The name for the token. This must be unique amongst all machine tokens within your organization.",
-          "type": "string"
+          "type": "string",
+          "willReplaceOnChanges": true
         },
         "teamName": {
           "description": "The team name.",
-          "type": "string"
+          "type": "string",
+          "willReplaceOnChanges": true
         },
         "description": {
           "description": "Optional. Team description.",
@@ -950,7 +960,8 @@
         },
         "organizationName": {
           "description": "The organization's name.",
-          "type": "string"
+          "type": "string",
+          "willReplaceOnChanges": true
         }
       },
       "requiredInputs": [
@@ -992,7 +1003,8 @@
       "inputProperties": {
         "name": {
           "description": "The name for the token.",
-          "type": "string"
+          "type": "string",
+          "willReplaceOnChanges": true
         },
         "description": {
           "description": "Optional. Team description.",
@@ -1000,7 +1012,8 @@
         },
         "organizationName": {
           "description": "The organization's name.",
-          "type": "string"
+          "type": "string",
+          "willReplaceOnChanges": true
         },
         "admin": {
           "description": "Optional. True if this is an admin token.",
@@ -1100,7 +1113,8 @@
         },
         "organizationName": {
           "description": "Name of the organization.",
-          "type": "string"
+          "type": "string",
+          "willReplaceOnChanges": true
         },
         "projectName": {
           "description": "Name of the project. Only specified if this is a stack or environment webhook.",
@@ -1189,15 +1203,18 @@
       "inputProperties": {
         "organization": {
           "description": "Organization name.",
-          "type": "string"
+          "type": "string",
+          "willReplaceOnChanges": true
         },
         "project": {
           "description": "Project name.",
-          "type": "string"
+          "type": "string",
+          "willReplaceOnChanges": true
         },
         "stack": {
           "description": "Stack name.",
-          "type": "string"
+          "type": "string",
+          "willReplaceOnChanges": true
         },
         "executorContext": {
           "$ref": "#/types/pulumiservice:index:DeploymentSettingsExecutorContext",
@@ -1264,19 +1281,23 @@
       "inputProperties": {
         "organization": {
           "description": "Organization name.",
-          "type": "string"
+          "type": "string",
+          "willReplaceOnChanges": true
         },
         "project": {
           "description": "Project name.",
-          "type": "string"
+          "type": "string",
+          "willReplaceOnChanges": true
         },
         "stack": {
           "description": "Stack name.",
-          "type": "string"
+          "type": "string",
+          "willReplaceOnChanges": true
         },
         "name": {
           "description": "Name of the tag. The 'key' part of the key=value pair",
-          "type": "string"
+          "type": "string",
+          "willReplaceOnChanges": true
         },
         "value": {
           "description": "Value of the tag. The 'value' part of the key=value pair",
@@ -1294,6 +1315,41 @@
     "pulumiservice:index:TeamStackPermission": {
       "description": "Grants a team permissions to the specified stack.",
       "inputProperties": {
+        "team": {
+          "description": "The name of the team to grant this stack permissions to. This is not the display name.",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "organization": {
+          "description": "The organization or the personal account name of the stack.",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "project": {
+          "description": "The project name for this stack.",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "stack": {
+          "description": "The name of the stack that the team will be granted permissions to.",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "permission": {
+          "$ref": "#/types/pulumiservice:index:TeamStackPermissionScope",
+          "plain": true,
+          "description": "Sets the permission level that this team will be granted to the stack.",
+          "willReplaceOnChanges": true
+        }
+      },
+      "requiredInputs": [
+        "team",
+        "organization",
+        "project",
+        "stack",
+        "permission"
+      ],
+      "properties": {
         "team": {
           "description": "The name of the team to grant this stack permissions to. This is not the display name.",
           "type": "string"
@@ -1316,7 +1372,7 @@
           "description": "Sets the permission level that this team will be granted to the stack."
         }
       },
-      "requiredInputs": [
+      "required": [
         "team",
         "organization",
         "project",
@@ -1367,15 +1423,18 @@
       "inputProperties": {
         "organization": {
           "description": "Organization name.",
-          "type": "string"
+          "type": "string",
+          "willReplaceOnChanges": true
         },
         "project": {
           "description": "Project name.",
-          "type": "string"
+          "type": "string",
+          "willReplaceOnChanges": true
         },
         "stack": {
           "description": "Stack name.",
-          "type": "string"
+          "type": "string",
+          "willReplaceOnChanges": true
         },
         "scheduleCron": {
           "description": "Cron expression for recurring scheduled runs. If you are supplying this, do not supply timestamp.",
@@ -1437,15 +1496,18 @@
       "inputProperties": {
         "organization": {
           "description": "Organization name.",
-          "type": "string"
+          "type": "string",
+          "willReplaceOnChanges": true
         },
         "project": {
           "description": "Project name.",
-          "type": "string"
+          "type": "string",
+          "willReplaceOnChanges": true
         },
         "stack": {
           "description": "Stack name.",
-          "type": "string"
+          "type": "string",
+          "willReplaceOnChanges": true
         },
         "scheduleCron": {
           "description": "Cron expression for when to run drift detection.",
@@ -1504,15 +1566,18 @@
       "inputProperties": {
         "organization": {
           "description": "Organization name.",
-          "type": "string"
+          "type": "string",
+          "willReplaceOnChanges": true
         },
         "project": {
           "description": "Project name.",
-          "type": "string"
+          "type": "string",
+          "willReplaceOnChanges": true
         },
         "stack": {
           "description": "Stack name.",
-          "type": "string"
+          "type": "string",
+          "willReplaceOnChanges": true
         },
         "timestamp": {
           "description": "The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.",
@@ -1591,6 +1656,23 @@
     "pulumiservice:index:TeamEnvironmentPermission": {
       "description": "A permission for a team to use an environment.",
       "properties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "team": {
+          "description": "Team name.",
+          "type": "string"
+        },
+        "project": {
+          "description": "Project name.",
+          "default": "default",
+          "type": "string"
+        },
+        "environment": {
+          "description": "Environment name.",
+          "type": "string"
+        },
         "permission": {
           "description": "Which permission level to grant to the specified team.",
           "$ref": "#/types/pulumiservice:index:EnvironmentPermission"
