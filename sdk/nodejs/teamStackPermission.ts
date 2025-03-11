@@ -37,6 +37,26 @@ export class TeamStackPermission extends pulumi.CustomResource {
         return obj['__pulumiType'] === TeamStackPermission.__pulumiType;
     }
 
+    /**
+     * The organization or the personal account name of the stack.
+     */
+    public readonly organization!: pulumi.Output<string>;
+    /**
+     * Sets the permission level that this team will be granted to the stack.
+     */
+    public readonly permission!: pulumi.Output<enums.TeamStackPermissionScope>;
+    /**
+     * The project name for this stack.
+     */
+    public readonly project!: pulumi.Output<string>;
+    /**
+     * The name of the stack that the team will be granted permissions to.
+     */
+    public readonly stack!: pulumi.Output<string>;
+    /**
+     * The name of the team to grant this stack permissions to. This is not the display name.
+     */
+    public readonly team!: pulumi.Output<string>;
 
     /**
      * Create a TeamStackPermission resource with the given unique name, arguments, and options.
@@ -70,6 +90,11 @@ export class TeamStackPermission extends pulumi.CustomResource {
             resourceInputs["stack"] = args ? args.stack : undefined;
             resourceInputs["team"] = args ? args.team : undefined;
         } else {
+            resourceInputs["organization"] = undefined /*out*/;
+            resourceInputs["permission"] = undefined /*out*/;
+            resourceInputs["project"] = undefined /*out*/;
+            resourceInputs["stack"] = undefined /*out*/;
+            resourceInputs["team"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         super(TeamStackPermission.__pulumiType, name, resourceInputs, opts);
