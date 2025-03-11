@@ -284,60 +284,12 @@ func (wh *PulumiServiceWebhookResource) Create(req *pulumirpc.CreateRequest) (*p
 }
 
 func (wh *PulumiServiceWebhookResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
+	olds, news, err := util.StandardOldNews(req)
 	if err != nil {
 		return nil, err
 	}
 
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
-
-	// previous versions of the provider used "__inputs" key to store inputs in output properties
-	// to maintain backwards compatibility, we still need to handle this case
-	// so we just lift up those values to the top level
-	if oldInputs, ok := olds["__inputs"]; ok && oldInputs.IsObject() {
-		for k, v := range oldInputs.ObjectValue() {
-			olds[k] = v
-		}
-	}
-
-	diffs := olds.Diff(news)
-	if diffs == nil {
-		return &pulumirpc.DiffResponse{
-			Changes: pulumirpc.DiffResponse_DIFF_NONE,
-		}, nil
-	}
-
-	dd := plugin.NewDetailedDiffFromObjectDiff(diffs, false)
-
-	detailedDiffs := map[string]*pulumirpc.PropertyDiff{}
-	replaceProperties := map[string]bool{
-		"organizationName": true,
-		"projectName":      true,
-		"stackName":        true,
-		"environmentName":  true,
-	}
-	for k, v := range dd {
-		if _, ok := replaceProperties[k]; ok {
-			v.Kind = v.Kind.AsReplace()
-		}
-		detailedDiffs[k] = &pulumirpc.PropertyDiff{
-			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind),
-			InputDiff: v.InputDiff,
-		}
-	}
-
-	changes := pulumirpc.DiffResponse_DIFF_NONE
-	if len(detailedDiffs) > 0 {
-		changes = pulumirpc.DiffResponse_DIFF_SOME
-	}
-	return &pulumirpc.DiffResponse{
-		Changes:         changes,
-		DetailedDiff:    detailedDiffs,
-		HasDetailedDiff: true,
-	}, nil
+	return util.DeprecatedOptionalInputDiff(olds, news, []string{"organizationName", "projectName", "stackName", "environmentName"}, false)
 }
 
 func (wh *PulumiServiceWebhookResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {

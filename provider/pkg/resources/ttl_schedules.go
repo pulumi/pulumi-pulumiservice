@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
@@ -67,12 +68,7 @@ func ToPulumiServiceTtlScheduleInput(properties *structpb.Struct) (*PulumiServic
 }
 
 func (st *PulumiServiceTtlScheduleResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
-
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	olds, news, err := util.StandardOldNews(req)
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +77,7 @@ func (st *PulumiServiceTtlScheduleResource) Diff(req *pulumirpc.DiffRequest) (*p
 		news["deleteAfterDestroy"] = resource.NewBoolProperty(false)
 	}
 
-	return ScheduleSharedDiffMaps(olds, news)
+	return util.StandardDiffNoMarshal(olds, news, []string{"organization", "project", "stack", "timestamp"}, false)
 }
 
 func (st *PulumiServiceTtlScheduleResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {

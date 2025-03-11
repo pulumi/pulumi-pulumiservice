@@ -5,8 +5,6 @@ import (
 	"reflect"
 
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
 // ToPropertyMap marshals a struct into a resource.PropertyMap. It obtains
@@ -60,25 +58,6 @@ func FromPropertyMap(properties resource.PropertyMap, structTagName string, out 
 
 	}
 	return nil
-}
-
-// DiffOldsAndNews unmarshals a DiffRequest and runs a diff on them. It returns any keys changed
-func DiffOldsAndNews(req *pulumirpc.DiffRequest) ([]string, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
-
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: false})
-	if err != nil {
-		return nil, err
-	}
-	d := olds.Diff(news)
-	var diffs []string
-	for _, key := range d.ChangedKeys() {
-		diffs = append(diffs, string(key))
-	}
-	return diffs, nil
 }
 
 // get returns the value depending on the kind

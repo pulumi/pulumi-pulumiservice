@@ -82,7 +82,12 @@ func (ot *PulumiServiceOrgAccessTokenResource) Name() string {
 }
 
 func (ot *PulumiServiceOrgAccessTokenResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	return diffAccessTokenProperties(req, []string{"name", "organizationName", "description", "admin"})
+	olds, news, err := util.DeprecatedOldNews(req)
+	if err != nil {
+		return nil, err
+	}
+
+	return util.DeprecatedInputDiff(olds, news, []string{"name", "organizationName", "description", "admin"}, false)
 }
 
 func (ot *PulumiServiceOrgAccessTokenResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
