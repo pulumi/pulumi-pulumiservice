@@ -1,7 +1,12 @@
 CHANGELOG
 =========
 
-## 0.28.0 (WIP)
+## 0.29.1 (WIP)
+
+### Bug Fixes
+- Fixed Schedules' Read method erroring on non-existant schedule [#500](https://github.com/pulumi/pulumi-pulumiservice/issues/500)
+
+## 0.28.0
 
 ### Improvements
 - Added OIDC Issuer resource [#349](https://github.com/pulumi/pulumi-pulumiservice/issues/349)
