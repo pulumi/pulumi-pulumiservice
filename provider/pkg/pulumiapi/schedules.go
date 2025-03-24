@@ -104,6 +104,9 @@ func (c *Client) GetSchedule(ctx context.Context, stack StackIdentifier, schedul
 	var scheduleResponse ScheduleResponse
 	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &scheduleResponse)
 	if err != nil {
+		if GetErrorStatusCode(err) == http.StatusNotFound {
+			return nil, nil
+		}
 		return nil, fmt.Errorf("failed to get schedule with scheduleId %s : %w", scheduleID, err)
 	}
 	return &scheduleResponse, nil

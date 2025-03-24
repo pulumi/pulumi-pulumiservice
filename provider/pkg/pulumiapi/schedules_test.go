@@ -117,8 +117,8 @@ func TestGetDeploymentSchedule(t *testing.T) {
 		})
 		defer cleanup()
 		expectedScheduleID, err := c.GetSchedule(ctx, testStack, testScheduleID)
-		assert.Nil(t, expectedScheduleID, "scheduleId should be nil since error was returned")
-		assert.EqualError(t, err, "failed to get schedule with scheduleId test-schedule-id : 404 API error: not found")
+		assert.Nil(t, expectedScheduleID, "scheduleId should be nil since it was not found")
+		assert.NoError(t, err)
 	})
 }
 
