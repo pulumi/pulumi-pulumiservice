@@ -64,7 +64,7 @@ runs:
       if: inputs.tools == 'all' || contains(inputs.tools, 'python')
       uses: actions/setup-python@v5
       with:
-        python-version: 3.11.8
+        python-version: 3.13.2
 
     - name: Setup Java
       if: inputs.tools == 'all' || contains(inputs.tools, 'java')
