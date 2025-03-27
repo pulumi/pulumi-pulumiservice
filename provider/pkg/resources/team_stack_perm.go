@@ -56,7 +56,7 @@ func (tp *TeamStackPermissionResource) Read(req *pulumirpc.ReadRequest) (*pulumi
 			// We return a warning and an empty response, which will cause the resource to be deleted on refresh,
 			// forcing the user to recreate it with the updated version.
 			return nil, fmt.Errorf("TeamStackPermission resources created before v0.17.0 do not support refresh. " +
-				"You will need to destroy and recreate this resource with >v0.17.0 to successfully refresh.")
+				"You will need to destroy and recreate this resource with >v0.17.0 to successfully refresh")
 		}
 		return nil, err
 	}

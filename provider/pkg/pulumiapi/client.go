@@ -85,7 +85,12 @@ func (c *Client) sendRequest(req *http.Request, resBody interface{}) (*http.Resp
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
-	defer res.Body.Close()
+	defer func() {
+		err = res.Body.Close()
+		if err != nil {
+			fmt.Println("failed to close reading body: %w", err)
+		}
+	}()
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read response body: %w", err)
@@ -96,7 +101,7 @@ func (c *Client) sendRequest(req *http.Request, resBody interface{}) (*http.Resp
 		var errRes ErrorResponse
 		err = json.Unmarshal(body, &errRes)
 		if err != nil {
-			return res, fmt.Errorf("failed to parse response body from url %q, status code %d: %w\n\n%s\n",
+			return res, fmt.Errorf("failed to parse response body from url %q, status code %d: %w\n\n%s",
 				req.URL.String(), res.StatusCode, err, body)
 		}
 		if errRes.StatusCode == 0 {

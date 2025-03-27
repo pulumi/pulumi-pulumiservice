@@ -36,9 +36,9 @@ func (i *PulumiServiceStack) ToPropertyMap() resource.PropertyMap {
 func (s *PulumiServiceStackResource) ToPulumiServiceStackTagInput(inputMap resource.PropertyMap) (*PulumiServiceStack, error) {
 	stack := PulumiServiceStack{}
 
-	stack.StackIdentifier.OrgName = inputMap["organizationName"].StringValue()
-	stack.StackIdentifier.ProjectName = inputMap["projectName"].StringValue()
-	stack.StackIdentifier.StackName = inputMap["stackName"].StringValue()
+	stack.OrgName = inputMap["organizationName"].StringValue()
+	stack.ProjectName = inputMap["projectName"].StringValue()
+	stack.StackName = inputMap["stackName"].StringValue()
 
 	if inputMap["forceDestroy"].HasValue() && inputMap["forceDestroy"].IsBool() {
 		stack.ForceDestroy = inputMap["forceDestroy"].BoolValue()
