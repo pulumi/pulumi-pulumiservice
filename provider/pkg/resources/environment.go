@@ -89,7 +89,12 @@ func getBytesFromAsset(asset *asset.Asset) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer reader.Close()
+	defer func() {
+		err = reader.Close()
+		if err != nil {
+			fmt.Println("failed to close reading asset: %w", err)
+		}
+	}()
 	return io.ReadAll(reader)
 }
 

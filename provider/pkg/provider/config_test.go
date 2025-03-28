@@ -19,9 +19,11 @@ func TestGetPulumiAccessToken(t *testing.T) {
 	// environment variable back to previous value
 	setEnv := func(envVar, val string) func() {
 		oldVal := os.Getenv(envVar)
-		os.Setenv(envVar, val)
+		err := os.Setenv(envVar, val)
+		assert.NoError(t, err)
 		return func() {
-			os.Setenv(envVar, oldVal)
+			err = os.Setenv(envVar, oldVal)
+			assert.NoError(t, err)
 		}
 	}
 
