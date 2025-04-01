@@ -24,3 +24,7 @@ class _ExportableConfig(types.ModuleType):
     def access_token(self) -> Optional[str]:
         return __config__.get('accessToken')
 
+    @property
+    def api_url(self) -> Optional[str]:
+        return __config__.get('apiUrl')
+

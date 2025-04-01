@@ -32,6 +32,7 @@ export class Provider extends pulumi.ProviderResource {
         opts = opts || {};
         {
             resourceInputs["accessToken"] = args?.accessToken ? pulumi.secret(args.accessToken) : undefined;
+            resourceInputs["apiUrl"] = args ? args.apiUrl : undefined;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         super(Provider.__pulumiType, name, resourceInputs, opts);
@@ -46,4 +47,8 @@ export interface ProviderArgs {
      * Access Token to authenticate with Pulumi Cloud.
      */
     accessToken?: pulumi.Input<string>;
+    /**
+     * Optional override of Pulumi Cloud API endpoint.
+     */
+    apiUrl?: pulumi.Input<string>;
 }

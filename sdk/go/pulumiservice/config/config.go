@@ -14,3 +14,6 @@ var _ = internal.GetEnvOrDefault
 func GetAccessToken(ctx *pulumi.Context) string {
 	return config.Get(ctx, "pulumiservice:accessToken")
 }
+func GetApiUrl(ctx *pulumi.Context) string {
+	return config.Get(ctx, "pulumiservice:apiUrl")
+}

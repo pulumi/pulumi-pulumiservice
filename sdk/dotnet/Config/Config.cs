@@ -39,5 +39,12 @@ namespace Pulumi.PulumiService
             set => _accessToken.Set(value);
         }
 
+        private static readonly __Value<string?> _apiUrl = new __Value<string?>(() => __config.Get("apiUrl"));
+        public static string? ApiUrl
+        {
+            get => _apiUrl.Get();
+            set => _apiUrl.Set(value);
+        }
+
     }
 }

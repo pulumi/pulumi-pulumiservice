@@ -16,3 +16,5 @@ from .. import _utilities
 
 accessToken: Optional[str]
 
+apiUrl: Optional[str]
+

@@ -19,13 +19,17 @@ __all__ = ['ProviderArgs', 'Provider']
 @pulumi.input_type
 class ProviderArgs:
     def __init__(__self__, *,
-                 access_token: Optional[pulumi.Input[str]] = None):
+                 access_token: Optional[pulumi.Input[str]] = None,
+                 api_url: Optional[pulumi.Input[str]] = None):
         """
         The set of arguments for constructing a Provider resource.
         :param pulumi.Input[str] access_token: Access Token to authenticate with Pulumi Cloud.
+        :param pulumi.Input[str] api_url: Optional override of Pulumi Cloud API endpoint.
         """
         if access_token is not None:
             pulumi.set(__self__, "access_token", access_token)
+        if api_url is not None:
+            pulumi.set(__self__, "api_url", api_url)
 
     @property
     @pulumi.getter(name="accessToken")
@@ -39,6 +43,18 @@ class ProviderArgs:
     def access_token(self, value: Optional[pulumi.Input[str]]):
         pulumi.set(self, "access_token", value)
 
+    @property
+    @pulumi.getter(name="apiUrl")
+    def api_url(self) -> Optional[pulumi.Input[str]]:
+        """
+        Optional override of Pulumi Cloud API endpoint.
+        """
+        return pulumi.get(self, "api_url")
+
+    @api_url.setter
+    def api_url(self, value: Optional[pulumi.Input[str]]):
+        pulumi.set(self, "api_url", value)
+
 
 class Provider(pulumi.ProviderResource):
     @overload
@@ -46,12 +62,14 @@ class Provider(pulumi.ProviderResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  access_token: Optional[pulumi.Input[str]] = None,
+                 api_url: Optional[pulumi.Input[str]] = None,
                  __props__=None):
         """
         Create a Pulumiservice resource with the given unique name, props, and options.
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[str] access_token: Access Token to authenticate with Pulumi Cloud.
+        :param pulumi.Input[str] api_url: Optional override of Pulumi Cloud API endpoint.
         """
         ...
     @overload
@@ -77,6 +95,7 @@ class Provider(pulumi.ProviderResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  access_token: Optional[pulumi.Input[str]] = None,
+                 api_url: Optional[pulumi.Input[str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
@@ -87,6 +106,7 @@ class Provider(pulumi.ProviderResource):
             __props__ = ProviderArgs.__new__(ProviderArgs)
 
             __props__.__dict__["access_token"] = None if access_token is None else pulumi.Output.secret(access_token)
+            __props__.__dict__["api_url"] = api_url
         super(Provider, __self__).__init__(
             'pulumiservice',
             resource_name,

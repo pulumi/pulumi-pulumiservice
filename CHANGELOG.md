@@ -5,6 +5,7 @@ CHANGELOG
 
 ### Bug Fixes
 - Fixed Schedules' Read method erroring on non-existant schedule [#500](https://github.com/pulumi/pulumi-pulumiservice/issues/500)
+- Added ability to pass in backend url in provider constructor [#514](https://github.com/pulumi/pulumi-pulumiservice/issues/514)
 
 ## 0.28.0
 

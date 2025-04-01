@@ -13,4 +13,7 @@ public final class Config {
     public Optional<String> accessToken() {
         return Codegen.stringProp("accessToken").config(config).get();
     }
+    public Optional<String> apiUrl() {
+        return Codegen.stringProp("apiUrl").config(config).get();
+    }
 }
