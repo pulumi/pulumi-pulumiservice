@@ -55,6 +55,12 @@ namespace Pulumi.PulumiService
             }
         }
 
+        /// <summary>
+        /// Optional override of Pulumi Cloud API endpoint.
+        /// </summary>
+        [Input("apiUrl")]
+        public Input<string>? ApiUrl { get; set; }
+
         public ProviderArgs()
         {
         }

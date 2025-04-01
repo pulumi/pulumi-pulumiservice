@@ -30,10 +30,26 @@ public final class ProviderArgs extends com.pulumi.resources.ResourceArgs {
         return Optional.ofNullable(this.accessToken);
     }
 
+    /**
+     * Optional override of Pulumi Cloud API endpoint.
+     * 
+     */
+    @Import(name="apiUrl")
+    private @Nullable Output<String> apiUrl;
+
+    /**
+     * @return Optional override of Pulumi Cloud API endpoint.
+     * 
+     */
+    public Optional<Output<String>> apiUrl() {
+        return Optional.ofNullable(this.apiUrl);
+    }
+
     private ProviderArgs() {}
 
     private ProviderArgs(ProviderArgs $) {
         this.accessToken = $.accessToken;
+        this.apiUrl = $.apiUrl;
     }
 
     public static Builder builder() {
@@ -73,6 +89,27 @@ public final class ProviderArgs extends com.pulumi.resources.ResourceArgs {
          */
         public Builder accessToken(String accessToken) {
             return accessToken(Output.of(accessToken));
+        }
+
+        /**
+         * @param apiUrl Optional override of Pulumi Cloud API endpoint.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder apiUrl(@Nullable Output<String> apiUrl) {
+            $.apiUrl = apiUrl;
+            return this;
+        }
+
+        /**
+         * @param apiUrl Optional override of Pulumi Cloud API endpoint.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder apiUrl(String apiUrl) {
+            return apiUrl(Output.of(apiUrl));
         }
 
         public ProviderArgs build() {

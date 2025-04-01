@@ -16,6 +16,9 @@
       "accessToken": {
         "type": "string",
         "secret": true
+      },
+      "apiUrl": {
+        "type": "string"
       }
     }
   },
@@ -26,6 +29,10 @@
         "description": "Access Token to authenticate with Pulumi Cloud.",
         "type": "string",
         "secret": true
+      },
+      "apiUrl": {
+        "description": "Optional override of Pulumi Cloud API endpoint.",
+        "type": "string"
       }
     }
   },

@@ -15,3 +15,11 @@ Object.defineProperty(exports, "accessToken", {
     enumerable: true,
 });
 
+export declare const apiUrl: string | undefined;
+Object.defineProperty(exports, "apiUrl", {
+    get() {
+        return __config.get("apiUrl");
+    },
+    enumerable: true,
+});
+

@@ -37,12 +37,16 @@ func NewProvider(ctx *pulumi.Context,
 type providerArgs struct {
 	// Access Token to authenticate with Pulumi Cloud.
 	AccessToken *string `pulumi:"accessToken"`
+	// Optional override of Pulumi Cloud API endpoint.
+	ApiUrl *string `pulumi:"apiUrl"`
 }
 
 // The set of arguments for constructing a Provider resource.
 type ProviderArgs struct {
 	// Access Token to authenticate with Pulumi Cloud.
 	AccessToken pulumi.StringPtrInput
+	// Optional override of Pulumi Cloud API endpoint.
+	ApiUrl pulumi.StringPtrInput
 }
 
 func (ProviderArgs) ElementType() reflect.Type {
