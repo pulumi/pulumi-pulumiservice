@@ -133,7 +133,7 @@ class OidcIssuer(pulumi.CustomResource):
                  url: Optional[pulumi.Input[str]] = None,
                  __props__=None):
         """
-        An OIDC issuer registration with Pulumi.
+        Register an OIDC Provider to establish a trust relationship between third-party systems like GitHub Actions and Pulumi Cloud, obviating the need to store a hard-coded Pulumi Cloud token in systems that need to run Pulumi commands or consume Pulumi Cloud APIs. Instead of a hard-coded, static token that must be manually rotated, trusted systems are granted temporary Pulumi Cloud tokens on an as-needed basis, which is more secure than static tokens.
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
@@ -151,7 +151,7 @@ class OidcIssuer(pulumi.CustomResource):
                  args: OidcIssuerArgs,
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
-        An OIDC issuer registration with Pulumi.
+        Register an OIDC Provider to establish a trust relationship between third-party systems like GitHub Actions and Pulumi Cloud, obviating the need to store a hard-coded Pulumi Cloud token in systems that need to run Pulumi commands or consume Pulumi Cloud APIs. Instead of a hard-coded, static token that must be manually rotated, trusted systems are granted temporary Pulumi Cloud tokens on an as-needed basis, which is more secure than static tokens.
 
         :param str resource_name: The name of the resource.
         :param OidcIssuerArgs args: The arguments to use to populate this resource's properties.
