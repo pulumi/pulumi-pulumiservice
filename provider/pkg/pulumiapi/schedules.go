@@ -50,7 +50,7 @@ type CreateDriftScheduleRequest struct {
 
 type CreateTtlScheduleRequest struct {
 	Timestamp          time.Time `json:"timestamp,omitempty"`
-	DeleteAfterDestroy bool      `json:"deleteAfterDestroy ,omitempty"`
+	DeleteAfterDestroy bool      `json:"deleteAfterDestroy,omitempty"`
 }
 
 type ScheduleResponse struct {
