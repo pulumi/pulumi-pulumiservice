@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
 
@@ -19,11 +20,12 @@ type PulumiServiceTeamEnvironmentPermissionResource struct {
 }
 
 type TeamEnvironmentPermissionInput struct {
-	Organization string `pulumi:"organization"`
-	Team         string `pulumi:"team"`
-	Environment  string `pulumi:"environment"`
-	Project      string `pulumi:"project"`
-	Permission   string `pulumi:"permission"`
+	Organization    string `pulumi:"organization"`
+	Team            string `pulumi:"team"`
+	Environment     string `pulumi:"environment"`
+	Project         string `pulumi:"project"`
+	Permission      string `pulumi:"permission"`
+	MaxOpenDuration string `pulumi:"maxOpenDuration"`
 }
 
 func (i *TeamEnvironmentPermissionInput) ToPropertyMap() resource.PropertyMap {
@@ -40,6 +42,22 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Name() string {
 }
 
 func (tp *PulumiServiceTeamEnvironmentPermissionResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
+	var input TeamEnvironmentPermissionInput
+	err := util.FromProperties(req.GetNews(), structTagKey, &input)
+	if err != nil {
+		return nil, err
+	}
+
+	var failures []*pulumirpc.CheckFailure
+	if input.MaxOpenDuration != "" {
+		if _, err := time.ParseDuration(input.MaxOpenDuration); err != nil {
+			failures = append(failures, &pulumirpc.CheckFailure{
+				Property: "maxOpenDuration",
+				Reason:   fmt.Sprintf("malformed duration: %v", err),
+			})
+		}
+	}
+
 	return &pulumirpc.CheckResponse{
 		Inputs: req.GetNews(),
 	}, nil
@@ -52,13 +70,13 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Read(req *pulumirpc.Re
 		return nil, err
 	}
 
-	request := pulumiapi.TeamEnvironmentPermissionRequest{
+	request := pulumiapi.TeamEnvironmentSettingsRequest{
 		Organization: permId.Organization,
 		Team:         permId.Team,
 		Environment:  permId.Environment,
 		Project:      permId.Project,
 	}
-	permission, err := tp.Client.GetTeamEnvironmentPermission(ctx, request)
+	permission, maxOpenDuration, err := tp.Client.GetTeamEnvironmentSettings(ctx, request)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get team environment permission: %w", err)
 	}
@@ -66,12 +84,18 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Read(req *pulumirpc.Re
 		return &pulumirpc.ReadResponse{}, nil
 	}
 
+	var maxOpenDurationStr string
+	if maxOpenDuration != nil {
+		maxOpenDurationStr = (time.Duration)(*maxOpenDuration).String()
+	}
+
 	inputs := TeamEnvironmentPermissionInput{
-		Organization: permId.Organization,
-		Team:         permId.Team,
-		Project:      permId.Project,
-		Environment:  permId.Environment,
-		Permission:   *permission,
+		Organization:    permId.Organization,
+		Team:            permId.Team,
+		Project:         permId.Project,
+		Environment:     permId.Environment,
+		Permission:      *permission,
+		MaxOpenDuration: maxOpenDurationStr,
 	}
 
 	properties, err := plugin.MarshalProperties(inputs.ToPropertyMap(), plugin.MarshalOptions{})
@@ -92,17 +116,28 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Create(req *pulumirpc.
 	if err != nil {
 		return nil, err
 	}
-	request := pulumiapi.CreateTeamEnvironmentPermissionRequest{
-		TeamEnvironmentPermissionRequest: pulumiapi.TeamEnvironmentPermissionRequest{
+
+	var maxOpenDuration *pulumiapi.Duration
+	if input.MaxOpenDuration != "" {
+		d, err := time.ParseDuration(input.MaxOpenDuration)
+		if err != nil {
+			return nil, err
+		}
+		maxOpenDuration = (*pulumiapi.Duration)(&d)
+	}
+
+	request := pulumiapi.CreateTeamEnvironmentSettingsRequest{
+		TeamEnvironmentSettingsRequest: pulumiapi.TeamEnvironmentSettingsRequest{
 			Organization: input.Organization,
 			Team:         input.Team,
 			Project:      input.Project,
 			Environment:  input.Environment,
 		},
-		Permission: input.Permission,
+		Permission:      input.Permission,
+		MaxOpenDuration: maxOpenDuration,
 	}
 
-	err = tp.Client.AddEnvironmentPermission(ctx, request)
+	err = tp.Client.AddEnvironmentSettings(ctx, request)
 	if err != nil {
 		return nil, err
 	}
@@ -127,13 +162,13 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Delete(req *pulumirpc.
 	if err != nil {
 		return nil, err
 	}
-	request := pulumiapi.TeamEnvironmentPermissionRequest{
+	request := pulumiapi.TeamEnvironmentSettingsRequest{
 		Organization: input.Organization,
 		Team:         input.Team,
 		Project:      input.Project,
 		Environment:  input.Environment,
 	}
-	err = tp.Client.RemoveEnvironmentPermission(ctx, request)
+	err = tp.Client.RemoveEnvironmentSettings(ctx, request)
 	if err != nil {
 		return nil, err
 	}
@@ -150,8 +185,9 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Diff(req *pulumirpc.Di
 		changes = pulumirpc.DiffResponse_DIFF_SOME
 	}
 	return &pulumirpc.DiffResponse{
-		Changes:  changes,
-		Replaces: changedKeys,
+		Changes:             changes,
+		Replaces:            changedKeys,
+		DeleteBeforeReplace: true,
 	}, nil
 }
 

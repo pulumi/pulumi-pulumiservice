@@ -32,9 +32,9 @@ type TeamClient interface {
 	AddStackPermission(ctx context.Context, stack StackIdentifier, teamName string, permission int) error
 	RemoveStackPermission(ctx context.Context, stack StackIdentifier, teamName string) error
 	GetTeamStackPermission(ctx context.Context, stack StackIdentifier, teamName string) (*int, error)
-	AddEnvironmentPermission(ctx context.Context, req CreateTeamEnvironmentPermissionRequest) error
-	RemoveEnvironmentPermission(ctx context.Context, req TeamEnvironmentPermissionRequest) error
-	GetTeamEnvironmentPermission(ctx context.Context, req TeamEnvironmentPermissionRequest) (*string, error)
+	AddEnvironmentSettings(ctx context.Context, req CreateTeamEnvironmentSettingsRequest) error
+	RemoveEnvironmentSettings(ctx context.Context, req TeamEnvironmentSettingsRequest) error
+	GetTeamEnvironmentSettings(ctx context.Context, req TeamEnvironmentSettingsRequest) (*string, *Duration, error)
 }
 
 type Teams struct {
@@ -48,7 +48,7 @@ type Team struct {
 	Description  string
 	Members      []TeamMember
 	Stacks       []TeamStackPermission
-	Environments []TeamEnvironmentPermission
+	Environments []TeamEnvironmentSettings
 }
 
 type TeamMember struct {
@@ -64,10 +64,11 @@ type TeamStackPermission struct {
 	Permission  int    `json:"permission"`
 }
 
-type TeamEnvironmentPermission struct {
-	EnvName     string `json:"envName"`
-	ProjectName string `json:"projectName"`
-	Permission  string `json:"permission"`
+type TeamEnvironmentSettings struct {
+	EnvName         string    `json:"envName"`
+	ProjectName     string    `json:"projectName"`
+	Permission      string    `json:"permission"`
+	MaxOpenDuration *Duration `json:"maxOpenDuration,omitempty"`
 }
 
 type createTeamRequest struct {
@@ -108,12 +109,13 @@ type removeStackPermissionRequest struct {
 	RemoveStackPermission RemoveStackPermission `json:"removeStack"`
 }
 
-type CreateTeamEnvironmentPermissionRequest struct {
-	TeamEnvironmentPermissionRequest
-	Permission string `json:"permission,omitempty"`
+type CreateTeamEnvironmentSettingsRequest struct {
+	TeamEnvironmentSettingsRequest
+	Permission      string    `json:"permission,omitempty"`
+	MaxOpenDuration *Duration `json:"maxOpenDuration,omitempty"`
 }
 
-type TeamEnvironmentPermissionRequest struct {
+type TeamEnvironmentSettingsRequest struct {
 	Organization string `json:"organization,omitempty"`
 	Team         string `json:"team,omitempty"`
 	Environment  string `json:"environment,omitempty"`
@@ -121,12 +123,13 @@ type TeamEnvironmentPermissionRequest struct {
 }
 
 type AddEnvironmentPermission struct {
-	EnvName     string `json:"envName"`
-	ProjectName string `json:"projectName"`
-	Permission  string `json:"permission"`
+	EnvName         string    `json:"envName"`
+	ProjectName     string    `json:"projectName"`
+	Permission      string    `json:"permission"`
+	MaxOpenDuration *Duration `json:"maxOpenDuration,omitempty"`
 }
 
-type addEnvironmentPermissionRequest struct {
+type addEnvironmentSettingsRequest struct {
 	AddEnvironmentPermission AddEnvironmentPermission `json:"addEnvironmentPermission"`
 }
 
@@ -383,7 +386,7 @@ func (c *Client) GetTeamStackPermission(ctx context.Context, stack StackIdentifi
 	return nil, nil
 }
 
-func (c *Client) AddEnvironmentPermission(ctx context.Context, req CreateTeamEnvironmentPermissionRequest) error {
+func (c *Client) AddEnvironmentSettings(ctx context.Context, req CreateTeamEnvironmentSettingsRequest) error {
 	if len(req.Organization) == 0 {
 		return errors.New("organization name must not be empty")
 	}
@@ -396,22 +399,23 @@ func (c *Client) AddEnvironmentPermission(ctx context.Context, req CreateTeamEnv
 
 	apiPath := path.Join("orgs", req.Organization, "teams", req.Team)
 
-	addEnvironmentPermissionRequest := addEnvironmentPermissionRequest{
+	addEnvironmentSettingsRequest := addEnvironmentSettingsRequest{
 		AddEnvironmentPermission: AddEnvironmentPermission{
-			ProjectName: req.Project,
-			EnvName:     req.Environment,
-			Permission:  req.Permission,
+			ProjectName:     req.Project,
+			EnvName:         req.Environment,
+			Permission:      req.Permission,
+			MaxOpenDuration: req.MaxOpenDuration,
 		},
 	}
 
-	_, err := c.do(ctx, http.MethodPatch, apiPath, addEnvironmentPermissionRequest, nil)
+	_, err := c.do(ctx, http.MethodPatch, apiPath, addEnvironmentSettingsRequest, nil)
 	if err != nil {
-		return fmt.Errorf("failed to add permission %s for environment %s to team %s due to error: %w", req.Permission, req.Environment, req.Team, err)
+		return fmt.Errorf("failed to add team settings for environment %s to team %s due to error: %w", req.Environment, req.Team, err)
 	}
 	return nil
 }
 
-func (c *Client) RemoveEnvironmentPermission(ctx context.Context, req TeamEnvironmentPermissionRequest) error {
+func (c *Client) RemoveEnvironmentSettings(ctx context.Context, req TeamEnvironmentSettingsRequest) error {
 	if len(req.Organization) == 0 {
 		return errors.New("organization name must not be empty")
 	}
@@ -424,29 +428,29 @@ func (c *Client) RemoveEnvironmentPermission(ctx context.Context, req TeamEnviro
 
 	apiPath := path.Join("orgs", req.Organization, "teams", req.Team)
 
-	removeEnvironmentPermissionRequest := removeEnvironmentPermissionRequest{
+	removeEnvironmentSettingsRequest := removeEnvironmentPermissionRequest{
 		RemoveEnvironment: RemoveEnvironmentPermission{
 			ProjectName: req.Project,
 			EnvName:     req.Environment,
 		},
 	}
 
-	_, err := c.do(ctx, http.MethodPatch, apiPath, removeEnvironmentPermissionRequest, nil)
+	_, err := c.do(ctx, http.MethodPatch, apiPath, removeEnvironmentSettingsRequest, nil)
 	if err != nil {
 		return fmt.Errorf("failed to remove permissions for environment %s from team %s due to error: %w", req.Environment, req.Team, err)
 	}
 	return nil
 }
 
-func (c *Client) GetTeamEnvironmentPermission(ctx context.Context, req TeamEnvironmentPermissionRequest) (*string, error) {
+func (c *Client) GetTeamEnvironmentSettings(ctx context.Context, req TeamEnvironmentSettingsRequest) (*string, *Duration, error) {
 	if len(req.Organization) == 0 {
-		return nil, errors.New("organization name must not be empty")
+		return nil, nil, errors.New("organization name must not be empty")
 	}
 	if len(req.Team) == 0 {
-		return nil, errors.New("team name must not be empty")
+		return nil, nil, errors.New("team name must not be empty")
 	}
 	if len(req.Environment) == 0 {
-		return nil, errors.New("environment name must not be empty")
+		return nil, nil, errors.New("environment name must not be empty")
 	}
 
 	apiPath := path.Join("orgs", req.Organization, "teams", req.Team)
@@ -454,14 +458,14 @@ func (c *Client) GetTeamEnvironmentPermission(ctx context.Context, req TeamEnvir
 	var team Team
 	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &team)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get team environment permission: %w", err)
+		return nil, nil, fmt.Errorf("failed to get team environment permission: %w", err)
 	}
 
-	for _, envPermission := range team.Environments {
-		if envPermission.EnvName == req.Environment {
-			return &envPermission.Permission, nil
+	for _, settings := range team.Environments {
+		if settings.EnvName == req.Environment {
+			return &settings.Permission, settings.MaxOpenDuration, nil
 		}
 	}
 
-	return nil, nil
+	return nil, nil, nil
 }

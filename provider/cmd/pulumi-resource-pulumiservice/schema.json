@@ -1683,6 +1683,10 @@
         "permission": {
           "description": "Which permission level to grant to the specified team.",
           "$ref": "#/types/pulumiservice:index:EnvironmentPermission"
+        },
+        "maxOpenDuration": {
+          "description": "The maximum duration for which members of this team may open the environment.",
+          "type": "string"
         }
       },
       "inputProperties": {
@@ -1706,6 +1710,10 @@
         "permission": {
           "description": "Which permission level to grant to the specified team.",
           "$ref": "#/types/pulumiservice:index:EnvironmentPermission"
+        },
+        "maxOpenDuration": {
+          "description": "The maximum duration for which members of this team may open the environment.",
+          "type": "string"
         }
       },
       "requiredInputs": [
