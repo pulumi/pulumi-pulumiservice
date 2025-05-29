@@ -34,6 +34,21 @@ public final class TeamEnvironmentPermissionArgs extends com.pulumi.resources.Re
     }
 
     /**
+     * The maximum duration for which members of this team may open the environment.
+     * 
+     */
+    @Import(name="maxOpenDuration")
+    private @Nullable Output<String> maxOpenDuration;
+
+    /**
+     * @return The maximum duration for which members of this team may open the environment.
+     * 
+     */
+    public Optional<Output<String>> maxOpenDuration() {
+        return Optional.ofNullable(this.maxOpenDuration);
+    }
+
+    /**
      * Organization name.
      * 
      */
@@ -97,6 +112,7 @@ public final class TeamEnvironmentPermissionArgs extends com.pulumi.resources.Re
 
     private TeamEnvironmentPermissionArgs(TeamEnvironmentPermissionArgs $) {
         this.environment = $.environment;
+        this.maxOpenDuration = $.maxOpenDuration;
         this.organization = $.organization;
         this.permission = $.permission;
         this.project = $.project;
@@ -140,6 +156,27 @@ public final class TeamEnvironmentPermissionArgs extends com.pulumi.resources.Re
          */
         public Builder environment(String environment) {
             return environment(Output.of(environment));
+        }
+
+        /**
+         * @param maxOpenDuration The maximum duration for which members of this team may open the environment.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder maxOpenDuration(@Nullable Output<String> maxOpenDuration) {
+            $.maxOpenDuration = maxOpenDuration;
+            return this;
+        }
+
+        /**
+         * @param maxOpenDuration The maximum duration for which members of this team may open the environment.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder maxOpenDuration(String maxOpenDuration) {
+            return maxOpenDuration(Output.of(maxOpenDuration));
         }
 
         /**
