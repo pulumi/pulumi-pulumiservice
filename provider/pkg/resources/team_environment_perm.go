@@ -50,16 +50,25 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Check(req *pulumirpc.C
 
 	var failures []*pulumirpc.CheckFailure
 	if input.MaxOpenDuration != "" {
-		if _, err := time.ParseDuration(input.MaxOpenDuration); err != nil {
+		d, err := time.ParseDuration(input.MaxOpenDuration)
+		if err != nil {
 			failures = append(failures, &pulumirpc.CheckFailure{
 				Property: "maxOpenDuration",
 				Reason:   fmt.Sprintf("malformed duration: %v", err),
 			})
+		} else {
+			// Normalize the duration to prevent spurious diffs.
+			input.MaxOpenDuration = d.String()
 		}
 	}
 
+	inputs, err := util.ToProperties(input, structTagKey)
+	if err != nil {
+		return nil, err
+	}
+
 	return &pulumirpc.CheckResponse{
-		Inputs:   req.GetNews(),
+		Inputs:   inputs,
 		Failures: failures,
 	}, nil
 }
@@ -181,6 +190,7 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Diff(req *pulumirpc.Di
 	if err != nil {
 		return nil, err
 	}
+
 	changes := pulumirpc.DiffResponse_DIFF_NONE
 	if len(changedKeys) > 0 {
 		changes = pulumirpc.DiffResponse_DIFF_SOME
