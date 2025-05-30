@@ -59,7 +59,8 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Check(req *pulumirpc.C
 	}
 
 	return &pulumirpc.CheckResponse{
-		Inputs: req.GetNews(),
+		Inputs:   req.GetNews(),
+		Failures: failures,
 	}, nil
 }
 

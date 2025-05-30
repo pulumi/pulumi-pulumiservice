@@ -36,19 +36,37 @@ var versionTag = new service.EnvironmentVersionTag("VersionTag", {
   retainOnDelete: true
 })
 
-const team = new service.Team("team", {
+const team1 = new service.Team("team1", {
   description: "This was created with Pulumi",
-  name: "ts-team-needing-permissions",
-  displayName: "PulumiUP Team",
+  name: "ts-team-1-needing-permissions",
+  displayName: "PulumiUP Team 1",
   organizationName: environment.organization,
   members: ["pulumi-bot", "service-provider-example-user"],
   teamType: "pulumi"
 });
 
-const teamEnvironmentPermission = new service.TeamEnvironmentPermission("teamEnvironmentPermission", {
+const team2 = new service.Team("team2", {
+  description: "This was created with Pulumi",
+  name: "ts-team-2-needing-permissions",
+  displayName: "PulumiUP Team 2",
+  organizationName: environment.organization,
+  members: ["service-provider-example-user"],
+  teamType: "pulumi"
+});
+
+const teamEnvironmentPermission1 = new service.TeamEnvironmentPermission("teamEnvironmentPermission", {
   organization: environment.organization,
-  team: team.name.apply((name: any) => name!!),
+  team: team1.name.apply((name: any) => name!!),
   environment: environment.name,
   project: environment.project,
-  permission: "admin"
+  permission: "admin",
+});
+
+const teamEnvironmentPermission2 = new service.TeamEnvironmentPermission("teamEnvironmentPermission", {
+  organization: environment.organization,
+  team: team2.name.apply((name: any) => name!!),
+  environment: environment.name,
+  project: environment.project,
+  permission: "open",
+  maxOpenDuration: "15m",
 });
