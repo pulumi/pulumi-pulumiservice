@@ -35,6 +35,20 @@ public class TeamEnvironmentPermission extends com.pulumi.resources.CustomResour
         return Codegen.optional(this.environment);
     }
     /**
+     * The maximum duration for which members of this team may open the environment.
+     * 
+     */
+    @Export(name="maxOpenDuration", refs={String.class}, tree="[0]")
+    private Output</* @Nullable */ String> maxOpenDuration;
+
+    /**
+     * @return The maximum duration for which members of this team may open the environment.
+     * 
+     */
+    public Output<Optional<String>> maxOpenDuration() {
+        return Codegen.optional(this.maxOpenDuration);
+    }
+    /**
      * Organization name.
      * 
      */

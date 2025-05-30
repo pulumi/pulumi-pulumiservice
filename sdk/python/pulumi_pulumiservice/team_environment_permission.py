@@ -24,6 +24,7 @@ class TeamEnvironmentPermissionArgs:
                  organization: pulumi.Input[str],
                  permission: pulumi.Input['EnvironmentPermission'],
                  team: pulumi.Input[str],
+                 max_open_duration: Optional[pulumi.Input[str]] = None,
                  project: Optional[pulumi.Input[str]] = None):
         """
         The set of arguments for constructing a TeamEnvironmentPermission resource.
@@ -31,12 +32,15 @@ class TeamEnvironmentPermissionArgs:
         :param pulumi.Input[str] organization: Organization name.
         :param pulumi.Input['EnvironmentPermission'] permission: Which permission level to grant to the specified team.
         :param pulumi.Input[str] team: Team name.
+        :param pulumi.Input[str] max_open_duration: The maximum duration for which members of this team may open the environment.
         :param pulumi.Input[str] project: Project name.
         """
         pulumi.set(__self__, "environment", environment)
         pulumi.set(__self__, "organization", organization)
         pulumi.set(__self__, "permission", permission)
         pulumi.set(__self__, "team", team)
+        if max_open_duration is not None:
+            pulumi.set(__self__, "max_open_duration", max_open_duration)
         if project is None:
             project = 'default'
         if project is not None:
@@ -91,6 +95,18 @@ class TeamEnvironmentPermissionArgs:
         pulumi.set(self, "team", value)
 
     @property
+    @pulumi.getter(name="maxOpenDuration")
+    def max_open_duration(self) -> Optional[pulumi.Input[str]]:
+        """
+        The maximum duration for which members of this team may open the environment.
+        """
+        return pulumi.get(self, "max_open_duration")
+
+    @max_open_duration.setter
+    def max_open_duration(self, value: Optional[pulumi.Input[str]]):
+        pulumi.set(self, "max_open_duration", value)
+
+    @property
     @pulumi.getter
     def project(self) -> Optional[pulumi.Input[str]]:
         """
@@ -109,6 +125,7 @@ class TeamEnvironmentPermission(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  environment: Optional[pulumi.Input[str]] = None,
+                 max_open_duration: Optional[pulumi.Input[str]] = None,
                  organization: Optional[pulumi.Input[str]] = None,
                  permission: Optional[pulumi.Input['EnvironmentPermission']] = None,
                  project: Optional[pulumi.Input[str]] = None,
@@ -120,6 +137,7 @@ class TeamEnvironmentPermission(pulumi.CustomResource):
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[str] environment: Environment name.
+        :param pulumi.Input[str] max_open_duration: The maximum duration for which members of this team may open the environment.
         :param pulumi.Input[str] organization: Organization name.
         :param pulumi.Input['EnvironmentPermission'] permission: Which permission level to grant to the specified team.
         :param pulumi.Input[str] project: Project name.
@@ -150,6 +168,7 @@ class TeamEnvironmentPermission(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  environment: Optional[pulumi.Input[str]] = None,
+                 max_open_duration: Optional[pulumi.Input[str]] = None,
                  organization: Optional[pulumi.Input[str]] = None,
                  permission: Optional[pulumi.Input['EnvironmentPermission']] = None,
                  project: Optional[pulumi.Input[str]] = None,
@@ -166,6 +185,7 @@ class TeamEnvironmentPermission(pulumi.CustomResource):
             if environment is None and not opts.urn:
                 raise TypeError("Missing required property 'environment'")
             __props__.__dict__["environment"] = environment
+            __props__.__dict__["max_open_duration"] = max_open_duration
             if organization is None and not opts.urn:
                 raise TypeError("Missing required property 'organization'")
             __props__.__dict__["organization"] = organization
@@ -201,6 +221,7 @@ class TeamEnvironmentPermission(pulumi.CustomResource):
         __props__ = TeamEnvironmentPermissionArgs.__new__(TeamEnvironmentPermissionArgs)
 
         __props__.__dict__["environment"] = None
+        __props__.__dict__["max_open_duration"] = None
         __props__.__dict__["organization"] = None
         __props__.__dict__["permission"] = None
         __props__.__dict__["project"] = None
@@ -214,6 +235,14 @@ class TeamEnvironmentPermission(pulumi.CustomResource):
         Environment name.
         """
         return pulumi.get(self, "environment")
+
+    @property
+    @pulumi.getter(name="maxOpenDuration")
+    def max_open_duration(self) -> pulumi.Output[Optional[str]]:
+        """
+        The maximum duration for which members of this team may open the environment.
+        """
+        return pulumi.get(self, "max_open_duration")
 
     @property
     @pulumi.getter

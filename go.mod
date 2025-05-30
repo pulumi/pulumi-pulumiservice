@@ -6,6 +6,7 @@ toolchain go1.24.0
 
 require (
 	github.com/google/uuid v1.6.0
+	github.com/pgavlin/fx/v2 v2.0.9
 	github.com/pulumi/esc v0.10.0
 	github.com/pulumi/pulumi/pkg/v3 v3.138.0
 	github.com/pulumi/pulumi/sdk/v3 v3.138.0

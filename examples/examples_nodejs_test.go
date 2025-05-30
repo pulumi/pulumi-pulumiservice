@@ -114,6 +114,7 @@ func TestNodejsEnvironmentsExample(t *testing.T) {
 		Dependencies: []string{
 			"@pulumi/pulumiservice",
 		},
+		ExpectRefreshChanges: true,
 	})
 }
 

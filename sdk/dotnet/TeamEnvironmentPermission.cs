@@ -22,6 +22,12 @@ namespace Pulumi.PulumiService
         public Output<string?> Environment { get; private set; } = null!;
 
         /// <summary>
+        /// The maximum duration for which members of this team may open the environment.
+        /// </summary>
+        [Output("maxOpenDuration")]
+        public Output<string?> MaxOpenDuration { get; private set; } = null!;
+
+        /// <summary>
         /// Organization name.
         /// </summary>
         [Output("organization")]
@@ -95,6 +101,12 @@ namespace Pulumi.PulumiService
         /// </summary>
         [Input("environment", required: true)]
         public Input<string> Environment { get; set; } = null!;
+
+        /// <summary>
+        /// The maximum duration for which members of this team may open the environment.
+        /// </summary>
+        [Input("maxOpenDuration")]
+        public Input<string>? MaxOpenDuration { get; set; }
 
         /// <summary>
         /// Organization name.
