@@ -3,7 +3,9 @@ package pulumiapi
 import (
 	"net/http"
 	"testing"
+	"time"
 
+	"github.com/pgavlin/fx/v2"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -310,24 +312,26 @@ func TestAddEnvironmentPermission(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPatch,
 			ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team",
-			ExpectedReqBody: addEnvironmentPermissionRequest{
+			ExpectedReqBody: addEnvironmentSettingsRequest{
 				AddEnvironmentPermission: AddEnvironmentPermission{
-					ProjectName: project,
-					EnvName:     environment,
-					Permission:  permission,
+					ProjectName:     project,
+					EnvName:         environment,
+					Permission:      permission,
+					MaxOpenDuration: fx.Some(Duration(15 * time.Minute)),
 				},
 			},
 			ResponseCode: 204,
 		})
 		defer cleanup()
-		assert.NoError(t, c.AddEnvironmentPermission(ctx, CreateTeamEnvironmentPermissionRequest{
-			TeamEnvironmentPermissionRequest: TeamEnvironmentPermissionRequest{
+		assert.NoError(t, c.AddEnvironmentSettings(ctx, CreateTeamEnvironmentSettingsRequest{
+			TeamEnvironmentSettingsRequest: TeamEnvironmentSettingsRequest{
 				Organization: organization,
 				Project:      project,
 				Environment:  environment,
 				Team:         teamName,
 			},
-			Permission: permission,
+			Permission:      permission,
+			MaxOpenDuration: fx.Some(Duration(15 * time.Minute)),
 		}))
 	})
 }
@@ -350,7 +354,7 @@ func TestRemoveEnvironmentPermission(t *testing.T) {
 			ResponseCode: 204,
 		})
 		defer cleanup()
-		assert.NoError(t, c.RemoveEnvironmentPermission(ctx, TeamEnvironmentPermissionRequest{
+		assert.NoError(t, c.RemoveEnvironmentSettings(ctx, TeamEnvironmentSettingsRequest{
 			Organization: organization,
 			Team:         teamName,
 			Project:      project,

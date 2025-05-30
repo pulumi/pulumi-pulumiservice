@@ -42,6 +42,10 @@ export class TeamEnvironmentPermission extends pulumi.CustomResource {
      */
     public readonly environment!: pulumi.Output<string | undefined>;
     /**
+     * The maximum duration for which members of this team may open the environment.
+     */
+    public readonly maxOpenDuration!: pulumi.Output<string | undefined>;
+    /**
      * Organization name.
      */
     public readonly organization!: pulumi.Output<string | undefined>;
@@ -82,12 +86,14 @@ export class TeamEnvironmentPermission extends pulumi.CustomResource {
                 throw new Error("Missing required property 'team'");
             }
             resourceInputs["environment"] = args ? args.environment : undefined;
+            resourceInputs["maxOpenDuration"] = args ? args.maxOpenDuration : undefined;
             resourceInputs["organization"] = args ? args.organization : undefined;
             resourceInputs["permission"] = args ? args.permission : undefined;
             resourceInputs["project"] = (args ? args.project : undefined) ?? "default";
             resourceInputs["team"] = args ? args.team : undefined;
         } else {
             resourceInputs["environment"] = undefined /*out*/;
+            resourceInputs["maxOpenDuration"] = undefined /*out*/;
             resourceInputs["organization"] = undefined /*out*/;
             resourceInputs["permission"] = undefined /*out*/;
             resourceInputs["project"] = undefined /*out*/;
@@ -106,6 +112,10 @@ export interface TeamEnvironmentPermissionArgs {
      * Environment name.
      */
     environment: pulumi.Input<string>;
+    /**
+     * The maximum duration for which members of this team may open the environment.
+     */
+    maxOpenDuration?: pulumi.Input<string>;
     /**
      * Organization name.
      */
