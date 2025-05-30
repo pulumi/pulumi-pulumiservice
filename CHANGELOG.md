@@ -2,6 +2,10 @@ CHANGELOG
 =========
 ## 0.29.2 (WIP)
 
+### Improvements
+
+- Added support for per-team maximum open durations for ESC environments [#525](https://github.com/pulumi/pulumi-pulumiservice/pull/525)
+
 ### Bug Fixes
 
 - Fix a bug in TTLSchedules preventing correct handling of deleteBeforeDestroy [#517](https://github.com/pulumi/pulumi-pulumiservice/pull/517)
