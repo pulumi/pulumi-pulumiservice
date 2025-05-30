@@ -1,10 +1,13 @@
 CHANGELOG
 =========
-## 0.29.2 (WIP)
+
+## 0.29.3
 
 ### Improvements
 
 - Added support for per-team maximum open durations for ESC environments [#525](https://github.com/pulumi/pulumi-pulumiservice/pull/525)
+
+## 0.29.2
 
 ### Bug Fixes
 
