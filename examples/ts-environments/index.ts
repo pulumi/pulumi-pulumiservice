@@ -54,7 +54,7 @@ const team2 = new service.Team("team2", {
   teamType: "pulumi"
 });
 
-const teamEnvironmentPermission1 = new service.TeamEnvironmentPermission("teamEnvironmentPermission", {
+const teamEnvironmentPermission1 = new service.TeamEnvironmentPermission("teamEnvironmentPermission1", {
   organization: environment.organization,
   team: team1.name.apply((name: any) => name!!),
   environment: environment.name,
@@ -62,7 +62,7 @@ const teamEnvironmentPermission1 = new service.TeamEnvironmentPermission("teamEn
   permission: "admin",
 });
 
-const teamEnvironmentPermission2 = new service.TeamEnvironmentPermission("teamEnvironmentPermission", {
+const teamEnvironmentPermission2 = new service.TeamEnvironmentPermission("teamEnvironmentPermission2", {
   organization: environment.organization,
   team: team2.name.apply((name: any) => name!!),
   environment: environment.name,
