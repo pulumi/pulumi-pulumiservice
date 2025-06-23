@@ -27,7 +27,7 @@ resources:
       name: github_issuer
       url: https://token.actions.githubusercontent.com
       thumbprints:
-        - ac476cca46ea95a04518f08e1e4bd3b010e50587f57706be7e259fd81817f1e1
+        - caef08400c87bedb0db28f1a0dc0b49e658c8e90a985b8c3e6a6e7f51a2d09d7
       policies:
         - decision: deny
           rules:
