@@ -1,15 +1,29 @@
 CHANGELOG
 =========
 
-## 0.29.1 (WIP)
+## 0.29.3
+
+### Improvements
+
+- Added support for per-team maximum open durations for ESC environments [#525](https://github.com/pulumi/pulumi-pulumiservice/pull/525)
+
+## 0.29.2
 
 ### Bug Fixes
-- Fixed Schedules' Read method erroring on non-existant schedule [#500](https://github.com/pulumi/pulumi-pulumiservice/issues/500)
-- Added ability to pass in backend url in provider constructor [#514](https://github.com/pulumi/pulumi-pulumiservice/issues/514)
+
+- Fix a bug in TTLSchedules preventing correct handling of deleteBeforeDestroy [#517](https://github.com/pulumi/pulumi-pulumiservice/pull/517)
+
+## 0.29.1
+
+### Bug Fixes
+
+- Fixed Schedules' Read method erroring on non-existent schedule [#510](https://github.com/pulumi/pulumi-pulumiservice/pull/510)
+- Added ability to pass in backend url in provider constructor [#515](https://github.com/pulumi/pulumi-pulumiservice/pull/515)
 
 ## 0.28.0
 
 ### Improvements
+
 - Added OIDC Issuer resource [#349](https://github.com/pulumi/pulumi-pulumiservice/issues/349)
 
 ## 0.27.4

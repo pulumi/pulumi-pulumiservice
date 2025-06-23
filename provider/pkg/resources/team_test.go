@@ -44,14 +44,14 @@ func (c *TeamClientMock) RemoveStackPermission(ctx context.Context, stack pulumi
 func (c *TeamClientMock) GetTeamStackPermission(ctx context.Context, stack pulumiapi.StackIdentifier, teamName string) (*int, error) {
 	return nil, nil
 }
-func (c *TeamClientMock) AddEnvironmentPermission(ctx context.Context, req pulumiapi.CreateTeamEnvironmentPermissionRequest) error {
+func (c *TeamClientMock) AddEnvironmentSettings(ctx context.Context, req pulumiapi.CreateTeamEnvironmentSettingsRequest) error {
 	return nil
 }
-func (c *TeamClientMock) RemoveEnvironmentPermission(ctx context.Context, req pulumiapi.TeamEnvironmentPermissionRequest) error {
+func (c *TeamClientMock) RemoveEnvironmentSettings(ctx context.Context, req pulumiapi.TeamEnvironmentSettingsRequest) error {
 	return nil
 }
-func (c *TeamClientMock) GetTeamEnvironmentPermission(ctx context.Context, req pulumiapi.TeamEnvironmentPermissionRequest) (*string, error) {
-	return nil, nil
+func (c *TeamClientMock) GetTeamEnvironmentSettings(ctx context.Context, req pulumiapi.TeamEnvironmentSettingsRequest) (*string, *pulumiapi.Duration, error) {
+	return nil, nil, nil
 }
 
 func buildTeamClientMock(getTeamFunc getTeamFunc) *TeamClientMock {

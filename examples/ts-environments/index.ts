@@ -2,11 +2,12 @@ import * as service from "@pulumi/pulumiservice";
 import * as pulumi from "@pulumi/pulumi";
 
 let config = new pulumi.Config();
+const digits = config.require("digits");
 
 var environment = new service.Environment("testing-environment", {
   organization: "service-provider-test-org",
   project: "my-project",
-  name: "testing-environment-ts-"+config.require("digits"),
+  name: `testing-environment-ts-${digits}`,
   yaml: new pulumi.asset.StringAsset(
 `values:
   myKey1: "myValue1"
@@ -36,19 +37,37 @@ var versionTag = new service.EnvironmentVersionTag("VersionTag", {
   retainOnDelete: true
 })
 
-const team = new service.Team("team", {
+const team1 = new service.Team("team1", {
   description: "This was created with Pulumi",
-  name: "ts-team-needing-permissions",
-  displayName: "PulumiUP Team",
+  name: `ts-team-1-needing-permissions-${digits}`,
+  displayName: "PulumiUP Team 1",
   organizationName: environment.organization,
   members: ["pulumi-bot", "service-provider-example-user"],
   teamType: "pulumi"
 });
 
-const teamEnvironmentPermission = new service.TeamEnvironmentPermission("teamEnvironmentPermission", {
+const team2 = new service.Team("team2", {
+  description: "This was created with Pulumi",
+  name: `ts-team-2-needing-permissions-${digits}`,
+  displayName: "PulumiUP Team 2",
+  organizationName: environment.organization,
+  members: ["service-provider-example-user"],
+  teamType: "pulumi"
+});
+
+const teamEnvironmentPermission1 = new service.TeamEnvironmentPermission("teamEnvironmentPermission1", {
   organization: environment.organization,
-  team: team.name.apply((name: any) => name!!),
+  team: team1.name.apply((name: any) => name!!),
   environment: environment.name,
   project: environment.project,
-  permission: "admin"
+  permission: "admin",
+});
+
+const teamEnvironmentPermission2 = new service.TeamEnvironmentPermission("teamEnvironmentPermission2", {
+  organization: environment.organization,
+  team: team2.name.apply((name: any) => name!!),
+  environment: environment.name,
+  project: environment.project,
+  permission: "open",
+  maxOpenDuration: "15m",
 });
