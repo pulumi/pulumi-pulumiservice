@@ -1915,6 +1915,73 @@
         "name",
         "url"
       ]
+    },
+    "pulumiservice:index:EnvironmentRotationSchedule": {
+      "description": "A scheduled recurring or single time environment rotation.",
+      "properties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "project": {
+          "description": "Project name.",
+          "type": "string"
+        },
+        "environment": {
+          "description": "Environment name.",
+          "type": "string"
+        },
+        "scheduleCron": {
+          "description": "Cron expression for recurring scheduled rotations. If you are supplying this, do not supply timestamp.",
+          "type": "string"
+        },
+        "timestamp": {
+          "description": "The time at which the rotation should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are supplying this, do not supply scheduleCron.",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "scheduleId": {
+          "description": "Schedule ID of the created rotation schedule, assigned by Pulumi Cloud.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "organization",
+        "project",
+        "environment",
+        "scheduleId"
+      ],
+      "inputProperties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "project": {
+          "description": "Project name.",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "environment": {
+          "description": "Environment name.",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "scheduleCron": {
+          "description": "Cron expression for recurring scheduled rotations. If you are supplying this, do not supply timestamp.",
+          "type": "string"
+        },
+        "timestamp": {
+          "description": "The time at which the rotation should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are supplying this, do not supply scheduleCron.",
+          "type": "string",
+          "willReplaceOnChanges": true
+        }
+      },
+      "requiredInputs": [
+        "organization",
+        "project",
+        "environment"
+      ]
     }
   },
   "language": {

@@ -31,11 +31,11 @@ var createTtlScheduleReq = CreateTtlScheduleRequest{
 	Timestamp:          timestamp,
 	DeleteAfterDestroy: true,
 }
-var testResponse = ScheduleResponse{
+var testResponse = StackScheduleResponse{
 	ID:           testScheduleID,
 	ScheduleOnce: nil,
 	ScheduleCron: &cron,
-	Definition: ScheduleDefinition{
+	Definition: StackScheduleDefinition{
 		Request: CreateDeploymentRequest{
 			PulumiOperation: "update",
 		},
@@ -85,7 +85,7 @@ func TestGetDeploymentSchedule(t *testing.T) {
 			ResponseBody:      testResponse,
 		})
 		defer cleanup()
-		response, err := c.GetSchedule(ctx, testStack, testScheduleID)
+		response, err := c.GetStackSchedule(ctx, testStack, testScheduleID)
 		assert.NoError(t, err)
 		assert.Equal(t, testResponse, *response)
 	})
@@ -100,9 +100,9 @@ func TestGetDeploymentSchedule(t *testing.T) {
 			},
 		})
 		defer cleanup()
-		expectedScheduleID, err := c.GetSchedule(ctx, testStack, testScheduleID)
+		expectedScheduleID, err := c.GetStackSchedule(ctx, testStack, testScheduleID)
 		assert.Nil(t, expectedScheduleID, "scheduleId should be nil since error was returned")
-		assert.EqualError(t, err, "failed to get schedule with scheduleId test-schedule-id : 401 API error: unauthorized")
+		assert.EqualError(t, err, "failed to get stack schedule with scheduleId test-schedule-id : 401 API error: unauthorized")
 	})
 
 	t.Run("404", func(t *testing.T) {
@@ -116,7 +116,7 @@ func TestGetDeploymentSchedule(t *testing.T) {
 			},
 		})
 		defer cleanup()
-		expectedScheduleID, err := c.GetSchedule(ctx, testStack, testScheduleID)
+		expectedScheduleID, err := c.GetStackSchedule(ctx, testStack, testScheduleID)
 		assert.Nil(t, expectedScheduleID, "scheduleId should be nil since it was not found")
 		assert.NoError(t, err)
 	})
@@ -163,7 +163,7 @@ func TestDeleteSchedule(t *testing.T) {
 			ResponseCode:      201,
 		})
 		defer cleanup()
-		err := c.DeleteSchedule(ctx, testStack, testScheduleID)
+		err := c.DeleteStackSchedule(ctx, testStack, testScheduleID)
 		assert.NoError(t, err)
 	})
 
@@ -177,8 +177,8 @@ func TestDeleteSchedule(t *testing.T) {
 			},
 		})
 		defer cleanup()
-		err := c.DeleteSchedule(ctx, testStack, testScheduleID)
-		assert.EqualError(t, err, "failed to delete schedule with scheduleId test-schedule-id : 401 API error: unauthorized")
+		err := c.DeleteStackSchedule(ctx, testStack, testScheduleID)
+		assert.EqualError(t, err, "failed to delete stack schedule with scheduleId test-schedule-id : 401 API error: unauthorized")
 	})
 }
 

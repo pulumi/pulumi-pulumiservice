@@ -16,7 +16,7 @@ import (
 )
 
 type PulumiServiceDeploymentScheduleResource struct {
-	Client pulumiapi.ScheduleClient
+	Client pulumiapi.StackScheduleClient
 }
 
 type PulumiServiceDeploymentScheduleInput struct {
@@ -26,7 +26,7 @@ type PulumiServiceDeploymentScheduleInput struct {
 	PulumiOperation string     `pulumi:"pulumiOperation"`
 }
 
-type PulumiServiceSharedScheduleOutput struct {
+type PulumiServiceStackScheduleOutput struct {
 	Stack      pulumiapi.StackIdentifier
 	ScheduleID string `pulumi:"scheduleId"`
 }
@@ -117,7 +117,7 @@ func ToPulumiServiceDeploymentScheduleInput(properties *structpb.Struct) (*Pulum
 	return &input, nil
 }
 
-func ToPulumiServiceSharedScheduleOutput(properties *structpb.Struct) (*PulumiServiceSharedScheduleOutput, error) {
+func ToPulumiServiceStackScheduleOutput(properties *structpb.Struct) (*PulumiServiceStackScheduleOutput, error) {
 	inputMap, err := plugin.UnmarshalProperties(properties, plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
@@ -127,7 +127,7 @@ func ToPulumiServiceSharedScheduleOutput(properties *structpb.Struct) (*PulumiSe
 		return nil, err
 	}
 
-	output := PulumiServiceSharedScheduleOutput{}
+	output := PulumiServiceStackScheduleOutput{}
 	output.Stack = *stack
 
 	if inputMap["scheduleId"].HasValue() && inputMap["scheduleId"].IsString() {
@@ -148,10 +148,10 @@ func ScheduleSharedDiff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, er
 		return nil, err
 	}
 
-	return ScheduleSharedDiffMaps(olds, news)
+	return StackScheduleSharedDiffMaps(olds, news)
 }
 
-func ScheduleSharedDiffMaps(olds resource.PropertyMap, news resource.PropertyMap) (*pulumirpc.DiffResponse, error) {
+func StackScheduleSharedDiffMaps(olds resource.PropertyMap, news resource.PropertyMap) (*pulumirpc.DiffResponse, error) {
 	diffs := olds.Diff(news)
 	if diffs == nil {
 		return &pulumirpc.DiffResponse{
@@ -197,13 +197,13 @@ func (st *PulumiServiceDeploymentScheduleResource) Diff(req *pulumirpc.DiffReque
 	return ScheduleSharedDiff(req)
 }
 
-func ScheduleSharedDelete(req *pulumirpc.DeleteRequest, client pulumiapi.ScheduleClient) (*pbempty.Empty, error) {
-	output, err := ToPulumiServiceSharedScheduleOutput(req.GetProperties())
+func StackScheduleSharedDelete(req *pulumirpc.DeleteRequest, client pulumiapi.StackScheduleClient) (*pbempty.Empty, error) {
+	output, err := ToPulumiServiceStackScheduleOutput(req.GetProperties())
 	if err != nil {
 		return nil, err
 	}
 
-	err = client.DeleteSchedule(context.Background(), output.Stack, output.ScheduleID)
+	err = client.DeleteStackSchedule(context.Background(), output.Stack, output.ScheduleID)
 	if err != nil {
 		return nil, err
 	}
@@ -211,7 +211,7 @@ func ScheduleSharedDelete(req *pulumirpc.DeleteRequest, client pulumiapi.Schedul
 }
 
 func (st *PulumiServiceDeploymentScheduleResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	return ScheduleSharedDelete(req, st.Client)
+	return StackScheduleSharedDelete(req, st.Client)
 }
 
 func (st *PulumiServiceDeploymentScheduleResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
@@ -287,7 +287,7 @@ func (st *PulumiServiceDeploymentScheduleResource) Check(req *pulumirpc.CheckReq
 }
 
 func (st *PulumiServiceDeploymentScheduleResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	previousOutput, err := ToPulumiServiceSharedScheduleOutput(req.GetOlds())
+	previousOutput, err := ToPulumiServiceStackScheduleOutput(req.GetOlds())
 	if err != nil {
 		return nil, err
 	}
@@ -324,12 +324,12 @@ func (st *PulumiServiceDeploymentScheduleResource) Update(req *pulumirpc.UpdateR
 }
 
 func (st *PulumiServiceDeploymentScheduleResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	stack, scheduleID, err := ParseScheduleID(req.Id, "")
+	stack, scheduleID, err := ParseStackScheduleID(req.Id, "")
 	if err != nil {
 		return nil, err
 	}
 
-	scheduleResponse, err := st.Client.GetSchedule(context.Background(), *stack, *scheduleID)
+	scheduleResponse, err := st.Client.GetStackSchedule(context.Background(), *stack, *scheduleID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read DeploymentSchedule (%q): %w", req.Id, err)
 	}
@@ -385,7 +385,7 @@ func (st *PulumiServiceDeploymentScheduleResource) Name() string {
 	return "pulumiservice:index:DeploymentSchedule"
 }
 
-func ParseScheduleID(id string, scheduleType string) (*pulumiapi.StackIdentifier, *string, error) {
+func ParseStackScheduleID(id string, scheduleType string) (*pulumiapi.StackIdentifier, *string, error) {
 	splitID := strings.Split(id, "/")
 	if len(splitID) < 4 {
 		return nil, nil, fmt.Errorf("invalid stack id: %s", id)

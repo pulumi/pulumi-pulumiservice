@@ -10,13 +10,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type getDeploymentScheduleFunc func() (*pulumiapi.ScheduleResponse, error)
+type getDeploymentScheduleFunc func() (*pulumiapi.StackScheduleResponse, error)
 
 type ScheduleClientMock struct {
 	getDeploymentScheduleFunc getDeploymentScheduleFunc
 }
 
-func (c *ScheduleClientMock) GetSchedule(ctx context.Context, stack pulumiapi.StackIdentifier, scheduleID string) (*pulumiapi.ScheduleResponse, error) {
+func (c *ScheduleClientMock) GetStackSchedule(ctx context.Context, stack pulumiapi.StackIdentifier, scheduleID string) (*pulumiapi.StackScheduleResponse, error) {
 	return c.getDeploymentScheduleFunc()
 }
 
@@ -44,7 +44,7 @@ func (c *ScheduleClientMock) UpdateTtlSchedule(ctx context.Context, stack pulumi
 	return nil, nil
 }
 
-func (c *ScheduleClientMock) DeleteSchedule(ctx context.Context, stack pulumiapi.StackIdentifier, scheduleID string) error {
+func (c *ScheduleClientMock) DeleteStackSchedule(ctx context.Context, stack pulumiapi.StackIdentifier, scheduleID string) error {
 	return nil
 }
 
@@ -57,7 +57,7 @@ func buildScheduleClientMock(getDeploymentScheduleFunc getDeploymentScheduleFunc
 func TestDeploymentSchedule(t *testing.T) {
 	t.Run("Read when the resource is not found", func(t *testing.T) {
 		mockedClient := buildScheduleClientMock(
-			func() (*pulumiapi.ScheduleResponse, error) { return nil, nil },
+			func() (*pulumiapi.StackScheduleResponse, error) { return nil, nil },
 		)
 
 		provider := PulumiServiceDeploymentScheduleResource{
@@ -97,13 +97,13 @@ func TestDeploymentSchedule(t *testing.T) {
 
 	t.Run("Read when the resource is found", func(t *testing.T) {
 		mockedClient := buildScheduleClientMock(
-			func() (*pulumiapi.ScheduleResponse, error) {
+			func() (*pulumiapi.StackScheduleResponse, error) {
 				timeString := "2026-06-06 00:00:00.000"
-				return &pulumiapi.ScheduleResponse{
+				return &pulumiapi.StackScheduleResponse{
 					ID:           "fake-id",
 					ScheduleOnce: &timeString,
 					ScheduleCron: nil,
-					Definition: pulumiapi.ScheduleDefinition{
+					Definition: pulumiapi.StackScheduleDefinition{
 						Request: pulumiapi.CreateDeploymentRequest{
 							PulumiOperation: "update",
 							OperationContext: pulumiapi.ScheduleOperationContext{

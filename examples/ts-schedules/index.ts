@@ -3,6 +3,7 @@ import * as service from "@pulumi/pulumiservice";
 
 let config = new pulumi.Config();
 let stackName = "test-stack-" + config.require("digits");
+let envName = "test-env-" + config.require("digits");
 
 // Deployment Settings are required to be setup before schedules can be
 // Note the `DependsOn` option in all of the schedules
@@ -16,6 +17,17 @@ var settings = new service.DeploymentSettings("deployment-settings", {
             branch: "refs/heads/main"
         }
     }
+})
+
+// Environment to create rotations on
+var environment = new service.Environment("testing-environment", {
+  organization: "service-provider-test-org",
+  project: "my-project",
+  name: envName,
+  yaml: new pulumi.asset.StringAsset(
+`values:
+  myNumber: 1`
+  )
 })
 
 // Schedule that runs drift every Sunday midnight, but does NOT remediate it 
@@ -53,3 +65,11 @@ var deployment_preview = new service.DeploymentSchedule("deployment-schedule-pre
     timestamp: "2026-01-01T00:00:00Z",
     pulumiOperation: service.PulumiOperation.Preview
 }, { dependsOn: settings })
+
+// Schedule that runs environment secret rotation every Sunday midnight
+var rotation_schedule = new service.EnvironmentRotationSchedule("environment-rotation-schedule", {
+    organization: environment.organization,
+    project: environment.project,
+    environment: environment.name,
+    scheduleCron: "0 0 * * 0",
+})

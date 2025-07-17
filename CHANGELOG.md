@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+## 0.30.0
+
+### Improvements
+
+- Added EnvironmentRotationSchedule resource [#536](https://github.com/pulumi/pulumi-pulumiservice/pull/536)
+
+
 ## 0.29.3
 
 ### Improvements
