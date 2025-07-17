@@ -14,7 +14,7 @@ import (
 )
 
 type PulumiServiceDriftScheduleResource struct {
-	Client pulumiapi.ScheduleClient
+	Client pulumiapi.StackScheduleClient
 }
 
 type PulumiServiceDriftScheduleInput struct {
@@ -77,11 +77,11 @@ func (st *PulumiServiceDriftScheduleResource) Diff(req *pulumirpc.DiffRequest) (
 		news["autoRemediate"] = resource.NewBoolProperty(false)
 	}
 
-	return ScheduleSharedDiffMaps(olds, news)
+	return StackScheduleSharedDiffMaps(olds, news)
 }
 
 func (st *PulumiServiceDriftScheduleResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	return ScheduleSharedDelete(req, st.Client)
+	return StackScheduleSharedDelete(req, st.Client)
 }
 
 func (st *PulumiServiceDriftScheduleResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
@@ -143,7 +143,7 @@ func (st *PulumiServiceDriftScheduleResource) Check(req *pulumirpc.CheckRequest)
 }
 
 func (st *PulumiServiceDriftScheduleResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	previousOutput, err := ToPulumiServiceSharedScheduleOutput(req.GetOlds())
+	previousOutput, err := ToPulumiServiceStackScheduleOutput(req.GetOlds())
 	if err != nil {
 		return nil, err
 	}
@@ -177,12 +177,12 @@ func (st *PulumiServiceDriftScheduleResource) Update(req *pulumirpc.UpdateReques
 }
 
 func (st *PulumiServiceDriftScheduleResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	stack, scheduleID, err := ParseScheduleID(req.Id, "drift")
+	stack, scheduleID, err := ParseStackScheduleID(req.Id, "drift")
 	if err != nil {
 		return nil, err
 	}
 
-	scheduleResponse, err := st.Client.GetSchedule(context.Background(), *stack, *scheduleID)
+	scheduleResponse, err := st.Client.GetStackSchedule(context.Background(), *stack, *scheduleID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read DriftSchedule (%q): %w", req.Id, err)
 	}
