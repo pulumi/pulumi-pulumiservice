@@ -19,6 +19,17 @@ resources:
         git:
           repoUrl: "https://github.com/example.git"
           branch: "refs/heads/main"
+  # Environment to create rotations on
+  environment:
+    type: pulumiservice:Environment
+    properties:
+      organization: service-provider-test-org
+      project: my-project
+      name: testing-environment-yaml-${digits}
+      yaml:
+        fn::stringAsset: |-
+          values:
+            myKey1: "myValue1"
   # Schedule that runs drift every Sunday midnight, but does NOT remediate it
   drift-schedule-${rand.result}:
     type: pulumiservice:DriftSchedule
@@ -67,3 +78,11 @@ resources:
     options:
       dependsOn:
         - ${settings}
+  # Schedule that runs environment secret rotation every Sunday midnight
+  environment-rotation-schedule-${rand.result}:
+    type: pulumiservice:EnvironmentRotationSchedule
+    properties:
+      organization: ${environment.organization}
+      project: ${environment.project}
+      environment: ${environment.name}
+      scheduleCron: "0 0 * * 0"

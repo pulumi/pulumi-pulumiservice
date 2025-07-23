@@ -1,7 +1,7 @@
+using System;
 using Pulumi;
 using Pulumi.PulumiService;
 using Pulumi.PulumiService.Inputs;
-using Pulumi.Random;
 
 class MyStack : Pulumi.Stack
 {
@@ -9,21 +9,41 @@ class MyStack : Pulumi.Stack
     {
         var config = new Pulumi.Config();
         var stackName = "test-stack-" + config.Require("digits");
+        var envName = "test-env-" + config.Require("digits");
+        String yaml = """
+        values:
+          myKey1: "myValue1"
+        """;
 
         // Deployment Settings are required to be setup before schedules can be
         // Note the `DependsOn` option in all of the schedules
         var settings = new DeploymentSettings(
             "Deployment Settings",
-            new DeploymentSettingsArgs{
+            new DeploymentSettingsArgs
+            {
                 Organization = "service-provider-test-org",
                 Project = "cs-schedules",
                 Stack = stackName,
-                SourceContext = new DeploymentSettingsSourceContextArgs{
-                    Git = new DeploymentSettingsGitSourceArgs{
+                SourceContext = new DeploymentSettingsSourceContextArgs
+                {
+                    Git = new DeploymentSettingsGitSourceArgs
+                    {
                         RepoUrl = "https://github.com/example.git",
                         Branch = "refs/heads/main"
                     }
                 }
+            }
+        );
+
+        // Environment to create rotations on
+        var environment = new Pulumi.PulumiService.Environment(
+            "testing-environment",
+            new EnvironmentArgs
+            {
+                Organization = "service-provider-test-org",
+                Project = "cs-schedules",
+                Name = envName,
+                Yaml = new StringAsset(yaml)
             }
         );
 
@@ -40,14 +60,15 @@ class MyStack : Pulumi.Stack
             },
             new CustomResourceOptions
             {
-              DependsOn = { settings }
+                DependsOn = { settings }
             }
         );
 
         // Schedule to destroy stack resources on Jan 1, 2026, but NOT delete the stack itself
         var ttl = new TtlSchedule(
             "ttl-schedule",
-            new TtlScheduleArgs{
+            new TtlScheduleArgs
+            {
                 Organization = "service-provider-test-org",
                 Project = "cs-schedules",
                 Stack = stackName,
@@ -56,14 +77,15 @@ class MyStack : Pulumi.Stack
             },
             new CustomResourceOptions
             {
-              DependsOn = { settings }
+                DependsOn = { settings }
             }
         );
 
         // Schedule that runs `pulumi up` every Sunday midnight
         var deploymentUp = new DeploymentSchedule(
             "deployment-schedule-up",
-            new DeploymentScheduleArgs{
+            new DeploymentScheduleArgs
+            {
                 Organization = "service-provider-test-org",
                 Project = "cs-schedules",
                 Stack = stackName,
@@ -72,14 +94,15 @@ class MyStack : Pulumi.Stack
             },
             new CustomResourceOptions
             {
-              DependsOn = { settings }
+                DependsOn = { settings }
             }
         );
 
         // Schedule that runs `pulumi preview` once on Jan 1, 2026
         var deploymentPreview = new DeploymentSchedule(
             "deployment-schedule-preview",
-            new DeploymentScheduleArgs{
+            new DeploymentScheduleArgs
+            {
                 Organization = "service-provider-test-org",
                 Project = "cs-schedules",
                 Stack = stackName,
@@ -88,7 +111,18 @@ class MyStack : Pulumi.Stack
             },
             new CustomResourceOptions
             {
-              DependsOn = { settings }
+                DependsOn = { settings }
+            }
+        );
+        
+        // Schedule that runs environment secret rotation every Sunday midnight
+        var environmentRotation = new EnvironmentRotationSchedule(
+            "environment-rotation-schedule",
+            new EnvironmentRotationScheduleArgs{
+                Organization = environment.Organization,
+                Project = environment.Project,
+                Environment = environment.Name,
+                ScheduleCron = "0 0 * * 0",
             }
         );
     }

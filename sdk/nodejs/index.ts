@@ -35,6 +35,11 @@ export type Environment = import("./environment").Environment;
 export const Environment: typeof import("./environment").Environment = null as any;
 utilities.lazyLoad(exports, ["Environment"], () => require("./environment"));
 
+export { EnvironmentRotationScheduleArgs } from "./environmentRotationSchedule";
+export type EnvironmentRotationSchedule = import("./environmentRotationSchedule").EnvironmentRotationSchedule;
+export const EnvironmentRotationSchedule: typeof import("./environmentRotationSchedule").EnvironmentRotationSchedule = null as any;
+utilities.lazyLoad(exports, ["EnvironmentRotationSchedule"], () => require("./environmentRotationSchedule"));
+
 export { EnvironmentVersionTagArgs } from "./environmentVersionTag";
 export type EnvironmentVersionTag = import("./environmentVersionTag").EnvironmentVersionTag;
 export const EnvironmentVersionTag: typeof import("./environmentVersionTag").EnvironmentVersionTag = null as any;
@@ -129,6 +134,8 @@ const _module = {
                 return new DriftSchedule(name, <any>undefined, { urn })
             case "pulumiservice:index:Environment":
                 return new Environment(name, <any>undefined, { urn })
+            case "pulumiservice:index:EnvironmentRotationSchedule":
+                return new EnvironmentRotationSchedule(name, <any>undefined, { urn })
             case "pulumiservice:index:EnvironmentVersionTag":
                 return new EnvironmentVersionTag(name, <any>undefined, { urn })
             case "pulumiservice:index:OidcIssuer":
