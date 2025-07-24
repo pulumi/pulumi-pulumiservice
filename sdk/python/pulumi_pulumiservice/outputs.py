@@ -18,6 +18,7 @@ from ._enums import *
 
 __all__ = [
     'AWSOIDCConfiguration',
+    'ApprovalRuleConfig',
     'AuthPolicyDefinition',
     'AzureOIDCConfiguration',
     'DeploymentSettingsCacheOptions',
@@ -29,6 +30,8 @@ __all__ = [
     'DeploymentSettingsGithub',
     'DeploymentSettingsOperationContext',
     'DeploymentSettingsSourceContext',
+    'EligibleApprover',
+    'EnvironmentIdentifier',
     'GCPOIDCConfiguration',
     'OperationContextOIDC',
     'OperationContextOptions',
@@ -107,6 +110,80 @@ class AWSOIDCConfiguration(dict):
         Optional set of IAM policy ARNs that further restrict the assume-role session
         """
         return pulumi.get(self, "policy_arns")
+
+
+@pulumi.output_type
+class ApprovalRuleConfig(dict):
+    @staticmethod
+    def __key_warning(key: str):
+        suggest = None
+        if key == "allowSelfApproval":
+            suggest = "allow_self_approval"
+        elif key == "eligibleApprovers":
+            suggest = "eligible_approvers"
+        elif key == "numApprovalsRequired":
+            suggest = "num_approvals_required"
+        elif key == "requireReapprovalOnChange":
+            suggest = "require_reapproval_on_change"
+
+        if suggest:
+            pulumi.log.warn(f"Key '{key}' not found in ApprovalRuleConfig. Access the value via the '{suggest}' property getter instead.")
+
+    def __getitem__(self, key: str) -> Any:
+        ApprovalRuleConfig.__key_warning(key)
+        return super().__getitem__(key)
+
+    def get(self, key: str, default = None) -> Any:
+        ApprovalRuleConfig.__key_warning(key)
+        return super().get(key, default)
+
+    def __init__(__self__, *,
+                 allow_self_approval: bool,
+                 eligible_approvers: Sequence['outputs.EligibleApprover'],
+                 num_approvals_required: int,
+                 require_reapproval_on_change: bool):
+        """
+        :param bool allow_self_approval: Whether self-approval is allowed.
+        :param Sequence['EligibleApprover'] eligible_approvers: List of eligible approvers.
+        :param int num_approvals_required: Number of approvals required.
+        :param bool require_reapproval_on_change: Whether reapproval is required on changes.
+        """
+        pulumi.set(__self__, "allow_self_approval", allow_self_approval)
+        pulumi.set(__self__, "eligible_approvers", eligible_approvers)
+        pulumi.set(__self__, "num_approvals_required", num_approvals_required)
+        pulumi.set(__self__, "require_reapproval_on_change", require_reapproval_on_change)
+
+    @property
+    @pulumi.getter(name="allowSelfApproval")
+    def allow_self_approval(self) -> bool:
+        """
+        Whether self-approval is allowed.
+        """
+        return pulumi.get(self, "allow_self_approval")
+
+    @property
+    @pulumi.getter(name="eligibleApprovers")
+    def eligible_approvers(self) -> Sequence['outputs.EligibleApprover']:
+        """
+        List of eligible approvers.
+        """
+        return pulumi.get(self, "eligible_approvers")
+
+    @property
+    @pulumi.getter(name="numApprovalsRequired")
+    def num_approvals_required(self) -> int:
+        """
+        Number of approvals required.
+        """
+        return pulumi.get(self, "num_approvals_required")
+
+    @property
+    @pulumi.getter(name="requireReapprovalOnChange")
+    def require_reapproval_on_change(self) -> bool:
+        """
+        Whether reapproval is required on changes.
+        """
+        return pulumi.get(self, "require_reapproval_on_change")
 
 
 @pulumi.output_type
@@ -774,6 +851,108 @@ class DeploymentSettingsSourceContext(dict):
         Git source settings for a deployment.
         """
         return pulumi.get(self, "git")
+
+
+@pulumi.output_type
+class EligibleApprover(dict):
+    @staticmethod
+    def __key_warning(key: str):
+        suggest = None
+        if key == "rbacPermission":
+            suggest = "rbac_permission"
+        elif key == "teamName":
+            suggest = "team_name"
+
+        if suggest:
+            pulumi.log.warn(f"Key '{key}' not found in EligibleApprover. Access the value via the '{suggest}' property getter instead.")
+
+    def __getitem__(self, key: str) -> Any:
+        EligibleApprover.__key_warning(key)
+        return super().__getitem__(key)
+
+    def get(self, key: str, default = None) -> Any:
+        EligibleApprover.__key_warning(key)
+        return super().get(key, default)
+
+    def __init__(__self__, *,
+                 rbac_permission: Optional['RbacPermission'] = None,
+                 team_name: Optional[str] = None,
+                 user: Optional[str] = None):
+        """
+        :param 'RbacPermission' rbac_permission: RBAC permission that gives right to approve.
+        :param str team_name: Name of the team that can approve.
+        :param str user: Login of the user that can approve.
+        """
+        if rbac_permission is not None:
+            pulumi.set(__self__, "rbac_permission", rbac_permission)
+        if team_name is not None:
+            pulumi.set(__self__, "team_name", team_name)
+        if user is not None:
+            pulumi.set(__self__, "user", user)
+
+    @property
+    @pulumi.getter(name="rbacPermission")
+    def rbac_permission(self) -> Optional['RbacPermission']:
+        """
+        RBAC permission that gives right to approve.
+        """
+        return pulumi.get(self, "rbac_permission")
+
+    @property
+    @pulumi.getter(name="teamName")
+    def team_name(self) -> Optional[str]:
+        """
+        Name of the team that can approve.
+        """
+        return pulumi.get(self, "team_name")
+
+    @property
+    @pulumi.getter
+    def user(self) -> Optional[str]:
+        """
+        Login of the user that can approve.
+        """
+        return pulumi.get(self, "user")
+
+
+@pulumi.output_type
+class EnvironmentIdentifier(dict):
+    def __init__(__self__, *,
+                 name: str,
+                 organization: str,
+                 project: str):
+        """
+        :param str name: The environment name.
+        :param str organization: The organization name.
+        :param str project: The project name.
+        """
+        pulumi.set(__self__, "name", name)
+        pulumi.set(__self__, "organization", organization)
+        pulumi.set(__self__, "project", project)
+
+    @property
+    @pulumi.getter
+    def name(self) -> str:
+        """
+        The environment name.
+        """
+        return pulumi.get(self, "name")
+
+    @property
+    @pulumi.getter
+    def organization(self) -> str:
+        """
+        The organization name.
+        """
+        return pulumi.get(self, "organization")
+
+    @property
+    @pulumi.getter
+    def project(self) -> str:
+        """
+        The project name.
+        """
+        return pulumi.get(self, "project")
 
 
 @pulumi.output_type

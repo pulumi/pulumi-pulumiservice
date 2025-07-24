@@ -187,6 +187,9 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 		&resources.PulumiServiceEnvironmentRotationScheduleResource{
 			Client: client,
 		},
+		&resources.PulumiServiceApprovalRuleResource{
+			Client: client,
+		},
 	}
 
 	return &pulumirpc.ConfigureResponse{

@@ -18,6 +18,8 @@ from ._enums import *
 __all__ = [
     'AWSOIDCConfigurationArgs',
     'AWSOIDCConfigurationArgsDict',
+    'ApprovalRuleConfigArgs',
+    'ApprovalRuleConfigArgsDict',
     'AuthPolicyDefinitionArgs',
     'AuthPolicyDefinitionArgsDict',
     'AzureOIDCConfigurationArgs',
@@ -40,6 +42,10 @@ __all__ = [
     'DeploymentSettingsOperationContextArgsDict',
     'DeploymentSettingsSourceContextArgs',
     'DeploymentSettingsSourceContextArgsDict',
+    'EligibleApproverArgs',
+    'EligibleApproverArgsDict',
+    'EnvironmentIdentifierArgs',
+    'EnvironmentIdentifierArgsDict',
     'GCPOIDCConfigurationArgs',
     'GCPOIDCConfigurationArgsDict',
     'OperationContextOIDCArgs',
@@ -140,6 +146,94 @@ class AWSOIDCConfigurationArgs:
     @policy_arns.setter
     def policy_arns(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]]):
         pulumi.set(self, "policy_arns", value)
+
+
+if not MYPY:
+    class ApprovalRuleConfigArgsDict(TypedDict):
+        allow_self_approval: pulumi.Input[bool]
+        """
+        Whether self-approval is allowed.
+        """
+        eligible_approvers: pulumi.Input[Sequence[pulumi.Input['EligibleApproverArgsDict']]]
+        """
+        List of eligible approvers.
+        """
+        num_approvals_required: pulumi.Input[int]
+        """
+        Number of approvals required.
+        """
+        require_reapproval_on_change: pulumi.Input[bool]
+        """
+        Whether reapproval is required on changes.
+        """
+elif False:
+    ApprovalRuleConfigArgsDict: TypeAlias = Mapping[str, Any]
+
+@pulumi.input_type
+class ApprovalRuleConfigArgs:
+    def __init__(__self__, *,
+                 allow_self_approval: pulumi.Input[bool],
+                 eligible_approvers: pulumi.Input[Sequence[pulumi.Input['EligibleApproverArgs']]],
+                 num_approvals_required: pulumi.Input[int],
+                 require_reapproval_on_change: pulumi.Input[bool]):
+        """
+        :param pulumi.Input[bool] allow_self_approval: Whether self-approval is allowed.
+        :param pulumi.Input[Sequence[pulumi.Input['EligibleApproverArgs']]] eligible_approvers: List of eligible approvers.
+        :param pulumi.Input[int] num_approvals_required: Number of approvals required.
+        :param pulumi.Input[bool] require_reapproval_on_change: Whether reapproval is required on changes.
+        """
+        pulumi.set(__self__, "allow_self_approval", allow_self_approval)
+        pulumi.set(__self__, "eligible_approvers", eligible_approvers)
+        pulumi.set(__self__, "num_approvals_required", num_approvals_required)
+        pulumi.set(__self__, "require_reapproval_on_change", require_reapproval_on_change)
+
+    @property
+    @pulumi.getter(name="allowSelfApproval")
+    def allow_self_approval(self) -> pulumi.Input[bool]:
+        """
+        Whether self-approval is allowed.
+        """
+        return pulumi.get(self, "allow_self_approval")
+
+    @allow_self_approval.setter
+    def allow_self_approval(self, value: pulumi.Input[bool]):
+        pulumi.set(self, "allow_self_approval", value)
+
+    @property
+    @pulumi.getter(name="eligibleApprovers")
+    def eligible_approvers(self) -> pulumi.Input[Sequence[pulumi.Input['EligibleApproverArgs']]]:
+        """
+        List of eligible approvers.
+        """
+        return pulumi.get(self, "eligible_approvers")
+
+    @eligible_approvers.setter
+    def eligible_approvers(self, value: pulumi.Input[Sequence[pulumi.Input['EligibleApproverArgs']]]):
+        pulumi.set(self, "eligible_approvers", value)
+
+    @property
+    @pulumi.getter(name="numApprovalsRequired")
+    def num_approvals_required(self) -> pulumi.Input[int]:
+        """
+        Number of approvals required.
+        """
+        return pulumi.get(self, "num_approvals_required")
+
+    @num_approvals_required.setter
+    def num_approvals_required(self, value: pulumi.Input[int]):
+        pulumi.set(self, "num_approvals_required", value)
+
+    @property
+    @pulumi.getter(name="requireReapprovalOnChange")
+    def require_reapproval_on_change(self) -> pulumi.Input[bool]:
+        """
+        Whether reapproval is required on changes.
+        """
+        return pulumi.get(self, "require_reapproval_on_change")
+
+    @require_reapproval_on_change.setter
+    def require_reapproval_on_change(self, value: pulumi.Input[bool]):
+        pulumi.set(self, "require_reapproval_on_change", value)
 
 
 if not MYPY:
@@ -966,6 +1060,147 @@ class DeploymentSettingsSourceContextArgs:
     @git.setter
     def git(self, value: Optional[pulumi.Input['DeploymentSettingsGitSourceArgs']]):
         pulumi.set(self, "git", value)
+
+
+if not MYPY:
+    class EligibleApproverArgsDict(TypedDict):
+        rbac_permission: NotRequired[pulumi.Input['RbacPermission']]
+        """
+        RBAC permission that gives right to approve.
+        """
+        team_name: NotRequired[pulumi.Input[str]]
+        """
+        Name of the team that can approve.
+        """
+        user: NotRequired[pulumi.Input[str]]
+        """
+        Login of the user that can approve.
+        """
+elif False:
+    EligibleApproverArgsDict: TypeAlias = Mapping[str, Any]
+
+@pulumi.input_type
+class EligibleApproverArgs:
+    def __init__(__self__, *,
+                 rbac_permission: Optional[pulumi.Input['RbacPermission']] = None,
+                 team_name: Optional[pulumi.Input[str]] = None,
+                 user: Optional[pulumi.Input[str]] = None):
+        """
+        :param pulumi.Input['RbacPermission'] rbac_permission: RBAC permission that gives right to approve.
+        :param pulumi.Input[str] team_name: Name of the team that can approve.
+        :param pulumi.Input[str] user: Login of the user that can approve.
+        """
+        if rbac_permission is not None:
+            pulumi.set(__self__, "rbac_permission", rbac_permission)
+        if team_name is not None:
+            pulumi.set(__self__, "team_name", team_name)
+        if user is not None:
+            pulumi.set(__self__, "user", user)
+
+    @property
+    @pulumi.getter(name="rbacPermission")
+    def rbac_permission(self) -> Optional[pulumi.Input['RbacPermission']]:
+        """
+        RBAC permission that gives right to approve.
+        """
+        return pulumi.get(self, "rbac_permission")
+
+    @rbac_permission.setter
+    def rbac_permission(self, value: Optional[pulumi.Input['RbacPermission']]):
+        pulumi.set(self, "rbac_permission", value)
+
+    @property
+    @pulumi.getter(name="teamName")
+    def team_name(self) -> Optional[pulumi.Input[str]]:
+        """
+        Name of the team that can approve.
+        """
+        return pulumi.get(self, "team_name")
+
+    @team_name.setter
+    def team_name(self, value: Optional[pulumi.Input[str]]):
+        pulumi.set(self, "team_name", value)
+
+    @property
+    @pulumi.getter
+    def user(self) -> Optional[pulumi.Input[str]]:
+        """
+        Login of the user that can approve.
+        """
+        return pulumi.get(self, "user")
+
+    @user.setter
+    def user(self, value: Optional[pulumi.Input[str]]):
+        pulumi.set(self, "user", value)
+
+
+if not MYPY:
+    class EnvironmentIdentifierArgsDict(TypedDict):
+        name: pulumi.Input[str]
+        """
+        The environment name.
+        """
+        organization: pulumi.Input[str]
+        """
+        The organization name.
+        """
+        project: pulumi.Input[str]
+        """
+        The project name.
+        """
+elif False:
+    EnvironmentIdentifierArgsDict: TypeAlias = Mapping[str, Any]
+
+@pulumi.input_type
+class EnvironmentIdentifierArgs:
+    def __init__(__self__, *,
+                 name: pulumi.Input[str],
+                 organization: pulumi.Input[str],
+                 project: pulumi.Input[str]):
+        """
+        :param pulumi.Input[str] name: The environment name.
+        :param pulumi.Input[str] organization: The organization name.
+        :param pulumi.Input[str] project: The project name.
+        """
+        pulumi.set(__self__, "name", name)
+        pulumi.set(__self__, "organization", organization)
+        pulumi.set(__self__, "project", project)
+
+    @property
+    @pulumi.getter
+    def name(self) -> pulumi.Input[str]:
+        """
+        The environment name.
+        """
+        return pulumi.get(self, "name")
+
+    @name.setter
+    def name(self, value: pulumi.Input[str]):
+        pulumi.set(self, "name", value)
+
+    @property
+    @pulumi.getter
+    def organization(self) -> pulumi.Input[str]:
+        """
+        The organization name.
+        """
+        return pulumi.get(self, "organization")
+
+    @organization.setter
+    def organization(self, value: pulumi.Input[str]):
+        pulumi.set(self, "organization", value)
+
+    @property
+    @pulumi.getter
+    def project(self) -> pulumi.Input[str]:
+        """
+        The project name.
+        """
+        return pulumi.get(self, "project")
+
+    @project.setter
+    def project(self, value: pulumi.Input[str]):
+        pulumi.set(self, "project", value)
 
 
 if not MYPY:

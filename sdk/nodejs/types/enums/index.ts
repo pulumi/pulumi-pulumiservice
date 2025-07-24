@@ -95,6 +95,48 @@ export const PulumiOperation = {
 
 export type PulumiOperation = (typeof PulumiOperation)[keyof typeof PulumiOperation];
 
+export const RbacPermission = {
+    /**
+     * Read permission.
+     */
+    Read: "environment:read",
+    /**
+     * Read and decrypt permission.
+     */
+    ReadDecrypt: "environment:read_decrypt",
+    /**
+     * Open permission.
+     */
+    Open: "environment:open",
+    /**
+     * Write permission.
+     */
+    Write: "environment:write",
+    /**
+     * Delete permission.
+     */
+    Delete: "environment:delete",
+    /**
+     * Clone permission.
+     */
+    Clone: "environment:clone",
+    /**
+     * Rotate permission.
+     */
+    Rotate: "environment:rotate",
+} as const;
+
+export type RbacPermission = (typeof RbacPermission)[keyof typeof RbacPermission];
+
+export const TargetActionType = {
+    /**
+     * Update action type for approval rules.
+     */
+    Update: "update",
+} as const;
+
+export type TargetActionType = (typeof TargetActionType)[keyof typeof TargetActionType];
+
 export const TeamStackPermissionScope = {
     /**
      * Grants read permissions to stack.

@@ -911,6 +911,352 @@ func (in *pulumiOperationPtr) ToPulumiOperationPtrOutputWithContext(ctx context.
 	return pulumi.ToOutputWithContext(ctx, in).(PulumiOperationPtrOutput)
 }
 
+type RbacPermission string
+
+const (
+	// Read permission.
+	RbacPermissionRead = RbacPermission("environment:read")
+	// Read and decrypt permission.
+	RbacPermissionReadDecrypt = RbacPermission("environment:read_decrypt")
+	// Open permission.
+	RbacPermissionOpen = RbacPermission("environment:open")
+	// Write permission.
+	RbacPermissionWrite = RbacPermission("environment:write")
+	// Delete permission.
+	RbacPermissionDelete = RbacPermission("environment:delete")
+	// Clone permission.
+	RbacPermissionClone = RbacPermission("environment:clone")
+	// Rotate permission.
+	RbacPermissionRotate = RbacPermission("environment:rotate")
+)
+
+func (RbacPermission) ElementType() reflect.Type {
+	return reflect.TypeOf((*RbacPermission)(nil)).Elem()
+}
+
+func (e RbacPermission) ToRbacPermissionOutput() RbacPermissionOutput {
+	return pulumi.ToOutput(e).(RbacPermissionOutput)
+}
+
+func (e RbacPermission) ToRbacPermissionOutputWithContext(ctx context.Context) RbacPermissionOutput {
+	return pulumi.ToOutputWithContext(ctx, e).(RbacPermissionOutput)
+}
+
+func (e RbacPermission) ToRbacPermissionPtrOutput() RbacPermissionPtrOutput {
+	return e.ToRbacPermissionPtrOutputWithContext(context.Background())
+}
+
+func (e RbacPermission) ToRbacPermissionPtrOutputWithContext(ctx context.Context) RbacPermissionPtrOutput {
+	return RbacPermission(e).ToRbacPermissionOutputWithContext(ctx).ToRbacPermissionPtrOutputWithContext(ctx)
+}
+
+func (e RbacPermission) ToStringOutput() pulumi.StringOutput {
+	return pulumi.ToOutput(pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e RbacPermission) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return pulumi.ToOutputWithContext(ctx, pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e RbacPermission) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringPtrOutputWithContext(context.Background())
+}
+
+func (e RbacPermission) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringOutputWithContext(ctx).ToStringPtrOutputWithContext(ctx)
+}
+
+type RbacPermissionOutput struct{ *pulumi.OutputState }
+
+func (RbacPermissionOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*RbacPermission)(nil)).Elem()
+}
+
+func (o RbacPermissionOutput) ToRbacPermissionOutput() RbacPermissionOutput {
+	return o
+}
+
+func (o RbacPermissionOutput) ToRbacPermissionOutputWithContext(ctx context.Context) RbacPermissionOutput {
+	return o
+}
+
+func (o RbacPermissionOutput) ToRbacPermissionPtrOutput() RbacPermissionPtrOutput {
+	return o.ToRbacPermissionPtrOutputWithContext(context.Background())
+}
+
+func (o RbacPermissionOutput) ToRbacPermissionPtrOutputWithContext(ctx context.Context) RbacPermissionPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v RbacPermission) *RbacPermission {
+		return &v
+	}).(RbacPermissionPtrOutput)
+}
+
+func (o RbacPermissionOutput) ToStringOutput() pulumi.StringOutput {
+	return o.ToStringOutputWithContext(context.Background())
+}
+
+func (o RbacPermissionOutput) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e RbacPermission) string {
+		return string(e)
+	}).(pulumi.StringOutput)
+}
+
+func (o RbacPermissionOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o RbacPermissionOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e RbacPermission) *string {
+		v := string(e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+type RbacPermissionPtrOutput struct{ *pulumi.OutputState }
+
+func (RbacPermissionPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**RbacPermission)(nil)).Elem()
+}
+
+func (o RbacPermissionPtrOutput) ToRbacPermissionPtrOutput() RbacPermissionPtrOutput {
+	return o
+}
+
+func (o RbacPermissionPtrOutput) ToRbacPermissionPtrOutputWithContext(ctx context.Context) RbacPermissionPtrOutput {
+	return o
+}
+
+func (o RbacPermissionPtrOutput) Elem() RbacPermissionOutput {
+	return o.ApplyT(func(v *RbacPermission) RbacPermission {
+		if v != nil {
+			return *v
+		}
+		var ret RbacPermission
+		return ret
+	}).(RbacPermissionOutput)
+}
+
+func (o RbacPermissionPtrOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o RbacPermissionPtrOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e *RbacPermission) *string {
+		if e == nil {
+			return nil
+		}
+		v := string(*e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+// RbacPermissionInput is an input type that accepts values of the RbacPermission enum
+// A concrete instance of `RbacPermissionInput` can be one of the following:
+//
+//	RbacPermissionRead
+//	RbacPermissionReadDecrypt
+//	RbacPermissionOpen
+//	RbacPermissionWrite
+//	RbacPermissionDelete
+//	RbacPermissionClone
+//	RbacPermissionRotate
+type RbacPermissionInput interface {
+	pulumi.Input
+
+	ToRbacPermissionOutput() RbacPermissionOutput
+	ToRbacPermissionOutputWithContext(context.Context) RbacPermissionOutput
+}
+
+var rbacPermissionPtrType = reflect.TypeOf((**RbacPermission)(nil)).Elem()
+
+type RbacPermissionPtrInput interface {
+	pulumi.Input
+
+	ToRbacPermissionPtrOutput() RbacPermissionPtrOutput
+	ToRbacPermissionPtrOutputWithContext(context.Context) RbacPermissionPtrOutput
+}
+
+type rbacPermissionPtr string
+
+func RbacPermissionPtr(v string) RbacPermissionPtrInput {
+	return (*rbacPermissionPtr)(&v)
+}
+
+func (*rbacPermissionPtr) ElementType() reflect.Type {
+	return rbacPermissionPtrType
+}
+
+func (in *rbacPermissionPtr) ToRbacPermissionPtrOutput() RbacPermissionPtrOutput {
+	return pulumi.ToOutput(in).(RbacPermissionPtrOutput)
+}
+
+func (in *rbacPermissionPtr) ToRbacPermissionPtrOutputWithContext(ctx context.Context) RbacPermissionPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, in).(RbacPermissionPtrOutput)
+}
+
+type TargetActionType string
+
+const (
+	// Update action type for approval rules.
+	TargetActionTypeUpdate = TargetActionType("update")
+)
+
+func (TargetActionType) ElementType() reflect.Type {
+	return reflect.TypeOf((*TargetActionType)(nil)).Elem()
+}
+
+func (e TargetActionType) ToTargetActionTypeOutput() TargetActionTypeOutput {
+	return pulumi.ToOutput(e).(TargetActionTypeOutput)
+}
+
+func (e TargetActionType) ToTargetActionTypeOutputWithContext(ctx context.Context) TargetActionTypeOutput {
+	return pulumi.ToOutputWithContext(ctx, e).(TargetActionTypeOutput)
+}
+
+func (e TargetActionType) ToTargetActionTypePtrOutput() TargetActionTypePtrOutput {
+	return e.ToTargetActionTypePtrOutputWithContext(context.Background())
+}
+
+func (e TargetActionType) ToTargetActionTypePtrOutputWithContext(ctx context.Context) TargetActionTypePtrOutput {
+	return TargetActionType(e).ToTargetActionTypeOutputWithContext(ctx).ToTargetActionTypePtrOutputWithContext(ctx)
+}
+
+func (e TargetActionType) ToStringOutput() pulumi.StringOutput {
+	return pulumi.ToOutput(pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e TargetActionType) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return pulumi.ToOutputWithContext(ctx, pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e TargetActionType) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringPtrOutputWithContext(context.Background())
+}
+
+func (e TargetActionType) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringOutputWithContext(ctx).ToStringPtrOutputWithContext(ctx)
+}
+
+type TargetActionTypeOutput struct{ *pulumi.OutputState }
+
+func (TargetActionTypeOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*TargetActionType)(nil)).Elem()
+}
+
+func (o TargetActionTypeOutput) ToTargetActionTypeOutput() TargetActionTypeOutput {
+	return o
+}
+
+func (o TargetActionTypeOutput) ToTargetActionTypeOutputWithContext(ctx context.Context) TargetActionTypeOutput {
+	return o
+}
+
+func (o TargetActionTypeOutput) ToTargetActionTypePtrOutput() TargetActionTypePtrOutput {
+	return o.ToTargetActionTypePtrOutputWithContext(context.Background())
+}
+
+func (o TargetActionTypeOutput) ToTargetActionTypePtrOutputWithContext(ctx context.Context) TargetActionTypePtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v TargetActionType) *TargetActionType {
+		return &v
+	}).(TargetActionTypePtrOutput)
+}
+
+func (o TargetActionTypeOutput) ToStringOutput() pulumi.StringOutput {
+	return o.ToStringOutputWithContext(context.Background())
+}
+
+func (o TargetActionTypeOutput) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e TargetActionType) string {
+		return string(e)
+	}).(pulumi.StringOutput)
+}
+
+func (o TargetActionTypeOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o TargetActionTypeOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e TargetActionType) *string {
+		v := string(e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+type TargetActionTypePtrOutput struct{ *pulumi.OutputState }
+
+func (TargetActionTypePtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**TargetActionType)(nil)).Elem()
+}
+
+func (o TargetActionTypePtrOutput) ToTargetActionTypePtrOutput() TargetActionTypePtrOutput {
+	return o
+}
+
+func (o TargetActionTypePtrOutput) ToTargetActionTypePtrOutputWithContext(ctx context.Context) TargetActionTypePtrOutput {
+	return o
+}
+
+func (o TargetActionTypePtrOutput) Elem() TargetActionTypeOutput {
+	return o.ApplyT(func(v *TargetActionType) TargetActionType {
+		if v != nil {
+			return *v
+		}
+		var ret TargetActionType
+		return ret
+	}).(TargetActionTypeOutput)
+}
+
+func (o TargetActionTypePtrOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o TargetActionTypePtrOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e *TargetActionType) *string {
+		if e == nil {
+			return nil
+		}
+		v := string(*e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+// TargetActionTypeInput is an input type that accepts values of the TargetActionType enum
+// A concrete instance of `TargetActionTypeInput` can be one of the following:
+//
+//	TargetActionTypeUpdate
+type TargetActionTypeInput interface {
+	pulumi.Input
+
+	ToTargetActionTypeOutput() TargetActionTypeOutput
+	ToTargetActionTypeOutputWithContext(context.Context) TargetActionTypeOutput
+}
+
+var targetActionTypePtrType = reflect.TypeOf((**TargetActionType)(nil)).Elem()
+
+type TargetActionTypePtrInput interface {
+	pulumi.Input
+
+	ToTargetActionTypePtrOutput() TargetActionTypePtrOutput
+	ToTargetActionTypePtrOutputWithContext(context.Context) TargetActionTypePtrOutput
+}
+
+type targetActionTypePtr string
+
+func TargetActionTypePtr(v string) TargetActionTypePtrInput {
+	return (*targetActionTypePtr)(&v)
+}
+
+func (*targetActionTypePtr) ElementType() reflect.Type {
+	return targetActionTypePtrType
+}
+
+func (in *targetActionTypePtr) ToTargetActionTypePtrOutput() TargetActionTypePtrOutput {
+	return pulumi.ToOutput(in).(TargetActionTypePtrOutput)
+}
+
+func (in *targetActionTypePtr) ToTargetActionTypePtrOutputWithContext(ctx context.Context) TargetActionTypePtrOutput {
+	return pulumi.ToOutputWithContext(ctx, in).(TargetActionTypePtrOutput)
+}
+
 type TeamStackPermissionScope float64
 
 const (
@@ -1701,6 +2047,10 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*EnvironmentPermissionPtrInput)(nil)).Elem(), EnvironmentPermission("none"))
 	pulumi.RegisterInputType(reflect.TypeOf((*PulumiOperationInput)(nil)).Elem(), PulumiOperation("update"))
 	pulumi.RegisterInputType(reflect.TypeOf((*PulumiOperationPtrInput)(nil)).Elem(), PulumiOperation("update"))
+	pulumi.RegisterInputType(reflect.TypeOf((*RbacPermissionInput)(nil)).Elem(), RbacPermission("environment:read"))
+	pulumi.RegisterInputType(reflect.TypeOf((*RbacPermissionPtrInput)(nil)).Elem(), RbacPermission("environment:read"))
+	pulumi.RegisterInputType(reflect.TypeOf((*TargetActionTypeInput)(nil)).Elem(), TargetActionType("update"))
+	pulumi.RegisterInputType(reflect.TypeOf((*TargetActionTypePtrInput)(nil)).Elem(), TargetActionType("update"))
 	pulumi.RegisterInputType(reflect.TypeOf((*WebhookFiltersInput)(nil)).Elem(), WebhookFilters("stack_created"))
 	pulumi.RegisterInputType(reflect.TypeOf((*WebhookFiltersPtrInput)(nil)).Elem(), WebhookFilters("stack_created"))
 	pulumi.RegisterInputType(reflect.TypeOf((*WebhookFiltersArrayInput)(nil)).Elem(), WebhookFiltersArray{})
@@ -1720,6 +2070,10 @@ func init() {
 	pulumi.RegisterOutputType(EnvironmentPermissionPtrOutput{})
 	pulumi.RegisterOutputType(PulumiOperationOutput{})
 	pulumi.RegisterOutputType(PulumiOperationPtrOutput{})
+	pulumi.RegisterOutputType(RbacPermissionOutput{})
+	pulumi.RegisterOutputType(RbacPermissionPtrOutput{})
+	pulumi.RegisterOutputType(TargetActionTypeOutput{})
+	pulumi.RegisterOutputType(TargetActionTypePtrOutput{})
 	pulumi.RegisterOutputType(TeamStackPermissionScopeOutput{})
 	pulumi.RegisterOutputType(TeamStackPermissionScopePtrOutput{})
 	pulumi.RegisterOutputType(WebhookFiltersOutput{})

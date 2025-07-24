@@ -9,6 +9,7 @@
 ### Improvements
 
 - Added EnvironmentRotationSchedule resource [#536](https://github.com/pulumi/pulumi-pulumiservice/pull/536)
+- Added ApprovalRule resource [#539](https://github.com/pulumi/pulumi-pulumiservice/pull/539)
 
 ## 0.29.3
 

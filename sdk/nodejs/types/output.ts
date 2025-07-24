@@ -27,6 +27,25 @@ export interface AWSOIDCConfiguration {
     sessionName: string;
 }
 
+export interface ApprovalRuleConfig {
+    /**
+     * Whether self-approval is allowed.
+     */
+    allowSelfApproval: boolean;
+    /**
+     * List of eligible approvers.
+     */
+    eligibleApprovers: outputs.EligibleApprover[];
+    /**
+     * Number of approvals required.
+     */
+    numApprovalsRequired: number;
+    /**
+     * Whether reapproval is required on changes.
+     */
+    requireReapprovalOnChange: boolean;
+}
+
 export interface AuthPolicyDefinition {
     /**
      * The permission level for organization tokens.
@@ -237,6 +256,36 @@ export interface DeploymentSettingsSourceContext {
      * Git source settings for a deployment.
      */
     git?: outputs.DeploymentSettingsGitSource;
+}
+
+export interface EligibleApprover {
+    /**
+     * RBAC permission that gives right to approve.
+     */
+    rbacPermission?: enums.RbacPermission;
+    /**
+     * Name of the team that can approve.
+     */
+    teamName?: string;
+    /**
+     * Login of the user that can approve.
+     */
+    user?: string;
+}
+
+export interface EnvironmentIdentifier {
+    /**
+     * The environment name.
+     */
+    name: string;
+    /**
+     * The organization name.
+     */
+    organization: string;
+    /**
+     * The project name.
+     */
+    project: string;
 }
 
 export interface GCPOIDCConfiguration {

@@ -27,6 +27,25 @@ export interface AWSOIDCConfigurationArgs {
     sessionName: pulumi.Input<string>;
 }
 
+export interface ApprovalRuleConfigArgs {
+    /**
+     * Whether self-approval is allowed.
+     */
+    allowSelfApproval: pulumi.Input<boolean>;
+    /**
+     * List of eligible approvers.
+     */
+    eligibleApprovers: pulumi.Input<pulumi.Input<inputs.EligibleApproverArgs>[]>;
+    /**
+     * Number of approvals required.
+     */
+    numApprovalsRequired: pulumi.Input<number>;
+    /**
+     * Whether reapproval is required on changes.
+     */
+    requireReapprovalOnChange: pulumi.Input<boolean>;
+}
+
 export interface AuthPolicyDefinitionArgs {
     /**
      * The permission level for organization tokens.
@@ -237,6 +256,36 @@ export interface DeploymentSettingsSourceContextArgs {
      * Git source settings for a deployment.
      */
     git?: pulumi.Input<inputs.DeploymentSettingsGitSourceArgs>;
+}
+
+export interface EligibleApproverArgs {
+    /**
+     * RBAC permission that gives right to approve.
+     */
+    rbacPermission?: pulumi.Input<enums.RbacPermission>;
+    /**
+     * Name of the team that can approve.
+     */
+    teamName?: pulumi.Input<string>;
+    /**
+     * Login of the user that can approve.
+     */
+    user?: pulumi.Input<string>;
+}
+
+export interface EnvironmentIdentifierArgs {
+    /**
+     * The environment name.
+     */
+    name: pulumi.Input<string>;
+    /**
+     * The organization name.
+     */
+    organization: pulumi.Input<string>;
+    /**
+     * The project name.
+     */
+    project: pulumi.Input<string>;
 }
 
 export interface GCPOIDCConfigurationArgs {

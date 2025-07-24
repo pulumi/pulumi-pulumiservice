@@ -206,6 +206,90 @@ namespace Pulumi.PulumiService
     }
 
     [EnumType]
+    public readonly struct RbacPermission : IEquatable<RbacPermission>
+    {
+        private readonly string _value;
+
+        private RbacPermission(string value)
+        {
+            _value = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        /// <summary>
+        /// Read permission.
+        /// </summary>
+        public static RbacPermission Read { get; } = new RbacPermission("environment:read");
+        /// <summary>
+        /// Read and decrypt permission.
+        /// </summary>
+        public static RbacPermission ReadDecrypt { get; } = new RbacPermission("environment:read_decrypt");
+        /// <summary>
+        /// Open permission.
+        /// </summary>
+        public static RbacPermission Open { get; } = new RbacPermission("environment:open");
+        /// <summary>
+        /// Write permission.
+        /// </summary>
+        public static RbacPermission Write { get; } = new RbacPermission("environment:write");
+        /// <summary>
+        /// Delete permission.
+        /// </summary>
+        public static RbacPermission Delete { get; } = new RbacPermission("environment:delete");
+        /// <summary>
+        /// Clone permission.
+        /// </summary>
+        public static RbacPermission Clone { get; } = new RbacPermission("environment:clone");
+        /// <summary>
+        /// Rotate permission.
+        /// </summary>
+        public static RbacPermission Rotate { get; } = new RbacPermission("environment:rotate");
+
+        public static bool operator ==(RbacPermission left, RbacPermission right) => left.Equals(right);
+        public static bool operator !=(RbacPermission left, RbacPermission right) => !left.Equals(right);
+
+        public static explicit operator string(RbacPermission value) => value._value;
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override bool Equals(object? obj) => obj is RbacPermission other && Equals(other);
+        public bool Equals(RbacPermission other) => string.Equals(_value, other._value, StringComparison.Ordinal);
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+
+        public override string ToString() => _value;
+    }
+
+    [EnumType]
+    public readonly struct TargetActionType : IEquatable<TargetActionType>
+    {
+        private readonly string _value;
+
+        private TargetActionType(string value)
+        {
+            _value = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        /// <summary>
+        /// Update action type for approval rules.
+        /// </summary>
+        public static TargetActionType Update { get; } = new TargetActionType("update");
+
+        public static bool operator ==(TargetActionType left, TargetActionType right) => left.Equals(right);
+        public static bool operator !=(TargetActionType left, TargetActionType right) => !left.Equals(right);
+
+        public static explicit operator string(TargetActionType value) => value._value;
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override bool Equals(object? obj) => obj is TargetActionType other && Equals(other);
+        public bool Equals(TargetActionType other) => string.Equals(_value, other._value, StringComparison.Ordinal);
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+
+        public override string ToString() => _value;
+    }
+
+    [EnumType]
     public readonly struct TeamStackPermissionScope : IEquatable<TeamStackPermissionScope>
     {
         private readonly double _value;
