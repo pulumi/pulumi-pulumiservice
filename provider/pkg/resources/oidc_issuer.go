@@ -1,11 +1,8 @@
 package resources
 
 import (
-	"bytes"
 	"context"
-	"encoding/gob"
 	"fmt"
-	"sort"
 	"strings"
 
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
@@ -110,7 +107,6 @@ func (oir *PulumiServiceOidcIssuerResource) ToPulumiServiceOidcIssuerInput(input
 		for _, policy := range inputMap["policies"].ArrayValue() {
 			policies = append(policies, propertyMapToPolicy(policy.ObjectValue()))
 		}
-		policies = sortPolicies(policies)
 		input.Policies = policies
 	}
 
@@ -301,8 +297,7 @@ func (input PulumiServiceOidcIssuerInput) toPropertyMap() resource.PropertyMap {
 	}
 	if len(input.Policies) > 0 {
 		policyValues := []resource.PropertyValue{}
-		inputPolicies := sortPolicies(input.Policies)
-		for _, policy := range inputPolicies {
+		for _, policy := range input.Policies {
 			propertyMap := policy.toPropertyMap()
 			policyValues = append(policyValues, resource.NewObjectProperty(propertyMap))
 		}
@@ -428,7 +423,6 @@ func apiPoliciesToInputs(policies []*pulumiapi.AuthPolicyDefinition) []PulumiSer
 	for _, policy := range policies {
 		inputPolicies = append(inputPolicies, apiPolicyToInput(*policy))
 	}
-	inputPolicies = sortPolicies(inputPolicies)
 	return inputPolicies
 }
 
@@ -466,17 +460,4 @@ func splitIssuerId(id string) (organization *string, issuerId *string, err error
 		return nil, nil, fmt.Errorf("error splitting resource id '%s'", id)
 	}
 	return &splitId[0], &splitId[1], nil
-}
-
-func sortPolicies(policies []PulumiServiceAuthPolicyDefinition) []PulumiServiceAuthPolicyDefinition {
-	sort.Slice(policies, func(i, j int) bool {
-		var firstBuffer bytes.Buffer
-		_ = gob.NewEncoder(&firstBuffer).Encode(policies[i])
-		firstHash := firstBuffer.String()
-		var secondBuffer bytes.Buffer
-		_ = gob.NewEncoder(&secondBuffer).Encode(policies[j])
-		secondHash := secondBuffer.String()
-		return firstHash < secondHash
-	})
-	return policies
 }
