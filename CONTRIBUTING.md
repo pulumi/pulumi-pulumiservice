@@ -57,15 +57,7 @@ Please ensure that you nest your branches under a unique identifier such as your
 This section is for Pulumi employees only. 
 
 To release a new version of the provider, follow steps below:
-- Run release commands, replacing `X.XX.XX` with your new version.
-     ```
-     git checkout main
-     git pull
-     git tag sdk/vX.XX.XX
-     git tag vX.XX.XX
-     git push origin vX.XX.XX
-     git push origin sdk/vX.XX.XX
-     ```
+- Trigger a release in #release-ops
 - Github Actions will automatically build, test and then publish the new release to all the various package managers
 - Once that is done, you will see your version in [Releases](https://github.com/pulumi/pulumi-pulumiservice/releases)
 
