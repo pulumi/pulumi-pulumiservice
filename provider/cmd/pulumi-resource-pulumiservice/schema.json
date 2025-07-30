@@ -696,6 +696,125 @@
           "value": "admin"
         }
       ]
+    },
+    "pulumiservice:index:TargetActionType": {
+      "type": "string",
+      "enum": [
+        {
+          "description": "Update action type for approval rules.",
+          "value": "update",
+          "name": "Update"
+        }
+      ]
+    },
+    "pulumiservice:index:RbacPermission": {
+      "type": "string",
+      "enum": [
+        {
+          "description": "Read permission.",
+          "value": "environment:read",
+          "name": "Read"
+        },
+        {
+          "description": "Read and decrypt permission.",
+          "value": "environment:read_decrypt",
+          "name": "ReadDecrypt"
+        },
+        {
+          "description": "Open permission.",
+          "value": "environment:open",
+          "name": "Open"
+        },
+        {
+          "description": "Write permission.",
+          "value": "environment:write",
+          "name": "Write"
+        },
+        {
+          "description": "Delete permission.",
+          "value": "environment:delete",
+          "name": "Delete"
+        },
+        {
+          "description": "Clone permission.",
+          "value": "environment:clone",
+          "name": "Clone"
+        },
+        {
+          "description": "Rotate permission.",
+          "value": "environment:rotate",
+          "name": "Rotate"
+        }
+      ]
+    },
+    "pulumiservice:index:EnvironmentIdentifier": {
+      "type": "object",
+      "properties": {
+        "organization": {
+          "type": "string",
+          "description": "The organization name."
+        },
+        "project": {
+          "type": "string",
+          "description": "The project name."
+        },
+        "name": {
+          "type": "string",
+          "description": "The environment name."
+        }
+      },
+      "required": [
+        "organization",
+        "project",
+        "name"
+      ]
+    },
+    "pulumiservice:index:EligibleApprover": {
+      "type": "object",
+      "properties": {
+        "teamName": {
+          "type": "string",
+          "description": "Name of the team that can approve."
+        },
+        "user": {
+          "type": "string",
+          "description": "Login of the user that can approve."
+        },
+        "rbacPermission": {
+          "$ref": "#/types/pulumiservice:index:RbacPermission",
+          "description": "RBAC permission that gives right to approve."
+        }
+      }
+    },
+    "pulumiservice:index:ApprovalRuleConfig": {
+      "type": "object",
+      "properties": {
+        "numApprovalsRequired": {
+          "type": "integer",
+          "description": "Number of approvals required."
+        },
+        "allowSelfApproval": {
+          "type": "boolean",
+          "description": "Whether self-approval is allowed."
+        },
+        "requireReapprovalOnChange": {
+          "type": "boolean",
+          "description": "Whether reapproval is required on changes."
+        },
+        "eligibleApprovers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:index:EligibleApprover"
+          },
+          "description": "List of eligible approvers."
+        }
+      },
+      "required": [
+        "numApprovalsRequired",
+        "allowSelfApproval",
+        "requireReapprovalOnChange",
+        "eligibleApprovers"
+      ]
     }
   },
   "resources": {
@@ -1981,6 +2100,68 @@
         "organization",
         "project",
         "environment"
+      ]
+    },
+    "pulumiservice:index:ApprovalRule": {
+      "description": "An approval rule for environment deployments.",
+      "properties": {
+        "name": {
+          "description": "Name of the approval rule.",
+          "type": "string"
+        },
+        "enabled": {
+          "description": "Whether the approval rule is enabled.",
+          "type": "boolean"
+        },
+        "targetActionType": {
+          "$ref": "#/types/pulumiservice:index:TargetActionType",
+          "description": "The type of action this rule applies to."
+        },
+        "environmentIdentifier": {
+          "$ref": "#/types/pulumiservice:index:EnvironmentIdentifier",
+          "description": "The environment this rule applies to."
+        },
+        "approvalRuleConfig": {
+          "$ref": "#/types/pulumiservice:index:ApprovalRuleConfig",
+          "description": "The approval rule configuration."
+        }
+      },
+      "required": [
+        "name",
+        "enabled",
+        "targetActionType",
+        "environmentIdentifier",
+        "approvalRuleConfig"
+      ],
+      "inputProperties": {
+        "name": {
+          "description": "The name of the approval rule.",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "enabled": {
+          "description": "Whether the approval rule is enabled.",
+          "type": "boolean"
+        },
+        "targetActionType": {
+          "$ref": "#/types/pulumiservice:index:TargetActionType",
+          "description": "The type of action this rule applies to."
+        },
+        "environmentIdentifier": {
+          "$ref": "#/types/pulumiservice:index:EnvironmentIdentifier",
+          "description": "The environment this rule applies to."
+        },
+        "approvalRuleConfig": {
+          "$ref": "#/types/pulumiservice:index:ApprovalRuleConfig",
+          "description": "The approval rule configuration."
+        }
+      },
+      "requiredInputs": [
+        "name",
+        "enabled",
+        "targetActionType",
+        "environmentIdentifier",
+        "approvalRuleConfig"
       ]
     }
   },

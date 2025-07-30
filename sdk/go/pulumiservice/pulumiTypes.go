@@ -207,6 +207,85 @@ func (o AWSOIDCConfigurationPtrOutput) SessionName() pulumi.StringPtrOutput {
 	}).(pulumi.StringPtrOutput)
 }
 
+type ApprovalRuleConfig struct {
+	// Whether self-approval is allowed.
+	AllowSelfApproval bool `pulumi:"allowSelfApproval"`
+	// List of eligible approvers.
+	EligibleApprovers []EligibleApprover `pulumi:"eligibleApprovers"`
+	// Number of approvals required.
+	NumApprovalsRequired int `pulumi:"numApprovalsRequired"`
+	// Whether reapproval is required on changes.
+	RequireReapprovalOnChange bool `pulumi:"requireReapprovalOnChange"`
+}
+
+// ApprovalRuleConfigInput is an input type that accepts ApprovalRuleConfigArgs and ApprovalRuleConfigOutput values.
+// You can construct a concrete instance of `ApprovalRuleConfigInput` via:
+//
+//	ApprovalRuleConfigArgs{...}
+type ApprovalRuleConfigInput interface {
+	pulumi.Input
+
+	ToApprovalRuleConfigOutput() ApprovalRuleConfigOutput
+	ToApprovalRuleConfigOutputWithContext(context.Context) ApprovalRuleConfigOutput
+}
+
+type ApprovalRuleConfigArgs struct {
+	// Whether self-approval is allowed.
+	AllowSelfApproval pulumi.BoolInput `pulumi:"allowSelfApproval"`
+	// List of eligible approvers.
+	EligibleApprovers EligibleApproverArrayInput `pulumi:"eligibleApprovers"`
+	// Number of approvals required.
+	NumApprovalsRequired pulumi.IntInput `pulumi:"numApprovalsRequired"`
+	// Whether reapproval is required on changes.
+	RequireReapprovalOnChange pulumi.BoolInput `pulumi:"requireReapprovalOnChange"`
+}
+
+func (ApprovalRuleConfigArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*ApprovalRuleConfig)(nil)).Elem()
+}
+
+func (i ApprovalRuleConfigArgs) ToApprovalRuleConfigOutput() ApprovalRuleConfigOutput {
+	return i.ToApprovalRuleConfigOutputWithContext(context.Background())
+}
+
+func (i ApprovalRuleConfigArgs) ToApprovalRuleConfigOutputWithContext(ctx context.Context) ApprovalRuleConfigOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(ApprovalRuleConfigOutput)
+}
+
+type ApprovalRuleConfigOutput struct{ *pulumi.OutputState }
+
+func (ApprovalRuleConfigOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*ApprovalRuleConfig)(nil)).Elem()
+}
+
+func (o ApprovalRuleConfigOutput) ToApprovalRuleConfigOutput() ApprovalRuleConfigOutput {
+	return o
+}
+
+func (o ApprovalRuleConfigOutput) ToApprovalRuleConfigOutputWithContext(ctx context.Context) ApprovalRuleConfigOutput {
+	return o
+}
+
+// Whether self-approval is allowed.
+func (o ApprovalRuleConfigOutput) AllowSelfApproval() pulumi.BoolOutput {
+	return o.ApplyT(func(v ApprovalRuleConfig) bool { return v.AllowSelfApproval }).(pulumi.BoolOutput)
+}
+
+// List of eligible approvers.
+func (o ApprovalRuleConfigOutput) EligibleApprovers() EligibleApproverArrayOutput {
+	return o.ApplyT(func(v ApprovalRuleConfig) []EligibleApprover { return v.EligibleApprovers }).(EligibleApproverArrayOutput)
+}
+
+// Number of approvals required.
+func (o ApprovalRuleConfigOutput) NumApprovalsRequired() pulumi.IntOutput {
+	return o.ApplyT(func(v ApprovalRuleConfig) int { return v.NumApprovalsRequired }).(pulumi.IntOutput)
+}
+
+// Whether reapproval is required on changes.
+func (o ApprovalRuleConfigOutput) RequireReapprovalOnChange() pulumi.BoolOutput {
+	return o.ApplyT(func(v ApprovalRuleConfig) bool { return v.RequireReapprovalOnChange }).(pulumi.BoolOutput)
+}
+
 type AuthPolicyDefinition struct {
 	// The permission level for organization tokens.
 	AuthorizedPermissions []AuthPolicyPermissionLevel `pulumi:"authorizedPermissions"`
@@ -2121,6 +2200,191 @@ func (o DeploymentSettingsSourceContextPtrOutput) Git() DeploymentSettingsGitSou
 	}).(DeploymentSettingsGitSourcePtrOutput)
 }
 
+type EligibleApprover struct {
+	// RBAC permission that gives right to approve.
+	RbacPermission *RbacPermission `pulumi:"rbacPermission"`
+	// Name of the team that can approve.
+	TeamName *string `pulumi:"teamName"`
+	// Login of the user that can approve.
+	User *string `pulumi:"user"`
+}
+
+// EligibleApproverInput is an input type that accepts EligibleApproverArgs and EligibleApproverOutput values.
+// You can construct a concrete instance of `EligibleApproverInput` via:
+//
+//	EligibleApproverArgs{...}
+type EligibleApproverInput interface {
+	pulumi.Input
+
+	ToEligibleApproverOutput() EligibleApproverOutput
+	ToEligibleApproverOutputWithContext(context.Context) EligibleApproverOutput
+}
+
+type EligibleApproverArgs struct {
+	// RBAC permission that gives right to approve.
+	RbacPermission RbacPermissionPtrInput `pulumi:"rbacPermission"`
+	// Name of the team that can approve.
+	TeamName pulumi.StringPtrInput `pulumi:"teamName"`
+	// Login of the user that can approve.
+	User pulumi.StringPtrInput `pulumi:"user"`
+}
+
+func (EligibleApproverArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*EligibleApprover)(nil)).Elem()
+}
+
+func (i EligibleApproverArgs) ToEligibleApproverOutput() EligibleApproverOutput {
+	return i.ToEligibleApproverOutputWithContext(context.Background())
+}
+
+func (i EligibleApproverArgs) ToEligibleApproverOutputWithContext(ctx context.Context) EligibleApproverOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(EligibleApproverOutput)
+}
+
+// EligibleApproverArrayInput is an input type that accepts EligibleApproverArray and EligibleApproverArrayOutput values.
+// You can construct a concrete instance of `EligibleApproverArrayInput` via:
+//
+//	EligibleApproverArray{ EligibleApproverArgs{...} }
+type EligibleApproverArrayInput interface {
+	pulumi.Input
+
+	ToEligibleApproverArrayOutput() EligibleApproverArrayOutput
+	ToEligibleApproverArrayOutputWithContext(context.Context) EligibleApproverArrayOutput
+}
+
+type EligibleApproverArray []EligibleApproverInput
+
+func (EligibleApproverArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]EligibleApprover)(nil)).Elem()
+}
+
+func (i EligibleApproverArray) ToEligibleApproverArrayOutput() EligibleApproverArrayOutput {
+	return i.ToEligibleApproverArrayOutputWithContext(context.Background())
+}
+
+func (i EligibleApproverArray) ToEligibleApproverArrayOutputWithContext(ctx context.Context) EligibleApproverArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(EligibleApproverArrayOutput)
+}
+
+type EligibleApproverOutput struct{ *pulumi.OutputState }
+
+func (EligibleApproverOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*EligibleApprover)(nil)).Elem()
+}
+
+func (o EligibleApproverOutput) ToEligibleApproverOutput() EligibleApproverOutput {
+	return o
+}
+
+func (o EligibleApproverOutput) ToEligibleApproverOutputWithContext(ctx context.Context) EligibleApproverOutput {
+	return o
+}
+
+// RBAC permission that gives right to approve.
+func (o EligibleApproverOutput) RbacPermission() RbacPermissionPtrOutput {
+	return o.ApplyT(func(v EligibleApprover) *RbacPermission { return v.RbacPermission }).(RbacPermissionPtrOutput)
+}
+
+// Name of the team that can approve.
+func (o EligibleApproverOutput) TeamName() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v EligibleApprover) *string { return v.TeamName }).(pulumi.StringPtrOutput)
+}
+
+// Login of the user that can approve.
+func (o EligibleApproverOutput) User() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v EligibleApprover) *string { return v.User }).(pulumi.StringPtrOutput)
+}
+
+type EligibleApproverArrayOutput struct{ *pulumi.OutputState }
+
+func (EligibleApproverArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]EligibleApprover)(nil)).Elem()
+}
+
+func (o EligibleApproverArrayOutput) ToEligibleApproverArrayOutput() EligibleApproverArrayOutput {
+	return o
+}
+
+func (o EligibleApproverArrayOutput) ToEligibleApproverArrayOutputWithContext(ctx context.Context) EligibleApproverArrayOutput {
+	return o
+}
+
+func (o EligibleApproverArrayOutput) Index(i pulumi.IntInput) EligibleApproverOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) EligibleApprover {
+		return vs[0].([]EligibleApprover)[vs[1].(int)]
+	}).(EligibleApproverOutput)
+}
+
+type EnvironmentIdentifier struct {
+	// The environment name.
+	Name string `pulumi:"name"`
+	// The organization name.
+	Organization string `pulumi:"organization"`
+	// The project name.
+	Project string `pulumi:"project"`
+}
+
+// EnvironmentIdentifierInput is an input type that accepts EnvironmentIdentifierArgs and EnvironmentIdentifierOutput values.
+// You can construct a concrete instance of `EnvironmentIdentifierInput` via:
+//
+//	EnvironmentIdentifierArgs{...}
+type EnvironmentIdentifierInput interface {
+	pulumi.Input
+
+	ToEnvironmentIdentifierOutput() EnvironmentIdentifierOutput
+	ToEnvironmentIdentifierOutputWithContext(context.Context) EnvironmentIdentifierOutput
+}
+
+type EnvironmentIdentifierArgs struct {
+	// The environment name.
+	Name pulumi.StringInput `pulumi:"name"`
+	// The organization name.
+	Organization pulumi.StringInput `pulumi:"organization"`
+	// The project name.
+	Project pulumi.StringInput `pulumi:"project"`
+}
+
+func (EnvironmentIdentifierArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*EnvironmentIdentifier)(nil)).Elem()
+}
+
+func (i EnvironmentIdentifierArgs) ToEnvironmentIdentifierOutput() EnvironmentIdentifierOutput {
+	return i.ToEnvironmentIdentifierOutputWithContext(context.Background())
+}
+
+func (i EnvironmentIdentifierArgs) ToEnvironmentIdentifierOutputWithContext(ctx context.Context) EnvironmentIdentifierOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(EnvironmentIdentifierOutput)
+}
+
+type EnvironmentIdentifierOutput struct{ *pulumi.OutputState }
+
+func (EnvironmentIdentifierOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*EnvironmentIdentifier)(nil)).Elem()
+}
+
+func (o EnvironmentIdentifierOutput) ToEnvironmentIdentifierOutput() EnvironmentIdentifierOutput {
+	return o
+}
+
+func (o EnvironmentIdentifierOutput) ToEnvironmentIdentifierOutputWithContext(ctx context.Context) EnvironmentIdentifierOutput {
+	return o
+}
+
+// The environment name.
+func (o EnvironmentIdentifierOutput) Name() pulumi.StringOutput {
+	return o.ApplyT(func(v EnvironmentIdentifier) string { return v.Name }).(pulumi.StringOutput)
+}
+
+// The organization name.
+func (o EnvironmentIdentifierOutput) Organization() pulumi.StringOutput {
+	return o.ApplyT(func(v EnvironmentIdentifier) string { return v.Organization }).(pulumi.StringOutput)
+}
+
+// The project name.
+func (o EnvironmentIdentifierOutput) Project() pulumi.StringOutput {
+	return o.ApplyT(func(v EnvironmentIdentifier) string { return v.Project }).(pulumi.StringOutput)
+}
+
 type GCPOIDCConfiguration struct {
 	// The numerical ID of the GCP project.
 	ProjectId string `pulumi:"projectId"`
@@ -2862,6 +3126,7 @@ func (o TemplateSourceDestinationPtrOutput) Url() pulumi.StringPtrOutput {
 func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*AWSOIDCConfigurationInput)(nil)).Elem(), AWSOIDCConfigurationArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*AWSOIDCConfigurationPtrInput)(nil)).Elem(), AWSOIDCConfigurationArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*ApprovalRuleConfigInput)(nil)).Elem(), ApprovalRuleConfigArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*AuthPolicyDefinitionInput)(nil)).Elem(), AuthPolicyDefinitionArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*AuthPolicyDefinitionArrayInput)(nil)).Elem(), AuthPolicyDefinitionArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*AzureOIDCConfigurationInput)(nil)).Elem(), AzureOIDCConfigurationArgs{})
@@ -2884,6 +3149,9 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsOperationContextPtrInput)(nil)).Elem(), DeploymentSettingsOperationContextArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsSourceContextInput)(nil)).Elem(), DeploymentSettingsSourceContextArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsSourceContextPtrInput)(nil)).Elem(), DeploymentSettingsSourceContextArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*EligibleApproverInput)(nil)).Elem(), EligibleApproverArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*EligibleApproverArrayInput)(nil)).Elem(), EligibleApproverArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*EnvironmentIdentifierInput)(nil)).Elem(), EnvironmentIdentifierArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*GCPOIDCConfigurationInput)(nil)).Elem(), GCPOIDCConfigurationArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*GCPOIDCConfigurationPtrInput)(nil)).Elem(), GCPOIDCConfigurationArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*OperationContextOIDCInput)(nil)).Elem(), OperationContextOIDCArgs{})
@@ -2894,6 +3162,7 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*TemplateSourceDestinationPtrInput)(nil)).Elem(), TemplateSourceDestinationArgs{})
 	pulumi.RegisterOutputType(AWSOIDCConfigurationOutput{})
 	pulumi.RegisterOutputType(AWSOIDCConfigurationPtrOutput{})
+	pulumi.RegisterOutputType(ApprovalRuleConfigOutput{})
 	pulumi.RegisterOutputType(AuthPolicyDefinitionOutput{})
 	pulumi.RegisterOutputType(AuthPolicyDefinitionArrayOutput{})
 	pulumi.RegisterOutputType(AzureOIDCConfigurationOutput{})
@@ -2916,6 +3185,9 @@ func init() {
 	pulumi.RegisterOutputType(DeploymentSettingsOperationContextPtrOutput{})
 	pulumi.RegisterOutputType(DeploymentSettingsSourceContextOutput{})
 	pulumi.RegisterOutputType(DeploymentSettingsSourceContextPtrOutput{})
+	pulumi.RegisterOutputType(EligibleApproverOutput{})
+	pulumi.RegisterOutputType(EligibleApproverArrayOutput{})
+	pulumi.RegisterOutputType(EnvironmentIdentifierOutput{})
 	pulumi.RegisterOutputType(GCPOIDCConfigurationOutput{})
 	pulumi.RegisterOutputType(GCPOIDCConfigurationPtrOutput{})
 	pulumi.RegisterOutputType(OperationContextOIDCOutput{})

@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.31.0
+
+### Improvements
+
+- Added ApprovalRule resource [#539](https://github.com/pulumi/pulumi-pulumiservice/pull/539)
+
 ## 0.30.0
 
 ### Bug Fixes

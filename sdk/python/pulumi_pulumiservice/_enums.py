@@ -10,6 +10,8 @@ __all__ = [
     'AuthPolicyTokenType',
     'EnvironmentPermission',
     'PulumiOperation',
+    'RbacPermission',
+    'TargetActionType',
     'TeamStackPermissionScope',
     'WebhookFilters',
     'WebhookFormat',
@@ -97,6 +99,44 @@ class PulumiOperation(str, Enum):
     DESTROY = "destroy"
     """
     Analogous to `pulumi destroy` command.
+    """
+
+
+class RbacPermission(str, Enum):
+    READ = "environment:read"
+    """
+    Read permission.
+    """
+    READ_DECRYPT = "environment:read_decrypt"
+    """
+    Read and decrypt permission.
+    """
+    OPEN = "environment:open"
+    """
+    Open permission.
+    """
+    WRITE = "environment:write"
+    """
+    Write permission.
+    """
+    DELETE = "environment:delete"
+    """
+    Delete permission.
+    """
+    CLONE = "environment:clone"
+    """
+    Clone permission.
+    """
+    ROTATE = "environment:rotate"
+    """
+    Rotate permission.
+    """
+
+
+class TargetActionType(str, Enum):
+    UPDATE = "update"
+    """
+    Update action type for approval rules.
     """
 
 

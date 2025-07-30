@@ -1,0 +1,3 @@
+name: go-approval-rules
+runtime: go
+description: A minimal pulumi service approval rules example

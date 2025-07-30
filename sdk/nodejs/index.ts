@@ -15,6 +15,11 @@ export type AgentPool = import("./agentPool").AgentPool;
 export const AgentPool: typeof import("./agentPool").AgentPool = null as any;
 utilities.lazyLoad(exports, ["AgentPool"], () => require("./agentPool"));
 
+export { ApprovalRuleArgs } from "./approvalRule";
+export type ApprovalRule = import("./approvalRule").ApprovalRule;
+export const ApprovalRule: typeof import("./approvalRule").ApprovalRule = null as any;
+utilities.lazyLoad(exports, ["ApprovalRule"], () => require("./approvalRule"));
+
 export { DeploymentScheduleArgs } from "./deploymentSchedule";
 export type DeploymentSchedule = import("./deploymentSchedule").DeploymentSchedule;
 export const DeploymentSchedule: typeof import("./deploymentSchedule").DeploymentSchedule = null as any;
@@ -126,6 +131,8 @@ const _module = {
                 return new AccessToken(name, <any>undefined, { urn })
             case "pulumiservice:index:AgentPool":
                 return new AgentPool(name, <any>undefined, { urn })
+            case "pulumiservice:index:ApprovalRule":
+                return new ApprovalRule(name, <any>undefined, { urn })
             case "pulumiservice:index:DeploymentSchedule":
                 return new DeploymentSchedule(name, <any>undefined, { urn })
             case "pulumiservice:index:DeploymentSettings":
