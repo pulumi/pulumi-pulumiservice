@@ -19,7 +19,6 @@ var environment = new service.Environment("testing-environment", {
 // This rule requires 3 approvals from eligible approvers before any update can proceed
 var approvalRule = new service.ApprovalRule("rule-test", {
   name: "My rule!",
-  description: "My description!",
   enabled: true,
   targetActionType: "update",
   environmentIdentifier: {

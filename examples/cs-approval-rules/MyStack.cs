@@ -31,7 +31,6 @@ class MyStack : Pulumi.Stack
             "rule-test",
             new ApprovalRuleArgs {
                 Name = "My rule!",
-                Description = "My description!",
                 Enabled = true,
                 TargetActionType = TargetActionType.Update,
                 EnvironmentIdentifier = new EnvironmentIdentifierArgs {

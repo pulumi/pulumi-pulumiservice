@@ -20,7 +20,6 @@ resources:
     type: pulumiservice:ApprovalRule
     properties:
       name: "My rule!"
-      description: "My description!"
       enabled: true
       targetActionType: "update"
       environmentIdentifier:

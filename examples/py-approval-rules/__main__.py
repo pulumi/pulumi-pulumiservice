@@ -21,7 +21,6 @@ environment = Environment(
 approval_rule = ApprovalRule(
     "rule-test",
     name="My rule!",
-    description="My description!",
     enabled=True,
     target_action_type=TargetActionType.UPDATE,
     environment_identifier=EnvironmentIdentifierArgs(
