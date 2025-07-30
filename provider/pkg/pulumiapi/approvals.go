@@ -31,14 +31,13 @@ type ApprovalRuleClient interface {
 }
 
 type ApprovalRule struct {
-	ID          string                  `json:"id"`
-	Name        string                  `json:"name"`
-	Description string                  `json:"description"`
-	Enabled     bool                    `json:"enabled"`
-	CreatedAt   string                  `json:"createdAt"`
-	UpdatedAt   string                  `json:"updatedAt"`
-	Rule        ChangeGateRuleOutput    `json:"rule"`
-	Target      *ChangeGateTargetOutput `json:"target,omitempty"`
+	ID        string                  `json:"id"`
+	Name      string                  `json:"name"`
+	Enabled   bool                    `json:"enabled"`
+	CreatedAt string                  `json:"createdAt"`
+	UpdatedAt string                  `json:"updatedAt"`
+	Rule      ChangeGateRuleOutput    `json:"rule"`
+	Target    *ChangeGateTargetOutput `json:"target,omitempty"`
 }
 
 type ApprovalRuleInput struct {
@@ -88,18 +87,16 @@ func ToApprovers(input []EligibleApproverOutput) []EligibleApprover {
 }
 
 type CreateApprovalRuleRequest struct {
-	Name        string                `json:"name"`
-	Description string                `json:"description"`
-	Enabled     bool                  `json:"enabled"`
-	Rule        ChangeGateRuleInput   `json:"rule"`
-	Target      ChangeGateTargetInput `json:"target"`
+	Name    string                `json:"name"`
+	Enabled bool                  `json:"enabled"`
+	Rule    ChangeGateRuleInput   `json:"rule"`
+	Target  ChangeGateTargetInput `json:"target"`
 }
 
 type UpdateApprovalRuleRequest struct {
-	Name        string              `json:"name"`
-	Description string              `json:"description"`
-	Enabled     bool                `json:"enabled"`
-	Rule        ChangeGateRuleInput `json:"rule"`
+	Name    string              `json:"name"`
+	Enabled bool                `json:"enabled"`
+	Rule    ChangeGateRuleInput `json:"rule"`
 }
 
 type ChangeGateTargetInput struct {

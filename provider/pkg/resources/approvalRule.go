@@ -20,7 +20,6 @@ type PulumiServiceApprovalRuleResource struct {
 
 type PulumiServiceApprovalRule struct {
 	Name                  string                          `json:"name"`
-	Description           string                          `json:"description"`
 	Enabled               bool                            `json:"enabled"`
 	TargetActionType      string                          `json:"targetActionType"`
 	EnvironmentIdentifier pulumiapi.EnvironmentIdentifier `json:"environmentIdentifier"`
@@ -64,10 +63,6 @@ func (i *PulumiServiceApprovalRule) ToPropertyMap() resource.PropertyMap {
 	ruleMap["eligibleApprovers"] = resource.NewPropertyValue(approvers)
 	pm["approvalRuleConfig"] = resource.NewPropertyValue(ruleMap)
 
-	if i.Description != "" {
-		pm["description"] = resource.NewPropertyValue(i.Description)
-	}
-
 	return pm
 }
 
@@ -77,10 +72,6 @@ func (s *PulumiServiceApprovalRuleResource) ToPulumiServiceApprovalRuleInput(inp
 	rule.Name = inputMap["name"].StringValue()
 	rule.Enabled = inputMap["enabled"].BoolValue()
 	rule.TargetActionType = inputMap["targetActionType"].StringValue()
-
-	if inputMap["description"].HasValue() && inputMap["description"].IsString() {
-		rule.Description = inputMap["description"].StringValue()
-	}
 
 	// Parse environment identifier
 	if inputMap["environmentIdentifier"].HasValue() && inputMap["environmentIdentifier"].IsObject() {
@@ -193,9 +184,8 @@ func (s *PulumiServiceApprovalRuleResource) Create(req *pulumirpc.CreateRequest)
 	}
 
 	createReq := pulumiapi.CreateApprovalRuleRequest{
-		Name:        rule.Name,
-		Description: rule.Description,
-		Enabled:     rule.Enabled,
+		Name:    rule.Name,
+		Enabled: rule.Enabled,
 		Rule: pulumiapi.ChangeGateRuleInput{
 			NumApprovalsRequired:      rule.ApprovalRuleConfig.NumApprovalsRequired,
 			AllowSelfApproval:         rule.ApprovalRuleConfig.AllowSelfApproval,
@@ -294,9 +284,8 @@ func (s *PulumiServiceApprovalRuleResource) Update(req *pulumirpc.UpdateRequest)
 	}
 
 	updateReq := pulumiapi.UpdateApprovalRuleRequest{
-		Name:        rule.Name,
-		Description: rule.Description,
-		Enabled:     rule.Enabled,
+		Name:    rule.Name,
+		Enabled: rule.Enabled,
 		Rule: pulumiapi.ChangeGateRuleInput{
 			NumApprovalsRequired:      rule.ApprovalRuleConfig.NumApprovalsRequired,
 			AllowSelfApproval:         rule.ApprovalRuleConfig.AllowSelfApproval,
@@ -343,7 +332,6 @@ func (s *PulumiServiceApprovalRuleResource) Read(req *pulumirpc.ReadRequest) (*p
 	// Convert API response back to our input format
 	readRule := PulumiServiceApprovalRule{
 		Name:                  apiRule.Name,
-		Description:           apiRule.Description,
 		Enabled:               apiRule.Enabled,
 		TargetActionType:      apiRule.Target.ActionType,
 		EnvironmentIdentifier: envID,
