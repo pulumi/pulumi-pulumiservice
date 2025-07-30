@@ -1,12 +1,14 @@
-CHANGELOG
-=========
+# CHANGELOG
 
 ## 0.30.0
+
+### Bug Fixes
+
+- Fixed OIDC Issuer policies order to prevent accidental drifts [#542](https://github.com/pulumi/pulumi-pulumiservice/pull/542)
 
 ### Improvements
 
 - Added EnvironmentRotationSchedule resource [#536](https://github.com/pulumi/pulumi-pulumiservice/pull/536)
-
 
 ## 0.29.3
 
@@ -76,10 +78,11 @@ CHANGELOG
 
 - Make SourceContext optional in DeploymentSettings [#427](https://github.com/pulumi/pulumi-pulumiservice/pulls/427)
 
-  In some advanced use cases, for example if your source code is baked into a custom image, or you are obtaining 
+  In some advanced use cases, for example if your source code is baked into a custom image, or you are obtaining
   the source code from a different source, you may not want to specify a `SourceContext` in your `DeploymentSettings`.
 
 ### Bug Fixes
+
 - Fixing TeamEnvironmentPermission, project field was not working [#429](https://github.com/pulumi/pulumi-pulumiservice/issues/429)
 
 ## 0.26.3
@@ -134,12 +137,14 @@ CHANGELOG
 ## 0.23.2
 
 ### Bug Fixes
+
 - Improving error messages and input validation [#374](https://github.com/pulumi/pulumi-pulumiservice/issues/374)
 - Fixing secrets leak [#376](https://github.com/pulumi/pulumi-pulumiservice/issues/376)[#377](https://github.com/pulumi/pulumi-pulumiservice/issues/377)
 
 ## 0.23.1
 
 ### Bug Fixes
+
 - Fixing webhook exposing secret values bug [#371](https://github.com/pulumi/pulumi-pulumiservice/issues/371)
 
 ## 0.23.0
@@ -167,17 +172,20 @@ CHANGELOG
 ## 0.22.1
 
 ### Bug Fixes
+
 - Fixed import by refactoring Read method of AccessToken resource + minor refactor [#311](https://github.com/pulumi/pulumi-pulumiservice/issues/311)
 - Fixed import by refactoring Read method of AgentPool resource + minor refactor [#311](https://github.com/pulumi/pulumi-pulumiservice/issues/311)
 - Fixing noisy diff in DS OIDC object [#330](https://github.com/pulumi/pulumi-pulumiservice/issues/330)
 - Removed accessToken provider parameter defaults from schema to prevent leaks [#350](https://github.com/pulumi/pulumi-pulumiservice/issues/350)
 
 ### Miscellaneous
+
 - Added CHANGELOG_PENDING file to ignore-list of the `main` workflow [[#340](https://github.com/pulumi/pulumi-pulumiservice/issues/340)]
 
 ## 0.22.0
 
 ### Bug Fixes
+
 - DeploymentSettings resource will now successfully store secrets, but outputs for secret values became ciphertext. [#123](https://github.com/pulumi/pulumi-pulumiservice/issues/123)
 - DeploymentSettings will no longer have noisy diff on update and refresh [#123](https://github.com/pulumi/pulumi-pulumiservice/issues/123)
 - DeploymentSettings can now be successfully imported [#123](https://github.com/pulumi/pulumi-pulumiservice/issues/123)
