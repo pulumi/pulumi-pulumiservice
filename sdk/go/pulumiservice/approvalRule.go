@@ -18,8 +18,6 @@ type ApprovalRule struct {
 
 	// The approval rule configuration.
 	ApprovalRuleConfig ApprovalRuleConfigOutput `pulumi:"approvalRuleConfig"`
-	// Description of the approval rule.
-	Description pulumi.StringPtrOutput `pulumi:"description"`
 	// Whether the approval rule is enabled.
 	Enabled pulumi.BoolOutput `pulumi:"enabled"`
 	// The environment this rule applies to.
@@ -87,8 +85,6 @@ func (ApprovalRuleState) ElementType() reflect.Type {
 type approvalRuleArgs struct {
 	// The approval rule configuration.
 	ApprovalRuleConfig ApprovalRuleConfig `pulumi:"approvalRuleConfig"`
-	// Optional description of the approval rule.
-	Description *string `pulumi:"description"`
 	// Whether the approval rule is enabled.
 	Enabled bool `pulumi:"enabled"`
 	// The environment this rule applies to.
@@ -103,8 +99,6 @@ type approvalRuleArgs struct {
 type ApprovalRuleArgs struct {
 	// The approval rule configuration.
 	ApprovalRuleConfig ApprovalRuleConfigInput
-	// Optional description of the approval rule.
-	Description pulumi.StringPtrInput
 	// Whether the approval rule is enabled.
 	Enabled pulumi.BoolInput
 	// The environment this rule applies to.
@@ -205,11 +199,6 @@ func (o ApprovalRuleOutput) ToApprovalRuleOutputWithContext(ctx context.Context)
 // The approval rule configuration.
 func (o ApprovalRuleOutput) ApprovalRuleConfig() ApprovalRuleConfigOutput {
 	return o.ApplyT(func(v *ApprovalRule) ApprovalRuleConfigOutput { return v.ApprovalRuleConfig }).(ApprovalRuleConfigOutput)
-}
-
-// Description of the approval rule.
-func (o ApprovalRuleOutput) Description() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *ApprovalRule) pulumi.StringPtrOutput { return v.Description }).(pulumi.StringPtrOutput)
 }
 
 // Whether the approval rule is enabled.

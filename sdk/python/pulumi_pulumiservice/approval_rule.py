@@ -26,8 +26,7 @@ class ApprovalRuleArgs:
                  enabled: pulumi.Input[bool],
                  environment_identifier: pulumi.Input['EnvironmentIdentifierArgs'],
                  name: pulumi.Input[str],
-                 target_action_type: pulumi.Input['TargetActionType'],
-                 description: Optional[pulumi.Input[str]] = None):
+                 target_action_type: pulumi.Input['TargetActionType']):
         """
         The set of arguments for constructing a ApprovalRule resource.
         :param pulumi.Input['ApprovalRuleConfigArgs'] approval_rule_config: The approval rule configuration.
@@ -35,15 +34,12 @@ class ApprovalRuleArgs:
         :param pulumi.Input['EnvironmentIdentifierArgs'] environment_identifier: The environment this rule applies to.
         :param pulumi.Input[str] name: The name of the approval rule.
         :param pulumi.Input['TargetActionType'] target_action_type: The type of action this rule applies to.
-        :param pulumi.Input[str] description: Optional description of the approval rule.
         """
         pulumi.set(__self__, "approval_rule_config", approval_rule_config)
         pulumi.set(__self__, "enabled", enabled)
         pulumi.set(__self__, "environment_identifier", environment_identifier)
         pulumi.set(__self__, "name", name)
         pulumi.set(__self__, "target_action_type", target_action_type)
-        if description is not None:
-            pulumi.set(__self__, "description", description)
 
     @property
     @pulumi.getter(name="approvalRuleConfig")
@@ -105,18 +101,6 @@ class ApprovalRuleArgs:
     def target_action_type(self, value: pulumi.Input['TargetActionType']):
         pulumi.set(self, "target_action_type", value)
 
-    @property
-    @pulumi.getter
-    def description(self) -> Optional[pulumi.Input[str]]:
-        """
-        Optional description of the approval rule.
-        """
-        return pulumi.get(self, "description")
-
-    @description.setter
-    def description(self, value: Optional[pulumi.Input[str]]):
-        pulumi.set(self, "description", value)
-
 
 class ApprovalRule(pulumi.CustomResource):
     @overload
@@ -124,7 +108,6 @@ class ApprovalRule(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  approval_rule_config: Optional[pulumi.Input[Union['ApprovalRuleConfigArgs', 'ApprovalRuleConfigArgsDict']]] = None,
-                 description: Optional[pulumi.Input[str]] = None,
                  enabled: Optional[pulumi.Input[bool]] = None,
                  environment_identifier: Optional[pulumi.Input[Union['EnvironmentIdentifierArgs', 'EnvironmentIdentifierArgsDict']]] = None,
                  name: Optional[pulumi.Input[str]] = None,
@@ -136,7 +119,6 @@ class ApprovalRule(pulumi.CustomResource):
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[Union['ApprovalRuleConfigArgs', 'ApprovalRuleConfigArgsDict']] approval_rule_config: The approval rule configuration.
-        :param pulumi.Input[str] description: Optional description of the approval rule.
         :param pulumi.Input[bool] enabled: Whether the approval rule is enabled.
         :param pulumi.Input[Union['EnvironmentIdentifierArgs', 'EnvironmentIdentifierArgsDict']] environment_identifier: The environment this rule applies to.
         :param pulumi.Input[str] name: The name of the approval rule.
@@ -167,7 +149,6 @@ class ApprovalRule(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  approval_rule_config: Optional[pulumi.Input[Union['ApprovalRuleConfigArgs', 'ApprovalRuleConfigArgsDict']]] = None,
-                 description: Optional[pulumi.Input[str]] = None,
                  enabled: Optional[pulumi.Input[bool]] = None,
                  environment_identifier: Optional[pulumi.Input[Union['EnvironmentIdentifierArgs', 'EnvironmentIdentifierArgsDict']]] = None,
                  name: Optional[pulumi.Input[str]] = None,
@@ -184,7 +165,6 @@ class ApprovalRule(pulumi.CustomResource):
             if approval_rule_config is None and not opts.urn:
                 raise TypeError("Missing required property 'approval_rule_config'")
             __props__.__dict__["approval_rule_config"] = approval_rule_config
-            __props__.__dict__["description"] = description
             if enabled is None and not opts.urn:
                 raise TypeError("Missing required property 'enabled'")
             __props__.__dict__["enabled"] = enabled
@@ -220,7 +200,6 @@ class ApprovalRule(pulumi.CustomResource):
         __props__ = ApprovalRuleArgs.__new__(ApprovalRuleArgs)
 
         __props__.__dict__["approval_rule_config"] = None
-        __props__.__dict__["description"] = None
         __props__.__dict__["enabled"] = None
         __props__.__dict__["environment_identifier"] = None
         __props__.__dict__["name"] = None
@@ -234,14 +213,6 @@ class ApprovalRule(pulumi.CustomResource):
         The approval rule configuration.
         """
         return pulumi.get(self, "approval_rule_config")
-
-    @property
-    @pulumi.getter
-    def description(self) -> pulumi.Output[Optional[str]]:
-        """
-        Description of the approval rule.
-        """
-        return pulumi.get(self, "description")
 
     @property
     @pulumi.getter

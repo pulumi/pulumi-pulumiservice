@@ -22,12 +22,6 @@ namespace Pulumi.PulumiService
         public Output<Outputs.ApprovalRuleConfig> ApprovalRuleConfig { get; private set; } = null!;
 
         /// <summary>
-        /// Description of the approval rule.
-        /// </summary>
-        [Output("description")]
-        public Output<string?> Description { get; private set; } = null!;
-
-        /// <summary>
         /// Whether the approval rule is enabled.
         /// </summary>
         [Output("enabled")]
@@ -101,12 +95,6 @@ namespace Pulumi.PulumiService
         /// </summary>
         [Input("approvalRuleConfig", required: true)]
         public Input<Inputs.ApprovalRuleConfigArgs> ApprovalRuleConfig { get; set; } = null!;
-
-        /// <summary>
-        /// Optional description of the approval rule.
-        /// </summary>
-        [Input("description")]
-        public Input<string>? Description { get; set; }
 
         /// <summary>
         /// Whether the approval rule is enabled.

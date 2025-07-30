@@ -42,10 +42,6 @@ export class ApprovalRule extends pulumi.CustomResource {
      */
     public readonly approvalRuleConfig!: pulumi.Output<outputs.ApprovalRuleConfig>;
     /**
-     * Description of the approval rule.
-     */
-    public readonly description!: pulumi.Output<string | undefined>;
-    /**
      * Whether the approval rule is enabled.
      */
     public readonly enabled!: pulumi.Output<boolean>;
@@ -89,14 +85,12 @@ export class ApprovalRule extends pulumi.CustomResource {
                 throw new Error("Missing required property 'targetActionType'");
             }
             resourceInputs["approvalRuleConfig"] = args ? args.approvalRuleConfig : undefined;
-            resourceInputs["description"] = args ? args.description : undefined;
             resourceInputs["enabled"] = args ? args.enabled : undefined;
             resourceInputs["environmentIdentifier"] = args ? args.environmentIdentifier : undefined;
             resourceInputs["name"] = args ? args.name : undefined;
             resourceInputs["targetActionType"] = args ? args.targetActionType : undefined;
         } else {
             resourceInputs["approvalRuleConfig"] = undefined /*out*/;
-            resourceInputs["description"] = undefined /*out*/;
             resourceInputs["enabled"] = undefined /*out*/;
             resourceInputs["environmentIdentifier"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
@@ -115,10 +109,6 @@ export interface ApprovalRuleArgs {
      * The approval rule configuration.
      */
     approvalRuleConfig: pulumi.Input<inputs.ApprovalRuleConfigArgs>;
-    /**
-     * Optional description of the approval rule.
-     */
-    description?: pulumi.Input<string>;
     /**
      * Whether the approval rule is enabled.
      */
