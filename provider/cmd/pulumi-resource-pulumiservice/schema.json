@@ -2113,8 +2113,11 @@
           "description": "Whether the approval rule is enabled.",
           "type": "boolean"
         },
-        "targetActionType": {
-          "$ref": "#/types/pulumiservice:index:TargetActionType",
+        "targetActionTypes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:index:TargetActionType"
+          },
           "description": "The type of action this rule applies to."
         },
         "environmentIdentifier": {
@@ -2129,7 +2132,7 @@
       "required": [
         "name",
         "enabled",
-        "targetActionType",
+        "targetActionTypes",
         "environmentIdentifier",
         "approvalRuleConfig"
       ],
@@ -2143,8 +2146,11 @@
           "description": "Whether the approval rule is enabled.",
           "type": "boolean"
         },
-        "targetActionType": {
-          "$ref": "#/types/pulumiservice:index:TargetActionType",
+        "targetActionTypes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:index:TargetActionType"
+          },
           "description": "The type of action this rule applies to."
         },
         "environmentIdentifier": {
@@ -2159,7 +2165,7 @@
       "requiredInputs": [
         "name",
         "enabled",
-        "targetActionType",
+        "targetActionTypes",
         "environmentIdentifier",
         "approvalRuleConfig"
       ]
