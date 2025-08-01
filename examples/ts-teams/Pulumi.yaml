@@ -1,3 +1,0 @@
-name: pulumi-service-teams-example-ts
-runtime: nodejs
-description: A minimal example of managing a Pulumi Service team in typescript
