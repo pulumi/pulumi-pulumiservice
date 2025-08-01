@@ -56,7 +56,7 @@ export class ApprovalRule extends pulumi.CustomResource {
     /**
      * The type of action this rule applies to.
      */
-    public readonly targetActionType!: pulumi.Output<enums.TargetActionType>;
+    public readonly targetActionTypes!: pulumi.Output<enums.TargetActionType[]>;
 
     /**
      * Create a ApprovalRule resource with the given unique name, arguments, and options.
@@ -81,20 +81,20 @@ export class ApprovalRule extends pulumi.CustomResource {
             if ((!args || args.name === undefined) && !opts.urn) {
                 throw new Error("Missing required property 'name'");
             }
-            if ((!args || args.targetActionType === undefined) && !opts.urn) {
-                throw new Error("Missing required property 'targetActionType'");
+            if ((!args || args.targetActionTypes === undefined) && !opts.urn) {
+                throw new Error("Missing required property 'targetActionTypes'");
             }
             resourceInputs["approvalRuleConfig"] = args ? args.approvalRuleConfig : undefined;
             resourceInputs["enabled"] = args ? args.enabled : undefined;
             resourceInputs["environmentIdentifier"] = args ? args.environmentIdentifier : undefined;
             resourceInputs["name"] = args ? args.name : undefined;
-            resourceInputs["targetActionType"] = args ? args.targetActionType : undefined;
+            resourceInputs["targetActionTypes"] = args ? args.targetActionTypes : undefined;
         } else {
             resourceInputs["approvalRuleConfig"] = undefined /*out*/;
             resourceInputs["enabled"] = undefined /*out*/;
             resourceInputs["environmentIdentifier"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
-            resourceInputs["targetActionType"] = undefined /*out*/;
+            resourceInputs["targetActionTypes"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         super(ApprovalRule.__pulumiType, name, resourceInputs, opts);
@@ -124,5 +124,5 @@ export interface ApprovalRuleArgs {
     /**
      * The type of action this rule applies to.
      */
-    targetActionType: pulumi.Input<enums.TargetActionType>;
+    targetActionTypes: pulumi.Input<pulumi.Input<enums.TargetActionType>[]>;
 }

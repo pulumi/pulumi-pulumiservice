@@ -26,20 +26,20 @@ class ApprovalRuleArgs:
                  enabled: pulumi.Input[bool],
                  environment_identifier: pulumi.Input['EnvironmentIdentifierArgs'],
                  name: pulumi.Input[str],
-                 target_action_type: pulumi.Input['TargetActionType']):
+                 target_action_types: pulumi.Input[Sequence[pulumi.Input['TargetActionType']]]):
         """
         The set of arguments for constructing a ApprovalRule resource.
         :param pulumi.Input['ApprovalRuleConfigArgs'] approval_rule_config: The approval rule configuration.
         :param pulumi.Input[bool] enabled: Whether the approval rule is enabled.
         :param pulumi.Input['EnvironmentIdentifierArgs'] environment_identifier: The environment this rule applies to.
         :param pulumi.Input[str] name: The name of the approval rule.
-        :param pulumi.Input['TargetActionType'] target_action_type: The type of action this rule applies to.
+        :param pulumi.Input[Sequence[pulumi.Input['TargetActionType']]] target_action_types: The type of action this rule applies to.
         """
         pulumi.set(__self__, "approval_rule_config", approval_rule_config)
         pulumi.set(__self__, "enabled", enabled)
         pulumi.set(__self__, "environment_identifier", environment_identifier)
         pulumi.set(__self__, "name", name)
-        pulumi.set(__self__, "target_action_type", target_action_type)
+        pulumi.set(__self__, "target_action_types", target_action_types)
 
     @property
     @pulumi.getter(name="approvalRuleConfig")
@@ -90,16 +90,16 @@ class ApprovalRuleArgs:
         pulumi.set(self, "name", value)
 
     @property
-    @pulumi.getter(name="targetActionType")
-    def target_action_type(self) -> pulumi.Input['TargetActionType']:
+    @pulumi.getter(name="targetActionTypes")
+    def target_action_types(self) -> pulumi.Input[Sequence[pulumi.Input['TargetActionType']]]:
         """
         The type of action this rule applies to.
         """
-        return pulumi.get(self, "target_action_type")
+        return pulumi.get(self, "target_action_types")
 
-    @target_action_type.setter
-    def target_action_type(self, value: pulumi.Input['TargetActionType']):
-        pulumi.set(self, "target_action_type", value)
+    @target_action_types.setter
+    def target_action_types(self, value: pulumi.Input[Sequence[pulumi.Input['TargetActionType']]]):
+        pulumi.set(self, "target_action_types", value)
 
 
 class ApprovalRule(pulumi.CustomResource):
@@ -111,7 +111,7 @@ class ApprovalRule(pulumi.CustomResource):
                  enabled: Optional[pulumi.Input[bool]] = None,
                  environment_identifier: Optional[pulumi.Input[Union['EnvironmentIdentifierArgs', 'EnvironmentIdentifierArgsDict']]] = None,
                  name: Optional[pulumi.Input[str]] = None,
-                 target_action_type: Optional[pulumi.Input['TargetActionType']] = None,
+                 target_action_types: Optional[pulumi.Input[Sequence[pulumi.Input['TargetActionType']]]] = None,
                  __props__=None):
         """
         An approval rule for environment deployments.
@@ -122,7 +122,7 @@ class ApprovalRule(pulumi.CustomResource):
         :param pulumi.Input[bool] enabled: Whether the approval rule is enabled.
         :param pulumi.Input[Union['EnvironmentIdentifierArgs', 'EnvironmentIdentifierArgsDict']] environment_identifier: The environment this rule applies to.
         :param pulumi.Input[str] name: The name of the approval rule.
-        :param pulumi.Input['TargetActionType'] target_action_type: The type of action this rule applies to.
+        :param pulumi.Input[Sequence[pulumi.Input['TargetActionType']]] target_action_types: The type of action this rule applies to.
         """
         ...
     @overload
@@ -152,7 +152,7 @@ class ApprovalRule(pulumi.CustomResource):
                  enabled: Optional[pulumi.Input[bool]] = None,
                  environment_identifier: Optional[pulumi.Input[Union['EnvironmentIdentifierArgs', 'EnvironmentIdentifierArgsDict']]] = None,
                  name: Optional[pulumi.Input[str]] = None,
-                 target_action_type: Optional[pulumi.Input['TargetActionType']] = None,
+                 target_action_types: Optional[pulumi.Input[Sequence[pulumi.Input['TargetActionType']]]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
@@ -174,9 +174,9 @@ class ApprovalRule(pulumi.CustomResource):
             if name is None and not opts.urn:
                 raise TypeError("Missing required property 'name'")
             __props__.__dict__["name"] = name
-            if target_action_type is None and not opts.urn:
-                raise TypeError("Missing required property 'target_action_type'")
-            __props__.__dict__["target_action_type"] = target_action_type
+            if target_action_types is None and not opts.urn:
+                raise TypeError("Missing required property 'target_action_types'")
+            __props__.__dict__["target_action_types"] = target_action_types
         super(ApprovalRule, __self__).__init__(
             'pulumiservice:index:ApprovalRule',
             resource_name,
@@ -203,7 +203,7 @@ class ApprovalRule(pulumi.CustomResource):
         __props__.__dict__["enabled"] = None
         __props__.__dict__["environment_identifier"] = None
         __props__.__dict__["name"] = None
-        __props__.__dict__["target_action_type"] = None
+        __props__.__dict__["target_action_types"] = None
         return ApprovalRule(resource_name, opts=opts, __props__=__props__)
 
     @property
@@ -239,10 +239,10 @@ class ApprovalRule(pulumi.CustomResource):
         return pulumi.get(self, "name")
 
     @property
-    @pulumi.getter(name="targetActionType")
-    def target_action_type(self) -> pulumi.Output['TargetActionType']:
+    @pulumi.getter(name="targetActionTypes")
+    def target_action_types(self) -> pulumi.Output[Sequence['TargetActionType']]:
         """
         The type of action this rule applies to.
         """
-        return pulumi.get(self, "target_action_type")
+        return pulumi.get(self, "target_action_types")
 

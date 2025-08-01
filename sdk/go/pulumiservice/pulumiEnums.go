@@ -1257,6 +1257,51 @@ func (in *targetActionTypePtr) ToTargetActionTypePtrOutputWithContext(ctx contex
 	return pulumi.ToOutputWithContext(ctx, in).(TargetActionTypePtrOutput)
 }
 
+// TargetActionTypeArrayInput is an input type that accepts TargetActionTypeArray and TargetActionTypeArrayOutput values.
+// You can construct a concrete instance of `TargetActionTypeArrayInput` via:
+//
+//	TargetActionTypeArray{ TargetActionTypeArgs{...} }
+type TargetActionTypeArrayInput interface {
+	pulumi.Input
+
+	ToTargetActionTypeArrayOutput() TargetActionTypeArrayOutput
+	ToTargetActionTypeArrayOutputWithContext(context.Context) TargetActionTypeArrayOutput
+}
+
+type TargetActionTypeArray []TargetActionType
+
+func (TargetActionTypeArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]TargetActionType)(nil)).Elem()
+}
+
+func (i TargetActionTypeArray) ToTargetActionTypeArrayOutput() TargetActionTypeArrayOutput {
+	return i.ToTargetActionTypeArrayOutputWithContext(context.Background())
+}
+
+func (i TargetActionTypeArray) ToTargetActionTypeArrayOutputWithContext(ctx context.Context) TargetActionTypeArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(TargetActionTypeArrayOutput)
+}
+
+type TargetActionTypeArrayOutput struct{ *pulumi.OutputState }
+
+func (TargetActionTypeArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]TargetActionType)(nil)).Elem()
+}
+
+func (o TargetActionTypeArrayOutput) ToTargetActionTypeArrayOutput() TargetActionTypeArrayOutput {
+	return o
+}
+
+func (o TargetActionTypeArrayOutput) ToTargetActionTypeArrayOutputWithContext(ctx context.Context) TargetActionTypeArrayOutput {
+	return o
+}
+
+func (o TargetActionTypeArrayOutput) Index(i pulumi.IntInput) TargetActionTypeOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) TargetActionType {
+		return vs[0].([]TargetActionType)[vs[1].(int)]
+	}).(TargetActionTypeOutput)
+}
+
 type TeamStackPermissionScope float64
 
 const (
@@ -2051,6 +2096,7 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*RbacPermissionPtrInput)(nil)).Elem(), RbacPermission("environment:read"))
 	pulumi.RegisterInputType(reflect.TypeOf((*TargetActionTypeInput)(nil)).Elem(), TargetActionType("update"))
 	pulumi.RegisterInputType(reflect.TypeOf((*TargetActionTypePtrInput)(nil)).Elem(), TargetActionType("update"))
+	pulumi.RegisterInputType(reflect.TypeOf((*TargetActionTypeArrayInput)(nil)).Elem(), TargetActionTypeArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*WebhookFiltersInput)(nil)).Elem(), WebhookFilters("stack_created"))
 	pulumi.RegisterInputType(reflect.TypeOf((*WebhookFiltersPtrInput)(nil)).Elem(), WebhookFilters("stack_created"))
 	pulumi.RegisterInputType(reflect.TypeOf((*WebhookFiltersArrayInput)(nil)).Elem(), WebhookFiltersArray{})
@@ -2074,6 +2120,7 @@ func init() {
 	pulumi.RegisterOutputType(RbacPermissionPtrOutput{})
 	pulumi.RegisterOutputType(TargetActionTypeOutput{})
 	pulumi.RegisterOutputType(TargetActionTypePtrOutput{})
+	pulumi.RegisterOutputType(TargetActionTypeArrayOutput{})
 	pulumi.RegisterOutputType(TeamStackPermissionScopeOutput{})
 	pulumi.RegisterOutputType(TeamStackPermissionScopePtrOutput{})
 	pulumi.RegisterOutputType(WebhookFiltersOutput{})
