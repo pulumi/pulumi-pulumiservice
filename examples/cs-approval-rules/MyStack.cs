@@ -32,7 +32,7 @@ class MyStack : Pulumi.Stack
             new ApprovalRuleArgs {
                 Name = "My rule!",
                 Enabled = true,
-                TargetActionType = TargetActionType.Update,
+                TargetActionTypes = new List<Pulumi.PulumiService.TargetActionType> { TargetActionType.Update },
                 EnvironmentIdentifier = new EnvironmentIdentifierArgs {
                     Organization = environment.Organization,
                     Project = environment.Project,

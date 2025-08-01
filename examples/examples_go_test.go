@@ -30,6 +30,18 @@ func TestGoEnvironmentsExample(t *testing.T) {
 	integration.ProgramTest(t, &testOpts)
 }
 
+func TestGoApprovalRulesExample(t *testing.T) {
+	digits := generateRandomFiveDigits()
+	testOpts := getGoBaseOptions(t).With(integration.ProgramTestOptions{
+		Verbose: true,
+		Dir:     filepath.Join(getCwd(t), "go-approval-rules"),
+		Config: map[string]string{
+			"digits": digits,
+		},
+	})
+	integration.ProgramTest(t, &testOpts)
+}
+
 func getGoBaseOptions(t *testing.T) integration.ProgramTestOptions {
 	return integration.ProgramTestOptions{
 		Dependencies: []string{

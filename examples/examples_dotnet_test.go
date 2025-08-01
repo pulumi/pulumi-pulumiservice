@@ -54,3 +54,16 @@ func TestDotnetOidcIssuerExamples(t *testing.T) {
 		},
 	})
 }
+
+func TestDotnetApprovalRulesExamples(t *testing.T) {
+	digits := generateRandomFiveDigits()
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Dir: path.Join(getCwd(t), "cs-approval-rules"),
+		Config: map[string]string{
+			"digits": digits,
+		},
+		Dependencies: []string{
+			"Pulumi.PulumiService",
+		},
+	})
+}
