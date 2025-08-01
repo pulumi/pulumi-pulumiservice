@@ -20,7 +20,7 @@ var environment = new service.Environment("testing-environment", {
 var approvalRule = new service.ApprovalRule("rule-test", {
   name: "My rule!",
   enabled: true,
-  targetActionType: "update",
+  targetActionTypes: ["update"],
   environmentIdentifier: {
     organization: environment.organization,
     project: environment.project,

@@ -26,9 +26,9 @@ func main() {
 		// Create an approval rule that governs who can approve updates to the environment
 		// This rule requires 3 approvals from eligible approvers before any update can proceed
 		_, err = pulumiservice.NewApprovalRule(ctx, "rule-test", &pulumiservice.ApprovalRuleArgs{
-			Name:             pulumi.String("My rule!"),
-			Enabled:          pulumi.Bool(true),
-			TargetActionType: pulumiservice.TargetActionTypeUpdate,
+			Name:              pulumi.String("My rule!"),
+			Enabled:           pulumi.Bool(true),
+			TargetActionTypes: pulumiservice.TargetActionTypeArray{pulumiservice.TargetActionTypeUpdate},
 			EnvironmentIdentifier: &pulumiservice.EnvironmentIdentifierArgs{
 				Organization: environment.Organization,
 				Project:      environment.Project,

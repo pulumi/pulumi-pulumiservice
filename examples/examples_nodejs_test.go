@@ -155,3 +155,17 @@ func TestNodejsOidcIssuerExample(t *testing.T) {
 		},
 	})
 }
+
+func TestNodejsApprovalRulesExample(t *testing.T) {
+	cwd := getCwd(t)
+	digits := generateRandomFiveDigits()
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Dir: path.Join(cwd, ".", "ts-approval-rules"),
+		Config: map[string]string{
+			"digits": digits,
+		},
+		Dependencies: []string{
+			"@pulumi/pulumiservice",
+		},
+	})
+}

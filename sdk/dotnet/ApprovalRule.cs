@@ -42,8 +42,8 @@ namespace Pulumi.PulumiService
         /// <summary>
         /// The type of action this rule applies to.
         /// </summary>
-        [Output("targetActionType")]
-        public Output<Pulumi.PulumiService.TargetActionType> TargetActionType { get; private set; } = null!;
+        [Output("targetActionTypes")]
+        public Output<ImmutableArray<Pulumi.PulumiService.TargetActionType>> TargetActionTypes { get; private set; } = null!;
 
 
         /// <summary>
@@ -114,11 +114,17 @@ namespace Pulumi.PulumiService
         [Input("name", required: true)]
         public Input<string> Name { get; set; } = null!;
 
+        [Input("targetActionTypes", required: true)]
+        private InputList<Pulumi.PulumiService.TargetActionType>? _targetActionTypes;
+
         /// <summary>
         /// The type of action this rule applies to.
         /// </summary>
-        [Input("targetActionType", required: true)]
-        public Input<Pulumi.PulumiService.TargetActionType> TargetActionType { get; set; } = null!;
+        public InputList<Pulumi.PulumiService.TargetActionType> TargetActionTypes
+        {
+            get => _targetActionTypes ?? (_targetActionTypes = new InputList<Pulumi.PulumiService.TargetActionType>());
+            set => _targetActionTypes = value;
+        }
 
         public ApprovalRuleArgs()
         {

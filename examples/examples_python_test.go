@@ -44,3 +44,16 @@ func TestPythonEnvironmentsExample(t *testing.T) {
 		},
 	})
 }
+
+func TestPythonApprovalRulesExample(t *testing.T) {
+	digits := generateRandomFiveDigits()
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Dir: path.Join(getCwd(t), "py-approval-rules"),
+		Config: map[string]string{
+			"digits": digits,
+		},
+		Dependencies: []string{
+			filepath.Join("..", "sdk", "python", "bin"),
+		},
+	})
+}

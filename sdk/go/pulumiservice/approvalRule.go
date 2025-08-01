@@ -25,7 +25,7 @@ type ApprovalRule struct {
 	// Name of the approval rule.
 	Name pulumi.StringOutput `pulumi:"name"`
 	// The type of action this rule applies to.
-	TargetActionType TargetActionTypeOutput `pulumi:"targetActionType"`
+	TargetActionTypes TargetActionTypeArrayOutput `pulumi:"targetActionTypes"`
 }
 
 // NewApprovalRule registers a new resource with the given unique name, arguments, and options.
@@ -47,8 +47,8 @@ func NewApprovalRule(ctx *pulumi.Context,
 	if args.Name == nil {
 		return nil, errors.New("invalid value for required argument 'Name'")
 	}
-	if args.TargetActionType == nil {
-		return nil, errors.New("invalid value for required argument 'TargetActionType'")
+	if args.TargetActionTypes == nil {
+		return nil, errors.New("invalid value for required argument 'TargetActionTypes'")
 	}
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource ApprovalRule
@@ -92,7 +92,7 @@ type approvalRuleArgs struct {
 	// The name of the approval rule.
 	Name string `pulumi:"name"`
 	// The type of action this rule applies to.
-	TargetActionType TargetActionType `pulumi:"targetActionType"`
+	TargetActionTypes []TargetActionType `pulumi:"targetActionTypes"`
 }
 
 // The set of arguments for constructing a ApprovalRule resource.
@@ -106,7 +106,7 @@ type ApprovalRuleArgs struct {
 	// The name of the approval rule.
 	Name pulumi.StringInput
 	// The type of action this rule applies to.
-	TargetActionType TargetActionTypeInput
+	TargetActionTypes TargetActionTypeArrayInput
 }
 
 func (ApprovalRuleArgs) ElementType() reflect.Type {
@@ -217,8 +217,8 @@ func (o ApprovalRuleOutput) Name() pulumi.StringOutput {
 }
 
 // The type of action this rule applies to.
-func (o ApprovalRuleOutput) TargetActionType() TargetActionTypeOutput {
-	return o.ApplyT(func(v *ApprovalRule) TargetActionTypeOutput { return v.TargetActionType }).(TargetActionTypeOutput)
+func (o ApprovalRuleOutput) TargetActionTypes() TargetActionTypeArrayOutput {
+	return o.ApplyT(func(v *ApprovalRule) TargetActionTypeArrayOutput { return v.TargetActionTypes }).(TargetActionTypeArrayOutput)
 }
 
 type ApprovalRuleArrayOutput struct{ *pulumi.OutputState }

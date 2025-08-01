@@ -21,7 +21,7 @@ type PulumiServiceApprovalRuleResource struct {
 type PulumiServiceApprovalRule struct {
 	Name                  string                          `json:"name"`
 	Enabled               bool                            `json:"enabled"`
-	TargetActionType      string                          `json:"targetActionType"`
+	TargetActionTypes     []string                        `json:"targetActionTypes"`
 	EnvironmentIdentifier pulumiapi.EnvironmentIdentifier `json:"environmentIdentifier"`
 	ApprovalRuleConfig    pulumiapi.ApprovalRuleInput     `json:"approvalRuleConfig"`
 }
@@ -30,7 +30,7 @@ func (i *PulumiServiceApprovalRule) ToPropertyMap() resource.PropertyMap {
 	pm := resource.PropertyMap{}
 	pm["name"] = resource.NewPropertyValue(i.Name)
 	pm["enabled"] = resource.NewPropertyValue(i.Enabled)
-	pm["targetActionType"] = resource.NewPropertyValue(i.TargetActionType)
+	pm["targetActionTypes"] = resource.NewPropertyValue(i.TargetActionTypes)
 
 	// Environment identifier
 	envMap := resource.PropertyMap{}
@@ -71,7 +71,12 @@ func (s *PulumiServiceApprovalRuleResource) ToPulumiServiceApprovalRuleInput(inp
 
 	rule.Name = inputMap["name"].StringValue()
 	rule.Enabled = inputMap["enabled"].BoolValue()
-	rule.TargetActionType = inputMap["targetActionType"].StringValue()
+
+	targetActionTypes := []string{}
+	for _, actionType := range inputMap["targetActionTypes"].ArrayValue() {
+		targetActionTypes = append(targetActionTypes, actionType.StringValue())
+	}
+	rule.TargetActionTypes = targetActionTypes
 
 	// Parse environment identifier
 	if inputMap["environmentIdentifier"].HasValue() && inputMap["environmentIdentifier"].IsObject() {
@@ -163,7 +168,7 @@ func (s *PulumiServiceApprovalRuleResource) Delete(req *pulumirpc.DeleteRequest)
 		return nil, err
 	}
 
-	err = s.Client.DeleteEnvironmentApprovalRule(ctx, envID, ruleID)
+	err = s.Client.DeleteEnvironmentApprovalRule(ctx, envID.OrgName, ruleID)
 	if err != nil {
 		return nil, err
 	}
@@ -194,11 +199,13 @@ func (s *PulumiServiceApprovalRuleResource) Create(req *pulumirpc.CreateRequest)
 			RuleType:                  pulumiapi.ChangeGateRuleTypeApproval,
 		},
 		Target: pulumiapi.ChangeGateTargetInput{
-			ActionType: rule.TargetActionType,
+			ActionTypes:   rule.TargetActionTypes,
+			EntityType:    "environment",
+			QualifiedName: fmt.Sprintf("%s/%s", rule.EnvironmentIdentifier.ProjectName, rule.EnvironmentIdentifier.EnvName),
 		},
 	}
 
-	createdRule, err := s.Client.CreateEnvironmentApprovalRule(ctx, rule.EnvironmentIdentifier, createReq)
+	createdRule, err := s.Client.CreateEnvironmentApprovalRule(ctx, rule.EnvironmentIdentifier.OrgName, createReq)
 	if err != nil {
 		return nil, err
 	}
@@ -293,9 +300,14 @@ func (s *PulumiServiceApprovalRuleResource) Update(req *pulumirpc.UpdateRequest)
 			EligibleApprovers:         rule.ApprovalRuleConfig.EligibleApprovers,
 			RuleType:                  pulumiapi.ChangeGateRuleTypeApproval,
 		},
+		Target: pulumiapi.ChangeGateTargetInput{
+			ActionTypes:   rule.TargetActionTypes,
+			EntityType:    "environment",
+			QualifiedName: fmt.Sprintf("%s/%s", rule.EnvironmentIdentifier.ProjectName, rule.EnvironmentIdentifier.EnvName),
+		},
 	}
 
-	_, err = s.Client.UpdateEnvironmentApprovalRule(ctx, envID, ruleID, updateReq)
+	_, err = s.Client.UpdateEnvironmentApprovalRule(ctx, envID.OrgName, ruleID, updateReq)
 	if err != nil {
 		return nil, err
 	}
@@ -321,7 +333,7 @@ func (s *PulumiServiceApprovalRuleResource) Read(req *pulumirpc.ReadRequest) (*p
 		return nil, err
 	}
 
-	apiRule, err := s.Client.GetEnvironmentApprovalRule(ctx, envID, ruleID)
+	apiRule, err := s.Client.GetEnvironmentApprovalRule(ctx, envID.OrgName, ruleID)
 	if err != nil {
 		return nil, fmt.Errorf("failure while reading approval rule %q: %w", req.Id, err)
 	}
@@ -333,7 +345,7 @@ func (s *PulumiServiceApprovalRuleResource) Read(req *pulumirpc.ReadRequest) (*p
 	readRule := PulumiServiceApprovalRule{
 		Name:                  apiRule.Name,
 		Enabled:               apiRule.Enabled,
-		TargetActionType:      apiRule.Target.ActionType,
+		TargetActionTypes:     apiRule.Target.ActionTypes,
 		EnvironmentIdentifier: envID,
 		ApprovalRuleConfig: pulumiapi.ApprovalRuleInput{
 			NumApprovalsRequired:      apiRule.Rule.NumApprovalsRequired,

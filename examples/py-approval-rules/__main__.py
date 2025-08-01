@@ -13,7 +13,7 @@ environment = Environment(
     project="test-project",
     name="testing-environment-approval-py-"+config.require('digits'),
     yaml=pulumi.StringAsset("""values:
-  myKey1: "myValue1"""")
+  myKey1: myValue1""")
 )
 
 # Create an approval rule that governs who can approve updates to the environment
@@ -22,7 +22,7 @@ approval_rule = ApprovalRule(
     "rule-test",
     name="My rule!",
     enabled=True,
-    target_action_type=TargetActionType.UPDATE,
+    target_action_types=[TargetActionType.UPDATE],
     environment_identifier=EnvironmentIdentifierArgs(
         organization=environment.organization,
         project=environment.project,

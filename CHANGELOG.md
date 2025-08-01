@@ -5,6 +5,7 @@
 ### Improvements
 
 - Added ApprovalRule resource [#539](https://github.com/pulumi/pulumi-pulumiservice/pull/539)
+- Minor fixes for the updated Approvals API [#543](https://github.com/pulumi/pulumi-pulumiservice/pull/543)
 
 ## 0.30.0
 

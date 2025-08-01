@@ -24,10 +24,10 @@ import (
 // Because the API routes require envIdentifiers, I'm making these methods specific, but in the future
 // we might want to generalize them
 type ApprovalRuleClient interface {
-	CreateEnvironmentApprovalRule(ctx context.Context, envId EnvironmentIdentifier, req CreateApprovalRuleRequest) (*ApprovalRule, error)
-	GetEnvironmentApprovalRule(ctx context.Context, envId EnvironmentIdentifier, ruleId string) (*ApprovalRule, error)
-	UpdateEnvironmentApprovalRule(ctx context.Context, envId EnvironmentIdentifier, ruleId string, req UpdateApprovalRuleRequest) (*ApprovalRule, error)
-	DeleteEnvironmentApprovalRule(ctx context.Context, envId EnvironmentIdentifier, ruleId string) error
+	CreateEnvironmentApprovalRule(ctx context.Context, orgName string, req CreateApprovalRuleRequest) (*ApprovalRule, error)
+	GetEnvironmentApprovalRule(ctx context.Context, orgName string, ruleId string) (*ApprovalRule, error)
+	UpdateEnvironmentApprovalRule(ctx context.Context, orgName string, ruleId string, req UpdateApprovalRuleRequest) (*ApprovalRule, error)
+	DeleteEnvironmentApprovalRule(ctx context.Context, orgName string, ruleId string) error
 }
 
 type ApprovalRule struct {
@@ -64,16 +64,21 @@ type EligibleApprover struct {
 
 type EligibleApproverOutput struct {
 	EligibilityType ApprovalRuleEligibilityType `json:"eligibilityType"`
-	TeamName        string                      `json:"teamName,omitempty"`
-	GithubLogin     string                      `json:"githubLogin,omitempty"`
+	TeamName        string                      `json:"name,omitempty"`
+	User            UserInfo                    `json:"user,omitempty"`
 	RbacPermission  string                      `json:"permission,omitempty"`
+}
+
+type UserInfo struct {
+	Name        string `json:"name"`
+	GithubLogin string `json:"githubLogin"`
 }
 
 func (out EligibleApproverOutput) toApprover() EligibleApprover {
 	return EligibleApprover{
 		EligibilityType: out.EligibilityType,
 		TeamName:        out.TeamName,
-		User:            out.GithubLogin,
+		User:            out.User.GithubLogin,
 		RbacPermission:  out.RbacPermission,
 	}
 }
@@ -94,13 +99,16 @@ type CreateApprovalRuleRequest struct {
 }
 
 type UpdateApprovalRuleRequest struct {
-	Name    string              `json:"name"`
-	Enabled bool                `json:"enabled"`
-	Rule    ChangeGateRuleInput `json:"rule"`
+	Name    string                `json:"name"`
+	Enabled bool                  `json:"enabled"`
+	Rule    ChangeGateRuleInput   `json:"rule"`
+	Target  ChangeGateTargetInput `json:"target"`
 }
 
 type ChangeGateTargetInput struct {
-	ActionType string `json:"actionType"`
+	ActionTypes   []string `json:"actionTypes"`
+	EntityType    string   `json:"entityType"`
+	QualifiedName string   `json:"qualifiedName"`
 }
 
 type ApprovalRuleType string
@@ -125,8 +133,10 @@ type ChangeGateRuleOutput struct {
 }
 
 type ChangeGateTargetOutput struct {
-	ActionType string                      `json:"actionType"`
-	EntityInfo *ChangeGateTargetEntityInfo `json:"entityInfo,omitempty"`
+	ActionTypes   []string                    `json:"actionTypes"`
+	QualifiedName string                      `json:"qualifiedName"`
+	EntityType    string                      `json:"entityType"`
+	EntityInfo    *ChangeGateTargetEntityInfo `json:"entityInfo,omitempty"`
 }
 
 type ChangeGateTargetEntityInfo struct {
@@ -138,12 +148,8 @@ type EnvironmentEntity struct {
 	Name    string `json:"name"`
 }
 
-func (c *Client) CreateEnvironmentApprovalRule(ctx context.Context, envId EnvironmentIdentifier, req CreateApprovalRuleRequest) (*ApprovalRule, error) {
-	apiPath := path.Join("preview", "esc", "environments",
-		envId.OrgName,
-		envId.ProjectName,
-		envId.EnvName,
-		"change-gates")
+func (c *Client) CreateEnvironmentApprovalRule(ctx context.Context, orgName string, req CreateApprovalRuleRequest) (*ApprovalRule, error) {
+	apiPath := path.Join("change-gates", orgName)
 
 	var rule ApprovalRule
 	_, err := c.do(ctx, http.MethodPost, apiPath, req, &rule)
@@ -154,13 +160,8 @@ func (c *Client) CreateEnvironmentApprovalRule(ctx context.Context, envId Enviro
 	return &rule, nil
 }
 
-func (c *Client) GetEnvironmentApprovalRule(ctx context.Context, envId EnvironmentIdentifier, ruleId string) (*ApprovalRule, error) {
-	apiPath := path.Join("preview", "esc", "environments",
-		envId.OrgName,
-		envId.ProjectName,
-		envId.EnvName,
-		"change-gates",
-		ruleId)
+func (c *Client) GetEnvironmentApprovalRule(ctx context.Context, orgName string, ruleId string) (*ApprovalRule, error) {
+	apiPath := path.Join("change-gates", orgName, ruleId)
 
 	var rule ApprovalRule
 	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &rule)
@@ -171,13 +172,8 @@ func (c *Client) GetEnvironmentApprovalRule(ctx context.Context, envId Environme
 	return &rule, nil
 }
 
-func (c *Client) UpdateEnvironmentApprovalRule(ctx context.Context, envId EnvironmentIdentifier, ruleId string, req UpdateApprovalRuleRequest) (*ApprovalRule, error) {
-	apiPath := path.Join("preview", "esc", "environments",
-		envId.OrgName,
-		envId.ProjectName,
-		envId.EnvName,
-		"change-gates",
-		ruleId)
+func (c *Client) UpdateEnvironmentApprovalRule(ctx context.Context, orgName string, ruleId string, req UpdateApprovalRuleRequest) (*ApprovalRule, error) {
+	apiPath := path.Join("change-gates", orgName, ruleId)
 
 	var rule ApprovalRule
 	_, err := c.do(ctx, http.MethodPut, apiPath, req, &rule)
@@ -188,13 +184,8 @@ func (c *Client) UpdateEnvironmentApprovalRule(ctx context.Context, envId Enviro
 	return &rule, nil
 }
 
-func (c *Client) DeleteEnvironmentApprovalRule(ctx context.Context, envId EnvironmentIdentifier, ruleId string) error {
-	apiPath := path.Join("preview", "esc", "environments",
-		envId.OrgName,
-		envId.ProjectName,
-		envId.EnvName,
-		"change-gates",
-		ruleId)
+func (c *Client) DeleteEnvironmentApprovalRule(ctx context.Context, orgName string, ruleId string) error {
+	apiPath := path.Join("change-gates", orgName, ruleId)
 
 	result, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
 	if err != nil {

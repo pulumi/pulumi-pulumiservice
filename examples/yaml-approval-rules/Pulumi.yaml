@@ -13,7 +13,7 @@ resources:
         fn::stringAsset: |-
           values:
             myKey1: "myValue1"
-  
+
   # Create an approval rule that governs who can approve updates to the environment
   # This rule requires 3 approvals from eligible approvers before any update can proceed
   approval-rule:
@@ -21,7 +21,7 @@ resources:
     properties:
       name: "My rule!"
       enabled: true
-      targetActionType: "update"
+      targetActionTypes: ["update"]
       environmentIdentifier:
         organization: ${testing-environment.organization}
         project: ${testing-environment.project}
