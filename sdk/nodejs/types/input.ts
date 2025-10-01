@@ -349,6 +349,17 @@ export interface OperationContextOptionsArgs {
     skipIntermediateDeployments?: pulumi.Input<boolean>;
 }
 
+export interface TaskEntityArgs {
+    /**
+     * The entity ID.
+     */
+    id: pulumi.Input<string>;
+    /**
+     * The type of entity.
+     */
+    type: pulumi.Input<string>;
+}
+
 export interface TemplateSourceDestinationArgs {
     /**
      * Destination URL that gets filled in on new project creation.

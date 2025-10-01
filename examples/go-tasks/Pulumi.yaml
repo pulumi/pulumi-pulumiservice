@@ -1,0 +1,7 @@
+name: go-task
+description: go-task
+runtime: go
+plugins:
+  providers:
+  - name: pulumiservice
+    path: ../../bin
