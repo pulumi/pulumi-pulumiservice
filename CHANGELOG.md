@@ -8,7 +8,7 @@
 - Upgraded Pulumi SDK to v3.204.0 with latest codegen improvements
 
 ### Bug Fixes
-
+- Added NeoTask resource for tracking user instructions and entity changes in the Neo agent system
 - Fixed PolicyGroup creation to include required entityType and mode fields [#563](https://github.com/pulumi/pulumi-pulumiservice/issues/563)
 - Fixed Makefile SDK generation to consistently use provider binary as source of truth, and added provider dependency to build_sdks target to prevent SDK inconsistencies in worktrees
 - Fixed Makefile PATH export to remove incorrect quotes, improving plugin installation

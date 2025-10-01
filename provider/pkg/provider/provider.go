@@ -205,6 +205,9 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 		&resources.PulumiServicePolicyGroupResource{
 			Client: client,
 		},
+		&resources.PulumiServiceNeoTaskResource{
+			Client: client,
+		},
 	}
 
 	return &pulumirpc.ConfigureResponse{

@@ -622,6 +622,23 @@
         }
       ]
     },
+    "pulumiservice:index:TaskEntity": {
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The entity ID."
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of entity."
+        }
+      },
+      "type": "object",
+      "required": [
+        "id",
+        "type"
+      ]
+    },
     "pulumiservice:index:TeamStackPermissionScope": {
       "type": "number",
       "enum": [
@@ -1449,6 +1466,79 @@
         "organization",
         "revision",
         "tagName"
+      ]
+    },
+    "pulumiservice:index:NeoTask": {
+      "description": "A task created in the Neo agent system for tracking user instructions and entity changes.",
+      "properties": {
+        "content": {
+          "type": "string",
+          "description": "The exact user instruction for the task."
+        },
+        "entityAdd": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:index:TaskEntity"
+          },
+          "description": "Entities to add in this task."
+        },
+        "entityRemove": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:index:TaskEntity"
+          },
+          "description": "Entities to remove in this task."
+        },
+        "organizationName": {
+          "type": "string",
+          "description": "The name of the organization."
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "When the event occurred (ISO 8601 format)."
+        }
+      },
+      "type": "object",
+      "required": [
+        "content",
+        "organizationName"
+      ],
+      "inputProperties": {
+        "content": {
+          "type": "string",
+          "description": "The exact user instruction for the task.",
+          "willReplaceOnChanges": true
+        },
+        "entityAdd": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:index:TaskEntity"
+          },
+          "description": "Entities to add in this task.",
+          "willReplaceOnChanges": true
+        },
+        "entityRemove": {
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:index:TaskEntity"
+          },
+          "description": "Entities to remove in this task.",
+          "willReplaceOnChanges": true
+        },
+        "organizationName": {
+          "type": "string",
+          "description": "The name of the organization.",
+          "willReplaceOnChanges": true
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "When the event occurred (ISO 8601 format). Defaults to current time if not specified.",
+          "willReplaceOnChanges": true
+        }
+      },
+      "requiredInputs": [
+        "content",
+        "organizationName"
       ]
     },
     "pulumiservice:index:OidcIssuer": {
