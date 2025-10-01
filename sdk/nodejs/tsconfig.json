@@ -27,6 +27,7 @@
         "getPolicyPack.ts",
         "getPolicyPacks.ts",
         "index.ts",
+        "neoTask.ts",
         "oidcIssuer.ts",
         "orgAccessToken.ts",
         "policyGroup.ts",
