@@ -27,3 +27,10 @@ func getOrgName() string {
 	}
 	return "service-provider-test-org"
 }
+
+func getTestOrg() string {
+	if org := os.Getenv("PULUMI_TEST_OWNER"); org != "" {
+		return org
+	}
+	return "service-provider-test-org"
+}

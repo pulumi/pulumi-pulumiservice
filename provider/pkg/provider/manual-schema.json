@@ -1410,6 +1410,66 @@
         "stack"
       ]
     },
+    "pulumiservice:index:StackTags": {
+      "description": "`StackTags` manages a set of stack tags as a single resource. Tags are supplied as a map and are created, updated, and deleted together.\n\nThis is especially convenient for YAML programs, where a single resource can declare many tags rather than needing one `StackTag` resource per key.\n\nThe resource tracks the set of tags it manages in state; tags added to the stack outside this resource (e.g. via the CLI, pulumibot, or a singular `StackTag` resource) are left alone. Because the Pulumi Cloud tag API is immutable per key, changing a tag value is implemented as delete-and-recreate.\n\n### Import\n\nImporting with an ID of `{organization}/{project}/{stack}/tags` adopts **every** tag currently on the stack into this resource's managed set. After import, explicitly declare the `tags` map in your program so subsequent updates match your intent.\n\n```sh\n$ pulumi import pulumiservice:index:StackTags mytags my-org/my-project/my-stack/tags\n```\n",
+      "properties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "project": {
+          "description": "Project name.",
+          "type": "string"
+        },
+        "stack": {
+          "description": "Stack name.",
+          "type": "string"
+        },
+        "tags": {
+          "description": "Map of tag names to values. Each entry represents a stack tag.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "organization",
+        "project",
+        "stack",
+        "tags"
+      ],
+      "inputProperties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "project": {
+          "description": "Project name.",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "stack": {
+          "description": "Stack name.",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "tags": {
+          "description": "Map of tag names to values. Each entry represents a stack tag.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "requiredInputs": [
+        "organization",
+        "project",
+        "stack",
+        "tags"
+      ]
+    },
     "pulumiservice:index:TeamStackPermission": {
       "description": "Grants a team permissions to the specified stack.",
       "inputProperties": {

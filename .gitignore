@@ -30,3 +30,7 @@ Library/
 
 coverage.txt
 .make/
+.config/
+
+# Environment variables
+.env
