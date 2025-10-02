@@ -1,0 +1,35 @@
+name: yaml-policy-groups
+description: Example demonstrating PolicyGroup resource and policy pack data sources
+runtime: yaml
+config:
+  digits:
+    type: string
+  organizationName:
+    type: string
+    default: service-provider-test-org
+
+variables:
+  # Query all available policy packs in the organization
+  # This demonstrates using the getPolicyPacks data source
+  policyPacks:
+    fn::invoke:
+      function: pulumiservice:index:getPolicyPacks
+      arguments:
+        organizationName: ${organizationName}
+      return: policyPacks
+
+resources:
+  # Create a policy group that manages policy packs for a set of stacks
+  # Policy groups allow you to apply policy packs consistently across multiple stacks
+  testPolicyGroup:
+    type: pulumiservice:PolicyGroup
+    properties:
+      name: test-policy-group-${digits}
+      organizationName: ${organizationName}
+      stacks: []
+      policyPacks: []
+
+outputs:
+  # Export the policy group name and the list of available policy packs
+  policyGroupName: ${testPolicyGroup.name}
+  availablePolicyPacks: ${policyPacks}

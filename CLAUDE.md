@@ -123,6 +123,11 @@ The provider schema is **manually maintained** at `provider/cmd/pulumi-resource-
 4. Register the resource in `provider/pkg/provider/provider.go`
 5. Rebuild provider and SDKs: `make build`
 6. Add examples in `examples/` directory
+7. **IMPORTANT**: Always create a YAML example for the new resource:
+   - Add a `yaml-*` example directory in `examples/`
+   - Create a `README.md` in the example directory that includes a link to the `pulumi convert` documentation (https://www.pulumi.com/docs/iac/cli/commands/pulumi_convert/) for converting the example to other programming languages
+   - Register the example test in `examples/examples_yaml_test.go`
+   - Test the YAML example before completing: `cd examples && go test -v -run TestYaml<ResourceName>Example -tags yaml -timeout 10m`
 
 ### Resource Interface
 

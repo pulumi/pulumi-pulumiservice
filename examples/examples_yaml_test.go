@@ -413,6 +413,18 @@ func TestYamlOidcIssuerExample(t *testing.T) {
 	})
 }
 
+func TestYamlPolicyGroupsExample(t *testing.T) {
+	cwd := getCwd(t)
+	digits := generateRandomFiveDigits()
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Dir: path.Join(cwd, ".", "yaml-policy-groups"),
+		Config: map[string]string{
+			"digits":           digits,
+			"organizationName": os.Getenv("PULUMI_TEST_OWNER"),
+		},
+	})
+}
+
 func writePulumiYaml(t *testing.T, yamlContents interface{}) string {
 	tmpdir := t.TempDir()
 	b, err := yaml.Marshal(yamlContents)

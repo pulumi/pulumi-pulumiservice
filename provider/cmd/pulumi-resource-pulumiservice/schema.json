@@ -820,55 +820,55 @@
   "resources": {
     "pulumiservice:index:Stack": {
       "description": "A stack is a collection of resources that share a common lifecycle. Stacks are uniquely identified by their name and the project they belong to.",
-        "properties": {
-            "organizationName": {
-              "description": "The name of the organization.",
-              "type": "string"
-            },
-            "projectName": {
-              "description": "The name of the project.",
-              "type": "string"
-            },
-            "stackName": {
-              "description": "The name of the stack.",
-              "type": "string"
-            },
-            "forceDestroy": {
-              "description": "Optional. Flag indicating whether to delete the stack even if it still contains resources.",
-              "type": "boolean"
-            }
+      "properties": {
+        "organizationName": {
+          "description": "The name of the organization.",
+          "type": "string"
         },
-        "required": [
-            "organizationName",
-            "projectName",
-            "stackName"
-        ],
-        "inputProperties": {
-          "organizationName": {
-            "description": "The name of the organization.",
-            "type": "string",
-            "willReplaceOnChanges": true
-          },
-          "projectName": {
-            "description": "The name of the project.",
-            "type": "string",
-            "willReplaceOnChanges": true
-          },
-          "stackName": {
-            "description": "The name of the stack.",
-            "type": "string",
-            "willReplaceOnChanges": true
-          },
-          "forceDestroy": {
-            "description": "Optional. Flag indicating whether to delete the stack even if it still contains resources.",
-            "type": "boolean"
-          }
+        "projectName": {
+          "description": "The name of the project.",
+          "type": "string"
         },
-        "requiredInputs": [
-            "organizationName",
-            "projectName",
-            "stackName"
-        ]
+        "stackName": {
+          "description": "The name of the stack.",
+          "type": "string"
+        },
+        "forceDestroy": {
+          "description": "Optional. Flag indicating whether to delete the stack even if it still contains resources.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "organizationName",
+        "projectName",
+        "stackName"
+      ],
+      "inputProperties": {
+        "organizationName": {
+          "description": "The name of the organization.",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "projectName": {
+          "description": "The name of the project.",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "stackName": {
+          "description": "The name of the stack.",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "forceDestroy": {
+          "description": "Optional. Flag indicating whether to delete the stack even if it still contains resources.",
+          "type": "boolean"
+        }
+      },
+      "requiredInputs": [
+        "organizationName",
+        "projectName",
+        "stackName"
+      ]
     },
     "pulumiservice:index:AgentPool": {
       "description": "Agent Pool for customer managed deployments",
@@ -2169,6 +2169,155 @@
         "environmentIdentifier",
         "approvalRuleConfig"
       ]
+    },
+    "pulumiservice:index:PolicyGroup": {
+      "description": "A Policy Group allows you to apply policy packs to a set of stacks in your organization.",
+      "properties": {
+        "name": {
+          "description": "The name of the policy group.",
+          "type": "string"
+        },
+        "organizationName": {
+          "description": "The name of the Pulumi organization the policy group belongs to.",
+          "type": "string"
+        },
+        "stacks": {
+          "description": "List of stack references that belong to this policy group.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "description": "The name of the stack.",
+                "type": "string"
+              },
+              "routingProject": {
+                "description": "The routing project name (also known as project name).",
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "routingProject"
+            ]
+          }
+        },
+        "policyPacks": {
+          "description": "List of policy packs applied to this policy group.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "description": "The name of the policy pack.",
+                "type": "string"
+              },
+              "displayName": {
+                "description": "The display name of the policy pack.",
+                "type": "string"
+              },
+              "version": {
+                "description": "The version of the policy pack.",
+                "type": "number"
+              },
+              "versionTag": {
+                "description": "The version tag of the policy pack.",
+                "type": "string"
+              },
+              "config": {
+                "description": "Optional configuration for the policy pack.",
+                "type": "object",
+                "additionalProperties": true
+              }
+            },
+            "required": [
+              "name",
+              "displayName",
+              "version",
+              "versionTag"
+            ]
+          }
+        }
+      },
+      "required": [
+        "name",
+        "organizationName",
+        "stacks",
+        "policyPacks"
+      ],
+      "inputProperties": {
+        "name": {
+          "description": "The name of the policy group.",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "organizationName": {
+          "description": "The name of the Pulumi organization the policy group belongs to.",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "stacks": {
+          "description": "List of stack references that belong to this policy group.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "description": "The name of the stack.",
+                "type": "string"
+              },
+              "routingProject": {
+                "description": "The routing project name (also known as project name).",
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "routingProject"
+            ]
+          }
+        },
+        "policyPacks": {
+          "description": "List of policy packs applied to this policy group.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "description": "The name of the policy pack.",
+                "type": "string"
+              },
+              "displayName": {
+                "description": "The display name of the policy pack.",
+                "type": "string"
+              },
+              "version": {
+                "description": "The version of the policy pack.",
+                "type": "number"
+              },
+              "versionTag": {
+                "description": "The version tag of the policy pack.",
+                "type": "string"
+              },
+              "config": {
+                "description": "Optional configuration for the policy pack.",
+                "type": "object",
+                "additionalProperties": true
+              }
+            },
+            "required": [
+              "name",
+              "displayName",
+              "version",
+              "versionTag"
+            ]
+          }
+        }
+      },
+      "requiredInputs": [
+        "name",
+        "organizationName"
+      ]
     }
   },
   "language": {
@@ -2213,6 +2362,160 @@
         "enabled": true
       },
       "respectSchemaVersion": true
+    }
+  },
+  "functions": {
+    "pulumiservice:index:getPolicyPacks": {
+      "description": "Get a list of all policy packs for an organization.",
+      "inputs": {
+        "properties": {
+          "organizationName": {
+            "type": "string",
+            "description": "The name of the Pulumi organization."
+          }
+        },
+        "required": [
+          "organizationName"
+        ]
+      },
+      "outputs": {
+        "properties": {
+          "policyPacks": {
+            "type": "array",
+            "description": "List of policy packs in the organization.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "The name of the policy pack."
+                },
+                "displayName": {
+                  "type": "string",
+                  "description": "The display name of the policy pack."
+                },
+                "versions": {
+                  "type": "array",
+                  "description": "List of version numbers for this policy pack.",
+                  "items": {
+                    "type": "integer"
+                  }
+                },
+                "versionTags": {
+                  "type": "array",
+                  "description": "List of version tags for this policy pack.",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "name",
+                "displayName",
+                "versions",
+                "versionTags"
+              ]
+            }
+          }
+        },
+        "required": [
+          "policyPacks"
+        ]
+      }
+    },
+    "pulumiservice:index:getPolicyPack": {
+      "description": "Get details about a specific version of a policy pack.",
+      "inputs": {
+        "properties": {
+          "organizationName": {
+            "type": "string",
+            "description": "The name of the Pulumi organization."
+          },
+          "policyPackName": {
+            "type": "string",
+            "description": "The name of the policy pack."
+          },
+          "version": {
+            "type": "integer",
+            "description": "The version number of the policy pack. If not specified, returns the latest version."
+          }
+        },
+        "required": [
+          "organizationName",
+          "policyPackName"
+        ]
+      },
+      "outputs": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the policy pack."
+          },
+          "displayName": {
+            "type": "string",
+            "description": "The display name of the policy pack."
+          },
+          "version": {
+            "type": "integer",
+            "description": "The version number."
+          },
+          "versionTag": {
+            "type": "string",
+            "description": "The version tag (if any)."
+          },
+          "config": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "pulumi.json#/Any"
+            },
+            "description": "Configuration for the policy pack."
+          },
+          "policies": {
+            "type": "array",
+            "description": "List of policies in this pack.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "The policy name."
+                },
+                "displayName": {
+                  "type": "string",
+                  "description": "The display name."
+                },
+                "description": {
+                  "type": "string",
+                  "description": "The policy description."
+                },
+                "enforcementLevel": {
+                  "type": "string",
+                  "description": "The enforcement level (advisory, mandatory, etc.)."
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Message shown when policy is violated."
+                },
+                "configSchema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "pulumi.json#/Any"
+                  },
+                  "description": "Configuration schema for this policy."
+                }
+              },
+              "required": [
+                "name"
+              ]
+            }
+          }
+        },
+        "required": [
+          "name",
+          "displayName",
+          "version"
+        ]
+      }
     }
   }
 }

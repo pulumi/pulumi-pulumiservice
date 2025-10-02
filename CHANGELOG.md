@@ -2,9 +2,13 @@
 
 ## Unreleased
 
+### Improvements
+
+- Added PolicyGroup resource and getPolicyPack/getPolicyPacks data sources for managing policy packs across stacks
+
 ### Bug Fixes
 
-- Fixed OIDC issuer examples: removed unsupported runner token type and updated Pulumi OIDC thumbprint 
+- Fixed OIDC issuer examples: removed unsupported runner token type and updated Pulumi OIDC thumbprint
 
 ## 0.31.0
 
