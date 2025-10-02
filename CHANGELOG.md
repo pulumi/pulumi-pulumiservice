@@ -5,6 +5,7 @@
 ### Improvements
 
 - Added PolicyGroup resource and getPolicyPack/getPolicyPacks data sources for managing policy packs across stacks
+- Added StackTags resource for managing multiple stack tags [#61](https://github.com/pulumi/pulumi-pulumiservice/issues/61)
 
 ### Bug Fixes
 

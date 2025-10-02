@@ -1,0 +1,19 @@
+name: yaml-stack-tags-plural-example
+runtime: yaml
+description: Example using StackTags resource to manage multiple tags at once
+configuration:
+  organization:
+    type: string
+    default: service-provider-test-org
+resources:
+  multiple-tags:
+    type: pulumiservice:StackTags
+    properties:
+      organization: ${organization}
+      project: ${pulumi.project}
+      stack: ${pulumi.stack}
+      tags:
+        environment: development
+        team: platform
+        cost-center: engineering
+        managed-by: pulumi
