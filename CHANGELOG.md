@@ -20,6 +20,7 @@
 
 - Added PolicyGroup resource and getPolicyPack/getPolicyPacks data sources for managing policy packs across stacks
 - Improved Makefile lint target with proper bash shell support and build tags for examples
+- Added StackTags resource for managing multiple stack tags [#61](https://github.com/pulumi/pulumi-pulumiservice/issues/61)
 
 ### Bug Fixes
 

@@ -33,6 +33,7 @@
         "provider.ts",
         "stack.ts",
         "stackTag.ts",
+        "stackTags.ts",
         "team.ts",
         "teamAccessToken.ts",
         "teamEnvironmentPermission.ts",

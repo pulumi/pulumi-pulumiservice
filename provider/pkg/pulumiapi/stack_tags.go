@@ -76,3 +76,17 @@ func (c *Client) DeleteStackTag(ctx context.Context, stackName StackIdentifier, 
 	}
 	return nil
 }
+
+// GetStackTags retrieves all tags for a stack
+func (c *Client) GetStackTags(ctx context.Context, stackName StackIdentifier) (map[string]string, error) {
+	apiPath := path.Join("stacks", stackName.OrgName, stackName.ProjectName, stackName.StackName)
+	var s stack
+	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &s)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get stack tags: %w", err)
+	}
+	if s.Tags == nil {
+		return make(map[string]string), nil
+	}
+	return s.Tags, nil
+}
