@@ -8,7 +8,7 @@ const pulumiOidcIssuer = new service.OidcIssuer("pulumi_issuer", {
   name: "pulumi_issuer",
   url: "https://api.pulumi.com/oidc",
   thumbprints: [
-    "df749a0f34ed673f8b0ec898445910c29c170d01d7d34073bd882235974a8a53"
+    "57d3e89f6b25dde3c174dc558e2b2623306a9d81f88a12e8ae7090a86c12f1da"
   ],
   policies: [
     {
@@ -60,15 +60,6 @@ const githubOidcIssuer = new service.OidcIssuer("github_issuer", {
       },
       teamName: "dream-team",
       tokenType: "team"
-    },
-    {
-      decision: "allow",
-      rules: {
-          "aud": "urn:pulumi:org:"+serviceOrg,
-          "sub": "repo:organization/repo:*"
-      },
-      runnerID: "1234-5678-ABCD-XYZD",
-      tokenType: "runner"
     }
   ]
 })
