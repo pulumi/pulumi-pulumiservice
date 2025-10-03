@@ -24,7 +24,7 @@ func TestCreateWebhook(t *testing.T) {
 	webhook := Webhook{
 		Name:        webhookName,
 		DisplayName: displayName,
-		PayloadUrl:  payloadURL,
+		PayloadURL:  payloadURL,
 		Secret:      &secret,
 		Active:      true,
 	}
@@ -75,7 +75,7 @@ func TestListWebhooks(t *testing.T) {
 	webhook := Webhook{
 		Name:        webhookName,
 		DisplayName: displayName,
-		PayloadUrl:  payloadURL,
+		PayloadURL:  payloadURL,
 		Secret:      &secret,
 		Active:      true,
 	}
@@ -118,7 +118,7 @@ func TestGetWebhook(t *testing.T) {
 	webhook := Webhook{
 		Name:        webhookName,
 		DisplayName: displayName,
-		PayloadUrl:  payloadURL,
+		PayloadURL:  payloadURL,
 		Secret:      &secret,
 		Active:      true,
 	}
@@ -176,7 +176,7 @@ func TestUpdateWebhook(t *testing.T) {
 	webhook := Webhook{
 		Name:        webhookName,
 		DisplayName: displayName,
-		PayloadUrl:  payloadURL,
+		PayloadURL:  payloadURL,
 		Secret:      &secret,
 		Active:      true,
 	}

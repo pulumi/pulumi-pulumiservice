@@ -164,7 +164,7 @@ func (s *PulumiServiceTemplateSourceResource) Create(req *pulumirpc.CreateReques
 	}
 
 	return &pulumirpc.CreateResponse{
-		Id:         path.Join(input.OrganizationName, response.Id),
+		Id:         path.Join(input.OrganizationName, response.ID),
 		Properties: outputProperties,
 	}, nil
 }
@@ -250,7 +250,7 @@ func (s *PulumiServiceTemplateSourceResource) Read(req *pulumirpc.ReadRequest) (
 	}, nil
 }
 
-func parseTemplateSourceID(id string) (organizationName *string, templateId *string, err error) {
+func parseTemplateSourceID(id string) (organizationName *string, templateID *string, err error) {
 	splitID := strings.Split(id, "/")
 	if len(splitID) != 2 {
 		return nil, nil, fmt.Errorf("invalid template source id: %s", id)
@@ -258,19 +258,19 @@ func parseTemplateSourceID(id string) (organizationName *string, templateId *str
 	return &splitID[0], &splitID[1], nil
 }
 
-func (input *PulumiServiceTemplateSourceInput) toRequest() pulumiapi.CreateTemplateSourceRequest {
+func (i *PulumiServiceTemplateSourceInput) toRequest() pulumiapi.CreateTemplateSourceRequest {
 	var destination *pulumiapi.CreateTemplateSourceRequestDestination
-	if input.Destination != nil {
+	if i.Destination != nil {
 		destination = &pulumiapi.CreateTemplateSourceRequestDestination{
-			URL: input.Destination.URL,
+			URL: i.Destination.URL,
 		}
 	} else {
 		destination = nil
 	}
 
 	return pulumiapi.CreateTemplateSourceRequest{
-		Name:        input.SourceName,
-		SourceURL:   input.SourceURL,
+		Name:        i.SourceName,
+		SourceURL:   i.SourceURL,
 		Destination: destination,
 	}
 }

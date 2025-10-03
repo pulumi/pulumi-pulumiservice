@@ -19,21 +19,21 @@ const (
 func TestDeleteTeamAccessToken(t *testing.T) {
 	orgName := testTeamTokenOrgName
 	teamName := testTeamTokenName
-	tokenId := "abcdegh"
+	tokenID := "abcdegh"
 	t.Run("Happy Path", func(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
-			ExpectedReqPath:   "/api/orgs/" + testTeamTokenOrgName + "/teams/" + testTeamTokenName + "/tokens/" + tokenId,
+			ExpectedReqPath:   "/api/orgs/" + testTeamTokenOrgName + "/teams/" + testTeamTokenName + "/tokens/" + tokenID,
 			ResponseCode:      204,
 		})
 		defer cleanup()
-		assert.NoError(t, c.DeleteTeamAccessToken(teamCtx, tokenId, orgName, teamName))
+		assert.NoError(t, c.DeleteTeamAccessToken(teamCtx, tokenID, orgName, teamName))
 	})
 
 	t.Run("Error", func(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
-			ExpectedReqPath:   "/api/orgs/" + testTeamTokenOrgName + "/teams/" + testTeamTokenName + "/tokens/" + tokenId,
+			ExpectedReqPath:   "/api/orgs/" + testTeamTokenOrgName + "/teams/" + testTeamTokenName + "/tokens/" + tokenID,
 			ResponseCode:      404,
 			ResponseBody: ErrorResponse{
 				StatusCode: 404,
@@ -42,7 +42,7 @@ func TestDeleteTeamAccessToken(t *testing.T) {
 		})
 		defer cleanup()
 		assert.EqualError(t,
-			c.DeleteTeamAccessToken(teamCtx, tokenId, orgName, teamName),
+			c.DeleteTeamAccessToken(teamCtx, tokenID, orgName, teamName),
 			`failed to delete access token "abcdegh": 404 API error: token not found`,
 		)
 	})

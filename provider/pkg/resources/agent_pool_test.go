@@ -23,30 +23,30 @@ type AgentPoolClientMock struct {
 }
 
 func (c *AgentPoolClientMock) GetAgentPool(
-	ctx context.Context,
-	agentPoolId, orgName string,
+	_ context.Context,
+	_ /* agentPoolId */, _ /* orgName */ string,
 ) (*pulumiapi.AgentPool, error) {
 	return c.getAgentPoolFunc()
 }
 
 func (c *AgentPoolClientMock) CreateAgentPool(
-	ctx context.Context,
-	name, orgName, description string,
+	_ context.Context,
+	_ /* name */, _ /* orgName */, _ /* description */ string,
 ) (*pulumiapi.AgentPool, error) {
 	return nil, nil
 }
 
 func (c *AgentPoolClientMock) UpdateAgentPool(
-	ctx context.Context,
-	agentPoolId, name, orgName, description string,
+	_ context.Context,
+	_ /* agentPoolId */, _ /* name */, _ /* orgName */, _ /* description */ string,
 ) error {
 	return nil
 }
 
 func (c *AgentPoolClientMock) DeleteAgentPool(
-	ctx context.Context,
-	agentPoolId, orgName string,
-	forceDestroy bool,
+	_ context.Context,
+	_ /* agentPoolId */, _ /* orgName */ string,
+	_ /* forceDestroy */ bool,
 ) error {
 	return c.deleteAgentPoolFunc()
 }

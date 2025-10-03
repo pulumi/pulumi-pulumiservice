@@ -105,7 +105,7 @@ func (st *PulumiServiceDriftScheduleResource) Create(req *pulumirpc.CreateReques
 	}
 
 	outputProperties, err := plugin.MarshalProperties(
-		AddScheduleIdToPropertyMap(*scheduleID, input.ToPropertyMap()),
+		AddScheduleIDToPropertyMap(*scheduleID, input.ToPropertyMap()),
 		plugin.MarshalOptions{
 			KeepUnknowns: true,
 			SkipNulls:    true,
@@ -181,7 +181,7 @@ func (st *PulumiServiceDriftScheduleResource) Update(req *pulumirpc.UpdateReques
 	}
 
 	outputProperties, err := plugin.MarshalProperties(
-		AddScheduleIdToPropertyMap(*scheduleID, input.ToPropertyMap()),
+		AddScheduleIDToPropertyMap(*scheduleID, input.ToPropertyMap()),
 		plugin.MarshalOptions{
 			KeepUnknowns: true,
 			SkipNulls:    true,
@@ -227,7 +227,7 @@ func (st *PulumiServiceDriftScheduleResource) Read(req *pulumirpc.ReadRequest) (
 		return nil, fmt.Errorf("failed to read DriftSchedule (%q): %w", req.Id, err)
 	}
 	outputProperties, err := plugin.MarshalProperties(
-		AddScheduleIdToPropertyMap(*scheduleID, input.ToPropertyMap()),
+		AddScheduleIDToPropertyMap(*scheduleID, input.ToPropertyMap()),
 		plugin.MarshalOptions{
 			KeepUnknowns: true,
 			SkipNulls:    true,

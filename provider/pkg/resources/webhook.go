@@ -29,7 +29,7 @@ type PulumiServiceWebhookResource struct {
 type PulumiServiceWebhookInput struct {
 	Active           bool
 	DisplayName      string
-	PayloadUrl       string
+	PayloadURL       string
 	Secret           *pulumiapi.SecretValue
 	OrganizationName string
 	ProjectName      *string
@@ -56,7 +56,7 @@ func (i *PulumiServiceWebhookInput) ToPropertyMap(
 	pm := resource.PropertyMap{}
 	pm["active"] = resource.NewPropertyValue(i.Active)
 	pm["displayName"] = resource.NewPropertyValue(i.DisplayName)
-	pm["payloadUrl"] = resource.NewPropertyValue(i.PayloadUrl)
+	pm["payloadUrl"] = resource.NewPropertyValue(i.PayloadURL)
 	pm["organizationName"] = resource.NewPropertyValue(i.OrganizationName)
 
 	if i.ProjectName != nil {
@@ -111,7 +111,7 @@ func (wh *PulumiServiceWebhookResource) ToPulumiServiceWebhookProperties(
 	props := PulumiServiceWebhookProperties{}
 
 	props.DisplayName = util.GetSecretOrStringValue(propMap["displayName"])
-	props.PayloadUrl = util.GetSecretOrStringValue(propMap["payloadUrl"])
+	props.PayloadURL = util.GetSecretOrStringValue(propMap["payloadUrl"])
 	props.OrganizationName = util.GetSecretOrStringValue(propMap["organizationName"])
 	props.ProjectName = util.GetSecretOrStringNullableValue(propMap["projectName"])
 	props.StackName = util.GetSecretOrStringNullableValue(propMap["stackName"])
@@ -255,7 +255,7 @@ func (wh *PulumiServiceWebhookResource) Create(req *pulumirpc.CreateRequest) (*p
 
 	inputProps := wh.ToPulumiServiceWebhookProperties(inputMap)
 
-	var secretStr *string = nil
+	var secretStr *string
 	if inputProps.Secret != nil {
 		secretStr = &inputProps.Secret.Value
 	}
@@ -266,7 +266,7 @@ func (wh *PulumiServiceWebhookResource) Create(req *pulumirpc.CreateRequest) (*p
 		StackName:        inputProps.StackName,
 		EnvironmentName:  inputProps.EnvironmentName,
 		DisplayName:      inputProps.DisplayName,
-		PayloadURL:       inputProps.PayloadUrl,
+		PayloadURL:       inputProps.PayloadURL,
 		Secret:           secretStr,
 		Active:           inputProps.Active,
 		Format:           inputProps.Format,
@@ -376,7 +376,7 @@ func (wh *PulumiServiceWebhookResource) Update(req *pulumirpc.UpdateRequest) (*p
 		return nil, fmt.Errorf("invalid resource id: %v", err)
 	}
 
-	var secretStr *string = nil
+	var secretStr *string
 	if inputProps.Secret != nil {
 		secretStr = &inputProps.Secret.Value
 	}
@@ -388,7 +388,7 @@ func (wh *PulumiServiceWebhookResource) Update(req *pulumirpc.UpdateRequest) (*p
 			StackName:        inputProps.StackName,
 			EnvironmentName:  inputProps.EnvironmentName,
 			DisplayName:      inputProps.DisplayName,
-			PayloadURL:       inputProps.PayloadUrl,
+			PayloadURL:       inputProps.PayloadURL,
 			Secret:           secretStr,
 			Active:           inputProps.Active,
 			Format:           inputProps.Format,
@@ -451,7 +451,7 @@ func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulum
 		return &pulumirpc.ReadResponse{}, nil
 	}
 
-	var secret *pulumiapi.SecretValue = nil
+	var secret *pulumiapi.SecretValue
 	if webhook.HasSecret {
 		secret = &pulumiapi.SecretValue{
 			Value:  webhook.SecretCiphertext,
@@ -463,7 +463,7 @@ func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulum
 		PulumiServiceWebhookInput: PulumiServiceWebhookInput{
 			Active:           webhook.Active,
 			DisplayName:      webhook.DisplayName,
-			PayloadUrl:       webhook.PayloadUrl,
+			PayloadURL:       webhook.PayloadURL,
 			Secret:           secret,
 			Format:           &webhook.Format,
 			Filters:          webhook.Filters,

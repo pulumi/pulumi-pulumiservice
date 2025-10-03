@@ -18,7 +18,7 @@ type CreateTemplateSourceRequest struct {
 }
 
 type TemplateSourceResponse struct {
-	Id          string                                  `json:"id"`
+	ID          string                                  `json:"id"`
 	IsValid     bool                                    `json:"isValid"`
 	Name        string                                  `json:"name"`
 	SourceURL   string                                  `json:"sourceURL"`
@@ -91,7 +91,7 @@ func (c *Client) GetTemplateSource(
 	}
 
 	for _, source := range templateSources.Sources {
-		if source.Id == templateID {
+		if source.ID == templateID {
 			return &source, nil
 		}
 	}

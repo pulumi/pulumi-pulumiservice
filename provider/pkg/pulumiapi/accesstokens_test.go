@@ -17,21 +17,21 @@ const (
 )
 
 func TestDeleteAccessToken(t *testing.T) {
-	tokenId := testTokenID
+	tokenID := testTokenID
 	t.Run("Happy Path", func(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
-			ExpectedReqPath:   "/api/user/tokens/" + tokenId,
+			ExpectedReqPath:   "/api/user/tokens/" + tokenID,
 			ResponseCode:      204,
 		})
 		defer cleanup()
-		assert.NoError(t, c.DeleteAccessToken(ctx, tokenId))
+		assert.NoError(t, c.DeleteAccessToken(ctx, tokenID))
 	})
 
 	t.Run("Error", func(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
-			ExpectedReqPath:   "/api/user/tokens/" + tokenId,
+			ExpectedReqPath:   "/api/user/tokens/" + tokenID,
 			ResponseCode:      404,
 			ResponseBody: ErrorResponse{
 				StatusCode: 404,
@@ -40,7 +40,7 @@ func TestDeleteAccessToken(t *testing.T) {
 		})
 		defer cleanup()
 		assert.EqualError(t,
-			c.DeleteAccessToken(ctx, tokenId),
+			c.DeleteAccessToken(ctx, tokenID),
 			`failed to delete access token "`+testTokenID+`": 404 API error: token not found`,
 		)
 	})

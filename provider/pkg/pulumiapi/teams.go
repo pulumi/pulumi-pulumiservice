@@ -323,9 +323,8 @@ func (c *Client) AddMemberToTeam(ctx context.Context, orgName, teamName, userNam
 			return nil
 		}
 		return err
-	} else {
-		return nil
 	}
+	return nil
 }
 
 // DeleteMemberFromTeam removes a user from a team.
@@ -333,9 +332,8 @@ func (c *Client) DeleteMemberFromTeam(ctx context.Context, orgName, teamName, us
 	err := c.updateTeamMembership(ctx, orgName, teamName, userName, "remove")
 	if err != nil {
 		return err
-	} else {
-		return nil
 	}
+	return nil
 }
 
 // AddStackPermission adds stack permissions for a team.

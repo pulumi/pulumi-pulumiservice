@@ -28,7 +28,7 @@ type DeploymentSettings struct {
 	GitHub           *GitHubConfiguration     `json:"gitHub,omitempty"`
 	SourceContext    *SourceContext           `json:"sourceContext,omitempty"`
 	ExecutorContext  *apitype.ExecutorContext `json:"executorContext,omitempty"`
-	AgentPoolId      string                   `json:"agentPoolID,omitempty"`
+	AgentPoolID      string                   `json:"agentPoolID,omitempty"`
 	Source           *string                  `json:"source,omitempty"`
 	CacheOptions     *CacheOptions            `json:"cacheOptions,omitempty"`
 }

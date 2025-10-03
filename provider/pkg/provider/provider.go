@@ -186,7 +186,7 @@ func (k *pulumiserviceProvider) Configure(
 		&resources.PulumiServiceDriftScheduleResource{
 			Client: client,
 		},
-		&resources.PulumiServiceTtlScheduleResource{
+		&resources.PulumiServiceTTLScheduleResource{
 			Client: client,
 		},
 		&resources.PulumiServiceEnvironmentResource{
@@ -287,7 +287,7 @@ func (k *pulumiserviceProvider) Update(
 
 // Delete tears down an existing resource with the given ID.  If it fails, the resource is assumed
 // to still exist.
-func (k *pulumiserviceProvider) Delete(ctx context.Context, req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
+func (k *pulumiserviceProvider) Delete(_ context.Context, req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
 	rn := getResourceNameFromRequest(req)
 	res := k.getPulumiServiceResource(rn)
 	return res.Delete(req)
@@ -302,7 +302,7 @@ func (k *pulumiserviceProvider) GetPluginInfo(context.Context, *pbempty.Empty) (
 
 // GetSchema returns the JSON-serialized schema for the provider.
 func (k *pulumiserviceProvider) GetSchema(
-	ctx context.Context, req *pulumirpc.GetSchemaRequest,
+	_ context.Context, _ *pulumirpc.GetSchemaRequest,
 ) (*pulumirpc.GetSchemaResponse, error) {
 	return &pulumirpc.GetSchemaResponse{
 		Schema: k.schema,

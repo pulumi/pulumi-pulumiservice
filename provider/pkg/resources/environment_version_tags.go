@@ -201,7 +201,7 @@ func (evt *PulumiServiceEnvironmentVersionTagResource) Read(
 ) (*pulumirpc.ReadResponse, error) {
 	ctx := context.Background()
 
-	orgName, projectName, environmentName, tagName, err := splitEnvironmentTagId(req.Id)
+	orgName, projectName, environmentName, tagName, err := splitEnvironmentTagID(req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -234,7 +234,7 @@ func (evt *PulumiServiceEnvironmentVersionTagResource) Read(
 	}, nil
 }
 
-func splitEnvironmentTagId(id string) (string, string, string, string, error) {
+func splitEnvironmentTagID(id string) (string, string, string, string, error) {
 	// format:
 	//   organization/project/environment/tag or
 	//   organization/environment/tag (legacy)

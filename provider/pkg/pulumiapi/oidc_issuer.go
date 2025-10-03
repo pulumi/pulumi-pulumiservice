@@ -136,13 +136,13 @@ func (c *Client) GetAuthPolicies(ctx context.Context, organization string, issue
 }
 
 func (c *Client) UpdateAuthPolicies(
-	ctx context.Context, organization string, policyId string, request AuthPolicyUpdateRequest,
+	ctx context.Context, organization string, policyID string, request AuthPolicyUpdateRequest,
 ) (*AuthPolicy, error) {
-	apiPath := path.Join("orgs", organization, "auth", "policies", policyId)
+	apiPath := path.Join("orgs", organization, "auth", "policies", policyID)
 	var response = &AuthPolicy{}
 	_, err := c.do(ctx, http.MethodPatch, apiPath, request, response)
 	if err != nil {
-		return nil, fmt.Errorf("failed to update auth policies with policy id '%s': %w", policyId, err)
+		return nil, fmt.Errorf("failed to update auth policies with policy id '%s': %w", policyID, err)
 	}
 	return response, nil
 }

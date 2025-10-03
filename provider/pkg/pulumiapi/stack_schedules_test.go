@@ -27,7 +27,7 @@ var createDriftScheduleReq = CreateDriftScheduleRequest{
 	ScheduleCron:  cron,
 	AutoRemediate: true,
 }
-var createTtlScheduleReq = CreateTtlScheduleRequest{
+var createTTLScheduleReq = CreateTTLScheduleRequest{
 	Timestamp:          timestamp,
 	DeleteAfterDestroy: true,
 }
@@ -277,18 +277,18 @@ func TestUpdateDriftSchedule(t *testing.T) {
 	})
 }
 
-func TestCreateTtlSchedule(t *testing.T) {
+func TestCreateTTLSchedule(t *testing.T) {
 
 	t.Run("Happy Path", func(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqPath:   "/api/stacks/org/project/stack/deployments/ttl/schedules",
-			ExpectedReqBody:   createTtlScheduleReq,
+			ExpectedReqBody:   createTTLScheduleReq,
 			ResponseCode:      201,
 			ResponseBody:      testResponse,
 		})
 		defer cleanup()
-		expectedScheduleID, err := c.CreateTtlSchedule(ctx, testStack, createTtlScheduleReq)
+		expectedScheduleID, err := c.CreateTTLSchedule(ctx, testStack, createTTLScheduleReq)
 		assert.NoError(t, err)
 		assert.Equal(t, testScheduleID, *expectedScheduleID)
 	})
@@ -297,14 +297,14 @@ func TestCreateTtlSchedule(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqPath:   "/api/stacks/org/project/stack/deployments/ttl/schedules",
-			ExpectedReqBody:   createTtlScheduleReq,
+			ExpectedReqBody:   createTTLScheduleReq,
 			ResponseCode:      401,
 			ResponseBody: ErrorResponse{
 				Message: "unauthorized",
 			},
 		})
 		defer cleanup()
-		expectedScheduleID, err := c.CreateTtlSchedule(ctx, testStack, createTtlScheduleReq)
+		expectedScheduleID, err := c.CreateTTLSchedule(ctx, testStack, createTTLScheduleReq)
 		assert.Nil(t, expectedScheduleID, "ttl schedule should be nil since error was returned")
 		assert.EqualError(t, err,
 			"failed to create ttl schedule (timestamp="+timestamp.String()+", deleteAfterDestroy=true): "+
@@ -312,18 +312,18 @@ func TestCreateTtlSchedule(t *testing.T) {
 	})
 }
 
-func TestUpdateTtlSchedule(t *testing.T) {
+func TestUpdateTTLSchedule(t *testing.T) {
 
 	t.Run("Happy Path", func(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqPath:   "/api/stacks/org/project/stack/deployments/ttl/schedules/" + testScheduleID,
-			ExpectedReqBody:   createTtlScheduleReq,
+			ExpectedReqBody:   createTTLScheduleReq,
 			ResponseCode:      201,
 			ResponseBody:      testResponse,
 		})
 		defer cleanup()
-		expectedScheduleID, err := c.UpdateTtlSchedule(ctx, testStack, createTtlScheduleReq, testScheduleID)
+		expectedScheduleID, err := c.UpdateTTLSchedule(ctx, testStack, createTTLScheduleReq, testScheduleID)
 		assert.NoError(t, err)
 		assert.Equal(t, testScheduleID, *expectedScheduleID)
 	})
@@ -332,14 +332,14 @@ func TestUpdateTtlSchedule(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqPath:   "/api/stacks/org/project/stack/deployments/ttl/schedules/" + testScheduleID,
-			ExpectedReqBody:   createTtlScheduleReq,
+			ExpectedReqBody:   createTTLScheduleReq,
 			ResponseCode:      401,
 			ResponseBody: ErrorResponse{
 				Message: "unauthorized",
 			},
 		})
 		defer cleanup()
-		expectedScheduleID, err := c.UpdateTtlSchedule(ctx, testStack, createTtlScheduleReq, testScheduleID)
+		expectedScheduleID, err := c.UpdateTTLSchedule(ctx, testStack, createTTLScheduleReq, testScheduleID)
 		assert.Nil(t, expectedScheduleID, "scheduleId should be nil since error was returned")
 		assert.EqualError(
 			t,

@@ -19,68 +19,68 @@ type ScheduleClientMock struct {
 }
 
 func (c *ScheduleClientMock) GetStackSchedule(
-	ctx context.Context,
-	stack pulumiapi.StackIdentifier,
-	scheduleID string,
+	_ context.Context,
+	_ /* stack */ pulumiapi.StackIdentifier,
+	_ /* scheduleID */ string,
 ) (*pulumiapi.StackScheduleResponse, error) {
 	return c.getDeploymentScheduleFunc()
 }
 
 func (c *ScheduleClientMock) CreateDeploymentSchedule(
-	ctx context.Context,
-	stack pulumiapi.StackIdentifier,
-	req pulumiapi.CreateDeploymentScheduleRequest,
+	_ context.Context,
+	_ /* stack */ pulumiapi.StackIdentifier,
+	_ /* req */ pulumiapi.CreateDeploymentScheduleRequest,
 ) (*string, error) {
 	return nil, nil
 }
 
 func (c *ScheduleClientMock) CreateDriftSchedule(
-	ctx context.Context,
-	stack pulumiapi.StackIdentifier,
-	req pulumiapi.CreateDriftScheduleRequest,
+	_ context.Context,
+	_ /* stack */ pulumiapi.StackIdentifier,
+	_ /* req */ pulumiapi.CreateDriftScheduleRequest,
 ) (*string, error) {
 	return nil, nil
 }
 
-func (c *ScheduleClientMock) CreateTtlSchedule(
-	ctx context.Context,
-	stack pulumiapi.StackIdentifier,
-	req pulumiapi.CreateTtlScheduleRequest,
+func (c *ScheduleClientMock) CreateTTLSchedule(
+	_ context.Context,
+	_ /* stack */ pulumiapi.StackIdentifier,
+	_ /* req */ pulumiapi.CreateTTLScheduleRequest,
 ) (*string, error) {
 	return nil, nil
 }
 
 func (c *ScheduleClientMock) UpdateDeploymentSchedule(
-	ctx context.Context,
-	stack pulumiapi.StackIdentifier,
-	req pulumiapi.CreateDeploymentScheduleRequest,
-	scheduleID string,
+	_ context.Context,
+	_ /* stack */ pulumiapi.StackIdentifier,
+	_ /* req */ pulumiapi.CreateDeploymentScheduleRequest,
+	_ /* scheduleID */ string,
 ) (*string, error) {
 	return nil, nil
 }
 
 func (c *ScheduleClientMock) UpdateDriftSchedule(
-	ctx context.Context,
-	stack pulumiapi.StackIdentifier,
-	req pulumiapi.CreateDriftScheduleRequest,
-	scheduleID string,
+	_ context.Context,
+	_ /* stack */ pulumiapi.StackIdentifier,
+	_ /* req */ pulumiapi.CreateDriftScheduleRequest,
+	_ /* scheduleID */ string,
 ) (*string, error) {
 	return nil, nil
 }
 
-func (c *ScheduleClientMock) UpdateTtlSchedule(
-	ctx context.Context,
-	stack pulumiapi.StackIdentifier,
-	req pulumiapi.CreateTtlScheduleRequest,
-	scheduleID string,
+func (c *ScheduleClientMock) UpdateTTLSchedule(
+	_ context.Context,
+	_ /* stack */ pulumiapi.StackIdentifier,
+	_ /* req */ pulumiapi.CreateTTLScheduleRequest,
+	_ /* scheduleID */ string,
 ) (*string, error) {
 	return nil, nil
 }
 
 func (c *ScheduleClientMock) DeleteStackSchedule(
-	ctx context.Context,
-	stack pulumiapi.StackIdentifier,
-	scheduleID string,
+	_ context.Context,
+	_ /* stack */ pulumiapi.StackIdentifier,
+	_ /* scheduleID */ string,
 ) error {
 	return nil
 }
@@ -114,7 +114,7 @@ func TestDeploymentSchedule(t *testing.T) {
 		scheduleID := "fake-schedule-id"
 
 		outputProperties, _ := plugin.MarshalProperties(
-			AddScheduleIdToPropertyMap(scheduleID, input.ToPropertyMap()),
+			AddScheduleIDToPropertyMap(scheduleID, input.ToPropertyMap()),
 			plugin.MarshalOptions{
 				KeepUnknowns: true,
 				SkipNulls:    true,
@@ -172,7 +172,7 @@ func TestDeploymentSchedule(t *testing.T) {
 		scheduleID := "fake-schedule-id"
 
 		outputProperties, _ := plugin.MarshalProperties(
-			AddScheduleIdToPropertyMap(scheduleID, input.ToPropertyMap()),
+			AddScheduleIDToPropertyMap(scheduleID, input.ToPropertyMap()),
 			plugin.MarshalOptions{
 				KeepUnknowns: true,
 				SkipNulls:    true,

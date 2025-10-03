@@ -1,4 +1,4 @@
-package util
+package util // nolint:revive // util is a common and acceptable package name
 
 import (
 	"fmt"

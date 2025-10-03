@@ -47,8 +47,8 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(
 	pm["project"] = resource.NewPropertyValue(ds.Stack.ProjectName)
 	pm["stack"] = resource.NewPropertyValue(ds.Stack.StackName)
 
-	if ds.AgentPoolId != "" {
-		pm["agentPoolId"] = resource.NewPropertyValue(ds.AgentPoolId)
+	if ds.AgentPoolID != "" {
+		pm["agentPoolId"] = resource.NewPropertyValue(ds.AgentPoolID)
 	}
 
 	if ds.SourceContext != nil {
@@ -329,7 +329,7 @@ func (ds *PulumiServiceDeploymentSettingsResource) ToPulumiServiceDeploymentSett
 	input.Stack.StackName = util.GetSecretOrStringValue(inputMap["stack"])
 
 	if inputMap["agentPoolId"].HasValue() {
-		input.AgentPoolId = util.GetSecretOrStringValue(inputMap["agentPoolId"])
+		input.AgentPoolID = util.GetSecretOrStringValue(inputMap["agentPoolId"])
 	}
 
 	input.ExecutorContext = toExecutorContext(inputMap)

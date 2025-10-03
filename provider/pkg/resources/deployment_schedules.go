@@ -55,7 +55,7 @@ func (i *PulumiServiceDeploymentScheduleInput) ToPropertyMap() resource.Property
 	return propertyMap
 }
 
-func AddScheduleIdToPropertyMap(scheduleID string, propertyMap resource.PropertyMap) resource.PropertyMap {
+func AddScheduleIDToPropertyMap(scheduleID string, propertyMap resource.PropertyMap) resource.PropertyMap {
 	propertyMap["scheduleId"] = resource.NewPropertyValue(scheduleID)
 	return propertyMap
 }
@@ -248,7 +248,7 @@ func (st *PulumiServiceDeploymentScheduleResource) Create(
 	}
 
 	outputProperties, err := plugin.MarshalProperties(
-		AddScheduleIdToPropertyMap(*scheduleID, input.ToPropertyMap()),
+		AddScheduleIDToPropertyMap(*scheduleID, input.ToPropertyMap()),
 		plugin.MarshalOptions{
 			KeepUnknowns: true,
 			SkipNulls:    true,
@@ -336,7 +336,7 @@ func (st *PulumiServiceDeploymentScheduleResource) Update(
 	}
 
 	outputProperties, err := plugin.MarshalProperties(
-		AddScheduleIdToPropertyMap(*scheduleID, input.ToPropertyMap()),
+		AddScheduleIDToPropertyMap(*scheduleID, input.ToPropertyMap()),
 		plugin.MarshalOptions{
 			KeepUnknowns: true,
 			SkipNulls:    true,
@@ -365,7 +365,7 @@ func (st *PulumiServiceDeploymentScheduleResource) Read(req *pulumirpc.ReadReque
 		return &pulumirpc.ReadResponse{}, nil
 	}
 
-	var scheduleOnce *time.Time = nil
+	var scheduleOnce *time.Time
 	if scheduleResponse.ScheduleOnce != nil {
 		parsed, err := time.Parse(time.DateTime, *scheduleResponse.ScheduleOnce)
 		if err != nil {
@@ -391,7 +391,7 @@ func (st *PulumiServiceDeploymentScheduleResource) Read(req *pulumirpc.ReadReque
 		return nil, fmt.Errorf("failed to read DeploymentSchedule (%q): %w", req.Id, err)
 	}
 	outputProperties, err := plugin.MarshalProperties(
-		AddScheduleIdToPropertyMap(*scheduleID, input.ToPropertyMap()),
+		AddScheduleIDToPropertyMap(*scheduleID, input.ToPropertyMap()),
 		plugin.MarshalOptions{
 			KeepUnknowns: true,
 			SkipNulls:    true,

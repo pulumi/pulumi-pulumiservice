@@ -39,7 +39,7 @@ type Member struct {
 type User struct {
 	Name        string
 	GithubLogin string
-	AvatarUrl   string
+	AvatarURL   string
 	Email       string
 }
 

@@ -16,22 +16,22 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
-type PulumiServiceTtlScheduleResource struct {
+type PulumiServiceTTLScheduleResource struct {
 	Client pulumiapi.StackScheduleClient
 }
 
-type PulumiServiceTtlScheduleInput struct {
+type PulumiServiceTTLScheduleInput struct {
 	Stack              pulumiapi.StackIdentifier
 	Timestamp          time.Time `pulumi:"timestamp"`
 	DeleteAfterDestroy bool      `pulumi:"deleteAfterDestroy"`
 }
 
-type PulumiServiceTtlScheduleOutput struct {
-	Input      PulumiServiceTtlScheduleInput
+type PulumiServiceTTLScheduleOutput struct {
+	Input      PulumiServiceTTLScheduleInput
 	ScheduleID string `pulumi:"scheduleId"`
 }
 
-func (i *PulumiServiceTtlScheduleInput) ToPropertyMap() resource.PropertyMap {
+func (i *PulumiServiceTTLScheduleInput) ToPropertyMap() resource.PropertyMap {
 	propertyMap := StackToPropertyMap(i.Stack)
 
 	propertyMap["timestamp"] = resource.NewPropertyValue(i.Timestamp.Format(time.RFC3339))
@@ -40,13 +40,13 @@ func (i *PulumiServiceTtlScheduleInput) ToPropertyMap() resource.PropertyMap {
 	return propertyMap
 }
 
-func ToPulumiServiceTtlScheduleInput(properties *structpb.Struct) (*PulumiServiceTtlScheduleInput, error) {
+func ToPulumiServiceTTLScheduleInput(properties *structpb.Struct) (*PulumiServiceTTLScheduleInput, error) {
 	inputMap, err := plugin.UnmarshalProperties(properties, plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
 	}
 
-	input := PulumiServiceTtlScheduleInput{}
+	input := PulumiServiceTTLScheduleInput{}
 	stack, err := ParseStack(inputMap)
 	if err != nil {
 		return nil, err
@@ -68,7 +68,7 @@ func ToPulumiServiceTtlScheduleInput(properties *structpb.Struct) (*PulumiServic
 	return &input, nil
 }
 
-func (st *PulumiServiceTtlScheduleResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+func (st *PulumiServiceTTLScheduleResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
 	olds, err := plugin.UnmarshalProperties(
 		req.GetOldInputs(),
 		plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true},
@@ -89,27 +89,27 @@ func (st *PulumiServiceTtlScheduleResource) Diff(req *pulumirpc.DiffRequest) (*p
 	return StackScheduleSharedDiffMaps(olds, news)
 }
 
-func (st *PulumiServiceTtlScheduleResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
+func (st *PulumiServiceTTLScheduleResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
 	return StackScheduleSharedDelete(req, st.Client)
 }
 
-func (st *PulumiServiceTtlScheduleResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
-	input, err := ToPulumiServiceTtlScheduleInput(req.GetProperties())
+func (st *PulumiServiceTTLScheduleResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
+	input, err := ToPulumiServiceTTLScheduleInput(req.GetProperties())
 	if err != nil {
 		return nil, err
 	}
 
-	scheduleReq := pulumiapi.CreateTtlScheduleRequest{
+	scheduleReq := pulumiapi.CreateTTLScheduleRequest{
 		Timestamp:          input.Timestamp,
 		DeleteAfterDestroy: input.DeleteAfterDestroy,
 	}
-	scheduleID, err := st.Client.CreateTtlSchedule(context.Background(), input.Stack, scheduleReq)
+	scheduleID, err := st.Client.CreateTTLSchedule(context.Background(), input.Stack, scheduleReq)
 	if err != nil {
 		return nil, err
 	}
 
 	outputProperties, err := plugin.MarshalProperties(
-		AddScheduleIdToPropertyMap(*scheduleID, input.ToPropertyMap()),
+		AddScheduleIDToPropertyMap(*scheduleID, input.ToPropertyMap()),
 		plugin.MarshalOptions{
 			KeepUnknowns: true,
 			SkipNulls:    true,
@@ -125,7 +125,7 @@ func (st *PulumiServiceTtlScheduleResource) Create(req *pulumirpc.CreateRequest)
 	}, nil
 }
 
-func (st *PulumiServiceTtlScheduleResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
+func (st *PulumiServiceTTLScheduleResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
 	inputMap, err := plugin.UnmarshalProperties(
 		req.GetNews(),
 		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
@@ -154,21 +154,21 @@ func (st *PulumiServiceTtlScheduleResource) Check(req *pulumirpc.CheckRequest) (
 	return &pulumirpc.CheckResponse{Inputs: req.GetNews(), Failures: failures}, nil
 }
 
-func (st *PulumiServiceTtlScheduleResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+func (st *PulumiServiceTTLScheduleResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
 	previousOutput, err := ToPulumiServiceStackScheduleOutput(req.GetOlds())
 	if err != nil {
 		return nil, err
 	}
-	input, err := ToPulumiServiceTtlScheduleInput(req.GetNews())
+	input, err := ToPulumiServiceTTLScheduleInput(req.GetNews())
 	if err != nil {
 		return nil, err
 	}
 
-	updateReq := pulumiapi.CreateTtlScheduleRequest{
+	updateReq := pulumiapi.CreateTTLScheduleRequest{
 		Timestamp:          input.Timestamp,
 		DeleteAfterDestroy: input.DeleteAfterDestroy,
 	}
-	scheduleID, err := st.Client.UpdateTtlSchedule(
+	scheduleID, err := st.Client.UpdateTTLSchedule(
 		context.Background(),
 		input.Stack,
 		updateReq,
@@ -179,7 +179,7 @@ func (st *PulumiServiceTtlScheduleResource) Update(req *pulumirpc.UpdateRequest)
 	}
 
 	outputProperties, err := plugin.MarshalProperties(
-		AddScheduleIdToPropertyMap(*scheduleID, input.ToPropertyMap()),
+		AddScheduleIDToPropertyMap(*scheduleID, input.ToPropertyMap()),
 		plugin.MarshalOptions{
 			KeepUnknowns: true,
 			SkipNulls:    true,
@@ -193,7 +193,7 @@ func (st *PulumiServiceTtlScheduleResource) Update(req *pulumirpc.UpdateRequest)
 	}, nil
 }
 
-func (st *PulumiServiceTtlScheduleResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
+func (st *PulumiServiceTTLScheduleResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
 	stack, scheduleID, err := ParseStackScheduleID(req.Id, "ttl")
 	if err != nil {
 		return nil, err
@@ -212,7 +212,7 @@ func (st *PulumiServiceTtlScheduleResource) Read(req *pulumirpc.ReadRequest) (*p
 	if err != nil {
 		return nil, fmt.Errorf("failed to read DeploymentSchedule (%q): %w", req.Id, err)
 	}
-	input := PulumiServiceTtlScheduleInput{
+	input := PulumiServiceTTLScheduleInput{
 		Stack:              *stack,
 		Timestamp:          timestamp,
 		DeleteAfterDestroy: scheduleResponse.Definition.Request.OperationContext.Options.DeleteAfterDestroy,
@@ -229,7 +229,7 @@ func (st *PulumiServiceTtlScheduleResource) Read(req *pulumirpc.ReadRequest) (*p
 		return nil, fmt.Errorf("failed to read TtlSchedule (%q): %w", req.Id, err)
 	}
 	outputProperties, err := plugin.MarshalProperties(
-		AddScheduleIdToPropertyMap(*scheduleID, input.ToPropertyMap()),
+		AddScheduleIDToPropertyMap(*scheduleID, input.ToPropertyMap()),
 		plugin.MarshalOptions{
 			KeepUnknowns: true,
 			SkipNulls:    true,
@@ -246,6 +246,6 @@ func (st *PulumiServiceTtlScheduleResource) Read(req *pulumirpc.ReadRequest) (*p
 	}, nil
 }
 
-func (st *PulumiServiceTtlScheduleResource) Name() string {
+func (st *PulumiServiceTTLScheduleResource) Name() string {
 	return "pulumiservice:index:TtlSchedule"
 }
