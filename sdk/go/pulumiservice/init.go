@@ -43,6 +43,8 @@ func (m *module) Construct(ctx *pulumi.Context, name, typ, urn string) (r pulumi
 		r = &OidcIssuer{}
 	case "pulumiservice:index:OrgAccessToken":
 		r = &OrgAccessToken{}
+	case "pulumiservice:index:PackageVersion":
+		r = &PackageVersion{}
 	case "pulumiservice:index:Stack":
 		r = &Stack{}
 	case "pulumiservice:index:StackTag":

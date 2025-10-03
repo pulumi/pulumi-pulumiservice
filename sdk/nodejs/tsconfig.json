@@ -27,6 +27,7 @@
         "index.ts",
         "oidcIssuer.ts",
         "orgAccessToken.ts",
+        "packageVersion.ts",
         "provider.ts",
         "stack.ts",
         "stackTag.ts",

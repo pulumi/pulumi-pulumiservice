@@ -1,0 +1,82 @@
+name: pulumi-service-package-version-example-yaml
+runtime: yaml
+description: An example of publishing a package version to the Pulumi Registry using YAML
+resources:
+  example-package:
+    type: pulumiservice:index:PackageVersion
+    properties:
+      source: pulumi
+      publisher: service-provider-test-org
+      name: example-component-${digits}
+      version: 1.0.0
+      schemaContent: |
+        {
+          "name": "example-component",
+          "version": "1.0.0",
+          "description": "An example component package",
+          "keywords": ["pulumi", "component", "example"],
+          "homepage": "https://github.com/example/example-component",
+          "repository": "https://github.com/example/example-component",
+          "license": "Apache-2.0",
+          "pluginDownloadURL": "github://api.github.com/example/example-component",
+          "publisher": "Example Org",
+          "meta": {
+            "moduleFormat": "(.*)(?:/[^/]*)"
+          },
+          "language": {
+            "nodejs": {
+              "packageName": "@example/example-component",
+              "packageDescription": "An example Pulumi component",
+              "readme": "Example component for demonstration purposes",
+              "dependencies": {
+                "@pulumi/pulumi": "^3.0.0"
+              },
+              "devDependencies": {
+                "typescript": "^4.0.0"
+              }
+            }
+          },
+          "config": {},
+          "types": {},
+          "provider": {},
+          "resources": {
+            "example-component:index:ExampleResource": {
+              "isComponent": true,
+              "inputProperties": {
+                "name": {
+                  "type": "string",
+                  "description": "The name of the resource"
+                }
+              },
+              "requiredInputs": ["name"],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "The name of the resource"
+                }
+              },
+              "required": ["name"]
+            }
+          },
+          "functions": {}
+        }
+      indexContent: |
+        {
+          "version": "1.0.0",
+          "modules": {
+            "example-component": {
+              "resources": ["ExampleResource"]
+            }
+          }
+        }
+      installationConfigContent: |
+        {
+          "version": "1.0.0",
+          "packageManager": "npm"
+        }
+      packageStatus: ga
+      visibility: private
+outputs:
+  packageId: ${example-package.source}/${example-package.publisher}/${example-package.name}@${example-package.version}
+  readmeURL: ${example-package.readmeURL}
+  schemaURL: ${example-package.schemaURL}
