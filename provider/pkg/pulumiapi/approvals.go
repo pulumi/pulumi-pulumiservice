@@ -11,6 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+// Package pulumiapi provides clients for interacting with the Pulumi Service API.
 package pulumiapi
 
 import (
@@ -20,16 +22,22 @@ import (
 	"path"
 )
 
-// In the future we might have different approval rule entities, for now it's only Environments
-// Because the API routes require envIdentifiers, I'm making these methods specific, but in the future
-// we might want to generalize them
+// ApprovalRuleClient provides methods for managing approval rules.
+// In the future we might have different approval rule entities, for now it's only Environments.
+// Because the API routes require envIdentifiers, I'm making these methods specific,
+// but in the future we might want to generalize them.
 type ApprovalRuleClient interface {
-	CreateEnvironmentApprovalRule(ctx context.Context, orgName string, req CreateApprovalRuleRequest) (*ApprovalRule, error)
-	GetEnvironmentApprovalRule(ctx context.Context, orgName string, ruleId string) (*ApprovalRule, error)
-	UpdateEnvironmentApprovalRule(ctx context.Context, orgName string, ruleId string, req UpdateApprovalRuleRequest) (*ApprovalRule, error)
-	DeleteEnvironmentApprovalRule(ctx context.Context, orgName string, ruleId string) error
+	CreateEnvironmentApprovalRule(
+		ctx context.Context, orgName string, req CreateApprovalRuleRequest,
+	) (*ApprovalRule, error)
+	GetEnvironmentApprovalRule(ctx context.Context, orgName string, ruleID string) (*ApprovalRule, error)
+	UpdateEnvironmentApprovalRule(
+		ctx context.Context, orgName string, ruleID string, req UpdateApprovalRuleRequest,
+	) (*ApprovalRule, error)
+	DeleteEnvironmentApprovalRule(ctx context.Context, orgName string, ruleID string) error
 }
 
+// ApprovalRule represents an approval rule in Pulumi Service.
 type ApprovalRule struct {
 	ID        string                  `json:"id"`
 	Name      string                  `json:"name"`
@@ -40,6 +48,7 @@ type ApprovalRule struct {
 	Target    *ChangeGateTargetOutput `json:"target,omitempty"`
 }
 
+// ApprovalRuleInput represents the input for creating or updating an approval rule.
 type ApprovalRuleInput struct {
 	NumApprovalsRequired      int                `json:"numApprovalsRequired"`
 	AllowSelfApproval         bool               `json:"allowSelfApproval"`
@@ -47,14 +56,19 @@ type ApprovalRuleInput struct {
 	EligibleApprovers         []EligibleApprover `json:"eligibleApprovers"`
 }
 
+// ApprovalRuleEligibilityType defines the type of eligibility for an approver.
 type ApprovalRuleEligibilityType string
 
 const (
-	ApprovalRuleEligibilityTypeTeam       ApprovalRuleEligibilityType = "team_member"
-	ApprovalRuleEligibilityTypeUser       ApprovalRuleEligibilityType = "specific_user"
+	// ApprovalRuleEligibilityTypeTeam indicates team member eligibility.
+	ApprovalRuleEligibilityTypeTeam ApprovalRuleEligibilityType = "team_member"
+	// ApprovalRuleEligibilityTypeUser indicates specific user eligibility.
+	ApprovalRuleEligibilityTypeUser ApprovalRuleEligibilityType = "specific_user"
+	// ApprovalRuleEligibilityTypePermission indicates permission-based eligibility.
 	ApprovalRuleEligibilityTypePermission ApprovalRuleEligibilityType = "has_permission_on_target"
 )
 
+// EligibleApprover represents an entity eligible to approve.
 type EligibleApprover struct {
 	EligibilityType ApprovalRuleEligibilityType `json:"eligibilityType"`
 	TeamName        string                      `json:"teamName,omitempty"`
@@ -62,6 +76,7 @@ type EligibleApprover struct {
 	RbacPermission  string                      `json:"permission,omitempty"`
 }
 
+// EligibleApproverOutput represents an eligible approver in API responses.
 type EligibleApproverOutput struct {
 	EligibilityType ApprovalRuleEligibilityType `json:"eligibilityType"`
 	TeamName        string                      `json:"name,omitempty"`
@@ -69,6 +84,7 @@ type EligibleApproverOutput struct {
 	RbacPermission  string                      `json:"permission,omitempty"`
 }
 
+// UserInfo represents user information in approval contexts.
 type UserInfo struct {
 	Name        string `json:"name"`
 	GithubLogin string `json:"githubLogin"`
@@ -83,6 +99,7 @@ func (out EligibleApproverOutput) toApprover() EligibleApprover {
 	}
 }
 
+// ToApprovers converts a slice of EligibleApproverOutput to EligibleApprover.
 func ToApprovers(input []EligibleApproverOutput) []EligibleApprover {
 	approvers := []EligibleApprover{}
 	for _, approver := range input {
@@ -91,6 +108,7 @@ func ToApprovers(input []EligibleApproverOutput) []EligibleApprover {
 	return approvers
 }
 
+// CreateApprovalRuleRequest represents a request to create an approval rule.
 type CreateApprovalRuleRequest struct {
 	Name    string                `json:"name"`
 	Enabled bool                  `json:"enabled"`
@@ -98,6 +116,7 @@ type CreateApprovalRuleRequest struct {
 	Target  ChangeGateTargetInput `json:"target"`
 }
 
+// UpdateApprovalRuleRequest represents a request to update an approval rule.
 type UpdateApprovalRuleRequest struct {
 	Name    string                `json:"name"`
 	Enabled bool                  `json:"enabled"`
@@ -105,18 +124,22 @@ type UpdateApprovalRuleRequest struct {
 	Target  ChangeGateTargetInput `json:"target"`
 }
 
+// ChangeGateTargetInput represents the target for a change gate rule.
 type ChangeGateTargetInput struct {
 	ActionTypes   []string `json:"actionTypes"`
 	EntityType    string   `json:"entityType"`
 	QualifiedName string   `json:"qualifiedName"`
 }
 
+// ApprovalRuleType defines the type of approval rule.
 type ApprovalRuleType string
 
 const (
+	// ChangeGateRuleTypeApproval indicates an approval-based change gate.
 	ChangeGateRuleTypeApproval ApprovalRuleType = "approval_required"
 )
 
+// ChangeGateRuleInput represents input for a change gate rule.
 type ChangeGateRuleInput struct {
 	RuleType                  ApprovalRuleType   `json:"ruleType"`
 	NumApprovalsRequired      int                `json:"numApprovalsRequired"`
@@ -125,6 +148,7 @@ type ChangeGateRuleInput struct {
 	EligibleApprovers         []EligibleApprover `json:"eligibleApprovers"`
 }
 
+// ChangeGateRuleOutput represents output from a change gate rule.
 type ChangeGateRuleOutput struct {
 	NumApprovalsRequired      int                      `json:"numApprovalsRequired"`
 	AllowSelfApproval         bool                     `json:"allowSelfApproval"`
@@ -132,6 +156,7 @@ type ChangeGateRuleOutput struct {
 	EligibleApproverOutputs   []EligibleApproverOutput `json:"eligibleApprovers"`
 }
 
+// ChangeGateTargetOutput represents the target output of a change gate.
 type ChangeGateTargetOutput struct {
 	ActionTypes   []string                    `json:"actionTypes"`
 	QualifiedName string                      `json:"qualifiedName"`
@@ -139,16 +164,21 @@ type ChangeGateTargetOutput struct {
 	EntityInfo    *ChangeGateTargetEntityInfo `json:"entityInfo,omitempty"`
 }
 
+// ChangeGateTargetEntityInfo represents entity information for a change gate target.
 type ChangeGateTargetEntityInfo struct {
 	Environment *EnvironmentEntity `json:"environment,omitempty"`
 }
 
+// EnvironmentEntity represents an environment entity in a change gate.
 type EnvironmentEntity struct {
 	Project string `json:"project"`
 	Name    string `json:"name"`
 }
 
-func (c *Client) CreateEnvironmentApprovalRule(ctx context.Context, orgName string, req CreateApprovalRuleRequest) (*ApprovalRule, error) {
+// CreateEnvironmentApprovalRule creates an approval rule for an environment.
+func (c *Client) CreateEnvironmentApprovalRule(
+	ctx context.Context, orgName string, req CreateApprovalRuleRequest,
+) (*ApprovalRule, error) {
 	apiPath := path.Join("change-gates", orgName)
 
 	var rule ApprovalRule
@@ -160,8 +190,9 @@ func (c *Client) CreateEnvironmentApprovalRule(ctx context.Context, orgName stri
 	return &rule, nil
 }
 
-func (c *Client) GetEnvironmentApprovalRule(ctx context.Context, orgName string, ruleId string) (*ApprovalRule, error) {
-	apiPath := path.Join("change-gates", orgName, ruleId)
+// GetEnvironmentApprovalRule retrieves an approval rule by ID.
+func (c *Client) GetEnvironmentApprovalRule(ctx context.Context, orgName string, ruleID string) (*ApprovalRule, error) {
+	apiPath := path.Join("change-gates", orgName, ruleID)
 
 	var rule ApprovalRule
 	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &rule)
@@ -172,8 +203,11 @@ func (c *Client) GetEnvironmentApprovalRule(ctx context.Context, orgName string,
 	return &rule, nil
 }
 
-func (c *Client) UpdateEnvironmentApprovalRule(ctx context.Context, orgName string, ruleId string, req UpdateApprovalRuleRequest) (*ApprovalRule, error) {
-	apiPath := path.Join("change-gates", orgName, ruleId)
+// UpdateEnvironmentApprovalRule updates an existing approval rule.
+func (c *Client) UpdateEnvironmentApprovalRule(
+	ctx context.Context, orgName string, ruleID string, req UpdateApprovalRuleRequest,
+) (*ApprovalRule, error) {
+	apiPath := path.Join("change-gates", orgName, ruleID)
 
 	var rule ApprovalRule
 	_, err := c.do(ctx, http.MethodPut, apiPath, req, &rule)
@@ -184,8 +218,9 @@ func (c *Client) UpdateEnvironmentApprovalRule(ctx context.Context, orgName stri
 	return &rule, nil
 }
 
-func (c *Client) DeleteEnvironmentApprovalRule(ctx context.Context, orgName string, ruleId string) error {
-	apiPath := path.Join("change-gates", orgName, ruleId)
+// DeleteEnvironmentApprovalRule deletes an approval rule.
+func (c *Client) DeleteEnvironmentApprovalRule(ctx context.Context, orgName string, ruleID string) error {
+	apiPath := path.Join("change-gates", orgName, ruleID)
 
 	result, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
 	if err != nil {

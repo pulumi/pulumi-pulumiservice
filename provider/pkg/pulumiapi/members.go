@@ -22,10 +22,12 @@ import (
 	"path"
 )
 
+// Members represents a collection of organization members.
 type Members struct {
 	Members []Member
 }
 
+// Member represents an organization member with their role and user information.
 type Member struct {
 	Role          string
 	User          User
@@ -33,6 +35,7 @@ type Member struct {
 	VirtualAdmin  bool
 }
 
+// User represents a Pulumi Service user.
 type User struct {
 	Name        string
 	GithubLogin string
@@ -44,6 +47,7 @@ type addMemberToOrgReq struct {
 	Role string `json:"role"`
 }
 
+// AddMemberToOrg adds a user to an organization with the specified role.
 func (c *Client) AddMemberToOrg(ctx context.Context, userName string, orgName string, role string) error {
 
 	if len(userName) == 0 {
@@ -71,6 +75,7 @@ func (c *Client) AddMemberToOrg(ctx context.Context, userName string, orgName st
 	return nil
 }
 
+// ListOrgMembers lists all members of an organization.
 func (c *Client) ListOrgMembers(ctx context.Context, orgName string) (*Members, error) {
 	if len(orgName) == 0 {
 		return nil, errors.New("empty orgName")
@@ -88,6 +93,7 @@ func (c *Client) ListOrgMembers(ctx context.Context, orgName string) (*Members, 
 
 }
 
+// DeleteMemberFromOrg removes a user from an organization.
 func (c *Client) DeleteMemberFromOrg(ctx context.Context, orgName string, userName string) error {
 	if len(orgName) == 0 {
 		return errors.New("orgName must not be empty")

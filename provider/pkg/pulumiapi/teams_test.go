@@ -9,8 +9,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const (
+	testTeamName    = "a-team"
+	testTeamOrgName = "an-organization"
+)
+
 func TestListTeams(t *testing.T) {
-	orgName := "an-organization"
+	orgName := testTeamOrgName
 	member1 := TeamMember{
 		Name: "member1",
 	}
@@ -56,8 +61,8 @@ func TestListTeams(t *testing.T) {
 }
 
 func TestGetTeam(t *testing.T) {
-	orgName := "an-organization"
-	teamName := "a-team"
+	orgName := testTeamOrgName
+	teamName := testTeamName
 	team := Team{
 		Type:        "pulumi",
 		Name:        teamName,
@@ -114,8 +119,8 @@ func TestGetTeam(t *testing.T) {
 }
 
 func TestCreateTeam(t *testing.T) {
-	orgName := "an-organization"
-	teamName := "a-team"
+	orgName := testTeamOrgName
+	teamName := testTeamName
 	displayName := "A Team"
 	description := "The A Team"
 	t.Run("Happy Path (pulumi team)", func(t *testing.T) {
@@ -214,8 +219,8 @@ func TestCreateTeam(t *testing.T) {
 }
 
 func TestAddMemberToTeam(t *testing.T) {
-	orgName := "an-organization"
-	teamName := "a-team"
+	orgName := testTeamOrgName
+	teamName := testTeamName
 	userName := "a-user"
 	t.Run("Happy Path", func(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
@@ -253,9 +258,9 @@ func TestAddMemberToTeam(t *testing.T) {
 }
 
 func TestAddStackPermission(t *testing.T) {
-	teamName := "a-team"
+	teamName := testTeamName
 	stack := StackIdentifier{
-		OrgName:     "an-organization",
+		OrgName:     testTeamOrgName,
 		ProjectName: "a-project",
 		StackName:   "a-stack",
 	}
@@ -279,9 +284,9 @@ func TestAddStackPermission(t *testing.T) {
 }
 
 func TestRemoveStackPermission(t *testing.T) {
-	teamName := "a-team"
+	teamName := testTeamName
 	stack := StackIdentifier{
-		OrgName:     "an-organization",
+		OrgName:     testTeamOrgName,
 		ProjectName: "a-project",
 		StackName:   "a-stack",
 	}
@@ -303,9 +308,9 @@ func TestRemoveStackPermission(t *testing.T) {
 }
 
 func TestAddEnvironmentPermission(t *testing.T) {
-	teamName := "a-team"
+	teamName := testTeamName
 	permission := "admin"
-	organization := "an-organization"
+	organization := testTeamOrgName
 	project := "a-project"
 	environment := "an-environment"
 	t.Run("Happy Path", func(t *testing.T) {
@@ -337,8 +342,8 @@ func TestAddEnvironmentPermission(t *testing.T) {
 }
 
 func TestRemoveEnvironmentPermission(t *testing.T) {
-	teamName := "a-team"
-	organization := "an-organization"
+	teamName := testTeamName
+	organization := testTeamOrgName
 	project := "a-project"
 	environment := "an-environment"
 	t.Run("Happy Path", func(t *testing.T) {

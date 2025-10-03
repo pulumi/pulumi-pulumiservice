@@ -21,10 +21,12 @@ import (
 	"path"
 )
 
+// TeamClient provides methods for managing teams in Pulumi Service.
 type TeamClient interface {
 	ListTeams(ctx context.Context, orgName string) ([]Team, error)
 	GetTeam(ctx context.Context, orgName string, teamName string) (*Team, error)
-	CreateTeam(ctx context.Context, orgName, teamName, teamType, displayName, description string, teamID int64) (*Team, error)
+	CreateTeam(ctx context.Context, orgName, teamName, teamType, displayName, description string,
+		teamID int64) (*Team, error)
 	UpdateTeam(ctx context.Context, orgName, teamName, displayName, description string) error
 	DeleteTeam(ctx context.Context, orgName, teamName string) error
 	AddMemberToTeam(ctx context.Context, orgName, teamName, userName string) error
@@ -37,10 +39,12 @@ type TeamClient interface {
 	GetTeamEnvironmentSettings(ctx context.Context, req TeamEnvironmentSettingsRequest) (*string, *Duration, error)
 }
 
+// Teams represents a collection of teams.
 type Teams struct {
 	Teams []Team
 }
 
+// Team represents a Pulumi Service team with its members, stack permissions, and environment settings.
 type Team struct {
 	Type         string `json:"kind"`
 	Name         string
@@ -51,19 +55,22 @@ type Team struct {
 	Environments []TeamEnvironmentSettings
 }
 
+// TeamMember represents a member of a team.
 type TeamMember struct {
 	Name        string
 	GithubLogin string
-	AvatarUrl   string
+	AvatarURL   string
 	Role        string
 }
 
+// TeamStackPermission represents stack permissions for a team.
 type TeamStackPermission struct {
 	ProjectName string `json:"projectName"`
 	StackName   string `json:"stackName"`
 	Permission  int    `json:"permission"`
 }
 
+// TeamEnvironmentSettings represents environment permissions for a team.
 type TeamEnvironmentSettings struct {
 	EnvName         string    `json:"envName"`
 	ProjectName     string    `json:"projectName"`
@@ -90,6 +97,7 @@ type updateTeamMembershipRequest struct {
 	Member       string `json:"member"`
 }
 
+// AddStackPermission represents a request to add stack permissions to a team.
 type AddStackPermission struct {
 	ProjectName string `json:"projectName"`
 	StackName   string `json:"stackName"`
@@ -100,6 +108,7 @@ type addStackPermissionRequest struct {
 	AddStackPermission AddStackPermission `json:"addStackPermission"`
 }
 
+// RemoveStackPermission represents a request to remove stack permissions from a team.
 type RemoveStackPermission struct {
 	ProjectName string `json:"projectName"`
 	StackName   string `json:"stackName"`
@@ -109,12 +118,14 @@ type removeStackPermissionRequest struct {
 	RemoveStackPermission RemoveStackPermission `json:"removeStack"`
 }
 
+// CreateTeamEnvironmentSettingsRequest represents a request to create team environment settings.
 type CreateTeamEnvironmentSettingsRequest struct {
 	TeamEnvironmentSettingsRequest
 	Permission      string    `json:"permission,omitempty"`
 	MaxOpenDuration *Duration `json:"maxOpenDuration,omitempty"`
 }
 
+// TeamEnvironmentSettingsRequest represents a request for team environment settings operations.
 type TeamEnvironmentSettingsRequest struct {
 	Organization string `json:"organization,omitempty"`
 	Team         string `json:"team,omitempty"`
@@ -122,6 +133,7 @@ type TeamEnvironmentSettingsRequest struct {
 	Project      string `json:"project,omitempty"`
 }
 
+// AddEnvironmentPermission represents a request to add environment permissions to a team.
 type AddEnvironmentPermission struct {
 	EnvName         string    `json:"envName"`
 	ProjectName     string    `json:"projectName"`
@@ -133,6 +145,7 @@ type addEnvironmentSettingsRequest struct {
 	AddEnvironmentPermission AddEnvironmentPermission `json:"addEnvironmentPermission"`
 }
 
+// RemoveEnvironmentPermission represents a request to remove environment permissions from a team.
 type RemoveEnvironmentPermission struct {
 	EnvName     string `json:"envName"`
 	ProjectName string `json:"projectName"`
@@ -142,21 +155,23 @@ type removeEnvironmentPermissionRequest struct {
 	RemoveEnvironment RemoveEnvironmentPermission `json:"removeEnvironment"`
 }
 
+// ListTeams lists all teams in the specified organization.
 func (c *Client) ListTeams(ctx context.Context, orgName string) ([]Team, error) {
 	if len(orgName) == 0 {
 		return nil, errors.New("empty orgName")
 	}
 
-	apiUrl := path.Join("orgs", orgName, "teams")
+	apiURL := path.Join("orgs", orgName, "teams")
 
 	var teamArray Teams
-	_, err := c.do(ctx, http.MethodGet, apiUrl, nil, &teamArray)
+	_, err := c.do(ctx, http.MethodGet, apiURL, nil, &teamArray)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list teams for %q: %w", orgName, err)
 	}
 	return teamArray.Teams, nil
 }
 
+// GetTeam retrieves details about a specific team in an organization.
 func (c *Client) GetTeam(ctx context.Context, orgName string, teamName string) (*Team, error) {
 	if len(orgName) == 0 {
 		return nil, errors.New("empty orgName")
@@ -182,7 +197,10 @@ func (c *Client) GetTeam(ctx context.Context, orgName string, teamName string) (
 	return &team, nil
 }
 
-func (c *Client) CreateTeam(ctx context.Context, orgName, teamName, teamType, displayName, description string, teamID int64) (*Team, error) {
+// CreateTeam creates a new team in the specified organization.
+func (c *Client) CreateTeam(
+	ctx context.Context, orgName, teamName, teamType, displayName, description string, teamID int64,
+) (*Team, error) {
 	teamtypeList := []string{"github", "pulumi"}
 	if !contains(teamtypeList, teamType) {
 		return nil, fmt.Errorf("teamtype must be one of %v, got %q", teamtypeList, teamType)
@@ -220,6 +238,7 @@ func (c *Client) CreateTeam(ctx context.Context, orgName, teamName, teamType, di
 	return &team, nil
 }
 
+// UpdateTeam updates a team's display name and description.
 func (c *Client) UpdateTeam(ctx context.Context, orgName, teamName, displayName, description string) error {
 	if len(orgName) == 0 {
 		return errors.New("orgname must not be empty")
@@ -243,6 +262,7 @@ func (c *Client) UpdateTeam(ctx context.Context, orgName, teamName, displayName,
 	return nil
 }
 
+// DeleteTeam deletes a team from an organization.
 func (c *Client) DeleteTeam(ctx context.Context, orgName, teamName string) error {
 	if len(orgName) == 0 {
 		return errors.New("orgname must not be empty")
@@ -293,6 +313,7 @@ func (c *Client) updateTeamMembership(ctx context.Context, orgName, teamName, us
 	return nil
 }
 
+// AddMemberToTeam adds a user to a team.
 func (c *Client) AddMemberToTeam(ctx context.Context, orgName, teamName, userName string) error {
 	err := c.updateTeamMembership(ctx, orgName, teamName, userName, "add")
 	if err != nil {
@@ -307,6 +328,7 @@ func (c *Client) AddMemberToTeam(ctx context.Context, orgName, teamName, userNam
 	}
 }
 
+// DeleteMemberFromTeam removes a user from a team.
 func (c *Client) DeleteMemberFromTeam(ctx context.Context, orgName, teamName, userName string) error {
 	err := c.updateTeamMembership(ctx, orgName, teamName, userName, "remove")
 	if err != nil {
@@ -316,6 +338,7 @@ func (c *Client) DeleteMemberFromTeam(ctx context.Context, orgName, teamName, us
 	}
 }
 
+// AddStackPermission adds stack permissions for a team.
 func (c *Client) AddStackPermission(ctx context.Context, stack StackIdentifier, teamName string, permission int) error {
 	if len(stack.OrgName) == 0 {
 		return errors.New("orgname must not be empty")
@@ -328,7 +351,11 @@ func (c *Client) AddStackPermission(ctx context.Context, stack StackIdentifier, 
 	apiPath := path.Join("orgs", stack.OrgName, "teams", teamName)
 
 	addStackPermissionRequest := addStackPermissionRequest{
-		AddStackPermission: AddStackPermission{ProjectName: stack.ProjectName, StackName: stack.StackName, Permission: permission},
+		AddStackPermission: AddStackPermission{
+			ProjectName: stack.ProjectName,
+			StackName:   stack.StackName,
+			Permission:  permission,
+		},
 	}
 
 	_, err := c.do(ctx, http.MethodPatch, apiPath, addStackPermissionRequest, nil)
@@ -338,6 +365,7 @@ func (c *Client) AddStackPermission(ctx context.Context, stack StackIdentifier, 
 	return nil
 }
 
+// RemoveStackPermission removes stack permissions from a team.
 func (c *Client) RemoveStackPermission(ctx context.Context, stack StackIdentifier, teamName string) error {
 	if len(stack.OrgName) == 0 {
 		return errors.New("orgname must not be empty")
@@ -360,6 +388,7 @@ func (c *Client) RemoveStackPermission(ctx context.Context, stack StackIdentifie
 	return nil
 }
 
+// GetTeamStackPermission retrieves stack permissions for a team.
 func (c *Client) GetTeamStackPermission(ctx context.Context, stack StackIdentifier, teamName string) (*int, error) {
 	if len(stack.OrgName) == 0 {
 		return nil, errors.New("orgname must not be empty")
@@ -386,6 +415,7 @@ func (c *Client) GetTeamStackPermission(ctx context.Context, stack StackIdentifi
 	return nil, nil
 }
 
+// AddEnvironmentSettings adds environment settings for a team.
 func (c *Client) AddEnvironmentSettings(ctx context.Context, req CreateTeamEnvironmentSettingsRequest) error {
 	if len(req.Organization) == 0 {
 		return errors.New("organization name must not be empty")
@@ -410,11 +440,17 @@ func (c *Client) AddEnvironmentSettings(ctx context.Context, req CreateTeamEnvir
 
 	_, err := c.do(ctx, http.MethodPatch, apiPath, addEnvironmentSettingsRequest, nil)
 	if err != nil {
-		return fmt.Errorf("failed to add team settings for environment %s to team %s due to error: %w", req.Environment, req.Team, err)
+		return fmt.Errorf(
+			"failed to add team settings for environment %s to team %s due to error: %w",
+			req.Environment,
+			req.Team,
+			err,
+		)
 	}
 	return nil
 }
 
+// RemoveEnvironmentSettings removes environment settings from a team.
 func (c *Client) RemoveEnvironmentSettings(ctx context.Context, req TeamEnvironmentSettingsRequest) error {
 	if len(req.Organization) == 0 {
 		return errors.New("organization name must not be empty")
@@ -437,12 +473,21 @@ func (c *Client) RemoveEnvironmentSettings(ctx context.Context, req TeamEnvironm
 
 	_, err := c.do(ctx, http.MethodPatch, apiPath, removeEnvironmentSettingsRequest, nil)
 	if err != nil {
-		return fmt.Errorf("failed to remove permissions for environment %s from team %s due to error: %w", req.Environment, req.Team, err)
+		return fmt.Errorf(
+			"failed to remove permissions for environment %s from team %s due to error: %w",
+			req.Environment,
+			req.Team,
+			err,
+		)
 	}
 	return nil
 }
 
-func (c *Client) GetTeamEnvironmentSettings(ctx context.Context, req TeamEnvironmentSettingsRequest) (*string, *Duration, error) {
+// GetTeamEnvironmentSettings retrieves environment settings for a team.
+func (c *Client) GetTeamEnvironmentSettings(
+	ctx context.Context,
+	req TeamEnvironmentSettingsRequest,
+) (*string, *Duration, error) {
 	if len(req.Organization) == 0 {
 		return nil, nil, errors.New("organization name must not be empty")
 	}

@@ -94,7 +94,7 @@ build:: provider dotnet_sdk go_sdk nodejs_sdk python_sdk java_sdk
 only_build:: build
 
 lint::
-	for DIR in "provider" "sdk" "examples" ; do \
+	for DIR in provider examples ; do \
 		pushd $$DIR && golangci-lint run -c ../.golangci.yml --timeout 10m && popd ; \
 	done
 

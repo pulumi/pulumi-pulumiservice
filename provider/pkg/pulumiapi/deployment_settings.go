@@ -10,23 +10,30 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
 )
 
+// DeploymentSettingsClient provides methods for managing deployment settings.
 type DeploymentSettingsClient interface {
-	CreateDeploymentSettings(ctx context.Context, stack StackIdentifier, ds DeploymentSettings) (*DeploymentSettings, error)
-	UpdateDeploymentSettings(ctx context.Context, stack StackIdentifier, ds DeploymentSettings) (*DeploymentSettings, error)
+	CreateDeploymentSettings(
+		ctx context.Context, stack StackIdentifier, ds DeploymentSettings,
+	) (*DeploymentSettings, error)
+	UpdateDeploymentSettings(
+		ctx context.Context, stack StackIdentifier, ds DeploymentSettings,
+	) (*DeploymentSettings, error)
 	GetDeploymentSettings(ctx context.Context, stack StackIdentifier) (*DeploymentSettings, error)
 	DeleteDeploymentSettings(ctx context.Context, stack StackIdentifier) error
 }
 
+// DeploymentSettings represents deployment configuration for a stack.
 type DeploymentSettings struct {
 	OperationContext *OperationContext        `json:"operationContext,omitempty"`
 	GitHub           *GitHubConfiguration     `json:"gitHub,omitempty"`
 	SourceContext    *SourceContext           `json:"sourceContext,omitempty"`
 	ExecutorContext  *apitype.ExecutorContext `json:"executorContext,omitempty"`
-	AgentPoolId      string                   `json:"agentPoolId,omitempty"`
+	AgentPoolId      string                   `json:"agentPoolID,omitempty"`
 	Source           *string                  `json:"source,omitempty"`
 	CacheOptions     *CacheOptions            `json:"cacheOptions,omitempty"`
 }
 
+// OperationContext represents operational settings for deployments.
 type OperationContext struct {
 	Options              *OperationContextOptions `json:"options,omitempty"`
 	PreRunCommands       []string                 `json:"PreRunCommands,omitempty"`
@@ -34,12 +41,14 @@ type OperationContext struct {
 	OIDC                 *OIDCConfiguration       `json:"oidc,omitempty"`
 }
 
+// OIDCConfiguration represents OIDC settings for cloud providers.
 type OIDCConfiguration struct {
 	AWS   *AWSOIDCConfiguration   `json:"aws,omitempty"`
 	GCP   *GCPOIDCConfiguration   `json:"gcp,omitempty"`
 	Azure *AzureOIDCConfiguration `json:"azure,omitempty"`
 }
 
+// AWSOIDCConfiguration represents AWS OIDC configuration.
 type AWSOIDCConfiguration struct {
 	Duration    string   `json:"duration,omitempty"`
 	PolicyARNs  []string `json:"policyArns,omitempty"`
@@ -47,6 +56,7 @@ type AWSOIDCConfiguration struct {
 	SessionName string   `json:"sessionName"`
 }
 
+// GCPOIDCConfiguration represents GCP OIDC configuration.
 type GCPOIDCConfiguration struct {
 	ProjectID      string `json:"projectId,omitempty"`
 	Region         string `json:"region"`
@@ -56,12 +66,14 @@ type GCPOIDCConfiguration struct {
 	TokenLifetime  string `json:"tokenLifetime"`
 }
 
+// AzureOIDCConfiguration represents Azure OIDC configuration.
 type AzureOIDCConfiguration struct {
 	ClientID       string `json:"clientId"`
 	TenantID       string `json:"tenantId"`
 	SubscriptionID string `json:"subscriptionId"`
 }
 
+// OperationContextOptions represents options for operation context.
 type OperationContextOptions struct {
 	SkipInstallDependencies     bool   `json:"skipInstallDependencies,omitempty"`
 	SkipIntermediateDeployments bool   `json:"skipIntermediateDeployments,omitempty"`
@@ -69,6 +81,7 @@ type OperationContextOptions struct {
 	DeleteAfterDestroy          bool   `json:"deleteAfterDestroy,omitempty"`
 }
 
+// GitHubConfiguration represents GitHub-specific deployment settings.
 type GitHubConfiguration struct {
 	Repository          string   `json:"repository,omitempty"`
 	DeployCommits       bool     `json:"deployCommits,omitempty"`
@@ -77,10 +90,12 @@ type GitHubConfiguration struct {
 	Paths               []string `json:"paths,omitempty"`
 }
 
+// SourceContext represents source code configuration.
 type SourceContext struct {
 	Git *SourceContextGit `json:"git,omitempty"`
 }
 
+// SourceContextGit represents Git source configuration.
 type SourceContextGit struct {
 	RepoURL string         `json:"repoURL"`
 	Branch  string         `json:"branch"`
@@ -89,27 +104,32 @@ type SourceContextGit struct {
 	GitAuth *GitAuthConfig `json:"gitAuth,omitempty"`
 }
 
+// GitAuthConfig represents Git authentication configuration.
 type GitAuthConfig struct {
 	PersonalAccessToken *SecretValue `json:"accessToken,omitempty"`
 	SSHAuth             *SSHAuth     `json:"sshAuth,omitempty"`
 	BasicAuth           *BasicAuth   `json:"basicAuth,omitempty"`
 }
 
+// SSHAuth represents SSH authentication credentials.
 type SSHAuth struct {
 	SSHPrivateKey SecretValue  `json:"sshPrivateKey"`
 	Password      *SecretValue `json:"password,omitempty"`
 }
 
+// BasicAuth represents basic authentication credentials.
 type BasicAuth struct {
 	UserName SecretValue `json:"userName"`
 	Password SecretValue `json:"password"`
 }
 
+// SecretValue represents an encrypted secret value.
 type SecretValue struct {
 	Value  string // Plaintext if Secret is false; ciphertext otherwise.
 	Secret bool
 }
 
+// CacheOptions represents caching configuration for deployments.
 type CacheOptions struct {
 	Enable bool `json:"enable"`
 }
@@ -144,7 +164,9 @@ func (v *SecretValue) UnmarshalJSON(bytes []byte) error {
 	return nil
 }
 
-func (c *Client) CreateDeploymentSettings(ctx context.Context, stack StackIdentifier, ds DeploymentSettings) (*DeploymentSettings, error) {
+func (c *Client) CreateDeploymentSettings(
+	ctx context.Context, stack StackIdentifier, ds DeploymentSettings,
+) (*DeploymentSettings, error) {
 	apiPath := path.Join("stacks", stack.OrgName, stack.ProjectName, stack.StackName, "deployments", "settings")
 	var resultDS = &DeploymentSettings{}
 	_, err := c.do(ctx, http.MethodPut, apiPath, ds, resultDS)
@@ -154,7 +176,9 @@ func (c *Client) CreateDeploymentSettings(ctx context.Context, stack StackIdenti
 	return resultDS, nil
 }
 
-func (c *Client) UpdateDeploymentSettings(ctx context.Context, stack StackIdentifier, ds DeploymentSettings) (*DeploymentSettings, error) {
+func (c *Client) UpdateDeploymentSettings(
+	ctx context.Context, stack StackIdentifier, ds DeploymentSettings,
+) (*DeploymentSettings, error) {
 	apiPath := path.Join("stacks", stack.OrgName, stack.ProjectName, stack.StackName, "deployments", "settings")
 	var resultDS = &DeploymentSettings{}
 	_, err := c.do(ctx, http.MethodPut, apiPath, ds, resultDS)

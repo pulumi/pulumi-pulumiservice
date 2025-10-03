@@ -8,9 +8,10 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/structpb"
 
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
 type getAgentPoolFunc func() (*pulumiapi.AgentPool, error)
@@ -21,20 +22,39 @@ type AgentPoolClientMock struct {
 	deleteAgentPoolFunc deleteAgentPoolFunc
 }
 
-func (c *AgentPoolClientMock) GetAgentPool(ctx context.Context, agentPoolId, orgName string) (*pulumiapi.AgentPool, error) {
+func (c *AgentPoolClientMock) GetAgentPool(
+	ctx context.Context,
+	agentPoolId, orgName string,
+) (*pulumiapi.AgentPool, error) {
 	return c.getAgentPoolFunc()
 }
-func (c *AgentPoolClientMock) CreateAgentPool(ctx context.Context, name, orgName, description string) (*pulumiapi.AgentPool, error) {
+
+func (c *AgentPoolClientMock) CreateAgentPool(
+	ctx context.Context,
+	name, orgName, description string,
+) (*pulumiapi.AgentPool, error) {
 	return nil, nil
 }
-func (c *AgentPoolClientMock) UpdateAgentPool(ctx context.Context, agentPoolId, name, orgName, description string) error {
+
+func (c *AgentPoolClientMock) UpdateAgentPool(
+	ctx context.Context,
+	agentPoolId, name, orgName, description string,
+) error {
 	return nil
 }
-func (c *AgentPoolClientMock) DeleteAgentPool(ctx context.Context, agentPoolId, orgName string, forceDestroy bool) error {
+
+func (c *AgentPoolClientMock) DeleteAgentPool(
+	ctx context.Context,
+	agentPoolId, orgName string,
+	forceDestroy bool,
+) error {
 	return c.deleteAgentPoolFunc()
 }
 
-func buildAgentPoolClientMock(getAgentPoolFunc getAgentPoolFunc, deleteAgentPoolFunc deleteAgentPoolFunc) *AgentPoolClientMock {
+func buildAgentPoolClientMock(
+	getAgentPoolFunc getAgentPoolFunc,
+	deleteAgentPoolFunc deleteAgentPoolFunc,
+) *AgentPoolClientMock {
 	return &AgentPoolClientMock{
 		getAgentPoolFunc,
 		deleteAgentPoolFunc,

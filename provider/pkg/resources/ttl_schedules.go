@@ -6,12 +6,14 @@ import (
 	"path"
 	"time"
 
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
+	pbempty "google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/structpb"
+
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
-	pbempty "google.golang.org/protobuf/types/known/emptypb"
-	"google.golang.org/protobuf/types/known/structpb"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
 type PulumiServiceTtlScheduleResource struct {
@@ -67,7 +69,10 @@ func ToPulumiServiceTtlScheduleInput(properties *structpb.Struct) (*PulumiServic
 }
 
 func (st *PulumiServiceTtlScheduleResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
+	olds, err := plugin.UnmarshalProperties(
+		req.GetOldInputs(),
+		plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +126,10 @@ func (st *PulumiServiceTtlScheduleResource) Create(req *pulumirpc.CreateRequest)
 }
 
 func (st *PulumiServiceTtlScheduleResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	inputMap, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	inputMap, err := plugin.UnmarshalProperties(
+		req.GetNews(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -160,7 +168,12 @@ func (st *PulumiServiceTtlScheduleResource) Update(req *pulumirpc.UpdateRequest)
 		Timestamp:          input.Timestamp,
 		DeleteAfterDestroy: input.DeleteAfterDestroy,
 	}
-	scheduleID, err := st.Client.UpdateTtlSchedule(context.Background(), input.Stack, updateReq, previousOutput.ScheduleID)
+	scheduleID, err := st.Client.UpdateTtlSchedule(
+		context.Background(),
+		input.Stack,
+		updateReq,
+		previousOutput.ScheduleID,
+	)
 	if err != nil {
 		return nil, err
 	}

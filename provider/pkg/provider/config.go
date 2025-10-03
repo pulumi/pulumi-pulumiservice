@@ -1,3 +1,4 @@
+// Package provider implements the Pulumi Service resource provider.
 package provider
 
 import (
@@ -8,12 +9,16 @@ import (
 )
 
 const (
+	// EnvVarPulumiAccessToken is the environment variable name for the Pulumi access token.
 	EnvVarPulumiAccessToken = "PULUMI_ACCESS_TOKEN"
-	EnvVarPulumiBackendUrl = "PULUMI_BACKEND_URL"
+	// EnvVarPulumiBackendURL is the environment variable name for the Pulumi backend URL.
+	EnvVarPulumiBackendURL = "PULUMI_BACKEND_URL"
 )
 
+// ErrAccessTokenNotFound is returned when a Pulumi access token cannot be found.
 var ErrAccessTokenNotFound = fmt.Errorf("pulumi access token not found")
 
+// PulumiServiceConfig holds configuration for the Pulumi Service provider.
 type PulumiServiceConfig struct {
 	Config map[string]string
 }
@@ -45,8 +50,8 @@ func (pc *PulumiServiceConfig) getPulumiAccessToken() (*string, error) {
 	return nil, ErrAccessTokenNotFound
 }
 
-func (pc *PulumiServiceConfig) getPulumiServiceUrl() (*string, error) {
-	url := pc.getConfig("apiUrl", EnvVarPulumiBackendUrl)
+func (pc *PulumiServiceConfig) getPulumiServiceURL() (*string, error) {
+	url := pc.getConfig("apiUrl", EnvVarPulumiBackendURL)
 	baseurl := "https://api.pulumi.com"
 
 	if len(url) == 0 {

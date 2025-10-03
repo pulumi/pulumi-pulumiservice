@@ -8,11 +8,12 @@ import (
 
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
 
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 type PulumiServiceStackTagResource struct {
@@ -33,7 +34,9 @@ func (i *PulumiServiceStackTagInput) ToPropertyMap() resource.PropertyMap {
 	return util.ToPropertyMap(*i, structTagKey)
 }
 
-func (st *PulumiServiceStackTagResource) ToPulumiServiceStackTagInput(inputMap resource.PropertyMap) PulumiServiceStackTagInput {
+func (st *PulumiServiceStackTagResource) ToPulumiServiceStackTagInput(
+	inputMap resource.PropertyMap,
+) PulumiServiceStackTagInput {
 	input := PulumiServiceStackTagInput{}
 	_ = util.FromPropertyMap(inputMap, structTagKey, &input)
 	return input
@@ -44,7 +47,10 @@ func (st *PulumiServiceStackTagResource) Name() string {
 }
 
 func (st *PulumiServiceStackTagResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
+	olds, err := plugin.UnmarshalProperties(
+		req.GetOldInputs(),
+		plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +73,7 @@ func (st *PulumiServiceStackTagResource) Diff(req *pulumirpc.DiffRequest) (*pulu
 	for k, v := range dd {
 		v.Kind = v.Kind.AsReplace()
 		detailedDiffs[k] = &pulumirpc.PropertyDiff{
-			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind),
+			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind), //nolint:gosec // Kind values are bounded by protobuf enum
 			InputDiff: v.InputDiff,
 		}
 	}

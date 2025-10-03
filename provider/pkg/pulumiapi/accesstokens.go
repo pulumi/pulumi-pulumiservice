@@ -21,6 +21,7 @@ import (
 	"path"
 )
 
+// AccessToken represents a Pulumi Service access token.
 type AccessToken struct {
 	ID          string `json:"id"`
 	Name        string `json:"name"`
@@ -50,6 +51,7 @@ type listTokenResponse struct {
 	Tokens []accessTokenResponse `json:"tokens"`
 }
 
+// CreateAccessToken creates a new access token with the specified description.
 func (c *Client) CreateAccessToken(ctx context.Context, description string) (*AccessToken, error) {
 	apiPath := path.Join("user", "tokens")
 
@@ -73,21 +75,23 @@ func (c *Client) CreateAccessToken(ctx context.Context, description string) (*Ac
 
 }
 
-func (c *Client) DeleteAccessToken(ctx context.Context, tokenId string) error {
-	if len(tokenId) == 0 {
+// DeleteAccessToken deletes an access token by its ID.
+func (c *Client) DeleteAccessToken(ctx context.Context, tokenID string) error {
+	if len(tokenID) == 0 {
 		return errors.New("tokenid length must be greater than zero")
 	}
 
-	apiPath := path.Join("user", "tokens", tokenId)
+	apiPath := path.Join("user", "tokens", tokenID)
 
 	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
 	if err != nil {
-		return fmt.Errorf("failed to delete access token %q: %w", tokenId, err)
+		return fmt.Errorf("failed to delete access token %q: %w", tokenID, err)
 	}
 
 	return nil
 }
 
+// GetAccessToken retrieves an access token by its ID.
 func (c *Client) GetAccessToken(ctx context.Context, id string) (*AccessToken, error) {
 	apiPath := path.Join("user", "tokens")
 

@@ -6,9 +6,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
 type getDeploymentSettingsFunc func() (*pulumiapi.DeploymentSettings, error)
@@ -17,20 +18,39 @@ type DeploymentSettingsClientMock struct {
 	getDeploymentSettingsFunc getDeploymentSettingsFunc
 }
 
-func (c *DeploymentSettingsClientMock) CreateDeploymentSettings(ctx context.Context, stack pulumiapi.StackIdentifier, ds pulumiapi.DeploymentSettings) (*pulumiapi.DeploymentSettings, error) {
+func (c *DeploymentSettingsClientMock) CreateDeploymentSettings(
+	ctx context.Context,
+	_ pulumiapi.StackIdentifier,
+	ds pulumiapi.DeploymentSettings,
+) (*pulumiapi.DeploymentSettings, error) {
 	return nil, nil
 }
-func (c *DeploymentSettingsClientMock) UpdateDeploymentSettings(ctx context.Context, stack pulumiapi.StackIdentifier, ds pulumiapi.DeploymentSettings) (*pulumiapi.DeploymentSettings, error) {
+
+func (c *DeploymentSettingsClientMock) UpdateDeploymentSettings(
+	ctx context.Context,
+	stack pulumiapi.StackIdentifier,
+	ds pulumiapi.DeploymentSettings,
+) (*pulumiapi.DeploymentSettings, error) {
 	return nil, nil
 }
-func (c *DeploymentSettingsClientMock) GetDeploymentSettings(ctx context.Context, stack pulumiapi.StackIdentifier) (*pulumiapi.DeploymentSettings, error) {
+
+func (c *DeploymentSettingsClientMock) GetDeploymentSettings(
+	ctx context.Context,
+	stack pulumiapi.StackIdentifier,
+) (*pulumiapi.DeploymentSettings, error) {
 	return c.getDeploymentSettingsFunc()
 }
-func (c *DeploymentSettingsClientMock) DeleteDeploymentSettings(ctx context.Context, stack pulumiapi.StackIdentifier) error {
+
+func (c *DeploymentSettingsClientMock) DeleteDeploymentSettings(
+	ctx context.Context,
+	stack pulumiapi.StackIdentifier,
+) error {
 	return nil
 }
 
-func buildDeploymentSettingsClientMock(getDeploymentSettingsFunc getDeploymentSettingsFunc) *DeploymentSettingsClientMock {
+func buildDeploymentSettingsClientMock(
+	getDeploymentSettingsFunc getDeploymentSettingsFunc,
+) *DeploymentSettingsClientMock {
 	return &DeploymentSettingsClientMock{
 		getDeploymentSettingsFunc,
 	}

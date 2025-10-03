@@ -28,6 +28,7 @@ func (err *ErrorResponse) Error() string {
 	return fmt.Sprintf("%d API error: %s", err.StatusCode, err.Message)
 }
 
+// GetErrorStatusCode extracts the HTTP status code from an error if it's an ErrorResponse.
 func GetErrorStatusCode(err error) int {
 	var errResp *ErrorResponse
 	if errors.As(err, &errResp) {

@@ -4,9 +4,11 @@ import (
 	"context"
 	"testing"
 
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 	"github.com/stretchr/testify/assert"
+
+	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
 type getTeamFunc func() (*pulumiapi.Team, error)
@@ -22,7 +24,12 @@ func (c *TeamClientMock) GetTeam(ctx context.Context, orgName string, teamName s
 func (c *TeamClientMock) ListTeams(ctx context.Context, orgName string) ([]pulumiapi.Team, error) {
 	return nil, nil
 }
-func (c *TeamClientMock) CreateTeam(ctx context.Context, orgName, teamName, teamType, displayName, description string, teamID int64) (*pulumiapi.Team, error) {
+
+func (c *TeamClientMock) CreateTeam(
+	ctx context.Context,
+	orgName, teamName, teamType, displayName, description string,
+	teamID int64,
+) (*pulumiapi.Team, error) {
 	return nil, nil
 }
 func (c *TeamClientMock) UpdateTeam(ctx context.Context, orgName, teamName, displayName, description string) error {
@@ -35,22 +42,50 @@ func (c *TeamClientMock) AddMemberToTeam(ctx context.Context, orgName, teamName,
 func (c *TeamClientMock) DeleteMemberFromTeam(ctx context.Context, orgName, teamName, userName string) error {
 	return nil
 }
-func (c *TeamClientMock) AddStackPermission(ctx context.Context, stack pulumiapi.StackIdentifier, teamName string, permission int) error {
+
+func (c *TeamClientMock) AddStackPermission(
+	ctx context.Context,
+	stack pulumiapi.StackIdentifier,
+	teamName string,
+	permission int,
+) error {
 	return nil
 }
-func (c *TeamClientMock) RemoveStackPermission(ctx context.Context, stack pulumiapi.StackIdentifier, teamName string) error {
+
+func (c *TeamClientMock) RemoveStackPermission(
+	ctx context.Context,
+	stack pulumiapi.StackIdentifier,
+	teamName string,
+) error {
 	return nil
 }
-func (c *TeamClientMock) GetTeamStackPermission(ctx context.Context, stack pulumiapi.StackIdentifier, teamName string) (*int, error) {
+
+func (c *TeamClientMock) GetTeamStackPermission(
+	ctx context.Context,
+	stack pulumiapi.StackIdentifier,
+	teamName string,
+) (*int, error) {
 	return nil, nil
 }
-func (c *TeamClientMock) AddEnvironmentSettings(ctx context.Context, req pulumiapi.CreateTeamEnvironmentSettingsRequest) error {
+
+func (c *TeamClientMock) AddEnvironmentSettings(
+	ctx context.Context,
+	req pulumiapi.CreateTeamEnvironmentSettingsRequest,
+) error {
 	return nil
 }
-func (c *TeamClientMock) RemoveEnvironmentSettings(ctx context.Context, req pulumiapi.TeamEnvironmentSettingsRequest) error {
+
+func (c *TeamClientMock) RemoveEnvironmentSettings(
+	ctx context.Context,
+	req pulumiapi.TeamEnvironmentSettingsRequest,
+) error {
 	return nil
 }
-func (c *TeamClientMock) GetTeamEnvironmentSettings(ctx context.Context, req pulumiapi.TeamEnvironmentSettingsRequest) (*string, *pulumiapi.Duration, error) {
+
+func (c *TeamClientMock) GetTeamEnvironmentSettings(
+	ctx context.Context,
+	req pulumiapi.TeamEnvironmentSettingsRequest,
+) (*string, *pulumiapi.Duration, error) {
 	return nil, nil, nil
 }
 

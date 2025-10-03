@@ -7,12 +7,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
+	pbempty "google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/structpb"
+
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
-	pbempty "google.golang.org/protobuf/types/known/emptypb"
-	"google.golang.org/protobuf/types/known/structpb"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
 type PulumiServiceDeploymentScheduleResource struct {
@@ -81,7 +83,9 @@ func ParseStack(inputMap resource.PropertyMap) (*pulumiapi.StackIdentifier, erro
 	return &stack, nil
 }
 
-func ToPulumiServiceDeploymentScheduleInput(properties *structpb.Struct) (*PulumiServiceDeploymentScheduleInput, error) {
+func ToPulumiServiceDeploymentScheduleInput(
+	properties *structpb.Struct,
+) (*PulumiServiceDeploymentScheduleInput, error) {
 	inputMap, err := plugin.UnmarshalProperties(properties, plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
@@ -138,7 +142,10 @@ func ToPulumiServiceStackScheduleOutput(properties *structpb.Struct) (*PulumiSer
 }
 
 func ScheduleSharedDiff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
+	olds, err := plugin.UnmarshalProperties(
+		req.GetOldInputs(),
+		plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -151,7 +158,10 @@ func ScheduleSharedDiff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, er
 	return StackScheduleSharedDiffMaps(olds, news)
 }
 
-func StackScheduleSharedDiffMaps(olds resource.PropertyMap, news resource.PropertyMap) (*pulumirpc.DiffResponse, error) {
+func StackScheduleSharedDiffMaps(
+	olds resource.PropertyMap,
+	news resource.PropertyMap,
+) (*pulumirpc.DiffResponse, error) {
 	diffs := olds.Diff(news)
 	if diffs == nil {
 		return &pulumirpc.DiffResponse{
@@ -175,7 +185,7 @@ func StackScheduleSharedDiffMaps(olds resource.PropertyMap, news resource.Proper
 			replaces = append(replaces, k)
 		}
 		detailedDiffs[k] = &pulumirpc.PropertyDiff{
-			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind),
+			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind), //nolint:gosec // Kind values are bounded by protobuf enum
 			InputDiff: v.InputDiff,
 		}
 	}
@@ -197,7 +207,10 @@ func (st *PulumiServiceDeploymentScheduleResource) Diff(req *pulumirpc.DiffReque
 	return ScheduleSharedDiff(req)
 }
 
-func StackScheduleSharedDelete(req *pulumirpc.DeleteRequest, client pulumiapi.StackScheduleClient) (*pbempty.Empty, error) {
+func StackScheduleSharedDelete(
+	req *pulumirpc.DeleteRequest,
+	client pulumiapi.StackScheduleClient,
+) (*pbempty.Empty, error) {
 	output, err := ToPulumiServiceStackScheduleOutput(req.GetProperties())
 	if err != nil {
 		return nil, err
@@ -214,7 +227,9 @@ func (st *PulumiServiceDeploymentScheduleResource) Delete(req *pulumirpc.DeleteR
 	return StackScheduleSharedDelete(req, st.Client)
 }
 
-func (st *PulumiServiceDeploymentScheduleResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
+func (st *PulumiServiceDeploymentScheduleResource) Create(
+	req *pulumirpc.CreateRequest,
+) (*pulumirpc.CreateResponse, error) {
 	input, err := ToPulumiServiceDeploymentScheduleInput(req.GetProperties())
 	if err != nil {
 		return nil, err
@@ -249,8 +264,13 @@ func (st *PulumiServiceDeploymentScheduleResource) Create(req *pulumirpc.CreateR
 	}, nil
 }
 
-func (st *PulumiServiceDeploymentScheduleResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	inputMap, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+func (st *PulumiServiceDeploymentScheduleResource) Check(
+	req *pulumirpc.CheckRequest,
+) (*pulumirpc.CheckResponse, error) {
+	inputMap, err := plugin.UnmarshalProperties(
+		req.GetNews(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -286,7 +306,9 @@ func (st *PulumiServiceDeploymentScheduleResource) Check(req *pulumirpc.CheckReq
 	return &pulumirpc.CheckResponse{Inputs: req.GetNews(), Failures: failures}, nil
 }
 
-func (st *PulumiServiceDeploymentScheduleResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+func (st *PulumiServiceDeploymentScheduleResource) Update(
+	req *pulumirpc.UpdateRequest,
+) (*pulumirpc.UpdateResponse, error) {
 	previousOutput, err := ToPulumiServiceStackScheduleOutput(req.GetOlds())
 	if err != nil {
 		return nil, err
@@ -303,7 +325,12 @@ func (st *PulumiServiceDeploymentScheduleResource) Update(req *pulumirpc.UpdateR
 			PulumiOperation: input.PulumiOperation,
 		},
 	}
-	scheduleID, err := st.Client.UpdateDeploymentSchedule(context.Background(), input.Stack, updateReq, previousOutput.ScheduleID)
+	scheduleID, err := st.Client.UpdateDeploymentSchedule(
+		context.Background(),
+		input.Stack,
+		updateReq,
+		previousOutput.ScheduleID,
+	)
 	if err != nil {
 		return nil, err
 	}

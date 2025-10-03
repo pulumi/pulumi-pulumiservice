@@ -11,14 +11,19 @@ import (
 
 var teamCtx = context.Background()
 
+const (
+	testTeamTokenOrgName = "anOrg"
+	testTeamTokenName    = "aTeam"
+)
+
 func TestDeleteTeamAccessToken(t *testing.T) {
-	orgName := "anOrg"
-	teamName := "aTeam"
+	orgName := testTeamTokenOrgName
+	teamName := testTeamTokenName
 	tokenId := "abcdegh"
 	t.Run("Happy Path", func(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
-			ExpectedReqPath:   "/api/orgs/anOrg/teams/aTeam/tokens/" + tokenId,
+			ExpectedReqPath:   "/api/orgs/" + testTeamTokenOrgName + "/teams/" + testTeamTokenName + "/tokens/" + tokenId,
 			ResponseCode:      204,
 		})
 		defer cleanup()
@@ -28,7 +33,7 @@ func TestDeleteTeamAccessToken(t *testing.T) {
 	t.Run("Error", func(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
-			ExpectedReqPath:   "/api/orgs/anOrg/teams/aTeam/tokens/" + tokenId,
+			ExpectedReqPath:   "/api/orgs/" + testTeamTokenOrgName + "/teams/" + testTeamTokenName + "/tokens/" + tokenId,
 			ResponseCode:      404,
 			ResponseBody: ErrorResponse{
 				StatusCode: 404,
@@ -45,8 +50,8 @@ func TestDeleteTeamAccessToken(t *testing.T) {
 }
 
 func TestCreateTeamAccessToken(t *testing.T) {
-	orgName := "anOrg"
-	teamName := "aTeam"
+	orgName := testTeamTokenOrgName
+	teamName := testTeamTokenName
 	desc := "token description"
 	tokenName := "aTeamToken"
 	t.Run("Happy Path", func(t *testing.T) {
@@ -60,7 +65,7 @@ func TestCreateTeamAccessToken(t *testing.T) {
 				Name:        tokenName,
 				Description: desc,
 			},
-			ExpectedReqPath: "/api/orgs/anOrg/teams/aTeam/tokens",
+			ExpectedReqPath: "/api/orgs/" + testTeamTokenOrgName + "/teams/" + testTeamTokenName + "/tokens",
 			ResponseCode:    201,
 			ResponseBody:    resp,
 		})
@@ -101,8 +106,8 @@ func TestCreateTeamAccessToken(t *testing.T) {
 func TestGetTeamAccessToken(t *testing.T) {
 	id := "uuid"
 	desc := "token description"
-	org := "anOrg"
-	team := "aTeam"
+	org := testTeamTokenOrgName
+	team := testTeamTokenName
 	lastUsed := 123
 	t.Run("Happy Path", func(t *testing.T) {
 		resp := listTokenResponse{
