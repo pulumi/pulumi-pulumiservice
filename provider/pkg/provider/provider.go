@@ -190,6 +190,9 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 		&resources.PulumiServiceApprovalRuleResource{
 			Client: client,
 		},
+		&resources.PulumiServicePackageVersionResource{
+			Client: client,
+		},
 	}
 
 	return &pulumirpc.ConfigureResponse{

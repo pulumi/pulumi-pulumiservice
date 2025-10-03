@@ -17,6 +17,7 @@ from .environment_rotation_schedule import *
 from .environment_version_tag import *
 from .oidc_issuer import *
 from .org_access_token import *
+from .package_version import *
 from .provider import *
 from .stack import *
 from .stack_tag import *
@@ -56,6 +57,7 @@ _utilities.register(
    "pulumiservice:index:EnvironmentVersionTag": "EnvironmentVersionTag",
    "pulumiservice:index:OidcIssuer": "OidcIssuer",
    "pulumiservice:index:OrgAccessToken": "OrgAccessToken",
+   "pulumiservice:index:PackageVersion": "PackageVersion",
    "pulumiservice:index:Stack": "Stack",
    "pulumiservice:index:StackTag": "StackTag",
    "pulumiservice:index:Team": "Team",

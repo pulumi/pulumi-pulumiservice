@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## Unreleased
+
+### Improvements
+
+- Added PackageVersion resource for publishing components to Pulumi Registry [#523](https://github.com/pulumi/pulumi-pulumiservice/issues/523)
+
 ## 0.31.0
 
 ### Improvements

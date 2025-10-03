@@ -2169,6 +2169,170 @@
         "environmentIdentifier",
         "approvalRuleConfig"
       ]
+    },
+    "pulumiservice:index:PackageVersion": {
+      "description": "A published package version in the Pulumi Registry. Packages are typically published via `pulumi publish` CLI, but this resource allows managing published packages declaratively, including publishing from uploaded artifacts and managing the lifecycle of published versions.",
+      "properties": {
+        "source": {
+          "description": "The source of the package (e.g., 'pulumi').",
+          "type": "string"
+        },
+        "publisher": {
+          "description": "The publisher of the package (typically the organization name).",
+          "type": "string"
+        },
+        "name": {
+          "description": "The name of the package.",
+          "type": "string"
+        },
+        "version": {
+          "description": "The version of the package in semver format.",
+          "type": "string"
+        },
+        "schemaContent": {
+          "description": "The schema.json content for the package.",
+          "type": "string"
+        },
+        "indexContent": {
+          "description": "The index.json content for the package.",
+          "type": "string"
+        },
+        "installationConfigContent": {
+          "description": "The installation-configuration.json content for the package.",
+          "type": "string"
+        },
+        "title": {
+          "description": "The title/display name of the package.",
+          "type": "string"
+        },
+        "description": {
+          "description": "The description of the package.",
+          "type": "string"
+        },
+        "logoUrl": {
+          "description": "The URL of the logo for the package.",
+          "type": "string"
+        },
+        "repoUrl": {
+          "description": "The URL of the repository the package is hosted in.",
+          "type": "string"
+        },
+        "category": {
+          "description": "The category of the package.",
+          "type": "string"
+        },
+        "packageStatus": {
+          "description": "The maturity level of the package.",
+          "type": "string"
+        },
+        "readmeURL": {
+          "description": "The URL of the readme for the package (output).",
+          "type": "string"
+        },
+        "schemaURL": {
+          "description": "The URL of the schema for the package (output).",
+          "type": "string"
+        },
+        "pluginDownloadURL": {
+          "description": "The URL to download the plugin at (output).",
+          "type": "string"
+        },
+        "createdAt": {
+          "description": "The date and time the package version was created (output).",
+          "type": "string"
+        },
+        "visibility": {
+          "description": "The visibility of the package.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source",
+        "publisher",
+        "name",
+        "version",
+        "schemaContent",
+        "indexContent",
+        "installationConfigContent",
+        "packageStatus",
+        "readmeURL",
+        "schemaURL",
+        "createdAt",
+        "visibility"
+      ],
+      "inputProperties": {
+        "source": {
+          "description": "The source of the package (e.g., 'pulumi').",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "publisher": {
+          "description": "The publisher of the package (typically the organization name).",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "name": {
+          "description": "The name of the package.",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "version": {
+          "description": "The version of the package in semver format.",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "schemaContent": {
+          "description": "The schema.json content for the package. This is the Pulumi package schema that defines the resources, functions, and types provided by the package.",
+          "type": "string"
+        },
+        "indexContent": {
+          "description": "The index.json content for the package. This file contains the API documentation index.",
+          "type": "string"
+        },
+        "installationConfigContent": {
+          "description": "The installation-configuration.json content for the package. This file contains configuration for installing the package.",
+          "type": "string"
+        },
+        "title": {
+          "description": "The title/display name of the package.",
+          "type": "string"
+        },
+        "description": {
+          "description": "The description of the package.",
+          "type": "string"
+        },
+        "logoUrl": {
+          "description": "The URL of the logo for the package.",
+          "type": "string"
+        },
+        "repoUrl": {
+          "description": "The URL of the repository the package is hosted in.",
+          "type": "string"
+        },
+        "category": {
+          "description": "The category of the package.",
+          "type": "string"
+        },
+        "packageStatus": {
+          "description": "The maturity level of the package (e.g., 'ga', 'public_preview').",
+          "type": "string",
+          "default": "ga"
+        },
+        "visibility": {
+          "description": "The visibility of the package ('public' or 'private').",
+          "type": "string",
+          "default": "private"
+        }
+      },
+      "requiredInputs": [
+        "source",
+        "publisher",
+        "name",
+        "version",
+        "schemaContent",
+        "indexContent",
+        "installationConfigContent"
+      ]
     }
   },
   "language": {

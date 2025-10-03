@@ -60,6 +60,11 @@ export type OrgAccessToken = import("./orgAccessToken").OrgAccessToken;
 export const OrgAccessToken: typeof import("./orgAccessToken").OrgAccessToken = null as any;
 utilities.lazyLoad(exports, ["OrgAccessToken"], () => require("./orgAccessToken"));
 
+export { PackageVersionArgs } from "./packageVersion";
+export type PackageVersion = import("./packageVersion").PackageVersion;
+export const PackageVersion: typeof import("./packageVersion").PackageVersion = null as any;
+utilities.lazyLoad(exports, ["PackageVersion"], () => require("./packageVersion"));
+
 export { ProviderArgs } from "./provider";
 export type Provider = import("./provider").Provider;
 export const Provider: typeof import("./provider").Provider = null as any;
@@ -149,6 +154,8 @@ const _module = {
                 return new OidcIssuer(name, <any>undefined, { urn })
             case "pulumiservice:index:OrgAccessToken":
                 return new OrgAccessToken(name, <any>undefined, { urn })
+            case "pulumiservice:index:PackageVersion":
+                return new PackageVersion(name, <any>undefined, { urn })
             case "pulumiservice:index:Stack":
                 return new Stack(name, <any>undefined, { urn })
             case "pulumiservice:index:StackTag":
