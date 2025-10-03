@@ -1,0 +1,26 @@
+name: yaml-service
+runtime: yaml
+description: A minimal example of provisioning a Service via Pulumi YAML
+
+configuration:
+  orgName:
+    type: string
+  ownerName:
+    type: string
+
+resources:
+  myService:
+    type: pulumiservice:index:Service
+    properties:
+      organizationName: ${orgName}
+      ownerType: user
+      ownerName: ${ownerName}
+      name: example-service
+      description: Example service created via Pulumi YAML
+      properties:
+        environment: development
+        team: platform
+
+outputs:
+  serviceName: ${myService.name}
+  serviceOwner: ${myService.ownerName}

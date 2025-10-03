@@ -65,6 +65,11 @@ export type Provider = import("./provider").Provider;
 export const Provider: typeof import("./provider").Provider = null as any;
 utilities.lazyLoad(exports, ["Provider"], () => require("./provider"));
 
+export { ServiceArgs } from "./service";
+export type Service = import("./service").Service;
+export const Service: typeof import("./service").Service = null as any;
+utilities.lazyLoad(exports, ["Service"], () => require("./service"));
+
 export { StackArgs } from "./stack";
 export type Stack = import("./stack").Stack;
 export const Stack: typeof import("./stack").Stack = null as any;
@@ -149,6 +154,8 @@ const _module = {
                 return new OidcIssuer(name, <any>undefined, { urn })
             case "pulumiservice:index:OrgAccessToken":
                 return new OrgAccessToken(name, <any>undefined, { urn })
+            case "pulumiservice:index:Service":
+                return new Service(name, <any>undefined, { urn })
             case "pulumiservice:index:Stack":
                 return new Stack(name, <any>undefined, { urn })
             case "pulumiservice:index:StackTag":

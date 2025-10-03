@@ -815,60 +815,78 @@
         "requireReapprovalOnChange",
         "eligibleApprovers"
       ]
+    },
+    "pulumiservice:index:ServiceItem": {
+      "type": "object",
+      "description": "An item that belongs to a service (stack or environment).",
+      "properties": {
+        "itemType": {
+          "type": "string",
+          "description": "The type of item (stack or environment)."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the item (format: org/project/stackOrEnv)."
+        }
+      },
+      "required": [
+        "itemType",
+        "name"
+      ]
     }
   },
   "resources": {
     "pulumiservice:index:Stack": {
       "description": "A stack is a collection of resources that share a common lifecycle. Stacks are uniquely identified by their name and the project they belong to.",
-        "properties": {
-            "organizationName": {
-              "description": "The name of the organization.",
-              "type": "string"
-            },
-            "projectName": {
-              "description": "The name of the project.",
-              "type": "string"
-            },
-            "stackName": {
-              "description": "The name of the stack.",
-              "type": "string"
-            },
-            "forceDestroy": {
-              "description": "Optional. Flag indicating whether to delete the stack even if it still contains resources.",
-              "type": "boolean"
-            }
+      "properties": {
+        "organizationName": {
+          "description": "The name of the organization.",
+          "type": "string"
         },
-        "required": [
-            "organizationName",
-            "projectName",
-            "stackName"
-        ],
-        "inputProperties": {
-          "organizationName": {
-            "description": "The name of the organization.",
-            "type": "string",
-            "willReplaceOnChanges": true
-          },
-          "projectName": {
-            "description": "The name of the project.",
-            "type": "string",
-            "willReplaceOnChanges": true
-          },
-          "stackName": {
-            "description": "The name of the stack.",
-            "type": "string",
-            "willReplaceOnChanges": true
-          },
-          "forceDestroy": {
-            "description": "Optional. Flag indicating whether to delete the stack even if it still contains resources.",
-            "type": "boolean"
-          }
+        "projectName": {
+          "description": "The name of the project.",
+          "type": "string"
         },
-        "requiredInputs": [
-            "organizationName",
-            "projectName",
-            "stackName"
-        ]
+        "stackName": {
+          "description": "The name of the stack.",
+          "type": "string"
+        },
+        "forceDestroy": {
+          "description": "Optional. Flag indicating whether to delete the stack even if it still contains resources.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "organizationName",
+        "projectName",
+        "stackName"
+      ],
+      "inputProperties": {
+        "organizationName": {
+          "description": "The name of the organization.",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "projectName": {
+          "description": "The name of the project.",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "stackName": {
+          "description": "The name of the stack.",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "forceDestroy": {
+          "description": "Optional. Flag indicating whether to delete the stack even if it still contains resources.",
+          "type": "boolean"
+        }
+      },
+      "requiredInputs": [
+        "organizationName",
+        "projectName",
+        "stackName"
+      ]
     },
     "pulumiservice:index:AgentPool": {
       "description": "Agent Pool for customer managed deployments",
@@ -2168,6 +2186,97 @@
         "targetActionTypes",
         "environmentIdentifier",
         "approvalRuleConfig"
+      ]
+    },
+    "pulumiservice:index:Service": {
+      "description": "A Service resource in Pulumi Cloud. Services allow you to group and organize related stacks and environments.",
+      "properties": {
+        "organizationName": {
+          "description": "The name of the organization.",
+          "type": "string"
+        },
+        "ownerType": {
+          "description": "The type of owner for this service (user or team).",
+          "type": "string"
+        },
+        "ownerName": {
+          "description": "The name of the owner (username or team name).",
+          "type": "string"
+        },
+        "name": {
+          "description": "The name of the service.",
+          "type": "string"
+        },
+        "description": {
+          "description": "Optional description of the service.",
+          "type": "string"
+        },
+        "properties": {
+          "description": "Optional properties for the service.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "items": {
+          "description": "Optional list of items (stacks or environments) that belong to this service.",
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:index:ServiceItem"
+          }
+        }
+      },
+      "required": [
+        "organizationName",
+        "ownerType",
+        "ownerName",
+        "name"
+      ],
+      "inputProperties": {
+        "organizationName": {
+          "description": "The name of the organization.",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "ownerType": {
+          "description": "The type of owner for this service (user or team).",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "ownerName": {
+          "description": "The name of the owner (username or team name).",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "name": {
+          "description": "The name of the service.",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "description": {
+          "description": "Optional description of the service.",
+          "type": "string"
+        },
+        "properties": {
+          "description": "Optional properties for the service.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "items": {
+          "description": "Optional list of items (stacks or environments) that belong to this service.",
+          "type": "array",
+          "items": {
+            "$ref": "#/types/pulumiservice:index:ServiceItem"
+          }
+        }
+      },
+      "requiredInputs": [
+        "organizationName",
+        "ownerType",
+        "ownerName",
+        "name"
       ]
     }
   },

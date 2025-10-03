@@ -28,6 +28,7 @@
         "oidcIssuer.ts",
         "orgAccessToken.ts",
         "provider.ts",
+        "service.ts",
         "stack.ts",
         "stackTag.ts",
         "team.ts",

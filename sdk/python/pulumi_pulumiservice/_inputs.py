@@ -52,6 +52,8 @@ __all__ = [
     'OperationContextOIDCArgsDict',
     'OperationContextOptionsArgs',
     'OperationContextOptionsArgsDict',
+    'ServiceItemArgs',
+    'ServiceItemArgsDict',
     'TemplateSourceDestinationArgs',
     'TemplateSourceDestinationArgsDict',
 ]
@@ -1493,6 +1495,60 @@ class OperationContextOptionsArgs:
     @skip_intermediate_deployments.setter
     def skip_intermediate_deployments(self, value: Optional[pulumi.Input[bool]]):
         pulumi.set(self, "skip_intermediate_deployments", value)
+
+
+if not MYPY:
+    class ServiceItemArgsDict(TypedDict):
+        """
+        An item that belongs to a service (stack or environment).
+        """
+        item_type: pulumi.Input[str]
+        """
+        The type of item (stack or environment).
+        """
+        name: pulumi.Input[str]
+        """
+        The name of the item (format: org/project/stackOrEnv).
+        """
+elif False:
+    ServiceItemArgsDict: TypeAlias = Mapping[str, Any]
+
+@pulumi.input_type
+class ServiceItemArgs:
+    def __init__(__self__, *,
+                 item_type: pulumi.Input[str],
+                 name: pulumi.Input[str]):
+        """
+        An item that belongs to a service (stack or environment).
+        :param pulumi.Input[str] item_type: The type of item (stack or environment).
+        :param pulumi.Input[str] name: The name of the item (format: org/project/stackOrEnv).
+        """
+        pulumi.set(__self__, "item_type", item_type)
+        pulumi.set(__self__, "name", name)
+
+    @property
+    @pulumi.getter(name="itemType")
+    def item_type(self) -> pulumi.Input[str]:
+        """
+        The type of item (stack or environment).
+        """
+        return pulumi.get(self, "item_type")
+
+    @item_type.setter
+    def item_type(self, value: pulumi.Input[str]):
+        pulumi.set(self, "item_type", value)
+
+    @property
+    @pulumi.getter
+    def name(self) -> pulumi.Input[str]:
+        """
+        The name of the item (format: org/project/stackOrEnv).
+        """
+        return pulumi.get(self, "name")
+
+    @name.setter
+    def name(self, value: pulumi.Input[str]):
+        pulumi.set(self, "name", value)
 
 
 if not MYPY:
