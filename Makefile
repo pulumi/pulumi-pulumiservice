@@ -1,5 +1,7 @@
 PROJECT_NAME := Pulumi Service Resource Provider
 
+SHELL := /bin/bash
+
 PACK             := pulumiservice
 PACKDIR          := sdk
 PROJECT          := github.com/pulumi/pulumi-pulumiservice
