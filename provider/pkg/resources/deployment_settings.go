@@ -134,6 +134,13 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(plaintextInputSett
 			}
 			scMap["git"] = resource.PropertyValue{V: gitPropertyMap}
 		}
+		if ds.SourceContext.Template != nil {
+			templatePropertyMap := resource.PropertyMap{}
+			if ds.SourceContext.Template.SourceURL != "" {
+				templatePropertyMap["sourceUrl"] = resource.NewPropertyValue(ds.SourceContext.Template.SourceURL)
+			}
+			scMap["template"] = resource.PropertyValue{V: templatePropertyMap}
+		}
 		pm["sourceContext"] = resource.PropertyValue{V: scMap}
 	}
 
@@ -424,6 +431,17 @@ func toSourceContext(inputMap resource.PropertyMap) *pulumiapi.SourceContext {
 		}
 
 		sc.Git = &g
+	}
+
+	if scInput["template"].HasValue() {
+		templateInput := util.GetSecretOrObjectValue(scInput["template"])
+		var t pulumiapi.SourceContextTemplate
+
+		if templateInput["sourceUrl"].HasValue() {
+			t.SourceURL = util.GetSecretOrStringValue(templateInput["sourceUrl"])
+		}
+
+		sc.Template = &t
 	}
 
 	return &sc

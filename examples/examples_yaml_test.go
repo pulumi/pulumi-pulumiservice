@@ -252,6 +252,41 @@ func TestYamlDeploymentSettingsCommitExample(t *testing.T) {
 	})
 }
 
+func TestYamlDeploymentSettingsNocodeExample(t *testing.T) {
+
+	// Set up tmpdir with a Pulumi.yml with no resources
+	// mimicking the deletion of resource
+	newProgram := YamlProgram{
+		Name:        "yaml-deployment-settings-nocode-example",
+		Runtime:     "yaml",
+		Description: "No-code deployment settings test using template source",
+	}
+
+	tmpdir := writePulumiYaml(t, newProgram)
+
+	cwd, _ := os.Getwd()
+	digits := generateRandomFiveDigits()
+
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Quick:     true,
+		Dir:       path.Join(cwd, ".", "yaml-deployment-settings-nocode"),
+		StackName: "nocode-stack-" + digits,
+		Config: map[string]string{
+			"digits": digits,
+		},
+		EditDirs: []integration.EditDir{
+			{
+				Dir: tmpdir,
+			},
+			// Reapply the same thing again, except this time we expect there to be no changes
+			{
+				Dir:             tmpdir,
+				ExpectNoChanges: true,
+			},
+		},
+	})
+}
+
 func TestYamlTeamAccessTokenExample(t *testing.T) {
 	cwd, _ := os.Getwd()
 	integration.ProgramTest(t, &integration.ProgramTestOptions{

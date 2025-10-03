@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## Unreleased
+
+### Improvements
+
+- Added support for no-code deployments with template source in DeploymentSettings [#521](https://github.com/pulumi/pulumi-pulumiservice/issues/521)
+
 ## 0.31.0
 
 ### Improvements

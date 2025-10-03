@@ -2064,6 +2064,8 @@ func (o DeploymentSettingsOperationContextPtrOutput) PreRunCommands() pulumi.Str
 type DeploymentSettingsSourceContext struct {
 	// Git source settings for a deployment.
 	Git *DeploymentSettingsGitSource `pulumi:"git"`
+	// Template source settings for a no-code deployment.
+	Template *DeploymentSettingsTemplateSource `pulumi:"template"`
 }
 
 // DeploymentSettingsSourceContextInput is an input type that accepts DeploymentSettingsSourceContextArgs and DeploymentSettingsSourceContextOutput values.
@@ -2081,6 +2083,8 @@ type DeploymentSettingsSourceContextInput interface {
 type DeploymentSettingsSourceContextArgs struct {
 	// Git source settings for a deployment.
 	Git DeploymentSettingsGitSourcePtrInput `pulumi:"git"`
+	// Template source settings for a no-code deployment.
+	Template DeploymentSettingsTemplateSourcePtrInput `pulumi:"template"`
 }
 
 func (DeploymentSettingsSourceContextArgs) ElementType() reflect.Type {
@@ -2166,6 +2170,11 @@ func (o DeploymentSettingsSourceContextOutput) Git() DeploymentSettingsGitSource
 	return o.ApplyT(func(v DeploymentSettingsSourceContext) *DeploymentSettingsGitSource { return v.Git }).(DeploymentSettingsGitSourcePtrOutput)
 }
 
+// Template source settings for a no-code deployment.
+func (o DeploymentSettingsSourceContextOutput) Template() DeploymentSettingsTemplateSourcePtrOutput {
+	return o.ApplyT(func(v DeploymentSettingsSourceContext) *DeploymentSettingsTemplateSource { return v.Template }).(DeploymentSettingsTemplateSourcePtrOutput)
+}
+
 type DeploymentSettingsSourceContextPtrOutput struct{ *pulumi.OutputState }
 
 func (DeploymentSettingsSourceContextPtrOutput) ElementType() reflect.Type {
@@ -2198,6 +2207,156 @@ func (o DeploymentSettingsSourceContextPtrOutput) Git() DeploymentSettingsGitSou
 		}
 		return v.Git
 	}).(DeploymentSettingsGitSourcePtrOutput)
+}
+
+// Template source settings for a no-code deployment.
+func (o DeploymentSettingsSourceContextPtrOutput) Template() DeploymentSettingsTemplateSourcePtrOutput {
+	return o.ApplyT(func(v *DeploymentSettingsSourceContext) *DeploymentSettingsTemplateSource {
+		if v == nil {
+			return nil
+		}
+		return v.Template
+	}).(DeploymentSettingsTemplateSourcePtrOutput)
+}
+
+// Template source settings for a no-code deployment.
+type DeploymentSettingsTemplateSource struct {
+	// The source URL of the template to use for the deployment.
+	SourceUrl string `pulumi:"sourceUrl"`
+}
+
+// DeploymentSettingsTemplateSourceInput is an input type that accepts DeploymentSettingsTemplateSourceArgs and DeploymentSettingsTemplateSourceOutput values.
+// You can construct a concrete instance of `DeploymentSettingsTemplateSourceInput` via:
+//
+//	DeploymentSettingsTemplateSourceArgs{...}
+type DeploymentSettingsTemplateSourceInput interface {
+	pulumi.Input
+
+	ToDeploymentSettingsTemplateSourceOutput() DeploymentSettingsTemplateSourceOutput
+	ToDeploymentSettingsTemplateSourceOutputWithContext(context.Context) DeploymentSettingsTemplateSourceOutput
+}
+
+// Template source settings for a no-code deployment.
+type DeploymentSettingsTemplateSourceArgs struct {
+	// The source URL of the template to use for the deployment.
+	SourceUrl pulumi.StringInput `pulumi:"sourceUrl"`
+}
+
+func (DeploymentSettingsTemplateSourceArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*DeploymentSettingsTemplateSource)(nil)).Elem()
+}
+
+func (i DeploymentSettingsTemplateSourceArgs) ToDeploymentSettingsTemplateSourceOutput() DeploymentSettingsTemplateSourceOutput {
+	return i.ToDeploymentSettingsTemplateSourceOutputWithContext(context.Background())
+}
+
+func (i DeploymentSettingsTemplateSourceArgs) ToDeploymentSettingsTemplateSourceOutputWithContext(ctx context.Context) DeploymentSettingsTemplateSourceOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(DeploymentSettingsTemplateSourceOutput)
+}
+
+func (i DeploymentSettingsTemplateSourceArgs) ToDeploymentSettingsTemplateSourcePtrOutput() DeploymentSettingsTemplateSourcePtrOutput {
+	return i.ToDeploymentSettingsTemplateSourcePtrOutputWithContext(context.Background())
+}
+
+func (i DeploymentSettingsTemplateSourceArgs) ToDeploymentSettingsTemplateSourcePtrOutputWithContext(ctx context.Context) DeploymentSettingsTemplateSourcePtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(DeploymentSettingsTemplateSourceOutput).ToDeploymentSettingsTemplateSourcePtrOutputWithContext(ctx)
+}
+
+// DeploymentSettingsTemplateSourcePtrInput is an input type that accepts DeploymentSettingsTemplateSourceArgs, DeploymentSettingsTemplateSourcePtr and DeploymentSettingsTemplateSourcePtrOutput values.
+// You can construct a concrete instance of `DeploymentSettingsTemplateSourcePtrInput` via:
+//
+//	        DeploymentSettingsTemplateSourceArgs{...}
+//
+//	or:
+//
+//	        nil
+type DeploymentSettingsTemplateSourcePtrInput interface {
+	pulumi.Input
+
+	ToDeploymentSettingsTemplateSourcePtrOutput() DeploymentSettingsTemplateSourcePtrOutput
+	ToDeploymentSettingsTemplateSourcePtrOutputWithContext(context.Context) DeploymentSettingsTemplateSourcePtrOutput
+}
+
+type deploymentSettingsTemplateSourcePtrType DeploymentSettingsTemplateSourceArgs
+
+func DeploymentSettingsTemplateSourcePtr(v *DeploymentSettingsTemplateSourceArgs) DeploymentSettingsTemplateSourcePtrInput {
+	return (*deploymentSettingsTemplateSourcePtrType)(v)
+}
+
+func (*deploymentSettingsTemplateSourcePtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**DeploymentSettingsTemplateSource)(nil)).Elem()
+}
+
+func (i *deploymentSettingsTemplateSourcePtrType) ToDeploymentSettingsTemplateSourcePtrOutput() DeploymentSettingsTemplateSourcePtrOutput {
+	return i.ToDeploymentSettingsTemplateSourcePtrOutputWithContext(context.Background())
+}
+
+func (i *deploymentSettingsTemplateSourcePtrType) ToDeploymentSettingsTemplateSourcePtrOutputWithContext(ctx context.Context) DeploymentSettingsTemplateSourcePtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(DeploymentSettingsTemplateSourcePtrOutput)
+}
+
+// Template source settings for a no-code deployment.
+type DeploymentSettingsTemplateSourceOutput struct{ *pulumi.OutputState }
+
+func (DeploymentSettingsTemplateSourceOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*DeploymentSettingsTemplateSource)(nil)).Elem()
+}
+
+func (o DeploymentSettingsTemplateSourceOutput) ToDeploymentSettingsTemplateSourceOutput() DeploymentSettingsTemplateSourceOutput {
+	return o
+}
+
+func (o DeploymentSettingsTemplateSourceOutput) ToDeploymentSettingsTemplateSourceOutputWithContext(ctx context.Context) DeploymentSettingsTemplateSourceOutput {
+	return o
+}
+
+func (o DeploymentSettingsTemplateSourceOutput) ToDeploymentSettingsTemplateSourcePtrOutput() DeploymentSettingsTemplateSourcePtrOutput {
+	return o.ToDeploymentSettingsTemplateSourcePtrOutputWithContext(context.Background())
+}
+
+func (o DeploymentSettingsTemplateSourceOutput) ToDeploymentSettingsTemplateSourcePtrOutputWithContext(ctx context.Context) DeploymentSettingsTemplateSourcePtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v DeploymentSettingsTemplateSource) *DeploymentSettingsTemplateSource {
+		return &v
+	}).(DeploymentSettingsTemplateSourcePtrOutput)
+}
+
+// The source URL of the template to use for the deployment.
+func (o DeploymentSettingsTemplateSourceOutput) SourceUrl() pulumi.StringOutput {
+	return o.ApplyT(func(v DeploymentSettingsTemplateSource) string { return v.SourceUrl }).(pulumi.StringOutput)
+}
+
+type DeploymentSettingsTemplateSourcePtrOutput struct{ *pulumi.OutputState }
+
+func (DeploymentSettingsTemplateSourcePtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**DeploymentSettingsTemplateSource)(nil)).Elem()
+}
+
+func (o DeploymentSettingsTemplateSourcePtrOutput) ToDeploymentSettingsTemplateSourcePtrOutput() DeploymentSettingsTemplateSourcePtrOutput {
+	return o
+}
+
+func (o DeploymentSettingsTemplateSourcePtrOutput) ToDeploymentSettingsTemplateSourcePtrOutputWithContext(ctx context.Context) DeploymentSettingsTemplateSourcePtrOutput {
+	return o
+}
+
+func (o DeploymentSettingsTemplateSourcePtrOutput) Elem() DeploymentSettingsTemplateSourceOutput {
+	return o.ApplyT(func(v *DeploymentSettingsTemplateSource) DeploymentSettingsTemplateSource {
+		if v != nil {
+			return *v
+		}
+		var ret DeploymentSettingsTemplateSource
+		return ret
+	}).(DeploymentSettingsTemplateSourceOutput)
+}
+
+// The source URL of the template to use for the deployment.
+func (o DeploymentSettingsTemplateSourcePtrOutput) SourceUrl() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *DeploymentSettingsTemplateSource) *string {
+		if v == nil {
+			return nil
+		}
+		return &v.SourceUrl
+	}).(pulumi.StringPtrOutput)
 }
 
 type EligibleApprover struct {
@@ -3149,6 +3308,8 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsOperationContextPtrInput)(nil)).Elem(), DeploymentSettingsOperationContextArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsSourceContextInput)(nil)).Elem(), DeploymentSettingsSourceContextArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsSourceContextPtrInput)(nil)).Elem(), DeploymentSettingsSourceContextArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsTemplateSourceInput)(nil)).Elem(), DeploymentSettingsTemplateSourceArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsTemplateSourcePtrInput)(nil)).Elem(), DeploymentSettingsTemplateSourceArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*EligibleApproverInput)(nil)).Elem(), EligibleApproverArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*EligibleApproverArrayInput)(nil)).Elem(), EligibleApproverArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*EnvironmentIdentifierInput)(nil)).Elem(), EnvironmentIdentifierArgs{})
@@ -3185,6 +3346,8 @@ func init() {
 	pulumi.RegisterOutputType(DeploymentSettingsOperationContextPtrOutput{})
 	pulumi.RegisterOutputType(DeploymentSettingsSourceContextOutput{})
 	pulumi.RegisterOutputType(DeploymentSettingsSourceContextPtrOutput{})
+	pulumi.RegisterOutputType(DeploymentSettingsTemplateSourceOutput{})
+	pulumi.RegisterOutputType(DeploymentSettingsTemplateSourcePtrOutput{})
 	pulumi.RegisterOutputType(EligibleApproverOutput{})
 	pulumi.RegisterOutputType(EligibleApproverArrayOutput{})
 	pulumi.RegisterOutputType(EnvironmentIdentifierOutput{})

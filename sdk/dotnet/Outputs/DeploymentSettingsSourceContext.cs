@@ -20,11 +20,19 @@ namespace Pulumi.PulumiService.Outputs
         /// Git source settings for a deployment.
         /// </summary>
         public readonly Outputs.DeploymentSettingsGitSource? Git;
+        /// <summary>
+        /// Template source settings for a no-code deployment.
+        /// </summary>
+        public readonly Outputs.DeploymentSettingsTemplateSource? Template;
 
         [OutputConstructor]
-        private DeploymentSettingsSourceContext(Outputs.DeploymentSettingsGitSource? git)
+        private DeploymentSettingsSourceContext(
+            Outputs.DeploymentSettingsGitSource? git,
+
+            Outputs.DeploymentSettingsTemplateSource? template)
         {
             Git = git;
+            Template = template;
         }
     }
 }

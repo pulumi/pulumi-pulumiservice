@@ -1,0 +1,22 @@
+name: yaml-deployment-settings-nocode-example
+runtime: yaml
+description: No-code deployment settings test using template source
+resources:
+  my_nocode_settings:
+    type: pulumiservice:DeploymentSettings
+    properties:
+      organization: service-provider-test-org
+      project: yaml-deployment-settings-nocode-example
+      stack: nocode-stack-${digits}
+      executorContext:
+        executorImage: "pulumi/pulumi-nodejs:latest"
+      sourceContext:
+        template:
+          sourceUrl: "https://github.com/pulumi/templates/kubernetes-aws-yaml"
+      operationContext:
+        environmentVariables:
+          AWS_REGION: "us-west-2"
+        options:
+          skipInstallDependencies: false
+      cacheOptions:
+        enable: true

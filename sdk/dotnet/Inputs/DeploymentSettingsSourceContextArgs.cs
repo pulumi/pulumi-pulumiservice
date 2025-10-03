@@ -21,6 +21,12 @@ namespace Pulumi.PulumiService.Inputs
         [Input("git")]
         public Input<Inputs.DeploymentSettingsGitSourceArgs>? Git { get; set; }
 
+        /// <summary>
+        /// Template source settings for a no-code deployment.
+        /// </summary>
+        [Input("template")]
+        public Input<Inputs.DeploymentSettingsTemplateSourceArgs>? Template { get; set; }
+
         public DeploymentSettingsSourceContextArgs()
         {
         }

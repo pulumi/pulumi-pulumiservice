@@ -256,6 +256,20 @@ export interface DeploymentSettingsSourceContext {
      * Git source settings for a deployment.
      */
     git?: outputs.DeploymentSettingsGitSource;
+    /**
+     * Template source settings for a no-code deployment.
+     */
+    template?: outputs.DeploymentSettingsTemplateSource;
+}
+
+/**
+ * Template source settings for a no-code deployment.
+ */
+export interface DeploymentSettingsTemplateSource {
+    /**
+     * The source URL of the template to use for the deployment.
+     */
+    sourceUrl: string;
 }
 
 export interface EligibleApprover {

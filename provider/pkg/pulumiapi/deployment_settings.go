@@ -78,7 +78,8 @@ type GitHubConfiguration struct {
 }
 
 type SourceContext struct {
-	Git *SourceContextGit `json:"git,omitempty"`
+	Git      *SourceContextGit      `json:"git,omitempty"`
+	Template *SourceContextTemplate `json:"template,omitempty"`
 }
 
 type SourceContextGit struct {
@@ -87,6 +88,10 @@ type SourceContextGit struct {
 	RepoDir string         `json:"repoDir,omitempty"`
 	Commit  string         `json:"commit,omitempty"`
 	GitAuth *GitAuthConfig `json:"gitAuth,omitempty"`
+}
+
+type SourceContextTemplate struct {
+	SourceURL string `json:"sourceURL"`
 }
 
 type GitAuthConfig struct {

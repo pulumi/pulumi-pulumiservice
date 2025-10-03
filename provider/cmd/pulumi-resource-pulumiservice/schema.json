@@ -274,6 +274,10 @@
         "git": {
           "$ref": "#/types/pulumiservice:index:DeploymentSettingsGitSource",
           "description": "Git source settings for a deployment."
+        },
+        "template": {
+          "$ref": "#/types/pulumiservice:index:DeploymentSettingsTemplateSource",
+          "description": "Template source settings for a no-code deployment."
         }
       },
       "type": "object"
@@ -354,6 +358,19 @@
       "required": [
         "username",
         "password"
+      ],
+      "type": "object"
+    },
+    "pulumiservice:index:DeploymentSettingsTemplateSource": {
+      "description": "Template source settings for a no-code deployment.",
+      "properties": {
+        "sourceUrl": {
+          "type": "string",
+          "description": "The source URL of the template to use for the deployment."
+        }
+      },
+      "required": [
+        "sourceUrl"
       ],
       "type": "object"
     },

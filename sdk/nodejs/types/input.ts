@@ -256,6 +256,20 @@ export interface DeploymentSettingsSourceContextArgs {
      * Git source settings for a deployment.
      */
     git?: pulumi.Input<inputs.DeploymentSettingsGitSourceArgs>;
+    /**
+     * Template source settings for a no-code deployment.
+     */
+    template?: pulumi.Input<inputs.DeploymentSettingsTemplateSourceArgs>;
+}
+
+/**
+ * Template source settings for a no-code deployment.
+ */
+export interface DeploymentSettingsTemplateSourceArgs {
+    /**
+     * The source URL of the template to use for the deployment.
+     */
+    sourceUrl: pulumi.Input<string>;
 }
 
 export interface EligibleApproverArgs {
