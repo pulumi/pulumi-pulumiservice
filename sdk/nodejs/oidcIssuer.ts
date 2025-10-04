@@ -40,27 +40,27 @@ export class OidcIssuer extends pulumi.CustomResource {
     /**
      * The maximum duration of the Pulumi access token working after an exchange, specified in seconds.
      */
-    public readonly maxExpirationSeconds!: pulumi.Output<number | undefined>;
+    declare public readonly maxExpirationSeconds: pulumi.Output<number | undefined>;
     /**
      * Issuer name.
      */
-    public readonly name!: pulumi.Output<string>;
+    declare public readonly name: pulumi.Output<string>;
     /**
      * Organization name.
      */
-    public readonly organization!: pulumi.Output<string>;
+    declare public readonly organization: pulumi.Output<string>;
     /**
      * The authorization policies for this Oidc Issuer.
      */
-    public readonly policies!: pulumi.Output<outputs.AuthPolicyDefinition[]>;
+    declare public readonly policies: pulumi.Output<outputs.AuthPolicyDefinition[]>;
     /**
      * The thumbprints of issuer's TLS certificates. By default, Pulumi will store the thumbprint of the certificate used to serve the OpenID configuration. If the provider uses multiple certificates to serve content, it is required to manually configure these.
      */
-    public readonly thumbprints!: pulumi.Output<string[]>;
+    declare public readonly thumbprints: pulumi.Output<string[]>;
     /**
      * The OIDC issuer URL.
      */
-    public readonly url!: pulumi.Output<string>;
+    declare public readonly url: pulumi.Output<string>;
 
     /**
      * Create a OidcIssuer resource with the given unique name, arguments, and options.
@@ -73,21 +73,21 @@ export class OidcIssuer extends pulumi.CustomResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
-            if ((!args || args.name === undefined) && !opts.urn) {
+            if (args?.name === undefined && !opts.urn) {
                 throw new Error("Missing required property 'name'");
             }
-            if ((!args || args.organization === undefined) && !opts.urn) {
+            if (args?.organization === undefined && !opts.urn) {
                 throw new Error("Missing required property 'organization'");
             }
-            if ((!args || args.url === undefined) && !opts.urn) {
+            if (args?.url === undefined && !opts.urn) {
                 throw new Error("Missing required property 'url'");
             }
-            resourceInputs["maxExpirationSeconds"] = args ? args.maxExpirationSeconds : undefined;
-            resourceInputs["name"] = args ? args.name : undefined;
-            resourceInputs["organization"] = args ? args.organization : undefined;
-            resourceInputs["policies"] = args ? args.policies : undefined;
-            resourceInputs["thumbprints"] = args ? args.thumbprints : undefined;
-            resourceInputs["url"] = args ? args.url : undefined;
+            resourceInputs["maxExpirationSeconds"] = args?.maxExpirationSeconds;
+            resourceInputs["name"] = args?.name;
+            resourceInputs["organization"] = args?.organization;
+            resourceInputs["policies"] = args?.policies;
+            resourceInputs["thumbprints"] = args?.thumbprints;
+            resourceInputs["url"] = args?.url;
         } else {
             resourceInputs["maxExpirationSeconds"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;

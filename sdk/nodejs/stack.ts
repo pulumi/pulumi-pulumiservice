@@ -37,19 +37,19 @@ export class Stack extends pulumi.CustomResource {
     /**
      * Optional. Flag indicating whether to delete the stack even if it still contains resources.
      */
-    public readonly forceDestroy!: pulumi.Output<boolean | undefined>;
+    declare public readonly forceDestroy: pulumi.Output<boolean | undefined>;
     /**
      * The name of the organization.
      */
-    public readonly organizationName!: pulumi.Output<string>;
+    declare public readonly organizationName: pulumi.Output<string>;
     /**
      * The name of the project.
      */
-    public readonly projectName!: pulumi.Output<string>;
+    declare public readonly projectName: pulumi.Output<string>;
     /**
      * The name of the stack.
      */
-    public readonly stackName!: pulumi.Output<string>;
+    declare public readonly stackName: pulumi.Output<string>;
 
     /**
      * Create a Stack resource with the given unique name, arguments, and options.
@@ -62,19 +62,19 @@ export class Stack extends pulumi.CustomResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
-            if ((!args || args.organizationName === undefined) && !opts.urn) {
+            if (args?.organizationName === undefined && !opts.urn) {
                 throw new Error("Missing required property 'organizationName'");
             }
-            if ((!args || args.projectName === undefined) && !opts.urn) {
+            if (args?.projectName === undefined && !opts.urn) {
                 throw new Error("Missing required property 'projectName'");
             }
-            if ((!args || args.stackName === undefined) && !opts.urn) {
+            if (args?.stackName === undefined && !opts.urn) {
                 throw new Error("Missing required property 'stackName'");
             }
-            resourceInputs["forceDestroy"] = args ? args.forceDestroy : undefined;
-            resourceInputs["organizationName"] = args ? args.organizationName : undefined;
-            resourceInputs["projectName"] = args ? args.projectName : undefined;
-            resourceInputs["stackName"] = args ? args.stackName : undefined;
+            resourceInputs["forceDestroy"] = args?.forceDestroy;
+            resourceInputs["organizationName"] = args?.organizationName;
+            resourceInputs["projectName"] = args?.projectName;
+            resourceInputs["stackName"] = args?.stackName;
         } else {
             resourceInputs["forceDestroy"] = undefined /*out*/;
             resourceInputs["organizationName"] = undefined /*out*/;

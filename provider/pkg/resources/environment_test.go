@@ -195,17 +195,6 @@ func (c *EscClientMock) OpenEnvironment(
 	return "", nil, nil
 }
 
-func (c *EscClientMock) OpenEnvironmentDraft(
-	context.Context,
-	string,
-	string,
-	string,
-	string,
-	time.Duration,
-) (string, []client.EnvironmentDiagnostic, error) {
-	return "", nil, nil
-}
-
 func (c *EscClientMock) OpenYAMLEnvironment(
 	context.Context,
 	string,
@@ -366,16 +355,6 @@ func (c *EscClientMock) RetractEnvironmentRevision(
 	_ /* reason */ string,
 ) error {
 	return nil
-}
-
-func (c *EscClientMock) RotateEnvironment(
-	_ context.Context,
-	_ /* orgName */ string,
-	_ /* projectName */ string,
-	_ /* envName */ string,
-	_ /* rotationPaths */ []string,
-) (*client.RotateEnvironmentResponse, []client.EnvironmentDiagnostic, error) {
-	return nil, nil, nil
 }
 
 func (c *EscClientMock) Insecure() bool {

@@ -86,7 +86,7 @@ func convertMapToPropertyMap(m map[string]interface{}) resource.PropertyMap {
 	return pm
 }
 
-func (i *PulumiServicePolicyGroupInput) ToRpc() (*structpb.Struct, error) {
+func (i *PulumiServicePolicyGroupInput) ToRPC() (*structpb.Struct, error) {
 	return plugin.MarshalProperties(i.ToPropertyMap(), plugin.MarshalOptions{
 		KeepOutputValues: true,
 	})
@@ -198,7 +198,9 @@ func (p *PulumiServicePolicyGroupResource) Delete(req *pulumirpc.DeleteRequest) 
 }
 
 func (p *PulumiServicePolicyGroupResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
+	olds, err := plugin.UnmarshalProperties(
+		req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -338,7 +340,7 @@ func (p *PulumiServicePolicyGroupResource) Update(req *pulumirpc.UpdateRequest) 
 		}
 	}
 
-	outputProperties, err := policyGroupNew.ToRpc()
+	outputProperties, err := policyGroupNew.ToRPC()
 	if err != nil {
 		return nil, err
 	}
@@ -350,7 +352,9 @@ func (p *PulumiServicePolicyGroupResource) Update(req *pulumirpc.UpdateRequest) 
 
 func (p *PulumiServicePolicyGroupResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	ctx := context.Background()
-	inputs, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	inputs, err := plugin.UnmarshalProperties(
+		req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -372,7 +376,12 @@ func (p *PulumiServicePolicyGroupResource) Create(req *pulumirpc.CreateRequest) 
 		}
 		err := p.Client.UpdatePolicyGroup(ctx, inputsPolicyGroup.OrganizationName, inputsPolicyGroup.Name, updateReq)
 		if err != nil {
-			return nil, partialErrorPolicyGroup(policyGroupID, fmt.Errorf("failed to add stack to policy group: %w", err), inputsPolicyGroup, inputsPolicyGroup)
+			return nil, partialErrorPolicyGroup(
+				policyGroupID,
+				fmt.Errorf("failed to add stack to policy group: %w", err),
+				inputsPolicyGroup,
+				inputsPolicyGroup,
+			)
 		}
 	}
 
@@ -383,7 +392,12 @@ func (p *PulumiServicePolicyGroupResource) Create(req *pulumirpc.CreateRequest) 
 		}
 		err := p.Client.UpdatePolicyGroup(ctx, inputsPolicyGroup.OrganizationName, inputsPolicyGroup.Name, updateReq)
 		if err != nil {
-			return nil, partialErrorPolicyGroup(policyGroupID, fmt.Errorf("failed to add policy pack to policy group: %w", err), inputsPolicyGroup, inputsPolicyGroup)
+			return nil, partialErrorPolicyGroup(
+				policyGroupID,
+				fmt.Errorf("failed to add policy pack to policy group: %w", err),
+				inputsPolicyGroup,
+				inputsPolicyGroup,
+			)
 		}
 	}
 
@@ -400,7 +414,7 @@ func (p *PulumiServicePolicyGroupResource) Create(req *pulumirpc.CreateRequest) 
 		PolicyPacks:      policyGroup.AppliedPolicyPacks,
 	}
 
-	outputProperties, err := outputs.ToRpc()
+	outputProperties, err := outputs.ToRPC()
 	if err != nil {
 		return nil, partialErrorPolicyGroup(policyGroupID, err, outputs, inputsPolicyGroup)
 	}
@@ -523,9 +537,11 @@ func containsPolicyPack(packs []pulumiapi.PolicyPackMetadata, target pulumiapi.P
 
 // partialErrorPolicyGroup creates an error for resources that did not complete an operation in progress.
 // The last known state of the object is included in the error so that it can be checkpointed.
-func partialErrorPolicyGroup(id string, err error, state PulumiServicePolicyGroupInput, inputs PulumiServicePolicyGroupInput) error {
-	stateRpc, stateSerErr := state.ToRpc()
-	inputRpc, inputSerErr := inputs.ToRpc()
+func partialErrorPolicyGroup(
+	id string, err error, state PulumiServicePolicyGroupInput, inputs PulumiServicePolicyGroupInput,
+) error {
+	stateRPC, stateSerErr := state.ToRPC()
+	inputRPC, inputSerErr := inputs.ToRPC()
 
 	// combine errors if we can't serialize state or inputs for some reason
 	if stateSerErr != nil {
@@ -536,9 +552,9 @@ func partialErrorPolicyGroup(id string, err error, state PulumiServicePolicyGrou
 	}
 	detail := pulumirpc.ErrorResourceInitFailed{
 		Id:         id,
-		Properties: stateRpc,
+		Properties: stateRPC,
 		Reasons:    []string{err.Error()},
-		Inputs:     inputRpc,
+		Inputs:     inputRPC,
 	}
 	return rpcerror.WithDetails(rpcerror.New(codes.Unknown, err.Error()), &detail)
 }

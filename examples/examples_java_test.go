@@ -17,7 +17,11 @@ func TestJavaTeamsExamples(t *testing.T) {
 	integration.ProgramTest(t, &test)
 }
 
-func getJavaBase(t *testing.T, dir string, testSpecificOptions integration.ProgramTestOptions) integration.ProgramTestOptions {
+func getJavaBase(
+	t *testing.T,
+	dir string,
+	testSpecificOptions integration.ProgramTestOptions,
+) integration.ProgramTestOptions {
 	repoRoot, err := filepath.Abs(filepath.Join("..", ".."))
 	if err != nil {
 		panic(err)
