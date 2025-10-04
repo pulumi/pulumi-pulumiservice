@@ -37,23 +37,23 @@ export class TeamAccessToken extends pulumi.CustomResource {
     /**
      * Optional. Description for the token.
      */
-    public readonly description!: pulumi.Output<string | undefined>;
+    declare public readonly description: pulumi.Output<string | undefined>;
     /**
      * The name for the token. This must be unique amongst all machine tokens within your organization.
      */
-    public readonly name!: pulumi.Output<string>;
+    declare public readonly name: pulumi.Output<string>;
     /**
      * The organization's name.
      */
-    public readonly organizationName!: pulumi.Output<string>;
+    declare public readonly organizationName: pulumi.Output<string>;
     /**
      * The team name.
      */
-    public readonly teamName!: pulumi.Output<string>;
+    declare public readonly teamName: pulumi.Output<string>;
     /**
      * The token's value.
      */
-    public /*out*/ readonly value!: pulumi.Output<string>;
+    declare public /*out*/ readonly value: pulumi.Output<string>;
 
     /**
      * Create a TeamAccessToken resource with the given unique name, arguments, and options.
@@ -66,19 +66,19 @@ export class TeamAccessToken extends pulumi.CustomResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
-            if ((!args || args.name === undefined) && !opts.urn) {
+            if (args?.name === undefined && !opts.urn) {
                 throw new Error("Missing required property 'name'");
             }
-            if ((!args || args.organizationName === undefined) && !opts.urn) {
+            if (args?.organizationName === undefined && !opts.urn) {
                 throw new Error("Missing required property 'organizationName'");
             }
-            if ((!args || args.teamName === undefined) && !opts.urn) {
+            if (args?.teamName === undefined && !opts.urn) {
                 throw new Error("Missing required property 'teamName'");
             }
-            resourceInputs["description"] = args ? args.description : undefined;
-            resourceInputs["name"] = args ? args.name : undefined;
-            resourceInputs["organizationName"] = args ? args.organizationName : undefined;
-            resourceInputs["teamName"] = args ? args.teamName : undefined;
+            resourceInputs["description"] = args?.description;
+            resourceInputs["name"] = args?.name;
+            resourceInputs["organizationName"] = args?.organizationName;
+            resourceInputs["teamName"] = args?.teamName;
             resourceInputs["value"] = undefined /*out*/;
         } else {
             resourceInputs["description"] = undefined /*out*/;

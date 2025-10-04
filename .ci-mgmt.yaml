@@ -1,17 +1,25 @@
-template: generic
+template: native
 provider: pulumiservice
 major-version: 0
 aws: false
 pulumiVersionFile: .pulumi.version
 providerDefaultBranch: main
+plugins:
+    - name: std
+      version: "1.6.2"
+    - name: local
+      version: "0.0.1"
 parallel: 3
-timeout: 0.0000001
+modulePath: .
 envOverride:
     AWS_REGION: us-west-2
     PULUMI_API: https://api.pulumi-staging.io
+    GOLANGCI_LINT_VERSION: v2.5.0
+    GOVERSION: 1.24.x
 esc:
     enabled: false
 env:
+    GOVERSION: 1.24.x
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
     PULUMI_BACKEND_URL: https://api.pulumi-staging.io
@@ -24,4 +32,3 @@ env:
     PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
     PULUMI_TEST_OWNER: service-provider-test-org
     PULUMI_TEST_USE_SERVICE: true
-shards: 6

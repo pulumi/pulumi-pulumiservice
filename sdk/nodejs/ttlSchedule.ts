@@ -37,27 +37,27 @@ export class TtlSchedule extends pulumi.CustomResource {
     /**
      * True if the stack and all associated history and settings should be deleted.
      */
-    public readonly deleteAfterDestroy!: pulumi.Output<boolean | undefined>;
+    declare public readonly deleteAfterDestroy: pulumi.Output<boolean | undefined>;
     /**
      * Organization name.
      */
-    public readonly organization!: pulumi.Output<string>;
+    declare public readonly organization: pulumi.Output<string>;
     /**
      * Project name.
      */
-    public readonly project!: pulumi.Output<string>;
+    declare public readonly project: pulumi.Output<string>;
     /**
      * Schedule ID of the created schedule, assigned by Pulumi Cloud.
      */
-    public /*out*/ readonly scheduleId!: pulumi.Output<string>;
+    declare public /*out*/ readonly scheduleId: pulumi.Output<string>;
     /**
      * Stack name.
      */
-    public readonly stack!: pulumi.Output<string>;
+    declare public readonly stack: pulumi.Output<string>;
     /**
      * The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.
      */
-    public readonly timestamp!: pulumi.Output<string>;
+    declare public readonly timestamp: pulumi.Output<string>;
 
     /**
      * Create a TtlSchedule resource with the given unique name, arguments, and options.
@@ -70,23 +70,23 @@ export class TtlSchedule extends pulumi.CustomResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
-            if ((!args || args.organization === undefined) && !opts.urn) {
+            if (args?.organization === undefined && !opts.urn) {
                 throw new Error("Missing required property 'organization'");
             }
-            if ((!args || args.project === undefined) && !opts.urn) {
+            if (args?.project === undefined && !opts.urn) {
                 throw new Error("Missing required property 'project'");
             }
-            if ((!args || args.stack === undefined) && !opts.urn) {
+            if (args?.stack === undefined && !opts.urn) {
                 throw new Error("Missing required property 'stack'");
             }
-            if ((!args || args.timestamp === undefined) && !opts.urn) {
+            if (args?.timestamp === undefined && !opts.urn) {
                 throw new Error("Missing required property 'timestamp'");
             }
-            resourceInputs["deleteAfterDestroy"] = (args ? args.deleteAfterDestroy : undefined) ?? false;
-            resourceInputs["organization"] = args ? args.organization : undefined;
-            resourceInputs["project"] = args ? args.project : undefined;
-            resourceInputs["stack"] = args ? args.stack : undefined;
-            resourceInputs["timestamp"] = args ? args.timestamp : undefined;
+            resourceInputs["deleteAfterDestroy"] = (args?.deleteAfterDestroy) ?? false;
+            resourceInputs["organization"] = args?.organization;
+            resourceInputs["project"] = args?.project;
+            resourceInputs["stack"] = args?.stack;
+            resourceInputs["timestamp"] = args?.timestamp;
             resourceInputs["scheduleId"] = undefined /*out*/;
         } else {
             resourceInputs["deleteAfterDestroy"] = undefined /*out*/;

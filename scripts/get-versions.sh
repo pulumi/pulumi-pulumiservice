@@ -5,7 +5,7 @@ set -euo pipefail
 # e.g. go list -m -f '{{.GoVersion}}'
 
 module_path="github.com/pulumi/pulumi/pkg/v3"
-go_mod_path="provider"
+go_mod_path="."
 gomod="go.mod"
 
 if [[ "$go_mod_path" != "" && "$go_mod_path" != "." ]]; then

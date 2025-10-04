@@ -37,11 +37,11 @@ export class AccessToken extends pulumi.CustomResource {
     /**
      * Description of the access token.
      */
-    public readonly description!: pulumi.Output<string>;
+    declare public readonly description: pulumi.Output<string>;
     /**
      * The token's value.
      */
-    public /*out*/ readonly value!: pulumi.Output<string>;
+    declare public /*out*/ readonly value: pulumi.Output<string>;
 
     /**
      * Create a AccessToken resource with the given unique name, arguments, and options.
@@ -54,10 +54,10 @@ export class AccessToken extends pulumi.CustomResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
-            if ((!args || args.description === undefined) && !opts.urn) {
+            if (args?.description === undefined && !opts.urn) {
                 throw new Error("Missing required property 'description'");
             }
-            resourceInputs["description"] = args ? args.description : undefined;
+            resourceInputs["description"] = args?.description;
             resourceInputs["value"] = undefined /*out*/;
         } else {
             resourceInputs["description"] = undefined /*out*/;

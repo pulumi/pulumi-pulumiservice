@@ -9,6 +9,16 @@
 **/build
 **/target
 
+# Make build markers
+.make/
+
+# Test coverage
+**/coverage.txt
+
+# Python build artifacts
+sdk/python/dist/
+sdk/python/*.egg-info
+
 sdk/java/build
 sdk/java/src
 sdk/java/.gradle

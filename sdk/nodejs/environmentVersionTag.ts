@@ -37,23 +37,23 @@ export class EnvironmentVersionTag extends pulumi.CustomResource {
     /**
      * Environment name.
      */
-    public readonly environment!: pulumi.Output<string>;
+    declare public readonly environment: pulumi.Output<string>;
     /**
      * Organization name.
      */
-    public readonly organization!: pulumi.Output<string>;
+    declare public readonly organization: pulumi.Output<string>;
     /**
      * Project name.
      */
-    public readonly project!: pulumi.Output<string>;
+    declare public readonly project: pulumi.Output<string>;
     /**
      * Revision number.
      */
-    public readonly revision!: pulumi.Output<number>;
+    declare public readonly revision: pulumi.Output<number>;
     /**
      * Tag name.
      */
-    public readonly tagName!: pulumi.Output<string>;
+    declare public readonly tagName: pulumi.Output<string>;
 
     /**
      * Create a EnvironmentVersionTag resource with the given unique name, arguments, and options.
@@ -66,23 +66,23 @@ export class EnvironmentVersionTag extends pulumi.CustomResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
-            if ((!args || args.environment === undefined) && !opts.urn) {
+            if (args?.environment === undefined && !opts.urn) {
                 throw new Error("Missing required property 'environment'");
             }
-            if ((!args || args.organization === undefined) && !opts.urn) {
+            if (args?.organization === undefined && !opts.urn) {
                 throw new Error("Missing required property 'organization'");
             }
-            if ((!args || args.revision === undefined) && !opts.urn) {
+            if (args?.revision === undefined && !opts.urn) {
                 throw new Error("Missing required property 'revision'");
             }
-            if ((!args || args.tagName === undefined) && !opts.urn) {
+            if (args?.tagName === undefined && !opts.urn) {
                 throw new Error("Missing required property 'tagName'");
             }
-            resourceInputs["environment"] = args ? args.environment : undefined;
-            resourceInputs["organization"] = args ? args.organization : undefined;
-            resourceInputs["project"] = (args ? args.project : undefined) ?? "default";
-            resourceInputs["revision"] = args ? args.revision : undefined;
-            resourceInputs["tagName"] = args ? args.tagName : undefined;
+            resourceInputs["environment"] = args?.environment;
+            resourceInputs["organization"] = args?.organization;
+            resourceInputs["project"] = (args?.project) ?? "default";
+            resourceInputs["revision"] = args?.revision;
+            resourceInputs["tagName"] = args?.tagName;
         } else {
             resourceInputs["environment"] = undefined /*out*/;
             resourceInputs["organization"] = undefined /*out*/;

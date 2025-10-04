@@ -30,7 +30,7 @@ export interface GetPolicyPacksResult {
 /**
  * Get a list of all policy packs for an organization.
  */
-export function getPolicyPacksOutput(args: GetPolicyPacksOutputArgs, opts?: pulumi.InvokeOptions): pulumi.Output<GetPolicyPacksResult> {
+export function getPolicyPacksOutput(args: GetPolicyPacksOutputArgs, opts?: pulumi.InvokeOutputOptions): pulumi.Output<GetPolicyPacksResult> {
     opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts || {});
     return pulumi.runtime.invokeOutput("pulumiservice:index:getPolicyPacks", {
         "organizationName": args.organizationName,

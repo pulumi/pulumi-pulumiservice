@@ -139,7 +139,9 @@ func (c *Client) CreatePolicyGroup(ctx context.Context, orgName, policyGroupName
 	return nil
 }
 
-func (c *Client) UpdatePolicyGroup(ctx context.Context, orgName, policyGroupName string, req UpdatePolicyGroupRequest) error {
+func (c *Client) UpdatePolicyGroup(
+	ctx context.Context, orgName, policyGroupName string, req UpdatePolicyGroupRequest,
+) error {
 	if len(orgName) == 0 {
 		return errors.New("orgName must not be empty")
 	}

@@ -5,10 +5,16 @@
 ### Improvements
 
 - Added PolicyGroup resource and getPolicyPack/getPolicyPacks data sources for managing policy packs across stacks
+- Migrated to ci-mgmt native template for automated CI/CD workflow generation
+
 
 ### Bug Fixes
 
-- Fixed OIDC issuer examples: removed unsupported runner token type and updated Pulumi OIDC thumbprint
+- Fixed OIDC issuer examples: removed unsupported runner token type and updated Pulumi OIDC thumbprint [#547](https://github.com/pulumi/pulumi-pulumiservice/pull/547)
+- Fixed golangci-lint issues in examples: improved security (crypto/rand), file permissions, and code formatting
+- Fixed Makefile to use correct directory structure and dependency patterns
+- Fixed CI workflows by creating codegen binary symlink for native provider compatibility
+- Fixed example test files to properly handle unused parameters and line length limits
 
 ## 0.31.0
 
