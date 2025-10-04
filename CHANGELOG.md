@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## Unreleased
+
+### Bug Fixes
+
+- Fixed OIDC issuer examples: removed unsupported runner token type and updated Pulumi OIDC thumbprint 
+
 ## 0.31.0
 
 ### Improvements
