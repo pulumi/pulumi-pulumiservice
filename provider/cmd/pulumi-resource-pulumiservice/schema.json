@@ -1152,6 +1152,67 @@
         "organizationName"
       ]
     },
+    "pulumiservice:index:Role": {
+      "description": "A Role resource manages custom RBAC roles in Pulumi Cloud. Roles define sets of permissions that can be assigned to users or teams within an organization.",
+      "properties": {
+        "organizationName": {
+          "description": "The organization name.",
+          "type": "string"
+        },
+        "name": {
+          "description": "The name of the role.",
+          "type": "string"
+        },
+        "description": {
+          "description": "The description of the role.",
+          "type": "string"
+        },
+        "uxPurpose": {
+          "description": "The UX purpose of the permission descriptor. One of 'role', 'policy', or 'set'. Defaults to 'role'.",
+          "type": "string"
+        },
+        "details": {
+          "description": "The permission descriptor details that define what permissions this role grants.",
+          "$ref": "pulumi.json#/Any"
+        }
+      },
+      "required": [
+        "organizationName",
+        "name",
+        "description",
+        "details"
+      ],
+      "inputProperties": {
+        "organizationName": {
+          "description": "The organization name.",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "name": {
+          "description": "The name of the role.",
+          "type": "string"
+        },
+        "description": {
+          "description": "The description of the role.",
+          "type": "string"
+        },
+        "uxPurpose": {
+          "description": "The UX purpose of the permission descriptor. One of 'role', 'policy', or 'set'. Defaults to 'role'.",
+          "type": "string",
+          "default": "role"
+        },
+        "details": {
+          "description": "The permission descriptor details that define what permissions this role grants.",
+          "$ref": "pulumi.json#/Any"
+        }
+      },
+      "requiredInputs": [
+        "organizationName",
+        "name",
+        "description",
+        "details"
+      ]
+    },
     "pulumiservice:index:Webhook": {
       "description": "Pulumi Webhooks allow you to notify external services of events happening within your Pulumi organization or stack. For example, you can trigger a notification whenever a stack is updated. Whenever an event occurs, Pulumi will send an HTTP POST request to all registered webhooks. The webhook can then be used to emit some notification, start running integration tests, or even update additional stacks.\n\n### Import\n\nPulumi webhooks can be imported using the `id`, which for webhooks is `{org}/{project}/{stack}/{webhook-name}` e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:Webhook my_webhook my-org/my-project/my-stack/4b0d0671\n```\n\n",
       "properties": {
