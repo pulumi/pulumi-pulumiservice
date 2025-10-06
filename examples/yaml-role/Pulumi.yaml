@@ -1,0 +1,26 @@
+name: yaml-role-example
+runtime: yaml
+description: A minimal Pulumi YAML program for managing custom RBAC roles
+config:
+  org:
+    type: string
+    default: service-provider-test-org
+  digits:
+    type: string
+resources:
+  # NOTE: This example requires existing role IDs to compose from.
+  # The Role resource uses PermissionDescriptorCompose which references
+  # existing permission descriptor IDs rather than direct permission strings.
+  # Replace "role-id-here" with an actual role ID from your organization.
+  # You can query available roles using: pulumi pulumiservice get-roles
+  custom-role:
+    type: pulumiservice:index:Role
+    properties:
+      organizationName: ${org}
+      name: custom-stack-reader-${digits}
+      description: "A custom role composed from existing permission descriptors"
+      uxPurpose: role
+      details:
+        __type: PermissionDescriptorCompose
+        permissionDescriptors:
+          - "role-id-here"  # Replace with actual role ID from your org
