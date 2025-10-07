@@ -1,26 +1,73 @@
 name: yaml-service
 runtime: yaml
-description: A minimal example of provisioning a Service via Pulumi YAML
+description: |
+  Example of provisioning a Service with items via Pulumi YAML.
+
+  This example demonstrates THREE ways to specify the organization:
+
+  1. AUTOMATIC (provider default): Omit organizationName - provider uses the first
+     organization from your Pulumi Cloud account where you are a member/admin.
+
+  2. EXPLICIT API (getCurrentUser): Call getCurrentUser() to get your default org
+     from Pulumi Cloud API and reference it explicitly.
+
+  3. STACK CONTEXT (pulumi.organization): Use the organization from your current
+     stack deployment context (e.g., if deploying org/project/stack, uses "org").
+     Note: This requires using the Pulumi SDK function in your language, not shown
+     in this YAML example. See TypeScript/Python examples for usage of
+     pulumi.getOrganization().
 
 configuration:
-  orgName:
-    type: string
   ownerName:
     type: string
+  projectName:
+    type: string
+  stackName:
+    type: string
+
+variables:
+  # Get current user info from Pulumi Cloud API
+  # Returns the user's default organization (first org where they're a member/admin)
+  currentUser:
+    fn::invoke:
+      function: pulumiservice:index:getCurrentUser
+      return: defaultOrganization
 
 resources:
-  myService:
+  # Example 1: Explicit API approach using getCurrentUser()
+  # Good for: When you want to be explicit about which org from your account to use
+  myServiceExplicit:
     type: pulumiservice:index:Service
     properties:
-      organizationName: ${orgName}
+      organizationName: ${currentUser}
       ownerType: user
       ownerName: ${ownerName}
-      name: example-service
-      description: Example service created via Pulumi YAML
+      name: example-service-explicit
+      description: Service using explicit defaultOrganization from getCurrentUser
+      properties:
+        environment: development
+        team: platform
+      items:
+        - itemType: stack
+          name: ${currentUser}/${projectName}/${stackName}
+
+  # Example 2: Automatic approach (provider infers from API)
+  # Good for: Quick prototyping, single-org scenarios
+  myServiceAutomatic:
+    type: pulumiservice:index:Service
+    properties:
+      # organizationName omitted - provider automatically uses default org from your account
+      ownerType: user
+      ownerName: ${ownerName}
+      name: example-service-automatic
+      description: Service using automatic default organization
       properties:
         environment: development
         team: platform
 
 outputs:
-  serviceName: ${myService.name}
-  serviceOwner: ${myService.ownerName}
+  explicitServiceName: ${myServiceExplicit.name}
+  explicitOrganization: ${myServiceExplicit.organizationName}
+  automaticServiceName: ${myServiceAutomatic.name}
+  automaticOrganization: ${myServiceAutomatic.organizationName}
+  userDefaultOrg: ${currentUser}

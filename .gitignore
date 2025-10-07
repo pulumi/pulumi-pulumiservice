@@ -27,4 +27,3 @@ ci-scripts
 *.sln
 .config/
 .gradle/
-PR_MESSAGE.md

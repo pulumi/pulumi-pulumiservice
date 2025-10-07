@@ -2280,6 +2280,53 @@
       ]
     }
   },
+  "functions": {
+    "pulumiservice:index:getCurrentUser": {
+      "description": "Get information about the currently authenticated user, including their default organization.",
+      "outputs": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The user's unique identifier."
+          },
+          "name": {
+            "type": "string",
+            "description": "The user's display name."
+          },
+          "githubLogin": {
+            "type": "string",
+            "description": "The user's GitHub login."
+          },
+          "email": {
+            "type": "string",
+            "description": "The user's email address."
+          },
+          "defaultOrganization": {
+            "type": "string",
+            "description": "The name of the user's default organization (first organization where they are a member, admin, or billing manager)."
+          },
+          "organizations": {
+            "type": "array",
+            "description": "List of organizations the user belongs to.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "role": {
+                  "type": "string",
+                  "description": "User's role in the organization (member, admin, billing-manager, etc.)"
+                }
+              }
+            }
+          }
+        },
+        "type": "object",
+        "required": ["id", "name", "githubLogin", "email", "defaultOrganization", "organizations"]
+      }
+    }
+  },
   "language": {
     "csharp": {
       "namespaces": {

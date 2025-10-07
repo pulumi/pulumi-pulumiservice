@@ -50,12 +50,13 @@ type PulumiServiceResource interface {
 type pulumiserviceProvider struct {
 	pulumirpc.UnimplementedResourceProviderServer
 
-	host            *provider.HostClient
-	name            string
-	version         string
-	schema          string
-	pulumiResources []PulumiServiceResource
-	AccessToken     string
+	host                *provider.HostClient
+	name                string
+	version             string
+	schema              string
+	pulumiResources     []PulumiServiceResource
+	AccessToken         string
+	defaultOrganization string
 }
 
 func MakeProvider(host *provider.HostClient, name, version, schema string) (pulumirpc.ResourceProviderServer, error) {
@@ -129,6 +130,14 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 		return nil, err
 	}
 
+	// Fetch the current user to get default organization
+	currentUser, err := client.GetCurrentUser(context.Background())
+	if err == nil && currentUser != nil {
+		k.defaultOrganization = currentUser.GetDefaultOrganization()
+	}
+	// Note: We don't fail if we can't get the default org, as users can still
+	// explicitly specify organizationName in their resources
+
 	k.pulumiResources = []PulumiServiceResource{
 		&resources.PulumiServiceTeamResource{
 			Client: client,
@@ -152,7 +161,8 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 			Client: client,
 		},
 		&resources.PulumiServiceServiceResource{
-			Client: client,
+			Client:              client,
+			DefaultOrganization: k.defaultOrganization,
 		},
 		&resources.PulumiServiceDeploymentSettingsResource{
 			Client: client,
@@ -201,9 +211,15 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 }
 
 // Invoke dynamically executes a built-in function in the provider.
-func (k *pulumiserviceProvider) Invoke(_ context.Context, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
+func (k *pulumiserviceProvider) Invoke(ctx context.Context, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
 	tok := req.GetTok()
-	return nil, fmt.Errorf("unknown Invoke token '%s'", tok)
+
+	switch tok {
+	case "pulumiservice:index:getCurrentUser":
+		return k.invokeFunctionGetCurrentUser(ctx, req)
+	default:
+		return nil, fmt.Errorf("unknown Invoke token '%s'", tok)
+	}
 }
 
 // StreamInvoke dynamically executes a built-in function in the provider. The result is streamed
@@ -317,4 +333,45 @@ func mustSetSchemaVersion(schemaStr string, version string) string {
 
 type ResourceBase interface {
 	GetUrn() string
+}
+
+// invokeFunctionGetCurrentUser implements the getCurrentUser function
+func (k *pulumiserviceProvider) invokeFunctionGetCurrentUser(ctx context.Context, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
+	if k.client == nil {
+		return nil, fmt.Errorf("provider not configured")
+	}
+
+	// Call the API to get current user
+	currentUser, err := k.client.GetCurrentUser(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get current user: %w", err)
+	}
+
+	// Build organizations array
+	orgsArray := make([]resource.PropertyValue, len(currentUser.Organizations))
+	for i, org := range currentUser.Organizations {
+		orgsArray[i] = resource.NewObjectProperty(resource.PropertyMap{
+			"name": resource.NewStringProperty(org.Name),
+			"role": resource.NewStringProperty(org.Role),
+		})
+	}
+
+	// Build output
+	outputProps := resource.PropertyMap{
+		"id":                   resource.NewStringProperty(currentUser.ID),
+		"name":                 resource.NewStringProperty(currentUser.Name),
+		"githubLogin":          resource.NewStringProperty(currentUser.GithubLogin),
+		"email":                resource.NewStringProperty(currentUser.Email),
+		"defaultOrganization":  resource.NewStringProperty(currentUser.GetDefaultOrganization()),
+		"organizations":        resource.NewArrayProperty(orgsArray),
+	}
+
+	outputProperties, err := plugin.MarshalProperties(outputProps, plugin.MarshalOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	return &pulumirpc.InvokeResponse{
+		Return: outputProperties,
+	}, nil
 }

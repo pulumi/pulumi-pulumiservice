@@ -15,7 +15,8 @@ import (
 )
 
 type PulumiServiceServiceResource struct {
-	Client pulumiapi.ServiceClient
+	Client               pulumiapi.ServiceClient
+	DefaultOrganization  string
 }
 
 type PulumiServiceServiceInput struct {
@@ -128,7 +129,20 @@ func (s *PulumiServiceServiceResource) Check(req *pulumirpc.CheckRequest) (*pulu
 
 	var failures []*pulumirpc.CheckFailure
 
-	for _, p := range []resource.PropertyKey{"organizationName", "ownerType", "ownerName", "name"} {
+	// Apply default organization if not specified
+	if !newsMap["organizationName"].HasValue() || !newsMap["organizationName"].IsString() || newsMap["organizationName"].StringValue() == "" {
+		if s.DefaultOrganization != "" {
+			newsMap["organizationName"] = resource.NewStringProperty(s.DefaultOrganization)
+		} else {
+			failures = append(failures, &pulumirpc.CheckFailure{
+				Reason:   "missing required property 'organizationName' and no default organization available",
+				Property: "organizationName",
+			})
+		}
+	}
+
+	// Check other required properties
+	for _, p := range []resource.PropertyKey{"ownerType", "ownerName", "name"} {
 		if !newsMap[p].HasValue() {
 			failures = append(failures, &pulumirpc.CheckFailure{
 				Reason:   fmt.Sprintf("missing required property '%s'", p),
