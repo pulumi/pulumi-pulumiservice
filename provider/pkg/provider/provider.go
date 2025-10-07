@@ -34,6 +34,7 @@ import (
 	"github.com/pulumi/pulumi/pkg/v3/codegen/schema"
 	"github.com/pulumi/pulumi/pkg/v3/resource/provider"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
@@ -56,6 +57,7 @@ type pulumiserviceProvider struct {
 	schema          string
 	pulumiResources []PulumiServiceResource
 	AccessToken     string
+	client          *pulumiapi.Client
 }
 
 func MakeProvider(host *provider.HostClient, name, version, schema string) (pulumirpc.ResourceProviderServer, error) {
@@ -129,6 +131,9 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 		return nil, err
 	}
 
+	// Store the client for use in Invoke functions
+	k.client = client
+
 	k.pulumiResources = []PulumiServiceResource{
 		&resources.PulumiServiceTeamResource{
 			Client: client,
@@ -190,6 +195,9 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 		&resources.PulumiServiceApprovalRuleResource{
 			Client: client,
 		},
+		&resources.PulumiServicePolicyGroupResource{
+			Client: client,
+		},
 	}
 
 	return &pulumirpc.ConfigureResponse{
@@ -198,9 +206,17 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 }
 
 // Invoke dynamically executes a built-in function in the provider.
-func (k *pulumiserviceProvider) Invoke(_ context.Context, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
+func (k *pulumiserviceProvider) Invoke(ctx context.Context, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
 	tok := req.GetTok()
-	return nil, fmt.Errorf("unknown Invoke token '%s'", tok)
+
+	switch tok {
+	case "pulumiservice:index:getPolicyPacks":
+		return k.invokeFunctionGetPolicyPacks(ctx, req)
+	case "pulumiservice:index:getPolicyPack":
+		return k.invokeFunctionGetPolicyPack(ctx, req)
+	default:
+		return nil, fmt.Errorf("unknown Invoke token '%s'", tok)
+	}
 }
 
 // StreamInvoke dynamically executes a built-in function in the provider. The result is streamed
@@ -314,4 +330,197 @@ func mustSetSchemaVersion(schemaStr string, version string) string {
 
 type ResourceBase interface {
 	GetUrn() string
+}
+
+// invokeFunctionGetPolicyPacks implements the getPolicyPacks function
+func (k *pulumiserviceProvider) invokeFunctionGetPolicyPacks(ctx context.Context, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
+	if k.client == nil {
+		return nil, fmt.Errorf("provider not configured")
+	}
+
+	// Parse inputs
+	inputs, err := plugin.UnmarshalProperties(req.GetArgs(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	if err != nil {
+		return nil, err
+	}
+
+	orgName := inputs["organizationName"].StringValue()
+	if orgName == "" {
+		return nil, fmt.Errorf("organizationName is required")
+	}
+
+	// Call the API
+	policyPacks, err := k.client.ListPolicyPacks(ctx, orgName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list policy packs: %w", err)
+	}
+
+	// Build output
+	outputProps := resource.PropertyMap{
+		"policyPacks": resource.NewPropertyValue(convertPolicyPacksToProperties(policyPacks)),
+	}
+
+	outputProperties, err := plugin.MarshalProperties(outputProps, plugin.MarshalOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	return &pulumirpc.InvokeResponse{
+		Return: outputProperties,
+	}, nil
+}
+
+// invokeFunctionGetPolicyPack implements the getPolicyPack function
+func (k *pulumiserviceProvider) invokeFunctionGetPolicyPack(ctx context.Context, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
+	if k.client == nil {
+		return nil, fmt.Errorf("provider not configured")
+	}
+
+	// Parse inputs
+	inputs, err := plugin.UnmarshalProperties(req.GetArgs(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	if err != nil {
+		return nil, err
+	}
+
+	orgName := inputs["organizationName"].StringValue()
+	if orgName == "" {
+		return nil, fmt.Errorf("organizationName is required")
+	}
+
+	policyPackName := inputs["policyPackName"].StringValue()
+	if policyPackName == "" {
+		return nil, fmt.Errorf("policyPackName is required")
+	}
+
+	// Call the API - either specific version or latest
+	var policyPack *pulumiapi.PolicyPackDetail
+	if inputs["version"].HasValue() && inputs["version"].IsNumber() {
+		version := int(inputs["version"].NumberValue())
+		policyPack, err = k.client.GetPolicyPack(ctx, orgName, policyPackName, version)
+	} else {
+		policyPack, err = k.client.GetLatestPolicyPack(ctx, orgName, policyPackName)
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to get policy pack: %w", err)
+	}
+
+	if policyPack == nil {
+		return nil, fmt.Errorf("policy pack not found")
+	}
+
+	// Build output
+	outputProps := convertPolicyPackDetailToProperties(policyPack)
+
+	outputProperties, err := plugin.MarshalProperties(outputProps, plugin.MarshalOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	return &pulumirpc.InvokeResponse{
+		Return: outputProperties,
+	}, nil
+}
+
+// Helper functions to convert API types to property values
+func convertPolicyPacksToProperties(packs []pulumiapi.PolicyPackWithVersions) []resource.PropertyValue {
+	result := make([]resource.PropertyValue, len(packs))
+	for i, pack := range packs {
+		versions := make([]resource.PropertyValue, len(pack.Versions))
+		for j, v := range pack.Versions {
+			versions[j] = resource.NewNumberProperty(float64(v))
+		}
+
+		versionTags := make([]resource.PropertyValue, len(pack.VersionTags))
+		for j, vt := range pack.VersionTags {
+			versionTags[j] = resource.NewStringProperty(vt)
+		}
+
+		result[i] = resource.NewObjectProperty(resource.PropertyMap{
+			"name":        resource.NewStringProperty(pack.Name),
+			"displayName": resource.NewStringProperty(pack.DisplayName),
+			"versions":    resource.NewArrayProperty(versions),
+			"versionTags": resource.NewArrayProperty(versionTags),
+		})
+	}
+	return result
+}
+
+func convertPolicyPackDetailToProperties(pack *pulumiapi.PolicyPackDetail) resource.PropertyMap {
+	props := resource.PropertyMap{
+		"name":        resource.NewStringProperty(pack.Name),
+		"displayName": resource.NewStringProperty(pack.DisplayName),
+		"version":     resource.NewNumberProperty(float64(pack.Version)),
+	}
+
+	if pack.VersionTag != "" {
+		props["versionTag"] = resource.NewStringProperty(pack.VersionTag)
+	}
+
+	if pack.Config != nil {
+		props["config"] = resource.NewObjectProperty(convertMapToPropertyMap(pack.Config))
+	}
+
+	if len(pack.Policies) > 0 {
+		policies := make([]resource.PropertyValue, len(pack.Policies))
+		for i, policy := range pack.Policies {
+			policyProps := resource.PropertyMap{
+				"name": resource.NewStringProperty(policy.Name),
+			}
+			if policy.DisplayName != "" {
+				policyProps["displayName"] = resource.NewStringProperty(policy.DisplayName)
+			}
+			if policy.Description != "" {
+				policyProps["description"] = resource.NewStringProperty(policy.Description)
+			}
+			if policy.EnforcementLevel != "" {
+				policyProps["enforcementLevel"] = resource.NewStringProperty(policy.EnforcementLevel)
+			}
+			if policy.Message != "" {
+				policyProps["message"] = resource.NewStringProperty(policy.Message)
+			}
+			if policy.ConfigSchema != nil {
+				policyProps["configSchema"] = resource.NewObjectProperty(convertMapToPropertyMap(policy.ConfigSchema))
+			}
+			policies[i] = resource.NewObjectProperty(policyProps)
+		}
+		props["policies"] = resource.NewArrayProperty(policies)
+	}
+
+	return props
+}
+
+func convertMapToPropertyMap(m map[string]interface{}) resource.PropertyMap {
+	props := resource.PropertyMap{}
+	for k, v := range m {
+		props[resource.PropertyKey(k)] = convertInterfaceToPropertyValue(v)
+	}
+	return props
+}
+
+func convertInterfaceToPropertyValue(v interface{}) resource.PropertyValue {
+	if v == nil {
+		return resource.NewNullProperty()
+	}
+
+	switch val := v.(type) {
+	case string:
+		return resource.NewStringProperty(val)
+	case float64:
+		return resource.NewNumberProperty(val)
+	case int:
+		return resource.NewNumberProperty(float64(val))
+	case bool:
+		return resource.NewBoolProperty(val)
+	case []interface{}:
+		arr := make([]resource.PropertyValue, len(val))
+		for i, item := range val {
+			arr[i] = convertInterfaceToPropertyValue(item)
+		}
+		return resource.NewArrayProperty(arr)
+	case map[string]interface{}:
+		return resource.NewObjectProperty(convertMapToPropertyMap(val))
+	default:
+		return resource.NewNullProperty()
+	}
 }

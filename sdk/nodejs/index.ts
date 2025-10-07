@@ -50,6 +50,16 @@ export type EnvironmentVersionTag = import("./environmentVersionTag").Environmen
 export const EnvironmentVersionTag: typeof import("./environmentVersionTag").EnvironmentVersionTag = null as any;
 utilities.lazyLoad(exports, ["EnvironmentVersionTag"], () => require("./environmentVersionTag"));
 
+export { GetPolicyPackArgs, GetPolicyPackResult, GetPolicyPackOutputArgs } from "./getPolicyPack";
+export const getPolicyPack: typeof import("./getPolicyPack").getPolicyPack = null as any;
+export const getPolicyPackOutput: typeof import("./getPolicyPack").getPolicyPackOutput = null as any;
+utilities.lazyLoad(exports, ["getPolicyPack","getPolicyPackOutput"], () => require("./getPolicyPack"));
+
+export { GetPolicyPacksArgs, GetPolicyPacksResult, GetPolicyPacksOutputArgs } from "./getPolicyPacks";
+export const getPolicyPacks: typeof import("./getPolicyPacks").getPolicyPacks = null as any;
+export const getPolicyPacksOutput: typeof import("./getPolicyPacks").getPolicyPacksOutput = null as any;
+utilities.lazyLoad(exports, ["getPolicyPacks","getPolicyPacksOutput"], () => require("./getPolicyPacks"));
+
 export { OidcIssuerArgs } from "./oidcIssuer";
 export type OidcIssuer = import("./oidcIssuer").OidcIssuer;
 export const OidcIssuer: typeof import("./oidcIssuer").OidcIssuer = null as any;
@@ -59,6 +69,11 @@ export { OrgAccessTokenArgs } from "./orgAccessToken";
 export type OrgAccessToken = import("./orgAccessToken").OrgAccessToken;
 export const OrgAccessToken: typeof import("./orgAccessToken").OrgAccessToken = null as any;
 utilities.lazyLoad(exports, ["OrgAccessToken"], () => require("./orgAccessToken"));
+
+export { PolicyGroupArgs } from "./policyGroup";
+export type PolicyGroup = import("./policyGroup").PolicyGroup;
+export const PolicyGroup: typeof import("./policyGroup").PolicyGroup = null as any;
+utilities.lazyLoad(exports, ["PolicyGroup"], () => require("./policyGroup"));
 
 export { ProviderArgs } from "./provider";
 export type Provider = import("./provider").Provider;
@@ -149,6 +164,8 @@ const _module = {
                 return new OidcIssuer(name, <any>undefined, { urn })
             case "pulumiservice:index:OrgAccessToken":
                 return new OrgAccessToken(name, <any>undefined, { urn })
+            case "pulumiservice:index:PolicyGroup":
+                return new PolicyGroup(name, <any>undefined, { urn })
             case "pulumiservice:index:Stack":
                 return new Stack(name, <any>undefined, { urn })
             case "pulumiservice:index:StackTag":
