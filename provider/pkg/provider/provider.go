@@ -198,6 +198,9 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 		&resources.PulumiServicePolicyGroupResource{
 			Client: client,
 		},
+		&resources.PulumiServiceRoleResource{
+			Client: client,
+		},
 	}
 
 	return &pulumirpc.ConfigureResponse{

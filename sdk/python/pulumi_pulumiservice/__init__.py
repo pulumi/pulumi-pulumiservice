@@ -21,6 +21,7 @@ from .oidc_issuer import *
 from .org_access_token import *
 from .policy_group import *
 from .provider import *
+from .role import *
 from .stack import *
 from .stack_tag import *
 from .team import *
@@ -60,6 +61,7 @@ _utilities.register(
    "pulumiservice:index:OidcIssuer": "OidcIssuer",
    "pulumiservice:index:OrgAccessToken": "OrgAccessToken",
    "pulumiservice:index:PolicyGroup": "PolicyGroup",
+   "pulumiservice:index:Role": "Role",
    "pulumiservice:index:Stack": "Stack",
    "pulumiservice:index:StackTag": "StackTag",
    "pulumiservice:index:Team": "Team",
