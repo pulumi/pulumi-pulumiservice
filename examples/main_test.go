@@ -6,14 +6,10 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	// Set default test owner if not already set
+	// Only set PULUMI_TEST_OWNER if not already set by environment
 	if os.Getenv("PULUMI_TEST_OWNER") == "" {
-		if err := os.Setenv("PULUMI_TEST_OWNER", "service-provider-test-org"); err != nil {
-			panic("failed to set PULUMI_TEST_OWNER: " + err.Error())
-		}
+		_ = os.Setenv("PULUMI_TEST_OWNER", "service-provider-test-org")
 	}
-	if err := os.Setenv("PULUMI_TEST_USE_SERVICE", "true"); err != nil {
-		panic("failed to set PULUMI_TEST_USE_SERVICE: " + err.Error())
-	}
+	_ = os.Setenv("PULUMI_TEST_USE_SERVICE", "true")
 	m.Run()
 }

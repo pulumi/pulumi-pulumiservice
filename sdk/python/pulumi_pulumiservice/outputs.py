@@ -35,6 +35,7 @@ __all__ = [
     'GCPOIDCConfiguration',
     'OperationContextOIDC',
     'OperationContextOptions',
+    'ServiceItem',
     'TemplateSourceDestination',
 ]
 
@@ -1172,6 +1173,56 @@ class OperationContextOptions(dict):
         Skip intermediate deployments (Consolidate multiple deployments of the same type into one deployment)
         """
         return pulumi.get(self, "skip_intermediate_deployments")
+
+
+@pulumi.output_type
+class ServiceItem(dict):
+    """
+    An item that belongs to a service (stack or environment).
+    """
+    @staticmethod
+    def __key_warning(key: str):
+        suggest = None
+        if key == "itemType":
+            suggest = "item_type"
+
+        if suggest:
+            pulumi.log.warn(f"Key '{key}' not found in ServiceItem. Access the value via the '{suggest}' property getter instead.")
+
+    def __getitem__(self, key: str) -> Any:
+        ServiceItem.__key_warning(key)
+        return super().__getitem__(key)
+
+    def get(self, key: str, default = None) -> Any:
+        ServiceItem.__key_warning(key)
+        return super().get(key, default)
+
+    def __init__(__self__, *,
+                 item_type: str,
+                 name: str):
+        """
+        An item that belongs to a service (stack or environment).
+        :param str item_type: The type of item (stack or environment).
+        :param str name: The name of the item (format: org/project/stackOrEnv).
+        """
+        pulumi.set(__self__, "item_type", item_type)
+        pulumi.set(__self__, "name", name)
+
+    @property
+    @pulumi.getter(name="itemType")
+    def item_type(self) -> str:
+        """
+        The type of item (stack or environment).
+        """
+        return pulumi.get(self, "item_type")
+
+    @property
+    @pulumi.getter
+    def name(self) -> str:
+        """
+        The name of the item (format: org/project/stackOrEnv).
+        """
+        return pulumi.get(self, "name")
 
 
 @pulumi.output_type

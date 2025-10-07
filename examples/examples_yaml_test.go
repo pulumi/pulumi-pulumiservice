@@ -413,6 +413,21 @@ func TestYamlOidcIssuerExample(t *testing.T) {
 	})
 }
 
+func TestYamlServiceExample(t *testing.T) {
+	cwd := getCwd(t)
+	orgName := getOrgName(t)
+	ownerName := getOwnerName(t)
+	digits := generateRandomFiveDigits()
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Dir:       path.Join(cwd, ".", "yaml-service"),
+		StackName: "test-stack-" + digits,
+		Config: map[string]string{
+			"orgName":   orgName,
+			"ownerName": ownerName,
+		},
+	})
+}
+
 func writePulumiYaml(t *testing.T, yamlContents interface{}) string {
 	tmpdir := t.TempDir()
 	b, err := yaml.Marshal(yamlContents)

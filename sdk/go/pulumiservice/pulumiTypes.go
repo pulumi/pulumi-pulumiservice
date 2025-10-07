@@ -2986,6 +2986,115 @@ func (o OperationContextOptionsPtrOutput) SkipIntermediateDeployments() pulumi.B
 	}).(pulumi.BoolPtrOutput)
 }
 
+// An item that belongs to a service (stack or environment).
+type ServiceItem struct {
+	// The type of item (stack or environment).
+	ItemType string `pulumi:"itemType"`
+	// The name of the item (format: org/project/stackOrEnv).
+	Name string `pulumi:"name"`
+}
+
+// ServiceItemInput is an input type that accepts ServiceItemArgs and ServiceItemOutput values.
+// You can construct a concrete instance of `ServiceItemInput` via:
+//
+//	ServiceItemArgs{...}
+type ServiceItemInput interface {
+	pulumi.Input
+
+	ToServiceItemOutput() ServiceItemOutput
+	ToServiceItemOutputWithContext(context.Context) ServiceItemOutput
+}
+
+// An item that belongs to a service (stack or environment).
+type ServiceItemArgs struct {
+	// The type of item (stack or environment).
+	ItemType pulumi.StringInput `pulumi:"itemType"`
+	// The name of the item (format: org/project/stackOrEnv).
+	Name pulumi.StringInput `pulumi:"name"`
+}
+
+func (ServiceItemArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*ServiceItem)(nil)).Elem()
+}
+
+func (i ServiceItemArgs) ToServiceItemOutput() ServiceItemOutput {
+	return i.ToServiceItemOutputWithContext(context.Background())
+}
+
+func (i ServiceItemArgs) ToServiceItemOutputWithContext(ctx context.Context) ServiceItemOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(ServiceItemOutput)
+}
+
+// ServiceItemArrayInput is an input type that accepts ServiceItemArray and ServiceItemArrayOutput values.
+// You can construct a concrete instance of `ServiceItemArrayInput` via:
+//
+//	ServiceItemArray{ ServiceItemArgs{...} }
+type ServiceItemArrayInput interface {
+	pulumi.Input
+
+	ToServiceItemArrayOutput() ServiceItemArrayOutput
+	ToServiceItemArrayOutputWithContext(context.Context) ServiceItemArrayOutput
+}
+
+type ServiceItemArray []ServiceItemInput
+
+func (ServiceItemArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]ServiceItem)(nil)).Elem()
+}
+
+func (i ServiceItemArray) ToServiceItemArrayOutput() ServiceItemArrayOutput {
+	return i.ToServiceItemArrayOutputWithContext(context.Background())
+}
+
+func (i ServiceItemArray) ToServiceItemArrayOutputWithContext(ctx context.Context) ServiceItemArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(ServiceItemArrayOutput)
+}
+
+// An item that belongs to a service (stack or environment).
+type ServiceItemOutput struct{ *pulumi.OutputState }
+
+func (ServiceItemOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*ServiceItem)(nil)).Elem()
+}
+
+func (o ServiceItemOutput) ToServiceItemOutput() ServiceItemOutput {
+	return o
+}
+
+func (o ServiceItemOutput) ToServiceItemOutputWithContext(ctx context.Context) ServiceItemOutput {
+	return o
+}
+
+// The type of item (stack or environment).
+func (o ServiceItemOutput) ItemType() pulumi.StringOutput {
+	return o.ApplyT(func(v ServiceItem) string { return v.ItemType }).(pulumi.StringOutput)
+}
+
+// The name of the item (format: org/project/stackOrEnv).
+func (o ServiceItemOutput) Name() pulumi.StringOutput {
+	return o.ApplyT(func(v ServiceItem) string { return v.Name }).(pulumi.StringOutput)
+}
+
+type ServiceItemArrayOutput struct{ *pulumi.OutputState }
+
+func (ServiceItemArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]ServiceItem)(nil)).Elem()
+}
+
+func (o ServiceItemArrayOutput) ToServiceItemArrayOutput() ServiceItemArrayOutput {
+	return o
+}
+
+func (o ServiceItemArrayOutput) ToServiceItemArrayOutputWithContext(ctx context.Context) ServiceItemArrayOutput {
+	return o
+}
+
+func (o ServiceItemArrayOutput) Index(i pulumi.IntInput) ServiceItemOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) ServiceItem {
+		return vs[0].([]ServiceItem)[vs[1].(int)]
+	}).(ServiceItemOutput)
+}
+
 type TemplateSourceDestination struct {
 	// Destination URL that gets filled in on new project creation.
 	Url *string `pulumi:"url"`
@@ -3158,6 +3267,8 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*OperationContextOIDCPtrInput)(nil)).Elem(), OperationContextOIDCArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*OperationContextOptionsInput)(nil)).Elem(), OperationContextOptionsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*OperationContextOptionsPtrInput)(nil)).Elem(), OperationContextOptionsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*ServiceItemInput)(nil)).Elem(), ServiceItemArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*ServiceItemArrayInput)(nil)).Elem(), ServiceItemArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*TemplateSourceDestinationInput)(nil)).Elem(), TemplateSourceDestinationArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*TemplateSourceDestinationPtrInput)(nil)).Elem(), TemplateSourceDestinationArgs{})
 	pulumi.RegisterOutputType(AWSOIDCConfigurationOutput{})
@@ -3194,6 +3305,8 @@ func init() {
 	pulumi.RegisterOutputType(OperationContextOIDCPtrOutput{})
 	pulumi.RegisterOutputType(OperationContextOptionsOutput{})
 	pulumi.RegisterOutputType(OperationContextOptionsPtrOutput{})
+	pulumi.RegisterOutputType(ServiceItemOutput{})
+	pulumi.RegisterOutputType(ServiceItemArrayOutput{})
 	pulumi.RegisterOutputType(TemplateSourceDestinationOutput{})
 	pulumi.RegisterOutputType(TemplateSourceDestinationPtrOutput{})
 }

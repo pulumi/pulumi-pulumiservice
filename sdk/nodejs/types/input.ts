@@ -349,6 +349,20 @@ export interface OperationContextOptionsArgs {
     skipIntermediateDeployments?: pulumi.Input<boolean>;
 }
 
+/**
+ * An item that belongs to a service (stack or environment).
+ */
+export interface ServiceItemArgs {
+    /**
+     * The type of item (stack or environment).
+     */
+    itemType: pulumi.Input<string>;
+    /**
+     * The name of the item (format: org/project/stackOrEnv).
+     */
+    name: pulumi.Input<string>;
+}
+
 export interface TemplateSourceDestinationArgs {
     /**
      * Destination URL that gets filled in on new project creation.

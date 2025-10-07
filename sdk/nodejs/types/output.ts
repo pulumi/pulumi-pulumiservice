@@ -349,6 +349,20 @@ export interface OperationContextOptions {
     skipIntermediateDeployments?: boolean;
 }
 
+/**
+ * An item that belongs to a service (stack or environment).
+ */
+export interface ServiceItem {
+    /**
+     * The type of item (stack or environment).
+     */
+    itemType: string;
+    /**
+     * The name of the item (format: org/project/stackOrEnv).
+     */
+    name: string;
+}
+
 export interface TemplateSourceDestination {
     /**
      * Destination URL that gets filled in on new project creation.
