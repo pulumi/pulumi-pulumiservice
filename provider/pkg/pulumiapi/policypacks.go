@@ -1,4 +1,4 @@
-// Copyright 2016-2022, Pulumi Corporation.
+// Copyright 2016-2025, Pulumi Corporation.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -45,13 +45,25 @@ type PolicyPackDetail struct {
 	Policies    []Policy               `json:"policies,omitempty"`
 }
 
+type PolicyComplianceFramework struct {
+	Name          string `json:"name,omitempty"`
+	Version       string `json:"version,omitempty"`
+	Reference     string `json:"reference,omitempty"`
+	Specification string `json:"specification,omitempty"`
+}
+
 type Policy struct {
-	Name             string                 `json:"name"`
-	DisplayName      string                 `json:"displayName,omitempty"`
-	Description      string                 `json:"description,omitempty"`
-	EnforcementLevel string                 `json:"enforcementLevel,omitempty"`
-	Message          string                 `json:"message,omitempty"`
-	ConfigSchema     map[string]interface{} `json:"configSchema,omitempty"`
+	Name             string                     `json:"name"`
+	DisplayName      string                     `json:"displayName,omitempty"`
+	Description      string                     `json:"description,omitempty"`
+	EnforcementLevel string                     `json:"enforcementLevel,omitempty"`
+	Message          string                     `json:"message,omitempty"`
+	ConfigSchema     map[string]interface{}     `json:"configSchema,omitempty"`
+	Severity         string                     `json:"severity,omitempty"`
+	Framework        *PolicyComplianceFramework `json:"framework,omitempty"`
+	Tags             []string                   `json:"tags,omitempty"`
+	RemediationSteps string                     `json:"remediationSteps,omitempty"`
+	URL              string                     `json:"url,omitempty"`
 }
 
 type listPolicyPacksResponse struct {

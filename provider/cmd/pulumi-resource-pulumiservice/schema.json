@@ -2502,6 +2502,47 @@
                     "$ref": "pulumi.json#/Any"
                   },
                   "description": "Configuration schema for this policy."
+                },
+                "severity": {
+                  "type": "string",
+                  "description": "The severity of the policy (low, medium, high, critical)."
+                },
+                "framework": {
+                  "type": "object",
+                  "description": "The compliance framework that this policy belongs to.",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "The compliance framework name."
+                    },
+                    "version": {
+                      "type": "string",
+                      "description": "The compliance framework version."
+                    },
+                    "reference": {
+                      "type": "string",
+                      "description": "The compliance framework reference."
+                    },
+                    "specification": {
+                      "type": "string",
+                      "description": "The compliance framework specification."
+                    }
+                  }
+                },
+                "tags": {
+                  "type": "array",
+                  "description": "Tags associated with the policy.",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "remediationSteps": {
+                  "type": "string",
+                  "description": "A description of the steps to take to remediate a policy violation."
+                },
+                "url": {
+                  "type": "string",
+                  "description": "A URL to more information about the policy."
                 }
               },
               "required": [

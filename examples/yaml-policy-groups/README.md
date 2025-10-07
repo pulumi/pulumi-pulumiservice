@@ -3,7 +3,16 @@
 This example demonstrates:
 - Creating a `PolicyGroup` resource
 - Using the `getPolicyPacks` data source to list all policy packs in an organization
-- Using the `getPolicyPack` data source to get details about a specific policy pack (if available)
+- Using the `getPolicyPack` data source to get details about a specific policy pack (commented out - requires existing policy pack)
+
+## New Policy Fields (v0.32.0+)
+
+The `getPolicyPack` function now returns enhanced policy metadata including:
+- **severity**: Policy severity level (low, medium, high, critical)
+- **framework**: Compliance framework details (name, version, reference, specification)
+- **tags**: Array of tags associated with the policy
+- **remediationSteps**: Description of remediation steps
+- **url**: URL to more information about the policy
 
 ## Prerequisites
 
