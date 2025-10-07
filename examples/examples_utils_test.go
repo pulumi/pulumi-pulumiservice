@@ -28,11 +28,9 @@ func getOrgName(t *testing.T) string {
 }
 
 func getOwnerName(t *testing.T) string {
-	// For the Service resource, the owner is a user, not an org
-	// This should be a valid username in the org
-	ownerName := os.Getenv("PULUMI_TEST_SERVICE_OWNER")
+	ownerName := os.Getenv("PULUMI_TEST_SERVICE_OWNER_USER_NAME")
 	if ownerName == "" {
-		t.Skip("PULUMI_TEST_SERVICE_OWNER not set, skipping Service example test")
+		t.Skip("PULUMI_TEST_SERVICE_OWNER_USER_NAME not set, skipping Service example test")
 	}
 	return ownerName
 }
