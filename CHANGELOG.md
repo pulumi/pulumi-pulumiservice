@@ -11,6 +11,10 @@
 ### Improvements
 
 - Added PolicyGroup resource and getPolicyPack/getPolicyPacks data sources for managing policy packs across stacks
+- Added getTeams data source for querying all teams in an organization [#509](https://github.com/pulumi/pulumi-pulumiservice/issues/509)
+- Added getTeamsForUser data source for finding teams a specific user belongs to [#509](https://github.com/pulumi/pulumi-pulumiservice/issues/509)
+- Added getStacks data source for listing all accessible stacks [#509](https://github.com/pulumi/pulumi-pulumiservice/issues/509)
+- Added getStackPermissions data source for querying team and user permissions on a stack [#509](https://github.com/pulumi/pulumi-pulumiservice/issues/509)
 
 ### Bug Fixes
 

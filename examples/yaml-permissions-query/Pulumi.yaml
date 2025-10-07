@@ -1,0 +1,34 @@
+name: yaml-permissions-query
+description: Example demonstrating permission query data sources (getTeams, getStacks)
+runtime: yaml
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+
+variables:
+  # Query all teams in the organization
+  # Returns: teams[] with kind, name, displayName, description, members[], stacks[], environments[]
+  allTeams:
+    fn::invoke:
+      function: pulumiservice:index:getTeams
+      arguments:
+        organizationName: ${organizationName}
+      return: teams
+
+  # Query all accessible stacks
+  # Returns: stacks[] with id, orgName, projectName, stackName, lastUpdate, resourceCount
+  allStacks:
+    fn::invoke:
+      function: pulumiservice:index:getStacks
+      arguments: {}
+      return: stacks
+
+outputs:
+  # Export all teams in the organization
+  # Includes full team details with members and permissions
+  organizationTeams: ${allTeams}
+
+  # Export all accessible stacks
+  # Useful for discovering what stacks you have access to
+  accessibleStacks: ${allStacks}
