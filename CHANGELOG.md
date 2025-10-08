@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+- Fixed TeamStackPermission and TeamEnvironmentPermission resources to handle deleted teams gracefully during refresh operations [#444](https://github.com/pulumi/pulumi-pulumiservice/issues/444)
 - Fixed OIDC issuer examples: removed unsupported runner token type and updated Pulumi OIDC thumbprint
 
 ## 0.31.0

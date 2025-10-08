@@ -362,3 +362,204 @@ func TestRemoveEnvironmentPermission(t *testing.T) {
 		}))
 	})
 }
+
+func TestGetTeamStackPermission(t *testing.T) {
+	teamName := "a-team"
+	stack := StackIdentifier{
+		OrgName:     "an-organization",
+		ProjectName: "a-project",
+		StackName:   "a-stack",
+	}
+	permission := 101
+
+	t.Run("Happy Path", func(t *testing.T) {
+		team := Team{
+			Type:        "pulumi",
+			Name:        teamName,
+			DisplayName: "A Team",
+			Description: "A team description",
+			Stacks: []TeamStackPermission{
+				{
+					ProjectName: stack.ProjectName,
+					StackName:   stack.StackName,
+					Permission:  permission,
+				},
+			},
+		}
+		c, cleanup := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodGet,
+			ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team",
+			ResponseCode:      200,
+			ResponseBody:      team,
+		})
+		defer cleanup()
+		actualPermission, err := c.GetTeamStackPermission(ctx, stack, teamName)
+		assert.NoError(t, err)
+		assert.NotNil(t, actualPermission)
+		assert.Equal(t, permission, *actualPermission)
+	})
+
+	t.Run("Permission not found for stack", func(t *testing.T) {
+		team := Team{
+			Type:        "pulumi",
+			Name:        teamName,
+			DisplayName: "A Team",
+			Description: "A team description",
+			Stacks:      []TeamStackPermission{}, // No permissions
+		}
+		c, cleanup := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodGet,
+			ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team",
+			ResponseCode:      200,
+			ResponseBody:      team,
+		})
+		defer cleanup()
+		actualPermission, err := c.GetTeamStackPermission(ctx, stack, teamName)
+		assert.NoError(t, err)
+		assert.Nil(t, actualPermission)
+	})
+
+	t.Run("404 - Team not found", func(t *testing.T) {
+		c, cleanup := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodGet,
+			ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team",
+			ResponseCode:      404,
+			ResponseBody: ErrorResponse{
+				StatusCode: 404,
+				Message:    "not found",
+			},
+		})
+		defer cleanup()
+		actualPermission, err := c.GetTeamStackPermission(ctx, stack, teamName)
+		assert.Nil(t, actualPermission, "permission should be nil when team doesn't exist")
+		assert.Nil(t, err, "err should be nil since 404 indicates team was deleted")
+	})
+
+	t.Run("Error", func(t *testing.T) {
+		c, cleanup := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodGet,
+			ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team",
+			ResponseCode:      401,
+			ResponseBody: ErrorResponse{
+				Message: "unauthorized",
+			},
+		})
+		defer cleanup()
+		actualPermission, err := c.GetTeamStackPermission(ctx, stack, teamName)
+		assert.Nil(t, actualPermission)
+		assert.EqualError(t, err, "failed to get team: 401 API error: unauthorized")
+	})
+}
+
+func TestGetTeamEnvironmentSettings(t *testing.T) {
+	teamName := "a-team"
+	organization := "an-organization"
+	project := "a-project"
+	environment := "an-environment"
+	permission := "admin"
+	maxOpenDuration := Duration(15 * time.Minute)
+
+	t.Run("Happy Path", func(t *testing.T) {
+		team := Team{
+			Type:        "pulumi",
+			Name:        teamName,
+			DisplayName: "A Team",
+			Description: "A team description",
+			Environments: []TeamEnvironmentSettings{
+				{
+					EnvName:         environment,
+					ProjectName:     project,
+					Permission:      permission,
+					MaxOpenDuration: &maxOpenDuration,
+				},
+			},
+		}
+		c, cleanup := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodGet,
+			ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team",
+			ResponseCode:      200,
+			ResponseBody:      team,
+		})
+		defer cleanup()
+		actualPermission, actualMaxOpenDuration, err := c.GetTeamEnvironmentSettings(ctx, TeamEnvironmentSettingsRequest{
+			Organization: organization,
+			Team:         teamName,
+			Project:      project,
+			Environment:  environment,
+		})
+		assert.NoError(t, err)
+		assert.NotNil(t, actualPermission)
+		assert.Equal(t, permission, *actualPermission)
+		assert.NotNil(t, actualMaxOpenDuration)
+		assert.Equal(t, maxOpenDuration, *actualMaxOpenDuration)
+	})
+
+	t.Run("Permission not found for environment", func(t *testing.T) {
+		team := Team{
+			Type:         "pulumi",
+			Name:         teamName,
+			DisplayName:  "A Team",
+			Description:  "A team description",
+			Environments: []TeamEnvironmentSettings{}, // No permissions
+		}
+		c, cleanup := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodGet,
+			ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team",
+			ResponseCode:      200,
+			ResponseBody:      team,
+		})
+		defer cleanup()
+		actualPermission, actualMaxOpenDuration, err := c.GetTeamEnvironmentSettings(ctx, TeamEnvironmentSettingsRequest{
+			Organization: organization,
+			Team:         teamName,
+			Project:      project,
+			Environment:  environment,
+		})
+		assert.NoError(t, err)
+		assert.Nil(t, actualPermission)
+		assert.Nil(t, actualMaxOpenDuration)
+	})
+
+	t.Run("404 - Team not found", func(t *testing.T) {
+		c, cleanup := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodGet,
+			ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team",
+			ResponseCode:      404,
+			ResponseBody: ErrorResponse{
+				StatusCode: 404,
+				Message:    "not found",
+			},
+		})
+		defer cleanup()
+		actualPermission, actualMaxOpenDuration, err := c.GetTeamEnvironmentSettings(ctx, TeamEnvironmentSettingsRequest{
+			Organization: organization,
+			Team:         teamName,
+			Project:      project,
+			Environment:  environment,
+		})
+		assert.Nil(t, actualPermission, "permission should be nil when team doesn't exist")
+		assert.Nil(t, actualMaxOpenDuration, "maxOpenDuration should be nil when team doesn't exist")
+		assert.Nil(t, err, "err should be nil since 404 indicates team was deleted")
+	})
+
+	t.Run("Error", func(t *testing.T) {
+		c, cleanup := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodGet,
+			ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team",
+			ResponseCode:      401,
+			ResponseBody: ErrorResponse{
+				Message: "unauthorized",
+			},
+		})
+		defer cleanup()
+		actualPermission, actualMaxOpenDuration, err := c.GetTeamEnvironmentSettings(ctx, TeamEnvironmentSettingsRequest{
+			Organization: organization,
+			Team:         teamName,
+			Project:      project,
+			Environment:  environment,
+		})
+		assert.Nil(t, actualPermission)
+		assert.Nil(t, actualMaxOpenDuration)
+		assert.EqualError(t, err, "failed to get team environment permission: 401 API error: unauthorized")
+	})
+}
