@@ -147,8 +147,9 @@ func (tp *TeamStackPermissionResource) Diff(req *pulumirpc.DiffRequest) (*pulumi
 		changes = pulumirpc.DiffResponse_DIFF_SOME
 	}
 	return &pulumirpc.DiffResponse{
-		Changes:  changes,
-		Replaces: changedKeys,
+		Changes:             changes,
+		Replaces:            changedKeys,
+		DeleteBeforeReplace: true,
 	}, nil
 }
 
