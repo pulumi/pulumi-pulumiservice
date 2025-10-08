@@ -7,16 +7,24 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const (
+	testWebhookName        = "a-webhook"
+	testWebhookOrgName     = "an-organization"
+	testWebhookDisplayName = "A Webhook"
+	testWebhookPayloadURL  = "https://example.com/webhook"
+	testWebhookSecret      = "{...}"
+)
+
 func TestCreateWebhook(t *testing.T) {
-	webhookName := "a-webhook"
-	orgName := "an-organization"
-	displayName := "A Webhook"
-	payloadURL := "https://example.com/webhook"
-	secret := "{...}"
+	webhookName := testWebhookName
+	orgName := testWebhookOrgName
+	displayName := testWebhookDisplayName
+	payloadURL := testWebhookPayloadURL
+	secret := testWebhookSecret
 	webhook := Webhook{
 		Name:        webhookName,
 		DisplayName: displayName,
-		PayloadUrl:  payloadURL,
+		PayloadURL:  payloadURL,
 		Secret:      &secret,
 		Active:      true,
 	}
@@ -59,15 +67,15 @@ func TestCreateWebhook(t *testing.T) {
 }
 
 func TestListWebhooks(t *testing.T) {
-	webhookName := "a-webhook"
-	orgName := "an-organization"
-	displayName := "A Webhook"
-	payloadURL := "https://example.com/webhook"
-	secret := "{...}"
+	webhookName := testWebhookName
+	orgName := testWebhookOrgName
+	displayName := testWebhookDisplayName
+	payloadURL := testWebhookPayloadURL
+	secret := testWebhookSecret
 	webhook := Webhook{
 		Name:        webhookName,
 		DisplayName: displayName,
-		PayloadUrl:  payloadURL,
+		PayloadURL:  payloadURL,
 		Secret:      &secret,
 		Active:      true,
 	}
@@ -102,15 +110,15 @@ func TestListWebhooks(t *testing.T) {
 }
 
 func TestGetWebhook(t *testing.T) {
-	webhookName := "a-webhook"
-	orgName := "an-organization"
-	displayName := "A Webhook"
-	payloadURL := "https://example.com/webhook"
-	secret := "{...}"
+	webhookName := testWebhookName
+	orgName := testWebhookOrgName
+	displayName := testWebhookDisplayName
+	payloadURL := testWebhookPayloadURL
+	secret := testWebhookSecret
 	webhook := Webhook{
 		Name:        webhookName,
 		DisplayName: displayName,
-		PayloadUrl:  payloadURL,
+		PayloadURL:  payloadURL,
 		Secret:      &secret,
 		Active:      true,
 	}
@@ -160,15 +168,15 @@ func TestGetWebhook(t *testing.T) {
 }
 
 func TestUpdateWebhook(t *testing.T) {
-	webhookName := "a-webhook"
-	orgName := "an-organization"
-	displayName := "A Webhook"
-	payloadURL := "https://example.com/webhook"
-	secret := "{...}"
+	webhookName := testWebhookName
+	orgName := testWebhookOrgName
+	displayName := testWebhookDisplayName
+	payloadURL := testWebhookPayloadURL
+	secret := testWebhookSecret
 	webhook := Webhook{
 		Name:        webhookName,
 		DisplayName: displayName,
-		PayloadUrl:  payloadURL,
+		PayloadURL:  payloadURL,
 		Secret:      &secret,
 		Active:      true,
 	}
@@ -213,8 +221,8 @@ func TestUpdateWebhook(t *testing.T) {
 }
 
 func TestDeleteWebhook(t *testing.T) {
-	webhookName := "a-webhook"
-	orgName := "an-organization"
+	webhookName := testWebhookName
+	orgName := testWebhookOrgName
 	t.Run("Happy Path", func(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,

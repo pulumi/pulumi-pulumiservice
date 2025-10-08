@@ -7,21 +7,25 @@ import (
 
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
 
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
+// PulumiServiceStackResource manages Pulumi Service stack resources.
 type PulumiServiceStackResource struct {
 	Client *pulumiapi.Client
 }
 
+// PulumiServiceStack represents a Pulumi Service stack with its properties.
 type PulumiServiceStack struct {
 	pulumiapi.StackIdentifier
 	ForceDestroy bool
 }
 
+// ToPropertyMap converts the stack to a property map.
 func (i *PulumiServiceStack) ToPropertyMap() resource.PropertyMap {
 	pm := resource.PropertyMap{}
 	pm["organizationName"] = resource.NewPropertyValue(i.OrgName)
@@ -33,7 +37,10 @@ func (i *PulumiServiceStack) ToPropertyMap() resource.PropertyMap {
 	return pm
 }
 
-func (s *PulumiServiceStackResource) ToPulumiServiceStackTagInput(inputMap resource.PropertyMap) (*PulumiServiceStack, error) {
+// ToPulumiServiceStackTagInput converts a property map to a PulumiServiceStack input.
+func (s *PulumiServiceStackResource) ToPulumiServiceStackTagInput(
+	inputMap resource.PropertyMap,
+) (*PulumiServiceStack, error) {
 	stack := PulumiServiceStack{}
 
 	stack.OrgName = inputMap["organizationName"].StringValue()
@@ -46,12 +53,17 @@ func (s *PulumiServiceStackResource) ToPulumiServiceStackTagInput(inputMap resou
 	return &stack, nil
 }
 
+// Name returns the resource type name.
 func (s *PulumiServiceStackResource) Name() string {
 	return "pulumiservice:index:Stack"
 }
 
+// Diff checks what impacts a hypothetical update will have on the stack resource.
 func (s *PulumiServiceStackResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
+	olds, err := plugin.UnmarshalProperties(
+		req.GetOldInputs(),
+		plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +86,7 @@ func (s *PulumiServiceStackResource) Diff(req *pulumirpc.DiffRequest) (*pulumirp
 	for k, v := range dd {
 		v.Kind = v.Kind.AsReplace()
 		detailedDiffs[k] = &pulumirpc.PropertyDiff{
-			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind),
+			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind), //nolint:gosec // Kind values are bounded by protobuf enum
 			InputDiff: v.InputDiff,
 		}
 	}
@@ -87,9 +99,13 @@ func (s *PulumiServiceStackResource) Diff(req *pulumirpc.DiffRequest) (*pulumirp
 	}, nil
 }
 
+// Delete tears down an existing stack resource.
 func (s *PulumiServiceStackResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
 	ctx := context.Background()
-	inputs, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	inputs, err := plugin.UnmarshalProperties(
+		req.GetProperties(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -105,9 +121,13 @@ func (s *PulumiServiceStackResource) Delete(req *pulumirpc.DeleteRequest) (*pbem
 	return &pbempty.Empty{}, nil
 }
 
+// Create allocates a new stack instance and returns its unique ID.
 func (s *PulumiServiceStackResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	ctx := context.Background()
-	inputs, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	inputs, err := plugin.UnmarshalProperties(
+		req.GetProperties(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -139,10 +159,12 @@ func (s *PulumiServiceStackResource) Create(req *pulumirpc.CreateRequest) (*pulu
 	}, nil
 }
 
+// Check validates that the given property bag is valid for a stack resource.
 func (s *PulumiServiceStackResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
 	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: nil}, nil
 }
 
+// Update updates an existing stack resource with new values.
 func (s *PulumiServiceStackResource) Update(_ *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
 	// all updates are destructive, so we just call Create.
 	return nil, fmt.Errorf("unexpected call to update, expected create to be called instead")

@@ -5,14 +5,20 @@ import (
 	"path"
 	"testing"
 
-	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
+)
+
+const (
+	testDeployOrgName     = "an-organization"
+	testDeployProjectName = "a-project"
 )
 
 func TestGetDeploymentSettings(t *testing.T) {
 
-	orgName := "an-organization"
-	projectName := "a-project"
+	orgName := testDeployOrgName
+	projectName := testDeployProjectName
 	stackName := "a-stack"
 
 	t.Run("Happy Path", func(t *testing.T) {
@@ -25,9 +31,17 @@ func TestGetDeploymentSettings(t *testing.T) {
 
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
-			ExpectedReqPath:   "/" + path.Join("api", "stacks", orgName, projectName, stackName, "deployments", "settings"),
-			ResponseCode:      200,
-			ResponseBody:      dsValue,
+			ExpectedReqPath: "/" + path.Join(
+				"api",
+				"stacks",
+				orgName,
+				projectName,
+				stackName,
+				"deployments",
+				"settings",
+			),
+			ResponseCode: 200,
+			ResponseBody: dsValue,
 		})
 		defer cleanup()
 
@@ -44,8 +58,16 @@ func TestGetDeploymentSettings(t *testing.T) {
 	t.Run("404", func(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
-			ExpectedReqPath:   "/" + path.Join("api", "stacks", orgName, projectName, stackName, "deployments", "settings"),
-			ResponseCode:      404,
+			ExpectedReqPath: "/" + path.Join(
+				"api",
+				"stacks",
+				orgName,
+				projectName,
+				stackName,
+				"deployments",
+				"settings",
+			),
+			ResponseCode: 404,
 			ResponseBody: ErrorResponse{
 				StatusCode: 404,
 				Message:    "not found",
@@ -66,8 +88,8 @@ func TestGetDeploymentSettings(t *testing.T) {
 
 func TestCreateDeploymentSettings(t *testing.T) {
 
-	orgName := "an-organization"
-	projectName := "a-project"
+	orgName := testDeployOrgName
+	projectName := testDeployProjectName
 	stackName := "a-stack"
 
 	t.Run("Happy Path", func(t *testing.T) {
@@ -81,10 +103,18 @@ func TestCreateDeploymentSettings(t *testing.T) {
 
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPut,
-			ExpectedReqPath:   "/" + path.Join("api", "stacks", orgName, projectName, stackName, "deployments", "settings"),
-			ResponseCode:      201,
-			ExpectedReqBody:   dsValue,
-			ResponseBody:      dsValue,
+			ExpectedReqPath: "/" + path.Join(
+				"api",
+				"stacks",
+				orgName,
+				projectName,
+				stackName,
+				"deployments",
+				"settings",
+			),
+			ResponseCode:    201,
+			ExpectedReqBody: dsValue,
+			ResponseBody:    dsValue,
 		})
 		defer cleanup()
 

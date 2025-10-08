@@ -12,15 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package main implements the Pulumi Service resource provider.
 package main
 
 import (
 	_ "embed"
 
-	psp "github.com/pulumi/pulumi-pulumiservice/provider/pkg/provider"
 	"github.com/pulumi/pulumi/pkg/v3/resource/provider"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/util/cmdutil"
 	rpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
+
+	psp "github.com/pulumi/pulumi-pulumiservice/provider/pkg/provider"
 )
 
 var providerName = "pulumiservice"
@@ -31,8 +33,8 @@ var providerName = "pulumiservice"
 //go:embed schema.json
 var schema string
 
-// The version needs to be replaced using LDFLAGS on build
-var Version string = "REPLACE_ON_BUILD"
+// Version is replaced using LDFLAGS on build.
+var Version = "REPLACE_ON_BUILD"
 
 func main() {
 	// Start gRPC service for the pulumiservice provider

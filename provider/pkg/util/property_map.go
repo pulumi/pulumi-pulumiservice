@@ -1,4 +1,4 @@
-package util
+package util // nolint:revive // util is a common and acceptable package name
 
 import (
 	"fmt"
@@ -64,7 +64,10 @@ func FromPropertyMap(properties resource.PropertyMap, structTagName string, out 
 
 // DiffOldsAndNews unmarshals a DiffRequest and runs a diff on them. It returns any keys changed
 func DiffOldsAndNews(req *pulumirpc.DiffRequest) ([]string, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
+	olds, err := plugin.UnmarshalProperties(
+		req.GetOldInputs(),
+		plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}

@@ -4,9 +4,11 @@ import (
 	"context"
 	"testing"
 
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 	"github.com/stretchr/testify/assert"
+
+	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
 type getWebhookFunc func() (*pulumiapi.Webhook, error)
@@ -15,23 +17,43 @@ type WebhookClientMock struct {
 	getWebhookFunc getWebhookFunc
 }
 
-func (c *WebhookClientMock) GetWebhook(ctx context.Context, orgName string, projectName, stackName, environmentName *string, webhookName string) (*pulumiapi.Webhook, error) {
+func (c *WebhookClientMock) GetWebhook(
+	_ context.Context,
+	_ /* orgName */ string,
+	_ /* projectName */, _ /* stackName */, _ /* environmentName */ *string,
+	_ /* webhookName */ string,
+) (*pulumiapi.Webhook, error) {
 	return c.getWebhookFunc()
 }
 
-func (c *WebhookClientMock) CreateWebhook(ctx context.Context, req pulumiapi.WebhookRequest) (*pulumiapi.Webhook, error) {
+func (c *WebhookClientMock) CreateWebhook(
+	_ context.Context,
+	_ /* req */ pulumiapi.WebhookRequest,
+) (*pulumiapi.Webhook, error) {
 	return nil, nil
 }
 
-func (c *WebhookClientMock) ListWebhooks(ctx context.Context, orgName string, projectName, stackName, environmentName *string) ([]pulumiapi.Webhook, error) {
+func (c *WebhookClientMock) ListWebhooks(
+	_ context.Context,
+	_ /* orgName */ string,
+	_ /* projectName */, _ /* stackName */, _ /* environmentName */ *string,
+) ([]pulumiapi.Webhook, error) {
 	return nil, nil
 }
 
-func (c *WebhookClientMock) UpdateWebhook(ctx context.Context, req pulumiapi.UpdateWebhookRequest) (*pulumiapi.Webhook, error) {
+func (c *WebhookClientMock) UpdateWebhook(
+	_ context.Context,
+	_ /* req */ pulumiapi.UpdateWebhookRequest,
+) (*pulumiapi.Webhook, error) {
 	return nil, nil
 }
 
-func (c *WebhookClientMock) DeleteWebhook(ctx context.Context, orgName string, projectName, stackName, environmentName *string, name string) error {
+func (c *WebhookClientMock) DeleteWebhook(
+	_ context.Context,
+	_ /* orgName */ string,
+	_ /* projectName */, _ /* stackName */, _ /* environmentName */ *string,
+	_ /* name */ string,
+) error {
 	return nil
 }
 
@@ -69,7 +91,7 @@ func TestWebhook(t *testing.T) {
 				return &pulumiapi.Webhook{
 					Active:      true,
 					DisplayName: "test webhook",
-					PayloadUrl:  "https://example.com/webhook",
+					PayloadURL:  "https://example.com/webhook",
 					Name:        "test-webhook",
 				}, nil
 			},

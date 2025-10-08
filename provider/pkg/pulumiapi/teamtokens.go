@@ -31,7 +31,10 @@ type createTeamTokenRequest struct {
 	Description string `json:"description"`
 }
 
-func (c *Client) CreateTeamAccessToken(ctx context.Context, name, orgName, teamName, description string) (*AccessToken, error) {
+func (c *Client) CreateTeamAccessToken(
+	ctx context.Context,
+	name, orgName, teamName, description string,
+) (*AccessToken, error) {
 
 	if len(orgName) == 0 {
 		return nil, errors.New("empty orgName")
@@ -64,8 +67,8 @@ func (c *Client) CreateTeamAccessToken(ctx context.Context, name, orgName, teamN
 
 }
 
-func (c *Client) DeleteTeamAccessToken(ctx context.Context, tokenId, orgName, teamName string) error {
-	if len(tokenId) == 0 {
+func (c *Client) DeleteTeamAccessToken(ctx context.Context, tokenID, orgName, teamName string) error {
+	if len(tokenID) == 0 {
 		return errors.New("tokenid length must be greater than zero")
 	}
 
@@ -77,17 +80,17 @@ func (c *Client) DeleteTeamAccessToken(ctx context.Context, tokenId, orgName, te
 		return errors.New("orgName length must be greater than zero")
 	}
 
-	apiPath := path.Join("orgs", orgName, "teams", teamName, "tokens", tokenId)
+	apiPath := path.Join("orgs", orgName, "teams", teamName, "tokens", tokenID)
 
 	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
 	if err != nil {
-		return fmt.Errorf("failed to delete access token %q: %w", tokenId, err)
+		return fmt.Errorf("failed to delete access token %q: %w", tokenID, err)
 	}
 
 	return nil
 }
 
-func (c *Client) GetTeamAccessToken(ctx context.Context, tokenId, orgName, teamName string) (*AccessToken, error) {
+func (c *Client) GetTeamAccessToken(ctx context.Context, tokenID, orgName, teamName string) (*AccessToken, error) {
 	apiPath := path.Join("orgs", orgName, "teams", teamName, "tokens")
 
 	var listRes listTokenResponse
@@ -100,7 +103,7 @@ func (c *Client) GetTeamAccessToken(ctx context.Context, tokenId, orgName, teamN
 
 	for i := 0; i < len(listRes.Tokens); i++ {
 		token := listRes.Tokens[i]
-		if token.ID == tokenId {
+		if token.ID == tokenID {
 			return &AccessToken{
 				ID:          token.ID,
 				Description: token.Description,

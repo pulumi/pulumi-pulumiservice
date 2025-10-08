@@ -1,8 +1,9 @@
-package util
+package util // nolint:revive // util is a common and acceptable package name
 
 import (
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	"google.golang.org/protobuf/types/known/structpb"
+
+	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 )
 
 func FromProperties(props *structpb.Struct, structTagName string, out interface{}) error {

@@ -8,23 +8,27 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const (
+	testOrgName = "anOrg"
+)
+
 func TestDeleteAgentPool(t *testing.T) {
-	orgName := "anOrg"
-	agentPoolId := "abcdegh"
+	orgName := testOrgName
+	agentPoolID := "abcdegh"
 	t.Run("Happy Path", func(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
-			ExpectedReqPath:   "/api/orgs/anOrg/agent-pools/" + agentPoolId,
+			ExpectedReqPath:   "/api/orgs/" + testOrgName + "/agent-pools/" + agentPoolID,
 			ResponseCode:      204,
 		})
 		defer cleanup()
-		assert.NoError(t, c.DeleteAgentPool(teamCtx, agentPoolId, orgName, false))
+		assert.NoError(t, c.DeleteAgentPool(teamCtx, agentPoolID, orgName, false))
 	})
 
 	t.Run("Error", func(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
-			ExpectedReqPath:   "/api/orgs/anOrg/agent-pools/" + agentPoolId,
+			ExpectedReqPath:   "/api/orgs/" + testOrgName + "/agent-pools/" + agentPoolID,
 			ResponseCode:      404,
 			ResponseBody: ErrorResponse{
 				StatusCode: 404,
@@ -33,7 +37,7 @@ func TestDeleteAgentPool(t *testing.T) {
 		})
 		defer cleanup()
 		assert.EqualError(t,
-			c.DeleteAgentPool(teamCtx, agentPoolId, orgName, false),
+			c.DeleteAgentPool(teamCtx, agentPoolID, orgName, false),
 			`failed to delete agent pool "abcdegh": 404 API error: agent pool not found`,
 		)
 	})
@@ -41,7 +45,7 @@ func TestDeleteAgentPool(t *testing.T) {
 }
 
 func TestCreateAgentPool(t *testing.T) {
-	orgName := "anOrg"
+	orgName := testOrgName
 	name := "anAgentPool"
 	desc := "agent pool description"
 
@@ -56,7 +60,7 @@ func TestCreateAgentPool(t *testing.T) {
 				Description: desc,
 				Name:        name,
 			},
-			ExpectedReqPath: "/api/orgs/anOrg/agent-pools",
+			ExpectedReqPath: "/api/orgs/" + testOrgName + "/agent-pools",
 			ResponseCode:    201,
 			ResponseBody:    resp,
 		})
@@ -99,7 +103,7 @@ func TestGetAgentPool(t *testing.T) {
 	id := "uuid"
 	name := "Pool 1"
 	desc := "agent pool description"
-	org := "anOrg"
+	org := testOrgName
 	t.Run("Happy Path", func(t *testing.T) {
 		resp := AgentPool{
 			ID:          id,
