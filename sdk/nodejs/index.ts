@@ -60,6 +60,11 @@ export const getPolicyPacks: typeof import("./getPolicyPacks").getPolicyPacks = 
 export const getPolicyPacksOutput: typeof import("./getPolicyPacks").getPolicyPacksOutput = null as any;
 utilities.lazyLoad(exports, ["getPolicyPacks","getPolicyPacksOutput"], () => require("./getPolicyPacks"));
 
+export { NeoTaskArgs } from "./neoTask";
+export type NeoTask = import("./neoTask").NeoTask;
+export const NeoTask: typeof import("./neoTask").NeoTask = null as any;
+utilities.lazyLoad(exports, ["NeoTask"], () => require("./neoTask"));
+
 export { OidcIssuerArgs } from "./oidcIssuer";
 export type OidcIssuer = import("./oidcIssuer").OidcIssuer;
 export const OidcIssuer: typeof import("./oidcIssuer").OidcIssuer = null as any;
@@ -160,6 +165,8 @@ const _module = {
                 return new EnvironmentRotationSchedule(name, <any>undefined, { urn })
             case "pulumiservice:index:EnvironmentVersionTag":
                 return new EnvironmentVersionTag(name, <any>undefined, { urn })
+            case "pulumiservice:index:NeoTask":
+                return new NeoTask(name, <any>undefined, { urn })
             case "pulumiservice:index:OidcIssuer":
                 return new OidcIssuer(name, <any>undefined, { urn })
             case "pulumiservice:index:OrgAccessToken":

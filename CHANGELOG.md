@@ -4,6 +4,7 @@
 
 ### Improvements
 
+- Added NeoTask resource for tracking user instructions and entity changes in the Neo agent system
 - Added PolicyGroup resource and getPolicyPack/getPolicyPacks data sources for managing policy packs across stacks
 
 ### Bug Fixes
