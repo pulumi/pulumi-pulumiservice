@@ -27,3 +27,6 @@ ci-scripts
 *.sln
 .config/
 .gradle/
+
+# Environment variables
+.env

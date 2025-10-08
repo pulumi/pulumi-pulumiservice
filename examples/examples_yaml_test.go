@@ -149,6 +149,39 @@ func TestYamlStackTagsExample(t *testing.T) {
 	})
 }
 
+func TestYamlStackTagsPluralExample(t *testing.T) {
+
+	// yaml-stack-tags-plural-example applies multiple tags to it's own stack using the StackTags resource.
+	// To do this, we need to first create an empty stack, then add the tags.
+
+	tmpdir := writePulumiYaml(t, YamlProgram{
+		Name:        "yaml-stack-tags-plural-example",
+		Runtime:     "yaml",
+		Description: "Example using StackTags resource to manage multiple tags at once",
+	})
+
+	cwd, err := os.Getwd()
+	require.NoError(t, err)
+
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Quick: true,
+		Dir:   tmpdir,
+		Config: map[string]string{
+			"organization": getTestOrg(),
+		},
+		EditDirs: []integration.EditDir{
+			{
+				Dir: path.Join(cwd, ".", "yaml-stack-tags-plural"),
+			},
+			// Reapply the same thing again, except this time we expect there to be no changes
+			{
+				Dir:             path.Join(cwd, ".", "yaml-stack-tags-plural"),
+				ExpectNoChanges: true,
+			},
+		},
+	})
+}
+
 func TestYamlDeploymentSettingsExample(t *testing.T) {
 
 	// Set up tmpdir with a Pulumi.yml with no resources

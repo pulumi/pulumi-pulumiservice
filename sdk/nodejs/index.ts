@@ -90,6 +90,11 @@ export type StackTag = import("./stackTag").StackTag;
 export const StackTag: typeof import("./stackTag").StackTag = null as any;
 utilities.lazyLoad(exports, ["StackTag"], () => require("./stackTag"));
 
+export { StackTagsArgs } from "./stackTags";
+export type StackTags = import("./stackTags").StackTags;
+export const StackTags: typeof import("./stackTags").StackTags = null as any;
+utilities.lazyLoad(exports, ["StackTags"], () => require("./stackTags"));
+
 export { TeamArgs } from "./team";
 export type Team = import("./team").Team;
 export const Team: typeof import("./team").Team = null as any;
@@ -170,6 +175,8 @@ const _module = {
                 return new Stack(name, <any>undefined, { urn })
             case "pulumiservice:index:StackTag":
                 return new StackTag(name, <any>undefined, { urn })
+            case "pulumiservice:index:StackTags":
+                return new StackTags(name, <any>undefined, { urn })
             case "pulumiservice:index:Team":
                 return new Team(name, <any>undefined, { urn })
             case "pulumiservice:index:TeamAccessToken":
