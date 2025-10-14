@@ -4,6 +4,12 @@
 
 ### Improvements
 
+### Bug Fixes
+
+## 0.32.0
+
+### Improvements
+
 - Added PolicyGroup resource and getPolicyPack/getPolicyPacks data sources for managing policy packs across stacks
 - Migrated to ci-mgmt native template for automated CI/CD workflow generation
 
