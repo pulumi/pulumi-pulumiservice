@@ -72,6 +72,8 @@ type EligibleApproverOutput struct {
 type UserInfo struct {
 	Name        string `json:"name"`
 	GithubLogin string `json:"githubLogin"`
+	AvatarUrl   string `json:"avatarUrl,omitempty"`
+	Email       string `json:"email,omitempty"`
 }
 
 func (out EligibleApproverOutput) toApprover() EligibleApprover {

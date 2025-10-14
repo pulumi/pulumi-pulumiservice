@@ -60,6 +60,26 @@ export const getPolicyPacks: typeof import("./getPolicyPacks").getPolicyPacks = 
 export const getPolicyPacksOutput: typeof import("./getPolicyPacks").getPolicyPacksOutput = null as any;
 utilities.lazyLoad(exports, ["getPolicyPacks","getPolicyPacksOutput"], () => require("./getPolicyPacks"));
 
+export { GetStackPermissionsArgs, GetStackPermissionsResult, GetStackPermissionsOutputArgs } from "./getStackPermissions";
+export const getStackPermissions: typeof import("./getStackPermissions").getStackPermissions = null as any;
+export const getStackPermissionsOutput: typeof import("./getStackPermissions").getStackPermissionsOutput = null as any;
+utilities.lazyLoad(exports, ["getStackPermissions","getStackPermissionsOutput"], () => require("./getStackPermissions"));
+
+export { GetStacksArgs, GetStacksResult, GetStacksOutputArgs } from "./getStacks";
+export const getStacks: typeof import("./getStacks").getStacks = null as any;
+export const getStacksOutput: typeof import("./getStacks").getStacksOutput = null as any;
+utilities.lazyLoad(exports, ["getStacks","getStacksOutput"], () => require("./getStacks"));
+
+export { GetTeamsArgs, GetTeamsResult, GetTeamsOutputArgs } from "./getTeams";
+export const getTeams: typeof import("./getTeams").getTeams = null as any;
+export const getTeamsOutput: typeof import("./getTeams").getTeamsOutput = null as any;
+utilities.lazyLoad(exports, ["getTeams","getTeamsOutput"], () => require("./getTeams"));
+
+export { GetTeamsForUserArgs, GetTeamsForUserResult, GetTeamsForUserOutputArgs } from "./getTeamsForUser";
+export const getTeamsForUser: typeof import("./getTeamsForUser").getTeamsForUser = null as any;
+export const getTeamsForUserOutput: typeof import("./getTeamsForUser").getTeamsForUserOutput = null as any;
+utilities.lazyLoad(exports, ["getTeamsForUser","getTeamsForUserOutput"], () => require("./getTeamsForUser"));
+
 export { OidcIssuerArgs } from "./oidcIssuer";
 export type OidcIssuer = import("./oidcIssuer").OidcIssuer;
 export const OidcIssuer: typeof import("./oidcIssuer").OidcIssuer = null as any;
