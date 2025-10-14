@@ -4,6 +4,8 @@
 
 ### Improvements
 
+- Added Java SDK support with Pulumi Java SDK v1.16.2
+
 ### Bug Fixes
 
 ## 0.32.0
@@ -11,6 +13,7 @@
 ### Improvements
 
 - Added PolicyGroup resource and getPolicyPack/getPolicyPacks data sources for managing policy packs across stacks
+- Improved Makefile lint target with proper bash shell support and build tags for examples
 
 ### Bug Fixes
 
