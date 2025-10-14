@@ -15,12 +15,12 @@
 package main
 
 import (
+	"context"
 	_ "embed"
 
+	p "github.com/pulumi/pulumi-go-provider"
 	psp "github.com/pulumi/pulumi-pulumiservice/provider/pkg/provider"
-	"github.com/pulumi/pulumi/pkg/v3/resource/provider"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/util/cmdutil"
-	rpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
 var providerName = "pulumiservice"
@@ -35,10 +35,11 @@ var schema string
 var Version string = "REPLACE_ON_BUILD"
 
 func main() {
-	// Start gRPC service for the pulumiservice provider
-	err := provider.Main(providerName, func(host *provider.HostClient) (rpc.ResourceProviderServer, error) {
-		return psp.MakeProvider(host, providerName, Version, schema)
-	})
+	// Start gRPC service for the pulumiservice provider using hybrid provider
+	// This supports both manual (legacy) and infer-based resources during migration
+	hybridProvider := psp.MakeHybridProvider(providerName, Version, schema)
+
+	err := p.RunProvider(context.Background(), providerName, Version, hybridProvider)
 	if err != nil {
 		cmdutil.ExitError(err.Error())
 	}

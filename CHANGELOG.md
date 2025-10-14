@@ -4,6 +4,13 @@
 
 ### Improvements
 
+- Migrated to pulumi-go-provider v1.1.2 infer framework with hybrid provider architecture
+- Upgraded to Go 1.24.0
+- Migrated StackTag resource to use infer (Phase 1 POC)
+- Removed deprecated StreamInvoke method (removed in Pulumi SDK v3.169.0)
+
+### Improvements
+
 - Added PolicyGroup resource and getPolicyPack/getPolicyPacks data sources for managing policy packs across stacks
 
 ### Bug Fixes
