@@ -1,3 +1,5 @@
+SHELL := bash
+
 PROJECT_NAME := Pulumi Service Resource Provider
 
 PACK             := pulumiservice
@@ -46,7 +48,7 @@ dotnet_sdk: gen_sdk_prerequisites
 	rm -rf sdk/dotnet
 	$(PULUMI) package gen-sdk bin/$(PROVIDER) --language dotnet
 	cd sdk/dotnet/ && \
-		echo "module fake_dotnet_module // Exclude this directory from Go tools\n\ngo 1.17" > go.mod && \
+		printf "module fake_dotnet_module // Exclude this directory from Go tools\n\ngo 1.17\n" > go.mod && \
 		echo "${VERSION_GENERIC}" >version.txt && \
 		dotnet build
 
@@ -69,7 +71,7 @@ python_sdk: gen_sdk_prerequisites
 	rm -rf sdk/python
 	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language python --version $(VERSION_GENERIC)
 	cd sdk/python/ && \
-		echo "module fake_python_module // Exclude this directory from Go tools\n\ngo 1.17" > go.mod && \
+		printf "module fake_python_module // Exclude this directory from Go tools\n\ngo 1.17\n" > go.mod && \
 		cp ../../README.md . && \
 		rm -rf ./bin/ ../python.bin/ && cp -R . ../python.bin && mv ../python.bin ./bin && \
 		python3 -m venv venv && \
@@ -82,7 +84,8 @@ java_sdk: gen_sdk_prerequisites
 	rm -rf sdk/java
 	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language java --version $(VERSION_GENERIC)
 	cd sdk/java && \
-		echo "module fake_java_module // Exclude this directory from Go tools\n\ngo 1.17" > go.mod && \
+		printf "module fake_java_module // Exclude this directory from Go tools\n\ngo 1.17\n" > go.mod && \
+		cp ../../README.md . && \
 		gradle --console=plain build
 
 .PHONY: build
@@ -92,9 +95,12 @@ build:: provider dotnet_sdk go_sdk nodejs_sdk python_sdk java_sdk
 only_build:: build
 
 lint::
-	for DIR in "provider" "sdk" "examples" ; do \
-		pushd $$DIR && golangci-lint run -c ../.golangci.yml --timeout 10m && popd ; \
-	done
+	if [ -d provider ]; then \
+		pushd provider && golangci-lint run --timeout 10m && popd ; \
+	fi
+	if [ -d examples ]; then \
+		pushd examples && golangci-lint run --timeout 10m --build-tags all && popd ; \
+	fi
 
 
 install:: install_nodejs_sdk install_dotnet_sdk
