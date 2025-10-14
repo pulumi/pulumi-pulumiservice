@@ -97,6 +97,16 @@ func get(v reflect.Value) interface{} {
 			return get(v.Elem())
 		}
 		return nil
+	case reflect.Map:
+		// Handle map[string]string
+		if v.Type().Key().Kind() == reflect.String && v.Type().Elem().Kind() == reflect.String {
+			result := make(map[string]interface{})
+			for _, key := range v.MapKeys() {
+				result[key.String()] = v.MapIndex(key).String()
+			}
+			return result
+		}
+		return nil
 	default:
 		return nil
 	}
@@ -113,7 +123,7 @@ func set(v reflect.Value, value interface{}) error {
 	if valueKind == reflect.Float64 {
 		fv := valueValue.Float()
 		floatValue = &fv
-	} else if v.Kind() != valueKind {
+	} else if v.Kind() != valueKind && (v.Kind() != reflect.Map || valueKind != reflect.Map) {
 		return fmt.Errorf("field type %q does not match property %q", v.Kind(), valueKind)
 	}
 	switch v.Kind() {
@@ -132,6 +142,33 @@ func set(v reflect.Value, value interface{}) error {
 		v.Set(reflect.New(v.Type().Elem()))
 		// call set again, but with deref'd value. note that this will recurse down for ptr to ptr's (and so on)
 		return set(v.Elem(), value)
+	case reflect.Map:
+		// Handle map[string]string
+		if v.Type().Key().Kind() == reflect.String && v.Type().Elem().Kind() == reflect.String {
+			var mapValue map[string]interface{}
+
+			// Check if value is a PropertyMap and convert it
+			if pm, ok := value.(resource.PropertyMap); ok {
+				mapValue = pm.Mappable()
+			} else if mv, ok := value.(map[string]interface{}); ok {
+				mapValue = mv
+			} else {
+				return fmt.Errorf("expected map[string]interface{} or PropertyMap, got %T", value)
+			}
+
+			// Create a new map if nil
+			if v.IsNil() {
+				v.Set(reflect.MakeMap(v.Type()))
+			}
+			// Populate the map
+			for k, val := range mapValue {
+				strVal, ok := val.(string)
+				if !ok {
+					return fmt.Errorf("expected string value in map, got %T", val)
+				}
+				v.SetMapIndex(reflect.ValueOf(k), reflect.ValueOf(strVal))
+			}
+		}
 	}
 	return nil
 }
