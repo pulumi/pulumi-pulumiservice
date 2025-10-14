@@ -42,7 +42,7 @@ func TestGoApprovalRulesExample(t *testing.T) {
 	integration.ProgramTest(t, &testOpts)
 }
 
-func getGoBaseOptions(t *testing.T) integration.ProgramTestOptions {
+func getGoBaseOptions(_ *testing.T) integration.ProgramTestOptions {
 	return integration.ProgramTestOptions{
 		Dependencies: []string{
 			"github.com/pulumi/pulumi-pulumiservice/sdk",

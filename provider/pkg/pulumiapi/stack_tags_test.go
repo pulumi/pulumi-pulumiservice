@@ -23,9 +23,10 @@ func TestCreateStackTags(t *testing.T) {
 	t.Run("Happy Path", func(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
-			ExpectedReqPath:   fmt.Sprintf("/api/stacks/%s/%s/%s/tags", stackName.OrgName, stackName.ProjectName, stackName.StackName),
-			ExpectedReqBody:   tag,
-			ResponseCode:      http.StatusNoContent,
+			ExpectedReqPath: fmt.Sprintf("/api/stacks/%s/%s/%s/tags",
+				stackName.OrgName, stackName.ProjectName, stackName.StackName),
+			ExpectedReqBody: tag,
+			ResponseCode:    http.StatusNoContent,
 		})
 		defer cleanup()
 		assert.NoError(t, c.CreateTag(ctx, stackName, tag))
@@ -34,8 +35,9 @@ func TestCreateStackTags(t *testing.T) {
 	t.Run("Error", func(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
-			ExpectedReqPath:   fmt.Sprintf("/api/stacks/%s/%s/%s/tags", stackName.OrgName, stackName.ProjectName, stackName.StackName),
-			ResponseCode:      401,
+			ExpectedReqPath: fmt.Sprintf("/api/stacks/%s/%s/%s/tags",
+				stackName.OrgName, stackName.ProjectName, stackName.StackName),
+			ResponseCode: 401,
 			ResponseBody: ErrorResponse{
 				Message: "unauthorized",
 			},
@@ -73,6 +75,10 @@ func TestDeleteStackTags(t *testing.T) {
 			},
 		})
 		defer cleanup()
-		assert.EqualError(t, c.DeleteStackTag(ctx, stackName, tagName), "failed to make request: 401 API error: unauthorized")
+		assert.EqualError(
+			t,
+			c.DeleteStackTag(ctx, stackName, tagName),
+			"failed to make request: 401 API error: unauthorized",
+		)
 	})
 }

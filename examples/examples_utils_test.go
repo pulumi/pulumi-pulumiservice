@@ -1,8 +1,9 @@
 package examples
 
 import (
+	"crypto/rand"
 	"fmt"
-	"math/rand"
+	"math/big"
 	"os"
 	"testing"
 )
@@ -16,5 +17,6 @@ func getCwd(t *testing.T) string {
 }
 
 func generateRandomFiveDigits() string {
-	return fmt.Sprintf("%05d", rand.Intn(100000))
+	n, _ := rand.Int(rand.Reader, big.NewInt(100000))
+	return fmt.Sprintf("%05d", n.Int64())
 }

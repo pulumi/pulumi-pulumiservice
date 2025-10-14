@@ -12,11 +12,17 @@ import (
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/structpb"
 
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/util/rpcutil/rpcerror"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
+)
+
+const (
+	teamTypeGitHub = "github"
+	teamTypePulumi = "pulumi"
 )
 
 type PulumiServiceTeamResource struct {
@@ -57,7 +63,7 @@ func (i *PulumiServiceTeamInput) ToPropertyMap() resource.PropertyMap {
 	return pm
 }
 
-func (i *PulumiServiceTeamInput) ToRpc() (*structpb.Struct, error) {
+func (i *PulumiServiceTeamInput) ToRPC() (*structpb.Struct, error) {
 	return plugin.MarshalProperties(i.ToPropertyMap(), plugin.MarshalOptions{
 		KeepOutputValues: true,
 	})
@@ -122,21 +128,21 @@ func (t *PulumiServiceTeamResource) Check(req *pulumirpc.CheckRequest) (*pulumir
 		teamType = newsMap["teamType"].StringValue()
 	}
 
-	if teamType != "github" && teamType != "pulumi" {
+	if teamType != teamTypeGitHub && teamType != teamTypePulumi {
 		failures = append(failures, &pulumirpc.CheckFailure{
 			Reason:   fmt.Sprintf("found %q instead of 'pulumi' or 'github'", teamType),
 			Property: "type",
 		})
 	}
 
-	if teamType == "github" && !newsMap["githubTeamId"].HasValue() {
+	if teamType == teamTypeGitHub && !newsMap["githubTeamId"].HasValue() {
 		failures = append(failures, &pulumirpc.CheckFailure{
 			Reason:   "teams with teamType 'github' require a githubTeamId",
 			Property: "githubTeamId",
 		})
 	}
 
-	if teamType == "pulumi" && !newsMap["name"].HasValue() {
+	if teamType == teamTypePulumi && !newsMap["name"].HasValue() {
 		failures = append(failures, &pulumirpc.CheckFailure{
 			Reason:   "teams with teamType 'pulumi' require a name",
 			Property: "name",
@@ -165,7 +171,10 @@ func (t *PulumiServiceTeamResource) Delete(req *pulumirpc.DeleteRequest) (*pbemp
 }
 
 func (t *PulumiServiceTeamResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
+	olds, err := plugin.UnmarshalProperties(
+		req.GetOldInputs(),
+		plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -232,11 +241,17 @@ func (t *PulumiServiceTeamResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc
 
 func (t *PulumiServiceTeamResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
 	ctx := context.Background()
-	inputsOld, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	inputsOld, err := plugin.UnmarshalProperties(
+		req.GetOlds(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
-	inputsNew, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	inputsNew, err := plugin.UnmarshalProperties(
+		req.GetNews(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -257,7 +272,7 @@ func (t *PulumiServiceTeamResource) Update(req *pulumirpc.UpdateRequest) (*pulum
 	}
 
 	// github teams can't manage membership.
-	if !slices.Equal(teamOld.Members, teamNew.Members) && teamNew.Type != "github" {
+	if !slices.Equal(teamOld.Members, teamNew.Members) && teamNew.Type != teamTypeGitHub {
 		inputsChanged.Members = teamNew.Members
 		for _, usernameToDelete := range teamOld.Members {
 			if !slices.Contains(teamNew.Members, usernameToDelete) {
@@ -278,7 +293,7 @@ func (t *PulumiServiceTeamResource) Update(req *pulumirpc.UpdateRequest) (*pulum
 		}
 	}
 
-	outputProperties, err := teamNew.ToRpc()
+	outputProperties, err := teamNew.ToRPC()
 	if err != nil {
 		return nil, err
 	}
@@ -289,7 +304,10 @@ func (t *PulumiServiceTeamResource) Update(req *pulumirpc.UpdateRequest) (*pulum
 
 func (t *PulumiServiceTeamResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	ctx := context.Background()
-	inputs, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	inputs, err := plugin.UnmarshalProperties(
+		req.GetProperties(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -335,7 +353,7 @@ func (t *PulumiServiceTeamResource) Create(req *pulumirpc.CreateRequest) (*pulum
 	// Sort the members so the order is deterministic
 	slices.Sort(outputs.Members)
 
-	outputProperties, err := outputs.ToRpc()
+	outputProperties, err := outputs.ToRPC()
 	if err != nil {
 		return nil, partialError(*teamUrn, err, outputs, inputsTeam)
 	}
@@ -355,7 +373,15 @@ func (t *PulumiServiceTeamResource) updateTeam(ctx context.Context, input Pulumi
 }
 
 func (t *PulumiServiceTeamResource) createTeam(ctx context.Context, input PulumiServiceTeamInput) (*string, error) {
-	team, err := t.Client.CreateTeam(ctx, input.OrganizationName, input.Name, input.Type, input.DisplayName, input.Description, input.GitHubTeamID)
+	team, err := t.Client.CreateTeam(
+		ctx,
+		input.OrganizationName,
+		input.Name,
+		input.Type,
+		input.DisplayName,
+		input.Description,
+		input.GitHubTeamID,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -364,7 +390,12 @@ func (t *PulumiServiceTeamResource) createTeam(ctx context.Context, input Pulumi
 	return &teamUrn, nil
 }
 
-func (t *PulumiServiceTeamResource) deleteFromTeam(ctx context.Context, orgName string, teamName string, userName string) error {
+func (t *PulumiServiceTeamResource) deleteFromTeam(
+	ctx context.Context,
+	orgName string,
+	teamName string,
+	userName string,
+) error {
 	if len(orgName) == 0 {
 		return errors.New("orgname must not be empty")
 	}
@@ -380,7 +411,12 @@ func (t *PulumiServiceTeamResource) deleteFromTeam(ctx context.Context, orgName 
 	return t.Client.DeleteMemberFromTeam(ctx, orgName, teamName, userName)
 }
 
-func (t *PulumiServiceTeamResource) addToTeam(ctx context.Context, orgName string, teamName string, userName string) error {
+func (t *PulumiServiceTeamResource) addToTeam(
+	ctx context.Context,
+	orgName string,
+	teamName string,
+	userName string,
+) error {
 	return t.Client.AddMemberToTeam(ctx, orgName, teamName, userName)
 }
 
@@ -399,8 +435,8 @@ func (t *PulumiServiceTeamResource) deleteTeam(ctx context.Context, id string) e
 // partialError creates an error for resources that did not complete an operation in progress.
 // The last known state of the object is included in the error so that it can be checkpointed.
 func partialError(id string, err error, state PulumiServiceTeamInput, inputs PulumiServiceTeamInput) error {
-	stateRpc, stateSerErr := state.ToRpc()
-	inputRpc, inputSerErr := inputs.ToRpc()
+	stateRPC, stateSerErr := state.ToRPC()
+	inputRPC, inputSerErr := inputs.ToRPC()
 
 	// combine errors if we can't serialize state or inputs for some reason
 	if stateSerErr != nil {
@@ -411,9 +447,9 @@ func partialError(id string, err error, state PulumiServiceTeamInput, inputs Pul
 	}
 	detail := pulumirpc.ErrorResourceInitFailed{
 		Id:         id,
-		Properties: stateRpc,
+		Properties: stateRPC,
 		Reasons:    []string{err.Error()},
-		Inputs:     inputRpc,
+		Inputs:     inputRPC,
 	}
 	return rpcerror.WithDetails(rpcerror.New(codes.Unknown, err.Error()), &detail)
 }

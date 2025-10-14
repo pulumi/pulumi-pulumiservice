@@ -9,22 +9,22 @@ import (
 )
 
 func TestDeleteOrgAccessToken(t *testing.T) {
-	orgName := "anOrg"
-	tokenId := "abcdegh"
+	orgName := testOrgName
+	tokenID := testTokenID
 	t.Run("Happy Path", func(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
-			ExpectedReqPath:   "/api/orgs/anOrg/tokens/" + tokenId,
+			ExpectedReqPath:   "/api/orgs/anOrg/tokens/" + tokenID,
 			ResponseCode:      204,
 		})
 		defer cleanup()
-		assert.NoError(t, c.DeleteOrgAccessToken(teamCtx, tokenId, orgName))
+		assert.NoError(t, c.DeleteOrgAccessToken(teamCtx, tokenID, orgName))
 	})
 
 	t.Run("Error", func(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
-			ExpectedReqPath:   "/api/orgs/anOrg/tokens/" + tokenId,
+			ExpectedReqPath:   "/api/orgs/anOrg/tokens/" + tokenID,
 			ResponseCode:      404,
 			ResponseBody: ErrorResponse{
 				StatusCode: 404,
@@ -33,7 +33,7 @@ func TestDeleteOrgAccessToken(t *testing.T) {
 		})
 		defer cleanup()
 		assert.EqualError(t,
-			c.DeleteOrgAccessToken(teamCtx, tokenId, orgName),
+			c.DeleteOrgAccessToken(teamCtx, tokenID, orgName),
 			`failed to delete access token "abcdegh": 404 API error: token not found`,
 		)
 	})
@@ -41,9 +41,9 @@ func TestDeleteOrgAccessToken(t *testing.T) {
 }
 
 func TestCreateOrgAccessToken(t *testing.T) {
-	orgName := "anOrg"
+	orgName := testOrgName
 	name := "anOrgToken"
-	desc := "token description"
+	desc := testTokenDesc
 
 	t.Run("Happy Path", func(t *testing.T) {
 		resp := createTokenResponse{
@@ -121,9 +121,9 @@ func TestCreateOrgAccessToken(t *testing.T) {
 }
 
 func TestGetOrgAccessToken(t *testing.T) {
-	id := "uuid"
-	desc := "token description"
-	org := "anOrg"
+	id := testUUID
+	desc := testTokenDesc
+	org := testOrgName
 	lastUsed := 123
 	t.Run("Happy Path", func(t *testing.T) {
 		resp := listTokenResponse{

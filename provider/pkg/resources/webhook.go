@@ -7,11 +7,12 @@ import (
 
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
 
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 // Not the best to create a second source of truth here, but this will likely not change for years
@@ -28,7 +29,7 @@ type PulumiServiceWebhookResource struct {
 type PulumiServiceWebhookInput struct {
 	Active           bool
 	DisplayName      string
-	PayloadUrl       string
+	PayloadURL       string
 	Secret           *pulumiapi.SecretValue
 	OrganizationName string
 	ProjectName      *string
@@ -44,14 +45,18 @@ type PulumiServiceWebhookProperties struct {
 	Name string
 }
 
-func (i *PulumiServiceWebhookInput) ToPropertyMap(plaintextSecret *pulumiapi.SecretValue, cipherSecret *pulumiapi.SecretValue, isInput bool) resource.PropertyMap {
+func (i *PulumiServiceWebhookInput) ToPropertyMap(
+	plaintextSecret *pulumiapi.SecretValue,
+	cipherSecret *pulumiapi.SecretValue,
+	isInput bool,
+) resource.PropertyMap {
 	createMode := plaintextSecret != nil && cipherSecret == nil
 	mergeMode := plaintextSecret != nil && cipherSecret != nil
 
 	pm := resource.PropertyMap{}
 	pm["active"] = resource.NewPropertyValue(i.Active)
 	pm["displayName"] = resource.NewPropertyValue(i.DisplayName)
-	pm["payloadUrl"] = resource.NewPropertyValue(i.PayloadUrl)
+	pm["payloadUrl"] = resource.NewPropertyValue(i.PayloadURL)
 	pm["organizationName"] = resource.NewPropertyValue(i.OrganizationName)
 
 	if i.ProjectName != nil {
@@ -86,7 +91,11 @@ func (i *PulumiServiceWebhookInput) ToPropertyMap(plaintextSecret *pulumiapi.Sec
 	return pm
 }
 
-func (i *PulumiServiceWebhookProperties) ToPropertyMap(plaintextSecret *pulumiapi.SecretValue, cipherSecret *pulumiapi.SecretValue, isInput bool) resource.PropertyMap {
+func (i *PulumiServiceWebhookProperties) ToPropertyMap(
+	plaintextSecret *pulumiapi.SecretValue,
+	cipherSecret *pulumiapi.SecretValue,
+	isInput bool,
+) resource.PropertyMap {
 	pm := i.PulumiServiceWebhookInput.ToPropertyMap(plaintextSecret, cipherSecret, isInput)
 
 	if !isInput {
@@ -96,11 +105,13 @@ func (i *PulumiServiceWebhookProperties) ToPropertyMap(plaintextSecret *pulumiap
 	return pm
 }
 
-func (wh *PulumiServiceWebhookResource) ToPulumiServiceWebhookProperties(propMap resource.PropertyMap) PulumiServiceWebhookProperties {
+func (wh *PulumiServiceWebhookResource) ToPulumiServiceWebhookProperties(
+	propMap resource.PropertyMap,
+) PulumiServiceWebhookProperties {
 	props := PulumiServiceWebhookProperties{}
 
 	props.DisplayName = util.GetSecretOrStringValue(propMap["displayName"])
-	props.PayloadUrl = util.GetSecretOrStringValue(propMap["payloadUrl"])
+	props.PayloadURL = util.GetSecretOrStringValue(propMap["payloadUrl"])
 	props.OrganizationName = util.GetSecretOrStringValue(propMap["organizationName"])
 	props.ProjectName = util.GetSecretOrStringNullableValue(propMap["projectName"])
 	props.StackName = util.GetSecretOrStringNullableValue(propMap["stackName"])
@@ -149,7 +160,10 @@ func (wh *PulumiServiceWebhookResource) Name() string {
 }
 
 func (wh *PulumiServiceWebhookResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
+	news, err := plugin.UnmarshalProperties(
+		req.GetNews(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -231,14 +245,17 @@ func (wh *PulumiServiceWebhookResource) Check(req *pulumirpc.CheckRequest) (*pul
 
 func (wh *PulumiServiceWebhookResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	ctx := context.Background()
-	inputMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
+	inputMap, err := plugin.UnmarshalProperties(
+		req.GetProperties(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true},
+	)
 	if err != nil {
 		return nil, err
 	}
 
 	inputProps := wh.ToPulumiServiceWebhookProperties(inputMap)
 
-	var secretStr *string = nil
+	var secretStr *string
 	if inputProps.Secret != nil {
 		secretStr = &inputProps.Secret.Value
 	}
@@ -249,7 +266,7 @@ func (wh *PulumiServiceWebhookResource) Create(req *pulumirpc.CreateRequest) (*p
 		StackName:        inputProps.StackName,
 		EnvironmentName:  inputProps.EnvironmentName,
 		DisplayName:      inputProps.DisplayName,
-		PayloadURL:       inputProps.PayloadUrl,
+		PayloadURL:       inputProps.PayloadURL,
 		Secret:           secretStr,
 		Active:           inputProps.Active,
 		Format:           inputProps.Format,
@@ -284,7 +301,10 @@ func (wh *PulumiServiceWebhookResource) Create(req *pulumirpc.CreateRequest) (*p
 }
 
 func (wh *PulumiServiceWebhookResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
+	olds, err := plugin.UnmarshalProperties(
+		req.GetOldInputs(),
+		plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -324,7 +344,7 @@ func (wh *PulumiServiceWebhookResource) Diff(req *pulumirpc.DiffRequest) (*pulum
 			v.Kind = v.Kind.AsReplace()
 		}
 		detailedDiffs[k] = &pulumirpc.PropertyDiff{
-			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind),
+			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind), //nolint:gosec // Kind values are bounded by protobuf enum
 			InputDiff: v.InputDiff,
 		}
 	}
@@ -341,7 +361,10 @@ func (wh *PulumiServiceWebhookResource) Diff(req *pulumirpc.DiffRequest) (*pulum
 }
 
 func (wh *PulumiServiceWebhookResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	inputMap, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	inputMap, err := plugin.UnmarshalProperties(
+		req.GetNews(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -353,7 +376,7 @@ func (wh *PulumiServiceWebhookResource) Update(req *pulumirpc.UpdateRequest) (*p
 		return nil, fmt.Errorf("invalid resource id: %v", err)
 	}
 
-	var secretStr *string = nil
+	var secretStr *string
 	if inputProps.Secret != nil {
 		secretStr = &inputProps.Secret.Value
 	}
@@ -365,7 +388,7 @@ func (wh *PulumiServiceWebhookResource) Update(req *pulumirpc.UpdateRequest) (*p
 			StackName:        inputProps.StackName,
 			EnvironmentName:  inputProps.EnvironmentName,
 			DisplayName:      inputProps.DisplayName,
-			PayloadURL:       inputProps.PayloadUrl,
+			PayloadURL:       inputProps.PayloadURL,
 			Secret:           secretStr,
 			Active:           inputProps.Active,
 			Format:           inputProps.Format,
@@ -428,7 +451,7 @@ func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulum
 		return &pulumirpc.ReadResponse{}, nil
 	}
 
-	var secret *pulumiapi.SecretValue = nil
+	var secret *pulumiapi.SecretValue
 	if webhook.HasSecret {
 		secret = &pulumiapi.SecretValue{
 			Value:  webhook.SecretCiphertext,
@@ -440,7 +463,7 @@ func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulum
 		PulumiServiceWebhookInput: PulumiServiceWebhookInput{
 			Active:           webhook.Active,
 			DisplayName:      webhook.DisplayName,
-			PayloadUrl:       webhook.PayloadUrl,
+			PayloadURL:       webhook.PayloadURL,
 			Secret:           secret,
 			Format:           &webhook.Format,
 			Filters:          webhook.Filters,
@@ -455,11 +478,17 @@ func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulum
 
 	var plaintextSecret *pulumiapi.SecretValue
 	var ciphertextSecret *pulumiapi.SecretValue
-	propertyMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
+	propertyMap, err := plugin.UnmarshalProperties(
+		req.GetProperties(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true},
+	)
 	if err != nil {
 		return nil, err
 	}
-	inputMap, err := plugin.UnmarshalProperties(req.GetInputs(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
+	inputMap, err := plugin.UnmarshalProperties(
+		req.GetInputs(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true},
+	)
 	if err != nil {
 		return nil, err
 	}

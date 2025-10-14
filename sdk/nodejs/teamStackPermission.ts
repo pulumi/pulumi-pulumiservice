@@ -40,23 +40,23 @@ export class TeamStackPermission extends pulumi.CustomResource {
     /**
      * The organization or the personal account name of the stack.
      */
-    public readonly organization!: pulumi.Output<string>;
+    declare public readonly organization: pulumi.Output<string>;
     /**
      * Sets the permission level that this team will be granted to the stack.
      */
-    public readonly permission!: pulumi.Output<enums.TeamStackPermissionScope>;
+    declare public readonly permission: pulumi.Output<enums.TeamStackPermissionScope>;
     /**
      * The project name for this stack.
      */
-    public readonly project!: pulumi.Output<string>;
+    declare public readonly project: pulumi.Output<string>;
     /**
      * The name of the stack that the team will be granted permissions to.
      */
-    public readonly stack!: pulumi.Output<string>;
+    declare public readonly stack: pulumi.Output<string>;
     /**
      * The name of the team to grant this stack permissions to. This is not the display name.
      */
-    public readonly team!: pulumi.Output<string>;
+    declare public readonly team: pulumi.Output<string>;
 
     /**
      * Create a TeamStackPermission resource with the given unique name, arguments, and options.
@@ -69,26 +69,26 @@ export class TeamStackPermission extends pulumi.CustomResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
-            if ((!args || args.organization === undefined) && !opts.urn) {
+            if (args?.organization === undefined && !opts.urn) {
                 throw new Error("Missing required property 'organization'");
             }
-            if ((!args || args.permission === undefined) && !opts.urn) {
+            if (args?.permission === undefined && !opts.urn) {
                 throw new Error("Missing required property 'permission'");
             }
-            if ((!args || args.project === undefined) && !opts.urn) {
+            if (args?.project === undefined && !opts.urn) {
                 throw new Error("Missing required property 'project'");
             }
-            if ((!args || args.stack === undefined) && !opts.urn) {
+            if (args?.stack === undefined && !opts.urn) {
                 throw new Error("Missing required property 'stack'");
             }
-            if ((!args || args.team === undefined) && !opts.urn) {
+            if (args?.team === undefined && !opts.urn) {
                 throw new Error("Missing required property 'team'");
             }
-            resourceInputs["organization"] = args ? args.organization : undefined;
-            resourceInputs["permission"] = args ? args.permission : undefined;
-            resourceInputs["project"] = args ? args.project : undefined;
-            resourceInputs["stack"] = args ? args.stack : undefined;
-            resourceInputs["team"] = args ? args.team : undefined;
+            resourceInputs["organization"] = args?.organization;
+            resourceInputs["permission"] = args?.permission;
+            resourceInputs["project"] = args?.project;
+            resourceInputs["stack"] = args?.stack;
+            resourceInputs["team"] = args?.team;
         } else {
             resourceInputs["organization"] = undefined /*out*/;
             resourceInputs["permission"] = undefined /*out*/;

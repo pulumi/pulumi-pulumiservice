@@ -24,9 +24,9 @@ import (
 
 type AgentPoolClient interface {
 	CreateAgentPool(ctx context.Context, orgName, name, description string) (*AgentPool, error)
-	UpdateAgentPool(ctx context.Context, agentPoolId, orgName, name, description string) error
-	DeleteAgentPool(ctx context.Context, agentPoolId, orgName string, forceDestroy bool) error
-	GetAgentPool(ctx context.Context, agentPoolId, orgName string) (*AgentPool, error)
+	UpdateAgentPool(ctx context.Context, agentPoolID, orgName, name, description string) error
+	DeleteAgentPool(ctx context.Context, agentPoolID, orgName string, forceDestroy bool) error
+	GetAgentPool(ctx context.Context, agentPoolID, orgName string) (*AgentPool, error)
 }
 
 type AgentPool struct {
@@ -80,9 +80,9 @@ func (c *Client) CreateAgentPool(ctx context.Context, orgName, name, description
 
 }
 
-func (c *Client) UpdateAgentPool(ctx context.Context, agentPoolId, orgName, name, description string) error {
-	if len(agentPoolId) == 0 {
-		return errors.New("agentPoolId length must be greater than zero")
+func (c *Client) UpdateAgentPool(ctx context.Context, agentPoolID, orgName, name, description string) error {
+	if len(agentPoolID) == 0 {
+		return errors.New("agentPoolID length must be greater than zero")
 	}
 
 	if len(orgName) == 0 {
@@ -93,7 +93,7 @@ func (c *Client) UpdateAgentPool(ctx context.Context, agentPoolId, orgName, name
 		return errors.New("empty name")
 	}
 
-	apiPath := path.Join("orgs", orgName, "agent-pools", agentPoolId)
+	apiPath := path.Join("orgs", orgName, "agent-pools", agentPoolID)
 
 	updateReq := createUpdateAgentPoolRequest{
 		Name:        name,
@@ -107,16 +107,16 @@ func (c *Client) UpdateAgentPool(ctx context.Context, agentPoolId, orgName, name
 	return nil
 }
 
-func (c *Client) DeleteAgentPool(ctx context.Context, agentPoolId, orgName string, forceDestroy bool) error {
-	if len(agentPoolId) == 0 {
-		return errors.New("agentPoolId length must be greater than zero")
+func (c *Client) DeleteAgentPool(ctx context.Context, agentPoolID, orgName string, forceDestroy bool) error {
+	if len(agentPoolID) == 0 {
+		return errors.New("agentPoolID length must be greater than zero")
 	}
 
 	if len(orgName) == 0 {
 		return errors.New("orgName length must be greater than zero")
 	}
 
-	apiPath := path.Join("orgs", orgName, "agent-pools", agentPoolId)
+	apiPath := path.Join("orgs", orgName, "agent-pools", agentPoolID)
 
 	var err error
 	if forceDestroy {
@@ -125,14 +125,14 @@ func (c *Client) DeleteAgentPool(ctx context.Context, agentPoolId, orgName strin
 		_, err = c.do(ctx, http.MethodDelete, apiPath, nil, nil)
 	}
 	if err != nil {
-		return fmt.Errorf("failed to delete agent pool %q: %w", agentPoolId, err)
+		return fmt.Errorf("failed to delete agent pool %q: %w", agentPoolID, err)
 	}
 
 	return nil
 }
 
-func (c *Client) GetAgentPool(ctx context.Context, agentPoolId, orgName string) (*AgentPool, error) {
-	apiPath := path.Join("orgs", orgName, "agent-pools", agentPoolId)
+func (c *Client) GetAgentPool(ctx context.Context, agentPoolID, orgName string) (*AgentPool, error) {
+	apiPath := path.Join("orgs", orgName, "agent-pools", agentPoolID)
 
 	var pool AgentPool
 	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &pool)

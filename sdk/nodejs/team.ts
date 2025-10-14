@@ -37,31 +37,31 @@ export class Team extends pulumi.CustomResource {
     /**
      * Optional. Team description.
      */
-    public readonly description!: pulumi.Output<string | undefined>;
+    declare public readonly description: pulumi.Output<string | undefined>;
     /**
      * Optional. Team display name.
      */
-    public readonly displayName!: pulumi.Output<string | undefined>;
+    declare public readonly displayName: pulumi.Output<string | undefined>;
     /**
      * The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for "github" teams.
      */
-    public readonly githubTeamId!: pulumi.Output<number | undefined>;
+    declare public readonly githubTeamId: pulumi.Output<number | undefined>;
     /**
      * List of Pulumi Cloud usernames of team members.
      */
-    public readonly members!: pulumi.Output<string[]>;
+    declare public readonly members: pulumi.Output<string[]>;
     /**
      * The team's name. Required for "pulumi" teams.
      */
-    public readonly name!: pulumi.Output<string | undefined>;
+    declare public readonly name: pulumi.Output<string | undefined>;
     /**
      * The name of the Pulumi organization the team belongs to.
      */
-    public readonly organizationName!: pulumi.Output<string>;
+    declare public readonly organizationName: pulumi.Output<string>;
     /**
      * The type of team. Must be either `pulumi` or `github`.
      */
-    public readonly teamType!: pulumi.Output<string>;
+    declare public readonly teamType: pulumi.Output<string>;
 
     /**
      * Create a Team resource with the given unique name, arguments, and options.
@@ -74,19 +74,19 @@ export class Team extends pulumi.CustomResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
-            if ((!args || args.organizationName === undefined) && !opts.urn) {
+            if (args?.organizationName === undefined && !opts.urn) {
                 throw new Error("Missing required property 'organizationName'");
             }
-            if ((!args || args.teamType === undefined) && !opts.urn) {
+            if (args?.teamType === undefined && !opts.urn) {
                 throw new Error("Missing required property 'teamType'");
             }
-            resourceInputs["description"] = args ? args.description : undefined;
-            resourceInputs["displayName"] = args ? args.displayName : undefined;
-            resourceInputs["githubTeamId"] = args ? args.githubTeamId : undefined;
-            resourceInputs["members"] = args ? args.members : undefined;
-            resourceInputs["name"] = args ? args.name : undefined;
-            resourceInputs["organizationName"] = args ? args.organizationName : undefined;
-            resourceInputs["teamType"] = args ? args.teamType : undefined;
+            resourceInputs["description"] = args?.description;
+            resourceInputs["displayName"] = args?.displayName;
+            resourceInputs["githubTeamId"] = args?.githubTeamId;
+            resourceInputs["members"] = args?.members;
+            resourceInputs["name"] = args?.name;
+            resourceInputs["organizationName"] = args?.organizationName;
+            resourceInputs["teamType"] = args?.teamType;
         } else {
             resourceInputs["description"] = undefined /*out*/;
             resourceInputs["displayName"] = undefined /*out*/;

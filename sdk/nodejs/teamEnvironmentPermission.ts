@@ -40,27 +40,27 @@ export class TeamEnvironmentPermission extends pulumi.CustomResource {
     /**
      * Environment name.
      */
-    public readonly environment!: pulumi.Output<string | undefined>;
+    declare public readonly environment: pulumi.Output<string | undefined>;
     /**
      * The maximum duration for which members of this team may open the environment.
      */
-    public readonly maxOpenDuration!: pulumi.Output<string | undefined>;
+    declare public readonly maxOpenDuration: pulumi.Output<string | undefined>;
     /**
      * Organization name.
      */
-    public readonly organization!: pulumi.Output<string | undefined>;
+    declare public readonly organization: pulumi.Output<string | undefined>;
     /**
      * Which permission level to grant to the specified team.
      */
-    public readonly permission!: pulumi.Output<enums.EnvironmentPermission | undefined>;
+    declare public readonly permission: pulumi.Output<enums.EnvironmentPermission | undefined>;
     /**
      * Project name.
      */
-    public readonly project!: pulumi.Output<string | undefined>;
+    declare public readonly project: pulumi.Output<string | undefined>;
     /**
      * Team name.
      */
-    public readonly team!: pulumi.Output<string | undefined>;
+    declare public readonly team: pulumi.Output<string | undefined>;
 
     /**
      * Create a TeamEnvironmentPermission resource with the given unique name, arguments, and options.
@@ -73,24 +73,24 @@ export class TeamEnvironmentPermission extends pulumi.CustomResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
-            if ((!args || args.environment === undefined) && !opts.urn) {
+            if (args?.environment === undefined && !opts.urn) {
                 throw new Error("Missing required property 'environment'");
             }
-            if ((!args || args.organization === undefined) && !opts.urn) {
+            if (args?.organization === undefined && !opts.urn) {
                 throw new Error("Missing required property 'organization'");
             }
-            if ((!args || args.permission === undefined) && !opts.urn) {
+            if (args?.permission === undefined && !opts.urn) {
                 throw new Error("Missing required property 'permission'");
             }
-            if ((!args || args.team === undefined) && !opts.urn) {
+            if (args?.team === undefined && !opts.urn) {
                 throw new Error("Missing required property 'team'");
             }
-            resourceInputs["environment"] = args ? args.environment : undefined;
-            resourceInputs["maxOpenDuration"] = args ? args.maxOpenDuration : undefined;
-            resourceInputs["organization"] = args ? args.organization : undefined;
-            resourceInputs["permission"] = args ? args.permission : undefined;
-            resourceInputs["project"] = (args ? args.project : undefined) ?? "default";
-            resourceInputs["team"] = args ? args.team : undefined;
+            resourceInputs["environment"] = args?.environment;
+            resourceInputs["maxOpenDuration"] = args?.maxOpenDuration;
+            resourceInputs["organization"] = args?.organization;
+            resourceInputs["permission"] = args?.permission;
+            resourceInputs["project"] = (args?.project) ?? "default";
+            resourceInputs["team"] = args?.team;
         } else {
             resourceInputs["environment"] = undefined /*out*/;
             resourceInputs["maxOpenDuration"] = undefined /*out*/;

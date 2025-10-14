@@ -60,7 +60,7 @@ export interface GetPolicyPackResult {
 /**
  * Get details about a specific version of a policy pack.
  */
-export function getPolicyPackOutput(args: GetPolicyPackOutputArgs, opts?: pulumi.InvokeOptions): pulumi.Output<GetPolicyPackResult> {
+export function getPolicyPackOutput(args: GetPolicyPackOutputArgs, opts?: pulumi.InvokeOutputOptions): pulumi.Output<GetPolicyPackResult> {
     opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts || {});
     return pulumi.runtime.invokeOutput("pulumiservice:index:getPolicyPack", {
         "organizationName": args.organizationName,

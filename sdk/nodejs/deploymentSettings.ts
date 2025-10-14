@@ -48,39 +48,39 @@ export class DeploymentSettings extends pulumi.CustomResource {
     /**
      * The agent pool identifier to use for the deployment.
      */
-    public readonly agentPoolId!: pulumi.Output<string | undefined>;
+    declare public readonly agentPoolId: pulumi.Output<string | undefined>;
     /**
      * Dependency cache settings for the deployment
      */
-    public readonly cacheOptions!: pulumi.Output<outputs.DeploymentSettingsCacheOptions | undefined>;
+    declare public readonly cacheOptions: pulumi.Output<outputs.DeploymentSettingsCacheOptions | undefined>;
     /**
      * Settings related to the deployment executor.
      */
-    public readonly executorContext!: pulumi.Output<outputs.DeploymentSettingsExecutorContext | undefined>;
+    declare public readonly executorContext: pulumi.Output<outputs.DeploymentSettingsExecutorContext | undefined>;
     /**
      * GitHub settings for the deployment.
      */
-    public readonly github!: pulumi.Output<outputs.DeploymentSettingsGithub | undefined>;
+    declare public readonly github: pulumi.Output<outputs.DeploymentSettingsGithub | undefined>;
     /**
      * Settings related to the Pulumi operation environment during the deployment.
      */
-    public readonly operationContext!: pulumi.Output<outputs.DeploymentSettingsOperationContext | undefined>;
+    declare public readonly operationContext: pulumi.Output<outputs.DeploymentSettingsOperationContext | undefined>;
     /**
      * Organization name.
      */
-    public readonly organization!: pulumi.Output<string>;
+    declare public readonly organization: pulumi.Output<string>;
     /**
      * Project name.
      */
-    public readonly project!: pulumi.Output<string>;
+    declare public readonly project: pulumi.Output<string>;
     /**
      * Settings related to the source of the deployment.
      */
-    public readonly sourceContext!: pulumi.Output<outputs.DeploymentSettingsSourceContext | undefined>;
+    declare public readonly sourceContext: pulumi.Output<outputs.DeploymentSettingsSourceContext | undefined>;
     /**
      * Stack name.
      */
-    public readonly stack!: pulumi.Output<string>;
+    declare public readonly stack: pulumi.Output<string>;
 
     /**
      * Create a DeploymentSettings resource with the given unique name, arguments, and options.
@@ -93,24 +93,24 @@ export class DeploymentSettings extends pulumi.CustomResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
-            if ((!args || args.organization === undefined) && !opts.urn) {
+            if (args?.organization === undefined && !opts.urn) {
                 throw new Error("Missing required property 'organization'");
             }
-            if ((!args || args.project === undefined) && !opts.urn) {
+            if (args?.project === undefined && !opts.urn) {
                 throw new Error("Missing required property 'project'");
             }
-            if ((!args || args.stack === undefined) && !opts.urn) {
+            if (args?.stack === undefined && !opts.urn) {
                 throw new Error("Missing required property 'stack'");
             }
-            resourceInputs["agentPoolId"] = args ? args.agentPoolId : undefined;
+            resourceInputs["agentPoolId"] = args?.agentPoolId;
             resourceInputs["cacheOptions"] = args ? (args.cacheOptions ? pulumi.output(args.cacheOptions).apply(inputs.deploymentSettingsCacheOptionsArgsProvideDefaults) : undefined) : undefined;
-            resourceInputs["executorContext"] = args ? args.executorContext : undefined;
+            resourceInputs["executorContext"] = args?.executorContext;
             resourceInputs["github"] = args ? (args.github ? pulumi.output(args.github).apply(inputs.deploymentSettingsGithubArgsProvideDefaults) : undefined) : undefined;
-            resourceInputs["operationContext"] = args ? args.operationContext : undefined;
-            resourceInputs["organization"] = args ? args.organization : undefined;
-            resourceInputs["project"] = args ? args.project : undefined;
-            resourceInputs["sourceContext"] = args ? args.sourceContext : undefined;
-            resourceInputs["stack"] = args ? args.stack : undefined;
+            resourceInputs["operationContext"] = args?.operationContext;
+            resourceInputs["organization"] = args?.organization;
+            resourceInputs["project"] = args?.project;
+            resourceInputs["sourceContext"] = args?.sourceContext;
+            resourceInputs["stack"] = args?.stack;
         } else {
             resourceInputs["agentPoolId"] = undefined /*out*/;
             resourceInputs["cacheOptions"] = undefined /*out*/;

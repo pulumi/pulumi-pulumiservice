@@ -10,22 +10,28 @@ import (
 
 var ctx = context.Background()
 
+const (
+	testTokenID   = "abcdegh"
+	testTokenDesc = "token description"
+	testUUID      = "uuid"
+)
+
 func TestDeleteAccessToken(t *testing.T) {
-	tokenId := "abcdegh"
+	tokenID := testTokenID
 	t.Run("Happy Path", func(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
-			ExpectedReqPath:   "/api/user/tokens/" + tokenId,
+			ExpectedReqPath:   "/api/user/tokens/" + tokenID,
 			ResponseCode:      204,
 		})
 		defer cleanup()
-		assert.NoError(t, c.DeleteAccessToken(ctx, tokenId))
+		assert.NoError(t, c.DeleteAccessToken(ctx, tokenID))
 	})
 
 	t.Run("Error", func(t *testing.T) {
 		c, cleanup := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
-			ExpectedReqPath:   "/api/user/tokens/" + tokenId,
+			ExpectedReqPath:   "/api/user/tokens/" + tokenID,
 			ResponseCode:      404,
 			ResponseBody: ErrorResponse{
 				StatusCode: 404,
@@ -34,15 +40,15 @@ func TestDeleteAccessToken(t *testing.T) {
 		})
 		defer cleanup()
 		assert.EqualError(t,
-			c.DeleteAccessToken(ctx, tokenId),
-			`failed to delete access token "abcdegh": 404 API error: token not found`,
+			c.DeleteAccessToken(ctx, tokenID),
+			`failed to delete access token "`+testTokenID+`": 404 API error: token not found`,
 		)
 	})
 
 }
 
 func TestCreateAccessToken(t *testing.T) {
-	desc := "token description"
+	desc := testTokenDesc
 	t.Run("Happy Path", func(t *testing.T) {
 		resp := createTokenResponse{
 			ID:         "token_id",
@@ -91,18 +97,18 @@ func TestCreateAccessToken(t *testing.T) {
 }
 
 func TestGetAccessToken(t *testing.T) {
-	id := "uuid"
-	desc := "token description"
+	id := testUUID
+	desc := testTokenDesc
 	lastUsed := 123
 	t.Run("Happy Path", func(t *testing.T) {
 		resp := listTokenResponse{
 			Tokens: []accessTokenResponse{
-				accessTokenResponse{
+				{
 					ID:          id,
 					Description: desc,
 					LastUsed:    lastUsed,
 				},
-				accessTokenResponse{
+				{
 					ID:          "other",
 					Description: desc,
 					LastUsed:    lastUsed,

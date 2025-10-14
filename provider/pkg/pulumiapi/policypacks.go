@@ -85,7 +85,9 @@ func (c *Client) ListPolicyPacks(ctx context.Context, orgName string) ([]PolicyP
 	return response.PolicyPacks, nil
 }
 
-func (c *Client) GetPolicyPack(ctx context.Context, orgName string, policyPackName string, version int) (*PolicyPackDetail, error) {
+func (c *Client) GetPolicyPack(
+	ctx context.Context, orgName string, policyPackName string, version int,
+) (*PolicyPackDetail, error) {
 	if len(orgName) == 0 {
 		return nil, errors.New("empty orgName")
 	}
@@ -109,7 +111,9 @@ func (c *Client) GetPolicyPack(ctx context.Context, orgName string, policyPackNa
 	return &policyPack, nil
 }
 
-func (c *Client) GetLatestPolicyPack(ctx context.Context, orgName string, policyPackName string) (*PolicyPackDetail, error) {
+func (c *Client) GetLatestPolicyPack(
+	ctx context.Context, orgName string, policyPackName string,
+) (*PolicyPackDetail, error) {
 	if len(orgName) == 0 {
 		return nil, errors.New("empty orgName")
 	}
