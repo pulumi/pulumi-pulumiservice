@@ -6,6 +6,10 @@
 
 - Added Java SDK support with Pulumi Java SDK v1.16.2
 - Upgraded Pulumi SDK to v3.204.0 with latest codegen improvements
+- Migrated to pulumi-go-provider v1.1.2 infer framework with hybrid provider architecture
+- Upgraded to Go 1.24.0
+- Migrated StackTag resource to use infer (Phase 1 POC)
+- Removed deprecated StreamInvoke method (removed in Pulumi SDK v3.169.0)
 
 ### Bug Fixes
 

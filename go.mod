@@ -8,6 +8,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/pgavlin/fx/v2 v2.0.10
 	github.com/pulumi/esc v0.17.0
+	github.com/pulumi/pulumi-go-provider v1.1.2
 	github.com/pulumi/pulumi/pkg/v3 v3.204.0
 	github.com/pulumi/pulumi/sdk/v3 v3.204.0
 	github.com/stretchr/testify v1.10.0
@@ -158,7 +159,7 @@ require (
 	go.opentelemetry.io/otel v1.36.0 // indirect
 	go.opentelemetry.io/otel/metric v1.36.0 // indirect
 	go.opentelemetry.io/otel/trace v1.36.0 // indirect
-	go.uber.org/atomic v1.9.0 // indirect
+	go.uber.org/atomic v1.10.0 // indirect
 	gocloud.dev v0.37.0 // indirect
 	gocloud.dev/secrets/hashivault v0.37.0 // indirect
 	golang.org/x/crypto v0.39.0 // indirect
