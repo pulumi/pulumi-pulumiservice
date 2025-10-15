@@ -10,6 +10,7 @@ from ._enums import *
 from .access_token import *
 from .agent_pool import *
 from .approval_rule import *
+from .create_task import *
 from .deployment_schedule import *
 from .deployment_settings import *
 from .drift_schedule import *
@@ -18,7 +19,6 @@ from .environment_rotation_schedule import *
 from .environment_version_tag import *
 from .get_policy_pack import *
 from .get_policy_packs import *
-from .neo_task import *
 from .oidc_issuer import *
 from .org_access_token import *
 from .policy_group import *
@@ -59,7 +59,6 @@ _utilities.register(
    "pulumiservice:index:Environment": "Environment",
    "pulumiservice:index:EnvironmentRotationSchedule": "EnvironmentRotationSchedule",
    "pulumiservice:index:EnvironmentVersionTag": "EnvironmentVersionTag",
-   "pulumiservice:index:NeoTask": "NeoTask",
    "pulumiservice:index:OidcIssuer": "OidcIssuer",
    "pulumiservice:index:OrgAccessToken": "OrgAccessToken",
    "pulumiservice:index:PolicyGroup": "PolicyGroup",

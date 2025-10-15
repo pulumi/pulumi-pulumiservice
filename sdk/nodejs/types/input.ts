@@ -349,6 +349,17 @@ export interface OperationContextOptionsArgs {
     skipIntermediateDeployments?: pulumi.Input<boolean>;
 }
 
+export interface TaskEntity {
+    /**
+     * The entity ID.
+     */
+    id: string;
+    /**
+     * The type of entity.
+     */
+    type: string;
+}
+
 export interface TaskEntityArgs {
     /**
      * The entity ID.

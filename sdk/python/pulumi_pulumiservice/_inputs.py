@@ -52,8 +52,8 @@ __all__ = [
     'OperationContextOIDCArgsDict',
     'OperationContextOptionsArgs',
     'OperationContextOptionsArgsDict',
-    'TaskEntityArgs',
-    'TaskEntityArgsDict',
+    'TaskEntity',
+    'TaskEntityDict',
     'TemplateSourceDestinationArgs',
     'TemplateSourceDestinationArgsDict',
 ]
@@ -1498,52 +1498,52 @@ class OperationContextOptionsArgs:
 
 
 if not MYPY:
-    class TaskEntityArgsDict(TypedDict):
-        id: pulumi.Input[str]
+    class TaskEntityDict(TypedDict):
+        id: _builtins.str
         """
         The entity ID.
         """
-        type: pulumi.Input[str]
+        type: _builtins.str
         """
         The type of entity.
         """
 elif False:
-    TaskEntityArgsDict: TypeAlias = Mapping[str, Any]
+    TaskEntityDict: TypeAlias = Mapping[str, Any]
 
 @pulumi.input_type
-class TaskEntityArgs:
+class TaskEntity:
     def __init__(__self__, *,
-                 id: pulumi.Input[str],
-                 type: pulumi.Input[str]):
+                 id: _builtins.str,
+                 type: _builtins.str):
         """
-        :param pulumi.Input[str] id: The entity ID.
-        :param pulumi.Input[str] type: The type of entity.
+        :param _builtins.str id: The entity ID.
+        :param _builtins.str type: The type of entity.
         """
         pulumi.set(__self__, "id", id)
         pulumi.set(__self__, "type", type)
 
-    @property
+    @_builtins.property
     @pulumi.getter
-    def id(self) -> pulumi.Input[str]:
+    def id(self) -> _builtins.str:
         """
         The entity ID.
         """
         return pulumi.get(self, "id")
 
     @id.setter
-    def id(self, value: pulumi.Input[str]):
+    def id(self, value: _builtins.str):
         pulumi.set(self, "id", value)
 
-    @property
+    @_builtins.property
     @pulumi.getter
-    def type(self) -> pulumi.Input[str]:
+    def type(self) -> _builtins.str:
         """
         The type of entity.
         """
         return pulumi.get(self, "type")
 
     @type.setter
-    def type(self, value: pulumi.Input[str]):
+    def type(self, value: _builtins.str):
         pulumi.set(self, "type", value)
 
 
