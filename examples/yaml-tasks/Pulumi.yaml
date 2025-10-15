@@ -2,11 +2,6 @@ name: yaml-tasks
 runtime: yaml
 description: A minimal example of creating a Neo task via Pulumi YAML
 
-plugins:
-  providers:
-  - name: pulumiservice
-    path: ../../bin
-
 config:
   organizationName:
     type: string
