@@ -4,7 +4,7 @@
 
 ### Improvements
 
-### Bug Fixes
+- Added NeoTask resource for tracking user instructions and entity changes in the Neo agent system
 
 ## 0.32.0
 
