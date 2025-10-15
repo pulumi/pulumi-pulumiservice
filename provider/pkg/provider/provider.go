@@ -205,9 +205,6 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 		&resources.PulumiServicePolicyGroupResource{
 			Client: client,
 		},
-		&resources.PulumiServiceNeoTaskResource{
-			Client: client,
-		},
 	}
 
 	return &pulumirpc.ConfigureResponse{
@@ -224,6 +221,8 @@ func (k *pulumiserviceProvider) Invoke(ctx context.Context, req *pulumirpc.Invok
 		return k.invokeFunctionGetPolicyPacks(ctx, req)
 	case "pulumiservice:index:getPolicyPack":
 		return k.invokeFunctionGetPolicyPack(ctx, req)
+	case "pulumiservice:index:createTask":
+		return k.invokeFunctionCreateTask(ctx, req)
 	default:
 		return nil, fmt.Errorf("unknown Invoke token '%s'", tok)
 	}

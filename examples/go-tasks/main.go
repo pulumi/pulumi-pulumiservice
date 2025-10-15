@@ -15,14 +15,14 @@ func main() {
 			organizationName = ctx.Organization()
 		}
 
-		task, err := pulumiservice.NewNeoTask(ctx, "exampleTask", &pulumiservice.NeoTaskArgs{
-			Content:          pulumi.String("Hello Neo!"),
-			OrganizationName: pulumi.String(organizationName),
+		task, err := pulumiservice.CreateTask(ctx, &pulumiservice.CreateTaskArgs{
+			Content:          "Hello Neo!",
+			OrganizationName: organizationName,
 		})
 		if err != nil {
 			return err
 		}
-		ctx.Export("taskId", task.ID())
+		ctx.Export("taskId", task.Id)
 
 		return nil
 	})

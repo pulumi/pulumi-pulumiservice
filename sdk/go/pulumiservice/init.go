@@ -39,8 +39,6 @@ func (m *module) Construct(ctx *pulumi.Context, name, typ, urn string) (r pulumi
 		r = &EnvironmentRotationSchedule{}
 	case "pulumiservice:index:EnvironmentVersionTag":
 		r = &EnvironmentVersionTag{}
-	case "pulumiservice:index:NeoTask":
-		r = &NeoTask{}
 	case "pulumiservice:index:OidcIssuer":
 		r = &OidcIssuer{}
 	case "pulumiservice:index:OrgAccessToken":

@@ -20,6 +20,11 @@ export type ApprovalRule = import("./approvalRule").ApprovalRule;
 export const ApprovalRule: typeof import("./approvalRule").ApprovalRule = null as any;
 utilities.lazyLoad(exports, ["ApprovalRule"], () => require("./approvalRule"));
 
+export { CreateTaskArgs, CreateTaskResult, CreateTaskOutputArgs } from "./createTask";
+export const createTask: typeof import("./createTask").createTask = null as any;
+export const createTaskOutput: typeof import("./createTask").createTaskOutput = null as any;
+utilities.lazyLoad(exports, ["createTask","createTaskOutput"], () => require("./createTask"));
+
 export { DeploymentScheduleArgs } from "./deploymentSchedule";
 export type DeploymentSchedule = import("./deploymentSchedule").DeploymentSchedule;
 export const DeploymentSchedule: typeof import("./deploymentSchedule").DeploymentSchedule = null as any;
@@ -59,11 +64,6 @@ export { GetPolicyPacksArgs, GetPolicyPacksResult, GetPolicyPacksOutputArgs } fr
 export const getPolicyPacks: typeof import("./getPolicyPacks").getPolicyPacks = null as any;
 export const getPolicyPacksOutput: typeof import("./getPolicyPacks").getPolicyPacksOutput = null as any;
 utilities.lazyLoad(exports, ["getPolicyPacks","getPolicyPacksOutput"], () => require("./getPolicyPacks"));
-
-export { NeoTaskArgs } from "./neoTask";
-export type NeoTask = import("./neoTask").NeoTask;
-export const NeoTask: typeof import("./neoTask").NeoTask = null as any;
-utilities.lazyLoad(exports, ["NeoTask"], () => require("./neoTask"));
 
 export { OidcIssuerArgs } from "./oidcIssuer";
 export type OidcIssuer = import("./oidcIssuer").OidcIssuer;
@@ -165,8 +165,6 @@ const _module = {
                 return new EnvironmentRotationSchedule(name, <any>undefined, { urn })
             case "pulumiservice:index:EnvironmentVersionTag":
                 return new EnvironmentVersionTag(name, <any>undefined, { urn })
-            case "pulumiservice:index:NeoTask":
-                return new NeoTask(name, <any>undefined, { urn })
             case "pulumiservice:index:OidcIssuer":
                 return new OidcIssuer(name, <any>undefined, { urn })
             case "pulumiservice:index:OrgAccessToken":

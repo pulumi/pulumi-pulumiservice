@@ -7,29 +7,26 @@ using System.Collections.Immutable;
 using System.Threading.Tasks;
 using Pulumi.Serialization;
 
-namespace Pulumi.PulumiService.Outputs
+namespace Pulumi.PulumiService.Inputs
 {
 
-    [OutputType]
-    public sealed class TaskEntity
+    public sealed class TaskEntity : global::Pulumi.InvokeArgs
     {
         /// <summary>
         /// The entity ID.
         /// </summary>
-        public readonly string Id;
+        [Input("id", required: true)]
+        public string Id { get; set; } = null!;
+
         /// <summary>
         /// The type of entity.
         /// </summary>
-        public readonly string Type;
+        [Input("type", required: true)]
+        public string Type { get; set; } = null!;
 
-        [OutputConstructor]
-        private TaskEntity(
-            string id,
-
-            string type)
+        public TaskEntity()
         {
-            Id = id;
-            Type = type;
         }
+        public static new TaskEntity Empty => new TaskEntity();
     }
 }

@@ -430,7 +430,7 @@ func TestYamlTasksExample(t *testing.T) {
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		Dir: path.Join(cwd, ".", "yaml-tasks"),
 		Config: map[string]string{
-			"pulumiservice:organizationName": os.Getenv("PULUMI_TEST_OWNER"),
+			"organizationName": os.Getenv("PULUMI_TEST_OWNER"),
 		},
 	})
 }

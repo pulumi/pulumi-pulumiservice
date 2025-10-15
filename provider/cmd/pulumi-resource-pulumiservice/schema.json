@@ -1468,79 +1468,6 @@
         "tagName"
       ]
     },
-    "pulumiservice:index:NeoTask": {
-      "description": "A task created in the Neo agent system for tracking user instructions and entity changes.",
-      "properties": {
-        "content": {
-          "type": "string",
-          "description": "The exact user instruction for the task."
-        },
-        "entityAdd": {
-          "type": "array",
-          "items": {
-            "$ref": "#/types/pulumiservice:index:TaskEntity"
-          },
-          "description": "Entities to add in this task."
-        },
-        "entityRemove": {
-          "type": "array",
-          "items": {
-            "$ref": "#/types/pulumiservice:index:TaskEntity"
-          },
-          "description": "Entities to remove in this task."
-        },
-        "organizationName": {
-          "type": "string",
-          "description": "The name of the organization."
-        },
-        "timestamp": {
-          "type": "string",
-          "description": "When the event occurred (ISO 8601 format)."
-        }
-      },
-      "type": "object",
-      "required": [
-        "content",
-        "organizationName"
-      ],
-      "inputProperties": {
-        "content": {
-          "type": "string",
-          "description": "The exact user instruction for the task.",
-          "willReplaceOnChanges": true
-        },
-        "entityAdd": {
-          "type": "array",
-          "items": {
-            "$ref": "#/types/pulumiservice:index:TaskEntity"
-          },
-          "description": "Entities to add in this task.",
-          "willReplaceOnChanges": true
-        },
-        "entityRemove": {
-          "type": "array",
-          "items": {
-            "$ref": "#/types/pulumiservice:index:TaskEntity"
-          },
-          "description": "Entities to remove in this task.",
-          "willReplaceOnChanges": true
-        },
-        "organizationName": {
-          "type": "string",
-          "description": "The name of the organization.",
-          "willReplaceOnChanges": true
-        },
-        "timestamp": {
-          "type": "string",
-          "description": "When the event occurred (ISO 8601 format). Defaults to current time if not specified.",
-          "willReplaceOnChanges": true
-        }
-      },
-      "requiredInputs": [
-        "content",
-        "organizationName"
-      ]
-    },
     "pulumiservice:index:OidcIssuer": {
       "description": "Register an OIDC Provider to establish a trust relationship between third-party systems like GitHub Actions and Pulumi Cloud, obviating the need to store a hard-coded Pulumi Cloud token in systems that need to run Pulumi commands or consume Pulumi Cloud APIs. Instead of a hard-coded, static token that must be manually rotated, trusted systems are granted temporary Pulumi Cloud tokens on an as-needed basis, which is more secure than static tokens.",
       "properties": {
@@ -2425,6 +2352,83 @@
     }
   },
   "functions": {
+    "pulumiservice:index:createTask": {
+      "description": "Creates a task in the Neo agent system for tracking user instructions and entity changes. Tasks are immutable once created.",
+      "inputs": {
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "The exact user instruction for the task."
+          },
+          "entityAdd": {
+            "type": "array",
+            "items": {
+              "$ref": "#/types/pulumiservice:index:TaskEntity"
+            },
+            "description": "Entities to add in this task."
+          },
+          "entityRemove": {
+            "type": "array",
+            "items": {
+              "$ref": "#/types/pulumiservice:index:TaskEntity"
+            },
+            "description": "Entities to remove in this task."
+          },
+          "organizationName": {
+            "type": "string",
+            "description": "The name of the organization."
+          },
+          "timestamp": {
+            "type": "string",
+            "description": "When the event occurred (ISO 8601 format). Defaults to current time if not specified."
+          }
+        },
+        "type": "object",
+        "required": [
+          "content",
+          "organizationName"
+        ]
+      },
+      "outputs": {
+        "properties": {
+          "content": {
+            "description": "The exact user instruction for the task.",
+            "type": "string"
+          },
+          "entities": {
+            "description": "All entities associated with this task after applying the diff.",
+            "items": {
+              "$ref": "#/types/pulumiservice:index:TaskEntity"
+            },
+            "type": "array"
+          },
+          "id": {
+            "description": "The unique identifier of the created task.",
+            "type": "string"
+          },
+          "organizationName": {
+            "description": "The name of the organization.",
+            "type": "string"
+          },
+          "status": {
+            "description": "The status of the task (e.g., 'preview').",
+            "type": "string"
+          },
+          "timestamp": {
+            "description": "When the task was created (ISO 8601 format).",
+            "type": "string"
+          }
+        },
+        "required": [
+          "content",
+          "id",
+          "organizationName",
+          "status",
+          "timestamp"
+        ],
+        "type": "object"
+      }
+    },
     "pulumiservice:index:getPolicyPack": {
       "description": "Get details about a specific version of a policy pack.",
       "inputs": {

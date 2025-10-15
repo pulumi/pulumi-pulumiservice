@@ -1178,26 +1178,26 @@ class OperationContextOptions(dict):
 @pulumi.output_type
 class TaskEntity(dict):
     def __init__(__self__, *,
-                 id: str,
-                 type: str):
+                 id: _builtins.str,
+                 type: _builtins.str):
         """
-        :param str id: The entity ID.
-        :param str type: The type of entity.
+        :param _builtins.str id: The entity ID.
+        :param _builtins.str type: The type of entity.
         """
         pulumi.set(__self__, "id", id)
         pulumi.set(__self__, "type", type)
 
-    @property
+    @_builtins.property
     @pulumi.getter
-    def id(self) -> str:
+    def id(self) -> _builtins.str:
         """
         The entity ID.
         """
         return pulumi.get(self, "id")
 
-    @property
+    @_builtins.property
     @pulumi.getter
-    def type(self) -> str:
+    def type(self) -> _builtins.str:
         """
         The type of entity.
         """
