@@ -425,6 +425,16 @@ func TestYamlPolicyGroupsExample(t *testing.T) {
 	})
 }
 
+func TestYamlTasksExample(t *testing.T) {
+	cwd := getCwd(t)
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Dir: path.Join(cwd, ".", "yaml-tasks"),
+		Config: map[string]string{
+			"pulumiservice:organizationName": os.Getenv("PULUMI_TEST_OWNER"),
+		},
+	})
+}
+
 func writePulumiYaml(t *testing.T, yamlContents interface{}) string {
 	tmpdir := t.TempDir()
 	b, err := yaml.Marshal(yamlContents)
