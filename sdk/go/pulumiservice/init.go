@@ -45,6 +45,8 @@ func (m *module) Construct(ctx *pulumi.Context, name, typ, urn string) (r pulumi
 		r = &OrgAccessToken{}
 	case "pulumiservice:index:PolicyGroup":
 		r = &PolicyGroup{}
+	case "pulumiservice:index:Role":
+		r = &Role{}
 	case "pulumiservice:index:Stack":
 		r = &Stack{}
 	case "pulumiservice:index:StackTag":

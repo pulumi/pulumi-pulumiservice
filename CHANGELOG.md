@@ -11,6 +11,7 @@
 ### Improvements
 
 - Added PolicyGroup resource and getPolicyPack/getPolicyPacks data sources for managing policy packs across stacks
+- Added Role resource for managing custom RBAC roles [#552](https://github.com/pulumi/pulumi-pulumiservice/issues/552)
 
 ### Bug Fixes
 

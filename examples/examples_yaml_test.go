@@ -425,6 +425,26 @@ func TestYamlPolicyGroupsExample(t *testing.T) {
 	})
 }
 
+func TestYamlRoleExample(t *testing.T) {
+	t.Skip("Skipping role example test - requires existing role IDs to compose from. " +
+		"Role creation with PermissionDescriptorCompose requires referencing existing " +
+		"permission descriptor IDs, which may not exist in all test environments.")
+
+	cwd := getCwd(t)
+	digits := generateRandomFiveDigits()
+	org := os.Getenv("PULUMI_TEST_OWNER")
+	if org == "" {
+		org = "service-provider-test-org"
+	}
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Dir: path.Join(cwd, ".", "yaml-role"),
+		Config: map[string]string{
+			"digits": digits,
+			"org":    org,
+		},
+	})
+}
+
 func writePulumiYaml(t *testing.T, yamlContents interface{}) string {
 	tmpdir := t.TempDir()
 	b, err := yaml.Marshal(yamlContents)
