@@ -40,19 +40,19 @@ export class TemplateSource extends pulumi.CustomResource {
     /**
      * The default destination for projects using templates from this source.
      */
-    public readonly destination!: pulumi.Output<outputs.TemplateSourceDestination | undefined>;
+    declare public readonly destination: pulumi.Output<outputs.TemplateSourceDestination | undefined>;
     /**
      * Organization name.
      */
-    public readonly organizationName!: pulumi.Output<string>;
+    declare public readonly organizationName: pulumi.Output<string>;
     /**
      * Source name.
      */
-    public readonly sourceName!: pulumi.Output<string>;
+    declare public readonly sourceName: pulumi.Output<string>;
     /**
      * Github URL of the repository from which to grab templates.
      */
-    public readonly sourceURL!: pulumi.Output<string>;
+    declare public readonly sourceURL: pulumi.Output<string>;
 
     /**
      * Create a TemplateSource resource with the given unique name, arguments, and options.
@@ -65,19 +65,19 @@ export class TemplateSource extends pulumi.CustomResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
-            if ((!args || args.organizationName === undefined) && !opts.urn) {
+            if (args?.organizationName === undefined && !opts.urn) {
                 throw new Error("Missing required property 'organizationName'");
             }
-            if ((!args || args.sourceName === undefined) && !opts.urn) {
+            if (args?.sourceName === undefined && !opts.urn) {
                 throw new Error("Missing required property 'sourceName'");
             }
-            if ((!args || args.sourceURL === undefined) && !opts.urn) {
+            if (args?.sourceURL === undefined && !opts.urn) {
                 throw new Error("Missing required property 'sourceURL'");
             }
-            resourceInputs["destination"] = args ? args.destination : undefined;
-            resourceInputs["organizationName"] = args ? args.organizationName : undefined;
-            resourceInputs["sourceName"] = args ? args.sourceName : undefined;
-            resourceInputs["sourceURL"] = args ? args.sourceURL : undefined;
+            resourceInputs["destination"] = args?.destination;
+            resourceInputs["organizationName"] = args?.organizationName;
+            resourceInputs["sourceName"] = args?.sourceName;
+            resourceInputs["sourceURL"] = args?.sourceURL;
         } else {
             resourceInputs["destination"] = undefined /*out*/;
             resourceInputs["organizationName"] = undefined /*out*/;

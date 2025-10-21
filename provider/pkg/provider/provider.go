@@ -58,6 +58,7 @@ type pulumiserviceProvider struct {
 	pulumiResources []PulumiServiceResource
 	AccessToken     string
 	client          *pulumiapi.Client
+	escClient       esc_client.Client
 }
 
 func MakeProvider(host *provider.HostClient, name, version, schema string) (pulumirpc.ResourceProviderServer, error) {
@@ -131,8 +132,9 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 		return nil, err
 	}
 
-	// Store the client for use in Invoke functions
+	// Store the clients for use in Invoke functions and context middleware
 	k.client = client
+	k.escClient = escClient
 
 	k.pulumiResources = []PulumiServiceResource{
 		&resources.PulumiServiceTeamResource{

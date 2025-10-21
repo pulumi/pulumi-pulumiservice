@@ -277,9 +277,10 @@ During the migration, we run a **hybrid provider** that supports both manual and
 ┌─────────────────────────────────────┐
 │  hybrid.go: MakeHybridProvider()    │
 │  ┌───────────────────────────────┐  │
-│  │ Manual Provider               │  │
+│  │ Manual Provider (RPC)         │  │
 │  │ (existing resources)          │  │
-│  │ - Wrapped by hybridWrapper    │  │
+│  │ - Wrapped by                  │  │
+│  │   contextMiddleware.Wrap      │  │
 │  │ - Injects client into context │  │
 │  └───────────────────────────────┘  │
 │               +                      │
@@ -296,50 +297,63 @@ During the migration, we run a **hybrid provider** that supports both manual and
 ```go
 // main.go
 func main() {
-    err := provider.MainWithOptions(providerName, Version, func(host *provider.HostClient) (p.Provider, error) {
-        return psp.MakeHybridProvider(host, providerName, Version, schema)
-    }, provider.Options{})
+    // Start gRPC service for the pulumiservice provider using hybrid provider
+    // This supports both manual (legacy) and infer-based resources during migration
+    hybridProvider := psp.MakeHybridProvider(providerName, Version, schema)
 
+    err := p.RunProvider(context.Background(), providerName, Version, hybridProvider)
     if err != nil {
         cmdutil.ExitError(err.Error())
     }
 }
 
 // provider/pkg/provider/hybrid.go
-func MakeHybridProvider(host *provider.HostClient, name, version, schema string) (p.Provider, error) {
+func MakeHybridProvider(name, version, schema string) p.Provider {
     // Create manual provider for legacy resources
     manualProvider := &pulumiserviceProvider{
-        host:    host,
         name:    name,
         schema:  mustSetSchemaVersion(schema, version),
         version: version,
     }
 
-    // Wrap manual provider to inject client into context
-    wrappedManual := &hybridManualProvider{
-        inner: rpc.Provider(manualProvider),
-        manualProvider: manualProvider,
-    }
-
-    // Create infer provider for migrated resources
     inferOpts := buildInferOptions()
 
-    // Combine both providers
-    return infer.Wrap(wrappedManual, inferOpts), nil
+    // Wrap manual provider with contextMiddleware to inject clients into context
+    // This is the CORRECT approach as confirmed by pulumi-go-provider maintainers
+    wrappedManual := contextMiddleware.Wrap(
+        rpc.Provider(manualProvider),
+        func(ctx context.Context) context.Context {
+            if manualProvider.client != nil {
+                ctx = inferResources.WithClient(ctx, manualProvider.client)
+            }
+            if manualProvider.escClient != nil {
+                ctx = inferResources.WithESCClient(ctx, manualProvider.escClient)
+            }
+            return ctx
+        },
+    )
+
+    // Combine manual provider (wrapped with context injection) and infer resources
+    return infer.Wrap(wrappedManual, inferOpts)
 }
 ```
 
 ### Client Context Injection Pattern
 
-**The Problem**: Infer resources need access to the Pulumi Service API client (`*pulumiapi.Client`) to make API calls.
+**The Problem**: Infer resources need access to the Pulumi Service API client (`*pulumiapi.Client`) and ESC client to make API calls.
 
-**Solution**: Use context injection via `hybridManualProvider` wrapper
+**Solution**: Use context injection via `contextMiddleware.Wrap` from `pulumi-go-provider/middleware/context`
+
+**Why contextMiddleware.Wrap?** This is the officially recommended approach from pulumi-go-provider maintainers. It provides a clean way to inject dependencies into the context before provider operations are dispatched.
 
 **Implementation**:
 
 ```go
-// provider/pkg/infer/client.go
+// provider/pkg/infer/client.go - Context key types and accessors
+// Use unexported empty struct types to prevent key collisions (Go best practice)
+
 type clientContextKey struct{}
+type escClientContextKey struct{}
 
 func WithClient(ctx context.Context, client *pulumiapi.Client) context.Context {
     return context.WithValue(ctx, clientContextKey{}, client)
@@ -349,30 +363,63 @@ func GetClient(ctx context.Context) *pulumiapi.Client {
     if client, ok := ctx.Value(clientContextKey{}).(*pulumiapi.Client); ok {
         return client
     }
-    panic("API client not found in context")
+    return nil  // Return nil if not found, let caller handle gracefully
 }
 
-// provider/pkg/provider/hybrid_wrapper.go
-type hybridManualProvider struct {
-    inner          p.Provider
-    manualProvider *pulumiserviceProvider
+func WithESCClient(ctx context.Context, escClient esc_client.Client) context.Context {
+    return context.WithValue(ctx, escClientContextKey{}, escClient)
 }
 
-func (h *hybridManualProvider) Create(ctx context.Context, req p.CreateRequest) (p.CreateResponse, error) {
-    // Inject client into context before calling infer resources
-    ctx = inferPkg.WithClient(ctx, h.manualProvider.client)
-    return h.inner.Create(ctx, req)
+func GetESCClient(ctx context.Context) esc_client.Client {
+    if client, ok := ctx.Value(escClientContextKey{}).(esc_client.Client); ok {
+        return client
+    }
+    return nil
 }
 
-// Similar injection for Read, Update, Delete operations
+// provider/pkg/provider/hybrid.go - Wrapping with contextMiddleware
+import (
+    contextMiddleware "github.com/pulumi/pulumi-go-provider/middleware/context"
+    "github.com/pulumi/pulumi-go-provider/middleware/rpc"
+)
+
+// Wrap the manual provider with contextMiddleware BEFORE passing to infer.Wrap
+// This ensures clients are injected before infer middleware layers are added
+wrappedManual := contextMiddleware.Wrap(
+    rpc.Provider(manualProvider),  // Convert manual gRPC provider to p.Provider interface
+    func(ctx context.Context) context.Context {
+        // Inject both clients if they exist
+        if manualProvider.client != nil {
+            ctx = inferResources.WithClient(ctx, manualProvider.client)
+        }
+        if manualProvider.escClient != nil {
+            ctx = inferResources.WithESCClient(ctx, manualProvider.escClient)
+        }
+        return ctx
+    },
+)
+
+// Then wrap with infer to add infer-based resources
+return infer.Wrap(wrappedManual, inferOpts)
 ```
+
+**Key Points**:
+- `contextMiddleware.Wrap` MUST be called BEFORE `infer.Wrap`
+- The middleware function runs for every provider operation (Create, Read, Update, Delete, Check, etc.)
+- Clients are stored in the manual provider during `Configure()` and injected on each operation
+- This pattern supports both manual resources (which don't use context) and infer resources (which do)
 
 **Usage in Infer Resources**:
 
 ```go
 func (StackTag) Create(ctx context.Context, req infer.CreateRequest[StackTagArgs]) (infer.CreateResponse[StackTagState], error) {
-    client := inferPkg.GetClient(ctx)  // Retrieve from context
+    client := inferResources.GetClient(ctx)  // Retrieve from context
+    if client == nil {
+        return infer.CreateResponse[StackTagState]{}, fmt.Errorf("API client not configured")
+    }
+
     // Use client to call API
+    err := client.CreateStackTag(...)
     return infer.CreateResponse[StackTagState]{...}, nil
 }
 ```
@@ -395,7 +442,7 @@ git checkout -b feature/migrate-to-infer-v1 47a344e  # main commit
 - [x] **0.4**: Remove deprecated StreamInvoke method (incompatible with Pulumi SDK v3.169.0)
 - [x] **0.5**: Create hybrid provider architecture ✅
   - ✅ Created `provider/pkg/provider/hybrid.go`
-  - ✅ Created `provider/pkg/provider/hybrid_wrapper.go` for client injection
+  - ✅ Implemented `contextMiddleware.Wrap` for client injection (confirmed correct by maintainers)
   - ✅ Updated `main.go` to use `p.RunProvider()` with hybrid provider
 - [x] **0.6**: Set up testing infrastructure ✅
   - ✅ Created `provider/pkg/infer/README.md` with guidelines
@@ -419,7 +466,7 @@ git checkout -b feature/migrate-to-infer-v1 47a344e  # main commit
 - [x] **1.1.6**: Implemented `Delete()` method ✅
 - [x] **1.1.7**: Added `Annotate()` for descriptions ✅
 - [x] **1.1.8**: Registered in `buildInferOptions()` in hybrid.go ✅
-- [x] **1.1.9**: Implemented client context injection via `hybridManualProvider` ✅
+- [x] **1.1.9**: Implemented client context injection via `contextMiddleware.Wrap` ✅
 - [x] **1.1.10**: Integration test `TestYamlStackTagsExample` - **PASSED** (17.3s) ✅
 - [x] **1.1.11**: Validated all CRUD operations work correctly ✅
 - [x] **1.1.12**: Documented in `docs/PHASE_0_1_SUMMARY.md` ✅
@@ -722,8 +769,7 @@ func buildInferOptions() infer.Options {
 - `docs/INFER_MIGRATION.md` - This comprehensive guide
 - `provider/pkg/infer/README.md` - Infer directory documentation
 - `provider/pkg/infer/client.go` - Client context handling
-- `provider/pkg/provider/hybrid.go` - Hybrid provider setup
-- `provider/pkg/provider/hybrid_wrapper.go` - Context injection wrapper
+- `provider/pkg/provider/hybrid.go` - Hybrid provider with contextMiddleware.Wrap for client injection
 
 **Files Modified**:
 - `go.mod` - Upgraded Go 1.24, added pulumi-go-provider v1.1.2
@@ -824,13 +870,15 @@ Both can coexist during migration.
 
 #### 6. Client Context Solution
 
-**Implemented Solution**: Created `hybridManualProvider` wrapper that injects clients into context
+**Implemented Solution**: Use `contextMiddleware.Wrap` from `pulumi-go-provider` to inject clients into context
+
+**Why This Approach?**: Confirmed as the correct solution by pulumi-go-provider maintainers
 
 **How it works**:
-1. `hybridManualProvider` wraps the manual provider
-2. Before each CRUD operation, it injects the API client into context
-3. Infer resources call `inferPkg.GetClient(ctx)` to retrieve the client
-4. Thread-safe and clean separation of concerns
+1. `contextMiddleware.Wrap` wraps the manual RPC provider before passing to `infer.Wrap`
+2. Before each provider operation, the middleware function injects both API client and ESC client into context
+3. Infer resources call `inferPkg.GetClient(ctx)` or `inferPkg.GetESCClient(ctx)` to retrieve clients
+4. Thread-safe, clean separation of concerns, and officially supported pattern
 
 ## Common Patterns & Best Practices
 
@@ -848,7 +896,7 @@ func (StackTag) Create(ctx context.Context, req infer.CreateRequest[StackTagArgs
 }
 ```
 
-**Note**: The client is automatically injected into context by `hybridManualProvider` wrapper before each operation.
+**Note**: The client is automatically injected into context by `contextMiddleware.Wrap` before each operation.
 
 ### Handling Secrets
 
@@ -1023,8 +1071,8 @@ make provider
 ### Runtime Errors
 
 **Error**: `panic: API client not found in context`
-- **Fix**: Ensure `hybridManualProvider` wrapper is properly set up in `hybrid.go`
-- **Check**: Verify `WithClient()` is called before CRUD operations
+- **Fix**: Ensure `contextMiddleware.Wrap` is properly set up in `hybrid.go` BEFORE `infer.Wrap`
+- **Check**: Verify `WithClient()` is called in the middleware function before CRUD operations
 
 **Error**: `nil pointer dereference` when accessing client
 - **Fix**: Ensure client is properly initialized in provider Configure method

@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package infer provides utilities for resources using the pulumi-go-provider infer framework.
+//
+// This package manages client injection via context, allowing infer-based resources to access
+// the Pulumi Service API client and ESC client that are configured during provider initialization.
 package infer
 
 import (
@@ -21,8 +25,17 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
-// Context keys for storing clients
+// clientContextKey is a context key for storing the Pulumi Service API client.
+//
+// We use an unexported empty struct type instead of a string to prevent key collisions
+// with other packages that might use the same string key name. This is the recommended
+// pattern for context keys in Go. See https://pkg.go.dev/context#WithValue for details.
 type clientContextKey struct{}
+
+// escClientContextKey is a context key for storing the ESC (Environments, Secrets, Config) client.
+//
+// We use an unexported empty struct type instead of a string to prevent key collisions.
+// This ensures that only this package can access values stored with this key.
 type escClientContextKey struct{}
 
 // WithClient stores the Pulumi Service API client in the context.

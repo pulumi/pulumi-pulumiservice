@@ -9,7 +9,7 @@ import (
 
 const (
 	EnvVarPulumiAccessToken = "PULUMI_ACCESS_TOKEN"
-	EnvVarPulumiBackendUrl = "PULUMI_BACKEND_URL"
+	EnvVarPulumiBackendUrl  = "PULUMI_BACKEND_URL"
 )
 
 var ErrAccessTokenNotFound = fmt.Errorf("pulumi access token not found")

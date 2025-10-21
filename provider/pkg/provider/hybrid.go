@@ -15,8 +15,11 @@
 package provider
 
 import (
+	"context"
+
 	p "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi-go-provider/infer"
+	contextMiddleware "github.com/pulumi/pulumi-go-provider/middleware/context"
 	"github.com/pulumi/pulumi-go-provider/middleware/rpc"
 
 	inferResources "github.com/pulumi/pulumi-pulumiservice/provider/pkg/infer"
@@ -37,23 +40,27 @@ import (
 //
 // See Convert-to-infer.md for the complete migration plan.
 func MakeHybridProvider(name, version, schema string) p.Provider {
-	// Create a wrapped manual provider that injects clients into context
-	manualProvider := &hybridManualProvider{
-		pulumiserviceProvider: &pulumiserviceProvider{
-			name:    name,
-			schema:  mustSetSchemaVersion(schema, version),
-			version: version,
-		},
+	manualProvider := &pulumiserviceProvider{
+		name:    name,
+		schema:  mustSetSchemaVersion(schema, version),
+		version: version,
 	}
 
-	// Build the infer provider options for migrated resources
 	inferOpts := buildInferOptions()
 
-	// Wrap the manual provider with RPC middleware to make it compatible with p.Provider
-	wrappedManual := rpc.Provider(manualProvider)
+	wrappedManual := contextMiddleware.Wrap(
+		rpc.Provider(manualProvider),
+		func(ctx context.Context) context.Context {
+			if manualProvider.client != nil {
+				ctx = inferResources.WithClient(ctx, manualProvider.client)
+			}
+			if manualProvider.escClient != nil {
+				ctx = inferResources.WithESCClient(ctx, manualProvider.escClient)
+			}
+			return ctx
+		},
+	)
 
-	// Combine both providers using infer.Wrap
-	// The infer provider will handle its resources, and delegate to manual provider for others
 	return infer.Wrap(wrappedManual, inferOpts)
 }
 

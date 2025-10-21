@@ -37,27 +37,27 @@ export class DriftSchedule extends pulumi.CustomResource {
     /**
      * Whether any drift detected should be remediated after a drift run.
      */
-    public readonly autoRemediate!: pulumi.Output<boolean | undefined>;
+    declare public readonly autoRemediate: pulumi.Output<boolean | undefined>;
     /**
      * Organization name.
      */
-    public readonly organization!: pulumi.Output<string>;
+    declare public readonly organization: pulumi.Output<string>;
     /**
      * Project name.
      */
-    public readonly project!: pulumi.Output<string>;
+    declare public readonly project: pulumi.Output<string>;
     /**
      * Cron expression for when to run drift detection.
      */
-    public readonly scheduleCron!: pulumi.Output<string>;
+    declare public readonly scheduleCron: pulumi.Output<string>;
     /**
      * Schedule ID of the created schedule, assigned by Pulumi Cloud.
      */
-    public /*out*/ readonly scheduleId!: pulumi.Output<string>;
+    declare public /*out*/ readonly scheduleId: pulumi.Output<string>;
     /**
      * Stack name.
      */
-    public readonly stack!: pulumi.Output<string>;
+    declare public readonly stack: pulumi.Output<string>;
 
     /**
      * Create a DriftSchedule resource with the given unique name, arguments, and options.
@@ -70,23 +70,23 @@ export class DriftSchedule extends pulumi.CustomResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
-            if ((!args || args.organization === undefined) && !opts.urn) {
+            if (args?.organization === undefined && !opts.urn) {
                 throw new Error("Missing required property 'organization'");
             }
-            if ((!args || args.project === undefined) && !opts.urn) {
+            if (args?.project === undefined && !opts.urn) {
                 throw new Error("Missing required property 'project'");
             }
-            if ((!args || args.scheduleCron === undefined) && !opts.urn) {
+            if (args?.scheduleCron === undefined && !opts.urn) {
                 throw new Error("Missing required property 'scheduleCron'");
             }
-            if ((!args || args.stack === undefined) && !opts.urn) {
+            if (args?.stack === undefined && !opts.urn) {
                 throw new Error("Missing required property 'stack'");
             }
-            resourceInputs["autoRemediate"] = (args ? args.autoRemediate : undefined) ?? false;
-            resourceInputs["organization"] = args ? args.organization : undefined;
-            resourceInputs["project"] = args ? args.project : undefined;
-            resourceInputs["scheduleCron"] = args ? args.scheduleCron : undefined;
-            resourceInputs["stack"] = args ? args.stack : undefined;
+            resourceInputs["autoRemediate"] = (args?.autoRemediate) ?? false;
+            resourceInputs["organization"] = args?.organization;
+            resourceInputs["project"] = args?.project;
+            resourceInputs["scheduleCron"] = args?.scheduleCron;
+            resourceInputs["stack"] = args?.stack;
             resourceInputs["scheduleId"] = undefined /*out*/;
         } else {
             resourceInputs["autoRemediate"] = undefined /*out*/;
