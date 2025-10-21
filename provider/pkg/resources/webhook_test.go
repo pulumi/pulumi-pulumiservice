@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 	"github.com/stretchr/testify/assert"
@@ -47,16 +48,15 @@ func TestWebhook(t *testing.T) {
 			func() (*pulumiapi.Webhook, error) { return nil, nil },
 		)
 
-		provider := PulumiServiceWebhookResource{
-			Client: mockedClient,
-		}
+		provider := PulumiServiceWebhookResource{}
+		ctx := context.WithValue(context.Background(), config.TestClientKey, mockedClient)
 
 		req := pulumirpc.ReadRequest{
 			Id:  "abc/def/ghi/123",
 			Urn: "urn:123",
 		}
 
-		resp, err := provider.Read(&req)
+		resp, err := provider.Read(ctx, &req)
 
 		assert.NoError(t, err)
 		assert.Equal(t, resp.Id, "")
@@ -75,16 +75,15 @@ func TestWebhook(t *testing.T) {
 			},
 		)
 
-		provider := PulumiServiceWebhookResource{
-			Client: mockedClient,
-		}
+		provider := PulumiServiceWebhookResource{}
+		ctx := context.WithValue(context.Background(), config.TestClientKey, mockedClient)
 
 		req := pulumirpc.ReadRequest{
 			Id:  "abc/def/ghi/123",
 			Urn: "urn:123",
 		}
 
-		resp, err := provider.Read(&req)
+		resp, err := provider.Read(ctx, &req)
 
 		assert.NoError(t, err)
 		assert.Equal(t, resp.Id, "abc/def/ghi/123")

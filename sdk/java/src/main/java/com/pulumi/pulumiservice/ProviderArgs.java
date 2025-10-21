@@ -5,6 +5,7 @@ package com.pulumi.pulumiservice;
 
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
+import com.pulumi.core.internal.Codegen;
 import java.lang.String;
 import java.util.Objects;
 import java.util.Optional;
@@ -31,25 +32,25 @@ public final class ProviderArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * Optional override of Pulumi Cloud API endpoint.
+     * The service URL used to reach Pulumi Cloud.
      * 
      */
-    @Import(name="apiUrl")
-    private @Nullable Output<String> apiUrl;
+    @Import(name="serviceURL")
+    private @Nullable Output<String> serviceURL;
 
     /**
-     * @return Optional override of Pulumi Cloud API endpoint.
+     * @return The service URL used to reach Pulumi Cloud.
      * 
      */
-    public Optional<Output<String>> apiUrl() {
-        return Optional.ofNullable(this.apiUrl);
+    public Optional<Output<String>> serviceURL() {
+        return Optional.ofNullable(this.serviceURL);
     }
 
     private ProviderArgs() {}
 
     private ProviderArgs(ProviderArgs $) {
         this.accessToken = $.accessToken;
-        this.apiUrl = $.apiUrl;
+        this.serviceURL = $.serviceURL;
     }
 
     public static Builder builder() {
@@ -92,27 +93,29 @@ public final class ProviderArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param apiUrl Optional override of Pulumi Cloud API endpoint.
+         * @param serviceURL The service URL used to reach Pulumi Cloud.
          * 
          * @return builder
          * 
          */
-        public Builder apiUrl(@Nullable Output<String> apiUrl) {
-            $.apiUrl = apiUrl;
+        public Builder serviceURL(@Nullable Output<String> serviceURL) {
+            $.serviceURL = serviceURL;
             return this;
         }
 
         /**
-         * @param apiUrl Optional override of Pulumi Cloud API endpoint.
+         * @param serviceURL The service URL used to reach Pulumi Cloud.
          * 
          * @return builder
          * 
          */
-        public Builder apiUrl(String apiUrl) {
-            return apiUrl(Output.of(apiUrl));
+        public Builder serviceURL(String serviceURL) {
+            return serviceURL(Output.of(serviceURL));
         }
 
         public ProviderArgs build() {
+            $.accessToken = Codegen.stringProp("accessToken").secret().arg($.accessToken).env("PULUMI_ACCESS_TOKEN").getNullable();
+            $.serviceURL = Codegen.stringProp("serviceURL").output().arg($.serviceURL).env("PULUMI_BACKEND_URL").def("https://api.pulumi.com").getNullable();
             return $;
         }
     }

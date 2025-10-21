@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
@@ -16,9 +17,7 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 )
 
-type PulumiServiceEnvironmentRotationScheduleResource struct {
-	Client pulumiapi.EnvironmentScheduleClient
-}
+type PulumiServiceEnvironmentRotationScheduleResource struct{}
 
 type PulumiServiceEnvironmentRotationScheduleInput struct {
 	Environment  pulumiapi.EnvironmentIdentifier
@@ -166,7 +165,7 @@ func EnvironmentScheduleSharedDiffMaps(olds resource.PropertyMap, news resource.
 	}, nil
 }
 
-func (st *PulumiServiceEnvironmentRotationScheduleResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+func (st *PulumiServiceEnvironmentRotationScheduleResource) Diff(ctx context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
 	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), util.StandardUnmarshal)
 	if err != nil {
 		return nil, err
@@ -193,11 +192,13 @@ func EnvironmentScheduleSharedDelete(req *pulumirpc.DeleteRequest, client pulumi
 	return &pbempty.Empty{}, nil
 }
 
-func (st *PulumiServiceEnvironmentRotationScheduleResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	return EnvironmentScheduleSharedDelete(req, st.Client)
+func (st *PulumiServiceEnvironmentRotationScheduleResource) Delete(ctx context.Context, req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
+	client := config.GetClient[pulumiapi.EnvironmentScheduleClient](ctx)
+	return EnvironmentScheduleSharedDelete(req, client)
 }
 
-func (st *PulumiServiceEnvironmentRotationScheduleResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
+func (st *PulumiServiceEnvironmentRotationScheduleResource) Create(ctx context.Context, req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
+	client := config.GetClient[pulumiapi.EnvironmentScheduleClient](ctx)
 	input, err := ToPulumiServiceEnvironmentRotationScheduleInput(req.GetProperties())
 	if err != nil {
 		return nil, err
@@ -207,7 +208,7 @@ func (st *PulumiServiceEnvironmentRotationScheduleResource) Create(req *pulumirp
 		ScheduleCron: input.ScheduleCron,
 		ScheduleOnce: input.ScheduleOnce,
 	}
-	scheduleID, err := st.Client.CreateEnvironmentRotationSchedule(context.Background(), input.Environment, scheduleReq)
+	scheduleID, err := client.CreateEnvironmentRotationSchedule(ctx, input.Environment, scheduleReq)
 	if err != nil {
 		return nil, err
 	}
@@ -226,7 +227,7 @@ func (st *PulumiServiceEnvironmentRotationScheduleResource) Create(req *pulumirp
 	}, nil
 }
 
-func (st *PulumiServiceEnvironmentRotationScheduleResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
+func (st *PulumiServiceEnvironmentRotationScheduleResource) Check(ctx context.Context, req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
 	inputMap, err := plugin.UnmarshalProperties(req.GetNews(), util.StandardUnmarshal)
 	if err != nil {
 		return nil, err
@@ -263,7 +264,8 @@ func (st *PulumiServiceEnvironmentRotationScheduleResource) Check(req *pulumirpc
 	return &pulumirpc.CheckResponse{Inputs: req.GetNews(), Failures: failures}, nil
 }
 
-func (st *PulumiServiceEnvironmentRotationScheduleResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+func (st *PulumiServiceEnvironmentRotationScheduleResource) Update(ctx context.Context, req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+	client := config.GetClient[pulumiapi.EnvironmentScheduleClient](ctx)
 	previousOutput, err := ToPulumiServiceEnvironmentRotationScheduleOutput(req.GetOlds())
 	if err != nil {
 		return nil, err
@@ -277,7 +279,7 @@ func (st *PulumiServiceEnvironmentRotationScheduleResource) Update(req *pulumirp
 		ScheduleCron: input.ScheduleCron,
 		ScheduleOnce: input.ScheduleOnce,
 	}
-	scheduleID, err := st.Client.UpdateEnvironmentRotationSchedule(context.Background(), input.Environment, updateReq, previousOutput.ScheduleID)
+	scheduleID, err := client.UpdateEnvironmentRotationSchedule(ctx, input.Environment, updateReq, previousOutput.ScheduleID)
 	if err != nil {
 		return nil, err
 	}
@@ -294,13 +296,14 @@ func (st *PulumiServiceEnvironmentRotationScheduleResource) Update(req *pulumirp
 	}, nil
 }
 
-func (st *PulumiServiceEnvironmentRotationScheduleResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
+func (st *PulumiServiceEnvironmentRotationScheduleResource) Read(ctx context.Context, req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
+	client := config.GetClient[pulumiapi.EnvironmentScheduleClient](ctx)
 	environment, scheduleID, err := ParseEnvironmentScheduleID(req.Id, "rotations")
 	if err != nil {
 		return nil, err
 	}
 
-	scheduleResponse, err := st.Client.GetEnvironmentSchedule(context.Background(), *environment, *scheduleID)
+	scheduleResponse, err := client.GetEnvironmentSchedule(ctx, *environment, *scheduleID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read EnvironmentRotationSchedule (%q): %w", req.Id, err)
 	}

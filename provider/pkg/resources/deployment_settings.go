@@ -8,6 +8,7 @@ import (
 
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
@@ -271,9 +272,7 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(plaintextInputSett
 	return pm
 }
 
-type PulumiServiceDeploymentSettingsResource struct {
-	Client pulumiapi.DeploymentSettingsClient
-}
+type PulumiServiceDeploymentSettingsResource struct{}
 
 func (ds *PulumiServiceDeploymentSettingsResource) ToPulumiServiceDeploymentSettingsInput(inputMap resource.PropertyMap) PulumiServiceDeploymentSettingsInput {
 	input := PulumiServiceDeploymentSettingsInput{}
@@ -580,7 +579,7 @@ func toCacheOptions(inputMap resource.PropertyMap) *pulumiapi.CacheOptions {
 	return &co
 }
 
-func (ds *PulumiServiceDeploymentSettingsResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+func (ds *PulumiServiceDeploymentSettingsResource) Diff(_ context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
 	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), util.StandardUnmarshal)
 	if err != nil {
 		return nil, err
@@ -627,7 +626,7 @@ func (ds *PulumiServiceDeploymentSettingsResource) Diff(req *pulumirpc.DiffReque
 	}, nil
 }
 
-func (ds *PulumiServiceDeploymentSettingsResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
+func (ds *PulumiServiceDeploymentSettingsResource) Check(_ context.Context, req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
 	news, err := plugin.UnmarshalProperties(req.GetNews(), util.KeepSecretsUnmarshal)
 	if err != nil {
 		return nil, err
@@ -678,14 +677,14 @@ func (ds *PulumiServiceDeploymentSettingsResource) Check(req *pulumirpc.CheckReq
 	return &pulumirpc.CheckResponse{Inputs: checkedNews, Failures: failures}, nil
 }
 
-func (ds *PulumiServiceDeploymentSettingsResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	ctx := context.Background()
+func (ds *PulumiServiceDeploymentSettingsResource) Read(ctx context.Context, req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
+	client := config.GetClient[pulumiapi.DeploymentSettingsClient](ctx)
 
 	stack, err := pulumiapi.NewStackIdentifier(req.GetId())
 	if err != nil {
 		return nil, err
 	}
-	settings, err := ds.Client.GetDeploymentSettings(ctx, stack)
+	settings, err := client.GetDeploymentSettings(ctx, stack)
 	if err != nil {
 		return nil, err
 	}
@@ -738,22 +737,22 @@ func (ds *PulumiServiceDeploymentSettingsResource) Read(req *pulumirpc.ReadReque
 	}, nil
 }
 
-func (ds *PulumiServiceDeploymentSettingsResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	ctx := context.Background()
+func (ds *PulumiServiceDeploymentSettingsResource) Delete(ctx context.Context, req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
+	client := config.GetClient[pulumiapi.DeploymentSettingsClient](ctx)
 	stack, err := pulumiapi.NewStackIdentifier(req.GetId())
 	if err != nil {
 		return nil, err
 	}
 
-	err = ds.Client.DeleteDeploymentSettings(ctx, stack)
+	err = client.DeleteDeploymentSettings(ctx, stack)
 	if err != nil {
 		return nil, err
 	}
 	return &pbempty.Empty{}, nil
 }
 
-func (ds *PulumiServiceDeploymentSettingsResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
-	ctx := context.Background()
+func (ds *PulumiServiceDeploymentSettingsResource) Create(ctx context.Context, req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
+	client := config.GetClient[pulumiapi.DeploymentSettingsClient](ctx)
 	inputsMap, err := plugin.UnmarshalProperties(req.GetProperties(), util.KeepSecretsUnmarshal)
 	if err != nil {
 		return nil, err
@@ -761,7 +760,7 @@ func (ds *PulumiServiceDeploymentSettingsResource) Create(req *pulumirpc.CreateR
 
 	input := ds.ToPulumiServiceDeploymentSettingsInput(inputsMap)
 	settings := input.DeploymentSettings
-	response, err := ds.Client.CreateDeploymentSettings(ctx, input.Stack, settings)
+	response, err := client.CreateDeploymentSettings(ctx, input.Stack, settings)
 	if err != nil {
 		return nil, err
 	}
@@ -784,8 +783,8 @@ func (ds *PulumiServiceDeploymentSettingsResource) Create(req *pulumirpc.CreateR
 	}, nil
 }
 
-func (ds *PulumiServiceDeploymentSettingsResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	ctx := context.Background()
+func (ds *PulumiServiceDeploymentSettingsResource) Update(ctx context.Context, req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+	client := config.GetClient[pulumiapi.DeploymentSettingsClient](ctx)
 	inputsMap, err := plugin.UnmarshalProperties(req.GetNews(), util.KeepSecretsUnmarshal)
 	if err != nil {
 		return nil, err
@@ -793,7 +792,7 @@ func (ds *PulumiServiceDeploymentSettingsResource) Update(req *pulumirpc.UpdateR
 
 	input := ds.ToPulumiServiceDeploymentSettingsInput(inputsMap)
 	settings := input.DeploymentSettings
-	response, err := ds.Client.UpdateDeploymentSettings(ctx, input.Stack, settings)
+	response, err := client.UpdateDeploymentSettings(ctx, input.Stack, settings)
 	if err != nil {
 		return nil, err
 	}

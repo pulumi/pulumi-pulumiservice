@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
@@ -60,9 +61,8 @@ func TestDeploymentSchedule(t *testing.T) {
 			func() (*pulumiapi.StackScheduleResponse, error) { return nil, nil },
 		)
 
-		provider := PulumiServiceDeploymentScheduleResource{
-			Client: mockedClient,
-		}
+		provider := PulumiServiceDeploymentScheduleResource{}
+		ctx := context.WithValue(context.Background(), config.TestClientKey, mockedClient)
 
 		input := PulumiServiceDeploymentScheduleInput{
 			Stack: pulumiapi.StackIdentifier{
@@ -88,7 +88,7 @@ func TestDeploymentSchedule(t *testing.T) {
 			Properties: outputProperties,
 		}
 
-		resp, err := provider.Read(&req)
+		resp, err := provider.Read(ctx, &req)
 
 		assert.NoError(t, err)
 		assert.Equal(t, resp.Id, "")
@@ -118,9 +118,8 @@ func TestDeploymentSchedule(t *testing.T) {
 			},
 		)
 
-		provider := PulumiServiceDeploymentScheduleResource{
-			Client: mockedClient,
-		}
+		provider := PulumiServiceDeploymentScheduleResource{}
+		ctx := context.WithValue(context.Background(), config.TestClientKey, mockedClient)
 
 		input := PulumiServiceDeploymentScheduleInput{
 			Stack: pulumiapi.StackIdentifier{
@@ -146,7 +145,7 @@ func TestDeploymentSchedule(t *testing.T) {
 			Properties: outputProperties,
 		}
 
-		resp, err := provider.Read(&req)
+		resp, err := provider.Read(ctx, &req)
 
 		assert.NoError(t, err)
 		assert.Equal(t, resp.Id, "org/project/stack/fake-schedule-id")

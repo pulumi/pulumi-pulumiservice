@@ -8,6 +8,7 @@ import (
 
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
@@ -15,9 +16,7 @@ import (
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
-type PulumiServiceTeamEnvironmentPermissionResource struct {
-	Client pulumiapi.TeamClient
-}
+type PulumiServiceTeamEnvironmentPermissionResource struct{}
 
 type TeamEnvironmentPermissionInput struct {
 	Organization    string `pulumi:"organization"`
@@ -41,7 +40,7 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Name() string {
 	return "pulumiservice:index:TeamEnvironmentPermission"
 }
 
-func (tp *PulumiServiceTeamEnvironmentPermissionResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
+func (tp *PulumiServiceTeamEnvironmentPermissionResource) Check(ctx context.Context, req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
 	var input TeamEnvironmentPermissionInput
 	err := util.FromProperties(req.GetNews(), structTagKey, &input)
 	if err != nil {
@@ -73,8 +72,8 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Check(req *pulumirpc.C
 	}, nil
 }
 
-func (tp *PulumiServiceTeamEnvironmentPermissionResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	ctx := context.Background()
+func (tp *PulumiServiceTeamEnvironmentPermissionResource) Read(ctx context.Context, req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
+	client := config.GetClient[pulumiapi.TeamClient](ctx)
 	permId, err := splitTeamEnvironmentPermissionId(req.GetId())
 	if err != nil {
 		return nil, err
@@ -86,7 +85,7 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Read(req *pulumirpc.Re
 		Environment:  permId.Environment,
 		Project:      permId.Project,
 	}
-	permission, maxOpenDuration, err := tp.Client.GetTeamEnvironmentSettings(ctx, request)
+	permission, maxOpenDuration, err := client.GetTeamEnvironmentSettings(ctx, request)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get team environment permission: %w", err)
 	}
@@ -119,8 +118,8 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Read(req *pulumirpc.Re
 	}, nil
 }
 
-func (tp *PulumiServiceTeamEnvironmentPermissionResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
-	ctx := context.Background()
+func (tp *PulumiServiceTeamEnvironmentPermissionResource) Create(ctx context.Context, req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
+	client := config.GetClient[pulumiapi.TeamClient](ctx)
 	var input TeamEnvironmentPermissionInput
 	err := util.FromProperties(req.GetProperties(), structTagKey, &input)
 	if err != nil {
@@ -147,7 +146,7 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Create(req *pulumirpc.
 		MaxOpenDuration: maxOpenDuration,
 	}
 
-	err = tp.Client.AddEnvironmentSettings(ctx, request)
+	err = client.AddEnvironmentSettings(ctx, request)
 	if err != nil {
 		return nil, err
 	}
@@ -165,8 +164,8 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Create(req *pulumirpc.
 	}, nil
 }
 
-func (tp *PulumiServiceTeamEnvironmentPermissionResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	ctx := context.Background()
+func (tp *PulumiServiceTeamEnvironmentPermissionResource) Delete(ctx context.Context, req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
+	client := config.GetClient[pulumiapi.TeamClient](ctx)
 	var input TeamEnvironmentPermissionInput
 	err := util.FromProperties(req.GetProperties(), structTagKey, &input)
 	if err != nil {
@@ -178,14 +177,14 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Delete(req *pulumirpc.
 		Project:      input.Project,
 		Environment:  input.Environment,
 	}
-	err = tp.Client.RemoveEnvironmentSettings(ctx, request)
+	err = client.RemoveEnvironmentSettings(ctx, request)
 	if err != nil {
 		return nil, err
 	}
 	return &pbempty.Empty{}, nil
 }
 
-func (tp *PulumiServiceTeamEnvironmentPermissionResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+func (tp *PulumiServiceTeamEnvironmentPermissionResource) Diff(ctx context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
 	changedKeys, err := util.DiffOldsAndNews(req)
 	if err != nil {
 		return nil, err
@@ -203,7 +202,7 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Diff(req *pulumirpc.Di
 }
 
 // Update does nothing because we always replace on changes, never an update
-func (tp *PulumiServiceTeamEnvironmentPermissionResource) Update(_ *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+func (tp *PulumiServiceTeamEnvironmentPermissionResource) Update(_ context.Context, _ *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
 	return nil, fmt.Errorf("unexpected call to update, expected create to be called instead")
 }
 

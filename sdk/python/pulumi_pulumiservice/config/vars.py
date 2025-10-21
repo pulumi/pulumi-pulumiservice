@@ -22,9 +22,15 @@ __config__ = pulumi.Config('pulumiservice')
 class _ExportableConfig(types.ModuleType):
     @_builtins.property
     def access_token(self) -> Optional[str]:
-        return __config__.get('accessToken')
+        """
+        Access Token to authenticate with Pulumi Cloud.
+        """
+        return __config__.get('accessToken') or _utilities.get_env('PULUMI_ACCESS_TOKEN')
 
     @_builtins.property
-    def api_url(self) -> Optional[str]:
-        return __config__.get('apiUrl')
+    def service_url(self) -> str:
+        """
+        The service URL used to reach Pulumi Cloud.
+        """
+        return __config__.get('serviceURL') or (_utilities.get_env('PULUMI_BACKEND_URL') or 'https://api.pulumi.com')
 

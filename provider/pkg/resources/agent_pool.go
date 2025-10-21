@@ -8,6 +8,7 @@ import (
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/structpb"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
@@ -15,9 +16,7 @@ import (
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
-type PulumiServiceAgentPoolResource struct {
-	Client pulumiapi.AgentPoolClient
-}
+type PulumiServiceAgentPoolResource struct{}
 
 type PulumiServiceAgentPoolInput struct {
 	OrgName      string
@@ -88,7 +87,7 @@ func (ap *PulumiServiceAgentPoolResource) Name() string {
 	return "pulumiservice:index:AgentPool"
 }
 
-func (ap *PulumiServiceAgentPoolResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+func (ap *PulumiServiceAgentPoolResource) Diff(_ context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
 	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
 	if err != nil {
 		return nil, err
@@ -133,8 +132,7 @@ func (ap *PulumiServiceAgentPoolResource) Diff(req *pulumirpc.DiffRequest) (*pul
 	}, nil
 }
 
-func (ap *PulumiServiceAgentPoolResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	ctx := context.Background()
+func (ap *PulumiServiceAgentPoolResource) Delete(ctx context.Context, req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
 	inputs, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
@@ -154,8 +152,7 @@ func (ap *PulumiServiceAgentPoolResource) Delete(req *pulumirpc.DeleteRequest) (
 	return &pbempty.Empty{}, nil
 }
 
-func (ap *PulumiServiceAgentPoolResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
-	ctx := context.Background()
+func (ap *PulumiServiceAgentPoolResource) Create(ctx context.Context, req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	inputMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
@@ -179,13 +176,11 @@ func (ap *PulumiServiceAgentPoolResource) Create(req *pulumirpc.CreateRequest) (
 
 }
 
-func (ap *PulumiServiceAgentPoolResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
+func (ap *PulumiServiceAgentPoolResource) Check(_ context.Context, req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
 	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: nil}, nil
 }
 
-func (ap *PulumiServiceAgentPoolResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	ctx := context.Background()
-
+func (ap *PulumiServiceAgentPoolResource) Update(ctx context.Context, req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
 	// ignore orgName because if that changed, we would have done a replace, so update would never have been called
 	_, _, agentPoolId, err := splitAgentPoolId(req.GetId())
 	if err != nil {
@@ -226,8 +221,8 @@ func (ap *PulumiServiceAgentPoolResource) Update(req *pulumirpc.UpdateRequest) (
 	}, nil
 }
 
-func (ap *PulumiServiceAgentPoolResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	ctx := context.Background()
+func (ap *PulumiServiceAgentPoolResource) Read(ctx context.Context, req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
+	client := config.GetClient[pulumiapi.AgentPoolClient](ctx)
 	urn := req.GetId()
 
 	orgName, _, agentPoolId, err := splitAgentPoolId(urn)
@@ -236,7 +231,7 @@ func (ap *PulumiServiceAgentPoolResource) Read(req *pulumirpc.ReadRequest) (*pul
 	}
 
 	// the agent id is immutable; if we get nil it got deleted, otherwise all data is the same
-	agentPool, err := ap.Client.GetAgentPool(ctx, agentPoolId, orgName)
+	agentPool, err := client.GetAgentPool(ctx, agentPoolId, orgName)
 	if err != nil {
 		return nil, err
 	}
@@ -270,7 +265,8 @@ func (ap *PulumiServiceAgentPoolResource) Read(req *pulumirpc.ReadRequest) (*pul
 }
 
 func (ap *PulumiServiceAgentPoolResource) createAgentPool(ctx context.Context, input PulumiServiceAgentPoolInput) (*pulumiapi.AgentPool, error) {
-	agentPool, err := ap.Client.CreateAgentPool(ctx, input.OrgName, input.Name, input.Description)
+	client := config.GetClient[pulumiapi.AgentPoolClient](ctx)
+	agentPool, err := client.CreateAgentPool(ctx, input.OrgName, input.Name, input.Description)
 	if err != nil {
 		return nil, err
 	}
@@ -279,16 +275,18 @@ func (ap *PulumiServiceAgentPoolResource) createAgentPool(ctx context.Context, i
 }
 
 func (ap *PulumiServiceAgentPoolResource) updateAgentPool(ctx context.Context, agentPoolId string, input PulumiServiceAgentPoolInput) error {
-	return ap.Client.UpdateAgentPool(ctx, agentPoolId, input.OrgName, input.Name, input.Description)
+	client := config.GetClient[pulumiapi.AgentPoolClient](ctx)
+	return client.UpdateAgentPool(ctx, agentPoolId, input.OrgName, input.Name, input.Description)
 }
 
 func (ap *PulumiServiceAgentPoolResource) deleteAgentPool(ctx context.Context, id string, forceDestroy bool) error {
+	client := config.GetClient[pulumiapi.AgentPoolClient](ctx)
 	// we don't need the token name when we delete
 	orgName, _, agentPoolId, err := splitAgentPoolId(id)
 	if err != nil {
 		return err
 	}
-	return ap.Client.DeleteAgentPool(ctx, agentPoolId, orgName, forceDestroy)
+	return client.DeleteAgentPool(ctx, agentPoolId, orgName, forceDestroy)
 
 }
 

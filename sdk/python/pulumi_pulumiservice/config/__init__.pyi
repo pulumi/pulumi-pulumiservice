@@ -15,6 +15,12 @@ else:
 from .. import _utilities
 
 accessToken: Optional[str]
+"""
+Access Token to authenticate with Pulumi Cloud.
+"""
 
-apiUrl: Optional[str]
+serviceURL: str
+"""
+The service URL used to reach Pulumi Cloud.
+"""
 

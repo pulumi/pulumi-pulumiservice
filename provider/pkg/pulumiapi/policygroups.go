@@ -31,12 +31,12 @@ type PolicyGroupClient interface {
 }
 
 type PolicyGroupSummary struct {
-	Name                   string `json:"name"`
-	IsOrgDefault           bool   `json:"isOrgDefault"`
-	NumStacks              int    `json:"numStacks"`
-	NumAccounts            int    `json:"numAccounts"`
-	EntityType             string `json:"entityType"`
-	NumEnabledPolicyPacks  int    `json:"numEnabledPolicyPacks"`
+	Name                  string `json:"name"`
+	IsOrgDefault          bool   `json:"isOrgDefault"`
+	NumStacks             int    `json:"numStacks"`
+	NumAccounts           int    `json:"numAccounts"`
+	EntityType            string `json:"entityType"`
+	NumEnabledPolicyPacks int    `json:"numEnabledPolicyPacks"`
 }
 
 type PolicyGroup struct {
@@ -73,11 +73,11 @@ type createPolicyGroupRequest struct {
 }
 
 type UpdatePolicyGroupRequest struct {
-	NewName          *string               `json:"newName,omitempty"`
-	AddStack         *StackReference       `json:"addStack,omitempty"`
-	RemoveStack      *StackReference       `json:"removeStack,omitempty"`
-	AddPolicyPack    *PolicyPackMetadata   `json:"addPolicyPack,omitempty"`
-	RemovePolicyPack *PolicyPackMetadata   `json:"removePolicyPack,omitempty"`
+	NewName          *string             `json:"newName,omitempty"`
+	AddStack         *StackReference     `json:"addStack,omitempty"`
+	RemoveStack      *StackReference     `json:"removeStack,omitempty"`
+	AddPolicyPack    *PolicyPackMetadata `json:"addPolicyPack,omitempty"`
+	RemovePolicyPack *PolicyPackMetadata `json:"removePolicyPack,omitempty"`
 }
 
 func (c *Client) ListPolicyGroups(ctx context.Context, orgName string) ([]PolicyGroupSummary, error) {

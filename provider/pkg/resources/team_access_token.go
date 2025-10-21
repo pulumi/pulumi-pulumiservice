@@ -8,6 +8,7 @@ import (
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/structpb"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
@@ -15,9 +16,7 @@ import (
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
-type PulumiServiceTeamAccessTokenResource struct {
-	Client *pulumiapi.Client
-}
+type PulumiServiceTeamAccessTokenResource struct{}
 
 type PulumiServiceTeamAccessTokenInput struct {
 	Name        string
@@ -81,13 +80,13 @@ func (t *PulumiServiceTeamAccessTokenResource) Name() string {
 	return "pulumiservice:index:TeamAccessToken"
 }
 
-func (t *PulumiServiceTeamAccessTokenResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+func (t *PulumiServiceTeamAccessTokenResource) Diff(_ context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
 	return diffAccessTokenProperties(req, []string{"name", "organizationName", "teamName", "description"})
 }
 
-func (t *PulumiServiceTeamAccessTokenResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	ctx := context.Background()
-	err := t.deleteTeamAccessToken(ctx, req.Id)
+func (t *PulumiServiceTeamAccessTokenResource) Delete(ctx context.Context, req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
+	client := config.GetClient[*pulumiapi.Client](ctx)
+	err := t.deleteTeamAccessToken(ctx, client, req.Id)
 
 	if err != nil {
 		return &pbempty.Empty{}, err
@@ -96,8 +95,7 @@ func (t *PulumiServiceTeamAccessTokenResource) Delete(req *pulumirpc.DeleteReque
 	return &pbempty.Empty{}, nil
 }
 
-func (t *PulumiServiceTeamAccessTokenResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
-	ctx := context.Background()
+func (t *PulumiServiceTeamAccessTokenResource) Create(ctx context.Context, req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	inputMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
@@ -121,17 +119,17 @@ func (t *PulumiServiceTeamAccessTokenResource) Create(req *pulumirpc.CreateReque
 	}, nil
 }
 
-func (t *PulumiServiceTeamAccessTokenResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
+func (t *PulumiServiceTeamAccessTokenResource) Check(_ context.Context, req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
 	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: nil}, nil
 }
 
-func (t *PulumiServiceTeamAccessTokenResource) Update(_ *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+func (t *PulumiServiceTeamAccessTokenResource) Update(_ context.Context, _ *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
 	// all updates are destructive, so we just call Create.
 	return nil, fmt.Errorf("unexpected call to update, expected create to be called instead")
 }
 
-func (t *PulumiServiceTeamAccessTokenResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	ctx := context.Background()
+func (t *PulumiServiceTeamAccessTokenResource) Read(ctx context.Context, req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
+	client := config.GetClient[*pulumiapi.Client](ctx)
 	urn := req.GetId()
 
 	orgName, teamName, tokenName, tokenId, err := splitTeamAccessTokenId(urn)
@@ -140,7 +138,7 @@ func (t *PulumiServiceTeamAccessTokenResource) Read(req *pulumirpc.ReadRequest) 
 	}
 
 	// the team access token is immutable; if we get nil it got deleted, otherwise all data is the same
-	accessToken, err := t.Client.GetTeamAccessToken(ctx, tokenId, orgName, teamName)
+	accessToken, err := client.GetTeamAccessToken(ctx, tokenId, orgName, teamName)
 	if err != nil {
 		return nil, err
 	}
@@ -176,8 +174,9 @@ func (t *PulumiServiceTeamAccessTokenResource) Read(req *pulumirpc.ReadRequest) 
 }
 
 func (t *PulumiServiceTeamAccessTokenResource) createTeamAccessToken(ctx context.Context, input PulumiServiceTeamAccessTokenInput) (*pulumiapi.AccessToken, error) {
+	client := config.GetClient[*pulumiapi.Client](ctx)
 
-	accessToken, err := t.Client.CreateTeamAccessToken(ctx, input.Name, input.OrgName, input.TeamName, input.Description)
+	accessToken, err := client.CreateTeamAccessToken(ctx, input.Name, input.OrgName, input.TeamName, input.Description)
 	if err != nil {
 		return nil, err
 	}
@@ -185,12 +184,12 @@ func (t *PulumiServiceTeamAccessTokenResource) createTeamAccessToken(ctx context
 	return accessToken, nil
 }
 
-func (t *PulumiServiceTeamAccessTokenResource) deleteTeamAccessToken(ctx context.Context, id string) error {
+func (t *PulumiServiceTeamAccessTokenResource) deleteTeamAccessToken(ctx context.Context, client *pulumiapi.Client, id string) error {
 	orgName, teamName, _, tokenId, err := splitTeamAccessTokenId(id)
 	if err != nil {
 		return err
 	}
-	return t.Client.DeleteTeamAccessToken(ctx, tokenId, orgName, teamName)
+	return client.DeleteTeamAccessToken(ctx, tokenId, orgName, teamName)
 
 }
 

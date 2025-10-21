@@ -7,6 +7,7 @@ import (
 
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
@@ -39,14 +40,14 @@ func (tp *TeamStackPermissionResource) Name() string {
 	return "pulumiservice:index:TeamStackPermission"
 }
 
-func (tp *TeamStackPermissionResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
+func (tp *TeamStackPermissionResource) Check(ctx context.Context, req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
 	return &pulumirpc.CheckResponse{
 		Inputs: req.GetNews(),
 	}, nil
 }
 
-func (tp *TeamStackPermissionResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	ctx := context.Background()
+func (tp *TeamStackPermissionResource) Read(ctx context.Context, req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
+	client := config.GetClient[pulumiapi.TeamClient](ctx)
 	id := req.GetId()
 
 	permId, err := splitTeamStackPermissionId(id)
@@ -61,7 +62,7 @@ func (tp *TeamStackPermissionResource) Read(req *pulumirpc.ReadRequest) (*pulumi
 		return nil, err
 	}
 
-	permission, err := tp.Client.GetTeamStackPermission(ctx, pulumiapi.StackIdentifier{
+	permission, err := client.GetTeamStackPermission(ctx, pulumiapi.StackIdentifier{
 		OrgName:     permId.Organization,
 		ProjectName: permId.Project,
 		StackName:   permId.Stack,
@@ -92,8 +93,8 @@ func (tp *TeamStackPermissionResource) Read(req *pulumirpc.ReadRequest) (*pulumi
 	}, nil
 }
 
-func (tp *TeamStackPermissionResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
-	ctx := context.Background()
+func (tp *TeamStackPermissionResource) Create(ctx context.Context, req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
+	client := config.GetClient[pulumiapi.TeamClient](ctx)
 	var input TeamStackPermissionInput
 	err := util.FromProperties(req.GetProperties(), structTagKey, &input)
 	if err != nil {
@@ -105,7 +106,7 @@ func (tp *TeamStackPermissionResource) Create(req *pulumirpc.CreateRequest) (*pu
 		StackName:   input.Stack,
 	}
 
-	err = tp.Client.AddStackPermission(ctx, stackName, input.Team, input.Permission)
+	err = client.AddStackPermission(ctx, stackName, input.Team, input.Permission)
 	if err != nil {
 		return nil, err
 	}
@@ -118,8 +119,8 @@ func (tp *TeamStackPermissionResource) Create(req *pulumirpc.CreateRequest) (*pu
 	}, nil
 }
 
-func (tp *TeamStackPermissionResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	ctx := context.Background()
+func (tp *TeamStackPermissionResource) Delete(ctx context.Context, req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
+	client := config.GetClient[pulumiapi.TeamClient](ctx)
 	var input TeamStackPermissionInput
 	err := util.FromProperties(req.GetProperties(), structTagKey, &input)
 	if err != nil {
@@ -130,14 +131,14 @@ func (tp *TeamStackPermissionResource) Delete(req *pulumirpc.DeleteRequest) (*pb
 		ProjectName: input.Project,
 		StackName:   input.Stack,
 	}
-	err = tp.Client.RemoveStackPermission(ctx, stackName, input.Team)
+	err = client.RemoveStackPermission(ctx, stackName, input.Team)
 	if err != nil {
 		return nil, err
 	}
 	return &pbempty.Empty{}, nil
 }
 
-func (tp *TeamStackPermissionResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+func (tp *TeamStackPermissionResource) Diff(ctx context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
 	changedKeys, err := util.DiffOldsAndNews(req)
 	if err != nil {
 		return nil, err
@@ -153,7 +154,7 @@ func (tp *TeamStackPermissionResource) Diff(req *pulumirpc.DiffRequest) (*pulumi
 }
 
 // Update does nothing because we always replace on changes, never an update
-func (tp *TeamStackPermissionResource) Update(_ *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+func (tp *TeamStackPermissionResource) Update(_ context.Context, _ *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
 	return nil, fmt.Errorf("unexpected call to update, expected create to be called instead")
 }
 

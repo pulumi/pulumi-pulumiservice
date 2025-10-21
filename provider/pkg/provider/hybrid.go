@@ -19,6 +19,7 @@ import (
 	"github.com/pulumi/pulumi-go-provider/infer"
 	"github.com/pulumi/pulumi-go-provider/middleware/rpc"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	inferResources "github.com/pulumi/pulumi-pulumiservice/provider/pkg/infer"
 )
 
@@ -37,23 +38,19 @@ import (
 //
 // See Convert-to-infer.md for the complete migration plan.
 func MakeHybridProvider(name, version, schema string) p.Provider {
-	// Create a wrapped manual provider that injects clients into context
-	manualProvider := &hybridManualProvider{
-		pulumiserviceProvider: &pulumiserviceProvider{
-			name:    name,
-			schema:  mustSetSchemaVersion(schema, version),
-			version: version,
-		},
+	manualProvider := &pulumiserviceProvider{
+		name:    name,
+		schema:  mustSetSchemaVersion(schema, version),
+		version: version,
 	}
 
-	// Build the infer provider options for migrated resources
 	inferOpts := buildInferOptions()
 
-	// Wrap the manual provider with RPC middleware to make it compatible with p.Provider
+	// Wrap the manual provider with rpc.Provider to convert it to p.Provider interface
 	wrappedManual := rpc.Provider(manualProvider)
 
-	// Combine both providers using infer.Wrap
-	// The infer provider will handle its resources, and delegate to manual provider for others
+	// Wrap with infer to add infer-based resources (like StackTag)
+	// infer.Wrap will handle infer resources and delegate unknown resources to wrappedManual
 	return infer.Wrap(wrappedManual, inferOpts)
 }
 
@@ -81,7 +78,9 @@ func buildInferOptions() infer.Options {
 			// infer.Function[GetPolicyPacks](),
 			// infer.Function[GetPolicyPack](),
 		},
-		// Note: Config is not specified here - we're using the manual provider's configuration
-		// Once all resources are migrated, we can define a proper infer Config
+		// Config is specified here to enable proper client injection via context
+		// infer.Config[*config.Config](&config.Config{}) will automatically call Config.Configure() and
+		// inject the config into context, making it available to resources via GetConfig(ctx)
+		Config: infer.Config[*config.Config](&config.Config{}),
 	}
 }

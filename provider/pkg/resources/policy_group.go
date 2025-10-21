@@ -24,6 +24,7 @@ import (
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/structpb"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
@@ -31,9 +32,7 @@ import (
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
-type PulumiServicePolicyGroupResource struct {
-	Client pulumiapi.PolicyGroupClient
-}
+type PulumiServicePolicyGroupResource struct{}
 
 type PulumiServicePolicyGroupInput struct {
 	Name             string
@@ -162,7 +161,7 @@ func (p *PulumiServicePolicyGroupResource) Name() string {
 	return "pulumiservice:index:PolicyGroup"
 }
 
-func (p *PulumiServicePolicyGroupResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
+func (p *PulumiServicePolicyGroupResource) Check(ctx context.Context, req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
 	news := req.GetNews()
 	newsMap, err := plugin.UnmarshalProperties(news, plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
@@ -222,14 +221,14 @@ func (p *PulumiServicePolicyGroupResource) Check(req *pulumirpc.CheckRequest) (*
 	return &pulumirpc.CheckResponse{Inputs: inputs, Failures: failures}, nil
 }
 
-func (p *PulumiServicePolicyGroupResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	ctx := context.Background()
+func (p *PulumiServicePolicyGroupResource) Delete(ctx context.Context, req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
+	client := config.GetClient[pulumiapi.PolicyGroupClient](ctx)
 	orgName, policyGroupName, err := splitSingleSlashString(req.Id)
 	if err != nil {
 		return &pbempty.Empty{}, err
 	}
 
-	err = p.Client.DeletePolicyGroup(ctx, orgName, policyGroupName)
+	err = client.DeletePolicyGroup(ctx, orgName, policyGroupName)
 	if err != nil {
 		return &pbempty.Empty{}, fmt.Errorf("failed to delete policy group %q: %w", req.Id, err)
 	}
@@ -237,7 +236,7 @@ func (p *PulumiServicePolicyGroupResource) Delete(req *pulumirpc.DeleteRequest) 
 	return &pbempty.Empty{}, nil
 }
 
-func (p *PulumiServicePolicyGroupResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+func (p *PulumiServicePolicyGroupResource) Diff(ctx context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
 	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
 	if err != nil {
 		return nil, err
@@ -281,15 +280,15 @@ func (p *PulumiServicePolicyGroupResource) Diff(req *pulumirpc.DiffRequest) (*pu
 	}, nil
 }
 
-func (p *PulumiServicePolicyGroupResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	ctx := context.Background()
+func (p *PulumiServicePolicyGroupResource) Read(ctx context.Context, req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
+	client := config.GetClient[pulumiapi.PolicyGroupClient](ctx)
 
 	orgName, policyGroupName, err := splitSingleSlashString(req.Id)
 	if err != nil {
 		return nil, err
 	}
 
-	policyGroup, err := p.Client.GetPolicyGroup(ctx, orgName, policyGroupName)
+	policyGroup, err := client.GetPolicyGroup(ctx, orgName, policyGroupName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read policy group (%q): %w", req.Id, err)
 	}
@@ -318,8 +317,8 @@ func (p *PulumiServicePolicyGroupResource) Read(req *pulumirpc.ReadRequest) (*pu
 	}, nil
 }
 
-func (p *PulumiServicePolicyGroupResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	ctx := context.Background()
+func (p *PulumiServicePolicyGroupResource) Update(ctx context.Context, req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+	client := config.GetClient[pulumiapi.PolicyGroupClient](ctx)
 	inputsOld, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
@@ -340,7 +339,7 @@ func (p *PulumiServicePolicyGroupResource) Update(req *pulumirpc.UpdateRequest) 
 				updateReq := pulumiapi.UpdatePolicyGroupRequest{
 					RemoveStack: &oldStack,
 				}
-				err := p.Client.UpdatePolicyGroup(ctx, policyGroupNew.OrganizationName, policyGroupNew.Name, updateReq)
+				err := client.UpdatePolicyGroup(ctx, policyGroupNew.OrganizationName, policyGroupNew.Name, updateReq)
 				if err != nil {
 					return nil, fmt.Errorf("failed to remove stack from policy group: %w", err)
 				}
@@ -353,7 +352,7 @@ func (p *PulumiServicePolicyGroupResource) Update(req *pulumirpc.UpdateRequest) 
 				updateReq := pulumiapi.UpdatePolicyGroupRequest{
 					AddStack: &newStack,
 				}
-				err := p.Client.UpdatePolicyGroup(ctx, policyGroupNew.OrganizationName, policyGroupNew.Name, updateReq)
+				err := client.UpdatePolicyGroup(ctx, policyGroupNew.OrganizationName, policyGroupNew.Name, updateReq)
 				if err != nil {
 					return nil, fmt.Errorf("failed to add stack to policy group: %w", err)
 				}
@@ -369,7 +368,7 @@ func (p *PulumiServicePolicyGroupResource) Update(req *pulumirpc.UpdateRequest) 
 				updateReq := pulumiapi.UpdatePolicyGroupRequest{
 					RemovePolicyPack: &oldPP,
 				}
-				err := p.Client.UpdatePolicyGroup(ctx, policyGroupNew.OrganizationName, policyGroupNew.Name, updateReq)
+				err := client.UpdatePolicyGroup(ctx, policyGroupNew.OrganizationName, policyGroupNew.Name, updateReq)
 				if err != nil {
 					return nil, fmt.Errorf("failed to remove policy pack from policy group: %w", err)
 				}
@@ -382,7 +381,7 @@ func (p *PulumiServicePolicyGroupResource) Update(req *pulumirpc.UpdateRequest) 
 				updateReq := pulumiapi.UpdatePolicyGroupRequest{
 					AddPolicyPack: &newPP,
 				}
-				err := p.Client.UpdatePolicyGroup(ctx, policyGroupNew.OrganizationName, policyGroupNew.Name, updateReq)
+				err := client.UpdatePolicyGroup(ctx, policyGroupNew.OrganizationName, policyGroupNew.Name, updateReq)
 				if err != nil {
 					return nil, fmt.Errorf("failed to add policy pack to policy group: %w", err)
 				}
@@ -400,8 +399,8 @@ func (p *PulumiServicePolicyGroupResource) Update(req *pulumirpc.UpdateRequest) 
 	}, nil
 }
 
-func (p *PulumiServicePolicyGroupResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
-	ctx := context.Background()
+func (p *PulumiServicePolicyGroupResource) Create(ctx context.Context, req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
+	client := config.GetClient[pulumiapi.PolicyGroupClient](ctx)
 	inputs, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
@@ -410,7 +409,7 @@ func (p *PulumiServicePolicyGroupResource) Create(req *pulumirpc.CreateRequest) 
 	inputsPolicyGroup := ToPulumiServicePolicyGroupInput(inputs)
 
 	// Create the policy group
-	err = p.Client.CreatePolicyGroup(ctx, inputsPolicyGroup.OrganizationName, inputsPolicyGroup.Name, inputsPolicyGroup.EntityType, inputsPolicyGroup.Mode)
+	err = client.CreatePolicyGroup(ctx, inputsPolicyGroup.OrganizationName, inputsPolicyGroup.Name, inputsPolicyGroup.EntityType, inputsPolicyGroup.Mode)
 	if err != nil {
 		return nil, fmt.Errorf("error creating policy group '%s': %w", inputsPolicyGroup.Name, err)
 	}
@@ -422,7 +421,7 @@ func (p *PulumiServicePolicyGroupResource) Create(req *pulumirpc.CreateRequest) 
 		updateReq := pulumiapi.UpdatePolicyGroupRequest{
 			AddStack: &stack,
 		}
-		err := p.Client.UpdatePolicyGroup(ctx, inputsPolicyGroup.OrganizationName, inputsPolicyGroup.Name, updateReq)
+		err := client.UpdatePolicyGroup(ctx, inputsPolicyGroup.OrganizationName, inputsPolicyGroup.Name, updateReq)
 		if err != nil {
 			return nil, partialErrorPolicyGroup(policyGroupID, fmt.Errorf("failed to add stack to policy group: %w", err), inputsPolicyGroup, inputsPolicyGroup)
 		}
@@ -433,14 +432,14 @@ func (p *PulumiServicePolicyGroupResource) Create(req *pulumirpc.CreateRequest) 
 		updateReq := pulumiapi.UpdatePolicyGroupRequest{
 			AddPolicyPack: &pp,
 		}
-		err := p.Client.UpdatePolicyGroup(ctx, inputsPolicyGroup.OrganizationName, inputsPolicyGroup.Name, updateReq)
+		err := client.UpdatePolicyGroup(ctx, inputsPolicyGroup.OrganizationName, inputsPolicyGroup.Name, updateReq)
 		if err != nil {
 			return nil, partialErrorPolicyGroup(policyGroupID, fmt.Errorf("failed to add policy pack to policy group: %w", err), inputsPolicyGroup, inputsPolicyGroup)
 		}
 	}
 
 	// Read back the policy group to get the full state
-	policyGroup, err := p.Client.GetPolicyGroup(ctx, inputsPolicyGroup.OrganizationName, inputsPolicyGroup.Name)
+	policyGroup, err := client.GetPolicyGroup(ctx, inputsPolicyGroup.OrganizationName, inputsPolicyGroup.Name)
 	if err != nil {
 		return nil, partialErrorPolicyGroup(policyGroupID, err, inputsPolicyGroup, inputsPolicyGroup)
 	}

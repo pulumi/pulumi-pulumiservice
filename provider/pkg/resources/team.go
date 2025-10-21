@@ -12,6 +12,7 @@ import (
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/structpb"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
@@ -19,9 +20,7 @@ import (
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
-type PulumiServiceTeamResource struct {
-	Client pulumiapi.TeamClient
-}
+type PulumiServiceTeamResource struct{}
 
 type PulumiServiceTeamStackPermission struct {
 	ProjectName string
@@ -108,7 +107,7 @@ func (t *PulumiServiceTeamResource) Name() string {
 	return "pulumiservice:index:Team"
 }
 
-func (t *PulumiServiceTeamResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
+func (t *PulumiServiceTeamResource) Check(ctx context.Context, req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
 	news := req.GetNews()
 	newsMap, err := plugin.UnmarshalProperties(news, plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
@@ -155,8 +154,9 @@ func (t *PulumiServiceTeamResource) Check(req *pulumirpc.CheckRequest) (*pulumir
 	return &pulumirpc.CheckResponse{Inputs: inputs, Failures: failures}, nil
 }
 
-func (t *PulumiServiceTeamResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	err := t.deleteTeam(context.Background(), req.Id)
+func (t *PulumiServiceTeamResource) Delete(ctx context.Context, req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
+	client := config.GetClient[pulumiapi.TeamClient](ctx)
+	err := t.deleteTeam(ctx, client, req.Id)
 	if err != nil {
 		return &pbempty.Empty{}, err
 	}
@@ -164,7 +164,7 @@ func (t *PulumiServiceTeamResource) Delete(req *pulumirpc.DeleteRequest) (*pbemp
 	return &pbempty.Empty{}, nil
 }
 
-func (t *PulumiServiceTeamResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+func (t *PulumiServiceTeamResource) Diff(ctx context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
 	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
 	if err != nil {
 		return nil, err
@@ -192,15 +192,15 @@ func (t *PulumiServiceTeamResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc
 	}, nil
 }
 
-func (t *PulumiServiceTeamResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	ctx := context.Background()
+func (t *PulumiServiceTeamResource) Read(ctx context.Context, req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
+	client := config.GetClient[pulumiapi.TeamClient](ctx)
 
 	orgName, teamName, err := splitSingleSlashString(req.Id)
 	if err != nil {
 		return nil, err
 	}
 
-	team, err := t.Client.GetTeam(ctx, orgName, teamName)
+	team, err := client.GetTeam(ctx, orgName, teamName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read Team (%q): %w", req.Id, err)
 	}
@@ -230,8 +230,8 @@ func (t *PulumiServiceTeamResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc
 	}, nil
 }
 
-func (t *PulumiServiceTeamResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	ctx := context.Background()
+func (t *PulumiServiceTeamResource) Update(ctx context.Context, req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+	client := config.GetClient[pulumiapi.TeamClient](ctx)
 	inputsOld, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
@@ -250,7 +250,7 @@ func (t *PulumiServiceTeamResource) Update(req *pulumirpc.UpdateRequest) (*pulum
 		inputsChanged.Description = teamNew.Description
 		inputsChanged.DisplayName = teamNew.DisplayName
 
-		err = t.updateTeam(context.Background(), inputsChanged)
+		err = t.updateTeam(ctx, client, inputsChanged)
 		if err != nil {
 			return nil, err
 		}
@@ -261,7 +261,7 @@ func (t *PulumiServiceTeamResource) Update(req *pulumirpc.UpdateRequest) (*pulum
 		inputsChanged.Members = teamNew.Members
 		for _, usernameToDelete := range teamOld.Members {
 			if !slices.Contains(teamNew.Members, usernameToDelete) {
-				err := t.deleteFromTeam(ctx, teamNew.OrganizationName, teamNew.Name, usernameToDelete)
+				err := t.deleteFromTeam(ctx, client, teamNew.OrganizationName, teamNew.Name, usernameToDelete)
 				if err != nil {
 					return nil, err
 				}
@@ -270,7 +270,7 @@ func (t *PulumiServiceTeamResource) Update(req *pulumirpc.UpdateRequest) (*pulum
 
 		for _, usernameToAdd := range teamNew.Members {
 			if !slices.Contains(teamOld.Members, usernameToAdd) {
-				err := t.addToTeam(ctx, teamNew.OrganizationName, teamNew.Name, usernameToAdd)
+				err := t.addToTeam(ctx, client, teamNew.OrganizationName, teamNew.Name, usernameToAdd)
 				if err != nil {
 					return nil, err
 				}
@@ -287,15 +287,15 @@ func (t *PulumiServiceTeamResource) Update(req *pulumirpc.UpdateRequest) (*pulum
 	}, nil
 }
 
-func (t *PulumiServiceTeamResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
-	ctx := context.Background()
+func (t *PulumiServiceTeamResource) Create(ctx context.Context, req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
+	client := config.GetClient[pulumiapi.TeamClient](ctx)
 	inputs, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
 	}
 
 	inputsTeam := ToPulumiServiceTeamInput(inputs)
-	teamUrn, err := t.createTeam(ctx, inputsTeam)
+	teamUrn, err := t.createTeam(ctx, client, inputsTeam)
 	if err != nil {
 		return nil, fmt.Errorf("error creating teamUrn '%s': %s", inputsTeam.Name, err.Error())
 	}
@@ -309,7 +309,7 @@ func (t *PulumiServiceTeamResource) Create(req *pulumirpc.CreateRequest) (*pulum
 	inProgTeam.Members = nil
 
 	for _, memberToAdd := range inputsTeam.Members {
-		err := t.addToTeam(ctx, inputsTeam.OrganizationName, inputsTeam.Name, memberToAdd)
+		err := t.addToTeam(ctx, client, inputsTeam.OrganizationName, inputsTeam.Name, memberToAdd)
 		if err != nil {
 			return nil, partialError(*teamUrn, err, inProgTeam, inputsTeam)
 		}
@@ -317,7 +317,7 @@ func (t *PulumiServiceTeamResource) Create(req *pulumirpc.CreateRequest) (*pulum
 
 	// Outputs should be the result of a GetTeam call, so we can return the full teamUrn object with fidelity
 	// including all new members that were added.
-	team, err := t.Client.GetTeam(ctx, inputsTeam.OrganizationName, inputsTeam.Name)
+	team, err := client.GetTeam(ctx, inputsTeam.OrganizationName, inputsTeam.Name)
 	if err != nil {
 		return nil, partialError(*teamUrn, err, inProgTeam, inputsTeam)
 	}
@@ -346,16 +346,16 @@ func (t *PulumiServiceTeamResource) Create(req *pulumirpc.CreateRequest) (*pulum
 	}, nil
 }
 
-func (t *PulumiServiceTeamResource) updateTeam(ctx context.Context, input PulumiServiceTeamInput) error {
-	err := t.Client.UpdateTeam(ctx, input.OrganizationName, input.Name, input.DisplayName, input.Description)
+func (t *PulumiServiceTeamResource) updateTeam(ctx context.Context, client pulumiapi.TeamClient, input PulumiServiceTeamInput) error {
+	err := client.UpdateTeam(ctx, input.OrganizationName, input.Name, input.DisplayName, input.Description)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (t *PulumiServiceTeamResource) createTeam(ctx context.Context, input PulumiServiceTeamInput) (*string, error) {
-	team, err := t.Client.CreateTeam(ctx, input.OrganizationName, input.Name, input.Type, input.DisplayName, input.Description, input.GitHubTeamID)
+func (t *PulumiServiceTeamResource) createTeam(ctx context.Context, client pulumiapi.TeamClient, input PulumiServiceTeamInput) (*string, error) {
+	team, err := client.CreateTeam(ctx, input.OrganizationName, input.Name, input.Type, input.DisplayName, input.Description, input.GitHubTeamID)
 	if err != nil {
 		return nil, err
 	}
@@ -364,7 +364,7 @@ func (t *PulumiServiceTeamResource) createTeam(ctx context.Context, input Pulumi
 	return &teamUrn, nil
 }
 
-func (t *PulumiServiceTeamResource) deleteFromTeam(ctx context.Context, orgName string, teamName string, userName string) error {
+func (t *PulumiServiceTeamResource) deleteFromTeam(ctx context.Context, client pulumiapi.TeamClient, orgName string, teamName string, userName string) error {
 	if len(orgName) == 0 {
 		return errors.New("orgname must not be empty")
 	}
@@ -377,19 +377,19 @@ func (t *PulumiServiceTeamResource) deleteFromTeam(ctx context.Context, orgName 
 		return errors.New("username must not be empty")
 	}
 
-	return t.Client.DeleteMemberFromTeam(ctx, orgName, teamName, userName)
+	return client.DeleteMemberFromTeam(ctx, orgName, teamName, userName)
 }
 
-func (t *PulumiServiceTeamResource) addToTeam(ctx context.Context, orgName string, teamName string, userName string) error {
-	return t.Client.AddMemberToTeam(ctx, orgName, teamName, userName)
+func (t *PulumiServiceTeamResource) addToTeam(ctx context.Context, client pulumiapi.TeamClient, orgName string, teamName string, userName string) error {
+	return client.AddMemberToTeam(ctx, orgName, teamName, userName)
 }
 
-func (t *PulumiServiceTeamResource) deleteTeam(ctx context.Context, id string) error {
+func (t *PulumiServiceTeamResource) deleteTeam(ctx context.Context, client pulumiapi.TeamClient, id string) error {
 	orgName, teamName, err := splitSingleSlashString(id)
 	if err != nil {
 		return err
 	}
-	err = t.Client.DeleteTeam(ctx, orgName, teamName)
+	err = client.DeleteTeam(ctx, orgName, teamName)
 	if err != nil {
 		return err
 	}

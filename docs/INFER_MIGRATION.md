@@ -19,6 +19,7 @@ This document tracks the migration of the Pulumi Service Provider from a **manua
 
 **Current Status**:
 - Phase 0 (Foundation): ✅ COMPLETE
+- Phase 0.5 (Config Pattern Implementation): ✅ COMPLETE
 - Phase 1.1 (StackTag POC): ✅ COMPLETE
 - Phase 1.2 (OrgAccessToken): 🔄 NEXT
 
@@ -72,30 +73,28 @@ This document tracks the migration of the Pulumi Service Provider from a **manua
 
 **Total Resources**: 21 resources + 2 data sources
 
-#### Resources at v0.20.0 (13 total)
-1. PulumiServiceTeamResource
-2. PulumiServiceAccessTokenResource
-3. PulumiServiceWebhookResource
-4. PulumiServiceStackTagResource ✅ **MIGRATED**
-5. TeamStackPermissionResource
-6. PulumiServiceTeamAccessTokenResource
-7. PulumiServiceOrgAccessTokenResource
-8. PulumiServiceDeploymentSettingsResource
-9. PulumiServiceAgentPoolResource
-10. PulumiServiceDeploymentScheduleResource
-11. PulumiServiceDriftScheduleResource
-12. PulumiServiceTtlScheduleResource
-13. PulumiServiceUnknownResource
-
-#### Resources added in v0.32.0 (8 new)
-14. **PulumiServiceEnvironmentResource** (ESC support)
-15. **PulumiServiceTeamEnvironmentPermissionResource** (ESC permissions)
-16. **PulumiServiceEnvironmentVersionTagResource** (ESC versioning)
-17. **PulumiServiceStackResource** (Stack management)
-18. **PulumiServiceTemplateSourceResource** (Templates)
-19. **PulumiServiceOidcIssuerResource** (OIDC authentication)
-20. **PulumiServiceEnvironmentRotationScheduleResource** (ESC rotation)
-21. **PulumiServiceApprovalRuleResource** (Deployment approvals)
+#### All Resources (21 total)
+1. PulumiServiceAccessTokenResource
+2. PulumiServiceAgentPoolResource
+3. PulumiServiceApprovalRuleResource
+4. PulumiServiceDeploymentScheduleResource
+5. PulumiServiceDeploymentSettingsResource
+6. PulumiServiceDriftScheduleResource
+7. PulumiServiceEnvironmentResource (ESC support)
+8. PulumiServiceEnvironmentRotationScheduleResource (ESC rotation)
+9. PulumiServiceEnvironmentVersionTagResource (ESC versioning)
+10. PulumiServiceOidcIssuerResource (OIDC authentication)
+11. PulumiServiceOrgAccessTokenResource
+12. PulumiServicePolicyGroupResource
+13. PulumiServiceStackResource (Stack management)
+14. **PulumiServiceStackTagResource** ✅ **MIGRATED TO INFER**
+15. PulumiServiceTeamResource
+16. PulumiServiceTeamAccessTokenResource
+17. PulumiServiceTeamEnvironmentPermissionResource (ESC permissions)
+18. TeamStackPermissionResource
+19. PulumiServiceTemplateSourceResource (Templates)
+20. PulumiServiceTtlScheduleResource
+21. PulumiServiceWebhookResource
 
 #### Data Sources (2 total)
 - `pulumiservice:index:getPolicyPacks` (list all policy packs)
@@ -277,16 +276,29 @@ During the migration, we run a **hybrid provider** that supports both manual and
 ┌─────────────────────────────────────┐
 │  hybrid.go: MakeHybridProvider()    │
 │  ┌───────────────────────────────┐  │
-│  │ Manual Provider               │  │
+│  │ Manual Provider (RPC)         │  │
 │  │ (existing resources)          │  │
-│  │ - Wrapped by hybridWrapper    │  │
-│  │ - Injects client into context │  │
+│  │ - Wrapped by rpc.Provider     │  │
+│  │ - Uses legacy config          │  │
 │  └───────────────────────────────┘  │
 │               +                      │
 │  ┌───────────────────────────────┐  │
 │  │ Infer Provider                │  │
 │  │ (migrated resources)          │  │
+│  │ - Uses infer.Config pattern   │  │
 │  │ - Gets client from context    │  │
+│  └───────────────────────────────┘  │
+└─────────────────────────────────────┘
+                │
+                ▼
+┌─────────────────────────────────────┐
+│  config/config.go                   │
+│  ┌───────────────────────────────┐  │
+│  │ Config struct                 │  │
+│  │ - infer.Annotated             │  │
+│  │ - infer.CustomConfigure       │  │
+│  │ - Configure() initializes     │  │
+│  │   client and injects to ctx   │  │
 │  └───────────────────────────────┘  │
 └─────────────────────────────────────┘
 ```
@@ -296,84 +308,150 @@ During the migration, we run a **hybrid provider** that supports both manual and
 ```go
 // main.go
 func main() {
-    err := provider.MainWithOptions(providerName, Version, func(host *provider.HostClient) (p.Provider, error) {
-        return psp.MakeHybridProvider(host, providerName, Version, schema)
-    }, provider.Options{})
+    // Start gRPC service for the pulumiservice provider using hybrid provider
+    // This supports both manual (legacy) and infer-based resources during migration
+    hybridProvider := psp.MakeHybridProvider(providerName, Version, schema)
 
+    err := p.RunProvider(context.Background(), providerName, Version, hybridProvider)
     if err != nil {
         cmdutil.ExitError(err.Error())
     }
 }
 
 // provider/pkg/provider/hybrid.go
-func MakeHybridProvider(host *provider.HostClient, name, version, schema string) (p.Provider, error) {
+func MakeHybridProvider(name, version, schema string) p.Provider {
     // Create manual provider for legacy resources
     manualProvider := &pulumiserviceProvider{
-        host:    host,
         name:    name,
         schema:  mustSetSchemaVersion(schema, version),
         version: version,
     }
 
-    // Wrap manual provider to inject client into context
-    wrappedManual := &hybridManualProvider{
-        inner: rpc.Provider(manualProvider),
-        manualProvider: manualProvider,
-    }
-
-    // Create infer provider for migrated resources
     inferOpts := buildInferOptions()
 
-    // Combine both providers
-    return infer.Wrap(wrappedManual, inferOpts), nil
+    // Wrap the manual provider with rpc.Provider to convert to p.Provider interface
+    wrappedManual := rpc.Provider(manualProvider)
+
+    // Wrap with infer to add infer-based resources (like StackTag)
+    // infer.Wrap will handle infer resources and delegate unknown resources to wrappedManual
+    return infer.Wrap(wrappedManual, inferOpts)
+}
+
+func buildInferOptions() infer.Options {
+    return infer.Options{
+        Resources: []infer.InferredResource{
+            infer.Resource(&inferResources.StackTag{}),
+        },
+        Components: []infer.InferredComponent{},
+        Functions:  []infer.InferredFunction{},
+        // Config enables proper client injection via context
+        // infer.Config[*config.Config]() automatically calls Config.Configure()
+        // and injects the config into context, available via GetConfig(ctx)
+        Config: infer.Config[*config.Config](&config.Config{}),
+    }
 }
 ```
 
-### Client Context Injection Pattern
+### Client Context Injection Pattern (Updated for Config Pattern)
 
 **The Problem**: Infer resources need access to the Pulumi Service API client (`*pulumiapi.Client`) to make API calls.
 
-**Solution**: Use context injection via `hybridManualProvider` wrapper
+**Solution**: Use `infer.Config[*Config]()` pattern from `pulumi-go-provider` (v1.1.2+)
+
+**Why This Approach?** This is Ian's pattern from PR #258, which follows the official pulumi-go-provider v1.1.2 best practices. The `Config` struct implements `infer.Annotated` and `infer.CustomConfigure`, allowing the framework to automatically initialize the client and inject it into context.
 
 **Implementation**:
 
 ```go
-// provider/pkg/infer/client.go
-type clientContextKey struct{}
+// provider/pkg/config/config.go - Config struct with client initialization
+package config
 
-func WithClient(ctx context.Context, client *pulumiapi.Client) context.Context {
-    return context.WithValue(ctx, clientContextKey{}, client)
+type Config struct {
+    AccessToken string `pulumi:"accessToken,optional" provider:"secret"`
+    ServiceURL  string `pulumi:"serviceURL,optional"`
+    client      *pulumiapi.Client  // Unexported - initialized by Configure()
 }
 
-func GetClient(ctx context.Context) *pulumiapi.Client {
-    if client, ok := ctx.Value(clientContextKey{}).(*pulumiapi.Client); ok {
-        return client
+var (
+    _ infer.Annotated       = (*Config)(nil)
+    _ infer.CustomConfigure = (*Config)(nil)
+)
+
+func (c *Config) Annotate(a infer.Annotator) {
+    a.Describe(&c.AccessToken, "Access Token to authenticate with Pulumi Cloud.")
+    a.SetDefault(&c.AccessToken, nil, EnvVarPulumiAccessToken)
+
+    a.Describe(&c.ServiceURL, "The service URL used to reach Pulumi Cloud.")
+    a.SetDefault(&c.ServiceURL, "https://api.pulumi.com", EnvVarPulumiBackendUrl)
+}
+
+func (c *Config) Configure(context.Context) error {
+    // Ensure that we have an access token
+    if len(c.AccessToken) == 0 {
+        creds, err := workspace.GetStoredCredentials()
+        if err != nil {
+            return ErrAccessTokenNotFound
+        }
+        if token, ok := creds.AccessTokens[creds.Current]; ok {
+            c.AccessToken = token
+        } else {
+            return ErrAccessTokenNotFound
+        }
     }
-    panic("API client not found in context")
+
+    // Construct the PulumiService client
+    client, err := pulumiapi.NewClient(&http.Client{
+        Timeout: 60 * time.Second,
+    }, c.AccessToken, c.ServiceURL)
+
+    c.client = client
+    return err
 }
 
-// provider/pkg/provider/hybrid_wrapper.go
-type hybridManualProvider struct {
-    inner          p.Provider
-    manualProvider *pulumiserviceProvider
+// GetClient retrieves the client from context
+func GetClient[T any](ctx context.Context) T {
+    if v := ctx.Value(TestClientKey); v != nil {
+        return v.(T)
+    }
+    return any(GetConfig(ctx).client).(T)
 }
 
-func (h *hybridManualProvider) Create(ctx context.Context, req p.CreateRequest) (p.CreateResponse, error) {
-    // Inject client into context before calling infer resources
-    ctx = inferPkg.WithClient(ctx, h.manualProvider.client)
-    return h.inner.Create(ctx, req)
+// GetConfig accesses the config associated with the current request
+func GetConfig(ctx context.Context) Config {
+    return *infer.GetConfig[*Config](ctx)
 }
-
-// Similar injection for Read, Update, Delete operations
 ```
+
+**Key Points**:
+- `Configure()` is automatically called by the infer framework during provider initialization
+- The client is stored in the `Config` struct and accessible via `GetConfig(ctx).client`
+- `infer.GetConfig[*Config](ctx)` retrieves the config from context (injected by framework)
+- Test support via `TestClientKey` allows mock client injection for unit tests
+- This pattern avoids import cycles by placing Config in a separate `provider/pkg/config` package
 
 **Usage in Infer Resources**:
 
 ```go
 func (StackTag) Create(ctx context.Context, req infer.CreateRequest[StackTagArgs]) (infer.CreateResponse[StackTagState], error) {
-    client := inferPkg.GetClient(ctx)  // Retrieve from context
+    // Get API client from context via provider Config
+    client := config.GetClient[*pulumiapi.Client](ctx)
+
     // Use client to call API
+    err := client.CreateStackTag(...)
     return infer.CreateResponse[StackTagState]{...}, nil
+}
+```
+
+**Test Usage**:
+
+```go
+func TestMyResource(t *testing.T) {
+    mockClient := &MockClient{}
+    ctx := context.WithValue(context.Background(), config.TestClientKey, mockClient)
+
+    resource := MyResource{}
+    resp, err := resource.Create(ctx, ...)
+    // ... assertions
 }
 ```
 
@@ -395,15 +473,54 @@ git checkout -b feature/migrate-to-infer-v1 47a344e  # main commit
 - [x] **0.4**: Remove deprecated StreamInvoke method (incompatible with Pulumi SDK v3.169.0)
 - [x] **0.5**: Create hybrid provider architecture ✅
   - ✅ Created `provider/pkg/provider/hybrid.go`
-  - ✅ Created `provider/pkg/provider/hybrid_wrapper.go` for client injection
+  - ✅ Initial implementation with `contextMiddleware.Wrap` (later replaced)
   - ✅ Updated `main.go` to use `p.RunProvider()` with hybrid provider
 - [x] **0.6**: Set up testing infrastructure ✅
   - ✅ Created `provider/pkg/infer/README.md` with guidelines
-  - ✅ Created `provider/pkg/infer/client.go` for context-based client access
+  - ✅ Initial client context handling (later updated)
   - ✅ Documented patterns in `docs/INFER_MIGRATION.md`
 - [x] **0.7**: Documentation complete ✅
   - ✅ `docs/INFER_MIGRATION.md`
   - ✅ `docs/PHASE_0_1_SUMMARY.md`
+
+### Phase 0.5: Config Pattern Implementation ✅ COMPLETE
+
+After Phase 1.1 (StackTag POC), we discovered Ian's superior Config pattern from PR #258 and implemented it to replace the initial `contextMiddleware.Wrap` approach.
+
+#### Completed Tasks
+
+- [x] **0.5.1**: Created `provider/pkg/config/config.go` package ✅
+  - ✅ Separated config from provider to avoid import cycles
+  - ✅ Implemented `Config` struct with `infer.Annotated` and `infer.CustomConfigure`
+  - ✅ Added `Configure()` method to initialize API client
+  - ✅ Added `GetClient[T]()` and `GetConfig()` helper functions
+  - ✅ Added `TestClientKey` for test mock injection
+
+- [x] **0.5.2**: Updated `provider/pkg/provider/config.go` ✅
+  - ✅ Re-exported config types for backward compatibility
+  - ✅ Added wrapper functions for clean imports
+  - ✅ Preserved legacy `PulumiServiceConfig` for manual provider
+
+- [x] **0.5.3**: Updated `provider/pkg/provider/hybrid.go` ✅
+  - ✅ Removed `contextMiddleware.Wrap` usage
+  - ✅ Simplified to: `rpc.Provider(manual)` → `infer.Wrap()`
+  - ✅ Added `Config: infer.Config[*config.Config](&config.Config{})` to `buildInferOptions()`
+
+- [x] **0.5.4**: Updated `provider/pkg/infer/stack_tag.go` ✅
+  - ✅ Changed to use `config.GetClient[*pulumiapi.Client](ctx)`
+  - ✅ Removed old client injection pattern
+
+- [x] **0.5.5**: Fixed all tests ✅
+  - ✅ Updated `provider/pkg/resources/policy_group_test.go`
+  - ✅ Removed `Client` field from test resource structs
+  - ✅ Added context injection with `config.TestClientKey`
+  - ✅ Added `ctx` parameter to all `Check()` and `Diff()` test calls
+
+- [x] **0.5.6**: Full validation ✅
+  - ✅ `make lint` - 0 issues
+  - ✅ `make build` - All SDKs built successfully
+  - ✅ `make test_provider` - All 100+ tests passed
+  - ✅ Integration test: `TestYamlStackTagsExample` - PASSED (15.26s)
 
 ### Phase 1: Proof of Concept ✅ PHASE 1.1 COMPLETE
 
@@ -419,7 +536,7 @@ git checkout -b feature/migrate-to-infer-v1 47a344e  # main commit
 - [x] **1.1.6**: Implemented `Delete()` method ✅
 - [x] **1.1.7**: Added `Annotate()` for descriptions ✅
 - [x] **1.1.8**: Registered in `buildInferOptions()` in hybrid.go ✅
-- [x] **1.1.9**: Implemented client context injection via `hybridManualProvider` ✅
+- [x] **1.1.9**: Implemented client context injection via `contextMiddleware.Wrap` ✅
 - [x] **1.1.10**: Integration test `TestYamlStackTagsExample` - **PASSED** (17.3s) ✅
 - [x] **1.1.11**: Validated all CRUD operations work correctly ✅
 - [x] **1.1.12**: Documented in `docs/PHASE_0_1_SUMMARY.md` ✅
@@ -717,20 +834,27 @@ func buildInferOptions() infer.Options {
 - ✅ Updated `main.go` to use `p.RunProviderF()` with hybrid provider
 - ✅ Verified provider builds successfully
 
-**Files Created**:
+**Files Created (Phase 0)**:
 - `Convert-to-infer.md` - Complete migration plan and analysis
 - `docs/INFER_MIGRATION.md` - This comprehensive guide
 - `provider/pkg/infer/README.md` - Infer directory documentation
-- `provider/pkg/infer/client.go` - Client context handling
-- `provider/pkg/provider/hybrid.go` - Hybrid provider setup
-- `provider/pkg/provider/hybrid_wrapper.go` - Context injection wrapper
+- `provider/pkg/provider/hybrid.go` - Hybrid provider architecture
 
-**Files Modified**:
+**Files Created (Phase 0.5 - Config Pattern)**:
+- `provider/pkg/config/config.go` - Config struct with infer.Config pattern
+
+**Files Modified (Phase 0)**:
 - `go.mod` - Upgraded Go 1.24, added pulumi-go-provider v1.1.2
 - `sdk/go.mod` - Upgraded Go 1.24
 - `examples/*/go.mod` - Upgraded Go 1.24
 - `provider/cmd/pulumi-resource-pulumiservice/main.go` - Use hybrid provider
 - `provider/pkg/provider/provider.go` - Removed deprecated StreamInvoke
+
+**Files Modified (Phase 0.5 - Config Pattern)**:
+- `provider/pkg/provider/config.go` - Re-exports config package + legacy support
+- `provider/pkg/provider/hybrid.go` - Simplified to use infer.Config pattern
+- `provider/pkg/infer/stack_tag.go` - Updated to use config.GetClient
+- `provider/pkg/resources/policy_group_test.go` - Fixed tests for new pattern
 
 ### Phase 1.1 Results: StackTag Migration
 
@@ -824,13 +948,15 @@ Both can coexist during migration.
 
 #### 6. Client Context Solution
 
-**Implemented Solution**: Created `hybridManualProvider` wrapper that injects clients into context
+**Implemented Solution**: Use `contextMiddleware.Wrap` from `pulumi-go-provider` to inject clients into context
+
+**Why This Approach?**: Confirmed as the correct solution by pulumi-go-provider maintainers
 
 **How it works**:
-1. `hybridManualProvider` wraps the manual provider
-2. Before each CRUD operation, it injects the API client into context
-3. Infer resources call `inferPkg.GetClient(ctx)` to retrieve the client
-4. Thread-safe and clean separation of concerns
+1. `contextMiddleware.Wrap` wraps the manual RPC provider before passing to `infer.Wrap`
+2. Before each provider operation, the middleware function injects both API client and ESC client into context
+3. Infer resources call `inferPkg.GetClient(ctx)` or `inferPkg.GetESCClient(ctx)` to retrieve clients
+4. Thread-safe, clean separation of concerns, and officially supported pattern
 
 ## Common Patterns & Best Practices
 
@@ -838,17 +964,27 @@ Both can coexist during migration.
 
 Since we're in a hybrid provider, infer resources need to access the same API client as manual resources.
 
-**Pattern**: Retrieve client from context
+**Pattern**: Retrieve client from context using the Config pattern
 
 ```go
 // In infer resource methods
 func (StackTag) Create(ctx context.Context, req infer.CreateRequest[StackTagArgs]) (infer.CreateResponse[StackTagState], error) {
-    client := inferPkg.GetClient(ctx)  // Get from context
+    // Get API client from context via provider Config
+    client := config.GetClient[*pulumiapi.Client](ctx)
+
     // Use client to call API
+    err := client.CreateStackTag(...)
+    return infer.CreateResponse[StackTagState]{...}, nil
 }
 ```
 
-**Note**: The client is automatically injected into context by `hybridManualProvider` wrapper before each operation.
+**Note**: The client is automatically initialized by `Config.Configure()` and injected into context by the infer framework. Resources access it via `config.GetClient[T](ctx)`.
+
+**For Tests**: Inject mock clients using `TestClientKey`:
+```go
+mockClient := &MockClient{}
+ctx := context.WithValue(context.Background(), config.TestClientKey, mockClient)
+```
 
 ### Handling Secrets
 
@@ -1023,8 +1159,8 @@ make provider
 ### Runtime Errors
 
 **Error**: `panic: API client not found in context`
-- **Fix**: Ensure `hybridManualProvider` wrapper is properly set up in `hybrid.go`
-- **Check**: Verify `WithClient()` is called before CRUD operations
+- **Fix**: Ensure `contextMiddleware.Wrap` is properly set up in `hybrid.go` BEFORE `infer.Wrap`
+- **Check**: Verify `WithClient()` is called in the middleware function before CRUD operations
 
 **Error**: `nil pointer dereference` when accessing client
 - **Fix**: Ensure client is properly initialized in provider Configure method
@@ -1075,15 +1211,18 @@ make provider
 - **Pulumi Go Provider**: https://github.com/pulumi/pulumi-go-provider
 - **Infer Documentation**: https://pkg.go.dev/github.com/pulumi/pulumi-go-provider/infer
 - **Builder Pattern Docs**: https://pkg.go.dev/github.com/pulumi/pulumi-go-provider/infer#NewProviderBuilder
+- **Ian's PR #258 (Config pattern reference)**: https://github.com/pulumi/pulumi-pulumiservice/pull/258
 - **Current provider implementation**: `provider/pkg/provider/provider.go`
-- **Example resource**: `provider/pkg/resources/stack_tags.go`
+- **Config pattern implementation**: `provider/pkg/config/config.go`
+- **Example manual resource**: `provider/pkg/resources/stack_tags.go`
 - **pulumi-go-provider examples**: https://github.com/pulumi/pulumi-go-provider/tree/main/examples
 - **Hybrid provider setup**: `provider/pkg/provider/hybrid.go`
-- **Client context handling**: `provider/pkg/infer/client.go`
-- **First migrated resource**: `provider/pkg/infer/stack_tag.go`
+- **First migrated infer resource**: `provider/pkg/infer/stack_tag.go`
 
 ---
 
 **Document Status**: Living document, updated as migration progresses
-**Last Updated**: Phase 0 & 1.1 complete, Phase 1.2 next
+**Last Updated**: Phase 0, 0.5, & 1.1 complete - Config pattern implemented, Phase 1.2 next
 **Maintainer**: Migration team
+
+**Recent Update (Phase 0.5)**: Implemented Ian's `infer.Config[*Config]()` pattern from PR #258, replacing the initial `contextMiddleware.Wrap` approach. This provides cleaner client injection following pulumi-go-provider v1.1.2 best practices.

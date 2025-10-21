@@ -7,6 +7,7 @@ import (
 
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
@@ -21,9 +22,7 @@ var defaultWebhookGroups = map[string][]string{
 	"environment":  {"environments"},
 }
 
-type PulumiServiceWebhookResource struct {
-	Client pulumiapi.WebhookClient
-}
+type PulumiServiceWebhookResource struct{}
 
 type PulumiServiceWebhookInput struct {
 	Active           bool
@@ -148,7 +147,7 @@ func (wh *PulumiServiceWebhookResource) Name() string {
 	return "pulumiservice:index:Webhook"
 }
 
-func (wh *PulumiServiceWebhookResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
+func (wh *PulumiServiceWebhookResource) Check(ctx context.Context, req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
 	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
 	if err != nil {
 		return nil, err
@@ -229,8 +228,8 @@ func (wh *PulumiServiceWebhookResource) Check(req *pulumirpc.CheckRequest) (*pul
 	return &pulumirpc.CheckResponse{Inputs: inputNews, Failures: failures}, nil
 }
 
-func (wh *PulumiServiceWebhookResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
-	ctx := context.Background()
+func (wh *PulumiServiceWebhookResource) Create(ctx context.Context, req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
+	client := config.GetClient[pulumiapi.WebhookClient](ctx)
 	inputMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
 	if err != nil {
 		return nil, err
@@ -256,7 +255,7 @@ func (wh *PulumiServiceWebhookResource) Create(req *pulumirpc.CreateRequest) (*p
 		Filters:          inputProps.Filters,
 		Groups:           inputProps.Groups,
 	}
-	webhook, err := wh.Client.CreateWebhook(ctx, request)
+	webhook, err := client.CreateWebhook(ctx, request)
 	if err != nil {
 		return nil, err
 	}
@@ -283,7 +282,7 @@ func (wh *PulumiServiceWebhookResource) Create(req *pulumirpc.CreateRequest) (*p
 	}, nil
 }
 
-func (wh *PulumiServiceWebhookResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+func (wh *PulumiServiceWebhookResource) Diff(ctx context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
 	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
 	if err != nil {
 		return nil, err
@@ -340,7 +339,8 @@ func (wh *PulumiServiceWebhookResource) Diff(req *pulumirpc.DiffRequest) (*pulum
 	}, nil
 }
 
-func (wh *PulumiServiceWebhookResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+func (wh *PulumiServiceWebhookResource) Update(ctx context.Context, req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+	client := config.GetClient[pulumiapi.WebhookClient](ctx)
 	inputMap, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
@@ -374,7 +374,7 @@ func (wh *PulumiServiceWebhookResource) Update(req *pulumirpc.UpdateRequest) (*p
 		},
 		Name: hookID.webhookName,
 	}
-	webhook, err := wh.Client.UpdateWebhook(context.Background(), updateReq)
+	webhook, err := client.UpdateWebhook(ctx, updateReq)
 	if err != nil {
 		return nil, err
 	}
@@ -401,24 +401,26 @@ func (wh *PulumiServiceWebhookResource) Update(req *pulumirpc.UpdateRequest) (*p
 
 }
 
-func (wh *PulumiServiceWebhookResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
+func (wh *PulumiServiceWebhookResource) Delete(ctx context.Context, req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
+	client := config.GetClient[pulumiapi.WebhookClient](ctx)
 	hookID, err := splitWebhookID(req.Id)
 	if err != nil {
 		return nil, err
 	}
 
-	err = wh.Client.DeleteWebhook(context.Background(), hookID.organizationName,
+	err = client.DeleteWebhook(ctx, hookID.organizationName,
 		hookID.projectName, hookID.stackName, hookID.environmentName, hookID.webhookName)
 
 	return &pbempty.Empty{}, err
 }
 
-func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
+func (wh *PulumiServiceWebhookResource) Read(ctx context.Context, req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
+	client := config.GetClient[pulumiapi.WebhookClient](ctx)
 	hookID, err := splitWebhookID(req.Id)
 	if err != nil {
 		return nil, err
 	}
-	webhook, err := wh.Client.GetWebhook(context.Background(),
+	webhook, err := client.GetWebhook(ctx,
 		hookID.organizationName, hookID.projectName, hookID.stackName, hookID.environmentName, hookID.webhookName)
 	if err != nil {
 		return nil, err

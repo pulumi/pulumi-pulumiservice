@@ -27,6 +27,8 @@
         "getPolicyPack.ts",
         "getPolicyPacks.ts",
         "index.ts",
+        "infer/index.ts",
+        "infer/stackTag.ts",
         "oidcIssuer.ts",
         "orgAccessToken.ts",
         "policyGroup.ts",

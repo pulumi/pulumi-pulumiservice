@@ -7,15 +7,14 @@ import (
 
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
-type PulumiServiceStackResource struct {
-	Client *pulumiapi.Client
-}
+type PulumiServiceStackResource struct{}
 
 type PulumiServiceStack struct {
 	pulumiapi.StackIdentifier
@@ -50,7 +49,7 @@ func (s *PulumiServiceStackResource) Name() string {
 	return "pulumiservice:index:Stack"
 }
 
-func (s *PulumiServiceStackResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+func (s *PulumiServiceStackResource) Diff(ctx context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
 	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
 	if err != nil {
 		return nil, err
@@ -87,8 +86,8 @@ func (s *PulumiServiceStackResource) Diff(req *pulumirpc.DiffRequest) (*pulumirp
 	}, nil
 }
 
-func (s *PulumiServiceStackResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	ctx := context.Background()
+func (s *PulumiServiceStackResource) Delete(ctx context.Context, req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
+	client := config.GetClient[*pulumiapi.Client](ctx)
 	inputs, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
@@ -98,15 +97,15 @@ func (s *PulumiServiceStackResource) Delete(req *pulumirpc.DeleteRequest) (*pbem
 	if err != nil {
 		return nil, err
 	}
-	err = s.Client.DeleteStack(ctx, stack.StackIdentifier, stack.ForceDestroy)
+	err = client.DeleteStack(ctx, stack.StackIdentifier, stack.ForceDestroy)
 	if err != nil {
 		return nil, err
 	}
 	return &pbempty.Empty{}, nil
 }
 
-func (s *PulumiServiceStackResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
-	ctx := context.Background()
+func (s *PulumiServiceStackResource) Create(ctx context.Context, req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
+	client := config.GetClient[*pulumiapi.Client](ctx)
 	inputs, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
@@ -116,7 +115,7 @@ func (s *PulumiServiceStackResource) Create(req *pulumirpc.CreateRequest) (*pulu
 	if err != nil {
 		return nil, err
 	}
-	err = s.Client.CreateStack(ctx, stack.StackIdentifier)
+	err = client.CreateStack(ctx, stack.StackIdentifier)
 	if err != nil {
 		return nil, err
 	}
@@ -139,22 +138,22 @@ func (s *PulumiServiceStackResource) Create(req *pulumirpc.CreateRequest) (*pulu
 	}, nil
 }
 
-func (s *PulumiServiceStackResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
+func (s *PulumiServiceStackResource) Check(ctx context.Context, req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
 	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: nil}, nil
 }
 
-func (s *PulumiServiceStackResource) Update(_ *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+func (s *PulumiServiceStackResource) Update(_ context.Context, _ *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
 	// all updates are destructive, so we just call Create.
 	return nil, fmt.Errorf("unexpected call to update, expected create to be called instead")
 }
 
-func (s *PulumiServiceStackResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	ctx := context.Background()
+func (s *PulumiServiceStackResource) Read(ctx context.Context, req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
+	client := config.GetClient[*pulumiapi.Client](ctx)
 	stack, err := pulumiapi.NewStackIdentifier(req.GetId())
 	if err != nil {
 		return nil, err
 	}
-	exists, err := s.Client.StackExists(ctx, stack)
+	exists, err := client.StackExists(ctx, stack)
 	if err != nil {
 		return nil, fmt.Errorf("failure while checking if stack %q exists: %w", req.Id, err)
 	}

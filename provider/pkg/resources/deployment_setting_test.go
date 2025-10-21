@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
@@ -42,16 +43,15 @@ func TestDeploymentSettings(t *testing.T) {
 			func() (*pulumiapi.DeploymentSettings, error) { return nil, nil },
 		)
 
-		provider := PulumiServiceDeploymentSettingsResource{
-			Client: mockedClient,
-		}
+		provider := PulumiServiceDeploymentSettingsResource{}
+		ctx := context.WithValue(context.Background(), config.TestClientKey, mockedClient)
 
 		req := pulumirpc.ReadRequest{
 			Id:  "abc/def/123",
 			Urn: "urn:123",
 		}
 
-		resp, err := provider.Read(&req)
+		resp, err := provider.Read(ctx, &req)
 
 		assert.NoError(t, err)
 		assert.Equal(t, resp.Id, "")
@@ -70,16 +70,15 @@ func TestDeploymentSettings(t *testing.T) {
 			},
 		)
 
-		provider := PulumiServiceDeploymentSettingsResource{
-			Client: mockedClient,
-		}
+		provider := PulumiServiceDeploymentSettingsResource{}
+		ctx := context.WithValue(context.Background(), config.TestClientKey, mockedClient)
 
 		req := pulumirpc.ReadRequest{
 			Id:  "abc/def/123",
 			Urn: "urn:123",
 		}
 
-		resp, err := provider.Read(&req)
+		resp, err := provider.Read(ctx, &req)
 
 		assert.NoError(t, err)
 		assert.Equal(t, resp.Id, "abc/def/123")

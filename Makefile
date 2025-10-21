@@ -44,6 +44,7 @@ provider_debug::
 test_provider::
 	cd provider/pkg && go test -short -v -count=1 -cover -timeout 2h -parallel ${TESTPARALLELISM} ./...
 
+dotnet_sdk: export PULUMI_IGNORE_AMBIENT_PLUGINS = true
 dotnet_sdk: gen_sdk_prerequisites
 	rm -rf sdk/dotnet
 	$(PULUMI) package gen-sdk $(WORKING_DIR)/bin/$(PROVIDER) --language dotnet

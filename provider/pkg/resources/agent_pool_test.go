@@ -8,6 +8,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/structpb"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
@@ -55,16 +56,15 @@ func TestAgentPool(t *testing.T) {
 			},
 		)
 
-		provider := PulumiServiceAgentPoolResource{
-			Client: mockedClient,
-		}
+		provider := PulumiServiceAgentPoolResource{}
+		ctx := context.WithValue(context.Background(), config.TestClientKey, mockedClient)
 
 		req := pulumirpc.DeleteRequest{
 			Id:  "org/abc/beep-boop",
 			Urn: "urn:beep-boop",
 		}
 
-		resp, err := provider.Delete(&req)
+		resp, err := provider.Delete(ctx, &req)
 
 		assert.Error(t, err)
 		assert.ErrorContains(t, err, errMsg)
@@ -77,9 +77,8 @@ func TestAgentPool(t *testing.T) {
 			func() error { return nil },
 		)
 
-		provider := PulumiServiceAgentPoolResource{
-			Client: mockedClient,
-		}
+		provider := PulumiServiceAgentPoolResource{}
+		ctx := context.WithValue(context.Background(), config.TestClientKey, mockedClient)
 
 		req := pulumirpc.DeleteRequest{
 			Id:  "org/abc/beep-boop",
@@ -89,7 +88,7 @@ func TestAgentPool(t *testing.T) {
 			}},
 		}
 
-		resp, err := provider.Delete(&req)
+		resp, err := provider.Delete(ctx, &req)
 
 		assert.NoError(t, err)
 		assert.NotNil(t, resp)
@@ -101,16 +100,15 @@ func TestAgentPool(t *testing.T) {
 			nil,
 		)
 
-		provider := PulumiServiceAgentPoolResource{
-			Client: mockedClient,
-		}
+		provider := PulumiServiceAgentPoolResource{}
+		ctx := context.WithValue(context.Background(), config.TestClientKey, mockedClient)
 
 		req := pulumirpc.ReadRequest{
 			Id:  "org/abc/123",
 			Urn: "urn:123",
 		}
 
-		resp, err := provider.Read(&req)
+		resp, err := provider.Read(ctx, &req)
 
 		assert.NoError(t, err)
 		assert.Equal(t, resp.Id, "")
@@ -128,16 +126,15 @@ func TestAgentPool(t *testing.T) {
 			nil,
 		)
 
-		provider := PulumiServiceAgentPoolResource{
-			Client: mockedClient,
-		}
+		provider := PulumiServiceAgentPoolResource{}
+		ctx := context.WithValue(context.Background(), config.TestClientKey, mockedClient)
 
 		req := pulumirpc.ReadRequest{
 			Id:  "org/abc/123",
 			Urn: "urn:123",
 		}
 
-		resp, err := provider.Read(&req)
+		resp, err := provider.Read(ctx, &req)
 
 		assert.NoError(t, err)
 		assert.Equal(t, resp.Id, "org/abc/123")

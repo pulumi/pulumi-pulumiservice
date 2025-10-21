@@ -8,6 +8,7 @@ import (
 
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
@@ -15,9 +16,7 @@ import (
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
-type PulumiServiceStackTagResource struct {
-	Client *pulumiapi.Client
-}
+type PulumiServiceStackTagResource struct{}
 
 type PulumiServiceStackTagInput struct {
 	Organization string `pulumi:"organization"`
@@ -43,7 +42,7 @@ func (st *PulumiServiceStackTagResource) Name() string {
 	return "pulumiservice:index:StackTag"
 }
 
-func (st *PulumiServiceStackTagResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+func (st *PulumiServiceStackTagResource) Diff(ctx context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
 	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
 	if err != nil {
 		return nil, err
@@ -80,8 +79,8 @@ func (st *PulumiServiceStackTagResource) Diff(req *pulumirpc.DiffRequest) (*pulu
 	}, nil
 }
 
-func (st *PulumiServiceStackTagResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	ctx := context.Background()
+func (st *PulumiServiceStackTagResource) Delete(ctx context.Context, req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
+	client := config.GetClient[*pulumiapi.Client](ctx)
 	var input PulumiServiceStackTagInput
 	err := util.FromProperties(req.GetProperties(), structTagKey, &input)
 	if err != nil {
@@ -92,15 +91,15 @@ func (st *PulumiServiceStackTagResource) Delete(req *pulumirpc.DeleteRequest) (*
 		ProjectName: input.Project,
 		StackName:   input.Stack,
 	}
-	err = st.Client.DeleteStackTag(ctx, stackName, input.Name)
+	err = client.DeleteStackTag(ctx, stackName, input.Name)
 	if err != nil {
 		return nil, err
 	}
 	return &pbempty.Empty{}, nil
 }
 
-func (st *PulumiServiceStackTagResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
-	ctx := context.Background()
+func (st *PulumiServiceStackTagResource) Create(ctx context.Context, req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
+	client := config.GetClient[*pulumiapi.Client](ctx)
 	var input PulumiServiceStackTagInput
 	err := util.FromProperties(req.GetProperties(), structTagKey, &input)
 	if err != nil {
@@ -115,7 +114,7 @@ func (st *PulumiServiceStackTagResource) Create(req *pulumirpc.CreateRequest) (*
 		Name:  input.Name,
 		Value: input.Value,
 	}
-	err = st.Client.CreateTag(ctx, stackName, stackTag)
+	err = client.CreateTag(ctx, stackName, stackTag)
 	if err != nil {
 		return nil, err
 	}
@@ -125,17 +124,17 @@ func (st *PulumiServiceStackTagResource) Create(req *pulumirpc.CreateRequest) (*
 	}, nil
 }
 
-func (st *PulumiServiceStackTagResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
+func (st *PulumiServiceStackTagResource) Check(ctx context.Context, req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
 	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: nil}, nil
 }
 
-func (st *PulumiServiceStackTagResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+func (st *PulumiServiceStackTagResource) Update(ctx context.Context, req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
 	// all updates are destructive, so we just call Create.
 	return nil, fmt.Errorf("unexpected call to update, expected create to be called instead")
 }
 
-func (st *PulumiServiceStackTagResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	ctx := context.Background()
+func (st *PulumiServiceStackTagResource) Read(ctx context.Context, req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
+	client := config.GetClient[*pulumiapi.Client](ctx)
 
 	organization, project, stack, tagName, err := splitStackTagId(req.Id)
 	if err != nil {
@@ -147,7 +146,7 @@ func (st *PulumiServiceStackTagResource) Read(req *pulumirpc.ReadRequest) (*pulu
 		ProjectName: project,
 		StackName:   stack,
 	}
-	tag, err := st.Client.GetStackTag(ctx, stackName, tagName)
+	tag, err := client.GetStackTag(ctx, stackName, tagName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read StackTag (%q): %w", req.Id, err)
 	}

@@ -7,6 +7,7 @@ import (
 
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
@@ -14,9 +15,7 @@ import (
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
-type PulumiServiceApprovalRuleResource struct {
-	Client pulumiapi.ApprovalRuleClient
-}
+type PulumiServiceApprovalRuleResource struct{}
 
 type PulumiServiceApprovalRule struct {
 	Name                  string                          `json:"name"`
@@ -151,7 +150,7 @@ func parseApprovalRuleID(compositeID string) (pulumiapi.EnvironmentIdentifier, s
 	return envID, ruleID, nil
 }
 
-func (s *PulumiServiceApprovalRuleResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+func (s *PulumiServiceApprovalRuleResource) Diff(ctx context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
 	replaceProperties := map[string]bool{
 		"environmentIdentifier.organization": true,
 		"environmentIdentifier.project":      true,
@@ -160,15 +159,15 @@ func (s *PulumiServiceApprovalRuleResource) Diff(req *pulumirpc.DiffRequest) (*p
 	return util.StandardDiff(req, replaceProperties)
 }
 
-func (s *PulumiServiceApprovalRuleResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	ctx := context.Background()
+func (s *PulumiServiceApprovalRuleResource) Delete(ctx context.Context, req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
+	client := config.GetClient[pulumiapi.ApprovalRuleClient](ctx)
 
 	envID, ruleID, err := parseApprovalRuleID(req.GetId())
 	if err != nil {
 		return nil, err
 	}
 
-	err = s.Client.DeleteEnvironmentApprovalRule(ctx, envID.OrgName, ruleID)
+	err = client.DeleteEnvironmentApprovalRule(ctx, envID.OrgName, ruleID)
 	if err != nil {
 		return nil, err
 	}
@@ -176,8 +175,8 @@ func (s *PulumiServiceApprovalRuleResource) Delete(req *pulumirpc.DeleteRequest)
 	return &pbempty.Empty{}, nil
 }
 
-func (s *PulumiServiceApprovalRuleResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
-	ctx := context.Background()
+func (s *PulumiServiceApprovalRuleResource) Create(ctx context.Context, req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
+	client := config.GetClient[pulumiapi.ApprovalRuleClient](ctx)
 	inputs, err := plugin.UnmarshalProperties(req.GetProperties(), util.StandardUnmarshal)
 	if err != nil {
 		return nil, err
@@ -205,7 +204,7 @@ func (s *PulumiServiceApprovalRuleResource) Create(req *pulumirpc.CreateRequest)
 		},
 	}
 
-	createdRule, err := s.Client.CreateEnvironmentApprovalRule(ctx, rule.EnvironmentIdentifier.OrgName, createReq)
+	createdRule, err := client.CreateEnvironmentApprovalRule(ctx, rule.EnvironmentIdentifier.OrgName, createReq)
 	if err != nil {
 		return nil, err
 	}
@@ -224,7 +223,7 @@ func (s *PulumiServiceApprovalRuleResource) Create(req *pulumirpc.CreateRequest)
 	}, nil
 }
 
-func (s *PulumiServiceApprovalRuleResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
+func (s *PulumiServiceApprovalRuleResource) Check(ctx context.Context, req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
 	inputs, err := plugin.UnmarshalProperties(req.GetNews(), util.StandardUnmarshal)
 	if err != nil {
 		return nil, err
@@ -273,8 +272,8 @@ func (s *PulumiServiceApprovalRuleResource) Check(req *pulumirpc.CheckRequest) (
 	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: failures}, nil
 }
 
-func (s *PulumiServiceApprovalRuleResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	ctx := context.Background()
+func (s *PulumiServiceApprovalRuleResource) Update(ctx context.Context, req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+	client := config.GetClient[pulumiapi.ApprovalRuleClient](ctx)
 	inputs, err := plugin.UnmarshalProperties(req.GetNews(), util.StandardUnmarshal)
 	if err != nil {
 		return nil, err
@@ -307,7 +306,7 @@ func (s *PulumiServiceApprovalRuleResource) Update(req *pulumirpc.UpdateRequest)
 		},
 	}
 
-	_, err = s.Client.UpdateEnvironmentApprovalRule(ctx, envID.OrgName, ruleID, updateReq)
+	_, err = client.UpdateEnvironmentApprovalRule(ctx, envID.OrgName, ruleID, updateReq)
 	if err != nil {
 		return nil, err
 	}
@@ -325,15 +324,15 @@ func (s *PulumiServiceApprovalRuleResource) Update(req *pulumirpc.UpdateRequest)
 	}, nil
 }
 
-func (s *PulumiServiceApprovalRuleResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	ctx := context.Background()
+func (s *PulumiServiceApprovalRuleResource) Read(ctx context.Context, req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
+	client := config.GetClient[pulumiapi.ApprovalRuleClient](ctx)
 
 	envID, ruleID, err := parseApprovalRuleID(req.GetId())
 	if err != nil {
 		return nil, err
 	}
 
-	apiRule, err := s.Client.GetEnvironmentApprovalRule(ctx, envID.OrgName, ruleID)
+	apiRule, err := client.GetEnvironmentApprovalRule(ctx, envID.OrgName, ruleID)
 	if err != nil {
 		return nil, fmt.Errorf("failure while reading approval rule %q: %w", req.Id, err)
 	}

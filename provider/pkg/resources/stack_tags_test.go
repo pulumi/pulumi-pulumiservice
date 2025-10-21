@@ -1,10 +1,12 @@
 package resources
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
@@ -26,9 +28,8 @@ func TestStackTagsUpdate(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		st := &PulumiServiceStackTagResource{
-			Client: apiClient,
-		}
+		st := &PulumiServiceStackTagResource{}
+		ctx := context.WithValue(context.Background(), config.TestClientKey, apiClient)
 
 		input := PulumiServiceStackTagInput{
 			Organization: "org",
@@ -49,7 +50,7 @@ func TestStackTagsUpdate(t *testing.T) {
 			News: properties,
 		}
 
-		_, err = st.Update(&upReq)
+		_, err = st.Update(ctx, &upReq)
 		assert.ErrorContains(t, err, "unexpected call to update, expected create to be called instead")
 	})
 

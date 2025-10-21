@@ -21,6 +21,7 @@ import (
 	"strings"
 
 	"github.com/pulumi/pulumi-go-provider/infer"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
@@ -63,12 +64,8 @@ func (*StackTag) Create(
 		}, nil
 	}
 
-	// Get the API client from context
-	// TODO: Implement proper client context handling once we set up configuration
-	client := getClientFromContext(ctx)
-	if client == nil {
-		return infer.CreateResponse[StackTagState]{}, fmt.Errorf("API client not configured")
-	}
+	// Get the API client from context via provider Config
+	client := config.GetClient[*pulumiapi.Client](ctx)
 
 	stackIdentifier := pulumiapi.StackIdentifier{
 		OrgName:     input.Organization,
@@ -113,10 +110,7 @@ func (*StackTag) Read(
 		return "", inputs, state, err
 	}
 
-	client := getClientFromContext(ctx)
-	if client == nil {
-		return "", inputs, state, fmt.Errorf("API client not configured")
-	}
+	client := config.GetClient[*pulumiapi.Client](ctx)
 
 	stackIdentifier := pulumiapi.StackIdentifier{
 		OrgName:     organization,
@@ -166,10 +160,7 @@ func (*StackTag) Delete(ctx context.Context, id string, state StackTagState) err
 		return err
 	}
 
-	client := getClientFromContext(ctx)
-	if client == nil {
-		return fmt.Errorf("API client not configured")
-	}
+	client := config.GetClient[*pulumiapi.Client](ctx)
 
 	stackIdentifier := pulumiapi.StackIdentifier{
 		OrgName:     organization,
@@ -186,8 +177,8 @@ func (*StackTag) Delete(ctx context.Context, id string, state StackTagState) err
 }
 
 // Annotate provides descriptions for the StackTag resource and its fields.
-func (*StackTag) Annotate(a infer.Annotator) {
-	a.Describe(new(StackTag), "A Stack Tag associates metadata with a Pulumi stack. "+
+func (s *StackTag) Annotate(a infer.Annotator) {
+	a.Describe(s, "A Stack Tag associates metadata with a Pulumi stack. "+
 		"Tags are key-value pairs that can be used to organize and categorize stacks.")
 }
 
@@ -199,9 +190,4 @@ func splitStackTagID(id string) (organization, project, stack, tagName string, e
 		return "", "", "", "", fmt.Errorf("invalid stack tag ID %q: must be in format organization/project/stack/tagName", id)
 	}
 	return parts[0], parts[1], parts[2], parts[3], nil
-}
-
-// getClientFromContext retrieves the Pulumi Service API client from the context.
-func getClientFromContext(ctx context.Context) *pulumiapi.Client {
-	return GetClient(ctx)
 }

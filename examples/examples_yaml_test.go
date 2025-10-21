@@ -34,6 +34,13 @@ const (
 	ServiceProviderTestOrg = "service-provider-test-org"
 )
 
+func getTestOrg() string {
+	if org := os.Getenv("PULUMI_TEST_OWNER"); org != "" {
+		return org
+	}
+	return ServiceProviderTestOrg
+}
+
 func TestYamlTeamsExample(t *testing.T) {
 
 	// This test builds a repro of https://github.com/pulumi/pulumi-pulumiservice/issues/73.
@@ -255,8 +262,12 @@ func TestYamlDeploymentSettingsCommitExample(t *testing.T) {
 func TestYamlTeamAccessTokenExample(t *testing.T) {
 	cwd, _ := os.Getwd()
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Quick: true,
-		Dir:   path.Join(cwd, ".", "yaml-team-token"),
+		Quick:          true,
+		RequireService: true,
+		Dir:            path.Join(cwd, ".", "yaml-team-token"),
+		Config: map[string]string{
+			"organizationName": getTestOrg(),
+		},
 	})
 }
 
@@ -388,9 +399,11 @@ func TestYamlAgentPoolsExample(t *testing.T) {
 	cwd := getCwd(t)
 	digits := generateRandomFiveDigits()
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Dir: path.Join(cwd, ".", "yaml-agent-pools"),
+		Dir:            path.Join(cwd, ".", "yaml-agent-pools"),
+		RequireService: true,
 		Config: map[string]string{
-			"digits": digits,
+			"digits":           digits,
+			"organizationName": getTestOrg(),
 		},
 	})
 }
@@ -417,10 +430,11 @@ func TestYamlPolicyGroupsExample(t *testing.T) {
 	cwd := getCwd(t)
 	digits := generateRandomFiveDigits()
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Dir: path.Join(cwd, ".", "yaml-policy-groups"),
+		Dir:            path.Join(cwd, ".", "yaml-policy-groups"),
+		RequireService: true,
 		Config: map[string]string{
 			"digits":           digits,
-			"organizationName": os.Getenv("PULUMI_TEST_OWNER"),
+			"organizationName": getTestOrg(),
 		},
 	})
 }

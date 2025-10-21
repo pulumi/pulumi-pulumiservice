@@ -2363,6 +2363,7 @@
         "com.google.code.gson:gson": "2.8.9",
         "com.pulumi:pulumi": "1.16.2"
       },
+      "generateExtraInputTypes": true,
       "gradleNexusPublishPluginVersion": "2.0.0",
       "gradleTest": ""
     },

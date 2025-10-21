@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 	"github.com/stretchr/testify/assert"
@@ -66,16 +67,15 @@ func TestTeam(t *testing.T) {
 			func() (*pulumiapi.Team, error) { return nil, nil },
 		)
 
-		provider := PulumiServiceTeamResource{
-			Client: mockedClient,
-		}
+		provider := PulumiServiceTeamResource{}
+		ctx := context.WithValue(context.Background(), config.TestClientKey, mockedClient)
 
 		req := pulumirpc.ReadRequest{
 			Id:  "abc/123",
 			Urn: "urn:123",
 		}
 
-		resp, err := provider.Read(&req)
+		resp, err := provider.Read(ctx, &req)
 
 		assert.NoError(t, err)
 		assert.Equal(t, resp.Id, "")
@@ -98,16 +98,15 @@ func TestTeam(t *testing.T) {
 			},
 		)
 
-		provider := PulumiServiceTeamResource{
-			Client: mockedClient,
-		}
+		provider := PulumiServiceTeamResource{}
+		ctx := context.WithValue(context.Background(), config.TestClientKey, mockedClient)
 
 		req := pulumirpc.ReadRequest{
 			Id:  "abc/123",
 			Urn: "urn:123",
 		}
 
-		resp, err := provider.Read(&req)
+		resp, err := provider.Read(ctx, &req)
 
 		assert.NoError(t, err)
 		assert.Equal(t, resp.Id, "abc/123")

@@ -14,6 +14,8 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/common/workspace"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 )
 
 type getEnvironmentFunc func(ctx context.Context, orgName string, envName string, version string, decrypt bool) (yaml []byte, etag string, revision int, err error)
@@ -96,6 +98,10 @@ func (c *EscClientMock) ListOrganizationEnvironments(context.Context, string, st
 	return nil, "", nil
 }
 
+func (c *EscClientMock) RotateEnvironment(context.Context, string, string, string, []string) (*client.RotateEnvironmentResponse, []client.EnvironmentDiagnostic, error) {
+	return nil, nil, nil
+}
+
 func (c *EscClientMock) ListEnvironmentRevisions(ctx context.Context, orgName, projectName, envName string, options client.ListEnvironmentRevisionsOptions) ([]client.EnvironmentRevision, error) {
 	return nil, nil
 }
@@ -112,18 +118,6 @@ func (c *EscClientMock) OpenYAMLEnvironment(context.Context, string, []byte, tim
 	return "", nil, nil
 }
 
-func (c *EscClientMock) OpenEnvironmentDraft(context.Context, string, string, string, string, time.Duration) (string, []client.EnvironmentDiagnostic, error) {
-	return "", nil, nil
-}
-
-func (c *EscClientMock) RotateEnvironment(context.Context, string, string, string, []string) (*client.RotateEnvironmentResponse, []client.EnvironmentDiagnostic, error) {
-	return nil, nil, nil
-}
-
-func (c *EscClientMock) SubmitChangeRequest(context.Context, string, string, *string) error {
-	return nil
-}
-
 func (c *EscClientMock) UpdateEnvironment(context.Context, string, string, []byte, string) ([]client.EnvironmentDiagnostic, error) {
 	return nil, nil
 }
@@ -134,18 +128,6 @@ func (c *EscClientMock) UpdateEnvironmentWithProject(context.Context, string, st
 
 func (c *EscClientMock) UpdateEnvironmentDraft(context.Context, string, string, string, string, []byte, string) ([]client.EnvironmentDiagnostic, error) {
 	return nil, nil
-}
-
-func (c *EscClientMock) CreateEnvironmentDraft(context.Context, string, string, string, []byte, string) (string, []client.EnvironmentDiagnostic, error) {
-	return "", nil, nil
-}
-
-func (c *EscClientMock) GetDefaultOrg(context.Context) (string, error) {
-	return "", nil
-}
-
-func (c *EscClientMock) GetEnvironmentDraft(context.Context, string, string, string, string) ([]byte, string, error) {
-	return nil, "", nil
 }
 
 func (c *EscClientMock) CreateEnvironmentTag(context.Context, string, string, string, string, string) (*client.EnvironmentTag, error) {
@@ -188,6 +170,38 @@ func (c *EscClientMock) RetractEnvironmentRevision(ctx context.Context, orgName,
 	return nil
 }
 
+func (c *EscClientMock) CreateEnvironmentDraft(ctx context.Context, orgName, projectName, envName string, yaml []byte, etag string) (string, []client.EnvironmentDiagnostic, error) {
+	return "", nil, nil
+}
+
+func (c *EscClientMock) GetEnvironmentDraft(ctx context.Context, orgName, projectName, envName, changeRequestID string) (yaml []byte, etag string, err error) {
+	return nil, "", nil
+}
+
+func (c *EscClientMock) DeleteEnvironmentDraft(ctx context.Context, orgName, projectName, envName, changeRequestID string) error {
+	return nil
+}
+
+func (c *EscClientMock) GetDefaultOrg(ctx context.Context) (string, error) {
+	return "", nil
+}
+
+func (c *EscClientMock) CloneEnvironmentWithProject(ctx context.Context, orgName, srcEnvProject, srcEnvName string, destEnv client.CloneEnvironmentRequest) error {
+	return nil
+}
+
+func (c *EscClientMock) EnvironmentExistsWithProject(ctx context.Context, orgName, projectName, envName string) (bool, error) {
+	return false, nil
+}
+
+func (c *EscClientMock) OpenEnvironmentDraft(ctx context.Context, orgName, projectName, envName, changeRequestID string, duration time.Duration) (string, []client.EnvironmentDiagnostic, error) {
+	return "", nil, nil
+}
+
+func (c *EscClientMock) SubmitChangeRequest(ctx context.Context, orgName, changeRequestID string, description *string) error {
+	return nil
+}
+
 func (c *EscClientMock) Insecure() bool {
 	return false
 }
@@ -212,9 +226,8 @@ func TestEnvironmentCheck(t *testing.T) {
 			return nil, nil
 		},
 	)
-	provider := PulumiServiceEnvironmentResource{
-		Client: mockedClient,
-	}
+	provider := PulumiServiceEnvironmentResource{}
+	ctx := context.WithValue(context.Background(), config.TestClientKey, mockedClient)
 
 	envDef := `values:
 foo: bar
@@ -237,7 +250,7 @@ foo: bar
 			News: properties,
 		}
 
-		_, err := provider.Check(&req)
+		_, err := provider.Check(ctx, &req)
 		assert.NoError(t, err)
 	})
 
@@ -255,7 +268,7 @@ foo: bar
 			News: properties,
 		}
 
-		_, err := provider.Check(&req)
+		_, err := provider.Check(ctx, &req)
 		assert.NoError(t, err)
 	})
 }
@@ -271,9 +284,8 @@ func TestEnvironment(t *testing.T) {
 			},
 		)
 
-		provider := PulumiServiceEnvironmentResource{
-			Client: mockedClient,
-		}
+		provider := PulumiServiceEnvironmentResource{}
+		ctx := context.WithValue(context.Background(), config.TestClientKey, mockedClient)
 
 		input := PulumiServiceEnvironmentInput{
 			OrgName:     "org",
@@ -297,7 +309,7 @@ func TestEnvironment(t *testing.T) {
 			Properties: outputProperties,
 		}
 
-		resp, err := provider.Read(&req)
+		resp, err := provider.Read(ctx, &req)
 
 		assert.NoError(t, err)
 		assert.Equal(t, resp.Id, "")
@@ -314,9 +326,8 @@ func TestEnvironment(t *testing.T) {
 			},
 		)
 
-		provider := PulumiServiceEnvironmentResource{
-			Client: mockedClient,
-		}
+		provider := PulumiServiceEnvironmentResource{}
+		ctx := context.WithValue(context.Background(), config.TestClientKey, mockedClient)
 
 		input := PulumiServiceEnvironmentInput{
 			OrgName: "org",
@@ -339,7 +350,7 @@ func TestEnvironment(t *testing.T) {
 			Properties: outputProperties,
 		}
 
-		resp, err := provider.Read(&req)
+		resp, err := provider.Read(ctx, &req)
 
 		assert.NoError(t, err)
 		assert.Equal(t, resp.Id, "org/env")
@@ -357,9 +368,8 @@ func TestEnvironmentVersionTag(t *testing.T) {
 			},
 		)
 
-		provider := PulumiServiceEnvironmentVersionTagResource{
-			Client: mockedClient,
-		}
+		provider := PulumiServiceEnvironmentVersionTagResource{}
+		ctx := context.WithValue(context.Background(), config.TestClientKey, mockedClient)
 
 		input := PulumiServiceEnvironmentVersionTagInput{
 			Organization: "org",
@@ -381,7 +391,7 @@ func TestEnvironmentVersionTag(t *testing.T) {
 			Properties: outputProperties,
 		}
 
-		resp, err := provider.Read(&req)
+		resp, err := provider.Read(ctx, &req)
 
 		assert.NoError(t, err)
 		assert.Equal(t, resp.Id, "")
@@ -400,9 +410,8 @@ func TestEnvironmentVersionTag(t *testing.T) {
 			},
 		)
 
-		provider := PulumiServiceEnvironmentVersionTagResource{
-			Client: mockedClient,
-		}
+		provider := PulumiServiceEnvironmentVersionTagResource{}
+		ctx := context.WithValue(context.Background(), config.TestClientKey, mockedClient)
 
 		input := PulumiServiceEnvironmentVersionTagInput{
 			Organization: "org",
@@ -424,7 +433,7 @@ func TestEnvironmentVersionTag(t *testing.T) {
 			Properties: outputProperties,
 		}
 
-		resp, err := provider.Read(&req)
+		resp, err := provider.Read(ctx, &req)
 
 		assert.NoError(t, err)
 		assert.Equal(t, resp.Id, "org/env/tag")

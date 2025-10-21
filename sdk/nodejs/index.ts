@@ -131,10 +131,12 @@ export * from "./types/enums";
 
 // Export sub-modules:
 import * as config from "./config";
+import * as infer from "./infer";
 import * as types from "./types";
 
 export {
     config,
+    infer,
     types,
 };
 

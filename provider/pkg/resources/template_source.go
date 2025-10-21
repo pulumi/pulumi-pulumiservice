@@ -8,15 +8,14 @@ import (
 
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
-type PulumiServiceTemplateSourceResource struct {
-	Client *pulumiapi.Client
-}
+type PulumiServiceTemplateSourceResource struct{}
 
 type PulumiServiceTemplateSourceDestination struct {
 	Url *string
@@ -67,7 +66,7 @@ func (s *PulumiServiceTemplateSourceResource) Name() string {
 	return "pulumiservice:index:TemplateSource"
 }
 
-func (s *PulumiServiceTemplateSourceResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+func (s *PulumiServiceTemplateSourceResource) Diff(ctx context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
 	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
 	if err != nil {
 		return nil, err
@@ -112,21 +111,21 @@ func (s *PulumiServiceTemplateSourceResource) Diff(req *pulumirpc.DiffRequest) (
 	}, nil
 }
 
-func (s *PulumiServiceTemplateSourceResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	ctx := context.Background()
+func (s *PulumiServiceTemplateSourceResource) Delete(ctx context.Context, req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
+	client := config.GetClient[*pulumiapi.Client](ctx)
 	orgName, templateId, err := parseTemplateSourceID(req.Id)
 	if err != nil {
 		return nil, err
 	}
-	err = s.Client.DeleteTemplateSource(ctx, *orgName, *templateId)
+	err = client.DeleteTemplateSource(ctx, *orgName, *templateId)
 	if err != nil {
 		return nil, err
 	}
 	return &pbempty.Empty{}, nil
 }
 
-func (s *PulumiServiceTemplateSourceResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
-	ctx := context.Background()
+func (s *PulumiServiceTemplateSourceResource) Create(ctx context.Context, req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
+	client := config.GetClient[*pulumiapi.Client](ctx)
 	inputMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
@@ -137,7 +136,7 @@ func (s *PulumiServiceTemplateSourceResource) Create(req *pulumirpc.CreateReques
 		return nil, err
 	}
 
-	response, err := s.Client.CreateTemplateSource(ctx, input.OrganizationName, input.toRequest())
+	response, err := client.CreateTemplateSource(ctx, input.OrganizationName, input.toRequest())
 	if err != nil {
 		return nil, err
 	}
@@ -160,12 +159,12 @@ func (s *PulumiServiceTemplateSourceResource) Create(req *pulumirpc.CreateReques
 	}, nil
 }
 
-func (s *PulumiServiceTemplateSourceResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
+func (s *PulumiServiceTemplateSourceResource) Check(ctx context.Context, req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
 	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: nil}, nil
 }
 
-func (s *PulumiServiceTemplateSourceResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	ctx := context.Background()
+func (s *PulumiServiceTemplateSourceResource) Update(ctx context.Context, req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+	client := config.GetClient[*pulumiapi.Client](ctx)
 	inputMap, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
@@ -181,7 +180,7 @@ func (s *PulumiServiceTemplateSourceResource) Update(req *pulumirpc.UpdateReques
 		return nil, err
 	}
 
-	response, err := s.Client.UpdateTemplateSource(ctx, input.OrganizationName, *templateId, input.toRequest())
+	response, err := client.UpdateTemplateSource(ctx, input.OrganizationName, *templateId, input.toRequest())
 	if err != nil {
 		return nil, err
 	}
@@ -203,14 +202,14 @@ func (s *PulumiServiceTemplateSourceResource) Update(req *pulumirpc.UpdateReques
 	}, nil
 }
 
-func (s *PulumiServiceTemplateSourceResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	ctx := context.Background()
+func (s *PulumiServiceTemplateSourceResource) Read(ctx context.Context, req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
+	client := config.GetClient[*pulumiapi.Client](ctx)
 	orgName, templateId, err := parseTemplateSourceID(req.Id)
 	if err != nil {
 		return nil, err
 	}
 
-	response, err := s.Client.GetTemplateSource(ctx, *orgName, *templateId)
+	response, err := client.GetTemplateSource(ctx, *orgName, *templateId)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get template source during Read. org: %s id: %s due to error: %w", *orgName, *templateId, err)
 	}

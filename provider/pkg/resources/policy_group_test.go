@@ -18,6 +18,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
@@ -60,9 +61,11 @@ func (c *PolicyGroupClientMock) DeletePolicyGroup(ctx context.Context, orgName, 
 
 // TestPolicyGroup_Check_Defaults tests that Check applies default values when entityType and mode are not provided
 func TestPolicyGroup_Check_Defaults(t *testing.T) {
-	provider := PulumiServicePolicyGroupResource{
-		Client: &PolicyGroupClientMock{},
-	}
+	provider := PulumiServicePolicyGroupResource{}
+
+	// Create context with mock client
+	mockClient := &PolicyGroupClientMock{}
+	ctx := context.WithValue(context.Background(), config.TestClientKey, mockClient)
 
 	// Create input without entityType and mode
 	inputs := resource.PropertyMap{
@@ -80,7 +83,7 @@ func TestPolicyGroup_Check_Defaults(t *testing.T) {
 		News: inputsStruct,
 	}
 
-	resp, err := provider.Check(req)
+	resp, err := provider.Check(ctx, req)
 	require.NoError(t, err)
 	require.NotNil(t, resp)
 	assert.Empty(t, resp.Failures, "Check should succeed with no failures")
@@ -129,9 +132,11 @@ func TestPolicyGroup_Check_ExplicitValues(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			provider := PulumiServicePolicyGroupResource{
-				Client: &PolicyGroupClientMock{},
-			}
+			provider := PulumiServicePolicyGroupResource{}
+
+			// Create context with mock client
+			mockClient := &PolicyGroupClientMock{}
+			ctx := context.WithValue(context.Background(), config.TestClientKey, mockClient)
 
 			inputs := resource.PropertyMap{
 				"name":             resource.NewStringProperty("test-policy-group"),
@@ -150,7 +155,7 @@ func TestPolicyGroup_Check_ExplicitValues(t *testing.T) {
 				News: inputsStruct,
 			}
 
-			resp, err := provider.Check(req)
+			resp, err := provider.Check(ctx, req)
 			require.NoError(t, err)
 			require.NotNil(t, resp)
 			assert.Empty(t, resp.Failures, "Check should succeed with no failures")
@@ -181,9 +186,11 @@ func TestPolicyGroup_Check_InvalidEntityType(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			provider := PulumiServicePolicyGroupResource{
-				Client: &PolicyGroupClientMock{},
-			}
+			provider := PulumiServicePolicyGroupResource{}
+
+			// Create context with mock client
+			mockClient := &PolicyGroupClientMock{}
+			ctx := context.WithValue(context.Background(), config.TestClientKey, mockClient)
 
 			inputs := resource.PropertyMap{
 				"name":             resource.NewStringProperty("test-policy-group"),
@@ -202,7 +209,7 @@ func TestPolicyGroup_Check_InvalidEntityType(t *testing.T) {
 				News: inputsStruct,
 			}
 
-			resp, err := provider.Check(req)
+			resp, err := provider.Check(ctx, req)
 			require.NoError(t, err)
 			require.NotNil(t, resp)
 			require.NotEmpty(t, resp.Failures, "Check should fail with validation error")
@@ -236,9 +243,11 @@ func TestPolicyGroup_Check_InvalidMode(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			provider := PulumiServicePolicyGroupResource{
-				Client: &PolicyGroupClientMock{},
-			}
+			provider := PulumiServicePolicyGroupResource{}
+
+			// Create context with mock client
+			mockClient := &PolicyGroupClientMock{}
+			ctx := context.WithValue(context.Background(), config.TestClientKey, mockClient)
 
 			inputs := resource.PropertyMap{
 				"name":             resource.NewStringProperty("test-policy-group"),
@@ -257,7 +266,7 @@ func TestPolicyGroup_Check_InvalidMode(t *testing.T) {
 				News: inputsStruct,
 			}
 
-			resp, err := provider.Check(req)
+			resp, err := provider.Check(ctx, req)
 			require.NoError(t, err)
 			require.NotNil(t, resp)
 			require.NotEmpty(t, resp.Failures, "Check should fail with validation error")
@@ -278,9 +287,11 @@ func TestPolicyGroup_Check_InvalidMode(t *testing.T) {
 
 // TestPolicyGroup_Diff_EntityTypeChange tests that changing entityType triggers replacement
 func TestPolicyGroup_Diff_EntityTypeChange(t *testing.T) {
-	provider := PulumiServicePolicyGroupResource{
-		Client: &PolicyGroupClientMock{},
-	}
+	provider := PulumiServicePolicyGroupResource{}
+
+	// Create context with mock client
+	mockClient := &PolicyGroupClientMock{}
+	ctx := context.WithValue(context.Background(), config.TestClientKey, mockClient)
 
 	// Old state: entityType = "stacks"
 	oldInputs := resource.PropertyMap{
@@ -315,7 +326,7 @@ func TestPolicyGroup_Diff_EntityTypeChange(t *testing.T) {
 		News: newState,
 	}
 
-	resp, err := provider.Diff(req)
+	resp, err := provider.Diff(ctx, req)
 	require.NoError(t, err)
 	require.NotNil(t, resp)
 
@@ -325,9 +336,11 @@ func TestPolicyGroup_Diff_EntityTypeChange(t *testing.T) {
 
 // TestPolicyGroup_Diff_ModeChange tests that changing mode triggers replacement
 func TestPolicyGroup_Diff_ModeChange(t *testing.T) {
-	provider := PulumiServicePolicyGroupResource{
-		Client: &PolicyGroupClientMock{},
-	}
+	provider := PulumiServicePolicyGroupResource{}
+
+	// Create context with mock client
+	mockClient := &PolicyGroupClientMock{}
+	ctx := context.WithValue(context.Background(), config.TestClientKey, mockClient)
 
 	// Old state: mode = "audit"
 	oldInputs := resource.PropertyMap{
@@ -362,7 +375,7 @@ func TestPolicyGroup_Diff_ModeChange(t *testing.T) {
 		News: newState,
 	}
 
-	resp, err := provider.Diff(req)
+	resp, err := provider.Diff(ctx, req)
 	require.NoError(t, err)
 	require.NotNil(t, resp)
 

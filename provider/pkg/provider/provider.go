@@ -39,12 +39,12 @@ import (
 )
 
 type PulumiServiceResource interface {
-	Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error)
-	Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error)
-	Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error)
-	Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error)
-	Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error)
-	Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error)
+	Diff(ctx context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error)
+	Create(ctx context.Context, req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error)
+	Delete(ctx context.Context, req *pulumirpc.DeleteRequest) (*pbempty.Empty, error)
+	Check(ctx context.Context, req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error)
+	Update(ctx context.Context, req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error)
+	Read(ctx context.Context, req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error)
 	Name() string
 }
 
@@ -58,6 +58,7 @@ type pulumiserviceProvider struct {
 	pulumiResources []PulumiServiceResource
 	AccessToken     string
 	client          *pulumiapi.Client
+	escClient       esc_client.Client
 }
 
 func MakeProvider(host *provider.HostClient, name, version, schema string) (pulumirpc.ResourceProviderServer, error) {
@@ -131,73 +132,36 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 		return nil, err
 	}
 
-	// Store the client for use in Invoke functions
+	// Store the clients for use in Invoke functions and context middleware
 	k.client = client
+	k.escClient = escClient
 
+	// Resources are instantiated as empty structs following the context-based client injection pattern.
+	// Clients are obtained from context via config.GetClient[T](ctx) in each resource method.
+	// This pattern matches Ian's PR #258 implementation.
 	k.pulumiResources = []PulumiServiceResource{
-		&resources.PulumiServiceTeamResource{
-			Client: client,
-		},
-		&resources.PulumiServiceAccessTokenResource{
-			Client: client,
-		},
-		&resources.PulumiServiceWebhookResource{
-			Client: client,
-		},
-		&resources.PulumiServiceStackTagResource{
-			Client: client,
-		},
-		&resources.TeamStackPermissionResource{
-			Client: client,
-		},
-		&resources.PulumiServiceTeamAccessTokenResource{
-			Client: client,
-		},
-		&resources.PulumiServiceOrgAccessTokenResource{
-			Client: client,
-		},
-		&resources.PulumiServiceDeploymentSettingsResource{
-			Client: client,
-		},
-		&resources.PulumiServiceAgentPoolResource{
-			Client: client,
-		},
-		&resources.PulumiServiceDeploymentScheduleResource{
-			Client: client,
-		},
-		&resources.PulumiServiceDriftScheduleResource{
-			Client: client,
-		},
-		&resources.PulumiServiceTtlScheduleResource{
-			Client: client,
-		},
-		&resources.PulumiServiceEnvironmentResource{
-			Client: escClient,
-		},
-		&resources.PulumiServiceTeamEnvironmentPermissionResource{
-			Client: client,
-		},
-		&resources.PulumiServiceEnvironmentVersionTagResource{
-			Client: escClient,
-		},
-		&resources.PulumiServiceStackResource{
-			Client: client,
-		},
-		&resources.PulumiServiceTemplateSourceResource{
-			Client: client,
-		},
-		&resources.PulumiServiceOidcIssuerResource{
-			Client: client,
-		},
-		&resources.PulumiServiceEnvironmentRotationScheduleResource{
-			Client: client,
-		},
-		&resources.PulumiServiceApprovalRuleResource{
-			Client: client,
-		},
-		&resources.PulumiServicePolicyGroupResource{
-			Client: client,
-		},
+		&resources.PulumiServiceTeamResource{},
+		&resources.PulumiServiceAccessTokenResource{},
+		&resources.PulumiServiceWebhookResource{},
+		// StackTag has been migrated to infer - see provider/pkg/infer/stack_tag.go
+		// and is registered in hybrid.go buildInferOptions()
+		&resources.TeamStackPermissionResource{},
+		&resources.PulumiServiceTeamAccessTokenResource{},
+		&resources.PulumiServiceOrgAccessTokenResource{},
+		&resources.PulumiServiceDeploymentSettingsResource{},
+		&resources.PulumiServiceAgentPoolResource{},
+		&resources.PulumiServiceDeploymentScheduleResource{},
+		&resources.PulumiServiceDriftScheduleResource{},
+		&resources.PulumiServiceTtlScheduleResource{},
+		&resources.PulumiServiceEnvironmentResource{},
+		&resources.PulumiServiceTeamEnvironmentPermissionResource{},
+		&resources.PulumiServiceEnvironmentVersionTagResource{},
+		&resources.PulumiServiceStackResource{},
+		&resources.PulumiServiceTemplateSourceResource{},
+		&resources.PulumiServiceOidcIssuerResource{},
+		&resources.PulumiServiceEnvironmentRotationScheduleResource{},
+		&resources.PulumiServiceApprovalRuleResource{},
+		&resources.PulumiServicePolicyGroupResource{},
 	}
 
 	return &pulumirpc.ConfigureResponse{
@@ -228,35 +192,35 @@ func (k *pulumiserviceProvider) Invoke(ctx context.Context, req *pulumirpc.Invok
 func (k *pulumiserviceProvider) Check(ctx context.Context, req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
 	rn := getResourceNameFromRequest(req)
 	res := k.getPulumiServiceResource(rn)
-	return res.Check(req)
+	return res.Check(ctx, req)
 }
 
 // Diff checks what impacts a hypothetical update will have on the resource's properties.
 func (k *pulumiserviceProvider) Diff(ctx context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
 	rn := getResourceNameFromRequest(req)
 	res := k.getPulumiServiceResource(rn)
-	return res.Diff(req)
+	return res.Diff(ctx, req)
 }
 
 // Create allocates a new instance of the provided resource and returns its unique ID afterwards.
 func (k *pulumiserviceProvider) Create(ctx context.Context, req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	rn := getResourceNameFromRequest(req)
 	res := k.getPulumiServiceResource(rn)
-	return res.Create(req)
+	return res.Create(ctx, req)
 }
 
 // Read the current live state associated with a resource.
 func (k *pulumiserviceProvider) Read(ctx context.Context, req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
 	rn := getResourceNameFromRequest(req)
 	res := k.getPulumiServiceResource(rn)
-	return res.Read(req)
+	return res.Read(ctx, req)
 }
 
 // Update updates an existing resource with new values.
 func (k *pulumiserviceProvider) Update(ctx context.Context, req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
 	rn := getResourceNameFromRequest(req)
 	res := k.getPulumiServiceResource(rn)
-	return res.Update(req)
+	return res.Update(ctx, req)
 }
 
 // Delete tears down an existing resource with the given ID.  If it fails, the resource is assumed
@@ -264,7 +228,7 @@ func (k *pulumiserviceProvider) Update(ctx context.Context, req *pulumirpc.Updat
 func (k *pulumiserviceProvider) Delete(ctx context.Context, req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
 	rn := getResourceNameFromRequest(req)
 	res := k.getPulumiServiceResource(rn)
-	return res.Delete(req)
+	return res.Delete(ctx, req)
 }
 
 // GetPluginInfo returns generic information about this plugin, like its version.

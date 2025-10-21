@@ -38,8 +38,11 @@ from . import outputs
 if typing.TYPE_CHECKING:
     import pulumi_pulumiservice.config as __config
     config = __config
+    import pulumi_pulumiservice.infer as __infer
+    infer = __infer
 else:
     config = _utilities.lazy_import('pulumi_pulumiservice.config')
+    infer = _utilities.lazy_import('pulumi_pulumiservice.infer')
 
 _utilities.register(
     resource_modules="""
@@ -70,6 +73,14 @@ _utilities.register(
    "pulumiservice:index:TemplateSource": "TemplateSource",
    "pulumiservice:index:TtlSchedule": "TtlSchedule",
    "pulumiservice:index:Webhook": "Webhook"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "infer",
+  "fqn": "pulumi_pulumiservice.infer",
+  "classes": {
+   "pulumiservice:infer:StackTag": "StackTag"
   }
  }
 ]

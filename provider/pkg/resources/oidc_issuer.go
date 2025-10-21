@@ -8,6 +8,7 @@ import (
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/structpb"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
@@ -15,9 +16,7 @@ import (
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
-type PulumiServiceOidcIssuerResource struct {
-	Client pulumiapi.OidcClient
-}
+type PulumiServiceOidcIssuerResource struct{}
 
 type AuthPolicyDecision string
 
@@ -117,7 +116,7 @@ func (oir *PulumiServiceOidcIssuerResource) Name() string {
 	return "pulumiservice:index:OidcIssuer"
 }
 
-func (oir *PulumiServiceOidcIssuerResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+func (oir *PulumiServiceOidcIssuerResource) Diff(ctx context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
 	replaceProperties := map[string]bool{
 		"organization": true,
 		"url":          true,
@@ -126,14 +125,14 @@ func (oir *PulumiServiceOidcIssuerResource) Diff(req *pulumirpc.DiffRequest) (*p
 	return util.StandardDiff(req, replaceProperties)
 }
 
-func (oir *PulumiServiceOidcIssuerResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	ctx := context.Background()
+func (oir *PulumiServiceOidcIssuerResource) Delete(ctx context.Context, req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
+	client := config.GetClient[pulumiapi.OidcClient](ctx)
 	organization, issuerId, err := splitIssuerId(req.Id)
 	if err != nil {
 		return nil, err
 	}
 
-	err = oir.Client.DeleteOidcIssuer(ctx, *organization, *issuerId)
+	err = client.DeleteOidcIssuer(ctx, *organization, *issuerId)
 	if err != nil {
 		return nil, err
 	}
@@ -141,8 +140,8 @@ func (oir *PulumiServiceOidcIssuerResource) Delete(req *pulumirpc.DeleteRequest)
 	return &pbempty.Empty{}, nil
 }
 
-func (oir *PulumiServiceOidcIssuerResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
-	ctx := context.Background()
+func (oir *PulumiServiceOidcIssuerResource) Create(ctx context.Context, req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
+	client := config.GetClient[pulumiapi.OidcClient](ctx)
 	inputMap, err := plugin.UnmarshalProperties(req.GetProperties(), util.StandardUnmarshal)
 	if err != nil {
 		return nil, err
@@ -150,13 +149,13 @@ func (oir *PulumiServiceOidcIssuerResource) Create(req *pulumirpc.CreateRequest)
 
 	// Create OIDC Issuer itself
 	input := oir.ToPulumiServiceOidcIssuerInput(inputMap)
-	registerResponse, err := oir.Client.RegisterOidcIssuer(ctx, input.Organization, input.toCreateRequest())
+	registerResponse, err := client.RegisterOidcIssuer(ctx, input.Organization, input.toCreateRequest())
 	if err != nil {
 		return nil, fmt.Errorf("error creating oidc issuer '%s': %s", input.Name, err.Error())
 	}
 
 	// Retrieve policy ID
-	authPolicy, err := oir.Client.GetAuthPolicies(ctx, input.Organization, registerResponse.ID)
+	authPolicy, err := client.GetAuthPolicies(ctx, input.Organization, registerResponse.ID)
 	if err != nil {
 		return nil, fmt.Errorf("error retrieving auth policies for oidc issuer '%s': %s", registerResponse.ID, err.Error())
 	}
@@ -164,10 +163,10 @@ func (oir *PulumiServiceOidcIssuerResource) Create(req *pulumirpc.CreateRequest)
 	// If user has provided policies, update with those, otherwise use the default one
 	if len(input.Policies) > 0 {
 		request := policiesToApiRequest(input.Policies)
-		authPolicy, err = oir.Client.UpdateAuthPolicies(ctx, input.Organization, authPolicy.ID, request)
+		authPolicy, err = client.UpdateAuthPolicies(ctx, input.Organization, authPolicy.ID, request)
 		if err != nil {
 			// To prevent resource being stuck in limbo, best-effort delete the issuer if policies were invalid
-			_ = oir.Client.DeleteOidcIssuer(ctx, input.Organization, registerResponse.ID)
+			_ = client.DeleteOidcIssuer(ctx, input.Organization, registerResponse.ID)
 
 			return nil, fmt.Errorf("error updating auth policies for oidc issuer '%s': %s", registerResponse.ID, err.Error())
 		}
@@ -184,7 +183,7 @@ func (oir *PulumiServiceOidcIssuerResource) Create(req *pulumirpc.CreateRequest)
 	}, nil
 }
 
-func (oir *PulumiServiceOidcIssuerResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
+func (oir *PulumiServiceOidcIssuerResource) Check(ctx context.Context, req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
 	// This conversion to and from is needed to sort policies on input
 	inputMap, err := plugin.UnmarshalProperties(req.GetNews(), util.StandardUnmarshal)
 	if err != nil {
@@ -198,8 +197,8 @@ func (oir *PulumiServiceOidcIssuerResource) Check(req *pulumirpc.CheckRequest) (
 	return &pulumirpc.CheckResponse{Inputs: inputs, Failures: nil}, nil
 }
 
-func (oir *PulumiServiceOidcIssuerResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	ctx := context.Background()
+func (oir *PulumiServiceOidcIssuerResource) Update(ctx context.Context, req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+	client := config.GetClient[pulumiapi.OidcClient](ctx)
 	inputMap, err := plugin.UnmarshalProperties(req.GetNews(), util.StandardUnmarshal)
 	if err != nil {
 		return nil, err
@@ -212,13 +211,13 @@ func (oir *PulumiServiceOidcIssuerResource) Update(req *pulumirpc.UpdateRequest)
 
 	// Update OIDC Issuer itself
 	input := oir.ToPulumiServiceOidcIssuerInput(inputMap)
-	updateResponse, err := oir.Client.UpdateOidcIssuer(ctx, input.Organization, *issuerId, input.toUpdateRequest())
+	updateResponse, err := client.UpdateOidcIssuer(ctx, input.Organization, *issuerId, input.toUpdateRequest())
 	if err != nil {
 		return nil, fmt.Errorf("error creating oidc issuer '%s': %s", input.Name, err.Error())
 	}
 
 	// Retrieve policy ID
-	authPolicy, err := oir.Client.GetAuthPolicies(ctx, input.Organization, *issuerId)
+	authPolicy, err := client.GetAuthPolicies(ctx, input.Organization, *issuerId)
 	if err != nil {
 		return nil, fmt.Errorf("error retrieving auth policies for oidc issuer '%s': %s", *issuerId, err.Error())
 	}
@@ -226,7 +225,7 @@ func (oir *PulumiServiceOidcIssuerResource) Update(req *pulumirpc.UpdateRequest)
 	// If user has provided policies, update with those, otherwise use the default one
 	if len(input.Policies) > 0 {
 		request := policiesToApiRequest(input.Policies)
-		authPolicy, err = oir.Client.UpdateAuthPolicies(ctx, input.Organization, authPolicy.ID, request)
+		authPolicy, err = client.UpdateAuthPolicies(ctx, input.Organization, authPolicy.ID, request)
 		if err != nil {
 			return nil, fmt.Errorf("error updating auth policies for oidc issuer '%s': %s", *issuerId, err.Error())
 		}
@@ -242,15 +241,15 @@ func (oir *PulumiServiceOidcIssuerResource) Update(req *pulumirpc.UpdateRequest)
 	}, nil
 }
 
-func (oir *PulumiServiceOidcIssuerResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	ctx := context.Background()
+func (oir *PulumiServiceOidcIssuerResource) Read(ctx context.Context, req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
+	client := config.GetClient[pulumiapi.OidcClient](ctx)
 
 	organization, issuerId, err := splitIssuerId(req.Id)
 	if err != nil {
 		return nil, err
 	}
 
-	readResponse, err := oir.Client.GetOidcIssuer(ctx, *organization, *issuerId)
+	readResponse, err := client.GetOidcIssuer(ctx, *organization, *issuerId)
 	if err != nil {
 		return nil, err
 	}
@@ -258,7 +257,7 @@ func (oir *PulumiServiceOidcIssuerResource) Read(req *pulumirpc.ReadRequest) (*p
 		return &pulumirpc.ReadResponse{}, nil
 	}
 
-	authPolicy, err := oir.Client.GetAuthPolicies(ctx, *organization, *issuerId)
+	authPolicy, err := client.GetAuthPolicies(ctx, *organization, *issuerId)
 	if err != nil {
 		return nil, fmt.Errorf("error retrieving auth policies for oidc issuer '%s': %s", *issuerId, err.Error())
 	}
