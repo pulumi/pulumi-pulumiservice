@@ -88,8 +88,16 @@ func (c *EscClientMock) GetPulumiAccountDetails(context.Context) (string, []stri
 	return "", nil, nil, nil
 }
 
-func (c *EscClientMock) ListEnvironments(context.Context, string, string) ([]client.OrgEnvironment, string, error) {
+func (c *EscClientMock) ListEnvironments(context.Context, string) ([]client.OrgEnvironment, string, error) {
 	return nil, "", nil
+}
+
+func (c *EscClientMock) ListOrganizationEnvironments(context.Context, string, string) ([]client.OrgEnvironment, string, error) {
+	return nil, "", nil
+}
+
+func (c *EscClientMock) RotateEnvironment(context.Context, string, string, string, []string) (*client.RotateEnvironmentResponse, []client.EnvironmentDiagnostic, error) {
+	return nil, nil, nil
 }
 
 func (c *EscClientMock) ListEnvironmentRevisions(ctx context.Context, orgName, projectName, envName string, options client.ListEnvironmentRevisionsOptions) ([]client.EnvironmentRevision, error) {
@@ -153,6 +161,42 @@ func (c *EscClientMock) DeleteEnvironmentRevisionTag(ctx context.Context, orgNam
 }
 
 func (c *EscClientMock) RetractEnvironmentRevision(ctx context.Context, orgName, projectName, envName string, version string, replacement *int, reason string) error {
+	return nil
+}
+
+func (c *EscClientMock) CreateEnvironmentDraft(ctx context.Context, orgName, projectName, envName string, yaml []byte, etag string) (string, []client.EnvironmentDiagnostic, error) {
+	return "", nil, nil
+}
+
+func (c *EscClientMock) GetEnvironmentDraft(ctx context.Context, orgName, projectName, envName, changeRequestID string) (yaml []byte, etag string, err error) {
+	return nil, "", nil
+}
+
+func (c *EscClientMock) UpdateEnvironmentDraft(ctx context.Context, orgName, projectName, envName, changeRequestID string, yaml []byte, etag string) ([]client.EnvironmentDiagnostic, error) {
+	return nil, nil
+}
+
+func (c *EscClientMock) DeleteEnvironmentDraft(ctx context.Context, orgName, projectName, envName, changeRequestID string) error {
+	return nil
+}
+
+func (c *EscClientMock) GetDefaultOrg(ctx context.Context) (string, error) {
+	return "", nil
+}
+
+func (c *EscClientMock) CloneEnvironmentWithProject(ctx context.Context, orgName, srcEnvProject, srcEnvName string, destEnv client.CloneEnvironmentRequest) error {
+	return nil
+}
+
+func (c *EscClientMock) EnvironmentExistsWithProject(ctx context.Context, orgName, projectName, envName string) (bool, error) {
+	return false, nil
+}
+
+func (c *EscClientMock) OpenEnvironmentDraft(ctx context.Context, orgName, projectName, envName, changeRequestID string, duration time.Duration) (string, []client.EnvironmentDiagnostic, error) {
+	return "", nil, nil
+}
+
+func (c *EscClientMock) SubmitChangeRequest(ctx context.Context, orgName, changeRequestID string, description *string) error {
 	return nil
 }
 

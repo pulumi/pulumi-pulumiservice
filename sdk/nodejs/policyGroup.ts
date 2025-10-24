@@ -37,19 +37,19 @@ export class PolicyGroup extends pulumi.CustomResource {
     /**
      * The name of the policy group.
      */
-    public readonly name!: pulumi.Output<string>;
+    declare public readonly name: pulumi.Output<string>;
     /**
      * The name of the Pulumi organization the policy group belongs to.
      */
-    public readonly organizationName!: pulumi.Output<string>;
+    declare public readonly organizationName: pulumi.Output<string>;
     /**
      * List of policy packs applied to this policy group.
      */
-    public readonly policyPacks!: pulumi.Output<{[key: string]: string}[]>;
+    declare public readonly policyPacks: pulumi.Output<{[key: string]: string}[]>;
     /**
      * List of stack references that belong to this policy group.
      */
-    public readonly stacks!: pulumi.Output<{[key: string]: string}[]>;
+    declare public readonly stacks: pulumi.Output<{[key: string]: string}[]>;
 
     /**
      * Create a PolicyGroup resource with the given unique name, arguments, and options.
@@ -62,16 +62,16 @@ export class PolicyGroup extends pulumi.CustomResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
-            if ((!args || args.name === undefined) && !opts.urn) {
+            if (args?.name === undefined && !opts.urn) {
                 throw new Error("Missing required property 'name'");
             }
-            if ((!args || args.organizationName === undefined) && !opts.urn) {
+            if (args?.organizationName === undefined && !opts.urn) {
                 throw new Error("Missing required property 'organizationName'");
             }
-            resourceInputs["name"] = args ? args.name : undefined;
-            resourceInputs["organizationName"] = args ? args.organizationName : undefined;
-            resourceInputs["policyPacks"] = args ? args.policyPacks : undefined;
-            resourceInputs["stacks"] = args ? args.stacks : undefined;
+            resourceInputs["name"] = args?.name;
+            resourceInputs["organizationName"] = args?.organizationName;
+            resourceInputs["policyPacks"] = args?.policyPacks;
+            resourceInputs["stacks"] = args?.stacks;
         } else {
             resourceInputs["name"] = undefined /*out*/;
             resourceInputs["organizationName"] = undefined /*out*/;

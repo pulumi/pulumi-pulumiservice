@@ -58,6 +58,7 @@ type pulumiserviceProvider struct {
 	pulumiResources []PulumiServiceResource
 	AccessToken     string
 	client          *pulumiapi.Client
+	escClient       esc_client.Client
 }
 
 func MakeProvider(host *provider.HostClient, name, version, schema string) (pulumirpc.ResourceProviderServer, error) {
@@ -131,8 +132,9 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 		return nil, err
 	}
 
-	// Store the client for use in Invoke functions
+	// Store the clients for use in Invoke functions and context middleware
 	k.client = client
+	k.escClient = escClient
 
 	k.pulumiResources = []PulumiServiceResource{
 		&resources.PulumiServiceTeamResource{
@@ -217,13 +219,6 @@ func (k *pulumiserviceProvider) Invoke(ctx context.Context, req *pulumirpc.Invok
 	default:
 		return nil, fmt.Errorf("unknown Invoke token '%s'", tok)
 	}
-}
-
-// StreamInvoke dynamically executes a built-in function in the provider. The result is streamed
-// back as a series of messages.
-func (k *pulumiserviceProvider) StreamInvoke(req *pulumirpc.InvokeRequest, server pulumirpc.ResourceProvider_StreamInvokeServer) error {
-	tok := req.GetTok()
-	return fmt.Errorf("unknown StreamInvoke token '%s'", tok)
 }
 
 // Check validates that the given property bag is valid for a resource of the given type and returns

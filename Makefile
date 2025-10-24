@@ -42,9 +42,10 @@ provider_debug::
 test_provider::
 	cd provider/pkg && go test -short -v -count=1 -cover -timeout 2h -parallel ${TESTPARALLELISM} ./...
 
+dotnet_sdk: export PULUMI_IGNORE_AMBIENT_PLUGINS = true
 dotnet_sdk: gen_sdk_prerequisites
 	rm -rf sdk/dotnet
-	$(PULUMI) package gen-sdk bin/$(PROVIDER) --language dotnet
+	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language dotnet --version $(VERSION_GENERIC)
 	cd sdk/dotnet/ && \
 		echo "module fake_dotnet_module // Exclude this directory from Go tools\n\ngo 1.17" > go.mod && \
 		echo "${VERSION_GENERIC}" >version.txt && \
