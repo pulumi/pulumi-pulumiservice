@@ -19,47 +19,61 @@ For now, PSP is in public preview, but we're working on releasing v1.0 in the ne
 
 This package is available in many languages in the standard packaging formats.
 
-### Node.js (Java/TypeScript)
+### Node.js (Javascript/TypeScript)
 
 To use from JavaScript or TypeScript in Node.js, install using either `npm`:
 
-    $ npm install @pulumi/pulumiservice
+```sh
+npm install @pulumi/pulumiservice
+```
 
 or `yarn`:
 
-    $ yarn add @pulumi/pulumiservice
+```sh
+yarn add @pulumi/pulumiservice
+```
 
 ### Python
 
 To use from Python, install using `pip`:
 
-    $ pip install pulumi_pulumiservice
+```sh
+pip install pulumi_pulumiservice
+```
 
 ### Go
 
 To use from Go, use `go get` to grab the latest version of the library
 
-    $ go get github.com/pulumi/pulumi-pulumiservice/sdk/go
+```sh
+go get github.com/pulumi/pulumi-pulumiservice/sdk/go
+```
 
 ### .NET
 
 To use from .NET, install using `dotnet add package`:
 
-    $ dotnet add package Pulumi.PulumiService
+```sh
+dotnet add package Pulumi.PulumiService
+```
 
 ### Java
 
 To use from Java, add an entry to your `build.gradle` file:
 
-    $ implementation 'com.pulumi:pulumiservice:%Fill in latest version from the badge up top%'
-    
+```groovy
+implementation 'com.pulumi:pulumiservice:%Fill in latest version from the badge up top%'
+```
+
 Or to your `pom.xml` file:
 
-    $   <dependency>
-    $       <groupId>com.pulumi</groupId>
-    $       <artifactId>pulumiservice</artifactId>
-    $       <version>%Fill in latest version from the badge up top%</version>
-    $   </dependency>
+```xml
+<dependency>
+    <groupId>com.pulumi</groupId>
+    <artifactId>pulumiservice</artifactId>
+    <version>%Fill in latest version from the badge up top%</version>
+</dependency>
+```
 
 ## Setup
 
@@ -94,7 +108,7 @@ const team = new service.Team("team", {
         "casey"
         "evan",
         "devon",
-        "meagan"
+        "meagan",
         "myles",
         "steve"
     ],
@@ -104,3 +118,8 @@ export const members = team.members;
 ```
 
 Check out the [examples/](examples/) directory for more examples.
+
+[1]: https://www.pulumi.com/registry/packages/pulumiservice/api-docs/provider/
+[2]: https://www.pulumi.com/docs/pulumi-cloud/access-management/access-tokens/
+[3]: https://www.pulumi.com/docs/pulumi-cloud/reference/cloud-rest-api/
+[4]: https://www.pulumi.com/docs/pulumi-cloud/self-hosted/
