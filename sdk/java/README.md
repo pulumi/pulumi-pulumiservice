@@ -55,11 +55,11 @@ To use from Java, add an entry to your `build.gradle` file:
     
 Or to your `pom.xml` file:
 
-    $   <dependency>
-    $       <groupId>com.pulumi</groupId>
-    $       <artifactId>pulumiservice</artifactId>
-    $       <version>%Fill in latest version from the badge up top%</version>
-    $   </dependency>
+    <dependency>
+        <groupId>com.pulumi</groupId>
+        <artifactId>pulumiservice</artifactId>
+        <version>%Fill in latest version from the badge up top%</version>
+    </dependency>
 
 ## Setup
 
@@ -91,10 +91,10 @@ const team = new service.Team("team", {
     members: [
         "piers",
         "bryce",
-        "casey"
+        "casey",
         "evan",
         "devon",
-        "meagan"
+        "meagan",
         "myles",
         "steve"
     ],
