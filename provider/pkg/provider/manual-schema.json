@@ -982,6 +982,94 @@
         "description"
       ]
     },
+    "pulumiservice:index:InsightsAccount": {
+      "description": "Insights Account for cloud resource scanning and analysis",
+      "properties": {
+        "insightsAccountId": {
+          "description": "The insights account identifier.",
+          "type": "string"
+        },
+        "accountName": {
+          "description": "The name of the insights account.",
+          "type": "string"
+        },
+        "organizationName": {
+          "description": "The organization's name.",
+          "type": "string"
+        },
+        "provider": {
+          "description": "The cloud provider (e.g., 'aws', 'azure', 'gcp').",
+          "type": "string"
+        },
+        "providerVersion": {
+          "description": "The provider version used for scanning.",
+          "type": "string"
+        },
+        "environment": {
+          "description": "The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0').",
+          "type": "string"
+        },
+        "cron": {
+          "description": "Optional cron expression for scheduled scanning.",
+          "type": "string"
+        },
+        "scheduledScanEnabled": {
+          "description": "Whether scheduled scanning is enabled.",
+          "type": "boolean"
+        },
+        "providerConfig": {
+          "description": "Provider-specific configuration as a JSON object.",
+          "$ref": "pulumi.json#/Any"
+        }
+      },
+      "required": [
+        "insightsAccountId",
+        "accountName",
+        "organizationName",
+        "provider",
+        "environment",
+        "scheduledScanEnabled"
+      ],
+      "inputProperties": {
+        "accountName": {
+          "description": "Name of the insights account.",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "organizationName": {
+          "description": "The organization's name.",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "provider": {
+          "description": "The cloud provider (e.g., 'aws', 'azure', 'gcp').",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "environment": {
+          "description": "The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0').",
+          "type": "string"
+        },
+        "cron": {
+          "description": "Optional cron expression for scheduled scanning.",
+          "type": "string"
+        },
+        "providerConfig": {
+          "description": "Provider-specific configuration as a JSON object.",
+          "$ref": "pulumi.json#/Any"
+        }
+      },
+      "requiredInputs": [
+        "accountName",
+        "organizationName",
+        "provider",
+        "environment"
+      ],
+      "methods": {
+        "triggerScan": "pulumiservice:index:InsightsAccount/triggerScan",
+        "getStatus": "pulumiservice:index:InsightsAccount/getStatus"
+      }
+    },
     "pulumiservice:index:TeamAccessToken": {
       "description": "The Pulumi Cloud allows users to create access tokens scoped to team. Team access tokens is a resource to create them and assign them to a team",
       "properties": {
@@ -2434,6 +2522,82 @@
           "displayName",
           "version"
         ]
+      }
+    },
+    "pulumiservice:index:InsightsAccount/triggerScan": {
+      "description": "Triggers an on-demand scan of the insights account's cloud resources.",
+      "inputs": {
+        "properties": {
+          "__self__": {
+            "$ref": "#/resources/pulumiservice:index:InsightsAccount"
+          }
+        },
+        "required": ["__self__"]
+      },
+      "outputs": {
+        "properties": {
+          "scanId": {
+            "type": "string",
+            "description": "The unique identifier for the triggered scan (may be empty if scan is queued but ID not yet assigned)."
+          },
+          "status": {
+            "type": "string",
+            "description": "The status of the scan request (e.g., 'queued', 'running', 'succeeded', 'failed')."
+          },
+          "message": {
+            "type": "string",
+            "description": "Optional message about the scan trigger."
+          },
+          "timestamp": {
+            "type": "string",
+            "description": "The timestamp when the scan was triggered."
+          }
+        },
+        "required": ["status"]
+      }
+    },
+    "pulumiservice:index:InsightsAccount/getStatus": {
+      "description": "Retrieves the current status of the insights account, including information about the last scan.",
+      "inputs": {
+        "properties": {
+          "__self__": {
+            "$ref": "#/resources/pulumiservice:index:InsightsAccount"
+          }
+        },
+        "required": ["__self__"]
+      },
+      "outputs": {
+        "properties": {
+          "accountId": {
+            "type": "string",
+            "description": "The insights account identifier."
+          },
+          "accountName": {
+            "type": "string",
+            "description": "The name of the insights account."
+          },
+          "status": {
+            "type": "string",
+            "description": "The current status of the account (e.g., 'active', 'scanning', 'idle')."
+          },
+          "lastScanId": {
+            "type": "string",
+            "description": "The identifier of the last completed scan."
+          },
+          "lastScanTime": {
+            "type": "string",
+            "description": "The timestamp of the last completed scan."
+          },
+          "nextScanTime": {
+            "type": "string",
+            "description": "The timestamp of the next scheduled scan (if scheduled scanning is enabled)."
+          },
+          "resourceCount": {
+            "type": "integer",
+            "description": "The number of resources discovered in the last scan."
+          }
+        },
+        "required": ["accountId", "accountName", "status"]
       }
     }
   }
