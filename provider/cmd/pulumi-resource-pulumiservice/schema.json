@@ -1533,6 +1533,91 @@
         "tagName"
       ]
     },
+    "pulumiservice:index:InsightsAccount": {
+      "description": "Insights Account for cloud resource scanning and analysis",
+      "properties": {
+        "accountName": {
+          "type": "string",
+          "description": "The name of the insights account."
+        },
+        "cron": {
+          "type": "string",
+          "description": "Optional cron expression for scheduled scanning."
+        },
+        "environment": {
+          "type": "string",
+          "description": "The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0')."
+        },
+        "insightsAccountId": {
+          "type": "string",
+          "description": "The insights account identifier."
+        },
+        "organizationName": {
+          "type": "string",
+          "description": "The organization's name."
+        },
+        "provider": {
+          "type": "string",
+          "description": "The cloud provider (e.g., 'aws', 'azure', 'gcp')."
+        },
+        "providerConfig": {
+          "$ref": "pulumi.json#/Any",
+          "description": "Provider-specific configuration as a JSON object."
+        },
+        "providerVersion": {
+          "type": "string",
+          "description": "The provider version used for scanning."
+        },
+        "scheduledScanEnabled": {
+          "type": "boolean",
+          "description": "Whether scheduled scanning is enabled."
+        }
+      },
+      "type": "object",
+      "required": [
+        "accountName",
+        "environment",
+        "insightsAccountId",
+        "organizationName",
+        "provider",
+        "scheduledScanEnabled"
+      ],
+      "inputProperties": {
+        "accountName": {
+          "type": "string",
+          "description": "Name of the insights account.",
+          "willReplaceOnChanges": true
+        },
+        "cron": {
+          "type": "string",
+          "description": "Optional cron expression for scheduled scanning."
+        },
+        "environment": {
+          "type": "string",
+          "description": "The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0')."
+        },
+        "organizationName": {
+          "type": "string",
+          "description": "The organization's name.",
+          "willReplaceOnChanges": true
+        },
+        "provider": {
+          "type": "string",
+          "description": "The cloud provider (e.g., 'aws', 'azure', 'gcp').",
+          "willReplaceOnChanges": true
+        },
+        "providerConfig": {
+          "$ref": "pulumi.json#/Any",
+          "description": "Provider-specific configuration as a JSON object."
+        }
+      },
+      "requiredInputs": [
+        "accountName",
+        "environment",
+        "organizationName",
+        "provider"
+      ]
+    },
     "pulumiservice:index:OidcIssuer": {
       "description": "Register an OIDC Provider to establish a trust relationship between third-party systems like GitHub Actions and Pulumi Cloud, obviating the need to store a hard-coded Pulumi Cloud token in systems that need to run Pulumi commands or consume Pulumi Cloud APIs. Instead of a hard-coded, static token that must be manually rotated, trusted systems are granted temporary Pulumi Cloud tokens on an as-needed basis, which is more secure than static tokens.",
       "properties": {

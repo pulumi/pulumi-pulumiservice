@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/pulumi/pulumi/pkg/v3/testing/integration"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestAccessTokenExample(t *testing.T) {
@@ -166,6 +167,43 @@ func TestNodejsApprovalRulesExample(t *testing.T) {
 		},
 		Dependencies: []string{
 			"@pulumi/pulumiservice",
+		},
+	})
+}
+
+func TestNodejsInsightsAccountMethodsExample(t *testing.T) {
+	cwd := getCwd(t)
+	digits := generateRandomFiveDigits()
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Quick: true, // Skip extra preview/update/refresh to avoid 409 conflicts from calling triggerScan() multiple times
+		Dir:   path.Join(cwd, ".", "ts-insights-account-methods"),
+		Config: map[string]string{
+			"digits":           digits,
+			"organizationName": getOrgName(),
+		},
+		Dependencies: []string{
+			"@pulumi/pulumiservice",
+		},
+		ExtraRuntimeValidation: func(t *testing.T, stackInfo integration.RuntimeValidationStackInfo) {
+			// Verify resource method outputs are present
+			outputs := stackInfo.Outputs
+
+			// Verify triggerScan() method outputs
+			// scanId is optional (HTTP 204 responses don't include it)
+			if scanId, ok := outputs["scanId"].(string); ok {
+				assert.NotEmpty(t, scanId, "scanId should not be empty if present")
+			}
+
+			// scanStatus is required
+			scanStatus, ok := outputs["scanStatus"].(string)
+			assert.True(t, ok, "scanStatus should be a string")
+			assert.NotEmpty(t, scanStatus, "scanStatus should not be empty")
+			assert.Contains(t, []string{"queued", "running", "succeeded", "failed"}, scanStatus, "scanStatus should be a valid workflow status")
+
+			// scanTimestamp is optional
+			if timestamp, ok := outputs["scanTimestamp"].(string); ok {
+				assert.NotEmpty(t, timestamp, "scanTimestamp should not be empty if present")
+			}
 		},
 	})
 }
