@@ -2361,9 +2361,9 @@
       "dependencies": {
         "com.google.code.findbugs:jsr305": "3.0.2",
         "com.google.code.gson:gson": "2.8.9",
-        "com.pulumi:pulumi": "0.9.9"
+        "com.pulumi:pulumi": "1.16.2"
       },
-      "gradleNexusPublishPluginVersion": "1.1.0",
+      "gradleNexusPublishPluginVersion": "2.0.0",
       "gradleTest": ""
     },
     "nodejs": {

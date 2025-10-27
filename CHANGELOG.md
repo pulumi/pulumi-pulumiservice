@@ -4,6 +4,8 @@
 
 ### Improvements
 
+- Added Java SDK support with Pulumi Java SDK v1.16.2
+
 ### Bug Fixes
 
 - Fixed PolicyGroup creation to include required entityType and mode fields [#563](https://github.com/pulumi/pulumi-pulumiservice/issues/563)
@@ -13,6 +15,7 @@
 ### Improvements
 
 - Added PolicyGroup resource and getPolicyPack/getPolicyPacks data sources for managing policy packs across stacks
+- Improved Makefile lint target with proper bash shell support and build tags for examples
 
 ### Bug Fixes
 
