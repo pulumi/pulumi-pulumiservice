@@ -39,6 +39,8 @@ resources:
     properties:
       name: test-policy-group-${digits}
       organizationName: ${organizationName}
+      entityType: stacks
+      mode: audit
       stacks: []
       policyPacks: []
 
