@@ -29,6 +29,7 @@
         "index.ts",
         "oidcIssuer.ts",
         "orgAccessToken.ts",
+        "orgMember.ts",
         "policyGroup.ts",
         "provider.ts",
         "stack.ts",
