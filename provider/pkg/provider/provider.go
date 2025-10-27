@@ -162,6 +162,9 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 		&resources.PulumiServiceAgentPoolResource{
 			Client: client,
 		},
+		&resources.PulumiServiceInsightsAccountResource{
+			Client: client,
+		},
 		&resources.PulumiServiceDeploymentScheduleResource{
 			Client: client,
 		},
