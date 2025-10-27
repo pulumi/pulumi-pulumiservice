@@ -16,6 +16,18 @@ namespace Pulumi.PulumiService
     public partial class PolicyGroup : global::Pulumi.CustomResource
     {
         /// <summary>
+        /// The entity type for the policy group. Valid values are 'stacks' or 'accounts'. Defaults to 'stacks'.
+        /// </summary>
+        [Output("entityType")]
+        public Output<string?> EntityType { get; private set; } = null!;
+
+        /// <summary>
+        /// The mode for the policy group. Valid values are 'audit' (reports violations) or 'preventative' (blocks operations). Defaults to 'audit'.
+        /// </summary>
+        [Output("mode")]
+        public Output<string?> Mode { get; private set; } = null!;
+
+        /// <summary>
         /// The name of the policy group.
         /// </summary>
         [Output("name")]
@@ -85,6 +97,18 @@ namespace Pulumi.PulumiService
     public sealed class PolicyGroupArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
+        /// The entity type for the policy group. Valid values are 'stacks' or 'accounts'. Defaults to 'stacks'.
+        /// </summary>
+        [Input("entityType")]
+        public Input<string>? EntityType { get; set; }
+
+        /// <summary>
+        /// The mode for the policy group. Valid values are 'audit' (reports violations) or 'preventative' (blocks operations). Defaults to 'audit'.
+        /// </summary>
+        [Input("mode")]
+        public Input<string>? Mode { get; set; }
+
+        /// <summary>
         /// The name of the policy group.
         /// </summary>
         [Input("name", required: true)]
@@ -122,6 +146,8 @@ namespace Pulumi.PulumiService
 
         public PolicyGroupArgs()
         {
+            EntityType = "stacks";
+            Mode = "audit";
         }
         public static new PolicyGroupArgs Empty => new PolicyGroupArgs();
     }

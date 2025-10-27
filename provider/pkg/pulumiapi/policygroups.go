@@ -25,7 +25,7 @@ import (
 type PolicyGroupClient interface {
 	ListPolicyGroups(ctx context.Context, orgName string) ([]PolicyGroupSummary, error)
 	GetPolicyGroup(ctx context.Context, orgName string, policyGroupName string) (*PolicyGroup, error)
-	CreatePolicyGroup(ctx context.Context, orgName, policyGroupName string) error
+	CreatePolicyGroup(ctx context.Context, orgName, policyGroupName, entityType, mode string) error
 	UpdatePolicyGroup(ctx context.Context, orgName, policyGroupName string, req UpdatePolicyGroupRequest) error
 	DeletePolicyGroup(ctx context.Context, orgName, policyGroupName string) error
 }
@@ -42,6 +42,8 @@ type PolicyGroupSummary struct {
 type PolicyGroup struct {
 	Name                string               `json:"name"`
 	IsOrgDefault        bool                 `json:"isOrgDefault"`
+	EntityType          string               `json:"entityType"`
+	Mode                string               `json:"mode"`
 	Stacks              []StackReference     `json:"stacks"`
 	AppliedPolicyPacks  []PolicyPackMetadata `json:"appliedPolicyPacks"`
 	Accounts            []string             `json:"accounts"`
@@ -65,7 +67,9 @@ type listPolicyGroupsResponse struct {
 }
 
 type createPolicyGroupRequest struct {
-	Name string `json:"name"`
+	Name       string `json:"name"`
+	EntityType string `json:"entityType"`
+	Mode       string `json:"mode"`
 }
 
 type UpdatePolicyGroupRequest struct {
@@ -116,7 +120,11 @@ func (c *Client) GetPolicyGroup(ctx context.Context, orgName string, policyGroup
 	return &policyGroup, nil
 }
 
-func (c *Client) CreatePolicyGroup(ctx context.Context, orgName, policyGroupName string) error {
+// CreatePolicyGroup creates a new policy group with the specified name, entityType, and mode.
+// The entityType determines the scope of the policy group (either "stacks" or "accounts").
+// The mode determines how policy violations are handled: "audit" reports violations,
+// or "preventative" blocks operations that violate policies.
+func (c *Client) CreatePolicyGroup(ctx context.Context, orgName, policyGroupName, entityType, mode string) error {
 	if len(orgName) == 0 {
 		return errors.New("orgName must not be empty")
 	}
@@ -125,10 +133,20 @@ func (c *Client) CreatePolicyGroup(ctx context.Context, orgName, policyGroupName
 		return errors.New("policyGroupName must not be empty")
 	}
 
+	if len(entityType) == 0 {
+		return errors.New("entityType must not be empty")
+	}
+
+	if len(mode) == 0 {
+		return errors.New("mode must not be empty")
+	}
+
 	apiPath := path.Join("orgs", orgName, "policygroups")
 
 	req := createPolicyGroupRequest{
-		Name: policyGroupName,
+		Name:       policyGroupName,
+		EntityType: entityType,
+		Mode:       mode,
 	}
 
 	_, err := c.do(ctx, http.MethodPost, apiPath, req, nil)

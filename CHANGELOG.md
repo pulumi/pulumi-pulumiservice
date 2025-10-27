@@ -6,6 +6,8 @@
 
 ### Bug Fixes
 
+- Fixed PolicyGroup creation to include required entityType and mode fields [#563](https://github.com/pulumi/pulumi-pulumiservice/issues/563)
+
 ## 0.32.0
 
 ### Improvements

@@ -16,6 +16,10 @@ import (
 type PolicyGroup struct {
 	pulumi.CustomResourceState
 
+	// The entity type for the policy group. Valid values are 'stacks' or 'accounts'. Defaults to 'stacks'.
+	EntityType pulumi.StringPtrOutput `pulumi:"entityType"`
+	// The mode for the policy group. Valid values are 'audit' (reports violations) or 'preventative' (blocks operations). Defaults to 'audit'.
+	Mode pulumi.StringPtrOutput `pulumi:"mode"`
 	// The name of the policy group.
 	Name pulumi.StringOutput `pulumi:"name"`
 	// The name of the Pulumi organization the policy group belongs to.
@@ -38,6 +42,12 @@ func NewPolicyGroup(ctx *pulumi.Context,
 	}
 	if args.OrganizationName == nil {
 		return nil, errors.New("invalid value for required argument 'OrganizationName'")
+	}
+	if args.EntityType == nil {
+		args.EntityType = pulumi.StringPtr("stacks")
+	}
+	if args.Mode == nil {
+		args.Mode = pulumi.StringPtr("audit")
 	}
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource PolicyGroup
@@ -72,6 +82,10 @@ func (PolicyGroupState) ElementType() reflect.Type {
 }
 
 type policyGroupArgs struct {
+	// The entity type for the policy group. Valid values are 'stacks' or 'accounts'. Defaults to 'stacks'.
+	EntityType *string `pulumi:"entityType"`
+	// The mode for the policy group. Valid values are 'audit' (reports violations) or 'preventative' (blocks operations). Defaults to 'audit'.
+	Mode *string `pulumi:"mode"`
 	// The name of the policy group.
 	Name string `pulumi:"name"`
 	// The name of the Pulumi organization the policy group belongs to.
@@ -84,6 +98,10 @@ type policyGroupArgs struct {
 
 // The set of arguments for constructing a PolicyGroup resource.
 type PolicyGroupArgs struct {
+	// The entity type for the policy group. Valid values are 'stacks' or 'accounts'. Defaults to 'stacks'.
+	EntityType pulumi.StringPtrInput
+	// The mode for the policy group. Valid values are 'audit' (reports violations) or 'preventative' (blocks operations). Defaults to 'audit'.
+	Mode pulumi.StringPtrInput
 	// The name of the policy group.
 	Name pulumi.StringInput
 	// The name of the Pulumi organization the policy group belongs to.
@@ -179,6 +197,16 @@ func (o PolicyGroupOutput) ToPolicyGroupOutput() PolicyGroupOutput {
 
 func (o PolicyGroupOutput) ToPolicyGroupOutputWithContext(ctx context.Context) PolicyGroupOutput {
 	return o
+}
+
+// The entity type for the policy group. Valid values are 'stacks' or 'accounts'. Defaults to 'stacks'.
+func (o PolicyGroupOutput) EntityType() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *PolicyGroup) pulumi.StringPtrOutput { return v.EntityType }).(pulumi.StringPtrOutput)
+}
+
+// The mode for the policy group. Valid values are 'audit' (reports violations) or 'preventative' (blocks operations). Defaults to 'audit'.
+func (o PolicyGroupOutput) Mode() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *PolicyGroup) pulumi.StringPtrOutput { return v.Mode }).(pulumi.StringPtrOutput)
 }
 
 // The name of the policy group.
