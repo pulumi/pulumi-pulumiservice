@@ -13,6 +13,16 @@ import (
 )
 
 // A scheduled recurring or single time environment rotation.
+//
+// ### Import
+//
+// Environment rotation schedules can be imported using the `id`, which for environment rotation schedules is `{org}/{project}/{environment}/rotations/{scheduleId}` e.g.,
+//
+// ```sh
+//
+//	$ pulumi import pulumiservice:index:EnvironmentRotationSchedule my_rotation my-org/my-project/my-env/rotations/sched-123
+//
+// ```
 type EnvironmentRotationSchedule struct {
 	pulumi.CustomResourceState
 

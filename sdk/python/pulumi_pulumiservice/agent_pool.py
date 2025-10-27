@@ -100,6 +100,14 @@ class AgentPool(pulumi.CustomResource):
         """
         Agent Pool for customer managed deployments
 
+        ### Import
+
+        Agent pools can be imported using the `id`, which for agent pools is `{org}/{name}/{agentPoolId}` e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:AgentPool my_pool my-org/my-pool/pool-12345
+        ```
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] description: Description of the agent pool.
@@ -115,6 +123,14 @@ class AgentPool(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Agent Pool for customer managed deployments
+
+        ### Import
+
+        Agent pools can be imported using the `id`, which for agent pools is `{org}/{name}/{agentPoolId}` e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:AgentPool my_pool my-org/my-pool/pool-12345
+        ```
 
         :param str resource_name: The name of the resource.
         :param AgentPoolArgs args: The arguments to use to populate this resource's properties.

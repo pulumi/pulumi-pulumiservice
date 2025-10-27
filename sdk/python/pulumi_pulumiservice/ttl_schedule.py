@@ -117,6 +117,14 @@ class TtlSchedule(pulumi.CustomResource):
         """
         A scheduled stack destroy run.
 
+        ### Import
+
+        TTL schedules can be imported using the `id`, which for TTL schedules is `{org}/{project}/{stack}/ttl/{scheduleId}` e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:TtlSchedule my_ttl_schedule my-org/my-project/my-stack/ttl/sched-789
+        ```
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.bool] delete_after_destroy: True if the stack and all associated history and settings should be deleted.
@@ -133,6 +141,14 @@ class TtlSchedule(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         A scheduled stack destroy run.
+
+        ### Import
+
+        TTL schedules can be imported using the `id`, which for TTL schedules is `{org}/{project}/{stack}/ttl/{scheduleId}` e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:TtlSchedule my_ttl_schedule my-org/my-project/my-stack/ttl/sched-789
+        ```
 
         :param str resource_name: The name of the resource.
         :param TtlScheduleArgs args: The arguments to use to populate this resource's properties.

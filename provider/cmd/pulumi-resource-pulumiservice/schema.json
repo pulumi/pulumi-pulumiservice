@@ -460,7 +460,7 @@
       "properties": {
         "duration": {
           "type": "string",
-          "description": "Duration of the assume-role session in “XhYmZs” format"
+          "description": "Duration of the assume-role session in \u201cXhYmZs\u201d format"
         },
         "policyARNs": {
           "type": "array",
@@ -508,7 +508,7 @@
         },
         "tokenLifetime": {
           "type": "string",
-          "description": "The lifetime of the temporary credentials in “XhYmZs” format."
+          "description": "The lifetime of the temporary credentials in \u201cXhYmZs\u201d format."
         }
       },
       "required": [
@@ -819,7 +819,7 @@
   },
   "resources": {
     "pulumiservice:index:Stack": {
-      "description": "A stack is a collection of resources that share a common lifecycle. Stacks are uniquely identified by their name and the project they belong to.",
+      "description": "A stack is a collection of resources that share a common lifecycle. Stacks are uniquely identified by their name and the project they belong to.\n\n### Import\n\nStacks can be imported using the `id`, which for stacks is `{org}/{project}/{stack}` e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:Stack my_stack my-org/my-project/my-stack\n```\n\n",
       "properties": {
         "organizationName": {
           "description": "The name of the organization.",
@@ -871,7 +871,7 @@
       ]
     },
     "pulumiservice:index:AgentPool": {
-      "description": "Agent Pool for customer managed deployments",
+      "description": "Agent Pool for customer managed deployments\n\n### Import\n\nAgent pools can be imported using the `id`, which for agent pools is `{org}/{name}/{agentPoolId}` e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:AgentPool my_pool my-org/my-pool/pool-12345\n```\n\n",
       "properties": {
         "agentPoolId": {
           "description": "The agent pool identifier.",
@@ -931,7 +931,7 @@
       ]
     },
     "pulumiservice:index:AccessToken": {
-      "description": "Access tokens allow a user to authenticate against the Pulumi Cloud",
+      "description": "Access tokens allow a user to authenticate against the Pulumi Cloud\n\n### Import\n\nAccess tokens can be imported using the token `id` e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:AccessToken my_token abc123def456\n```\n\n",
       "properties": {
         "description": {
           "description": "Description of the access token.",
@@ -958,7 +958,7 @@
       ]
     },
     "pulumiservice:index:Team": {
-      "description": "The Pulumi Cloud offers role-based access control (RBAC) using teams. Teams allow organization admins to assign a set of stack permissions to a group of users.",
+      "description": "The Pulumi Cloud offers role-based access control (RBAC) using teams. Teams allow organization admins to assign a set of stack permissions to a group of users.\n\n### Import\n\nTeams can be imported using the `id`, which for teams is `{org}/{teamName}` e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:Team my_team my-org/my-team\n```\n\n",
       "properties": {
         "teamType": {
           "description": "The type of team. Must be either `pulumi` or `github`.",
@@ -1039,7 +1039,7 @@
       ]
     },
     "pulumiservice:index:TeamAccessToken": {
-      "description": "The Pulumi Cloud allows users to create access tokens scoped to team. Team access tokens is a resource to create them and assign them to a team",
+      "description": "The Pulumi Cloud allows users to create access tokens scoped to team. Team access tokens is a resource to create them and assign them to a team\n\n### Import\n\nTeam access tokens can be imported using the `id`, which for team access tokens is `{org}/{teamName}/{tokenName}/{tokenId}` e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:TeamAccessToken my_team_token my-org/my-team/my-token/token-456\n```\n\n",
       "properties": {
         "name": {
           "description": "The name for the token. This must be unique amongst all machine tokens within your organization.",
@@ -1097,7 +1097,7 @@
       ]
     },
     "pulumiservice:index:OrgAccessToken": {
-      "description": "The Pulumi Cloud allows users to create access tokens scoped to orgs. Org access tokens is a resource to create them and assign them to an org",
+      "description": "The Pulumi Cloud allows users to create access tokens scoped to orgs. Org access tokens is a resource to create them and assign them to an org\n\n### Import\n\nOrganization access tokens can be imported using the `id`, which for organization access tokens is `{org}/{tokenName}/{tokenId}` e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:OrgAccessToken my_org_token my-org/my-token/token-xyz789\n```\n\n",
       "properties": {
         "name": {
           "description": "The name for the token.",
@@ -1374,7 +1374,7 @@
       ]
     },
     "pulumiservice:index:StackTag": {
-      "description": "Stacks have associated metadata in the form of tags. Each tag consists of a name and value.",
+      "description": "Stacks have associated metadata in the form of tags. Each tag consists of a name and value.\n\n### Import\n\nStack tags can be imported using the `id`, which for stack tags is `{org}/{project}/{stack}/{tagName}` e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:StackTag my_tag my-org/my-project/my-stack/my-tag\n```\n\n",
       "properties": {
         "organization": {
           "description": "Organization name.",
@@ -1439,7 +1439,7 @@
       ]
     },
     "pulumiservice:index:TeamStackPermission": {
-      "description": "Grants a team permissions to the specified stack.",
+      "description": "Grants a team permissions to the specified stack.\n\n### Import\n\nTeam stack permissions can be imported using the `id`, which for team stack permissions is `{org}/{project}/{stack}/{teamName}` e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:TeamStackPermission my_perm my-org/my-project/my-stack/my-team\n```\n\n",
       "inputProperties": {
         "team": {
           "description": "The name of the team to grant this stack permissions to. This is not the display name.",
@@ -1507,7 +1507,7 @@
       ]
     },
     "pulumiservice:index:DeploymentSchedule": {
-      "description": "A scheduled recurring or single time run of a pulumi command.",
+      "description": "A scheduled recurring or single time run of a pulumi command.\n\n### Import\n\nDeployment schedules can be imported using the `id`, which for deployment schedules is `{org}/{project}/{stack}/{scheduleId}` e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:DeploymentSchedule my_schedule my-org/my-project/my-stack/sched-789\n```\n\n",
       "properties": {
         "organization": {
           "description": "Organization name.",
@@ -1584,7 +1584,7 @@
       ]
     },
     "pulumiservice:index:DriftSchedule": {
-      "description": "A cron schedule to run drift detection.",
+      "description": "A cron schedule to run drift detection.\n\n### Import\n\nDrift schedules can be imported using the `id`, which for drift schedules is `{org}/{project}/{stack}/drift/{scheduleId}` e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:DriftSchedule my_drift_schedule my-org/my-project/my-stack/drift/sched-456\n```\n\n",
       "properties": {
         "organization": {
           "description": "Organization name.",
@@ -1653,7 +1653,7 @@
       ]
     },
     "pulumiservice:index:TtlSchedule": {
-      "description": "A scheduled stack destroy run.",
+      "description": "A scheduled stack destroy run.\n\n### Import\n\nTTL schedules can be imported using the `id`, which for TTL schedules is `{org}/{project}/{stack}/ttl/{scheduleId}` e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:TtlSchedule my_ttl_schedule my-org/my-project/my-stack/ttl/sched-789\n```\n\n",
       "properties": {
         "organization": {
           "description": "Organization name.",
@@ -1724,7 +1724,7 @@
       ]
     },
     "pulumiservice:index:Environment": {
-      "description": "An ESC Environment.",
+      "description": "An ESC Environment.\n\n### Import\n\nEnvironments can be imported using the `id`, which for environments is `{org}/{project}/{environment}` or `{org}/{environment}` e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:Environment my_environment my-org/my-project/my-env\n```\n\nor using the legacy format (assumes \"default\" project):\n\n```sh\n $ pulumi import pulumiservice:index:Environment my_environment my-org/my-env\n```\n\n",
       "properties": {
         "organization": {
           "description": "Organization name.",
@@ -1780,7 +1780,7 @@
       ]
     },
     "pulumiservice:index:TeamEnvironmentPermission": {
-      "description": "A permission for a team to use an environment.",
+      "description": "A permission for a team to use an environment.\n\n### Import\n\nTeam environment permissions can be imported using the `id`, which for team environment permissions is `{org}/{team}/{project}+{environment}` or `{org}/{team}/{environment}` e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:TeamEnvironmentPermission my_perm my-org/my-team/my-project+my-env\n```\n\nor using the legacy format (assumes \"default\" project):\n\n```sh\n $ pulumi import pulumiservice:index:TeamEnvironmentPermission my_perm my-org/my-team/my-env\n```\n\n",
       "properties": {
         "organization": {
           "description": "Organization name.",
@@ -1843,7 +1843,7 @@
       ]
     },
     "pulumiservice:index:EnvironmentVersionTag": {
-      "description": "A tag on a specific revision of an environment.",
+      "description": "A tag on a specific revision of an environment.\n\n### Import\n\nEnvironment version tags can be imported using the `id`, which for environment version tags is `{org}/{project}/{environment}/{tagName}` or `{org}/{environment}/{tagName}` e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:EnvironmentVersionTag my_tag my-org/my-project/my-env/tag-v1\n```\n\nor using the legacy format (assumes \"default\" project):\n\n```sh\n $ pulumi import pulumiservice:index:EnvironmentVersionTag my_tag my-org/my-env/tag-v1\n```\n\n",
       "properties": {
         "organization": {
           "description": "Organization name.",
@@ -1904,7 +1904,7 @@
       ]
     },
     "pulumiservice:index:TemplateSource": {
-      "description": "A source for Pulumi templates",
+      "description": "A source for Pulumi templates\n\n### Import\n\nTemplate sources can be imported using the `id`, which for template sources is `{org}/{templateId}` e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:TemplateSource my_template my-org/template-abc123\n```\n\n",
       "properties": {
         "organizationName": {
           "description": "Organization name.",
@@ -1953,7 +1953,7 @@
       ]
     },
     "pulumiservice:index:OidcIssuer": {
-      "description": "Register an OIDC Provider to establish a trust relationship between third-party systems like GitHub Actions and Pulumi Cloud, obviating the need to store a hard-coded Pulumi Cloud token in systems that need to run Pulumi commands or consume Pulumi Cloud APIs. Instead of a hard-coded, static token that must be manually rotated, trusted systems are granted temporary Pulumi Cloud tokens on an as-needed basis, which is more secure than static tokens.",
+      "description": "Register an OIDC Provider to establish a trust relationship between third-party systems like GitHub Actions and Pulumi Cloud, obviating the need to store a hard-coded Pulumi Cloud token in systems that need to run Pulumi commands or consume Pulumi Cloud APIs. Instead of a hard-coded, static token that must be manually rotated, trusted systems are granted temporary Pulumi Cloud tokens on an as-needed basis, which is more secure than static tokens.\n\n### Import\n\nOIDC issuers can be imported using the `id`, which for OIDC issuers is `{org}/{issuerId}` e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:OidcIssuer my_issuer my-org/issuer-abc123\n```\n\n",
       "properties": {
         "organization": {
           "description": "Organization name.",
@@ -2036,7 +2036,7 @@
       ]
     },
     "pulumiservice:index:EnvironmentRotationSchedule": {
-      "description": "A scheduled recurring or single time environment rotation.",
+      "description": "A scheduled recurring or single time environment rotation.\n\n### Import\n\nEnvironment rotation schedules can be imported using the `id`, which for environment rotation schedules is `{org}/{project}/{environment}/rotations/{scheduleId}` e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:EnvironmentRotationSchedule my_rotation my-org/my-project/my-env/rotations/sched-123\n```\n\n",
       "properties": {
         "organization": {
           "description": "Organization name.",
@@ -2103,7 +2103,7 @@
       ]
     },
     "pulumiservice:index:ApprovalRule": {
-      "description": "An approval rule for environment deployments.",
+      "description": "An approval rule for environment deployments.\n\n### Import\n\nApproval rules can be imported using the `id`, which for approval rules is `environment/{org}/{project}/{environment}/{ruleId}` e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:ApprovalRule my_rule environment/my-org/my-project/my-env/rule-123\n```\n\n",
       "properties": {
         "name": {
           "description": "Name of the approval rule.",
@@ -2171,7 +2171,7 @@
       ]
     },
     "pulumiservice:index:PolicyGroup": {
-      "description": "A Policy Group allows you to apply policy packs to a set of stacks in your organization.",
+      "description": "A Policy Group allows you to apply policy packs to a set of stacks in your organization.\n\n### Import\n\nPolicy groups can be imported using the `id`, which for policy groups is `{org}/{policyGroupName}` e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:PolicyGroup my_policy_group my-org/my-policy-group\n```\n\n",
       "properties": {
         "name": {
           "description": "The name of the policy group.",

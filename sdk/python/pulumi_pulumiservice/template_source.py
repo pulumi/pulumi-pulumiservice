@@ -101,6 +101,14 @@ class TemplateSource(pulumi.CustomResource):
         """
         A source for Pulumi templates
 
+        ### Import
+
+        Template sources can be imported using the `id`, which for template sources is `{org}/{templateId}` e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:TemplateSource my_template my-org/template-abc123
+        ```
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[Union['TemplateSourceDestinationArgs', 'TemplateSourceDestinationArgsDict']] destination: The default destination for projects using templates from this source.
@@ -116,6 +124,14 @@ class TemplateSource(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         A source for Pulumi templates
+
+        ### Import
+
+        Template sources can be imported using the `id`, which for template sources is `{org}/{templateId}` e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:TemplateSource my_template my-org/template-abc123
+        ```
 
         :param str resource_name: The name of the resource.
         :param TemplateSourceArgs args: The arguments to use to populate this resource's properties.

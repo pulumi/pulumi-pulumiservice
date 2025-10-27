@@ -114,6 +114,14 @@ class StackTag(pulumi.CustomResource):
         """
         Stacks have associated metadata in the form of tags. Each tag consists of a name and value.
 
+        ### Import
+
+        Stack tags can be imported using the `id`, which for stack tags is `{org}/{project}/{stack}/{tagName}` e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:StackTag my_tag my-org/my-project/my-stack/my-tag
+        ```
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] name: Name of the tag. The 'key' part of the key=value pair
@@ -130,6 +138,14 @@ class StackTag(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Stacks have associated metadata in the form of tags. Each tag consists of a name and value.
+
+        ### Import
+
+        Stack tags can be imported using the `id`, which for stack tags is `{org}/{project}/{stack}/{tagName}` e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:StackTag my_tag my-org/my-project/my-stack/my-tag
+        ```
 
         :param str resource_name: The name of the resource.
         :param StackTagArgs args: The arguments to use to populate this resource's properties.

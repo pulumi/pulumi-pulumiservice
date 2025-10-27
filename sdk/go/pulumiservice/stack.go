@@ -13,6 +13,16 @@ import (
 )
 
 // A stack is a collection of resources that share a common lifecycle. Stacks are uniquely identified by their name and the project they belong to.
+//
+// ### Import
+//
+// Stacks can be imported using the `id`, which for stacks is `{org}/{project}/{stack}` e.g.,
+//
+// ```sh
+//
+//	$ pulumi import pulumiservice:index:Stack my_stack my-org/my-project/my-stack
+//
+// ```
 type Stack struct {
 	pulumi.CustomResourceState
 

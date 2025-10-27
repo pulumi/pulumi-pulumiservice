@@ -17,6 +17,14 @@ import javax.annotation.Nullable;
 /**
  * A source for Pulumi templates
  * 
+ * ### Import
+ * 
+ * Template sources can be imported using the `id`, which for template sources is `{org}/{templateId}` e.g.,
+ * 
+ * ```sh
+ *  $ pulumi import pulumiservice:index:TemplateSource my_template my-org/template-abc123
+ * ```
+ * 
  */
 @ResourceType(type="pulumiservice:index:TemplateSource")
 public class TemplateSource extends com.pulumi.resources.CustomResource {

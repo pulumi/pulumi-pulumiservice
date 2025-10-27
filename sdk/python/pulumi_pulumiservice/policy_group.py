@@ -138,6 +138,14 @@ class PolicyGroup(pulumi.CustomResource):
         """
         A Policy Group allows you to apply policy packs to a set of stacks in your organization.
 
+        ### Import
+
+        Policy groups can be imported using the `id`, which for policy groups is `{org}/{policyGroupName}` e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:PolicyGroup my_policy_group my-org/my-policy-group
+        ```
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] entity_type: The entity type for the policy group. Valid values are 'stacks' or 'accounts'. Defaults to 'stacks'.
@@ -155,6 +163,14 @@ class PolicyGroup(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         A Policy Group allows you to apply policy packs to a set of stacks in your organization.
+
+        ### Import
+
+        Policy groups can be imported using the `id`, which for policy groups is `{org}/{policyGroupName}` e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:PolicyGroup my_policy_group my-org/my-policy-group
+        ```
 
         :param str resource_name: The name of the resource.
         :param PolicyGroupArgs args: The arguments to use to populate this resource's properties.

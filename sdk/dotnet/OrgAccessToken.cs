@@ -11,6 +11,14 @@ namespace Pulumi.PulumiService
 {
     /// <summary>
     /// The Pulumi Cloud allows users to create access tokens scoped to orgs. Org access tokens is a resource to create them and assign them to an org
+    /// 
+    /// ### Import
+    /// 
+    /// Organization access tokens can be imported using the `id`, which for organization access tokens is `{org}/{tokenName}/{tokenId}` e.g.,
+    /// 
+    /// ```sh
+    ///  $ pulumi import pulumiservice:index:OrgAccessToken my_org_token my-org/my-token/token-xyz789
+    /// ```
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:index:OrgAccessToken")]
     public partial class OrgAccessToken : global::Pulumi.CustomResource

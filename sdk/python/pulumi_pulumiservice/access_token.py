@@ -50,6 +50,14 @@ class AccessToken(pulumi.CustomResource):
         """
         Access tokens allow a user to authenticate against the Pulumi Cloud
 
+        ### Import
+
+        Access tokens can be imported using the token `id` e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:AccessToken my_token abc123def456
+        ```
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] description: Description of the access token.
@@ -62,6 +70,14 @@ class AccessToken(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Access tokens allow a user to authenticate against the Pulumi Cloud
+
+        ### Import
+
+        Access tokens can be imported using the token `id` e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:AccessToken my_token abc123def456
+        ```
 
         :param str resource_name: The name of the resource.
         :param AccessTokenArgs args: The arguments to use to populate this resource's properties.

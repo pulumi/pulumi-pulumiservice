@@ -97,6 +97,7 @@ lint::
 	if [ -d examples ]; then \
 		pushd examples && golangci-lint run --timeout 10m --build-tags all && popd ; \
 	fi
+	./scripts/validate-schema-imports.sh
 
 
 install:: install_nodejs_sdk install_dotnet_sdk

@@ -13,6 +13,16 @@ import (
 )
 
 // Access tokens allow a user to authenticate against the Pulumi Cloud
+//
+// ### Import
+//
+// Access tokens can be imported using the token `id` e.g.,
+//
+// ```sh
+//
+//	$ pulumi import pulumiservice:index:AccessToken my_token abc123def456
+//
+// ```
 type AccessToken struct {
 	pulumi.CustomResourceState
 

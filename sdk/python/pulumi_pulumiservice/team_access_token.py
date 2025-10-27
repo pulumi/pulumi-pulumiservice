@@ -99,6 +99,14 @@ class TeamAccessToken(pulumi.CustomResource):
         """
         The Pulumi Cloud allows users to create access tokens scoped to team. Team access tokens is a resource to create them and assign them to a team
 
+        ### Import
+
+        Team access tokens can be imported using the `id`, which for team access tokens is `{org}/{teamName}/{tokenName}/{tokenId}` e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:TeamAccessToken my_team_token my-org/my-team/my-token/token-456
+        ```
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] description: Optional. Team description.
@@ -114,6 +122,14 @@ class TeamAccessToken(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         The Pulumi Cloud allows users to create access tokens scoped to team. Team access tokens is a resource to create them and assign them to a team
+
+        ### Import
+
+        Team access tokens can be imported using the `id`, which for team access tokens is `{org}/{teamName}/{tokenName}/{tokenId}` e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:TeamAccessToken my_team_token my-org/my-team/my-token/token-456
+        ```
 
         :param str resource_name: The name of the resource.
         :param TeamAccessTokenArgs args: The arguments to use to populate this resource's properties.

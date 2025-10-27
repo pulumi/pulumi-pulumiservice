@@ -117,6 +117,14 @@ class DriftSchedule(pulumi.CustomResource):
         """
         A cron schedule to run drift detection.
 
+        ### Import
+
+        Drift schedules can be imported using the `id`, which for drift schedules is `{org}/{project}/{stack}/drift/{scheduleId}` e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:DriftSchedule my_drift_schedule my-org/my-project/my-stack/drift/sched-456
+        ```
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.bool] auto_remediate: Whether any drift detected should be remediated after a drift run.
@@ -133,6 +141,14 @@ class DriftSchedule(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         A cron schedule to run drift detection.
+
+        ### Import
+
+        Drift schedules can be imported using the `id`, which for drift schedules is `{org}/{project}/{stack}/drift/{scheduleId}` e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:DriftSchedule my_drift_schedule my-org/my-project/my-stack/drift/sched-456
+        ```
 
         :param str resource_name: The name of the resource.
         :param DriftScheduleArgs args: The arguments to use to populate this resource's properties.

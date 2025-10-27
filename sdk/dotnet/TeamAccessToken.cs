@@ -11,6 +11,14 @@ namespace Pulumi.PulumiService
 {
     /// <summary>
     /// The Pulumi Cloud allows users to create access tokens scoped to team. Team access tokens is a resource to create them and assign them to a team
+    /// 
+    /// ### Import
+    /// 
+    /// Team access tokens can be imported using the `id`, which for team access tokens is `{org}/{teamName}/{tokenName}/{tokenId}` e.g.,
+    /// 
+    /// ```sh
+    ///  $ pulumi import pulumiservice:index:TeamAccessToken my_team_token my-org/my-team/my-token/token-456
+    /// ```
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:index:TeamAccessToken")]
     public partial class TeamAccessToken : global::Pulumi.CustomResource

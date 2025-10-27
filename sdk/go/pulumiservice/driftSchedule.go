@@ -13,6 +13,16 @@ import (
 )
 
 // A cron schedule to run drift detection.
+//
+// ### Import
+//
+// Drift schedules can be imported using the `id`, which for drift schedules is `{org}/{project}/{stack}/drift/{scheduleId}` e.g.,
+//
+// ```sh
+//
+//	$ pulumi import pulumiservice:index:DriftSchedule my_drift_schedule my-org/my-project/my-stack/drift/sched-456
+//
+// ```
 type DriftSchedule struct {
 	pulumi.CustomResourceState
 

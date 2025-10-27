@@ -17,6 +17,20 @@ import javax.annotation.Nullable;
 /**
  * An ESC Environment.
  * 
+ * ### Import
+ * 
+ * Environments can be imported using the `id`, which for environments is `{org}/{project}/{environment}` or `{org}/{environment}` e.g.,
+ * 
+ * ```sh
+ *  $ pulumi import pulumiservice:index:Environment my_environment my-org/my-project/my-env
+ * ```
+ * 
+ * or using the legacy format (assumes &#34;default&#34; project):
+ * 
+ * ```sh
+ *  $ pulumi import pulumiservice:index:Environment my_environment my-org/my-env
+ * ```
+ * 
  */
 @ResourceType(type="pulumiservice:index:Environment")
 public class Environment extends com.pulumi.resources.CustomResource {

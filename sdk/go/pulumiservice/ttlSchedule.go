@@ -13,6 +13,16 @@ import (
 )
 
 // A scheduled stack destroy run.
+//
+// ### Import
+//
+// TTL schedules can be imported using the `id`, which for TTL schedules is `{org}/{project}/{stack}/ttl/{scheduleId}` e.g.,
+//
+// ```sh
+//
+//	$ pulumi import pulumiservice:index:TtlSchedule my_ttl_schedule my-org/my-project/my-stack/ttl/sched-789
+//
+// ```
 type TtlSchedule struct {
 	pulumi.CustomResourceState
 

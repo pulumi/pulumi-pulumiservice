@@ -13,6 +13,16 @@ import (
 )
 
 // Grants a team permissions to the specified stack.
+//
+// ### Import
+//
+// Team stack permissions can be imported using the `id`, which for team stack permissions is `{org}/{project}/{stack}/{teamName}` e.g.,
+//
+// ```sh
+//
+//	$ pulumi import pulumiservice:index:TeamStackPermission my_perm my-org/my-project/my-stack/my-team
+//
+// ```
 type TeamStackPermission struct {
 	pulumi.CustomResourceState
 

@@ -11,6 +11,14 @@ namespace Pulumi.PulumiService
 {
     /// <summary>
     /// Agent Pool for customer managed deployments
+    /// 
+    /// ### Import
+    /// 
+    /// Agent pools can be imported using the `id`, which for agent pools is `{org}/{name}/{agentPoolId}` e.g.,
+    /// 
+    /// ```sh
+    ///  $ pulumi import pulumiservice:index:AgentPool my_pool my-org/my-pool/pool-12345
+    /// ```
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:index:AgentPool")]
     public partial class AgentPool : global::Pulumi.CustomResource

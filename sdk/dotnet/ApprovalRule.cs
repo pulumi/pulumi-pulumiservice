@@ -11,6 +11,14 @@ namespace Pulumi.PulumiService
 {
     /// <summary>
     /// An approval rule for environment deployments.
+    /// 
+    /// ### Import
+    /// 
+    /// Approval rules can be imported using the `id`, which for approval rules is `environment/{org}/{project}/{environment}/{ruleId}` e.g.,
+    /// 
+    /// ```sh
+    ///  $ pulumi import pulumiservice:index:ApprovalRule my_rule environment/my-org/my-project/my-env/rule-123
+    /// ```
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:index:ApprovalRule")]
     public partial class ApprovalRule : global::Pulumi.CustomResource
