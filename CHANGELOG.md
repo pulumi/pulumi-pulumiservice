@@ -6,6 +6,7 @@
 
 - Added Java SDK support with Pulumi Java SDK v1.16.2
 - Upgraded Pulumi SDK to v3.204.0 with latest codegen improvements
+- Added comprehensive unit tests for DriftSchedule, RotationSchedule, TtlSchedule, and DeploymentSettings resources covering all CRUD operations and validation [#575](https://github.com/pulumi/pulumi-pulumiservice/issues/575)
 
 ### Bug Fixes
 
