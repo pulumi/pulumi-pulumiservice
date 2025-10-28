@@ -60,6 +60,31 @@ export const getPolicyPacks: typeof import("./getPolicyPacks").getPolicyPacks = 
 export const getPolicyPacksOutput: typeof import("./getPolicyPacks").getPolicyPacksOutput = null as any;
 utilities.lazyLoad(exports, ["getPolicyPacks","getPolicyPacksOutput"], () => require("./getPolicyPacks"));
 
+export { GetStackCollaboratorsArgs, GetStackCollaboratorsResult, GetStackCollaboratorsOutputArgs } from "./getStackCollaborators";
+export const getStackCollaborators: typeof import("./getStackCollaborators").getStackCollaborators = null as any;
+export const getStackCollaboratorsOutput: typeof import("./getStackCollaborators").getStackCollaboratorsOutput = null as any;
+utilities.lazyLoad(exports, ["getStackCollaborators","getStackCollaboratorsOutput"], () => require("./getStackCollaborators"));
+
+export { GetStackTeamPermissionsArgs, GetStackTeamPermissionsResult, GetStackTeamPermissionsOutputArgs } from "./getStackTeamPermissions";
+export const getStackTeamPermissions: typeof import("./getStackTeamPermissions").getStackTeamPermissions = null as any;
+export const getStackTeamPermissionsOutput: typeof import("./getStackTeamPermissions").getStackTeamPermissionsOutput = null as any;
+utilities.lazyLoad(exports, ["getStackTeamPermissions","getStackTeamPermissionsOutput"], () => require("./getStackTeamPermissions"));
+
+export { GetStacksArgs, GetStacksResult, GetStacksOutputArgs } from "./getStacks";
+export const getStacks: typeof import("./getStacks").getStacks = null as any;
+export const getStacksOutput: typeof import("./getStacks").getStacksOutput = null as any;
+utilities.lazyLoad(exports, ["getStacks","getStacksOutput"], () => require("./getStacks"));
+
+export { GetTeamsArgs, GetTeamsResult, GetTeamsOutputArgs } from "./getTeams";
+export const getTeams: typeof import("./getTeams").getTeams = null as any;
+export const getTeamsOutput: typeof import("./getTeams").getTeamsOutput = null as any;
+utilities.lazyLoad(exports, ["getTeams","getTeamsOutput"], () => require("./getTeams"));
+
+export { GetTeamsForUserArgs, GetTeamsForUserResult, GetTeamsForUserOutputArgs } from "./getTeamsForUser";
+export const getTeamsForUser: typeof import("./getTeamsForUser").getTeamsForUser = null as any;
+export const getTeamsForUserOutput: typeof import("./getTeamsForUser").getTeamsForUserOutput = null as any;
+utilities.lazyLoad(exports, ["getTeamsForUser","getTeamsForUserOutput"], () => require("./getTeamsForUser"));
+
 export { OidcIssuerArgs } from "./oidcIssuer";
 export type OidcIssuer = import("./oidcIssuer").OidcIssuer;
 export const OidcIssuer: typeof import("./oidcIssuer").OidcIssuer = null as any;

@@ -16,6 +16,11 @@
 
 - Added PolicyGroup resource and getPolicyPack/getPolicyPacks data sources for managing policy packs across stacks
 - Improved Makefile lint target with proper bash shell support and build tags for examples
+- Added getTeams data source for querying all teams in an organization [#509](https://github.com/pulumi/pulumi-pulumiservice/issues/509)
+- Added getTeamsForUser data source for finding teams a specific user belongs to [#509](https://github.com/pulumi/pulumi-pulumiservice/issues/509)
+- Added getStacks data source for listing all accessible stacks [#509](https://github.com/pulumi/pulumi-pulumiservice/issues/509)
+- Added getStackTeamPermissions data source for querying team permissions on a stack [#509](https://github.com/pulumi/pulumi-pulumiservice/issues/509)
+- Added getStackCollaborators data source for querying individual user collaborators with direct stack access [#509](https://github.com/pulumi/pulumi-pulumiservice/issues/509)
 
 ### Bug Fixes
 

@@ -1,0 +1,88 @@
+name: yaml-permissions-query
+description: Example demonstrating all five permission query data sources
+runtime: yaml
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  # Optional: specify a username to look up team memberships
+  testUserName:
+    type: string
+    default: ""
+  # Optional: specify a stack to query permissions for
+  testStackOrg:
+    type: string
+    default: ""
+  testStackProject:
+    type: string
+    default: ""
+  testStackName:
+    type: string
+    default: ""
+
+variables:
+  # Query all teams in the organization
+  allTeams:
+    fn::invoke:
+      function: pulumiservice:index:getTeams
+      arguments:
+        organizationName: ${organizationName}
+      return: teams
+
+  # Query all accessible stacks
+  allStacks:
+    fn::invoke:
+      function: pulumiservice:index:getStacks
+      arguments: {}
+      return: stacks
+
+  # Query teams for a specific user (if testUserName is provided)
+  userTeams:
+    fn::invoke:
+      function: pulumiservice:index:getTeamsForUser
+      arguments:
+        organizationName: ${organizationName}
+        userName: ${testUserName}
+      return: teams
+    options:
+      ignoreChanges: ["*"]
+
+  # Query team permissions for a specific stack (if stack details are provided)
+  stackTeamPerms:
+    fn::invoke:
+      function: pulumiservice:index:getStackTeamPermissions
+      arguments:
+        organizationName: ${testStackOrg}
+        projectName: ${testStackProject}
+        stackName: ${testStackName}
+      return: teams
+    options:
+      ignoreChanges: ["*"]
+
+  # Query individual collaborators for a specific stack (if stack details are provided)
+  stackCollaborators:
+    fn::invoke:
+      function: pulumiservice:index:getStackCollaborators
+      arguments:
+        organizationName: ${testStackOrg}
+        projectName: ${testStackProject}
+        stackName: ${testStackName}
+      return: users
+    options:
+      ignoreChanges: ["*"]
+
+outputs:
+  # All teams in the organization with full details
+  organizationTeams: ${allTeams}
+
+  # All accessible stacks
+  accessibleStacks: ${allStacks}
+
+  # Team memberships for the specified user (if provided)
+  userTeamMemberships: ${userTeams}
+
+  # Team permissions for the specified stack (if provided)
+  stackTeamPermissions: ${stackTeamPerms}
+
+  # Individual collaborator permissions for the specified stack (if provided)
+  stackCollaboratorPermissions: ${stackCollaborators}
