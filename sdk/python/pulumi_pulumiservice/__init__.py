@@ -24,6 +24,7 @@ from .policy_group import *
 from .provider import *
 from .stack import *
 from .stack_tag import *
+from .stack_tags import *
 from .team import *
 from .team_access_token import *
 from .team_environment_permission import *
@@ -63,6 +64,7 @@ _utilities.register(
    "pulumiservice:index:PolicyGroup": "PolicyGroup",
    "pulumiservice:index:Stack": "Stack",
    "pulumiservice:index:StackTag": "StackTag",
+   "pulumiservice:index:StackTags": "StackTags",
    "pulumiservice:index:Team": "Team",
    "pulumiservice:index:TeamAccessToken": "TeamAccessToken",
    "pulumiservice:index:TeamEnvironmentPermission": "TeamEnvironmentPermission",

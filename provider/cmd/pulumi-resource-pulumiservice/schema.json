@@ -1438,6 +1438,66 @@
         "value"
       ]
     },
+    "pulumiservice:index:StackTags": {
+      "description": "Manages multiple stack tags as a single resource. Each tag consists of a name and value pair defined in the tags map.",
+      "properties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string"
+        },
+        "project": {
+          "description": "Project name.",
+          "type": "string"
+        },
+        "stack": {
+          "description": "Stack name.",
+          "type": "string"
+        },
+        "tags": {
+          "description": "Map of tag names to values. Each entry represents a stack tag.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "organization",
+        "project",
+        "stack",
+        "tags"
+      ],
+      "inputProperties": {
+        "organization": {
+          "description": "Organization name.",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "project": {
+          "description": "Project name.",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "stack": {
+          "description": "Stack name.",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "tags": {
+          "description": "Map of tag names to values. Each entry represents a stack tag.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "requiredInputs": [
+        "organization",
+        "project",
+        "stack",
+        "tags"
+      ]
+    },
     "pulumiservice:index:TeamStackPermission": {
       "description": "Grants a team permissions to the specified stack.",
       "inputProperties": {
