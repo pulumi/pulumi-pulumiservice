@@ -6,6 +6,10 @@
 
 - Added Java SDK support with Pulumi Java SDK v1.16.2
 - Upgraded Pulumi SDK to v3.204.0 with latest codegen improvements
+- Added comprehensive unit tests for TemplateSource, OidcIssuer, ApprovalRule,
+  EnvironmentVersionTag, and DeploymentSchedule resources
+  [#574](https://github.com/pulumi/pulumi-pulumiservice/issues/574)
+- Upgraded Pulumi SDK to v3.204.0 with latest codegen improvements
 
 ### Bug Fixes
 
