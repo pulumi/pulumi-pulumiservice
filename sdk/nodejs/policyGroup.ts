@@ -35,6 +35,14 @@ export class PolicyGroup extends pulumi.CustomResource {
     }
 
     /**
+     * The entity type for the policy group. Valid values are 'stacks' or 'accounts'. Defaults to 'stacks'.
+     */
+    public readonly entityType!: pulumi.Output<string | undefined>;
+    /**
+     * The mode for the policy group. Valid values are 'audit' (reports violations) or 'preventative' (blocks operations). Defaults to 'audit'.
+     */
+    public readonly mode!: pulumi.Output<string | undefined>;
+    /**
      * The name of the policy group.
      */
     public readonly name!: pulumi.Output<string>;
@@ -68,11 +76,15 @@ export class PolicyGroup extends pulumi.CustomResource {
             if ((!args || args.organizationName === undefined) && !opts.urn) {
                 throw new Error("Missing required property 'organizationName'");
             }
+            resourceInputs["entityType"] = (args ? args.entityType : undefined) ?? "stacks";
+            resourceInputs["mode"] = (args ? args.mode : undefined) ?? "audit";
             resourceInputs["name"] = args ? args.name : undefined;
             resourceInputs["organizationName"] = args ? args.organizationName : undefined;
             resourceInputs["policyPacks"] = args ? args.policyPacks : undefined;
             resourceInputs["stacks"] = args ? args.stacks : undefined;
         } else {
+            resourceInputs["entityType"] = undefined /*out*/;
+            resourceInputs["mode"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
             resourceInputs["organizationName"] = undefined /*out*/;
             resourceInputs["policyPacks"] = undefined /*out*/;
@@ -87,6 +99,14 @@ export class PolicyGroup extends pulumi.CustomResource {
  * The set of arguments for constructing a PolicyGroup resource.
  */
 export interface PolicyGroupArgs {
+    /**
+     * The entity type for the policy group. Valid values are 'stacks' or 'accounts'. Defaults to 'stacks'.
+     */
+    entityType?: pulumi.Input<string>;
+    /**
+     * The mode for the policy group. Valid values are 'audit' (reports violations) or 'preventative' (blocks operations). Defaults to 'audit'.
+     */
+    mode?: pulumi.Input<string>;
     /**
      * The name of the policy group.
      */

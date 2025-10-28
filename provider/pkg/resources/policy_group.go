@@ -1,4 +1,4 @@
-// Copyright 2016-2022, Pulumi Corporation.
+// Copyright 2016-2025, Pulumi Corporation.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -38,6 +38,8 @@ type PulumiServicePolicyGroupResource struct {
 type PulumiServicePolicyGroupInput struct {
 	Name             string
 	OrganizationName string
+	EntityType       string
+	Mode             string
 	Stacks           []pulumiapi.StackReference
 	PolicyPacks      []pulumiapi.PolicyPackMetadata
 }
@@ -46,6 +48,8 @@ func (i *PulumiServicePolicyGroupInput) ToPropertyMap() resource.PropertyMap {
 	pm := resource.PropertyMap{}
 	pm["name"] = resource.NewPropertyValue(i.Name)
 	pm["organizationName"] = resource.NewPropertyValue(i.OrganizationName)
+	pm["entityType"] = resource.NewPropertyValue(i.EntityType)
+	pm["mode"] = resource.NewPropertyValue(i.Mode)
 
 	// Convert stacks
 	stackValues := []resource.PropertyValue{}
@@ -100,6 +104,14 @@ func ToPulumiServicePolicyGroupInput(inputMap resource.PropertyMap) PulumiServic
 
 	if inputMap["organizationName"].HasValue() && inputMap["organizationName"].IsString() {
 		input.OrganizationName = inputMap["organizationName"].StringValue()
+	}
+
+	if inputMap["entityType"].HasValue() && inputMap["entityType"].IsString() {
+		input.EntityType = inputMap["entityType"].StringValue()
+	}
+
+	if inputMap["mode"].HasValue() && inputMap["mode"].IsString() {
+		input.Mode = inputMap["mode"].StringValue()
 	}
 
 	// Parse stacks
@@ -173,6 +185,35 @@ func (p *PulumiServicePolicyGroupResource) Check(req *pulumirpc.CheckRequest) (*
 		})
 	}
 
+	// Apply defaults if not provided
+	if !newsMap["entityType"].HasValue() {
+		newsMap["entityType"] = resource.NewPropertyValue("stacks")
+	}
+	if !newsMap["mode"].HasValue() {
+		newsMap["mode"] = resource.NewPropertyValue("audit")
+	}
+
+	// Validate enum values
+	if newsMap["entityType"].HasValue() {
+		entityType := newsMap["entityType"].StringValue()
+		if entityType != "stacks" && entityType != "accounts" {
+			failures = append(failures, &pulumirpc.CheckFailure{
+				Reason:   "entityType must be either 'stacks' or 'accounts'",
+				Property: "entityType",
+			})
+		}
+	}
+
+	if newsMap["mode"].HasValue() {
+		mode := newsMap["mode"].StringValue()
+		if mode != "audit" && mode != "preventative" {
+			failures = append(failures, &pulumirpc.CheckFailure{
+				Reason:   "mode must be either 'audit' or 'preventative'",
+				Property: "mode",
+			})
+		}
+	}
+
 	inputs, err := plugin.MarshalProperties(newsMap, plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
@@ -222,6 +263,16 @@ func (p *PulumiServicePolicyGroupResource) Diff(req *pulumirpc.DiffRequest) (*pu
 		replaces = append(replaces, "name")
 	}
 
+	// EntityType change requires replacement
+	if oldPolicyGroup.EntityType != newPolicyGroup.EntityType {
+		replaces = append(replaces, "entityType")
+	}
+
+	// Mode change requires replacement (API doesn't support update yet)
+	if oldPolicyGroup.Mode != newPolicyGroup.Mode {
+		replaces = append(replaces, "mode")
+	}
+
 	return &pulumirpc.DiffResponse{
 		Changes:             changes,
 		Replaces:            replaces,
@@ -249,6 +300,8 @@ func (p *PulumiServicePolicyGroupResource) Read(req *pulumirpc.ReadRequest) (*pu
 	inputs := PulumiServicePolicyGroupInput{
 		Name:             policyGroup.Name,
 		OrganizationName: orgName,
+		EntityType:       policyGroup.EntityType,
+		Mode:             policyGroup.Mode,
 		Stacks:           policyGroup.Stacks,
 		PolicyPacks:      policyGroup.AppliedPolicyPacks,
 	}
@@ -357,7 +410,7 @@ func (p *PulumiServicePolicyGroupResource) Create(req *pulumirpc.CreateRequest) 
 	inputsPolicyGroup := ToPulumiServicePolicyGroupInput(inputs)
 
 	// Create the policy group
-	err = p.Client.CreatePolicyGroup(ctx, inputsPolicyGroup.OrganizationName, inputsPolicyGroup.Name)
+	err = p.Client.CreatePolicyGroup(ctx, inputsPolicyGroup.OrganizationName, inputsPolicyGroup.Name, inputsPolicyGroup.EntityType, inputsPolicyGroup.Mode)
 	if err != nil {
 		return nil, fmt.Errorf("error creating policy group '%s': %w", inputsPolicyGroup.Name, err)
 	}
