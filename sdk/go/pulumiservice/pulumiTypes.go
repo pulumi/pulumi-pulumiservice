@@ -2986,6 +2986,112 @@ func (o OperationContextOptionsPtrOutput) SkipIntermediateDeployments() pulumi.B
 	}).(pulumi.BoolPtrOutput)
 }
 
+type TaskEntity struct {
+	// The entity ID.
+	Id string `pulumi:"id"`
+	// The type of entity.
+	Type string `pulumi:"type"`
+}
+
+// TaskEntityInput is an input type that accepts TaskEntityArgs and TaskEntityOutput values.
+// You can construct a concrete instance of `TaskEntityInput` via:
+//
+//	TaskEntityArgs{...}
+type TaskEntityInput interface {
+	pulumi.Input
+
+	ToTaskEntityOutput() TaskEntityOutput
+	ToTaskEntityOutputWithContext(context.Context) TaskEntityOutput
+}
+
+type TaskEntityArgs struct {
+	// The entity ID.
+	Id pulumi.StringInput `pulumi:"id"`
+	// The type of entity.
+	Type pulumi.StringInput `pulumi:"type"`
+}
+
+func (TaskEntityArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*TaskEntity)(nil)).Elem()
+}
+
+func (i TaskEntityArgs) ToTaskEntityOutput() TaskEntityOutput {
+	return i.ToTaskEntityOutputWithContext(context.Background())
+}
+
+func (i TaskEntityArgs) ToTaskEntityOutputWithContext(ctx context.Context) TaskEntityOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(TaskEntityOutput)
+}
+
+// TaskEntityArrayInput is an input type that accepts TaskEntityArray and TaskEntityArrayOutput values.
+// You can construct a concrete instance of `TaskEntityArrayInput` via:
+//
+//	TaskEntityArray{ TaskEntityArgs{...} }
+type TaskEntityArrayInput interface {
+	pulumi.Input
+
+	ToTaskEntityArrayOutput() TaskEntityArrayOutput
+	ToTaskEntityArrayOutputWithContext(context.Context) TaskEntityArrayOutput
+}
+
+type TaskEntityArray []TaskEntityInput
+
+func (TaskEntityArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]TaskEntity)(nil)).Elem()
+}
+
+func (i TaskEntityArray) ToTaskEntityArrayOutput() TaskEntityArrayOutput {
+	return i.ToTaskEntityArrayOutputWithContext(context.Background())
+}
+
+func (i TaskEntityArray) ToTaskEntityArrayOutputWithContext(ctx context.Context) TaskEntityArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(TaskEntityArrayOutput)
+}
+
+type TaskEntityOutput struct{ *pulumi.OutputState }
+
+func (TaskEntityOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*TaskEntity)(nil)).Elem()
+}
+
+func (o TaskEntityOutput) ToTaskEntityOutput() TaskEntityOutput {
+	return o
+}
+
+func (o TaskEntityOutput) ToTaskEntityOutputWithContext(ctx context.Context) TaskEntityOutput {
+	return o
+}
+
+// The entity ID.
+func (o TaskEntityOutput) Id() pulumi.StringOutput {
+	return o.ApplyT(func(v TaskEntity) string { return v.Id }).(pulumi.StringOutput)
+}
+
+// The type of entity.
+func (o TaskEntityOutput) Type() pulumi.StringOutput {
+	return o.ApplyT(func(v TaskEntity) string { return v.Type }).(pulumi.StringOutput)
+}
+
+type TaskEntityArrayOutput struct{ *pulumi.OutputState }
+
+func (TaskEntityArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]TaskEntity)(nil)).Elem()
+}
+
+func (o TaskEntityArrayOutput) ToTaskEntityArrayOutput() TaskEntityArrayOutput {
+	return o
+}
+
+func (o TaskEntityArrayOutput) ToTaskEntityArrayOutputWithContext(ctx context.Context) TaskEntityArrayOutput {
+	return o
+}
+
+func (o TaskEntityArrayOutput) Index(i pulumi.IntInput) TaskEntityOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) TaskEntity {
+		return vs[0].([]TaskEntity)[vs[1].(int)]
+	}).(TaskEntityOutput)
+}
+
 type TemplateSourceDestination struct {
 	// Destination URL that gets filled in on new project creation.
 	Url *string `pulumi:"url"`
@@ -3158,6 +3264,8 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*OperationContextOIDCPtrInput)(nil)).Elem(), OperationContextOIDCArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*OperationContextOptionsInput)(nil)).Elem(), OperationContextOptionsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*OperationContextOptionsPtrInput)(nil)).Elem(), OperationContextOptionsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*TaskEntityInput)(nil)).Elem(), TaskEntityArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*TaskEntityArrayInput)(nil)).Elem(), TaskEntityArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*TemplateSourceDestinationInput)(nil)).Elem(), TemplateSourceDestinationArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*TemplateSourceDestinationPtrInput)(nil)).Elem(), TemplateSourceDestinationArgs{})
 	pulumi.RegisterOutputType(AWSOIDCConfigurationOutput{})
@@ -3194,6 +3302,8 @@ func init() {
 	pulumi.RegisterOutputType(OperationContextOIDCPtrOutput{})
 	pulumi.RegisterOutputType(OperationContextOptionsOutput{})
 	pulumi.RegisterOutputType(OperationContextOptionsPtrOutput{})
+	pulumi.RegisterOutputType(TaskEntityOutput{})
+	pulumi.RegisterOutputType(TaskEntityArrayOutput{})
 	pulumi.RegisterOutputType(TemplateSourceDestinationOutput{})
 	pulumi.RegisterOutputType(TemplateSourceDestinationPtrOutput{})
 }

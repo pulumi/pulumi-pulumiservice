@@ -35,6 +35,7 @@ __all__ = [
     'GCPOIDCConfiguration',
     'OperationContextOIDC',
     'OperationContextOptions',
+    'TaskEntity',
     'TemplateSourceDestination',
 ]
 
@@ -1172,6 +1173,35 @@ class OperationContextOptions(dict):
         Skip intermediate deployments (Consolidate multiple deployments of the same type into one deployment)
         """
         return pulumi.get(self, "skip_intermediate_deployments")
+
+
+@pulumi.output_type
+class TaskEntity(dict):
+    def __init__(__self__, *,
+                 id: _builtins.str,
+                 type: _builtins.str):
+        """
+        :param _builtins.str id: The entity ID.
+        :param _builtins.str type: The type of entity.
+        """
+        pulumi.set(__self__, "id", id)
+        pulumi.set(__self__, "type", type)
+
+    @_builtins.property
+    @pulumi.getter
+    def id(self) -> _builtins.str:
+        """
+        The entity ID.
+        """
+        return pulumi.get(self, "id")
+
+    @_builtins.property
+    @pulumi.getter
+    def type(self) -> _builtins.str:
+        """
+        The type of entity.
+        """
+        return pulumi.get(self, "type")
 
 
 @pulumi.output_type

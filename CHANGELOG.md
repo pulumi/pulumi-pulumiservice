@@ -6,6 +6,7 @@
 
 - Added Java SDK support with Pulumi Java SDK v1.16.2
 - Upgraded Pulumi SDK to v3.204.0 with latest codegen improvements
+- Added `createTask` invoke function for creating immutable tasks in the Neo agent system [#545](https://github.com/pulumi/pulumi-pulumiservice/pull/545)
 
 ### Bug Fixes
 
