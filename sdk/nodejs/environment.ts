@@ -37,23 +37,23 @@ export class Environment extends pulumi.CustomResource {
     /**
      * Environment name.
      */
-    public readonly name!: pulumi.Output<string>;
+    declare public readonly name: pulumi.Output<string>;
     /**
      * Organization name.
      */
-    public readonly organization!: pulumi.Output<string>;
+    declare public readonly organization: pulumi.Output<string>;
     /**
      * Project name.
      */
-    public readonly project!: pulumi.Output<string>;
+    declare public readonly project: pulumi.Output<string>;
     /**
      * Revision number of the latest version.
      */
-    public /*out*/ readonly revision!: pulumi.Output<number>;
+    declare public /*out*/ readonly revision: pulumi.Output<number>;
     /**
      * Environment's yaml file.
      */
-    public readonly yaml!: pulumi.Output<pulumi.asset.Asset | pulumi.asset.Archive>;
+    declare public readonly yaml: pulumi.Output<pulumi.asset.Asset | pulumi.asset.Archive>;
 
     /**
      * Create a Environment resource with the given unique name, arguments, and options.
@@ -66,19 +66,19 @@ export class Environment extends pulumi.CustomResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
-            if ((!args || args.name === undefined) && !opts.urn) {
+            if (args?.name === undefined && !opts.urn) {
                 throw new Error("Missing required property 'name'");
             }
-            if ((!args || args.organization === undefined) && !opts.urn) {
+            if (args?.organization === undefined && !opts.urn) {
                 throw new Error("Missing required property 'organization'");
             }
-            if ((!args || args.yaml === undefined) && !opts.urn) {
+            if (args?.yaml === undefined && !opts.urn) {
                 throw new Error("Missing required property 'yaml'");
             }
-            resourceInputs["name"] = args ? args.name : undefined;
-            resourceInputs["organization"] = args ? args.organization : undefined;
-            resourceInputs["project"] = (args ? args.project : undefined) ?? "default";
-            resourceInputs["yaml"] = args ? args.yaml : undefined;
+            resourceInputs["name"] = args?.name;
+            resourceInputs["organization"] = args?.organization;
+            resourceInputs["project"] = (args?.project) ?? "default";
+            resourceInputs["yaml"] = args?.yaml;
             resourceInputs["revision"] = undefined /*out*/;
         } else {
             resourceInputs["name"] = undefined /*out*/;

@@ -37,27 +37,27 @@ export class AgentPool extends pulumi.CustomResource {
     /**
      * The agent pool identifier.
      */
-    public /*out*/ readonly agentPoolId!: pulumi.Output<string>;
+    declare public /*out*/ readonly agentPoolId: pulumi.Output<string>;
     /**
      * Description of the agent pool.
      */
-    public readonly description!: pulumi.Output<string | undefined>;
+    declare public readonly description: pulumi.Output<string | undefined>;
     /**
      * Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.
      */
-    public readonly forceDestroy!: pulumi.Output<boolean | undefined>;
+    declare public readonly forceDestroy: pulumi.Output<boolean | undefined>;
     /**
      * The name of the agent pool.
      */
-    public readonly name!: pulumi.Output<string>;
+    declare public readonly name: pulumi.Output<string>;
     /**
      * The organization's name.
      */
-    public readonly organizationName!: pulumi.Output<string>;
+    declare public readonly organizationName: pulumi.Output<string>;
     /**
      * The agent pool's token's value.
      */
-    public /*out*/ readonly tokenValue!: pulumi.Output<string>;
+    declare public /*out*/ readonly tokenValue: pulumi.Output<string>;
 
     /**
      * Create a AgentPool resource with the given unique name, arguments, and options.
@@ -70,16 +70,16 @@ export class AgentPool extends pulumi.CustomResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
-            if ((!args || args.name === undefined) && !opts.urn) {
+            if (args?.name === undefined && !opts.urn) {
                 throw new Error("Missing required property 'name'");
             }
-            if ((!args || args.organizationName === undefined) && !opts.urn) {
+            if (args?.organizationName === undefined && !opts.urn) {
                 throw new Error("Missing required property 'organizationName'");
             }
-            resourceInputs["description"] = args ? args.description : undefined;
-            resourceInputs["forceDestroy"] = args ? args.forceDestroy : undefined;
-            resourceInputs["name"] = args ? args.name : undefined;
-            resourceInputs["organizationName"] = args ? args.organizationName : undefined;
+            resourceInputs["description"] = args?.description;
+            resourceInputs["forceDestroy"] = args?.forceDestroy;
+            resourceInputs["name"] = args?.name;
+            resourceInputs["organizationName"] = args?.organizationName;
             resourceInputs["agentPoolId"] = undefined /*out*/;
             resourceInputs["tokenValue"] = undefined /*out*/;
         } else {

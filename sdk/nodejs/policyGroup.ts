@@ -37,27 +37,27 @@ export class PolicyGroup extends pulumi.CustomResource {
     /**
      * The entity type for the policy group. Valid values are 'stacks' or 'accounts'. Defaults to 'stacks'.
      */
-    public readonly entityType!: pulumi.Output<string | undefined>;
+    declare public readonly entityType: pulumi.Output<string | undefined>;
     /**
      * The mode for the policy group. Valid values are 'audit' (reports violations) or 'preventative' (blocks operations). Defaults to 'audit'.
      */
-    public readonly mode!: pulumi.Output<string | undefined>;
+    declare public readonly mode: pulumi.Output<string | undefined>;
     /**
      * The name of the policy group.
      */
-    public readonly name!: pulumi.Output<string>;
+    declare public readonly name: pulumi.Output<string>;
     /**
      * The name of the Pulumi organization the policy group belongs to.
      */
-    public readonly organizationName!: pulumi.Output<string>;
+    declare public readonly organizationName: pulumi.Output<string>;
     /**
      * List of policy packs applied to this policy group.
      */
-    public readonly policyPacks!: pulumi.Output<{[key: string]: string}[]>;
+    declare public readonly policyPacks: pulumi.Output<{[key: string]: string}[]>;
     /**
      * List of stack references that belong to this policy group.
      */
-    public readonly stacks!: pulumi.Output<{[key: string]: string}[]>;
+    declare public readonly stacks: pulumi.Output<{[key: string]: string}[]>;
 
     /**
      * Create a PolicyGroup resource with the given unique name, arguments, and options.
@@ -70,18 +70,18 @@ export class PolicyGroup extends pulumi.CustomResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
-            if ((!args || args.name === undefined) && !opts.urn) {
+            if (args?.name === undefined && !opts.urn) {
                 throw new Error("Missing required property 'name'");
             }
-            if ((!args || args.organizationName === undefined) && !opts.urn) {
+            if (args?.organizationName === undefined && !opts.urn) {
                 throw new Error("Missing required property 'organizationName'");
             }
-            resourceInputs["entityType"] = (args ? args.entityType : undefined) ?? "stacks";
-            resourceInputs["mode"] = (args ? args.mode : undefined) ?? "audit";
-            resourceInputs["name"] = args ? args.name : undefined;
-            resourceInputs["organizationName"] = args ? args.organizationName : undefined;
-            resourceInputs["policyPacks"] = args ? args.policyPacks : undefined;
-            resourceInputs["stacks"] = args ? args.stacks : undefined;
+            resourceInputs["entityType"] = (args?.entityType) ?? "stacks";
+            resourceInputs["mode"] = (args?.mode) ?? "audit";
+            resourceInputs["name"] = args?.name;
+            resourceInputs["organizationName"] = args?.organizationName;
+            resourceInputs["policyPacks"] = args?.policyPacks;
+            resourceInputs["stacks"] = args?.stacks;
         } else {
             resourceInputs["entityType"] = undefined /*out*/;
             resourceInputs["mode"] = undefined /*out*/;

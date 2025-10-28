@@ -40,23 +40,23 @@ export class ApprovalRule extends pulumi.CustomResource {
     /**
      * The approval rule configuration.
      */
-    public readonly approvalRuleConfig!: pulumi.Output<outputs.ApprovalRuleConfig>;
+    declare public readonly approvalRuleConfig: pulumi.Output<outputs.ApprovalRuleConfig>;
     /**
      * Whether the approval rule is enabled.
      */
-    public readonly enabled!: pulumi.Output<boolean>;
+    declare public readonly enabled: pulumi.Output<boolean>;
     /**
      * The environment this rule applies to.
      */
-    public readonly environmentIdentifier!: pulumi.Output<outputs.EnvironmentIdentifier>;
+    declare public readonly environmentIdentifier: pulumi.Output<outputs.EnvironmentIdentifier>;
     /**
      * Name of the approval rule.
      */
-    public readonly name!: pulumi.Output<string>;
+    declare public readonly name: pulumi.Output<string>;
     /**
      * The type of action this rule applies to.
      */
-    public readonly targetActionTypes!: pulumi.Output<enums.TargetActionType[]>;
+    declare public readonly targetActionTypes: pulumi.Output<enums.TargetActionType[]>;
 
     /**
      * Create a ApprovalRule resource with the given unique name, arguments, and options.
@@ -69,26 +69,26 @@ export class ApprovalRule extends pulumi.CustomResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
-            if ((!args || args.approvalRuleConfig === undefined) && !opts.urn) {
+            if (args?.approvalRuleConfig === undefined && !opts.urn) {
                 throw new Error("Missing required property 'approvalRuleConfig'");
             }
-            if ((!args || args.enabled === undefined) && !opts.urn) {
+            if (args?.enabled === undefined && !opts.urn) {
                 throw new Error("Missing required property 'enabled'");
             }
-            if ((!args || args.environmentIdentifier === undefined) && !opts.urn) {
+            if (args?.environmentIdentifier === undefined && !opts.urn) {
                 throw new Error("Missing required property 'environmentIdentifier'");
             }
-            if ((!args || args.name === undefined) && !opts.urn) {
+            if (args?.name === undefined && !opts.urn) {
                 throw new Error("Missing required property 'name'");
             }
-            if ((!args || args.targetActionTypes === undefined) && !opts.urn) {
+            if (args?.targetActionTypes === undefined && !opts.urn) {
                 throw new Error("Missing required property 'targetActionTypes'");
             }
-            resourceInputs["approvalRuleConfig"] = args ? args.approvalRuleConfig : undefined;
-            resourceInputs["enabled"] = args ? args.enabled : undefined;
-            resourceInputs["environmentIdentifier"] = args ? args.environmentIdentifier : undefined;
-            resourceInputs["name"] = args ? args.name : undefined;
-            resourceInputs["targetActionTypes"] = args ? args.targetActionTypes : undefined;
+            resourceInputs["approvalRuleConfig"] = args?.approvalRuleConfig;
+            resourceInputs["enabled"] = args?.enabled;
+            resourceInputs["environmentIdentifier"] = args?.environmentIdentifier;
+            resourceInputs["name"] = args?.name;
+            resourceInputs["targetActionTypes"] = args?.targetActionTypes;
         } else {
             resourceInputs["approvalRuleConfig"] = undefined /*out*/;
             resourceInputs["enabled"] = undefined /*out*/;

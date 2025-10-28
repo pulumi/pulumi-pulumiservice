@@ -40,31 +40,31 @@ export class DeploymentSchedule extends pulumi.CustomResource {
     /**
      * Organization name.
      */
-    public readonly organization!: pulumi.Output<string>;
+    declare public readonly organization: pulumi.Output<string>;
     /**
      * Project name.
      */
-    public readonly project!: pulumi.Output<string>;
+    declare public readonly project: pulumi.Output<string>;
     /**
      * Which operation to run.
      */
-    public readonly pulumiOperation!: pulumi.Output<enums.PulumiOperation>;
+    declare public readonly pulumiOperation: pulumi.Output<enums.PulumiOperation>;
     /**
      * Cron expression for recurring scheduled runs. If you are supplying this, do not supply timestamp.
      */
-    public readonly scheduleCron!: pulumi.Output<string | undefined>;
+    declare public readonly scheduleCron: pulumi.Output<string | undefined>;
     /**
      * Schedule ID of the created schedule, assigned by Pulumi Cloud.
      */
-    public /*out*/ readonly scheduleId!: pulumi.Output<string>;
+    declare public /*out*/ readonly scheduleId: pulumi.Output<string>;
     /**
      * Stack name.
      */
-    public readonly stack!: pulumi.Output<string>;
+    declare public readonly stack: pulumi.Output<string>;
     /**
      * The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are supplying this, do not supply scheduleCron.
      */
-    public readonly timestamp!: pulumi.Output<string | undefined>;
+    declare public readonly timestamp: pulumi.Output<string | undefined>;
 
     /**
      * Create a DeploymentSchedule resource with the given unique name, arguments, and options.
@@ -77,24 +77,24 @@ export class DeploymentSchedule extends pulumi.CustomResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
-            if ((!args || args.organization === undefined) && !opts.urn) {
+            if (args?.organization === undefined && !opts.urn) {
                 throw new Error("Missing required property 'organization'");
             }
-            if ((!args || args.project === undefined) && !opts.urn) {
+            if (args?.project === undefined && !opts.urn) {
                 throw new Error("Missing required property 'project'");
             }
-            if ((!args || args.pulumiOperation === undefined) && !opts.urn) {
+            if (args?.pulumiOperation === undefined && !opts.urn) {
                 throw new Error("Missing required property 'pulumiOperation'");
             }
-            if ((!args || args.stack === undefined) && !opts.urn) {
+            if (args?.stack === undefined && !opts.urn) {
                 throw new Error("Missing required property 'stack'");
             }
-            resourceInputs["organization"] = args ? args.organization : undefined;
-            resourceInputs["project"] = args ? args.project : undefined;
-            resourceInputs["pulumiOperation"] = args ? args.pulumiOperation : undefined;
-            resourceInputs["scheduleCron"] = args ? args.scheduleCron : undefined;
-            resourceInputs["stack"] = args ? args.stack : undefined;
-            resourceInputs["timestamp"] = args ? args.timestamp : undefined;
+            resourceInputs["organization"] = args?.organization;
+            resourceInputs["project"] = args?.project;
+            resourceInputs["pulumiOperation"] = args?.pulumiOperation;
+            resourceInputs["scheduleCron"] = args?.scheduleCron;
+            resourceInputs["stack"] = args?.stack;
+            resourceInputs["timestamp"] = args?.timestamp;
             resourceInputs["scheduleId"] = undefined /*out*/;
         } else {
             resourceInputs["organization"] = undefined /*out*/;
