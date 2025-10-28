@@ -14,8 +14,15 @@ import (
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
+// AccessTokenClient defines the interface for access token operations
+type AccessTokenClient interface {
+	CreateAccessToken(ctx context.Context, description string) (*pulumiapi.AccessToken, error)
+	DeleteAccessToken(ctx context.Context, tokenId string) error
+	GetAccessToken(ctx context.Context, id string) (*pulumiapi.AccessToken, error)
+}
+
 type PulumiServiceAccessTokenResource struct {
-	Client *pulumiapi.Client
+	Client AccessTokenClient
 }
 
 type PulumiServiceAccessTokenInput struct {
@@ -41,7 +48,7 @@ func GenerateAcessTokenProperties(input PulumiServiceAccessTokenInput, accessTok
 
 	outputs, err = plugin.MarshalProperties(
 		outputStore,
-		plugin.MarshalOptions{},
+		plugin.MarshalOptions{KeepSecrets: true},
 	)
 	if err != nil {
 		return nil, nil, err

@@ -13,8 +13,15 @@ import (
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
+// StackClient defines the interface for stack operations
+type StackClient interface {
+	CreateStack(ctx context.Context, stack pulumiapi.StackIdentifier) error
+	DeleteStack(ctx context.Context, stack pulumiapi.StackIdentifier, forceDestroy bool) error
+	StackExists(ctx context.Context, stack pulumiapi.StackIdentifier) (bool, error)
+}
+
 type PulumiServiceStackResource struct {
-	Client *pulumiapi.Client
+	Client StackClient
 }
 
 type PulumiServiceStack struct {

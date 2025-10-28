@@ -15,8 +15,15 @@ import (
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
+// TeamAccessTokenClient defines the interface for team access token operations
+type TeamAccessTokenClient interface {
+	CreateTeamAccessToken(ctx context.Context, name, orgName, teamName, description string) (*pulumiapi.AccessToken, error)
+	DeleteTeamAccessToken(ctx context.Context, tokenId, orgName, teamName string) error
+	GetTeamAccessToken(ctx context.Context, tokenId, orgName, teamName string) (*pulumiapi.AccessToken, error)
+}
+
 type PulumiServiceTeamAccessTokenResource struct {
-	Client *pulumiapi.Client
+	Client TeamAccessTokenClient
 }
 
 type PulumiServiceTeamAccessTokenInput struct {
@@ -38,7 +45,7 @@ func GenerateTeamAccessTokenProperties(input PulumiServiceTeamAccessTokenInput, 
 		return nil, nil, err
 	}
 
-	outputs, err = plugin.MarshalProperties(outputMap, plugin.MarshalOptions{})
+	outputs, err = plugin.MarshalProperties(outputMap, plugin.MarshalOptions{KeepSecrets: true})
 	if err != nil {
 		return nil, nil, err
 	}
@@ -198,7 +205,7 @@ func splitTeamAccessTokenId(id string) (string, string, string, string, error) {
 	// format: organization/teamName/tokenName/tokenId
 	s := strings.Split(id, "/")
 	if len(s) != 4 {
-		return "", "", "", "", fmt.Errorf("%q is invalid, must contain a single slash ('/')", id)
+		return "", "", "", "", fmt.Errorf("%q is invalid, must be in format 'organization/teamName/tokenName/tokenId'", id)
 	}
 	return s[0], s[1], s[2], s[3], nil
 }
