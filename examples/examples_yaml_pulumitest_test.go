@@ -40,13 +40,19 @@ func TestYamlExamplesWithPulumiTest(t *testing.T) {
 				opttest.UseAmbientBackend())
 
 			// Configure the pulumiservice provider
-			// Set API URL to the real Pulumi Service (not the file backend used for state)
-			test.SetConfig(t, "pulumiservice:apiUrl", "https://api.pulumi.com")
+			// Use the staging API URL if PULUMI_BACKEND_URL is set (matches CI environment)
+			apiUrl := "https://api.pulumi.com"
+			if backendUrl := os.Getenv("PULUMI_BACKEND_URL"); backendUrl != "" {
+				apiUrl = backendUrl
+			}
+			test.SetConfig(t, "pulumiservice:apiUrl", apiUrl)
 			
 			// Set access token from environment variable (required for API access)
-			if token := os.Getenv("PULUMI_ACCESS_TOKEN"); token != "" {
-				test.SetConfig(t, "pulumiservice:accessToken", token)
+			token := os.Getenv("PULUMI_ACCESS_TOKEN")
+			if token == "" {
+				t.Fatal("PULUMI_ACCESS_TOKEN environment variable is required for pulumitest")
 			}
+			test.SetConfig(t, "pulumiservice:accessToken", token)
 
 			// Set default organization if PULUMI_TEST_OWNER is available
 			if orgName := os.Getenv("PULUMI_TEST_OWNER"); orgName != "" {
@@ -202,13 +208,19 @@ func TestYamlExamplesWithConfigWithPulumiTest(t *testing.T) {
 			test := pulumitest.NewPulumiTest(t, testCase.directoryName, options...)
 
 			// Configure the pulumiservice provider
-			// Set API URL to the real Pulumi Service (not the file backend used for state)
-			test.SetConfig(t, "pulumiservice:apiUrl", "https://api.pulumi.com")
+			// Use the staging API URL if PULUMI_BACKEND_URL is set (matches CI environment)
+			apiUrl := "https://api.pulumi.com"
+			if backendUrl := os.Getenv("PULUMI_BACKEND_URL"); backendUrl != "" {
+				apiUrl = backendUrl
+			}
+			test.SetConfig(t, "pulumiservice:apiUrl", apiUrl)
 			
 			// Set access token from environment variable (required for API access)
-			if token := os.Getenv("PULUMI_ACCESS_TOKEN"); token != "" {
-				test.SetConfig(t, "pulumiservice:accessToken", token)
+			token := os.Getenv("PULUMI_ACCESS_TOKEN")
+			if token == "" {
+				t.Fatal("PULUMI_ACCESS_TOKEN environment variable is required for pulumitest")
 			}
+			test.SetConfig(t, "pulumiservice:accessToken", token)
 
 			// Set the required configuration
 			for key, value := range testCase.config {
