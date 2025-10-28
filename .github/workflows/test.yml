@@ -23,6 +23,7 @@ env:
   PULUMI_JAVA_SDK_VERSION: 0.10.0
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
   PULUMI_TEST_OWNER: service-provider-test-org
+  PULUMI_TEST_USER: pulumi-bot
   PULUMI_TEST_USE_SERVICE: "true"
   PYPI_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
   PYPI_USERNAME: __token__
@@ -106,3 +107,29 @@ jobs:
         - 3
         - 4
         - 5
+
+  pulumitest:
+    name: pulumitest
+    needs: test
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    env:
+      PROVIDER_VERSION: ${{ inputs.version }}
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ env.PR_COMMIT_SHA }}
+        persist-credentials: false
+    - name: Setup tools
+      uses: ./.github/actions/setup-tools
+      with:
+        tools: pulumictl, pulumicli, go
+    - name: Download bin
+      uses: ./.github/actions/download-bin
+    - name: Update path
+      run: echo "${{ github.workspace }}/bin" >> "$GITHUB_PATH"
+    - name: Run pulumitest examples
+      run: make test_pulumitest

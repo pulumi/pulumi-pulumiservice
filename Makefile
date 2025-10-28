@@ -160,6 +160,10 @@ test_shard:
 	cd examples && \
 		go test -tags=all -v -count=1 -coverprofile="coverage.txt" -coverpkg=./... -timeout 3h -parallel ${TESTPARALLELISM} -run "$(SHARD_TESTS)" $(SHARD_PATHS)
 
+test_pulumitest:
+	cd examples && \
+		go test -tags=yaml_pulumitest -v -count=1 -timeout 3h -parallel ${TESTPARALLELISM} ./...
+
 install_plugins: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
 install_plugins: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
 install_plugins: .pulumi/bin/pulumi

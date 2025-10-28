@@ -1,5 +1,5 @@
-//go:build yaml_pulumitest || all
-// +build yaml_pulumitest all
+//go:build yaml_pulumitest
+// +build yaml_pulumitest
 
 // Copyright 2016-2025, Pulumi Corporation.
 
@@ -259,8 +259,12 @@ func TestYamlStackTagsExampleWithPulumiTest(t *testing.T) {
 			opttest.UseAmbientBackend())
 
 		// Configure the pulumiservice provider
-		// Set API URL to the real Pulumi Service (not the file backend used for state)
-		test.SetConfig(t, "pulumiservice:apiUrl", "https://api.pulumi.com")
+		// Use the staging API URL if PULUMI_BACKEND_URL is set (matches CI environment)
+		apiUrl := "https://api.pulumi.com"
+		if backendUrl := os.Getenv("PULUMI_BACKEND_URL"); backendUrl != "" {
+			apiUrl = backendUrl
+		}
+		test.SetConfig(t, "pulumiservice:apiUrl", apiUrl)
 		
 		// Set access token from environment variable (required for API access)
 		if token := os.Getenv("PULUMI_ACCESS_TOKEN"); token != "" {
