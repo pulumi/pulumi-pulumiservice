@@ -30,7 +30,7 @@ ensure::
 	go mod tidy
 	cd sdk && go mod tidy
 
-build_sdks: dotnet_sdk go_sdk nodejs_sdk python_sdk java_sdk
+build_sdks: provider dotnet_sdk go_sdk nodejs_sdk python_sdk java_sdk
 
 gen_sdk_prerequisites: $(PULUMI)
 
@@ -46,30 +46,27 @@ test_provider::
 
 dotnet_sdk: gen_sdk_prerequisites
 	rm -rf sdk/dotnet
-	$(PULUMI) package gen-sdk bin/$(PROVIDER) --language dotnet
+	$(PULUMI) package gen-sdk $(WORKING_DIR)/bin/$(PROVIDER) --language dotnet
 	cd sdk/dotnet/ && \
 		printf "module fake_dotnet_module // Exclude this directory from Go tools\n\ngo 1.17\n" > go.mod && \
 		echo "${VERSION_GENERIC}" >version.txt && \
 		dotnet build
 
-go_sdk: export PULUMI_IGNORE_AMBIENT_PLUGINS = true
 go_sdk: gen_sdk_prerequisites
 	rm -rf sdk/go
-	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language go --version $(VERSION_GENERIC)
+	$(PULUMI) package gen-sdk $(WORKING_DIR)/bin/$(PROVIDER) --language go
 
-nodejs_sdk: export PULUMI_IGNORE_AMBIENT_PLUGINS = true
 nodejs_sdk: gen_sdk_prerequisites
 	rm -rf sdk/nodejs
-	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language nodejs --version $(VERSION_GENERIC)
+	$(PULUMI) package gen-sdk $(WORKING_DIR)/bin/$(PROVIDER) --language nodejs
 	cd sdk/nodejs && \
 		yarn install --no-progress && \
 		yarn run build && \
 		cp package.json yarn.lock ./bin/
 
-python_sdk: export PULUMI_IGNORE_AMBIENT_PLUGINS = true
 python_sdk: gen_sdk_prerequisites
 	rm -rf sdk/python
-	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language python --version $(VERSION_GENERIC)
+	$(PULUMI) package gen-sdk $(WORKING_DIR)/bin/$(PROVIDER) --language python
 	cd sdk/python/ && \
 		printf "module fake_python_module // Exclude this directory from Go tools\n\ngo 1.17\n" > go.mod && \
 		cp ../../README.md . && \
@@ -79,10 +76,9 @@ python_sdk: gen_sdk_prerequisites
 		cd ./bin && \
 		../venv/bin/python -m build .
 
-java_sdk: export PULUMI_IGNORE_AMBIENT_PLUGINS = true
 java_sdk: gen_sdk_prerequisites
 	rm -rf sdk/java
-	$(PULUMI) package gen-sdk $(SCHEMA_FILE) --language java --version $(VERSION_GENERIC)
+	$(PULUMI) package gen-sdk $(WORKING_DIR)/bin/$(PROVIDER) --language java
 	cd sdk/java && \
 		printf "module fake_java_module // Exclude this directory from Go tools\n\ngo 1.17\n" > go.mod && \
 		cp ../../README.md . && \
@@ -158,7 +154,7 @@ test_shard:
 		go test -tags=all -v -count=1 -coverprofile="coverage.txt" -coverpkg=./... -timeout 3h -parallel ${TESTPARALLELISM} -run "$(SHARD_TESTS)" $(SHARD_PATHS)
 
 install_plugins: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
-install_plugins: export PATH := "$(WORKING_DIR)/.pulumi/bin:$(PATH)"
+install_plugins: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
 install_plugins: .pulumi/bin/pulumi
 
 bin/linux-amd64/$(PROVIDER): TARGET := linux-amd64

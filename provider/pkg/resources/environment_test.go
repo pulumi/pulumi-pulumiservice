@@ -88,7 +88,11 @@ func (c *EscClientMock) GetPulumiAccountDetails(context.Context) (string, []stri
 	return "", nil, nil, nil
 }
 
-func (c *EscClientMock) ListEnvironments(context.Context, string, string) ([]client.OrgEnvironment, string, error) {
+func (c *EscClientMock) ListEnvironments(context.Context, string) ([]client.OrgEnvironment, string, error) {
+	return nil, "", nil
+}
+
+func (c *EscClientMock) ListOrganizationEnvironments(context.Context, string, string) ([]client.OrgEnvironment, string, error) {
 	return nil, "", nil
 }
 
@@ -108,12 +112,40 @@ func (c *EscClientMock) OpenYAMLEnvironment(context.Context, string, []byte, tim
 	return "", nil, nil
 }
 
+func (c *EscClientMock) OpenEnvironmentDraft(context.Context, string, string, string, string, time.Duration) (string, []client.EnvironmentDiagnostic, error) {
+	return "", nil, nil
+}
+
+func (c *EscClientMock) RotateEnvironment(context.Context, string, string, string, []string) (*client.RotateEnvironmentResponse, []client.EnvironmentDiagnostic, error) {
+	return nil, nil, nil
+}
+
+func (c *EscClientMock) SubmitChangeRequest(context.Context, string, string, *string) error {
+	return nil
+}
+
 func (c *EscClientMock) UpdateEnvironment(context.Context, string, string, []byte, string) ([]client.EnvironmentDiagnostic, error) {
 	return nil, nil
 }
 
 func (c *EscClientMock) UpdateEnvironmentWithProject(context.Context, string, string, string, []byte, string) ([]client.EnvironmentDiagnostic, error) {
 	return nil, nil
+}
+
+func (c *EscClientMock) UpdateEnvironmentDraft(context.Context, string, string, string, string, []byte, string) ([]client.EnvironmentDiagnostic, error) {
+	return nil, nil
+}
+
+func (c *EscClientMock) CreateEnvironmentDraft(context.Context, string, string, string, []byte, string) (string, []client.EnvironmentDiagnostic, error) {
+	return "", nil, nil
+}
+
+func (c *EscClientMock) GetDefaultOrg(context.Context) (string, error) {
+	return "", nil
+}
+
+func (c *EscClientMock) GetEnvironmentDraft(context.Context, string, string, string, string) ([]byte, string, error) {
+	return nil, "", nil
 }
 
 func (c *EscClientMock) CreateEnvironmentTag(context.Context, string, string, string, string, string) (*client.EnvironmentTag, error) {
