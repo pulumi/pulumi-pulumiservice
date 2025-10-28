@@ -6,6 +6,8 @@
 
 - Added Java SDK support with Pulumi Java SDK v1.16.2
 - Upgraded Pulumi SDK to v3.204.0 with latest codegen improvements
+- Added comprehensive pulumitest integration tests that mirror existing test functionality
+- Updated all YAML examples to use configurable stack values with sensible defaults, making tests runnable locally in any organization
 
 ### Bug Fixes
 
