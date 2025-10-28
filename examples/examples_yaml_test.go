@@ -425,6 +425,17 @@ func TestYamlPolicyGroupsExample(t *testing.T) {
 	})
 }
 
+func TestYamlInsightsAccountExample(t *testing.T) {
+	cwd := getCwd(t)
+	digits := generateRandomFiveDigits()
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Dir: path.Join(cwd, ".", "yaml-insights-account"),
+		Config: map[string]string{
+			"digits": digits,
+		},
+	})
+}
+
 func writePulumiYaml(t *testing.T, yamlContents interface{}) string {
 	tmpdir := t.TempDir()
 	b, err := yaml.Marshal(yamlContents)

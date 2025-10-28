@@ -1,0 +1,41 @@
+name: yaml-insights-account
+runtime: yaml
+description: A minimal example of provisioning an Insights Account via Pulumi YAML
+
+resources:
+  # ESC environment with AWS credentials for scanning
+  credentials-env:
+    type: pulumiservice:index:Environment
+    properties:
+      organization: service-provider-test-org
+      name: insights-credentials-${digits}
+      yaml:
+        fn::stringAsset: |-
+          values:
+            aws:
+              login:
+                fn::open::aws-login:
+                  oidc:
+                    roleArn: arn:aws:iam::123456789012:role/PulumiInsightsRole
+                    sessionName: pulumi-insights-session
+            environmentVariables:
+              AWS_REGION: us-west-2
+
+  # Insights account for AWS scanning
+  insights-account:
+    type: pulumiservice:index:InsightsAccount
+    properties:
+      organizationName: service-provider-test-org
+      accountName: test-insights-account-${digits}
+      provider: aws
+      environment: ${credentials-env.name}
+      cron: "0 2 * * *"
+      providerConfig:
+        regions:
+          - us-west-2
+          - us-east-1
+
+outputs:
+  insightsAccountId: ${insights-account.insightsAccountId}
+  accountName: ${insights-account.accountName}
+  scheduledScanEnabled: ${insights-account.scheduledScanEnabled}
