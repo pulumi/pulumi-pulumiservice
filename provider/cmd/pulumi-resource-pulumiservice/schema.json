@@ -1096,6 +1096,57 @@
         "organizationName"
       ]
     },
+    "pulumiservice:index:OrgMember": {
+      "description": "Manages the membership of a user in a Pulumi Cloud organization. This resource allows you to add users to organizations and assign roles (admin or member).",
+      "properties": {
+        "organizationName": {
+          "description": "The name of the Pulumi organization.",
+          "type": "string"
+        },
+        "userName": {
+          "description": "The username of the Pulumi user to add to the organization.",
+          "type": "string"
+        },
+        "role": {
+          "description": "The role to assign to the user. Must be either 'admin' or 'member'.",
+          "type": "string"
+        },
+        "knownToPulumi": {
+          "description": "Whether the user is known to Pulumi (read-only).",
+          "type": "boolean"
+        },
+        "virtualAdmin": {
+          "description": "Whether the user is a virtual admin (read-only).",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "organizationName",
+        "userName",
+        "role"
+      ],
+      "inputProperties": {
+        "organizationName": {
+          "description": "The name of the Pulumi organization.",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "userName": {
+          "description": "The username of the Pulumi user to add to the organization.",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "role": {
+          "description": "The role to assign to the user. Must be either 'admin' or 'member'.",
+          "type": "string"
+        }
+      },
+      "requiredInputs": [
+        "organizationName",
+        "userName",
+        "role"
+      ]
+    },
     "pulumiservice:index:OrgAccessToken": {
       "description": "The Pulumi Cloud allows users to create access tokens scoped to orgs. Org access tokens is a resource to create them and assign them to an org",
       "properties": {

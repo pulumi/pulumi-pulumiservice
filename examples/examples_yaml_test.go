@@ -425,6 +425,17 @@ func TestYamlPolicyGroupsExample(t *testing.T) {
 	})
 }
 
+func TestYamlOrgMemberExample(t *testing.T) {
+	cwd := getCwd(t)
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Dir: path.Join(cwd, ".", "yaml-org-member"),
+		ExtraRuntimeValidation: func(t *testing.T, stack integration.RuntimeValidationStackInfo) {
+			assert.NotEmpty(t, stack.Outputs["memberId"])
+			assert.Equal(t, "member", stack.Outputs["memberRole"])
+		},
+	})
+}
+
 func writePulumiYaml(t *testing.T, yamlContents interface{}) string {
 	tmpdir := t.TempDir()
 	b, err := yaml.Marshal(yamlContents)

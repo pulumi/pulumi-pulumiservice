@@ -1,0 +1,16 @@
+name: yaml-org-member
+runtime: yaml
+description: Example of managing Pulumi Cloud organization members
+
+resources:
+  example-member:
+    type: pulumiservice:index:OrgMember
+    properties:
+      organizationName: service-provider-test-org
+      userName: service-provider-example-user
+      role: member
+
+outputs:
+  memberId: ${example-member.id}
+  memberRole: ${example-member.role}
+  knownToPulumi: ${example-member.knownToPulumi}

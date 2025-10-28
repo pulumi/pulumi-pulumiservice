@@ -156,6 +156,9 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 		&resources.PulumiServiceOrgAccessTokenResource{
 			Client: client,
 		},
+		&resources.PulumiServiceOrgMemberResource{
+			Client: client,
+		},
 		&resources.PulumiServiceDeploymentSettingsResource{
 			Client: client,
 		},

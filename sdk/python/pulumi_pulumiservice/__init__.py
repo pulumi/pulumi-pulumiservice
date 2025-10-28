@@ -20,6 +20,7 @@ from .get_policy_pack import *
 from .get_policy_packs import *
 from .oidc_issuer import *
 from .org_access_token import *
+from .org_member import *
 from .policy_group import *
 from .provider import *
 from .stack import *
@@ -60,6 +61,7 @@ _utilities.register(
    "pulumiservice:index:EnvironmentVersionTag": "EnvironmentVersionTag",
    "pulumiservice:index:OidcIssuer": "OidcIssuer",
    "pulumiservice:index:OrgAccessToken": "OrgAccessToken",
+   "pulumiservice:index:OrgMember": "OrgMember",
    "pulumiservice:index:PolicyGroup": "PolicyGroup",
    "pulumiservice:index:Stack": "Stack",
    "pulumiservice:index:StackTag": "StackTag",

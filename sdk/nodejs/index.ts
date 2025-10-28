@@ -70,6 +70,11 @@ export type OrgAccessToken = import("./orgAccessToken").OrgAccessToken;
 export const OrgAccessToken: typeof import("./orgAccessToken").OrgAccessToken = null as any;
 utilities.lazyLoad(exports, ["OrgAccessToken"], () => require("./orgAccessToken"));
 
+export { OrgMemberArgs } from "./orgMember";
+export type OrgMember = import("./orgMember").OrgMember;
+export const OrgMember: typeof import("./orgMember").OrgMember = null as any;
+utilities.lazyLoad(exports, ["OrgMember"], () => require("./orgMember"));
+
 export { PolicyGroupArgs } from "./policyGroup";
 export type PolicyGroup = import("./policyGroup").PolicyGroup;
 export const PolicyGroup: typeof import("./policyGroup").PolicyGroup = null as any;
@@ -164,6 +169,8 @@ const _module = {
                 return new OidcIssuer(name, <any>undefined, { urn })
             case "pulumiservice:index:OrgAccessToken":
                 return new OrgAccessToken(name, <any>undefined, { urn })
+            case "pulumiservice:index:OrgMember":
+                return new OrgMember(name, <any>undefined, { urn })
             case "pulumiservice:index:PolicyGroup":
                 return new PolicyGroup(name, <any>undefined, { urn })
             case "pulumiservice:index:Stack":
