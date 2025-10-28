@@ -17,6 +17,20 @@ import javax.annotation.Nullable;
 /**
  * A permission for a team to use an environment.
  * 
+ * ### Import
+ * 
+ * Team environment permissions can be imported using the `id`, which for team environment permissions is `{org}/{team}/{project}+{environment}` or `{org}/{team}/{environment}` e.g.,
+ * 
+ * ```sh
+ *  $ pulumi import pulumiservice:index:TeamEnvironmentPermission my_perm my-org/my-team/my-project+my-env
+ * ```
+ * 
+ * or using the legacy format (assumes &#34;default&#34; project):
+ * 
+ * ```sh
+ *  $ pulumi import pulumiservice:index:TeamEnvironmentPermission my_perm my-org/my-team/my-env
+ * ```
+ * 
  */
 @ResourceType(type="pulumiservice:index:TeamEnvironmentPermission")
 public class TeamEnvironmentPermission extends com.pulumi.resources.CustomResource {

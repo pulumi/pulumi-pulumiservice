@@ -116,6 +116,14 @@ class EnvironmentRotationSchedule(pulumi.CustomResource):
         """
         A scheduled recurring or single time environment rotation.
 
+        ### Import
+
+        Environment rotation schedules can be imported using the `id`, which for environment rotation schedules is `{org}/{project}/{environment}/rotations/{scheduleId}` e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:EnvironmentRotationSchedule my_rotation my-org/my-project/my-env/rotations/sched-123
+        ```
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] environment: Environment name.
@@ -132,6 +140,14 @@ class EnvironmentRotationSchedule(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         A scheduled recurring or single time environment rotation.
+
+        ### Import
+
+        Environment rotation schedules can be imported using the `id`, which for environment rotation schedules is `{org}/{project}/{environment}/rotations/{scheduleId}` e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:EnvironmentRotationSchedule my_rotation my-org/my-project/my-env/rotations/sched-123
+        ```
 
         :param str resource_name: The name of the resource.
         :param EnvironmentRotationScheduleArgs args: The arguments to use to populate this resource's properties.

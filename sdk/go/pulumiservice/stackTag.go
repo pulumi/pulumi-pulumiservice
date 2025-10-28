@@ -13,6 +13,16 @@ import (
 )
 
 // Stacks have associated metadata in the form of tags. Each tag consists of a name and value.
+//
+// ### Import
+//
+// Stack tags can be imported using the `id`, which for stack tags is `{org}/{project}/{stack}/{tagName}` e.g.,
+//
+// ```sh
+//
+//	$ pulumi import pulumiservice:index:StackTag my_tag my-org/my-project/my-stack/my-tag
+//
+// ```
 type StackTag struct {
 	pulumi.CustomResourceState
 

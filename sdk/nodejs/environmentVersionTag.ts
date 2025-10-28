@@ -6,6 +6,20 @@ import * as utilities from "./utilities";
 
 /**
  * A tag on a specific revision of an environment.
+ *
+ * ### Import
+ *
+ * Environment version tags can be imported using the `id`, which for environment version tags is `{org}/{project}/{environment}/{tagName}` or `{org}/{environment}/{tagName}` e.g.,
+ *
+ * ```sh
+ *  $ pulumi import pulumiservice:index:EnvironmentVersionTag my_tag my-org/my-project/my-env/tag-v1
+ * ```
+ *
+ * or using the legacy format (assumes "default" project):
+ *
+ * ```sh
+ *  $ pulumi import pulumiservice:index:EnvironmentVersionTag my_tag my-org/my-env/tag-v1
+ * ```
  */
 export class EnvironmentVersionTag extends pulumi.CustomResource {
     /**

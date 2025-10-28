@@ -136,6 +136,14 @@ class OidcIssuer(pulumi.CustomResource):
         """
         Register an OIDC Provider to establish a trust relationship between third-party systems like GitHub Actions and Pulumi Cloud, obviating the need to store a hard-coded Pulumi Cloud token in systems that need to run Pulumi commands or consume Pulumi Cloud APIs. Instead of a hard-coded, static token that must be manually rotated, trusted systems are granted temporary Pulumi Cloud tokens on an as-needed basis, which is more secure than static tokens.
 
+        ### Import
+
+        OIDC issuers can be imported using the `id`, which for OIDC issuers is `{org}/{issuerId}` e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:OidcIssuer my_issuer my-org/issuer-abc123
+        ```
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.int] max_expiration_seconds: The maximum duration of the Pulumi access token working after an exchange, specified in seconds.
@@ -153,6 +161,14 @@ class OidcIssuer(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Register an OIDC Provider to establish a trust relationship between third-party systems like GitHub Actions and Pulumi Cloud, obviating the need to store a hard-coded Pulumi Cloud token in systems that need to run Pulumi commands or consume Pulumi Cloud APIs. Instead of a hard-coded, static token that must be manually rotated, trusted systems are granted temporary Pulumi Cloud tokens on an as-needed basis, which is more secure than static tokens.
+
+        ### Import
+
+        OIDC issuers can be imported using the `id`, which for OIDC issuers is `{org}/{issuerId}` e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:OidcIssuer my_issuer my-org/issuer-abc123
+        ```
 
         :param str resource_name: The name of the resource.
         :param OidcIssuerArgs args: The arguments to use to populate this resource's properties.

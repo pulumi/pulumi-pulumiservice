@@ -11,6 +11,14 @@ namespace Pulumi.PulumiService
 {
     /// <summary>
     /// A source for Pulumi templates
+    /// 
+    /// ### Import
+    /// 
+    /// Template sources can be imported using the `id`, which for template sources is `{org}/{templateId}` e.g.,
+    /// 
+    /// ```sh
+    ///  $ pulumi import pulumiservice:index:TemplateSource my_template my-org/template-abc123
+    /// ```
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:index:TemplateSource")]
     public partial class TemplateSource : global::Pulumi.CustomResource

@@ -6,6 +6,20 @@ import * as utilities from "./utilities";
 
 /**
  * An ESC Environment.
+ *
+ * ### Import
+ *
+ * Environments can be imported using the `id`, which for environments is `{org}/{project}/{environment}` or `{org}/{environment}` e.g.,
+ *
+ * ```sh
+ *  $ pulumi import pulumiservice:index:Environment my_environment my-org/my-project/my-env
+ * ```
+ *
+ * or using the legacy format (assumes "default" project):
+ *
+ * ```sh
+ *  $ pulumi import pulumiservice:index:Environment my_environment my-org/my-env
+ * ```
  */
 export class Environment extends pulumi.CustomResource {
     /**

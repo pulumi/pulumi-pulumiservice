@@ -117,6 +117,14 @@ class ApprovalRule(pulumi.CustomResource):
         """
         An approval rule for environment deployments.
 
+        ### Import
+
+        Approval rules can be imported using the `id`, which for approval rules is `environment/{org}/{project}/{environment}/{ruleId}` e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:ApprovalRule my_rule environment/my-org/my-project/my-env/rule-123
+        ```
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[Union['ApprovalRuleConfigArgs', 'ApprovalRuleConfigArgsDict']] approval_rule_config: The approval rule configuration.
@@ -133,6 +141,14 @@ class ApprovalRule(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         An approval rule for environment deployments.
+
+        ### Import
+
+        Approval rules can be imported using the `id`, which for approval rules is `environment/{org}/{project}/{environment}/{ruleId}` e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:ApprovalRule my_rule environment/my-org/my-project/my-env/rule-123
+        ```
 
         :param str resource_name: The name of the resource.
         :param ApprovalRuleArgs args: The arguments to use to populate this resource's properties.

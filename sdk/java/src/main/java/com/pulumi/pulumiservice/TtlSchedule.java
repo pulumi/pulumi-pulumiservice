@@ -17,6 +17,14 @@ import javax.annotation.Nullable;
 /**
  * A scheduled stack destroy run.
  * 
+ * ### Import
+ * 
+ * TTL schedules can be imported using the `id`, which for TTL schedules is `{org}/{project}/{stack}/ttl/{scheduleId}` e.g.,
+ * 
+ * ```sh
+ *  $ pulumi import pulumiservice:index:TtlSchedule my_ttl_schedule my-org/my-project/my-stack/ttl/sched-789
+ * ```
+ * 
  */
 @ResourceType(type="pulumiservice:index:TtlSchedule")
 public class TtlSchedule extends com.pulumi.resources.CustomResource {

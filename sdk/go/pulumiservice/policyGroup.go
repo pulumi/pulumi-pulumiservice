@@ -13,6 +13,16 @@ import (
 )
 
 // A Policy Group allows you to apply policy packs to a set of stacks in your organization.
+//
+// ### Import
+//
+// Policy groups can be imported using the `id`, which for policy groups is `{org}/{policyGroupName}` e.g.,
+//
+// ```sh
+//
+//	$ pulumi import pulumiservice:index:PolicyGroup my_policy_group my-org/my-policy-group
+//
+// ```
 type PolicyGroup struct {
 	pulumi.CustomResourceState
 

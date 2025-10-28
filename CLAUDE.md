@@ -127,7 +127,7 @@ The provider schema is **manually maintained** at `provider/cmd/pulumi-resource-
 1. Add resource definition to `provider/cmd/pulumi-resource-pulumiservice/schema.json`
 2. Create API client methods in `provider/pkg/pulumiapi/` (e.g., `teams.go`, `webhooks.go`)
 3. Create resource implementation in `provider/pkg/resources/` implementing `PulumiServiceResource` interface
-4. Register the resource in `provider/pkg/provider/provider.go`
+4. Register the resource in `provider/pkg/provider/provider.go` (in the `pulumiResources` slice in `Configure`)
 5. Rebuild provider and SDKs: `make build`
 6. Add examples in `examples/` directory
 7. **IMPORTANT**: Always create a YAML example for the new resource:
@@ -135,6 +135,17 @@ The provider schema is **manually maintained** at `provider/cmd/pulumi-resource-
    - Create a `README.md` in the example directory that includes a link to the `pulumi convert` documentation (https://www.pulumi.com/docs/iac/cli/commands/pulumi_convert/) for converting the example to other programming languages
    - Register the example test in `examples/examples_yaml_test.go`
    - Test the YAML example before completing: `cd examples && go test -v -run TestYaml<ResourceName>Example -tags yaml -timeout 10m`
+
+### Adding a New Data Source (Function)
+
+Data sources are implemented as Invoke functions in the provider:
+
+1. Add function definition to `provider/cmd/pulumi-resource-pulumiservice/schema.json` under the `functions` section
+2. Create or update API client methods in `provider/pkg/pulumiapi/` for the required API calls
+3. Add a case for your function token in the `Invoke` method in `provider/pkg/provider/provider.go` (e.g., `"pulumiservice:index:getYourFunction"`)
+4. Implement the invoke function method (e.g., `invokeFunctionGetYourFunction`) in `provider.go`
+5. Rebuild provider and SDKs: `make build`
+6. Add examples demonstrating the data source usage in `examples/` directory
 
 ### Resource Interface
 
@@ -188,6 +199,30 @@ cd examples && golangci-lint run --timeout 10m --build-tags all
 ```
 
 Without the build tags, golangci-lint may report false positives about unused functions that are actually used in files with specific build tags.
+
+### Schema Import Documentation Validation
+
+The `make lint` target includes validation that all resources in `schema.json` have import documentation. The validation script `scripts/validate-schema-imports.sh` checks that every resource's `description` field contains a `### Import` section.
+
+To run the validation separately:
+
+```bash
+./scripts/validate-schema-imports.sh
+```
+
+All resources must include import documentation in the format:
+
+```markdown
+### Import
+
+[Resource] can be imported using the `id`, which for [resource] is `{format}` e.g.,
+
+```sh
+ $ pulumi import pulumiservice:index:[Resource] [name] [id-example]
+```
+```
+
+If the validation fails, it will list all resources missing import documentation.
 
 ## Debugging CI Failures
 

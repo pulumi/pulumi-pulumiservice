@@ -9,6 +9,14 @@ import * as utilities from "./utilities";
 
 /**
  * A scheduled recurring or single time run of a pulumi command.
+ *
+ * ### Import
+ *
+ * Deployment schedules can be imported using the `id`, which for deployment schedules is `{org}/{project}/{stack}/{scheduleId}` e.g.,
+ *
+ * ```sh
+ *  $ pulumi import pulumiservice:index:DeploymentSchedule my_schedule my-org/my-project/my-stack/sched-789
+ * ```
  */
 export class DeploymentSchedule extends pulumi.CustomResource {
     /**

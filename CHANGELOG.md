@@ -6,6 +6,8 @@
 
 - Added Java SDK support with Pulumi Java SDK v1.16.2
 - Upgraded Pulumi SDK to v3.204.0 with latest codegen improvements
+- Added import documentation for all resources [#344](https://github.com/pulumi/pulumi-pulumiservice/issues/344)
+- Added schema validation script to ensure all resources have import documentation
 
 ### Bug Fixes
 

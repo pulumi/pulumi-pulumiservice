@@ -102,6 +102,14 @@ class OrgAccessToken(pulumi.CustomResource):
         """
         The Pulumi Cloud allows users to create access tokens scoped to orgs. Org access tokens is a resource to create them and assign them to an org
 
+        ### Import
+
+        Organization access tokens can be imported using the `id`, which for organization access tokens is `{org}/{tokenName}/{tokenId}` e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:OrgAccessToken my_org_token my-org/my-token/token-xyz789
+        ```
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.bool] admin: Optional. True if this is an admin token.
@@ -117,6 +125,14 @@ class OrgAccessToken(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         The Pulumi Cloud allows users to create access tokens scoped to orgs. Org access tokens is a resource to create them and assign them to an org
+
+        ### Import
+
+        Organization access tokens can be imported using the `id`, which for organization access tokens is `{org}/{tokenName}/{tokenId}` e.g.,
+
+        ```sh
+         $ pulumi import pulumiservice:index:OrgAccessToken my_org_token my-org/my-token/token-xyz789
+        ```
 
         :param str resource_name: The name of the resource.
         :param OrgAccessTokenArgs args: The arguments to use to populate this resource's properties.

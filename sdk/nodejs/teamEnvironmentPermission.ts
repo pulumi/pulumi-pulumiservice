@@ -9,6 +9,20 @@ import * as utilities from "./utilities";
 
 /**
  * A permission for a team to use an environment.
+ *
+ * ### Import
+ *
+ * Team environment permissions can be imported using the `id`, which for team environment permissions is `{org}/{team}/{project}+{environment}` or `{org}/{team}/{environment}` e.g.,
+ *
+ * ```sh
+ *  $ pulumi import pulumiservice:index:TeamEnvironmentPermission my_perm my-org/my-team/my-project+my-env
+ * ```
+ *
+ * or using the legacy format (assumes "default" project):
+ *
+ * ```sh
+ *  $ pulumi import pulumiservice:index:TeamEnvironmentPermission my_perm my-org/my-team/my-env
+ * ```
  */
 export class TeamEnvironmentPermission extends pulumi.CustomResource {
     /**
