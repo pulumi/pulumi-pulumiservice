@@ -138,16 +138,30 @@ func (tp *TeamStackPermissionResource) Delete(req *pulumirpc.DeleteRequest) (*pb
 }
 
 func (tp *TeamStackPermissionResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	changedKeys, err := util.DiffOldsAndNews(req)
+	olds, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
 	if err != nil {
 		return nil, err
 	}
-	changes := pulumirpc.DiffResponse_DIFF_NONE
-	if len(changedKeys) > 0 {
-		changes = pulumirpc.DiffResponse_DIFF_SOME
+
+	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: false})
+	if err != nil {
+		return nil, err
 	}
+
+	d := olds.Diff(news)
+	if d == nil {
+		return &pulumirpc.DiffResponse{
+			Changes: pulumirpc.DiffResponse_DIFF_NONE,
+		}, nil
+	}
+
+	var changedKeys []string
+	for _, key := range d.ChangedKeys() {
+		changedKeys = append(changedKeys, string(key))
+	}
+
 	return &pulumirpc.DiffResponse{
-		Changes:  changes,
+		Changes:  pulumirpc.DiffResponse_DIFF_SOME,
 		Replaces: changedKeys,
 	}, nil
 }

@@ -4,6 +4,7 @@
 
 ### Improvements
 
+- Added comprehensive unit tests for AccessToken, Stack, TeamAccessToken, TeamStackPermission, and TeamEnvironmentPermission resources [#573](https://github.com/pulumi/pulumi-pulumiservice/issues/573)
 - Added Java SDK support with Pulumi Java SDK v1.16.2
 - Upgraded Pulumi SDK to v3.204.0 with latest codegen improvements
 
