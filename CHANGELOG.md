@@ -6,6 +6,7 @@
 
 - Added Java SDK support with Pulumi Java SDK v1.16.2
 - Upgraded Pulumi SDK to v3.204.0 with latest codegen improvements
+- Added regression test for OIDC Issuer policy ordering to prevent spurious diffs [#542](https://github.com/pulumi/pulumi-pulumiservice/pull/542)
 
 ### Bug Fixes
 
