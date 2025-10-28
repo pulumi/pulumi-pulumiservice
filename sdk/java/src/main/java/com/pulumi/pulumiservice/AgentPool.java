@@ -50,14 +50,14 @@ public class AgentPool extends com.pulumi.resources.CustomResource {
         return Codegen.optional(this.description);
     }
     /**
-     * Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.
+     * Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it. Defaults to false, which means the agent pool will not be deleted if stacks are still configured to use it.
      * 
      */
     @Export(name="forceDestroy", refs={Boolean.class}, tree="[0]")
     private Output</* @Nullable */ Boolean> forceDestroy;
 
     /**
-     * @return Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.
+     * @return Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it. Defaults to false, which means the agent pool will not be deleted if stacks are still configured to use it.
      * 
      */
     public Output<Optional<Boolean>> forceDestroy() {

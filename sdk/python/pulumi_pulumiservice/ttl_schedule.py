@@ -30,7 +30,7 @@ class TtlScheduleArgs:
         :param pulumi.Input[_builtins.str] project: Project name.
         :param pulumi.Input[_builtins.str] stack: Stack name.
         :param pulumi.Input[_builtins.str] timestamp: The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.
-        :param pulumi.Input[_builtins.bool] delete_after_destroy: True if the stack and all associated history and settings should be deleted.
+        :param pulumi.Input[_builtins.bool] delete_after_destroy: True if the stack and all associated history and settings should be deleted. Defaults to false, which means only the resources are destroyed but the stack itself remains.
         """
         pulumi.set(__self__, "organization", organization)
         pulumi.set(__self__, "project", project)
@@ -93,7 +93,7 @@ class TtlScheduleArgs:
     @pulumi.getter(name="deleteAfterDestroy")
     def delete_after_destroy(self) -> Optional[pulumi.Input[_builtins.bool]]:
         """
-        True if the stack and all associated history and settings should be deleted.
+        True if the stack and all associated history and settings should be deleted. Defaults to false, which means only the resources are destroyed but the stack itself remains.
         """
         return pulumi.get(self, "delete_after_destroy")
 
@@ -119,7 +119,7 @@ class TtlSchedule(pulumi.CustomResource):
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
-        :param pulumi.Input[_builtins.bool] delete_after_destroy: True if the stack and all associated history and settings should be deleted.
+        :param pulumi.Input[_builtins.bool] delete_after_destroy: True if the stack and all associated history and settings should be deleted. Defaults to false, which means only the resources are destroyed but the stack itself remains.
         :param pulumi.Input[_builtins.str] organization: Organization name.
         :param pulumi.Input[_builtins.str] project: Project name.
         :param pulumi.Input[_builtins.str] stack: Stack name.
@@ -213,7 +213,7 @@ class TtlSchedule(pulumi.CustomResource):
     @pulumi.getter(name="deleteAfterDestroy")
     def delete_after_destroy(self) -> pulumi.Output[Optional[_builtins.bool]]:
         """
-        True if the stack and all associated history and settings should be deleted.
+        True if the stack and all associated history and settings should be deleted. Defaults to false, which means only the resources are destroyed but the stack itself remains.
         """
         return pulumi.get(self, "delete_after_destroy")
 
