@@ -16,7 +16,7 @@ import (
 type Stack struct {
 	pulumi.CustomResourceState
 
-	// Optional. Flag indicating whether to delete the stack even if it still contains resources.
+	// Optional. Flag indicating whether to delete the stack even if it still contains resources. Defaults to false, which means the stack will not be deleted if it still contains resources.
 	ForceDestroy pulumi.BoolPtrOutput `pulumi:"forceDestroy"`
 	// The name of the organization.
 	OrganizationName pulumi.StringOutput `pulumi:"organizationName"`
@@ -41,6 +41,9 @@ func NewStack(ctx *pulumi.Context,
 	}
 	if args.StackName == nil {
 		return nil, errors.New("invalid value for required argument 'StackName'")
+	}
+	if args.ForceDestroy == nil {
+		args.ForceDestroy = pulumi.BoolPtr(false)
 	}
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Stack
@@ -75,7 +78,7 @@ func (StackState) ElementType() reflect.Type {
 }
 
 type stackArgs struct {
-	// Optional. Flag indicating whether to delete the stack even if it still contains resources.
+	// Optional. Flag indicating whether to delete the stack even if it still contains resources. Defaults to false, which means the stack will not be deleted if it still contains resources.
 	ForceDestroy *bool `pulumi:"forceDestroy"`
 	// The name of the organization.
 	OrganizationName string `pulumi:"organizationName"`
@@ -87,7 +90,7 @@ type stackArgs struct {
 
 // The set of arguments for constructing a Stack resource.
 type StackArgs struct {
-	// Optional. Flag indicating whether to delete the stack even if it still contains resources.
+	// Optional. Flag indicating whether to delete the stack even if it still contains resources. Defaults to false, which means the stack will not be deleted if it still contains resources.
 	ForceDestroy pulumi.BoolPtrInput
 	// The name of the organization.
 	OrganizationName pulumi.StringInput
@@ -184,7 +187,7 @@ func (o StackOutput) ToStackOutputWithContext(ctx context.Context) StackOutput {
 	return o
 }
 
-// Optional. Flag indicating whether to delete the stack even if it still contains resources.
+// Optional. Flag indicating whether to delete the stack even if it still contains resources. Defaults to false, which means the stack will not be deleted if it still contains resources.
 func (o StackOutput) ForceDestroy() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v *Stack) pulumi.BoolPtrOutput { return v.ForceDestroy }).(pulumi.BoolPtrOutput)
 }

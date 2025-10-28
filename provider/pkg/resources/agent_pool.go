@@ -33,9 +33,7 @@ func GenerateAgentPoolProperties(input PulumiServiceAgentPoolInput, agentPool pu
 	if input.Description != "" {
 		inputMap["description"] = resource.NewPropertyValue(input.Description)
 	}
-	if input.ForceDestroy {
-		inputMap["forceDestroy"] = resource.NewPropertyValue(input.ForceDestroy)
-	}
+	inputMap["forceDestroy"] = resource.NewPropertyValue(input.ForceDestroy)
 
 	outputMap := resource.PropertyMap{}
 	outputMap["agentPoolId"] = resource.NewPropertyValue(agentPool.ID)
@@ -45,9 +43,7 @@ func GenerateAgentPoolProperties(input PulumiServiceAgentPoolInput, agentPool pu
 	if input.Description != "" {
 		outputMap["description"] = inputMap["description"]
 	}
-	if input.ForceDestroy {
-		outputMap["forceDestroy"] = inputMap["forceDestroy"]
-	}
+	outputMap["forceDestroy"] = inputMap["forceDestroy"]
 
 	inputs, err = plugin.MarshalProperties(inputMap, plugin.MarshalOptions{})
 	if err != nil {
@@ -97,6 +93,10 @@ func (ap *PulumiServiceAgentPoolResource) Diff(req *pulumirpc.DiffRequest) (*pul
 	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
+	}
+
+	if !news["forceDestroy"].HasValue() {
+		news["forceDestroy"] = resource.NewBoolProperty(false)
 	}
 
 	diffs := olds.Diff(news)
@@ -253,10 +253,17 @@ func (ap *PulumiServiceAgentPoolResource) Read(req *pulumirpc.ReadRequest) (*pul
 	}
 
 	input := PulumiServiceAgentPoolInput{
-		OrgName:     orgName,
-		Description: agentPool.Description,
-		Name:        agentPool.Name,
+		OrgName:      orgName,
+		Description:  agentPool.Description,
+		Name:         agentPool.Name,
+		ForceDestroy: false,
 	}
+
+	// Preserve forceDestroy from existing inputs since the API doesn't return this field
+	if propertyMap["forceDestroy"].HasValue() && propertyMap["forceDestroy"].IsBool() {
+		input.ForceDestroy = propertyMap["forceDestroy"].BoolValue()
+	}
+
 	outputProperties, inputs, err := GenerateAgentPoolProperties(input, *agentPool)
 	if err != nil {
 		return nil, err

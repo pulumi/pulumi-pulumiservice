@@ -956,7 +956,8 @@
         },
         "forceDestroy": {
           "type": "boolean",
-          "description": "Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it."
+          "description": "Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it. Defaults to false, which means the agent pool will not be deleted if stacks are still configured to use it.",
+          "default": false
         },
         "name": {
           "type": "string",
@@ -986,7 +987,8 @@
         },
         "forceDestroy": {
           "type": "boolean",
-          "description": "Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it."
+          "description": "Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it. Defaults to false, which means the agent pool will not be deleted if stacks are still configured to use it.",
+          "default": false
         },
         "name": {
           "type": "string",
@@ -1590,7 +1592,8 @@
       "properties": {
         "admin": {
           "type": "boolean",
-          "description": "Optional. True if this is an admin token."
+          "description": "Optional. True if this is an admin token. Defaults to false.",
+          "default": false
         },
         "description": {
           "type": "string",
@@ -1619,7 +1622,7 @@
       "inputProperties": {
         "admin": {
           "type": "boolean",
-          "description": "Optional. True if this is an admin token.",
+          "description": "Optional. True if this is an admin token. Defaults to false.",
           "default": false
         },
         "description": {
@@ -1731,7 +1734,8 @@
       "properties": {
         "forceDestroy": {
           "type": "boolean",
-          "description": "Optional. Flag indicating whether to delete the stack even if it still contains resources."
+          "description": "Optional. Flag indicating whether to delete the stack even if it still contains resources. Defaults to false, which means the stack will not be deleted if it still contains resources.",
+          "default": false
         },
         "organizationName": {
           "type": "string",
@@ -1755,7 +1759,8 @@
       "inputProperties": {
         "forceDestroy": {
           "type": "boolean",
-          "description": "Optional. Flag indicating whether to delete the stack even if it still contains resources."
+          "description": "Optional. Flag indicating whether to delete the stack even if it still contains resources. Defaults to false, which means the stack will not be deleted if it still contains resources.",
+          "default": false
         },
         "organizationName": {
           "type": "string",
@@ -2174,7 +2179,7 @@
       "properties": {
         "deleteAfterDestroy": {
           "type": "boolean",
-          "description": "True if the stack and all associated history and settings should be deleted.",
+          "description": "True if the stack and all associated history and settings should be deleted. Defaults to false, which means only the resources are destroyed but the stack itself remains.",
           "default": false
         },
         "organization": {
@@ -2210,7 +2215,7 @@
       "inputProperties": {
         "deleteAfterDestroy": {
           "type": "boolean",
-          "description": "True if the stack and all associated history and settings should be deleted.",
+          "description": "True if the stack and all associated history and settings should be deleted. Defaults to false, which means only the resources are destroyed but the stack itself remains.",
           "default": false
         },
         "organization": {

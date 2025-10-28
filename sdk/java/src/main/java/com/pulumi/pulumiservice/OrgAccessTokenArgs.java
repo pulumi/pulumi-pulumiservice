@@ -19,14 +19,14 @@ public final class OrgAccessTokenArgs extends com.pulumi.resources.ResourceArgs 
     public static final OrgAccessTokenArgs Empty = new OrgAccessTokenArgs();
 
     /**
-     * Optional. True if this is an admin token.
+     * Optional. True if this is an admin token. Defaults to false.
      * 
      */
     @Import(name="admin")
     private @Nullable Output<Boolean> admin;
 
     /**
-     * @return Optional. True if this is an admin token.
+     * @return Optional. True if this is an admin token. Defaults to false.
      * 
      */
     public Optional<Output<Boolean>> admin() {
@@ -106,7 +106,7 @@ public final class OrgAccessTokenArgs extends com.pulumi.resources.ResourceArgs 
         }
 
         /**
-         * @param admin Optional. True if this is an admin token.
+         * @param admin Optional. True if this is an admin token. Defaults to false.
          * 
          * @return builder
          * 
@@ -117,7 +117,7 @@ public final class OrgAccessTokenArgs extends com.pulumi.resources.ResourceArgs 
         }
 
         /**
-         * @param admin Optional. True if this is an admin token.
+         * @param admin Optional. True if this is an admin token. Defaults to false.
          * 
          * @return builder
          * 

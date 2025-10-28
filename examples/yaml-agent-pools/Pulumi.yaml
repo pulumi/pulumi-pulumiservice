@@ -9,6 +9,7 @@ resources:
       organizationName: service-provider-test-org
       name: test-agent-pool-${digits}
       description: Test agent pool
+      forceDestroy: false
 
 outputs:
   # export the value of the access token

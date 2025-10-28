@@ -21,14 +21,14 @@ import javax.annotation.Nullable;
 @ResourceType(type="pulumiservice:index:TtlSchedule")
 public class TtlSchedule extends com.pulumi.resources.CustomResource {
     /**
-     * True if the stack and all associated history and settings should be deleted.
+     * True if the stack and all associated history and settings should be deleted. Defaults to false, which means only the resources are destroyed but the stack itself remains.
      * 
      */
     @Export(name="deleteAfterDestroy", refs={Boolean.class}, tree="[0]")
     private Output</* @Nullable */ Boolean> deleteAfterDestroy;
 
     /**
-     * @return True if the stack and all associated history and settings should be deleted.
+     * @return True if the stack and all associated history and settings should be deleted. Defaults to false, which means only the resources are destroyed but the stack itself remains.
      * 
      */
     public Output<Optional<Boolean>> deleteAfterDestroy() {

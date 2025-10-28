@@ -10,6 +10,7 @@ const stack = new service.Stack("my_stack", {
     organizationName: "service-provider-test-org",
     projectName: "my-new-project",
     stackName: id.result,
+    forceDestroy: false,
 })
 
 const settings = new service.DeploymentSettings("deployment_settings", {

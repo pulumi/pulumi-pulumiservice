@@ -16,7 +16,7 @@ namespace Pulumi.PulumiService
     public partial class OrgAccessToken : global::Pulumi.CustomResource
     {
         /// <summary>
-        /// Optional. True if this is an admin token.
+        /// Optional. True if this is an admin token. Defaults to false.
         /// </summary>
         [Output("admin")]
         public Output<bool?> Admin { get; private set; } = null!;
@@ -95,7 +95,7 @@ namespace Pulumi.PulumiService
     public sealed class OrgAccessTokenArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
-        /// Optional. True if this is an admin token.
+        /// Optional. True if this is an admin token. Defaults to false.
         /// </summary>
         [Input("admin")]
         public Input<bool>? Admin { get; set; }

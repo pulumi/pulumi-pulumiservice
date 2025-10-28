@@ -14,6 +14,7 @@ agent_pool = AgentPool(
     "my-agent-pool",
     organization_name="service-provider-test-org",
     name="my-test-pool",
+    force_destroy=False,
 )
 
 settings = DeploymentSettings(

@@ -22,14 +22,14 @@ import javax.annotation.Nullable;
 @ResourceType(type="pulumiservice:index:OrgAccessToken")
 public class OrgAccessToken extends com.pulumi.resources.CustomResource {
     /**
-     * Optional. True if this is an admin token.
+     * Optional. True if this is an admin token. Defaults to false.
      * 
      */
     @Export(name="admin", refs={Boolean.class}, tree="[0]")
     private Output</* @Nullable */ Boolean> admin;
 
     /**
-     * @return Optional. True if this is an admin token.
+     * @return Optional. True if this is an admin token. Defaults to false.
      * 
      */
     public Output<Optional<Boolean>> admin() {

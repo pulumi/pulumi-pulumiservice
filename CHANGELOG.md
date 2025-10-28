@@ -4,8 +4,21 @@
 
 ### Improvements
 
+- Added comprehensive error handling and edge case tests for 6 high-priority resources [#578](https://github.com/pulumi/pulumi-pulumiservice/issues/578):
+  - AccessToken: 19 new test functions covering API errors, validation, and edge cases
+  - Stack: 26 new test functions covering create/delete errors, forceDestroy behavior, and special characters
+  - Team: 13 additional test functions for CRUD operation errors and Unicode handling
+  - Webhook: 14 additional test functions for URL validation, filter arrays, and error scenarios
+  - DeploymentSettings: 13 additional test functions for configuration validation and nested contexts
+  - Environment: 18 additional test functions for YAML validation, large content, and deeply nested structures
+  - Total: 103 new test functions ensuring robust error handling across the provider
 - Added Java SDK support with Pulumi Java SDK v1.16.2
 - Upgraded Pulumi SDK to v3.204.0 with latest codegen improvements
+- Documented default values for boolean properties [#498](https://github.com/pulumi/pulumi-pulumiservice/issues/498):
+  - Stack.forceDestroy (defaults to false)
+  - AgentPool.forceDestroy (defaults to false)
+  - OrgAccessToken.admin (defaults to false)
+  - TtlSchedule.deleteAfterDestroy (defaults to false)
 
 ### Bug Fixes
 

@@ -28,11 +28,13 @@ class StackArgs:
         :param pulumi.Input[_builtins.str] organization_name: The name of the organization.
         :param pulumi.Input[_builtins.str] project_name: The name of the project.
         :param pulumi.Input[_builtins.str] stack_name: The name of the stack.
-        :param pulumi.Input[_builtins.bool] force_destroy: Optional. Flag indicating whether to delete the stack even if it still contains resources.
+        :param pulumi.Input[_builtins.bool] force_destroy: Optional. Flag indicating whether to delete the stack even if it still contains resources. Defaults to false, which means the stack will not be deleted if it still contains resources.
         """
         pulumi.set(__self__, "organization_name", organization_name)
         pulumi.set(__self__, "project_name", project_name)
         pulumi.set(__self__, "stack_name", stack_name)
+        if force_destroy is None:
+            force_destroy = False
         if force_destroy is not None:
             pulumi.set(__self__, "force_destroy", force_destroy)
 
@@ -76,7 +78,7 @@ class StackArgs:
     @pulumi.getter(name="forceDestroy")
     def force_destroy(self) -> Optional[pulumi.Input[_builtins.bool]]:
         """
-        Optional. Flag indicating whether to delete the stack even if it still contains resources.
+        Optional. Flag indicating whether to delete the stack even if it still contains resources. Defaults to false, which means the stack will not be deleted if it still contains resources.
         """
         return pulumi.get(self, "force_destroy")
 
@@ -101,7 +103,7 @@ class Stack(pulumi.CustomResource):
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
-        :param pulumi.Input[_builtins.bool] force_destroy: Optional. Flag indicating whether to delete the stack even if it still contains resources.
+        :param pulumi.Input[_builtins.bool] force_destroy: Optional. Flag indicating whether to delete the stack even if it still contains resources. Defaults to false, which means the stack will not be deleted if it still contains resources.
         :param pulumi.Input[_builtins.str] organization_name: The name of the organization.
         :param pulumi.Input[_builtins.str] project_name: The name of the project.
         :param pulumi.Input[_builtins.str] stack_name: The name of the stack.
@@ -143,6 +145,8 @@ class Stack(pulumi.CustomResource):
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
             __props__ = StackArgs.__new__(StackArgs)
 
+            if force_destroy is None:
+                force_destroy = False
             __props__.__dict__["force_destroy"] = force_destroy
             if organization_name is None and not opts.urn:
                 raise TypeError("Missing required property 'organization_name'")
@@ -185,7 +189,7 @@ class Stack(pulumi.CustomResource):
     @pulumi.getter(name="forceDestroy")
     def force_destroy(self) -> pulumi.Output[Optional[_builtins.bool]]:
         """
-        Optional. Flag indicating whether to delete the stack even if it still contains resources.
+        Optional. Flag indicating whether to delete the stack even if it still contains resources. Defaults to false, which means the stack will not be deleted if it still contains resources.
         """
         return pulumi.get(self, "force_destroy")
 
