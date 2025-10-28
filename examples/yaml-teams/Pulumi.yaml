@@ -1,6 +1,13 @@
 name: pulumi-service-teams-example-yaml
 runtime: yaml
 description: An example of using yaml to create a team
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  testUserName:
+    type: string
+    default: pulumi-bot
 resources:
   rand:
     type: random:RandomString
@@ -12,7 +19,7 @@ resources:
     type: pulumiservice:index:Team
     properties:
       name: brand-new-yaml-team-${rand.result}
-      organizationName: service-provider-test-org
+      organizationName: ${organizationName}
       teamType: pulumi
       members:
-        - pulumi-bot
+        - ${testUserName}

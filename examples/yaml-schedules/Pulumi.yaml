@@ -1,6 +1,13 @@
 name: pulumi-service-schedules-example-yaml
 runtime: yaml
 description: An example of using yaml to create schedules
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  digits:
+    type: string
+    default: "00000"
 resources:
   rand:
     type: random:RandomString
@@ -12,7 +19,7 @@ resources:
   settings:
     type: pulumiservice:DeploymentSettings
     properties:
-      organization: service-provider-test-org
+      organization: ${organizationName}
       project: pulumi-service-schedules-example-yaml
       stack: test-stack-${digits}
       sourceContext:
@@ -23,7 +30,7 @@ resources:
   environment:
     type: pulumiservice:Environment
     properties:
-      organization: service-provider-test-org
+      organization: ${organizationName}
       project: my-project
       name: testing-environment-yaml-${digits}
       yaml:
@@ -34,7 +41,7 @@ resources:
   drift-schedule-${rand.result}:
     type: pulumiservice:DriftSchedule
     properties:
-      organization: service-provider-test-org
+      organization: ${organizationName}
       project: pulumi-service-schedules-example-yaml
       stack: test-stack-${digits}
       scheduleCron: "0 0 * * 0"
@@ -46,7 +53,7 @@ resources:
   ttl-schedule-${rand.result}:
     type: pulumiservice:TtlSchedule
     properties:
-      organization: service-provider-test-org
+      organization: ${organizationName}
       project: pulumi-service-schedules-example-yaml
       stack: test-stack-${digits}
       timestamp: "2026-01-01T00:00:00Z"
@@ -58,7 +65,7 @@ resources:
   deployment-schedule-up-${rand.result}:
     type: pulumiservice:DeploymentSchedule
     properties:
-      organization: service-provider-test-org
+      organization: ${organizationName}
       project: pulumi-service-schedules-example-yaml
       stack: test-stack-${digits}
       scheduleCron: "0 0 * * 0"
@@ -70,7 +77,7 @@ resources:
   deployment-schedule-preview-${rand.result}:
     type: pulumiservice:DeploymentSchedule
     properties:
-      organization: service-provider-test-org
+      organization: ${organizationName}
       project: pulumi-service-schedules-example-yaml
       stack: test-stack-${digits}
       timestamp: "2026-01-01T00:00:00Z"

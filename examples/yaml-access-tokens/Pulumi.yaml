@@ -1,13 +1,11 @@
 name: yaml-access-tokens
 runtime: yaml
 description: A minimal example of provisioning access token via Pulumi YAML
-
 resources:
   access-token:
     type: pulumiservice:index:AccessToken
     properties:
       description: example token
-
 outputs:
   # export the value of the access token
   token: ${access-token.value}

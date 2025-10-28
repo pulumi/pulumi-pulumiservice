@@ -1,6 +1,13 @@
 name: pulumi-service-teams-access-token-yaml
 runtime: yaml
 description: An example of using yaml to create a team token
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  testUserName:
+    type: string
+    default: pulumi-bot
 resources:
   rand:
     type: random:RandomString
@@ -12,16 +19,15 @@ resources:
     type: pulumiservice:index:Team
     properties:
       name: brand-new-yaml-team-${rand.result}
-      organizationName: service-provider-test-org
+      organizationName: ${organizationName}
       displayName: PulumiUP Team
       teamType: pulumi
       members:
-        - pulumi-bot
-        - service-provider-example-user
+        - ${testUserName}
   token:
     type: pulumiservice:index:TeamAccessToken
     properties:
       name: test-${rand.result}
       teamName: ${team.name}
-      organizationName: service-provider-test-org
+      organizationName: ${organizationName}
       description: "example team access token"
