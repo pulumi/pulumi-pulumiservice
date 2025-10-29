@@ -33,6 +33,7 @@ import (
 	p "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi-go-provider/infer"
 	"github.com/pulumi/pulumi-go-provider/middleware/rpc"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/resources"
 	"github.com/pulumi/pulumi/pkg/v3/codegen/schema"
@@ -88,6 +89,7 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 		WithModuleMap(map[tokens.ModuleName]tokens.ModuleName{
 			"resources": "index",
 		}).
+		WithConfig(infer.Config(&config.Config{})).
 		WithLanguageMap(map[string]any{
 			"csharp": map[string]any{
 				"namespaces": map[string]any{
@@ -200,9 +202,6 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 	k.client = client
 
 	k.pulumiResources = []PulumiServiceResource{
-		&resources.PulumiServiceTeamResource{
-			Client: client,
-		},
 		&resources.PulumiServiceAccessTokenResource{
 			Client: client,
 		},

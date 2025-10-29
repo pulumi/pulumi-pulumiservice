@@ -63,10 +63,18 @@
     "variables": {
       "accessToken": {
         "type": "string",
+        "description": "Access Token to authenticate with Pulumi Cloud.",
         "secret": true
       },
       "apiUrl": {
-        "type": "string"
+        "type": "string",
+        "description": "Optional override of Pulumi Cloud API endpoint.",
+        "default": "https://api.pulumi.com",
+        "defaultInfo": {
+          "environment": [
+            "PULUMI_BACKEND_URL"
+          ]
+        }
       }
     }
   },
@@ -902,6 +910,23 @@
     }
   },
   "provider": {
+    "properties": {
+      "accessToken": {
+        "type": "string",
+        "description": "Access Token to authenticate with Pulumi Cloud.",
+        "secret": true
+      },
+      "apiUrl": {
+        "type": "string",
+        "description": "Optional override of Pulumi Cloud API endpoint.",
+        "default": "https://api.pulumi.com",
+        "defaultInfo": {
+          "environment": [
+            "PULUMI_BACKEND_URL"
+          ]
+        }
+      }
+    },
     "type": "object",
     "inputProperties": {
       "accessToken": {
@@ -911,7 +936,13 @@
       },
       "apiUrl": {
         "type": "string",
-        "description": "Optional override of Pulumi Cloud API endpoint."
+        "description": "Optional override of Pulumi Cloud API endpoint.",
+        "default": "https://api.pulumi.com",
+        "defaultInfo": {
+          "environment": [
+            "PULUMI_BACKEND_URL"
+          ]
+        }
       }
     }
   },
