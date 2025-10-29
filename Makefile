@@ -23,6 +23,9 @@ GOPATH			:= $(shell go env GOPATH)
 WORKING_DIR     := $(shell pwd)
 TESTPARALLELISM := 4
 
+# Ensure helpmakego is installed
+_ := $(shell go build -o bin/helpmakego github.com/iwahbe/helpmakego)
+
 # The pulumi binary to use during generation
 PULUMI := .pulumi/bin/pulumi
 
@@ -32,11 +35,11 @@ ensure::
 
 build_sdks: provider dotnet_sdk go_sdk nodejs_sdk python_sdk java_sdk
 
-gen_sdk_prerequisites: $(PULUMI)
+bin/pulumi-resource-pulumiservice: $(shell bin/helpmakego provider/cmd/pulumi-resource-pulumiservice)
+	go build -C provider -o ../$@ -ldflags $(LDFLAGS) $(BUILD_PATH)
 
-provider::
-	(cd provider && VERSION=${VERSION_GENERIC} go generate cmd/${PROVIDER}/main.go)
-	(cd provider && go build -o $(WORKING_DIR)/bin/${PROVIDER} -ldflags $(LDFLAGS) $(BUILD_PATH))
+.PHONY: provider
+provider: bin/pulumi-resource-pulumiservice
 
 provider_debug::
 	(cd provider && go build -o $(WORKING_DIR)/bin/${PROVIDER} -gcflags="all=-N -l" -ldflags $(LDFLAGS) $(BUILD_PATH))
@@ -44,29 +47,29 @@ provider_debug::
 test_provider::
 	cd provider/pkg && go test -short -v -count=1 -cover -timeout 2h -parallel ${TESTPARALLELISM} ./...
 
-dotnet_sdk: gen_sdk_prerequisites
+dotnet_sdk: bin/pulumi-resource-pulumiservice $(PULUMI)
 	rm -rf sdk/dotnet
-	$(PULUMI) package gen-sdk $(WORKING_DIR)/bin/$(PROVIDER) --language dotnet
+	$(PULUMI) package gen-sdk ./$< --language dotnet
 	cd sdk/dotnet/ && \
 		printf "module fake_dotnet_module // Exclude this directory from Go tools\n\ngo 1.17\n" > go.mod && \
 		echo "${VERSION_GENERIC}" >version.txt && \
 		dotnet build
 
-go_sdk: gen_sdk_prerequisites
+go_sdk: bin/pulumi-resource-pulumiservice $(PULUMI)
 	rm -rf sdk/go
-	$(PULUMI) package gen-sdk $(WORKING_DIR)/bin/$(PROVIDER) --language go
+	$(PULUMI) package gen-sdk ./$< --language go
 
-nodejs_sdk: gen_sdk_prerequisites
+nodejs_sdk: bin/pulumi-resource-pulumiservice $(PULUMI)
 	rm -rf sdk/nodejs
-	$(PULUMI) package gen-sdk $(WORKING_DIR)/bin/$(PROVIDER) --language nodejs
+	$(PULUMI) package gen-sdk ./$< --language nodejs
 	cd sdk/nodejs && \
 		yarn install --no-progress && \
 		yarn run build && \
 		cp package.json yarn.lock ./bin/
 
-python_sdk: gen_sdk_prerequisites
+python_sdk: bin/pulumi-resource-pulumiservice $(PULUMI)
 	rm -rf sdk/python
-	$(PULUMI) package gen-sdk $(WORKING_DIR)/bin/$(PROVIDER) --language python
+	$(PULUMI) package gen-sdk ./$< --language python
 	cd sdk/python/ && \
 		printf "module fake_python_module // Exclude this directory from Go tools\n\ngo 1.17\n" > go.mod && \
 		cp ../../README.md . && \
@@ -76,9 +79,9 @@ python_sdk: gen_sdk_prerequisites
 		cd ./bin && \
 		../venv/bin/python -m build .
 
-java_sdk: gen_sdk_prerequisites
+java_sdk: bin/pulumi-resource-pulumiservice $(PULUMI)
 	rm -rf sdk/java
-	$(PULUMI) package gen-sdk $(WORKING_DIR)/bin/$(PROVIDER) --language java
+	$(PULUMI) package gen-sdk ./$< --language java
 	cd sdk/java && \
 		printf "module fake_java_module // Exclude this directory from Go tools\n\ngo 1.17\n" > go.mod && \
 		cp ../../README.md . && \
@@ -140,6 +143,10 @@ $(PULUMI): go.mod
 		curl -fsSL https://get.pulumi.com | sh -s -- --version "$${PULUMI_VERSION#v}"; \
 	fi
 
+$(SCHEMA_FILE): bin/pulumi-resource-pulumiservice $(PULUMI)
+	$(PULUMI) package get-schema ./$<  | \
+		jq 'del(.version)' > $@
+
 ######################
 # ci-mgmt onboarding #
 ######################
@@ -197,6 +204,4 @@ build_java: java_sdk
 build_dotnet: dotnet_sdk
 build_go: go_sdk
 
-# Schema is manually maintained.
-schema:
-
+schema: provider/cmd/pulumi-resource-pulumiservice/schema.json

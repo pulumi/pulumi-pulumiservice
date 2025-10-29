@@ -25,19 +25,13 @@ import (
 
 var providerName = "pulumiservice"
 
-// embed schema.json directly into resource binary so that we can properly serve the schema
-// directly from the resource provider
-//
-//go:embed schema.json
-var schema string
-
 // The version needs to be replaced using LDFLAGS on build
 var Version string = "REPLACE_ON_BUILD"
 
 func main() {
 	// Start gRPC service for the pulumiservice provider
 	err := provider.Main(providerName, func(host *provider.HostClient) (rpc.ResourceProviderServer, error) {
-		return psp.MakeProvider(host, providerName, Version, schema)
+		return psp.MakeProvider(host, providerName, Version)
 	})
 	if err != nil {
 		cmdutil.ExitError(err.Error())
