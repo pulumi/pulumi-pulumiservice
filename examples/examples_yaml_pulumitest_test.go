@@ -59,13 +59,22 @@ func TestYamlExamplesWithPulumiTest(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			
+			// Get organization from PULUMI_TEST_OWNER (like integration tests do)
+			orgName := os.Getenv("PULUMI_TEST_OWNER")
+			if orgName == "" {
+				orgName = "service-provider-test-org" // fallback to default
+			}
+			
+			// Create fully qualified stack name: {org}/{project}/{stack}
+			projectName := testCase.directoryName
+			stackName := fmt.Sprintf("%s/%s/test", orgName, projectName)
+			
 			test := pulumitest.NewPulumiTest(t, testCase.directoryName,
 				opttest.LocalProviderPath("pulumiservice", "../bin"),
-				opttest.UseAmbientBackend())
+				opttest.UseAmbientBackend(),
+				opttest.StackName(stackName))
 
 			// UseAmbientBackend() automatically handles API URL and access token from environment
-
-			// Don't override organization - let it use the ambient backend organization
 
 			// Set test user name if PULUMI_TEST_USER is available
 			if userName := os.Getenv("PULUMI_TEST_USER"); userName != "" {
@@ -135,9 +144,23 @@ func TestYamlExamplesWithConfigWithPulumiTest(t *testing.T) {
 				opttest.UseAmbientBackend(),
 			}
 			
+			// Get organization from PULUMI_TEST_OWNER (like integration tests do)
+			orgName := os.Getenv("PULUMI_TEST_OWNER")
+			if orgName == "" {
+				orgName = "service-provider-test-org" // fallback to default
+			}
+			
 			// Add custom stack name if specified (needed for DeploymentSettings/Schedules tests)
 			if testCase.stackName != "" {
-				options = append(options, opttest.StackName(testCase.stackName))
+				// Create fully qualified stack name: {org}/{project}/{stack}
+				projectName := testCase.directoryName
+				qualifiedStackName := fmt.Sprintf("%s/%s/%s", orgName, projectName, testCase.stackName)
+				options = append(options, opttest.StackName(qualifiedStackName))
+			} else {
+				// Create default fully qualified stack name
+				projectName := testCase.directoryName
+				qualifiedStackName := fmt.Sprintf("%s/%s/test", orgName, projectName)
+				options = append(options, opttest.StackName(qualifiedStackName))
 			}
 			
 			test := pulumitest.NewPulumiTest(t, testCase.directoryName, options...)
@@ -172,19 +195,29 @@ func TestYamlExamplesWithConfigWithPulumiTest(t *testing.T) {
 func TestYamlStackTagsExampleWithPulumiTest(t *testing.T) {
 	// Special test case for stack tags that requires a two-step process
 	t.Run("YamlStackTags", func(t *testing.T) {
+		// Get organization from PULUMI_TEST_OWNER (like integration tests do)
+		orgName := os.Getenv("PULUMI_TEST_OWNER")
+		if orgName == "" {
+			orgName = "service-provider-test-org" // fallback to default
+		}
+		
 		// Generate unique stack name for this test run
 		digits := generateRandomFiveDigitsPulumiTest()
 		stackName := "test-stack-" + digits
 		
+		// Create fully qualified stack name: {org}/{project}/{stack}
+		projectName := "yaml-stack-tags-example"
+		qualifiedStackName := fmt.Sprintf("%s/%s/%s", orgName, projectName, stackName)
+		
 		// Step 1: Create empty project directory
-		emptyDir := createEmptyPulumiProject(t, "yaml-stack-tags-example")
+		emptyDir := createEmptyPulumiProject(t, projectName)
 		defer os.RemoveAll(emptyDir) // cleanup temp directory
 		
 		// Step 2: Start with empty project directory
 		test := pulumitest.NewPulumiTest(t, emptyDir,
 			opttest.LocalProviderPath("pulumiservice", "../bin"),
 			opttest.UseAmbientBackend(),
-			opttest.StackName(stackName))
+			opttest.StackName(qualifiedStackName))
 
 		// UseAmbientBackend() automatically handles API URL and access token from environment
 
@@ -215,18 +248,28 @@ func TestYamlStackTagsExampleWithPulumiTest(t *testing.T) {
 // Multistep tests for resources that need empty stacks created first
 func TestYamlDeploymentSettingsWithPulumiTest(t *testing.T) {
 	t.Run("YamlDeploymentSettings", func(t *testing.T) {
+		// Get organization from PULUMI_TEST_OWNER (like integration tests do)
+		orgName := os.Getenv("PULUMI_TEST_OWNER")
+		if orgName == "" {
+			orgName = "service-provider-test-org" // fallback to default
+		}
+		
 		digits := generateRandomFiveDigitsPulumiTest()
 		stackName := "test-stack-" + digits
 		
+		// Create fully qualified stack name: {org}/{project}/{stack}
+		projectName := "yaml-deployment-settings-example"
+		qualifiedStackName := fmt.Sprintf("%s/%s/%s", orgName, projectName, stackName)
+		
 		// Step 1: Create empty project directory
-		emptyDir := createEmptyPulumiProject(t, "yaml-deployment-settings-example")
+		emptyDir := createEmptyPulumiProject(t, projectName)
 		defer os.RemoveAll(emptyDir) // cleanup temp directory
 		
 		// Step 2: Start with empty project directory
 		test := pulumitest.NewPulumiTest(t, emptyDir,
 			opttest.LocalProviderPath("pulumiservice", "../bin"),
 			opttest.UseAmbientBackend(),
-			opttest.StackName(stackName))
+			opttest.StackName(qualifiedStackName))
 
 		// UseAmbientBackend() automatically handles API URL and access token from environment
 		test.SetConfig(t, "digits", digits)
@@ -251,18 +294,28 @@ func TestYamlDeploymentSettingsWithPulumiTest(t *testing.T) {
 
 func TestYamlDeploymentSettingsNoSourceWithPulumiTest(t *testing.T) {
 	t.Run("YamlDeploymentSettingsNoSource", func(t *testing.T) {
+		// Get organization from PULUMI_TEST_OWNER (like integration tests do)
+		orgName := os.Getenv("PULUMI_TEST_OWNER")
+		if orgName == "" {
+			orgName = "service-provider-test-org" // fallback to default
+		}
+		
 		digits := generateRandomFiveDigitsPulumiTest()
 		stackName := "test-stack-" + digits
 		
-		// Step 1: Create empty project directory (match the project name in yaml-deployment-settings-no-source)
-		emptyDir := createEmptyPulumiProject(t, "yaml-deployment-settings-example")
+		// Create fully qualified stack name: {org}/{project}/{stack}
+		projectName := "yaml-deployment-settings-example" // match the project name in yaml-deployment-settings-no-source
+		qualifiedStackName := fmt.Sprintf("%s/%s/%s", orgName, projectName, stackName)
+		
+		// Step 1: Create empty project directory
+		emptyDir := createEmptyPulumiProject(t, projectName)
 		defer os.RemoveAll(emptyDir) // cleanup temp directory
 		
 		// Step 2: Start with empty project directory
 		test := pulumitest.NewPulumiTest(t, emptyDir,
 			opttest.LocalProviderPath("pulumiservice", "../bin"),
 			opttest.UseAmbientBackend(),
-			opttest.StackName(stackName))
+			opttest.StackName(qualifiedStackName))
 
 		// UseAmbientBackend() automatically handles API URL and access token from environment
 		test.SetConfig(t, "digits", digits)
@@ -287,18 +340,28 @@ func TestYamlDeploymentSettingsNoSourceWithPulumiTest(t *testing.T) {
 
 func TestYamlDeploymentSettingsCommitWithPulumiTest(t *testing.T) {
 	t.Run("YamlDeploymentSettingsCommit", func(t *testing.T) {
+		// Get organization from PULUMI_TEST_OWNER (like integration tests do)
+		orgName := os.Getenv("PULUMI_TEST_OWNER")
+		if orgName == "" {
+			orgName = "service-provider-test-org" // fallback to default
+		}
+		
 		digits := generateRandomFiveDigitsPulumiTest()
 		stackName := "test-stack-" + digits
 		
+		// Create fully qualified stack name: {org}/{project}/{stack}
+		projectName := "yaml-deployment-settings-commit-example"
+		qualifiedStackName := fmt.Sprintf("%s/%s/%s", orgName, projectName, stackName)
+		
 		// Step 1: Create empty project directory
-		emptyDir := createEmptyPulumiProject(t, "yaml-deployment-settings-commit-example")
+		emptyDir := createEmptyPulumiProject(t, projectName)
 		defer os.RemoveAll(emptyDir) // cleanup temp directory
 		
 		// Step 2: Start with empty project directory
 		test := pulumitest.NewPulumiTest(t, emptyDir,
 			opttest.LocalProviderPath("pulumiservice", "../bin"),
 			opttest.UseAmbientBackend(),
-			opttest.StackName(stackName))
+			opttest.StackName(qualifiedStackName))
 
 		// UseAmbientBackend() automatically handles API URL and access token from environment
 		test.SetConfig(t, "digits", digits)
@@ -323,18 +386,28 @@ func TestYamlDeploymentSettingsCommitWithPulumiTest(t *testing.T) {
 
 func TestYamlSchedulesWithPulumiTest(t *testing.T) {
 	t.Run("YamlSchedules", func(t *testing.T) {
+		// Get organization from PULUMI_TEST_OWNER (like integration tests do)
+		orgName := os.Getenv("PULUMI_TEST_OWNER")
+		if orgName == "" {
+			orgName = "service-provider-test-org" // fallback to default
+		}
+		
 		digits := generateRandomFiveDigitsPulumiTest()
 		stackName := "test-stack-" + digits
 		
+		// Create fully qualified stack name: {org}/{project}/{stack}
+		projectName := "pulumi-service-schedules-example-yaml"
+		qualifiedStackName := fmt.Sprintf("%s/%s/%s", orgName, projectName, stackName)
+		
 		// Step 1: Create empty project directory
-		emptyDir := createEmptyPulumiProject(t, "pulumi-service-schedules-example-yaml")
+		emptyDir := createEmptyPulumiProject(t, projectName)
 		defer os.RemoveAll(emptyDir) // cleanup temp directory
 		
 		// Step 2: Start with empty project directory
 		test := pulumitest.NewPulumiTest(t, emptyDir,
 			opttest.LocalProviderPath("pulumiservice", "../bin"),
 			opttest.UseAmbientBackend(),
-			opttest.StackName(stackName))
+			opttest.StackName(qualifiedStackName))
 
 		// UseAmbientBackend() automatically handles API URL and access token from environment
 		test.SetConfig(t, "digits", digits)

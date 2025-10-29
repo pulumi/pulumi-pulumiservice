@@ -1,6 +1,7 @@
 name: yaml-approval-rules-example
 runtime: yaml
 description: A minimal Pulumi YAML program for approval rules
+config:
   digits:
     type: string
     default: "00000"
