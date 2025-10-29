@@ -2,6 +2,11 @@ name: yaml-deployment-settings-example
 runtime: yaml
 description: Deployment settings test
 resources:
+  random_integer:
+    type: random:RandomInteger
+    properties:
+      min: 1000
+      max: 9999
   my_settings:
     type: pulumiservice:DeploymentSettings
     properties:
@@ -25,3 +30,6 @@ resources:
           skipInstallDependencies: true
       cacheOptions:
         enable: true
+    options:
+      dependsOn:
+        - ${random_integer}

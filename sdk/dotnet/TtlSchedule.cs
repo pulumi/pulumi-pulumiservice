@@ -16,7 +16,7 @@ namespace Pulumi.PulumiService
     public partial class TtlSchedule : global::Pulumi.CustomResource
     {
         /// <summary>
-        /// True if the stack and all associated history and settings should be deleted.
+        /// True if the stack and all associated history and settings should be deleted. Defaults to false, which means only the resources are destroyed but the stack itself remains.
         /// </summary>
         [Output("deleteAfterDestroy")]
         public Output<bool?> DeleteAfterDestroy { get; private set; } = null!;
@@ -97,7 +97,7 @@ namespace Pulumi.PulumiService
     public sealed class TtlScheduleArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
-        /// True if the stack and all associated history and settings should be deleted.
+        /// True if the stack and all associated history and settings should be deleted. Defaults to false, which means only the resources are destroyed but the stack itself remains.
         /// </summary>
         [Input("deleteAfterDestroy")]
         public Input<bool>? DeleteAfterDestroy { get; set; }

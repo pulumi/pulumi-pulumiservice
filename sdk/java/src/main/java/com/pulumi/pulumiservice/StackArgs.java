@@ -5,6 +5,7 @@ package com.pulumi.pulumiservice;
 
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
+import com.pulumi.core.internal.Codegen;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
 import java.lang.Boolean;
 import java.lang.String;
@@ -18,14 +19,14 @@ public final class StackArgs extends com.pulumi.resources.ResourceArgs {
     public static final StackArgs Empty = new StackArgs();
 
     /**
-     * Optional. Flag indicating whether to delete the stack even if it still contains resources.
+     * Optional. Flag indicating whether to delete the stack even if it still contains resources. Defaults to false, which means the stack will not be deleted if it still contains resources.
      * 
      */
     @Import(name="forceDestroy")
     private @Nullable Output<Boolean> forceDestroy;
 
     /**
-     * @return Optional. Flag indicating whether to delete the stack even if it still contains resources.
+     * @return Optional. Flag indicating whether to delete the stack even if it still contains resources. Defaults to false, which means the stack will not be deleted if it still contains resources.
      * 
      */
     public Optional<Output<Boolean>> forceDestroy() {
@@ -105,7 +106,7 @@ public final class StackArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param forceDestroy Optional. Flag indicating whether to delete the stack even if it still contains resources.
+         * @param forceDestroy Optional. Flag indicating whether to delete the stack even if it still contains resources. Defaults to false, which means the stack will not be deleted if it still contains resources.
          * 
          * @return builder
          * 
@@ -116,7 +117,7 @@ public final class StackArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param forceDestroy Optional. Flag indicating whether to delete the stack even if it still contains resources.
+         * @param forceDestroy Optional. Flag indicating whether to delete the stack even if it still contains resources. Defaults to false, which means the stack will not be deleted if it still contains resources.
          * 
          * @return builder
          * 
@@ -189,6 +190,7 @@ public final class StackArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         public StackArgs build() {
+            $.forceDestroy = Codegen.booleanProp("forceDestroy").output().arg($.forceDestroy).def(false).getNullable();
             if ($.organizationName == null) {
                 throw new MissingRequiredPropertyException("StackArgs", "organizationName");
             }

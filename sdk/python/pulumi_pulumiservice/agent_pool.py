@@ -28,12 +28,14 @@ class AgentPoolArgs:
         :param pulumi.Input[_builtins.str] name: Name of the agent pool.
         :param pulumi.Input[_builtins.str] organization_name: The organization's name.
         :param pulumi.Input[_builtins.str] description: Description of the agent pool.
-        :param pulumi.Input[_builtins.bool] force_destroy: Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.
+        :param pulumi.Input[_builtins.bool] force_destroy: Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it. Defaults to false, which means the agent pool will not be deleted if stacks are still configured to use it.
         """
         pulumi.set(__self__, "name", name)
         pulumi.set(__self__, "organization_name", organization_name)
         if description is not None:
             pulumi.set(__self__, "description", description)
+        if force_destroy is None:
+            force_destroy = False
         if force_destroy is not None:
             pulumi.set(__self__, "force_destroy", force_destroy)
 
@@ -77,7 +79,7 @@ class AgentPoolArgs:
     @pulumi.getter(name="forceDestroy")
     def force_destroy(self) -> Optional[pulumi.Input[_builtins.bool]]:
         """
-        Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.
+        Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it. Defaults to false, which means the agent pool will not be deleted if stacks are still configured to use it.
         """
         return pulumi.get(self, "force_destroy")
 
@@ -103,7 +105,7 @@ class AgentPool(pulumi.CustomResource):
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] description: Description of the agent pool.
-        :param pulumi.Input[_builtins.bool] force_destroy: Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.
+        :param pulumi.Input[_builtins.bool] force_destroy: Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it. Defaults to false, which means the agent pool will not be deleted if stacks are still configured to use it.
         :param pulumi.Input[_builtins.str] name: Name of the agent pool.
         :param pulumi.Input[_builtins.str] organization_name: The organization's name.
         """
@@ -145,6 +147,8 @@ class AgentPool(pulumi.CustomResource):
             __props__ = AgentPoolArgs.__new__(AgentPoolArgs)
 
             __props__.__dict__["description"] = description
+            if force_destroy is None:
+                force_destroy = False
             __props__.__dict__["force_destroy"] = force_destroy
             if name is None and not opts.urn:
                 raise TypeError("Missing required property 'name'")
@@ -206,7 +210,7 @@ class AgentPool(pulumi.CustomResource):
     @pulumi.getter(name="forceDestroy")
     def force_destroy(self) -> pulumi.Output[Optional[_builtins.bool]]:
         """
-        Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.
+        Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it. Defaults to false, which means the agent pool will not be deleted if stacks are still configured to use it.
         """
         return pulumi.get(self, "force_destroy")
 

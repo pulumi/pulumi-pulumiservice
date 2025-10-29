@@ -5,7 +5,7 @@ resources:
   testing-tag:
     type: pulumiservice:StackTag
     properties:
-      organization: service-provider-test-org
+      organization: team-ce
       project: ${pulumi.project}
       stack: ${pulumi.stack}
       name: testing-tag

@@ -5,6 +5,7 @@ package com.pulumi.pulumiservice;
 
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
+import com.pulumi.core.internal.Codegen;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
 import java.lang.Boolean;
 import java.lang.String;
@@ -33,14 +34,14 @@ public final class AgentPoolArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.
+     * Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it. Defaults to false, which means the agent pool will not be deleted if stacks are still configured to use it.
      * 
      */
     @Import(name="forceDestroy")
     private @Nullable Output<Boolean> forceDestroy;
 
     /**
-     * @return Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.
+     * @return Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it. Defaults to false, which means the agent pool will not be deleted if stacks are still configured to use it.
      * 
      */
     public Optional<Output<Boolean>> forceDestroy() {
@@ -126,7 +127,7 @@ public final class AgentPoolArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param forceDestroy Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.
+         * @param forceDestroy Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it. Defaults to false, which means the agent pool will not be deleted if stacks are still configured to use it.
          * 
          * @return builder
          * 
@@ -137,7 +138,7 @@ public final class AgentPoolArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param forceDestroy Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.
+         * @param forceDestroy Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it. Defaults to false, which means the agent pool will not be deleted if stacks are still configured to use it.
          * 
          * @return builder
          * 
@@ -189,6 +190,7 @@ public final class AgentPoolArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         public AgentPoolArgs build() {
+            $.forceDestroy = Codegen.booleanProp("forceDestroy").output().arg($.forceDestroy).def(false).getNullable();
             if ($.name == null) {
                 throw new MissingRequiredPropertyException("AgentPoolArgs", "name");
             }
