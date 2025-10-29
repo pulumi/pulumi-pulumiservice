@@ -80,6 +80,11 @@ export type Provider = import("./provider").Provider;
 export const Provider: typeof import("./provider").Provider = null as any;
 utilities.lazyLoad(exports, ["Provider"], () => require("./provider"));
 
+export { RoleArgs } from "./role";
+export type Role = import("./role").Role;
+export const Role: typeof import("./role").Role = null as any;
+utilities.lazyLoad(exports, ["Role"], () => require("./role"));
+
 export { StackArgs } from "./stack";
 export type Stack = import("./stack").Stack;
 export const Stack: typeof import("./stack").Stack = null as any;
@@ -166,6 +171,8 @@ const _module = {
                 return new OrgAccessToken(name, <any>undefined, { urn })
             case "pulumiservice:index:PolicyGroup":
                 return new PolicyGroup(name, <any>undefined, { urn })
+            case "pulumiservice:index:Role":
+                return new Role(name, <any>undefined, { urn })
             case "pulumiservice:index:Stack":
                 return new Stack(name, <any>undefined, { urn })
             case "pulumiservice:index:StackTag":

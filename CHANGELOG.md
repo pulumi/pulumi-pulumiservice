@@ -19,6 +19,7 @@
 ### Improvements
 
 - Added PolicyGroup resource and getPolicyPack/getPolicyPacks data sources for managing policy packs across stacks
+- Added Role resource for managing custom RBAC roles [#552](https://github.com/pulumi/pulumi-pulumiservice/issues/552)
 - Improved Makefile lint target with proper bash shell support and build tags for examples
 
 ### Bug Fixes
