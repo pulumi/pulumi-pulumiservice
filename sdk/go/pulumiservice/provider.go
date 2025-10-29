@@ -13,6 +13,11 @@ import (
 
 type Provider struct {
 	pulumi.ProviderResourceState
+
+	// Access Token to authenticate with Pulumi Cloud.
+	AccessToken pulumi.StringPtrOutput `pulumi:"accessToken"`
+	// Optional override of Pulumi Cloud API endpoint.
+	ApiUrl pulumi.StringPtrOutput `pulumi:"apiUrl"`
 }
 
 // NewProvider registers a new resource with the given unique name, arguments, and options.
@@ -22,9 +27,18 @@ func NewProvider(ctx *pulumi.Context,
 		args = &ProviderArgs{}
 	}
 
+	if args.ApiUrl == nil {
+		if d := internal.GetEnvOrDefault("https://api.pulumi.com", nil, "PULUMI_BACKEND_URL"); d != nil {
+			args.ApiUrl = pulumi.StringPtr(d.(string))
+		}
+	}
 	if args.AccessToken != nil {
 		args.AccessToken = pulumi.ToSecret(args.AccessToken).(pulumi.StringPtrInput)
 	}
+	secrets := pulumi.AdditionalSecretOutputs([]string{
+		"accessToken",
+	})
+	opts = append(opts, secrets)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Provider
 	err := ctx.RegisterResource("pulumi:providers:pulumiservice", name, args, &resource, opts...)
@@ -84,6 +98,16 @@ func (o ProviderOutput) ToProviderOutput() ProviderOutput {
 
 func (o ProviderOutput) ToProviderOutputWithContext(ctx context.Context) ProviderOutput {
 	return o
+}
+
+// Access Token to authenticate with Pulumi Cloud.
+func (o ProviderOutput) AccessToken() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *Provider) pulumi.StringPtrOutput { return v.AccessToken }).(pulumi.StringPtrOutput)
+}
+
+// Optional override of Pulumi Cloud API endpoint.
+func (o ProviderOutput) ApiUrl() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *Provider) pulumi.StringPtrOutput { return v.ApiUrl }).(pulumi.StringPtrOutput)
 }
 
 func init() {

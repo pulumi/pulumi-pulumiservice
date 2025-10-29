@@ -13,6 +13,19 @@ namespace Pulumi.PulumiService
     public partial class Provider : global::Pulumi.ProviderResource
     {
         /// <summary>
+        /// Access Token to authenticate with Pulumi Cloud.
+        /// </summary>
+        [Output("accessToken")]
+        public Output<string?> AccessToken { get; private set; } = null!;
+
+        /// <summary>
+        /// Optional override of Pulumi Cloud API endpoint.
+        /// </summary>
+        [Output("apiUrl")]
+        public Output<string?> ApiUrl { get; private set; } = null!;
+
+
+        /// <summary>
         /// Create a Provider resource with the given unique name, arguments, and options.
         /// </summary>
         ///
@@ -29,6 +42,10 @@ namespace Pulumi.PulumiService
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
+                AdditionalSecretOutputs =
+                {
+                    "accessToken",
+                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.
@@ -63,6 +80,7 @@ namespace Pulumi.PulumiService
 
         public ProviderArgs()
         {
+            ApiUrl = Utilities.GetEnv("PULUMI_BACKEND_URL") ?? "https://api.pulumi.com";
         }
         public static new ProviderArgs Empty => new ProviderArgs();
     }

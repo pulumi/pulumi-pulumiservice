@@ -19,6 +19,14 @@ export class Provider extends pulumi.ProviderResource {
         return obj['__pulumiType'] === "pulumi:providers:" + Provider.__pulumiType;
     }
 
+    /**
+     * Access Token to authenticate with Pulumi Cloud.
+     */
+    declare public readonly accessToken: pulumi.Output<string | undefined>;
+    /**
+     * Optional override of Pulumi Cloud API endpoint.
+     */
+    declare public readonly apiUrl: pulumi.Output<string | undefined>;
 
     /**
      * Create a Provider resource with the given unique name, arguments, and options.
@@ -32,9 +40,11 @@ export class Provider extends pulumi.ProviderResource {
         opts = opts || {};
         {
             resourceInputs["accessToken"] = args?.accessToken ? pulumi.secret(args.accessToken) : undefined;
-            resourceInputs["apiUrl"] = args?.apiUrl;
+            resourceInputs["apiUrl"] = (args?.apiUrl) ?? (utilities.getEnv("PULUMI_BACKEND_URL") || "https://api.pulumi.com");
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const secretOpts = { additionalSecretOutputs: ["accessToken"] };
+        opts = pulumi.mergeOptions(opts, secretOpts);
         super(Provider.__pulumiType, name, resourceInputs, opts);
     }
 }
