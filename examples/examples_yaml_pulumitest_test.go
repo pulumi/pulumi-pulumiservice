@@ -7,14 +7,45 @@ package examples
 
 import (
 	"fmt"
+	"io/ioutil"
 	"math/rand"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/pulumi/providertest/pulumitest"
 	"github.com/pulumi/providertest/pulumitest/assertpreview"
 	"github.com/pulumi/providertest/pulumitest/opttest"
 )
+
+// createEmptyPulumiProject creates a temporary directory with an empty Pulumi.yaml project
+func createEmptyPulumiProject(t *testing.T, projectName string) string {
+	tempDir, err := ioutil.TempDir("", "pulumitest-empty-"+projectName)
+	if err != nil {
+		t.Fatalf("Failed to create temp directory: %v", err)
+	}
+
+	// Create a minimal Pulumi.yaml with the specified project name but no resources
+	pulumiYaml := fmt.Sprintf(`name: %s
+runtime: yaml
+description: Empty project for multistep testing
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  digits:
+    type: string
+    default: "00000"
+resources: {}
+`, projectName)
+
+	pulumiYamlPath := filepath.Join(tempDir, "Pulumi.yaml")
+	if err := ioutil.WriteFile(pulumiYamlPath, []byte(pulumiYaml), 0644); err != nil {
+		t.Fatalf("Failed to write Pulumi.yaml: %v", err)
+	}
+
+	return tempDir
+}
 
 func TestYamlExamplesWithPulumiTest(t *testing.T) {
 	// Simple examples that don't need additional configuration
@@ -85,78 +116,6 @@ func TestYamlExamplesWithConfigWithPulumiTest(t *testing.T) {
 		config        map[string]string
 		stackName     string // Custom stack name for tests that need existing stacks
 	}{
-		"YamlDeploymentSettings": func() struct {
-			directoryName string
-			config        map[string]string
-			stackName     string
-		} {
-			digits := generateRandomFiveDigitsPulumiTest()
-			return struct {
-				directoryName string
-				config        map[string]string
-				stackName     string
-			}{
-				directoryName: "yaml-deployment-settings",
-				config: map[string]string{
-					"digits": digits,
-				},
-				stackName: "test-stack-" + digits,
-			}
-		}(),
-		"YamlDeploymentSettingsNoSource": func() struct {
-			directoryName string
-			config        map[string]string
-			stackName     string
-		} {
-			digits := generateRandomFiveDigitsPulumiTest()
-			return struct {
-				directoryName string
-				config        map[string]string
-				stackName     string
-			}{
-				directoryName: "yaml-deployment-settings-no-source",
-				config: map[string]string{
-					"digits": digits,
-				},
-				stackName: "test-stack-" + digits,
-			}
-		}(),
-		"YamlDeploymentSettingsCommit": func() struct {
-			directoryName string
-			config        map[string]string
-			stackName     string
-		} {
-			digits := generateRandomFiveDigitsPulumiTest()
-			return struct {
-				directoryName string
-				config        map[string]string
-				stackName     string
-			}{
-				directoryName: "yaml-deployment-settings-commit",
-				config: map[string]string{
-					"digits": digits,
-				},
-				stackName: "test-stack-" + digits,
-			}
-		}(),
-		"YamlSchedules": func() struct {
-			directoryName string
-			config        map[string]string
-			stackName     string
-		} {
-			digits := generateRandomFiveDigitsPulumiTest()
-			return struct {
-				directoryName string
-				config        map[string]string
-				stackName     string
-			}{
-				directoryName: "yaml-schedules",
-				config: map[string]string{
-					"digits": digits,
-				},
-				stackName: "test-stack-" + digits,
-			}
-		}(),
 		"YamlEnvironments": {
 			directoryName: "yaml-environments",
 			config: map[string]string{
@@ -254,9 +213,19 @@ func TestYamlExamplesWithConfigWithPulumiTest(t *testing.T) {
 func TestYamlStackTagsExampleWithPulumiTest(t *testing.T) {
 	// Special test case for stack tags that requires a two-step process
 	t.Run("YamlStackTags", func(t *testing.T) {
-		test := pulumitest.NewPulumiTest(t, "yaml-stack-tags",
+		// Generate unique stack name for this test run
+		digits := generateRandomFiveDigitsPulumiTest()
+		stackName := "test-stack-" + digits
+		
+		// Step 1: Create empty project directory
+		emptyDir := createEmptyPulumiProject(t, "yaml-stack-tags-example")
+		defer os.RemoveAll(emptyDir) // cleanup temp directory
+		
+		// Step 2: Start with empty project directory
+		test := pulumitest.NewPulumiTest(t, emptyDir,
 			opttest.LocalProviderPath("pulumiservice", "../bin"),
-			opttest.UseAmbientBackend())
+			opttest.UseAmbientBackend(),
+			opttest.StackName(stackName))
 
 		// Configure the pulumiservice provider
 		// Use the staging API URL if PULUMI_BACKEND_URL is set (matches CI environment)
@@ -267,9 +236,11 @@ func TestYamlStackTagsExampleWithPulumiTest(t *testing.T) {
 		test.SetConfig(t, "pulumiservice:apiUrl", apiUrl)
 		
 		// Set access token from environment variable (required for API access)
-		if token := os.Getenv("PULUMI_ACCESS_TOKEN"); token != "" {
-			test.SetConfig(t, "pulumiservice:accessToken", token)
+		token := os.Getenv("PULUMI_ACCESS_TOKEN")
+		if token == "" {
+			t.Fatal("PULUMI_ACCESS_TOKEN environment variable is required for pulumitest")
 		}
+		test.SetConfig(t, "pulumiservice:accessToken", token)
 
 		// Set organization if available
 		if orgName := os.Getenv("PULUMI_TEST_OWNER"); orgName != "" {
@@ -282,14 +253,219 @@ func TestYamlStackTagsExampleWithPulumiTest(t *testing.T) {
 			test.SetConfig(t, "testUserName", userName)
 		}
 
-		// Deploy the stack tags
+		// Step 3: Create empty stack first
+		test.Up(t) // This creates an empty stack with no resources
+		
+		// Step 4: Update source to stack tags and deploy
+		test.UpdateSource(t, "yaml-stack-tags")
 		test.Up(t)
 
-		// Verify no changes on subsequent preview
+		// Step 5: Verify no changes on subsequent preview
 		previewResult := test.Preview(t)
 		assertpreview.HasNoChanges(t, previewResult)
 
-		// Refresh and verify state is consistent
+		// Step 6: Refresh and verify state is consistent
+		test.Refresh(t)
+	})
+}
+
+// Multistep tests for resources that need empty stacks created first
+func TestYamlDeploymentSettingsWithPulumiTest(t *testing.T) {
+	t.Run("YamlDeploymentSettings", func(t *testing.T) {
+		digits := generateRandomFiveDigitsPulumiTest()
+		stackName := "test-stack-" + digits
+		
+		// Step 1: Create empty project directory
+		emptyDir := createEmptyPulumiProject(t, "yaml-deployment-settings-example")
+		defer os.RemoveAll(emptyDir) // cleanup temp directory
+		
+		// Step 2: Start with empty project directory
+		test := pulumitest.NewPulumiTest(t, emptyDir,
+			opttest.LocalProviderPath("pulumiservice", "../bin"),
+			opttest.UseAmbientBackend(),
+			opttest.StackName(stackName))
+
+		// Configure the pulumiservice provider
+		apiUrl := "https://api.pulumi.com"
+		if backendUrl := os.Getenv("PULUMI_BACKEND_URL"); backendUrl != "" {
+			apiUrl = backendUrl
+		}
+		test.SetConfig(t, "pulumiservice:apiUrl", apiUrl)
+		
+		token := os.Getenv("PULUMI_ACCESS_TOKEN")
+		if token == "" {
+			t.Fatal("PULUMI_ACCESS_TOKEN environment variable is required for pulumitest")
+		}
+		test.SetConfig(t, "pulumiservice:accessToken", token)
+		test.SetConfig(t, "digits", digits)
+		
+		if orgName := os.Getenv("PULUMI_TEST_OWNER"); orgName != "" {
+			test.SetConfig(t, "organizationName", orgName)
+			test.SetConfig(t, "pulumiservice:organizationName", orgName)
+		}
+
+		// Step 3: Create empty stack first
+		test.Up(t) // This creates an empty stack with no resources
+		
+		// Step 4: Update source to deployment settings and deploy
+		test.UpdateSource(t, "yaml-deployment-settings")
+		test.Up(t)
+
+		// Step 5: Verify no changes on subsequent preview
+		previewResult := test.Preview(t)
+		assertpreview.HasNoChanges(t, previewResult)
+
+		// Step 6: Refresh and verify state is consistent
+		test.Refresh(t)
+	})
+}
+
+func TestYamlDeploymentSettingsNoSourceWithPulumiTest(t *testing.T) {
+	t.Run("YamlDeploymentSettingsNoSource", func(t *testing.T) {
+		digits := generateRandomFiveDigitsPulumiTest()
+		stackName := "test-stack-" + digits
+		
+		// Step 1: Create empty project directory (match the project name in yaml-deployment-settings-no-source)
+		emptyDir := createEmptyPulumiProject(t, "yaml-deployment-settings-example")
+		defer os.RemoveAll(emptyDir) // cleanup temp directory
+		
+		// Step 2: Start with empty project directory
+		test := pulumitest.NewPulumiTest(t, emptyDir,
+			opttest.LocalProviderPath("pulumiservice", "../bin"),
+			opttest.UseAmbientBackend(),
+			opttest.StackName(stackName))
+
+		// Configure the pulumiservice provider
+		apiUrl := "https://api.pulumi.com"
+		if backendUrl := os.Getenv("PULUMI_BACKEND_URL"); backendUrl != "" {
+			apiUrl = backendUrl
+		}
+		test.SetConfig(t, "pulumiservice:apiUrl", apiUrl)
+		
+		token := os.Getenv("PULUMI_ACCESS_TOKEN")
+		if token == "" {
+			t.Fatal("PULUMI_ACCESS_TOKEN environment variable is required for pulumitest")
+		}
+		test.SetConfig(t, "pulumiservice:accessToken", token)
+		test.SetConfig(t, "digits", digits)
+		
+		if orgName := os.Getenv("PULUMI_TEST_OWNER"); orgName != "" {
+			test.SetConfig(t, "organizationName", orgName)
+			test.SetConfig(t, "pulumiservice:organizationName", orgName)
+		}
+
+		// Step 3: Create empty stack first
+		test.Up(t) // This creates an empty stack with no resources
+		
+		// Step 4: Update source to deployment settings and deploy
+		test.UpdateSource(t, "yaml-deployment-settings-no-source")
+		test.Up(t)
+
+		// Step 5: Verify no changes on subsequent preview
+		previewResult := test.Preview(t)
+		assertpreview.HasNoChanges(t, previewResult)
+
+		// Step 6: Refresh and verify state is consistent
+		test.Refresh(t)
+	})
+}
+
+func TestYamlDeploymentSettingsCommitWithPulumiTest(t *testing.T) {
+	t.Run("YamlDeploymentSettingsCommit", func(t *testing.T) {
+		digits := generateRandomFiveDigitsPulumiTest()
+		stackName := "test-stack-" + digits
+		
+		// Step 1: Create empty project directory
+		emptyDir := createEmptyPulumiProject(t, "yaml-deployment-settings-commit-example")
+		defer os.RemoveAll(emptyDir) // cleanup temp directory
+		
+		// Step 2: Start with empty project directory
+		test := pulumitest.NewPulumiTest(t, emptyDir,
+			opttest.LocalProviderPath("pulumiservice", "../bin"),
+			opttest.UseAmbientBackend(),
+			opttest.StackName(stackName))
+
+		// Configure the pulumiservice provider
+		apiUrl := "https://api.pulumi.com"
+		if backendUrl := os.Getenv("PULUMI_BACKEND_URL"); backendUrl != "" {
+			apiUrl = backendUrl
+		}
+		test.SetConfig(t, "pulumiservice:apiUrl", apiUrl)
+		
+		token := os.Getenv("PULUMI_ACCESS_TOKEN")
+		if token == "" {
+			t.Fatal("PULUMI_ACCESS_TOKEN environment variable is required for pulumitest")
+		}
+		test.SetConfig(t, "pulumiservice:accessToken", token)
+		test.SetConfig(t, "digits", digits)
+		
+		if orgName := os.Getenv("PULUMI_TEST_OWNER"); orgName != "" {
+			test.SetConfig(t, "organizationName", orgName)
+			test.SetConfig(t, "pulumiservice:organizationName", orgName)
+		}
+
+		// Step 3: Create empty stack first
+		test.Up(t) // This creates an empty stack with no resources
+		
+		// Step 4: Update source to deployment settings and deploy
+		test.UpdateSource(t, "yaml-deployment-settings-commit")
+		test.Up(t)
+
+		// Step 5: Verify no changes on subsequent preview
+		previewResult := test.Preview(t)
+		assertpreview.HasNoChanges(t, previewResult)
+
+		// Step 6: Refresh and verify state is consistent
+		test.Refresh(t)
+	})
+}
+
+func TestYamlSchedulesWithPulumiTest(t *testing.T) {
+	t.Run("YamlSchedules", func(t *testing.T) {
+		digits := generateRandomFiveDigitsPulumiTest()
+		stackName := "test-stack-" + digits
+		
+		// Step 1: Create empty project directory
+		emptyDir := createEmptyPulumiProject(t, "pulumi-service-schedules-example-yaml")
+		defer os.RemoveAll(emptyDir) // cleanup temp directory
+		
+		// Step 2: Start with empty project directory
+		test := pulumitest.NewPulumiTest(t, emptyDir,
+			opttest.LocalProviderPath("pulumiservice", "../bin"),
+			opttest.UseAmbientBackend(),
+			opttest.StackName(stackName))
+
+		// Configure the pulumiservice provider
+		apiUrl := "https://api.pulumi.com"
+		if backendUrl := os.Getenv("PULUMI_BACKEND_URL"); backendUrl != "" {
+			apiUrl = backendUrl
+		}
+		test.SetConfig(t, "pulumiservice:apiUrl", apiUrl)
+		
+		token := os.Getenv("PULUMI_ACCESS_TOKEN")
+		if token == "" {
+			t.Fatal("PULUMI_ACCESS_TOKEN environment variable is required for pulumitest")
+		}
+		test.SetConfig(t, "pulumiservice:accessToken", token)
+		test.SetConfig(t, "digits", digits)
+		
+		if orgName := os.Getenv("PULUMI_TEST_OWNER"); orgName != "" {
+			test.SetConfig(t, "organizationName", orgName)
+			test.SetConfig(t, "pulumiservice:organizationName", orgName)
+		}
+
+		// Step 3: Create empty stack first
+		test.Up(t) // This creates an empty stack with no resources
+		
+		// Step 4: Update source to schedules and deploy
+		test.UpdateSource(t, "yaml-schedules")
+		test.Up(t)
+
+		// Step 5: Verify no changes on subsequent preview
+		previewResult := test.Preview(t)
+		assertpreview.HasNoChanges(t, previewResult)
+
+		// Step 6: Refresh and verify state is consistent
 		test.Refresh(t)
 	})
 }
