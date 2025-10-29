@@ -254,6 +254,8 @@ github.com/hashicorp/vault/api v1.12.0 h1:meCpJSesvzQyao8FCOgk2fGdoADAnbDu2WPJN1
 github.com/hashicorp/vault/api v1.12.0/go.mod h1:si+lJCYO7oGkIoNPAN8j3azBLTn9SjMGS+jFaHd1Cck=
 github.com/inconshreveable/mousetrap v1.1.0 h1:wN+x4NVGpMsO7ErUn/mUI3vEoE6Jt13X2s0bqwp9tc8=
 github.com/inconshreveable/mousetrap v1.1.0/go.mod h1:vpF70FUmC8bwa3OWnCshd2FqLfsEA9PFc4w1p2J65bw=
+github.com/iwahbe/helpmakego v0.3.0 h1:cT9AOWNV6tWRkTklr+bn9SCWRcCYm/Wdjwx1/PCg80M=
+github.com/iwahbe/helpmakego v0.3.0/go.mod h1:SNrBTLB/hEwr4EzMfcoMFVBGP9wQfJzSDF6PWZn4qac=
 github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 h1:BQSFePA1RWJOlocH6Fxy8MmwDt+yVQYULKfN0RoTN8A=
 github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99/go.mod h1:1lJo3i6rXxKeerYnT8Nvf0QmHCRC1n8sfWVwXF2Frvo=
 github.com/jmespath/go-jmespath v0.4.0 h1:BEgLn5cpjn8UN1mAw4NjwDrS35OdebyEtFe+9YPoQUg=
@@ -343,6 +345,8 @@ github.com/pulumi/appdash v0.0.0-20231130102222-75f619a67231 h1:vkHw5I/plNdTr435
 github.com/pulumi/appdash v0.0.0-20231130102222-75f619a67231/go.mod h1:murToZ2N9hNJzewjHBgfFdXhZKjY3z5cYC1VXk+lbFE=
 github.com/pulumi/esc v0.17.0 h1:oaVOIyFTENlYDuqc3pW75lQT9jb2cd6ie/4/Twxn66w=
 github.com/pulumi/esc v0.17.0/go.mod h1:XnSxlt5NkmuAj304l/gK4pRErFbtqq6XpfX1tYT9Jbc=
+github.com/pulumi/pulumi-go-provider v1.1.2 h1:NUQDXaftBDFTPMBPwxo8FhJUX0ymkv6a1XiXTnCDpvg=
+github.com/pulumi/pulumi-go-provider v1.1.2/go.mod h1:3lNIuxT/BArFyiKrVfv+UT7gMMtplss7V69KuBZ4zIk=
 github.com/pulumi/pulumi/pkg/v3 v3.204.0 h1:sK10GNL+nDnfrGzgzQKvd8A357q0SiTQZL7iDERnYMc=
 github.com/pulumi/pulumi/pkg/v3 v3.204.0/go.mod h1:Ycr0BogYboSb8UkCa3be1dyvzz2lcYZnLUPrSLW2Y9k=
 github.com/pulumi/pulumi/sdk/v3 v3.204.0 h1:tIiirsTpnq+Y9HqLY2NmXSEtbSg5XdZT9k+/6NmesAo=
@@ -430,6 +434,8 @@ go.opentelemetry.io/otel/trace v1.36.0 h1:ahxWNuqZjpdiFAyrIoQ4GIiAIhxAunQR6MUoKr
 go.opentelemetry.io/otel/trace v1.36.0/go.mod h1:gQ+OnDZzrybY4k4seLzPAWNwVBBVlF2szhehOBB/tGA=
 go.uber.org/atomic v1.9.0 h1:ECmE8Bn/WFTYwEW/bpKD3M8VtR/zQVbavAoalC1PYyE=
 go.uber.org/atomic v1.9.0/go.mod h1:fEN4uk6kAWBTFdckzkM89CLk9XfWZrxpCo0nPH17wJc=
+go.uber.org/atomic v1.10.0 h1:9qC72Qh0+3MqyJbAn8YU5xVq1frD8bn3JtD2oXtafVQ=
+go.uber.org/atomic v1.10.0/go.mod h1:LUxbIzbOniOlMKjJjyPfpl4v+PKK2cNJn91OQbhoJI0=
 gocloud.dev v0.37.0 h1:XF1rN6R0qZI/9DYjN16Uy0durAmSlf58DHOcb28GPro=
 gocloud.dev v0.37.0/go.mod h1:7/O4kqdInCNsc6LqgmuFnS0GRew4XNNYWpA44yQnwco=
 gocloud.dev/secrets/hashivault v0.37.0 h1:5ehGtUBP29DFAgAs6bPw7fVSgqQ3TxaoK2xVcLp1x+c=

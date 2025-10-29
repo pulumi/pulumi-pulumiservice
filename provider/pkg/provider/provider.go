@@ -16,6 +16,7 @@ package provider
 
 import (
 	"context"
+	_ "embed"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -60,9 +61,15 @@ type pulumiserviceProvider struct {
 	client          *pulumiapi.Client
 }
 
-func MakeProvider(host *provider.HostClient, name, version, schema string) (pulumirpc.ResourceProviderServer, error) {
+// embed manual-schema.json directly into resource binary so that we can properly serve the schema
+// directly from the resource provider.
+//
+//go:embed manual-schema.json
+var manualSchema string
+
+func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.ResourceProviderServer, error) {
 	// inject version into schema
-	versionedSchema := mustSetSchemaVersion(schema, version)
+	versionedSchema := mustSetSchemaVersion(manualSchema, version)
 	// Return the new provider
 	return &pulumiserviceProvider{
 		host:        host,

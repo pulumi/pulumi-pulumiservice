@@ -103,6 +103,7 @@ require (
 	github.com/hashicorp/hcl/v2 v2.22.0 // indirect
 	github.com/hashicorp/vault/api v1.12.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
+	github.com/iwahbe/helpmakego v0.3.0 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
@@ -180,3 +181,5 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	lukechampine.com/frand v1.4.2 // indirect
 )
+
+tool github.com/iwahbe/helpmakego
