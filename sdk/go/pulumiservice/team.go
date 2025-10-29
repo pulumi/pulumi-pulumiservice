@@ -45,6 +45,12 @@ func NewTeam(ctx *pulumi.Context,
 	if args.TeamType == nil {
 		return nil, errors.New("invalid value for required argument 'TeamType'")
 	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"name",
+		"organizationName",
+		"teamType",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Team
 	err := ctx.RegisterResource("pulumiservice:index:Team", name, args, &resource, opts...)
