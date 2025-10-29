@@ -4,6 +4,7 @@
 
 ### Improvements
 
+- Added YAML integration tests for 9 resources (AccessToken, ApprovalRule, Stack, TeamEnvironmentPermission, EnvironmentVersionTag, DeploymentSchedule, DriftSchedule, TtlSchedule, EnvironmentRotationSchedule) [#576](https://github.com/pulumi/pulumi-pulumiservice/issues/576)
 - Added Java SDK support with Pulumi Java SDK v1.16.2
 - Upgraded Pulumi SDK to v3.204.0 with latest codegen improvements
 

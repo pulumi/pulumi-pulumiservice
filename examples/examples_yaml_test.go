@@ -425,6 +425,125 @@ func TestYamlPolicyGroupsExample(t *testing.T) {
 	})
 }
 
+func TestYamlAccessTokenExample(t *testing.T) {
+	cwd := getCwd(t)
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Quick: true,
+		Dir:   path.Join(cwd, ".", "yaml-access-tokens"),
+		Config: map[string]string{
+			"organizationName": getOrgName(),
+		},
+	})
+}
+
+func TestYamlApprovalRuleExample(t *testing.T) {
+	cwd := getCwd(t)
+	digits := generateRandomFiveDigits()
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Quick: true,
+		Dir:   path.Join(cwd, ".", "yaml-approval-rules"),
+		Config: map[string]string{
+			"organizationName": getOrgName(),
+			"digits":           digits,
+		},
+	})
+}
+
+func TestYamlStackExample(t *testing.T) {
+	cwd := getCwd(t)
+	digits := generateRandomFiveDigits()
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Quick: true,
+		Dir:   path.Join(cwd, ".", "yaml-stack"),
+		Config: map[string]string{
+			"organizationName": getOrgName(),
+			"digits":           digits,
+		},
+	})
+}
+
+func TestYamlTeamEnvironmentPermissionExample(t *testing.T) {
+	cwd := getCwd(t)
+	digits := generateRandomFiveDigits()
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Quick:                true,
+		Dir:                  path.Join(cwd, ".", "yaml-team-environment-permission"),
+		ExpectRefreshChanges: true, // Team resource has known drift issues
+		Config: map[string]string{
+			"organizationName": getOrgName(),
+			"digits":           digits,
+		},
+	})
+}
+
+func TestYamlEnvironmentVersionTagExample(t *testing.T) {
+	cwd := getCwd(t)
+	digits := generateRandomFiveDigits()
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Quick: true,
+		Dir:   path.Join(cwd, ".", "yaml-environment-version-tag"),
+		Config: map[string]string{
+			"organizationName": getOrgName(),
+			"digits":           digits,
+		},
+	})
+}
+
+func TestYamlDeploymentScheduleExample(t *testing.T) {
+	cwd := getCwd(t)
+	digits := generateRandomFiveDigits()
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Quick:     true,
+		Dir:       path.Join(cwd, ".", "yaml-deployment-schedule"),
+		StackName: "test-stack-" + digits,
+		Config: map[string]string{
+			"organizationName": getOrgName(),
+			"digits":           digits,
+		},
+	})
+}
+
+func TestYamlDriftScheduleExample(t *testing.T) {
+	cwd := getCwd(t)
+	digits := generateRandomFiveDigits()
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Quick:     true,
+		Dir:       path.Join(cwd, ".", "yaml-drift-schedule"),
+		StackName: "test-stack-" + digits,
+		Config: map[string]string{
+			"organizationName": getOrgName(),
+			"digits":           digits,
+		},
+	})
+}
+
+func TestYamlTtlScheduleExample(t *testing.T) {
+	cwd := getCwd(t)
+	digits := generateRandomFiveDigits()
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Quick:     true,
+		Dir:       path.Join(cwd, ".", "yaml-ttl-schedule"),
+		StackName: "test-stack-" + digits,
+		Config: map[string]string{
+			"organizationName": getOrgName(),
+			"digits":           digits,
+		},
+	})
+}
+
+func TestYamlEnvironmentRotationScheduleExample(t *testing.T) {
+	cwd := getCwd(t)
+	digits := generateRandomFiveDigits()
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Quick: true,
+		Dir:   path.Join(cwd, ".", "yaml-environment-rotation-schedule"),
+		Config: map[string]string{
+			"organizationName": getOrgName(),
+			"digits":           digits,
+		},
+	})
+}
+
 func writePulumiYaml(t *testing.T, yamlContents interface{}) string {
 	tmpdir := t.TempDir()
 	b, err := yaml.Marshal(yamlContents)

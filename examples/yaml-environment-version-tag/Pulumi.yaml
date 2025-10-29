@@ -1,0 +1,38 @@
+name: yaml-environment-version-tag
+runtime: yaml
+description: Example of EnvironmentVersionTag resource
+
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  digits:
+    type: string
+
+resources:
+  # Create environment first (dependency)
+  testEnvironment:
+    type: pulumiservice:Environment
+    properties:
+      organization: ${organizationName}
+      project: default
+      name: test-env-tag-${digits}
+      yaml:
+        fn::stringAsset: |-
+          values:
+            example: value
+
+  # Tag the initial revision
+  versionTag:
+    type: pulumiservice:EnvironmentVersionTag
+    properties:
+      organization: ${organizationName}
+      project: ${testEnvironment.project}
+      environment: ${testEnvironment.name}
+      tagName: stable
+      revision: 1
+
+outputs:
+  environmentName: ${testEnvironment.name}
+  tagName: ${versionTag.tagName}
+  revision: ${versionTag.revision}
