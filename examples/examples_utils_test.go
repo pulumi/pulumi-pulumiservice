@@ -18,3 +18,12 @@ func getCwd(t *testing.T) string {
 func generateRandomFiveDigits() string {
 	return fmt.Sprintf("%05d", rand.Intn(100000))
 }
+
+// getOrgName returns the organization name from PULUMI_TEST_OWNER env var,
+// or defaults to "service-provider-test-org" if not set
+func getOrgName() string {
+	if org := os.Getenv("PULUMI_TEST_OWNER"); org != "" {
+		return org
+	}
+	return "service-provider-test-org"
+}

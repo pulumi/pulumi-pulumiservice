@@ -1,0 +1,45 @@
+name: yaml-team-environment-permission
+runtime: yaml
+description: Example of TeamEnvironmentPermission resource
+
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  digits:
+    type: string
+
+resources:
+  # Create team first (dependency)
+  testTeam:
+    type: pulumiservice:index:Team
+    properties:
+      name: test-team-${digits}
+      organizationName: ${organizationName}
+      teamType: pulumi
+
+  # Create environment (dependency)
+  testEnvironment:
+    type: pulumiservice:Environment
+    properties:
+      organization: ${organizationName}
+      project: default
+      name: test-env-${digits}
+      yaml:
+        fn::stringAsset: |-
+          values:
+            example: value
+
+  # Grant team permission to environment
+  teamPermission:
+    type: pulumiservice:TeamEnvironmentPermission
+    properties:
+      organization: ${organizationName}
+      team: ${testTeam.name}
+      environment: ${testEnvironment.name}
+      permission: read
+
+outputs:
+  teamName: ${testTeam.name}
+  environmentName: ${testEnvironment.name}
+  permissionLevel: ${teamPermission.permission}

@@ -1,0 +1,36 @@
+name: yaml-environment-rotation-schedule
+runtime: yaml
+description: Example of EnvironmentRotationSchedule resource
+
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  digits:
+    type: string
+
+resources:
+  # Create environment first (dependency)
+  testEnvironment:
+    type: pulumiservice:Environment
+    properties:
+      organization: ${organizationName}
+      project: default
+      name: test-env-rotation-${digits}
+      yaml:
+        fn::stringAsset: |-
+          values:
+            example: value
+
+  # Rotation schedule
+  rotationSchedule:
+    type: pulumiservice:EnvironmentRotationSchedule
+    properties:
+      organization: ${testEnvironment.organization}
+      project: ${testEnvironment.project}
+      environment: ${testEnvironment.name}
+      scheduleCron: "0 0 1 1 *"
+
+outputs:
+  environmentName: ${testEnvironment.name}
+  scheduleId: ${rotationSchedule.scheduleId}

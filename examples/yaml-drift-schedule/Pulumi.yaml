@@ -1,0 +1,39 @@
+name: yaml-drift-schedule
+runtime: yaml
+description: Example of DriftSchedule resource
+
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  digits:
+    type: string
+
+resources:
+  # DeploymentSettings required before schedule
+  settings:
+    type: pulumiservice:DeploymentSettings
+    properties:
+      organization: ${organizationName}
+      project: yaml-drift-schedule
+      stack: test-stack-${digits}
+      sourceContext:
+        git:
+          repoUrl: https://github.com/pulumi/examples.git
+          branch: refs/heads/master
+
+  # Drift schedule
+  driftSchedule:
+    type: pulumiservice:DriftSchedule
+    properties:
+      organization: ${organizationName}
+      project: yaml-drift-schedule
+      stack: test-stack-${digits}
+      scheduleCron: "0 0 1 1 *"
+      autoRemediate: false
+    options:
+      dependsOn:
+        - ${settings}
+
+outputs:
+  scheduleId: ${driftSchedule.scheduleId}

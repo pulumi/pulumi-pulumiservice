@@ -1,12 +1,20 @@
 name: yaml-approval-rules-example
 runtime: yaml
 description: A minimal Pulumi YAML program for approval rules
+
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  digits:
+    type: string
+
 resources:
   # Create an environment that will be used as the target for our approval rule
   testing-environment:
     type: pulumiservice:Environment
     properties:
-      organization: service-provider-test-org
+      organization: ${organizationName}
       project: test-project
       name: testing-environment-approval-yaml-${digits}
       yaml:
@@ -15,7 +23,7 @@ resources:
             myKey1: "myValue1"
 
   # Create an approval rule that governs who can approve updates to the environment
-  # This rule requires 3 approvals from eligible approvers before any update can proceed
+  # This rule requires 1 approval from eligible approvers before any update can proceed
   approval-rule:
     type: pulumiservice:ApprovalRule
     properties:
@@ -27,10 +35,8 @@ resources:
         project: ${testing-environment.project}
         name: ${testing-environment.name}
       approvalRuleConfig:
-        numApprovalsRequired: 3
+        numApprovalsRequired: 1
         allowSelfApproval: true
         requireReapprovalOnChange: true
         eligibleApprovers:
           - rbacPermission: "environment:write"
-          - user: "pulumi-bot"
-          - user: "IaroslavTitov"
