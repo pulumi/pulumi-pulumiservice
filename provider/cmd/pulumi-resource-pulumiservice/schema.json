@@ -1,7 +1,6 @@
 {
   "name": "pulumiservice",
   "displayName": "Pulumi Cloud",
-  "version": "1.0.0-alpha.0+dev",
   "description": "A native Pulumi package for creating and managing Pulumi Cloud constructs",
   "keywords": [
     "pulumi",
@@ -51,7 +50,7 @@
     "python": {
       "packageName": "pulumi_pulumiservice",
       "requires": {
-        "pulumi": "\u003e=3.0.0,\u003c4.0.0"
+        "pulumi": ">=3.0.0,<4.0.0"
       },
       "pyproject": {
         "enabled": true

@@ -47,29 +47,29 @@ provider_debug::
 test_provider::
 	cd provider/pkg && go test -short -v -count=1 -cover -timeout 2h -parallel ${TESTPARALLELISM} ./...
 
-dotnet_sdk: provider/cmd/pulumi-resource-pulumiservice/schema.json $(PULUMI)
+dotnet_sdk: bin/pulumi-resource-pulumiservice $(PULUMI)
 	rm -rf sdk/dotnet
-	$(PULUMI) package gen-sdk $< --language dotnet
+	$(PULUMI) package gen-sdk ./$< --language dotnet
 	cd sdk/dotnet/ && \
 		printf "module fake_dotnet_module // Exclude this directory from Go tools\n\ngo 1.17\n" > go.mod && \
 		echo "${VERSION_GENERIC}" >version.txt && \
 		dotnet build
 
-go_sdk: provider/cmd/pulumi-resource-pulumiservice/schema.json $(PULUMI)
+go_sdk: bin/pulumi-resource-pulumiservice $(PULUMI)
 	rm -rf sdk/go
-	$(PULUMI) package gen-sdk $< --language go
+	$(PULUMI) package gen-sdk ./$< --language go
 
-nodejs_sdk: provider/cmd/pulumi-resource-pulumiservice/schema.json $(PULUMI)
+nodejs_sdk: bin/pulumi-resource-pulumiservice $(PULUMI)
 	rm -rf sdk/nodejs
-	$(PULUMI) package gen-sdk $< --language nodejs
+	$(PULUMI) package gen-sdk ./$< --language nodejs
 	cd sdk/nodejs && \
 		yarn install --no-progress && \
 		yarn run build && \
 		cp package.json yarn.lock ./bin/
 
-python_sdk: provider/cmd/pulumi-resource-pulumiservice/schema.json $(PULUMI)
+python_sdk: bin/pulumi-resource-pulumiservice $(PULUMI)
 	rm -rf sdk/python
-	$(PULUMI) package gen-sdk $< --language python
+	$(PULUMI) package gen-sdk ./$< --language python
 	cd sdk/python/ && \
 		printf "module fake_python_module // Exclude this directory from Go tools\n\ngo 1.17\n" > go.mod && \
 		cp ../../README.md . && \
@@ -79,9 +79,9 @@ python_sdk: provider/cmd/pulumi-resource-pulumiservice/schema.json $(PULUMI)
 		cd ./bin && \
 		../venv/bin/python -m build .
 
-java_sdk: provider/cmd/pulumi-resource-pulumiservice/schema.json $(PULUMI)
+java_sdk: bin/pulumi-resource-pulumiservice $(PULUMI)
 	rm -rf sdk/java
-	$(PULUMI) package gen-sdk $< --language java
+	$(PULUMI) package gen-sdk ./$< --language java
 	cd sdk/java && \
 		printf "module fake_java_module // Exclude this directory from Go tools\n\ngo 1.17\n" > go.mod && \
 		cp ../../README.md . && \
@@ -143,8 +143,9 @@ $(PULUMI): go.mod
 		curl -fsSL https://get.pulumi.com | sh -s -- --version "$${PULUMI_VERSION#v}"; \
 	fi
 
-provider/cmd/pulumi-resource-pulumiservice/schema.json: bin/pulumi-resource-pulumiservice $(PULUMI)
-	VERSION=${VERSION_GENERIC} $(PULUMI) package get-schema ./$< > $@
+$(SCHEMA_FILE): bin/pulumi-resource-pulumiservice $(PULUMI)
+	$(PULUMI) package get-schema ./$<  | \
+		jq 'del(.version)' > $@
 
 ######################
 # ci-mgmt onboarding #
