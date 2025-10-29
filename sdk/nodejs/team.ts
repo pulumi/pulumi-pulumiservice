@@ -97,6 +97,8 @@ export class Team extends pulumi.CustomResource {
             resourceInputs["teamType"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["name", "organizationName", "teamType"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(Team.__pulumiType, name, resourceInputs, opts);
     }
 }
