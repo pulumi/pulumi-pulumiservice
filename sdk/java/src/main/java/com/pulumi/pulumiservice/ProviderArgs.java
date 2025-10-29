@@ -5,6 +5,7 @@ package com.pulumi.pulumiservice;
 
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
+import com.pulumi.core.internal.Codegen;
 import java.lang.String;
 import java.util.Objects;
 import java.util.Optional;
@@ -113,6 +114,7 @@ public final class ProviderArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         public ProviderArgs build() {
+            $.apiUrl = Codegen.stringProp("apiUrl").output().arg($.apiUrl).env("PULUMI_BACKEND_URL").def("https://api.pulumi.com").getNullable();
             return $;
         }
     }
