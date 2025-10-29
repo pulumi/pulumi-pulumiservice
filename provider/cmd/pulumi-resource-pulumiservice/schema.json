@@ -11,6 +11,7 @@
   "license": "Apache-2.0",
   "repository": "https://github.com/pulumi/pulumi-pulumiservice",
   "publisher": "Pulumi",
+  "namespace": "pulumi",
   "meta": {
     "moduleFormat": "(.*)"
   },
@@ -41,19 +42,19 @@
       "gradleTest": ""
     },
     "nodejs": {
-      "packageName": "@pulumi/pulumiservice",
       "dependencies": {
         "@pulumi/pulumi": "^3.0.0"
       },
+      "packageName": "@pulumi/pulumiservice",
       "respectSchemaVersion": true
     },
     "python": {
       "packageName": "pulumi_pulumiservice",
-      "requires": {
-        "pulumi": ">=3.0.0,<4.0.0"
-      },
       "pyproject": {
         "enabled": true
+      },
+      "requires": {
+        "pulumi": ">=3.0.0,<4.0.0"
       },
       "respectSchemaVersion": true
     }
@@ -1869,15 +1870,18 @@
         },
         "name": {
           "type": "string",
-          "description": "The team's name. Required for \"pulumi\" teams."
+          "description": "The team's name. Required for \"pulumi\" teams.",
+          "replaceOnChanges": true
         },
         "organizationName": {
           "type": "string",
-          "description": "The name of the Pulumi organization the team belongs to."
+          "description": "The name of the Pulumi organization the team belongs to.",
+          "replaceOnChanges": true
         },
         "teamType": {
           "type": "string",
-          "description": "The type of team. Must be either `pulumi` or `github`."
+          "description": "The type of team. Must be either `pulumi` or `github`.",
+          "replaceOnChanges": true
         }
       },
       "type": "object",
@@ -1909,17 +1913,17 @@
         "name": {
           "type": "string",
           "description": "The team's name. Required for \"pulumi\" teams.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         },
         "organizationName": {
           "type": "string",
           "description": "The name of the Pulumi organization the team belongs to.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         },
         "teamType": {
           "type": "string",
           "description": "The type of team. Must be either `pulumi` or `github`.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         }
       },
       "requiredInputs": [

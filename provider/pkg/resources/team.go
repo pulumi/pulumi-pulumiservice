@@ -12,12 +12,52 @@ import (
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/structpb"
 
+	"github.com/pulumi/pulumi-go-provider/infer"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/util/rpcutil/rpcerror"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
+
+type Team struct{}
+
+func (t *Team) Annotate(a infer.Annotator) {
+	a.Describe(t, "The Pulumi Cloud offers role-based access control (RBAC) using teams. Teams allow organization admins to assign a set of stack permissions to a group of users.")
+}
+
+type TeamInput struct {
+	OrganizationName string   `pulumi:"organizationName" provider:"replaceOnChanges"`
+	Type             string   `pulumi:"teamType" provider:"replaceOnChanges"`
+	Name             *string  `pulumi:"name,optional" provider:"replaceOnChanges"`
+	DisplayName      *string  `pulumi:"displayName,optional"`
+	Description      *string  `pulumi:"description,optional"`
+	Members          []string `pulumi:"members,optional"`
+	GitHubTeamID     *float64 `pulumi:"githubTeamId,optional"`
+}
+
+func (t *TeamInput) Annotate(a infer.Annotator) {
+	a.Describe(&t.Description, "Optional. Team description.")
+	a.Describe(&t.DisplayName, "Optional. Team display name.")
+	a.Describe(&t.Members, "List of Pulumi Cloud usernames of team members.")
+	a.Describe(&t.Name, "The team's name. Required for \"pulumi\" teams.")
+	a.Describe(&t.OrganizationName, "The name of the Pulumi organization the team belongs to.")
+	a.Describe(&t.Type, "The type of team. Must be either `pulumi` or `github`.")
+	a.Describe(&t.GitHubTeamID, `The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for "github" teams.`)
+}
+
+type TeamState struct {
+	TeamInput
+	Members []string `pulumi:"members"`
+}
+
+func (t *TeamState) Annotate(a infer.Annotator) {
+	a.Describe(&t.Members, "List of Pulumi Cloud usernames of team members.")
+}
+
+func (Team) Create(ctx context.Context, req infer.CreateRequest[TeamInput]) (infer.CreateResponse[TeamState], error) {
+	panic("TODO")
+}
 
 type PulumiServiceTeamResource struct {
 	Client pulumiapi.TeamClient

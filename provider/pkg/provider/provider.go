@@ -30,12 +30,16 @@ import (
 
 	esc_client "github.com/pulumi/esc/cmd/esc/cli/client"
 	"github.com/pulumi/esc/cmd/esc/cli/version"
+	p "github.com/pulumi/pulumi-go-provider"
+	"github.com/pulumi/pulumi-go-provider/infer"
+	"github.com/pulumi/pulumi-go-provider/middleware/rpc"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/resources"
 	"github.com/pulumi/pulumi/pkg/v3/codegen/schema"
 	"github.com/pulumi/pulumi/pkg/v3/resource/provider"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/tokens"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
@@ -68,16 +72,70 @@ type pulumiserviceProvider struct {
 var manualSchema string
 
 func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.ResourceProviderServer, error) {
-	// inject version into schema
-	versionedSchema := mustSetSchemaVersion(manualSchema, version)
 	// Return the new provider
-	return &pulumiserviceProvider{
-		host:        host,
-		name:        name,
-		schema:      versionedSchema,
-		version:     version,
-		AccessToken: "",
-	}, nil
+	provider, err := infer.NewProviderBuilder().
+		WithDisplayName("Pulumi Cloud").
+		WithNamespace("pulumi").
+		WithWrapped(rpc.Provider(&pulumiserviceProvider{
+			host:    host,
+			name:    name,
+			schema:  mustSetSchemaVersion(manualSchema, version),
+			version: version,
+		})).
+		WithResources(
+			infer.Resource(&resources.Team{}),
+		).
+		WithModuleMap(map[tokens.ModuleName]tokens.ModuleName{
+			"resources": "index",
+		}).
+		WithLanguageMap(map[string]any{
+			"csharp": map[string]any{
+				"namespaces": map[string]any{
+					"pulumiservice": "PulumiService",
+				},
+				"packageReferences": map[string]any{
+					"Pulumi": "3.*",
+				},
+				"respectSchemaVersion": true,
+			},
+			"go": map[string]any{
+				"generateResourceContainerTypes": true,
+				"importBasePath":                 "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice",
+				"respectSchemaVersion":           true,
+			},
+			"java": map[string]any{
+				"basePackage": "",
+				"buildFiles":  "gradle",
+				"dependencies": map[string]any{
+					"com.google.code.findbugs:jsr305": "3.0.2",
+					"com.google.code.gson:gson":       "2.8.9",
+					"com.pulumi:pulumi":               "1.16.2",
+				},
+				"gradleNexusPublishPluginVersion": "2.0.0",
+				"gradleTest":                      "",
+			},
+			"nodejs": map[string]any{
+				"packageName": "@pulumi/pulumiservice",
+				"dependencies": map[string]any{
+					"@pulumi/pulumi": "^3.0.0",
+				},
+				"respectSchemaVersion": true,
+			},
+			"python": map[string]any{
+				"packageName": "pulumi_pulumiservice",
+				"requires": map[string]any{
+					"pulumi": ">=3.0.0,<4.0.0",
+				},
+				"pyproject": map[string]any{
+					"enabled": true,
+				},
+				"respectSchemaVersion": true,
+			},
+		}).Build()
+	if err != nil {
+		return nil, err
+	}
+	return p.RawServer(name, version, provider)(host)
 }
 
 // Call dynamically executes a method in the provider associated with a component resource.
