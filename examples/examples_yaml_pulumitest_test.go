@@ -25,17 +25,10 @@ func createEmptyPulumiProject(t *testing.T, projectName string) string {
 		t.Fatalf("Failed to create temp directory: %v", err)
 	}
 
-	// Create a minimal Pulumi.yaml with the specified project name but no resources
+	// Create a minimal Pulumi.yaml with the specified project name but no resources or config
 	pulumiYaml := fmt.Sprintf(`name: %s
 runtime: yaml
 description: Empty project for multistep testing
-config:
-  organizationName:
-    type: string
-    default: service-provider-test-org
-  digits:
-    type: string
-    default: "00000"
 resources: {}
 `, projectName)
 
@@ -70,26 +63,9 @@ func TestYamlExamplesWithPulumiTest(t *testing.T) {
 				opttest.LocalProviderPath("pulumiservice", "../bin"),
 				opttest.UseAmbientBackend())
 
-			// Configure the pulumiservice provider
-			// Use the staging API URL if PULUMI_BACKEND_URL is set (matches CI environment)
-			apiUrl := "https://api.pulumi.com"
-			if backendUrl := os.Getenv("PULUMI_BACKEND_URL"); backendUrl != "" {
-				apiUrl = backendUrl
-			}
-			test.SetConfig(t, "pulumiservice:apiUrl", apiUrl)
-			
-			// Set access token from environment variable (required for API access)
-			token := os.Getenv("PULUMI_ACCESS_TOKEN")
-			if token == "" {
-				t.Fatal("PULUMI_ACCESS_TOKEN environment variable is required for pulumitest")
-			}
-			test.SetConfig(t, "pulumiservice:accessToken", token)
+			// UseAmbientBackend() automatically handles API URL and access token from environment
 
-			// Set default organization if PULUMI_TEST_OWNER is available
-			if orgName := os.Getenv("PULUMI_TEST_OWNER"); orgName != "" {
-				test.SetConfig(t, "organizationName", orgName)
-				test.SetConfig(t, "pulumiservice:organizationName", orgName)
-			}
+			// Don't override organization - let it use the ambient backend organization
 
 			// Set test user name if PULUMI_TEST_USER is available
 			if userName := os.Getenv("PULUMI_TEST_USER"); userName != "" {
@@ -166,31 +142,14 @@ func TestYamlExamplesWithConfigWithPulumiTest(t *testing.T) {
 			
 			test := pulumitest.NewPulumiTest(t, testCase.directoryName, options...)
 
-			// Configure the pulumiservice provider
-			// Use the staging API URL if PULUMI_BACKEND_URL is set (matches CI environment)
-			apiUrl := "https://api.pulumi.com"
-			if backendUrl := os.Getenv("PULUMI_BACKEND_URL"); backendUrl != "" {
-				apiUrl = backendUrl
-			}
-			test.SetConfig(t, "pulumiservice:apiUrl", apiUrl)
-			
-			// Set access token from environment variable (required for API access)
-			token := os.Getenv("PULUMI_ACCESS_TOKEN")
-			if token == "" {
-				t.Fatal("PULUMI_ACCESS_TOKEN environment variable is required for pulumitest")
-			}
-			test.SetConfig(t, "pulumiservice:accessToken", token)
+			// UseAmbientBackend() automatically handles API URL and access token from environment
 
 			// Set the required configuration
 			for key, value := range testCase.config {
 				test.SetConfig(t, key, value)
 			}
 
-			// Set organization name from environment if available
-			if orgName := os.Getenv("PULUMI_TEST_OWNER"); orgName != "" {
-				test.SetConfig(t, "organizationName", orgName)
-				test.SetConfig(t, "pulumiservice:organizationName", orgName)
-			}
+			// Don't override organization - let it use the ambient backend organization
 
 			// Set test user name if PULUMI_TEST_USER is available
 			if userName := os.Getenv("PULUMI_TEST_USER"); userName != "" {
@@ -227,26 +186,10 @@ func TestYamlStackTagsExampleWithPulumiTest(t *testing.T) {
 			opttest.UseAmbientBackend(),
 			opttest.StackName(stackName))
 
-		// Configure the pulumiservice provider
-		// Use the staging API URL if PULUMI_BACKEND_URL is set (matches CI environment)
-		apiUrl := "https://api.pulumi.com"
-		if backendUrl := os.Getenv("PULUMI_BACKEND_URL"); backendUrl != "" {
-			apiUrl = backendUrl
-		}
-		test.SetConfig(t, "pulumiservice:apiUrl", apiUrl)
-		
-		// Set access token from environment variable (required for API access)
-		token := os.Getenv("PULUMI_ACCESS_TOKEN")
-		if token == "" {
-			t.Fatal("PULUMI_ACCESS_TOKEN environment variable is required for pulumitest")
-		}
-		test.SetConfig(t, "pulumiservice:accessToken", token)
+		// UseAmbientBackend() automatically handles API URL and access token from environment
 
 		// Set organization if available
-		if orgName := os.Getenv("PULUMI_TEST_OWNER"); orgName != "" {
-			test.SetConfig(t, "organizationName", orgName)
-			test.SetConfig(t, "pulumiservice:organizationName", orgName)
-		}
+		// Don't override organization - let it use the ambient backend organization
 
 		// Set test user name if PULUMI_TEST_USER is available
 		if userName := os.Getenv("PULUMI_TEST_USER"); userName != "" {
@@ -285,24 +228,10 @@ func TestYamlDeploymentSettingsWithPulumiTest(t *testing.T) {
 			opttest.UseAmbientBackend(),
 			opttest.StackName(stackName))
 
-		// Configure the pulumiservice provider
-		apiUrl := "https://api.pulumi.com"
-		if backendUrl := os.Getenv("PULUMI_BACKEND_URL"); backendUrl != "" {
-			apiUrl = backendUrl
-		}
-		test.SetConfig(t, "pulumiservice:apiUrl", apiUrl)
-		
-		token := os.Getenv("PULUMI_ACCESS_TOKEN")
-		if token == "" {
-			t.Fatal("PULUMI_ACCESS_TOKEN environment variable is required for pulumitest")
-		}
-		test.SetConfig(t, "pulumiservice:accessToken", token)
+		// UseAmbientBackend() automatically handles API URL and access token from environment
 		test.SetConfig(t, "digits", digits)
 		
-		if orgName := os.Getenv("PULUMI_TEST_OWNER"); orgName != "" {
-			test.SetConfig(t, "organizationName", orgName)
-			test.SetConfig(t, "pulumiservice:organizationName", orgName)
-		}
+		// Don't override organization - let it use the ambient backend organization
 
 		// Step 3: Create empty stack first
 		test.Up(t) // This creates an empty stack with no resources
@@ -335,24 +264,10 @@ func TestYamlDeploymentSettingsNoSourceWithPulumiTest(t *testing.T) {
 			opttest.UseAmbientBackend(),
 			opttest.StackName(stackName))
 
-		// Configure the pulumiservice provider
-		apiUrl := "https://api.pulumi.com"
-		if backendUrl := os.Getenv("PULUMI_BACKEND_URL"); backendUrl != "" {
-			apiUrl = backendUrl
-		}
-		test.SetConfig(t, "pulumiservice:apiUrl", apiUrl)
-		
-		token := os.Getenv("PULUMI_ACCESS_TOKEN")
-		if token == "" {
-			t.Fatal("PULUMI_ACCESS_TOKEN environment variable is required for pulumitest")
-		}
-		test.SetConfig(t, "pulumiservice:accessToken", token)
+		// UseAmbientBackend() automatically handles API URL and access token from environment
 		test.SetConfig(t, "digits", digits)
 		
-		if orgName := os.Getenv("PULUMI_TEST_OWNER"); orgName != "" {
-			test.SetConfig(t, "organizationName", orgName)
-			test.SetConfig(t, "pulumiservice:organizationName", orgName)
-		}
+		// Don't override organization - let it use the ambient backend organization
 
 		// Step 3: Create empty stack first
 		test.Up(t) // This creates an empty stack with no resources
@@ -385,24 +300,10 @@ func TestYamlDeploymentSettingsCommitWithPulumiTest(t *testing.T) {
 			opttest.UseAmbientBackend(),
 			opttest.StackName(stackName))
 
-		// Configure the pulumiservice provider
-		apiUrl := "https://api.pulumi.com"
-		if backendUrl := os.Getenv("PULUMI_BACKEND_URL"); backendUrl != "" {
-			apiUrl = backendUrl
-		}
-		test.SetConfig(t, "pulumiservice:apiUrl", apiUrl)
-		
-		token := os.Getenv("PULUMI_ACCESS_TOKEN")
-		if token == "" {
-			t.Fatal("PULUMI_ACCESS_TOKEN environment variable is required for pulumitest")
-		}
-		test.SetConfig(t, "pulumiservice:accessToken", token)
+		// UseAmbientBackend() automatically handles API URL and access token from environment
 		test.SetConfig(t, "digits", digits)
 		
-		if orgName := os.Getenv("PULUMI_TEST_OWNER"); orgName != "" {
-			test.SetConfig(t, "organizationName", orgName)
-			test.SetConfig(t, "pulumiservice:organizationName", orgName)
-		}
+		// Don't override organization - let it use the ambient backend organization
 
 		// Step 3: Create empty stack first
 		test.Up(t) // This creates an empty stack with no resources
@@ -435,24 +336,10 @@ func TestYamlSchedulesWithPulumiTest(t *testing.T) {
 			opttest.UseAmbientBackend(),
 			opttest.StackName(stackName))
 
-		// Configure the pulumiservice provider
-		apiUrl := "https://api.pulumi.com"
-		if backendUrl := os.Getenv("PULUMI_BACKEND_URL"); backendUrl != "" {
-			apiUrl = backendUrl
-		}
-		test.SetConfig(t, "pulumiservice:apiUrl", apiUrl)
-		
-		token := os.Getenv("PULUMI_ACCESS_TOKEN")
-		if token == "" {
-			t.Fatal("PULUMI_ACCESS_TOKEN environment variable is required for pulumitest")
-		}
-		test.SetConfig(t, "pulumiservice:accessToken", token)
+		// UseAmbientBackend() automatically handles API URL and access token from environment
 		test.SetConfig(t, "digits", digits)
 		
-		if orgName := os.Getenv("PULUMI_TEST_OWNER"); orgName != "" {
-			test.SetConfig(t, "organizationName", orgName)
-			test.SetConfig(t, "pulumiservice:organizationName", orgName)
-		}
+		// Don't override organization - let it use the ambient backend organization
 
 		// Step 3: Create empty stack first
 		test.Up(t) // This creates an empty stack with no resources

@@ -1,10 +1,6 @@
 name: pulumi-service-teams-access-token-yaml
 runtime: yaml
 description: An example of using yaml to create an org token
-config:
-  organizationName:
-    type: string
-    default: service-provider-test-org
 resources:
   rand:
     type: random:RandomString
@@ -16,6 +12,6 @@ resources:
     type: pulumiservice:index:OrgAccessToken
     properties:
       name: test-${rand.result}
-      organizationName: ${organizationName}
+      organizationName: ${pulumi.organization}
       description: "example org access token"
       admin: false

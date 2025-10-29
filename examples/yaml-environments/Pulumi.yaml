@@ -2,9 +2,6 @@ name: yaml-environments-example
 runtime: yaml
 description: A minimal Pulumi YAML program
 config:
-  organizationName:
-    type: string
-    default: service-provider-test-org
   digits:
     type: string
     default: "00000"
@@ -15,7 +12,7 @@ resources:
   testing-environment:
     type: pulumiservice:Environment
     properties:
-      organization: ${organizationName}
+      organization: ${pulumi.organization}
       project: my-project
       name: testing-environment-yaml-${digits}
       yaml:
@@ -59,4 +56,3 @@ resources:
       environment: ${testing-environment.name}
       project: ${testing-environment.project}
       permission: "admin"
-

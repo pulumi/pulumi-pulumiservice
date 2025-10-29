@@ -2,9 +2,6 @@ name: yaml-deployment-settings-commit-example
 runtime: yaml
 description: Deployment settings test
 config:
-  organizationName:
-    type: string
-    default: service-provider-test-org
   digits:
     type: string
     default: "00000"
@@ -12,7 +9,7 @@ resources:
   my_settings:
     type: pulumiservice:DeploymentSettings
     properties:
-      organization: ${organizationName}
+      organization: ${pulumi.organization}
       project: yaml-deployment-settings-commit-example
       stack: test-stack-${digits}
       operationContext:

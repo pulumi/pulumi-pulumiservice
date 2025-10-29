@@ -1,17 +1,13 @@
 name: yaml-oidc-issuer
 runtime: yaml
 description: A minimal example of provisioning OIDC Issuer via Pulumi YAML
-config:
-  organizationName:
-    type: string
-    default: service-provider-test-org
 
 resources:
 # A Pulumi OIDC Issuer with a basic policy
   pulumi_issuer:
     type: pulumiservice:index:OidcIssuer
     properties:
-      organization: ${organizationName}
+      organization: ${pulumi.organization}
       name: pulumi_issuer
       url: https://api.pulumi.com/oidc
       thumbprints:
@@ -19,7 +15,7 @@ resources:
       policies:
         - decision: allow
           rules:
-            aud: urn:pulumi:org:${organizationName}
+            aud: urn:pulumi:org:${pulumi.organization}
             sub: pulumi:deploy:org:myTestOrg:project:myTestProject:*
           userLogin: pulumipus
           tokenType: personal
@@ -27,7 +23,7 @@ resources:
   github_issuer:
     type: pulumiservice:index:OidcIssuer
     properties:
-      organization: ${organizationName}
+      organization: ${pulumi.organization}
       name: github_issuer
       url: https://token.actions.githubusercontent.com
       thumbprints:
@@ -35,20 +31,20 @@ resources:
       policies:
         - decision: deny
           rules:
-            aud: urn:pulumi:org:${organizationName}
+            aud: urn:pulumi:org:${pulumi.organization}
             sub: repo:organization/repo:*
           userLogin: pulumipus
           tokenType: personal
         - decision: allow
           rules:
-            aud: urn:pulumi:org:${organizationName}
+            aud: urn:pulumi:org:${pulumi.organization}
             sub: repo:organization/repo:*
           authorizedPermissions:
             - admin
           tokenType: organization
         - decision: deny
           rules:
-            aud: urn:pulumi:org:${organizationName}
+            aud: urn:pulumi:org:${pulumi.organization}
             sub: repo:organization/repo:*
           teamName: dream-team
           tokenType: team

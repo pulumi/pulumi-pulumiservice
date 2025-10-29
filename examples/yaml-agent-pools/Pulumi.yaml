@@ -2,9 +2,6 @@ name: yaml-agent-pools
 runtime: yaml
 description: A minimal example of provisioning agent pool via Pulumi YAML
 config:
-  organizationName:
-    type: string
-    default: service-provider-test-org
   digits:
     type: string
     default: "00000"
@@ -13,7 +10,7 @@ resources:
   agent-pool:
     type: pulumiservice:index:AgentPool
     properties:
-      organizationName: ${organizationName}
+      organizationName: ${pulumi.organization}
       name: test-agent-pool-${digits}
       description: Test agent pool
 

@@ -1,10 +1,6 @@
 name: yaml-webhooks
 runtime: yaml
 description: A minimal example of provisioning webhooks via Pulumi YAML
-config:
-  organizationName:
-    type: string
-    default: service-provider-test-org
 
 resources:
   webhook:
@@ -12,7 +8,7 @@ resources:
     properties:
       active: true
       displayName: yaml-webhook
-      organizationName: ${organizationName}
+      organizationName: ${pulumi.organization}
       payloadUrl: "https://google.com"
       secret: super-secret
 

@@ -2,9 +2,6 @@ name: yaml-team-stack-example
 runtime: yaml
 description: An example of using yaml to manage team stack permissions
 config:
-  organizationName:
-    type: string
-    default: service-provider-test-org
   testUserName:
     type: string
     default: pulumi-bot
@@ -19,7 +16,7 @@ resources:
     type: pulumiservice:index:Team
     properties:
       name: yaml-team-${rand.result}
-      organizationName: ${organizationName}
+      organizationName: ${pulumi.organization}
       displayName: Team Stack Permission Example
       teamType: pulumi
       members:

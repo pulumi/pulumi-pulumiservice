@@ -1,15 +1,12 @@
 name: yaml-stack-tags-example
 runtime: yaml
 description: A minimal Pulumi YAML program
-config:
-  organizationName:
-    type: string
-    default: service-provider-test-org
+config: {}
 resources:
   testing-tag:
     type: pulumiservice:StackTag
     properties:
-      organization: ${organizationName}
+      organization: ${pulumi.organization}
       project: ${pulumi.project}
       stack: ${pulumi.stack}
       name: testing-tag
