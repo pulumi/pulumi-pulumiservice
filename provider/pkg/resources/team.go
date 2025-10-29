@@ -27,28 +27,35 @@ func (t *Team) Annotate(a infer.Annotator) {
 	a.Describe(t, "The Pulumi Cloud offers role-based access control (RBAC) using teams. Teams allow organization admins to assign a set of stack permissions to a group of users.")
 }
 
-type TeamInput struct {
+type TeamCore struct {
 	OrganizationName string   `pulumi:"organizationName" provider:"replaceOnChanges"`
 	Type             string   `pulumi:"teamType" provider:"replaceOnChanges"`
 	Name             *string  `pulumi:"name,optional" provider:"replaceOnChanges"`
 	DisplayName      *string  `pulumi:"displayName,optional"`
 	Description      *string  `pulumi:"description,optional"`
-	Members          []string `pulumi:"members,optional"`
 	GitHubTeamID     *float64 `pulumi:"githubTeamId,optional"`
 }
 
-func (t *TeamInput) Annotate(a infer.Annotator) {
+func (t *TeamCore) Annotate(a infer.Annotator) {
 	a.Describe(&t.Description, "Optional. Team description.")
 	a.Describe(&t.DisplayName, "Optional. Team display name.")
-	a.Describe(&t.Members, "List of Pulumi Cloud usernames of team members.")
 	a.Describe(&t.Name, "The team's name. Required for \"pulumi\" teams.")
 	a.Describe(&t.OrganizationName, "The name of the Pulumi organization the team belongs to.")
 	a.Describe(&t.Type, "The type of team. Must be either `pulumi` or `github`.")
 	a.Describe(&t.GitHubTeamID, `The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for "github" teams.`)
 }
 
+type TeamInput struct {
+	TeamCore
+	Members []string `pulumi:"members,optional"`
+}
+
+func (t *TeamInput) Annotate(a infer.Annotator) {
+	a.Describe(&t.Members, "List of Pulumi Cloud usernames of team members.")
+}
+
 type TeamState struct {
-	TeamInput
+	TeamCore
 	Members []string `pulumi:"members"`
 }
 
@@ -62,8 +69,8 @@ func (*Team) Create(ctx context.Context, req infer.CreateRequest[TeamInput]) (in
 		return infer.CreateResponse[TeamState]{
 			ID: teamURN,
 			Output: TeamState{
-				TeamInput: req.Inputs,
-				Members:   req.Inputs.Members,
+				TeamCore: req.Inputs.TeamCore,
+				Members:  req.Inputs.Members,
 			},
 		}, nil
 	}
@@ -91,8 +98,8 @@ func (*Team) Create(ctx context.Context, req infer.CreateRequest[TeamInput]) (in
 			return infer.CreateResponse[TeamState]{
 				ID: teamURN,
 				Output: TeamState{
-					TeamInput: req.Inputs,
-					Members:   members,
+					TeamCore: req.Inputs.TeamCore,
+					Members:  members,
 				},
 			}, infer.ResourceInitFailedError{Reasons: []string{err.Error()}}
 		}
@@ -106,8 +113,8 @@ func (*Team) Create(ctx context.Context, req infer.CreateRequest[TeamInput]) (in
 		return infer.CreateResponse[TeamState]{
 			ID: teamURN,
 			Output: TeamState{
-				TeamInput: req.Inputs,
-				Members:   members,
+				TeamCore: req.Inputs.TeamCore,
+				Members:  members,
 			},
 		}, infer.ResourceInitFailedError{Reasons: []string{err.Error()}}
 	}
@@ -122,13 +129,13 @@ func (*Team) Create(ctx context.Context, req infer.CreateRequest[TeamInput]) (in
 		ID: teamURN,
 		Output: TeamState{
 			Members: members,
-			TeamInput: TeamInput{
+			TeamCore: TeamCore{
 				Description:      &team.Description,
 				DisplayName:      &team.DisplayName,
 				Name:             &team.Name,
 				Type:             team.Type,
 				OrganizationName: req.Inputs.OrganizationName,
-				Members:          members,
+				GitHubTeamID:     req.Inputs.GitHubTeamID,
 			},
 		},
 	}, nil
@@ -191,7 +198,7 @@ func (*Team) Read(ctx context.Context, req infer.ReadRequest[TeamInput, TeamStat
 		return infer.ReadResponse[TeamInput, TeamState]{}, nil
 	}
 
-	inputs := TeamInput{
+	core := TeamCore{
 		OrganizationName: orgName,
 		Type:             team.Type,
 		Name:             &team.Name,
@@ -200,17 +207,21 @@ func (*Team) Read(ctx context.Context, req infer.ReadRequest[TeamInput, TeamStat
 		GitHubTeamID:     req.Inputs.GitHubTeamID,
 	}
 
+	var members []string
 	for _, m := range team.Members {
-		inputs.Members = append(inputs.Members, m.GithubLogin)
+		members = append(members, m.GithubLogin)
 	}
-	slices.Sort(inputs.Members)
+	slices.Sort(members)
 
 	return infer.ReadResponse[TeamInput, TeamState]{
-		ID:     req.ID,
-		Inputs: inputs,
+		ID: req.ID,
+		Inputs: TeamInput{
+			TeamCore: core,
+			Members:  members,
+		},
 		State: TeamState{
-			TeamInput: inputs,
-			Members:   inputs.Members,
+			TeamCore: core,
+			Members:  members,
 		},
 	}, nil
 }
@@ -219,8 +230,8 @@ func (*Team) Update(ctx context.Context, req infer.UpdateRequest[TeamInput, Team
 	if req.DryRun {
 		return infer.UpdateResponse[TeamState]{
 			Output: TeamState{
-				TeamInput: req.Inputs,
-				Members:   req.Inputs.Members,
+				TeamCore: req.Inputs.TeamCore,
+				Members:  req.Inputs.Members,
 			},
 		}, nil
 	}
@@ -249,8 +260,8 @@ func (*Team) Update(ctx context.Context, req infer.UpdateRequest[TeamInput, Team
 					// did.
 					return infer.UpdateResponse[TeamState]{
 						Output: TeamState{
-							TeamInput: req.Inputs,
-							Members:   members,
+							TeamCore: req.Inputs.TeamCore,
+							Members:  members,
 						},
 					}, infer.ResourceInitFailedError{Reasons: []string{err.Error()}}
 				}
@@ -273,8 +284,8 @@ func (*Team) Update(ctx context.Context, req infer.UpdateRequest[TeamInput, Team
 					slices.Sort(members)
 					return infer.UpdateResponse[TeamState]{
 						Output: TeamState{
-							TeamInput: req.Inputs,
-							Members:   members,
+							TeamCore: req.Inputs.TeamCore,
+							Members:  members,
 						},
 					}, infer.ResourceInitFailedError{Reasons: []string{err.Error()}}
 				}
@@ -287,8 +298,8 @@ func (*Team) Update(ctx context.Context, req infer.UpdateRequest[TeamInput, Team
 
 	return infer.UpdateResponse[TeamState]{
 		Output: TeamState{
-			TeamInput: req.Inputs,
-			Members:   req.Inputs.Members,
+			TeamCore: req.Inputs.TeamCore,
+			Members:  req.Inputs.Members,
 		},
 	}, nil
 }
