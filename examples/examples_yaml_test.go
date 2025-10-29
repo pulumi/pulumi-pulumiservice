@@ -425,6 +425,32 @@ func TestYamlPolicyGroupsExample(t *testing.T) {
 	})
 }
 
+func TestYamlApprovalRuleExample(t *testing.T) {
+	cwd := getCwd(t)
+	digits := generateRandomFiveDigits()
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Quick: true,
+		Dir:   path.Join(cwd, ".", "yaml-approval-rules"),
+		Config: map[string]string{
+			"organizationName": getOrgName(),
+			"digits":           digits,
+		},
+	})
+}
+
+func TestYamlStackExample(t *testing.T) {
+	cwd := getCwd(t)
+	digits := generateRandomFiveDigits()
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Quick: true,
+		Dir:   path.Join(cwd, ".", "yaml-stack"),
+		Config: map[string]string{
+			"organizationName": getOrgName(),
+			"digits":           digits,
+		},
+	})
+}
+
 func writePulumiYaml(t *testing.T, yamlContents interface{}) string {
 	tmpdir := t.TempDir()
 	b, err := yaml.Marshal(yamlContents)
