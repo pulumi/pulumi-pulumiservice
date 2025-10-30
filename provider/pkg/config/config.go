@@ -17,13 +17,39 @@ const (
 	EnvVarPulumiBackendUrl  = "PULUMI_BACKEND_URL"
 )
 
-func GetClient(ctx context.Context) *pulumiapi.Client { return infer.GetConfig[*Config](ctx).client }
+func GetClient(ctx context.Context) Client {
+	if v := ctx.Value(mockClientKey{}); v != nil {
+		return v.(Client)
+	}
+	return infer.GetConfig[*Config](ctx).client
+}
+
+type mockClientKey struct{}
+
+// WithMockClient injects a client into the context for testing. This should only be used
+// for testing.
+func WithMockClient(ctx context.Context, client Client) context.Context {
+	return context.WithValue(ctx, mockClientKey{}, client)
+}
 
 var ErrAccessTokenNotFound = fmt.Errorf("pulumi access token not found")
 
 var (
 	_ infer.CustomConfigure = &Config{}
 )
+
+// An interface to represent [*pulumiapi.Client] that remains mock-able.
+//
+// All client interfaces from [pulumiapi] should be added to this interface.
+type Client interface {
+	pulumiapi.AgentPoolClient
+	pulumiapi.ApprovalRuleClient
+	pulumiapi.DeploymentSettingsClient
+	pulumiapi.EnvironmentScheduleClient
+	pulumiapi.OidcClient
+	pulumiapi.TeamClient
+	pulumiapi.WebhookClient
+}
 
 type Config struct {
 	AccessToken string `pulumi:"accessToken,optional" provider:"secret"`
