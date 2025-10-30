@@ -66,11 +66,15 @@ func (t *TeamState) Annotate(a infer.Annotator) {
 func (*Team) Create(ctx context.Context, req infer.CreateRequest[TeamInput]) (infer.CreateResponse[TeamState], error) {
 	teamURN := fmt.Sprintf("%s/%s", req.Inputs.OrganizationName, *req.Inputs.Name)
 	if req.DryRun {
+		members := req.Inputs.Members
+		if members == nil {
+			members = []string{}
+		}
 		return infer.CreateResponse[TeamState]{
 			ID: teamURN,
 			Output: TeamState{
 				TeamCore: req.Inputs.TeamCore,
-				Members:  req.Inputs.Members,
+				Members:  members,
 			},
 		}, nil
 	}
@@ -91,7 +95,7 @@ func (*Team) Create(ctx context.Context, req infer.CreateRequest[TeamInput]) (in
 	// below returns the ID using the `pulumirpc.ErrorResourceInitFailed` error details annotation.  Otherwise,
 	// we leak a teamUrn resource. We ensure that we wrap any errors in a partial error and return that to the RPC.
 
-	var members []string
+	members := []string{}
 	for _, memberToAdd := range req.Inputs.Members {
 		err = client.AddMemberToTeam(ctx, req.Inputs.OrganizationName, util.OrZero(req.Inputs.Name), memberToAdd)
 		if err != nil {
@@ -207,7 +211,7 @@ func (*Team) Read(ctx context.Context, req infer.ReadRequest[TeamInput, TeamStat
 		GitHubTeamID:     req.Inputs.GitHubTeamID,
 	}
 
-	var members []string
+	members := []string{}
 	for _, m := range team.Members {
 		members = append(members, m.GithubLogin)
 	}
@@ -228,10 +232,14 @@ func (*Team) Read(ctx context.Context, req infer.ReadRequest[TeamInput, TeamStat
 
 func (*Team) Update(ctx context.Context, req infer.UpdateRequest[TeamInput, TeamState]) (infer.UpdateResponse[TeamState], error) {
 	if req.DryRun {
+		members := req.Inputs.Members
+		if members == nil {
+			members = []string{}
+		}
 		return infer.UpdateResponse[TeamState]{
 			Output: TeamState{
 				TeamCore: req.Inputs.TeamCore,
-				Members:  req.Inputs.Members,
+				Members:  members,
 			},
 		}, nil
 	}
@@ -296,10 +304,14 @@ func (*Team) Update(ctx context.Context, req infer.UpdateRequest[TeamInput, Team
 		req.Inputs.Members = members
 	}
 
+	outputMembers := req.Inputs.Members
+	if outputMembers == nil {
+		outputMembers = []string{}
+	}
 	return infer.UpdateResponse[TeamState]{
 		Output: TeamState{
 			TeamCore: req.Inputs.TeamCore,
-			Members:  req.Inputs.Members,
+			Members:  outputMembers,
 		},
 	}, nil
 }
