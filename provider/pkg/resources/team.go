@@ -64,7 +64,7 @@ func (t *TeamState) Annotate(a infer.Annotator) {
 }
 
 func (*Team) Create(ctx context.Context, req infer.CreateRequest[TeamInput]) (infer.CreateResponse[TeamState], error) {
-	teamURN := fmt.Sprintf("%s/%s", req.Inputs.OrganizationName, *req.Inputs.Name)
+	teamURN := fmt.Sprintf("%s/%s", req.Inputs.OrganizationName, util.OrZero(req.Inputs.Name))
 	if req.DryRun {
 		return infer.CreateResponse[TeamState]{
 			ID: teamURN,
@@ -84,7 +84,7 @@ func (*Team) Create(ctx context.Context, req infer.CreateRequest[TeamInput]) (in
 		int64(util.OrZero(req.Inputs.GitHubTeamID)),
 	)
 	if err != nil {
-		return infer.CreateResponse[TeamState]{}, fmt.Errorf("error creating teamUrn '%s': %s", *req.Inputs.Name, err.Error())
+		return infer.CreateResponse[TeamState]{}, fmt.Errorf("error creating teamUrn '%s': %s", util.OrZero(req.Inputs.Name), err.Error())
 	}
 
 	// We have now created a teamUrn.  It is very important to ensure that from this point on, any other error
@@ -130,8 +130,8 @@ func (*Team) Create(ctx context.Context, req infer.CreateRequest[TeamInput]) (in
 		Output: TeamState{
 			Members: members,
 			TeamCore: TeamCore{
-				Description:      &team.Description,
-				DisplayName:      &team.DisplayName,
+				Description:      util.OrNil(team.Description),
+				DisplayName:      util.OrNil(team.DisplayName),
 				Name:             &team.Name,
 				Type:             team.Type,
 				OrganizationName: req.Inputs.OrganizationName,
@@ -183,7 +183,7 @@ func (*Team) Check(ctx context.Context, req infer.CheckRequest) (infer.CheckResp
 
 func (*Team) Delete(ctx context.Context, req infer.DeleteRequest[TeamState]) (infer.DeleteResponse, error) {
 	client := config.GetClient(ctx)
-	return infer.DeleteResponse{}, client.DeleteTeam(ctx, req.State.OrganizationName, *req.State.Name)
+	return infer.DeleteResponse{}, client.DeleteTeam(ctx, req.State.OrganizationName, util.OrZero(req.State.Name))
 }
 
 func (*Team) Read(ctx context.Context, req infer.ReadRequest[TeamInput, TeamState]) (infer.ReadResponse[TeamInput, TeamState], error) {
@@ -205,8 +205,8 @@ func (*Team) Read(ctx context.Context, req infer.ReadRequest[TeamInput, TeamStat
 		OrganizationName: orgName,
 		Type:             team.Type,
 		Name:             &team.Name,
-		DisplayName:      &team.DisplayName,
-		Description:      &team.Description,
+		DisplayName:      util.OrNil(team.DisplayName),
+		Description:      util.OrNil(team.Description),
 		GitHubTeamID:     req.Inputs.GitHubTeamID,
 	}
 
@@ -240,8 +240,8 @@ func (*Team) Update(ctx context.Context, req infer.UpdateRequest[TeamInput, Team
 	}
 	client := config.GetClient(ctx)
 
-	if req.State.Description != req.Inputs.Description || req.State.DisplayName != req.Inputs.Description {
-		err := client.UpdateTeam(ctx, req.Inputs.OrganizationName, *req.Inputs.Name, *req.Inputs.DisplayName, *req.Inputs.Description)
+	if req.State.Description != req.Inputs.Description || req.State.DisplayName != req.Inputs.DisplayName {
+		err := client.UpdateTeam(ctx, req.Inputs.OrganizationName, util.OrZero(req.Inputs.Name), util.OrZero(req.Inputs.DisplayName), util.OrZero(req.Inputs.Description))
 		if err != nil {
 			return infer.UpdateResponse[TeamState]{}, err
 		}
@@ -255,7 +255,7 @@ func (*Team) Update(ctx context.Context, req infer.UpdateRequest[TeamInput, Team
 		for i := len(req.State.Members) - 1; i >= 0; i-- {
 			usernameToDelete := req.State.Members[i]
 			if !slices.Contains(req.Inputs.Members, usernameToDelete) {
-				err := client.DeleteMemberFromTeam(ctx, req.Inputs.OrganizationName, *req.Inputs.Name, usernameToDelete)
+				err := client.DeleteMemberFromTeam(ctx, req.Inputs.OrganizationName, util.OrZero(req.Inputs.Name), usernameToDelete)
 				if err != nil {
 					slices.Sort(members)
 					// We have failed to delete a member, but we may
@@ -282,7 +282,7 @@ func (*Team) Update(ctx context.Context, req infer.UpdateRequest[TeamInput, Team
 
 		for _, usernameToAdd := range req.Inputs.Members {
 			if !slices.Contains(req.State.Members, usernameToAdd) {
-				err := client.AddMemberToTeam(ctx, req.Inputs.OrganizationName, *req.Inputs.Name, usernameToAdd)
+				err := client.AddMemberToTeam(ctx, req.Inputs.OrganizationName, util.OrZero(req.Inputs.Name), usernameToAdd)
 				if err != nil {
 					slices.Sort(members)
 					return infer.UpdateResponse[TeamState]{
