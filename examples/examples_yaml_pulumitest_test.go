@@ -6,7 +6,6 @@
 package examples
 
 import (
-	"context"
 	"fmt"
 	"io/ioutil"
 	"math/rand"
@@ -147,17 +146,6 @@ func TestYamlExamplesWithConfigWithPulumiTest(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			
-			// Build options for pulumitest
-			options := []opttest.Option{
-				opttest.LocalProviderPath("pulumiservice", "../bin"),
-				opttest.UseAmbientBackend(),
-			}
-			
-			// Add SkipStackCreate to all config tests
-			options = append(options, opttest.SkipStackCreate())
-			
-			test := pulumitest.NewPulumiTest(t, testCase.directoryName, options...)
-
 			// Get organization from PULUMI_TEST_OWNER (like integration tests do)
 			orgName := os.Getenv("PULUMI_TEST_OWNER")
 			if orgName == "" {
@@ -165,10 +153,20 @@ func TestYamlExamplesWithConfigWithPulumiTest(t *testing.T) {
 			}
 			
 			// Get the actual project name from the Pulumi.yaml file
-			projectSettings, err := test.CurrentStack().Workspace().ProjectSettings(context.Background())
-			if err != nil {
-				t.Fatalf("Failed to get project settings: %v", err)
+			projectPath := filepath.Join(testCase.directoryName, "Pulumi.yaml")
+			if _, err := os.Stat(projectPath); os.IsNotExist(err) {
+				t.Fatalf("Pulumi.yaml file not found at %s", projectPath)
 			}
+			
+			projectSettings, err := workspace.LoadProject(projectPath)
+			if err != nil {
+				t.Fatalf("Failed to load project settings from %s: %v", projectPath, err)
+			}
+			
+			if projectSettings == nil || projectSettings.Name == "" {
+				t.Fatalf("Invalid project settings: project name is empty in %s", projectPath)
+			}
+			
 			projectName := projectSettings.Name.String()
 			
 			// Create fully qualified stack name: {org}/{project}/{stack}
@@ -181,8 +179,14 @@ func TestYamlExamplesWithConfigWithPulumiTest(t *testing.T) {
 				qualifiedStackName = fmt.Sprintf("%s/%s/test", orgName, projectName)
 			}
 			
-			// Create the stack with the correct organization context
-			test.NewStack(t, qualifiedStackName)
+			// Build options for pulumitest
+			options := []opttest.Option{
+				opttest.LocalProviderPath("pulumiservice", "../bin"),
+				opttest.UseAmbientBackend(),
+				opttest.StackName(qualifiedStackName),
+			}
+			
+			test := pulumitest.NewPulumiTest(t, testCase.directoryName, options...)
 
 			// UseAmbientBackend() automatically handles API URL and access token from environment
 
@@ -231,9 +235,17 @@ func TestYamlStackTagsExampleWithPulumiTest(t *testing.T) {
 		
 		// Get the actual project name from the empty Pulumi.yaml file  
 		projectPath := filepath.Join(emptyDir, "Pulumi.yaml")
+		if _, err := os.Stat(projectPath); os.IsNotExist(err) {
+			t.Fatalf("Pulumi.yaml file not found at %s", projectPath)
+		}
+		
 		projectSettings, err := workspace.LoadProject(projectPath)
 		if err != nil {
-			t.Fatalf("Failed to load project settings: %v", err)
+			t.Fatalf("Failed to load project settings from %s: %v", projectPath, err)
+		}
+		
+		if projectSettings == nil || projectSettings.Name == "" {
+			t.Fatalf("Invalid project settings: project name is empty in %s", projectPath)
 		}
 		projectName := projectSettings.Name.String()
 		
@@ -290,9 +302,17 @@ func TestYamlDeploymentSettingsWithPulumiTest(t *testing.T) {
 		
 		// Get the actual project name from the empty Pulumi.yaml file  
 		projectPath := filepath.Join(emptyDir, "Pulumi.yaml")
+		if _, err := os.Stat(projectPath); os.IsNotExist(err) {
+			t.Fatalf("Pulumi.yaml file not found at %s", projectPath)
+		}
+		
 		projectSettings, err := workspace.LoadProject(projectPath)
 		if err != nil {
-			t.Fatalf("Failed to load project settings: %v", err)
+			t.Fatalf("Failed to load project settings from %s: %v", projectPath, err)
+		}
+		
+		if projectSettings == nil || projectSettings.Name == "" {
+			t.Fatalf("Invalid project settings: project name is empty in %s", projectPath)
 		}
 		projectName := projectSettings.Name.String()
 		
@@ -343,9 +363,17 @@ func TestYamlDeploymentSettingsNoSourceWithPulumiTest(t *testing.T) {
 		
 		// Get the actual project name from the empty Pulumi.yaml file  
 		projectPath := filepath.Join(emptyDir, "Pulumi.yaml")
+		if _, err := os.Stat(projectPath); os.IsNotExist(err) {
+			t.Fatalf("Pulumi.yaml file not found at %s", projectPath)
+		}
+		
 		projectSettings, err := workspace.LoadProject(projectPath)
 		if err != nil {
-			t.Fatalf("Failed to load project settings: %v", err)
+			t.Fatalf("Failed to load project settings from %s: %v", projectPath, err)
+		}
+		
+		if projectSettings == nil || projectSettings.Name == "" {
+			t.Fatalf("Invalid project settings: project name is empty in %s", projectPath)
 		}
 		projectName := projectSettings.Name.String()
 		
@@ -396,9 +424,17 @@ func TestYamlDeploymentSettingsCommitWithPulumiTest(t *testing.T) {
 		
 		// Get the actual project name from the empty Pulumi.yaml file  
 		projectPath := filepath.Join(emptyDir, "Pulumi.yaml")
+		if _, err := os.Stat(projectPath); os.IsNotExist(err) {
+			t.Fatalf("Pulumi.yaml file not found at %s", projectPath)
+		}
+		
 		projectSettings, err := workspace.LoadProject(projectPath)
 		if err != nil {
-			t.Fatalf("Failed to load project settings: %v", err)
+			t.Fatalf("Failed to load project settings from %s: %v", projectPath, err)
+		}
+		
+		if projectSettings == nil || projectSettings.Name == "" {
+			t.Fatalf("Invalid project settings: project name is empty in %s", projectPath)
 		}
 		projectName := projectSettings.Name.String()
 		
@@ -449,9 +485,17 @@ func TestYamlSchedulesWithPulumiTest(t *testing.T) {
 		
 		// Get the actual project name from the empty Pulumi.yaml file  
 		projectPath := filepath.Join(emptyDir, "Pulumi.yaml")
+		if _, err := os.Stat(projectPath); os.IsNotExist(err) {
+			t.Fatalf("Pulumi.yaml file not found at %s", projectPath)
+		}
+		
 		projectSettings, err := workspace.LoadProject(projectPath)
 		if err != nil {
-			t.Fatalf("Failed to load project settings: %v", err)
+			t.Fatalf("Failed to load project settings from %s: %v", projectPath, err)
+		}
+		
+		if projectSettings == nil || projectSettings.Name == "" {
+			t.Fatalf("Invalid project settings: project name is empty in %s", projectPath)
 		}
 		projectName := projectSettings.Name.String()
 		

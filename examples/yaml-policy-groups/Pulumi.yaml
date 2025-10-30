@@ -32,7 +32,7 @@ resources:
   # Create a policy group that manages policy packs for a set of stacks
   # Policy groups allow you to apply policy packs consistently across multiple stacks
   testPolicyGroup:
-    type: pulumiservice:PolicyGroup
+    type: pulumiservice:index:PolicyGroup
     properties:
       name: test-policy-group-${digits}
       organizationName: ${pulumi.organization}

@@ -1,4 +1,4 @@
-name: pulumi-service-teams-access-token-yaml
+name: pulumi-service-teams-team-token-yaml
 runtime: yaml
 description: An example of using yaml to create a team token
 config:
