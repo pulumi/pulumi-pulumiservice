@@ -1,11 +1,15 @@
 name: pulumi-service-template-source-example-yaml
 runtime: yaml
 description: An example of using yaml to create a template source
+config:
+  digits:
+    type: string
+    default: "00000"
 resources:
   source:
     type: pulumiservice:index:TemplateSource
     properties:
-      organizationName: service-provider-test-org
+      organizationName: ${pulumi.organization}
       sourceName: bootstrap-${digits}
       sourceURL: "https://github.com/pulumi/pulumi"
       destination:

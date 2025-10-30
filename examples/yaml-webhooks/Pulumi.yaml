@@ -8,7 +8,7 @@ resources:
     properties:
       active: true
       displayName: yaml-webhook
-      organizationName: service-provider-test-org
+      organizationName: ${pulumi.organization}
       payloadUrl: "https://google.com"
       secret: super-secret
 

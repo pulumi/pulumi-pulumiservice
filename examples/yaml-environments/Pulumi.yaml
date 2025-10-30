@@ -1,11 +1,18 @@
 name: yaml-environments-example
 runtime: yaml
 description: A minimal Pulumi YAML program
+config:
+  digits:
+    type: string
+    default: "00000"
+  testUserName:
+    type: string
+    default: pulumi-bot
 resources:
   testing-environment:
     type: pulumiservice:Environment
     properties:
-      organization: service-provider-test-org
+      organization: ${pulumi.organization}
       project: my-project
       name: testing-environment-yaml-${digits}
       yaml:
@@ -40,7 +47,7 @@ resources:
       organizationName: ${testing-environment.organization}
       teamType: pulumi
       members:
-        - pulumi-bot
+        - ${testUserName}
   teamEnvPermission:
     type: pulumiservice:index:TeamEnvironmentPermission
     properties:
@@ -49,4 +56,3 @@ resources:
       environment: ${testing-environment.name}
       project: ${testing-environment.project}
       permission: "admin"
-

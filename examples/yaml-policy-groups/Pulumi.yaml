@@ -4,9 +4,6 @@ runtime: yaml
 config:
   digits:
     type: string
-  organizationName:
-    type: string
-    default: service-provider-test-org
 
 variables:
   # Query all available policy packs in the organization
@@ -15,7 +12,7 @@ variables:
     fn::invoke:
       function: pulumiservice:index:getPolicyPacks
       arguments:
-        organizationName: ${organizationName}
+        organizationName: ${pulumi.organization}
       return: policyPacks
 
   # Get detailed information about a specific policy pack (if available)
@@ -27,7 +24,7 @@ variables:
   #   fn::invoke:
   #     function: pulumiservice:index:getPolicyPack
   #     arguments:
-  #       organizationName: ${organizationName}
+  #       organizationName: ${pulumi.organization}
   #       policyPackName: "aws-compliance"
   #       version: 1
 
@@ -35,10 +32,10 @@ resources:
   # Create a policy group that manages policy packs for a set of stacks
   # Policy groups allow you to apply policy packs consistently across multiple stacks
   testPolicyGroup:
-    type: pulumiservice:PolicyGroup
+    type: pulumiservice:index:PolicyGroup
     properties:
       name: test-policy-group-${digits}
-      organizationName: ${organizationName}
+      organizationName: ${pulumi.organization}
       entityType: stacks
       mode: audit
       stacks: []
