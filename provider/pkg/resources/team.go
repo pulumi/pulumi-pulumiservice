@@ -66,15 +66,11 @@ func (t *TeamState) Annotate(a infer.Annotator) {
 func (*Team) Create(ctx context.Context, req infer.CreateRequest[TeamInput]) (infer.CreateResponse[TeamState], error) {
 	teamURN := fmt.Sprintf("%s/%s", req.Inputs.OrganizationName, *req.Inputs.Name)
 	if req.DryRun {
-		members := req.Inputs.Members
-		if members == nil {
-			members = []string{}
-		}
 		return infer.CreateResponse[TeamState]{
 			ID: teamURN,
 			Output: TeamState{
 				TeamCore: req.Inputs.TeamCore,
-				Members:  members,
+				Members:  req.Inputs.Members,
 			},
 		}, nil
 	}
@@ -174,6 +170,9 @@ func (*Team) Check(ctx context.Context, req infer.CheckRequest) (infer.CheckResp
 	if i.DisplayName == nil {
 		i.DisplayName = i.Name
 	}
+	if i.Members == nil {
+		i.Members = []string{}
+	}
 	slices.Sort(i.Members)
 
 	return infer.CheckResponse[TeamInput]{
@@ -232,14 +231,10 @@ func (*Team) Read(ctx context.Context, req infer.ReadRequest[TeamInput, TeamStat
 
 func (*Team) Update(ctx context.Context, req infer.UpdateRequest[TeamInput, TeamState]) (infer.UpdateResponse[TeamState], error) {
 	if req.DryRun {
-		members := req.Inputs.Members
-		if members == nil {
-			members = []string{}
-		}
 		return infer.UpdateResponse[TeamState]{
 			Output: TeamState{
 				TeamCore: req.Inputs.TeamCore,
-				Members:  members,
+				Members:  req.Inputs.Members,
 			},
 		}, nil
 	}
@@ -304,14 +299,10 @@ func (*Team) Update(ctx context.Context, req infer.UpdateRequest[TeamInput, Team
 		req.Inputs.Members = members
 	}
 
-	outputMembers := req.Inputs.Members
-	if outputMembers == nil {
-		outputMembers = []string{}
-	}
 	return infer.UpdateResponse[TeamState]{
 		Output: TeamState{
 			TeamCore: req.Inputs.TeamCore,
-			Members:  outputMembers,
+			Members:  req.Inputs.Members,
 		},
 	}, nil
 }
