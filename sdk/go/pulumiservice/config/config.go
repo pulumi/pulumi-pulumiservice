@@ -11,9 +11,20 @@ import (
 
 var _ = internal.GetEnvOrDefault
 
+// Access Token to authenticate with Pulumi Cloud.
 func GetAccessToken(ctx *pulumi.Context) string {
 	return config.Get(ctx, "pulumiservice:accessToken")
 }
+
+// Optional override of Pulumi Cloud API endpoint.
 func GetApiUrl(ctx *pulumi.Context) string {
-	return config.Get(ctx, "pulumiservice:apiUrl")
+	v, err := config.Try(ctx, "pulumiservice:apiUrl")
+	if err == nil {
+		return v
+	}
+	var value string
+	if d := internal.GetEnvOrDefault("https://api.pulumi.com", nil, "PULUMI_BACKEND_URL"); d != nil {
+		value = d.(string)
+	}
+	return value
 }

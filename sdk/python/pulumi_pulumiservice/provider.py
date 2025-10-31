@@ -28,6 +28,8 @@ class ProviderArgs:
         """
         if access_token is not None:
             pulumi.set(__self__, "access_token", access_token)
+        if api_url is None:
+            api_url = (_utilities.get_env('PULUMI_BACKEND_URL') or 'https://api.pulumi.com')
         if api_url is not None:
             pulumi.set(__self__, "api_url", api_url)
 
@@ -107,10 +109,30 @@ class Provider(pulumi.ProviderResource):
             __props__ = ProviderArgs.__new__(ProviderArgs)
 
             __props__.__dict__["access_token"] = None if access_token is None else pulumi.Output.secret(access_token)
+            if api_url is None:
+                api_url = (_utilities.get_env('PULUMI_BACKEND_URL') or 'https://api.pulumi.com')
             __props__.__dict__["api_url"] = api_url
+        secret_opts = pulumi.ResourceOptions(additional_secret_outputs=["accessToken"])
+        opts = pulumi.ResourceOptions.merge(opts, secret_opts)
         super(Provider, __self__).__init__(
             'pulumiservice',
             resource_name,
             __props__,
             opts)
+
+    @_builtins.property
+    @pulumi.getter(name="accessToken")
+    def access_token(self) -> pulumi.Output[Optional[_builtins.str]]:
+        """
+        Access Token to authenticate with Pulumi Cloud.
+        """
+        return pulumi.get(self, "access_token")
+
+    @_builtins.property
+    @pulumi.getter(name="apiUrl")
+    def api_url(self) -> pulumi.Output[Optional[_builtins.str]]:
+        """
+        Optional override of Pulumi Cloud API endpoint.
+        """
+        return pulumi.get(self, "api_url")
 

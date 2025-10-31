@@ -8,6 +8,7 @@
 **/.ionide
 **/build
 **/target
+Library
 
 sdk/java/build
 sdk/java/src
