@@ -21,7 +21,7 @@ func GetClient(ctx context.Context) Client {
 	if v := ctx.Value(mockClientKey{}); v != nil {
 		return v.(Client)
 	}
-	return infer.GetConfig[*Config](ctx).client
+	return infer.GetConfig[Config](ctx).client
 }
 
 type mockClientKey struct{}
@@ -76,6 +76,10 @@ func (c *Config) Configure(context.Context) error {
 			return ErrAccessTokenNotFound
 		}
 		c.AccessToken = creds.Current
+	}
+
+	if c.AccessToken == "" {
+		return ErrAccessTokenNotFound
 	}
 
 	var err error
