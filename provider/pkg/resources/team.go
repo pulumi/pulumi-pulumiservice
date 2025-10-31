@@ -84,7 +84,7 @@ func (*Team) Create(ctx context.Context, req infer.CreateRequest[TeamInput]) (in
 		int64(util.OrZero(req.Inputs.GitHubTeamID)),
 	)
 	if err != nil {
-		return infer.CreateResponse[TeamState]{}, fmt.Errorf("error creating teamUrn '%s': %s", util.OrZero(req.Inputs.Name), err.Error())
+		return infer.CreateResponse[TeamState]{}, fmt.Errorf("error creating team '%s': %s", util.OrZero(req.Inputs.Name), err.Error())
 	}
 
 	// We have now created a teamUrn.  It is very important to ensure that from this point on, any other error
