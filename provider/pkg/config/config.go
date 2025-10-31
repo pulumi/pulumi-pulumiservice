@@ -78,10 +78,9 @@ func (c *Config) Configure(context.Context) error {
 		c.AccessToken = creds.Current
 	}
 
-	httpClient := http.Client{
-		Timeout: 60 * time.Second,
-	}
 	var err error
-	c.client, err = pulumiapi.NewClient(&httpClient, c.AccessToken, c.ApiURL)
+	c.client, err = pulumiapi.NewClient(&http.Client{
+		Timeout: 60 * time.Second,
+	}, c.AccessToken, c.ApiURL)
 	return err
 }
