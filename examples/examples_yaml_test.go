@@ -67,7 +67,7 @@ func TestYamlTeamsExample(t *testing.T) {
 		pulumiBot := "pulumi-bot"
 		providerUser := "service-provider-example-user"
 
-		notFoundDir := writeTeamProgram([]string{pulumiBot, providerUser, "not-found-user"})
+		notFoundDir := writeTeamProgram([]string{pulumiBot, "not-found-user"})
 		correctUpdateDir := writeTeamProgram([]string{pulumiBot, providerUser})
 
 		first := &strings.Builder{}
