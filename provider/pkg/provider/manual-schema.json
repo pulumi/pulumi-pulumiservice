@@ -11,31 +11,6 @@
   ],
   "license": "Apache-2.0",
   "publisher": "Pulumi",
-  "config": {
-    "variables": {
-      "accessToken": {
-        "type": "string",
-        "secret": true
-      },
-      "apiUrl": {
-        "type": "string"
-      }
-    }
-  },
-  "provider": {
-    "type": "object",
-    "inputProperties": {
-      "accessToken": {
-        "description": "Access Token to authenticate with Pulumi Cloud.",
-        "type": "string",
-        "secret": true
-      },
-      "apiUrl": {
-        "description": "Optional override of Pulumi Cloud API endpoint.",
-        "type": "string"
-      }
-    }
-  },
   "types": {
     "pulumiservice:index:TeamStackPermissionScope": {
       "type": "number",

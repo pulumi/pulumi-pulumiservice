@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	p "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi-go-provider/infer"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/workspace"
@@ -35,7 +36,8 @@ func WithMockClient(ctx context.Context, client Client) context.Context {
 var ErrAccessTokenNotFound = fmt.Errorf("pulumi access token not found")
 
 var (
-	_ infer.CustomConfigure = &Config{}
+	_ infer.CustomConfigure            = &Config{}
+	_ infer.CustomDiff[Config, Config] = &Config{}
 )
 
 // An interface to represent [*pulumiapi.Client] that remains mock-able.
@@ -88,4 +90,41 @@ func (c *Config) Configure(context.Context) error {
 		Timeout: 60 * time.Second,
 	}, c.AccessToken, c.ApiURL)
 	return err
+}
+
+func (Config) Diff(ctx context.Context, req infer.DiffRequest[Config, Config]) (infer.DiffResponse, error) {
+	kind := func(input, state string) p.DiffKind {
+		switch {
+		case input == "" && state != "":
+			return p.Delete
+		case input != "" && state == "":
+			return p.Add
+		case input != state:
+			return p.Update
+		default:
+			return p.Stable
+		}
+	}
+	var hasChanges bool
+	detailedDiff := map[string]p.PropertyDiff{}
+
+	if req.Inputs.AccessToken != req.State.AccessToken {
+		hasChanges = true
+		detailedDiff["accessToken"] = p.PropertyDiff{
+			Kind:      kind(req.Inputs.AccessToken, req.State.AccessToken),
+			InputDiff: true,
+		}
+	}
+
+	if req.Inputs.ApiURL != req.State.ApiURL {
+		hasChanges = true
+		detailedDiff["apiUrl"] = p.PropertyDiff{
+			Kind:      kind(req.Inputs.ApiURL, req.State.ApiURL),
+			InputDiff: true,
+		}
+	}
+	return infer.DiffResponse{
+		HasChanges:   hasChanges,
+		DetailedDiff: detailedDiff,
+	}, nil
 }
