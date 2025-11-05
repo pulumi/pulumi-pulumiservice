@@ -20,6 +20,9 @@ env:
 jobs:
   setup-policy-packs:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -37,204 +40,40 @@ jobs:
         pulumi login
         pulumi whoami
 
-    - name: Create AWS Security Policy Pack
+    - name: Clone policy packs repository
       run: |
-        mkdir -p /tmp/aws-security-policy
-        cd /tmp/aws-security-policy
-        
-        # Create PulumiPolicy.yaml
-        cat > PulumiPolicy.yaml << 'EOF'
-        name: aws-security-policy
-        description: AWS security best practices policy pack
-        policies:
-          - s3-bucket-public-access-prohibited
-          - ec2-instance-no-public-ip
-        EOF
-        
-        # Create package.json
-        cat > package.json << 'EOF'
-        {
-          "name": "aws-security-policy",
-          "version": "1.0.0",
-          "description": "AWS security policy pack",
-          "main": "index.js",
-          "dependencies": {
-            "@pulumi/policy": "^1.8.0"
-          }
-        }
-        EOF
+        git clone https://${{ secrets.GITHUB_TOKEN }}@github.com/pulumi/policy-packs-internal.git /tmp/policy-packs-internal
+
+    - name: Publish AWS Best Practices Policy Pack
+      run: |
+        cd /tmp/policy-packs-internal/packs/pulumi-best-practices/aws
         
         # Install dependencies
         npm install
-        
-        # Create index.js with policies
-        cat > index.js << 'EOF'
-        const { PolicyPack, validateResourceOfType } = require("@pulumi/policy");
-
-        new PolicyPack("aws-security-policy", {
-            policies: [
-                {
-                    name: "s3-bucket-public-access-prohibited",
-                    description: "S3 buckets should not allow public access.",
-                    enforcementLevel: "advisory",
-                    validateResource: validateResourceOfType("aws:s3/bucket:Bucket", (bucket, args, reportViolation) => {
-                        if (bucket.acl === "public-read" || bucket.acl === "public-read-write") {
-                            reportViolation("S3 bucket should not have public access.");
-                        }
-                    }),
-                },
-                {
-                    name: "ec2-instance-no-public-ip",
-                    description: "EC2 instances should not have public IP addresses.",
-                    enforcementLevel: "advisory", 
-                    validateResource: validateResourceOfType("aws:ec2/instance:Instance", (instance, args, reportViolation) => {
-                        if (instance.associatePublicIpAddress === true) {
-                            reportViolation("EC2 instance should not have a public IP address.");
-                        }
-                    }),
-                },
-            ],
-        });
-        EOF
         
         # Publish the policy pack
         pulumi policy publish $PULUMI_TEST_OWNER
 
-    - name: Create Azure Security Policy Pack
+    - name: Publish Azure Best Practices Policy Pack
       run: |
-        mkdir -p /tmp/azure-security-policy
-        cd /tmp/azure-security-policy
+        cd /tmp/policy-packs-internal/packs/pulumi-best-practices/azure
         
-        # Create PulumiPolicy.yaml
-        cat > PulumiPolicy.yaml << 'EOF'
-        name: azure-security-policy
-        description: Azure security best practices policy pack
-        policies:
-          - storage-account-secure-transfer
-          - vm-no-public-ip
-        EOF
-        
-        # Create package.json
-        cat > package.json << 'EOF'
-        {
-          "name": "azure-security-policy",
-          "version": "1.0.0",
-          "description": "Azure security policy pack",
-          "main": "index.js",
-          "dependencies": {
-            "@pulumi/policy": "^1.8.0"
-          }
-        }
-        EOF
-        
-        # Install dependencies
-        npm install
-        
-        # Create index.js with policies
-        cat > index.js << 'EOF'
-        const { PolicyPack, validateResourceOfType } = require("@pulumi/policy");
-
-        new PolicyPack("azure-security-policy", {
-            policies: [
-                {
-                    name: "storage-account-secure-transfer",
-                    description: "Storage accounts should require secure transfer.",
-                    enforcementLevel: "advisory",
-                    validateResource: validateResourceOfType("azure:storage/account:Account", (account, args, reportViolation) => {
-                        if (!account.enableHttpsTrafficOnly) {
-                            reportViolation("Storage account should require secure transfer (HTTPS).");
-                        }
-                    }),
-                },
-                {
-                    name: "vm-no-public-ip",
-                    description: "Virtual machines should not have public IP addresses.",
-                    enforcementLevel: "advisory",
-                    validateResource: validateResourceOfType("azure:compute/virtualMachine:VirtualMachine", (vm, args, reportViolation) => {
-                        // This is a simplified check - in practice you'd check network interfaces
-                        if (vm.networkInterfaceIds && vm.networkInterfaceIds.length > 0) {
-                            // Would need additional logic to check if NICs have public IPs
-                        }
-                    }),
-                },
-            ],
-        });
-        EOF
+        # Install dependencies if package.json exists
+        if [ -f package.json ]; then
+          npm install
+        fi
         
         # Publish the policy pack
         pulumi policy publish $PULUMI_TEST_OWNER
 
-    - name: Create Compliance Policy Pack
+    - name: Publish GCP Best Practices Policy Pack
       run: |
-        mkdir -p /tmp/compliance-policy
-        cd /tmp/compliance-policy
+        cd /tmp/policy-packs-internal/packs/pulumi-best-practices/gcp
         
-        # Create PulumiPolicy.yaml
-        cat > PulumiPolicy.yaml << 'EOF'
-        name: compliance-policy
-        description: General compliance policy pack for cloud resources
-        policies:
-          - required-tags
-          - encryption-at-rest
-        EOF
-        
-        # Create package.json
-        cat > package.json << 'EOF'
-        {
-          "name": "compliance-policy",
-          "version": "1.0.0", 
-          "description": "Compliance policy pack",
-          "main": "index.js",
-          "dependencies": {
-            "@pulumi/policy": "^1.8.0"
-          }
-        }
-        EOF
-        
-        # Install dependencies
-        npm install
-        
-        # Create index.js with policies
-        cat > index.js << 'EOF'
-        const { PolicyPack, validateResourceOfType } = require("@pulumi/policy");
-
-        new PolicyPack("compliance-policy", {
-            policies: [
-                {
-                    name: "required-tags",
-                    description: "Resources should have required tags.",
-                    enforcementLevel: "advisory",
-                    validateResource: (args, reportViolation) => {
-                        const requiredTags = ["Environment", "Owner"];
-                        const tags = args.props.tags || {};
-                        
-                        for (const tag of requiredTags) {
-                            if (!tags[tag]) {
-                                reportViolation(`Resource is missing required tag: ${tag}`);
-                            }
-                        }
-                    },
-                },
-                {
-                    name: "encryption-at-rest",
-                    description: "Storage resources should have encryption at rest enabled.",
-                    enforcementLevel: "advisory",
-                    validateResource: [
-                        validateResourceOfType("aws:s3/bucket:Bucket", (bucket, args, reportViolation) => {
-                            if (!bucket.serverSideEncryptionConfiguration) {
-                                reportViolation("S3 bucket should have encryption at rest enabled.");
-                            }
-                        }),
-                        validateResourceOfType("azure:storage/account:Account", (account, args, reportViolation) => {
-                            if (!account.encryption || !account.encryption[0].services) {
-                                reportViolation("Storage account should have encryption enabled.");
-                            }
-                        }),
-                    ],
-                },
-            ],
-        });
-        EOF
+        # Install dependencies if package.json exists
+        if [ -f package.json ]; then
+          npm install
+        fi
         
         # Publish the policy pack
         pulumi policy publish $PULUMI_TEST_OWNER
@@ -246,10 +85,10 @@ jobs:
 
     - name: Summary
       run: |
-        echo "✅ Successfully created and published 3 policy packs:"
-        echo "  1. aws-security-policy - AWS security best practices"
-        echo "  2. azure-security-policy - Azure security best practices" 
-        echo "  3. compliance-policy - General compliance policies"
+        echo "✅ Successfully published policy packs from policy-packs-internal:"
+        echo "  1. pulumi-best-practices/aws - AWS best practices"
+        echo "  2. pulumi-best-practices/azure - Azure best practices" 
+        echo "  3. pulumi-best-practices/gcp - GCP best practices"
         echo ""
         echo "These policy packs are now available for testing with PolicyGroup resources"
         echo "in the service-provider-test-org organization."
