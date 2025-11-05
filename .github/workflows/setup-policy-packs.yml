@@ -40,13 +40,16 @@ jobs:
         pulumi login
         pulumi whoami
 
-    - name: Clone policy packs repository
-      run: |
-        git clone https://${{ secrets.GITHUB_TOKEN }}@github.com/pulumi/policy-packs-internal.git /tmp/policy-packs-internal
+    - name: Checkout policy packs repository
+      uses: actions/checkout@v4
+      with:
+        repository: pulumi/policy-packs-internal
+        token: ${{ secrets.GITHUB_TOKEN }}
+        path: policy-packs-internal
 
     - name: Publish AWS Best Practices Policy Pack
       run: |
-        cd /tmp/policy-packs-internal/packs/pulumi-best-practices/aws
+        cd policy-packs-internal/packs/pulumi-best-practices/aws
         
         # Install dependencies
         npm install
@@ -56,7 +59,7 @@ jobs:
 
     - name: Publish Azure Best Practices Policy Pack
       run: |
-        cd /tmp/policy-packs-internal/packs/pulumi-best-practices/azure
+        cd policy-packs-internal/packs/pulumi-best-practices/azure
         
         # Install dependencies if package.json exists
         if [ -f package.json ]; then
@@ -68,7 +71,7 @@ jobs:
 
     - name: Publish GCP Best Practices Policy Pack
       run: |
-        cd /tmp/policy-packs-internal/packs/pulumi-best-practices/gcp
+        cd policy-packs-internal/packs/pulumi-best-practices/gcp
         
         # Install dependencies if package.json exists
         if [ -f package.json ]; then
