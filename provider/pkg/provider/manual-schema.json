@@ -786,6 +786,59 @@
         }
       }
     },
+    "pulumiservice:index:PolicyGroupStackReference": {
+      "type": "object",
+      "description": "A reference to a stack within a policy group.",
+      "properties": {
+        "name": {
+          "description": "The name of the stack.",
+          "type": "string"
+        },
+        "routingProject": {
+          "description": "The routing project name (also known as project name).",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "routingProject"
+      ]
+    },
+    "pulumiservice:index:PolicyGroupPolicyPackReference": {
+      "type": "object",
+      "description": "A reference to a policy pack within a policy group.",
+      "properties": {
+        "name": {
+          "description": "The name of the policy pack.",
+          "type": "string"
+        },
+        "displayName": {
+          "description": "The display name of the policy pack.",
+          "type": "string"
+        },
+        "version": {
+          "description": "The version of the policy pack.",
+          "type": "number"
+        },
+        "versionTag": {
+          "description": "The version tag of the policy pack.",
+          "type": "string"
+        },
+        "config": {
+          "description": "Optional configuration for the policy pack.",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "pulumi.json#/Any"
+          }
+        }
+      },
+      "required": [
+        "name",
+        "displayName",
+        "version",
+        "versionTag"
+      ]
+    },
     "pulumiservice:index:ApprovalRuleConfig": {
       "type": "object",
       "properties": {
@@ -2193,57 +2246,14 @@
           "description": "List of stack references that belong to this policy group.",
           "type": "array",
           "items": {
-            "type": "object",
-            "properties": {
-              "name": {
-                "description": "The name of the stack.",
-                "type": "string"
-              },
-              "routingProject": {
-                "description": "The routing project name (also known as project name).",
-                "type": "string"
-              }
-            },
-            "required": [
-              "name",
-              "routingProject"
-            ]
+            "$ref": "#/types/pulumiservice:index:PolicyGroupStackReference"
           }
         },
         "policyPacks": {
           "description": "List of policy packs applied to this policy group.",
           "type": "array",
           "items": {
-            "type": "object",
-            "properties": {
-              "name": {
-                "description": "The name of the policy pack.",
-                "type": "string"
-              },
-              "displayName": {
-                "description": "The display name of the policy pack.",
-                "type": "string"
-              },
-              "version": {
-                "description": "The version of the policy pack.",
-                "type": "number"
-              },
-              "versionTag": {
-                "description": "The version tag of the policy pack.",
-                "type": "string"
-              },
-              "config": {
-                "description": "Optional configuration for the policy pack.",
-                "type": "object",
-                "additionalProperties": true
-              }
-            },
-            "required": [
-              "name",
-              "displayName",
-              "version",
-              "versionTag"
-            ]
+            "$ref": "#/types/pulumiservice:index:PolicyGroupPolicyPackReference"
           }
         }
       },
@@ -2280,57 +2290,14 @@
           "description": "List of stack references that belong to this policy group.",
           "type": "array",
           "items": {
-            "type": "object",
-            "properties": {
-              "name": {
-                "description": "The name of the stack.",
-                "type": "string"
-              },
-              "routingProject": {
-                "description": "The routing project name (also known as project name).",
-                "type": "string"
-              }
-            },
-            "required": [
-              "name",
-              "routingProject"
-            ]
+            "$ref": "#/types/pulumiservice:index:PolicyGroupStackReference"
           }
         },
         "policyPacks": {
           "description": "List of policy packs applied to this policy group.",
           "type": "array",
           "items": {
-            "type": "object",
-            "properties": {
-              "name": {
-                "description": "The name of the policy pack.",
-                "type": "string"
-              },
-              "displayName": {
-                "description": "The display name of the policy pack.",
-                "type": "string"
-              },
-              "version": {
-                "description": "The version of the policy pack.",
-                "type": "number"
-              },
-              "versionTag": {
-                "description": "The version tag of the policy pack.",
-                "type": "string"
-              },
-              "config": {
-                "description": "Optional configuration for the policy pack.",
-                "type": "object",
-                "additionalProperties": true
-              }
-            },
-            "required": [
-              "name",
-              "displayName",
-              "version",
-              "versionTag"
-            ]
+            "$ref": "#/types/pulumiservice:index:PolicyGroupPolicyPackReference"
           }
         }
       },

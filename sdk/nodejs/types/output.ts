@@ -349,6 +349,46 @@ export interface OperationContextOptions {
     skipIntermediateDeployments?: boolean;
 }
 
+/**
+ * A reference to a policy pack within a policy group.
+ */
+export interface PolicyGroupPolicyPackReference {
+    /**
+     * Optional configuration for the policy pack.
+     */
+    config?: {[key: string]: any};
+    /**
+     * The display name of the policy pack.
+     */
+    displayName: string;
+    /**
+     * The name of the policy pack.
+     */
+    name: string;
+    /**
+     * The version of the policy pack.
+     */
+    version: number;
+    /**
+     * The version tag of the policy pack.
+     */
+    versionTag: string;
+}
+
+/**
+ * A reference to a stack within a policy group.
+ */
+export interface PolicyGroupStackReference {
+    /**
+     * The name of the stack.
+     */
+    name: string;
+    /**
+     * The routing project name (also known as project name).
+     */
+    routingProject: string;
+}
+
 export interface TemplateSourceDestination {
     /**
      * Destination URL that gets filled in on new project creation.

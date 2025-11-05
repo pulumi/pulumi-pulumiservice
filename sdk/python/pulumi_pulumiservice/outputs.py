@@ -35,6 +35,8 @@ __all__ = [
     'GCPOIDCConfiguration',
     'OperationContextOIDC',
     'OperationContextOptions',
+    'PolicyGroupPolicyPackReference',
+    'PolicyGroupStackReference',
     'TemplateSourceDestination',
 ]
 
@@ -1172,6 +1174,142 @@ class OperationContextOptions(dict):
         Skip intermediate deployments (Consolidate multiple deployments of the same type into one deployment)
         """
         return pulumi.get(self, "skip_intermediate_deployments")
+
+
+@pulumi.output_type
+class PolicyGroupPolicyPackReference(dict):
+    """
+    A reference to a policy pack within a policy group.
+    """
+    @staticmethod
+    def __key_warning(key: str):
+        suggest = None
+        if key == "displayName":
+            suggest = "display_name"
+        elif key == "versionTag":
+            suggest = "version_tag"
+
+        if suggest:
+            pulumi.log.warn(f"Key '{key}' not found in PolicyGroupPolicyPackReference. Access the value via the '{suggest}' property getter instead.")
+
+    def __getitem__(self, key: str) -> Any:
+        PolicyGroupPolicyPackReference.__key_warning(key)
+        return super().__getitem__(key)
+
+    def get(self, key: str, default = None) -> Any:
+        PolicyGroupPolicyPackReference.__key_warning(key)
+        return super().get(key, default)
+
+    def __init__(__self__, *,
+                 display_name: _builtins.str,
+                 name: _builtins.str,
+                 version: _builtins.float,
+                 version_tag: _builtins.str,
+                 config: Optional[Mapping[str, Any]] = None):
+        """
+        A reference to a policy pack within a policy group.
+        :param _builtins.str display_name: The display name of the policy pack.
+        :param _builtins.str name: The name of the policy pack.
+        :param _builtins.float version: The version of the policy pack.
+        :param _builtins.str version_tag: The version tag of the policy pack.
+        :param Mapping[str, Any] config: Optional configuration for the policy pack.
+        """
+        pulumi.set(__self__, "display_name", display_name)
+        pulumi.set(__self__, "name", name)
+        pulumi.set(__self__, "version", version)
+        pulumi.set(__self__, "version_tag", version_tag)
+        if config is not None:
+            pulumi.set(__self__, "config", config)
+
+    @_builtins.property
+    @pulumi.getter(name="displayName")
+    def display_name(self) -> _builtins.str:
+        """
+        The display name of the policy pack.
+        """
+        return pulumi.get(self, "display_name")
+
+    @_builtins.property
+    @pulumi.getter
+    def name(self) -> _builtins.str:
+        """
+        The name of the policy pack.
+        """
+        return pulumi.get(self, "name")
+
+    @_builtins.property
+    @pulumi.getter
+    def version(self) -> _builtins.float:
+        """
+        The version of the policy pack.
+        """
+        return pulumi.get(self, "version")
+
+    @_builtins.property
+    @pulumi.getter(name="versionTag")
+    def version_tag(self) -> _builtins.str:
+        """
+        The version tag of the policy pack.
+        """
+        return pulumi.get(self, "version_tag")
+
+    @_builtins.property
+    @pulumi.getter
+    def config(self) -> Optional[Mapping[str, Any]]:
+        """
+        Optional configuration for the policy pack.
+        """
+        return pulumi.get(self, "config")
+
+
+@pulumi.output_type
+class PolicyGroupStackReference(dict):
+    """
+    A reference to a stack within a policy group.
+    """
+    @staticmethod
+    def __key_warning(key: str):
+        suggest = None
+        if key == "routingProject":
+            suggest = "routing_project"
+
+        if suggest:
+            pulumi.log.warn(f"Key '{key}' not found in PolicyGroupStackReference. Access the value via the '{suggest}' property getter instead.")
+
+    def __getitem__(self, key: str) -> Any:
+        PolicyGroupStackReference.__key_warning(key)
+        return super().__getitem__(key)
+
+    def get(self, key: str, default = None) -> Any:
+        PolicyGroupStackReference.__key_warning(key)
+        return super().get(key, default)
+
+    def __init__(__self__, *,
+                 name: _builtins.str,
+                 routing_project: _builtins.str):
+        """
+        A reference to a stack within a policy group.
+        :param _builtins.str name: The name of the stack.
+        :param _builtins.str routing_project: The routing project name (also known as project name).
+        """
+        pulumi.set(__self__, "name", name)
+        pulumi.set(__self__, "routing_project", routing_project)
+
+    @_builtins.property
+    @pulumi.getter
+    def name(self) -> _builtins.str:
+        """
+        The name of the stack.
+        """
+        return pulumi.get(self, "name")
+
+    @_builtins.property
+    @pulumi.getter(name="routingProject")
+    def routing_project(self) -> _builtins.str:
+        """
+        The routing project name (also known as project name).
+        """
+        return pulumi.get(self, "routing_project")
 
 
 @pulumi.output_type

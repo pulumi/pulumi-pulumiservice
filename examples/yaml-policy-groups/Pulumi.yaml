@@ -41,8 +41,20 @@ resources:
       organizationName: ${organizationName}
       entityType: stacks
       mode: audit
-      stacks: []
-      policyPacks: []
+      stacks:
+        # Reference the current stack
+        - name: ${pulumi.stack}
+          routingProject: ${pulumi.project}
+      policyPacks:
+        # Use actual policy packs from the organization
+        # This demonstrates the correct structure: name, displayName, version, versionTag
+        - name: ${policyPacks[0].name}
+          displayName: ${policyPacks[0].displayName}
+          version: ${policyPacks[0].versions[0]}
+          versionTag: ${policyPacks[0].versionTags[0]}
+          config:
+            # Example configuration - structure depends on the policy pack
+            enabled: true
 
 outputs:
   # Export the policy group name and the list of available policy packs

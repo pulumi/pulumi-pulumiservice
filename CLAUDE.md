@@ -125,16 +125,55 @@ CHANGELOG.
 
 ### Schema Changes
 
-The provider schema is **manually maintained** at `provider/cmd/pulumi-resource-pulumiservice/schema.json`. When adding/modifying resources:
+The provider schema is **manually maintained** at `provider/pkg/provider/manual-schema.json`. When adding/modifying resources:
 
-1. Update `schema.json` with the new resource/property definitions
+1. Update `manual-schema.json` with the new resource/property definitions
 2. Run `make provider` to regenerate the provider binary (uses `go generate`)
 3. Run `make build_sdks` to regenerate all language SDKs from the schema
 4. The schema is embedded into the provider binary at build time
 
+#### Schema JSON Syntax Guidelines
+
+**Important**: The schema JSON must follow strict syntax rules. Common patterns:
+
+**Complex Nested Objects**:
+- ❌ **NEVER** define inline objects directly in array `items`:
+  ```json
+  "items": {
+    "type": "object",
+    "properties": { ... }
+  }
+  ```
+- ✅ **ALWAYS** define complex objects as separate types in the `types` section and reference them:
+  ```json
+  "items": {
+    "$ref": "#/types/pulumiservice:index:YourTypeName"
+  }
+  ```
+
+**Additional Properties**:
+- ❌ **NEVER** use boolean values: `"additionalProperties": true`
+- ✅ **ALWAYS** use type specifications:
+  ```json
+  "additionalProperties": {
+    "$ref": "pulumi.json#/Any"
+  }
+  ```
+  or
+  ```json
+  "additionalProperties": {
+    "type": "string"
+  }
+  ```
+
+**Type References**:
+- Use `"$ref": "#/types/pulumiservice:index:TypeName"` for custom types
+- Use `"$ref": "pulumi.json#/Any"` for generic object types
+- Custom types must be defined in the `types` section with full descriptions
+
 ### Adding a New Resource
 
-1. Add resource definition to `provider/cmd/pulumi-resource-pulumiservice/schema.json`
+1. Add resource definition to `provider/pkg/provider/manual-schema.json`
 2. Create API client methods in `provider/pkg/pulumiapi/` (e.g., `teams.go`, `webhooks.go`)
 3. Create resource implementation in `provider/pkg/resources/` implementing `PulumiServiceResource` interface
 4. Register the resource in `provider/pkg/provider/provider.go`

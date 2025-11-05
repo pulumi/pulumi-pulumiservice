@@ -52,6 +52,10 @@ __all__ = [
     'OperationContextOIDCArgsDict',
     'OperationContextOptionsArgs',
     'OperationContextOptionsArgsDict',
+    'PolicyGroupPolicyPackReferenceArgs',
+    'PolicyGroupPolicyPackReferenceArgsDict',
+    'PolicyGroupStackReferenceArgs',
+    'PolicyGroupStackReferenceArgsDict',
     'TemplateSourceDestinationArgs',
     'TemplateSourceDestinationArgsDict',
 ]
@@ -1493,6 +1497,172 @@ class OperationContextOptionsArgs:
     @skip_intermediate_deployments.setter
     def skip_intermediate_deployments(self, value: Optional[pulumi.Input[_builtins.bool]]):
         pulumi.set(self, "skip_intermediate_deployments", value)
+
+
+if not MYPY:
+    class PolicyGroupPolicyPackReferenceArgsDict(TypedDict):
+        """
+        A reference to a policy pack within a policy group.
+        """
+        display_name: pulumi.Input[_builtins.str]
+        """
+        The display name of the policy pack.
+        """
+        name: pulumi.Input[_builtins.str]
+        """
+        The name of the policy pack.
+        """
+        version: pulumi.Input[_builtins.float]
+        """
+        The version of the policy pack.
+        """
+        version_tag: pulumi.Input[_builtins.str]
+        """
+        The version tag of the policy pack.
+        """
+        config: NotRequired[pulumi.Input[Mapping[str, Any]]]
+        """
+        Optional configuration for the policy pack.
+        """
+elif False:
+    PolicyGroupPolicyPackReferenceArgsDict: TypeAlias = Mapping[str, Any]
+
+@pulumi.input_type
+class PolicyGroupPolicyPackReferenceArgs:
+    def __init__(__self__, *,
+                 display_name: pulumi.Input[_builtins.str],
+                 name: pulumi.Input[_builtins.str],
+                 version: pulumi.Input[_builtins.float],
+                 version_tag: pulumi.Input[_builtins.str],
+                 config: Optional[pulumi.Input[Mapping[str, Any]]] = None):
+        """
+        A reference to a policy pack within a policy group.
+        :param pulumi.Input[_builtins.str] display_name: The display name of the policy pack.
+        :param pulumi.Input[_builtins.str] name: The name of the policy pack.
+        :param pulumi.Input[_builtins.float] version: The version of the policy pack.
+        :param pulumi.Input[_builtins.str] version_tag: The version tag of the policy pack.
+        :param pulumi.Input[Mapping[str, Any]] config: Optional configuration for the policy pack.
+        """
+        pulumi.set(__self__, "display_name", display_name)
+        pulumi.set(__self__, "name", name)
+        pulumi.set(__self__, "version", version)
+        pulumi.set(__self__, "version_tag", version_tag)
+        if config is not None:
+            pulumi.set(__self__, "config", config)
+
+    @_builtins.property
+    @pulumi.getter(name="displayName")
+    def display_name(self) -> pulumi.Input[_builtins.str]:
+        """
+        The display name of the policy pack.
+        """
+        return pulumi.get(self, "display_name")
+
+    @display_name.setter
+    def display_name(self, value: pulumi.Input[_builtins.str]):
+        pulumi.set(self, "display_name", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def name(self) -> pulumi.Input[_builtins.str]:
+        """
+        The name of the policy pack.
+        """
+        return pulumi.get(self, "name")
+
+    @name.setter
+    def name(self, value: pulumi.Input[_builtins.str]):
+        pulumi.set(self, "name", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def version(self) -> pulumi.Input[_builtins.float]:
+        """
+        The version of the policy pack.
+        """
+        return pulumi.get(self, "version")
+
+    @version.setter
+    def version(self, value: pulumi.Input[_builtins.float]):
+        pulumi.set(self, "version", value)
+
+    @_builtins.property
+    @pulumi.getter(name="versionTag")
+    def version_tag(self) -> pulumi.Input[_builtins.str]:
+        """
+        The version tag of the policy pack.
+        """
+        return pulumi.get(self, "version_tag")
+
+    @version_tag.setter
+    def version_tag(self, value: pulumi.Input[_builtins.str]):
+        pulumi.set(self, "version_tag", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def config(self) -> Optional[pulumi.Input[Mapping[str, Any]]]:
+        """
+        Optional configuration for the policy pack.
+        """
+        return pulumi.get(self, "config")
+
+    @config.setter
+    def config(self, value: Optional[pulumi.Input[Mapping[str, Any]]]):
+        pulumi.set(self, "config", value)
+
+
+if not MYPY:
+    class PolicyGroupStackReferenceArgsDict(TypedDict):
+        """
+        A reference to a stack within a policy group.
+        """
+        name: pulumi.Input[_builtins.str]
+        """
+        The name of the stack.
+        """
+        routing_project: pulumi.Input[_builtins.str]
+        """
+        The routing project name (also known as project name).
+        """
+elif False:
+    PolicyGroupStackReferenceArgsDict: TypeAlias = Mapping[str, Any]
+
+@pulumi.input_type
+class PolicyGroupStackReferenceArgs:
+    def __init__(__self__, *,
+                 name: pulumi.Input[_builtins.str],
+                 routing_project: pulumi.Input[_builtins.str]):
+        """
+        A reference to a stack within a policy group.
+        :param pulumi.Input[_builtins.str] name: The name of the stack.
+        :param pulumi.Input[_builtins.str] routing_project: The routing project name (also known as project name).
+        """
+        pulumi.set(__self__, "name", name)
+        pulumi.set(__self__, "routing_project", routing_project)
+
+    @_builtins.property
+    @pulumi.getter
+    def name(self) -> pulumi.Input[_builtins.str]:
+        """
+        The name of the stack.
+        """
+        return pulumi.get(self, "name")
+
+    @name.setter
+    def name(self, value: pulumi.Input[_builtins.str]):
+        pulumi.set(self, "name", value)
+
+    @_builtins.property
+    @pulumi.getter(name="routingProject")
+    def routing_project(self) -> pulumi.Input[_builtins.str]:
+        """
+        The routing project name (also known as project name).
+        """
+        return pulumi.get(self, "routing_project")
+
+    @routing_project.setter
+    def routing_project(self, value: pulumi.Input[_builtins.str]):
+        pulumi.set(self, "routing_project", value)
 
 
 if not MYPY:

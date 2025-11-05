@@ -43,13 +43,13 @@ namespace Pulumi.PulumiService
         /// List of policy packs applied to this policy group.
         /// </summary>
         [Output("policyPacks")]
-        public Output<ImmutableArray<ImmutableDictionary<string, string>>> PolicyPacks { get; private set; } = null!;
+        public Output<ImmutableArray<Outputs.PolicyGroupPolicyPackReference>> PolicyPacks { get; private set; } = null!;
 
         /// <summary>
         /// List of stack references that belong to this policy group.
         /// </summary>
         [Output("stacks")]
-        public Output<ImmutableArray<ImmutableDictionary<string, string>>> Stacks { get; private set; } = null!;
+        public Output<ImmutableArray<Outputs.PolicyGroupStackReference>> Stacks { get; private set; } = null!;
 
 
         /// <summary>
@@ -121,26 +121,26 @@ namespace Pulumi.PulumiService
         public Input<string> OrganizationName { get; set; } = null!;
 
         [Input("policyPacks")]
-        private InputList<ImmutableDictionary<string, string>>? _policyPacks;
+        private InputList<Inputs.PolicyGroupPolicyPackReferenceArgs>? _policyPacks;
 
         /// <summary>
         /// List of policy packs applied to this policy group.
         /// </summary>
-        public InputList<ImmutableDictionary<string, string>> PolicyPacks
+        public InputList<Inputs.PolicyGroupPolicyPackReferenceArgs> PolicyPacks
         {
-            get => _policyPacks ?? (_policyPacks = new InputList<ImmutableDictionary<string, string>>());
+            get => _policyPacks ?? (_policyPacks = new InputList<Inputs.PolicyGroupPolicyPackReferenceArgs>());
             set => _policyPacks = value;
         }
 
         [Input("stacks")]
-        private InputList<ImmutableDictionary<string, string>>? _stacks;
+        private InputList<Inputs.PolicyGroupStackReferenceArgs>? _stacks;
 
         /// <summary>
         /// List of stack references that belong to this policy group.
         /// </summary>
-        public InputList<ImmutableDictionary<string, string>> Stacks
+        public InputList<Inputs.PolicyGroupStackReferenceArgs> Stacks
         {
-            get => _stacks ?? (_stacks = new InputList<ImmutableDictionary<string, string>>());
+            get => _stacks ?? (_stacks = new InputList<Inputs.PolicyGroupStackReferenceArgs>());
             set => _stacks = value;
         }
 

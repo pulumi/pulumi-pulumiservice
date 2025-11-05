@@ -25,9 +25,9 @@ type PolicyGroup struct {
 	// The name of the Pulumi organization the policy group belongs to.
 	OrganizationName pulumi.StringOutput `pulumi:"organizationName"`
 	// List of policy packs applied to this policy group.
-	PolicyPacks pulumi.StringMapArrayOutput `pulumi:"policyPacks"`
+	PolicyPacks PolicyGroupPolicyPackReferenceArrayOutput `pulumi:"policyPacks"`
 	// List of stack references that belong to this policy group.
-	Stacks pulumi.StringMapArrayOutput `pulumi:"stacks"`
+	Stacks PolicyGroupStackReferenceArrayOutput `pulumi:"stacks"`
 }
 
 // NewPolicyGroup registers a new resource with the given unique name, arguments, and options.
@@ -91,9 +91,9 @@ type policyGroupArgs struct {
 	// The name of the Pulumi organization the policy group belongs to.
 	OrganizationName string `pulumi:"organizationName"`
 	// List of policy packs applied to this policy group.
-	PolicyPacks []map[string]string `pulumi:"policyPacks"`
+	PolicyPacks []PolicyGroupPolicyPackReference `pulumi:"policyPacks"`
 	// List of stack references that belong to this policy group.
-	Stacks []map[string]string `pulumi:"stacks"`
+	Stacks []PolicyGroupStackReference `pulumi:"stacks"`
 }
 
 // The set of arguments for constructing a PolicyGroup resource.
@@ -107,9 +107,9 @@ type PolicyGroupArgs struct {
 	// The name of the Pulumi organization the policy group belongs to.
 	OrganizationName pulumi.StringInput
 	// List of policy packs applied to this policy group.
-	PolicyPacks pulumi.StringMapArrayInput
+	PolicyPacks PolicyGroupPolicyPackReferenceArrayInput
 	// List of stack references that belong to this policy group.
-	Stacks pulumi.StringMapArrayInput
+	Stacks PolicyGroupStackReferenceArrayInput
 }
 
 func (PolicyGroupArgs) ElementType() reflect.Type {
@@ -220,13 +220,13 @@ func (o PolicyGroupOutput) OrganizationName() pulumi.StringOutput {
 }
 
 // List of policy packs applied to this policy group.
-func (o PolicyGroupOutput) PolicyPacks() pulumi.StringMapArrayOutput {
-	return o.ApplyT(func(v *PolicyGroup) pulumi.StringMapArrayOutput { return v.PolicyPacks }).(pulumi.StringMapArrayOutput)
+func (o PolicyGroupOutput) PolicyPacks() PolicyGroupPolicyPackReferenceArrayOutput {
+	return o.ApplyT(func(v *PolicyGroup) PolicyGroupPolicyPackReferenceArrayOutput { return v.PolicyPacks }).(PolicyGroupPolicyPackReferenceArrayOutput)
 }
 
 // List of stack references that belong to this policy group.
-func (o PolicyGroupOutput) Stacks() pulumi.StringMapArrayOutput {
-	return o.ApplyT(func(v *PolicyGroup) pulumi.StringMapArrayOutput { return v.Stacks }).(pulumi.StringMapArrayOutput)
+func (o PolicyGroupOutput) Stacks() PolicyGroupStackReferenceArrayOutput {
+	return o.ApplyT(func(v *PolicyGroup) PolicyGroupStackReferenceArrayOutput { return v.Stacks }).(PolicyGroupStackReferenceArrayOutput)
 }
 
 type PolicyGroupArrayOutput struct{ *pulumi.OutputState }

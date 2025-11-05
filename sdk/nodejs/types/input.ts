@@ -349,6 +349,46 @@ export interface OperationContextOptionsArgs {
     skipIntermediateDeployments?: pulumi.Input<boolean>;
 }
 
+/**
+ * A reference to a policy pack within a policy group.
+ */
+export interface PolicyGroupPolicyPackReferenceArgs {
+    /**
+     * Optional configuration for the policy pack.
+     */
+    config?: pulumi.Input<{[key: string]: any}>;
+    /**
+     * The display name of the policy pack.
+     */
+    displayName: pulumi.Input<string>;
+    /**
+     * The name of the policy pack.
+     */
+    name: pulumi.Input<string>;
+    /**
+     * The version of the policy pack.
+     */
+    version: pulumi.Input<number>;
+    /**
+     * The version tag of the policy pack.
+     */
+    versionTag: pulumi.Input<string>;
+}
+
+/**
+ * A reference to a stack within a policy group.
+ */
+export interface PolicyGroupStackReferenceArgs {
+    /**
+     * The name of the stack.
+     */
+    name: pulumi.Input<string>;
+    /**
+     * The routing project name (also known as project name).
+     */
+    routingProject: pulumi.Input<string>;
+}
+
 export interface TemplateSourceDestinationArgs {
     /**
      * Destination URL that gets filled in on new project creation.
