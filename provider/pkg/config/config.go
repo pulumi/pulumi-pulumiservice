@@ -36,8 +36,8 @@ func WithMockClient(ctx context.Context, client Client) context.Context {
 var ErrAccessTokenNotFound = fmt.Errorf("pulumi access token not found")
 
 var (
-	_ infer.CustomConfigure            = &Config{}
-	_ infer.CustomDiff[Config, Config] = &Config{}
+	_ infer.CustomConfigure              = &Config{}
+	_ infer.CustomDiff[*Config, *Config] = &Config{}
 )
 
 // An interface to represent [*pulumiapi.Client] that remains mock-able.
@@ -92,7 +92,7 @@ func (c *Config) Configure(context.Context) error {
 	return err
 }
 
-func (Config) Diff(ctx context.Context, req infer.DiffRequest[Config, Config]) (infer.DiffResponse, error) {
+func (*Config) Diff(ctx context.Context, req infer.DiffRequest[*Config, *Config]) (infer.DiffResponse, error) {
 	kind := func(input, state string) p.DiffKind {
 		switch {
 		case input == "" && state != "":

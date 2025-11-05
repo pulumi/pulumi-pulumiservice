@@ -89,7 +89,7 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 		WithModuleMap(map[tokens.ModuleName]tokens.ModuleName{
 			"resources": "index",
 		}).
-		WithConfig(infer.Config(config.Config{})).
+		WithConfig(infer.Config(&config.Config{})).
 		WithLanguageMap(map[string]any{
 			"csharp": map[string]any{
 				"namespaces": map[string]any{
