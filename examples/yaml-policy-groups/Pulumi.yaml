@@ -50,7 +50,7 @@ resources:
         # This demonstrates the correct structure: name, displayName, version, versionTag
         - name: ${policyPacks[0].name}
           displayName: ${policyPacks[0].displayName}
-          version: ${fn::toNumber(policyPacks[0].versions[0])}
+          version: 1
           versionTag: ${policyPacks[0].versionTags[0]}
           config:
             # Example configuration - structure depends on the policy pack
