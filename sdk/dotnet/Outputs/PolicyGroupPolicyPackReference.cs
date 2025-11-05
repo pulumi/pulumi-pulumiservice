@@ -23,7 +23,7 @@ namespace Pulumi.PulumiService.Outputs
         /// <summary>
         /// The display name of the policy pack.
         /// </summary>
-        public readonly string DisplayName;
+        public readonly string? DisplayName;
         /// <summary>
         /// The name of the policy pack.
         /// </summary>
@@ -31,23 +31,23 @@ namespace Pulumi.PulumiService.Outputs
         /// <summary>
         /// The version of the policy pack.
         /// </summary>
-        public readonly double Version;
+        public readonly double? Version;
         /// <summary>
         /// The version tag of the policy pack.
         /// </summary>
-        public readonly string VersionTag;
+        public readonly string? VersionTag;
 
         [OutputConstructor]
         private PolicyGroupPolicyPackReference(
             ImmutableDictionary<string, object>? config,
 
-            string displayName,
+            string? displayName,
 
             string name,
 
-            double version,
+            double? version,
 
-            string versionTag)
+            string? versionTag)
         {
             Config = config;
             DisplayName = displayName;

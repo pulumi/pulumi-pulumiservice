@@ -30,8 +30,8 @@ namespace Pulumi.PulumiService.Inputs
         /// <summary>
         /// The display name of the policy pack.
         /// </summary>
-        [Input("displayName", required: true)]
-        public Input<string> DisplayName { get; set; } = null!;
+        [Input("displayName")]
+        public Input<string>? DisplayName { get; set; }
 
         /// <summary>
         /// The name of the policy pack.
@@ -42,14 +42,14 @@ namespace Pulumi.PulumiService.Inputs
         /// <summary>
         /// The version of the policy pack.
         /// </summary>
-        [Input("version", required: true)]
-        public Input<double> Version { get; set; } = null!;
+        [Input("version")]
+        public Input<double>? Version { get; set; }
 
         /// <summary>
         /// The version tag of the policy pack.
         /// </summary>
-        [Input("versionTag", required: true)]
-        public Input<string> VersionTag { get; set; } = null!;
+        [Input("versionTag")]
+        public Input<string>? VersionTag { get; set; }
 
         public PolicyGroupPolicyPackReferenceArgs()
         {

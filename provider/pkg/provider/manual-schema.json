@@ -833,10 +833,7 @@
         }
       },
       "required": [
-        "name",
-        "displayName",
-        "version",
-        "versionTag"
+        "name"
       ]
     },
     "pulumiservice:index:ApprovalRuleConfig": {

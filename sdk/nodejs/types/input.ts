@@ -360,7 +360,7 @@ export interface PolicyGroupPolicyPackReferenceArgs {
     /**
      * The display name of the policy pack.
      */
-    displayName: pulumi.Input<string>;
+    displayName?: pulumi.Input<string>;
     /**
      * The name of the policy pack.
      */
@@ -368,11 +368,11 @@ export interface PolicyGroupPolicyPackReferenceArgs {
     /**
      * The version of the policy pack.
      */
-    version: pulumi.Input<number>;
+    version?: pulumi.Input<number>;
     /**
      * The version tag of the policy pack.
      */
-    versionTag: pulumi.Input<string>;
+    versionTag?: pulumi.Input<string>;
 }
 
 /**

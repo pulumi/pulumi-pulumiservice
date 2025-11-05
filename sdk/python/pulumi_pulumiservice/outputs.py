@@ -1201,33 +1201,28 @@ class PolicyGroupPolicyPackReference(dict):
         return super().get(key, default)
 
     def __init__(__self__, *,
-                 display_name: _builtins.str,
                  name: _builtins.str,
-                 version: _builtins.float,
-                 version_tag: _builtins.str,
-                 config: Optional[Mapping[str, Any]] = None):
+                 config: Optional[Mapping[str, Any]] = None,
+                 display_name: Optional[_builtins.str] = None,
+                 version: Optional[_builtins.float] = None,
+                 version_tag: Optional[_builtins.str] = None):
         """
         A reference to a policy pack within a policy group.
-        :param _builtins.str display_name: The display name of the policy pack.
         :param _builtins.str name: The name of the policy pack.
+        :param Mapping[str, Any] config: Optional configuration for the policy pack.
+        :param _builtins.str display_name: The display name of the policy pack.
         :param _builtins.float version: The version of the policy pack.
         :param _builtins.str version_tag: The version tag of the policy pack.
-        :param Mapping[str, Any] config: Optional configuration for the policy pack.
         """
-        pulumi.set(__self__, "display_name", display_name)
         pulumi.set(__self__, "name", name)
-        pulumi.set(__self__, "version", version)
-        pulumi.set(__self__, "version_tag", version_tag)
         if config is not None:
             pulumi.set(__self__, "config", config)
-
-    @_builtins.property
-    @pulumi.getter(name="displayName")
-    def display_name(self) -> _builtins.str:
-        """
-        The display name of the policy pack.
-        """
-        return pulumi.get(self, "display_name")
+        if display_name is not None:
+            pulumi.set(__self__, "display_name", display_name)
+        if version is not None:
+            pulumi.set(__self__, "version", version)
+        if version_tag is not None:
+            pulumi.set(__self__, "version_tag", version_tag)
 
     @_builtins.property
     @pulumi.getter
@@ -1239,7 +1234,23 @@ class PolicyGroupPolicyPackReference(dict):
 
     @_builtins.property
     @pulumi.getter
-    def version(self) -> _builtins.float:
+    def config(self) -> Optional[Mapping[str, Any]]:
+        """
+        Optional configuration for the policy pack.
+        """
+        return pulumi.get(self, "config")
+
+    @_builtins.property
+    @pulumi.getter(name="displayName")
+    def display_name(self) -> Optional[_builtins.str]:
+        """
+        The display name of the policy pack.
+        """
+        return pulumi.get(self, "display_name")
+
+    @_builtins.property
+    @pulumi.getter
+    def version(self) -> Optional[_builtins.float]:
         """
         The version of the policy pack.
         """
@@ -1247,19 +1258,11 @@ class PolicyGroupPolicyPackReference(dict):
 
     @_builtins.property
     @pulumi.getter(name="versionTag")
-    def version_tag(self) -> _builtins.str:
+    def version_tag(self) -> Optional[_builtins.str]:
         """
         The version tag of the policy pack.
         """
         return pulumi.get(self, "version_tag")
-
-    @_builtins.property
-    @pulumi.getter
-    def config(self) -> Optional[Mapping[str, Any]]:
-        """
-        Optional configuration for the policy pack.
-        """
-        return pulumi.get(self, "config")
 
 
 @pulumi.output_type

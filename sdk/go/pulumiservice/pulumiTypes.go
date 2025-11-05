@@ -2991,13 +2991,13 @@ type PolicyGroupPolicyPackReference struct {
 	// Optional configuration for the policy pack.
 	Config map[string]interface{} `pulumi:"config"`
 	// The display name of the policy pack.
-	DisplayName string `pulumi:"displayName"`
+	DisplayName *string `pulumi:"displayName"`
 	// The name of the policy pack.
 	Name string `pulumi:"name"`
 	// The version of the policy pack.
-	Version float64 `pulumi:"version"`
+	Version *float64 `pulumi:"version"`
 	// The version tag of the policy pack.
-	VersionTag string `pulumi:"versionTag"`
+	VersionTag *string `pulumi:"versionTag"`
 }
 
 // PolicyGroupPolicyPackReferenceInput is an input type that accepts PolicyGroupPolicyPackReferenceArgs and PolicyGroupPolicyPackReferenceOutput values.
@@ -3016,13 +3016,13 @@ type PolicyGroupPolicyPackReferenceArgs struct {
 	// Optional configuration for the policy pack.
 	Config pulumi.MapInput `pulumi:"config"`
 	// The display name of the policy pack.
-	DisplayName pulumi.StringInput `pulumi:"displayName"`
+	DisplayName pulumi.StringPtrInput `pulumi:"displayName"`
 	// The name of the policy pack.
 	Name pulumi.StringInput `pulumi:"name"`
 	// The version of the policy pack.
-	Version pulumi.Float64Input `pulumi:"version"`
+	Version pulumi.Float64PtrInput `pulumi:"version"`
 	// The version tag of the policy pack.
-	VersionTag pulumi.StringInput `pulumi:"versionTag"`
+	VersionTag pulumi.StringPtrInput `pulumi:"versionTag"`
 }
 
 func (PolicyGroupPolicyPackReferenceArgs) ElementType() reflect.Type {
@@ -3083,8 +3083,8 @@ func (o PolicyGroupPolicyPackReferenceOutput) Config() pulumi.MapOutput {
 }
 
 // The display name of the policy pack.
-func (o PolicyGroupPolicyPackReferenceOutput) DisplayName() pulumi.StringOutput {
-	return o.ApplyT(func(v PolicyGroupPolicyPackReference) string { return v.DisplayName }).(pulumi.StringOutput)
+func (o PolicyGroupPolicyPackReferenceOutput) DisplayName() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PolicyGroupPolicyPackReference) *string { return v.DisplayName }).(pulumi.StringPtrOutput)
 }
 
 // The name of the policy pack.
@@ -3093,13 +3093,13 @@ func (o PolicyGroupPolicyPackReferenceOutput) Name() pulumi.StringOutput {
 }
 
 // The version of the policy pack.
-func (o PolicyGroupPolicyPackReferenceOutput) Version() pulumi.Float64Output {
-	return o.ApplyT(func(v PolicyGroupPolicyPackReference) float64 { return v.Version }).(pulumi.Float64Output)
+func (o PolicyGroupPolicyPackReferenceOutput) Version() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v PolicyGroupPolicyPackReference) *float64 { return v.Version }).(pulumi.Float64PtrOutput)
 }
 
 // The version tag of the policy pack.
-func (o PolicyGroupPolicyPackReferenceOutput) VersionTag() pulumi.StringOutput {
-	return o.ApplyT(func(v PolicyGroupPolicyPackReference) string { return v.VersionTag }).(pulumi.StringOutput)
+func (o PolicyGroupPolicyPackReferenceOutput) VersionTag() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PolicyGroupPolicyPackReference) *string { return v.VersionTag }).(pulumi.StringPtrOutput)
 }
 
 type PolicyGroupPolicyPackReferenceArrayOutput struct{ *pulumi.OutputState }

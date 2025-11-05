@@ -551,6 +551,56 @@
       },
       "type": "object"
     },
+    "pulumiservice:index:PolicyGroupPolicyPackReference": {
+      "description": "A reference to a policy pack within a policy group.",
+      "properties": {
+        "config": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "Optional configuration for the policy pack."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The display name of the policy pack."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the policy pack."
+        },
+        "version": {
+          "type": "number",
+          "description": "The version of the policy pack."
+        },
+        "versionTag": {
+          "type": "string",
+          "description": "The version tag of the policy pack."
+        }
+      },
+      "type": "object",
+      "required": [
+        "name"
+      ]
+    },
+    "pulumiservice:index:PolicyGroupStackReference": {
+      "description": "A reference to a stack within a policy group.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the stack."
+        },
+        "routingProject": {
+          "type": "string",
+          "description": "The routing project name (also known as project name)."
+        }
+      },
+      "type": "object",
+      "required": [
+        "name",
+        "routingProject"
+      ]
+    },
     "pulumiservice:index:PulumiOperation": {
       "type": "string",
       "enum": [
@@ -1614,20 +1664,14 @@
         "policyPacks": {
           "type": "array",
           "items": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
+            "$ref": "#/types/pulumiservice:index:PolicyGroupPolicyPackReference"
           },
           "description": "List of policy packs applied to this policy group."
         },
         "stacks": {
           "type": "array",
           "items": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
+            "$ref": "#/types/pulumiservice:index:PolicyGroupStackReference"
           },
           "description": "List of stack references that belong to this policy group."
         }
@@ -1665,20 +1709,14 @@
         "policyPacks": {
           "type": "array",
           "items": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
+            "$ref": "#/types/pulumiservice:index:PolicyGroupPolicyPackReference"
           },
           "description": "List of policy packs applied to this policy group."
         },
         "stacks": {
           "type": "array",
           "items": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
+            "$ref": "#/types/pulumiservice:index:PolicyGroupStackReference"
           },
           "description": "List of stack references that belong to this policy group."
         }

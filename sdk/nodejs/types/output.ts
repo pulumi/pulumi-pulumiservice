@@ -360,7 +360,7 @@ export interface PolicyGroupPolicyPackReference {
     /**
      * The display name of the policy pack.
      */
-    displayName: string;
+    displayName?: string;
     /**
      * The name of the policy pack.
      */
@@ -368,11 +368,11 @@ export interface PolicyGroupPolicyPackReference {
     /**
      * The version of the policy pack.
      */
-    version: number;
+    version?: number;
     /**
      * The version tag of the policy pack.
      */
-    versionTag: string;
+    versionTag?: string;
 }
 
 /**

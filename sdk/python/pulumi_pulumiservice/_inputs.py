@@ -1504,25 +1504,25 @@ if not MYPY:
         """
         A reference to a policy pack within a policy group.
         """
-        display_name: pulumi.Input[_builtins.str]
-        """
-        The display name of the policy pack.
-        """
         name: pulumi.Input[_builtins.str]
         """
         The name of the policy pack.
         """
-        version: pulumi.Input[_builtins.float]
-        """
-        The version of the policy pack.
-        """
-        version_tag: pulumi.Input[_builtins.str]
-        """
-        The version tag of the policy pack.
-        """
         config: NotRequired[pulumi.Input[Mapping[str, Any]]]
         """
         Optional configuration for the policy pack.
+        """
+        display_name: NotRequired[pulumi.Input[_builtins.str]]
+        """
+        The display name of the policy pack.
+        """
+        version: NotRequired[pulumi.Input[_builtins.float]]
+        """
+        The version of the policy pack.
+        """
+        version_tag: NotRequired[pulumi.Input[_builtins.str]]
+        """
+        The version tag of the policy pack.
         """
 elif False:
     PolicyGroupPolicyPackReferenceArgsDict: TypeAlias = Mapping[str, Any]
@@ -1530,37 +1530,28 @@ elif False:
 @pulumi.input_type
 class PolicyGroupPolicyPackReferenceArgs:
     def __init__(__self__, *,
-                 display_name: pulumi.Input[_builtins.str],
                  name: pulumi.Input[_builtins.str],
-                 version: pulumi.Input[_builtins.float],
-                 version_tag: pulumi.Input[_builtins.str],
-                 config: Optional[pulumi.Input[Mapping[str, Any]]] = None):
+                 config: Optional[pulumi.Input[Mapping[str, Any]]] = None,
+                 display_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 version: Optional[pulumi.Input[_builtins.float]] = None,
+                 version_tag: Optional[pulumi.Input[_builtins.str]] = None):
         """
         A reference to a policy pack within a policy group.
-        :param pulumi.Input[_builtins.str] display_name: The display name of the policy pack.
         :param pulumi.Input[_builtins.str] name: The name of the policy pack.
+        :param pulumi.Input[Mapping[str, Any]] config: Optional configuration for the policy pack.
+        :param pulumi.Input[_builtins.str] display_name: The display name of the policy pack.
         :param pulumi.Input[_builtins.float] version: The version of the policy pack.
         :param pulumi.Input[_builtins.str] version_tag: The version tag of the policy pack.
-        :param pulumi.Input[Mapping[str, Any]] config: Optional configuration for the policy pack.
         """
-        pulumi.set(__self__, "display_name", display_name)
         pulumi.set(__self__, "name", name)
-        pulumi.set(__self__, "version", version)
-        pulumi.set(__self__, "version_tag", version_tag)
         if config is not None:
             pulumi.set(__self__, "config", config)
-
-    @_builtins.property
-    @pulumi.getter(name="displayName")
-    def display_name(self) -> pulumi.Input[_builtins.str]:
-        """
-        The display name of the policy pack.
-        """
-        return pulumi.get(self, "display_name")
-
-    @display_name.setter
-    def display_name(self, value: pulumi.Input[_builtins.str]):
-        pulumi.set(self, "display_name", value)
+        if display_name is not None:
+            pulumi.set(__self__, "display_name", display_name)
+        if version is not None:
+            pulumi.set(__self__, "version", version)
+        if version_tag is not None:
+            pulumi.set(__self__, "version_tag", version_tag)
 
     @_builtins.property
     @pulumi.getter
@@ -1576,30 +1567,6 @@ class PolicyGroupPolicyPackReferenceArgs:
 
     @_builtins.property
     @pulumi.getter
-    def version(self) -> pulumi.Input[_builtins.float]:
-        """
-        The version of the policy pack.
-        """
-        return pulumi.get(self, "version")
-
-    @version.setter
-    def version(self, value: pulumi.Input[_builtins.float]):
-        pulumi.set(self, "version", value)
-
-    @_builtins.property
-    @pulumi.getter(name="versionTag")
-    def version_tag(self) -> pulumi.Input[_builtins.str]:
-        """
-        The version tag of the policy pack.
-        """
-        return pulumi.get(self, "version_tag")
-
-    @version_tag.setter
-    def version_tag(self, value: pulumi.Input[_builtins.str]):
-        pulumi.set(self, "version_tag", value)
-
-    @_builtins.property
-    @pulumi.getter
     def config(self) -> Optional[pulumi.Input[Mapping[str, Any]]]:
         """
         Optional configuration for the policy pack.
@@ -1609,6 +1576,42 @@ class PolicyGroupPolicyPackReferenceArgs:
     @config.setter
     def config(self, value: Optional[pulumi.Input[Mapping[str, Any]]]):
         pulumi.set(self, "config", value)
+
+    @_builtins.property
+    @pulumi.getter(name="displayName")
+    def display_name(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        The display name of the policy pack.
+        """
+        return pulumi.get(self, "display_name")
+
+    @display_name.setter
+    def display_name(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "display_name", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def version(self) -> Optional[pulumi.Input[_builtins.float]]:
+        """
+        The version of the policy pack.
+        """
+        return pulumi.get(self, "version")
+
+    @version.setter
+    def version(self, value: Optional[pulumi.Input[_builtins.float]]):
+        pulumi.set(self, "version", value)
+
+    @_builtins.property
+    @pulumi.getter(name="versionTag")
+    def version_tag(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        The version tag of the policy pack.
+        """
+        return pulumi.get(self, "version_tag")
+
+    @version_tag.setter
+    def version_tag(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "version_tag", value)
 
 
 if not MYPY:
