@@ -20,6 +20,11 @@ export type ApprovalRule = import("./approvalRule").ApprovalRule;
 export const ApprovalRule: typeof import("./approvalRule").ApprovalRule = null as any;
 utilities.lazyLoad(exports, ["ApprovalRule"], () => require("./approvalRule"));
 
+export { CreateTaskArgs, CreateTaskResult, CreateTaskOutputArgs } from "./createTask";
+export const createTask: typeof import("./createTask").createTask = null as any;
+export const createTaskOutput: typeof import("./createTask").createTaskOutput = null as any;
+utilities.lazyLoad(exports, ["createTask","createTaskOutput"], () => require("./createTask"));
+
 export { DeploymentScheduleArgs } from "./deploymentSchedule";
 export type DeploymentSchedule = import("./deploymentSchedule").DeploymentSchedule;
 export const DeploymentSchedule: typeof import("./deploymentSchedule").DeploymentSchedule = null as any;

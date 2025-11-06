@@ -349,6 +349,17 @@ export interface OperationContextOptions {
     skipIntermediateDeployments?: boolean;
 }
 
+export interface TaskEntity {
+    /**
+     * The entity ID.
+     */
+    id: string;
+    /**
+     * The type of entity.
+     */
+    type: string;
+}
+
 export interface TemplateSourceDestination {
     /**
      * Destination URL that gets filled in on new project creation.

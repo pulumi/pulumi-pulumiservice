@@ -1,0 +1,18 @@
+name: yaml-tasks
+runtime: yaml
+description: A minimal example of creating a Neo task via Pulumi YAML
+
+config:
+  organizationName:
+    type: string
+
+variables:
+  task:
+    fn::invoke:
+      function: pulumiservice:index:createTask
+      arguments:
+        content: "Hello Neo!"
+        organizationName: ${organizationName}
+
+outputs:
+  taskId: ${task.id}

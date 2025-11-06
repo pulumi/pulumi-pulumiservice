@@ -10,6 +10,7 @@ from ._enums import *
 from .access_token import *
 from .agent_pool import *
 from .approval_rule import *
+from .create_task import *
 from .deployment_schedule import *
 from .deployment_settings import *
 from .drift_schedule import *

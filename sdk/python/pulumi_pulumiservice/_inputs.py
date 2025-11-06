@@ -52,6 +52,8 @@ __all__ = [
     'OperationContextOIDCArgsDict',
     'OperationContextOptionsArgs',
     'OperationContextOptionsArgsDict',
+    'TaskEntity',
+    'TaskEntityDict',
     'TemplateSourceDestinationArgs',
     'TemplateSourceDestinationArgsDict',
 ]
@@ -1493,6 +1495,56 @@ class OperationContextOptionsArgs:
     @skip_intermediate_deployments.setter
     def skip_intermediate_deployments(self, value: Optional[pulumi.Input[_builtins.bool]]):
         pulumi.set(self, "skip_intermediate_deployments", value)
+
+
+if not MYPY:
+    class TaskEntityDict(TypedDict):
+        id: _builtins.str
+        """
+        The entity ID.
+        """
+        type: _builtins.str
+        """
+        The type of entity.
+        """
+elif False:
+    TaskEntityDict: TypeAlias = Mapping[str, Any]
+
+@pulumi.input_type
+class TaskEntity:
+    def __init__(__self__, *,
+                 id: _builtins.str,
+                 type: _builtins.str):
+        """
+        :param _builtins.str id: The entity ID.
+        :param _builtins.str type: The type of entity.
+        """
+        pulumi.set(__self__, "id", id)
+        pulumi.set(__self__, "type", type)
+
+    @_builtins.property
+    @pulumi.getter
+    def id(self) -> _builtins.str:
+        """
+        The entity ID.
+        """
+        return pulumi.get(self, "id")
+
+    @id.setter
+    def id(self, value: _builtins.str):
+        pulumi.set(self, "id", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def type(self) -> _builtins.str:
+        """
+        The type of entity.
+        """
+        return pulumi.get(self, "type")
+
+    @type.setter
+    def type(self, value: _builtins.str):
+        pulumi.set(self, "type", value)
 
 
 if not MYPY:
