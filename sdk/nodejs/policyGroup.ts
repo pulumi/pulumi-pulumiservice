@@ -40,11 +40,11 @@ export class PolicyGroup extends pulumi.CustomResource {
     /**
      * The entity type for the policy group. Valid values are 'stacks' or 'accounts'. Defaults to 'stacks'.
      */
-    declare public readonly entityType: pulumi.Output<string | undefined>;
+    declare public readonly entityType: pulumi.Output<string>;
     /**
      * The mode for the policy group. Valid values are 'audit' (reports violations) or 'preventative' (blocks operations). Defaults to 'audit'.
      */
-    declare public readonly mode: pulumi.Output<string | undefined>;
+    declare public readonly mode: pulumi.Output<string>;
     /**
      * The name of the policy group.
      */
@@ -56,11 +56,11 @@ export class PolicyGroup extends pulumi.CustomResource {
     /**
      * List of policy packs applied to this policy group.
      */
-    declare public readonly policyPacks: pulumi.Output<outputs.PolicyGroupPolicyPackReference[]>;
+    declare public readonly policyPacks: pulumi.Output<outputs.PolicyGroupPolicyPackReference[] | undefined>;
     /**
      * List of stack references that belong to this policy group.
      */
-    declare public readonly stacks: pulumi.Output<outputs.PolicyGroupStackReference[]>;
+    declare public readonly stacks: pulumi.Output<outputs.PolicyGroupStackReference[] | undefined>;
 
     /**
      * Create a PolicyGroup resource with the given unique name, arguments, and options.

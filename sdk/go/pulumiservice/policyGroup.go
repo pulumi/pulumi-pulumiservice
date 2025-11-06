@@ -17,9 +17,9 @@ type PolicyGroup struct {
 	pulumi.CustomResourceState
 
 	// The entity type for the policy group. Valid values are 'stacks' or 'accounts'. Defaults to 'stacks'.
-	EntityType pulumi.StringPtrOutput `pulumi:"entityType"`
+	EntityType pulumi.StringOutput `pulumi:"entityType"`
 	// The mode for the policy group. Valid values are 'audit' (reports violations) or 'preventative' (blocks operations). Defaults to 'audit'.
-	Mode pulumi.StringPtrOutput `pulumi:"mode"`
+	Mode pulumi.StringOutput `pulumi:"mode"`
 	// The name of the policy group.
 	Name pulumi.StringOutput `pulumi:"name"`
 	// The name of the Pulumi organization the policy group belongs to.
@@ -200,13 +200,13 @@ func (o PolicyGroupOutput) ToPolicyGroupOutputWithContext(ctx context.Context) P
 }
 
 // The entity type for the policy group. Valid values are 'stacks' or 'accounts'. Defaults to 'stacks'.
-func (o PolicyGroupOutput) EntityType() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *PolicyGroup) pulumi.StringPtrOutput { return v.EntityType }).(pulumi.StringPtrOutput)
+func (o PolicyGroupOutput) EntityType() pulumi.StringOutput {
+	return o.ApplyT(func(v *PolicyGroup) pulumi.StringOutput { return v.EntityType }).(pulumi.StringOutput)
 }
 
 // The mode for the policy group. Valid values are 'audit' (reports violations) or 'preventative' (blocks operations). Defaults to 'audit'.
-func (o PolicyGroupOutput) Mode() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *PolicyGroup) pulumi.StringPtrOutput { return v.Mode }).(pulumi.StringPtrOutput)
+func (o PolicyGroupOutput) Mode() pulumi.StringOutput {
+	return o.ApplyT(func(v *PolicyGroup) pulumi.StringOutput { return v.Mode }).(pulumi.StringOutput)
 }
 
 // The name of the policy group.

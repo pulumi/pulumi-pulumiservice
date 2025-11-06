@@ -19,13 +19,13 @@ namespace Pulumi.PulumiService
         /// The entity type for the policy group. Valid values are 'stacks' or 'accounts'. Defaults to 'stacks'.
         /// </summary>
         [Output("entityType")]
-        public Output<string?> EntityType { get; private set; } = null!;
+        public Output<string> EntityType { get; private set; } = null!;
 
         /// <summary>
         /// The mode for the policy group. Valid values are 'audit' (reports violations) or 'preventative' (blocks operations). Defaults to 'audit'.
         /// </summary>
         [Output("mode")]
-        public Output<string?> Mode { get; private set; } = null!;
+        public Output<string> Mode { get; private set; } = null!;
 
         /// <summary>
         /// The name of the policy group.
