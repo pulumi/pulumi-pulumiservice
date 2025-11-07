@@ -44,7 +44,6 @@ resources:
           routingProject: ${pulumi.project}
       policyPacks:
         - name: hitrust-aws
-          displayName: test-display-name-hitrust-aws
           config:
             approvedAmiIds:
               - ami-0abcdef1234567890
