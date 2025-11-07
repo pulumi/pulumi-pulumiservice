@@ -441,3 +441,72 @@ func TestPolicyGroup_ToPulumiServicePolicyGroupInput_MissingFields(t *testing.T)
 	assert.Equal(t, "", result.EntityType)
 	assert.Equal(t, "", result.Mode)
 }
+
+// TestPolicyGroup_ToPulumiServicePolicyGroupInput_OptionalPolicyPackFields tests that optional policy pack fields are handled
+func TestPolicyGroup_ToPulumiServicePolicyGroupInput_OptionalPolicyPackFields(t *testing.T) {
+	// Test with only required name field
+	inputMap := resource.PropertyMap{
+		"name":             resource.NewStringProperty("test-policy-group"),
+		"organizationName": resource.NewStringProperty("test-org"),
+		"entityType":       resource.NewStringProperty("stacks"),
+		"mode":             resource.NewStringProperty("audit"),
+		"stacks":           resource.NewArrayProperty([]resource.PropertyValue{}),
+		"policyPacks": resource.NewArrayProperty([]resource.PropertyValue{
+			resource.NewObjectProperty(resource.PropertyMap{
+				"name": resource.NewStringProperty("test-policy-pack"),
+			}),
+		}),
+	}
+
+	result := ToPulumiServicePolicyGroupInput(inputMap)
+
+	assert.Equal(t, "test-policy-group", result.Name)
+	assert.Equal(t, "test-org", result.OrganizationName)
+	assert.Equal(t, "stacks", result.EntityType)
+	assert.Equal(t, "audit", result.Mode)
+	assert.Empty(t, result.Stacks)
+	assert.Len(t, result.PolicyPacks, 1)
+	
+	// Verify only name is set, others are empty/zero values
+	pp := result.PolicyPacks[0]
+	assert.Equal(t, "test-policy-pack", pp.Name)
+	assert.Equal(t, "", pp.DisplayName)
+	assert.Equal(t, 0, pp.Version)
+	assert.Equal(t, "", pp.VersionTag)
+	assert.Nil(t, pp.Config)
+}
+
+// TestPolicyGroup_ToPulumiServicePolicyGroupInput_PartialPolicyPackFields tests mixed optional fields
+func TestPolicyGroup_ToPulumiServicePolicyGroupInput_PartialPolicyPackFields(t *testing.T) {
+	// Test with some optional fields provided
+	inputMap := resource.PropertyMap{
+		"name":             resource.NewStringProperty("test-policy-group"),
+		"organizationName": resource.NewStringProperty("test-org"),
+		"entityType":       resource.NewStringProperty("stacks"),
+		"mode":             resource.NewStringProperty("audit"),
+		"stacks":           resource.NewArrayProperty([]resource.PropertyValue{}),
+		"policyPacks": resource.NewArrayProperty([]resource.PropertyValue{
+			resource.NewObjectProperty(resource.PropertyMap{
+				"name":        resource.NewStringProperty("test-policy-pack"),
+				"displayName": resource.NewStringProperty("Test Policy Pack"),
+				// Note: version and versionTag are intentionally omitted
+				"config": resource.NewObjectProperty(resource.PropertyMap{
+					"enabled": resource.NewBoolProperty(true),
+				}),
+			}),
+		}),
+	}
+
+	result := ToPulumiServicePolicyGroupInput(inputMap)
+
+	assert.Len(t, result.PolicyPacks, 1)
+	
+	// Verify partial fields are set correctly
+	pp := result.PolicyPacks[0]
+	assert.Equal(t, "test-policy-pack", pp.Name)
+	assert.Equal(t, "Test Policy Pack", pp.DisplayName)
+	assert.Equal(t, 0, pp.Version)           // Should be zero value when not provided
+	assert.Equal(t, "", pp.VersionTag)       // Should be empty string when not provided
+	assert.NotNil(t, pp.Config)
+	assert.Equal(t, true, pp.Config["enabled"])
+}

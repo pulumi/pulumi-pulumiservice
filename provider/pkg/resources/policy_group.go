@@ -134,10 +134,22 @@ func ToPulumiServicePolicyGroupInput(inputMap resource.PropertyMap) PulumiServic
 			if ppValue.IsObject() {
 				ppObj := ppValue.ObjectValue()
 				pp := pulumiapi.PolicyPackMetadata{
-					Name:        ppObj["name"].StringValue(),
-					DisplayName: ppObj["displayName"].StringValue(),
-					Version:     int(ppObj["version"].NumberValue()),
-					VersionTag:  ppObj["versionTag"].StringValue(),
+					Name: ppObj["name"].StringValue(),
+				}
+				
+				// DisplayName is optional
+				if ppObj["displayName"].HasValue() && ppObj["displayName"].IsString() {
+					pp.DisplayName = ppObj["displayName"].StringValue()
+				}
+				
+				// Version is optional
+				if ppObj["version"].HasValue() && ppObj["version"].IsNumber() {
+					pp.Version = int(ppObj["version"].NumberValue())
+				}
+				
+				// VersionTag is optional
+				if ppObj["versionTag"].HasValue() && ppObj["versionTag"].IsString() {
+					pp.VersionTag = ppObj["versionTag"].StringValue()
 				}
 				if ppObj["config"].HasValue() && ppObj["config"].IsObject() {
 					pp.Config = convertPropertyMapToMap(ppObj["config"].ObjectValue())
