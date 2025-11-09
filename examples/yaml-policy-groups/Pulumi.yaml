@@ -45,7 +45,7 @@ resources:
       policyPacks:
         - name: hitrust-aws
           config:
-            aws-ec2-ami-approved:
+            hardened-os-image:
               approvedAmiIds:
                 - ami-0abcdef1234567890
 
