@@ -44,6 +44,9 @@ resources:
           routingProject: ${pulumi.project}
       policyPacks:
         - name: hitrust-aws
+          displayName: ""
+          version: 1
+          versionTag: 2.4.1
           config:
             hardened-os-image:
               approvedAmiIds:

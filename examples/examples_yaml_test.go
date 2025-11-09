@@ -418,7 +418,6 @@ func TestYamlPolicyGroupsExample(t *testing.T) {
 			"digits":           digits,
 			"organizationName": os.Getenv("PULUMI_TEST_OWNER"),
 		},
-		SkipStackRemoval: true,
 	})
 }
 
