@@ -25,6 +25,7 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/util/rpcutil/rpcerror"
@@ -45,48 +46,93 @@ type PulumiServicePolicyGroupInput struct {
 }
 
 func (i *PulumiServicePolicyGroupInput) ToPropertyMap() resource.PropertyMap {
-	pm := resource.PropertyMap{}
-	pm["name"] = resource.NewPropertyValue(i.Name)
-	pm["organizationName"] = resource.NewPropertyValue(i.OrganizationName)
-	pm["entityType"] = resource.NewPropertyValue(i.EntityType)
-	pm["mode"] = resource.NewPropertyValue(i.Mode)
-
-	// Convert stacks
-	stackValues := []resource.PropertyValue{}
-	for _, stack := range i.Stacks {
-		stackMap := resource.PropertyMap{
-			"name":           resource.NewPropertyValue(stack.Name),
-			"routingProject": resource.NewPropertyValue(stack.RoutingProject),
-		}
-		stackValues = append(stackValues, resource.NewObjectProperty(stackMap))
+	// Convert the entire struct to a map first, then use helper
+	inputMap := map[string]interface{}{
+		"name":             i.Name,
+		"organizationName": i.OrganizationName,
+		"entityType":       i.EntityType,
+		"mode":             i.Mode,
+		"stacks":           convertStacksToInterfaceArray(i.Stacks),
+		"policyPacks":      convertPolicyPacksToInterfaceArray(i.PolicyPacks),
 	}
-	pm["stacks"] = resource.NewArrayProperty(stackValues)
-
-	// Convert policy packs
-	policyPackValues := []resource.PropertyValue{}
-	for _, pp := range i.PolicyPacks {
-		ppMap := resource.PropertyMap{
-			"name":        resource.NewPropertyValue(pp.Name),
-			"displayName": resource.NewPropertyValue(pp.DisplayName),
-			"version":     resource.NewPropertyValue(float64(pp.Version)),
-			"versionTag":  resource.NewPropertyValue(pp.VersionTag),
-		}
-		if pp.Config != nil {
-			ppMap["config"] = resource.NewObjectProperty(convertMapToPropertyMap(pp.Config))
-		}
-		policyPackValues = append(policyPackValues, resource.NewObjectProperty(ppMap))
-	}
-	pm["policyPacks"] = resource.NewArrayProperty(policyPackValues)
-
-	return pm
+	
+	return util.ConvertMapToPropertyMap(inputMap)
 }
 
-func convertMapToPropertyMap(m map[string]interface{}) resource.PropertyMap {
-	pm := resource.PropertyMap{}
-	for k, v := range m {
-		pm[resource.PropertyKey(k)] = resource.NewPropertyValue(v)
+
+// convertStacksToInterfaceArray converts []pulumiapi.StackReference to []interface{}
+func convertStacksToInterfaceArray(stacks []pulumiapi.StackReference) []interface{} {
+	result := make([]interface{}, len(stacks))
+	for i, stack := range stacks {
+		result[i] = map[string]interface{}{
+			"name":           stack.Name,
+			"routingProject": stack.RoutingProject,
+		}
 	}
-	return pm
+	return result
+}
+
+// convertPolicyPacksToInterfaceArray converts []pulumiapi.PolicyPackMetadata to []interface{}
+func convertPolicyPacksToInterfaceArray(policyPacks []pulumiapi.PolicyPackMetadata) []interface{} {
+	result := make([]interface{}, len(policyPacks))
+	for i, pp := range policyPacks {
+		ppMap := map[string]interface{}{
+			"name":        pp.Name,
+			"displayName": pp.DisplayName,
+			"version":     float64(pp.Version),
+			"versionTag":  pp.VersionTag,
+		}
+		if pp.Config != nil {
+			ppMap["config"] = pp.Config
+		}
+		result[i] = ppMap
+	}
+	return result
+}
+
+// convertInterfaceArrayToStacks converts []interface{} to []pulumiapi.StackReference using helpers
+func convertInterfaceArrayToStacks(arr []interface{}) []pulumiapi.StackReference {
+	result := make([]pulumiapi.StackReference, 0, len(arr))
+	for _, item := range arr {
+		if stackMap, ok := item.(map[string]interface{}); ok {
+			stack := pulumiapi.StackReference{}
+			if name, ok := stackMap["name"].(string); ok {
+				stack.Name = name
+			}
+			if routingProject, ok := stackMap["routingProject"].(string); ok {
+				stack.RoutingProject = routingProject
+			}
+			result = append(result, stack)
+		}
+	}
+	return result
+}
+
+// convertInterfaceArrayToPolicyPacks converts []interface{} to []pulumiapi.PolicyPackMetadata using helpers
+func convertInterfaceArrayToPolicyPacks(arr []interface{}) []pulumiapi.PolicyPackMetadata {
+	result := make([]pulumiapi.PolicyPackMetadata, 0, len(arr))
+	for _, item := range arr {
+		if ppMap, ok := item.(map[string]interface{}); ok {
+			pp := pulumiapi.PolicyPackMetadata{}
+			if name, ok := ppMap["name"].(string); ok {
+				pp.Name = name
+			}
+			if displayName, ok := ppMap["displayName"].(string); ok {
+				pp.DisplayName = displayName
+			}
+			if version, ok := ppMap["version"].(float64); ok {
+				pp.Version = int(version)
+			}
+			if versionTag, ok := ppMap["versionTag"].(string); ok {
+				pp.VersionTag = versionTag
+			}
+			if config, ok := ppMap["config"].(map[string]interface{}); ok {
+				pp.Config = config
+			}
+			result = append(result, pp)
+		}
+	}
+	return result
 }
 
 func (i *PulumiServicePolicyGroupInput) ToRpc() (*structpb.Struct, error) {
@@ -96,79 +142,40 @@ func (i *PulumiServicePolicyGroupInput) ToRpc() (*structpb.Struct, error) {
 }
 
 func ToPulumiServicePolicyGroupInput(inputMap resource.PropertyMap) PulumiServicePolicyGroupInput {
+	// Convert PropertyMap to regular map using helper, then extract fields
+	interfaceMap := util.ConvertPropertyMapToMap(inputMap)
+	
 	input := PulumiServicePolicyGroupInput{}
 
-	if inputMap["name"].HasValue() && inputMap["name"].IsString() {
-		input.Name = inputMap["name"].StringValue()
+	if name, ok := interfaceMap["name"].(string); ok {
+		input.Name = name
 	}
 
-	if inputMap["organizationName"].HasValue() && inputMap["organizationName"].IsString() {
-		input.OrganizationName = inputMap["organizationName"].StringValue()
+	if organizationName, ok := interfaceMap["organizationName"].(string); ok {
+		input.OrganizationName = organizationName
 	}
 
-	if inputMap["entityType"].HasValue() && inputMap["entityType"].IsString() {
-		input.EntityType = inputMap["entityType"].StringValue()
+	if entityType, ok := interfaceMap["entityType"].(string); ok {
+		input.EntityType = entityType
 	}
 
-	if inputMap["mode"].HasValue() && inputMap["mode"].IsString() {
-		input.Mode = inputMap["mode"].StringValue()
+	if mode, ok := interfaceMap["mode"].(string); ok {
+		input.Mode = mode
 	}
 
-	// Parse stacks
-	if inputMap["stacks"].HasValue() && inputMap["stacks"].IsArray() {
-		for _, stackValue := range inputMap["stacks"].ArrayValue() {
-			if stackValue.IsObject() {
-				stackObj := stackValue.ObjectValue()
-				stack := pulumiapi.StackReference{
-					Name:           stackObj["name"].StringValue(),
-					RoutingProject: stackObj["routingProject"].StringValue(),
-				}
-				input.Stacks = append(input.Stacks, stack)
-			}
-		}
+	// Parse stacks using helper
+	if stacksInterface, ok := interfaceMap["stacks"].([]interface{}); ok {
+		input.Stacks = convertInterfaceArrayToStacks(stacksInterface)
 	}
 
-	// Parse policy packs
-	if inputMap["policyPacks"].HasValue() && inputMap["policyPacks"].IsArray() {
-		for _, ppValue := range inputMap["policyPacks"].ArrayValue() {
-			if ppValue.IsObject() {
-				ppObj := ppValue.ObjectValue()
-				pp := pulumiapi.PolicyPackMetadata{
-					Name: ppObj["name"].StringValue(),
-				}
-				
-				// DisplayName is optional
-				if ppObj["displayName"].HasValue() && ppObj["displayName"].IsString() {
-					pp.DisplayName = ppObj["displayName"].StringValue()
-				}
-				
-				// Version is optional
-				if ppObj["version"].HasValue() && ppObj["version"].IsNumber() {
-					pp.Version = int(ppObj["version"].NumberValue())
-				}
-				
-				// VersionTag is optional
-				if ppObj["versionTag"].HasValue() && ppObj["versionTag"].IsString() {
-					pp.VersionTag = ppObj["versionTag"].StringValue()
-				}
-				if ppObj["config"].HasValue() && ppObj["config"].IsObject() {
-					pp.Config = convertPropertyMapToMap(ppObj["config"].ObjectValue())
-				}
-				input.PolicyPacks = append(input.PolicyPacks, pp)
-			}
-		}
+	// Parse policy packs using helper
+	if policyPacksInterface, ok := interfaceMap["policyPacks"].([]interface{}); ok {
+		input.PolicyPacks = convertInterfaceArrayToPolicyPacks(policyPacksInterface)
 	}
 
 	return input
 }
 
-func convertPropertyMapToMap(pm resource.PropertyMap) map[string]interface{} {
-	m := make(map[string]interface{})
-	for k, v := range pm {
-		m[string(k)] = v.V
-	}
-	return m
-}
 
 func (p *PulumiServicePolicyGroupResource) Name() string {
 	return "pulumiservice:index:PolicyGroup"
@@ -309,16 +316,19 @@ func (p *PulumiServicePolicyGroupResource) Read(req *pulumirpc.ReadRequest) (*pu
 		return &pulumirpc.ReadResponse{}, nil
 	}
 
-	inputs := PulumiServicePolicyGroupInput{
-		Name:             policyGroup.Name,
-		OrganizationName: orgName,
-		EntityType:       policyGroup.EntityType,
-		Mode:             policyGroup.Mode,
-		Stacks:           policyGroup.Stacks,
-		PolicyPacks:      policyGroup.AppliedPolicyPacks,
+	// Convert API response directly to PropertyMap using consistent helpers
+	inputMap := map[string]interface{}{
+		"name":             policyGroup.Name,
+		"organizationName": orgName,
+		"entityType":       policyGroup.EntityType,
+		"mode":             policyGroup.Mode,
+		"stacks":           convertStacksToInterfaceArray(policyGroup.Stacks),
+		"policyPacks":      convertPolicyPacksToInterfaceArray(policyGroup.AppliedPolicyPacks),
 	}
 
-	props, err := plugin.MarshalProperties(inputs.ToPropertyMap(), plugin.MarshalOptions{})
+	propertyMap := util.ConvertMapToPropertyMap(inputMap)
+
+	props, err := plugin.MarshalProperties(propertyMap, plugin.MarshalOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal inputs to properties: %w", err)
 	}
@@ -462,6 +472,8 @@ func (p *PulumiServicePolicyGroupResource) Create(req *pulumirpc.CreateRequest) 
 		OrganizationName: inputsPolicyGroup.OrganizationName,
 		Stacks:           policyGroup.Stacks,
 		PolicyPacks:      policyGroup.AppliedPolicyPacks,
+		EntityType:       policyGroup.EntityType,
+		Mode:             policyGroup.Mode,
 	}
 
 	outputProperties, err := outputs.ToRpc()
