@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"net/http"
 	"path"
+	"slices"
 	"strconv"
 )
 
@@ -82,6 +83,18 @@ func (c *Client) ListPolicyPacks(ctx context.Context, orgName string) ([]PolicyP
 	if err != nil {
 		return nil, fmt.Errorf("failed to list policy packs for %q: %w", orgName, err)
 	}
+
+	// Sort policy packs by name for consistent ordering
+	slices.SortFunc(response.PolicyPacks, func(a, b PolicyPackWithVersions) int {
+		if a.Name < b.Name {
+			return -1
+		}
+		if a.Name > b.Name {
+			return 1
+		}
+		return 0
+	})
+
 	return response.PolicyPacks, nil
 }
 

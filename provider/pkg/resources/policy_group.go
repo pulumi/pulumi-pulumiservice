@@ -55,10 +55,9 @@ func (i *PulumiServicePolicyGroupInput) ToPropertyMap() resource.PropertyMap {
 		"stacks":           convertStacksToInterfaceArray(i.Stacks),
 		"policyPacks":      convertPolicyPacksToInterfaceArray(i.PolicyPacks),
 	}
-	
+
 	return util.ConvertMapToPropertyMap(inputMap)
 }
-
 
 // convertStacksToInterfaceArray converts []pulumiapi.StackReference to []interface{}
 func convertStacksToInterfaceArray(stacks []pulumiapi.StackReference) []interface{} {
@@ -144,7 +143,7 @@ func (i *PulumiServicePolicyGroupInput) ToRpc() (*structpb.Struct, error) {
 func ToPulumiServicePolicyGroupInput(inputMap resource.PropertyMap) PulumiServicePolicyGroupInput {
 	// Convert PropertyMap to regular map using helper, then extract fields
 	interfaceMap := util.ConvertPropertyMapToMap(inputMap)
-	
+
 	input := PulumiServicePolicyGroupInput{}
 
 	if name, ok := interfaceMap["name"].(string); ok {
@@ -175,7 +174,6 @@ func ToPulumiServicePolicyGroupInput(inputMap resource.PropertyMap) PulumiServic
 
 	return input
 }
-
 
 func (p *PulumiServicePolicyGroupResource) Name() string {
 	return "pulumiservice:index:PolicyGroup"

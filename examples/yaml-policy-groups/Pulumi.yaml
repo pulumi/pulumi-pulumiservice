@@ -51,7 +51,3 @@ resources:
 outputs:
   # Export the policy group name and the list of available policy packs
   policyGroupName: ${testPolicyGroup.name}
-
-  # List of all policy packs in the organization
-  # Each pack includes: name, displayName, versions[], versionTags[]
-  availablePolicyPacks: ${policyPacks}
