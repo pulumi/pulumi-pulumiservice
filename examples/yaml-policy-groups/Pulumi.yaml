@@ -45,8 +45,9 @@ resources:
       policyPacks:
         - name: hitrust-aws
           config:
-            approvedAmiIds:
-              - ami-0abcdef1234567890
+            aws-ec2-ami-approved:
+              approvedAmiIds:
+                - ami-0abcdef1234567890
 
 outputs:
   # Export the policy group name and the list of available policy packs
