@@ -510,3 +510,60 @@ func TestPolicyGroup_ToPulumiServicePolicyGroupInput_PartialPolicyPackFields(t *
 	assert.NotNil(t, pp.Config)
 	assert.Equal(t, true, pp.Config["enabled"])
 }
+
+// Test the refactored PolicyGroup serialization with complex policy pack configs
+func TestPolicyGroupSerializationConsistency(t *testing.T) {
+	// Create a policy group input with complex config
+	input := PulumiServicePolicyGroupInput{
+		Name:             "test-group",
+		OrganizationName: "test-org",
+		EntityType:       "stacks",
+		Mode:             "audit",
+		Stacks: []pulumiapi.StackReference{
+			{Name: "stack1", RoutingProject: "project1"},
+			{Name: "stack2", RoutingProject: "project2"},
+		},
+		PolicyPacks: []pulumiapi.PolicyPackMetadata{
+			{
+				Name:        "aws-compliance",
+				DisplayName: "AWS Compliance Pack",
+				Version:     1,
+				VersionTag:  "v1.0.0",
+				Config: map[string]interface{}{
+					"approvedAmiIds": []interface{}{"ami-123", "ami-456"},
+					"maxInstances":   float64(10),
+					"nestedConfig": map[string]interface{}{
+						"regions": []interface{}{"us-east-1", "us-west-2"},
+						"enabled": true,
+					},
+				},
+			},
+		},
+	}
+
+	// Convert to PropertyMap using refactored method
+	propertyMap := input.ToPropertyMap()
+
+	// Convert back using refactored method
+	roundtripInput := ToPulumiServicePolicyGroupInput(propertyMap)
+
+	// Verify all fields are preserved correctly
+	assert.Equal(t, input.Name, roundtripInput.Name)
+	assert.Equal(t, input.OrganizationName, roundtripInput.OrganizationName)
+	assert.Equal(t, input.EntityType, roundtripInput.EntityType)
+	assert.Equal(t, input.Mode, roundtripInput.Mode)
+	assert.Equal(t, input.Stacks, roundtripInput.Stacks)
+	
+	// Verify policy pack details including complex config
+	assert.Len(t, roundtripInput.PolicyPacks, 1)
+	pp := roundtripInput.PolicyPacks[0]
+	assert.Equal(t, input.PolicyPacks[0].Name, pp.Name)
+	assert.Equal(t, input.PolicyPacks[0].DisplayName, pp.DisplayName)
+	assert.Equal(t, input.PolicyPacks[0].Version, pp.Version)
+	assert.Equal(t, input.PolicyPacks[0].VersionTag, pp.VersionTag)
+	
+	// Verify complex config is preserved
+	originalConfig := input.PolicyPacks[0].Config
+	roundtripConfig := pp.Config
+	assert.Equal(t, originalConfig, roundtripConfig)
+}
