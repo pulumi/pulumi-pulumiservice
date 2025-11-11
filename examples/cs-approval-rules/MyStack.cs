@@ -49,9 +49,6 @@ class MyStack : Pulumi.Stack
                         new EligibleApproverArgs {
                             User = "pulumi-bot"
                         },
-                        new EligibleApproverArgs {
-                            User = "IaroslavTitov"
-                        }
                     }
                 }
             }

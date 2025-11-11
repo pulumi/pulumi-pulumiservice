@@ -8,7 +8,6 @@ import (
 )
 
 func TestToPropertyMap(t *testing.T) {
-	// Test struct for property map conversion
 	type A struct {
 		IntField      int      `pulumi:"int_field"`
 		FloatField    float64  `pulumi:"float_field"`

@@ -45,9 +45,6 @@ func main() {
 					&pulumiservice.EligibleApproverArgs{
 						User: pulumi.String("pulumi-bot"),
 					},
-					&pulumiservice.EligibleApproverArgs{
-						User: pulumi.String("IaroslavTitov"),
-					},
 				},
 			},
 		})

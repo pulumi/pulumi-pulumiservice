@@ -37,9 +37,6 @@ var approvalRule = new service.ApprovalRule("rule-test", {
       {
         user: "pulumi-bot",
       },
-      {
-        user: "IaroslavTitov",
-      },
     ]
   }
 })
