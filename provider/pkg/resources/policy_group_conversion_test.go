@@ -18,192 +18,11 @@ import (
 	"testing"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestConvertMapToPropertyMap(t *testing.T) {
-	tests := []struct {
-		name           string
-		input          map[string]interface{}
-		expectedOutput resource.PropertyMap
-	}{
-		{
-			name: "Simple string values",
-			input: map[string]interface{}{
-				"key1": "value1",
-				"key2": "value2",
-			},
-			expectedOutput: resource.PropertyMap{
-				"key1": resource.NewPropertyValue("value1"),
-				"key2": resource.NewPropertyValue("value2"),
-			},
-		},
-		{
-			name: "Array of strings (the main fix)",
-			input: map[string]interface{}{
-				"approvedAmiIds": []interface{}{"ami-0abcdef1234567890", "ami-1234567890abcdef"},
-				"regions":        []interface{}{"us-east-1", "us-west-2"},
-			},
-			expectedOutput: resource.PropertyMap{
-				"approvedAmiIds": resource.NewArrayProperty([]resource.PropertyValue{
-					resource.NewPropertyValue("ami-0abcdef1234567890"),
-					resource.NewPropertyValue("ami-1234567890abcdef"),
-				}),
-				"regions": resource.NewArrayProperty([]resource.PropertyValue{
-					resource.NewPropertyValue("us-east-1"),
-					resource.NewPropertyValue("us-west-2"),
-				}),
-			},
-		},
-		{
-			name: "Nested object",
-			input: map[string]interface{}{
-				"nestedObj": map[string]interface{}{
-					"innerKey": "innerValue",
-					"innerNum": float64(42),
-				},
-			},
-			expectedOutput: resource.PropertyMap{
-				"nestedObj": resource.NewObjectProperty(resource.PropertyMap{
-					"innerKey": resource.NewPropertyValue("innerValue"),
-					"innerNum": resource.NewPropertyValue(float64(42)),
-				}),
-			},
-		},
-		{
-			name: "Complex nested structure with arrays",
-			input: map[string]interface{}{
-				"config": map[string]interface{}{
-					"approvedAmiIds": []interface{}{"ami-123", "ami-456"},
-					"settings": map[string]interface{}{
-						"enabled": true,
-						"count":   float64(5),
-					},
-				},
-			},
-			expectedOutput: resource.PropertyMap{
-				"config": resource.NewObjectProperty(resource.PropertyMap{
-					"approvedAmiIds": resource.NewArrayProperty([]resource.PropertyValue{
-						resource.NewPropertyValue("ami-123"),
-						resource.NewPropertyValue("ami-456"),
-					}),
-					"settings": resource.NewObjectProperty(resource.PropertyMap{
-						"enabled": resource.NewPropertyValue(true),
-						"count":   resource.NewPropertyValue(float64(5)),
-					}),
-				}),
-			},
-		},
-		{
-			name: "Array of objects",
-			input: map[string]interface{}{
-				"items": []interface{}{
-					map[string]interface{}{"name": "item1", "value": float64(10)},
-					map[string]interface{}{"name": "item2", "value": float64(20)},
-				},
-			},
-			expectedOutput: resource.PropertyMap{
-				"items": resource.NewArrayProperty([]resource.PropertyValue{
-					resource.NewObjectProperty(resource.PropertyMap{
-						"name":  resource.NewPropertyValue("item1"),
-						"value": resource.NewPropertyValue(float64(10)),
-					}),
-					resource.NewObjectProperty(resource.PropertyMap{
-						"name":  resource.NewPropertyValue("item2"),
-						"value": resource.NewPropertyValue(float64(20)),
-					}),
-				}),
-			},
-		},
-		{
-			name:           "Empty map",
-			input:          map[string]interface{}{},
-			expectedOutput: resource.PropertyMap{},
-		},
-		{
-			name: "Mixed types",
-			input: map[string]interface{}{
-				"stringVal": "hello",
-				"numberVal": float64(42.5),
-				"boolVal":   true,
-				"arrayVal":  []interface{}{"a", "b", "c"},
-			},
-			expectedOutput: resource.PropertyMap{
-				"stringVal": resource.NewPropertyValue("hello"),
-				"numberVal": resource.NewPropertyValue(float64(42.5)),
-				"boolVal":   resource.NewPropertyValue(true),
-				"arrayVal": resource.NewArrayProperty([]resource.PropertyValue{
-					resource.NewPropertyValue("a"),
-					resource.NewPropertyValue("b"),
-					resource.NewPropertyValue("c"),
-				}),
-			},
-		},
-	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := util.ConvertMapToPropertyMap(tt.input)
-			assert.Equal(t, tt.expectedOutput, result)
-		})
-	}
-}
-
-func TestConvertInterfaceToPropertyValue(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    interface{}
-		expected resource.PropertyValue
-	}{
-		{
-			name:     "String value",
-			input:    "test-string",
-			expected: resource.NewPropertyValue("test-string"),
-		},
-		{
-			name:     "Number value",
-			input:    float64(123.45),
-			expected: resource.NewPropertyValue(float64(123.45)),
-		},
-		{
-			name:     "Boolean value",
-			input:    true,
-			expected: resource.NewPropertyValue(true),
-		},
-		{
-			name:  "Array of strings",
-			input: []interface{}{"a", "b", "c"},
-			expected: resource.NewArrayProperty([]resource.PropertyValue{
-				resource.NewPropertyValue("a"),
-				resource.NewPropertyValue("b"),
-				resource.NewPropertyValue("c"),
-			}),
-		},
-		{
-			name:     "Empty array",
-			input:    []interface{}{},
-			expected: resource.NewArrayProperty([]resource.PropertyValue{}),
-		},
-		{
-			name: "Map",
-			input: map[string]interface{}{
-				"key": "value",
-			},
-			expected: resource.NewObjectProperty(resource.PropertyMap{
-				"key": resource.NewPropertyValue("value"),
-			}),
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := util.ConvertInterfaceToPropertyValue(tt.input)
-			assert.Equal(t, tt.expected, result)
-		})
-	}
-}
 
 // Test the specific use case from the PolicyGroup issue
 func TestPolicyPackConfigConversion(t *testing.T) {
@@ -215,7 +34,7 @@ func TestPolicyPackConfigConversion(t *testing.T) {
 		"requireTags":    true,
 	}
 
-	result := util.ConvertMapToPropertyMap(apiConfig)
+	result := resource.NewPropertyMapFromMap(apiConfig)
 
 	// Verify approvedAmiIds is properly converted as an array of strings
 	assert.True(t, result["approvedAmiIds"].IsArray())
@@ -361,65 +180,12 @@ func TestConvertPropertyMapToMap(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := util.ConvertPropertyMapToMap(tt.input)
+			result := tt.input.Mappable()
 			assert.Equal(t, tt.expected, result)
 		})
 	}
 }
 
-func TestConvertPropertyValueToInterface(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    resource.PropertyValue
-		expected interface{}
-	}{
-		{
-			name:     "String value",
-			input:    resource.NewPropertyValue("test-string"),
-			expected: "test-string",
-		},
-		{
-			name:     "Number value",
-			input:    resource.NewPropertyValue(float64(123.45)),
-			expected: float64(123.45),
-		},
-		{
-			name:     "Boolean value",
-			input:    resource.NewPropertyValue(true),
-			expected: true,
-		},
-		{
-			name: "Array of strings",
-			input: resource.NewArrayProperty([]resource.PropertyValue{
-				resource.NewPropertyValue("a"),
-				resource.NewPropertyValue("b"),
-				resource.NewPropertyValue("c"),
-			}),
-			expected: []interface{}{"a", "b", "c"},
-		},
-		{
-			name:     "Empty array",
-			input:    resource.NewArrayProperty([]resource.PropertyValue{}),
-			expected: []interface{}{},
-		},
-		{
-			name: "Object",
-			input: resource.NewObjectProperty(resource.PropertyMap{
-				"key": resource.NewPropertyValue("value"),
-			}),
-			expected: map[string]interface{}{
-				"key": "value",
-			},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := util.ConvertPropertyValueToInterface(tt.input)
-			assert.Equal(t, tt.expected, result)
-		})
-	}
-}
 
 // Test roundtrip conversion (API response -> PropertyMap -> Map for API input)
 func TestPolicyPackConfigRoundtrip(t *testing.T) {
@@ -436,10 +202,10 @@ func TestPolicyPackConfigRoundtrip(t *testing.T) {
 	}
 
 	// Convert to PropertyMap (as would happen when reading from API)
-	propertyMap := util.ConvertMapToPropertyMap(originalConfig)
+	propertyMap := resource.NewPropertyMapFromMap(originalConfig)
 
 	// Convert back to map (as would happen when sending to API)
-	finalConfig := util.ConvertPropertyMapToMap(propertyMap)
+	finalConfig := propertyMap.Mappable()
 
 	// Should match the original
 	assert.Equal(t, originalConfig, finalConfig)

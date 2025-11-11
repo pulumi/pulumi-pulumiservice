@@ -25,7 +25,6 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/util/rpcutil/rpcerror"
@@ -56,7 +55,7 @@ func (i *PulumiServicePolicyGroupInput) ToPropertyMap() resource.PropertyMap {
 		"policyPacks":      convertPolicyPacksToInterfaceArray(i.PolicyPacks),
 	}
 
-	return util.ConvertMapToPropertyMap(inputMap)
+	return resource.NewPropertyMapFromMap(inputMap)
 }
 
 // convertStacksToInterfaceArray converts []pulumiapi.StackReference to []interface{}
@@ -142,7 +141,7 @@ func (i *PulumiServicePolicyGroupInput) ToRpc() (*structpb.Struct, error) {
 
 func ToPulumiServicePolicyGroupInput(inputMap resource.PropertyMap) PulumiServicePolicyGroupInput {
 	// Convert PropertyMap to regular map using helper, then extract fields
-	interfaceMap := util.ConvertPropertyMapToMap(inputMap)
+	interfaceMap := inputMap.Mappable()
 
 	input := PulumiServicePolicyGroupInput{}
 
@@ -324,7 +323,7 @@ func (p *PulumiServicePolicyGroupResource) Read(req *pulumirpc.ReadRequest) (*pu
 		"policyPacks":      convertPolicyPacksToInterfaceArray(policyGroup.AppliedPolicyPacks),
 	}
 
-	propertyMap := util.ConvertMapToPropertyMap(inputMap)
+	propertyMap := resource.NewPropertyMapFromMap(inputMap)
 
 	props, err := plugin.MarshalProperties(propertyMap, plugin.MarshalOptions{})
 	if err != nil {

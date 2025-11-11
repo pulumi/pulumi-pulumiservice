@@ -140,62 +140,6 @@ func getTagValue(tag reflect.StructTag, structTagName string) (string, bool) {
 	return tag.Lookup(structTagName)
 }
 
-// ConvertMapToPropertyMap converts a map[string]interface{} to resource.PropertyMap
-// handling nested structures and arrays properly
-func ConvertMapToPropertyMap(m map[string]interface{}) resource.PropertyMap {
-	pm := resource.PropertyMap{}
-	for k, v := range m {
-		pm[resource.PropertyKey(k)] = ConvertInterfaceToPropertyValue(v)
-	}
-	return pm
-}
 
-// ConvertInterfaceToPropertyValue converts interface{} to resource.PropertyValue
-// handling arrays, objects, and primitive types recursively
-func ConvertInterfaceToPropertyValue(v interface{}) resource.PropertyValue {
-	switch val := v.(type) {
-	case []interface{}:
-		// Handle arrays by recursively converting each element
-		arrayValues := make([]resource.PropertyValue, len(val))
-		for i, elem := range val {
-			arrayValues[i] = ConvertInterfaceToPropertyValue(elem)
-		}
-		return resource.NewArrayProperty(arrayValues)
-	case map[string]interface{}:
-		// Handle nested objects by recursively converting
-		return resource.NewObjectProperty(ConvertMapToPropertyMap(val))
-	default:
-		// Handle primitive types (string, number, bool, etc.)
-		return resource.NewPropertyValue(val)
-	}
-}
 
-// ConvertPropertyMapToMap converts resource.PropertyMap to map[string]interface{}
-// handling nested structures and arrays properly
-func ConvertPropertyMapToMap(pm resource.PropertyMap) map[string]interface{} {
-	m := make(map[string]interface{})
-	for k, v := range pm {
-		m[string(k)] = ConvertPropertyValueToInterface(v)
-	}
-	return m
-}
 
-// ConvertPropertyValueToInterface converts resource.PropertyValue to interface{}
-// handling arrays, objects, and primitive types recursively
-func ConvertPropertyValueToInterface(pv resource.PropertyValue) interface{} {
-	if pv.IsArray() {
-		// Handle arrays by recursively converting each element
-		arrayValues := pv.ArrayValue()
-		result := make([]interface{}, len(arrayValues))
-		for i, elem := range arrayValues {
-			result[i] = ConvertPropertyValueToInterface(elem)
-		}
-		return result
-	} else if pv.IsObject() {
-		// Handle nested objects by recursively converting
-		return ConvertPropertyMapToMap(pv.ObjectValue())
-	} else {
-		// Handle primitive types (string, number, bool, etc.)
-		return pv.V
-	}
-}
