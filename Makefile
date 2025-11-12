@@ -45,7 +45,7 @@ provider_debug::
 	(cd provider && go build -o $(WORKING_DIR)/bin/${PROVIDER} -gcflags="all=-N -l" -ldflags $(LDFLAGS) $(BUILD_PATH))
 
 test_provider::
-	cd provider/pkg && go test -short -v -count=1 -cover -timeout 2h -parallel ${TESTPARALLELISM} ./...
+	cd provider/pkg && go test -short -v -count=1 -coverprofile="coverage.txt" -coverpkg=./... -timeout 2h -parallel ${TESTPARALLELISM} ./...
 
 dotnet_sdk: bin/pulumi-resource-pulumiservice $(PULUMI)
 	rm -rf sdk/dotnet
