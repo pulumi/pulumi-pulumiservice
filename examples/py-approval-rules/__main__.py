@@ -39,9 +39,6 @@ approval_rule = ApprovalRule(
             EligibleApproverArgs(
                 user="pulumi-bot",
             ),
-            EligibleApproverArgs(
-                user="IaroslavTitov",
-            ),
         ]
     )
 )
