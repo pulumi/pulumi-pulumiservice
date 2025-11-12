@@ -2434,6 +2434,352 @@
         ],
         "type": "object"
       }
+    },
+    "pulumiservice:index:getTeams": {
+      "description": "Get a list of all teams in an organization.",
+      "inputs": {
+        "properties": {
+          "organizationName": {
+            "type": "string",
+            "description": "The name of the Pulumi organization."
+          }
+        },
+        "required": [
+          "organizationName"
+        ]
+      },
+      "outputs": {
+        "properties": {
+          "teams": {
+            "type": "array",
+            "description": "List of teams in the organization.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "description": "The kind of team (github, pulumi, scim)."
+                },
+                "name": {
+                  "type": "string",
+                  "description": "The name of the team."
+                },
+                "displayName": {
+                  "type": "string",
+                  "description": "The display name of the team."
+                },
+                "description": {
+                  "type": "string",
+                  "description": "The description of the team."
+                },
+                "members": {
+                  "type": "array",
+                  "description": "List of team members.",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "The member's name."
+                      },
+                      "githubLogin": {
+                        "type": "string",
+                        "description": "The member's GitHub login."
+                      },
+                      "avatarUrl": {
+                        "type": "string",
+                        "description": "The member's avatar URL."
+                      },
+                      "role": {
+                        "type": "string",
+                        "description": "The member's role in the team."
+                      }
+                    }
+                  }
+                },
+                "stacks": {
+                  "type": "array",
+                  "description": "Stack permissions for this team.",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "projectName": {
+                        "type": "string",
+                        "description": "The project name."
+                      },
+                      "stackName": {
+                        "type": "string",
+                        "description": "The stack name."
+                      },
+                      "permission": {
+                        "type": "integer",
+                        "description": "The permission level."
+                      }
+                    }
+                  }
+                },
+                "environments": {
+                  "type": "array",
+                  "description": "Environment permissions for this team.",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "envName": {
+                        "type": "string",
+                        "description": "The environment name."
+                      },
+                      "projectName": {
+                        "type": "string",
+                        "description": "The project name."
+                      },
+                      "permission": {
+                        "type": "string",
+                        "description": "The permission level."
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "teams"
+        ]
+      }
+    },
+    "pulumiservice:index:getTeamsForUser": {
+      "description": "Get a list of teams that a specific user is a member of.",
+      "inputs": {
+        "properties": {
+          "organizationName": {
+            "type": "string",
+            "description": "The name of the Pulumi organization."
+          },
+          "userName": {
+            "type": "string",
+            "description": "The username to search for. Matches against both name and GitHub login."
+          }
+        },
+        "required": [
+          "organizationName",
+          "userName"
+        ]
+      },
+      "outputs": {
+        "properties": {
+          "teams": {
+            "type": "array",
+            "description": "List of teams where the user is a member.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "description": "The kind of team (github, pulumi, scim)."
+                },
+                "name": {
+                  "type": "string",
+                  "description": "The name of the team."
+                },
+                "displayName": {
+                  "type": "string",
+                  "description": "The display name of the team."
+                },
+                "description": {
+                  "type": "string",
+                  "description": "The description of the team."
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "teams"
+        ]
+      }
+    },
+    "pulumiservice:index:getStacks": {
+      "description": "Get a list of all stacks accessible by the authenticated user.",
+      "inputs": {
+        "properties": {
+          "maxResults": {
+            "type": "integer",
+            "description": "Maximum number of stacks to return. If not specified, all stacks are returned."
+          }
+        }
+      },
+      "outputs": {
+        "properties": {
+          "stacks": {
+            "type": "array",
+            "description": "List of accessible stacks.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "The logical ID of the stack."
+                },
+                "orgName": {
+                  "type": "string",
+                  "description": "The organization name."
+                },
+                "projectName": {
+                  "type": "string",
+                  "description": "The project name."
+                },
+                "stackName": {
+                  "type": "string",
+                  "description": "The stack name."
+                },
+                "lastUpdate": {
+                  "type": "integer",
+                  "description": "Unix timestamp of the last update."
+                },
+                "resourceCount": {
+                  "type": "integer",
+                  "description": "Number of resources in the stack."
+                }
+              },
+              "required": [
+                "id",
+                "orgName",
+                "projectName",
+                "stackName"
+              ]
+            }
+          },
+          "continuationToken": {
+            "type": "string",
+            "description": "Continuation token for pagination."
+          }
+        },
+        "required": [
+          "stacks"
+        ]
+      }
+    },
+    "pulumiservice:index:getStackTeamPermissions": {
+      "description": "Get all teams that have access to a specific stack.",
+      "inputs": {
+        "properties": {
+          "organizationName": {
+            "type": "string",
+            "description": "The name of the Pulumi organization."
+          },
+          "projectName": {
+            "type": "string",
+            "description": "The name of the project."
+          },
+          "stackName": {
+            "type": "string",
+            "description": "The name of the stack."
+          }
+        },
+        "required": [
+          "organizationName",
+          "projectName",
+          "stackName"
+        ]
+      },
+      "outputs": {
+        "properties": {
+          "teams": {
+            "type": "array",
+            "description": "List of teams with permissions on this stack.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "The team name."
+                },
+                "displayName": {
+                  "type": "string",
+                  "description": "The team display name."
+                },
+                "description": {
+                  "type": "string",
+                  "description": "The team description."
+                },
+                "permission": {
+                  "type": "integer",
+                  "description": "The permission level (0=None, 101=Read, 102=Write, 103=Admin)."
+                },
+                "isMember": {
+                  "type": "boolean",
+                  "description": "Whether the requesting user is a member of the team."
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "teams"
+        ]
+      }
+    },
+    "pulumiservice:index:getStackCollaborators": {
+      "description": "Get all individual user collaborators that have direct access to a specific stack (not team-derived access).",
+      "inputs": {
+        "properties": {
+          "organizationName": {
+            "type": "string",
+            "description": "The name of the Pulumi organization."
+          },
+          "projectName": {
+            "type": "string",
+            "description": "The name of the project."
+          },
+          "stackName": {
+            "type": "string",
+            "description": "The name of the stack."
+          }
+        },
+        "required": [
+          "organizationName",
+          "projectName",
+          "stackName"
+        ]
+      },
+      "outputs": {
+        "properties": {
+          "users": {
+            "type": "array",
+            "description": "List of users with direct collaborator permissions on this stack.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "user": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "The user's name."
+                    },
+                    "githubLogin": {
+                      "type": "string",
+                      "description": "The user's GitHub login."
+                    },
+                    "avatarUrl": {
+                      "type": "string",
+                      "description": "The user's avatar URL."
+                    }
+                  }
+                },
+                "permission": {
+                  "type": "integer",
+                  "description": "The permission level (0=None, 101=Read, 102=Write, 103=Admin)."
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "users"
+        ]
+      }
     }
   }
 }

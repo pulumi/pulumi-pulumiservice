@@ -221,6 +221,16 @@ func (k *pulumiserviceProvider) Invoke(ctx context.Context, req *pulumirpc.Invok
 		return k.invokeFunctionGetPolicyPacks(ctx, req)
 	case "pulumiservice:index:getPolicyPack":
 		return k.invokeFunctionGetPolicyPack(ctx, req)
+	case "pulumiservice:index:getTeams":
+		return k.invokeFunctionGetTeams(ctx, req)
+	case "pulumiservice:index:getTeamsForUser":
+		return k.invokeFunctionGetTeamsForUser(ctx, req)
+	case "pulumiservice:index:getStacks":
+		return k.invokeFunctionGetStacks(ctx, req)
+	case "pulumiservice:index:getStackTeamPermissions":
+		return k.invokeFunctionGetStackTeamPermissions(ctx, req)
+	case "pulumiservice:index:getStackCollaborators":
+		return k.invokeFunctionGetStackCollaborators(ctx, req)
 	default:
 		return nil, fmt.Errorf("unknown Invoke token '%s'", tok)
 	}
@@ -338,7 +348,6 @@ func (k *pulumiserviceProvider) invokeFunctionGetPolicyPacks(ctx context.Context
 		return nil, fmt.Errorf("provider not configured")
 	}
 
-	// Parse inputs
 	inputs, err := plugin.UnmarshalProperties(req.GetArgs(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
@@ -349,13 +358,11 @@ func (k *pulumiserviceProvider) invokeFunctionGetPolicyPacks(ctx context.Context
 		return nil, fmt.Errorf("organizationName is required")
 	}
 
-	// Call the API
 	policyPacks, err := k.client.ListPolicyPacks(ctx, orgName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list policy packs: %w", err)
 	}
 
-	// Build output
 	outputProps := resource.PropertyMap{
 		"policyPacks": resource.NewPropertyValue(convertPolicyPacksToProperties(policyPacks)),
 	}
@@ -376,7 +383,6 @@ func (k *pulumiserviceProvider) invokeFunctionGetPolicyPack(ctx context.Context,
 		return nil, fmt.Errorf("provider not configured")
 	}
 
-	// Parse inputs
 	inputs, err := plugin.UnmarshalProperties(req.GetArgs(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
@@ -392,7 +398,6 @@ func (k *pulumiserviceProvider) invokeFunctionGetPolicyPack(ctx context.Context,
 		return nil, fmt.Errorf("policyPackName is required")
 	}
 
-	// Call the API - either specific version or latest
 	var policyPack *pulumiapi.PolicyPackDetail
 	if inputs["version"].HasValue() && inputs["version"].IsNumber() {
 		version := int(inputs["version"].NumberValue())
@@ -409,7 +414,6 @@ func (k *pulumiserviceProvider) invokeFunctionGetPolicyPack(ctx context.Context,
 		return nil, fmt.Errorf("policy pack not found")
 	}
 
-	// Build output
 	outputProps := convertPolicyPackDetailToProperties(policyPack)
 
 	outputProperties, err := plugin.MarshalProperties(outputProps, plugin.MarshalOptions{})
@@ -523,4 +527,325 @@ func convertInterfaceToPropertyValue(v interface{}) resource.PropertyValue {
 	default:
 		return resource.NewNullProperty()
 	}
+}
+
+// invokeFunctionGetTeams implements the getTeams function
+func (k *pulumiserviceProvider) invokeFunctionGetTeams(ctx context.Context, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
+	if k.client == nil {
+		return nil, fmt.Errorf("provider not configured")
+	}
+
+	inputs, err := plugin.UnmarshalProperties(req.GetArgs(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	if err != nil {
+		return nil, err
+	}
+
+	orgName := inputs["organizationName"].StringValue()
+	if orgName == "" {
+		return nil, fmt.Errorf("organizationName is required")
+	}
+
+	teams, err := k.client.ListTeams(ctx, orgName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list teams: %w", err)
+	}
+
+	outputProps := resource.PropertyMap{
+		"teams": resource.NewPropertyValue(convertTeamsToProperties(teams)),
+	}
+
+	outputProperties, err := plugin.MarshalProperties(outputProps, plugin.MarshalOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	return &pulumirpc.InvokeResponse{
+		Return: outputProperties,
+	}, nil
+}
+
+// invokeFunctionGetTeamsForUser implements the getTeamsForUser function
+func (k *pulumiserviceProvider) invokeFunctionGetTeamsForUser(ctx context.Context, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
+	if k.client == nil {
+		return nil, fmt.Errorf("provider not configured")
+	}
+
+	inputs, err := plugin.UnmarshalProperties(req.GetArgs(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	if err != nil {
+		return nil, err
+	}
+
+	orgName := inputs["organizationName"].StringValue()
+	if orgName == "" {
+		return nil, fmt.Errorf("organizationName is required")
+	}
+
+	userName := inputs["userName"].StringValue()
+	if userName == "" {
+		return nil, fmt.Errorf("userName is required")
+	}
+
+	teams, err := k.client.ListTeams(ctx, orgName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list teams: %w", err)
+	}
+
+	var userTeams []pulumiapi.Team
+	for _, team := range teams {
+		for _, member := range team.Members {
+			if member.Name == userName || member.GithubLogin == userName {
+				userTeams = append(userTeams, team)
+				break
+			}
+		}
+	}
+
+	teamProps := make([]resource.PropertyValue, len(userTeams))
+	for i, team := range userTeams {
+		teamProps[i] = resource.NewObjectProperty(resource.PropertyMap{
+			"kind":        resource.NewStringProperty(team.Type),
+			"name":        resource.NewStringProperty(team.Name),
+			"displayName": resource.NewStringProperty(team.DisplayName),
+			"description": resource.NewStringProperty(team.Description),
+		})
+	}
+
+	outputProps := resource.PropertyMap{
+		"teams": resource.NewArrayProperty(teamProps),
+	}
+
+	outputProperties, err := plugin.MarshalProperties(outputProps, plugin.MarshalOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	return &pulumirpc.InvokeResponse{
+		Return: outputProperties,
+	}, nil
+}
+
+// invokeFunctionGetStacks implements the getStacks function
+func (k *pulumiserviceProvider) invokeFunctionGetStacks(ctx context.Context, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
+	if k.client == nil {
+		return nil, fmt.Errorf("provider not configured")
+	}
+
+	inputs, err := plugin.UnmarshalProperties(req.GetArgs(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	if err != nil {
+		return nil, err
+	}
+
+	var maxResults *int
+	if inputs["maxResults"].HasValue() && inputs["maxResults"].IsNumber() {
+		mr := int(inputs["maxResults"].NumberValue())
+		maxResults = &mr
+	}
+
+	response, err := k.client.ListUserStacks(ctx, maxResults)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list user stacks: %w", err)
+	}
+
+	stackProps := make([]resource.PropertyValue, len(response.Stacks))
+	for i, stack := range response.Stacks {
+		props := resource.PropertyMap{
+			"id":          resource.NewStringProperty(stack.ID),
+			"orgName":     resource.NewStringProperty(stack.OrgName),
+			"projectName": resource.NewStringProperty(stack.ProjectName),
+			"stackName":   resource.NewStringProperty(stack.StackName),
+		}
+		if stack.LastUpdate != nil {
+			props["lastUpdate"] = resource.NewNumberProperty(float64(*stack.LastUpdate))
+		}
+		if stack.ResourceCount != nil {
+			props["resourceCount"] = resource.NewNumberProperty(float64(*stack.ResourceCount))
+		}
+		stackProps[i] = resource.NewObjectProperty(props)
+	}
+
+	outputProps := resource.PropertyMap{
+		"stacks": resource.NewArrayProperty(stackProps),
+	}
+
+	if response.ContinuationToken != nil {
+		outputProps["continuationToken"] = resource.NewStringProperty(*response.ContinuationToken)
+	}
+
+	outputProperties, err := plugin.MarshalProperties(outputProps, plugin.MarshalOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	return &pulumirpc.InvokeResponse{
+		Return: outputProperties,
+	}, nil
+}
+
+func (k *pulumiserviceProvider) invokeFunctionGetStackTeamPermissions(ctx context.Context, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
+	if k.client == nil {
+		return nil, fmt.Errorf("provider not configured")
+	}
+
+	inputs, err := plugin.UnmarshalProperties(req.GetArgs(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	if err != nil {
+		return nil, err
+	}
+
+	orgName := inputs["organizationName"].StringValue()
+	if orgName == "" {
+		return nil, fmt.Errorf("organizationName is required")
+	}
+
+	projectName := inputs["projectName"].StringValue()
+	if projectName == "" {
+		return nil, fmt.Errorf("projectName is required")
+	}
+
+	stackName := inputs["stackName"].StringValue()
+	if stackName == "" {
+		return nil, fmt.Errorf("stackName is required")
+	}
+
+	stack := pulumiapi.StackIdentifier{
+		OrgName:     orgName,
+		ProjectName: projectName,
+		StackName:   stackName,
+	}
+
+	teamPerms, err := k.client.ListStackTeamPermissions(ctx, stack)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list stack team permissions: %w", err)
+	}
+
+	teamProps := make([]resource.PropertyValue, len(teamPerms.Teams))
+	for i, team := range teamPerms.Teams {
+		teamProps[i] = resource.NewObjectProperty(resource.PropertyMap{
+			"name":        resource.NewStringProperty(team.Name),
+			"displayName": resource.NewStringProperty(team.DisplayName),
+			"description": resource.NewStringProperty(team.Description),
+			"permission":  resource.NewNumberProperty(float64(team.Permission)),
+			"isMember":    resource.NewBoolProperty(team.IsMember),
+		})
+	}
+
+	outputProps := resource.PropertyMap{
+		"teams": resource.NewArrayProperty(teamProps),
+	}
+
+	outputProperties, err := plugin.MarshalProperties(outputProps, plugin.MarshalOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	return &pulumirpc.InvokeResponse{
+		Return: outputProperties,
+	}, nil
+}
+
+func (k *pulumiserviceProvider) invokeFunctionGetStackCollaborators(ctx context.Context, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
+	if k.client == nil {
+		return nil, fmt.Errorf("provider not configured")
+	}
+
+	inputs, err := plugin.UnmarshalProperties(req.GetArgs(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	if err != nil {
+		return nil, err
+	}
+
+	orgName := inputs["organizationName"].StringValue()
+	if orgName == "" {
+		return nil, fmt.Errorf("organizationName is required")
+	}
+
+	projectName := inputs["projectName"].StringValue()
+	if projectName == "" {
+		return nil, fmt.Errorf("projectName is required")
+	}
+
+	stackName := inputs["stackName"].StringValue()
+	if stackName == "" {
+		return nil, fmt.Errorf("stackName is required")
+	}
+
+	stack := pulumiapi.StackIdentifier{
+		OrgName:     orgName,
+		ProjectName: projectName,
+		StackName:   stackName,
+	}
+
+	userPerms, err := k.client.ListStackCollaborators(ctx, stack)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list stack collaborators: %w", err)
+	}
+
+	userProps := make([]resource.PropertyValue, len(userPerms.Users))
+	for i, user := range userPerms.Users {
+		userProps[i] = resource.NewObjectProperty(resource.PropertyMap{
+			"user": resource.NewObjectProperty(resource.PropertyMap{
+				"name":        resource.NewStringProperty(user.User.Name),
+				"githubLogin": resource.NewStringProperty(user.User.GithubLogin),
+				"avatarUrl":   resource.NewStringProperty(user.User.AvatarUrl),
+			}),
+			"permission": resource.NewNumberProperty(float64(user.Permission)),
+		})
+	}
+
+	outputProps := resource.PropertyMap{
+		"users": resource.NewArrayProperty(userProps),
+	}
+
+	outputProperties, err := plugin.MarshalProperties(outputProps, plugin.MarshalOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	return &pulumirpc.InvokeResponse{
+		Return: outputProperties,
+	}, nil
+}
+
+// convertTeamsToProperties converts a slice of teams to property values
+func convertTeamsToProperties(teams []pulumiapi.Team) []resource.PropertyValue {
+	result := make([]resource.PropertyValue, len(teams))
+	for i, team := range teams {
+		members := make([]resource.PropertyValue, len(team.Members))
+		for j, member := range team.Members {
+			members[j] = resource.NewObjectProperty(resource.PropertyMap{
+				"name":        resource.NewStringProperty(member.Name),
+				"githubLogin": resource.NewStringProperty(member.GithubLogin),
+				"avatarUrl":   resource.NewStringProperty(member.AvatarUrl),
+				"role":        resource.NewStringProperty(member.Role),
+			})
+		}
+
+		stacks := make([]resource.PropertyValue, len(team.Stacks))
+		for j, stack := range team.Stacks {
+			stacks[j] = resource.NewObjectProperty(resource.PropertyMap{
+				"projectName": resource.NewStringProperty(stack.ProjectName),
+				"stackName":   resource.NewStringProperty(stack.StackName),
+				"permission":  resource.NewNumberProperty(float64(stack.Permission)),
+			})
+		}
+
+		environments := make([]resource.PropertyValue, len(team.Environments))
+		for j, env := range team.Environments {
+			envProps := resource.PropertyMap{
+				"envName":     resource.NewStringProperty(env.EnvName),
+				"projectName": resource.NewStringProperty(env.ProjectName),
+				"permission":  resource.NewStringProperty(env.Permission),
+			}
+			environments[j] = resource.NewObjectProperty(envProps)
+		}
+
+		result[i] = resource.NewObjectProperty(resource.PropertyMap{
+			"kind":         resource.NewStringProperty(team.Type),
+			"name":         resource.NewStringProperty(team.Name),
+			"displayName":  resource.NewStringProperty(team.DisplayName),
+			"description":  resource.NewStringProperty(team.Description),
+			"members":      resource.NewArrayProperty(members),
+			"stacks":       resource.NewArrayProperty(stacks),
+			"environments": resource.NewArrayProperty(environments),
+		})
+	}
+	return result
 }
