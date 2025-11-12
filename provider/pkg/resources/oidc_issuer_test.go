@@ -121,10 +121,7 @@ func createTestPolicies() []*pulumiapi.AuthPolicyDefinition {
 // createReversedTestPolicies returns test policies in reversed order
 func createReversedTestPolicies() []*pulumiapi.AuthPolicyDefinition {
 	policies := createTestPolicies()
-	// Reverse the slice
-	for i, j := 0, len(policies)-1; i < j; i, j = i+1, j-1 {
-		policies[i], policies[j] = policies[j], policies[i]
-	}
+	slices.Reverse(policies)
 	return policies
 }
 
