@@ -82,7 +82,6 @@ func (c *Client) ListPolicyPacks(ctx context.Context, orgName string) ([]PolicyP
 	if err != nil {
 		return nil, fmt.Errorf("failed to list policy packs for %q: %w", orgName, err)
 	}
-
 	return response.PolicyPacks, nil
 }
 

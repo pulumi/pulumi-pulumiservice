@@ -139,7 +139,3 @@ func set(v reflect.Value, value interface{}) error {
 func getTagValue(tag reflect.StructTag, structTagName string) (string, bool) {
 	return tag.Lookup(structTagName)
 }
-
-
-
-
