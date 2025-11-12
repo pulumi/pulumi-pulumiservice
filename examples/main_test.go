@@ -2,7 +2,6 @@ package examples
 
 import (
 	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/pulumi/pulumi/pkg/v3/testing/integration"
@@ -45,19 +44,6 @@ func getBaseOptions() integration.ProgramTestOptions {
 	// GOCOVERDIR for test coverage, and we want to collect provider coverage separately
 	if coverDir := os.Getenv("PROVIDER_GOCOVERDIR"); coverDir != "" {
 		opts.Env = []string{"GOCOVERDIR=" + coverDir}
-
-		// Also set LocalProviders to ensure we use the coverage-instrumented binary
-		// The Path should point to the directory containing the provider binary
-		cwd, err := os.Getwd()
-		if err == nil {
-			providerBinDir := filepath.Join(cwd, "..", "bin")
-			opts.LocalProviders = []integration.LocalDependency{
-				{
-					Package: "pulumiservice",
-					Path:    providerBinDir,
-				},
-			}
-		}
 	}
 
 	return opts
