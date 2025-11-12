@@ -13,6 +13,8 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from . import _utilities
+from . import outputs
+from ._inputs import *
 
 __all__ = ['PolicyGroupArgs', 'PolicyGroup']
 
@@ -23,16 +25,16 @@ class PolicyGroupArgs:
                  organization_name: pulumi.Input[_builtins.str],
                  entity_type: Optional[pulumi.Input[_builtins.str]] = None,
                  mode: Optional[pulumi.Input[_builtins.str]] = None,
-                 policy_packs: Optional[pulumi.Input[Sequence[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]]] = None,
-                 stacks: Optional[pulumi.Input[Sequence[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]]] = None):
+                 policy_packs: Optional[pulumi.Input[Sequence[pulumi.Input['PolicyGroupPolicyPackReferenceArgs']]]] = None,
+                 stacks: Optional[pulumi.Input[Sequence[pulumi.Input['PolicyGroupStackReferenceArgs']]]] = None):
         """
         The set of arguments for constructing a PolicyGroup resource.
         :param pulumi.Input[_builtins.str] name: The name of the policy group.
         :param pulumi.Input[_builtins.str] organization_name: The name of the Pulumi organization the policy group belongs to.
         :param pulumi.Input[_builtins.str] entity_type: The entity type for the policy group. Valid values are 'stacks' or 'accounts'. Defaults to 'stacks'.
         :param pulumi.Input[_builtins.str] mode: The mode for the policy group. Valid values are 'audit' (reports violations) or 'preventative' (blocks operations). Defaults to 'audit'.
-        :param pulumi.Input[Sequence[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]] policy_packs: List of policy packs applied to this policy group.
-        :param pulumi.Input[Sequence[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]] stacks: List of stack references that belong to this policy group.
+        :param pulumi.Input[Sequence[pulumi.Input['PolicyGroupPolicyPackReferenceArgs']]] policy_packs: List of policy packs applied to this policy group.
+        :param pulumi.Input[Sequence[pulumi.Input['PolicyGroupStackReferenceArgs']]] stacks: List of stack references that belong to this policy group.
         """
         pulumi.set(__self__, "name", name)
         pulumi.set(__self__, "organization_name", organization_name)
@@ -99,26 +101,26 @@ class PolicyGroupArgs:
 
     @_builtins.property
     @pulumi.getter(name="policyPacks")
-    def policy_packs(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]]]:
+    def policy_packs(self) -> Optional[pulumi.Input[Sequence[pulumi.Input['PolicyGroupPolicyPackReferenceArgs']]]]:
         """
         List of policy packs applied to this policy group.
         """
         return pulumi.get(self, "policy_packs")
 
     @policy_packs.setter
-    def policy_packs(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]]]):
+    def policy_packs(self, value: Optional[pulumi.Input[Sequence[pulumi.Input['PolicyGroupPolicyPackReferenceArgs']]]]):
         pulumi.set(self, "policy_packs", value)
 
     @_builtins.property
     @pulumi.getter
-    def stacks(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]]]:
+    def stacks(self) -> Optional[pulumi.Input[Sequence[pulumi.Input['PolicyGroupStackReferenceArgs']]]]:
         """
         List of stack references that belong to this policy group.
         """
         return pulumi.get(self, "stacks")
 
     @stacks.setter
-    def stacks(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]]]):
+    def stacks(self, value: Optional[pulumi.Input[Sequence[pulumi.Input['PolicyGroupStackReferenceArgs']]]]):
         pulumi.set(self, "stacks", value)
 
 
@@ -132,8 +134,8 @@ class PolicyGroup(pulumi.CustomResource):
                  mode: Optional[pulumi.Input[_builtins.str]] = None,
                  name: Optional[pulumi.Input[_builtins.str]] = None,
                  organization_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 policy_packs: Optional[pulumi.Input[Sequence[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]]] = None,
-                 stacks: Optional[pulumi.Input[Sequence[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]]] = None,
+                 policy_packs: Optional[pulumi.Input[Sequence[pulumi.Input[Union['PolicyGroupPolicyPackReferenceArgs', 'PolicyGroupPolicyPackReferenceArgsDict']]]]] = None,
+                 stacks: Optional[pulumi.Input[Sequence[pulumi.Input[Union['PolicyGroupStackReferenceArgs', 'PolicyGroupStackReferenceArgsDict']]]]] = None,
                  __props__=None):
         """
         A Policy Group allows you to apply policy packs to a set of stacks in your organization.
@@ -144,8 +146,8 @@ class PolicyGroup(pulumi.CustomResource):
         :param pulumi.Input[_builtins.str] mode: The mode for the policy group. Valid values are 'audit' (reports violations) or 'preventative' (blocks operations). Defaults to 'audit'.
         :param pulumi.Input[_builtins.str] name: The name of the policy group.
         :param pulumi.Input[_builtins.str] organization_name: The name of the Pulumi organization the policy group belongs to.
-        :param pulumi.Input[Sequence[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]] policy_packs: List of policy packs applied to this policy group.
-        :param pulumi.Input[Sequence[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]] stacks: List of stack references that belong to this policy group.
+        :param pulumi.Input[Sequence[pulumi.Input[Union['PolicyGroupPolicyPackReferenceArgs', 'PolicyGroupPolicyPackReferenceArgsDict']]]] policy_packs: List of policy packs applied to this policy group.
+        :param pulumi.Input[Sequence[pulumi.Input[Union['PolicyGroupStackReferenceArgs', 'PolicyGroupStackReferenceArgsDict']]]] stacks: List of stack references that belong to this policy group.
         """
         ...
     @overload
@@ -175,8 +177,8 @@ class PolicyGroup(pulumi.CustomResource):
                  mode: Optional[pulumi.Input[_builtins.str]] = None,
                  name: Optional[pulumi.Input[_builtins.str]] = None,
                  organization_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 policy_packs: Optional[pulumi.Input[Sequence[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]]] = None,
-                 stacks: Optional[pulumi.Input[Sequence[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]]] = None,
+                 policy_packs: Optional[pulumi.Input[Sequence[pulumi.Input[Union['PolicyGroupPolicyPackReferenceArgs', 'PolicyGroupPolicyPackReferenceArgsDict']]]]] = None,
+                 stacks: Optional[pulumi.Input[Sequence[pulumi.Input[Union['PolicyGroupStackReferenceArgs', 'PolicyGroupStackReferenceArgsDict']]]]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
@@ -232,7 +234,7 @@ class PolicyGroup(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter(name="entityType")
-    def entity_type(self) -> pulumi.Output[Optional[_builtins.str]]:
+    def entity_type(self) -> pulumi.Output[_builtins.str]:
         """
         The entity type for the policy group. Valid values are 'stacks' or 'accounts'. Defaults to 'stacks'.
         """
@@ -240,7 +242,7 @@ class PolicyGroup(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def mode(self) -> pulumi.Output[Optional[_builtins.str]]:
+    def mode(self) -> pulumi.Output[_builtins.str]:
         """
         The mode for the policy group. Valid values are 'audit' (reports violations) or 'preventative' (blocks operations). Defaults to 'audit'.
         """
@@ -264,7 +266,7 @@ class PolicyGroup(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter(name="policyPacks")
-    def policy_packs(self) -> pulumi.Output[Sequence[Mapping[str, _builtins.str]]]:
+    def policy_packs(self) -> pulumi.Output[Optional[Sequence['outputs.PolicyGroupPolicyPackReference']]]:
         """
         List of policy packs applied to this policy group.
         """
@@ -272,7 +274,7 @@ class PolicyGroup(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def stacks(self) -> pulumi.Output[Sequence[Mapping[str, _builtins.str]]]:
+    def stacks(self) -> pulumi.Output[Optional[Sequence['outputs.PolicyGroupStackReference']]]:
         """
         List of stack references that belong to this policy group.
         """

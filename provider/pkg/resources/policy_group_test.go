@@ -441,3 +441,129 @@ func TestPolicyGroup_ToPulumiServicePolicyGroupInput_MissingFields(t *testing.T)
 	assert.Equal(t, "", result.EntityType)
 	assert.Equal(t, "", result.Mode)
 }
+
+// TestPolicyGroup_ToPulumiServicePolicyGroupInput_OptionalPolicyPackFields tests that optional policy pack fields are handled
+func TestPolicyGroup_ToPulumiServicePolicyGroupInput_OptionalPolicyPackFields(t *testing.T) {
+	// Test with only required name field
+	inputMap := resource.PropertyMap{
+		"name":             resource.NewStringProperty("test-policy-group"),
+		"organizationName": resource.NewStringProperty("test-org"),
+		"entityType":       resource.NewStringProperty("stacks"),
+		"mode":             resource.NewStringProperty("audit"),
+		"stacks":           resource.NewArrayProperty([]resource.PropertyValue{}),
+		"policyPacks": resource.NewArrayProperty([]resource.PropertyValue{
+			resource.NewObjectProperty(resource.PropertyMap{
+				"name": resource.NewStringProperty("test-policy-pack"),
+			}),
+		}),
+	}
+
+	result := ToPulumiServicePolicyGroupInput(inputMap)
+
+	assert.Equal(t, "test-policy-group", result.Name)
+	assert.Equal(t, "test-org", result.OrganizationName)
+	assert.Equal(t, "stacks", result.EntityType)
+	assert.Equal(t, "audit", result.Mode)
+	assert.Empty(t, result.Stacks)
+	assert.Len(t, result.PolicyPacks, 1)
+	
+	// Verify only name is set, others are empty/zero values
+	pp := result.PolicyPacks[0]
+	assert.Equal(t, "test-policy-pack", pp.Name)
+	assert.Equal(t, "", pp.DisplayName)
+	assert.Equal(t, 0, pp.Version)
+	assert.Equal(t, "", pp.VersionTag)
+	assert.Nil(t, pp.Config)
+}
+
+// TestPolicyGroup_ToPulumiServicePolicyGroupInput_PartialPolicyPackFields tests mixed optional fields
+func TestPolicyGroup_ToPulumiServicePolicyGroupInput_PartialPolicyPackFields(t *testing.T) {
+	// Test with some optional fields provided
+	inputMap := resource.PropertyMap{
+		"name":             resource.NewStringProperty("test-policy-group"),
+		"organizationName": resource.NewStringProperty("test-org"),
+		"entityType":       resource.NewStringProperty("stacks"),
+		"mode":             resource.NewStringProperty("audit"),
+		"stacks":           resource.NewArrayProperty([]resource.PropertyValue{}),
+		"policyPacks": resource.NewArrayProperty([]resource.PropertyValue{
+			resource.NewObjectProperty(resource.PropertyMap{
+				"name":        resource.NewStringProperty("test-policy-pack"),
+				"displayName": resource.NewStringProperty("Test Policy Pack"),
+				// Note: version and versionTag are intentionally omitted
+				"config": resource.NewObjectProperty(resource.PropertyMap{
+					"enabled": resource.NewBoolProperty(true),
+				}),
+			}),
+		}),
+	}
+
+	result := ToPulumiServicePolicyGroupInput(inputMap)
+
+	assert.Len(t, result.PolicyPacks, 1)
+	
+	// Verify partial fields are set correctly
+	pp := result.PolicyPacks[0]
+	assert.Equal(t, "test-policy-pack", pp.Name)
+	assert.Equal(t, "Test Policy Pack", pp.DisplayName)
+	assert.Equal(t, 0, pp.Version)           // Should be zero value when not provided
+	assert.Equal(t, "", pp.VersionTag)       // Should be empty string when not provided
+	assert.NotNil(t, pp.Config)
+	assert.Equal(t, true, pp.Config["enabled"])
+}
+
+// Test the refactored PolicyGroup serialization with complex policy pack configs
+func TestPolicyGroupSerializationConsistency(t *testing.T) {
+	// Create a policy group input with complex config
+	input := PulumiServicePolicyGroupInput{
+		Name:             "test-group",
+		OrganizationName: "test-org",
+		EntityType:       "stacks",
+		Mode:             "audit",
+		Stacks: []pulumiapi.StackReference{
+			{Name: "stack1", RoutingProject: "project1"},
+			{Name: "stack2", RoutingProject: "project2"},
+		},
+		PolicyPacks: []pulumiapi.PolicyPackMetadata{
+			{
+				Name:        "aws-compliance",
+				DisplayName: "AWS Compliance Pack",
+				Version:     1,
+				VersionTag:  "v1.0.0",
+				Config: map[string]interface{}{
+					"approvedAmiIds": []interface{}{"ami-123", "ami-456"},
+					"maxInstances":   float64(10),
+					"nestedConfig": map[string]interface{}{
+						"regions": []interface{}{"us-east-1", "us-west-2"},
+						"enabled": true,
+					},
+				},
+			},
+		},
+	}
+
+	// Convert to PropertyMap using refactored method
+	propertyMap := input.ToPropertyMap()
+
+	// Convert back using refactored method
+	roundtripInput := ToPulumiServicePolicyGroupInput(propertyMap)
+
+	// Verify all fields are preserved correctly
+	assert.Equal(t, input.Name, roundtripInput.Name)
+	assert.Equal(t, input.OrganizationName, roundtripInput.OrganizationName)
+	assert.Equal(t, input.EntityType, roundtripInput.EntityType)
+	assert.Equal(t, input.Mode, roundtripInput.Mode)
+	assert.Equal(t, input.Stacks, roundtripInput.Stacks)
+	
+	// Verify policy pack details including complex config
+	assert.Len(t, roundtripInput.PolicyPacks, 1)
+	pp := roundtripInput.PolicyPacks[0]
+	assert.Equal(t, input.PolicyPacks[0].Name, pp.Name)
+	assert.Equal(t, input.PolicyPacks[0].DisplayName, pp.DisplayName)
+	assert.Equal(t, input.PolicyPacks[0].Version, pp.Version)
+	assert.Equal(t, input.PolicyPacks[0].VersionTag, pp.VersionTag)
+	
+	// Verify complex config is preserved
+	originalConfig := input.PolicyPacks[0].Config
+	roundtripConfig := pp.Config
+	assert.Equal(t, originalConfig, roundtripConfig)
+}

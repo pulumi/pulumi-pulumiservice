@@ -30,10 +30,6 @@ type YamlProgram struct {
 	Resources   map[string]Resource `yaml:"resources"`
 }
 
-const (
-	ServiceProviderTestOrg = "service-provider-test-org"
-)
-
 func TestYamlTeamsExample(t *testing.T) {
 
 	// This test builds a repro of https://github.com/pulumi/pulumi-pulumiservice/issues/73.

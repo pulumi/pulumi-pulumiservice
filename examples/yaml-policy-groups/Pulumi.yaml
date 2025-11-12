@@ -32,8 +32,6 @@ variables:
   #       version: 1
 
 resources:
-  # Create a policy group that manages policy packs for a set of stacks
-  # Policy groups allow you to apply policy packs consistently across multiple stacks
   testPolicyGroup:
     type: pulumiservice:PolicyGroup
     properties:
@@ -41,21 +39,19 @@ resources:
       organizationName: ${organizationName}
       entityType: stacks
       mode: audit
-      stacks: []
-      policyPacks: []
+      stacks:
+        - name: ${pulumi.stack}
+          routingProject: ${pulumi.project}
+      policyPacks:
+        - name: hitrust-aws
+          displayName: ""
+          version: 1
+          versionTag: 2.4.1
+          config:
+            hardened-os-image:
+              approvedAmiIds:
+                - ami-0abcdef1234567890
 
 outputs:
   # Export the policy group name and the list of available policy packs
   policyGroupName: ${testPolicyGroup.name}
-
-  # List of all policy packs in the organization
-  # Each pack includes: name, displayName, versions[], versionTags[]
-  availablePolicyPacks: ${policyPacks}
-
-  # Detailed policy pack information (uncomment if policyPackDetail is enabled above)
-  # This shows the full policy details including:
-  # - name, displayName, version, versionTag
-  # - policies[] with: name, displayName, description, enforcementLevel, message, configSchema
-  #   - NEW FIELDS: severity, framework (name/version/reference/specification),
-  #                 tags[], remediationSteps, url
-  # policyPackDetails: ${policyPackDetail}

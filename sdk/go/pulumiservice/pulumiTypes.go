@@ -2986,6 +2986,251 @@ func (o OperationContextOptionsPtrOutput) SkipIntermediateDeployments() pulumi.B
 	}).(pulumi.BoolPtrOutput)
 }
 
+// A reference to a policy pack within a policy group.
+type PolicyGroupPolicyPackReference struct {
+	// Optional configuration for the policy pack.
+	Config map[string]interface{} `pulumi:"config"`
+	// The display name of the policy pack.
+	DisplayName *string `pulumi:"displayName"`
+	// The name of the policy pack.
+	Name string `pulumi:"name"`
+	// The version of the policy pack.
+	Version *float64 `pulumi:"version"`
+	// The version tag of the policy pack.
+	VersionTag *string `pulumi:"versionTag"`
+}
+
+// PolicyGroupPolicyPackReferenceInput is an input type that accepts PolicyGroupPolicyPackReferenceArgs and PolicyGroupPolicyPackReferenceOutput values.
+// You can construct a concrete instance of `PolicyGroupPolicyPackReferenceInput` via:
+//
+//	PolicyGroupPolicyPackReferenceArgs{...}
+type PolicyGroupPolicyPackReferenceInput interface {
+	pulumi.Input
+
+	ToPolicyGroupPolicyPackReferenceOutput() PolicyGroupPolicyPackReferenceOutput
+	ToPolicyGroupPolicyPackReferenceOutputWithContext(context.Context) PolicyGroupPolicyPackReferenceOutput
+}
+
+// A reference to a policy pack within a policy group.
+type PolicyGroupPolicyPackReferenceArgs struct {
+	// Optional configuration for the policy pack.
+	Config pulumi.MapInput `pulumi:"config"`
+	// The display name of the policy pack.
+	DisplayName pulumi.StringPtrInput `pulumi:"displayName"`
+	// The name of the policy pack.
+	Name pulumi.StringInput `pulumi:"name"`
+	// The version of the policy pack.
+	Version pulumi.Float64PtrInput `pulumi:"version"`
+	// The version tag of the policy pack.
+	VersionTag pulumi.StringPtrInput `pulumi:"versionTag"`
+}
+
+func (PolicyGroupPolicyPackReferenceArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*PolicyGroupPolicyPackReference)(nil)).Elem()
+}
+
+func (i PolicyGroupPolicyPackReferenceArgs) ToPolicyGroupPolicyPackReferenceOutput() PolicyGroupPolicyPackReferenceOutput {
+	return i.ToPolicyGroupPolicyPackReferenceOutputWithContext(context.Background())
+}
+
+func (i PolicyGroupPolicyPackReferenceArgs) ToPolicyGroupPolicyPackReferenceOutputWithContext(ctx context.Context) PolicyGroupPolicyPackReferenceOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PolicyGroupPolicyPackReferenceOutput)
+}
+
+// PolicyGroupPolicyPackReferenceArrayInput is an input type that accepts PolicyGroupPolicyPackReferenceArray and PolicyGroupPolicyPackReferenceArrayOutput values.
+// You can construct a concrete instance of `PolicyGroupPolicyPackReferenceArrayInput` via:
+//
+//	PolicyGroupPolicyPackReferenceArray{ PolicyGroupPolicyPackReferenceArgs{...} }
+type PolicyGroupPolicyPackReferenceArrayInput interface {
+	pulumi.Input
+
+	ToPolicyGroupPolicyPackReferenceArrayOutput() PolicyGroupPolicyPackReferenceArrayOutput
+	ToPolicyGroupPolicyPackReferenceArrayOutputWithContext(context.Context) PolicyGroupPolicyPackReferenceArrayOutput
+}
+
+type PolicyGroupPolicyPackReferenceArray []PolicyGroupPolicyPackReferenceInput
+
+func (PolicyGroupPolicyPackReferenceArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]PolicyGroupPolicyPackReference)(nil)).Elem()
+}
+
+func (i PolicyGroupPolicyPackReferenceArray) ToPolicyGroupPolicyPackReferenceArrayOutput() PolicyGroupPolicyPackReferenceArrayOutput {
+	return i.ToPolicyGroupPolicyPackReferenceArrayOutputWithContext(context.Background())
+}
+
+func (i PolicyGroupPolicyPackReferenceArray) ToPolicyGroupPolicyPackReferenceArrayOutputWithContext(ctx context.Context) PolicyGroupPolicyPackReferenceArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PolicyGroupPolicyPackReferenceArrayOutput)
+}
+
+// A reference to a policy pack within a policy group.
+type PolicyGroupPolicyPackReferenceOutput struct{ *pulumi.OutputState }
+
+func (PolicyGroupPolicyPackReferenceOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*PolicyGroupPolicyPackReference)(nil)).Elem()
+}
+
+func (o PolicyGroupPolicyPackReferenceOutput) ToPolicyGroupPolicyPackReferenceOutput() PolicyGroupPolicyPackReferenceOutput {
+	return o
+}
+
+func (o PolicyGroupPolicyPackReferenceOutput) ToPolicyGroupPolicyPackReferenceOutputWithContext(ctx context.Context) PolicyGroupPolicyPackReferenceOutput {
+	return o
+}
+
+// Optional configuration for the policy pack.
+func (o PolicyGroupPolicyPackReferenceOutput) Config() pulumi.MapOutput {
+	return o.ApplyT(func(v PolicyGroupPolicyPackReference) map[string]interface{} { return v.Config }).(pulumi.MapOutput)
+}
+
+// The display name of the policy pack.
+func (o PolicyGroupPolicyPackReferenceOutput) DisplayName() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PolicyGroupPolicyPackReference) *string { return v.DisplayName }).(pulumi.StringPtrOutput)
+}
+
+// The name of the policy pack.
+func (o PolicyGroupPolicyPackReferenceOutput) Name() pulumi.StringOutput {
+	return o.ApplyT(func(v PolicyGroupPolicyPackReference) string { return v.Name }).(pulumi.StringOutput)
+}
+
+// The version of the policy pack.
+func (o PolicyGroupPolicyPackReferenceOutput) Version() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v PolicyGroupPolicyPackReference) *float64 { return v.Version }).(pulumi.Float64PtrOutput)
+}
+
+// The version tag of the policy pack.
+func (o PolicyGroupPolicyPackReferenceOutput) VersionTag() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PolicyGroupPolicyPackReference) *string { return v.VersionTag }).(pulumi.StringPtrOutput)
+}
+
+type PolicyGroupPolicyPackReferenceArrayOutput struct{ *pulumi.OutputState }
+
+func (PolicyGroupPolicyPackReferenceArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]PolicyGroupPolicyPackReference)(nil)).Elem()
+}
+
+func (o PolicyGroupPolicyPackReferenceArrayOutput) ToPolicyGroupPolicyPackReferenceArrayOutput() PolicyGroupPolicyPackReferenceArrayOutput {
+	return o
+}
+
+func (o PolicyGroupPolicyPackReferenceArrayOutput) ToPolicyGroupPolicyPackReferenceArrayOutputWithContext(ctx context.Context) PolicyGroupPolicyPackReferenceArrayOutput {
+	return o
+}
+
+func (o PolicyGroupPolicyPackReferenceArrayOutput) Index(i pulumi.IntInput) PolicyGroupPolicyPackReferenceOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) PolicyGroupPolicyPackReference {
+		return vs[0].([]PolicyGroupPolicyPackReference)[vs[1].(int)]
+	}).(PolicyGroupPolicyPackReferenceOutput)
+}
+
+// A reference to a stack within a policy group.
+type PolicyGroupStackReference struct {
+	// The name of the stack.
+	Name string `pulumi:"name"`
+	// The routing project name (also known as project name).
+	RoutingProject string `pulumi:"routingProject"`
+}
+
+// PolicyGroupStackReferenceInput is an input type that accepts PolicyGroupStackReferenceArgs and PolicyGroupStackReferenceOutput values.
+// You can construct a concrete instance of `PolicyGroupStackReferenceInput` via:
+//
+//	PolicyGroupStackReferenceArgs{...}
+type PolicyGroupStackReferenceInput interface {
+	pulumi.Input
+
+	ToPolicyGroupStackReferenceOutput() PolicyGroupStackReferenceOutput
+	ToPolicyGroupStackReferenceOutputWithContext(context.Context) PolicyGroupStackReferenceOutput
+}
+
+// A reference to a stack within a policy group.
+type PolicyGroupStackReferenceArgs struct {
+	// The name of the stack.
+	Name pulumi.StringInput `pulumi:"name"`
+	// The routing project name (also known as project name).
+	RoutingProject pulumi.StringInput `pulumi:"routingProject"`
+}
+
+func (PolicyGroupStackReferenceArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*PolicyGroupStackReference)(nil)).Elem()
+}
+
+func (i PolicyGroupStackReferenceArgs) ToPolicyGroupStackReferenceOutput() PolicyGroupStackReferenceOutput {
+	return i.ToPolicyGroupStackReferenceOutputWithContext(context.Background())
+}
+
+func (i PolicyGroupStackReferenceArgs) ToPolicyGroupStackReferenceOutputWithContext(ctx context.Context) PolicyGroupStackReferenceOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PolicyGroupStackReferenceOutput)
+}
+
+// PolicyGroupStackReferenceArrayInput is an input type that accepts PolicyGroupStackReferenceArray and PolicyGroupStackReferenceArrayOutput values.
+// You can construct a concrete instance of `PolicyGroupStackReferenceArrayInput` via:
+//
+//	PolicyGroupStackReferenceArray{ PolicyGroupStackReferenceArgs{...} }
+type PolicyGroupStackReferenceArrayInput interface {
+	pulumi.Input
+
+	ToPolicyGroupStackReferenceArrayOutput() PolicyGroupStackReferenceArrayOutput
+	ToPolicyGroupStackReferenceArrayOutputWithContext(context.Context) PolicyGroupStackReferenceArrayOutput
+}
+
+type PolicyGroupStackReferenceArray []PolicyGroupStackReferenceInput
+
+func (PolicyGroupStackReferenceArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]PolicyGroupStackReference)(nil)).Elem()
+}
+
+func (i PolicyGroupStackReferenceArray) ToPolicyGroupStackReferenceArrayOutput() PolicyGroupStackReferenceArrayOutput {
+	return i.ToPolicyGroupStackReferenceArrayOutputWithContext(context.Background())
+}
+
+func (i PolicyGroupStackReferenceArray) ToPolicyGroupStackReferenceArrayOutputWithContext(ctx context.Context) PolicyGroupStackReferenceArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PolicyGroupStackReferenceArrayOutput)
+}
+
+// A reference to a stack within a policy group.
+type PolicyGroupStackReferenceOutput struct{ *pulumi.OutputState }
+
+func (PolicyGroupStackReferenceOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*PolicyGroupStackReference)(nil)).Elem()
+}
+
+func (o PolicyGroupStackReferenceOutput) ToPolicyGroupStackReferenceOutput() PolicyGroupStackReferenceOutput {
+	return o
+}
+
+func (o PolicyGroupStackReferenceOutput) ToPolicyGroupStackReferenceOutputWithContext(ctx context.Context) PolicyGroupStackReferenceOutput {
+	return o
+}
+
+// The name of the stack.
+func (o PolicyGroupStackReferenceOutput) Name() pulumi.StringOutput {
+	return o.ApplyT(func(v PolicyGroupStackReference) string { return v.Name }).(pulumi.StringOutput)
+}
+
+// The routing project name (also known as project name).
+func (o PolicyGroupStackReferenceOutput) RoutingProject() pulumi.StringOutput {
+	return o.ApplyT(func(v PolicyGroupStackReference) string { return v.RoutingProject }).(pulumi.StringOutput)
+}
+
+type PolicyGroupStackReferenceArrayOutput struct{ *pulumi.OutputState }
+
+func (PolicyGroupStackReferenceArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]PolicyGroupStackReference)(nil)).Elem()
+}
+
+func (o PolicyGroupStackReferenceArrayOutput) ToPolicyGroupStackReferenceArrayOutput() PolicyGroupStackReferenceArrayOutput {
+	return o
+}
+
+func (o PolicyGroupStackReferenceArrayOutput) ToPolicyGroupStackReferenceArrayOutputWithContext(ctx context.Context) PolicyGroupStackReferenceArrayOutput {
+	return o
+}
+
+func (o PolicyGroupStackReferenceArrayOutput) Index(i pulumi.IntInput) PolicyGroupStackReferenceOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) PolicyGroupStackReference {
+		return vs[0].([]PolicyGroupStackReference)[vs[1].(int)]
+	}).(PolicyGroupStackReferenceOutput)
+}
+
 type TemplateSourceDestination struct {
 	// Destination URL that gets filled in on new project creation.
 	Url *string `pulumi:"url"`
@@ -3158,6 +3403,10 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*OperationContextOIDCPtrInput)(nil)).Elem(), OperationContextOIDCArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*OperationContextOptionsInput)(nil)).Elem(), OperationContextOptionsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*OperationContextOptionsPtrInput)(nil)).Elem(), OperationContextOptionsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PolicyGroupPolicyPackReferenceInput)(nil)).Elem(), PolicyGroupPolicyPackReferenceArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PolicyGroupPolicyPackReferenceArrayInput)(nil)).Elem(), PolicyGroupPolicyPackReferenceArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PolicyGroupStackReferenceInput)(nil)).Elem(), PolicyGroupStackReferenceArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PolicyGroupStackReferenceArrayInput)(nil)).Elem(), PolicyGroupStackReferenceArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*TemplateSourceDestinationInput)(nil)).Elem(), TemplateSourceDestinationArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*TemplateSourceDestinationPtrInput)(nil)).Elem(), TemplateSourceDestinationArgs{})
 	pulumi.RegisterOutputType(AWSOIDCConfigurationOutput{})
@@ -3194,6 +3443,10 @@ func init() {
 	pulumi.RegisterOutputType(OperationContextOIDCPtrOutput{})
 	pulumi.RegisterOutputType(OperationContextOptionsOutput{})
 	pulumi.RegisterOutputType(OperationContextOptionsPtrOutput{})
+	pulumi.RegisterOutputType(PolicyGroupPolicyPackReferenceOutput{})
+	pulumi.RegisterOutputType(PolicyGroupPolicyPackReferenceArrayOutput{})
+	pulumi.RegisterOutputType(PolicyGroupStackReferenceOutput{})
+	pulumi.RegisterOutputType(PolicyGroupStackReferenceArrayOutput{})
 	pulumi.RegisterOutputType(TemplateSourceDestinationOutput{})
 	pulumi.RegisterOutputType(TemplateSourceDestinationPtrOutput{})
 }

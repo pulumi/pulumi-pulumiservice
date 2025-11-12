@@ -2,6 +2,9 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
+import * as inputs from "./types/input";
+import * as outputs from "./types/output";
+import * as enums from "./types/enums";
 import * as utilities from "./utilities";
 
 /**
@@ -37,11 +40,11 @@ export class PolicyGroup extends pulumi.CustomResource {
     /**
      * The entity type for the policy group. Valid values are 'stacks' or 'accounts'. Defaults to 'stacks'.
      */
-    declare public readonly entityType: pulumi.Output<string | undefined>;
+    declare public readonly entityType: pulumi.Output<string>;
     /**
      * The mode for the policy group. Valid values are 'audit' (reports violations) or 'preventative' (blocks operations). Defaults to 'audit'.
      */
-    declare public readonly mode: pulumi.Output<string | undefined>;
+    declare public readonly mode: pulumi.Output<string>;
     /**
      * The name of the policy group.
      */
@@ -53,11 +56,11 @@ export class PolicyGroup extends pulumi.CustomResource {
     /**
      * List of policy packs applied to this policy group.
      */
-    declare public readonly policyPacks: pulumi.Output<{[key: string]: string}[]>;
+    declare public readonly policyPacks: pulumi.Output<outputs.PolicyGroupPolicyPackReference[] | undefined>;
     /**
      * List of stack references that belong to this policy group.
      */
-    declare public readonly stacks: pulumi.Output<{[key: string]: string}[]>;
+    declare public readonly stacks: pulumi.Output<outputs.PolicyGroupStackReference[] | undefined>;
 
     /**
      * Create a PolicyGroup resource with the given unique name, arguments, and options.
@@ -118,9 +121,9 @@ export interface PolicyGroupArgs {
     /**
      * List of policy packs applied to this policy group.
      */
-    policyPacks?: pulumi.Input<pulumi.Input<{[key: string]: pulumi.Input<string>}>[]>;
+    policyPacks?: pulumi.Input<pulumi.Input<inputs.PolicyGroupPolicyPackReferenceArgs>[]>;
     /**
      * List of stack references that belong to this policy group.
      */
-    stacks?: pulumi.Input<pulumi.Input<{[key: string]: pulumi.Input<string>}>[]>;
+    stacks?: pulumi.Input<pulumi.Input<inputs.PolicyGroupStackReferenceArgs>[]>;
 }
