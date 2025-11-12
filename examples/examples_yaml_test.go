@@ -129,7 +129,7 @@ func TestYamlStackTagsExample(t *testing.T) {
 	cwd, err := os.Getwd()
 	require.NoError(t, err)
 
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
+	opts := getBaseOptions().With(integration.ProgramTestOptions{
 		Quick: true,
 		Dir:   tmpdir,
 		EditDirs: []integration.EditDir{
@@ -143,6 +143,7 @@ func TestYamlStackTagsExample(t *testing.T) {
 			},
 		},
 	})
+	integration.ProgramTest(t, &opts)
 }
 
 func TestYamlDeploymentSettingsExample(t *testing.T) {

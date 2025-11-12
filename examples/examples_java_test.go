@@ -20,18 +20,12 @@ func TestJavaTeamsExamples(t *testing.T) {
 func getJavaBase(t *testing.T, dir string, testSpecificOptions integration.ProgramTestOptions) integration.ProgramTestOptions {
 	repoRoot, err := filepath.Abs(filepath.Join("..", ".."))
 	if err != nil {
-		panic(err)
+		t.Fatalf("Error: %s", err)
 	}
-	opts := integration.ProgramTestOptions{
-		Dir: filepath.Join(getCwd(t), dir),
-		Env: []string{fmt.Sprintf("PULUMI_REPO_ROOT=%s", repoRoot)},
-	}
-	opts = opts.With(getBaseOptions()).With(testSpecificOptions)
-	return opts
-}
 
-func getBaseOptions() integration.ProgramTestOptions {
-	return integration.ProgramTestOptions{
+	return getBaseOptions().With(integration.ProgramTestOptions{
+		Dir:          filepath.Join(getCwd(t), dir),
+		Env:          []string{fmt.Sprintf("PULUMI_REPO_ROOT=%s", repoRoot)},
 		Dependencies: []string{"@pulumi/pulumi"},
-	}
+	})
 }

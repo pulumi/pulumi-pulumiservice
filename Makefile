@@ -159,12 +159,12 @@ $(SCHEMA_FILE): bin/pulumi-resource-pulumiservice $(PULUMI)
 shard:
 	@(cd examples && go run github.com/blampe/shard@latest --total $(TOTAL) --index $(INDEX) --output env) >> "$(GITHUB_ENV)"
 
-test_shard: export GOCOVERDIR=$(WORKING_DIR)/coverage/integration
+test_shard: export PROVIDER_GOCOVERDIR=$(WORKING_DIR)/coverage/integration
 test_shard: provider_with_cover
-	mkdir -p $(GOCOVERDIR)
+	mkdir -p $(PROVIDER_GOCOVERDIR)
 	cd examples && \
 		go test -tags=all -v -count=1 -coverprofile="coverage.txt" -coverpkg=./... -timeout 3h -parallel ${TESTPARALLELISM} -run "$(SHARD_TESTS)" $(SHARD_PATHS)
-	go tool covdata textfmt -i=$(GOCOVERDIR) -o=$(GOCOVERDIR).txt
+	go tool covdata textfmt -i=$(PROVIDER_GOCOVERDIR) -o=$(PROVIDER_GOCOVERDIR).txt
 
 install_plugins: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
 install_plugins: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
