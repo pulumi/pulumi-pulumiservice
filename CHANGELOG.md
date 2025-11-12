@@ -10,7 +10,6 @@
 ### Bug Fixes
 
 - Fixed PolicyGroup creation to include required entityType and mode fields [#563](https://github.com/pulumi/pulumi-pulumiservice/issues/563)
-- Removed references to deactivated user from approval rule examples
 - Fixed Makefile SDK generation to consistently use provider binary as source of truth, and added provider dependency to build_sdks target to prevent SDK inconsistencies in worktrees
 - Fixed Makefile PATH export to remove incorrect quotes, improving plugin installation
 - Removed deprecated StreamInvoke method for compatibility with Pulumi v3.161.0+
