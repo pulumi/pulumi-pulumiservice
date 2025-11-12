@@ -41,8 +41,8 @@ bin/pulumi-resource-pulumiservice: $(shell bin/helpmakego provider/cmd/pulumi-re
 .PHONY: provider
 provider: bin/pulumi-resource-pulumiservice
 
-provider_with_cover:
-	cd provider && go build -cover -o $(WORKING_DIR)/bin/${PROVIDER} -ldflags $(LDFLAGS) $(BUILD_PATH)
+bin/coverage/pulumi-resource-pulumiservice: $(shell bin/helpmakego provider/cmd/pulumi-resource-pulumiservice)
+	go build -C provider -cover -o ../$@ -ldflags $(LDFLAGS) $(BUILD_PATH)
 
 provider_debug::
 	(cd provider && go build -o $(WORKING_DIR)/bin/${PROVIDER} -gcflags="all=-N -l" -ldflags $(LDFLAGS) $(BUILD_PATH))
@@ -160,9 +160,9 @@ shard:
 	@(cd examples && go run github.com/blampe/shard@latest --total $(TOTAL) --index $(INDEX) --output env) >> "$(GITHUB_ENV)"
 
 test_shard: export PROVIDER_GOCOVERDIR=$(WORKING_DIR)/coverage/integration
-test_shard: provider_with_cover
+test_shard: bin/coverage/pulumi-resource-pulumiservice
 	mkdir -p $(PROVIDER_GOCOVERDIR)
-	cd examples && \
+	cd examples && PATH=$(WORKING_DIR)/bin/coverage:$$PATH \
 		go test -tags=all -v -count=1 -coverprofile="coverage.txt" -coverpkg=./... -timeout 3h -parallel ${TESTPARALLELISM} -run "$(SHARD_TESTS)" $(SHARD_PATHS)
 	go tool covdata textfmt -i=$(PROVIDER_GOCOVERDIR) -o=$(PROVIDER_GOCOVERDIR).txt
 
