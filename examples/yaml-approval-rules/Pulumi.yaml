@@ -1,12 +1,18 @@
 name: yaml-approval-rules-example
 runtime: yaml
 description: A minimal Pulumi YAML program for approval rules
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  digits:
+    type: string
 resources:
   # Create an environment that will be used as the target for our approval rule
   testing-environment:
     type: pulumiservice:Environment
     properties:
-      organization: service-provider-test-org
+      organization: ${organizationName}
       project: test-project
       name: testing-environment-approval-yaml-${digits}
       yaml:

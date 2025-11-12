@@ -113,6 +113,16 @@ cd examples && go test -v -run TestYamlStackTagsPluralExample -tags yaml -timeou
    - `- Added StackTags resource for managing multiple stack tags [#61](https://github.com/pulumi/pulumi-pulumiservice/issues/61)`
    - `- Fixed OIDC Issuer policies order to prevent accidental drifts [#542](https://github.com/pulumi/pulumi-pulumiservice/pull/542)`
 
+**EXCEPTION**: **DO NOT** add CHANGELOG entries for:
+
+- Test-only changes (adding tests, fixing tests, test infrastructure)
+- Documentation updates (README, CLAUDE.md, code comments)
+- CI/build configuration changes
+- Development tooling changes
+
+These changes are important but not user-facing, so they don't belong in the
+CHANGELOG.
+
 ### Schema Changes
 
 The provider schema is **manually maintained** at `provider/cmd/pulumi-resource-pulumiservice/schema.json`. When adding/modifying resources:
@@ -204,3 +214,80 @@ When investigating CI test failures:
 3. **Check for outdated test data**: Examples may contain hardcoded values like TLS certificate thumbprints that become stale when certificates are rotated
 
 4. **Look for related issues across examples**: If one language example fails, check all language examples (ts-, py-, go-, cs-, yaml-) for the same issue
+
+## Lessons Learned
+
+### Test Coverage and Example Management
+
+**ALWAYS audit existing test coverage before creating new tests or examples:**
+
+1. **Check for composite examples first**: Some examples intentionally test multiple related resources together:
+   - `yaml-schedules` tests DeploymentSchedule, DriftSchedule, TtlSchedule, and EnvironmentRotationSchedule
+   - `yaml-environments` tests Environment, EnvironmentVersionTag, and TeamEnvironmentPermission
+   - `yaml-deployment-settings*` tests different DeploymentSettings configurations
+   - Don't create duplicate examples for resources already covered in composite examples
+
+2. **Understand the intent behind composite examples**: They exist to:
+   - Show how related resources work together
+   - Reduce maintenance burden (one example to update vs. many)
+   - Test realistic usage patterns (resources are rarely used in isolation)
+   - Avoid test duplication and longer CI times
+
+3. **When to create a new example directory**:
+   - ✅ Resource has NO existing example coverage
+   - ✅ Resource represents a distinct use case not covered by composite examples
+   - ❌ Resource is already tested in a composite example
+   - ❌ Creating individual examples would duplicate existing coverage
+
+4. **How to add test coverage for already-covered resources**:
+   - Add test functions that point to existing composite examples
+   - Example: Add `TestYamlDriftSchedule` that uses `yaml-schedules` directory
+   - Don't create `yaml-drift-schedule/` if `yaml-schedules` already tests it
+
+5. **Review existing test files**:
+   - Check `examples/examples_yaml_test.go` for existing YAML tests
+   - Check other language test files (nodejs, python, go, dotnet, java)
+   - Use `grep -r "TestYaml.*Schedule" examples/` to find related tests
+
+### CHANGELOG Best Practices
+
+**DO NOT add CHANGELOG entries for test-only changes:**
+
+- ❌ "Added YAML integration tests for 9 resources"
+- ❌ "Fixed flaky test in TeamEnvironmentPermission"
+- ❌ "Migrated tests from integration.ProgramTest to pulumitest"
+- ✅ "Added StackTags resource for managing multiple stack tags" (new user-facing feature)
+- ✅ "Fixed drift in OIDC Issuer policies order" (user-facing bug fix)
+
+**Rationale**: Tests are infrastructure for maintainers, not features for users. The CHANGELOG documents user-facing changes only.
+
+### Interpreting Issue Requirements
+
+**Don't take issue descriptions literally without understanding context:**
+
+1. **"Create dedicated example"** might mean:
+   - "Add a dedicated test function" (not a new directory)
+   - "Add focused documentation" (not a separate example)
+   - "Extract into separate example" (only if current example is too complex)
+
+2. **Always ask**: "Is this adding value or just duplication?"
+   - If the resource is already tested elsewhere, link to it instead
+   - If the example is already comprehensive, reference it instead
+   - If creating work that will need ongoing maintenance, question if it's necessary
+
+3. **Check with the team**: If an issue seems to request duplication, ask for clarification before implementing
+
+### Code Review Feedback
+
+**When reviewers question changes, they're often seeing duplication you missed:**
+
+- "How is this different from X?" usually means "This duplicates X, please remove it"
+- "Why are we changing Y?" usually means "This change seems unnecessary"
+- Don't be defensive - reviewers have broader context and catch things you missed
+
+**Respond to review feedback by**:
+
+1. Acknowledging the feedback
+2. Analyzing why you made the change
+3. Fixing the issue (removing duplicates, reverting unnecessary changes)
+4. Learning the pattern to avoid repeating the mistake
