@@ -28,3 +28,8 @@ ci-scripts
 .config/
 .gradle/
 Library/
+
+# Coverage files
+coverage/
+coverage.txt
+*.coverprofile
