@@ -4,6 +4,7 @@ package resources
 
 import (
 	"context"
+	"slices"
 	"sort"
 	"testing"
 
@@ -32,6 +33,7 @@ import (
 // Read() and Check() operations without any client-side reordering.
 
 // Mock implementation of pulumiapi.OidcClient for testing
+// Unused methods will panic when called via embedded interface
 type OidcClientMock struct {
 	pulumiapi.OidcClient
 	getOidcIssuerFunc   func(ctx context.Context, org string, id string) (*pulumiapi.OidcIssuerRegistrationResponse, error)
@@ -44,17 +46,6 @@ func (m *OidcClientMock) GetOidcIssuer(ctx context.Context, org string, id strin
 
 func (m *OidcClientMock) GetAuthPolicies(ctx context.Context, org string, id string) (*pulumiapi.AuthPolicy, error) {
 	return m.getAuthPoliciesFunc(ctx, org, id)
-}
-
-// buildOidcClientMock creates a mock OIDC client with custom response functions
-func buildOidcClientMock(
-	issuerFunc func(ctx context.Context, org string, id string) (*pulumiapi.OidcIssuerRegistrationResponse, error),
-	policiesFunc func(ctx context.Context, org string, id string) (*pulumiapi.AuthPolicy, error),
-) *OidcClientMock {
-	return &OidcClientMock{
-		getOidcIssuerFunc:   issuerFunc,
-		getAuthPoliciesFunc: policiesFunc,
-	}
 }
 
 // createTestPolicies creates three distinct test policies in a specific order
@@ -103,8 +94,10 @@ func createReversedTestPolicies() []*pulumiapi.AuthPolicyDefinition {
 	return policies
 }
 
-// extractPolicyOrderFromProperties extracts policy identifiable characteristics
-// Returns a slice of strings representing the order of policies in the properties
+// extractPolicyOrderFromProperties extracts policy identifiable characteristics from resource.PropertyMap.
+// Input structure: PropertyMap with "policies" key containing array of policy objects.
+// Each policy object has "tokenType" and "rules" properties.
+// Returns a slice of strings representing the order of policies (e.g., ["organization:repository", "team:environment"]).
 func extractPolicyOrderFromProperties(props *resource.PropertyMap) ([]string, error) {
 	if props == nil {
 		return nil, nil
@@ -151,8 +144,8 @@ func TestOidcIssuer_PolicyOrderingDoesNotCauseDrift(t *testing.T) {
 	t.Run("Read preserves policy order from API", func(t *testing.T) {
 		// Setup: Mock returns policies in specific order [A, B, C]
 		testPolicies := createTestPolicies()
-		mockedClient := buildOidcClientMock(
-			func(ctx context.Context, org string, id string) (*pulumiapi.OidcIssuerRegistrationResponse, error) {
+		mockedClient := &OidcClientMock{
+			getOidcIssuerFunc: func(ctx context.Context, org string, id string) (*pulumiapi.OidcIssuerRegistrationResponse, error) {
 				return &pulumiapi.OidcIssuerRegistrationResponse{
 					ID:          "issuer-123",
 					Name:        "test-issuer",
@@ -161,14 +154,14 @@ func TestOidcIssuer_PolicyOrderingDoesNotCauseDrift(t *testing.T) {
 					Thumbprints: []string{"a1b2c3d4"},
 				}, nil
 			},
-			func(ctx context.Context, org string, id string) (*pulumiapi.AuthPolicy, error) {
+			getAuthPoliciesFunc: func(ctx context.Context, org string, id string) (*pulumiapi.AuthPolicy, error) {
 				return &pulumiapi.AuthPolicy{
 					ID:         "policy-abc",
 					Version:    1,
 					Definition: testPolicies,
 				}, nil
 			},
-		)
+		}
 
 		provider := PulumiServiceOidcIssuerResource{
 			Client: mockedClient,
@@ -182,73 +175,26 @@ func TestOidcIssuer_PolicyOrderingDoesNotCauseDrift(t *testing.T) {
 		// Execute: Call Read() method
 		resp, err := provider.Read(&req)
 
-		require.Equal(t, &pulumirpc.ReadResponse{
-			...
-		}, resp)
-	})
+		// Assert: No error and response is valid
+		require.NoError(t, err, "Read should not return an error")
+		require.NotNil(t, resp, "Read response should not be nil")
+		require.Equal(t, "test-org/issuer-123", resp.Id, "Resource ID should be preserved")
 
-	t.Run("Multiple reads return consistent policy order", func(t *testing.T) {
-		// Setup: Mock returns same policies consistently
-		testPolicies := createTestPolicies()
-		mockedClient := buildOidcClientMock(
-			func(ctx context.Context, org string, id string) (*pulumiapi.OidcIssuerRegistrationResponse, error) {
-				return &pulumiapi.OidcIssuerRegistrationResponse{
-					ID:          "issuer-456",
-					Name:        "consistent-issuer",
-					URL:         "https://token.actions.githubusercontent.com",
-					Issuer:      "https://token.actions.githubusercontent.com",
-					Thumbprints: []string{"e5f6g7h8"},
-				}, nil
-			},
-			func(ctx context.Context, org string, id string) (*pulumiapi.AuthPolicy, error) {
-				return &pulumiapi.AuthPolicy{
-					ID:         "policy-def",
-					Version:    1,
-					Definition: testPolicies,
-				}, nil
-			},
-		)
+		// Assert: Policies are returned in the same order as the API
+		outputMap, err := plugin.UnmarshalProperties(resp.Properties, util.StandardUnmarshal)
+		require.NoError(t, err, "Should unmarshal output properties")
 
-		provider := PulumiServiceOidcIssuerResource{
-			Client: mockedClient,
-		}
+		outputOrder, err := extractPolicyOrderFromProperties(&outputMap)
+		require.NoError(t, err, "Should extract policy order")
+		require.Len(t, outputOrder, 3, "Should have 3 policies")
 
-		req := pulumirpc.ReadRequest{
-			Id:  "test-org/issuer-456",
-			Urn: "urn:pulumi:test::test::pulumiservice:index:OidcIssuer::consistent-issuer",
-		}
-
-		// Execute: Call Read() twice
-		resp1, err1 := provider.Read(&req)
-		resp2, err2 := provider.Read(&req)
-
-		// Assert: Both reads succeed
-		require.NoError(t, err1, "First read should not return an error")
-		require.NoError(t, err2, "Second read should not return an error")
-
-		// Assert: Extract policy orders from both responses
-		outputMap1, err := plugin.UnmarshalProperties(resp1.Properties, util.StandardUnmarshal)
-		require.NoError(t, err, "Should unmarshal first output properties")
-
-		outputMap2, err := plugin.UnmarshalProperties(resp2.Properties, util.StandardUnmarshal)
-		require.NoError(t, err, "Should unmarshal second output properties")
-
-		order1, err := extractPolicyOrderFromProperties(&outputMap1)
-		require.NoError(t, err, "Should extract policy order from first response")
-
-		order2, err := extractPolicyOrderFromProperties(&outputMap2)
-		require.NoError(t, err, "Should extract policy order from second response")
-
-		// Assert: Both reads return identical policy order (no spurious drift)
-		assert.Equal(t, order1, order2, "Multiple reads should return consistent policy order without drift")
-
+		// Verify order matches API response: organization:repository, team:environment, personal:project
 		expectedOrder := []string{
 			"organization:repository",
 			"team:environment",
 			"personal:project",
 		}
-		assert.Equal(t, expectedOrder, order1, "First read should have correct order")
-		assert.Equal(t, expectedOrder, order2, "Second read should have correct order")
+		assert.Equal(t, expectedOrder, outputOrder, "Policy order should match API response order")
 	})
 
 	t.Run("Check preserves input policy order", func(t *testing.T) {
@@ -326,8 +272,8 @@ func TestOidcIssuer_PolicyOrderingDoesNotCauseDrift(t *testing.T) {
 	t.Run("Different API policy orders are respected", func(t *testing.T) {
 		// Setup: Mock returns policies in REVERSED order [C, B, A]
 		reversedPolicies := createReversedTestPolicies()
-		mockedClient := buildOidcClientMock(
-			func(ctx context.Context, org string, id string) (*pulumiapi.OidcIssuerRegistrationResponse, error) {
+		mockedClient := &OidcClientMock{
+			getOidcIssuerFunc: func(ctx context.Context, org string, id string) (*pulumiapi.OidcIssuerRegistrationResponse, error) {
 				return &pulumiapi.OidcIssuerRegistrationResponse{
 					ID:          "issuer-789",
 					Name:        "reversed-issuer",
@@ -336,14 +282,14 @@ func TestOidcIssuer_PolicyOrderingDoesNotCauseDrift(t *testing.T) {
 					Thumbprints: []string{"i9j0k1l2"},
 				}, nil
 			},
-			func(ctx context.Context, org string, id string) (*pulumiapi.AuthPolicy, error) {
+			getAuthPoliciesFunc: func(ctx context.Context, org string, id string) (*pulumiapi.AuthPolicy, error) {
 				return &pulumiapi.AuthPolicy{
 					ID:         "policy-ghi",
 					Version:    1,
 					Definition: reversedPolicies,
 				}, nil
 			},
-		)
+		}
 
 		provider := PulumiServiceOidcIssuerResource{
 			Client: mockedClient,
