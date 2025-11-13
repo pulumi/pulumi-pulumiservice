@@ -162,7 +162,7 @@ shard:
 test_shard: export PROVIDER_GOCOVERDIR=$(WORKING_DIR)/coverage/integration
 test_shard: bin/coverage/pulumi-resource-pulumiservice
 	mkdir -p $(PROVIDER_GOCOVERDIR)
-	cd examples && PATH=$(WORKING_DIR)/bin/coverage:$$PATH \
+	cd examples && \
 		go test -tags=all -v -count=1 -coverprofile="coverage.txt" -coverpkg=./... -timeout 3h -parallel ${TESTPARALLELISM} -run "$(SHARD_TESTS)" $(SHARD_PATHS)
 	go tool covdata textfmt -i=$(PROVIDER_GOCOVERDIR) -o=$(PROVIDER_GOCOVERDIR).txt
 

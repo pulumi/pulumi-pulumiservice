@@ -16,8 +16,6 @@ package main
 
 import (
 	_ "embed"
-	"fmt"
-	"os"
 
 	psp "github.com/pulumi/pulumi-pulumiservice/provider/pkg/provider"
 	"github.com/pulumi/pulumi/pkg/v3/resource/provider"
@@ -31,9 +29,6 @@ var providerName = "pulumiservice"
 var Version string = "REPLACE_ON_BUILD"
 
 func main() {
-	// Debug: Write debug info to a file to verify env vars
-	panic(fmt.Sprintf("Provider PID=%d GOCOVERDIR=%s\n", os.Getpid(), os.Getenv("GOCOVERDIR")))
-
 	// Start gRPC service for the pulumiservice provider
 	err := provider.Main(providerName, func(host *provider.HostClient) (rpc.ResourceProviderServer, error) {
 		return psp.MakeProvider(host, providerName, Version)

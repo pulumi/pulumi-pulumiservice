@@ -1,7 +1,10 @@
 package examples
 
 import (
+	"errors"
+	"io/fs"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/pulumi/pulumi/pkg/v3/testing/integration"
@@ -23,13 +26,6 @@ func TestMain(m *testing.M) {
 		panic("failed to set PULUMI_TEST_USE_SERVICE: " + err.Error())
 	}
 
-	// If GOCOVERDIR is set, ensure it's propagated to provider processes
-	// This is needed for integration test coverage collection (Go 1.20+)
-	if coverDir := os.Getenv("GOCOVERDIR"); coverDir != "" {
-		// GOCOVERDIR is already set in the environment, it will be inherited by child processes
-		// including the provider binary launched by Pulumi
-	}
-
 	m.Run()
 }
 
@@ -44,6 +40,25 @@ func getBaseOptions() integration.ProgramTestOptions {
 	// GOCOVERDIR for test coverage, and we want to collect provider coverage separately
 	if coverDir := os.Getenv("PROVIDER_GOCOVERDIR"); coverDir != "" {
 		opts.Env = []string{"GOCOVERDIR=" + coverDir}
+		cwd, err := os.Getwd()
+		if err != nil {
+			panic(err)
+		}
+		coverageDir := filepath.Join(cwd, "..", "bin", "coverage")
+		coverageBinaryPath := filepath.Join(coverageDir, "pulumi-resource-pulumiservice")
+		if _, err := os.Stat(coverageBinaryPath); err != nil {
+			if errors.Is(err, fs.ErrNotExist) {
+				panic("Missing coverage binary at " + coverageBinaryPath)
+			} else {
+				panic(err)
+			}
+		}
+		opts.LocalProviders = []integration.LocalDependency{
+			{
+				Package: "pulumiservice",
+				Path:    coverageDir,
+			},
+		}
 	}
 
 	return opts
