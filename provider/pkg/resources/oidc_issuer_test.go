@@ -33,39 +33,17 @@ import (
 
 // Mock implementation of pulumiapi.OidcClient for testing
 type OidcClientMock struct {
+	pulumiapi.OidcClient
 	getOidcIssuerFunc   func(ctx context.Context, org string, id string) (*pulumiapi.OidcIssuerRegistrationResponse, error)
 	getAuthPoliciesFunc func(ctx context.Context, org string, id string) (*pulumiapi.AuthPolicy, error)
 }
 
 func (m *OidcClientMock) GetOidcIssuer(ctx context.Context, org string, id string) (*pulumiapi.OidcIssuerRegistrationResponse, error) {
-	if m.getOidcIssuerFunc != nil {
-		return m.getOidcIssuerFunc(ctx, org, id)
-	}
-	return nil, nil
+	return m.getOidcIssuerFunc(ctx, org, id)
 }
 
 func (m *OidcClientMock) GetAuthPolicies(ctx context.Context, org string, id string) (*pulumiapi.AuthPolicy, error) {
-	if m.getAuthPoliciesFunc != nil {
-		return m.getAuthPoliciesFunc(ctx, org, id)
-	}
-	return nil, nil
-}
-
-// Stub implementations for unused interface methods
-func (m *OidcClientMock) RegisterOidcIssuer(ctx context.Context, org string, req pulumiapi.OidcIssuerRegistrationRequest) (*pulumiapi.OidcIssuerRegistrationResponse, error) {
-	return nil, nil
-}
-
-func (m *OidcClientMock) UpdateOidcIssuer(ctx context.Context, org string, id string, req pulumiapi.OidcIssuerUpdateRequest) (*pulumiapi.OidcIssuerRegistrationResponse, error) {
-	return nil, nil
-}
-
-func (m *OidcClientMock) DeleteOidcIssuer(ctx context.Context, org string, id string) error {
-	return nil
-}
-
-func (m *OidcClientMock) UpdateAuthPolicies(ctx context.Context, org string, policyID string, req pulumiapi.AuthPolicyUpdateRequest) (*pulumiapi.AuthPolicy, error) {
-	return nil, nil
+	return m.getAuthPoliciesFunc(ctx, org, id)
 }
 
 // buildOidcClientMock creates a mock OIDC client with custom response functions
@@ -167,8 +145,7 @@ func extractPolicyOrderFromProperties(props *resource.PropertyMap) ([]string, er
 	return order, nil
 }
 
-// TestOidcIssuer_PolicyOrderingDoesNotCauseDrift is the main regression test suite
-// for issue #542. It verifies that the OIDC Issuer resource preserves policy order
+// TestOidcIssuer_PolicyOrderingDoesNotCauseDrift verifies that the OIDC Issuer resource preserves policy order
 // and does not introduce spurious diffs.
 func TestOidcIssuer_PolicyOrderingDoesNotCauseDrift(t *testing.T) {
 	t.Run("Read preserves policy order from API", func(t *testing.T) {
@@ -205,26 +182,9 @@ func TestOidcIssuer_PolicyOrderingDoesNotCauseDrift(t *testing.T) {
 		// Execute: Call Read() method
 		resp, err := provider.Read(&req)
 
-		// Assert: No error and response is valid
-		require.NoError(t, err, "Read should not return an error")
-		require.NotNil(t, resp, "Read response should not be nil")
-		require.Equal(t, "test-org/issuer-123", resp.Id, "Resource ID should be preserved")
-
-		// Assert: Policies are returned in the same order as the API
-		outputMap, err := plugin.UnmarshalProperties(resp.Properties, util.StandardUnmarshal)
-		require.NoError(t, err, "Should unmarshal output properties")
-
-		outputOrder, err := extractPolicyOrderFromProperties(&outputMap)
-		require.NoError(t, err, "Should extract policy order")
-		require.Len(t, outputOrder, 3, "Should have 3 policies")
-
-		// Verify order matches API response: organization:repository, team:environment, personal:project
-		expectedOrder := []string{
-			"organization:repository",
-			"team:environment",
-			"personal:project",
-		}
-		assert.Equal(t, expectedOrder, outputOrder, "Policy order should match API response order")
+		require.Equal(t, &pulumirpc.ReadResponse{
+			...
+		}, resp)
 	})
 
 	t.Run("Multiple reads return consistent policy order", func(t *testing.T) {
