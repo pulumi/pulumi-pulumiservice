@@ -72,8 +72,8 @@ Triggers an on-demand scan of the insights account's cloud resources.
 **Example:**
 ```typescript
 const scanResult = insightsAccount.triggerScan();
-export const scanId = scanResult.scanId;
-export const scanStatus = scanResult.status;
+export const scanId = scanResult.apply(result => result.scanId);
+export const scanStatus = scanResult.apply(result => result.status);
 ```
 
 ### getStatus()
@@ -94,8 +94,8 @@ about the last scan.
 **Example:**
 ```typescript
 const status = insightsAccount.getStatus();
-export const lastScanTime = status.lastScanTime;
-export const resourceCount = status.resourceCount;
+export const lastScanTime = status.apply(result => result.lastScanTime);
+export const resourceCount = status.apply(result => result.resourceCount);
 ```
 
 ## Viewing Outputs
@@ -130,8 +130,8 @@ The example demonstrates the key pattern for using resource methods:
 
 3. **Use the results** in outputs or other resources:
    ```typescript
-   export const scanId = scanResult.scanId;
-   export const resourceCount = status.resourceCount;
+   export const scanId = scanResult.apply(result => result.scanId);
+   export const resourceCount = status.apply(result => result.resourceCount);
    ```
 
 The methods execute during the `pulumi up` operation and their results are

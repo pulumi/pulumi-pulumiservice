@@ -164,6 +164,9 @@ func TestNodejsInsightsAccountMethodsExample(t *testing.T) {
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		Quick: true, // Skip extra preview/update/refresh to avoid 409 conflicts from calling triggerScan() multiple times
 		Dir:   path.Join(cwd, ".", "ts-insights-account-methods"),
+		Env: []string{
+			"NODE_OPTIONS=--max-old-space-size=8192",
+		},
 		Config: map[string]string{
 			"digits":           digits,
 			"organizationName": getOrgName(),
