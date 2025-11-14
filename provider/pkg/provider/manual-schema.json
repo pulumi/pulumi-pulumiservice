@@ -11,31 +11,6 @@
   ],
   "license": "Apache-2.0",
   "publisher": "Pulumi",
-  "config": {
-    "variables": {
-      "accessToken": {
-        "type": "string",
-        "secret": true
-      },
-      "apiUrl": {
-        "type": "string"
-      }
-    }
-  },
-  "provider": {
-    "type": "object",
-    "inputProperties": {
-      "accessToken": {
-        "description": "Access Token to authenticate with Pulumi Cloud.",
-        "type": "string",
-        "secret": true
-      },
-      "apiUrl": {
-        "description": "Optional override of Pulumi Cloud API endpoint.",
-        "type": "string"
-      }
-    }
-  },
   "types": {
     "pulumiservice:index:TeamStackPermissionScope": {
       "type": "number",
@@ -1005,87 +980,6 @@
       },
       "requiredInputs": [
         "description"
-      ]
-    },
-    "pulumiservice:index:Team": {
-      "description": "The Pulumi Cloud offers role-based access control (RBAC) using teams. Teams allow organization admins to assign a set of stack permissions to a group of users.",
-      "properties": {
-        "teamType": {
-          "description": "The type of team. Must be either `pulumi` or `github`.",
-          "type": "string"
-        },
-        "name": {
-          "description": "The team's name. Required for \"pulumi\" teams.",
-          "type": "string"
-        },
-        "displayName": {
-          "description": "Optional. Team display name.",
-          "type": "string"
-        },
-        "description": {
-          "description": "Optional. Team description.",
-          "type": "string"
-        },
-        "members": {
-          "description": "List of Pulumi Cloud usernames of team members.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "organizationName": {
-          "description": "The name of the Pulumi organization the team belongs to.",
-          "type": "string"
-        },
-        "githubTeamId": {
-          "description": "The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for \"github\" teams.",
-          "type": "number"
-        }
-      },
-      "required": [
-        "organizationName",
-        "teamType",
-        "members"
-      ],
-      "inputProperties": {
-        "teamType": {
-          "description": "The type of team. Must be either `pulumi` or `github`.",
-          "type": "string",
-          "willReplaceOnChanges": true
-        },
-        "name": {
-          "description": "The team's name. Required for \"pulumi\" teams.",
-          "type": "string",
-          "willReplaceOnChanges": true
-        },
-        "displayName": {
-          "description": "Optional. Team display name.",
-          "type": "string"
-        },
-        "description": {
-          "description": "Optional. Team description.",
-          "type": "string"
-        },
-        "members": {
-          "description": "List of Pulumi Cloud usernames of team members.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "organizationName": {
-          "description": "The name of the Pulumi organization the team belongs to.",
-          "type": "string",
-          "willReplaceOnChanges": true
-        },
-        "githubTeamId": {
-          "description": "The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for \"github\" teams.",
-          "type": "number"
-        }
-      },
-      "requiredInputs": [
-        "organizationName",
-        "teamType"
       ]
     },
     "pulumiservice:index:TeamAccessToken": {

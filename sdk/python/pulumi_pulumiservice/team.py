@@ -212,6 +212,8 @@ class Team(pulumi.CustomResource):
             if team_type is None and not opts.urn:
                 raise TypeError("Missing required property 'team_type'")
             __props__.__dict__["team_type"] = team_type
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["name", "organizationName", "teamType"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(Team, __self__).__init__(
             'pulumiservice:index:Team',
             resource_name,

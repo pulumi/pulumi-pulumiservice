@@ -7,6 +7,9 @@ import * as utilities from "../utilities";
 declare var exports: any;
 const __config = new pulumi.Config("pulumiservice");
 
+/**
+ * Access Token to authenticate with Pulumi Cloud.
+ */
 export declare const accessToken: string | undefined;
 Object.defineProperty(exports, "accessToken", {
     get() {
@@ -15,10 +18,13 @@ Object.defineProperty(exports, "accessToken", {
     enumerable: true,
 });
 
-export declare const apiUrl: string | undefined;
+/**
+ * Optional override of Pulumi Cloud API endpoint.
+ */
+export declare const apiUrl: string;
 Object.defineProperty(exports, "apiUrl", {
     get() {
-        return __config.get("apiUrl");
+        return __config.get("apiUrl") ?? (utilities.getEnv("PULUMI_BACKEND_URL") || "https://api.pulumi.com");
     },
     enumerable: true,
 });

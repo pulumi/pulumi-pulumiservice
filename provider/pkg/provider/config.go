@@ -9,7 +9,7 @@ import (
 
 const (
 	EnvVarPulumiAccessToken = "PULUMI_ACCESS_TOKEN"
-	EnvVarPulumiBackendUrl = "PULUMI_BACKEND_URL"
+	EnvVarPulumiBackendUrl  = "PULUMI_BACKEND_URL"
 )
 
 var ErrAccessTokenNotFound = fmt.Errorf("pulumi access token not found")
@@ -19,7 +19,7 @@ type PulumiServiceConfig struct {
 }
 
 func (pc *PulumiServiceConfig) getConfig(configName, envName string) string {
-	if val, ok := pc.Config[configName]; ok {
+	if val := pc.Config[configName]; val != "" {
 		return val
 	}
 

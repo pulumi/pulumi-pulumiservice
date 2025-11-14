@@ -4,112 +4,120 @@ import (
 	"context"
 	"testing"
 
+	"github.com/pulumi/pulumi-go-provider/infer"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 	"github.com/stretchr/testify/assert"
 )
 
-type getTeamFunc func() (*pulumiapi.Team, error)
-
 type TeamClientMock struct {
-	getTeamFunc getTeamFunc
+	config.Client
+	getTeamFunc func(ctx context.Context, orgName string, teamName string) (*pulumiapi.Team, error)
 }
 
 func (c *TeamClientMock) GetTeam(ctx context.Context, orgName string, teamName string) (*pulumiapi.Team, error) {
-	return c.getTeamFunc()
-}
-
-func (c *TeamClientMock) ListTeams(ctx context.Context, orgName string) ([]pulumiapi.Team, error) {
-	return nil, nil
-}
-func (c *TeamClientMock) CreateTeam(ctx context.Context, orgName, teamName, teamType, displayName, description string, teamID int64) (*pulumiapi.Team, error) {
-	return nil, nil
-}
-func (c *TeamClientMock) UpdateTeam(ctx context.Context, orgName, teamName, displayName, description string) error {
-	return nil
-}
-func (c *TeamClientMock) DeleteTeam(ctx context.Context, orgName, teamName string) error { return nil }
-func (c *TeamClientMock) AddMemberToTeam(ctx context.Context, orgName, teamName, userName string) error {
-	return nil
-}
-func (c *TeamClientMock) DeleteMemberFromTeam(ctx context.Context, orgName, teamName, userName string) error {
-	return nil
-}
-func (c *TeamClientMock) AddStackPermission(ctx context.Context, stack pulumiapi.StackIdentifier, teamName string, permission int) error {
-	return nil
-}
-func (c *TeamClientMock) RemoveStackPermission(ctx context.Context, stack pulumiapi.StackIdentifier, teamName string) error {
-	return nil
-}
-func (c *TeamClientMock) GetTeamStackPermission(ctx context.Context, stack pulumiapi.StackIdentifier, teamName string) (*int, error) {
-	return nil, nil
-}
-func (c *TeamClientMock) AddEnvironmentSettings(ctx context.Context, req pulumiapi.CreateTeamEnvironmentSettingsRequest) error {
-	return nil
-}
-func (c *TeamClientMock) RemoveEnvironmentSettings(ctx context.Context, req pulumiapi.TeamEnvironmentSettingsRequest) error {
-	return nil
-}
-func (c *TeamClientMock) GetTeamEnvironmentSettings(ctx context.Context, req pulumiapi.TeamEnvironmentSettingsRequest) (*string, *pulumiapi.Duration, error) {
-	return nil, nil, nil
-}
-
-func buildTeamClientMock(getTeamFunc getTeamFunc) *TeamClientMock {
-	return &TeamClientMock{
-		getTeamFunc,
-	}
+	return c.getTeamFunc(ctx, orgName, teamName)
 }
 
 func TestTeam(t *testing.T) {
 	t.Run("Read when the resource is not found", func(t *testing.T) {
-		mockedClient := buildTeamClientMock(
-			func() (*pulumiapi.Team, error) { return nil, nil },
-		)
-
-		provider := PulumiServiceTeamResource{
-			Client: mockedClient,
+		mockedClient := &TeamClientMock{
+			getTeamFunc: func(ctx context.Context, orgName string, teamName string) (*pulumiapi.Team, error) {
+				return nil, nil
+			},
 		}
 
-		req := pulumirpc.ReadRequest{
-			Id:  "abc/123",
-			Urn: "urn:123",
+		ctx := config.WithMockClient(context.Background(), mockedClient)
+
+		team := &Team{}
+		req := infer.ReadRequest[TeamInput, TeamState]{
+			ID: "abc/test",
+			Inputs: TeamInput{
+				TeamCore: TeamCore{
+					OrganizationName: "abc",
+					Type:             "pulumi",
+					Name:             ref("test"),
+				},
+			},
+			State: TeamState{
+				TeamCore: TeamCore{
+					OrganizationName: "abc",
+					Type:             "pulumi",
+					Name:             ref("test"),
+				},
+			},
 		}
 
-		resp, err := provider.Read(&req)
+		resp, err := team.Read(ctx, req)
 
 		assert.NoError(t, err)
-		assert.Equal(t, resp.Id, "")
-		assert.Nil(t, resp.Properties)
+		assert.Equal(t, "", resp.ID)
+		assert.Equal(t, TeamInput{}, resp.Inputs)
+		assert.Equal(t, TeamState{}, resp.State)
 	})
 
 	t.Run("Read when the resource is found", func(t *testing.T) {
-		mockedClient := buildTeamClientMock(
-			func() (*pulumiapi.Team, error) {
+		mockedClient := &TeamClientMock{
+			getTeamFunc: func(ctx context.Context, orgName string, teamName string) (*pulumiapi.Team, error) {
 				return &pulumiapi.Team{
 					Type:        "pulumi",
 					Name:        "test",
 					DisplayName: "test team",
 					Description: "test team description",
 					Members: []pulumiapi.TeamMember{
-						{Name: "member1"},
-						{Name: "member2"},
+						{GithubLogin: "member1"},
+						{GithubLogin: "member2"},
 					},
 				}, nil
 			},
-		)
-
-		provider := PulumiServiceTeamResource{
-			Client: mockedClient,
 		}
 
-		req := pulumirpc.ReadRequest{
-			Id:  "abc/123",
-			Urn: "urn:123",
+		ctx := config.WithMockClient(context.Background(), mockedClient)
+
+		team := &Team{}
+		req := infer.ReadRequest[TeamInput, TeamState]{
+			ID: "abc/test",
+			Inputs: TeamInput{
+				TeamCore: TeamCore{
+					OrganizationName: "abc",
+					Type:             "pulumi",
+					Name:             ref("test"),
+				},
+			},
+			State: TeamState{
+				TeamCore: TeamCore{
+					OrganizationName: "abc",
+					Type:             "pulumi",
+					Name:             ref("test"),
+				},
+			},
 		}
 
-		resp, err := provider.Read(&req)
+		resp, err := team.Read(ctx, req)
 
 		assert.NoError(t, err)
-		assert.Equal(t, resp.Id, "abc/123")
+		assert.Equal(t, "abc/test", resp.ID)
+		assert.Equal(t, TeamInput{
+			TeamCore: TeamCore{
+				OrganizationName: "abc",
+				Type:             "pulumi",
+				Name:             ref("test"),
+				DisplayName:      ref("test team"),
+				Description:      ref("test team description"),
+			},
+			Members: []string{"member1", "member2"},
+		}, resp.Inputs)
+		assert.Equal(t, TeamState{
+			TeamCore: TeamCore{
+				OrganizationName: "abc",
+				Type:             "pulumi",
+				Name:             ref("test"),
+				DisplayName:      ref("test team"),
+				Description:      ref("test team description"),
+			},
+			Members: []string{"member1", "member2"},
+		}, resp.State)
 	})
 }
+
+func ref[T any](v T) *T { return &v }
