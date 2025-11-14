@@ -29,3 +29,5 @@ ci-scripts
 .config/
 .gradle/
 Library/
+
+coverage.txt

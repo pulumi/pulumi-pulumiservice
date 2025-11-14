@@ -6,8 +6,11 @@ package examples
 import (
 	"os"
 	"path"
+	"path/filepath"
 	"testing"
 
+	"github.com/pulumi/providertest/pulumitest"
+	"github.com/pulumi/providertest/pulumitest/opttest"
 	"github.com/pulumi/pulumi/pkg/v3/testing/integration"
 )
 
@@ -64,14 +67,14 @@ func TestTeamStackPermissionsExample(t *testing.T) {
 }
 
 func TestTeamsExample(t *testing.T) {
-	cwd, _ := os.Getwd()
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Quick: true,
-		Dir:   path.Join(cwd, ".", "ts-teams"),
-		Dependencies: []string{
-			"@pulumi/pulumiservice",
-		},
-	})
+	cwd := getCwd(t)
+
+	// Create a pulumitest instance with in-memory provider using the existing ts-teams directory
+	testPulumiProgram(t, pulumitest.NewPulumiTest(t,
+		filepath.Join(cwd, "ts-teams"),
+		inMemoryProvider(),
+		opttest.YarnLink("@pulumi/pulumiservice"),
+	))
 }
 
 func TestNodejsWebhookExample(t *testing.T) {
