@@ -122,119 +122,6 @@ func (InsightsAccountArgs) ElementType() reflect.Type {
 	return reflect.TypeOf((*insightsAccountArgs)(nil)).Elem()
 }
 
-// Retrieves the current status of the insights account, including information about the last scan.
-func (r *InsightsAccount) GetStatus(ctx *pulumi.Context) (InsightsAccountGetStatusResultOutput, error) {
-	out, err := ctx.Call("pulumiservice:index:InsightsAccount/getStatus", nil, InsightsAccountGetStatusResultOutput{}, r)
-	if err != nil {
-		return InsightsAccountGetStatusResultOutput{}, err
-	}
-	return out.(InsightsAccountGetStatusResultOutput), nil
-}
-
-type InsightsAccountGetStatusResult struct {
-	// The insights account identifier.
-	AccountId string `pulumi:"accountId"`
-	// The name of the insights account.
-	AccountName string `pulumi:"accountName"`
-	// The identifier of the last completed scan.
-	LastScanId *string `pulumi:"lastScanId"`
-	// The timestamp of the last completed scan.
-	LastScanTime *string `pulumi:"lastScanTime"`
-	// The timestamp of the next scheduled scan (if scheduled scanning is enabled).
-	NextScanTime *string `pulumi:"nextScanTime"`
-	// The number of resources discovered in the last scan.
-	ResourceCount *int `pulumi:"resourceCount"`
-	// The current status of the account (e.g., 'active', 'scanning', 'idle').
-	Status string `pulumi:"status"`
-}
-
-type InsightsAccountGetStatusResultOutput struct{ *pulumi.OutputState }
-
-func (InsightsAccountGetStatusResultOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*InsightsAccountGetStatusResult)(nil)).Elem()
-}
-
-// The insights account identifier.
-func (o InsightsAccountGetStatusResultOutput) AccountId() pulumi.StringOutput {
-	return o.ApplyT(func(v InsightsAccountGetStatusResult) string { return v.AccountId }).(pulumi.StringOutput)
-}
-
-// The name of the insights account.
-func (o InsightsAccountGetStatusResultOutput) AccountName() pulumi.StringOutput {
-	return o.ApplyT(func(v InsightsAccountGetStatusResult) string { return v.AccountName }).(pulumi.StringOutput)
-}
-
-// The identifier of the last completed scan.
-func (o InsightsAccountGetStatusResultOutput) LastScanId() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v InsightsAccountGetStatusResult) *string { return v.LastScanId }).(pulumi.StringPtrOutput)
-}
-
-// The timestamp of the last completed scan.
-func (o InsightsAccountGetStatusResultOutput) LastScanTime() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v InsightsAccountGetStatusResult) *string { return v.LastScanTime }).(pulumi.StringPtrOutput)
-}
-
-// The timestamp of the next scheduled scan (if scheduled scanning is enabled).
-func (o InsightsAccountGetStatusResultOutput) NextScanTime() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v InsightsAccountGetStatusResult) *string { return v.NextScanTime }).(pulumi.StringPtrOutput)
-}
-
-// The number of resources discovered in the last scan.
-func (o InsightsAccountGetStatusResultOutput) ResourceCount() pulumi.IntPtrOutput {
-	return o.ApplyT(func(v InsightsAccountGetStatusResult) *int { return v.ResourceCount }).(pulumi.IntPtrOutput)
-}
-
-// The current status of the account (e.g., 'active', 'scanning', 'idle').
-func (o InsightsAccountGetStatusResultOutput) Status() pulumi.StringOutput {
-	return o.ApplyT(func(v InsightsAccountGetStatusResult) string { return v.Status }).(pulumi.StringOutput)
-}
-
-// Triggers an on-demand scan of the insights account's cloud resources.
-func (r *InsightsAccount) TriggerScan(ctx *pulumi.Context) (InsightsAccountTriggerScanResultOutput, error) {
-	out, err := ctx.Call("pulumiservice:index:InsightsAccount/triggerScan", nil, InsightsAccountTriggerScanResultOutput{}, r)
-	if err != nil {
-		return InsightsAccountTriggerScanResultOutput{}, err
-	}
-	return out.(InsightsAccountTriggerScanResultOutput), nil
-}
-
-type InsightsAccountTriggerScanResult struct {
-	// Optional message about the scan trigger.
-	Message *string `pulumi:"message"`
-	// The unique identifier for the triggered scan (may be empty if scan is queued but ID not yet assigned).
-	ScanId *string `pulumi:"scanId"`
-	// The status of the scan request (e.g., 'queued', 'running', 'succeeded', 'failed').
-	Status string `pulumi:"status"`
-	// The timestamp when the scan was triggered.
-	Timestamp *string `pulumi:"timestamp"`
-}
-
-type InsightsAccountTriggerScanResultOutput struct{ *pulumi.OutputState }
-
-func (InsightsAccountTriggerScanResultOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*InsightsAccountTriggerScanResult)(nil)).Elem()
-}
-
-// Optional message about the scan trigger.
-func (o InsightsAccountTriggerScanResultOutput) Message() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v InsightsAccountTriggerScanResult) *string { return v.Message }).(pulumi.StringPtrOutput)
-}
-
-// The unique identifier for the triggered scan (may be empty if scan is queued but ID not yet assigned).
-func (o InsightsAccountTriggerScanResultOutput) ScanId() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v InsightsAccountTriggerScanResult) *string { return v.ScanId }).(pulumi.StringPtrOutput)
-}
-
-// The status of the scan request (e.g., 'queued', 'running', 'succeeded', 'failed').
-func (o InsightsAccountTriggerScanResultOutput) Status() pulumi.StringOutput {
-	return o.ApplyT(func(v InsightsAccountTriggerScanResult) string { return v.Status }).(pulumi.StringOutput)
-}
-
-// The timestamp when the scan was triggered.
-func (o InsightsAccountTriggerScanResultOutput) Timestamp() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v InsightsAccountTriggerScanResult) *string { return v.Timestamp }).(pulumi.StringPtrOutput)
-}
-
 type InsightsAccountInput interface {
 	pulumi.Input
 
@@ -408,8 +295,6 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*InsightsAccountArrayInput)(nil)).Elem(), InsightsAccountArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*InsightsAccountMapInput)(nil)).Elem(), InsightsAccountMap{})
 	pulumi.RegisterOutputType(InsightsAccountOutput{})
-	pulumi.RegisterOutputType(InsightsAccountGetStatusResultOutput{})
-	pulumi.RegisterOutputType(InsightsAccountTriggerScanResultOutput{})
 	pulumi.RegisterOutputType(InsightsAccountArrayOutput{})
 	pulumi.RegisterOutputType(InsightsAccountMapOutput{})
 }

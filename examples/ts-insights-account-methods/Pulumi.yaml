@@ -1,3 +1,0 @@
-name: ts-insights-account-methods
-runtime: nodejs
-description: Demonstrates InsightsAccount resource methods (triggerScan and getStatus)

@@ -140,23 +140,6 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 	return p.RawServer(name, version, provider)(host)
 }
 
-// Call dynamically executes a method in the provider associated with a component resource.
-func (k *pulumiserviceProvider) Call(ctx context.Context, req *pulumirpc.CallRequest) (*pulumirpc.CallResponse, error) {
-	tok := req.GetTok()
-
-	// Extract the resource type from the method token
-	// Method tokens are in format: "resource:type/methodName"
-	// For example: "pulumiservice:index:InsightsAccount/triggerScan"
-	if strings.HasPrefix(tok, "pulumiservice:index:InsightsAccount/") {
-		// Route to InsightsAccount resource
-		insightsAccountRes := resources.PulumiServiceInsightsAccountResource{
-			Client: k.client,
-		}
-		return insightsAccountRes.Call(req)
-	}
-
-	return nil, status.Errorf(codes.Unimplemented, "unknown method: %s", tok)
-}
 
 // Attach implements pulumirpc.ResourceProviderServer
 func (k *pulumiserviceProvider) Attach(_ context.Context, req *pulumirpc.PluginAttach) (*pbempty.Empty, error) {
