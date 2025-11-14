@@ -60,8 +60,10 @@ export const getPolicyPacks: typeof import("./getPolicyPacks").getPolicyPacks = 
 export const getPolicyPacksOutput: typeof import("./getPolicyPacks").getPolicyPacksOutput = null as any;
 utilities.lazyLoad(exports, ["getPolicyPacks","getPolicyPacksOutput"], () => require("./getPolicyPacks"));
 
-export * from "./insightsAccount";
-import { InsightsAccount } from "./insightsAccount";
+export { InsightsAccountArgs } from "./insightsAccount";
+export type InsightsAccount = import("./insightsAccount").InsightsAccount;
+export const InsightsAccount: typeof import("./insightsAccount").InsightsAccount = null as any;
+utilities.lazyLoad(exports, ["InsightsAccount"], () => require("./insightsAccount"));
 
 export { OidcIssuerArgs } from "./oidcIssuer";
 export type OidcIssuer = import("./oidcIssuer").OidcIssuer;

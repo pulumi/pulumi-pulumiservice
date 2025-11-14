@@ -110,18 +110,6 @@ namespace Pulumi.PulumiService
         {
             return new InsightsAccount(name, id, options);
         }
-
-        /// <summary>
-        /// Retrieves the current status of the insights account, including information about the last scan.
-        /// </summary>
-        public global::Pulumi.Output<InsightsAccountGetStatusResult> GetStatus()
-            => global::Pulumi.Deployment.Instance.Call<InsightsAccountGetStatusResult>("pulumiservice:index:InsightsAccount/getStatus", CallArgs.Empty, this);
-
-        /// <summary>
-        /// Triggers an on-demand scan of the insights account's cloud resources.
-        /// </summary>
-        public global::Pulumi.Output<InsightsAccountTriggerScanResult> TriggerScan()
-            => global::Pulumi.Deployment.Instance.Call<InsightsAccountTriggerScanResult>("pulumiservice:index:InsightsAccount/triggerScan", CallArgs.Empty, this);
     }
 
     public sealed class InsightsAccountArgs : global::Pulumi.ResourceArgs
@@ -166,106 +154,5 @@ namespace Pulumi.PulumiService
         {
         }
         public static new InsightsAccountArgs Empty => new InsightsAccountArgs();
-    }
-
-    /// <summary>
-    /// The results of the <see cref="InsightsAccount.GetStatus"/> method.
-    /// </summary>
-    [OutputType]
-    public sealed class InsightsAccountGetStatusResult
-    {
-        /// <summary>
-        /// The insights account identifier.
-        /// </summary>
-        public readonly string AccountId;
-        /// <summary>
-        /// The name of the insights account.
-        /// </summary>
-        public readonly string AccountName;
-        /// <summary>
-        /// The identifier of the last completed scan.
-        /// </summary>
-        public readonly string? LastScanId;
-        /// <summary>
-        /// The timestamp of the last completed scan.
-        /// </summary>
-        public readonly string? LastScanTime;
-        /// <summary>
-        /// The timestamp of the next scheduled scan (if scheduled scanning is enabled).
-        /// </summary>
-        public readonly string? NextScanTime;
-        /// <summary>
-        /// The number of resources discovered in the last scan.
-        /// </summary>
-        public readonly int? ResourceCount;
-        /// <summary>
-        /// The current status of the account (e.g., 'active', 'scanning', 'idle').
-        /// </summary>
-        public readonly string Status;
-
-        [OutputConstructor]
-        private InsightsAccountGetStatusResult(
-            string accountId,
-
-            string accountName,
-
-            string? lastScanId,
-
-            string? lastScanTime,
-
-            string? nextScanTime,
-
-            int? resourceCount,
-
-            string status)
-        {
-            AccountId = accountId;
-            AccountName = accountName;
-            LastScanId = lastScanId;
-            LastScanTime = lastScanTime;
-            NextScanTime = nextScanTime;
-            ResourceCount = resourceCount;
-            Status = status;
-        }
-    }
-
-    /// <summary>
-    /// The results of the <see cref="InsightsAccount.TriggerScan"/> method.
-    /// </summary>
-    [OutputType]
-    public sealed class InsightsAccountTriggerScanResult
-    {
-        /// <summary>
-        /// Optional message about the scan trigger.
-        /// </summary>
-        public readonly string? Message;
-        /// <summary>
-        /// The unique identifier for the triggered scan (may be empty if scan is queued but ID not yet assigned).
-        /// </summary>
-        public readonly string? ScanId;
-        /// <summary>
-        /// The status of the scan request (e.g., 'queued', 'running', 'succeeded', 'failed').
-        /// </summary>
-        public readonly string Status;
-        /// <summary>
-        /// The timestamp when the scan was triggered.
-        /// </summary>
-        public readonly string? Timestamp;
-
-        [OutputConstructor]
-        private InsightsAccountTriggerScanResult(
-            string? message,
-
-            string? scanId,
-
-            string status,
-
-            string? timestamp)
-        {
-            Message = message;
-            ScanId = scanId;
-            Status = status;
-            Timestamp = timestamp;
-        }
     }
 }

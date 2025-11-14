@@ -117,24 +117,6 @@ export class InsightsAccount extends pulumi.CustomResource {
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         super(InsightsAccount.__pulumiType, name, resourceInputs, opts);
     }
-
-    /**
-     * Retrieves the current status of the insights account, including information about the last scan.
-     */
-    getStatus(): pulumi.Output<InsightsAccount.GetStatusResult> {
-        return pulumi.runtime.call("pulumiservice:index:InsightsAccount/getStatus", {
-            "__self__": this,
-        }, this);
-    }
-
-    /**
-     * Triggers an on-demand scan of the insights account's cloud resources.
-     */
-    triggerScan(): pulumi.Output<InsightsAccount.TriggerScanResult> {
-        return pulumi.runtime.call("pulumiservice:index:InsightsAccount/triggerScan", {
-            "__self__": this,
-        }, this);
-    }
 }
 
 /**
@@ -165,63 +147,4 @@ export interface InsightsAccountArgs {
      * Provider-specific configuration as a JSON object.
      */
     providerConfig?: any;
-}
-
-export namespace InsightsAccount {
-    /**
-     * The results of the InsightsAccount.getStatus method.
-     */
-    export interface GetStatusResult {
-        /**
-         * The insights account identifier.
-         */
-        readonly accountId: string;
-        /**
-         * The name of the insights account.
-         */
-        readonly accountName: string;
-        /**
-         * The identifier of the last completed scan.
-         */
-        readonly lastScanId?: string;
-        /**
-         * The timestamp of the last completed scan.
-         */
-        readonly lastScanTime?: string;
-        /**
-         * The timestamp of the next scheduled scan (if scheduled scanning is enabled).
-         */
-        readonly nextScanTime?: string;
-        /**
-         * The number of resources discovered in the last scan.
-         */
-        readonly resourceCount?: number;
-        /**
-         * The current status of the account (e.g., 'active', 'scanning', 'idle').
-         */
-        readonly status: string;
-    }
-
-    /**
-     * The results of the InsightsAccount.triggerScan method.
-     */
-    export interface TriggerScanResult {
-        /**
-         * Optional message about the scan trigger.
-         */
-        readonly message?: string;
-        /**
-         * The unique identifier for the triggered scan (may be empty if scan is queued but ID not yet assigned).
-         */
-        readonly scanId?: string;
-        /**
-         * The status of the scan request (e.g., 'queued', 'running', 'succeeded', 'failed').
-         */
-        readonly status: string;
-        /**
-         * The timestamp when the scan was triggered.
-         */
-        readonly timestamp?: string;
-    }
-
 }
