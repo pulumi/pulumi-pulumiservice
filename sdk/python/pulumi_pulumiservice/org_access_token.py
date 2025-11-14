@@ -27,7 +27,7 @@ class OrgAccessTokenArgs:
         The set of arguments for constructing a OrgAccessToken resource.
         :param pulumi.Input[_builtins.str] name: The name for the token.
         :param pulumi.Input[_builtins.str] organization_name: The organization's name.
-        :param pulumi.Input[_builtins.bool] admin: Optional. True if this is an admin token.
+        :param pulumi.Input[_builtins.bool] admin: Optional. True if this is an admin token. Defaults to false.
         :param pulumi.Input[_builtins.str] description: Optional. Team description.
         """
         pulumi.set(__self__, "name", name)
@@ -67,7 +67,7 @@ class OrgAccessTokenArgs:
     @pulumi.getter
     def admin(self) -> Optional[pulumi.Input[_builtins.bool]]:
         """
-        Optional. True if this is an admin token.
+        Optional. True if this is an admin token. Defaults to false.
         """
         return pulumi.get(self, "admin")
 
@@ -104,7 +104,7 @@ class OrgAccessToken(pulumi.CustomResource):
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
-        :param pulumi.Input[_builtins.bool] admin: Optional. True if this is an admin token.
+        :param pulumi.Input[_builtins.bool] admin: Optional. True if this is an admin token. Defaults to false.
         :param pulumi.Input[_builtins.str] description: Optional. Team description.
         :param pulumi.Input[_builtins.str] name: The name for the token.
         :param pulumi.Input[_builtins.str] organization_name: The organization's name.
@@ -192,7 +192,7 @@ class OrgAccessToken(pulumi.CustomResource):
     @pulumi.getter
     def admin(self) -> pulumi.Output[Optional[_builtins.bool]]:
         """
-        Optional. True if this is an admin token.
+        Optional. True if this is an admin token. Defaults to false.
         """
         return pulumi.get(self, "admin")
 

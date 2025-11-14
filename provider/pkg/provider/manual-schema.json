@@ -859,8 +859,9 @@
           "type": "string"
         },
         "forceDestroy": {
-          "description": "Optional. Flag indicating whether to delete the stack even if it still contains resources.",
-          "type": "boolean"
+          "description": "Optional. Flag indicating whether to delete the stack even if it still contains resources. Defaults to false, which means the stack will not be deleted if it still contains resources.",
+          "type": "boolean",
+          "default": false
         }
       },
       "required": [
@@ -885,8 +886,9 @@
           "willReplaceOnChanges": true
         },
         "forceDestroy": {
-          "description": "Optional. Flag indicating whether to delete the stack even if it still contains resources.",
-          "type": "boolean"
+          "description": "Optional. Flag indicating whether to delete the stack even if it still contains resources. Defaults to false, which means the stack will not be deleted if it still contains resources.",
+          "type": "boolean",
+          "default": false
         }
       },
       "requiredInputs": [
@@ -920,8 +922,9 @@
           "secret": true
         },
         "forceDestroy": {
-          "description": "Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.",
-          "type": "boolean"
+          "description": "Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it. Defaults to false, which means the agent pool will not be deleted if stacks are still configured to use it.",
+          "type": "boolean",
+          "default": false
         }
       },
       "required": [
@@ -946,8 +949,9 @@
           "willReplaceOnChanges": true
         },
         "forceDestroy": {
-          "description": "Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.",
-          "type": "boolean"
+          "description": "Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it. Defaults to false, which means the agent pool will not be deleted if stacks are still configured to use it.",
+          "type": "boolean",
+          "default": false
         }
       },
       "requiredInputs": [
@@ -1056,8 +1060,9 @@
           "type": "string"
         },
         "admin": {
-          "description": "Optional. True if this is an admin token.",
-          "type": "boolean"
+          "description": "Optional. True if this is an admin token. Defaults to false.",
+          "type": "boolean",
+          "default": false
         },
         "value": {
           "description": "The token's value.",
@@ -1086,7 +1091,7 @@
           "willReplaceOnChanges": true
         },
         "admin": {
-          "description": "Optional. True if this is an admin token.",
+          "description": "Optional. True if this is an admin token. Defaults to false.",
           "type": "boolean",
           "default": false
         }
@@ -1617,7 +1622,7 @@
           "willReplaceOnChanges": true
         },
         "deleteAfterDestroy": {
-          "description": "True if the stack and all associated history and settings should be deleted.",
+          "description": "True if the stack and all associated history and settings should be deleted. Defaults to false, which means only the resources are destroyed but the stack itself remains.",
           "type": "boolean",
           "default": false
         },
@@ -1655,7 +1660,7 @@
           "willReplaceOnChanges": true
         },
         "deleteAfterDestroy": {
-          "description": "True if the stack and all associated history and settings should be deleted.",
+          "description": "True if the stack and all associated history and settings should be deleted. Defaults to false, which means only the resources are destroyed but the stack itself remains.",
           "type": "boolean",
           "default": false
         }

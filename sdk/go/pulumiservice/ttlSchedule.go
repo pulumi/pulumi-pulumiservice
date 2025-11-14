@@ -16,7 +16,7 @@ import (
 type TtlSchedule struct {
 	pulumi.CustomResourceState
 
-	// True if the stack and all associated history and settings should be deleted.
+	// True if the stack and all associated history and settings should be deleted. Defaults to false, which means only the resources are destroyed but the stack itself remains.
 	DeleteAfterDestroy pulumi.BoolPtrOutput `pulumi:"deleteAfterDestroy"`
 	// Organization name.
 	Organization pulumi.StringOutput `pulumi:"organization"`
@@ -85,7 +85,7 @@ func (TtlScheduleState) ElementType() reflect.Type {
 }
 
 type ttlScheduleArgs struct {
-	// True if the stack and all associated history and settings should be deleted.
+	// True if the stack and all associated history and settings should be deleted. Defaults to false, which means only the resources are destroyed but the stack itself remains.
 	DeleteAfterDestroy *bool `pulumi:"deleteAfterDestroy"`
 	// Organization name.
 	Organization string `pulumi:"organization"`
@@ -99,7 +99,7 @@ type ttlScheduleArgs struct {
 
 // The set of arguments for constructing a TtlSchedule resource.
 type TtlScheduleArgs struct {
-	// True if the stack and all associated history and settings should be deleted.
+	// True if the stack and all associated history and settings should be deleted. Defaults to false, which means only the resources are destroyed but the stack itself remains.
 	DeleteAfterDestroy pulumi.BoolPtrInput
 	// Organization name.
 	Organization pulumi.StringInput
@@ -198,7 +198,7 @@ func (o TtlScheduleOutput) ToTtlScheduleOutputWithContext(ctx context.Context) T
 	return o
 }
 
-// True if the stack and all associated history and settings should be deleted.
+// True if the stack and all associated history and settings should be deleted. Defaults to false, which means only the resources are destroyed but the stack itself remains.
 func (o TtlScheduleOutput) DeleteAfterDestroy() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v *TtlSchedule) pulumi.BoolPtrOutput { return v.DeleteAfterDestroy }).(pulumi.BoolPtrOutput)
 }
