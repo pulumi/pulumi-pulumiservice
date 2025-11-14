@@ -737,6 +737,19 @@ func TestInsightsAccount_Name(t *testing.T) {
 }
 
 // Call Method Tests
+// createResourceReference creates a proper resource reference struct for testing
+// Resource references require a sentinel field to be recognized by Pulumi's unmarshaling
+func createResourceReference(urn, id string) *structpb.Struct {
+	return &structpb.Struct{
+		Fields: map[string]*structpb.Value{
+			// Sentinel field that marks this as a resource reference
+			"4dabf18193072939515e22adb298388d": {Kind: &structpb.Value_StringValue{StringValue: "5cf8f73096256a8f31e491e813e4eb8e"}},
+			"urn": {Kind: &structpb.Value_StringValue{StringValue: urn}},
+			"id":  {Kind: &structpb.Value_StringValue{StringValue: id}},
+		},
+	}
+}
+
 func TestInsightsAccount_Call_TriggerScan(t *testing.T) {
 	mockedClient := buildInsightsAccountClientMock(nil, nil, nil, nil)
 
@@ -745,12 +758,10 @@ func TestInsightsAccount_Call_TriggerScan(t *testing.T) {
 	}
 
 	// Create __self__ resource reference
-	selfRef := &structpb.Struct{
-		Fields: map[string]*structpb.Value{
-			"urn": {Kind: &structpb.Value_StringValue{StringValue: "urn:pulumi:stack::project::pulumiservice:index:InsightsAccount::test-account"}},
-			"id":  {Kind: &structpb.Value_StringValue{StringValue: "test-org/test-account"}},
-		},
-	}
+	selfRef := createResourceReference(
+		"urn:pulumi:stack::project::pulumiservice:index:InsightsAccount::test-account",
+		"test-org/test-account",
+	)
 
 	req := &pulumirpc.CallRequest{
 		Tok: "pulumiservice:index:InsightsAccount/triggerScan",
@@ -782,12 +793,10 @@ func TestInsightsAccount_Call_GetStatus(t *testing.T) {
 	}
 
 	// Create __self__ resource reference
-	selfRef := &structpb.Struct{
-		Fields: map[string]*structpb.Value{
-			"urn": {Kind: &structpb.Value_StringValue{StringValue: "urn:pulumi:stack::project::pulumiservice:index:InsightsAccount::test-account"}},
-			"id":  {Kind: &structpb.Value_StringValue{StringValue: "test-org/test-account"}},
-		},
-	}
+	selfRef := createResourceReference(
+		"urn:pulumi:stack::project::pulumiservice:index:InsightsAccount::test-account",
+		"test-org/test-account",
+	)
 
 	req := &pulumirpc.CallRequest{
 		Tok: "pulumiservice:index:InsightsAccount/getStatus",
@@ -823,12 +832,10 @@ func TestInsightsAccount_Call_UnknownMethod(t *testing.T) {
 	}
 
 	// Create __self__ resource reference
-	selfRef := &structpb.Struct{
-		Fields: map[string]*structpb.Value{
-			"urn": {Kind: &structpb.Value_StringValue{StringValue: "urn:pulumi:stack::project::pulumiservice:index:InsightsAccount::test-account"}},
-			"id":  {Kind: &structpb.Value_StringValue{StringValue: "test-org/test-account"}},
-		},
-	}
+	selfRef := createResourceReference(
+		"urn:pulumi:stack::project::pulumiservice:index:InsightsAccount::test-account",
+		"test-org/test-account",
+	)
 
 	req := &pulumirpc.CallRequest{
 		Tok: "pulumiservice:index:InsightsAccount/unknownMethod",
@@ -873,12 +880,10 @@ func TestInsightsAccount_Call_InvalidResourceID(t *testing.T) {
 	}
 
 	// Create __self__ with invalid ID format (should be org/account)
-	selfRef := &structpb.Struct{
-		Fields: map[string]*structpb.Value{
-			"urn": {Kind: &structpb.Value_StringValue{StringValue: "urn:pulumi:stack::project::pulumiservice:index:InsightsAccount::test"}},
-			"id":  {Kind: &structpb.Value_StringValue{StringValue: "invalid-id-format"}},
-		},
-	}
+	selfRef := createResourceReference(
+		"urn:pulumi:stack::project::pulumiservice:index:InsightsAccount::test",
+		"invalid-id-format",
+	)
 
 	req := &pulumirpc.CallRequest{
 		Tok: "pulumiservice:index:InsightsAccount/triggerScan",
@@ -904,12 +909,10 @@ func TestInsightsAccount_Call_TriggerScan_Preview(t *testing.T) {
 	}
 
 	// Create __self__ resource reference with empty ID (simulating preview)
-	selfRef := &structpb.Struct{
-		Fields: map[string]*structpb.Value{
-			"urn": {Kind: &structpb.Value_StringValue{StringValue: "urn:pulumi:stack::project::pulumiservice:index:InsightsAccount::test-account"}},
-			"id":  {Kind: &structpb.Value_StringValue{StringValue: ""}}, // Empty ID during preview
-		},
-	}
+	selfRef := createResourceReference(
+		"urn:pulumi:stack::project::pulumiservice:index:InsightsAccount::test-account",
+		"", // Empty ID during preview
+	)
 
 	req := &pulumirpc.CallRequest{
 		Tok: "pulumiservice:index:InsightsAccount/triggerScan",
@@ -952,12 +955,10 @@ func TestInsightsAccount_Call_GetStatus_Preview(t *testing.T) {
 	}
 
 	// Create __self__ resource reference with empty ID (simulating preview)
-	selfRef := &structpb.Struct{
-		Fields: map[string]*structpb.Value{
-			"urn": {Kind: &structpb.Value_StringValue{StringValue: "urn:pulumi:stack::project::pulumiservice:index:InsightsAccount::test-account"}},
-			"id":  {Kind: &structpb.Value_StringValue{StringValue: ""}}, // Empty ID during preview
-		},
-	}
+	selfRef := createResourceReference(
+		"urn:pulumi:stack::project::pulumiservice:index:InsightsAccount::test-account",
+		"", // Empty ID during preview
+	)
 
 	req := &pulumirpc.CallRequest{
 		Tok: "pulumiservice:index:InsightsAccount/getStatus",

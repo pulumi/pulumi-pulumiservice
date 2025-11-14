@@ -329,20 +329,30 @@ func (ia *PulumiServiceInsightsAccountResource) Delete(req *pulumirpc.DeleteRequ
 func (ia *PulumiServiceInsightsAccountResource) Call(req *pulumirpc.CallRequest) (*pulumirpc.CallResponse, error) {
 	ctx := context.Background()
 
-	// Get the resource URN from __self__
+	// Get __self__ directly from the raw protobuf args before unmarshaling
+	// This bypasses pulumi-go-provider's rpc.Provider wrapper which may transform resource references
 	selfArg, ok := req.GetArgs().GetFields()["__self__"]
 	if !ok {
 		return nil, fmt.Errorf("missing required __self__ argument")
 	}
 
-	resourceRef := selfArg.GetStructValue()
-	if resourceRef == nil {
-		return nil, fmt.Errorf("__self__ must be a resource reference")
-	}
+	// Extract ID from __self__ - it can be encoded as either a struct (resource reference)
+	// or potentially as a string (URN) depending on how the wrapper transformed it
+	var idString string
 
-	urn := resourceRef.GetFields()["urn"].GetStringValue()
-	if urn == "" {
-		return nil, fmt.Errorf("__self__ resource reference missing URN")
+	if structVal := selfArg.GetStructValue(); structVal != nil {
+		// Struct encoding - extract ID directly from the struct fields
+		// Resource references have a special sentinel field and urn/id fields
+		idVal := structVal.GetFields()["id"]
+		if idVal == nil {
+			return nil, fmt.Errorf("__self__ struct missing id field")
+		}
+		idString = idVal.GetStringValue()
+	} else if strVal := selfArg.GetStringValue(); strVal != "" {
+		// String encoding - this shouldn't happen for resource methods, but handle it gracefully
+		return nil, fmt.Errorf("__self__ was sent as string (%s) instead of resource reference struct; custom resource methods require the resource ID", strVal)
+	} else {
+		return nil, fmt.Errorf("__self__ has unexpected encoding: not struct or string")
 	}
 
 	// During preview (dry run), return computed/unknown values for all outputs
@@ -351,14 +361,13 @@ func (ia *PulumiServiceInsightsAccountResource) Call(req *pulumirpc.CallRequest)
 		return ia.returnUnknownOutputs(req.GetTok())
 	}
 
-	// Fallback: check for empty ID (for older SDKs/tests that don't set DryRun)
-	id := resourceRef.GetFields()["id"].GetStringValue()
-	if id == "" {
+	// Check for empty ID (fallback for preview detection in older SDKs that don't set DryRun)
+	if idString == "" {
 		return ia.returnUnknownOutputs(req.GetTok())
 	}
 
 	// Split the ID to get org and account name
-	orgName, accountName, err := splitInsightsAccountId(id)
+	orgName, accountName, err := splitInsightsAccountId(idString)
 	if err != nil {
 		return nil, fmt.Errorf("invalid resource ID: %w", err)
 	}

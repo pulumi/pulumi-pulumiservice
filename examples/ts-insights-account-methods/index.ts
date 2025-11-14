@@ -45,11 +45,8 @@ export const scheduledScanEnabled = insightsAccount.scheduledScanEnabled;
 // This makes the method idempotent - safe to call multiple times.
 const scanResult = insightsAccount.triggerScan();
 
-// Note: scanId and timestamp are optional outputs from triggerScan()
-// When a scan is first queued, it may not have been assigned an ID yet.
-// The scan ID is only created once the scan actually starts running.
-// Similarly, the timestamp is only available once the scan begins.
-// We export these with fallback values to avoid "undefined value" warnings.
-export const scanId = pulumi.output(scanResult.scanId).apply(id => id ?? "not-yet-assigned");
-export const scanStatus = scanResult.status;
-export const scanTimestamp = pulumi.output(scanResult.timestamp).apply(ts => ts ?? "not-yet-started");
+// Note: triggerScan() returns an Output, so we unwrap the result before
+// exporting individual fields. Optional fields have sensible defaults.
+export const scanId = scanResult.apply(result => result?.scanId ?? "not-yet-assigned");
+export const scanStatus = scanResult.apply(result => result?.status ?? "queued");
+export const scanTimestamp = scanResult.apply(result => result?.timestamp ?? "not-yet-started");
