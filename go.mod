@@ -18,6 +18,14 @@ require (
 )
 
 require (
+	github.com/fsnotify/fsnotify v1.7.0 // indirect
+	github.com/iwdgo/sigintwindows v0.2.2 // indirect
+	github.com/nxadm/tail v1.4.11 // indirect
+	github.com/pulumi/providertest v0.3.1 // indirect
+	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
+)
+
+require (
 	cloud.google.com/go v0.112.1 // indirect
 	cloud.google.com/go/compute/metadata v0.6.0 // indirect
 	cloud.google.com/go/iam v1.1.6 // indirect
