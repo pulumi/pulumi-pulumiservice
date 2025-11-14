@@ -52,29 +52,22 @@ func TestDeploymentSettingsExample(t *testing.T) {
 }
 
 func TestTeamStackPermissionsExample(t *testing.T) {
-	cwd, _ := os.Getwd()
-	digits := generateRandomFiveDigits()
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Quick: true,
-		Dir:   path.Join(cwd, ".", "ts-team-stack-permissions"),
-		Config: map[string]string{
-			"digits": digits,
-		},
-		Dependencies: []string{
-			"@pulumi/pulumiservice",
-		},
-	})
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "ts-team-stack-permissions"),
+		inMemoryProvider(),
+		opttest.YarnLink("@pulumi/pulumiservice"),
+	)
+	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	runPulumiTest(t, test)
 }
 
 func TestTeamsExample(t *testing.T) {
-	cwd := getCwd(t)
-
-	// Create a pulumitest instance with in-memory provider using the existing ts-teams directory
-	testPulumiProgram(t, pulumitest.NewPulumiTest(t,
-		filepath.Join(cwd, "ts-teams"),
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "ts-teams"),
 		inMemoryProvider(),
 		opttest.YarnLink("@pulumi/pulumiservice"),
-	))
+	)
+	runPulumiTest(t, test)
 }
 
 func TestNodejsWebhookExample(t *testing.T) {

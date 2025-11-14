@@ -39,10 +39,9 @@ func inMemoryProvider() opttest.Option {
 	return opttest.AttachProviderServer("pulumiservice", provider)
 }
 
-// testPulumiProgram performs the same basic steps as
+// runPulumiTest performs the same basic steps as
 // [github.com/pulumi/pulumi/pkg/v3/testing/integration.ProgramTest].
-func testPulumiProgram(t *testing.T, test *pulumitest.PulumiTest) {
-
+func runPulumiTest(t *testing.T, test *pulumitest.PulumiTest) {
 	// Run the Pulumi program
 	test.Up(t)
 
