@@ -89,6 +89,23 @@ cd examples && go test -v -run TestYamlStackTagsPluralExample -tags yaml -timeou
 - Add example programs in `examples/` for each new resource (examples serve as integration tests)
 - Examples are organized by language: `ts-*`, `py-*`, `go-*`, `cs-*`, `java-*`, `yaml-*`
 
+**IMPORTANT - Integration Test Framework**:
+- **Always use `pulumitest`** from `github.com/pulumi/providertest/pulumitest` for new integration tests
+- DO NOT use the legacy `integration.ProgramTest` from `github.com/pulumi/pulumi/pkg/v3/testing/integration`
+- The `pulumitest` framework provides better control, cleaner syntax, and is the preferred approach going forward
+- See `examples/examples_nodejs_test.go` for examples of properly structured `pulumitest` tests
+- Common pattern for `pulumitest` tests:
+  ```go
+  test := pulumitest.NewPulumiTest(t,
+      filepath.Join(getCwd(t), "example-directory"),
+      inMemoryProvider(),
+      opttest.UseAmbientBackend(),
+      opttest.YarnLink("@pulumi/pulumiservice"),  // for Node.js tests
+  )
+  test.SetConfig(t, "key", "value")  // optional config
+  runPulumiTest(t, test)  // runs up, preview, refresh, destroy
+  ```
+
 ## Development Workflow
 
 ### Copyright Headers
