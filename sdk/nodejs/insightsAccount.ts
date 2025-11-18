@@ -8,7 +8,7 @@ import * as enums from "./types/enums";
 import * as utilities from "./utilities";
 
 /**
- * Insights Account for cloud resource scanning and analysis
+ * Insights Account for cloud resource scanning and analysis across AWS, Azure, and GCP.
  */
 export class InsightsAccount extends pulumi.CustomResource {
     /**
@@ -38,7 +38,7 @@ export class InsightsAccount extends pulumi.CustomResource {
     }
 
     /**
-     * The name of the insights account.
+     * Name of the insights account.
      */
     declare public readonly accountName: pulumi.Output<string>;
     /**
@@ -58,13 +58,13 @@ export class InsightsAccount extends pulumi.CustomResource {
      */
     declare public readonly provider: pulumi.Output<string>;
     /**
-     * Provider-specific configuration as a JSON object.
+     * Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {"regions": ["us-west-1", "us-west-2"]}.
      */
-    declare public readonly providerConfig: pulumi.Output<any | undefined>;
+    declare public readonly providerConfig: pulumi.Output<{[key: string]: any} | undefined>;
     /**
-     * The provider version used for scanning.
+     * Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning.
      */
-    declare public /*out*/ readonly providerVersion: pulumi.Output<string | undefined>;
+    declare public readonly scanSchedule: pulumi.Output<enums.ScanSchedule | undefined>;
     /**
      * Whether scheduled scanning is enabled.
      */
@@ -100,7 +100,6 @@ export class InsightsAccount extends pulumi.CustomResource {
             resourceInputs["providerConfig"] = args?.providerConfig;
             resourceInputs["scanSchedule"] = args?.scanSchedule;
             resourceInputs["insightsAccountId"] = undefined /*out*/;
-            resourceInputs["providerVersion"] = undefined /*out*/;
             resourceInputs["scheduledScanEnabled"] = undefined /*out*/;
         } else {
             resourceInputs["accountName"] = undefined /*out*/;
@@ -109,10 +108,12 @@ export class InsightsAccount extends pulumi.CustomResource {
             resourceInputs["organizationName"] = undefined /*out*/;
             resourceInputs["provider"] = undefined /*out*/;
             resourceInputs["providerConfig"] = undefined /*out*/;
-            resourceInputs["providerVersion"] = undefined /*out*/;
+            resourceInputs["scanSchedule"] = undefined /*out*/;
             resourceInputs["scheduledScanEnabled"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["accountName", "organizationName", "provider"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(InsightsAccount.__pulumiType, name, resourceInputs, opts);
     }
 }
@@ -138,9 +139,9 @@ export interface InsightsAccountArgs {
      */
     provider: pulumi.Input<string>;
     /**
-     * Provider-specific configuration as a JSON object.
+     * Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {"regions": ["us-west-1", "us-west-2"]}.
      */
-    providerConfig?: any;
+    providerConfig?: pulumi.Input<{[key: string]: any}>;
     /**
      * Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning.
      */

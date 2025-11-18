@@ -4,734 +4,467 @@ package resources
 
 import (
 	"context"
-	"errors"
 	"testing"
 
+	"github.com/pulumi/pulumi-go-provider/infer"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
+	"github.com/pulumi/pulumi/sdk/v3/go/property"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
-// Mock types for InsightsAccount tests
-type getInsightsAccountFunc func() (*pulumiapi.InsightsAccount, error)
-type createInsightsAccountFunc func() error
-type updateInsightsAccountFunc func() error
-type deleteInsightsAccountFunc func() error
-
-type insightsAccountClientMock struct {
-	getFunc    getInsightsAccountFunc
-	createFunc createInsightsAccountFunc
-	updateFunc updateInsightsAccountFunc
-	deleteFunc deleteInsightsAccountFunc
+type InsightsAccountClientMock struct {
+	config.Client
+	getInsightsAccountFunc    func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error)
+	createInsightsAccountFunc func(ctx context.Context, orgName string, accountName string, req pulumiapi.CreateInsightsAccountRequest) error
+	updateInsightsAccountFunc func(ctx context.Context, orgName string, accountName string, req pulumiapi.UpdateInsightsAccountRequest) error
+	deleteInsightsAccountFunc func(ctx context.Context, orgName string, accountName string) error
 }
 
-func (c *insightsAccountClientMock) GetInsightsAccount(ctx context.Context, orgName, accountName string) (*pulumiapi.InsightsAccount, error) {
-	if c.getFunc == nil {
+func (c *InsightsAccountClientMock) GetInsightsAccount(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+	if c.getInsightsAccountFunc == nil {
 		return nil, nil
 	}
-	return c.getFunc()
+	return c.getInsightsAccountFunc(ctx, orgName, accountName)
 }
 
-func (c *insightsAccountClientMock) CreateInsightsAccount(ctx context.Context, orgName, accountName string, req pulumiapi.CreateInsightsAccountRequest) error {
-	if c.createFunc == nil {
+func (c *InsightsAccountClientMock) CreateInsightsAccount(ctx context.Context, orgName string, accountName string, req pulumiapi.CreateInsightsAccountRequest) error {
+	if c.createInsightsAccountFunc == nil {
 		return nil
 	}
-	return c.createFunc()
+	return c.createInsightsAccountFunc(ctx, orgName, accountName, req)
 }
 
-func (c *insightsAccountClientMock) UpdateInsightsAccount(ctx context.Context, orgName, accountName string, req pulumiapi.UpdateInsightsAccountRequest) error {
-	if c.updateFunc == nil {
+func (c *InsightsAccountClientMock) UpdateInsightsAccount(ctx context.Context, orgName string, accountName string, req pulumiapi.UpdateInsightsAccountRequest) error {
+	if c.updateInsightsAccountFunc == nil {
 		return nil
 	}
-	return c.updateFunc()
+	return c.updateInsightsAccountFunc(ctx, orgName, accountName, req)
 }
 
-func (c *insightsAccountClientMock) DeleteInsightsAccount(ctx context.Context, orgName, accountName string) error {
-	if c.deleteFunc == nil {
+func (c *InsightsAccountClientMock) DeleteInsightsAccount(ctx context.Context, orgName string, accountName string) error {
+	if c.deleteInsightsAccountFunc == nil {
 		return nil
 	}
-	return c.deleteFunc()
+	return c.deleteInsightsAccountFunc(ctx, orgName, accountName)
 }
 
-func (c *insightsAccountClientMock) TriggerScan(ctx context.Context, orgName, accountName string) (*pulumiapi.TriggerScanResponse, error) {
+func (c *InsightsAccountClientMock) TriggerScan(ctx context.Context, orgName string, accountName string) (*pulumiapi.TriggerScanResponse, error) {
 	return &pulumiapi.TriggerScanResponse{
 		WorkflowRun: pulumiapi.WorkflowRun{
-			ID:        "test-scan-123",
-			Status:    "running",
-			StartedAt: "2025-11-12T15:30:00Z",
+			ID:     "test-scan-id",
+			Status: "running",
 		},
 	}, nil
 }
 
-func (c *insightsAccountClientMock) GetScanStatus(ctx context.Context, orgName, accountName string) (*pulumiapi.ScanStatusResponse, error) {
+func (c *InsightsAccountClientMock) GetScanStatus(ctx context.Context, orgName string, accountName string) (*pulumiapi.ScanStatusResponse, error) {
 	return &pulumiapi.ScanStatusResponse{
 		WorkflowRun: pulumiapi.WorkflowRun{
-			ID:         "scan-456",
-			Status:     "succeeded",
-			FinishedAt: "2025-11-12T14:00:00Z",
+			ID:     "test-scan-id",
+			Status: "succeeded",
 		},
-		NextScan:      "2025-11-13T02:00:00Z",
 		ResourceCount: 42,
 	}, nil
 }
 
-func buildInsightsAccountClientMock(
-	getFunc getInsightsAccountFunc,
-	createFunc createInsightsAccountFunc,
-	updateFunc updateInsightsAccountFunc,
-	deleteFunc deleteInsightsAccountFunc,
-) *insightsAccountClientMock {
-	return &insightsAccountClientMock{
-		getFunc:    getFunc,
-		createFunc: createFunc,
-		updateFunc: updateFunc,
-		deleteFunc: deleteFunc,
-	}
+func TestInsightsAccount(t *testing.T) {
+	t.Run("Read when the resource is not found", func(t *testing.T) {
+		mockedClient := &InsightsAccountClientMock{
+			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+				return nil, nil
+			},
+		}
+
+		ctx := config.WithMockClient(context.Background(), mockedClient)
+
+		ia := &InsightsAccount{}
+		scanSchedule := ScanScheduleDaily
+		req := infer.ReadRequest[InsightsAccountInput, InsightsAccountState]{
+			ID: "test-org/test-account",
+			Inputs: InsightsAccountInput{
+				InsightsAccountCore: InsightsAccountCore{
+					OrganizationName: "test-org",
+					AccountName:      "test-account",
+					Provider:         "aws",
+					Environment:      "test-env",
+					ScanSchedule:     &scanSchedule,
+				},
+			},
+			State: InsightsAccountState{
+				InsightsAccountCore: InsightsAccountCore{
+					OrganizationName: "test-org",
+					AccountName:      "test-account",
+					Provider:         "aws",
+					Environment:      "test-env",
+					ScanSchedule:     &scanSchedule,
+				},
+				InsightsAccountId: "test-account-id",
+			},
+		}
+
+		resp, err := ia.Read(ctx, req)
+
+		assert.NoError(t, err)
+		assert.Equal(t, "", resp.ID)
+		assert.Equal(t, InsightsAccountInput{}, resp.Inputs)
+		assert.Equal(t, InsightsAccountState{}, resp.State)
+	})
+
+	t.Run("Read when the resource is found", func(t *testing.T) {
+		mockedClient := &InsightsAccountClientMock{
+			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+				return &pulumiapi.InsightsAccount{
+					ID:                   "test-account-id",
+					Name:                 "test-account",
+					Provider:             "aws",
+					ProviderEnvRef:       "test-env",
+					ScheduledScanEnabled: true,
+					ProviderConfig: map[string]interface{}{
+						"region": "us-west-2",
+					},
+				}, nil
+			},
+		}
+
+		ctx := config.WithMockClient(context.Background(), mockedClient)
+
+		ia := &InsightsAccount{}
+		scanSchedule := ScanScheduleDaily
+		req := infer.ReadRequest[InsightsAccountInput, InsightsAccountState]{
+			ID: "test-org/test-account",
+			Inputs: InsightsAccountInput{
+				InsightsAccountCore: InsightsAccountCore{
+					OrganizationName: "test-org",
+					AccountName:      "test-account",
+					Provider:         "aws",
+					Environment:      "test-env",
+					ScanSchedule:     &scanSchedule,
+				},
+			},
+			State: InsightsAccountState{
+				InsightsAccountCore: InsightsAccountCore{
+					OrganizationName: "test-org",
+					AccountName:      "test-account",
+					Provider:         "aws",
+					Environment:      "test-env",
+					ScanSchedule:     &scanSchedule,
+				},
+			},
+		}
+
+		resp, err := ia.Read(ctx, req)
+
+		assert.NoError(t, err)
+		assert.Equal(t, "test-org/test-account", resp.ID)
+		assert.Equal(t, "test-org", resp.Inputs.OrganizationName)
+		assert.Equal(t, "test-account", resp.Inputs.AccountName)
+		assert.Equal(t, "aws", resp.Inputs.Provider)
+		assert.Equal(t, "test-env", resp.Inputs.Environment)
+		assert.Equal(t, ScanScheduleDaily, *resp.Inputs.ScanSchedule)
+		assert.Equal(t, "test-account-id", resp.State.InsightsAccountId)
+		assert.Equal(t, true, resp.State.ScheduledScanEnabled)
+		assert.Equal(t, "us-west-2", resp.State.ProviderConfig["region"])
+	})
+
+	t.Run("Create with DryRun", func(t *testing.T) {
+		mockedClient := &InsightsAccountClientMock{}
+		ctx := config.WithMockClient(context.Background(), mockedClient)
+
+		ia := &InsightsAccount{}
+		scanSchedule := ScanScheduleDaily
+		req := infer.CreateRequest[InsightsAccountInput]{
+			DryRun: true,
+			Inputs: InsightsAccountInput{
+				InsightsAccountCore: InsightsAccountCore{
+					OrganizationName: "test-org",
+					AccountName:      "test-account",
+					Provider:         "aws",
+					Environment:      "test-env",
+					ScanSchedule:     &scanSchedule,
+					ProviderConfig: map[string]interface{}{
+						"regions": []string{"us-west-2"},
+					},
+				},
+			},
+		}
+
+		resp, err := ia.Create(ctx, req)
+
+		assert.NoError(t, err)
+		assert.Equal(t, "test-org/test-account", resp.ID)
+		assert.Equal(t, "", resp.Output.InsightsAccountId)
+		assert.Equal(t, true, resp.Output.ScheduledScanEnabled)
+		assert.Equal(t, "test-org", resp.Output.OrganizationName)
+		assert.Equal(t, "test-account", resp.Output.AccountName)
+	})
+
+	t.Run("Create successfully", func(t *testing.T) {
+		var capturedRequest pulumiapi.CreateInsightsAccountRequest
+		mockedClient := &InsightsAccountClientMock{
+			createInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.CreateInsightsAccountRequest) error {
+				capturedRequest = req
+				return nil
+			},
+			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+				return &pulumiapi.InsightsAccount{
+					ID:                   "account-id-123",
+					Name:                 accountName,
+					Provider:             "aws",
+					ProviderEnvRef:       "test-env",
+					ScheduledScanEnabled: true,
+					ProviderConfig: map[string]interface{}{
+						"regions": []interface{}{"us-west-2"},
+					},
+				}, nil
+			},
+		}
+		ctx := config.WithMockClient(context.Background(), mockedClient)
+
+		ia := &InsightsAccount{}
+		scanSchedule := ScanScheduleDaily
+		req := infer.CreateRequest[InsightsAccountInput]{
+			DryRun: false,
+			Inputs: InsightsAccountInput{
+				InsightsAccountCore: InsightsAccountCore{
+					OrganizationName: "test-org",
+					AccountName:      "test-account",
+					Provider:         "aws",
+					Environment:      "test-env",
+					ScanSchedule:     &scanSchedule,
+					ProviderConfig: map[string]interface{}{
+						"regions": []string{"us-west-2"},
+					},
+				},
+			},
+		}
+
+		resp, err := ia.Create(ctx, req)
+
+		assert.NoError(t, err)
+		assert.Equal(t, "test-org/test-account", resp.ID)
+		assert.Equal(t, "account-id-123", resp.Output.InsightsAccountId)
+		assert.Equal(t, true, resp.Output.ScheduledScanEnabled)
+		assert.Equal(t, "aws", capturedRequest.Provider)
+		assert.Equal(t, "test-env", capturedRequest.Environment)
+		assert.Equal(t, "daily", capturedRequest.ScanSchedule)
+	})
+
+	t.Run("Create with scanSchedule none", func(t *testing.T) {
+		var capturedRequest pulumiapi.CreateInsightsAccountRequest
+		mockedClient := &InsightsAccountClientMock{
+			createInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.CreateInsightsAccountRequest) error {
+				capturedRequest = req
+				return nil
+			},
+			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+				return &pulumiapi.InsightsAccount{
+					ID:                   "account-id-123",
+					Name:                 accountName,
+					Provider:             "aws",
+					ProviderEnvRef:       "test-env",
+					ScheduledScanEnabled: false,
+				}, nil
+			},
+		}
+		ctx := config.WithMockClient(context.Background(), mockedClient)
+
+		ia := &InsightsAccount{}
+		scanSchedule := ScanScheduleNone
+		req := infer.CreateRequest[InsightsAccountInput]{
+			DryRun: false,
+			Inputs: InsightsAccountInput{
+				InsightsAccountCore: InsightsAccountCore{
+					OrganizationName: "test-org",
+					AccountName:      "test-account",
+					Provider:         "aws",
+					Environment:      "test-env",
+					ScanSchedule:     &scanSchedule,
+				},
+			},
+		}
+
+		resp, err := ia.Create(ctx, req)
+
+		assert.NoError(t, err)
+		assert.Equal(t, "none", capturedRequest.ScanSchedule)
+		assert.Equal(t, false, resp.Output.ScheduledScanEnabled)
+	})
+
+	t.Run("Update with DryRun", func(t *testing.T) {
+		mockedClient := &InsightsAccountClientMock{}
+		ctx := config.WithMockClient(context.Background(), mockedClient)
+
+		ia := &InsightsAccount{}
+		oldSchedule := ScanScheduleDaily
+		newSchedule := ScanScheduleNone
+		req := infer.UpdateRequest[InsightsAccountInput, InsightsAccountState]{
+			DryRun: true,
+			Inputs: InsightsAccountInput{
+				InsightsAccountCore: InsightsAccountCore{
+					OrganizationName: "test-org",
+					AccountName:      "test-account",
+					Provider:         "aws",
+					Environment:      "updated-env",
+					ScanSchedule:     &newSchedule,
+				},
+			},
+			State: InsightsAccountState{
+				InsightsAccountCore: InsightsAccountCore{
+					OrganizationName: "test-org",
+					AccountName:      "test-account",
+					Provider:         "aws",
+					Environment:      "old-env",
+					ScanSchedule:     &oldSchedule,
+				},
+				InsightsAccountId:    "account-id-123",
+				ScheduledScanEnabled: true,
+			},
+		}
+
+		resp, err := ia.Update(ctx, req)
+
+		assert.NoError(t, err)
+		assert.Equal(t, "updated-env", resp.Output.Environment)
+		assert.Equal(t, "account-id-123", resp.Output.InsightsAccountId)
+		assert.Equal(t, true, resp.Output.ScheduledScanEnabled) // State value preserved in DryRun
+	})
+
+	t.Run("Update successfully", func(t *testing.T) {
+		var capturedRequest pulumiapi.UpdateInsightsAccountRequest
+		mockedClient := &InsightsAccountClientMock{
+			updateInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.UpdateInsightsAccountRequest) error {
+				capturedRequest = req
+				return nil
+			},
+			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+				return &pulumiapi.InsightsAccount{
+					ID:                   "account-id-123",
+					Name:                 accountName,
+					Provider:             "aws",
+					ProviderEnvRef:       "updated-env",
+					ScheduledScanEnabled: false,
+				}, nil
+			},
+		}
+		ctx := config.WithMockClient(context.Background(), mockedClient)
+
+		ia := &InsightsAccount{}
+		oldSchedule := ScanScheduleDaily
+		newSchedule := ScanScheduleNone
+		req := infer.UpdateRequest[InsightsAccountInput, InsightsAccountState]{
+			DryRun: false,
+			Inputs: InsightsAccountInput{
+				InsightsAccountCore: InsightsAccountCore{
+					OrganizationName: "test-org",
+					AccountName:      "test-account",
+					Provider:         "aws",
+					Environment:      "updated-env",
+					ScanSchedule:     &newSchedule,
+				},
+			},
+			State: InsightsAccountState{
+				InsightsAccountCore: InsightsAccountCore{
+					OrganizationName: "test-org",
+					AccountName:      "test-account",
+					Provider:         "aws",
+					Environment:      "old-env",
+					ScanSchedule:     &oldSchedule,
+				},
+				InsightsAccountId:    "account-id-123",
+				ScheduledScanEnabled: true,
+			},
+		}
+
+		resp, err := ia.Update(ctx, req)
+
+		assert.NoError(t, err)
+		assert.Equal(t, "updated-env", capturedRequest.Environment)
+		assert.Equal(t, "none", capturedRequest.ScanSchedule)
+		assert.Equal(t, false, resp.Output.ScheduledScanEnabled)
+	})
+
+	t.Run("Delete successfully", func(t *testing.T) {
+		deleteCalled := false
+		mockedClient := &InsightsAccountClientMock{
+			deleteInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) error {
+				deleteCalled = true
+				assert.Equal(t, "test-org", orgName)
+				assert.Equal(t, "test-account", accountName)
+				return nil
+			},
+		}
+		ctx := config.WithMockClient(context.Background(), mockedClient)
+
+		ia := &InsightsAccount{}
+		scanSchedule := ScanScheduleDaily
+		req := infer.DeleteRequest[InsightsAccountState]{
+			State: InsightsAccountState{
+				InsightsAccountCore: InsightsAccountCore{
+					OrganizationName: "test-org",
+					AccountName:      "test-account",
+					Provider:         "aws",
+					Environment:      "test-env",
+					ScanSchedule:     &scanSchedule,
+				},
+				InsightsAccountId: "account-id-123",
+			},
+		}
+
+		_, err := ia.Delete(ctx, req)
+
+		assert.NoError(t, err)
+		assert.True(t, deleteCalled)
+	})
+
+	t.Run("Check with valid provider", func(t *testing.T) {
+		ia := &InsightsAccount{}
+
+		validProviders := []string{"aws", "azure", "gcp"}
+		for _, provider := range validProviders {
+			t.Run(provider, func(t *testing.T) {
+				inputs := property.NewMap(map[string]property.Value{
+					"organizationName": property.New("test-org"),
+					"accountName":      property.New("test-account"),
+					"provider":         property.New(provider),
+					"environment":      property.New("test-env"),
+					"scanSchedule":     property.New("daily"),
+				})
+
+				req := infer.CheckRequest{
+					NewInputs: inputs,
+				}
+
+				resp, err := ia.Check(context.Background(), req)
+
+				assert.NoError(t, err)
+				assert.Empty(t, resp.Failures)
+				assert.Equal(t, provider, resp.Inputs.Provider)
+			})
+		}
+	})
+
+	t.Run("Check with invalid provider", func(t *testing.T) {
+		ia := &InsightsAccount{}
+
+		inputs := property.NewMap(map[string]property.Value{
+			"organizationName": property.New("test-org"),
+			"accountName":      property.New("test-account"),
+			"provider":         property.New("invalid-provider"),
+			"environment":      property.New("test-env"),
+			"scanSchedule":     property.New("daily"),
+		})
+
+		req := infer.CheckRequest{
+			NewInputs: inputs,
+		}
+
+		resp, err := ia.Check(context.Background(), req)
+
+		assert.NoError(t, err)
+		assert.Len(t, resp.Failures, 1)
+		assert.Equal(t, "provider", resp.Failures[0].Property)
+		assert.Contains(t, resp.Failures[0].Reason, "provider must be one of")
+		assert.Contains(t, resp.Failures[0].Reason, "invalid-provider")
+	})
 }
-
-// Test helper functions
-func testInsightsAccountInput() PulumiServiceInsightsAccountInput {
-	return PulumiServiceInsightsAccountInput{
-		OrgName:        "test-org",
-		AccountName:    "test-account",
-		Provider:       "aws",
-		Environment:    "test-env",
-		ScanSchedule:   "daily",
-		ProviderConfig: map[string]interface{}{
-			"region": "us-west-2",
-		},
-	}
-}
-
-func testInsightsAccountResponse() *pulumiapi.InsightsAccount {
-	return &pulumiapi.InsightsAccount{
-		ID:                   "test-account-id",
-		Name:                 "test-account",
-		Provider:             "aws",
-		ProviderVersion:      "6.0.0",
-		ProviderEnvRef:       "test-env",
-		ScheduledScanEnabled: true,
-		ProviderConfig: map[string]interface{}{
-			"region": "us-west-2",
-		},
-	}
-}
-
-// Read Tests
-func TestInsightsAccount_Read_NotFound(t *testing.T) {
-	mockedClient := buildInsightsAccountClientMock(
-		func() (*pulumiapi.InsightsAccount, error) { return nil, nil },
-		nil,
-		nil,
-		nil,
-	)
-
-	provider := PulumiServiceInsightsAccountResource{
-		Client: mockedClient,
-	}
-
-	input := testInsightsAccountInput()
-	inputMap := resource.PropertyMap{
-		"organizationName": resource.NewPropertyValue(input.OrgName),
-		"accountName":      resource.NewPropertyValue(input.AccountName),
-		"provider":         resource.NewPropertyValue(input.Provider),
-		"environment":      resource.NewPropertyValue(input.Environment),
-	}
-
-	inputProperties, _ := plugin.MarshalProperties(
-		inputMap,
-		plugin.MarshalOptions{
-			KeepUnknowns: true,
-			SkipNulls:    true,
-		},
-	)
-
-	req := pulumirpc.ReadRequest{
-		Id:         "test-org/test-account",
-		Properties: inputProperties,
-	}
-
-	resp, err := provider.Read(&req)
-
-	assert.NoError(t, err)
-	assert.Empty(t, resp.Id)
-	assert.Nil(t, resp.Properties)
-}
-
-func TestInsightsAccount_Read_Found(t *testing.T) {
-	mockedClient := buildInsightsAccountClientMock(
-		func() (*pulumiapi.InsightsAccount, error) {
-			return testInsightsAccountResponse(), nil
-		},
-		nil,
-		nil,
-		nil,
-	)
-
-	provider := PulumiServiceInsightsAccountResource{
-		Client: mockedClient,
-	}
-
-	input := testInsightsAccountInput()
-	inputMap := resource.PropertyMap{
-		"organizationName": resource.NewPropertyValue(input.OrgName),
-		"accountName":      resource.NewPropertyValue(input.AccountName),
-		"provider":         resource.NewPropertyValue(input.Provider),
-		"environment":      resource.NewPropertyValue(input.Environment),
-		"cron":             resource.NewPropertyValue(input.ScanSchedule),
-		"providerConfig":   resource.NewPropertyValue(input.ProviderConfig),
-	}
-
-	inputProperties, _ := plugin.MarshalProperties(
-		inputMap,
-		plugin.MarshalOptions{
-			KeepUnknowns: true,
-			SkipNulls:    true,
-		},
-	)
-
-	req := pulumirpc.ReadRequest{
-		Id:         "test-org/test-account",
-		Properties: inputProperties,
-	}
-
-	resp, err := provider.Read(&req)
-
-	assert.NoError(t, err)
-	assert.Equal(t, "test-org/test-account", resp.Id)
-	assert.NotNil(t, resp.Properties)
-	assert.NotNil(t, resp.Inputs)
-}
-
-func TestInsightsAccount_Read_InvalidId(t *testing.T) {
-	mockedClient := buildInsightsAccountClientMock(nil, nil, nil, nil)
-
-	provider := PulumiServiceInsightsAccountResource{
-		Client: mockedClient,
-	}
-
-	inputMap := resource.PropertyMap{}
-	inputProperties, _ := plugin.MarshalProperties(
-		inputMap,
-		plugin.MarshalOptions{
-			KeepUnknowns: true,
-			SkipNulls:    true,
-		},
-	)
-
-	req := pulumirpc.ReadRequest{
-		Id:         "invalid-id-format",
-		Properties: inputProperties,
-	}
-
-	resp, err := provider.Read(&req)
-
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "invalid, must be in the format")
-	assert.Nil(t, resp)
-}
-
-// Create Tests
-func TestInsightsAccount_Create_Success(t *testing.T) {
-	mockedClient := buildInsightsAccountClientMock(
-		func() (*pulumiapi.InsightsAccount, error) {
-			return testInsightsAccountResponse(), nil
-		},
-		func() error { return nil },
-		nil,
-		nil,
-	)
-
-	provider := PulumiServiceInsightsAccountResource{
-		Client: mockedClient,
-	}
-
-	input := testInsightsAccountInput()
-	inputMap := resource.PropertyMap{
-		"organizationName": resource.NewPropertyValue(input.OrgName),
-		"accountName":      resource.NewPropertyValue(input.AccountName),
-		"provider":         resource.NewPropertyValue(input.Provider),
-		"environment":      resource.NewPropertyValue(input.Environment),
-		"cron":             resource.NewPropertyValue(input.ScanSchedule),
-		"providerConfig":   resource.NewPropertyValue(input.ProviderConfig),
-	}
-
-	properties, _ := plugin.MarshalProperties(
-		inputMap,
-		plugin.MarshalOptions{
-			KeepUnknowns: true,
-			SkipNulls:    true,
-		},
-	)
-
-	req := pulumirpc.CreateRequest{
-		Properties: properties,
-	}
-
-	resp, err := provider.Create(&req)
-
-	assert.NoError(t, err)
-	assert.Equal(t, "test-org/test-account", resp.Id)
-	assert.NotNil(t, resp.Properties)
-}
-
-func TestInsightsAccount_Create_APIError(t *testing.T) {
-	mockedClient := buildInsightsAccountClientMock(
-		nil,
-		func() error { return errors.New("API error") },
-		nil,
-		nil,
-	)
-
-	provider := PulumiServiceInsightsAccountResource{
-		Client: mockedClient,
-	}
-
-	input := testInsightsAccountInput()
-	inputMap := resource.PropertyMap{
-		"organizationName": resource.NewPropertyValue(input.OrgName),
-		"accountName":      resource.NewPropertyValue(input.AccountName),
-		"provider":         resource.NewPropertyValue(input.Provider),
-		"environment":      resource.NewPropertyValue(input.Environment),
-	}
-
-	properties, _ := plugin.MarshalProperties(
-		inputMap,
-		plugin.MarshalOptions{
-			KeepUnknowns: true,
-			SkipNulls:    true,
-		},
-	)
-
-	req := pulumirpc.CreateRequest{
-		Properties: properties,
-	}
-
-	resp, err := provider.Create(&req)
-
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "error creating insights account")
-	assert.Nil(t, resp)
-}
-
-func TestInsightsAccount_Create_NotFoundAfterCreate(t *testing.T) {
-	mockedClient := buildInsightsAccountClientMock(
-		func() (*pulumiapi.InsightsAccount, error) {
-			return nil, nil
-		},
-		func() error { return nil },
-		nil,
-		nil,
-	)
-
-	provider := PulumiServiceInsightsAccountResource{
-		Client: mockedClient,
-	}
-
-	input := testInsightsAccountInput()
-	inputMap := resource.PropertyMap{
-		"organizationName": resource.NewPropertyValue(input.OrgName),
-		"accountName":      resource.NewPropertyValue(input.AccountName),
-		"provider":         resource.NewPropertyValue(input.Provider),
-		"environment":      resource.NewPropertyValue(input.Environment),
-	}
-
-	properties, _ := plugin.MarshalProperties(
-		inputMap,
-		plugin.MarshalOptions{
-			KeepUnknowns: true,
-			SkipNulls:    true,
-		},
-	)
-
-	req := pulumirpc.CreateRequest{
-		Properties: properties,
-	}
-
-	resp, err := provider.Create(&req)
-
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "not found after creation")
-	assert.Nil(t, resp)
-}
-
-// Update Tests
-func TestInsightsAccount_Update_Success(t *testing.T) {
-	mockedClient := buildInsightsAccountClientMock(
-		func() (*pulumiapi.InsightsAccount, error) {
-			account := testInsightsAccountResponse()
-			account.ProviderEnvRef = "new-env"
-			return account, nil
-		},
-		nil,
-		func() error { return nil },
-		nil,
-	)
-
-	provider := PulumiServiceInsightsAccountResource{
-		Client: mockedClient,
-	}
-
-	input := testInsightsAccountInput()
-	input.Environment = "new-env"
-
-	inputMap := resource.PropertyMap{
-		"organizationName": resource.NewPropertyValue(input.OrgName),
-		"accountName":      resource.NewPropertyValue(input.AccountName),
-		"provider":         resource.NewPropertyValue(input.Provider),
-		"environment":      resource.NewPropertyValue(input.Environment),
-		"cron":             resource.NewPropertyValue(input.ScanSchedule),
-		"providerConfig":   resource.NewPropertyValue(input.ProviderConfig),
-	}
-
-	properties, _ := plugin.MarshalProperties(
-		inputMap,
-		plugin.MarshalOptions{
-			KeepUnknowns: true,
-			SkipNulls:    true,
-		},
-	)
-
-	req := pulumirpc.UpdateRequest{
-		Id:   "test-org/test-account",
-		News: properties,
-	}
-
-	resp, err := provider.Update(&req)
-
-	assert.NoError(t, err)
-	assert.NotNil(t, resp.Properties)
-}
-
-func TestInsightsAccount_Update_NotFoundAfterUpdate(t *testing.T) {
-	mockedClient := buildInsightsAccountClientMock(
-		func() (*pulumiapi.InsightsAccount, error) {
-			return nil, nil
-		},
-		nil,
-		func() error { return nil },
-		nil,
-	)
-
-	provider := PulumiServiceInsightsAccountResource{
-		Client: mockedClient,
-	}
-
-	input := testInsightsAccountInput()
-	inputMap := resource.PropertyMap{
-		"organizationName": resource.NewPropertyValue(input.OrgName),
-		"accountName":      resource.NewPropertyValue(input.AccountName),
-		"provider":         resource.NewPropertyValue(input.Provider),
-		"environment":      resource.NewPropertyValue(input.Environment),
-	}
-
-	properties, _ := plugin.MarshalProperties(
-		inputMap,
-		plugin.MarshalOptions{
-			KeepUnknowns: true,
-			SkipNulls:    true,
-		},
-	)
-
-	req := pulumirpc.UpdateRequest{
-		Id:   "test-org/test-account",
-		News: properties,
-	}
-
-	resp, err := provider.Update(&req)
-
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "not found after update")
-	assert.Nil(t, resp)
-}
-
-// Delete Tests
-func TestInsightsAccount_Delete_Success(t *testing.T) {
-	mockedClient := buildInsightsAccountClientMock(
-		nil,
-		nil,
-		nil,
-		func() error { return nil },
-	)
-
-	provider := PulumiServiceInsightsAccountResource{
-		Client: mockedClient,
-	}
-
-	req := pulumirpc.DeleteRequest{
-		Id: "test-org/test-account",
-	}
-
-	resp, err := provider.Delete(&req)
-
-	assert.NoError(t, err)
-	assert.NotNil(t, resp)
-}
-
-func TestInsightsAccount_Delete_InvalidId(t *testing.T) {
-	mockedClient := buildInsightsAccountClientMock(nil, nil, nil, nil)
-
-	provider := PulumiServiceInsightsAccountResource{
-		Client: mockedClient,
-	}
-
-	req := pulumirpc.DeleteRequest{
-		Id: "invalid-id",
-	}
-
-	_, err := provider.Delete(&req)
-
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "invalid, must be in the format")
-}
-
-// Diff Tests - Replacement Properties
-func TestInsightsAccount_Diff_OrganizationNameChange_RequiresReplacement(t *testing.T) {
-	provider := PulumiServiceInsightsAccountResource{}
-
-	oldInput := testInsightsAccountInput()
-	oldInputMap := resource.PropertyMap{
-		"organizationName": resource.NewPropertyValue(oldInput.OrgName),
-		"accountName":      resource.NewPropertyValue(oldInput.AccountName),
-		"provider":         resource.NewPropertyValue(oldInput.Provider),
-		"environment":      resource.NewPropertyValue(oldInput.Environment),
-	}
-
-	newInput := testInsightsAccountInput()
-	newInput.OrgName = "new-org"
-	newInputMap := resource.PropertyMap{
-		"organizationName": resource.NewPropertyValue(newInput.OrgName),
-		"accountName":      resource.NewPropertyValue(newInput.AccountName),
-		"provider":         resource.NewPropertyValue(newInput.Provider),
-		"environment":      resource.NewPropertyValue(newInput.Environment),
-	}
-
-	oldInputs, _ := plugin.MarshalProperties(oldInputMap, plugin.MarshalOptions{})
-	news, _ := plugin.MarshalProperties(newInputMap, plugin.MarshalOptions{})
-
-	req := pulumirpc.DiffRequest{
-		OldInputs: oldInputs,
-		News:      news,
-	}
-
-	resp, err := provider.Diff(&req)
-
-	assert.NoError(t, err)
-	assert.Equal(t, pulumirpc.DiffResponse_DIFF_SOME, resp.Changes)
-	assert.True(t, resp.HasDetailedDiff)
-	assert.Contains(t, resp.DetailedDiff, "organizationName")
-	assert.Equal(t, pulumirpc.PropertyDiff_UPDATE_REPLACE, resp.DetailedDiff["organizationName"].Kind)
-}
-
-func TestInsightsAccount_Diff_AccountNameChange_RequiresReplacement(t *testing.T) {
-	provider := PulumiServiceInsightsAccountResource{}
-
-	oldInput := testInsightsAccountInput()
-	oldInputMap := resource.PropertyMap{
-		"organizationName": resource.NewPropertyValue(oldInput.OrgName),
-		"accountName":      resource.NewPropertyValue(oldInput.AccountName),
-		"provider":         resource.NewPropertyValue(oldInput.Provider),
-		"environment":      resource.NewPropertyValue(oldInput.Environment),
-	}
-
-	newInput := testInsightsAccountInput()
-	newInput.AccountName = "new-account"
-	newInputMap := resource.PropertyMap{
-		"organizationName": resource.NewPropertyValue(newInput.OrgName),
-		"accountName":      resource.NewPropertyValue(newInput.AccountName),
-		"provider":         resource.NewPropertyValue(newInput.Provider),
-		"environment":      resource.NewPropertyValue(newInput.Environment),
-	}
-
-	oldInputs, _ := plugin.MarshalProperties(oldInputMap, plugin.MarshalOptions{})
-	news, _ := plugin.MarshalProperties(newInputMap, plugin.MarshalOptions{})
-
-	req := pulumirpc.DiffRequest{
-		OldInputs: oldInputs,
-		News:      news,
-	}
-
-	resp, err := provider.Diff(&req)
-
-	assert.NoError(t, err)
-	assert.Equal(t, pulumirpc.DiffResponse_DIFF_SOME, resp.Changes)
-	assert.True(t, resp.HasDetailedDiff)
-	assert.Contains(t, resp.DetailedDiff, "accountName")
-	assert.Equal(t, pulumirpc.PropertyDiff_UPDATE_REPLACE, resp.DetailedDiff["accountName"].Kind)
-}
-
-func TestInsightsAccount_Diff_ProviderChange_RequiresReplacement(t *testing.T) {
-	provider := PulumiServiceInsightsAccountResource{}
-
-	oldInput := testInsightsAccountInput()
-	oldInputMap := resource.PropertyMap{
-		"organizationName": resource.NewPropertyValue(oldInput.OrgName),
-		"accountName":      resource.NewPropertyValue(oldInput.AccountName),
-		"provider":         resource.NewPropertyValue(oldInput.Provider),
-		"environment":      resource.NewPropertyValue(oldInput.Environment),
-	}
-
-	newInput := testInsightsAccountInput()
-	newInput.Provider = "azure"
-	newInputMap := resource.PropertyMap{
-		"organizationName": resource.NewPropertyValue(newInput.OrgName),
-		"accountName":      resource.NewPropertyValue(newInput.AccountName),
-		"provider":         resource.NewPropertyValue(newInput.Provider),
-		"environment":      resource.NewPropertyValue(newInput.Environment),
-	}
-
-	oldInputs, _ := plugin.MarshalProperties(oldInputMap, plugin.MarshalOptions{})
-	news, _ := plugin.MarshalProperties(newInputMap, plugin.MarshalOptions{})
-
-	req := pulumirpc.DiffRequest{
-		OldInputs: oldInputs,
-		News:      news,
-	}
-
-	resp, err := provider.Diff(&req)
-
-	assert.NoError(t, err)
-	assert.Equal(t, pulumirpc.DiffResponse_DIFF_SOME, resp.Changes)
-	assert.True(t, resp.HasDetailedDiff)
-	assert.Contains(t, resp.DetailedDiff, "provider")
-	assert.Equal(t, pulumirpc.PropertyDiff_UPDATE_REPLACE, resp.DetailedDiff["provider"].Kind)
-}
-
-// Diff Tests - Update-Only Properties
-func TestInsightsAccount_Diff_EnvironmentChange_UpdateOnly(t *testing.T) {
-	provider := PulumiServiceInsightsAccountResource{}
-
-	oldInput := testInsightsAccountInput()
-	oldInputMap := resource.PropertyMap{
-		"organizationName": resource.NewPropertyValue(oldInput.OrgName),
-		"accountName":      resource.NewPropertyValue(oldInput.AccountName),
-		"provider":         resource.NewPropertyValue(oldInput.Provider),
-		"environment":      resource.NewPropertyValue(oldInput.Environment),
-		"cron":             resource.NewPropertyValue(oldInput.ScanSchedule),
-		"providerConfig":   resource.NewPropertyValue(oldInput.ProviderConfig),
-	}
-
-	newInput := testInsightsAccountInput()
-	newInput.Environment = "new-env"
-	newInputMap := resource.PropertyMap{
-		"organizationName": resource.NewPropertyValue(newInput.OrgName),
-		"accountName":      resource.NewPropertyValue(newInput.AccountName),
-		"provider":         resource.NewPropertyValue(newInput.Provider),
-		"environment":      resource.NewPropertyValue(newInput.Environment),
-		"cron":             resource.NewPropertyValue(newInput.ScanSchedule),
-		"providerConfig":   resource.NewPropertyValue(newInput.ProviderConfig),
-	}
-
-	oldInputs, _ := plugin.MarshalProperties(oldInputMap, plugin.MarshalOptions{})
-	news, _ := plugin.MarshalProperties(newInputMap, plugin.MarshalOptions{})
-
-	req := pulumirpc.DiffRequest{
-		OldInputs: oldInputs,
-		News:      news,
-	}
-
-	resp, err := provider.Diff(&req)
-
-	assert.NoError(t, err)
-	assert.Equal(t, pulumirpc.DiffResponse_DIFF_SOME, resp.Changes)
-	assert.True(t, resp.HasDetailedDiff)
-	assert.Contains(t, resp.DetailedDiff, "environment")
-	// Environment change should be UPDATE, not REPLACE
-	assert.Equal(t, pulumirpc.PropertyDiff_UPDATE, resp.DetailedDiff["environment"].Kind)
-}
-
-func TestInsightsAccount_Diff_NoChanges(t *testing.T) {
-	provider := PulumiServiceInsightsAccountResource{}
-
-	input := testInsightsAccountInput()
-	inputMap := resource.PropertyMap{
-		"organizationName": resource.NewPropertyValue(input.OrgName),
-		"accountName":      resource.NewPropertyValue(input.AccountName),
-		"provider":         resource.NewPropertyValue(input.Provider),
-		"environment":      resource.NewPropertyValue(input.Environment),
-		"cron":             resource.NewPropertyValue(input.ScanSchedule),
-		"providerConfig":   resource.NewPropertyValue(input.ProviderConfig),
-	}
-
-	oldInputs, _ := plugin.MarshalProperties(inputMap, plugin.MarshalOptions{})
-	news, _ := plugin.MarshalProperties(inputMap, plugin.MarshalOptions{})
-
-	req := pulumirpc.DiffRequest{
-		OldInputs: oldInputs,
-		News:      news,
-	}
-
-	resp, err := provider.Diff(&req)
-
-	assert.NoError(t, err)
-	assert.Equal(t, pulumirpc.DiffResponse_DIFF_NONE, resp.Changes)
-	assert.False(t, resp.HasDetailedDiff)
-}
-
-// Check Tests
-func TestInsightsAccount_Check_Success(t *testing.T) {
-	provider := PulumiServiceInsightsAccountResource{}
-
-	input := testInsightsAccountInput()
-	inputMap := resource.PropertyMap{
-		"organizationName": resource.NewPropertyValue(input.OrgName),
-		"accountName":      resource.NewPropertyValue(input.AccountName),
-		"provider":         resource.NewPropertyValue(input.Provider),
-		"environment":      resource.NewPropertyValue(input.Environment),
-		"cron":             resource.NewPropertyValue(input.ScanSchedule),
-		"providerConfig":   resource.NewPropertyValue(input.ProviderConfig),
-	}
-
-	news, _ := plugin.MarshalProperties(inputMap, plugin.MarshalOptions{})
-
-	req := pulumirpc.CheckRequest{
-		News: news,
-	}
-
-	resp, err := provider.Check(&req)
-
-	assert.NoError(t, err)
-	assert.NotNil(t, resp)
-	assert.Nil(t, resp.Failures)
-}
-
-// Helper function tests
-func TestSplitInsightsAccountId_Valid(t *testing.T) {
-	orgName, accountName, err := splitInsightsAccountId("test-org/test-account")
-
-	assert.NoError(t, err)
-	assert.Equal(t, "test-org", orgName)
-	assert.Equal(t, "test-account", accountName)
-}
-
-func TestSplitInsightsAccountId_InvalidFormat(t *testing.T) {
-	_, _, err := splitInsightsAccountId("invalid-id")
-
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "invalid, must be in the format")
-}
-
-// GenerateInsightsAccountProperties Tests
-func TestGenerateInsightsAccountProperties_Success(t *testing.T) {
-	input := testInsightsAccountInput()
-	account := testInsightsAccountResponse()
-
-	outputs, inputs, err := GenerateInsightsAccountProperties(input, *account)
-
-	require.NoError(t, err)
-	require.NotNil(t, outputs)
-	require.NotNil(t, inputs)
-}
-
-// Name Test
-func TestInsightsAccount_Name(t *testing.T) {
-	provider := PulumiServiceInsightsAccountResource{}
-
-	name := provider.Name()
-
-	assert.Equal(t, "pulumiservice:index:InsightsAccount", name)
-}
-

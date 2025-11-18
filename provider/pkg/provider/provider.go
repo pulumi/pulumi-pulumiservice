@@ -84,6 +84,7 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 			version: version,
 		})).
 		WithResources(
+			infer.Resource(&resources.InsightsAccount{}),
 			infer.Resource(&resources.Team{}),
 		).
 		WithModuleMap(map[tokens.ModuleName]tokens.ModuleName{
@@ -220,9 +221,6 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 			Client: client,
 		},
 		&resources.PulumiServiceAgentPoolResource{
-			Client: client,
-		},
-		&resources.PulumiServiceInsightsAccountResource{
 			Client: client,
 		},
 		&resources.PulumiServiceDeploymentScheduleResource{

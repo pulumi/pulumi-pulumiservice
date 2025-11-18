@@ -1093,7 +1093,6 @@ func (in *rbacPermissionPtr) ToRbacPermissionPtrOutputWithContext(ctx context.Co
 	return pulumi.ToOutputWithContext(ctx, in).(RbacPermissionPtrOutput)
 }
 
-// Schedule for automated cloud resource scans.
 type ScanSchedule string
 
 const (

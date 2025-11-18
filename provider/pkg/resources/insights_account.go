@@ -19,307 +19,255 @@ import (
 	"fmt"
 	"strings"
 
-	pbempty "google.golang.org/protobuf/types/known/emptypb"
-	"google.golang.org/protobuf/types/known/structpb"
-
+	p "github.com/pulumi/pulumi-go-provider"
+	"github.com/pulumi/pulumi-go-provider/infer"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
-type PulumiServiceInsightsAccountResource struct {
-	Client pulumiapi.InsightsAccountClient
+type InsightsAccount struct{}
+
+var (
+	_ infer.CustomCreate[InsightsAccountInput, InsightsAccountState] = &InsightsAccount{}
+	_ infer.CustomCheck[InsightsAccountInput]                        = &InsightsAccount{}
+	_ infer.CustomDelete[InsightsAccountState]                       = &InsightsAccount{}
+	_ infer.CustomRead[InsightsAccountInput, InsightsAccountState]   = &InsightsAccount{}
+	_ infer.CustomUpdate[InsightsAccountInput, InsightsAccountState] = &InsightsAccount{}
+)
+
+func (ia *InsightsAccount) Annotate(a infer.Annotator) {
+	a.Describe(ia, "Insights Account for cloud resource scanning and analysis across AWS, Azure, and GCP.")
 }
 
-type PulumiServiceInsightsAccountInput struct {
-	OrgName        string
-	AccountName    string
-	Provider       string
-	Environment    string
-	ScanSchedule   string
-	ProviderConfig map[string]interface{}
+// ScanSchedule enum for automated scanning frequency
+type ScanSchedule string
+
+const (
+	ScanScheduleNone  ScanSchedule = "none"
+	ScanScheduleDaily ScanSchedule = "daily"
+)
+
+func (ScanSchedule) Values() []infer.EnumValue[ScanSchedule] {
+	return []infer.EnumValue[ScanSchedule]{
+		{Name: "none", Value: ScanScheduleNone, Description: "Disable automated scanning."},
+		{Name: "daily", Value: ScanScheduleDaily, Description: "Run automated scans once per day."},
+	}
 }
 
-func (ia *PulumiServiceInsightsAccountResource) Name() string {
-	return "pulumiservice:index:InsightsAccount"
+// InsightsAccountCore contains the core fields for an insights account
+type InsightsAccountCore struct {
+	OrganizationName string                 `pulumi:"organizationName" provider:"replaceOnChanges"`
+	AccountName      string                 `pulumi:"accountName" provider:"replaceOnChanges"`
+	Provider         string                 `pulumi:"provider" provider:"replaceOnChanges"`
+	Environment      string                 `pulumi:"environment"`
+	ScanSchedule     *ScanSchedule          `pulumi:"scanSchedule,optional"`
+	ProviderConfig   map[string]interface{} `pulumi:"providerConfig,optional"`
 }
 
-func (ia *PulumiServiceInsightsAccountResource) ToPulumiServiceInsightsAccountInput(inputMap resource.PropertyMap) PulumiServiceInsightsAccountInput {
-	input := PulumiServiceInsightsAccountInput{}
-
-	if inputMap["organizationName"].HasValue() && inputMap["organizationName"].IsString() {
-		input.OrgName = inputMap["organizationName"].StringValue()
-	}
-
-	if inputMap["accountName"].HasValue() && inputMap["accountName"].IsString() {
-		input.AccountName = inputMap["accountName"].StringValue()
-	}
-
-	if inputMap["provider"].HasValue() && inputMap["provider"].IsString() {
-		input.Provider = inputMap["provider"].StringValue()
-	}
-
-	if inputMap["environment"].HasValue() && inputMap["environment"].IsString() {
-		input.Environment = inputMap["environment"].StringValue()
-	}
-
-	if inputMap["scanSchedule"].HasValue() && inputMap["scanSchedule"].IsString() {
-		input.ScanSchedule = inputMap["scanSchedule"].StringValue()
-	}
-
-	if inputMap["providerConfig"].HasValue() && inputMap["providerConfig"].IsObject() {
-		input.ProviderConfig = inputMap["providerConfig"].ObjectValue().Mappable()
-	}
-
-	return input
+func (c *InsightsAccountCore) Annotate(a infer.Annotator) {
+	a.Describe(&c.OrganizationName, "The organization's name.")
+	a.Describe(&c.AccountName, "Name of the insights account.")
+	a.Describe(&c.Provider, "The cloud provider (e.g., 'aws', 'azure', 'gcp').")
+	a.Describe(&c.Environment, "The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0').")
+	a.Describe(&c.ScanSchedule, "Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning.")
+	a.Describe(&c.ProviderConfig, "Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {\"regions\": [\"us-west-1\", \"us-west-2\"]}.")
 }
 
-func GenerateInsightsAccountProperties(input PulumiServiceInsightsAccountInput, account pulumiapi.InsightsAccount) (*structpb.Struct, *structpb.Struct, error) {
-	inputMap := resource.PropertyMap{}
-	inputMap["organizationName"] = resource.NewPropertyValue(input.OrgName)
-	inputMap["accountName"] = resource.NewPropertyValue(input.AccountName)
-	inputMap["provider"] = resource.NewPropertyValue(input.Provider)
-	inputMap["environment"] = resource.NewPropertyValue(input.Environment)
-
-	if input.ScanSchedule != "" {
-		inputMap["scanSchedule"] = resource.NewPropertyValue(input.ScanSchedule)
-	}
-
-	if input.ProviderConfig != nil {
-		inputMap["providerConfig"] = resource.NewPropertyValue(input.ProviderConfig)
-	}
-
-	outputMap := resource.PropertyMap{}
-	outputMap["insightsAccountId"] = resource.NewPropertyValue(account.ID)
-	outputMap["organizationName"] = inputMap["organizationName"]
-	outputMap["accountName"] = inputMap["accountName"]
-	outputMap["provider"] = inputMap["provider"]
-	outputMap["environment"] = inputMap["environment"]
-	outputMap["scheduledScanEnabled"] = resource.NewPropertyValue(account.ScheduledScanEnabled)
-
-	if account.ProviderVersion != "" {
-		outputMap["providerVersion"] = resource.NewPropertyValue(account.ProviderVersion)
-	}
-
-	if input.ProviderConfig != nil {
-		outputMap["providerConfig"] = inputMap["providerConfig"]
-	}
-
-	inputs, err := plugin.MarshalProperties(inputMap, plugin.MarshalOptions{})
-	if err != nil {
-		return nil, nil, err
-	}
-
-	outputs, err := plugin.MarshalProperties(outputMap, plugin.MarshalOptions{})
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return outputs, inputs, nil
+// InsightsAccountInput represents the input properties for creating an insights account
+type InsightsAccountInput struct {
+	InsightsAccountCore
 }
 
-func (ia *PulumiServiceInsightsAccountResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: nil}, nil
+// InsightsAccountState represents the output properties of an insights account
+type InsightsAccountState struct {
+	InsightsAccountCore
+	InsightsAccountId    string `pulumi:"insightsAccountId"`
+	ScheduledScanEnabled bool   `pulumi:"scheduledScanEnabled"`
 }
 
-func (ia *PulumiServiceInsightsAccountResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
+func (s *InsightsAccountState) Annotate(a infer.Annotator) {
+	a.Describe(&s.InsightsAccountId, "The insights account identifier.")
+	a.Describe(&s.ScheduledScanEnabled, "Whether scheduled scanning is enabled.")
+}
 
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
-
-	diffs := olds.Diff(news)
-	if diffs == nil {
-		return &pulumirpc.DiffResponse{
-			Changes: pulumirpc.DiffResponse_DIFF_NONE,
+func (*InsightsAccount) Create(ctx context.Context, req infer.CreateRequest[InsightsAccountInput]) (infer.CreateResponse[InsightsAccountState], error) {
+	accountID := fmt.Sprintf("%s/%s", req.Inputs.OrganizationName, req.Inputs.AccountName)
+	if req.DryRun {
+		return infer.CreateResponse[InsightsAccountState]{
+			ID: accountID,
+			Output: InsightsAccountState{
+				InsightsAccountCore:  req.Inputs.InsightsAccountCore,
+				InsightsAccountId:    "",
+				ScheduledScanEnabled: req.Inputs.ScanSchedule != nil && *req.Inputs.ScanSchedule != ScanScheduleNone,
+			},
 		}, nil
 	}
 
-	dd := plugin.NewDetailedDiffFromObjectDiff(diffs, false)
-
-	detailedDiffs := map[string]*pulumirpc.PropertyDiff{}
-	replaceProperties := map[string]bool{
-		"organizationName": true,
-		"accountName":      true,
-		"provider":         true,
-	}
-	for k, v := range dd {
-		if _, ok := replaceProperties[k]; ok {
-			v.Kind = v.Kind.AsReplace()
-		}
-		detailedDiffs[k] = &pulumirpc.PropertyDiff{
-			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind),
-			InputDiff: v.InputDiff,
-		}
-	}
-
-	changes := pulumirpc.DiffResponse_DIFF_NONE
-	if len(detailedDiffs) > 0 {
-		changes = pulumirpc.DiffResponse_DIFF_SOME
-	}
-
-	return &pulumirpc.DiffResponse{
-		Changes:         changes,
-		DetailedDiff:    detailedDiffs,
-		HasDetailedDiff: true,
-	}, nil
-}
-
-func (ia *PulumiServiceInsightsAccountResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
-	ctx := context.Background()
-	inputMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
-
-	input := ia.ToPulumiServiceInsightsAccountInput(inputMap)
+	client := config.GetClient(ctx)
 
 	createReq := pulumiapi.CreateInsightsAccountRequest{
-		Provider:       input.Provider,
-		Environment:    input.Environment,
-		ScanSchedule:   input.ScanSchedule,
-		ProviderConfig: input.ProviderConfig,
+		Provider:       req.Inputs.Provider,
+		Environment:    req.Inputs.Environment,
+		ProviderConfig: req.Inputs.ProviderConfig,
+	}
+	if req.Inputs.ScanSchedule != nil {
+		createReq.ScanSchedule = string(*req.Inputs.ScanSchedule)
 	}
 
-	err = ia.Client.CreateInsightsAccount(ctx, input.OrgName, input.AccountName, createReq)
+	err := client.CreateInsightsAccount(ctx, req.Inputs.OrganizationName, req.Inputs.AccountName, createReq)
 	if err != nil {
-		return nil, fmt.Errorf("error creating insights account '%s': %w", input.AccountName, err)
+		return infer.CreateResponse[InsightsAccountState]{}, fmt.Errorf("error creating insights account '%s': %w", req.Inputs.AccountName, err)
 	}
 
-	account, err := ia.Client.GetInsightsAccount(ctx, input.OrgName, input.AccountName)
+	account, err := client.GetInsightsAccount(ctx, req.Inputs.OrganizationName, req.Inputs.AccountName)
 	if err != nil {
-		return nil, fmt.Errorf("error reading insights account after creation: %w", err)
+		return infer.CreateResponse[InsightsAccountState]{
+			ID: accountID,
+			Output: InsightsAccountState{
+				InsightsAccountCore: req.Inputs.InsightsAccountCore,
+			},
+		}, infer.ResourceInitFailedError{Reasons: []string{err.Error()}}
 	}
 	if account == nil {
-		return nil, fmt.Errorf("insights account '%s' not found after creation", input.AccountName)
+		return infer.CreateResponse[InsightsAccountState]{
+			ID: accountID,
+			Output: InsightsAccountState{
+				InsightsAccountCore: req.Inputs.InsightsAccountCore,
+			},
+		}, infer.ResourceInitFailedError{Reasons: []string{fmt.Sprintf("insights account '%s' not found after creation", req.Inputs.AccountName)}}
 	}
 
-	outputProperties, _, err := GenerateInsightsAccountProperties(input, *account)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.CreateResponse{
-		Id:         input.OrgName + "/" + input.AccountName,
-		Properties: outputProperties,
+	return infer.CreateResponse[InsightsAccountState]{
+		ID: accountID,
+		Output: InsightsAccountState{
+			InsightsAccountCore:  req.Inputs.InsightsAccountCore,
+			InsightsAccountId:    account.ID,
+			ScheduledScanEnabled: account.ScheduledScanEnabled,
+		},
 	}, nil
 }
 
-func (ia *PulumiServiceInsightsAccountResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	ctx := context.Background()
-	urn := req.GetId()
-
-	orgName, accountName, err := splitInsightsAccountId(urn)
+func (*InsightsAccount) Check(ctx context.Context, req infer.CheckRequest) (infer.CheckResponse[InsightsAccountInput], error) {
+	i, checkFailures, err := infer.DefaultCheck[InsightsAccountInput](ctx, req.NewInputs)
 	if err != nil {
-		return nil, err
+		return infer.CheckResponse[InsightsAccountInput]{}, err
 	}
 
-	account, err := ia.Client.GetInsightsAccount(ctx, orgName, accountName)
-	if err != nil {
-		return nil, err
+	// Validate provider value
+	validProviders := []string{"aws", "azure", "gcp"}
+	valid := false
+	for _, p := range validProviders {
+		if i.Provider == p {
+			valid = true
+			break
+		}
 	}
-	if account == nil {
-		return &pulumirpc.ReadResponse{}, nil
-	}
-
-	propertyMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepSecrets: true})
-	if err != nil {
-		return nil, err
-	}
-
-	input := PulumiServiceInsightsAccountInput{
-		OrgName:     orgName,
-		AccountName: accountName,
-		Provider:    account.Provider,
-		Environment: account.ProviderEnvRef,
+	if !valid {
+		checkFailures = append(checkFailures, p.CheckFailure{
+			Reason:   fmt.Sprintf("provider must be one of %v, got '%s'", validProviders, i.Provider),
+			Property: "provider",
+		})
 	}
 
-	// Only include providerConfig if it was in the original inputs
-	if propertyMap["providerConfig"].HasValue() {
-		input.ProviderConfig = account.ProviderConfig
-	}
-
-	// Only include scanSchedule if it was in the original inputs
-	if propertyMap["scanSchedule"].HasValue() && propertyMap["scanSchedule"].IsString() {
-		input.ScanSchedule = propertyMap["scanSchedule"].StringValue()
-	}
-
-	outputProperties, inputs, err := GenerateInsightsAccountProperties(input, *account)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.ReadResponse{
-		Id:         req.GetId(),
-		Properties: outputProperties,
-		Inputs:     inputs,
+	return infer.CheckResponse[InsightsAccountInput]{
+		Inputs:   i,
+		Failures: checkFailures,
 	}, nil
 }
 
-func (ia *PulumiServiceInsightsAccountResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	ctx := context.Background()
+func (*InsightsAccount) Delete(ctx context.Context, req infer.DeleteRequest[InsightsAccountState]) (infer.DeleteResponse, error) {
+	client := config.GetClient(ctx)
+	return infer.DeleteResponse{}, client.DeleteInsightsAccount(ctx, req.State.OrganizationName, req.State.AccountName)
+}
 
-	orgName, accountName, err := splitInsightsAccountId(req.GetId())
+func (*InsightsAccount) Read(ctx context.Context, req infer.ReadRequest[InsightsAccountInput, InsightsAccountState]) (infer.ReadResponse[InsightsAccountInput, InsightsAccountState], error) {
+	client := config.GetClient(ctx)
+	orgName, accountName, err := splitInsightsAccountId(req.ID)
 	if err != nil {
-		return nil, fmt.Errorf("invalid resource id: %w", err)
+		return infer.ReadResponse[InsightsAccountInput, InsightsAccountState]{}, err
 	}
 
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	account, err := client.GetInsightsAccount(ctx, orgName, accountName)
 	if err != nil {
-		return nil, err
+		return infer.ReadResponse[InsightsAccountInput, InsightsAccountState]{}, fmt.Errorf("failed to read InsightsAccount (%q): %w", req.ID, err)
+	}
+	if account == nil {
+		return infer.ReadResponse[InsightsAccountInput, InsightsAccountState]{}, nil
 	}
 
-	input := ia.ToPulumiServiceInsightsAccountInput(news)
+	core := InsightsAccountCore{
+		OrganizationName: orgName,
+		AccountName:      accountName,
+		Provider:         account.Provider,
+		Environment:      account.ProviderEnvRef,
+		ProviderConfig:   account.ProviderConfig,
+		ScanSchedule:     req.Inputs.ScanSchedule, // Preserve input since API doesn't return this
+	}
+
+	return infer.ReadResponse[InsightsAccountInput, InsightsAccountState]{
+		ID: req.ID,
+		Inputs: InsightsAccountInput{
+			InsightsAccountCore: core,
+		},
+		State: InsightsAccountState{
+			InsightsAccountCore:  core,
+			InsightsAccountId:    account.ID,
+			ScheduledScanEnabled: account.ScheduledScanEnabled,
+		},
+	}, nil
+}
+
+func (*InsightsAccount) Update(ctx context.Context, req infer.UpdateRequest[InsightsAccountInput, InsightsAccountState]) (infer.UpdateResponse[InsightsAccountState], error) {
+	if req.DryRun {
+		return infer.UpdateResponse[InsightsAccountState]{
+			Output: InsightsAccountState{
+				InsightsAccountCore:  req.Inputs.InsightsAccountCore,
+				InsightsAccountId:    req.State.InsightsAccountId,
+				ScheduledScanEnabled: req.State.ScheduledScanEnabled,
+			},
+		}, nil
+	}
+
+	client := config.GetClient(ctx)
 
 	updateReq := pulumiapi.UpdateInsightsAccountRequest{
-		Environment:    input.Environment,
-		ScanSchedule:   input.ScanSchedule,
-		ProviderConfig: input.ProviderConfig,
+		Environment:    req.Inputs.Environment,
+		ProviderConfig: req.Inputs.ProviderConfig,
+	}
+	if req.Inputs.ScanSchedule != nil {
+		updateReq.ScanSchedule = string(*req.Inputs.ScanSchedule)
 	}
 
-	err = ia.Client.UpdateInsightsAccount(ctx, orgName, accountName, updateReq)
+	err := client.UpdateInsightsAccount(ctx, req.State.OrganizationName, req.State.AccountName, updateReq)
 	if err != nil {
-		return nil, fmt.Errorf("error updating insights account '%s': %w", accountName, err)
+		return infer.UpdateResponse[InsightsAccountState]{}, fmt.Errorf("error updating insights account '%s': %w", req.State.AccountName, err)
 	}
 
-	account, err := ia.Client.GetInsightsAccount(ctx, orgName, accountName)
+	account, err := client.GetInsightsAccount(ctx, req.State.OrganizationName, req.State.AccountName)
 	if err != nil {
-		return nil, fmt.Errorf("error reading insights account after update: %w", err)
+		return infer.UpdateResponse[InsightsAccountState]{
+			Output: InsightsAccountState{
+				InsightsAccountCore: req.Inputs.InsightsAccountCore,
+				InsightsAccountId:   req.State.InsightsAccountId,
+			},
+		}, infer.ResourceInitFailedError{Reasons: []string{err.Error()}}
 	}
 	if account == nil {
-		return nil, fmt.Errorf("insights account '%s' not found after update", accountName)
+		return infer.UpdateResponse[InsightsAccountState]{
+			Output: InsightsAccountState{
+				InsightsAccountCore: req.Inputs.InsightsAccountCore,
+				InsightsAccountId:   req.State.InsightsAccountId,
+			},
+		}, infer.ResourceInitFailedError{Reasons: []string{fmt.Sprintf("insights account '%s' not found after update", req.State.AccountName)}}
 	}
 
-	outputProperties, _, err := GenerateInsightsAccountProperties(input, *account)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.UpdateResponse{
-		Properties: outputProperties,
+	return infer.UpdateResponse[InsightsAccountState]{
+		Output: InsightsAccountState{
+			InsightsAccountCore:  req.Inputs.InsightsAccountCore,
+			InsightsAccountId:    account.ID,
+			ScheduledScanEnabled: account.ScheduledScanEnabled,
+		},
 	}, nil
-}
-
-func (ia *PulumiServiceInsightsAccountResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	ctx := context.Background()
-
-	orgName, accountName, err := splitInsightsAccountId(req.GetId())
-	if err != nil {
-		return nil, err
-	}
-
-	err = ia.Client.DeleteInsightsAccount(ctx, orgName, accountName)
-	if err != nil {
-		return &pbempty.Empty{}, err
-	}
-
-	return &pbempty.Empty{}, nil
 }
 
 func splitInsightsAccountId(id string) (string, string, error) {

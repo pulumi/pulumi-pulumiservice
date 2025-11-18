@@ -12,11 +12,11 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-// Insights Account for cloud resource scanning and analysis
+// Insights Account for cloud resource scanning and analysis across AWS, Azure, and GCP.
 type InsightsAccount struct {
 	pulumi.CustomResourceState
 
-	// The name of the insights account.
+	// Name of the insights account.
 	AccountName pulumi.StringOutput `pulumi:"accountName"`
 	// The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0').
 	Environment pulumi.StringOutput `pulumi:"environment"`
@@ -26,10 +26,10 @@ type InsightsAccount struct {
 	OrganizationName pulumi.StringOutput `pulumi:"organizationName"`
 	// The cloud provider (e.g., 'aws', 'azure', 'gcp').
 	Provider pulumi.StringOutput `pulumi:"provider"`
-	// Provider-specific configuration as a JSON object.
-	ProviderConfig pulumi.AnyOutput `pulumi:"providerConfig"`
-	// The provider version used for scanning.
-	ProviderVersion pulumi.StringPtrOutput `pulumi:"providerVersion"`
+	// Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {"regions": ["us-west-1", "us-west-2"]}.
+	ProviderConfig pulumi.MapOutput `pulumi:"providerConfig"`
+	// Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning.
+	ScanSchedule ScanSchedulePtrOutput `pulumi:"scanSchedule"`
 	// Whether scheduled scanning is enabled.
 	ScheduledScanEnabled pulumi.BoolOutput `pulumi:"scheduledScanEnabled"`
 }
@@ -53,6 +53,12 @@ func NewInsightsAccount(ctx *pulumi.Context,
 	if args.Provider == nil {
 		return nil, errors.New("invalid value for required argument 'Provider'")
 	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"accountName",
+		"organizationName",
+		"provider",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource InsightsAccount
 	err := ctx.RegisterResource("pulumiservice:index:InsightsAccount", name, args, &resource, opts...)
@@ -94,8 +100,8 @@ type insightsAccountArgs struct {
 	OrganizationName string `pulumi:"organizationName"`
 	// The cloud provider (e.g., 'aws', 'azure', 'gcp').
 	Provider string `pulumi:"provider"`
-	// Provider-specific configuration as a JSON object.
-	ProviderConfig interface{} `pulumi:"providerConfig"`
+	// Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {"regions": ["us-west-1", "us-west-2"]}.
+	ProviderConfig map[string]interface{} `pulumi:"providerConfig"`
 	// Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning.
 	ScanSchedule *ScanSchedule `pulumi:"scanSchedule"`
 }
@@ -110,8 +116,8 @@ type InsightsAccountArgs struct {
 	OrganizationName pulumi.StringInput
 	// The cloud provider (e.g., 'aws', 'azure', 'gcp').
 	Provider pulumi.StringInput
-	// Provider-specific configuration as a JSON object.
-	ProviderConfig pulumi.Input
+	// Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {"regions": ["us-west-1", "us-west-2"]}.
+	ProviderConfig pulumi.MapInput
 	// Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning.
 	ScanSchedule ScanSchedulePtrInput
 }
@@ -203,7 +209,7 @@ func (o InsightsAccountOutput) ToInsightsAccountOutputWithContext(ctx context.Co
 	return o
 }
 
-// The name of the insights account.
+// Name of the insights account.
 func (o InsightsAccountOutput) AccountName() pulumi.StringOutput {
 	return o.ApplyT(func(v *InsightsAccount) pulumi.StringOutput { return v.AccountName }).(pulumi.StringOutput)
 }
@@ -228,14 +234,14 @@ func (o InsightsAccountOutput) Provider() pulumi.StringOutput {
 	return o.ApplyT(func(v *InsightsAccount) pulumi.StringOutput { return v.Provider }).(pulumi.StringOutput)
 }
 
-// Provider-specific configuration as a JSON object.
-func (o InsightsAccountOutput) ProviderConfig() pulumi.AnyOutput {
-	return o.ApplyT(func(v *InsightsAccount) pulumi.AnyOutput { return v.ProviderConfig }).(pulumi.AnyOutput)
+// Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {"regions": ["us-west-1", "us-west-2"]}.
+func (o InsightsAccountOutput) ProviderConfig() pulumi.MapOutput {
+	return o.ApplyT(func(v *InsightsAccount) pulumi.MapOutput { return v.ProviderConfig }).(pulumi.MapOutput)
 }
 
-// The provider version used for scanning.
-func (o InsightsAccountOutput) ProviderVersion() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *InsightsAccount) pulumi.StringPtrOutput { return v.ProviderVersion }).(pulumi.StringPtrOutput)
+// Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning.
+func (o InsightsAccountOutput) ScanSchedule() ScanSchedulePtrOutput {
+	return o.ApplyT(func(v *InsightsAccount) ScanSchedulePtrOutput { return v.ScanSchedule }).(ScanSchedulePtrOutput)
 }
 
 // Whether scheduled scanning is enabled.

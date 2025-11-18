@@ -4,14 +4,12 @@
 package examples
 
 import (
-	"path"
 	"path/filepath"
 	"testing"
 
 	"github.com/pulumi/providertest/pulumitest"
 	"github.com/pulumi/providertest/pulumitest/assertpreview"
 	"github.com/pulumi/providertest/pulumitest/opttest"
-	"github.com/pulumi/pulumi/pkg/v3/testing/integration"
 )
 
 func TestAccessTokenExample(t *testing.T) {

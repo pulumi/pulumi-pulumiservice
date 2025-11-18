@@ -35,7 +35,6 @@ type InsightsAccount struct {
 	ID                   string                 `json:"id"`
 	Name                 string                 `json:"name"`
 	Provider             string                 `json:"provider"`
-	ProviderVersion      string                 `json:"providerVersion,omitempty"`
 	ProviderEnvRef       string                 `json:"providerEnvRef,omitempty"`
 	ScheduledScanEnabled bool                   `json:"scheduledScanEnabled"`
 	ProviderConfig       map[string]interface{} `json:"providerConfig,omitempty"`

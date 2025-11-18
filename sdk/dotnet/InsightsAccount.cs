@@ -10,13 +10,13 @@ using Pulumi.Serialization;
 namespace Pulumi.PulumiService
 {
     /// <summary>
-    /// Insights Account for cloud resource scanning and analysis
+    /// Insights Account for cloud resource scanning and analysis across AWS, Azure, and GCP.
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:index:InsightsAccount")]
     public partial class InsightsAccount : global::Pulumi.CustomResource
     {
         /// <summary>
-        /// The name of the insights account.
+        /// Name of the insights account.
         /// </summary>
         [Output("accountName")]
         public Output<string> AccountName { get; private set; } = null!;
@@ -46,16 +46,16 @@ namespace Pulumi.PulumiService
         public Output<string> Provider { get; private set; } = null!;
 
         /// <summary>
-        /// Provider-specific configuration as a JSON object.
+        /// Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {"regions": ["us-west-1", "us-west-2"]}.
         /// </summary>
         [Output("providerConfig")]
-        public Output<object?> ProviderConfig { get; private set; } = null!;
+        public Output<ImmutableDictionary<string, object>?> ProviderConfig { get; private set; } = null!;
 
         /// <summary>
-        /// The provider version used for scanning.
+        /// Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning.
         /// </summary>
-        [Output("providerVersion")]
-        public Output<string?> ProviderVersion { get; private set; } = null!;
+        [Output("scanSchedule")]
+        public Output<Pulumi.PulumiService.ScanSchedule?> ScanSchedule { get; private set; } = null!;
 
         /// <summary>
         /// Whether scheduled scanning is enabled.
@@ -86,6 +86,12 @@ namespace Pulumi.PulumiService
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
+                ReplaceOnChanges =
+                {
+                    "accountName",
+                    "organizationName",
+                    "provider",
+                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.
@@ -132,11 +138,17 @@ namespace Pulumi.PulumiService
         [Input("provider", required: true)]
         public Input<string> Provider { get; set; } = null!;
 
-        /// <summary>
-        /// Provider-specific configuration as a JSON object.
-        /// </summary>
         [Input("providerConfig")]
-        public Input<object>? ProviderConfig { get; set; }
+        private InputMap<object>? _providerConfig;
+
+        /// <summary>
+        /// Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {"regions": ["us-west-1", "us-west-2"]}.
+        /// </summary>
+        public InputMap<object> ProviderConfig
+        {
+            get => _providerConfig ?? (_providerConfig = new InputMap<object>());
+            set => _providerConfig = value;
+        }
 
         /// <summary>
         /// Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning.

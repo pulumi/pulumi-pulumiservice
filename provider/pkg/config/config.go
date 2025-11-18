@@ -48,6 +48,7 @@ type Client interface {
 	pulumiapi.ApprovalRuleClient
 	pulumiapi.DeploymentSettingsClient
 	pulumiapi.EnvironmentScheduleClient
+	pulumiapi.InsightsAccountClient
 	pulumiapi.OidcClient
 	pulumiapi.TeamClient
 	pulumiapi.WebhookClient

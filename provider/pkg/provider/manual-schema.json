@@ -75,22 +75,6 @@
         }
       ]
     },
-    "pulumiservice:index:ScanSchedule": {
-      "type": "string",
-      "description": "Schedule for automated cloud resource scans.",
-      "enum": [
-        {
-          "value": "none",
-          "description": "Disable automated scanning.",
-          "name": "None"
-        },
-        {
-          "value": "daily",
-          "description": "Run automated scans once per day.",
-          "name": "Daily"
-        }
-      ]
-    },
     "pulumiservice:index:WebhookFilters": {
       "type": "string",
       "enum": [
@@ -996,86 +980,6 @@
       },
       "requiredInputs": [
         "description"
-      ]
-    },
-    "pulumiservice:index:InsightsAccount": {
-      "description": "Insights Account for cloud resource scanning and analysis",
-      "properties": {
-        "insightsAccountId": {
-          "description": "The insights account identifier.",
-          "type": "string"
-        },
-        "accountName": {
-          "description": "The name of the insights account.",
-          "type": "string"
-        },
-        "organizationName": {
-          "description": "The organization's name.",
-          "type": "string"
-        },
-        "provider": {
-          "description": "The cloud provider (e.g., 'aws', 'azure', 'gcp').",
-          "type": "string"
-        },
-        "providerVersion": {
-          "description": "The provider version used for scanning.",
-          "type": "string"
-        },
-        "environment": {
-          "description": "The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0').",
-          "type": "string"
-        },
-        "scheduledScanEnabled": {
-          "description": "Whether scheduled scanning is enabled.",
-          "type": "boolean"
-        },
-        "providerConfig": {
-          "description": "Provider-specific configuration as a JSON object.",
-          "$ref": "pulumi.json#/Any"
-        }
-      },
-      "required": [
-        "insightsAccountId",
-        "accountName",
-        "organizationName",
-        "provider",
-        "environment",
-        "scheduledScanEnabled"
-      ],
-      "inputProperties": {
-        "accountName": {
-          "description": "Name of the insights account.",
-          "type": "string",
-          "willReplaceOnChanges": true
-        },
-        "organizationName": {
-          "description": "The organization's name.",
-          "type": "string",
-          "willReplaceOnChanges": true
-        },
-        "provider": {
-          "description": "The cloud provider (e.g., 'aws', 'azure', 'gcp').",
-          "type": "string",
-          "willReplaceOnChanges": true
-        },
-        "environment": {
-          "description": "The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0').",
-          "type": "string"
-        },
-        "scanSchedule": {
-          "description": "Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning.",
-          "$ref": "#/types/pulumiservice:index:ScanSchedule"
-        },
-        "providerConfig": {
-          "description": "Provider-specific configuration as a JSON object.",
-          "$ref": "pulumi.json#/Any"
-        }
-      },
-      "requiredInputs": [
-        "accountName",
-        "organizationName",
-        "provider",
-        "environment"
       ]
     },
     "pulumiservice:index:TeamAccessToken": {

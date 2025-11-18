@@ -139,9 +139,6 @@ export const ScanSchedule = {
     Daily: "daily",
 } as const;
 
-/**
- * Schedule for automated cloud resource scans.
- */
 export type ScanSchedule = (typeof ScanSchedule)[keyof typeof ScanSchedule];
 
 export const TargetActionType = {

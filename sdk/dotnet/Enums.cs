@@ -259,9 +259,6 @@ namespace Pulumi.PulumiService
         public override string ToString() => _value;
     }
 
-    /// <summary>
-    /// Schedule for automated cloud resource scans.
-    /// </summary>
     [EnumType]
     public readonly struct ScanSchedule : IEquatable<ScanSchedule>
     {

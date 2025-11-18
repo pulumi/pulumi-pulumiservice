@@ -144,9 +144,6 @@ class RbacPermission(_builtins.str, Enum):
 
 @pulumi.type_token("pulumiservice:index:ScanSchedule")
 class ScanSchedule(_builtins.str, Enum):
-    """
-    Schedule for automated cloud resource scans.
-    """
     NONE = "none"
     """
     Disable automated scanning.
