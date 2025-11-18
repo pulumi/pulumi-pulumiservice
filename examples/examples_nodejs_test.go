@@ -4,168 +4,153 @@
 package examples
 
 import (
-	"os"
-	"path"
+	"path/filepath"
 	"testing"
 
-	"github.com/pulumi/pulumi/pkg/v3/testing/integration"
+	"github.com/pulumi/providertest/pulumitest"
+	"github.com/pulumi/providertest/pulumitest/assertpreview"
+	"github.com/pulumi/providertest/pulumitest/opttest"
 )
 
 func TestAccessTokenExample(t *testing.T) {
-	cwd, _ := os.Getwd()
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Quick: true,
-		Dir:   path.Join(cwd, ".", "ts-access-tokens"),
-		Dependencies: []string{
-			"@pulumi/pulumiservice",
-		},
-	})
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "ts-access-tokens"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.YarnLink("@pulumi/pulumiservice"),
+	)
+	runPulumiTest(t, test)
 }
 
 func TestStackTagsExample(t *testing.T) {
-	cwd, _ := os.Getwd()
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Quick: true,
-		Dir:   path.Join(cwd, ".", "ts-stack-tags"),
-		Dependencies: []string{
-			"@pulumi/pulumiservice",
-		},
-	})
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "ts-stack-tags"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.YarnLink("@pulumi/pulumiservice"),
+	)
+	runPulumiTest(t, test)
 }
 
 func TestDeploymentSettingsExample(t *testing.T) {
-	cwd, _ := os.Getwd()
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Config: map[string]string{
-			"my_secret": "my_secret_value",
-			"password":  "my_password",
-		},
-		Quick: true,
-		Dir:   path.Join(cwd, ".", "ts-deployment-settings"),
-		Dependencies: []string{
-			"@pulumi/pulumiservice",
-		},
-	})
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "ts-deployment-settings"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.YarnLink("@pulumi/pulumiservice"),
+	)
+	test.SetConfig(t, "my_secret", "my_secret_value")
+	test.SetConfig(t, "password", "my_password")
+	runPulumiTest(t, test)
 }
 
 func TestTeamStackPermissionsExample(t *testing.T) {
-	cwd, _ := os.Getwd()
-	digits := generateRandomFiveDigits()
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Quick: true,
-		Dir:   path.Join(cwd, ".", "ts-team-stack-permissions"),
-		Config: map[string]string{
-			"digits": digits,
-		},
-		Dependencies: []string{
-			"@pulumi/pulumiservice",
-		},
-	})
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "ts-team-stack-permissions"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.YarnLink("@pulumi/pulumiservice"),
+	)
+	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	runPulumiTest(t, test)
 }
 
 func TestTeamsExample(t *testing.T) {
-	cwd, _ := os.Getwd()
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Quick: true,
-		Dir:   path.Join(cwd, ".", "ts-teams"),
-		Dependencies: []string{
-			"@pulumi/pulumiservice",
-		},
-	})
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "ts-teams"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.YarnLink("@pulumi/pulumiservice"),
+	)
+	runPulumiTest(t, test)
 }
 
 func TestNodejsWebhookExample(t *testing.T) {
-	cwd := getCwd(t)
-	digits := generateRandomFiveDigits()
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Dir: path.Join(cwd, ".", "ts-webhooks"),
-		Config: map[string]string{
-			"digits": digits,
-		},
-		Dependencies: []string{
-			"@pulumi/pulumiservice",
-		},
-	})
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "ts-webhooks"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.YarnLink("@pulumi/pulumiservice"),
+	)
+	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	runPulumiTest(t, test)
 }
 
 func TestNodejsSchedulesExample(t *testing.T) {
-	cwd := getCwd(t)
 	digits := generateRandomFiveDigits()
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Dir:       path.Join(cwd, ".", "ts-schedules"),
-		StackName: "test-stack-" + digits,
-		Config: map[string]string{
-			"digits": digits,
-		},
-		Dependencies: []string{
-			"@pulumi/pulumiservice",
-		},
-	})
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "ts-schedules"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.YarnLink("@pulumi/pulumiservice"),
+		opttest.StackName("test-stack-"+digits),
+	)
+	test.SetConfig(t, "digits", digits)
+	runPulumiTest(t, test)
 }
 
 func TestNodejsEnvironmentsExample(t *testing.T) {
-	cwd := getCwd(t)
-	digits := generateRandomFiveDigits()
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Dir: path.Join(cwd, ".", "ts-environments"),
-		Config: map[string]string{
-			"digits": digits,
-		},
-		Dependencies: []string{
-			"@pulumi/pulumiservice",
-		},
-		ExpectRefreshChanges: true,
-	})
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "ts-environments"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.YarnLink("@pulumi/pulumiservice"),
+	)
+	test.SetConfig(t, "digits", generateRandomFiveDigits())
+
+	// Run the Pulumi program
+	test.Up(t)
+
+	// Run preview to ensure no changes after initial deployment
+	previewResult := test.Preview(t)
+	assertpreview.HasNoChanges(t, previewResult)
+
+	// Skip refresh assertion since this example expects refresh changes
+	test.Refresh(t)
+
+	// Clean up - destroy the stack
+	test.Destroy(t)
 }
 
 func TestNodejsTemplateSourcesExample(t *testing.T) {
-	cwd := getCwd(t)
-	digits := generateRandomFiveDigits()
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Dir: path.Join(cwd, ".", "ts-template-source"),
-		Config: map[string]string{
-			"digits": digits,
-		},
-		Dependencies: []string{
-			"@pulumi/pulumiservice",
-		},
-	})
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "ts-template-source"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.YarnLink("@pulumi/pulumiservice"),
+	)
+	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	runPulumiTest(t, test)
 }
 
 func TestNodejsEnvironmentsFileAssetExample(t *testing.T) {
-	cwd := getCwd(t)
-	digits := generateRandomFiveDigits()
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Dir: path.Join(cwd, ".", "ts-environments-file-asset"),
-		Config: map[string]string{
-			"digits": digits,
-		},
-		Dependencies: []string{
-			"@pulumi/pulumiservice",
-		},
-	})
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "ts-environments-file-asset"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.YarnLink("@pulumi/pulumiservice"),
+	)
+	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	runPulumiTest(t, test)
 }
 
 func TestNodejsOidcIssuerExample(t *testing.T) {
-	cwd := getCwd(t)
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Dir: path.Join(cwd, ".", "ts-oidc-issuer"),
-		Dependencies: []string{
-			"@pulumi/pulumiservice",
-		},
-	})
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "ts-oidc-issuer"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.YarnLink("@pulumi/pulumiservice"),
+	)
+	runPulumiTest(t, test)
 }
 
 func TestNodejsApprovalRulesExample(t *testing.T) {
-	cwd := getCwd(t)
-	digits := generateRandomFiveDigits()
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Dir: path.Join(cwd, ".", "ts-approval-rules"),
-		Config: map[string]string{
-			"digits": digits,
-		},
-		Dependencies: []string{
-			"@pulumi/pulumiservice",
-		},
-	})
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "ts-approval-rules"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.YarnLink("@pulumi/pulumiservice"),
+	)
+	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	runPulumiTest(t, test)
 }

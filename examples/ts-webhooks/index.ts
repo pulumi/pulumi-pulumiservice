@@ -1,9 +1,21 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as service from "@pulumi/pulumiservice";
 import { WebhookGroup, WebhookFormat, WebhookFilters } from "@pulumi/pulumiservice";
+import * as random from "@pulumi/random";
 
 const serviceOrg = "service-provider-test-org";
 let config = new pulumi.Config();
+
+// Create the stack resource first so it exists before we reference it
+const stackSuffix = new random.RandomPet("stack-suffix", {
+  prefix: pulumi.getStack(),
+  separator: "-",
+});
+const stack = new service.Stack("test-stack", {
+  organizationName: serviceOrg,
+  projectName: pulumi.getProject(),
+  stackName: stackSuffix.id,
+});
 
 var environment = new service.Environment("environment-to-use", {
   organization: serviceOrg,
@@ -39,8 +51,8 @@ const stackWebhook = new service.Webhook("stack-webhook", {
   active: true,
   displayName: "stack-webhook",
   organizationName: serviceOrg,
-  projectName: pulumi.getProject(),
-  stackName: pulumi.getStack(),
+  projectName: stack.projectName,
+  stackName: stack.stackName,
   payloadUrl: "https://hooks.slack.com/blahblah",
   format: WebhookFormat.Slack,
   groups: [ WebhookGroup.Stacks ],
