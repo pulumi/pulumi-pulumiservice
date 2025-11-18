@@ -44,13 +44,13 @@ type InsightsAccount struct {
 type CreateInsightsAccountRequest struct {
 	Provider       string                 `json:"provider"`
 	Environment    string                 `json:"environment"`
-	Cron           string                 `json:"cron,omitempty"`
+	ScanSchedule   string                 `json:"scanSchedule,omitempty"`
 	ProviderConfig map[string]interface{} `json:"providerConfig,omitempty"`
 }
 
 type UpdateInsightsAccountRequest struct {
 	Environment    string                 `json:"environment"`
-	Cron           string                 `json:"cron,omitempty"`
+	ScanSchedule   string                 `json:"scanSchedule,omitempty"`
 	ProviderConfig map[string]interface{} `json:"providerConfig,omitempty"`
 }
 

@@ -22,12 +22,6 @@ namespace Pulumi.PulumiService
         public Output<string> AccountName { get; private set; } = null!;
 
         /// <summary>
-        /// Optional cron expression for scheduled scanning.
-        /// </summary>
-        [Output("cron")]
-        public Output<string?> Cron { get; private set; } = null!;
-
-        /// <summary>
         /// The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0').
         /// </summary>
         [Output("environment")]
@@ -121,12 +115,6 @@ namespace Pulumi.PulumiService
         public Input<string> AccountName { get; set; } = null!;
 
         /// <summary>
-        /// Optional cron expression for scheduled scanning.
-        /// </summary>
-        [Input("cron")]
-        public Input<string>? Cron { get; set; }
-
-        /// <summary>
         /// The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0').
         /// </summary>
         [Input("environment", required: true)]
@@ -149,6 +137,12 @@ namespace Pulumi.PulumiService
         /// </summary>
         [Input("providerConfig")]
         public Input<object>? ProviderConfig { get; set; }
+
+        /// <summary>
+        /// Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning.
+        /// </summary>
+        [Input("scanSchedule")]
+        public Input<Pulumi.PulumiService.ScanSchedule>? ScanSchedule { get; set; }
 
         public InsightsAccountArgs()
         {

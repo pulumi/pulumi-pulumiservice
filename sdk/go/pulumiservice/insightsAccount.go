@@ -18,8 +18,6 @@ type InsightsAccount struct {
 
 	// The name of the insights account.
 	AccountName pulumi.StringOutput `pulumi:"accountName"`
-	// Optional cron expression for scheduled scanning.
-	Cron pulumi.StringPtrOutput `pulumi:"cron"`
 	// The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0').
 	Environment pulumi.StringOutput `pulumi:"environment"`
 	// The insights account identifier.
@@ -90,8 +88,6 @@ func (InsightsAccountState) ElementType() reflect.Type {
 type insightsAccountArgs struct {
 	// Name of the insights account.
 	AccountName string `pulumi:"accountName"`
-	// Optional cron expression for scheduled scanning.
-	Cron *string `pulumi:"cron"`
 	// The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0').
 	Environment string `pulumi:"environment"`
 	// The organization's name.
@@ -100,14 +96,14 @@ type insightsAccountArgs struct {
 	Provider string `pulumi:"provider"`
 	// Provider-specific configuration as a JSON object.
 	ProviderConfig interface{} `pulumi:"providerConfig"`
+	// Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning.
+	ScanSchedule *ScanSchedule `pulumi:"scanSchedule"`
 }
 
 // The set of arguments for constructing a InsightsAccount resource.
 type InsightsAccountArgs struct {
 	// Name of the insights account.
 	AccountName pulumi.StringInput
-	// Optional cron expression for scheduled scanning.
-	Cron pulumi.StringPtrInput
 	// The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0').
 	Environment pulumi.StringInput
 	// The organization's name.
@@ -116,6 +112,8 @@ type InsightsAccountArgs struct {
 	Provider pulumi.StringInput
 	// Provider-specific configuration as a JSON object.
 	ProviderConfig pulumi.Input
+	// Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning.
+	ScanSchedule ScanSchedulePtrInput
 }
 
 func (InsightsAccountArgs) ElementType() reflect.Type {
@@ -208,11 +206,6 @@ func (o InsightsAccountOutput) ToInsightsAccountOutputWithContext(ctx context.Co
 // The name of the insights account.
 func (o InsightsAccountOutput) AccountName() pulumi.StringOutput {
 	return o.ApplyT(func(v *InsightsAccount) pulumi.StringOutput { return v.AccountName }).(pulumi.StringOutput)
-}
-
-// Optional cron expression for scheduled scanning.
-func (o InsightsAccountOutput) Cron() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *InsightsAccount) pulumi.StringPtrOutput { return v.Cron }).(pulumi.StringPtrOutput)
 }
 
 // The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0').

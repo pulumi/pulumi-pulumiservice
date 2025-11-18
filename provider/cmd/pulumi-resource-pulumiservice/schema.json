@@ -671,6 +671,22 @@
         }
       ]
     },
+    "pulumiservice:index:ScanSchedule": {
+      "description": "Schedule for automated cloud resource scans.",
+      "type": "string",
+      "enum": [
+        {
+          "name": "None",
+          "description": "Disable automated scanning.",
+          "value": "none"
+        },
+        {
+          "name": "Daily",
+          "description": "Run automated scans once per day.",
+          "value": "daily"
+        }
+      ]
+    },
     "pulumiservice:index:TargetActionType": {
       "type": "string",
       "enum": [
@@ -1540,10 +1556,6 @@
           "type": "string",
           "description": "The name of the insights account."
         },
-        "cron": {
-          "type": "string",
-          "description": "Optional cron expression for scheduled scanning."
-        },
         "environment": {
           "type": "string",
           "description": "The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0')."
@@ -1588,10 +1600,6 @@
           "description": "Name of the insights account.",
           "willReplaceOnChanges": true
         },
-        "cron": {
-          "type": "string",
-          "description": "Optional cron expression for scheduled scanning."
-        },
         "environment": {
           "type": "string",
           "description": "The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0')."
@@ -1609,6 +1617,10 @@
         "providerConfig": {
           "$ref": "pulumi.json#/Any",
           "description": "Provider-specific configuration as a JSON object."
+        },
+        "scanSchedule": {
+          "$ref": "#/types/pulumiservice:index:ScanSchedule",
+          "description": "Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning."
         }
       },
       "requiredInputs": [

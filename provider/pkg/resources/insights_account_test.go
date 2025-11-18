@@ -95,11 +95,11 @@ func buildInsightsAccountClientMock(
 // Test helper functions
 func testInsightsAccountInput() PulumiServiceInsightsAccountInput {
 	return PulumiServiceInsightsAccountInput{
-		OrgName:     "test-org",
-		AccountName: "test-account",
-		Provider:    "aws",
-		Environment: "test-env",
-		Cron:        "0 0 * * *",
+		OrgName:        "test-org",
+		AccountName:    "test-account",
+		Provider:       "aws",
+		Environment:    "test-env",
+		ScanSchedule:   "daily",
 		ProviderConfig: map[string]interface{}{
 			"region": "us-west-2",
 		},
@@ -181,7 +181,7 @@ func TestInsightsAccount_Read_Found(t *testing.T) {
 		"accountName":      resource.NewPropertyValue(input.AccountName),
 		"provider":         resource.NewPropertyValue(input.Provider),
 		"environment":      resource.NewPropertyValue(input.Environment),
-		"cron":             resource.NewPropertyValue(input.Cron),
+		"cron":             resource.NewPropertyValue(input.ScanSchedule),
 		"providerConfig":   resource.NewPropertyValue(input.ProviderConfig),
 	}
 
@@ -255,7 +255,7 @@ func TestInsightsAccount_Create_Success(t *testing.T) {
 		"accountName":      resource.NewPropertyValue(input.AccountName),
 		"provider":         resource.NewPropertyValue(input.Provider),
 		"environment":      resource.NewPropertyValue(input.Environment),
-		"cron":             resource.NewPropertyValue(input.Cron),
+		"cron":             resource.NewPropertyValue(input.ScanSchedule),
 		"providerConfig":   resource.NewPropertyValue(input.ProviderConfig),
 	}
 
@@ -383,7 +383,7 @@ func TestInsightsAccount_Update_Success(t *testing.T) {
 		"accountName":      resource.NewPropertyValue(input.AccountName),
 		"provider":         resource.NewPropertyValue(input.Provider),
 		"environment":      resource.NewPropertyValue(input.Environment),
-		"cron":             resource.NewPropertyValue(input.Cron),
+		"cron":             resource.NewPropertyValue(input.ScanSchedule),
 		"providerConfig":   resource.NewPropertyValue(input.ProviderConfig),
 	}
 
@@ -610,7 +610,7 @@ func TestInsightsAccount_Diff_EnvironmentChange_UpdateOnly(t *testing.T) {
 		"accountName":      resource.NewPropertyValue(oldInput.AccountName),
 		"provider":         resource.NewPropertyValue(oldInput.Provider),
 		"environment":      resource.NewPropertyValue(oldInput.Environment),
-		"cron":             resource.NewPropertyValue(oldInput.Cron),
+		"cron":             resource.NewPropertyValue(oldInput.ScanSchedule),
 		"providerConfig":   resource.NewPropertyValue(oldInput.ProviderConfig),
 	}
 
@@ -621,7 +621,7 @@ func TestInsightsAccount_Diff_EnvironmentChange_UpdateOnly(t *testing.T) {
 		"accountName":      resource.NewPropertyValue(newInput.AccountName),
 		"provider":         resource.NewPropertyValue(newInput.Provider),
 		"environment":      resource.NewPropertyValue(newInput.Environment),
-		"cron":             resource.NewPropertyValue(newInput.Cron),
+		"cron":             resource.NewPropertyValue(newInput.ScanSchedule),
 		"providerConfig":   resource.NewPropertyValue(newInput.ProviderConfig),
 	}
 
@@ -652,7 +652,7 @@ func TestInsightsAccount_Diff_NoChanges(t *testing.T) {
 		"accountName":      resource.NewPropertyValue(input.AccountName),
 		"provider":         resource.NewPropertyValue(input.Provider),
 		"environment":      resource.NewPropertyValue(input.Environment),
-		"cron":             resource.NewPropertyValue(input.Cron),
+		"cron":             resource.NewPropertyValue(input.ScanSchedule),
 		"providerConfig":   resource.NewPropertyValue(input.ProviderConfig),
 	}
 
@@ -681,7 +681,7 @@ func TestInsightsAccount_Check_Success(t *testing.T) {
 		"accountName":      resource.NewPropertyValue(input.AccountName),
 		"provider":         resource.NewPropertyValue(input.Provider),
 		"environment":      resource.NewPropertyValue(input.Environment),
-		"cron":             resource.NewPropertyValue(input.Cron),
+		"cron":             resource.NewPropertyValue(input.ScanSchedule),
 		"providerConfig":   resource.NewPropertyValue(input.ProviderConfig),
 	}
 

@@ -2,6 +2,9 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
+import * as inputs from "./types/input";
+import * as outputs from "./types/output";
+import * as enums from "./types/enums";
 import * as utilities from "./utilities";
 
 /**
@@ -38,10 +41,6 @@ export class InsightsAccount extends pulumi.CustomResource {
      * The name of the insights account.
      */
     declare public readonly accountName: pulumi.Output<string>;
-    /**
-     * Optional cron expression for scheduled scanning.
-     */
-    declare public readonly cron: pulumi.Output<string | undefined>;
     /**
      * The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0').
      */
@@ -95,17 +94,16 @@ export class InsightsAccount extends pulumi.CustomResource {
                 throw new Error("Missing required property 'provider'");
             }
             resourceInputs["accountName"] = args?.accountName;
-            resourceInputs["cron"] = args?.cron;
             resourceInputs["environment"] = args?.environment;
             resourceInputs["organizationName"] = args?.organizationName;
             resourceInputs["provider"] = args?.provider;
             resourceInputs["providerConfig"] = args?.providerConfig;
+            resourceInputs["scanSchedule"] = args?.scanSchedule;
             resourceInputs["insightsAccountId"] = undefined /*out*/;
             resourceInputs["providerVersion"] = undefined /*out*/;
             resourceInputs["scheduledScanEnabled"] = undefined /*out*/;
         } else {
             resourceInputs["accountName"] = undefined /*out*/;
-            resourceInputs["cron"] = undefined /*out*/;
             resourceInputs["environment"] = undefined /*out*/;
             resourceInputs["insightsAccountId"] = undefined /*out*/;
             resourceInputs["organizationName"] = undefined /*out*/;
@@ -128,10 +126,6 @@ export interface InsightsAccountArgs {
      */
     accountName: pulumi.Input<string>;
     /**
-     * Optional cron expression for scheduled scanning.
-     */
-    cron?: pulumi.Input<string>;
-    /**
      * The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0').
      */
     environment: pulumi.Input<string>;
@@ -147,4 +141,8 @@ export interface InsightsAccountArgs {
      * Provider-specific configuration as a JSON object.
      */
     providerConfig?: any;
+    /**
+     * Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning.
+     */
+    scanSchedule?: pulumi.Input<enums.ScanSchedule>;
 }

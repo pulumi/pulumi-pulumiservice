@@ -1093,6 +1093,174 @@ func (in *rbacPermissionPtr) ToRbacPermissionPtrOutputWithContext(ctx context.Co
 	return pulumi.ToOutputWithContext(ctx, in).(RbacPermissionPtrOutput)
 }
 
+// Schedule for automated cloud resource scans.
+type ScanSchedule string
+
+const (
+	// Disable automated scanning.
+	ScanScheduleNone = ScanSchedule("none")
+	// Run automated scans once per day.
+	ScanScheduleDaily = ScanSchedule("daily")
+)
+
+func (ScanSchedule) ElementType() reflect.Type {
+	return reflect.TypeOf((*ScanSchedule)(nil)).Elem()
+}
+
+func (e ScanSchedule) ToScanScheduleOutput() ScanScheduleOutput {
+	return pulumi.ToOutput(e).(ScanScheduleOutput)
+}
+
+func (e ScanSchedule) ToScanScheduleOutputWithContext(ctx context.Context) ScanScheduleOutput {
+	return pulumi.ToOutputWithContext(ctx, e).(ScanScheduleOutput)
+}
+
+func (e ScanSchedule) ToScanSchedulePtrOutput() ScanSchedulePtrOutput {
+	return e.ToScanSchedulePtrOutputWithContext(context.Background())
+}
+
+func (e ScanSchedule) ToScanSchedulePtrOutputWithContext(ctx context.Context) ScanSchedulePtrOutput {
+	return ScanSchedule(e).ToScanScheduleOutputWithContext(ctx).ToScanSchedulePtrOutputWithContext(ctx)
+}
+
+func (e ScanSchedule) ToStringOutput() pulumi.StringOutput {
+	return pulumi.ToOutput(pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e ScanSchedule) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return pulumi.ToOutputWithContext(ctx, pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e ScanSchedule) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringPtrOutputWithContext(context.Background())
+}
+
+func (e ScanSchedule) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringOutputWithContext(ctx).ToStringPtrOutputWithContext(ctx)
+}
+
+type ScanScheduleOutput struct{ *pulumi.OutputState }
+
+func (ScanScheduleOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*ScanSchedule)(nil)).Elem()
+}
+
+func (o ScanScheduleOutput) ToScanScheduleOutput() ScanScheduleOutput {
+	return o
+}
+
+func (o ScanScheduleOutput) ToScanScheduleOutputWithContext(ctx context.Context) ScanScheduleOutput {
+	return o
+}
+
+func (o ScanScheduleOutput) ToScanSchedulePtrOutput() ScanSchedulePtrOutput {
+	return o.ToScanSchedulePtrOutputWithContext(context.Background())
+}
+
+func (o ScanScheduleOutput) ToScanSchedulePtrOutputWithContext(ctx context.Context) ScanSchedulePtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v ScanSchedule) *ScanSchedule {
+		return &v
+	}).(ScanSchedulePtrOutput)
+}
+
+func (o ScanScheduleOutput) ToStringOutput() pulumi.StringOutput {
+	return o.ToStringOutputWithContext(context.Background())
+}
+
+func (o ScanScheduleOutput) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e ScanSchedule) string {
+		return string(e)
+	}).(pulumi.StringOutput)
+}
+
+func (o ScanScheduleOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o ScanScheduleOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e ScanSchedule) *string {
+		v := string(e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+type ScanSchedulePtrOutput struct{ *pulumi.OutputState }
+
+func (ScanSchedulePtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**ScanSchedule)(nil)).Elem()
+}
+
+func (o ScanSchedulePtrOutput) ToScanSchedulePtrOutput() ScanSchedulePtrOutput {
+	return o
+}
+
+func (o ScanSchedulePtrOutput) ToScanSchedulePtrOutputWithContext(ctx context.Context) ScanSchedulePtrOutput {
+	return o
+}
+
+func (o ScanSchedulePtrOutput) Elem() ScanScheduleOutput {
+	return o.ApplyT(func(v *ScanSchedule) ScanSchedule {
+		if v != nil {
+			return *v
+		}
+		var ret ScanSchedule
+		return ret
+	}).(ScanScheduleOutput)
+}
+
+func (o ScanSchedulePtrOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o ScanSchedulePtrOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e *ScanSchedule) *string {
+		if e == nil {
+			return nil
+		}
+		v := string(*e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+// ScanScheduleInput is an input type that accepts values of the ScanSchedule enum
+// A concrete instance of `ScanScheduleInput` can be one of the following:
+//
+//	ScanScheduleNone
+//	ScanScheduleDaily
+type ScanScheduleInput interface {
+	pulumi.Input
+
+	ToScanScheduleOutput() ScanScheduleOutput
+	ToScanScheduleOutputWithContext(context.Context) ScanScheduleOutput
+}
+
+var scanSchedulePtrType = reflect.TypeOf((**ScanSchedule)(nil)).Elem()
+
+type ScanSchedulePtrInput interface {
+	pulumi.Input
+
+	ToScanSchedulePtrOutput() ScanSchedulePtrOutput
+	ToScanSchedulePtrOutputWithContext(context.Context) ScanSchedulePtrOutput
+}
+
+type scanSchedulePtr string
+
+func ScanSchedulePtr(v string) ScanSchedulePtrInput {
+	return (*scanSchedulePtr)(&v)
+}
+
+func (*scanSchedulePtr) ElementType() reflect.Type {
+	return scanSchedulePtrType
+}
+
+func (in *scanSchedulePtr) ToScanSchedulePtrOutput() ScanSchedulePtrOutput {
+	return pulumi.ToOutput(in).(ScanSchedulePtrOutput)
+}
+
+func (in *scanSchedulePtr) ToScanSchedulePtrOutputWithContext(ctx context.Context) ScanSchedulePtrOutput {
+	return pulumi.ToOutputWithContext(ctx, in).(ScanSchedulePtrOutput)
+}
+
 type TargetActionType string
 
 const (
@@ -2094,6 +2262,8 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*PulumiOperationPtrInput)(nil)).Elem(), PulumiOperation("update"))
 	pulumi.RegisterInputType(reflect.TypeOf((*RbacPermissionInput)(nil)).Elem(), RbacPermission("environment:read"))
 	pulumi.RegisterInputType(reflect.TypeOf((*RbacPermissionPtrInput)(nil)).Elem(), RbacPermission("environment:read"))
+	pulumi.RegisterInputType(reflect.TypeOf((*ScanScheduleInput)(nil)).Elem(), ScanSchedule("none"))
+	pulumi.RegisterInputType(reflect.TypeOf((*ScanSchedulePtrInput)(nil)).Elem(), ScanSchedule("none"))
 	pulumi.RegisterInputType(reflect.TypeOf((*TargetActionTypeInput)(nil)).Elem(), TargetActionType("update"))
 	pulumi.RegisterInputType(reflect.TypeOf((*TargetActionTypePtrInput)(nil)).Elem(), TargetActionType("update"))
 	pulumi.RegisterInputType(reflect.TypeOf((*TargetActionTypeArrayInput)(nil)).Elem(), TargetActionTypeArray{})
@@ -2118,6 +2288,8 @@ func init() {
 	pulumi.RegisterOutputType(PulumiOperationPtrOutput{})
 	pulumi.RegisterOutputType(RbacPermissionOutput{})
 	pulumi.RegisterOutputType(RbacPermissionPtrOutput{})
+	pulumi.RegisterOutputType(ScanScheduleOutput{})
+	pulumi.RegisterOutputType(ScanSchedulePtrOutput{})
 	pulumi.RegisterOutputType(TargetActionTypeOutput{})
 	pulumi.RegisterOutputType(TargetActionTypePtrOutput{})
 	pulumi.RegisterOutputType(TargetActionTypeArrayOutput{})

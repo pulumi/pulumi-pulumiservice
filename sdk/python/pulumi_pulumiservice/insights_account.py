@@ -13,6 +13,7 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from . import _utilities
+from ._enums import *
 
 __all__ = ['InsightsAccountArgs', 'InsightsAccount']
 
@@ -23,25 +24,25 @@ class InsightsAccountArgs:
                  environment: pulumi.Input[_builtins.str],
                  organization_name: pulumi.Input[_builtins.str],
                  provider: pulumi.Input[_builtins.str],
-                 cron: Optional[pulumi.Input[_builtins.str]] = None,
-                 provider_config: Optional[Any] = None):
+                 provider_config: Optional[Any] = None,
+                 scan_schedule: Optional[pulumi.Input['ScanSchedule']] = None):
         """
         The set of arguments for constructing a InsightsAccount resource.
         :param pulumi.Input[_builtins.str] account_name: Name of the insights account.
         :param pulumi.Input[_builtins.str] environment: The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0').
         :param pulumi.Input[_builtins.str] organization_name: The organization's name.
         :param pulumi.Input[_builtins.str] provider: The cloud provider (e.g., 'aws', 'azure', 'gcp').
-        :param pulumi.Input[_builtins.str] cron: Optional cron expression for scheduled scanning.
         :param Any provider_config: Provider-specific configuration as a JSON object.
+        :param pulumi.Input['ScanSchedule'] scan_schedule: Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning.
         """
         pulumi.set(__self__, "account_name", account_name)
         pulumi.set(__self__, "environment", environment)
         pulumi.set(__self__, "organization_name", organization_name)
         pulumi.set(__self__, "provider", provider)
-        if cron is not None:
-            pulumi.set(__self__, "cron", cron)
         if provider_config is not None:
             pulumi.set(__self__, "provider_config", provider_config)
+        if scan_schedule is not None:
+            pulumi.set(__self__, "scan_schedule", scan_schedule)
 
     @_builtins.property
     @pulumi.getter(name="accountName")
@@ -92,18 +93,6 @@ class InsightsAccountArgs:
         pulumi.set(self, "provider", value)
 
     @_builtins.property
-    @pulumi.getter
-    def cron(self) -> Optional[pulumi.Input[_builtins.str]]:
-        """
-        Optional cron expression for scheduled scanning.
-        """
-        return pulumi.get(self, "cron")
-
-    @cron.setter
-    def cron(self, value: Optional[pulumi.Input[_builtins.str]]):
-        pulumi.set(self, "cron", value)
-
-    @_builtins.property
     @pulumi.getter(name="providerConfig")
     def provider_config(self) -> Optional[Any]:
         """
@@ -115,6 +104,18 @@ class InsightsAccountArgs:
     def provider_config(self, value: Optional[Any]):
         pulumi.set(self, "provider_config", value)
 
+    @_builtins.property
+    @pulumi.getter(name="scanSchedule")
+    def scan_schedule(self) -> Optional[pulumi.Input['ScanSchedule']]:
+        """
+        Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning.
+        """
+        return pulumi.get(self, "scan_schedule")
+
+    @scan_schedule.setter
+    def scan_schedule(self, value: Optional[pulumi.Input['ScanSchedule']]):
+        pulumi.set(self, "scan_schedule", value)
+
 
 @pulumi.type_token("pulumiservice:index:InsightsAccount")
 class InsightsAccount(pulumi.CustomResource):
@@ -123,11 +124,11 @@ class InsightsAccount(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  account_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 cron: Optional[pulumi.Input[_builtins.str]] = None,
                  environment: Optional[pulumi.Input[_builtins.str]] = None,
                  organization_name: Optional[pulumi.Input[_builtins.str]] = None,
                  provider: Optional[pulumi.Input[_builtins.str]] = None,
                  provider_config: Optional[Any] = None,
+                 scan_schedule: Optional[pulumi.Input['ScanSchedule']] = None,
                  __props__=None):
         """
         Insights Account for cloud resource scanning and analysis
@@ -135,11 +136,11 @@ class InsightsAccount(pulumi.CustomResource):
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] account_name: Name of the insights account.
-        :param pulumi.Input[_builtins.str] cron: Optional cron expression for scheduled scanning.
         :param pulumi.Input[_builtins.str] environment: The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0').
         :param pulumi.Input[_builtins.str] organization_name: The organization's name.
         :param pulumi.Input[_builtins.str] provider: The cloud provider (e.g., 'aws', 'azure', 'gcp').
         :param Any provider_config: Provider-specific configuration as a JSON object.
+        :param pulumi.Input['ScanSchedule'] scan_schedule: Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning.
         """
         ...
     @overload
@@ -166,11 +167,11 @@ class InsightsAccount(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  account_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 cron: Optional[pulumi.Input[_builtins.str]] = None,
                  environment: Optional[pulumi.Input[_builtins.str]] = None,
                  organization_name: Optional[pulumi.Input[_builtins.str]] = None,
                  provider: Optional[pulumi.Input[_builtins.str]] = None,
                  provider_config: Optional[Any] = None,
+                 scan_schedule: Optional[pulumi.Input['ScanSchedule']] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
@@ -183,7 +184,6 @@ class InsightsAccount(pulumi.CustomResource):
             if account_name is None and not opts.urn:
                 raise TypeError("Missing required property 'account_name'")
             __props__.__dict__["account_name"] = account_name
-            __props__.__dict__["cron"] = cron
             if environment is None and not opts.urn:
                 raise TypeError("Missing required property 'environment'")
             __props__.__dict__["environment"] = environment
@@ -194,6 +194,7 @@ class InsightsAccount(pulumi.CustomResource):
                 raise TypeError("Missing required property 'provider'")
             __props__.__dict__["provider"] = provider
             __props__.__dict__["provider_config"] = provider_config
+            __props__.__dict__["scan_schedule"] = scan_schedule
             __props__.__dict__["insights_account_id"] = None
             __props__.__dict__["provider_version"] = None
             __props__.__dict__["scheduled_scan_enabled"] = None
@@ -220,7 +221,6 @@ class InsightsAccount(pulumi.CustomResource):
         __props__ = InsightsAccountArgs.__new__(InsightsAccountArgs)
 
         __props__.__dict__["account_name"] = None
-        __props__.__dict__["cron"] = None
         __props__.__dict__["environment"] = None
         __props__.__dict__["insights_account_id"] = None
         __props__.__dict__["organization_name"] = None
@@ -237,14 +237,6 @@ class InsightsAccount(pulumi.CustomResource):
         The name of the insights account.
         """
         return pulumi.get(self, "account_name")
-
-    @_builtins.property
-    @pulumi.getter
-    def cron(self) -> pulumi.Output[Optional[_builtins.str]]:
-        """
-        Optional cron expression for scheduled scanning.
-        """
-        return pulumi.get(self, "cron")
 
     @_builtins.property
     @pulumi.getter

@@ -13,6 +13,7 @@ __all__ = [
     'EnvironmentPermission',
     'PulumiOperation',
     'RbacPermission',
+    'ScanSchedule',
     'TargetActionType',
     'TeamStackPermissionScope',
     'WebhookFilters',
@@ -138,6 +139,21 @@ class RbacPermission(_builtins.str, Enum):
     ROTATE = "environment:rotate"
     """
     Rotate permission.
+    """
+
+
+@pulumi.type_token("pulumiservice:index:ScanSchedule")
+class ScanSchedule(_builtins.str, Enum):
+    """
+    Schedule for automated cloud resource scans.
+    """
+    NONE = "none"
+    """
+    Disable automated scanning.
+    """
+    DAILY = "daily"
+    """
+    Run automated scans once per day.
     """
 
 

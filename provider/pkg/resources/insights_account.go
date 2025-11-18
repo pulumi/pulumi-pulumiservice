@@ -37,7 +37,7 @@ type PulumiServiceInsightsAccountInput struct {
 	AccountName    string
 	Provider       string
 	Environment    string
-	Cron           string
+	ScanSchedule   string
 	ProviderConfig map[string]interface{}
 }
 
@@ -64,8 +64,8 @@ func (ia *PulumiServiceInsightsAccountResource) ToPulumiServiceInsightsAccountIn
 		input.Environment = inputMap["environment"].StringValue()
 	}
 
-	if inputMap["cron"].HasValue() && inputMap["cron"].IsString() {
-		input.Cron = inputMap["cron"].StringValue()
+	if inputMap["scanSchedule"].HasValue() && inputMap["scanSchedule"].IsString() {
+		input.ScanSchedule = inputMap["scanSchedule"].StringValue()
 	}
 
 	if inputMap["providerConfig"].HasValue() && inputMap["providerConfig"].IsObject() {
@@ -82,8 +82,8 @@ func GenerateInsightsAccountProperties(input PulumiServiceInsightsAccountInput, 
 	inputMap["provider"] = resource.NewPropertyValue(input.Provider)
 	inputMap["environment"] = resource.NewPropertyValue(input.Environment)
 
-	if input.Cron != "" {
-		inputMap["cron"] = resource.NewPropertyValue(input.Cron)
+	if input.ScanSchedule != "" {
+		inputMap["scanSchedule"] = resource.NewPropertyValue(input.ScanSchedule)
 	}
 
 	if input.ProviderConfig != nil {
@@ -97,10 +97,6 @@ func GenerateInsightsAccountProperties(input PulumiServiceInsightsAccountInput, 
 	outputMap["provider"] = inputMap["provider"]
 	outputMap["environment"] = inputMap["environment"]
 	outputMap["scheduledScanEnabled"] = resource.NewPropertyValue(account.ScheduledScanEnabled)
-
-	if input.Cron != "" {
-		outputMap["cron"] = inputMap["cron"]
-	}
 
 	if account.ProviderVersion != "" {
 		outputMap["providerVersion"] = resource.NewPropertyValue(account.ProviderVersion)
@@ -187,7 +183,7 @@ func (ia *PulumiServiceInsightsAccountResource) Create(req *pulumirpc.CreateRequ
 	createReq := pulumiapi.CreateInsightsAccountRequest{
 		Provider:       input.Provider,
 		Environment:    input.Environment,
-		Cron:           input.Cron,
+		ScanSchedule:   input.ScanSchedule,
 		ProviderConfig: input.ProviderConfig,
 	}
 
@@ -249,8 +245,9 @@ func (ia *PulumiServiceInsightsAccountResource) Read(req *pulumirpc.ReadRequest)
 		input.ProviderConfig = account.ProviderConfig
 	}
 
-	if propertyMap["cron"].HasValue() && propertyMap["cron"].IsString() {
-		input.Cron = propertyMap["cron"].StringValue()
+	// Only include scanSchedule if it was in the original inputs
+	if propertyMap["scanSchedule"].HasValue() && propertyMap["scanSchedule"].IsString() {
+		input.ScanSchedule = propertyMap["scanSchedule"].StringValue()
 	}
 
 	outputProperties, inputs, err := GenerateInsightsAccountProperties(input, *account)
@@ -282,7 +279,7 @@ func (ia *PulumiServiceInsightsAccountResource) Update(req *pulumirpc.UpdateRequ
 
 	updateReq := pulumiapi.UpdateInsightsAccountRequest{
 		Environment:    input.Environment,
-		Cron:           input.Cron,
+		ScanSchedule:   input.ScanSchedule,
 		ProviderConfig: input.ProviderConfig,
 	}
 

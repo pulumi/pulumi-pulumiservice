@@ -75,6 +75,22 @@
         }
       ]
     },
+    "pulumiservice:index:ScanSchedule": {
+      "type": "string",
+      "description": "Schedule for automated cloud resource scans.",
+      "enum": [
+        {
+          "value": "none",
+          "description": "Disable automated scanning.",
+          "name": "None"
+        },
+        {
+          "value": "daily",
+          "description": "Run automated scans once per day.",
+          "name": "Daily"
+        }
+      ]
+    },
     "pulumiservice:index:WebhookFilters": {
       "type": "string",
       "enum": [
@@ -1009,10 +1025,6 @@
           "description": "The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0').",
           "type": "string"
         },
-        "cron": {
-          "description": "Optional cron expression for scheduled scanning.",
-          "type": "string"
-        },
         "scheduledScanEnabled": {
           "description": "Whether scheduled scanning is enabled.",
           "type": "boolean"
@@ -1050,9 +1062,9 @@
           "description": "The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0').",
           "type": "string"
         },
-        "cron": {
-          "description": "Optional cron expression for scheduled scanning.",
-          "type": "string"
+        "scanSchedule": {
+          "description": "Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning.",
+          "$ref": "#/types/pulumiservice:index:ScanSchedule"
         },
         "providerConfig": {
           "description": "Provider-specific configuration as a JSON object.",

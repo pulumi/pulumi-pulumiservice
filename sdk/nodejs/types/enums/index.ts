@@ -128,6 +128,22 @@ export const RbacPermission = {
 
 export type RbacPermission = (typeof RbacPermission)[keyof typeof RbacPermission];
 
+export const ScanSchedule = {
+    /**
+     * Disable automated scanning.
+     */
+    None: "none",
+    /**
+     * Run automated scans once per day.
+     */
+    Daily: "daily",
+} as const;
+
+/**
+ * Schedule for automated cloud resource scans.
+ */
+export type ScanSchedule = (typeof ScanSchedule)[keyof typeof ScanSchedule];
+
 export const TargetActionType = {
     /**
      * Update action type for approval rules.
