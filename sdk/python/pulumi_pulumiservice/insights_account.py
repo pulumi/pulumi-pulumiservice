@@ -33,7 +33,7 @@ class InsightsAccountArgs:
         :param pulumi.Input[_builtins.str] organization_name: The organization's name.
         :param pulumi.Input['CloudProvider'] provider: The cloud provider for scanning.
         :param pulumi.Input[Mapping[str, Any]] provider_config: Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {"regions": ["us-west-1", "us-west-2"]}.
-        :param pulumi.Input['ScanSchedule'] scan_schedule: Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning.
+        :param pulumi.Input['ScanSchedule'] scan_schedule: Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
         """
         pulumi.set(__self__, "account_name", account_name)
         pulumi.set(__self__, "environment", environment)
@@ -41,6 +41,8 @@ class InsightsAccountArgs:
         pulumi.set(__self__, "provider", provider)
         if provider_config is not None:
             pulumi.set(__self__, "provider_config", provider_config)
+        if scan_schedule is None:
+            scan_schedule = 'none'
         if scan_schedule is not None:
             pulumi.set(__self__, "scan_schedule", scan_schedule)
 
@@ -108,7 +110,7 @@ class InsightsAccountArgs:
     @pulumi.getter(name="scanSchedule")
     def scan_schedule(self) -> Optional[pulumi.Input['ScanSchedule']]:
         """
-        Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning.
+        Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
         """
         return pulumi.get(self, "scan_schedule")
 
@@ -140,7 +142,7 @@ class InsightsAccount(pulumi.CustomResource):
         :param pulumi.Input[_builtins.str] organization_name: The organization's name.
         :param pulumi.Input['CloudProvider'] provider: The cloud provider for scanning.
         :param pulumi.Input[Mapping[str, Any]] provider_config: Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {"regions": ["us-west-1", "us-west-2"]}.
-        :param pulumi.Input['ScanSchedule'] scan_schedule: Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning.
+        :param pulumi.Input['ScanSchedule'] scan_schedule: Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
         """
         ...
     @overload
@@ -194,6 +196,8 @@ class InsightsAccount(pulumi.CustomResource):
                 raise TypeError("Missing required property 'provider'")
             __props__.__dict__["provider"] = provider
             __props__.__dict__["provider_config"] = provider_config
+            if scan_schedule is None:
+                scan_schedule = 'none'
             __props__.__dict__["scan_schedule"] = scan_schedule
             __props__.__dict__["insights_account_id"] = None
             __props__.__dict__["scheduled_scan_enabled"] = None
@@ -283,7 +287,7 @@ class InsightsAccount(pulumi.CustomResource):
     @pulumi.getter(name="scanSchedule")
     def scan_schedule(self) -> pulumi.Output[Optional['ScanSchedule']]:
         """
-        Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning.
+        Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
         """
         return pulumi.get(self, "scan_schedule")
 

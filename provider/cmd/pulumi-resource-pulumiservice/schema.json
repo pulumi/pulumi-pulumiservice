@@ -1598,7 +1598,8 @@
         },
         "scanSchedule": {
           "$ref": "#/types/pulumiservice:index:ScanSchedule",
-          "description": "Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning."
+          "description": "Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.",
+          "default": "none"
         },
         "scheduledScanEnabled": {
           "type": "boolean",
@@ -1643,7 +1644,8 @@
         },
         "scanSchedule": {
           "$ref": "#/types/pulumiservice:index:ScanSchedule",
-          "description": "Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning."
+          "description": "Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.",
+          "default": "none"
         }
       },
       "requiredInputs": [

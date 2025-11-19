@@ -28,7 +28,7 @@ type InsightsAccount struct {
 	Provider CloudProviderOutput `pulumi:"provider"`
 	// Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {"regions": ["us-west-1", "us-west-2"]}.
 	ProviderConfig pulumi.MapOutput `pulumi:"providerConfig"`
-	// Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning.
+	// Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
 	ScanSchedule ScanSchedulePtrOutput `pulumi:"scanSchedule"`
 	// Whether scheduled scanning is enabled.
 	ScheduledScanEnabled pulumi.BoolOutput `pulumi:"scheduledScanEnabled"`
@@ -52,6 +52,9 @@ func NewInsightsAccount(ctx *pulumi.Context,
 	}
 	if args.Provider == nil {
 		return nil, errors.New("invalid value for required argument 'Provider'")
+	}
+	if args.ScanSchedule == nil {
+		args.ScanSchedule = ScanSchedule("none")
 	}
 	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
 		"accountName",
@@ -102,7 +105,7 @@ type insightsAccountArgs struct {
 	Provider CloudProvider `pulumi:"provider"`
 	// Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {"regions": ["us-west-1", "us-west-2"]}.
 	ProviderConfig map[string]interface{} `pulumi:"providerConfig"`
-	// Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning.
+	// Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
 	ScanSchedule *ScanSchedule `pulumi:"scanSchedule"`
 }
 
@@ -118,7 +121,7 @@ type InsightsAccountArgs struct {
 	Provider CloudProviderInput
 	// Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {"regions": ["us-west-1", "us-west-2"]}.
 	ProviderConfig pulumi.MapInput
-	// Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning.
+	// Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
 	ScanSchedule ScanSchedulePtrInput
 }
 
@@ -239,7 +242,7 @@ func (o InsightsAccountOutput) ProviderConfig() pulumi.MapOutput {
 	return o.ApplyT(func(v *InsightsAccount) pulumi.MapOutput { return v.ProviderConfig }).(pulumi.MapOutput)
 }
 
-// Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning.
+// Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
 func (o InsightsAccountOutput) ScanSchedule() ScanSchedulePtrOutput {
 	return o.ApplyT(func(v *InsightsAccount) ScanSchedulePtrOutput { return v.ScanSchedule }).(ScanSchedulePtrOutput)
 }

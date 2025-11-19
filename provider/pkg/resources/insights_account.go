@@ -85,7 +85,8 @@ func (c *InsightsAccountCore) Annotate(a infer.Annotator) {
 	a.Describe(&c.AccountName, "Name of the insights account.")
 	a.Describe(&c.Provider, "The cloud provider for scanning.")
 	a.Describe(&c.Environment, "The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0').")
-	a.Describe(&c.ScanSchedule, "Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning.")
+	a.Describe(&c.ScanSchedule, "Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.")
+	a.SetDefault(&c.ScanSchedule, ScanScheduleNone)
 	a.Describe(&c.ProviderConfig, "Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {\"regions\": [\"us-west-1\", \"us-west-2\"]}.")
 }
 
