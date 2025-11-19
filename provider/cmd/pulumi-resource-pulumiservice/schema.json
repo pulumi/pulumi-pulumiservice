@@ -250,6 +250,23 @@
         "tenantId"
       ]
     },
+    "pulumiservice:index:CloudProvider": {
+      "type": "string",
+      "enum": [
+        {
+          "description": "Amazon Web Services",
+          "value": "aws"
+        },
+        {
+          "description": "Microsoft Azure",
+          "value": "azure"
+        },
+        {
+          "description": "Google Cloud Platform",
+          "value": "gcp"
+        }
+      ]
+    },
     "pulumiservice:index:DeploymentSettingsCacheOptions": {
       "description": "Dependency cache settings for the deployment",
       "properties": {
@@ -1568,8 +1585,8 @@
           "replaceOnChanges": true
         },
         "provider": {
-          "type": "string",
-          "description": "The cloud provider (e.g., 'aws', 'azure', 'gcp').",
+          "$ref": "#/types/pulumiservice:index:CloudProvider",
+          "description": "The cloud provider for scanning.",
           "replaceOnChanges": true
         },
         "providerConfig": {
@@ -1613,8 +1630,8 @@
           "replaceOnChanges": true
         },
         "provider": {
-          "type": "string",
-          "description": "The cloud provider (e.g., 'aws', 'azure', 'gcp').",
+          "$ref": "#/types/pulumiservice:index:CloudProvider",
+          "description": "The cloud provider for scanning.",
           "replaceOnChanges": true
         },
         "providerConfig": {

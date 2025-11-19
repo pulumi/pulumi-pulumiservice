@@ -49,6 +49,23 @@ export const AuthPolicyTokenType = {
 
 export type AuthPolicyTokenType = (typeof AuthPolicyTokenType)[keyof typeof AuthPolicyTokenType];
 
+export const CloudProvider = {
+    /**
+     * Amazon Web Services
+     */
+    Aws: "aws",
+    /**
+     * Microsoft Azure
+     */
+    Azure: "azure",
+    /**
+     * Google Cloud Platform
+     */
+    Gcp: "gcp",
+} as const;
+
+export type CloudProvider = (typeof CloudProvider)[keyof typeof CloudProvider];
+
 export const EnvironmentPermission = {
     /**
      * No permissions.

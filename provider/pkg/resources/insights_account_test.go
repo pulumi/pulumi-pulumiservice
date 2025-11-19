@@ -86,7 +86,7 @@ func TestInsightsAccount(t *testing.T) {
 				InsightsAccountCore: InsightsAccountCore{
 					OrganizationName: "test-org",
 					AccountName:      "test-account",
-					Provider:         "aws",
+					Provider:         CloudProviderAWS,
 					Environment:      "test-env",
 					ScanSchedule:     &scanSchedule,
 				},
@@ -95,7 +95,7 @@ func TestInsightsAccount(t *testing.T) {
 				InsightsAccountCore: InsightsAccountCore{
 					OrganizationName: "test-org",
 					AccountName:      "test-account",
-					Provider:         "aws",
+					Provider:         CloudProviderAWS,
 					Environment:      "test-env",
 					ScanSchedule:     &scanSchedule,
 				},
@@ -137,7 +137,7 @@ func TestInsightsAccount(t *testing.T) {
 				InsightsAccountCore: InsightsAccountCore{
 					OrganizationName: "test-org",
 					AccountName:      "test-account",
-					Provider:         "aws",
+					Provider:         CloudProviderAWS,
 					Environment:      "test-env",
 					ScanSchedule:     &scanSchedule,
 				},
@@ -146,7 +146,7 @@ func TestInsightsAccount(t *testing.T) {
 				InsightsAccountCore: InsightsAccountCore{
 					OrganizationName: "test-org",
 					AccountName:      "test-account",
-					Provider:         "aws",
+					Provider:         CloudProviderAWS,
 					Environment:      "test-env",
 					ScanSchedule:     &scanSchedule,
 				},
@@ -159,12 +159,61 @@ func TestInsightsAccount(t *testing.T) {
 		assert.Equal(t, "test-org/test-account", resp.ID)
 		assert.Equal(t, "test-org", resp.Inputs.OrganizationName)
 		assert.Equal(t, "test-account", resp.Inputs.AccountName)
-		assert.Equal(t, "aws", resp.Inputs.Provider)
+		assert.Equal(t, CloudProviderAWS, resp.Inputs.Provider)
 		assert.Equal(t, "test-env", resp.Inputs.Environment)
 		assert.Equal(t, ScanScheduleDaily, *resp.Inputs.ScanSchedule)
 		assert.Equal(t, "test-account-id", resp.State.InsightsAccountId)
 		assert.Equal(t, true, resp.State.ScheduledScanEnabled)
 		assert.Equal(t, "us-west-2", resp.State.ProviderConfig["region"])
+	})
+
+	t.Run("Read preserves nil providerConfig when API returns empty map", func(t *testing.T) {
+		// This test ensures we don't get spurious diffs during refresh
+		// when providerConfig was not specified initially
+		mockedClient := &InsightsAccountClientMock{
+			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+				return &pulumiapi.InsightsAccount{
+					ID:                   "test-account-id",
+					Name:                 "test-account",
+					Provider:             "aws",
+					ProviderEnvRef:       "test-env",
+					ScheduledScanEnabled: false,
+					ProviderConfig:       map[string]interface{}{}, // API returns empty map
+				}, nil
+			},
+		}
+
+		ctx := config.WithMockClient(context.Background(), mockedClient)
+
+		ia := &InsightsAccount{}
+		req := infer.ReadRequest[InsightsAccountInput, InsightsAccountState]{
+			ID: "test-org/test-account",
+			Inputs: InsightsAccountInput{
+				InsightsAccountCore: InsightsAccountCore{
+					OrganizationName: "test-org",
+					AccountName:      "test-account",
+					Provider:         CloudProviderAWS,
+					Environment:      "test-env",
+					// providerConfig is nil - not specified
+				},
+			},
+			State: InsightsAccountState{
+				InsightsAccountCore: InsightsAccountCore{
+					OrganizationName: "test-org",
+					AccountName:      "test-account",
+					Provider:         CloudProviderAWS,
+					Environment:      "test-env",
+					// providerConfig is nil
+				},
+				InsightsAccountId: "test-account-id",
+			},
+		}
+
+		resp, err := ia.Read(ctx, req)
+
+		assert.NoError(t, err)
+		assert.Nil(t, resp.Inputs.ProviderConfig, "providerConfig should remain nil when input was nil and API returned empty map")
+		assert.Nil(t, resp.State.ProviderConfig, "providerConfig should remain nil in state too")
 	})
 
 	t.Run("Create with DryRun", func(t *testing.T) {
@@ -179,7 +228,7 @@ func TestInsightsAccount(t *testing.T) {
 				InsightsAccountCore: InsightsAccountCore{
 					OrganizationName: "test-org",
 					AccountName:      "test-account",
-					Provider:         "aws",
+					Provider:         CloudProviderAWS,
 					Environment:      "test-env",
 					ScanSchedule:     &scanSchedule,
 					ProviderConfig: map[string]interface{}{
@@ -229,7 +278,7 @@ func TestInsightsAccount(t *testing.T) {
 				InsightsAccountCore: InsightsAccountCore{
 					OrganizationName: "test-org",
 					AccountName:      "test-account",
-					Provider:         "aws",
+					Provider:         CloudProviderAWS,
 					Environment:      "test-env",
 					ScanSchedule:     &scanSchedule,
 					ProviderConfig: map[string]interface{}{
@@ -277,7 +326,7 @@ func TestInsightsAccount(t *testing.T) {
 				InsightsAccountCore: InsightsAccountCore{
 					OrganizationName: "test-org",
 					AccountName:      "test-account",
-					Provider:         "aws",
+					Provider:         CloudProviderAWS,
 					Environment:      "test-env",
 					ScanSchedule:     &scanSchedule,
 				},
@@ -304,7 +353,7 @@ func TestInsightsAccount(t *testing.T) {
 				InsightsAccountCore: InsightsAccountCore{
 					OrganizationName: "test-org",
 					AccountName:      "test-account",
-					Provider:         "aws",
+					Provider:         CloudProviderAWS,
 					Environment:      "updated-env",
 					ScanSchedule:     &newSchedule,
 				},
@@ -313,7 +362,7 @@ func TestInsightsAccount(t *testing.T) {
 				InsightsAccountCore: InsightsAccountCore{
 					OrganizationName: "test-org",
 					AccountName:      "test-account",
-					Provider:         "aws",
+					Provider:         CloudProviderAWS,
 					Environment:      "old-env",
 					ScanSchedule:     &oldSchedule,
 				},
@@ -358,7 +407,7 @@ func TestInsightsAccount(t *testing.T) {
 				InsightsAccountCore: InsightsAccountCore{
 					OrganizationName: "test-org",
 					AccountName:      "test-account",
-					Provider:         "aws",
+					Provider:         CloudProviderAWS,
 					Environment:      "updated-env",
 					ScanSchedule:     &newSchedule,
 				},
@@ -367,7 +416,7 @@ func TestInsightsAccount(t *testing.T) {
 				InsightsAccountCore: InsightsAccountCore{
 					OrganizationName: "test-org",
 					AccountName:      "test-account",
-					Provider:         "aws",
+					Provider:         CloudProviderAWS,
 					Environment:      "old-env",
 					ScanSchedule:     &oldSchedule,
 				},
@@ -403,7 +452,7 @@ func TestInsightsAccount(t *testing.T) {
 				InsightsAccountCore: InsightsAccountCore{
 					OrganizationName: "test-org",
 					AccountName:      "test-account",
-					Provider:         "aws",
+					Provider:         CloudProviderAWS,
 					Environment:      "test-env",
 					ScanSchedule:     &scanSchedule,
 				},
@@ -420,13 +469,21 @@ func TestInsightsAccount(t *testing.T) {
 	t.Run("Check with valid provider", func(t *testing.T) {
 		ia := &InsightsAccount{}
 
-		validProviders := []string{"aws", "azure", "gcp"}
-		for _, provider := range validProviders {
-			t.Run(provider, func(t *testing.T) {
+		testCases := []struct {
+			name     string
+			provider CloudProvider
+		}{
+			{"aws", CloudProviderAWS},
+			{"azure", CloudProviderAzure},
+			{"gcp", CloudProviderGCP},
+		}
+
+		for _, tc := range testCases {
+			t.Run(tc.name, func(t *testing.T) {
 				inputs := property.NewMap(map[string]property.Value{
 					"organizationName": property.New("test-org"),
 					"accountName":      property.New("test-account"),
-					"provider":         property.New(provider),
+					"provider":         property.New(tc.name),
 					"environment":      property.New("test-env"),
 					"scanSchedule":     property.New("daily"),
 				})
@@ -439,32 +496,8 @@ func TestInsightsAccount(t *testing.T) {
 
 				assert.NoError(t, err)
 				assert.Empty(t, resp.Failures)
-				assert.Equal(t, provider, resp.Inputs.Provider)
+				assert.Equal(t, tc.provider, resp.Inputs.Provider)
 			})
 		}
-	})
-
-	t.Run("Check with invalid provider", func(t *testing.T) {
-		ia := &InsightsAccount{}
-
-		inputs := property.NewMap(map[string]property.Value{
-			"organizationName": property.New("test-org"),
-			"accountName":      property.New("test-account"),
-			"provider":         property.New("invalid-provider"),
-			"environment":      property.New("test-env"),
-			"scanSchedule":     property.New("daily"),
-		})
-
-		req := infer.CheckRequest{
-			NewInputs: inputs,
-		}
-
-		resp, err := ia.Check(context.Background(), req)
-
-		assert.NoError(t, err)
-		assert.Len(t, resp.Failures, 1)
-		assert.Equal(t, "provider", resp.Failures[0].Property)
-		assert.Contains(t, resp.Failures[0].Reason, "provider must be one of")
-		assert.Contains(t, resp.Failures[0].Reason, "invalid-provider")
 	})
 }

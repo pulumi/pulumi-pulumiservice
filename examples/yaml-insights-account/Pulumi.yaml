@@ -1,6 +1,6 @@
 name: yaml-insights-account
 runtime: yaml
-description: A minimal example of provisioning an Insights Account via Pulumi YAML
+description: Creates a Pulumi Insights Account for AWS cloud resource scanning, including ESC environment setup with placeholder credentials.
 config:
   digits:
     type: string

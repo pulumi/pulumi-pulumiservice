@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"strings"
 
-	p "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi-go-provider/infer"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
@@ -37,6 +36,23 @@ var (
 
 func (ia *InsightsAccount) Annotate(a infer.Annotator) {
 	a.Describe(ia, "Insights Account for cloud resource scanning and analysis across AWS, Azure, and GCP.")
+}
+
+// CloudProvider enum for supported cloud providers
+type CloudProvider string
+
+const (
+	CloudProviderAWS   CloudProvider = "aws"
+	CloudProviderAzure CloudProvider = "azure"
+	CloudProviderGCP   CloudProvider = "gcp"
+)
+
+func (CloudProvider) Values() []infer.EnumValue[CloudProvider] {
+	return []infer.EnumValue[CloudProvider]{
+		{Name: "aws", Value: CloudProviderAWS, Description: "Amazon Web Services"},
+		{Name: "azure", Value: CloudProviderAzure, Description: "Microsoft Azure"},
+		{Name: "gcp", Value: CloudProviderGCP, Description: "Google Cloud Platform"},
+	}
 }
 
 // ScanSchedule enum for automated scanning frequency
@@ -58,7 +74,7 @@ func (ScanSchedule) Values() []infer.EnumValue[ScanSchedule] {
 type InsightsAccountCore struct {
 	OrganizationName string                 `pulumi:"organizationName" provider:"replaceOnChanges"`
 	AccountName      string                 `pulumi:"accountName" provider:"replaceOnChanges"`
-	Provider         string                 `pulumi:"provider" provider:"replaceOnChanges"`
+	Provider         CloudProvider          `pulumi:"provider" provider:"replaceOnChanges"`
 	Environment      string                 `pulumi:"environment"`
 	ScanSchedule     *ScanSchedule          `pulumi:"scanSchedule,optional"`
 	ProviderConfig   map[string]interface{} `pulumi:"providerConfig,optional"`
@@ -67,7 +83,7 @@ type InsightsAccountCore struct {
 func (c *InsightsAccountCore) Annotate(a infer.Annotator) {
 	a.Describe(&c.OrganizationName, "The organization's name.")
 	a.Describe(&c.AccountName, "Name of the insights account.")
-	a.Describe(&c.Provider, "The cloud provider (e.g., 'aws', 'azure', 'gcp').")
+	a.Describe(&c.Provider, "The cloud provider for scanning.")
 	a.Describe(&c.Environment, "The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0').")
 	a.Describe(&c.ScanSchedule, "Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning.")
 	a.Describe(&c.ProviderConfig, "Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {\"regions\": [\"us-west-1\", \"us-west-2\"]}.")
@@ -106,7 +122,7 @@ func (*InsightsAccount) Create(ctx context.Context, req infer.CreateRequest[Insi
 	client := config.GetClient(ctx)
 
 	createReq := pulumiapi.CreateInsightsAccountRequest{
-		Provider:       req.Inputs.Provider,
+		Provider:       string(req.Inputs.Provider),
 		Environment:    req.Inputs.Environment,
 		ProviderConfig: req.Inputs.ProviderConfig,
 	}
@@ -148,30 +164,14 @@ func (*InsightsAccount) Create(ctx context.Context, req infer.CreateRequest[Insi
 }
 
 func (*InsightsAccount) Check(ctx context.Context, req infer.CheckRequest) (infer.CheckResponse[InsightsAccountInput], error) {
-	i, checkFailures, err := infer.DefaultCheck[InsightsAccountInput](ctx, req.NewInputs)
+	// Provider validation is handled automatically by the CloudProvider enum type
+	inputs, failures, err := infer.DefaultCheck[InsightsAccountInput](ctx, req.NewInputs)
 	if err != nil {
 		return infer.CheckResponse[InsightsAccountInput]{}, err
 	}
-
-	// Validate provider value
-	validProviders := []string{"aws", "azure", "gcp"}
-	valid := false
-	for _, p := range validProviders {
-		if i.Provider == p {
-			valid = true
-			break
-		}
-	}
-	if !valid {
-		checkFailures = append(checkFailures, p.CheckFailure{
-			Reason:   fmt.Sprintf("provider must be one of %v, got '%s'", validProviders, i.Provider),
-			Property: "provider",
-		})
-	}
-
 	return infer.CheckResponse[InsightsAccountInput]{
-		Inputs:   i,
-		Failures: checkFailures,
+		Inputs:   inputs,
+		Failures: failures,
 	}, nil
 }
 
@@ -195,12 +195,21 @@ func (*InsightsAccount) Read(ctx context.Context, req infer.ReadRequest[Insights
 		return infer.ReadResponse[InsightsAccountInput, InsightsAccountState]{}, nil
 	}
 
+	// Preserve input ProviderConfig to avoid spurious diffs
+	// when API returns empty map or single region (default configuration)
+	providerConfig := req.Inputs.ProviderConfig
+	isInputDefault := isDefaultProviderConfig(req.Inputs.Provider, req.Inputs.ProviderConfig)
+	isAPIDefault := isDefaultProviderConfig(req.Inputs.Provider, account.ProviderConfig)
+	if isInputDefault != isAPIDefault {
+		providerConfig = account.ProviderConfig
+	}
+
 	core := InsightsAccountCore{
 		OrganizationName: orgName,
 		AccountName:      accountName,
-		Provider:         account.Provider,
+		Provider:         CloudProvider(account.Provider),
 		Environment:      account.ProviderEnvRef,
-		ProviderConfig:   account.ProviderConfig,
+		ProviderConfig:   providerConfig,
 		ScanSchedule:     req.Inputs.ScanSchedule, // Preserve input since API doesn't return this
 	}
 
@@ -230,9 +239,15 @@ func (*InsightsAccount) Update(ctx context.Context, req infer.UpdateRequest[Insi
 
 	client := config.GetClient(ctx)
 
+	providerConfig := req.Inputs.ProviderConfig
+	// If provider config is default (empty or single region for AWS), pass config with empty regions to ensure API updates correctly
+	if isDefaultProviderConfig(req.Inputs.Provider, providerConfig) {
+		providerConfig = map[string]interface{}{"regions": []string{}}
+	}
+
 	updateReq := pulumiapi.UpdateInsightsAccountRequest{
 		Environment:    req.Inputs.Environment,
-		ProviderConfig: req.Inputs.ProviderConfig,
+		ProviderConfig: providerConfig,
 	}
 	if req.Inputs.ScanSchedule != nil {
 		updateReq.ScanSchedule = string(*req.Inputs.ScanSchedule)
@@ -268,6 +283,20 @@ func (*InsightsAccount) Update(ctx context.Context, req infer.UpdateRequest[Insi
 			ScheduledScanEnabled: account.ScheduledScanEnabled,
 		},
 	}, nil
+}
+
+func isDefaultProviderConfig(provider CloudProvider, config map[string]interface{}) bool {
+	if len(config) == 0 {
+		return true
+	}
+	if provider == CloudProviderAWS {
+		if regions, ok := config["regions"]; ok {
+			if regionsSlice, ok := regions.([]interface{}); ok {
+				return len(regionsSlice) == 0
+			}
+		}
+	}
+	return false
 }
 
 func splitInsightsAccountId(id string) (string, string, error) {

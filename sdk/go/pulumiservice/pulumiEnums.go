@@ -562,6 +562,176 @@ func (in *authPolicyTokenTypePtr) ToAuthPolicyTokenTypePtrOutputWithContext(ctx 
 	return pulumi.ToOutputWithContext(ctx, in).(AuthPolicyTokenTypePtrOutput)
 }
 
+type CloudProvider string
+
+const (
+	// Amazon Web Services
+	CloudProviderAws = CloudProvider("aws")
+	// Microsoft Azure
+	CloudProviderAzure = CloudProvider("azure")
+	// Google Cloud Platform
+	CloudProviderGcp = CloudProvider("gcp")
+)
+
+func (CloudProvider) ElementType() reflect.Type {
+	return reflect.TypeOf((*CloudProvider)(nil)).Elem()
+}
+
+func (e CloudProvider) ToCloudProviderOutput() CloudProviderOutput {
+	return pulumi.ToOutput(e).(CloudProviderOutput)
+}
+
+func (e CloudProvider) ToCloudProviderOutputWithContext(ctx context.Context) CloudProviderOutput {
+	return pulumi.ToOutputWithContext(ctx, e).(CloudProviderOutput)
+}
+
+func (e CloudProvider) ToCloudProviderPtrOutput() CloudProviderPtrOutput {
+	return e.ToCloudProviderPtrOutputWithContext(context.Background())
+}
+
+func (e CloudProvider) ToCloudProviderPtrOutputWithContext(ctx context.Context) CloudProviderPtrOutput {
+	return CloudProvider(e).ToCloudProviderOutputWithContext(ctx).ToCloudProviderPtrOutputWithContext(ctx)
+}
+
+func (e CloudProvider) ToStringOutput() pulumi.StringOutput {
+	return pulumi.ToOutput(pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e CloudProvider) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return pulumi.ToOutputWithContext(ctx, pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e CloudProvider) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringPtrOutputWithContext(context.Background())
+}
+
+func (e CloudProvider) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringOutputWithContext(ctx).ToStringPtrOutputWithContext(ctx)
+}
+
+type CloudProviderOutput struct{ *pulumi.OutputState }
+
+func (CloudProviderOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*CloudProvider)(nil)).Elem()
+}
+
+func (o CloudProviderOutput) ToCloudProviderOutput() CloudProviderOutput {
+	return o
+}
+
+func (o CloudProviderOutput) ToCloudProviderOutputWithContext(ctx context.Context) CloudProviderOutput {
+	return o
+}
+
+func (o CloudProviderOutput) ToCloudProviderPtrOutput() CloudProviderPtrOutput {
+	return o.ToCloudProviderPtrOutputWithContext(context.Background())
+}
+
+func (o CloudProviderOutput) ToCloudProviderPtrOutputWithContext(ctx context.Context) CloudProviderPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v CloudProvider) *CloudProvider {
+		return &v
+	}).(CloudProviderPtrOutput)
+}
+
+func (o CloudProviderOutput) ToStringOutput() pulumi.StringOutput {
+	return o.ToStringOutputWithContext(context.Background())
+}
+
+func (o CloudProviderOutput) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e CloudProvider) string {
+		return string(e)
+	}).(pulumi.StringOutput)
+}
+
+func (o CloudProviderOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o CloudProviderOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e CloudProvider) *string {
+		v := string(e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+type CloudProviderPtrOutput struct{ *pulumi.OutputState }
+
+func (CloudProviderPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**CloudProvider)(nil)).Elem()
+}
+
+func (o CloudProviderPtrOutput) ToCloudProviderPtrOutput() CloudProviderPtrOutput {
+	return o
+}
+
+func (o CloudProviderPtrOutput) ToCloudProviderPtrOutputWithContext(ctx context.Context) CloudProviderPtrOutput {
+	return o
+}
+
+func (o CloudProviderPtrOutput) Elem() CloudProviderOutput {
+	return o.ApplyT(func(v *CloudProvider) CloudProvider {
+		if v != nil {
+			return *v
+		}
+		var ret CloudProvider
+		return ret
+	}).(CloudProviderOutput)
+}
+
+func (o CloudProviderPtrOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o CloudProviderPtrOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e *CloudProvider) *string {
+		if e == nil {
+			return nil
+		}
+		v := string(*e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+// CloudProviderInput is an input type that accepts values of the CloudProvider enum
+// A concrete instance of `CloudProviderInput` can be one of the following:
+//
+//	CloudProviderAws
+//	CloudProviderAzure
+//	CloudProviderGcp
+type CloudProviderInput interface {
+	pulumi.Input
+
+	ToCloudProviderOutput() CloudProviderOutput
+	ToCloudProviderOutputWithContext(context.Context) CloudProviderOutput
+}
+
+var cloudProviderPtrType = reflect.TypeOf((**CloudProvider)(nil)).Elem()
+
+type CloudProviderPtrInput interface {
+	pulumi.Input
+
+	ToCloudProviderPtrOutput() CloudProviderPtrOutput
+	ToCloudProviderPtrOutputWithContext(context.Context) CloudProviderPtrOutput
+}
+
+type cloudProviderPtr string
+
+func CloudProviderPtr(v string) CloudProviderPtrInput {
+	return (*cloudProviderPtr)(&v)
+}
+
+func (*cloudProviderPtr) ElementType() reflect.Type {
+	return cloudProviderPtrType
+}
+
+func (in *cloudProviderPtr) ToCloudProviderPtrOutput() CloudProviderPtrOutput {
+	return pulumi.ToOutput(in).(CloudProviderPtrOutput)
+}
+
+func (in *cloudProviderPtr) ToCloudProviderPtrOutputWithContext(ctx context.Context) CloudProviderPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, in).(CloudProviderPtrOutput)
+}
+
 type EnvironmentPermission string
 
 const (
@@ -2255,6 +2425,8 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*AuthPolicyPermissionLevelArrayInput)(nil)).Elem(), AuthPolicyPermissionLevelArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*AuthPolicyTokenTypeInput)(nil)).Elem(), AuthPolicyTokenType("personal"))
 	pulumi.RegisterInputType(reflect.TypeOf((*AuthPolicyTokenTypePtrInput)(nil)).Elem(), AuthPolicyTokenType("personal"))
+	pulumi.RegisterInputType(reflect.TypeOf((*CloudProviderInput)(nil)).Elem(), CloudProvider("aws"))
+	pulumi.RegisterInputType(reflect.TypeOf((*CloudProviderPtrInput)(nil)).Elem(), CloudProvider("aws"))
 	pulumi.RegisterInputType(reflect.TypeOf((*EnvironmentPermissionInput)(nil)).Elem(), EnvironmentPermission("none"))
 	pulumi.RegisterInputType(reflect.TypeOf((*EnvironmentPermissionPtrInput)(nil)).Elem(), EnvironmentPermission("none"))
 	pulumi.RegisterInputType(reflect.TypeOf((*PulumiOperationInput)(nil)).Elem(), PulumiOperation("update"))
@@ -2281,6 +2453,8 @@ func init() {
 	pulumi.RegisterOutputType(AuthPolicyPermissionLevelArrayOutput{})
 	pulumi.RegisterOutputType(AuthPolicyTokenTypeOutput{})
 	pulumi.RegisterOutputType(AuthPolicyTokenTypePtrOutput{})
+	pulumi.RegisterOutputType(CloudProviderOutput{})
+	pulumi.RegisterOutputType(CloudProviderPtrOutput{})
 	pulumi.RegisterOutputType(EnvironmentPermissionOutput{})
 	pulumi.RegisterOutputType(EnvironmentPermissionPtrOutput{})
 	pulumi.RegisterOutputType(PulumiOperationOutput{})

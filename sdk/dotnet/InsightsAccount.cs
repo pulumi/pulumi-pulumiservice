@@ -40,10 +40,10 @@ namespace Pulumi.PulumiService
         public Output<string> OrganizationName { get; private set; } = null!;
 
         /// <summary>
-        /// The cloud provider (e.g., 'aws', 'azure', 'gcp').
+        /// The cloud provider for scanning.
         /// </summary>
         [Output("provider")]
-        public Output<string> Provider { get; private set; } = null!;
+        public Output<Pulumi.PulumiService.CloudProvider> Provider { get; private set; } = null!;
 
         /// <summary>
         /// Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {"regions": ["us-west-1", "us-west-2"]}.
@@ -133,10 +133,10 @@ namespace Pulumi.PulumiService
         public Input<string> OrganizationName { get; set; } = null!;
 
         /// <summary>
-        /// The cloud provider (e.g., 'aws', 'azure', 'gcp').
+        /// The cloud provider for scanning.
         /// </summary>
         [Input("provider", required: true)]
-        public Input<string> Provider { get; set; } = null!;
+        public Input<Pulumi.PulumiService.CloudProvider> Provider { get; set; } = null!;
 
         [Input("providerConfig")]
         private InputMap<object>? _providerConfig;

@@ -10,6 +10,7 @@ __all__ = [
     'AuthPolicyDecision',
     'AuthPolicyPermissionLevel',
     'AuthPolicyTokenType',
+    'CloudProvider',
     'EnvironmentPermission',
     'PulumiOperation',
     'RbacPermission',
@@ -63,6 +64,22 @@ class AuthPolicyTokenType(_builtins.str, Enum):
     RUNNER = "runner"
     """
     Deployment Runner Pulumi token. Requires runnerID field to be filled.
+    """
+
+
+@pulumi.type_token("pulumiservice:index:CloudProvider")
+class CloudProvider(_builtins.str, Enum):
+    AWS = "aws"
+    """
+    Amazon Web Services
+    """
+    AZURE = "azure"
+    """
+    Microsoft Azure
+    """
+    GCP = "gcp"
+    """
+    Google Cloud Platform
     """
 
 

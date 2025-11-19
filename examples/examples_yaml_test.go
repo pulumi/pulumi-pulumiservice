@@ -7,11 +7,14 @@ import (
 	"io"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/pulumi/providertest/pulumitest"
+	"github.com/pulumi/providertest/pulumitest/opttest"
 	"github.com/pulumi/pulumi/pkg/v3/testing/integration"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -448,15 +451,14 @@ func TestYamlStackExample(t *testing.T) {
 }
 
 func TestYamlInsightsAccountExample(t *testing.T) {
-	cwd := getCwd(t)
-	digits := generateRandomFiveDigits()
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Dir: path.Join(cwd, ".", "yaml-insights-account"),
-		Config: map[string]string{
-			"digits":           digits,
-			"organizationName": getOrgName(),
-		},
-	})
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-insights-account"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+	)
+	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	test.SetConfig(t, "organizationName", getOrgName())
+	runPulumiTest(t, test)
 }
 
 func writePulumiYaml(t *testing.T, yamlContents interface{}) string {

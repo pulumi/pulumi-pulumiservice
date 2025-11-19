@@ -54,9 +54,9 @@ export class InsightsAccount extends pulumi.CustomResource {
      */
     declare public readonly organizationName: pulumi.Output<string>;
     /**
-     * The cloud provider (e.g., 'aws', 'azure', 'gcp').
+     * The cloud provider for scanning.
      */
-    declare public readonly provider: pulumi.Output<string>;
+    declare public readonly provider: pulumi.Output<enums.CloudProvider>;
     /**
      * Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {"regions": ["us-west-1", "us-west-2"]}.
      */
@@ -135,9 +135,9 @@ export interface InsightsAccountArgs {
      */
     organizationName: pulumi.Input<string>;
     /**
-     * The cloud provider (e.g., 'aws', 'azure', 'gcp').
+     * The cloud provider for scanning.
      */
-    provider: pulumi.Input<string>;
+    provider: pulumi.Input<enums.CloudProvider>;
     /**
      * Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {"regions": ["us-west-1", "us-west-2"]}.
      */

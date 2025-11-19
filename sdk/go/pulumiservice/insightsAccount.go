@@ -24,8 +24,8 @@ type InsightsAccount struct {
 	InsightsAccountId pulumi.StringOutput `pulumi:"insightsAccountId"`
 	// The organization's name.
 	OrganizationName pulumi.StringOutput `pulumi:"organizationName"`
-	// The cloud provider (e.g., 'aws', 'azure', 'gcp').
-	Provider pulumi.StringOutput `pulumi:"provider"`
+	// The cloud provider for scanning.
+	Provider CloudProviderOutput `pulumi:"provider"`
 	// Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {"regions": ["us-west-1", "us-west-2"]}.
 	ProviderConfig pulumi.MapOutput `pulumi:"providerConfig"`
 	// Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning.
@@ -98,8 +98,8 @@ type insightsAccountArgs struct {
 	Environment string `pulumi:"environment"`
 	// The organization's name.
 	OrganizationName string `pulumi:"organizationName"`
-	// The cloud provider (e.g., 'aws', 'azure', 'gcp').
-	Provider string `pulumi:"provider"`
+	// The cloud provider for scanning.
+	Provider CloudProvider `pulumi:"provider"`
 	// Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {"regions": ["us-west-1", "us-west-2"]}.
 	ProviderConfig map[string]interface{} `pulumi:"providerConfig"`
 	// Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning.
@@ -114,8 +114,8 @@ type InsightsAccountArgs struct {
 	Environment pulumi.StringInput
 	// The organization's name.
 	OrganizationName pulumi.StringInput
-	// The cloud provider (e.g., 'aws', 'azure', 'gcp').
-	Provider pulumi.StringInput
+	// The cloud provider for scanning.
+	Provider CloudProviderInput
 	// Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {"regions": ["us-west-1", "us-west-2"]}.
 	ProviderConfig pulumi.MapInput
 	// Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning.
@@ -229,9 +229,9 @@ func (o InsightsAccountOutput) OrganizationName() pulumi.StringOutput {
 	return o.ApplyT(func(v *InsightsAccount) pulumi.StringOutput { return v.OrganizationName }).(pulumi.StringOutput)
 }
 
-// The cloud provider (e.g., 'aws', 'azure', 'gcp').
-func (o InsightsAccountOutput) Provider() pulumi.StringOutput {
-	return o.ApplyT(func(v *InsightsAccount) pulumi.StringOutput { return v.Provider }).(pulumi.StringOutput)
+// The cloud provider for scanning.
+func (o InsightsAccountOutput) Provider() CloudProviderOutput {
+	return o.ApplyT(func(v *InsightsAccount) CloudProviderOutput { return v.Provider }).(CloudProviderOutput)
 }
 
 // Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {"regions": ["us-west-1", "us-west-2"]}.

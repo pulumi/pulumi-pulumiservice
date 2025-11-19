@@ -118,6 +118,44 @@ namespace Pulumi.PulumiService
     }
 
     [EnumType]
+    public readonly struct CloudProvider : IEquatable<CloudProvider>
+    {
+        private readonly string _value;
+
+        private CloudProvider(string value)
+        {
+            _value = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        /// <summary>
+        /// Amazon Web Services
+        /// </summary>
+        public static CloudProvider Aws { get; } = new CloudProvider("aws");
+        /// <summary>
+        /// Microsoft Azure
+        /// </summary>
+        public static CloudProvider Azure { get; } = new CloudProvider("azure");
+        /// <summary>
+        /// Google Cloud Platform
+        /// </summary>
+        public static CloudProvider Gcp { get; } = new CloudProvider("gcp");
+
+        public static bool operator ==(CloudProvider left, CloudProvider right) => left.Equals(right);
+        public static bool operator !=(CloudProvider left, CloudProvider right) => !left.Equals(right);
+
+        public static explicit operator string(CloudProvider value) => value._value;
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override bool Equals(object? obj) => obj is CloudProvider other && Equals(other);
+        public bool Equals(CloudProvider other) => string.Equals(_value, other._value, StringComparison.Ordinal);
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+
+        public override string ToString() => _value;
+    }
+
+    [EnumType]
     public readonly struct EnvironmentPermission : IEquatable<EnvironmentPermission>
     {
         private readonly string _value;

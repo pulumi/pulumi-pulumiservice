@@ -23,7 +23,7 @@ class InsightsAccountArgs:
                  account_name: pulumi.Input[_builtins.str],
                  environment: pulumi.Input[_builtins.str],
                  organization_name: pulumi.Input[_builtins.str],
-                 provider: pulumi.Input[_builtins.str],
+                 provider: pulumi.Input['CloudProvider'],
                  provider_config: Optional[pulumi.Input[Mapping[str, Any]]] = None,
                  scan_schedule: Optional[pulumi.Input['ScanSchedule']] = None):
         """
@@ -31,7 +31,7 @@ class InsightsAccountArgs:
         :param pulumi.Input[_builtins.str] account_name: Name of the insights account.
         :param pulumi.Input[_builtins.str] environment: The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0').
         :param pulumi.Input[_builtins.str] organization_name: The organization's name.
-        :param pulumi.Input[_builtins.str] provider: The cloud provider (e.g., 'aws', 'azure', 'gcp').
+        :param pulumi.Input['CloudProvider'] provider: The cloud provider for scanning.
         :param pulumi.Input[Mapping[str, Any]] provider_config: Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {"regions": ["us-west-1", "us-west-2"]}.
         :param pulumi.Input['ScanSchedule'] scan_schedule: Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning.
         """
@@ -82,14 +82,14 @@ class InsightsAccountArgs:
 
     @_builtins.property
     @pulumi.getter
-    def provider(self) -> pulumi.Input[_builtins.str]:
+    def provider(self) -> pulumi.Input['CloudProvider']:
         """
-        The cloud provider (e.g., 'aws', 'azure', 'gcp').
+        The cloud provider for scanning.
         """
         return pulumi.get(self, "provider")
 
     @provider.setter
-    def provider(self, value: pulumi.Input[_builtins.str]):
+    def provider(self, value: pulumi.Input['CloudProvider']):
         pulumi.set(self, "provider", value)
 
     @_builtins.property
@@ -126,7 +126,7 @@ class InsightsAccount(pulumi.CustomResource):
                  account_name: Optional[pulumi.Input[_builtins.str]] = None,
                  environment: Optional[pulumi.Input[_builtins.str]] = None,
                  organization_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 provider: Optional[pulumi.Input[_builtins.str]] = None,
+                 provider: Optional[pulumi.Input['CloudProvider']] = None,
                  provider_config: Optional[pulumi.Input[Mapping[str, Any]]] = None,
                  scan_schedule: Optional[pulumi.Input['ScanSchedule']] = None,
                  __props__=None):
@@ -138,7 +138,7 @@ class InsightsAccount(pulumi.CustomResource):
         :param pulumi.Input[_builtins.str] account_name: Name of the insights account.
         :param pulumi.Input[_builtins.str] environment: The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0').
         :param pulumi.Input[_builtins.str] organization_name: The organization's name.
-        :param pulumi.Input[_builtins.str] provider: The cloud provider (e.g., 'aws', 'azure', 'gcp').
+        :param pulumi.Input['CloudProvider'] provider: The cloud provider for scanning.
         :param pulumi.Input[Mapping[str, Any]] provider_config: Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {"regions": ["us-west-1", "us-west-2"]}.
         :param pulumi.Input['ScanSchedule'] scan_schedule: Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning.
         """
@@ -169,7 +169,7 @@ class InsightsAccount(pulumi.CustomResource):
                  account_name: Optional[pulumi.Input[_builtins.str]] = None,
                  environment: Optional[pulumi.Input[_builtins.str]] = None,
                  organization_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 provider: Optional[pulumi.Input[_builtins.str]] = None,
+                 provider: Optional[pulumi.Input['CloudProvider']] = None,
                  provider_config: Optional[pulumi.Input[Mapping[str, Any]]] = None,
                  scan_schedule: Optional[pulumi.Input['ScanSchedule']] = None,
                  __props__=None):
@@ -265,9 +265,9 @@ class InsightsAccount(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def provider(self) -> pulumi.Output[_builtins.str]:
+    def provider(self) -> pulumi.Output['CloudProvider']:
         """
-        The cloud provider (e.g., 'aws', 'azure', 'gcp').
+        The cloud provider for scanning.
         """
         return pulumi.get(self, "provider")
 
