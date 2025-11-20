@@ -55,7 +55,7 @@ namespace Pulumi.PulumiService
         /// Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
         /// </summary>
         [Output("scanSchedule")]
-        public Output<Pulumi.PulumiService.ScanSchedule?> ScanSchedule { get; private set; } = null!;
+        public Output<Pulumi.PulumiService.ScanSchedule> ScanSchedule { get; private set; } = null!;
 
         /// <summary>
         /// Whether scheduled scanning is enabled.
@@ -153,8 +153,8 @@ namespace Pulumi.PulumiService
         /// <summary>
         /// Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
         /// </summary>
-        [Input("scanSchedule")]
-        public Input<Pulumi.PulumiService.ScanSchedule>? ScanSchedule { get; set; }
+        [Input("scanSchedule", required: true)]
+        public Input<Pulumi.PulumiService.ScanSchedule> ScanSchedule { get; set; } = null!;
 
         public InsightsAccountArgs()
         {

@@ -24,27 +24,26 @@ class InsightsAccountArgs:
                  environment: pulumi.Input[_builtins.str],
                  organization_name: pulumi.Input[_builtins.str],
                  provider: pulumi.Input['CloudProvider'],
-                 provider_config: Optional[pulumi.Input[Mapping[str, Any]]] = None,
-                 scan_schedule: Optional[pulumi.Input['ScanSchedule']] = None):
+                 scan_schedule: Optional[pulumi.Input['ScanSchedule']] = None,
+                 provider_config: Optional[pulumi.Input[Mapping[str, Any]]] = None):
         """
         The set of arguments for constructing a InsightsAccount resource.
         :param pulumi.Input[_builtins.str] account_name: Name of the insights account.
         :param pulumi.Input[_builtins.str] environment: The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0').
         :param pulumi.Input[_builtins.str] organization_name: The organization's name.
         :param pulumi.Input['CloudProvider'] provider: The cloud provider for scanning.
-        :param pulumi.Input[Mapping[str, Any]] provider_config: Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {"regions": ["us-west-1", "us-west-2"]}.
         :param pulumi.Input['ScanSchedule'] scan_schedule: Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
+        :param pulumi.Input[Mapping[str, Any]] provider_config: Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {"regions": ["us-west-1", "us-west-2"]}.
         """
         pulumi.set(__self__, "account_name", account_name)
         pulumi.set(__self__, "environment", environment)
         pulumi.set(__self__, "organization_name", organization_name)
         pulumi.set(__self__, "provider", provider)
-        if provider_config is not None:
-            pulumi.set(__self__, "provider_config", provider_config)
         if scan_schedule is None:
             scan_schedule = 'none'
-        if scan_schedule is not None:
-            pulumi.set(__self__, "scan_schedule", scan_schedule)
+        pulumi.set(__self__, "scan_schedule", scan_schedule)
+        if provider_config is not None:
+            pulumi.set(__self__, "provider_config", provider_config)
 
     @_builtins.property
     @pulumi.getter(name="accountName")
@@ -95,6 +94,18 @@ class InsightsAccountArgs:
         pulumi.set(self, "provider", value)
 
     @_builtins.property
+    @pulumi.getter(name="scanSchedule")
+    def scan_schedule(self) -> pulumi.Input['ScanSchedule']:
+        """
+        Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
+        """
+        return pulumi.get(self, "scan_schedule")
+
+    @scan_schedule.setter
+    def scan_schedule(self, value: pulumi.Input['ScanSchedule']):
+        pulumi.set(self, "scan_schedule", value)
+
+    @_builtins.property
     @pulumi.getter(name="providerConfig")
     def provider_config(self) -> Optional[pulumi.Input[Mapping[str, Any]]]:
         """
@@ -105,18 +116,6 @@ class InsightsAccountArgs:
     @provider_config.setter
     def provider_config(self, value: Optional[pulumi.Input[Mapping[str, Any]]]):
         pulumi.set(self, "provider_config", value)
-
-    @_builtins.property
-    @pulumi.getter(name="scanSchedule")
-    def scan_schedule(self) -> Optional[pulumi.Input['ScanSchedule']]:
-        """
-        Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
-        """
-        return pulumi.get(self, "scan_schedule")
-
-    @scan_schedule.setter
-    def scan_schedule(self, value: Optional[pulumi.Input['ScanSchedule']]):
-        pulumi.set(self, "scan_schedule", value)
 
 
 @pulumi.type_token("pulumiservice:index:InsightsAccount")
@@ -198,6 +197,8 @@ class InsightsAccount(pulumi.CustomResource):
             __props__.__dict__["provider_config"] = provider_config
             if scan_schedule is None:
                 scan_schedule = 'none'
+            if scan_schedule is None and not opts.urn:
+                raise TypeError("Missing required property 'scan_schedule'")
             __props__.__dict__["scan_schedule"] = scan_schedule
             __props__.__dict__["insights_account_id"] = None
             __props__.__dict__["scheduled_scan_enabled"] = None
@@ -285,7 +286,7 @@ class InsightsAccount(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter(name="scanSchedule")
-    def scan_schedule(self) -> pulumi.Output[Optional['ScanSchedule']]:
+    def scan_schedule(self) -> pulumi.Output['ScanSchedule']:
         """
         Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
         """

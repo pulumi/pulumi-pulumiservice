@@ -139,6 +139,14 @@ namespace Pulumi.PulumiService
         /// Google Cloud Platform
         /// </summary>
         public static CloudProvider Gcp { get; } = new CloudProvider("gcp");
+        /// <summary>
+        /// Kubernetes
+        /// </summary>
+        public static CloudProvider Kubernetes { get; } = new CloudProvider("kubernetes");
+        /// <summary>
+        /// Oracle Cloud Infrastructure
+        /// </summary>
+        public static CloudProvider Oci { get; } = new CloudProvider("oci");
 
         public static bool operator ==(CloudProvider left, CloudProvider right) => left.Equals(right);
         public static bool operator !=(CloudProvider left, CloudProvider right) => !left.Equals(right);

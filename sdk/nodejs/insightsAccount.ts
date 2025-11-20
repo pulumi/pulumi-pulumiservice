@@ -64,7 +64,7 @@ export class InsightsAccount extends pulumi.CustomResource {
     /**
      * Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
      */
-    declare public readonly scanSchedule: pulumi.Output<enums.ScanSchedule | undefined>;
+    declare public readonly scanSchedule: pulumi.Output<enums.ScanSchedule>;
     /**
      * Whether scheduled scanning is enabled.
      */
@@ -92,6 +92,9 @@ export class InsightsAccount extends pulumi.CustomResource {
             }
             if (args?.provider === undefined && !opts.urn) {
                 throw new Error("Missing required property 'provider'");
+            }
+            if (args?.scanSchedule === undefined && !opts.urn) {
+                throw new Error("Missing required property 'scanSchedule'");
             }
             resourceInputs["accountName"] = args?.accountName;
             resourceInputs["environment"] = args?.environment;
@@ -145,5 +148,5 @@ export interface InsightsAccountArgs {
     /**
      * Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
      */
-    scanSchedule?: pulumi.Input<enums.ScanSchedule>;
+    scanSchedule: pulumi.Input<enums.ScanSchedule>;
 }

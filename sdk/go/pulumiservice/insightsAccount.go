@@ -29,7 +29,7 @@ type InsightsAccount struct {
 	// Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {"regions": ["us-west-1", "us-west-2"]}.
 	ProviderConfig pulumi.MapOutput `pulumi:"providerConfig"`
 	// Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
-	ScanSchedule ScanSchedulePtrOutput `pulumi:"scanSchedule"`
+	ScanSchedule ScanScheduleOutput `pulumi:"scanSchedule"`
 	// Whether scheduled scanning is enabled.
 	ScheduledScanEnabled pulumi.BoolOutput `pulumi:"scheduledScanEnabled"`
 }
@@ -106,7 +106,7 @@ type insightsAccountArgs struct {
 	// Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {"regions": ["us-west-1", "us-west-2"]}.
 	ProviderConfig map[string]interface{} `pulumi:"providerConfig"`
 	// Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
-	ScanSchedule *ScanSchedule `pulumi:"scanSchedule"`
+	ScanSchedule ScanSchedule `pulumi:"scanSchedule"`
 }
 
 // The set of arguments for constructing a InsightsAccount resource.
@@ -122,7 +122,7 @@ type InsightsAccountArgs struct {
 	// Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {"regions": ["us-west-1", "us-west-2"]}.
 	ProviderConfig pulumi.MapInput
 	// Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
-	ScanSchedule ScanSchedulePtrInput
+	ScanSchedule ScanScheduleInput
 }
 
 func (InsightsAccountArgs) ElementType() reflect.Type {
@@ -243,8 +243,8 @@ func (o InsightsAccountOutput) ProviderConfig() pulumi.MapOutput {
 }
 
 // Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
-func (o InsightsAccountOutput) ScanSchedule() ScanSchedulePtrOutput {
-	return o.ApplyT(func(v *InsightsAccount) ScanSchedulePtrOutput { return v.ScanSchedule }).(ScanSchedulePtrOutput)
+func (o InsightsAccountOutput) ScanSchedule() ScanScheduleOutput {
+	return o.ApplyT(func(v *InsightsAccount) ScanScheduleOutput { return v.ScanSchedule }).(ScanScheduleOutput)
 }
 
 // Whether scheduled scanning is enabled.

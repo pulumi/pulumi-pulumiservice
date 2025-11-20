@@ -62,6 +62,14 @@ export const CloudProvider = {
      * Google Cloud Platform
      */
     Gcp: "gcp",
+    /**
+     * Kubernetes
+     */
+    Kubernetes: "kubernetes",
+    /**
+     * Oracle Cloud Infrastructure
+     */
+    Oci: "oci",
 } as const;
 
 export type CloudProvider = (typeof CloudProvider)[keyof typeof CloudProvider];

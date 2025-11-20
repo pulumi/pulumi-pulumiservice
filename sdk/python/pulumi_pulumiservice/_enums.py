@@ -81,6 +81,14 @@ class CloudProvider(_builtins.str, Enum):
     """
     Google Cloud Platform
     """
+    KUBERNETES = "kubernetes"
+    """
+    Kubernetes
+    """
+    OCI = "oci"
+    """
+    Oracle Cloud Infrastructure
+    """
 
 
 @pulumi.type_token("pulumiservice:index:EnvironmentPermission")
