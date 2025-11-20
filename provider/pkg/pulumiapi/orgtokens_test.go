@@ -12,17 +12,16 @@ func TestDeleteOrgAccessToken(t *testing.T) {
 	orgName := "anOrg"
 	tokenId := "abcdegh"
 	t.Run("Happy Path", func(t *testing.T) {
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
 			ExpectedReqPath:   "/api/orgs/anOrg/tokens/" + tokenId,
 			ResponseCode:      204,
 		})
-		defer cleanup()
 		assert.NoError(t, c.DeleteOrgAccessToken(teamCtx, tokenId, orgName))
 	})
 
 	t.Run("Error", func(t *testing.T) {
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
 			ExpectedReqPath:   "/api/orgs/anOrg/tokens/" + tokenId,
 			ResponseCode:      404,
@@ -31,7 +30,6 @@ func TestDeleteOrgAccessToken(t *testing.T) {
 				Message:    "token not found",
 			},
 		})
-		defer cleanup()
 		assert.EqualError(t,
 			c.DeleteOrgAccessToken(teamCtx, tokenId, orgName),
 			`failed to delete access token "abcdegh": 404 API error: token not found`,
@@ -50,7 +48,7 @@ func TestCreateOrgAccessToken(t *testing.T) {
 			ID:         "token_id",
 			TokenValue: "secret",
 		}
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqBody: createOrgTokenRequest{
 				Description: desc,
@@ -60,7 +58,6 @@ func TestCreateOrgAccessToken(t *testing.T) {
 			ResponseCode:    201,
 			ResponseBody:    resp,
 		})
-		defer cleanup()
 		token, err := c.CreateOrgAccessToken(teamCtx, name, orgName, desc, false)
 		assert.NoError(t, err)
 		assert.Equal(t, &AccessToken{
@@ -75,7 +72,7 @@ func TestCreateOrgAccessToken(t *testing.T) {
 			ID:         "token_id",
 			TokenValue: "secret",
 		}
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqBody: createOrgTokenRequest{
 				Description: desc,
@@ -86,7 +83,6 @@ func TestCreateOrgAccessToken(t *testing.T) {
 			ResponseCode:    201,
 			ResponseBody:    resp,
 		})
-		defer cleanup()
 		token, err := c.CreateOrgAccessToken(teamCtx, name, orgName, desc, true)
 		assert.NoError(t, err)
 		assert.Equal(t, &AccessToken{
@@ -97,7 +93,7 @@ func TestCreateOrgAccessToken(t *testing.T) {
 	})
 
 	t.Run("Error", func(t *testing.T) {
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqPath:   "/api/orgs/anOrg/tokens",
 			ExpectedReqBody: createOrgTokenRequest{
@@ -110,7 +106,6 @@ func TestCreateOrgAccessToken(t *testing.T) {
 				Message:    "unauthorized",
 			},
 		})
-		defer cleanup()
 		token, err := c.CreateOrgAccessToken(teamCtx, name, orgName, desc, false)
 		assert.Nil(t, token, "token should be nil")
 		assert.EqualError(t,
@@ -140,14 +135,13 @@ func TestGetOrgAccessToken(t *testing.T) {
 				},
 			},
 		}
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
 			ExpectedReqBody:   nil,
 			ExpectedReqPath:   fmt.Sprintf("/api/orgs/%s/tokens", org),
 			ResponseCode:      200,
 			ResponseBody:      resp,
 		})
-		defer cleanup()
 		token, err := c.GetOrgAccessToken(ctx, id, org)
 		assert.NoError(t, err)
 		assert.Equal(t, &AccessToken{
@@ -157,7 +151,7 @@ func TestGetOrgAccessToken(t *testing.T) {
 	})
 
 	t.Run("Error", func(t *testing.T) {
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
 			ExpectedReqPath:   fmt.Sprintf("/api/orgs/%s/tokens", org),
 			ExpectedReqBody:   nil,
@@ -167,7 +161,6 @@ func TestGetOrgAccessToken(t *testing.T) {
 				Message:    "unauthorized",
 			},
 		})
-		defer cleanup()
 		token, err := c.GetOrgAccessToken(ctx, id, org)
 		assert.Nil(t, token, "token should be nil")
 		assert.EqualError(t,

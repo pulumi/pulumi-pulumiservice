@@ -13,17 +13,16 @@ var ctx = context.Background()
 func TestDeleteAccessToken(t *testing.T) {
 	tokenId := "abcdegh"
 	t.Run("Happy Path", func(t *testing.T) {
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
 			ExpectedReqPath:   "/api/user/tokens/" + tokenId,
 			ResponseCode:      204,
 		})
-		defer cleanup()
 		assert.NoError(t, c.DeleteAccessToken(ctx, tokenId))
 	})
 
 	t.Run("Error", func(t *testing.T) {
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
 			ExpectedReqPath:   "/api/user/tokens/" + tokenId,
 			ResponseCode:      404,
@@ -32,7 +31,6 @@ func TestDeleteAccessToken(t *testing.T) {
 				Message:    "token not found",
 			},
 		})
-		defer cleanup()
 		assert.EqualError(t,
 			c.DeleteAccessToken(ctx, tokenId),
 			`failed to delete access token "abcdegh": 404 API error: token not found`,
@@ -48,7 +46,7 @@ func TestCreateAccessToken(t *testing.T) {
 			ID:         "token_id",
 			TokenValue: "secret",
 		}
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqBody: createTokenRequest{
 				Description: desc,
@@ -57,7 +55,6 @@ func TestCreateAccessToken(t *testing.T) {
 			ResponseCode:    201,
 			ResponseBody:    resp,
 		})
-		defer cleanup()
 		token, err := c.CreateAccessToken(ctx, desc)
 		assert.NoError(t, err)
 		assert.Equal(t, &AccessToken{
@@ -68,7 +65,7 @@ func TestCreateAccessToken(t *testing.T) {
 	})
 
 	t.Run("Error", func(t *testing.T) {
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqPath:   "/api/user/tokens",
 			ExpectedReqBody: createTokenRequest{
@@ -80,7 +77,6 @@ func TestCreateAccessToken(t *testing.T) {
 				Message:    "unauthorized",
 			},
 		})
-		defer cleanup()
 		token, err := c.CreateAccessToken(ctx, desc)
 		assert.Nil(t, token, "token should be nil")
 		assert.EqualError(t,
@@ -109,14 +105,13 @@ func TestGetAccessToken(t *testing.T) {
 				},
 			},
 		}
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
 			ExpectedReqBody:   nil,
 			ExpectedReqPath:   "/api/user/tokens",
 			ResponseCode:      200,
 			ResponseBody:      resp,
 		})
-		defer cleanup()
 		token, err := c.GetAccessToken(ctx, id)
 		assert.NoError(t, err)
 		assert.Equal(t, &AccessToken{
@@ -126,7 +121,7 @@ func TestGetAccessToken(t *testing.T) {
 	})
 
 	t.Run("Error", func(t *testing.T) {
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
 			ExpectedReqPath:   "/api/user/tokens",
 			ExpectedReqBody:   nil,
@@ -136,7 +131,6 @@ func TestGetAccessToken(t *testing.T) {
 				Message:    "unauthorized",
 			},
 		})
-		defer cleanup()
 		token, err := c.GetAccessToken(ctx, id)
 		assert.Nil(t, token, "token should be nil")
 		assert.EqualError(t,

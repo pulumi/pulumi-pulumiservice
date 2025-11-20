@@ -23,13 +23,12 @@ func TestGetDeploymentSettings(t *testing.T) {
 			ExecutorContext:  &apitype.ExecutorContext{},
 		}
 
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
 			ExpectedReqPath:   "/" + path.Join("api", "stacks", orgName, projectName, stackName, "deployments", "settings"),
 			ResponseCode:      200,
 			ResponseBody:      dsValue,
 		})
-		defer cleanup()
 
 		ds, err := c.GetDeploymentSettings(ctx, StackIdentifier{
 			OrgName:     orgName,
@@ -42,7 +41,7 @@ func TestGetDeploymentSettings(t *testing.T) {
 	})
 
 	t.Run("404", func(t *testing.T) {
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
 			ExpectedReqPath:   "/" + path.Join("api", "stacks", orgName, projectName, stackName, "deployments", "settings"),
 			ResponseCode:      404,
@@ -51,7 +50,6 @@ func TestGetDeploymentSettings(t *testing.T) {
 				Message:    "not found",
 			},
 		})
-		defer cleanup()
 
 		ds, err := c.GetDeploymentSettings(ctx, StackIdentifier{
 			OrgName:     orgName,
@@ -79,14 +77,13 @@ func TestCreateDeploymentSettings(t *testing.T) {
 			CacheOptions:     &CacheOptions{},
 		}
 
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPut,
 			ExpectedReqPath:   "/" + path.Join("api", "stacks", orgName, projectName, stackName, "deployments", "settings"),
 			ResponseCode:      201,
 			ExpectedReqBody:   dsValue,
 			ResponseBody:      dsValue,
 		})
-		defer cleanup()
 
 		response, err := c.CreateDeploymentSettings(ctx, StackIdentifier{
 			OrgName:     orgName,
