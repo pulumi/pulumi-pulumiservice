@@ -12,17 +12,16 @@ func TestDeleteAgentPool(t *testing.T) {
 	orgName := "anOrg"
 	agentPoolId := "abcdegh"
 	t.Run("Happy Path", func(t *testing.T) {
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
 			ExpectedReqPath:   "/api/orgs/anOrg/agent-pools/" + agentPoolId,
 			ResponseCode:      204,
 		})
-		defer cleanup()
 		assert.NoError(t, c.DeleteAgentPool(teamCtx, agentPoolId, orgName, false))
 	})
 
 	t.Run("Error", func(t *testing.T) {
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
 			ExpectedReqPath:   "/api/orgs/anOrg/agent-pools/" + agentPoolId,
 			ResponseCode:      404,
@@ -31,7 +30,6 @@ func TestDeleteAgentPool(t *testing.T) {
 				Message:    "agent pool not found",
 			},
 		})
-		defer cleanup()
 		assert.EqualError(t,
 			c.DeleteAgentPool(teamCtx, agentPoolId, orgName, false),
 			`failed to delete agent pool "abcdegh": 404 API error: agent pool not found`,
@@ -50,7 +48,7 @@ func TestCreateAgentPool(t *testing.T) {
 			ID:         "token_id",
 			TokenValue: "secret",
 		}
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqBody: createUpdateAgentPoolRequest{
 				Description: desc,
@@ -60,7 +58,6 @@ func TestCreateAgentPool(t *testing.T) {
 			ResponseCode:    201,
 			ResponseBody:    resp,
 		})
-		defer cleanup()
 		token, err := c.CreateAgentPool(teamCtx, orgName, name, desc)
 		assert.NoError(t, err)
 		assert.Equal(t, &AgentPool{
@@ -72,7 +69,7 @@ func TestCreateAgentPool(t *testing.T) {
 	})
 
 	t.Run("Error", func(t *testing.T) {
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqPath:   "/api/orgs/anOrg/agent-pools",
 			ExpectedReqBody: createUpdateAgentPoolRequest{
@@ -85,7 +82,6 @@ func TestCreateAgentPool(t *testing.T) {
 				Message:    "unauthorized",
 			},
 		})
-		defer cleanup()
 		token, err := c.CreateAgentPool(teamCtx, orgName, name, desc)
 		assert.Nil(t, token, "agent pool should be nil")
 		assert.EqualError(t,
@@ -106,14 +102,13 @@ func TestGetAgentPool(t *testing.T) {
 			Name:        name,
 			Description: desc,
 		}
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
 			ExpectedReqBody:   nil,
 			ExpectedReqPath:   fmt.Sprintf("/api/orgs/%s/agent-pools/%s", org, id),
 			ResponseCode:      200,
 			ResponseBody:      resp,
 		})
-		defer cleanup()
 		token, err := c.GetAgentPool(ctx, id, org)
 		assert.NoError(t, err)
 		assert.Equal(t, &AgentPool{
@@ -124,7 +119,7 @@ func TestGetAgentPool(t *testing.T) {
 	})
 
 	t.Run("Error", func(t *testing.T) {
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
 			ExpectedReqPath:   fmt.Sprintf("/api/orgs/%s/agent-pools/%s", org, id),
 			ExpectedReqBody:   nil,
@@ -134,7 +129,6 @@ func TestGetAgentPool(t *testing.T) {
 				Message:    "unauthorized",
 			},
 		})
-		defer cleanup()
 		token, err := c.GetAgentPool(ctx, id, org)
 		assert.Nil(t, token, "agent pool should be nil")
 		assert.EqualError(t,

@@ -16,17 +16,16 @@ func TestDeleteTeamAccessToken(t *testing.T) {
 	teamName := "aTeam"
 	tokenId := "abcdegh"
 	t.Run("Happy Path", func(t *testing.T) {
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
 			ExpectedReqPath:   "/api/orgs/anOrg/teams/aTeam/tokens/" + tokenId,
 			ResponseCode:      204,
 		})
-		defer cleanup()
 		assert.NoError(t, c.DeleteTeamAccessToken(teamCtx, tokenId, orgName, teamName))
 	})
 
 	t.Run("Error", func(t *testing.T) {
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
 			ExpectedReqPath:   "/api/orgs/anOrg/teams/aTeam/tokens/" + tokenId,
 			ResponseCode:      404,
@@ -35,7 +34,6 @@ func TestDeleteTeamAccessToken(t *testing.T) {
 				Message:    "token not found",
 			},
 		})
-		defer cleanup()
 		assert.EqualError(t,
 			c.DeleteTeamAccessToken(teamCtx, tokenId, orgName, teamName),
 			`failed to delete access token "abcdegh": 404 API error: token not found`,
@@ -54,7 +52,7 @@ func TestCreateTeamAccessToken(t *testing.T) {
 			ID:         "token_id",
 			TokenValue: "secret",
 		}
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqBody: createTeamTokenRequest{
 				Name:        tokenName,
@@ -64,7 +62,6 @@ func TestCreateTeamAccessToken(t *testing.T) {
 			ResponseCode:    201,
 			ResponseBody:    resp,
 		})
-		defer cleanup()
 		token, err := c.CreateTeamAccessToken(teamCtx, tokenName, orgName, teamName, desc)
 		assert.NoError(t, err)
 		assert.Equal(t, &AccessToken{
@@ -75,7 +72,7 @@ func TestCreateTeamAccessToken(t *testing.T) {
 	})
 
 	t.Run("Error", func(t *testing.T) {
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqPath:   "/api/orgs/anOrg/teams/aTeam/tokens",
 			ExpectedReqBody: createTeamTokenRequest{
@@ -88,7 +85,6 @@ func TestCreateTeamAccessToken(t *testing.T) {
 				Message:    "unauthorized",
 			},
 		})
-		defer cleanup()
 		token, err := c.CreateTeamAccessToken(teamCtx, tokenName, orgName, teamName, desc)
 		assert.Nil(t, token, "token should be nil")
 		assert.EqualError(t,
@@ -119,14 +115,13 @@ func TestGetTeamAccessToken(t *testing.T) {
 				},
 			},
 		}
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
 			ExpectedReqBody:   nil,
 			ExpectedReqPath:   fmt.Sprintf("/api/orgs/%s/teams/%s/tokens", org, team),
 			ResponseCode:      200,
 			ResponseBody:      resp,
 		})
-		defer cleanup()
 		token, err := c.GetTeamAccessToken(ctx, id, org, team)
 		assert.NoError(t, err)
 		assert.Equal(t, &AccessToken{
@@ -136,7 +131,7 @@ func TestGetTeamAccessToken(t *testing.T) {
 	})
 
 	t.Run("Error", func(t *testing.T) {
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
 			ExpectedReqPath:   fmt.Sprintf("/api/orgs/%s/teams/%s/tokens", org, team),
 			ExpectedReqBody:   nil,
@@ -146,7 +141,6 @@ func TestGetTeamAccessToken(t *testing.T) {
 				Message:    "unauthorized",
 			},
 		})
-		defer cleanup()
 		token, err := c.GetTeamAccessToken(ctx, id, org, team)
 		assert.Nil(t, token, "token should be nil")
 		assert.EqualError(t,

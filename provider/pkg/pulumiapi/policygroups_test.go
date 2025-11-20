@@ -35,14 +35,13 @@ func TestCreatePolicyGroup_HappyPath(t *testing.T) {
 		Mode:       mode,
 	}
 
-	c, cleanup := startTestServer(t, testServerConfig{
+	c := startTestServer(t, testServerConfig{
 		ExpectedReqMethod: http.MethodPost,
 		ExpectedReqPath:   "/api/orgs/test-org/policygroups",
 		ExpectedReqBody:   expectedReqBody,
 		ResponseCode:      201,
 		ResponseBody:      nil,
 	})
-	defer cleanup()
 
 	err := c.CreatePolicyGroup(ctx, orgName, policyGroupName, entityType, mode)
 	assert.NoError(t, err)
@@ -61,14 +60,13 @@ func TestCreatePolicyGroup_AccountsPreventative(t *testing.T) {
 		Mode:       mode,
 	}
 
-	c, cleanup := startTestServer(t, testServerConfig{
+	c := startTestServer(t, testServerConfig{
 		ExpectedReqMethod: http.MethodPost,
 		ExpectedReqPath:   "/api/orgs/test-org/policygroups",
 		ExpectedReqBody:   expectedReqBody,
 		ResponseCode:      201,
 		ResponseBody:      nil,
 	})
-	defer cleanup()
 
 	err := c.CreatePolicyGroup(ctx, orgName, policyGroupName, entityType, mode)
 	assert.NoError(t, err)
@@ -123,7 +121,7 @@ func TestCreatePolicyGroup_APIError(t *testing.T) {
 		Mode:       mode,
 	}
 
-	c, cleanup := startTestServer(t, testServerConfig{
+	c := startTestServer(t, testServerConfig{
 		ExpectedReqMethod: http.MethodPost,
 		ExpectedReqPath:   "/api/orgs/test-org/policygroups",
 		ExpectedReqBody:   expectedReqBody,
@@ -132,7 +130,6 @@ func TestCreatePolicyGroup_APIError(t *testing.T) {
 			Message: "Invalid entity type",
 		},
 	})
-	defer cleanup()
 
 	err := c.CreatePolicyGroup(ctx, orgName, policyGroupName, entityType, mode)
 	require.Error(t, err)
@@ -153,7 +150,7 @@ func TestCreatePolicyGroup_Unauthorized(t *testing.T) {
 		Mode:       mode,
 	}
 
-	c, cleanup := startTestServer(t, testServerConfig{
+	c := startTestServer(t, testServerConfig{
 		ExpectedReqMethod: http.MethodPost,
 		ExpectedReqPath:   "/api/orgs/test-org/policygroups",
 		ExpectedReqBody:   expectedReqBody,
@@ -162,7 +159,6 @@ func TestCreatePolicyGroup_Unauthorized(t *testing.T) {
 			Message: "unauthorized",
 		},
 	})
-	defer cleanup()
 
 	err := c.CreatePolicyGroup(ctx, orgName, policyGroupName, entityType, mode)
 	require.Error(t, err)
@@ -185,13 +181,12 @@ func TestGetPolicyGroup_IncludesEntityTypeAndMode(t *testing.T) {
 		Accounts:            []string{},
 	}
 
-	c, cleanup := startTestServer(t, testServerConfig{
+	c := startTestServer(t, testServerConfig{
 		ExpectedReqMethod: http.MethodGet,
 		ExpectedReqPath:   "/api/orgs/test-org/policygroups/test-policy-group",
 		ResponseCode:      200,
 		ResponseBody:      expectedResponse,
 	})
-	defer cleanup()
 
 	result, err := c.GetPolicyGroup(ctx, orgName, policyGroupName)
 	require.NoError(t, err)
