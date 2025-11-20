@@ -73,13 +73,21 @@ class CloudProvider(_builtins.str, Enum):
     """
     Amazon Web Services
     """
-    AZURE = "azure"
+    AZURE_NATIVE = "azure-native"
     """
     Microsoft Azure
     """
     GCP = "gcp"
     """
     Google Cloud Platform
+    """
+    KUBERNETES = "kubernetes"
+    """
+    Kubernetes
+    """
+    OCI = "oci"
+    """
+    Oracle Cloud Infrastructure
     """
 
 

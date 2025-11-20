@@ -4,12 +4,12 @@ package resources
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/pulumi/pulumi-go-provider/infer"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
-	"github.com/pulumi/pulumi/sdk/v3/go/property"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -88,7 +88,7 @@ func TestInsightsAccount(t *testing.T) {
 					AccountName:      "test-account",
 					Provider:         CloudProviderAWS,
 					Environment:      "test-env",
-					ScanSchedule:     &scanSchedule,
+					ScanSchedule:     scanSchedule,
 				},
 			},
 			State: InsightsAccountState{
@@ -97,7 +97,7 @@ func TestInsightsAccount(t *testing.T) {
 					AccountName:      "test-account",
 					Provider:         CloudProviderAWS,
 					Environment:      "test-env",
-					ScanSchedule:     &scanSchedule,
+					ScanSchedule:     scanSchedule,
 				},
 				InsightsAccountId: "test-account-id",
 			},
@@ -139,7 +139,7 @@ func TestInsightsAccount(t *testing.T) {
 					AccountName:      "test-account",
 					Provider:         CloudProviderAWS,
 					Environment:      "test-env",
-					ScanSchedule:     &scanSchedule,
+					ScanSchedule:     scanSchedule,
 				},
 			},
 			State: InsightsAccountState{
@@ -148,7 +148,7 @@ func TestInsightsAccount(t *testing.T) {
 					AccountName:      "test-account",
 					Provider:         CloudProviderAWS,
 					Environment:      "test-env",
-					ScanSchedule:     &scanSchedule,
+					ScanSchedule:     scanSchedule,
 				},
 			},
 		}
@@ -161,7 +161,7 @@ func TestInsightsAccount(t *testing.T) {
 		assert.Equal(t, "test-account", resp.Inputs.AccountName)
 		assert.Equal(t, CloudProviderAWS, resp.Inputs.Provider)
 		assert.Equal(t, "test-env", resp.Inputs.Environment)
-		assert.Equal(t, ScanScheduleDaily, *resp.Inputs.ScanSchedule)
+		assert.Equal(t, ScanScheduleDaily, resp.Inputs.ScanSchedule)
 		assert.Equal(t, "test-account-id", resp.State.InsightsAccountId)
 		assert.Equal(t, true, resp.State.ScheduledScanEnabled)
 		assert.Equal(t, "us-west-2", resp.State.ProviderConfig["region"])
@@ -230,7 +230,7 @@ func TestInsightsAccount(t *testing.T) {
 					AccountName:      "test-account",
 					Provider:         CloudProviderAWS,
 					Environment:      "test-env",
-					ScanSchedule:     &scanSchedule,
+					ScanSchedule:     scanSchedule,
 					ProviderConfig: map[string]interface{}{
 						"regions": []string{"us-west-2"},
 					},
@@ -280,7 +280,7 @@ func TestInsightsAccount(t *testing.T) {
 					AccountName:      "test-account",
 					Provider:         CloudProviderAWS,
 					Environment:      "test-env",
-					ScanSchedule:     &scanSchedule,
+					ScanSchedule:     scanSchedule,
 					ProviderConfig: map[string]interface{}{
 						"regions": []string{"us-west-2"},
 					},
@@ -328,7 +328,7 @@ func TestInsightsAccount(t *testing.T) {
 					AccountName:      "test-account",
 					Provider:         CloudProviderAWS,
 					Environment:      "test-env",
-					ScanSchedule:     &scanSchedule,
+					ScanSchedule:     scanSchedule,
 				},
 			},
 		}
@@ -338,6 +338,105 @@ func TestInsightsAccount(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, "none", capturedRequest.ScanSchedule)
 		assert.Equal(t, false, resp.Output.ScheduledScanEnabled)
+	})
+
+	t.Run("Create fails with API error", func(t *testing.T) {
+		mockedClient := &InsightsAccountClientMock{
+			createInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.CreateInsightsAccountRequest) error {
+				return fmt.Errorf("API error: invalid environment reference")
+			},
+		}
+		ctx := config.WithMockClient(context.Background(), mockedClient)
+
+		ia := &InsightsAccount{}
+		req := infer.CreateRequest[InsightsAccountInput]{
+			DryRun: false,
+			Inputs: InsightsAccountInput{
+				InsightsAccountCore: InsightsAccountCore{
+					OrganizationName: "test-org",
+					AccountName:      "test-account",
+					Provider:         CloudProviderAWS,
+					Environment:      "invalid-env",
+					ScanSchedule:     ScanScheduleDaily,
+				},
+			},
+		}
+
+		_, err := ia.Create(ctx, req)
+
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "error creating insights account 'test-account'")
+		assert.Contains(t, err.Error(), "invalid environment reference")
+	})
+
+	t.Run("Create succeeds but GET fails after creation", func(t *testing.T) {
+		mockedClient := &InsightsAccountClientMock{
+			createInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.CreateInsightsAccountRequest) error {
+				return nil
+			},
+			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+				return nil, fmt.Errorf("API error: internal server error")
+			},
+		}
+		ctx := config.WithMockClient(context.Background(), mockedClient)
+
+		ia := &InsightsAccount{}
+		req := infer.CreateRequest[InsightsAccountInput]{
+			DryRun: false,
+			Inputs: InsightsAccountInput{
+				InsightsAccountCore: InsightsAccountCore{
+					OrganizationName: "test-org",
+					AccountName:      "test-account",
+					Provider:         CloudProviderAWS,
+					Environment:      "test-env",
+					ScanSchedule:     ScanScheduleDaily,
+				},
+			},
+		}
+
+		resp, err := ia.Create(ctx, req)
+
+		assert.Error(t, err)
+		var initErr infer.ResourceInitFailedError
+		assert.ErrorAs(t, err, &initErr)
+		assert.Contains(t, initErr.Reasons[0], "internal server error")
+		assert.Equal(t, "test-org/test-account", resp.ID)
+		assert.Equal(t, "", resp.Output.InsightsAccountId)
+	})
+
+	t.Run("Create succeeds but account not found after creation", func(t *testing.T) {
+		mockedClient := &InsightsAccountClientMock{
+			createInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.CreateInsightsAccountRequest) error {
+				return nil
+			},
+			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+				return nil, nil // 404 - not found
+			},
+		}
+		ctx := config.WithMockClient(context.Background(), mockedClient)
+
+		ia := &InsightsAccount{}
+		req := infer.CreateRequest[InsightsAccountInput]{
+			DryRun: false,
+			Inputs: InsightsAccountInput{
+				InsightsAccountCore: InsightsAccountCore{
+					OrganizationName: "test-org",
+					AccountName:      "test-account",
+					Provider:         CloudProviderAWS,
+					Environment:      "test-env",
+					ScanSchedule:     ScanScheduleDaily,
+				},
+			},
+		}
+
+		resp, err := ia.Create(ctx, req)
+
+		assert.Error(t, err)
+		var initErr infer.ResourceInitFailedError
+		assert.ErrorAs(t, err, &initErr)
+		assert.Contains(t, initErr.Reasons[0], "insights account 'test-account' not found after creation")
+		assert.Equal(t, "test-org/test-account", resp.ID)
+		assert.Equal(t, "", resp.Output.InsightsAccountId)
 	})
 
 	t.Run("Update with DryRun", func(t *testing.T) {
@@ -355,7 +454,7 @@ func TestInsightsAccount(t *testing.T) {
 					AccountName:      "test-account",
 					Provider:         CloudProviderAWS,
 					Environment:      "updated-env",
-					ScanSchedule:     &newSchedule,
+					ScanSchedule:     newSchedule,
 				},
 			},
 			State: InsightsAccountState{
@@ -364,7 +463,7 @@ func TestInsightsAccount(t *testing.T) {
 					AccountName:      "test-account",
 					Provider:         CloudProviderAWS,
 					Environment:      "old-env",
-					ScanSchedule:     &oldSchedule,
+					ScanSchedule:     oldSchedule,
 				},
 				InsightsAccountId:    "account-id-123",
 				ScheduledScanEnabled: true,
@@ -409,7 +508,7 @@ func TestInsightsAccount(t *testing.T) {
 					AccountName:      "test-account",
 					Provider:         CloudProviderAWS,
 					Environment:      "updated-env",
-					ScanSchedule:     &newSchedule,
+					ScanSchedule:     newSchedule,
 				},
 			},
 			State: InsightsAccountState{
@@ -418,7 +517,7 @@ func TestInsightsAccount(t *testing.T) {
 					AccountName:      "test-account",
 					Provider:         CloudProviderAWS,
 					Environment:      "old-env",
-					ScanSchedule:     &oldSchedule,
+					ScanSchedule:     oldSchedule,
 				},
 				InsightsAccountId:    "account-id-123",
 				ScheduledScanEnabled: true,
@@ -431,6 +530,136 @@ func TestInsightsAccount(t *testing.T) {
 		assert.Equal(t, "updated-env", capturedRequest.Environment)
 		assert.Equal(t, "none", capturedRequest.ScanSchedule)
 		assert.Equal(t, false, resp.Output.ScheduledScanEnabled)
+	})
+
+	t.Run("Update fails with API error", func(t *testing.T) {
+		mockedClient := &InsightsAccountClientMock{
+			updateInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.UpdateInsightsAccountRequest) error {
+				return fmt.Errorf("API error: environment not found")
+			},
+		}
+		ctx := config.WithMockClient(context.Background(), mockedClient)
+
+		ia := &InsightsAccount{}
+		req := infer.UpdateRequest[InsightsAccountInput, InsightsAccountState]{
+			DryRun: false,
+			Inputs: InsightsAccountInput{
+				InsightsAccountCore: InsightsAccountCore{
+					OrganizationName: "test-org",
+					AccountName:      "test-account",
+					Provider:         CloudProviderAWS,
+					Environment:      "invalid-env",
+					ScanSchedule:     ScanScheduleNone,
+				},
+			},
+			State: InsightsAccountState{
+				InsightsAccountCore: InsightsAccountCore{
+					OrganizationName: "test-org",
+					AccountName:      "test-account",
+					Provider:         CloudProviderAWS,
+					Environment:      "old-env",
+					ScanSchedule:     ScanScheduleDaily,
+				},
+				InsightsAccountId:    "account-id-123",
+				ScheduledScanEnabled: true,
+			},
+		}
+
+		_, err := ia.Update(ctx, req)
+
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "error updating insights account 'test-account'")
+		assert.Contains(t, err.Error(), "environment not found")
+	})
+
+	t.Run("Update succeeds but GET fails after update", func(t *testing.T) {
+		mockedClient := &InsightsAccountClientMock{
+			updateInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.UpdateInsightsAccountRequest) error {
+				return nil
+			},
+			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+				return nil, fmt.Errorf("API error: internal server error")
+			},
+		}
+		ctx := config.WithMockClient(context.Background(), mockedClient)
+
+		ia := &InsightsAccount{}
+		req := infer.UpdateRequest[InsightsAccountInput, InsightsAccountState]{
+			DryRun: false,
+			Inputs: InsightsAccountInput{
+				InsightsAccountCore: InsightsAccountCore{
+					OrganizationName: "test-org",
+					AccountName:      "test-account",
+					Provider:         CloudProviderAWS,
+					Environment:      "updated-env",
+					ScanSchedule:     ScanScheduleNone,
+				},
+			},
+			State: InsightsAccountState{
+				InsightsAccountCore: InsightsAccountCore{
+					OrganizationName: "test-org",
+					AccountName:      "test-account",
+					Provider:         CloudProviderAWS,
+					Environment:      "old-env",
+					ScanSchedule:     ScanScheduleDaily,
+				},
+				InsightsAccountId:    "account-id-123",
+				ScheduledScanEnabled: true,
+			},
+		}
+
+		resp, err := ia.Update(ctx, req)
+
+		assert.Error(t, err)
+		var initErr infer.ResourceInitFailedError
+		assert.ErrorAs(t, err, &initErr)
+		assert.Contains(t, initErr.Reasons[0], "internal server error")
+		assert.Equal(t, "account-id-123", resp.Output.InsightsAccountId)
+	})
+
+	t.Run("Update succeeds but account not found after update", func(t *testing.T) {
+		mockedClient := &InsightsAccountClientMock{
+			updateInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.UpdateInsightsAccountRequest) error {
+				return nil
+			},
+			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+				return nil, nil // 404 - not found
+			},
+		}
+		ctx := config.WithMockClient(context.Background(), mockedClient)
+
+		ia := &InsightsAccount{}
+		req := infer.UpdateRequest[InsightsAccountInput, InsightsAccountState]{
+			DryRun: false,
+			Inputs: InsightsAccountInput{
+				InsightsAccountCore: InsightsAccountCore{
+					OrganizationName: "test-org",
+					AccountName:      "test-account",
+					Provider:         CloudProviderAWS,
+					Environment:      "updated-env",
+					ScanSchedule:     ScanScheduleNone,
+				},
+			},
+			State: InsightsAccountState{
+				InsightsAccountCore: InsightsAccountCore{
+					OrganizationName: "test-org",
+					AccountName:      "test-account",
+					Provider:         CloudProviderAWS,
+					Environment:      "old-env",
+					ScanSchedule:     ScanScheduleDaily,
+				},
+				InsightsAccountId:    "account-id-123",
+				ScheduledScanEnabled: true,
+			},
+		}
+
+		resp, err := ia.Update(ctx, req)
+
+		assert.Error(t, err)
+		var initErr infer.ResourceInitFailedError
+		assert.ErrorAs(t, err, &initErr)
+		assert.Contains(t, initErr.Reasons[0], "insights account 'test-account' not found after update")
+		assert.Equal(t, "account-id-123", resp.Output.InsightsAccountId)
 	})
 
 	t.Run("Delete successfully", func(t *testing.T) {
@@ -454,7 +683,7 @@ func TestInsightsAccount(t *testing.T) {
 					AccountName:      "test-account",
 					Provider:         CloudProviderAWS,
 					Environment:      "test-env",
-					ScanSchedule:     &scanSchedule,
+					ScanSchedule:     scanSchedule,
 				},
 				InsightsAccountId: "account-id-123",
 			},
@@ -466,38 +695,4 @@ func TestInsightsAccount(t *testing.T) {
 		assert.True(t, deleteCalled)
 	})
 
-	t.Run("Check with valid provider", func(t *testing.T) {
-		ia := &InsightsAccount{}
-
-		testCases := []struct {
-			name     string
-			provider CloudProvider
-		}{
-			{"aws", CloudProviderAWS},
-			{"azure", CloudProviderAzure},
-			{"gcp", CloudProviderGCP},
-		}
-
-		for _, tc := range testCases {
-			t.Run(tc.name, func(t *testing.T) {
-				inputs := property.NewMap(map[string]property.Value{
-					"organizationName": property.New("test-org"),
-					"accountName":      property.New("test-account"),
-					"provider":         property.New(tc.name),
-					"environment":      property.New("test-env"),
-					"scanSchedule":     property.New("daily"),
-				})
-
-				req := infer.CheckRequest{
-					NewInputs: inputs,
-				}
-
-				resp, err := ia.Check(context.Background(), req)
-
-				assert.NoError(t, err)
-				assert.Empty(t, resp.Failures)
-				assert.Equal(t, tc.provider, resp.Inputs.Provider)
-			})
-		}
-	})
 }

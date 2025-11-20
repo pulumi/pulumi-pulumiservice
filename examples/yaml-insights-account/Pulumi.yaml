@@ -37,6 +37,7 @@ resources:
       accountName: test-insights-account-${digits}
       provider: aws
       environment: ${credentials-env.project}/${credentials-env.name}
+      scanSchedule: none
 
 outputs:
   insightsAccountId: ${insights-account.insightsAccountId}

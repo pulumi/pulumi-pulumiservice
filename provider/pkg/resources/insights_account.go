@@ -28,7 +28,6 @@ type InsightsAccount struct{}
 
 var (
 	_ infer.CustomCreate[InsightsAccountInput, InsightsAccountState] = &InsightsAccount{}
-	_ infer.CustomCheck[InsightsAccountInput]                        = &InsightsAccount{}
 	_ infer.CustomDelete[InsightsAccountState]                       = &InsightsAccount{}
 	_ infer.CustomRead[InsightsAccountInput, InsightsAccountState]   = &InsightsAccount{}
 	_ infer.CustomUpdate[InsightsAccountInput, InsightsAccountState] = &InsightsAccount{}
@@ -42,16 +41,20 @@ func (ia *InsightsAccount) Annotate(a infer.Annotator) {
 type CloudProvider string
 
 const (
-	CloudProviderAWS   CloudProvider = "aws"
-	CloudProviderAzure CloudProvider = "azure"
-	CloudProviderGCP   CloudProvider = "gcp"
+	CloudProviderAWS        CloudProvider = "aws"
+	CloudProviderAzure      CloudProvider = "azure-native"
+	CloudProviderGCP        CloudProvider = "gcp"
+	CloudProviderKubernetes CloudProvider = "kubernetes"
+	CloudProviderOCI        CloudProvider = "oci"
 )
 
 func (CloudProvider) Values() []infer.EnumValue[CloudProvider] {
 	return []infer.EnumValue[CloudProvider]{
 		{Name: "aws", Value: CloudProviderAWS, Description: "Amazon Web Services"},
-		{Name: "azure", Value: CloudProviderAzure, Description: "Microsoft Azure"},
+		{Name: "azure-native", Value: CloudProviderAzure, Description: "Microsoft Azure"},
 		{Name: "gcp", Value: CloudProviderGCP, Description: "Google Cloud Platform"},
+		{Name: "kubernetes", Value: CloudProviderKubernetes, Description: "Kubernetes"},
+		{Name: "oci", Value: CloudProviderOCI, Description: "Oracle Cloud Infrastructure"},
 	}
 }
 
@@ -76,7 +79,7 @@ type InsightsAccountCore struct {
 	AccountName      string                 `pulumi:"accountName" provider:"replaceOnChanges"`
 	Provider         CloudProvider          `pulumi:"provider" provider:"replaceOnChanges"`
 	Environment      string                 `pulumi:"environment"`
-	ScanSchedule     *ScanSchedule          `pulumi:"scanSchedule,optional"`
+	ScanSchedule     ScanSchedule           `pulumi:"scanSchedule"`
 	ProviderConfig   map[string]interface{} `pulumi:"providerConfig,optional"`
 }
 
@@ -115,7 +118,7 @@ func (*InsightsAccount) Create(ctx context.Context, req infer.CreateRequest[Insi
 			Output: InsightsAccountState{
 				InsightsAccountCore:  req.Inputs.InsightsAccountCore,
 				InsightsAccountId:    "",
-				ScheduledScanEnabled: req.Inputs.ScanSchedule != nil && *req.Inputs.ScanSchedule != ScanScheduleNone,
+				ScheduledScanEnabled: req.Inputs.ScanSchedule != ScanScheduleNone,
 			},
 		}, nil
 	}
@@ -126,9 +129,7 @@ func (*InsightsAccount) Create(ctx context.Context, req infer.CreateRequest[Insi
 		Provider:       string(req.Inputs.Provider),
 		Environment:    req.Inputs.Environment,
 		ProviderConfig: req.Inputs.ProviderConfig,
-	}
-	if req.Inputs.ScanSchedule != nil {
-		createReq.ScanSchedule = string(*req.Inputs.ScanSchedule)
+		ScanSchedule:   string(req.Inputs.ScanSchedule),
 	}
 
 	err := client.CreateInsightsAccount(ctx, req.Inputs.OrganizationName, req.Inputs.AccountName, createReq)
@@ -161,18 +162,6 @@ func (*InsightsAccount) Create(ctx context.Context, req infer.CreateRequest[Insi
 			InsightsAccountId:    account.ID,
 			ScheduledScanEnabled: account.ScheduledScanEnabled,
 		},
-	}, nil
-}
-
-func (*InsightsAccount) Check(ctx context.Context, req infer.CheckRequest) (infer.CheckResponse[InsightsAccountInput], error) {
-	// Provider validation is handled automatically by the CloudProvider enum type
-	inputs, failures, err := infer.DefaultCheck[InsightsAccountInput](ctx, req.NewInputs)
-	if err != nil {
-		return infer.CheckResponse[InsightsAccountInput]{}, err
-	}
-	return infer.CheckResponse[InsightsAccountInput]{
-		Inputs:   inputs,
-		Failures: failures,
 	}, nil
 }
 
@@ -249,9 +238,7 @@ func (*InsightsAccount) Update(ctx context.Context, req infer.UpdateRequest[Insi
 	updateReq := pulumiapi.UpdateInsightsAccountRequest{
 		Environment:    req.Inputs.Environment,
 		ProviderConfig: providerConfig,
-	}
-	if req.Inputs.ScanSchedule != nil {
-		updateReq.ScanSchedule = string(*req.Inputs.ScanSchedule)
+		ScanSchedule:   string(req.Inputs.ScanSchedule),
 	}
 
 	err := client.UpdateInsightsAccount(ctx, req.State.OrganizationName, req.State.AccountName, updateReq)

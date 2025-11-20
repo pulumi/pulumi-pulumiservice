@@ -134,11 +134,19 @@ namespace Pulumi.PulumiService
         /// <summary>
         /// Microsoft Azure
         /// </summary>
-        public static CloudProvider Azure { get; } = new CloudProvider("azure");
+        public static CloudProvider Azure_native { get; } = new CloudProvider("azure-native");
         /// <summary>
         /// Google Cloud Platform
         /// </summary>
         public static CloudProvider Gcp { get; } = new CloudProvider("gcp");
+        /// <summary>
+        /// Kubernetes
+        /// </summary>
+        public static CloudProvider Kubernetes { get; } = new CloudProvider("kubernetes");
+        /// <summary>
+        /// Oracle Cloud Infrastructure
+        /// </summary>
+        public static CloudProvider Oci { get; } = new CloudProvider("oci");
 
         public static bool operator ==(CloudProvider left, CloudProvider right) => left.Equals(right);
         public static bool operator !=(CloudProvider left, CloudProvider right) => !left.Equals(right);

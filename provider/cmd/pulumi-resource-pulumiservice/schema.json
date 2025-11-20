@@ -259,11 +259,19 @@
         },
         {
           "description": "Microsoft Azure",
-          "value": "azure"
+          "value": "azure-native"
         },
         {
           "description": "Google Cloud Platform",
           "value": "gcp"
+        },
+        {
+          "description": "Kubernetes",
+          "value": "kubernetes"
+        },
+        {
+          "description": "Oracle Cloud Infrastructure",
+          "value": "oci"
         }
       ]
     },
@@ -1613,6 +1621,7 @@
         "insightsAccountId",
         "organizationName",
         "provider",
+        "scanSchedule",
         "scheduledScanEnabled"
       ],
       "inputProperties": {
@@ -1652,7 +1661,8 @@
         "accountName",
         "environment",
         "organizationName",
-        "provider"
+        "provider",
+        "scanSchedule"
       ]
     },
     "pulumiservice:index:OidcIssuer": {

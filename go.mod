@@ -8,6 +8,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/pgavlin/fx/v2 v2.0.10
 	github.com/pulumi/esc v0.17.0
+	github.com/pulumi/providertest v0.3.1
 	github.com/pulumi/pulumi/pkg/v3 v3.204.0
 	github.com/pulumi/pulumi/sdk/v3 v3.204.0
 	github.com/stretchr/testify v1.10.0
@@ -21,7 +22,6 @@ require (
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/iwdgo/sigintwindows v0.2.2 // indirect
 	github.com/nxadm/tail v1.4.11 // indirect
-	github.com/pulumi/providertest v0.3.1 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 )
 

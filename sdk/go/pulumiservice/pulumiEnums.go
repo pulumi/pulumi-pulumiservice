@@ -568,9 +568,13 @@ const (
 	// Amazon Web Services
 	CloudProviderAws = CloudProvider("aws")
 	// Microsoft Azure
-	CloudProviderAzure = CloudProvider("azure")
+	CloudProvider_Azure_Native = CloudProvider("azure-native")
 	// Google Cloud Platform
 	CloudProviderGcp = CloudProvider("gcp")
+	// Kubernetes
+	CloudProviderKubernetes = CloudProvider("kubernetes")
+	// Oracle Cloud Infrastructure
+	CloudProviderOci = CloudProvider("oci")
 )
 
 func (CloudProvider) ElementType() reflect.Type {
@@ -696,8 +700,10 @@ func (o CloudProviderPtrOutput) ToStringPtrOutputWithContext(ctx context.Context
 // A concrete instance of `CloudProviderInput` can be one of the following:
 //
 //	CloudProviderAws
-//	CloudProviderAzure
+//	CloudProvider_Azure_Native
 //	CloudProviderGcp
+//	CloudProviderKubernetes
+//	CloudProviderOci
 type CloudProviderInput interface {
 	pulumi.Input
 

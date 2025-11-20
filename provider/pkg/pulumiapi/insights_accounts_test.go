@@ -1,7 +1,6 @@
 package pulumiapi
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -9,9 +8,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
-
-var insightsCtx = context.Background()
 
 func TestCreateInsightsAccount(t *testing.T) {
 	orgName := "test-org"
@@ -27,15 +25,14 @@ func TestCreateInsightsAccount(t *testing.T) {
 			},
 		}
 
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqPath:   fmt.Sprintf("/api/preview/insights/%s/accounts/%s", orgName, accountName),
 			ExpectedReqBody:   reqBody,
 			ResponseCode:      201,
 		})
-		defer cleanup()
 
-		err := c.CreateInsightsAccount(insightsCtx, orgName, accountName, reqBody)
+		err := c.CreateInsightsAccount(t.Context(), orgName, accountName, reqBody)
 		assert.NoError(t, err)
 	})
 
@@ -45,7 +42,7 @@ func TestCreateInsightsAccount(t *testing.T) {
 			Environment: "test-env",
 		}
 
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqPath:   fmt.Sprintf("/api/preview/insights/%s/accounts/%s", orgName, accountName),
 			ExpectedReqBody:   reqBody,
@@ -55,9 +52,8 @@ func TestCreateInsightsAccount(t *testing.T) {
 				Message:    "invalid environment reference",
 			},
 		})
-		defer cleanup()
 
-		err := c.CreateInsightsAccount(insightsCtx, orgName, accountName, reqBody)
+		err := c.CreateInsightsAccount(t.Context(), orgName, accountName, reqBody)
 		assert.EqualError(t, err, `failed to create insights account: 400 API error: invalid environment reference`)
 	})
 }
@@ -78,21 +74,20 @@ func TestGetInsightsAccount(t *testing.T) {
 			},
 		}
 
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
 			ExpectedReqPath:   fmt.Sprintf("/api/preview/insights/%s/accounts/%s", orgName, accountName),
 			ResponseCode:      200,
 			ResponseBody:      resp,
 		})
-		defer cleanup()
 
-		account, err := c.GetInsightsAccount(insightsCtx, orgName, accountName)
+		account, err := c.GetInsightsAccount(t.Context(), orgName, accountName)
 		assert.NoError(t, err)
 		assert.Equal(t, &resp, account)
 	})
 
 	t.Run("Not Found", func(t *testing.T) {
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
 			ExpectedReqPath:   fmt.Sprintf("/api/preview/insights/%s/accounts/%s", orgName, accountName),
 			ResponseCode:      404,
@@ -101,15 +96,14 @@ func TestGetInsightsAccount(t *testing.T) {
 				Message:    "insights account not found",
 			},
 		})
-		defer cleanup()
 
-		account, err := c.GetInsightsAccount(insightsCtx, orgName, accountName)
+		account, err := c.GetInsightsAccount(t.Context(), orgName, accountName)
 		assert.Nil(t, account)
 		assert.NoError(t, err, "404 should return nil, nil")
 	})
 
 	t.Run("Error", func(t *testing.T) {
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
 			ExpectedReqPath:   fmt.Sprintf("/api/preview/insights/%s/accounts/%s", orgName, accountName),
 			ResponseCode:      500,
@@ -118,9 +112,8 @@ func TestGetInsightsAccount(t *testing.T) {
 				Message:    "internal server error",
 			},
 		})
-		defer cleanup()
 
-		account, err := c.GetInsightsAccount(insightsCtx, orgName, accountName)
+		account, err := c.GetInsightsAccount(t.Context(), orgName, accountName)
 		assert.Nil(t, account)
 		assert.EqualError(t, err, `failed to get insights account: 500 API error: internal server error`)
 	})
@@ -139,15 +132,14 @@ func TestUpdateInsightsAccount(t *testing.T) {
 			},
 		}
 
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPatch,
 			ExpectedReqPath:   fmt.Sprintf("/api/preview/insights/%s/accounts/%s", orgName, accountName),
 			ExpectedReqBody:   reqBody,
 			ResponseCode:      204,
 		})
-		defer cleanup()
 
-		err := c.UpdateInsightsAccount(insightsCtx, orgName, accountName, reqBody)
+		err := c.UpdateInsightsAccount(t.Context(), orgName, accountName, reqBody)
 		assert.NoError(t, err)
 	})
 
@@ -156,7 +148,7 @@ func TestUpdateInsightsAccount(t *testing.T) {
 			Environment: "invalid-env",
 		}
 
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPatch,
 			ExpectedReqPath:   fmt.Sprintf("/api/preview/insights/%s/accounts/%s", orgName, accountName),
 			ExpectedReqBody:   reqBody,
@@ -166,9 +158,8 @@ func TestUpdateInsightsAccount(t *testing.T) {
 				Message:    "environment not found",
 			},
 		})
-		defer cleanup()
 
-		err := c.UpdateInsightsAccount(insightsCtx, orgName, accountName, reqBody)
+		err := c.UpdateInsightsAccount(t.Context(), orgName, accountName, reqBody)
 		assert.EqualError(t, err, `failed to update insights account: 400 API error: environment not found`)
 	})
 }
@@ -178,19 +169,18 @@ func TestDeleteInsightsAccount(t *testing.T) {
 	accountName := "test-account"
 
 	t.Run("Happy Path", func(t *testing.T) {
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
 			ExpectedReqPath:   fmt.Sprintf("/api/preview/insights/%s/accounts/%s", orgName, accountName),
 			ResponseCode:      204,
 		})
-		defer cleanup()
 
-		err := c.DeleteInsightsAccount(insightsCtx, orgName, accountName)
+		err := c.DeleteInsightsAccount(t.Context(), orgName, accountName)
 		assert.NoError(t, err)
 	})
 
 	t.Run("Error", func(t *testing.T) {
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
 			ExpectedReqPath:   fmt.Sprintf("/api/preview/insights/%s/accounts/%s", orgName, accountName),
 			ResponseCode:      404,
@@ -199,9 +189,8 @@ func TestDeleteInsightsAccount(t *testing.T) {
 				Message:    "insights account not found",
 			},
 		})
-		defer cleanup()
 
-		err := c.DeleteInsightsAccount(insightsCtx, orgName, accountName)
+		err := c.DeleteInsightsAccount(t.Context(), orgName, accountName)
 		assert.EqualError(t, err, `failed to delete insights account "test-account": 404 API error: insights account not found`)
 	})
 }
@@ -248,9 +237,10 @@ func TestTriggerScan(t *testing.T) {
 		defer server.Close()
 
 		httpClient := http.Client{}
-		c, _ := NewClient(&httpClient, "token", server.URL)
+		c, err := NewClient(&httpClient, "token", server.URL)
+		require.NoError(t, err)
 
-		result, err := c.TriggerScan(insightsCtx, orgName, accountName)
+		result, err := c.TriggerScan(t.Context(), orgName, accountName)
 		assert.NoError(t, err)
 		assert.Equal(t, "run-123", result.ID)
 		assert.Equal(t, "running", result.Status)
@@ -279,9 +269,10 @@ func TestTriggerScan(t *testing.T) {
 		defer server.Close()
 
 		httpClient := http.Client{}
-		c, _ := NewClient(&httpClient, "token", server.URL)
+		c, err := NewClient(&httpClient, "token", server.URL)
+		require.NoError(t, err)
 
-		result, err := c.TriggerScan(insightsCtx, orgName, accountName)
+		result, err := c.TriggerScan(t.Context(), orgName, accountName)
 		assert.NoError(t, err)
 		assert.NotNil(t, result)
 		assert.Equal(t, "queued", result.Status)
@@ -309,10 +300,10 @@ func TestTriggerScan(t *testing.T) {
 		defer server.Close()
 
 		httpClient := http.Client{}
-		c, _ := NewClient(&httpClient, "token", server.URL)
+		c, err := NewClient(&httpClient, "token", server.URL)
+		require.NoError(t, err)
 
-		result, err := c.TriggerScan(insightsCtx, orgName, accountName)
-		assert.Nil(t, result)
+		_, err = c.TriggerScan(t.Context(), orgName, accountName)
 		assert.EqualError(t, err, `failed to trigger scan for insights account "test-account": 400 API error: scan already in progress`)
 	})
 }
@@ -333,24 +324,20 @@ func TestGetScanStatus(t *testing.T) {
 			ResourceCount: 142,
 		}
 
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
 			ExpectedReqPath:   fmt.Sprintf("/api/preview/insights/%s/accounts/%s/scan", orgName, accountName),
 			ResponseCode:      200,
 			ResponseBody:      resp,
 		})
-		defer cleanup()
 
-		result, err := c.GetScanStatus(insightsCtx, orgName, accountName)
+		result, err := c.GetScanStatus(t.Context(), orgName, accountName)
 		assert.NoError(t, err)
 		assert.Equal(t, &resp, result)
-		assert.Equal(t, "succeeded", result.Status)
-		assert.Equal(t, 142, result.ResourceCount)
-		assert.Equal(t, "2025-11-19T02:00:00Z", result.NextScan)
 	})
 
 	t.Run("Not Found", func(t *testing.T) {
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
 			ExpectedReqPath:   fmt.Sprintf("/api/preview/insights/%s/accounts/%s/scan", orgName, accountName),
 			ResponseCode:      404,
@@ -359,15 +346,14 @@ func TestGetScanStatus(t *testing.T) {
 				Message:    "no scan found",
 			},
 		})
-		defer cleanup()
 
-		result, err := c.GetScanStatus(insightsCtx, orgName, accountName)
+		result, err := c.GetScanStatus(t.Context(), orgName, accountName)
 		assert.Nil(t, result)
 		assert.NoError(t, err, "404 should return nil, nil")
 	})
 
 	t.Run("Error", func(t *testing.T) {
-		c, cleanup := startTestServer(t, testServerConfig{
+		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
 			ExpectedReqPath:   fmt.Sprintf("/api/preview/insights/%s/accounts/%s/scan", orgName, accountName),
 			ResponseCode:      500,
@@ -376,9 +362,8 @@ func TestGetScanStatus(t *testing.T) {
 				Message:    "internal server error",
 			},
 		})
-		defer cleanup()
 
-		result, err := c.GetScanStatus(insightsCtx, orgName, accountName)
+		result, err := c.GetScanStatus(t.Context(), orgName, accountName)
 		assert.Nil(t, result)
 		assert.EqualError(t, err, `failed to get scan status for insights account "test-account": 500 API error: internal server error`)
 	})
