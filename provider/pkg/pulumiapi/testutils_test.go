@@ -14,14 +14,14 @@ import (
 
 type testServerConfig struct {
 	ExpectedReqMethod   string
-	ExpectedReqBody     interface{}
+	ExpectedReqBody     any
 	ExpectedReqPath     string
 	ExpectedQueryParams url.Values
-	ResponseBody        interface{}
+	ResponseBody        any
 	ResponseCode        int
 }
 
-func startTestServer(t *testing.T, config testServerConfig) (client *Client, cleanup func()) {
+func startTestServer(t *testing.T, config testServerConfig) *Client {
 	token := "abc123"
 	httpClient := http.Client{
 		Timeout: 10 * time.Second,
@@ -57,5 +57,6 @@ func startTestServer(t *testing.T, config testServerConfig) (client *Client, cle
 	if err != nil {
 		t.Fatalf("could not create client: %v", err)
 	}
-	return c, server.Close
+	t.Cleanup(server.Close)
+	return c
 }
