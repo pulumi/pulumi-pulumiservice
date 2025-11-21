@@ -11,7 +11,7 @@ const stackSuffix = new random.RandomPet("stack-suffix", {
   separator: "-",
 });
 const stack = new service.Stack("test-stack", {
-    organizationName: "service-provider-test-org",
+    organizationName: process.env.PULUMI_TEST_OWNER || "service-provider-test-org",
     projectName: "pulumi-service-schedules-example-ts",
     stackName: stackSuffix.id,
 });
@@ -32,7 +32,7 @@ var settings = new service.DeploymentSettings("deployment-settings", {
 
 // Environment to create rotations on
 var environment = new service.Environment("testing-environment", {
-  organization: "service-provider-test-org",
+  organization: stack.organizationName,
   project: "my-project",
   name: envName,
   yaml: new pulumi.asset.StringAsset(
