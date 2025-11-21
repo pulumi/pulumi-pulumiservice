@@ -109,10 +109,13 @@ func (c *Client) sendRequest(req *http.Request, resBody interface{}) (*http.Resp
 		}
 		return res, &errRes
 	}
-	if resBody != nil {
+	// Only unmarshal response body if:
+	// 1. resBody is not nil (caller wants the response)
+	// 2. Body is not empty (HTTP 204 No Content returns empty body)
+	if resBody != nil && len(body) > 0 {
 		err = json.Unmarshal(body, resBody)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse response body: %w", err)
+			return res, fmt.Errorf("failed to parse response body: %w", err)
 		}
 	}
 	return res, nil

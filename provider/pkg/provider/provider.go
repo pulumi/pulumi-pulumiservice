@@ -84,6 +84,7 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 			version: version,
 		})).
 		WithResources(
+			infer.Resource(&resources.InsightsAccount{}),
 			infer.Resource(&resources.Team{}),
 		).
 		WithModuleMap(map[tokens.ModuleName]tokens.ModuleName{
@@ -140,10 +141,6 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 	return p.RawServer(name, version, provider)(host)
 }
 
-// Call dynamically executes a method in the provider associated with a component resource.
-func (k *pulumiserviceProvider) Call(ctx context.Context, req *pulumirpc.CallRequest) (*pulumirpc.CallResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "Call is not yet implemented")
-}
 
 // Attach implements pulumirpc.ResourceProviderServer
 func (k *pulumiserviceProvider) Attach(_ context.Context, req *pulumirpc.PluginAttach) (*pbempty.Empty, error) {

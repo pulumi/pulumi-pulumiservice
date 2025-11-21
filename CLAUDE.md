@@ -149,6 +149,12 @@ The provider schema is **manually maintained** at `provider/pkg/provider/manual-
 3. Run `make build_sdks` to regenerate all language SDKs from the schema
 4. The schema is embedded into the provider binary at build time
 
+**CRITICAL**: After changing `manual-schema.json`, you MUST run `make build_sdks`
+to regenerate all language SDKs (Node.js, Python, Go, .NET, Java). Skipping this
+step will cause the SDKs to be out of sync with the schema, leading to runtime
+errors and test failures. The SDKs are generated code and must be rebuilt after
+every schema change.
+
 #### Schema JSON Syntax Guidelines
 
 **Important**: The schema JSON must follow strict syntax rules. Common patterns:
@@ -201,6 +207,21 @@ The provider schema is **manually maintained** at `provider/pkg/provider/manual-
    - Create a `README.md` in the example directory that includes a link to the `pulumi convert` documentation (https://www.pulumi.com/docs/iac/cli/commands/pulumi_convert/) for converting the example to other programming languages
    - Register the example test in `examples/examples_yaml_test.go`
    - Test the YAML example before completing: `cd examples && go test -v -run TestYaml<ResourceName>Example -tags yaml -timeout 10m`
+   - **Resource Type Names**: In Pulumi YAML, the `index:` module is optional and should be omitted for cleaner syntax:
+     - ✅ Correct: `type: pulumiservice:Environment`
+     - ✅ Correct: `type: pulumiservice:InsightsAccount`
+     - ❌ Unnecessary: `type: pulumiservice:index:Environment`
+     - ❌ Unnecessary: `type: pulumiservice:index:InsightsAccount`
+   - **Organization Name Configuration**: When the resource requires an
+     organization name, make it configurable for testing:
+     - Add `organizationName` to the `config` section in `Pulumi.yaml` with
+       a default value of `service-provider-test-org`
+     - Use `${organizationName}` variable in resource properties instead of
+       hardcoding the organization
+     - Pass `organizationName: getOrgName()` in the test's `Config` map in
+       `examples_yaml_test.go`
+     - This allows tests to use the `PULUMI_TEST_OWNER` environment variable
+       (e.g., `team-ce`) for different organizations
 
 ### Resource Interface
 
@@ -217,6 +238,31 @@ type PulumiServiceResource interface {
     Name() string
 }
 ```
+
+### Adding Resource Methods
+
+Resource methods enable runtime operations on resources (e.g.,
+`account.triggerScan()`). See
+[InsightsAccount implementation](provider/pkg/resources/insights_account.go)
+and [Pulumi blog](https://www.pulumi.com/blog/resource-methods-for-pulumi-packages/).
+
+**Key steps:**
+
+1. Add API client methods in `provider/pkg/pulumiapi/`
+2. Add `methods` section to resource in `manual-schema.json`, define functions
+   with `__self__` parameter
+3. Implement `Call()` RPC in resource - handle preview mode (empty ID) by
+   returning computed values with `KeepUnknowns: true`:
+   ```go
+   resource.MakeComputed(resource.NewStringProperty(""))
+   resource.MakeComputed(resource.NewNumberProperty(0))
+   ```
+4. **REQUIRED**: Add preview test verifying computed markers
+   (`04da6b54-80e4-46f7-96ec-b56ff0331ba9` for strings,
+   `3eeb2bf0-c639-47a8-9e75-3b44932eb421` for numbers)
+5. Update provider Call() routing in `provider.go`
+6. Create TypeScript integration test with `Quick: true` option
+7. Run `make build_sdks` to regenerate SDKs with methods
 
 ## API Client Architecture
 
