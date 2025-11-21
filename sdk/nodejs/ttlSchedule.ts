@@ -35,7 +35,7 @@ export class TtlSchedule extends pulumi.CustomResource {
     }
 
     /**
-     * True if the stack and all associated history and settings should be deleted.
+     * True if the stack and all associated history and settings should be deleted. Defaults to false, which means only the resources are destroyed but the stack itself remains.
      */
     declare public readonly deleteAfterDestroy: pulumi.Output<boolean | undefined>;
     /**
@@ -106,7 +106,7 @@ export class TtlSchedule extends pulumi.CustomResource {
  */
 export interface TtlScheduleArgs {
     /**
-     * True if the stack and all associated history and settings should be deleted.
+     * True if the stack and all associated history and settings should be deleted. Defaults to false, which means only the resources are destroyed but the stack itself remains.
      */
     deleteAfterDestroy?: pulumi.Input<boolean>;
     /**

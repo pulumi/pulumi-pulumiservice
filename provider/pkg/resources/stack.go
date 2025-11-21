@@ -27,9 +27,7 @@ func (i *PulumiServiceStack) ToPropertyMap() resource.PropertyMap {
 	pm["organizationName"] = resource.NewPropertyValue(i.OrgName)
 	pm["projectName"] = resource.NewPropertyValue(i.ProjectName)
 	pm["stackName"] = resource.NewPropertyValue(i.StackName)
-	if i.ForceDestroy {
-		pm["forceDestroy"] = resource.NewPropertyValue(i.ForceDestroy)
-	}
+	pm["forceDestroy"] = resource.NewPropertyValue(i.ForceDestroy)
 	return pm
 }
 
@@ -59,6 +57,10 @@ func (s *PulumiServiceStackResource) Diff(req *pulumirpc.DiffRequest) (*pulumirp
 	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
+	}
+
+	if !news["forceDestroy"].HasValue() {
+		news["forceDestroy"] = resource.NewBoolProperty(false)
 	}
 
 	diffs := olds.Diff(news)
@@ -164,6 +166,16 @@ func (s *PulumiServiceStackResource) Read(req *pulumirpc.ReadRequest) (*pulumirp
 
 	props := PulumiServiceStack{
 		StackIdentifier: stack,
+		ForceDestroy:    false,
+	}
+
+	// Preserve forceDestroy from existing inputs since the API doesn't return this field
+	propertyMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepSecrets: true})
+	if err != nil {
+		return nil, err
+	}
+	if propertyMap["forceDestroy"].HasValue() && propertyMap["forceDestroy"].IsBool() {
+		props.ForceDestroy = propertyMap["forceDestroy"].BoolValue()
 	}
 
 	outputs, err := plugin.MarshalProperties(

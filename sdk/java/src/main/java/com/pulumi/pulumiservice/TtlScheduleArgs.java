@@ -19,14 +19,14 @@ public final class TtlScheduleArgs extends com.pulumi.resources.ResourceArgs {
     public static final TtlScheduleArgs Empty = new TtlScheduleArgs();
 
     /**
-     * True if the stack and all associated history and settings should be deleted.
+     * True if the stack and all associated history and settings should be deleted. Defaults to false, which means only the resources are destroyed but the stack itself remains.
      * 
      */
     @Import(name="deleteAfterDestroy")
     private @Nullable Output<Boolean> deleteAfterDestroy;
 
     /**
-     * @return True if the stack and all associated history and settings should be deleted.
+     * @return True if the stack and all associated history and settings should be deleted. Defaults to false, which means only the resources are destroyed but the stack itself remains.
      * 
      */
     public Optional<Output<Boolean>> deleteAfterDestroy() {
@@ -122,7 +122,7 @@ public final class TtlScheduleArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param deleteAfterDestroy True if the stack and all associated history and settings should be deleted.
+         * @param deleteAfterDestroy True if the stack and all associated history and settings should be deleted. Defaults to false, which means only the resources are destroyed but the stack itself remains.
          * 
          * @return builder
          * 
@@ -133,7 +133,7 @@ public final class TtlScheduleArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param deleteAfterDestroy True if the stack and all associated history and settings should be deleted.
+         * @param deleteAfterDestroy True if the stack and all associated history and settings should be deleted. Defaults to false, which means only the resources are destroyed but the stack itself remains.
          * 
          * @return builder
          * 
