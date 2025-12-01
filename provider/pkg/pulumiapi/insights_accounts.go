@@ -29,6 +29,8 @@ type InsightsAccountClient interface {
 	DeleteInsightsAccount(ctx context.Context, orgName, accountName string) error
 	TriggerScan(ctx context.Context, orgName, accountName string) (*TriggerScanResponse, error)
 	GetScanStatus(ctx context.Context, orgName, accountName string) (*ScanStatusResponse, error)
+	GetInsightsAccountTags(ctx context.Context, orgName, accountName string) (map[string]string, error)
+	SetInsightsAccountTags(ctx context.Context, orgName, accountName string, tags map[string]string) error
 }
 
 type InsightsAccount struct {
@@ -74,6 +76,24 @@ type ScanStatusResponse struct {
 	WorkflowRun
 	NextScan      string `json:"nextScan,omitempty"`      // Next scheduled scan time
 	ResourceCount int    `json:"resourceCount,omitempty"` // Number of resources discovered
+}
+
+// InsightsAccountTag represents a tag on an insights account
+type InsightsAccountTag struct {
+	Name     string `json:"name"`
+	Value    string `json:"value"`
+	Created  string `json:"created,omitempty"`
+	Modified string `json:"modified,omitempty"`
+}
+
+// GetInsightsAccountTagsResponse is returned when getting tags (GET /tags)
+type GetInsightsAccountTagsResponse struct {
+	Tags map[string]*InsightsAccountTag `json:"tags"`
+}
+
+// SetInsightsAccountTagsRequest is the request body for setting tags (PUT /tags)
+type SetInsightsAccountTagsRequest struct {
+	Tags map[string]string `json:"tags"`
 }
 
 func (c *Client) CreateInsightsAccount(ctx context.Context, orgName, accountName string, req CreateInsightsAccountRequest) error {
@@ -242,4 +262,57 @@ func (c *Client) GetScanStatus(ctx context.Context, orgName, accountName string)
 	}
 
 	return &status, nil
+}
+
+// GetInsightsAccountTags retrieves the tags for an insights account
+func (c *Client) GetInsightsAccountTags(ctx context.Context, orgName, accountName string) (map[string]string, error) {
+	if len(orgName) == 0 {
+		return nil, errors.New("empty orgName")
+	}
+
+	if len(accountName) == 0 {
+		return nil, errors.New("empty accountName")
+	}
+
+	apiPath := path.Join("preview", "insights", orgName, "accounts", accountName, "tags")
+
+	var response GetInsightsAccountTagsResponse
+	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &response)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get tags for insights account %q: %w", accountName, err)
+	}
+
+	// Convert the response to a simple map[string]string
+	tags := make(map[string]string)
+	for key, tag := range response.Tags {
+		if tag != nil {
+			tags[key] = tag.Value
+		}
+	}
+
+	return tags, nil
+}
+
+// SetInsightsAccountTags sets the tags for an insights account
+func (c *Client) SetInsightsAccountTags(ctx context.Context, orgName, accountName string, tags map[string]string) error {
+	if len(orgName) == 0 {
+		return errors.New("empty orgName")
+	}
+
+	if len(accountName) == 0 {
+		return errors.New("empty accountName")
+	}
+
+	apiPath := path.Join("preview", "insights", orgName, "accounts", accountName, "tags")
+
+	req := SetInsightsAccountTagsRequest{
+		Tags: tags,
+	}
+
+	_, err := c.do(ctx, http.MethodPut, apiPath, req, nil)
+	if err != nil {
+		return fmt.Errorf("failed to set tags for insights account %q: %w", accountName, err)
+	}
+
+	return nil
 }

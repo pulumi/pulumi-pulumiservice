@@ -81,6 +81,7 @@ type InsightsAccountCore struct {
 	Environment      string                 `pulumi:"environment"`
 	ScanSchedule     ScanSchedule           `pulumi:"scanSchedule"`
 	ProviderConfig   map[string]interface{} `pulumi:"providerConfig,optional"`
+	Tags             map[string]string      `pulumi:"tags,optional"`
 }
 
 func (c *InsightsAccountCore) Annotate(a infer.Annotator) {
@@ -91,6 +92,7 @@ func (c *InsightsAccountCore) Annotate(a infer.Annotator) {
 	a.Describe(&c.ScanSchedule, "Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.")
 	a.SetDefault(&c.ScanSchedule, ScanScheduleNone)
 	a.Describe(&c.ProviderConfig, "Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {\"regions\": [\"us-west-1\", \"us-west-2\"]}.")
+	a.Describe(&c.Tags, "Key-value tags to associate with the insights account.")
 }
 
 // InsightsAccountInput represents the input properties for creating an insights account
@@ -135,6 +137,19 @@ func (*InsightsAccount) Create(ctx context.Context, req infer.CreateRequest[Insi
 	err := client.CreateInsightsAccount(ctx, req.Inputs.OrganizationName, req.Inputs.AccountName, createReq)
 	if err != nil {
 		return infer.CreateResponse[InsightsAccountState]{}, fmt.Errorf("error creating insights account '%s': %w", req.Inputs.AccountName, err)
+	}
+
+	// Set tags if provided
+	if len(req.Inputs.Tags) > 0 {
+		err = client.SetInsightsAccountTags(ctx, req.Inputs.OrganizationName, req.Inputs.AccountName, req.Inputs.Tags)
+		if err != nil {
+			return infer.CreateResponse[InsightsAccountState]{
+				ID: accountID,
+				Output: InsightsAccountState{
+					InsightsAccountCore: req.Inputs.InsightsAccountCore,
+				},
+			}, infer.ResourceInitFailedError{Reasons: []string{fmt.Sprintf("failed to set tags: %s", err.Error())}}
+		}
 	}
 
 	account, err := client.GetInsightsAccount(ctx, req.Inputs.OrganizationName, req.Inputs.AccountName)
@@ -194,6 +209,12 @@ func (*InsightsAccount) Read(ctx context.Context, req infer.ReadRequest[Insights
 		providerConfig = account.ProviderConfig
 	}
 
+	// Fetch tags from API
+	tags, err := client.GetInsightsAccountTags(ctx, orgName, accountName)
+	if err != nil {
+		return infer.ReadResponse[InsightsAccountInput, InsightsAccountState]{}, fmt.Errorf("failed to get tags for InsightsAccount (%q): %w", req.ID, err)
+	}
+
 	core := InsightsAccountCore{
 		OrganizationName: orgName,
 		AccountName:      accountName,
@@ -201,6 +222,7 @@ func (*InsightsAccount) Read(ctx context.Context, req infer.ReadRequest[Insights
 		Environment:      account.ProviderEnvRef,
 		ProviderConfig:   providerConfig,
 		ScanSchedule:     req.Inputs.ScanSchedule, // Preserve input since API doesn't return this
+		Tags:             tags,
 	}
 
 	return infer.ReadResponse[InsightsAccountInput, InsightsAccountState]{
@@ -244,6 +266,18 @@ func (*InsightsAccount) Update(ctx context.Context, req infer.UpdateRequest[Insi
 	err := client.UpdateInsightsAccount(ctx, req.State.OrganizationName, req.State.AccountName, updateReq)
 	if err != nil {
 		return infer.UpdateResponse[InsightsAccountState]{}, fmt.Errorf("error updating insights account '%s': %w", req.State.AccountName, err)
+	}
+
+	// Update tags - SetInsightsAccountTags replaces all tags, so we always call it
+	// to ensure the desired state matches (including removing tags if empty)
+	err = client.SetInsightsAccountTags(ctx, req.State.OrganizationName, req.State.AccountName, req.Inputs.Tags)
+	if err != nil {
+		return infer.UpdateResponse[InsightsAccountState]{
+			Output: InsightsAccountState{
+				InsightsAccountCore: req.Inputs.InsightsAccountCore,
+				InsightsAccountId:   req.State.InsightsAccountId,
+			},
+		}, infer.ResourceInitFailedError{Reasons: []string{fmt.Sprintf("failed to set tags: %s", err.Error())}}
 	}
 
 	account, err := client.GetInsightsAccount(ctx, req.State.OrganizationName, req.State.AccountName)

@@ -25,7 +25,8 @@ class InsightsAccountArgs:
                  organization_name: pulumi.Input[_builtins.str],
                  provider: pulumi.Input['CloudProvider'],
                  scan_schedule: Optional[pulumi.Input['ScanSchedule']] = None,
-                 provider_config: Optional[pulumi.Input[Mapping[str, Any]]] = None):
+                 provider_config: Optional[pulumi.Input[Mapping[str, Any]]] = None,
+                 tags: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None):
         """
         The set of arguments for constructing a InsightsAccount resource.
         :param pulumi.Input[_builtins.str] account_name: Name of the insights account.
@@ -34,6 +35,7 @@ class InsightsAccountArgs:
         :param pulumi.Input['CloudProvider'] provider: The cloud provider for scanning.
         :param pulumi.Input['ScanSchedule'] scan_schedule: Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
         :param pulumi.Input[Mapping[str, Any]] provider_config: Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {"regions": ["us-west-1", "us-west-2"]}.
+        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] tags: Key-value tags to associate with the insights account.
         """
         pulumi.set(__self__, "account_name", account_name)
         pulumi.set(__self__, "environment", environment)
@@ -44,6 +46,8 @@ class InsightsAccountArgs:
         pulumi.set(__self__, "scan_schedule", scan_schedule)
         if provider_config is not None:
             pulumi.set(__self__, "provider_config", provider_config)
+        if tags is not None:
+            pulumi.set(__self__, "tags", tags)
 
     @_builtins.property
     @pulumi.getter(name="accountName")
@@ -117,6 +121,18 @@ class InsightsAccountArgs:
     def provider_config(self, value: Optional[pulumi.Input[Mapping[str, Any]]]):
         pulumi.set(self, "provider_config", value)
 
+    @_builtins.property
+    @pulumi.getter
+    def tags(self) -> Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]:
+        """
+        Key-value tags to associate with the insights account.
+        """
+        return pulumi.get(self, "tags")
+
+    @tags.setter
+    def tags(self, value: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]):
+        pulumi.set(self, "tags", value)
+
 
 @pulumi.type_token("pulumiservice:index:InsightsAccount")
 class InsightsAccount(pulumi.CustomResource):
@@ -130,6 +146,7 @@ class InsightsAccount(pulumi.CustomResource):
                  provider: Optional[pulumi.Input['CloudProvider']] = None,
                  provider_config: Optional[pulumi.Input[Mapping[str, Any]]] = None,
                  scan_schedule: Optional[pulumi.Input['ScanSchedule']] = None,
+                 tags: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
                  __props__=None):
         """
         Insights Account for cloud resource scanning and analysis across AWS, Azure, and GCP.
@@ -142,6 +159,7 @@ class InsightsAccount(pulumi.CustomResource):
         :param pulumi.Input['CloudProvider'] provider: The cloud provider for scanning.
         :param pulumi.Input[Mapping[str, Any]] provider_config: Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {"regions": ["us-west-1", "us-west-2"]}.
         :param pulumi.Input['ScanSchedule'] scan_schedule: Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
+        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] tags: Key-value tags to associate with the insights account.
         """
         ...
     @overload
@@ -173,6 +191,7 @@ class InsightsAccount(pulumi.CustomResource):
                  provider: Optional[pulumi.Input['CloudProvider']] = None,
                  provider_config: Optional[pulumi.Input[Mapping[str, Any]]] = None,
                  scan_schedule: Optional[pulumi.Input['ScanSchedule']] = None,
+                 tags: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
@@ -200,6 +219,7 @@ class InsightsAccount(pulumi.CustomResource):
             if scan_schedule is None and not opts.urn:
                 raise TypeError("Missing required property 'scan_schedule'")
             __props__.__dict__["scan_schedule"] = scan_schedule
+            __props__.__dict__["tags"] = tags
             __props__.__dict__["insights_account_id"] = None
             __props__.__dict__["scheduled_scan_enabled"] = None
         replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["accountName", "organizationName", "provider"])
@@ -234,6 +254,7 @@ class InsightsAccount(pulumi.CustomResource):
         __props__.__dict__["provider_config"] = None
         __props__.__dict__["scan_schedule"] = None
         __props__.__dict__["scheduled_scan_enabled"] = None
+        __props__.__dict__["tags"] = None
         return InsightsAccount(resource_name, opts=opts, __props__=__props__)
 
     @_builtins.property
@@ -299,4 +320,12 @@ class InsightsAccount(pulumi.CustomResource):
         Whether scheduled scanning is enabled.
         """
         return pulumi.get(self, "scheduled_scan_enabled")
+
+    @_builtins.property
+    @pulumi.getter
+    def tags(self) -> pulumi.Output[Optional[Mapping[str, _builtins.str]]]:
+        """
+        Key-value tags to associate with the insights account.
+        """
+        return pulumi.get(self, "tags")
 

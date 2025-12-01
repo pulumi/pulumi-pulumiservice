@@ -11,14 +11,17 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 type InsightsAccountClientMock struct {
 	config.Client
-	getInsightsAccountFunc    func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error)
-	createInsightsAccountFunc func(ctx context.Context, orgName string, accountName string, req pulumiapi.CreateInsightsAccountRequest) error
-	updateInsightsAccountFunc func(ctx context.Context, orgName string, accountName string, req pulumiapi.UpdateInsightsAccountRequest) error
-	deleteInsightsAccountFunc func(ctx context.Context, orgName string, accountName string) error
+	getInsightsAccountFunc     func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error)
+	createInsightsAccountFunc  func(ctx context.Context, orgName string, accountName string, req pulumiapi.CreateInsightsAccountRequest) error
+	updateInsightsAccountFunc  func(ctx context.Context, orgName string, accountName string, req pulumiapi.UpdateInsightsAccountRequest) error
+	deleteInsightsAccountFunc  func(ctx context.Context, orgName string, accountName string) error
+	getInsightsAccountTagsFunc func(ctx context.Context, orgName string, accountName string) (map[string]string, error)
+	setInsightsAccountTagsFunc func(ctx context.Context, orgName string, accountName string, tags map[string]string) error
 }
 
 func (c *InsightsAccountClientMock) GetInsightsAccount(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
@@ -68,8 +71,24 @@ func (c *InsightsAccountClientMock) GetScanStatus(ctx context.Context, orgName s
 	}, nil
 }
 
+func (c *InsightsAccountClientMock) GetInsightsAccountTags(ctx context.Context, orgName string, accountName string) (map[string]string, error) {
+	if c.getInsightsAccountTagsFunc == nil {
+		return map[string]string{}, nil
+	}
+	return c.getInsightsAccountTagsFunc(ctx, orgName, accountName)
+}
+
+func (c *InsightsAccountClientMock) SetInsightsAccountTags(ctx context.Context, orgName string, accountName string, tags map[string]string) error {
+	if c.setInsightsAccountTagsFunc == nil {
+		return nil
+	}
+	return c.setInsightsAccountTagsFunc(ctx, orgName, accountName, tags)
+}
+
 func TestInsightsAccount(t *testing.T) {
+	t.Parallel()
 	t.Run("Read when the resource is not found", func(t *testing.T) {
+		t.Parallel()
 		mockedClient := &InsightsAccountClientMock{
 			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
 				return nil, nil
@@ -105,13 +124,12 @@ func TestInsightsAccount(t *testing.T) {
 
 		resp, err := ia.Read(ctx, req)
 
-		assert.NoError(t, err)
-		assert.Equal(t, "", resp.ID)
-		assert.Equal(t, InsightsAccountInput{}, resp.Inputs)
-		assert.Equal(t, InsightsAccountState{}, resp.State)
+		require.NoError(t, err)
+		assert.Equal(t, infer.ReadResponse[InsightsAccountInput, InsightsAccountState]{}, resp)
 	})
 
 	t.Run("Read when the resource is found", func(t *testing.T) {
+		t.Parallel()
 		mockedClient := &InsightsAccountClientMock{
 			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
 				return &pulumiapi.InsightsAccount{
@@ -155,19 +173,31 @@ func TestInsightsAccount(t *testing.T) {
 
 		resp, err := ia.Read(ctx, req)
 
-		assert.NoError(t, err)
-		assert.Equal(t, "test-org/test-account", resp.ID)
-		assert.Equal(t, "test-org", resp.Inputs.OrganizationName)
-		assert.Equal(t, "test-account", resp.Inputs.AccountName)
-		assert.Equal(t, CloudProviderAWS, resp.Inputs.Provider)
-		assert.Equal(t, "test-env", resp.Inputs.Environment)
-		assert.Equal(t, ScanScheduleDaily, resp.Inputs.ScanSchedule)
-		assert.Equal(t, "test-account-id", resp.State.InsightsAccountId)
-		assert.Equal(t, true, resp.State.ScheduledScanEnabled)
-		assert.Equal(t, "us-west-2", resp.State.ProviderConfig["region"])
+		require.NoError(t, err)
+		expectedCore := InsightsAccountCore{
+			OrganizationName: "test-org",
+			AccountName:      "test-account",
+			Provider:         CloudProviderAWS,
+			Environment:      "test-env",
+			ScanSchedule:     ScanScheduleDaily,
+			ProviderConfig: map[string]interface{}{
+				"region": "us-west-2",
+			},
+			Tags: map[string]string{},
+		}
+		assert.Equal(t, infer.ReadResponse[InsightsAccountInput, InsightsAccountState]{
+			ID:     "test-org/test-account",
+			Inputs: InsightsAccountInput{InsightsAccountCore: expectedCore},
+			State: InsightsAccountState{
+				InsightsAccountCore:  expectedCore,
+				InsightsAccountId:    "test-account-id",
+				ScheduledScanEnabled: true,
+			},
+		}, resp)
 	})
 
 	t.Run("Read preserves nil providerConfig when API returns empty map", func(t *testing.T) {
+		t.Parallel()
 		// This test ensures we don't get spurious diffs during refresh
 		// when providerConfig was not specified initially
 		mockedClient := &InsightsAccountClientMock{
@@ -194,7 +224,6 @@ func TestInsightsAccount(t *testing.T) {
 					AccountName:      "test-account",
 					Provider:         CloudProviderAWS,
 					Environment:      "test-env",
-					// providerConfig is nil - not specified
 				},
 			},
 			State: InsightsAccountState{
@@ -203,7 +232,6 @@ func TestInsightsAccount(t *testing.T) {
 					AccountName:      "test-account",
 					Provider:         CloudProviderAWS,
 					Environment:      "test-env",
-					// providerConfig is nil
 				},
 				InsightsAccountId: "test-account-id",
 			},
@@ -211,12 +239,13 @@ func TestInsightsAccount(t *testing.T) {
 
 		resp, err := ia.Read(ctx, req)
 
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.Nil(t, resp.Inputs.ProviderConfig, "providerConfig should remain nil when input was nil and API returned empty map")
 		assert.Nil(t, resp.State.ProviderConfig, "providerConfig should remain nil in state too")
 	})
 
 	t.Run("Create with DryRun", func(t *testing.T) {
+		t.Parallel()
 		mockedClient := &InsightsAccountClientMock{}
 		ctx := config.WithMockClient(context.Background(), mockedClient)
 
@@ -240,15 +269,19 @@ func TestInsightsAccount(t *testing.T) {
 
 		resp, err := ia.Create(ctx, req)
 
-		assert.NoError(t, err)
-		assert.Equal(t, "test-org/test-account", resp.ID)
-		assert.Equal(t, "", resp.Output.InsightsAccountId)
-		assert.Equal(t, true, resp.Output.ScheduledScanEnabled)
-		assert.Equal(t, "test-org", resp.Output.OrganizationName)
-		assert.Equal(t, "test-account", resp.Output.AccountName)
+		require.NoError(t, err)
+		assert.Equal(t, infer.CreateResponse[InsightsAccountState]{
+			ID: "test-org/test-account",
+			Output: InsightsAccountState{
+				InsightsAccountCore:  req.Inputs.InsightsAccountCore,
+				InsightsAccountId:    "",
+				ScheduledScanEnabled: true,
+			},
+		}, resp)
 	})
 
 	t.Run("Create successfully", func(t *testing.T) {
+		t.Parallel()
 		var capturedRequest pulumiapi.CreateInsightsAccountRequest
 		mockedClient := &InsightsAccountClientMock{
 			createInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.CreateInsightsAccountRequest) error {
@@ -290,7 +323,7 @@ func TestInsightsAccount(t *testing.T) {
 
 		resp, err := ia.Create(ctx, req)
 
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.Equal(t, "test-org/test-account", resp.ID)
 		assert.Equal(t, "account-id-123", resp.Output.InsightsAccountId)
 		assert.Equal(t, true, resp.Output.ScheduledScanEnabled)
@@ -300,6 +333,7 @@ func TestInsightsAccount(t *testing.T) {
 	})
 
 	t.Run("Create with scanSchedule none", func(t *testing.T) {
+		t.Parallel()
 		var capturedRequest pulumiapi.CreateInsightsAccountRequest
 		mockedClient := &InsightsAccountClientMock{
 			createInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.CreateInsightsAccountRequest) error {
@@ -335,12 +369,13 @@ func TestInsightsAccount(t *testing.T) {
 
 		resp, err := ia.Create(ctx, req)
 
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.Equal(t, "none", capturedRequest.ScanSchedule)
 		assert.Equal(t, false, resp.Output.ScheduledScanEnabled)
 	})
 
 	t.Run("Create fails with API error", func(t *testing.T) {
+		t.Parallel()
 		mockedClient := &InsightsAccountClientMock{
 			createInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.CreateInsightsAccountRequest) error {
 				return fmt.Errorf("API error: invalid environment reference")
@@ -370,6 +405,7 @@ func TestInsightsAccount(t *testing.T) {
 	})
 
 	t.Run("Create succeeds but GET fails after creation", func(t *testing.T) {
+		t.Parallel()
 		mockedClient := &InsightsAccountClientMock{
 			createInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.CreateInsightsAccountRequest) error {
 				return nil
@@ -405,6 +441,7 @@ func TestInsightsAccount(t *testing.T) {
 	})
 
 	t.Run("Create succeeds but account not found after creation", func(t *testing.T) {
+		t.Parallel()
 		mockedClient := &InsightsAccountClientMock{
 			createInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.CreateInsightsAccountRequest) error {
 				return nil
@@ -440,6 +477,7 @@ func TestInsightsAccount(t *testing.T) {
 	})
 
 	t.Run("Update with DryRun", func(t *testing.T) {
+		t.Parallel()
 		mockedClient := &InsightsAccountClientMock{}
 		ctx := config.WithMockClient(context.Background(), mockedClient)
 
@@ -472,13 +510,18 @@ func TestInsightsAccount(t *testing.T) {
 
 		resp, err := ia.Update(ctx, req)
 
-		assert.NoError(t, err)
-		assert.Equal(t, "updated-env", resp.Output.Environment)
-		assert.Equal(t, "account-id-123", resp.Output.InsightsAccountId)
-		assert.Equal(t, true, resp.Output.ScheduledScanEnabled) // State value preserved in DryRun
+		require.NoError(t, err)
+		assert.Equal(t, infer.UpdateResponse[InsightsAccountState]{
+			Output: InsightsAccountState{
+				InsightsAccountCore:  req.Inputs.InsightsAccountCore,
+				InsightsAccountId:    "account-id-123",
+				ScheduledScanEnabled: true, // State value preserved in DryRun
+			},
+		}, resp)
 	})
 
 	t.Run("Update successfully", func(t *testing.T) {
+		t.Parallel()
 		var capturedRequest pulumiapi.UpdateInsightsAccountRequest
 		mockedClient := &InsightsAccountClientMock{
 			updateInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.UpdateInsightsAccountRequest) error {
@@ -526,13 +569,14 @@ func TestInsightsAccount(t *testing.T) {
 
 		resp, err := ia.Update(ctx, req)
 
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.Equal(t, "updated-env", capturedRequest.Environment)
 		assert.Equal(t, "none", capturedRequest.ScanSchedule)
 		assert.Equal(t, false, resp.Output.ScheduledScanEnabled)
 	})
 
 	t.Run("Update fails with API error", func(t *testing.T) {
+		t.Parallel()
 		mockedClient := &InsightsAccountClientMock{
 			updateInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.UpdateInsightsAccountRequest) error {
 				return fmt.Errorf("API error: environment not found")
@@ -573,6 +617,7 @@ func TestInsightsAccount(t *testing.T) {
 	})
 
 	t.Run("Update succeeds but GET fails after update", func(t *testing.T) {
+		t.Parallel()
 		mockedClient := &InsightsAccountClientMock{
 			updateInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.UpdateInsightsAccountRequest) error {
 				return nil
@@ -618,6 +663,7 @@ func TestInsightsAccount(t *testing.T) {
 	})
 
 	t.Run("Update succeeds but account not found after update", func(t *testing.T) {
+		t.Parallel()
 		mockedClient := &InsightsAccountClientMock{
 			updateInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.UpdateInsightsAccountRequest) error {
 				return nil
@@ -663,6 +709,7 @@ func TestInsightsAccount(t *testing.T) {
 	})
 
 	t.Run("Delete successfully", func(t *testing.T) {
+		t.Parallel()
 		deleteCalled := false
 		mockedClient := &InsightsAccountClientMock{
 			deleteInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) error {
@@ -691,8 +738,404 @@ func TestInsightsAccount(t *testing.T) {
 
 		_, err := ia.Delete(ctx, req)
 
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.True(t, deleteCalled)
+	})
+
+	t.Run("Read returns tags from API", func(t *testing.T) {
+		t.Parallel()
+		expectedTags := map[string]string{
+			"environment": "production",
+			"team":        "platform",
+		}
+		mockedClient := &InsightsAccountClientMock{
+			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+				return &pulumiapi.InsightsAccount{
+					ID:                   "test-account-id",
+					Name:                 "test-account",
+					Provider:             "aws",
+					ProviderEnvRef:       "test-env",
+					ScheduledScanEnabled: true,
+				}, nil
+			},
+			getInsightsAccountTagsFunc: func(ctx context.Context, orgName string, accountName string) (map[string]string, error) {
+				return expectedTags, nil
+			},
+		}
+
+		ctx := config.WithMockClient(context.Background(), mockedClient)
+
+		ia := &InsightsAccount{}
+		req := infer.ReadRequest[InsightsAccountInput, InsightsAccountState]{
+			ID: "test-org/test-account",
+			Inputs: InsightsAccountInput{
+				InsightsAccountCore: InsightsAccountCore{
+					OrganizationName: "test-org",
+					AccountName:      "test-account",
+					Provider:         CloudProviderAWS,
+					Environment:      "test-env",
+					ScanSchedule:     ScanScheduleDaily,
+				},
+			},
+			State: InsightsAccountState{
+				InsightsAccountCore: InsightsAccountCore{
+					OrganizationName: "test-org",
+					AccountName:      "test-account",
+					Provider:         CloudProviderAWS,
+					Environment:      "test-env",
+					ScanSchedule:     ScanScheduleDaily,
+				},
+			},
+		}
+
+		resp, err := ia.Read(ctx, req)
+
+		require.NoError(t, err)
+		assert.Equal(t, expectedTags, resp.State.Tags)
+		assert.Equal(t, expectedTags, resp.Inputs.Tags)
+	})
+
+	t.Run("Read fails when GetInsightsAccountTags fails", func(t *testing.T) {
+		t.Parallel()
+		mockedClient := &InsightsAccountClientMock{
+			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+				return &pulumiapi.InsightsAccount{
+					ID:                   "test-account-id",
+					Name:                 "test-account",
+					Provider:             "aws",
+					ProviderEnvRef:       "test-env",
+					ScheduledScanEnabled: true,
+				}, nil
+			},
+			getInsightsAccountTagsFunc: func(ctx context.Context, orgName string, accountName string) (map[string]string, error) {
+				return nil, fmt.Errorf("API error: failed to fetch tags")
+			},
+		}
+
+		ctx := config.WithMockClient(context.Background(), mockedClient)
+
+		ia := &InsightsAccount{}
+		req := infer.ReadRequest[InsightsAccountInput, InsightsAccountState]{
+			ID: "test-org/test-account",
+			Inputs: InsightsAccountInput{
+				InsightsAccountCore: InsightsAccountCore{
+					OrganizationName: "test-org",
+					AccountName:      "test-account",
+					Provider:         CloudProviderAWS,
+					Environment:      "test-env",
+				},
+			},
+			State: InsightsAccountState{},
+		}
+
+		_, err := ia.Read(ctx, req)
+
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "failed to get tags for InsightsAccount")
+	})
+
+	t.Run("Create without tags does not call SetInsightsAccountTags", func(t *testing.T) {
+		t.Parallel()
+		setTagsCalled := false
+		mockedClient := &InsightsAccountClientMock{
+			createInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.CreateInsightsAccountRequest) error {
+				return nil
+			},
+			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+				return &pulumiapi.InsightsAccount{
+					ID:                   "account-id-123",
+					Name:                 accountName,
+					Provider:             "aws",
+					ProviderEnvRef:       "test-env",
+					ScheduledScanEnabled: true,
+				}, nil
+			},
+			setInsightsAccountTagsFunc: func(ctx context.Context, orgName string, accountName string, tags map[string]string) error {
+				setTagsCalled = true
+				return nil
+			},
+		}
+		ctx := config.WithMockClient(context.Background(), mockedClient)
+
+		ia := &InsightsAccount{}
+		req := infer.CreateRequest[InsightsAccountInput]{
+			DryRun: false,
+			Inputs: InsightsAccountInput{
+				InsightsAccountCore: InsightsAccountCore{
+					OrganizationName: "test-org",
+					AccountName:      "test-account",
+					Provider:         CloudProviderAWS,
+					Environment:      "test-env",
+					ScanSchedule:     ScanScheduleDaily,
+				},
+			},
+		}
+
+		resp, err := ia.Create(ctx, req)
+
+		require.NoError(t, err)
+		assert.False(t, setTagsCalled, "SetInsightsAccountTags should not be called when Tags is nil/empty")
+		assert.Equal(t, "account-id-123", resp.Output.InsightsAccountId)
+	})
+
+	t.Run("Create with tags", func(t *testing.T) {
+		t.Parallel()
+		expectedTags := map[string]string{
+			"environment": "staging",
+			"cost-center": "engineering",
+		}
+		var capturedTags map[string]string
+		mockedClient := &InsightsAccountClientMock{
+			createInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.CreateInsightsAccountRequest) error {
+				return nil
+			},
+			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+				return &pulumiapi.InsightsAccount{
+					ID:                   "account-id-123",
+					Name:                 accountName,
+					Provider:             "aws",
+					ProviderEnvRef:       "test-env",
+					ScheduledScanEnabled: true,
+				}, nil
+			},
+			setInsightsAccountTagsFunc: func(ctx context.Context, orgName string, accountName string, tags map[string]string) error {
+				capturedTags = tags
+				return nil
+			},
+		}
+		ctx := config.WithMockClient(context.Background(), mockedClient)
+
+		ia := &InsightsAccount{}
+		req := infer.CreateRequest[InsightsAccountInput]{
+			DryRun: false,
+			Inputs: InsightsAccountInput{
+				InsightsAccountCore: InsightsAccountCore{
+					OrganizationName: "test-org",
+					AccountName:      "test-account",
+					Provider:         CloudProviderAWS,
+					Environment:      "test-env",
+					ScanSchedule:     ScanScheduleDaily,
+					Tags:             expectedTags,
+				},
+			},
+		}
+
+		resp, err := ia.Create(ctx, req)
+
+		require.NoError(t, err)
+		assert.Equal(t, expectedTags, capturedTags)
+		assert.Equal(t, expectedTags, resp.Output.Tags)
+	})
+
+	t.Run("Create fails when SetInsightsAccountTags fails", func(t *testing.T) {
+		t.Parallel()
+		mockedClient := &InsightsAccountClientMock{
+			createInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.CreateInsightsAccountRequest) error {
+				return nil
+			},
+			setInsightsAccountTagsFunc: func(ctx context.Context, orgName string, accountName string, tags map[string]string) error {
+				return fmt.Errorf("API error: failed to set tags")
+			},
+		}
+		ctx := config.WithMockClient(context.Background(), mockedClient)
+
+		ia := &InsightsAccount{}
+		req := infer.CreateRequest[InsightsAccountInput]{
+			DryRun: false,
+			Inputs: InsightsAccountInput{
+				InsightsAccountCore: InsightsAccountCore{
+					OrganizationName: "test-org",
+					AccountName:      "test-account",
+					Provider:         CloudProviderAWS,
+					Environment:      "test-env",
+					ScanSchedule:     ScanScheduleDaily,
+					Tags: map[string]string{
+						"environment": "staging",
+					},
+				},
+			},
+		}
+
+		resp, err := ia.Create(ctx, req)
+
+		assert.Error(t, err)
+		var initErr infer.ResourceInitFailedError
+		assert.ErrorAs(t, err, &initErr)
+		assert.Contains(t, initErr.Reasons[0], "failed to set tags")
+		assert.Equal(t, "test-org/test-account", resp.ID)
+	})
+
+	t.Run("Update with empty tags calls SetInsightsAccountTags to clear them", func(t *testing.T) {
+		t.Parallel()
+		var capturedTags map[string]string
+		setTagsCalled := false
+		mockedClient := &InsightsAccountClientMock{
+			updateInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.UpdateInsightsAccountRequest) error {
+				return nil
+			},
+			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+				return &pulumiapi.InsightsAccount{
+					ID:                   "account-id-123",
+					Name:                 accountName,
+					Provider:             "aws",
+					ProviderEnvRef:       "updated-env",
+					ScheduledScanEnabled: true,
+				}, nil
+			},
+			setInsightsAccountTagsFunc: func(ctx context.Context, orgName string, accountName string, tags map[string]string) error {
+				setTagsCalled = true
+				capturedTags = tags
+				return nil
+			},
+		}
+		ctx := config.WithMockClient(context.Background(), mockedClient)
+
+		ia := &InsightsAccount{}
+		req := infer.UpdateRequest[InsightsAccountInput, InsightsAccountState]{
+			DryRun: false,
+			Inputs: InsightsAccountInput{
+				InsightsAccountCore: InsightsAccountCore{
+					OrganizationName: "test-org",
+					AccountName:      "test-account",
+					Provider:         CloudProviderAWS,
+					Environment:      "updated-env",
+					ScanSchedule:     ScanScheduleDaily,
+				},
+			},
+			State: InsightsAccountState{
+				InsightsAccountCore: InsightsAccountCore{
+					OrganizationName: "test-org",
+					AccountName:      "test-account",
+					Provider:         CloudProviderAWS,
+					Environment:      "old-env",
+					ScanSchedule:     ScanScheduleDaily,
+					Tags: map[string]string{
+						"environment": "staging",
+					},
+				},
+				InsightsAccountId:    "account-id-123",
+				ScheduledScanEnabled: true,
+			},
+		}
+
+		resp, err := ia.Update(ctx, req)
+
+		require.NoError(t, err)
+		assert.True(t, setTagsCalled, "SetInsightsAccountTags should be called even when Tags is nil/empty")
+		assert.Nil(t, capturedTags, "Tags should be nil when clearing")
+		assert.Nil(t, resp.Output.Tags)
+	})
+
+	t.Run("Update with tags", func(t *testing.T) {
+		t.Parallel()
+		expectedTags := map[string]string{
+			"environment": "production",
+			"team":        "platform",
+		}
+		var capturedTags map[string]string
+		mockedClient := &InsightsAccountClientMock{
+			updateInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.UpdateInsightsAccountRequest) error {
+				return nil
+			},
+			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+				return &pulumiapi.InsightsAccount{
+					ID:                   "account-id-123",
+					Name:                 accountName,
+					Provider:             "aws",
+					ProviderEnvRef:       "updated-env",
+					ScheduledScanEnabled: true,
+				}, nil
+			},
+			setInsightsAccountTagsFunc: func(ctx context.Context, orgName string, accountName string, tags map[string]string) error {
+				capturedTags = tags
+				return nil
+			},
+		}
+		ctx := config.WithMockClient(context.Background(), mockedClient)
+
+		ia := &InsightsAccount{}
+		req := infer.UpdateRequest[InsightsAccountInput, InsightsAccountState]{
+			DryRun: false,
+			Inputs: InsightsAccountInput{
+				InsightsAccountCore: InsightsAccountCore{
+					OrganizationName: "test-org",
+					AccountName:      "test-account",
+					Provider:         CloudProviderAWS,
+					Environment:      "updated-env",
+					ScanSchedule:     ScanScheduleDaily,
+					Tags:             expectedTags,
+				},
+			},
+			State: InsightsAccountState{
+				InsightsAccountCore: InsightsAccountCore{
+					OrganizationName: "test-org",
+					AccountName:      "test-account",
+					Provider:         CloudProviderAWS,
+					Environment:      "old-env",
+					ScanSchedule:     ScanScheduleDaily,
+					Tags: map[string]string{
+						"environment": "staging",
+					},
+				},
+				InsightsAccountId:    "account-id-123",
+				ScheduledScanEnabled: true,
+			},
+		}
+
+		resp, err := ia.Update(ctx, req)
+
+		require.NoError(t, err)
+		assert.Equal(t, expectedTags, capturedTags)
+		assert.Equal(t, expectedTags, resp.Output.Tags)
+	})
+
+	t.Run("Update fails when SetInsightsAccountTags fails", func(t *testing.T) {
+		t.Parallel()
+		mockedClient := &InsightsAccountClientMock{
+			updateInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.UpdateInsightsAccountRequest) error {
+				return nil
+			},
+			setInsightsAccountTagsFunc: func(ctx context.Context, orgName string, accountName string, tags map[string]string) error {
+				return fmt.Errorf("API error: failed to set tags")
+			},
+		}
+		ctx := config.WithMockClient(context.Background(), mockedClient)
+
+		ia := &InsightsAccount{}
+		req := infer.UpdateRequest[InsightsAccountInput, InsightsAccountState]{
+			DryRun: false,
+			Inputs: InsightsAccountInput{
+				InsightsAccountCore: InsightsAccountCore{
+					OrganizationName: "test-org",
+					AccountName:      "test-account",
+					Provider:         CloudProviderAWS,
+					Environment:      "updated-env",
+					ScanSchedule:     ScanScheduleDaily,
+					Tags: map[string]string{
+						"environment": "production",
+					},
+				},
+			},
+			State: InsightsAccountState{
+				InsightsAccountCore: InsightsAccountCore{
+					OrganizationName: "test-org",
+					AccountName:      "test-account",
+					Provider:         CloudProviderAWS,
+					Environment:      "old-env",
+					ScanSchedule:     ScanScheduleDaily,
+				},
+				InsightsAccountId:    "account-id-123",
+				ScheduledScanEnabled: true,
+			},
+		}
+
+		resp, err := ia.Update(ctx, req)
+
+		assert.Error(t, err)
+		var initErr infer.ResourceInitFailedError
+		assert.ErrorAs(t, err, &initErr)
+		assert.Contains(t, initErr.Reasons[0], "failed to set tags")
+		assert.Equal(t, "account-id-123", resp.Output.InsightsAccountId)
 	})
 
 }

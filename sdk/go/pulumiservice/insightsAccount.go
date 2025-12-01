@@ -32,6 +32,8 @@ type InsightsAccount struct {
 	ScanSchedule ScanScheduleOutput `pulumi:"scanSchedule"`
 	// Whether scheduled scanning is enabled.
 	ScheduledScanEnabled pulumi.BoolOutput `pulumi:"scheduledScanEnabled"`
+	// Key-value tags to associate with the insights account.
+	Tags pulumi.StringMapOutput `pulumi:"tags"`
 }
 
 // NewInsightsAccount registers a new resource with the given unique name, arguments, and options.
@@ -107,6 +109,8 @@ type insightsAccountArgs struct {
 	ProviderConfig map[string]interface{} `pulumi:"providerConfig"`
 	// Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
 	ScanSchedule ScanSchedule `pulumi:"scanSchedule"`
+	// Key-value tags to associate with the insights account.
+	Tags map[string]string `pulumi:"tags"`
 }
 
 // The set of arguments for constructing a InsightsAccount resource.
@@ -123,6 +127,8 @@ type InsightsAccountArgs struct {
 	ProviderConfig pulumi.MapInput
 	// Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
 	ScanSchedule ScanScheduleInput
+	// Key-value tags to associate with the insights account.
+	Tags pulumi.StringMapInput
 }
 
 func (InsightsAccountArgs) ElementType() reflect.Type {
@@ -250,6 +256,11 @@ func (o InsightsAccountOutput) ScanSchedule() ScanScheduleOutput {
 // Whether scheduled scanning is enabled.
 func (o InsightsAccountOutput) ScheduledScanEnabled() pulumi.BoolOutput {
 	return o.ApplyT(func(v *InsightsAccount) pulumi.BoolOutput { return v.ScheduledScanEnabled }).(pulumi.BoolOutput)
+}
+
+// Key-value tags to associate with the insights account.
+func (o InsightsAccountOutput) Tags() pulumi.StringMapOutput {
+	return o.ApplyT(func(v *InsightsAccount) pulumi.StringMapOutput { return v.Tags }).(pulumi.StringMapOutput)
 }
 
 type InsightsAccountArrayOutput struct{ *pulumi.OutputState }

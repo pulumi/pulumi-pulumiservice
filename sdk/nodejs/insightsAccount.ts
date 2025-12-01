@@ -69,6 +69,10 @@ export class InsightsAccount extends pulumi.CustomResource {
      * Whether scheduled scanning is enabled.
      */
     declare public /*out*/ readonly scheduledScanEnabled: pulumi.Output<boolean>;
+    /**
+     * Key-value tags to associate with the insights account.
+     */
+    declare public readonly tags: pulumi.Output<{[key: string]: string} | undefined>;
 
     /**
      * Create a InsightsAccount resource with the given unique name, arguments, and options.
@@ -102,6 +106,7 @@ export class InsightsAccount extends pulumi.CustomResource {
             resourceInputs["provider"] = args?.provider;
             resourceInputs["providerConfig"] = args?.providerConfig;
             resourceInputs["scanSchedule"] = (args?.scanSchedule) ?? "none";
+            resourceInputs["tags"] = args?.tags;
             resourceInputs["insightsAccountId"] = undefined /*out*/;
             resourceInputs["scheduledScanEnabled"] = undefined /*out*/;
         } else {
@@ -113,6 +118,7 @@ export class InsightsAccount extends pulumi.CustomResource {
             resourceInputs["providerConfig"] = undefined /*out*/;
             resourceInputs["scanSchedule"] = undefined /*out*/;
             resourceInputs["scheduledScanEnabled"] = undefined /*out*/;
+            resourceInputs["tags"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         const replaceOnChanges = { replaceOnChanges: ["accountName", "organizationName", "provider"] };
@@ -149,4 +155,8 @@ export interface InsightsAccountArgs {
      * Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
      */
     scanSchedule: pulumi.Input<enums.ScanSchedule>;
+    /**
+     * Key-value tags to associate with the insights account.
+     */
+    tags?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
 }

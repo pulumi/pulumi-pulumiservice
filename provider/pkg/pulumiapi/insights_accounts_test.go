@@ -113,8 +113,7 @@ func TestGetInsightsAccount(t *testing.T) {
 			},
 		})
 
-		account, err := c.GetInsightsAccount(t.Context(), orgName, accountName)
-		assert.Nil(t, account)
+		_, err := c.GetInsightsAccount(t.Context(), orgName, accountName)
 		assert.EqualError(t, err, `failed to get insights account: 500 API error: internal server error`)
 	})
 }
@@ -363,8 +362,211 @@ func TestGetScanStatus(t *testing.T) {
 			},
 		})
 
-		result, err := c.GetScanStatus(t.Context(), orgName, accountName)
-		assert.Nil(t, result)
+		_, err := c.GetScanStatus(t.Context(), orgName, accountName)
 		assert.EqualError(t, err, `failed to get scan status for insights account "test-account": 500 API error: internal server error`)
+	})
+}
+
+func TestGetInsightsAccountTags(t *testing.T) {
+	orgName := "test-org"
+	accountName := "test-account"
+
+	t.Run("Empty OrgName", func(t *testing.T) {
+		c := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodGet,
+			ExpectedReqPath:   "/api/preview/insights//accounts/test-account/tags",
+			ResponseCode:      200,
+		})
+
+		tags, err := c.GetInsightsAccountTags(t.Context(), "", accountName)
+		assert.Nil(t, tags)
+		assert.EqualError(t, err, "empty orgName")
+	})
+
+	t.Run("Empty AccountName", func(t *testing.T) {
+		c := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodGet,
+			ExpectedReqPath:   "/api/preview/insights/test-org/accounts//tags",
+			ResponseCode:      200,
+		})
+
+		tags, err := c.GetInsightsAccountTags(t.Context(), orgName, "")
+		assert.Nil(t, tags)
+		assert.EqualError(t, err, "empty accountName")
+	})
+
+	t.Run("Happy Path", func(t *testing.T) {
+		resp := GetInsightsAccountTagsResponse{
+			Tags: map[string]*InsightsAccountTag{
+				"environment": {
+					Name:     "environment",
+					Value:    "production",
+					Created:  "2025-01-01T00:00:00Z",
+					Modified: "2025-01-02T00:00:00Z",
+				},
+				"team": {
+					Name:     "team",
+					Value:    "platform",
+					Created:  "2025-01-01T00:00:00Z",
+					Modified: "2025-01-01T00:00:00Z",
+				},
+			},
+		}
+
+		c := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodGet,
+			ExpectedReqPath:   fmt.Sprintf("/api/preview/insights/%s/accounts/%s/tags", orgName, accountName),
+			ResponseCode:      200,
+			ResponseBody:      resp,
+		})
+
+		tags, err := c.GetInsightsAccountTags(t.Context(), orgName, accountName)
+		assert.NoError(t, err)
+		assert.Equal(t, map[string]string{
+			"environment": "production",
+			"team":        "platform",
+		}, tags)
+	})
+
+	t.Run("Empty Tags", func(t *testing.T) {
+		resp := GetInsightsAccountTagsResponse{
+			Tags: map[string]*InsightsAccountTag{},
+		}
+
+		c := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodGet,
+			ExpectedReqPath:   fmt.Sprintf("/api/preview/insights/%s/accounts/%s/tags", orgName, accountName),
+			ResponseCode:      200,
+			ResponseBody:      resp,
+		})
+
+		tags, err := c.GetInsightsAccountTags(t.Context(), orgName, accountName)
+		assert.NoError(t, err)
+		assert.Equal(t, map[string]string{}, tags)
+	})
+
+	t.Run("Nil Tag Value Skipped", func(t *testing.T) {
+		resp := GetInsightsAccountTagsResponse{
+			Tags: map[string]*InsightsAccountTag{
+				"valid-tag": {
+					Name:  "valid-tag",
+					Value: "value",
+				},
+				"nil-tag": nil, // This should be skipped
+			},
+		}
+
+		c := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodGet,
+			ExpectedReqPath:   fmt.Sprintf("/api/preview/insights/%s/accounts/%s/tags", orgName, accountName),
+			ResponseCode:      200,
+			ResponseBody:      resp,
+		})
+
+		tags, err := c.GetInsightsAccountTags(t.Context(), orgName, accountName)
+		assert.NoError(t, err)
+		assert.Equal(t, map[string]string{
+			"valid-tag": "value",
+		}, tags)
+		assert.NotContains(t, tags, "nil-tag")
+	})
+
+	t.Run("Error", func(t *testing.T) {
+		c := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodGet,
+			ExpectedReqPath:   fmt.Sprintf("/api/preview/insights/%s/accounts/%s/tags", orgName, accountName),
+			ResponseCode:      500,
+			ResponseBody: ErrorResponse{
+				StatusCode: 500,
+				Message:    "internal server error",
+			},
+		})
+
+		_, err := c.GetInsightsAccountTags(t.Context(), orgName, accountName)
+		assert.EqualError(t, err, `failed to get tags for insights account "test-account": 500 API error: internal server error`)
+	})
+}
+
+func TestSetInsightsAccountTags(t *testing.T) {
+	orgName := "test-org"
+	accountName := "test-account"
+
+	t.Run("Empty OrgName", func(t *testing.T) {
+		c := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodPut,
+			ExpectedReqPath:   "/api/preview/insights//accounts/test-account/tags",
+			ResponseCode:      200,
+		})
+
+		err := c.SetInsightsAccountTags(t.Context(), "", accountName, map[string]string{"key": "value"})
+		assert.EqualError(t, err, "empty orgName")
+	})
+
+	t.Run("Empty AccountName", func(t *testing.T) {
+		c := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodPut,
+			ExpectedReqPath:   "/api/preview/insights/test-org/accounts//tags",
+			ResponseCode:      200,
+		})
+
+		err := c.SetInsightsAccountTags(t.Context(), orgName, "", map[string]string{"key": "value"})
+		assert.EqualError(t, err, "empty accountName")
+	})
+
+	t.Run("Happy Path", func(t *testing.T) {
+		reqBody := SetInsightsAccountTagsRequest{
+			Tags: map[string]string{
+				"environment": "staging",
+				"cost-center": "engineering",
+			},
+		}
+
+		c := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodPut,
+			ExpectedReqPath:   fmt.Sprintf("/api/preview/insights/%s/accounts/%s/tags", orgName, accountName),
+			ExpectedReqBody:   reqBody,
+			ResponseCode:      200,
+		})
+
+		err := c.SetInsightsAccountTags(t.Context(), orgName, accountName, reqBody.Tags)
+		assert.NoError(t, err)
+	})
+
+	t.Run("Empty Tags", func(t *testing.T) {
+		reqBody := SetInsightsAccountTagsRequest{
+			Tags: map[string]string{},
+		}
+
+		c := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodPut,
+			ExpectedReqPath:   fmt.Sprintf("/api/preview/insights/%s/accounts/%s/tags", orgName, accountName),
+			ExpectedReqBody:   reqBody,
+			ResponseCode:      200,
+		})
+
+		err := c.SetInsightsAccountTags(t.Context(), orgName, accountName, reqBody.Tags)
+		assert.NoError(t, err)
+	})
+
+	t.Run("Error", func(t *testing.T) {
+		reqBody := SetInsightsAccountTagsRequest{
+			Tags: map[string]string{
+				"invalid": "tag",
+			},
+		}
+
+		c := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodPut,
+			ExpectedReqPath:   fmt.Sprintf("/api/preview/insights/%s/accounts/%s/tags", orgName, accountName),
+			ExpectedReqBody:   reqBody,
+			ResponseCode:      400,
+			ResponseBody: ErrorResponse{
+				StatusCode: 400,
+				Message:    "invalid tag name",
+			},
+		})
+
+		err := c.SetInsightsAccountTags(t.Context(), orgName, accountName, reqBody.Tags)
+		assert.EqualError(t, err, `failed to set tags for insights account "test-account": 400 API error: invalid tag name`)
 	})
 }

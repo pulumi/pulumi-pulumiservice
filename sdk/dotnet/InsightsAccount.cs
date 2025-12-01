@@ -63,6 +63,12 @@ namespace Pulumi.PulumiService
         [Output("scheduledScanEnabled")]
         public Output<bool> ScheduledScanEnabled { get; private set; } = null!;
 
+        /// <summary>
+        /// Key-value tags to associate with the insights account.
+        /// </summary>
+        [Output("tags")]
+        public Output<ImmutableDictionary<string, string>?> Tags { get; private set; } = null!;
+
 
         /// <summary>
         /// Create a InsightsAccount resource with the given unique name, arguments, and options.
@@ -155,6 +161,18 @@ namespace Pulumi.PulumiService
         /// </summary>
         [Input("scanSchedule", required: true)]
         public Input<Pulumi.PulumiService.ScanSchedule> ScanSchedule { get; set; } = null!;
+
+        [Input("tags")]
+        private InputMap<string>? _tags;
+
+        /// <summary>
+        /// Key-value tags to associate with the insights account.
+        /// </summary>
+        public InputMap<string> Tags
+        {
+            get => _tags ?? (_tags = new InputMap<string>());
+            set => _tags = value;
+        }
 
         public InsightsAccountArgs()
         {

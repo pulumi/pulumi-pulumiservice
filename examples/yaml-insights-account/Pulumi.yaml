@@ -38,6 +38,9 @@ resources:
       provider: aws
       environment: ${credentials-env.project}/${credentials-env.name}
       scanSchedule: none
+      tags:
+        environment: testing
+        team: platform
 
 outputs:
   insightsAccountId: ${insights-account.insightsAccountId}
