@@ -118,6 +118,52 @@ namespace Pulumi.PulumiService
     }
 
     [EnumType]
+    public readonly struct CloudProvider : IEquatable<CloudProvider>
+    {
+        private readonly string _value;
+
+        private CloudProvider(string value)
+        {
+            _value = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        /// <summary>
+        /// Amazon Web Services
+        /// </summary>
+        public static CloudProvider Aws { get; } = new CloudProvider("aws");
+        /// <summary>
+        /// Microsoft Azure
+        /// </summary>
+        public static CloudProvider Azure_native { get; } = new CloudProvider("azure-native");
+        /// <summary>
+        /// Google Cloud Platform
+        /// </summary>
+        public static CloudProvider Gcp { get; } = new CloudProvider("gcp");
+        /// <summary>
+        /// Kubernetes
+        /// </summary>
+        public static CloudProvider Kubernetes { get; } = new CloudProvider("kubernetes");
+        /// <summary>
+        /// Oracle Cloud Infrastructure
+        /// </summary>
+        public static CloudProvider Oci { get; } = new CloudProvider("oci");
+
+        public static bool operator ==(CloudProvider left, CloudProvider right) => left.Equals(right);
+        public static bool operator !=(CloudProvider left, CloudProvider right) => !left.Equals(right);
+
+        public static explicit operator string(CloudProvider value) => value._value;
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override bool Equals(object? obj) => obj is CloudProvider other && Equals(other);
+        public bool Equals(CloudProvider other) => string.Equals(_value, other._value, StringComparison.Ordinal);
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+
+        public override string ToString() => _value;
+    }
+
+    [EnumType]
     public readonly struct EnvironmentPermission : IEquatable<EnvironmentPermission>
     {
         private readonly string _value;
@@ -252,6 +298,40 @@ namespace Pulumi.PulumiService
         [EditorBrowsable(EditorBrowsableState.Never)]
         public override bool Equals(object? obj) => obj is RbacPermission other && Equals(other);
         public bool Equals(RbacPermission other) => string.Equals(_value, other._value, StringComparison.Ordinal);
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+
+        public override string ToString() => _value;
+    }
+
+    [EnumType]
+    public readonly struct ScanSchedule : IEquatable<ScanSchedule>
+    {
+        private readonly string _value;
+
+        private ScanSchedule(string value)
+        {
+            _value = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        /// <summary>
+        /// Disable automated scanning.
+        /// </summary>
+        public static ScanSchedule None { get; } = new ScanSchedule("none");
+        /// <summary>
+        /// Run automated scans once per day.
+        /// </summary>
+        public static ScanSchedule Daily { get; } = new ScanSchedule("daily");
+
+        public static bool operator ==(ScanSchedule left, ScanSchedule right) => left.Equals(right);
+        public static bool operator !=(ScanSchedule left, ScanSchedule right) => !left.Equals(right);
+
+        public static explicit operator string(ScanSchedule value) => value._value;
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override bool Equals(object? obj) => obj is ScanSchedule other && Equals(other);
+        public bool Equals(ScanSchedule other) => string.Equals(_value, other._value, StringComparison.Ordinal);
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public override int GetHashCode() => _value?.GetHashCode() ?? 0;

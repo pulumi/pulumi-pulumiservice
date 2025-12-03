@@ -60,6 +60,11 @@ export const getPolicyPacks: typeof import("./getPolicyPacks").getPolicyPacks = 
 export const getPolicyPacksOutput: typeof import("./getPolicyPacks").getPolicyPacksOutput = null as any;
 utilities.lazyLoad(exports, ["getPolicyPacks","getPolicyPacksOutput"], () => require("./getPolicyPacks"));
 
+export { InsightsAccountArgs } from "./insightsAccount";
+export type InsightsAccount = import("./insightsAccount").InsightsAccount;
+export const InsightsAccount: typeof import("./insightsAccount").InsightsAccount = null as any;
+utilities.lazyLoad(exports, ["InsightsAccount"], () => require("./insightsAccount"));
+
 export { OidcIssuerArgs } from "./oidcIssuer";
 export type OidcIssuer = import("./oidcIssuer").OidcIssuer;
 export const OidcIssuer: typeof import("./oidcIssuer").OidcIssuer = null as any;
@@ -160,6 +165,8 @@ const _module = {
                 return new EnvironmentRotationSchedule(name, <any>undefined, { urn })
             case "pulumiservice:index:EnvironmentVersionTag":
                 return new EnvironmentVersionTag(name, <any>undefined, { urn })
+            case "pulumiservice:index:InsightsAccount":
+                return new InsightsAccount(name, <any>undefined, { urn })
             case "pulumiservice:index:OidcIssuer":
                 return new OidcIssuer(name, <any>undefined, { urn })
             case "pulumiservice:index:OrgAccessToken":

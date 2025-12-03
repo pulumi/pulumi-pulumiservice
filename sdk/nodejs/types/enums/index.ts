@@ -49,6 +49,31 @@ export const AuthPolicyTokenType = {
 
 export type AuthPolicyTokenType = (typeof AuthPolicyTokenType)[keyof typeof AuthPolicyTokenType];
 
+export const CloudProvider = {
+    /**
+     * Amazon Web Services
+     */
+    Aws: "aws",
+    /**
+     * Microsoft Azure
+     */
+    Azure_native: "azure-native",
+    /**
+     * Google Cloud Platform
+     */
+    Gcp: "gcp",
+    /**
+     * Kubernetes
+     */
+    Kubernetes: "kubernetes",
+    /**
+     * Oracle Cloud Infrastructure
+     */
+    Oci: "oci",
+} as const;
+
+export type CloudProvider = (typeof CloudProvider)[keyof typeof CloudProvider];
+
 export const EnvironmentPermission = {
     /**
      * No permissions.
@@ -127,6 +152,19 @@ export const RbacPermission = {
 } as const;
 
 export type RbacPermission = (typeof RbacPermission)[keyof typeof RbacPermission];
+
+export const ScanSchedule = {
+    /**
+     * Disable automated scanning.
+     */
+    None: "none",
+    /**
+     * Run automated scans once per day.
+     */
+    Daily: "daily",
+} as const;
+
+export type ScanSchedule = (typeof ScanSchedule)[keyof typeof ScanSchedule];
 
 export const TargetActionType = {
     /**

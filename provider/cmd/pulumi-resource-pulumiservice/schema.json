@@ -250,6 +250,31 @@
         "tenantId"
       ]
     },
+    "pulumiservice:index:CloudProvider": {
+      "type": "string",
+      "enum": [
+        {
+          "description": "Amazon Web Services",
+          "value": "aws"
+        },
+        {
+          "description": "Microsoft Azure",
+          "value": "azure-native"
+        },
+        {
+          "description": "Google Cloud Platform",
+          "value": "gcp"
+        },
+        {
+          "description": "Kubernetes",
+          "value": "kubernetes"
+        },
+        {
+          "description": "Oracle Cloud Infrastructure",
+          "value": "oci"
+        }
+      ]
+    },
     "pulumiservice:index:DeploymentSettingsCacheOptions": {
       "description": "Dependency cache settings for the deployment",
       "properties": {
@@ -668,6 +693,19 @@
           "name": "Rotate",
           "description": "Rotate permission.",
           "value": "environment:rotate"
+        }
+      ]
+    },
+    "pulumiservice:index:ScanSchedule": {
+      "type": "string",
+      "enum": [
+        {
+          "description": "Disable automated scanning.",
+          "value": "none"
+        },
+        {
+          "description": "Run automated scans once per day.",
+          "value": "daily"
         }
       ]
     },
@@ -1531,6 +1569,114 @@
         "organization",
         "revision",
         "tagName"
+      ]
+    },
+    "pulumiservice:index:InsightsAccount": {
+      "description": "Insights Account for cloud resource scanning and analysis across AWS, Azure, and GCP.",
+      "properties": {
+        "accountName": {
+          "type": "string",
+          "description": "Name of the insights account.",
+          "replaceOnChanges": true
+        },
+        "environment": {
+          "type": "string",
+          "description": "The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0')."
+        },
+        "insightsAccountId": {
+          "type": "string",
+          "description": "The insights account identifier."
+        },
+        "organizationName": {
+          "type": "string",
+          "description": "The organization's name.",
+          "replaceOnChanges": true
+        },
+        "provider": {
+          "$ref": "#/types/pulumiservice:index:CloudProvider",
+          "description": "The cloud provider for scanning.",
+          "replaceOnChanges": true
+        },
+        "providerConfig": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {\"regions\": [\"us-west-1\", \"us-west-2\"]}."
+        },
+        "scanSchedule": {
+          "$ref": "#/types/pulumiservice:index:ScanSchedule",
+          "description": "Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.",
+          "default": "none"
+        },
+        "scheduledScanEnabled": {
+          "type": "boolean",
+          "description": "Whether scheduled scanning is enabled."
+        },
+        "tags": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Key-value tags to associate with the insights account."
+        }
+      },
+      "type": "object",
+      "required": [
+        "accountName",
+        "environment",
+        "insightsAccountId",
+        "organizationName",
+        "provider",
+        "scanSchedule",
+        "scheduledScanEnabled"
+      ],
+      "inputProperties": {
+        "accountName": {
+          "type": "string",
+          "description": "Name of the insights account.",
+          "replaceOnChanges": true
+        },
+        "environment": {
+          "type": "string",
+          "description": "The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0')."
+        },
+        "organizationName": {
+          "type": "string",
+          "description": "The organization's name.",
+          "replaceOnChanges": true
+        },
+        "provider": {
+          "$ref": "#/types/pulumiservice:index:CloudProvider",
+          "description": "The cloud provider for scanning.",
+          "replaceOnChanges": true
+        },
+        "providerConfig": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {\"regions\": [\"us-west-1\", \"us-west-2\"]}."
+        },
+        "scanSchedule": {
+          "$ref": "#/types/pulumiservice:index:ScanSchedule",
+          "description": "Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.",
+          "default": "none"
+        },
+        "tags": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Key-value tags to associate with the insights account."
+        }
+      },
+      "requiredInputs": [
+        "accountName",
+        "environment",
+        "organizationName",
+        "provider",
+        "scanSchedule"
       ]
     },
     "pulumiservice:index:OidcIssuer": {

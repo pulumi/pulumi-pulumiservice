@@ -10,9 +10,11 @@ __all__ = [
     'AuthPolicyDecision',
     'AuthPolicyPermissionLevel',
     'AuthPolicyTokenType',
+    'CloudProvider',
     'EnvironmentPermission',
     'PulumiOperation',
     'RbacPermission',
+    'ScanSchedule',
     'TargetActionType',
     'TeamStackPermissionScope',
     'WebhookFilters',
@@ -62,6 +64,30 @@ class AuthPolicyTokenType(_builtins.str, Enum):
     RUNNER = "runner"
     """
     Deployment Runner Pulumi token. Requires runnerID field to be filled.
+    """
+
+
+@pulumi.type_token("pulumiservice:index:CloudProvider")
+class CloudProvider(_builtins.str, Enum):
+    AWS = "aws"
+    """
+    Amazon Web Services
+    """
+    AZURE_NATIVE = "azure-native"
+    """
+    Microsoft Azure
+    """
+    GCP = "gcp"
+    """
+    Google Cloud Platform
+    """
+    KUBERNETES = "kubernetes"
+    """
+    Kubernetes
+    """
+    OCI = "oci"
+    """
+    Oracle Cloud Infrastructure
     """
 
 
@@ -138,6 +164,18 @@ class RbacPermission(_builtins.str, Enum):
     ROTATE = "environment:rotate"
     """
     Rotate permission.
+    """
+
+
+@pulumi.type_token("pulumiservice:index:ScanSchedule")
+class ScanSchedule(_builtins.str, Enum):
+    NONE = "none"
+    """
+    Disable automated scanning.
+    """
+    DAILY = "daily"
+    """
+    Run automated scans once per day.
     """
 
 
