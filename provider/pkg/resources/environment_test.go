@@ -258,6 +258,28 @@ foo: bar
 		_, err := provider.Check(&req)
 		assert.NoError(t, err)
 	})
+
+	t.Run("Check when yaml is secret wrapping computed resource", func(t *testing.T) {
+		// This tests the bug fix for issue #606:
+		// Secret wraps a computed value (from Output.ApplyT), causing panic in Check()
+		computedValue := resource.NewComputedProperty(resource.Computed{Element: resource.NewStringProperty("")})
+		propertyMap["yaml"] = resource.MakeSecret(computedValue)
+
+		properties, _ := plugin.MarshalProperties(
+			propertyMap,
+			plugin.MarshalOptions{
+				KeepUnknowns: true,
+				SkipNulls:    true,
+				KeepSecrets:  true,
+			},
+		)
+		req := pulumirpc.CheckRequest{
+			News: properties,
+		}
+
+		_, err := provider.Check(&req)
+		assert.NoError(t, err)
+	})
 }
 
 func TestEnvironment(t *testing.T) {

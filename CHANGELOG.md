@@ -10,6 +10,7 @@
 
 ### Bug Fixes
 
+- Fixed Environment resource crash when yaml property contains computed values from Outputs (e.g., template execution results) [#606](https://github.com/pulumi/pulumi-pulumiservice/issues/606)
 - Fixed PolicyGroup schema syntax error preventing proper nested object definitions in policyPacks field [#595](https://github.com/pulumi/pulumi-pulumiservice/pull/595)
 - Fixed PolicyGroup creation to include required entityType and mode fields [#563](https://github.com/pulumi/pulumi-pulumiservice/issues/563)
 - Fixed PolicyGroup resource to properly handle policy pack config arrays (e.g., approvedAmiIds) as string arrays instead of object arrays

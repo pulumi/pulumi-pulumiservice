@@ -253,14 +253,17 @@ func (st *PulumiServiceEnvironmentResource) Check(req *pulumirpc.CheckRequest) (
 			inputYaml = inputYaml.SecretValue().Element
 		}
 
-		if inputYaml.IsAsset() {
-			yamlBytes, err := getBytesFromAsset(inputYaml.AssetValue())
-			if err != nil {
-				return nil, err
+		// After unwrapping secret, check again if the inner value is computed
+		if !inputYaml.IsComputed() {
+			if inputYaml.IsAsset() {
+				yamlBytes, err := getBytesFromAsset(inputYaml.AssetValue())
+				if err != nil {
+					return nil, err
+				}
+				stringYaml = string(yamlBytes)
+			} else {
+				stringYaml = inputYaml.StringValue()
 			}
-			stringYaml = string(yamlBytes)
-		} else {
-			stringYaml = inputYaml.StringValue()
 		}
 	}
 
