@@ -2617,6 +2617,118 @@ func (o GCPOIDCConfigurationPtrOutput) WorkloadPoolId() pulumi.StringPtrOutput {
 	}).(pulumi.StringPtrOutput)
 }
 
+type InsightsAccountStateType struct {
+	// Name of the insights account.
+	AccountName string `pulumi:"accountName"`
+	// The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0').
+	Environment string `pulumi:"environment"`
+	// The insights account identifier.
+	InsightsAccountId string `pulumi:"insightsAccountId"`
+	// The organization's name.
+	OrganizationName string `pulumi:"organizationName"`
+	// The cloud provider for scanning.
+	Provider CloudProvider `pulumi:"provider"`
+	// Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {"regions": ["us-west-1", "us-west-2"]}.
+	ProviderConfig map[string]interface{} `pulumi:"providerConfig"`
+	// Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
+	ScanSchedule ScanSchedule `pulumi:"scanSchedule"`
+	// Whether scheduled scanning is enabled.
+	ScheduledScanEnabled bool `pulumi:"scheduledScanEnabled"`
+	// Key-value tags to associate with the insights account.
+	Tags map[string]string `pulumi:"tags"`
+}
+
+// Defaults sets the appropriate defaults for InsightsAccountStateType
+func (val *InsightsAccountStateType) Defaults() *InsightsAccountStateType {
+	if val == nil {
+		return nil
+	}
+	tmp := *val
+	if internal.IsZero(tmp.ScanSchedule) {
+		tmp.ScanSchedule = ScanSchedule("none")
+	}
+	return &tmp
+}
+
+type InsightsAccountStateTypeOutput struct{ *pulumi.OutputState }
+
+func (InsightsAccountStateTypeOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*InsightsAccountStateType)(nil)).Elem()
+}
+
+func (o InsightsAccountStateTypeOutput) ToInsightsAccountStateTypeOutput() InsightsAccountStateTypeOutput {
+	return o
+}
+
+func (o InsightsAccountStateTypeOutput) ToInsightsAccountStateTypeOutputWithContext(ctx context.Context) InsightsAccountStateTypeOutput {
+	return o
+}
+
+// Name of the insights account.
+func (o InsightsAccountStateTypeOutput) AccountName() pulumi.StringOutput {
+	return o.ApplyT(func(v InsightsAccountStateType) string { return v.AccountName }).(pulumi.StringOutput)
+}
+
+// The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0').
+func (o InsightsAccountStateTypeOutput) Environment() pulumi.StringOutput {
+	return o.ApplyT(func(v InsightsAccountStateType) string { return v.Environment }).(pulumi.StringOutput)
+}
+
+// The insights account identifier.
+func (o InsightsAccountStateTypeOutput) InsightsAccountId() pulumi.StringOutput {
+	return o.ApplyT(func(v InsightsAccountStateType) string { return v.InsightsAccountId }).(pulumi.StringOutput)
+}
+
+// The organization's name.
+func (o InsightsAccountStateTypeOutput) OrganizationName() pulumi.StringOutput {
+	return o.ApplyT(func(v InsightsAccountStateType) string { return v.OrganizationName }).(pulumi.StringOutput)
+}
+
+// The cloud provider for scanning.
+func (o InsightsAccountStateTypeOutput) Provider() CloudProviderOutput {
+	return o.ApplyT(func(v InsightsAccountStateType) CloudProvider { return v.Provider }).(CloudProviderOutput)
+}
+
+// Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {"regions": ["us-west-1", "us-west-2"]}.
+func (o InsightsAccountStateTypeOutput) ProviderConfig() pulumi.MapOutput {
+	return o.ApplyT(func(v InsightsAccountStateType) map[string]interface{} { return v.ProviderConfig }).(pulumi.MapOutput)
+}
+
+// Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
+func (o InsightsAccountStateTypeOutput) ScanSchedule() ScanScheduleOutput {
+	return o.ApplyT(func(v InsightsAccountStateType) ScanSchedule { return v.ScanSchedule }).(ScanScheduleOutput)
+}
+
+// Whether scheduled scanning is enabled.
+func (o InsightsAccountStateTypeOutput) ScheduledScanEnabled() pulumi.BoolOutput {
+	return o.ApplyT(func(v InsightsAccountStateType) bool { return v.ScheduledScanEnabled }).(pulumi.BoolOutput)
+}
+
+// Key-value tags to associate with the insights account.
+func (o InsightsAccountStateTypeOutput) Tags() pulumi.StringMapOutput {
+	return o.ApplyT(func(v InsightsAccountStateType) map[string]string { return v.Tags }).(pulumi.StringMapOutput)
+}
+
+type InsightsAccountStateTypeArrayOutput struct{ *pulumi.OutputState }
+
+func (InsightsAccountStateTypeArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]InsightsAccountStateType)(nil)).Elem()
+}
+
+func (o InsightsAccountStateTypeArrayOutput) ToInsightsAccountStateTypeArrayOutput() InsightsAccountStateTypeArrayOutput {
+	return o
+}
+
+func (o InsightsAccountStateTypeArrayOutput) ToInsightsAccountStateTypeArrayOutputWithContext(ctx context.Context) InsightsAccountStateTypeArrayOutput {
+	return o
+}
+
+func (o InsightsAccountStateTypeArrayOutput) Index(i pulumi.IntInput) InsightsAccountStateTypeOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) InsightsAccountStateType {
+		return vs[0].([]InsightsAccountStateType)[vs[1].(int)]
+	}).(InsightsAccountStateTypeOutput)
+}
+
 type OperationContextOIDC struct {
 	// AWS-specific OIDC configuration.
 	Aws *AWSOIDCConfiguration `pulumi:"aws"`
@@ -3439,6 +3551,8 @@ func init() {
 	pulumi.RegisterOutputType(EnvironmentIdentifierOutput{})
 	pulumi.RegisterOutputType(GCPOIDCConfigurationOutput{})
 	pulumi.RegisterOutputType(GCPOIDCConfigurationPtrOutput{})
+	pulumi.RegisterOutputType(InsightsAccountStateTypeOutput{})
+	pulumi.RegisterOutputType(InsightsAccountStateTypeArrayOutput{})
 	pulumi.RegisterOutputType(OperationContextOIDCOutput{})
 	pulumi.RegisterOutputType(OperationContextOIDCPtrOutput{})
 	pulumi.RegisterOutputType(OperationContextOptionsOutput{})

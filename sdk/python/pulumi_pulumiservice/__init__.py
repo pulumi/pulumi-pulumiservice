@@ -16,6 +16,8 @@ from .drift_schedule import *
 from .environment import *
 from .environment_rotation_schedule import *
 from .environment_version_tag import *
+from .get_insights_account import *
+from .get_insights_accounts import *
 from .get_policy_pack import *
 from .get_policy_packs import *
 from .insights_account import *

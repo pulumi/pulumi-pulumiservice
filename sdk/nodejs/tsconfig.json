@@ -24,6 +24,8 @@
         "environment.ts",
         "environmentRotationSchedule.ts",
         "environmentVersionTag.ts",
+        "getInsightsAccount.ts",
+        "getInsightsAccounts.ts",
         "getPolicyPack.ts",
         "getPolicyPacks.ts",
         "index.ts",
