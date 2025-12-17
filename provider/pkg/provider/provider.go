@@ -34,6 +34,7 @@ import (
 	"github.com/pulumi/pulumi-go-provider/infer"
 	"github.com/pulumi/pulumi-go-provider/middleware/rpc"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/functions"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/resources"
 	"github.com/pulumi/pulumi/pkg/v3/codegen/schema"
@@ -87,8 +88,13 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 			infer.Resource(&resources.InsightsAccount{}),
 			infer.Resource(&resources.Team{}),
 		).
+		WithFunctions(
+			infer.Function(&functions.GetInsightsAccountsFunction{}),
+			infer.Function(&functions.GetInsightsAccountFunction{}),
+		).
 		WithModuleMap(map[tokens.ModuleName]tokens.ModuleName{
 			"resources": "index",
+			"functions": "index",
 		}).
 		WithConfig(infer.Config(&config.Config{})).
 		WithLanguageMap(map[string]any{
@@ -140,7 +146,6 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 	}
 	return p.RawServer(name, version, provider)(host)
 }
-
 
 // Attach implements pulumirpc.ResourceProviderServer
 func (k *pulumiserviceProvider) Attach(_ context.Context, req *pulumirpc.PluginAttach) (*pbempty.Empty, error) {

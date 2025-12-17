@@ -4,7 +4,7 @@
 
 ### Improvements
 
-- Added InsightsAccount resource for cloud resource scanning and analysis across AWS, Azure, and GCP
+- Added InsightsAccount resource and getInsightsAccount/getInsightsAccounts for cloud resource scanning and analysis across AWS, Azure, and GCP, OCI and Kubernetes. 
 - Added Java SDK support with Pulumi Java SDK v1.16.2
 - Upgraded Pulumi SDK to v3.204.0 with latest codegen improvements
 

@@ -315,6 +315,54 @@ export interface GCPOIDCConfiguration {
     workloadPoolId: string;
 }
 
+export interface InsightsAccountState {
+    /**
+     * Name of the insights account.
+     */
+    accountName: string;
+    /**
+     * The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0').
+     */
+    environment: string;
+    /**
+     * The insights account identifier.
+     */
+    insightsAccountId: string;
+    /**
+     * The organization's name.
+     */
+    organizationName: string;
+    /**
+     * The cloud provider for scanning.
+     */
+    provider: enums.CloudProvider;
+    /**
+     * Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {"regions": ["us-west-1", "us-west-2"]}.
+     */
+    providerConfig?: {[key: string]: any};
+    /**
+     * Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
+     */
+    scanSchedule: enums.ScanSchedule;
+    /**
+     * Whether scheduled scanning is enabled.
+     */
+    scheduledScanEnabled: boolean;
+    /**
+     * Key-value tags to associate with the insights account.
+     */
+    tags?: {[key: string]: string};
+}
+/**
+ * insightsAccountStateProvideDefaults sets the appropriate defaults for InsightsAccountState
+ */
+export function insightsAccountStateProvideDefaults(val: InsightsAccountState): InsightsAccountState {
+    return {
+        ...val,
+        scanSchedule: (val.scanSchedule) ?? "none",
+    };
+}
+
 export interface OperationContextOIDC {
     /**
      * AWS-specific OIDC configuration.

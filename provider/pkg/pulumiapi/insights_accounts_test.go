@@ -58,6 +58,74 @@ func TestCreateInsightsAccount(t *testing.T) {
 	})
 }
 
+func TestListInsightsAccounts(t *testing.T) {
+	orgName := "test-org"
+
+	t.Run("Empty OrgName", func(t *testing.T) {
+		c := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodGet,
+			ExpectedReqPath:   "/api/preview/insights//accounts",
+			ResponseCode:      200,
+		})
+
+		accounts, err := c.ListInsightsAccounts(t.Context(), "")
+		assert.Nil(t, accounts)
+		assert.EqualError(t, err, "empty orgName")
+	})
+
+	t.Run("Happy Path", func(t *testing.T) {
+		resp := ListInsightsAccountsResponse{
+			Accounts: []InsightsAccount{
+				{
+					ID:                   "account-id-123",
+					Name:                 "test-account-1",
+					Provider:             "aws",
+					ProviderEnvRef:       "test-env",
+					ScheduledScanEnabled: true,
+					ProviderConfig: map[string]interface{}{
+						"regions": []interface{}{"us-west-2", "us-east-1"},
+					},
+				},
+				{
+					ID:                   "account-id-456",
+					Name:                 "test-account-2",
+					Provider:             "azure",
+					ProviderEnvRef:       "test-env-2",
+					ScheduledScanEnabled: false,
+				},
+			},
+		}
+
+		c := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodGet,
+			ExpectedReqPath:   fmt.Sprintf("/api/preview/insights/%s/accounts", orgName),
+			ResponseCode:      200,
+			ResponseBody:      resp,
+		})
+
+		accounts, err := c.ListInsightsAccounts(t.Context(), orgName)
+		require.NoError(t, err)
+		assert.Equal(t, 2, len(accounts))
+		assert.Equal(t, accounts, resp.Accounts)
+	})
+
+	t.Run("Error", func(t *testing.T) {
+		c := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodGet,
+			ExpectedReqPath:   fmt.Sprintf("/api/preview/insights/%s/accounts", orgName),
+			ResponseCode:      500,
+			ResponseBody: ErrorResponse{
+				StatusCode: 500,
+				Message:    "internal server error",
+			},
+		})
+
+		accounts, err := c.ListInsightsAccounts(t.Context(), orgName)
+		assert.Nil(t, accounts)
+		assert.EqualError(t, err, `failed to list insights accounts: 500 API error: internal server error`)
+	})
+}
+
 func TestGetInsightsAccount(t *testing.T) {
 	orgName := "test-org"
 	accountName := "test-account"
