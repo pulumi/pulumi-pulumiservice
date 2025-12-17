@@ -123,7 +123,7 @@ jobs:
       with:
         tools: pulumictl, pulumicli, nodejs, python, dotnet, go, java
     - name: Publish SDKs
-      uses: pulumi/pulumi-package-publisher@v0.0.20
+      uses: pulumi/pulumi-package-publisher@3ec1409d3e894142b9825c7859be8e57d362762a # v0.0.23
       with:
         sdk: all
         version: ${{ inputs.version }}
