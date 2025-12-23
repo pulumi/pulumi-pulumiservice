@@ -9,6 +9,7 @@ import (
 	"github.com/pulumi/providertest/pulumitest/assertpreview"
 	"github.com/pulumi/providertest/pulumitest/assertrefresh"
 	"github.com/pulumi/providertest/pulumitest/opttest"
+	"github.com/pulumi/pulumi/sdk/v3/go/auto"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 
 	psp "github.com/pulumi/pulumi-pulumiservice/provider/pkg/provider"
@@ -41,9 +42,9 @@ func inMemoryProvider() opttest.Option {
 
 // runPulumiTest performs the same basic steps as
 // [github.com/pulumi/pulumi/pkg/v3/testing/integration.ProgramTest].
-func runPulumiTest(t *testing.T, test *pulumitest.PulumiTest) {
+func runPulumiTest(t *testing.T, test *pulumitest.PulumiTest) auto.UpResult {
 	// Run the Pulumi program
-	test.Up(t)
+	upResult := test.Up(t)
 
 	// Run preview to ensure no changes after initial deployment
 	previewResult := test.Preview(t)
@@ -55,4 +56,6 @@ func runPulumiTest(t *testing.T, test *pulumitest.PulumiTest) {
 
 	// Clean up - destroy the stack
 	test.Destroy(t)
+
+	return upResult
 }

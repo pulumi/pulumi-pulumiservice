@@ -10,6 +10,7 @@ import (
 	"github.com/pulumi/providertest/pulumitest"
 	"github.com/pulumi/providertest/pulumitest/assertpreview"
 	"github.com/pulumi/providertest/pulumitest/opttest"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestAccessTokenExample(t *testing.T) {
@@ -153,4 +154,46 @@ func TestNodejsApprovalRulesExample(t *testing.T) {
 	)
 	test.SetConfig(t, "digits", generateRandomFiveDigits())
 	runPulumiTest(t, test)
+}
+
+func TestNodejsInsightsAccountInvokesExample(t *testing.T) {
+	digits := generateRandomFiveDigits()
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "ts-insights-account-invokes"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.YarnLink("@pulumi/pulumiservice"),
+	)
+	test.SetConfig(t, "digits", digits)
+	test.SetConfig(t, "organizationName", getOrgName())
+	upResult := runPulumiTest(t, test)
+
+	// Verify the resource outputs
+	resourceAccountName := upResult.Outputs["resourceAccountName"].Value.(string)
+	expectedAccountName := "test-invoke-account-" + digits
+	assert.Equal(t, expectedAccountName, resourceAccountName)
+
+	// Verify the getInsightsAccount invoke outputs match the resource
+	fetchedAccountName := upResult.Outputs["fetchedAccountName"].Value.(string)
+	assert.Equal(t, resourceAccountName, fetchedAccountName)
+
+	fetchedInsightsAccountId := upResult.Outputs["fetchedInsightsAccountId"].Value.(string)
+	resourceInsightsAccountId := upResult.Outputs["resourceInsightsAccountId"].Value.(string)
+	assert.Equal(t, resourceInsightsAccountId, fetchedInsightsAccountId)
+
+	fetchedProvider := upResult.Outputs["fetchedProvider"].Value.(string)
+	assert.Equal(t, "aws", fetchedProvider)
+
+	fetchedScanSchedule := upResult.Outputs["fetchedScanSchedule"].Value.(string)
+	assert.Equal(t, "none", fetchedScanSchedule)
+
+	fetchedScheduledScanEnabled := upResult.Outputs["fetchedScheduledScanEnabled"].Value.(bool)
+	assert.False(t, fetchedScheduledScanEnabled)
+
+	// Verify the getInsightsAccounts invoke outputs
+	accountsCount := upResult.Outputs["accountsCount"].Value.(float64)
+	assert.GreaterOrEqual(t, accountsCount, float64(1))
+
+	createdAccountInList := upResult.Outputs["createdAccountInList"].Value.(bool)
+	assert.True(t, createdAccountInList)
 }
