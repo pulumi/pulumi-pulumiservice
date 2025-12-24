@@ -2140,6 +2140,13 @@
             "$ref": "#/types/pulumiservice:index:PolicyGroupStackReference"
           }
         },
+        "accounts": {
+          "description": "List of accounts that belong to this policy group.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "policyPacks": {
           "description": "List of policy packs applied to this policy group.",
           "type": "array",
@@ -2182,6 +2189,13 @@
           "type": "array",
           "items": {
             "$ref": "#/types/pulumiservice:index:PolicyGroupStackReference"
+          }
+        },
+        "accounts": {
+          "description": "List of accounts that belong to this policy group.",
+          "type": "array",
+          "items": {
+            "type": "string"
           }
         },
         "policyPacks": {
