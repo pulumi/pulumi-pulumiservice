@@ -12,9 +12,6 @@
   "repository": "https://github.com/pulumi/pulumi-pulumiservice",
   "publisher": "Pulumi",
   "namespace": "pulumi",
-  "meta": {
-    "moduleFormat": "(.*)"
-  },
   "language": {
     "csharp": {
       "namespaces": {
@@ -131,10 +128,10 @@
       },
       "type": "object",
       "required": [
-        "allowSelfApproval",
-        "eligibleApprovers",
         "numApprovalsRequired",
-        "requireReapprovalOnChange"
+        "allowSelfApproval",
+        "requireReapprovalOnChange",
+        "eligibleApprovers"
       ]
     },
     "pulumiservice:index:AuthPolicyDecision": {
@@ -190,8 +187,8 @@
       "type": "object",
       "required": [
         "decision",
-        "rules",
-        "tokenType"
+        "tokenType",
+        "rules"
       ]
     },
     "pulumiservice:index:AuthPolicyPermissionLevel": {
@@ -246,8 +243,8 @@
       "type": "object",
       "required": [
         "clientId",
-        "subscriptionId",
-        "tenantId"
+        "tenantId",
+        "subscriptionId"
       ]
     },
     "pulumiservice:index:CloudProvider": {
@@ -315,8 +312,8 @@
       },
       "type": "object",
       "required": [
-        "password",
-        "username"
+        "username",
+        "password"
       ]
     },
     "pulumiservice:index:DeploymentSettingsGitAuthSSHAuth": {
@@ -482,9 +479,9 @@
       },
       "type": "object",
       "required": [
-        "name",
         "organization",
-        "project"
+        "project",
+        "name"
       ]
     },
     "pulumiservice:index:EnvironmentPermission": {
@@ -542,9 +539,9 @@
       "type": "object",
       "required": [
         "projectId",
+        "workloadPoolId",
         "providerId",
-        "serviceAccount",
-        "workloadPoolId"
+        "serviceAccount"
       ]
     },
     "pulumiservice:index:OperationContextOIDC": {
@@ -965,7 +962,6 @@
         }
       }
     },
-    "type": "object",
     "inputProperties": {
       "accessToken": {
         "type": "string",
@@ -998,7 +994,6 @@
           "secret": true
         }
       },
-      "type": "object",
       "required": [
         "description",
         "value"
@@ -1042,7 +1037,6 @@
           "secret": true
         }
       },
-      "type": "object",
       "required": [
         "agentPoolId",
         "name",
@@ -1101,13 +1095,12 @@
           "description": "The type of action this rule applies to."
         }
       },
-      "type": "object",
       "required": [
-        "approvalRuleConfig",
-        "enabled",
-        "environmentIdentifier",
         "name",
-        "targetActionTypes"
+        "enabled",
+        "targetActionTypes",
+        "environmentIdentifier",
+        "approvalRuleConfig"
       ],
       "inputProperties": {
         "approvalRuleConfig": {
@@ -1136,11 +1129,11 @@
         }
       },
       "requiredInputs": [
-        "approvalRuleConfig",
-        "enabled",
-        "environmentIdentifier",
         "name",
-        "targetActionTypes"
+        "enabled",
+        "targetActionTypes",
+        "environmentIdentifier",
+        "approvalRuleConfig"
       ]
     },
     "pulumiservice:index:DeploymentSchedule": {
@@ -1176,13 +1169,12 @@
           "willReplaceOnChanges": true
         }
       },
-      "type": "object",
       "required": [
         "organization",
         "project",
+        "stack",
         "pulumiOperation",
-        "scheduleId",
-        "stack"
+        "scheduleId"
       ],
       "inputProperties": {
         "organization": {
@@ -1217,8 +1209,8 @@
       "requiredInputs": [
         "organization",
         "project",
-        "pulumiOperation",
-        "stack"
+        "stack",
+        "pulumiOperation"
       ]
     },
     "pulumiservice:index:DeploymentSettings": {
@@ -1261,7 +1253,6 @@
           "description": "Stack name."
         }
       },
-      "type": "object",
       "required": [
         "organization",
         "project",
@@ -1343,13 +1334,12 @@
           "description": "Stack name."
         }
       },
-      "type": "object",
       "required": [
         "organization",
         "project",
+        "stack",
         "scheduleCron",
-        "scheduleId",
-        "stack"
+        "scheduleId"
       ],
       "inputProperties": {
         "autoRemediate": {
@@ -1380,8 +1370,8 @@
       "requiredInputs": [
         "organization",
         "project",
-        "scheduleCron",
-        "stack"
+        "stack",
+        "scheduleCron"
       ]
     },
     "pulumiservice:index:Environment": {
@@ -1408,13 +1398,12 @@
           "description": "Environment's yaml file."
         }
       },
-      "type": "object",
       "required": [
-        "name",
         "organization",
         "project",
-        "revision",
-        "yaml"
+        "name",
+        "yaml",
+        "revision"
       ],
       "inputProperties": {
         "name": {
@@ -1436,8 +1425,8 @@
         }
       },
       "requiredInputs": [
-        "name",
         "organization",
+        "name",
         "yaml"
       ]
     },
@@ -1470,11 +1459,10 @@
           "willReplaceOnChanges": true
         }
       },
-      "type": "object",
       "required": [
-        "environment",
         "organization",
         "project",
+        "environment",
         "scheduleId"
       ],
       "inputProperties": {
@@ -1504,9 +1492,9 @@
         }
       },
       "requiredInputs": [
-        "environment",
         "organization",
-        "project"
+        "project",
+        "environment"
       ]
     },
     "pulumiservice:index:EnvironmentVersionTag": {
@@ -1533,13 +1521,12 @@
           "description": "Tag name."
         }
       },
-      "type": "object",
       "required": [
-        "environment",
         "organization",
         "project",
-        "revision",
-        "tagName"
+        "environment",
+        "tagName",
+        "revision"
       ],
       "inputProperties": {
         "environment": {
@@ -1565,10 +1552,10 @@
         }
       },
       "requiredInputs": [
-        "environment",
         "organization",
-        "revision",
-        "tagName"
+        "environment",
+        "tagName",
+        "revision"
       ]
     },
     "pulumiservice:index:InsightsAccount": {
@@ -1621,14 +1608,13 @@
           "description": "Key-value tags to associate with the insights account."
         }
       },
-      "type": "object",
       "required": [
-        "accountName",
-        "environment",
-        "insightsAccountId",
         "organizationName",
+        "accountName",
         "provider",
+        "environment",
         "scanSchedule",
+        "insightsAccountId",
         "scheduledScanEnabled"
       ],
       "inputProperties": {
@@ -1672,10 +1658,10 @@
         }
       },
       "requiredInputs": [
-        "accountName",
-        "environment",
         "organizationName",
+        "accountName",
         "provider",
+        "environment",
         "scanSchedule"
       ]
     },
@@ -1715,13 +1701,12 @@
           "replaceOnChanges": true
         }
       },
-      "type": "object",
       "required": [
-        "name",
         "organization",
-        "policies",
+        "name",
+        "url",
         "thumbprints",
-        "url"
+        "policies"
       ],
       "inputProperties": {
         "maxExpirationSeconds": {
@@ -1758,8 +1743,8 @@
         }
       },
       "requiredInputs": [
-        "name",
         "organization",
+        "name",
         "url"
       ]
     },
@@ -1788,7 +1773,6 @@
           "secret": true
         }
       },
-      "type": "object",
       "required": [
         "name",
         "organizationName",
@@ -1823,6 +1807,13 @@
     "pulumiservice:index:PolicyGroup": {
       "description": "A Policy Group allows you to apply policy packs to a set of stacks in your organization.",
       "properties": {
+        "accounts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of accounts that belong to this policy group."
+        },
         "entityType": {
           "type": "string",
           "description": "The entity type for the policy group. Valid values are 'stacks' or 'accounts'. Defaults to 'stacks'."
@@ -1854,14 +1845,20 @@
           "description": "List of stack references that belong to this policy group."
         }
       },
-      "type": "object",
       "required": [
-        "entityType",
-        "mode",
         "name",
-        "organizationName"
+        "organizationName",
+        "entityType",
+        "mode"
       ],
       "inputProperties": {
+        "accounts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of accounts that belong to this policy group."
+        },
         "entityType": {
           "type": "string",
           "description": "The entity type for the policy group. Valid values are 'stacks' or 'accounts'. Defaults to 'stacks'.",
@@ -1924,7 +1921,6 @@
           "description": "The name of the stack."
         }
       },
-      "type": "object",
       "required": [
         "organizationName",
         "projectName",
@@ -1981,12 +1977,11 @@
           "description": "Value of the tag. The 'value' part of the key=value pair"
         }
       },
-      "type": "object",
       "required": [
-        "name",
         "organization",
         "project",
         "stack",
+        "name",
         "value"
       ],
       "inputProperties": {
@@ -2016,10 +2011,10 @@
         }
       },
       "requiredInputs": [
-        "name",
         "organization",
         "project",
         "stack",
+        "name",
         "value"
       ]
     },
@@ -2061,11 +2056,10 @@
           "replaceOnChanges": true
         }
       },
-      "type": "object",
       "required": [
-        "members",
         "organizationName",
-        "teamType"
+        "teamType",
+        "members"
       ],
       "inputProperties": {
         "description": {
@@ -2133,11 +2127,10 @@
           "secret": true
         }
       },
-      "type": "object",
       "required": [
         "name",
-        "organizationName",
         "teamName",
+        "organizationName",
         "value"
       ],
       "inputProperties": {
@@ -2163,8 +2156,8 @@
       },
       "requiredInputs": [
         "name",
-        "organizationName",
-        "teamName"
+        "teamName",
+        "organizationName"
       ]
     },
     "pulumiservice:index:TeamEnvironmentPermission": {
@@ -2196,7 +2189,6 @@
           "description": "Team name."
         }
       },
-      "type": "object",
       "inputProperties": {
         "environment": {
           "type": "string",
@@ -2225,10 +2217,10 @@
         }
       },
       "requiredInputs": [
-        "environment",
         "organization",
-        "permission",
-        "team"
+        "team",
+        "environment",
+        "permission"
       ]
     },
     "pulumiservice:index:TeamStackPermission": {
@@ -2256,13 +2248,12 @@
           "description": "The name of the team to grant this stack permissions to. This is not the display name."
         }
       },
-      "type": "object",
       "required": [
+        "team",
         "organization",
-        "permission",
         "project",
         "stack",
-        "team"
+        "permission"
       ],
       "inputProperties": {
         "organization": {
@@ -2293,11 +2284,11 @@
         }
       },
       "requiredInputs": [
+        "team",
         "organization",
-        "permission",
         "project",
         "stack",
-        "team"
+        "permission"
       ]
     },
     "pulumiservice:index:TemplateSource": {
@@ -2320,7 +2311,6 @@
           "description": "Github URL of the repository from which to grab templates."
         }
       },
-      "type": "object",
       "required": [
         "organizationName",
         "sourceName",
@@ -2380,13 +2370,12 @@
           "willReplaceOnChanges": true
         }
       },
-      "type": "object",
       "required": [
         "organization",
         "project",
-        "scheduleId",
         "stack",
-        "timestamp"
+        "timestamp",
+        "scheduleId"
       ],
       "inputProperties": {
         "deleteAfterDestroy": {
@@ -2481,14 +2470,13 @@
           "description": "Name of the stack. Only specified if this is a stack webhook."
         }
       },
-      "type": "object",
       "required": [
         "active",
         "displayName",
-        "format",
-        "name",
         "organizationName",
-        "payloadUrl"
+        "payloadUrl",
+        "name",
+        "format"
       ],
       "inputProperties": {
         "active": {
@@ -2571,7 +2559,6 @@
             "description": "The version number of the policy pack. If not specified, returns the latest version."
           }
         },
-        "type": "object",
         "required": [
           "organizationName",
           "policyPackName"
@@ -2597,9 +2584,6 @@
           "policies": {
             "description": "List of policies in this pack.",
             "items": {
-              "additionalProperties": {
-                "type": "string"
-              },
               "type": "object"
             },
             "type": "array"
@@ -2614,11 +2598,10 @@
           }
         },
         "required": [
-          "displayName",
           "name",
+          "displayName",
           "version"
-        ],
-        "type": "object"
+        ]
       }
     },
     "pulumiservice:index:getPolicyPacks": {
@@ -2630,7 +2613,6 @@
             "description": "The name of the Pulumi organization."
           }
         },
-        "type": "object",
         "required": [
           "organizationName"
         ]
@@ -2640,9 +2622,6 @@
           "policyPacks": {
             "description": "List of policy packs in the organization.",
             "items": {
-              "additionalProperties": {
-                "type": "string"
-              },
               "type": "object"
             },
             "type": "array"
@@ -2650,8 +2629,7 @@
         },
         "required": [
           "policyPacks"
-        ],
-        "type": "object"
+        ]
       }
     }
   }

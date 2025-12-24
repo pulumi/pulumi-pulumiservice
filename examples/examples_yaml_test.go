@@ -424,6 +424,18 @@ func TestYamlPolicyGroupsExample(t *testing.T) {
 	})
 }
 
+func TestYamlPolicyGroupsAccountsExample(t *testing.T) {
+	cwd := getCwd(t)
+	digits := generateRandomFiveDigits()
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Dir: path.Join(cwd, ".", "yaml-policy-groups-accounts"),
+		Config: map[string]string{
+			"digits":           digits,
+			"organizationName": getOrgName(),
+		},
+	})
+}
+
 func TestYamlApprovalRuleExample(t *testing.T) {
 	cwd := getCwd(t)
 	digits := generateRandomFiveDigits()
