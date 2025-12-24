@@ -17,14 +17,15 @@ package resources
 import (
 	"context"
 	"fmt"
-	"reflect"
+	"slices"
+	"strings"
 
-	"golang.org/x/exp/slices"
 	"google.golang.org/grpc/codes"
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/util/rpcutil/rpcerror"
@@ -41,6 +42,7 @@ type PulumiServicePolicyGroupInput struct {
 	EntityType       string
 	Mode             string
 	Stacks           []pulumiapi.StackReference
+	Accounts         []string
 	PolicyPacks      []pulumiapi.PolicyPackMetadata
 }
 
@@ -52,6 +54,7 @@ func (i *PulumiServicePolicyGroupInput) ToPropertyMap() resource.PropertyMap {
 		"entityType":       i.EntityType,
 		"mode":             i.Mode,
 		"stacks":           convertStacksToInterfaceArray(i.Stacks),
+		"accounts":         i.Accounts,
 		"policyPacks":      convertPolicyPacksToInterfaceArray(i.PolicyPacks),
 	}
 
@@ -133,6 +136,17 @@ func convertInterfaceArrayToPolicyPacks(arr []interface{}) []pulumiapi.PolicyPac
 	return result
 }
 
+// convertInterfaceArrayToStrings converts []interface{} to []string
+func convertInterfaceArrayToStrings(arr []interface{}) []string {
+	result := make([]string, 0, len(arr))
+	for _, item := range arr {
+		if s, ok := item.(string); ok {
+			result = append(result, s)
+		}
+	}
+	return result
+}
+
 func (i *PulumiServicePolicyGroupInput) ToRpc() (*structpb.Struct, error) {
 	return plugin.MarshalProperties(i.ToPropertyMap(), plugin.MarshalOptions{
 		KeepOutputValues: true,
@@ -169,6 +183,11 @@ func ToPulumiServicePolicyGroupInput(inputMap resource.PropertyMap) PulumiServic
 	// Parse policy packs using helper
 	if policyPacksInterface, ok := interfaceMap["policyPacks"].([]interface{}); ok {
 		input.PolicyPacks = convertInterfaceArrayToPolicyPacks(policyPacksInterface)
+	}
+
+	// Parse accounts using helper
+	if accountsInterface, ok := interfaceMap["accounts"].([]interface{}); ok {
+		input.Accounts = convertInterfaceArrayToStrings(accountsInterface)
 	}
 
 	return input
@@ -269,7 +288,9 @@ func (p *PulumiServicePolicyGroupResource) Diff(req *pulumirpc.DiffRequest) (*pu
 
 	changes := pulumirpc.DiffResponse_DIFF_NONE
 
-	if !reflect.DeepEqual(oldPolicyGroup, newPolicyGroup) {
+	// Compare using order-independent comparison for arrays
+	// This prevents spurious diffs when array elements are in different order
+	if !policyGroupInputsEqual(oldPolicyGroup, newPolicyGroup) {
 		changes = pulumirpc.DiffResponse_DIFF_SOME
 	}
 
@@ -313,27 +334,43 @@ func (p *PulumiServicePolicyGroupResource) Read(req *pulumirpc.ReadRequest) (*pu
 		return &pulumirpc.ReadResponse{}, nil
 	}
 
-	// Convert API response directly to PropertyMap using consistent helpers
-	inputMap := map[string]interface{}{
+	// Get the previous state and inputs if available
+	previousStateAccounts, previousInputAccounts := parsePreviousAccounts(req.Properties, req.Inputs)
+
+	// Determine which accounts to use for inputs
+	// If the API accounts match the previous state, preserve the original inputs
+	// This prevents auto-added child accounts from polluting the inputs
+	inputAccounts := policyGroup.Accounts
+	if util.ElementsEqual(previousStateAccounts, policyGroup.Accounts) {
+		inputAccounts = previousInputAccounts
+	}
+
+	// Properties (state) always reflect the full API response
+	propsMap := map[string]interface{}{
 		"name":             policyGroup.Name,
 		"organizationName": orgName,
 		"entityType":       policyGroup.EntityType,
 		"mode":             policyGroup.Mode,
 		"stacks":           convertStacksToInterfaceArray(policyGroup.Stacks),
+		"accounts":         policyGroup.Accounts,
 		"policyPacks":      convertPolicyPacksToInterfaceArray(policyGroup.AppliedPolicyPacks),
 	}
 
-	propertyMap := resource.NewPropertyMapFromMap(inputMap)
-
-	props, err := plugin.MarshalProperties(propertyMap, plugin.MarshalOptions{})
+	props, err := plugin.MarshalProperties(resource.NewPropertyMapFromMap(propsMap), plugin.MarshalOptions{})
 	if err != nil {
-		return nil, fmt.Errorf("failed to marshal inputs to properties: %w", err)
+		return nil, fmt.Errorf("failed to marshal properties: %w", err)
+	}
+
+	propsMap["accounts"] = inputAccounts
+	inputs, err := plugin.MarshalProperties(resource.NewPropertyMapFromMap(propsMap), plugin.MarshalOptions{})
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal inputs: %w", err)
 	}
 
 	return &pulumirpc.ReadResponse{
 		Id:         req.Id,
 		Properties: props,
-		Inputs:     props,
+		Inputs:     inputs,
 	}, nil
 }
 
@@ -351,31 +388,28 @@ func (p *PulumiServicePolicyGroupResource) Update(req *pulumirpc.UpdateRequest) 
 	policyGroupOld := ToPulumiServicePolicyGroupInput(inputsOld)
 	policyGroupNew := ToPulumiServicePolicyGroupInput(inputsNew)
 
+	// Collect all update operations into a batch request
+	var batchReqs []pulumiapi.UpdatePolicyGroupRequest
+
 	// Handle stack changes
 	if !stackReferencesEqual(policyGroupOld.Stacks, policyGroupNew.Stacks) {
 		// Remove stacks that are no longer in the new list
 		for _, oldStack := range policyGroupOld.Stacks {
 			if !containsStackReference(policyGroupNew.Stacks, oldStack) {
-				updateReq := pulumiapi.UpdatePolicyGroupRequest{
-					RemoveStack: &oldStack,
-				}
-				err := p.Client.UpdatePolicyGroup(ctx, policyGroupNew.OrganizationName, policyGroupNew.Name, updateReq)
-				if err != nil {
-					return nil, fmt.Errorf("failed to remove stack from policy group: %w", err)
-				}
+				stack := oldStack
+				batchReqs = append(batchReqs, pulumiapi.UpdatePolicyGroupRequest{
+					RemoveStack: &stack,
+				})
 			}
 		}
 
 		// Add stacks that are new in the new list
 		for _, newStack := range policyGroupNew.Stacks {
 			if !containsStackReference(policyGroupOld.Stacks, newStack) {
-				updateReq := pulumiapi.UpdatePolicyGroupRequest{
-					AddStack: &newStack,
-				}
-				err := p.Client.UpdatePolicyGroup(ctx, policyGroupNew.OrganizationName, policyGroupNew.Name, updateReq)
-				if err != nil {
-					return nil, fmt.Errorf("failed to add stack to policy group: %w", err)
-				}
+				stack := newStack
+				batchReqs = append(batchReqs, pulumiapi.UpdatePolicyGroupRequest{
+					AddStack: &stack,
+				})
 			}
 		}
 	}
@@ -385,31 +419,77 @@ func (p *PulumiServicePolicyGroupResource) Update(req *pulumirpc.UpdateRequest) 
 		// Remove policy packs that are no longer in the new list
 		for _, oldPP := range policyGroupOld.PolicyPacks {
 			if !containsPolicyPack(policyGroupNew.PolicyPacks, oldPP) {
-				updateReq := pulumiapi.UpdatePolicyGroupRequest{
-					RemovePolicyPack: &oldPP,
-				}
-				err := p.Client.UpdatePolicyGroup(ctx, policyGroupNew.OrganizationName, policyGroupNew.Name, updateReq)
-				if err != nil {
-					return nil, fmt.Errorf("failed to remove policy pack from policy group: %w", err)
-				}
+				pp := oldPP
+				batchReqs = append(batchReqs, pulumiapi.UpdatePolicyGroupRequest{
+					RemovePolicyPack: &pp,
+				})
 			}
 		}
 
 		// Add policy packs that are new in the new list
 		for _, newPP := range policyGroupNew.PolicyPacks {
 			if !containsPolicyPack(policyGroupOld.PolicyPacks, newPP) {
-				updateReq := pulumiapi.UpdatePolicyGroupRequest{
-					AddPolicyPack: &newPP,
-				}
-				err := p.Client.UpdatePolicyGroup(ctx, policyGroupNew.OrganizationName, policyGroupNew.Name, updateReq)
-				if err != nil {
-					return nil, fmt.Errorf("failed to add policy pack to policy group: %w", err)
-				}
+				pp := newPP
+				batchReqs = append(batchReqs, pulumiapi.UpdatePolicyGroupRequest{
+					AddPolicyPack: &pp,
+				})
 			}
 		}
 	}
 
-	outputProperties, err := policyGroupNew.ToRpc()
+	// Handle account changes
+	if !util.ElementsEqual(policyGroupOld.Accounts, policyGroupNew.Accounts) {
+		// Remove accounts that are no longer in the new list
+		for _, oldAccount := range policyGroupOld.Accounts {
+			if !slices.Contains(policyGroupNew.Accounts, oldAccount) {
+				// Don't remove child accounts if their parent is still in the new list
+				// Child accounts are auto-managed when a parent account is added
+				if !hasParentAccount(oldAccount, policyGroupNew.Accounts) {
+					account := pulumiapi.InsightsAccountReference{Name: oldAccount}
+					batchReqs = append(batchReqs, pulumiapi.UpdatePolicyGroupRequest{
+						RemoveInsightsAccount: &account,
+					})
+				}
+			}
+		}
+
+		// Add accounts that are new in the new list
+		for _, newAccount := range policyGroupNew.Accounts {
+			if !slices.Contains(policyGroupOld.Accounts, newAccount) {
+				account := pulumiapi.InsightsAccountReference{Name: newAccount}
+				batchReqs = append(batchReqs, pulumiapi.UpdatePolicyGroupRequest{
+					AddInsightsAccount: &account,
+				})
+			}
+		}
+	}
+
+	// Send all updates in a single batch request
+	if len(batchReqs) > 0 {
+		err = p.Client.BatchUpdatePolicyGroup(ctx, policyGroupNew.OrganizationName, policyGroupNew.Name, batchReqs)
+		if err != nil {
+			return nil, fmt.Errorf("failed to update policy group: %w", err)
+		}
+	}
+
+	// Read back the policy group to get the full state
+	// This is important because adding accounts may auto-add child accounts
+	policyGroup, err := p.Client.GetPolicyGroup(ctx, policyGroupNew.OrganizationName, policyGroupNew.Name)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read policy group after update: %w", err)
+	}
+
+	outputs := PulumiServicePolicyGroupInput{
+		Name:             policyGroup.Name,
+		OrganizationName: policyGroupNew.OrganizationName,
+		Stacks:           policyGroup.Stacks,
+		Accounts:         policyGroup.Accounts,
+		PolicyPacks:      policyGroup.AppliedPolicyPacks,
+		EntityType:       policyGroup.EntityType,
+		Mode:             policyGroup.Mode,
+	}
+
+	outputProperties, err := outputs.ToRpc()
 	if err != nil {
 		return nil, err
 	}
@@ -436,25 +516,38 @@ func (p *PulumiServicePolicyGroupResource) Create(req *pulumirpc.CreateRequest) 
 
 	policyGroupID := fmt.Sprintf("%s/%s", inputsPolicyGroup.OrganizationName, inputsPolicyGroup.Name)
 
+	// Collect all add operations into a batch request
+	var batchReqs []pulumiapi.UpdatePolicyGroupRequest
+
 	// Add stacks to the policy group
 	for _, stack := range inputsPolicyGroup.Stacks {
-		updateReq := pulumiapi.UpdatePolicyGroupRequest{
-			AddStack: &stack,
-		}
-		err := p.Client.UpdatePolicyGroup(ctx, inputsPolicyGroup.OrganizationName, inputsPolicyGroup.Name, updateReq)
-		if err != nil {
-			return nil, partialErrorPolicyGroup(policyGroupID, fmt.Errorf("failed to add stack to policy group: %w", err), inputsPolicyGroup, inputsPolicyGroup)
-		}
+		s := stack
+		batchReqs = append(batchReqs, pulumiapi.UpdatePolicyGroupRequest{
+			AddStack: &s,
+		})
 	}
 
 	// Add policy packs to the policy group
 	for _, pp := range inputsPolicyGroup.PolicyPacks {
-		updateReq := pulumiapi.UpdatePolicyGroupRequest{
-			AddPolicyPack: &pp,
-		}
-		err := p.Client.UpdatePolicyGroup(ctx, inputsPolicyGroup.OrganizationName, inputsPolicyGroup.Name, updateReq)
+		p := pp
+		batchReqs = append(batchReqs, pulumiapi.UpdatePolicyGroupRequest{
+			AddPolicyPack: &p,
+		})
+	}
+
+	// Add accounts to the policy group
+	for _, account := range inputsPolicyGroup.Accounts {
+		a := account
+		batchReqs = append(batchReqs, pulumiapi.UpdatePolicyGroupRequest{
+			AddInsightsAccount: &pulumiapi.InsightsAccountReference{Name: a},
+		})
+	}
+
+	// Send all adds in a single batch request
+	if len(batchReqs) > 0 {
+		err = p.Client.BatchUpdatePolicyGroup(ctx, inputsPolicyGroup.OrganizationName, inputsPolicyGroup.Name, batchReqs)
 		if err != nil {
-			return nil, partialErrorPolicyGroup(policyGroupID, fmt.Errorf("failed to add policy pack to policy group: %w", err), inputsPolicyGroup, inputsPolicyGroup)
+			return nil, partialErrorPolicyGroup(policyGroupID, fmt.Errorf("failed to add items to policy group: %w", err), inputsPolicyGroup, inputsPolicyGroup)
 		}
 	}
 
@@ -468,6 +561,7 @@ func (p *PulumiServicePolicyGroupResource) Create(req *pulumirpc.CreateRequest) 
 		Name:             policyGroup.Name,
 		OrganizationName: inputsPolicyGroup.OrganizationName,
 		Stacks:           policyGroup.Stacks,
+		Accounts:         policyGroup.Accounts,
 		PolicyPacks:      policyGroup.AppliedPolicyPacks,
 		EntityType:       policyGroup.EntityType,
 		Mode:             policyGroup.Mode,
@@ -487,48 +581,27 @@ func (p *PulumiServicePolicyGroupResource) Create(req *pulumirpc.CreateRequest) 
 // Helper functions
 
 func stackReferencesEqual(a, b []pulumiapi.StackReference) bool {
-	if len(a) != len(b) {
-		return false
+	return util.ElementsEqualFunc(a, b, compareStackReferences, stackReferencesEq)
+}
+
+func compareStackReferences(i, j pulumiapi.StackReference) int {
+	if i.RoutingProject != j.RoutingProject {
+		if i.RoutingProject < j.RoutingProject {
+			return -1
+		}
+		return 1
 	}
-	aCopy := make([]pulumiapi.StackReference, len(a))
-	bCopy := make([]pulumiapi.StackReference, len(b))
-	copy(aCopy, a)
-	copy(bCopy, b)
+	if i.Name < j.Name {
+		return -1
+	}
+	if i.Name > j.Name {
+		return 1
+	}
+	return 0
+}
 
-	slices.SortFunc(aCopy, func(i, j pulumiapi.StackReference) int {
-		if i.RoutingProject != j.RoutingProject {
-			if i.RoutingProject < j.RoutingProject {
-				return -1
-			}
-			return 1
-		}
-		if i.Name < j.Name {
-			return -1
-		}
-		if i.Name > j.Name {
-			return 1
-		}
-		return 0
-	})
-	slices.SortFunc(bCopy, func(i, j pulumiapi.StackReference) int {
-		if i.RoutingProject != j.RoutingProject {
-			if i.RoutingProject < j.RoutingProject {
-				return -1
-			}
-			return 1
-		}
-		if i.Name < j.Name {
-			return -1
-		}
-		if i.Name > j.Name {
-			return 1
-		}
-		return 0
-	})
-
-	return slices.EqualFunc(aCopy, bCopy, func(x, y pulumiapi.StackReference) bool {
-		return x.Name == y.Name && x.RoutingProject == y.RoutingProject
-	})
+func stackReferencesEq(x, y pulumiapi.StackReference) bool {
+	return x.Name == y.Name && x.RoutingProject == y.RoutingProject
 }
 
 func containsStackReference(stacks []pulumiapi.StackReference, target pulumiapi.StackReference) bool {
@@ -541,48 +614,27 @@ func containsStackReference(stacks []pulumiapi.StackReference, target pulumiapi.
 }
 
 func policyPacksEqual(a, b []pulumiapi.PolicyPackMetadata) bool {
-	if len(a) != len(b) {
-		return false
+	return util.ElementsEqualFunc(a, b, comparePolicyPacks, policyPacksEq)
+}
+
+func comparePolicyPacks(i, j pulumiapi.PolicyPackMetadata) int {
+	if i.Name < j.Name {
+		return -1
 	}
-	aCopy := make([]pulumiapi.PolicyPackMetadata, len(a))
-	bCopy := make([]pulumiapi.PolicyPackMetadata, len(b))
-	copy(aCopy, a)
-	copy(bCopy, b)
+	if i.Name > j.Name {
+		return 1
+	}
+	if i.Version < j.Version {
+		return -1
+	}
+	if i.Version > j.Version {
+		return 1
+	}
+	return 0
+}
 
-	slices.SortFunc(aCopy, func(i, j pulumiapi.PolicyPackMetadata) int {
-		if i.Name < j.Name {
-			return -1
-		}
-		if i.Name > j.Name {
-			return 1
-		}
-		if i.Version < j.Version {
-			return -1
-		}
-		if i.Version > j.Version {
-			return 1
-		}
-		return 0
-	})
-	slices.SortFunc(bCopy, func(i, j pulumiapi.PolicyPackMetadata) int {
-		if i.Name < j.Name {
-			return -1
-		}
-		if i.Name > j.Name {
-			return 1
-		}
-		if i.Version < j.Version {
-			return -1
-		}
-		if i.Version > j.Version {
-			return 1
-		}
-		return 0
-	})
-
-	return slices.EqualFunc(aCopy, bCopy, func(x, y pulumiapi.PolicyPackMetadata) bool {
-		return x.Name == y.Name && x.Version == y.Version && x.VersionTag == y.VersionTag
-	})
+func policyPacksEq(x, y pulumiapi.PolicyPackMetadata) bool {
+	return x.Name == y.Name && x.Version == y.Version && x.VersionTag == y.VersionTag
 }
 
 func containsPolicyPack(packs []pulumiapi.PolicyPackMetadata, target pulumiapi.PolicyPackMetadata) bool {
@@ -592,6 +644,64 @@ func containsPolicyPack(packs []pulumiapi.PolicyPackMetadata, target pulumiapi.P
 		}
 	}
 	return false
+}
+
+// parsePreviousAccounts extracts the accounts from previous state and inputs.
+// This is used during Read to determine if we should preserve original inputs.
+func parsePreviousAccounts(properties, inputs *structpb.Struct) (stateAccounts, inputAccounts []string) {
+	if properties != nil {
+		oldProps, err := plugin.UnmarshalProperties(properties, plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
+		if err == nil {
+			oldState := ToPulumiServicePolicyGroupInput(oldProps)
+			stateAccounts = oldState.Accounts
+		}
+	}
+	if inputs != nil {
+		oldInputs, err := plugin.UnmarshalProperties(inputs, plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
+		if err == nil {
+			oldInput := ToPulumiServicePolicyGroupInput(oldInputs)
+			inputAccounts = oldInput.Accounts
+		}
+	}
+	return stateAccounts, inputAccounts
+}
+
+// hasParentAccount checks if the given account has a parent account in the list.
+// Account names use "/" as a separator, so "parent/child" has parent "parent".
+func hasParentAccount(account string, accounts []string) bool {
+	for _, acc := range accounts {
+		// Check if account starts with acc + "/" (meaning acc is a parent of account)
+		if strings.HasPrefix(account, acc+"/") {
+			return true
+		}
+	}
+	return false
+}
+
+// policyGroupInputsEqual compares two PulumiServicePolicyGroupInput structs using order-independent
+// comparison for array fields (stacks, accounts, policyPacks). This prevents spurious diffs when
+// array elements are in different order but contain the same values.
+func policyGroupInputsEqual(a, b PulumiServicePolicyGroupInput) bool {
+	// Compare scalar fields
+	if a.Name != b.Name ||
+		a.OrganizationName != b.OrganizationName ||
+		a.EntityType != b.EntityType ||
+		a.Mode != b.Mode {
+		return false
+	}
+
+	// Compare arrays using order-independent comparison
+	if !stackReferencesEqual(a.Stacks, b.Stacks) {
+		return false
+	}
+	if !util.ElementsEqual(a.Accounts, b.Accounts) {
+		return false
+	}
+	if !policyPacksEqual(a.PolicyPacks, b.PolicyPacks) {
+		return false
+	}
+
+	return true
 }
 
 // partialErrorPolicyGroup creates an error for resources that did not complete an operation in progress.
