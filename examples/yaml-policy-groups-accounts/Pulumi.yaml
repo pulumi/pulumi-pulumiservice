@@ -1,0 +1,58 @@
+name: yaml-policy-groups-accounts
+description: Example demonstrating PolicyGroup resource with InsightsAccount entityType
+runtime: yaml
+config:
+  digits:
+    type: string
+  organizationName:
+    type: string
+    default: service-provider-test-org
+
+resources:
+  # ESC environment with AWS credentials for the insights account
+  credentials-env:
+    type: pulumiservice:Environment
+    properties:
+      organization: ${organizationName}
+      project: policy-group-test-${digits}
+      name: insights-credentials-${digits}
+      yaml:
+        fn::stringAsset: |-
+          values:
+            aws:
+              login:
+                fn::open::aws-login:
+                  oidc:
+                    roleArn: arn:aws:iam::123456789012:role/PulumiInsightsRole
+                    sessionName: pulumi-insights-session
+            environmentVariables:
+              AWS_REGION: us-west-2
+
+  # Insights account for AWS scanning
+  insights-account:
+    type: pulumiservice:InsightsAccount
+    properties:
+      organizationName: ${organizationName}
+      accountName: policy-group-test-account-${digits}
+      provider: aws
+      environment: ${credentials-env.project}/${credentials-env.name}
+      scanSchedule: none
+      tags:
+        environment: testing
+
+  # Policy group that targets the insights account
+  # This tests the accounts entityType with a real InsightsAccount reference
+  testPolicyGroup:
+    type: pulumiservice:PolicyGroup
+    properties:
+      name: test-policy-group-accounts-${digits}
+      organizationName: ${organizationName}
+      entityType: accounts
+      mode: audit
+      accounts:
+        - ${insights-account.accountName}
+
+outputs:
+  policyGroupName: ${testPolicyGroup.name}
+  insightsAccountName: ${insights-account.accountName}
+  policyGroupAccounts: ${testPolicyGroup.accounts}

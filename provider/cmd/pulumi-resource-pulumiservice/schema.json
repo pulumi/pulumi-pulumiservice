@@ -1867,6 +1867,13 @@
     "pulumiservice:index:PolicyGroup": {
       "description": "A Policy Group allows you to apply policy packs to a set of stacks in your organization.",
       "properties": {
+        "accounts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of accounts that belong to this policy group."
+        },
         "entityType": {
           "type": "string",
           "description": "The entity type for the policy group. Valid values are 'stacks' or 'accounts'. Defaults to 'stacks'."
@@ -1905,6 +1912,13 @@
         "mode"
       ],
       "inputProperties": {
+        "accounts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of accounts that belong to this policy group."
+        },
         "entityType": {
           "type": "string",
           "description": "The entity type for the policy group. Valid values are 'stacks' or 'accounts'. Defaults to 'stacks'.",

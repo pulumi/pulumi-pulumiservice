@@ -38,6 +38,10 @@ export class PolicyGroup extends pulumi.CustomResource {
     }
 
     /**
+     * List of accounts that belong to this policy group.
+     */
+    declare public readonly accounts: pulumi.Output<string[] | undefined>;
+    /**
      * The entity type for the policy group. Valid values are 'stacks' or 'accounts'. Defaults to 'stacks'.
      */
     declare public readonly entityType: pulumi.Output<string>;
@@ -79,6 +83,7 @@ export class PolicyGroup extends pulumi.CustomResource {
             if (args?.organizationName === undefined && !opts.urn) {
                 throw new Error("Missing required property 'organizationName'");
             }
+            resourceInputs["accounts"] = args?.accounts;
             resourceInputs["entityType"] = (args?.entityType) ?? "stacks";
             resourceInputs["mode"] = (args?.mode) ?? "audit";
             resourceInputs["name"] = args?.name;
@@ -86,6 +91,7 @@ export class PolicyGroup extends pulumi.CustomResource {
             resourceInputs["policyPacks"] = args?.policyPacks;
             resourceInputs["stacks"] = args?.stacks;
         } else {
+            resourceInputs["accounts"] = undefined /*out*/;
             resourceInputs["entityType"] = undefined /*out*/;
             resourceInputs["mode"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
@@ -102,6 +108,10 @@ export class PolicyGroup extends pulumi.CustomResource {
  * The set of arguments for constructing a PolicyGroup resource.
  */
 export interface PolicyGroupArgs {
+    /**
+     * List of accounts that belong to this policy group.
+     */
+    accounts?: pulumi.Input<pulumi.Input<string>[]>;
     /**
      * The entity type for the policy group. Valid values are 'stacks' or 'accounts'. Defaults to 'stacks'.
      */

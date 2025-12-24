@@ -16,6 +16,8 @@ import (
 type PolicyGroup struct {
 	pulumi.CustomResourceState
 
+	// List of accounts that belong to this policy group.
+	Accounts pulumi.StringArrayOutput `pulumi:"accounts"`
 	// The entity type for the policy group. Valid values are 'stacks' or 'accounts'. Defaults to 'stacks'.
 	EntityType pulumi.StringOutput `pulumi:"entityType"`
 	// The mode for the policy group. Valid values are 'audit' (reports violations) or 'preventative' (blocks operations). Defaults to 'audit'.
@@ -82,6 +84,8 @@ func (PolicyGroupState) ElementType() reflect.Type {
 }
 
 type policyGroupArgs struct {
+	// List of accounts that belong to this policy group.
+	Accounts []string `pulumi:"accounts"`
 	// The entity type for the policy group. Valid values are 'stacks' or 'accounts'. Defaults to 'stacks'.
 	EntityType *string `pulumi:"entityType"`
 	// The mode for the policy group. Valid values are 'audit' (reports violations) or 'preventative' (blocks operations). Defaults to 'audit'.
@@ -98,6 +102,8 @@ type policyGroupArgs struct {
 
 // The set of arguments for constructing a PolicyGroup resource.
 type PolicyGroupArgs struct {
+	// List of accounts that belong to this policy group.
+	Accounts pulumi.StringArrayInput
 	// The entity type for the policy group. Valid values are 'stacks' or 'accounts'. Defaults to 'stacks'.
 	EntityType pulumi.StringPtrInput
 	// The mode for the policy group. Valid values are 'audit' (reports violations) or 'preventative' (blocks operations). Defaults to 'audit'.
@@ -197,6 +203,11 @@ func (o PolicyGroupOutput) ToPolicyGroupOutput() PolicyGroupOutput {
 
 func (o PolicyGroupOutput) ToPolicyGroupOutputWithContext(ctx context.Context) PolicyGroupOutput {
 	return o
+}
+
+// List of accounts that belong to this policy group.
+func (o PolicyGroupOutput) Accounts() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v *PolicyGroup) pulumi.StringArrayOutput { return v.Accounts }).(pulumi.StringArrayOutput)
 }
 
 // The entity type for the policy group. Valid values are 'stacks' or 'accounts'. Defaults to 'stacks'.

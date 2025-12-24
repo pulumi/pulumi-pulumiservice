@@ -166,19 +166,95 @@ func TestCreatePolicyGroup_Unauthorized(t *testing.T) {
 	assert.Contains(t, err.Error(), "unauthorized")
 }
 
+// TestBatchUpdatePolicyGroup tests the batch update functionality
+func TestBatchUpdatePolicyGroup(t *testing.T) {
+	orgName := "test-org"
+	policyGroupName := "test-policy-group"
+
+	t.Run("Empty OrgName", func(t *testing.T) {
+		c := &Client{}
+
+		err := c.BatchUpdatePolicyGroup(ctx, "", policyGroupName, []UpdatePolicyGroupRequest{})
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "orgName must not be empty")
+	})
+
+	t.Run("Empty PolicyGroupName", func(t *testing.T) {
+		c := &Client{}
+
+		err := c.BatchUpdatePolicyGroup(ctx, orgName, "", []UpdatePolicyGroupRequest{})
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "policyGroupName must not be empty")
+	})
+
+	t.Run("Empty Requests - No Op", func(t *testing.T) {
+		c := &Client{}
+
+		// Empty requests should return nil without making any API call
+		err := c.BatchUpdatePolicyGroup(ctx, orgName, policyGroupName, []UpdatePolicyGroupRequest{})
+		assert.NoError(t, err)
+	})
+
+	t.Run("Multiple Operations", func(t *testing.T) {
+		stack1 := StackReference{Name: "stack-1", RoutingProject: "project-1"}
+		stack2 := StackReference{Name: "stack-2", RoutingProject: "project-2"}
+		account := InsightsAccountReference{Name: "my-account"}
+		policyPack := PolicyPackMetadata{Name: "my-pack", Version: 1}
+
+		reqs := []UpdatePolicyGroupRequest{
+			{AddStack: &stack1},
+			{RemoveStack: &stack2},
+			{AddInsightsAccount: &account},
+			{AddPolicyPack: &policyPack},
+		}
+
+		c := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodPatch,
+			ExpectedReqPath:   "/api/orgs/test-org/policygroups/test-policy-group/batch",
+			ExpectedReqBody:   reqs,
+			ResponseCode:      200,
+		})
+
+		err := c.BatchUpdatePolicyGroup(ctx, orgName, policyGroupName, reqs)
+		assert.NoError(t, err)
+	})
+
+	t.Run("API Error", func(t *testing.T) {
+		stack := StackReference{Name: "invalid-stack"}
+		reqs := []UpdatePolicyGroupRequest{
+			{AddStack: &stack},
+		}
+
+		c := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodPatch,
+			ExpectedReqPath:   "/api/orgs/test-org/policygroups/test-policy-group/batch",
+			ExpectedReqBody:   reqs,
+			ResponseCode:      400,
+			ResponseBody: ErrorResponse{
+				Message: "stack not found",
+			},
+		})
+
+		err := c.BatchUpdatePolicyGroup(ctx, orgName, policyGroupName, reqs)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "failed to batch update policy group")
+		assert.Contains(t, err.Error(), "stack not found")
+	})
+}
+
 // TestGetPolicyGroup_IncludesEntityTypeAndMode tests that GetPolicyGroup response includes new fields
 func TestGetPolicyGroup_IncludesEntityTypeAndMode(t *testing.T) {
 	orgName := "test-org"
 	policyGroupName := "test-policy-group"
 
 	expectedResponse := PolicyGroup{
-		Name:                policyGroupName,
-		IsOrgDefault:        false,
-		EntityType:          "accounts",
-		Mode:                "preventative",
-		Stacks:              []StackReference{},
-		AppliedPolicyPacks:  []PolicyPackMetadata{},
-		Accounts:            []string{},
+		Name:               policyGroupName,
+		IsOrgDefault:       false,
+		EntityType:         "accounts",
+		Mode:               "preventative",
+		Stacks:             []StackReference{},
+		AppliedPolicyPacks: []PolicyPackMetadata{},
+		Accounts:           []string{},
 	}
 
 	c := startTestServer(t, testServerConfig{
