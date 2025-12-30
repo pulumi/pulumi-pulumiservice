@@ -368,10 +368,10 @@ github.com/pulumi/providertest v0.3.1 h1:vlftr7TZlObh81mL88IhhF0/9ZbLrZZos4NAvR4
 github.com/pulumi/providertest v0.3.1/go.mod h1:fFHUP4/9DRyYnHWiRnwcynMtM/a7hHR/QcJfcuZKO3A=
 github.com/pulumi/pulumi-go-provider v1.2.0 h1:PZ5P986OiS+tTzEaO+9LRHbXnYU6jqVtIYlRJa8quS0=
 github.com/pulumi/pulumi-go-provider v1.2.0/go.mod h1:3lNIuxT/BArFyiKrVfv+UT7gMMtplss7V69KuBZ4zIk=
-github.com/pulumi/pulumi/pkg/v3 v3.213.0 h1:Vs7uooioUTgoe9OiusNIr3n5Emjw7gU38NCp3gGzZq0=
-github.com/pulumi/pulumi/pkg/v3 v3.213.0/go.mod h1:rqMSDY7SPN6ymilqjHImS+z+TsHCs5rqcJVhDNAFvuY=
-github.com/pulumi/pulumi/sdk/v3 v3.213.0 h1:ICp0WJlTShaTLrx2fDI52fJ3xwCf1h8T8tVrKDRNUB4=
-github.com/pulumi/pulumi/sdk/v3 v3.213.0/go.mod h1:Bn5Z9Rzp1lPqdAccaB+F2ivUBiamEl2TNR3Gg/h7iLs=
+github.com/pulumi/pulumi/pkg/v3 v3.214.0 h1:YTdU/VuVXP1Mk05FvCyTGO6+85DTuXacVoH2dhu8gRs=
+github.com/pulumi/pulumi/pkg/v3 v3.214.0/go.mod h1:HVYW1gwE3eGtHImAfCs/Ww0yyW0PujHpsAA8S3RGxoo=
+github.com/pulumi/pulumi/sdk/v3 v3.214.0 h1:MBUrjhaY7i9RmEQddyH/HR0kvF5Kxl3WT+/Ra9wV3YM=
+github.com/pulumi/pulumi/sdk/v3 v3.214.0/go.mod h1:Bn5Z9Rzp1lPqdAccaB+F2ivUBiamEl2TNR3Gg/h7iLs=
 github.com/redis/go-redis/v9 v9.7.0 h1:HhLSs+B6O021gwzl+locl0zEDnyNkxMtf/Z3NNBMa9E=
 github.com/redis/go-redis/v9 v9.7.0/go.mod h1:f6zhXITC7JUJIlPEiBOTXxJgPLdZcA93GewI7inzyWw=
 github.com/rivo/uniseg v0.1.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJtxc=
