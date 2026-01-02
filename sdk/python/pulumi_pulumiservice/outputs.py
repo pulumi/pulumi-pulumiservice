@@ -33,6 +33,7 @@ __all__ = [
     'EligibleApprover',
     'EnvironmentIdentifier',
     'GCPOIDCConfiguration',
+    'InsightsAccountState',
     'OperationContextOIDC',
     'OperationContextOptions',
     'PolicyGroupPolicyPackReference',
@@ -1055,6 +1056,116 @@ class GCPOIDCConfiguration(dict):
         The lifetime of the temporary credentials in “XhYmZs” format.
         """
         return pulumi.get(self, "token_lifetime")
+
+
+@pulumi.output_type
+class InsightsAccountState(dict):
+    def __init__(__self__, *,
+                 account_name: _builtins.str,
+                 environment: _builtins.str,
+                 insights_account_id: _builtins.str,
+                 organization_name: _builtins.str,
+                 provider: 'CloudProvider',
+                 scan_schedule: Optional['ScanSchedule'] = None,
+                 scheduled_scan_enabled: _builtins.bool,
+                 provider_config: Optional[Mapping[str, Any]] = None,
+                 tags: Optional[Mapping[str, _builtins.str]] = None):
+        """
+        :param _builtins.str account_name: Name of the insights account.
+        :param _builtins.str environment: The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0').
+        :param _builtins.str insights_account_id: The insights account identifier.
+        :param _builtins.str organization_name: The organization's name.
+        :param 'CloudProvider' provider: The cloud provider for scanning.
+        :param 'ScanSchedule' scan_schedule: Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
+        :param _builtins.bool scheduled_scan_enabled: Whether scheduled scanning is enabled.
+        :param Mapping[str, Any] provider_config: Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {"regions": ["us-west-1", "us-west-2"]}.
+        :param Mapping[str, _builtins.str] tags: Key-value tags to associate with the insights account.
+        """
+        pulumi.set(__self__, "account_name", account_name)
+        pulumi.set(__self__, "environment", environment)
+        pulumi.set(__self__, "insights_account_id", insights_account_id)
+        pulumi.set(__self__, "organization_name", organization_name)
+        pulumi.set(__self__, "provider", provider)
+        if scan_schedule is None:
+            scan_schedule = 'none'
+        pulumi.set(__self__, "scan_schedule", scan_schedule)
+        pulumi.set(__self__, "scheduled_scan_enabled", scheduled_scan_enabled)
+        if provider_config is not None:
+            pulumi.set(__self__, "provider_config", provider_config)
+        if tags is not None:
+            pulumi.set(__self__, "tags", tags)
+
+    @_builtins.property
+    @pulumi.getter(name="accountName")
+    def account_name(self) -> _builtins.str:
+        """
+        Name of the insights account.
+        """
+        return pulumi.get(self, "account_name")
+
+    @_builtins.property
+    @pulumi.getter
+    def environment(self) -> _builtins.str:
+        """
+        The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0').
+        """
+        return pulumi.get(self, "environment")
+
+    @_builtins.property
+    @pulumi.getter(name="insightsAccountId")
+    def insights_account_id(self) -> _builtins.str:
+        """
+        The insights account identifier.
+        """
+        return pulumi.get(self, "insights_account_id")
+
+    @_builtins.property
+    @pulumi.getter(name="organizationName")
+    def organization_name(self) -> _builtins.str:
+        """
+        The organization's name.
+        """
+        return pulumi.get(self, "organization_name")
+
+    @_builtins.property
+    @pulumi.getter
+    def provider(self) -> 'CloudProvider':
+        """
+        The cloud provider for scanning.
+        """
+        return pulumi.get(self, "provider")
+
+    @_builtins.property
+    @pulumi.getter(name="scanSchedule")
+    def scan_schedule(self) -> 'ScanSchedule':
+        """
+        Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
+        """
+        return pulumi.get(self, "scan_schedule")
+
+    @_builtins.property
+    @pulumi.getter(name="scheduledScanEnabled")
+    def scheduled_scan_enabled(self) -> _builtins.bool:
+        """
+        Whether scheduled scanning is enabled.
+        """
+        return pulumi.get(self, "scheduled_scan_enabled")
+
+    @_builtins.property
+    @pulumi.getter(name="providerConfig")
+    def provider_config(self) -> Optional[Mapping[str, Any]]:
+        """
+        Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {"regions": ["us-west-1", "us-west-2"]}.
+        """
+        return pulumi.get(self, "provider_config")
+
+    @_builtins.property
+    @pulumi.getter
+    def tags(self) -> Optional[Mapping[str, _builtins.str]]:
+        """
+        Key-value tags to associate with the insights account.
+        """
+        return pulumi.get(self, "tags")
 
 
 @pulumi.output_type

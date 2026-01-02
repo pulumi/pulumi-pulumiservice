@@ -64,7 +64,7 @@ class MyStack : Pulumi.Stack
             }
         );
 
-        // Schedule to destroy stack resources on Jan 1, 2026, but NOT delete the stack itself
+        // Schedule to destroy stack resources on Jan 1, 2099, but NOT delete the stack itself
         var ttl = new TtlSchedule(
             "ttl-schedule",
             new TtlScheduleArgs
@@ -72,7 +72,7 @@ class MyStack : Pulumi.Stack
                 Organization = "service-provider-test-org",
                 Project = "cs-schedules",
                 Stack = stackName,
-                Timestamp = "2026-01-01T00:00:00Z",
+                Timestamp = "2099-01-01T00:00:00Z",
                 DeleteAfterDestroy = false
             },
             new CustomResourceOptions
@@ -98,7 +98,7 @@ class MyStack : Pulumi.Stack
             }
         );
 
-        // Schedule that runs `pulumi preview` once on Jan 1, 2026
+        // Schedule that runs `pulumi preview` once on Jan 1, 2099
         var deploymentPreview = new DeploymentSchedule(
             "deployment-schedule-preview",
             new DeploymentScheduleArgs
@@ -106,7 +106,7 @@ class MyStack : Pulumi.Stack
                 Organization = "service-provider-test-org",
                 Project = "cs-schedules",
                 Stack = stackName,
-                Timestamp = "2026-01-01T00:00:00Z",
+                Timestamp = "2099-01-01T00:00:00Z",
                 PulumiOperation = PulumiOperation.Preview
             },
             new CustomResourceOptions

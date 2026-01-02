@@ -50,6 +50,16 @@ export type EnvironmentVersionTag = import("./environmentVersionTag").Environmen
 export const EnvironmentVersionTag: typeof import("./environmentVersionTag").EnvironmentVersionTag = null as any;
 utilities.lazyLoad(exports, ["EnvironmentVersionTag"], () => require("./environmentVersionTag"));
 
+export { GetInsightsAccountArgs, GetInsightsAccountResult, GetInsightsAccountOutputArgs } from "./getInsightsAccount";
+export const getInsightsAccount: typeof import("./getInsightsAccount").getInsightsAccount = null as any;
+export const getInsightsAccountOutput: typeof import("./getInsightsAccount").getInsightsAccountOutput = null as any;
+utilities.lazyLoad(exports, ["getInsightsAccount","getInsightsAccountOutput"], () => require("./getInsightsAccount"));
+
+export { GetInsightsAccountsArgs, GetInsightsAccountsResult, GetInsightsAccountsOutputArgs } from "./getInsightsAccounts";
+export const getInsightsAccounts: typeof import("./getInsightsAccounts").getInsightsAccounts = null as any;
+export const getInsightsAccountsOutput: typeof import("./getInsightsAccounts").getInsightsAccountsOutput = null as any;
+utilities.lazyLoad(exports, ["getInsightsAccounts","getInsightsAccountsOutput"], () => require("./getInsightsAccounts"));
+
 export { GetPolicyPackArgs, GetPolicyPackResult, GetPolicyPackOutputArgs } from "./getPolicyPack";
 export const getPolicyPack: typeof import("./getPolicyPack").getPolicyPack = null as any;
 export const getPolicyPackOutput: typeof import("./getPolicyPack").getPolicyPackOutput = null as any;

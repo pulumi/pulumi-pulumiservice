@@ -42,14 +42,14 @@ resources:
     options:
       dependsOn:
         - ${settings}
-  # Schedule to destroy stack resources on Jan 1, 2026, but NOT delete the stack itself
+  # Schedule to destroy stack resources on Jan 1, 2099, but NOT delete the stack itself
   ttl-schedule-${rand.result}:
     type: pulumiservice:TtlSchedule
     properties:
       organization: service-provider-test-org
       project: pulumi-service-schedules-example-yaml
       stack: test-stack-${digits}
-      timestamp: "2026-01-01T00:00:00Z"
+      timestamp: "2099-01-01T00:00:00Z"
       deleteAfterDestroy: false
     options:
       dependsOn:
@@ -66,14 +66,14 @@ resources:
     options:
       dependsOn:
         - ${settings}
-  # Schedule that runs `pulumi preview` once on Jan 1, 2026
+  # Schedule that runs `pulumi preview` once on Jan 1, 2099
   deployment-schedule-preview-${rand.result}:
     type: pulumiservice:DeploymentSchedule
     properties:
       organization: service-provider-test-org
       project: pulumi-service-schedules-example-yaml
       stack: test-stack-${digits}
-      timestamp: "2026-01-01T00:00:00Z"
+      timestamp: "2099-01-01T00:00:00Z"
       pulumiOperation: preview
     options:
       dependsOn:

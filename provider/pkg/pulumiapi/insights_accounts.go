@@ -25,6 +25,7 @@ import (
 type InsightsAccountClient interface {
 	CreateInsightsAccount(ctx context.Context, orgName, accountName string, req CreateInsightsAccountRequest) error
 	GetInsightsAccount(ctx context.Context, orgName, accountName string) (*InsightsAccount, error)
+	ListInsightsAccounts(ctx context.Context, orgName string) ([]InsightsAccount, error)
 	UpdateInsightsAccount(ctx context.Context, orgName, accountName string, req UpdateInsightsAccountRequest) error
 	DeleteInsightsAccount(ctx context.Context, orgName, accountName string) error
 	TriggerScan(ctx context.Context, orgName, accountName string) (*TriggerScanResponse, error)
@@ -140,12 +141,32 @@ func (c *Client) GetInsightsAccount(ctx context.Context, orgName, accountName st
 	return &account, nil
 }
 
+type ListInsightsAccountsResponse struct {
+	Accounts []InsightsAccount `json:"accounts"`
+}
+
+func (c *Client) ListInsightsAccounts(ctx context.Context, orgName string) ([]InsightsAccount, error) {
+	if orgName == "" {
+		return nil, errors.New("empty orgName")
+	}
+
+	apiPath := path.Join("preview", "insights", orgName, "accounts")
+
+	var response ListInsightsAccountsResponse
+	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &response)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list insights accounts: %w", err)
+	}
+
+	return response.Accounts, nil
+}
+
 func (c *Client) UpdateInsightsAccount(ctx context.Context, orgName, accountName string, req UpdateInsightsAccountRequest) error {
-	if len(orgName) == 0 {
+	if orgName == "" {
 		return errors.New("empty orgName")
 	}
 
-	if len(accountName) == 0 {
+	if accountName == "" {
 		return errors.New("empty accountName")
 	}
 
@@ -160,11 +181,11 @@ func (c *Client) UpdateInsightsAccount(ctx context.Context, orgName, accountName
 }
 
 func (c *Client) DeleteInsightsAccount(ctx context.Context, orgName, accountName string) error {
-	if len(orgName) == 0 {
+	if orgName == "" {
 		return errors.New("empty orgName")
 	}
 
-	if len(accountName) == 0 {
+	if accountName == "" {
 		return errors.New("empty accountName")
 	}
 
@@ -189,11 +210,11 @@ type ScanOptions struct {
 // TriggerScan initiates an on-demand scan for the insights account
 // If a scan is already running, it returns the existing scan details instead of triggering a new one
 func (c *Client) TriggerScan(ctx context.Context, orgName, accountName string) (*TriggerScanResponse, error) {
-	if len(orgName) == 0 {
+	if orgName == "" {
 		return nil, errors.New("empty orgName")
 	}
 
-	if len(accountName) == 0 {
+	if accountName == "" {
 		return nil, errors.New("empty accountName")
 	}
 
@@ -240,11 +261,11 @@ func (c *Client) TriggerScan(ctx context.Context, orgName, accountName string) (
 
 // GetScanStatus retrieves the current scan status of the insights account
 func (c *Client) GetScanStatus(ctx context.Context, orgName, accountName string) (*ScanStatusResponse, error) {
-	if len(orgName) == 0 {
+	if orgName == "" {
 		return nil, errors.New("empty orgName")
 	}
 
-	if len(accountName) == 0 {
+	if accountName == "" {
 		return nil, errors.New("empty accountName")
 	}
 
@@ -266,11 +287,11 @@ func (c *Client) GetScanStatus(ctx context.Context, orgName, accountName string)
 
 // GetInsightsAccountTags retrieves the tags for an insights account
 func (c *Client) GetInsightsAccountTags(ctx context.Context, orgName, accountName string) (map[string]string, error) {
-	if len(orgName) == 0 {
+	if orgName == "" {
 		return nil, errors.New("empty orgName")
 	}
 
-	if len(accountName) == 0 {
+	if accountName == "" {
 		return nil, errors.New("empty accountName")
 	}
 
@@ -295,11 +316,11 @@ func (c *Client) GetInsightsAccountTags(ctx context.Context, orgName, accountNam
 
 // SetInsightsAccountTags sets the tags for an insights account
 func (c *Client) SetInsightsAccountTags(ctx context.Context, orgName, accountName string, tags map[string]string) error {
-	if len(orgName) == 0 {
+	if orgName == "" {
 		return errors.New("empty orgName")
 	}
 
-	if len(accountName) == 0 {
+	if accountName == "" {
 		return errors.New("empty accountName")
 	}
 
