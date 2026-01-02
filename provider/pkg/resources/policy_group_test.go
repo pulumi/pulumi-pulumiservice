@@ -16,6 +16,7 @@ package resources
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
@@ -28,8 +29,9 @@ import (
 
 // Mock client for PolicyGroup tests
 type PolicyGroupClientMock struct {
-	getPolicyGroupFunc    func() (*pulumiapi.PolicyGroup, error)
-	createPolicyGroupFunc func(ctx context.Context, orgName, policyGroupName, entityType, mode string) error
+	getPolicyGroupFunc         func() (*pulumiapi.PolicyGroup, error)
+	createPolicyGroupFunc      func(ctx context.Context, orgName, policyGroupName, entityType, mode string) error
+	batchUpdatePolicyGroupFunc func(ctx context.Context, orgName, policyGroupName string, reqs []pulumiapi.UpdatePolicyGroupRequest) error
 }
 
 func (c *PolicyGroupClientMock) ListPolicyGroups(ctx context.Context, orgName string) ([]pulumiapi.PolicyGroupSummary, error) {
@@ -55,12 +57,155 @@ func (c *PolicyGroupClientMock) UpdatePolicyGroup(ctx context.Context, orgName, 
 }
 
 func (c *PolicyGroupClientMock) BatchUpdatePolicyGroup(ctx context.Context, orgName, policyGroupName string, reqs []pulumiapi.UpdatePolicyGroupRequest) error {
+	if c.batchUpdatePolicyGroupFunc != nil {
+		return c.batchUpdatePolicyGroupFunc(ctx, orgName, policyGroupName, reqs)
+	}
 	return nil
 }
 
 func (c *PolicyGroupClientMock) DeletePolicyGroup(ctx context.Context, orgName, policyGroupName string) error {
 	return nil
 }
+
+// Test helper types and functions
+
+// policyGroupInputBuilder provides a fluent API for building policy group inputs
+type policyGroupInputBuilder struct {
+	name        string
+	org         string
+	entityType  string
+	mode        string
+	stacks      []stackRef
+	policyPacks []policyPackRef
+	accounts    []string
+}
+
+type stackRef struct {
+	name, project string
+}
+
+type policyPackRef struct {
+	name    string
+	version int
+}
+
+func newPolicyGroupInput() *policyGroupInputBuilder {
+	return &policyGroupInputBuilder{
+		name:       "test-policy-group",
+		org:        "test-org",
+		entityType: "stacks",
+		mode:       "audit",
+	}
+}
+
+func (b *policyGroupInputBuilder) withEntityType(t string) *policyGroupInputBuilder {
+	b.entityType = t
+	return b
+}
+
+func (b *policyGroupInputBuilder) withStacks(stacks ...stackRef) *policyGroupInputBuilder {
+	b.stacks = stacks
+	return b
+}
+
+func (b *policyGroupInputBuilder) withPolicyPacks(packs ...policyPackRef) *policyGroupInputBuilder {
+	b.policyPacks = packs
+	return b
+}
+
+func (b *policyGroupInputBuilder) withAccounts(accounts ...string) *policyGroupInputBuilder {
+	b.accounts = accounts
+	return b
+}
+
+func (b *policyGroupInputBuilder) build() resource.PropertyMap {
+	pm := resource.PropertyMap{
+		"name":             resource.NewStringProperty(b.name),
+		"organizationName": resource.NewStringProperty(b.org),
+		"entityType":       resource.NewStringProperty(b.entityType),
+		"mode":             resource.NewStringProperty(b.mode),
+	}
+
+	// Build stacks array
+	stackValues := make([]resource.PropertyValue, len(b.stacks))
+	for i, s := range b.stacks {
+		stackValues[i] = resource.NewObjectProperty(resource.PropertyMap{
+			"name":           resource.NewStringProperty(s.name),
+			"routingProject": resource.NewStringProperty(s.project),
+		})
+	}
+	pm["stacks"] = resource.NewArrayProperty(stackValues)
+
+	// Build policy packs array
+	ppValues := make([]resource.PropertyValue, len(b.policyPacks))
+	for i, pp := range b.policyPacks {
+		ppValues[i] = resource.NewObjectProperty(resource.PropertyMap{
+			"name":    resource.NewStringProperty(pp.name),
+			"version": resource.NewNumberProperty(float64(pp.version)),
+		})
+	}
+	pm["policyPacks"] = resource.NewArrayProperty(ppValues)
+
+	// Build accounts array
+	accountValues := make([]resource.PropertyValue, len(b.accounts))
+	for i, a := range b.accounts {
+		accountValues[i] = resource.NewStringProperty(a)
+	}
+	pm["accounts"] = resource.NewArrayProperty(accountValues)
+
+	return pm
+}
+
+func (b *policyGroupInputBuilder) buildStruct(t *testing.T) *structpb.Struct {
+	t.Helper()
+	s, err := structpb.NewStruct(b.build().Mappable())
+	require.NoError(t, err)
+	return s
+}
+
+// mockPolicyGroupBuilder provides a fluent API for building mock PolicyGroup responses
+type mockPolicyGroupBuilder struct {
+	pg *pulumiapi.PolicyGroup
+}
+
+func newMockPolicyGroup() *mockPolicyGroupBuilder {
+	return &mockPolicyGroupBuilder{
+		pg: &pulumiapi.PolicyGroup{
+			Name:       "test-policy-group",
+			EntityType: "stacks",
+			Mode:       "audit",
+		},
+	}
+}
+
+func (b *mockPolicyGroupBuilder) withStacks(stacks ...stackRef) *mockPolicyGroupBuilder {
+	b.pg.Stacks = make([]pulumiapi.StackReference, len(stacks))
+	for i, s := range stacks {
+		b.pg.Stacks[i] = pulumiapi.StackReference{Name: s.name, RoutingProject: s.project}
+	}
+	return b
+}
+
+func (b *mockPolicyGroupBuilder) withPolicyPacks(packs ...policyPackRef) *mockPolicyGroupBuilder {
+	b.pg.AppliedPolicyPacks = make([]pulumiapi.PolicyPackMetadata, len(packs))
+	for i, p := range packs {
+		b.pg.AppliedPolicyPacks[i] = pulumiapi.PolicyPackMetadata{Name: p.name, Version: p.version}
+	}
+	return b
+}
+
+func (b *mockPolicyGroupBuilder) withAccounts(accounts ...string) *mockPolicyGroupBuilder {
+	b.pg.EntityType = "accounts"
+	b.pg.Accounts = accounts
+	return b
+}
+
+func (b *mockPolicyGroupBuilder) build() *pulumiapi.PolicyGroup {
+	return b.pg
+}
+
+const testPolicyGroupURN = "urn:pulumi:dev::test::pulumiservice:index:PolicyGroup::testPolicyGroup"
+const testPolicyGroupID = "test-org/test-policy-group"
 
 // TestPolicyGroup_Check_Defaults tests that Check applies default values when entityType and mode are not provided
 func TestPolicyGroup_Check_Defaults(t *testing.T) {
@@ -658,46 +803,28 @@ func TestHasParentAccount(t *testing.T) {
 }
 
 func TestPolicyGroup_Read(t *testing.T) {
+	parentAccount := "parent-account"
+	childAccount := "parent-account/child"
+	accountA := "account-a"
+	accountB := "account-b"
+	accountC := "account-c"
+
 	t.Run("preserves original inputs when API state matches previous state", func(t *testing.T) {
 		// Scenario: User specified ["parent-account"], API returned ["parent-account", "parent-account/child"]
 		// After refresh, API still returns the same. We should preserve the original input ["parent-account"]
 		provider := PulumiServicePolicyGroupResource{
 			Client: &PolicyGroupClientMock{
 				getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
-					return &pulumiapi.PolicyGroup{
-						Name:       "test-policy-group",
-						EntityType: "accounts",
-						Mode:       "audit",
-						Accounts:   []string{"parent-account", "parent-account/child"},
-					}, nil
+					return newMockPolicyGroup().withAccounts(parentAccount, childAccount).build(), nil
 				},
 			},
 		}
 
-		// Previous state (from last refresh) - includes auto-added child
-		previousState := resource.PropertyMap{
-			"accounts": resource.NewArrayProperty([]resource.PropertyValue{
-				resource.NewStringProperty("parent-account"),
-				resource.NewStringProperty("parent-account/child"),
-			}),
-		}
-		propsStruct, err := structpb.NewStruct(previousState.Mappable())
-		require.NoError(t, err)
-
-		// Previous inputs (what user originally specified)
-		previousInputs := resource.PropertyMap{
-			"accounts": resource.NewArrayProperty([]resource.PropertyValue{
-				resource.NewStringProperty("parent-account"),
-			}),
-		}
-		inputsStruct, err := structpb.NewStruct(previousInputs.Mappable())
-		require.NoError(t, err)
-
 		req := &pulumirpc.ReadRequest{
-			Id:         "test-org/test-policy-group",
-			Urn:        "urn:pulumi:dev::test::pulumiservice:index:PolicyGroup::testPolicyGroup",
-			Properties: propsStruct,
-			Inputs:     inputsStruct,
+			Id:         testPolicyGroupID,
+			Urn:        testPolicyGroupURN,
+			Properties: newPolicyGroupInput().withEntityType("accounts").withAccounts(parentAccount, childAccount).buildStruct(t),
+			Inputs:     newPolicyGroupInput().withEntityType("accounts").withAccounts(parentAccount).buildStruct(t),
 		}
 
 		resp, err := provider.Read(req)
@@ -717,7 +844,7 @@ func TestPolicyGroup_Read(t *testing.T) {
 			inputsMap[resource.PropertyKey(k)] = resource.NewPropertyValue(v.AsInterface())
 		}
 		assert.Len(t, inputsMap["accounts"].ArrayValue(), 1, "Inputs should preserve original user input")
-		assert.Equal(t, "parent-account", inputsMap["accounts"].ArrayValue()[0].StringValue())
+		assert.Equal(t, parentAccount, inputsMap["accounts"].ArrayValue()[0].StringValue())
 	})
 
 	t.Run("updates inputs when API state has changed externally", func(t *testing.T) {
@@ -726,41 +853,16 @@ func TestPolicyGroup_Read(t *testing.T) {
 		provider := PulumiServicePolicyGroupResource{
 			Client: &PolicyGroupClientMock{
 				getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
-					return &pulumiapi.PolicyGroup{
-						Name:       "test-policy-group",
-						EntityType: "accounts",
-						Mode:       "audit",
-						Accounts:   []string{"account-a", "account-b", "account-c"}, // External change
-					}, nil
+					return newMockPolicyGroup().withAccounts(accountA, accountB, accountC).build(), nil
 				},
 			},
 		}
 
-		// Previous state (before external change)
-		previousState := resource.PropertyMap{
-			"accounts": resource.NewArrayProperty([]resource.PropertyValue{
-				resource.NewStringProperty("account-a"),
-				resource.NewStringProperty("account-b"),
-			}),
-		}
-		propsStruct, err := structpb.NewStruct(previousState.Mappable())
-		require.NoError(t, err)
-
-		// Previous inputs
-		previousInputs := resource.PropertyMap{
-			"accounts": resource.NewArrayProperty([]resource.PropertyValue{
-				resource.NewStringProperty("account-a"),
-				resource.NewStringProperty("account-b"),
-			}),
-		}
-		inputsStruct, err := structpb.NewStruct(previousInputs.Mappable())
-		require.NoError(t, err)
-
 		req := &pulumirpc.ReadRequest{
-			Id:         "test-org/test-policy-group",
-			Urn:        "urn:pulumi:dev::test::pulumiservice:index:PolicyGroup::testPolicyGroup",
-			Properties: propsStruct,
-			Inputs:     inputsStruct,
+			Id:         testPolicyGroupID,
+			Urn:        testPolicyGroupURN,
+			Properties: newPolicyGroupInput().withEntityType("accounts").withAccounts(accountA, accountB).buildStruct(t),
+			Inputs:     newPolicyGroupInput().withEntityType("accounts").withAccounts(accountA, accountB).buildStruct(t),
 		}
 
 		resp, err := provider.Read(req)
@@ -780,19 +882,14 @@ func TestPolicyGroup_Read(t *testing.T) {
 		provider := PulumiServicePolicyGroupResource{
 			Client: &PolicyGroupClientMock{
 				getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
-					return &pulumiapi.PolicyGroup{
-						Name:       "test-policy-group",
-						EntityType: "accounts",
-						Mode:       "audit",
-						Accounts:   []string{"account-a"},
-					}, nil
+					return newMockPolicyGroup().withAccounts(accountA).build(), nil
 				},
 			},
 		}
 
 		req := &pulumirpc.ReadRequest{
-			Id:         "test-org/test-policy-group",
-			Urn:        "urn:pulumi:dev::test::pulumiservice:index:PolicyGroup::testPolicyGroup",
+			Id:         testPolicyGroupID,
+			Urn:        testPolicyGroupURN,
 			Properties: nil,
 			Inputs:     nil,
 		}
@@ -825,8 +922,8 @@ func TestPolicyGroup_Read(t *testing.T) {
 		}
 
 		req := &pulumirpc.ReadRequest{
-			Id:  "test-org/test-policy-group",
-			Urn: "urn:pulumi:dev::test::pulumiservice:index:PolicyGroup::testPolicyGroup",
+			Id:  testPolicyGroupID,
+			Urn: testPolicyGroupURN,
 		}
 
 		resp, err := provider.Read(req)
@@ -898,6 +995,574 @@ func TestParsePreviousAccounts(t *testing.T) {
 
 		assert.Nil(t, stateAccounts)
 		assert.Nil(t, inputAccounts)
+	})
+}
+
+// TestPolicyGroup_Create tests the Create function
+func TestPolicyGroup_Create(t *testing.T) {
+	stack1 := stackRef{name: "stack-1", project: "project-1"}
+	stack2 := stackRef{name: "stack-2", project: "project-2"}
+	pp1 := policyPackRef{name: "policy-pack-1", version: 1}
+	account1 := "account-1"
+	account2 := "account-2"
+
+	t.Run("creates empty policy group", func(t *testing.T) {
+		var createCalled bool
+		var batchUpdateCalled bool
+		provider := PulumiServicePolicyGroupResource{
+			Client: &PolicyGroupClientMock{
+				createPolicyGroupFunc: func(_ context.Context, orgName, policyGroupName, entityType, mode string) error {
+					createCalled = true
+					assert.Equal(t, "test-org", orgName)
+					assert.Equal(t, "test-policy-group", policyGroupName)
+					assert.Equal(t, "stacks", entityType)
+					assert.Equal(t, "audit", mode)
+					return nil
+				},
+				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, reqs []pulumiapi.UpdatePolicyGroupRequest) error {
+					batchUpdateCalled = true
+					return nil
+				},
+				getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
+					return newMockPolicyGroup().build(), nil
+				},
+			},
+		}
+
+		req := &pulumirpc.CreateRequest{
+			Urn:        testPolicyGroupURN,
+			Properties: newPolicyGroupInput().buildStruct(t),
+		}
+
+		resp, err := provider.Create(req)
+		require.NoError(t, err)
+		require.NotNil(t, resp)
+
+		assert.True(t, createCalled, "CreatePolicyGroup should be called")
+		assert.False(t, batchUpdateCalled, "BatchUpdatePolicyGroup should not be called for empty policy group")
+		assert.Equal(t, testPolicyGroupID, resp.Id)
+	})
+
+	t.Run("creates policy group with stacks", func(t *testing.T) {
+		var capturedReqs []pulumiapi.UpdatePolicyGroupRequest
+		provider := PulumiServicePolicyGroupResource{
+			Client: &PolicyGroupClientMock{
+				createPolicyGroupFunc: func(_ context.Context, _, _, _, _ string) error {
+					return nil
+				},
+				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, reqs []pulumiapi.UpdatePolicyGroupRequest) error {
+					capturedReqs = reqs
+					return nil
+				},
+				getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
+					return newMockPolicyGroup().withStacks(stack1, stack2).build(), nil
+				},
+			},
+		}
+
+		req := &pulumirpc.CreateRequest{
+			Urn:        testPolicyGroupURN,
+			Properties: newPolicyGroupInput().withStacks(stack1, stack2).buildStruct(t),
+		}
+
+		resp, err := provider.Create(req)
+		require.NoError(t, err)
+		require.NotNil(t, resp)
+
+		require.Len(t, capturedReqs, 2)
+		require.NotNil(t, capturedReqs[0].AddStack)
+		assert.Equal(t, stack1.name, capturedReqs[0].AddStack.Name)
+		require.NotNil(t, capturedReqs[1].AddStack)
+		assert.Equal(t, stack2.name, capturedReqs[1].AddStack.Name)
+	})
+
+	t.Run("creates policy group with policy packs", func(t *testing.T) {
+		var capturedReqs []pulumiapi.UpdatePolicyGroupRequest
+		provider := PulumiServicePolicyGroupResource{
+			Client: &PolicyGroupClientMock{
+				createPolicyGroupFunc: func(_ context.Context, _, _, _, _ string) error {
+					return nil
+				},
+				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, reqs []pulumiapi.UpdatePolicyGroupRequest) error {
+					capturedReqs = reqs
+					return nil
+				},
+				getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
+					return newMockPolicyGroup().withPolicyPacks(pp1).build(), nil
+				},
+			},
+		}
+
+		req := &pulumirpc.CreateRequest{
+			Urn:        testPolicyGroupURN,
+			Properties: newPolicyGroupInput().withPolicyPacks(pp1).buildStruct(t),
+		}
+
+		resp, err := provider.Create(req)
+		require.NoError(t, err)
+		require.NotNil(t, resp)
+
+		require.Len(t, capturedReqs, 1)
+		require.NotNil(t, capturedReqs[0].AddPolicyPack)
+		assert.Equal(t, pp1.name, capturedReqs[0].AddPolicyPack.Name)
+	})
+
+	t.Run("creates policy group with accounts", func(t *testing.T) {
+		var capturedReqs []pulumiapi.UpdatePolicyGroupRequest
+		provider := PulumiServicePolicyGroupResource{
+			Client: &PolicyGroupClientMock{
+				createPolicyGroupFunc: func(_ context.Context, _, _, _, _ string) error {
+					return nil
+				},
+				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, reqs []pulumiapi.UpdatePolicyGroupRequest) error {
+					capturedReqs = reqs
+					return nil
+				},
+				getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
+					return newMockPolicyGroup().withAccounts(account1, account2).build(), nil
+				},
+			},
+		}
+
+		req := &pulumirpc.CreateRequest{
+			Urn:        testPolicyGroupURN,
+			Properties: newPolicyGroupInput().withEntityType("accounts").withAccounts(account1, account2).buildStruct(t),
+		}
+
+		resp, err := provider.Create(req)
+		require.NoError(t, err)
+		require.NotNil(t, resp)
+
+		require.Len(t, capturedReqs, 2)
+		require.NotNil(t, capturedReqs[0].AddInsightsAccount)
+		assert.Equal(t, account1, capturedReqs[0].AddInsightsAccount.Name)
+		require.NotNil(t, capturedReqs[1].AddInsightsAccount)
+		assert.Equal(t, account2, capturedReqs[1].AddInsightsAccount.Name)
+	})
+
+	t.Run("returns error from CreatePolicyGroup", func(t *testing.T) {
+		provider := PulumiServicePolicyGroupResource{
+			Client: &PolicyGroupClientMock{
+				createPolicyGroupFunc: func(_ context.Context, _, _, _, _ string) error {
+					return fmt.Errorf("create error")
+				},
+			},
+		}
+
+		req := &pulumirpc.CreateRequest{
+			Urn:        testPolicyGroupURN,
+			Properties: newPolicyGroupInput().buildStruct(t),
+		}
+
+		_, err := provider.Create(req)
+		assert.ErrorContains(t, err, "error creating policy group")
+		assert.ErrorContains(t, err, "create error")
+	})
+
+	t.Run("returns error from BatchUpdatePolicyGroup", func(t *testing.T) {
+		provider := PulumiServicePolicyGroupResource{
+			Client: &PolicyGroupClientMock{
+				createPolicyGroupFunc: func(_ context.Context, _, _, _, _ string) error {
+					return nil
+				},
+				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, _ []pulumiapi.UpdatePolicyGroupRequest) error {
+					return fmt.Errorf("batch update error")
+				},
+			},
+		}
+
+		req := &pulumirpc.CreateRequest{
+			Urn:        testPolicyGroupURN,
+			Properties: newPolicyGroupInput().withStacks(stack1).buildStruct(t),
+		}
+
+		_, err := provider.Create(req)
+		assert.ErrorContains(t, err, "failed to add items to policy group")
+		assert.ErrorContains(t, err, "batch update error")
+	})
+
+	t.Run("returns error from GetPolicyGroup after create", func(t *testing.T) {
+		provider := PulumiServicePolicyGroupResource{
+			Client: &PolicyGroupClientMock{
+				createPolicyGroupFunc: func(_ context.Context, _, _, _, _ string) error {
+					return nil
+				},
+				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, _ []pulumiapi.UpdatePolicyGroupRequest) error {
+					return nil
+				},
+				getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
+					return nil, fmt.Errorf("read error")
+				},
+			},
+		}
+
+		req := &pulumirpc.CreateRequest{
+			Urn:        testPolicyGroupURN,
+			Properties: newPolicyGroupInput().withStacks(stack1).buildStruct(t),
+		}
+
+		_, err := provider.Create(req)
+		assert.ErrorContains(t, err, "read error")
+	})
+
+	t.Run("returns state from API response", func(t *testing.T) {
+		provider := PulumiServicePolicyGroupResource{
+			Client: &PolicyGroupClientMock{
+				createPolicyGroupFunc: func(_ context.Context, _, _, _, _ string) error {
+					return nil
+				},
+				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, _ []pulumiapi.UpdatePolicyGroupRequest) error {
+					return nil
+				},
+				getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
+					// API returns more than what was requested (e.g., auto-added child accounts)
+					return newMockPolicyGroup().withAccounts(account1, account1+"/child").build(), nil
+				},
+			},
+		}
+
+		req := &pulumirpc.CreateRequest{
+			Urn:        testPolicyGroupURN,
+			Properties: newPolicyGroupInput().withEntityType("accounts").withAccounts(account1).buildStruct(t),
+		}
+
+		resp, err := provider.Create(req)
+		require.NoError(t, err)
+		require.NotNil(t, resp)
+		require.NotNil(t, resp.Properties)
+
+		propsMap := resource.PropertyMap{}
+		for k, v := range resp.Properties.GetFields() {
+			propsMap[resource.PropertyKey(k)] = resource.NewPropertyValue(v.AsInterface())
+		}
+
+		accounts := propsMap["accounts"].ArrayValue()
+		require.Len(t, accounts, 2, "Should return full state from API including auto-added accounts")
+	})
+}
+
+// TestPolicyGroup_Update tests the Update function
+func TestPolicyGroup_Update(t *testing.T) {
+	stack1 := stackRef{name: "stack-1", project: "project-1"}
+	stack2 := stackRef{name: "stack-2", project: "project-2"}
+	pp1 := policyPackRef{name: "policy-pack-1", version: 1}
+	pp2 := policyPackRef{name: "policy-pack-2", version: 1}
+	account1 := "account-1"
+	account2 := "account-2"
+	parentAccount := "parent-account"
+	childAccount := "parent-account/child"
+
+	t.Run("adds new stacks", func(t *testing.T) {
+		var capturedReqs []pulumiapi.UpdatePolicyGroupRequest
+		provider := PulumiServicePolicyGroupResource{
+			Client: &PolicyGroupClientMock{
+				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, reqs []pulumiapi.UpdatePolicyGroupRequest) error {
+					capturedReqs = reqs
+					return nil
+				},
+				getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
+					return newMockPolicyGroup().withStacks(stack1, stack2).build(), nil
+				},
+			},
+		}
+
+		req := &pulumirpc.UpdateRequest{
+			Id:   testPolicyGroupID,
+			Urn:  testPolicyGroupURN,
+			Olds: newPolicyGroupInput().withStacks(stack1).buildStruct(t),
+			News: newPolicyGroupInput().withStacks(stack1, stack2).buildStruct(t),
+		}
+
+		resp, err := provider.Update(req)
+		require.NoError(t, err)
+		require.NotNil(t, resp)
+
+		require.Len(t, capturedReqs, 1)
+		require.NotNil(t, capturedReqs[0].AddStack)
+		assert.Equal(t, stack2.name, capturedReqs[0].AddStack.Name)
+		assert.Equal(t, stack2.project, capturedReqs[0].AddStack.RoutingProject)
+	})
+
+	t.Run("removes stacks", func(t *testing.T) {
+		var capturedReqs []pulumiapi.UpdatePolicyGroupRequest
+		provider := PulumiServicePolicyGroupResource{
+			Client: &PolicyGroupClientMock{
+				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, reqs []pulumiapi.UpdatePolicyGroupRequest) error {
+					capturedReqs = reqs
+					return nil
+				},
+				getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
+					return newMockPolicyGroup().withStacks(stack1).build(), nil
+				},
+			},
+		}
+
+		req := &pulumirpc.UpdateRequest{
+			Id:   testPolicyGroupID,
+			Urn:  testPolicyGroupURN,
+			Olds: newPolicyGroupInput().withStacks(stack1, stack2).buildStruct(t),
+			News: newPolicyGroupInput().withStacks(stack1).buildStruct(t),
+		}
+
+		resp, err := provider.Update(req)
+		require.NoError(t, err)
+		require.NotNil(t, resp)
+
+		require.Len(t, capturedReqs, 1)
+		require.NotNil(t, capturedReqs[0].RemoveStack)
+		assert.Equal(t, stack2.name, capturedReqs[0].RemoveStack.Name)
+		assert.Equal(t, stack2.project, capturedReqs[0].RemoveStack.RoutingProject)
+	})
+
+	t.Run("adds and removes policy packs", func(t *testing.T) {
+		var capturedReqs []pulumiapi.UpdatePolicyGroupRequest
+		provider := PulumiServicePolicyGroupResource{
+			Client: &PolicyGroupClientMock{
+				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, reqs []pulumiapi.UpdatePolicyGroupRequest) error {
+					capturedReqs = reqs
+					return nil
+				},
+				getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
+					return newMockPolicyGroup().withPolicyPacks(pp2).build(), nil
+				},
+			},
+		}
+
+		req := &pulumirpc.UpdateRequest{
+			Id:   testPolicyGroupID,
+			Urn:  testPolicyGroupURN,
+			Olds: newPolicyGroupInput().withPolicyPacks(pp1).buildStruct(t),
+			News: newPolicyGroupInput().withPolicyPacks(pp2).buildStruct(t),
+		}
+
+		resp, err := provider.Update(req)
+		require.NoError(t, err)
+		require.NotNil(t, resp)
+
+		require.Len(t, capturedReqs, 2)
+
+		var removeReq, addReq *pulumiapi.UpdatePolicyGroupRequest
+		for i := range capturedReqs {
+			if capturedReqs[i].RemovePolicyPack != nil {
+				removeReq = &capturedReqs[i]
+			}
+			if capturedReqs[i].AddPolicyPack != nil {
+				addReq = &capturedReqs[i]
+			}
+		}
+
+		require.NotNil(t, removeReq)
+		assert.Equal(t, pp1.name, removeReq.RemovePolicyPack.Name)
+		require.NotNil(t, addReq)
+		assert.Equal(t, pp2.name, addReq.AddPolicyPack.Name)
+	})
+
+	t.Run("adds accounts", func(t *testing.T) {
+		var capturedReqs []pulumiapi.UpdatePolicyGroupRequest
+		provider := PulumiServicePolicyGroupResource{
+			Client: &PolicyGroupClientMock{
+				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, reqs []pulumiapi.UpdatePolicyGroupRequest) error {
+					capturedReqs = reqs
+					return nil
+				},
+				getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
+					return newMockPolicyGroup().withAccounts(account1, account2).build(), nil
+				},
+			},
+		}
+
+		req := &pulumirpc.UpdateRequest{
+			Id:   testPolicyGroupID,
+			Urn:  testPolicyGroupURN,
+			Olds: newPolicyGroupInput().withEntityType("accounts").withAccounts(account1).buildStruct(t),
+			News: newPolicyGroupInput().withEntityType("accounts").withAccounts(account1, account2).buildStruct(t),
+		}
+
+		resp, err := provider.Update(req)
+		require.NoError(t, err)
+		require.NotNil(t, resp)
+
+		require.Len(t, capturedReqs, 1)
+		require.NotNil(t, capturedReqs[0].AddInsightsAccount)
+		assert.Equal(t, account2, capturedReqs[0].AddInsightsAccount.Name)
+	})
+
+	t.Run("removes accounts but skips child accounts with parent still present", func(t *testing.T) {
+		var capturedReqs []pulumiapi.UpdatePolicyGroupRequest
+		provider := PulumiServicePolicyGroupResource{
+			Client: &PolicyGroupClientMock{
+				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, reqs []pulumiapi.UpdatePolicyGroupRequest) error {
+					capturedReqs = reqs
+					return nil
+				},
+				getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
+					return newMockPolicyGroup().withAccounts(parentAccount, childAccount).build(), nil
+				},
+			},
+		}
+
+		req := &pulumirpc.UpdateRequest{
+			Id:   testPolicyGroupID,
+			Urn:  testPolicyGroupURN,
+			Olds: newPolicyGroupInput().withEntityType("accounts").withAccounts(parentAccount, childAccount).buildStruct(t),
+			News: newPolicyGroupInput().withEntityType("accounts").withAccounts(parentAccount).buildStruct(t),
+		}
+
+		resp, err := provider.Update(req)
+		require.NoError(t, err)
+		require.NotNil(t, resp)
+
+		// Child should NOT be removed because parent is still present
+		assert.Empty(t, capturedReqs, "Should not remove child account when parent is still present")
+	})
+
+	t.Run("removes child account when parent is also removed", func(t *testing.T) {
+		var capturedReqs []pulumiapi.UpdatePolicyGroupRequest
+		provider := PulumiServicePolicyGroupResource{
+			Client: &PolicyGroupClientMock{
+				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, reqs []pulumiapi.UpdatePolicyGroupRequest) error {
+					capturedReqs = reqs
+					return nil
+				},
+				getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
+					return newMockPolicyGroup().withAccounts().build(), nil
+				},
+			},
+		}
+
+		req := &pulumirpc.UpdateRequest{
+			Id:   testPolicyGroupID,
+			Urn:  testPolicyGroupURN,
+			Olds: newPolicyGroupInput().withEntityType("accounts").withAccounts(parentAccount, childAccount).buildStruct(t),
+			News: newPolicyGroupInput().withEntityType("accounts").buildStruct(t),
+		}
+
+		resp, err := provider.Update(req)
+		require.NoError(t, err)
+		require.NotNil(t, resp)
+
+		require.Len(t, capturedReqs, 2)
+
+		removedAccounts := make([]string, 0, 2)
+		for _, req := range capturedReqs {
+			require.NotNil(t, req.RemoveInsightsAccount)
+			removedAccounts = append(removedAccounts, req.RemoveInsightsAccount.Name)
+		}
+		assert.Contains(t, removedAccounts, parentAccount)
+		assert.Contains(t, removedAccounts, childAccount)
+	})
+
+	t.Run("no changes when inputs are identical", func(t *testing.T) {
+		var batchUpdateCalled bool
+		provider := PulumiServicePolicyGroupResource{
+			Client: &PolicyGroupClientMock{
+				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, _ []pulumiapi.UpdatePolicyGroupRequest) error {
+					batchUpdateCalled = true
+					return nil
+				},
+				getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
+					return newMockPolicyGroup().withStacks(stack1).build(), nil
+				},
+			},
+		}
+
+		inputs := newPolicyGroupInput().withStacks(stack1).buildStruct(t)
+		req := &pulumirpc.UpdateRequest{
+			Id:   testPolicyGroupID,
+			Urn:  testPolicyGroupURN,
+			Olds: inputs,
+			News: inputs,
+		}
+
+		resp, err := provider.Update(req)
+		require.NoError(t, err)
+		require.NotNil(t, resp)
+
+		assert.False(t, batchUpdateCalled, "BatchUpdatePolicyGroup should not be called when there are no changes")
+	})
+
+	t.Run("returns error from BatchUpdatePolicyGroup", func(t *testing.T) {
+		provider := PulumiServicePolicyGroupResource{
+			Client: &PolicyGroupClientMock{
+				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, _ []pulumiapi.UpdatePolicyGroupRequest) error {
+					return fmt.Errorf("API error")
+				},
+			},
+		}
+
+		req := &pulumirpc.UpdateRequest{
+			Id:   testPolicyGroupID,
+			Urn:  testPolicyGroupURN,
+			Olds: newPolicyGroupInput().buildStruct(t),
+			News: newPolicyGroupInput().withStacks(stack1).buildStruct(t),
+		}
+
+		_, err := provider.Update(req)
+		assert.ErrorContains(t, err, "failed to update policy group: API error")
+	})
+
+	t.Run("returns error from GetPolicyGroup after update", func(t *testing.T) {
+		provider := PulumiServicePolicyGroupResource{
+			Client: &PolicyGroupClientMock{
+				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, _ []pulumiapi.UpdatePolicyGroupRequest) error {
+					return nil
+				},
+				getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
+					return nil, fmt.Errorf("read error")
+				},
+			},
+		}
+
+		req := &pulumirpc.UpdateRequest{
+			Id:   testPolicyGroupID,
+			Urn:  testPolicyGroupURN,
+			Olds: newPolicyGroupInput().buildStruct(t),
+			News: newPolicyGroupInput().withStacks(stack1).buildStruct(t),
+		}
+
+		_, err := provider.Update(req)
+		assert.ErrorContains(t, err, "failed to read policy group after update: read error")
+	})
+
+	t.Run("returns updated state from API response", func(t *testing.T) {
+		provider := PulumiServicePolicyGroupResource{
+			Client: &PolicyGroupClientMock{
+				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, _ []pulumiapi.UpdatePolicyGroupRequest) error {
+					return nil
+				},
+				getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
+					// API includes auto-added child account
+					return newMockPolicyGroup().withAccounts(parentAccount, childAccount).build(), nil
+				},
+			},
+		}
+
+		req := &pulumirpc.UpdateRequest{
+			Id:   testPolicyGroupID,
+			Urn:  testPolicyGroupURN,
+			Olds: newPolicyGroupInput().withEntityType("accounts").buildStruct(t),
+			News: newPolicyGroupInput().withEntityType("accounts").withAccounts(parentAccount).buildStruct(t),
+		}
+
+		resp, err := provider.Update(req)
+		require.NoError(t, err)
+		require.NotNil(t, resp)
+		require.NotNil(t, resp.Properties)
+
+		propsMap := resource.PropertyMap{}
+		for k, v := range resp.Properties.GetFields() {
+			propsMap[resource.PropertyKey(k)] = resource.NewPropertyValue(v.AsInterface())
+		}
+
+		accounts := propsMap["accounts"].ArrayValue()
+		require.Len(t, accounts, 2)
+
+		accountNames := make([]string, len(accounts))
+		for i, a := range accounts {
+			accountNames[i] = a.StringValue()
+		}
+		assert.Contains(t, accountNames, parentAccount)
+		assert.Contains(t, accountNames, childAccount)
 	})
 }
 
