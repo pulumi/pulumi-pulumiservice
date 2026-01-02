@@ -62,11 +62,7 @@ func TestListInsightsAccounts(t *testing.T) {
 	orgName := "test-org"
 
 	t.Run("Empty OrgName", func(t *testing.T) {
-		c := startTestServer(t, testServerConfig{
-			ExpectedReqMethod: http.MethodGet,
-			ExpectedReqPath:   "/api/preview/insights//accounts",
-			ResponseCode:      200,
-		})
+		c := startTestServer(t, testServerConfig{})
 
 		accounts, err := c.ListInsightsAccounts(t.Context(), "")
 		assert.Nil(t, accounts)

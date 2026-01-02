@@ -49,22 +49,7 @@ func (GetInsightsAccountsFunction) Invoke(ctx context.Context, req infer.Functio
 
 	outputAccounts := make([]resources.InsightsAccountState, len(accounts))
 	for i, account := range accounts {
-		scanSchedule := resources.ScanScheduleNone
-		if account.ScheduledScanEnabled {
-			scanSchedule = resources.ScanScheduleDaily
-		}
-		outputAccounts[i] = resources.InsightsAccountState{
-			InsightsAccountCore: resources.InsightsAccountCore{
-				OrganizationName: req.Input.OrganizationName,
-				AccountName:      account.Name,
-				Provider:         resources.CloudProvider(account.Provider),
-				Environment:      account.ProviderEnvRef,
-				ProviderConfig:   account.ProviderConfig,
-				ScanSchedule:     scanSchedule,
-			},
-			InsightsAccountId:    account.ID,
-			ScheduledScanEnabled: account.ScheduledScanEnabled,
-		}
+		outputAccounts[i] = resources.InsightsAccountStateFromAPI(req.Input.OrganizationName, account)
 	}
 
 	return infer.FunctionResponse[GetInsightsAccountsOutput]{
@@ -99,25 +84,7 @@ func (GetInsightsAccountFunction) Invoke(ctx context.Context, req infer.Function
 		return infer.FunctionResponse[resources.InsightsAccountState]{}, fmt.Errorf("insights account %q not found", req.Input.AccountName)
 	}
 
-	scanSchedule := resources.ScanScheduleNone
-	if account.ScheduledScanEnabled {
-		scanSchedule = resources.ScanScheduleDaily
-	}
-
-	output := resources.InsightsAccountState{
-		InsightsAccountCore: resources.InsightsAccountCore{
-			OrganizationName: req.Input.OrganizationName,
-			AccountName:      account.Name,
-			Provider:         resources.CloudProvider(account.Provider),
-			Environment:      account.ProviderEnvRef,
-			ProviderConfig:   account.ProviderConfig,
-			ScanSchedule:     scanSchedule,
-		},
-		InsightsAccountId:    account.ID,
-		ScheduledScanEnabled: account.ScheduledScanEnabled,
-	}
-
 	return infer.FunctionResponse[resources.InsightsAccountState]{
-		Output: output,
+		Output: resources.InsightsAccountStateFromAPI(req.Input.OrganizationName, *account),
 	}, nil
 }

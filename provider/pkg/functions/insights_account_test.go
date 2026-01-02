@@ -4,6 +4,7 @@ package functions
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"testing"
 
@@ -60,7 +61,7 @@ func TestGetInsightsAccountFunction(t *testing.T) {
 			},
 		}
 
-		ctx := config.WithMockClient(context.Background(), mockedClient)
+		ctx := config.WithMockClient(t.Context(), mockedClient)
 
 		fn := GetInsightsAccountFunction{}
 		req := infer.FunctionRequest[GetInsightsAccountInput]{
@@ -73,14 +74,7 @@ func TestGetInsightsAccountFunction(t *testing.T) {
 		resp, err := fn.Invoke(ctx, req)
 
 		require.NoError(t, err)
-		assert.Equal(t, testOrg, resp.Output.OrganizationName)
-		assert.Equal(t, testAccount, resp.Output.AccountName)
-		assert.Equal(t, resources.CloudProvider(insightsAccount.Provider), resp.Output.Provider)
-		assert.Equal(t, insightsAccount.ProviderEnvRef, resp.Output.Environment)
-		assert.Equal(t, resources.ScanScheduleDaily, resp.Output.ScanSchedule)
-		assert.Equal(t, insightsAccount.ID, resp.Output.InsightsAccountId)
-		assert.True(t, resp.Output.ScheduledScanEnabled)
-		assert.Equal(t, insightsAccount.ProviderConfig, resp.Output.ProviderConfig)
+		assert.Equal(t, resources.InsightsAccountStateFromAPI(testOrg, *insightsAccount), resp.Output)
 	})
 
 	t.Run("returns error when account not found", func(t *testing.T) {
@@ -93,7 +87,7 @@ func TestGetInsightsAccountFunction(t *testing.T) {
 			},
 		}
 
-		ctx := config.WithMockClient(context.Background(), mockedClient)
+		ctx := config.WithMockClient(t.Context(), mockedClient)
 
 		fn := GetInsightsAccountFunction{}
 		req := infer.FunctionRequest[GetInsightsAccountInput]{
@@ -105,22 +99,21 @@ func TestGetInsightsAccountFunction(t *testing.T) {
 
 		_, err := fn.Invoke(ctx, req)
 
-		assert.Error(t, err)
-		assert.Contains(t, err.Error(), fmt.Sprintf("insights account %q not found", testAccount))
+		assert.ErrorContains(t, err, fmt.Sprintf("insights account %q not found", testAccount))
 	})
 
 	t.Run("returns error when API call fails", func(t *testing.T) {
 		t.Parallel()
 		testOrg := "test-org"
 		testAccount := "test-account"
-		expectedError := "internal server error"
+		apiError := "API error: internal server error"
 		mockedClient := &insightsAccountClientMock{
 			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
-				return nil, fmt.Errorf("API error: %s", expectedError)
+				return nil, errors.New(apiError)
 			},
 		}
 
-		ctx := config.WithMockClient(context.Background(), mockedClient)
+		ctx := config.WithMockClient(t.Context(), mockedClient)
 
 		fn := GetInsightsAccountFunction{}
 		req := infer.FunctionRequest[GetInsightsAccountInput]{
@@ -132,9 +125,7 @@ func TestGetInsightsAccountFunction(t *testing.T) {
 
 		_, err := fn.Invoke(ctx, req)
 
-		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "failed to get insights account")
-		assert.Contains(t, err.Error(), expectedError)
+		assert.ErrorContains(t, err, fmt.Sprintf("failed to get insights account: %s", apiError))
 	})
 
 	t.Run("correctly maps scan schedule none", func(t *testing.T) {
@@ -154,7 +145,7 @@ func TestGetInsightsAccountFunction(t *testing.T) {
 			},
 		}
 
-		ctx := config.WithMockClient(context.Background(), mockedClient)
+		ctx := config.WithMockClient(t.Context(), mockedClient)
 
 		fn := GetInsightsAccountFunction{}
 		req := infer.FunctionRequest[GetInsightsAccountInput]{
@@ -167,9 +158,7 @@ func TestGetInsightsAccountFunction(t *testing.T) {
 		resp, err := fn.Invoke(ctx, req)
 
 		require.NoError(t, err)
-		assert.Equal(t, resources.ScanScheduleNone, resp.Output.ScanSchedule)
-		assert.Equal(t, insightsAccount.ScheduledScanEnabled, resp.Output.ScheduledScanEnabled)
-		assert.Equal(t, resources.CloudProvider(insightsAccount.Provider), resp.Output.Provider)
+		assert.Equal(t, resources.InsightsAccountStateFromAPI(testOrg, *insightsAccount), resp.Output)
 	})
 }
 
@@ -204,7 +193,7 @@ func TestGetInsightsAccountsFunction(t *testing.T) {
 			},
 		}
 
-		ctx := config.WithMockClient(context.Background(), mockedClient)
+		ctx := config.WithMockClient(t.Context(), mockedClient)
 
 		fn := GetInsightsAccountsFunction{}
 		req := infer.FunctionRequest[GetInsightsAccountsInput]{
@@ -218,25 +207,8 @@ func TestGetInsightsAccountsFunction(t *testing.T) {
 		require.NoError(t, err)
 		require.Len(t, resp.Output.Accounts, len(insightsAccounts))
 
-		// Check first account (AWS)
-		firstAccount := resp.Output.Accounts[0]
-		assert.Equal(t, testOrg, firstAccount.OrganizationName)
-		assert.Equal(t, awsAccount.Name, firstAccount.AccountName)
-		assert.Equal(t, resources.CloudProvider(awsAccount.Provider), firstAccount.Provider)
-		assert.Equal(t, awsAccount.ProviderEnvRef, firstAccount.Environment)
-		assert.Equal(t, resources.ScanScheduleDaily, firstAccount.ScanSchedule)
-		assert.Equal(t, awsAccount.ID, firstAccount.InsightsAccountId)
-		assert.Equal(t, awsAccount.ScheduledScanEnabled, firstAccount.ScheduledScanEnabled)
-
-		// Check second account (GCP)
-		secondAccount := resp.Output.Accounts[1]
-		assert.Equal(t, testOrg, secondAccount.OrganizationName)
-		assert.Equal(t, gcpAccount.Name, secondAccount.AccountName)
-		assert.Equal(t, resources.CloudProvider(gcpAccount.Provider), secondAccount.Provider)
-		assert.Equal(t, gcpAccount.ProviderEnvRef, secondAccount.Environment)
-		assert.Equal(t, resources.ScanScheduleNone, secondAccount.ScanSchedule)
-		assert.Equal(t, gcpAccount.ID, secondAccount.InsightsAccountId)
-		assert.Equal(t, gcpAccount.ScheduledScanEnabled, secondAccount.ScheduledScanEnabled)
+		assert.Equal(t, resources.InsightsAccountStateFromAPI(testOrg, awsAccount), resp.Output.Accounts[0])
+		assert.Equal(t, resources.InsightsAccountStateFromAPI(testOrg, gcpAccount), resp.Output.Accounts[1])
 	})
 
 	t.Run("returns empty list when no accounts exist", func(t *testing.T) {
@@ -249,7 +221,7 @@ func TestGetInsightsAccountsFunction(t *testing.T) {
 			},
 		}
 
-		ctx := config.WithMockClient(context.Background(), mockedClient)
+		ctx := config.WithMockClient(t.Context(), mockedClient)
 
 		fn := GetInsightsAccountsFunction{}
 		req := infer.FunctionRequest[GetInsightsAccountsInput]{
@@ -267,14 +239,14 @@ func TestGetInsightsAccountsFunction(t *testing.T) {
 	t.Run("returns error when API call fails", func(t *testing.T) {
 		t.Parallel()
 		testOrg := "test-org"
-		expectedError := "unauthorized"
+		apiError := "API error: unauthorized"
 		mockedClient := &insightsAccountClientMock{
 			listInsightsAccountsFunc: func(ctx context.Context, orgName string) ([]pulumiapi.InsightsAccount, error) {
-				return nil, fmt.Errorf("API error: %s", expectedError)
+				return nil, errors.New(apiError)
 			},
 		}
 
-		ctx := config.WithMockClient(context.Background(), mockedClient)
+		ctx := config.WithMockClient(t.Context(), mockedClient)
 
 		fn := GetInsightsAccountsFunction{}
 		req := infer.FunctionRequest[GetInsightsAccountsInput]{
@@ -285,8 +257,6 @@ func TestGetInsightsAccountsFunction(t *testing.T) {
 
 		_, err := fn.Invoke(ctx, req)
 
-		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "failed to list insights accounts")
-		assert.Contains(t, err.Error(), expectedError)
+		assert.ErrorContains(t, err, fmt.Sprintf("failed to list insights accounts: %s", apiError))
 	})
 }

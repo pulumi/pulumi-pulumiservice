@@ -112,6 +112,26 @@ func (s *InsightsAccountState) Annotate(a infer.Annotator) {
 	a.Describe(&s.ScheduledScanEnabled, "Whether scheduled scanning is enabled.")
 }
 
+// InsightsAccountStateFromAPI converts a pulumiapi.InsightsAccount to an InsightsAccountState.
+func InsightsAccountStateFromAPI(orgName string, account pulumiapi.InsightsAccount) InsightsAccountState {
+	scanSchedule := ScanScheduleNone
+	if account.ScheduledScanEnabled {
+		scanSchedule = ScanScheduleDaily
+	}
+	return InsightsAccountState{
+		InsightsAccountCore: InsightsAccountCore{
+			OrganizationName: orgName,
+			AccountName:      account.Name,
+			Provider:         CloudProvider(account.Provider),
+			Environment:      account.ProviderEnvRef,
+			ProviderConfig:   account.ProviderConfig,
+			ScanSchedule:     scanSchedule,
+		},
+		InsightsAccountId:    account.ID,
+		ScheduledScanEnabled: account.ScheduledScanEnabled,
+	}
+}
+
 func (*InsightsAccount) Create(ctx context.Context, req infer.CreateRequest[InsightsAccountInput]) (infer.CreateResponse[InsightsAccountState], error) {
 	accountID := fmt.Sprintf("%s/%s", req.Inputs.OrganizationName, req.Inputs.AccountName)
 	if req.DryRun {
