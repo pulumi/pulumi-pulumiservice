@@ -26,27 +26,27 @@ type PolicyGroupClient interface {
 	ListPolicyGroups(ctx context.Context, orgName string) ([]PolicyGroupSummary, error)
 	GetPolicyGroup(ctx context.Context, orgName string, policyGroupName string) (*PolicyGroup, error)
 	CreatePolicyGroup(ctx context.Context, orgName, policyGroupName, entityType, mode string) error
-	UpdatePolicyGroup(ctx context.Context, orgName, policyGroupName string, req UpdatePolicyGroupRequest) error
+	BatchUpdatePolicyGroup(ctx context.Context, orgName, policyGroupName string, reqs []UpdatePolicyGroupRequest) error
 	DeletePolicyGroup(ctx context.Context, orgName, policyGroupName string) error
 }
 
 type PolicyGroupSummary struct {
-	Name                   string `json:"name"`
-	IsOrgDefault           bool   `json:"isOrgDefault"`
-	NumStacks              int    `json:"numStacks"`
-	NumAccounts            int    `json:"numAccounts"`
-	EntityType             string `json:"entityType"`
-	NumEnabledPolicyPacks  int    `json:"numEnabledPolicyPacks"`
+	Name                  string `json:"name"`
+	IsOrgDefault          bool   `json:"isOrgDefault"`
+	NumStacks             int    `json:"numStacks"`
+	NumAccounts           int    `json:"numAccounts"`
+	EntityType            string `json:"entityType"`
+	NumEnabledPolicyPacks int    `json:"numEnabledPolicyPacks"`
 }
 
 type PolicyGroup struct {
-	Name                string               `json:"name"`
-	IsOrgDefault        bool                 `json:"isOrgDefault"`
-	EntityType          string               `json:"entityType"`
-	Mode                string               `json:"mode"`
-	Stacks              []StackReference     `json:"stacks"`
-	AppliedPolicyPacks  []PolicyPackMetadata `json:"appliedPolicyPacks"`
-	Accounts            []string             `json:"accounts"`
+	Name               string               `json:"name"`
+	IsOrgDefault       bool                 `json:"isOrgDefault"`
+	EntityType         string               `json:"entityType"`
+	Mode               string               `json:"mode"`
+	Stacks             []StackReference     `json:"stacks"`
+	AppliedPolicyPacks []PolicyPackMetadata `json:"appliedPolicyPacks"`
+	Accounts           []string             `json:"accounts"`
 }
 
 type StackReference struct {
@@ -72,12 +72,18 @@ type createPolicyGroupRequest struct {
 	Mode       string `json:"mode"`
 }
 
+type InsightsAccountReference struct {
+	Name string `json:"name"`
+}
+
 type UpdatePolicyGroupRequest struct {
-	NewName          *string               `json:"newName,omitempty"`
-	AddStack         *StackReference       `json:"addStack,omitempty"`
-	RemoveStack      *StackReference       `json:"removeStack,omitempty"`
-	AddPolicyPack    *PolicyPackMetadata   `json:"addPolicyPack,omitempty"`
-	RemovePolicyPack *PolicyPackMetadata   `json:"removePolicyPack,omitempty"`
+	NewName               *string                   `json:"newName,omitempty"`
+	AddStack              *StackReference           `json:"addStack,omitempty"`
+	RemoveStack           *StackReference           `json:"removeStack,omitempty"`
+	AddPolicyPack         *PolicyPackMetadata       `json:"addPolicyPack,omitempty"`
+	RemovePolicyPack      *PolicyPackMetadata       `json:"removePolicyPack,omitempty"`
+	AddInsightsAccount    *InsightsAccountReference `json:"addInsightsAccount,omitempty"`
+	RemoveInsightsAccount *InsightsAccountReference `json:"removeInsightsAccount,omitempty"`
 }
 
 func (c *Client) ListPolicyGroups(ctx context.Context, orgName string) ([]PolicyGroupSummary, error) {
@@ -157,7 +163,9 @@ func (c *Client) CreatePolicyGroup(ctx context.Context, orgName, policyGroupName
 	return nil
 }
 
-func (c *Client) UpdatePolicyGroup(ctx context.Context, orgName, policyGroupName string, req UpdatePolicyGroupRequest) error {
+// BatchUpdatePolicyGroup applies multiple update operations to a policy group in a single request.
+// This is more efficient than calling UpdatePolicyGroup multiple times.
+func (c *Client) BatchUpdatePolicyGroup(ctx context.Context, orgName, policyGroupName string, reqs []UpdatePolicyGroupRequest) error {
 	if len(orgName) == 0 {
 		return errors.New("orgName must not be empty")
 	}
@@ -166,11 +174,15 @@ func (c *Client) UpdatePolicyGroup(ctx context.Context, orgName, policyGroupName
 		return errors.New("policyGroupName must not be empty")
 	}
 
-	apiPath := path.Join("orgs", orgName, "policygroups", policyGroupName)
+	if len(reqs) == 0 {
+		return nil
+	}
 
-	_, err := c.do(ctx, http.MethodPatch, apiPath, req, nil)
+	apiPath := path.Join("orgs", orgName, "policygroups", policyGroupName, "batch")
+
+	_, err := c.do(ctx, http.MethodPatch, apiPath, reqs, nil)
 	if err != nil {
-		return fmt.Errorf("failed to update policy group %q: %w", policyGroupName, err)
+		return fmt.Errorf("failed to batch update policy group %q: %w", policyGroupName, err)
 	}
 
 	return nil

@@ -16,6 +16,12 @@ namespace Pulumi.PulumiService
     public partial class PolicyGroup : global::Pulumi.CustomResource
     {
         /// <summary>
+        /// List of accounts that belong to this policy group.
+        /// </summary>
+        [Output("accounts")]
+        public Output<ImmutableArray<string>> Accounts { get; private set; } = null!;
+
+        /// <summary>
         /// The entity type for the policy group. Valid values are 'stacks' or 'accounts'. Defaults to 'stacks'.
         /// </summary>
         [Output("entityType")]
@@ -96,6 +102,18 @@ namespace Pulumi.PulumiService
 
     public sealed class PolicyGroupArgs : global::Pulumi.ResourceArgs
     {
+        [Input("accounts")]
+        private InputList<string>? _accounts;
+
+        /// <summary>
+        /// List of accounts that belong to this policy group.
+        /// </summary>
+        public InputList<string> Accounts
+        {
+            get => _accounts ?? (_accounts = new InputList<string>());
+            set => _accounts = value;
+        }
+
         /// <summary>
         /// The entity type for the policy group. Valid values are 'stacks' or 'accounts'. Defaults to 'stacks'.
         /// </summary>

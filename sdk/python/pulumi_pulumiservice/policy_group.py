@@ -23,6 +23,7 @@ class PolicyGroupArgs:
     def __init__(__self__, *,
                  name: pulumi.Input[_builtins.str],
                  organization_name: pulumi.Input[_builtins.str],
+                 accounts: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  entity_type: Optional[pulumi.Input[_builtins.str]] = None,
                  mode: Optional[pulumi.Input[_builtins.str]] = None,
                  policy_packs: Optional[pulumi.Input[Sequence[pulumi.Input['PolicyGroupPolicyPackReferenceArgs']]]] = None,
@@ -31,6 +32,7 @@ class PolicyGroupArgs:
         The set of arguments for constructing a PolicyGroup resource.
         :param pulumi.Input[_builtins.str] name: The name of the policy group.
         :param pulumi.Input[_builtins.str] organization_name: The name of the Pulumi organization the policy group belongs to.
+        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] accounts: List of accounts that belong to this policy group.
         :param pulumi.Input[_builtins.str] entity_type: The entity type for the policy group. Valid values are 'stacks' or 'accounts'. Defaults to 'stacks'.
         :param pulumi.Input[_builtins.str] mode: The mode for the policy group. Valid values are 'audit' (reports violations) or 'preventative' (blocks operations). Defaults to 'audit'.
         :param pulumi.Input[Sequence[pulumi.Input['PolicyGroupPolicyPackReferenceArgs']]] policy_packs: List of policy packs applied to this policy group.
@@ -38,6 +40,8 @@ class PolicyGroupArgs:
         """
         pulumi.set(__self__, "name", name)
         pulumi.set(__self__, "organization_name", organization_name)
+        if accounts is not None:
+            pulumi.set(__self__, "accounts", accounts)
         if entity_type is None:
             entity_type = 'stacks'
         if entity_type is not None:
@@ -74,6 +78,18 @@ class PolicyGroupArgs:
     @organization_name.setter
     def organization_name(self, value: pulumi.Input[_builtins.str]):
         pulumi.set(self, "organization_name", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def accounts(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]:
+        """
+        List of accounts that belong to this policy group.
+        """
+        return pulumi.get(self, "accounts")
+
+    @accounts.setter
+    def accounts(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]):
+        pulumi.set(self, "accounts", value)
 
     @_builtins.property
     @pulumi.getter(name="entityType")
@@ -130,6 +146,7 @@ class PolicyGroup(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 accounts: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  entity_type: Optional[pulumi.Input[_builtins.str]] = None,
                  mode: Optional[pulumi.Input[_builtins.str]] = None,
                  name: Optional[pulumi.Input[_builtins.str]] = None,
@@ -142,6 +159,7 @@ class PolicyGroup(pulumi.CustomResource):
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
+        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] accounts: List of accounts that belong to this policy group.
         :param pulumi.Input[_builtins.str] entity_type: The entity type for the policy group. Valid values are 'stacks' or 'accounts'. Defaults to 'stacks'.
         :param pulumi.Input[_builtins.str] mode: The mode for the policy group. Valid values are 'audit' (reports violations) or 'preventative' (blocks operations). Defaults to 'audit'.
         :param pulumi.Input[_builtins.str] name: The name of the policy group.
@@ -173,6 +191,7 @@ class PolicyGroup(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 accounts: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  entity_type: Optional[pulumi.Input[_builtins.str]] = None,
                  mode: Optional[pulumi.Input[_builtins.str]] = None,
                  name: Optional[pulumi.Input[_builtins.str]] = None,
@@ -188,6 +207,7 @@ class PolicyGroup(pulumi.CustomResource):
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
             __props__ = PolicyGroupArgs.__new__(PolicyGroupArgs)
 
+            __props__.__dict__["accounts"] = accounts
             if entity_type is None:
                 entity_type = 'stacks'
             __props__.__dict__["entity_type"] = entity_type
@@ -224,6 +244,7 @@ class PolicyGroup(pulumi.CustomResource):
 
         __props__ = PolicyGroupArgs.__new__(PolicyGroupArgs)
 
+        __props__.__dict__["accounts"] = None
         __props__.__dict__["entity_type"] = None
         __props__.__dict__["mode"] = None
         __props__.__dict__["name"] = None
@@ -231,6 +252,14 @@ class PolicyGroup(pulumi.CustomResource):
         __props__.__dict__["policy_packs"] = None
         __props__.__dict__["stacks"] = None
         return PolicyGroup(resource_name, opts=opts, __props__=__props__)
+
+    @_builtins.property
+    @pulumi.getter
+    def accounts(self) -> pulumi.Output[Optional[Sequence[_builtins.str]]]:
+        """
+        List of accounts that belong to this policy group.
+        """
+        return pulumi.get(self, "accounts")
 
     @_builtins.property
     @pulumi.getter(name="entityType")
