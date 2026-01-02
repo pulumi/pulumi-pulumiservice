@@ -1,5 +1,5 @@
 {
-    "name": "pulumi-service-teams-example-ts",
+    "name": "pulumi-service-teams-stack-permissions-example-ts",
     "devDependencies": {
         "@types/node": "^14"
     },

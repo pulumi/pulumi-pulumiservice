@@ -50,12 +50,12 @@ var drift = new service.DriftSchedule("drift-schedule", {
     autoRemediate: false
 }, { dependsOn: settings })
 
-// Schedule to destroy stack resources on Jan 1, 2026, but NOT delete the stack itself
+// Schedule to destroy stack resources on Jan 1, 2099, but NOT delete the stack itself
 var ttl = new service.TtlSchedule("ttl-schedule", {
     organization: stack.organizationName,
     project: stack.projectName,
     stack: stack.stackName,
-    timestamp: "2026-01-01T00:00:00Z",
+    timestamp: "2099-01-01T00:00:00Z",
     deleteAfterDestroy: false
 }, { dependsOn: settings })
 
@@ -68,12 +68,12 @@ var deployment_up = new service.DeploymentSchedule("deployment-schedule-up", {
     pulumiOperation: service.PulumiOperation.Update
 }, { dependsOn: settings })
 
-// Schedule that runs `pulumi preview` once on Jan 1, 2026
+// Schedule that runs `pulumi preview` once on Jan 1, 2099
 var deployment_preview = new service.DeploymentSchedule("deployment-schedule-preview", {
     organization: stack.organizationName,
     project: stack.projectName,
     stack: stack.stackName,
-    timestamp: "2026-01-01T00:00:00Z",
+    timestamp: "2099-01-01T00:00:00Z",
     pulumiOperation: service.PulumiOperation.Preview
 }, { dependsOn: settings })
 

@@ -1,5 +1,5 @@
 {
-    "name": "pulumi-service-teams-example-ts",
+    "name": "pulumi-service-teams-stackref-example-ts",
     "devDependencies": {
         "@types/node": "^14"
     },
