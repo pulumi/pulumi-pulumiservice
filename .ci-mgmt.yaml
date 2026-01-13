@@ -15,6 +15,9 @@ env:
 
   PULUMI_TEST_OWNER: service-provider-test-org
   PULUMI_TEST_USE_SERVICE: true
-defaultBranch: main
+providerDefaultBranch: main
 template: generic
 shards: 6
+esc:
+    enabled: true
+    environment: imports/github-secrets
