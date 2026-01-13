@@ -83,6 +83,13 @@ jobs:
     - name: Install dependencies
       run: make install_sdks
 
+    - name: debug artifact
+      uses: actions/upload-artifact@v4
+      with:
+        include-hidden-files: true
+        path: .
+        retention-days: 1
+
     - name: Generate shard
       run: make shard >> "$GITHUB_ENV"
       env:
