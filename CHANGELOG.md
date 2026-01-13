@@ -5,6 +5,8 @@
 ### Improvements
 
 - Added InsightsAccount resource and getInsightsAccount/getInsightsAccounts for cloud resource scanning and analysis across AWS, Azure, and GCP, OCI and Kubernetes. 
+- Added `accounts` field to PolicyGroup resource for managing cloud accounts in policy groups
+- Updated PolicyGroup to use batch API for more efficient updates when adding/removing stacks, accounts, or policy packs
 - Added Java SDK support with Pulumi Java SDK v1.16.2
 - Upgraded Pulumi SDK to v3.204.0 with latest codegen improvements
 
