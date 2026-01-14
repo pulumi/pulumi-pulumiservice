@@ -71,23 +71,61 @@ make install_java_sdk     # Publish Java SDK to local Maven
 
 ### Testing
 
+**See [CONTRIBUTING.md Testing Section](CONTRIBUTING.md#testing) for comprehensive testing documentation.**
+
+#### LLM Testing Requirements
+
+When implementing new resources or fixing bugs, you **must** follow these testing requirements:
+
+**For New Resources:**
+
+1. **Unit tests** in `provider/pkg/resources/*_test.go`:
+   - Test all CRUD operations: Create, Read, Update, Delete, Diff, Check
+   - Test error cases: not found, API errors, validation errors
+   - Use mocks to isolate from API calls (see `provider/pkg/resources/team_test.go` for pattern)
+
+2. **YAML integration test only** in `examples/`:
+   - Create `yaml-<resource>` directory with `Pulumi.yaml` and `README.md`
+   - README must link to [pulumi convert](<https://www.pulumi.com/docs/iac/cli/commands/pulumi_convert/>)
+   - Register test in `examples/examples_yaml_test.go`
+   - **CRITICAL**: Only write YAML integration tests, NOT TypeScript/Python/Go/etc.
+
+3. **Run tests before marking work complete**:
+
+   ```bash
+   # Unit tests
+   cd provider/pkg/resources && go test -v -run Test<ResourceName>
+
+   # Integration test
+   cd examples && go test -v -run TestYaml<ResourceName>Example -tags yaml -timeout 10m
+   ```
+
+**For Bug Fixes:**
+
+- Add unit test that reproduces the bug
+- Add comment referencing the issue: `// Regression test for #123`
+- Verify test fails before fix, passes after fix
+
+**Quick Commands:**
+
 ```bash
-# Run provider unit tests
+# Run all unit tests
 cd provider/pkg && go test -short -v -count=1 -cover -timeout 2h -parallel 4 ./...
 
-# Run example tests (integration tests)
-cd examples && go test -tags=all -v -count=1 -timeout 3h -parallel 4
+# Run all integration tests
+cd examples && go test -tags=yaml -v -count=1 -timeout 3h -parallel 4
 
-# Run specific example test
+# Run specific integration test
 cd examples && go test -v -run TestYamlStackTagsPluralExample -tags yaml -timeout 10m
 ```
 
-- Integration tests are located in `examples/` directory
-- Tests are tagged: use `-tags yaml`, `-tags nodejs`, `-tags python`, etc.
-- The `.env` file allows running integration tests locally against a custom organization
-- Every new resource should have unit tests in `provider/pkg/` with `_test.go` suffix
-- Add example programs in `examples/` for each new resource (examples serve as integration tests)
-- Examples are organized by language: `ts-*`, `py-*`, `go-*`, `cs-*`, `java-*`, `yaml-*`
+**Key Points:**
+
+- Integration tests are in `examples/` directory
+- Tests use build tags: `-tags yaml`, `-tags nodejs`, etc.
+- The `.env` file allows running integration tests locally
+- Never commit `.env` files or hardcoded credentials
+- Never make real API calls in unit tests
 
 **IMPORTANT - Integration Test Framework**:
 - **Always use `pulumitest`** from `github.com/pulumi/providertest/pulumitest` for new integration tests
@@ -111,6 +149,7 @@ cd examples && go test -v -run TestYamlStackTagsPluralExample -tags yaml -timeou
 ### Copyright Headers
 
 **IMPORTANT**: All new files must have correct copyright year ranges:
+
 - In 2025: Use `// Copyright 2016-2025, Pulumi Corporation.`
 - In 2026: Use `// Copyright 2016-2026, Pulumi Corporation.`
 - General rule: Always use current year as the end year for new files
@@ -280,6 +319,7 @@ Releases are handled by Pulumi employees via `#release-ops` Slack channel. GitHu
 ## Configuration
 
 Provider accepts two configuration options:
+
 - `accessToken` (env: `PULUMI_ACCESS_TOKEN`) - Pulumi Service access token
 - `apiUrl` (env: `PULUMI_BACKEND_URL`) - Custom API URL for self-hosted instances
 
@@ -306,6 +346,7 @@ Without the build tags, golangci-lint may report false positives about unused fu
 When investigating CI test failures:
 
 1. **Use GitHub CLI to fetch logs**:
+
    ```bash
    gh run view <run_id> --log-failed
    gh api repos/pulumi/pulumi-pulumiservice/actions/jobs/<job_id>/logs | grep "error:"
