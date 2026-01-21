@@ -30,3 +30,4 @@ ci-scripts
 Library/
 
 coverage.txt
+.make/

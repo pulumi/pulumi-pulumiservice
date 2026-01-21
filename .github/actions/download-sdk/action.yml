@@ -1,19 +1,20 @@
-name: Download SDK asset
-description: Restores the SDK asset for a language.
+name: Download SDK
+description: Downloads and extracts SDK artifacts for a specific language
 
 inputs:
   language:
+    description: 'The SDK language to download (nodejs, python, dotnet, java)'
     required: true
-    description: One of nodejs, python, dotnet, go, java
 
 runs:
   using: "composite"
   steps:
-    - name: Download ${{ inputs.language }} SDK
-      uses: actions/download-artifact@v4
+    - name: Download SDK
+      uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
       with:
         name: ${{ inputs.language }}-sdk.tar.gz
-        path: ${{ github.workspace}}/sdk/
-    - name: Uncompress SDK folder
+        path: ${{ github.workspace }}/sdk/
+
+    - name: UnTar SDK folder
       shell: bash
       run: tar -zxf ${{ github.workspace }}/sdk/${{ inputs.language }}.tar.gz -C ${{ github.workspace }}/sdk/${{ inputs.language }}
