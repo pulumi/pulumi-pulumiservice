@@ -16,6 +16,12 @@ namespace Pulumi.PulumiService
     public partial class Environment : global::Pulumi.CustomResource
     {
         /// <summary>
+        /// When set to true, the environment cannot be deleted. Defaults to false.
+        /// </summary>
+        [Output("deletionProtected")]
+        public Output<bool> DeletionProtected { get; private set; } = null!;
+
+        /// <summary>
         /// Environment name.
         /// </summary>
         [Output("name")]
@@ -91,6 +97,12 @@ namespace Pulumi.PulumiService
     public sealed class EnvironmentArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
+        /// When set to true, the environment cannot be deleted. Defaults to false.
+        /// </summary>
+        [Input("deletionProtected")]
+        public Input<bool>? DeletionProtected { get; set; }
+
+        /// <summary>
         /// Environment name.
         /// </summary>
         [Input("name", required: true)]
@@ -116,6 +128,7 @@ namespace Pulumi.PulumiService
 
         public EnvironmentArgs()
         {
+            DeletionProtected = false;
             Project = "default";
         }
         public static new EnvironmentArgs Empty => new EnvironmentArgs();

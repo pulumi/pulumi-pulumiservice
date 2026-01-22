@@ -238,7 +238,8 @@ func (k *pulumiserviceProvider) Configure(_ context.Context, req *pulumirpc.Conf
 			Client: client,
 		},
 		&resources.PulumiServiceEnvironmentResource{
-			Client: escClient,
+			Client:         escClient,
+			SettingsClient: client,
 		},
 		&resources.PulumiServiceTeamEnvironmentPermissionResource{
 			Client: client,

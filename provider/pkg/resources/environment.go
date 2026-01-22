@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	esc_client "github.com/pulumi/esc/cmd/esc/cli/client"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/asset"
@@ -20,19 +21,22 @@ import (
 const defaultProject = "default"
 
 type PulumiServiceEnvironmentResource struct {
-	Client esc_client.Client
+	Client         esc_client.Client
+	SettingsClient pulumiapi.EnvironmentSettingsClient
 }
 
 type PulumiServiceEnvironmentInput struct {
-	OrgName     string
-	ProjectName string
-	EnvName     string
-	Yaml        string
+	OrgName           string
+	ProjectName       string
+	EnvName           string
+	Yaml              string
+	DeletionProtected bool
 }
 
 type PulumiServiceEnvironmentOutput struct {
-	input    PulumiServiceEnvironmentInput
-	revision int
+	input             PulumiServiceEnvironmentInput
+	revision          int
+	deletionProtected bool
 }
 
 func (i *PulumiServiceEnvironmentInput) ToPropertyMap() (resource.PropertyMap, error) {
@@ -41,6 +45,7 @@ func (i *PulumiServiceEnvironmentInput) ToPropertyMap() (resource.PropertyMap, e
 	propertyMap["project"] = resource.NewPropertyValue(i.ProjectName)
 	propertyMap["name"] = resource.NewPropertyValue(i.EnvName)
 	propertyMap["yaml"] = resource.MakeSecret(resource.NewStringProperty(i.Yaml))
+	propertyMap["deletionProtected"] = resource.NewPropertyValue(i.DeletionProtected)
 
 	return propertyMap, nil
 }
@@ -52,6 +57,7 @@ func (i *PulumiServiceEnvironmentOutput) ToPropertyMap() (resource.PropertyMap, 
 	}
 
 	propertyMap["revision"] = resource.NewPropertyValue(i.revision)
+	propertyMap["deletionProtected"] = resource.NewPropertyValue(i.deletionProtected)
 
 	return propertyMap, nil
 }
@@ -79,6 +85,12 @@ func ToPulumiServiceEnvironmentInput(properties *structpb.Struct) (*PulumiServic
 	inputProject := inputMap["project"]
 	if inputProject.HasValue() && inputProject.IsString() {
 		input.ProjectName = inputProject.StringValue()
+	}
+
+	// Set deletionProtected (defaults to false)
+	inputDeletionProtected := inputMap["deletionProtected"]
+	if inputDeletionProtected.HasValue() && inputDeletionProtected.IsBool() {
+		input.DeletionProtected = inputDeletionProtected.BoolValue()
 	}
 
 	return &input, nil
@@ -198,9 +210,27 @@ func (st *PulumiServiceEnvironmentResource) Create(req *pulumirpc.CreateRequest)
 		return nil, fmt.Errorf("failed to push yaml into environment due to error: %+v", err)
 	}
 
+	// Set deletion protection if enabled
+	if input.DeletionProtected && st.SettingsClient != nil {
+		deletionProtected := true
+		err = st.SettingsClient.UpdateEnvironmentSettings(
+			context.Background(),
+			input.OrgName,
+			input.ProjectName,
+			input.EnvName,
+			pulumiapi.UpdateEnvironmentSettingsRequest{
+				DeletionProtected: &deletionProtected,
+			},
+		)
+		if err != nil {
+			return nil, fmt.Errorf("failed to enable deletion protection for environment: %+v", err)
+		}
+	}
+
 	output := PulumiServiceEnvironmentOutput{
-		input:    *input,
-		revision: revision,
+		input:             *input,
+		revision:          revision,
+		deletionProtected: input.DeletionProtected,
 	}
 
 	propertyMap, err := output.ToPropertyMap()
@@ -284,6 +314,11 @@ func (st *PulumiServiceEnvironmentResource) Update(req *pulumirpc.UpdateRequest)
 		return nil, err
 	}
 
+	oldInput, err := ToPulumiServiceEnvironmentInput(req.GetOlds())
+	if err != nil {
+		return nil, err
+	}
+
 	diagnostics, revision, _ := st.Client.UpdateEnvironmentWithRevision(
 		context.Background(),
 		input.OrgName,
@@ -296,9 +331,27 @@ func (st *PulumiServiceEnvironmentResource) Update(req *pulumirpc.UpdateRequest)
 		return nil, fmt.Errorf("failed to update environment, yaml code failed following checks: %+v", diagnostics)
 	}
 
+	// Update deletion protection if it changed
+	if st.SettingsClient != nil && input.DeletionProtected != oldInput.DeletionProtected {
+		deletionProtected := input.DeletionProtected
+		err = st.SettingsClient.UpdateEnvironmentSettings(
+			context.Background(),
+			input.OrgName,
+			input.ProjectName,
+			input.EnvName,
+			pulumiapi.UpdateEnvironmentSettingsRequest{
+				DeletionProtected: &deletionProtected,
+			},
+		)
+		if err != nil {
+			return nil, fmt.Errorf("failed to update deletion protection for environment: %+v", err)
+		}
+	}
+
 	output := PulumiServiceEnvironmentOutput{
-		input:    *input,
-		revision: revision,
+		input:             *input,
+		revision:          revision,
+		deletionProtected: input.DeletionProtected,
 	}
 
 	propertyMap, err := output.ToPropertyMap()
@@ -349,16 +402,28 @@ func (st *PulumiServiceEnvironmentResource) Read(req *pulumirpc.ReadRequest) (*p
 	stringYaml := string(retrievedYaml)
 	trimmedYaml := strings.TrimSpace(stringYaml)
 
+	// Get deletion protection setting
+	var deletionProtected bool
+	if st.SettingsClient != nil {
+		settings, err := st.SettingsClient.GetEnvironmentSettings(context.Background(), orgName, projectName, envName)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get environment settings: %+v", err)
+		}
+		deletionProtected = settings.DeletionProtected
+	}
+
 	input := PulumiServiceEnvironmentInput{
-		OrgName:     orgName,
-		ProjectName: projectName,
-		EnvName:     envName,
-		Yaml:        trimmedYaml,
+		OrgName:           orgName,
+		ProjectName:       projectName,
+		EnvName:           envName,
+		Yaml:              trimmedYaml,
+		DeletionProtected: deletionProtected,
 	}
 
 	result := PulumiServiceEnvironmentOutput{
-		input:    input,
-		revision: revision,
+		input:             input,
+		revision:          revision,
+		deletionProtected: deletionProtected,
 	}
 
 	inputMap, err := input.ToPropertyMap()

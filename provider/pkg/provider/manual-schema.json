@@ -1689,6 +1689,10 @@
         "revision": {
           "description": "Revision number of the latest version.",
           "type": "integer"
+        },
+        "deletionProtected": {
+          "description": "When set to true, the environment cannot be deleted. Defaults to false.",
+          "type": "boolean"
         }
       },
       "required": [
@@ -1696,7 +1700,8 @@
         "project",
         "name",
         "yaml",
-        "revision"
+        "revision",
+        "deletionProtected"
       ],
       "inputProperties": {
         "organization": {
@@ -1715,6 +1720,11 @@
         "yaml": {
           "description": "Environment's yaml file.",
           "$ref": "pulumi.json#/Asset"
+        },
+        "deletionProtected": {
+          "description": "When set to true, the environment cannot be deleted. Defaults to false.",
+          "type": "boolean",
+          "default": false
         }
       },
       "requiredInputs": [

@@ -35,6 +35,10 @@ export class Environment extends pulumi.CustomResource {
     }
 
     /**
+     * When set to true, the environment cannot be deleted. Defaults to false.
+     */
+    declare public readonly deletionProtected: pulumi.Output<boolean>;
+    /**
      * Environment name.
      */
     declare public readonly name: pulumi.Output<string>;
@@ -75,12 +79,14 @@ export class Environment extends pulumi.CustomResource {
             if (args?.yaml === undefined && !opts.urn) {
                 throw new Error("Missing required property 'yaml'");
             }
+            resourceInputs["deletionProtected"] = (args?.deletionProtected) ?? false;
             resourceInputs["name"] = args?.name;
             resourceInputs["organization"] = args?.organization;
             resourceInputs["project"] = (args?.project) ?? "default";
             resourceInputs["yaml"] = args?.yaml;
             resourceInputs["revision"] = undefined /*out*/;
         } else {
+            resourceInputs["deletionProtected"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
             resourceInputs["organization"] = undefined /*out*/;
             resourceInputs["project"] = undefined /*out*/;
@@ -96,6 +102,10 @@ export class Environment extends pulumi.CustomResource {
  * The set of arguments for constructing a Environment resource.
  */
 export interface EnvironmentArgs {
+    /**
+     * When set to true, the environment cannot be deleted. Defaults to false.
+     */
+    deletionProtected?: pulumi.Input<boolean>;
     /**
      * Environment name.
      */

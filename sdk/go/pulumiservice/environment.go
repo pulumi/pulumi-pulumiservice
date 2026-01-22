@@ -16,6 +16,8 @@ import (
 type Environment struct {
 	pulumi.CustomResourceState
 
+	// When set to true, the environment cannot be deleted. Defaults to false.
+	DeletionProtected pulumi.BoolOutput `pulumi:"deletionProtected"`
 	// Environment name.
 	Name pulumi.StringOutput `pulumi:"name"`
 	// Organization name.
@@ -43,6 +45,9 @@ func NewEnvironment(ctx *pulumi.Context,
 	}
 	if args.Yaml == nil {
 		return nil, errors.New("invalid value for required argument 'Yaml'")
+	}
+	if args.DeletionProtected == nil {
+		args.DeletionProtected = pulumi.BoolPtr(false)
 	}
 	if args.Project == nil {
 		args.Project = pulumi.StringPtr("default")
@@ -80,6 +85,8 @@ func (EnvironmentState) ElementType() reflect.Type {
 }
 
 type environmentArgs struct {
+	// When set to true, the environment cannot be deleted. Defaults to false.
+	DeletionProtected *bool `pulumi:"deletionProtected"`
 	// Environment name.
 	Name string `pulumi:"name"`
 	// Organization name.
@@ -92,6 +99,8 @@ type environmentArgs struct {
 
 // The set of arguments for constructing a Environment resource.
 type EnvironmentArgs struct {
+	// When set to true, the environment cannot be deleted. Defaults to false.
+	DeletionProtected pulumi.BoolPtrInput
 	// Environment name.
 	Name pulumi.StringInput
 	// Organization name.
@@ -187,6 +196,11 @@ func (o EnvironmentOutput) ToEnvironmentOutput() EnvironmentOutput {
 
 func (o EnvironmentOutput) ToEnvironmentOutputWithContext(ctx context.Context) EnvironmentOutput {
 	return o
+}
+
+// When set to true, the environment cannot be deleted. Defaults to false.
+func (o EnvironmentOutput) DeletionProtected() pulumi.BoolOutput {
+	return o.ApplyT(func(v *Environment) pulumi.BoolOutput { return v.DeletionProtected }).(pulumi.BoolOutput)
 }
 
 // Environment name.
