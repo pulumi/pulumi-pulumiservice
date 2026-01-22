@@ -118,6 +118,7 @@ jobs:
         make GOTESTARGS="-test.run ${SHARD_TESTS} ${SHARD_PATHS}" test
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        PULUMI_ACCESS_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_ACCESS_TOKEN_STAGING }}
     strategy:
       fail-fast: false
       matrix:
