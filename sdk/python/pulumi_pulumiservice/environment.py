@@ -22,17 +22,23 @@ class EnvironmentArgs:
                  name: pulumi.Input[_builtins.str],
                  organization: pulumi.Input[_builtins.str],
                  yaml: pulumi.Input[Union[pulumi.Asset, pulumi.Archive]],
+                 deletion_protected: Optional[pulumi.Input[_builtins.bool]] = None,
                  project: Optional[pulumi.Input[_builtins.str]] = None):
         """
         The set of arguments for constructing a Environment resource.
         :param pulumi.Input[_builtins.str] name: Environment name.
         :param pulumi.Input[_builtins.str] organization: Organization name.
         :param pulumi.Input[Union[pulumi.Asset, pulumi.Archive]] yaml: Environment's yaml file.
+        :param pulumi.Input[_builtins.bool] deletion_protected: When set to true, the environment cannot be deleted. Defaults to false.
         :param pulumi.Input[_builtins.str] project: Project name.
         """
         pulumi.set(__self__, "name", name)
         pulumi.set(__self__, "organization", organization)
         pulumi.set(__self__, "yaml", yaml)
+        if deletion_protected is None:
+            deletion_protected = False
+        if deletion_protected is not None:
+            pulumi.set(__self__, "deletion_protected", deletion_protected)
         if project is None:
             project = 'default'
         if project is not None:
@@ -75,6 +81,18 @@ class EnvironmentArgs:
         pulumi.set(self, "yaml", value)
 
     @_builtins.property
+    @pulumi.getter(name="deletionProtected")
+    def deletion_protected(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        """
+        When set to true, the environment cannot be deleted. Defaults to false.
+        """
+        return pulumi.get(self, "deletion_protected")
+
+    @deletion_protected.setter
+    def deletion_protected(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "deletion_protected", value)
+
+    @_builtins.property
     @pulumi.getter
     def project(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
@@ -93,6 +111,7 @@ class Environment(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 deletion_protected: Optional[pulumi.Input[_builtins.bool]] = None,
                  name: Optional[pulumi.Input[_builtins.str]] = None,
                  organization: Optional[pulumi.Input[_builtins.str]] = None,
                  project: Optional[pulumi.Input[_builtins.str]] = None,
@@ -103,6 +122,7 @@ class Environment(pulumi.CustomResource):
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
+        :param pulumi.Input[_builtins.bool] deletion_protected: When set to true, the environment cannot be deleted. Defaults to false.
         :param pulumi.Input[_builtins.str] name: Environment name.
         :param pulumi.Input[_builtins.str] organization: Organization name.
         :param pulumi.Input[_builtins.str] project: Project name.
@@ -132,6 +152,7 @@ class Environment(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 deletion_protected: Optional[pulumi.Input[_builtins.bool]] = None,
                  name: Optional[pulumi.Input[_builtins.str]] = None,
                  organization: Optional[pulumi.Input[_builtins.str]] = None,
                  project: Optional[pulumi.Input[_builtins.str]] = None,
@@ -145,6 +166,9 @@ class Environment(pulumi.CustomResource):
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
             __props__ = EnvironmentArgs.__new__(EnvironmentArgs)
 
+            if deletion_protected is None:
+                deletion_protected = False
+            __props__.__dict__["deletion_protected"] = deletion_protected
             if name is None and not opts.urn:
                 raise TypeError("Missing required property 'name'")
             __props__.__dict__["name"] = name
@@ -180,12 +204,21 @@ class Environment(pulumi.CustomResource):
 
         __props__ = EnvironmentArgs.__new__(EnvironmentArgs)
 
+        __props__.__dict__["deletion_protected"] = None
         __props__.__dict__["name"] = None
         __props__.__dict__["organization"] = None
         __props__.__dict__["project"] = None
         __props__.__dict__["revision"] = None
         __props__.__dict__["yaml"] = None
         return Environment(resource_name, opts=opts, __props__=__props__)
+
+    @_builtins.property
+    @pulumi.getter(name="deletionProtected")
+    def deletion_protected(self) -> pulumi.Output[_builtins.bool]:
+        """
+        When set to true, the environment cannot be deleted. Defaults to false.
+        """
+        return pulumi.get(self, "deletion_protected")
 
     @_builtins.property
     @pulumi.getter

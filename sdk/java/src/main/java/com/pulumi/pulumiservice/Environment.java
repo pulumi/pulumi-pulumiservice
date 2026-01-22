@@ -10,6 +10,7 @@ import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.EnvironmentArgs;
 import com.pulumi.pulumiservice.Utilities;
+import java.lang.Boolean;
 import java.lang.Integer;
 import java.lang.String;
 import javax.annotation.Nullable;
@@ -20,6 +21,20 @@ import javax.annotation.Nullable;
  */
 @ResourceType(type="pulumiservice:index:Environment")
 public class Environment extends com.pulumi.resources.CustomResource {
+    /**
+     * When set to true, the environment cannot be deleted. Defaults to false.
+     * 
+     */
+    @Export(name="deletionProtected", refs={Boolean.class}, tree="[0]")
+    private Output<Boolean> deletionProtected;
+
+    /**
+     * @return When set to true, the environment cannot be deleted. Defaults to false.
+     * 
+     */
+    public Output<Boolean> deletionProtected() {
+        return this.deletionProtected;
+    }
     /**
      * Environment name.
      * 

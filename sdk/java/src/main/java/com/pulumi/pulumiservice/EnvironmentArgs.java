@@ -8,6 +8,7 @@ import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
+import java.lang.Boolean;
 import java.lang.String;
 import java.util.Objects;
 import java.util.Optional;
@@ -17,6 +18,21 @@ import javax.annotation.Nullable;
 public final class EnvironmentArgs extends com.pulumi.resources.ResourceArgs {
 
     public static final EnvironmentArgs Empty = new EnvironmentArgs();
+
+    /**
+     * When set to true, the environment cannot be deleted. Defaults to false.
+     * 
+     */
+    @Import(name="deletionProtected")
+    private @Nullable Output<Boolean> deletionProtected;
+
+    /**
+     * @return When set to true, the environment cannot be deleted. Defaults to false.
+     * 
+     */
+    public Optional<Output<Boolean>> deletionProtected() {
+        return Optional.ofNullable(this.deletionProtected);
+    }
 
     /**
      * Environment name.
@@ -81,6 +97,7 @@ public final class EnvironmentArgs extends com.pulumi.resources.ResourceArgs {
     private EnvironmentArgs() {}
 
     private EnvironmentArgs(EnvironmentArgs $) {
+        this.deletionProtected = $.deletionProtected;
         this.name = $.name;
         this.organization = $.organization;
         this.project = $.project;
@@ -103,6 +120,27 @@ public final class EnvironmentArgs extends com.pulumi.resources.ResourceArgs {
 
         public Builder(EnvironmentArgs defaults) {
             $ = new EnvironmentArgs(Objects.requireNonNull(defaults));
+        }
+
+        /**
+         * @param deletionProtected When set to true, the environment cannot be deleted. Defaults to false.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder deletionProtected(@Nullable Output<Boolean> deletionProtected) {
+            $.deletionProtected = deletionProtected;
+            return this;
+        }
+
+        /**
+         * @param deletionProtected When set to true, the environment cannot be deleted. Defaults to false.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder deletionProtected(Boolean deletionProtected) {
+            return deletionProtected(Output.of(deletionProtected));
         }
 
         /**
@@ -190,6 +228,7 @@ public final class EnvironmentArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         public EnvironmentArgs build() {
+            $.deletionProtected = Codegen.booleanProp("deletionProtected").output().arg($.deletionProtected).def(false).getNullable();
             if ($.name == null) {
                 throw new MissingRequiredPropertyException("EnvironmentArgs", "name");
             }
