@@ -393,3 +393,122 @@ When investigating CI test failures:
 2. Analyzing why you made the change
 3. Fixing the issue (removing duplicates, reverting unnecessary changes)
 4. Learning the pattern to avoid repeating the mistake
+
+## Unit Testing Best Practices
+
+### What to Unit Test
+
+**Good candidates for unit testing:**
+- ✅ Pure transformation functions (data structure conversions like `ToPropertyMap()`)
+- ✅ Stateless logic (diff calculations, validation like `Diff()`, `Check()`)
+- ✅ Simple methods with no external dependencies (like `Name()`)
+- ✅ Input parsing and validation logic
+
+**Poor candidates for unit testing:**
+- ❌ CRUD operations requiring HTTP clients (test these as integration tests in `examples/`)
+- ❌ Methods that primarily delegate to external services
+- ❌ Complex orchestration logic across multiple services
+- ❌ Anything requiring a real `pulumiapi.Client` instance
+
+**Rationale**: Unit tests should be fast, isolated, and test logic you own. Integration tests in `examples/` already provide coverage for end-to-end workflows.
+
+### Mocking Guidelines
+
+**Don't mock what you don't own:**
+- If a dependency doesn't provide an interface, it's a signal that unit testing at that level may not be appropriate
+- The `pulumiapi.Client` is a concrete struct - don't try to mock it in resource tests
+- Client/HTTP testing belongs in the `pulumiapi/` package, not in resource tests
+- Resource tests should focus on resource-specific logic only (transformations, diffs, validation)
+
+**Avoid over-engineering:**
+- ❌ No helper functions that just wrap struct literals (e.g., `buildMock(...)` that returns `&Mock{...}`)
+- ❌ No complex mocking infrastructure with embedding and type conversions
+- ❌ If you need `unsafe.Pointer` conversions, you're going the wrong way
+- ✅ Inline mock creation when actually needed
+- ✅ Keep test setup simple and obvious
+
+### Test Quality Indicators
+
+**Signs of good tests:**
+- ✅ Each test has a distinct, clear purpose
+- ✅ Table-driven tests for variations on the same behavior
+- ✅ Simple setup with inline test data, clear assertions
+- ✅ Fast execution (< 1s for entire test suite)
+- ✅ Tests focus on behavior, not implementation details
+- ✅ No redundant test cases
+
+**Signs of "AI slop" or over-engineered tests:**
+- ❌ Redundant test cases testing the same thing multiple ways
+- ❌ Unused test structure fields (e.g., `expectError bool` when method never errors)
+- ❌ Helper functions that don't actually reduce complexity
+- ❌ Over-complicated extraction/assertion logic
+- ❌ Tests that duplicate what integration tests already cover
+- ❌ Complex mocking that fights the type system
+
+### Example: Stack Resource Tests
+
+See `provider/pkg/resources/stack_test.go` for a well-architected test file that follows these principles:
+
+**What it tests:**
+- `Name()` - simple getter
+- `ToPropertyMap()` - pure transformation
+- `ToPulumiServiceStackTagInput()` - input parsing
+- `Diff()` - diff calculation logic
+- `Check()` - input validation
+- `Update()` - ensures it errors (stacks are immutable)
+
+**What it doesn't test:**
+- Create/Read/Delete operations (require real `pulumiapi.Client`)
+- HTTP client behavior (belongs in `pulumiapi/` package)
+- End-to-end workflows (covered by integration tests in `examples/`)
+
+**Results:**
+- 6 test functions, 17 test cases
+- < 50ms execution time
+- No mocking complexity
+- No external dependencies
+- Clear, maintainable code
+
+### Common Pitfalls
+
+**Trying to mock `pulumiapi.Client`:**
+- The Client is a concrete struct, not an interface
+- Don't try embedding, type conversion tricks, or unsafe pointers
+- If you need the client, you need an integration test
+
+**Testing the wrong thing:**
+- Don't test that HTTP calls work (that's the client's job)
+- Don't test Pulumi SDK behavior (trust the SDK)
+- Test YOUR logic: transformations, validation, diff calculation
+
+**Over-complicated test structures:**
+```go
+// ❌ Bad: Unused fields that make tests confusing
+tests := []struct {
+    name          string
+    input         Foo
+    expected      Bar
+    expectError   bool  // Never true in any test case
+    errorContains string // Never used
+}{...}
+
+// ✅ Good: Only the fields you actually use
+tests := []struct {
+    name     string
+    input    Foo
+    expected Bar
+}{...}
+```
+
+### When to Skip Unit Tests
+
+It's OK to not have unit tests for:
+- Simple CRUD resources with no transformation logic
+- Resources that are thin wrappers around API calls
+- Code that's already covered by integration tests
+
+**Focus unit testing effort on:**
+- Complex validation logic
+- Non-trivial transformations
+- Diff calculation algorithms
+- Edge cases that are hard to reproduce in integration tests
