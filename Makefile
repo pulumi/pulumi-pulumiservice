@@ -74,7 +74,7 @@ dotnet_sdk: bin/pulumi-resource-pulumiservice
 	$(PULUMI) package gen-sdk ./$< --language dotnet
 	cd sdk/dotnet/ && \
 		printf "module fake_dotnet_module // Exclude this directory from Go tools\n\ngo 1.17\n" > go.mod && \
-		echo "${VERSION_GENERIC}" >version.txt && \
+		echo "$(PROVIDER_VERSION)" >version.txt && \
 		dotnet build
 
 go_sdk: bin/pulumi-resource-pulumiservice
