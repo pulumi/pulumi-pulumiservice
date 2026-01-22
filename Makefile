@@ -135,7 +135,6 @@ install_dotnet_sdk::
 	if ! dotnet nuget list source | grep "${WORKING_DIR}/nuget"; then \
 		dotnet nuget add source "${WORKING_DIR}/nuget" --name "${WORKING_DIR}/nuget" \
 	; fi
-	@touch $@
 
 install_python_sdk::
 	#target intentionally blank
