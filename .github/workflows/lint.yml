@@ -32,7 +32,7 @@ jobs:
       with:
         persist-credentials: false    
     - env:
-        ESC_ACTION_ENVIRONMENT: imports/github-secrets
+        ESC_ACTION_ENVIRONMENT: github-secrets/${{ github.repository_owner }}-${{ github.event.repository.name }}
         ESC_ACTION_EXPORT_ENVIRONMENT_VARIABLES: "false"
         ESC_ACTION_OIDC_AUTH: "true"
         ESC_ACTION_OIDC_ORGANIZATION: pulumi
@@ -64,6 +64,8 @@ jobs:
       run: make prepare_local_workspace
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: lint
-      run: |
-        make lint
+    - name: golangci-lint
+      uses: golangci/golangci-lint-action@55c2c1448f86e01eaae002a5a3a9624417608d84 # v6
+      with:
+        install-mode: none # Handled by mise.
+        working-directory: provider
