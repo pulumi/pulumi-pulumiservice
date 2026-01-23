@@ -1,7 +1,7 @@
 lint:: | mise_install
 	 if [ -d provider ]; then \
-		pushd provider && golangci-lint run --timeout 10m && popd ; \
+		(cd provider && golangci-lint run --timeout 10m); \
 	 fi
 	 if [ -d examples ]; then \
-		pushd examples && golangci-lint run --timeout 10m --build-tags all && popd ; \
+		(cd examples && golangci-lint run --timeout 10m --build-tags all); \
 	fi
