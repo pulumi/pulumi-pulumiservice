@@ -137,12 +137,11 @@ build_go: .make/build_go
 	@touch $@
 .PHONY: generate_go build_go
 
-generate_java: .make/generate_java
-build_java: .make/build_java
+.make/generate_java: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
 .make/generate_java: PACKAGE_VERSION := $(PROVIDER_VERSION)
-.make/generate_java: .make/mise_install bin/$(CODEGEN)
+.make/generate_java: .make/mise_install .make/schema
 .make/generate_java: | mise_env
-	$(GEN_ENVS) $(WORKING_DIR)/bin/$(CODEGEN) java --out sdk/java/
+	PULUMI_HOME=$(GEN_PULUMI_HOME) PULUMI_CONVERT_EXAMPLES_CACHE_DIR=$(GEN_PULUMI_CONVERT_EXAMPLES_CACHE_DIR) pulumi package gen-sdk provider/cmd/$(PROVIDER)/schema.json --language java --out sdk/
 	printf "module fake_java_module // Exclude this directory from Go tools\n\ngo 1.17\n" > sdk/java/go.mod
 	@touch $@
 .make/build_java: PACKAGE_VERSION := $(PROVIDER_VERSION)
@@ -266,7 +265,13 @@ tfgen_no_deps: .make/schema
 	(cd provider && VERSION=$(PROVIDER_VERSION) go generate cmd/$(PROVIDER)/main.go)
 	@touch $@
 tfgen_build_only: bin/$(CODEGEN)
-bin/$(CODEGEN): provider/*.go provider/go.* .make/upstream
+
+# Do not try to create Golang files but use them to see if we require
+# re-building
+%.go: ;
+%/go.mod: ;
+%/go.sum: ;
+bin/$(CODEGEN): $(PROVIDER_PATH)/%.go $(PROVIDER_PATH)/go.mod $(PROVIDER_PATH)/go.sum .make/upstream
 	(cd provider && go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o $(WORKING_DIR)/bin/$(CODEGEN) -ldflags "$(LDFLAGS_PROJ_VERSION) $(LDFLAGS_EXTRAS)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(CODEGEN))
 .PHONY: tfgen schema tfgen_no_deps tfgen_build_only
 
