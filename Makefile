@@ -266,12 +266,9 @@ tfgen_no_deps: .make/schema
 	@touch $@
 tfgen_build_only: bin/$(CODEGEN)
 
-# Do not try to create Golang files but use them to see if we require
-# re-building
-%.go: ;
-%/go.mod: ;
-%/go.sum: ;
-bin/$(CODEGEN): $(PROVIDER_PATH)/%.go $(PROVIDER_PATH)/go.mod $(PROVIDER_PATH)/go.sum .make/upstream
+GOSRCS = $(shell find ./provider -type f -name '*.go')
+GOMODSUM = $(shell find ./provider -type f -name 'go.*')
+bin/$(CODEGEN): $(GOSRCS) $(GOMODSUM) .make/upstream
 	(cd provider && go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o $(WORKING_DIR)/bin/$(CODEGEN) -ldflags "$(LDFLAGS_PROJ_VERSION) $(LDFLAGS_EXTRAS)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(CODEGEN))
 .PHONY: tfgen schema tfgen_no_deps tfgen_build_only
 
