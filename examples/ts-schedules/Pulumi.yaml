@@ -1,3 +1,0 @@
-name: pulumi-service-schedules-example-ts
-runtime: nodejs
-description: A minimal example of managing a Pulumi Service schedules in typescript
