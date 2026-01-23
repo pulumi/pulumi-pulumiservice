@@ -8,7 +8,7 @@ resources:
       organization: service-provider-test-org
       project: my-project
       name: testing-environment-yaml-${digits}
-      deletionProtected: true
+      deletionProtected: false
       yaml:
         fn::stringAsset: |-
           values:
