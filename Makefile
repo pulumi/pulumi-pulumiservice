@@ -23,43 +23,65 @@ GOPATH			:= $(shell go env GOPATH)
 WORKING_DIR     := $(shell pwd)
 TESTPARALLELISM := 4
 
+# Ensure all directories exist before evaluating targets to avoid issues with `touch` creating directories.
+_ := $(shell mkdir -p .make bin .pulumi/bin)
+
 # Ensure helpmakego is installed
 _ := $(shell go build -o bin/helpmakego github.com/iwahbe/helpmakego)
 
 # The pulumi binary to use during generation
-PULUMI := .pulumi/bin/pulumi
+PULUMI := pulumi
 
-ensure::
+ensure:: | mise_install
 	go mod tidy
 	cd sdk && go mod tidy
 
+# Installs all necessary tools with mise and records completion in a sentinel
+# file so dependent targets can participate in make's caching behaviour. The
+# environment is refreshed via an order-only prerequisite so it still runs on
+# every invocation without invalidating the sentinel.
+mise_install: .make/mise_install | mise_env
+
+.PHONY: mise_env
+mise_env:
+	@mise env -q  > /dev/null
+
+.make/mise_install:
+	@mise install -q
+	@touch $@
+
+# Prepare the workspace for building the provider and SDKs
+# Importantly this is run by CI ahead of restoring the bin directory and resuming SDK builds
+prepare_local_workspace: .make/mise_install
+prepare_local_workspace: | mise_env
+
 build_sdks: provider dotnet_sdk go_sdk nodejs_sdk python_sdk java_sdk
 
-bin/pulumi-resource-pulumiservice: $(shell bin/helpmakego provider/cmd/pulumi-resource-pulumiservice)
+bin/pulumi-resource-pulumiservice: $(shell bin/helpmakego provider/cmd/pulumi-resource-pulumiservice) | mise_install
 	go build -C provider -o ../$@ -ldflags $(LDFLAGS) $(BUILD_PATH)
 
 .PHONY: provider
 provider: bin/pulumi-resource-pulumiservice
 
-provider_debug::
+provider_debug:: | mise_install
 	(cd provider && go build -o $(WORKING_DIR)/bin/${PROVIDER} -gcflags="all=-N -l" -ldflags $(LDFLAGS) $(BUILD_PATH))
 
 test_provider::
 	cd provider/pkg && go test -short -v -count=1 -coverprofile="coverage.txt" -coverpkg=./... -timeout 2h -parallel ${TESTPARALLELISM} ./...
 
-dotnet_sdk: bin/pulumi-resource-pulumiservice $(PULUMI)
+dotnet_sdk: bin/pulumi-resource-pulumiservice
 	rm -rf sdk/dotnet
 	$(PULUMI) package gen-sdk ./$< --language dotnet
 	cd sdk/dotnet/ && \
 		printf "module fake_dotnet_module // Exclude this directory from Go tools\n\ngo 1.17\n" > go.mod && \
-		echo "${VERSION_GENERIC}" >version.txt && \
+		echo "$(VERSION_GENERIC)" >version.txt && \
 		dotnet build
 
-go_sdk: bin/pulumi-resource-pulumiservice $(PULUMI)
+go_sdk: bin/pulumi-resource-pulumiservice
 	rm -rf sdk/go
 	$(PULUMI) package gen-sdk ./$< --language go
 
-nodejs_sdk: bin/pulumi-resource-pulumiservice $(PULUMI)
+nodejs_sdk: bin/pulumi-resource-pulumiservice
 	rm -rf sdk/nodejs
 	$(PULUMI) package gen-sdk ./$< --language nodejs
 	cd sdk/nodejs && \
@@ -67,7 +89,7 @@ nodejs_sdk: bin/pulumi-resource-pulumiservice $(PULUMI)
 		yarn run build && \
 		cp package.json yarn.lock ./bin/
 
-python_sdk: bin/pulumi-resource-pulumiservice $(PULUMI)
+python_sdk: bin/pulumi-resource-pulumiservice
 	rm -rf sdk/python
 	$(PULUMI) package gen-sdk ./$< --language python
 	cd sdk/python/ && \
@@ -79,7 +101,7 @@ python_sdk: bin/pulumi-resource-pulumiservice $(PULUMI)
 		cd ./bin && \
 		../venv/bin/python -m build .
 
-java_sdk: bin/pulumi-resource-pulumiservice $(PULUMI)
+java_sdk: bin/pulumi-resource-pulumiservice
 	rm -rf sdk/java
 	$(PULUMI) package gen-sdk ./$< --language java
 	cd sdk/java && \
@@ -93,7 +115,7 @@ build:: provider dotnet_sdk go_sdk nodejs_sdk python_sdk java_sdk
 # Required for the codegen action that runs in pulumi/pulumi
 only_build:: build
 
-lint::
+lint:: | mise_install
 	if [ -d provider ]; then \
 		pushd provider && golangci-lint run --timeout 10m && popd ; \
 	fi
@@ -108,9 +130,11 @@ install:: install_nodejs_sdk install_dotnet_sdk
 GO_TEST := go test -v -count=1 -cover -timeout 2h -parallel ${TESTPARALLELISM}
 
 install_dotnet_sdk::
-	rm -rf $(WORKING_DIR)/nuget/$(NUGET_PKG_NAME).*.nupkg
-	mkdir -p $(WORKING_DIR)/nuget
-	find . -name '*.nupkg' -print -exec cp -p {} ${WORKING_DIR}/nuget \;
+	mkdir -p nuget
+	find sdk/dotnet/bin -name '*.nupkg' -print -exec cp -p "{}" ${WORKING_DIR}/nuget \;
+	if ! dotnet nuget list source | grep "${WORKING_DIR}/nuget"; then \
+		dotnet nuget add source "${WORKING_DIR}/nuget" --name "${WORKING_DIR}/nuget" \
+	; fi
 
 install_python_sdk::
 	#target intentionally blank
@@ -118,32 +142,15 @@ install_python_sdk::
 install_go_sdk::
 	#target intentionally blank
 
-install_nodejs_sdk::
+install_nodejs_sdk:: | mise_install
 	-yarn unlink --cwd $(WORKING_DIR)/sdk/nodejs/bin
 	yarn link --cwd $(WORKING_DIR)/sdk/nodejs/bin
 
-install_java_sdk::
+install_java_sdk:: | mise_install
 	cd sdk/java && gradle publishToMavenLocal
 
 
-# Keep the version of the pulumi binary used for code generation in sync with the version
-# of the dependency used by github.com/pulumi/pulumi-pulumiservice/provider
-
-$(PULUMI): HOME := $(WORKING_DIR)
-$(PULUMI): go.mod
-	@ PULUMI_VERSION="$$(cd provider && go list -m github.com/pulumi/pulumi/pkg/v3 | awk '{print $$2}')"; \
-	if [ -x $(PULUMI) ]; then \
-		CURRENT_VERSION="$$($(PULUMI) version)"; \
-		if [ "$${CURRENT_VERSION}" != "$${PULUMI_VERSION}" ]; then \
-			echo "Upgrading $(PULUMI) from $${CURRENT_VERSION} to $${PULUMI_VERSION}"; \
-			rm $(PULUMI); \
-		fi; \
-	fi; \
-	if ! [ -x $(PULUMI) ]; then \
-		curl -fsSL https://get.pulumi.com | sh -s -- --version "$${PULUMI_VERSION#v}"; \
-	fi
-
-$(SCHEMA_FILE): bin/pulumi-resource-pulumiservice $(PULUMI)
+$(SCHEMA_FILE): bin/pulumi-resource-pulumiservice | mise_install
 	$(PULUMI) package get-schema ./$<  | \
 		jq 'del(.version)' > $@
 
@@ -153,15 +160,15 @@ $(SCHEMA_FILE): bin/pulumi-resource-pulumiservice $(PULUMI)
 
 # TODO(https://github.com/pulumi/ci-mgmt/issues/1131): Use default target implementations.
 
-shard:
-	@(cd examples && go run github.com/blampe/shard@latest --total $(TOTAL) --index $(INDEX) --output env) >> "$(GITHUB_ENV)"
-
-test_shard:
-	go test -tags=all -v -count=1 -coverprofile="coverage.txt" -coverpkg=./... -timeout 3h -parallel ${TESTPARALLELISM} -run "$(SHARD_TESTS)" $(PROJECT)/examples/...
+.PHONY: test
+test: export PATH := $(WORKING_DIR)/bin:$(PATH)
+test:
+	cd examples && go test -v -tags=all -parallel $(TESTPARALLELISM) -timeout 2h $(value GOTESTARGS)
 
 install_plugins: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
 install_plugins: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
 install_plugins: .pulumi/bin/pulumi
+
 
 bin/linux-amd64/$(PROVIDER): TARGET := linux-amd64
 bin/linux-arm64/$(PROVIDER): TARGET := linux-arm64
@@ -204,3 +211,5 @@ build_dotnet: dotnet_sdk
 build_go: go_sdk
 
 schema: provider/cmd/pulumi-resource-pulumiservice/schema.json
+
+include scripts/crossbuild.mk
