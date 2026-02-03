@@ -25,9 +25,17 @@ func TestGetDeploymentSettings(t *testing.T) {
 
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
-			ExpectedReqPath:   "/" + path.Join("api", "stacks", orgName, projectName, stackName, "deployments", "settings"),
-			ResponseCode:      200,
-			ResponseBody:      dsValue,
+			ExpectedReqPath: "/" + path.Join(
+				"api",
+				"stacks",
+				orgName,
+				projectName,
+				stackName,
+				"deployments",
+				"settings",
+			),
+			ResponseCode: 200,
+			ResponseBody: dsValue,
 		})
 
 		ds, err := c.GetDeploymentSettings(ctx, StackIdentifier{
@@ -43,8 +51,16 @@ func TestGetDeploymentSettings(t *testing.T) {
 	t.Run("404", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodGet,
-			ExpectedReqPath:   "/" + path.Join("api", "stacks", orgName, projectName, stackName, "deployments", "settings"),
-			ResponseCode:      404,
+			ExpectedReqPath: "/" + path.Join(
+				"api",
+				"stacks",
+				orgName,
+				projectName,
+				stackName,
+				"deployments",
+				"settings",
+			),
+			ResponseCode: 404,
 			ResponseBody: ErrorResponse{
 				StatusCode: 404,
 				Message:    "not found",
@@ -79,10 +95,18 @@ func TestCreateDeploymentSettings(t *testing.T) {
 
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPut,
-			ExpectedReqPath:   "/" + path.Join("api", "stacks", orgName, projectName, stackName, "deployments", "settings"),
-			ResponseCode:      201,
-			ExpectedReqBody:   dsValue,
-			ResponseBody:      dsValue,
+			ExpectedReqPath: "/" + path.Join(
+				"api",
+				"stacks",
+				orgName,
+				projectName,
+				stackName,
+				"deployments",
+				"settings",
+			),
+			ResponseCode:    201,
+			ExpectedReqBody: dsValue,
+			ResponseBody:    dsValue,
 		})
 
 		response, err := c.CreateDeploymentSettings(ctx, StackIdentifier{

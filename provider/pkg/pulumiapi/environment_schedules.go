@@ -9,9 +9,22 @@ import (
 )
 
 type EnvironmentScheduleClient interface {
-	CreateEnvironmentRotationSchedule(ctx context.Context, environment EnvironmentIdentifier, req CreateEnvironmentRotationScheduleRequest) (*string, error)
-	GetEnvironmentSchedule(ctx context.Context, environment EnvironmentIdentifier, scheduleID string) (*EnvironmentScheduleResponse, error)
-	UpdateEnvironmentRotationSchedule(ctx context.Context, environment EnvironmentIdentifier, req CreateEnvironmentRotationScheduleRequest, scheduleID string) (*string, error)
+	CreateEnvironmentRotationSchedule(
+		ctx context.Context,
+		environment EnvironmentIdentifier,
+		req CreateEnvironmentRotationScheduleRequest,
+	) (*string, error)
+	GetEnvironmentSchedule(
+		ctx context.Context,
+		environment EnvironmentIdentifier,
+		scheduleID string,
+	) (*EnvironmentScheduleResponse, error)
+	UpdateEnvironmentRotationSchedule(
+		ctx context.Context,
+		environment EnvironmentIdentifier,
+		req CreateEnvironmentRotationScheduleRequest,
+		scheduleID string,
+	) (*string, error)
 	DeleteEnvironmentSchedule(ctx context.Context, environment EnvironmentIdentifier, scheduleID string) error
 }
 
@@ -43,8 +56,19 @@ type EnvironmentScheduleDefinition struct {
 	EnvironmentID   string `json:"environmentID"`
 }
 
-func (c *Client) CreateEnvironmentRotationSchedule(ctx context.Context, environment EnvironmentIdentifier, scheduleReq CreateEnvironmentRotationScheduleRequest) (*string, error) {
-	apiPath := path.Join("esc", "environments", environment.OrgName, environment.ProjectName, environment.EnvName, "schedules")
+func (c *Client) CreateEnvironmentRotationSchedule(
+	ctx context.Context,
+	environment EnvironmentIdentifier,
+	scheduleReq CreateEnvironmentRotationScheduleRequest,
+) (*string, error) {
+	apiPath := path.Join(
+		"esc",
+		"environments",
+		environment.OrgName,
+		environment.ProjectName,
+		environment.EnvName,
+		"schedules",
+	)
 	var scheduleResponse EnvironmentScheduleResponse
 	_, err := c.do(ctx, http.MethodPost, apiPath, scheduleReq, &scheduleResponse)
 	if err != nil {
@@ -60,8 +84,20 @@ func (c *Client) CreateEnvironmentRotationSchedule(ctx context.Context, environm
 	return &scheduleResponse.ID, nil
 }
 
-func (c *Client) GetEnvironmentSchedule(ctx context.Context, environment EnvironmentIdentifier, scheduleID string) (*EnvironmentScheduleResponse, error) {
-	apiPath := path.Join("esc", "environments", environment.OrgName, environment.ProjectName, environment.EnvName, "schedules", scheduleID)
+func (c *Client) GetEnvironmentSchedule(
+	ctx context.Context,
+	environment EnvironmentIdentifier,
+	scheduleID string,
+) (*EnvironmentScheduleResponse, error) {
+	apiPath := path.Join(
+		"esc",
+		"environments",
+		environment.OrgName,
+		environment.ProjectName,
+		environment.EnvName,
+		"schedules",
+		scheduleID,
+	)
 	var scheduleResponse EnvironmentScheduleResponse
 	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &scheduleResponse)
 	if err != nil {
@@ -73,8 +109,21 @@ func (c *Client) GetEnvironmentSchedule(ctx context.Context, environment Environ
 	return &scheduleResponse, nil
 }
 
-func (c *Client) UpdateEnvironmentRotationSchedule(ctx context.Context, environment EnvironmentIdentifier, scheduleReq CreateEnvironmentRotationScheduleRequest, scheduleID string) (*string, error) {
-	apiPath := path.Join("esc", "environments", environment.OrgName, environment.ProjectName, environment.EnvName, "schedules", scheduleID)
+func (c *Client) UpdateEnvironmentRotationSchedule(
+	ctx context.Context,
+	environment EnvironmentIdentifier,
+	scheduleReq CreateEnvironmentRotationScheduleRequest,
+	scheduleID string,
+) (*string, error) {
+	apiPath := path.Join(
+		"esc",
+		"environments",
+		environment.OrgName,
+		environment.ProjectName,
+		environment.EnvName,
+		"schedules",
+		scheduleID,
+	)
 	var scheduleResponse EnvironmentScheduleResponse
 	_, err := c.do(ctx, http.MethodPost, apiPath, scheduleReq, &scheduleResponse)
 	if err != nil {
@@ -90,8 +139,20 @@ func (c *Client) UpdateEnvironmentRotationSchedule(ctx context.Context, environm
 	return &scheduleResponse.ID, nil
 }
 
-func (c *Client) DeleteEnvironmentSchedule(ctx context.Context, environment EnvironmentIdentifier, scheduleID string) error {
-	apiPath := path.Join("esc", "environments", environment.OrgName, environment.ProjectName, environment.EnvName, "schedules", scheduleID)
+func (c *Client) DeleteEnvironmentSchedule(
+	ctx context.Context,
+	environment EnvironmentIdentifier,
+	scheduleID string,
+) error {
+	apiPath := path.Join(
+		"esc",
+		"environments",
+		environment.OrgName,
+		environment.ProjectName,
+		environment.EnvName,
+		"schedules",
+		scheduleID,
+	)
 	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
 	if err != nil {
 		return fmt.Errorf("failed to delete environment schedule with scheduleId %s : %w", scheduleID, err)

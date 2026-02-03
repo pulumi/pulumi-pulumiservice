@@ -8,12 +8,26 @@ import (
 )
 
 type OidcClient interface {
-	RegisterOidcIssuer(ctx context.Context, organization string, request OidcIssuerRegistrationRequest) (*OidcIssuerRegistrationResponse, error)
-	UpdateOidcIssuer(ctx context.Context, organization string, issuerId string, request OidcIssuerUpdateRequest) (*OidcIssuerRegistrationResponse, error)
+	RegisterOidcIssuer(
+		ctx context.Context,
+		organization string,
+		request OidcIssuerRegistrationRequest,
+	) (*OidcIssuerRegistrationResponse, error)
+	UpdateOidcIssuer(
+		ctx context.Context,
+		organization string,
+		issuerId string,
+		request OidcIssuerUpdateRequest,
+	) (*OidcIssuerRegistrationResponse, error)
 	GetOidcIssuer(ctx context.Context, organization string, issuerId string) (*OidcIssuerRegistrationResponse, error)
 	DeleteOidcIssuer(ctx context.Context, organization string, issuerId string) error
 	GetAuthPolicies(ctx context.Context, organization string, issuerId string) (*AuthPolicy, error)
-	UpdateAuthPolicies(ctx context.Context, organization string, policyId string, request AuthPolicyUpdateRequest) (*AuthPolicy, error)
+	UpdateAuthPolicies(
+		ctx context.Context,
+		organization string,
+		policyId string,
+		request AuthPolicyUpdateRequest,
+	) (*AuthPolicy, error)
 }
 
 type OidcIssuerRegistrationRequest struct {
@@ -60,7 +74,11 @@ type AuthPolicyUpdateRequest struct {
 	Definition []AuthPolicyDefinition `json:"policies"`
 }
 
-func (c *Client) RegisterOidcIssuer(ctx context.Context, organization string, request OidcIssuerRegistrationRequest) (*OidcIssuerRegistrationResponse, error) {
+func (c *Client) RegisterOidcIssuer(
+	ctx context.Context,
+	organization string,
+	request OidcIssuerRegistrationRequest,
+) (*OidcIssuerRegistrationResponse, error) {
 	apiPath := path.Join("orgs", organization, "oidc", "issuers")
 	var response = &OidcIssuerRegistrationResponse{}
 	_, err := c.do(ctx, http.MethodPost, apiPath, request, response)
@@ -70,7 +88,12 @@ func (c *Client) RegisterOidcIssuer(ctx context.Context, organization string, re
 	return response, nil
 }
 
-func (c *Client) UpdateOidcIssuer(ctx context.Context, organization string, issuerId string, request OidcIssuerUpdateRequest) (*OidcIssuerRegistrationResponse, error) {
+func (c *Client) UpdateOidcIssuer(
+	ctx context.Context,
+	organization string,
+	issuerId string,
+	request OidcIssuerUpdateRequest,
+) (*OidcIssuerRegistrationResponse, error) {
 	apiPath := path.Join("orgs", organization, "oidc", "issuers", issuerId)
 	var response = &OidcIssuerRegistrationResponse{}
 	_, err := c.do(ctx, http.MethodPatch, apiPath, request, response)
@@ -80,7 +103,11 @@ func (c *Client) UpdateOidcIssuer(ctx context.Context, organization string, issu
 	return response, nil
 }
 
-func (c *Client) GetOidcIssuer(ctx context.Context, organization string, issuerId string) (*OidcIssuerRegistrationResponse, error) {
+func (c *Client) GetOidcIssuer(
+	ctx context.Context,
+	organization string,
+	issuerId string,
+) (*OidcIssuerRegistrationResponse, error) {
 	apiPath := path.Join("orgs", organization, "oidc", "issuers", issuerId)
 	var response = &OidcIssuerRegistrationResponse{}
 	result, err := c.do(ctx, http.MethodGet, apiPath, nil, response)
@@ -115,7 +142,12 @@ func (c *Client) GetAuthPolicies(ctx context.Context, organization string, issue
 	return response, nil
 }
 
-func (c *Client) UpdateAuthPolicies(ctx context.Context, organization string, policyId string, request AuthPolicyUpdateRequest) (*AuthPolicy, error) {
+func (c *Client) UpdateAuthPolicies(
+	ctx context.Context,
+	organization string,
+	policyId string,
+	request AuthPolicyUpdateRequest,
+) (*AuthPolicy, error) {
 	apiPath := path.Join("orgs", organization, "auth", "policies", policyId)
 	var response = &AuthPolicy{}
 	_, err := c.do(ctx, http.MethodPatch, apiPath, request, response)

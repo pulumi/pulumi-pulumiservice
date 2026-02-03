@@ -33,7 +33,9 @@ func (i *PulumiServiceStack) ToPropertyMap() resource.PropertyMap {
 	return pm
 }
 
-func (s *PulumiServiceStackResource) ToPulumiServiceStackTagInput(inputMap resource.PropertyMap) (*PulumiServiceStack, error) {
+func (s *PulumiServiceStackResource) ToPulumiServiceStackTagInput(
+	inputMap resource.PropertyMap,
+) (*PulumiServiceStack, error) {
 	stack := PulumiServiceStack{}
 
 	stack.OrgName = inputMap["organizationName"].StringValue()
@@ -51,7 +53,10 @@ func (s *PulumiServiceStackResource) Name() string {
 }
 
 func (s *PulumiServiceStackResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
+	olds, err := plugin.UnmarshalProperties(
+		req.GetOldInputs(),
+		plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +94,10 @@ func (s *PulumiServiceStackResource) Diff(req *pulumirpc.DiffRequest) (*pulumirp
 
 func (s *PulumiServiceStackResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
 	ctx := context.Background()
-	inputs, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	inputs, err := plugin.UnmarshalProperties(
+		req.GetProperties(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +115,10 @@ func (s *PulumiServiceStackResource) Delete(req *pulumirpc.DeleteRequest) (*pbem
 
 func (s *PulumiServiceStackResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	ctx := context.Background()
-	inputs, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	inputs, err := plugin.UnmarshalProperties(
+		req.GetProperties(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}

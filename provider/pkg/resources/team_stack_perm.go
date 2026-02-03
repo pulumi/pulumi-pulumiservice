@@ -30,7 +30,9 @@ func (i *TeamStackPermissionInput) ToPropertyMap() resource.PropertyMap {
 	return util.ToPropertyMap(*i, structTagKey)
 }
 
-func (tp *TeamStackPermissionResource) ToPulumiServiceTeamInput(inputMap resource.PropertyMap) (*TeamStackPermissionInput, error) {
+func (tp *TeamStackPermissionResource) ToPulumiServiceTeamInput(
+	inputMap resource.PropertyMap,
+) (*TeamStackPermissionInput, error) {
 	input := TeamStackPermissionInput{}
 	return &input, util.FromPropertyMap(inputMap, structTagKey, &input)
 }

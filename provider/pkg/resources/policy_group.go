@@ -273,7 +273,10 @@ func (p *PulumiServicePolicyGroupResource) Delete(req *pulumirpc.DeleteRequest) 
 }
 
 func (p *PulumiServicePolicyGroupResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
+	olds, err := plugin.UnmarshalProperties(
+		req.GetOldInputs(),
+		plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -376,11 +379,17 @@ func (p *PulumiServicePolicyGroupResource) Read(req *pulumirpc.ReadRequest) (*pu
 
 func (p *PulumiServicePolicyGroupResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
 	ctx := context.Background()
-	inputsOld, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	inputsOld, err := plugin.UnmarshalProperties(
+		req.GetOlds(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
-	inputsNew, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	inputsNew, err := plugin.UnmarshalProperties(
+		req.GetNews(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -501,7 +510,10 @@ func (p *PulumiServicePolicyGroupResource) Update(req *pulumirpc.UpdateRequest) 
 
 func (p *PulumiServicePolicyGroupResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	ctx := context.Background()
-	inputs, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	inputs, err := plugin.UnmarshalProperties(
+		req.GetProperties(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -509,7 +521,13 @@ func (p *PulumiServicePolicyGroupResource) Create(req *pulumirpc.CreateRequest) 
 	inputsPolicyGroup := ToPulumiServicePolicyGroupInput(inputs)
 
 	// Create the policy group
-	err = p.Client.CreatePolicyGroup(ctx, inputsPolicyGroup.OrganizationName, inputsPolicyGroup.Name, inputsPolicyGroup.EntityType, inputsPolicyGroup.Mode)
+	err = p.Client.CreatePolicyGroup(
+		ctx,
+		inputsPolicyGroup.OrganizationName,
+		inputsPolicyGroup.Name,
+		inputsPolicyGroup.EntityType,
+		inputsPolicyGroup.Mode,
+	)
 	if err != nil {
 		return nil, fmt.Errorf("error creating policy group '%s': %w", inputsPolicyGroup.Name, err)
 	}
@@ -545,9 +563,19 @@ func (p *PulumiServicePolicyGroupResource) Create(req *pulumirpc.CreateRequest) 
 
 	// Send all adds in a single batch request
 	if len(batchReqs) > 0 {
-		err = p.Client.BatchUpdatePolicyGroup(ctx, inputsPolicyGroup.OrganizationName, inputsPolicyGroup.Name, batchReqs)
+		err = p.Client.BatchUpdatePolicyGroup(
+			ctx,
+			inputsPolicyGroup.OrganizationName,
+			inputsPolicyGroup.Name,
+			batchReqs,
+		)
 		if err != nil {
-			return nil, partialErrorPolicyGroup(policyGroupID, fmt.Errorf("failed to add items to policy group: %w", err), inputsPolicyGroup, inputsPolicyGroup)
+			return nil, partialErrorPolicyGroup(
+				policyGroupID,
+				fmt.Errorf("failed to add items to policy group: %w", err),
+				inputsPolicyGroup,
+				inputsPolicyGroup,
+			)
 		}
 	}
 
@@ -650,14 +678,20 @@ func containsPolicyPack(packs []pulumiapi.PolicyPackMetadata, target pulumiapi.P
 // This is used during Read to determine if we should preserve original inputs.
 func parsePreviousAccounts(properties, inputs *structpb.Struct) (stateAccounts, inputAccounts []string) {
 	if properties != nil {
-		oldProps, err := plugin.UnmarshalProperties(properties, plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
+		oldProps, err := plugin.UnmarshalProperties(
+			properties,
+			plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true},
+		)
 		if err == nil {
 			oldState := ToPulumiServicePolicyGroupInput(oldProps)
 			stateAccounts = oldState.Accounts
 		}
 	}
 	if inputs != nil {
-		oldInputs, err := plugin.UnmarshalProperties(inputs, plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
+		oldInputs, err := plugin.UnmarshalProperties(
+			inputs,
+			plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true},
+		)
 		if err == nil {
 			oldInput := ToPulumiServicePolicyGroupInput(oldInputs)
 			inputAccounts = oldInput.Accounts
@@ -706,7 +740,12 @@ func policyGroupInputsEqual(a, b PulumiServicePolicyGroupInput) bool {
 
 // partialErrorPolicyGroup creates an error for resources that did not complete an operation in progress.
 // The last known state of the object is included in the error so that it can be checkpointed.
-func partialErrorPolicyGroup(id string, err error, state PulumiServicePolicyGroupInput, inputs PulumiServicePolicyGroupInput) error {
+func partialErrorPolicyGroup(
+	id string,
+	err error,
+	state PulumiServicePolicyGroupInput,
+	inputs PulumiServicePolicyGroupInput,
+) error {
 	stateRpc, stateSerErr := state.ToRpc()
 	inputRpc, inputSerErr := inputs.ToRpc()
 

@@ -75,9 +75,9 @@ func (ScanSchedule) Values() []infer.EnumValue[ScanSchedule] {
 
 // InsightsAccountCore contains the core fields for an insights account
 type InsightsAccountCore struct {
-	OrganizationName string                 `pulumi:"organizationName" provider:"replaceOnChanges"`
-	AccountName      string                 `pulumi:"accountName" provider:"replaceOnChanges"`
-	Provider         CloudProvider          `pulumi:"provider" provider:"replaceOnChanges"`
+	OrganizationName string                 `pulumi:"organizationName"        provider:"replaceOnChanges"`
+	AccountName      string                 `pulumi:"accountName"             provider:"replaceOnChanges"`
+	Provider         CloudProvider          `pulumi:"provider"                provider:"replaceOnChanges"`
 	Environment      string                 `pulumi:"environment"`
 	ScanSchedule     ScanSchedule           `pulumi:"scanSchedule"`
 	ProviderConfig   map[string]interface{} `pulumi:"providerConfig,optional"`
@@ -88,10 +88,19 @@ func (c *InsightsAccountCore) Annotate(a infer.Annotator) {
 	a.Describe(&c.OrganizationName, "The organization's name.")
 	a.Describe(&c.AccountName, "Name of the insights account.")
 	a.Describe(&c.Provider, "The cloud provider for scanning.")
-	a.Describe(&c.Environment, "The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0').")
-	a.Describe(&c.ScanSchedule, "Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.")
+	a.Describe(
+		&c.Environment,
+		"The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0').",
+	)
+	a.Describe(
+		&c.ScanSchedule,
+		"Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.",
+	)
 	a.SetDefault(&c.ScanSchedule, ScanScheduleNone)
-	a.Describe(&c.ProviderConfig, "Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {\"regions\": [\"us-west-1\", \"us-west-2\"]}.")
+	a.Describe(
+		&c.ProviderConfig,
+		"Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {\"regions\": [\"us-west-1\", \"us-west-2\"]}.",
+	)
 	a.Describe(&c.Tags, "Key-value tags to associate with the insights account.")
 }
 
@@ -132,7 +141,10 @@ func InsightsAccountStateFromAPI(orgName string, account pulumiapi.InsightsAccou
 	}
 }
 
-func (*InsightsAccount) Create(ctx context.Context, req infer.CreateRequest[InsightsAccountInput]) (infer.CreateResponse[InsightsAccountState], error) {
+func (*InsightsAccount) Create(
+	ctx context.Context,
+	req infer.CreateRequest[InsightsAccountInput],
+) (infer.CreateResponse[InsightsAccountState], error) {
 	accountID := fmt.Sprintf("%s/%s", req.Inputs.OrganizationName, req.Inputs.AccountName)
 	if req.DryRun {
 		return infer.CreateResponse[InsightsAccountState]{
@@ -156,7 +168,11 @@ func (*InsightsAccount) Create(ctx context.Context, req infer.CreateRequest[Insi
 
 	err := client.CreateInsightsAccount(ctx, req.Inputs.OrganizationName, req.Inputs.AccountName, createReq)
 	if err != nil {
-		return infer.CreateResponse[InsightsAccountState]{}, fmt.Errorf("error creating insights account '%s': %w", req.Inputs.AccountName, err)
+		return infer.CreateResponse[InsightsAccountState]{}, fmt.Errorf(
+			"error creating insights account '%s': %w",
+			req.Inputs.AccountName,
+			err,
+		)
 	}
 
 	// Set tags if provided
@@ -200,12 +216,18 @@ func (*InsightsAccount) Create(ctx context.Context, req infer.CreateRequest[Insi
 	}, nil
 }
 
-func (*InsightsAccount) Delete(ctx context.Context, req infer.DeleteRequest[InsightsAccountState]) (infer.DeleteResponse, error) {
+func (*InsightsAccount) Delete(
+	ctx context.Context,
+	req infer.DeleteRequest[InsightsAccountState],
+) (infer.DeleteResponse, error) {
 	client := config.GetClient(ctx)
 	return infer.DeleteResponse{}, client.DeleteInsightsAccount(ctx, req.State.OrganizationName, req.State.AccountName)
 }
 
-func (*InsightsAccount) Read(ctx context.Context, req infer.ReadRequest[InsightsAccountInput, InsightsAccountState]) (infer.ReadResponse[InsightsAccountInput, InsightsAccountState], error) {
+func (*InsightsAccount) Read(
+	ctx context.Context,
+	req infer.ReadRequest[InsightsAccountInput, InsightsAccountState],
+) (infer.ReadResponse[InsightsAccountInput, InsightsAccountState], error) {
 	client := config.GetClient(ctx)
 	orgName, accountName, err := splitInsightsAccountId(req.ID)
 	if err != nil {
@@ -214,7 +236,11 @@ func (*InsightsAccount) Read(ctx context.Context, req infer.ReadRequest[Insights
 
 	account, err := client.GetInsightsAccount(ctx, orgName, accountName)
 	if err != nil {
-		return infer.ReadResponse[InsightsAccountInput, InsightsAccountState]{}, fmt.Errorf("failed to read InsightsAccount (%q): %w", req.ID, err)
+		return infer.ReadResponse[InsightsAccountInput, InsightsAccountState]{}, fmt.Errorf(
+			"failed to read InsightsAccount (%q): %w",
+			req.ID,
+			err,
+		)
 	}
 	if account == nil {
 		return infer.ReadResponse[InsightsAccountInput, InsightsAccountState]{}, nil
@@ -232,7 +258,11 @@ func (*InsightsAccount) Read(ctx context.Context, req infer.ReadRequest[Insights
 	// Fetch tags from API
 	tags, err := client.GetInsightsAccountTags(ctx, orgName, accountName)
 	if err != nil {
-		return infer.ReadResponse[InsightsAccountInput, InsightsAccountState]{}, fmt.Errorf("failed to get tags for InsightsAccount (%q): %w", req.ID, err)
+		return infer.ReadResponse[InsightsAccountInput, InsightsAccountState]{}, fmt.Errorf(
+			"failed to get tags for InsightsAccount (%q): %w",
+			req.ID,
+			err,
+		)
 	}
 
 	core := InsightsAccountCore{
@@ -258,7 +288,10 @@ func (*InsightsAccount) Read(ctx context.Context, req infer.ReadRequest[Insights
 	}, nil
 }
 
-func (*InsightsAccount) Update(ctx context.Context, req infer.UpdateRequest[InsightsAccountInput, InsightsAccountState]) (infer.UpdateResponse[InsightsAccountState], error) {
+func (*InsightsAccount) Update(
+	ctx context.Context,
+	req infer.UpdateRequest[InsightsAccountInput, InsightsAccountState],
+) (infer.UpdateResponse[InsightsAccountState], error) {
 	if req.DryRun {
 		return infer.UpdateResponse[InsightsAccountState]{
 			Output: InsightsAccountState{
@@ -285,7 +318,11 @@ func (*InsightsAccount) Update(ctx context.Context, req infer.UpdateRequest[Insi
 
 	err := client.UpdateInsightsAccount(ctx, req.State.OrganizationName, req.State.AccountName, updateReq)
 	if err != nil {
-		return infer.UpdateResponse[InsightsAccountState]{}, fmt.Errorf("error updating insights account '%s': %w", req.State.AccountName, err)
+		return infer.UpdateResponse[InsightsAccountState]{}, fmt.Errorf(
+			"error updating insights account '%s': %w",
+			req.State.AccountName,
+			err,
+		)
 	}
 
 	// Update tags - SetInsightsAccountTags replaces all tags, so we always call it

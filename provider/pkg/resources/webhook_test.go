@@ -15,23 +15,43 @@ type WebhookClientMock struct {
 	getWebhookFunc getWebhookFunc
 }
 
-func (c *WebhookClientMock) GetWebhook(ctx context.Context, orgName string, projectName, stackName, environmentName *string, webhookName string) (*pulumiapi.Webhook, error) {
+func (c *WebhookClientMock) GetWebhook(
+	ctx context.Context,
+	orgName string,
+	projectName, stackName, environmentName *string,
+	webhookName string,
+) (*pulumiapi.Webhook, error) {
 	return c.getWebhookFunc()
 }
 
-func (c *WebhookClientMock) CreateWebhook(ctx context.Context, req pulumiapi.WebhookRequest) (*pulumiapi.Webhook, error) {
+func (c *WebhookClientMock) CreateWebhook(
+	ctx context.Context,
+	req pulumiapi.WebhookRequest,
+) (*pulumiapi.Webhook, error) {
 	return nil, nil
 }
 
-func (c *WebhookClientMock) ListWebhooks(ctx context.Context, orgName string, projectName, stackName, environmentName *string) ([]pulumiapi.Webhook, error) {
+func (c *WebhookClientMock) ListWebhooks(
+	ctx context.Context,
+	orgName string,
+	projectName, stackName, environmentName *string,
+) ([]pulumiapi.Webhook, error) {
 	return nil, nil
 }
 
-func (c *WebhookClientMock) UpdateWebhook(ctx context.Context, req pulumiapi.UpdateWebhookRequest) (*pulumiapi.Webhook, error) {
+func (c *WebhookClientMock) UpdateWebhook(
+	ctx context.Context,
+	req pulumiapi.UpdateWebhookRequest,
+) (*pulumiapi.Webhook, error) {
 	return nil, nil
 }
 
-func (c *WebhookClientMock) DeleteWebhook(ctx context.Context, orgName string, projectName, stackName, environmentName *string, name string) error {
+func (c *WebhookClientMock) DeleteWebhook(
+	ctx context.Context,
+	orgName string,
+	projectName, stackName, environmentName *string,
+	name string,
+) error {
 	return nil
 }
 

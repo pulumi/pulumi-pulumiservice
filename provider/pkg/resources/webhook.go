@@ -44,7 +44,11 @@ type PulumiServiceWebhookProperties struct {
 	Name string
 }
 
-func (i *PulumiServiceWebhookInput) ToPropertyMap(plaintextSecret *pulumiapi.SecretValue, cipherSecret *pulumiapi.SecretValue, isInput bool) resource.PropertyMap {
+func (i *PulumiServiceWebhookInput) ToPropertyMap(
+	plaintextSecret *pulumiapi.SecretValue,
+	cipherSecret *pulumiapi.SecretValue,
+	isInput bool,
+) resource.PropertyMap {
 	createMode := plaintextSecret != nil && cipherSecret == nil
 	mergeMode := plaintextSecret != nil && cipherSecret != nil
 
@@ -86,7 +90,11 @@ func (i *PulumiServiceWebhookInput) ToPropertyMap(plaintextSecret *pulumiapi.Sec
 	return pm
 }
 
-func (i *PulumiServiceWebhookProperties) ToPropertyMap(plaintextSecret *pulumiapi.SecretValue, cipherSecret *pulumiapi.SecretValue, isInput bool) resource.PropertyMap {
+func (i *PulumiServiceWebhookProperties) ToPropertyMap(
+	plaintextSecret *pulumiapi.SecretValue,
+	cipherSecret *pulumiapi.SecretValue,
+	isInput bool,
+) resource.PropertyMap {
 	pm := i.PulumiServiceWebhookInput.ToPropertyMap(plaintextSecret, cipherSecret, isInput)
 
 	if !isInput {
@@ -96,7 +104,9 @@ func (i *PulumiServiceWebhookProperties) ToPropertyMap(plaintextSecret *pulumiap
 	return pm
 }
 
-func (wh *PulumiServiceWebhookResource) ToPulumiServiceWebhookProperties(propMap resource.PropertyMap) PulumiServiceWebhookProperties {
+func (wh *PulumiServiceWebhookResource) ToPulumiServiceWebhookProperties(
+	propMap resource.PropertyMap,
+) PulumiServiceWebhookProperties {
 	props := PulumiServiceWebhookProperties{}
 
 	props.DisplayName = util.GetSecretOrStringValue(propMap["displayName"])
@@ -149,7 +159,10 @@ func (wh *PulumiServiceWebhookResource) Name() string {
 }
 
 func (wh *PulumiServiceWebhookResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
+	news, err := plugin.UnmarshalProperties(
+		req.GetNews(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -231,7 +244,10 @@ func (wh *PulumiServiceWebhookResource) Check(req *pulumirpc.CheckRequest) (*pul
 
 func (wh *PulumiServiceWebhookResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	ctx := context.Background()
-	inputMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
+	inputMap, err := plugin.UnmarshalProperties(
+		req.GetProperties(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -284,7 +300,10 @@ func (wh *PulumiServiceWebhookResource) Create(req *pulumirpc.CreateRequest) (*p
 }
 
 func (wh *PulumiServiceWebhookResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
+	olds, err := plugin.UnmarshalProperties(
+		req.GetOldInputs(),
+		plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -341,7 +360,10 @@ func (wh *PulumiServiceWebhookResource) Diff(req *pulumirpc.DiffRequest) (*pulum
 }
 
 func (wh *PulumiServiceWebhookResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	inputMap, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	inputMap, err := plugin.UnmarshalProperties(
+		req.GetNews(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -455,11 +477,17 @@ func (wh *PulumiServiceWebhookResource) Read(req *pulumirpc.ReadRequest) (*pulum
 
 	var plaintextSecret *pulumiapi.SecretValue
 	var ciphertextSecret *pulumiapi.SecretValue
-	propertyMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
+	propertyMap, err := plugin.UnmarshalProperties(
+		req.GetProperties(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true},
+	)
 	if err != nil {
 		return nil, err
 	}
-	inputMap, err := plugin.UnmarshalProperties(req.GetInputs(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
+	inputMap, err := plugin.UnmarshalProperties(
+		req.GetInputs(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true},
+	)
 	if err != nil {
 		return nil, err
 	}

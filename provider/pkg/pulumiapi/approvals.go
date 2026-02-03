@@ -24,9 +24,18 @@ import (
 // Because the API routes require envIdentifiers, I'm making these methods specific, but in the future
 // we might want to generalize them
 type ApprovalRuleClient interface {
-	CreateEnvironmentApprovalRule(ctx context.Context, orgName string, req CreateApprovalRuleRequest) (*ApprovalRule, error)
+	CreateEnvironmentApprovalRule(
+		ctx context.Context,
+		orgName string,
+		req CreateApprovalRuleRequest,
+	) (*ApprovalRule, error)
 	GetEnvironmentApprovalRule(ctx context.Context, orgName string, ruleId string) (*ApprovalRule, error)
-	UpdateEnvironmentApprovalRule(ctx context.Context, orgName string, ruleId string, req UpdateApprovalRuleRequest) (*ApprovalRule, error)
+	UpdateEnvironmentApprovalRule(
+		ctx context.Context,
+		orgName string,
+		ruleId string,
+		req UpdateApprovalRuleRequest,
+	) (*ApprovalRule, error)
 	DeleteEnvironmentApprovalRule(ctx context.Context, orgName string, ruleId string) error
 }
 
@@ -148,7 +157,11 @@ type EnvironmentEntity struct {
 	Name    string `json:"name"`
 }
 
-func (c *Client) CreateEnvironmentApprovalRule(ctx context.Context, orgName string, req CreateApprovalRuleRequest) (*ApprovalRule, error) {
+func (c *Client) CreateEnvironmentApprovalRule(
+	ctx context.Context,
+	orgName string,
+	req CreateApprovalRuleRequest,
+) (*ApprovalRule, error) {
 	apiPath := path.Join("change-gates", orgName)
 
 	var rule ApprovalRule
@@ -172,7 +185,12 @@ func (c *Client) GetEnvironmentApprovalRule(ctx context.Context, orgName string,
 	return &rule, nil
 }
 
-func (c *Client) UpdateEnvironmentApprovalRule(ctx context.Context, orgName string, ruleId string, req UpdateApprovalRuleRequest) (*ApprovalRule, error) {
+func (c *Client) UpdateEnvironmentApprovalRule(
+	ctx context.Context,
+	orgName string,
+	ruleId string,
+	req UpdateApprovalRuleRequest,
+) (*ApprovalRule, error) {
 	apiPath := path.Join("change-gates", orgName, ruleId)
 
 	var rule ApprovalRule

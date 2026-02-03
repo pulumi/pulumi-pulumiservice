@@ -254,7 +254,11 @@ func TestDeleteInsightsAccount(t *testing.T) {
 		})
 
 		err := c.DeleteInsightsAccount(t.Context(), orgName, accountName)
-		assert.EqualError(t, err, `failed to delete insights account "test-account": 404 API error: insights account not found`)
+		assert.EqualError(
+			t,
+			err,
+			`failed to delete insights account "test-account": 404 API error: insights account not found`,
+		)
 	})
 }
 
@@ -367,7 +371,11 @@ func TestTriggerScan(t *testing.T) {
 		require.NoError(t, err)
 
 		_, err = c.TriggerScan(t.Context(), orgName, accountName)
-		assert.EqualError(t, err, `failed to trigger scan for insights account "test-account": 400 API error: scan already in progress`)
+		assert.EqualError(
+			t,
+			err,
+			`failed to trigger scan for insights account "test-account": 400 API error: scan already in progress`,
+		)
 	})
 }
 
@@ -427,7 +435,11 @@ func TestGetScanStatus(t *testing.T) {
 		})
 
 		_, err := c.GetScanStatus(t.Context(), orgName, accountName)
-		assert.EqualError(t, err, `failed to get scan status for insights account "test-account": 500 API error: internal server error`)
+		assert.EqualError(
+			t,
+			err,
+			`failed to get scan status for insights account "test-account": 500 API error: internal server error`,
+		)
 	})
 }
 
@@ -547,7 +559,11 @@ func TestGetInsightsAccountTags(t *testing.T) {
 		})
 
 		_, err := c.GetInsightsAccountTags(t.Context(), orgName, accountName)
-		assert.EqualError(t, err, `failed to get tags for insights account "test-account": 500 API error: internal server error`)
+		assert.EqualError(
+			t,
+			err,
+			`failed to get tags for insights account "test-account": 500 API error: internal server error`,
+		)
 	})
 }
 
@@ -631,6 +647,10 @@ func TestSetInsightsAccountTags(t *testing.T) {
 		})
 
 		err := c.SetInsightsAccountTags(t.Context(), orgName, accountName, reqBody.Tags)
-		assert.EqualError(t, err, `failed to set tags for insights account "test-account": 400 API error: invalid tag name`)
+		assert.EqualError(
+			t,
+			err,
+			`failed to set tags for insights account "test-account": 400 API error: invalid tag name`,
+		)
 	})
 }

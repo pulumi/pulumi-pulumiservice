@@ -31,7 +31,10 @@ type createTeamTokenRequest struct {
 	Description string `json:"description"`
 }
 
-func (c *Client) CreateTeamAccessToken(ctx context.Context, name, orgName, teamName, description string) (*AccessToken, error) {
+func (c *Client) CreateTeamAccessToken(
+	ctx context.Context,
+	name, orgName, teamName, description string,
+) (*AccessToken, error) {
 
 	if len(orgName) == 0 {
 		return nil, errors.New("empty orgName")

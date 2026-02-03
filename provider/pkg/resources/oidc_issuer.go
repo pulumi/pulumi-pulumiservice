@@ -65,7 +65,11 @@ type PulumiServiceOidcIssuerProperties struct {
 	PulumiServiceOidcIssuerInput
 }
 
-func GenerateOidcIssuerProperties(input PulumiServiceOidcIssuerInput, issuer *pulumiapi.OidcIssuerRegistrationResponse, authPolicy *pulumiapi.AuthPolicy) (outputs *structpb.Struct, inputs *structpb.Struct, err error) {
+func GenerateOidcIssuerProperties(
+	input PulumiServiceOidcIssuerInput,
+	issuer *pulumiapi.OidcIssuerRegistrationResponse,
+	authPolicy *pulumiapi.AuthPolicy,
+) (outputs *structpb.Struct, inputs *structpb.Struct, err error) {
 	inputMap := input.toPropertyMap()
 
 	outputMap := inputMap
@@ -85,7 +89,9 @@ func GenerateOidcIssuerProperties(input PulumiServiceOidcIssuerInput, issuer *pu
 	return outputs, inputs, err
 }
 
-func (oir *PulumiServiceOidcIssuerResource) ToPulumiServiceOidcIssuerInput(inputMap resource.PropertyMap) PulumiServiceOidcIssuerInput {
+func (oir *PulumiServiceOidcIssuerResource) ToPulumiServiceOidcIssuerInput(
+	inputMap resource.PropertyMap,
+) PulumiServiceOidcIssuerInput {
 	input := PulumiServiceOidcIssuerInput{}
 
 	input.Organization = inputMap["organization"].StringValue()
@@ -158,7 +164,11 @@ func (oir *PulumiServiceOidcIssuerResource) Create(req *pulumirpc.CreateRequest)
 	// Retrieve policy ID
 	authPolicy, err := oir.Client.GetAuthPolicies(ctx, input.Organization, registerResponse.ID)
 	if err != nil {
-		return nil, fmt.Errorf("error retrieving auth policies for oidc issuer '%s': %s", registerResponse.ID, err.Error())
+		return nil, fmt.Errorf(
+			"error retrieving auth policies for oidc issuer '%s': %s",
+			registerResponse.ID,
+			err.Error(),
+		)
 	}
 
 	// If user has provided policies, update with those, otherwise use the default one
@@ -169,7 +179,11 @@ func (oir *PulumiServiceOidcIssuerResource) Create(req *pulumirpc.CreateRequest)
 			// To prevent resource being stuck in limbo, best-effort delete the issuer if policies were invalid
 			_ = oir.Client.DeleteOidcIssuer(ctx, input.Organization, registerResponse.ID)
 
-			return nil, fmt.Errorf("error updating auth policies for oidc issuer '%s': %s", registerResponse.ID, err.Error())
+			return nil, fmt.Errorf(
+				"error updating auth policies for oidc issuer '%s': %s",
+				registerResponse.ID,
+				err.Error(),
+			)
 		}
 	}
 

@@ -26,7 +26,10 @@ type PulumiServiceTeamAccessTokenInput struct {
 	Description string
 }
 
-func GenerateTeamAccessTokenProperties(input PulumiServiceTeamAccessTokenInput, teamAccessToken pulumiapi.AccessToken) (outputs *structpb.Struct, inputs *structpb.Struct, err error) {
+func GenerateTeamAccessTokenProperties(
+	input PulumiServiceTeamAccessTokenInput,
+	teamAccessToken pulumiapi.AccessToken,
+) (outputs *structpb.Struct, inputs *structpb.Struct, err error) {
 	inputMap := input.ToPropertyMap()
 
 	outputMap := inputMap.Copy()
@@ -55,7 +58,9 @@ func (i *PulumiServiceTeamAccessTokenInput) ToPropertyMap() resource.PropertyMap
 	return pm
 }
 
-func (t *PulumiServiceTeamAccessTokenResource) ToPulumiServiceAccessTokenInput(inputMap resource.PropertyMap) PulumiServiceTeamAccessTokenInput {
+func (t *PulumiServiceTeamAccessTokenResource) ToPulumiServiceAccessTokenInput(
+	inputMap resource.PropertyMap,
+) PulumiServiceTeamAccessTokenInput {
 	input := PulumiServiceTeamAccessTokenInput{}
 
 	if inputMap["name"].HasValue() && inputMap["name"].IsString() {
@@ -98,7 +103,10 @@ func (t *PulumiServiceTeamAccessTokenResource) Delete(req *pulumirpc.DeleteReque
 
 func (t *PulumiServiceTeamAccessTokenResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	ctx := context.Background()
-	inputMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	inputMap, err := plugin.UnmarshalProperties(
+		req.GetProperties(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -175,9 +183,18 @@ func (t *PulumiServiceTeamAccessTokenResource) Read(req *pulumirpc.ReadRequest) 
 	}, nil
 }
 
-func (t *PulumiServiceTeamAccessTokenResource) createTeamAccessToken(ctx context.Context, input PulumiServiceTeamAccessTokenInput) (*pulumiapi.AccessToken, error) {
+func (t *PulumiServiceTeamAccessTokenResource) createTeamAccessToken(
+	ctx context.Context,
+	input PulumiServiceTeamAccessTokenInput,
+) (*pulumiapi.AccessToken, error) {
 
-	accessToken, err := t.Client.CreateTeamAccessToken(ctx, input.Name, input.OrgName, input.TeamName, input.Description)
+	accessToken, err := t.Client.CreateTeamAccessToken(
+		ctx,
+		input.Name,
+		input.OrgName,
+		input.TeamName,
+		input.Description,
+	)
 	if err != nil {
 		return nil, err
 	}

@@ -24,7 +24,11 @@ type PulumiServiceDeploymentSettingsInput struct {
 // plaintextInputSettings are the latest inputs of the resource, containing plaintext values wrapped in Secrets
 // currentStateCipherSettings are the latest outputs/properties of the resource, containing ciphertext strings of secret values
 // isInput is a flag that selects whether to generating an input PropertyMap that contains plaintext (true) or an output PropertyMap that contains ciphertext (false)
-func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(plaintextInputSettings *pulumiapi.DeploymentSettings, currentStateCipherSettings *pulumiapi.DeploymentSettings, isInput bool) resource.PropertyMap {
+func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(
+	plaintextInputSettings *pulumiapi.DeploymentSettings,
+	currentStateCipherSettings *pulumiapi.DeploymentSettings,
+	isInput bool,
+) resource.PropertyMap {
 	// Below flags are used throughout this method and direct the serialization of twin value secrets
 	// Twin value secrets are values whose plaintext cannot be retrieved from the API, thus forcing the development of this fairly complex system
 	// When plaintextInputSettings is passed in, but currentStateCipherSettings is not, that means the resource is being created or updated
@@ -74,7 +78,14 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(plaintextInputSett
 								plaintextValue = &plaintextInputSettings.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey
 								currentCipherValue = &currentStateCipherSettings.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey
 							}
-							util.MergeSecretValue(sshAuthPropertyMap, "sshPrivateKey", ds.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey, plaintextValue, currentCipherValue, isInput)
+							util.MergeSecretValue(
+								sshAuthPropertyMap,
+								"sshPrivateKey",
+								ds.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey,
+								plaintextValue,
+								currentCipherValue,
+								isInput,
+							)
 						} else if createMode {
 							util.CreateSecretValue(sshAuthPropertyMap, "sshPrivateKey", ds.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey,
 								plaintextInputSettings.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey, isInput)
@@ -82,7 +93,8 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(plaintextInputSett
 							util.ImportSecretValue(sshAuthPropertyMap, "sshPrivateKey", ds.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey, isInput)
 						}
 					}
-					if ds.SourceContext.Git.GitAuth.SSHAuth.Password != nil && ds.SourceContext.Git.GitAuth.SSHAuth.Password.Value != "" {
+					if ds.SourceContext.Git.GitAuth.SSHAuth.Password != nil &&
+						ds.SourceContext.Git.GitAuth.SSHAuth.Password.Value != "" {
 						if mergeMode {
 							var plaintextValue *pulumiapi.SecretValue
 							var currentCipherValue *pulumiapi.SecretValue
@@ -94,7 +106,14 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(plaintextInputSett
 								plaintextValue = plaintextInputSettings.SourceContext.Git.GitAuth.SSHAuth.Password
 								currentCipherValue = currentStateCipherSettings.SourceContext.Git.GitAuth.SSHAuth.Password
 							}
-							util.MergeSecretValue(sshAuthPropertyMap, "password", *ds.SourceContext.Git.GitAuth.SSHAuth.Password, plaintextValue, currentCipherValue, isInput)
+							util.MergeSecretValue(
+								sshAuthPropertyMap,
+								"password",
+								*ds.SourceContext.Git.GitAuth.SSHAuth.Password,
+								plaintextValue,
+								currentCipherValue,
+								isInput,
+							)
 						} else if createMode {
 							util.CreateSecretValue(sshAuthPropertyMap, "password", *ds.SourceContext.Git.GitAuth.SSHAuth.Password,
 								*plaintextInputSettings.SourceContext.Git.GitAuth.SSHAuth.Password, isInput)
@@ -107,7 +126,9 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(plaintextInputSett
 				if ds.SourceContext.Git.GitAuth.BasicAuth != nil {
 					basicAuthPropertyMap := resource.PropertyMap{}
 					if ds.SourceContext.Git.GitAuth.BasicAuth.UserName.Value != "" {
-						basicAuthPropertyMap["username"] = resource.NewPropertyValue(ds.SourceContext.Git.GitAuth.BasicAuth.UserName.Value)
+						basicAuthPropertyMap["username"] = resource.NewPropertyValue(
+							ds.SourceContext.Git.GitAuth.BasicAuth.UserName.Value,
+						)
 					}
 					if ds.SourceContext.Git.GitAuth.BasicAuth.Password.Value != "" {
 						if mergeMode {
@@ -120,7 +141,14 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(plaintextInputSett
 								plaintextValue = &plaintextInputSettings.SourceContext.Git.GitAuth.BasicAuth.Password
 								currentCipherValue = &currentStateCipherSettings.SourceContext.Git.GitAuth.BasicAuth.Password
 							}
-							util.MergeSecretValue(basicAuthPropertyMap, "password", ds.SourceContext.Git.GitAuth.BasicAuth.Password, plaintextValue, currentCipherValue, isInput)
+							util.MergeSecretValue(
+								basicAuthPropertyMap,
+								"password",
+								ds.SourceContext.Git.GitAuth.BasicAuth.Password,
+								plaintextValue,
+								currentCipherValue,
+								isInput,
+							)
 						} else if createMode {
 							util.CreateSecretValue(basicAuthPropertyMap, "password", ds.SourceContext.Git.GitAuth.BasicAuth.Password,
 								plaintextInputSettings.SourceContext.Git.GitAuth.BasicAuth.Password, isInput)
@@ -183,7 +211,8 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(plaintextInputSett
 			ocMap["options"] = resource.PropertyValue{V: optionsMap}
 		}
 		if ds.OperationContext.OIDC != nil {
-			if ds.OperationContext.OIDC.AWS != nil || ds.OperationContext.OIDC.GCP != nil || ds.OperationContext.OIDC.Azure != nil {
+			if ds.OperationContext.OIDC.AWS != nil || ds.OperationContext.OIDC.GCP != nil ||
+				ds.OperationContext.OIDC.Azure != nil {
 				oidcMap := resource.PropertyMap{}
 				if ds.OperationContext.OIDC.AWS != nil {
 					awsMap := resource.PropertyMap{}
@@ -207,13 +236,17 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(plaintextInputSett
 						gcpMap["providerId"] = resource.NewPropertyValue(ds.OperationContext.OIDC.GCP.ProviderID)
 					}
 					if ds.OperationContext.OIDC.GCP.ServiceAccount != "" {
-						gcpMap["serviceAccount"] = resource.NewPropertyValue(ds.OperationContext.OIDC.GCP.ServiceAccount)
+						gcpMap["serviceAccount"] = resource.NewPropertyValue(
+							ds.OperationContext.OIDC.GCP.ServiceAccount,
+						)
 					}
 					if ds.OperationContext.OIDC.GCP.Region != "" {
 						gcpMap["region"] = resource.NewPropertyValue(ds.OperationContext.OIDC.GCP.Region)
 					}
 					if ds.OperationContext.OIDC.GCP.WorkloadPoolID != "" {
-						gcpMap["workloadPoolId"] = resource.NewPropertyValue(ds.OperationContext.OIDC.GCP.WorkloadPoolID)
+						gcpMap["workloadPoolId"] = resource.NewPropertyValue(
+							ds.OperationContext.OIDC.GCP.WorkloadPoolID,
+						)
 					}
 					if ds.OperationContext.OIDC.GCP.ProjectID != "" {
 						gcpMap["projectId"] = resource.NewPropertyValue(ds.OperationContext.OIDC.GCP.ProjectID)
@@ -232,7 +265,9 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(plaintextInputSett
 						azureMap["clientId"] = resource.NewPropertyValue(ds.OperationContext.OIDC.Azure.ClientID)
 					}
 					if ds.OperationContext.OIDC.Azure.SubscriptionID != "" {
-						azureMap["subscriptionId"] = resource.NewPropertyValue(ds.OperationContext.OIDC.Azure.SubscriptionID)
+						azureMap["subscriptionId"] = resource.NewPropertyValue(
+							ds.OperationContext.OIDC.Azure.SubscriptionID,
+						)
 					}
 					oidcMap["azure"] = resource.PropertyValue{V: azureMap}
 				}
@@ -256,7 +291,8 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(plaintextInputSett
 		pm["github"] = resource.PropertyValue{V: githubMap}
 	}
 
-	if ds.ExecutorContext != nil && ds.ExecutorContext.ExecutorImage != nil && ds.ExecutorContext.ExecutorImage.Reference != "" {
+	if ds.ExecutorContext != nil && ds.ExecutorContext.ExecutorImage != nil &&
+		ds.ExecutorContext.ExecutorImage.Reference != "" {
 		ecMap := resource.PropertyMap{}
 		ecMap["executorImage"] = resource.NewPropertyValue(ds.ExecutorContext.ExecutorImage.Reference)
 		pm["executorContext"] = resource.PropertyValue{V: ecMap}
@@ -275,7 +311,9 @@ type PulumiServiceDeploymentSettingsResource struct {
 	Client pulumiapi.DeploymentSettingsClient
 }
 
-func (ds *PulumiServiceDeploymentSettingsResource) ToPulumiServiceDeploymentSettingsInput(inputMap resource.PropertyMap) PulumiServiceDeploymentSettingsInput {
+func (ds *PulumiServiceDeploymentSettingsResource) ToPulumiServiceDeploymentSettingsInput(
+	inputMap resource.PropertyMap,
+) PulumiServiceDeploymentSettingsInput {
 	input := PulumiServiceDeploymentSettingsInput{}
 
 	input.Stack.OrgName = util.GetSecretOrStringValue(inputMap["organization"])
@@ -627,7 +665,9 @@ func (ds *PulumiServiceDeploymentSettingsResource) Diff(req *pulumirpc.DiffReque
 	}, nil
 }
 
-func (ds *PulumiServiceDeploymentSettingsResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
+func (ds *PulumiServiceDeploymentSettingsResource) Check(
+	req *pulumirpc.CheckRequest,
+) (*pulumirpc.CheckResponse, error) {
 	news, err := plugin.UnmarshalProperties(req.GetNews(), util.KeepSecretsUnmarshal)
 	if err != nil {
 		return nil, err
@@ -752,7 +792,9 @@ func (ds *PulumiServiceDeploymentSettingsResource) Delete(req *pulumirpc.DeleteR
 	return &pbempty.Empty{}, nil
 }
 
-func (ds *PulumiServiceDeploymentSettingsResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
+func (ds *PulumiServiceDeploymentSettingsResource) Create(
+	req *pulumirpc.CreateRequest,
+) (*pulumirpc.CreateResponse, error) {
 	ctx := context.Background()
 	inputsMap, err := plugin.UnmarshalProperties(req.GetProperties(), util.KeepSecretsUnmarshal)
 	if err != nil {
@@ -784,7 +826,9 @@ func (ds *PulumiServiceDeploymentSettingsResource) Create(req *pulumirpc.CreateR
 	}, nil
 }
 
-func (ds *PulumiServiceDeploymentSettingsResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+func (ds *PulumiServiceDeploymentSettingsResource) Update(
+	req *pulumirpc.UpdateRequest,
+) (*pulumirpc.UpdateResponse, error) {
 	ctx := context.Background()
 	inputsMap, err := plugin.UnmarshalProperties(req.GetNews(), util.KeepSecretsUnmarshal)
 	if err != nil {

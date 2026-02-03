@@ -6,7 +6,10 @@ import (
 )
 
 func StandardDiff(req *pulumirpc.DiffRequest, replaceProperties map[string]bool) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
+	olds, err := plugin.UnmarshalProperties(
+		req.GetOldInputs(),
+		plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}

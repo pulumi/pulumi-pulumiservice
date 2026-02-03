@@ -17,6 +17,7 @@ import (
 )
 
 type getEnvironmentFunc func(ctx context.Context, orgName string, envName string, version string, decrypt bool) (yaml []byte, etag string, revision int, err error)
+
 type getEnvironmentRevisionTagFunc func(ctx context.Context, orgName, envName, tagName string) (*client.EnvironmentRevisionTag, error)
 
 type EscClientMock struct {
@@ -24,23 +25,43 @@ type EscClientMock struct {
 	getEnvironmentRevisionTagFunc getEnvironmentRevisionTagFunc
 }
 
-func (c *EscClientMock) GetEnvironment(ctx context.Context, orgName, projectName, envName string, version string, decrypt bool) (yaml []byte, etag string, revision int, err error) {
+func (c *EscClientMock) GetEnvironment(
+	ctx context.Context,
+	orgName, projectName, envName string,
+	version string,
+	decrypt bool,
+) (yaml []byte, etag string, revision int, err error) {
 	return c.getEnvironmentFunc(ctx, orgName, envName, version, decrypt)
 }
 
-func (c *EscClientMock) GetEnvironmentRevision(ctx context.Context, orgName, projectName, envName string, revision int) (*client.EnvironmentRevision, error) {
+func (c *EscClientMock) GetEnvironmentRevision(
+	ctx context.Context,
+	orgName, projectName, envName string,
+	revision int,
+) (*client.EnvironmentRevision, error) {
 	return nil, nil
 }
 
-func (c *EscClientMock) GetEnvironmentRevisionTag(ctx context.Context, orgName, projectName, envName, tagName string) (*client.EnvironmentRevisionTag, error) {
+func (c *EscClientMock) GetEnvironmentRevisionTag(
+	ctx context.Context,
+	orgName, projectName, envName, tagName string,
+) (*client.EnvironmentRevisionTag, error) {
 	return c.getEnvironmentRevisionTagFunc(ctx, orgName, envName, tagName)
 }
 
-func (c *EscClientMock) GetRevisionNumber(ctx context.Context, orgName, projectName, envName, version string) (int, error) {
+func (c *EscClientMock) GetRevisionNumber(
+	ctx context.Context,
+	orgName, projectName, envName, version string,
+) (int, error) {
 	return 0, nil
 }
 
-func (c *EscClientMock) CheckYAMLEnvironment(context.Context, string, []byte, ...client.CheckYAMLOption) (*esc.Environment, []client.EnvironmentDiagnostic, error) {
+func (c *EscClientMock) CheckYAMLEnvironment(
+	context.Context,
+	string,
+	[]byte,
+	...client.CheckYAMLOption,
+) (*esc.Environment, []client.EnvironmentDiagnostic, error) {
 	return nil, nil, nil
 }
 
@@ -52,7 +73,13 @@ func (c *EscClientMock) CreateEnvironmentWithProject(context.Context, string, st
 	return nil
 }
 
-func (c *EscClientMock) CloneEnvironment(context.Context, string, string, string, client.CloneEnvironmentRequest) error {
+func (c *EscClientMock) CloneEnvironment(
+	context.Context,
+	string,
+	string,
+	string,
+	client.CloneEnvironmentRequest,
+) error {
 	return nil
 }
 
@@ -72,7 +99,13 @@ func (c *EscClientMock) GetOpenEnvironment(context.Context, string, string, stri
 	return nil, nil
 }
 
-func (c *EscClientMock) GetOpenEnvironmentWithProject(context.Context, string, string, string, string) (*esc.Environment, error) {
+func (c *EscClientMock) GetOpenEnvironmentWithProject(
+	context.Context,
+	string,
+	string,
+	string,
+	string,
+) (*esc.Environment, error) {
 	return nil, nil
 }
 
@@ -84,7 +117,9 @@ func (c *EscClientMock) GetOpenProperty(context.Context, string, string, string,
 	return nil, nil
 }
 
-func (c *EscClientMock) GetPulumiAccountDetails(context.Context) (string, []string, *workspace.TokenInformation, error) {
+func (c *EscClientMock) GetPulumiAccountDetails(
+	context.Context,
+) (string, []string, *workspace.TokenInformation, error) {
 	return "", nil, nil, nil
 }
 
@@ -92,31 +127,68 @@ func (c *EscClientMock) ListEnvironments(context.Context, string) ([]client.OrgE
 	return nil, "", nil
 }
 
-func (c *EscClientMock) ListOrganizationEnvironments(context.Context, string, string) ([]client.OrgEnvironment, string, error) {
+func (c *EscClientMock) ListOrganizationEnvironments(
+	context.Context,
+	string,
+	string,
+) ([]client.OrgEnvironment, string, error) {
 	return nil, "", nil
 }
 
-func (c *EscClientMock) ListEnvironmentRevisions(ctx context.Context, orgName, projectName, envName string, options client.ListEnvironmentRevisionsOptions) ([]client.EnvironmentRevision, error) {
+func (c *EscClientMock) ListEnvironmentRevisions(
+	ctx context.Context,
+	orgName, projectName, envName string,
+	options client.ListEnvironmentRevisionsOptions,
+) ([]client.EnvironmentRevision, error) {
 	return nil, nil
 }
 
-func (c *EscClientMock) ListEnvironmentRevisionTags(ctx context.Context, orgName, projectName, envName string, options client.ListEnvironmentRevisionTagsOptions) ([]client.EnvironmentRevisionTag, error) {
+func (c *EscClientMock) ListEnvironmentRevisionTags(
+	ctx context.Context,
+	orgName, projectName, envName string,
+	options client.ListEnvironmentRevisionTagsOptions,
+) ([]client.EnvironmentRevisionTag, error) {
 	return nil, nil
 }
 
-func (c *EscClientMock) OpenEnvironment(context.Context, string, string, string, string, time.Duration) (string, []client.EnvironmentDiagnostic, error) {
+func (c *EscClientMock) OpenEnvironment(
+	context.Context,
+	string,
+	string,
+	string,
+	string,
+	time.Duration,
+) (string, []client.EnvironmentDiagnostic, error) {
 	return "", nil, nil
 }
 
-func (c *EscClientMock) OpenYAMLEnvironment(context.Context, string, []byte, time.Duration) (string, []client.EnvironmentDiagnostic, error) {
+func (c *EscClientMock) OpenYAMLEnvironment(
+	context.Context,
+	string,
+	[]byte,
+	time.Duration,
+) (string, []client.EnvironmentDiagnostic, error) {
 	return "", nil, nil
 }
 
-func (c *EscClientMock) OpenEnvironmentDraft(context.Context, string, string, string, string, time.Duration) (string, []client.EnvironmentDiagnostic, error) {
+func (c *EscClientMock) OpenEnvironmentDraft(
+	context.Context,
+	string,
+	string,
+	string,
+	string,
+	time.Duration,
+) (string, []client.EnvironmentDiagnostic, error) {
 	return "", nil, nil
 }
 
-func (c *EscClientMock) RotateEnvironment(context.Context, string, string, string, []string) (*client.RotateEnvironmentResponse, []client.EnvironmentDiagnostic, error) {
+func (c *EscClientMock) RotateEnvironment(
+	context.Context,
+	string,
+	string,
+	string,
+	[]string,
+) (*client.RotateEnvironmentResponse, []client.EnvironmentDiagnostic, error) {
 	return nil, nil, nil
 }
 
@@ -124,19 +196,47 @@ func (c *EscClientMock) SubmitChangeRequest(context.Context, string, string, *st
 	return nil
 }
 
-func (c *EscClientMock) UpdateEnvironment(context.Context, string, string, []byte, string) ([]client.EnvironmentDiagnostic, error) {
+func (c *EscClientMock) UpdateEnvironment(
+	context.Context,
+	string,
+	string,
+	[]byte,
+	string,
+) ([]client.EnvironmentDiagnostic, error) {
 	return nil, nil
 }
 
-func (c *EscClientMock) UpdateEnvironmentWithProject(context.Context, string, string, string, []byte, string) ([]client.EnvironmentDiagnostic, error) {
+func (c *EscClientMock) UpdateEnvironmentWithProject(
+	context.Context,
+	string,
+	string,
+	string,
+	[]byte,
+	string,
+) ([]client.EnvironmentDiagnostic, error) {
 	return nil, nil
 }
 
-func (c *EscClientMock) UpdateEnvironmentDraft(context.Context, string, string, string, string, []byte, string) ([]client.EnvironmentDiagnostic, error) {
+func (c *EscClientMock) UpdateEnvironmentDraft(
+	context.Context,
+	string,
+	string,
+	string,
+	string,
+	[]byte,
+	string,
+) ([]client.EnvironmentDiagnostic, error) {
 	return nil, nil
 }
 
-func (c *EscClientMock) CreateEnvironmentDraft(context.Context, string, string, string, []byte, string) (string, []client.EnvironmentDiagnostic, error) {
+func (c *EscClientMock) CreateEnvironmentDraft(
+	context.Context,
+	string,
+	string,
+	string,
+	[]byte,
+	string,
+) (string, []client.EnvironmentDiagnostic, error) {
 	return "", nil, nil
 }
 
@@ -148,19 +248,47 @@ func (c *EscClientMock) GetEnvironmentDraft(context.Context, string, string, str
 	return nil, "", nil
 }
 
-func (c *EscClientMock) CreateEnvironmentTag(context.Context, string, string, string, string, string) (*client.EnvironmentTag, error) {
+func (c *EscClientMock) CreateEnvironmentTag(
+	context.Context,
+	string,
+	string,
+	string,
+	string,
+	string,
+) (*client.EnvironmentTag, error) {
 	return nil, nil
 }
 
-func (c *EscClientMock) GetEnvironmentTag(context.Context, string, string, string, string) (*client.EnvironmentTag, error) {
+func (c *EscClientMock) GetEnvironmentTag(
+	context.Context,
+	string,
+	string,
+	string,
+	string,
+) (*client.EnvironmentTag, error) {
 	return nil, nil
 }
 
-func (c *EscClientMock) ListEnvironmentTags(context.Context, string, string, string, client.ListEnvironmentTagsOptions) ([]*client.EnvironmentTag, string, error) {
+func (c *EscClientMock) ListEnvironmentTags(
+	context.Context,
+	string,
+	string,
+	string,
+	client.ListEnvironmentTagsOptions,
+) ([]*client.EnvironmentTag, string, error) {
 	return nil, "", nil
 }
 
-func (c *EscClientMock) UpdateEnvironmentTag(context.Context, string, string, string, string, string, string, string) (*client.EnvironmentTag, error) {
+func (c *EscClientMock) UpdateEnvironmentTag(
+	context.Context,
+	string,
+	string,
+	string,
+	string,
+	string,
+	string,
+	string,
+) (*client.EnvironmentTag, error) {
 	return nil, nil
 }
 
@@ -168,23 +296,45 @@ func (c *EscClientMock) DeleteEnvironmentTag(context.Context, string, string, st
 	return nil
 }
 
-func (c *EscClientMock) UpdateEnvironmentRevisionTag(ctx context.Context, orgName, projectName, envName, tagName string, revision *int) error {
+func (c *EscClientMock) UpdateEnvironmentRevisionTag(
+	ctx context.Context,
+	orgName, projectName, envName, tagName string,
+	revision *int,
+) error {
 	return nil
 }
 
-func (c *EscClientMock) UpdateEnvironmentWithRevision(ctx context.Context, orgName, projectName, envName string, yaml []byte, etag string) ([]client.EnvironmentDiagnostic, int, error) {
+func (c *EscClientMock) UpdateEnvironmentWithRevision(
+	ctx context.Context,
+	orgName, projectName, envName string,
+	yaml []byte,
+	etag string,
+) ([]client.EnvironmentDiagnostic, int, error) {
 	return nil, 0, nil
 }
 
-func (c *EscClientMock) CreateEnvironmentRevisionTag(ctx context.Context, orgName, projectName, envName, tagName string, revision *int) error {
+func (c *EscClientMock) CreateEnvironmentRevisionTag(
+	ctx context.Context,
+	orgName, projectName, envName, tagName string,
+	revision *int,
+) error {
 	return nil
 }
 
-func (c *EscClientMock) DeleteEnvironmentRevisionTag(ctx context.Context, orgName, projectName, envName, tagName string) error {
+func (c *EscClientMock) DeleteEnvironmentRevisionTag(
+	ctx context.Context,
+	orgName, projectName, envName, tagName string,
+) error {
 	return nil
 }
 
-func (c *EscClientMock) RetractEnvironmentRevision(ctx context.Context, orgName, projectName, envName string, version string, replacement *int, reason string) error {
+func (c *EscClientMock) RetractEnvironmentRevision(
+	ctx context.Context,
+	orgName, projectName, envName string,
+	version string,
+	replacement *int,
+	reason string,
+) error {
 	return nil
 }
 
@@ -196,7 +346,10 @@ func (c *EscClientMock) URL() string {
 	return ""
 }
 
-func buildEscClientMock(getEnvironmentFunc getEnvironmentFunc, getEnvironmentRevisionTagFunc getEnvironmentRevisionTagFunc) *EscClientMock {
+func buildEscClientMock(
+	getEnvironmentFunc getEnvironmentFunc,
+	getEnvironmentRevisionTagFunc getEnvironmentRevisionTagFunc,
+) *EscClientMock {
 	return &EscClientMock{
 		getEnvironmentFunc,
 		getEnvironmentRevisionTagFunc,

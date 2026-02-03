@@ -26,7 +26,10 @@ type PulumiServiceOrgAccessTokenInput struct {
 	Admin       bool
 }
 
-func GenerateOrgAccessTokenProperties(input PulumiServiceOrgAccessTokenInput, orgAccessToken pulumiapi.AccessToken) (outputs *structpb.Struct, inputs *structpb.Struct, err error) {
+func GenerateOrgAccessTokenProperties(
+	input PulumiServiceOrgAccessTokenInput,
+	orgAccessToken pulumiapi.AccessToken,
+) (outputs *structpb.Struct, inputs *structpb.Struct, err error) {
 	inputMap := input.ToPropertyMap()
 
 	outputMap := inputMap.Copy()
@@ -55,7 +58,9 @@ func (i *PulumiServiceOrgAccessTokenInput) ToPropertyMap() resource.PropertyMap 
 	return pm
 }
 
-func (ot *PulumiServiceOrgAccessTokenResource) ToPulumiServiceOrgAccessTokenInput(inputMap resource.PropertyMap) PulumiServiceOrgAccessTokenInput {
+func (ot *PulumiServiceOrgAccessTokenResource) ToPulumiServiceOrgAccessTokenInput(
+	inputMap resource.PropertyMap,
+) PulumiServiceOrgAccessTokenInput {
 	input := PulumiServiceOrgAccessTokenInput{}
 
 	if inputMap["name"].HasValue() && inputMap["name"].IsString() {
@@ -98,7 +103,10 @@ func (ot *PulumiServiceOrgAccessTokenResource) Delete(req *pulumirpc.DeleteReque
 
 func (ot *PulumiServiceOrgAccessTokenResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	ctx := context.Background()
-	inputMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	inputMap, err := plugin.UnmarshalProperties(
+		req.GetProperties(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -176,7 +184,10 @@ func (ot *PulumiServiceOrgAccessTokenResource) Read(req *pulumirpc.ReadRequest) 
 	}, nil
 }
 
-func (ot *PulumiServiceOrgAccessTokenResource) createOrgAccessToken(ctx context.Context, input PulumiServiceOrgAccessTokenInput) (*pulumiapi.AccessToken, error) {
+func (ot *PulumiServiceOrgAccessTokenResource) createOrgAccessToken(
+	ctx context.Context,
+	input PulumiServiceOrgAccessTokenInput,
+) (*pulumiapi.AccessToken, error) {
 
 	accessToken, err := ot.Client.CreateOrgAccessToken(ctx, input.Name, input.OrgName, input.Description, input.Admin)
 	if err != nil {

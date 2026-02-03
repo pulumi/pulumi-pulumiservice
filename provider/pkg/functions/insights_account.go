@@ -39,12 +39,18 @@ func (GetInsightsAccountsFunction) Annotate(a infer.Annotator) {
 	a.SetToken("index", "getInsightsAccounts")
 }
 
-func (GetInsightsAccountsFunction) Invoke(ctx context.Context, req infer.FunctionRequest[GetInsightsAccountsInput]) (infer.FunctionResponse[GetInsightsAccountsOutput], error) {
+func (GetInsightsAccountsFunction) Invoke(
+	ctx context.Context,
+	req infer.FunctionRequest[GetInsightsAccountsInput],
+) (infer.FunctionResponse[GetInsightsAccountsOutput], error) {
 	client := config.GetClient(ctx)
 
 	accounts, err := client.ListInsightsAccounts(ctx, req.Input.OrganizationName)
 	if err != nil {
-		return infer.FunctionResponse[GetInsightsAccountsOutput]{}, fmt.Errorf("failed to list insights accounts: %w", err)
+		return infer.FunctionResponse[GetInsightsAccountsOutput]{}, fmt.Errorf(
+			"failed to list insights accounts: %w",
+			err,
+		)
 	}
 
 	outputAccounts := make([]resources.InsightsAccountState, len(accounts))
@@ -72,16 +78,25 @@ func (GetInsightsAccountFunction) Annotate(a infer.Annotator) {
 	a.SetToken("index", "getInsightsAccount")
 }
 
-func (GetInsightsAccountFunction) Invoke(ctx context.Context, req infer.FunctionRequest[GetInsightsAccountInput]) (infer.FunctionResponse[resources.InsightsAccountState], error) {
+func (GetInsightsAccountFunction) Invoke(
+	ctx context.Context,
+	req infer.FunctionRequest[GetInsightsAccountInput],
+) (infer.FunctionResponse[resources.InsightsAccountState], error) {
 	client := config.GetClient(ctx)
 
 	account, err := client.GetInsightsAccount(ctx, req.Input.OrganizationName, req.Input.AccountName)
 	if err != nil {
-		return infer.FunctionResponse[resources.InsightsAccountState]{}, fmt.Errorf("failed to get insights account: %w", err)
+		return infer.FunctionResponse[resources.InsightsAccountState]{}, fmt.Errorf(
+			"failed to get insights account: %w",
+			err,
+		)
 	}
 
 	if account == nil {
-		return infer.FunctionResponse[resources.InsightsAccountState]{}, fmt.Errorf("insights account %q not found", req.Input.AccountName)
+		return infer.FunctionResponse[resources.InsightsAccountState]{}, fmt.Errorf(
+			"insights account %q not found",
+			req.Input.AccountName,
+		)
 	}
 
 	return infer.FunctionResponse[resources.InsightsAccountState]{

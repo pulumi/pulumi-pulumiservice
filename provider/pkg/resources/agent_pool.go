@@ -26,7 +26,10 @@ type PulumiServiceAgentPoolInput struct {
 	ForceDestroy bool
 }
 
-func GenerateAgentPoolProperties(input PulumiServiceAgentPoolInput, agentPool pulumiapi.AgentPool) (outputs *structpb.Struct, inputs *structpb.Struct, err error) {
+func GenerateAgentPoolProperties(
+	input PulumiServiceAgentPoolInput,
+	agentPool pulumiapi.AgentPool,
+) (outputs *structpb.Struct, inputs *structpb.Struct, err error) {
 	inputMap := resource.PropertyMap{}
 	inputMap["name"] = resource.NewPropertyValue(input.Name)
 	inputMap["organizationName"] = resource.NewPropertyValue(input.OrgName)
@@ -62,7 +65,9 @@ func GenerateAgentPoolProperties(input PulumiServiceAgentPoolInput, agentPool pu
 	return outputs, inputs, err
 }
 
-func (ap *PulumiServiceAgentPoolResource) ToPulumiServiceAgentPoolInput(inputMap resource.PropertyMap) PulumiServiceAgentPoolInput {
+func (ap *PulumiServiceAgentPoolResource) ToPulumiServiceAgentPoolInput(
+	inputMap resource.PropertyMap,
+) PulumiServiceAgentPoolInput {
 	input := PulumiServiceAgentPoolInput{}
 
 	if inputMap["name"].HasValue() && inputMap["name"].IsString() {
@@ -89,7 +94,10 @@ func (ap *PulumiServiceAgentPoolResource) Name() string {
 }
 
 func (ap *PulumiServiceAgentPoolResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
+	olds, err := plugin.UnmarshalProperties(
+		req.GetOldInputs(),
+		plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +143,10 @@ func (ap *PulumiServiceAgentPoolResource) Diff(req *pulumirpc.DiffRequest) (*pul
 
 func (ap *PulumiServiceAgentPoolResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
 	ctx := context.Background()
-	inputs, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	inputs, err := plugin.UnmarshalProperties(
+		req.GetProperties(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -156,7 +167,10 @@ func (ap *PulumiServiceAgentPoolResource) Delete(req *pulumirpc.DeleteRequest) (
 
 func (ap *PulumiServiceAgentPoolResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	ctx := context.Background()
-	inputMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	inputMap, err := plugin.UnmarshalProperties(
+		req.GetProperties(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -192,7 +206,10 @@ func (ap *PulumiServiceAgentPoolResource) Update(req *pulumirpc.UpdateRequest) (
 		return nil, fmt.Errorf("invalid resource id: %v", err)
 	}
 
-	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	olds, err := plugin.UnmarshalProperties(
+		req.GetOldInputs(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -269,7 +286,10 @@ func (ap *PulumiServiceAgentPoolResource) Read(req *pulumirpc.ReadRequest) (*pul
 	}, nil
 }
 
-func (ap *PulumiServiceAgentPoolResource) createAgentPool(ctx context.Context, input PulumiServiceAgentPoolInput) (*pulumiapi.AgentPool, error) {
+func (ap *PulumiServiceAgentPoolResource) createAgentPool(
+	ctx context.Context,
+	input PulumiServiceAgentPoolInput,
+) (*pulumiapi.AgentPool, error) {
 	agentPool, err := ap.Client.CreateAgentPool(ctx, input.OrgName, input.Name, input.Description)
 	if err != nil {
 		return nil, err
@@ -278,7 +298,11 @@ func (ap *PulumiServiceAgentPoolResource) createAgentPool(ctx context.Context, i
 	return agentPool, nil
 }
 
-func (ap *PulumiServiceAgentPoolResource) updateAgentPool(ctx context.Context, agentPoolId string, input PulumiServiceAgentPoolInput) error {
+func (ap *PulumiServiceAgentPoolResource) updateAgentPool(
+	ctx context.Context,
+	agentPoolId string,
+	input PulumiServiceAgentPoolInput,
+) error {
 	return ap.Client.UpdateAgentPool(ctx, agentPoolId, input.OrgName, input.Name, input.Description)
 }
 

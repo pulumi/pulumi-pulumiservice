@@ -32,7 +32,11 @@ type createOrgTokenRequest struct {
 	Admin       bool   `json:"admin"`
 }
 
-func (c *Client) CreateOrgAccessToken(ctx context.Context, name, orgName, description string, admin bool) (*AccessToken, error) {
+func (c *Client) CreateOrgAccessToken(
+	ctx context.Context,
+	name, orgName, description string,
+	admin bool,
+) (*AccessToken, error) {
 
 	if len(orgName) == 0 {
 		return nil, errors.New("empty orgName")

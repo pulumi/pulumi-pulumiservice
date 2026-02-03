@@ -22,14 +22,21 @@ type insightsAccountClientMock struct {
 	listInsightsAccountsFunc func(ctx context.Context, orgName string) ([]pulumiapi.InsightsAccount, error)
 }
 
-func (c *insightsAccountClientMock) GetInsightsAccount(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+func (c *insightsAccountClientMock) GetInsightsAccount(
+	ctx context.Context,
+	orgName string,
+	accountName string,
+) (*pulumiapi.InsightsAccount, error) {
 	if c.getInsightsAccountFunc == nil {
 		return nil, nil
 	}
 	return c.getInsightsAccountFunc(ctx, orgName, accountName)
 }
 
-func (c *insightsAccountClientMock) ListInsightsAccounts(ctx context.Context, orgName string) ([]pulumiapi.InsightsAccount, error) {
+func (c *insightsAccountClientMock) ListInsightsAccounts(
+	ctx context.Context,
+	orgName string,
+) ([]pulumiapi.InsightsAccount, error) {
 	if c.listInsightsAccountsFunc == nil {
 		return nil, nil
 	}

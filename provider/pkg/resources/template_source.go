@@ -44,7 +44,9 @@ func (i *PulumiServiceTemplateSourceInput) ToPropertyMap() resource.PropertyMap 
 	return pm
 }
 
-func (s *PulumiServiceTemplateSourceResource) ToPulumiServiceTemplateSourceInput(inputMap resource.PropertyMap) (*PulumiServiceTemplateSourceInput, error) {
+func (s *PulumiServiceTemplateSourceResource) ToPulumiServiceTemplateSourceInput(
+	inputMap resource.PropertyMap,
+) (*PulumiServiceTemplateSourceInput, error) {
 	input := PulumiServiceTemplateSourceInput{}
 
 	input.OrganizationName = inputMap["organizationName"].StringValue()
@@ -68,7 +70,10 @@ func (s *PulumiServiceTemplateSourceResource) Name() string {
 }
 
 func (s *PulumiServiceTemplateSourceResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
+	olds, err := plugin.UnmarshalProperties(
+		req.GetOldInputs(),
+		plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -127,7 +132,10 @@ func (s *PulumiServiceTemplateSourceResource) Delete(req *pulumirpc.DeleteReques
 
 func (s *PulumiServiceTemplateSourceResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	ctx := context.Background()
-	inputMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	inputMap, err := plugin.UnmarshalProperties(
+		req.GetProperties(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -166,7 +174,10 @@ func (s *PulumiServiceTemplateSourceResource) Check(req *pulumirpc.CheckRequest)
 
 func (s *PulumiServiceTemplateSourceResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
 	ctx := context.Background()
-	inputMap, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	inputMap, err := plugin.UnmarshalProperties(
+		req.GetNews(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -212,7 +223,12 @@ func (s *PulumiServiceTemplateSourceResource) Read(req *pulumirpc.ReadRequest) (
 
 	response, err := s.Client.GetTemplateSource(ctx, *orgName, *templateId)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get template source during Read. org: %s id: %s due to error: %w", *orgName, *templateId, err)
+		return nil, fmt.Errorf(
+			"failed to get template source during Read. org: %s id: %s due to error: %w",
+			*orgName,
+			*templateId,
+			err,
+		)
 	}
 	if response == nil {
 		return &pulumirpc.ReadResponse{}, nil

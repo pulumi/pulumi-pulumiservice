@@ -63,7 +63,10 @@ func ToPulumiServiceDriftScheduleInput(properties *structpb.Struct) (*PulumiServ
 }
 
 func (st *PulumiServiceDriftScheduleResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
+	olds, err := plugin.UnmarshalProperties(
+		req.GetOldInputs(),
+		plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -111,13 +114,22 @@ func (st *PulumiServiceDriftScheduleResource) Create(req *pulumirpc.CreateReques
 	}
 
 	return &pulumirpc.CreateResponse{
-		Id:         path.Join(input.Stack.OrgName, input.Stack.ProjectName, input.Stack.StackName, "drift", *scheduleID),
+		Id: path.Join(
+			input.Stack.OrgName,
+			input.Stack.ProjectName,
+			input.Stack.StackName,
+			"drift",
+			*scheduleID,
+		),
 		Properties: outputProperties,
 	}, nil
 }
 
 func (st *PulumiServiceDriftScheduleResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	inputMap, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	inputMap, err := plugin.UnmarshalProperties(
+		req.GetNews(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -156,7 +168,12 @@ func (st *PulumiServiceDriftScheduleResource) Update(req *pulumirpc.UpdateReques
 		ScheduleCron:  input.ScheduleCron,
 		AutoRemediate: input.AutoRemediate,
 	}
-	scheduleID, err := st.Client.UpdateDriftSchedule(context.Background(), input.Stack, updateReq, previousOutput.ScheduleID)
+	scheduleID, err := st.Client.UpdateDriftSchedule(
+		context.Background(),
+		input.Stack,
+		updateReq,
+		previousOutput.ScheduleID,
+	)
 	if err != nil {
 		return nil, err
 	}

@@ -24,35 +24,57 @@ type InsightsAccountClientMock struct {
 	setInsightsAccountTagsFunc func(ctx context.Context, orgName string, accountName string, tags map[string]string) error
 }
 
-func (c *InsightsAccountClientMock) GetInsightsAccount(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+func (c *InsightsAccountClientMock) GetInsightsAccount(
+	ctx context.Context,
+	orgName string,
+	accountName string,
+) (*pulumiapi.InsightsAccount, error) {
 	if c.getInsightsAccountFunc == nil {
 		return nil, nil
 	}
 	return c.getInsightsAccountFunc(ctx, orgName, accountName)
 }
 
-func (c *InsightsAccountClientMock) CreateInsightsAccount(ctx context.Context, orgName string, accountName string, req pulumiapi.CreateInsightsAccountRequest) error {
+func (c *InsightsAccountClientMock) CreateInsightsAccount(
+	ctx context.Context,
+	orgName string,
+	accountName string,
+	req pulumiapi.CreateInsightsAccountRequest,
+) error {
 	if c.createInsightsAccountFunc == nil {
 		return nil
 	}
 	return c.createInsightsAccountFunc(ctx, orgName, accountName, req)
 }
 
-func (c *InsightsAccountClientMock) UpdateInsightsAccount(ctx context.Context, orgName string, accountName string, req pulumiapi.UpdateInsightsAccountRequest) error {
+func (c *InsightsAccountClientMock) UpdateInsightsAccount(
+	ctx context.Context,
+	orgName string,
+	accountName string,
+	req pulumiapi.UpdateInsightsAccountRequest,
+) error {
 	if c.updateInsightsAccountFunc == nil {
 		return nil
 	}
 	return c.updateInsightsAccountFunc(ctx, orgName, accountName, req)
 }
 
-func (c *InsightsAccountClientMock) DeleteInsightsAccount(ctx context.Context, orgName string, accountName string) error {
+func (c *InsightsAccountClientMock) DeleteInsightsAccount(
+	ctx context.Context,
+	orgName string,
+	accountName string,
+) error {
 	if c.deleteInsightsAccountFunc == nil {
 		return nil
 	}
 	return c.deleteInsightsAccountFunc(ctx, orgName, accountName)
 }
 
-func (c *InsightsAccountClientMock) TriggerScan(ctx context.Context, orgName string, accountName string) (*pulumiapi.TriggerScanResponse, error) {
+func (c *InsightsAccountClientMock) TriggerScan(
+	ctx context.Context,
+	orgName string,
+	accountName string,
+) (*pulumiapi.TriggerScanResponse, error) {
 	return &pulumiapi.TriggerScanResponse{
 		WorkflowRun: pulumiapi.WorkflowRun{
 			ID:     "test-scan-id",
@@ -61,7 +83,11 @@ func (c *InsightsAccountClientMock) TriggerScan(ctx context.Context, orgName str
 	}, nil
 }
 
-func (c *InsightsAccountClientMock) GetScanStatus(ctx context.Context, orgName string, accountName string) (*pulumiapi.ScanStatusResponse, error) {
+func (c *InsightsAccountClientMock) GetScanStatus(
+	ctx context.Context,
+	orgName string,
+	accountName string,
+) (*pulumiapi.ScanStatusResponse, error) {
 	return &pulumiapi.ScanStatusResponse{
 		WorkflowRun: pulumiapi.WorkflowRun{
 			ID:     "test-scan-id",
@@ -71,14 +97,23 @@ func (c *InsightsAccountClientMock) GetScanStatus(ctx context.Context, orgName s
 	}, nil
 }
 
-func (c *InsightsAccountClientMock) GetInsightsAccountTags(ctx context.Context, orgName string, accountName string) (map[string]string, error) {
+func (c *InsightsAccountClientMock) GetInsightsAccountTags(
+	ctx context.Context,
+	orgName string,
+	accountName string,
+) (map[string]string, error) {
 	if c.getInsightsAccountTagsFunc == nil {
 		return map[string]string{}, nil
 	}
 	return c.getInsightsAccountTagsFunc(ctx, orgName, accountName)
 }
 
-func (c *InsightsAccountClientMock) SetInsightsAccountTags(ctx context.Context, orgName string, accountName string, tags map[string]string) error {
+func (c *InsightsAccountClientMock) SetInsightsAccountTags(
+	ctx context.Context,
+	orgName string,
+	accountName string,
+	tags map[string]string,
+) error {
 	if c.setInsightsAccountTagsFunc == nil {
 		return nil
 	}
@@ -240,7 +275,11 @@ func TestInsightsAccount(t *testing.T) {
 		resp, err := ia.Read(ctx, req)
 
 		require.NoError(t, err)
-		assert.Nil(t, resp.Inputs.ProviderConfig, "providerConfig should remain nil when input was nil and API returned empty map")
+		assert.Nil(
+			t,
+			resp.Inputs.ProviderConfig,
+			"providerConfig should remain nil when input was nil and API returned empty map",
+		)
 		assert.Nil(t, resp.State.ProviderConfig, "providerConfig should remain nil in state too")
 	})
 

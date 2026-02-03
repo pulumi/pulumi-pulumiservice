@@ -47,7 +47,10 @@ func createUnknownResourceErrorFromRequest(req ResourceBase) error {
 	return fmt.Errorf("unknown resource type '%s'", rn)
 }
 
-func (u *PulumiServiceUnknownResource) Invoke(s *pulumiserviceProvider, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
+func (u *PulumiServiceUnknownResource) Invoke(
+	s *pulumiserviceProvider,
+	req *pulumirpc.InvokeRequest,
+) (*pulumirpc.InvokeResponse, error) {
 	return &pulumirpc.InvokeResponse{Return: nil}, fmt.Errorf("unknown function '%s'", req.Tok)
 }
 

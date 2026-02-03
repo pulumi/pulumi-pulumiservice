@@ -16,35 +16,70 @@ type ScheduleClientMock struct {
 	getDeploymentScheduleFunc getDeploymentScheduleFunc
 }
 
-func (c *ScheduleClientMock) GetStackSchedule(ctx context.Context, stack pulumiapi.StackIdentifier, scheduleID string) (*pulumiapi.StackScheduleResponse, error) {
+func (c *ScheduleClientMock) GetStackSchedule(
+	ctx context.Context,
+	stack pulumiapi.StackIdentifier,
+	scheduleID string,
+) (*pulumiapi.StackScheduleResponse, error) {
 	return c.getDeploymentScheduleFunc()
 }
 
-func (c *ScheduleClientMock) CreateDeploymentSchedule(ctx context.Context, stack pulumiapi.StackIdentifier, req pulumiapi.CreateDeploymentScheduleRequest) (*string, error) {
+func (c *ScheduleClientMock) CreateDeploymentSchedule(
+	ctx context.Context,
+	stack pulumiapi.StackIdentifier,
+	req pulumiapi.CreateDeploymentScheduleRequest,
+) (*string, error) {
 	return nil, nil
 }
 
-func (c *ScheduleClientMock) CreateDriftSchedule(ctx context.Context, stack pulumiapi.StackIdentifier, req pulumiapi.CreateDriftScheduleRequest) (*string, error) {
+func (c *ScheduleClientMock) CreateDriftSchedule(
+	ctx context.Context,
+	stack pulumiapi.StackIdentifier,
+	req pulumiapi.CreateDriftScheduleRequest,
+) (*string, error) {
 	return nil, nil
 }
 
-func (c *ScheduleClientMock) CreateTtlSchedule(ctx context.Context, stack pulumiapi.StackIdentifier, req pulumiapi.CreateTtlScheduleRequest) (*string, error) {
+func (c *ScheduleClientMock) CreateTtlSchedule(
+	ctx context.Context,
+	stack pulumiapi.StackIdentifier,
+	req pulumiapi.CreateTtlScheduleRequest,
+) (*string, error) {
 	return nil, nil
 }
 
-func (c *ScheduleClientMock) UpdateDeploymentSchedule(ctx context.Context, stack pulumiapi.StackIdentifier, req pulumiapi.CreateDeploymentScheduleRequest, scheduleID string) (*string, error) {
+func (c *ScheduleClientMock) UpdateDeploymentSchedule(
+	ctx context.Context,
+	stack pulumiapi.StackIdentifier,
+	req pulumiapi.CreateDeploymentScheduleRequest,
+	scheduleID string,
+) (*string, error) {
 	return nil, nil
 }
 
-func (c *ScheduleClientMock) UpdateDriftSchedule(ctx context.Context, stack pulumiapi.StackIdentifier, req pulumiapi.CreateDriftScheduleRequest, scheduleID string) (*string, error) {
+func (c *ScheduleClientMock) UpdateDriftSchedule(
+	ctx context.Context,
+	stack pulumiapi.StackIdentifier,
+	req pulumiapi.CreateDriftScheduleRequest,
+	scheduleID string,
+) (*string, error) {
 	return nil, nil
 }
 
-func (c *ScheduleClientMock) UpdateTtlSchedule(ctx context.Context, stack pulumiapi.StackIdentifier, req pulumiapi.CreateTtlScheduleRequest, scheduleID string) (*string, error) {
+func (c *ScheduleClientMock) UpdateTtlSchedule(
+	ctx context.Context,
+	stack pulumiapi.StackIdentifier,
+	req pulumiapi.CreateTtlScheduleRequest,
+	scheduleID string,
+) (*string, error) {
 	return nil, nil
 }
 
-func (c *ScheduleClientMock) DeleteStackSchedule(ctx context.Context, stack pulumiapi.StackIdentifier, scheduleID string) error {
+func (c *ScheduleClientMock) DeleteStackSchedule(
+	ctx context.Context,
+	stack pulumiapi.StackIdentifier,
+	scheduleID string,
+) error {
 	return nil
 }
 

@@ -66,7 +66,9 @@ func (i *PulumiServiceApprovalRule) ToPropertyMap() resource.PropertyMap {
 	return pm
 }
 
-func (s *PulumiServiceApprovalRuleResource) ToPulumiServiceApprovalRuleInput(inputMap resource.PropertyMap) (*PulumiServiceApprovalRule, error) {
+func (s *PulumiServiceApprovalRuleResource) ToPulumiServiceApprovalRuleInput(
+	inputMap resource.PropertyMap,
+) (*PulumiServiceApprovalRule, error) {
 	rule := PulumiServiceApprovalRule{}
 
 	rule.Name = inputMap["name"].StringValue()
@@ -117,7 +119,10 @@ func (s *PulumiServiceApprovalRuleResource) ToPulumiServiceApprovalRuleInput(inp
 						approver.EligibilityType = pulumiapi.ApprovalRuleEligibilityTypePermission
 					}
 
-					rule.ApprovalRuleConfig.EligibleApprovers = append(rule.ApprovalRuleConfig.EligibleApprovers, approver)
+					rule.ApprovalRuleConfig.EligibleApprovers = append(
+						rule.ApprovalRuleConfig.EligibleApprovers,
+						approver,
+					)
 				}
 			}
 		}
@@ -138,7 +143,10 @@ func parseApprovalRuleID(compositeID string) (pulumiapi.EnvironmentIdentifier, s
 	parts := strings.Split(compositeID, "/")
 	if len(parts) != 5 || parts[0] != "environment" {
 		// For now, this is the only type, but we expect to have more types of approvals later on
-		return pulumiapi.EnvironmentIdentifier{}, "", fmt.Errorf("invalid approval rule ID format: expected 'environment/{orgName}/{projectName}/{envName}/{ruleID}', got %q", compositeID)
+		return pulumiapi.EnvironmentIdentifier{}, "", fmt.Errorf(
+			"invalid approval rule ID format: expected 'environment/{orgName}/{projectName}/{envName}/{ruleID}', got %q",
+			compositeID,
+		)
 	}
 
 	envID := pulumiapi.EnvironmentIdentifier{
@@ -199,9 +207,13 @@ func (s *PulumiServiceApprovalRuleResource) Create(req *pulumirpc.CreateRequest)
 			RuleType:                  pulumiapi.ChangeGateRuleTypeApproval,
 		},
 		Target: pulumiapi.ChangeGateTargetInput{
-			ActionTypes:   rule.TargetActionTypes,
-			EntityType:    "environment",
-			QualifiedName: fmt.Sprintf("%s/%s", rule.EnvironmentIdentifier.ProjectName, rule.EnvironmentIdentifier.EnvName),
+			ActionTypes: rule.TargetActionTypes,
+			EntityType:  "environment",
+			QualifiedName: fmt.Sprintf(
+				"%s/%s",
+				rule.EnvironmentIdentifier.ProjectName,
+				rule.EnvironmentIdentifier.EnvName,
+			),
 		},
 	}
 
@@ -243,13 +255,16 @@ func (s *PulumiServiceApprovalRuleResource) Check(req *pulumirpc.CheckRequest) (
 
 					// Count how many fields are set
 					fieldsSet := 0
-					if approverMap["teamName"].HasValue() && approverMap["teamName"].IsString() && approverMap["teamName"].StringValue() != "" {
+					if approverMap["teamName"].HasValue() && approverMap["teamName"].IsString() &&
+						approverMap["teamName"].StringValue() != "" {
 						fieldsSet++
 					}
-					if approverMap["user"].HasValue() && approverMap["user"].IsString() && approverMap["user"].StringValue() != "" {
+					if approverMap["user"].HasValue() && approverMap["user"].IsString() &&
+						approverMap["user"].StringValue() != "" {
 						fieldsSet++
 					}
-					if approverMap["rbacPermission"].HasValue() && approverMap["rbacPermission"].IsString() && approverMap["rbacPermission"].StringValue() != "" {
+					if approverMap["rbacPermission"].HasValue() && approverMap["rbacPermission"].IsString() &&
+						approverMap["rbacPermission"].StringValue() != "" {
 						fieldsSet++
 					}
 
@@ -301,9 +316,13 @@ func (s *PulumiServiceApprovalRuleResource) Update(req *pulumirpc.UpdateRequest)
 			RuleType:                  pulumiapi.ChangeGateRuleTypeApproval,
 		},
 		Target: pulumiapi.ChangeGateTargetInput{
-			ActionTypes:   rule.TargetActionTypes,
-			EntityType:    "environment",
-			QualifiedName: fmt.Sprintf("%s/%s", rule.EnvironmentIdentifier.ProjectName, rule.EnvironmentIdentifier.EnvName),
+			ActionTypes: rule.TargetActionTypes,
+			EntityType:  "environment",
+			QualifiedName: fmt.Sprintf(
+				"%s/%s",
+				rule.EnvironmentIdentifier.ProjectName,
+				rule.EnvironmentIdentifier.EnvName,
+			),
 		},
 	}
 
