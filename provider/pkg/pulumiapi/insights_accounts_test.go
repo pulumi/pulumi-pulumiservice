@@ -11,9 +11,14 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const (
+	testInsightsOrgName     = "test-org"
+	testInsightsAccountName = "test-account"
+)
+
 func TestCreateInsightsAccount(t *testing.T) {
-	orgName := "test-org"
-	accountName := "test-account"
+	orgName := testInsightsOrgName
+	accountName := testInsightsAccountName
 
 	t.Run("Happy Path", func(t *testing.T) {
 		reqBody := CreateInsightsAccountRequest{
@@ -59,7 +64,7 @@ func TestCreateInsightsAccount(t *testing.T) {
 }
 
 func TestListInsightsAccounts(t *testing.T) {
-	orgName := "test-org"
+	orgName := testInsightsOrgName
 
 	t.Run("Empty OrgName", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{})
@@ -123,8 +128,8 @@ func TestListInsightsAccounts(t *testing.T) {
 }
 
 func TestGetInsightsAccount(t *testing.T) {
-	orgName := "test-org"
-	accountName := "test-account"
+	orgName := testInsightsOrgName
+	accountName := testInsightsAccountName
 
 	t.Run("Happy Path", func(t *testing.T) {
 		resp := InsightsAccount{
@@ -183,8 +188,8 @@ func TestGetInsightsAccount(t *testing.T) {
 }
 
 func TestUpdateInsightsAccount(t *testing.T) {
-	orgName := "test-org"
-	accountName := "test-account"
+	orgName := testInsightsOrgName
+	accountName := testInsightsAccountName
 
 	t.Run("Happy Path", func(t *testing.T) {
 		reqBody := UpdateInsightsAccountRequest{
@@ -228,8 +233,8 @@ func TestUpdateInsightsAccount(t *testing.T) {
 }
 
 func TestDeleteInsightsAccount(t *testing.T) {
-	orgName := "test-org"
-	accountName := "test-account"
+	orgName := testInsightsOrgName
+	accountName := testInsightsAccountName
 
 	t.Run("Happy Path", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
@@ -254,13 +259,18 @@ func TestDeleteInsightsAccount(t *testing.T) {
 		})
 
 		err := c.DeleteInsightsAccount(t.Context(), orgName, accountName)
-		assert.EqualError(t, err, `failed to delete insights account "test-account": 404 API error: insights account not found`)
+		assert.EqualError(
+			t,
+			err,
+			fmt.Sprintf(`failed to delete insights account "%s": 404 API error: insights account not found`,
+				testInsightsAccountName),
+		)
 	})
 }
 
 func TestTriggerScan(t *testing.T) {
-	orgName := "test-org"
-	accountName := "test-account"
+	orgName := testInsightsOrgName
+	accountName := testInsightsAccountName
 
 	// Note: TriggerScan calls GetScanStatus first to check if a scan is already running.
 	// We test GetScanStatus separately, so these tests assume GetScanStatus returns nil
@@ -343,7 +353,7 @@ func TestTriggerScan(t *testing.T) {
 
 	t.Run("Error", func(t *testing.T) {
 		callCount := 0
-		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 			callCount++
 			if callCount == 1 {
 				// First call: GET to check status
@@ -367,13 +377,18 @@ func TestTriggerScan(t *testing.T) {
 		require.NoError(t, err)
 
 		_, err = c.TriggerScan(t.Context(), orgName, accountName)
-		assert.EqualError(t, err, `failed to trigger scan for insights account "test-account": 400 API error: scan already in progress`)
+		assert.EqualError(
+			t,
+			err,
+			fmt.Sprintf(`failed to trigger scan for insights account "%s": 400 API error: scan already in progress`,
+				testInsightsAccountName),
+		)
 	})
 }
 
 func TestGetScanStatus(t *testing.T) {
-	orgName := "test-org"
-	accountName := "test-account"
+	orgName := testInsightsOrgName
+	accountName := testInsightsAccountName
 
 	t.Run("Happy Path", func(t *testing.T) {
 		resp := ScanStatusResponse{
@@ -427,13 +442,18 @@ func TestGetScanStatus(t *testing.T) {
 		})
 
 		_, err := c.GetScanStatus(t.Context(), orgName, accountName)
-		assert.EqualError(t, err, `failed to get scan status for insights account "test-account": 500 API error: internal server error`)
+		assert.EqualError(
+			t,
+			err,
+			fmt.Sprintf(`failed to get scan status for insights account "%s": 500 API error: internal server error`,
+				testInsightsAccountName),
+		)
 	})
 }
 
 func TestGetInsightsAccountTags(t *testing.T) {
-	orgName := "test-org"
-	accountName := "test-account"
+	orgName := testInsightsOrgName
+	accountName := testInsightsAccountName
 
 	t.Run("Empty OrgName", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
@@ -547,13 +567,18 @@ func TestGetInsightsAccountTags(t *testing.T) {
 		})
 
 		_, err := c.GetInsightsAccountTags(t.Context(), orgName, accountName)
-		assert.EqualError(t, err, `failed to get tags for insights account "test-account": 500 API error: internal server error`)
+		assert.EqualError(
+			t,
+			err,
+			fmt.Sprintf(`failed to get tags for insights account "%s": 500 API error: internal server error`,
+				testInsightsAccountName),
+		)
 	})
 }
 
 func TestSetInsightsAccountTags(t *testing.T) {
-	orgName := "test-org"
-	accountName := "test-account"
+	orgName := testInsightsOrgName
+	accountName := testInsightsAccountName
 
 	t.Run("Empty OrgName", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
@@ -631,6 +656,11 @@ func TestSetInsightsAccountTags(t *testing.T) {
 		})
 
 		err := c.SetInsightsAccountTags(t.Context(), orgName, accountName, reqBody.Tags)
-		assert.EqualError(t, err, `failed to set tags for insights account "test-account": 400 API error: invalid tag name`)
+		assert.EqualError(
+			t,
+			err,
+			fmt.Sprintf(`failed to set tags for insights account "%s": 400 API error: invalid tag name`,
+				testInsightsAccountName),
+		)
 	})
 }

@@ -33,7 +33,9 @@ func (i *PulumiServiceStackTagInput) ToPropertyMap() resource.PropertyMap {
 	return util.ToPropertyMap(*i, structTagKey)
 }
 
-func (st *PulumiServiceStackTagResource) ToPulumiServiceStackTagInput(inputMap resource.PropertyMap) PulumiServiceStackTagInput {
+func (st *PulumiServiceStackTagResource) ToPulumiServiceStackTagInput(
+	inputMap resource.PropertyMap,
+) PulumiServiceStackTagInput {
 	input := PulumiServiceStackTagInput{}
 	_ = util.FromPropertyMap(inputMap, structTagKey, &input)
 	return input
@@ -44,7 +46,10 @@ func (st *PulumiServiceStackTagResource) Name() string {
 }
 
 func (st *PulumiServiceStackTagResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
+	olds, err := plugin.UnmarshalProperties(
+		req.GetOldInputs(),
+		plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +72,7 @@ func (st *PulumiServiceStackTagResource) Diff(req *pulumirpc.DiffRequest) (*pulu
 	for k, v := range dd {
 		v.Kind = v.Kind.AsReplace()
 		detailedDiffs[k] = &pulumirpc.PropertyDiff{
-			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind),
+			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind), //nolint:gosec // safe conversion from plugin.DiffKind
 			InputDiff: v.InputDiff,
 		}
 	}
@@ -129,7 +134,7 @@ func (st *PulumiServiceStackTagResource) Check(req *pulumirpc.CheckRequest) (*pu
 	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: nil}, nil
 }
 
-func (st *PulumiServiceStackTagResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+func (st *PulumiServiceStackTagResource) Update(_ *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
 	// all updates are destructive, so we just call Create.
 	return nil, fmt.Errorf("unexpected call to update, expected create to be called instead")
 }
@@ -137,7 +142,7 @@ func (st *PulumiServiceStackTagResource) Update(req *pulumirpc.UpdateRequest) (*
 func (st *PulumiServiceStackTagResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
 	ctx := context.Background()
 
-	organization, project, stack, tagName, err := splitStackTagId(req.Id)
+	organization, project, stack, tagName, err := splitStackTagID(req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -174,7 +179,7 @@ func (st *PulumiServiceStackTagResource) Read(req *pulumirpc.ReadRequest) (*pulu
 	}, nil
 }
 
-func splitStackTagId(id string) (organization string, project string, stack string, tagName string, err error) {
+func splitStackTagID(id string) (organization string, project string, stack string, tagName string, err error) {
 	// format: organization/project/stack/tagName
 	s := strings.Split(id, "/")
 	if len(s) != 4 {

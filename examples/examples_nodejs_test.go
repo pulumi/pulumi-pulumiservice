@@ -7,10 +7,11 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/pulumi/providertest/pulumitest"
 	"github.com/pulumi/providertest/pulumitest/assertpreview"
 	"github.com/pulumi/providertest/pulumitest/opttest"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestAccessTokenExample(t *testing.T) {
@@ -177,9 +178,9 @@ func TestNodejsInsightsAccountInvokesExample(t *testing.T) {
 	fetchedAccountName := upResult.Outputs["fetchedAccountName"].Value.(string)
 	assert.Equal(t, resourceAccountName, fetchedAccountName)
 
-	fetchedInsightsAccountId := upResult.Outputs["fetchedInsightsAccountId"].Value.(string)
-	resourceInsightsAccountId := upResult.Outputs["resourceInsightsAccountId"].Value.(string)
-	assert.Equal(t, resourceInsightsAccountId, fetchedInsightsAccountId)
+	fetchedInsightsAccountID := upResult.Outputs["fetchedInsightsAccountId"].Value.(string)
+	resourceInsightsAccountID := upResult.Outputs["resourceInsightsAccountId"].Value.(string)
+	assert.Equal(t, resourceInsightsAccountID, fetchedInsightsAccountID)
 
 	fetchedProvider := upResult.Outputs["fetchedProvider"].Value.(string)
 	assert.Equal(t, "aws", fetchedProvider)

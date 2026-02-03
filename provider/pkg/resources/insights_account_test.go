@@ -7,52 +7,81 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/pulumi/pulumi-go-provider/infer"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 type InsightsAccountClientMock struct {
 	config.Client
-	getInsightsAccountFunc     func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error)
-	createInsightsAccountFunc  func(ctx context.Context, orgName string, accountName string, req pulumiapi.CreateInsightsAccountRequest) error
-	updateInsightsAccountFunc  func(ctx context.Context, orgName string, accountName string, req pulumiapi.UpdateInsightsAccountRequest) error
+	getInsightsAccountFunc func(
+		ctx context.Context, orgName string, accountName string,
+	) (*pulumiapi.InsightsAccount, error)
+	createInsightsAccountFunc func(
+		ctx context.Context, orgName string, accountName string, req pulumiapi.CreateInsightsAccountRequest,
+	) error
+	updateInsightsAccountFunc func(
+		ctx context.Context, orgName string, accountName string, req pulumiapi.UpdateInsightsAccountRequest,
+	) error
 	deleteInsightsAccountFunc  func(ctx context.Context, orgName string, accountName string) error
 	getInsightsAccountTagsFunc func(ctx context.Context, orgName string, accountName string) (map[string]string, error)
 	setInsightsAccountTagsFunc func(ctx context.Context, orgName string, accountName string, tags map[string]string) error
 }
 
-func (c *InsightsAccountClientMock) GetInsightsAccount(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+func (c *InsightsAccountClientMock) GetInsightsAccount(
+	ctx context.Context,
+	orgName string,
+	accountName string,
+) (*pulumiapi.InsightsAccount, error) {
 	if c.getInsightsAccountFunc == nil {
 		return nil, nil
 	}
 	return c.getInsightsAccountFunc(ctx, orgName, accountName)
 }
 
-func (c *InsightsAccountClientMock) CreateInsightsAccount(ctx context.Context, orgName string, accountName string, req pulumiapi.CreateInsightsAccountRequest) error {
+func (c *InsightsAccountClientMock) CreateInsightsAccount(
+	ctx context.Context,
+	orgName string,
+	accountName string,
+	req pulumiapi.CreateInsightsAccountRequest,
+) error {
 	if c.createInsightsAccountFunc == nil {
 		return nil
 	}
 	return c.createInsightsAccountFunc(ctx, orgName, accountName, req)
 }
 
-func (c *InsightsAccountClientMock) UpdateInsightsAccount(ctx context.Context, orgName string, accountName string, req pulumiapi.UpdateInsightsAccountRequest) error {
+func (c *InsightsAccountClientMock) UpdateInsightsAccount(
+	ctx context.Context,
+	orgName string,
+	accountName string,
+	req pulumiapi.UpdateInsightsAccountRequest,
+) error {
 	if c.updateInsightsAccountFunc == nil {
 		return nil
 	}
 	return c.updateInsightsAccountFunc(ctx, orgName, accountName, req)
 }
 
-func (c *InsightsAccountClientMock) DeleteInsightsAccount(ctx context.Context, orgName string, accountName string) error {
+func (c *InsightsAccountClientMock) DeleteInsightsAccount(
+	ctx context.Context,
+	orgName string,
+	accountName string,
+) error {
 	if c.deleteInsightsAccountFunc == nil {
 		return nil
 	}
 	return c.deleteInsightsAccountFunc(ctx, orgName, accountName)
 }
 
-func (c *InsightsAccountClientMock) TriggerScan(ctx context.Context, orgName string, accountName string) (*pulumiapi.TriggerScanResponse, error) {
+func (c *InsightsAccountClientMock) TriggerScan(
+	_ context.Context,
+	_ string,
+	_ string,
+) (*pulumiapi.TriggerScanResponse, error) {
 	return &pulumiapi.TriggerScanResponse{
 		WorkflowRun: pulumiapi.WorkflowRun{
 			ID:     "test-scan-id",
@@ -61,7 +90,11 @@ func (c *InsightsAccountClientMock) TriggerScan(ctx context.Context, orgName str
 	}, nil
 }
 
-func (c *InsightsAccountClientMock) GetScanStatus(ctx context.Context, orgName string, accountName string) (*pulumiapi.ScanStatusResponse, error) {
+func (c *InsightsAccountClientMock) GetScanStatus(
+	_ context.Context,
+	_ string,
+	_ string,
+) (*pulumiapi.ScanStatusResponse, error) {
 	return &pulumiapi.ScanStatusResponse{
 		WorkflowRun: pulumiapi.WorkflowRun{
 			ID:     "test-scan-id",
@@ -71,14 +104,23 @@ func (c *InsightsAccountClientMock) GetScanStatus(ctx context.Context, orgName s
 	}, nil
 }
 
-func (c *InsightsAccountClientMock) GetInsightsAccountTags(ctx context.Context, orgName string, accountName string) (map[string]string, error) {
+func (c *InsightsAccountClientMock) GetInsightsAccountTags(
+	ctx context.Context,
+	orgName string,
+	accountName string,
+) (map[string]string, error) {
 	if c.getInsightsAccountTagsFunc == nil {
 		return map[string]string{}, nil
 	}
 	return c.getInsightsAccountTagsFunc(ctx, orgName, accountName)
 }
 
-func (c *InsightsAccountClientMock) SetInsightsAccountTags(ctx context.Context, orgName string, accountName string, tags map[string]string) error {
+func (c *InsightsAccountClientMock) SetInsightsAccountTags(
+	ctx context.Context,
+	orgName string,
+	accountName string,
+	tags map[string]string,
+) error {
 	if c.setInsightsAccountTagsFunc == nil {
 		return nil
 	}
@@ -90,7 +132,7 @@ func TestInsightsAccount(t *testing.T) {
 	t.Run("Read when the resource is not found", func(t *testing.T) {
 		t.Parallel()
 		mockedClient := &InsightsAccountClientMock{
-			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+			getInsightsAccountFunc: func(_ context.Context, _ string, _ string) (*pulumiapi.InsightsAccount, error) {
 				return nil, nil
 			},
 		}
@@ -118,7 +160,7 @@ func TestInsightsAccount(t *testing.T) {
 					Environment:      "test-env",
 					ScanSchedule:     scanSchedule,
 				},
-				InsightsAccountId: "test-account-id",
+				InsightsAccountID: "test-account-id",
 			},
 		}
 
@@ -131,7 +173,7 @@ func TestInsightsAccount(t *testing.T) {
 	t.Run("Read when the resource is found", func(t *testing.T) {
 		t.Parallel()
 		mockedClient := &InsightsAccountClientMock{
-			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+			getInsightsAccountFunc: func(_ context.Context, _ string, _ string) (*pulumiapi.InsightsAccount, error) {
 				return &pulumiapi.InsightsAccount{
 					ID:                   "test-account-id",
 					Name:                 "test-account",
@@ -190,7 +232,7 @@ func TestInsightsAccount(t *testing.T) {
 			Inputs: InsightsAccountInput{InsightsAccountCore: expectedCore},
 			State: InsightsAccountState{
 				InsightsAccountCore:  expectedCore,
-				InsightsAccountId:    "test-account-id",
+				InsightsAccountID:    "test-account-id",
 				ScheduledScanEnabled: true,
 			},
 		}, resp)
@@ -201,7 +243,7 @@ func TestInsightsAccount(t *testing.T) {
 		// This test ensures we don't get spurious diffs during refresh
 		// when providerConfig was not specified initially
 		mockedClient := &InsightsAccountClientMock{
-			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+			getInsightsAccountFunc: func(_ context.Context, _ string, _ string) (*pulumiapi.InsightsAccount, error) {
 				return &pulumiapi.InsightsAccount{
 					ID:                   "test-account-id",
 					Name:                 "test-account",
@@ -233,14 +275,18 @@ func TestInsightsAccount(t *testing.T) {
 					Provider:         CloudProviderAWS,
 					Environment:      "test-env",
 				},
-				InsightsAccountId: "test-account-id",
+				InsightsAccountID: "test-account-id",
 			},
 		}
 
 		resp, err := ia.Read(ctx, req)
 
 		require.NoError(t, err)
-		assert.Nil(t, resp.Inputs.ProviderConfig, "providerConfig should remain nil when input was nil and API returned empty map")
+		assert.Nil(
+			t,
+			resp.Inputs.ProviderConfig,
+			"providerConfig should remain nil when input was nil and API returned empty map",
+		)
 		assert.Nil(t, resp.State.ProviderConfig, "providerConfig should remain nil in state too")
 	})
 
@@ -274,7 +320,7 @@ func TestInsightsAccount(t *testing.T) {
 			ID: "test-org/test-account",
 			Output: InsightsAccountState{
 				InsightsAccountCore:  req.Inputs.InsightsAccountCore,
-				InsightsAccountId:    "",
+				InsightsAccountID:    "",
 				ScheduledScanEnabled: true,
 			},
 		}, resp)
@@ -284,11 +330,13 @@ func TestInsightsAccount(t *testing.T) {
 		t.Parallel()
 		var capturedRequest pulumiapi.CreateInsightsAccountRequest
 		mockedClient := &InsightsAccountClientMock{
-			createInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.CreateInsightsAccountRequest) error {
+			createInsightsAccountFunc: func(
+				_ context.Context, _ string, _ string, req pulumiapi.CreateInsightsAccountRequest,
+			) error {
 				capturedRequest = req
 				return nil
 			},
-			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+			getInsightsAccountFunc: func(_ context.Context, _ string, accountName string) (*pulumiapi.InsightsAccount, error) {
 				return &pulumiapi.InsightsAccount{
 					ID:                   "account-id-123",
 					Name:                 accountName,
@@ -325,7 +373,7 @@ func TestInsightsAccount(t *testing.T) {
 
 		require.NoError(t, err)
 		assert.Equal(t, "test-org/test-account", resp.ID)
-		assert.Equal(t, "account-id-123", resp.Output.InsightsAccountId)
+		assert.Equal(t, "account-id-123", resp.Output.InsightsAccountID)
 		assert.Equal(t, true, resp.Output.ScheduledScanEnabled)
 		assert.Equal(t, "aws", capturedRequest.Provider)
 		assert.Equal(t, "test-env", capturedRequest.Environment)
@@ -336,11 +384,13 @@ func TestInsightsAccount(t *testing.T) {
 		t.Parallel()
 		var capturedRequest pulumiapi.CreateInsightsAccountRequest
 		mockedClient := &InsightsAccountClientMock{
-			createInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.CreateInsightsAccountRequest) error {
+			createInsightsAccountFunc: func(
+				_ context.Context, _ string, _ string, req pulumiapi.CreateInsightsAccountRequest,
+			) error {
 				capturedRequest = req
 				return nil
 			},
-			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+			getInsightsAccountFunc: func(_ context.Context, _ string, accountName string) (*pulumiapi.InsightsAccount, error) {
 				return &pulumiapi.InsightsAccount{
 					ID:                   "account-id-123",
 					Name:                 accountName,
@@ -377,7 +427,9 @@ func TestInsightsAccount(t *testing.T) {
 	t.Run("Create fails with API error", func(t *testing.T) {
 		t.Parallel()
 		mockedClient := &InsightsAccountClientMock{
-			createInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.CreateInsightsAccountRequest) error {
+			createInsightsAccountFunc: func(
+				_ context.Context, _ string, _ string, _ pulumiapi.CreateInsightsAccountRequest,
+			) error {
 				return fmt.Errorf("API error: invalid environment reference")
 			},
 		}
@@ -407,10 +459,12 @@ func TestInsightsAccount(t *testing.T) {
 	t.Run("Create succeeds but GET fails after creation", func(t *testing.T) {
 		t.Parallel()
 		mockedClient := &InsightsAccountClientMock{
-			createInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.CreateInsightsAccountRequest) error {
+			createInsightsAccountFunc: func(
+				_ context.Context, _ string, _ string, _ pulumiapi.CreateInsightsAccountRequest,
+			) error {
 				return nil
 			},
-			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+			getInsightsAccountFunc: func(_ context.Context, _ string, _ string) (*pulumiapi.InsightsAccount, error) {
 				return nil, fmt.Errorf("API error: internal server error")
 			},
 		}
@@ -437,16 +491,18 @@ func TestInsightsAccount(t *testing.T) {
 		assert.ErrorAs(t, err, &initErr)
 		assert.Contains(t, initErr.Reasons[0], "internal server error")
 		assert.Equal(t, "test-org/test-account", resp.ID)
-		assert.Equal(t, "", resp.Output.InsightsAccountId)
+		assert.Equal(t, "", resp.Output.InsightsAccountID)
 	})
 
 	t.Run("Create succeeds but account not found after creation", func(t *testing.T) {
 		t.Parallel()
 		mockedClient := &InsightsAccountClientMock{
-			createInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.CreateInsightsAccountRequest) error {
+			createInsightsAccountFunc: func(
+				_ context.Context, _ string, _ string, _ pulumiapi.CreateInsightsAccountRequest,
+			) error {
 				return nil
 			},
-			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+			getInsightsAccountFunc: func(_ context.Context, _ string, _ string) (*pulumiapi.InsightsAccount, error) {
 				return nil, nil // 404 - not found
 			},
 		}
@@ -473,7 +529,7 @@ func TestInsightsAccount(t *testing.T) {
 		assert.ErrorAs(t, err, &initErr)
 		assert.Contains(t, initErr.Reasons[0], "insights account 'test-account' not found after creation")
 		assert.Equal(t, "test-org/test-account", resp.ID)
-		assert.Equal(t, "", resp.Output.InsightsAccountId)
+		assert.Equal(t, "", resp.Output.InsightsAccountID)
 	})
 
 	t.Run("Update with DryRun", func(t *testing.T) {
@@ -503,7 +559,7 @@ func TestInsightsAccount(t *testing.T) {
 					Environment:      "old-env",
 					ScanSchedule:     oldSchedule,
 				},
-				InsightsAccountId:    "account-id-123",
+				InsightsAccountID:    "account-id-123",
 				ScheduledScanEnabled: true,
 			},
 		}
@@ -514,7 +570,7 @@ func TestInsightsAccount(t *testing.T) {
 		assert.Equal(t, infer.UpdateResponse[InsightsAccountState]{
 			Output: InsightsAccountState{
 				InsightsAccountCore:  req.Inputs.InsightsAccountCore,
-				InsightsAccountId:    "account-id-123",
+				InsightsAccountID:    "account-id-123",
 				ScheduledScanEnabled: true, // State value preserved in DryRun
 			},
 		}, resp)
@@ -524,11 +580,13 @@ func TestInsightsAccount(t *testing.T) {
 		t.Parallel()
 		var capturedRequest pulumiapi.UpdateInsightsAccountRequest
 		mockedClient := &InsightsAccountClientMock{
-			updateInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.UpdateInsightsAccountRequest) error {
+			updateInsightsAccountFunc: func(
+				_ context.Context, _ string, _ string, req pulumiapi.UpdateInsightsAccountRequest,
+			) error {
 				capturedRequest = req
 				return nil
 			},
-			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+			getInsightsAccountFunc: func(_ context.Context, _ string, accountName string) (*pulumiapi.InsightsAccount, error) {
 				return &pulumiapi.InsightsAccount{
 					ID:                   "account-id-123",
 					Name:                 accountName,
@@ -562,7 +620,7 @@ func TestInsightsAccount(t *testing.T) {
 					Environment:      "old-env",
 					ScanSchedule:     oldSchedule,
 				},
-				InsightsAccountId:    "account-id-123",
+				InsightsAccountID:    "account-id-123",
 				ScheduledScanEnabled: true,
 			},
 		}
@@ -578,7 +636,9 @@ func TestInsightsAccount(t *testing.T) {
 	t.Run("Update fails with API error", func(t *testing.T) {
 		t.Parallel()
 		mockedClient := &InsightsAccountClientMock{
-			updateInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.UpdateInsightsAccountRequest) error {
+			updateInsightsAccountFunc: func(
+				_ context.Context, _ string, _ string, _ pulumiapi.UpdateInsightsAccountRequest,
+			) error {
 				return fmt.Errorf("API error: environment not found")
 			},
 		}
@@ -604,7 +664,7 @@ func TestInsightsAccount(t *testing.T) {
 					Environment:      "old-env",
 					ScanSchedule:     ScanScheduleDaily,
 				},
-				InsightsAccountId:    "account-id-123",
+				InsightsAccountID:    "account-id-123",
 				ScheduledScanEnabled: true,
 			},
 		}
@@ -619,10 +679,12 @@ func TestInsightsAccount(t *testing.T) {
 	t.Run("Update succeeds but GET fails after update", func(t *testing.T) {
 		t.Parallel()
 		mockedClient := &InsightsAccountClientMock{
-			updateInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.UpdateInsightsAccountRequest) error {
+			updateInsightsAccountFunc: func(
+				_ context.Context, _ string, _ string, _ pulumiapi.UpdateInsightsAccountRequest,
+			) error {
 				return nil
 			},
-			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+			getInsightsAccountFunc: func(_ context.Context, _ string, _ string) (*pulumiapi.InsightsAccount, error) {
 				return nil, fmt.Errorf("API error: internal server error")
 			},
 		}
@@ -648,7 +710,7 @@ func TestInsightsAccount(t *testing.T) {
 					Environment:      "old-env",
 					ScanSchedule:     ScanScheduleDaily,
 				},
-				InsightsAccountId:    "account-id-123",
+				InsightsAccountID:    "account-id-123",
 				ScheduledScanEnabled: true,
 			},
 		}
@@ -659,16 +721,18 @@ func TestInsightsAccount(t *testing.T) {
 		var initErr infer.ResourceInitFailedError
 		assert.ErrorAs(t, err, &initErr)
 		assert.Contains(t, initErr.Reasons[0], "internal server error")
-		assert.Equal(t, "account-id-123", resp.Output.InsightsAccountId)
+		assert.Equal(t, "account-id-123", resp.Output.InsightsAccountID)
 	})
 
 	t.Run("Update succeeds but account not found after update", func(t *testing.T) {
 		t.Parallel()
 		mockedClient := &InsightsAccountClientMock{
-			updateInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.UpdateInsightsAccountRequest) error {
+			updateInsightsAccountFunc: func(
+				_ context.Context, _ string, _ string, _ pulumiapi.UpdateInsightsAccountRequest,
+			) error {
 				return nil
 			},
-			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+			getInsightsAccountFunc: func(_ context.Context, _ string, _ string) (*pulumiapi.InsightsAccount, error) {
 				return nil, nil // 404 - not found
 			},
 		}
@@ -694,7 +758,7 @@ func TestInsightsAccount(t *testing.T) {
 					Environment:      "old-env",
 					ScanSchedule:     ScanScheduleDaily,
 				},
-				InsightsAccountId:    "account-id-123",
+				InsightsAccountID:    "account-id-123",
 				ScheduledScanEnabled: true,
 			},
 		}
@@ -705,14 +769,14 @@ func TestInsightsAccount(t *testing.T) {
 		var initErr infer.ResourceInitFailedError
 		assert.ErrorAs(t, err, &initErr)
 		assert.Contains(t, initErr.Reasons[0], "insights account 'test-account' not found after update")
-		assert.Equal(t, "account-id-123", resp.Output.InsightsAccountId)
+		assert.Equal(t, "account-id-123", resp.Output.InsightsAccountID)
 	})
 
 	t.Run("Delete successfully", func(t *testing.T) {
 		t.Parallel()
 		deleteCalled := false
 		mockedClient := &InsightsAccountClientMock{
-			deleteInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) error {
+			deleteInsightsAccountFunc: func(_ context.Context, orgName string, accountName string) error {
 				deleteCalled = true
 				assert.Equal(t, "test-org", orgName)
 				assert.Equal(t, "test-account", accountName)
@@ -732,7 +796,7 @@ func TestInsightsAccount(t *testing.T) {
 					Environment:      "test-env",
 					ScanSchedule:     scanSchedule,
 				},
-				InsightsAccountId: "account-id-123",
+				InsightsAccountID: "account-id-123",
 			},
 		}
 
@@ -749,7 +813,7 @@ func TestInsightsAccount(t *testing.T) {
 			"team":        "platform",
 		}
 		mockedClient := &InsightsAccountClientMock{
-			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+			getInsightsAccountFunc: func(_ context.Context, _ string, _ string) (*pulumiapi.InsightsAccount, error) {
 				return &pulumiapi.InsightsAccount{
 					ID:                   "test-account-id",
 					Name:                 "test-account",
@@ -758,7 +822,7 @@ func TestInsightsAccount(t *testing.T) {
 					ScheduledScanEnabled: true,
 				}, nil
 			},
-			getInsightsAccountTagsFunc: func(ctx context.Context, orgName string, accountName string) (map[string]string, error) {
+			getInsightsAccountTagsFunc: func(_ context.Context, _ string, _ string) (map[string]string, error) {
 				return expectedTags, nil
 			},
 		}
@@ -798,7 +862,7 @@ func TestInsightsAccount(t *testing.T) {
 	t.Run("Read fails when GetInsightsAccountTags fails", func(t *testing.T) {
 		t.Parallel()
 		mockedClient := &InsightsAccountClientMock{
-			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+			getInsightsAccountFunc: func(_ context.Context, _ string, _ string) (*pulumiapi.InsightsAccount, error) {
 				return &pulumiapi.InsightsAccount{
 					ID:                   "test-account-id",
 					Name:                 "test-account",
@@ -807,7 +871,7 @@ func TestInsightsAccount(t *testing.T) {
 					ScheduledScanEnabled: true,
 				}, nil
 			},
-			getInsightsAccountTagsFunc: func(ctx context.Context, orgName string, accountName string) (map[string]string, error) {
+			getInsightsAccountTagsFunc: func(_ context.Context, _ string, _ string) (map[string]string, error) {
 				return nil, fmt.Errorf("API error: failed to fetch tags")
 			},
 		}
@@ -838,10 +902,12 @@ func TestInsightsAccount(t *testing.T) {
 		t.Parallel()
 		setTagsCalled := false
 		mockedClient := &InsightsAccountClientMock{
-			createInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.CreateInsightsAccountRequest) error {
+			createInsightsAccountFunc: func(
+				_ context.Context, _ string, _ string, _ pulumiapi.CreateInsightsAccountRequest,
+			) error {
 				return nil
 			},
-			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+			getInsightsAccountFunc: func(_ context.Context, _ string, accountName string) (*pulumiapi.InsightsAccount, error) {
 				return &pulumiapi.InsightsAccount{
 					ID:                   "account-id-123",
 					Name:                 accountName,
@@ -850,7 +916,7 @@ func TestInsightsAccount(t *testing.T) {
 					ScheduledScanEnabled: true,
 				}, nil
 			},
-			setInsightsAccountTagsFunc: func(ctx context.Context, orgName string, accountName string, tags map[string]string) error {
+			setInsightsAccountTagsFunc: func(_ context.Context, _ string, _ string, _ map[string]string) error {
 				setTagsCalled = true
 				return nil
 			},
@@ -875,7 +941,7 @@ func TestInsightsAccount(t *testing.T) {
 
 		require.NoError(t, err)
 		assert.False(t, setTagsCalled, "SetInsightsAccountTags should not be called when Tags is nil/empty")
-		assert.Equal(t, "account-id-123", resp.Output.InsightsAccountId)
+		assert.Equal(t, "account-id-123", resp.Output.InsightsAccountID)
 	})
 
 	t.Run("Create with tags", func(t *testing.T) {
@@ -886,10 +952,12 @@ func TestInsightsAccount(t *testing.T) {
 		}
 		var capturedTags map[string]string
 		mockedClient := &InsightsAccountClientMock{
-			createInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.CreateInsightsAccountRequest) error {
+			createInsightsAccountFunc: func(
+				_ context.Context, _ string, _ string, _ pulumiapi.CreateInsightsAccountRequest,
+			) error {
 				return nil
 			},
-			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+			getInsightsAccountFunc: func(_ context.Context, _ string, accountName string) (*pulumiapi.InsightsAccount, error) {
 				return &pulumiapi.InsightsAccount{
 					ID:                   "account-id-123",
 					Name:                 accountName,
@@ -898,7 +966,7 @@ func TestInsightsAccount(t *testing.T) {
 					ScheduledScanEnabled: true,
 				}, nil
 			},
-			setInsightsAccountTagsFunc: func(ctx context.Context, orgName string, accountName string, tags map[string]string) error {
+			setInsightsAccountTagsFunc: func(_ context.Context, _ string, _ string, tags map[string]string) error {
 				capturedTags = tags
 				return nil
 			},
@@ -930,10 +998,12 @@ func TestInsightsAccount(t *testing.T) {
 	t.Run("Create fails when SetInsightsAccountTags fails", func(t *testing.T) {
 		t.Parallel()
 		mockedClient := &InsightsAccountClientMock{
-			createInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.CreateInsightsAccountRequest) error {
+			createInsightsAccountFunc: func(
+				_ context.Context, _ string, _ string, _ pulumiapi.CreateInsightsAccountRequest,
+			) error {
 				return nil
 			},
-			setInsightsAccountTagsFunc: func(ctx context.Context, orgName string, accountName string, tags map[string]string) error {
+			setInsightsAccountTagsFunc: func(_ context.Context, _ string, _ string, _ map[string]string) error {
 				return fmt.Errorf("API error: failed to set tags")
 			},
 		}
@@ -970,10 +1040,12 @@ func TestInsightsAccount(t *testing.T) {
 		var capturedTags map[string]string
 		setTagsCalled := false
 		mockedClient := &InsightsAccountClientMock{
-			updateInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.UpdateInsightsAccountRequest) error {
+			updateInsightsAccountFunc: func(
+				_ context.Context, _ string, _ string, _ pulumiapi.UpdateInsightsAccountRequest,
+			) error {
 				return nil
 			},
-			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+			getInsightsAccountFunc: func(_ context.Context, _ string, accountName string) (*pulumiapi.InsightsAccount, error) {
 				return &pulumiapi.InsightsAccount{
 					ID:                   "account-id-123",
 					Name:                 accountName,
@@ -982,7 +1054,7 @@ func TestInsightsAccount(t *testing.T) {
 					ScheduledScanEnabled: true,
 				}, nil
 			},
-			setInsightsAccountTagsFunc: func(ctx context.Context, orgName string, accountName string, tags map[string]string) error {
+			setInsightsAccountTagsFunc: func(_ context.Context, _ string, _ string, tags map[string]string) error {
 				setTagsCalled = true
 				capturedTags = tags
 				return nil
@@ -1013,7 +1085,7 @@ func TestInsightsAccount(t *testing.T) {
 						"environment": "staging",
 					},
 				},
-				InsightsAccountId:    "account-id-123",
+				InsightsAccountID:    "account-id-123",
 				ScheduledScanEnabled: true,
 			},
 		}
@@ -1034,10 +1106,12 @@ func TestInsightsAccount(t *testing.T) {
 		}
 		var capturedTags map[string]string
 		mockedClient := &InsightsAccountClientMock{
-			updateInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.UpdateInsightsAccountRequest) error {
+			updateInsightsAccountFunc: func(
+				_ context.Context, _ string, _ string, _ pulumiapi.UpdateInsightsAccountRequest,
+			) error {
 				return nil
 			},
-			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+			getInsightsAccountFunc: func(_ context.Context, _ string, accountName string) (*pulumiapi.InsightsAccount, error) {
 				return &pulumiapi.InsightsAccount{
 					ID:                   "account-id-123",
 					Name:                 accountName,
@@ -1046,7 +1120,7 @@ func TestInsightsAccount(t *testing.T) {
 					ScheduledScanEnabled: true,
 				}, nil
 			},
-			setInsightsAccountTagsFunc: func(ctx context.Context, orgName string, accountName string, tags map[string]string) error {
+			setInsightsAccountTagsFunc: func(_ context.Context, _ string, _ string, tags map[string]string) error {
 				capturedTags = tags
 				return nil
 			},
@@ -1077,7 +1151,7 @@ func TestInsightsAccount(t *testing.T) {
 						"environment": "staging",
 					},
 				},
-				InsightsAccountId:    "account-id-123",
+				InsightsAccountID:    "account-id-123",
 				ScheduledScanEnabled: true,
 			},
 		}
@@ -1092,10 +1166,12 @@ func TestInsightsAccount(t *testing.T) {
 	t.Run("Update fails when SetInsightsAccountTags fails", func(t *testing.T) {
 		t.Parallel()
 		mockedClient := &InsightsAccountClientMock{
-			updateInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string, req pulumiapi.UpdateInsightsAccountRequest) error {
+			updateInsightsAccountFunc: func(
+				_ context.Context, _ string, _ string, _ pulumiapi.UpdateInsightsAccountRequest,
+			) error {
 				return nil
 			},
-			setInsightsAccountTagsFunc: func(ctx context.Context, orgName string, accountName string, tags map[string]string) error {
+			setInsightsAccountTagsFunc: func(_ context.Context, _ string, _ string, _ map[string]string) error {
 				return fmt.Errorf("API error: failed to set tags")
 			},
 		}
@@ -1124,7 +1200,7 @@ func TestInsightsAccount(t *testing.T) {
 					Environment:      "old-env",
 					ScanSchedule:     ScanScheduleDaily,
 				},
-				InsightsAccountId:    "account-id-123",
+				InsightsAccountID:    "account-id-123",
 				ScheduledScanEnabled: true,
 			},
 		}
@@ -1135,7 +1211,7 @@ func TestInsightsAccount(t *testing.T) {
 		var initErr infer.ResourceInitFailedError
 		assert.ErrorAs(t, err, &initErr)
 		assert.Contains(t, initErr.Reasons[0], "failed to set tags")
-		assert.Equal(t, "account-id-123", resp.Output.InsightsAccountId)
+		assert.Equal(t, "account-id-123", resp.Output.InsightsAccountID)
 	})
 
 }

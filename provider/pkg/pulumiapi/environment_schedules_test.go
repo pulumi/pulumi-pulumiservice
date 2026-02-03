@@ -36,7 +36,11 @@ func TestCreateEnvironmentRotationSchedule(t *testing.T) {
 			ResponseCode:      201,
 			ResponseBody:      testEnvResponse,
 		})
-		expectedScheduleID, err := c.CreateEnvironmentRotationSchedule(ctx, testEnv, createEnvironmentRotationScheduleReq)
+		expectedScheduleID, err := c.CreateEnvironmentRotationSchedule(
+			ctx,
+			testEnv,
+			createEnvironmentRotationScheduleReq,
+		)
 		assert.NoError(t, err)
 		assert.Equal(t, testScheduleID, *expectedScheduleID)
 	})
@@ -51,9 +55,18 @@ func TestCreateEnvironmentRotationSchedule(t *testing.T) {
 				Message: "unauthorized",
 			},
 		})
-		expectedScheduleID, err := c.CreateEnvironmentRotationSchedule(ctx, testEnv, createEnvironmentRotationScheduleReq)
+		expectedScheduleID, err := c.CreateEnvironmentRotationSchedule(
+			ctx,
+			testEnv,
+			createEnvironmentRotationScheduleReq,
+		)
 		assert.Nil(t, expectedScheduleID, "deployment schedule should be nil since error was returned")
-		assert.EqualError(t, err, "failed to create environment rotation schedule (scheduleCron=0 * 0 * 0, scheduleOnce=<nil>): 401 API error: unauthorized")
+		assert.EqualError(
+			t,
+			err,
+			"failed to create environment rotation schedule (scheduleCron=0 * 0 * 0, scheduleOnce=<nil>): "+
+				"401 API error: unauthorized",
+		)
 	})
 }
 
@@ -82,7 +95,11 @@ func TestGetEnvironmentSchedule(t *testing.T) {
 		})
 		expectedScheduleID, err := c.GetEnvironmentSchedule(ctx, testEnv, testScheduleID)
 		assert.Nil(t, expectedScheduleID, "scheduleId should be nil since error was returned")
-		assert.EqualError(t, err, "failed to get environment schedule with scheduleId test-schedule-id : 401 API error: unauthorized")
+		assert.EqualError(
+			t,
+			err,
+			"failed to get environment schedule with scheduleId test-schedule-id : 401 API error: unauthorized",
+		)
 	})
 
 	t.Run("404", func(t *testing.T) {
@@ -111,7 +128,12 @@ func TestUpdateEnvironmentRotationSchedule(t *testing.T) {
 			ResponseCode:      201,
 			ResponseBody:      testResponse,
 		})
-		expectedScheduleID, err := c.UpdateEnvironmentRotationSchedule(ctx, testEnv, createEnvironmentRotationScheduleReq, testScheduleID)
+		expectedScheduleID, err := c.UpdateEnvironmentRotationSchedule(
+			ctx,
+			testEnv,
+			createEnvironmentRotationScheduleReq,
+			testScheduleID,
+		)
 		assert.NoError(t, err)
 		assert.Equal(t, testScheduleID, *expectedScheduleID)
 	})
@@ -126,9 +148,19 @@ func TestUpdateEnvironmentRotationSchedule(t *testing.T) {
 				Message: "unauthorized",
 			},
 		})
-		expectedScheduleID, err := c.UpdateEnvironmentRotationSchedule(ctx, testEnv, createEnvironmentRotationScheduleReq, testScheduleID)
+		expectedScheduleID, err := c.UpdateEnvironmentRotationSchedule(
+			ctx,
+			testEnv,
+			createEnvironmentRotationScheduleReq,
+			testScheduleID,
+		)
 		assert.Nil(t, expectedScheduleID, "scheduleId should be nil since error was returned")
-		assert.EqualError(t, err, "failed to update environment schedule test-schedule-id (scheduleCron=0 * 0 * 0, scheduleOnce=<nil>): 401 API error: unauthorized")
+		assert.EqualError(
+			t,
+			err,
+			"failed to update environment schedule test-schedule-id (scheduleCron=0 * 0 * 0, "+
+				"scheduleOnce=<nil>): 401 API error: unauthorized",
+		)
 	})
 }
 
@@ -153,6 +185,10 @@ func TestDeleteEnvironmentSchedule(t *testing.T) {
 			},
 		})
 		err := c.DeleteEnvironmentSchedule(ctx, testEnv, testScheduleID)
-		assert.EqualError(t, err, "failed to delete environment schedule with scheduleId test-schedule-id : 401 API error: unauthorized")
+		assert.EqualError(
+			t,
+			err,
+			"failed to delete environment schedule with scheduleId test-schedule-id : 401 API error: unauthorized",
+		)
 	})
 }

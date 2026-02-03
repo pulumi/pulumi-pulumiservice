@@ -21,20 +21,39 @@ type AgentPoolClientMock struct {
 	deleteAgentPoolFunc deleteAgentPoolFunc
 }
 
-func (c *AgentPoolClientMock) GetAgentPool(ctx context.Context, agentPoolId, orgName string) (*pulumiapi.AgentPool, error) {
+func (c *AgentPoolClientMock) GetAgentPool(
+	_ context.Context,
+	_, _ string,
+) (*pulumiapi.AgentPool, error) {
 	return c.getAgentPoolFunc()
 }
-func (c *AgentPoolClientMock) CreateAgentPool(ctx context.Context, name, orgName, description string) (*pulumiapi.AgentPool, error) {
+
+func (c *AgentPoolClientMock) CreateAgentPool(
+	_ context.Context,
+	_, _, _ string,
+) (*pulumiapi.AgentPool, error) {
 	return nil, nil
 }
-func (c *AgentPoolClientMock) UpdateAgentPool(ctx context.Context, agentPoolId, name, orgName, description string) error {
+
+func (c *AgentPoolClientMock) UpdateAgentPool(
+	_ context.Context,
+	_, _, _, _ string,
+) error {
 	return nil
 }
-func (c *AgentPoolClientMock) DeleteAgentPool(ctx context.Context, agentPoolId, orgName string, forceDestroy bool) error {
+
+func (c *AgentPoolClientMock) DeleteAgentPool(
+	_ context.Context,
+	_, _ string,
+	_ bool,
+) error {
 	return c.deleteAgentPoolFunc()
 }
 
-func buildAgentPoolClientMock(getAgentPoolFunc getAgentPoolFunc, deleteAgentPoolFunc deleteAgentPoolFunc) *AgentPoolClientMock {
+func buildAgentPoolClientMock(
+	getAgentPoolFunc getAgentPoolFunc,
+	deleteAgentPoolFunc deleteAgentPoolFunc,
+) *AgentPoolClientMock {
 	return &AgentPoolClientMock{
 		getAgentPoolFunc,
 		deleteAgentPoolFunc,

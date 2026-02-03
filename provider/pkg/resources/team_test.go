@@ -4,10 +4,11 @@ import (
 	"context"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/pulumi/pulumi-go-provider/infer"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
-	"github.com/stretchr/testify/assert"
 )
 
 type TeamClientMock struct {
@@ -22,7 +23,7 @@ func (c *TeamClientMock) GetTeam(ctx context.Context, orgName string, teamName s
 func TestTeam(t *testing.T) {
 	t.Run("Read when the resource is not found", func(t *testing.T) {
 		mockedClient := &TeamClientMock{
-			getTeamFunc: func(ctx context.Context, orgName string, teamName string) (*pulumiapi.Team, error) {
+			getTeamFunc: func(_ context.Context, _ string, _ string) (*pulumiapi.Team, error) {
 				return nil, nil
 			},
 		}
@@ -58,7 +59,7 @@ func TestTeam(t *testing.T) {
 
 	t.Run("Read when the resource is found", func(t *testing.T) {
 		mockedClient := &TeamClientMock{
-			getTeamFunc: func(ctx context.Context, orgName string, teamName string) (*pulumiapi.Team, error) {
+			getTeamFunc: func(_ context.Context, _ string, _ string) (*pulumiapi.Team, error) {
 				return &pulumiapi.Team{
 					Type:        "pulumi",
 					Name:        "test",

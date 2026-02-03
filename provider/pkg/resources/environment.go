@@ -7,14 +7,15 @@ import (
 	"path"
 	"strings"
 
+	pbempty "google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/structpb"
+
 	esc_client "github.com/pulumi/esc/cmd/esc/cli/client"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/asset"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
-	pbempty "google.golang.org/protobuf/types/known/emptypb"
-	"google.golang.org/protobuf/types/known/structpb"
 )
 
 const defaultProject = "default"
@@ -99,7 +100,10 @@ func getBytesFromAsset(asset *asset.Asset) ([]byte, error) {
 }
 
 func (st *PulumiServiceEnvironmentResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	olds, err := plugin.UnmarshalProperties(
+		req.GetOldInputs(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -131,7 +135,7 @@ func (st *PulumiServiceEnvironmentResource) Diff(req *pulumirpc.DiffRequest) (*p
 			replaces = append(replaces, k)
 		}
 		detailedDiffs[k] = &pulumirpc.PropertyDiff{
-			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind),
+			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind), //nolint:gosec // safe conversion from plugin.DiffKind
 			InputDiff: v.InputDiff,
 		}
 	}
@@ -169,7 +173,12 @@ func (st *PulumiServiceEnvironmentResource) Create(req *pulumirpc.CreateRequest)
 	}
 
 	// First check if yaml is valid
-	_, diagnostics, err := st.Client.CheckYAMLEnvironment(context.Background(), input.OrgName, []byte(input.Yaml), esc_client.CheckYAMLOption{})
+	_, diagnostics, err := st.Client.CheckYAMLEnvironment(
+		context.Background(),
+		input.OrgName,
+		[]byte(input.Yaml),
+		esc_client.CheckYAMLOption{},
+	)
 	if diagnostics != nil {
 		return nil, fmt.Errorf("failed to check environment, yaml code failed following checks: %+v", diagnostics)
 	}
@@ -191,8 +200,11 @@ func (st *PulumiServiceEnvironmentResource) Create(req *pulumirpc.CreateRequest)
 		"",
 	)
 	if diagnostics != nil {
-		return nil, fmt.Errorf("failed to update brand new environment with pre-checked yaml, due to failing the following checks: %+v \n"+
-			"This should never happen, if you're seeing this message there's likely a bug in ESC APIs", diagnostics)
+		return nil, fmt.Errorf(
+			"failed to update brand new environment with pre-checked yaml, due to failing the following checks: %+v \n"+
+				"This should never happen, if you're seeing this message there's likely a bug in ESC APIs",
+			diagnostics,
+		)
 	}
 	if err != nil {
 		return nil, fmt.Errorf("failed to push yaml into environment due to error: %+v", err)
@@ -224,7 +236,10 @@ func (st *PulumiServiceEnvironmentResource) Create(req *pulumirpc.CreateRequest)
 }
 
 func (st *PulumiServiceEnvironmentResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	inputMap, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
+	inputMap, err := plugin.UnmarshalProperties(
+		req.GetNews(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -270,7 +285,10 @@ func (st *PulumiServiceEnvironmentResource) Check(req *pulumirpc.CheckRequest) (
 	trimmedYaml := strings.TrimSpace(stringYaml)
 	inputMap["yaml"] = resource.MakeSecret(resource.NewStringProperty(trimmedYaml))
 
-	inputs, err := plugin.MarshalProperties(inputMap, plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true})
+	inputs, err := plugin.MarshalProperties(
+		inputMap,
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -341,7 +359,14 @@ func (st *PulumiServiceEnvironmentResource) Read(req *pulumirpc.ReadRequest) (*p
 		return nil, fmt.Errorf("invalid environment id: %s", req.Id)
 	}
 
-	retrievedYaml, _, revision, err := st.Client.GetEnvironment(context.Background(), orgName, projectName, envName, "", false)
+	retrievedYaml, _, revision, err := st.Client.GetEnvironment(
+		context.Background(),
+		orgName,
+		projectName,
+		envName,
+		"",
+		false,
+	)
 	if err != nil {
 		return &pulumirpc.ReadResponse{Id: "", Properties: nil}, nil
 	}

@@ -73,16 +73,16 @@ func (c *Client) CreateAccessToken(ctx context.Context, description string) (*Ac
 
 }
 
-func (c *Client) DeleteAccessToken(ctx context.Context, tokenId string) error {
-	if len(tokenId) == 0 {
+func (c *Client) DeleteAccessToken(ctx context.Context, tokenID string) error {
+	if len(tokenID) == 0 {
 		return errors.New("tokenid length must be greater than zero")
 	}
 
-	apiPath := path.Join("user", "tokens", tokenId)
+	apiPath := path.Join("user", "tokens", tokenID)
 
 	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
 	if err != nil {
-		return fmt.Errorf("failed to delete access token %q: %w", tokenId, err)
+		return fmt.Errorf("failed to delete access token %q: %w", tokenID, err)
 	}
 
 	return nil

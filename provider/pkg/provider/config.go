@@ -9,7 +9,7 @@ import (
 
 const (
 	EnvVarPulumiAccessToken = "PULUMI_ACCESS_TOKEN"
-	EnvVarPulumiBackendUrl  = "PULUMI_BACKEND_URL"
+	EnvVarPulumiBackendURL  = "PULUMI_BACKEND_URL"
 )
 
 var ErrAccessTokenNotFound = fmt.Errorf("pulumi access token not found")
@@ -45,8 +45,8 @@ func (pc *PulumiServiceConfig) getPulumiAccessToken() (*string, error) {
 	return nil, ErrAccessTokenNotFound
 }
 
-func (pc *PulumiServiceConfig) getPulumiServiceUrl() (*string, error) {
-	url := pc.getConfig("apiUrl", EnvVarPulumiBackendUrl)
+func (pc *PulumiServiceConfig) getPulumiServiceURL() (*string, error) {
+	url := pc.getConfig("apiUrl", EnvVarPulumiBackendURL)
 	baseurl := "https://api.pulumi.com"
 
 	if len(url) == 0 {

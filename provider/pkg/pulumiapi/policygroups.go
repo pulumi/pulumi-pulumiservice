@@ -165,7 +165,11 @@ func (c *Client) CreatePolicyGroup(ctx context.Context, orgName, policyGroupName
 
 // BatchUpdatePolicyGroup applies multiple update operations to a policy group in a single request.
 // This is more efficient than calling UpdatePolicyGroup multiple times.
-func (c *Client) BatchUpdatePolicyGroup(ctx context.Context, orgName, policyGroupName string, reqs []UpdatePolicyGroupRequest) error {
+func (c *Client) BatchUpdatePolicyGroup(
+	ctx context.Context,
+	orgName, policyGroupName string,
+	reqs []UpdatePolicyGroupRequest,
+) error {
 	if len(orgName) == 0 {
 		return errors.New("orgName must not be empty")
 	}

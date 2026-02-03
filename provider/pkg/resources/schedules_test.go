@@ -4,10 +4,11 @@ import (
 	"context"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
-	"github.com/stretchr/testify/assert"
 )
 
 type getDeploymentScheduleFunc func() (*pulumiapi.StackScheduleResponse, error)
@@ -16,35 +17,70 @@ type ScheduleClientMock struct {
 	getDeploymentScheduleFunc getDeploymentScheduleFunc
 }
 
-func (c *ScheduleClientMock) GetStackSchedule(ctx context.Context, stack pulumiapi.StackIdentifier, scheduleID string) (*pulumiapi.StackScheduleResponse, error) {
+func (c *ScheduleClientMock) GetStackSchedule(
+	_ context.Context,
+	_ pulumiapi.StackIdentifier,
+	_ string,
+) (*pulumiapi.StackScheduleResponse, error) {
 	return c.getDeploymentScheduleFunc()
 }
 
-func (c *ScheduleClientMock) CreateDeploymentSchedule(ctx context.Context, stack pulumiapi.StackIdentifier, req pulumiapi.CreateDeploymentScheduleRequest) (*string, error) {
+func (c *ScheduleClientMock) CreateDeploymentSchedule(
+	_ context.Context,
+	_ pulumiapi.StackIdentifier,
+	_ pulumiapi.CreateDeploymentScheduleRequest,
+) (*string, error) {
 	return nil, nil
 }
 
-func (c *ScheduleClientMock) CreateDriftSchedule(ctx context.Context, stack pulumiapi.StackIdentifier, req pulumiapi.CreateDriftScheduleRequest) (*string, error) {
+func (c *ScheduleClientMock) CreateDriftSchedule(
+	_ context.Context,
+	_ pulumiapi.StackIdentifier,
+	_ pulumiapi.CreateDriftScheduleRequest,
+) (*string, error) {
 	return nil, nil
 }
 
-func (c *ScheduleClientMock) CreateTtlSchedule(ctx context.Context, stack pulumiapi.StackIdentifier, req pulumiapi.CreateTtlScheduleRequest) (*string, error) {
+func (c *ScheduleClientMock) CreateTTLSchedule(
+	_ context.Context,
+	_ pulumiapi.StackIdentifier,
+	_ pulumiapi.CreateTTLScheduleRequest,
+) (*string, error) {
 	return nil, nil
 }
 
-func (c *ScheduleClientMock) UpdateDeploymentSchedule(ctx context.Context, stack pulumiapi.StackIdentifier, req pulumiapi.CreateDeploymentScheduleRequest, scheduleID string) (*string, error) {
+func (c *ScheduleClientMock) UpdateDeploymentSchedule(
+	_ context.Context,
+	_ pulumiapi.StackIdentifier,
+	_ pulumiapi.CreateDeploymentScheduleRequest,
+	_ string,
+) (*string, error) {
 	return nil, nil
 }
 
-func (c *ScheduleClientMock) UpdateDriftSchedule(ctx context.Context, stack pulumiapi.StackIdentifier, req pulumiapi.CreateDriftScheduleRequest, scheduleID string) (*string, error) {
+func (c *ScheduleClientMock) UpdateDriftSchedule(
+	_ context.Context,
+	_ pulumiapi.StackIdentifier,
+	_ pulumiapi.CreateDriftScheduleRequest,
+	_ string,
+) (*string, error) {
 	return nil, nil
 }
 
-func (c *ScheduleClientMock) UpdateTtlSchedule(ctx context.Context, stack pulumiapi.StackIdentifier, req pulumiapi.CreateTtlScheduleRequest, scheduleID string) (*string, error) {
+func (c *ScheduleClientMock) UpdateTTLSchedule(
+	_ context.Context,
+	_ pulumiapi.StackIdentifier,
+	_ pulumiapi.CreateTTLScheduleRequest,
+	_ string,
+) (*string, error) {
 	return nil, nil
 }
 
-func (c *ScheduleClientMock) DeleteStackSchedule(ctx context.Context, stack pulumiapi.StackIdentifier, scheduleID string) error {
+func (c *ScheduleClientMock) DeleteStackSchedule(
+	_ context.Context,
+	_ pulumiapi.StackIdentifier,
+	_ string,
+) error {
 	return nil
 }
 
@@ -77,7 +113,7 @@ func TestDeploymentSchedule(t *testing.T) {
 		scheduleID := "fake-schedule-id"
 
 		outputProperties, _ := plugin.MarshalProperties(
-			AddScheduleIdToPropertyMap(scheduleID, input.ToPropertyMap()),
+			AddScheduleIDToPropertyMap(scheduleID, input.ToPropertyMap()),
 			plugin.MarshalOptions{
 				KeepUnknowns: true,
 				SkipNulls:    true,
@@ -135,7 +171,7 @@ func TestDeploymentSchedule(t *testing.T) {
 		scheduleID := "fake-schedule-id"
 
 		outputProperties, _ := plugin.MarshalProperties(
-			AddScheduleIdToPropertyMap(scheduleID, input.ToPropertyMap()),
+			AddScheduleIDToPropertyMap(scheduleID, input.ToPropertyMap()),
 			plugin.MarshalOptions{
 				KeepUnknowns: true,
 				SkipNulls:    true,

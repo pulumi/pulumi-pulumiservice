@@ -32,7 +32,9 @@ func (i *PulumiServiceEnvironmentVersionTagInput) ToPropertyMap() resource.Prope
 	return util.ToPropertyMap(*i, structTagKey)
 }
 
-func (evt *PulumiServiceEnvironmentVersionTagResource) ToPulumiServiceEnvironmentVersionTagInput(properties *structpb.Struct) PulumiServiceEnvironmentVersionTagInput {
+func (evt *PulumiServiceEnvironmentVersionTagResource) ToPulumiServiceEnvironmentVersionTagInput(
+	properties *structpb.Struct,
+) PulumiServiceEnvironmentVersionTagInput {
 	input := PulumiServiceEnvironmentVersionTagInput{}
 	_ = util.FromProperties(properties, structTagKey, &input)
 
@@ -47,8 +49,13 @@ func (evt *PulumiServiceEnvironmentVersionTagResource) Name() string {
 	return "pulumiservice:index:EnvironmentVersionTag"
 }
 
-func (evt *PulumiServiceEnvironmentVersionTagResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
+func (evt *PulumiServiceEnvironmentVersionTagResource) Diff(
+	req *pulumirpc.DiffRequest,
+) (*pulumirpc.DiffResponse, error) {
+	olds, err := plugin.UnmarshalProperties(
+		req.GetOldInputs(),
+		plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +88,7 @@ func (evt *PulumiServiceEnvironmentVersionTagResource) Diff(req *pulumirpc.DiffR
 			replaces = append(replaces, k)
 		}
 		detailedDiffs[k] = &pulumirpc.PropertyDiff{
-			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind),
+			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind), //nolint:gosec // safe conversion from plugin.DiffKind
 			InputDiff: v.InputDiff,
 		}
 	}
@@ -100,19 +107,34 @@ func (evt *PulumiServiceEnvironmentVersionTagResource) Delete(req *pulumirpc.Del
 
 	input := evt.ToPulumiServiceEnvironmentVersionTagInput(req.GetProperties())
 
-	err := evt.Client.DeleteEnvironmentRevisionTag(ctx, input.Organization, input.Project, input.Environment, input.TagName)
+	err := evt.Client.DeleteEnvironmentRevisionTag(
+		ctx,
+		input.Organization,
+		input.Project,
+		input.Environment,
+		input.TagName,
+	)
 	if err != nil {
 		return nil, err
 	}
 	return &pbempty.Empty{}, nil
 }
 
-func (evt *PulumiServiceEnvironmentVersionTagResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
+func (evt *PulumiServiceEnvironmentVersionTagResource) Create(
+	req *pulumirpc.CreateRequest,
+) (*pulumirpc.CreateResponse, error) {
 	ctx := context.Background()
 
 	input := evt.ToPulumiServiceEnvironmentVersionTagInput(req.GetProperties())
 
-	err := evt.Client.CreateEnvironmentRevisionTag(ctx, input.Organization, input.Project, input.Environment, input.TagName, &input.Revision)
+	err := evt.Client.CreateEnvironmentRevisionTag(
+		ctx,
+		input.Organization,
+		input.Project,
+		input.Environment,
+		input.TagName,
+		&input.Revision,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -122,8 +144,13 @@ func (evt *PulumiServiceEnvironmentVersionTagResource) Create(req *pulumirpc.Cre
 	}, nil
 }
 
-func (evt *PulumiServiceEnvironmentVersionTagResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	inputMap, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+func (evt *PulumiServiceEnvironmentVersionTagResource) Check(
+	req *pulumirpc.CheckRequest,
+) (*pulumirpc.CheckResponse, error) {
+	inputMap, err := plugin.UnmarshalProperties(
+		req.GetNews(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -141,7 +168,9 @@ func (evt *PulumiServiceEnvironmentVersionTagResource) Check(req *pulumirpc.Chec
 	return &pulumirpc.CheckResponse{Inputs: req.GetNews(), Failures: failures}, nil
 }
 
-func (evt *PulumiServiceEnvironmentVersionTagResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+func (evt *PulumiServiceEnvironmentVersionTagResource) Update(
+	req *pulumirpc.UpdateRequest,
+) (*pulumirpc.UpdateResponse, error) {
 	ctx := context.Background()
 	var input PulumiServiceEnvironmentVersionTagInput
 	err := util.FromProperties(req.GetNews(), structTagKey, &input)
@@ -149,7 +178,14 @@ func (evt *PulumiServiceEnvironmentVersionTagResource) Update(req *pulumirpc.Upd
 		return nil, err
 	}
 
-	err = evt.Client.UpdateEnvironmentRevisionTag(ctx, input.Organization, input.Project, input.Environment, input.TagName, &input.Revision)
+	err = evt.Client.UpdateEnvironmentRevisionTag(
+		ctx,
+		input.Organization,
+		input.Project,
+		input.Environment,
+		input.TagName,
+		&input.Revision,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -159,10 +195,12 @@ func (evt *PulumiServiceEnvironmentVersionTagResource) Update(req *pulumirpc.Upd
 	}, nil
 }
 
-func (evt *PulumiServiceEnvironmentVersionTagResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
+func (evt *PulumiServiceEnvironmentVersionTagResource) Read(
+	req *pulumirpc.ReadRequest,
+) (*pulumirpc.ReadResponse, error) {
 	ctx := context.Background()
 
-	orgName, projectName, environmentName, tagName, err := splitEnvironmentTagId(req.Id)
+	orgName, projectName, environmentName, tagName, err := splitEnvironmentTagID(req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -195,7 +233,7 @@ func (evt *PulumiServiceEnvironmentVersionTagResource) Read(req *pulumirpc.ReadR
 	}, nil
 }
 
-func splitEnvironmentTagId(id string) (string, string, string, string, error) {
+func splitEnvironmentTagID(id string) (string, string, string, string, error) {
 	// format:
 	//   organization/project/environment/tag or
 	//   organization/environment/tag (legacy)

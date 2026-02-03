@@ -11,8 +11,16 @@ import (
 )
 
 type DeploymentSettingsClient interface {
-	CreateDeploymentSettings(ctx context.Context, stack StackIdentifier, ds DeploymentSettings) (*DeploymentSettings, error)
-	UpdateDeploymentSettings(ctx context.Context, stack StackIdentifier, ds DeploymentSettings) (*DeploymentSettings, error)
+	CreateDeploymentSettings(
+		ctx context.Context,
+		stack StackIdentifier,
+		ds DeploymentSettings,
+	) (*DeploymentSettings, error)
+	UpdateDeploymentSettings(
+		ctx context.Context,
+		stack StackIdentifier,
+		ds DeploymentSettings,
+	) (*DeploymentSettings, error)
 	GetDeploymentSettings(ctx context.Context, stack StackIdentifier) (*DeploymentSettings, error)
 	DeleteDeploymentSettings(ctx context.Context, stack StackIdentifier) error
 }
@@ -22,7 +30,7 @@ type DeploymentSettings struct {
 	GitHub           *GitHubConfiguration     `json:"gitHub,omitempty"`
 	SourceContext    *SourceContext           `json:"sourceContext,omitempty"`
 	ExecutorContext  *apitype.ExecutorContext `json:"executorContext,omitempty"`
-	AgentPoolId      string                   `json:"agentPoolId,omitempty"`
+	AgentPoolID      string                   `json:"agentPoolId,omitempty"`
 	Source           *string                  `json:"source,omitempty"`
 	CacheOptions     *CacheOptions            `json:"cacheOptions,omitempty"`
 }
@@ -144,7 +152,11 @@ func (v *SecretValue) UnmarshalJSON(bytes []byte) error {
 	return nil
 }
 
-func (c *Client) CreateDeploymentSettings(ctx context.Context, stack StackIdentifier, ds DeploymentSettings) (*DeploymentSettings, error) {
+func (c *Client) CreateDeploymentSettings(
+	ctx context.Context,
+	stack StackIdentifier,
+	ds DeploymentSettings,
+) (*DeploymentSettings, error) {
 	apiPath := path.Join("stacks", stack.OrgName, stack.ProjectName, stack.StackName, "deployments", "settings")
 	var resultDS = &DeploymentSettings{}
 	_, err := c.do(ctx, http.MethodPut, apiPath, ds, resultDS)
@@ -154,7 +166,11 @@ func (c *Client) CreateDeploymentSettings(ctx context.Context, stack StackIdenti
 	return resultDS, nil
 }
 
-func (c *Client) UpdateDeploymentSettings(ctx context.Context, stack StackIdentifier, ds DeploymentSettings) (*DeploymentSettings, error) {
+func (c *Client) UpdateDeploymentSettings(
+	ctx context.Context,
+	stack StackIdentifier,
+	ds DeploymentSettings,
+) (*DeploymentSettings, error) {
 	apiPath := path.Join("stacks", stack.OrgName, stack.ProjectName, stack.StackName, "deployments", "settings")
 	var resultDS = &DeploymentSettings{}
 	_, err := c.do(ctx, http.MethodPut, apiPath, ds, resultDS)

@@ -97,7 +97,11 @@ type SetInsightsAccountTagsRequest struct {
 	Tags map[string]string `json:"tags"`
 }
 
-func (c *Client) CreateInsightsAccount(ctx context.Context, orgName, accountName string, req CreateInsightsAccountRequest) error {
+func (c *Client) CreateInsightsAccount(
+	ctx context.Context,
+	orgName, accountName string,
+	req CreateInsightsAccountRequest,
+) error {
 	if len(orgName) == 0 {
 		return errors.New("empty orgName")
 	}
@@ -161,7 +165,11 @@ func (c *Client) ListInsightsAccounts(ctx context.Context, orgName string) ([]In
 	return response.Accounts, nil
 }
 
-func (c *Client) UpdateInsightsAccount(ctx context.Context, orgName, accountName string, req UpdateInsightsAccountRequest) error {
+func (c *Client) UpdateInsightsAccount(
+	ctx context.Context,
+	orgName, accountName string,
+	req UpdateInsightsAccountRequest,
+) error {
 	if orgName == "" {
 		return errors.New("empty orgName")
 	}
@@ -315,7 +323,11 @@ func (c *Client) GetInsightsAccountTags(ctx context.Context, orgName, accountNam
 }
 
 // SetInsightsAccountTags sets the tags for an insights account
-func (c *Client) SetInsightsAccountTags(ctx context.Context, orgName, accountName string, tags map[string]string) error {
+func (c *Client) SetInsightsAccountTags(
+	ctx context.Context,
+	orgName, accountName string,
+	tags map[string]string,
+) error {
 	if orgName == "" {
 		return errors.New("empty orgName")
 	}

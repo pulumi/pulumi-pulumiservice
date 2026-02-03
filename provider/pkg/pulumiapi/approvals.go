@@ -24,10 +24,19 @@ import (
 // Because the API routes require envIdentifiers, I'm making these methods specific, but in the future
 // we might want to generalize them
 type ApprovalRuleClient interface {
-	CreateEnvironmentApprovalRule(ctx context.Context, orgName string, req CreateApprovalRuleRequest) (*ApprovalRule, error)
-	GetEnvironmentApprovalRule(ctx context.Context, orgName string, ruleId string) (*ApprovalRule, error)
-	UpdateEnvironmentApprovalRule(ctx context.Context, orgName string, ruleId string, req UpdateApprovalRuleRequest) (*ApprovalRule, error)
-	DeleteEnvironmentApprovalRule(ctx context.Context, orgName string, ruleId string) error
+	CreateEnvironmentApprovalRule(
+		ctx context.Context,
+		orgName string,
+		req CreateApprovalRuleRequest,
+	) (*ApprovalRule, error)
+	GetEnvironmentApprovalRule(ctx context.Context, orgName string, ruleID string) (*ApprovalRule, error)
+	UpdateEnvironmentApprovalRule(
+		ctx context.Context,
+		orgName string,
+		ruleID string,
+		req UpdateApprovalRuleRequest,
+	) (*ApprovalRule, error)
+	DeleteEnvironmentApprovalRule(ctx context.Context, orgName string, ruleID string) error
 }
 
 type ApprovalRule struct {
@@ -148,7 +157,11 @@ type EnvironmentEntity struct {
 	Name    string `json:"name"`
 }
 
-func (c *Client) CreateEnvironmentApprovalRule(ctx context.Context, orgName string, req CreateApprovalRuleRequest) (*ApprovalRule, error) {
+func (c *Client) CreateEnvironmentApprovalRule(
+	ctx context.Context,
+	orgName string,
+	req CreateApprovalRuleRequest,
+) (*ApprovalRule, error) {
 	apiPath := path.Join("change-gates", orgName)
 
 	var rule ApprovalRule
@@ -160,8 +173,8 @@ func (c *Client) CreateEnvironmentApprovalRule(ctx context.Context, orgName stri
 	return &rule, nil
 }
 
-func (c *Client) GetEnvironmentApprovalRule(ctx context.Context, orgName string, ruleId string) (*ApprovalRule, error) {
-	apiPath := path.Join("change-gates", orgName, ruleId)
+func (c *Client) GetEnvironmentApprovalRule(ctx context.Context, orgName string, ruleID string) (*ApprovalRule, error) {
+	apiPath := path.Join("change-gates", orgName, ruleID)
 
 	var rule ApprovalRule
 	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &rule)
@@ -172,8 +185,13 @@ func (c *Client) GetEnvironmentApprovalRule(ctx context.Context, orgName string,
 	return &rule, nil
 }
 
-func (c *Client) UpdateEnvironmentApprovalRule(ctx context.Context, orgName string, ruleId string, req UpdateApprovalRuleRequest) (*ApprovalRule, error) {
-	apiPath := path.Join("change-gates", orgName, ruleId)
+func (c *Client) UpdateEnvironmentApprovalRule(
+	ctx context.Context,
+	orgName string,
+	ruleID string,
+	req UpdateApprovalRuleRequest,
+) (*ApprovalRule, error) {
+	apiPath := path.Join("change-gates", orgName, ruleID)
 
 	var rule ApprovalRule
 	_, err := c.do(ctx, http.MethodPut, apiPath, req, &rule)
@@ -184,8 +202,8 @@ func (c *Client) UpdateEnvironmentApprovalRule(ctx context.Context, orgName stri
 	return &rule, nil
 }
 
-func (c *Client) DeleteEnvironmentApprovalRule(ctx context.Context, orgName string, ruleId string) error {
-	apiPath := path.Join("change-gates", orgName, ruleId)
+func (c *Client) DeleteEnvironmentApprovalRule(ctx context.Context, orgName string, ruleID string) error {
+	apiPath := path.Join("change-gates", orgName, ruleID)
 
 	result, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
 	if err != nil {

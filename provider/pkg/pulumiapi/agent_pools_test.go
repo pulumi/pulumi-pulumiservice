@@ -8,22 +8,28 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const (
+	testOrgName       = "anOrg"
+	testAgentPoolID   = "abcdegh"
+	testAgentPoolUUID = "uuid"
+)
+
 func TestDeleteAgentPool(t *testing.T) {
-	orgName := "anOrg"
-	agentPoolId := "abcdegh"
+	orgName := testOrgName
+	agentPoolID := testAgentPoolID
 	t.Run("Happy Path", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
-			ExpectedReqPath:   "/api/orgs/anOrg/agent-pools/" + agentPoolId,
+			ExpectedReqPath:   "/api/orgs/" + testOrgName + "/agent-pools/" + agentPoolID,
 			ResponseCode:      204,
 		})
-		assert.NoError(t, c.DeleteAgentPool(teamCtx, agentPoolId, orgName, false))
+		assert.NoError(t, c.DeleteAgentPool(teamCtx, agentPoolID, orgName, false))
 	})
 
 	t.Run("Error", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
-			ExpectedReqPath:   "/api/orgs/anOrg/agent-pools/" + agentPoolId,
+			ExpectedReqPath:   "/api/orgs/" + testOrgName + "/agent-pools/" + agentPoolID,
 			ResponseCode:      404,
 			ResponseBody: ErrorResponse{
 				StatusCode: 404,
@@ -31,15 +37,15 @@ func TestDeleteAgentPool(t *testing.T) {
 			},
 		})
 		assert.EqualError(t,
-			c.DeleteAgentPool(teamCtx, agentPoolId, orgName, false),
-			`failed to delete agent pool "abcdegh": 404 API error: agent pool not found`,
+			c.DeleteAgentPool(teamCtx, agentPoolID, orgName, false),
+			fmt.Sprintf(`failed to delete agent pool "%s": 404 API error: agent pool not found`, testAgentPoolID),
 		)
 	})
 
 }
 
 func TestCreateAgentPool(t *testing.T) {
-	orgName := "anOrg"
+	orgName := testOrgName
 	name := "anAgentPool"
 	desc := "agent pool description"
 
@@ -54,7 +60,7 @@ func TestCreateAgentPool(t *testing.T) {
 				Description: desc,
 				Name:        name,
 			},
-			ExpectedReqPath: "/api/orgs/anOrg/agent-pools",
+			ExpectedReqPath: "/api/orgs/" + testOrgName + "/agent-pools",
 			ResponseCode:    201,
 			ResponseBody:    resp,
 		})
@@ -71,7 +77,7 @@ func TestCreateAgentPool(t *testing.T) {
 	t.Run("Error", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
-			ExpectedReqPath:   "/api/orgs/anOrg/agent-pools",
+			ExpectedReqPath:   "/api/orgs/" + testOrgName + "/agent-pools",
 			ExpectedReqBody: createUpdateAgentPoolRequest{
 				Description: desc,
 				Name:        name,
@@ -92,10 +98,10 @@ func TestCreateAgentPool(t *testing.T) {
 }
 
 func TestGetAgentPool(t *testing.T) {
-	id := "uuid"
+	id := testAgentPoolUUID
 	name := "Pool 1"
 	desc := "agent pool description"
-	org := "anOrg"
+	org := testOrgName
 	t.Run("Happy Path", func(t *testing.T) {
 		resp := AgentPool{
 			ID:          id,

@@ -7,10 +7,16 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const (
+	testMemberUserName = "a-user"
+	testMemberRole     = "admin"
+	testMemberOrgName  = "an-organization"
+)
+
 func TestAddMemberToOrg(t *testing.T) {
-	userName := "a-user"
-	orgName := "an-organization"
-	role := "admin"
+	userName := testMemberUserName
+	orgName := testMemberOrgName
+	role := testMemberRole
 	t.Run("Happy Path", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
@@ -42,9 +48,9 @@ func TestAddMemberToOrg(t *testing.T) {
 }
 
 func TestListOrgMembers(t *testing.T) {
-	userName := "a-user"
-	orgName := "an-organization"
-	role := "admin"
+	userName := testMemberUserName
+	orgName := testMemberOrgName
+	role := testMemberRole
 	members := Members{
 		Members: []Member{
 			{
@@ -83,8 +89,8 @@ func TestListOrgMembers(t *testing.T) {
 }
 
 func TestDeleteMemberFromOrg(t *testing.T) {
-	userName := "a-user"
-	orgName := "an-organization"
+	userName := testMemberUserName
+	orgName := testMemberOrgName
 	t.Run("Happy Path", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,

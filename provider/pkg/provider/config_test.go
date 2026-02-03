@@ -4,8 +4,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/pulumi/pulumi/sdk/v3/go/common/workspace"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/pulumi/pulumi/sdk/v3/go/common/workspace"
 )
 
 const (

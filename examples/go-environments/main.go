@@ -69,15 +69,19 @@ func main() {
 			return err
 		}
 
-		_, err = pulumiservice.NewTeamEnvironmentPermission(ctx, "teamEnvironmentPermission", &pulumiservice.TeamEnvironmentPermissionArgs{
-			Organization: environment.Organization,
-			Team: team.Name.ApplyT(func(name *string) (string, error) {
-				return *name, nil
-			}).(pulumi.StringOutput),
-			Environment: environment.Name,
-			Project:     environment.Project,
-			Permission:  pulumiservice.EnvironmentPermissionAdmin,
-		})
+		_, err = pulumiservice.NewTeamEnvironmentPermission(
+			ctx,
+			"teamEnvironmentPermission",
+			&pulumiservice.TeamEnvironmentPermissionArgs{
+				Organization: environment.Organization,
+				Team: team.Name.ApplyT(func(name *string) (string, error) {
+					return *name, nil
+				}).(pulumi.StringOutput),
+				Environment: environment.Name,
+				Project:     environment.Project,
+				Permission:  pulumiservice.EnvironmentPermissionAdmin,
+			},
+		)
 		if err != nil {
 			return err
 		}

@@ -9,14 +9,13 @@ import (
 	"github.com/pulumi/providertest/pulumitest/assertpreview"
 	"github.com/pulumi/providertest/pulumitest/assertrefresh"
 	"github.com/pulumi/providertest/pulumitest/opttest"
+	psp "github.com/pulumi/pulumi-pulumiservice/provider/pkg/provider"
 	"github.com/pulumi/pulumi/sdk/v3/go/auto"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
-
-	psp "github.com/pulumi/pulumi-pulumiservice/provider/pkg/provider"
 )
 
 // The default test org to use.
-var ServiceProviderTestOrg string = "service-provider-test-org"
+var ServiceProviderTestOrg = "service-provider-test-org"
 
 func TestMain(m *testing.M) {
 	// Set default test owner if not already set
@@ -34,7 +33,7 @@ func TestMain(m *testing.M) {
 }
 
 func inMemoryProvider() opttest.Option {
-	provider := func(pt providers.PulumiTest) (pulumirpc.ResourceProviderServer, error) {
+	provider := func(_ providers.PulumiTest) (pulumirpc.ResourceProviderServer, error) {
 		return psp.MakeProvider(nil, "pulumiservice", "1.0.0")
 	}
 	return opttest.AttachProviderServer("pulumiservice", provider)

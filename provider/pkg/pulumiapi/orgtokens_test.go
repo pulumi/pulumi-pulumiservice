@@ -8,22 +8,28 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const (
+	testOrgTokenOrgName     = "anOrg"
+	testOrgTokenID          = "abcdegh"
+	testOrgTokenDescription = "token description"
+)
+
 func TestDeleteOrgAccessToken(t *testing.T) {
-	orgName := "anOrg"
-	tokenId := "abcdegh"
+	orgName := testOrgTokenOrgName
+	tokenID := testOrgTokenID
 	t.Run("Happy Path", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
-			ExpectedReqPath:   "/api/orgs/anOrg/tokens/" + tokenId,
+			ExpectedReqPath:   "/api/orgs/anOrg/tokens/" + tokenID,
 			ResponseCode:      204,
 		})
-		assert.NoError(t, c.DeleteOrgAccessToken(teamCtx, tokenId, orgName))
+		assert.NoError(t, c.DeleteOrgAccessToken(teamCtx, tokenID, orgName))
 	})
 
 	t.Run("Error", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
-			ExpectedReqPath:   "/api/orgs/anOrg/tokens/" + tokenId,
+			ExpectedReqPath:   "/api/orgs/anOrg/tokens/" + tokenID,
 			ResponseCode:      404,
 			ResponseBody: ErrorResponse{
 				StatusCode: 404,
@@ -31,17 +37,17 @@ func TestDeleteOrgAccessToken(t *testing.T) {
 			},
 		})
 		assert.EqualError(t,
-			c.DeleteOrgAccessToken(teamCtx, tokenId, orgName),
-			`failed to delete access token "abcdegh": 404 API error: token not found`,
+			c.DeleteOrgAccessToken(teamCtx, tokenID, orgName),
+			fmt.Sprintf(`failed to delete access token "%s": 404 API error: token not found`, testOrgTokenID),
 		)
 	})
 
 }
 
 func TestCreateOrgAccessToken(t *testing.T) {
-	orgName := "anOrg"
+	orgName := testOrgTokenOrgName
 	name := "anOrgToken"
-	desc := "token description"
+	desc := testOrgTokenDescription
 
 	t.Run("Happy Path", func(t *testing.T) {
 		resp := createTokenResponse{
@@ -117,8 +123,8 @@ func TestCreateOrgAccessToken(t *testing.T) {
 
 func TestGetOrgAccessToken(t *testing.T) {
 	id := "uuid"
-	desc := "token description"
-	org := "anOrg"
+	desc := testOrgTokenDescription
+	org := testOrgTokenOrgName
 	lastUsed := 123
 	t.Run("Happy Path", func(t *testing.T) {
 		resp := listTokenResponse{

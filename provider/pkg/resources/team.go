@@ -13,6 +13,11 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
+const (
+	teamTypeGitHub = "github"
+	teamTypePulumi = "pulumi"
+)
+
 type Team struct{}
 
 var (
@@ -24,13 +29,17 @@ var (
 )
 
 func (t *Team) Annotate(a infer.Annotator) {
-	a.Describe(t, "The Pulumi Cloud offers role-based access control (RBAC) using teams. Teams allow organization admins to assign a set of stack permissions to a group of users.")
+	a.Describe(
+		t,
+		"The Pulumi Cloud offers role-based access control (RBAC) using teams. Teams allow organization admins "+
+			"to assign a set of stack permissions to a group of users.",
+	)
 }
 
 type TeamCore struct {
-	OrganizationName string   `pulumi:"organizationName" provider:"replaceOnChanges"`
-	Type             string   `pulumi:"teamType" provider:"replaceOnChanges"`
-	Name             *string  `pulumi:"name,optional" provider:"replaceOnChanges"`
+	OrganizationName string   `pulumi:"organizationName"      provider:"replaceOnChanges"`
+	Type             string   `pulumi:"teamType"              provider:"replaceOnChanges"`
+	Name             *string  `pulumi:"name,optional"         provider:"replaceOnChanges"`
 	DisplayName      *string  `pulumi:"displayName,optional"`
 	Description      *string  `pulumi:"description,optional"`
 	GitHubTeamID     *float64 `pulumi:"githubTeamId,optional"`
@@ -42,7 +51,11 @@ func (t *TeamCore) Annotate(a infer.Annotator) {
 	a.Describe(&t.Name, "The team's name. Required for \"pulumi\" teams.")
 	a.Describe(&t.OrganizationName, "The name of the Pulumi organization the team belongs to.")
 	a.Describe(&t.Type, "The type of team. Must be either `pulumi` or `github`.")
-	a.Describe(&t.GitHubTeamID, `The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for "github" teams.`)
+	a.Describe(
+		&t.GitHubTeamID,
+		`The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is `+
+			`backed by. Required for "github" teams.`,
+	)
 }
 
 type TeamInput struct {
@@ -84,7 +97,11 @@ func (*Team) Create(ctx context.Context, req infer.CreateRequest[TeamInput]) (in
 		int64(util.OrZero(req.Inputs.GitHubTeamID)),
 	)
 	if err != nil {
-		return infer.CreateResponse[TeamState]{}, fmt.Errorf("error creating team '%s': %s", util.OrZero(req.Inputs.Name), err.Error())
+		return infer.CreateResponse[TeamState]{}, fmt.Errorf(
+			"error creating team '%s': %s",
+			util.OrZero(req.Inputs.Name),
+			err.Error(),
+		)
 	}
 
 	// We have now created a teamUrn.  It is very important to ensure that from this point on, any other error
@@ -146,21 +163,21 @@ func (*Team) Check(ctx context.Context, req infer.CheckRequest) (infer.CheckResp
 	if err != nil {
 		return infer.CheckResponse[TeamInput]{}, nil
 	}
-	if i.Type != "github" && i.Type != "pulumi" {
+	if i.Type != teamTypeGitHub && i.Type != teamTypePulumi {
 		checkFailures = append(checkFailures, p.CheckFailure{
 			Reason:   fmt.Sprintf("found %q instead of 'pulumi' or 'github'", i.Type),
 			Property: "type",
 		})
 	}
 
-	if i.Type == "github" && i.GitHubTeamID == nil {
+	if i.Type == teamTypeGitHub && i.GitHubTeamID == nil {
 		checkFailures = append(checkFailures, p.CheckFailure{
 			Reason:   "teams with teamType 'github' require a githubTeamId",
 			Property: "githubTeamId",
 		})
 	}
 
-	if i.Type == "pulumi" && i.Name == nil {
+	if i.Type == teamTypePulumi && i.Name == nil {
 		checkFailures = append(checkFailures, p.CheckFailure{
 			Reason:   "teams with teamType 'pulumi' require a name",
 			Property: "name",
@@ -186,7 +203,10 @@ func (*Team) Delete(ctx context.Context, req infer.DeleteRequest[TeamState]) (in
 	return infer.DeleteResponse{}, client.DeleteTeam(ctx, req.State.OrganizationName, util.OrZero(req.State.Name))
 }
 
-func (*Team) Read(ctx context.Context, req infer.ReadRequest[TeamInput, TeamState]) (infer.ReadResponse[TeamInput, TeamState], error) {
+func (*Team) Read(
+	ctx context.Context,
+	req infer.ReadRequest[TeamInput, TeamState],
+) (infer.ReadResponse[TeamInput, TeamState], error) {
 	client := config.GetClient(ctx)
 	orgName, teamName, err := splitSingleSlashString(req.ID)
 	if err != nil {
@@ -229,7 +249,10 @@ func (*Team) Read(ctx context.Context, req infer.ReadRequest[TeamInput, TeamStat
 	}, nil
 }
 
-func (*Team) Update(ctx context.Context, req infer.UpdateRequest[TeamInput, TeamState]) (infer.UpdateResponse[TeamState], error) {
+func (*Team) Update(
+	ctx context.Context,
+	req infer.UpdateRequest[TeamInput, TeamState],
+) (infer.UpdateResponse[TeamState], error) {
 	if req.DryRun {
 		return infer.UpdateResponse[TeamState]{
 			Output: TeamState{
@@ -241,7 +264,13 @@ func (*Team) Update(ctx context.Context, req infer.UpdateRequest[TeamInput, Team
 	client := config.GetClient(ctx)
 
 	if req.State.Description != req.Inputs.Description || req.State.DisplayName != req.Inputs.DisplayName {
-		err := client.UpdateTeam(ctx, req.Inputs.OrganizationName, util.OrZero(req.Inputs.Name), util.OrZero(req.Inputs.DisplayName), util.OrZero(req.Inputs.Description))
+		err := client.UpdateTeam(
+			ctx,
+			req.Inputs.OrganizationName,
+			util.OrZero(req.Inputs.Name),
+			util.OrZero(req.Inputs.DisplayName),
+			util.OrZero(req.Inputs.Description),
+		)
 		if err != nil {
 			return infer.UpdateResponse[TeamState]{}, err
 		}
@@ -251,11 +280,16 @@ func (*Team) Update(ctx context.Context, req infer.UpdateRequest[TeamInput, Team
 	members := make([]string, len(req.State.Members))
 	copy(members, req.State.Members)
 
-	if !slices.Equal(req.Inputs.Members, req.State.Members) && req.Inputs.Type != "github" {
+	if !slices.Equal(req.Inputs.Members, req.State.Members) && req.Inputs.Type != teamTypeGitHub {
 		for i := len(req.State.Members) - 1; i >= 0; i-- {
 			usernameToDelete := req.State.Members[i]
 			if !slices.Contains(req.Inputs.Members, usernameToDelete) {
-				err := client.DeleteMemberFromTeam(ctx, req.Inputs.OrganizationName, util.OrZero(req.Inputs.Name), usernameToDelete)
+				err := client.DeleteMemberFromTeam(
+					ctx,
+					req.Inputs.OrganizationName,
+					util.OrZero(req.Inputs.Name),
+					usernameToDelete,
+				)
 				if err != nil {
 					slices.Sort(members)
 					// We have failed to delete a member, but we may
@@ -282,7 +316,12 @@ func (*Team) Update(ctx context.Context, req infer.UpdateRequest[TeamInput, Team
 
 		for _, usernameToAdd := range req.Inputs.Members {
 			if !slices.Contains(req.State.Members, usernameToAdd) {
-				err := client.AddMemberToTeam(ctx, req.Inputs.OrganizationName, util.OrZero(req.Inputs.Name), usernameToAdd)
+				err := client.AddMemberToTeam(
+					ctx,
+					req.Inputs.OrganizationName,
+					util.OrZero(req.Inputs.Name),
+					usernameToAdd,
+				)
 				if err != nil {
 					slices.Sort(members)
 					return infer.UpdateResponse[TeamState]{

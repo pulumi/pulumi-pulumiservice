@@ -26,7 +26,10 @@ type PulumiServiceAgentPoolInput struct {
 	ForceDestroy bool
 }
 
-func GenerateAgentPoolProperties(input PulumiServiceAgentPoolInput, agentPool pulumiapi.AgentPool) (outputs *structpb.Struct, inputs *structpb.Struct, err error) {
+func GenerateAgentPoolProperties(
+	input PulumiServiceAgentPoolInput,
+	agentPool pulumiapi.AgentPool,
+) (outputs *structpb.Struct, inputs *structpb.Struct, err error) {
 	inputMap := resource.PropertyMap{}
 	inputMap["name"] = resource.NewPropertyValue(input.Name)
 	inputMap["organizationName"] = resource.NewPropertyValue(input.OrgName)
@@ -38,7 +41,7 @@ func GenerateAgentPoolProperties(input PulumiServiceAgentPoolInput, agentPool pu
 	}
 
 	outputMap := resource.PropertyMap{}
-	outputMap["agentPoolId"] = resource.NewPropertyValue(agentPool.ID)
+	outputMap["agentPoolID"] = resource.NewPropertyValue(agentPool.ID)
 	outputMap["name"] = inputMap["name"]
 	outputMap["organizationName"] = inputMap["organizationName"]
 	outputMap["tokenValue"] = resource.NewPropertyValue(agentPool.TokenValue)
@@ -62,7 +65,9 @@ func GenerateAgentPoolProperties(input PulumiServiceAgentPoolInput, agentPool pu
 	return outputs, inputs, err
 }
 
-func (ap *PulumiServiceAgentPoolResource) ToPulumiServiceAgentPoolInput(inputMap resource.PropertyMap) PulumiServiceAgentPoolInput {
+func (ap *PulumiServiceAgentPoolResource) ToPulumiServiceAgentPoolInput(
+	inputMap resource.PropertyMap,
+) PulumiServiceAgentPoolInput {
 	input := PulumiServiceAgentPoolInput{}
 
 	if inputMap["name"].HasValue() && inputMap["name"].IsString() {
@@ -89,7 +94,10 @@ func (ap *PulumiServiceAgentPoolResource) Name() string {
 }
 
 func (ap *PulumiServiceAgentPoolResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
+	olds, err := plugin.UnmarshalProperties(
+		req.GetOldInputs(),
+		plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -117,7 +125,7 @@ func (ap *PulumiServiceAgentPoolResource) Diff(req *pulumirpc.DiffRequest) (*pul
 			v.Kind = v.Kind.AsReplace()
 		}
 		detailedDiffs[k] = &pulumirpc.PropertyDiff{
-			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind),
+			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind), //nolint:gosec // safe conversion from plugin.DiffKind
 			InputDiff: v.InputDiff,
 		}
 	}
@@ -135,7 +143,10 @@ func (ap *PulumiServiceAgentPoolResource) Diff(req *pulumirpc.DiffRequest) (*pul
 
 func (ap *PulumiServiceAgentPoolResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
 	ctx := context.Background()
-	inputs, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	inputs, err := plugin.UnmarshalProperties(
+		req.GetProperties(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -156,7 +167,10 @@ func (ap *PulumiServiceAgentPoolResource) Delete(req *pulumirpc.DeleteRequest) (
 
 func (ap *PulumiServiceAgentPoolResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	ctx := context.Background()
-	inputMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	inputMap, err := plugin.UnmarshalProperties(
+		req.GetProperties(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -187,12 +201,15 @@ func (ap *PulumiServiceAgentPoolResource) Update(req *pulumirpc.UpdateRequest) (
 	ctx := context.Background()
 
 	// ignore orgName because if that changed, we would have done a replace, so update would never have been called
-	_, _, agentPoolId, err := splitAgentPoolId(req.GetId())
+	_, _, agentPoolID, err := splitAgentPoolID(req.GetId())
 	if err != nil {
 		return nil, fmt.Errorf("invalid resource id: %v", err)
 	}
 
-	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	olds, err := plugin.UnmarshalProperties(
+		req.GetOldInputs(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -208,7 +225,7 @@ func (ap *PulumiServiceAgentPoolResource) Update(req *pulumirpc.UpdateRequest) (
 	changedInputs["forceDestroy"] = news["forceDestroy"]
 
 	inputsAgentPool := ap.ToPulumiServiceAgentPoolInput(changedInputs)
-	err = ap.updateAgentPool(ctx, agentPoolId, inputsAgentPool)
+	err = ap.updateAgentPool(ctx, agentPoolID, inputsAgentPool)
 	if err != nil {
 		return nil, fmt.Errorf("error updating agent pool '%s': %s", inputsAgentPool.Name, err.Error())
 	}
@@ -230,13 +247,13 @@ func (ap *PulumiServiceAgentPoolResource) Read(req *pulumirpc.ReadRequest) (*pul
 	ctx := context.Background()
 	urn := req.GetId()
 
-	orgName, _, agentPoolId, err := splitAgentPoolId(urn)
+	orgName, _, agentPoolID, err := splitAgentPoolID(urn)
 	if err != nil {
 		return nil, err
 	}
 
 	// the agent id is immutable; if we get nil it got deleted, otherwise all data is the same
-	agentPool, err := ap.Client.GetAgentPool(ctx, agentPoolId, orgName)
+	agentPool, err := ap.Client.GetAgentPool(ctx, agentPoolID, orgName)
 	if err != nil {
 		return nil, err
 	}
@@ -269,7 +286,10 @@ func (ap *PulumiServiceAgentPoolResource) Read(req *pulumirpc.ReadRequest) (*pul
 	}, nil
 }
 
-func (ap *PulumiServiceAgentPoolResource) createAgentPool(ctx context.Context, input PulumiServiceAgentPoolInput) (*pulumiapi.AgentPool, error) {
+func (ap *PulumiServiceAgentPoolResource) createAgentPool(
+	ctx context.Context,
+	input PulumiServiceAgentPoolInput,
+) (*pulumiapi.AgentPool, error) {
 	agentPool, err := ap.Client.CreateAgentPool(ctx, input.OrgName, input.Name, input.Description)
 	if err != nil {
 		return nil, err
@@ -278,25 +298,29 @@ func (ap *PulumiServiceAgentPoolResource) createAgentPool(ctx context.Context, i
 	return agentPool, nil
 }
 
-func (ap *PulumiServiceAgentPoolResource) updateAgentPool(ctx context.Context, agentPoolId string, input PulumiServiceAgentPoolInput) error {
-	return ap.Client.UpdateAgentPool(ctx, agentPoolId, input.OrgName, input.Name, input.Description)
+func (ap *PulumiServiceAgentPoolResource) updateAgentPool(
+	ctx context.Context,
+	agentPoolID string,
+	input PulumiServiceAgentPoolInput,
+) error {
+	return ap.Client.UpdateAgentPool(ctx, agentPoolID, input.OrgName, input.Name, input.Description)
 }
 
 func (ap *PulumiServiceAgentPoolResource) deleteAgentPool(ctx context.Context, id string, forceDestroy bool) error {
 	// we don't need the token name when we delete
-	orgName, _, agentPoolId, err := splitAgentPoolId(id)
+	orgName, _, agentPoolID, err := splitAgentPoolID(id)
 	if err != nil {
 		return err
 	}
-	return ap.Client.DeleteAgentPool(ctx, agentPoolId, orgName, forceDestroy)
+	return ap.Client.DeleteAgentPool(ctx, agentPoolID, orgName, forceDestroy)
 
 }
 
-func splitAgentPoolId(id string) (string, string, string, error) {
-	// format: organization/name/agentPoolId
+func splitAgentPoolID(id string) (string, string, string, error) {
+	// format: organization/name/agentPoolID
 	s := strings.Split(id, "/")
 	if len(s) != 3 {
-		return "", "", "", fmt.Errorf("%q is invalid, must be in the format: organization/name/agentPoolId", id)
+		return "", "", "", fmt.Errorf("%q is invalid, must be in the format: organization/name/agentPoolID", id)
 	}
 	return s[0], s[1], s[2], nil
 }

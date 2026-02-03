@@ -26,7 +26,10 @@ type PulumiServiceTeamAccessTokenInput struct {
 	Description string
 }
 
-func GenerateTeamAccessTokenProperties(input PulumiServiceTeamAccessTokenInput, teamAccessToken pulumiapi.AccessToken) (outputs *structpb.Struct, inputs *structpb.Struct, err error) {
+func GenerateTeamAccessTokenProperties(
+	input PulumiServiceTeamAccessTokenInput,
+	teamAccessToken pulumiapi.AccessToken,
+) (outputs *structpb.Struct, inputs *structpb.Struct, err error) {
 	inputMap := input.ToPropertyMap()
 
 	outputMap := inputMap.Copy()
@@ -55,7 +58,9 @@ func (i *PulumiServiceTeamAccessTokenInput) ToPropertyMap() resource.PropertyMap
 	return pm
 }
 
-func (t *PulumiServiceTeamAccessTokenResource) ToPulumiServiceAccessTokenInput(inputMap resource.PropertyMap) PulumiServiceTeamAccessTokenInput {
+func (t *PulumiServiceTeamAccessTokenResource) ToPulumiServiceAccessTokenInput(
+	inputMap resource.PropertyMap,
+) PulumiServiceTeamAccessTokenInput {
 	input := PulumiServiceTeamAccessTokenInput{}
 
 	if inputMap["name"].HasValue() && inputMap["name"].IsString() {
@@ -98,7 +103,10 @@ func (t *PulumiServiceTeamAccessTokenResource) Delete(req *pulumirpc.DeleteReque
 
 func (t *PulumiServiceTeamAccessTokenResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	ctx := context.Background()
-	inputMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	inputMap, err := plugin.UnmarshalProperties(
+		req.GetProperties(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -134,13 +142,13 @@ func (t *PulumiServiceTeamAccessTokenResource) Read(req *pulumirpc.ReadRequest) 
 	ctx := context.Background()
 	urn := req.GetId()
 
-	orgName, teamName, tokenName, tokenId, err := splitTeamAccessTokenId(urn)
+	orgName, teamName, tokenName, tokenID, err := splitTeamAccessTokenID(urn)
 	if err != nil {
 		return nil, err
 	}
 
 	// the team access token is immutable; if we get nil it got deleted, otherwise all data is the same
-	accessToken, err := t.Client.GetTeamAccessToken(ctx, tokenId, orgName, teamName)
+	accessToken, err := t.Client.GetTeamAccessToken(ctx, tokenID, orgName, teamName)
 	if err != nil {
 		return nil, err
 	}
@@ -175,9 +183,18 @@ func (t *PulumiServiceTeamAccessTokenResource) Read(req *pulumirpc.ReadRequest) 
 	}, nil
 }
 
-func (t *PulumiServiceTeamAccessTokenResource) createTeamAccessToken(ctx context.Context, input PulumiServiceTeamAccessTokenInput) (*pulumiapi.AccessToken, error) {
+func (t *PulumiServiceTeamAccessTokenResource) createTeamAccessToken(
+	ctx context.Context,
+	input PulumiServiceTeamAccessTokenInput,
+) (*pulumiapi.AccessToken, error) {
 
-	accessToken, err := t.Client.CreateTeamAccessToken(ctx, input.Name, input.OrgName, input.TeamName, input.Description)
+	accessToken, err := t.Client.CreateTeamAccessToken(
+		ctx,
+		input.Name,
+		input.OrgName,
+		input.TeamName,
+		input.Description,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -186,16 +203,16 @@ func (t *PulumiServiceTeamAccessTokenResource) createTeamAccessToken(ctx context
 }
 
 func (t *PulumiServiceTeamAccessTokenResource) deleteTeamAccessToken(ctx context.Context, id string) error {
-	orgName, teamName, _, tokenId, err := splitTeamAccessTokenId(id)
+	orgName, teamName, _, tokenID, err := splitTeamAccessTokenID(id)
 	if err != nil {
 		return err
 	}
-	return t.Client.DeleteTeamAccessToken(ctx, tokenId, orgName, teamName)
+	return t.Client.DeleteTeamAccessToken(ctx, tokenID, orgName, teamName)
 
 }
 
-func splitTeamAccessTokenId(id string) (string, string, string, string, error) {
-	// format: organization/teamName/tokenName/tokenId
+func splitTeamAccessTokenID(id string) (string, string, string, string, error) {
+	// format: organization/teamName/tokenName/tokenID
 	s := strings.Split(id, "/")
 	if len(s) != 4 {
 		return "", "", "", "", fmt.Errorf("%q is invalid, must contain a single slash ('/')", id)

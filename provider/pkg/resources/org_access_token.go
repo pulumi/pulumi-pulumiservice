@@ -26,7 +26,10 @@ type PulumiServiceOrgAccessTokenInput struct {
 	Admin       bool
 }
 
-func GenerateOrgAccessTokenProperties(input PulumiServiceOrgAccessTokenInput, orgAccessToken pulumiapi.AccessToken) (outputs *structpb.Struct, inputs *structpb.Struct, err error) {
+func GenerateOrgAccessTokenProperties(
+	input PulumiServiceOrgAccessTokenInput,
+	orgAccessToken pulumiapi.AccessToken,
+) (outputs *structpb.Struct, inputs *structpb.Struct, err error) {
 	inputMap := input.ToPropertyMap()
 
 	outputMap := inputMap.Copy()
@@ -55,7 +58,9 @@ func (i *PulumiServiceOrgAccessTokenInput) ToPropertyMap() resource.PropertyMap 
 	return pm
 }
 
-func (ot *PulumiServiceOrgAccessTokenResource) ToPulumiServiceOrgAccessTokenInput(inputMap resource.PropertyMap) PulumiServiceOrgAccessTokenInput {
+func (ot *PulumiServiceOrgAccessTokenResource) ToPulumiServiceOrgAccessTokenInput(
+	inputMap resource.PropertyMap,
+) PulumiServiceOrgAccessTokenInput {
 	input := PulumiServiceOrgAccessTokenInput{}
 
 	if inputMap["name"].HasValue() && inputMap["name"].IsString() {
@@ -98,7 +103,10 @@ func (ot *PulumiServiceOrgAccessTokenResource) Delete(req *pulumirpc.DeleteReque
 
 func (ot *PulumiServiceOrgAccessTokenResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	ctx := context.Background()
-	inputMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	inputMap, err := plugin.UnmarshalProperties(
+		req.GetProperties(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -135,13 +143,13 @@ func (ot *PulumiServiceOrgAccessTokenResource) Read(req *pulumirpc.ReadRequest) 
 	ctx := context.Background()
 	urn := req.GetId()
 
-	orgName, _, tokenId, err := splitOrgAccessTokenId(urn)
+	orgName, _, tokenID, err := splitOrgAccessTokenID(urn)
 	if err != nil {
 		return nil, err
 	}
 
 	// the org access token is immutable; if we get nil it got deleted, otherwise all data is the same
-	accessToken, err := ot.Client.GetOrgAccessToken(ctx, tokenId, orgName)
+	accessToken, err := ot.Client.GetOrgAccessToken(ctx, tokenID, orgName)
 	if err != nil {
 		return nil, err
 	}
@@ -176,7 +184,10 @@ func (ot *PulumiServiceOrgAccessTokenResource) Read(req *pulumirpc.ReadRequest) 
 	}, nil
 }
 
-func (ot *PulumiServiceOrgAccessTokenResource) createOrgAccessToken(ctx context.Context, input PulumiServiceOrgAccessTokenInput) (*pulumiapi.AccessToken, error) {
+func (ot *PulumiServiceOrgAccessTokenResource) createOrgAccessToken(
+	ctx context.Context,
+	input PulumiServiceOrgAccessTokenInput,
+) (*pulumiapi.AccessToken, error) {
 
 	accessToken, err := ot.Client.CreateOrgAccessToken(ctx, input.Name, input.OrgName, input.Description, input.Admin)
 	if err != nil {
@@ -188,25 +199,25 @@ func (ot *PulumiServiceOrgAccessTokenResource) createOrgAccessToken(ctx context.
 
 func (ot *PulumiServiceOrgAccessTokenResource) deleteOrgAccessToken(ctx context.Context, id string) error {
 	// we don't need the token name when we delete
-	orgName, _, tokenId, err := splitOrgAccessTokenId(id)
+	orgName, _, tokenID, err := splitOrgAccessTokenID(id)
 	if err != nil {
 		return err
 	}
-	return ot.Client.DeleteOrgAccessToken(ctx, tokenId, orgName)
+	return ot.Client.DeleteOrgAccessToken(ctx, tokenID, orgName)
 
 }
 
-func splitOrgAccessTokenId(id string) (string, string, string, error) {
-	// format: organization/name/tokenId
+func splitOrgAccessTokenID(id string) (string, string, string, error) {
+	// format: organization/name/tokenID
 	s := strings.Split(id, "/")
 	if len(s) < 3 {
 		return "", "", "", fmt.Errorf("%q is invalid, must contain a single slash ('/')", id)
 	}
 
 	org := s[0]
-	tokenId := s[len(s)-1]
+	tokenID := s[len(s)-1]
 	// Name can contain slashes so this joins the split parts except for first and last
 	name := strings.Join(s[1:len(s)-1], "/")
 
-	return org, name, tokenId, nil
+	return org, name, tokenID, nil
 }

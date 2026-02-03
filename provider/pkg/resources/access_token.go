@@ -23,7 +23,10 @@ type PulumiServiceAccessTokenInput struct {
 }
 
 // AccessToken uses outdated way of storing input in internal __inputs property
-func GenerateAcessTokenProperties(input PulumiServiceAccessTokenInput, accessToken pulumiapi.AccessToken) (outputs *structpb.Struct, inputs *structpb.Struct, err error) {
+func GenerateAcessTokenProperties(
+	input PulumiServiceAccessTokenInput,
+	accessToken pulumiapi.AccessToken,
+) (outputs *structpb.Struct, inputs *structpb.Struct, err error) {
 	inputMap := resource.PropertyMap{}
 	inputMap["description"] = resource.NewPropertyValue(input.Description)
 	outputStore := resource.PropertyMap{}
@@ -50,7 +53,9 @@ func GenerateAcessTokenProperties(input PulumiServiceAccessTokenInput, accessTok
 	return outputs, inputs, err
 }
 
-func (at *PulumiServiceAccessTokenResource) ToPulumiServiceAccessTokenInput(inputMap resource.PropertyMap) PulumiServiceAccessTokenInput {
+func (at *PulumiServiceAccessTokenResource) ToPulumiServiceAccessTokenInput(
+	inputMap resource.PropertyMap,
+) PulumiServiceAccessTokenInput {
 	input := PulumiServiceAccessTokenInput{}
 
 	if inputMap["description"].HasValue() && inputMap["description"].IsString() {
@@ -80,7 +85,10 @@ func (at *PulumiServiceAccessTokenResource) Delete(req *pulumirpc.DeleteRequest)
 
 func (at *PulumiServiceAccessTokenResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	ctx := context.Background()
-	inputMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	inputMap, err := plugin.UnmarshalProperties(
+		req.GetProperties(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -147,7 +155,10 @@ func (at *PulumiServiceAccessTokenResource) Read(req *pulumirpc.ReadRequest) (*p
 	}, nil
 }
 
-func (at *PulumiServiceAccessTokenResource) createAccessToken(ctx context.Context, input PulumiServiceAccessTokenInput) (*pulumiapi.AccessToken, error) {
+func (at *PulumiServiceAccessTokenResource) createAccessToken(
+	ctx context.Context,
+	input PulumiServiceAccessTokenInput,
+) (*pulumiapi.AccessToken, error) {
 
 	accessToken, err := at.Client.CreateAccessToken(ctx, input.Description)
 	if err != nil {
@@ -157,8 +168,8 @@ func (at *PulumiServiceAccessTokenResource) createAccessToken(ctx context.Contex
 	return accessToken, nil
 }
 
-func (at *PulumiServiceAccessTokenResource) deleteAccessToken(ctx context.Context, tokenId string) error {
-	return at.Client.DeleteAccessToken(ctx, tokenId)
+func (at *PulumiServiceAccessTokenResource) deleteAccessToken(ctx context.Context, tokenID string) error {
+	return at.Client.DeleteAccessToken(ctx, tokenID)
 }
 
 func diffAccessTokenProperties(req *pulumirpc.DiffRequest, replaceProps []string) (*pulumirpc.DiffResponse, error) {

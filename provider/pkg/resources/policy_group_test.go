@@ -19,51 +19,72 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/structpb"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
+	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
 // Mock client for PolicyGroup tests
 type PolicyGroupClientMock struct {
 	getPolicyGroupFunc         func() (*pulumiapi.PolicyGroup, error)
 	createPolicyGroupFunc      func(ctx context.Context, orgName, policyGroupName, entityType, mode string) error
-	batchUpdatePolicyGroupFunc func(ctx context.Context, orgName, policyGroupName string, reqs []pulumiapi.UpdatePolicyGroupRequest) error
+	batchUpdatePolicyGroupFunc func(
+		ctx context.Context, orgName, policyGroupName string, reqs []pulumiapi.UpdatePolicyGroupRequest,
+	) error
 }
 
-func (c *PolicyGroupClientMock) ListPolicyGroups(ctx context.Context, orgName string) ([]pulumiapi.PolicyGroupSummary, error) {
+func (c *PolicyGroupClientMock) ListPolicyGroups(
+	_ context.Context,
+	_ string,
+) ([]pulumiapi.PolicyGroupSummary, error) {
 	return nil, nil
 }
 
-func (c *PolicyGroupClientMock) GetPolicyGroup(ctx context.Context, orgName string, policyGroupName string) (*pulumiapi.PolicyGroup, error) {
+func (c *PolicyGroupClientMock) GetPolicyGroup(
+	_ context.Context,
+	_ string,
+	_ string,
+) (*pulumiapi.PolicyGroup, error) {
 	if c.getPolicyGroupFunc != nil {
 		return c.getPolicyGroupFunc()
 	}
 	return nil, nil
 }
 
-func (c *PolicyGroupClientMock) CreatePolicyGroup(ctx context.Context, orgName, policyGroupName, entityType, mode string) error {
+func (c *PolicyGroupClientMock) CreatePolicyGroup(
+	ctx context.Context,
+	orgName, policyGroupName, entityType, mode string,
+) error {
 	if c.createPolicyGroupFunc != nil {
 		return c.createPolicyGroupFunc(ctx, orgName, policyGroupName, entityType, mode)
 	}
 	return nil
 }
 
-func (c *PolicyGroupClientMock) UpdatePolicyGroup(ctx context.Context, orgName, policyGroupName string, req pulumiapi.UpdatePolicyGroupRequest) error {
+func (c *PolicyGroupClientMock) UpdatePolicyGroup(
+	_ context.Context,
+	_, _ string,
+	_ pulumiapi.UpdatePolicyGroupRequest,
+) error {
 	return nil
 }
 
-func (c *PolicyGroupClientMock) BatchUpdatePolicyGroup(ctx context.Context, orgName, policyGroupName string, reqs []pulumiapi.UpdatePolicyGroupRequest) error {
+func (c *PolicyGroupClientMock) BatchUpdatePolicyGroup(
+	ctx context.Context,
+	orgName, policyGroupName string,
+	reqs []pulumiapi.UpdatePolicyGroupRequest,
+) error {
 	if c.batchUpdatePolicyGroupFunc != nil {
 		return c.batchUpdatePolicyGroupFunc(ctx, orgName, policyGroupName, reqs)
 	}
 	return nil
 }
 
-func (c *PolicyGroupClientMock) DeletePolicyGroup(ctx context.Context, orgName, policyGroupName string) error {
+func (c *PolicyGroupClientMock) DeletePolicyGroup(_ context.Context, _, _ string) error {
 	return nil
 }
 
@@ -310,7 +331,12 @@ func TestPolicyGroup_Check_ExplicitValues(t *testing.T) {
 				outputMap[resource.PropertyKey(k)] = resource.NewPropertyValue(v.AsInterface())
 			}
 
-			assert.Equal(t, tc.entityType, outputMap["entityType"].StringValue(), "entityType should preserve explicit value")
+			assert.Equal(
+				t,
+				tc.entityType,
+				outputMap["entityType"].StringValue(),
+				"entityType should preserve explicit value",
+			)
 			assert.Equal(t, tc.mode, outputMap["mode"].StringValue(), "mode should preserve explicit value")
 		})
 	}
@@ -564,7 +590,8 @@ func TestPolicyGroup_Diff_ArrayOrderIndependent(t *testing.T) {
 	assert.Empty(t, resp.Replaces, "Expected no replacements")
 }
 
-// TestPolicyGroup_Diff_NullVsEmptyArray tests that null arrays in inputs don't cause diffs against empty arrays in state
+// TestPolicyGroup_Diff_NullVsEmptyArray tests that null arrays in inputs don't
+// cause diffs against empty arrays in state
 func TestPolicyGroup_Diff_NullVsEmptyArray(t *testing.T) {
 	provider := PulumiServicePolicyGroupResource{
 		Client: &PolicyGroupClientMock{},
@@ -679,7 +706,8 @@ func TestPolicyGroup_ToPulumiServicePolicyGroupInput_MissingFields(t *testing.T)
 	assert.Equal(t, "", result.Mode)
 }
 
-// TestPolicyGroup_ToPulumiServicePolicyGroupInput_OptionalPolicyPackFields tests that optional policy pack fields are handled
+// TestPolicyGroup_ToPulumiServicePolicyGroupInput_OptionalPolicyPackFields
+// tests that optional policy pack fields are handled
 func TestPolicyGroup_ToPulumiServicePolicyGroupInput_OptionalPolicyPackFields(t *testing.T) {
 	// Test with only required name field
 	inputMap := resource.PropertyMap{
@@ -821,10 +849,12 @@ func TestPolicyGroup_Read(t *testing.T) {
 		}
 
 		req := &pulumirpc.ReadRequest{
-			Id:         testPolicyGroupID,
-			Urn:        testPolicyGroupURN,
-			Properties: newPolicyGroupInput().withEntityType("accounts").withAccounts(parentAccount, childAccount).buildStruct(t),
-			Inputs:     newPolicyGroupInput().withEntityType("accounts").withAccounts(parentAccount).buildStruct(t),
+			Id:  testPolicyGroupID,
+			Urn: testPolicyGroupURN,
+			Properties: newPolicyGroupInput().withEntityType("accounts").
+				withAccounts(parentAccount, childAccount).
+				buildStruct(t),
+			Inputs: newPolicyGroupInput().withEntityType("accounts").withAccounts(parentAccount).buildStruct(t),
 		}
 
 		resp, err := provider.Read(req)
@@ -859,10 +889,14 @@ func TestPolicyGroup_Read(t *testing.T) {
 		}
 
 		req := &pulumirpc.ReadRequest{
-			Id:         testPolicyGroupID,
-			Urn:        testPolicyGroupURN,
-			Properties: newPolicyGroupInput().withEntityType("accounts").withAccounts(accountA, accountB).buildStruct(t),
-			Inputs:     newPolicyGroupInput().withEntityType("accounts").withAccounts(accountA, accountB).buildStruct(t),
+			Id:  testPolicyGroupID,
+			Urn: testPolicyGroupURN,
+			Properties: newPolicyGroupInput().withEntityType("accounts").
+				withAccounts(accountA, accountB).
+				buildStruct(t),
+			Inputs: newPolicyGroupInput().withEntityType("accounts").
+				withAccounts(accountA, accountB).
+				buildStruct(t),
 		}
 
 		resp, err := provider.Read(req)
@@ -1019,7 +1053,7 @@ func TestPolicyGroup_Create(t *testing.T) {
 					assert.Equal(t, "audit", mode)
 					return nil
 				},
-				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, reqs []pulumiapi.UpdatePolicyGroupRequest) error {
+				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, _ []pulumiapi.UpdatePolicyGroupRequest) error {
 					batchUpdateCalled = true
 					return nil
 				},
@@ -1125,8 +1159,10 @@ func TestPolicyGroup_Create(t *testing.T) {
 		}
 
 		req := &pulumirpc.CreateRequest{
-			Urn:        testPolicyGroupURN,
-			Properties: newPolicyGroupInput().withEntityType("accounts").withAccounts(account1, account2).buildStruct(t),
+			Urn: testPolicyGroupURN,
+			Properties: newPolicyGroupInput().withEntityType("accounts").
+				withAccounts(account1, account2).
+				buildStruct(t),
 		}
 
 		resp, err := provider.Create(req)
@@ -1402,9 +1438,11 @@ func TestPolicyGroup_Update(t *testing.T) {
 		}
 
 		req := &pulumirpc.UpdateRequest{
-			Id:   testPolicyGroupID,
-			Urn:  testPolicyGroupURN,
-			Olds: newPolicyGroupInput().withEntityType("accounts").withAccounts(parentAccount, childAccount).buildStruct(t),
+			Id:  testPolicyGroupID,
+			Urn: testPolicyGroupURN,
+			Olds: newPolicyGroupInput().withEntityType("accounts").
+				withAccounts(parentAccount, childAccount).
+				buildStruct(t),
 			News: newPolicyGroupInput().withEntityType("accounts").withAccounts(parentAccount).buildStruct(t),
 		}
 
@@ -1431,9 +1469,11 @@ func TestPolicyGroup_Update(t *testing.T) {
 		}
 
 		req := &pulumirpc.UpdateRequest{
-			Id:   testPolicyGroupID,
-			Urn:  testPolicyGroupURN,
-			Olds: newPolicyGroupInput().withEntityType("accounts").withAccounts(parentAccount, childAccount).buildStruct(t),
+			Id:  testPolicyGroupID,
+			Urn: testPolicyGroupURN,
+			Olds: newPolicyGroupInput().withEntityType("accounts").
+				withAccounts(parentAccount, childAccount).
+				buildStruct(t),
 			News: newPolicyGroupInput().withEntityType("accounts").buildStruct(t),
 		}
 

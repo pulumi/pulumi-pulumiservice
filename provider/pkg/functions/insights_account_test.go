@@ -8,28 +8,43 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/pulumi/pulumi-go-provider/infer"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/resources"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+)
+
+const (
+	testFunctionInsightsOrgName     = "test-org"
+	testFunctionInsightsAccountName = "test-account"
 )
 
 type insightsAccountClientMock struct {
 	config.Client
-	getInsightsAccountFunc   func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error)
+	getInsightsAccountFunc func(
+		ctx context.Context, orgName string, accountName string,
+	) (*pulumiapi.InsightsAccount, error)
 	listInsightsAccountsFunc func(ctx context.Context, orgName string) ([]pulumiapi.InsightsAccount, error)
 }
 
-func (c *insightsAccountClientMock) GetInsightsAccount(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+func (c *insightsAccountClientMock) GetInsightsAccount(
+	ctx context.Context,
+	orgName string,
+	accountName string,
+) (*pulumiapi.InsightsAccount, error) {
 	if c.getInsightsAccountFunc == nil {
 		return nil, nil
 	}
 	return c.getInsightsAccountFunc(ctx, orgName, accountName)
 }
 
-func (c *insightsAccountClientMock) ListInsightsAccounts(ctx context.Context, orgName string) ([]pulumiapi.InsightsAccount, error) {
+func (c *insightsAccountClientMock) ListInsightsAccounts(
+	ctx context.Context,
+	orgName string,
+) ([]pulumiapi.InsightsAccount, error) {
 	if c.listInsightsAccountsFunc == nil {
 		return nil, nil
 	}
@@ -41,8 +56,8 @@ func TestGetInsightsAccountFunction(t *testing.T) {
 
 	t.Run("successfully gets an account", func(t *testing.T) {
 		t.Parallel()
-		testOrg := "test-org"
-		testAccount := "test-account"
+		testOrg := testFunctionInsightsOrgName
+		testAccount := testFunctionInsightsAccountName
 		insightsAccount := &pulumiapi.InsightsAccount{
 			ID:                   "account-id-123",
 			Name:                 testAccount,
@@ -54,7 +69,9 @@ func TestGetInsightsAccountFunction(t *testing.T) {
 			},
 		}
 		mockedClient := &insightsAccountClientMock{
-			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+			getInsightsAccountFunc: func(
+				_ context.Context, orgName string, accountName string,
+			) (*pulumiapi.InsightsAccount, error) {
 				assert.Equal(t, testOrg, orgName)
 				assert.Equal(t, testAccount, accountName)
 				return insightsAccount, nil
@@ -79,10 +96,10 @@ func TestGetInsightsAccountFunction(t *testing.T) {
 
 	t.Run("returns error when account not found", func(t *testing.T) {
 		t.Parallel()
-		testOrg := "test-org"
+		testOrg := testFunctionInsightsOrgName
 		testAccount := "nonexistent-account"
 		mockedClient := &insightsAccountClientMock{
-			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+			getInsightsAccountFunc: func(_ context.Context, _ string, _ string) (*pulumiapi.InsightsAccount, error) {
 				return nil, nil // 404 - not found
 			},
 		}
@@ -104,11 +121,11 @@ func TestGetInsightsAccountFunction(t *testing.T) {
 
 	t.Run("returns error when API call fails", func(t *testing.T) {
 		t.Parallel()
-		testOrg := "test-org"
-		testAccount := "test-account"
+		testOrg := testFunctionInsightsOrgName
+		testAccount := testFunctionInsightsAccountName
 		apiError := "API error: internal server error"
 		mockedClient := &insightsAccountClientMock{
-			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+			getInsightsAccountFunc: func(_ context.Context, _ string, _ string) (*pulumiapi.InsightsAccount, error) {
 				return nil, errors.New(apiError)
 			},
 		}
@@ -130,8 +147,8 @@ func TestGetInsightsAccountFunction(t *testing.T) {
 
 	t.Run("correctly maps scan schedule none", func(t *testing.T) {
 		t.Parallel()
-		testOrg := "test-org"
-		testAccount := "test-account"
+		testOrg := testFunctionInsightsOrgName
+		testAccount := testFunctionInsightsAccountName
 		insightsAccount := &pulumiapi.InsightsAccount{
 			ID:                   "account-id-123",
 			Name:                 testAccount,
@@ -140,7 +157,7 @@ func TestGetInsightsAccountFunction(t *testing.T) {
 			ScheduledScanEnabled: false,
 		}
 		mockedClient := &insightsAccountClientMock{
-			getInsightsAccountFunc: func(ctx context.Context, orgName string, accountName string) (*pulumiapi.InsightsAccount, error) {
+			getInsightsAccountFunc: func(_ context.Context, _ string, _ string) (*pulumiapi.InsightsAccount, error) {
 				return insightsAccount, nil
 			},
 		}
@@ -167,7 +184,7 @@ func TestGetInsightsAccountsFunction(t *testing.T) {
 
 	t.Run("successfully lists accounts", func(t *testing.T) {
 		t.Parallel()
-		testOrg := "test-org"
+		testOrg := testFunctionInsightsOrgName
 		awsAccount := pulumiapi.InsightsAccount{
 			ID:                   "account-1",
 			Name:                 "aws-account",
@@ -187,7 +204,7 @@ func TestGetInsightsAccountsFunction(t *testing.T) {
 		}
 		insightsAccounts := []pulumiapi.InsightsAccount{awsAccount, gcpAccount}
 		mockedClient := &insightsAccountClientMock{
-			listInsightsAccountsFunc: func(ctx context.Context, orgName string) ([]pulumiapi.InsightsAccount, error) {
+			listInsightsAccountsFunc: func(_ context.Context, orgName string) ([]pulumiapi.InsightsAccount, error) {
 				assert.Equal(t, testOrg, orgName)
 				return insightsAccounts, nil
 			},
@@ -213,10 +230,10 @@ func TestGetInsightsAccountsFunction(t *testing.T) {
 
 	t.Run("returns empty list when no accounts exist", func(t *testing.T) {
 		t.Parallel()
-		testOrg := "test-org"
+		testOrg := testFunctionInsightsOrgName
 		emptyAccounts := []pulumiapi.InsightsAccount{}
 		mockedClient := &insightsAccountClientMock{
-			listInsightsAccountsFunc: func(ctx context.Context, orgName string) ([]pulumiapi.InsightsAccount, error) {
+			listInsightsAccountsFunc: func(_ context.Context, _ string) ([]pulumiapi.InsightsAccount, error) {
 				return emptyAccounts, nil
 			},
 		}
@@ -238,10 +255,10 @@ func TestGetInsightsAccountsFunction(t *testing.T) {
 
 	t.Run("returns error when API call fails", func(t *testing.T) {
 		t.Parallel()
-		testOrg := "test-org"
+		testOrg := testFunctionInsightsOrgName
 		apiError := "API error: unauthorized"
 		mockedClient := &insightsAccountClientMock{
-			listInsightsAccountsFunc: func(ctx context.Context, orgName string) ([]pulumiapi.InsightsAccount, error) {
+			listInsightsAccountsFunc: func(_ context.Context, _ string) ([]pulumiapi.InsightsAccount, error) {
 				return nil, errors.New(apiError)
 			},
 		}

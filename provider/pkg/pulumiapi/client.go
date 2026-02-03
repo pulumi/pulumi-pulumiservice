@@ -53,7 +53,12 @@ func NewClient(client *http.Client, token, URL string) (*Client, error) {
 }
 
 // createRequest creates a *http.Request with standard headers set and reqBody marshalled into json.
-func (c *Client) createRequest(ctx context.Context, method string, url *url.URL, reqBody interface{}) (*http.Request, error) {
+func (c *Client) createRequest(
+	ctx context.Context,
+	method string,
+	url *url.URL,
+	reqBody interface{},
+) (*http.Request, error) {
 	var reqBodyReader io.Reader
 	if reqBody != nil {
 		data, err := json.Marshal(reqBody)
@@ -124,7 +129,12 @@ func (c *Client) sendRequest(req *http.Request, resBody interface{}) (*http.Resp
 // do execute an http request to the pulumi service at the configured url
 // Marshals reqBody and resBody to/from JSON. Applies appropriate headers as well
 // Returns http.Response, but Body will be closed
-func (c *Client) do(ctx context.Context, method, path string, reqBody interface{}, resBody interface{}) (*http.Response, error) {
+func (c *Client) do(
+	ctx context.Context,
+	method, path string,
+	reqBody interface{},
+	resBody interface{},
+) (*http.Response, error) {
 	req, err := c.createRequest(ctx, method, &url.URL{Path: path}, reqBody)
 	if err != nil {
 		return nil, err
@@ -132,7 +142,13 @@ func (c *Client) do(ctx context.Context, method, path string, reqBody interface{
 	return c.sendRequest(req, resBody)
 }
 
-func (c *Client) doWithQuery(ctx context.Context, method, path string, query url.Values, reqBody interface{}, resBody interface{}) (*http.Response, error) {
+func (c *Client) doWithQuery(
+	ctx context.Context,
+	method, path string,
+	query url.Values,
+	reqBody interface{},
+	resBody interface{},
+) (*http.Response, error) {
 	reqURL := &url.URL{Path: path}
 	reqURL.RawQuery = query.Encode()
 	req, err := c.createRequest(ctx, method, reqURL, reqBody)
