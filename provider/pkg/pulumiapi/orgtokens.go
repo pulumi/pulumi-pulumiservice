@@ -70,8 +70,8 @@ func (c *Client) CreateOrgAccessToken(
 
 }
 
-func (c *Client) DeleteOrgAccessToken(ctx context.Context, tokenId, orgName string) error {
-	if len(tokenId) == 0 {
+func (c *Client) DeleteOrgAccessToken(ctx context.Context, tokenID, orgName string) error {
+	if len(tokenID) == 0 {
 		return errors.New("tokenid length must be greater than zero")
 	}
 
@@ -79,19 +79,19 @@ func (c *Client) DeleteOrgAccessToken(ctx context.Context, tokenId, orgName stri
 		return errors.New("orgname length must be greater than zero")
 	}
 
-	apiPath := path.Join("orgs", orgName, "tokens", tokenId)
+	apiPath := path.Join("orgs", orgName, "tokens", tokenID)
 
 	fmt.Println(apiPath)
 
 	_, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
 	if err != nil {
-		return fmt.Errorf("failed to delete access token %q: %w", tokenId, err)
+		return fmt.Errorf("failed to delete access token %q: %w", tokenID, err)
 	}
 
 	return nil
 }
 
-func (c *Client) GetOrgAccessToken(ctx context.Context, tokenId, orgName string) (*AccessToken, error) {
+func (c *Client) GetOrgAccessToken(ctx context.Context, tokenID, orgName string) (*AccessToken, error) {
 	apiPath := path.Join("orgs", orgName, "tokens")
 
 	var listRes listTokenResponse
@@ -104,7 +104,7 @@ func (c *Client) GetOrgAccessToken(ctx context.Context, tokenId, orgName string)
 
 	for i := 0; i < len(listRes.Tokens); i++ {
 		token := listRes.Tokens[i]
-		if token.ID == tokenId {
+		if token.ID == tokenID {
 			return &AccessToken{
 				ID:          token.ID,
 				Name:        token.Name,

@@ -10,21 +10,27 @@ import (
 
 var ctx = context.Background()
 
+const (
+	testTokenID          = "abcdegh"
+	testTokenUUID        = "uuid"
+	testTokenDescription = "token description"
+)
+
 func TestDeleteAccessToken(t *testing.T) {
-	tokenId := "abcdegh"
+	tokenID := testTokenID
 	t.Run("Happy Path", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
-			ExpectedReqPath:   "/api/user/tokens/" + tokenId,
+			ExpectedReqPath:   "/api/user/tokens/" + tokenID,
 			ResponseCode:      204,
 		})
-		assert.NoError(t, c.DeleteAccessToken(ctx, tokenId))
+		assert.NoError(t, c.DeleteAccessToken(ctx, tokenID))
 	})
 
 	t.Run("Error", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
-			ExpectedReqPath:   "/api/user/tokens/" + tokenId,
+			ExpectedReqPath:   "/api/user/tokens/" + tokenID,
 			ResponseCode:      404,
 			ResponseBody: ErrorResponse{
 				StatusCode: 404,
@@ -32,7 +38,7 @@ func TestDeleteAccessToken(t *testing.T) {
 			},
 		})
 		assert.EqualError(t,
-			c.DeleteAccessToken(ctx, tokenId),
+			c.DeleteAccessToken(ctx, tokenID),
 			`failed to delete access token "abcdegh": 404 API error: token not found`,
 		)
 	})
@@ -40,7 +46,7 @@ func TestDeleteAccessToken(t *testing.T) {
 }
 
 func TestCreateAccessToken(t *testing.T) {
-	desc := "token description"
+	desc := testTokenDescription
 	t.Run("Happy Path", func(t *testing.T) {
 		resp := createTokenResponse{
 			ID:         "token_id",
@@ -87,18 +93,18 @@ func TestCreateAccessToken(t *testing.T) {
 }
 
 func TestGetAccessToken(t *testing.T) {
-	id := "uuid"
-	desc := "token description"
+	id := testTokenUUID
+	desc := testTokenDescription
 	lastUsed := 123
 	t.Run("Happy Path", func(t *testing.T) {
 		resp := listTokenResponse{
 			Tokens: []accessTokenResponse{
-				accessTokenResponse{
+				{
 					ID:          id,
 					Description: desc,
 					LastUsed:    lastUsed,
 				},
-				accessTokenResponse{
+				{
 					ID:          "other",
 					Description: desc,
 					LastUsed:    lastUsed,

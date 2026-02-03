@@ -277,7 +277,8 @@ func (s *PulumiServiceApprovalRuleResource) Check(req *pulumirpc.CheckRequest) (
 					} else if fieldsSet > 1 {
 						failures = append(failures, &pulumirpc.CheckFailure{
 							Property: fmt.Sprintf("approvalRuleConfig.eligibleApprovers[%d]", i),
-							Reason:   "eligible approver must have exactly one of teamName, user, or rbacPermission set, but multiple were provided",
+							Reason: "eligible approver must have exactly one of teamName, user, or rbacPermission set, " +
+								"but multiple were provided",
 						})
 					}
 				}

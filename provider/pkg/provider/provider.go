@@ -16,13 +16,14 @@ package provider
 
 import (
 	"context"
-	_ "embed"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"runtime"
 	"strings"
 	"time"
+
+	_ "embed"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -159,15 +160,15 @@ func (k *pulumiserviceProvider) Attach(_ context.Context, req *pulumirpc.PluginA
 
 // Construct creates a new component resource.
 func (k *pulumiserviceProvider) Construct(
-	ctx context.Context,
-	req *pulumirpc.ConstructRequest,
+	_ context.Context,
+	_ *pulumirpc.ConstructRequest,
 ) (*pulumirpc.ConstructResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "Construct is not yet implemented")
 }
 
 // CheckConfig validates the configuration for this provider.
 func (k *pulumiserviceProvider) CheckConfig(
-	ctx context.Context,
+	_ context.Context,
 	req *pulumirpc.CheckRequest,
 ) (*pulumirpc.CheckResponse, error) {
 	return &pulumirpc.CheckResponse{Inputs: req.GetNews()}, nil
@@ -175,8 +176,8 @@ func (k *pulumiserviceProvider) CheckConfig(
 
 // DiffConfig diffs the configuration for this provider.
 func (k *pulumiserviceProvider) DiffConfig(
-	ctx context.Context,
-	req *pulumirpc.DiffRequest,
+	_ context.Context,
+	_ *pulumirpc.DiffRequest,
 ) (*pulumirpc.DiffResponse, error) {
 	return &pulumirpc.DiffResponse{}, nil
 }
@@ -200,7 +201,7 @@ func (k *pulumiserviceProvider) Configure(
 	if err != nil {
 		return nil, err
 	}
-	url, err := sc.getPulumiServiceUrl()
+	url, err := sc.getPulumiServiceURL()
 	if err != nil {
 		return nil, err
 	}
@@ -251,7 +252,7 @@ func (k *pulumiserviceProvider) Configure(
 		&resources.PulumiServiceDriftScheduleResource{
 			Client: client,
 		},
-		&resources.PulumiServiceTtlScheduleResource{
+		&resources.PulumiServiceTTLScheduleResource{
 			Client: client,
 		},
 		&resources.PulumiServiceEnvironmentResource{
@@ -312,7 +313,7 @@ func (k *pulumiserviceProvider) Invoke(
 // required for correctness, violations thereof can negatively impact the end-user experience, as
 // the provider inputs are using for detecting and rendering diffs.
 func (k *pulumiserviceProvider) Check(
-	ctx context.Context,
+	_ context.Context,
 	req *pulumirpc.CheckRequest,
 ) (*pulumirpc.CheckResponse, error) {
 	rn := getResourceNameFromRequest(req)
@@ -321,7 +322,7 @@ func (k *pulumiserviceProvider) Check(
 }
 
 // Diff checks what impacts a hypothetical update will have on the resource's properties.
-func (k *pulumiserviceProvider) Diff(ctx context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+func (k *pulumiserviceProvider) Diff(_ context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
 	rn := getResourceNameFromRequest(req)
 	res := k.getPulumiServiceResource(rn)
 	return res.Diff(req)
@@ -329,7 +330,7 @@ func (k *pulumiserviceProvider) Diff(ctx context.Context, req *pulumirpc.DiffReq
 
 // Create allocates a new instance of the provided resource and returns its unique ID afterwards.
 func (k *pulumiserviceProvider) Create(
-	ctx context.Context,
+	_ context.Context,
 	req *pulumirpc.CreateRequest,
 ) (*pulumirpc.CreateResponse, error) {
 	rn := getResourceNameFromRequest(req)
@@ -338,7 +339,7 @@ func (k *pulumiserviceProvider) Create(
 }
 
 // Read the current live state associated with a resource.
-func (k *pulumiserviceProvider) Read(ctx context.Context, req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
+func (k *pulumiserviceProvider) Read(_ context.Context, req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
 	rn := getResourceNameFromRequest(req)
 	res := k.getPulumiServiceResource(rn)
 	return res.Read(req)
@@ -346,7 +347,7 @@ func (k *pulumiserviceProvider) Read(ctx context.Context, req *pulumirpc.ReadReq
 
 // Update updates an existing resource with new values.
 func (k *pulumiserviceProvider) Update(
-	ctx context.Context,
+	_ context.Context,
 	req *pulumirpc.UpdateRequest,
 ) (*pulumirpc.UpdateResponse, error) {
 	rn := getResourceNameFromRequest(req)
@@ -356,7 +357,7 @@ func (k *pulumiserviceProvider) Update(
 
 // Delete tears down an existing resource with the given ID.  If it fails, the resource is assumed
 // to still exist.
-func (k *pulumiserviceProvider) Delete(ctx context.Context, req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
+func (k *pulumiserviceProvider) Delete(_ context.Context, req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
 	rn := getResourceNameFromRequest(req)
 	res := k.getPulumiServiceResource(rn)
 	return res.Delete(req)
@@ -371,8 +372,8 @@ func (k *pulumiserviceProvider) GetPluginInfo(context.Context, *pbempty.Empty) (
 
 // GetSchema returns the JSON-serialized schema for the provider.
 func (k *pulumiserviceProvider) GetSchema(
-	ctx context.Context,
-	req *pulumirpc.GetSchemaRequest,
+	_ context.Context,
+	_ *pulumirpc.GetSchemaRequest,
 ) (*pulumirpc.GetSchemaResponse, error) {
 	return &pulumirpc.GetSchemaResponse{
 		Schema: k.schema,
@@ -384,7 +385,7 @@ func (k *pulumiserviceProvider) GetSchema(
 // creation error or an initialization error). Since Cancel is advisory and non-blocking, it is up
 // to the host to decide how long to wait after Cancel is called before (e.g.)
 // hard-closing any gRPC connection.
-func (k *pulumiserviceProvider) Cancel(context.Context, *pbempty.Empty) (*pbempty.Empty, error) {
+func (k *pulumiserviceProvider) Cancel(_ context.Context, _ *pbempty.Empty) (*pbempty.Empty, error) {
 	// TODO
 	return &pbempty.Empty{}, nil
 }

@@ -8,6 +8,8 @@ import (
 	"time"
 )
 
+const nilScheduleCronPlaceholder = "<nil>"
+
 type EnvironmentScheduleClient interface {
 	CreateEnvironmentRotationSchedule(
 		ctx context.Context,
@@ -76,7 +78,7 @@ func (c *Client) CreateEnvironmentRotationSchedule(
 		if scheduleReq.ScheduleCron != nil {
 			cronString = *scheduleReq.ScheduleCron
 		} else {
-			cronString = "<nil>"
+			cronString = nilScheduleCronPlaceholder
 		}
 		return nil, fmt.Errorf("failed to create environment rotation schedule (scheduleCron=%s, scheduleOnce=%s): %w",
 			cronString, scheduleReq.ScheduleOnce, err)
@@ -131,7 +133,7 @@ func (c *Client) UpdateEnvironmentRotationSchedule(
 		if scheduleReq.ScheduleCron != nil {
 			cronString = *scheduleReq.ScheduleCron
 		} else {
-			cronString = "<nil>"
+			cronString = nilScheduleCronPlaceholder
 		}
 		return nil, fmt.Errorf("failed to update environment schedule %s (scheduleCron=%s, scheduleOnce=%s): %w",
 			scheduleID, cronString, scheduleReq.ScheduleOnce, err)

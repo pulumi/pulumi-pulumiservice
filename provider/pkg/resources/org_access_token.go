@@ -143,13 +143,13 @@ func (ot *PulumiServiceOrgAccessTokenResource) Read(req *pulumirpc.ReadRequest) 
 	ctx := context.Background()
 	urn := req.GetId()
 
-	orgName, _, tokenId, err := splitOrgAccessTokenId(urn)
+	orgName, _, tokenID, err := splitOrgAccessTokenID(urn)
 	if err != nil {
 		return nil, err
 	}
 
 	// the org access token is immutable; if we get nil it got deleted, otherwise all data is the same
-	accessToken, err := ot.Client.GetOrgAccessToken(ctx, tokenId, orgName)
+	accessToken, err := ot.Client.GetOrgAccessToken(ctx, tokenID, orgName)
 	if err != nil {
 		return nil, err
 	}
@@ -199,25 +199,25 @@ func (ot *PulumiServiceOrgAccessTokenResource) createOrgAccessToken(
 
 func (ot *PulumiServiceOrgAccessTokenResource) deleteOrgAccessToken(ctx context.Context, id string) error {
 	// we don't need the token name when we delete
-	orgName, _, tokenId, err := splitOrgAccessTokenId(id)
+	orgName, _, tokenID, err := splitOrgAccessTokenID(id)
 	if err != nil {
 		return err
 	}
-	return ot.Client.DeleteOrgAccessToken(ctx, tokenId, orgName)
+	return ot.Client.DeleteOrgAccessToken(ctx, tokenID, orgName)
 
 }
 
-func splitOrgAccessTokenId(id string) (string, string, string, error) {
-	// format: organization/name/tokenId
+func splitOrgAccessTokenID(id string) (string, string, string, error) {
+	// format: organization/name/tokenID
 	s := strings.Split(id, "/")
 	if len(s) < 3 {
 		return "", "", "", fmt.Errorf("%q is invalid, must contain a single slash ('/')", id)
 	}
 
 	org := s[0]
-	tokenId := s[len(s)-1]
+	tokenID := s[len(s)-1]
 	// Name can contain slashes so this joins the split parts except for first and last
 	name := strings.Join(s[1:len(s)-1], "/")
 
-	return org, name, tokenId, nil
+	return org, name, tokenID, nil
 }

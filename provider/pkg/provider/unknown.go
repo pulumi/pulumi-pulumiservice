@@ -15,7 +15,7 @@ func (u *PulumiServiceUnknownResource) Name() string {
 	return "pulumiservice:index:Unknown"
 }
 
-func (u *PulumiServiceUnknownResource) Configure(config PulumiServiceConfig) {
+func (u *PulumiServiceUnknownResource) Configure(_ PulumiServiceConfig) {
 }
 
 func (u *PulumiServiceUnknownResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
@@ -48,7 +48,7 @@ func createUnknownResourceErrorFromRequest(req ResourceBase) error {
 }
 
 func (u *PulumiServiceUnknownResource) Invoke(
-	s *pulumiserviceProvider,
+	_ *pulumiserviceProvider,
 	req *pulumirpc.InvokeRequest,
 ) (*pulumirpc.InvokeResponse, error) {
 	return &pulumirpc.InvokeResponse{Return: nil}, fmt.Errorf("unknown function '%s'", req.Tok)
@@ -58,5 +58,5 @@ func (f *PulumiServiceUnknownFunction) Name() string {
 	return "pulumiservice:index:Unknown"
 }
 
-func (f *PulumiServiceUnknownFunction) Configure(config PulumiServiceConfig) {
+func (f *PulumiServiceUnknownFunction) Configure(_ PulumiServiceConfig) {
 }

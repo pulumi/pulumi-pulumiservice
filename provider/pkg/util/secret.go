@@ -116,7 +116,8 @@ func CreateSecretValue(
 // Inputs are more complicated :
 // If ciphertext never changed, keep existing plaintext value
 // If ciphertext is different, set plaintext to empty string
-// If retrieved state has a value that current state does not have, pass in nil, which will fill plaintext with empty string
+// If retrieved state has a value that current state does not have, pass in nil, which will fill plaintext with
+// empty string
 func MergeSecretValue(
 	propertyMap resource.PropertyMap,
 	propertyName string,

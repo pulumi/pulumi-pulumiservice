@@ -15,7 +15,7 @@ type StackScheduleClient interface {
 		req CreateDeploymentScheduleRequest,
 	) (*string, error)
 	CreateDriftSchedule(ctx context.Context, stack StackIdentifier, req CreateDriftScheduleRequest) (*string, error)
-	CreateTtlSchedule(ctx context.Context, stack StackIdentifier, req CreateTtlScheduleRequest) (*string, error)
+	CreateTTLSchedule(ctx context.Context, stack StackIdentifier, req CreateTTLScheduleRequest) (*string, error)
 	GetStackSchedule(ctx context.Context, stack StackIdentifier, scheduleID string) (*StackScheduleResponse, error)
 	UpdateDeploymentSchedule(
 		ctx context.Context,
@@ -29,10 +29,10 @@ type StackScheduleClient interface {
 		req CreateDriftScheduleRequest,
 		scheduleID string,
 	) (*string, error)
-	UpdateTtlSchedule(
+	UpdateTTLSchedule(
 		ctx context.Context,
 		stack StackIdentifier,
-		req CreateTtlScheduleRequest,
+		req CreateTTLScheduleRequest,
 		scheduleID string,
 	) (*string, error)
 	DeleteStackSchedule(ctx context.Context, stack StackIdentifier, scheduleID string) error
@@ -67,7 +67,7 @@ type CreateDriftScheduleRequest struct {
 	AutoRemediate bool   `json:"autoRemediate,omitempty"`
 }
 
-type CreateTtlScheduleRequest struct {
+type CreateTTLScheduleRequest struct {
 	Timestamp          time.Time `json:"timestamp,omitempty"`
 	DeleteAfterDestroy bool      `json:"deleteAfterDestroy,omitempty"`
 }
@@ -128,10 +128,10 @@ func (c *Client) CreateDriftSchedule(
 	return &scheduleResponse.ID, nil
 }
 
-func (c *Client) CreateTtlSchedule(
+func (c *Client) CreateTTLSchedule(
 	ctx context.Context,
 	stack StackIdentifier,
-	scheduleReq CreateTtlScheduleRequest,
+	scheduleReq CreateTTLScheduleRequest,
 ) (*string, error) {
 	apiPath := path.Join("stacks", stack.OrgName, stack.ProjectName, stack.StackName, "deployments", "ttl", "schedules")
 	var scheduleResponse StackScheduleResponse
@@ -229,10 +229,10 @@ func (c *Client) UpdateDriftSchedule(
 	return &scheduleResponse.ID, nil
 }
 
-func (c *Client) UpdateTtlSchedule(
+func (c *Client) UpdateTTLSchedule(
 	ctx context.Context,
 	stack StackIdentifier,
-	scheduleReq CreateTtlScheduleRequest,
+	scheduleReq CreateTTLScheduleRequest,
 	scheduleID string,
 ) (*string, error) {
 	apiPath := path.Join(

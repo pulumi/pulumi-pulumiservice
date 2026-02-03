@@ -88,7 +88,7 @@ func (evt *PulumiServiceEnvironmentVersionTagResource) Diff(
 			replaces = append(replaces, k)
 		}
 		detailedDiffs[k] = &pulumirpc.PropertyDiff{
-			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind),
+			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind), //nolint:gosec // safe conversion from plugin.DiffKind
 			InputDiff: v.InputDiff,
 		}
 	}
@@ -200,7 +200,7 @@ func (evt *PulumiServiceEnvironmentVersionTagResource) Read(
 ) (*pulumirpc.ReadResponse, error) {
 	ctx := context.Background()
 
-	orgName, projectName, environmentName, tagName, err := splitEnvironmentTagId(req.Id)
+	orgName, projectName, environmentName, tagName, err := splitEnvironmentTagID(req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -233,7 +233,7 @@ func (evt *PulumiServiceEnvironmentVersionTagResource) Read(
 	}, nil
 }
 
-func splitEnvironmentTagId(id string) (string, string, string, string, error) {
+func splitEnvironmentTagID(id string) (string, string, string, string, error) {
 	// format:
 	//   organization/project/environment/tag or
 	//   organization/environment/tag (legacy)

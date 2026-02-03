@@ -7,13 +7,14 @@ import (
 	"strings"
 	"time"
 
+	pbempty "google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/structpb"
+
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
-	pbempty "google.golang.org/protobuf/types/known/emptypb"
-	"google.golang.org/protobuf/types/known/structpb"
 )
 
 type PulumiServiceEnvironmentRotationScheduleResource struct {
@@ -155,7 +156,7 @@ func EnvironmentScheduleSharedDiffMaps(
 			replaces = append(replaces, k)
 		}
 		detailedDiffs[k] = &pulumirpc.PropertyDiff{
-			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind),
+			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind), //nolint:gosec // safe conversion from plugin.DiffKind
 			InputDiff: v.InputDiff,
 		}
 	}
@@ -229,7 +230,7 @@ func (st *PulumiServiceEnvironmentRotationScheduleResource) Create(
 	}
 
 	outputProperties, err := plugin.MarshalProperties(
-		AddScheduleIdToPropertyMap(*scheduleID, input.ToPropertyMap()),
+		AddScheduleIDToPropertyMap(*scheduleID, input.ToPropertyMap()),
 		util.StandardMarshal,
 	)
 	if err != nil {
@@ -314,7 +315,7 @@ func (st *PulumiServiceEnvironmentRotationScheduleResource) Update(
 	}
 
 	outputProperties, err := plugin.MarshalProperties(
-		AddScheduleIdToPropertyMap(*scheduleID, input.ToPropertyMap()),
+		AddScheduleIDToPropertyMap(*scheduleID, input.ToPropertyMap()),
 		util.StandardMarshal,
 	)
 	if err != nil {
@@ -342,7 +343,7 @@ func (st *PulumiServiceEnvironmentRotationScheduleResource) Read(
 		return &pulumirpc.ReadResponse{}, nil
 	}
 
-	var scheduleOnce *time.Time = nil
+	var scheduleOnce *time.Time
 	if scheduleResponse.ScheduleOnce != nil {
 		parsed, err := time.Parse(time.DateTime, *scheduleResponse.ScheduleOnce)
 		if err != nil {
@@ -364,7 +365,7 @@ func (st *PulumiServiceEnvironmentRotationScheduleResource) Read(
 		return nil, fmt.Errorf("failed to read EnvironmentRotationSchedule (%q): %w", req.Id, err)
 	}
 	outputProperties, err := plugin.MarshalProperties(
-		AddScheduleIdToPropertyMap(*scheduleID, input.ToPropertyMap()),
+		AddScheduleIDToPropertyMap(*scheduleID, input.ToPropertyMap()),
 		util.StandardMarshal,
 	)
 	if err != nil {
@@ -387,7 +388,7 @@ func ParseEnvironmentScheduleID(id string, scheduleType string) (*pulumiapi.Envi
 	if len(splitID) < 4 {
 		return nil, nil, fmt.Errorf("invalid environment id: %s", id)
 	}
-	envId := pulumiapi.EnvironmentIdentifier{
+	envID := pulumiapi.EnvironmentIdentifier{
 		OrgName:     splitID[0],
 		ProjectName: splitID[1],
 		EnvName:     splitID[2],
@@ -396,10 +397,10 @@ func ParseEnvironmentScheduleID(id string, scheduleType string) (*pulumiapi.Envi
 		if len(splitID) != 4 {
 			return nil, nil, fmt.Errorf("invalid schedule id: %s", id)
 		}
-		return &envId, &splitID[3], nil
+		return &envID, &splitID[3], nil
 	}
 	if len(splitID) != 5 || splitID[3] != scheduleType {
 		return nil, nil, fmt.Errorf("invalid schedule id: %s", id)
 	}
-	return &envId, &splitID[4], nil
+	return &envID, &splitID[4], nil
 }

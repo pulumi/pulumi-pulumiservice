@@ -147,7 +147,7 @@ func convertInterfaceArrayToStrings(arr []interface{}) []string {
 	return result
 }
 
-func (i *PulumiServicePolicyGroupInput) ToRpc() (*structpb.Struct, error) {
+func (i *PulumiServicePolicyGroupInput) ToRPC() (*structpb.Struct, error) {
 	return plugin.MarshalProperties(i.ToPropertyMap(), plugin.MarshalOptions{
 		KeepOutputValues: true,
 	})
@@ -498,7 +498,7 @@ func (p *PulumiServicePolicyGroupResource) Update(req *pulumirpc.UpdateRequest) 
 		Mode:             policyGroup.Mode,
 	}
 
-	outputProperties, err := outputs.ToRpc()
+	outputProperties, err := outputs.ToRPC()
 	if err != nil {
 		return nil, err
 	}
@@ -595,7 +595,7 @@ func (p *PulumiServicePolicyGroupResource) Create(req *pulumirpc.CreateRequest) 
 		Mode:             policyGroup.Mode,
 	}
 
-	outputProperties, err := outputs.ToRpc()
+	outputProperties, err := outputs.ToRPC()
 	if err != nil {
 		return nil, partialErrorPolicyGroup(policyGroupID, err, outputs, inputsPolicyGroup)
 	}
@@ -746,8 +746,8 @@ func partialErrorPolicyGroup(
 	state PulumiServicePolicyGroupInput,
 	inputs PulumiServicePolicyGroupInput,
 ) error {
-	stateRpc, stateSerErr := state.ToRpc()
-	inputRpc, inputSerErr := inputs.ToRpc()
+	stateRPC, stateSerErr := state.ToRPC()
+	inputRPC, inputSerErr := inputs.ToRPC()
 
 	// combine errors if we can't serialize state or inputs for some reason
 	if stateSerErr != nil {
@@ -758,9 +758,9 @@ func partialErrorPolicyGroup(
 	}
 	detail := pulumirpc.ErrorResourceInitFailed{
 		Id:         id,
-		Properties: stateRpc,
+		Properties: stateRPC,
 		Reasons:    []string{err.Error()},
-		Inputs:     inputRpc,
+		Inputs:     inputRPC,
 	}
 	return rpcerror.WithDetails(rpcerror.New(codes.Unknown, err.Error()), &detail)
 }

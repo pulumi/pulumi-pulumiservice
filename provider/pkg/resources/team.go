@@ -13,6 +13,11 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
+const (
+	teamTypeGitHub = "github"
+	teamTypePulumi = "pulumi"
+)
+
 type Team struct{}
 
 var (
@@ -26,7 +31,8 @@ var (
 func (t *Team) Annotate(a infer.Annotator) {
 	a.Describe(
 		t,
-		"The Pulumi Cloud offers role-based access control (RBAC) using teams. Teams allow organization admins to assign a set of stack permissions to a group of users.",
+		"The Pulumi Cloud offers role-based access control (RBAC) using teams. Teams allow organization admins "+
+			"to assign a set of stack permissions to a group of users.",
 	)
 }
 
@@ -47,7 +53,8 @@ func (t *TeamCore) Annotate(a infer.Annotator) {
 	a.Describe(&t.Type, "The type of team. Must be either `pulumi` or `github`.")
 	a.Describe(
 		&t.GitHubTeamID,
-		`The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for "github" teams.`,
+		`The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is `+
+			`backed by. Required for "github" teams.`,
 	)
 }
 
@@ -156,21 +163,21 @@ func (*Team) Check(ctx context.Context, req infer.CheckRequest) (infer.CheckResp
 	if err != nil {
 		return infer.CheckResponse[TeamInput]{}, nil
 	}
-	if i.Type != "github" && i.Type != "pulumi" {
+	if i.Type != teamTypeGitHub && i.Type != teamTypePulumi {
 		checkFailures = append(checkFailures, p.CheckFailure{
 			Reason:   fmt.Sprintf("found %q instead of 'pulumi' or 'github'", i.Type),
 			Property: "type",
 		})
 	}
 
-	if i.Type == "github" && i.GitHubTeamID == nil {
+	if i.Type == teamTypeGitHub && i.GitHubTeamID == nil {
 		checkFailures = append(checkFailures, p.CheckFailure{
 			Reason:   "teams with teamType 'github' require a githubTeamId",
 			Property: "githubTeamId",
 		})
 	}
 
-	if i.Type == "pulumi" && i.Name == nil {
+	if i.Type == teamTypePulumi && i.Name == nil {
 		checkFailures = append(checkFailures, p.CheckFailure{
 			Reason:   "teams with teamType 'pulumi' require a name",
 			Property: "name",
@@ -273,7 +280,7 @@ func (*Team) Update(
 	members := make([]string, len(req.State.Members))
 	copy(members, req.State.Members)
 
-	if !slices.Equal(req.Inputs.Members, req.State.Members) && req.Inputs.Type != "github" {
+	if !slices.Equal(req.Inputs.Members, req.State.Members) && req.Inputs.Type != teamTypeGitHub {
 		for i := len(req.State.Members) - 1; i >= 0; i-- {
 			usernameToDelete := req.State.Members[i]
 			if !slices.Contains(req.Inputs.Members, usernameToDelete) {

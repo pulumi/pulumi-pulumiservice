@@ -29,14 +29,14 @@ type ApprovalRuleClient interface {
 		orgName string,
 		req CreateApprovalRuleRequest,
 	) (*ApprovalRule, error)
-	GetEnvironmentApprovalRule(ctx context.Context, orgName string, ruleId string) (*ApprovalRule, error)
+	GetEnvironmentApprovalRule(ctx context.Context, orgName string, ruleID string) (*ApprovalRule, error)
 	UpdateEnvironmentApprovalRule(
 		ctx context.Context,
 		orgName string,
-		ruleId string,
+		ruleID string,
 		req UpdateApprovalRuleRequest,
 	) (*ApprovalRule, error)
-	DeleteEnvironmentApprovalRule(ctx context.Context, orgName string, ruleId string) error
+	DeleteEnvironmentApprovalRule(ctx context.Context, orgName string, ruleID string) error
 }
 
 type ApprovalRule struct {
@@ -173,8 +173,8 @@ func (c *Client) CreateEnvironmentApprovalRule(
 	return &rule, nil
 }
 
-func (c *Client) GetEnvironmentApprovalRule(ctx context.Context, orgName string, ruleId string) (*ApprovalRule, error) {
-	apiPath := path.Join("change-gates", orgName, ruleId)
+func (c *Client) GetEnvironmentApprovalRule(ctx context.Context, orgName string, ruleID string) (*ApprovalRule, error) {
+	apiPath := path.Join("change-gates", orgName, ruleID)
 
 	var rule ApprovalRule
 	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &rule)
@@ -188,10 +188,10 @@ func (c *Client) GetEnvironmentApprovalRule(ctx context.Context, orgName string,
 func (c *Client) UpdateEnvironmentApprovalRule(
 	ctx context.Context,
 	orgName string,
-	ruleId string,
+	ruleID string,
 	req UpdateApprovalRuleRequest,
 ) (*ApprovalRule, error) {
-	apiPath := path.Join("change-gates", orgName, ruleId)
+	apiPath := path.Join("change-gates", orgName, ruleID)
 
 	var rule ApprovalRule
 	_, err := c.do(ctx, http.MethodPut, apiPath, req, &rule)
@@ -202,8 +202,8 @@ func (c *Client) UpdateEnvironmentApprovalRule(
 	return &rule, nil
 }
 
-func (c *Client) DeleteEnvironmentApprovalRule(ctx context.Context, orgName string, ruleId string) error {
-	apiPath := path.Join("change-gates", orgName, ruleId)
+func (c *Client) DeleteEnvironmentApprovalRule(ctx context.Context, orgName string, ruleID string) error {
+	apiPath := path.Join("change-gates", orgName, ruleID)
 
 	result, err := c.do(ctx, http.MethodDelete, apiPath, nil, nil)
 	if err != nil {

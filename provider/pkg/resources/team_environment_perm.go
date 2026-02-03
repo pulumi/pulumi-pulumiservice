@@ -81,16 +81,16 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Read(
 	req *pulumirpc.ReadRequest,
 ) (*pulumirpc.ReadResponse, error) {
 	ctx := context.Background()
-	permId, err := splitTeamEnvironmentPermissionId(req.GetId())
+	permID, err := splitTeamEnvironmentPermissionID(req.GetId())
 	if err != nil {
 		return nil, err
 	}
 
 	request := pulumiapi.TeamEnvironmentSettingsRequest{
-		Organization: permId.Organization,
-		Team:         permId.Team,
-		Environment:  permId.Environment,
-		Project:      permId.Project,
+		Organization: permID.Organization,
+		Team:         permID.Team,
+		Environment:  permID.Environment,
+		Project:      permID.Project,
 	}
 	permission, maxOpenDuration, err := tp.Client.GetTeamEnvironmentSettings(ctx, request)
 	if err != nil {
@@ -106,10 +106,10 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Read(
 	}
 
 	inputs := TeamEnvironmentPermissionInput{
-		Organization:    permId.Organization,
-		Team:            permId.Team,
-		Project:         permId.Project,
-		Environment:     permId.Environment,
+		Organization:    permID.Organization,
+		Team:            permID.Team,
+		Project:         permID.Project,
+		Environment:     permID.Environment,
 		Permission:      *permission,
 		MaxOpenDuration: maxOpenDurationStr,
 	}
@@ -160,7 +160,7 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Create(
 		return nil, err
 	}
 
-	environmentPermissionId := teamEnvironmentPermissionId{
+	environmentPermissionID := teamEnvironmentPermissionID{
 		Organization: input.Organization,
 		Team:         input.Team,
 		Project:      input.Project,
@@ -168,7 +168,7 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Create(
 	}
 
 	return &pulumirpc.CreateResponse{
-		Id:         environmentPermissionId.String(),
+		Id:         environmentPermissionID.String(),
 		Properties: req.GetProperties(),
 	}, nil
 }
@@ -219,26 +219,26 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Update(
 	return nil, fmt.Errorf("unexpected call to update, expected create to be called instead")
 }
 
-type teamEnvironmentPermissionId struct {
+type teamEnvironmentPermissionID struct {
 	Organization string
 	Team         string
 	Project      string
 	Environment  string
 }
 
-func (s *teamEnvironmentPermissionId) String() string {
+func (s *teamEnvironmentPermissionID) String() string {
 	return fmt.Sprintf("%s/%s/%s+%s", s.Organization, s.Team, s.Project, s.Environment)
 }
 
-func splitTeamEnvironmentPermissionId(id string) (teamEnvironmentPermissionId, error) {
+func splitTeamEnvironmentPermissionID(id string) (teamEnvironmentPermissionID, error) {
 	split := strings.Split(id, "/")
 	if len(split) != 3 {
-		return teamEnvironmentPermissionId{}, fmt.Errorf("invalid id %q, expected 3 parts", id)
+		return teamEnvironmentPermissionID{}, fmt.Errorf("invalid id %q, expected 3 parts", id)
 	}
 
 	splitProjectEnv := strings.Split(split[2], "+")
 	if len(splitProjectEnv) == 1 {
-		return teamEnvironmentPermissionId{
+		return teamEnvironmentPermissionID{
 			Organization: split[0],
 			Team:         split[1],
 			Project:      "default",
@@ -246,7 +246,7 @@ func splitTeamEnvironmentPermissionId(id string) (teamEnvironmentPermissionId, e
 		}, nil
 	}
 	if len(splitProjectEnv) == 2 {
-		return teamEnvironmentPermissionId{
+		return teamEnvironmentPermissionID{
 			Organization: split[0],
 			Team:         split[1],
 			Project:      splitProjectEnv[0],
@@ -254,7 +254,7 @@ func splitTeamEnvironmentPermissionId(id string) (teamEnvironmentPermissionId, e
 		}, nil
 	}
 
-	return teamEnvironmentPermissionId{}, fmt.Errorf(
+	return teamEnvironmentPermissionID{}, fmt.Errorf(
 		"invalid id %q, expected environment name or project/environment in last part",
 		id,
 	)

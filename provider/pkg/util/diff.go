@@ -35,7 +35,10 @@ func StandardDiff(req *pulumirpc.DiffRequest, replaceProperties map[string]bool)
 			v.Kind = v.Kind.AsReplace()
 		}
 		detailedDiffs[k] = &pulumirpc.PropertyDiff{
-			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind),
+			//nolint:gosec // G115: Safe conversion from DiffKind enum to int32
+			Kind: pulumirpc.PropertyDiff_Kind(
+				v.Kind,
+			),
 			InputDiff: v.InputDiff,
 		}
 	}

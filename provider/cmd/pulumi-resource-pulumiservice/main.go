@@ -26,7 +26,7 @@ import (
 var providerName = "pulumiservice"
 
 // The version needs to be replaced using LDFLAGS on build
-var Version string = "REPLACE_ON_BUILD"
+var Version = "REPLACE_ON_BUILD"
 
 func main() {
 	// Start gRPC service for the pulumiservice provider

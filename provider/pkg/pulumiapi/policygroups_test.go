@@ -22,12 +22,18 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const (
+	testPolicyGroupName    = "test-policy-group"
+	testPolicyGroupMode    = "audit"
+	testPolicyGroupOrgName = "test-org"
+)
+
 // TestCreatePolicyGroup_HappyPath tests that CreatePolicyGroup sends all required fields
 func TestCreatePolicyGroup_HappyPath(t *testing.T) {
-	orgName := "test-org"
-	policyGroupName := "test-policy-group"
+	orgName := testPolicyGroupOrgName
+	policyGroupName := testPolicyGroupName
 	entityType := "stacks"
-	mode := "audit"
+	mode := testPolicyGroupMode
 
 	expectedReqBody := createPolicyGroupRequest{
 		Name:       policyGroupName,
@@ -49,8 +55,8 @@ func TestCreatePolicyGroup_HappyPath(t *testing.T) {
 
 // TestCreatePolicyGroup_AccountsPreventative tests creating a policy group with accounts and preventative mode
 func TestCreatePolicyGroup_AccountsPreventative(t *testing.T) {
-	orgName := "test-org"
-	policyGroupName := "test-policy-group"
+	orgName := testPolicyGroupOrgName
+	policyGroupName := testPolicyGroupName
 	entityType := "accounts"
 	mode := "preventative"
 
@@ -110,8 +116,8 @@ func TestCreatePolicyGroup_EmptyMode(t *testing.T) {
 
 // TestCreatePolicyGroup_APIError tests that API errors are properly propagated
 func TestCreatePolicyGroup_APIError(t *testing.T) {
-	orgName := "test-org"
-	policyGroupName := "test-policy-group"
+	orgName := testPolicyGroupOrgName
+	policyGroupName := testPolicyGroupName
 	entityType := "invalid"
 	mode := "audit"
 
@@ -139,8 +145,8 @@ func TestCreatePolicyGroup_APIError(t *testing.T) {
 
 // TestCreatePolicyGroup_Unauthorized tests that 401 errors are properly handled
 func TestCreatePolicyGroup_Unauthorized(t *testing.T) {
-	orgName := "test-org"
-	policyGroupName := "test-policy-group"
+	orgName := testPolicyGroupOrgName
+	policyGroupName := testPolicyGroupName
 	entityType := "stacks"
 	mode := "audit"
 
@@ -168,8 +174,8 @@ func TestCreatePolicyGroup_Unauthorized(t *testing.T) {
 
 // TestBatchUpdatePolicyGroup tests the batch update functionality
 func TestBatchUpdatePolicyGroup(t *testing.T) {
-	orgName := "test-org"
-	policyGroupName := "test-policy-group"
+	orgName := testPolicyGroupOrgName
+	policyGroupName := testPolicyGroupName
 
 	t.Run("Empty OrgName", func(t *testing.T) {
 		c := &Client{}
@@ -244,8 +250,8 @@ func TestBatchUpdatePolicyGroup(t *testing.T) {
 
 // TestGetPolicyGroup_IncludesEntityTypeAndMode tests that GetPolicyGroup response includes new fields
 func TestGetPolicyGroup_IncludesEntityTypeAndMode(t *testing.T) {
-	orgName := "test-org"
-	policyGroupName := "test-policy-group"
+	orgName := testPolicyGroupOrgName
+	policyGroupName := testPolicyGroupName
 
 	expectedResponse := PolicyGroup{
 		Name:               policyGroupName,

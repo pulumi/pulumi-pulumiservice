@@ -11,23 +11,28 @@ import (
 
 var teamCtx = context.Background()
 
+const (
+	testTeamTokenTeamName = "aTeam"
+	testTeamTokenOrgName  = "anOrg"
+)
+
 func TestDeleteTeamAccessToken(t *testing.T) {
-	orgName := "anOrg"
-	teamName := "aTeam"
-	tokenId := "abcdegh"
+	orgName := testTeamTokenOrgName
+	teamName := testTeamTokenTeamName
+	tokenID := "abcdegh"
 	t.Run("Happy Path", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
-			ExpectedReqPath:   "/api/orgs/anOrg/teams/aTeam/tokens/" + tokenId,
+			ExpectedReqPath:   "/api/orgs/anOrg/teams/aTeam/tokens/" + tokenID,
 			ResponseCode:      204,
 		})
-		assert.NoError(t, c.DeleteTeamAccessToken(teamCtx, tokenId, orgName, teamName))
+		assert.NoError(t, c.DeleteTeamAccessToken(teamCtx, tokenID, orgName, teamName))
 	})
 
 	t.Run("Error", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
-			ExpectedReqPath:   "/api/orgs/anOrg/teams/aTeam/tokens/" + tokenId,
+			ExpectedReqPath:   "/api/orgs/anOrg/teams/aTeam/tokens/" + tokenID,
 			ResponseCode:      404,
 			ResponseBody: ErrorResponse{
 				StatusCode: 404,
@@ -35,7 +40,7 @@ func TestDeleteTeamAccessToken(t *testing.T) {
 			},
 		})
 		assert.EqualError(t,
-			c.DeleteTeamAccessToken(teamCtx, tokenId, orgName, teamName),
+			c.DeleteTeamAccessToken(teamCtx, tokenID, orgName, teamName),
 			`failed to delete access token "abcdegh": 404 API error: token not found`,
 		)
 	})
@@ -43,7 +48,7 @@ func TestDeleteTeamAccessToken(t *testing.T) {
 }
 
 func TestCreateTeamAccessToken(t *testing.T) {
-	orgName := "anOrg"
+	orgName := testTeamTokenOrgName
 	teamName := "aTeam"
 	desc := "token description"
 	tokenName := "aTeamToken"

@@ -18,7 +18,7 @@ type CreateTemplateSourceRequest struct {
 }
 
 type TemplateSourceResponse struct {
-	Id          string                                  `json:"id"`
+	ID          string                                  `json:"id"`
 	IsValid     bool                                    `json:"isValid"`
 	Name        string                                  `json:"name"`
 	SourceURL   string                                  `json:"sourceURL"`
@@ -51,17 +51,17 @@ func (c *Client) CreateTemplateSource(
 func (c *Client) UpdateTemplateSource(
 	ctx context.Context,
 	organizationName string,
-	templateId string,
+	templateID string,
 	request CreateTemplateSourceRequest,
 ) (*TemplateSourceResponse, error) {
-	apiPath := path.Join("orgs", organizationName, "templates/sources", templateId)
+	apiPath := path.Join("orgs", organizationName, "templates/sources", templateID)
 	var response TemplateSourceResponse
 	_, err := c.do(ctx, http.MethodPatch, apiPath, request, &response)
 	if err != nil {
 		return nil, fmt.Errorf(
 			"failed to update template source in org %s with id %s: %+v due to error: %w",
 			organizationName,
-			templateId,
+			templateID,
 			request,
 			err,
 		)
@@ -91,7 +91,7 @@ func (c *Client) GetTemplateSource(
 	}
 
 	for _, source := range templateSources.Sources {
-		if source.Id == templateID {
+		if source.ID == templateID {
 			return &source, nil
 		}
 	}

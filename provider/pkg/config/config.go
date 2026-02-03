@@ -15,7 +15,7 @@ import (
 
 const (
 	EnvVarPulumiAccessToken = "PULUMI_ACCESS_TOKEN"
-	EnvVarPulumiBackendUrl  = "PULUMI_BACKEND_URL"
+	EnvVarPulumiBackendURL  = "PULUMI_BACKEND_URL"
 )
 
 func GetClient(ctx context.Context) Client {
@@ -56,15 +56,15 @@ type Client interface {
 
 type Config struct {
 	AccessToken string `pulumi:"accessToken,optional" provider:"secret"`
-	ApiURL      string `pulumi:"apiUrl,optional"`
+	APIURL      string `pulumi:"apiUrl,optional"`
 
 	client *pulumiapi.Client
 }
 
 func (c *Config) Annotate(a infer.Annotator) {
 	a.Describe(&c.AccessToken, "Access Token to authenticate with Pulumi Cloud.")
-	a.Describe(&c.ApiURL, "Optional override of Pulumi Cloud API endpoint.")
-	a.SetDefault(&c.ApiURL, "https://api.pulumi.com", EnvVarPulumiBackendUrl)
+	a.Describe(&c.APIURL, "Optional override of Pulumi Cloud API endpoint.")
+	a.SetDefault(&c.APIURL, "https://api.pulumi.com", EnvVarPulumiBackendURL)
 }
 
 func (c *Config) Configure(context.Context) error {
@@ -89,11 +89,11 @@ func (c *Config) Configure(context.Context) error {
 	var err error
 	c.client, err = pulumiapi.NewClient(&http.Client{
 		Timeout: 60 * time.Second,
-	}, c.AccessToken, c.ApiURL)
+	}, c.AccessToken, c.APIURL)
 	return err
 }
 
-func (*Config) Diff(ctx context.Context, req infer.DiffRequest[*Config, *Config]) (infer.DiffResponse, error) {
+func (*Config) Diff(_ context.Context, req infer.DiffRequest[*Config, *Config]) (infer.DiffResponse, error) {
 	kind := func(input, state string) p.DiffKind {
 		switch {
 		case input == "" && state != "":
@@ -117,10 +117,10 @@ func (*Config) Diff(ctx context.Context, req infer.DiffRequest[*Config, *Config]
 		}
 	}
 
-	if req.Inputs.ApiURL != req.State.ApiURL {
+	if req.Inputs.APIURL != req.State.APIURL {
 		hasChanges = true
 		detailedDiff["apiUrl"] = p.PropertyDiff{
-			Kind:      kind(req.Inputs.ApiURL, req.State.ApiURL),
+			Kind:      kind(req.Inputs.APIURL, req.State.APIURL),
 			InputDiff: true,
 		}
 	}

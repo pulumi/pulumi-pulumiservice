@@ -64,7 +64,8 @@ func TestCreateEnvironmentRotationSchedule(t *testing.T) {
 		assert.EqualError(
 			t,
 			err,
-			"failed to create environment rotation schedule (scheduleCron=0 * 0 * 0, scheduleOnce=<nil>): 401 API error: unauthorized",
+			"failed to create environment rotation schedule (scheduleCron=0 * 0 * 0, scheduleOnce=<nil>): "+
+				"401 API error: unauthorized",
 		)
 	})
 }
@@ -157,7 +158,8 @@ func TestUpdateEnvironmentRotationSchedule(t *testing.T) {
 		assert.EqualError(
 			t,
 			err,
-			"failed to update environment schedule test-schedule-id (scheduleCron=0 * 0 * 0, scheduleOnce=<nil>): 401 API error: unauthorized",
+			"failed to update environment schedule test-schedule-id (scheduleCron=0 * 0 * 0, "+
+				"scheduleOnce=<nil>): 401 API error: unauthorized",
 		)
 	})
 }

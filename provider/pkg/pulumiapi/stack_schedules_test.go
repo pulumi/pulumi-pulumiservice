@@ -27,7 +27,7 @@ var createDriftScheduleReq = CreateDriftScheduleRequest{
 	ScheduleCron:  cron,
 	AutoRemediate: true,
 }
-var createTtlScheduleReq = CreateTtlScheduleRequest{
+var createTTLScheduleReq = CreateTTLScheduleRequest{
 	Timestamp:          timestamp,
 	DeleteAfterDestroy: true,
 }
@@ -72,7 +72,8 @@ func TestCreateDeploymentSchedule(t *testing.T) {
 		assert.EqualError(
 			t,
 			err,
-			"failed to create deployment schedule (scheduleCron=0 * 0 * 0, scheduleOnce=<nil>, pulumiOperation=update): 401 API error: unauthorized",
+			"failed to create deployment schedule (scheduleCron=0 * 0 * 0, scheduleOnce=<nil>, "+
+				"pulumiOperation=update): 401 API error: unauthorized",
 		)
 	})
 }
@@ -165,7 +166,8 @@ func TestUpdateDeploymentSchedule(t *testing.T) {
 		assert.EqualError(
 			t,
 			err,
-			"failed to update deployment schedule test-schedule-id (scheduleCron=0 * 0 * 0, scheduleOnce=<nil>, pulumiOperation=update): 401 API error: unauthorized",
+			"failed to update deployment schedule test-schedule-id (scheduleCron=0 * 0 * 0, "+
+				"scheduleOnce=<nil>, pulumiOperation=update): 401 API error: unauthorized",
 		)
 	})
 }
@@ -264,22 +266,23 @@ func TestUpdateDriftSchedule(t *testing.T) {
 		assert.EqualError(
 			t,
 			err,
-			"failed to update drift schedule test-schedule-id (scheduleCron=0 * 0 * 0, autoRemediate=true): 401 API error: unauthorized",
+			"failed to update drift schedule test-schedule-id (scheduleCron=0 * 0 * 0, "+
+				"autoRemediate=true): 401 API error: unauthorized",
 		)
 	})
 }
 
-func TestCreateTtlSchedule(t *testing.T) {
+func TestCreateTTLSchedule(t *testing.T) {
 
 	t.Run("Happy Path", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqPath:   "/api/stacks/org/project/stack/deployments/ttl/schedules",
-			ExpectedReqBody:   createTtlScheduleReq,
+			ExpectedReqBody:   createTTLScheduleReq,
 			ResponseCode:      201,
 			ResponseBody:      testResponse,
 		})
-		expectedScheduleID, err := c.CreateTtlSchedule(ctx, testStack, createTtlScheduleReq)
+		expectedScheduleID, err := c.CreateTTLSchedule(ctx, testStack, createTTLScheduleReq)
 		assert.NoError(t, err)
 		assert.Equal(t, testScheduleID, *expectedScheduleID)
 	})
@@ -288,33 +291,34 @@ func TestCreateTtlSchedule(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqPath:   "/api/stacks/org/project/stack/deployments/ttl/schedules",
-			ExpectedReqBody:   createTtlScheduleReq,
+			ExpectedReqBody:   createTTLScheduleReq,
 			ResponseCode:      401,
 			ResponseBody: ErrorResponse{
 				Message: "unauthorized",
 			},
 		})
-		expectedScheduleID, err := c.CreateTtlSchedule(ctx, testStack, createTtlScheduleReq)
+		expectedScheduleID, err := c.CreateTTLSchedule(ctx, testStack, createTTLScheduleReq)
 		assert.Nil(t, expectedScheduleID, "ttl schedule should be nil since error was returned")
 		assert.EqualError(
 			t,
 			err,
-			"failed to create ttl schedule (timestamp="+timestamp.String()+", deleteAfterDestroy=true): 401 API error: unauthorized",
+			"failed to create ttl schedule (timestamp="+timestamp.String()+", "+
+				"deleteAfterDestroy=true): 401 API error: unauthorized",
 		)
 	})
 }
 
-func TestUpdateTtlSchedule(t *testing.T) {
+func TestUpdateTTLSchedule(t *testing.T) {
 
 	t.Run("Happy Path", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqPath:   "/api/stacks/org/project/stack/deployments/ttl/schedules/" + testScheduleID,
-			ExpectedReqBody:   createTtlScheduleReq,
+			ExpectedReqBody:   createTTLScheduleReq,
 			ResponseCode:      201,
 			ResponseBody:      testResponse,
 		})
-		expectedScheduleID, err := c.UpdateTtlSchedule(ctx, testStack, createTtlScheduleReq, testScheduleID)
+		expectedScheduleID, err := c.UpdateTTLSchedule(ctx, testStack, createTTLScheduleReq, testScheduleID)
 		assert.NoError(t, err)
 		assert.Equal(t, testScheduleID, *expectedScheduleID)
 	})
@@ -323,18 +327,19 @@ func TestUpdateTtlSchedule(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqPath:   "/api/stacks/org/project/stack/deployments/ttl/schedules/" + testScheduleID,
-			ExpectedReqBody:   createTtlScheduleReq,
+			ExpectedReqBody:   createTTLScheduleReq,
 			ResponseCode:      401,
 			ResponseBody: ErrorResponse{
 				Message: "unauthorized",
 			},
 		})
-		expectedScheduleID, err := c.UpdateTtlSchedule(ctx, testStack, createTtlScheduleReq, testScheduleID)
+		expectedScheduleID, err := c.UpdateTTLSchedule(ctx, testStack, createTTLScheduleReq, testScheduleID)
 		assert.Nil(t, expectedScheduleID, "scheduleId should be nil since error was returned")
 		assert.EqualError(
 			t,
 			err,
-			"failed to update ttl schedule test-schedule-id (timestamp="+timestamp.String()+", deleteAfterDestroy=true): 401 API error: unauthorized",
+			"failed to update ttl schedule test-schedule-id (timestamp="+timestamp.String()+", "+
+				"deleteAfterDestroy=true): 401 API error: unauthorized",
 		)
 	})
 }

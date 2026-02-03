@@ -58,7 +58,7 @@ type Team struct {
 type TeamMember struct {
 	Name        string
 	GithubLogin string
-	AvatarUrl   string
+	AvatarURL   string
 	Role        string
 }
 
@@ -151,10 +151,10 @@ func (c *Client) ListTeams(ctx context.Context, orgName string) ([]Team, error) 
 		return nil, errors.New("empty orgName")
 	}
 
-	apiUrl := path.Join("orgs", orgName, "teams")
+	apiURL := path.Join("orgs", orgName, "teams")
 
 	var teamArray Teams
-	_, err := c.do(ctx, http.MethodGet, apiUrl, nil, &teamArray)
+	_, err := c.do(ctx, http.MethodGet, apiURL, nil, &teamArray)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list teams for %q: %w", orgName, err)
 	}
@@ -310,18 +310,16 @@ func (c *Client) AddMemberToTeam(ctx context.Context, orgName, teamName, userNam
 			return nil
 		}
 		return err
-	} else {
-		return nil
 	}
+	return nil
 }
 
 func (c *Client) DeleteMemberFromTeam(ctx context.Context, orgName, teamName, userName string) error {
 	err := c.updateTeamMembership(ctx, orgName, teamName, userName, "remove")
 	if err != nil {
 		return err
-	} else {
-		return nil
 	}
+	return nil
 }
 
 func (c *Client) AddStackPermission(ctx context.Context, stack StackIdentifier, teamName string, permission int) error {

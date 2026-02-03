@@ -5,15 +5,22 @@ import (
 	"path"
 	"testing"
 
-	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
+)
+
+const (
+	testDeploymentSettingsOrgName     = "an-organization"
+	testDeploymentSettingsProjectName = "a-project"
+	testDeploymentSettingsStackName   = "a-stack"
 )
 
 func TestGetDeploymentSettings(t *testing.T) {
 
-	orgName := "an-organization"
-	projectName := "a-project"
-	stackName := "a-stack"
+	orgName := testDeploymentSettingsOrgName
+	projectName := testDeploymentSettingsProjectName
+	stackName := testDeploymentSettingsStackName
 
 	t.Run("Happy Path", func(t *testing.T) {
 		dsValue := DeploymentSettings{
@@ -80,9 +87,9 @@ func TestGetDeploymentSettings(t *testing.T) {
 
 func TestCreateDeploymentSettings(t *testing.T) {
 
-	orgName := "an-organization"
-	projectName := "a-project"
-	stackName := "a-stack"
+	orgName := testDeploymentSettingsOrgName
+	projectName := testDeploymentSettingsProjectName
+	stackName := testDeploymentSettingsStackName
 
 	t.Run("Happy Path", func(t *testing.T) {
 		dsValue := DeploymentSettings{

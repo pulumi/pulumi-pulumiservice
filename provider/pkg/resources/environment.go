@@ -7,14 +7,15 @@ import (
 	"path"
 	"strings"
 
+	pbempty "google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/structpb"
+
 	esc_client "github.com/pulumi/esc/cmd/esc/cli/client"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/asset"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
-	pbempty "google.golang.org/protobuf/types/known/emptypb"
-	"google.golang.org/protobuf/types/known/structpb"
 )
 
 const defaultProject = "default"
@@ -134,7 +135,7 @@ func (st *PulumiServiceEnvironmentResource) Diff(req *pulumirpc.DiffRequest) (*p
 			replaces = append(replaces, k)
 		}
 		detailedDiffs[k] = &pulumirpc.PropertyDiff{
-			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind),
+			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind), //nolint:gosec // safe conversion from plugin.DiffKind
 			InputDiff: v.InputDiff,
 		}
 	}

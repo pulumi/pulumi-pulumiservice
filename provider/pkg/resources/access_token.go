@@ -168,8 +168,8 @@ func (at *PulumiServiceAccessTokenResource) createAccessToken(
 	return accessToken, nil
 }
 
-func (at *PulumiServiceAccessTokenResource) deleteAccessToken(ctx context.Context, tokenId string) error {
-	return at.Client.DeleteAccessToken(ctx, tokenId)
+func (at *PulumiServiceAccessTokenResource) deleteAccessToken(ctx context.Context, tokenID string) error {
+	return at.Client.DeleteAccessToken(ctx, tokenID)
 }
 
 func diffAccessTokenProperties(req *pulumirpc.DiffRequest, replaceProps []string) (*pulumirpc.DiffResponse, error) {

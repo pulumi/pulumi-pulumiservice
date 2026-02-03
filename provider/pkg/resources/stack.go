@@ -79,7 +79,7 @@ func (s *PulumiServiceStackResource) Diff(req *pulumirpc.DiffRequest) (*pulumirp
 	for k, v := range dd {
 		v.Kind = v.Kind.AsReplace()
 		detailedDiffs[k] = &pulumirpc.PropertyDiff{
-			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind),
+			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind), //nolint:gosec // safe conversion from plugin.DiffKind
 			InputDiff: v.InputDiff,
 		}
 	}

@@ -19,32 +19,35 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/structpb"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
+	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
 // Mock client for PolicyGroup tests
 type PolicyGroupClientMock struct {
 	getPolicyGroupFunc         func() (*pulumiapi.PolicyGroup, error)
 	createPolicyGroupFunc      func(ctx context.Context, orgName, policyGroupName, entityType, mode string) error
-	batchUpdatePolicyGroupFunc func(ctx context.Context, orgName, policyGroupName string, reqs []pulumiapi.UpdatePolicyGroupRequest) error
+	batchUpdatePolicyGroupFunc func(
+		ctx context.Context, orgName, policyGroupName string, reqs []pulumiapi.UpdatePolicyGroupRequest,
+	) error
 }
 
 func (c *PolicyGroupClientMock) ListPolicyGroups(
-	ctx context.Context,
-	orgName string,
+	_ context.Context,
+	_ string,
 ) ([]pulumiapi.PolicyGroupSummary, error) {
 	return nil, nil
 }
 
 func (c *PolicyGroupClientMock) GetPolicyGroup(
-	ctx context.Context,
-	orgName string,
-	policyGroupName string,
+	_ context.Context,
+	_ string,
+	_ string,
 ) (*pulumiapi.PolicyGroup, error) {
 	if c.getPolicyGroupFunc != nil {
 		return c.getPolicyGroupFunc()
@@ -63,9 +66,9 @@ func (c *PolicyGroupClientMock) CreatePolicyGroup(
 }
 
 func (c *PolicyGroupClientMock) UpdatePolicyGroup(
-	ctx context.Context,
-	orgName, policyGroupName string,
-	req pulumiapi.UpdatePolicyGroupRequest,
+	_ context.Context,
+	_, _ string,
+	_ pulumiapi.UpdatePolicyGroupRequest,
 ) error {
 	return nil
 }
@@ -81,7 +84,7 @@ func (c *PolicyGroupClientMock) BatchUpdatePolicyGroup(
 	return nil
 }
 
-func (c *PolicyGroupClientMock) DeletePolicyGroup(ctx context.Context, orgName, policyGroupName string) error {
+func (c *PolicyGroupClientMock) DeletePolicyGroup(_ context.Context, _, _ string) error {
 	return nil
 }
 
@@ -587,7 +590,8 @@ func TestPolicyGroup_Diff_ArrayOrderIndependent(t *testing.T) {
 	assert.Empty(t, resp.Replaces, "Expected no replacements")
 }
 
-// TestPolicyGroup_Diff_NullVsEmptyArray tests that null arrays in inputs don't cause diffs against empty arrays in state
+// TestPolicyGroup_Diff_NullVsEmptyArray tests that null arrays in inputs don't
+// cause diffs against empty arrays in state
 func TestPolicyGroup_Diff_NullVsEmptyArray(t *testing.T) {
 	provider := PulumiServicePolicyGroupResource{
 		Client: &PolicyGroupClientMock{},
@@ -702,7 +706,8 @@ func TestPolicyGroup_ToPulumiServicePolicyGroupInput_MissingFields(t *testing.T)
 	assert.Equal(t, "", result.Mode)
 }
 
-// TestPolicyGroup_ToPulumiServicePolicyGroupInput_OptionalPolicyPackFields tests that optional policy pack fields are handled
+// TestPolicyGroup_ToPulumiServicePolicyGroupInput_OptionalPolicyPackFields
+// tests that optional policy pack fields are handled
 func TestPolicyGroup_ToPulumiServicePolicyGroupInput_OptionalPolicyPackFields(t *testing.T) {
 	// Test with only required name field
 	inputMap := resource.PropertyMap{
@@ -1048,7 +1053,7 @@ func TestPolicyGroup_Create(t *testing.T) {
 					assert.Equal(t, "audit", mode)
 					return nil
 				},
-				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, reqs []pulumiapi.UpdatePolicyGroupRequest) error {
+				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, _ []pulumiapi.UpdatePolicyGroupRequest) error {
 					batchUpdateCalled = true
 					return nil
 				},

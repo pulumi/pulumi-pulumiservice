@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/pulumi/esc"
 	"github.com/pulumi/esc/cmd/esc/cli/client"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
@@ -13,12 +15,15 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/workspace"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
-	"github.com/stretchr/testify/assert"
 )
 
-type getEnvironmentFunc func(ctx context.Context, orgName string, envName string, version string, decrypt bool) (yaml []byte, etag string, revision int, err error)
+type getEnvironmentFunc func(
+	ctx context.Context, orgName string, envName string, version string, decrypt bool,
+) (yaml []byte, etag string, revision int, err error)
 
-type getEnvironmentRevisionTagFunc func(ctx context.Context, orgName, envName, tagName string) (*client.EnvironmentRevisionTag, error)
+type getEnvironmentRevisionTagFunc func(
+	ctx context.Context, orgName, envName, tagName string,
+) (*client.EnvironmentRevisionTag, error)
 
 type EscClientMock struct {
 	getEnvironmentFunc            getEnvironmentFunc
@@ -27,7 +32,7 @@ type EscClientMock struct {
 
 func (c *EscClientMock) GetEnvironment(
 	ctx context.Context,
-	orgName, projectName, envName string,
+	orgName, _ /* projectName */, envName string,
 	version string,
 	decrypt bool,
 ) (yaml []byte, etag string, revision int, err error) {
@@ -35,23 +40,23 @@ func (c *EscClientMock) GetEnvironment(
 }
 
 func (c *EscClientMock) GetEnvironmentRevision(
-	ctx context.Context,
-	orgName, projectName, envName string,
-	revision int,
+	_ context.Context,
+	_, _, _ string,
+	_ int,
 ) (*client.EnvironmentRevision, error) {
 	return nil, nil
 }
 
 func (c *EscClientMock) GetEnvironmentRevisionTag(
 	ctx context.Context,
-	orgName, projectName, envName, tagName string,
+	orgName, _ /* projectName */, envName, tagName string,
 ) (*client.EnvironmentRevisionTag, error) {
 	return c.getEnvironmentRevisionTagFunc(ctx, orgName, envName, tagName)
 }
 
 func (c *EscClientMock) GetRevisionNumber(
-	ctx context.Context,
-	orgName, projectName, envName, version string,
+	_ context.Context,
+	_, _, _, _ string,
 ) (int, error) {
 	return 0, nil
 }
@@ -136,17 +141,17 @@ func (c *EscClientMock) ListOrganizationEnvironments(
 }
 
 func (c *EscClientMock) ListEnvironmentRevisions(
-	ctx context.Context,
-	orgName, projectName, envName string,
-	options client.ListEnvironmentRevisionsOptions,
+	_ context.Context,
+	_, _, _ string,
+	_ client.ListEnvironmentRevisionsOptions,
 ) ([]client.EnvironmentRevision, error) {
 	return nil, nil
 }
 
 func (c *EscClientMock) ListEnvironmentRevisionTags(
-	ctx context.Context,
-	orgName, projectName, envName string,
-	options client.ListEnvironmentRevisionTagsOptions,
+	_ context.Context,
+	_, _, _ string,
+	_ client.ListEnvironmentRevisionTagsOptions,
 ) ([]client.EnvironmentRevisionTag, error) {
 	return nil, nil
 }
@@ -297,43 +302,43 @@ func (c *EscClientMock) DeleteEnvironmentTag(context.Context, string, string, st
 }
 
 func (c *EscClientMock) UpdateEnvironmentRevisionTag(
-	ctx context.Context,
-	orgName, projectName, envName, tagName string,
-	revision *int,
+	_ context.Context,
+	_, _, _, _ string,
+	_ *int,
 ) error {
 	return nil
 }
 
 func (c *EscClientMock) UpdateEnvironmentWithRevision(
-	ctx context.Context,
-	orgName, projectName, envName string,
-	yaml []byte,
-	etag string,
+	_ context.Context,
+	_, _, _ string,
+	_ []byte,
+	_ string,
 ) ([]client.EnvironmentDiagnostic, int, error) {
 	return nil, 0, nil
 }
 
 func (c *EscClientMock) CreateEnvironmentRevisionTag(
-	ctx context.Context,
-	orgName, projectName, envName, tagName string,
-	revision *int,
+	_ context.Context,
+	_, _, _, _ string,
+	_ *int,
 ) error {
 	return nil
 }
 
 func (c *EscClientMock) DeleteEnvironmentRevisionTag(
-	ctx context.Context,
-	orgName, projectName, envName, tagName string,
+	_ context.Context,
+	_, _, _, _ string,
 ) error {
 	return nil
 }
 
 func (c *EscClientMock) RetractEnvironmentRevision(
-	ctx context.Context,
-	orgName, projectName, envName string,
-	version string,
-	replacement *int,
-	reason string,
+	_ context.Context,
+	_, _, _ string,
+	_ string,
+	_ *int,
+	_ string,
 ) error {
 	return nil
 }
@@ -358,10 +363,10 @@ func buildEscClientMock(
 
 func TestEnvironmentCheck(t *testing.T) {
 	mockedClient := buildEscClientMock(
-		func(ctx context.Context, orgName string, envName string, version string, decrypt bool) (yaml []byte, etag string, revision int, err error) {
+		func(_ context.Context, _ string, _ string, _ string, _ bool) (yaml []byte, etag string, revision int, err error) {
 			return nil, "", 0, fmt.Errorf("not found")
 		},
-		func(ctx context.Context, orgName, envName, tagName string) (*client.EnvironmentRevisionTag, error) {
+		func(_ context.Context, _, _, _ string) (*client.EnvironmentRevisionTag, error) {
 			return nil, nil
 		},
 	)
@@ -438,10 +443,10 @@ foo: bar
 func TestEnvironment(t *testing.T) {
 	t.Run("Read when the resource is not found", func(t *testing.T) {
 		mockedClient := buildEscClientMock(
-			func(ctx context.Context, orgName string, envName string, version string, decrypt bool) (yaml []byte, etag string, revision int, err error) {
+			func(_ context.Context, _ string, _ string, _ string, _ bool) (yaml []byte, etag string, revision int, err error) {
 				return nil, "", 0, fmt.Errorf("not found")
 			},
-			func(ctx context.Context, orgName, envName, tagName string) (*client.EnvironmentRevisionTag, error) {
+			func(_ context.Context, _, _, _ string) (*client.EnvironmentRevisionTag, error) {
 				return nil, nil
 			},
 		)
@@ -481,10 +486,10 @@ func TestEnvironment(t *testing.T) {
 
 	t.Run("Read when the resource is found", func(t *testing.T) {
 		mockedClient := buildEscClientMock(
-			func(ctx context.Context, orgName string, envName string, version string, decrypt bool) (yaml []byte, etag string, revision int, err error) {
+			func(_ context.Context, _ string, _ string, _ string, _ bool) (yaml []byte, etag string, revision int, err error) {
 				return nil, "", 0, nil
 			},
-			func(ctx context.Context, orgName, envName, tagName string) (*client.EnvironmentRevisionTag, error) {
+			func(_ context.Context, _, _, _ string) (*client.EnvironmentRevisionTag, error) {
 				return nil, nil
 			},
 		)
@@ -524,10 +529,10 @@ func TestEnvironment(t *testing.T) {
 func TestEnvironmentVersionTag(t *testing.T) {
 	t.Run("Read when the resource is not found", func(t *testing.T) {
 		mockedClient := buildEscClientMock(
-			func(ctx context.Context, orgName string, envName string, version string, decrypt bool) (yaml []byte, etag string, revision int, err error) {
+			func(_ context.Context, _ string, _ string, _ string, _ bool) (yaml []byte, etag string, revision int, err error) {
 				return nil, "", 0, nil
 			},
-			func(ctx context.Context, orgName, envName, tagName string) (*client.EnvironmentRevisionTag, error) {
+			func(_ context.Context, _, _, _ string) (*client.EnvironmentRevisionTag, error) {
 				return nil, nil
 			},
 		)
@@ -565,10 +570,10 @@ func TestEnvironmentVersionTag(t *testing.T) {
 
 	t.Run("Read when the resource is found", func(t *testing.T) {
 		mockedClient := buildEscClientMock(
-			func(ctx context.Context, orgName string, envName string, version string, decrypt bool) (yaml []byte, etag string, revision int, err error) {
+			func(_ context.Context, _ string, _ string, _ string, _ bool) (yaml []byte, etag string, revision int, err error) {
 				return nil, "", 0, nil
 			},
-			func(ctx context.Context, orgName, envName, tagName string) (*client.EnvironmentRevisionTag, error) {
+			func(_ context.Context, _, _, _ string) (*client.EnvironmentRevisionTag, error) {
 				return &client.EnvironmentRevisionTag{
 					Revision: 1,
 				}, nil

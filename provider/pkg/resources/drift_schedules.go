@@ -5,12 +5,13 @@ import (
 	"fmt"
 	"path"
 
+	pbempty "google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/structpb"
+
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
-	pbempty "google.golang.org/protobuf/types/known/emptypb"
-	"google.golang.org/protobuf/types/known/structpb"
 )
 
 type PulumiServiceDriftScheduleResource struct {
@@ -103,7 +104,7 @@ func (st *PulumiServiceDriftScheduleResource) Create(req *pulumirpc.CreateReques
 	}
 
 	outputProperties, err := plugin.MarshalProperties(
-		AddScheduleIdToPropertyMap(*scheduleID, input.ToPropertyMap()),
+		AddScheduleIDToPropertyMap(*scheduleID, input.ToPropertyMap()),
 		plugin.MarshalOptions{
 			KeepUnknowns: true,
 			SkipNulls:    true,
@@ -179,7 +180,7 @@ func (st *PulumiServiceDriftScheduleResource) Update(req *pulumirpc.UpdateReques
 	}
 
 	outputProperties, err := plugin.MarshalProperties(
-		AddScheduleIdToPropertyMap(*scheduleID, input.ToPropertyMap()),
+		AddScheduleIDToPropertyMap(*scheduleID, input.ToPropertyMap()),
 		plugin.MarshalOptions{
 			KeepUnknowns: true,
 			SkipNulls:    true,
@@ -225,7 +226,7 @@ func (st *PulumiServiceDriftScheduleResource) Read(req *pulumirpc.ReadRequest) (
 		return nil, fmt.Errorf("failed to read DriftSchedule (%q): %w", req.Id, err)
 	}
 	outputProperties, err := plugin.MarshalProperties(
-		AddScheduleIdToPropertyMap(*scheduleID, input.ToPropertyMap()),
+		AddScheduleIDToPropertyMap(*scheduleID, input.ToPropertyMap()),
 		plugin.MarshalOptions{
 			KeepUnknowns: true,
 			SkipNulls:    true,

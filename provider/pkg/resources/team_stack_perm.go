@@ -51,7 +51,7 @@ func (tp *TeamStackPermissionResource) Read(req *pulumirpc.ReadRequest) (*pulumi
 	ctx := context.Background()
 	id := req.GetId()
 
-	permId, err := splitTeamStackPermissionId(id)
+	permID, err := splitTeamStackPermissionID(id)
 	if err != nil {
 		if strings.Contains(err.Error(), "expected 4 parts") {
 			// Return an error if attempting to refresh stack permissions created before this change.
@@ -64,10 +64,10 @@ func (tp *TeamStackPermissionResource) Read(req *pulumirpc.ReadRequest) (*pulumi
 	}
 
 	permission, err := tp.Client.GetTeamStackPermission(ctx, pulumiapi.StackIdentifier{
-		OrgName:     permId.Organization,
-		ProjectName: permId.Project,
-		StackName:   permId.Stack,
-	}, permId.Team)
+		OrgName:     permID.Organization,
+		ProjectName: permID.Project,
+		StackName:   permID.Stack,
+	}, permID.Team)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get team stack permission: %w", err)
 	}
@@ -76,10 +76,10 @@ func (tp *TeamStackPermissionResource) Read(req *pulumirpc.ReadRequest) (*pulumi
 	}
 
 	inputs := TeamStackPermissionInput{
-		Organization: permId.Organization,
-		Project:      permId.Project,
-		Stack:        permId.Stack,
-		Team:         permId.Team,
+		Organization: permID.Organization,
+		Project:      permID.Project,
+		Stack:        permID.Stack,
+		Team:         permID.Team,
 		Permission:   *permission,
 	}
 
@@ -112,10 +112,10 @@ func (tp *TeamStackPermissionResource) Create(req *pulumirpc.CreateRequest) (*pu
 		return nil, err
 	}
 
-	stackPermissionId := fmt.Sprintf("%s/%s", stackName.String(), input.Team)
+	stackPermissionID := fmt.Sprintf("%s/%s", stackName.String(), input.Team)
 
 	return &pulumirpc.CreateResponse{
-		Id:         stackPermissionId,
+		Id:         stackPermissionID,
 		Properties: req.GetProperties(),
 	}, nil
 }
@@ -159,19 +159,19 @@ func (tp *TeamStackPermissionResource) Update(_ *pulumirpc.UpdateRequest) (*pulu
 	return nil, fmt.Errorf("unexpected call to update, expected create to be called instead")
 }
 
-type teamStackPermissionId struct {
+type teamStackPermissionID struct {
 	Organization string
 	Project      string
 	Stack        string
 	Team         string
 }
 
-func splitTeamStackPermissionId(id string) (teamStackPermissionId, error) {
+func splitTeamStackPermissionID(id string) (teamStackPermissionID, error) {
 	split := strings.Split(id, "/")
 	if len(split) != 4 {
-		return teamStackPermissionId{}, fmt.Errorf("invalid id %q, expected 4 parts", id)
+		return teamStackPermissionID{}, fmt.Errorf("invalid id %q, expected 4 parts", id)
 	}
-	return teamStackPermissionId{
+	return teamStackPermissionID{
 		Organization: split[0],
 		Project:      split[1],
 		Stack:        split[2],

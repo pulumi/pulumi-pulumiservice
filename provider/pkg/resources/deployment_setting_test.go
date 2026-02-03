@@ -18,31 +18,31 @@ type DeploymentSettingsClientMock struct {
 }
 
 func (c *DeploymentSettingsClientMock) CreateDeploymentSettings(
-	ctx context.Context,
-	stack pulumiapi.StackIdentifier,
-	ds pulumiapi.DeploymentSettings,
+	_ context.Context,
+	_ pulumiapi.StackIdentifier,
+	_ pulumiapi.DeploymentSettings,
 ) (*pulumiapi.DeploymentSettings, error) {
 	return nil, nil
 }
 
 func (c *DeploymentSettingsClientMock) UpdateDeploymentSettings(
-	ctx context.Context,
-	stack pulumiapi.StackIdentifier,
-	ds pulumiapi.DeploymentSettings,
+	_ context.Context,
+	_ pulumiapi.StackIdentifier,
+	_ pulumiapi.DeploymentSettings,
 ) (*pulumiapi.DeploymentSettings, error) {
 	return nil, nil
 }
 
 func (c *DeploymentSettingsClientMock) GetDeploymentSettings(
-	ctx context.Context,
-	stack pulumiapi.StackIdentifier,
+	_ context.Context,
+	_ pulumiapi.StackIdentifier,
 ) (*pulumiapi.DeploymentSettings, error) {
 	return c.getDeploymentSettingsFunc()
 }
 
 func (c *DeploymentSettingsClientMock) DeleteDeploymentSettings(
-	ctx context.Context,
-	stack pulumiapi.StackIdentifier,
+	_ context.Context,
+	_ pulumiapi.StackIdentifier,
 ) error {
 	return nil
 }

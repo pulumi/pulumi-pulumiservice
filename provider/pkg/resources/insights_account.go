@@ -90,16 +90,19 @@ func (c *InsightsAccountCore) Annotate(a infer.Annotator) {
 	a.Describe(&c.Provider, "The cloud provider for scanning.")
 	a.Describe(
 		&c.Environment,
-		"The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0').",
+		"The ESC environment used for provider credentials. Format: 'project/environment' with optional "+
+			"'@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0').",
 	)
 	a.Describe(
 		&c.ScanSchedule,
-		"Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.",
+		"Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled "+
+			"scanning. Defaults to 'none'.",
 	)
 	a.SetDefault(&c.ScanSchedule, ScanScheduleNone)
 	a.Describe(
 		&c.ProviderConfig,
-		"Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {\"regions\": [\"us-west-1\", \"us-west-2\"]}.",
+		"Provider-specific configuration as a JSON object. For AWS, specify regions to scan: "+
+			"{\"regions\": [\"us-west-1\", \"us-west-2\"]}.",
 	)
 	a.Describe(&c.Tags, "Key-value tags to associate with the insights account.")
 }
@@ -112,12 +115,12 @@ type InsightsAccountInput struct {
 // InsightsAccountState represents the output properties of an insights account
 type InsightsAccountState struct {
 	InsightsAccountCore
-	InsightsAccountId    string `pulumi:"insightsAccountId"`
+	InsightsAccountID    string `pulumi:"insightsAccountId"`
 	ScheduledScanEnabled bool   `pulumi:"scheduledScanEnabled"`
 }
 
 func (s *InsightsAccountState) Annotate(a infer.Annotator) {
-	a.Describe(&s.InsightsAccountId, "The insights account identifier.")
+	a.Describe(&s.InsightsAccountID, "The insights account identifier.")
 	a.Describe(&s.ScheduledScanEnabled, "Whether scheduled scanning is enabled.")
 }
 
@@ -136,7 +139,7 @@ func InsightsAccountStateFromAPI(orgName string, account pulumiapi.InsightsAccou
 			ProviderConfig:   account.ProviderConfig,
 			ScanSchedule:     scanSchedule,
 		},
-		InsightsAccountId:    account.ID,
+		InsightsAccountID:    account.ID,
 		ScheduledScanEnabled: account.ScheduledScanEnabled,
 	}
 }
@@ -151,7 +154,7 @@ func (*InsightsAccount) Create(
 			ID: accountID,
 			Output: InsightsAccountState{
 				InsightsAccountCore:  req.Inputs.InsightsAccountCore,
-				InsightsAccountId:    "",
+				InsightsAccountID:    "",
 				ScheduledScanEnabled: req.Inputs.ScanSchedule != ScanScheduleNone,
 			},
 		}, nil
@@ -199,18 +202,22 @@ func (*InsightsAccount) Create(
 	}
 	if account == nil {
 		return infer.CreateResponse[InsightsAccountState]{
-			ID: accountID,
-			Output: InsightsAccountState{
-				InsightsAccountCore: req.Inputs.InsightsAccountCore,
-			},
-		}, infer.ResourceInitFailedError{Reasons: []string{fmt.Sprintf("insights account '%s' not found after creation", req.Inputs.AccountName)}}
+				ID: accountID,
+				Output: InsightsAccountState{
+					InsightsAccountCore: req.Inputs.InsightsAccountCore,
+				},
+			}, infer.ResourceInitFailedError{
+				Reasons: []string{
+					fmt.Sprintf("insights account '%s' not found after creation", req.Inputs.AccountName),
+				},
+			}
 	}
 
 	return infer.CreateResponse[InsightsAccountState]{
 		ID: accountID,
 		Output: InsightsAccountState{
 			InsightsAccountCore:  req.Inputs.InsightsAccountCore,
-			InsightsAccountId:    account.ID,
+			InsightsAccountID:    account.ID,
 			ScheduledScanEnabled: account.ScheduledScanEnabled,
 		},
 	}, nil
@@ -229,7 +236,7 @@ func (*InsightsAccount) Read(
 	req infer.ReadRequest[InsightsAccountInput, InsightsAccountState],
 ) (infer.ReadResponse[InsightsAccountInput, InsightsAccountState], error) {
 	client := config.GetClient(ctx)
-	orgName, accountName, err := splitInsightsAccountId(req.ID)
+	orgName, accountName, err := splitInsightsAccountID(req.ID)
 	if err != nil {
 		return infer.ReadResponse[InsightsAccountInput, InsightsAccountState]{}, err
 	}
@@ -282,7 +289,7 @@ func (*InsightsAccount) Read(
 		},
 		State: InsightsAccountState{
 			InsightsAccountCore:  core,
-			InsightsAccountId:    account.ID,
+			InsightsAccountID:    account.ID,
 			ScheduledScanEnabled: account.ScheduledScanEnabled,
 		},
 	}, nil
@@ -296,7 +303,7 @@ func (*InsightsAccount) Update(
 		return infer.UpdateResponse[InsightsAccountState]{
 			Output: InsightsAccountState{
 				InsightsAccountCore:  req.Inputs.InsightsAccountCore,
-				InsightsAccountId:    req.State.InsightsAccountId,
+				InsightsAccountID:    req.State.InsightsAccountID,
 				ScheduledScanEnabled: req.State.ScheduledScanEnabled,
 			},
 		}, nil
@@ -305,7 +312,8 @@ func (*InsightsAccount) Update(
 	client := config.GetClient(ctx)
 
 	providerConfig := req.Inputs.ProviderConfig
-	// If provider config is default (empty or single region for AWS), pass config with empty regions to ensure API updates correctly
+	// If provider config is default (empty or single region for AWS), pass
+	// config with empty regions to ensure API updates correctly
 	if isDefaultProviderConfig(req.Inputs.Provider, providerConfig) {
 		providerConfig = map[string]interface{}{"regions": []string{}}
 	}
@@ -332,7 +340,7 @@ func (*InsightsAccount) Update(
 		return infer.UpdateResponse[InsightsAccountState]{
 			Output: InsightsAccountState{
 				InsightsAccountCore: req.Inputs.InsightsAccountCore,
-				InsightsAccountId:   req.State.InsightsAccountId,
+				InsightsAccountID:   req.State.InsightsAccountID,
 			},
 		}, infer.ResourceInitFailedError{Reasons: []string{fmt.Sprintf("failed to set tags: %s", err.Error())}}
 	}
@@ -342,23 +350,25 @@ func (*InsightsAccount) Update(
 		return infer.UpdateResponse[InsightsAccountState]{
 			Output: InsightsAccountState{
 				InsightsAccountCore: req.Inputs.InsightsAccountCore,
-				InsightsAccountId:   req.State.InsightsAccountId,
+				InsightsAccountID:   req.State.InsightsAccountID,
 			},
 		}, infer.ResourceInitFailedError{Reasons: []string{err.Error()}}
 	}
 	if account == nil {
 		return infer.UpdateResponse[InsightsAccountState]{
-			Output: InsightsAccountState{
-				InsightsAccountCore: req.Inputs.InsightsAccountCore,
-				InsightsAccountId:   req.State.InsightsAccountId,
-			},
-		}, infer.ResourceInitFailedError{Reasons: []string{fmt.Sprintf("insights account '%s' not found after update", req.State.AccountName)}}
+				Output: InsightsAccountState{
+					InsightsAccountCore: req.Inputs.InsightsAccountCore,
+					InsightsAccountID:   req.State.InsightsAccountID,
+				},
+			}, infer.ResourceInitFailedError{
+				Reasons: []string{fmt.Sprintf("insights account '%s' not found after update", req.State.AccountName)},
+			}
 	}
 
 	return infer.UpdateResponse[InsightsAccountState]{
 		Output: InsightsAccountState{
 			InsightsAccountCore:  req.Inputs.InsightsAccountCore,
-			InsightsAccountId:    account.ID,
+			InsightsAccountID:    account.ID,
 			ScheduledScanEnabled: account.ScheduledScanEnabled,
 		},
 	}, nil
@@ -378,7 +388,7 @@ func isDefaultProviderConfig(provider CloudProvider, config map[string]interface
 	return false
 }
 
-func splitInsightsAccountId(id string) (string, string, error) {
+func splitInsightsAccountID(id string) (string, string, error) {
 	// format: organization/accountName
 	s := strings.Split(id, "/")
 	if len(s) != 2 {

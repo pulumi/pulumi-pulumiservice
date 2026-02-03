@@ -21,30 +21,40 @@ type PulumiServiceDeploymentSettingsInput struct {
 	Stack pulumiapi.StackIdentifier
 }
 
-// plaintextInputSettings are the latest inputs of the resource, containing plaintext values wrapped in Secrets
-// currentStateCipherSettings are the latest outputs/properties of the resource, containing ciphertext strings of secret values
-// isInput is a flag that selects whether to generating an input PropertyMap that contains plaintext (true) or an output PropertyMap that contains ciphertext (false)
+// plaintextInputSettings are the latest inputs of the resource, containing
+// plaintext values wrapped in Secrets currentStateCipherSettings are the
+// latest outputs/properties of the resource, containing ciphertext strings of
+// secret values isInput is a flag that selects whether to generating an input
+// PropertyMap that contains plaintext (true) or an output PropertyMap that
+// contains ciphertext (false)
 func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(
 	plaintextInputSettings *pulumiapi.DeploymentSettings,
 	currentStateCipherSettings *pulumiapi.DeploymentSettings,
 	isInput bool,
 ) resource.PropertyMap {
-	// Below flags are used throughout this method and direct the serialization of twin value secrets
-	// Twin value secrets are values whose plaintext cannot be retrieved from the API, thus forcing the development of this fairly complex system
-	// When plaintextInputSettings is passed in, but currentStateCipherSettings is not, that means the resource is being created or updated
+	// Below flags are used throughout this method and direct the serialization
+	// of twin value secrets Twin value secrets are values whose plaintext
+	// cannot be retrieved from the API, thus forcing the development of this
+	// fairly complex system When plaintextInputSettings is passed in, but
+	// currentStateCipherSettings is not, that means the resource is being
+	// created or updated
 	createMode := plaintextInputSettings != nil && currentStateCipherSettings == nil
-	// When both plaintextInputSettings and currentStateCipherSettings are passed in, that means an existing resource is being refreshed, and it's necessary to merge values
-	// In case we are merging, but some of the properties don't previously exist, we will merge with empty value, setting plaintext to be empty string
+	// When both plaintextInputSettings and currentStateCipherSettings are
+	// passed in, that means an existing resource is being refreshed, and it's
+	// necessary to merge values In case we are merging, but some of the
+	// properties don't previously exist, we will merge with empty value,
+	// setting plaintext to be empty string
 	mergeMode := plaintextInputSettings != nil && currentStateCipherSettings != nil
-	// If neither one is passed in, we are importing an existing resource into the state
+	// If neither one is passed in, we are importing an existing resource into
+	// the state
 
 	pm := resource.PropertyMap{}
 	pm["organization"] = resource.NewPropertyValue(ds.Stack.OrgName)
 	pm["project"] = resource.NewPropertyValue(ds.Stack.ProjectName)
 	pm["stack"] = resource.NewPropertyValue(ds.Stack.StackName)
 
-	if ds.AgentPoolId != "" {
-		pm["agentPoolId"] = resource.NewPropertyValue(ds.AgentPoolId)
+	if ds.AgentPoolID != "" {
+		pm["agentPoolId"] = resource.NewPropertyValue(ds.AgentPoolID)
 	}
 
 	if ds.SourceContext != nil {
@@ -90,7 +100,9 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(
 							util.CreateSecretValue(sshAuthPropertyMap, "sshPrivateKey", ds.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey,
 								plaintextInputSettings.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey, isInput)
 						} else {
-							util.ImportSecretValue(sshAuthPropertyMap, "sshPrivateKey", ds.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey, isInput)
+							util.ImportSecretValue(
+								sshAuthPropertyMap, "sshPrivateKey", ds.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey, isInput,
+							)
 						}
 					}
 					if ds.SourceContext.Git.GitAuth.SSHAuth.Password != nil &&
@@ -153,7 +165,9 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(
 							util.CreateSecretValue(basicAuthPropertyMap, "password", ds.SourceContext.Git.GitAuth.BasicAuth.Password,
 								plaintextInputSettings.SourceContext.Git.GitAuth.BasicAuth.Password, isInput)
 						} else {
-							util.ImportSecretValue(basicAuthPropertyMap, "password", ds.SourceContext.Git.GitAuth.BasicAuth.Password, isInput)
+							util.ImportSecretValue(
+								basicAuthPropertyMap, "password", ds.SourceContext.Git.GitAuth.BasicAuth.Password, isInput,
+							)
 						}
 					}
 					gitAuthPropertyMap["basicAuth"] = resource.PropertyValue{V: basicAuthPropertyMap}
@@ -321,7 +335,7 @@ func (ds *PulumiServiceDeploymentSettingsResource) ToPulumiServiceDeploymentSett
 	input.Stack.StackName = util.GetSecretOrStringValue(inputMap["stack"])
 
 	if inputMap["agentPoolId"].HasValue() {
-		input.AgentPoolId = util.GetSecretOrStringValue(inputMap["agentPoolId"])
+		input.AgentPoolID = util.GetSecretOrStringValue(inputMap["agentPoolId"])
 	}
 
 	input.ExecutorContext = toExecutorContext(inputMap)
@@ -651,7 +665,7 @@ func (ds *PulumiServiceDeploymentSettingsResource) Diff(req *pulumirpc.DiffReque
 			replaces = append(replaces, k)
 		}
 		detailedDiffs[k] = &pulumirpc.PropertyDiff{
-			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind),
+			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind), //nolint:gosec // safe conversion from plugin.DiffKind
 			InputDiff: v.InputDiff,
 		}
 	}
