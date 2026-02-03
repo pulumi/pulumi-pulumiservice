@@ -120,10 +120,10 @@ only_build:: build
 
 lint:: | mise_install
 	if [ -d provider ]; then \
-		pushd provider && golangci-lint run --timeout 10m && popd ; \
+		pushd provider && golangci-lint run --timeout 10m --config ../.golangci.yml && popd ; \
 	fi
 	if [ -d examples ]; then \
-		pushd examples && golangci-lint run --timeout 10m --build-tags all && popd ; \
+		pushd examples && golangci-lint run --timeout 10m --build-tags all --config ../.golangci.yml && popd ; \
 	fi
 
 
