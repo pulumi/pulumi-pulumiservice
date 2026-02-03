@@ -23,7 +23,7 @@ import (
 	"strings"
 	"time"
 
-	_ "embed"
+	_ "embed" // For manualSchema.
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

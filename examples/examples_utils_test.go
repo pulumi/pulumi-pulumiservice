@@ -16,7 +16,7 @@ func getCwd(t *testing.T) string {
 }
 
 func generateRandomFiveDigits() string {
-	return fmt.Sprintf("%05d", rand.Intn(100000))
+	return fmt.Sprintf("%05d", rand.Intn(100000)) //nolint:gosec // For testing.
 }
 
 // getOrgName returns the organization name from PULUMI_TEST_OWNER env var,

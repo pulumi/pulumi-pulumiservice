@@ -13,12 +13,13 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/pulumi/providertest/pulumitest"
-	"github.com/pulumi/providertest/pulumitest/opttest"
-	"github.com/pulumi/pulumi/pkg/v3/testing/integration"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v2"
+
+	"github.com/pulumi/providertest/pulumitest"
+	"github.com/pulumi/providertest/pulumitest/opttest"
+	"github.com/pulumi/pulumi/pkg/v3/testing/integration"
 )
 
 type Resource struct {
@@ -479,7 +480,7 @@ func writePulumiYaml(t *testing.T, yamlContents interface{}) string {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = os.WriteFile(path.Join(tmpdir, "Pulumi.yaml"), b, 0666)
+	err = os.WriteFile(path.Join(tmpdir, "Pulumi.yaml"), b, 0600)
 	if err != nil {
 		t.Fatal(err)
 	}
