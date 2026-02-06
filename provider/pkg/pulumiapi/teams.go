@@ -384,6 +384,11 @@ func (c *Client) GetTeamStackPermission(ctx context.Context, stack StackIdentifi
 	var team Team
 	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &team)
 	if err != nil {
+		statusCode := GetErrorStatusCode(err)
+		if statusCode == http.StatusNotFound {
+			// Team doesn't exist, permission implicitly doesn't exist either
+			return nil, nil
+		}
 		return nil, fmt.Errorf("failed to get team: %w", err)
 	}
 
@@ -481,6 +486,11 @@ func (c *Client) GetTeamEnvironmentSettings(
 	var team Team
 	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &team)
 	if err != nil {
+		statusCode := GetErrorStatusCode(err)
+		if statusCode == http.StatusNotFound {
+			// Team doesn't exist, permission implicitly doesn't exist either
+			return nil, nil, nil
+		}
 		return nil, nil, fmt.Errorf("failed to get team environment permission: %w", err)
 	}
 
