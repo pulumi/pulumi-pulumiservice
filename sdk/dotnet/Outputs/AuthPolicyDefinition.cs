@@ -22,6 +22,10 @@ namespace Pulumi.PulumiService.Outputs
         /// </summary>
         public readonly Pulumi.PulumiService.AuthPolicyDecision Decision;
         /// <summary>
+        /// The role ID for organization tokens.
+        /// </summary>
+        public readonly string? RoleID;
+        /// <summary>
         /// OIDC rules to set for this policy.
         /// </summary>
         public readonly ImmutableDictionary<string, string> Rules;
@@ -48,6 +52,8 @@ namespace Pulumi.PulumiService.Outputs
 
             Pulumi.PulumiService.AuthPolicyDecision decision,
 
+            string? roleID,
+
             ImmutableDictionary<string, string> rules,
 
             string? runnerID,
@@ -60,6 +66,7 @@ namespace Pulumi.PulumiService.Outputs
         {
             AuthorizedPermissions = authorizedPermissions;
             Decision = decision;
+            RoleID = roleID;
             Rules = rules;
             RunnerID = runnerID;
             TeamName = teamName;

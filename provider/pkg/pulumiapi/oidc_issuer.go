@@ -67,6 +67,7 @@ type AuthPolicyDefinition struct {
 	UserLogin             *string           `json:"userLogin,omitempty"`
 	RunnerID              *string           `json:"runnerID,omitempty"`
 	AuthorizedPermissions []string          `json:"authorizedPermissions"`
+	RoleID                *string           `json:"roleID,omitempty"`
 	Rules                 map[string]string `json:"rules"`
 }
 
