@@ -56,6 +56,10 @@ export interface AuthPolicyDefinitionArgs {
      */
     decision: pulumi.Input<enums.AuthPolicyDecision>;
     /**
+     * The role ID for organization tokens.
+     */
+    roleID?: pulumi.Input<string>;
+    /**
      * OIDC rules to set for this policy.
      */
     rules: pulumi.Input<{[key: string]: pulumi.Input<string>}>;

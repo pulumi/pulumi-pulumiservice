@@ -291,6 +291,8 @@ type AuthPolicyDefinition struct {
 	AuthorizedPermissions []AuthPolicyPermissionLevel `pulumi:"authorizedPermissions"`
 	// The rule type of this policy definition
 	Decision AuthPolicyDecision `pulumi:"decision"`
+	// The role ID for organization tokens.
+	RoleID *string `pulumi:"roleID"`
 	// OIDC rules to set for this policy.
 	Rules map[string]string `pulumi:"rules"`
 	// The runner ID for deployment runner tokens.
@@ -319,6 +321,8 @@ type AuthPolicyDefinitionArgs struct {
 	AuthorizedPermissions AuthPolicyPermissionLevelArrayInput `pulumi:"authorizedPermissions"`
 	// The rule type of this policy definition
 	Decision AuthPolicyDecisionInput `pulumi:"decision"`
+	// The role ID for organization tokens.
+	RoleID pulumi.StringPtrInput `pulumi:"roleID"`
 	// OIDC rules to set for this policy.
 	Rules pulumi.StringMapInput `pulumi:"rules"`
 	// The runner ID for deployment runner tokens.
@@ -390,6 +394,11 @@ func (o AuthPolicyDefinitionOutput) AuthorizedPermissions() AuthPolicyPermission
 // The rule type of this policy definition
 func (o AuthPolicyDefinitionOutput) Decision() AuthPolicyDecisionOutput {
 	return o.ApplyT(func(v AuthPolicyDefinition) AuthPolicyDecision { return v.Decision }).(AuthPolicyDecisionOutput)
+}
+
+// The role ID for organization tokens.
+func (o AuthPolicyDefinitionOutput) RoleID() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v AuthPolicyDefinition) *string { return v.RoleID }).(pulumi.StringPtrOutput)
 }
 
 // OIDC rules to set for this policy.
