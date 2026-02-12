@@ -6,9 +6,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
 type getDeploymentScheduleFunc func() (*pulumiapi.StackScheduleResponse, error)
