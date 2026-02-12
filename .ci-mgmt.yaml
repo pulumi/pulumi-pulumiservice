@@ -1,5 +1,5 @@
 provider: pulumiservice
-major-version: 0
+major-version: 1
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   PULUMI_ACCESS_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_ACCESS_TOKEN_STAGING }}
@@ -20,3 +20,5 @@ template: generic
 shards: 6
 esc:
     enabled: true
+modulePath: .
+useJavaPackageGenSdk: true
