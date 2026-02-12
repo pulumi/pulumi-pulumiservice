@@ -17,11 +17,11 @@ package main
 import (
 	_ "embed"
 
-	psp "github.com/pulumi/pulumi-pulumiservice/provider/pkg/provider"
 	"github.com/pulumi/pulumi/pkg/v3/resource/provider"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/util/cmdutil"
 	rpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 
+	psp "github.com/pulumi/pulumi-pulumiservice/provider/pkg/provider"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/version"
 )
 

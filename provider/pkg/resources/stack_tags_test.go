@@ -7,9 +7,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
+
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
 func TestStackTagsUpdate(t *testing.T) {
