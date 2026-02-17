@@ -612,6 +612,146 @@ func (o AzureOIDCConfigurationPtrOutput) TenantId() pulumi.StringPtrOutput {
 	}).(pulumi.StringPtrOutput)
 }
 
+// A deployment role to use for the deployment.
+type DeploymentRole struct {
+	// The unique identifier of the deployment role.
+	Id *string `pulumi:"id"`
+}
+
+// DeploymentRoleInput is an input type that accepts DeploymentRoleArgs and DeploymentRoleOutput values.
+// You can construct a concrete instance of `DeploymentRoleInput` via:
+//
+//	DeploymentRoleArgs{...}
+type DeploymentRoleInput interface {
+	pulumi.Input
+
+	ToDeploymentRoleOutput() DeploymentRoleOutput
+	ToDeploymentRoleOutputWithContext(context.Context) DeploymentRoleOutput
+}
+
+// A deployment role to use for the deployment.
+type DeploymentRoleArgs struct {
+	// The unique identifier of the deployment role.
+	Id pulumi.StringPtrInput `pulumi:"id"`
+}
+
+func (DeploymentRoleArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*DeploymentRole)(nil)).Elem()
+}
+
+func (i DeploymentRoleArgs) ToDeploymentRoleOutput() DeploymentRoleOutput {
+	return i.ToDeploymentRoleOutputWithContext(context.Background())
+}
+
+func (i DeploymentRoleArgs) ToDeploymentRoleOutputWithContext(ctx context.Context) DeploymentRoleOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(DeploymentRoleOutput)
+}
+
+func (i DeploymentRoleArgs) ToDeploymentRolePtrOutput() DeploymentRolePtrOutput {
+	return i.ToDeploymentRolePtrOutputWithContext(context.Background())
+}
+
+func (i DeploymentRoleArgs) ToDeploymentRolePtrOutputWithContext(ctx context.Context) DeploymentRolePtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(DeploymentRoleOutput).ToDeploymentRolePtrOutputWithContext(ctx)
+}
+
+// DeploymentRolePtrInput is an input type that accepts DeploymentRoleArgs, DeploymentRolePtr and DeploymentRolePtrOutput values.
+// You can construct a concrete instance of `DeploymentRolePtrInput` via:
+//
+//	        DeploymentRoleArgs{...}
+//
+//	or:
+//
+//	        nil
+type DeploymentRolePtrInput interface {
+	pulumi.Input
+
+	ToDeploymentRolePtrOutput() DeploymentRolePtrOutput
+	ToDeploymentRolePtrOutputWithContext(context.Context) DeploymentRolePtrOutput
+}
+
+type deploymentRolePtrType DeploymentRoleArgs
+
+func DeploymentRolePtr(v *DeploymentRoleArgs) DeploymentRolePtrInput {
+	return (*deploymentRolePtrType)(v)
+}
+
+func (*deploymentRolePtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**DeploymentRole)(nil)).Elem()
+}
+
+func (i *deploymentRolePtrType) ToDeploymentRolePtrOutput() DeploymentRolePtrOutput {
+	return i.ToDeploymentRolePtrOutputWithContext(context.Background())
+}
+
+func (i *deploymentRolePtrType) ToDeploymentRolePtrOutputWithContext(ctx context.Context) DeploymentRolePtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(DeploymentRolePtrOutput)
+}
+
+// A deployment role to use for the deployment.
+type DeploymentRoleOutput struct{ *pulumi.OutputState }
+
+func (DeploymentRoleOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*DeploymentRole)(nil)).Elem()
+}
+
+func (o DeploymentRoleOutput) ToDeploymentRoleOutput() DeploymentRoleOutput {
+	return o
+}
+
+func (o DeploymentRoleOutput) ToDeploymentRoleOutputWithContext(ctx context.Context) DeploymentRoleOutput {
+	return o
+}
+
+func (o DeploymentRoleOutput) ToDeploymentRolePtrOutput() DeploymentRolePtrOutput {
+	return o.ToDeploymentRolePtrOutputWithContext(context.Background())
+}
+
+func (o DeploymentRoleOutput) ToDeploymentRolePtrOutputWithContext(ctx context.Context) DeploymentRolePtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v DeploymentRole) *DeploymentRole {
+		return &v
+	}).(DeploymentRolePtrOutput)
+}
+
+// The unique identifier of the deployment role.
+func (o DeploymentRoleOutput) Id() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v DeploymentRole) *string { return v.Id }).(pulumi.StringPtrOutput)
+}
+
+type DeploymentRolePtrOutput struct{ *pulumi.OutputState }
+
+func (DeploymentRolePtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**DeploymentRole)(nil)).Elem()
+}
+
+func (o DeploymentRolePtrOutput) ToDeploymentRolePtrOutput() DeploymentRolePtrOutput {
+	return o
+}
+
+func (o DeploymentRolePtrOutput) ToDeploymentRolePtrOutputWithContext(ctx context.Context) DeploymentRolePtrOutput {
+	return o
+}
+
+func (o DeploymentRolePtrOutput) Elem() DeploymentRoleOutput {
+	return o.ApplyT(func(v *DeploymentRole) DeploymentRole {
+		if v != nil {
+			return *v
+		}
+		var ret DeploymentRole
+		return ret
+	}).(DeploymentRoleOutput)
+}
+
+// The unique identifier of the deployment role.
+func (o DeploymentRolePtrOutput) Id() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *DeploymentRole) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Id
+	}).(pulumi.StringPtrOutput)
+}
+
 // Dependency cache settings for the deployment
 type DeploymentSettingsCacheOptions struct {
 	// Enable dependency caching
@@ -1873,6 +2013,8 @@ type DeploymentSettingsOperationContext struct {
 	Options *OperationContextOptions `pulumi:"options"`
 	// Shell commands to run before the Pulumi operation executes.
 	PreRunCommands []string `pulumi:"preRunCommands"`
+	// The role to use for this deployment.
+	Role *DeploymentRole `pulumi:"role"`
 }
 
 // DeploymentSettingsOperationContextInput is an input type that accepts DeploymentSettingsOperationContextArgs and DeploymentSettingsOperationContextOutput values.
@@ -1896,6 +2038,8 @@ type DeploymentSettingsOperationContextArgs struct {
 	Options OperationContextOptionsPtrInput `pulumi:"options"`
 	// Shell commands to run before the Pulumi operation executes.
 	PreRunCommands pulumi.StringArrayInput `pulumi:"preRunCommands"`
+	// The role to use for this deployment.
+	Role DeploymentRolePtrInput `pulumi:"role"`
 }
 
 func (DeploymentSettingsOperationContextArgs) ElementType() reflect.Type {
@@ -1996,6 +2140,11 @@ func (o DeploymentSettingsOperationContextOutput) PreRunCommands() pulumi.String
 	return o.ApplyT(func(v DeploymentSettingsOperationContext) []string { return v.PreRunCommands }).(pulumi.StringArrayOutput)
 }
 
+// The role to use for this deployment.
+func (o DeploymentSettingsOperationContextOutput) Role() DeploymentRolePtrOutput {
+	return o.ApplyT(func(v DeploymentSettingsOperationContext) *DeploymentRole { return v.Role }).(DeploymentRolePtrOutput)
+}
+
 type DeploymentSettingsOperationContextPtrOutput struct{ *pulumi.OutputState }
 
 func (DeploymentSettingsOperationContextPtrOutput) ElementType() reflect.Type {
@@ -2058,6 +2207,16 @@ func (o DeploymentSettingsOperationContextPtrOutput) PreRunCommands() pulumi.Str
 		}
 		return v.PreRunCommands
 	}).(pulumi.StringArrayOutput)
+}
+
+// The role to use for this deployment.
+func (o DeploymentSettingsOperationContextPtrOutput) Role() DeploymentRolePtrOutput {
+	return o.ApplyT(func(v *DeploymentSettingsOperationContext) *DeploymentRole {
+		if v == nil {
+			return nil
+		}
+		return v.Role
+	}).(DeploymentRolePtrOutput)
 }
 
 // Settings related to the source of the deployment.
@@ -3488,6 +3647,8 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*AuthPolicyDefinitionArrayInput)(nil)).Elem(), AuthPolicyDefinitionArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*AzureOIDCConfigurationInput)(nil)).Elem(), AzureOIDCConfigurationArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*AzureOIDCConfigurationPtrInput)(nil)).Elem(), AzureOIDCConfigurationArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentRoleInput)(nil)).Elem(), DeploymentRoleArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentRolePtrInput)(nil)).Elem(), DeploymentRoleArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsCacheOptionsInput)(nil)).Elem(), DeploymentSettingsCacheOptionsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsCacheOptionsPtrInput)(nil)).Elem(), DeploymentSettingsCacheOptionsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsExecutorContextInput)(nil)).Elem(), DeploymentSettingsExecutorContextArgs{})
@@ -3528,6 +3689,8 @@ func init() {
 	pulumi.RegisterOutputType(AuthPolicyDefinitionArrayOutput{})
 	pulumi.RegisterOutputType(AzureOIDCConfigurationOutput{})
 	pulumi.RegisterOutputType(AzureOIDCConfigurationPtrOutput{})
+	pulumi.RegisterOutputType(DeploymentRoleOutput{})
+	pulumi.RegisterOutputType(DeploymentRolePtrOutput{})
 	pulumi.RegisterOutputType(DeploymentSettingsCacheOptionsOutput{})
 	pulumi.RegisterOutputType(DeploymentSettingsCacheOptionsPtrOutput{})
 	pulumi.RegisterOutputType(DeploymentSettingsExecutorContextOutput{})

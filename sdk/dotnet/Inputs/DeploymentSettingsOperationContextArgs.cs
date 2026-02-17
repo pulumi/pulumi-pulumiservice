@@ -51,6 +51,12 @@ namespace Pulumi.PulumiService.Inputs
             set => _preRunCommands = value;
         }
 
+        /// <summary>
+        /// The role to use for this deployment.
+        /// </summary>
+        [Input("role")]
+        public Input<Inputs.DeploymentRoleArgs>? Role { get; set; }
+
         public DeploymentSettingsOperationContextArgs()
         {
         }

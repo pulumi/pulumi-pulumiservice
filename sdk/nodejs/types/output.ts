@@ -93,6 +93,16 @@ export interface AzureOIDCConfiguration {
 }
 
 /**
+ * A deployment role to use for the deployment.
+ */
+export interface DeploymentRole {
+    /**
+     * The unique identifier of the deployment role.
+     */
+    id?: string;
+}
+
+/**
  * Dependency cache settings for the deployment
  */
 export interface DeploymentSettingsCacheOptions {
@@ -246,6 +256,10 @@ export interface DeploymentSettingsOperationContext {
      * Shell commands to run before the Pulumi operation executes.
      */
     preRunCommands?: string[];
+    /**
+     * The role to use for this deployment.
+     */
+    role?: outputs.DeploymentRole;
 }
 
 /**

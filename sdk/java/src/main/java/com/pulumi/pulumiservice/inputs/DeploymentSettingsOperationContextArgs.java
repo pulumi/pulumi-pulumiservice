@@ -5,6 +5,7 @@ package com.pulumi.pulumiservice.inputs;
 
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
+import com.pulumi.pulumiservice.inputs.DeploymentRoleArgs;
 import com.pulumi.pulumiservice.inputs.OperationContextOIDCArgs;
 import com.pulumi.pulumiservice.inputs.OperationContextOptionsArgs;
 import java.lang.String;
@@ -83,6 +84,21 @@ public final class DeploymentSettingsOperationContextArgs extends com.pulumi.res
         return Optional.ofNullable(this.preRunCommands);
     }
 
+    /**
+     * The role to use for this deployment.
+     * 
+     */
+    @Import(name="role")
+    private @Nullable Output<DeploymentRoleArgs> role;
+
+    /**
+     * @return The role to use for this deployment.
+     * 
+     */
+    public Optional<Output<DeploymentRoleArgs>> role() {
+        return Optional.ofNullable(this.role);
+    }
+
     private DeploymentSettingsOperationContextArgs() {}
 
     private DeploymentSettingsOperationContextArgs(DeploymentSettingsOperationContextArgs $) {
@@ -90,6 +106,7 @@ public final class DeploymentSettingsOperationContextArgs extends com.pulumi.res
         this.oidc = $.oidc;
         this.options = $.options;
         this.preRunCommands = $.preRunCommands;
+        this.role = $.role;
     }
 
     public static Builder builder() {
@@ -202,6 +219,27 @@ public final class DeploymentSettingsOperationContextArgs extends com.pulumi.res
          */
         public Builder preRunCommands(String... preRunCommands) {
             return preRunCommands(List.of(preRunCommands));
+        }
+
+        /**
+         * @param role The role to use for this deployment.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder role(@Nullable Output<DeploymentRoleArgs> role) {
+            $.role = role;
+            return this;
+        }
+
+        /**
+         * @param role The role to use for this deployment.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder role(DeploymentRoleArgs role) {
+            return role(Output.of(role));
         }
 
         public DeploymentSettingsOperationContextArgs build() {

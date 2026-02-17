@@ -4,6 +4,7 @@
 package com.pulumi.pulumiservice.outputs;
 
 import com.pulumi.core.annotations.CustomType;
+import com.pulumi.pulumiservice.outputs.DeploymentRole;
 import com.pulumi.pulumiservice.outputs.OperationContextOIDC;
 import com.pulumi.pulumiservice.outputs.OperationContextOptions;
 import java.lang.String;
@@ -35,6 +36,11 @@ public final class DeploymentSettingsOperationContext {
      * 
      */
     private @Nullable List<String> preRunCommands;
+    /**
+     * @return The role to use for this deployment.
+     * 
+     */
+    private @Nullable DeploymentRole role;
 
     private DeploymentSettingsOperationContext() {}
     /**
@@ -65,6 +71,13 @@ public final class DeploymentSettingsOperationContext {
     public List<String> preRunCommands() {
         return this.preRunCommands == null ? List.of() : this.preRunCommands;
     }
+    /**
+     * @return The role to use for this deployment.
+     * 
+     */
+    public Optional<DeploymentRole> role() {
+        return Optional.ofNullable(this.role);
+    }
 
     public static Builder builder() {
         return new Builder();
@@ -79,6 +92,7 @@ public final class DeploymentSettingsOperationContext {
         private @Nullable OperationContextOIDC oidc;
         private @Nullable OperationContextOptions options;
         private @Nullable List<String> preRunCommands;
+        private @Nullable DeploymentRole role;
         public Builder() {}
         public Builder(DeploymentSettingsOperationContext defaults) {
     	      Objects.requireNonNull(defaults);
@@ -86,6 +100,7 @@ public final class DeploymentSettingsOperationContext {
     	      this.oidc = defaults.oidc;
     	      this.options = defaults.options;
     	      this.preRunCommands = defaults.preRunCommands;
+    	      this.role = defaults.role;
         }
 
         @CustomType.Setter
@@ -115,12 +130,19 @@ public final class DeploymentSettingsOperationContext {
         public Builder preRunCommands(String... preRunCommands) {
             return preRunCommands(List.of(preRunCommands));
         }
+        @CustomType.Setter
+        public Builder role(@Nullable DeploymentRole role) {
+
+            this.role = role;
+            return this;
+        }
         public DeploymentSettingsOperationContext build() {
             final var _resultValue = new DeploymentSettingsOperationContext();
             _resultValue.environmentVariables = environmentVariables;
             _resultValue.oidc = oidc;
             _resultValue.options = options;
             _resultValue.preRunCommands = preRunCommands;
+            _resultValue.role = role;
             return _resultValue;
         }
     }

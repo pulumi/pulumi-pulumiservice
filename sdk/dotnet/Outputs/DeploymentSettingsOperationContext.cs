@@ -32,6 +32,10 @@ namespace Pulumi.PulumiService.Outputs
         /// Shell commands to run before the Pulumi operation executes.
         /// </summary>
         public readonly ImmutableArray<string> PreRunCommands;
+        /// <summary>
+        /// The role to use for this deployment.
+        /// </summary>
+        public readonly Outputs.DeploymentRole? Role;
 
         [OutputConstructor]
         private DeploymentSettingsOperationContext(
@@ -41,12 +45,15 @@ namespace Pulumi.PulumiService.Outputs
 
             Outputs.OperationContextOptions? options,
 
-            ImmutableArray<string> preRunCommands)
+            ImmutableArray<string> preRunCommands,
+
+            Outputs.DeploymentRole? role)
         {
             EnvironmentVariables = environmentVariables;
             Oidc = oidc;
             Options = options;
             PreRunCommands = preRunCommands;
+            Role = role;
         }
     }
 }

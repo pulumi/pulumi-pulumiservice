@@ -21,6 +21,7 @@ __all__ = [
     'ApprovalRuleConfig',
     'AuthPolicyDefinition',
     'AzureOIDCConfiguration',
+    'DeploymentRole',
     'DeploymentSettingsCacheOptions',
     'DeploymentSettingsExecutorContext',
     'DeploymentSettingsGitAuthBasicAuth',
@@ -361,6 +362,29 @@ class AzureOIDCConfiguration(dict):
         The tenant ID of the federated workload identity.
         """
         return pulumi.get(self, "tenant_id")
+
+
+@pulumi.output_type
+class DeploymentRole(dict):
+    """
+    A deployment role to use for the deployment.
+    """
+    def __init__(__self__, *,
+                 id: Optional[_builtins.str] = None):
+        """
+        A deployment role to use for the deployment.
+        :param _builtins.str id: The unique identifier of the deployment role.
+        """
+        if id is not None:
+            pulumi.set(__self__, "id", id)
+
+    @_builtins.property
+    @pulumi.getter
+    def id(self) -> Optional[_builtins.str]:
+        """
+        The unique identifier of the deployment role.
+        """
+        return pulumi.get(self, "id")
 
 
 @pulumi.output_type
@@ -783,13 +807,15 @@ class DeploymentSettingsOperationContext(dict):
                  environment_variables: Optional[Mapping[str, _builtins.str]] = None,
                  oidc: Optional['outputs.OperationContextOIDC'] = None,
                  options: Optional['outputs.OperationContextOptions'] = None,
-                 pre_run_commands: Optional[Sequence[_builtins.str]] = None):
+                 pre_run_commands: Optional[Sequence[_builtins.str]] = None,
+                 role: Optional['outputs.DeploymentRole'] = None):
         """
         Settings related to the Pulumi operation environment during the deployment.
         :param Mapping[str, _builtins.str] environment_variables: Environment variables to set for the deployment.
         :param 'OperationContextOIDC' oidc: OIDC configuration to use during the deployment.
         :param 'OperationContextOptions' options: Options to override default behavior during the deployment.
         :param Sequence[_builtins.str] pre_run_commands: Shell commands to run before the Pulumi operation executes.
+        :param 'DeploymentRole' role: The role to use for this deployment.
         """
         if environment_variables is not None:
             pulumi.set(__self__, "environment_variables", environment_variables)
@@ -799,6 +825,8 @@ class DeploymentSettingsOperationContext(dict):
             pulumi.set(__self__, "options", options)
         if pre_run_commands is not None:
             pulumi.set(__self__, "pre_run_commands", pre_run_commands)
+        if role is not None:
+            pulumi.set(__self__, "role", role)
 
     @_builtins.property
     @pulumi.getter(name="environmentVariables")
@@ -831,6 +859,14 @@ class DeploymentSettingsOperationContext(dict):
         Shell commands to run before the Pulumi operation executes.
         """
         return pulumi.get(self, "pre_run_commands")
+
+    @_builtins.property
+    @pulumi.getter
+    def role(self) -> Optional['outputs.DeploymentRole']:
+        """
+        The role to use for this deployment.
+        """
+        return pulumi.get(self, "role")
 
 
 @pulumi.output_type

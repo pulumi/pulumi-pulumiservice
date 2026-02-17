@@ -24,6 +24,8 @@ __all__ = [
     'AuthPolicyDefinitionArgsDict',
     'AzureOIDCConfigurationArgs',
     'AzureOIDCConfigurationArgsDict',
+    'DeploymentRoleArgs',
+    'DeploymentRoleArgsDict',
     'DeploymentSettingsCacheOptionsArgs',
     'DeploymentSettingsCacheOptionsArgsDict',
     'DeploymentSettingsExecutorContextArgs',
@@ -456,6 +458,42 @@ class AzureOIDCConfigurationArgs:
     @tenant_id.setter
     def tenant_id(self, value: pulumi.Input[_builtins.str]):
         pulumi.set(self, "tenant_id", value)
+
+
+if not MYPY:
+    class DeploymentRoleArgsDict(TypedDict):
+        """
+        A deployment role to use for the deployment.
+        """
+        id: NotRequired[pulumi.Input[_builtins.str]]
+        """
+        The unique identifier of the deployment role.
+        """
+elif False:
+    DeploymentRoleArgsDict: TypeAlias = Mapping[str, Any]
+
+@pulumi.input_type
+class DeploymentRoleArgs:
+    def __init__(__self__, *,
+                 id: Optional[pulumi.Input[_builtins.str]] = None):
+        """
+        A deployment role to use for the deployment.
+        :param pulumi.Input[_builtins.str] id: The unique identifier of the deployment role.
+        """
+        if id is not None:
+            pulumi.set(__self__, "id", id)
+
+    @_builtins.property
+    @pulumi.getter
+    def id(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        The unique identifier of the deployment role.
+        """
+        return pulumi.get(self, "id")
+
+    @id.setter
+    def id(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "id", value)
 
 
 if not MYPY:
@@ -955,6 +993,10 @@ if not MYPY:
         """
         Shell commands to run before the Pulumi operation executes.
         """
+        role: NotRequired[pulumi.Input['DeploymentRoleArgsDict']]
+        """
+        The role to use for this deployment.
+        """
 elif False:
     DeploymentSettingsOperationContextArgsDict: TypeAlias = Mapping[str, Any]
 
@@ -964,13 +1006,15 @@ class DeploymentSettingsOperationContextArgs:
                  environment_variables: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
                  oidc: Optional[pulumi.Input['OperationContextOIDCArgs']] = None,
                  options: Optional[pulumi.Input['OperationContextOptionsArgs']] = None,
-                 pre_run_commands: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None):
+                 pre_run_commands: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 role: Optional[pulumi.Input['DeploymentRoleArgs']] = None):
         """
         Settings related to the Pulumi operation environment during the deployment.
         :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] environment_variables: Environment variables to set for the deployment.
         :param pulumi.Input['OperationContextOIDCArgs'] oidc: OIDC configuration to use during the deployment.
         :param pulumi.Input['OperationContextOptionsArgs'] options: Options to override default behavior during the deployment.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] pre_run_commands: Shell commands to run before the Pulumi operation executes.
+        :param pulumi.Input['DeploymentRoleArgs'] role: The role to use for this deployment.
         """
         if environment_variables is not None:
             pulumi.set(__self__, "environment_variables", environment_variables)
@@ -980,6 +1024,8 @@ class DeploymentSettingsOperationContextArgs:
             pulumi.set(__self__, "options", options)
         if pre_run_commands is not None:
             pulumi.set(__self__, "pre_run_commands", pre_run_commands)
+        if role is not None:
+            pulumi.set(__self__, "role", role)
 
     @_builtins.property
     @pulumi.getter(name="environmentVariables")
@@ -1028,6 +1074,18 @@ class DeploymentSettingsOperationContextArgs:
     @pre_run_commands.setter
     def pre_run_commands(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]):
         pulumi.set(self, "pre_run_commands", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def role(self) -> Optional[pulumi.Input['DeploymentRoleArgs']]:
+        """
+        The role to use for this deployment.
+        """
+        return pulumi.get(self, "role")
+
+    @role.setter
+    def role(self, value: Optional[pulumi.Input['DeploymentRoleArgs']]):
+        pulumi.set(self, "role", value)
 
 
 if not MYPY:
