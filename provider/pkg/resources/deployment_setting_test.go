@@ -8,6 +8,8 @@ import (
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
@@ -112,6 +114,44 @@ func TestDeploymentSettingsRoundtrip(t *testing.T) {
 				Enable: true,
 			},
 		}}
+
+	encoded := initial.ToPropertyMap(nil, nil, true)
+	decoded := (&PulumiServiceDeploymentSettingsResource{}).ToPulumiServiceDeploymentSettingsInput(encoded)
+
+	assert.EqualValues(t, initial, decoded)
+}
+
+func TestDeploymentSettingsRoleRoundtrip(t *testing.T) {
+	initial := PulumiServiceDeploymentSettingsInput{
+		DeploymentSettings: pulumiapi.DeploymentSettings{
+			OperationContext: &pulumiapi.OperationContext{
+				Role: &pulumiapi.DeploymentRole{
+					ID: "role-123",
+				},
+			},
+		},
+	}
+
+	encoded := initial.ToPropertyMap(nil, nil, true)
+	decoded := (&PulumiServiceDeploymentSettingsResource{}).ToPulumiServiceDeploymentSettingsInput(encoded)
+
+	assert.EqualValues(t, initial, decoded)
+}
+
+func TestDeploymentSettingsRoleWithOtherContextRoundtrip(t *testing.T) {
+	initial := PulumiServiceDeploymentSettingsInput{
+		DeploymentSettings: pulumiapi.DeploymentSettings{
+			OperationContext: &pulumiapi.OperationContext{
+				PreRunCommands: []string{"echo hello"},
+				Role: &pulumiapi.DeploymentRole{
+					ID: "role-456",
+				},
+				Options: &pulumiapi.OperationContextOptions{
+					SkipInstallDependencies: true,
+				},
+			},
+		},
+	}
 
 	encoded := initial.ToPropertyMap(nil, nil, true)
 	decoded := (&PulumiServiceDeploymentSettingsResource{}).ToPulumiServiceDeploymentSettingsInput(encoded)

@@ -388,9 +388,23 @@
         "oidc": {
           "$ref": "#/types/pulumiservice:index:OperationContextOIDC",
           "description": "OIDC configuration to use during the deployment."
+        },
+        "role": {
+          "$ref": "#/types/pulumiservice:index:DeploymentRole",
+          "description": "The role to use for this deployment."
         }
       },
       "type": "object"
+    },
+    "pulumiservice:index:DeploymentRole": {
+      "type": "object",
+      "description": "A deployment role to use for the deployment.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier of the deployment role."
+        }
+      }
     },
     "pulumiservice:index:OperationContextOptions": {
       "type": "object",

@@ -40,6 +40,11 @@ type OperationContext struct {
 	PreRunCommands       []string                 `json:"PreRunCommands,omitempty"`
 	EnvironmentVariables map[string]SecretValue   `json:"environmentVariables,omitempty"`
 	OIDC                 *OIDCConfiguration       `json:"oidc,omitempty"`
+	Role                 *DeploymentRole          `json:"role,omitempty"`
+}
+
+type DeploymentRole struct {
+	ID string `json:"id,omitempty"`
 }
 
 type OIDCConfiguration struct {

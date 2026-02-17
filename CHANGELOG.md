@@ -4,6 +4,7 @@
 
 ### Improvements
 
+- Added `role` property to DeploymentSettings `operationContext` for configuring deployment roles
 - Added InsightsAccount resource and getInsightsAccount/getInsightsAccounts for cloud resource scanning and analysis across AWS, Azure, and GCP, OCI and Kubernetes. 
 - Added `accounts` field to PolicyGroup resource for managing cloud accounts in policy groups
 - Updated PolicyGroup to use batch API for more efficient updates when adding/removing stacks, accounts, or policy packs

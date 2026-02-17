@@ -26,7 +26,7 @@ settings = DeploymentSettings(
         environment_variables={
             "MY_ENV_VAR": "my-value",
             "MY_SECRET_ENV_VAR": config.require_secret("my-secret")
-        }
+        },
     ),
     source_context=DeploymentSettingsSourceContextArgs(
         git=DeploymentSettingsGitSourceArgs(

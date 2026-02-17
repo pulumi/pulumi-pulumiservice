@@ -224,6 +224,13 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(
 			}
 			ocMap["options"] = resource.PropertyValue{V: optionsMap}
 		}
+		if ds.OperationContext.Role != nil {
+			roleMap := resource.PropertyMap{}
+			if ds.OperationContext.Role.ID != "" {
+				roleMap["id"] = resource.NewPropertyValue(ds.OperationContext.Role.ID)
+			}
+			ocMap["role"] = resource.PropertyValue{V: roleMap}
+		}
 		if ds.OperationContext.OIDC != nil {
 			if ds.OperationContext.OIDC.AWS != nil || ds.OperationContext.OIDC.GCP != nil ||
 				ds.OperationContext.OIDC.Azure != nil {
@@ -535,6 +542,17 @@ func toOperationContext(inputMap resource.PropertyMap) *pulumiapi.OperationConte
 		}
 
 		oc.Options = &o
+	}
+
+	if ocInput["role"].HasValue() {
+		roleInput := util.GetSecretOrObjectValue(ocInput["role"])
+		var role pulumiapi.DeploymentRole
+
+		if roleInput["id"].HasValue() {
+			role.ID = util.GetSecretOrStringValue(roleInput["id"])
+		}
+
+		oc.Role = &role
 	}
 
 	if ocInput["oidc"].HasValue() {
