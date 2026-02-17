@@ -158,3 +158,73 @@ func TestDeploymentSettingsRoleWithOtherContextRoundtrip(t *testing.T) {
 
 	assert.EqualValues(t, initial, decoded)
 }
+
+func TestCheckPreservesUnknownsDuringPreview(t *testing.T) {
+	keepUnknowns := plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true}
+	provider := PulumiServiceDeploymentSettingsResource{}
+
+	t.Run("top-level unknown passes validation", func(t *testing.T) {
+		inputs := resource.PropertyMap{
+			"organization": resource.NewStringProperty("test-org"),
+			"project":      resource.NewStringProperty("test-project"),
+			"stack":        resource.MakeComputed(resource.NewStringProperty("")),
+		}
+
+		news, err := plugin.MarshalProperties(inputs, keepUnknowns)
+		assert.NoError(t, err)
+
+		resp, err := provider.Check(&pulumirpc.CheckRequest{News: news})
+		assert.NoError(t, err)
+		assert.Empty(t, resp.Failures)
+
+		outputs, err := plugin.UnmarshalProperties(resp.Inputs, keepUnknowns)
+		assert.NoError(t, err)
+		assert.True(t, outputs["stack"].IsComputed())
+	})
+
+	t.Run("nested unknown in operationContext is preserved", func(t *testing.T) {
+		inputs := resource.PropertyMap{
+			"organization": resource.NewStringProperty("test-org"),
+			"project":      resource.NewStringProperty("test-project"),
+			"stack":        resource.NewStringProperty("test-stack"),
+			"operationContext": resource.NewObjectProperty(resource.PropertyMap{
+				"role": resource.NewObjectProperty(resource.PropertyMap{
+					"id": resource.MakeComputed(resource.NewStringProperty("")),
+				}),
+			}),
+		}
+
+		news, err := plugin.MarshalProperties(inputs, keepUnknowns)
+		assert.NoError(t, err)
+
+		resp, err := provider.Check(&pulumirpc.CheckRequest{News: news})
+		assert.NoError(t, err)
+		assert.Empty(t, resp.Failures)
+
+		outputs, err := plugin.UnmarshalProperties(resp.Inputs, keepUnknowns)
+		assert.NoError(t, err)
+		oc := outputs["operationContext"].ObjectValue()
+		role := oc["role"].ObjectValue()
+		assert.True(t, role["id"].IsComputed())
+	})
+
+	t.Run("secrets are preserved alongside unknowns", func(t *testing.T) {
+		inputs := resource.PropertyMap{
+			"organization": resource.NewStringProperty("test-org"),
+			"project":      resource.NewStringProperty("test-project"),
+			"stack":        resource.MakeSecret(resource.NewStringProperty("secret-stack")),
+		}
+
+		news, err := plugin.MarshalProperties(inputs, keepUnknowns)
+		assert.NoError(t, err)
+
+		resp, err := provider.Check(&pulumirpc.CheckRequest{News: news})
+		assert.NoError(t, err)
+		assert.Empty(t, resp.Failures)
+
+		outputs, err := plugin.UnmarshalProperties(resp.Inputs, keepUnknowns)
+		assert.NoError(t, err)
+		assert.True(t, outputs["stack"].IsSecret())
+		assert.Equal(t, "secret-stack", outputs["stack"].SecretValue().Element.StringValue())
+	})
+}
