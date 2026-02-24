@@ -305,11 +305,17 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(
 		pm["github"] = resource.PropertyValue{V: githubMap}
 	}
 
-	if ds.ExecutorContext != nil && ds.ExecutorContext.ExecutorImage != nil &&
-		ds.ExecutorContext.ExecutorImage.Reference != "" {
+	if ds.ExecutorContext != nil {
 		ecMap := resource.PropertyMap{}
-		ecMap["executorImage"] = resource.NewPropertyValue(ds.ExecutorContext.ExecutorImage.Reference)
-		pm["executorContext"] = resource.PropertyValue{V: ecMap}
+		if ds.ExecutorContext.ExecutorImage != nil && ds.ExecutorContext.ExecutorImage.Reference != "" {
+			ecMap["executorImage"] = resource.NewPropertyValue(ds.ExecutorContext.ExecutorImage.Reference)
+		}
+		if ds.ExecutorContext.ExecutorRootPath != "" {
+			ecMap["executorRootPath"] = resource.NewPropertyValue(ds.ExecutorContext.ExecutorRootPath)
+		}
+		if len(ecMap) > 0 {
+			pm["executorContext"] = resource.PropertyValue{V: ecMap}
+		}
 	}
 
 	if ds.CacheOptions != nil {
@@ -347,18 +353,22 @@ func (ds *PulumiServiceDeploymentSettingsResource) ToPulumiServiceDeploymentSett
 	return input
 }
 
-func toExecutorContext(inputMap resource.PropertyMap) *apitype.ExecutorContext {
+func toExecutorContext(inputMap resource.PropertyMap) *pulumiapi.ExecutorContext {
 	if !inputMap["executorContext"].HasValue() {
 		return nil
 	}
 
 	ecInput := util.GetSecretOrObjectValue(inputMap["executorContext"])
-	var ec apitype.ExecutorContext
+	var ec pulumiapi.ExecutorContext
 
 	if ecInput["executorImage"].HasValue() {
 		ec.ExecutorImage = &apitype.DockerImage{
 			Reference: util.GetSecretOrStringValue(ecInput["executorImage"]),
 		}
+	}
+
+	if ecInput["executorRootPath"].HasValue() {
+		ec.ExecutorRootPath = util.GetSecretOrStringValue(ecInput["executorRootPath"])
 	}
 
 	return &ec

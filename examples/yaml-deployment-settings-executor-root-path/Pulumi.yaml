@@ -1,0 +1,16 @@
+name: yaml-deployment-settings-executor-root-path
+runtime: yaml
+description: Deployment settings test with custom executor root path
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+resources:
+  my_settings:
+    type: pulumiservice:DeploymentSettings
+    properties:
+      organization: ${organizationName}
+      project: yaml-deployment-settings-executor-root-path
+      stack: test-stack-${digits}
+      executorContext:
+        executorRootPath: /my/custom/root

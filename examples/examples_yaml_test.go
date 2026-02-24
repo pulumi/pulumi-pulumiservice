@@ -252,6 +252,17 @@ func TestYamlDeploymentSettingsCommitExample(t *testing.T) {
 	})
 }
 
+func TestYamlDeploymentSettingsExecutorRootPathExample(t *testing.T) {
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-deployment-settings-executor-root-path"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+	)
+	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	test.SetConfig(t, "organizationName", getOrgName())
+	runPulumiTest(t, test)
+}
+
 func TestYamlTeamAccessTokenExample(t *testing.T) {
 	cwd, _ := os.Getwd()
 	integration.ProgramTest(t, &integration.ProgramTestOptions{

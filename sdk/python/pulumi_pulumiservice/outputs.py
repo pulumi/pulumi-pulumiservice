@@ -398,6 +398,8 @@ class DeploymentSettingsExecutorContext(dict):
         suggest = None
         if key == "executorImage":
             suggest = "executor_image"
+        elif key == "executorRootPath":
+            suggest = "executor_root_path"
 
         if suggest:
             pulumi.log.warn(f"Key '{key}' not found in DeploymentSettingsExecutorContext. Access the value via the '{suggest}' property getter instead.")
@@ -411,20 +413,33 @@ class DeploymentSettingsExecutorContext(dict):
         return super().get(key, default)
 
     def __init__(__self__, *,
-                 executor_image: _builtins.str):
+                 executor_image: Optional[_builtins.str] = None,
+                 executor_root_path: Optional[_builtins.str] = None):
         """
         The executor context defines information about the executor where the deployment is executed. If unspecified, the default 'pulumi/pulumi' image is used.
         :param _builtins.str executor_image: Allows overriding the default executor image with a custom image. E.g. 'pulumi/pulumi-nodejs:latest'
+        :param _builtins.str executor_root_path: Override the default root path (/) used by the deployment executor. This can be useful when running with non-root users (e.g., set to /tmp ).
         """
-        pulumi.set(__self__, "executor_image", executor_image)
+        if executor_image is not None:
+            pulumi.set(__self__, "executor_image", executor_image)
+        if executor_root_path is not None:
+            pulumi.set(__self__, "executor_root_path", executor_root_path)
 
     @_builtins.property
     @pulumi.getter(name="executorImage")
-    def executor_image(self) -> _builtins.str:
+    def executor_image(self) -> Optional[_builtins.str]:
         """
         Allows overriding the default executor image with a custom image. E.g. 'pulumi/pulumi-nodejs:latest'
         """
         return pulumi.get(self, "executor_image")
+
+    @_builtins.property
+    @pulumi.getter(name="executorRootPath")
+    def executor_root_path(self) -> Optional[_builtins.str]:
+        """
+        Override the default root path (/) used by the deployment executor. This can be useful when running with non-root users (e.g., set to /tmp ).
+        """
+        return pulumi.get(self, "executor_root_path")
 
 
 @pulumi.output_type

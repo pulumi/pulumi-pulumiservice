@@ -26,13 +26,18 @@ type DeploymentSettingsClient interface {
 }
 
 type DeploymentSettings struct {
-	OperationContext *OperationContext        `json:"operationContext,omitempty"`
-	GitHub           *GitHubConfiguration     `json:"gitHub,omitempty"`
-	SourceContext    *SourceContext           `json:"sourceContext,omitempty"`
-	ExecutorContext  *apitype.ExecutorContext `json:"executorContext,omitempty"`
-	AgentPoolID      string                   `json:"agentPoolId,omitempty"`
-	Source           *string                  `json:"source,omitempty"`
-	CacheOptions     *CacheOptions            `json:"cacheOptions,omitempty"`
+	OperationContext *OperationContext    `json:"operationContext,omitempty"`
+	GitHub           *GitHubConfiguration `json:"gitHub,omitempty"`
+	SourceContext    *SourceContext       `json:"sourceContext,omitempty"`
+	ExecutorContext  *ExecutorContext     `json:"executorContext,omitempty"`
+	AgentPoolID      string               `json:"agentPoolId,omitempty"`
+	Source           *string              `json:"source,omitempty"`
+	CacheOptions     *CacheOptions        `json:"cacheOptions,omitempty"`
+}
+
+type ExecutorContext struct {
+	ExecutorImage    *apitype.DockerImage `json:"executorImage,omitempty" yaml:"executorImage,omitempty"`
+	ExecutorRootPath string               `json:"executorRootPath,omitempty" yaml:"executorRootPath,omitempty"`
 }
 
 type OperationContext struct {

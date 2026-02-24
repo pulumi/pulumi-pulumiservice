@@ -236,12 +236,13 @@
         "executorImage": {
           "type": "string",
           "description": "Allows overriding the default executor image with a custom image. E.g. 'pulumi/pulumi-nodejs:latest'"
+        },
+        "executorRootPath": {
+          "type": "string",
+          "description": "Override the default root path (/) used by the deployment executor. This can be useful when running with non-root users (e.g., set to /tmp )."
         }
       },
-      "type": "object",
-      "required": [
-        "executorImage"
-      ]
+      "type": "object"
     },
     "pulumiservice:index:DeploymentSettingsSourceContext": {
       "description": "Settings related to the source of the deployment.",

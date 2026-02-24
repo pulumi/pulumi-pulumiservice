@@ -4,9 +4,10 @@
 package com.pulumi.pulumiservice.outputs;
 
 import com.pulumi.core.annotations.CustomType;
-import com.pulumi.exceptions.MissingRequiredPropertyException;
 import java.lang.String;
 import java.util.Objects;
+import java.util.Optional;
+import javax.annotation.Nullable;
 
 @CustomType
 public final class DeploymentSettingsExecutorContext {
@@ -14,15 +15,27 @@ public final class DeploymentSettingsExecutorContext {
      * @return Allows overriding the default executor image with a custom image. E.g. &#39;pulumi/pulumi-nodejs:latest&#39;
      * 
      */
-    private String executorImage;
+    private @Nullable String executorImage;
+    /**
+     * @return Override the default root path (/) used by the deployment executor. This can be useful when running with non-root users (e.g., set to /tmp ).
+     * 
+     */
+    private @Nullable String executorRootPath;
 
     private DeploymentSettingsExecutorContext() {}
     /**
      * @return Allows overriding the default executor image with a custom image. E.g. &#39;pulumi/pulumi-nodejs:latest&#39;
      * 
      */
-    public String executorImage() {
-        return this.executorImage;
+    public Optional<String> executorImage() {
+        return Optional.ofNullable(this.executorImage);
+    }
+    /**
+     * @return Override the default root path (/) used by the deployment executor. This can be useful when running with non-root users (e.g., set to /tmp ).
+     * 
+     */
+    public Optional<String> executorRootPath() {
+        return Optional.ofNullable(this.executorRootPath);
     }
 
     public static Builder builder() {
@@ -34,24 +47,31 @@ public final class DeploymentSettingsExecutorContext {
     }
     @CustomType.Builder
     public static final class Builder {
-        private String executorImage;
+        private @Nullable String executorImage;
+        private @Nullable String executorRootPath;
         public Builder() {}
         public Builder(DeploymentSettingsExecutorContext defaults) {
     	      Objects.requireNonNull(defaults);
     	      this.executorImage = defaults.executorImage;
+    	      this.executorRootPath = defaults.executorRootPath;
         }
 
         @CustomType.Setter
-        public Builder executorImage(String executorImage) {
-            if (executorImage == null) {
-              throw new MissingRequiredPropertyException("DeploymentSettingsExecutorContext", "executorImage");
-            }
+        public Builder executorImage(@Nullable String executorImage) {
+
             this.executorImage = executorImage;
+            return this;
+        }
+        @CustomType.Setter
+        public Builder executorRootPath(@Nullable String executorRootPath) {
+
+            this.executorRootPath = executorRootPath;
             return this;
         }
         public DeploymentSettingsExecutorContext build() {
             final var _resultValue = new DeploymentSettingsExecutorContext();
             _resultValue.executorImage = executorImage;
+            _resultValue.executorRootPath = executorRootPath;
             return _resultValue;
         }
     }

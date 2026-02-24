@@ -118,7 +118,11 @@ export interface DeploymentSettingsExecutorContextArgs {
     /**
      * Allows overriding the default executor image with a custom image. E.g. 'pulumi/pulumi-nodejs:latest'
      */
-    executorImage: pulumi.Input<string>;
+    executorImage?: pulumi.Input<string>;
+    /**
+     * Override the default root path (/) used by the deployment executor. This can be useful when running with non-root users (e.g., set to /tmp ).
+     */
+    executorRootPath?: pulumi.Input<string>;
 }
 
 /**
