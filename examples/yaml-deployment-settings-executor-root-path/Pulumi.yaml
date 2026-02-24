@@ -5,6 +5,8 @@ config:
   organizationName:
     type: string
     default: service-provider-test-org
+  digits:
+    type: string
 resources:
   my_settings:
     type: pulumiservice:DeploymentSettings
