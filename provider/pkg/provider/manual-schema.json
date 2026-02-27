@@ -364,6 +364,51 @@
       },
       "type": "object"
     },
+    "pulumiservice:index:DeploymentSettingsVcs": {
+      "description": "VCS settings for the deployment, supporting multiple VCS providers.",
+      "properties": {
+        "provider": {
+          "type": "string",
+          "description": "The VCS provider type. Must be 'azure_devops' or 'github'."
+        },
+        "repository": {
+          "type": "string",
+          "description": "The repository identifier (e.g., 'ProjectName/RepoName' for Azure DevOps, 'org/repo' for GitHub)."
+        },
+        "installationId": {
+          "type": "string",
+          "description": "The VCS integration ID."
+        },
+        "deployCommits": {
+          "type": "boolean",
+          "description": "Trigger a deployment running `pulumi up` on commit.",
+          "default": true
+        },
+        "previewPullRequests": {
+          "type": "boolean",
+          "description": "Trigger a deployment running `pulumi preview` when a PR is opened.",
+          "default": true
+        },
+        "pullRequestTemplate": {
+          "type": "boolean",
+          "description": "Use this stack as a template for pull request review stacks.",
+          "default": false
+        },
+        "paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The paths within the repo that deployments should be filtered to."
+        },
+        "deployPullRequest": {
+          "type": "integer",
+          "description": "Deploy a specific pull request number."
+        }
+      },
+      "required": ["provider"],
+      "type": "object"
+    },
     "pulumiservice:index:DeploymentSettingsOperationContext": {
       "description": "Settings related to the Pulumi operation environment during the deployment.",
       "properties": {
@@ -1252,6 +1297,10 @@
           "$ref": "#/types/pulumiservice:index:DeploymentSettingsGithub",
           "description": "GitHub settings for the deployment."
         },
+        "vcs": {
+          "$ref": "#/types/pulumiservice:index:DeploymentSettingsVcs",
+          "description": "VCS settings for the deployment. Supports Azure DevOps and GitHub via the 'provider' discriminator field."
+        },
         "operationContext": {
           "$ref": "#/types/pulumiservice:index:DeploymentSettingsOperationContext",
           "description": "Settings related to the Pulumi operation environment during the deployment."
@@ -1297,6 +1346,10 @@
         "github": {
           "$ref": "#/types/pulumiservice:index:DeploymentSettingsGithub",
           "description": "GitHub settings for the deployment."
+        },
+        "vcs": {
+          "$ref": "#/types/pulumiservice:index:DeploymentSettingsVcs",
+          "description": "VCS settings for the deployment. Supports Azure DevOps and GitHub via the 'provider' discriminator field."
         },
         "operationContext": {
           "$ref": "#/types/pulumiservice:index:DeploymentSettingsOperationContext",
@@ -2209,6 +2262,105 @@
       "requiredInputs": [
         "name",
         "organizationName"
+      ]
+    },
+    "pulumiservice:index:AzureDevOpsIntegration": {
+      "description": "Manages an Azure DevOps integration for a Pulumi organization.\n\n### Import\n\nAzure DevOps integrations can be imported using `{orgName}/{integrationId}` e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:AzureDevOpsIntegration my_integration my-org/integration-uuid\n```\n\n",
+      "properties": {
+        "organization": {
+          "description": "The Pulumi organization name.",
+          "type": "string"
+        },
+        "adoOrganizationName": {
+          "description": "The Azure DevOps organization name (e.g., 'mycompany' in dev.azure.com/mycompany).",
+          "type": "string"
+        },
+        "projectId": {
+          "description": "The Azure DevOps project UUID.",
+          "type": "string"
+        },
+        "disablePRComments": {
+          "description": "Disable PR comments from Pulumi.",
+          "type": "boolean",
+          "default": false
+        },
+        "disableNeoSummaries": {
+          "description": "Disable AI summaries on PRs.",
+          "type": "boolean",
+          "default": false
+        },
+        "disableDetailedDiff": {
+          "description": "Disable property-level diffs on PRs.",
+          "type": "boolean",
+          "default": false
+        },
+        "integrationId": {
+          "description": "The Pulumi-assigned integration ID.",
+          "type": "string"
+        },
+        "valid": {
+          "description": "Whether the integration is currently valid.",
+          "type": "boolean"
+        },
+        "adoOrganizationId": {
+          "description": "The Azure DevOps organization ID.",
+          "type": "string"
+        },
+        "adoOrganizationUrl": {
+          "description": "The Azure DevOps organization account URL.",
+          "type": "string"
+        },
+        "projectName": {
+          "description": "The Azure DevOps project name.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "organization",
+        "adoOrganizationName",
+        "projectId",
+        "integrationId",
+        "valid",
+        "adoOrganizationId",
+        "adoOrganizationUrl",
+        "projectName"
+      ],
+      "inputProperties": {
+        "organization": {
+          "description": "The Pulumi organization name.",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "adoOrganizationName": {
+          "description": "The Azure DevOps organization name (e.g., 'mycompany' in dev.azure.com/mycompany).",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "projectId": {
+          "description": "The Azure DevOps project UUID.",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "disablePRComments": {
+          "description": "Disable PR comments from Pulumi.",
+          "type": "boolean",
+          "default": false
+        },
+        "disableNeoSummaries": {
+          "description": "Disable AI summaries on PRs.",
+          "type": "boolean",
+          "default": false
+        },
+        "disableDetailedDiff": {
+          "description": "Disable property-level diffs on PRs.",
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "requiredInputs": [
+        "organization",
+        "adoOrganizationName",
+        "projectId"
       ]
     }
   },
