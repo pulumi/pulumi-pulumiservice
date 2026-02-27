@@ -33,6 +33,7 @@ type DeploymentSettings struct {
 	AgentPoolID      string                   `json:"agentPoolId,omitempty"`
 	Source           *string                  `json:"source,omitempty"`
 	CacheOptions     *CacheOptions            `json:"cacheOptions,omitempty"`
+	VCS              *VCSConfiguration        `json:"vcs,omitempty"`
 }
 
 type OperationContext struct {
@@ -83,6 +84,17 @@ type GitHubConfiguration struct {
 	PreviewPullRequests bool     `json:"previewPullRequests,omitempty"`
 	PullRequestTemplate bool     `json:"pullRequestTemplate,omitempty"`
 	Paths               []string `json:"paths,omitempty"`
+}
+
+type VCSConfiguration struct {
+	Provider            string   `json:"provider"`
+	Repository          string   `json:"repository,omitempty"`
+	InstallationID      string   `json:"installationId,omitempty"`
+	DeployCommits       bool     `json:"deployCommits,omitempty"`
+	PreviewPullRequests bool     `json:"previewPullRequests,omitempty"`
+	PullRequestTemplate bool     `json:"pullRequestTemplate,omitempty"`
+	Paths               []string `json:"paths,omitempty"`
+	DeployPullRequest   *int     `json:"deployPullRequest,omitempty"`
 }
 
 type SourceContext struct {

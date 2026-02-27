@@ -305,6 +305,27 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(
 		pm["github"] = resource.PropertyValue{V: githubMap}
 	}
 
+	if ds.VCS != nil {
+		vcsMap := resource.PropertyMap{}
+		vcsMap["provider"] = resource.NewPropertyValue(ds.VCS.Provider)
+		vcsMap["deployCommits"] = resource.NewPropertyValue(ds.VCS.DeployCommits)
+		vcsMap["previewPullRequests"] = resource.NewPropertyValue(ds.VCS.PreviewPullRequests)
+		vcsMap["pullRequestTemplate"] = resource.NewPropertyValue(ds.VCS.PullRequestTemplate)
+		if ds.VCS.Repository != "" {
+			vcsMap["repository"] = resource.NewPropertyValue(ds.VCS.Repository)
+		}
+		if ds.VCS.InstallationID != "" {
+			vcsMap["installationId"] = resource.NewPropertyValue(ds.VCS.InstallationID)
+		}
+		if len(ds.VCS.Paths) > 0 {
+			vcsMap["paths"] = resource.NewPropertyValue(ds.VCS.Paths)
+		}
+		if ds.VCS.DeployPullRequest != nil {
+			vcsMap["deployPullRequest"] = resource.NewPropertyValue(float64(*ds.VCS.DeployPullRequest))
+		}
+		pm["vcs"] = resource.PropertyValue{V: vcsMap}
+	}
+
 	if ds.ExecutorContext != nil && ds.ExecutorContext.ExecutorImage != nil &&
 		ds.ExecutorContext.ExecutorImage.Reference != "" {
 		ecMap := resource.PropertyMap{}
@@ -343,6 +364,7 @@ func (ds *PulumiServiceDeploymentSettingsResource) ToPulumiServiceDeploymentSett
 	input.SourceContext = toSourceContext(inputMap)
 	input.OperationContext = toOperationContext(inputMap)
 	input.CacheOptions = toCacheOptions(inputMap)
+	input.VCS = toVCSConfig(inputMap)
 
 	return input
 }
@@ -397,6 +419,48 @@ func toGitHubConfig(inputMap resource.PropertyMap) *pulumiapi.GitHubConfiguratio
 	}
 
 	return &github
+}
+
+func toVCSConfig(inputMap resource.PropertyMap) *pulumiapi.VCSConfiguration {
+	if !inputMap["vcs"].HasValue() {
+		return nil
+	}
+
+	vcsInput := util.GetSecretOrObjectValue(inputMap["vcs"])
+	var vcs pulumiapi.VCSConfiguration
+
+	if vcsInput["provider"].HasValue() {
+		vcs.Provider = util.GetSecretOrStringValue(vcsInput["provider"])
+	}
+	if vcsInput["repository"].HasValue() {
+		vcs.Repository = util.GetSecretOrStringValue(vcsInput["repository"])
+	}
+	if vcsInput["installationId"].HasValue() {
+		vcs.InstallationID = util.GetSecretOrStringValue(vcsInput["installationId"])
+	}
+	if vcsInput["deployCommits"].HasValue() {
+		vcs.DeployCommits = util.GetSecretOrBoolValue(vcsInput["deployCommits"])
+	}
+	if vcsInput["previewPullRequests"].HasValue() {
+		vcs.PreviewPullRequests = util.GetSecretOrBoolValue(vcsInput["previewPullRequests"])
+	}
+	if vcsInput["pullRequestTemplate"].HasValue() {
+		vcs.PullRequestTemplate = util.GetSecretOrBoolValue(vcsInput["pullRequestTemplate"])
+	}
+	if vcsInput["paths"].HasValue() {
+		pathsInput := util.GetSecretOrArrayValue(vcsInput["paths"])
+		paths := make([]string, len(pathsInput))
+		for i, v := range pathsInput {
+			paths[i] = util.GetSecretOrStringValue(v)
+		}
+		vcs.Paths = paths
+	}
+	if vcsInput["deployPullRequest"].HasValue() {
+		val := int(vcsInput["deployPullRequest"].NumberValue())
+		vcs.DeployPullRequest = &val
+	}
+
+	return &vcs
 }
 
 func toSourceContext(inputMap resource.PropertyMap) *pulumiapi.SourceContext {
