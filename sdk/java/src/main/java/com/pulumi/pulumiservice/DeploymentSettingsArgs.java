@@ -11,6 +11,7 @@ import com.pulumi.pulumiservice.inputs.DeploymentSettingsExecutorContextArgs;
 import com.pulumi.pulumiservice.inputs.DeploymentSettingsGithubArgs;
 import com.pulumi.pulumiservice.inputs.DeploymentSettingsOperationContextArgs;
 import com.pulumi.pulumiservice.inputs.DeploymentSettingsSourceContextArgs;
+import com.pulumi.pulumiservice.inputs.DeploymentSettingsVcsArgs;
 import java.lang.String;
 import java.util.Objects;
 import java.util.Optional;
@@ -156,6 +157,21 @@ public final class DeploymentSettingsArgs extends com.pulumi.resources.ResourceA
         return this.stack;
     }
 
+    /**
+     * VCS settings for the deployment. Supports Azure DevOps and GitHub via the &#39;provider&#39; discriminator field.
+     * 
+     */
+    @Import(name="vcs")
+    private @Nullable Output<DeploymentSettingsVcsArgs> vcs;
+
+    /**
+     * @return VCS settings for the deployment. Supports Azure DevOps and GitHub via the &#39;provider&#39; discriminator field.
+     * 
+     */
+    public Optional<Output<DeploymentSettingsVcsArgs>> vcs() {
+        return Optional.ofNullable(this.vcs);
+    }
+
     private DeploymentSettingsArgs() {}
 
     private DeploymentSettingsArgs(DeploymentSettingsArgs $) {
@@ -168,6 +184,7 @@ public final class DeploymentSettingsArgs extends com.pulumi.resources.ResourceA
         this.project = $.project;
         this.sourceContext = $.sourceContext;
         this.stack = $.stack;
+        this.vcs = $.vcs;
     }
 
     public static Builder builder() {
@@ -375,6 +392,27 @@ public final class DeploymentSettingsArgs extends com.pulumi.resources.ResourceA
          */
         public Builder stack(String stack) {
             return stack(Output.of(stack));
+        }
+
+        /**
+         * @param vcs VCS settings for the deployment. Supports Azure DevOps and GitHub via the &#39;provider&#39; discriminator field.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder vcs(@Nullable Output<DeploymentSettingsVcsArgs> vcs) {
+            $.vcs = vcs;
+            return this;
+        }
+
+        /**
+         * @param vcs VCS settings for the deployment. Supports Azure DevOps and GitHub via the &#39;provider&#39; discriminator field.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder vcs(DeploymentSettingsVcsArgs vcs) {
+            return vcs(Output.of(vcs));
         }
 
         public DeploymentSettingsArgs build() {

@@ -10,6 +10,7 @@ from ._enums import *
 from .access_token import *
 from .agent_pool import *
 from .approval_rule import *
+from .azure_dev_ops_integration import *
 from .deployment_schedule import *
 from .deployment_settings import *
 from .drift_schedule import *
@@ -55,6 +56,7 @@ _utilities.register(
    "pulumiservice:index:AccessToken": "AccessToken",
    "pulumiservice:index:AgentPool": "AgentPool",
    "pulumiservice:index:ApprovalRule": "ApprovalRule",
+   "pulumiservice:index:AzureDevOpsIntegration": "AzureDevOpsIntegration",
    "pulumiservice:index:DeploymentSchedule": "DeploymentSchedule",
    "pulumiservice:index:DeploymentSettings": "DeploymentSettings",
    "pulumiservice:index:DriftSchedule": "DriftSchedule",

@@ -81,6 +81,10 @@ export class DeploymentSettings extends pulumi.CustomResource {
      * Stack name.
      */
     declare public readonly stack: pulumi.Output<string>;
+    /**
+     * VCS settings for the deployment. Supports Azure DevOps and GitHub via the 'provider' discriminator field.
+     */
+    declare public readonly vcs: pulumi.Output<outputs.DeploymentSettingsVcs | undefined>;
 
     /**
      * Create a DeploymentSettings resource with the given unique name, arguments, and options.
@@ -111,6 +115,7 @@ export class DeploymentSettings extends pulumi.CustomResource {
             resourceInputs["project"] = args?.project;
             resourceInputs["sourceContext"] = args?.sourceContext;
             resourceInputs["stack"] = args?.stack;
+            resourceInputs["vcs"] = args ? (args.vcs ? pulumi.output(args.vcs).apply(inputs.deploymentSettingsVcsArgsProvideDefaults) : undefined) : undefined;
         } else {
             resourceInputs["agentPoolId"] = undefined /*out*/;
             resourceInputs["cacheOptions"] = undefined /*out*/;
@@ -121,6 +126,7 @@ export class DeploymentSettings extends pulumi.CustomResource {
             resourceInputs["project"] = undefined /*out*/;
             resourceInputs["sourceContext"] = undefined /*out*/;
             resourceInputs["stack"] = undefined /*out*/;
+            resourceInputs["vcs"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         super(DeploymentSettings.__pulumiType, name, resourceInputs, opts);
@@ -167,4 +173,8 @@ export interface DeploymentSettingsArgs {
      * Stack name.
      */
     stack: pulumi.Input<string>;
+    /**
+     * VCS settings for the deployment. Supports Azure DevOps and GitHub via the 'provider' discriminator field.
+     */
+    vcs?: pulumi.Input<inputs.DeploymentSettingsVcsArgs>;
 }

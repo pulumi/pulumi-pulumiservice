@@ -44,6 +44,8 @@ type DeploymentSettings struct {
 	SourceContext DeploymentSettingsSourceContextPtrOutput `pulumi:"sourceContext"`
 	// Stack name.
 	Stack pulumi.StringOutput `pulumi:"stack"`
+	// VCS settings for the deployment. Supports Azure DevOps and GitHub via the 'provider' discriminator field.
+	Vcs DeploymentSettingsVcsPtrOutput `pulumi:"vcs"`
 }
 
 // NewDeploymentSettings registers a new resource with the given unique name, arguments, and options.
@@ -67,6 +69,9 @@ func NewDeploymentSettings(ctx *pulumi.Context,
 	}
 	if args.Github != nil {
 		args.Github = args.Github.ToDeploymentSettingsGithubPtrOutput().ApplyT(func(v *DeploymentSettingsGithub) *DeploymentSettingsGithub { return v.Defaults() }).(DeploymentSettingsGithubPtrOutput)
+	}
+	if args.Vcs != nil {
+		args.Vcs = args.Vcs.ToDeploymentSettingsVcsPtrOutput().ApplyT(func(v *DeploymentSettingsVcs) *DeploymentSettingsVcs { return v.Defaults() }).(DeploymentSettingsVcsPtrOutput)
 	}
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource DeploymentSettings
@@ -119,6 +124,8 @@ type deploymentSettingsArgs struct {
 	SourceContext *DeploymentSettingsSourceContext `pulumi:"sourceContext"`
 	// Stack name.
 	Stack string `pulumi:"stack"`
+	// VCS settings for the deployment. Supports Azure DevOps and GitHub via the 'provider' discriminator field.
+	Vcs *DeploymentSettingsVcs `pulumi:"vcs"`
 }
 
 // The set of arguments for constructing a DeploymentSettings resource.
@@ -141,6 +148,8 @@ type DeploymentSettingsArgs struct {
 	SourceContext DeploymentSettingsSourceContextPtrInput
 	// Stack name.
 	Stack pulumi.StringInput
+	// VCS settings for the deployment. Supports Azure DevOps and GitHub via the 'provider' discriminator field.
+	Vcs DeploymentSettingsVcsPtrInput
 }
 
 func (DeploymentSettingsArgs) ElementType() reflect.Type {
@@ -273,6 +282,11 @@ func (o DeploymentSettingsOutput) SourceContext() DeploymentSettingsSourceContex
 // Stack name.
 func (o DeploymentSettingsOutput) Stack() pulumi.StringOutput {
 	return o.ApplyT(func(v *DeploymentSettings) pulumi.StringOutput { return v.Stack }).(pulumi.StringOutput)
+}
+
+// VCS settings for the deployment. Supports Azure DevOps and GitHub via the 'provider' discriminator field.
+func (o DeploymentSettingsOutput) Vcs() DeploymentSettingsVcsPtrOutput {
+	return o.ApplyT(func(v *DeploymentSettings) DeploymentSettingsVcsPtrOutput { return v.Vcs }).(DeploymentSettingsVcsPtrOutput)
 }
 
 type DeploymentSettingsArrayOutput struct{ *pulumi.OutputState }
