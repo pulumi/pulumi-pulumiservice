@@ -604,6 +604,10 @@
           "type": "string",
           "description": "The runner ID for deployment runner tokens."
         },
+        "roleID": {
+          "type": "string",
+          "description": "The role ID for organization tokens."
+        },
         "authorizedPermissions": {
           "description": "The permission level for organization tokens.",
           "type": "array",

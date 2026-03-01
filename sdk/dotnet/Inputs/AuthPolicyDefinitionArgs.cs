@@ -30,6 +30,12 @@ namespace Pulumi.PulumiService.Inputs
         [Input("decision", required: true)]
         public Input<Pulumi.PulumiService.AuthPolicyDecision> Decision { get; set; } = null!;
 
+        /// <summary>
+        /// The role ID for organization tokens.
+        /// </summary>
+        [Input("roleID")]
+        public Input<string>? RoleID { get; set; }
+
         [Input("rules", required: true)]
         private InputMap<string>? _rules;
 

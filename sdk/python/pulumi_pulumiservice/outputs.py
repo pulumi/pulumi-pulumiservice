@@ -198,6 +198,8 @@ class AuthPolicyDefinition(dict):
             suggest = "token_type"
         elif key == "authorizedPermissions":
             suggest = "authorized_permissions"
+        elif key == "roleID":
+            suggest = "role_id"
         elif key == "runnerID":
             suggest = "runner_id"
         elif key == "teamName":
@@ -221,6 +223,7 @@ class AuthPolicyDefinition(dict):
                  rules: Mapping[str, _builtins.str],
                  token_type: 'AuthPolicyTokenType',
                  authorized_permissions: Optional[Sequence['AuthPolicyPermissionLevel']] = None,
+                 role_id: Optional[_builtins.str] = None,
                  runner_id: Optional[_builtins.str] = None,
                  team_name: Optional[_builtins.str] = None,
                  user_login: Optional[_builtins.str] = None):
@@ -229,6 +232,7 @@ class AuthPolicyDefinition(dict):
         :param Mapping[str, _builtins.str] rules: OIDC rules to set for this policy.
         :param 'AuthPolicyTokenType' token_type: The token type for this policy definition
         :param Sequence['AuthPolicyPermissionLevel'] authorized_permissions: The permission level for organization tokens.
+        :param _builtins.str role_id: The role ID for organization tokens.
         :param _builtins.str runner_id: The runner ID for deployment runner tokens.
         :param _builtins.str team_name: The team name for team tokens.
         :param _builtins.str user_login: The user login for personal tokens.
@@ -238,6 +242,8 @@ class AuthPolicyDefinition(dict):
         pulumi.set(__self__, "token_type", token_type)
         if authorized_permissions is not None:
             pulumi.set(__self__, "authorized_permissions", authorized_permissions)
+        if role_id is not None:
+            pulumi.set(__self__, "role_id", role_id)
         if runner_id is not None:
             pulumi.set(__self__, "runner_id", runner_id)
         if team_name is not None:
@@ -276,6 +282,14 @@ class AuthPolicyDefinition(dict):
         The permission level for organization tokens.
         """
         return pulumi.get(self, "authorized_permissions")
+
+    @_builtins.property
+    @pulumi.getter(name="roleID")
+    def role_id(self) -> Optional[_builtins.str]:
+        """
+        The role ID for organization tokens.
+        """
+        return pulumi.get(self, "role_id")
 
     @_builtins.property
     @pulumi.getter(name="runnerID")

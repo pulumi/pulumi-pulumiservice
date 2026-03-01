@@ -258,6 +258,10 @@ if not MYPY:
         """
         The permission level for organization tokens.
         """
+        role_id: NotRequired[pulumi.Input[_builtins.str]]
+        """
+        The role ID for organization tokens.
+        """
         runner_id: NotRequired[pulumi.Input[_builtins.str]]
         """
         The runner ID for deployment runner tokens.
@@ -280,6 +284,7 @@ class AuthPolicyDefinitionArgs:
                  rules: pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]],
                  token_type: pulumi.Input['AuthPolicyTokenType'],
                  authorized_permissions: Optional[pulumi.Input[Sequence[pulumi.Input['AuthPolicyPermissionLevel']]]] = None,
+                 role_id: Optional[pulumi.Input[_builtins.str]] = None,
                  runner_id: Optional[pulumi.Input[_builtins.str]] = None,
                  team_name: Optional[pulumi.Input[_builtins.str]] = None,
                  user_login: Optional[pulumi.Input[_builtins.str]] = None):
@@ -288,6 +293,7 @@ class AuthPolicyDefinitionArgs:
         :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] rules: OIDC rules to set for this policy.
         :param pulumi.Input['AuthPolicyTokenType'] token_type: The token type for this policy definition
         :param pulumi.Input[Sequence[pulumi.Input['AuthPolicyPermissionLevel']]] authorized_permissions: The permission level for organization tokens.
+        :param pulumi.Input[_builtins.str] role_id: The role ID for organization tokens.
         :param pulumi.Input[_builtins.str] runner_id: The runner ID for deployment runner tokens.
         :param pulumi.Input[_builtins.str] team_name: The team name for team tokens.
         :param pulumi.Input[_builtins.str] user_login: The user login for personal tokens.
@@ -297,6 +303,8 @@ class AuthPolicyDefinitionArgs:
         pulumi.set(__self__, "token_type", token_type)
         if authorized_permissions is not None:
             pulumi.set(__self__, "authorized_permissions", authorized_permissions)
+        if role_id is not None:
+            pulumi.set(__self__, "role_id", role_id)
         if runner_id is not None:
             pulumi.set(__self__, "runner_id", runner_id)
         if team_name is not None:
@@ -351,6 +359,18 @@ class AuthPolicyDefinitionArgs:
     @authorized_permissions.setter
     def authorized_permissions(self, value: Optional[pulumi.Input[Sequence[pulumi.Input['AuthPolicyPermissionLevel']]]]):
         pulumi.set(self, "authorized_permissions", value)
+
+    @_builtins.property
+    @pulumi.getter(name="roleID")
+    def role_id(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        The role ID for organization tokens.
+        """
+        return pulumi.get(self, "role_id")
+
+    @role_id.setter
+    def role_id(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "role_id", value)
 
     @_builtins.property
     @pulumi.getter(name="runnerID")
