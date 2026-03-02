@@ -483,6 +483,7 @@ func TestYamlAdoIntegrationExample(t *testing.T) {
 }
 
 func TestYamlAdoIntegrationExampleManual(t *testing.T) {
+	t.Skip("requires an existing Azure DevOps integration; run manually against a configured environment")
 	adoOrg := os.Getenv("ADO_ORGANIZATION_NAME")
 	if adoOrg == "" {
 		adoOrg = "test-ado-org"
