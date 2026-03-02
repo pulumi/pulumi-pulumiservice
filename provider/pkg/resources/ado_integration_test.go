@@ -18,11 +18,12 @@ import (
 	"context"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
@@ -30,34 +31,52 @@ import (
 // --- mock ---
 
 type AdoIntegrationClientMock struct {
-	getFunc    func(ctx context.Context, orgName, integrationID string) (*pulumiapi.AzureDevOpsIntegration, error)
-	updateFunc func(ctx context.Context, orgName, integrationID string, req pulumiapi.UpdateAzureDevOpsIntegrationRequest) error
-	deleteFunc func(ctx context.Context, orgName, integrationID string) error
-	listFunc   func(ctx context.Context, orgName string) ([]pulumiapi.AzureDevOpsIntegration, error)
+	getFunc func(
+		ctx context.Context, orgName, integrationID string,
+	) (*pulumiapi.AzureDevOpsIntegration, error)
+	updateFunc func(
+		ctx context.Context, orgName, integrationID string,
+		req pulumiapi.UpdateAzureDevOpsIntegrationRequest,
+	) error
+	deleteFunc func(
+		ctx context.Context, orgName, integrationID string,
+	) error
+	listFunc func(
+		ctx context.Context, orgName string,
+	) ([]pulumiapi.AzureDevOpsIntegration, error)
 }
 
-func (m *AdoIntegrationClientMock) GetAzureDevOpsIntegration(ctx context.Context, orgName, integrationID string) (*pulumiapi.AzureDevOpsIntegration, error) {
+func (m *AdoIntegrationClientMock) GetAzureDevOpsIntegration(
+	ctx context.Context, orgName, integrationID string,
+) (*pulumiapi.AzureDevOpsIntegration, error) {
 	if m.getFunc != nil {
 		return m.getFunc(ctx, orgName, integrationID)
 	}
 	return nil, nil
 }
 
-func (m *AdoIntegrationClientMock) UpdateAzureDevOpsIntegration(ctx context.Context, orgName, integrationID string, req pulumiapi.UpdateAzureDevOpsIntegrationRequest) error {
+func (m *AdoIntegrationClientMock) UpdateAzureDevOpsIntegration(
+	ctx context.Context, orgName, integrationID string,
+	req pulumiapi.UpdateAzureDevOpsIntegrationRequest,
+) error {
 	if m.updateFunc != nil {
 		return m.updateFunc(ctx, orgName, integrationID, req)
 	}
 	return nil
 }
 
-func (m *AdoIntegrationClientMock) DeleteAzureDevOpsIntegration(ctx context.Context, orgName, integrationID string) error {
+func (m *AdoIntegrationClientMock) DeleteAzureDevOpsIntegration(
+	ctx context.Context, orgName, integrationID string,
+) error {
 	if m.deleteFunc != nil {
 		return m.deleteFunc(ctx, orgName, integrationID)
 	}
 	return nil
 }
 
-func (m *AdoIntegrationClientMock) ListAzureDevOpsIntegrations(ctx context.Context, orgName string) ([]pulumiapi.AzureDevOpsIntegration, error) {
+func (m *AdoIntegrationClientMock) ListAzureDevOpsIntegrations(
+	ctx context.Context, orgName string,
+) ([]pulumiapi.AzureDevOpsIntegration, error) {
 	if m.listFunc != nil {
 		return m.listFunc(ctx, orgName)
 	}
@@ -239,8 +258,9 @@ func TestAdoIntegrationDiff(t *testing.T) {
 
 		orgDiff, ok := resp.DetailedDiff["organization"]
 		require.True(t, ok, "expected organization in DetailedDiff")
-		// Replace kinds are UPDATE_REPLACE (5) or ADD_REPLACE (1)
-		assert.True(t, orgDiff.Kind == pulumirpc.PropertyDiff_UPDATE_REPLACE || orgDiff.Kind == pulumirpc.PropertyDiff_ADD_REPLACE,
+		isReplace := orgDiff.Kind == pulumirpc.PropertyDiff_UPDATE_REPLACE ||
+			orgDiff.Kind == pulumirpc.PropertyDiff_ADD_REPLACE
+		assert.True(t, isReplace,
 			"expected replace kind, got %v", orgDiff.Kind)
 	})
 
