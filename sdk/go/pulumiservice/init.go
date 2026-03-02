@@ -27,8 +27,6 @@ func (m *module) Construct(ctx *pulumi.Context, name, typ, urn string) (r pulumi
 		r = &AgentPool{}
 	case "pulumiservice:index:ApprovalRule":
 		r = &ApprovalRule{}
-	case "pulumiservice:index:AzureDevOpsIntegration":
-		r = &AzureDevOpsIntegration{}
 	case "pulumiservice:index:DeploymentSchedule":
 		r = &DeploymentSchedule{}
 	case "pulumiservice:index:DeploymentSettings":
