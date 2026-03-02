@@ -20,11 +20,6 @@ export type ApprovalRule = import("./approvalRule").ApprovalRule;
 export const ApprovalRule: typeof import("./approvalRule").ApprovalRule = null as any;
 utilities.lazyLoad(exports, ["ApprovalRule"], () => require("./approvalRule"));
 
-export { AzureDevOpsIntegrationArgs } from "./azureDevOpsIntegration";
-export type AzureDevOpsIntegration = import("./azureDevOpsIntegration").AzureDevOpsIntegration;
-export const AzureDevOpsIntegration: typeof import("./azureDevOpsIntegration").AzureDevOpsIntegration = null as any;
-utilities.lazyLoad(exports, ["AzureDevOpsIntegration"], () => require("./azureDevOpsIntegration"));
-
 export { DeploymentScheduleArgs } from "./deploymentSchedule";
 export type DeploymentSchedule = import("./deploymentSchedule").DeploymentSchedule;
 export const DeploymentSchedule: typeof import("./deploymentSchedule").DeploymentSchedule = null as any;
@@ -168,8 +163,6 @@ const _module = {
                 return new AgentPool(name, <any>undefined, { urn })
             case "pulumiservice:index:ApprovalRule":
                 return new ApprovalRule(name, <any>undefined, { urn })
-            case "pulumiservice:index:AzureDevOpsIntegration":
-                return new AzureDevOpsIntegration(name, <any>undefined, { urn })
             case "pulumiservice:index:DeploymentSchedule":
                 return new DeploymentSchedule(name, <any>undefined, { urn })
             case "pulumiservice:index:DeploymentSettings":

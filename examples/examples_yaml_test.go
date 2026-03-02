@@ -478,31 +478,6 @@ func TestYamlDeploymentSettingsVcsExample(t *testing.T) {
 	t.Skip("requires an existing Azure DevOps integration; run manually against a configured environment")
 }
 
-func TestYamlAdoIntegrationExample(t *testing.T) {
-	t.Skip("requires an existing Azure DevOps integration; run manually against a configured environment")
-}
-
-func TestYamlAdoIntegrationExampleManual(t *testing.T) {
-	t.Skip("requires an existing Azure DevOps integration; run manually against a configured environment")
-	adoOrg := os.Getenv("ADO_ORGANIZATION_NAME")
-	if adoOrg == "" {
-		adoOrg = "test-ado-org"
-	}
-	projectID := os.Getenv("ADO_PROJECT_ID")
-	if projectID == "" {
-		projectID = "test-project-id"
-	}
-	cwd := getCwd(t)
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Dir: path.Join(cwd, ".", "yaml-ado-integration"),
-		Config: map[string]string{
-			"organizationName":    getOrgName(),
-			"adoOrganizationName": adoOrg,
-			"projectId":           projectID,
-		},
-	})
-}
-
 func writePulumiYaml(t *testing.T, yamlContents interface{}) string {
 	tmpdir := t.TempDir()
 	b, err := yaml.Marshal(yamlContents)

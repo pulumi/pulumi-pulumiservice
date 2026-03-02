@@ -289,9 +289,6 @@ func (k *pulumiserviceProvider) Configure(
 		&resources.PulumiServicePolicyGroupResource{
 			Client: client,
 		},
-		&resources.PulumiServiceAdoIntegrationResource{
-			Client: client,
-		},
 	}
 
 	return &pulumirpc.ConfigureResponse{
