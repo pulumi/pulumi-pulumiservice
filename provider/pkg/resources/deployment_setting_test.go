@@ -119,3 +119,25 @@ func TestDeploymentSettingsRoundtrip(t *testing.T) {
 
 	assert.EqualValues(t, initial, decoded)
 }
+
+func TestDeploymentSettingsVcsRoundtrip(t *testing.T) {
+	deployPR := 1
+	initial := PulumiServiceDeploymentSettingsInput{
+		DeploymentSettings: pulumiapi.DeploymentSettings{
+			VCS: &pulumiapi.VCSConfiguration{
+				Provider:            "azure-devops",
+				Repository:          "my-org/my-repo",
+				DeployCommits:       true,
+				PreviewPullRequests: true,
+				PullRequestTemplate: false,
+				Paths:               []string{"infra/**"},
+				DeployPullRequest:   &deployPR,
+			},
+		},
+	}
+
+	encoded := initial.ToPropertyMap(nil, nil, true)
+	decoded := (&PulumiServiceDeploymentSettingsResource{}).ToPulumiServiceDeploymentSettingsInput(encoded)
+
+	assert.EqualValues(t, initial, decoded)
+}
