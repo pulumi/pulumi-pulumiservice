@@ -46,7 +46,7 @@ namespace Pulumi.PulumiService.Inputs
         public Input<bool>? PreviewPullRequests { get; set; }
 
         /// <summary>
-        /// The VCS provider type. Must be 'azure_devops' or 'github'.
+        /// The VCS provider type.
         /// </summary>
         [Input("provider", required: true)]
         public Input<string> Provider { get; set; } = null!;

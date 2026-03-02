@@ -54,6 +54,9 @@ class DeploymentSettingsArgs:
         if executor_context is not None:
             pulumi.set(__self__, "executor_context", executor_context)
         if github is not None:
+            warnings.warn("""Use the 'vcs' property instead, which supports both GitHub and Azure DevOps.""", DeprecationWarning)
+            pulumi.log.warn("""github is deprecated: Use the 'vcs' property instead, which supports both GitHub and Azure DevOps.""")
+        if github is not None:
             pulumi.set(__self__, "github", github)
         if operation_context is not None:
             pulumi.set(__self__, "operation_context", operation_context)
@@ -136,6 +139,7 @@ class DeploymentSettingsArgs:
 
     @_builtins.property
     @pulumi.getter
+    @_utilities.deprecated("""Use the 'vcs' property instead, which supports both GitHub and Azure DevOps.""")
     def github(self) -> Optional[pulumi.Input['DeploymentSettingsGithubArgs']]:
         """
         GitHub settings for the deployment.
@@ -351,6 +355,7 @@ class DeploymentSettings(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
+    @_utilities.deprecated("""Use the 'vcs' property instead, which supports both GitHub and Azure DevOps.""")
     def github(self) -> pulumi.Output[Optional['outputs.DeploymentSettingsGithub']]:
         """
         GitHub settings for the deployment.

@@ -2210,7 +2210,7 @@ type DeploymentSettingsVcs struct {
 	Paths []string `pulumi:"paths"`
 	// Trigger a deployment running `pulumi preview` when a PR is opened.
 	PreviewPullRequests *bool `pulumi:"previewPullRequests"`
-	// The VCS provider type. Must be 'azure_devops' or 'github'.
+	// The VCS provider type.
 	Provider string `pulumi:"provider"`
 	// Use this stack as a template for pull request review stacks.
 	PullRequestTemplate *bool `pulumi:"pullRequestTemplate"`
@@ -2260,7 +2260,7 @@ type DeploymentSettingsVcsArgs struct {
 	Paths pulumi.StringArrayInput `pulumi:"paths"`
 	// Trigger a deployment running `pulumi preview` when a PR is opened.
 	PreviewPullRequests pulumi.BoolPtrInput `pulumi:"previewPullRequests"`
-	// The VCS provider type. Must be 'azure_devops' or 'github'.
+	// The VCS provider type.
 	Provider pulumi.StringInput `pulumi:"provider"`
 	// Use this stack as a template for pull request review stacks.
 	PullRequestTemplate pulumi.BoolPtrInput `pulumi:"pullRequestTemplate"`
@@ -2383,7 +2383,7 @@ func (o DeploymentSettingsVcsOutput) PreviewPullRequests() pulumi.BoolPtrOutput 
 	return o.ApplyT(func(v DeploymentSettingsVcs) *bool { return v.PreviewPullRequests }).(pulumi.BoolPtrOutput)
 }
 
-// The VCS provider type. Must be 'azure_devops' or 'github'.
+// The VCS provider type.
 func (o DeploymentSettingsVcsOutput) Provider() pulumi.StringOutput {
 	return o.ApplyT(func(v DeploymentSettingsVcs) string { return v.Provider }).(pulumi.StringOutput)
 }
@@ -2462,7 +2462,7 @@ func (o DeploymentSettingsVcsPtrOutput) PreviewPullRequests() pulumi.BoolPtrOutp
 	}).(pulumi.BoolPtrOutput)
 }
 
-// The VCS provider type. Must be 'azure_devops' or 'github'.
+// The VCS provider type.
 func (o DeploymentSettingsVcsPtrOutput) Provider() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *DeploymentSettingsVcs) *string {
 		if v == nil {

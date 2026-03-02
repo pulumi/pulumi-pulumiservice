@@ -1075,7 +1075,7 @@ if not MYPY:
         """
         provider: pulumi.Input[_builtins.str]
         """
-        The VCS provider type. Must be 'azure_devops' or 'github'.
+        The VCS provider type.
         """
         deploy_commits: NotRequired[pulumi.Input[_builtins.bool]]
         """
@@ -1116,7 +1116,7 @@ class DeploymentSettingsVcsArgs:
                  repository: Optional[pulumi.Input[_builtins.str]] = None):
         """
         VCS settings for the deployment, supporting multiple VCS providers.
-        :param pulumi.Input[_builtins.str] provider: The VCS provider type. Must be 'azure_devops' or 'github'.
+        :param pulumi.Input[_builtins.str] provider: The VCS provider type.
         :param pulumi.Input[_builtins.bool] deploy_commits: Trigger a deployment running `pulumi up` on commit.
         :param pulumi.Input[_builtins.int] deploy_pull_request: Deploy a specific pull request number.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] paths: The paths within the repo that deployments should be filtered to.
@@ -1148,7 +1148,7 @@ class DeploymentSettingsVcsArgs:
     @pulumi.getter
     def provider(self) -> pulumi.Input[_builtins.str]:
         """
-        The VCS provider type. Must be 'azure_devops' or 'github'.
+        The VCS provider type.
         """
         return pulumi.get(self, "provider")
 

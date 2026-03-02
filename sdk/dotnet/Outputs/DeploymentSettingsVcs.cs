@@ -33,7 +33,7 @@ namespace Pulumi.PulumiService.Outputs
         /// </summary>
         public readonly bool? PreviewPullRequests;
         /// <summary>
-        /// The VCS provider type. Must be 'azure_devops' or 'github'.
+        /// The VCS provider type.
         /// </summary>
         public readonly string Provider;
         /// <summary>

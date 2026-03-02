@@ -369,7 +369,17 @@
       "properties": {
         "provider": {
           "type": "string",
-          "description": "The VCS provider type. Must be 'azure_devops' or 'github'."
+          "description": "The VCS provider type.",
+          "enum": [
+            {
+              "value": "azure_devops",
+              "name": "AzureDevOps"
+            },
+            {
+              "value": "github",
+              "name": "GitHub"
+            }
+          ]
         },
         "repository": {
           "type": "string",
@@ -1291,7 +1301,8 @@
         },
         "github": {
           "$ref": "#/types/pulumiservice:index:DeploymentSettingsGithub",
-          "description": "GitHub settings for the deployment."
+          "description": "GitHub settings for the deployment.",
+          "deprecationMessage": "Use the 'vcs' property instead, which supports both GitHub and Azure DevOps."
         },
         "vcs": {
           "$ref": "#/types/pulumiservice:index:DeploymentSettingsVcs",
@@ -1341,7 +1352,8 @@
         },
         "github": {
           "$ref": "#/types/pulumiservice:index:DeploymentSettingsGithub",
-          "description": "GitHub settings for the deployment."
+          "description": "GitHub settings for the deployment.",
+          "deprecationMessage": "Use the 'vcs' property instead, which supports both GitHub and Azure DevOps."
         },
         "vcs": {
           "$ref": "#/types/pulumiservice:index:DeploymentSettingsVcs",

@@ -895,7 +895,7 @@ class DeploymentSettingsVcs(dict):
                  repository: Optional[_builtins.str] = None):
         """
         VCS settings for the deployment, supporting multiple VCS providers.
-        :param _builtins.str provider: The VCS provider type. Must be 'azure_devops' or 'github'.
+        :param _builtins.str provider: The VCS provider type.
         :param _builtins.bool deploy_commits: Trigger a deployment running `pulumi up` on commit.
         :param _builtins.int deploy_pull_request: Deploy a specific pull request number.
         :param Sequence[_builtins.str] paths: The paths within the repo that deployments should be filtered to.
@@ -927,7 +927,7 @@ class DeploymentSettingsVcs(dict):
     @pulumi.getter
     def provider(self) -> _builtins.str:
         """
-        The VCS provider type. Must be 'azure_devops' or 'github'.
+        The VCS provider type.
         """
         return pulumi.get(self, "provider")
 

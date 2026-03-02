@@ -33,6 +33,8 @@ type DeploymentSettings struct {
 	// Settings related to the deployment executor.
 	ExecutorContext DeploymentSettingsExecutorContextPtrOutput `pulumi:"executorContext"`
 	// GitHub settings for the deployment.
+	//
+	// Deprecated: Use the 'vcs' property instead, which supports both GitHub and Azure DevOps.
 	Github DeploymentSettingsGithubPtrOutput `pulumi:"github"`
 	// Settings related to the Pulumi operation environment during the deployment.
 	OperationContext DeploymentSettingsOperationContextPtrOutput `pulumi:"operationContext"`
@@ -113,6 +115,8 @@ type deploymentSettingsArgs struct {
 	// Settings related to the deployment executor.
 	ExecutorContext *DeploymentSettingsExecutorContext `pulumi:"executorContext"`
 	// GitHub settings for the deployment.
+	//
+	// Deprecated: Use the 'vcs' property instead, which supports both GitHub and Azure DevOps.
 	Github *DeploymentSettingsGithub `pulumi:"github"`
 	// Settings related to the Pulumi operation environment during the deployment.
 	OperationContext *DeploymentSettingsOperationContext `pulumi:"operationContext"`
@@ -137,6 +141,8 @@ type DeploymentSettingsArgs struct {
 	// Settings related to the deployment executor.
 	ExecutorContext DeploymentSettingsExecutorContextPtrInput
 	// GitHub settings for the deployment.
+	//
+	// Deprecated: Use the 'vcs' property instead, which supports both GitHub and Azure DevOps.
 	Github DeploymentSettingsGithubPtrInput
 	// Settings related to the Pulumi operation environment during the deployment.
 	OperationContext DeploymentSettingsOperationContextPtrInput
@@ -255,6 +261,8 @@ func (o DeploymentSettingsOutput) ExecutorContext() DeploymentSettingsExecutorCo
 }
 
 // GitHub settings for the deployment.
+//
+// Deprecated: Use the 'vcs' property instead, which supports both GitHub and Azure DevOps.
 func (o DeploymentSettingsOutput) Github() DeploymentSettingsGithubPtrOutput {
 	return o.ApplyT(func(v *DeploymentSettings) DeploymentSettingsGithubPtrOutput { return v.Github }).(DeploymentSettingsGithubPtrOutput)
 }

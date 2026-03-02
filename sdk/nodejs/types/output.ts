@@ -279,7 +279,7 @@ export interface DeploymentSettingsVcs {
      */
     previewPullRequests?: boolean;
     /**
-     * The VCS provider type. Must be 'azure_devops' or 'github'.
+     * The VCS provider type.
      */
     provider: string;
     /**

@@ -59,6 +59,8 @@ export class DeploymentSettings extends pulumi.CustomResource {
     declare public readonly executorContext: pulumi.Output<outputs.DeploymentSettingsExecutorContext | undefined>;
     /**
      * GitHub settings for the deployment.
+     *
+     * @deprecated Use the 'vcs' property instead, which supports both GitHub and Azure DevOps.
      */
     declare public readonly github: pulumi.Output<outputs.DeploymentSettingsGithub | undefined>;
     /**
@@ -151,6 +153,8 @@ export interface DeploymentSettingsArgs {
     executorContext?: pulumi.Input<inputs.DeploymentSettingsExecutorContextArgs>;
     /**
      * GitHub settings for the deployment.
+     *
+     * @deprecated Use the 'vcs' property instead, which supports both GitHub and Azure DevOps.
      */
     github?: pulumi.Input<inputs.DeploymentSettingsGithubArgs>;
     /**
