@@ -21,19 +21,10 @@ import (
 )
 
 type AzureDevOpsIntegrationClient interface {
-	CreateAzureDevOpsIntegration(ctx context.Context, orgName string, req CreateAzureDevOpsIntegrationRequest) (*AzureDevOpsIntegration, error)
 	GetAzureDevOpsIntegration(ctx context.Context, orgName, integrationID string) (*AzureDevOpsIntegration, error)
 	UpdateAzureDevOpsIntegration(ctx context.Context, orgName, integrationID string, req UpdateAzureDevOpsIntegrationRequest) error
 	DeleteAzureDevOpsIntegration(ctx context.Context, orgName, integrationID string) error
 	ListAzureDevOpsIntegrations(ctx context.Context, orgName string) ([]AzureDevOpsIntegration, error)
-}
-
-type CreateAzureDevOpsIntegrationRequest struct {
-	OrganizationName    string `json:"organizationName"`
-	ProjectID           string `json:"projectId"`
-	DisablePRComments   bool   `json:"disablePRComments"`
-	DisableNeoSummaries bool   `json:"disableNeoSummaries"`
-	DisableDetailedDiff bool   `json:"disableDetailedDiff"`
 }
 
 type UpdateAzureDevOpsIntegrationRequest struct {
@@ -69,29 +60,6 @@ type listAzureDevOpsIntegrationsResponse struct {
 
 func adoIntegrationBasePath(orgName string) string {
 	return path.Join("console", "orgs", orgName, "integrations", "azure-devops")
-}
-
-func (c *Client) CreateAzureDevOpsIntegration(ctx context.Context, orgName string, req CreateAzureDevOpsIntegrationRequest) (*AzureDevOpsIntegration, error) {
-	apiPath := adoIntegrationBasePath(orgName)
-
-	_, err := c.do(ctx, http.MethodPost, apiPath, req, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create azure devops integration: %w", err)
-	}
-
-	// POST returns 204, so we need to list and find the created integration
-	integrations, err := c.ListAzureDevOpsIntegrations(ctx, orgName)
-	if err != nil {
-		return nil, fmt.Errorf("failed to list azure devops integrations after create: %w", err)
-	}
-
-	for _, integration := range integrations {
-		if integration.Organization.Name == req.OrganizationName && integration.Project.ID == req.ProjectID {
-			return &integration, nil
-		}
-	}
-
-	return nil, fmt.Errorf("failed to find created azure devops integration for org %q and project %q", req.OrganizationName, req.ProjectID)
 }
 
 func (c *Client) GetAzureDevOpsIntegration(ctx context.Context, orgName, integrationID string) (*AzureDevOpsIntegration, error) {

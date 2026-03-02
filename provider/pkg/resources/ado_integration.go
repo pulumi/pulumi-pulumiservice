@@ -176,15 +176,37 @@ func (r *PulumiServiceAdoIntegrationResource) Create(req *pulumirpc.CreateReques
 
 	input := ToPulumiServiceAdoIntegrationInput(inputMap)
 
-	integration, err := r.Client.CreateAzureDevOpsIntegration(ctx, input.Organization, pulumiapi.CreateAzureDevOpsIntegrationRequest{
-		OrganizationName:    input.AdoOrganizationName,
-		ProjectID:           input.ProjectID,
+	// ADO integrations are created via the Pulumi Cloud UI (OAuth flow).
+	// This resource adopts an existing integration by looking it up.
+	integrations, err := r.Client.ListAzureDevOpsIntegrations(ctx, input.Organization)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list azure devops integrations: %w", err)
+	}
+
+	var integration *pulumiapi.AzureDevOpsIntegration
+	for _, i := range integrations {
+		if i.Organization.Name == input.AdoOrganizationName && i.Project.ID == input.ProjectID {
+			integration = &i
+			break
+		}
+	}
+
+	if integration == nil {
+		return nil, fmt.Errorf(
+			"no azure devops integration found for ADO organization %q and project %q in Pulumi organization %q; "+
+				"integrations must be created via the Pulumi Cloud console first",
+			input.AdoOrganizationName, input.ProjectID, input.Organization,
+		)
+	}
+
+	// Apply the desired settings
+	err = r.Client.UpdateAzureDevOpsIntegration(ctx, input.Organization, integration.ID, pulumiapi.UpdateAzureDevOpsIntegrationRequest{
 		DisablePRComments:   input.DisablePRComments,
 		DisableNeoSummaries: input.DisableNeoSummaries,
 		DisableDetailedDiff: input.DisableDetailedDiff,
 	})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to update azure devops integration settings: %w", err)
 	}
 
 	props := PulumiServiceAdoIntegrationProperties{

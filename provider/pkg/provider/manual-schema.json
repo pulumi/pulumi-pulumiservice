@@ -375,10 +375,6 @@
           "type": "string",
           "description": "The repository identifier (e.g., 'ProjectName/RepoName' for Azure DevOps, 'org/repo' for GitHub)."
         },
-        "installationId": {
-          "type": "string",
-          "description": "The VCS integration ID."
-        },
         "deployCommits": {
           "type": "boolean",
           "description": "Trigger a deployment running `pulumi up` on commit.",

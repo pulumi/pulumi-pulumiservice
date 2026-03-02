@@ -474,7 +474,15 @@ func TestYamlInsightsAccountExample(t *testing.T) {
 	runPulumiTest(t, test)
 }
 
+func TestYamlDeploymentSettingsVcsExample(t *testing.T) {
+	t.Skip("requires an existing Azure DevOps integration; run manually against a configured environment")
+}
+
 func TestYamlAdoIntegrationExample(t *testing.T) {
+	t.Skip("requires an existing Azure DevOps integration; run manually against a configured environment")
+}
+
+func TestYamlAdoIntegrationExampleManual(t *testing.T) {
 	cwd := getCwd(t)
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		Dir: path.Join(cwd, ".", "yaml-ado-integration"),

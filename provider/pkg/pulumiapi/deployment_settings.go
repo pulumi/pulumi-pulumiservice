@@ -90,9 +90,9 @@ type VCSConfiguration struct {
 	Provider            string   `json:"provider"`
 	Repository          string   `json:"repository,omitempty"`
 	InstallationID      string   `json:"installationId,omitempty"`
-	DeployCommits       bool     `json:"deployCommits,omitempty"`
-	PreviewPullRequests bool     `json:"previewPullRequests,omitempty"`
-	PullRequestTemplate bool     `json:"pullRequestTemplate,omitempty"`
+	DeployCommits       bool     `json:"deployCommits"`
+	PreviewPullRequests bool     `json:"previewPullRequests"`
+	PullRequestTemplate bool     `json:"pullRequestTemplate"`
 	Paths               []string `json:"paths,omitempty"`
 	DeployPullRequest   *int     `json:"deployPullRequest,omitempty"`
 }

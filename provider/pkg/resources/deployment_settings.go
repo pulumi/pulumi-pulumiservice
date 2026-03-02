@@ -314,9 +314,6 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(
 		if ds.VCS.Repository != "" {
 			vcsMap["repository"] = resource.NewPropertyValue(ds.VCS.Repository)
 		}
-		if ds.VCS.InstallationID != "" {
-			vcsMap["installationId"] = resource.NewPropertyValue(ds.VCS.InstallationID)
-		}
 		if len(ds.VCS.Paths) > 0 {
 			vcsMap["paths"] = resource.NewPropertyValue(ds.VCS.Paths)
 		}
@@ -434,9 +431,6 @@ func toVCSConfig(inputMap resource.PropertyMap) *pulumiapi.VCSConfiguration {
 	}
 	if vcsInput["repository"].HasValue() {
 		vcs.Repository = util.GetSecretOrStringValue(vcsInput["repository"])
-	}
-	if vcsInput["installationId"].HasValue() {
-		vcs.InstallationID = util.GetSecretOrStringValue(vcsInput["installationId"])
 	}
 	if vcsInput["deployCommits"].HasValue() {
 		vcs.DeployCommits = util.GetSecretOrBoolValue(vcsInput["deployCommits"])
