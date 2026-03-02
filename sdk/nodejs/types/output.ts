@@ -271,10 +271,6 @@ export interface DeploymentSettingsVcs {
      */
     deployPullRequest?: number;
     /**
-     * The VCS integration ID.
-     */
-    installationId?: string;
-    /**
      * The paths within the repo that deployments should be filtered to.
      */
     paths?: string[];

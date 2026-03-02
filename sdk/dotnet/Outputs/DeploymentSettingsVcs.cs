@@ -25,10 +25,6 @@ namespace Pulumi.PulumiService.Outputs
         /// </summary>
         public readonly int? DeployPullRequest;
         /// <summary>
-        /// The VCS integration ID.
-        /// </summary>
-        public readonly string? InstallationId;
-        /// <summary>
         /// The paths within the repo that deployments should be filtered to.
         /// </summary>
         public readonly ImmutableArray<string> Paths;
@@ -55,8 +51,6 @@ namespace Pulumi.PulumiService.Outputs
 
             int? deployPullRequest,
 
-            string? installationId,
-
             ImmutableArray<string> paths,
 
             bool? previewPullRequests,
@@ -69,7 +63,6 @@ namespace Pulumi.PulumiService.Outputs
         {
             DeployCommits = deployCommits;
             DeployPullRequest = deployPullRequest;
-            InstallationId = installationId;
             Paths = paths;
             PreviewPullRequests = previewPullRequests;
             Provider = provider;

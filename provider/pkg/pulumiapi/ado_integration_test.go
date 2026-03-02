@@ -21,8 +21,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const testAdoIntegrationID = "integration-1"
+
 func TestListAzureDevOpsIntegrations(t *testing.T) {
-	orgName := "test-org"
+	orgName := testPolicyGroupOrgName
 	integrations := []AzureDevOpsIntegration{
 		{
 			ID: "integration-1",
@@ -72,8 +74,8 @@ func TestListAzureDevOpsIntegrations(t *testing.T) {
 }
 
 func TestGetAzureDevOpsIntegration(t *testing.T) {
-	orgName := "test-org"
-	integrationID := "integration-1"
+	orgName := testPolicyGroupOrgName
+	integrationID := testAdoIntegrationID
 	integration := AzureDevOpsIntegration{
 		ID: integrationID,
 		Organization: AzureDevOpsOrganization{
@@ -134,8 +136,8 @@ func TestGetAzureDevOpsIntegration(t *testing.T) {
 }
 
 func TestUpdateAzureDevOpsIntegration(t *testing.T) {
-	orgName := "test-org"
-	integrationID := "integration-1"
+	orgName := testPolicyGroupOrgName
+	integrationID := testAdoIntegrationID
 	updateReq := UpdateAzureDevOpsIntegrationRequest{
 		DisablePRComments:   true,
 		DisableNeoSummaries: false,
@@ -169,8 +171,8 @@ func TestUpdateAzureDevOpsIntegration(t *testing.T) {
 }
 
 func TestDeleteAzureDevOpsIntegration(t *testing.T) {
-	orgName := "test-org"
-	integrationID := "integration-1"
+	orgName := testPolicyGroupOrgName
+	integrationID := testAdoIntegrationID
 
 	t.Run("Happy Path", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{

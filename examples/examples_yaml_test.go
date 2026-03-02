@@ -483,13 +483,21 @@ func TestYamlAdoIntegrationExample(t *testing.T) {
 }
 
 func TestYamlAdoIntegrationExampleManual(t *testing.T) {
+	adoOrg := os.Getenv("ADO_ORGANIZATION_NAME")
+	if adoOrg == "" {
+		adoOrg = "test-ado-org"
+	}
+	projectID := os.Getenv("ADO_PROJECT_ID")
+	if projectID == "" {
+		projectID = "test-project-id"
+	}
 	cwd := getCwd(t)
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		Dir: path.Join(cwd, ".", "yaml-ado-integration"),
 		Config: map[string]string{
 			"organizationName":    getOrgName(),
-			"adoOrganizationName": "test-ado-org",
-			"projectId":           "test-project-id",
+			"adoOrganizationName": adoOrg,
+			"projectId":           projectID,
 		},
 	})
 }

@@ -6,7 +6,7 @@
 #   2. Update the config defaults and resource properties below to match
 #      your organization, project, stack, and ADO repository
 #   3. Run: pulumi up
-name: yaml-deployment-settings-vcs-example
+name: yaml-deployment-settings-vcs
 runtime: yaml
 description: Deployment settings test with VCS configuration
 config:

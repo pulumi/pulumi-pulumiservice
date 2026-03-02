@@ -200,11 +200,14 @@ func (r *PulumiServiceAdoIntegrationResource) Create(req *pulumirpc.CreateReques
 	}
 
 	// Apply the desired settings
-	err = r.Client.UpdateAzureDevOpsIntegration(ctx, input.Organization, integration.ID, pulumiapi.UpdateAzureDevOpsIntegrationRequest{
+	updateReq := pulumiapi.UpdateAzureDevOpsIntegrationRequest{
 		DisablePRComments:   input.DisablePRComments,
 		DisableNeoSummaries: input.DisableNeoSummaries,
 		DisableDetailedDiff: input.DisableDetailedDiff,
-	})
+	}
+	err = r.Client.UpdateAzureDevOpsIntegration(
+		ctx, input.Organization, integration.ID, updateReq,
+	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to update azure devops integration settings: %w", err)
 	}
@@ -328,6 +331,10 @@ func (r *PulumiServiceAdoIntegrationResource) Update(req *pulumirpc.UpdateReques
 	integration, err := r.Client.GetAzureDevOpsIntegration(ctx, orgName, integrationID)
 	if err != nil {
 		return nil, err
+	}
+
+	if integration == nil {
+		return nil, fmt.Errorf("azure devops integration %q not found after update", integrationID)
 	}
 
 	props := PulumiServiceAdoIntegrationProperties{

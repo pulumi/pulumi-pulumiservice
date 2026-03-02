@@ -271,10 +271,6 @@ export interface DeploymentSettingsVcsArgs {
      */
     deployPullRequest?: pulumi.Input<number>;
     /**
-     * The VCS integration ID.
-     */
-    installationId?: pulumi.Input<string>;
-    /**
      * The paths within the repo that deployments should be filtered to.
      */
     paths?: pulumi.Input<pulumi.Input<string>[]>;

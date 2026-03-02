@@ -27,12 +27,6 @@ namespace Pulumi.PulumiService.Inputs
         [Input("deployPullRequest")]
         public Input<int>? DeployPullRequest { get; set; }
 
-        /// <summary>
-        /// The VCS integration ID.
-        /// </summary>
-        [Input("installationId")]
-        public Input<string>? InstallationId { get; set; }
-
         [Input("paths")]
         private InputList<string>? _paths;
 

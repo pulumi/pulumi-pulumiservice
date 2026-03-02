@@ -26,11 +26,6 @@ public final class DeploymentSettingsVcs {
      */
     private @Nullable Integer deployPullRequest;
     /**
-     * @return The VCS integration ID.
-     * 
-     */
-    private @Nullable String installationId;
-    /**
      * @return The paths within the repo that deployments should be filtered to.
      * 
      */
@@ -70,13 +65,6 @@ public final class DeploymentSettingsVcs {
      */
     public Optional<Integer> deployPullRequest() {
         return Optional.ofNullable(this.deployPullRequest);
-    }
-    /**
-     * @return The VCS integration ID.
-     * 
-     */
-    public Optional<String> installationId() {
-        return Optional.ofNullable(this.installationId);
     }
     /**
      * @return The paths within the repo that deployments should be filtered to.
@@ -125,7 +113,6 @@ public final class DeploymentSettingsVcs {
     public static final class Builder {
         private @Nullable Boolean deployCommits;
         private @Nullable Integer deployPullRequest;
-        private @Nullable String installationId;
         private @Nullable List<String> paths;
         private @Nullable Boolean previewPullRequests;
         private String provider;
@@ -136,7 +123,6 @@ public final class DeploymentSettingsVcs {
     	      Objects.requireNonNull(defaults);
     	      this.deployCommits = defaults.deployCommits;
     	      this.deployPullRequest = defaults.deployPullRequest;
-    	      this.installationId = defaults.installationId;
     	      this.paths = defaults.paths;
     	      this.previewPullRequests = defaults.previewPullRequests;
     	      this.provider = defaults.provider;
@@ -154,12 +140,6 @@ public final class DeploymentSettingsVcs {
         public Builder deployPullRequest(@Nullable Integer deployPullRequest) {
 
             this.deployPullRequest = deployPullRequest;
-            return this;
-        }
-        @CustomType.Setter
-        public Builder installationId(@Nullable String installationId) {
-
-            this.installationId = installationId;
             return this;
         }
         @CustomType.Setter
@@ -201,7 +181,6 @@ public final class DeploymentSettingsVcs {
             final var _resultValue = new DeploymentSettingsVcs();
             _resultValue.deployCommits = deployCommits;
             _resultValue.deployPullRequest = deployPullRequest;
-            _resultValue.installationId = installationId;
             _resultValue.paths = paths;
             _resultValue.previewPullRequests = previewPullRequests;
             _resultValue.provider = provider;

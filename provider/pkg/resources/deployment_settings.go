@@ -450,7 +450,7 @@ func toVCSConfig(inputMap resource.PropertyMap) *pulumiapi.VCSConfiguration {
 		vcs.Paths = paths
 	}
 	if vcsInput["deployPullRequest"].HasValue() {
-		val := int(vcsInput["deployPullRequest"].NumberValue())
+		val := int(util.GetSecretOrNumberValue(vcsInput["deployPullRequest"]))
 		vcs.DeployPullRequest = &val
 	}
 

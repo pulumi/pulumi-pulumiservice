@@ -1085,10 +1085,6 @@ if not MYPY:
         """
         Deploy a specific pull request number.
         """
-        installation_id: NotRequired[pulumi.Input[_builtins.str]]
-        """
-        The VCS integration ID.
-        """
         paths: NotRequired[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]
         """
         The paths within the repo that deployments should be filtered to.
@@ -1114,7 +1110,6 @@ class DeploymentSettingsVcsArgs:
                  provider: pulumi.Input[_builtins.str],
                  deploy_commits: Optional[pulumi.Input[_builtins.bool]] = None,
                  deploy_pull_request: Optional[pulumi.Input[_builtins.int]] = None,
-                 installation_id: Optional[pulumi.Input[_builtins.str]] = None,
                  paths: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  preview_pull_requests: Optional[pulumi.Input[_builtins.bool]] = None,
                  pull_request_template: Optional[pulumi.Input[_builtins.bool]] = None,
@@ -1124,7 +1119,6 @@ class DeploymentSettingsVcsArgs:
         :param pulumi.Input[_builtins.str] provider: The VCS provider type. Must be 'azure_devops' or 'github'.
         :param pulumi.Input[_builtins.bool] deploy_commits: Trigger a deployment running `pulumi up` on commit.
         :param pulumi.Input[_builtins.int] deploy_pull_request: Deploy a specific pull request number.
-        :param pulumi.Input[_builtins.str] installation_id: The VCS integration ID.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] paths: The paths within the repo that deployments should be filtered to.
         :param pulumi.Input[_builtins.bool] preview_pull_requests: Trigger a deployment running `pulumi preview` when a PR is opened.
         :param pulumi.Input[_builtins.bool] pull_request_template: Use this stack as a template for pull request review stacks.
@@ -1137,8 +1131,6 @@ class DeploymentSettingsVcsArgs:
             pulumi.set(__self__, "deploy_commits", deploy_commits)
         if deploy_pull_request is not None:
             pulumi.set(__self__, "deploy_pull_request", deploy_pull_request)
-        if installation_id is not None:
-            pulumi.set(__self__, "installation_id", installation_id)
         if paths is not None:
             pulumi.set(__self__, "paths", paths)
         if preview_pull_requests is None:
@@ -1187,18 +1179,6 @@ class DeploymentSettingsVcsArgs:
     @deploy_pull_request.setter
     def deploy_pull_request(self, value: Optional[pulumi.Input[_builtins.int]]):
         pulumi.set(self, "deploy_pull_request", value)
-
-    @_builtins.property
-    @pulumi.getter(name="installationId")
-    def installation_id(self) -> Optional[pulumi.Input[_builtins.str]]:
-        """
-        The VCS integration ID.
-        """
-        return pulumi.get(self, "installation_id")
-
-    @installation_id.setter
-    def installation_id(self, value: Optional[pulumi.Input[_builtins.str]]):
-        pulumi.set(self, "installation_id", value)
 
     @_builtins.property
     @pulumi.getter

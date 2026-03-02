@@ -21,8 +21,12 @@ import (
 )
 
 type AzureDevOpsIntegrationClient interface {
-	GetAzureDevOpsIntegration(ctx context.Context, orgName, integrationID string) (*AzureDevOpsIntegration, error)
-	UpdateAzureDevOpsIntegration(ctx context.Context, orgName, integrationID string, req UpdateAzureDevOpsIntegrationRequest) error
+	GetAzureDevOpsIntegration(
+		ctx context.Context, orgName, integrationID string,
+	) (*AzureDevOpsIntegration, error)
+	UpdateAzureDevOpsIntegration(
+		ctx context.Context, orgName, integrationID string, req UpdateAzureDevOpsIntegrationRequest,
+	) error
 	DeleteAzureDevOpsIntegration(ctx context.Context, orgName, integrationID string) error
 	ListAzureDevOpsIntegrations(ctx context.Context, orgName string) ([]AzureDevOpsIntegration, error)
 }
@@ -62,7 +66,9 @@ func adoIntegrationBasePath(orgName string) string {
 	return path.Join("console", "orgs", orgName, "integrations", "azure-devops")
 }
 
-func (c *Client) GetAzureDevOpsIntegration(ctx context.Context, orgName, integrationID string) (*AzureDevOpsIntegration, error) {
+func (c *Client) GetAzureDevOpsIntegration(
+	ctx context.Context, orgName, integrationID string,
+) (*AzureDevOpsIntegration, error) {
 	apiPath := path.Join(adoIntegrationBasePath(orgName), integrationID)
 
 	var integration AzureDevOpsIntegration
@@ -78,7 +84,9 @@ func (c *Client) GetAzureDevOpsIntegration(ctx context.Context, orgName, integra
 	return &integration, nil
 }
 
-func (c *Client) UpdateAzureDevOpsIntegration(ctx context.Context, orgName, integrationID string, req UpdateAzureDevOpsIntegrationRequest) error {
+func (c *Client) UpdateAzureDevOpsIntegration(
+	ctx context.Context, orgName, integrationID string, req UpdateAzureDevOpsIntegrationRequest,
+) error {
 	apiPath := path.Join(adoIntegrationBasePath(orgName), integrationID)
 
 	_, err := c.do(ctx, http.MethodPatch, apiPath, req, nil)
