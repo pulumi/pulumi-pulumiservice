@@ -17,16 +17,18 @@ package main
 import (
 	_ "embed"
 
-	psp "github.com/pulumi/pulumi-pulumiservice/provider/pkg/provider"
 	"github.com/pulumi/pulumi/pkg/v3/resource/provider"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/util/cmdutil"
 	rpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
+
+	psp "github.com/pulumi/pulumi-pulumiservice/provider/pkg/provider"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/version"
 )
 
 var providerName = "pulumiservice"
 
 // The version needs to be replaced using LDFLAGS on build
-var Version = "REPLACE_ON_BUILD"
+var Version = version.Version
 
 func main() {
 	// Start gRPC service for the pulumiservice provider
