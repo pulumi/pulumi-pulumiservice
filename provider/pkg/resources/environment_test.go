@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/pulumi/esc"
 	"github.com/pulumi/esc/cmd/esc/cli/client"
@@ -523,6 +525,175 @@ func TestEnvironment(t *testing.T) {
 
 		assert.NoError(t, err)
 		assert.Equal(t, resp.Id, "org/env")
+	})
+}
+
+func TestEnvironmentDiff(t *testing.T) {
+	mockedClient := buildEscClientMock(
+		func(_ context.Context, _ string, _ string, _ string, _ bool) (yaml []byte, etag string, revision int, err error) {
+			return nil, "", 0, nil
+		},
+		func(_ context.Context, _, _, _ string) (*client.EnvironmentRevisionTag, error) {
+			return nil, nil
+		},
+	)
+	provider := PulumiServiceEnvironmentResource{
+		Client: mockedClient,
+	}
+
+	t.Run("No diff when inputs are identical", func(t *testing.T) {
+		inputs := resource.PropertyMap{
+			"organization": resource.NewStringProperty("org"),
+			"project":      resource.NewStringProperty("default"),
+			"name":         resource.NewStringProperty("env"),
+			"yaml":         resource.NewStringProperty("values:\n  foo: bar"),
+		}
+
+		state, err := structpb.NewStruct(inputs.Mappable())
+		require.NoError(t, err)
+
+		req := &pulumirpc.DiffRequest{
+			Id:        "org/default/env",
+			Urn:       "urn:pulumi:dev::test::pulumiservice:index:Environment::testEnv",
+			OldInputs: state,
+			News:      state,
+		}
+
+		resp, err := provider.Diff(req)
+		require.NoError(t, err)
+		assert.Equal(t, pulumirpc.DiffResponse_DIFF_NONE, resp.Changes)
+		assert.Empty(t, resp.DetailedDiff)
+	})
+
+	t.Run("Replace when organization changes", func(t *testing.T) {
+		oldInputs := resource.PropertyMap{
+			"organization": resource.NewStringProperty("org1"),
+			"project":      resource.NewStringProperty("default"),
+			"name":         resource.NewStringProperty("env"),
+			"yaml":         resource.NewStringProperty("values:\n  foo: bar"),
+		}
+		newInputs := resource.PropertyMap{
+			"organization": resource.NewStringProperty("org2"),
+			"project":      resource.NewStringProperty("default"),
+			"name":         resource.NewStringProperty("env"),
+			"yaml":         resource.NewStringProperty("values:\n  foo: bar"),
+		}
+
+		oldState, err := structpb.NewStruct(oldInputs.Mappable())
+		require.NoError(t, err)
+		newState, err := structpb.NewStruct(newInputs.Mappable())
+		require.NoError(t, err)
+
+		req := &pulumirpc.DiffRequest{
+			Id:        "org1/default/env",
+			Urn:       "urn:pulumi:dev::test::pulumiservice:index:Environment::testEnv",
+			OldInputs: oldState,
+			News:      newState,
+		}
+
+		resp, err := provider.Diff(req)
+		require.NoError(t, err)
+		assert.Equal(t, pulumirpc.DiffResponse_DIFF_SOME, resp.Changes)
+
+		orgDiff, ok := resp.DetailedDiff["organization"]
+		assert.True(t, ok, "organization should be in the detailed diff")
+		assert.Equal(t, pulumirpc.PropertyDiff_UPDATE_REPLACE, orgDiff.Kind)
+	})
+
+	t.Run("Replace when name changes", func(t *testing.T) {
+		oldInputs := resource.PropertyMap{
+			"organization": resource.NewStringProperty("org"),
+			"project":      resource.NewStringProperty("default"),
+			"name":         resource.NewStringProperty("env1"),
+			"yaml":         resource.NewStringProperty("values:\n  foo: bar"),
+		}
+		newInputs := resource.PropertyMap{
+			"organization": resource.NewStringProperty("org"),
+			"project":      resource.NewStringProperty("default"),
+			"name":         resource.NewStringProperty("env2"),
+			"yaml":         resource.NewStringProperty("values:\n  foo: bar"),
+		}
+
+		oldState, err := structpb.NewStruct(oldInputs.Mappable())
+		require.NoError(t, err)
+		newState, err := structpb.NewStruct(newInputs.Mappable())
+		require.NoError(t, err)
+
+		req := &pulumirpc.DiffRequest{
+			Id:        "org/default/env1",
+			Urn:       "urn:pulumi:dev::test::pulumiservice:index:Environment::testEnv",
+			OldInputs: oldState,
+			News:      newState,
+		}
+
+		resp, err := provider.Diff(req)
+		require.NoError(t, err)
+		assert.Equal(t, pulumirpc.DiffResponse_DIFF_SOME, resp.Changes)
+
+		nameDiff, ok := resp.DetailedDiff["name"]
+		assert.True(t, ok, "name should be in the detailed diff")
+		assert.Equal(t, pulumirpc.PropertyDiff_UPDATE_REPLACE, nameDiff.Kind)
+	})
+
+	t.Run("No replace when only yaml changes", func(t *testing.T) {
+		oldInputs := resource.PropertyMap{
+			"organization": resource.NewStringProperty("org"),
+			"project":      resource.NewStringProperty("default"),
+			"name":         resource.NewStringProperty("env"),
+			"yaml":         resource.NewStringProperty("values:\n  foo: bar"),
+		}
+		newInputs := resource.PropertyMap{
+			"organization": resource.NewStringProperty("org"),
+			"project":      resource.NewStringProperty("default"),
+			"name":         resource.NewStringProperty("env"),
+			"yaml":         resource.NewStringProperty("values:\n  foo: baz"),
+		}
+
+		oldState, err := structpb.NewStruct(oldInputs.Mappable())
+		require.NoError(t, err)
+		newState, err := structpb.NewStruct(newInputs.Mappable())
+		require.NoError(t, err)
+
+		req := &pulumirpc.DiffRequest{
+			Id:        "org/default/env",
+			Urn:       "urn:pulumi:dev::test::pulumiservice:index:Environment::testEnv",
+			OldInputs: oldState,
+			News:      newState,
+		}
+
+		resp, err := provider.Diff(req)
+		require.NoError(t, err)
+		assert.Equal(t, pulumirpc.DiffResponse_DIFF_SOME, resp.Changes)
+
+		yamlDiff, ok := resp.DetailedDiff["yaml"]
+		assert.True(t, ok, "yaml should be in the detailed diff")
+		assert.Equal(t, pulumirpc.PropertyDiff_UPDATE, yamlDiff.Kind, "yaml change should be UPDATE, not REPLACE")
+	})
+
+	t.Run("No diff when provider version changes but inputs are same", func(t *testing.T) {
+		// This is the core regression test: when upgrading the provider version,
+		// the diff should show no changes if the user's inputs haven't changed.
+		inputs := resource.PropertyMap{
+			"organization": resource.NewStringProperty("org"),
+			"project":      resource.NewStringProperty("default"),
+			"name":         resource.NewStringProperty("env"),
+			"yaml":         resource.NewStringProperty("values:\n  foo: bar"),
+		}
+
+		state, err := structpb.NewStruct(inputs.Mappable())
+		require.NoError(t, err)
+
+		req := &pulumirpc.DiffRequest{
+			Id:        "org/default/env",
+			Urn:       "urn:pulumi:dev::test::pulumiservice:index:Environment::testEnv",
+			OldInputs: state,
+			News:      state,
+		}
+
+		resp, err := provider.Diff(req)
+		require.NoError(t, err)
+		assert.Equal(t, pulumirpc.DiffResponse_DIFF_NONE, resp.Changes)
+		assert.Empty(t, resp.DetailedDiff)
 	})
 }
 

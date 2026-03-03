@@ -12,6 +12,7 @@
 
 ### Bug Fixes
 
+- Fixed Environment resource being spuriously replaced on provider version upgrades by correcting the Diff implementation to use the standard diff utility with proper `KeepUnknowns` handling
 - Fixed Environment resource crash when yaml property contains computed values from Outputs (e.g., template execution results) [#606](https://github.com/pulumi/pulumi-pulumiservice/issues/606)
 - Fixed PolicyGroup schema syntax error preventing proper nested object definitions in policyPacks field [#595](https://github.com/pulumi/pulumi-pulumiservice/pull/595)
 - Fixed PolicyGroup creation to include required entityType and mode fields [#563](https://github.com/pulumi/pulumi-pulumiservice/issues/563)
