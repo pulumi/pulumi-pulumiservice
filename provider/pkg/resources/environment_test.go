@@ -670,30 +670,78 @@ func TestEnvironmentDiff(t *testing.T) {
 		assert.Equal(t, pulumirpc.PropertyDiff_UPDATE, yamlDiff.Kind, "yaml change should be UPDATE, not REPLACE")
 	})
 
-	t.Run("No diff when provider version changes but inputs are same", func(t *testing.T) {
-		// This is the core regression test: when upgrading the provider version,
-		// the diff should show no changes if the user's inputs haven't changed.
-		inputs := resource.PropertyMap{
+	t.Run("No replace when upgrading from pre-0.25.0 state without project", func(t *testing.T) {
+		// Core regression test: pre-0.25.0 state has no project field.
+		// v0.25.0+ adds project with default "default". The diff should NOT
+		// trigger a replace because the implicit project was always "default".
+		oldInputs := resource.PropertyMap{
+			"organization": resource.NewStringProperty("org"),
+			"name":         resource.NewStringProperty("env"),
+			"yaml":         resource.NewStringProperty("values:\n  foo: bar"),
+			// Note: no "project" — this is what pre-0.25.0 state looks like
+		}
+		newInputs := resource.PropertyMap{
 			"organization": resource.NewStringProperty("org"),
 			"project":      resource.NewStringProperty("default"),
 			"name":         resource.NewStringProperty("env"),
 			"yaml":         resource.NewStringProperty("values:\n  foo: bar"),
 		}
 
-		state, err := structpb.NewStruct(inputs.Mappable())
+		oldState, err := structpb.NewStruct(oldInputs.Mappable())
+		require.NoError(t, err)
+		newState, err := structpb.NewStruct(newInputs.Mappable())
 		require.NoError(t, err)
 
 		req := &pulumirpc.DiffRequest{
-			Id:        "org/default/env",
+			Id:        "org/env",
 			Urn:       "urn:pulumi:dev::test::pulumiservice:index:Environment::testEnv",
-			OldInputs: state,
-			News:      state,
+			OldInputs: oldState,
+			News:      newState,
 		}
 
 		resp, err := provider.Diff(req)
 		require.NoError(t, err)
-		assert.Equal(t, pulumirpc.DiffResponse_DIFF_NONE, resp.Changes)
+		assert.Equal(t, pulumirpc.DiffResponse_DIFF_NONE, resp.Changes,
+			"upgrading from pre-0.25.0 should not show any diff when project defaults to 'default'")
 		assert.Empty(t, resp.DetailedDiff)
+	})
+
+	t.Run("Replace when upgrading from pre-0.25.0 with non-default project", func(t *testing.T) {
+		// If a user upgrades and sets project to something other than "default",
+		// that IS a real change and should trigger a replace.
+		oldInputs := resource.PropertyMap{
+			"organization": resource.NewStringProperty("org"),
+			"name":         resource.NewStringProperty("env"),
+			"yaml":         resource.NewStringProperty("values:\n  foo: bar"),
+			// No project in old state
+		}
+		newInputs := resource.PropertyMap{
+			"organization": resource.NewStringProperty("org"),
+			"project":      resource.NewStringProperty("my-project"),
+			"name":         resource.NewStringProperty("env"),
+			"yaml":         resource.NewStringProperty("values:\n  foo: bar"),
+		}
+
+		oldState, err := structpb.NewStruct(oldInputs.Mappable())
+		require.NoError(t, err)
+		newState, err := structpb.NewStruct(newInputs.Mappable())
+		require.NoError(t, err)
+
+		req := &pulumirpc.DiffRequest{
+			Id:        "org/env",
+			Urn:       "urn:pulumi:dev::test::pulumiservice:index:Environment::testEnv",
+			OldInputs: oldState,
+			News:      newState,
+		}
+
+		resp, err := provider.Diff(req)
+		require.NoError(t, err)
+		assert.Equal(t, pulumirpc.DiffResponse_DIFF_SOME, resp.Changes)
+
+		projectDiff, ok := resp.DetailedDiff["project"]
+		assert.True(t, ok, "project should be in the detailed diff")
+		assert.Equal(t, pulumirpc.PropertyDiff_UPDATE_REPLACE, projectDiff.Kind,
+			"changing project to a non-default value should trigger replace")
 	})
 }
 

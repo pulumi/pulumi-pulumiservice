@@ -101,12 +101,60 @@ func getBytesFromAsset(asset *asset.Asset) ([]byte, error) {
 }
 
 func (st *PulumiServiceEnvironmentResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+	olds, err := plugin.UnmarshalProperties(
+		req.GetOldInputs(),
+		plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	// Backfill project default for state created before v0.25.0, which added the
+	// project input. Without this, upgrading from pre-0.25.0 causes a spurious
+	// replace because the diff sees project as a new addition to a replace property.
+	if !olds["project"].HasValue() {
+		olds["project"] = resource.NewPropertyValue(defaultProject)
+	}
+
+	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	if err != nil {
+		return nil, err
+	}
+
+	diffs := olds.Diff(news)
+	if diffs == nil {
+		return &pulumirpc.DiffResponse{
+			Changes: pulumirpc.DiffResponse_DIFF_NONE,
+		}, nil
+	}
+
+	dd := plugin.NewDetailedDiffFromObjectDiff(diffs, false)
+
+	detailedDiffs := map[string]*pulumirpc.PropertyDiff{}
 	replaceProperties := map[string]bool{
 		"organization": true,
 		"project":      true,
 		"name":         true,
 	}
-	return util.StandardDiff(req, replaceProperties)
+	for k, v := range dd {
+		if _, ok := replaceProperties[k]; ok {
+			v.Kind = v.Kind.AsReplace()
+		}
+		detailedDiffs[k] = &pulumirpc.PropertyDiff{
+			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind), //nolint:gosec // safe conversion from plugin.DiffKind
+			InputDiff: v.InputDiff,
+		}
+	}
+
+	changes := pulumirpc.DiffResponse_DIFF_NONE
+	if len(detailedDiffs) > 0 {
+		changes = pulumirpc.DiffResponse_DIFF_SOME
+	}
+	return &pulumirpc.DiffResponse{
+		Changes:         changes,
+		DetailedDiff:    detailedDiffs,
+		HasDetailedDiff: true,
+	}, nil
 }
 
 func (st *PulumiServiceEnvironmentResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
