@@ -85,14 +85,14 @@ public final class DeploymentSettingsVcsArgs extends com.pulumi.resources.Resour
     }
 
     /**
-     * The VCS provider type. Must be &#39;azure_devops&#39; or &#39;github&#39;.
+     * The VCS provider type.
      * 
      */
     @Import(name="provider", required=true)
     private Output<String> provider;
 
     /**
-     * @return The VCS provider type. Must be &#39;azure_devops&#39; or &#39;github&#39;.
+     * @return The VCS provider type.
      * 
      */
     public Output<String> provider() {
@@ -254,7 +254,7 @@ public final class DeploymentSettingsVcsArgs extends com.pulumi.resources.Resour
         }
 
         /**
-         * @param provider The VCS provider type. Must be &#39;azure_devops&#39; or &#39;github&#39;.
+         * @param provider The VCS provider type.
          * 
          * @return builder
          * 
@@ -265,7 +265,7 @@ public final class DeploymentSettingsVcsArgs extends com.pulumi.resources.Resour
         }
 
         /**
-         * @param provider The VCS provider type. Must be &#39;azure_devops&#39; or &#39;github&#39;.
+         * @param provider The VCS provider type.
          * 
          * @return builder
          * 

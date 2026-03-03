@@ -36,7 +36,7 @@ public final class DeploymentSettingsVcs {
      */
     private @Nullable Boolean previewPullRequests;
     /**
-     * @return The VCS provider type. Must be &#39;azure_devops&#39; or &#39;github&#39;.
+     * @return The VCS provider type.
      * 
      */
     private String provider;
@@ -81,7 +81,7 @@ public final class DeploymentSettingsVcs {
         return Optional.ofNullable(this.previewPullRequests);
     }
     /**
-     * @return The VCS provider type. Must be &#39;azure_devops&#39; or &#39;github&#39;.
+     * @return The VCS provider type.
      * 
      */
     public String provider() {
