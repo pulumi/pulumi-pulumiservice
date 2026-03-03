@@ -276,6 +276,122 @@ func TestYamlTeamStackPermissionsExample(t *testing.T) {
 	})
 }
 
+func TestYamlTeamStackPermissionDeletedTeam(t *testing.T) {
+	// This test verifies the fix for https://github.com/pulumi/pulumi-pulumiservice/issues/444
+	// The scenario is where a team is deleted externally (via SCIM/SSO) and the
+	// TeamStackPermission resource should be gracefully removed during refresh
+	// instead of failing with a 404 error.
+
+	t.Run("Gracefully handles deleted team during refresh", func(t *testing.T) {
+		teamName := "test-team-" + uuid.NewString()[0:10]
+		stackName := "test-stack-" + uuid.NewString()[0:10]
+		projectName := "yaml-team-deleted-" + uuid.NewString()[0:10]
+
+		// Program with team, stack, and permission
+		writeTeamAndPermission := func() string {
+			prog := YamlProgram{
+				Name:    projectName,
+				Runtime: "yaml",
+				Resources: map[string]Resource{
+					"team": {
+						Type: "pulumiservice:index:Team",
+						Properties: map[string]interface{}{
+							"name":             teamName,
+							"teamType":         "pulumi",
+							"displayName":      teamName,
+							"organizationName": ServiceProviderTestOrg,
+						},
+					},
+					"stack": {
+						Type: "pulumiservice:index:Stack",
+						Properties: map[string]interface{}{
+							"stackName":        stackName,
+							"projectName":      projectName,
+							"organizationName": ServiceProviderTestOrg,
+						},
+					},
+					"permission": {
+						Type: "pulumiservice:index:TeamStackPermission",
+						Properties: map[string]interface{}{
+							"organization": ServiceProviderTestOrg,
+							"project":      projectName,
+							"stack":        stackName,
+							"team":         teamName,
+							"permission":   100, // READ permission
+						},
+						Options: map[string]interface{}{
+							"dependsOn": []string{"${team}", "${stack}"},
+						},
+					},
+				},
+			}
+			return writePulumiYaml(t, prog)
+		}
+
+		// Program with stack and permission, but no team (simulating team deleted by SCIM)
+		writePermissionOnly := func() string {
+			prog := YamlProgram{
+				Name:    projectName,
+				Runtime: "yaml",
+				Resources: map[string]Resource{
+					"stack": {
+						Type: "pulumiservice:index:Stack",
+						Properties: map[string]interface{}{
+							"stackName":        stackName,
+							"projectName":      projectName,
+							"organizationName": ServiceProviderTestOrg,
+						},
+					},
+					"permission": {
+						Type: "pulumiservice:index:TeamStackPermission",
+						Properties: map[string]interface{}{
+							"organization": ServiceProviderTestOrg,
+							"project":      projectName,
+							"stack":        stackName,
+							"team":         teamName,
+							"permission":   100,
+						},
+						Options: map[string]interface{}{
+							"dependsOn": []string{"${stack}"},
+						},
+					},
+				},
+			}
+			return writePulumiYaml(t, prog)
+		}
+
+		initialDir := writeTeamAndPermission()
+		afterTeamDeleteDir := writePermissionOnly()
+
+		refresh := &strings.Builder{}
+		refreshOut := io.MultiWriter(os.Stdout, refresh)
+
+		integration.ProgramTest(t, &integration.ProgramTestOptions{
+			Quick:       true,
+			SkipRefresh: true, // We'll refresh manually in EditDir
+			Dir:         initialDir,
+			EditDirs: []integration.EditDir{
+				{
+					Dir:      afterTeamDeleteDir,
+					Additive: true,
+					Verbose:  true,
+					Stdout:   refreshOut,
+					Stderr:   refreshOut,
+					// The permission should be deleted when the team is gone
+					// This should NOT fail - that's the bug fix
+					ExpectFailure: false,
+				},
+			},
+		})
+
+		// Verify the permission resource was deleted (not errored)
+		refreshOutput := refresh.String()
+		assert.Contains(t, refreshOutput, "permission", "Should show permission resource")
+		// Should NOT contain 404 error
+		assert.NotContains(t, refreshOutput, "404 API error", "Should not fail with 404 error")
+	})
+}
+
 func TestYamlWebhookExample(t *testing.T) {
 	cwd := getCwd(t)
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
