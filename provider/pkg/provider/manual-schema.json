@@ -378,6 +378,10 @@
             {
               "value": "github",
               "name": "GitHub"
+            },
+            {
+              "value": "gitlab",
+              "name": "GitLab"
             }
           ]
         },
