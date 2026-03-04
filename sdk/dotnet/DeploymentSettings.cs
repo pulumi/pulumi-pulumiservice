@@ -77,6 +77,12 @@ namespace Pulumi.PulumiService
         [Output("stack")]
         public Output<string> Stack { get; private set; } = null!;
 
+        /// <summary>
+        /// VCS settings for the deployment. Supports Azure DevOps and GitHub via the 'provider' discriminator field.
+        /// </summary>
+        [Output("vcs")]
+        public Output<Outputs.DeploymentSettingsVcs?> Vcs { get; private set; } = null!;
+
 
         /// <summary>
         /// Create a DeploymentSettings resource with the given unique name, arguments, and options.
@@ -175,6 +181,12 @@ namespace Pulumi.PulumiService
         /// </summary>
         [Input("stack", required: true)]
         public Input<string> Stack { get; set; } = null!;
+
+        /// <summary>
+        /// VCS settings for the deployment. Supports Azure DevOps and GitHub via the 'provider' discriminator field.
+        /// </summary>
+        [Input("vcs")]
+        public Input<Inputs.DeploymentSettingsVcsArgs>? Vcs { get; set; }
 
         public DeploymentSettingsArgs()
         {

@@ -9,6 +9,7 @@
 - Updated PolicyGroup to use batch API for more efficient updates when adding/removing stacks, accounts, or policy packs
 - Added Java SDK support with Pulumi Java SDK v1.16.2
 - Upgraded Pulumi SDK to v3.204.0 with latest codegen improvements
+- Added `vcs` property to DeploymentSettings for polymorphic VCS support (Azure DevOps and GitHub) [#671](https://github.com/pulumi/pulumi-pulumiservice/pull/671)
 
 ### Bug Fixes
 

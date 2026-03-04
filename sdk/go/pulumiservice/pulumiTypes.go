@@ -2200,6 +2200,298 @@ func (o DeploymentSettingsSourceContextPtrOutput) Git() DeploymentSettingsGitSou
 	}).(DeploymentSettingsGitSourcePtrOutput)
 }
 
+// VCS settings for the deployment, supporting multiple VCS providers.
+type DeploymentSettingsVcs struct {
+	// Trigger a deployment running `pulumi up` on commit.
+	DeployCommits *bool `pulumi:"deployCommits"`
+	// Deploy a specific pull request number.
+	DeployPullRequest *int `pulumi:"deployPullRequest"`
+	// The paths within the repo that deployments should be filtered to.
+	Paths []string `pulumi:"paths"`
+	// Trigger a deployment running `pulumi preview` when a PR is opened.
+	PreviewPullRequests *bool `pulumi:"previewPullRequests"`
+	// The VCS provider type.
+	Provider string `pulumi:"provider"`
+	// Use this stack as a template for pull request review stacks.
+	PullRequestTemplate *bool `pulumi:"pullRequestTemplate"`
+	// The repository identifier (e.g., 'ProjectName/RepoName' for Azure DevOps, 'org/repo' for GitHub).
+	Repository *string `pulumi:"repository"`
+}
+
+// Defaults sets the appropriate defaults for DeploymentSettingsVcs
+func (val *DeploymentSettingsVcs) Defaults() *DeploymentSettingsVcs {
+	if val == nil {
+		return nil
+	}
+	tmp := *val
+	if tmp.DeployCommits == nil {
+		deployCommits_ := true
+		tmp.DeployCommits = &deployCommits_
+	}
+	if tmp.PreviewPullRequests == nil {
+		previewPullRequests_ := true
+		tmp.PreviewPullRequests = &previewPullRequests_
+	}
+	if tmp.PullRequestTemplate == nil {
+		pullRequestTemplate_ := false
+		tmp.PullRequestTemplate = &pullRequestTemplate_
+	}
+	return &tmp
+}
+
+// DeploymentSettingsVcsInput is an input type that accepts DeploymentSettingsVcsArgs and DeploymentSettingsVcsOutput values.
+// You can construct a concrete instance of `DeploymentSettingsVcsInput` via:
+//
+//	DeploymentSettingsVcsArgs{...}
+type DeploymentSettingsVcsInput interface {
+	pulumi.Input
+
+	ToDeploymentSettingsVcsOutput() DeploymentSettingsVcsOutput
+	ToDeploymentSettingsVcsOutputWithContext(context.Context) DeploymentSettingsVcsOutput
+}
+
+// VCS settings for the deployment, supporting multiple VCS providers.
+type DeploymentSettingsVcsArgs struct {
+	// Trigger a deployment running `pulumi up` on commit.
+	DeployCommits pulumi.BoolPtrInput `pulumi:"deployCommits"`
+	// Deploy a specific pull request number.
+	DeployPullRequest pulumi.IntPtrInput `pulumi:"deployPullRequest"`
+	// The paths within the repo that deployments should be filtered to.
+	Paths pulumi.StringArrayInput `pulumi:"paths"`
+	// Trigger a deployment running `pulumi preview` when a PR is opened.
+	PreviewPullRequests pulumi.BoolPtrInput `pulumi:"previewPullRequests"`
+	// The VCS provider type.
+	Provider pulumi.StringInput `pulumi:"provider"`
+	// Use this stack as a template for pull request review stacks.
+	PullRequestTemplate pulumi.BoolPtrInput `pulumi:"pullRequestTemplate"`
+	// The repository identifier (e.g., 'ProjectName/RepoName' for Azure DevOps, 'org/repo' for GitHub).
+	Repository pulumi.StringPtrInput `pulumi:"repository"`
+}
+
+// Defaults sets the appropriate defaults for DeploymentSettingsVcsArgs
+func (val *DeploymentSettingsVcsArgs) Defaults() *DeploymentSettingsVcsArgs {
+	if val == nil {
+		return nil
+	}
+	tmp := *val
+	if tmp.DeployCommits == nil {
+		tmp.DeployCommits = pulumi.BoolPtr(true)
+	}
+	if tmp.PreviewPullRequests == nil {
+		tmp.PreviewPullRequests = pulumi.BoolPtr(true)
+	}
+	if tmp.PullRequestTemplate == nil {
+		tmp.PullRequestTemplate = pulumi.BoolPtr(false)
+	}
+	return &tmp
+}
+func (DeploymentSettingsVcsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*DeploymentSettingsVcs)(nil)).Elem()
+}
+
+func (i DeploymentSettingsVcsArgs) ToDeploymentSettingsVcsOutput() DeploymentSettingsVcsOutput {
+	return i.ToDeploymentSettingsVcsOutputWithContext(context.Background())
+}
+
+func (i DeploymentSettingsVcsArgs) ToDeploymentSettingsVcsOutputWithContext(ctx context.Context) DeploymentSettingsVcsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(DeploymentSettingsVcsOutput)
+}
+
+func (i DeploymentSettingsVcsArgs) ToDeploymentSettingsVcsPtrOutput() DeploymentSettingsVcsPtrOutput {
+	return i.ToDeploymentSettingsVcsPtrOutputWithContext(context.Background())
+}
+
+func (i DeploymentSettingsVcsArgs) ToDeploymentSettingsVcsPtrOutputWithContext(ctx context.Context) DeploymentSettingsVcsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(DeploymentSettingsVcsOutput).ToDeploymentSettingsVcsPtrOutputWithContext(ctx)
+}
+
+// DeploymentSettingsVcsPtrInput is an input type that accepts DeploymentSettingsVcsArgs, DeploymentSettingsVcsPtr and DeploymentSettingsVcsPtrOutput values.
+// You can construct a concrete instance of `DeploymentSettingsVcsPtrInput` via:
+//
+//	        DeploymentSettingsVcsArgs{...}
+//
+//	or:
+//
+//	        nil
+type DeploymentSettingsVcsPtrInput interface {
+	pulumi.Input
+
+	ToDeploymentSettingsVcsPtrOutput() DeploymentSettingsVcsPtrOutput
+	ToDeploymentSettingsVcsPtrOutputWithContext(context.Context) DeploymentSettingsVcsPtrOutput
+}
+
+type deploymentSettingsVcsPtrType DeploymentSettingsVcsArgs
+
+func DeploymentSettingsVcsPtr(v *DeploymentSettingsVcsArgs) DeploymentSettingsVcsPtrInput {
+	return (*deploymentSettingsVcsPtrType)(v)
+}
+
+func (*deploymentSettingsVcsPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**DeploymentSettingsVcs)(nil)).Elem()
+}
+
+func (i *deploymentSettingsVcsPtrType) ToDeploymentSettingsVcsPtrOutput() DeploymentSettingsVcsPtrOutput {
+	return i.ToDeploymentSettingsVcsPtrOutputWithContext(context.Background())
+}
+
+func (i *deploymentSettingsVcsPtrType) ToDeploymentSettingsVcsPtrOutputWithContext(ctx context.Context) DeploymentSettingsVcsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(DeploymentSettingsVcsPtrOutput)
+}
+
+// VCS settings for the deployment, supporting multiple VCS providers.
+type DeploymentSettingsVcsOutput struct{ *pulumi.OutputState }
+
+func (DeploymentSettingsVcsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*DeploymentSettingsVcs)(nil)).Elem()
+}
+
+func (o DeploymentSettingsVcsOutput) ToDeploymentSettingsVcsOutput() DeploymentSettingsVcsOutput {
+	return o
+}
+
+func (o DeploymentSettingsVcsOutput) ToDeploymentSettingsVcsOutputWithContext(ctx context.Context) DeploymentSettingsVcsOutput {
+	return o
+}
+
+func (o DeploymentSettingsVcsOutput) ToDeploymentSettingsVcsPtrOutput() DeploymentSettingsVcsPtrOutput {
+	return o.ToDeploymentSettingsVcsPtrOutputWithContext(context.Background())
+}
+
+func (o DeploymentSettingsVcsOutput) ToDeploymentSettingsVcsPtrOutputWithContext(ctx context.Context) DeploymentSettingsVcsPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v DeploymentSettingsVcs) *DeploymentSettingsVcs {
+		return &v
+	}).(DeploymentSettingsVcsPtrOutput)
+}
+
+// Trigger a deployment running `pulumi up` on commit.
+func (o DeploymentSettingsVcsOutput) DeployCommits() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v DeploymentSettingsVcs) *bool { return v.DeployCommits }).(pulumi.BoolPtrOutput)
+}
+
+// Deploy a specific pull request number.
+func (o DeploymentSettingsVcsOutput) DeployPullRequest() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v DeploymentSettingsVcs) *int { return v.DeployPullRequest }).(pulumi.IntPtrOutput)
+}
+
+// The paths within the repo that deployments should be filtered to.
+func (o DeploymentSettingsVcsOutput) Paths() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v DeploymentSettingsVcs) []string { return v.Paths }).(pulumi.StringArrayOutput)
+}
+
+// Trigger a deployment running `pulumi preview` when a PR is opened.
+func (o DeploymentSettingsVcsOutput) PreviewPullRequests() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v DeploymentSettingsVcs) *bool { return v.PreviewPullRequests }).(pulumi.BoolPtrOutput)
+}
+
+// The VCS provider type.
+func (o DeploymentSettingsVcsOutput) Provider() pulumi.StringOutput {
+	return o.ApplyT(func(v DeploymentSettingsVcs) string { return v.Provider }).(pulumi.StringOutput)
+}
+
+// Use this stack as a template for pull request review stacks.
+func (o DeploymentSettingsVcsOutput) PullRequestTemplate() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v DeploymentSettingsVcs) *bool { return v.PullRequestTemplate }).(pulumi.BoolPtrOutput)
+}
+
+// The repository identifier (e.g., 'ProjectName/RepoName' for Azure DevOps, 'org/repo' for GitHub).
+func (o DeploymentSettingsVcsOutput) Repository() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v DeploymentSettingsVcs) *string { return v.Repository }).(pulumi.StringPtrOutput)
+}
+
+type DeploymentSettingsVcsPtrOutput struct{ *pulumi.OutputState }
+
+func (DeploymentSettingsVcsPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**DeploymentSettingsVcs)(nil)).Elem()
+}
+
+func (o DeploymentSettingsVcsPtrOutput) ToDeploymentSettingsVcsPtrOutput() DeploymentSettingsVcsPtrOutput {
+	return o
+}
+
+func (o DeploymentSettingsVcsPtrOutput) ToDeploymentSettingsVcsPtrOutputWithContext(ctx context.Context) DeploymentSettingsVcsPtrOutput {
+	return o
+}
+
+func (o DeploymentSettingsVcsPtrOutput) Elem() DeploymentSettingsVcsOutput {
+	return o.ApplyT(func(v *DeploymentSettingsVcs) DeploymentSettingsVcs {
+		if v != nil {
+			return *v
+		}
+		var ret DeploymentSettingsVcs
+		return ret
+	}).(DeploymentSettingsVcsOutput)
+}
+
+// Trigger a deployment running `pulumi up` on commit.
+func (o DeploymentSettingsVcsPtrOutput) DeployCommits() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *DeploymentSettingsVcs) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.DeployCommits
+	}).(pulumi.BoolPtrOutput)
+}
+
+// Deploy a specific pull request number.
+func (o DeploymentSettingsVcsPtrOutput) DeployPullRequest() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *DeploymentSettingsVcs) *int {
+		if v == nil {
+			return nil
+		}
+		return v.DeployPullRequest
+	}).(pulumi.IntPtrOutput)
+}
+
+// The paths within the repo that deployments should be filtered to.
+func (o DeploymentSettingsVcsPtrOutput) Paths() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v *DeploymentSettingsVcs) []string {
+		if v == nil {
+			return nil
+		}
+		return v.Paths
+	}).(pulumi.StringArrayOutput)
+}
+
+// Trigger a deployment running `pulumi preview` when a PR is opened.
+func (o DeploymentSettingsVcsPtrOutput) PreviewPullRequests() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *DeploymentSettingsVcs) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.PreviewPullRequests
+	}).(pulumi.BoolPtrOutput)
+}
+
+// The VCS provider type.
+func (o DeploymentSettingsVcsPtrOutput) Provider() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *DeploymentSettingsVcs) *string {
+		if v == nil {
+			return nil
+		}
+		return &v.Provider
+	}).(pulumi.StringPtrOutput)
+}
+
+// Use this stack as a template for pull request review stacks.
+func (o DeploymentSettingsVcsPtrOutput) PullRequestTemplate() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *DeploymentSettingsVcs) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.PullRequestTemplate
+	}).(pulumi.BoolPtrOutput)
+}
+
+// The repository identifier (e.g., 'ProjectName/RepoName' for Azure DevOps, 'org/repo' for GitHub).
+func (o DeploymentSettingsVcsPtrOutput) Repository() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *DeploymentSettingsVcs) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Repository
+	}).(pulumi.StringPtrOutput)
+}
+
 type EligibleApprover struct {
 	// RBAC permission that gives right to approve.
 	RbacPermission *RbacPermission `pulumi:"rbacPermission"`
@@ -3506,6 +3798,8 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsOperationContextPtrInput)(nil)).Elem(), DeploymentSettingsOperationContextArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsSourceContextInput)(nil)).Elem(), DeploymentSettingsSourceContextArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsSourceContextPtrInput)(nil)).Elem(), DeploymentSettingsSourceContextArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsVcsInput)(nil)).Elem(), DeploymentSettingsVcsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*DeploymentSettingsVcsPtrInput)(nil)).Elem(), DeploymentSettingsVcsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*EligibleApproverInput)(nil)).Elem(), EligibleApproverArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*EligibleApproverArrayInput)(nil)).Elem(), EligibleApproverArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*EnvironmentIdentifierInput)(nil)).Elem(), EnvironmentIdentifierArgs{})
@@ -3546,6 +3840,8 @@ func init() {
 	pulumi.RegisterOutputType(DeploymentSettingsOperationContextPtrOutput{})
 	pulumi.RegisterOutputType(DeploymentSettingsSourceContextOutput{})
 	pulumi.RegisterOutputType(DeploymentSettingsSourceContextPtrOutput{})
+	pulumi.RegisterOutputType(DeploymentSettingsVcsOutput{})
+	pulumi.RegisterOutputType(DeploymentSettingsVcsPtrOutput{})
 	pulumi.RegisterOutputType(EligibleApproverOutput{})
 	pulumi.RegisterOutputType(EligibleApproverArrayOutput{})
 	pulumi.RegisterOutputType(EnvironmentIdentifierOutput{})

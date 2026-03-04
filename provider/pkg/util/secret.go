@@ -57,6 +57,15 @@ func GetSecretOrBoolValue(prop resource.PropertyValue) bool {
 	}
 }
 
+func GetSecretOrNumberValue(prop resource.PropertyValue) float64 {
+	switch prop.V.(type) {
+	case *resource.Secret:
+		return prop.SecretValue().Element.NumberValue()
+	default:
+		return prop.NumberValue()
+	}
+}
+
 func GetSecretOrArrayValue(prop resource.PropertyValue) []resource.PropertyValue {
 	switch prop.V.(type) {
 	case *resource.Secret:

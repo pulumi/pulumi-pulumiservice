@@ -258,6 +258,51 @@ export interface DeploymentSettingsSourceContext {
     git?: outputs.DeploymentSettingsGitSource;
 }
 
+/**
+ * VCS settings for the deployment, supporting multiple VCS providers.
+ */
+export interface DeploymentSettingsVcs {
+    /**
+     * Trigger a deployment running `pulumi up` on commit.
+     */
+    deployCommits?: boolean;
+    /**
+     * Deploy a specific pull request number.
+     */
+    deployPullRequest?: number;
+    /**
+     * The paths within the repo that deployments should be filtered to.
+     */
+    paths?: string[];
+    /**
+     * Trigger a deployment running `pulumi preview` when a PR is opened.
+     */
+    previewPullRequests?: boolean;
+    /**
+     * The VCS provider type.
+     */
+    provider: string;
+    /**
+     * Use this stack as a template for pull request review stacks.
+     */
+    pullRequestTemplate?: boolean;
+    /**
+     * The repository identifier (e.g., 'ProjectName/RepoName' for Azure DevOps, 'org/repo' for GitHub).
+     */
+    repository?: string;
+}
+/**
+ * deploymentSettingsVcsProvideDefaults sets the appropriate defaults for DeploymentSettingsVcs
+ */
+export function deploymentSettingsVcsProvideDefaults(val: DeploymentSettingsVcs): DeploymentSettingsVcs {
+    return {
+        ...val,
+        deployCommits: (val.deployCommits) ?? true,
+        previewPullRequests: (val.previewPullRequests) ?? true,
+        pullRequestTemplate: (val.pullRequestTemplate) ?? false,
+    };
+}
+
 export interface EligibleApprover {
     /**
      * RBAC permission that gives right to approve.
