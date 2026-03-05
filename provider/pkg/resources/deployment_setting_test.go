@@ -85,7 +85,7 @@ func TestDeploymentSettings(t *testing.T) {
 					OperationContext: &pulumiapi.OperationContext{},
 					GitHub:           &pulumiapi.GitHubConfiguration{},
 					SourceContext:    &pulumiapi.SourceContext{},
-					ExecutorContext:  &apitype.ExecutorContext{},
+					ExecutorContext:  &pulumiapi.ExecutorContext{},
 				}, nil
 			},
 		)
@@ -111,6 +111,36 @@ func TestDeploymentSettingsRoundtrip(t *testing.T) {
 		DeploymentSettings: pulumiapi.DeploymentSettings{
 			CacheOptions: &pulumiapi.CacheOptions{
 				Enable: true,
+			},
+		}}
+
+	encoded := initial.ToPropertyMap(nil, nil, true)
+	decoded := (&PulumiServiceDeploymentSettingsResource{}).ToPulumiServiceDeploymentSettingsInput(encoded)
+
+	assert.EqualValues(t, initial, decoded)
+}
+
+func TestDeploymentSettingsExecutorImageRoundtrip(t *testing.T) {
+	initial := PulumiServiceDeploymentSettingsInput{
+		DeploymentSettings: pulumiapi.DeploymentSettings{
+			ExecutorContext: &pulumiapi.ExecutorContext{
+				ExecutorImage: &apitype.DockerImage{
+					Reference: "my-custom-image:latest",
+				},
+			},
+		}}
+
+	encoded := initial.ToPropertyMap(nil, nil, true)
+	decoded := (&PulumiServiceDeploymentSettingsResource{}).ToPulumiServiceDeploymentSettingsInput(encoded)
+
+	assert.EqualValues(t, initial, decoded)
+}
+
+func TestDeploymentSettingsExecutorRootPathRoundtrip(t *testing.T) {
+	initial := PulumiServiceDeploymentSettingsInput{
+		DeploymentSettings: pulumiapi.DeploymentSettings{
+			ExecutorContext: &pulumiapi.ExecutorContext{
+				ExecutorRootPath: "/my/custom/path",
 			},
 		}}
 

@@ -252,6 +252,38 @@ func TestYamlDeploymentSettingsCommitExample(t *testing.T) {
 	})
 }
 
+func TestYamlDeploymentSettingsExecutorRootPathExample(t *testing.T) {
+	newProgram := YamlProgram{
+		Name:        "yaml-deployment-settings-executor-root-path",
+		Runtime:     "yaml",
+		Description: "Deployment settings test with custom executor root path",
+	}
+
+	tmpdir := writePulumiYaml(t, newProgram)
+
+	cwd, _ := os.Getwd()
+	digits := generateRandomFiveDigits()
+
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Quick:     true,
+		Dir:       path.Join(cwd, ".", "yaml-deployment-settings-executor-root-path"),
+		StackName: "test-stack-" + digits,
+		Config: map[string]string{
+			"digits":           digits,
+			"organizationName": getOrgName(),
+		},
+		EditDirs: []integration.EditDir{
+			{
+				Dir: tmpdir,
+			},
+			{
+				Dir:             tmpdir,
+				ExpectNoChanges: true,
+			},
+		},
+	})
+}
+
 func TestYamlTeamAccessTokenExample(t *testing.T) {
 	cwd, _ := os.Getwd()
 	integration.ProgramTest(t, &integration.ProgramTestOptions{

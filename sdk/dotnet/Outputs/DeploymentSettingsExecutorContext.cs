@@ -19,12 +19,20 @@ namespace Pulumi.PulumiService.Outputs
         /// <summary>
         /// Allows overriding the default executor image with a custom image. E.g. 'pulumi/pulumi-nodejs:latest'
         /// </summary>
-        public readonly string ExecutorImage;
+        public readonly string? ExecutorImage;
+        /// <summary>
+        /// Override the default root path (/) used by the deployment executor. This can be useful when running with non-root users (e.g., set to /tmp ).
+        /// </summary>
+        public readonly string? ExecutorRootPath;
 
         [OutputConstructor]
-        private DeploymentSettingsExecutorContext(string executorImage)
+        private DeploymentSettingsExecutorContext(
+            string? executorImage,
+
+            string? executorRootPath)
         {
             ExecutorImage = executorImage;
+            ExecutorRootPath = executorRootPath;
         }
     }
 }
