@@ -1,0 +1,42 @@
+# This example requires an existing Azure DevOps integration and a stack
+# with VCS configured. It cannot run in CI automatically.
+#
+# To test manually:
+#   1. Set PULUMI_BACKEND_URL and PULUMI_ACCESS_TOKEN for your environment
+#   2. Update the config defaults and resource properties below to match
+#      your organization, project, stack, and ADO repository
+#   3. Run: pulumi up
+name: yaml-deployment-settings-vcs
+runtime: yaml
+description: Deployment settings test with VCS configuration
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  projectName:
+    type: string
+  stackName:
+    type: string
+  adoRepository:
+    type: string
+resources:
+  my_settings:
+    type: pulumiservice:DeploymentSettings
+    properties:
+      organization: ${organizationName}
+      project: ${projectName}
+      stack: ${stackName}
+      sourceContext:
+        git:
+          branch: "refs/heads/main"
+      vcs:
+        provider: azure_devops
+        repository: ${adoRepository}
+        deployCommits: true
+        previewPullRequests: true
+        pullRequestTemplate: false
+      operationContext:
+        preRunCommands:
+          - echo "hello"
+        environmentVariables:
+          TEST_VAR: "test-value"

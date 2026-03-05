@@ -26,13 +26,14 @@ type DeploymentSettingsClient interface {
 }
 
 type DeploymentSettings struct {
-	OperationContext *OperationContext    `json:"operationContext,omitempty"`
-	GitHub           *GitHubConfiguration `json:"gitHub,omitempty"`
-	SourceContext    *SourceContext       `json:"sourceContext,omitempty"`
-	ExecutorContext  *ExecutorContext     `json:"executorContext,omitempty"`
-	AgentPoolID      string               `json:"agentPoolId,omitempty"`
-	Source           *string              `json:"source,omitempty"`
-	CacheOptions     *CacheOptions        `json:"cacheOptions,omitempty"`
+	OperationContext *OperationContext        `json:"operationContext,omitempty"`
+	GitHub           *GitHubConfiguration     `json:"gitHub,omitempty"`
+	SourceContext    *SourceContext           `json:"sourceContext,omitempty"`
+	ExecutorContext  *ExecutorContext         `json:"executorContext,omitempty"`
+	AgentPoolID      string                   `json:"agentPoolId,omitempty"`
+	Source           *string                  `json:"source,omitempty"`
+	CacheOptions     *CacheOptions            `json:"cacheOptions,omitempty"`
+	VCS              *VCSConfiguration        `json:"vcs,omitempty"`
 }
 
 type ExecutorContext struct {
@@ -88,6 +89,17 @@ type GitHubConfiguration struct {
 	PreviewPullRequests bool     `json:"previewPullRequests,omitempty"`
 	PullRequestTemplate bool     `json:"pullRequestTemplate,omitempty"`
 	Paths               []string `json:"paths,omitempty"`
+}
+
+type VCSConfiguration struct {
+	Provider            string   `json:"provider"`
+	Repository          string   `json:"repository,omitempty"`
+	InstallationID      string   `json:"installationId,omitempty"`
+	DeployCommits       bool     `json:"deployCommits"`
+	PreviewPullRequests bool     `json:"previewPullRequests"`
+	PullRequestTemplate bool     `json:"pullRequestTemplate"`
+	Paths               []string `json:"paths,omitempty"`
+	DeployPullRequest   *int     `json:"deployPullRequest,omitempty"`
 }
 
 type SourceContext struct {

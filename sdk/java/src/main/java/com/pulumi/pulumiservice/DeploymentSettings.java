@@ -14,6 +14,7 @@ import com.pulumi.pulumiservice.outputs.DeploymentSettingsExecutorContext;
 import com.pulumi.pulumiservice.outputs.DeploymentSettingsGithub;
 import com.pulumi.pulumiservice.outputs.DeploymentSettingsOperationContext;
 import com.pulumi.pulumiservice.outputs.DeploymentSettingsSourceContext;
+import com.pulumi.pulumiservice.outputs.DeploymentSettingsVcs;
 import java.lang.String;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -77,7 +78,11 @@ public class DeploymentSettings extends com.pulumi.resources.CustomResource {
     /**
      * GitHub settings for the deployment.
      * 
+     * @deprecated
+     * Use the &#39;vcs&#39; property instead, which supports both GitHub and Azure DevOps.
+     * 
      */
+    @Deprecated /* Use the 'vcs' property instead, which supports both GitHub and Azure DevOps. */
     @Export(name="github", refs={DeploymentSettingsGithub.class}, tree="[0]")
     private Output</* @Nullable */ DeploymentSettingsGithub> github;
 
@@ -157,6 +162,20 @@ public class DeploymentSettings extends com.pulumi.resources.CustomResource {
      */
     public Output<String> stack() {
         return this.stack;
+    }
+    /**
+     * VCS settings for the deployment. Supports Azure DevOps and GitHub via the &#39;provider&#39; discriminator field.
+     * 
+     */
+    @Export(name="vcs", refs={DeploymentSettingsVcs.class}, tree="[0]")
+    private Output</* @Nullable */ DeploymentSettingsVcs> vcs;
+
+    /**
+     * @return VCS settings for the deployment. Supports Azure DevOps and GitHub via the &#39;provider&#39; discriminator field.
+     * 
+     */
+    public Output<Optional<DeploymentSettingsVcs>> vcs() {
+        return Codegen.optional(this.vcs);
     }
 
     /**

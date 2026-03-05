@@ -12,6 +12,9 @@
   "repository": "https://github.com/pulumi/pulumi-pulumiservice",
   "publisher": "Pulumi",
   "namespace": "pulumi",
+  "meta": {
+    "moduleFormat": "(.*)"
+  },
   "language": {
     "csharp": {
       "namespaces": {
@@ -36,13 +39,15 @@
         "com.pulumi:pulumi": "1.16.2"
       },
       "gradleNexusPublishPluginVersion": "2.0.0",
-      "gradleTest": ""
+      "gradleTest": "",
+      "readme": "# Pulumi Service Provider\n\n[![Slack](http://www.pulumi.com/images/docs/badges/slack.svg)](https://slack.pulumi.com)\n[![NPM version](https://badge.fury.io/js/%40pulumi%2Fpulumiservice.svg)](https://www.npmjs.com/package/@pulumi/pulumiservice)\n[![Python version](https://badge.fury.io/py/pulumi-pulumiservice.svg)](https://pypi.org/project/pulumi-pulumiservice)\n[![NuGet version](https://badge.fury.io/nu/pulumi.pulumiservice.svg)](https://badge.fury.io/nu/pulumi.pulumiservice)\n[![PkgGoDev](https://pkg.go.dev/badge/github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice)](https://pkg.go.dev/github.com/pulumi/pulumi-pulumiservice/sdk/go)\n[![License](https://img.shields.io/npm/l/%40pulumi%2Fpulumiservice.svg)](https://github.com/pulumi/pulumi-pulumiservice/blob/main/LICENSE)\n\nPulumi Service Provider for creating Pulumi Cloud resources.\n\nThe Pulumi Service Provider (PSP) is built on top of the [Pulumi Cloud REST API](https://www.pulumi.com/docs/pulumi-cloud/reference/cloud-rest-api/), allowing Pulumi customers to create Pulumi Cloud resources using Pulumi programs. That includes Stacks, Environments, Teams, Tokens, Webhooks, Tags, Deployment Settings, Deployment Schedules and much more! Pulumi Service Provider is especially powerful when used in combination with the [Automation API](https://pulumi.com/automation).\n\nFor a full list of supported resources, visit the [Pulumi Registry](https://www.pulumi.com/registry/packages/pulumiservice/). For the REST API reference documentation, visit [Pulumi Cloud API Documentation](https://www.pulumi.com/docs/pulumi-cloud/reference/cloud-rest-api/).\n\nFor now, PSP is in public preview, but we're working on releasing v1.0 in the near future.\n\n## Installing\n\nThis package is available in many languages in the standard packaging formats.\n\n### Node.js (Javascript/TypeScript)\n\nTo use from JavaScript or TypeScript in Node.js, install using either `npm`:\n\n```sh\nnpm install @pulumi/pulumiservice\n```\n\nor `yarn`:\n\n```sh\nyarn add @pulumi/pulumiservice\n```\n\n### Python\n\nTo use from Python, install using `pip`:\n\n```sh\npip install pulumi_pulumiservice\n```\n\n### Go\n\nTo use from Go, use `go get` to grab the latest version of the library\n\n```sh\ngo get github.com/pulumi/pulumi-pulumiservice/sdk/go\n```\n\n### .NET\n\nTo use from .NET, install using `dotnet add package`:\n\n```sh\ndotnet add package Pulumi.PulumiService\n```\n\n### Java\n\nTo use from Java, add an entry to your `build.gradle` file:\n\n```groovy\nimplementation 'com.pulumi:pulumiservice:%Fill in latest version from the badge up top%'\n```\n\nOr to your `pom.xml` file:\n\n```xml\n<dependency>\n    <groupId>com.pulumi</groupId>\n    <artifactId>pulumiservice</artifactId>\n    <version>%Fill in latest version from the badge up top%</version>\n</dependency>\n```\n\n## Setup\n\nEnsure that you have ran `pulumi login`. Run `pulumi whoami` to verify that you are logged in.\n\n### Configuration Options\n\nUse `pulumi config set pulumiservice:<option>` or pass options to the [constructor of `new pulumiservice.Provider`][1].\n\n| Option        | Environment Variable Name | Required/Optional | Description                                                                           |\n|---------------|---------------------------|-------------------|---------------------------------------------------------------------------------------|\n| `accessToken` | `PULUMI_ACCESS_TOKEN`     | Optional          | Overrides [Pulumi Service Access Tokens][2]                                           |\n| `apiUrl`      | `PULUMI_BACKEND_URL`      | Optional          | Allows overriding default [Pulumi Service API URL][3] for [self hosted customers][4]. |\n|               |                           |                   |                                                                                       |\n\n## Examples\n\n```typescript\nimport * as aws from \"@pulumi/awsx\"\nimport * as pulumi from \"@pulumi/pulumi\";\nimport * as service from \"@pulumi/pulumiservice\";\n\nconst team = new service.Team(\"team\", {\n    name: \"pulumi-service-team\",\n    displayName: \"Pulumi Service\",\n    description: \"The Pulumi Service Team\",\n    organizationName: \"pulumi\",\n    teamType: \"pulumi\",\n    members: [\n        \"piers\",\n        \"bryce\",\n        \"casey\"\n        \"evan\",\n        \"devon\",\n        \"meagan\",\n        \"myles\",\n        \"steve\"\n    ],\n});\n\nexport const members = team.members;\n```\n\nCheck out the [examples/](examples/) directory for more examples.\n\n[1]: https://www.pulumi.com/registry/packages/pulumiservice/api-docs/provider/\n[2]: https://www.pulumi.com/docs/pulumi-cloud/access-management/access-tokens/\n[3]: https://www.pulumi.com/docs/pulumi-cloud/reference/cloud-rest-api/\n[4]: https://www.pulumi.com/docs/pulumi-cloud/self-hosted/\n"
     },
     "nodejs": {
       "dependencies": {
         "@pulumi/pulumi": "^3.0.0"
       },
       "packageName": "@pulumi/pulumiservice",
+      "readme": "# Pulumi Service Provider\n\n[![Slack](http://www.pulumi.com/images/docs/badges/slack.svg)](https://slack.pulumi.com)\n[![NPM version](https://badge.fury.io/js/%40pulumi%2Fpulumiservice.svg)](https://www.npmjs.com/package/@pulumi/pulumiservice)\n[![Python version](https://badge.fury.io/py/pulumi-pulumiservice.svg)](https://pypi.org/project/pulumi-pulumiservice)\n[![NuGet version](https://badge.fury.io/nu/pulumi.pulumiservice.svg)](https://badge.fury.io/nu/pulumi.pulumiservice)\n[![PkgGoDev](https://pkg.go.dev/badge/github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice)](https://pkg.go.dev/github.com/pulumi/pulumi-pulumiservice/sdk/go)\n[![License](https://img.shields.io/npm/l/%40pulumi%2Fpulumiservice.svg)](https://github.com/pulumi/pulumi-pulumiservice/blob/main/LICENSE)\n\nPulumi Service Provider for creating Pulumi Cloud resources.\n\nThe Pulumi Service Provider (PSP) is built on top of the [Pulumi Cloud REST API](https://www.pulumi.com/docs/pulumi-cloud/reference/cloud-rest-api/), allowing Pulumi customers to create Pulumi Cloud resources using Pulumi programs. That includes Stacks, Environments, Teams, Tokens, Webhooks, Tags, Deployment Settings, Deployment Schedules and much more! Pulumi Service Provider is especially powerful when used in combination with the [Automation API](https://pulumi.com/automation).\n\nFor a full list of supported resources, visit the [Pulumi Registry](https://www.pulumi.com/registry/packages/pulumiservice/). For the REST API reference documentation, visit [Pulumi Cloud API Documentation](https://www.pulumi.com/docs/pulumi-cloud/reference/cloud-rest-api/).\n\nFor now, PSP is in public preview, but we're working on releasing v1.0 in the near future.\n\n## Installing\n\nThis package is available in many languages in the standard packaging formats.\n\n### Node.js (Javascript/TypeScript)\n\nTo use from JavaScript or TypeScript in Node.js, install using either `npm`:\n\n```sh\nnpm install @pulumi/pulumiservice\n```\n\nor `yarn`:\n\n```sh\nyarn add @pulumi/pulumiservice\n```\n\n### Python\n\nTo use from Python, install using `pip`:\n\n```sh\npip install pulumi_pulumiservice\n```\n\n### Go\n\nTo use from Go, use `go get` to grab the latest version of the library\n\n```sh\ngo get github.com/pulumi/pulumi-pulumiservice/sdk/go\n```\n\n### .NET\n\nTo use from .NET, install using `dotnet add package`:\n\n```sh\ndotnet add package Pulumi.PulumiService\n```\n\n### Java\n\nTo use from Java, add an entry to your `build.gradle` file:\n\n```groovy\nimplementation 'com.pulumi:pulumiservice:%Fill in latest version from the badge up top%'\n```\n\nOr to your `pom.xml` file:\n\n```xml\n<dependency>\n    <groupId>com.pulumi</groupId>\n    <artifactId>pulumiservice</artifactId>\n    <version>%Fill in latest version from the badge up top%</version>\n</dependency>\n```\n\n## Setup\n\nEnsure that you have ran `pulumi login`. Run `pulumi whoami` to verify that you are logged in.\n\n### Configuration Options\n\nUse `pulumi config set pulumiservice:<option>` or pass options to the [constructor of `new pulumiservice.Provider`][1].\n\n| Option        | Environment Variable Name | Required/Optional | Description                                                                           |\n|---------------|---------------------------|-------------------|---------------------------------------------------------------------------------------|\n| `accessToken` | `PULUMI_ACCESS_TOKEN`     | Optional          | Overrides [Pulumi Service Access Tokens][2]                                           |\n| `apiUrl`      | `PULUMI_BACKEND_URL`      | Optional          | Allows overriding default [Pulumi Service API URL][3] for [self hosted customers][4]. |\n|               |                           |                   |                                                                                       |\n\n## Examples\n\n```typescript\nimport * as aws from \"@pulumi/awsx\"\nimport * as pulumi from \"@pulumi/pulumi\";\nimport * as service from \"@pulumi/pulumiservice\";\n\nconst team = new service.Team(\"team\", {\n    name: \"pulumi-service-team\",\n    displayName: \"Pulumi Service\",\n    description: \"The Pulumi Service Team\",\n    organizationName: \"pulumi\",\n    teamType: \"pulumi\",\n    members: [\n        \"piers\",\n        \"bryce\",\n        \"casey\"\n        \"evan\",\n        \"devon\",\n        \"meagan\",\n        \"myles\",\n        \"steve\"\n    ],\n});\n\nexport const members = team.members;\n```\n\nCheck out the [examples/](examples/) directory for more examples.\n\n[1]: https://www.pulumi.com/registry/packages/pulumiservice/api-docs/provider/\n[2]: https://www.pulumi.com/docs/pulumi-cloud/access-management/access-tokens/\n[3]: https://www.pulumi.com/docs/pulumi-cloud/reference/cloud-rest-api/\n[4]: https://www.pulumi.com/docs/pulumi-cloud/self-hosted/\n",
       "respectSchemaVersion": true
     },
     "python": {
@@ -50,6 +55,7 @@
       "pyproject": {
         "enabled": true
       },
+      "readme": "# Pulumi Service Provider\n\n[![Slack](http://www.pulumi.com/images/docs/badges/slack.svg)](https://slack.pulumi.com)\n[![NPM version](https://badge.fury.io/js/%40pulumi%2Fpulumiservice.svg)](https://www.npmjs.com/package/@pulumi/pulumiservice)\n[![Python version](https://badge.fury.io/py/pulumi-pulumiservice.svg)](https://pypi.org/project/pulumi-pulumiservice)\n[![NuGet version](https://badge.fury.io/nu/pulumi.pulumiservice.svg)](https://badge.fury.io/nu/pulumi.pulumiservice)\n[![PkgGoDev](https://pkg.go.dev/badge/github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice)](https://pkg.go.dev/github.com/pulumi/pulumi-pulumiservice/sdk/go)\n[![License](https://img.shields.io/npm/l/%40pulumi%2Fpulumiservice.svg)](https://github.com/pulumi/pulumi-pulumiservice/blob/main/LICENSE)\n\nPulumi Service Provider for creating Pulumi Cloud resources.\n\nThe Pulumi Service Provider (PSP) is built on top of the [Pulumi Cloud REST API](https://www.pulumi.com/docs/pulumi-cloud/reference/cloud-rest-api/), allowing Pulumi customers to create Pulumi Cloud resources using Pulumi programs. That includes Stacks, Environments, Teams, Tokens, Webhooks, Tags, Deployment Settings, Deployment Schedules and much more! Pulumi Service Provider is especially powerful when used in combination with the [Automation API](https://pulumi.com/automation).\n\nFor a full list of supported resources, visit the [Pulumi Registry](https://www.pulumi.com/registry/packages/pulumiservice/). For the REST API reference documentation, visit [Pulumi Cloud API Documentation](https://www.pulumi.com/docs/pulumi-cloud/reference/cloud-rest-api/).\n\nFor now, PSP is in public preview, but we're working on releasing v1.0 in the near future.\n\n## Installing\n\nThis package is available in many languages in the standard packaging formats.\n\n### Node.js (Javascript/TypeScript)\n\nTo use from JavaScript or TypeScript in Node.js, install using either `npm`:\n\n```sh\nnpm install @pulumi/pulumiservice\n```\n\nor `yarn`:\n\n```sh\nyarn add @pulumi/pulumiservice\n```\n\n### Python\n\nTo use from Python, install using `pip`:\n\n```sh\npip install pulumi_pulumiservice\n```\n\n### Go\n\nTo use from Go, use `go get` to grab the latest version of the library\n\n```sh\ngo get github.com/pulumi/pulumi-pulumiservice/sdk/go\n```\n\n### .NET\n\nTo use from .NET, install using `dotnet add package`:\n\n```sh\ndotnet add package Pulumi.PulumiService\n```\n\n### Java\n\nTo use from Java, add an entry to your `build.gradle` file:\n\n```groovy\nimplementation 'com.pulumi:pulumiservice:%Fill in latest version from the badge up top%'\n```\n\nOr to your `pom.xml` file:\n\n```xml\n<dependency>\n    <groupId>com.pulumi</groupId>\n    <artifactId>pulumiservice</artifactId>\n    <version>%Fill in latest version from the badge up top%</version>\n</dependency>\n```\n\n## Setup\n\nEnsure that you have ran `pulumi login`. Run `pulumi whoami` to verify that you are logged in.\n\n### Configuration Options\n\nUse `pulumi config set pulumiservice:<option>` or pass options to the [constructor of `new pulumiservice.Provider`][1].\n\n| Option        | Environment Variable Name | Required/Optional | Description                                                                           |\n|---------------|---------------------------|-------------------|---------------------------------------------------------------------------------------|\n| `accessToken` | `PULUMI_ACCESS_TOKEN`     | Optional          | Overrides [Pulumi Service Access Tokens][2]                                           |\n| `apiUrl`      | `PULUMI_BACKEND_URL`      | Optional          | Allows overriding default [Pulumi Service API URL][3] for [self hosted customers][4]. |\n|               |                           |                   |                                                                                       |\n\n## Examples\n\n```typescript\nimport * as aws from \"@pulumi/awsx\"\nimport * as pulumi from \"@pulumi/pulumi\";\nimport * as service from \"@pulumi/pulumiservice\";\n\nconst team = new service.Team(\"team\", {\n    name: \"pulumi-service-team\",\n    displayName: \"Pulumi Service\",\n    description: \"The Pulumi Service Team\",\n    organizationName: \"pulumi\",\n    teamType: \"pulumi\",\n    members: [\n        \"piers\",\n        \"bryce\",\n        \"casey\"\n        \"evan\",\n        \"devon\",\n        \"meagan\",\n        \"myles\",\n        \"steve\"\n    ],\n});\n\nexport const members = team.members;\n```\n\nCheck out the [examples/](examples/) directory for more examples.\n\n[1]: https://www.pulumi.com/registry/packages/pulumiservice/api-docs/provider/\n[2]: https://www.pulumi.com/docs/pulumi-cloud/access-management/access-tokens/\n[3]: https://www.pulumi.com/docs/pulumi-cloud/reference/cloud-rest-api/\n[4]: https://www.pulumi.com/docs/pulumi-cloud/self-hosted/\n",
       "requires": {
         "pulumi": ">=3.0.0,<4.0.0"
       },
@@ -128,10 +134,10 @@
       },
       "type": "object",
       "required": [
-        "numApprovalsRequired",
         "allowSelfApproval",
-        "requireReapprovalOnChange",
-        "eligibleApprovers"
+        "eligibleApprovers",
+        "numApprovalsRequired",
+        "requireReapprovalOnChange"
       ]
     },
     "pulumiservice:index:AuthPolicyDecision": {
@@ -187,8 +193,8 @@
       "type": "object",
       "required": [
         "decision",
-        "tokenType",
-        "rules"
+        "rules",
+        "tokenType"
       ]
     },
     "pulumiservice:index:AuthPolicyPermissionLevel": {
@@ -243,8 +249,8 @@
       "type": "object",
       "required": [
         "clientId",
-        "tenantId",
-        "subscriptionId"
+        "subscriptionId",
+        "tenantId"
       ]
     },
     "pulumiservice:index:CloudProvider": {
@@ -312,8 +318,8 @@
       },
       "type": "object",
       "required": [
-        "username",
-        "password"
+        "password",
+        "username"
       ]
     },
     "pulumiservice:index:DeploymentSettingsGitAuthSSHAuth": {
@@ -445,6 +451,49 @@
       },
       "type": "object"
     },
+    "pulumiservice:index:DeploymentSettingsVcs": {
+      "description": "VCS settings for the deployment, supporting multiple VCS providers.",
+      "properties": {
+        "deployCommits": {
+          "type": "boolean",
+          "description": "Trigger a deployment running `pulumi up` on commit.",
+          "default": true
+        },
+        "deployPullRequest": {
+          "type": "integer",
+          "description": "Deploy a specific pull request number."
+        },
+        "paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The paths within the repo that deployments should be filtered to."
+        },
+        "previewPullRequests": {
+          "type": "boolean",
+          "description": "Trigger a deployment running `pulumi preview` when a PR is opened.",
+          "default": true
+        },
+        "provider": {
+          "type": "string",
+          "description": "The VCS provider type."
+        },
+        "pullRequestTemplate": {
+          "type": "boolean",
+          "description": "Use this stack as a template for pull request review stacks.",
+          "default": false
+        },
+        "repository": {
+          "type": "string",
+          "description": "The repository identifier (e.g., 'ProjectName/RepoName' for Azure DevOps, 'org/repo' for GitHub)."
+        }
+      },
+      "type": "object",
+      "required": [
+        "provider"
+      ]
+    },
     "pulumiservice:index:EligibleApprover": {
       "properties": {
         "rbacPermission": {
@@ -479,9 +528,9 @@
       },
       "type": "object",
       "required": [
+        "name",
         "organization",
-        "project",
-        "name"
+        "project"
       ]
     },
     "pulumiservice:index:EnvironmentPermission": {
@@ -539,9 +588,9 @@
       "type": "object",
       "required": [
         "projectId",
-        "workloadPoolId",
         "providerId",
-        "serviceAccount"
+        "serviceAccount",
+        "workloadPoolId"
       ]
     },
     "pulumiservice:index:InsightsAccountState": {
@@ -595,12 +644,12 @@
       },
       "type": "object",
       "required": [
-        "organizationName",
         "accountName",
-        "provider",
         "environment",
-        "scanSchedule",
         "insightsAccountId",
+        "organizationName",
+        "provider",
+        "scanSchedule",
         "scheduledScanEnabled"
       ]
     },
@@ -1022,6 +1071,7 @@
         }
       }
     },
+    "type": "object",
     "inputProperties": {
       "accessToken": {
         "type": "string",
@@ -1054,6 +1104,7 @@
           "secret": true
         }
       },
+      "type": "object",
       "required": [
         "description",
         "value"
@@ -1097,6 +1148,7 @@
           "secret": true
         }
       },
+      "type": "object",
       "required": [
         "agentPoolId",
         "name",
@@ -1155,12 +1207,13 @@
           "description": "The type of action this rule applies to."
         }
       },
+      "type": "object",
       "required": [
-        "name",
+        "approvalRuleConfig",
         "enabled",
-        "targetActionTypes",
         "environmentIdentifier",
-        "approvalRuleConfig"
+        "name",
+        "targetActionTypes"
       ],
       "inputProperties": {
         "approvalRuleConfig": {
@@ -1189,11 +1242,11 @@
         }
       },
       "requiredInputs": [
-        "name",
+        "approvalRuleConfig",
         "enabled",
-        "targetActionTypes",
         "environmentIdentifier",
-        "approvalRuleConfig"
+        "name",
+        "targetActionTypes"
       ]
     },
     "pulumiservice:index:DeploymentSchedule": {
@@ -1229,12 +1282,13 @@
           "willReplaceOnChanges": true
         }
       },
+      "type": "object",
       "required": [
         "organization",
         "project",
-        "stack",
         "pulumiOperation",
-        "scheduleId"
+        "scheduleId",
+        "stack"
       ],
       "inputProperties": {
         "organization": {
@@ -1269,8 +1323,8 @@
       "requiredInputs": [
         "organization",
         "project",
-        "stack",
-        "pulumiOperation"
+        "pulumiOperation",
+        "stack"
       ]
     },
     "pulumiservice:index:DeploymentSettings": {
@@ -1290,7 +1344,8 @@
         },
         "github": {
           "$ref": "#/types/pulumiservice:index:DeploymentSettingsGithub",
-          "description": "GitHub settings for the deployment."
+          "description": "GitHub settings for the deployment.",
+          "deprecationMessage": "Use the 'vcs' property instead, which supports both GitHub and Azure DevOps."
         },
         "operationContext": {
           "$ref": "#/types/pulumiservice:index:DeploymentSettingsOperationContext",
@@ -1311,8 +1366,13 @@
         "stack": {
           "type": "string",
           "description": "Stack name."
+        },
+        "vcs": {
+          "$ref": "#/types/pulumiservice:index:DeploymentSettingsVcs",
+          "description": "VCS settings for the deployment. Supports Azure DevOps and GitHub via the 'provider' discriminator field."
         }
       },
+      "type": "object",
       "required": [
         "organization",
         "project",
@@ -1333,7 +1393,8 @@
         },
         "github": {
           "$ref": "#/types/pulumiservice:index:DeploymentSettingsGithub",
-          "description": "GitHub settings for the deployment."
+          "description": "GitHub settings for the deployment.",
+          "deprecationMessage": "Use the 'vcs' property instead, which supports both GitHub and Azure DevOps."
         },
         "operationContext": {
           "$ref": "#/types/pulumiservice:index:DeploymentSettingsOperationContext",
@@ -1357,6 +1418,10 @@
           "type": "string",
           "description": "Stack name.",
           "willReplaceOnChanges": true
+        },
+        "vcs": {
+          "$ref": "#/types/pulumiservice:index:DeploymentSettingsVcs",
+          "description": "VCS settings for the deployment. Supports Azure DevOps and GitHub via the 'provider' discriminator field."
         }
       },
       "requiredInputs": [
@@ -1394,12 +1459,13 @@
           "description": "Stack name."
         }
       },
+      "type": "object",
       "required": [
         "organization",
         "project",
-        "stack",
         "scheduleCron",
-        "scheduleId"
+        "scheduleId",
+        "stack"
       ],
       "inputProperties": {
         "autoRemediate": {
@@ -1430,8 +1496,8 @@
       "requiredInputs": [
         "organization",
         "project",
-        "stack",
-        "scheduleCron"
+        "scheduleCron",
+        "stack"
       ]
     },
     "pulumiservice:index:Environment": {
@@ -1458,12 +1524,13 @@
           "description": "Environment's yaml file."
         }
       },
+      "type": "object",
       "required": [
+        "name",
         "organization",
         "project",
-        "name",
-        "yaml",
-        "revision"
+        "revision",
+        "yaml"
       ],
       "inputProperties": {
         "name": {
@@ -1485,8 +1552,8 @@
         }
       },
       "requiredInputs": [
-        "organization",
         "name",
+        "organization",
         "yaml"
       ]
     },
@@ -1519,10 +1586,11 @@
           "willReplaceOnChanges": true
         }
       },
+      "type": "object",
       "required": [
+        "environment",
         "organization",
         "project",
-        "environment",
         "scheduleId"
       ],
       "inputProperties": {
@@ -1552,9 +1620,9 @@
         }
       },
       "requiredInputs": [
+        "environment",
         "organization",
-        "project",
-        "environment"
+        "project"
       ]
     },
     "pulumiservice:index:EnvironmentVersionTag": {
@@ -1581,12 +1649,13 @@
           "description": "Tag name."
         }
       },
+      "type": "object",
       "required": [
+        "environment",
         "organization",
         "project",
-        "environment",
-        "tagName",
-        "revision"
+        "revision",
+        "tagName"
       ],
       "inputProperties": {
         "environment": {
@@ -1612,10 +1681,10 @@
         }
       },
       "requiredInputs": [
-        "organization",
         "environment",
-        "tagName",
-        "revision"
+        "organization",
+        "revision",
+        "tagName"
       ]
     },
     "pulumiservice:index:InsightsAccount": {
@@ -1668,13 +1737,14 @@
           "description": "Key-value tags to associate with the insights account."
         }
       },
+      "type": "object",
       "required": [
-        "organizationName",
         "accountName",
-        "provider",
         "environment",
-        "scanSchedule",
         "insightsAccountId",
+        "organizationName",
+        "provider",
+        "scanSchedule",
         "scheduledScanEnabled"
       ],
       "inputProperties": {
@@ -1718,10 +1788,10 @@
         }
       },
       "requiredInputs": [
-        "organizationName",
         "accountName",
-        "provider",
         "environment",
+        "organizationName",
+        "provider",
         "scanSchedule"
       ]
     },
@@ -1761,12 +1831,13 @@
           "replaceOnChanges": true
         }
       },
+      "type": "object",
       "required": [
-        "organization",
         "name",
-        "url",
+        "organization",
+        "policies",
         "thumbprints",
-        "policies"
+        "url"
       ],
       "inputProperties": {
         "maxExpirationSeconds": {
@@ -1803,8 +1874,8 @@
         }
       },
       "requiredInputs": [
-        "organization",
         "name",
+        "organization",
         "url"
       ]
     },
@@ -1833,6 +1904,7 @@
           "secret": true
         }
       },
+      "type": "object",
       "required": [
         "name",
         "organizationName",
@@ -1905,11 +1977,12 @@
           "description": "List of stack references that belong to this policy group."
         }
       },
+      "type": "object",
       "required": [
-        "name",
-        "organizationName",
         "entityType",
-        "mode"
+        "mode",
+        "name",
+        "organizationName"
       ],
       "inputProperties": {
         "accounts": {
@@ -1981,6 +2054,7 @@
           "description": "The name of the stack."
         }
       },
+      "type": "object",
       "required": [
         "organizationName",
         "projectName",
@@ -2037,11 +2111,12 @@
           "description": "Value of the tag. The 'value' part of the key=value pair"
         }
       },
+      "type": "object",
       "required": [
+        "name",
         "organization",
         "project",
         "stack",
-        "name",
         "value"
       ],
       "inputProperties": {
@@ -2071,10 +2146,10 @@
         }
       },
       "requiredInputs": [
+        "name",
         "organization",
         "project",
         "stack",
-        "name",
         "value"
       ]
     },
@@ -2116,10 +2191,11 @@
           "replaceOnChanges": true
         }
       },
+      "type": "object",
       "required": [
+        "members",
         "organizationName",
-        "teamType",
-        "members"
+        "teamType"
       ],
       "inputProperties": {
         "description": {
@@ -2187,10 +2263,11 @@
           "secret": true
         }
       },
+      "type": "object",
       "required": [
         "name",
-        "teamName",
         "organizationName",
+        "teamName",
         "value"
       ],
       "inputProperties": {
@@ -2216,8 +2293,8 @@
       },
       "requiredInputs": [
         "name",
-        "teamName",
-        "organizationName"
+        "organizationName",
+        "teamName"
       ]
     },
     "pulumiservice:index:TeamEnvironmentPermission": {
@@ -2249,6 +2326,7 @@
           "description": "Team name."
         }
       },
+      "type": "object",
       "inputProperties": {
         "environment": {
           "type": "string",
@@ -2277,10 +2355,10 @@
         }
       },
       "requiredInputs": [
-        "organization",
-        "team",
         "environment",
-        "permission"
+        "organization",
+        "permission",
+        "team"
       ]
     },
     "pulumiservice:index:TeamStackPermission": {
@@ -2308,12 +2386,13 @@
           "description": "The name of the team to grant this stack permissions to. This is not the display name."
         }
       },
+      "type": "object",
       "required": [
-        "team",
         "organization",
+        "permission",
         "project",
         "stack",
-        "permission"
+        "team"
       ],
       "inputProperties": {
         "organization": {
@@ -2344,11 +2423,11 @@
         }
       },
       "requiredInputs": [
-        "team",
         "organization",
+        "permission",
         "project",
         "stack",
-        "permission"
+        "team"
       ]
     },
     "pulumiservice:index:TemplateSource": {
@@ -2371,6 +2450,7 @@
           "description": "Github URL of the repository from which to grab templates."
         }
       },
+      "type": "object",
       "required": [
         "organizationName",
         "sourceName",
@@ -2430,12 +2510,13 @@
           "willReplaceOnChanges": true
         }
       },
+      "type": "object",
       "required": [
         "organization",
         "project",
+        "scheduleId",
         "stack",
-        "timestamp",
-        "scheduleId"
+        "timestamp"
       ],
       "inputProperties": {
         "deleteAfterDestroy": {
@@ -2530,13 +2611,14 @@
           "description": "Name of the stack. Only specified if this is a stack webhook."
         }
       },
+      "type": "object",
       "required": [
         "active",
         "displayName",
-        "organizationName",
-        "payloadUrl",
+        "format",
         "name",
-        "format"
+        "organizationName",
+        "payloadUrl"
       ],
       "inputProperties": {
         "active": {
@@ -2615,8 +2697,8 @@
         },
         "type": "object",
         "required": [
-          "organizationName",
-          "accountName"
+          "accountName",
+          "organizationName"
         ]
       },
       "outputs": {
@@ -2669,12 +2751,12 @@
           }
         },
         "required": [
-          "organizationName",
           "accountName",
-          "provider",
           "environment",
-          "scanSchedule",
           "insightsAccountId",
+          "organizationName",
+          "provider",
+          "scanSchedule",
           "scheduledScanEnabled"
         ],
         "type": "object"
@@ -2725,6 +2807,7 @@
             "description": "The version number of the policy pack. If not specified, returns the latest version."
           }
         },
+        "type": "object",
         "required": [
           "organizationName",
           "policyPackName"
@@ -2750,6 +2833,9 @@
           "policies": {
             "description": "List of policies in this pack.",
             "items": {
+              "additionalProperties": {
+                "type": "string"
+              },
               "type": "object"
             },
             "type": "array"
@@ -2764,10 +2850,11 @@
           }
         },
         "required": [
-          "name",
           "displayName",
+          "name",
           "version"
-        ]
+        ],
+        "type": "object"
       }
     },
     "pulumiservice:index:getPolicyPacks": {
@@ -2779,6 +2866,7 @@
             "description": "The name of the Pulumi organization."
           }
         },
+        "type": "object",
         "required": [
           "organizationName"
         ]
@@ -2788,6 +2876,9 @@
           "policyPacks": {
             "description": "List of policy packs in the organization.",
             "items": {
+              "additionalProperties": {
+                "type": "string"
+              },
               "type": "object"
             },
             "type": "array"
@@ -2795,7 +2886,8 @@
         },
         "required": [
           "policyPacks"
-        ]
+        ],
+        "type": "object"
       }
     }
   }

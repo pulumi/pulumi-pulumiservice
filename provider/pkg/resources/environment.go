@@ -11,11 +11,12 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 
 	esc_client "github.com/pulumi/esc/cmd/esc/cli/client"
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/asset"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 const defaultProject = "default"

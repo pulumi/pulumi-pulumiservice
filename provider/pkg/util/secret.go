@@ -1,9 +1,10 @@
 package util
 
 import (
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
 var StandardUnmarshal plugin.MarshalOptions = plugin.MarshalOptions{
@@ -53,6 +54,15 @@ func GetSecretOrBoolValue(prop resource.PropertyValue) bool {
 		return prop.SecretValue().Element.BoolValue()
 	default:
 		return prop.BoolValue()
+	}
+}
+
+func GetSecretOrNumberValue(prop resource.PropertyValue) float64 {
+	switch prop.V.(type) {
+	case *resource.Secret:
+		return prop.SecretValue().Element.NumberValue()
+	default:
+		return prop.NumberValue()
 	}
 }
 

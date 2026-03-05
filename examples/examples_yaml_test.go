@@ -506,6 +506,10 @@ func TestYamlInsightsAccountExample(t *testing.T) {
 	runPulumiTest(t, test)
 }
 
+func TestYamlDeploymentSettingsVcsExample(t *testing.T) {
+	t.Skip("requires an existing Azure DevOps integration; run manually against a configured environment")
+}
+
 func writePulumiYaml(t *testing.T, yamlContents interface{}) string {
 	tmpdir := t.TempDir()
 	b, err := yaml.Marshal(yamlContents)

@@ -30,6 +30,7 @@ __all__ = [
     'DeploymentSettingsGithub',
     'DeploymentSettingsOperationContext',
     'DeploymentSettingsSourceContext',
+    'DeploymentSettingsVcs',
     'EligibleApprover',
     'EnvironmentIdentifier',
     'GCPOIDCConfiguration',
@@ -869,6 +870,129 @@ class DeploymentSettingsSourceContext(dict):
         Git source settings for a deployment.
         """
         return pulumi.get(self, "git")
+
+
+@pulumi.output_type
+class DeploymentSettingsVcs(dict):
+    """
+    VCS settings for the deployment, supporting multiple VCS providers.
+    """
+    @staticmethod
+    def __key_warning(key: str):
+        suggest = None
+        if key == "deployCommits":
+            suggest = "deploy_commits"
+        elif key == "deployPullRequest":
+            suggest = "deploy_pull_request"
+        elif key == "previewPullRequests":
+            suggest = "preview_pull_requests"
+        elif key == "pullRequestTemplate":
+            suggest = "pull_request_template"
+
+        if suggest:
+            pulumi.log.warn(f"Key '{key}' not found in DeploymentSettingsVcs. Access the value via the '{suggest}' property getter instead.")
+
+    def __getitem__(self, key: str) -> Any:
+        DeploymentSettingsVcs.__key_warning(key)
+        return super().__getitem__(key)
+
+    def get(self, key: str, default = None) -> Any:
+        DeploymentSettingsVcs.__key_warning(key)
+        return super().get(key, default)
+
+    def __init__(__self__, *,
+                 provider: _builtins.str,
+                 deploy_commits: Optional[_builtins.bool] = None,
+                 deploy_pull_request: Optional[_builtins.int] = None,
+                 paths: Optional[Sequence[_builtins.str]] = None,
+                 preview_pull_requests: Optional[_builtins.bool] = None,
+                 pull_request_template: Optional[_builtins.bool] = None,
+                 repository: Optional[_builtins.str] = None):
+        """
+        VCS settings for the deployment, supporting multiple VCS providers.
+        :param _builtins.str provider: The VCS provider type.
+        :param _builtins.bool deploy_commits: Trigger a deployment running `pulumi up` on commit.
+        :param _builtins.int deploy_pull_request: Deploy a specific pull request number.
+        :param Sequence[_builtins.str] paths: The paths within the repo that deployments should be filtered to.
+        :param _builtins.bool preview_pull_requests: Trigger a deployment running `pulumi preview` when a PR is opened.
+        :param _builtins.bool pull_request_template: Use this stack as a template for pull request review stacks.
+        :param _builtins.str repository: The repository identifier (e.g., 'ProjectName/RepoName' for Azure DevOps, 'org/repo' for GitHub).
+        """
+        pulumi.set(__self__, "provider", provider)
+        if deploy_commits is None:
+            deploy_commits = True
+        if deploy_commits is not None:
+            pulumi.set(__self__, "deploy_commits", deploy_commits)
+        if deploy_pull_request is not None:
+            pulumi.set(__self__, "deploy_pull_request", deploy_pull_request)
+        if paths is not None:
+            pulumi.set(__self__, "paths", paths)
+        if preview_pull_requests is None:
+            preview_pull_requests = True
+        if preview_pull_requests is not None:
+            pulumi.set(__self__, "preview_pull_requests", preview_pull_requests)
+        if pull_request_template is None:
+            pull_request_template = False
+        if pull_request_template is not None:
+            pulumi.set(__self__, "pull_request_template", pull_request_template)
+        if repository is not None:
+            pulumi.set(__self__, "repository", repository)
+
+    @_builtins.property
+    @pulumi.getter
+    def provider(self) -> _builtins.str:
+        """
+        The VCS provider type.
+        """
+        return pulumi.get(self, "provider")
+
+    @_builtins.property
+    @pulumi.getter(name="deployCommits")
+    def deploy_commits(self) -> Optional[_builtins.bool]:
+        """
+        Trigger a deployment running `pulumi up` on commit.
+        """
+        return pulumi.get(self, "deploy_commits")
+
+    @_builtins.property
+    @pulumi.getter(name="deployPullRequest")
+    def deploy_pull_request(self) -> Optional[_builtins.int]:
+        """
+        Deploy a specific pull request number.
+        """
+        return pulumi.get(self, "deploy_pull_request")
+
+    @_builtins.property
+    @pulumi.getter
+    def paths(self) -> Optional[Sequence[_builtins.str]]:
+        """
+        The paths within the repo that deployments should be filtered to.
+        """
+        return pulumi.get(self, "paths")
+
+    @_builtins.property
+    @pulumi.getter(name="previewPullRequests")
+    def preview_pull_requests(self) -> Optional[_builtins.bool]:
+        """
+        Trigger a deployment running `pulumi preview` when a PR is opened.
+        """
+        return pulumi.get(self, "preview_pull_requests")
+
+    @_builtins.property
+    @pulumi.getter(name="pullRequestTemplate")
+    def pull_request_template(self) -> Optional[_builtins.bool]:
+        """
+        Use this stack as a template for pull request review stacks.
+        """
+        return pulumi.get(self, "pull_request_template")
+
+    @_builtins.property
+    @pulumi.getter
+    def repository(self) -> Optional[_builtins.str]:
+        """
+        The repository identifier (e.g., 'ProjectName/RepoName' for Azure DevOps, 'org/repo' for GitHub).
+        """
+        return pulumi.get(self, "repository")
 
 
 @pulumi.output_type
