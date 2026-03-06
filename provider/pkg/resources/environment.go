@@ -103,7 +103,7 @@ func getBytesFromAsset(asset *asset.Asset) ([]byte, error) {
 func (st *PulumiServiceEnvironmentResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
 	olds, err := plugin.UnmarshalProperties(
 		req.GetOldInputs(),
-		plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true},
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
 	)
 	if err != nil {
 		return nil, err
@@ -129,6 +129,7 @@ func (st *PulumiServiceEnvironmentResource) Diff(req *pulumirpc.DiffRequest) (*p
 	dd := plugin.NewDetailedDiffFromObjectDiff(diffs, false)
 
 	detailedDiffs := map[string]*pulumirpc.PropertyDiff{}
+	replaces := []string(nil)
 	replaceProperties := map[string]bool{
 		"organization": true,
 		"project":      true,
@@ -137,6 +138,7 @@ func (st *PulumiServiceEnvironmentResource) Diff(req *pulumirpc.DiffRequest) (*p
 	for k, v := range dd {
 		if _, ok := replaceProperties[k]; ok {
 			v.Kind = v.Kind.AsReplace()
+			replaces = append(replaces, k)
 		}
 		detailedDiffs[k] = &pulumirpc.PropertyDiff{
 			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind), //nolint:gosec // safe conversion from plugin.DiffKind
@@ -149,9 +151,11 @@ func (st *PulumiServiceEnvironmentResource) Diff(req *pulumirpc.DiffRequest) (*p
 		changes = pulumirpc.DiffResponse_DIFF_SOME
 	}
 	return &pulumirpc.DiffResponse{
-		Changes:         changes,
-		DetailedDiff:    detailedDiffs,
-		HasDetailedDiff: true,
+		Changes:             changes,
+		Replaces:            replaces,
+		DetailedDiff:        detailedDiffs,
+		HasDetailedDiff:     true,
+		DeleteBeforeReplace: len(replaces) > 0,
 	}, nil
 }
 
