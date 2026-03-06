@@ -440,6 +440,80 @@ foo: bar
 	})
 }
 
+func TestEnvironmentDiff(t *testing.T) {
+	mockedClient := buildEscClientMock(
+		func(_ context.Context, _ string, _ string, _ string, _ bool) (yaml []byte, etag string, revision int, err error) {
+			return nil, "", 0, nil
+		},
+		func(_ context.Context, _, _, _ string) (*client.EnvironmentRevisionTag, error) {
+			return nil, nil
+		},
+	)
+	provider := PulumiServiceEnvironmentResource{
+		Client: mockedClient,
+	}
+
+	t.Run("No spurious replace when upgrading from pre-0.25.0 state without project", func(t *testing.T) {
+		// Old inputs from pre-0.25.0 lack the "project" field.
+		oldInputs := resource.PropertyMap{
+			"organization": resource.NewPropertyValue("org"),
+			"name":         resource.NewPropertyValue("env"),
+			"yaml":         resource.MakeSecret(resource.NewStringProperty("values:\n  foo: bar")),
+		}
+		// New inputs from 0.25.0+ include project defaulting to "default".
+		newInputs := resource.PropertyMap{
+			"organization": resource.NewPropertyValue("org"),
+			"project":      resource.NewPropertyValue("default"),
+			"name":         resource.NewPropertyValue("env"),
+			"yaml":         resource.MakeSecret(resource.NewStringProperty("values:\n  foo: bar")),
+		}
+
+		oldProps, err := plugin.MarshalProperties(oldInputs, plugin.MarshalOptions{KeepSecrets: true})
+		assert.NoError(t, err)
+		newProps, err := plugin.MarshalProperties(newInputs, plugin.MarshalOptions{KeepSecrets: true})
+		assert.NoError(t, err)
+
+		resp, err := provider.Diff(&pulumirpc.DiffRequest{
+			OldInputs: oldProps,
+			News:      newProps,
+		})
+		assert.NoError(t, err)
+		assert.Equal(t, pulumirpc.DiffResponse_DIFF_NONE, resp.Changes)
+		assert.Empty(t, resp.DetailedDiff)
+		assert.Empty(t, resp.Replaces)
+	})
+
+	t.Run("Replace when project actually changes", func(t *testing.T) {
+		oldInputs := resource.PropertyMap{
+			"organization": resource.NewPropertyValue("org"),
+			"project":      resource.NewPropertyValue("proj-a"),
+			"name":         resource.NewPropertyValue("env"),
+			"yaml":         resource.MakeSecret(resource.NewStringProperty("values:\n  foo: bar")),
+		}
+		newInputs := resource.PropertyMap{
+			"organization": resource.NewPropertyValue("org"),
+			"project":      resource.NewPropertyValue("proj-b"),
+			"name":         resource.NewPropertyValue("env"),
+			"yaml":         resource.MakeSecret(resource.NewStringProperty("values:\n  foo: bar")),
+		}
+
+		oldProps, err := plugin.MarshalProperties(oldInputs, plugin.MarshalOptions{KeepSecrets: true})
+		assert.NoError(t, err)
+		newProps, err := plugin.MarshalProperties(newInputs, plugin.MarshalOptions{KeepSecrets: true})
+		assert.NoError(t, err)
+
+		resp, err := provider.Diff(&pulumirpc.DiffRequest{
+			OldInputs: oldProps,
+			News:      newProps,
+		})
+		assert.NoError(t, err)
+		assert.Equal(t, pulumirpc.DiffResponse_DIFF_SOME, resp.Changes)
+		assert.Contains(t, resp.DetailedDiff, "project")
+		// The kind should be a replace variant.
+		assert.True(t, resp.DetailedDiff["project"].Kind >= pulumirpc.PropertyDiff_ADD_REPLACE)
+	})
+}
+
 func TestEnvironment(t *testing.T) {
 	t.Run("Read when the resource is not found", func(t *testing.T) {
 		mockedClient := buildEscClientMock(

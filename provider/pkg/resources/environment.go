@@ -109,6 +109,11 @@ func (st *PulumiServiceEnvironmentResource) Diff(req *pulumirpc.DiffRequest) (*p
 		return nil, err
 	}
 
+	// Backfill project for state from pre-0.25.0 which didn't have this field.
+	if !olds["project"].HasValue() {
+		olds["project"] = resource.NewPropertyValue(defaultProject)
+	}
+
 	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
