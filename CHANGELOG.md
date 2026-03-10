@@ -13,6 +13,7 @@
 
 ### Bug Fixes
 
+- Fixed TeamEnvironmentPermission refresh returning wrong permission when the same environment name exists in multiple projects [#674](https://github.com/pulumi/pulumi-pulumiservice/issues/674)
 - Fixed Environment resource spurious replace on provider upgrade from pre-0.25.0 due to missing `project` field in old state
 - Fixed Environment resource crash when yaml property contains computed values from Outputs (e.g., template execution results) [#606](https://github.com/pulumi/pulumi-pulumiservice/issues/606)
 - Fixed PolicyGroup schema syntax error preventing proper nested object definitions in policyPacks field [#595](https://github.com/pulumi/pulumi-pulumiservice/pull/595)

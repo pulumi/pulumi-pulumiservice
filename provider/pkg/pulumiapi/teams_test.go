@@ -324,6 +324,63 @@ func TestAddEnvironmentPermission(t *testing.T) {
 	})
 }
 
+func TestGetTeamEnvironmentSettings(t *testing.T) {
+	organization := testTeamOrgName
+	teamName := testTeamName
+
+	team := Team{
+		Type: "pulumi",
+		Name: teamName,
+		Environments: []TeamEnvironmentSettings{
+			{
+				EnvName:     "Default",
+				ProjectName: "project-a",
+				Permission:  "read",
+			},
+			{
+				EnvName:     "Default",
+				ProjectName: "project-b",
+				Permission:  "admin",
+			},
+		},
+	}
+
+	t.Run("Matches correct project when same env name exists in multiple projects", func(t *testing.T) {
+		c := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodGet,
+			ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team",
+			ResponseCode:      200,
+			ResponseBody:      team,
+		})
+		perm, _, err := c.GetTeamEnvironmentSettings(ctx, TeamEnvironmentSettingsRequest{
+			Organization: organization,
+			Team:         teamName,
+			Project:      "project-b",
+			Environment:  "Default",
+		})
+		assert.NoError(t, err)
+		assert.NotNil(t, perm)
+		assert.Equal(t, "admin", *perm)
+	})
+
+	t.Run("Returns nil when project does not match", func(t *testing.T) {
+		c := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodGet,
+			ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team",
+			ResponseCode:      200,
+			ResponseBody:      team,
+		})
+		perm, _, err := c.GetTeamEnvironmentSettings(ctx, TeamEnvironmentSettingsRequest{
+			Organization: organization,
+			Team:         teamName,
+			Project:      "project-c",
+			Environment:  "Default",
+		})
+		assert.NoError(t, err)
+		assert.Nil(t, perm)
+	})
+}
+
 func TestRemoveEnvironmentPermission(t *testing.T) {
 	teamName := testTeamName
 	organization := testTeamOrgName
