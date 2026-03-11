@@ -4,16 +4,32 @@
 
 ### Improvements
 
-- Added InsightsAccount resource and getInsightsAccount/getInsightsAccounts for cloud resource scanning and analysis across AWS, Azure, and GCP, OCI and Kubernetes. 
+### Bug Fixes
+- Fixed TeamEnvironmentPermission refresh returning wrong permission when the same environment name exists in multiple projects [#674](https://github.com/pulumi/pulumi-pulumiservice/issues/674)
+
+## 0.35.0
+
+### Improvements
+- Added `vcs` property to DeploymentSettings for polymorphic VCS support (Azure DevOps and GitHub) [#671](https://github.com/pulumi/pulumi-pulumiservice/pull/671)
+
+### Bug Fixes
+- Fixed Environment resource spurious replace on provider upgrade from pre-0.25.0 due to missing `project` field in old state [#673](https://github.com/pulumi/pulumi-pulumiservice/pull/673)
+
+## 0.34.0
+
+### Improvements
+- Manage pulumi service provider with ci-mgmt
+
+## 0.33.0
+
+### Improvements
+- Added InsightsAccount resource and getInsightsAccount/getInsightsAccounts for cloud resource scanning and analysis across AWS, Azure, and GCP, OCI and Kubernetes.
 - Added `accounts` field to PolicyGroup resource for managing cloud accounts in policy groups
 - Updated PolicyGroup to use batch API for more efficient updates when adding/removing stacks, accounts, or policy packs
 - Added Java SDK support with Pulumi Java SDK v1.16.2
 - Upgraded Pulumi SDK to v3.204.0 with latest codegen improvements
-- Added `vcs` property to DeploymentSettings for polymorphic VCS support (Azure DevOps and GitHub) [#671](https://github.com/pulumi/pulumi-pulumiservice/pull/671)
 
 ### Bug Fixes
-
-- Fixed Environment resource spurious replace on provider upgrade from pre-0.25.0 due to missing `project` field in old state
 - Fixed Environment resource crash when yaml property contains computed values from Outputs (e.g., template execution results) [#606](https://github.com/pulumi/pulumi-pulumiservice/issues/606)
 - Fixed PolicyGroup schema syntax error preventing proper nested object definitions in policyPacks field [#595](https://github.com/pulumi/pulumi-pulumiservice/pull/595)
 - Fixed PolicyGroup creation to include required entityType and mode fields [#563](https://github.com/pulumi/pulumi-pulumiservice/issues/563)
