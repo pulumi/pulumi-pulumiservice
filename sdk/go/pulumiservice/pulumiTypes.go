@@ -779,7 +779,9 @@ func (o DeploymentSettingsCacheOptionsPtrOutput) Enable() pulumi.BoolPtrOutput {
 // The executor context defines information about the executor where the deployment is executed. If unspecified, the default 'pulumi/pulumi' image is used.
 type DeploymentSettingsExecutorContext struct {
 	// Allows overriding the default executor image with a custom image. E.g. 'pulumi/pulumi-nodejs:latest'
-	ExecutorImage string `pulumi:"executorImage"`
+	ExecutorImage *string `pulumi:"executorImage"`
+	// Override the default root path (/) used by the deployment executor. This can be useful when running with non-root users (e.g., set to /tmp ).
+	ExecutorRootPath *string `pulumi:"executorRootPath"`
 }
 
 // DeploymentSettingsExecutorContextInput is an input type that accepts DeploymentSettingsExecutorContextArgs and DeploymentSettingsExecutorContextOutput values.
@@ -796,7 +798,9 @@ type DeploymentSettingsExecutorContextInput interface {
 // The executor context defines information about the executor where the deployment is executed. If unspecified, the default 'pulumi/pulumi' image is used.
 type DeploymentSettingsExecutorContextArgs struct {
 	// Allows overriding the default executor image with a custom image. E.g. 'pulumi/pulumi-nodejs:latest'
-	ExecutorImage pulumi.StringInput `pulumi:"executorImage"`
+	ExecutorImage pulumi.StringPtrInput `pulumi:"executorImage"`
+	// Override the default root path (/) used by the deployment executor. This can be useful when running with non-root users (e.g., set to /tmp ).
+	ExecutorRootPath pulumi.StringPtrInput `pulumi:"executorRootPath"`
 }
 
 func (DeploymentSettingsExecutorContextArgs) ElementType() reflect.Type {
@@ -878,8 +882,13 @@ func (o DeploymentSettingsExecutorContextOutput) ToDeploymentSettingsExecutorCon
 }
 
 // Allows overriding the default executor image with a custom image. E.g. 'pulumi/pulumi-nodejs:latest'
-func (o DeploymentSettingsExecutorContextOutput) ExecutorImage() pulumi.StringOutput {
-	return o.ApplyT(func(v DeploymentSettingsExecutorContext) string { return v.ExecutorImage }).(pulumi.StringOutput)
+func (o DeploymentSettingsExecutorContextOutput) ExecutorImage() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v DeploymentSettingsExecutorContext) *string { return v.ExecutorImage }).(pulumi.StringPtrOutput)
+}
+
+// Override the default root path (/) used by the deployment executor. This can be useful when running with non-root users (e.g., set to /tmp ).
+func (o DeploymentSettingsExecutorContextOutput) ExecutorRootPath() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v DeploymentSettingsExecutorContext) *string { return v.ExecutorRootPath }).(pulumi.StringPtrOutput)
 }
 
 type DeploymentSettingsExecutorContextPtrOutput struct{ *pulumi.OutputState }
@@ -912,7 +921,17 @@ func (o DeploymentSettingsExecutorContextPtrOutput) ExecutorImage() pulumi.Strin
 		if v == nil {
 			return nil
 		}
-		return &v.ExecutorImage
+		return v.ExecutorImage
+	}).(pulumi.StringPtrOutput)
+}
+
+// Override the default root path (/) used by the deployment executor. This can be useful when running with non-root users (e.g., set to /tmp ).
+func (o DeploymentSettingsExecutorContextPtrOutput) ExecutorRootPath() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *DeploymentSettingsExecutorContext) *string {
+		if v == nil {
+			return nil
+		}
+		return v.ExecutorRootPath
 	}).(pulumi.StringPtrOutput)
 }
 

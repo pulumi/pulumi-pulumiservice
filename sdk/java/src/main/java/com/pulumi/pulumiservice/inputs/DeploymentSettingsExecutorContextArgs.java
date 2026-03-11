@@ -5,9 +5,10 @@ package com.pulumi.pulumiservice.inputs;
 
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
-import com.pulumi.exceptions.MissingRequiredPropertyException;
 import java.lang.String;
 import java.util.Objects;
+import java.util.Optional;
+import javax.annotation.Nullable;
 
 
 /**
@@ -22,21 +23,37 @@ public final class DeploymentSettingsExecutorContextArgs extends com.pulumi.reso
      * Allows overriding the default executor image with a custom image. E.g. &#39;pulumi/pulumi-nodejs:latest&#39;
      * 
      */
-    @Import(name="executorImage", required=true)
-    private Output<String> executorImage;
+    @Import(name="executorImage")
+    private @Nullable Output<String> executorImage;
 
     /**
      * @return Allows overriding the default executor image with a custom image. E.g. &#39;pulumi/pulumi-nodejs:latest&#39;
      * 
      */
-    public Output<String> executorImage() {
-        return this.executorImage;
+    public Optional<Output<String>> executorImage() {
+        return Optional.ofNullable(this.executorImage);
+    }
+
+    /**
+     * Override the default root path (/) used by the deployment executor. This can be useful when running with non-root users (e.g., set to /tmp ).
+     * 
+     */
+    @Import(name="executorRootPath")
+    private @Nullable Output<String> executorRootPath;
+
+    /**
+     * @return Override the default root path (/) used by the deployment executor. This can be useful when running with non-root users (e.g., set to /tmp ).
+     * 
+     */
+    public Optional<Output<String>> executorRootPath() {
+        return Optional.ofNullable(this.executorRootPath);
     }
 
     private DeploymentSettingsExecutorContextArgs() {}
 
     private DeploymentSettingsExecutorContextArgs(DeploymentSettingsExecutorContextArgs $) {
         this.executorImage = $.executorImage;
+        this.executorRootPath = $.executorRootPath;
     }
 
     public static Builder builder() {
@@ -63,7 +80,7 @@ public final class DeploymentSettingsExecutorContextArgs extends com.pulumi.reso
          * @return builder
          * 
          */
-        public Builder executorImage(Output<String> executorImage) {
+        public Builder executorImage(@Nullable Output<String> executorImage) {
             $.executorImage = executorImage;
             return this;
         }
@@ -78,10 +95,28 @@ public final class DeploymentSettingsExecutorContextArgs extends com.pulumi.reso
             return executorImage(Output.of(executorImage));
         }
 
+        /**
+         * @param executorRootPath Override the default root path (/) used by the deployment executor. This can be useful when running with non-root users (e.g., set to /tmp ).
+         * 
+         * @return builder
+         * 
+         */
+        public Builder executorRootPath(@Nullable Output<String> executorRootPath) {
+            $.executorRootPath = executorRootPath;
+            return this;
+        }
+
+        /**
+         * @param executorRootPath Override the default root path (/) used by the deployment executor. This can be useful when running with non-root users (e.g., set to /tmp ).
+         * 
+         * @return builder
+         * 
+         */
+        public Builder executorRootPath(String executorRootPath) {
+            return executorRootPath(Output.of(executorRootPath));
+        }
+
         public DeploymentSettingsExecutorContextArgs build() {
-            if ($.executorImage == null) {
-                throw new MissingRequiredPropertyException("DeploymentSettingsExecutorContextArgs", "executorImage");
-            }
             return $;
         }
     }
