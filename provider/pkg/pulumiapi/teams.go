@@ -485,7 +485,7 @@ func (c *Client) GetTeamEnvironmentSettings(
 	}
 
 	for _, settings := range team.Environments {
-		if settings.EnvName == req.Environment {
+		if settings.EnvName == req.Environment && settings.ProjectName == req.Project {
 			return &settings.Permission, settings.MaxOpenDuration, nil
 		}
 	}

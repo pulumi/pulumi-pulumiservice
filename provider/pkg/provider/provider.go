@@ -34,17 +34,21 @@ import (
 	p "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi-go-provider/infer"
 	"github.com/pulumi/pulumi-go-provider/middleware/rpc"
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/functions"
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/resources"
 	"github.com/pulumi/pulumi/pkg/v3/codegen/schema"
 	"github.com/pulumi/pulumi/pkg/v3/resource/provider"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/tokens"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/functions"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/resources"
 )
+
+//go:embed README.md
+var readme string
 
 type PulumiServiceResource interface {
 	Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error)
@@ -123,6 +127,7 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 				},
 				"gradleNexusPublishPluginVersion": "2.0.0",
 				"gradleTest":                      "",
+				"readme":                          readme,
 			},
 			"nodejs": map[string]any{
 				"packageName": "@pulumi/pulumiservice",
@@ -130,6 +135,7 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 					"@pulumi/pulumi": "^3.0.0",
 				},
 				"respectSchemaVersion": true,
+				"readme":               readme,
 			},
 			"python": map[string]any{
 				"packageName": "pulumi_pulumiservice",
@@ -140,6 +146,7 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 					"enabled": true,
 				},
 				"respectSchemaVersion": true,
+				"readme":               readme,
 			},
 		}).Build()
 	if err != nil {

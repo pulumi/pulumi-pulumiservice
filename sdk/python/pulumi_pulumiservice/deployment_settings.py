@@ -29,7 +29,8 @@ class DeploymentSettingsArgs:
                  executor_context: Optional[pulumi.Input['DeploymentSettingsExecutorContextArgs']] = None,
                  github: Optional[pulumi.Input['DeploymentSettingsGithubArgs']] = None,
                  operation_context: Optional[pulumi.Input['DeploymentSettingsOperationContextArgs']] = None,
-                 source_context: Optional[pulumi.Input['DeploymentSettingsSourceContextArgs']] = None):
+                 source_context: Optional[pulumi.Input['DeploymentSettingsSourceContextArgs']] = None,
+                 vcs: Optional[pulumi.Input['DeploymentSettingsVcsArgs']] = None):
         """
         The set of arguments for constructing a DeploymentSettings resource.
         :param pulumi.Input[_builtins.str] organization: Organization name.
@@ -41,6 +42,7 @@ class DeploymentSettingsArgs:
         :param pulumi.Input['DeploymentSettingsGithubArgs'] github: GitHub settings for the deployment.
         :param pulumi.Input['DeploymentSettingsOperationContextArgs'] operation_context: Settings related to the Pulumi operation environment during the deployment.
         :param pulumi.Input['DeploymentSettingsSourceContextArgs'] source_context: Settings related to the source of the deployment.
+        :param pulumi.Input['DeploymentSettingsVcsArgs'] vcs: VCS settings for the deployment. Supports Azure DevOps and GitHub via the 'provider' discriminator field.
         """
         pulumi.set(__self__, "organization", organization)
         pulumi.set(__self__, "project", project)
@@ -52,11 +54,16 @@ class DeploymentSettingsArgs:
         if executor_context is not None:
             pulumi.set(__self__, "executor_context", executor_context)
         if github is not None:
+            warnings.warn("""Use the 'vcs' property instead, which supports both GitHub and Azure DevOps.""", DeprecationWarning)
+            pulumi.log.warn("""github is deprecated: Use the 'vcs' property instead, which supports both GitHub and Azure DevOps.""")
+        if github is not None:
             pulumi.set(__self__, "github", github)
         if operation_context is not None:
             pulumi.set(__self__, "operation_context", operation_context)
         if source_context is not None:
             pulumi.set(__self__, "source_context", source_context)
+        if vcs is not None:
+            pulumi.set(__self__, "vcs", vcs)
 
     @_builtins.property
     @pulumi.getter
@@ -132,6 +139,7 @@ class DeploymentSettingsArgs:
 
     @_builtins.property
     @pulumi.getter
+    @_utilities.deprecated("""Use the 'vcs' property instead, which supports both GitHub and Azure DevOps.""")
     def github(self) -> Optional[pulumi.Input['DeploymentSettingsGithubArgs']]:
         """
         GitHub settings for the deployment.
@@ -166,6 +174,18 @@ class DeploymentSettingsArgs:
     def source_context(self, value: Optional[pulumi.Input['DeploymentSettingsSourceContextArgs']]):
         pulumi.set(self, "source_context", value)
 
+    @_builtins.property
+    @pulumi.getter
+    def vcs(self) -> Optional[pulumi.Input['DeploymentSettingsVcsArgs']]:
+        """
+        VCS settings for the deployment. Supports Azure DevOps and GitHub via the 'provider' discriminator field.
+        """
+        return pulumi.get(self, "vcs")
+
+    @vcs.setter
+    def vcs(self, value: Optional[pulumi.Input['DeploymentSettingsVcsArgs']]):
+        pulumi.set(self, "vcs", value)
+
 
 @pulumi.type_token("pulumiservice:index:DeploymentSettings")
 class DeploymentSettings(pulumi.CustomResource):
@@ -182,6 +202,7 @@ class DeploymentSettings(pulumi.CustomResource):
                  project: Optional[pulumi.Input[_builtins.str]] = None,
                  source_context: Optional[pulumi.Input[Union['DeploymentSettingsSourceContextArgs', 'DeploymentSettingsSourceContextArgsDict']]] = None,
                  stack: Optional[pulumi.Input[_builtins.str]] = None,
+                 vcs: Optional[pulumi.Input[Union['DeploymentSettingsVcsArgs', 'DeploymentSettingsVcsArgsDict']]] = None,
                  __props__=None):
         """
         Deployment settings configure Pulumi Deployments for a stack.
@@ -205,6 +226,7 @@ class DeploymentSettings(pulumi.CustomResource):
         :param pulumi.Input[_builtins.str] project: Project name.
         :param pulumi.Input[Union['DeploymentSettingsSourceContextArgs', 'DeploymentSettingsSourceContextArgsDict']] source_context: Settings related to the source of the deployment.
         :param pulumi.Input[_builtins.str] stack: Stack name.
+        :param pulumi.Input[Union['DeploymentSettingsVcsArgs', 'DeploymentSettingsVcsArgsDict']] vcs: VCS settings for the deployment. Supports Azure DevOps and GitHub via the 'provider' discriminator field.
         """
         ...
     @overload
@@ -247,6 +269,7 @@ class DeploymentSettings(pulumi.CustomResource):
                  project: Optional[pulumi.Input[_builtins.str]] = None,
                  source_context: Optional[pulumi.Input[Union['DeploymentSettingsSourceContextArgs', 'DeploymentSettingsSourceContextArgsDict']]] = None,
                  stack: Optional[pulumi.Input[_builtins.str]] = None,
+                 vcs: Optional[pulumi.Input[Union['DeploymentSettingsVcsArgs', 'DeploymentSettingsVcsArgsDict']]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
@@ -271,6 +294,7 @@ class DeploymentSettings(pulumi.CustomResource):
             if stack is None and not opts.urn:
                 raise TypeError("Missing required property 'stack'")
             __props__.__dict__["stack"] = stack
+            __props__.__dict__["vcs"] = vcs
         super(DeploymentSettings, __self__).__init__(
             'pulumiservice:index:DeploymentSettings',
             resource_name,
@@ -302,6 +326,7 @@ class DeploymentSettings(pulumi.CustomResource):
         __props__.__dict__["project"] = None
         __props__.__dict__["source_context"] = None
         __props__.__dict__["stack"] = None
+        __props__.__dict__["vcs"] = None
         return DeploymentSettings(resource_name, opts=opts, __props__=__props__)
 
     @_builtins.property
@@ -330,6 +355,7 @@ class DeploymentSettings(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
+    @_utilities.deprecated("""Use the 'vcs' property instead, which supports both GitHub and Azure DevOps.""")
     def github(self) -> pulumi.Output[Optional['outputs.DeploymentSettingsGithub']]:
         """
         GitHub settings for the deployment.
@@ -375,4 +401,12 @@ class DeploymentSettings(pulumi.CustomResource):
         Stack name.
         """
         return pulumi.get(self, "stack")
+
+    @_builtins.property
+    @pulumi.getter
+    def vcs(self) -> pulumi.Output[Optional['outputs.DeploymentSettingsVcs']]:
+        """
+        VCS settings for the deployment. Supports Azure DevOps and GitHub via the 'provider' discriminator field.
+        """
+        return pulumi.get(self, "vcs")
 

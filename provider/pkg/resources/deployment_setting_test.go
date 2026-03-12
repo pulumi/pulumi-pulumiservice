@@ -6,9 +6,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
 type getDeploymentSettingsFunc func() (*pulumiapi.DeploymentSettings, error)
@@ -112,6 +113,28 @@ func TestDeploymentSettingsRoundtrip(t *testing.T) {
 				Enable: true,
 			},
 		}}
+
+	encoded := initial.ToPropertyMap(nil, nil, true)
+	decoded := (&PulumiServiceDeploymentSettingsResource{}).ToPulumiServiceDeploymentSettingsInput(encoded)
+
+	assert.EqualValues(t, initial, decoded)
+}
+
+func TestDeploymentSettingsVcsRoundtrip(t *testing.T) {
+	deployPR := 1
+	initial := PulumiServiceDeploymentSettingsInput{
+		DeploymentSettings: pulumiapi.DeploymentSettings{
+			VCS: &pulumiapi.VCSConfiguration{
+				Provider:            "azure-devops",
+				Repository:          "my-org/my-repo",
+				DeployCommits:       true,
+				PreviewPullRequests: true,
+				PullRequestTemplate: false,
+				Paths:               []string{"infra/**"},
+				DeployPullRequest:   &deployPR,
+			},
+		},
+	}
 
 	encoded := initial.ToPropertyMap(nil, nil, true)
 	decoded := (&PulumiServiceDeploymentSettingsResource{}).ToPulumiServiceDeploymentSettingsInput(encoded)
