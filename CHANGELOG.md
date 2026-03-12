@@ -3,6 +3,7 @@
 ## Unreleased
 
 ### Improvements
+- Added `roleID` field to OIDC Issuer policies for role-based authentication policies
 
 ### Bug Fixes
 - Fixed TeamEnvironmentPermission refresh returning wrong permission when the same environment name exists in multiple projects [#674](https://github.com/pulumi/pulumi-pulumiservice/issues/674)
@@ -28,7 +29,6 @@
 - Updated PolicyGroup to use batch API for more efficient updates when adding/removing stacks, accounts, or policy packs
 - Added Java SDK support with Pulumi Java SDK v1.16.2
 - Upgraded Pulumi SDK to v3.204.0 with latest codegen improvements
-- Added `roleID` field to OIDC Issuer policies for role-based authentication policies
 
 ### Bug Fixes
 - Fixed Environment resource crash when yaml property contains computed values from Outputs (e.g., template execution results) [#606](https://github.com/pulumi/pulumi-pulumiservice/issues/606)
