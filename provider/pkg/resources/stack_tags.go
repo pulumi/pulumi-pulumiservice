@@ -1,3 +1,17 @@
+// Copyright 2026, Pulumi Corporation.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//	http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package resources
 
 import (
@@ -6,185 +20,131 @@ import (
 	"path"
 	"strings"
 
-	pbempty "google.golang.org/protobuf/types/known/emptypb"
+	"github.com/pulumi/pulumi-go-provider/infer"
 
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
-
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
-type PulumiServiceStackTagResource struct {
-	Client *pulumiapi.Client
+type StackTag struct{}
+
+var (
+	_ infer.CustomCreate[StackTagInput, StackTagState] = &StackTag{}
+	_ infer.CustomDelete[StackTagState]                = &StackTag{}
+	_ infer.CustomRead[StackTagInput, StackTagState]   = &StackTag{}
+
+	_ infer.Annotated = &StackTag{}
+	_ infer.Annotated = &StackTagInput{}
+)
+
+func (s *StackTag) Annotate(a infer.Annotator) {
+	a.Describe(s, "Stacks have associated metadata in the form of tags. Each tag consists of a name and value.")
 }
 
-type PulumiServiceStackTagInput struct {
-	Organization string `pulumi:"organization"`
-	Project      string `pulumi:"project"`
-	Stack        string `pulumi:"stack"`
-	Name         string `pulumi:"name"`
-	Value        string `pulumi:"value"`
+type StackTagInput struct {
+	Organization string `pulumi:"organization"  provider:"replaceOnChanges"`
+	Project      string `pulumi:"project"       provider:"replaceOnChanges"`
+	Stack        string `pulumi:"stack"         provider:"replaceOnChanges"`
+	Name         string `pulumi:"name"          provider:"replaceOnChanges"`
+	Value        string `pulumi:"value"         provider:"replaceOnChanges"`
 }
 
-const structTagKey = "pulumi" // could also be "json"
-
-func (i *PulumiServiceStackTagInput) ToPropertyMap() resource.PropertyMap {
-	return util.ToPropertyMap(*i, structTagKey)
+func (i *StackTagInput) Annotate(a infer.Annotator) {
+	a.Describe(&i.Organization, "Organization name.")
+	a.Describe(&i.Project, "Project name.")
+	a.Describe(&i.Stack, "Stack name.")
+	a.Describe(&i.Name, "Name of the tag. The 'key' part of the key=value pair")
+	a.Describe(&i.Value, "Value of the tag. The 'value' part of the key=value pair")
 }
 
-func (st *PulumiServiceStackTagResource) ToPulumiServiceStackTagInput(
-	inputMap resource.PropertyMap,
-) PulumiServiceStackTagInput {
-	input := PulumiServiceStackTagInput{}
-	_ = util.FromPropertyMap(inputMap, structTagKey, &input)
-	return input
-}
+type StackTagState = StackTagInput
 
-func (st *PulumiServiceStackTagResource) Name() string {
-	return "pulumiservice:index:StackTag"
-}
+func (*StackTag) Create(
+	ctx context.Context,
+	req infer.CreateRequest[StackTagInput],
+) (infer.CreateResponse[StackTagState], error) {
+	id := path.Join(req.Inputs.Organization, req.Inputs.Project, req.Inputs.Stack, req.Inputs.Name)
 
-func (st *PulumiServiceStackTagResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(
-		req.GetOldInputs(),
-		plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
-
-	diffs := olds.Diff(news)
-	if diffs == nil {
-		return &pulumirpc.DiffResponse{
-			Changes: pulumirpc.DiffResponse_DIFF_NONE,
+	if req.DryRun {
+		return infer.CreateResponse[StackTagState]{
+			ID:     id,
+			Output: req.Inputs,
 		}, nil
 	}
 
-	dd := plugin.NewDetailedDiffFromObjectDiff(diffs, false)
-
-	detailedDiffs := map[string]*pulumirpc.PropertyDiff{}
-	for k, v := range dd {
-		v.Kind = v.Kind.AsReplace()
-		detailedDiffs[k] = &pulumirpc.PropertyDiff{
-			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind), //nolint:gosec // safe conversion from plugin.DiffKind
-			InputDiff: v.InputDiff,
-		}
+	client := config.GetClient(ctx)
+	err := client.CreateTag(ctx,
+		pulumiapi.StackIdentifier{
+			OrgName:     req.Inputs.Organization,
+			ProjectName: req.Inputs.Project,
+			StackName:   req.Inputs.Stack,
+		},
+		pulumiapi.StackTag{
+			Name:  req.Inputs.Name,
+			Value: req.Inputs.Value,
+		},
+	)
+	if err != nil {
+		return infer.CreateResponse[StackTagState]{}, err
 	}
 
-	return &pulumirpc.DiffResponse{
-		Changes:             pulumirpc.DiffResponse_DIFF_SOME,
-		DetailedDiff:        detailedDiffs,
-		DeleteBeforeReplace: true,
-		HasDetailedDiff:     true,
+	return infer.CreateResponse[StackTagState]{
+		ID:     id,
+		Output: req.Inputs,
 	}, nil
 }
 
-func (st *PulumiServiceStackTagResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	ctx := context.Background()
-	var input PulumiServiceStackTagInput
-	err := util.FromProperties(req.GetProperties(), structTagKey, &input)
-	if err != nil {
-		return nil, err
-	}
-	stackName := pulumiapi.StackIdentifier{
-		OrgName:     input.Organization,
-		ProjectName: input.Project,
-		StackName:   input.Stack,
-	}
-	err = st.Client.DeleteStackTag(ctx, stackName, input.Name)
-	if err != nil {
-		return nil, err
-	}
-	return &pbempty.Empty{}, nil
+func (*StackTag) Delete(ctx context.Context, req infer.DeleteRequest[StackTagState]) (infer.DeleteResponse, error) {
+	client := config.GetClient(ctx)
+	return infer.DeleteResponse{}, client.DeleteStackTag(ctx,
+		pulumiapi.StackIdentifier{
+			OrgName:     req.State.Organization,
+			ProjectName: req.State.Project,
+			StackName:   req.State.Stack,
+		},
+		req.State.Name,
+	)
 }
 
-func (st *PulumiServiceStackTagResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
-	ctx := context.Background()
-	var input PulumiServiceStackTagInput
-	err := util.FromProperties(req.GetProperties(), structTagKey, &input)
+func (*StackTag) Read(
+	ctx context.Context,
+	req infer.ReadRequest[StackTagInput, StackTagState],
+) (infer.ReadResponse[StackTagInput, StackTagState], error) {
+	parts := strings.Split(req.ID, "/")
+	if len(parts) != 4 {
+		return infer.ReadResponse[StackTagInput, StackTagState]{},
+			fmt.Errorf("%q is invalid, must be in organization/project/stack/tagName format", req.ID)
+	}
+	organization, project, stack, tagName := parts[0], parts[1], parts[2], parts[3]
+
+	client := config.GetClient(ctx)
+	tag, err := client.GetStackTag(ctx,
+		pulumiapi.StackIdentifier{
+			OrgName:     organization,
+			ProjectName: project,
+			StackName:   stack,
+		},
+		tagName,
+	)
 	if err != nil {
-		return nil, err
-	}
-	stackName := pulumiapi.StackIdentifier{
-		OrgName:     input.Organization,
-		ProjectName: input.Project,
-		StackName:   input.Stack,
-	}
-	stackTag := pulumiapi.StackTag{
-		Name:  input.Name,
-		Value: input.Value,
-	}
-	err = st.Client.CreateTag(ctx, stackName, stackTag)
-	if err != nil {
-		return nil, err
-	}
-	return &pulumirpc.CreateResponse{
-		Id:         path.Join(input.Organization, input.Project, input.Stack, input.Name),
-		Properties: req.GetProperties(),
-	}, nil
-}
-
-func (st *PulumiServiceStackTagResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: nil}, nil
-}
-
-func (st *PulumiServiceStackTagResource) Update(_ *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	// all updates are destructive, so we just call Create.
-	return nil, fmt.Errorf("unexpected call to update, expected create to be called instead")
-}
-
-func (st *PulumiServiceStackTagResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	ctx := context.Background()
-
-	organization, project, stack, tagName, err := splitStackTagID(req.Id)
-	if err != nil {
-		return nil, err
-	}
-
-	stackName := pulumiapi.StackIdentifier{
-		OrgName:     organization,
-		ProjectName: project,
-		StackName:   stack,
-	}
-	tag, err := st.Client.GetStackTag(ctx, stackName, tagName)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read StackTag (%q): %w", req.Id, err)
+		return infer.ReadResponse[StackTagInput, StackTagState]{},
+			fmt.Errorf("failed to read StackTag (%q): %w", req.ID, err)
 	}
 	if tag == nil {
-		// if the tag doesn't exist, then return empty response
-		return &pulumirpc.ReadResponse{}, nil
+		return infer.ReadResponse[StackTagInput, StackTagState]{}, nil
 	}
 
-	input := PulumiServiceStackTagInput{
+	state := StackTagState{
 		Organization: organization,
 		Project:      project,
 		Stack:        stack,
 		Name:         tag.Name,
 		Value:        tag.Value,
 	}
-	props, err := util.ToProperties(input, structTagKey)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal inputs to properties: %w", err)
-	}
-	return &pulumirpc.ReadResponse{
-		Id:         req.Id,
-		Properties: props,
-		Inputs:     props,
-	}, nil
-}
 
-func splitStackTagID(id string) (organization string, project string, stack string, tagName string, err error) {
-	// format: organization/project/stack/tagName
-	s := strings.Split(id, "/")
-	if len(s) != 4 {
-		return "", "", "", "", fmt.Errorf("%q is invalid, must be in organization/project/stack/tagName format", id)
-	}
-	return s[0], s[1], s[2], s[3], nil
+	return infer.ReadResponse[StackTagInput, StackTagState]{
+		ID:     req.ID,
+		Inputs: state,
+		State:  state,
+	}, nil
 }

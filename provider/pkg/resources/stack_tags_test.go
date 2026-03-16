@@ -1,58 +1,132 @@
+// Copyright 2026, Pulumi Corporation.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//	http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package resources
 
 import (
-	"net/http"
-	"net/http/httptest"
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
+	"github.com/pulumi/pulumi-go-provider/infer"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
-func TestStackTagsUpdate(t *testing.T) {
-	t.Run("Calls to Update return an error", func(t *testing.T) {
-		var gotMethods []string
+type StackTagClientMock struct {
+	config.Client
+	getStackTagFunc func(
+		ctx context.Context, stackName pulumiapi.StackIdentifier, tagName string,
+	) (*pulumiapi.StackTag, error)
+}
 
-		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			gotMethods = append(gotMethods, r.Method)
-			w.WriteHeader(http.StatusOK)
-		}))
-		defer server.Close()
+func (c *StackTagClientMock) GetStackTag(
+	ctx context.Context, stackName pulumiapi.StackIdentifier, tagName string,
+) (*pulumiapi.StackTag, error) {
+	return c.getStackTagFunc(ctx, stackName, tagName)
+}
 
-		apiClient, err := pulumiapi.NewClient(server.Client(), "", server.URL)
-		if err != nil {
-			t.Fatal(err)
+func TestStackTag(t *testing.T) {
+	t.Parallel()
+
+	t.Run("Read when the resource is not found", func(t *testing.T) {
+		t.Parallel()
+		mockedClient := &StackTagClientMock{
+			getStackTagFunc: func(_ context.Context, _ pulumiapi.StackIdentifier, _ string) (*pulumiapi.StackTag, error) {
+				return nil, nil
+			},
 		}
 
-		st := &PulumiServiceStackTagResource{
-			Client: apiClient,
+		ctx := config.WithMockClient(context.Background(), mockedClient)
+
+		st := &StackTag{}
+		req := infer.ReadRequest[StackTagInput, StackTagState]{
+			ID: "org/project/stack/tag",
+			Inputs: StackTagInput{
+				Organization: "org",
+				Project:      "project",
+				Stack:        "stack",
+				Name:         "tag",
+				Value:        "value",
+			},
+			State: StackTagState{
+				Organization: "org",
+				Project:      "project",
+				Stack:        "stack",
+				Name:         "tag",
+				Value:        "value",
+			},
 		}
 
-		input := PulumiServiceStackTagInput{
-			Organization: "org",
-			Project:      "project",
-			Stack:        "stack",
-			Name:         "tag",
-			Value:        "tag_value",
-		}
-
-		properties, err := util.ToProperties(input, "pulumi")
-
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		upReq := pulumirpc.UpdateRequest{
-			Olds: properties,
-			News: properties,
-		}
-
-		_, err = st.Update(&upReq)
-		assert.ErrorContains(t, err, "unexpected call to update, expected create to be called instead")
+		resp, err := st.Read(ctx, req)
+		require.NoError(t, err)
+		assert.Equal(t, infer.ReadResponse[StackTagInput, StackTagState]{}, resp)
 	})
 
+	t.Run("Read when the resource is found", func(t *testing.T) {
+		t.Parallel()
+		mockedClient := &StackTagClientMock{
+			getStackTagFunc: func(_ context.Context, _ pulumiapi.StackIdentifier, _ string) (*pulumiapi.StackTag, error) {
+				return &pulumiapi.StackTag{
+					Name:  "myTag",
+					Value: "myValue",
+				}, nil
+			},
+		}
+
+		ctx := config.WithMockClient(context.Background(), mockedClient)
+
+		st := &StackTag{}
+		req := infer.ReadRequest[StackTagInput, StackTagState]{
+			ID: "org/project/stack/myTag",
+			Inputs: StackTagInput{
+				Organization: "org",
+				Project:      "project",
+				Stack:        "stack",
+				Name:         "myTag",
+				Value:        "oldValue",
+			},
+			State: StackTagState{
+				Organization: "org",
+				Project:      "project",
+				Stack:        "stack",
+				Name:         "myTag",
+				Value:        "oldValue",
+			},
+		}
+
+		resp, err := st.Read(ctx, req)
+		require.NoError(t, err)
+		assert.Equal(t, infer.ReadResponse[StackTagInput, StackTagState]{
+			ID: "org/project/stack/myTag",
+			Inputs: StackTagInput{
+				Organization: "org",
+				Project:      "project",
+				Stack:        "stack",
+				Name:         "myTag",
+				Value:        "myValue",
+			},
+			State: StackTagState{
+				Organization: "org",
+				Project:      "project",
+				Stack:        "stack",
+				Name:         "myTag",
+				Value:        "myValue",
+			},
+		}, resp)
+	})
 }

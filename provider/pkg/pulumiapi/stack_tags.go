@@ -30,6 +30,12 @@ func NewStackIdentifier(id string) (StackIdentifier, error) {
 	}, nil
 }
 
+type StackTagClient interface {
+	CreateTag(ctx context.Context, stack StackIdentifier, tag StackTag) error
+	GetStackTag(ctx context.Context, stackName StackIdentifier, tagName string) (*StackTag, error)
+	DeleteStackTag(ctx context.Context, stackName StackIdentifier, tagName string) error
+}
+
 type StackTag struct {
 	Name  string `json:"name"`
 	Value string `json:"value"`

@@ -51,6 +51,7 @@ type Client interface {
 	pulumiapi.EnvironmentScheduleClient
 	pulumiapi.InsightsAccountClient
 	pulumiapi.OidcClient
+	pulumiapi.StackTagClient
 	pulumiapi.TeamClient
 	pulumiapi.WebhookClient
 }
