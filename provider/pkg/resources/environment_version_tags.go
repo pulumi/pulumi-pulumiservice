@@ -30,14 +30,14 @@ type PulumiServiceEnvironmentVersionTagInput struct {
 }
 
 func (i *PulumiServiceEnvironmentVersionTagInput) ToPropertyMap() resource.PropertyMap {
-	return util.ToPropertyMap(*i, structTagKey)
+	return util.ToPropertyMap(*i)
 }
 
 func (evt *PulumiServiceEnvironmentVersionTagResource) ToPulumiServiceEnvironmentVersionTagInput(
 	properties *structpb.Struct,
 ) PulumiServiceEnvironmentVersionTagInput {
 	input := PulumiServiceEnvironmentVersionTagInput{}
-	_ = util.FromProperties(properties, structTagKey, &input)
+	_ = util.FromProperties(properties, &input)
 
 	if input.Project == "" {
 		input.Project = defaultProject
@@ -174,7 +174,7 @@ func (evt *PulumiServiceEnvironmentVersionTagResource) Update(
 ) (*pulumirpc.UpdateResponse, error) {
 	ctx := context.Background()
 	var input PulumiServiceEnvironmentVersionTagInput
-	err := util.FromProperties(req.GetNews(), structTagKey, &input)
+	err := util.FromProperties(req.GetNews(), &input)
 	if err != nil {
 		return nil, err
 	}
@@ -223,7 +223,7 @@ func (evt *PulumiServiceEnvironmentVersionTagResource) Read(
 		Revision:     tag.Revision,
 	}
 
-	props, err := util.ToProperties(input, structTagKey)
+	props, err := util.ToProperties(input)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal input to properties: %w", err)
 	}

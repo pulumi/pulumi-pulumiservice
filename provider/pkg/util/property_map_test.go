@@ -25,7 +25,7 @@ func TestToPropertyMap(t *testing.T) {
 		FloatPtrField: &floatValue,
 		IntPtrField:   &intvalue,
 	}
-	propertyMap := ToPropertyMap(a, "pulumi")
+	propertyMap := ToPropertyMap(a)
 	expected := map[string]interface{}{
 		// NewPropertyValue() auto converts ints to float64
 		"int_field":    float64(1),
@@ -57,7 +57,7 @@ func TestFromPropertyMap(t *testing.T) {
 			IntPtrField:   &intValue,
 		}
 		propertyMap := resource.PropertyMap{}
-		expected := map[string]interface{}{
+		expected := map[string]any{
 			// NewPropertyValue() auto converts ints to float64
 			"int_field":      float64(1),
 			"float_field":    float64(2.5),
@@ -69,7 +69,7 @@ func TestFromPropertyMap(t *testing.T) {
 			propertyMap[resource.PropertyKey(key)] = resource.NewPropertyValue(value)
 		}
 		got := A{}
-		err := FromPropertyMap(propertyMap, "pulumi", &got)
+		err := FromPropertyMap(propertyMap, &got)
 		assert.NoError(t, err)
 		assert.Equal(t, want, got)
 	})
@@ -80,7 +80,7 @@ func TestFromPropertyMap(t *testing.T) {
 		want := A{}
 
 		got := A{}
-		err := FromPropertyMap(propertyMap, "pulumi", &got)
+		err := FromPropertyMap(propertyMap, &got)
 
 		// no error should be returned, even though struct has pulumi tags
 		// that aren't present in propertyMap

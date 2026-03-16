@@ -28,14 +28,14 @@ type TeamStackPermissionInput struct {
 }
 
 func (i *TeamStackPermissionInput) ToPropertyMap() resource.PropertyMap {
-	return util.ToPropertyMap(*i, structTagKey)
+	return util.ToPropertyMap(*i)
 }
 
 func (tp *TeamStackPermissionResource) ToPulumiServiceTeamInput(
 	inputMap resource.PropertyMap,
 ) (*TeamStackPermissionInput, error) {
 	input := TeamStackPermissionInput{}
-	return &input, util.FromPropertyMap(inputMap, structTagKey, &input)
+	return &input, util.FromPropertyMap(inputMap, &input)
 }
 
 func (tp *TeamStackPermissionResource) Name() string {
@@ -98,7 +98,7 @@ func (tp *TeamStackPermissionResource) Read(req *pulumirpc.ReadRequest) (*pulumi
 func (tp *TeamStackPermissionResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	ctx := context.Background()
 	var input TeamStackPermissionInput
-	err := util.FromProperties(req.GetProperties(), structTagKey, &input)
+	err := util.FromProperties(req.GetProperties(), &input)
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +124,7 @@ func (tp *TeamStackPermissionResource) Create(req *pulumirpc.CreateRequest) (*pu
 func (tp *TeamStackPermissionResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
 	ctx := context.Background()
 	var input TeamStackPermissionInput
-	err := util.FromProperties(req.GetProperties(), structTagKey, &input)
+	err := util.FromProperties(req.GetProperties(), &input)
 	if err != nil {
 		return nil, err
 	}

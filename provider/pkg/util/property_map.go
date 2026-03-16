@@ -9,10 +9,12 @@ import (
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
-// ToPropertyMap marshals a struct into a resource.PropertyMap. It obtains
-// the resource.PropertyKey() values for each struct field by grabbing
-// value of the structTagKey
-func ToPropertyMap(obj interface{}, structTagName string) resource.PropertyMap {
+const structTagName = "pulumi"
+
+// ToPropertyMap marshals a struct into a resource.PropertyMap. It obtains the
+// resource.PropertyKey() values for each struct field by grabbing value of the
+// structTagName.
+func ToPropertyMap(obj any) resource.PropertyMap {
 	v := reflect.ValueOf(obj)
 	kind := v.Kind()
 	if kind != reflect.Struct {
@@ -31,7 +33,7 @@ func ToPropertyMap(obj interface{}, structTagName string) resource.PropertyMap {
 }
 
 // FromPropertyMap unmarshals properties into out.
-func FromPropertyMap(properties resource.PropertyMap, structTagName string, out interface{}) error {
+func FromPropertyMap(properties resource.PropertyMap, out any) error {
 	v := reflect.ValueOf(out)
 	kind := v.Kind()
 	if kind == reflect.Ptr {
