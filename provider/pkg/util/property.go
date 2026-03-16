@@ -6,15 +6,15 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 )
 
-func FromProperties(props *structpb.Struct, structTagName string, out interface{}) error {
+func FromProperties(props *structpb.Struct, out interface{}) error {
 	inputs, err := plugin.UnmarshalProperties(props, StandardUnmarshal)
 	if err != nil {
 		return err
 	}
-	return FromPropertyMap(inputs, structTagName, out)
+	return FromPropertyMap(inputs, out)
 }
 
-func ToProperties(obj interface{}, structTagName string) (*structpb.Struct, error) {
-	propertyMap := ToPropertyMap(obj, structTagName)
+func ToProperties(obj interface{}) (*structpb.Struct, error) {
+	propertyMap := ToPropertyMap(obj)
 	return plugin.MarshalProperties(propertyMap, StandardMarshal)
 }

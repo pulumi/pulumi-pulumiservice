@@ -30,14 +30,14 @@ type TeamEnvironmentPermissionInput struct {
 }
 
 func (i *TeamEnvironmentPermissionInput) ToPropertyMap() resource.PropertyMap {
-	return util.ToPropertyMap(*i, structTagKey)
+	return util.ToPropertyMap(*i)
 }
 
 func (tp *PulumiServiceTeamEnvironmentPermissionResource) ToPulumiServiceTeamInput(
 	inputMap resource.PropertyMap,
 ) (*TeamEnvironmentPermissionInput, error) {
 	input := TeamEnvironmentPermissionInput{}
-	return &input, util.FromPropertyMap(inputMap, structTagKey, &input)
+	return &input, util.FromPropertyMap(inputMap, &input)
 }
 
 func (tp *PulumiServiceTeamEnvironmentPermissionResource) Name() string {
@@ -48,7 +48,7 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Check(
 	req *pulumirpc.CheckRequest,
 ) (*pulumirpc.CheckResponse, error) {
 	var input TeamEnvironmentPermissionInput
-	err := util.FromProperties(req.GetNews(), structTagKey, &input)
+	err := util.FromProperties(req.GetNews(), &input)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Check(
 		}
 	}
 
-	inputs, err := util.ToProperties(input, structTagKey)
+	inputs, err := util.ToProperties(input)
 	if err != nil {
 		return nil, err
 	}
@@ -131,7 +131,7 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Create(
 ) (*pulumirpc.CreateResponse, error) {
 	ctx := context.Background()
 	var input TeamEnvironmentPermissionInput
-	err := util.FromProperties(req.GetProperties(), structTagKey, &input)
+	err := util.FromProperties(req.GetProperties(), &input)
 	if err != nil {
 		return nil, err
 	}
@@ -177,7 +177,7 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Create(
 func (tp *PulumiServiceTeamEnvironmentPermissionResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
 	ctx := context.Background()
 	var input TeamEnvironmentPermissionInput
-	err := util.FromProperties(req.GetProperties(), structTagKey, &input)
+	err := util.FromProperties(req.GetProperties(), &input)
 	if err != nil {
 		return nil, err
 	}
