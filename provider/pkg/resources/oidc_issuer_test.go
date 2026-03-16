@@ -47,9 +47,10 @@ func TestOidcIssuerPolicySerialization(t *testing.T) {
 				},
 			},
 			{
-				Decision:  AuthPolicyDecisionDeny,
-				TokenType: AuthPolicyTokenTypePersonal,
-				UserLogin: &userLogin,
+				Decision:              AuthPolicyDecisionDeny,
+				TokenType:             AuthPolicyTokenTypePersonal,
+				AuthorizedPermissions: []AuthPolicyPermissionLevel{},
+				UserLogin:             &userLogin,
 				Rules: map[string]string{
 					"aud": "urn:pulumi:org:test-org",
 					"sub": "pulumi:deploy:org:test-org:project:test-project:*",
@@ -66,18 +67,20 @@ func TestOidcIssuerPolicySerialization(t *testing.T) {
 				},
 			},
 			{
-				Decision:  AuthPolicyDecisionAllow,
-				TokenType: AuthPolicyTokenTypeDeploymentRunner,
-				RunnerID:  &runnerID,
+				Decision:              AuthPolicyDecisionAllow,
+				TokenType:             AuthPolicyTokenTypeDeploymentRunner,
+				AuthorizedPermissions: []AuthPolicyPermissionLevel{},
+				RunnerID:              &runnerID,
 				Rules: map[string]string{
 					"aud": "urn:pulumi:org:test-org",
 					"sub": "repo:organization/repo:*",
 				},
 			},
 			{
-				Decision:  AuthPolicyDecisionDeny,
-				TokenType: AuthPolicyTokenTypeOrganization,
-				RoleID:    &roleID,
+				Decision:              AuthPolicyDecisionDeny,
+				TokenType:             AuthPolicyTokenTypeOrganization,
+				RoleID:                &roleID,
+				AuthorizedPermissions: []AuthPolicyPermissionLevel{},
 				Rules: map[string]string{
 					"aud": "urn:pulumi:org:test-org",
 					"sub": "repo:organization/repo:*",
@@ -88,51 +91,6 @@ func TestOidcIssuerPolicySerialization(t *testing.T) {
 	}
 
 	propertyMap := input.toPropertyMap()
-
 	result := provider.ToPulumiServiceOidcIssuerInput(propertyMap)
-
-	assert.Equal(t, input.Organization, result.Organization)
-	assert.Equal(t, input.Name, result.Name)
-	assert.Equal(t, input.URL, result.URL)
-	assert.Equal(t, input.MaxExpirationSeconds, result.MaxExpirationSeconds)
-	assert.Equal(t, input.Thumbprints, result.Thumbprints)
-
-	assert.Len(t, result.Policies, 5, "Should have 5 policies")
-
-	orgPolicy := result.Policies[0]
-	assert.Equal(t, AuthPolicyDecisionAllow, orgPolicy.Decision)
-	assert.Equal(t, AuthPolicyTokenTypeOrganization, orgPolicy.TokenType)
-	assert.Equal(t, []AuthPolicyPermissionLevel{AuthPolicyPermissionLevelAdmin}, orgPolicy.AuthorizedPermissions)
-	assert.Equal(t, "urn:pulumi:org:test-org", orgPolicy.Rules["aud"])
-	assert.Equal(t, "repo:organization/repo:*", orgPolicy.Rules["sub"])
-
-	personalPolicy := result.Policies[1]
-	assert.Equal(t, AuthPolicyDecisionDeny, personalPolicy.Decision)
-	assert.Equal(t, AuthPolicyTokenTypePersonal, personalPolicy.TokenType)
-	assert.Equal(t, &userLogin, personalPolicy.UserLogin)
-	assert.Equal(t, "urn:pulumi:org:test-org", personalPolicy.Rules["aud"])
-	assert.Equal(t, "pulumi:deploy:org:test-org:project:test-project:*", personalPolicy.Rules["sub"])
-
-	teamPolicy := result.Policies[2]
-	assert.Equal(t, AuthPolicyDecisionAllow, teamPolicy.Decision)
-	assert.Equal(t, AuthPolicyTokenTypeTeam, teamPolicy.TokenType)
-	assert.Equal(t, &teamName, teamPolicy.TeamName)
-	assert.Equal(t, []AuthPolicyPermissionLevel{AuthPolicyPermissionLevelStandard}, teamPolicy.AuthorizedPermissions)
-	assert.Equal(t, "urn:pulumi:org:test-org", teamPolicy.Rules["aud"])
-	assert.Equal(t, "repo:organization/repo:*", teamPolicy.Rules["sub"])
-
-	runnerPolicy := result.Policies[3]
-	assert.Equal(t, AuthPolicyDecisionAllow, runnerPolicy.Decision)
-	assert.Equal(t, AuthPolicyTokenTypeDeploymentRunner, runnerPolicy.TokenType)
-	assert.Equal(t, &runnerID, runnerPolicy.RunnerID)
-	assert.Equal(t, "urn:pulumi:org:test-org", runnerPolicy.Rules["aud"])
-	assert.Equal(t, "repo:organization/repo:*", runnerPolicy.Rules["sub"])
-
-	rolePolicy := result.Policies[4]
-	assert.Equal(t, AuthPolicyDecisionDeny, rolePolicy.Decision)
-	assert.Equal(t, AuthPolicyTokenTypeOrganization, rolePolicy.TokenType)
-	assert.Equal(t, &roleID, rolePolicy.RoleID)
-	assert.Equal(t, "urn:pulumi:org:test-org", rolePolicy.Rules["aud"])
-	assert.Equal(t, "repo:organization/repo:*", rolePolicy.Rules["sub"])
-	assert.Equal(t, "production", rolePolicy.Rules["env"])
+	assert.Equal(t, input, result)
 }
