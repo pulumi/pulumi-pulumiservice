@@ -49,6 +49,7 @@ type PulumiServiceAuthPolicyDefinition struct {
 	TeamName              *string
 	UserLogin             *string
 	RunnerID              *string
+	RoleID                *string
 	AuthorizedPermissions []AuthPolicyPermissionLevel
 	Rules                 map[string]string
 }
@@ -334,6 +335,9 @@ func (policy PulumiServiceAuthPolicyDefinition) toPropertyMap() resource.Propert
 	if policy.RunnerID != nil {
 		propertyMap["runnerID"] = resource.NewPropertyValue(policy.RunnerID)
 	}
+	if policy.RoleID != nil {
+		propertyMap["roleID"] = resource.NewPropertyValue(policy.RoleID)
+	}
 	if len(policy.AuthorizedPermissions) > 0 {
 		propertyMap["authorizedPermissions"] = resource.NewPropertyValue(policy.AuthorizedPermissions)
 	}
@@ -387,6 +391,11 @@ func propertyMapToPolicy(policyObject resource.PropertyMap) PulumiServiceAuthPol
 		runnerID = &value
 	}
 
+	var roleID *string
+	if policyObject["roleID"].HasValue() {
+		value := policyObject["roleID"].StringValue()
+		roleID = &value
+	}
 	authorizedPermissions := []AuthPolicyPermissionLevel{}
 	if policyObject["authorizedPermissions"].HasValue() {
 		for _, permission := range policyObject["authorizedPermissions"].ArrayValue() {
@@ -408,6 +417,7 @@ func propertyMapToPolicy(policyObject resource.PropertyMap) PulumiServiceAuthPol
 		TeamName:              teamName,
 		UserLogin:             userLogin,
 		RunnerID:              runnerID,
+		RoleID:                roleID,
 		AuthorizedPermissions: authorizedPermissions,
 		Rules:                 rules,
 	}
@@ -423,6 +433,7 @@ func policiesToAPIRequest(policies []PulumiServiceAuthPolicyDefinition) pulumiap
 			TeamName:              policy.TeamName,
 			UserLogin:             policy.UserLogin,
 			RunnerID:              policy.RunnerID,
+			RoleID:                policy.RoleID,
 			AuthorizedPermissions: permissionsToAPI(policy.AuthorizedPermissions),
 			Rules:                 policy.Rules,
 		})
@@ -448,6 +459,7 @@ func apiPolicyToInput(policy pulumiapi.AuthPolicyDefinition) PulumiServiceAuthPo
 		TeamName:              policy.TeamName,
 		UserLogin:             policy.UserLogin,
 		RunnerID:              policy.RunnerID,
+		RoleID:                policy.RoleID,
 		AuthorizedPermissions: permissionsToInput(policy.AuthorizedPermissions),
 		Rules:                 policy.Rules,
 	}

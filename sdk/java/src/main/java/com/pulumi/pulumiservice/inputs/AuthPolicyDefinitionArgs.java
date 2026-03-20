@@ -52,6 +52,21 @@ public final class AuthPolicyDefinitionArgs extends com.pulumi.resources.Resourc
     }
 
     /**
+     * The role ID for organization tokens.
+     * 
+     */
+    @Import(name="roleID")
+    private @Nullable Output<String> roleID;
+
+    /**
+     * @return The role ID for organization tokens.
+     * 
+     */
+    public Optional<Output<String>> roleID() {
+        return Optional.ofNullable(this.roleID);
+    }
+
+    /**
      * OIDC rules to set for this policy.
      * 
      */
@@ -131,6 +146,7 @@ public final class AuthPolicyDefinitionArgs extends com.pulumi.resources.Resourc
     private AuthPolicyDefinitionArgs(AuthPolicyDefinitionArgs $) {
         this.authorizedPermissions = $.authorizedPermissions;
         this.decision = $.decision;
+        this.roleID = $.roleID;
         this.rules = $.rules;
         this.runnerID = $.runnerID;
         this.teamName = $.teamName;
@@ -206,6 +222,27 @@ public final class AuthPolicyDefinitionArgs extends com.pulumi.resources.Resourc
          */
         public Builder decision(AuthPolicyDecision decision) {
             return decision(Output.of(decision));
+        }
+
+        /**
+         * @param roleID The role ID for organization tokens.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder roleID(@Nullable Output<String> roleID) {
+            $.roleID = roleID;
+            return this;
+        }
+
+        /**
+         * @param roleID The role ID for organization tokens.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder roleID(String roleID) {
+            return roleID(Output.of(roleID));
         }
 
         /**
