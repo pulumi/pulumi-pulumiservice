@@ -50,6 +50,14 @@ func NewStackTag(ctx *pulumi.Context,
 	if args.Value == nil {
 		return nil, errors.New("invalid value for required argument 'Value'")
 	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"name",
+		"organization",
+		"project",
+		"stack",
+		"value",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource StackTag
 	err := ctx.RegisterResource("pulumiservice:index:StackTag", name, args, &resource, opts...)

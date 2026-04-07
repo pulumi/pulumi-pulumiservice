@@ -52,7 +52,7 @@ namespace Pulumi.PulumiService
         public Output<ImmutableDictionary<string, object>?> ProviderConfig { get; private set; } = null!;
 
         /// <summary>
-        /// Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
+        /// Schedule for automated scanning. Use 'daily' for daily scans, '12h' for scans every twelve hours, or 'none' to disable scheduled scanning. Defaults to 'none'.
         /// </summary>
         [Output("scanSchedule")]
         public Output<Pulumi.PulumiService.ScanSchedule> ScanSchedule { get; private set; } = null!;
@@ -157,7 +157,7 @@ namespace Pulumi.PulumiService
         }
 
         /// <summary>
-        /// Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
+        /// Schedule for automated scanning. Use 'daily' for daily scans, '12h' for scans every twelve hours, or 'none' to disable scheduled scanning. Defaults to 'none'.
         /// </summary>
         [Input("scanSchedule", required: true)]
         public Input<Pulumi.PulumiService.ScanSchedule> ScanSchedule { get; set; } = null!;

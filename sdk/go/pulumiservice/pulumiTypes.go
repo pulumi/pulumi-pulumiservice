@@ -2922,7 +2922,7 @@ type InsightsAccountStateType struct {
 	Provider CloudProvider `pulumi:"provider"`
 	// Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {"regions": ["us-west-1", "us-west-2"]}.
 	ProviderConfig map[string]interface{} `pulumi:"providerConfig"`
-	// Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
+	// Schedule for automated scanning. Use 'daily' for daily scans, '12h' for scans every twelve hours, or 'none' to disable scheduled scanning. Defaults to 'none'.
 	ScanSchedule ScanSchedule `pulumi:"scanSchedule"`
 	// Whether scheduled scanning is enabled.
 	ScheduledScanEnabled bool `pulumi:"scheduledScanEnabled"`
@@ -2986,7 +2986,7 @@ func (o InsightsAccountStateTypeOutput) ProviderConfig() pulumi.MapOutput {
 	return o.ApplyT(func(v InsightsAccountStateType) map[string]interface{} { return v.ProviderConfig }).(pulumi.MapOutput)
 }
 
-// Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
+// Schedule for automated scanning. Use 'daily' for daily scans, '12h' for scans every twelve hours, or 'none' to disable scheduled scanning. Defaults to 'none'.
 func (o InsightsAccountStateTypeOutput) ScanSchedule() ScanScheduleOutput {
 	return o.ApplyT(func(v InsightsAccountStateType) ScanSchedule { return v.ScanSchedule }).(ScanScheduleOutput)
 }

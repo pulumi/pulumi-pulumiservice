@@ -62,7 +62,7 @@ export class InsightsAccount extends pulumi.CustomResource {
      */
     declare public readonly providerConfig: pulumi.Output<{[key: string]: any} | undefined>;
     /**
-     * Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
+     * Schedule for automated scanning. Use 'daily' for daily scans, '12h' for scans every twelve hours, or 'none' to disable scheduled scanning. Defaults to 'none'.
      */
     declare public readonly scanSchedule: pulumi.Output<enums.ScanSchedule>;
     /**
@@ -152,7 +152,7 @@ export interface InsightsAccountArgs {
      */
     providerConfig?: pulumi.Input<{[key: string]: any}>;
     /**
-     * Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
+     * Schedule for automated scanning. Use 'daily' for daily scans, '12h' for scans every twelve hours, or 'none' to disable scheduled scanning. Defaults to 'none'.
      */
     scanSchedule: pulumi.Input<enums.ScanSchedule>;
     /**

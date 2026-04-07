@@ -1,4 +1,4 @@
-// Copyright 2016-2025, Pulumi Corporation.
+// Copyright 2016-2026, Pulumi Corporation.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -63,13 +63,15 @@ func (CloudProvider) Values() []infer.EnumValue[CloudProvider] {
 type ScanSchedule string
 
 const (
-	ScanScheduleNone  ScanSchedule = "none"
-	ScanScheduleDaily ScanSchedule = "daily"
+	ScanScheduleNone        ScanSchedule = "none"
+	ScanScheduleTwelveHours ScanSchedule = "12h"
+	ScanScheduleDaily       ScanSchedule = "daily"
 )
 
 func (ScanSchedule) Values() []infer.EnumValue[ScanSchedule] {
 	return []infer.EnumValue[ScanSchedule]{
 		{Name: "none", Value: ScanScheduleNone, Description: "Disable automated scanning."},
+		{Name: "TwelveHours", Value: ScanScheduleTwelveHours, Description: "Run automated scans every twelve hours."},
 		{Name: "daily", Value: ScanScheduleDaily, Description: "Run automated scans once per day."},
 	}
 }
@@ -96,8 +98,8 @@ func (c *InsightsAccountCore) Annotate(a infer.Annotator) {
 	)
 	a.Describe(
 		&c.ScanSchedule,
-		"Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled "+
-			"scanning. Defaults to 'none'.",
+		"Schedule for automated scanning. Use 'daily' for daily scans, '12h' for scans every twelve hours, "+
+			"or 'none' to disable scheduled scanning. Defaults to 'none'.",
 	)
 	a.SetDefault(&c.ScanSchedule, ScanScheduleNone)
 	a.Describe(

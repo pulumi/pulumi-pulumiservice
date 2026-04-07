@@ -109,14 +109,14 @@ public class InsightsAccount extends com.pulumi.resources.CustomResource {
         return Codegen.optional(this.providerConfig);
     }
     /**
-     * Schedule for automated scanning. Use &#39;daily&#39; to enable daily scans, or &#39;none&#39; to disable scheduled scanning. Defaults to &#39;none&#39;.
+     * Schedule for automated scanning. Use &#39;daily&#39; for daily scans, &#39;12h&#39; for scans every twelve hours, or &#39;none&#39; to disable scheduled scanning. Defaults to &#39;none&#39;.
      * 
      */
     @Export(name="scanSchedule", refs={ScanSchedule.class}, tree="[0]")
     private Output<ScanSchedule> scanSchedule;
 
     /**
-     * @return Schedule for automated scanning. Use &#39;daily&#39; to enable daily scans, or &#39;none&#39; to disable scheduled scanning. Defaults to &#39;none&#39;.
+     * @return Schedule for automated scanning. Use &#39;daily&#39; for daily scans, &#39;12h&#39; for scans every twelve hours, or &#39;none&#39; to disable scheduled scanning. Defaults to &#39;none&#39;.
      * 
      */
     public Output<ScanSchedule> scanSchedule() {

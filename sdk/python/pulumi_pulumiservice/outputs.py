@@ -1200,7 +1200,7 @@ class InsightsAccountState(dict):
         :param _builtins.str insights_account_id: The insights account identifier.
         :param _builtins.str organization_name: The organization's name.
         :param 'CloudProvider' provider: The cloud provider for scanning.
-        :param 'ScanSchedule' scan_schedule: Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
+        :param 'ScanSchedule' scan_schedule: Schedule for automated scanning. Use 'daily' for daily scans, '12h' for scans every twelve hours, or 'none' to disable scheduled scanning. Defaults to 'none'.
         :param _builtins.bool scheduled_scan_enabled: Whether scheduled scanning is enabled.
         :param Mapping[str, Any] provider_config: Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {"regions": ["us-west-1", "us-west-2"]}.
         :param Mapping[str, _builtins.str] tags: Key-value tags to associate with the insights account.
@@ -1263,7 +1263,7 @@ class InsightsAccountState(dict):
     @pulumi.getter(name="scanSchedule")
     def scan_schedule(self) -> 'ScanSchedule':
         """
-        Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
+        Schedule for automated scanning. Use 'daily' for daily scans, '12h' for scans every twelve hours, or 'none' to disable scheduled scanning. Defaults to 'none'.
         """
         return pulumi.get(self, "scan_schedule")
 
