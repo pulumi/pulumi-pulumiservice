@@ -25,7 +25,6 @@ class StackArgs:
                  force_destroy: Optional[pulumi.Input[_builtins.bool]] = None):
         """
         The set of arguments for constructing a Stack resource.
-
         :param pulumi.Input[_builtins.str] organization_name: The name of the organization.
         :param pulumi.Input[_builtins.str] project_name: The name of the project.
         :param pulumi.Input[_builtins.str] stack_name: The name of the stack.
@@ -100,7 +99,6 @@ class Stack(pulumi.CustomResource):
         """
         A stack is a collection of resources that share a common lifecycle. Stacks are uniquely identified by their name and the project they belong to.
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.bool] force_destroy: Optional. Flag indicating whether to delete the stack even if it still contains resources.
@@ -116,7 +114,6 @@ class Stack(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         A stack is a collection of resources that share a common lifecycle. Stacks are uniquely identified by their name and the project they belong to.
-
 
         :param str resource_name: The name of the resource.
         :param StackArgs args: The arguments to use to populate this resource's properties.

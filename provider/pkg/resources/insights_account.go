@@ -63,9 +63,9 @@ func (CloudProvider) Values() []infer.EnumValue[CloudProvider] {
 type ScanSchedule string
 
 const (
-	ScanScheduleNone         ScanSchedule = "none"
-	ScanScheduleTwelveHours  ScanSchedule = "12h"
-	ScanScheduleDaily        ScanSchedule = "daily"
+	ScanScheduleNone        ScanSchedule = "none"
+	ScanScheduleTwelveHours ScanSchedule = "12h"
+	ScanScheduleDaily       ScanSchedule = "daily"
 )
 
 func (ScanSchedule) Values() []infer.EnumValue[ScanSchedule] {

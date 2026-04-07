@@ -11,3 +11,4 @@ pluginManagement {
 }
 
 rootProject.name = "com.pulumi.pulumiservice"
+include("lib")
