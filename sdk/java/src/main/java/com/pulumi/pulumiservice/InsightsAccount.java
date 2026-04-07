@@ -14,6 +14,7 @@ import com.pulumi.pulumiservice.enums.ScanSchedule;
 import java.lang.Boolean;
 import java.lang.Object;
 import java.lang.String;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -109,14 +110,14 @@ public class InsightsAccount extends com.pulumi.resources.CustomResource {
         return Codegen.optional(this.providerConfig);
     }
     /**
-     * Schedule for automated scanning. Use &#39;daily&#39; to enable daily scans, or &#39;none&#39; to disable scheduled scanning. Defaults to &#39;none&#39;.
+     * Schedule for automated scanning. Use &#39;daily&#39; for daily scans, &#39;12h&#39; for scans every twelve hours, or &#39;none&#39; to disable scheduled scanning. Defaults to &#39;none&#39;.
      * 
      */
     @Export(name="scanSchedule", refs={ScanSchedule.class}, tree="[0]")
     private Output<ScanSchedule> scanSchedule;
 
     /**
-     * @return Schedule for automated scanning. Use &#39;daily&#39; to enable daily scans, or &#39;none&#39; to disable scheduled scanning. Defaults to &#39;none&#39;.
+     * @return Schedule for automated scanning. Use &#39;daily&#39; for daily scans, &#39;12h&#39; for scans every twelve hours, or &#39;none&#39; to disable scheduled scanning. Defaults to &#39;none&#39;.
      * 
      */
     public Output<ScanSchedule> scanSchedule() {
@@ -190,6 +191,11 @@ public class InsightsAccount extends com.pulumi.resources.CustomResource {
     private static com.pulumi.resources.CustomResourceOptions makeResourceOptions(@Nullable com.pulumi.resources.CustomResourceOptions options, @Nullable Output<java.lang.String> id) {
         var defaultOptions = com.pulumi.resources.CustomResourceOptions.builder()
             .version(Utilities.getVersion())
+            .replaceOnChanges(List.of(
+                "accountName",
+                "organizationName",
+                "provider"
+            ))
             .build();
         return com.pulumi.resources.CustomResourceOptions.merge(defaultOptions, options, id);
     }

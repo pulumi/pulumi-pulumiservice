@@ -30,6 +30,7 @@ class PolicyGroupArgs:
                  stacks: Optional[pulumi.Input[Sequence[pulumi.Input['PolicyGroupStackReferenceArgs']]]] = None):
         """
         The set of arguments for constructing a PolicyGroup resource.
+
         :param pulumi.Input[_builtins.str] name: The name of the policy group.
         :param pulumi.Input[_builtins.str] organization_name: The name of the Pulumi organization the policy group belongs to.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] accounts: List of accounts that belong to this policy group.
@@ -157,6 +158,7 @@ class PolicyGroup(pulumi.CustomResource):
         """
         A Policy Group allows you to apply policy packs to a set of stacks in your organization.
 
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] accounts: List of accounts that belong to this policy group.
@@ -175,6 +177,7 @@ class PolicyGroup(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         A Policy Group allows you to apply policy packs to a set of stacks in your organization.
+
 
         :param str resource_name: The name of the resource.
         :param PolicyGroupArgs args: The arguments to use to populate this resource's properties.

@@ -25,6 +25,7 @@ class AgentPoolArgs:
                  force_destroy: Optional[pulumi.Input[_builtins.bool]] = None):
         """
         The set of arguments for constructing a AgentPool resource.
+
         :param pulumi.Input[_builtins.str] name: Name of the agent pool.
         :param pulumi.Input[_builtins.str] organization_name: The organization's name.
         :param pulumi.Input[_builtins.str] description: Description of the agent pool.
@@ -100,6 +101,7 @@ class AgentPool(pulumi.CustomResource):
         """
         Agent Pool for customer managed deployments
 
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] description: Description of the agent pool.
@@ -115,6 +117,7 @@ class AgentPool(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Agent Pool for customer managed deployments
+
 
         :param str resource_name: The name of the resource.
         :param AgentPoolArgs args: The arguments to use to populate this resource's properties.

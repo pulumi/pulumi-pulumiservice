@@ -88,7 +88,7 @@ namespace Pulumi.PulumiService
         /// </summary>
         public readonly ImmutableDictionary<string, object>? ProviderConfig;
         /// <summary>
-        /// Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
+        /// Schedule for automated scanning. Use 'daily' for daily scans, '12h' for scans every twelve hours, or 'none' to disable scheduled scanning. Defaults to 'none'.
         /// </summary>
         public readonly Pulumi.PulumiService.ScanSchedule ScanSchedule;
         /// <summary>

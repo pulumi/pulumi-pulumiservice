@@ -105,7 +105,7 @@ class GetInsightsAccountResult:
     @pulumi.getter(name="scanSchedule")
     def scan_schedule(self) -> 'ScanSchedule':
         """
-        Schedule for automated scanning. Use 'daily' to enable daily scans, or 'none' to disable scheduled scanning. Defaults to 'none'.
+        Schedule for automated scanning. Use 'daily' for daily scans, '12h' for scans every twelve hours, or 'none' to disable scheduled scanning. Defaults to 'none'.
         """
         return pulumi.get(self, "scan_schedule")
 

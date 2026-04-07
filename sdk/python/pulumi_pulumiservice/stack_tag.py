@@ -26,6 +26,7 @@ class StackTagArgs:
                  value: pulumi.Input[_builtins.str]):
         """
         The set of arguments for constructing a StackTag resource.
+
         :param pulumi.Input[_builtins.str] name: Name of the tag. The 'key' part of the key=value pair
         :param pulumi.Input[_builtins.str] organization: Organization name.
         :param pulumi.Input[_builtins.str] project: Project name.
@@ -114,6 +115,7 @@ class StackTag(pulumi.CustomResource):
         """
         Stacks have associated metadata in the form of tags. Each tag consists of a name and value.
 
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] name: Name of the tag. The 'key' part of the key=value pair
@@ -130,6 +132,7 @@ class StackTag(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Stacks have associated metadata in the form of tags. Each tag consists of a name and value.
+
 
         :param str resource_name: The name of the resource.
         :param StackTagArgs args: The arguments to use to populate this resource's properties.
@@ -175,6 +178,8 @@ class StackTag(pulumi.CustomResource):
             if value is None and not opts.urn:
                 raise TypeError("Missing required property 'value'")
             __props__.__dict__["value"] = value
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["name", "organization", "project", "stack", "value"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(StackTag, __self__).__init__(
             'pulumiservice:index:StackTag',
             resource_name,
