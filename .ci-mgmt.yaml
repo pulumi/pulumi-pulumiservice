@@ -27,3 +27,9 @@ useNodejsPackageGenSdk: true
 useGoPackageGenSdk: true
 usePythonPackageGenSdk: true
 useProviderBinarySchemaGen: true
+testProviderCmd: >-
+  cd provider && $(GO_TEST_EXEC) -v -short
+  -coverprofile="coverage.txt"
+  -coverpkg="./...,github.com/hashicorp/terraform-provider-..."
+  -parallel $(TESTPARALLELISM)
+  ./pkg/...
