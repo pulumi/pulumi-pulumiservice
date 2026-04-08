@@ -3,6 +3,7 @@
 ## Unreleased
 
 ### Improvements
+- Added `roleID` field to OIDC Issuer policies for role-based authentication policies
 
 ### Bug Fixes
 - Fixed TeamEnvironmentPermission refresh returning wrong permission when the same environment name exists in multiple projects [#674](https://github.com/pulumi/pulumi-pulumiservice/issues/674)
