@@ -286,6 +286,7 @@ func (k *pulumiserviceProvider) Configure(
 		},
 		&resources.PulumiServicePolicyGroupResource{
 			Client: client,
+			Host:   k.host,
 		},
 	}
 

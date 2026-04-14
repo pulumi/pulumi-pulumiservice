@@ -107,8 +107,9 @@ type stackRef struct {
 }
 
 type policyPackRef struct {
-	name    string
-	version int
+	name       string
+	version    int
+	versionTag string
 }
 
 func newPolicyGroupInput() *policyGroupInputBuilder {
@@ -161,10 +162,14 @@ func (b *policyGroupInputBuilder) build() resource.PropertyMap {
 	// Build policy packs array
 	ppValues := make([]resource.PropertyValue, len(b.policyPacks))
 	for i, pp := range b.policyPacks {
-		ppValues[i] = resource.NewObjectProperty(resource.PropertyMap{
+		ppm := resource.PropertyMap{
 			"name":    resource.NewStringProperty(pp.name),
 			"version": resource.NewNumberProperty(float64(pp.version)),
-		})
+		}
+		if pp.versionTag != "" {
+			ppm["versionTag"] = resource.NewStringProperty(pp.versionTag)
+		}
+		ppValues[i] = resource.NewObjectProperty(ppm)
 	}
 	pm["policyPacks"] = resource.NewArrayProperty(ppValues)
 
@@ -211,7 +216,9 @@ func (b *mockPolicyGroupBuilder) withStacks(stacks ...stackRef) *mockPolicyGroup
 func (b *mockPolicyGroupBuilder) withPolicyPacks(packs ...policyPackRef) *mockPolicyGroupBuilder {
 	b.pg.AppliedPolicyPacks = make([]pulumiapi.PolicyPackMetadata, len(packs))
 	for i, p := range packs {
-		b.pg.AppliedPolicyPacks[i] = pulumiapi.PolicyPackMetadata{Name: p.name, Version: p.version}
+		b.pg.AppliedPolicyPacks[i] = pulumiapi.PolicyPackMetadata{
+			Name: p.name, Version: p.version, VersionTag: p.versionTag,
+		}
 	}
 	return b
 }
@@ -1392,6 +1399,48 @@ func TestPolicyGroup_Update(t *testing.T) {
 		assert.Equal(t, pp1.name, removeReq.RemovePolicyPack.Name)
 		require.NotNil(t, addReq)
 		assert.Equal(t, pp2.name, addReq.AddPolicyPack.Name)
+	})
+
+	// Regression for https://github.com/pulumi/pulumi-pulumiservice/issues/727.
+	// Old state carries the server-normalized numeric Version while new inputs carry the user's
+	// Version. Identity must key off VersionTag, otherwise the provider would remove the existing
+	// pack and re-add it with a stale Version that the server silently drops.
+	t.Run("keeps unchanged pack when server-normalized Version differs from input Version", func(t *testing.T) {
+		existing := policyPackRef{name: "cis-aws", version: 2, versionTag: "1.0.1"}      // server-normalized
+		existingInput := policyPackRef{name: "cis-aws", version: 1, versionTag: "1.0.1"} // user input
+		added := policyPackRef{name: "cis-azure", version: 1, versionTag: "1.0.0"}
+
+		var capturedReqs []pulumiapi.UpdatePolicyGroupRequest
+		provider := PulumiServicePolicyGroupResource{
+			Client: &PolicyGroupClientMock{
+				batchUpdatePolicyGroupFunc: func(_ context.Context, _, _ string, reqs []pulumiapi.UpdatePolicyGroupRequest) error {
+					capturedReqs = reqs
+					return nil
+				},
+				getPolicyGroupFunc: func() (*pulumiapi.PolicyGroup, error) {
+					return newMockPolicyGroup().withPolicyPacks(existing, added).build(), nil
+				},
+			},
+		}
+
+		req := &pulumirpc.UpdateRequest{
+			Id:   testPolicyGroupID,
+			Urn:  testPolicyGroupURN,
+			Olds: newPolicyGroupInput().withPolicyPacks(existing).buildStruct(t),
+			News: newPolicyGroupInput().withPolicyPacks(existingInput, added).buildStruct(t),
+		}
+
+		resp, err := provider.Update(req)
+		require.NoError(t, err)
+		require.NotNil(t, resp)
+
+		for _, r := range capturedReqs {
+			require.Nil(t, r.RemovePolicyPack, "must not remove a pack whose VersionTag is unchanged")
+		}
+		require.Len(t, capturedReqs, 1)
+		require.NotNil(t, capturedReqs[0].AddPolicyPack)
+		assert.Equal(t, added.name, capturedReqs[0].AddPolicyPack.Name)
+		assert.Equal(t, added.versionTag, capturedReqs[0].AddPolicyPack.VersionTag)
 	})
 
 	t.Run("adds accounts", func(t *testing.T) {

@@ -6,6 +6,7 @@
 
 ### Bug Fixes
 - Fixed TeamEnvironmentPermission refresh returning wrong permission when the same environment name exists in multiple projects [#674](https://github.com/pulumi/pulumi-pulumiservice/issues/674)
+- Fixed PolicyGroup losing previously-applied policy packs when adding more packs, caused by using the server-normalized numeric version as pack identity [#727](https://github.com/pulumi/pulumi-pulumiservice/issues/727)
 
 ## 0.35.0
 

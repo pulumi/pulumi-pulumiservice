@@ -24,6 +24,8 @@ import (
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/structpb"
 
+	"github.com/pulumi/pulumi/pkg/v3/resource/provider"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/diag"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/util/rpcutil/rpcerror"
@@ -35,6 +37,7 @@ import (
 
 type PulumiServicePolicyGroupResource struct {
 	Client pulumiapi.PolicyGroupClient
+	Host   *provider.HostClient
 }
 
 type PulumiServicePolicyGroupInput struct {
@@ -250,12 +253,47 @@ func (p *PulumiServicePolicyGroupResource) Check(req *pulumirpc.CheckRequest) (*
 		}
 	}
 
+	p.warnIfPolicyPackVersionSet(newsMap, req.GetUrn())
+
 	inputs, err := plugin.MarshalProperties(newsMap, plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
 	}
 
 	return &pulumirpc.CheckResponse{Inputs: inputs, Failures: failures}, nil
+}
+
+// warnIfPolicyPackVersionSet emits a warning when the user sets the server-derived `version` field
+// on any policy pack. The numeric `version` is normalized by Pulumi Cloud based on `versionTag`,
+// so user input is ignored or silently overridden. Tracked for schema removal in a follow-up issue.
+func (p *PulumiServicePolicyGroupResource) warnIfPolicyPackVersionSet(news resource.PropertyMap, urn string) {
+	if p.Host == nil {
+		return
+	}
+	packs, ok := news["policyPacks"]
+	if !ok || !packs.IsArray() {
+		return
+	}
+	for _, item := range packs.ArrayValue() {
+		if !item.IsObject() {
+			continue
+		}
+		obj := item.ObjectValue()
+		v, has := obj["version"]
+		if !has || !v.HasValue() {
+			continue
+		}
+		name := ""
+		if n, ok := obj["name"]; ok && n.IsString() {
+			name = n.StringValue()
+		}
+		msg := fmt.Sprintf(
+			"PolicyGroup policy pack %q: the numeric `version` field is server-derived from "+
+				"`versionTag` and will be ignored. Specify only `name` and `versionTag`.",
+			name,
+		)
+		_ = p.Host.Log(context.Background(), diag.Warning, resource.URN(urn), msg)
+	}
 }
 
 func (p *PulumiServicePolicyGroupResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
@@ -653,10 +691,10 @@ func comparePolicyPacks(i, j pulumiapi.PolicyPackMetadata) int {
 	if i.Name > j.Name {
 		return 1
 	}
-	if i.Version < j.Version {
+	if i.VersionTag < j.VersionTag {
 		return -1
 	}
-	if i.Version > j.Version {
+	if i.VersionTag > j.VersionTag {
 		return 1
 	}
 	return 0
@@ -666,9 +704,13 @@ func policyPacksEq(x, y pulumiapi.PolicyPackMetadata) bool {
 	return x.Name == y.Name && x.Version == y.Version && x.VersionTag == y.VersionTag
 }
 
+// containsPolicyPack checks membership by Name + VersionTag. The numeric Version field is
+// server-owned (normalized to the current published version), so it cannot be used as identity:
+// state carries the server's Version while user inputs carry the user's Version, and comparing
+// them would cause spurious remove+add pairs whose add silently fails server-side.
 func containsPolicyPack(packs []pulumiapi.PolicyPackMetadata, target pulumiapi.PolicyPackMetadata) bool {
 	for _, pp := range packs {
-		if pp.Name == target.Name && pp.Version == target.Version {
+		if pp.Name == target.Name && pp.VersionTag == target.VersionTag {
 			return true
 		}
 	}
