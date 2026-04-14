@@ -250,6 +250,11 @@ func (p *PulumiServicePolicyGroupResource) Check(req *pulumirpc.CheckRequest) (*
 		}
 	}
 
+	// The numeric `version` on policy packs is server-derived from `versionTag`
+	// and is output-only. Strip it from inputs so legacy programs that still set
+	// it upgrade cleanly without spurious diffs.
+	stripPolicyPackVersion(newsMap)
+
 	inputs, err := plugin.MarshalProperties(newsMap, plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
@@ -653,26 +658,47 @@ func comparePolicyPacks(i, j pulumiapi.PolicyPackMetadata) int {
 	if i.Name > j.Name {
 		return 1
 	}
-	if i.Version < j.Version {
+	if i.VersionTag < j.VersionTag {
 		return -1
 	}
-	if i.Version > j.Version {
+	if i.VersionTag > j.VersionTag {
 		return 1
 	}
 	return 0
 }
 
 func policyPacksEq(x, y pulumiapi.PolicyPackMetadata) bool {
-	return x.Name == y.Name && x.Version == y.Version && x.VersionTag == y.VersionTag
+	return x.Name == y.Name && x.VersionTag == y.VersionTag
 }
 
 func containsPolicyPack(packs []pulumiapi.PolicyPackMetadata, target pulumiapi.PolicyPackMetadata) bool {
 	for _, pp := range packs {
-		if pp.Name == target.Name && pp.Version == target.Version {
+		if pp.Name == target.Name && pp.VersionTag == target.VersionTag {
 			return true
 		}
 	}
 	return false
+}
+
+// stripPolicyPackVersion removes the server-derived `version` field from each
+// policy pack in the given inputs map. See Check for rationale.
+func stripPolicyPackVersion(news resource.PropertyMap) {
+	packs, ok := news["policyPacks"]
+	if !ok || !packs.IsArray() {
+		return
+	}
+	items := packs.ArrayValue()
+	for i, item := range items {
+		if !item.IsObject() {
+			continue
+		}
+		obj := item.ObjectValue()
+		if _, has := obj["version"]; has {
+			delete(obj, "version")
+			items[i] = resource.NewObjectProperty(obj)
+		}
+	}
+	news["policyPacks"] = resource.NewArrayProperty(items)
 }
 
 // parsePreviousAccounts extracts the accounts from previous state and inputs.

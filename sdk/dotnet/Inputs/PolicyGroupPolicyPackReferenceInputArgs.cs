@@ -11,9 +11,9 @@ namespace Pulumi.PulumiService.Inputs
 {
 
     /// <summary>
-    /// A reference to a policy pack within a policy group.
+    /// A reference to a policy pack within a policy group (input).
     /// </summary>
-    public sealed class PolicyGroupPolicyPackReferenceArgs : global::Pulumi.ResourceArgs
+    public sealed class PolicyGroupPolicyPackReferenceInputArgs : global::Pulumi.ResourceArgs
     {
         [Input("config")]
         private InputMap<object>? _config;
@@ -40,20 +40,14 @@ namespace Pulumi.PulumiService.Inputs
         public Input<string> Name { get; set; } = null!;
 
         /// <summary>
-        /// The version of the policy pack.
-        /// </summary>
-        [Input("version")]
-        public Input<double>? Version { get; set; }
-
-        /// <summary>
         /// The version tag of the policy pack.
         /// </summary>
         [Input("versionTag")]
         public Input<string>? VersionTag { get; set; }
 
-        public PolicyGroupPolicyPackReferenceArgs()
+        public PolicyGroupPolicyPackReferenceInputArgs()
         {
         }
-        public static new PolicyGroupPolicyPackReferenceArgs Empty => new PolicyGroupPolicyPackReferenceArgs();
+        public static new PolicyGroupPolicyPackReferenceInputArgs Empty => new PolicyGroupPolicyPackReferenceInputArgs();
     }
 }

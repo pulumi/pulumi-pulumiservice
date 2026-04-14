@@ -395,9 +395,9 @@ export interface OperationContextOptionsArgs {
 }
 
 /**
- * A reference to a policy pack within a policy group.
+ * A reference to a policy pack within a policy group (input).
  */
-export interface PolicyGroupPolicyPackReferenceArgs {
+export interface PolicyGroupPolicyPackReferenceInputArgs {
     /**
      * Optional configuration for the policy pack.
      */
@@ -410,10 +410,6 @@ export interface PolicyGroupPolicyPackReferenceArgs {
      * The name of the policy pack.
      */
     name: pulumi.Input<string>;
-    /**
-     * The version of the policy pack.
-     */
-    version?: pulumi.Input<number>;
     /**
      * The version tag of the policy pack.
      */

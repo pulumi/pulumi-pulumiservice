@@ -708,7 +708,35 @@
         },
         "version": {
           "type": "number",
-          "description": "The version of the policy pack."
+          "description": "The server-derived numeric version of the policy pack. This is output-only; use `versionTag` to pin a specific version."
+        },
+        "versionTag": {
+          "type": "string",
+          "description": "The version tag of the policy pack."
+        }
+      },
+      "type": "object",
+      "required": [
+        "name"
+      ]
+    },
+    "pulumiservice:index:PolicyGroupPolicyPackReferenceInput": {
+      "description": "A reference to a policy pack within a policy group (input).",
+      "properties": {
+        "config": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "Optional configuration for the policy pack."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The display name of the policy pack."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the policy pack."
         },
         "versionTag": {
           "type": "string",
@@ -2004,7 +2032,7 @@
         "policyPacks": {
           "type": "array",
           "items": {
-            "$ref": "#/types/pulumiservice:index:PolicyGroupPolicyPackReference"
+            "$ref": "#/types/pulumiservice:index:PolicyGroupPolicyPackReferenceInput"
           },
           "description": "List of policy packs applied to this policy group."
         },

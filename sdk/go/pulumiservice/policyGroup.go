@@ -95,7 +95,7 @@ type policyGroupArgs struct {
 	// The name of the Pulumi organization the policy group belongs to.
 	OrganizationName string `pulumi:"organizationName"`
 	// List of policy packs applied to this policy group.
-	PolicyPacks []PolicyGroupPolicyPackReference `pulumi:"policyPacks"`
+	PolicyPacks []PolicyGroupPolicyPackReferenceInputType `pulumi:"policyPacks"`
 	// List of stack references that belong to this policy group.
 	Stacks []PolicyGroupStackReference `pulumi:"stacks"`
 }
@@ -113,7 +113,7 @@ type PolicyGroupArgs struct {
 	// The name of the Pulumi organization the policy group belongs to.
 	OrganizationName pulumi.StringInput
 	// List of policy packs applied to this policy group.
-	PolicyPacks PolicyGroupPolicyPackReferenceArrayInput
+	PolicyPacks PolicyGroupPolicyPackReferenceInputTypeArrayInput
 	// List of stack references that belong to this policy group.
 	Stacks PolicyGroupStackReferenceArrayInput
 }

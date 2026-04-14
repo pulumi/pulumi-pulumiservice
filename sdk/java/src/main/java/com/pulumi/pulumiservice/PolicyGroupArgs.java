@@ -7,7 +7,7 @@ import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
-import com.pulumi.pulumiservice.inputs.PolicyGroupPolicyPackReferenceArgs;
+import com.pulumi.pulumiservice.inputs.PolicyGroupPolicyPackReferenceInputArgs;
 import com.pulumi.pulumiservice.inputs.PolicyGroupStackReferenceArgs;
 import java.lang.String;
 import java.util.List;
@@ -100,13 +100,13 @@ public final class PolicyGroupArgs extends com.pulumi.resources.ResourceArgs {
      * 
      */
     @Import(name="policyPacks")
-    private @Nullable Output<List<PolicyGroupPolicyPackReferenceArgs>> policyPacks;
+    private @Nullable Output<List<PolicyGroupPolicyPackReferenceInputArgs>> policyPacks;
 
     /**
      * @return List of policy packs applied to this policy group.
      * 
      */
-    public Optional<Output<List<PolicyGroupPolicyPackReferenceArgs>>> policyPacks() {
+    public Optional<Output<List<PolicyGroupPolicyPackReferenceInputArgs>>> policyPacks() {
         return Optional.ofNullable(this.policyPacks);
     }
 
@@ -276,7 +276,7 @@ public final class PolicyGroupArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder policyPacks(@Nullable Output<List<PolicyGroupPolicyPackReferenceArgs>> policyPacks) {
+        public Builder policyPacks(@Nullable Output<List<PolicyGroupPolicyPackReferenceInputArgs>> policyPacks) {
             $.policyPacks = policyPacks;
             return this;
         }
@@ -287,7 +287,7 @@ public final class PolicyGroupArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder policyPacks(List<PolicyGroupPolicyPackReferenceArgs> policyPacks) {
+        public Builder policyPacks(List<PolicyGroupPolicyPackReferenceInputArgs> policyPacks) {
             return policyPacks(Output.of(policyPacks));
         }
 
@@ -297,7 +297,7 @@ public final class PolicyGroupArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder policyPacks(PolicyGroupPolicyPackReferenceArgs... policyPacks) {
+        public Builder policyPacks(PolicyGroupPolicyPackReferenceInputArgs... policyPacks) {
             return policyPacks(List.of(policyPacks));
         }
 

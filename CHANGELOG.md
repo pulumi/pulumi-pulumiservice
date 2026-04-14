@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Breaking Changes
+- Removed the numeric `version` field from `PolicyGroup.policyPacks` inputs; it is now output-only, since the value is server-derived from `versionTag`. Use `versionTag` to pin pack versions. [#737](https://github.com/pulumi/pulumi-pulumiservice/issues/737)
+
 ### Improvements
 
 ### Bug Fixes

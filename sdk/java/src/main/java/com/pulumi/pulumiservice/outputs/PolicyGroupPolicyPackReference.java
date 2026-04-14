@@ -31,7 +31,7 @@ public final class PolicyGroupPolicyPackReference {
      */
     private String name;
     /**
-     * @return The version of the policy pack.
+     * @return The server-derived numeric version of the policy pack. This is output-only; use `versionTag` to pin a specific version.
      * 
      */
     private @Nullable Double version;
@@ -64,7 +64,7 @@ public final class PolicyGroupPolicyPackReference {
         return this.name;
     }
     /**
-     * @return The version of the policy pack.
+     * @return The server-derived numeric version of the policy pack. This is output-only; use `versionTag` to pin a specific version.
      * 
      */
     public Optional<Double> version() {
