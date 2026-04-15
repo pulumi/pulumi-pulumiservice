@@ -6,7 +6,6 @@ package com.pulumi.pulumiservice.inputs;
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
-import java.lang.Double;
 import java.lang.Object;
 import java.lang.String;
 import java.util.Map;
@@ -16,12 +15,12 @@ import javax.annotation.Nullable;
 
 
 /**
- * A reference to a policy pack within a policy group.
+ * A reference to a policy pack within a policy group (input).
  * 
  */
-public final class PolicyGroupPolicyPackReferenceArgs extends com.pulumi.resources.ResourceArgs {
+public final class PolicyGroupPolicyPackReferenceInputArgs extends com.pulumi.resources.ResourceArgs {
 
-    public static final PolicyGroupPolicyPackReferenceArgs Empty = new PolicyGroupPolicyPackReferenceArgs();
+    public static final PolicyGroupPolicyPackReferenceInputArgs Empty = new PolicyGroupPolicyPackReferenceInputArgs();
 
     /**
      * Optional configuration for the policy pack.
@@ -69,21 +68,6 @@ public final class PolicyGroupPolicyPackReferenceArgs extends com.pulumi.resourc
     }
 
     /**
-     * The version of the policy pack.
-     * 
-     */
-    @Import(name="version")
-    private @Nullable Output<Double> version;
-
-    /**
-     * @return The version of the policy pack.
-     * 
-     */
-    public Optional<Output<Double>> version() {
-        return Optional.ofNullable(this.version);
-    }
-
-    /**
      * The version tag of the policy pack.
      * 
      */
@@ -98,32 +82,31 @@ public final class PolicyGroupPolicyPackReferenceArgs extends com.pulumi.resourc
         return Optional.ofNullable(this.versionTag);
     }
 
-    private PolicyGroupPolicyPackReferenceArgs() {}
+    private PolicyGroupPolicyPackReferenceInputArgs() {}
 
-    private PolicyGroupPolicyPackReferenceArgs(PolicyGroupPolicyPackReferenceArgs $) {
+    private PolicyGroupPolicyPackReferenceInputArgs(PolicyGroupPolicyPackReferenceInputArgs $) {
         this.config = $.config;
         this.displayName = $.displayName;
         this.name = $.name;
-        this.version = $.version;
         this.versionTag = $.versionTag;
     }
 
     public static Builder builder() {
         return new Builder();
     }
-    public static Builder builder(PolicyGroupPolicyPackReferenceArgs defaults) {
+    public static Builder builder(PolicyGroupPolicyPackReferenceInputArgs defaults) {
         return new Builder(defaults);
     }
 
     public static final class Builder {
-        private PolicyGroupPolicyPackReferenceArgs $;
+        private PolicyGroupPolicyPackReferenceInputArgs $;
 
         public Builder() {
-            $ = new PolicyGroupPolicyPackReferenceArgs();
+            $ = new PolicyGroupPolicyPackReferenceInputArgs();
         }
 
-        public Builder(PolicyGroupPolicyPackReferenceArgs defaults) {
-            $ = new PolicyGroupPolicyPackReferenceArgs(Objects.requireNonNull(defaults));
+        public Builder(PolicyGroupPolicyPackReferenceInputArgs defaults) {
+            $ = new PolicyGroupPolicyPackReferenceInputArgs(Objects.requireNonNull(defaults));
         }
 
         /**
@@ -190,27 +173,6 @@ public final class PolicyGroupPolicyPackReferenceArgs extends com.pulumi.resourc
         }
 
         /**
-         * @param version The version of the policy pack.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder version(@Nullable Output<Double> version) {
-            $.version = version;
-            return this;
-        }
-
-        /**
-         * @param version The version of the policy pack.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder version(Double version) {
-            return version(Output.of(version));
-        }
-
-        /**
          * @param versionTag The version tag of the policy pack.
          * 
          * @return builder
@@ -231,9 +193,9 @@ public final class PolicyGroupPolicyPackReferenceArgs extends com.pulumi.resourc
             return versionTag(Output.of(versionTag));
         }
 
-        public PolicyGroupPolicyPackReferenceArgs build() {
+        public PolicyGroupPolicyPackReferenceInputArgs build() {
             if ($.name == null) {
-                throw new MissingRequiredPropertyException("PolicyGroupPolicyPackReferenceArgs", "name");
+                throw new MissingRequiredPropertyException("PolicyGroupPolicyPackReferenceInputArgs", "name");
             }
             return $;
         }

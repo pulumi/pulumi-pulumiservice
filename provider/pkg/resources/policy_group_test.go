@@ -107,8 +107,9 @@ type stackRef struct {
 }
 
 type policyPackRef struct {
-	name    string
-	version int
+	name       string
+	version    int
+	versionTag string
 }
 
 func newPolicyGroupInput() *policyGroupInputBuilder {
@@ -158,12 +159,13 @@ func (b *policyGroupInputBuilder) build() resource.PropertyMap {
 	}
 	pm["stacks"] = resource.NewArrayProperty(stackValues)
 
-	// Build policy packs array
+	// Build policy packs array. `version` is intentionally omitted from inputs:
+	// it is server-derived and output-only.
 	ppValues := make([]resource.PropertyValue, len(b.policyPacks))
 	for i, pp := range b.policyPacks {
 		ppValues[i] = resource.NewObjectProperty(resource.PropertyMap{
-			"name":    resource.NewStringProperty(pp.name),
-			"version": resource.NewNumberProperty(float64(pp.version)),
+			"name":       resource.NewStringProperty(pp.name),
+			"versionTag": resource.NewStringProperty(pp.versionTag),
 		})
 	}
 	pm["policyPacks"] = resource.NewArrayProperty(ppValues)
@@ -211,7 +213,7 @@ func (b *mockPolicyGroupBuilder) withStacks(stacks ...stackRef) *mockPolicyGroup
 func (b *mockPolicyGroupBuilder) withPolicyPacks(packs ...policyPackRef) *mockPolicyGroupBuilder {
 	b.pg.AppliedPolicyPacks = make([]pulumiapi.PolicyPackMetadata, len(packs))
 	for i, p := range packs {
-		b.pg.AppliedPolicyPacks[i] = pulumiapi.PolicyPackMetadata{Name: p.name, Version: p.version}
+		b.pg.AppliedPolicyPacks[i] = pulumiapi.PolicyPackMetadata{Name: p.name, Version: p.version, VersionTag: p.versionTag}
 	}
 	return b
 }
@@ -267,6 +269,50 @@ func TestPolicyGroup_Check_Defaults(t *testing.T) {
 
 	assert.True(t, outputMap["mode"].HasValue(), "mode should have a value")
 	assert.Equal(t, "audit", outputMap["mode"].StringValue(), "mode should default to 'audit'")
+}
+
+// TestPolicyGroup_Check_StripsPolicyPackVersion verifies that the server-derived
+// `version` field is stripped from policy pack inputs during Check, so legacy
+// programs (or stacks with old state) that still supply it upgrade cleanly.
+func TestPolicyGroup_Check_StripsPolicyPackVersion(t *testing.T) {
+	provider := PulumiServicePolicyGroupResource{
+		Client: &PolicyGroupClientMock{},
+	}
+
+	inputs := resource.PropertyMap{
+		"name":             resource.NewStringProperty("test-policy-group"),
+		"organizationName": resource.NewStringProperty("test-org"),
+		"policyPacks": resource.NewArrayProperty([]resource.PropertyValue{
+			resource.NewObjectProperty(resource.PropertyMap{
+				"name":       resource.NewStringProperty("pp1"),
+				"version":    resource.NewNumberProperty(5),
+				"versionTag": resource.NewStringProperty("1.0.0"),
+			}),
+		}),
+	}
+
+	inputsStruct, err := structpb.NewStruct(inputs.Mappable())
+	require.NoError(t, err)
+
+	resp, err := provider.Check(&pulumirpc.CheckRequest{
+		Urn:  "urn:pulumi:dev::test::pulumiservice:index:PolicyGroup::testPolicyGroup",
+		News: inputsStruct,
+	})
+	require.NoError(t, err)
+	require.Empty(t, resp.Failures)
+
+	outputMap := resource.PropertyMap{}
+	for k, v := range resp.Inputs.GetFields() {
+		outputMap[resource.PropertyKey(k)] = resource.NewPropertyValue(v.AsInterface())
+	}
+
+	packs := outputMap["policyPacks"].ArrayValue()
+	require.Len(t, packs, 1)
+	pp := packs[0].ObjectValue()
+	_, hasVersion := pp["version"]
+	assert.False(t, hasVersion, "version should be stripped from policy pack inputs")
+	assert.Equal(t, "pp1", pp["name"].StringValue())
+	assert.Equal(t, "1.0.0", pp["versionTag"].StringValue())
 }
 
 // TestPolicyGroup_Check_ExplicitValues tests that Check preserves explicit entityType and mode values
@@ -1037,7 +1083,7 @@ func TestParsePreviousAccounts(t *testing.T) {
 func TestPolicyGroup_Create(t *testing.T) {
 	stack1 := stackRef{name: "stack-1", project: "project-1"}
 	stack2 := stackRef{name: "stack-2", project: "project-2"}
-	pp1 := policyPackRef{name: "policy-pack-1", version: 1}
+	pp1 := policyPackRef{name: "policy-pack-1", version: 1, versionTag: "1.0.0"}
 	account1 := "account-1"
 	account2 := "account-2"
 
@@ -1282,8 +1328,8 @@ func TestPolicyGroup_Create(t *testing.T) {
 func TestPolicyGroup_Update(t *testing.T) {
 	stack1 := stackRef{name: "stack-1", project: "project-1"}
 	stack2 := stackRef{name: "stack-2", project: "project-2"}
-	pp1 := policyPackRef{name: "policy-pack-1", version: 1}
-	pp2 := policyPackRef{name: "policy-pack-2", version: 1}
+	pp1 := policyPackRef{name: "policy-pack-1", version: 1, versionTag: "1.0.0"}
+	pp2 := policyPackRef{name: "policy-pack-2", version: 1, versionTag: "1.0.0"}
 	account1 := "account-1"
 	account2 := "account-2"
 	parentAccount := "parent-account"

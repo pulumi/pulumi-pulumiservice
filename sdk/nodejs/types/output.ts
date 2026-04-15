@@ -459,7 +459,7 @@ export interface PolicyGroupPolicyPackReference {
      */
     name: string;
     /**
-     * The version of the policy pack.
+     * The server-derived numeric version of the policy pack. This is output-only; use `versionTag` to pin a specific version.
      */
     version?: number;
     /**

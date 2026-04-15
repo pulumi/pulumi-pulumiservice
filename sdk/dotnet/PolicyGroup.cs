@@ -139,14 +139,14 @@ namespace Pulumi.PulumiService
         public Input<string> OrganizationName { get; set; } = null!;
 
         [Input("policyPacks")]
-        private InputList<Inputs.PolicyGroupPolicyPackReferenceArgs>? _policyPacks;
+        private InputList<Inputs.PolicyGroupPolicyPackReferenceInputArgs>? _policyPacks;
 
         /// <summary>
         /// List of policy packs applied to this policy group.
         /// </summary>
-        public InputList<Inputs.PolicyGroupPolicyPackReferenceArgs> PolicyPacks
+        public InputList<Inputs.PolicyGroupPolicyPackReferenceInputArgs> PolicyPacks
         {
-            get => _policyPacks ?? (_policyPacks = new InputList<Inputs.PolicyGroupPolicyPackReferenceArgs>());
+            get => _policyPacks ?? (_policyPacks = new InputList<Inputs.PolicyGroupPolicyPackReferenceInputArgs>());
             set => _policyPacks = value;
         }
 

@@ -131,7 +131,7 @@ export interface PolicyGroupArgs {
     /**
      * List of policy packs applied to this policy group.
      */
-    policyPacks?: pulumi.Input<pulumi.Input<inputs.PolicyGroupPolicyPackReferenceArgs>[]>;
+    policyPacks?: pulumi.Input<pulumi.Input<inputs.PolicyGroupPolicyPackReferenceInputArgs>[]>;
     /**
      * List of stack references that belong to this policy group.
      */
