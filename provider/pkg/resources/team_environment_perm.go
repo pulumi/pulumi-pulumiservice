@@ -47,27 +47,38 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Name() string {
 func (tp *PulumiServiceTeamEnvironmentPermissionResource) Check(
 	req *pulumirpc.CheckRequest,
 ) (*pulumirpc.CheckResponse, error) {
-	var input TeamEnvironmentPermissionInput
-	err := util.FromProperties(req.GetNews(), &input)
+	// Work on the property map directly so we only touch fields the user
+	// actually supplied. Re-serializing the input struct would emit every
+	// tagged field (including empty strings), which introduces spurious
+	// diffs for optional fields that weren't present in state written by
+	// older provider versions.
+	news, err := plugin.UnmarshalProperties(req.GetNews(), util.StandardUnmarshal)
 	if err != nil {
 		return nil, err
 	}
 
 	var failures []*pulumirpc.CheckFailure
-	if input.MaxOpenDuration != "" {
-		d, err := time.ParseDuration(input.MaxOpenDuration)
-		if err != nil {
-			failures = append(failures, &pulumirpc.CheckFailure{
-				Property: "maxOpenDuration",
-				Reason:   fmt.Sprintf("malformed duration: %v", err),
-			})
+	if prop, ok := news["maxOpenDuration"]; ok && prop.IsString() {
+		raw := prop.StringValue()
+		if raw == "" {
+			// Treat an explicit empty string as "unset" to stay consistent
+			// with state saved before this field existed.
+			delete(news, "maxOpenDuration")
 		} else {
-			// Normalize the duration to prevent spurious diffs.
-			input.MaxOpenDuration = d.String()
+			d, err := time.ParseDuration(raw)
+			if err != nil {
+				failures = append(failures, &pulumirpc.CheckFailure{
+					Property: "maxOpenDuration",
+					Reason:   fmt.Sprintf("malformed duration: %v", err),
+				})
+			} else if normalized := d.String(); normalized != raw {
+				// Normalize the duration to prevent spurious diffs.
+				news["maxOpenDuration"] = resource.NewStringProperty(normalized)
+			}
 		}
 	}
 
-	inputs, err := util.ToProperties(input)
+	inputs, err := plugin.MarshalProperties(news, util.StandardMarshal)
 	if err != nil {
 		return nil, err
 	}
@@ -101,21 +112,26 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Read(
 		return &pulumirpc.ReadResponse{}, nil
 	}
 
-	var maxOpenDurationStr string
-	if maxOpenDuration != nil {
-		maxOpenDurationStr = (time.Duration)(*maxOpenDuration).String()
-	}
-
 	inputs := TeamEnvironmentPermissionInput{
-		Organization:    permID.Organization,
-		Team:            permID.Team,
-		Project:         permID.Project,
-		Environment:     permID.Environment,
-		Permission:      *permission,
-		MaxOpenDuration: maxOpenDurationStr,
+		Organization: permID.Organization,
+		Team:         permID.Team,
+		Project:      permID.Project,
+		Environment:  permID.Environment,
+		Permission:   *permission,
+	}
+	if maxOpenDuration != nil {
+		inputs.MaxOpenDuration = (time.Duration)(*maxOpenDuration).String()
 	}
 
-	properties, err := plugin.MarshalProperties(inputs.ToPropertyMap(), plugin.MarshalOptions{})
+	// Omit maxOpenDuration when it wasn't set on the remote resource; emitting
+	// an empty string would cause a spurious replacement on the next update
+	// against state written by providers that didn't have this field.
+	propertyMap := inputs.ToPropertyMap()
+	if inputs.MaxOpenDuration == "" {
+		delete(propertyMap, "maxOpenDuration")
+	}
+
+	properties, err := plugin.MarshalProperties(propertyMap, plugin.MarshalOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal inputs to properties: %w", err)
 	}
