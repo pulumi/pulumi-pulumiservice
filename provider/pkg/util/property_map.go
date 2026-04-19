@@ -14,6 +14,11 @@ const structTagName = "pulumi"
 // ToPropertyMap marshals a struct into a resource.PropertyMap. It obtains the
 // resource.PropertyKey() values for each struct field by grabbing value of the
 // structTagName.
+//
+// Map fields are only supported when typed as map[string]string; fields typed
+// with any other key or value kind are emitted as a null property. Use
+// FromPropertyMap to decode a map[string]string field; unsupported map types
+// return an error there.
 func ToPropertyMap(obj any) resource.PropertyMap {
 	v := reflect.ValueOf(obj)
 	kind := v.Kind()
@@ -102,6 +107,16 @@ func get(v reflect.Value) interface{} {
 			return get(v.Elem())
 		}
 		return nil
+	case reflect.Map:
+		// Handle map[string]string
+		if v.Type().Key().Kind() == reflect.String && v.Type().Elem().Kind() == reflect.String {
+			result := make(map[string]string, v.Len())
+			for _, key := range v.MapKeys() {
+				result[key.String()] = v.MapIndex(key).String()
+			}
+			return result
+		}
+		return nil
 	default:
 		return nil
 	}
@@ -119,7 +134,11 @@ func set(v reflect.Value, value interface{}) error {
 		fv := valueValue.Float()
 		floatValue = &fv
 	} else if v.Kind() != valueKind {
-		return fmt.Errorf("field type %q does not match property %q", v.Kind(), valueKind)
+		// Allow map-to-map assignment even when concrete element types differ
+		// (e.g. map[string]string target vs. map[string]interface{} source).
+		if v.Kind() != reflect.Map || valueKind != reflect.Map {
+			return fmt.Errorf("field type %q does not match property %q", v.Kind(), valueKind)
+		}
 	}
 	switch v.Kind() {
 	case reflect.String:
@@ -137,6 +156,23 @@ func set(v reflect.Value, value interface{}) error {
 		v.Set(reflect.New(v.Type().Elem()))
 		// call set again, but with deref'd value. note that this will recurse down for ptr to ptr's (and so on)
 		return set(v.Elem(), value)
+	case reflect.Map:
+		if v.Type().Key().Kind() != reflect.String || v.Type().Elem().Kind() != reflect.String {
+			return fmt.Errorf("unsupported map type %s: only map[string]string is supported", v.Type())
+		}
+		pm, ok := value.(resource.PropertyMap)
+		if !ok {
+			return fmt.Errorf("expected resource.PropertyMap, got %T", value)
+		}
+		// Always start from a fresh map so keys that are absent from `value`
+		// don't linger from a prior decode into the same struct.
+		v.Set(reflect.MakeMapWithSize(v.Type(), len(pm)))
+		for k, pv := range pm {
+			if !pv.IsString() {
+				return fmt.Errorf("expected string value for key %q, got %T", string(k), pv.V)
+			}
+			v.SetMapIndex(reflect.ValueOf(string(k)), reflect.ValueOf(pv.StringValue()))
+		}
 	}
 	return nil
 }

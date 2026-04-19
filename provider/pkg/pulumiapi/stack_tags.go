@@ -31,7 +31,7 @@ func NewStackIdentifier(id string) (StackIdentifier, error) {
 }
 
 type StackTagClient interface {
-	CreateTag(ctx context.Context, stack StackIdentifier, tag StackTag) error
+	CreateStackTag(ctx context.Context, stack StackIdentifier, tag StackTag) error
 	GetStackTag(ctx context.Context, stackName StackIdentifier, tagName string) (*StackTag, error)
 	DeleteStackTag(ctx context.Context, stackName StackIdentifier, tagName string) error
 }
@@ -46,7 +46,7 @@ type stack struct {
 	Tags map[string]string `json:"tags"`
 }
 
-func (c *Client) CreateTag(ctx context.Context, stack StackIdentifier, tag StackTag) error {
+func (c *Client) CreateStackTag(ctx context.Context, stack StackIdentifier, tag StackTag) error {
 	apiPath := path.Join("stacks", stack.OrgName, stack.ProjectName, stack.StackName, "tags")
 	_, err := c.do(ctx, http.MethodPost, apiPath, tag, nil)
 	if err != nil {
@@ -56,13 +56,11 @@ func (c *Client) CreateTag(ctx context.Context, stack StackIdentifier, tag Stack
 }
 
 func (c *Client) GetStackTag(ctx context.Context, stackName StackIdentifier, tagName string) (*StackTag, error) {
-	apiPath := path.Join("stacks", stackName.OrgName, stackName.ProjectName, stackName.StackName)
-	var s stack
-	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &s)
+	tags, err := c.GetStackTags(ctx, stackName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get stack tag: %w", err)
 	}
-	tagValue, ok := s.Tags[tagName]
+	tagValue, ok := tags[tagName]
 	if !ok {
 		return nil, nil
 	}
@@ -81,4 +79,18 @@ func (c *Client) DeleteStackTag(ctx context.Context, stackName StackIdentifier, 
 		return fmt.Errorf("failed to make request: %w", err)
 	}
 	return nil
+}
+
+// GetStackTags retrieves all tags for a stack
+func (c *Client) GetStackTags(ctx context.Context, stackName StackIdentifier) (map[string]string, error) {
+	apiPath := path.Join("stacks", stackName.OrgName, stackName.ProjectName, stackName.StackName)
+	var s stack
+	_, err := c.do(ctx, http.MethodGet, apiPath, nil, &s)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get stack tags: %w", err)
+	}
+	if s.Tags == nil {
+		return make(map[string]string), nil
+	}
+	return s.Tags, nil
 }

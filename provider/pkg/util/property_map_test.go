@@ -88,4 +88,19 @@ func TestFromPropertyMap(t *testing.T) {
 		assert.Equal(t, want, got)
 	})
 
+	t.Run("Replaces map fields rather than merging into existing values", func(t *testing.T) {
+		type B struct {
+			Tags map[string]string `pulumi:"tags"`
+		}
+		// A struct that already has a populated map — the incoming property
+		// map has a smaller set of keys. Decoding must not leave the stale
+		// "kept" key behind.
+		got := B{Tags: map[string]string{"kept": "old", "removed": "old"}}
+		propertyMap := resource.PropertyMap{
+			"tags": resource.NewPropertyValue(map[string]any{"kept": "new"}),
+		}
+		err := FromPropertyMap(propertyMap, &got)
+		assert.NoError(t, err)
+		assert.Equal(t, map[string]string{"kept": "new"}, got.Tags)
+	})
 }
