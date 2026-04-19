@@ -5,7 +5,19 @@ import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "./utilities";
 
 /**
- * Manages multiple stack tags as a single resource. Each tag consists of a name and value pair defined in the tags map.
+ * `StackTags` manages a set of stack tags as a single resource. Tags are supplied as a map and are created, updated, and deleted together.
+ *
+ * This is especially convenient for YAML programs, where a single resource can declare many tags rather than needing one `StackTag` resource per key.
+ *
+ * The resource tracks the set of tags it manages in state; tags added to the stack outside this resource (e.g. via the CLI, pulumibot, or a singular `StackTag` resource) are left alone. Because the Pulumi Cloud tag API is immutable per key, changing a tag value is implemented as delete-and-recreate.
+ *
+ * ### Import
+ *
+ * Importing with an ID of `{organization}/{project}/{stack}/tags` adopts **every** tag currently on the stack into this resource's managed set. After import, explicitly declare the `tags` map in your program so subsequent updates match your intent.
+ *
+ * ```sh
+ * $ pulumi import pulumiservice:index:StackTags mytags my-org/my-project/my-stack/tags
+ * ```
  */
 export class StackTags extends pulumi.CustomResource {
     /**

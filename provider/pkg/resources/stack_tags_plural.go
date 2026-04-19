@@ -5,14 +5,19 @@ import (
 	"fmt"
 	"path"
 	"sort"
+	"strings"
 
+	"google.golang.org/grpc/codes"
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/structpb"
+
+	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/util/rpcutil/rpcerror"
+	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
 type PulumiServiceStackTagsResource struct {
@@ -26,15 +31,21 @@ type PulumiServiceStackTagsInput struct {
 	Tags         map[string]string `pulumi:"tags"`
 }
 
-const stackTagsStructTagKey = "pulumi" // could also be "json"
-
 func (i *PulumiServiceStackTagsInput) ToPropertyMap() resource.PropertyMap {
-	return util.ToPropertyMap(*i, stackTagsStructTagKey)
+	return util.ToPropertyMap(*i)
 }
 
-func (st *PulumiServiceStackTagsResource) ToPulumiServiceStackTagsInput(inputMap resource.PropertyMap) PulumiServiceStackTagsInput {
+func (i *PulumiServiceStackTagsInput) ToRPC() (*structpb.Struct, error) {
+	return plugin.MarshalProperties(i.ToPropertyMap(), plugin.MarshalOptions{
+		KeepOutputValues: true,
+	})
+}
+
+func (st *PulumiServiceStackTagsResource) ToPulumiServiceStackTagsInput(
+	inputMap resource.PropertyMap,
+) PulumiServiceStackTagsInput {
 	input := PulumiServiceStackTagsInput{}
-	_ = util.FromPropertyMap(inputMap, stackTagsStructTagKey, &input)
+	_ = util.FromPropertyMap(inputMap, &input)
 	return input
 }
 
@@ -47,12 +58,14 @@ func (st *PulumiServiceStackTagsResource) Check(req *pulumirpc.CheckRequest) (*p
 }
 
 func (st *PulumiServiceStackTagsResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
+	olds, err := plugin.UnmarshalProperties(
+		req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
 	if err != nil {
 		return nil, err
 	}
 
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	news, err := plugin.UnmarshalProperties(
+		req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
 	}
@@ -70,14 +83,12 @@ func (st *PulumiServiceStackTagsResource) Diff(req *pulumirpc.DiffRequest) (*pul
 	replaces := []string{}
 
 	for k, v := range dd {
-		// Organization, project, stack changes require replacement
 		if k == "organization" || k == "project" || k == "stack" {
 			v.Kind = v.Kind.AsReplace()
 			replaces = append(replaces, k)
 		}
-		// Tag changes can be updated in place
 		detailedDiffs[k] = &pulumirpc.PropertyDiff{
-			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind),
+			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind), //nolint:gosec // safe conversion from plugin.DiffKind
 			InputDiff: v.InputDiff,
 		}
 	}
@@ -99,7 +110,7 @@ func (st *PulumiServiceStackTagsResource) Diff(req *pulumirpc.DiffRequest) (*pul
 func (st *PulumiServiceStackTagsResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	ctx := context.Background()
 	var input PulumiServiceStackTagsInput
-	err := util.FromProperties(req.GetProperties(), stackTagsStructTagKey, &input)
+	err := util.FromProperties(req.GetProperties(), &input)
 	if err != nil {
 		return nil, err
 	}
@@ -109,21 +120,25 @@ func (st *PulumiServiceStackTagsResource) Create(req *pulumirpc.CreateRequest) (
 		ProjectName: input.Project,
 		StackName:   input.Stack,
 	}
+	id := path.Join(input.Organization, input.Project, input.Stack, "tags")
 
-	// Create each tag in the map
-	for name, value := range input.Tags {
-		stackTag := pulumiapi.StackTag{
-			Name:  name,
-			Value: value,
-		}
-		err = st.Client.CreateTag(ctx, stackName, stackTag)
+	// Create tags in sorted order so partial failures are deterministic.
+	created := map[string]string{}
+	tagNames := sortedKeys(input.Tags)
+	for _, name := range tagNames {
+		err := st.Client.CreateTag(ctx, stackName, pulumiapi.StackTag{Name: name, Value: input.Tags[name]})
 		if err != nil {
-			return nil, fmt.Errorf("failed to create tag %q: %w", name, err)
+			// Record the subset of tags that were successfully created so Pulumi
+			// can track them in state and the next `up` resumes from the right place.
+			partial := input
+			partial.Tags = created
+			return nil, partialErrorStackTags(id, fmt.Errorf("failed to create tag %q: %w", name, err), partial, input)
 		}
+		created[name] = input.Tags[name]
 	}
 
 	return &pulumirpc.CreateResponse{
-		Id:         path.Join(input.Organization, input.Project, input.Stack, "tags"),
+		Id:         id,
 		Properties: req.GetProperties(),
 	}, nil
 }
@@ -131,10 +146,9 @@ func (st *PulumiServiceStackTagsResource) Create(req *pulumirpc.CreateRequest) (
 func (st *PulumiServiceStackTagsResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
 	ctx := context.Background()
 
-	// Parse ID: organization/project/stack/tags
-	organization, project, stack, _, err := splitStackTagId(req.Id)
+	organization, project, stack, err := parseStackTagsID(req.Id)
 	if err != nil {
-		return nil, fmt.Errorf("invalid ID format: %w", err)
+		return nil, err
 	}
 
 	stackName := pulumiapi.StackIdentifier{
@@ -143,44 +157,44 @@ func (st *PulumiServiceStackTagsResource) Read(req *pulumirpc.ReadRequest) (*pul
 		StackName:   stack,
 	}
 
-	// Get all tags from the stack
 	allTags, err := st.Client.GetStackTags(ctx, stackName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read stack tags (%q): %w", req.Id, err)
 	}
 
-	// Parse current inputs to know which tags we manage
+	// Parse current inputs to know which tags we manage.
 	var currentInput PulumiServiceStackTagsInput
 	if req.Inputs != nil {
 		inputMap, err := plugin.UnmarshalProperties(req.Inputs, plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
 		if err != nil {
 			return nil, fmt.Errorf("failed to unmarshal inputs: %w", err)
 		}
-		_ = util.FromPropertyMap(inputMap, stackTagsStructTagKey, &currentInput)
+		_ = util.FromPropertyMap(inputMap, &currentInput)
 	}
 
-	// Filter to only the tags we manage
 	managedTags := make(map[string]string)
 	if len(currentInput.Tags) > 0 {
-		// We have previous state, only return tags we previously managed
+		// We have previous state, only return tags we previously managed.
 		for tagName := range currentInput.Tags {
 			if value, exists := allTags[tagName]; exists {
 				managedTags[tagName] = value
 			}
 		}
 	} else {
-		// No previous state (import scenario), return all tags
+		// No previous state (import scenario): adopt every tag currently on the stack.
+		// The user is expected to declare the `tags` map explicitly after import so
+		// subsequent updates match their intent — see the schema description.
 		managedTags = allTags
 	}
 
-	input := PulumiServiceStackTagsInput{
+	state := PulumiServiceStackTagsInput{
 		Organization: organization,
 		Project:      project,
 		Stack:        stack,
 		Tags:         managedTags,
 	}
 
-	props, err := util.ToProperties(input, stackTagsStructTagKey)
+	props, err := util.ToProperties(state)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal inputs to properties: %w", err)
 	}
@@ -196,13 +210,13 @@ func (st *PulumiServiceStackTagsResource) Update(req *pulumirpc.UpdateRequest) (
 	ctx := context.Background()
 
 	var oldInput PulumiServiceStackTagsInput
-	err := util.FromProperties(req.GetOlds(), stackTagsStructTagKey, &oldInput)
+	err := util.FromProperties(req.GetOlds(), &oldInput)
 	if err != nil {
 		return nil, err
 	}
 
 	var newInput PulumiServiceStackTagsInput
-	err = util.FromProperties(req.GetNews(), stackTagsStructTagKey, &newInput)
+	err = util.FromProperties(req.GetNews(), &newInput)
 	if err != nil {
 		return nil, err
 	}
@@ -212,56 +226,55 @@ func (st *PulumiServiceStackTagsResource) Update(req *pulumirpc.UpdateRequest) (
 		ProjectName: newInput.Project,
 		StackName:   newInput.Stack,
 	}
+	id := path.Join(newInput.Organization, newInput.Project, newInput.Stack, "tags")
 
-	// Determine which tags to add, update, and delete
+	// Compute the add/remove/modify sets. Pulumi Cloud tags are immutable per
+	// key, so a value change is a delete + create.
 	tagsToDelete := []string{}
 	tagsToCreate := map[string]string{}
 
-	// Find tags that were removed or changed
 	for oldName, oldValue := range oldInput.Tags {
 		if newValue, exists := newInput.Tags[oldName]; !exists {
-			// Tag was removed
 			tagsToDelete = append(tagsToDelete, oldName)
 		} else if newValue != oldValue {
-			// Tag value changed - delete old and create new (tags are immutable)
 			tagsToDelete = append(tagsToDelete, oldName)
 			tagsToCreate[oldName] = newValue
 		}
 	}
-
-	// Find tags that were added
 	for newName, newValue := range newInput.Tags {
 		if _, exists := oldInput.Tags[newName]; !exists {
 			tagsToCreate[newName] = newValue
 		}
 	}
 
-	// Delete tags (in sorted order for deterministic behavior)
+	// Track the live tag set as we mutate it. If any API call fails we return
+	// this as the resource state so Pulumi knows exactly which tags exist.
+	currentTags := map[string]string{}
+	for k, v := range oldInput.Tags {
+		currentTags[k] = v
+	}
+
 	sort.Strings(tagsToDelete)
 	for _, tagName := range tagsToDelete {
-		err = st.Client.DeleteStackTag(ctx, stackName, tagName)
+		err := st.Client.DeleteStackTag(ctx, stackName, tagName)
 		if err != nil {
-			return nil, fmt.Errorf("failed to delete tag %q: %w", tagName, err)
+			state := newInput
+			state.Tags = currentTags
+			return nil, partialErrorStackTags(id, fmt.Errorf("failed to delete tag %q: %w", tagName, err), state, newInput)
 		}
+		delete(currentTags, tagName)
 	}
 
-	// Create/update tags (in sorted order for deterministic behavior)
-	tagNames := make([]string, 0, len(tagsToCreate))
-	for name := range tagsToCreate {
-		tagNames = append(tagNames, name)
-	}
-	sort.Strings(tagNames)
-
-	for _, name := range tagNames {
+	createNames := sortedKeys(tagsToCreate)
+	for _, name := range createNames {
 		value := tagsToCreate[name]
-		stackTag := pulumiapi.StackTag{
-			Name:  name,
-			Value: value,
-		}
-		err = st.Client.CreateTag(ctx, stackName, stackTag)
+		err := st.Client.CreateTag(ctx, stackName, pulumiapi.StackTag{Name: name, Value: value})
 		if err != nil {
-			return nil, fmt.Errorf("failed to create/update tag %q: %w", name, err)
+			state := newInput
+			state.Tags = currentTags
+			return nil, partialErrorStackTags(id, fmt.Errorf("failed to create tag %q: %w", name, err), state, newInput)
 		}
+		currentTags[name] = value
 	}
 
 	return &pulumirpc.UpdateResponse{
@@ -272,7 +285,7 @@ func (st *PulumiServiceStackTagsResource) Update(req *pulumirpc.UpdateRequest) (
 func (st *PulumiServiceStackTagsResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
 	ctx := context.Background()
 	var input PulumiServiceStackTagsInput
-	err := util.FromProperties(req.GetProperties(), stackTagsStructTagKey, &input)
+	err := util.FromProperties(req.GetProperties(), &input)
 	if err != nil {
 		return nil, err
 	}
@@ -283,13 +296,7 @@ func (st *PulumiServiceStackTagsResource) Delete(req *pulumirpc.DeleteRequest) (
 		StackName:   input.Stack,
 	}
 
-	// Delete all managed tags (in sorted order for deterministic behavior)
-	tagNames := make([]string, 0, len(input.Tags))
-	for name := range input.Tags {
-		tagNames = append(tagNames, name)
-	}
-	sort.Strings(tagNames)
-
+	tagNames := sortedKeys(input.Tags)
 	for _, tagName := range tagNames {
 		err = st.Client.DeleteStackTag(ctx, stackName, tagName)
 		if err != nil {
@@ -298,4 +305,43 @@ func (st *PulumiServiceStackTagsResource) Delete(req *pulumirpc.DeleteRequest) (
 	}
 
 	return &pbempty.Empty{}, nil
+}
+
+// parseStackTagsID parses an ID of the form `organization/project/stack/tags`.
+func parseStackTagsID(id string) (organization, project, stack string, err error) {
+	parts := strings.Split(id, "/")
+	if len(parts) != 4 || parts[3] != "tags" {
+		return "", "", "", fmt.Errorf("%q is invalid, must be in organization/project/stack/tags format", id)
+	}
+	return parts[0], parts[1], parts[2], nil
+}
+
+func sortedKeys(m map[string]string) []string {
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	return keys
+}
+
+// partialErrorStackTags wraps err so Pulumi records `state` as the resource's
+// last known state before failure. Without this, a Create that creates 2 of 5
+// tags and then fails would leave those 2 untracked and re-create them on retry.
+func partialErrorStackTags(id string, err error, state, inputs PulumiServiceStackTagsInput) error {
+	stateRPC, stateSerErr := state.ToRPC()
+	inputRPC, inputSerErr := inputs.ToRPC()
+	if stateSerErr != nil {
+		err = fmt.Errorf("err serializing state: %v (src error: %v)", stateSerErr, err)
+	}
+	if inputSerErr != nil {
+		err = fmt.Errorf("err serializing inputs: %v (src error: %v)", inputSerErr, err)
+	}
+	detail := pulumirpc.ErrorResourceInitFailed{
+		Id:         id,
+		Properties: stateRPC,
+		Reasons:    []string{err.Error()},
+		Inputs:     inputRPC,
+	}
+	return rpcerror.WithDetails(rpcerror.New(codes.Unknown, err.Error()), &detail)
 }

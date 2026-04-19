@@ -7,12 +7,15 @@ import (
 	"path"
 	"testing"
 
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/util/rpcutil/rpcerror"
+	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 // extractTagNameFromPath extracts the tag name from a URL path like /api/stacks/org/project/stack/tags/tagname
@@ -60,7 +63,7 @@ func TestStackTagsPluralCreate(t *testing.T) {
 			},
 		}
 
-		properties, err := util.ToProperties(input, "pulumi")
+		properties, err := util.ToProperties(input)
 		require.NoError(t, err)
 
 		createReq := pulumirpc.CreateRequest{
@@ -80,6 +83,75 @@ func TestStackTagsPluralCreate(t *testing.T) {
 		assert.Equal(t, "value1", tagMap["tag1"])
 		assert.Equal(t, "value2", tagMap["tag2"])
 		assert.Equal(t, "value3", tagMap["tag3"])
+	})
+}
+
+func TestStackTagsPluralCreatePartialFailure(t *testing.T) {
+	t.Run("Returns partial state when a tag creation fails mid-way", func(t *testing.T) {
+		// Fail the third tag (tags are created in sorted order: tag1, tag2, tag3).
+		var created []string
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.Method != http.MethodPost {
+				w.WriteHeader(http.StatusNotFound)
+				return
+			}
+			var tag pulumiapi.StackTag
+			if err := json.NewDecoder(r.Body).Decode(&tag); err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
+			if tag.Name == "tag3" {
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			created = append(created, tag.Name)
+			w.WriteHeader(http.StatusOK)
+		}))
+		defer server.Close()
+
+		apiClient, err := pulumiapi.NewClient(server.Client(), "", server.URL)
+		require.NoError(t, err)
+
+		st := &PulumiServiceStackTagsResource{Client: apiClient}
+
+		input := PulumiServiceStackTagsInput{
+			Organization: "org",
+			Project:      "project",
+			Stack:        "stack",
+			Tags: map[string]string{
+				"tag1": "value1",
+				"tag2": "value2",
+				"tag3": "value3",
+			},
+		}
+		properties, err := util.ToProperties(input)
+		require.NoError(t, err)
+
+		_, err = st.Create(&pulumirpc.CreateRequest{Properties: properties})
+		require.Error(t, err)
+		assert.ElementsMatch(t, []string{"tag1", "tag2"}, created)
+
+		// The error must carry ErrorResourceInitFailed with the successfully-created
+		// subset so Pulumi records them in state and doesn't recreate them on retry.
+		rpcErr, ok := rpcerror.FromError(err)
+		require.True(t, ok, "expected a pulumi rpcerror")
+
+		var initFailed *pulumirpc.ErrorResourceInitFailed
+		for _, d := range rpcErr.Details() {
+			if f, ok := d.(*pulumirpc.ErrorResourceInitFailed); ok {
+				initFailed = f
+				break
+			}
+		}
+		require.NotNil(t, initFailed, "expected ErrorResourceInitFailed detail")
+		assert.Equal(t, "org/project/stack/tags", initFailed.Id)
+
+		partialProps, err := plugin.UnmarshalProperties(
+			initFailed.Properties, plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
+		require.NoError(t, err)
+		var partial PulumiServiceStackTagsInput
+		require.NoError(t, util.FromPropertyMap(partialProps, &partial))
+		assert.Equal(t, map[string]string{"tag1": "value1", "tag2": "value2"}, partial.Tags)
 	})
 }
 
@@ -119,7 +191,7 @@ func TestStackTagsPluralRead(t *testing.T) {
 				"tag2": "value2",
 			},
 		}
-		previousProps, err := util.ToProperties(previousInput, "pulumi")
+		previousProps, err := util.ToProperties(previousInput)
 		require.NoError(t, err)
 
 		readReq := pulumirpc.ReadRequest{
@@ -135,7 +207,7 @@ func TestStackTagsPluralRead(t *testing.T) {
 		var output PulumiServiceStackTagsInput
 		props, err := plugin.UnmarshalProperties(resp.Properties, plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
 		require.NoError(t, err)
-		err = util.FromPropertyMap(props, "pulumi", &output)
+		err = util.FromPropertyMap(props, &output)
 		require.NoError(t, err)
 
 		assert.Equal(t, 2, len(output.Tags))
@@ -202,9 +274,9 @@ func TestStackTagsPluralUpdate(t *testing.T) {
 			},
 		}
 
-		oldProps, err := util.ToProperties(oldInput, "pulumi")
+		oldProps, err := util.ToProperties(oldInput)
 		require.NoError(t, err)
-		newProps, err := util.ToProperties(newInput, "pulumi")
+		newProps, err := util.ToProperties(newInput)
 		require.NoError(t, err)
 
 		updateReq := pulumirpc.UpdateRequest{
@@ -267,7 +339,7 @@ func TestStackTagsPluralDelete(t *testing.T) {
 			},
 		}
 
-		properties, err := util.ToProperties(input, "pulumi")
+		properties, err := util.ToProperties(input)
 		require.NoError(t, err)
 
 		deleteReq := pulumirpc.DeleteRequest{
@@ -299,7 +371,7 @@ func TestStackTagsPluralDiff(t *testing.T) {
 			},
 		}
 
-		props, err := util.ToProperties(input, "pulumi")
+		props, err := util.ToProperties(input)
 		require.NoError(t, err)
 
 		diffReq := pulumirpc.DiffRequest{
@@ -333,9 +405,9 @@ func TestStackTagsPluralDiff(t *testing.T) {
 			},
 		}
 
-		oldProps, err := util.ToProperties(oldInput, "pulumi")
+		oldProps, err := util.ToProperties(oldInput)
 		require.NoError(t, err)
-		newProps, err := util.ToProperties(newInput, "pulumi")
+		newProps, err := util.ToProperties(newInput)
 		require.NoError(t, err)
 
 		diffReq := pulumirpc.DiffRequest{
@@ -370,9 +442,9 @@ func TestStackTagsPluralDiff(t *testing.T) {
 			},
 		}
 
-		oldProps, err := util.ToProperties(oldInput, "pulumi")
+		oldProps, err := util.ToProperties(oldInput)
 		require.NoError(t, err)
-		newProps, err := util.ToProperties(newInput, "pulumi")
+		newProps, err := util.ToProperties(newInput)
 		require.NoError(t, err)
 
 		diffReq := pulumirpc.DiffRequest{
@@ -401,7 +473,7 @@ func TestStackTagsPluralCheck(t *testing.T) {
 			},
 		}
 
-		props, err := util.ToProperties(input, "pulumi")
+		props, err := util.ToProperties(input)
 		require.NoError(t, err)
 
 		checkReq := pulumirpc.CheckRequest{

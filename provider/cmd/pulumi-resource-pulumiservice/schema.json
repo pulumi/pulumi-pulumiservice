@@ -2172,6 +2172,66 @@
         "value"
       ]
     },
+    "pulumiservice:index:StackTags": {
+      "description": "`StackTags` manages a set of stack tags as a single resource. Tags are supplied as a map and are created, updated, and deleted together.\n\nThis is especially convenient for YAML programs, where a single resource can declare many tags rather than needing one `StackTag` resource per key.\n\nThe resource tracks the set of tags it manages in state; tags added to the stack outside this resource (e.g. via the CLI, pulumibot, or a singular `StackTag` resource) are left alone. Because the Pulumi Cloud tag API is immutable per key, changing a tag value is implemented as delete-and-recreate.\n\n### Import\n\nImporting with an ID of `{organization}/{project}/{stack}/tags` adopts **every** tag currently on the stack into this resource's managed set. After import, explicitly declare the `tags` map in your program so subsequent updates match your intent.\n\n```sh\n$ pulumi import pulumiservice:index:StackTags mytags my-org/my-project/my-stack/tags\n```\n",
+      "properties": {
+        "organization": {
+          "type": "string",
+          "description": "Organization name."
+        },
+        "project": {
+          "type": "string",
+          "description": "Project name."
+        },
+        "stack": {
+          "type": "string",
+          "description": "Stack name."
+        },
+        "tags": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Map of tag names to values. Each entry represents a stack tag."
+        }
+      },
+      "required": [
+        "organization",
+        "project",
+        "stack",
+        "tags"
+      ],
+      "inputProperties": {
+        "organization": {
+          "type": "string",
+          "description": "Organization name.",
+          "willReplaceOnChanges": true
+        },
+        "project": {
+          "type": "string",
+          "description": "Project name.",
+          "willReplaceOnChanges": true
+        },
+        "stack": {
+          "type": "string",
+          "description": "Stack name.",
+          "willReplaceOnChanges": true
+        },
+        "tags": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Map of tag names to values. Each entry represents a stack tag."
+        }
+      },
+      "requiredInputs": [
+        "organization",
+        "project",
+        "stack",
+        "tags"
+      ]
+    },
     "pulumiservice:index:Team": {
       "description": "The Pulumi Cloud offers role-based access control (RBAC) using teams. Teams allow organization admins to assign a set of stack permissions to a group of users.",
       "properties": {

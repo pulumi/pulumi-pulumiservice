@@ -128,8 +128,12 @@ func set(v reflect.Value, value interface{}) error {
 	if valueKind == reflect.Float64 {
 		fv := valueValue.Float()
 		floatValue = &fv
-	} else if v.Kind() != valueKind && (v.Kind() != reflect.Map || valueKind != reflect.Map) {
-		return fmt.Errorf("field type %q does not match property %q", v.Kind(), valueKind)
+	} else if v.Kind() != valueKind {
+		// Allow map-to-map assignment even when concrete element types differ
+		// (e.g. map[string]string target vs. map[string]interface{} source).
+		if v.Kind() != reflect.Map || valueKind != reflect.Map {
+			return fmt.Errorf("field type %q does not match property %q", v.Kind(), valueKind)
+		}
 	}
 	switch v.Kind() {
 	case reflect.String:
