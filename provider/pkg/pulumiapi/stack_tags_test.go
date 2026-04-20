@@ -32,7 +32,7 @@ func TestCreateStackTags(t *testing.T) {
 			ExpectedReqBody: tag,
 			ResponseCode:    http.StatusNoContent,
 		})
-		assert.NoError(t, c.CreateTag(ctx, stackName, tag))
+		assert.NoError(t, c.CreateStackTag(ctx, stackName, tag))
 	})
 
 	t.Run("Error", func(t *testing.T) {
@@ -49,7 +49,7 @@ func TestCreateStackTags(t *testing.T) {
 				Message: "unauthorized",
 			},
 		})
-		err := c.CreateTag(ctx, stackName, tag)
+		err := c.CreateStackTag(ctx, stackName, tag)
 		assert.EqualError(t, err, "failed to create tag (tagName=tagValue): 401 API error: unauthorized")
 	})
 }
