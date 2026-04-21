@@ -50,6 +50,7 @@ type Client interface {
 	pulumiapi.DeploymentSettingsClient
 	pulumiapi.EnvironmentScheduleClient
 	pulumiapi.InsightsAccountClient
+	pulumiapi.MemberClient
 	pulumiapi.OidcClient
 	pulumiapi.StackTagClient
 	pulumiapi.TeamClient
