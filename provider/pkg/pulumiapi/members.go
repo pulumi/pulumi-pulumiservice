@@ -1,4 +1,4 @@
-// Copyright 2016-2022, Pulumi Corporation.
+// Copyright 2016-2025, Pulumi Corporation.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,6 +21,11 @@ import (
 	"net/url"
 	"path"
 )
+
+// MemberClient defines read operations on organization membership.
+type MemberClient interface {
+	ListOrgMembers(ctx context.Context, orgName string) (*Members, error)
+}
 
 type Members struct {
 	Members []Member
