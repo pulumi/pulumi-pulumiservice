@@ -73,7 +73,7 @@ func (*StackTag) Create(
 	}
 
 	client := config.GetClient(ctx)
-	err := client.CreateTag(ctx,
+	err := client.CreateStackTag(ctx,
 		pulumiapi.StackIdentifier{
 			OrgName:     req.Inputs.Organization,
 			ProjectName: req.Inputs.Project,

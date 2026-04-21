@@ -236,6 +236,9 @@ func (k *pulumiserviceProvider) Configure(
 		&resources.PulumiServiceWebhookResource{
 			Client: client,
 		},
+		&resources.PulumiServiceStackTagsResource{
+			Client: client,
+		},
 		&resources.TeamStackPermissionResource{
 			Client: client,
 		},
