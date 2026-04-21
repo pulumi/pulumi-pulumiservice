@@ -47,6 +47,11 @@ resources:
           displayName: ""
           versionTag: 2.4.1
           config:
+            # Default every policy in the pack to `mandatory`.
+            # Per-policy entries below override individual properties while
+            # inheriting the enforcement level set here.
+            all:
+              enforcementLevel: mandatory
             hardened-os-image:
               approvedAmiIds:
                 - ami-0abcdef1234567890
