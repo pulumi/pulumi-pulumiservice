@@ -228,7 +228,7 @@ func TestTeamEnvironmentPermission_Diff_UpgradeFromPreMaxOpenDuration(t *testing
 func TestTeamEnvironmentPermission_Read_OmitsMaxOpenDurationWhenUnset(t *testing.T) {
 	// When the Pulumi Cloud API does not return a maxOpenDuration for the
 	// environment, Read must not bake an empty string into state. Otherwise
-	// a follow-up up against a program that doesn't set the field would
+	// a follow-up against a program that doesn't set the field would
 	// observe a spurious diff (same root cause as the Check path).
 	permission := "open"
 	client := &teamEnvPermClientMock{
