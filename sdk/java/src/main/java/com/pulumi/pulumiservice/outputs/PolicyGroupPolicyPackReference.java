@@ -16,7 +16,7 @@ import javax.annotation.Nullable;
 @CustomType
 public final class PolicyGroupPolicyPackReference {
     /**
-     * @return Optional configuration for the policy pack.
+     * @return Optional configuration for the policy pack. The special key `all` sets the default enforcement level for every policy in the pack; per-policy entries override it.
      * 
      */
     private @Nullable Map<String,Object> config;
@@ -43,7 +43,7 @@ public final class PolicyGroupPolicyPackReference {
 
     private PolicyGroupPolicyPackReference() {}
     /**
-     * @return Optional configuration for the policy pack.
+     * @return Optional configuration for the policy pack. The special key `all` sets the default enforcement level for every policy in the pack; per-policy entries override it.
      * 
      */
     public Map<String,Object> config() {

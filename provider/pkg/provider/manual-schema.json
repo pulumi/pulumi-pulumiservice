@@ -883,7 +883,7 @@
           "type": "string"
         },
         "config": {
-          "description": "Optional configuration for the policy pack.",
+          "description": "Optional configuration for the policy pack. The special key `all` sets the default enforcement level for every policy in the pack; per-policy entries override it.",
           "type": "object",
           "additionalProperties": {
             "$ref": "pulumi.json#/Any"

@@ -3392,7 +3392,7 @@ func (o OperationContextOptionsPtrOutput) SkipIntermediateDeployments() pulumi.B
 
 // A reference to a policy pack within a policy group.
 type PolicyGroupPolicyPackReference struct {
-	// Optional configuration for the policy pack.
+	// Optional configuration for the policy pack. The special key `all` sets the default enforcement level for every policy in the pack; per-policy entries override it.
 	Config map[string]interface{} `pulumi:"config"`
 	// The display name of the policy pack.
 	DisplayName *string `pulumi:"displayName"`
@@ -3419,7 +3419,7 @@ func (o PolicyGroupPolicyPackReferenceOutput) ToPolicyGroupPolicyPackReferenceOu
 	return o
 }
 
-// Optional configuration for the policy pack.
+// Optional configuration for the policy pack. The special key `all` sets the default enforcement level for every policy in the pack; per-policy entries override it.
 func (o PolicyGroupPolicyPackReferenceOutput) Config() pulumi.MapOutput {
 	return o.ApplyT(func(v PolicyGroupPolicyPackReference) map[string]interface{} { return v.Config }).(pulumi.MapOutput)
 }
@@ -3466,7 +3466,7 @@ func (o PolicyGroupPolicyPackReferenceArrayOutput) Index(i pulumi.IntInput) Poli
 
 // A reference to a policy pack within a policy group (input).
 type PolicyGroupPolicyPackReferenceInputType struct {
-	// Optional configuration for the policy pack.
+	// Optional configuration for the policy pack. The special key `all` sets the default enforcement level for every policy in the pack; per-policy entries override it.
 	Config map[string]interface{} `pulumi:"config"`
 	// The display name of the policy pack.
 	DisplayName *string `pulumi:"displayName"`
@@ -3489,7 +3489,7 @@ type PolicyGroupPolicyPackReferenceInputTypeInput interface {
 
 // A reference to a policy pack within a policy group (input).
 type PolicyGroupPolicyPackReferenceInputTypeArgs struct {
-	// Optional configuration for the policy pack.
+	// Optional configuration for the policy pack. The special key `all` sets the default enforcement level for every policy in the pack; per-policy entries override it.
 	Config pulumi.MapInput `pulumi:"config"`
 	// The display name of the policy pack.
 	DisplayName pulumi.StringPtrInput `pulumi:"displayName"`
@@ -3551,7 +3551,7 @@ func (o PolicyGroupPolicyPackReferenceInputTypeOutput) ToPolicyGroupPolicyPackRe
 	return o
 }
 
-// Optional configuration for the policy pack.
+// Optional configuration for the policy pack. The special key `all` sets the default enforcement level for every policy in the pack; per-policy entries override it.
 func (o PolicyGroupPolicyPackReferenceInputTypeOutput) Config() pulumi.MapOutput {
 	return o.ApplyT(func(v PolicyGroupPolicyPackReferenceInputType) map[string]interface{} { return v.Config }).(pulumi.MapOutput)
 }
