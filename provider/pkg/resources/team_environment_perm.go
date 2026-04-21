@@ -58,22 +58,32 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Check(
 	}
 
 	var failures []*pulumirpc.CheckFailure
-	if prop, ok := news["maxOpenDuration"]; ok && prop.IsString() {
-		raw := prop.StringValue()
-		if raw == "" {
-			// Treat an explicit empty string as "unset" to stay consistent
-			// with state saved before this field existed.
-			delete(news, "maxOpenDuration")
+	if prop, ok := news["maxOpenDuration"]; ok {
+		if !prop.IsString() {
+			// Reject non-string values deterministically at preview; otherwise
+			// util.FromPropertyMap panics during Create when asserting a
+			// number into the string field.
+			failures = append(failures, &pulumirpc.CheckFailure{
+				Property: "maxOpenDuration",
+				Reason:   "maxOpenDuration property is present but can't be parsed as string",
+			})
 		} else {
-			d, err := time.ParseDuration(raw)
-			if err != nil {
-				failures = append(failures, &pulumirpc.CheckFailure{
-					Property: "maxOpenDuration",
-					Reason:   fmt.Sprintf("malformed duration: %v", err),
-				})
-			} else if normalized := d.String(); normalized != raw {
-				// Normalize the duration to prevent spurious diffs.
-				news["maxOpenDuration"] = resource.NewStringProperty(normalized)
+			raw := prop.StringValue()
+			if raw == "" {
+				// Treat an explicit empty string as "unset" to stay consistent
+				// with state saved before this field existed.
+				delete(news, "maxOpenDuration")
+			} else {
+				d, err := time.ParseDuration(raw)
+				if err != nil {
+					failures = append(failures, &pulumirpc.CheckFailure{
+						Property: "maxOpenDuration",
+						Reason:   fmt.Sprintf("malformed duration: %v", err),
+					})
+				} else if normalized := d.String(); normalized != raw {
+					// Normalize the duration to prevent spurious diffs.
+					news["maxOpenDuration"] = resource.NewStringProperty(normalized)
+				}
 			}
 		}
 	}

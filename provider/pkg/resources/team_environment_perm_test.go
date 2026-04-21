@@ -197,6 +197,36 @@ func TestTeamEnvironmentPermission_Check_InvalidMaxOpenDurationReportsFailure(t 
 	assert.Equal(t, "maxOpenDuration", resp.Failures[0].Property)
 }
 
+func TestTeamEnvironmentPermission_Check_NonStringMaxOpenDurationReportsFailure(t *testing.T) {
+	cases := map[string]resource.PropertyValue{
+		"number": resource.NewNumberProperty(3600),
+		"bool":   resource.NewBoolProperty(true),
+		"array":  resource.NewArrayProperty([]resource.PropertyValue{resource.NewStringProperty("60m")}),
+		"object": resource.NewObjectProperty(resource.PropertyMap{
+			"value": resource.NewStringProperty("60m"),
+		}),
+	}
+	for name, value := range cases {
+		t.Run(name, func(t *testing.T) {
+			r := newTeamEnvPermResource(&teamEnvPermClientMock{})
+			news := resource.PropertyMap{
+				"organization":    resource.NewStringProperty("org"),
+				"team":            resource.NewStringProperty("team"),
+				"project":         resource.NewStringProperty("proj"),
+				"environment":     resource.NewStringProperty("env"),
+				"permission":      resource.NewStringProperty("open"),
+				"maxOpenDuration": value,
+			}
+
+			resp, err := r.Check(&pulumirpc.CheckRequest{News: toStruct(t, news)})
+			require.NoError(t, err)
+			require.Len(t, resp.Failures, 1)
+			assert.Equal(t, "maxOpenDuration", resp.Failures[0].Property)
+			assert.Contains(t, resp.Failures[0].Reason, "can't be parsed as string")
+		})
+	}
+}
+
 func TestTeamEnvironmentPermission_Diff_UpgradeFromPreMaxOpenDuration(t *testing.T) {
 	// End-to-end regression for the 0.29.2 -> 0.29.3 upgrade path:
 	//   - OldInputs has no maxOpenDuration (was saved before the field existed)
