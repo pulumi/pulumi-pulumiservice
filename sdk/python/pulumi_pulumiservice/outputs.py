@@ -1444,7 +1444,7 @@ class PolicyGroupPolicyPackReference(dict):
         """
         A reference to a policy pack within a policy group.
         :param _builtins.str name: The name of the policy pack.
-        :param Mapping[str, Any] config: Optional configuration for the policy pack.
+        :param Mapping[str, Any] config: Optional configuration for the policy pack. The special key `all` sets the default enforcement level for every policy in the pack; per-policy entries override it.
         :param _builtins.str display_name: The display name of the policy pack.
         :param _builtins.float version: The server-derived numeric version of the policy pack. This is output-only; use `versionTag` to pin a specific version.
         :param _builtins.str version_tag: The version tag of the policy pack.
@@ -1471,7 +1471,7 @@ class PolicyGroupPolicyPackReference(dict):
     @pulumi.getter
     def config(self) -> Optional[Mapping[str, Any]]:
         """
-        Optional configuration for the policy pack.
+        Optional configuration for the policy pack. The special key `all` sets the default enforcement level for every policy in the pack; per-policy entries override it.
         """
         return pulumi.get(self, "config")
 

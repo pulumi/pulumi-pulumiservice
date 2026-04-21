@@ -1673,7 +1673,7 @@ if not MYPY:
         """
         config: NotRequired[pulumi.Input[Mapping[str, Any]]]
         """
-        Optional configuration for the policy pack.
+        Optional configuration for the policy pack. The special key `all` sets the default enforcement level for every policy in the pack; per-policy entries override it.
         """
         display_name: NotRequired[pulumi.Input[_builtins.str]]
         """
@@ -1696,7 +1696,7 @@ class PolicyGroupPolicyPackReferenceInputArgs:
         """
         A reference to a policy pack within a policy group (input).
         :param pulumi.Input[_builtins.str] name: The name of the policy pack.
-        :param pulumi.Input[Mapping[str, Any]] config: Optional configuration for the policy pack.
+        :param pulumi.Input[Mapping[str, Any]] config: Optional configuration for the policy pack. The special key `all` sets the default enforcement level for every policy in the pack; per-policy entries override it.
         :param pulumi.Input[_builtins.str] display_name: The display name of the policy pack.
         :param pulumi.Input[_builtins.str] version_tag: The version tag of the policy pack.
         """
@@ -1724,7 +1724,7 @@ class PolicyGroupPolicyPackReferenceInputArgs:
     @pulumi.getter
     def config(self) -> Optional[pulumi.Input[Mapping[str, Any]]]:
         """
-        Optional configuration for the policy pack.
+        Optional configuration for the policy pack. The special key `all` sets the default enforcement level for every policy in the pack; per-policy entries override it.
         """
         return pulumi.get(self, "config")
 

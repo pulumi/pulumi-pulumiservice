@@ -17,7 +17,7 @@ namespace Pulumi.PulumiService.Outputs
     public sealed class PolicyGroupPolicyPackReference
     {
         /// <summary>
-        /// Optional configuration for the policy pack.
+        /// Optional configuration for the policy pack. The special key `all` sets the default enforcement level for every policy in the pack; per-policy entries override it.
         /// </summary>
         public readonly ImmutableDictionary<string, object>? Config;
         /// <summary>

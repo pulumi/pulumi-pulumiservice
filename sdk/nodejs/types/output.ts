@@ -447,7 +447,7 @@ export interface OperationContextOptions {
  */
 export interface PolicyGroupPolicyPackReference {
     /**
-     * Optional configuration for the policy pack.
+     * Optional configuration for the policy pack. The special key `all` sets the default enforcement level for every policy in the pack; per-policy entries override it.
      */
     config?: {[key: string]: any};
     /**

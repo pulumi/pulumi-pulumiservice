@@ -23,14 +23,14 @@ public final class PolicyGroupPolicyPackReferenceInputArgs extends com.pulumi.re
     public static final PolicyGroupPolicyPackReferenceInputArgs Empty = new PolicyGroupPolicyPackReferenceInputArgs();
 
     /**
-     * Optional configuration for the policy pack.
+     * Optional configuration for the policy pack. The special key `all` sets the default enforcement level for every policy in the pack; per-policy entries override it.
      * 
      */
     @Import(name="config")
     private @Nullable Output<Map<String,Object>> config;
 
     /**
-     * @return Optional configuration for the policy pack.
+     * @return Optional configuration for the policy pack. The special key `all` sets the default enforcement level for every policy in the pack; per-policy entries override it.
      * 
      */
     public Optional<Output<Map<String,Object>>> config() {
@@ -110,7 +110,7 @@ public final class PolicyGroupPolicyPackReferenceInputArgs extends com.pulumi.re
         }
 
         /**
-         * @param config Optional configuration for the policy pack.
+         * @param config Optional configuration for the policy pack. The special key `all` sets the default enforcement level for every policy in the pack; per-policy entries override it.
          * 
          * @return builder
          * 
@@ -121,7 +121,7 @@ public final class PolicyGroupPolicyPackReferenceInputArgs extends com.pulumi.re
         }
 
         /**
-         * @param config Optional configuration for the policy pack.
+         * @param config Optional configuration for the policy pack. The special key `all` sets the default enforcement level for every policy in the pack; per-policy entries override it.
          * 
          * @return builder
          * 
