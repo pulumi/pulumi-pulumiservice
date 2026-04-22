@@ -255,6 +255,82 @@ func TestTeamEnvironmentPermission_Diff_UpgradeFromPreMaxOpenDuration(t *testing
 	assert.Empty(t, diffResp.Replaces, "maxOpenDuration should not drive a spurious replacement on upgrade")
 }
 
+func TestTeamEnvironmentPermission_Diff_UpgradeFromEmptyStringMaxOpenDuration(t *testing.T) {
+	// Regression for the residual 0.29.3–0.36.0 upgrade path that #752 did
+	// not cover: those provider versions wrote `maxOpenDuration: ""` into
+	// state whenever the user did not set the field. After #752, Check no
+	// longer emits the empty string, but state written by the old versions
+	// still carries it. Without Diff-side normalization, the first preview
+	// after upgrading would see the key as deleted and force one more
+	// spurious replacement.
+	r := newTeamEnvPermResource(&teamEnvPermClientMock{})
+
+	// State on disk from a buggy 0.29.3–0.36.0 run: contains the empty string.
+	oldInputs := resource.PropertyMap{
+		"organization":    resource.NewStringProperty("org"),
+		"team":            resource.NewStringProperty("team"),
+		"project":         resource.NewStringProperty("proj"),
+		"environment":     resource.NewStringProperty("env"),
+		"permission":      resource.NewStringProperty("open"),
+		"maxOpenDuration": resource.NewStringProperty(""),
+	}
+
+	// User program (unchanged): never sets maxOpenDuration.
+	news := resource.PropertyMap{
+		"organization": resource.NewStringProperty("org"),
+		"team":         resource.NewStringProperty("team"),
+		"project":      resource.NewStringProperty("proj"),
+		"environment":  resource.NewStringProperty("env"),
+		"permission":   resource.NewStringProperty("open"),
+	}
+
+	checkResp, err := r.Check(&pulumirpc.CheckRequest{News: toStruct(t, news)})
+	require.NoError(t, err)
+	require.Empty(t, checkResp.Failures)
+
+	diffResp, err := r.Diff(&pulumirpc.DiffRequest{
+		OldInputs: toStruct(t, oldInputs),
+		News:      checkResp.Inputs,
+	})
+	require.NoError(t, err)
+	assert.Equal(t, pulumirpc.DiffResponse_DIFF_NONE, diffResp.Changes)
+	assert.Empty(
+		t, diffResp.Replaces,
+		"an empty-string maxOpenDuration in old state must compare equal to an absent field",
+	)
+}
+
+func TestTeamEnvironmentPermission_Diff_DetectsRealMaxOpenDurationChange(t *testing.T) {
+	// Guard against over-aggressive normalization: a real value change must
+	// still be reported as a change (and, for this resource, a replace).
+	r := newTeamEnvPermResource(&teamEnvPermClientMock{})
+
+	oldInputs := resource.PropertyMap{
+		"organization":    resource.NewStringProperty("org"),
+		"team":            resource.NewStringProperty("team"),
+		"project":         resource.NewStringProperty("proj"),
+		"environment":     resource.NewStringProperty("env"),
+		"permission":      resource.NewStringProperty("open"),
+		"maxOpenDuration": resource.NewStringProperty("30m0s"),
+	}
+	news := resource.PropertyMap{
+		"organization":    resource.NewStringProperty("org"),
+		"team":            resource.NewStringProperty("team"),
+		"project":         resource.NewStringProperty("proj"),
+		"environment":     resource.NewStringProperty("env"),
+		"permission":      resource.NewStringProperty("open"),
+		"maxOpenDuration": resource.NewStringProperty("1h0m0s"),
+	}
+
+	diffResp, err := r.Diff(&pulumirpc.DiffRequest{
+		OldInputs: toStruct(t, oldInputs),
+		News:      toStruct(t, news),
+	})
+	require.NoError(t, err)
+	assert.Equal(t, pulumirpc.DiffResponse_DIFF_SOME, diffResp.Changes)
+	assert.Contains(t, diffResp.Replaces, "maxOpenDuration")
+}
+
 func TestTeamEnvironmentPermission_Read_OmitsMaxOpenDurationWhenUnset(t *testing.T) {
 	// When the Pulumi Cloud API does not return a maxOpenDuration for the
 	// environment, Read must not bake an empty string into state. Otherwise

@@ -223,9 +223,33 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Delete(req *pulumirpc.
 func (tp *PulumiServiceTeamEnvironmentPermissionResource) Diff(
 	req *pulumirpc.DiffRequest,
 ) (*pulumirpc.DiffResponse, error) {
-	changedKeys, err := util.DiffOldsAndNews(req)
+	olds, err := plugin.UnmarshalProperties(
+		req.GetOldInputs(),
+		plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true},
+	)
 	if err != nil {
 		return nil, err
+	}
+	news, err := plugin.UnmarshalProperties(
+		req.GetNews(),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: false},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	// Provider versions 0.29.3–0.36.0 wrote `maxOpenDuration: ""` into state
+	// whenever the user did not set the field. #752 fixed the Check/Read
+	// paths, but state saved by those versions still carries the empty
+	// string. Without this normalization, the first preview after upgrading
+	// from that window would observe the key as deleted and force one more
+	// spurious replacement — the exact failure mode #751 set out to remove.
+	normalizeEmptyMaxOpenDuration(olds)
+	normalizeEmptyMaxOpenDuration(news)
+
+	var changedKeys []string
+	for _, k := range olds.Diff(news).ChangedKeys() {
+		changedKeys = append(changedKeys, string(k))
 	}
 
 	changes := pulumirpc.DiffResponse_DIFF_NONE
@@ -237,6 +261,14 @@ func (tp *PulumiServiceTeamEnvironmentPermissionResource) Diff(
 		Replaces:            changedKeys,
 		DeleteBeforeReplace: true,
 	}, nil
+}
+
+// normalizeEmptyMaxOpenDuration removes a zero-value `maxOpenDuration` so it
+// compares equal to an absent field. See Diff() for the history.
+func normalizeEmptyMaxOpenDuration(m resource.PropertyMap) {
+	if v, ok := m["maxOpenDuration"]; ok && v.IsString() && v.StringValue() == "" {
+		delete(m, "maxOpenDuration")
+	}
 }
 
 // Update does nothing because we always replace on changes, never an update
