@@ -277,9 +277,18 @@ func orgRoleCoreFromAPI(
 		OrganizationName: orgName,
 		Name:             role.Name,
 		Description:      util.OrNil(role.Description),
-		ResourceType:     util.OrNil(role.ResourceType),
-		UxPurpose:        util.OrNil(role.UXPurpose),
-		Permissions:      prior.Permissions,
+		// Preserve user intent for defaultable fields: if the user left
+		// resourceType/uxPurpose unset, don't let the service-computed
+		// default leak into state and cause refresh drift.
+		ResourceType: prior.ResourceType,
+		UxPurpose:    prior.UxPurpose,
+		Permissions:  prior.Permissions,
+	}
+	if core.ResourceType == nil && role.ResourceType != "" && role.ResourceType != "global" {
+		core.ResourceType = util.OrNil(role.ResourceType)
+	}
+	if core.UxPurpose == nil && role.UXPurpose != "" && role.UXPurpose != "role" {
+		core.UxPurpose = util.OrNil(role.UXPurpose)
 	}
 	if len(role.Details) > 0 {
 		parsed := map[string]interface{}{}
