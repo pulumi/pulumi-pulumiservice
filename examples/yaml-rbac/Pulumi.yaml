@@ -1,10 +1,6 @@
 name: yaml-rbac
 runtime: yaml
-description: |
-  Exercises the fine-grained RBAC resources: OrganizationRole (custom role
-  definition), OrganizationMember (user membership + role assignment), and
-  TeamRoleAssignment (assigning a custom role to a team). Also uses the
-  getOrganizationMembers data source to list current organization members.
+description: Exercises the RBAC resources and data sources.
 
 config:
   organizationName:
