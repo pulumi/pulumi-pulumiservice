@@ -10,7 +10,7 @@
 - Added `OrganizationMember` resource for managing a user's membership in an organization and their assigned role (built-in or custom).
 - Added `OrganizationRole` resource for defining custom fine-grained roles on an organization.
 - Added `TeamRoleAssignment` resource for assigning a custom role to a team, with automatic enablement of the team custom-roles feature on first use.
-- Added `getOrganizationMembers` data source for listing every member of a Pulumi Cloud organization and their assigned roles. [#41668](https://github.com/pulumi/pulumi-service/issues/41668)
+- Added `getOrganizationMembers` data source for listing every member of a Pulumi Cloud organization and their assigned roles.
 - Added `getOrganizationRoleScopes` data source for discovering the permission scope names available for use in `OrganizationRole.permissions`.
 
 ### Bug Fixes
