@@ -4,7 +4,9 @@
 package examples
 
 import (
+	"context"
 	"io"
+	"net/http"
 	"os"
 	"path"
 	"path/filepath"
@@ -21,6 +23,8 @@ import (
 	"github.com/pulumi/providertest/pulumitest/assertpreview"
 	"github.com/pulumi/providertest/pulumitest/opttest"
 	"github.com/pulumi/pulumi/pkg/v3/testing/integration"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
 type Resource struct {
@@ -516,23 +520,59 @@ func TestYamlRbacExample(t *testing.T) {
 	// Requires the Custom Roles feature to be enabled on the test
 	// organization. If it isn't, CreateRole will return a feature-flag
 	// error and the test fails loudly — which is what we want to learn.
+	orgName := getOrgName()
+	const fixtureUser = "service-provider-example-user"
+
+	// Safety net: if anything leaves the fixture user on a non-default
+	// role, snap them back to "member". OrganizationRole.Delete with
+	// force=true *should* revoke their custom role assignment on destroy,
+	// but we don't want a mis-wired teardown to leak state into other
+	// shards.
+	t.Cleanup(func() {
+		if err := resetFixtureOrgMember(orgName, fixtureUser); err != nil {
+			t.Logf("cleanup: could not reset fixture user role: %v", err)
+		}
+	})
+
 	test := pulumitest.NewPulumiTest(t,
 		filepath.Join(getCwd(t), "yaml-rbac"),
 		inMemoryProvider(),
 		opttest.UseAmbientBackend(),
 	)
 	test.SetConfig(t, "digits", generateRandomFiveDigits())
-	test.SetConfig(t, "organizationName", getOrgName())
+	test.SetConfig(t, "organizationName", orgName)
 
 	// Custom flow: skip the refresh-has-no-changes assertion that
 	// runPulumiTest enforces. Enabling custom roles on a team causes the
 	// service to add the caller as a team member, which shows up on
 	// refresh as a drift on the pre-existing Team resource. Tracked as
 	// a follow-up Team-resource fix; not in scope for this PR.
-	test.Up(t)
+	up := test.Up(t)
+	// Sanity-check adoption: OrganizationMember should have hit the 409
+	// branch and adopted the pre-existing membership.
+	if adopted, ok := up.Outputs["memberAdopted"]; ok {
+		assert.Equal(t, true, adopted.Value, "expected OrganizationMember to adopt the existing membership")
+	}
 	preview := test.Preview(t)
 	assertpreview.HasNoChanges(t, preview)
 	test.Destroy(t)
+}
+
+// resetFixtureOrgMember snaps the fixture user back to the default
+// built-in role. Used as a test cleanup to ensure the shared test org is
+// restored to a known state even if the Pulumi-level teardown leaves
+// any custom role assignment dangling.
+func resetFixtureOrgMember(orgName, userName string) error {
+	token := os.Getenv("PULUMI_ACCESS_TOKEN")
+	apiURL := os.Getenv("PULUMI_BACKEND_URL")
+	if token == "" || apiURL == "" {
+		return nil // no creds → nothing to clean up (local dev without env)
+	}
+	client, err := pulumiapi.NewClient(&http.Client{Timeout: 60 * time.Second}, token, apiURL)
+	if err != nil {
+		return err
+	}
+	return client.UpdateOrgMemberRole(context.Background(), orgName, userName, "member", nil)
 }
 
 func writePulumiYaml(t *testing.T, yamlContents interface{}) string {

@@ -42,11 +42,17 @@ resources:
       teamName: ${rbacTeam.name}
       roleId: ${readOnlyRole.roleId}
 
-  # OrganizationMember is intentionally not exercised by this example:
-  # the test organisation is shared, and destroying the stack would remove
-  # the user from the org and break other tests. Use
-  # `pulumi import pulumiservice:index:OrganizationMember` to adopt
-  # existing members and assign them custom roles.
+  # Exercise OrganizationMember via adoption: the user already exists in
+  # the org, so Create hits 409 → adopts the membership (adopted=true),
+  # then assigns the custom role. Destroy is a no-op for adopted
+  # memberships; destroying readOnlyRole above (force=true) revokes the
+  # assignment, restoring the user to their org-default role.
+  rbacMember:
+    type: pulumiservice:OrganizationMember
+    properties:
+      organizationName: ${organizationName}
+      username: service-provider-example-user
+      roleId: ${readOnlyRole.roleId}
 
 variables:
   # Data source: list every member of the organization.
@@ -69,3 +75,5 @@ outputs:
   assignedRoleName: ${rbacTeamRoleBinding.roleName}
   firstMember: ${currentMembers.members[0].username}
   firstScope: ${availableScopes.scopes[0].name}
+  memberAdopted: ${rbacMember.adopted}
+  memberAssignedRole: ${rbacMember.roleName}
