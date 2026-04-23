@@ -244,12 +244,22 @@ func (*OrganizationMember) Delete(
 	ctx context.Context,
 	req infer.DeleteRequest[OrganizationMemberState],
 ) (infer.DeleteResponse, error) {
-	if req.State.Adopted {
-		// We didn't create this membership — don't remove it. Pulumi import
-		// semantics: adopted resources are released, not destroyed.
-		return infer.DeleteResponse{}, nil
-	}
 	client := config.GetClient(ctx)
+	if req.State.Adopted {
+		// Adopted: don't remove the user from the org, but un-assign any
+		// custom role we applied. Leaving a dangling fgaRoleId would block
+		// deletion of the custom role (the service refuses "cannot delete
+		// role X, it is referenced by users or teams"). Reset to the
+		// built-in member role — the default for unassigned members.
+		empty := ""
+		return infer.DeleteResponse{}, client.UpdateOrgMemberRole(
+			ctx,
+			req.State.OrganizationName,
+			req.State.Username,
+			defaultOrgMemberRole,
+			&empty,
+		)
+	}
 	return infer.DeleteResponse{}, client.DeleteMemberFromOrg(
 		ctx,
 		req.State.OrganizationName,

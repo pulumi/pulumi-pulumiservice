@@ -202,6 +202,66 @@ func TestOrganizationMemberCreate(t *testing.T) {
 	})
 }
 
+func TestOrganizationMemberDelete(t *testing.T) {
+	t.Run("adopted: un-assigns role but keeps user", func(t *testing.T) {
+		deleted := false
+		updated := false
+		mock := &orgMemberClientMock{
+			deleteFunc: func(_ context.Context, _, _ string) error {
+				deleted = true
+				return nil
+			},
+			updateFunc: func(_ context.Context, _, _, role string, fgaRoleID *string) error {
+				updated = true
+				assert.Equal(t, "member", role)
+				// Explicit empty pointer so the service clears the custom role
+				// (no-omit: "" still serialises as "fgaRoleId":"").
+				if assert.NotNil(t, fgaRoleID) {
+					assert.Equal(t, "", *fgaRoleID)
+				}
+				return nil
+			},
+		}
+		ctx := config.WithMockClient(context.Background(), mock)
+		r := &OrganizationMember{}
+		_, err := r.Delete(ctx, infer.DeleteRequest[OrganizationMemberState]{
+			State: OrganizationMemberState{
+				OrganizationMemberCore: OrganizationMemberCore{
+					OrganizationName: "acme",
+					Username:         "alice",
+				},
+				Adopted: true,
+			},
+		})
+		assert.NoError(t, err)
+		assert.True(t, updated, "expected UpdateOrgMemberRole to un-assign the custom role")
+		assert.False(t, deleted, "must not remove an adopted member from the org")
+	})
+
+	t.Run("owned: removes the user", func(t *testing.T) {
+		deleted := false
+		mock := &orgMemberClientMock{
+			deleteFunc: func(_ context.Context, _, _ string) error {
+				deleted = true
+				return nil
+			},
+		}
+		ctx := config.WithMockClient(context.Background(), mock)
+		r := &OrganizationMember{}
+		_, err := r.Delete(ctx, infer.DeleteRequest[OrganizationMemberState]{
+			State: OrganizationMemberState{
+				OrganizationMemberCore: OrganizationMemberCore{
+					OrganizationName: "acme",
+					Username:         "alice",
+				},
+				Adopted: false,
+			},
+		})
+		assert.NoError(t, err)
+		assert.True(t, deleted)
+	})
+}
+
 func TestOrganizationMemberCheck(t *testing.T) {
 	r := &OrganizationMember{}
 	bad := "owner"
