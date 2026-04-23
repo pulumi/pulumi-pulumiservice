@@ -511,6 +511,20 @@ func TestYamlDeploymentSettingsVcsExample(t *testing.T) {
 	t.Skip("requires an existing Azure DevOps integration; run manually against a configured environment")
 }
 
+func TestYamlRbacExample(t *testing.T) {
+	// Requires the Custom Roles feature to be enabled on the test
+	// organization. If it isn't, CreateRole will return a feature-flag
+	// error and the test fails loudly — which is what we want to learn.
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-rbac"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+	)
+	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	test.SetConfig(t, "organizationName", getOrgName())
+	runPulumiTest(t, test)
+}
+
 func writePulumiYaml(t *testing.T, yamlContents interface{}) string {
 	tmpdir := t.TempDir()
 	b, err := yaml.Marshal(yamlContents)

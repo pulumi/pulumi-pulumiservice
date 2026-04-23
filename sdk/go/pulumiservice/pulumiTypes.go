@@ -3390,6 +3390,106 @@ func (o OperationContextOptionsPtrOutput) SkipIntermediateDeployments() pulumi.B
 	}).(pulumi.BoolPtrOutput)
 }
 
+type OrganizationMemberInfo struct {
+	// The member's email address.
+	Email string `pulumi:"email"`
+	// The member's GitHub login.
+	GithubLogin string `pulumi:"githubLogin"`
+	// Whether this member has a Pulumi Cloud account.
+	KnownToPulumi bool `pulumi:"knownToPulumi"`
+	// The member's display name.
+	Name string `pulumi:"name"`
+	// The member's built-in role (member, admin, billing-manager).
+	Role string `pulumi:"role"`
+	// The custom role ID assigned to this member, if any.
+	RoleId *string `pulumi:"roleId"`
+	// The custom role name assigned to this member, if any.
+	RoleName *string `pulumi:"roleName"`
+	// The member's Pulumi Cloud username.
+	Username string `pulumi:"username"`
+	// Whether this member is an admin in Pulumi Cloud without admin access on the backing identity provider.
+	VirtualAdmin bool `pulumi:"virtualAdmin"`
+}
+
+type OrganizationMemberInfoOutput struct{ *pulumi.OutputState }
+
+func (OrganizationMemberInfoOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*OrganizationMemberInfo)(nil)).Elem()
+}
+
+func (o OrganizationMemberInfoOutput) ToOrganizationMemberInfoOutput() OrganizationMemberInfoOutput {
+	return o
+}
+
+func (o OrganizationMemberInfoOutput) ToOrganizationMemberInfoOutputWithContext(ctx context.Context) OrganizationMemberInfoOutput {
+	return o
+}
+
+// The member's email address.
+func (o OrganizationMemberInfoOutput) Email() pulumi.StringOutput {
+	return o.ApplyT(func(v OrganizationMemberInfo) string { return v.Email }).(pulumi.StringOutput)
+}
+
+// The member's GitHub login.
+func (o OrganizationMemberInfoOutput) GithubLogin() pulumi.StringOutput {
+	return o.ApplyT(func(v OrganizationMemberInfo) string { return v.GithubLogin }).(pulumi.StringOutput)
+}
+
+// Whether this member has a Pulumi Cloud account.
+func (o OrganizationMemberInfoOutput) KnownToPulumi() pulumi.BoolOutput {
+	return o.ApplyT(func(v OrganizationMemberInfo) bool { return v.KnownToPulumi }).(pulumi.BoolOutput)
+}
+
+// The member's display name.
+func (o OrganizationMemberInfoOutput) Name() pulumi.StringOutput {
+	return o.ApplyT(func(v OrganizationMemberInfo) string { return v.Name }).(pulumi.StringOutput)
+}
+
+// The member's built-in role (member, admin, billing-manager).
+func (o OrganizationMemberInfoOutput) Role() pulumi.StringOutput {
+	return o.ApplyT(func(v OrganizationMemberInfo) string { return v.Role }).(pulumi.StringOutput)
+}
+
+// The custom role ID assigned to this member, if any.
+func (o OrganizationMemberInfoOutput) RoleId() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v OrganizationMemberInfo) *string { return v.RoleId }).(pulumi.StringPtrOutput)
+}
+
+// The custom role name assigned to this member, if any.
+func (o OrganizationMemberInfoOutput) RoleName() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v OrganizationMemberInfo) *string { return v.RoleName }).(pulumi.StringPtrOutput)
+}
+
+// The member's Pulumi Cloud username.
+func (o OrganizationMemberInfoOutput) Username() pulumi.StringOutput {
+	return o.ApplyT(func(v OrganizationMemberInfo) string { return v.Username }).(pulumi.StringOutput)
+}
+
+// Whether this member is an admin in Pulumi Cloud without admin access on the backing identity provider.
+func (o OrganizationMemberInfoOutput) VirtualAdmin() pulumi.BoolOutput {
+	return o.ApplyT(func(v OrganizationMemberInfo) bool { return v.VirtualAdmin }).(pulumi.BoolOutput)
+}
+
+type OrganizationMemberInfoArrayOutput struct{ *pulumi.OutputState }
+
+func (OrganizationMemberInfoArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]OrganizationMemberInfo)(nil)).Elem()
+}
+
+func (o OrganizationMemberInfoArrayOutput) ToOrganizationMemberInfoArrayOutput() OrganizationMemberInfoArrayOutput {
+	return o
+}
+
+func (o OrganizationMemberInfoArrayOutput) ToOrganizationMemberInfoArrayOutputWithContext(ctx context.Context) OrganizationMemberInfoArrayOutput {
+	return o
+}
+
+func (o OrganizationMemberInfoArrayOutput) Index(i pulumi.IntInput) OrganizationMemberInfoOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) OrganizationMemberInfo {
+		return vs[0].([]OrganizationMemberInfo)[vs[1].(int)]
+	}).(OrganizationMemberInfoOutput)
+}
+
 // A reference to a policy pack within a policy group.
 type PolicyGroupPolicyPackReference struct {
 	// Optional configuration for the policy pack. The special key `all` sets the default enforcement level for every policy in the pack; per-policy entries override it.
@@ -3700,6 +3800,71 @@ func (o PolicyGroupStackReferenceArrayOutput) Index(i pulumi.IntInput) PolicyGro
 	}).(PolicyGroupStackReferenceOutput)
 }
 
+type RoleScopeInfo struct {
+	// Human-readable description of what the scope grants.
+	Description string `pulumi:"description"`
+	// The scope group label as shown in the Pulumi Cloud console (e.g. `Stacks`).
+	GroupName string `pulumi:"groupName"`
+	// The scope name (e.g. `stack:read`).
+	Name string `pulumi:"name"`
+	// The resource-type bucket the scope belongs to (e.g. `stack`, `team`).
+	ResourceType string `pulumi:"resourceType"`
+}
+
+type RoleScopeInfoOutput struct{ *pulumi.OutputState }
+
+func (RoleScopeInfoOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*RoleScopeInfo)(nil)).Elem()
+}
+
+func (o RoleScopeInfoOutput) ToRoleScopeInfoOutput() RoleScopeInfoOutput {
+	return o
+}
+
+func (o RoleScopeInfoOutput) ToRoleScopeInfoOutputWithContext(ctx context.Context) RoleScopeInfoOutput {
+	return o
+}
+
+// Human-readable description of what the scope grants.
+func (o RoleScopeInfoOutput) Description() pulumi.StringOutput {
+	return o.ApplyT(func(v RoleScopeInfo) string { return v.Description }).(pulumi.StringOutput)
+}
+
+// The scope group label as shown in the Pulumi Cloud console (e.g. `Stacks`).
+func (o RoleScopeInfoOutput) GroupName() pulumi.StringOutput {
+	return o.ApplyT(func(v RoleScopeInfo) string { return v.GroupName }).(pulumi.StringOutput)
+}
+
+// The scope name (e.g. `stack:read`).
+func (o RoleScopeInfoOutput) Name() pulumi.StringOutput {
+	return o.ApplyT(func(v RoleScopeInfo) string { return v.Name }).(pulumi.StringOutput)
+}
+
+// The resource-type bucket the scope belongs to (e.g. `stack`, `team`).
+func (o RoleScopeInfoOutput) ResourceType() pulumi.StringOutput {
+	return o.ApplyT(func(v RoleScopeInfo) string { return v.ResourceType }).(pulumi.StringOutput)
+}
+
+type RoleScopeInfoArrayOutput struct{ *pulumi.OutputState }
+
+func (RoleScopeInfoArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]RoleScopeInfo)(nil)).Elem()
+}
+
+func (o RoleScopeInfoArrayOutput) ToRoleScopeInfoArrayOutput() RoleScopeInfoArrayOutput {
+	return o
+}
+
+func (o RoleScopeInfoArrayOutput) ToRoleScopeInfoArrayOutputWithContext(ctx context.Context) RoleScopeInfoArrayOutput {
+	return o
+}
+
+func (o RoleScopeInfoArrayOutput) Index(i pulumi.IntInput) RoleScopeInfoOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) RoleScopeInfo {
+		return vs[0].([]RoleScopeInfo)[vs[1].(int)]
+	}).(RoleScopeInfoOutput)
+}
+
 type TemplateSourceDestination struct {
 	// Destination URL that gets filled in on new project creation.
 	Url *string `pulumi:"url"`
@@ -3918,12 +4083,16 @@ func init() {
 	pulumi.RegisterOutputType(OperationContextOIDCPtrOutput{})
 	pulumi.RegisterOutputType(OperationContextOptionsOutput{})
 	pulumi.RegisterOutputType(OperationContextOptionsPtrOutput{})
+	pulumi.RegisterOutputType(OrganizationMemberInfoOutput{})
+	pulumi.RegisterOutputType(OrganizationMemberInfoArrayOutput{})
 	pulumi.RegisterOutputType(PolicyGroupPolicyPackReferenceOutput{})
 	pulumi.RegisterOutputType(PolicyGroupPolicyPackReferenceArrayOutput{})
 	pulumi.RegisterOutputType(PolicyGroupPolicyPackReferenceInputTypeOutput{})
 	pulumi.RegisterOutputType(PolicyGroupPolicyPackReferenceInputTypeArrayOutput{})
 	pulumi.RegisterOutputType(PolicyGroupStackReferenceOutput{})
 	pulumi.RegisterOutputType(PolicyGroupStackReferenceArrayOutput{})
+	pulumi.RegisterOutputType(RoleScopeInfoOutput{})
+	pulumi.RegisterOutputType(RoleScopeInfoArrayOutput{})
 	pulumi.RegisterOutputType(TemplateSourceDestinationOutput{})
 	pulumi.RegisterOutputType(TemplateSourceDestinationPtrOutput{})
 }

@@ -1,4 +1,4 @@
-// Copyright 2016-2022, Pulumi Corporation.
+// Copyright 2016-2026, Pulumi Corporation.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,8 +22,17 @@ import (
 	"path"
 )
 
+type MemberClient interface {
+	AddMemberToOrg(ctx context.Context, userName, orgName, role string) error
+	UpdateOrgMemberRole(ctx context.Context, orgName, userName, role string, fgaRoleID *string) error
+	ListOrgMembers(ctx context.Context, orgName string) (*Members, error)
+	GetOrgMember(ctx context.Context, orgName, userName string) (*Member, error)
+	DeleteMemberFromOrg(ctx context.Context, orgName, userName string) error
+}
+
 type Members struct {
-	Members []Member
+	Members           []Member
+	ContinuationToken *string `json:"continuationToken,omitempty"`
 }
 
 type Member struct {
@@ -31,6 +40,15 @@ type Member struct {
 	User          User
 	KnownToPulumi bool
 	VirtualAdmin  bool
+	FGARole       *FGARole `json:"fgaRole,omitempty"`
+}
+
+// FGARole is the fine-grained role assigned to a member. For built-in roles,
+// the ID/name reflect member/admin/billing-manager; for custom roles, they
+// reflect the custom role defined on the organization.
+type FGARole struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }
 
 type User struct {
@@ -44,19 +62,28 @@ type addMemberToOrgReq struct {
 	Role string `json:"role"`
 }
 
-func (c *Client) AddMemberToOrg(ctx context.Context, userName string, orgName string, role string) error {
+type updateMemberRoleReq struct {
+	Role       string  `json:"role,omitempty"`
+	FGARoleID  *string `json:"fgaRoleId,omitempty"`
+}
 
+func validBuiltinOrgRole(role string) bool {
+	switch role {
+	case "admin", "member", "billing-manager":
+		return true
+	}
+	return false
+}
+
+func (c *Client) AddMemberToOrg(ctx context.Context, userName string, orgName string, role string) error {
 	if len(userName) == 0 {
 		return errors.New("username should not be empty")
 	}
 	if len(orgName) == 0 {
 		return errors.New("organization name should not be empty")
 	}
-
-	roleList := []string{"admin", "member"}
-
-	if !contains(roleList, role) {
-		return fmt.Errorf("role must be one of: %v", roleList)
+	if !validBuiltinOrgRole(role) {
+		return fmt.Errorf("role must be one of: admin, member, billing-manager")
 	}
 
 	apiPath := path.Join("orgs", orgName, "members", userName)
@@ -71,21 +98,80 @@ func (c *Client) AddMemberToOrg(ctx context.Context, userName string, orgName st
 	return nil
 }
 
+// UpdateOrgMemberRole updates a member's role on the organization. Pass role
+// for a built-in role (member, admin, billing-manager); pass fgaRoleID to
+// assign a custom role (takes precedence). At least one must be non-empty.
+func (c *Client) UpdateOrgMemberRole(
+	ctx context.Context,
+	orgName, userName, role string,
+	fgaRoleID *string,
+) error {
+	if len(orgName) == 0 {
+		return errors.New("organization name should not be empty")
+	}
+	if len(userName) == 0 {
+		return errors.New("username should not be empty")
+	}
+	if role == "" && (fgaRoleID == nil || *fgaRoleID == "") {
+		return errors.New("one of role or fgaRoleID must be set")
+	}
+	if role != "" && !validBuiltinOrgRole(role) {
+		return fmt.Errorf("role must be one of: admin, member, billing-manager")
+	}
+
+	apiPath := path.Join("orgs", orgName, "members", userName)
+	req := updateMemberRoleReq{Role: role, FGARoleID: fgaRoleID}
+	if _, err := c.do(ctx, http.MethodPatch, apiPath, req, nil); err != nil {
+		return fmt.Errorf("failed to update org member role: %w", err)
+	}
+	return nil
+}
+
+// ListOrgMembers returns every member of the organization, following
+// continuationToken pagination.
 func (c *Client) ListOrgMembers(ctx context.Context, orgName string) (*Members, error) {
 	if len(orgName) == 0 {
 		return nil, errors.New("empty orgName")
 	}
 
 	apiPath := path.Join("orgs", orgName, "members")
+	all := Members{Members: []Member{}}
 
-	var members Members
-	_, err := c.doWithQuery(ctx, http.MethodGet, apiPath, url.Values{"type": []string{"backend"}}, nil, &members)
-	if err != nil {
-		return nil, fmt.Errorf("failed to list organization members: %w", err)
+	token := ""
+	for {
+		q := url.Values{"type": []string{"backend"}}
+		if token != "" {
+			q.Set("continuationToken", token)
+		}
+
+		var page Members
+		if _, err := c.doWithQuery(ctx, http.MethodGet, apiPath, q, nil, &page); err != nil {
+			return nil, fmt.Errorf("failed to list organization members: %w", err)
+		}
+		all.Members = append(all.Members, page.Members...)
+
+		if page.ContinuationToken == nil || *page.ContinuationToken == "" {
+			break
+		}
+		token = *page.ContinuationToken
 	}
 
-	return &members, nil
+	return &all, nil
+}
 
+// GetOrgMember looks up a single member by username using the list endpoint.
+// Returns (nil, nil) when not found.
+func (c *Client) GetOrgMember(ctx context.Context, orgName, userName string) (*Member, error) {
+	members, err := c.ListOrgMembers(ctx, orgName)
+	if err != nil {
+		return nil, err
+	}
+	for i, m := range members.Members {
+		if m.User.GithubLogin == userName || m.User.Name == userName {
+			return &members.Members[i], nil
+		}
+	}
+	return nil, nil
 }
 
 func (c *Client) DeleteMemberFromOrg(ctx context.Context, orgName string, userName string) error {

@@ -45,6 +45,10 @@ func (m *module) Construct(ctx *pulumi.Context, name, typ, urn string) (r pulumi
 		r = &OidcIssuer{}
 	case "pulumiservice:index:OrgAccessToken":
 		r = &OrgAccessToken{}
+	case "pulumiservice:index:OrganizationMember":
+		r = &OrganizationMember{}
+	case "pulumiservice:index:OrganizationRole":
+		r = &OrganizationRole{}
 	case "pulumiservice:index:PolicyGroup":
 		r = &PolicyGroup{}
 	case "pulumiservice:index:Stack":
@@ -59,6 +63,8 @@ func (m *module) Construct(ctx *pulumi.Context, name, typ, urn string) (r pulumi
 		r = &TeamAccessToken{}
 	case "pulumiservice:index:TeamEnvironmentPermission":
 		r = &TeamEnvironmentPermission{}
+	case "pulumiservice:index:TeamRoleAssignment":
+		r = &TeamRoleAssignment{}
 	case "pulumiservice:index:TeamStackPermission":
 		r = &TeamStackPermission{}
 	case "pulumiservice:index:TemplateSource":

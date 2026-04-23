@@ -60,6 +60,16 @@ export const getInsightsAccounts: typeof import("./getInsightsAccounts").getInsi
 export const getInsightsAccountsOutput: typeof import("./getInsightsAccounts").getInsightsAccountsOutput = null as any;
 utilities.lazyLoad(exports, ["getInsightsAccounts","getInsightsAccountsOutput"], () => require("./getInsightsAccounts"));
 
+export { GetOrganizationMembersArgs, GetOrganizationMembersResult, GetOrganizationMembersOutputArgs } from "./getOrganizationMembers";
+export const getOrganizationMembers: typeof import("./getOrganizationMembers").getOrganizationMembers = null as any;
+export const getOrganizationMembersOutput: typeof import("./getOrganizationMembers").getOrganizationMembersOutput = null as any;
+utilities.lazyLoad(exports, ["getOrganizationMembers","getOrganizationMembersOutput"], () => require("./getOrganizationMembers"));
+
+export { GetOrganizationRoleScopesArgs, GetOrganizationRoleScopesResult, GetOrganizationRoleScopesOutputArgs } from "./getOrganizationRoleScopes";
+export const getOrganizationRoleScopes: typeof import("./getOrganizationRoleScopes").getOrganizationRoleScopes = null as any;
+export const getOrganizationRoleScopesOutput: typeof import("./getOrganizationRoleScopes").getOrganizationRoleScopesOutput = null as any;
+utilities.lazyLoad(exports, ["getOrganizationRoleScopes","getOrganizationRoleScopesOutput"], () => require("./getOrganizationRoleScopes"));
+
 export { GetPolicyPackArgs, GetPolicyPackResult, GetPolicyPackOutputArgs } from "./getPolicyPack";
 export const getPolicyPack: typeof import("./getPolicyPack").getPolicyPack = null as any;
 export const getPolicyPackOutput: typeof import("./getPolicyPack").getPolicyPackOutput = null as any;
@@ -84,6 +94,16 @@ export { OrgAccessTokenArgs } from "./orgAccessToken";
 export type OrgAccessToken = import("./orgAccessToken").OrgAccessToken;
 export const OrgAccessToken: typeof import("./orgAccessToken").OrgAccessToken = null as any;
 utilities.lazyLoad(exports, ["OrgAccessToken"], () => require("./orgAccessToken"));
+
+export { OrganizationMemberArgs } from "./organizationMember";
+export type OrganizationMember = import("./organizationMember").OrganizationMember;
+export const OrganizationMember: typeof import("./organizationMember").OrganizationMember = null as any;
+utilities.lazyLoad(exports, ["OrganizationMember"], () => require("./organizationMember"));
+
+export { OrganizationRoleArgs } from "./organizationRole";
+export type OrganizationRole = import("./organizationRole").OrganizationRole;
+export const OrganizationRole: typeof import("./organizationRole").OrganizationRole = null as any;
+utilities.lazyLoad(exports, ["OrganizationRole"], () => require("./organizationRole"));
 
 export { PolicyGroupArgs } from "./policyGroup";
 export type PolicyGroup = import("./policyGroup").PolicyGroup;
@@ -124,6 +144,11 @@ export { TeamEnvironmentPermissionArgs } from "./teamEnvironmentPermission";
 export type TeamEnvironmentPermission = import("./teamEnvironmentPermission").TeamEnvironmentPermission;
 export const TeamEnvironmentPermission: typeof import("./teamEnvironmentPermission").TeamEnvironmentPermission = null as any;
 utilities.lazyLoad(exports, ["TeamEnvironmentPermission"], () => require("./teamEnvironmentPermission"));
+
+export { TeamRoleAssignmentArgs } from "./teamRoleAssignment";
+export type TeamRoleAssignment = import("./teamRoleAssignment").TeamRoleAssignment;
+export const TeamRoleAssignment: typeof import("./teamRoleAssignment").TeamRoleAssignment = null as any;
+utilities.lazyLoad(exports, ["TeamRoleAssignment"], () => require("./teamRoleAssignment"));
 
 export { TeamStackPermissionArgs } from "./teamStackPermission";
 export type TeamStackPermission = import("./teamStackPermission").TeamStackPermission;
@@ -186,6 +211,10 @@ const _module = {
                 return new OidcIssuer(name, <any>undefined, { urn })
             case "pulumiservice:index:OrgAccessToken":
                 return new OrgAccessToken(name, <any>undefined, { urn })
+            case "pulumiservice:index:OrganizationMember":
+                return new OrganizationMember(name, <any>undefined, { urn })
+            case "pulumiservice:index:OrganizationRole":
+                return new OrganizationRole(name, <any>undefined, { urn })
             case "pulumiservice:index:PolicyGroup":
                 return new PolicyGroup(name, <any>undefined, { urn })
             case "pulumiservice:index:Stack":
@@ -200,6 +229,8 @@ const _module = {
                 return new TeamAccessToken(name, <any>undefined, { urn })
             case "pulumiservice:index:TeamEnvironmentPermission":
                 return new TeamEnvironmentPermission(name, <any>undefined, { urn })
+            case "pulumiservice:index:TeamRoleAssignment":
+                return new TeamRoleAssignment(name, <any>undefined, { urn })
             case "pulumiservice:index:TeamStackPermission":
                 return new TeamStackPermission(name, <any>undefined, { urn })
             case "pulumiservice:index:TemplateSource":

@@ -13,12 +13,18 @@ import com.pulumi.pulumiservice.inputs.GetInsightsAccountArgs;
 import com.pulumi.pulumiservice.inputs.GetInsightsAccountPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetInsightsAccountsArgs;
 import com.pulumi.pulumiservice.inputs.GetInsightsAccountsPlainArgs;
+import com.pulumi.pulumiservice.inputs.GetOrganizationMembersArgs;
+import com.pulumi.pulumiservice.inputs.GetOrganizationMembersPlainArgs;
+import com.pulumi.pulumiservice.inputs.GetOrganizationRoleScopesArgs;
+import com.pulumi.pulumiservice.inputs.GetOrganizationRoleScopesPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetPolicyPackArgs;
 import com.pulumi.pulumiservice.inputs.GetPolicyPackPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetPolicyPacksArgs;
 import com.pulumi.pulumiservice.inputs.GetPolicyPacksPlainArgs;
 import com.pulumi.pulumiservice.outputs.GetInsightsAccountResult;
 import com.pulumi.pulumiservice.outputs.GetInsightsAccountsResult;
+import com.pulumi.pulumiservice.outputs.GetOrganizationMembersResult;
+import com.pulumi.pulumiservice.outputs.GetOrganizationRoleScopesResult;
 import com.pulumi.pulumiservice.outputs.GetPolicyPackResult;
 import com.pulumi.pulumiservice.outputs.GetPolicyPacksResult;
 import java.util.concurrent.CompletableFuture;
@@ -93,6 +99,76 @@ public final class PulumiserviceFunctions {
      */
     public static CompletableFuture<GetInsightsAccountsResult> getInsightsAccountsPlain(GetInsightsAccountsPlainArgs args, InvokeOptions options) {
         return Deployment.getInstance().invokeAsync("pulumiservice:index:getInsightsAccounts", TypeShape.of(GetInsightsAccountsResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Lists all members of a Pulumi Cloud organization, including their role assignments.
+     * 
+     */
+    public static Output<GetOrganizationMembersResult> getOrganizationMembers(GetOrganizationMembersArgs args) {
+        return getOrganizationMembers(args, InvokeOptions.Empty);
+    }
+    /**
+     * Lists all members of a Pulumi Cloud organization, including their role assignments.
+     * 
+     */
+    public static CompletableFuture<GetOrganizationMembersResult> getOrganizationMembersPlain(GetOrganizationMembersPlainArgs args) {
+        return getOrganizationMembersPlain(args, InvokeOptions.Empty);
+    }
+    /**
+     * Lists all members of a Pulumi Cloud organization, including their role assignments.
+     * 
+     */
+    public static Output<GetOrganizationMembersResult> getOrganizationMembers(GetOrganizationMembersArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getOrganizationMembers", TypeShape.of(GetOrganizationMembersResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Lists all members of a Pulumi Cloud organization, including their role assignments.
+     * 
+     */
+    public static Output<GetOrganizationMembersResult> getOrganizationMembers(GetOrganizationMembersArgs args, InvokeOutputOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getOrganizationMembers", TypeShape.of(GetOrganizationMembersResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Lists all members of a Pulumi Cloud organization, including their role assignments.
+     * 
+     */
+    public static CompletableFuture<GetOrganizationMembersResult> getOrganizationMembersPlain(GetOrganizationMembersPlainArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invokeAsync("pulumiservice:index:getOrganizationMembers", TypeShape.of(GetOrganizationMembersResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Lists the permission scopes available for custom roles in an organization. Use this to discover valid scope names before setting `OrganizationRole.permissions`. The catalogue is flattened into a single list with resource type and group context, sorted deterministically.
+     * 
+     */
+    public static Output<GetOrganizationRoleScopesResult> getOrganizationRoleScopes(GetOrganizationRoleScopesArgs args) {
+        return getOrganizationRoleScopes(args, InvokeOptions.Empty);
+    }
+    /**
+     * Lists the permission scopes available for custom roles in an organization. Use this to discover valid scope names before setting `OrganizationRole.permissions`. The catalogue is flattened into a single list with resource type and group context, sorted deterministically.
+     * 
+     */
+    public static CompletableFuture<GetOrganizationRoleScopesResult> getOrganizationRoleScopesPlain(GetOrganizationRoleScopesPlainArgs args) {
+        return getOrganizationRoleScopesPlain(args, InvokeOptions.Empty);
+    }
+    /**
+     * Lists the permission scopes available for custom roles in an organization. Use this to discover valid scope names before setting `OrganizationRole.permissions`. The catalogue is flattened into a single list with resource type and group context, sorted deterministically.
+     * 
+     */
+    public static Output<GetOrganizationRoleScopesResult> getOrganizationRoleScopes(GetOrganizationRoleScopesArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getOrganizationRoleScopes", TypeShape.of(GetOrganizationRoleScopesResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Lists the permission scopes available for custom roles in an organization. Use this to discover valid scope names before setting `OrganizationRole.permissions`. The catalogue is flattened into a single list with resource type and group context, sorted deterministically.
+     * 
+     */
+    public static Output<GetOrganizationRoleScopesResult> getOrganizationRoleScopes(GetOrganizationRoleScopesArgs args, InvokeOutputOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getOrganizationRoleScopes", TypeShape.of(GetOrganizationRoleScopesResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Lists the permission scopes available for custom roles in an organization. Use this to discover valid scope names before setting `OrganizationRole.permissions`. The catalogue is flattened into a single list with resource type and group context, sorted deterministically.
+     * 
+     */
+    public static CompletableFuture<GetOrganizationRoleScopesResult> getOrganizationRoleScopesPlain(GetOrganizationRoleScopesPlainArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invokeAsync("pulumiservice:index:getOrganizationRoleScopes", TypeShape.of(GetOrganizationRoleScopesResult.class), args, Utilities.withVersion(options));
     }
     /**
      * Get details about a specific version of a policy pack.

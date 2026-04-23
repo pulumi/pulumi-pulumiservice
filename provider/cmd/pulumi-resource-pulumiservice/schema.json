@@ -688,6 +688,56 @@
       },
       "type": "object"
     },
+    "pulumiservice:index:OrganizationMemberInfo": {
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "The member's email address."
+        },
+        "githubLogin": {
+          "type": "string",
+          "description": "The member's GitHub login."
+        },
+        "knownToPulumi": {
+          "type": "boolean",
+          "description": "Whether this member has a Pulumi Cloud account."
+        },
+        "name": {
+          "type": "string",
+          "description": "The member's display name."
+        },
+        "role": {
+          "type": "string",
+          "description": "The member's built-in role (member, admin, billing-manager)."
+        },
+        "roleId": {
+          "type": "string",
+          "description": "The custom role ID assigned to this member, if any."
+        },
+        "roleName": {
+          "type": "string",
+          "description": "The custom role name assigned to this member, if any."
+        },
+        "username": {
+          "type": "string",
+          "description": "The member's Pulumi Cloud username."
+        },
+        "virtualAdmin": {
+          "type": "boolean",
+          "description": "Whether this member is an admin in Pulumi Cloud without admin access on the backing identity provider."
+        }
+      },
+      "type": "object",
+      "required": [
+        "username",
+        "name",
+        "email",
+        "githubLogin",
+        "role",
+        "knownToPulumi",
+        "virtualAdmin"
+      ]
+    },
     "pulumiservice:index:PolicyGroupPolicyPackReference": {
       "description": "A reference to a policy pack within a policy group.",
       "properties": {
@@ -825,6 +875,33 @@
           "description": "Rotate permission.",
           "value": "environment:rotate"
         }
+      ]
+    },
+    "pulumiservice:index:RoleScopeInfo": {
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Human-readable description of what the scope grants."
+        },
+        "groupName": {
+          "type": "string",
+          "description": "The scope group label as shown in the Pulumi Cloud console (e.g. `Stacks`)."
+        },
+        "name": {
+          "type": "string",
+          "description": "The scope name (e.g. `stack:read`)."
+        },
+        "resourceType": {
+          "type": "string",
+          "description": "The resource-type bucket the scope belongs to (e.g. `stack`, `team`)."
+        }
+      },
+      "type": "object",
+      "required": [
+        "name",
+        "description",
+        "groupName",
+        "resourceType"
       ]
     },
     "pulumiservice:index:ScanSchedule": {
@@ -1952,6 +2029,165 @@
         "organizationName"
       ]
     },
+    "pulumiservice:index:OrganizationMember": {
+      "description": "Manages a user's membership in a Pulumi Cloud organization and their assigned role. The user must already have a Pulumi Cloud account before they can be added. Custom (fine-grained) roles are assigned by setting `roleId`; built-in roles are assigned by setting `role`. When both are set, `roleId` takes precedence.",
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "The member's email address."
+        },
+        "githubLogin": {
+          "type": "string",
+          "description": "The member's GitHub login."
+        },
+        "knownToPulumi": {
+          "type": "boolean",
+          "description": "Whether the member has a Pulumi Cloud account."
+        },
+        "name": {
+          "type": "string",
+          "description": "The member's display name."
+        },
+        "organizationName": {
+          "type": "string",
+          "description": "The Pulumi Cloud organization name.",
+          "replaceOnChanges": true
+        },
+        "role": {
+          "type": "string",
+          "description": "The built-in organization role. One of `member`, `admin`, `billing-manager`. Defaults to `member` on create. Ignored when `roleId` is set."
+        },
+        "roleId": {
+          "type": "string",
+          "description": "The ID of a custom (fine-grained) organization role to assign. Takes precedence over `role`."
+        },
+        "roleName": {
+          "type": "string",
+          "description": "The name of the currently assigned role (custom role name, or built-in role)."
+        },
+        "username": {
+          "type": "string",
+          "description": "The Pulumi Cloud username of the member.",
+          "replaceOnChanges": true
+        }
+      },
+      "required": [
+        "organizationName",
+        "username",
+        "name",
+        "email",
+        "githubLogin",
+        "knownToPulumi",
+        "roleName"
+      ],
+      "inputProperties": {
+        "organizationName": {
+          "type": "string",
+          "description": "The Pulumi Cloud organization name.",
+          "replaceOnChanges": true
+        },
+        "role": {
+          "type": "string",
+          "description": "The built-in organization role. One of `member`, `admin`, `billing-manager`. Defaults to `member` on create. Ignored when `roleId` is set."
+        },
+        "roleId": {
+          "type": "string",
+          "description": "The ID of a custom (fine-grained) organization role to assign. Takes precedence over `role`."
+        },
+        "username": {
+          "type": "string",
+          "description": "The Pulumi Cloud username of the member.",
+          "replaceOnChanges": true
+        }
+      },
+      "requiredInputs": [
+        "organizationName",
+        "username"
+      ]
+    },
+    "pulumiservice:index:OrganizationRole": {
+      "description": "A custom (fine-grained) role defined on a Pulumi Cloud organization. Custom roles allow precise permission control beyond the built-in `admin` / `member` / `billing-manager` roles. Assign them to members via the `OrganizationMember.roleId` field or to teams via `TeamRoleAssignment`.\n\nRequires the Custom Roles feature to be enabled on the organization. See the [Pulumi Cloud RBAC docs](https://www.pulumi.com/docs/pulumi-cloud/access-management/rbac/) for the shape of the `permissions` descriptor.",
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Human-readable description of what the role grants."
+        },
+        "name": {
+          "type": "string",
+          "description": "The role's display name. Must be unique within the organization."
+        },
+        "organizationName": {
+          "type": "string",
+          "description": "The Pulumi Cloud organization name.",
+          "replaceOnChanges": true
+        },
+        "permissions": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "The role's permission descriptor tree — passed to the service verbatim. This is the `details` field of a Pulumi Cloud PermissionDescriptor: an object with a `__type` discriminator (e.g. `PermissionDescriptorAllow`, `PermissionDescriptorCompose`) describing which scopes are granted."
+        },
+        "resourceType": {
+          "type": "string",
+          "description": "The resource type this role targets. Defaults to `organization`. Advanced: set to `team` for team-assignable roles."
+        },
+        "roleId": {
+          "type": "string",
+          "description": "The unique identifier of the custom role."
+        },
+        "uxPurpose": {
+          "type": "string",
+          "description": "How the role appears in the Pulumi Cloud console. One of `role`, `role_private`, `policy`, `set`. Defaults to `role`."
+        },
+        "version": {
+          "type": "integer",
+          "description": "The service-maintained version number that increments on every update."
+        }
+      },
+      "required": [
+        "organizationName",
+        "name",
+        "permissions",
+        "roleId",
+        "version"
+      ],
+      "inputProperties": {
+        "description": {
+          "type": "string",
+          "description": "Human-readable description of what the role grants."
+        },
+        "name": {
+          "type": "string",
+          "description": "The role's display name. Must be unique within the organization."
+        },
+        "organizationName": {
+          "type": "string",
+          "description": "The Pulumi Cloud organization name.",
+          "replaceOnChanges": true
+        },
+        "permissions": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "The role's permission descriptor tree — passed to the service verbatim. This is the `details` field of a Pulumi Cloud PermissionDescriptor: an object with a `__type` discriminator (e.g. `PermissionDescriptorAllow`, `PermissionDescriptorCompose`) describing which scopes are granted."
+        },
+        "resourceType": {
+          "type": "string",
+          "description": "The resource type this role targets. Defaults to `organization`. Advanced: set to `team` for team-assignable roles."
+        },
+        "uxPurpose": {
+          "type": "string",
+          "description": "How the role appears in the Pulumi Cloud console. One of `role`, `role_private`, `policy`, `set`. Defaults to `role`."
+        }
+      },
+      "requiredInputs": [
+        "organizationName",
+        "name",
+        "permissions"
+      ]
+    },
     "pulumiservice:index:PolicyGroup": {
       "description": "A Policy Group allows you to apply policy packs to a set of stacks in your organization.",
       "properties": {
@@ -2437,6 +2673,58 @@
         "permission"
       ]
     },
+    "pulumiservice:index:TeamRoleAssignment": {
+      "description": "Assigns a custom (fine-grained) role to a Pulumi Cloud team. The Pulumi Cloud API currently supports one role per team; creating a second assignment replaces the first. Automatically enables the team's custom-roles feature on first use.",
+      "properties": {
+        "organizationName": {
+          "type": "string",
+          "description": "The Pulumi Cloud organization name.",
+          "replaceOnChanges": true
+        },
+        "roleId": {
+          "type": "string",
+          "description": "The ID of the custom role to assign.",
+          "replaceOnChanges": true
+        },
+        "roleName": {
+          "type": "string",
+          "description": "The name of the assigned role at the time of last refresh."
+        },
+        "teamName": {
+          "type": "string",
+          "description": "The team name.",
+          "replaceOnChanges": true
+        }
+      },
+      "required": [
+        "organizationName",
+        "teamName",
+        "roleId",
+        "roleName"
+      ],
+      "inputProperties": {
+        "organizationName": {
+          "type": "string",
+          "description": "The Pulumi Cloud organization name.",
+          "replaceOnChanges": true
+        },
+        "roleId": {
+          "type": "string",
+          "description": "The ID of the custom role to assign.",
+          "replaceOnChanges": true
+        },
+        "teamName": {
+          "type": "string",
+          "description": "The team name.",
+          "replaceOnChanges": true
+        }
+      },
+      "requiredInputs": [
+        "organizationName",
+        "teamName",
+        "roleId"
+      ]
+    },
     "pulumiservice:index:TeamStackPermission": {
       "description": "Grants a team permissions to the specified stack.",
       "properties": {
@@ -2858,6 +3146,64 @@
         },
         "required": [
           "accounts"
+        ],
+        "type": "object"
+      }
+    },
+    "pulumiservice:index:getOrganizationMembers": {
+      "description": "Lists all members of a Pulumi Cloud organization, including their role assignments.",
+      "inputs": {
+        "properties": {
+          "organizationName": {
+            "type": "string",
+            "description": "The name of the Pulumi organization."
+          }
+        },
+        "type": "object",
+        "required": [
+          "organizationName"
+        ]
+      },
+      "outputs": {
+        "properties": {
+          "members": {
+            "items": {
+              "$ref": "#/types/pulumiservice:index:OrganizationMemberInfo"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "members"
+        ],
+        "type": "object"
+      }
+    },
+    "pulumiservice:index:getOrganizationRoleScopes": {
+      "description": "Lists the permission scopes available for custom roles in an organization. Use this to discover valid scope names before setting `OrganizationRole.permissions`. The catalogue is flattened into a single list with resource type and group context, sorted deterministically.",
+      "inputs": {
+        "properties": {
+          "organizationName": {
+            "type": "string",
+            "description": "The Pulumi Cloud organization name."
+          }
+        },
+        "type": "object",
+        "required": [
+          "organizationName"
+        ]
+      },
+      "outputs": {
+        "properties": {
+          "scopes": {
+            "items": {
+              "$ref": "#/types/pulumiservice:index:RoleScopeInfo"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "scopes"
         ],
         "type": "object"
       }
