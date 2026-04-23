@@ -1,0 +1,19 @@
+name: pulumi-service-rbac-example-ts
+runtime: nodejs
+description: Exercises the RBAC resources and data sources (OrganizationRole, TeamRoleAssignment, OrganizationMember, getOrganizationMembers, getOrganizationRoleScopes).
+
+config:
+  organizationName:
+    type: string
+    description: Pulumi Cloud organization to run against.
+  targetUsername:
+    type: string
+    description: Existing Pulumi Cloud username to adopt as an OrganizationMember and assign the custom role to.
+  nameSuffix:
+    type: string
+    description: Suffix appended to the created role and team names so repeat runs don't collide.
+    default: manual
+  lookupEmail:
+    type: string
+    description: Email address to look up via getOrganizationMember. Optional. Leave unset to skip the by-email invocation.
+    default: ""
