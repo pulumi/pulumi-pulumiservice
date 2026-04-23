@@ -250,14 +250,15 @@ func (*OrganizationMember) Delete(
 		// custom role we applied. Leaving a dangling fgaRoleId would block
 		// deletion of the custom role (the service refuses "cannot delete
 		// role X, it is referenced by users or teams"). Reset to the
-		// built-in member role — the default for unassigned members.
-		empty := ""
+		// built-in member role by PATCHing with only `role` set: the
+		// service converts legacy role input onto the backing FGA role
+		// when fgaRoleId is absent, effectively clearing any custom role.
 		return infer.DeleteResponse{}, client.UpdateOrgMemberRole(
 			ctx,
 			req.State.OrganizationName,
 			req.State.Username,
 			defaultOrgMemberRole,
-			&empty,
+			nil,
 		)
 	}
 	return infer.DeleteResponse{}, client.DeleteMemberFromOrg(

@@ -214,11 +214,10 @@ func TestOrganizationMemberDelete(t *testing.T) {
 			updateFunc: func(_ context.Context, _, _, role string, fgaRoleID *string) error {
 				updated = true
 				assert.Equal(t, "member", role)
-				// Explicit empty pointer so the service clears the custom role
-				// (no-omit: "" still serialises as "fgaRoleId":"").
-				if assert.NotNil(t, fgaRoleID) {
-					assert.Equal(t, "", *fgaRoleID)
-				}
+				// Nil fgaRoleID: server falls through to the legacy path and
+				// applies the built-in role as the new FGA role, clearing
+				// any prior custom-role assignment.
+				assert.Nil(t, fgaRoleID)
 				return nil
 			},
 		}
