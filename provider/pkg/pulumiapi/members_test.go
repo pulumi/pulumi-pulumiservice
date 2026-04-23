@@ -1,6 +1,8 @@
 package pulumiapi
 
 import (
+	"encoding/json"
+	"io"
 	"net/http"
 	"testing"
 
@@ -119,14 +121,33 @@ func TestUpdateOrgMemberRole(t *testing.T) {
 	orgName := testMemberOrgName
 	userName := testMemberUserName
 
-	t.Run("built-in role", func(t *testing.T) {
-		c := startTestServer(t, testServerConfig{
-			ExpectedReqMethod: http.MethodPatch,
-			ExpectedReqPath:   "/api/orgs/an-organization/members/a-user",
-			ExpectedReqBody:   updateMemberRoleReq{Role: "admin"},
-			ResponseCode:      204,
+	t.Run("built-in role resolves to FGA ID before PATCH", func(t *testing.T) {
+		roles := struct {
+			Roles []RoleDescriptor `json:"roles"`
+		}{
+			Roles: []RoleDescriptor{
+				{ID: "admin-fga-id", Name: "Admin", DefaultIdentifier: "admin"},
+				{ID: "member-fga-id", Name: "Member", DefaultIdentifier: "member"},
+			},
+		}
+		adminID := "admin-fga-id"
+		var patchBody []byte
+		c := startTestServerMulti(t, func(r *http.Request) (int, any) {
+			switch {
+			case r.Method == http.MethodGet && r.URL.Path == "/api/orgs/an-organization/roles":
+				assert.Equal(t, "role", r.URL.Query().Get("uxPurpose"))
+				return 200, roles
+			case r.Method == http.MethodPatch && r.URL.Path == "/api/orgs/an-organization/members/a-user":
+				patchBody, _ = io.ReadAll(r.Body)
+				return 204, nil
+			default:
+				t.Fatalf("unexpected request: %s %s", r.Method, r.URL.Path)
+				return 500, nil
+			}
 		})
 		assert.NoError(t, c.UpdateOrgMemberRole(ctx, orgName, userName, "admin", nil))
+		expected, _ := json.Marshal(updateMemberRoleReq{FGARoleID: &adminID})
+		assert.JSONEq(t, string(expected), string(patchBody))
 	})
 
 	t.Run("custom role", func(t *testing.T) {

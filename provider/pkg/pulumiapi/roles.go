@@ -32,6 +32,8 @@ type RoleClient interface {
 	) (*RoleDescriptor, error)
 	DeleteRole(ctx context.Context, orgName, roleID string, force bool) error
 	ListAvailableRoleScopes(ctx context.Context, orgName string) (map[string][]RoleScopeGroup, error)
+	ListOrgRoles(ctx context.Context, orgName, uxPurpose string) ([]RoleDescriptor, error)
+	ResolveBuiltInRoleID(ctx context.Context, orgName, builtInRole string) (string, error)
 }
 
 // RoleScope is a single permission scope (e.g. "stack:read") plus its
@@ -223,6 +225,45 @@ func (c *Client) ListAvailableRoleScopes(
 		out[bucket] = converted
 	}
 	return out, nil
+}
+
+// ListOrgRoles returns the role catalogue for an organization filtered by
+// uxPurpose (e.g. "role", "policy"). The service requires uxPurpose — calling
+// the endpoint without it returns 400 Bad Request.
+func (c *Client) ListOrgRoles(ctx context.Context, orgName, uxPurpose string) ([]RoleDescriptor, error) {
+	if len(orgName) == 0 {
+		return nil, errors.New("organization name should not be empty")
+	}
+	if len(uxPurpose) == 0 {
+		return nil, errors.New("uxPurpose should not be empty")
+	}
+
+	apiPath := path.Join("orgs", orgName, "roles")
+	q := url.Values{"uxPurpose": []string{uxPurpose}}
+	var body struct {
+		Roles []RoleDescriptor `json:"roles"`
+	}
+	if _, err := c.doWithQuery(ctx, http.MethodGet, apiPath, q, nil, &body); err != nil {
+		return nil, fmt.Errorf("failed to list organization roles: %w", err)
+	}
+	return body.Roles, nil
+}
+
+// ResolveBuiltInRoleID returns the FGA role ID for a Pulumi Cloud built-in
+// role (admin, member, billing-manager). The member PATCH endpoint rejects
+// built-in role names in the `role` field — callers must translate to
+// `fgaRoleId` first. Each org has its own set of built-in role IDs.
+func (c *Client) ResolveBuiltInRoleID(ctx context.Context, orgName, builtInRole string) (string, error) {
+	roles, err := c.ListOrgRoles(ctx, orgName, "role")
+	if err != nil {
+		return "", err
+	}
+	for _, r := range roles {
+		if r.DefaultIdentifier == builtInRole {
+			return r.ID, nil
+		}
+	}
+	return "", fmt.Errorf("built-in role %q not found in organization %q", builtInRole, orgName)
 }
 
 // DeleteRole deletes a custom role. When force is true the role is removed
