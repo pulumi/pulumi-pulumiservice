@@ -3155,6 +3155,79 @@
         "type": "object"
       }
     },
+    "pulumiservice:index:getOrganizationMember": {
+      "description": "Looks up a single member of a Pulumi Cloud organization by username or email. Exactly one of `username` or `email` must be set. Returns an error when the member is not found.",
+      "inputs": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "The email address to look up. Matching is case-insensitive. Mutually exclusive with `username`."
+          },
+          "organizationName": {
+            "type": "string",
+            "description": "The name of the Pulumi organization."
+          },
+          "username": {
+            "type": "string",
+            "description": "The Pulumi Cloud username to look up. Mutually exclusive with `email`."
+          }
+        },
+        "type": "object",
+        "required": [
+          "organizationName"
+        ]
+      },
+      "outputs": {
+        "properties": {
+          "email": {
+            "description": "The member's email address.",
+            "type": "string"
+          },
+          "githubLogin": {
+            "description": "The member's GitHub login.",
+            "type": "string"
+          },
+          "knownToPulumi": {
+            "description": "Whether this member has a Pulumi Cloud account.",
+            "type": "boolean"
+          },
+          "name": {
+            "description": "The member's display name.",
+            "type": "string"
+          },
+          "role": {
+            "description": "The member's built-in role (member, admin, billing-manager).",
+            "type": "string"
+          },
+          "roleId": {
+            "description": "The custom role ID assigned to this member, if any.",
+            "type": "string"
+          },
+          "roleName": {
+            "description": "The custom role name assigned to this member, if any.",
+            "type": "string"
+          },
+          "username": {
+            "description": "The member's Pulumi Cloud username.",
+            "type": "string"
+          },
+          "virtualAdmin": {
+            "description": "Whether this member is an admin in Pulumi Cloud without admin access on the backing identity provider.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "username",
+          "name",
+          "email",
+          "githubLogin",
+          "role",
+          "knownToPulumi",
+          "virtualAdmin"
+        ],
+        "type": "object"
+      }
+    },
     "pulumiservice:index:getOrganizationMembers": {
       "description": "Lists all members of a Pulumi Cloud organization, including their role assignments.",
       "inputs": {

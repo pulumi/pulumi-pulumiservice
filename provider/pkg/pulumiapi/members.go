@@ -20,6 +20,7 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"strings"
 )
 
 type MemberClient interface {
@@ -27,6 +28,7 @@ type MemberClient interface {
 	UpdateOrgMemberRole(ctx context.Context, orgName, userName, role string, fgaRoleID *string) error
 	ListOrgMembers(ctx context.Context, orgName string) (*Members, error)
 	GetOrgMember(ctx context.Context, orgName, userName string) (*Member, error)
+	GetOrgMemberByEmail(ctx context.Context, orgName, email string) (*Member, error)
 	DeleteMemberFromOrg(ctx context.Context, orgName, userName string) error
 }
 
@@ -168,6 +170,22 @@ func (c *Client) GetOrgMember(ctx context.Context, orgName, userName string) (*M
 	}
 	for i, m := range members.Members {
 		if m.User.GithubLogin == userName || m.User.Name == userName {
+			return &members.Members[i], nil
+		}
+	}
+	return nil, nil
+}
+
+// GetOrgMemberByEmail looks up a single member by email using the list endpoint.
+// Matching is case-insensitive. Returns (nil, nil) when not found.
+func (c *Client) GetOrgMemberByEmail(ctx context.Context, orgName, email string) (*Member, error) {
+	members, err := c.ListOrgMembers(ctx, orgName)
+	if err != nil {
+		return nil, err
+	}
+	needle := strings.ToLower(email)
+	for i, m := range members.Members {
+		if strings.ToLower(m.User.Email) == needle {
 			return &members.Members[i], nil
 		}
 	}

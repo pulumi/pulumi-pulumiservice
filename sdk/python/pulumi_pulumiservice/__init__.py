@@ -18,6 +18,7 @@ from .environment_rotation_schedule import *
 from .environment_version_tag import *
 from .get_insights_account import *
 from .get_insights_accounts import *
+from .get_organization_member import *
 from .get_organization_members import *
 from .get_organization_role_scopes import *
 from .get_policy_pack import *

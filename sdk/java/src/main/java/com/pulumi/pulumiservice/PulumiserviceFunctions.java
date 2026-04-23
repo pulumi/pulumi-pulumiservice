@@ -13,6 +13,8 @@ import com.pulumi.pulumiservice.inputs.GetInsightsAccountArgs;
 import com.pulumi.pulumiservice.inputs.GetInsightsAccountPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetInsightsAccountsArgs;
 import com.pulumi.pulumiservice.inputs.GetInsightsAccountsPlainArgs;
+import com.pulumi.pulumiservice.inputs.GetOrganizationMemberArgs;
+import com.pulumi.pulumiservice.inputs.GetOrganizationMemberPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetOrganizationMembersArgs;
 import com.pulumi.pulumiservice.inputs.GetOrganizationMembersPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetOrganizationRoleScopesArgs;
@@ -23,6 +25,7 @@ import com.pulumi.pulumiservice.inputs.GetPolicyPacksArgs;
 import com.pulumi.pulumiservice.inputs.GetPolicyPacksPlainArgs;
 import com.pulumi.pulumiservice.outputs.GetInsightsAccountResult;
 import com.pulumi.pulumiservice.outputs.GetInsightsAccountsResult;
+import com.pulumi.pulumiservice.outputs.GetOrganizationMemberResult;
 import com.pulumi.pulumiservice.outputs.GetOrganizationMembersResult;
 import com.pulumi.pulumiservice.outputs.GetOrganizationRoleScopesResult;
 import com.pulumi.pulumiservice.outputs.GetPolicyPackResult;
@@ -99,6 +102,41 @@ public final class PulumiserviceFunctions {
      */
     public static CompletableFuture<GetInsightsAccountsResult> getInsightsAccountsPlain(GetInsightsAccountsPlainArgs args, InvokeOptions options) {
         return Deployment.getInstance().invokeAsync("pulumiservice:index:getInsightsAccounts", TypeShape.of(GetInsightsAccountsResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Looks up a single member of a Pulumi Cloud organization by username or email. Exactly one of `username` or `email` must be set. Returns an error when the member is not found.
+     * 
+     */
+    public static Output<GetOrganizationMemberResult> getOrganizationMember(GetOrganizationMemberArgs args) {
+        return getOrganizationMember(args, InvokeOptions.Empty);
+    }
+    /**
+     * Looks up a single member of a Pulumi Cloud organization by username or email. Exactly one of `username` or `email` must be set. Returns an error when the member is not found.
+     * 
+     */
+    public static CompletableFuture<GetOrganizationMemberResult> getOrganizationMemberPlain(GetOrganizationMemberPlainArgs args) {
+        return getOrganizationMemberPlain(args, InvokeOptions.Empty);
+    }
+    /**
+     * Looks up a single member of a Pulumi Cloud organization by username or email. Exactly one of `username` or `email` must be set. Returns an error when the member is not found.
+     * 
+     */
+    public static Output<GetOrganizationMemberResult> getOrganizationMember(GetOrganizationMemberArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getOrganizationMember", TypeShape.of(GetOrganizationMemberResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Looks up a single member of a Pulumi Cloud organization by username or email. Exactly one of `username` or `email` must be set. Returns an error when the member is not found.
+     * 
+     */
+    public static Output<GetOrganizationMemberResult> getOrganizationMember(GetOrganizationMemberArgs args, InvokeOutputOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getOrganizationMember", TypeShape.of(GetOrganizationMemberResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Looks up a single member of a Pulumi Cloud organization by username or email. Exactly one of `username` or `email` must be set. Returns an error when the member is not found.
+     * 
+     */
+    public static CompletableFuture<GetOrganizationMemberResult> getOrganizationMemberPlain(GetOrganizationMemberPlainArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invokeAsync("pulumiservice:index:getOrganizationMember", TypeShape.of(GetOrganizationMemberResult.class), args, Utilities.withVersion(options));
     }
     /**
      * Lists all members of a Pulumi Cloud organization, including their role assignments.

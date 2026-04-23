@@ -16,11 +16,14 @@ package functions
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/pulumi/pulumi-go-provider/infer"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
 // GetOrganizationMembersFunction lists the members of a Pulumi Cloud
@@ -91,24 +94,118 @@ func (GetOrganizationMembersFunction) Invoke(
 
 	out := make([]OrganizationMemberInfo, 0, len(members.Members))
 	for _, m := range members.Members {
-		info := OrganizationMemberInfo{
-			Username:      m.User.GithubLogin,
-			Name:          m.User.Name,
-			Email:         m.User.Email,
-			GithubLogin:   m.User.GithubLogin,
-			Role:          m.Role,
-			KnownToPulumi: m.KnownToPulumi,
-			VirtualAdmin:  m.VirtualAdmin,
-		}
-		if m.FGARole != nil {
-			id, name := m.FGARole.ID, m.FGARole.Name
-			info.RoleId = &id
-			info.RoleName = &name
-		}
-		out = append(out, info)
+		out = append(out, memberInfoFrom(m))
 	}
 
 	return infer.FunctionResponse[GetOrganizationMembersOutput]{
 		Output: GetOrganizationMembersOutput{Members: out},
 	}, nil
+}
+
+// GetOrganizationMemberFunction looks up a single Pulumi Cloud organization
+// member by username or email. Exactly one of the two lookup fields must be
+// provided. Returns an error when the member is not found.
+type GetOrganizationMemberFunction struct{}
+
+type GetOrganizationMemberInput struct {
+	OrganizationName string  `pulumi:"organizationName"`
+	Username         *string `pulumi:"username,optional"`
+	Email            *string `pulumi:"email,optional"`
+}
+
+type GetOrganizationMemberOutput struct {
+	OrganizationMemberInfo
+}
+
+func (GetOrganizationMemberFunction) Annotate(a infer.Annotator) {
+	a.Describe(
+		&GetOrganizationMemberFunction{},
+		"Looks up a single member of a Pulumi Cloud organization by username or "+
+			"email. Exactly one of `username` or `email` must be set. Returns an "+
+			"error when the member is not found.",
+	)
+	a.SetToken("index", "getOrganizationMember")
+}
+
+func (i *GetOrganizationMemberInput) Annotate(a infer.Annotator) {
+	a.Describe(&i.OrganizationName, "The name of the Pulumi organization.")
+	a.Describe(&i.Username, "The Pulumi Cloud username to look up. Mutually exclusive with `email`.")
+	a.Describe(&i.Email, "The email address to look up. Matching is case-insensitive. Mutually exclusive with `username`.")
+}
+
+func (GetOrganizationMemberFunction) Invoke(
+	ctx context.Context,
+	req infer.FunctionRequest[GetOrganizationMemberInput],
+) (infer.FunctionResponse[GetOrganizationMemberOutput], error) {
+	username := strings.TrimSpace(deref(req.Input.Username))
+	email := strings.TrimSpace(deref(req.Input.Email))
+
+	switch {
+	case username == "" && email == "":
+		return infer.FunctionResponse[GetOrganizationMemberOutput]{}, errors.New(
+			"exactly one of `username` or `email` must be set",
+		)
+	case username != "" && email != "":
+		return infer.FunctionResponse[GetOrganizationMemberOutput]{}, errors.New(
+			"`username` and `email` are mutually exclusive; set only one",
+		)
+	}
+
+	client := config.GetClient(ctx)
+
+	var (
+		member *pulumiapi.Member
+		err    error
+		lookup string
+	)
+	if username != "" {
+		lookup = fmt.Sprintf("username %q", username)
+		member, err = client.GetOrgMember(ctx, req.Input.OrganizationName, username)
+	} else {
+		lookup = fmt.Sprintf("email %q", email)
+		member, err = client.GetOrgMemberByEmail(ctx, req.Input.OrganizationName, email)
+	}
+	if err != nil {
+		return infer.FunctionResponse[GetOrganizationMemberOutput]{}, fmt.Errorf(
+			"failed to look up organization member by %s: %w",
+			lookup,
+			err,
+		)
+	}
+	if member == nil {
+		return infer.FunctionResponse[GetOrganizationMemberOutput]{}, fmt.Errorf(
+			"organization %q has no member matching %s",
+			req.Input.OrganizationName,
+			lookup,
+		)
+	}
+
+	return infer.FunctionResponse[GetOrganizationMemberOutput]{
+		Output: GetOrganizationMemberOutput{OrganizationMemberInfo: memberInfoFrom(*member)},
+	}, nil
+}
+
+func memberInfoFrom(m pulumiapi.Member) OrganizationMemberInfo {
+	info := OrganizationMemberInfo{
+		Username:      m.User.GithubLogin,
+		Name:          m.User.Name,
+		Email:         m.User.Email,
+		GithubLogin:   m.User.GithubLogin,
+		Role:          m.Role,
+		KnownToPulumi: m.KnownToPulumi,
+		VirtualAdmin:  m.VirtualAdmin,
+	}
+	if m.FGARole != nil {
+		id, name := m.FGARole.ID, m.FGARole.Name
+		info.RoleId = &id
+		info.RoleName = &name
+	}
+	return info
+}
+
+func deref(s *string) string {
+	if s == nil {
+		return ""
+	}
+	return *s
 }

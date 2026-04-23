@@ -26,6 +26,7 @@
         "environmentVersionTag.ts",
         "getInsightsAccount.ts",
         "getInsightsAccounts.ts",
+        "getOrganizationMember.ts",
         "getOrganizationMembers.ts",
         "getOrganizationRoleScopes.ts",
         "getPolicyPack.ts",

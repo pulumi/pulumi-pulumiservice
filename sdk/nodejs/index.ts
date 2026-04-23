@@ -60,6 +60,11 @@ export const getInsightsAccounts: typeof import("./getInsightsAccounts").getInsi
 export const getInsightsAccountsOutput: typeof import("./getInsightsAccounts").getInsightsAccountsOutput = null as any;
 utilities.lazyLoad(exports, ["getInsightsAccounts","getInsightsAccountsOutput"], () => require("./getInsightsAccounts"));
 
+export { GetOrganizationMemberArgs, GetOrganizationMemberResult, GetOrganizationMemberOutputArgs } from "./getOrganizationMember";
+export const getOrganizationMember: typeof import("./getOrganizationMember").getOrganizationMember = null as any;
+export const getOrganizationMemberOutput: typeof import("./getOrganizationMember").getOrganizationMemberOutput = null as any;
+utilities.lazyLoad(exports, ["getOrganizationMember","getOrganizationMemberOutput"], () => require("./getOrganizationMember"));
+
 export { GetOrganizationMembersArgs, GetOrganizationMembersResult, GetOrganizationMembersOutputArgs } from "./getOrganizationMembers";
 export const getOrganizationMembers: typeof import("./getOrganizationMembers").getOrganizationMembers = null as any;
 export const getOrganizationMembersOutput: typeof import("./getOrganizationMembers").getOrganizationMembersOutput = null as any;
