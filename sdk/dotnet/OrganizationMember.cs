@@ -16,6 +16,12 @@ namespace Pulumi.PulumiService
     public partial class OrganizationMember : global::Pulumi.CustomResource
     {
         /// <summary>
+        /// True when this resource adopted an existing organization member (the user was already in the org at Create time). Adopted memberships are left in place on destroy; only the role is reset.
+        /// </summary>
+        [Output("adopted")]
+        public Output<bool> Adopted { get; private set; } = null!;
+
+        /// <summary>
         /// The member's email address.
         /// </summary>
         [Output("email")]

@@ -79,14 +79,14 @@ public final class OrganizationRoleArgs extends com.pulumi.resources.ResourceArg
     }
 
     /**
-     * The resource type this role targets. Defaults to `organization`. Advanced: set to `team` for team-assignable roles.
+     * The resource type the role&#39;s permissions apply to. Defaults to `global` (the org-wide role that can be assigned to members and teams). Other valid values: `stack`, `environment`, `insights-account`.
      * 
      */
     @Import(name="resourceType")
     private @Nullable Output<String> resourceType;
 
     /**
-     * @return The resource type this role targets. Defaults to `organization`. Advanced: set to `team` for team-assignable roles.
+     * @return The resource type the role&#39;s permissions apply to. Defaults to `global` (the org-wide role that can be assigned to members and teams). Other valid values: `stack`, `environment`, `insights-account`.
      * 
      */
     public Optional<Output<String>> resourceType() {
@@ -222,7 +222,7 @@ public final class OrganizationRoleArgs extends com.pulumi.resources.ResourceArg
         }
 
         /**
-         * @param resourceType The resource type this role targets. Defaults to `organization`. Advanced: set to `team` for team-assignable roles.
+         * @param resourceType The resource type the role&#39;s permissions apply to. Defaults to `global` (the org-wide role that can be assigned to members and teams). Other valid values: `stack`, `environment`, `insights-account`.
          * 
          * @return builder
          * 
@@ -233,7 +233,7 @@ public final class OrganizationRoleArgs extends com.pulumi.resources.ResourceArg
         }
 
         /**
-         * @param resourceType The resource type this role targets. Defaults to `organization`. Advanced: set to `team` for team-assignable roles.
+         * @param resourceType The resource type the role&#39;s permissions apply to. Defaults to `global` (the org-wide role that can be assigned to members and teams). Other valid values: `stack`, `environment`, `insights-account`.
          * 
          * @return builder
          * 

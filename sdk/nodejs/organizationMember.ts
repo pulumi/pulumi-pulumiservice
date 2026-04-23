@@ -35,6 +35,10 @@ export class OrganizationMember extends pulumi.CustomResource {
     }
 
     /**
+     * True when this resource adopted an existing organization member (the user was already in the org at Create time). Adopted memberships are left in place on destroy; only the role is reset.
+     */
+    declare public /*out*/ readonly adopted: pulumi.Output<boolean>;
+    /**
      * The member's email address.
      */
     declare public /*out*/ readonly email: pulumi.Output<string>;
@@ -92,12 +96,14 @@ export class OrganizationMember extends pulumi.CustomResource {
             resourceInputs["role"] = args?.role;
             resourceInputs["roleId"] = args?.roleId;
             resourceInputs["username"] = args?.username;
+            resourceInputs["adopted"] = undefined /*out*/;
             resourceInputs["email"] = undefined /*out*/;
             resourceInputs["githubLogin"] = undefined /*out*/;
             resourceInputs["knownToPulumi"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
             resourceInputs["roleName"] = undefined /*out*/;
         } else {
+            resourceInputs["adopted"] = undefined /*out*/;
             resourceInputs["email"] = undefined /*out*/;
             resourceInputs["githubLogin"] = undefined /*out*/;
             resourceInputs["knownToPulumi"] = undefined /*out*/;

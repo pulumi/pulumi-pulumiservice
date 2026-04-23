@@ -81,14 +81,14 @@ public class OrganizationRole extends com.pulumi.resources.CustomResource {
         return this.permissions;
     }
     /**
-     * The resource type this role targets. Defaults to `organization`. Advanced: set to `team` for team-assignable roles.
+     * The resource type the role&#39;s permissions apply to. Defaults to `global` (the org-wide role that can be assigned to members and teams). Other valid values: `stack`, `environment`, `insights-account`.
      * 
      */
     @Export(name="resourceType", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> resourceType;
 
     /**
-     * @return The resource type this role targets. Defaults to `organization`. Advanced: set to `team` for team-assignable roles.
+     * @return The resource type the role&#39;s permissions apply to. Defaults to `global` (the org-wide role that can be assigned to members and teams). Other valid values: `stack`, `environment`, `insights-account`.
      * 
      */
     public Output<Optional<String>> resourceType() {

@@ -2032,6 +2032,10 @@
     "pulumiservice:index:OrganizationMember": {
       "description": "Manages a user's membership in a Pulumi Cloud organization and their assigned role. The user must already have a Pulumi Cloud account before they can be added. Custom (fine-grained) roles are assigned by setting `roleId`; built-in roles are assigned by setting `role`. When both are set, `roleId` takes precedence.",
       "properties": {
+        "adopted": {
+          "type": "boolean",
+          "description": "True when this resource adopted an existing organization member (the user was already in the org at Create time). Adopted memberships are left in place on destroy; only the role is reset."
+        },
         "email": {
           "type": "string",
           "description": "The member's email address."
@@ -2078,7 +2082,8 @@
         "email",
         "githubLogin",
         "knownToPulumi",
-        "roleName"
+        "roleName",
+        "adopted"
       ],
       "inputProperties": {
         "organizationName": {
@@ -2130,7 +2135,7 @@
         },
         "resourceType": {
           "type": "string",
-          "description": "The resource type this role targets. Defaults to `organization`. Advanced: set to `team` for team-assignable roles."
+          "description": "The resource type the role's permissions apply to. Defaults to `global` (the org-wide role that can be assigned to members and teams). Other valid values: `stack`, `environment`, `insights-account`."
         },
         "roleId": {
           "type": "string",
@@ -2175,7 +2180,7 @@
         },
         "resourceType": {
           "type": "string",
-          "description": "The resource type this role targets. Defaults to `organization`. Advanced: set to `team` for team-assignable roles."
+          "description": "The resource type the role's permissions apply to. Defaults to `global` (the org-wide role that can be assigned to members and teams). Other valid values: `stack`, `environment`, `insights-account`."
         },
         "uxPurpose": {
           "type": "string",

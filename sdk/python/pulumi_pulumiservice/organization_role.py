@@ -31,7 +31,7 @@ class OrganizationRoleArgs:
         :param pulumi.Input[_builtins.str] organization_name: The Pulumi Cloud organization name.
         :param pulumi.Input[Mapping[str, Any]] permissions: The role's permission descriptor tree — passed to the service verbatim. This is the `details` field of a Pulumi Cloud PermissionDescriptor: an object with a `__type` discriminator (e.g. `PermissionDescriptorAllow`, `PermissionDescriptorCompose`) describing which scopes are granted.
         :param pulumi.Input[_builtins.str] description: Human-readable description of what the role grants.
-        :param pulumi.Input[_builtins.str] resource_type: The resource type this role targets. Defaults to `organization`. Advanced: set to `team` for team-assignable roles.
+        :param pulumi.Input[_builtins.str] resource_type: The resource type the role's permissions apply to. Defaults to `global` (the org-wide role that can be assigned to members and teams). Other valid values: `stack`, `environment`, `insights-account`.
         :param pulumi.Input[_builtins.str] ux_purpose: How the role appears in the Pulumi Cloud console. One of `role`, `role_private`, `policy`, `set`. Defaults to `role`.
         """
         pulumi.set(__self__, "name", name)
@@ -96,7 +96,7 @@ class OrganizationRoleArgs:
     @pulumi.getter(name="resourceType")
     def resource_type(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        The resource type this role targets. Defaults to `organization`. Advanced: set to `team` for team-assignable roles.
+        The resource type the role's permissions apply to. Defaults to `global` (the org-wide role that can be assigned to members and teams). Other valid values: `stack`, `environment`, `insights-account`.
         """
         return pulumi.get(self, "resource_type")
 
@@ -141,7 +141,7 @@ class OrganizationRole(pulumi.CustomResource):
         :param pulumi.Input[_builtins.str] name: The role's display name. Must be unique within the organization.
         :param pulumi.Input[_builtins.str] organization_name: The Pulumi Cloud organization name.
         :param pulumi.Input[Mapping[str, Any]] permissions: The role's permission descriptor tree — passed to the service verbatim. This is the `details` field of a Pulumi Cloud PermissionDescriptor: an object with a `__type` discriminator (e.g. `PermissionDescriptorAllow`, `PermissionDescriptorCompose`) describing which scopes are granted.
-        :param pulumi.Input[_builtins.str] resource_type: The resource type this role targets. Defaults to `organization`. Advanced: set to `team` for team-assignable roles.
+        :param pulumi.Input[_builtins.str] resource_type: The resource type the role's permissions apply to. Defaults to `global` (the org-wide role that can be assigned to members and teams). Other valid values: `stack`, `environment`, `insights-account`.
         :param pulumi.Input[_builtins.str] ux_purpose: How the role appears in the Pulumi Cloud console. One of `role`, `role_private`, `policy`, `set`. Defaults to `role`.
         """
         ...
@@ -269,7 +269,7 @@ class OrganizationRole(pulumi.CustomResource):
     @pulumi.getter(name="resourceType")
     def resource_type(self) -> pulumi.Output[Optional[_builtins.str]]:
         """
-        The resource type this role targets. Defaults to `organization`. Advanced: set to `team` for team-assignable roles.
+        The resource type the role's permissions apply to. Defaults to `global` (the org-wide role that can be assigned to members and teams). Other valid values: `stack`, `environment`, `insights-account`.
         """
         return pulumi.get(self, "resource_type")
 

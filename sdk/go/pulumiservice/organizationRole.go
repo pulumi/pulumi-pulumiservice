@@ -26,7 +26,7 @@ type OrganizationRole struct {
 	OrganizationName pulumi.StringOutput `pulumi:"organizationName"`
 	// The role's permission descriptor tree — passed to the service verbatim. This is the `details` field of a Pulumi Cloud PermissionDescriptor: an object with a `__type` discriminator (e.g. `PermissionDescriptorAllow`, `PermissionDescriptorCompose`) describing which scopes are granted.
 	Permissions pulumi.MapOutput `pulumi:"permissions"`
-	// The resource type this role targets. Defaults to `organization`. Advanced: set to `team` for team-assignable roles.
+	// The resource type the role's permissions apply to. Defaults to `global` (the org-wide role that can be assigned to members and teams). Other valid values: `stack`, `environment`, `insights-account`.
 	ResourceType pulumi.StringPtrOutput `pulumi:"resourceType"`
 	// The unique identifier of the custom role.
 	RoleId pulumi.StringOutput `pulumi:"roleId"`
@@ -97,7 +97,7 @@ type organizationRoleArgs struct {
 	OrganizationName string `pulumi:"organizationName"`
 	// The role's permission descriptor tree — passed to the service verbatim. This is the `details` field of a Pulumi Cloud PermissionDescriptor: an object with a `__type` discriminator (e.g. `PermissionDescriptorAllow`, `PermissionDescriptorCompose`) describing which scopes are granted.
 	Permissions map[string]interface{} `pulumi:"permissions"`
-	// The resource type this role targets. Defaults to `organization`. Advanced: set to `team` for team-assignable roles.
+	// The resource type the role's permissions apply to. Defaults to `global` (the org-wide role that can be assigned to members and teams). Other valid values: `stack`, `environment`, `insights-account`.
 	ResourceType *string `pulumi:"resourceType"`
 	// How the role appears in the Pulumi Cloud console. One of `role`, `role_private`, `policy`, `set`. Defaults to `role`.
 	UxPurpose *string `pulumi:"uxPurpose"`
@@ -113,7 +113,7 @@ type OrganizationRoleArgs struct {
 	OrganizationName pulumi.StringInput
 	// The role's permission descriptor tree — passed to the service verbatim. This is the `details` field of a Pulumi Cloud PermissionDescriptor: an object with a `__type` discriminator (e.g. `PermissionDescriptorAllow`, `PermissionDescriptorCompose`) describing which scopes are granted.
 	Permissions pulumi.MapInput
-	// The resource type this role targets. Defaults to `organization`. Advanced: set to `team` for team-assignable roles.
+	// The resource type the role's permissions apply to. Defaults to `global` (the org-wide role that can be assigned to members and teams). Other valid values: `stack`, `environment`, `insights-account`.
 	ResourceType pulumi.StringPtrInput
 	// How the role appears in the Pulumi Cloud console. One of `role`, `role_private`, `policy`, `set`. Defaults to `role`.
 	UxPurpose pulumi.StringPtrInput
@@ -226,7 +226,7 @@ func (o OrganizationRoleOutput) Permissions() pulumi.MapOutput {
 	return o.ApplyT(func(v *OrganizationRole) pulumi.MapOutput { return v.Permissions }).(pulumi.MapOutput)
 }
 
-// The resource type this role targets. Defaults to `organization`. Advanced: set to `team` for team-assignable roles.
+// The resource type the role's permissions apply to. Defaults to `global` (the org-wide role that can be assigned to members and teams). Other valid values: `stack`, `environment`, `insights-account`.
 func (o OrganizationRoleOutput) ResourceType() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *OrganizationRole) pulumi.StringPtrOutput { return v.ResourceType }).(pulumi.StringPtrOutput)
 }

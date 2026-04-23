@@ -152,6 +152,7 @@ class OrganizationMember(pulumi.CustomResource):
             if username is None and not opts.urn:
                 raise TypeError("Missing required property 'username'")
             __props__.__dict__["username"] = username
+            __props__.__dict__["adopted"] = None
             __props__.__dict__["email"] = None
             __props__.__dict__["github_login"] = None
             __props__.__dict__["known_to_pulumi"] = None
@@ -181,6 +182,7 @@ class OrganizationMember(pulumi.CustomResource):
 
         __props__ = OrganizationMemberArgs.__new__(OrganizationMemberArgs)
 
+        __props__.__dict__["adopted"] = None
         __props__.__dict__["email"] = None
         __props__.__dict__["github_login"] = None
         __props__.__dict__["known_to_pulumi"] = None
@@ -191,6 +193,14 @@ class OrganizationMember(pulumi.CustomResource):
         __props__.__dict__["role_name"] = None
         __props__.__dict__["username"] = None
         return OrganizationMember(resource_name, opts=opts, __props__=__props__)
+
+    @_builtins.property
+    @pulumi.getter
+    def adopted(self) -> pulumi.Output[_builtins.bool]:
+        """
+        True when this resource adopted an existing organization member (the user was already in the org at Create time). Adopted memberships are left in place on destroy; only the role is reset.
+        """
+        return pulumi.get(self, "adopted")
 
     @_builtins.property
     @pulumi.getter

@@ -78,6 +78,10 @@ type OrganizationMemberState struct {
 	GithubLogin   string `pulumi:"githubLogin"`
 	KnownToPulumi bool   `pulumi:"knownToPulumi"`
 	RoleName      string `pulumi:"roleName"`
+	// Adopted is true when Create found the user already in the org (409)
+	// and adopted the membership instead of adding it. When set, Delete
+	// does not remove the user from the org — it only resets the role.
+	Adopted bool `pulumi:"adopted"`
 }
 
 func (s *OrganizationMemberState) Annotate(a infer.Annotator) {
@@ -86,6 +90,11 @@ func (s *OrganizationMemberState) Annotate(a infer.Annotator) {
 	a.Describe(&s.GithubLogin, "The member's GitHub login.")
 	a.Describe(&s.KnownToPulumi, "Whether the member has a Pulumi Cloud account.")
 	a.Describe(&s.RoleName, "The name of the currently assigned role (custom role name, or built-in role).")
+	a.Describe(
+		&s.Adopted,
+		"True when this resource adopted an existing organization member (the user was already in the org "+
+			"at Create time). Adopted memberships are left in place on destroy; only the role is reset.",
+	)
 }
 
 const defaultOrgMemberRole = "member"
@@ -180,9 +189,10 @@ func (*OrganizationMember) Create(
 	if err != nil {
 		return infer.CreateResponse[OrganizationMemberState]{
 			ID:     id,
-			Output: OrganizationMemberState{OrganizationMemberCore: core},
+			Output: OrganizationMemberState{OrganizationMemberCore: core, Adopted: existingMember},
 		}, infer.ResourceInitFailedError{Reasons: []string{err.Error()}}
 	}
+	state.Adopted = existingMember
 
 	return infer.CreateResponse[OrganizationMemberState]{ID: id, Output: state}, nil
 }
@@ -234,6 +244,11 @@ func (*OrganizationMember) Delete(
 	ctx context.Context,
 	req infer.DeleteRequest[OrganizationMemberState],
 ) (infer.DeleteResponse, error) {
+	if req.State.Adopted {
+		// We didn't create this membership — don't remove it. Pulumi import
+		// semantics: adopted resources are released, not destroyed.
+		return infer.DeleteResponse{}, nil
+	}
 	client := config.GetClient(ctx)
 	return infer.DeleteResponse{}, client.DeleteMemberFromOrg(
 		ctx,

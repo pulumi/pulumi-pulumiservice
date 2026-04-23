@@ -53,7 +53,7 @@ export class OrganizationRole extends pulumi.CustomResource {
      */
     declare public readonly permissions: pulumi.Output<{[key: string]: any}>;
     /**
-     * The resource type this role targets. Defaults to `organization`. Advanced: set to `team` for team-assignable roles.
+     * The resource type the role's permissions apply to. Defaults to `global` (the org-wide role that can be assigned to members and teams). Other valid values: `stack`, `environment`, `insights-account`.
      */
     declare public readonly resourceType: pulumi.Output<string | undefined>;
     /**
@@ -135,7 +135,7 @@ export interface OrganizationRoleArgs {
      */
     permissions: pulumi.Input<{[key: string]: any}>;
     /**
-     * The resource type this role targets. Defaults to `organization`. Advanced: set to `team` for team-assignable roles.
+     * The resource type the role's permissions apply to. Defaults to `global` (the org-wide role that can be assigned to members and teams). Other valid values: `stack`, `environment`, `insights-account`.
      */
     resourceType?: pulumi.Input<string>;
     /**

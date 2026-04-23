@@ -21,6 +21,20 @@ import javax.annotation.Nullable;
 @ResourceType(type="pulumiservice:index:OrganizationMember")
 public class OrganizationMember extends com.pulumi.resources.CustomResource {
     /**
+     * True when this resource adopted an existing organization member (the user was already in the org at Create time). Adopted memberships are left in place on destroy; only the role is reset.
+     * 
+     */
+    @Export(name="adopted", refs={Boolean.class}, tree="[0]")
+    private Output<Boolean> adopted;
+
+    /**
+     * @return True when this resource adopted an existing organization member (the user was already in the org at Create time). Adopted memberships are left in place on destroy; only the role is reset.
+     * 
+     */
+    public Output<Boolean> adopted() {
+        return this.adopted;
+    }
+    /**
      * The member&#39;s email address.
      * 
      */

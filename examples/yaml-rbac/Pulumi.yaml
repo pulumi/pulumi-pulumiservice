@@ -8,11 +8,6 @@ config:
     default: service-provider-test-org
   digits:
     type: string
-  # The Pulumi Cloud user to add to the organization. Must already have an
-  # account.
-  memberUsername:
-    type: string
-    default: service-provider-example-user
 
 resources:
   # A custom organization-level role that grants stack read access.
@@ -46,13 +41,11 @@ resources:
       teamName: ${rbacTeam.name}
       roleId: ${readOnlyRole.roleId}
 
-  # Add a user to the organization and assign them the custom role directly.
-  rbacMember:
-    type: pulumiservice:OrganizationMember
-    properties:
-      organizationName: ${organizationName}
-      username: ${memberUsername}
-      roleId: ${readOnlyRole.roleId}
+  # OrganizationMember is intentionally not exercised by this example:
+  # the test organisation is shared, and destroying the stack would remove
+  # the user from the org and break other tests. Use
+  # `pulumi import pulumiservice:index:OrganizationMember` to adopt
+  # existing members and assign them custom roles.
 
 variables:
   # Data source: list every member of the organization.
@@ -73,6 +66,5 @@ outputs:
   roleId: ${readOnlyRole.roleId}
   roleVersion: ${readOnlyRole.version}
   assignedRoleName: ${rbacTeamRoleBinding.roleName}
-  memberRoleName: ${rbacMember.roleName}
   firstMember: ${currentMembers.members[0].username}
   firstScope: ${availableScopes.scopes[0].name}

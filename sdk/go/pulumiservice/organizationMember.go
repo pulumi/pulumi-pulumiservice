@@ -16,6 +16,8 @@ import (
 type OrganizationMember struct {
 	pulumi.CustomResourceState
 
+	// True when this resource adopted an existing organization member (the user was already in the org at Create time). Adopted memberships are left in place on destroy; only the role is reset.
+	Adopted pulumi.BoolOutput `pulumi:"adopted"`
 	// The member's email address.
 	Email pulumi.StringOutput `pulumi:"email"`
 	// The member's GitHub login.
@@ -194,6 +196,11 @@ func (o OrganizationMemberOutput) ToOrganizationMemberOutput() OrganizationMembe
 
 func (o OrganizationMemberOutput) ToOrganizationMemberOutputWithContext(ctx context.Context) OrganizationMemberOutput {
 	return o
+}
+
+// True when this resource adopted an existing organization member (the user was already in the org at Create time). Adopted memberships are left in place on destroy; only the role is reset.
+func (o OrganizationMemberOutput) Adopted() pulumi.BoolOutput {
+	return o.ApplyT(func(v *OrganizationMember) pulumi.BoolOutput { return v.Adopted }).(pulumi.BoolOutput)
 }
 
 // The member's email address.
