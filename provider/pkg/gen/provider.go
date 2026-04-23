@@ -15,36 +15,18 @@ const (
 	apiURLDefault   = "https://api.pulumi.com"
 )
 
-// providerConfig returns the schema's top-level `config` block. These are
-// the variables that can appear in Pulumi stack config under
-// `pulumiservice:<key>`; they map 1:1 to the provider resource's inputs.
-func providerConfig() *pulumiConfig {
-	return &pulumiConfig{
-		Variables: map[string]pulumiProperty{
-			"accessToken": {
-				Description: accessTokenDesc,
-				Type:        "string",
-				Secret:      true,
-			},
-			"apiUrl": {
-				Description: apiURLDesc,
-				Type:        "string",
-				Default:     apiURLDefault,
-				DefaultInfo: &pulumiDefaultInfo{Environment: []string{"PULUMI_BACKEND_URL"}},
-			},
-		},
-	}
-}
-
-// providerResource returns the schema's `provider` block — the shape of
-// the explicit Provider resource a user can construct (e.g.,
-// `new pulumiservice.Provider("p", { accessToken })`). Mirrors config.
-func providerResource() *pulumiResource {
-	props := map[string]pulumiProperty{
+// providerVars returns a fresh copy of the provider-level property shapes
+// (accessToken, apiUrl) each time it's called. Used for both the top-level
+// `config` block and the `provider` resource's properties — they must not
+// share a map, or future divergence (e.g., an output-only provider
+// property) would mutate both sides at once.
+func providerVars() map[string]pulumiProperty {
+	return map[string]pulumiProperty{
 		"accessToken": {
 			Description: accessTokenDesc,
 			Type:        "string",
 			Secret:      true,
+			DefaultInfo: &pulumiDefaultInfo{Environment: []string{"PULUMI_ACCESS_TOKEN"}},
 		},
 		"apiUrl": {
 			Description: apiURLDesc,
@@ -53,9 +35,22 @@ func providerResource() *pulumiResource {
 			DefaultInfo: &pulumiDefaultInfo{Environment: []string{"PULUMI_BACKEND_URL"}},
 		},
 	}
+}
+
+// providerConfig returns the schema's top-level `config` block. These are
+// the variables that can appear in Pulumi stack config under
+// `pulumiservice:<key>`; they map 1:1 to the provider resource's inputs.
+func providerConfig() *pulumiConfig {
+	return &pulumiConfig{Variables: providerVars()}
+}
+
+// providerResource returns the schema's `provider` block — the shape of
+// the explicit Provider resource a user can construct (e.g.,
+// `new pulumiservice.Provider("p", { accessToken })`). Mirrors config.
+func providerResource() *pulumiResource {
 	return &pulumiResource{
-		Properties:      props,
-		InputProperties: props,
+		Properties:      providerVars(),
+		InputProperties: providerVars(),
 	}
 }
 

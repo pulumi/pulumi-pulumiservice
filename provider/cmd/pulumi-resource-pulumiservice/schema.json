@@ -60,6 +60,11 @@
       "accessToken": {
         "type": "string",
         "description": "Access Token to authenticate with Pulumi Cloud.",
+        "defaultInfo": {
+          "environment": [
+            "PULUMI_ACCESS_TOKEN"
+          ]
+        },
         "secret": true
       },
       "apiUrl": {
@@ -79,6 +84,11 @@
       "accessToken": {
         "type": "string",
         "description": "Access Token to authenticate with Pulumi Cloud.",
+        "defaultInfo": {
+          "environment": [
+            "PULUMI_ACCESS_TOKEN"
+          ]
+        },
         "secret": true
       },
       "apiUrl": {
@@ -96,6 +106,11 @@
       "accessToken": {
         "type": "string",
         "description": "Access Token to authenticate with Pulumi Cloud.",
+        "defaultInfo": {
+          "environment": [
+            "PULUMI_ACCESS_TOKEN"
+          ]
+        },
         "secret": true
       },
       "apiUrl": {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sync"
 	"testing"
 
 	"github.com/pulumi/providertest/providers"
@@ -14,6 +15,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/auto"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/gen"
 	psp "github.com/pulumi/pulumi-pulumiservice/provider/pkg/provider"
 )
 
@@ -36,34 +38,46 @@ func TestMain(m *testing.M) {
 }
 
 // inMemoryProvider attaches an in-process v2 provider server to the
-// pulumitest harness. Schema + metadata are read from the canonical binary
-// embed paths, and the full custom-resource set is registered — this
-// mirrors what the shipped provider binary does at startup, minus the
-// gRPC plugin handshake.
+// pulumitest harness. Schema + metadata are generated from the pinned
+// OpenAPI spec and resource-map.yaml at test-setup time — the tests
+// don't depend on any pre-built artifacts under bin/ or
+// provider/cmd/..., so `go test ./...` works against a clean checkout
+// without first running `make v2_gen`.
 func inMemoryProvider() opttest.Option {
-	provider := func(_ providers.PulumiTest) (pulumirpc.ResourceProviderServer, error) {
-		schemaBytes, err := os.ReadFile(schemaPath())
-		if err != nil {
-			return nil, fmt.Errorf("reading embedded schema: %w", err)
-		}
-		metadataBytes, err := os.ReadFile(metadataPath())
-		if err != nil {
-			return nil, fmt.Errorf("reading embedded metadata: %w", err)
-		}
-
-		return psp.New("pulumiservice", "2.0.0-alpha.1+dev", schemaBytes, metadataBytes)
-	}
-	return opttest.AttachProviderServer("pulumiservice", provider)
+	return opttest.AttachProviderServer("pulumiservice",
+		func(_ providers.PulumiTest) (pulumirpc.ResourceProviderServer, error) {
+			schemaBytes, metadataBytes, err := generateSchemaAndMetadata()
+			if err != nil {
+				return nil, err
+			}
+			return psp.New("pulumiservice", "2.0.0-alpha.1+dev", schemaBytes, metadataBytes)
+		})
 }
 
-// schemaPath / metadataPath locate the generator-emitted artifacts that
-// the shipped binary embeds. Tests read them fresh so schema edits take
-// effect without rebuilding the binary.
-func schemaPath() string {
-	return filepath.Join(repoRoot(), "provider", "cmd", "pulumi-resource-pulumiservice", "schema.json")
-}
-func metadataPath() string {
-	return filepath.Join(repoRoot(), "provider", "cmd", "pulumi-resource-pulumiservice", "metadata.json")
+// generateSchemaAndMetadata runs the generator against the committed
+// spec + resource map. Memoized so the (non-trivial) emission only
+// happens once per test binary run.
+var (
+	genOnce     sync.Once
+	genSchema   []byte
+	genMetadata []byte
+	genErr      error
+)
+
+func generateSchemaAndMetadata() ([]byte, []byte, error) {
+	genOnce.Do(func() {
+		spec := filepath.Join(repoRoot(), "provider", "spec", "openapi_public.json")
+		resMap := filepath.Join(repoRoot(), "provider", "resource-map.yaml")
+		if genSchema, genErr = gen.EmitSchema(spec, resMap); genErr != nil {
+			genErr = fmt.Errorf("emitting schema: %w", genErr)
+			return
+		}
+		if genMetadata, genErr = gen.EmitMetadata(spec, resMap); genErr != nil {
+			genErr = fmt.Errorf("emitting metadata: %w", genErr)
+			return
+		}
+	})
+	return genSchema, genMetadata, genErr
 }
 
 // repoRoot walks up from the examples/ directory to find the repo root.

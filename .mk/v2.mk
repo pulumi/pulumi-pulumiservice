@@ -24,6 +24,7 @@ update_spec:
 # Marked .PHONY so we always rebuild rather than chase a stale sentinel;
 # the binary is small and the go cache makes this cheap.
 v2_build:
+	@mkdir -p bin
 	go build -o bin/pulumi-gen-pulumiservice ./provider/cmd/pulumi-gen-pulumiservice
 .PHONY: v2_build
 
