@@ -111,7 +111,7 @@ func TestOrganizationRoleRead(t *testing.T) {
 					ID:           "role-123",
 					Name:         "read-only",
 					Description:  "ro",
-					ResourceType: "organization",
+					ResourceType: "global",
 					UXPurpose:    "role",
 					Version:      2,
 					Details:      raw,

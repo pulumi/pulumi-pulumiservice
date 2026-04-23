@@ -65,8 +65,9 @@ func (c *OrganizationRoleCore) Annotate(a infer.Annotator) {
 	a.Describe(&c.Description, "Human-readable description of what the role grants.")
 	a.Describe(
 		&c.ResourceType,
-		"The resource type this role targets. Defaults to `organization`. Advanced: "+
-			"set to `team` for team-assignable roles.",
+		"The resource type the role's permissions apply to. Defaults to `global` (the org-wide role "+
+			"that can be assigned to members and teams). Other valid values: `stack`, `environment`, "+
+			"`insights-account`.",
 	)
 	a.Describe(
 		&c.UxPurpose,

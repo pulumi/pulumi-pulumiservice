@@ -94,15 +94,15 @@ type CreateRoleRequest struct {
 }
 
 type updateRoleReq struct {
-	Name        *string         `json:"Name"`
-	Description *string         `json:"Description"`
-	Details     json.RawMessage `json:"Details"`
+	Name        *string         `json:"name,omitempty"`
+	Description *string         `json:"description,omitempty"`
+	Details     json.RawMessage `json:"details,omitempty"`
 }
 
 // CreateRole creates a new custom role on the organization. resourceType and
 // uxPurpose follow the service's PermissionDescriptorBase contract
-// ("organization"/"role" is the common shape for a user-assignable fine-grained
-// org role).
+// ("global"/"role" is the shape for an org-wide role assignable to members
+// and teams).
 func (c *Client) CreateRole(
 	ctx context.Context,
 	orgName string,
@@ -115,7 +115,7 @@ func (c *Client) CreateRole(
 		return nil, errors.New("role name should not be empty")
 	}
 	if req.ResourceType == "" {
-		req.ResourceType = "organization"
+		req.ResourceType = "global"
 	}
 	if req.UXPurpose == "" {
 		req.UXPurpose = "role"

@@ -21,7 +21,7 @@ func TestCreateRole(t *testing.T) {
 			ID:           testRoleID,
 			Name:         "read-only",
 			Description:  "read only access",
-			ResourceType: "organization",
+			ResourceType: "global",
 			UXPurpose:    "role",
 			OrgID:        "org-id",
 			Version:      1,
@@ -32,7 +32,7 @@ func TestCreateRole(t *testing.T) {
 			ExpectedReqBody: CreateRoleRequest{
 				Name:         "read-only",
 				Description:  "read only access",
-				ResourceType: "organization",
+				ResourceType: "global",
 				UXPurpose:    "role",
 				Details:      testRoleDetails,
 			},
@@ -41,7 +41,7 @@ func TestCreateRole(t *testing.T) {
 		})
 
 		got, err := c.CreateRole(ctx, testRoleOrgName, NewCreateRoleRequest(
-			"read-only", "read only access", "organization", "role", testRoleDetails,
+			"read-only", "read only access", "global", "role", testRoleDetails,
 		))
 		assert.NoError(t, err)
 		if assert.NotNil(t, got) {
@@ -56,7 +56,7 @@ func TestCreateRole(t *testing.T) {
 			ExpectedReqPath:   "/api/orgs/an-organization/roles",
 			ExpectedReqBody: CreateRoleRequest{
 				Name:         "r",
-				ResourceType: "organization",
+				ResourceType: "global",
 				UXPurpose:    "role",
 				Details:      testRoleDetails,
 			},
