@@ -23,7 +23,7 @@ func TestAssignRoleToTeam(t *testing.T) {
 				assert.Equal(t, "/api/orgs/an-organization/teams/a-team/enable-team-roles", r.URL.Path)
 				return 200, nil
 			case 2:
-				assert.Equal(t, http.MethodPut, r.Method)
+				assert.Equal(t, http.MethodPost, r.Method)
 				assert.Equal(t, "/api/orgs/an-organization/teams/a-team/roles/"+testRoleID, r.URL.Path)
 				return 204, nil
 			}
@@ -42,7 +42,7 @@ func TestAssignRoleToTeam(t *testing.T) {
 			case 1:
 				return 409, ErrorResponse{Message: "already enabled"}
 			case 2:
-				assert.Equal(t, http.MethodPut, r.Method)
+				assert.Equal(t, http.MethodPost, r.Method)
 				return 204, nil
 			}
 			t.Fatalf("unexpected call %d", calls)

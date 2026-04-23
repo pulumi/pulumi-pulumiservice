@@ -17,6 +17,7 @@ package resources
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"slices"
 	"strings"
 
@@ -135,7 +136,11 @@ func (*OrganizationMember) Create(
 	if addRole == "" {
 		addRole = defaultOrgMemberRole
 	}
-	if err := client.AddMemberToOrg(ctx, req.Inputs.Username, req.Inputs.OrganizationName, addRole); err != nil {
+	// Adopt an existing membership: if the user is already in the org (409),
+	// fall through and apply the desired role via UpdateOrgMemberRole below.
+	// This makes Create behave as "ensure user is in org with role X".
+	err := client.AddMemberToOrg(ctx, req.Inputs.Username, req.Inputs.OrganizationName, addRole)
+	if err != nil && pulumiapi.GetErrorStatusCode(err) != http.StatusConflict {
 		return infer.CreateResponse[OrganizationMemberState]{}, fmt.Errorf(
 			"error adding user %q to org %q: %w",
 			req.Inputs.Username,
@@ -143,13 +148,21 @@ func (*OrganizationMember) Create(
 			err,
 		)
 	}
+	existingMember := err != nil // 409 path
 
-	if core.RoleId != nil && *core.RoleId != "" {
+	// Always patch the role when we adopted an existing member (the built-in
+	// role from Add wasn't applied) or when a custom role was requested.
+	needsRolePatch := existingMember || (core.RoleId != nil && *core.RoleId != "")
+	if needsRolePatch {
+		roleToSet := ""
+		if core.RoleId == nil || *core.RoleId == "" {
+			roleToSet = addRole
+		}
 		if err := client.UpdateOrgMemberRole(
 			ctx,
 			req.Inputs.OrganizationName,
 			req.Inputs.Username,
-			"",
+			roleToSet,
 			core.RoleId,
 		); err != nil {
 			return infer.CreateResponse[OrganizationMemberState]{
@@ -158,7 +171,7 @@ func (*OrganizationMember) Create(
 						OrganizationMemberCore: core,
 					},
 				}, infer.ResourceInitFailedError{Reasons: []string{
-					fmt.Sprintf("user added but failed to assign custom role: %s", err.Error()),
+					fmt.Sprintf("user added but failed to assign role: %s", err.Error()),
 				}}
 		}
 	}

@@ -21,6 +21,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 type Client struct {
@@ -102,12 +103,12 @@ func (c *Client) sendRequest(req *http.Request, resBody interface{}) (*http.Resp
 	}
 	if !ok(res.StatusCode) {
 		// if we didn't get an 2XX status code, unmarshal the response as an ErrorResponse
-		// and return an error
+		// and return an error. Some edges (e.g. gorilla mux 404) return
+		// plain-text bodies, so fall back to the raw body as the message
+		// rather than masking the real status with a JSON parse error.
 		var errRes ErrorResponse
-		err = json.Unmarshal(body, &errRes)
-		if err != nil {
-			return res, fmt.Errorf("failed to parse response body from url %q, status code %d: %w\n\n%s",
-				req.URL.String(), res.StatusCode, err, body)
+		if unmarshalErr := json.Unmarshal(body, &errRes); unmarshalErr != nil {
+			errRes = ErrorResponse{Message: strings.TrimSpace(string(body))}
 		}
 		if errRes.StatusCode == 0 {
 			errRes.StatusCode = res.StatusCode
