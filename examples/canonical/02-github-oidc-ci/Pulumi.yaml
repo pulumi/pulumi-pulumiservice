@@ -1,0 +1,56 @@
+name: pulumiservice-canonical-02-github-oidc-ci
+runtime: yaml
+description: |
+  Configure Pulumi Cloud to accept deployments from GitHub Actions using
+  OIDC — no long-lived Pulumi access tokens in CI. The workflow exchanges
+  its short-lived GitHub OIDC token for a Pulumi ephemeral token at deploy
+  time.
+
+  This is the recommended pattern for GitHub-hosted CI. It removes the
+  biggest class of Pulumi-cloud credential leaks (a token copied into a
+  CI secret and forgotten when the user leaves).
+
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  # The GitHub repo(s) that should be trusted to deploy. Use a wildcard
+  # sparingly — `repo:acme/*` is a standing invitation to every repo in
+  # your org; better to enumerate explicitly.
+  trustedRepositories:
+    type: array
+    items:
+      type: string
+    default:
+      - "repo:acme-corp/infrastructure:ref:refs/heads/main"
+      - "repo:acme-corp/platform:environment:production"
+
+resources:
+  # OIDC issuer: tells Pulumi Cloud "trust tokens minted by GitHub that
+  # claim one of these subjects."
+  githubActions:
+    type: pulumiservice:orgs/oidc:Issuer
+    properties:
+      organizationName: ${organizationName}
+      name: github-actions
+      url: https://token.actions.githubusercontent.com
+      thumbprints:
+        # GitHub's OIDC signing cert chain thumbprint. Check the current
+        # value at https://github.blog/changelog/ — rotated occasionally.
+        - "6938fd4d98bab03faadb97b34396831e3780aea1"
+      policies:
+        # Token minting rules: each rule grants specific Pulumi permissions
+        # to GitHub workflows whose OIDC claims match the filter.
+        - decision: allow
+          tokenType: team
+          teamName: deployers
+          rules:
+            sub:
+              operator: in
+              values: ${trustedRepositories}
+
+outputs:
+  issuerUrl:
+    value: ${githubActions.url}
+  issuerId:
+    value: ${githubActions.issuerId}

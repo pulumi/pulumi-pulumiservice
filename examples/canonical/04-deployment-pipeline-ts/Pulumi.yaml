@@ -1,0 +1,13 @@
+name: pulumiservice-canonical-04-ts
+runtime: nodejs
+description: Deployment-pipeline scenario, TypeScript variant.
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  project:
+    type: string
+    default: infrastructure
+  stack:
+    type: string
+    default: production

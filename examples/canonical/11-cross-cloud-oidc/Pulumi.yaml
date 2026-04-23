@@ -1,0 +1,82 @@
+name: pulumiservice-canonical-11-cross-cloud-oidc
+runtime: yaml
+description: |
+  Federate Pulumi Cloud identity across AWS, Azure, and GCP using OIDC
+  issuers. Pulumi deployments assume cloud IAM roles directly via
+  short-lived OIDC-minted credentials — no static cloud access keys
+  stored in stack config, no ESC secrets to rotate.
+
+  The canonical multi-cloud pattern when you want Pulumi Cloud as the
+  sole identity source and every downstream cloud to trust its tokens.
+
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  awsRoleArn:
+    type: string
+    # This role's trust policy federates pulumi.com's issuer; see README
+    # for the AWS-side setup.
+    default: arn:aws:iam::123456789012:role/PulumiOidcDeployer
+  azureClientId:
+    type: string
+    default: "00000000-0000-0000-0000-000000000000"
+  gcpWorkloadIdentityProvider:
+    type: string
+    default: projects/123/locations/global/workloadIdentityPools/pulumi/providers/pulumi-cloud
+
+resources:
+  # Trust AWS. Pulumi issues OIDC tokens; AWS STS exchanges them for
+  # short-lived role credentials via sts:AssumeRoleWithWebIdentity.
+  awsTrust:
+    type: pulumiservice:orgs/oidc:Issuer
+    properties:
+      organizationName: ${organizationName}
+      name: aws-production
+      url: https://oidc.pulumi.com
+      policies:
+        - decision: allow
+          tokenType: cloud
+          cloud: aws
+          roleArn: ${awsRoleArn}
+          rules:
+            sub:
+              operator: equals
+              value: "pulumi.com/${organizationName}"
+            aud:
+              operator: equals
+              value: sts.amazonaws.com
+
+  # Trust Azure. Federated-identity credentials on an Azure AD
+  # application point back to Pulumi Cloud's OIDC issuer.
+  azureTrust:
+    type: pulumiservice:orgs/oidc:Issuer
+    properties:
+      organizationName: ${organizationName}
+      name: azure-production
+      url: https://oidc.pulumi.com
+      policies:
+        - decision: allow
+          tokenType: cloud
+          cloud: azure
+          clientId: ${azureClientId}
+
+  # Trust GCP. Workload identity federation pools map Pulumi tokens
+  # to GCP service-account identities.
+  gcpTrust:
+    type: pulumiservice:orgs/oidc:Issuer
+    properties:
+      organizationName: ${organizationName}
+      name: gcp-production
+      url: https://oidc.pulumi.com
+      policies:
+        - decision: allow
+          tokenType: cloud
+          cloud: gcp
+          workloadIdentityProvider: ${gcpWorkloadIdentityProvider}
+
+outputs:
+  # Feed these into your stack programs via ESC `fn::open::aws/azure/gcp-login`.
+  awsIssuerId:   { value: ${awsTrust.issuerId} }
+  azureIssuerId: { value: ${azureTrust.issuerId} }
+  gcpIssuerId:   { value: ${gcpTrust.issuerId} }

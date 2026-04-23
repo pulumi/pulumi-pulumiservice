@@ -1,0 +1,73 @@
+name: pulumiservice-canonical-09-tag-based-routing
+runtime: yaml
+description: |
+  Stack tags + per-tag webhooks. Events from production stacks go to the
+  on-call PagerDuty service; events from dev stacks go to a quiet Slack
+  channel. The canonical pattern for not waking engineers up over dev
+  stack drift.
+
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  project:
+    type: string
+    default: infrastructure
+  stack:
+    type: string
+    default: production
+  pagerdutyUrl:
+    type: string
+    secret: true
+  slackDevUrl:
+    type: string
+    secret: true
+
+resources:
+  # Tag the stack. Tags drive downstream routing (webhooks, policies,
+  # change gates all match on tags).
+  stackTags:
+    type: pulumiservice:stacks/tags:Tags
+    properties:
+      organizationName: ${organizationName}
+      projectName: ${project}
+      stackName: ${stack}
+      tags:
+        environment: production
+        criticality: tier-1
+        owner: platform-team
+
+  # Production-tier webhook: pages on-call on failures.
+  productionAlerts:
+    type: pulumiservice:stacks/hooks:Webhook
+    properties:
+      organizationName: ${organizationName}
+      projectName: ${project}
+      stackName: ${stack}
+      name: pagerduty-prod
+      payloadUrl: ${pagerdutyUrl}
+      secret: ${pagerdutyUrl}
+      format: pagerduty
+      events:
+        - stack_update.failed
+        - stack_drift.detected
+        - deployment.failed
+      active: true
+
+  # Dev-tier webhook (demonstrating the same shape routed differently).
+  # Deliberately does NOT subscribe to "failed" events — dev stacks failing
+  # is not a 3am alert.
+  devNotifications:
+    type: pulumiservice:stacks/hooks:Webhook
+    properties:
+      organizationName: ${organizationName}
+      projectName: ${project}
+      stackName: dev      # different stack, same project
+      name: slack-dev
+      payloadUrl: ${slackDevUrl}
+      secret: ${slackDevUrl}
+      format: slack
+      events:
+        - stack_update.succeeded
+        - stack_update.failed
+      active: true

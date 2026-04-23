@@ -1,0 +1,10 @@
+name: pulumiservice-canonical-07-ts
+runtime: nodejs
+description: Tiered-team-access scenario, TypeScript variant.
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  digits:
+    type: string
+    default: "00000"

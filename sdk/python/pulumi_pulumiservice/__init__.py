@@ -6,76 +6,235 @@ import builtins as _builtins
 from . import _utilities
 import typing
 # Export this package's modules as members:
-from ._enums import *
-from .access_token import *
-from .agent_pool import *
-from .approval_rule import *
-from .deployment_schedule import *
-from .deployment_settings import *
-from .drift_schedule import *
-from .environment import *
-from .environment_rotation_schedule import *
-from .environment_version_tag import *
-from .get_insights_account import *
-from .get_insights_accounts import *
-from .get_policy_pack import *
-from .get_policy_packs import *
-from .insights_account import *
-from .oidc_issuer import *
-from .org_access_token import *
-from .policy_group import *
 from .provider import *
-from .stack import *
-from .stack_tag import *
-from .stack_tags import *
-from .team import *
-from .team_access_token import *
-from .team_environment_permission import *
-from .team_stack_permission import *
-from .template_source import *
-from .ttl_schedule import *
-from .webhook import *
-from ._inputs import *
-from . import outputs
 
 # Make subpackages available:
 if typing.TYPE_CHECKING:
+    import pulumi_pulumiservice.changegates as __changegates
+    changegates = __changegates
+    import pulumi_pulumiservice.changerequests as __changerequests
+    changerequests = __changerequests
     import pulumi_pulumiservice.config as __config
     config = __config
+    import pulumi_pulumiservice.esc as __esc
+    esc = __esc
+    import pulumi_pulumiservice.integrations as __integrations
+    integrations = __integrations
+    import pulumi_pulumiservice.orgs as __orgs
+    orgs = __orgs
+    import pulumi_pulumiservice.stacks as __stacks
+    stacks = __stacks
 else:
+    changegates = _utilities.lazy_import('pulumi_pulumiservice.changegates')
+    changerequests = _utilities.lazy_import('pulumi_pulumiservice.changerequests')
     config = _utilities.lazy_import('pulumi_pulumiservice.config')
+    esc = _utilities.lazy_import('pulumi_pulumiservice.esc')
+    integrations = _utilities.lazy_import('pulumi_pulumiservice.integrations')
+    orgs = _utilities.lazy_import('pulumi_pulumiservice.orgs')
+    stacks = _utilities.lazy_import('pulumi_pulumiservice.stacks')
 
 _utilities.register(
     resource_modules="""
 [
  {
   "pkg": "pulumiservice",
-  "mod": "index",
-  "fqn": "pulumi_pulumiservice",
+  "mod": "changegates",
+  "fqn": "pulumi_pulumiservice.changegates",
   "classes": {
-   "pulumiservice:index:AccessToken": "AccessToken",
-   "pulumiservice:index:AgentPool": "AgentPool",
-   "pulumiservice:index:ApprovalRule": "ApprovalRule",
-   "pulumiservice:index:DeploymentSchedule": "DeploymentSchedule",
-   "pulumiservice:index:DeploymentSettings": "DeploymentSettings",
-   "pulumiservice:index:DriftSchedule": "DriftSchedule",
-   "pulumiservice:index:Environment": "Environment",
-   "pulumiservice:index:EnvironmentRotationSchedule": "EnvironmentRotationSchedule",
-   "pulumiservice:index:EnvironmentVersionTag": "EnvironmentVersionTag",
-   "pulumiservice:index:InsightsAccount": "InsightsAccount",
-   "pulumiservice:index:OidcIssuer": "OidcIssuer",
-   "pulumiservice:index:OrgAccessToken": "OrgAccessToken",
-   "pulumiservice:index:PolicyGroup": "PolicyGroup",
-   "pulumiservice:index:Stack": "Stack",
-   "pulumiservice:index:StackTag": "StackTag",
-   "pulumiservice:index:StackTags": "StackTags",
-   "pulumiservice:index:Team": "Team",
-   "pulumiservice:index:TeamAccessToken": "TeamAccessToken",
-   "pulumiservice:index:TeamEnvironmentPermission": "TeamEnvironmentPermission",
-   "pulumiservice:index:TeamStackPermission": "TeamStackPermission",
-   "pulumiservice:index:TemplateSource": "TemplateSource",
-   "pulumiservice:index:TtlSchedule": "TtlSchedule",
-   "pulumiservice:index:Webhook": "Webhook"
+   "pulumiservice:changegates:ApprovalRule": "ApprovalRule"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "esc",
+  "fqn": "pulumi_pulumiservice.esc",
+  "classes": {
+   "pulumiservice:esc:Environment": "Environment"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "esc/schedules",
+  "fqn": "pulumi_pulumiservice.esc.schedules",
+  "classes": {
+   "pulumiservice:esc/schedules:Rotation": "Rotation"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "esc/versions",
+  "fqn": "pulumi_pulumiservice.esc.versions",
+  "classes": {
+   "pulumiservice:esc/versions:Tag": "Tag"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "integrations",
+  "fqn": "pulumi_pulumiservice.integrations",
+  "classes": {
+   "pulumiservice:integrations:AzureDevOps": "AzureDevOps",
+   "pulumiservice:integrations:BitBucket": "BitBucket",
+   "pulumiservice:integrations:GitLab": "GitLab",
+   "pulumiservice:integrations:Github": "Github"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "orgs/agents",
+  "fqn": "pulumi_pulumiservice.orgs.agents",
+  "classes": {
+   "pulumiservice:orgs/agents:AgentPool": "AgentPool"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "orgs/audit",
+  "fqn": "pulumi_pulumiservice.orgs.audit",
+  "classes": {
+   "pulumiservice:orgs/audit:LogExport": "LogExport"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "orgs/cmk",
+  "fqn": "pulumi_pulumiservice.orgs.cmk",
+  "classes": {
+   "pulumiservice:orgs/cmk:Key": "Key"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "orgs/identity",
+  "fqn": "pulumi_pulumiservice.orgs.identity",
+  "classes": {
+   "pulumiservice:orgs/identity:IdentityProvider": "IdentityProvider"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "orgs/insights",
+  "fqn": "pulumi_pulumiservice.orgs.insights",
+  "classes": {
+   "pulumiservice:orgs/insights:Account": "Account"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "orgs/members",
+  "fqn": "pulumi_pulumiservice.orgs.members",
+  "classes": {
+   "pulumiservice:orgs/members:Member": "Member"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "orgs/oidc",
+  "fqn": "pulumi_pulumiservice.orgs.oidc",
+  "classes": {
+   "pulumiservice:orgs/oidc:Issuer": "Issuer"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "orgs/policies",
+  "fqn": "pulumi_pulumiservice.orgs.policies",
+  "classes": {
+   "pulumiservice:orgs/policies:PolicyGroup": "PolicyGroup"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "orgs/policypacks",
+  "fqn": "pulumi_pulumiservice.orgs.policypacks",
+  "classes": {
+   "pulumiservice:orgs/policypacks:PolicyPack": "PolicyPack"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "orgs/roles",
+  "fqn": "pulumi_pulumiservice.orgs.roles",
+  "classes": {
+   "pulumiservice:orgs/roles:Role": "Role"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "orgs/services",
+  "fqn": "pulumi_pulumiservice.orgs.services",
+  "classes": {
+   "pulumiservice:orgs/services:Service": "Service"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "orgs/teams",
+  "fqn": "pulumi_pulumiservice.orgs.teams",
+  "classes": {
+   "pulumiservice:orgs/teams:Team": "Team"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "orgs/templates",
+  "fqn": "pulumi_pulumiservice.orgs.templates",
+  "classes": {
+   "pulumiservice:orgs/templates:Source": "Source"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "orgs/tokens",
+  "fqn": "pulumi_pulumiservice.orgs.tokens",
+  "classes": {
+   "pulumiservice:orgs/tokens:AccessToken": "AccessToken",
+   "pulumiservice:orgs/tokens:OrgAccessToken": "OrgAccessToken",
+   "pulumiservice:orgs/tokens:TeamAccessToken": "TeamAccessToken"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "stacks",
+  "fqn": "pulumi_pulumiservice.stacks",
+  "classes": {
+   "pulumiservice:stacks:Stack": "Stack"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "stacks/deployments",
+  "fqn": "pulumi_pulumiservice.stacks.deployments",
+  "classes": {
+   "pulumiservice:stacks/deployments:DriftSchedule": "DriftSchedule",
+   "pulumiservice:stacks/deployments:Schedule": "Schedule",
+   "pulumiservice:stacks/deployments:Settings": "Settings",
+   "pulumiservice:stacks/deployments:TtlSchedule": "TtlSchedule"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "stacks/hooks",
+  "fqn": "pulumi_pulumiservice.stacks.hooks",
+  "classes": {
+   "pulumiservice:stacks/hooks:Webhook": "Webhook"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "stacks/permissions",
+  "fqn": "pulumi_pulumiservice.stacks.permissions",
+  "classes": {
+   "pulumiservice:stacks/permissions:TeamStackPermission": "TeamStackPermission"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "stacks/tags",
+  "fqn": "pulumi_pulumiservice.stacks.tags",
+  "classes": {
+   "pulumiservice:stacks/tags:Tag": "Tag",
+   "pulumiservice:stacks/tags:Tags": "Tags"
   }
  }
 ]

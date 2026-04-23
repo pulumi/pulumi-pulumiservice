@@ -1,0 +1,72 @@
+name: pulumiservice-canonical-01-organization-bootstrap
+runtime: yaml
+description: |
+  Day 0 of a new Pulumi organization. Provisions the foundational resources
+  every Pulumi Cloud tenant needs: three teams (admin, deploy, read-only),
+  a service token for CI, an OIDC issuer that trusts GitHub Actions, and
+  a default policy group gating every stack.
+
+  This is the scenario most users hit first. Everything downstream
+  (stacks, environments, deployment settings) assumes these exist.
+
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  digits:
+    type: string
+    default: "00000"
+
+resources:
+  # Teams — least-privilege by default; developers are read-only until explicitly
+  # granted deploy access on a specific stack.
+  admins:
+    type: pulumiservice:orgs/teams:Team
+    properties:
+      organizationName: ${organizationName}
+      teamType: pulumi
+      name: admins-${digits}
+      displayName: Organization Admins
+      description: Full org control; rotate this membership quarterly.
+
+  deployers:
+    type: pulumiservice:orgs/teams:Team
+    properties:
+      organizationName: ${organizationName}
+      teamType: pulumi
+      name: deployers-${digits}
+      displayName: CI Deployers
+      description: Automation-only team. Human members are discouraged — use the CI token.
+
+  readers:
+    type: pulumiservice:orgs/teams:Team
+    properties:
+      organizationName: ${organizationName}
+      teamType: pulumi
+      name: readers-${digits}
+      displayName: Developers (read-only)
+      description: Default team for new org members; grants stack read access.
+
+  # A team-scoped access token for CI. We prefer team tokens over org tokens
+  # because membership changes don't require rotating the token.
+  ciToken:
+    type: pulumiservice:orgs/tokens:TeamAccessToken
+    properties:
+      organizationName: ${organizationName}
+      teamName: ${deployers.name}
+      description: "Used by GitHub Actions to deploy non-production stacks"
+
+  # Default policy group every stack should inherit. Points at an org-published
+  # policy pack — typically a baseline like aws-security-guardrails.
+  defaultGuardrails:
+    type: pulumiservice:orgs/policies:PolicyGroup
+    properties:
+      organizationName: ${organizationName}
+      name: baseline-guardrails-${digits}
+      description: Applied to every stack by default.
+
+outputs:
+  ciTokenValue:
+    value: ${ciToken.value}
+    # Use `pulumi stack output --show-secrets ciTokenValue` to retrieve;
+    # store in your CI provider's secret manager.

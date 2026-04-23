@@ -1,0 +1,47 @@
+name: pulumiservice-canonical-10-template-catalog
+runtime: yaml
+description: |
+  Register a git-hosted catalog of internal templates so developers
+  can `pulumi new` from your curated set instead of copy-pasting
+  from the wiki. New services come online consistent by default.
+
+  The canonical "golden path" setup for platform engineering teams.
+
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+
+resources:
+  # The template source: points Pulumi Cloud at a git repo where a set
+  # of template directories live. Each subdir becomes a template the
+  # org can `pulumi new` from.
+  internalCatalog:
+    type: pulumiservice:orgs/templates:Source
+    properties:
+      organizationName: ${organizationName}
+      name: acme-golden-path
+      description: |
+        Golden-path templates: every new service should start here.
+        Contents curated by the platform team; PRs welcome.
+      sourceType: git
+      sourceUrl: https://github.com/acme-corp/pulumi-templates.git
+      sourceBranch: main
+      # Sub-paths within the repo that each become a usable template.
+      # Absence here means "the repo root is one template."
+      templates:
+        - path: typescript-microservice
+          displayName: TypeScript microservice (ECS Fargate)
+          description: Fargate service with ALB, CloudWatch, and a DynamoDB table.
+        - path: python-data-pipeline
+          displayName: Python data pipeline (Glue + S3)
+          description: Batch ETL using AWS Glue; opinionated partitioning scheme.
+        - path: static-site
+          displayName: Static site (S3 + CloudFront)
+          description: Versioned static hosting with WAF and cert auto-renewal.
+
+outputs:
+  catalogUrl:
+    value: "https://app.pulumi.com/${organizationName}/templates/${internalCatalog.name}"
+  usage:
+    value: "pulumi new ${organizationName}/${internalCatalog.name}/typescript-microservice"

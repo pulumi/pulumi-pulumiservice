@@ -1,3 +1,0 @@
-name: cs-teams
-runtime: dotnet
-description: A minimal C# Pulumi Teams Example

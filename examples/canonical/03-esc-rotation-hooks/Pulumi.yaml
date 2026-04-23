@@ -1,0 +1,63 @@
+name: pulumiservice-canonical-03-esc-rotation-hooks
+runtime: yaml
+description: |
+  An ESC environment containing a rotated database password, a rotation
+  schedule that refreshes the password on a cron, and an ESC-scoped
+  webhook that notifies Slack whenever a rotation occurs.
+
+  The canonical "secrets in motion" pattern: secrets change automatically
+  on a schedule, consumers pick up the new values on their next open,
+  and operators see every rotation in a channel.
+
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  digits:
+    type: string
+    default: "00000"
+  slackWebhookUrl:
+    type: string
+    secret: true
+    default: https://hooks.slack.invalid/placeholder
+
+resources:
+  productionSecrets:
+    type: pulumiservice:esc:Environment
+    properties:
+      organization: ${organizationName}
+      project: platform
+      name: production-secrets-${digits}
+      yaml: |
+        values:
+          database:
+            fn::rotate::awsSecretsManager:
+              region: us-west-2
+              secretId: prod/db/master
+              rotationPolicy: quarterly
+
+  dailyRotation:
+    type: pulumiservice:esc/schedules:Rotation
+    properties:
+      organization: ${productionSecrets.organization}
+      project: ${productionSecrets.project}
+      environment: ${productionSecrets.name}
+      scheduleCron: "0 3 * * *"   # 03:00 UTC daily
+
+  # Notification: ESC-scoped webhook (Webhook with environmentName +
+  # projectName set — no stackName).
+  rotationNotifier:
+    type: pulumiservice:stacks/hooks:Webhook
+    properties:
+      organizationName: ${productionSecrets.organization}
+      projectName: ${productionSecrets.project}
+      environmentName: ${productionSecrets.name}
+      displayName: slack-rotation-alerts-${digits}
+      payloadUrl: ${slackWebhookUrl}
+      secret: ${slackWebhookUrl}            # sign deliveries so Slack can verify
+      format: slack
+      active: true
+
+outputs:
+  environmentRef:
+    value: "${productionSecrets.organization}/${productionSecrets.project}/${productionSecrets.name}"

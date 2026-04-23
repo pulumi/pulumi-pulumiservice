@@ -1,0 +1,10 @@
+name: pulumiservice-canonical-01-go
+runtime: go
+description: Organization-bootstrap scenario, Go variant.
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  digits:
+    type: string
+    default: "00000"

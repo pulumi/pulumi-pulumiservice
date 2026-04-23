@@ -1,159 +1,133 @@
-// Copyright 2016-2025, Pulumi Corporation.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright 2016-2026, Pulumi Corporation.
 
 package provider
 
 import (
 	"context"
-	"os"
+	"encoding/json"
+	"io"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
+	pbempty "google.golang.org/protobuf/types/known/emptypb"
+	structpb "google.golang.org/protobuf/types/known/structpb"
+
+	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
-func TestDiffConfig(t *testing.T) {
-	tests := []struct {
-		name            string
-		oldConfig       resource.PropertyMap
-		newConfig       resource.PropertyMap
-		expectedChanges pulumirpc.DiffResponse_DiffChanges
-	}{
-		{
-			name: "accessToken changed",
-			oldConfig: resource.PropertyMap{
-				"accessToken": resource.NewPropertyValue("old-token-123"),
-				"apiUrl":      resource.NewPropertyValue("https://api.pulumi.com"),
-			},
-			newConfig: resource.PropertyMap{
-				"accessToken": resource.NewPropertyValue("new-token-456"),
-				"apiUrl":      resource.NewPropertyValue("https://api.pulumi.com"),
-			},
-			expectedChanges: pulumirpc.DiffResponse_DIFF_SOME,
-		},
-		{
-			name: "apiUrl changed",
-			oldConfig: resource.PropertyMap{
-				"accessToken": resource.NewPropertyValue("token-123"),
-				"apiUrl":      resource.NewPropertyValue("https://api.pulumi.com"),
-			},
-			newConfig: resource.PropertyMap{
-				"accessToken": resource.NewPropertyValue("token-123"),
-				"apiUrl":      resource.NewPropertyValue("https://custom.pulumi.example.com"),
-			},
-			expectedChanges: pulumirpc.DiffResponse_DIFF_SOME,
-		},
-		{
-			name: "no changes",
-			oldConfig: resource.PropertyMap{
-				"accessToken": resource.NewPropertyValue("token-123"),
-				"apiUrl":      resource.NewPropertyValue("https://api.pulumi.com"),
-			},
-			newConfig: resource.PropertyMap{
-				"accessToken": resource.NewPropertyValue("token-123"),
-				"apiUrl":      resource.NewPropertyValue("https://api.pulumi.com"),
-			},
-			expectedChanges: pulumirpc.DiffResponse_DIFF_NONE,
-		},
-	}
+// TestServer_GetSchema confirms the embedded schema is returned verbatim.
+func TestServer_GetSchema(t *testing.T) {
+	schemaJSON := `{"name":"pulumiservice"}`
+	metadataJSON := `{"resources":{}}`
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			ctx := context.Background()
-
-			// Create provider instance
-			provider, err := MakeProvider(nil, "pulumiservice", "1.0.0")
-			require.NoError(t, err)
-
-			// Marshal old and new configs
-			oldProps, err := plugin.MarshalProperties(tt.oldConfig, plugin.MarshalOptions{})
-			require.NoError(t, err)
-
-			newProps, err := plugin.MarshalProperties(tt.newConfig, plugin.MarshalOptions{})
-			require.NoError(t, err)
-
-			// Call CheckConfig with old config
-			_, err = provider.CheckConfig(ctx, &pulumirpc.CheckRequest{
-				News: oldProps,
-			})
-			require.NoError(t, err)
-
-			// Call DiffConfig to detect changes
-			resp, err := provider.DiffConfig(ctx, &pulumirpc.DiffRequest{
-				Urn:  "urn:pulumi:stack::project::pulumi:providers:pulumiservice::provider",
-				Olds: oldProps,
-				News: newProps,
-			})
-			require.NoError(t, err)
-
-			// Assert expected changes
-			assert.Equal(t, tt.expectedChanges, resp.Changes)
-			assert.Empty(t, resp.Replaces, "config changes should not require replacement")
-		})
-	}
+	srv, err := New("pulumiservice", "1.0.0-test", []byte(schemaJSON), []byte(metadataJSON))
+	require.NoError(t, err)
+	resp, err := srv.GetSchema(context.Background(), &pulumirpc.GetSchemaRequest{})
+	require.NoError(t, err)
+	assert.Equal(t, schemaJSON, resp.Schema)
 }
 
-func TestConfigure_SetsAccessToken(t *testing.T) {
+// TestServer_GetPluginInfo reports the provider version.
+func TestServer_GetPluginInfo(t *testing.T) {
+	srv, err := New("pulumiservice", "2.0.0-alpha", []byte(`{}`), []byte(`{}`))
+	require.NoError(t, err)
+	resp, err := srv.GetPluginInfo(context.Background(), &pbempty.Empty{})
+	require.NoError(t, err)
+	assert.Equal(t, "2.0.0-alpha", resp.Version)
+}
+
+// TestServer_ConfigureAndCreate exercises the full path: Configure stashes
+// credentials, then a Create dispatches through the metadata-driven runtime
+// against a fake Pulumi Cloud server. Proves the gRPC → dispatcher → HTTP
+// wiring end-to-end.
+func TestServer_ConfigureAndCreate(t *testing.T) {
+	// Fake Pulumi Cloud.
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "token test-token", r.Header.Get("Authorization"))
+		assert.Equal(t, "provider", r.Header.Get("X-Pulumi-Source"))
+		body, _ := io.ReadAll(r.Body)
+		var req map[string]interface{}
+		_ = json.Unmarshal(body, &req)
+		_ = json.NewEncoder(w).Encode(map[string]interface{}{
+			"id":          "pool-abc",
+			"name":        req["name"],
+			"description": req["description"],
+			"tokenValue":  "secret-xyz",
+		})
+	}))
+	defer srv.Close()
+
+	// Metadata mirroring AgentPool v1 shape.
+	metadata := `{
+		"resources": {
+			"pulumiservice:orgs/agents:AgentPool": {
+				"token": "pulumiservice:orgs/agents:AgentPool",
+				"module": "orgs/agents",
+				"create": {
+					"operationId": "CreateOrgAgentPool",
+					"method": "POST",
+					"path": "/api/orgs/{orgName}/agent-pools"
+				},
+				"id": {
+					"template": "{organizationName}/{agentPoolId}",
+					"params": ["organizationName", "agentPoolId"]
+				},
+				"properties": {
+					"organizationName": {"from": "orgName", "source": "path"},
+					"name":             {"from": "name", "source": "body"},
+					"description":      {"from": "description", "source": "body"},
+					"tokenValue":       {"from": "tokenValue", "source": "response", "secret": true, "output": true},
+					"agentPoolId":      {"from": "id", "source": "response", "output": true}
+				}
+			}
+		}
+	}`
+	ps, err := New("pulumiservice", "2.0.0-test", []byte(`{}`), []byte(metadata))
+	require.NoError(t, err)
+
 	ctx := context.Background()
-
-	// Ensure PULUMI_ACCESS_TOKEN is not set from environment
-	oldToken := os.Getenv(EnvVarPulumiAccessToken)
-	err := os.Setenv(EnvVarPulumiAccessToken, "")
-	require.NoError(t, err)
-	defer func() {
-		err := os.Setenv(EnvVarPulumiAccessToken, oldToken)
-		assert.NoError(t, err)
-	}()
-
-	// Create provider instance
-	provider, err := MakeProvider(nil, "pulumiservice", "1.0.0")
-	require.NoError(t, err)
-
-	// Create config with accessToken
-	config := resource.PropertyMap{
-		"accessToken": resource.NewPropertyValue("pul-test0token"),
-	}
-	props, err := plugin.MarshalProperties(config, plugin.MarshalOptions{})
-	require.NoError(t, err)
-
-	// Call CheckConfig
-	_, err = provider.CheckConfig(ctx, &pulumirpc.CheckRequest{
-		News: props,
+	_, err = ps.Configure(ctx, &pulumirpc.ConfigureRequest{
+		Args: &structpb.Struct{Fields: map[string]*structpb.Value{
+			"accessToken": structpb.NewStringValue("test-token"),
+			"apiUrl":      structpb.NewStringValue(srv.URL),
+		}},
 	})
 	require.NoError(t, err)
 
-	// Build config variables map as expected by Configure
-	configVars := map[string]string{
-		"pulumiservice:config:accessToken": "pul-test0token",
-	}
-
-	// Call Configure
-	_, err = provider.Configure(ctx, &pulumirpc.ConfigureRequest{
-		Variables: configVars,
+	props, err := structpb.NewStruct(map[string]interface{}{
+		"organizationName": "acme-corp",
+		"name":             "vpc-pool",
+		"description":      "VPC-isolated agent pool",
 	})
 	require.NoError(t, err)
 
-	// Assert that AccessToken is set on the provider
-	// We need to cast to the concrete type to access AccessToken field
-	concreteProvider, ok := provider.(*pulumiserviceProvider)
-	if !ok {
-		// The provider is wrapped, so we need to check if client was set instead
-		t.Skip("Provider is wrapped, cannot directly access AccessToken field")
+	resp, err := ps.Create(ctx, &pulumirpc.CreateRequest{
+		Urn:        "urn:pulumi:dev::test::pulumiservice:orgs/agents:AgentPool::my-pool",
+		Properties: props,
+	})
+	require.NoError(t, err)
+	assert.Equal(t, "acme-corp/pool-abc", resp.GetId())
+
+	out := resp.GetProperties().GetFields()
+	require.Contains(t, out, "tokenValue")
+	// Secret-wrapped values are serialized as a sentinel object (secret=true + value).
+	sv := out["tokenValue"]
+	// Unwrap the structpb secret form if present.
+	if s := sv.GetStructValue(); s != nil {
+		if _, isSecret := s.GetFields()["4dabf18193072939515e22adb298388d"]; isSecret {
+			inner := s.GetFields()["value"]
+			assert.Equal(t, "secret-xyz", inner.GetStringValue())
+			return
+		}
 	}
-	assert.NotNil(t, concreteProvider.client, "client should be initialized after Configure")
+	t.Fatalf("tokenValue in response should be a wrapped secret, got %v", sv)
+}
+
+// TestServer_TokenFromURN confirms the URN parsing.
+func TestServer_TokenFromURN(t *testing.T) {
+	urn := "urn:pulumi:dev::test::pulumiservice:orgs/agents:AgentPool::pool"
+	assert.Equal(t, "pulumiservice:orgs/agents:AgentPool", tokenFromURN(urn))
 }

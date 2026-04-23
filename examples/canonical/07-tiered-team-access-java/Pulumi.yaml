@@ -1,0 +1,10 @@
+name: pulumiservice-canonical-07-java
+runtime: java
+description: Tiered-team-access scenario, Java variant.
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  digits:
+    type: string
+    default: "00000"

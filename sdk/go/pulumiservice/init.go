@@ -11,70 +11,6 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-type module struct {
-	version semver.Version
-}
-
-func (m *module) Version() semver.Version {
-	return m.version
-}
-
-func (m *module) Construct(ctx *pulumi.Context, name, typ, urn string) (r pulumi.Resource, err error) {
-	switch typ {
-	case "pulumiservice:index:AccessToken":
-		r = &AccessToken{}
-	case "pulumiservice:index:AgentPool":
-		r = &AgentPool{}
-	case "pulumiservice:index:ApprovalRule":
-		r = &ApprovalRule{}
-	case "pulumiservice:index:DeploymentSchedule":
-		r = &DeploymentSchedule{}
-	case "pulumiservice:index:DeploymentSettings":
-		r = &DeploymentSettings{}
-	case "pulumiservice:index:DriftSchedule":
-		r = &DriftSchedule{}
-	case "pulumiservice:index:Environment":
-		r = &Environment{}
-	case "pulumiservice:index:EnvironmentRotationSchedule":
-		r = &EnvironmentRotationSchedule{}
-	case "pulumiservice:index:EnvironmentVersionTag":
-		r = &EnvironmentVersionTag{}
-	case "pulumiservice:index:InsightsAccount":
-		r = &InsightsAccount{}
-	case "pulumiservice:index:OidcIssuer":
-		r = &OidcIssuer{}
-	case "pulumiservice:index:OrgAccessToken":
-		r = &OrgAccessToken{}
-	case "pulumiservice:index:PolicyGroup":
-		r = &PolicyGroup{}
-	case "pulumiservice:index:Stack":
-		r = &Stack{}
-	case "pulumiservice:index:StackTag":
-		r = &StackTag{}
-	case "pulumiservice:index:StackTags":
-		r = &StackTags{}
-	case "pulumiservice:index:Team":
-		r = &Team{}
-	case "pulumiservice:index:TeamAccessToken":
-		r = &TeamAccessToken{}
-	case "pulumiservice:index:TeamEnvironmentPermission":
-		r = &TeamEnvironmentPermission{}
-	case "pulumiservice:index:TeamStackPermission":
-		r = &TeamStackPermission{}
-	case "pulumiservice:index:TemplateSource":
-		r = &TemplateSource{}
-	case "pulumiservice:index:TtlSchedule":
-		r = &TtlSchedule{}
-	case "pulumiservice:index:Webhook":
-		r = &Webhook{}
-	default:
-		return nil, fmt.Errorf("unknown resource type: %s", typ)
-	}
-
-	err = ctx.RegisterResource(typ, name, nil, r, pulumi.URN_(urn))
-	return
-}
-
 type pkg struct {
 	version semver.Version
 }
@@ -98,11 +34,6 @@ func init() {
 	if err != nil {
 		version = semver.Version{Major: 1}
 	}
-	pulumi.RegisterResourceModule(
-		"pulumiservice",
-		"index",
-		&module{version},
-	)
 	pulumi.RegisterResourcePackage(
 		"pulumiservice",
 		&pkg{version},

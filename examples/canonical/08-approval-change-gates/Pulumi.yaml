@@ -1,0 +1,52 @@
+name: pulumiservice-canonical-08-approval-change-gates
+runtime: yaml
+description: |
+  Gate production deployments behind a human approval. Any attempt to
+  `pulumi up` against the production stack creates a change request;
+  until a named approver (or team) clicks approve in the Pulumi Console,
+  the deployment stays pending.
+
+  The canonical pattern for regulated workloads (SOX, PCI, HIPAA) where
+  all production changes must be attested by a different person than the
+  change author.
+
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+
+resources:
+  # The team whose members can approve production changes. Per SOX, this
+  # must be distinct from the team that authors them.
+  approvers:
+    type: pulumiservice:orgs/teams:Team
+    properties:
+      organizationName: ${organizationName}
+      teamType: pulumi
+      name: change-approvers
+      displayName: Production Change Approvers
+      description: |
+        Can approve/reject production change requests. Must NOT overlap
+        with production-deployers membership (segregation of duties).
+
+  # The gate itself. Any deployment that matches its filter (here, any
+  # stack in project "production") requires at least one approver ack.
+  productionGate:
+    type: pulumiservice:changegates:ApprovalRule
+    properties:
+      organizationName: ${organizationName}
+      name: production-deploys
+      description: All production deployments require approval.
+      # Filter: which updates this gate applies to.
+      match:
+        projects: ["production", "billing-service-production"]
+        stackTags:
+          environment: production
+      # Rules: what has to happen for the gate to open.
+      approval:
+        minApprovals: 1
+        approverTeams:
+          - ${approvers.name}
+        preventSelfApproval: true   # author can't be an approver
+        timeoutHours: 24            # auto-reject after a day pending
+      enabled: true

@@ -1,0 +1,72 @@
+name: pulumiservice-canonical-04-deployment-pipeline
+runtime: yaml
+description: |
+  A complete Pulumi Deployments pipeline for one stack: git-driven
+  previews on every PR (with review stacks), scheduled drift detection,
+  and a TTL on ephemeral preview environments.
+
+  This is the "GitOps for your infrastructure" setup most teams converge
+  on after a few months with Pulumi Cloud.
+
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  project:
+    type: string
+    default: infrastructure
+  stack:
+    type: string
+    default: production
+  digits:
+    type: string
+    default: "00000"
+
+resources:
+  # Deployment settings — wires the stack to a git repo, CI image, and
+  # execution context. Without this, nothing is automated.
+  deploymentSettings:
+    type: pulumiservice:stacks/deployments:Settings
+    properties:
+      organization: ${organizationName}
+      project: ${project}
+      stack: ${stack}
+      sourceContext:
+        git:
+          repoUrl: https://github.com/acme-corp/infrastructure.git
+          branch: refs/heads/main
+          repoDir: stacks/production
+      github:
+        repository: acme-corp/infrastructure
+        deployCommits: true
+        previewPullRequests: true   # runs `pulumi preview` on every PR
+        pullRequestTemplate: true   # creates a review stack per PR
+      executorContext:
+        executorImage:
+          image: pulumi/pulumi:latest
+      operationContext:
+        preRunCommands:
+          - "npm ci"
+        environmentVariables:
+          NODE_ENV: production
+
+  # Drift detection every 6 hours — if someone clicks around in the AWS
+  # console, we notice and (optionally) remediate on a schedule.
+  driftCheck:
+    type: pulumiservice:stacks/deployments:DriftSchedule
+    properties:
+      organization: ${organizationName}
+      project: ${project}
+      stack: ${stack}
+      scheduleCron: "0 */6 * * *"
+      autoRemediate: false           # notify-only; flip to true with care
+
+  # TTL for ephemeral preview stacks so they don't pile up after PRs merge.
+  ephemeralTtl:
+    type: pulumiservice:stacks/deployments:TtlSchedule
+    properties:
+      organization: ${organizationName}
+      project: ${project}
+      stack: ${stack}
+      timestamp: "2026-12-31T00:00:00Z"
+      deleteAfterDestroy: true

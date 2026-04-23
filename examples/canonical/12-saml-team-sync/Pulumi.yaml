@@ -1,0 +1,69 @@
+name: pulumiservice-canonical-12-saml-team-sync
+runtime: yaml
+description: |
+  Mirror your IdP (Okta, Azure AD, Google Workspace) group structure into
+  Pulumi teams, so org membership and team assignments follow from a
+  single source of truth upstream. When HR adds a new platform engineer
+  to the Okta group, they appear in the right Pulumi teams next login;
+  when they leave, their access disappears.
+
+  The canonical pattern for organizations that already have a corporate
+  IdP and want "who has what in Pulumi?" answered by their existing IAM
+  audit pipeline.
+
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  # IdP group external IDs. Format varies by provider — see README.
+  platformGroupId:
+    type: string
+    default: "okta-group-id:00gtbcaaaaaaaaaaaaaa"
+  securityGroupId:
+    type: string
+    default: "okta-group-id:00gtbcbbbbbbbbbbbbbb"
+  allEngineersGroupId:
+    type: string
+    default: "okta-group-id:00gtbccccccccccccccc"
+
+resources:
+  # Teams bound to IdP groups. Team membership is reconciled on each
+  # user's login based on the claims present in their SAML assertion.
+  platformTeam:
+    type: pulumiservice:orgs/teams:Team
+    properties:
+      organizationName: ${organizationName}
+      teamType: pulumi
+      name: platform
+      displayName: Platform Engineering
+      description: Mirrors Okta group "Platform Engineering"
+      externalMembershipBinding:
+        type: saml-group
+        claim: groups
+        value: ${platformGroupId}
+
+  securityTeam:
+    type: pulumiservice:orgs/teams:Team
+    properties:
+      organizationName: ${organizationName}
+      teamType: pulumi
+      name: security
+      displayName: Security Engineering
+      description: Mirrors Okta group "Security Engineering"
+      externalMembershipBinding:
+        type: saml-group
+        claim: groups
+        value: ${securityGroupId}
+
+  developersTeam:
+    type: pulumiservice:orgs/teams:Team
+    properties:
+      organizationName: ${organizationName}
+      teamType: pulumi
+      name: developers
+      displayName: All Engineering
+      description: Mirrors Okta group "All Engineers" — read-only baseline.
+      externalMembershipBinding:
+        type: saml-group
+        claim: groups
+        value: ${allEngineersGroupId}

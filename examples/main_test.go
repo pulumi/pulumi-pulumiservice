@@ -1,7 +1,9 @@
 package examples
 
 import (
+	"fmt"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/pulumi/providertest/providers"
@@ -9,9 +11,10 @@ import (
 	"github.com/pulumi/providertest/pulumitest/assertpreview"
 	"github.com/pulumi/providertest/pulumitest/assertrefresh"
 	"github.com/pulumi/providertest/pulumitest/opttest"
-	psp "github.com/pulumi/pulumi-pulumiservice/provider/pkg/provider"
 	"github.com/pulumi/pulumi/sdk/v3/go/auto"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
+
+	psp "github.com/pulumi/pulumi-pulumiservice/provider/pkg/provider"
 )
 
 // The default test org to use.
@@ -32,11 +35,45 @@ func TestMain(m *testing.M) {
 	m.Run()
 }
 
+// inMemoryProvider attaches an in-process v2 provider server to the
+// pulumitest harness. Schema + metadata are read from the canonical binary
+// embed paths, and the full custom-resource set is registered — this
+// mirrors what the shipped provider binary does at startup, minus the
+// gRPC plugin handshake.
 func inMemoryProvider() opttest.Option {
 	provider := func(_ providers.PulumiTest) (pulumirpc.ResourceProviderServer, error) {
-		return psp.MakeProvider(nil, "pulumiservice", "1.0.0")
+		schemaBytes, err := os.ReadFile(schemaPath())
+		if err != nil {
+			return nil, fmt.Errorf("reading embedded schema: %w", err)
+		}
+		metadataBytes, err := os.ReadFile(metadataPath())
+		if err != nil {
+			return nil, fmt.Errorf("reading embedded metadata: %w", err)
+		}
+
+		return psp.New("pulumiservice", "2.0.0-alpha.1+dev", schemaBytes, metadataBytes)
 	}
 	return opttest.AttachProviderServer("pulumiservice", provider)
+}
+
+// schemaPath / metadataPath locate the generator-emitted artifacts that
+// the shipped binary embeds. Tests read them fresh so schema edits take
+// effect without rebuilding the binary.
+func schemaPath() string {
+	return filepath.Join(repoRoot(), "provider", "cmd", "pulumi-resource-pulumiservice", "schema.json")
+}
+func metadataPath() string {
+	return filepath.Join(repoRoot(), "provider", "cmd", "pulumi-resource-pulumiservice", "metadata.json")
+}
+
+// repoRoot walks up from the examples/ directory to find the repo root.
+// Tests always run with cwd=examples/, so this is a single parent hop.
+func repoRoot() string {
+	cwd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	return filepath.Dir(cwd)
 }
 
 // runPulumiTest performs the same basic steps as

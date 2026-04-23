@@ -4,12 +4,12 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Pulumi</Authors>
     <Company>Pulumi</Company>
-    <Description>A native Pulumi package for creating and managing Pulumi Cloud constructs</Description>
+    <Description>A Pulumi package for creating and managing Pulumi Cloud resources.</Description>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://pulumi.com</PackageProjectUrl>
     <RepositoryUrl>https://github.com/pulumi/pulumi-pulumiservice</RepositoryUrl>
     <PackageIcon>logo.png</PackageIcon>
-    <Version>1.0.0-alpha.0+dev</Version>
+    <Version>2.0.0-alpha.1+dev</Version>
 
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>

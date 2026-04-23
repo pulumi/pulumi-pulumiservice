@@ -1,0 +1,11 @@
+{
+    "name": "pulumiservice-canonical-01-ts",
+    "devDependencies": {
+        "@types/node": "^18",
+        "typescript": "^4.3.5"
+    },
+    "dependencies": {
+        "@pulumi/pulumi": "^3.0.0",
+        "@pulumi/pulumiservice": "^2.0.0-alpha"
+    }
+}

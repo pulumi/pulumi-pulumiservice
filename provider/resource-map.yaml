@@ -1,0 +1,1946 @@
+# Pulumi Service Provider v2 — resource map
+#
+# Authoritative mapping from Pulumi Cloud OpenAPI operationIds to Pulumi
+# resources, functions, and methods. Consumed by the `pulumi-gen-pulumiservice`
+# generator alongside provider/spec/openapi_public.json.
+#
+# This is the single source of truth: if a pattern can't be expressed here,
+# the schema is extended — we do NOT add a second file (no overlays).
+#
+# Status: v2.0 in-progress. The 20 resources the v1 hand-coded provider
+# shipped are mapped below. Remaining operations are tracked in the
+# coverage report; expansion to 100% coverage is tracked as a separate task.
+
+modules:
+
+  # ─── Organizations ──────────────────────────────────────────────────────
+
+  orgs:
+    resources:
+      Organization:
+        operations:
+          read:   GetOrganization              # GET    /api/orgs/{orgName}
+          update: UpdateOrganizationSettings   # PATCH  /api/orgs/{orgName}
+        id:
+          template: "{name}"
+          params: [name]
+        forceNew: [name]
+        properties:
+          name: { from: orgName, source: path }
+
+  orgs/agents:
+    resources:
+      AgentPool:
+        operations:
+          create: CreateOrgAgentPool           # POST   /api/orgs/{orgName}/agent-pools
+          read:   GetAgentPool                 # GET    /api/orgs/{orgName}/agent-pools/{poolId}
+          update: PatchOrgAgentPool            # PATCH
+          delete: DeleteOrgAgentPool           # DELETE
+        id:
+          template: "{organizationName}/{name}/{agentPoolId}"
+          params: [organizationName, name, agentPoolId]
+        forceNew: [organizationName]
+        properties:
+          organizationName: { from: orgName,   source: path }
+          name:             { from: name,      source: body }
+          description:      { from: description, source: body }
+          tokenValue:       { from: tokenValue, source: response, secret: true, output: true }
+          agentPoolId:      { from: id,        source: response, output: true }
+    functions:
+      listAgentPools: { operationId: ListOrgAgentPool }
+
+  orgs/teams:
+    resources:
+      Team:
+        # Spec exposes CreatePulumiTeam and CreateGitHubTeam as separate
+        # operations. The provider collapses them into one resource
+        # discriminated by `teamType` (matches v1 naming).
+        doc: |
+          The Pulumi Cloud offers role-based access control (RBAC) using teams.
+          Teams allow organization admins to assign a set of stack permissions
+          to a named group of users. A Pulumi team may be managed by Pulumi
+          Cloud directly, or synced from GitHub.
+        discriminator: { field: teamType, values: [pulumi, github] }
+        operations:
+          create:
+            case: teamType
+            pulumi: CreatePulumiTeam           # POST   /api/orgs/{orgName}/teams/pulumi
+            github: CreateGitHubTeam           # POST   /api/orgs/{orgName}/teams/github
+          read:   GetTeam                      # GET    /api/orgs/{orgName}/teams/{teamName}
+          update: UpdateTeam                   # PATCH
+          delete: DeleteTeam                   # DELETE
+        id:
+          template: "{organizationName}/{name}"
+          params: [organizationName, name]
+        forceNew: [organizationName, teamType]
+        properties:
+          organizationName:
+            from: orgName
+            source: path
+            doc: Organization the team lives in.
+          teamType:
+            type: string
+            source: body
+            required: true
+            enum: [pulumi, github]
+            doc: Team type. "pulumi" for a Pulumi-managed team; "github" for a team synced from a GitHub organization.
+          name:
+            type: string
+            source: body
+            requireIf: "teamType == pulumi"
+            doc: Team name. Must be unique within the organization. Required for `pulumi` teams.
+          githubTeamId:
+            type: integer
+            source: body
+            requireIf: "teamType == github"
+            doc: Numeric GitHub team ID. Required for `github` teams.
+          displayName:
+            type: string
+            source: body
+            defaultFromField: name
+            doc: Human-readable display name.
+          description:
+            type: string
+            source: body
+            doc: Team description.
+          members:
+            type: array
+            source: body
+            sortOnRead: true
+            items: { type: string }
+            doc: List of usernames in the team.
+    functions:
+      listTeams: { operationId: ListTeams }
+
+  orgs/tokens:
+    resources:
+      OrgAccessToken:
+        operations:
+          create: CreateOrgToken               # POST   /api/orgs/{orgName}/tokens
+          delete: DeleteOrgToken               # DELETE /api/orgs/{orgName}/tokens/{tokenId}
+          # Note: spec has no per-token GET; Read falls back to listing and filtering.
+          # Handled by a `readVia: list` field on the operations block once
+          # the schema is extended (tracked in task #7).
+          readVia:
+            operationId: ListOrgTokens         # GET    /api/orgs/{orgName}/tokens
+            filterBy: id
+        id:
+          template: "{organizationName}/{tokenId}"
+          params: [organizationName, tokenId]
+        forceNew: [organizationName, description]
+        properties:
+          organizationName: { from: orgName,      source: path }
+          description:      { from: description,  source: body }
+          value:            { from: tokenValue,   source: response, secret: true, output: true }
+          tokenId:          { from: id,           source: response, output: true }
+      TeamAccessToken:
+        operations:
+          create: CreateTeamToken              # POST   /api/orgs/{orgName}/teams/{teamName}/tokens
+          delete: DeleteTeamToken              # DELETE
+          readVia: { operationId: ListTeamTokens, filterBy: id }
+        id:
+          template: "{organizationName}/{teamName}/{tokenId}"
+          params: [organizationName, teamName, tokenId]
+        forceNew: [organizationName, teamName, description]
+        properties:
+          organizationName: { from: orgName,      source: path }
+          teamName:         { from: teamName,     source: path }
+          description:      { from: description,  source: body }
+          value:            { from: tokenValue,   source: response, secret: true, output: true }
+          tokenId:          { from: id,           source: response, output: true }
+      AccessToken:                             # user/personal access token
+        operations:
+          create: CreatePersonalToken          # POST   /api/user/tokens
+          delete: DeletePersonalToken          # DELETE /api/user/tokens/{tokenId}
+          readVia: { operationId: ListPersonalTokens, filterBy: id }
+        id:
+          template: "{tokenId}"
+          params: [tokenId]
+        forceNew: [description]
+        properties:
+          description: { from: description,  source: body }
+          value:       { from: tokenValue,   source: response, secret: true, output: true }
+          tokenId:     { from: id,           source: response, output: true }
+
+  orgs/oidc:
+    resources:
+      # Just `Issuer`, not `OidcIssuer` — the `orgs/oidc` sub-module already
+      # provides the OIDC context. The fully-qualified token reads
+      # `pulumiservice:orgs/oidc:Issuer`.
+      Issuer:
+        doc: |
+          Register an OIDC issuer to establish a trust relationship between
+          third-party systems like GitHub Actions or CircleCI and Pulumi
+          Cloud.
+        operations:
+          create: RegisterOidcIssuer   # POST   /api/orgs/{orgName}/oidc/issuers
+          read:   GetOidcIssuer        # GET    /api/orgs/{orgName}/oidc/issuers/{issuerId}
+          update: UpdateOidcIssuer     # PATCH
+          delete: DeleteOidcIssuer     # DELETE
+        id:
+          template: "{organization}/{issuerId}"
+          params: [organization, issuerId]
+        forceNew: [organization]
+        properties:
+          organization:
+            from: orgName
+            type: string
+            source: path
+            required: true
+            doc: Organization the OIDC issuer belongs to.
+          name:
+            type: string
+            source: body
+            required: true
+            doc: A human-readable name for this issuer.
+          url:
+            type: string
+            source: body
+            required: true
+            doc: Issuer URL (e.g., https://token.actions.githubusercontent.com).
+          maxExpirationSeconds:
+            type: integer
+            source: body
+            doc: Maximum validity of access tokens exchanged via this issuer.
+          thumbprints:
+            type: array
+            source: body
+            items: { type: string }
+            doc: TLS certificate thumbprints trusted for this issuer. Usually derived automatically.
+          policies:
+            type: array
+            source: body
+            items: { ref: "pulumi.json#/Any" }
+            sortOnRead: true
+            doc: Authorization policies controlling which workloads can exchange OIDC tokens for Pulumi tokens.
+          issuerId:
+            type: string
+            source: response
+            output: true
+            doc: Server-assigned issuer ID.
+    functions:
+      listIssuers:   { operationId: List_orgs_oidc_issuers }
+      getAuthPolicy: { operationId: GetAuthPolicy }     # auth policy on an issuer
+    methods:
+      Issuer.regenerateThumbprints:
+        resource: orgs/oidc:Issuer
+        operationId: RegenerateThumbprints
+      Issuer.updateAuthPolicy:
+        resource: orgs/oidc:Issuer
+        operationId: UpdateAuthPolicy
+
+  orgs/policies:
+    resources:
+      PolicyGroup:
+        operations:
+          create: NewPolicyGroup               # POST   /api/orgs/{orgName}/policygroups
+          read:   GetPolicyGroup               # GET    /api/orgs/{orgName}/policygroups/{policyGroup}
+          update: UpdatePolicyGroup            # PATCH
+          delete: DeletePolicyGroup            # DELETE
+        id:
+          template: "{organizationName}/{name}"
+          params: [organizationName, name]
+        forceNew: [organizationName]
+        properties:
+          organizationName: { from: orgName,  source: path }
+          name:             { from: policyGroup, source: path }
+    functions:
+      getPolicyPack:  { operationId: GetPolicyPack }
+      listPolicyPacks: { operationId: ListPolicyPacks_orgs }
+
+  orgs/templates:
+    resources:
+      # Just `Source`, not `TemplateSource` — `orgs/templates:Source` reads
+      # cleanly as "template source" because the module provides the context.
+      Source:
+        doc: A source for Pulumi templates — a git repository or URL from which `pulumi new` templates are sourced.
+        operations:
+          create: CreateOrgTemplateCollection  # POST   /api/orgs/{orgName}/templates/sources
+          update: UpdateOrgTemplateCollection  # PATCH  /api/orgs/{orgName}/templates/sources/{templateID}
+          delete: DeleteOrgTemplateCollection  # DELETE
+          readVia: { operationId: GetOrgTemplateCollections, filterBy: id }
+        id:
+          template: "{organizationName}/{templateId}"
+          params: [organizationName, templateId]
+        forceNew: [organizationName]
+        properties:
+          organizationName:
+            from: orgName
+            type: string
+            source: path
+            required: true
+            doc: Organization the template source belongs to.
+          sourceName:
+            type: string
+            source: body
+            required: true
+            doc: Human-readable name for this template source.
+          sourceURL:
+            type: string
+            source: body
+            required: true
+            doc: URL of the template source (typically a git repository).
+          destination:
+            ref: "pulumi.json#/Any"
+            source: body
+            doc: Optional destination settings for rendered templates.
+          templateId:
+            type: string
+            source: response
+            output: true
+            doc: Server-assigned template source ID.
+
+  # ─── Stacks ─────────────────────────────────────────────────────────────
+
+  stacks:
+    resources:
+      Stack:
+        doc: |
+          A Pulumi Cloud stack registration. Owns the stack's existence in
+          Pulumi Cloud; stack *content* is managed by the Pulumi programs
+          deploying to it. `stackName` sits in the create request body
+          (POST /api/stacks/{org}/{project}) but in the path of the
+          resource-scoped verbs — declared via the `createSource:` override.
+        operations:
+          create: CreateStack
+          read:   GetStack
+          delete: DeleteStack
+        id:
+          template: "{organizationName}/{projectName}/{stackName}"
+          params: [organizationName, projectName, stackName]
+        forceNew: [organizationName, projectName, stackName]
+        properties:
+          organizationName:
+            from: orgName
+            type: string
+            source: path
+            required: true
+            doc: Organization name.
+          projectName:
+            from: projectName
+            type: string
+            source: path
+            required: true
+            doc: Project name.
+          stackName:
+            from: stackName
+            type: string
+            source: path
+            createSource: body   # POSTed on create, then path-addressable
+            required: true
+            doc: Stack name.
+
+  stacks/hooks:
+    resources:
+      Webhook:
+        # Polymorphic: organization-level, stack-level, and ESC-level webhooks
+        # share a shape but use different CRUD endpoints. The `case: scope`
+        # selector picks which operation to dispatch based on inputs.
+        operations:
+          case: scope
+          scopes:
+            org:
+              create: CreateOrganizationWebhook
+              read:   GetOrganizationWebhook
+              update: UpdateOrganizationWebhook
+              delete: DeleteOrganizationWebhook
+            stack:
+              create: CreateStackWebhook
+              read:   GetStackWebhook
+              update: UpdateStackWebhook
+              delete: DeleteStackWebhook
+            esc:
+              create: CreateWebhook_esc_environments
+              read:   GetWebhook_esc_environments
+              update: UpdateWebhook_esc_environments
+              delete: DeleteWebhook_esc_environments
+        id:
+          case: scope
+          templates:
+            org:   "{organizationName}/{name}"
+            stack: "{organizationName}/{projectName}/{stackName}/{name}"
+            esc:   "{organizationName}/environment/{projectName}/{envName}/{name}"
+        doc: |
+          Pulumi Webhooks allow you to notify external services of events
+          happening within your Pulumi organization, stack, or ESC
+          environment. Webhook scope is determined by which identity fields
+          you set: `organizationName` alone → org-scoped; plus
+          `projectName` + `stackName` → stack-scoped; or plus
+          `environmentName` (with `projectName`) → ESC-scoped.
+        forceNew: [organizationName, projectName, stackName, environmentName]
+        properties:
+          organizationName:
+            type: string
+            source: path
+            required: true
+            doc: Organization that owns the webhook.
+          projectName:
+            type: string
+            source: path
+            doc: Project the webhook belongs to (stack- or ESC-scoped webhooks only).
+          stackName:
+            type: string
+            source: path
+            doc: Stack the webhook belongs to (stack-scoped webhooks only).
+          environmentName:
+            type: string
+            source: path
+            doc: Environment the webhook belongs to (ESC-scoped webhooks only).
+          name:
+            type: string
+            output: true
+            doc: Webhook name, assigned by the server.
+          displayName:
+            type: string
+            source: body
+            required: true
+            doc: Human-readable display name for the webhook.
+          payloadUrl:
+            from: payloadURL
+            type: string
+            source: body
+            required: true
+            doc: URL the webhook POSTs to.
+          format:
+            type: string
+            source: body
+            default: raw
+            enum: [raw, slack, pulumi_deployments, ms_teams]
+            doc: Payload encoding — "raw" by default; other options shape the body for specific consumers.
+          active:
+            type: boolean
+            source: body
+            required: true
+            default: true
+            doc: Whether the webhook is currently firing.
+          secret:
+            type: string
+            source: body
+            secret: true
+            diffMode: ciphertext
+            doc: Shared secret used to sign webhook payloads (HMAC-SHA256).
+          filters:
+            type: array
+            source: body
+            sortOnRead: true
+            items: { type: string }
+            doc: Event filter strings restricting which events trigger the webhook.
+          groups:
+            type: array
+            source: body
+            sortOnRead: true
+            items: { type: string }
+            doc: Event group filters (stacks, deployments, environments).
+        checks:
+          - requireOneOf: [stackName, environmentName, organizationName]
+            message: "exactly one of stackName, environmentName, or organizationName must be set (scope selector)"
+          - requireTogether: [stackName, projectName]
+        sortProperties: [groups, filters]
+
+  stacks/deployments:
+    resources:
+      # Just `Schedule`, not `DeploymentSchedule` — the `stacks/deployments`
+      # module frames the noun. Sibling `DriftSchedule`/`TtlSchedule` keep
+      # their qualifier because they identify a *kind* of schedule that
+      # diverges from the default deployment one (drift scan, TTL destroy).
+      Schedule:
+        doc: A scheduled recurring or single-time run of a Pulumi command on a stack.
+        operations:
+          create: CreateScheduledDeployment    # POST   /api/stacks/.../deployments/schedules
+          read:   ReadScheduledDeployment
+          update: UpdateScheduledDeployment
+          delete: DeleteScheduledDeployment
+        id:
+          template: "{organization}/{project}/{stack}/{scheduleId}"
+          params: [organization, project, stack, scheduleId]
+        forceNew: [organization, project, stack]
+        properties:
+          organization:
+            from: orgName
+            type: string
+            source: path
+            required: true
+            doc: Organization name.
+          project:
+            from: projectName
+            type: string
+            source: path
+            required: true
+            doc: Project name.
+          stack:
+            from: stackName
+            type: string
+            source: path
+            required: true
+            doc: Stack name.
+          pulumiOperation:
+            type: string
+            source: body
+            required: true
+            enum: [update, preview, refresh, destroy]
+            doc: Which Pulumi operation to run on schedule.
+          scheduleCron:
+            type: string
+            source: body
+            doc: Cron expression for recurring schedules. Mutually exclusive with `timestamp`.
+          timestamp:
+            type: string
+            source: body
+            doc: RFC3339 timestamp for a single-time run. Mutually exclusive with `scheduleCron`.
+          scheduleId:
+            type: string
+            source: response
+            output: true
+            doc: Server-assigned schedule ID.
+      DriftSchedule:
+        doc: A cron schedule to run drift detection on a stack.
+        operations:
+          create: CreateScheduledDriftDeployment
+          update: UpdateScheduledDriftDeployment
+          delete: DeleteScheduledDeployment    # shared delete endpoint
+          readVia: { operationId: ReadScheduledDeployment }
+        id:
+          template: "{organization}/{project}/{stack}/{scheduleId}"
+          params: [organization, project, stack, scheduleId]
+        forceNew: [organization, project, stack]
+        properties:
+          organization:
+            from: orgName
+            type: string
+            source: path
+            required: true
+            doc: Organization name.
+          project:
+            from: projectName
+            type: string
+            source: path
+            required: true
+            doc: Project name.
+          stack:
+            from: stackName
+            type: string
+            source: path
+            required: true
+            doc: Stack name.
+          scheduleCron:
+            type: string
+            source: body
+            required: true
+            doc: Cron expression for how often drift detection runs.
+          autoRemediate:
+            type: boolean
+            source: body
+            doc: When true, automatically run an update to reconcile detected drift.
+          scheduleId:
+            type: string
+            source: response
+            output: true
+            doc: Server-assigned schedule ID.
+      TtlSchedule:
+        doc: A scheduled stack destroy run, for ephemeral environments.
+        operations:
+          create: CreateScheduledTTLDeployment
+          update: UpdateScheduledTTLDeployment
+          delete: DeleteScheduledDeployment    # shared delete endpoint
+          readVia: { operationId: ReadScheduledDeployment }
+        id:
+          template: "{organization}/{project}/{stack}/{scheduleId}"
+          params: [organization, project, stack, scheduleId]
+        forceNew: [organization, project, stack]
+        properties:
+          organization:
+            from: orgName
+            type: string
+            source: path
+            required: true
+            doc: Organization name.
+          project:
+            from: projectName
+            type: string
+            source: path
+            required: true
+            doc: Project name.
+          stack:
+            from: stackName
+            type: string
+            source: path
+            required: true
+            doc: Stack name.
+          timestamp:
+            type: string
+            source: body
+            required: true
+            doc: RFC3339 timestamp after which the TTL destroy runs.
+          deleteAfterDestroy:
+            type: boolean
+            source: body
+            doc: When true, delete the stack itself (not just resources) after the destroy succeeds.
+          scheduleId:
+            type: string
+            source: response
+            output: true
+            doc: Server-assigned schedule ID.
+      Settings:
+        doc: |
+          Deployment settings for a Pulumi Cloud stack — source context,
+          executor, and secrets for Pulumi Deployments. PUT is the upsert
+          endpoint (create and update both map to ReplaceDeploymentSettings).
+          Complex sub-objects (github, executorContext, operationContext,
+          cacheOptions, vcs) are typed as `pulumi.json#/Any` for v2.0.0-alpha;
+          tightening their shapes is 2.x follow-up work.
+        operations:
+          create: ReplaceDeploymentSettings   # PUT = upsert
+          read:   GetDeploymentSettings
+          update: ReplaceDeploymentSettings
+          delete: DeleteDeploymentSettings
+        id:
+          template: "{organization}/{project}/{stack}"
+          params: [organization, project, stack]
+        forceNew: [organization, project, stack]
+        properties:
+          organization:
+            from: orgName
+            type: string
+            source: path
+            required: true
+            doc: Organization name.
+          project:
+            from: projectName
+            type: string
+            source: path
+            required: true
+            doc: Project name.
+          stack:
+            from: stackName
+            type: string
+            source: path
+            required: true
+            doc: Stack name.
+          github:
+            from: gitHub
+            ref: "pulumi.json#/Any"
+            source: body
+            doc: GitHub VCS settings — repository, branch/path filters, and push triggers.
+          sourceContext:
+            ref: "pulumi.json#/Any"
+            source: body
+            doc: Source context — git coordinates or other VCS location.
+          executorContext:
+            ref: "pulumi.json#/Any"
+            source: body
+            doc: Executor context — agent pool, docker image, or custom runner.
+          operationContext:
+            ref: "pulumi.json#/Any"
+            source: body
+            doc: Operation context — pre-run commands, environment variables, and OIDC settings.
+          cacheOptions:
+            ref: "pulumi.json#/Any"
+            source: body
+            doc: Cache options for deployment artifacts.
+          agentPoolId:
+            from: agentPoolID
+            type: string
+            source: body
+            doc: Agent pool ID this stack's deployments run on.
+          vcs:
+            ref: "pulumi.json#/Any"
+            source: body
+            doc: Generic VCS settings (used when `github` isn't applicable).
+
+  stacks/tags:
+    # `Tag` (per-tag) and `Tags` (whole-map) are both metadata-driven.
+    # Their reads piggyback on the parent stack GET — Pulumi Cloud exposes
+    # no per-tag GET — via `readVia.extractField: tags`. `Tags.delete`
+    # iterates per-key over the state's `tags` map.
+    resources:
+      Tag:
+        doc: A single tag (name + value) on a Pulumi Cloud stack.
+        operations:
+          create: AddStackTag          # POST  /api/stacks/.../tags       body {name, value}
+          update: UpdateStackTag       # PATCH /api/stacks/.../tags/{tagName} body {name, value}
+          delete: DeleteStackTag       # DELETE .../tags/{tagName}
+          readVia:
+            operationId: GetStack      # GET /api/stacks/.../stackName — response.tags
+            extractField: tags
+            keyBy: name
+            valueProperty: value
+        id:
+          template: "{organization}/{project}/{stack}/{name}"
+          params: [organization, project, stack, name]
+        forceNew: [organization, project, stack, name]
+        properties:
+          organization:
+            from: orgName
+            type: string
+            source: path
+            required: true
+            doc: Organization name.
+          project:
+            from: projectName
+            type: string
+            source: path
+            required: true
+            doc: Project name.
+          stack:
+            from: stackName
+            type: string
+            source: path
+            required: true
+            doc: Stack name.
+          name:
+            from: tagName             # path-side wire name (UpdateStackTag/DeleteStackTag)
+            type: string
+            source: path
+            createSource: body        # body-side on AddStackTag
+            createFrom: name          # body field literally "name"
+            required: true
+            doc: Tag name.
+          value:
+            type: string
+            source: body
+            required: true
+            doc: Tag value.
+      Tags:
+        doc: |
+          A set of stack tags managed as a single resource via a `tags` map.
+          Create/Update use the batch PATCH endpoint. Delete iterates once
+          per tag in the map (there's no batch-delete API).
+        operations:
+          create: UpdateStackTags      # PATCH /api/stacks/.../tags  body {tags: {...}}
+          update: UpdateStackTags
+          delete:
+            operationId: DeleteStackTag    # DELETE /.../tags/{tagName}
+            iterateOver: tags
+            iterateKeyParam: tagName
+          readVia:
+            operationId: GetStack
+            extractField: tags          # whole-map mode: no keyBy
+        id:
+          template: "{organization}/{project}/{stack}"
+          params: [organization, project, stack]
+        forceNew: [organization, project, stack]
+        properties:
+          organization:
+            from: orgName
+            type: string
+            source: path
+            required: true
+            doc: Organization name.
+          project:
+            from: projectName
+            type: string
+            source: path
+            required: true
+            doc: Project name.
+          stack:
+            from: stackName
+            type: string
+            source: path
+            required: true
+            doc: Stack name.
+          tags:
+            type: object
+            source: body
+            additionalProperties: { type: string }
+            required: true
+            doc: Tag name → tag value map managed by this resource.
+
+  stacks/permissions:
+    resources:
+      TeamStackPermission:
+        doc: |
+          Grants a team a specific permission level on a stack. The Pulumi
+          Cloud API exposes a single PATCH endpoint that is both create and
+          update; removal is done by PATCHing permission:0 via the same
+          endpoint (the `delete.bodyOverride` below).
+        operations:
+          create: UpdateTeamStackPermissions
+          update: UpdateTeamStackPermissions
+          # No per-team GET — a soft Read via the stack's GET would require
+          # readVia:extractField; the metadata surfaces a DELETE here, and
+          # readVia falls through to "return prior inputs" via the dispatcher's
+          # default for resources without Read.
+          delete:
+            operationId: UpdateTeamStackPermissions
+            bodyOverride: { permission: 0 }
+        id:
+          template: "{organization}/{project}/{stack}/{team}"
+          params: [organization, project, stack, team]
+        forceNew: [organization, project, stack, team]
+        properties:
+          organization:
+            from: orgName
+            type: string
+            source: path
+            required: true
+            doc: Organization name.
+          project:
+            from: projectName
+            type: string
+            source: path
+            required: true
+            doc: Project name.
+          stack:
+            from: stackName
+            type: string
+            source: path
+            required: true
+            doc: Stack name.
+          team:
+            from: teamName
+            type: string
+            source: path
+            required: true
+            doc: Team name.
+          permission:
+            type: integer
+            source: body
+            required: true
+            doc: "Permission level: 0 = no permission, 101 = read, 102 = edit, 103 = admin."
+
+  # ─── ESC (Environments, Secrets, Config) ────────────────────────────────
+
+  esc:
+    resources:
+      Environment:
+        doc: |
+          An ESC (Environments, Secrets, Config) environment. Create is a
+          two-step operation — POST (empty env with project+name in JSON
+          body) followed by PATCH (YAML document as `application/x-yaml`
+          raw body) — expressed via `postCreate:` on the resource and
+          `rawBodyFrom:` on the follow-on op. Read also returns
+          `application/x-yaml`; the raw body comes back into the `yaml`
+          property via `rawBodyTo:`.
+        operations:
+          create: CreateEnvironment_esc_environments   # POST   /api/esc/environments/{orgName}                  body {project, name}
+          postCreate:                                  # PATCH  /api/esc/environments/{org}/{proj}/{envName}     body: yaml (raw)
+            operationId: UpdateEnvironment_esc_environments
+            rawBodyFrom: yaml
+            contentType: application/x-yaml
+          read:
+            operationId: ReadEnvironment_esc_environments
+            rawBodyTo: yaml
+            contentType: application/x-yaml
+          update:
+            operationId: UpdateEnvironment_esc_environments
+            rawBodyFrom: yaml
+            contentType: application/x-yaml
+          delete: DeleteEnvironment_esc_environments   # DELETE /api/esc/environments/{org}/{proj}/{envName}
+        id:
+          template: "{organization}/{project}/{name}"
+          params: [organization, project, name]
+        forceNew: [organization, project, name]
+        properties:
+          organization:
+            from: orgName
+            type: string
+            source: path
+            required: true
+            doc: Organization that owns the environment.
+          project:
+            from: projectName
+            type: string
+            source: path
+            createSource: body          # POST body has `project`, path has `orgName` only
+            createFrom: project
+            default: default
+            doc: Project the environment belongs to (defaults to "default").
+          name:
+            from: envName
+            type: string
+            source: path
+            createSource: body          # POST body has `name`, path has `orgName` only
+            createFrom: name
+            required: true
+            doc: Environment name.
+          yaml:
+            type: string
+            source: rawBody             # never in path/query/JSON body; only via rawBodyFrom
+            required: true
+            secret: true
+            doc: |
+              The environment definition as YAML text. ESC documents carry
+              secrets; the property is marked secret so Pulumi state keeps
+              it encrypted.
+
+  esc/schedules:
+    resources:
+      # Just `Rotation`, not `EnvironmentRotationSchedule` — the `esc/schedules`
+      # module provides both "esc" and "schedule" context. Fully-qualified:
+      # `pulumiservice:esc/schedules:Rotation`.
+      Rotation:
+        doc: A scheduled recurring rotation of secrets in an ESC environment.
+        operations:
+          create: CreateEnvironmentSchedule    # POST   /api/esc/environments/.../schedules
+          read:   ReadEnvironmentSchedule
+          update: UpdateEnvironmentSchedule
+          delete: DeleteEnvironmentSchedule
+        id:
+          template: "{organization}/{project}/{environment}/{scheduleId}"
+          params: [organization, project, environment, scheduleId]
+        forceNew: [organization, project, environment]
+        properties:
+          organization:
+            from: orgName
+            type: string
+            source: path
+            required: true
+            doc: Organization name.
+          project:
+            from: projectName
+            type: string
+            source: path
+            default: default
+            doc: Project name (defaults to "default").
+          environment:
+            from: envName
+            type: string
+            source: path
+            required: true
+            doc: Environment name.
+          scheduleCron:
+            type: string
+            source: body
+            doc: Cron expression for recurring rotations. Mutually exclusive with `timestamp`.
+          timestamp:
+            type: string
+            source: body
+            doc: RFC3339 timestamp for a single rotation. Mutually exclusive with `scheduleCron`.
+          scheduleId:
+            type: string
+            source: response
+            output: true
+            doc: Server-assigned schedule ID.
+
+  esc/versions:
+    resources:
+      # Just `Tag`, not `EnvironmentVersionTag` — the `esc/versions` module
+      # provides the context. Fully-qualified: `pulumiservice:esc/versions:Tag`.
+      Tag:
+        doc: A named tag attached to a specific revision of an ESC environment.
+        operations:
+          create: CreateRevisionTag_esc_environments_versions_tags
+          read:   ReadRevisionTag_esc_environments
+          update: UpdateRevisionTag_esc_environments
+          delete: DeleteRevisionTag_esc_environments
+        id:
+          template: "{organization}/{project}/{environment}/{tagName}"
+          params: [organization, project, environment, tagName]
+        forceNew: [organization, project, environment, tagName]
+        properties:
+          organization:
+            from: orgName
+            type: string
+            source: path
+            required: true
+            doc: Organization name.
+          project:
+            from: projectName
+            type: string
+            source: path
+            default: default
+            doc: Project name (defaults to "default").
+          environment:
+            from: envName
+            type: string
+            source: path
+            required: true
+            doc: Environment name.
+          tagName:
+            type: string
+            source: path
+            required: true
+            doc: Tag name.
+          revision:
+            type: integer
+            source: body
+            required: true
+            doc: Revision number the tag points to.
+
+  esc/permissions:
+    resources:
+      TeamEnvironmentPermission:
+        operations:
+          # TODO (task #7): locate the ESC team-permission operationIds in the spec
+          create: TODO:SetTeamEnvironmentPermission
+          read:   TODO:GetTeamEnvironmentPermission
+          delete: TODO:RemoveTeamEnvironmentPermission
+        id:
+          template: "{organizationName}/{projectName}/{envName}/{teamName}"
+          params: [organizationName, projectName, envName, teamName]
+        forceNew: [organizationName, projectName, envName, teamName]
+
+  # ─── SAML / SSO identity providers ──────────────────────────────────────
+
+  orgs/identity:
+    resources:
+      IdentityProvider:
+        doc: |
+          Organization identity provider configuration (SAML/SSO). Declarative
+          resource over the SAML-organization endpoints: PATCH is
+          create-or-update (upsert), GET reads the current config, DELETE
+          tears it down.
+        operations:
+          # PATCH is the create + update path (upsert). Read + delete are
+          # dedicated. No separate POST exists.
+          create: UpdateSAMLOrganization
+          read:   GetSAMLOrganization
+          update: UpdateSAMLOrganization
+          delete: DeleteIdentityProvider
+        id:
+          template: "{organizationName}"
+          params: [organizationName]
+        forceNew: [organizationName]
+        properties:
+          organizationName:
+            from: orgName
+            type: string
+            source: path
+            required: true
+            doc: Organization the identity provider is configured for.
+          providerType:
+            from: type
+            type: string
+            source: body
+            enum: [saml]
+            default: saml
+            doc: Identity provider protocol. Only `saml` is supported today.
+          metadataUrl:
+            type: string
+            source: body
+            doc: SAML metadata URL (IdP publishes this). Mutually exclusive with `metadataXml`.
+          metadataXml:
+            type: string
+            source: body
+            secret: true
+            doc: SAML metadata document content (XML). Mutually exclusive with `metadataUrl`.
+          ssoUrl:
+            type: string
+            source: body
+            doc: IdP single-sign-on endpoint.
+          certificate:
+            type: string
+            source: body
+            doc: IdP signing certificate (PEM).
+          enforceSAML:
+            type: boolean
+            source: body
+            doc: When true, require SAML for all org members (no local-credential fallback).
+        checks:
+          - requireOneOf: [metadataUrl, metadataXml]
+            message: "exactly one of metadataUrl or metadataXml must be provided"
+    functions:
+      listSamlAdmins:             { operationId: ListSAMLOrganizationAdmins }
+      listIdentityProviderOrgs:   { operationId: ListIdentityProviderOrganizations }
+    methods:
+      IdentityProvider.updateAdmins:
+        resource: orgs/identity:IdentityProvider
+        operationId: UpdateSAMLOrganizationAdmins
+      IdentityProvider.setSoleAdmin:
+        resource: orgs/identity:IdentityProvider
+        operationId: SetSoleOrganizationAdmin
+      IdentityProvider.syncWithIdp:
+        resource: orgs/identity:IdentityProvider
+        operationId: SyncWithIdentityProvider
+
+  # ─── Audit logs ─────────────────────────────────────────────────────────
+
+  orgs/audit:
+    resources:
+      LogExport:
+        operations:
+          create: UpdateAuditLogExportConfiguration  # POST   /api/orgs/{orgName}/auditlogs/export/config
+          read:   GetAuditLogExportConfiguration     # GET
+          update: UpdateAuditLogExportConfiguration  # POST (idempotent upsert semantics)
+          delete: DeleteAuditLogExportConfiguration  # DELETE
+        id:
+          template: "{organizationName}"
+          params: [organizationName]
+        forceNew: [organizationName]
+        properties:
+          organizationName: { from: orgName, source: path }
+    functions:
+      listAuditLogEvents:     { operationId: ListAuditLogEventsHandlerV2 }
+      exportAuditLogEvents:   { operationId: ExportAuditLogEventsHandlerV2 }
+      getAuditLogsReaderKind: { operationId: GetAuditLogsReaderKind }
+    methods:
+      # Admin-trigger actions surfaced as methods on the export config.
+      LogExport.forceExport:
+        resource: orgs/audit:LogExport
+        operationId: ForceAuditLogExport
+      LogExport.testConfiguration:
+        resource: orgs/audit:LogExport
+        operationId: TestAuditLogExportConfiguration
+
+  # ─── VCS integrations ───────────────────────────────────────────────────
+  # Each integration type is a distinct resource (the wire shapes differ;
+  # collapsing them into one polymorphic resource would obscure real API
+  # differences). Actions like OAuth-flow completion are exposed as methods.
+
+  integrations:
+    resources:
+      Github:
+        operations:
+          create: StartGitHubSetup                # POST
+          read:   GetGitHubIntegration
+          update: UpdateGitHubIntegration
+          delete: DeleteGitHubIntegration
+        id:
+          template: "{organizationName}/github/{integrationId}"
+          params: [organizationName, integrationId]
+        forceNew: [organizationName]
+      GithubEnterprise:
+        operations:
+          # No Create in the public spec — GHE integrations come online via
+          # an admin-only setup path; v2 exposes them read/update/delete only
+          # and documents creation via `pulumi import`.
+          read:   GetGitHubEnterpriseIntegration
+          update: UpdateGitHubEnterpriseIntegration
+          delete: DeleteGitHubEnterpriseIntegration
+        id:
+          template: "{organizationName}/github-enterprise/{integrationId}"
+          params: [organizationName, integrationId]
+        forceNew: [organizationName]
+      GitLab:
+        operations:
+          create: CreateGitLabSetup
+          read:   GetGitLabIntegration
+          update: UpdateGitLabIntegration
+          delete: DeleteGitLabIntegration
+        id:
+          template: "{organizationName}/gitlab/{integrationId}"
+          params: [organizationName, integrationId]
+        forceNew: [organizationName]
+      BitBucket:
+        operations:
+          create: CreateBitBucketSetup
+          read:   GetBitBucketIntegration
+          update: UpdateBitBucketIntegration
+          delete: DeleteBitBucketIntegration
+        id:
+          template: "{organizationName}/bitbucket/{integrationId}"
+          params: [organizationName, integrationId]
+        forceNew: [organizationName]
+      AzureDevOps:
+        operations:
+          create: CreateAzureDevOpsSetup
+          read:   GetAzureDevOpsIntegration
+          update: UpdateAzureDevOpsIntegration
+          delete: DeleteAzureDevOpsIntegration
+        id:
+          template: "{organizationName}/azure-devops/{integrationId}"
+          params: [organizationName, integrationId]
+        forceNew: [organizationName]
+    functions:
+      listAllVCSIntegrations:      { operationId: ListAllVCSIntegrations }
+      listGithubIntegrations:      { operationId: ListGitHubIntegrations }
+      listGithubEnterpriseIntegrations: { operationId: ListGitHubEnterpriseIntegrations }
+      listGitlabIntegrations:      { operationId: ListGitLabIntegrations }
+      listBitbucketIntegrations:   { operationId: ListBitBucketIntegrations }
+      listAzureDevOpsIntegrations: { operationId: ListAzureDevOpsIntegrations }
+      getGithubAccessStatus:       { operationId: GetGitHubAccess }
+      getGitlabAccessStatus:       { operationId: GetGitLabAccessStatus }
+      getBitbucketAccessStatus:    { operationId: GetBitBucketAccessStatus }
+      getAzureDevOpsAccessStatus:  { operationId: GetAzureDevOpsAccessStatus }
+      listVCSRepos:                { operationId: ListVCSRepos }
+      listVCSBranches:             { operationId: ListVCSBranches }
+      listVCSRepoDestinations:     { operationId: ListVCSRepoDestinations }
+      listAzureDevOpsOrganizations: { operationId: ListAzureDevOpsOrganizations }
+      listAzureDevOpsProjects:     { operationId: ListAzureDevOpsProjects }
+    methods:
+      AzureDevOps.initiateOAuth:
+        resource: integrations:AzureDevOps
+        operationId: InitiateAzureDevOpsOAuth
+      AzureDevOps.completeOAuth:
+        resource: integrations:AzureDevOps
+        operationId: CompleteAzureDevOpsOAuth
+
+  # ─── ESC cloud setup (AWS / Azure / GCP OAuth wizards) ──────────────────
+  # Cloud-setup flows are interactive OAuth dances, not a CRUD resource.
+  # Expose them as functions + methods under esc/cloudsetup so programs can
+  # trigger them imperatively (e.g. from a one-shot bootstrap script).
+
+  esc/cloudsetup:
+    functions:
+      listAwsSSOAccounts:   { operationId: AWSSSOListAccounts }
+      listAzureAccounts:    { operationId: AzureListAccounts }
+      listGcpAccounts:      { operationId: GCPListAccounts }
+    # The setup POSTs are top-level methods (no parent resource — ESC org
+    # is implicit in the token).
+    # They're registered under the cross-module methods block below.
+
+  # ─── Change requests ────────────────────────────────────────────────────
+  # Change requests are user-visible proposals routed through change gates.
+  # Modeled as a resource for Create/Read/Update/Delete-like semantics;
+  # the many action POSTs (approve, apply, close, etc.) are methods.
+
+  changerequests:
+    resources:
+      ChangeRequest:
+        operations:
+          # No dedicated create endpoint in the public spec — change requests
+          # are created by tooling during `pulumi up`, not directly authored.
+          # v2 exposes Read/Update/Close + approve/unapprove as actions.
+          read:   Get
+          update: Update
+          # Close is the closest analog to delete.
+          delete: Close
+        id:
+          template: "{organizationName}/{changeRequestId}"
+          params: [organizationName, changeRequestId]
+        forceNew: [organizationName]
+    functions:
+      listChangeRequests:        { operationId: List_change_requests }
+      listChangeRequestEvents:   { operationId: ListEvents }
+    methods:
+      ChangeRequest.approve:
+        resource: changerequests:ChangeRequest
+        operationId: Approve
+      ChangeRequest.unapprove:
+        resource: changerequests:ChangeRequest
+        operationId: Unapprove
+      ChangeRequest.apply:
+        resource: changerequests:ChangeRequest
+        operationId: Apply
+      ChangeRequest.submit:
+        resource: changerequests:ChangeRequest
+        operationId: Submit
+      ChangeRequest.addComment:
+        resource: changerequests:ChangeRequest
+        operationId: AddComment
+
+  # ─── Customer Managed Keys (CMK) ────────────────────────────────────────
+
+  orgs/cmk:
+    resources:
+      # Just `Key`, not `OrganizationKey` — the `cmk` module (customer-managed
+      # keys) scopes the noun. Fully-qualified: `pulumiservice:orgs/cmk:Key`.
+      Key:
+        operations:
+          create: CreateOrganizationKey
+          # No dedicated single-key GET in the public spec; read from list.
+          readVia: { operationId: ListOrganizationKeys, filterBy: id }
+          # Keys are disabled rather than deleted in Pulumi Cloud's CMK flow.
+          delete: DisableOrganizationKey
+        id:
+          template: "{organizationName}/{keyId}"
+          params: [organizationName, keyId]
+        forceNew: [organizationName]
+    functions:
+      listKeys:           { operationId: ListOrganizationKeys }
+      listKeyMigrations:  { operationId: ListOrganizationKeyMigrations }
+    methods:
+      Key.setDefault:
+        resource: orgs/cmk:Key
+        operationId: SetDefaultOrganizationKey
+      Key.disableAll:
+        resource: orgs/cmk:Key
+        operationId: DisableAllOrganizationKeys
+      Key.retryMigrations:
+        resource: orgs/cmk:Key
+        operationId: RetryOrganizationKeyMigrations
+
+  # ─── Organization members, roles, services ─────────────────────────────
+
+  orgs/members:
+    resources:
+      # Just `Member`, not `OrganizationMember` — the `orgs/members` module
+      # scopes the noun. Fully-qualified: `pulumiservice:orgs/members:Member`.
+      Member:
+        operations:
+          create: AddOrganizationMember      # POST   /api/orgs/{orgName}/members/{userLogin}
+          delete: DeleteOrganizationMember   # DELETE
+          # No dedicated GET for a single membership — fall back to a list
+          # filter when the spec adds one; for now Read is handled by Pulumi's
+          # refresh sampling on other properties of the user.
+          readVia: { operationId: ListOrganizationMembers, filterBy: userLogin }
+        id:
+          template: "{organizationName}/{userLogin}"
+          params: [organizationName, userLogin]
+        forceNew: [organizationName, userLogin]
+    functions:
+      listMembers:                { operationId: ListOrganizationMembers }
+      listMemberStackPermissions: { operationId: ListMemberStackPermissions }
+
+  orgs/roles:
+    resources:
+      Role:
+        operations:
+          create: CreateRole
+          read:   GetRole
+          update: UpdateRole
+          delete: DeleteRole
+        id:
+          template: "{organizationName}/{roleId}"
+          params: [organizationName, roleId]
+        forceNew: [organizationName]
+    functions:
+      listRoles:             { operationId: ListRolesByOrgIDAndUXPurpose }
+      listTeamsWithRole:     { operationId: ListTeamsWithRole }
+      listUsersWithRole:     { operationId: ListUsersWithRole }
+      listOrgTokensWithRole: { operationId: ListOrgTokensWithRole }
+    methods:
+      Role.setOrganizationDefault:
+        resource: orgs/roles:Role
+        operationId: UpdateOrganizationDefaultRole
+
+  orgs/services:
+    resources:
+      Service:
+        operations:
+          create: CreateService
+          read:   GetService
+          update: UpdateService
+          delete: DeleteService
+        id:
+          template: "{organizationName}/{ownerType}/{ownerName}/{serviceName}"
+          params: [organizationName, ownerType, ownerName, serviceName]
+        forceNew: [organizationName, ownerType, ownerName]
+    functions:
+      listServices: { operationId: ListServices }
+    methods:
+      Service.addItems:
+        resource: orgs/services:Service
+        operationId: AddServiceItems
+      Service.removeItem:
+        resource: orgs/services:Service
+        operationId: RemoveServiceItem
+
+  # ─── Policy packs (org-registered) ──────────────────────────────────────
+  # Note: publishing versions is a CLI/tooling operation, not a declarative
+  # Pulumi program concern. The provider exposes the pack registration for
+  # org-level policy groups to bind to; version publish lives in exclusions.
+
+  orgs/policypacks:
+    resources:
+      PolicyPack:
+        operations:
+          create: CreatePolicyPack
+          # GET for a pack version exists at a different path (GetPolicyPack);
+          # for the pack-level resource we list and filter.
+          readVia: { operationId: ListPolicyPacks_orgs, filterBy: name }
+          delete: DeletePolicyPack_orgs_policypacks
+        id:
+          template: "{organizationName}/{name}"
+          params: [organizationName, name]
+        forceNew: [organizationName]
+
+  # ─── Insights (preview) ─────────────────────────────────────────────────
+  # `Account` manages a cloud-resource-scanning account under the insights
+  # sub-module. Named just `Account` (not `InsightsAccount`) because the
+  # module already provides the "insights" context — the spec's own
+  # operationIds (CreateAccount/ReadAccount/…) and path segment confirm
+  # the canonical noun is Account. Backed by the `/api/preview/insights/...`
+  # endpoints; the API is preview and will stabilize alongside GA.
+  orgs/insights:
+    resources:
+      Account:
+        doc: |
+          Insights account for cloud resource scanning and analysis across
+          AWS, Azure, and GCP (preview). Associates a cloud provider
+          configuration with an ESC environment, and optionally schedules
+          recurring scans.
+        operations:
+          create: CreateAccount        # POST   /api/preview/insights/{orgName}/accounts/{accountName}
+          read:   ReadAccount          # GET    /api/preview/insights/{orgName}/accounts/{accountName}
+          update: UpdateAccount        # PATCH
+          delete: DeleteAccount        # DELETE
+        id:
+          template: "{organizationName}/{accountName}"
+          params: [organizationName, accountName]
+        forceNew: [organizationName, accountName, provider]
+        properties:
+          organizationName:
+            from: orgName
+            type: string
+            source: path
+            required: true
+            doc: Organization the insights account belongs to.
+          accountName:
+            type: string
+            source: path
+            required: true
+            doc: Account name. Must be unique within the organization.
+          provider:
+            type: string
+            source: body
+            required: true
+            enum: [aws, azure-native, gcp, kubernetes, oci]
+            doc: Cloud provider being scanned.
+          environment:
+            type: string
+            source: body
+            required: true
+            doc: ESC environment providing the provider credentials (format "<project>/<env>" or just "<env>" for default project).
+          providerConfig:
+            ref: "pulumi.json#/Any"
+            source: body
+            doc: Provider-specific configuration (region list, subscription IDs, GCP projects, etc.).
+          scanSchedule:
+            type: string
+            source: body
+            required: true
+            enum: [none, "12h", daily]
+            doc: How often to scan this account automatically. Set to "none" to disable scheduled scans (manual invoke via `triggerScan` still works).
+          tags:
+            type: object
+            source: body
+            additionalProperties: { type: string }
+            doc: User-defined tags for filtering/grouping accounts.
+          accountId:
+            from: id
+            type: string
+            source: response
+            output: true
+            doc: Server-assigned account ID.
+          scheduledScanEnabled:
+            type: boolean
+            source: response
+            output: true
+            doc: Whether scheduled scans are currently enabled for this account.
+    functions:
+      listAccounts: { operationId: ListAccounts }
+    methods:
+      # Trigger an ad-hoc scan of this account's cloud resources.
+      Account.triggerScan:
+        resource: orgs/insights:Account
+        operationId: ScanAccount
+
+  # ─── Approval rules ─────────────────────────────────────────────────────
+  # NOTE: ApprovalRule in v1 likely maps to change-gates or change-requests in
+  # the spec. The public spec exposes `change-gates` (Create/Read/Update/Delete
+  # Gate) — TODO (task #7): confirm this is the v1 ApprovalRule equivalent
+  # and map accordingly.
+
+  changegates:
+    resources:
+      ApprovalRule:
+        doc: |
+          An approval rule gating deployments or environment changes. Requires
+          one or more approvals from eligible approvers before a targeted
+          action proceeds.
+        operations:
+          create: CreateGate                   # POST   /api/change-gates/{orgName}
+          read:   ReadGate                     # GET    /api/change-gates/{orgName}/{gateID}
+          update: UpdateGate                   # PUT
+          delete: DeleteGate                   # DELETE
+        id:
+          template: "{organizationName}/{gateId}"
+          params: [organizationName, gateId]
+        forceNew: [organizationName]
+        properties:
+          organizationName:
+            from: orgName
+            type: string
+            source: path
+            required: true
+            doc: Organization that owns the rule.
+          name:
+            type: string
+            source: body
+            required: true
+            doc: Human-readable name for the rule.
+          enabled:
+            type: boolean
+            source: body
+            required: true
+            default: true
+            doc: Whether the rule is active.
+          targetActionTypes:
+            type: array
+            source: body
+            required: true
+            items: { type: string }
+            doc: Which action types the rule gates (e.g., deployment, environment_change).
+          environmentIdentifier:
+            ref: "pulumi.json#/Any"
+            source: body
+            required: true
+            doc: Target environment — organization/project/environment triple.
+          approvalRuleConfig:
+            ref: "pulumi.json#/Any"
+            source: body
+            required: true
+            doc: Rule config — number of required approvals, eligible approvers, reapproval policy, self-approval toggle.
+          gateId:
+            type: string
+            source: response
+            output: true
+            doc: Server-assigned rule ID.
+    functions:
+      listApprovalRules: { operationId: ListGates }
+
+# ─── Cross-module resource methods (non-CRUD POST actions surfaced as methods) ──
+# (Method entries live under their owning module. This section is reserved
+# for future cross-module methods.)
+methods: {}
+
+# ─── Intentional non-coverage ───────────────────────────────────────────────
+# Every unmapped operationId must either appear under a module above or here.
+# The coverage gate fails CI if anything is missing.
+exclusions:
+  # ── Meta / infrastructure endpoints ─────────────────────────────────
+  - { operationId: FetchRestSpecification, reason: "meta endpoint — publishes the spec itself" }
+  - { operationId: Token,                  reason: "OAuth2 token exchange, not a user-facing resource" }
+  - { operationId: Capabilities,           reason: "service-discovery endpoint" }
+  - { operationId: Version,                reason: "CLI version endpoint" }
+  - { operationId: AITemplate,             reason: "AI-template generation is an interactive tool, not a declarative resource" }
+
+  # ── Stack update lifecycle endpoints ─────────────────────────────────
+  # The `pulumi up` engine owns update lifecycle (start/complete/cancel/log
+  # append). These are SaaS internals coordinating the deployment, not
+  # something a Pulumi program declaratively manages.
+  - { operationId: AppendUpdateLogEntry_destroy, reason: "stack update lifecycle: engine-managed, not declarative" }
+  - { operationId: AppendUpdateLogEntry_preview, reason: "stack update lifecycle: engine-managed, not declarative" }
+  - { operationId: AppendUpdateLogEntry_refresh, reason: "stack update lifecycle: engine-managed, not declarative" }
+  - { operationId: AppendUpdateLogEntry_update,  reason: "stack update lifecycle: engine-managed, not declarative" }
+  - { operationId: CompleteUpdate_destroy,       reason: "stack update lifecycle: engine-managed, not declarative" }
+  - { operationId: CompleteUpdate_preview,       reason: "stack update lifecycle: engine-managed, not declarative" }
+  - { operationId: CompleteUpdate_refresh,       reason: "stack update lifecycle: engine-managed, not declarative" }
+  - { operationId: CompleteUpdate_update,        reason: "stack update lifecycle: engine-managed, not declarative" }
+  - { operationId: CancelUpdate_destroy,         reason: "stack update lifecycle: engine-managed, not declarative" }
+  - { operationId: CancelUpdate_preview,         reason: "stack update lifecycle: engine-managed, not declarative" }
+  - { operationId: CancelUpdate_refresh,         reason: "stack update lifecycle: engine-managed, not declarative" }
+  - { operationId: CancelUpdate_update,          reason: "stack update lifecycle: engine-managed, not declarative" }
+  - { operationId: GetEngineEvents_destroy,      reason: "stack update events stream: engine-consumed" }
+  - { operationId: GetEngineEvents_preview,      reason: "stack update events stream: engine-consumed" }
+  - { operationId: GetEngineEvents_refresh,      reason: "stack update events stream: engine-consumed" }
+  - { operationId: GetEngineEvents_update,       reason: "stack update events stream: engine-consumed" }
+
+  # ── Encryption primitives ────────────────────────────────────────────
+  # Batch encrypt/decrypt endpoints are used by the CLI's value crypto
+  # pipeline, not by declarative programs.
+  - { operationId: BatchDecryptProjectValue,  reason: "CLI value-decryption primitive" }
+  - { operationId: BatchDecryptValue,         reason: "CLI value-decryption primitive" }
+  - { operationId: BatchEncryptValue,         reason: "CLI value-encryption primitive" }
+  - { operationId: DecryptEnvironmentSecrets, reason: "imperative decrypt — use ESC open flow instead" }
+  - { operationId: EncryptEnvironmentSecrets, reason: "imperative encrypt — use ESC open flow instead" }
+
+  # ── Preview-environment endpoints (superseded by `esc/*`) ────────────
+  # `/api/preview/environments/*` is the legacy path retained for backwards
+  # compatibility; v2 exposes the successor paths under `/api/esc/*`.
+  - { operationId: CheckEnvironment_preview_environments,          reason: "legacy preview path; use esc/* equivalents" }
+  - { operationId: CheckEnvironment_preview_environments_versions, reason: "legacy preview path; use esc/* equivalents" }
+  - { operationId: CheckYAML_preview,                              reason: "legacy preview path; use esc/* equivalents" }
+  - { operationId: DeleteWebhook_preview_environments,             reason: "legacy preview path; use esc/hooks" }
+  - { operationId: GetWebhook_preview_environments,                reason: "legacy preview path; use esc/hooks" }
+  - { operationId: GetWebhookDeliveries_preview_environments,      reason: "legacy preview path; use esc/hooks" }
+  - { operationId: ListWebhooks_preview_environments,              reason: "legacy preview path; use esc/hooks" }
+  - { operationId: CreateWebhook_preview_environments,             reason: "legacy preview path; use esc/hooks" }
+  - { operationId: UpdateWebhook_preview_environments,             reason: "legacy preview path; use esc/hooks" }
+  - { operationId: PingWebhook_preview_environments,               reason: "legacy preview path; use esc/hooks" }
+  - { operationId: RedeliverWebhookEvent_preview_environments,     reason: "legacy preview path; use esc/hooks" }
+
+  # ── Deployment runtime endpoints ─────────────────────────────────────
+  - { operationId: GetPulumiDeployExecutor, reason: "runtime endpoint for the deployment executor itself" }
+  - { operationId: PollDeploymentsQueue,    reason: "runtime endpoint for agent pool workers" }
+  - { operationId: CancelDeployment,        reason: "imperative deployment control; expose as a future method on DeploymentSettings" }
+  - { operationId: ClearProjectCache,       reason: "deployment cache maintenance; operational, not declarative" }
+
+  # ── Insights (preview) endpoints ─────────────────────────────────────
+  # Insights is in preview; specific shapes will stabilize before we expose
+  # them as v2 resources. Excluded in bulk until then.
+  - { operationId: AcceptInsightsBilling,         reason: "insights (preview): awaiting GA stabilization" }
+  - { operationId: BulkCreateAccounts,            reason: "insights (preview): awaiting GA stabilization" }
+  - { operationId: CancelScan,                    reason: "insights (preview): awaiting GA stabilization" }
+  - { operationId: DeleteResourceMigrationAnnotation, reason: "insights (preview): awaiting GA stabilization" }
+  - { operationId: GetDiscoveredProject,          reason: "insights (preview): awaiting GA stabilization" }
+  - { operationId: GetDiscoveredStack,            reason: "insights (preview): awaiting GA stabilization" }
+  - { operationId: ListInsightsAccountTeams,      reason: "insights (preview): awaiting GA stabilization" }
+  - { operationId: ListPolicyPacksForAccount,     reason: "insights (preview): awaiting GA stabilization" }
+  - { operationId: UpdateTeamInsightsAccountPermissions, reason: "insights (preview): awaiting GA stabilization" }
+  - { operationId: UpdateResourceVersionPolicyResults, reason: "insights (preview): awaiting GA stabilization" }
+  - { operationId: UpdateStackPolicyResults,      reason: "insights (preview): awaiting GA stabilization" }
+  # (AddServiceItems claimed as orgs/services:Service.addItems method above.)
+
+  # ── User-scoped endpoints ────────────────────────────────────────────
+  # User-self-service endpoints (profile, personal tokens beyond create/delete,
+  # etc.) aren't typically what Pulumi programs manage. Personal token CRUD
+  # is exposed under `orgs/tokens:AccessToken`; the rest are excluded.
+  - { operationId: ListGitHubOrganizationTeams, reason: "user-scoped lookup, not an org resource" }
+  - { operationId: GetLatestPendingEmailChange, reason: "user-profile flow, not a Pulumi program concern" }
+  - { operationId: DeletePendingEmailChange,    reason: "user-profile flow, not a Pulumi program concern" }
+
+  # ── Stack query / status endpoints (functions, not resources) ───────
+  # These are read-only views of ephemeral state (updates, previews, drift
+  # status, events). They belong in the CLI/console, not in declarative
+  # infrastructure code. A few particularly useful ones may graduate to
+  # proper data-source functions in a follow-up; the rest stay excluded.
+  - { operationId: ExportStack,                 reason: "CLI-side state export; not declarative" }
+  - { operationId: ExportStackAtVersion,        reason: "CLI-side state export; not declarative" }
+  - { operationId: GetStackDriftStatus,         reason: "ephemeral status; surfaces via DriftSchedule" }
+  - { operationId: GetStackActivity,            reason: "ephemeral activity stream" }
+  - { operationId: GetStackMetadata,            reason: "metadata subset of GetStack; overlap" }
+  - { operationId: GetStackOverview,            reason: "console overview view; not declarative" }
+  - { operationId: GetStackConfig,              reason: "config is managed by `pulumi config`, not the provider" }
+  - { operationId: DeleteStackConfig,           reason: "config is managed by `pulumi config`, not the provider" }
+  - { operationId: GetStackResource,            reason: "stack resource graph read; belongs in Pulumi engine" }
+  - { operationId: GetStackResources,           reason: "stack resource graph read; belongs in Pulumi engine" }
+  - { operationId: GetStackResourceCount,       reason: "stack resource graph read; belongs in Pulumi engine" }
+  - { operationId: GetLatestStackResource,      reason: "stack resource graph read; belongs in Pulumi engine" }
+  - { operationId: GetLatestStackResources,     reason: "stack resource graph read; belongs in Pulumi engine" }
+  - { operationId: GetStackUpdate,              reason: "update history read; belongs in `pulumi stack history`" }
+  - { operationId: GetStackUpdateSummary,       reason: "update history read; belongs in `pulumi stack history`" }
+  - { operationId: GetLatestStackUpdate,        reason: "update history read; belongs in `pulumi stack history`" }
+  - { operationId: GetLatestUpdateTimeline,     reason: "update history read; belongs in `pulumi stack history`" }
+  - { operationId: GetStackPreview,             reason: "preview read; CLI-side" }
+  - { operationId: GetStackPreviewSummary,      reason: "preview read; CLI-side" }
+  - { operationId: GetStackPreviews,            reason: "preview read; CLI-side" }
+  - { operationId: GetLatestStackPreviews,      reason: "preview read; CLI-side" }
+  - { operationId: UpdateSummary,               reason: "console update view" }
+  - { operationId: UpdateSummaryHandlerLatest,  reason: "console update view" }
+  - { operationId: GetStackPolicyGroups,        reason: "policy-group binding read; use GetPolicyGroup" }
+  - { operationId: GetStackPolicyPacks,         reason: "policy-pack binding read; use ListPolicyPacks_orgs" }
+  - { operationId: SearchStacks,                reason: "console search view" }
+  - { operationId: ListStackTeams,              reason: "permission view; use TeamStackPermission" }
+  - { operationId: CreateStack,                 reason: "Stack resource is custom-coded (hybrid semantics)" }
+
+  # ── Deployment runtime read endpoints ────────────────────────────────
+  - { operationId: GetDeployment,               reason: "individual deployment run read; use Pulumi console/CLI" }
+  - { operationId: GetDeploymentLogs,           reason: "deployment logs; streamed, not a resource" }
+  - { operationId: GetDeploymentUpdates,        reason: "deployment update list; operational view" }
+  - { operationId: GetDeployment_version,       reason: "deployment-by-version read; operational view" }
+  - { operationId: GetDeploymentsStatus,        reason: "deployment status read; operational view" }
+  - { operationId: ListOrgDeployments,          reason: "org-wide deployment list; operational view" }
+  - { operationId: GetDeployUsageReport,        reason: "usage telemetry read; operational view" }
+  - { operationId: GetUsageSummaryDeployCompute, reason: "usage telemetry read; operational view" }
+  - { operationId: EncryptDeploymentSettingsSecret, reason: "CLI encryption primitive for deployment settings" }
+  - { operationId: CreateAPIDeploymentHandlerV2, reason: "direct deployment trigger; use stacks/deployments:Schedule or git-driven" }
+
+  # ── ESC operational / wizard endpoints (methods or excluded) ─────────
+  # Most of these are actions on an environment rather than resources.
+  # A future pass may expose specific ones as methods on Environment.
+  - { operationId: CheckEnvironment_esc_environments,          reason: "ESC validation; surfaces via CLI `pulumi env open`" }
+  - { operationId: CheckEnvironment_esc_environments_versions, reason: "ESC validation; surfaces via CLI `pulumi env open`" }
+  - { operationId: CheckYAML_esc,                              reason: "ESC YAML validation; CLI-side" }
+  - { operationId: OpenEnvironment_esc_environments,           reason: "ESC value resolution; runtime, not declarative" }
+  - { operationId: OpenEnvironment_esc_environments_versions,  reason: "ESC value resolution; runtime, not declarative" }
+  - { operationId: OpenYAML_esc,                               reason: "ESC value resolution; runtime, not declarative" }
+  - { operationId: DecryptEnvironment_esc_environments,        reason: "ESC secret decrypt; runtime, not declarative" }
+  - { operationId: DecryptEnvironment_esc_environments_versions, reason: "ESC secret decrypt; runtime, not declarative" }
+  - { operationId: ReadAnonymousOpenEnvironment_esc,           reason: "ESC open session poll; runtime" }
+  - { operationId: ReadOpenEnvironment_esc_environments,       reason: "ESC open session poll; runtime" }
+  - { operationId: ReadOpenEnvironmentRequest,                 reason: "ESC open session request poll; runtime" }
+  - { operationId: CreateOpenEnvironmentRequest,               reason: "ESC open session request; runtime" }
+  - { operationId: UpdateOpenEnvironmentRequest,               reason: "ESC open session request; runtime" }
+  - { operationId: CloneEnvironment,                           reason: "imperative; use `pulumi env clone` CLI" }
+  - { operationId: RestoreEnvironment,                         reason: "imperative recovery operation; not declarative" }
+  - { operationId: ListDeletedEnvironments,                    reason: "tombstone list for recovery; operational" }
+  - { operationId: ListEnvironmentReferrers_esc_environments,           reason: "graph view; operational" }
+  - { operationId: ListEnvironmentReferrers_esc_environments_versions,  reason: "graph view; operational" }
+  - { operationId: ListEnvironmentRevisions_esc_environments,  reason: "revision history view; operational" }
+  - { operationId: ListEnvironmentSecretRotationHistory,       reason: "rotation history view; operational" }
+  - { operationId: ReassignEnvironmentOwnership,               reason: "admin ownership transfer; expose as method if demanded" }
+  - { operationId: RotateEnvironment,                          reason: "imperative rotate; use esc/schedules:Rotation" }
+  - { operationId: GetEnvironmentMetadata_esc_environments,    reason: "metadata view; subset of Read" }
+  - { operationId: GetEnvironmentSettings,                     reason: "settings view; subset of Read" }
+  - { operationId: PatchEnvironmentSettings,                   reason: "settings mutation; fold into Environment update in a follow-up" }
+  - { operationId: ListAllEnvironmentTags_esc,                 reason: "tag search; operational" }
+  # ESC drafts — change-request workflow, not a Pulumi program concern.
+  - { operationId: CreateEnvironmentDraft,  reason: "ESC draft workflow; CLI/console" }
+  - { operationId: ReadEnvironmentDraft,    reason: "ESC draft workflow; CLI/console" }
+  - { operationId: UpdateEnvironmentDraft,  reason: "ESC draft workflow; CLI/console" }
+  - { operationId: OpenEnvironmentDraft,    reason: "ESC draft workflow; CLI/console" }
+  - { operationId: GetProviderSchema_esc,   reason: "ESC provider schema discovery; data source — candidate for follow-up" }
+  - { operationId: GetRotatorSchema,        reason: "ESC rotator schema discovery; data source — candidate for follow-up" }
+  - { operationId: ListProviders_esc,       reason: "ESC provider list; data source — candidate for follow-up" }
+  - { operationId: ListRotators,            reason: "ESC rotator list; data source — candidate for follow-up" }
+  - { operationId: ListEnvironments_esc,    reason: "cross-org listing; use ListOrgEnvironments_esc" }
+  - { operationId: ListOrgEnvironments_esc, reason: "listing; candidate for a future `listEnvironments` function" }
+  - { operationId: ListEnvironmentSchedule, reason: "listing; subset of esc/schedules:Rotation CRUD" }
+  - { operationId: ListEnvironmentScheduleHistory, reason: "history view; operational" }
+  - { operationId: PauseEnvironmentSchedule,  reason: "imperative pause; expose as method if demanded" }
+  - { operationId: ResumeEnvironmentSchedule, reason: "imperative resume; expose as method if demanded" }
+
+  # ── ESC environment tags (covered by esc/versions:Tag + per-tag ops) ──
+  - { operationId: CreateEnvironmentTag_esc_environments, reason: "per-tag mutation; use esc/versions:Tag resource" }
+  - { operationId: GetEnvironmentTag_esc_environments,    reason: "per-tag mutation; use esc/versions:Tag resource" }
+  - { operationId: UpdateEnvironmentTag_esc_environments, reason: "per-tag mutation; use esc/versions:Tag resource" }
+  - { operationId: DeleteEnvironmentTag_esc_environments, reason: "per-tag mutation; use esc/versions:Tag resource" }
+  - { operationId: ListEnvironmentTags_esc_environments,  reason: "per-tag mutation; use esc/versions:Tag resource" }
+
+  # ── Webhook deliveries / pings (actions on existing Webhook) ────────
+  - { operationId: GetOrganizationWebhookDeliveries, reason: "delivery audit view; candidate for method" }
+  - { operationId: GetStackWebhookDeliveries,        reason: "delivery audit view; candidate for method" }
+  - { operationId: GetWebhookDeliveries_esc_environments, reason: "delivery audit view; candidate for method" }
+  - { operationId: PingOrganizationWebhook,          reason: "manual test trigger; CLI action" }
+  - { operationId: PingStackWebhook,                 reason: "manual test trigger; CLI action" }
+  - { operationId: PingWebhook_esc_environments,     reason: "manual test trigger; CLI action" }
+  - { operationId: RedeliverOrganizationWebhookEvent, reason: "manual test trigger; CLI action" }
+  - { operationId: RedeliverStackWebhookEvent,       reason: "manual test trigger; CLI action" }
+  - { operationId: RedeliverWebhookEvent_esc_environments, reason: "manual test trigger; CLI action" }
+
+  # ── Audit log v1 endpoints (v2 is canonical) ────────────────────────
+  - { operationId: ListAuditLogEventsHandlerV1,   reason: "v1 audit API; v2 is canonical" }
+  - { operationId: ExportAuditLogEventsHandlerV1, reason: "v1 audit API; v2 is canonical" }
+
+  # ── Policy-results read endpoints (reporting, not declarative) ──────
+  - { operationId: GetPolicyIssue,              reason: "policy-run reporting view" }
+  - { operationId: UpdatePolicyIssue,           reason: "policy-run triage; expose as method if demanded" }
+  - { operationId: GetPolicyIssuesFilters,      reason: "policy-run reporting view" }
+  - { operationId: ExportPolicyIssues,          reason: "policy-run reporting export" }
+  - { operationId: GetPolicyComplianceResults,  reason: "policy-run compliance snapshot" }
+  - { operationId: GetPolicyResultsMetadata,    reason: "policy-run reporting view" }
+  - { operationId: ListPolicyViolationsV2,      reason: "policy-run reporting view" }
+  - { operationId: ListPolicyIssues,            reason: "policy-run reporting view" }
+  - { operationId: ListPoliciesCompliance,      reason: "policy-run reporting view" }
+  - { operationId: BatchUpdatePolicyGroup,      reason: "batch mutation; use PolicyGroup + per-pack operations" }
+
+  # ── Policy pack publishing (CLI/tooling, not declarative) ────────────
+  - { operationId: CompletePolicyPack,                   reason: "CLI publish step" }
+  - { operationId: DeletePolicyPackVersion,              reason: "CLI publish step" }
+  - { operationId: DeletePolicyPack_preview_registry_policypacks,  reason: "legacy preview; use orgs/policypacks:PolicyPack" }
+  - { operationId: DeletePolicyPack_preview_registry_policypacks_versions, reason: "legacy preview; version management is CLI" }
+  - { operationId: GetPolicyPackVersion,                 reason: "version read; use GetPolicyPack" }
+  - { operationId: GetPolicyPackConfigSchema,            reason: "schema discovery; data source candidate" }
+  - { operationId: GetOrgRegistryPolicyPack,             reason: "registry view; data source candidate" }
+  - { operationId: ListPolicyPackVersions,               reason: "version list; data source candidate" }
+  - { operationId: ListPolicyPacks_preview_registry,     reason: "legacy preview; use ListPolicyPacks_orgs" }
+  - { operationId: ListPolicyPacks_preview_registry_post, reason: "legacy preview search" }
+  - { operationId: PostPublishPolicyPackVersion,         reason: "CLI publish step" }
+  - { operationId: PostPublishPolicyPackVersionComplete, reason: "CLI publish step" }
+
+  # ── Template publishing (CLI/tooling) ────────────────────────────────
+  - { operationId: DeleteTemplateVersion,                reason: "CLI publish step" }
+  - { operationId: DeleteTemplateVersion_preview,        reason: "legacy preview" }
+  - { operationId: GetProjectTemplate,                   reason: "template discovery view; data source candidate" }
+  - { operationId: GetProjectTemplateConfiguration,      reason: "template discovery view; data source candidate" }
+  - { operationId: GetTemplateVersion,                   reason: "version read; data source candidate" }
+  - { operationId: GetTemplateVersion_preview,           reason: "legacy preview" }
+  - { operationId: GetOrgTemplates,                      reason: "listing; use GetOrgTemplateCollections" }
+  - { operationId: GetOrgTemplateDownload,               reason: "CLI download step" }
+  - { operationId: GetOrgTemplateReadme,                 reason: "UI readme view" }
+  - { operationId: ListTemplates,                        reason: "registry listing; data source candidate" }
+  - { operationId: ListTemplates_preview,                reason: "legacy preview" }
+  - { operationId: ListTemplateVersions,                 reason: "version list; data source candidate" }
+  - { operationId: PostPublishTemplateVersion,           reason: "CLI publish step" }
+  - { operationId: PostPublishTemplateVersionComplete,   reason: "CLI publish step" }
+  - { operationId: PostPublishTemplateVersion_preview,   reason: "legacy preview publish" }
+  - { operationId: PostPublishTemplateVersionComplete_preview, reason: "legacy preview publish" }
+
+  # ── Registry package publishing (CLI/tooling) ────────────────────────
+  - { operationId: DeletePublishPackageVersion,          reason: "CLI publish step" }
+  - { operationId: DeletePublishPackageVersion_preview,  reason: "legacy preview" }
+  - { operationId: GetPackageVersion,                    reason: "version read; data source candidate" }
+  - { operationId: GetPackageVersion_preview,            reason: "legacy preview" }
+  - { operationId: ListPackages,                         reason: "registry listing; data source candidate" }
+  - { operationId: ListPackages_preview,                 reason: "legacy preview" }
+  # (ListPackageVersions not in spec; future spec addition will cover it.)
+  - { operationId: PostPublishPackageVersion,            reason: "CLI publish step" }
+  - { operationId: PostPublishPackageVersionComplete,    reason: "CLI publish step" }
+  - { operationId: PostPublishPackageVersion_preview,    reason: "legacy preview publish" }
+
+  # ── Bulk-transfer (admin operation, not typical) ────────────────────
+  - { operationId: TransferAllStacks, reason: "admin bulk-transfer; operational, not declarative" }
+
+  # ── OAuth flow initiators (methods via integrations) ────────────────
+  - { operationId: CompleteOAuth,          reason: "cloud-setup OAuth completion; interactive" }
+  - { operationId: InitiateOAuth,          reason: "cloud-setup OAuth initiation; interactive" }
+  - { operationId: AWSSetup,               reason: "AWS cloud-setup; interactive wizard" }
+  - { operationId: AWSSSOSetup,            reason: "AWS SSO cloud-setup; interactive wizard" }
+  - { operationId: AWSSSOInitiate,         reason: "AWS SSO cloud-setup; interactive wizard" }
+  - { operationId: AzureSetup,             reason: "Azure cloud-setup; interactive wizard" }
+  - { operationId: GCPSetup,               reason: "GCP cloud-setup; interactive wizard" }
+  - { operationId: GetGroupsForGitLabApp,  reason: "GitLab app group discovery; CLI-only" }
+
+  # ── Team role enablement (auxiliary; part of Role / Team) ───────────
+  - { operationId: EnableTeamRoles,   reason: "auxiliary feature flag; belongs to Team" }
+  - { operationId: ListTeamRoles,     reason: "view; data source candidate" }
+  - { operationId: UpdateTeamRoles,   reason: "auxiliary mutation; fold into Team update in a follow-up" }
+  - { operationId: DeleteTeamRole,    reason: "auxiliary mutation; fold into Team update in a follow-up" }
+
+  # ── Insights account tag endpoints (preview) ────────────────────────
+  - { operationId: GetInsightAccountTags,       reason: "insights (preview)" }
+  - { operationId: SetInsightAccountTags,       reason: "insights (preview)" }
+  - { operationId: GetInsightsTrialSummary,     reason: "insights (preview)" }
+  - { operationId: TerminateInsightsTrial,      reason: "insights (preview)" }
+  - { operationId: GetUsageSummaryInsightsScans, reason: "insights (preview)" }
+
+  # ── Change-request auxiliary endpoint (AddComment mapped as method) ──
+  # (AddComment already claimed by change-requests:ChangeRequest.addComment)
+
+  # ── /api/preview/environments/** — legacy ESC path, superseded by /api/esc ──
+  - { operationId: CreateEnvironment_preview_environments,      reason: "legacy preview path; use esc:Environment" }
+  - { operationId: DeleteEnvironment_preview_environments,      reason: "legacy preview path; use esc:Environment" }
+  - { operationId: UpdateEnvironment_preview_environments,      reason: "legacy preview path; use esc:Environment" }
+  - { operationId: ReadEnvironment_preview_environments,        reason: "legacy preview path; use esc:Environment" }
+  - { operationId: ReadEnvironment_preview_environments_versions, reason: "legacy preview path; use esc:Environment" }
+  - { operationId: GetEnvironmentMetadata_preview_environments, reason: "legacy preview path" }
+  - { operationId: DecryptEnvironment_preview_environments,     reason: "legacy preview path" }
+  - { operationId: DecryptEnvironment_preview_environments_versions, reason: "legacy preview path" }
+  - { operationId: GetProviderSchema_preview_environments,      reason: "legacy preview path" }
+  - { operationId: ListEnvironments_preview,                    reason: "legacy preview path" }
+  - { operationId: ListOrgEnvironments_preview,                 reason: "legacy preview path" }
+  - { operationId: ListAllEnvironmentTags_preview,              reason: "legacy preview path" }
+  - { operationId: ListProviders_preview_environments,          reason: "legacy preview path" }
+  - { operationId: ListEnvironmentReferrers_preview_environments_versions, reason: "legacy preview path" }
+  - { operationId: ListEnvironmentRevisions_preview_environments, reason: "legacy preview path" }
+  - { operationId: ListEnvironmentTags_preview_environments,    reason: "legacy preview path" }
+  - { operationId: OpenEnvironment_preview_environments,        reason: "legacy preview path" }
+  - { operationId: OpenEnvironment_preview_environments_versions, reason: "legacy preview path" }
+  - { operationId: OpenYAML_preview,                            reason: "legacy preview path" }
+  - { operationId: OpenEnvironmentDraft_preview,                reason: "legacy preview path" }
+  - { operationId: CreateEnvironmentDraft_preview,              reason: "legacy preview path" }
+  - { operationId: ReadEnvironmentDraft_preview,                reason: "legacy preview path" }
+  - { operationId: UpdateEnvironmentDraft_preview,              reason: "legacy preview path" }
+  - { operationId: ReadAnonymousOpenEnvironment_preview,        reason: "legacy preview path" }
+  - { operationId: ReadOpenEnvironment_preview_environments,    reason: "legacy preview path" }
+  - { operationId: CreateEnvironmentTag_preview_environments,   reason: "legacy preview path" }
+  - { operationId: GetEnvironmentTag_preview_environments,      reason: "legacy preview path" }
+  - { operationId: UpdateEnvironmentTag_preview_environments,   reason: "legacy preview path" }
+  - { operationId: DeleteEnvironmentTag_preview_environments,   reason: "legacy preview path" }
+  - { operationId: CreateRevisionTag_preview_environments_versions_tags, reason: "legacy preview path" }
+  - { operationId: ReadRevisionTag_preview_environments,        reason: "legacy preview path" }
+  - { operationId: UpdateRevisionTag_preview_environments,      reason: "legacy preview path" }
+  - { operationId: DeleteRevisionTag_preview_environments,      reason: "legacy preview path" }
+  - { operationId: ListRevisionTags_preview_environments_versions, reason: "legacy preview path" }
+  - { operationId: ListRevisionTags_preview_environments_versions2, reason: "legacy preview path" }
+  - { operationId: RetractEnvironmentRevision_preview_environments, reason: "legacy preview path" }
+
+  # ── Update engine internals (`pulumi up`/`preview`/`refresh`/`destroy` state machine) ──
+  # These endpoints record the state of an in-flight Pulumi deployment.
+  # The Pulumi engine owns them; declarative programs shouldn't touch them.
+  - { operationId: CreateJournalEntries_destroy, reason: "update engine internals" }
+  - { operationId: CreateJournalEntries_preview, reason: "update engine internals" }
+  - { operationId: CreateJournalEntries_refresh, reason: "update engine internals" }
+  - { operationId: CreateJournalEntries_update,  reason: "update engine internals" }
+  - { operationId: CreateUpdateForDestroy,       reason: "update engine internals" }
+  - { operationId: CreateUpdateForPreview,       reason: "update engine internals" }
+  - { operationId: CreateUpdateForRefresh,       reason: "update engine internals" }
+  - { operationId: CreateUpdateForUpdate,        reason: "update engine internals" }
+  - { operationId: StartUpdateForDestroy,        reason: "update engine internals" }
+  - { operationId: StartUpdateForPreview,        reason: "update engine internals" }
+  - { operationId: StartUpdateForRefresh,        reason: "update engine internals" }
+  - { operationId: StartUpdateForUpdate,         reason: "update engine internals" }
+  - { operationId: GetUpdateStatusForDestroy,    reason: "update engine internals" }
+  - { operationId: GetUpdateStatusForPreview,    reason: "update engine internals" }
+  - { operationId: GetUpdateStatusForRefresh,    reason: "update engine internals" }
+  - { operationId: GetUpdateStatusForUpdate,     reason: "update engine internals" }
+  - { operationId: GetUpdateTimeline,            reason: "update engine internals" }
+  - { operationId: PatchUpdateCheckpoint_destroy,         reason: "update engine internals" }
+  - { operationId: PatchUpdateCheckpoint_refresh,         reason: "update engine internals" }
+  - { operationId: PatchUpdateCheckpoint_update,          reason: "update engine internals" }
+  - { operationId: PatchUpdateCheckpointDelta_destroy,    reason: "update engine internals" }
+  - { operationId: PatchUpdateCheckpointDelta_refresh,    reason: "update engine internals" }
+  - { operationId: PatchUpdateCheckpointDelta_update,     reason: "update engine internals" }
+  - { operationId: PatchUpdateVerbatimCheckpoint_destroy, reason: "update engine internals" }
+  - { operationId: PatchUpdateVerbatimCheckpoint_refresh, reason: "update engine internals" }
+  - { operationId: PatchUpdateVerbatimCheckpoint_update,  reason: "update engine internals" }
+  - { operationId: RecordEngineEvent_destroy,       reason: "update engine internals" }
+  - { operationId: RecordEngineEvent_preview,       reason: "update engine internals" }
+  - { operationId: RecordEngineEvent_refresh,       reason: "update engine internals" }
+  - { operationId: RecordEngineEvent_update,        reason: "update engine internals" }
+  - { operationId: RecordEngineEventBatch_destroy,  reason: "update engine internals" }
+  - { operationId: RecordEngineEventBatch_preview,  reason: "update engine internals" }
+  - { operationId: RecordEngineEventBatch_refresh,  reason: "update engine internals" }
+  - { operationId: RecordEngineEventBatch_update,   reason: "update engine internals" }
+  - { operationId: RenewUpdateLease_destroy, reason: "update engine internals" }
+  - { operationId: RenewUpdateLease_preview, reason: "update engine internals" }
+  - { operationId: RenewUpdateLease_refresh, reason: "update engine internals" }
+  - { operationId: RenewUpdateLease_update,  reason: "update engine internals" }
+  - { operationId: DecryptValue,             reason: "CLI value-decryption primitive" }
+  - { operationId: EncryptValue,             reason: "CLI value-encryption primitive" }
+  - { operationId: DecryptProjectValue,      reason: "CLI value-decryption primitive" }
+  - { operationId: EncryptProjectValue,      reason: "CLI value-encryption primitive" }
+  - { operationId: LogOnlyBatchDecryptValue, reason: "CLI audit-log variant" }
+  - { operationId: LogOnlyDecryptValue,      reason: "CLI audit-log variant" }
+
+  # ── Insights scans / accounts (preview; superseded when it GAs) ──────
+  - { operationId: GetScan,                 reason: "insights (preview)" }
+  - { operationId: GetScanLogs,             reason: "insights (preview)" }
+  - { operationId: ReadScanStatus,          reason: "insights (preview)" }
+  - { operationId: ListScanStatus,          reason: "insights (preview)" }
+  - { operationId: ReadScheduledScanSettings,   reason: "insights (preview)" }
+  - { operationId: UpdateScheduledScanSettings, reason: "insights (preview)" }
+  - { operationId: PauseScheduledScans,     reason: "insights (preview)" }
+  - { operationId: ResumeScheduledScans,    reason: "insights (preview)" }
+  - { operationId: ReassignAccountOwnership, reason: "insights (preview)" }
+  - { operationId: ListDiscoveredStackResources, reason: "insights (preview)" }
+  - { operationId: ListResourceStackEdges,      reason: "insights (preview)" }
+  - { operationId: ListResourceVersionEdges,    reason: "insights (preview)" }
+  - { operationId: ListResourceVersionEdges_versions, reason: "insights (preview)" }
+  - { operationId: ListResourceVersions,        reason: "insights (preview)" }
+  - { operationId: ListResourcesWithReferences, reason: "insights (preview)" }
+  - { operationId: ListDownstreamStackReferences, reason: "insights (preview)" }
+  - { operationId: ReadResource,                reason: "insights (preview)" }
+  - { operationId: ReadResourceWithReferences,  reason: "insights (preview)" }
+  - { operationId: ReadResource_versions,       reason: "insights (preview)" }
+  - { operationId: UpsertResources,             reason: "insights (preview)" }
+  - { operationId: UpsertResourceMigrationAnnotation, reason: "insights (preview)" }
+  - { operationId: UpsertStacksAnnotations,     reason: "insights (preview)" }
+  - { operationId: GetStacksAnnotation,         reason: "insights (preview)" }
+  - { operationId: GetResourceColumnFilterSet,  reason: "insights (preview)" }
+  - { operationId: GetResourceDashboardAggregations, reason: "insights (preview)" }
+  - { operationId: ExportOrgResourceSearchQuery,    reason: "insights (preview)" }
+  - { operationId: GetOrgResourceSearchQuery,       reason: "insights (preview)" }
+  - { operationId: GetOrgResourceSearchV2Query,     reason: "insights (preview)" }
+  - { operationId: GetNaturalLanguageQuery,         reason: "insights (preview)" }
+  - { operationId: GenerateImportCode,              reason: "insights (preview)" }
+  - { operationId: ListAvailableScopes,             reason: "insights (preview)" }
+  - { operationId: GetUsageSummaryResourceHours,    reason: "usage telemetry; operational" }
+  - { operationId: GetUsageSummaryDiscoveredResourceHours, reason: "usage telemetry; operational" }
+  - { operationId: GetUsageSummaryEnvironmentSecrets, reason: "usage telemetry; operational" }
+
+  # ── Stack admin / read-only views (operational) ──────────────────────
+  - { operationId: ImportStack,              reason: "admin stack import; operational" }
+  - { operationId: RenameStack,              reason: "admin stack rename; prefer state rename via CLI" }
+  - { operationId: RestoreDeletedStack,      reason: "admin stack restore; operational" }
+  - { operationId: ReassignStackOwnership,   reason: "admin ownership transfer; operational" }
+  - { operationId: TransferStack,            reason: "admin stack transfer; operational" }
+  - { operationId: ListDeletedStacks,        reason: "tombstone view; operational" }
+  - { operationId: ListUserStacks,           reason: "user-scope query" }
+  - { operationId: ListStackPermissions,     reason: "permission view; use TeamStackPermission" }
+  - { operationId: DeleteStackPermission,    reason: "user-scoped collaborator removal; Pulumi's user-level permission model is governed elsewhere" }
+  - { operationId: ListStackWebhooks,        reason: "listing; use Webhook resource CRUD" }
+  - { operationId: ListOrganizationWebhooks, reason: "listing; use Webhook resource CRUD" }
+  - { operationId: ListWebhooks_esc_environments, reason: "listing; use esc/hooks:Hook" }
+  - { operationId: ListPolicyGroups,         reason: "listing; covered via orgs/policies module" }
+  - { operationId: ListScheduledDeployment,  reason: "listing; use stacks/deployments resources" }
+  - { operationId: ListScheduledDeploymentHistory, reason: "history view; operational" }
+  - { operationId: ListStackDeploymentsHandlerV2, reason: "history view; operational" }
+  - { operationId: ListDriftRuns,            reason: "drift history view; operational" }
+  - { operationId: PauseOrgDeployments,      reason: "admin pause switch; candidate for method" }
+  - { operationId: ResumeOrgDeployments,     reason: "admin pause switch; candidate for method" }
+  - { operationId: PauseStackDeployments,    reason: "admin pause switch; candidate for method" }
+  - { operationId: ResumeStackDeployments,   reason: "admin pause switch; candidate for method" }
+  - { operationId: PauseScheduledDeployment, reason: "admin pause switch; candidate for method" }
+  - { operationId: ResumeScheduledDeployment, reason: "admin pause switch; candidate for method" }
+  - { operationId: OrgDeploymentsMetadata,   reason: "metadata view; operational" }
+  - { operationId: StackDeploymentsMetadata, reason: "metadata view; operational" }
+  - { operationId: GetStackUpdates,          reason: "update history view; operational" }
+  - { operationId: GetStackStarterWorkflow,  reason: "console onboarding view" }
+  - { operationId: UpdateStackConfig,        reason: "config is managed by `pulumi config`" }
+  - { operationId: UpdateStackNotificationSettings, reason: "notification settings; candidate resource" }
+  - { operationId: PatchDeploymentSettings,  reason: "superseded by PUT ReplaceDeploymentSettings; PATCH is partial-update which we don't expose" }
+
+  # ── Organization / user read-only views ──────────────────────────────
+  - { operationId: GetCurrentUser,           reason: "user-profile query; not a resource" }
+  - { operationId: GetDefaultOrganization,   reason: "user-profile query" }
+  - { operationId: UpdateDefaultOrganization, reason: "user-profile mutation" }
+  - { operationId: GetUserHasVerifiedEmail,  reason: "user-profile query" }
+  - { operationId: ListUserOrgInvites,       reason: "user-profile query" }
+  - { operationId: GetOrganizationMetadata,  reason: "metadata view; subset of Organization read" }
+  - { operationId: UpdateOrganizationMember, reason: "member mutation; fold into OrganizationMember update" }
+  - { operationId: GetPolicyGroupMetadata,   reason: "metadata view; subset of PolicyGroup read" }
+  - { operationId: GetPackageUsedByStacks,   reason: "registry usage view; operational" }
+  - { operationId: GetPresignedCacheURL,     reason: "cache helper; CLI-side" }
+
+  # ── Task / scheduled-scan/deployment-queue admin endpoints ──────────
+  # Tasks feed the agent pool worker queue. They're not a user-declarative
+  # resource.
+  - { operationId: CreateTasks,      reason: "agent pool task queue; runtime" }
+  - { operationId: GetTask,          reason: "agent pool task queue; runtime" }
+  - { operationId: GetTaskEvents,    reason: "agent pool task queue; runtime" }
+  - { operationId: ListTasks,        reason: "agent pool task queue; runtime" }
+  - { operationId: RespondToTask,    reason: "agent pool task queue; runtime" }
+  - { operationId: StreamTaskEvents, reason: "agent pool task queue; runtime" }
+  - { operationId: UpdateTask,       reason: "agent pool task queue; runtime" }
+
+  # ── Revision-tag listings (covered via esc/versions:Tag) ───────
+  - { operationId: ListRevisionTags_esc_environments_versions,  reason: "listing; covered via esc/versions:Tag CRUD" }
+  - { operationId: ListRevisionTags_esc_environments_versions2, reason: "alternate list endpoint; same surface" }
+
+  # ── Final three ──
+  - { operationId: PostPublishPackageVersionComplete_preview, reason: "legacy preview publish step" }
+  - { operationId: ReadEnvironment_esc_environments_versions, reason: "ESC version read; covered via esc/versions:Tag CRUD" }
+  - { operationId: RetractEnvironmentRevision_esc_environments, reason: "imperative revision retract; operational, not declarative" }

@@ -1,395 +1,320 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when working
+with code in this repository. For the long-form maintainer playbook —
+including the full refresh workflow, the decision tree for new
+operations, and the anti-patterns to avoid — see
+**[docs/MAINTAINING.md](docs/MAINTAINING.md)**.
 
 ## Project Overview
 
-This is the Pulumi Service Provider (PSP), a Pulumi provider built on top of the Pulumi Cloud REST API that allows managing Pulumi Cloud resources (Stacks, Environments, Teams, Tokens, Webhooks, Deployment Settings, etc.) using Pulumi programs.
+This is the Pulumi Service Provider (PSP), a Pulumi provider built on
+top of the Pulumi Cloud REST API. It lets users manage Pulumi Cloud
+resources (Stacks, Environments, Teams, Tokens, Webhooks, Deployment
+Settings, etc.) from Pulumi programs.
 
-The provider is written in Go and generates SDKs for multiple languages (Node.js/TypeScript, Python, Go, .NET, Java).
+**The provider is generated, not hand-coded. There is no escape
+hatch — every supported resource lives in `resource-map.yaml`.** Two
+inputs compose into the shipped binary + SDKs:
+
+1. `provider/spec/openapi_public.json` — pinned copy of the Pulumi
+   Cloud OpenAPI 3.0.3 spec.
+2. `provider/resource-map.yaml` — the editable mapping from
+   operationIds to Pulumi resources/functions/methods (plus per-property
+   metadata — renames, secrets, defaults, force-new, validation checks).
+
+A generator (`provider/cmd/pulumi-gen-pulumiservice`) emits
+`bin/schema.json` + `bin/metadata.json` from those inputs; the runtime
+dispatcher in `provider/pkg/runtime/` consumes the metadata to serve
+CRUD gRPC.
+
+If a Pulumi Cloud API pattern can't be expressed in the current
+metadata shape, the answer is to **extend the metadata schema** in
+`provider/pkg/runtime/metadata.go` (plus parse + dispatch), not to add
+per-resource Go. The current primitives that cover the non-trivial
+cases: `createSource`/`createFrom` (per-verb property source rename),
+`bodyOverride` (tombstone-style delete via update op),
+`readVia.extractField`/`keyBy` (read as a field on a parent resource's
+GET), `iterateOver`+`iterateKeyParam` (delete one call per map key),
+`rawBodyFrom`/`rawBodyTo`+`contentType` (non-JSON bodies), `postCreate`
+(two-step create).
 
 ## Repository Structure
 
-- `provider/` - Core provider implementation in Go
-  - `provider/cmd/pulumi-resource-pulumiservice/` - Main provider binary and schema.json
-  - `provider/pkg/provider/` - Provider server implementation (gRPC)
-  - `provider/pkg/pulumiapi/` - HTTP client wrappers for Pulumi Cloud REST API
-  - `provider/pkg/resources/` - Resource implementations (teams, stacks, webhooks, etc.)
-  - `provider/pkg/util/` - Utility functions for property handling, diffs, secrets
-- `sdk/` - Generated SDKs for each language (dotnet, go, java, nodejs, python)
-- `examples/` - Example programs in various languages demonstrating provider usage
+```
+provider/
+  spec/openapi_public.json         pinned Pulumi Cloud OpenAPI spec
+  resource-map.yaml                THE editable mapping (source of truth)
+  cmd/
+    pulumi-gen-pulumiservice/      generator CLI (schema, metadata, coverage)
+    pulumi-resource-pulumiservice/ provider binary (embeds schema + metadata)
+  pkg/
+    gen/                           generator internals
+    runtime/                       metadata-driven CRUD dispatcher
+    provider/                      gRPC server, Check routing
+    version/                       version variable injected via LDFLAGS
+
+sdk/                               generated SDKs; never edit by hand
+
+examples/
+  canonical/                       12 end-to-end user-story programs
+  yaml-<resource>/                 per-resource smoke-test programs
+  examples_yaml_test.go            integration test registration
+  examples_canonical_test.go       canonical-scenario test registration
+
+docs/
+  MAINTAINING.md                   long-form maintainer playbook
+  UPGRADE-v1-to-v2.md              upgrade guide for v1 users
+```
+
+**Never edit `bin/*.json` or `sdk/*` by hand** — they're regenerated.
+`CLAUDE.md` and `docs/MAINTAINING.md` are the two human-authored docs.
 
 ## Build Commands
 
-### Essential Commands
+### v2 generator + provider binary
 
 ```bash
-# Restore/install build dependencies
-make ensure
-
-# Build provider binary only
-make provider
-
-# Build all SDKs (requires provider to be built first)
-make build_sdks
-
-# Build everything (provider + all SDKs)
-make build
-
-# Run provider tests
-make test_provider
-
-# Run linting (runs golangci-lint in provider, sdk, and examples directories)
-make lint
+make v2_gen               # regenerate schema.json + metadata.json from the map
+make v2_provider          # v2_gen + build binary + write merged schema (with
+                          # custom-resource contributions) back to disk
+make coverage_report      # print coverage stats; doesn't fail on gaps
+make coverage_report_strict  # fails non-zero if any operationId is unmapped
+make update_spec          # refresh pinned spec from sibling ../pulumi-service/
 ```
 
-### SDK-Specific Commands
+### SDK generation + build
 
 ```bash
-make nodejs_sdk    # Build Node.js/TypeScript SDK
-make python_sdk    # Build Python SDK
-make go_sdk        # Build Go SDK
-make dotnet_sdk    # Build .NET SDK
-make java_sdk      # Build Java SDK
+make build_sdks           # regenerate all five language SDKs from schema.json
+make nodejs_sdk           # one language at a time
+make build                # everything: generator + provider + SDKs
 ```
-
-### Installation Commands
-
-```bash
-make install              # Install provider binary and Node.js/dotnet SDKs
-make install_nodejs_sdk   # Link Node.js SDK locally via yarn
-make install_java_sdk     # Publish Java SDK to local Maven
-```
-
-## Environment Variables
-
-- **Integration Tests**: This project uses `.env` file for local testing credentials
-  - `PULUMI_ACCESS_TOKEN`: Token for authenticating with Pulumi Cloud
-  - `PULUMI_TEST_OWNER`: Organization name for tests (defaults to `service-provider-test-org` if not set)
-  - These variables are loaded automatically by the test framework when present in `.env`
-  - The `.env` file is gitignored for security
 
 ### Testing
 
 ```bash
-# Run provider unit tests
-cd provider/pkg && go test -short -v -count=1 -cover -timeout 2h -parallel 4 ./...
+make test_provider        # unit tests in provider/pkg/...
 
-# Run example tests (integration tests)
-cd examples && go test -tags=all -v -count=1 -timeout 3h -parallel 4
-
-# Run specific example test
-cd examples && go test -v -run TestYamlStackTagsPluralExample -tags yaml -timeout 10m
+# Integration tests require PULUMI_ACCESS_TOKEN + PULUMI_TEST_OWNER.
+cd examples && go test -tags=yaml -v -timeout 3h ./...           # per-resource
+cd examples && go test -tags=canonical -v -timeout 3h ./...      # canonical scenarios
+cd examples && go test -tags=all -v -timeout 3h ./...            # everything
 ```
 
-- Integration tests are located in `examples/` directory
-- Tests are tagged: use `-tags yaml`, `-tags nodejs`, `-tags python`, etc.
-- The `.env` file allows running integration tests locally against a custom organization
-- Every new resource should have unit tests in `provider/pkg/` with `_test.go` suffix
-- Add example programs in `examples/` for each new resource (examples serve as integration tests)
-- Examples are organized by language: `ts-*`, `py-*`, `go-*`, `cs-*`, `java-*`, `yaml-*`
+### Linting
 
-**IMPORTANT - Integration Test Framework**:
-- **Always use `pulumitest`** from `github.com/pulumi/providertest/pulumitest` for new integration tests
-- DO NOT use the legacy `integration.ProgramTest` from `github.com/pulumi/pulumi/pkg/v3/testing/integration`
-- The `pulumitest` framework provides better control, cleaner syntax, and is the preferred approach going forward
-- See `examples/examples_nodejs_test.go` for examples of properly structured `pulumitest` tests
-- Common pattern for `pulumitest` tests:
-  ```go
-  test := pulumitest.NewPulumiTest(t,
-      filepath.Join(getCwd(t), "example-directory"),
-      inMemoryProvider(),
-      opttest.UseAmbientBackend(),
-      opttest.YarnLink("@pulumi/pulumiservice"),  // for Node.js tests
-  )
-  test.SetConfig(t, "key", "value")  // optional config
-  runPulumiTest(t, test)  // runs up, preview, refresh, destroy
-  ```
-
-## Development Workflow
-
-### Copyright Headers
-
-**IMPORTANT**: All new files must have correct copyright year ranges:
-- In 2025: Use `// Copyright 2016-2025, Pulumi Corporation.`
-- In 2026: Use `// Copyright 2016-2026, Pulumi Corporation.`
-- General rule: Always use current year as the end year for new files
-
-### CHANGELOG Updates
-
-**IMPORTANT**: Always update `CHANGELOG.md` when making code changes that affect users:
-
-1. Add an entry under the `## Unreleased` section
-2. If `## Unreleased` doesn't exist, create it at the top of the file (after the `# CHANGELOG` header)
-3. Categorize changes appropriately:
-   - `### Improvements` - New features, enhancements, new resources
-   - `### Bug Fixes` - Bug fixes, corrections
-   - `### Breaking Changes` - Breaking changes (rare, requires major version bump)
-4. Format: `- Description of change [#issue_or_pr_number](link_to_issue_or_pr)`
-5. Examples:
-   - `- Added StackTags resource for managing multiple stack tags [#61](https://github.com/pulumi/pulumi-pulumiservice/issues/61)`
-   - `- Fixed OIDC Issuer policies order to prevent accidental drifts [#542](https://github.com/pulumi/pulumi-pulumiservice/pull/542)`
-
-**EXCEPTION**: **DO NOT** add CHANGELOG entries for:
-
-- Test-only changes (adding tests, fixing tests, test infrastructure)
-- Documentation updates (README, CLAUDE.md, code comments)
-- CI/build configuration changes
-- Development tooling changes
-
-These changes are important but not user-facing, so they don't belong in the
-CHANGELOG.
-
-### Schema Changes
-
-The provider schema is **manually maintained** at `provider/pkg/provider/manual-schema.json`. When adding/modifying resources:
-
-1. Update `manual-schema.json` with the new resource/property definitions
-2. Run `make provider` to regenerate the provider binary (uses `go generate`)
-3. Run `make build_sdks` to regenerate all language SDKs from the schema
-4. The schema is embedded into the provider binary at build time
-
-**CRITICAL**: After changing `manual-schema.json`, you MUST run `make build_sdks`
-to regenerate all language SDKs (Node.js, Python, Go, .NET, Java). Skipping this
-step will cause the SDKs to be out of sync with the schema, leading to runtime
-errors and test failures. The SDKs are generated code and must be rebuilt after
-every schema change.
-
-#### Schema JSON Syntax Guidelines
-
-**Important**: The schema JSON must follow strict syntax rules. Common patterns:
-
-**Complex Nested Objects**:
-- ❌ **NEVER** define inline objects directly in array `items`:
-  ```json
-  "items": {
-    "type": "object",
-    "properties": { ... }
-  }
-  ```
-- ✅ **ALWAYS** define complex objects as separate types in the `types` section and reference them:
-  ```json
-  "items": {
-    "$ref": "#/types/pulumiservice:index:YourTypeName"
-  }
-  ```
-
-**Additional Properties**:
-- ❌ **NEVER** use boolean values: `"additionalProperties": true`
-- ✅ **ALWAYS** use type specifications:
-  ```json
-  "additionalProperties": {
-    "$ref": "pulumi.json#/Any"
-  }
-  ```
-  or
-  ```json
-  "additionalProperties": {
-    "type": "string"
-  }
-  ```
-
-**Type References**:
-- Use `"$ref": "#/types/pulumiservice:index:TypeName"` for custom types
-- Use `"$ref": "pulumi.json#/Any"` for generic object types
-- Custom types must be defined in the `types` section with full descriptions
-
-### Adding a New Resource
-
-1. Add resource definition to `provider/pkg/provider/manual-schema.json`
-2. Create API client methods in `provider/pkg/pulumiapi/` (e.g., `teams.go`, `webhooks.go`)
-3. Create resource implementation in `provider/pkg/resources/` implementing `PulumiServiceResource` interface
-4. Register the resource in `provider/pkg/provider/provider.go`
-5. Rebuild provider and SDKs: `make build`
-6. Add examples in `examples/` directory
-7. **IMPORTANT**: Always create a YAML example for the new resource:
-   - Add a `yaml-*` example directory in `examples/`
-   - Create a `README.md` in the example directory that includes a link to the `pulumi convert` documentation (https://www.pulumi.com/docs/iac/cli/commands/pulumi_convert/) for converting the example to other programming languages
-   - Register the example test in `examples/examples_yaml_test.go`
-   - Test the YAML example before completing: `cd examples && go test -v -run TestYaml<ResourceName>Example -tags yaml -timeout 10m`
-   - **Resource Type Names**: In Pulumi YAML, the `index:` module is optional and should be omitted for cleaner syntax:
-     - ✅ Correct: `type: pulumiservice:Environment`
-     - ✅ Correct: `type: pulumiservice:InsightsAccount`
-     - ❌ Unnecessary: `type: pulumiservice:index:Environment`
-     - ❌ Unnecessary: `type: pulumiservice:index:InsightsAccount`
-   - **Organization Name Configuration**: When the resource requires an
-     organization name, make it configurable for testing:
-     - Add `organizationName` to the `config` section in `Pulumi.yaml` with
-       a default value of `service-provider-test-org`
-     - Use `${organizationName}` variable in resource properties instead of
-       hardcoding the organization
-     - Pass `organizationName: getOrgName()` in the test's `Config` map in
-       `examples_yaml_test.go`
-     - This allows tests to use the `PULUMI_TEST_OWNER` environment variable
-       (e.g., `team-ce`) for different organizations
-
-### Resource Interface
-
-All resources must implement the `PulumiServiceResource` interface:
-
-```go
-type PulumiServiceResource interface {
-    Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error)
-    Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error)
-    Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error)
-    Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error)
-    Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error)
-    Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error)
-    Name() string
-}
+```bash
+make lint                 # golangci-lint in provider/, sdk/, examples/
 ```
 
-### Adding Resource Methods
-
-Resource methods enable runtime operations on resources (e.g.,
-`account.triggerScan()`). See
-[InsightsAccount implementation](provider/pkg/resources/insights_account.go)
-and [Pulumi blog](https://www.pulumi.com/blog/resource-methods-for-pulumi-packages/).
-
-**Key steps:**
-
-1. Add API client methods in `provider/pkg/pulumiapi/`
-2. Add `methods` section to resource in `manual-schema.json`, define functions
-   with `__self__` parameter
-3. Implement `Call()` RPC in resource - handle preview mode (empty ID) by
-   returning computed values with `KeepUnknowns: true`:
-   ```go
-   resource.MakeComputed(resource.NewStringProperty(""))
-   resource.MakeComputed(resource.NewNumberProperty(0))
-   ```
-4. **REQUIRED**: Add preview test verifying computed markers
-   (`04da6b54-80e4-46f7-96ec-b56ff0331ba9` for strings,
-   `3eeb2bf0-c639-47a8-9e75-3b44932eb421` for numbers)
-5. Update provider Call() routing in `provider.go`
-6. Create TypeScript integration test with `Quick: true` option
-7. Run `make build_sdks` to regenerate SDKs with methods
-
-## API Client Architecture
-
-The `pulumiapi` package provides HTTP client wrappers for the Pulumi Cloud REST API:
-
-- `Client` - Base HTTP client with authentication and standard headers
-- Individual files for each resource type (e.g., `teams.go`, `stack.go`, `webhooks.go`)
-- All API calls use the standard headers: `X-Pulumi-Source: provider`, `Accept: application/vnd.pulumi+8`
-- Authentication via Bearer token in `Authorization` header
-
-## Release Process
-
-Releases are handled by Pulumi employees via `#release-ops` Slack channel. GitHub Actions automatically builds, tests, and publishes new releases to all package managers.
-
-## Configuration
-
-Provider accepts two configuration options:
-- `accessToken` (env: `PULUMI_ACCESS_TOKEN`) - Pulumi Service access token
-- `apiUrl` (env: `PULUMI_BACKEND_URL`) - Custom API URL for self-hosted instances
-
-## Version Management
-
-- Provider version is set via `PROVIDER_VERSION` environment variable or defaults to `1.0.0-alpha.0+dev`
-- Version is injected into provider binary via LDFLAGS at build time
-- The Pulumi CLI binary version used for SDK generation is automatically synced with the `github.com/pulumi/pulumi/pkg/v3` dependency version
-
-## Linting
-
-The Makefile references `.golangci.yml` but it may not exist in the repository root. The `make lint` command runs golangci-lint in three directories: `provider`, `sdk`, and `examples` with a 10-minute timeout.
-
-**Important**: When linting the `examples/` directory, you must use the `--build-tags all` flag because the test files use build tags (yaml, nodejs, python, etc.):
+When linting `examples/`, use `--build-tags all` so test files under
+build tags are included:
 
 ```bash
 cd examples && golangci-lint run --timeout 10m --build-tags all
 ```
 
-Without the build tags, golangci-lint may report false positives about unused functions that are actually used in files with specific build tags.
+## Environment Variables
 
-## Debugging CI Failures
+Used by integration tests (local `.env` is gitignored):
 
-When investigating CI test failures:
+- `PULUMI_ACCESS_TOKEN` — token for Pulumi Cloud.
+- `PULUMI_TEST_OWNER` — test org (defaults to
+  `service-provider-test-org`).
+- `PULUMI_BACKEND_URL` — optional API URL override (consumed by the
+  provider's `apiUrl` config).
 
-1. **Use GitHub CLI to fetch logs**:
-   ```bash
-   gh run view <run_id> --log-failed
-   gh api repos/pulumi/pulumi-pulumiservice/actions/jobs/<job_id>/logs | grep "error:"
-   ```
+## Adding or changing a resource
 
-2. **Check for API validation errors**: The Pulumi Cloud API may reject values that are defined in the schema but not yet implemented (e.g., "runner" token type in OIDC policies)
+**Read [docs/MAINTAINING.md](docs/MAINTAINING.md) first.** Quick
+reference:
 
-3. **Check for outdated test data**: Examples may contain hardcoded values like TLS certificate thumbprints that become stale when certificates are rotated
+### Declarative (common case)
 
-4. **Look for related issues across examples**: If one language example fails, check all language examples (ts-, py-, go-, cs-, yaml-) for the same issue
+Edit `provider/resource-map.yaml`, under the right sub-module:
 
-## Lessons Learned
+```yaml
+orgs/<module>:
+  resources:
+    ResourceName:
+      doc: One-sentence description.
+      operations:
+        create: CreateOp      # spec operationId
+        read:   GetOp
+        update: UpdateOp
+        delete: DeleteOp
+      id:
+        template: "{organizationName}/{fooId}"
+        params: [organizationName, fooId]
+      forceNew: [organizationName]
+      properties:
+        organizationName:
+          from: orgName         # wire name if different from SDK name
+          type: string
+          source: path           # path | query | body | response
+          required: true
+          doc: …
+        # output-only: set `output: true` and `source: response`
+```
 
-### Test Coverage and Example Management
+Then:
 
-**ALWAYS audit existing test coverage before creating new tests or examples:**
+```bash
+make v2_provider && make build_sdks
+cd provider && go test ./...
+```
 
-1. **Check for composite examples first**: Some examples intentionally test multiple related resources together:
-   - `yaml-schedules` tests DeploymentSchedule, DriftSchedule, TtlSchedule, and EnvironmentRotationSchedule
-   - `yaml-environments` tests Environment, EnvironmentVersionTag, and TeamEnvironmentPermission
-   - `yaml-deployment-settings*` tests different DeploymentSettings configurations
-   - Don't create duplicate examples for resources already covered in composite examples
+Add a YAML example under `examples/yaml-<resource>/` and register it in
+`examples/examples_yaml_test.go`. Update `CHANGELOG.md` under the
+current unreleased section.
 
-2. **Understand the intent behind composite examples**: They exist to:
-   - Show how related resources work together
-   - Reduce maintenance burden (one example to update vs. many)
-   - Test realistic usage patterns (resources are rarely used in isolation)
-   - Avoid test duplication and longer CI times
+### What if the resource doesn't fit the metadata shape?
 
-3. **When to create a new example directory**:
-   - ✅ Resource has NO existing example coverage
-   - ✅ Resource represents a distinct use case not covered by composite examples
-   - ❌ Resource is already tested in a composite example
-   - ❌ Creating individual examples would duplicate existing coverage
+Extend the metadata schema — don't add hand-coded Go. Every known
+irreducible case in v2 has been expressed declaratively:
 
-4. **How to add test coverage for already-covered resources**:
-   - Add test functions that point to existing composite examples
-   - Example: Add `TestYamlDriftSchedule` that uses `yaml-schedules` directory
-   - Don't create `yaml-drift-schedule/` if `yaml-schedules` already tests it
+- Upsert (no separate POST): reuse the same operationId for create +
+  update. See `LogExport`, `Settings`, `TeamStackPermission`.
+- Tombstone-style delete: `delete: { operationId: …, bodyOverride: {…} }`.
+- Per-verb property source or wire rename: `createSource:` /
+  `createFrom:` on the property.
+- Child resources with no dedicated GET: `readVia: { operationId: …,
+  extractField: …, keyBy: … }` — piggyback on the parent's GET.
+- Batch-over-children delete: `delete: { operationId: …,
+  iterateOver: <prop>, iterateKeyParam: <path-placeholder> }`.
+- Non-JSON bodies: property `source: rawBody` + op `rawBodyFrom: <prop>`
+  / `rawBodyTo: <prop>` / `contentType: …`.
+- Multi-step create: `postCreate:` on the resource (runs a follow-on op
+  with update-style input handling after the primary create).
 
-5. **Review existing test files**:
-   - Check `examples/examples_yaml_test.go` for existing YAML tests
-   - Check other language test files (nodejs, python, go, dotnet, java)
-   - Use `grep -r "TestYaml.*Schedule" examples/` to find related tests
+If a new case comes up that none of those cover, the right move is to
+add a new primitive — edit `provider/pkg/runtime/metadata.go`, wire it
+through `provider/pkg/gen/metadata.go` and the dispatcher, add a test,
+and use it. Do not reintroduce a `customresources/` package.
 
-### CHANGELOG Best Practices
+## Resource naming — no module stutter
 
-**DO NOT add CHANGELOG entries for test-only changes:**
+In `pulumiservice:<module>:<Name>`, the module provides context. Don't
+repeat it in the type name:
 
-- ❌ "Added YAML integration tests for 9 resources"
-- ❌ "Fixed flaky test in TeamEnvironmentPermission"
-- ❌ "Migrated tests from integration.ProgramTest to pulumitest"
-- ✅ "Added StackTags resource for managing multiple stack tags" (new user-facing feature)
-- ✅ "Fixed drift in OIDC Issuer policies order" (user-facing bug fix)
+- ✅ `pulumiservice:orgs/oidc:Issuer` (not `OidcIssuer`)
+- ✅ `pulumiservice:orgs/insights:Account` (not `InsightsAccount`)
+- ✅ `pulumiservice:stacks/tags:Tag` (not `StackTag`)
 
-**Rationale**: Tests are infrastructure for maintainers, not features for users. The CHANGELOG documents user-facing changes only.
+Exception when the un-prefixed name would be too generic or collide:
+- `pulumiservice:orgs/identity:IdentityProvider` — bare `Provider`
+  would clash with `pulumi.Provider`.
+- `pulumiservice:orgs/agents:AgentPool` — bare `Pool` is meaningless.
 
-### Interpreting Issue Requirements
+When adding a new resource, read the fully-qualified token out loud
+before committing the name.
 
-**Don't take issue descriptions literally without understanding context:**
+## Schema must NOT be hand-edited
 
-1. **"Create dedicated example"** might mean:
-   - "Add a dedicated test function" (not a new directory)
-   - "Add focused documentation" (not a separate example)
-   - "Extract into separate example" (only if current example is too complex)
+`provider/cmd/pulumi-resource-pulumiservice/schema.json` and
+`metadata.json` are regenerated outputs. The generator writes them
+from `resource-map.yaml` + the OpenAPI spec; the provider's runtime
+`GetSchema` further merges in custom-resource schema contributions.
 
-2. **Always ask**: "Is this adding value or just duplication?"
-   - If the resource is already tested elsewhere, link to it instead
-   - If the example is already comprehensive, reference it instead
-   - If creating work that will need ongoing maintenance, question if it's necessary
+If you need to change the schema, edit `resource-map.yaml` or the
+custom resource's `Schema()` method. Never hand-edit the JSON.
 
-3. **Check with the team**: If an issue seems to request duplication, ask for clarification before implementing
+## Copyright Headers
 
-### Code Review Feedback
+All new files use the current year in the range:
 
-**When reviewers question changes, they're often seeing duplication you missed:**
+- In 2026: `// Copyright 2016-2026, Pulumi Corporation.`
+- In 2027: `// Copyright 2016-2027, Pulumi Corporation.`
 
-- "How is this different from X?" usually means "This duplicates X, please remove it"
-- "Why are we changing Y?" usually means "This change seems unnecessary"
-- Don't be defensive - reviewers have broader context and catch things you missed
+## CHANGELOG Updates
 
-**Respond to review feedback by**:
+Update `CHANGELOG.md` when making code changes that are user-visible:
 
-1. Acknowledging the feedback
-2. Analyzing why you made the change
-3. Fixing the issue (removing duplicates, reverting unnecessary changes)
-4. Learning the pattern to avoid repeating the mistake
+- `### Improvements` — new features, new resources, new properties.
+- `### Bug Fixes` — bug fixes.
+- `### Breaking Changes` — breaking changes (rare outside majors).
+
+Format: `- Description of change [#<issue-or-pr>](<link>)`.
+
+**Do NOT** add CHANGELOG entries for:
+- Test-only changes.
+- Doc updates (README, MAINTAINING.md, CLAUDE.md).
+- CI/build tooling changes.
+
+## Testing conventions
+
+- Use `pulumitest` (`github.com/pulumi/providertest/pulumitest`) for
+  new integration tests. Do not use the legacy `integration.ProgramTest`.
+- Unit tests live alongside the code they test (`_test.go` suffix) in
+  `provider/pkg/...`.
+- Every new resource should have a YAML example that doubles as an
+  integration test — either in `examples/yaml-<name>/` or as part of
+  a canonical scenario under `examples/canonical/<n>-<scenario>/`.
+- Example tests are tagged; use `-tags=yaml`, `-tags=canonical`, or
+  `-tags=all` as appropriate.
+
+## Sub-module naming
+
+Resources live under sub-modules that mirror the Pulumi Cloud URL
+hierarchy:
+
+- `orgs`, `orgs/agents`, `orgs/teams`, `orgs/tokens`, `orgs/oidc`,
+  `orgs/policies`, `orgs/templates`, `orgs/audit`, `orgs/cmk`,
+  `orgs/members`, `orgs/roles`, `orgs/services`, `orgs/policypacks`,
+  `orgs/insights`, `orgs/identity`
+- `stacks`, `stacks/hooks`, `stacks/deployments`, `stacks/tags`,
+  `stacks/permissions`
+- `esc`, `esc/schedules`, `esc/versions`, `esc/permissions`,
+  `esc/cloudsetup`
+- `integrations`, `changegates`, `changerequests`
+
+Tokens use `/` between nested modules (Pulumi-native convention):
+`pulumiservice:orgs/teams:Team`, not `pulumiservice:orgs:teams:Team`.
+
+## Release process
+
+Releases are handled by Pulumi employees via the `#release-ops` Slack
+channel. GitHub Actions build, test, and publish.
+
+## Provider configuration
+
+Two config variables (surfaced in every SDK's `Provider` resource):
+
+- `accessToken` (env: `PULUMI_ACCESS_TOKEN`) — secret Pulumi Cloud
+  token.
+- `apiUrl` (env: `PULUMI_BACKEND_URL`, default
+  `https://api.pulumi.com`) — API endpoint override for self-hosted
+  Pulumi Cloud.
+
+## Spec refresh
+
+See [docs/MAINTAINING.md](docs/MAINTAINING.md) for the full workflow.
+Short version:
+
+```bash
+make update_spec                   # pull from sibling pulumi-service
+make coverage_report               # see what changed
+# triage each unmapped op into resources/functions/methods/exclusions
+make v2_provider && make build_sdks
+cd provider && go test ./...
+```
+
+## Anti-patterns to avoid
+
+- **Editing `bin/schema.json` or `bin/metadata.json` directly.**
+  They'll be overwritten. Edit `resource-map.yaml` or custom-resource
+  `Schema()`.
+- **Editing `sdk/**` directly.** Same — they're generated.
+- **Adding a hand-coded resource in `provider/pkg/customresources/`
+  before checking whether the metadata schema can be extended to cover
+  the case.** Budget is ≤5 custom resources; over that, extend the
+  metadata.
+- **Excluding a new operationId without a written reason.** Every
+  `exclusions:` entry must have a 1-sentence reason so a later
+  maintainer can revisit.
+- **Copying a v1 resource name verbatim into v2.** Apply the
+  anti-stutter rule; the sub-module gives context.
+- **Shipping without regenerating SDKs.** `make build_sdks` is
+  load-bearing; without it users see a new property in the schema but
+  can't use it from their language.

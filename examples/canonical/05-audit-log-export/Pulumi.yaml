@@ -1,0 +1,52 @@
+name: pulumiservice-canonical-05-audit-log-export
+runtime: yaml
+description: |
+  Configure Pulumi Cloud to stream the organization audit log to an S3
+  bucket continuously. Every admin action (token creation, team membership
+  change, policy group update, stack delete, …) lands in your SIEM/compliance
+  pipeline without a human in the loop.
+
+  Required for SOC 2, ISO 27001, HIPAA, and similar compliance frameworks.
+
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  exportBucket:
+    type: string
+    default: acme-corp-pulumi-audit-logs
+  exportRoleArn:
+    type: string
+    # Should have s3:PutObject on the bucket; trust policy allows the
+    # Pulumi Cloud audit-log exporter to assume it.
+    default: arn:aws:iam::123456789012:role/PulumiAuditLogExporter
+
+resources:
+  auditExport:
+    type: pulumiservice:orgs/audit:LogExport
+    properties:
+      organizationName: ${organizationName}
+      destination:
+        type: s3
+        bucket: ${exportBucket}
+        region: us-west-2
+        prefix: pulumi-audit/
+        roleArn: ${exportRoleArn}
+      # Export on a 5-minute cadence. Smaller batches mean faster detection;
+      # larger batches are cheaper. 5m is a reasonable default.
+      batchIntervalMinutes: 5
+      # Emit all event categories — you can always filter downstream.
+      # Narrow this here only if you have a volume problem.
+      includeCategories:
+        - iam
+        - stack
+        - environment
+        - policy
+        - integration
+        - token
+
+outputs:
+  exportConfigId:
+    value: ${auditExport.id}
+  verifyWith:
+    value: "pulumi org audit-log-export test ${organizationName}"

@@ -1,0 +1,55 @@
+name: pulumiservice-canonical-06-self-hosted-agents
+runtime: yaml
+description: |
+  Spin up a Pulumi self-hosted agent pool and wire a stack to run its
+  deployments inside it. The canonical pattern for teams whose cloud
+  accounts are network-isolated (VPC-only, no public egress) and can't
+  be reached from Pulumi's SaaS executors.
+
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  project:
+    type: string
+    default: infrastructure
+  stack:
+    type: string
+    default: production-isolated
+
+resources:
+  # Create the agent pool. The returned `tokenValue` is used to register
+  # self-hosted agent workers with Pulumi Cloud — keep it secret.
+  isolatedPool:
+    type: pulumiservice:orgs/agents:AgentPool
+    properties:
+      organizationName: ${organizationName}
+      name: vpc-isolated
+      description: Runs deployments inside the isolated VPC; no SaaS egress.
+
+  # Point the stack's deployment settings at the pool. The executor runs
+  # on YOUR infrastructure, but the control plane (state, updates, RBAC)
+  # remains in Pulumi Cloud.
+  deploymentSettings:
+    type: pulumiservice:stacks/deployments:Settings
+    properties:
+      organizationName: ${organizationName}
+      projectName: ${project}
+      stackName: ${stack}
+      agentPoolId: ${isolatedPool.agentPoolId}
+      sourceContext:
+        git:
+          repoUrl: https://github.com/acme-corp/infrastructure.git
+          branch: refs/heads/main
+
+outputs:
+  registrationToken:
+    # Install this on each agent VM: `pulumi-agent register --token <value>`
+    value: ${isolatedPool.tokenValue}
+  workerInstructions:
+    value: |
+      Deploy the agent binary to your VPC:
+        docker run -e PULUMI_ACCESS_TOKEN=${isolatedPool.tokenValue} \
+                   -v /var/run/docker.sock:/var/run/docker.sock \
+                   pulumi/pulumi-agent:latest
+      Agents will self-register and appear in the org's agent-pool view.

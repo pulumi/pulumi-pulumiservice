@@ -1,8 +1,108 @@
 # CHANGELOG
 
-## Unreleased
+## 2.0.0-alpha.1 (unreleased)
+
+v2 is a full rewrite of the provider, generated from the Pulumi Cloud
+OpenAPI specification rather than hand-coded. See
+[docs/UPGRADE-v1-to-v2.md](docs/UPGRADE-v1-to-v2.md) for the upgrade
+guide.
+
+This is the first preview. The scope of alpha.1 is **v1 feature parity**
+plus the new sub-module partition, preview-backed resources that were
+missing from v1 (`InsightsAccount`, `IdentityProvider` for SAML/SSO),
+and a coverage gate that guarantees future Pulumi Cloud API additions
+surface on a known cadence. Additional domains surfaced by the OpenAPI
+spec — policy packs, organization members/roles/services, registry
+integrations — land in subsequent 2.x releases.
 
 ### Breaking Changes
+
+- **All resources moved from `pulumiservice:index:*` to domain
+  sub-modules** (e.g. `pulumiservice:orgs/agents:AgentPool`,
+  `pulumiservice:stacks:Stack`, `pulumiservice:esc:Environment`,
+  `pulumiservice:stacks/hooks:Webhook`). See the upgrade guide's rename
+  table for the exhaustive mapping. Pulumi state continues to reference
+  the v1 URNs until you run `pulumi state rename` — no Pulumi Cloud
+  resources are recreated, modified, or deleted.
+- **Stutter-free resource names.** Where a v1 resource's type name
+  repeated the noun already present in its v2 sub-module, the type name
+  drops the redundant prefix. The sub-module + type together still read
+  the same way, just without repetition:
+
+  | v1 token | v2 token |
+  |---|---|
+  | `pulumiservice:index:OidcIssuer` | `pulumiservice:orgs/oidc:Issuer` |
+  | `pulumiservice:index:TemplateSource` | `pulumiservice:orgs/templates:Source` |
+  | `pulumiservice:index:OrganizationMember` | `pulumiservice:orgs/members:Member` |
+  | `pulumiservice:index:InsightsAccount` | `pulumiservice:orgs/insights:Account` |
+  | (v2-new `OrganizationKey`) | `pulumiservice:orgs/cmk:Key` |
+  | `pulumiservice:index:StackTag` | `pulumiservice:stacks/tags:Tag` |
+  | `pulumiservice:index:StackTags` | `pulumiservice:stacks/tags:Tags` |
+  | `pulumiservice:index:DeploymentSchedule` | `pulumiservice:stacks/deployments:Schedule` |
+  | `pulumiservice:index:EnvironmentRotationSchedule` | `pulumiservice:esc/schedules:Rotation` |
+  | `pulumiservice:index:EnvironmentVersionTag` | `pulumiservice:esc/versions:Tag` |
+
+  Associated functions and resource methods follow the same rule (e.g.
+  `listOidcIssuers` → `listIssuers`, `InsightsAccount.triggerScan` →
+  `Account.triggerScan`).
+- Schedule resources (`Schedule`, `DriftSchedule`, `TtlSchedule`,
+  `Rotation`) standardize on `organization` / `project` / `stack` /
+  `environment` property names, matching what the v1 SDK already
+  emitted. The v2 schema surfaces the canonical names uniformly.
+- SDK import paths follow the sub-module structure; `import * as ps
+  from "@pulumi/pulumiservice"` now exposes resources as
+  `ps.orgs.agents.AgentPool`, `ps.stacks.Stack`, etc. (TypeScript; other
+  languages analogous).
+
+### Improvements
+
+- **OpenAPI-driven provider** — resources, properties, and validation
+  rules come from a single authoritative `provider/resource-map.yaml`
+  mapping file over the pinned Pulumi Cloud OpenAPI spec. New endpoints
+  land automatically once mapped; nothing is hand-coded per resource
+  with zero hand-coded resources — every CRUD path is declared in the
+  map, and the metadata schema was extended as needed (`createSource`,
+  `bodyOverride`, `readVia.extractField`, `iterateOver`, `rawBodyFrom`,
+  `postCreate`) to cover the v1 cases that didn't fit a one-op-per-verb
+  shape.
+- **Declarative cross-field validation** — `requireOneOf` /
+  `requireTogether` / `requireIf` rules in the resource map are
+  enforced during `pulumi preview`, giving immediate feedback when
+  e.g. a `Webhook` has neither stack, environment, nor organization
+  scope set.
+- **Three-way diff for ciphertext secrets** — Webhook `secret` and
+  similar redacted fields no longer flag spurious changes on refresh.
+- **12 end-to-end canonical examples** under `examples/canonical/`
+  covering organization bootstrap, GitHub OIDC CI, ESC rotation hooks,
+  deployment pipelines, audit log export, self-hosted agents, tiered
+  team access, approval gates, tag-based webhook routing, template
+  catalogs, cross-cloud OIDC federation, and SAML team sync.
+- **Coverage gate** — CI fails if any new Pulumi Cloud operation is
+  neither mapped to a resource/function/method nor explicitly excluded
+  with a written reason. Guarantees the provider doesn't silently drift
+  from the API.
+
+### Preview resources (included in alpha.1)
+
+- **`pulumiservice:orgs/insights:Account`** — cloud resource scanning
+  account. Backed by the `/api/preview/insights/...` endpoints; the API
+  is in preview and its shape may evolve. Includes an
+  `Account.triggerScan` method to kick off an ad-hoc scan, and a
+  `listAccounts` data source.
+- **`pulumiservice:orgs/identity:IdentityProvider`** — SAML/SSO
+  organization identity provider configuration, with a `requireOneOf`
+  check over `metadataUrl` / `metadataXml`.
+
+### Deferred to a subsequent 2.x release
+
+- `TeamEnvironmentPermission` — the v1 resource depended on endpoints
+  that aren't present in the public OpenAPI spec. Returns when the
+  endpoints are published.
+- Auto-naming and async-operation polling — no v1-parity resource
+  needs them today; the metadata surface is in place for when they do.
+
+### Prior v1 unreleased changes (carried forward)
+
 - Removed the numeric `version` field from `PolicyGroup.policyPacks` inputs; it is now output-only, since the value is server-derived from `versionTag`. Use `versionTag` to pin pack versions. [#737](https://github.com/pulumi/pulumi-pulumiservice/issues/737)
 
 ### Improvements
