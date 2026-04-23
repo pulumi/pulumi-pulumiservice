@@ -176,7 +176,7 @@ func TestListOrgMembersPagination(t *testing.T) {
 	c := startTestServerMulti(t, func(r *http.Request) (int, any) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		assert.Equal(t, "/api/orgs/an-organization/members", r.URL.Path)
-		assert.Equal(t, "backend", r.URL.Query().Get("type"))
+		assert.Equal(t, "", r.URL.Query().Get("type"))
 		if call == 0 {
 			assert.Equal(t, "", r.URL.Query().Get("continuationToken"))
 		} else {

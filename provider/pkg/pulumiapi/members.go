@@ -141,9 +141,9 @@ func (c *Client) ListOrgMembers(ctx context.Context, orgName string) (*Members, 
 
 	token := ""
 	for {
-		q := url.Values{"type": []string{"backend"}}
+		var q url.Values
 		if token != "" {
-			q.Set("continuationToken", token)
+			q = url.Values{"continuationToken": []string{token}}
 		}
 
 		var page Members
