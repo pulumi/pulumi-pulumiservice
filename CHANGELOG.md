@@ -12,6 +12,7 @@
 - Fixed TeamEnvironmentPermission refresh returning wrong permission when the same environment name exists in multiple projects [#674](https://github.com/pulumi/pulumi-pulumiservice/issues/674)
 - Fixed TeamEnvironmentPermission spurious replacement on upgrade from 0.29.2 caused by the optional `maxOpenDuration` field being serialized as an empty string in Check and Read [#751](https://github.com/pulumi/pulumi-pulumiservice/issues/751)
 - Fixed TeamEnvironmentPermission panic when `maxOpenDuration` was supplied as a non-string value; `Check` now returns a `CheckFailure` at preview instead of crashing during apply [#751](https://github.com/pulumi/pulumi-pulumiservice/issues/751)
+- Fixed TeamEnvironmentPermission spurious replacement for users upgrading from provider versions 0.29.3–0.36.0 whose state contains an empty-string `maxOpenDuration`; `Diff` now treats an empty-string `maxOpenDuration` as equivalent to an absent field [#751](https://github.com/pulumi/pulumi-pulumiservice/issues/751)
 
 ## 0.35.0
 
