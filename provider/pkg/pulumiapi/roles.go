@@ -26,7 +26,10 @@ import (
 type RoleClient interface {
 	CreateRole(ctx context.Context, orgName string, req CreateRoleRequest) (*RoleDescriptor, error)
 	GetRole(ctx context.Context, orgName, roleID string) (*RoleDescriptor, error)
-	UpdateRole(ctx context.Context, orgName, roleID string, name, description *string, details json.RawMessage) (*RoleDescriptor, error)
+	UpdateRole(
+		ctx context.Context, orgName, roleID string,
+		name, description *string, details json.RawMessage,
+	) (*RoleDescriptor, error)
 	DeleteRole(ctx context.Context, orgName, roleID string, force bool) error
 	ListAvailableRoleScopes(ctx context.Context, orgName string) (map[string][]RoleScopeGroup, error)
 }
@@ -131,7 +134,10 @@ func (c *Client) CreateRole(
 
 // NewCreateRoleRequest is a small constructor for CreateRoleRequest. Exposed so
 // that resource code can build requests without touching the unexported type.
-func NewCreateRoleRequest(name, description, resourceType, uxPurpose string, details json.RawMessage) CreateRoleRequest {
+func NewCreateRoleRequest(
+	name, description, resourceType, uxPurpose string,
+	details json.RawMessage,
+) CreateRoleRequest {
 	return CreateRoleRequest{
 		Name:         name,
 		Description:  description,

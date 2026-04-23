@@ -87,7 +87,9 @@ func (s *OrganizationMemberState) Annotate(a infer.Annotator) {
 	a.Describe(&s.RoleName, "The name of the currently assigned role (custom role name, or built-in role).")
 }
 
-var validOrgMemberRoles = []string{"member", "admin", "billing-manager"}
+const defaultOrgMemberRole = "member"
+
+var validOrgMemberRoles = []string{defaultOrgMemberRole, "admin", "billing-manager"}
 
 func (*OrganizationMember) Check(
 	ctx context.Context,
@@ -114,7 +116,7 @@ func (*OrganizationMember) Create(
 
 	core := req.Inputs.OrganizationMemberCore
 	if core.Role == nil || *core.Role == "" {
-		def := "member"
+		def := defaultOrgMemberRole
 		core.Role = &def
 	}
 
@@ -131,7 +133,7 @@ func (*OrganizationMember) Create(
 	// an update that follows the add. We always add with a built-in role first.
 	addRole := util.OrZero(core.Role)
 	if addRole == "" {
-		addRole = "member"
+		addRole = defaultOrgMemberRole
 	}
 	if err := client.AddMemberToOrg(ctx, req.Inputs.Username, req.Inputs.OrganizationName, addRole); err != nil {
 		return infer.CreateResponse[OrganizationMemberState]{}, fmt.Errorf(
@@ -151,13 +153,13 @@ func (*OrganizationMember) Create(
 			core.RoleId,
 		); err != nil {
 			return infer.CreateResponse[OrganizationMemberState]{
-				ID: id,
-				Output: OrganizationMemberState{
-					OrganizationMemberCore: core,
-				},
-			}, infer.ResourceInitFailedError{Reasons: []string{
-				fmt.Sprintf("user added but failed to assign custom role: %s", err.Error()),
-			}}
+					ID: id,
+					Output: OrganizationMemberState{
+						OrganizationMemberCore: core,
+					},
+				}, infer.ResourceInitFailedError{Reasons: []string{
+					fmt.Sprintf("user added but failed to assign custom role: %s", err.Error()),
+				}}
 		}
 	}
 
@@ -192,7 +194,7 @@ func (*OrganizationMember) Update(
 	if core.RoleId == nil || *core.RoleId == "" {
 		role = util.OrZero(core.Role)
 		if role == "" {
-			role = "member"
+			role = defaultOrgMemberRole
 		}
 	}
 	if err := client.UpdateOrgMemberRole(

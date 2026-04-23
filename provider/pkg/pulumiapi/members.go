@@ -63,8 +63,8 @@ type addMemberToOrgReq struct {
 }
 
 type updateMemberRoleReq struct {
-	Role       string  `json:"role,omitempty"`
-	FGARoleID  *string `json:"fgaRoleId,omitempty"`
+	Role      string  `json:"role,omitempty"`
+	FGARoleID *string `json:"fgaRoleId,omitempty"`
 }
 
 func validBuiltinOrgRole(role string) bool {

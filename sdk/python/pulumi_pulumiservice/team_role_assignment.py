@@ -24,7 +24,6 @@ class TeamRoleAssignmentArgs:
                  team_name: pulumi.Input[_builtins.str]):
         """
         The set of arguments for constructing a TeamRoleAssignment resource.
-
         :param pulumi.Input[_builtins.str] organization_name: The Pulumi Cloud organization name.
         :param pulumi.Input[_builtins.str] role_id: The ID of the custom role to assign.
         :param pulumi.Input[_builtins.str] team_name: The team name.
@@ -83,7 +82,6 @@ class TeamRoleAssignment(pulumi.CustomResource):
         """
         Assigns a custom (fine-grained) role to a Pulumi Cloud team. The Pulumi Cloud API currently supports one role per team; creating a second assignment replaces the first. Automatically enables the team's custom-roles feature on first use.
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] organization_name: The Pulumi Cloud organization name.
@@ -98,7 +96,6 @@ class TeamRoleAssignment(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Assigns a custom (fine-grained) role to a Pulumi Cloud team. The Pulumi Cloud API currently supports one role per team; creating a second assignment replaces the first. Automatically enables the team's custom-roles feature on first use.
-
 
         :param str resource_name: The name of the resource.
         :param TeamRoleAssignmentArgs args: The arguments to use to populate this resource's properties.

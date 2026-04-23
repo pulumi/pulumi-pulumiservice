@@ -26,7 +26,6 @@ class EnvironmentVersionTagArgs:
                  project: Optional[pulumi.Input[_builtins.str]] = None):
         """
         The set of arguments for constructing a EnvironmentVersionTag resource.
-
         :param pulumi.Input[_builtins.str] environment: Environment name.
         :param pulumi.Input[_builtins.str] organization: Organization name.
         :param pulumi.Input[_builtins.int] revision: Revision number.
@@ -118,7 +117,6 @@ class EnvironmentVersionTag(pulumi.CustomResource):
         """
         A tag on a specific revision of an environment.
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] environment: Environment name.
@@ -135,7 +133,6 @@ class EnvironmentVersionTag(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         A tag on a specific revision of an environment.
-
 
         :param str resource_name: The name of the resource.
         :param EnvironmentVersionTagArgs args: The arguments to use to populate this resource's properties.
