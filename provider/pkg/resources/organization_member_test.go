@@ -261,6 +261,74 @@ func TestOrganizationMemberDelete(t *testing.T) {
 	})
 }
 
+func TestOrganizationMemberUpdatePreservesAdopted(t *testing.T) {
+	// Regression: Update called readOrgMemberState (which returns a fresh
+	// state with Adopted=false) without carrying Adopted over from the prior
+	// state. That caused a subsequent Delete to take the non-adopted branch
+	// and remove the user from the org — see the ts-rbac manual test run
+	// that deleted pulumiux-test.
+	mock := &orgMemberClientMock{
+		updateFunc: func(_ context.Context, _, _, _ string, _ *string) error { return nil },
+		getFunc: func(_ context.Context, _, _ string) (*pulumiapi.Member, error) {
+			return &pulumiapi.Member{
+				Role: "admin",
+				User: pulumiapi.User{GithubLogin: "alice"},
+			}, nil
+		},
+	}
+	ctx := config.WithMockClient(context.Background(), mock)
+	role := "admin"
+
+	r := &OrganizationMember{}
+	resp, err := r.Update(ctx, infer.UpdateRequest[OrganizationMemberInput, OrganizationMemberState]{
+		Inputs: OrganizationMemberInput{
+			OrganizationMemberCore: OrganizationMemberCore{
+				OrganizationName: "acme",
+				Username:         "alice",
+				Role:             &role,
+			},
+		},
+		State: OrganizationMemberState{
+			OrganizationMemberCore: OrganizationMemberCore{
+				OrganizationName: "acme",
+				Username:         "alice",
+			},
+			Adopted: true,
+		},
+	})
+	assert.NoError(t, err)
+	assert.True(t, resp.Output.Adopted, "Update must preserve Adopted from prior state")
+}
+
+func TestOrganizationMemberReadPreservesAdopted(t *testing.T) {
+	// Regression: Read rebuilt state from the server without carrying the
+	// Adopted flag; refresh would silently drop it and cause a subsequent
+	// Delete to remove the user from the org.
+	mock := &orgMemberClientMock{
+		getFunc: func(_ context.Context, _, _ string) (*pulumiapi.Member, error) {
+			return &pulumiapi.Member{
+				Role: "member",
+				User: pulumiapi.User{GithubLogin: "alice"},
+			}, nil
+		},
+	}
+	ctx := config.WithMockClient(context.Background(), mock)
+
+	r := &OrganizationMember{}
+	resp, err := r.Read(ctx, infer.ReadRequest[OrganizationMemberInput, OrganizationMemberState]{
+		ID: "acme/alice",
+		State: OrganizationMemberState{
+			OrganizationMemberCore: OrganizationMemberCore{
+				OrganizationName: "acme",
+				Username:         "alice",
+			},
+			Adopted: true,
+		},
+	})
+	assert.NoError(t, err)
+	assert.True(t, resp.State.Adopted, "Read must preserve Adopted from prior state")
+}
+
 func TestOrganizationMemberCheck(t *testing.T) {
 	r := &OrganizationMember{}
 	bad := "owner"

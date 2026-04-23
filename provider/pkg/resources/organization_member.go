@@ -237,6 +237,10 @@ func (*OrganizationMember) Update(
 	if err != nil {
 		return infer.UpdateResponse[OrganizationMemberState]{}, err
 	}
+	// Adopted is a local-only flag recording that Create adopted an existing
+	// membership. It must survive Update; readOrgMemberState rebuilds state
+	// from the server, which has no such concept.
+	state.Adopted = req.State.Adopted
 	return infer.UpdateResponse[OrganizationMemberState]{Output: state}, nil
 }
 
@@ -289,6 +293,9 @@ func (*OrganizationMember) Read(
 		// Member not found.
 		return infer.ReadResponse[OrganizationMemberInput, OrganizationMemberState]{}, nil
 	}
+	// Preserve Adopted from the prior state — it's a local record of whether
+	// Create adopted an existing membership and the server can't tell us.
+	state.Adopted = req.State.Adopted
 
 	return infer.ReadResponse[OrganizationMemberInput, OrganizationMemberState]{
 		ID:     req.ID,

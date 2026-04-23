@@ -15,6 +15,7 @@
 
 ### Bug Fixes
 - `OrganizationMember` update now translates built-in role names (`member`, `admin`, `billing-manager`) to their per-org FGA role IDs before PATCHing. The member PATCH endpoint rejects built-in names in the `role` field; previously, any update or adopted-destroy that reset to a built-in role would fail with `404 Role '…' not found`.
+- `OrganizationMember.Update` and `OrganizationMember.Read` now preserve the `adopted` flag from prior state. Previously, either operation rebuilt state from the server (which does not expose adoption) and silently cleared `adopted`, causing a subsequent `pulumi destroy` to fall through the non-adopted branch and remove the user from the organization.
 - Added `getOrganizationRoleScopes` data source for discovering the permission scope names available for use in `OrganizationRole.permissions`.
 
 ### Bug Fixes
