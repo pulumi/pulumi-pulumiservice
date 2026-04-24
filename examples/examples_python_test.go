@@ -83,10 +83,5 @@ func TestPythonRbacExample(t *testing.T) {
 		Dependencies: []string{
 			filepath.Join("..", "sdk", "python", "bin"),
 		},
-		// Enabling custom roles on the team causes the service to add the
-		// caller as a team member, which shows up on refresh as drift on
-		// the pre-existing Team resource. Same follow-up the yaml-rbac
-		// test is waiting on — not in scope here.
-		ExpectRefreshChanges: true,
 	})
 }
