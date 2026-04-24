@@ -201,13 +201,12 @@ func (*OrganizationRole) Update(
 
 	client := config.GetClient(ctx)
 	name := core.Name
-	desc := util.OrZero(core.Description)
 	role, err := client.UpdateRole(
 		ctx,
 		req.State.OrganizationName,
 		req.State.RoleId,
 		&name,
-		&desc,
+		core.Description,
 		details,
 	)
 	if err != nil {

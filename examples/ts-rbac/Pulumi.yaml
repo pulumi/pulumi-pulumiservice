@@ -13,7 +13,3 @@ config:
     type: string
     description: Suffix appended to the created role and team names so repeat runs don't collide.
     default: manual
-  lookupEmail:
-    type: string
-    description: Email address to look up via getOrganizationMember. Optional. Leave unset to skip the by-email invocation.
-    default: ""

@@ -261,6 +261,35 @@ func TestOrganizationMemberDelete(t *testing.T) {
 	})
 }
 
+func TestOrganizationMemberUpdateDryRunPreservesAdopted(t *testing.T) {
+	// Regression: Update's DryRun branch returned OrganizationMemberState{}
+	// with Adopted defaulting to false. `pulumi preview` on an adopted
+	// member then showed a spurious `adopted: true → false` diff.
+	ctx := config.WithMockClient(context.Background(), &orgMemberClientMock{})
+	role := "admin"
+
+	r := &OrganizationMember{}
+	resp, err := r.Update(ctx, infer.UpdateRequest[OrganizationMemberInput, OrganizationMemberState]{
+		DryRun: true,
+		Inputs: OrganizationMemberInput{
+			OrganizationMemberCore: OrganizationMemberCore{
+				OrganizationName: "acme",
+				Username:         "alice",
+				Role:             &role,
+			},
+		},
+		State: OrganizationMemberState{
+			OrganizationMemberCore: OrganizationMemberCore{
+				OrganizationName: "acme",
+				Username:         "alice",
+			},
+			Adopted: true,
+		},
+	})
+	assert.NoError(t, err)
+	assert.True(t, resp.Output.Adopted, "Update DryRun must preserve Adopted from prior state")
+}
+
 func TestOrganizationMemberUpdatePreservesAdopted(t *testing.T) {
 	// Regression: Update called readOrgMemberState (which returns a fresh
 	// state with Adopted=false) without carrying Adopted over from the prior

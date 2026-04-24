@@ -12,19 +12,19 @@ namespace Pulumi.PulumiService
     public static class GetOrganizationMember
     {
         /// <summary>
-        /// Looks up a single member of a Pulumi Cloud organization by username or email. Exactly one of `username` or `email` must be set. Returns an error when the member is not found.
+        /// Looks up a single member of a Pulumi Cloud organization by username (the backing identity-provider login, e.g. GitHub login). Returns an error when the member is not found.
         /// </summary>
         public static Task<GetOrganizationMemberResult> InvokeAsync(GetOrganizationMemberArgs args, InvokeOptions? options = null)
             => global::Pulumi.Deployment.Instance.InvokeAsync<GetOrganizationMemberResult>("pulumiservice:index:getOrganizationMember", args ?? new GetOrganizationMemberArgs(), options.WithDefaults());
 
         /// <summary>
-        /// Looks up a single member of a Pulumi Cloud organization by username or email. Exactly one of `username` or `email` must be set. Returns an error when the member is not found.
+        /// Looks up a single member of a Pulumi Cloud organization by username (the backing identity-provider login, e.g. GitHub login). Returns an error when the member is not found.
         /// </summary>
         public static Output<GetOrganizationMemberResult> Invoke(GetOrganizationMemberInvokeArgs args, InvokeOptions? options = null)
             => global::Pulumi.Deployment.Instance.Invoke<GetOrganizationMemberResult>("pulumiservice:index:getOrganizationMember", args ?? new GetOrganizationMemberInvokeArgs(), options.WithDefaults());
 
         /// <summary>
-        /// Looks up a single member of a Pulumi Cloud organization by username or email. Exactly one of `username` or `email` must be set. Returns an error when the member is not found.
+        /// Looks up a single member of a Pulumi Cloud organization by username (the backing identity-provider login, e.g. GitHub login). Returns an error when the member is not found.
         /// </summary>
         public static Output<GetOrganizationMemberResult> Invoke(GetOrganizationMemberInvokeArgs args, InvokeOutputOptions options)
             => global::Pulumi.Deployment.Instance.Invoke<GetOrganizationMemberResult>("pulumiservice:index:getOrganizationMember", args ?? new GetOrganizationMemberInvokeArgs(), options.WithDefaults());
@@ -34,22 +34,16 @@ namespace Pulumi.PulumiService
     public sealed class GetOrganizationMemberArgs : global::Pulumi.InvokeArgs
     {
         /// <summary>
-        /// The email address to look up. Matching is case-insensitive. Mutually exclusive with `username`.
-        /// </summary>
-        [Input("email")]
-        public string? Email { get; set; }
-
-        /// <summary>
         /// The name of the Pulumi organization.
         /// </summary>
         [Input("organizationName", required: true)]
         public string OrganizationName { get; set; } = null!;
 
         /// <summary>
-        /// The Pulumi Cloud username to look up. Mutually exclusive with `email`.
+        /// The Pulumi Cloud username (backing identity-provider login) to look up.
         /// </summary>
-        [Input("username")]
-        public string? Username { get; set; }
+        [Input("username", required: true)]
+        public string Username { get; set; } = null!;
 
         public GetOrganizationMemberArgs()
         {
@@ -60,22 +54,16 @@ namespace Pulumi.PulumiService
     public sealed class GetOrganizationMemberInvokeArgs : global::Pulumi.InvokeArgs
     {
         /// <summary>
-        /// The email address to look up. Matching is case-insensitive. Mutually exclusive with `username`.
-        /// </summary>
-        [Input("email")]
-        public Input<string>? Email { get; set; }
-
-        /// <summary>
         /// The name of the Pulumi organization.
         /// </summary>
         [Input("organizationName", required: true)]
         public Input<string> OrganizationName { get; set; } = null!;
 
         /// <summary>
-        /// The Pulumi Cloud username to look up. Mutually exclusive with `email`.
+        /// The Pulumi Cloud username (backing identity-provider login) to look up.
         /// </summary>
-        [Input("username")]
-        public Input<string>? Username { get; set; }
+        [Input("username", required: true)]
+        public Input<string> Username { get; set; } = null!;
 
         public GetOrganizationMemberInvokeArgs()
         {
@@ -88,10 +76,6 @@ namespace Pulumi.PulumiService
     public sealed class GetOrganizationMemberResult
     {
         /// <summary>
-        /// The member's email address.
-        /// </summary>
-        public readonly string Email;
-        /// <summary>
         /// The member's GitHub login.
         /// </summary>
         public readonly string GithubLogin;
@@ -100,19 +84,15 @@ namespace Pulumi.PulumiService
         /// </summary>
         public readonly bool KnownToPulumi;
         /// <summary>
-        /// The member's display name.
+        /// The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.
         /// </summary>
-        public readonly string Name;
-        /// <summary>
-        /// The member's built-in role (member, admin, billing-manager).
-        /// </summary>
-        public readonly string Role;
+        public readonly string? Role;
         /// <summary>
         /// The custom role ID assigned to this member, if any.
         /// </summary>
         public readonly string? RoleId;
         /// <summary>
-        /// The custom role name assigned to this member, if any.
+        /// The name of the currently assigned role (custom role name, or built-in role).
         /// </summary>
         public readonly string? RoleName;
         /// <summary>
@@ -126,15 +106,11 @@ namespace Pulumi.PulumiService
 
         [OutputConstructor]
         private GetOrganizationMemberResult(
-            string email,
-
             string githubLogin,
 
             bool knownToPulumi,
 
-            string name,
-
-            string role,
+            string? role,
 
             string? roleId,
 
@@ -144,10 +120,8 @@ namespace Pulumi.PulumiService
 
             bool virtualAdmin)
         {
-            Email = email;
             GithubLogin = githubLogin;
             KnownToPulumi = knownToPulumi;
-            Name = name;
             Role = role;
             RoleId = roleId;
             RoleName = roleName;

@@ -80,7 +80,6 @@ func (c *Client) AssignRoleToTeam(ctx context.Context, orgName, teamName, roleID
 	}
 
 	apiPath := path.Join("orgs", orgName, "teams", teamName, "roles", roleID)
-	// Service registers this as POST (despite the Java spec showing PUT).
 	if _, err := c.do(ctx, http.MethodPost, apiPath, nil, nil); err != nil {
 		return fmt.Errorf("failed to assign role to team: %w", err)
 	}

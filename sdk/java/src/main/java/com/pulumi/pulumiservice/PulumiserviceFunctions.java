@@ -104,35 +104,35 @@ public final class PulumiserviceFunctions {
         return Deployment.getInstance().invokeAsync("pulumiservice:index:getInsightsAccounts", TypeShape.of(GetInsightsAccountsResult.class), args, Utilities.withVersion(options));
     }
     /**
-     * Looks up a single member of a Pulumi Cloud organization by username or email. Exactly one of `username` or `email` must be set. Returns an error when the member is not found.
+     * Looks up a single member of a Pulumi Cloud organization by username (the backing identity-provider login, e.g. GitHub login). Returns an error when the member is not found.
      * 
      */
     public static Output<GetOrganizationMemberResult> getOrganizationMember(GetOrganizationMemberArgs args) {
         return getOrganizationMember(args, InvokeOptions.Empty);
     }
     /**
-     * Looks up a single member of a Pulumi Cloud organization by username or email. Exactly one of `username` or `email` must be set. Returns an error when the member is not found.
+     * Looks up a single member of a Pulumi Cloud organization by username (the backing identity-provider login, e.g. GitHub login). Returns an error when the member is not found.
      * 
      */
     public static CompletableFuture<GetOrganizationMemberResult> getOrganizationMemberPlain(GetOrganizationMemberPlainArgs args) {
         return getOrganizationMemberPlain(args, InvokeOptions.Empty);
     }
     /**
-     * Looks up a single member of a Pulumi Cloud organization by username or email. Exactly one of `username` or `email` must be set. Returns an error when the member is not found.
+     * Looks up a single member of a Pulumi Cloud organization by username (the backing identity-provider login, e.g. GitHub login). Returns an error when the member is not found.
      * 
      */
     public static Output<GetOrganizationMemberResult> getOrganizationMember(GetOrganizationMemberArgs args, InvokeOptions options) {
         return Deployment.getInstance().invoke("pulumiservice:index:getOrganizationMember", TypeShape.of(GetOrganizationMemberResult.class), args, Utilities.withVersion(options));
     }
     /**
-     * Looks up a single member of a Pulumi Cloud organization by username or email. Exactly one of `username` or `email` must be set. Returns an error when the member is not found.
+     * Looks up a single member of a Pulumi Cloud organization by username (the backing identity-provider login, e.g. GitHub login). Returns an error when the member is not found.
      * 
      */
     public static Output<GetOrganizationMemberResult> getOrganizationMember(GetOrganizationMemberArgs args, InvokeOutputOptions options) {
         return Deployment.getInstance().invoke("pulumiservice:index:getOrganizationMember", TypeShape.of(GetOrganizationMemberResult.class), args, Utilities.withVersion(options));
     }
     /**
-     * Looks up a single member of a Pulumi Cloud organization by username or email. Exactly one of `username` or `email` must be set. Returns an error when the member is not found.
+     * Looks up a single member of a Pulumi Cloud organization by username (the backing identity-provider login, e.g. GitHub login). Returns an error when the member is not found.
      * 
      */
     public static CompletableFuture<GetOrganizationMemberResult> getOrganizationMemberPlain(GetOrganizationMemberPlainArgs args, InvokeOptions options) {

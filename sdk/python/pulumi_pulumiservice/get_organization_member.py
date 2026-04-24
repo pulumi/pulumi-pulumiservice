@@ -23,19 +23,13 @@ __all__ = [
 
 @pulumi.output_type
 class GetOrganizationMemberResult:
-    def __init__(__self__, email=None, github_login=None, known_to_pulumi=None, name=None, role=None, role_id=None, role_name=None, username=None, virtual_admin=None):
-        if email and not isinstance(email, str):
-            raise TypeError("Expected argument 'email' to be a str")
-        pulumi.set(__self__, "email", email)
+    def __init__(__self__, github_login=None, known_to_pulumi=None, role=None, role_id=None, role_name=None, username=None, virtual_admin=None):
         if github_login and not isinstance(github_login, str):
             raise TypeError("Expected argument 'github_login' to be a str")
         pulumi.set(__self__, "github_login", github_login)
         if known_to_pulumi and not isinstance(known_to_pulumi, bool):
             raise TypeError("Expected argument 'known_to_pulumi' to be a bool")
         pulumi.set(__self__, "known_to_pulumi", known_to_pulumi)
-        if name and not isinstance(name, str):
-            raise TypeError("Expected argument 'name' to be a str")
-        pulumi.set(__self__, "name", name)
         if role and not isinstance(role, str):
             raise TypeError("Expected argument 'role' to be a str")
         pulumi.set(__self__, "role", role)
@@ -51,14 +45,6 @@ class GetOrganizationMemberResult:
         if virtual_admin and not isinstance(virtual_admin, bool):
             raise TypeError("Expected argument 'virtual_admin' to be a bool")
         pulumi.set(__self__, "virtual_admin", virtual_admin)
-
-    @_builtins.property
-    @pulumi.getter
-    def email(self) -> _builtins.str:
-        """
-        The member's email address.
-        """
-        return pulumi.get(self, "email")
 
     @_builtins.property
     @pulumi.getter(name="githubLogin")
@@ -78,17 +64,9 @@ class GetOrganizationMemberResult:
 
     @_builtins.property
     @pulumi.getter
-    def name(self) -> _builtins.str:
+    def role(self) -> Optional[_builtins.str]:
         """
-        The member's display name.
-        """
-        return pulumi.get(self, "name")
-
-    @_builtins.property
-    @pulumi.getter
-    def role(self) -> _builtins.str:
-        """
-        The member's built-in role (member, admin, billing-manager).
+        The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.
         """
         return pulumi.get(self, "role")
 
@@ -104,7 +82,7 @@ class GetOrganizationMemberResult:
     @pulumi.getter(name="roleName")
     def role_name(self) -> Optional[_builtins.str]:
         """
-        The custom role name assigned to this member, if any.
+        The name of the currently assigned role (custom role name, or built-in role).
         """
         return pulumi.get(self, "role_name")
 
@@ -131,10 +109,8 @@ class AwaitableGetOrganizationMemberResult(GetOrganizationMemberResult):
         if False:
             yield self
         return GetOrganizationMemberResult(
-            email=self.email,
             github_login=self.github_login,
             known_to_pulumi=self.known_to_pulumi,
-            name=self.name,
             role=self.role,
             role_id=self.role_id,
             role_name=self.role_name,
@@ -142,58 +118,48 @@ class AwaitableGetOrganizationMemberResult(GetOrganizationMemberResult):
             virtual_admin=self.virtual_admin)
 
 
-def get_organization_member(email: Optional[_builtins.str] = None,
-                            organization_name: Optional[_builtins.str] = None,
+def get_organization_member(organization_name: Optional[_builtins.str] = None,
                             username: Optional[_builtins.str] = None,
                             opts: Optional[pulumi.InvokeOptions] = None) -> AwaitableGetOrganizationMemberResult:
     """
-    Looks up a single member of a Pulumi Cloud organization by username or email. Exactly one of `username` or `email` must be set. Returns an error when the member is not found.
+    Looks up a single member of a Pulumi Cloud organization by username (the backing identity-provider login, e.g. GitHub login). Returns an error when the member is not found.
 
 
-    :param _builtins.str email: The email address to look up. Matching is case-insensitive. Mutually exclusive with `username`.
     :param _builtins.str organization_name: The name of the Pulumi organization.
-    :param _builtins.str username: The Pulumi Cloud username to look up. Mutually exclusive with `email`.
+    :param _builtins.str username: The Pulumi Cloud username (backing identity-provider login) to look up.
     """
     __args__ = dict()
-    __args__['email'] = email
     __args__['organizationName'] = organization_name
     __args__['username'] = username
     opts = pulumi.InvokeOptions.merge(_utilities.get_invoke_opts_defaults(), opts)
     __ret__ = pulumi.runtime.invoke('pulumiservice:index:getOrganizationMember', __args__, opts=opts, typ=GetOrganizationMemberResult).value
 
     return AwaitableGetOrganizationMemberResult(
-        email=pulumi.get(__ret__, 'email'),
         github_login=pulumi.get(__ret__, 'github_login'),
         known_to_pulumi=pulumi.get(__ret__, 'known_to_pulumi'),
-        name=pulumi.get(__ret__, 'name'),
         role=pulumi.get(__ret__, 'role'),
         role_id=pulumi.get(__ret__, 'role_id'),
         role_name=pulumi.get(__ret__, 'role_name'),
         username=pulumi.get(__ret__, 'username'),
         virtual_admin=pulumi.get(__ret__, 'virtual_admin'))
-def get_organization_member_output(email: Optional[pulumi.Input[Optional[_builtins.str]]] = None,
-                                   organization_name: Optional[pulumi.Input[_builtins.str]] = None,
-                                   username: Optional[pulumi.Input[Optional[_builtins.str]]] = None,
+def get_organization_member_output(organization_name: Optional[pulumi.Input[_builtins.str]] = None,
+                                   username: Optional[pulumi.Input[_builtins.str]] = None,
                                    opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[GetOrganizationMemberResult]:
     """
-    Looks up a single member of a Pulumi Cloud organization by username or email. Exactly one of `username` or `email` must be set. Returns an error when the member is not found.
+    Looks up a single member of a Pulumi Cloud organization by username (the backing identity-provider login, e.g. GitHub login). Returns an error when the member is not found.
 
 
-    :param _builtins.str email: The email address to look up. Matching is case-insensitive. Mutually exclusive with `username`.
     :param _builtins.str organization_name: The name of the Pulumi organization.
-    :param _builtins.str username: The Pulumi Cloud username to look up. Mutually exclusive with `email`.
+    :param _builtins.str username: The Pulumi Cloud username (backing identity-provider login) to look up.
     """
     __args__ = dict()
-    __args__['email'] = email
     __args__['organizationName'] = organization_name
     __args__['username'] = username
     opts = pulumi.InvokeOutputOptions.merge(_utilities.get_invoke_opts_defaults(), opts)
     __ret__ = pulumi.runtime.invoke_output('pulumiservice:index:getOrganizationMember', __args__, opts=opts, typ=GetOrganizationMemberResult)
     return __ret__.apply(lambda __response__: GetOrganizationMemberResult(
-        email=pulumi.get(__response__, 'email'),
         github_login=pulumi.get(__response__, 'github_login'),
         known_to_pulumi=pulumi.get(__response__, 'known_to_pulumi'),
-        name=pulumi.get(__response__, 'name'),
         role=pulumi.get(__response__, 'role'),
         role_id=pulumi.get(__response__, 'role_id'),
         role_name=pulumi.get(__response__, 'role_name'),

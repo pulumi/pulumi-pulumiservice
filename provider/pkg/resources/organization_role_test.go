@@ -152,6 +152,43 @@ func TestOrganizationRoleDelete(t *testing.T) {
 	assert.True(t, called)
 }
 
+func TestOrganizationRoleUpdateOmitsDescriptionWhenUnset(t *testing.T) {
+	// Regression: Update used to pass `&""` (from util.OrZero) as the description
+	// pointer when the user had not set one. With `omitempty` on *string only
+	// eliding nil (not empty), the PATCH body included `"description": ""` and
+	// cleared any existing description on the server.
+	raw, _ := json.Marshal(testPermissions)
+	var gotDesc *string
+	gotDesc = new(string) // sentinel so we can distinguish "passed nil" from "test hasn't run"
+	*gotDesc = "__sentinel__"
+	mock := &orgRoleClientMock{
+		update: func(
+			_ context.Context, _, _ string, _, desc *string, _ json.RawMessage,
+		) (*pulumiapi.RoleDescriptor, error) {
+			gotDesc = desc
+			return &pulumiapi.RoleDescriptor{ID: "role-123", Name: "read-only", Version: 3, Details: raw}, nil
+		},
+	}
+	ctx := config.WithMockClient(context.Background(), mock)
+	r := &OrganizationRole{}
+	_, err := r.Update(ctx, infer.UpdateRequest[OrganizationRoleInput, OrganizationRoleState]{
+		Inputs: OrganizationRoleInput{
+			OrganizationRoleCore: OrganizationRoleCore{
+				OrganizationName: "acme",
+				Name:             "read-only",
+				// Description intentionally unset.
+				Permissions: testPermissions,
+			},
+		},
+		State: OrganizationRoleState{
+			OrganizationRoleCore: OrganizationRoleCore{OrganizationName: "acme"},
+			RoleId:               "role-123",
+		},
+	})
+	assert.NoError(t, err)
+	assert.Nil(t, gotDesc, "Update must pass nil description when the user did not set one")
+}
+
 func TestOrganizationRoleCheck(t *testing.T) {
 	r := &OrganizationRole{}
 

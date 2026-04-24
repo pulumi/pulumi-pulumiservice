@@ -5,12 +5,11 @@ import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "./utilities";
 
 /**
- * Looks up a single member of a Pulumi Cloud organization by username or email. Exactly one of `username` or `email` must be set. Returns an error when the member is not found.
+ * Looks up a single member of a Pulumi Cloud organization by username (the backing identity-provider login, e.g. GitHub login). Returns an error when the member is not found.
  */
 export function getOrganizationMember(args: GetOrganizationMemberArgs, opts?: pulumi.InvokeOptions): Promise<GetOrganizationMemberResult> {
     opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts || {});
     return pulumi.runtime.invoke("pulumiservice:index:getOrganizationMember", {
-        "email": args.email,
         "organizationName": args.organizationName,
         "username": args.username,
     }, opts);
@@ -18,24 +17,16 @@ export function getOrganizationMember(args: GetOrganizationMemberArgs, opts?: pu
 
 export interface GetOrganizationMemberArgs {
     /**
-     * The email address to look up. Matching is case-insensitive. Mutually exclusive with `username`.
-     */
-    email?: string;
-    /**
      * The name of the Pulumi organization.
      */
     organizationName: string;
     /**
-     * The Pulumi Cloud username to look up. Mutually exclusive with `email`.
+     * The Pulumi Cloud username (backing identity-provider login) to look up.
      */
-    username?: string;
+    username: string;
 }
 
 export interface GetOrganizationMemberResult {
-    /**
-     * The member's email address.
-     */
-    readonly email: string;
     /**
      * The member's GitHub login.
      */
@@ -45,19 +36,15 @@ export interface GetOrganizationMemberResult {
      */
     readonly knownToPulumi: boolean;
     /**
-     * The member's display name.
+     * The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.
      */
-    readonly name: string;
-    /**
-     * The member's built-in role (member, admin, billing-manager).
-     */
-    readonly role: string;
+    readonly role?: string;
     /**
      * The custom role ID assigned to this member, if any.
      */
     readonly roleId?: string;
     /**
-     * The custom role name assigned to this member, if any.
+     * The name of the currently assigned role (custom role name, or built-in role).
      */
     readonly roleName?: string;
     /**
@@ -70,12 +57,11 @@ export interface GetOrganizationMemberResult {
     readonly virtualAdmin: boolean;
 }
 /**
- * Looks up a single member of a Pulumi Cloud organization by username or email. Exactly one of `username` or `email` must be set. Returns an error when the member is not found.
+ * Looks up a single member of a Pulumi Cloud organization by username (the backing identity-provider login, e.g. GitHub login). Returns an error when the member is not found.
  */
 export function getOrganizationMemberOutput(args: GetOrganizationMemberOutputArgs, opts?: pulumi.InvokeOutputOptions): pulumi.Output<GetOrganizationMemberResult> {
     opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts || {});
     return pulumi.runtime.invokeOutput("pulumiservice:index:getOrganizationMember", {
-        "email": args.email,
         "organizationName": args.organizationName,
         "username": args.username,
     }, opts);
@@ -83,15 +69,11 @@ export function getOrganizationMemberOutput(args: GetOrganizationMemberOutputArg
 
 export interface GetOrganizationMemberOutputArgs {
     /**
-     * The email address to look up. Matching is case-insensitive. Mutually exclusive with `username`.
-     */
-    email?: pulumi.Input<string>;
-    /**
      * The name of the Pulumi organization.
      */
     organizationName: pulumi.Input<string>;
     /**
-     * The Pulumi Cloud username to look up. Mutually exclusive with `email`.
+     * The Pulumi Cloud username (backing identity-provider login) to look up.
      */
-    username?: pulumi.Input<string>;
+    username: pulumi.Input<string>;
 }

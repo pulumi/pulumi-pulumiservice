@@ -1416,45 +1416,32 @@ class OperationContextOptions(dict):
 @pulumi.output_type
 class OrganizationMemberInfo(dict):
     def __init__(__self__, *,
-                 email: _builtins.str,
                  github_login: _builtins.str,
                  known_to_pulumi: _builtins.bool,
-                 name: _builtins.str,
-                 role: _builtins.str,
                  username: _builtins.str,
                  virtual_admin: _builtins.bool,
+                 role: Optional[_builtins.str] = None,
                  role_id: Optional[_builtins.str] = None,
                  role_name: Optional[_builtins.str] = None):
         """
-        :param _builtins.str email: The member's email address.
         :param _builtins.str github_login: The member's GitHub login.
         :param _builtins.bool known_to_pulumi: Whether this member has a Pulumi Cloud account.
-        :param _builtins.str name: The member's display name.
-        :param _builtins.str role: The member's built-in role (member, admin, billing-manager).
         :param _builtins.str username: The member's Pulumi Cloud username.
         :param _builtins.bool virtual_admin: Whether this member is an admin in Pulumi Cloud without admin access on the backing identity provider.
+        :param _builtins.str role: The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.
         :param _builtins.str role_id: The custom role ID assigned to this member, if any.
-        :param _builtins.str role_name: The custom role name assigned to this member, if any.
+        :param _builtins.str role_name: The name of the currently assigned role (custom role name, or built-in role).
         """
-        pulumi.set(__self__, "email", email)
         pulumi.set(__self__, "github_login", github_login)
         pulumi.set(__self__, "known_to_pulumi", known_to_pulumi)
-        pulumi.set(__self__, "name", name)
-        pulumi.set(__self__, "role", role)
         pulumi.set(__self__, "username", username)
         pulumi.set(__self__, "virtual_admin", virtual_admin)
+        if role is not None:
+            pulumi.set(__self__, "role", role)
         if role_id is not None:
             pulumi.set(__self__, "role_id", role_id)
         if role_name is not None:
             pulumi.set(__self__, "role_name", role_name)
-
-    @_builtins.property
-    @pulumi.getter
-    def email(self) -> _builtins.str:
-        """
-        The member's email address.
-        """
-        return pulumi.get(self, "email")
 
     @_builtins.property
     @pulumi.getter(name="githubLogin")
@@ -1474,22 +1461,6 @@ class OrganizationMemberInfo(dict):
 
     @_builtins.property
     @pulumi.getter
-    def name(self) -> _builtins.str:
-        """
-        The member's display name.
-        """
-        return pulumi.get(self, "name")
-
-    @_builtins.property
-    @pulumi.getter
-    def role(self) -> _builtins.str:
-        """
-        The member's built-in role (member, admin, billing-manager).
-        """
-        return pulumi.get(self, "role")
-
-    @_builtins.property
-    @pulumi.getter
     def username(self) -> _builtins.str:
         """
         The member's Pulumi Cloud username.
@@ -1505,6 +1476,14 @@ class OrganizationMemberInfo(dict):
         return pulumi.get(self, "virtual_admin")
 
     @_builtins.property
+    @pulumi.getter
+    def role(self) -> Optional[_builtins.str]:
+        """
+        The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.
+        """
+        return pulumi.get(self, "role")
+
+    @_builtins.property
     @pulumi.getter(name="roleId")
     def role_id(self) -> Optional[_builtins.str]:
         """
@@ -1516,7 +1495,7 @@ class OrganizationMemberInfo(dict):
     @pulumi.getter(name="roleName")
     def role_name(self) -> Optional[_builtins.str]:
         """
-        The custom role name assigned to this member, if any.
+        The name of the currently assigned role (custom role name, or built-in role).
         """
         return pulumi.get(self, "role_name")
 

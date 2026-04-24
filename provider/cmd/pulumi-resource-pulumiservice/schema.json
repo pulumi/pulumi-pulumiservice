@@ -690,10 +690,6 @@
     },
     "pulumiservice:index:OrganizationMemberInfo": {
       "properties": {
-        "email": {
-          "type": "string",
-          "description": "The member's email address."
-        },
         "githubLogin": {
           "type": "string",
           "description": "The member's GitHub login."
@@ -702,13 +698,9 @@
           "type": "boolean",
           "description": "Whether this member has a Pulumi Cloud account."
         },
-        "name": {
-          "type": "string",
-          "description": "The member's display name."
-        },
         "role": {
           "type": "string",
-          "description": "The member's built-in role (member, admin, billing-manager)."
+          "description": "The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case."
         },
         "roleId": {
           "type": "string",
@@ -716,7 +708,7 @@
         },
         "roleName": {
           "type": "string",
-          "description": "The custom role name assigned to this member, if any."
+          "description": "The name of the currently assigned role (custom role name, or built-in role)."
         },
         "username": {
           "type": "string",
@@ -730,10 +722,7 @@
       "type": "object",
       "required": [
         "username",
-        "name",
-        "email",
         "githubLogin",
-        "role",
         "knownToPulumi",
         "virtualAdmin"
       ]
@@ -3156,33 +3145,26 @@
       }
     },
     "pulumiservice:index:getOrganizationMember": {
-      "description": "Looks up a single member of a Pulumi Cloud organization by username or email. Exactly one of `username` or `email` must be set. Returns an error when the member is not found.",
+      "description": "Looks up a single member of a Pulumi Cloud organization by username (the backing identity-provider login, e.g. GitHub login). Returns an error when the member is not found.",
       "inputs": {
         "properties": {
-          "email": {
-            "type": "string",
-            "description": "The email address to look up. Matching is case-insensitive. Mutually exclusive with `username`."
-          },
           "organizationName": {
             "type": "string",
             "description": "The name of the Pulumi organization."
           },
           "username": {
             "type": "string",
-            "description": "The Pulumi Cloud username to look up. Mutually exclusive with `email`."
+            "description": "The Pulumi Cloud username (backing identity-provider login) to look up."
           }
         },
         "type": "object",
         "required": [
-          "organizationName"
+          "organizationName",
+          "username"
         ]
       },
       "outputs": {
         "properties": {
-          "email": {
-            "description": "The member's email address.",
-            "type": "string"
-          },
           "githubLogin": {
             "description": "The member's GitHub login.",
             "type": "string"
@@ -3191,12 +3173,8 @@
             "description": "Whether this member has a Pulumi Cloud account.",
             "type": "boolean"
           },
-          "name": {
-            "description": "The member's display name.",
-            "type": "string"
-          },
           "role": {
-            "description": "The member's built-in role (member, admin, billing-manager).",
+            "description": "The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.",
             "type": "string"
           },
           "roleId": {
@@ -3204,7 +3182,7 @@
             "type": "string"
           },
           "roleName": {
-            "description": "The custom role name assigned to this member, if any.",
+            "description": "The name of the currently assigned role (custom role name, or built-in role).",
             "type": "string"
           },
           "username": {
@@ -3218,10 +3196,7 @@
         },
         "required": [
           "username",
-          "name",
-          "email",
           "githubLogin",
-          "role",
           "knownToPulumi",
           "virtualAdmin"
         ],

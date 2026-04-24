@@ -20,7 +20,6 @@ import (
 	"net/http"
 	"net/url"
 	"path"
-	"strings"
 )
 
 type MemberClient interface {
@@ -28,7 +27,6 @@ type MemberClient interface {
 	UpdateOrgMemberRole(ctx context.Context, orgName, userName, role string, fgaRoleID *string) error
 	ListOrgMembers(ctx context.Context, orgName string) (*Members, error)
 	GetOrgMember(ctx context.Context, orgName, userName string) (*Member, error)
-	GetOrgMemberByEmail(ctx context.Context, orgName, email string) (*Member, error)
 	DeleteMemberFromOrg(ctx context.Context, orgName, userName string) error
 }
 
@@ -38,10 +36,10 @@ type Members struct {
 }
 
 type Member struct {
-	Role          string
-	User          User
-	KnownToPulumi bool
-	VirtualAdmin  bool
+	Role          string   `json:"role"`
+	User          User     `json:"user"`
+	KnownToPulumi bool     `json:"knownToPulumi"`
+	VirtualAdmin  bool     `json:"virtualAdmin"`
 	FGARole       *FGARole `json:"fgaRole,omitempty"`
 }
 
@@ -54,10 +52,10 @@ type FGARole struct {
 }
 
 type User struct {
-	Name        string
-	GithubLogin string
-	AvatarURL   string
-	Email       string
+	Name        string `json:"name"`
+	GithubLogin string `json:"githubLogin"`
+	AvatarURL   string `json:"avatarUrl"`
+	Email       string `json:"email"`
 }
 
 type addMemberToOrgReq struct {
@@ -146,7 +144,13 @@ func (c *Client) UpdateOrgMemberRole(
 }
 
 // ListOrgMembers returns every member of the organization, following
-// continuationToken pagination.
+// continuationToken pagination. `?type=backend` is required: it switches the
+// endpoint from the "frontend" seat-count roster (Pulumi DB; no pagination,
+// ≤50 members; SAML-only visibility) to the backend identity-provider roster
+// (GitHub/GitLab/Bitbucket/SAML; paginated; includes users who have not yet
+// logged into Pulumi, surfaced with KnownToPulumi=false). Dropping the filter
+// makes adoption and import flows silently lose any member who hasn't created
+// a Pulumi account.
 func (c *Client) ListOrgMembers(ctx context.Context, orgName string) (*Members, error) {
 	if len(orgName) == 0 {
 		return nil, errors.New("empty orgName")
@@ -157,9 +161,9 @@ func (c *Client) ListOrgMembers(ctx context.Context, orgName string) (*Members, 
 
 	token := ""
 	for {
-		var q url.Values
+		q := url.Values{"type": []string{"backend"}}
 		if token != "" {
-			q = url.Values{"continuationToken": []string{token}}
+			q.Set("continuationToken", token)
 		}
 
 		var page Members
@@ -186,22 +190,6 @@ func (c *Client) GetOrgMember(ctx context.Context, orgName, userName string) (*M
 	}
 	for i, m := range members.Members {
 		if m.User.GithubLogin == userName || m.User.Name == userName {
-			return &members.Members[i], nil
-		}
-	}
-	return nil, nil
-}
-
-// GetOrgMemberByEmail looks up a single member by email using the list endpoint.
-// Matching is case-insensitive. Returns (nil, nil) when not found.
-func (c *Client) GetOrgMemberByEmail(ctx context.Context, orgName, email string) (*Member, error) {
-	members, err := c.ListOrgMembers(ctx, orgName)
-	if err != nil {
-		return nil, err
-	}
-	needle := strings.ToLower(email)
-	for i, m := range members.Members {
-		if strings.ToLower(m.User.Email) == needle {
 			return &members.Members[i], nil
 		}
 	}

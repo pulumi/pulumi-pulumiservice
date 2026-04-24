@@ -3391,19 +3391,15 @@ func (o OperationContextOptionsPtrOutput) SkipIntermediateDeployments() pulumi.B
 }
 
 type OrganizationMemberInfo struct {
-	// The member's email address.
-	Email string `pulumi:"email"`
 	// The member's GitHub login.
 	GithubLogin string `pulumi:"githubLogin"`
 	// Whether this member has a Pulumi Cloud account.
 	KnownToPulumi bool `pulumi:"knownToPulumi"`
-	// The member's display name.
-	Name string `pulumi:"name"`
-	// The member's built-in role (member, admin, billing-manager).
-	Role string `pulumi:"role"`
+	// The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.
+	Role *string `pulumi:"role"`
 	// The custom role ID assigned to this member, if any.
 	RoleId *string `pulumi:"roleId"`
-	// The custom role name assigned to this member, if any.
+	// The name of the currently assigned role (custom role name, or built-in role).
 	RoleName *string `pulumi:"roleName"`
 	// The member's Pulumi Cloud username.
 	Username string `pulumi:"username"`
@@ -3425,11 +3421,6 @@ func (o OrganizationMemberInfoOutput) ToOrganizationMemberInfoOutputWithContext(
 	return o
 }
 
-// The member's email address.
-func (o OrganizationMemberInfoOutput) Email() pulumi.StringOutput {
-	return o.ApplyT(func(v OrganizationMemberInfo) string { return v.Email }).(pulumi.StringOutput)
-}
-
 // The member's GitHub login.
 func (o OrganizationMemberInfoOutput) GithubLogin() pulumi.StringOutput {
 	return o.ApplyT(func(v OrganizationMemberInfo) string { return v.GithubLogin }).(pulumi.StringOutput)
@@ -3440,14 +3431,9 @@ func (o OrganizationMemberInfoOutput) KnownToPulumi() pulumi.BoolOutput {
 	return o.ApplyT(func(v OrganizationMemberInfo) bool { return v.KnownToPulumi }).(pulumi.BoolOutput)
 }
 
-// The member's display name.
-func (o OrganizationMemberInfoOutput) Name() pulumi.StringOutput {
-	return o.ApplyT(func(v OrganizationMemberInfo) string { return v.Name }).(pulumi.StringOutput)
-}
-
-// The member's built-in role (member, admin, billing-manager).
-func (o OrganizationMemberInfoOutput) Role() pulumi.StringOutput {
-	return o.ApplyT(func(v OrganizationMemberInfo) string { return v.Role }).(pulumi.StringOutput)
+// The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.
+func (o OrganizationMemberInfoOutput) Role() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v OrganizationMemberInfo) *string { return v.Role }).(pulumi.StringPtrOutput)
 }
 
 // The custom role ID assigned to this member, if any.
@@ -3455,7 +3441,7 @@ func (o OrganizationMemberInfoOutput) RoleId() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v OrganizationMemberInfo) *string { return v.RoleId }).(pulumi.StringPtrOutput)
 }
 
-// The custom role name assigned to this member, if any.
+// The name of the currently assigned role (custom role name, or built-in role).
 func (o OrganizationMemberInfoOutput) RoleName() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v OrganizationMemberInfo) *string { return v.RoleName }).(pulumi.StringPtrOutput)
 }

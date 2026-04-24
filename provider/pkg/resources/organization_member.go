@@ -205,7 +205,10 @@ func (*OrganizationMember) Update(
 
 	if req.DryRun {
 		return infer.UpdateResponse[OrganizationMemberState]{
-			Output: OrganizationMemberState{OrganizationMemberCore: core},
+			Output: OrganizationMemberState{
+				OrganizationMemberCore: core,
+				Adopted:                req.State.Adopted,
+			},
 		}, nil
 	}
 
@@ -254,9 +257,9 @@ func (*OrganizationMember) Delete(
 		// custom role we applied. Leaving a dangling fgaRoleId would block
 		// deletion of the custom role (the service refuses "cannot delete
 		// role X, it is referenced by users or teams"). Reset to the
-		// built-in member role by PATCHing with only `role` set: the
-		// service converts legacy role input onto the backing FGA role
-		// when fgaRoleId is absent, effectively clearing any custom role.
+		// built-in member role — UpdateOrgMemberRole resolves the built-in
+		// name to its per-org FGA ID and PATCHes with `fgaRoleId` set,
+		// which clears any custom role.
 		return infer.DeleteResponse{}, client.UpdateOrgMemberRole(
 			ctx,
 			req.State.OrganizationName,

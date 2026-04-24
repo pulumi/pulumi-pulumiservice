@@ -5,7 +5,6 @@ const config = new pulumi.Config();
 const organizationName = config.require("organizationName");
 const targetUsername = config.require("targetUsername");
 const nameSuffix = config.get("nameSuffix") ?? "manual";
-const lookupEmail = config.get("lookupEmail") ?? "";
 
 // A custom organization-level role that grants stack read access.
 const readOnlyRole = new service.OrganizationRole("readOnlyRole", {
@@ -60,12 +59,6 @@ const memberByUsername = service.getOrganizationMemberOutput({
     username: targetUsername,
 });
 
-// Data source: single-member lookup by email (optional — only invoked when
-// lookupEmail is set in config, since "" would fail the exactly-one-of check).
-const memberByEmail = lookupEmail
-    ? service.getOrganizationMemberOutput({ organizationName, email: lookupEmail })
-    : undefined;
-
 export const roleId = readOnlyRole.roleId;
 export const roleVersion = readOnlyRole.version;
 export const assignedRoleName = rbacTeamRoleBinding.roleName;
@@ -74,6 +67,3 @@ export const firstScope = availableScopes.scopes[0].name;
 export const memberAdopted = rbacMember.adopted;
 export const memberAssignedRole = rbacMember.roleName;
 export const lookedUpByUsernameRole = memberByUsername.role;
-export const lookedUpByUsernameEmail = memberByUsername.email;
-export const lookedUpByEmailUsername = memberByEmail?.username;
-export const lookedUpByEmailRole = memberByEmail?.role;

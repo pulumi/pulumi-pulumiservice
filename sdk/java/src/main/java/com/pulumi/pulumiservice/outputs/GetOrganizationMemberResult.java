@@ -14,11 +14,6 @@ import javax.annotation.Nullable;
 @CustomType
 public final class GetOrganizationMemberResult {
     /**
-     * @return The member&#39;s email address.
-     * 
-     */
-    private String email;
-    /**
      * @return The member&#39;s GitHub login.
      * 
      */
@@ -29,22 +24,17 @@ public final class GetOrganizationMemberResult {
      */
     private Boolean knownToPulumi;
     /**
-     * @return The member&#39;s display name.
+     * @return The member&#39;s built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.
      * 
      */
-    private String name;
-    /**
-     * @return The member&#39;s built-in role (member, admin, billing-manager).
-     * 
-     */
-    private String role;
+    private @Nullable String role;
     /**
      * @return The custom role ID assigned to this member, if any.
      * 
      */
     private @Nullable String roleId;
     /**
-     * @return The custom role name assigned to this member, if any.
+     * @return The name of the currently assigned role (custom role name, or built-in role).
      * 
      */
     private @Nullable String roleName;
@@ -61,13 +51,6 @@ public final class GetOrganizationMemberResult {
 
     private GetOrganizationMemberResult() {}
     /**
-     * @return The member&#39;s email address.
-     * 
-     */
-    public String email() {
-        return this.email;
-    }
-    /**
      * @return The member&#39;s GitHub login.
      * 
      */
@@ -82,18 +65,11 @@ public final class GetOrganizationMemberResult {
         return this.knownToPulumi;
     }
     /**
-     * @return The member&#39;s display name.
+     * @return The member&#39;s built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.
      * 
      */
-    public String name() {
-        return this.name;
-    }
-    /**
-     * @return The member&#39;s built-in role (member, admin, billing-manager).
-     * 
-     */
-    public String role() {
-        return this.role;
+    public Optional<String> role() {
+        return Optional.ofNullable(this.role);
     }
     /**
      * @return The custom role ID assigned to this member, if any.
@@ -103,7 +79,7 @@ public final class GetOrganizationMemberResult {
         return Optional.ofNullable(this.roleId);
     }
     /**
-     * @return The custom role name assigned to this member, if any.
+     * @return The name of the currently assigned role (custom role name, or built-in role).
      * 
      */
     public Optional<String> roleName() {
@@ -133,11 +109,9 @@ public final class GetOrganizationMemberResult {
     }
     @CustomType.Builder
     public static final class Builder {
-        private String email;
         private String githubLogin;
         private Boolean knownToPulumi;
-        private String name;
-        private String role;
+        private @Nullable String role;
         private @Nullable String roleId;
         private @Nullable String roleName;
         private String username;
@@ -145,10 +119,8 @@ public final class GetOrganizationMemberResult {
         public Builder() {}
         public Builder(GetOrganizationMemberResult defaults) {
     	      Objects.requireNonNull(defaults);
-    	      this.email = defaults.email;
     	      this.githubLogin = defaults.githubLogin;
     	      this.knownToPulumi = defaults.knownToPulumi;
-    	      this.name = defaults.name;
     	      this.role = defaults.role;
     	      this.roleId = defaults.roleId;
     	      this.roleName = defaults.roleName;
@@ -156,14 +128,6 @@ public final class GetOrganizationMemberResult {
     	      this.virtualAdmin = defaults.virtualAdmin;
         }
 
-        @CustomType.Setter
-        public Builder email(String email) {
-            if (email == null) {
-              throw new MissingRequiredPropertyException("GetOrganizationMemberResult", "email");
-            }
-            this.email = email;
-            return this;
-        }
         @CustomType.Setter
         public Builder githubLogin(String githubLogin) {
             if (githubLogin == null) {
@@ -181,18 +145,8 @@ public final class GetOrganizationMemberResult {
             return this;
         }
         @CustomType.Setter
-        public Builder name(String name) {
-            if (name == null) {
-              throw new MissingRequiredPropertyException("GetOrganizationMemberResult", "name");
-            }
-            this.name = name;
-            return this;
-        }
-        @CustomType.Setter
-        public Builder role(String role) {
-            if (role == null) {
-              throw new MissingRequiredPropertyException("GetOrganizationMemberResult", "role");
-            }
+        public Builder role(@Nullable String role) {
+
             this.role = role;
             return this;
         }
@@ -226,10 +180,8 @@ public final class GetOrganizationMemberResult {
         }
         public GetOrganizationMemberResult build() {
             final var _resultValue = new GetOrganizationMemberResult();
-            _resultValue.email = email;
             _resultValue.githubLogin = githubLogin;
             _resultValue.knownToPulumi = knownToPulumi;
-            _resultValue.name = name;
             _resultValue.role = role;
             _resultValue.roleId = roleId;
             _resultValue.roleName = roleName;

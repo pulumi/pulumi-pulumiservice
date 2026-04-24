@@ -14,10 +14,6 @@ namespace Pulumi.PulumiService.Outputs
     public sealed class OrganizationMemberInfo
     {
         /// <summary>
-        /// The member's email address.
-        /// </summary>
-        public readonly string Email;
-        /// <summary>
         /// The member's GitHub login.
         /// </summary>
         public readonly string GithubLogin;
@@ -26,19 +22,15 @@ namespace Pulumi.PulumiService.Outputs
         /// </summary>
         public readonly bool KnownToPulumi;
         /// <summary>
-        /// The member's display name.
+        /// The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.
         /// </summary>
-        public readonly string Name;
-        /// <summary>
-        /// The member's built-in role (member, admin, billing-manager).
-        /// </summary>
-        public readonly string Role;
+        public readonly string? Role;
         /// <summary>
         /// The custom role ID assigned to this member, if any.
         /// </summary>
         public readonly string? RoleId;
         /// <summary>
-        /// The custom role name assigned to this member, if any.
+        /// The name of the currently assigned role (custom role name, or built-in role).
         /// </summary>
         public readonly string? RoleName;
         /// <summary>
@@ -52,15 +44,11 @@ namespace Pulumi.PulumiService.Outputs
 
         [OutputConstructor]
         private OrganizationMemberInfo(
-            string email,
-
             string githubLogin,
 
             bool knownToPulumi,
 
-            string name,
-
-            string role,
+            string? role,
 
             string? roleId,
 
@@ -70,10 +58,8 @@ namespace Pulumi.PulumiService.Outputs
 
             bool virtualAdmin)
         {
-            Email = email;
             GithubLogin = githubLogin;
             KnownToPulumi = knownToPulumi;
-            Name = name;
             Role = role;
             RoleId = roleId;
             RoleName = roleName;

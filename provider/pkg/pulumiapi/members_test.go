@@ -197,7 +197,7 @@ func TestListOrgMembersPagination(t *testing.T) {
 	c := startTestServerMulti(t, func(r *http.Request) (int, any) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		assert.Equal(t, "/api/orgs/an-organization/members", r.URL.Path)
-		assert.Equal(t, "", r.URL.Query().Get("type"))
+		assert.Equal(t, "backend", r.URL.Query().Get("type"))
 		if call == 0 {
 			assert.Equal(t, "", r.URL.Query().Get("continuationToken"))
 		} else {
@@ -252,36 +252,3 @@ func TestGetOrgMember(t *testing.T) {
 	})
 }
 
-func TestGetOrgMemberByEmail(t *testing.T) {
-	orgName := testMemberOrgName
-	members := Members{Members: []Member{
-		{User: User{Name: "alice", GithubLogin: "alice", Email: "Alice@Example.com"}, Role: "admin"},
-		{User: User{Name: "bob", GithubLogin: "bob", Email: "bob@example.com"}, Role: "member"},
-	}}
-
-	t.Run("found case-insensitive", func(t *testing.T) {
-		c := startTestServer(t, testServerConfig{
-			ExpectedReqMethod: http.MethodGet,
-			ExpectedReqPath:   "/api/orgs/an-organization/members",
-			ResponseCode:      200,
-			ResponseBody:      members,
-		})
-		got, err := c.GetOrgMemberByEmail(ctx, orgName, "ALICE@example.com")
-		assert.NoError(t, err)
-		if assert.NotNil(t, got) {
-			assert.Equal(t, "alice", got.User.GithubLogin)
-		}
-	})
-
-	t.Run("not found", func(t *testing.T) {
-		c := startTestServer(t, testServerConfig{
-			ExpectedReqMethod: http.MethodGet,
-			ExpectedReqPath:   "/api/orgs/an-organization/members",
-			ResponseCode:      200,
-			ResponseBody:      members,
-		})
-		got, err := c.GetOrgMemberByEmail(ctx, orgName, "carol@example.com")
-		assert.NoError(t, err)
-		assert.Nil(t, got)
-	})
-}

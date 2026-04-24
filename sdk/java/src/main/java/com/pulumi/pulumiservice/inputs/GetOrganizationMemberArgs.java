@@ -8,28 +8,11 @@ import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
 import java.lang.String;
 import java.util.Objects;
-import java.util.Optional;
-import javax.annotation.Nullable;
 
 
 public final class GetOrganizationMemberArgs extends com.pulumi.resources.InvokeArgs {
 
     public static final GetOrganizationMemberArgs Empty = new GetOrganizationMemberArgs();
-
-    /**
-     * The email address to look up. Matching is case-insensitive. Mutually exclusive with `username`.
-     * 
-     */
-    @Import(name="email")
-    private @Nullable Output<String> email;
-
-    /**
-     * @return The email address to look up. Matching is case-insensitive. Mutually exclusive with `username`.
-     * 
-     */
-    public Optional<Output<String>> email() {
-        return Optional.ofNullable(this.email);
-    }
 
     /**
      * The name of the Pulumi organization.
@@ -47,24 +30,23 @@ public final class GetOrganizationMemberArgs extends com.pulumi.resources.Invoke
     }
 
     /**
-     * The Pulumi Cloud username to look up. Mutually exclusive with `email`.
+     * The Pulumi Cloud username (backing identity-provider login) to look up.
      * 
      */
-    @Import(name="username")
-    private @Nullable Output<String> username;
+    @Import(name="username", required=true)
+    private Output<String> username;
 
     /**
-     * @return The Pulumi Cloud username to look up. Mutually exclusive with `email`.
+     * @return The Pulumi Cloud username (backing identity-provider login) to look up.
      * 
      */
-    public Optional<Output<String>> username() {
-        return Optional.ofNullable(this.username);
+    public Output<String> username() {
+        return this.username;
     }
 
     private GetOrganizationMemberArgs() {}
 
     private GetOrganizationMemberArgs(GetOrganizationMemberArgs $) {
-        this.email = $.email;
         this.organizationName = $.organizationName;
         this.username = $.username;
     }
@@ -85,27 +67,6 @@ public final class GetOrganizationMemberArgs extends com.pulumi.resources.Invoke
 
         public Builder(GetOrganizationMemberArgs defaults) {
             $ = new GetOrganizationMemberArgs(Objects.requireNonNull(defaults));
-        }
-
-        /**
-         * @param email The email address to look up. Matching is case-insensitive. Mutually exclusive with `username`.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder email(@Nullable Output<String> email) {
-            $.email = email;
-            return this;
-        }
-
-        /**
-         * @param email The email address to look up. Matching is case-insensitive. Mutually exclusive with `username`.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder email(String email) {
-            return email(Output.of(email));
         }
 
         /**
@@ -130,18 +91,18 @@ public final class GetOrganizationMemberArgs extends com.pulumi.resources.Invoke
         }
 
         /**
-         * @param username The Pulumi Cloud username to look up. Mutually exclusive with `email`.
+         * @param username The Pulumi Cloud username (backing identity-provider login) to look up.
          * 
          * @return builder
          * 
          */
-        public Builder username(@Nullable Output<String> username) {
+        public Builder username(Output<String> username) {
             $.username = username;
             return this;
         }
 
         /**
-         * @param username The Pulumi Cloud username to look up. Mutually exclusive with `email`.
+         * @param username The Pulumi Cloud username (backing identity-provider login) to look up.
          * 
          * @return builder
          * 
@@ -153,6 +114,9 @@ public final class GetOrganizationMemberArgs extends com.pulumi.resources.Invoke
         public GetOrganizationMemberArgs build() {
             if ($.organizationName == null) {
                 throw new MissingRequiredPropertyException("GetOrganizationMemberArgs", "organizationName");
+            }
+            if ($.username == null) {
+                throw new MissingRequiredPropertyException("GetOrganizationMemberArgs", "username");
             }
             return $;
         }

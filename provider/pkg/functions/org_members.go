@@ -16,8 +16,8 @@ package functions
 
 import (
 	"context"
-	"errors"
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/pulumi/pulumi-go-provider/infer"
@@ -35,12 +35,15 @@ type GetOrganizationMembersInput struct {
 	OrganizationName string `pulumi:"organizationName"`
 }
 
+// OrganizationMemberInfo carries the fields returned by the backend member
+// roster for Pulumi Cloud organizations. Display name and email are not
+// included: the backing identity provider (GitHub/GitLab/Bitbucket) does not
+// populate them in the member list, and Pulumi only knows those fields for
+// members who have already signed in (surfaced via `knownToPulumi`).
 type OrganizationMemberInfo struct {
 	Username      string  `pulumi:"username"`
-	Name          string  `pulumi:"name"`
-	Email         string  `pulumi:"email"`
 	GithubLogin   string  `pulumi:"githubLogin"`
-	Role          string  `pulumi:"role"`
+	Role          *string `pulumi:"role,optional"`
 	RoleId        *string `pulumi:"roleId,optional"`
 	RoleName      *string `pulumi:"roleName,optional"`
 	KnownToPulumi bool    `pulumi:"knownToPulumi"`
@@ -65,12 +68,14 @@ func (i *GetOrganizationMembersInput) Annotate(a infer.Annotator) {
 
 func (m *OrganizationMemberInfo) Annotate(a infer.Annotator) {
 	a.Describe(&m.Username, "The member's Pulumi Cloud username.")
-	a.Describe(&m.Name, "The member's display name.")
-	a.Describe(&m.Email, "The member's email address.")
 	a.Describe(&m.GithubLogin, "The member's GitHub login.")
-	a.Describe(&m.Role, "The member's built-in role (member, admin, billing-manager).")
+	a.Describe(
+		&m.Role,
+		"The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned "+
+			"— check `roleId` in that case.",
+	)
 	a.Describe(&m.RoleId, "The custom role ID assigned to this member, if any.")
-	a.Describe(&m.RoleName, "The custom role name assigned to this member, if any.")
+	a.Describe(&m.RoleName, "The name of the currently assigned role (custom role name, or built-in role).")
 	a.Describe(&m.KnownToPulumi, "Whether this member has a Pulumi Cloud account.")
 	a.Describe(
 		&m.VirtualAdmin,
@@ -103,14 +108,12 @@ func (GetOrganizationMembersFunction) Invoke(
 }
 
 // GetOrganizationMemberFunction looks up a single Pulumi Cloud organization
-// member by username or email. Exactly one of the two lookup fields must be
-// provided. Returns an error when the member is not found.
+// member by username. Returns an error when the member is not found.
 type GetOrganizationMemberFunction struct{}
 
 type GetOrganizationMemberInput struct {
-	OrganizationName string  `pulumi:"organizationName"`
-	Username         *string `pulumi:"username,optional"`
-	Email            *string `pulumi:"email,optional"`
+	OrganizationName string `pulumi:"organizationName"`
+	Username         string `pulumi:"username"`
 }
 
 type GetOrganizationMemberOutput struct {
@@ -120,63 +123,40 @@ type GetOrganizationMemberOutput struct {
 func (GetOrganizationMemberFunction) Annotate(a infer.Annotator) {
 	a.Describe(
 		&GetOrganizationMemberFunction{},
-		"Looks up a single member of a Pulumi Cloud organization by username or "+
-			"email. Exactly one of `username` or `email` must be set. Returns an "+
-			"error when the member is not found.",
+		"Looks up a single member of a Pulumi Cloud organization by username (the backing identity-provider "+
+			"login, e.g. GitHub login). Returns an error when the member is not found.",
 	)
 	a.SetToken("index", "getOrganizationMember")
 }
 
 func (i *GetOrganizationMemberInput) Annotate(a infer.Annotator) {
 	a.Describe(&i.OrganizationName, "The name of the Pulumi organization.")
-	a.Describe(&i.Username, "The Pulumi Cloud username to look up. Mutually exclusive with `email`.")
-	a.Describe(&i.Email, "The email address to look up. Matching is case-insensitive. Mutually exclusive with `username`.")
+	a.Describe(&i.Username, "The Pulumi Cloud username (backing identity-provider login) to look up.")
 }
 
 func (GetOrganizationMemberFunction) Invoke(
 	ctx context.Context,
 	req infer.FunctionRequest[GetOrganizationMemberInput],
 ) (infer.FunctionResponse[GetOrganizationMemberOutput], error) {
-	username := strings.TrimSpace(deref(req.Input.Username))
-	email := strings.TrimSpace(deref(req.Input.Email))
-
-	switch {
-	case username == "" && email == "":
-		return infer.FunctionResponse[GetOrganizationMemberOutput]{}, errors.New(
-			"exactly one of `username` or `email` must be set",
-		)
-	case username != "" && email != "":
-		return infer.FunctionResponse[GetOrganizationMemberOutput]{}, errors.New(
-			"`username` and `email` are mutually exclusive; set only one",
-		)
+	username := strings.TrimSpace(req.Input.Username)
+	if username == "" {
+		return infer.FunctionResponse[GetOrganizationMemberOutput]{}, fmt.Errorf("`username` must not be empty")
 	}
 
 	client := config.GetClient(ctx)
-
-	var (
-		member *pulumiapi.Member
-		err    error
-		lookup string
-	)
-	if username != "" {
-		lookup = fmt.Sprintf("username %q", username)
-		member, err = client.GetOrgMember(ctx, req.Input.OrganizationName, username)
-	} else {
-		lookup = fmt.Sprintf("email %q", email)
-		member, err = client.GetOrgMemberByEmail(ctx, req.Input.OrganizationName, email)
-	}
+	member, err := client.GetOrgMember(ctx, req.Input.OrganizationName, username)
 	if err != nil {
 		return infer.FunctionResponse[GetOrganizationMemberOutput]{}, fmt.Errorf(
-			"failed to look up organization member by %s: %w",
-			lookup,
+			"failed to look up organization member %q: %w",
+			username,
 			err,
 		)
 	}
 	if member == nil {
 		return infer.FunctionResponse[GetOrganizationMemberOutput]{}, fmt.Errorf(
-			"organization %q has no member matching %s",
+			"organization %q has no member with username %q",
 			req.Input.OrganizationName,
-			lookup,
+			username,
 		)
 	}
 
@@ -185,27 +165,32 @@ func (GetOrganizationMemberFunction) Invoke(
 	}, nil
 }
 
+// builtinOrgRoles mirrors the built-in role set in the OrganizationMember
+// resource; kept in sync so the data source and resource surface the same
+// shape for the same underlying member (built-in → role set, custom → roleId
+// set, never both).
+var builtinOrgRoles = []string{"member", "admin", "billing-manager"}
+
 func memberInfoFrom(m pulumiapi.Member) OrganizationMemberInfo {
 	info := OrganizationMemberInfo{
 		Username:      m.User.GithubLogin,
-		Name:          m.User.Name,
-		Email:         m.User.Email,
 		GithubLogin:   m.User.GithubLogin,
-		Role:          m.Role,
 		KnownToPulumi: m.KnownToPulumi,
 		VirtualAdmin:  m.VirtualAdmin,
 	}
 	if m.FGARole != nil {
-		id, name := m.FGARole.ID, m.FGARole.Name
-		info.RoleId = &id
+		name := m.FGARole.Name
 		info.RoleName = &name
+		if slices.Contains(builtinOrgRoles, m.FGARole.Name) {
+			info.Role = &name
+			return info
+		}
+		id := m.FGARole.ID
+		info.RoleId = &id
+		return info
 	}
+	role := m.Role
+	info.Role = &role
+	info.RoleName = &role
 	return info
-}
-
-func deref(s *string) string {
-	if s == nil {
-		return ""
-	}
-	return *s
 }

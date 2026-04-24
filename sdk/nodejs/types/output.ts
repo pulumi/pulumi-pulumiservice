@@ -444,10 +444,6 @@ export interface OperationContextOptions {
 
 export interface OrganizationMemberInfo {
     /**
-     * The member's email address.
-     */
-    email: string;
-    /**
      * The member's GitHub login.
      */
     githubLogin: string;
@@ -456,19 +452,15 @@ export interface OrganizationMemberInfo {
      */
     knownToPulumi: boolean;
     /**
-     * The member's display name.
+     * The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.
      */
-    name: string;
-    /**
-     * The member's built-in role (member, admin, billing-manager).
-     */
-    role: string;
+    role?: string;
     /**
      * The custom role ID assigned to this member, if any.
      */
     roleId?: string;
     /**
-     * The custom role name assigned to this member, if any.
+     * The name of the currently assigned role (custom role name, or built-in role).
      */
     roleName?: string;
     /**

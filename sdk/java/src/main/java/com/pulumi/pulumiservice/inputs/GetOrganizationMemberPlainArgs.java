@@ -7,28 +7,11 @@ import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
 import java.lang.String;
 import java.util.Objects;
-import java.util.Optional;
-import javax.annotation.Nullable;
 
 
 public final class GetOrganizationMemberPlainArgs extends com.pulumi.resources.InvokeArgs {
 
     public static final GetOrganizationMemberPlainArgs Empty = new GetOrganizationMemberPlainArgs();
-
-    /**
-     * The email address to look up. Matching is case-insensitive. Mutually exclusive with `username`.
-     * 
-     */
-    @Import(name="email")
-    private @Nullable String email;
-
-    /**
-     * @return The email address to look up. Matching is case-insensitive. Mutually exclusive with `username`.
-     * 
-     */
-    public Optional<String> email() {
-        return Optional.ofNullable(this.email);
-    }
 
     /**
      * The name of the Pulumi organization.
@@ -46,24 +29,23 @@ public final class GetOrganizationMemberPlainArgs extends com.pulumi.resources.I
     }
 
     /**
-     * The Pulumi Cloud username to look up. Mutually exclusive with `email`.
+     * The Pulumi Cloud username (backing identity-provider login) to look up.
      * 
      */
-    @Import(name="username")
-    private @Nullable String username;
+    @Import(name="username", required=true)
+    private String username;
 
     /**
-     * @return The Pulumi Cloud username to look up. Mutually exclusive with `email`.
+     * @return The Pulumi Cloud username (backing identity-provider login) to look up.
      * 
      */
-    public Optional<String> username() {
-        return Optional.ofNullable(this.username);
+    public String username() {
+        return this.username;
     }
 
     private GetOrganizationMemberPlainArgs() {}
 
     private GetOrganizationMemberPlainArgs(GetOrganizationMemberPlainArgs $) {
-        this.email = $.email;
         this.organizationName = $.organizationName;
         this.username = $.username;
     }
@@ -87,17 +69,6 @@ public final class GetOrganizationMemberPlainArgs extends com.pulumi.resources.I
         }
 
         /**
-         * @param email The email address to look up. Matching is case-insensitive. Mutually exclusive with `username`.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder email(@Nullable String email) {
-            $.email = email;
-            return this;
-        }
-
-        /**
          * @param organizationName The name of the Pulumi organization.
          * 
          * @return builder
@@ -109,12 +80,12 @@ public final class GetOrganizationMemberPlainArgs extends com.pulumi.resources.I
         }
 
         /**
-         * @param username The Pulumi Cloud username to look up. Mutually exclusive with `email`.
+         * @param username The Pulumi Cloud username (backing identity-provider login) to look up.
          * 
          * @return builder
          * 
          */
-        public Builder username(@Nullable String username) {
+        public Builder username(String username) {
             $.username = username;
             return this;
         }
@@ -122,6 +93,9 @@ public final class GetOrganizationMemberPlainArgs extends com.pulumi.resources.I
         public GetOrganizationMemberPlainArgs build() {
             if ($.organizationName == null) {
                 throw new MissingRequiredPropertyException("GetOrganizationMemberPlainArgs", "organizationName");
+            }
+            if ($.username == null) {
+                throw new MissingRequiredPropertyException("GetOrganizationMemberPlainArgs", "username");
             }
             return $;
         }

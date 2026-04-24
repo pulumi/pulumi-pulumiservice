@@ -232,10 +232,10 @@ func (c *Client) ListAvailableRoleScopes(
 // the endpoint without it returns 400 Bad Request.
 func (c *Client) ListOrgRoles(ctx context.Context, orgName, uxPurpose string) ([]RoleDescriptor, error) {
 	if len(orgName) == 0 {
-		return nil, errors.New("organization name should not be empty")
+		return nil, errors.New("organization name must not be empty")
 	}
 	if len(uxPurpose) == 0 {
-		return nil, errors.New("uxPurpose should not be empty")
+		return nil, errors.New("uxPurpose must not be empty")
 	}
 
 	apiPath := path.Join("orgs", orgName, "roles")
