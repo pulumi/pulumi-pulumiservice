@@ -22,7 +22,6 @@ import (
 )
 
 type TeamRoleClient interface {
-	EnableTeamRoles(ctx context.Context, orgName, teamName string) error
 	AssignRoleToTeam(ctx context.Context, orgName, teamName, roleID string) error
 	RemoveRoleFromTeam(ctx context.Context, orgName, teamName, roleID string) error
 	ListTeamRoles(ctx context.Context, orgName, teamName string) ([]TeamRoleRef, error)
@@ -38,32 +37,9 @@ type listTeamRolesResponse struct {
 	Roles []TeamRoleRef `json:"roles"`
 }
 
-// EnableTeamRoles flips the per-team custom-roles feature on. The endpoint is
-// idempotent at the caller level: if it's already enabled, we swallow the
-// 400/409 the service returns.
-func (c *Client) EnableTeamRoles(ctx context.Context, orgName, teamName string) error {
-	if len(orgName) == 0 {
-		return errors.New("organization name should not be empty")
-	}
-	if len(teamName) == 0 {
-		return errors.New("team name should not be empty")
-	}
-
-	apiPath := path.Join("orgs", orgName, "teams", teamName, "enable-team-roles")
-	if _, err := c.do(ctx, http.MethodPost, apiPath, nil, nil); err != nil {
-		switch GetErrorStatusCode(err) {
-		case http.StatusConflict, http.StatusBadRequest:
-			// Already enabled — best-effort idempotency.
-			return nil
-		}
-		return fmt.Errorf("failed to enable team roles: %w", err)
-	}
-	return nil
-}
-
-// AssignRoleToTeam assigns a custom role to a team. Because the team's custom-
-// roles feature is a one-time opt-in and there's no reliable read-side signal,
-// we call EnableTeamRoles first and treat 400/409 as already-enabled.
+// AssignRoleToTeam assigns a custom role to a team. The organization must
+// already have the custom-roles feature enabled; this client is a thin
+// wrapper around a single endpoint and performs no side effects.
 func (c *Client) AssignRoleToTeam(ctx context.Context, orgName, teamName, roleID string) error {
 	if len(orgName) == 0 {
 		return errors.New("organization name should not be empty")
@@ -73,10 +49,6 @@ func (c *Client) AssignRoleToTeam(ctx context.Context, orgName, teamName, roleID
 	}
 	if len(roleID) == 0 {
 		return errors.New("role id should not be empty")
-	}
-
-	if err := c.EnableTeamRoles(ctx, orgName, teamName); err != nil {
-		return err
 	}
 
 	apiPath := path.Join("orgs", orgName, "teams", teamName, "roles", roleID)

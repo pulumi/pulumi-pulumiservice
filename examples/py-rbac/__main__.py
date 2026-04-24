@@ -65,8 +65,8 @@ team = Team(
     members=team_members,
 )
 
-# 5. Attach the custom role to the team. The provider auto-enables the
-#    team custom-roles feature on first use.
+# 5. Attach the custom role to the team. The team's organization must have
+#    the custom-roles feature enabled.
 team_role = TeamRoleAssignment(
     "rbacTeamRoleBinding",
     organization_name=organization_name,

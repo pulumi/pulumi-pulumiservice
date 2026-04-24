@@ -36,8 +36,8 @@ func (*TeamRoleAssignment) Annotate(a infer.Annotator) {
 	a.Describe(
 		&TeamRoleAssignment{},
 		"Assigns a custom (fine-grained) role to a Pulumi Cloud team. The Pulumi Cloud API currently "+
-			"supports one role per team; creating a second assignment replaces the first. Automatically "+
-			"enables the team's custom-roles feature on first use.",
+			"supports one role per team; creating a second assignment replaces the first. The team's "+
+			"organization must already have the custom-roles feature enabled.",
 	)
 }
 

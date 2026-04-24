@@ -33,8 +33,8 @@ resources:
       description: Team created by the yaml-rbac example.
       members: []
 
-  # Assign the custom role to the team. The provider auto-enables the
-  # team custom-roles feature on first use.
+  # Assign the custom role to the team. The team's organization must have
+  # the custom-roles feature enabled.
   rbacTeamRoleBinding:
     type: pulumiservice:TeamRoleAssignment
     properties:

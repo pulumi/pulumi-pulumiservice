@@ -7,7 +7,8 @@ Python example that exercises the RBAC resources and data sources:
 - `pulumiservice.OrganizationRole` — creates a custom `stack:read` role.
 - `pulumiservice.Team` + `pulumiservice.TeamRoleAssignment` — creates a team
   whose members are pulled from the data source, then attaches the custom
-  role to it (auto-enables the team custom-roles feature on first use).
+  role to it. Requires the custom-roles feature to already be enabled on
+  the organization.
 - `pulumiservice.OrganizationMember` — adopts an existing member (409
   branch on create) and changes their built-in org role to `admin`. On
   destroy the adopted membership is left in place; only the role change

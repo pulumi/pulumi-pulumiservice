@@ -13,44 +13,12 @@ const (
 )
 
 func TestAssignRoleToTeam(t *testing.T) {
-	t.Run("enables then puts", func(t *testing.T) {
-		calls := 0
-		c := startTestServerMulti(t, func(r *http.Request) (int, any) {
-			calls++
-			switch calls {
-			case 1:
-				assert.Equal(t, http.MethodPost, r.Method)
-				assert.Equal(t, "/api/orgs/an-organization/teams/a-team/enable-team-roles", r.URL.Path)
-				return 200, nil
-			case 2:
-				assert.Equal(t, http.MethodPost, r.Method)
-				assert.Equal(t, "/api/orgs/an-organization/teams/a-team/roles/"+testRoleID, r.URL.Path)
-				return 204, nil
-			}
-			t.Fatalf("unexpected call %d", calls)
-			return 0, nil
-		})
-		assert.NoError(t, c.AssignRoleToTeam(ctx, testTeamRolesOrg, testTeamRolesTeam, testRoleID))
-		assert.Equal(t, 2, calls)
+	c := startTestServer(t, testServerConfig{
+		ExpectedReqMethod: http.MethodPost,
+		ExpectedReqPath:   "/api/orgs/an-organization/teams/a-team/roles/" + testRoleID,
+		ResponseCode:      204,
 	})
-
-	t.Run("already enabled", func(t *testing.T) {
-		calls := 0
-		c := startTestServerMulti(t, func(r *http.Request) (int, any) {
-			calls++
-			switch calls {
-			case 1:
-				return 409, ErrorResponse{Message: "already enabled"}
-			case 2:
-				assert.Equal(t, http.MethodPost, r.Method)
-				return 204, nil
-			}
-			t.Fatalf("unexpected call %d", calls)
-			return 0, nil
-		})
-		assert.NoError(t, c.AssignRoleToTeam(ctx, testTeamRolesOrg, testTeamRolesTeam, testRoleID))
-		assert.Equal(t, 2, calls)
-	})
+	assert.NoError(t, c.AssignRoleToTeam(ctx, testTeamRolesOrg, testTeamRolesTeam, testRoleID))
 }
 
 func TestRemoveRoleFromTeam(t *testing.T) {

@@ -28,8 +28,8 @@ const rbacTeam = new service.Team("rbacTeam", {
     members: [],
 });
 
-// Assign the custom role to the team. The provider auto-enables the team
-// custom-roles feature on first use.
+// Assign the custom role to the team. The team's organization must have
+// the custom-roles feature enabled.
 const rbacTeamRoleBinding = new service.TeamRoleAssignment("rbacTeamRoleBinding", {
     organizationName,
     teamName: rbacTeam.name.apply(n => n ?? teamName),
