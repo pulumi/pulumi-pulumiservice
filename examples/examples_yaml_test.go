@@ -4,9 +4,7 @@
 package examples
 
 import (
-	"context"
 	"io"
-	"net/http"
 	"os"
 	"path"
 	"path/filepath"
@@ -23,8 +21,6 @@ import (
 	"github.com/pulumi/providertest/pulumitest/assertpreview"
 	"github.com/pulumi/providertest/pulumitest/opttest"
 	"github.com/pulumi/pulumi/pkg/v3/testing/integration"
-
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
 type Resource struct {
@@ -556,23 +552,6 @@ func TestYamlRbacExample(t *testing.T) {
 	preview := test.Preview(t)
 	assertpreview.HasNoChanges(t, preview)
 	test.Destroy(t)
-}
-
-// resetFixtureOrgMember snaps the fixture user back to the default
-// built-in role. Used as a test cleanup to ensure the shared test org is
-// restored to a known state even if the Pulumi-level teardown leaves
-// any custom role assignment dangling.
-func resetFixtureOrgMember(orgName, userName string) error {
-	token := os.Getenv("PULUMI_ACCESS_TOKEN")
-	apiURL := os.Getenv("PULUMI_BACKEND_URL")
-	if token == "" || apiURL == "" {
-		return nil // no creds → nothing to clean up (local dev without env)
-	}
-	client, err := pulumiapi.NewClient(&http.Client{Timeout: 60 * time.Second}, token, apiURL)
-	if err != nil {
-		return err
-	}
-	return client.UpdateOrgMemberRole(context.Background(), orgName, userName, "member", nil)
 }
 
 func writePulumiYaml(t *testing.T, yamlContents interface{}) string {

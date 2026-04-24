@@ -1,0 +1,90 @@
+"""Python Pulumi Service RBAC example.
+
+Exercises the full RBAC flow from Python:
+- Fetches org members via the getOrganizationMembers data source.
+- Creates a custom OrganizationRole.
+- Creates a Team whose membership is derived from the data-source output
+  (filtered to known-safe fixture users so the integration test never
+  re-parents a real admin).
+- Binds the custom role to the team via TeamRoleAssignment.
+- Adopts an existing org member via OrganizationMember and flips their
+  built-in role to "admin".
+"""
+
+import pulumi
+from pulumi_pulumiservice import (
+    OrganizationMember,
+    OrganizationRole,
+    Team,
+    TeamRoleAssignment,
+    get_organization_members_output,
+)
+
+config = pulumi.Config()
+organization_name = config.get("organizationName") or "service-provider-test-org"
+digits = config.require("digits")
+
+# Fixture users the test org is known to have. Filtering the data-source
+# output to this set keeps the test from putting real admins on the team or
+# demoting them.
+SAFE_USERS = {"pulumi-bot", "service-provider-example-user"}
+
+# The single user we flip to "admin" below. Kept separate so the test's
+# cleanup hook can reset just this user back to "member".
+ROLE_CHANGE_USER = "service-provider-example-user"
+
+# 1. Fetch org members.
+current_members = get_organization_members_output(organization_name=organization_name)
+
+# 2. Derive the team member list dynamically from the data-source output,
+#    intersected with the known-safe set.
+team_members = current_members.members.apply(
+    lambda ms: sorted(m.username for m in ms if m.username in SAFE_USERS)
+)
+
+# 3. Custom org role that grants stack:read.
+custom_role = OrganizationRole(
+    "rbacRole",
+    organization_name=organization_name,
+    name=f"py-rbac-read-only-{digits}",
+    description="Read-only access to stacks, created by the py-rbac example.",
+    permissions={
+        "__type": "PermissionDescriptorAllow",
+        "permissions": ["stack:read"],
+    },
+)
+
+# 4. Team with members pulled from the data source.
+team = Team(
+    "rbacTeam",
+    organization_name=organization_name,
+    name=f"py-rbac-team-{digits}",
+    team_type="pulumi",
+    display_name=f"py-rbac team ({digits})",
+    description="Team created by the py-rbac example.",
+    members=team_members,
+)
+
+# 5. Attach the custom role to the team. The provider auto-enables the
+#    team custom-roles feature on first use.
+team_role = TeamRoleAssignment(
+    "rbacTeamRoleBinding",
+    organization_name=organization_name,
+    team_name=team.name,
+    role_id=custom_role.role_id,
+)
+
+# 6. Change the built-in org role for an existing member. Create hits the
+#    409 branch, adopts the existing membership, then updates the role.
+member_role_change = OrganizationMember(
+    "rbacMemberRoleChange",
+    organization_name=organization_name,
+    username=ROLE_CHANGE_USER,
+    role="admin",
+)
+
+pulumi.export("teamMemberCount", team_members.apply(len))
+pulumi.export("roleId", custom_role.role_id)
+pulumi.export("assignedRoleName", team_role.role_name)
+pulumi.export("memberAdopted", member_role_change.adopted)
+pulumi.export("memberRole", member_role_change.role)
