@@ -2,9 +2,9 @@
 //
 // checks.go — runtime evaluation of the declarative Check rules carried
 // in CloudAPIResource.Checks (requireOneOf, requireAtMostOne,
-// requireTogether, requireIf). These replace the ad-hoc cross-field
-// validation a hand-written Check() RPC would otherwise have to
-// implement.
+// requireTogether, requireIfSet, requireIf). These replace the ad-hoc
+// cross-field validation a hand-written Check() RPC would otherwise
+// have to implement.
 
 package runtime
 
@@ -37,6 +37,8 @@ func EvaluateChecks(res *CloudAPIResource, inputs resource.PropertyMap) []CheckF
 			failures = append(failures, evalRequireAtMostOne(rule, inputs)...)
 		case len(rule.RequireTogether) > 0:
 			failures = append(failures, evalRequireTogether(rule, inputs)...)
+		case rule.RequireIfSet != "" && rule.Field != "":
+			failures = append(failures, evalRequireIfSet(rule, inputs)...)
 		case rule.RequireIf != "" && rule.Field != "":
 			failures = append(failures, evalRequireIf(rule, inputs)...)
 		}
@@ -117,6 +119,25 @@ func evalRequireTogether(rule CheckRule, inputs resource.PropertyMap) []CheckFai
 		}
 	}
 	return out
+}
+
+// evalRequireIfSet enforces a "when X is set, Y is required" dependency.
+// This is the one-directional cousin of requireTogether: useful when
+// two fields shouldn't be treated symmetrically (e.g., Webhook's
+// `projectName` is required when `stackName` is set, but the reverse
+// — projectName alone for an ESC-scoped webhook — is valid).
+func evalRequireIfSet(rule CheckRule, inputs resource.PropertyMap) []CheckFailure {
+	if !isPropertySet(inputs, rule.RequireIfSet) {
+		return nil
+	}
+	if isPropertySet(inputs, rule.Field) {
+		return nil
+	}
+	msg := rule.Message
+	if msg == "" {
+		msg = fmt.Sprintf("%s is required when %s is set", rule.Field, rule.RequireIfSet)
+	}
+	return []CheckFailure{{Property: rule.Field, Reason: msg}}
 }
 
 // evalRequireIf evaluates simple `field == value` predicates. Extension to

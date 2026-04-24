@@ -29,24 +29,30 @@ resources:
         Can approve/reject production change requests. Must NOT overlap
         with production-deployers membership (segregation of duties).
 
-  # The gate itself. Any deployment that matches its filter (here, any
-  # stack in project "production") requires at least one approver ack.
+  # The gate itself. The shapes under `environmentIdentifier` and
+  # `approvalRuleConfig` pass through to Pulumi Cloud unchanged —
+  # v2.0.0-alpha keeps them loose so the gate schema can evolve
+  # independently; tighter typing is tracked as follow-up work.
   productionGate:
     type: pulumiservice:changegates:ApprovalRule
     properties:
       organizationName: ${organizationName}
       name: production-deploys
-      description: All production deployments require approval.
-      # Filter: which updates this gate applies to.
-      match:
-        projects: ["production", "billing-service-production"]
-        stackTags:
-          environment: production
-      # Rules: what has to happen for the gate to open.
-      approval:
-        minApprovals: 1
-        approverTeams:
-          - ${approvers.name}
-        preventSelfApproval: true   # author can't be an approver
-        timeoutHours: 24            # auto-reject after a day pending
       enabled: true
+      # Which kinds of actions this gate covers (deployments + ESC writes).
+      targetActionTypes:
+        - deployment
+      # Which environment(s) the gate applies to. `environment` here is
+      # an ESC environment, not an AWS environment — it's the change-gate
+      # scope, not a stack filter.
+      environmentIdentifier:
+        organization: ${organizationName}
+        project: production
+        environment: default
+      # Who can approve and under what conditions.
+      approvalRuleConfig:
+        numApprovalsRequired: 1
+        eligibleApprovers:
+          teams:
+            - ${approvers.name}
+        preventSelfApproval: true

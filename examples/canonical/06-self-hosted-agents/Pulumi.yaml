@@ -33,9 +33,9 @@ resources:
   deploymentSettings:
     type: pulumiservice:stacks/deployments:Settings
     properties:
-      organizationName: ${organizationName}
-      projectName: ${project}
-      stackName: ${stack}
+      organization: ${organizationName}
+      project: ${project}
+      stack: ${stack}
       agentPoolId: ${isolatedPool.agentPoolId}
       sourceContext:
         git:

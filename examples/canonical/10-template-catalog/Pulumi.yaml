@@ -13,35 +13,21 @@ config:
     default: service-provider-test-org
 
 resources:
-  # The template source: points Pulumi Cloud at a git repo where a set
-  # of template directories live. Each subdir becomes a template the
-  # org can `pulumi new` from.
+  # The template source: points Pulumi Cloud at a git repo of template
+  # directories. Each subdir in the repo becomes a template the org can
+  # `pulumi new` from (discovery is git-driven; no per-template entries
+  # here). The source URL must be reachable by Pulumi Cloud.
   internalCatalog:
     type: pulumiservice:orgs/templates:Source
     properties:
       organizationName: ${organizationName}
-      name: acme-golden-path
-      description: |
-        Golden-path templates: every new service should start here.
-        Contents curated by the platform team; PRs welcome.
-      sourceType: git
-      sourceUrl: https://github.com/acme-corp/pulumi-templates.git
-      sourceBranch: main
-      # Sub-paths within the repo that each become a usable template.
-      # Absence here means "the repo root is one template."
-      templates:
-        - path: typescript-microservice
-          displayName: TypeScript microservice (ECS Fargate)
-          description: Fargate service with ALB, CloudWatch, and a DynamoDB table.
-        - path: python-data-pipeline
-          displayName: Python data pipeline (Glue + S3)
-          description: Batch ETL using AWS Glue; opinionated partitioning scheme.
-        - path: static-site
-          displayName: Static site (S3 + CloudFront)
-          description: Versioned static hosting with WAF and cert auto-renewal.
+      sourceName: acme-golden-path
+      sourceURL: https://github.com/acme-corp/pulumi-templates.git
 
 outputs:
+  templateId:
+    value: ${internalCatalog.templateId}
   catalogUrl:
-    value: "https://app.pulumi.com/${organizationName}/templates/${internalCatalog.name}"
+    value: "https://app.pulumi.com/${organizationName}/templates/${internalCatalog.sourceName}"
   usage:
-    value: "pulumi new ${organizationName}/${internalCatalog.name}/typescript-microservice"
+    value: "pulumi new ${organizationName}/${internalCatalog.sourceName}/typescript-microservice"

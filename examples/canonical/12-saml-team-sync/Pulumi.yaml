@@ -1,11 +1,12 @@
 name: pulumiservice-canonical-12-saml-team-sync
 runtime: yaml
 description: |
-  Mirror your IdP (Okta, Azure AD, Google Workspace) group structure into
-  Pulumi teams, so org membership and team assignments follow from a
-  single source of truth upstream. When HR adds a new platform engineer
-  to the Okta group, they appear in the right Pulumi teams next login;
-  when they leave, their access disappears.
+  Provision Pulumi teams that mirror the structure of your IdP (Okta,
+  Azure AD, Google Workspace) groups. Group-membership sync itself is
+  configured in the Pulumi Cloud admin UI under SSO → SAML Group
+  Mappings — there is no API resource for the mapping today; this
+  program just creates the *target* teams that the IdP-side mapping
+  points at.
 
   The canonical pattern for organizations that already have a corporate
   IdP and want "who has what in Pulumi?" answered by their existing IAM
@@ -15,20 +16,12 @@ config:
   organizationName:
     type: string
     default: service-provider-test-org
-  # IdP group external IDs. Format varies by provider — see README.
-  platformGroupId:
-    type: string
-    default: "okta-group-id:00gtbcaaaaaaaaaaaaaa"
-  securityGroupId:
-    type: string
-    default: "okta-group-id:00gtbcbbbbbbbbbbbbbb"
-  allEngineersGroupId:
-    type: string
-    default: "okta-group-id:00gtbccccccccccccccc"
 
 resources:
-  # Teams bound to IdP groups. Team membership is reconciled on each
-  # user's login based on the claims present in their SAML assertion.
+  # Teams that an upstream SAML group mapping populates. Names here
+  # should match the group mappings configured in the Pulumi Cloud
+  # admin console (SSO → SAML → Group Mappings). Membership itself is
+  # reconciled on each user's login based on the SAML assertion.
   platformTeam:
     type: pulumiservice:orgs/teams:Team
     properties:
@@ -36,11 +29,7 @@ resources:
       teamType: pulumi
       name: platform
       displayName: Platform Engineering
-      description: Mirrors Okta group "Platform Engineering"
-      externalMembershipBinding:
-        type: saml-group
-        claim: groups
-        value: ${platformGroupId}
+      description: Mirrors Okta group "Platform Engineering".
 
   securityTeam:
     type: pulumiservice:orgs/teams:Team
@@ -49,11 +38,7 @@ resources:
       teamType: pulumi
       name: security
       displayName: Security Engineering
-      description: Mirrors Okta group "Security Engineering"
-      externalMembershipBinding:
-        type: saml-group
-        claim: groups
-        value: ${securityGroupId}
+      description: Mirrors Okta group "Security Engineering".
 
   developersTeam:
     type: pulumiservice:orgs/teams:Team
@@ -63,7 +48,3 @@ resources:
       name: developers
       displayName: All Engineering
       description: Mirrors Okta group "All Engineers" — read-only baseline.
-      externalMembershipBinding:
-        type: saml-group
-        claim: groups
-        value: ${allEngineersGroupId}

@@ -558,3 +558,54 @@ func TestPrimitive_PostCreate_RunsFollowOnOp(t *testing.T) {
 	}, calls)
 	assert.Equal(t, "values: {}\n", postCreateBody)
 }
+
+// ─── requireIfSet (Check) ───────────────────────────────────────────────
+
+// A required field gated on a trigger field being set: when the trigger
+// is absent the rule is silent, when the trigger is present the gated
+// field must also be present. Mirrors Webhook's projectName-when-
+// stackName check — stack-scoped webhooks need a project path; ESC-
+// scoped webhooks need it too but for a different scope selector; org-
+// scoped webhooks need neither.
+func TestPrimitive_RequireIfSet_TriggerAbsent_Silent(t *testing.T) {
+	res := &CloudAPIResource{
+		Checks: []CheckRule{{
+			RequireIfSet: "stackName",
+			Field:        "projectName",
+		}},
+	}
+	failures := EvaluateChecks(res, resource.PropertyMap{
+		"organizationName": resource.NewStringProperty("acme"),
+	})
+	assert.Empty(t, failures, "rule should be silent when trigger field is unset")
+}
+
+func TestPrimitive_RequireIfSet_TriggerPresent_FieldMissing_Fails(t *testing.T) {
+	res := &CloudAPIResource{
+		Checks: []CheckRule{{
+			RequireIfSet: "stackName",
+			Field:        "projectName",
+		}},
+	}
+	failures := EvaluateChecks(res, resource.PropertyMap{
+		"organizationName": resource.NewStringProperty("acme"),
+		"stackName":        resource.NewStringProperty("prod"),
+	})
+	require.Len(t, failures, 1)
+	assert.Equal(t, "projectName", failures[0].Property)
+}
+
+func TestPrimitive_RequireIfSet_TriggerPresent_FieldPresent_Passes(t *testing.T) {
+	res := &CloudAPIResource{
+		Checks: []CheckRule{{
+			RequireIfSet: "stackName",
+			Field:        "projectName",
+		}},
+	}
+	failures := EvaluateChecks(res, resource.PropertyMap{
+		"organizationName": resource.NewStringProperty("acme"),
+		"stackName":        resource.NewStringProperty("prod"),
+		"projectName":      resource.NewStringProperty("infra"),
+	})
+	assert.Empty(t, failures)
+}

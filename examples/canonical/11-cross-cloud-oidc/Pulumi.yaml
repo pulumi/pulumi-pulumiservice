@@ -31,7 +31,7 @@ resources:
   awsTrust:
     type: pulumiservice:orgs/oidc:Issuer
     properties:
-      organizationName: ${organizationName}
+      organization: ${organizationName}
       name: aws-production
       url: https://oidc.pulumi.com
       policies:
@@ -52,7 +52,7 @@ resources:
   azureTrust:
     type: pulumiservice:orgs/oidc:Issuer
     properties:
-      organizationName: ${organizationName}
+      organization: ${organizationName}
       name: azure-production
       url: https://oidc.pulumi.com
       policies:
@@ -66,7 +66,7 @@ resources:
   gcpTrust:
     type: pulumiservice:orgs/oidc:Issuer
     properties:
-      organizationName: ${organizationName}
+      organization: ${organizationName}
       name: gcp-production
       url: https://oidc.pulumi.com
       policies:
@@ -77,6 +77,9 @@ resources:
 
 outputs:
   # Feed these into your stack programs via ESC `fn::open::aws/azure/gcp-login`.
-  awsIssuerId:   { value: ${awsTrust.issuerId} }
-  azureIssuerId: { value: ${azureTrust.issuerId} }
-  gcpIssuerId:   { value: ${gcpTrust.issuerId} }
+  awsIssuerId:
+    value: ${awsTrust.issuerId}
+  azureIssuerId:
+    value: ${azureTrust.issuerId}
+  gcpIssuerId:
+    value: ${gcpTrust.issuerId}

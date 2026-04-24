@@ -252,8 +252,9 @@ type CheckRule struct {
 	RequireOneOf     []string `json:"requireOneOf,omitempty"`     // exactly one must be set
 	RequireAtMostOne []string `json:"requireAtMostOne,omitempty"` // zero or one, never more
 	RequireTogether  []string `json:"requireTogether,omitempty"`  // all-or-nothing
+	RequireIfSet     string   `json:"requireIfSet,omitempty"`     // when this field is set, Field is required
 	RequireIf        string   `json:"requireIf,omitempty"`        // e.g., "type == pulumi"
-	Field            string   `json:"field,omitempty"`            // the field that RequireIf gates
+	Field            string   `json:"field,omitempty"`            // the field that RequireIf / RequireIfSet gates
 
 	// Message is the user-facing error returned when the rule fails.
 	Message string `json:"message,omitempty"`

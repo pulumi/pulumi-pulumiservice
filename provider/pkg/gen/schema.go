@@ -386,6 +386,13 @@ func isInCheckSet(checks []map[string]interface{}, name string) bool {
 				}
 			}
 		}
+		// requireIfSet / requireIf name scalar fields; both the trigger
+		// field and the `field:` target are conditionally required.
+		for _, key := range []string{"requireIfSet", "field"} {
+			if s, ok := c[key].(string); ok && s == name {
+				return true
+			}
+		}
 	}
 	return false
 }

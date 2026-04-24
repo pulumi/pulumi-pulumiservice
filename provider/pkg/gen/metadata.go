@@ -414,6 +414,9 @@ func checkFromMap(m map[string]interface{}) runtime.CheckRule {
 			}
 		}
 	}
+	if s, ok := m["requireIfSet"].(string); ok {
+		r.RequireIfSet = s
+	}
 	if s, ok := m["requireIf"].(string); ok {
 		r.RequireIf = s
 	}

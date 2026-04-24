@@ -437,7 +437,12 @@ modules:
           # — mutually exclusive, or both omitted for org-scoped hooks.
           - requireAtMostOne: [stackName, environmentName]
             message: "stackName and environmentName are mutually exclusive; omit both for an org-scoped webhook, set one for the matching scope"
-          - requireTogether: [stackName, projectName]
+          # projectName is required when either scope selector is present
+          # (stack- and ESC-scoped URLs both path through the project).
+          - requireIfSet: stackName
+            field: projectName
+          - requireIfSet: environmentName
+            field: projectName
         sortProperties: [groups, filters]
 
   stacks/deployments:

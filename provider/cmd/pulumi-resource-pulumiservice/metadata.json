@@ -1747,10 +1747,12 @@
           "message": "stackName and environmentName are mutually exclusive; omit both for an org-scoped webhook, set one for the matching scope"
         },
         {
-          "requireTogether": [
-            "stackName",
-            "projectName"
-          ]
+          "requireIfSet": "stackName",
+          "field": "projectName"
+        },
+        {
+          "requireIfSet": "environmentName",
+          "field": "projectName"
         }
       ],
       "sortProperties": [
