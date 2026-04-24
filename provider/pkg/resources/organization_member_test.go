@@ -17,10 +17,11 @@ const testAdminRole = "admin"
 
 type orgMemberClientMock struct {
 	config.Client
-	addFunc    func(ctx context.Context, userName, orgName, role string) error
-	updateFunc func(ctx context.Context, orgName, userName, role string, fgaRoleID *string) error
-	deleteFunc func(ctx context.Context, orgName, userName string) error
-	getFunc    func(ctx context.Context, orgName, userName string) (*pulumiapi.Member, error)
+	addFunc       func(ctx context.Context, userName, orgName, role string) error
+	updateFunc    func(ctx context.Context, orgName, userName, role string, fgaRoleID *string) error
+	deleteFunc    func(ctx context.Context, orgName, userName string) error
+	getFunc       func(ctx context.Context, orgName, userName string) (*pulumiapi.Member, error)
+	listRolesFunc func(ctx context.Context, orgName, uxPurpose string) ([]pulumiapi.RoleDescriptor, error)
 }
 
 func (c *orgMemberClientMock) AddMemberToOrg(ctx context.Context, userName, orgName, role string) error {
@@ -43,6 +44,29 @@ func (c *orgMemberClientMock) GetOrgMember(
 	return c.getFunc(ctx, orgName, userName)
 }
 
+func (c *orgMemberClientMock) ListOrgRoles(
+	ctx context.Context, orgName, uxPurpose string,
+) ([]pulumiapi.RoleDescriptor, error) {
+	if c.listRolesFunc == nil {
+		return nil, nil
+	}
+	return c.listRolesFunc(ctx, orgName, uxPurpose)
+}
+
+// builtinRoles is the role-catalogue fixture used by tests that don't care
+// about the exact role layout, only that ListOrgRoles returns the standard
+// built-in slugs so applyMemberRoleToState can round-trip an FGARole back
+// to the matching built-in Role string.
+var builtinRoles = []pulumiapi.RoleDescriptor{
+	{ID: "admin-fga", Name: "Admin", DefaultIdentifier: "admin"},
+	{ID: "member-fga", Name: "Member", DefaultIdentifier: "member"},
+	{ID: "billing-fga", Name: "Billing Manager", DefaultIdentifier: "billing-manager"},
+}
+
+func stubBuiltinRoles(_ context.Context, _, _ string) ([]pulumiapi.RoleDescriptor, error) {
+	return builtinRoles, nil
+}
+
 func TestOrganizationMemberRead(t *testing.T) {
 	t.Run("not found returns empty", func(t *testing.T) {
 		mock := &orgMemberClientMock{
@@ -59,6 +83,11 @@ func TestOrganizationMemberRead(t *testing.T) {
 	})
 
 	t.Run("built-in role surfaces as role, not roleId", func(t *testing.T) {
+		// Regression: the Pulumi Cloud member response returns the role's
+		// display name ("Admin"), not its slug ("admin"). Earlier versions
+		// of applyMemberRoleToState compared the display name directly
+		// against the built-in slug list, so Read populated roleId instead
+		// of role and every refresh drifted +roleId-role.
 		mock := &orgMemberClientMock{
 			getFunc: func(_ context.Context, _, _ string) (*pulumiapi.Member, error) {
 				return &pulumiapi.Member{
@@ -69,9 +98,10 @@ func TestOrganizationMemberRead(t *testing.T) {
 						Email:       "alice@example.com",
 					},
 					KnownToPulumi: true,
-					FGARole:       &pulumiapi.FGARole{ID: "admin", Name: "admin"},
+					FGARole:       &pulumiapi.FGARole{ID: "admin-fga", Name: "Admin"},
 				}, nil
 			},
+			listRolesFunc: stubBuiltinRoles,
 		}
 		ctx := config.WithMockClient(context.Background(), mock)
 
@@ -98,6 +128,9 @@ func TestOrganizationMemberRead(t *testing.T) {
 					FGARole:       &pulumiapi.FGARole{ID: "role-xyz", Name: "read-only-devops"},
 				}, nil
 			},
+			// Custom role isn't present in the built-in catalogue; the
+			// lookup falls through and state surfaces as RoleId.
+			listRolesFunc: stubBuiltinRoles,
 		}
 		ctx := config.WithMockClient(context.Background(), mock)
 
@@ -141,9 +174,10 @@ func TestOrganizationMemberCreate(t *testing.T) {
 				return &pulumiapi.Member{
 					Role:    "admin",
 					User:    pulumiapi.User{GithubLogin: "alice"},
-					FGARole: &pulumiapi.FGARole{ID: "admin", Name: "admin"},
+					FGARole: &pulumiapi.FGARole{ID: "admin-fga", Name: "Admin"},
 				}, nil
 			},
+			listRolesFunc: stubBuiltinRoles,
 		}
 		ctx := config.WithMockClient(context.Background(), mock)
 		role := testAdminRole
@@ -185,6 +219,7 @@ func TestOrganizationMemberCreate(t *testing.T) {
 					FGARole: &pulumiapi.FGARole{ID: "role-xyz", Name: "custom"},
 				}, nil
 			},
+			listRolesFunc: stubBuiltinRoles,
 		}
 		ctx := config.WithMockClient(context.Background(), mock)
 		roleID := "role-xyz"

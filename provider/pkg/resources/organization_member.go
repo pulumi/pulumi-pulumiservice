@@ -334,31 +334,55 @@ func readOrgMemberState(
 		KnownToPulumi: member.KnownToPulumi,
 	}
 
-	applyMemberRoleToState(member, &state)
+	if err := applyMemberRoleToState(ctx, client, orgName, member, &state); err != nil {
+		return OrganizationMemberState{}, err
+	}
 	return state, nil
 }
 
 // applyMemberRoleToState populates Role/RoleId/RoleName on state from the
-// service response. fgaRole is authoritative: if it names a custom role
-// (anything outside the built-in set) we surface roleId; otherwise we surface
-// the built-in role.
-func applyMemberRoleToState(member *pulumiapi.Member, state *OrganizationMemberState) {
-	if member.FGARole != nil {
-		state.RoleName = member.FGARole.Name
-		if slices.Contains(validOrgMemberRoles, member.FGARole.Name) {
-			name := member.FGARole.Name
-			state.Role = &name
-			state.RoleId = nil
-			return
-		}
-		id := member.FGARole.ID
-		state.RoleId = &id
-		state.Role = nil
-		return
+// service response. FGARole carries only id + display name, not the slug,
+// so we look the role up in the org's role catalogue to decide whether it
+// is a built-in (member/admin/billing-manager) or a custom role: a matching
+// catalogue entry with a DefaultIdentifier in the built-in set surfaces as
+// Role; anything else surfaces as RoleId.
+func applyMemberRoleToState(
+	ctx context.Context,
+	client config.Client,
+	orgName string,
+	member *pulumiapi.Member,
+	state *OrganizationMemberState,
+) error {
+	if member.FGARole == nil {
+		name := member.Role
+		state.Role = &name
+		state.RoleName = name
+		return nil
 	}
-	name := member.Role
-	state.Role = &name
-	state.RoleName = name
+
+	state.RoleName = member.FGARole.Name
+
+	roles, err := client.ListOrgRoles(ctx, orgName, "role")
+	if err != nil {
+		return fmt.Errorf("failed to resolve org role metadata: %w", err)
+	}
+	for _, r := range roles {
+		if r.ID != member.FGARole.ID {
+			continue
+		}
+		if r.DefaultIdentifier != "" && slices.Contains(validOrgMemberRoles, r.DefaultIdentifier) {
+			slug := r.DefaultIdentifier
+			state.Role = &slug
+			state.RoleId = nil
+			return nil
+		}
+		break
+	}
+
+	id := member.FGARole.ID
+	state.RoleId = &id
+	state.Role = nil
+	return nil
 }
 
 func splitOrgMemberID(id string) (string, string, error) {
