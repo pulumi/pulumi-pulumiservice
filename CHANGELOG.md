@@ -7,12 +7,18 @@
 
 ### Improvements
 - Added `StackTags` resource for managing multiple stack tags as a single resource, with a `tags` map input. [#61](https://github.com/pulumi/pulumi-pulumiservice/issues/61)
+- Added `TwelveHours` (12h) scan schedule option for `InsightsAccount` resources. [#731](https://github.com/pulumi/pulumi-pulumiservice/pull/731)
+- Documented the `all` enforcement-level wildcard on `PolicyGroupPolicyPackReference.config`, enabling a single entry to set the enforcement level for every policy in a pack with optional per-policy overrides. [#756](https://github.com/pulumi/pulumi-pulumiservice/pull/756)
 
 ### Bug Fixes
-- Fixed TeamEnvironmentPermission refresh returning wrong permission when the same environment name exists in multiple projects [#674](https://github.com/pulumi/pulumi-pulumiservice/issues/674)
 - Fixed TeamEnvironmentPermission spurious replacement on upgrade from 0.29.2 caused by the optional `maxOpenDuration` field being serialized as an empty string in Check and Read [#751](https://github.com/pulumi/pulumi-pulumiservice/issues/751)
 - Fixed TeamEnvironmentPermission panic when `maxOpenDuration` was supplied as a non-string value; `Check` now returns a `CheckFailure` at preview instead of crashing during apply [#751](https://github.com/pulumi/pulumi-pulumiservice/issues/751)
 - Fixed TeamEnvironmentPermission spurious replacement for users upgrading from provider versions 0.29.3–0.36.0 whose state contains an empty-string `maxOpenDuration`; `Diff` now treats an empty-string `maxOpenDuration` as equivalent to an absent field [#751](https://github.com/pulumi/pulumi-pulumiservice/issues/751)
+
+## 0.36.0
+
+### Bug Fixes
+- Fixed TeamEnvironmentPermission refresh returning wrong permission when the same environment name exists in multiple projects [#674](https://github.com/pulumi/pulumi-pulumiservice/issues/674)
 
 ## 0.35.0
 
