@@ -70,7 +70,7 @@ func TestCreateRole(t *testing.T) {
 	t.Run("empty details rejected", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{ResponseCode: 200})
 		_, err := c.CreateRole(ctx, testRoleOrgName, NewCreateRoleRequest("r", "", "", "", nil))
-		assert.EqualError(t, err, "role permissions details should not be empty")
+		assert.EqualError(t, err, "role permissions details must not be empty")
 	})
 }
 

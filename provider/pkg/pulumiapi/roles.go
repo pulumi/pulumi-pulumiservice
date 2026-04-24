@@ -111,10 +111,10 @@ func (c *Client) CreateRole(
 	req CreateRoleRequest,
 ) (*RoleDescriptor, error) {
 	if len(orgName) == 0 {
-		return nil, errors.New("organization name should not be empty")
+		return nil, errors.New("organization name must not be empty")
 	}
 	if req.Name == "" {
-		return nil, errors.New("role name should not be empty")
+		return nil, errors.New("role name must not be empty")
 	}
 	if req.ResourceType == "" {
 		req.ResourceType = "global"
@@ -123,7 +123,7 @@ func (c *Client) CreateRole(
 		req.UXPurpose = "role"
 	}
 	if len(req.Details) == 0 {
-		return nil, errors.New("role permissions details should not be empty")
+		return nil, errors.New("role permissions details must not be empty")
 	}
 
 	apiPath := path.Join("orgs", orgName, "roles")
@@ -152,10 +152,10 @@ func NewCreateRoleRequest(
 // GetRole fetches a role by ID. Returns (nil, nil) if the role does not exist.
 func (c *Client) GetRole(ctx context.Context, orgName, roleID string) (*RoleDescriptor, error) {
 	if len(orgName) == 0 {
-		return nil, errors.New("organization name should not be empty")
+		return nil, errors.New("organization name must not be empty")
 	}
 	if len(roleID) == 0 {
-		return nil, errors.New("role id should not be empty")
+		return nil, errors.New("role id must not be empty")
 	}
 
 	apiPath := path.Join("orgs", orgName, "roles", roleID)
@@ -179,10 +179,10 @@ func (c *Client) UpdateRole(
 	details json.RawMessage,
 ) (*RoleDescriptor, error) {
 	if len(orgName) == 0 {
-		return nil, errors.New("organization name should not be empty")
+		return nil, errors.New("organization name must not be empty")
 	}
 	if len(roleID) == 0 {
-		return nil, errors.New("role id should not be empty")
+		return nil, errors.New("role id must not be empty")
 	}
 
 	apiPath := path.Join("orgs", orgName, "roles", roleID)
@@ -203,7 +203,7 @@ func (c *Client) ListAvailableRoleScopes(
 	orgName string,
 ) (map[string][]RoleScopeGroup, error) {
 	if len(orgName) == 0 {
-		return nil, errors.New("organization name should not be empty")
+		return nil, errors.New("organization name must not be empty")
 	}
 
 	apiPath := path.Join("orgs", orgName, "roles", "scopes")
@@ -270,10 +270,10 @@ func (c *Client) ResolveBuiltInRoleID(ctx context.Context, orgName, builtInRole 
 // even if still assigned to members or teams.
 func (c *Client) DeleteRole(ctx context.Context, orgName, roleID string, force bool) error {
 	if len(orgName) == 0 {
-		return errors.New("organization name should not be empty")
+		return errors.New("organization name must not be empty")
 	}
 	if len(roleID) == 0 {
-		return errors.New("role id should not be empty")
+		return errors.New("role id must not be empty")
 	}
 
 	apiPath := path.Join("orgs", orgName, "roles", roleID)
