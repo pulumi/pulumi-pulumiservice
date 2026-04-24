@@ -65,14 +65,11 @@ func TestPythonRbacExample(t *testing.T) {
 	orgName := getOrgName()
 	const fixtureUser = "service-provider-example-user"
 
-	// Safety net: OrganizationMember flips this user's built-in role to
-	// "admin" during the test. If teardown leaves them on any role other
-	// than the default, snap them back here so we don't leak state.
-	t.Cleanup(func() {
-		if err := resetFixtureOrgMember(orgName, fixtureUser); err != nil {
-			t.Logf("cleanup: could not reset fixture user role: %v", err)
-		}
-	})
+	// Snapshot the fixture user's role before the test mutates it, and
+	// restore it on cleanup. OrganizationMember flips this user's role
+	// to "admin" during the test; the restore puts them back on whatever
+	// role they had pre-test (rather than blindly resetting to "member").
+	t.Cleanup(snapshotFixtureOrgMember(t, orgName, fixtureUser))
 
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		Dir: path.Join(getCwd(t), "py-rbac"),

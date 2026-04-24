@@ -520,16 +520,12 @@ func TestYamlRbacExample(t *testing.T) {
 	orgName := getOrgName()
 	const fixtureUser = "service-provider-example-user"
 
-	// Safety net: if anything leaves the fixture user on a non-default
-	// role, snap them back to "member". OrganizationRole.Delete with
-	// force=true *should* revoke their custom role assignment on destroy,
-	// but we don't want a mis-wired teardown to leak state into other
-	// shards.
-	t.Cleanup(func() {
-		if err := resetFixtureOrgMember(orgName, fixtureUser); err != nil {
-			t.Logf("cleanup: could not reset fixture user role: %v", err)
-		}
-	})
+	// Snapshot the fixture user's role before the test mutates it, and
+	// restore it on cleanup. OrganizationRole.Delete with force=true
+	// *should* revoke their custom role assignment on destroy, but if a
+	// mis-wired teardown leaves the user on the test's role, this hook
+	// still gets the org back to a known state.
+	t.Cleanup(snapshotFixtureOrgMember(t, orgName, fixtureUser))
 
 	test := pulumitest.NewPulumiTest(t,
 		filepath.Join(getCwd(t), "yaml-rbac"),

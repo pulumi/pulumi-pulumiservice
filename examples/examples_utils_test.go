@@ -33,19 +33,66 @@ func getOrgName() string {
 	return "service-provider-test-org"
 }
 
-// resetFixtureOrgMember snaps the fixture user back to the default
-// built-in role. Used as a test cleanup to ensure the shared test org is
-// restored to a known state even if the Pulumi-level teardown leaves
-// any custom role assignment dangling.
-func resetFixtureOrgMember(orgName, userName string) error {
+// snapshotFixtureOrgMember reads the user's current role from the org and
+// returns a closure that restores it. Pass the closure to t.Cleanup so the
+// shared test org returns to its pre-test state regardless of how the test
+// exited.
+//
+// This replaces the older "always reset to member" cleanup, which was
+// destructive for fixture users whose pre-test role was anything other than
+// the default — e.g. snapping pulumi-bot back to "member" would have broken
+// every subsequent test that relied on its admin-level access.
+//
+// Concurrency: this is a per-process snapshot. Tests in the same go-test
+// invocation that mutate the same fixture user are still serialized by the
+// absence of t.Parallel(). It does not protect against parallel invocations
+// across CI shards or local terminals. The robust fix for cross-shard races
+// is a per-test fixture user; tracked as a follow-up.
+func snapshotFixtureOrgMember(t *testing.T, orgName, userName string) func() {
+	t.Helper()
 	token := os.Getenv("PULUMI_ACCESS_TOKEN")
 	apiURL := os.Getenv("PULUMI_BACKEND_URL")
 	if token == "" || apiURL == "" {
-		return nil // no creds → nothing to clean up (local dev without env)
+		return func() {} // no creds → nothing to snapshot (local dev without env)
 	}
 	client, err := pulumiapi.NewClient(&http.Client{Timeout: 60 * time.Second}, token, apiURL)
 	if err != nil {
-		return err
+		t.Logf("snapshot fixture user: client init failed: %v", err)
+		return func() {}
 	}
-	return client.UpdateOrgMemberRole(context.Background(), orgName, userName, "member", nil)
+	member, err := client.GetOrgMember(context.Background(), orgName, userName)
+	if err != nil {
+		t.Logf("snapshot fixture user: lookup failed: %v", err)
+		return func() {}
+	}
+	if member == nil {
+		t.Logf("snapshot fixture user: %q not found in %q", userName, orgName)
+		return func() {}
+	}
+
+	// Capture both representations: fgaRoleId is authoritative for both
+	// built-in and custom roles, but legacy responses without fgaRole need
+	// the role-string fallback.
+	var origFGARoleID *string
+	if member.FGARole != nil {
+		id := member.FGARole.ID
+		origFGARoleID = &id
+	}
+	origRole := member.Role
+
+	return func() {
+		var restoreErr error
+		if origFGARoleID != nil {
+			restoreErr = client.UpdateOrgMemberRole(
+				context.Background(), orgName, userName, "", origFGARoleID,
+			)
+		} else if origRole != "" {
+			restoreErr = client.UpdateOrgMemberRole(
+				context.Background(), orgName, userName, origRole, nil,
+			)
+		}
+		if restoreErr != nil {
+			t.Logf("restore fixture user role: %v", restoreErr)
+		}
+	}
 }
