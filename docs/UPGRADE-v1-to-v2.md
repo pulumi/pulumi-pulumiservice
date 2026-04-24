@@ -152,31 +152,41 @@ v2 accepts those names verbatim.
 - Optional write-only properties (e.g. one-time setup tokens) are
   unchanged from v1.
 
-## State rename recipes
+## State rewrite recipe
 
 Pulumi's state stores each resource keyed by URN, which includes the
-type token. When you change a token, run `pulumi state rename` so
-Pulumi's records mirror the new code without re-creating the resource.
+type token. When you change a token, the state's URN has to be
+rewritten — otherwise Pulumi doesn't match the existing resource to
+your v2 program and wants to create it again. `pulumi state rename`
+only rewrites the *name* segment, not the type, so the supported
+workflow is export → edit → import.
 
 Do this **after** you've updated your code to v2 but **before** you
 run `pulumi up`.
 
 ```bash
-# One-line form, per resource:
-pulumi state rename <name> --type-token pulumiservice:orgs/agents:AgentPool
+# 1. Export the full state so we can edit URNs (and IDs, below).
+pulumi stack export --file state.json
 
-# Or for bulk renames, run `pulumi state` in an interactive session:
-pulumi state edit
+# 2. Rewrite v1 → v2 tokens. The full mapping is in the
+#    [resource rename table](#resource-rename-table) above; this sed
+#    handles the common cases:
+sed -i.bak -E '
+  s|pulumiservice:index:AgentPool|pulumiservice:orgs/agents:AgentPool|g
+  s|pulumiservice:index:Team|pulumiservice:orgs/teams:Team|g
+  s|pulumiservice:index:Webhook|pulumiservice:stacks/hooks:Webhook|g
+  s|pulumiservice:index:Stack|pulumiservice:stacks:Stack|g
+  s|pulumiservice:index:Environment|pulumiservice:esc:Environment|g
+  # …apply the full table…
+' state.json
+
+# 3. Import the rewritten state.
+pulumi stack import --file state.json
 ```
 
-Template this across your stack — the [resource rename table](#resource-rename-table)
-is exhaustive for v1. For large programs, the pattern is:
-
-```bash
-for urn in $(pulumi stack --show-urns | grep "pulumiservice:index:AgentPool"); do
-  pulumi state rename --urn "$urn" --type-token pulumiservice:orgs/agents:AgentPool
-done
-```
+For each edited URN, the inputs and outputs are preserved verbatim —
+the resource is not recreated, mutated, or re-registered with Pulumi
+Cloud. Only Pulumi's client-side record changes.
 
 ## What does NOT require a re-creation
 
@@ -194,8 +204,9 @@ upgrade:
 Most resources keep the same ID across v1 → v2 (e.g., a v1 `AgentPool`
 with ID `org/pool-name/pool-abc-123` is a v2 `AgentPool` with the same
 ID). Four resources, however, ship with a different ID composition in
-v2 — the `pulumi state rename --type-token` form below is not enough
-for these; you also need `--id` to tell Pulumi the new form:
+v2. For these, the state-rewrite step above also needs to edit the
+`id` field on each affected resource — not just the `urn`'s type
+token:
 
 | Resource | v1 ID | v2 ID |
 |---|---|---|
@@ -204,22 +215,15 @@ for these; you also need `--id` to tell Pulumi the new form:
 | `stacks/tags:Tags` | `{org}/{project}/{stack}/tags` | `{org}/{project}/{stack}` |
 | `changegates:ApprovalRule` | `{environment}/{org}/{project}/{env}/{ruleID}` | `{org}/{gateId}` |
 
-For each of these, rename the state entry with both the type token
-**and** the new ID. The old ID value is recoverable from the v1 state
-(`pulumi stack --show-ids`); take the tokenId/gateId sub-segment and
-compose the new form:
+In the exported `state.json`, each resource appears with `urn`,
+`id`, `inputs`, and `outputs` fields. For each instance of the
+four resources above, rewrite the `id` as well as the URN type
+token. The old ID's tokenId / gateId sub-segment (last component)
+is the only piece the v2 form needs; strip the extra segments.
 
-```bash
-# Example: OrgAccessToken
-pulumi state rename \
-    --urn "urn:pulumi:prod::myproj::pulumiservice:index:OrgAccessToken::ci" \
-    --type-token pulumiservice:orgs/tokens:OrgAccessToken \
-    --id "acme-corp/tok-abc-123"
-```
-
-If you skip the `--id` flag on these four, the first `pulumi refresh`
-or `pulumi up` after the upgrade will fail to parse the ID against v2's
-template and report the resource as not found.
+If you skip the `id` rewrite on these four, the first `pulumi
+refresh` or `pulumi up` after the upgrade will fail to parse the
+ID against v2's template and report the resource as not found.
 
 ## What's new in v2
 
