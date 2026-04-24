@@ -7,6 +7,8 @@
 
 ### Improvements
 - Added `StackTags` resource for managing multiple stack tags as a single resource, with a `tags` map input. [#61](https://github.com/pulumi/pulumi-pulumiservice/issues/61)
+- Added `TwelveHours` (12h) scan schedule option for `InsightsAccount` resources. [#731](https://github.com/pulumi/pulumi-pulumiservice/pull/731)
+- Documented the `all` enforcement-level wildcard on `PolicyGroupPolicyPackReference.config`, enabling a single entry to set the enforcement level for every policy in a pack with optional per-policy overrides. [#756](https://github.com/pulumi/pulumi-pulumiservice/pull/756)
 - Added `OrganizationMember` resource for managing a user's membership in an organization and their assigned role (built-in or custom).
 - Added `OrganizationRole` resource for defining custom fine-grained roles on an organization.
 - Added `TeamRoleAssignment` resource for assigning a custom role to a team, with automatic enablement of the team custom-roles feature on first use.
@@ -14,14 +16,17 @@
 - Added `getOrganizationMember` data source for looking up a single organization member by username or email (case-insensitive). [#41668](https://github.com/pulumi/pulumi-service/issues/41668)
 
 ### Bug Fixes
+- Fixed TeamEnvironmentPermission spurious replacement on upgrade from 0.29.2 caused by the optional `maxOpenDuration` field being serialized as an empty string in Check and Read [#751](https://github.com/pulumi/pulumi-pulumiservice/issues/751)
+- Fixed TeamEnvironmentPermission panic when `maxOpenDuration` was supplied as a non-string value; `Check` now returns a `CheckFailure` at preview instead of crashing during apply [#751](https://github.com/pulumi/pulumi-pulumiservice/issues/751)
+- Fixed TeamEnvironmentPermission spurious replacement for users upgrading from provider versions 0.29.3–0.36.0 whose state contains an empty-string `maxOpenDuration`; `Diff` now treats an empty-string `maxOpenDuration` as equivalent to an absent field [#751](https://github.com/pulumi/pulumi-pulumiservice/issues/751)
 - `OrganizationMember` update now translates built-in role names (`member`, `admin`, `billing-manager`) to their per-org FGA role IDs before PATCHing. The member PATCH endpoint rejects built-in names in the `role` field; previously, any update or adopted-destroy that reset to a built-in role would fail with `404 Role '…' not found`.
 - `OrganizationMember.Update` and `OrganizationMember.Read` now preserve the `adopted` flag from prior state. Previously, either operation rebuilt state from the server (which does not expose adoption) and silently cleared `adopted`, causing a subsequent `pulumi destroy` to fall through the non-adopted branch and remove the user from the organization.
 - Added `getOrganizationRoleScopes` data source for discovering the permission scope names available for use in `OrganizationRole.permissions`.
 
+## 0.36.0
+
 ### Bug Fixes
 - Fixed TeamEnvironmentPermission refresh returning wrong permission when the same environment name exists in multiple projects [#674](https://github.com/pulumi/pulumi-pulumiservice/issues/674)
-- Fixed TeamEnvironmentPermission spurious replacement on upgrade from 0.29.2 caused by the optional `maxOpenDuration` field being serialized as an empty string in Check and Read [#751](https://github.com/pulumi/pulumi-pulumiservice/issues/751)
-- Fixed TeamEnvironmentPermission panic when `maxOpenDuration` was supplied as a non-string value; `Check` now returns a `CheckFailure` at preview instead of crashing during apply [#751](https://github.com/pulumi/pulumi-pulumiservice/issues/751)
 
 ## 0.35.0
 
