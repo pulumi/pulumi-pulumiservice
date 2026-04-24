@@ -65,7 +65,6 @@ resources:
     properties:
       organizationName: ${organizationName}
       name: baseline-guardrails-${digits}
-      description: Applied to every stack by default.
 
 outputs:
   ciTokenValue:

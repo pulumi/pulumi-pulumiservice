@@ -400,6 +400,13 @@ func checkFromMap(m map[string]interface{}) runtime.CheckRule {
 			}
 		}
 	}
+	if v, ok := m["requireAtMostOne"].([]interface{}); ok {
+		for _, e := range v {
+			if s, ok := e.(string); ok {
+				r.RequireAtMostOne = append(r.RequireAtMostOne, s)
+			}
+		}
+	}
 	if v, ok := m["requireTogether"].([]interface{}); ok {
 		for _, e := range v {
 			if s, ok := e.(string); ok {

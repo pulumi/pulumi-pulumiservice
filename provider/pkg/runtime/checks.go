@@ -1,9 +1,10 @@
 // Copyright 2016-2026, Pulumi Corporation.
 //
-// checks.go — runtime evaluation of the declarative Check rules carried in
-// CloudAPIResource.Checks (requireOneOf, requireTogether, requireIf). These
-// replace the ad-hoc cross-field validation a hand-written Check() RPC
-// would otherwise have to implement.
+// checks.go — runtime evaluation of the declarative Check rules carried
+// in CloudAPIResource.Checks (requireOneOf, requireAtMostOne,
+// requireTogether, requireIf). These replace the ad-hoc cross-field
+// validation a hand-written Check() RPC would otherwise have to
+// implement.
 
 package runtime
 
@@ -32,6 +33,8 @@ func EvaluateChecks(res *CloudAPIResource, inputs resource.PropertyMap) []CheckF
 		switch {
 		case len(rule.RequireOneOf) > 0:
 			failures = append(failures, evalRequireOneOf(rule, inputs)...)
+		case len(rule.RequireAtMostOne) > 0:
+			failures = append(failures, evalRequireAtMostOne(rule, inputs)...)
 		case len(rule.RequireTogether) > 0:
 			failures = append(failures, evalRequireTogether(rule, inputs)...)
 		case rule.RequireIf != "" && rule.Field != "":
@@ -59,6 +62,34 @@ func evalRequireOneOf(rule CheckRule, inputs resource.PropertyMap) []CheckFailur
 	out := make([]CheckFailure, 0, len(rule.RequireOneOf))
 	for _, name := range rule.RequireOneOf {
 		out = append(out, CheckFailure{Property: name, Reason: msg})
+	}
+	return out
+}
+
+// evalRequireAtMostOne checks that zero or one of the named fields is
+// set; having two or more is a failure. Used for mutually-exclusive
+// scope selectors (e.g., Webhook's `stackName` vs `environmentName` —
+// either stack-scoped, env-scoped, or neither for org-scope, but never
+// both).
+func evalRequireAtMostOne(rule CheckRule, inputs resource.PropertyMap) []CheckFailure {
+	setCount := 0
+	for _, name := range rule.RequireAtMostOne {
+		if isPropertySet(inputs, name) {
+			setCount++
+		}
+	}
+	if setCount <= 1 {
+		return nil
+	}
+	msg := rule.Message
+	if msg == "" {
+		msg = fmt.Sprintf("at most one of %v may be set; %d were set", rule.RequireAtMostOne, setCount)
+	}
+	out := make([]CheckFailure, 0, len(rule.RequireAtMostOne))
+	for _, name := range rule.RequireAtMostOne {
+		if isPropertySet(inputs, name) {
+			out = append(out, CheckFailure{Property: name, Reason: msg})
+		}
 	}
 	return out
 }

@@ -525,9 +525,23 @@
         "organizationName"
       ],
       "properties": {
+        "enabled": {
+          "type": "boolean",
+          "from": "newEnabled",
+          "source": "body",
+          "default": true,
+          "doc": "Whether the export is currently active. Set to false to pause without deleting."
+        },
         "organizationName": {
+          "type": "string",
           "from": "orgName",
-          "source": "path"
+          "source": "path",
+          "doc": "Organization whose audit log is being exported."
+        },
+        "s3Configuration": {
+          "from": "newS3Configuration",
+          "source": "body",
+          "doc": "S3 destination settings — an object with `iamRoleArn`\n(role Pulumi Cloud assumes to write), `s3BucketName`,\nand optional `s3PathPrefix`.\n"
         }
       }
     },
@@ -1726,12 +1740,11 @@
       },
       "checks": [
         {
-          "requireOneOf": [
+          "requireAtMostOne": [
             "stackName",
-            "environmentName",
-            "organizationName"
+            "environmentName"
           ],
-          "message": "exactly one of stackName, environmentName, or organizationName must be set (scope selector)"
+          "message": "stackName and environmentName are mutually exclusive; omit both for an org-scoped webhook, set one for the matching scope"
         },
         {
           "requireTogether": [

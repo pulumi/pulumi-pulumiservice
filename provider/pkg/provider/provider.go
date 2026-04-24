@@ -119,6 +119,17 @@ func (s *Server) Cancel(ctx context.Context, _ *pbempty.Empty) (*pbempty.Empty, 
 	return &pbempty.Empty{}, nil
 }
 
+// Attach is the "handshake" RPC the Pulumi engine calls when a provider
+// is running out-of-process (e.g., started manually for local
+// development via PULUMI_DEBUG_PROVIDERS). The request carries the
+// engine's gRPC address, which a more sophisticated provider would use
+// for log-passthrough or for issuing engine-side callbacks. This
+// provider doesn't need either — it simply acknowledges the attach so
+// the engine can proceed with GetSchema / Configure / CRUD.
+func (s *Server) Attach(ctx context.Context, _ *pulumirpc.PluginAttach) (*pbempty.Empty, error) {
+	return &pbempty.Empty{}, nil
+}
+
 // ─── CRUD ───────────────────────────────────────────────────────────────
 
 // Check validates + normalizes inputs. Declarative Checks (requireOneOf,

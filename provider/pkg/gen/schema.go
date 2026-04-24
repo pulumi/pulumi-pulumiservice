@@ -375,7 +375,7 @@ func propertyFromMap(p ResourceProperty, compSchemas map[string]componentSchema)
 // requirement is enforced at runtime in Check().
 func isInCheckSet(checks []map[string]interface{}, name string) bool {
 	for _, c := range checks {
-		for _, key := range []string{"requireOneOf", "requireTogether"} {
+		for _, key := range []string{"requireOneOf", "requireAtMostOne", "requireTogether"} {
 			if v, ok := c[key]; ok {
 				if slice, ok := v.([]interface{}); ok {
 					for _, item := range slice {

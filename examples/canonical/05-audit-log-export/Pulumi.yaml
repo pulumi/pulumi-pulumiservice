@@ -22,28 +22,21 @@ config:
     default: arn:aws:iam::123456789012:role/PulumiAuditLogExporter
 
 resources:
+  # The LogExport resource is a singleton per organization — there is at
+  # most one audit-log export configuration. Setting `enabled: false`
+  # pauses the stream without tearing down the destination config.
   auditExport:
     type: pulumiservice:orgs/audit:LogExport
     properties:
       organizationName: ${organizationName}
-      destination:
-        type: s3
-        bucket: ${exportBucket}
-        region: us-west-2
-        prefix: pulumi-audit/
-        roleArn: ${exportRoleArn}
-      # Export on a 5-minute cadence. Smaller batches mean faster detection;
-      # larger batches are cheaper. 5m is a reasonable default.
-      batchIntervalMinutes: 5
-      # Emit all event categories — you can always filter downstream.
-      # Narrow this here only if you have a volume problem.
-      includeCategories:
-        - iam
-        - stack
-        - environment
-        - policy
-        - integration
-        - token
+      enabled: true
+      # S3 destination. The shape here passes through to Pulumi Cloud,
+      # which writes newline-delimited JSON under the given prefix using
+      # the assumed IAM role.
+      s3Configuration:
+        iamRoleArn: ${exportRoleArn}
+        s3BucketName: ${exportBucket}
+        s3PathPrefix: pulumi-audit/
 
 outputs:
   exportConfigId:

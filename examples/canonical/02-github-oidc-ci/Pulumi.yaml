@@ -31,7 +31,7 @@ resources:
   githubActions:
     type: pulumiservice:orgs/oidc:Issuer
     properties:
-      organizationName: ${organizationName}
+      organization: ${organizationName}
       name: github-actions
       url: https://token.actions.githubusercontent.com
       thumbprints:

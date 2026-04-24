@@ -432,8 +432,11 @@ modules:
             items: { type: string }
             doc: Event group filters (stacks, deployments, environments).
         checks:
-          - requireOneOf: [stackName, environmentName, organizationName]
-            message: "exactly one of stackName, environmentName, or organizationName must be set (scope selector)"
+          # organizationName is always required (declared on the property
+          # itself). The scope selector is `stackName` vs `environmentName`
+          # — mutually exclusive, or both omitted for org-scoped hooks.
+          - requireAtMostOne: [stackName, environmentName]
+            message: "stackName and environmentName are mutually exclusive; omit both for an org-scoped webhook, set one for the matching scope"
           - requireTogether: [stackName, projectName]
         sortProperties: [groups, filters]
 
@@ -1048,17 +1051,44 @@ modules:
   orgs/audit:
     resources:
       LogExport:
+        doc: |
+          Streams Pulumi Cloud organization audit logs to an S3 bucket.
+          Every admin action (token creation, team membership change,
+          policy group update, stack delete, …) is emitted to the
+          configured bucket on the cadence Pulumi Cloud supports.
+          Required for SOC 2 / ISO 27001 / HIPAA compliance flows.
         operations:
-          create: UpdateAuditLogExportConfiguration  # POST   /api/orgs/{orgName}/auditlogs/export/config
+          create: UpdateAuditLogExportConfiguration  # POST (idempotent upsert)
           read:   GetAuditLogExportConfiguration     # GET
-          update: UpdateAuditLogExportConfiguration  # POST (idempotent upsert semantics)
+          update: UpdateAuditLogExportConfiguration  # POST same endpoint
           delete: DeleteAuditLogExportConfiguration  # DELETE
         id:
           template: "{organizationName}"
           params: [organizationName]
         forceNew: [organizationName]
         properties:
-          organizationName: { from: orgName, source: path }
+          organizationName:
+            from: orgName
+            type: string
+            source: path
+            required: true
+            doc: Organization whose audit log is being exported.
+          enabled:
+            from: newEnabled
+            type: boolean
+            source: body
+            required: true
+            default: true
+            doc: Whether the export is currently active. Set to false to pause without deleting.
+          s3Configuration:
+            from: newS3Configuration
+            ref: "pulumi.json#/Any"
+            source: body
+            required: true
+            doc: |
+              S3 destination settings — an object with `iamRoleArn`
+              (role Pulumi Cloud assumes to write), `s3BucketName`,
+              and optional `s3PathPrefix`.
     functions:
       listAuditLogEvents:     { operationId: ListAuditLogEventsHandlerV2 }
       exportAuditLogEvents:   { operationId: ExportAuditLogEventsHandlerV2 }

@@ -249,10 +249,11 @@ type AutoNameConfig struct {
 // CheckRule is a declarative validation. Executed during the Check gRPC phase.
 type CheckRule struct {
 	// Exactly one of these fields is set per rule.
-	RequireOneOf    []string `json:"requireOneOf,omitempty"`
-	RequireTogether []string `json:"requireTogether,omitempty"`
-	RequireIf       string   `json:"requireIf,omitempty"` // e.g., "type == pulumi"
-	Field           string   `json:"field,omitempty"`     // the field that RequireIf gates
+	RequireOneOf     []string `json:"requireOneOf,omitempty"`     // exactly one must be set
+	RequireAtMostOne []string `json:"requireAtMostOne,omitempty"` // zero or one, never more
+	RequireTogether  []string `json:"requireTogether,omitempty"`  // all-or-nothing
+	RequireIf        string   `json:"requireIf,omitempty"`        // e.g., "type == pulumi"
+	Field            string   `json:"field,omitempty"`            // the field that RequireIf gates
 
 	// Message is the user-facing error returned when the rule fails.
 	Message string `json:"message,omitempty"`

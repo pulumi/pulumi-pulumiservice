@@ -451,22 +451,44 @@
     },
     "pulumiservice:orgs/audit:LogExport": {
       "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether the export is currently active. Set to false to pause without deleting.",
+          "default": true
+        },
         "organizationName": {
           "type": "string",
+          "description": "Organization whose audit log is being exported.",
           "willReplaceOnChanges": true
+        },
+        "s3Configuration": {
+          "$ref": "pulumi.json#/Any",
+          "description": "S3 destination settings — an object with `iamRoleArn`\n(role Pulumi Cloud assumes to write), `s3BucketName`,\nand optional `s3PathPrefix`.\n"
         }
       },
       "required": [
         "organizationName"
       ],
       "inputProperties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether the export is currently active. Set to false to pause without deleting.",
+          "default": true
+        },
         "organizationName": {
           "type": "string",
+          "description": "Organization whose audit log is being exported.",
           "willReplaceOnChanges": true
+        },
+        "s3Configuration": {
+          "$ref": "pulumi.json#/Any",
+          "description": "S3 destination settings — an object with `iamRoleArn`\n(role Pulumi Cloud assumes to write), `s3BucketName`,\nand optional `s3PathPrefix`.\n"
         }
       },
       "requiredInputs": [
-        "organizationName"
+        "enabled",
+        "organizationName",
+        "s3Configuration"
       ]
     },
     "pulumiservice:orgs/cmk:Key": {},
