@@ -118,19 +118,30 @@ func TestOrganizationMemberRead(t *testing.T) {
 		assert.Equal(t, "alice", resp.State.GithubLogin)
 	})
 
-	t.Run("custom role surfaces as roleId", func(t *testing.T) {
+	t.Run("custom role surfaces the catalogue ID, not the FGA-side ID", func(t *testing.T) {
+		// Regression: Pulumi Cloud hands out two separate identifiers for
+		// the same role — the role-catalogue ID (`RoleDescriptor.ID`, what
+		// users supply as `roleId`) and the FGA-system ID returned on the
+		// member list endpoint (`member.fgaRole.id`). Surfacing the FGA id
+		// made every refresh of a custom-role assignment drift `~roleId`
+		// against the user's original input. The lookup has to bridge the
+		// two by matching the shared display Name.
+		const catalogueID = "role-catalogue-xyz"
+		const fgaID = "role-fga-xyz"
 		mock := &orgMemberClientMock{
 			getFunc: func(_ context.Context, _, _ string) (*pulumiapi.Member, error) {
 				return &pulumiapi.Member{
 					Role:          "member",
 					User:          pulumiapi.User{Name: "Bob", GithubLogin: "bob"},
 					KnownToPulumi: true,
-					FGARole:       &pulumiapi.FGARole{ID: "role-xyz", Name: "read-only-devops"},
+					FGARole:       &pulumiapi.FGARole{ID: fgaID, Name: "read-only-devops"},
 				}, nil
 			},
-			// Custom role isn't present in the built-in catalogue; the
-			// lookup falls through and state surfaces as RoleId.
-			listRolesFunc: stubBuiltinRoles,
+			listRolesFunc: func(_ context.Context, _, _ string) ([]pulumiapi.RoleDescriptor, error) {
+				return append([]pulumiapi.RoleDescriptor{
+					{ID: catalogueID, Name: "read-only-devops"},
+				}, builtinRoles...), nil
+			},
 		}
 		ctx := config.WithMockClient(context.Background(), mock)
 
@@ -140,7 +151,8 @@ func TestOrganizationMemberRead(t *testing.T) {
 		})
 		assert.NoError(t, err)
 		if assert.NotNil(t, resp.State.RoleId) {
-			assert.Equal(t, "role-xyz", *resp.State.RoleId)
+			assert.Equal(t, catalogueID, *resp.State.RoleId,
+				"RoleId must be the role-catalogue ID, not the FGA-side ID")
 		}
 		assert.Nil(t, resp.State.Role)
 		assert.Equal(t, "read-only-devops", resp.State.RoleName)

@@ -341,11 +341,12 @@ func readOrgMemberState(
 }
 
 // applyMemberRoleToState populates Role/RoleId/RoleName on state from the
-// service response. FGARole carries only id + display name, not the slug,
-// so we look the role up in the org's role catalogue to decide whether it
-// is a built-in (member/admin/billing-manager) or a custom role: a matching
-// catalogue entry with a DefaultIdentifier in the built-in set surfaces as
-// Role; anything else surfaces as RoleId.
+// service response. The FGARole the member endpoint returns carries its own
+// internal id, which is distinct from the role-catalogue `RoleDescriptor.ID`
+// that the provider exposes as `roleId` (and what users supply). We bridge
+// the two ID spaces by looking the role up in the catalogue by its display
+// `Name` — that field is shared between both sides — and use the catalogue
+// entry to decide built-in vs custom and to report the catalogue-side ID.
 func applyMemberRoleToState(
 	ctx context.Context,
 	client config.Client,
@@ -367,21 +368,24 @@ func applyMemberRoleToState(
 		return fmt.Errorf("failed to resolve org role metadata: %w", err)
 	}
 	for _, r := range roles {
-		if r.ID != member.FGARole.ID {
+		if r.Name != member.FGARole.Name {
 			continue
 		}
-		if r.DefaultIdentifier != "" && slices.Contains(validOrgMemberRoles, r.DefaultIdentifier) {
+		if slices.Contains(validOrgMemberRoles, r.DefaultIdentifier) {
 			slug := r.DefaultIdentifier
 			state.Role = &slug
 			state.RoleId = nil
 			return nil
 		}
-		break
+		id := r.ID
+		state.RoleId = &id
+		state.Role = nil
+		return nil
 	}
 
-	id := member.FGARole.ID
-	state.RoleId = &id
-	state.Role = nil
+	// Role isn't in the catalogue we just fetched. Preserve whatever
+	// Role / RoleId came in with state (i.e. the caller's declaration)
+	// rather than surfacing an FGA-side id that can't round-trip.
 	return nil
 }
 
