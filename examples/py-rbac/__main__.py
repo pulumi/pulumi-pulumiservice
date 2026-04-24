@@ -5,7 +5,8 @@ Exercises the full RBAC flow from Python:
 - Creates a custom OrganizationRole.
 - Creates a Team whose membership is derived from the data-source output
   (filtered to known-safe fixture users so the integration test never
-  re-parents a real admin).
+  re-parents a real admin) plus the authenticated caller, who Pulumi
+  Cloud auto-adds on team creation.
 - Binds the custom role to the team via TeamRoleAssignment.
 - Adopts an existing org member via OrganizationMember and flips their
   built-in role to "admin".
@@ -17,6 +18,7 @@ from pulumi_pulumiservice import (
     OrganizationRole,
     Team,
     TeamRoleAssignment,
+    get_current_user_output,
     get_organization_members_output,
 )
 
@@ -33,13 +35,22 @@ SAFE_USERS = {"pulumi-bot", "service-provider-example-user"}
 # cleanup hook can reset just this user back to "member".
 ROLE_CHANGE_USER = "service-provider-example-user"
 
-# 1. Fetch org members.
+# 1. Fetch org members and the authenticated caller.
 current_members = get_organization_members_output(organization_name=organization_name)
+current_user = get_current_user_output()
 
-# 2. Derive the team member list dynamically from the data-source output,
-#    intersected with the known-safe set.
-team_members = current_members.members.apply(
-    lambda ms: sorted(m.username for m in ms if m.username in SAFE_USERS)
+# 2. Derive the team member list dynamically: known-safe org members plus
+#    the authenticated caller. Pulumi Cloud auto-adds the team creator on
+#    team creation, so seeding the list with the caller keeps refresh from
+#    detecting that as drift. Sorted so the order is stable across runs.
+team_members = pulumi.Output.all(
+    members=current_members.members,
+    caller=current_user.username,
+).apply(
+    lambda args: sorted(
+        {m.username for m in args["members"] if m.username in SAFE_USERS}
+        | {args["caller"]}
+    )
 )
 
 # 3. Custom org role that grants stack:read.
