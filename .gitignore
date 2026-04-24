@@ -34,3 +34,6 @@ coverage.txt
 
 # Environment variables
 .env
+
+# Claude Code workspace artifacts
+.claude/
