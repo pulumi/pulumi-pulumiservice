@@ -43,13 +43,17 @@ current_user = get_current_user_output()
 #    the authenticated caller. Pulumi Cloud auto-adds the team creator on
 #    team creation, so seeding the list with the caller keeps refresh from
 #    detecting that as drift. Sorted so the order is stable across runs.
-team_members = pulumi.Output.all(
-    members=current_members.members,
-    caller=current_user.username,
-).apply(
-    lambda args: sorted(
-        {m.username for m in args["members"] if m.username in SAFE_USERS}
-        | {args["caller"]}
+#
+# Implemented as a nested apply (rather than pulumi.Output.all) because
+# Output.all serializes the inner list of OrganizationMemberInfo down to
+# plain dicts, which loses the .username attribute access. Nesting the
+# applies preserves the typed shape that get_organization_members_output
+# returns.
+team_members = current_user.username.apply(
+    lambda caller: current_members.members.apply(
+        lambda ms: sorted(
+            {m.username for m in ms if m.username in SAFE_USERS} | {caller}
+        )
     )
 )
 

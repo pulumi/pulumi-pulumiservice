@@ -72,9 +72,12 @@ func snapshotFixtureOrgMember(t *testing.T, orgName, userName string) func() {
 
 	// Capture both representations: fgaRoleId is authoritative for both
 	// built-in and custom roles, but legacy responses without fgaRole need
-	// the role-string fallback.
+	// the role-string fallback. Treat FGARole with an empty ID the same as
+	// FGARole=nil; that's what we see when the snapshot races into another
+	// shard's mid-flight role teardown and observes an inconsistent
+	// intermediate state.
 	var origFGARoleID *string
-	if member.FGARole != nil {
+	if member.FGARole != nil && member.FGARole.ID != "" {
 		id := member.FGARole.ID
 		origFGARoleID = &id
 	}
@@ -82,14 +85,18 @@ func snapshotFixtureOrgMember(t *testing.T, orgName, userName string) func() {
 
 	return func() {
 		var restoreErr error
-		if origFGARoleID != nil {
+		switch {
+		case origFGARoleID != nil:
 			restoreErr = client.UpdateOrgMemberRole(
 				context.Background(), orgName, userName, "", origFGARoleID,
 			)
-		} else if origRole != "" {
+		case origRole != "":
 			restoreErr = client.UpdateOrgMemberRole(
 				context.Background(), orgName, userName, origRole, nil,
 			)
+		default:
+			t.Logf("restore fixture user role: snapshot captured no role; skipping restore")
+			return
 		}
 		if restoreErr != nil {
 			t.Logf("restore fixture user role: %v", restoreErr)
