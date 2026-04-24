@@ -251,4 +251,3 @@ func TestGetOrgMember(t *testing.T) {
 		assert.Nil(t, got)
 	})
 }
-

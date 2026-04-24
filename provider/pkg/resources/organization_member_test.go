@@ -13,6 +13,8 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
+const testAdminRole = "admin"
+
 type orgMemberClientMock struct {
 	config.Client
 	addFunc    func(ctx context.Context, userName, orgName, role string) error
@@ -144,7 +146,7 @@ func TestOrganizationMemberCreate(t *testing.T) {
 			},
 		}
 		ctx := config.WithMockClient(context.Background(), mock)
-		role := "admin"
+		role := testAdminRole
 
 		r := &OrganizationMember{}
 		resp, err := r.Create(ctx, infer.CreateRequest[OrganizationMemberInput]{
@@ -266,7 +268,7 @@ func TestOrganizationMemberUpdateDryRunPreservesAdopted(t *testing.T) {
 	// with Adopted defaulting to false. `pulumi preview` on an adopted
 	// member then showed a spurious `adopted: true → false` diff.
 	ctx := config.WithMockClient(context.Background(), &orgMemberClientMock{})
-	role := "admin"
+	role := testAdminRole
 
 	r := &OrganizationMember{}
 	resp, err := r.Update(ctx, infer.UpdateRequest[OrganizationMemberInput, OrganizationMemberState]{
@@ -306,7 +308,7 @@ func TestOrganizationMemberUpdatePreservesAdopted(t *testing.T) {
 		},
 	}
 	ctx := config.WithMockClient(context.Background(), mock)
-	role := "admin"
+	role := testAdminRole
 
 	r := &OrganizationMember{}
 	resp, err := r.Update(ctx, infer.UpdateRequest[OrganizationMemberInput, OrganizationMemberState]{
