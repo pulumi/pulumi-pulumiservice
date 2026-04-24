@@ -25,8 +25,10 @@ import (
 )
 
 // Server implements pulumirpc.ResourceProviderServer for the v2 provider.
-// Embed UnimplementedResourceProviderServer so unimplemented RPCs (Construct,
-// Invoke on unknown tokens, etc.) return a consistent "not implemented" error.
+// Embed UnimplementedResourceProviderServer so RPCs we haven't wired yet
+// — Construct, Call (resource methods), StreamInvoke — return a
+// consistent "not implemented" error. Invoke (data-source functions)
+// is implemented; Call will follow in a subsequent 2.x.
 type Server struct {
 	pulumirpc.UnimplementedResourceProviderServer
 
