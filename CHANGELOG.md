@@ -86,15 +86,28 @@ integrations — land in subsequent 2.x releases.
 
 - **`pulumiservice:orgs/insights:Account`** — cloud resource scanning
   account. Backed by the `/api/preview/insights/...` endpoints; the API
-  is in preview and its shape may evolve. Includes an
-  `Account.triggerScan` method to kick off an ad-hoc scan, and a
-  `listAccounts` data source.
+  is in preview and its shape may evolve. Includes a `listAccounts`
+  data source (callable via the SDK's `invoke` / `getInsightsAccounts`
+  binding).
 - **`pulumiservice:orgs/identity:IdentityProvider`** — SAML/SSO
   organization identity provider configuration, with a `requireOneOf`
   check over `metadataUrl` / `metadataXml`.
 
+### Data sources and methods
+
+- **Data sources (`Invoke` / `list*` functions)** are wired end-to-end
+  in alpha.1. Every `list*` function exposed by Pulumi Cloud's public
+  spec is callable from the SDK (`listTeams`, `listAgentPools`,
+  `listIssuers`, `listAccounts`, …).
+- **Resource methods (`Call` RPC)** — e.g. `Account.triggerScan`,
+  `Issuer.regenerateThumbprints` — are declared in the schema so SDK
+  bindings generate, but the provider-side `Call` RPC is not
+  implemented yet. Calling them at runtime currently returns a
+  `not implemented` error; the wiring lands in a subsequent 2.x.
+
 ### Deferred to a subsequent 2.x release
 
+- Resource methods (`Call` RPC), per above.
 - `TeamEnvironmentPermission` — the v1 resource depended on endpoints
   that aren't present in the public OpenAPI spec. Returns when the
   endpoints are published.

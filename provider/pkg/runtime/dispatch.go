@@ -300,11 +300,31 @@ func (d *Dispatcher) Update(ctx context.Context, token, id string, olds, news re
 	if err != nil {
 		return nil, err
 	}
-	outputs, err := decodeReadBody(ops.Update, resp, res.Properties, news)
+	// Merge prior state with new inputs (news winning) so that any
+	// write-once secret outputs present in olds but absent from news and
+	// from the update response (e.g. an access-token value that was only
+	// surfaced by Create) are carried forward rather than silently
+	// dropped. ResponseToOutputs' secret-output fallback consults this
+	// merged map as its prior-state backfill.
+	priorState := mergePropertyMaps(olds, news)
+	outputs, err := decodeReadBody(ops.Update, resp, res.Properties, priorState)
 	if err != nil {
 		return nil, err
 	}
 	return outputs, nil
+}
+
+// mergePropertyMaps returns a new map containing every key from base plus
+// every key from overrides; overrides win on collision.
+func mergePropertyMaps(base, overrides resource.PropertyMap) resource.PropertyMap {
+	out := make(resource.PropertyMap, len(base)+len(overrides))
+	for k, v := range base {
+		out[k] = v
+	}
+	for k, v := range overrides {
+		out[k] = v
+	}
+	return out
 }
 
 // Delete runs the delete operation.
@@ -680,5 +700,66 @@ func translateSDKToWire(props map[string]CloudAPIProperty, sdkValues map[string]
 		out[k] = v
 	}
 	return out
+}
+
+// Invoke runs a data-source function (a read-only GET) and returns its
+// response as a Pulumi property map. Token must resolve to an entry in
+// Metadata.Functions; args map directly to the path/query parameters the
+// operation declares.
+//
+// No declarative checks or source-splitting happen here today — functions
+// are assumed to be simple GETs whose only inputs are path parameters.
+// Extend if and when the spec surfaces a function with a POST body or
+// non-trivial argument shapes.
+func (d *Dispatcher) Invoke(ctx context.Context, token string, args resource.PropertyMap) (resource.PropertyMap, error) {
+	fn, ok := d.Metadata.Functions[token]
+	if !ok {
+		return nil, fmt.Errorf("no metadata for function %q", token)
+	}
+	pathValues := map[string]string{}
+	for k, v := range args {
+		mv := v
+		if mv.IsSecret() {
+			mv = mv.SecretValue().Element
+		}
+		if mv.IsString() {
+			pathValues[string(k)] = mv.StringValue()
+		} else if mv.IsNumber() {
+			pathValues[string(k)] = fmt.Sprintf("%v", mv.NumberValue())
+		} else if mv.IsBool() {
+			pathValues[string(k)] = fmt.Sprintf("%v", mv.BoolValue())
+		}
+	}
+	path, err := ExpandPath(fn.Operation.PathTemplate, pathValues)
+	if err != nil {
+		return nil, fmt.Errorf("expanding function path: %w", err)
+	}
+	resp, err := d.Client.Call(ctx, Request{Method: fn.Operation.Method, Path: path})
+	if err != nil {
+		return nil, err
+	}
+	// Decode into a generic shape. We pass it through as the `result` of the
+	// invoke. Arrays get wrapped in { items: [...] } so the structpb encoder
+	// always receives an object at the top level.
+	var decoded interface{}
+	if err := json.Unmarshal(resp.Body, &decoded); err != nil {
+		return nil, fmt.Errorf("decoding function response: %w", err)
+	}
+	switch v := decoded.(type) {
+	case map[string]interface{}:
+		out := resource.PropertyMap{}
+		for k, val := range v {
+			out[resource.PropertyKey(k)] = resource.NewPropertyValue(val)
+		}
+		return out, nil
+	case []interface{}:
+		return resource.PropertyMap{
+			"items": resource.NewPropertyValue(v),
+		}, nil
+	default:
+		return resource.PropertyMap{
+			"result": resource.NewPropertyValue(decoded),
+		}, nil
+	}
 }
 

@@ -185,11 +185,41 @@ upgrade:
 
 - Your Pulumi Cloud resources themselves (agent pools, stacks,
   environments, teams, webhooks, tokens, …) are untouched.
-- Resource IDs keep their format and value. A v1 AgentPool with ID
-  `org/pool-name/pool-abc-123` is a v2 AgentPool with the same ID.
 - Access tokens' values don't rotate; webhooks don't re-register.
 - Stack outputs exported by other stacks referencing these resources
   remain valid.
+
+## Resources whose Pulumi ID format changed
+
+Most resources keep the same ID across v1 → v2 (e.g., a v1 `AgentPool`
+with ID `org/pool-name/pool-abc-123` is a v2 `AgentPool` with the same
+ID). Four resources, however, ship with a different ID composition in
+v2 — the `pulumi state rename --type-token` form below is not enough
+for these; you also need `--id` to tell Pulumi the new form:
+
+| Resource | v1 ID | v2 ID |
+|---|---|---|
+| `orgs/tokens:OrgAccessToken` | `{org}/{description}/{tokenId}` | `{org}/{tokenId}` |
+| `orgs/tokens:TeamAccessToken` | `{org}/{team}/{description}/{tokenId}` | `{org}/{team}/{tokenId}` |
+| `stacks/tags:Tags` | `{org}/{project}/{stack}/tags` | `{org}/{project}/{stack}` |
+| `changegates:ApprovalRule` | `{environment}/{org}/{project}/{env}/{ruleID}` | `{org}/{gateId}` |
+
+For each of these, rename the state entry with both the type token
+**and** the new ID. The old ID value is recoverable from the v1 state
+(`pulumi stack --show-ids`); take the tokenId/gateId sub-segment and
+compose the new form:
+
+```bash
+# Example: OrgAccessToken
+pulumi state rename \
+    --urn "urn:pulumi:prod::myproj::pulumiservice:index:OrgAccessToken::ci" \
+    --type-token pulumiservice:orgs/tokens:OrgAccessToken \
+    --id "acme-corp/tok-abc-123"
+```
+
+If you skip the `--id` flag on these four, the first `pulumi refresh`
+or `pulumi up` after the upgrade will fail to parse the ID against v2's
+template and report the resource as not found.
 
 ## What's new in v2
 

@@ -10,6 +10,7 @@ package runtime
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -317,6 +318,188 @@ func TestPrimitive_ReadViaExtractField_WholeMap(t *testing.T) {
 	tagsMap := outs["tags"].ObjectValue()
 	assert.Equal(t, "prod", tagsMap["env"].StringValue())
 	assert.Equal(t, "platform", tagsMap["team"].StringValue())
+}
+
+// ─── Write-once secret outputs persist across refresh ──────────────────
+
+// An access-token-style property: the Create response carries
+// tokenValue, but subsequent List (used as readVia) responses do not.
+// ResponseToOutputs must fall back to the prior state for secret
+// output properties so the secret doesn't silently vanish on refresh.
+func TestPrimitive_WriteOnceSecretOutput_PreservedFromPriorState(t *testing.T) {
+	props := map[string]CloudAPIProperty{
+		"description": {Source: "body"},
+		"tokenId":     {From: "id", Source: "response", Output: true},
+		"value":       {From: "tokenValue", Source: "response", Output: true, Secret: true},
+	}
+	// Server response (list entry) omits tokenValue — typical of list
+	// endpoints that don't re-surface secrets.
+	response := map[string]interface{}{
+		"id":          "tok-abc",
+		"description": "CI deploy token",
+	}
+	// Prior state — from the previous refresh/up — still carries the
+	// secret. This is what Pulumi passes as originalInputs on Read.
+	prior := resource.PropertyMap{
+		"description": resource.NewStringProperty("CI deploy token"),
+		"tokenId":     resource.NewStringProperty("tok-abc"),
+		"value":       resource.MakeSecret(resource.NewStringProperty("secret-xyz")),
+	}
+
+	out := ResponseToOutputs(props, response, prior)
+
+	require.Contains(t, out, resource.PropertyKey("value"))
+	require.True(t, out["value"].IsSecret(), "preserved value must remain secret-wrapped")
+	assert.Equal(t, "secret-xyz", out["value"].SecretValue().Element.StringValue())
+}
+
+// Stable-sort for complex object arrays: two arrays of the same objects
+// in different orders must sort to byte-identical results, even though
+// map iteration inside fmt.Sprintf is nondeterministic. Guards against
+// regressing from json.Marshal back to %v.
+func TestPrimitive_SortOnRead_StableForObjectsWithMapFields(t *testing.T) {
+	obj := func(a, b string) resource.PropertyValue {
+		return resource.NewObjectProperty(resource.PropertyMap{
+			"first":  resource.NewStringProperty(a),
+			"second": resource.NewStringProperty(b),
+		})
+	}
+	props := map[string]CloudAPIProperty{"policies": {SortOnRead: true}}
+	inputs1 := resource.PropertyMap{
+		"policies": resource.NewArrayProperty([]resource.PropertyValue{
+			obj("y", "1"), obj("a", "2"), obj("m", "3"),
+		}),
+	}
+	inputs2 := resource.PropertyMap{
+		"policies": resource.NewArrayProperty([]resource.PropertyValue{
+			obj("m", "3"), obj("y", "1"), obj("a", "2"),
+		}),
+	}
+
+	// Run the sort twice over the different-order inputs; expected
+	// canonical form is identical.
+	out1 := CanonicalizeSortedInputs(props, inputs1)
+	out2 := CanonicalizeSortedInputs(props, inputs2)
+
+	serialize := func(pm resource.PropertyMap) string {
+		arr := pm["policies"].ArrayValue()
+		keys := make([]string, len(arr))
+		for i, v := range arr {
+			keys[i] = v.ObjectValue()["first"].StringValue()
+		}
+		return fmt.Sprintf("%v", keys)
+	}
+	assert.Equal(t, serialize(out1), serialize(out2),
+		"equal object arrays in different input orders must produce the same canonical order")
+	assert.Equal(t, "[a m y]", serialize(out1))
+}
+
+// ─── sortOnRead canonicalizes inputs too (anti-drift) ───────────────────
+
+// User writes an array in arbitrary order; after Check, inputs are in
+// the same canonical order the server will sort to on Read, so diff
+// doesn't see spurious reordering.
+func TestPrimitive_SortOnRead_CanonicalizesInputs(t *testing.T) {
+	props := map[string]CloudAPIProperty{
+		"members": {SortOnRead: true},
+		"other":   {},
+	}
+	inputs := resource.PropertyMap{
+		"members": resource.NewArrayProperty([]resource.PropertyValue{
+			resource.NewStringProperty("zeta"),
+			resource.NewStringProperty("alpha"),
+			resource.NewStringProperty("mu"),
+		}),
+		"other": resource.NewStringProperty("unchanged"),
+	}
+
+	assert.True(t, HasSortOnRead(props))
+
+	out := CanonicalizeSortedInputs(props, inputs)
+	sorted := out["members"].ArrayValue()
+	require.Len(t, sorted, 3)
+	assert.Equal(t, "alpha", sorted[0].StringValue())
+	assert.Equal(t, "mu", sorted[1].StringValue())
+	assert.Equal(t, "zeta", sorted[2].StringValue())
+
+	// Non-sorted property untouched.
+	assert.Equal(t, "unchanged", out["other"].StringValue())
+}
+
+// Secrets wrapping a sorted array: sort occurs inside the secret wrap,
+// so the property remains secret after canonicalization.
+func TestPrimitive_SortOnRead_PreservesSecretWrap(t *testing.T) {
+	props := map[string]CloudAPIProperty{
+		"members": {SortOnRead: true, Secret: true},
+	}
+	inputs := resource.PropertyMap{
+		"members": resource.MakeSecret(resource.NewArrayProperty([]resource.PropertyValue{
+			resource.NewStringProperty("zeta"),
+			resource.NewStringProperty("alpha"),
+		})),
+	}
+
+	out := CanonicalizeSortedInputs(props, inputs)
+	require.True(t, out["members"].IsSecret())
+	inner := out["members"].SecretValue().Element.ArrayValue()
+	assert.Equal(t, "alpha", inner[0].StringValue())
+	assert.Equal(t, "zeta", inner[1].StringValue())
+}
+
+// ─── Invoke (data-source function) ──────────────────────────────────────
+
+func TestPrimitive_Invoke_ListResponseWrappedInItems(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/api/orgs/acme/agent-pools", r.URL.Path)
+		_, _ = w.Write([]byte(`[{"id":"pool-1"},{"id":"pool-2"}]`))
+	}))
+	defer srv.Close()
+
+	md := &CloudAPIMetadata{Functions: map[string]CloudAPIFunction{
+		"pulumiservice:orgs/agents:listAgentPools": {
+			Token: "pulumiservice:orgs/agents:listAgentPools",
+			Operation: CloudAPIOperation{
+				OperationID: "ListOrgAgentPool", Method: "GET",
+				PathTemplate: "/api/orgs/{orgName}/agent-pools",
+			},
+		},
+	}}
+	d := &Dispatcher{Client: NewClient(srv.URL, "tok"), Metadata: md}
+
+	out, err := d.Invoke(context.Background(), "pulumiservice:orgs/agents:listAgentPools",
+		resource.PropertyMap{"orgName": resource.NewStringProperty("acme")})
+	require.NoError(t, err)
+	require.Contains(t, out, resource.PropertyKey("items"))
+	items := out["items"].ArrayValue()
+	require.Len(t, items, 2)
+	assert.Equal(t, "pool-1", items[0].ObjectValue()["id"].StringValue())
+}
+
+func TestPrimitive_Invoke_ObjectResponsePassedThrough(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(`{"decision":"allow","reason":"trusted sub"}`))
+	}))
+	defer srv.Close()
+
+	md := &CloudAPIMetadata{Functions: map[string]CloudAPIFunction{
+		"pulumiservice:orgs/oidc:getAuthPolicy": {
+			Token: "pulumiservice:orgs/oidc:getAuthPolicy",
+			Operation: CloudAPIOperation{
+				OperationID: "GetAuthPolicy", Method: "GET",
+				PathTemplate: "/api/orgs/{orgName}/oidc/issuers/{issuerId}/policy",
+			},
+		},
+	}}
+	d := &Dispatcher{Client: NewClient(srv.URL, "tok"), Metadata: md}
+
+	out, err := d.Invoke(context.Background(), "pulumiservice:orgs/oidc:getAuthPolicy",
+		resource.PropertyMap{
+			"orgName":  resource.NewStringProperty("acme"),
+			"issuerId": resource.NewStringProperty("iss-1"),
+		})
+	require.NoError(t, err)
+	assert.Equal(t, "allow", out["decision"].StringValue())
+	assert.Equal(t, "trusted sub", out["reason"].StringValue())
 }
 
 // ─── postCreate (two-step create) ───────────────────────────────────────

@@ -17,6 +17,7 @@
 package runtime
 
 import (
+	"encoding/json"
 	"fmt"
 	"sort"
 
@@ -166,6 +167,20 @@ func ResponseToOutputs(props map[string]CloudAPIProperty, response map[string]in
 				continue
 			}
 		}
+
+		// Write-once secret outputs: the API returns the value on Create
+		// but not on subsequent reads (e.g. {Org,Team,AccessToken}.value
+		// issued by create/list endpoints that omit the token secret from
+		// list payloads). Without this fallback the secret silently
+		// disappears from state on the first refresh. `originalInputs` here
+		// is the prior full state passed to Read, so the value is present
+		// whenever it was ever written.
+		if !present && meta.Secret && meta.Output {
+			if v, ok := originalInputs[resource.PropertyKey(name)]; ok && !v.IsNull() {
+				out[resource.PropertyKey(name)] = v
+				continue
+			}
+		}
 		if !present {
 			continue
 		}
@@ -182,10 +197,58 @@ func ResponseToOutputs(props map[string]CloudAPIProperty, response map[string]in
 	return out
 }
 
+// HasSortOnRead reports whether any property in the map is marked
+// sortOnRead. Cheap probe for the provider's Check RPC to decide whether
+// it needs to unmarshal inputs at all.
+func HasSortOnRead(props map[string]CloudAPIProperty) bool {
+	for _, meta := range props {
+		if meta.SortOnRead {
+			return true
+		}
+	}
+	return false
+}
+
+// CanonicalizeSortedInputs sorts any input property marked sortOnRead,
+// using the same comparator ResponseToOutputs uses for the Read side.
+// Called from the provider's Check RPC so that user input (however they
+// wrote the array) and server response (however it returns the array)
+// end up in the same canonical order in state. Without this, a property
+// like OidcIssuer.policies that the server reorders produces a perpetual
+// diff — the bug originally fixed in pulumi-pulumiservice#542.
+func CanonicalizeSortedInputs(props map[string]CloudAPIProperty, inputs resource.PropertyMap) resource.PropertyMap {
+	out := make(resource.PropertyMap, len(inputs))
+	for k, v := range inputs {
+		meta, known := props[string(k)]
+		if !known || !meta.SortOnRead {
+			out[k] = v
+			continue
+		}
+		// Unwrap secret if needed, sort, re-wrap.
+		inner := v
+		wasSecret := false
+		if inner.IsSecret() {
+			wasSecret = true
+			inner = inner.SecretValue().Element
+		}
+		if inner.IsArray() {
+			inner = sortPropertyArray(inner)
+		}
+		if wasSecret {
+			inner = resource.MakeSecret(inner)
+		}
+		out[k] = inner
+	}
+	return out
+}
+
 // sortPropertyArray returns a new array property whose elements are sorted
-// by their string representation — enough determinism for simple member/tag
-// lists. Complex objects get sorted by their JSON-ish string form; this is
-// fine for drift-prevention even if not strictly "semantic" sorting.
+// by their canonical JSON representation. Using json.Marshal (which
+// sorts map keys alphabetically) — rather than fmt.Sprintf("%v", …) on
+// the Mappable() form — keeps sort keys stable across runs for complex
+// object elements; map iteration order would otherwise produce different
+// sort keys for the same logical object and re-introduce the drift the
+// sort is meant to prevent.
 func sortPropertyArray(arr resource.PropertyValue) resource.PropertyValue {
 	items := arr.ArrayValue()
 	type indexed struct {
@@ -194,7 +257,17 @@ func sortPropertyArray(arr resource.PropertyValue) resource.PropertyValue {
 	}
 	x := make([]indexed, 0, len(items))
 	for _, it := range items {
-		x = append(x, indexed{key: fmt.Sprintf("%v", it.Mappable()), val: it})
+		keyBytes, err := json.Marshal(it.Mappable())
+		var key string
+		if err != nil {
+			// Marshal should never fail on a Mappable()'d value, but if it
+			// ever does, fall back to %v; the sort is approximate rather
+			// than unstable.
+			key = fmt.Sprintf("%v", it.Mappable())
+		} else {
+			key = string(keyBytes)
+		}
+		x = append(x, indexed{key: key, val: it})
 	}
 	sort.Slice(x, func(i, j int) bool { return x[i].key < x[j].key })
 	sorted := make([]resource.PropertyValue, 0, len(items))

@@ -121,20 +121,25 @@ func (s *Server) Cancel(ctx context.Context, _ *pbempty.Empty) (*pbempty.Empty, 
 
 // Check validates + normalizes inputs. Declarative Checks (requireOneOf,
 // requireTogether, requireIf) from the resource's metadata are evaluated
-// here. Resources with no Checks block pass through unchanged.
+// here, and any property with `sortOnRead: true` is canonicalized into
+// its sorted form so subsequent diffs against the server's (also
+// canonicalized) response don't flag spurious ordering changes.
 func (s *Server) Check(ctx context.Context, req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
 	token := tokenFromURN(req.GetUrn())
-	if res, ok := s.metadata.Resources[token]; ok && len(res.Checks) > 0 {
-		news, err := propertiesFromStruct(req.GetNews())
-		if err != nil {
-			return nil, err
-		}
-		if failures := runtime.EvaluateChecks(&res, news); len(failures) > 0 {
-			return makeCheckResponse(news, failures)
-		}
+	res, found := s.metadata.Resources[token]
+	if !found {
+		return &pulumirpc.CheckResponse{Inputs: req.GetNews()}, nil
 	}
-	// Default: return inputs unchanged.
-	return &pulumirpc.CheckResponse{Inputs: req.GetNews()}, nil
+	if len(res.Checks) == 0 && !runtime.HasSortOnRead(res.Properties) {
+		return &pulumirpc.CheckResponse{Inputs: req.GetNews()}, nil
+	}
+	news, err := propertiesFromStruct(req.GetNews())
+	if err != nil {
+		return nil, err
+	}
+	news = runtime.CanonicalizeSortedInputs(res.Properties, news)
+	failures := runtime.EvaluateChecks(&res, news)
+	return makeCheckResponse(news, failures)
 }
 
 // Diff reports whether a change is needed and which properties require
@@ -214,6 +219,30 @@ func (s *Server) Delete(ctx context.Context, req *pulumirpc.DeleteRequest) (*pbe
 		return nil, err
 	}
 	return &pbempty.Empty{}, nil
+}
+
+// Invoke runs a data-source function. The tok identifies which
+// CloudAPIFunction in the metadata to call; args map to its path/query
+// parameters. Resource method calls (Call) are not yet implemented —
+// CloudAPIMethod entries are emitted into schema + metadata but the
+// Call RPC is deferred to a subsequent 2.x.
+func (s *Server) Invoke(ctx context.Context, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
+	if s.dispatcher == nil {
+		return nil, fmt.Errorf("provider not configured; Configure must precede Invoke")
+	}
+	args, err := propertiesFromStruct(req.GetArgs())
+	if err != nil {
+		return nil, err
+	}
+	out, err := s.dispatcher.Invoke(ctx, req.GetTok(), args)
+	if err != nil {
+		return nil, err
+	}
+	ret, err := propertiesToStruct(out)
+	if err != nil {
+		return nil, err
+	}
+	return &pulumirpc.InvokeResponse{Return: ret}, nil
 }
 
 // ─── Helpers ────────────────────────────────────────────────────────────
