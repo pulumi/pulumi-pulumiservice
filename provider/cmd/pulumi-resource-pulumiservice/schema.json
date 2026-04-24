@@ -2668,7 +2668,7 @@
       ]
     },
     "pulumiservice:index:TeamRoleAssignment": {
-      "description": "Assigns a custom (fine-grained) role to a Pulumi Cloud team. The Pulumi Cloud API currently supports one role per team; creating a second assignment replaces the first. Automatically enables the team's custom-roles feature on first use.",
+      "description": "Assigns a custom (fine-grained) role to a Pulumi Cloud team. The Pulumi Cloud API currently supports one role per team; creating a second assignment replaces the first. The team's organization must already have the custom-roles feature enabled.",
       "properties": {
         "organizationName": {
           "type": "string",
@@ -3038,6 +3038,44 @@
     }
   },
   "functions": {
+    "pulumiservice:index:getCurrentUser": {
+      "description": "Returns the Pulumi Cloud user that the provider's access token belongs to. Useful for seeding a newly-created `Team` with the creator as a member, since Pulumi Cloud auto-adds the creator and omitting them causes a refresh drift.",
+      "inputs": {
+        "type": "object"
+      },
+      "outputs": {
+        "properties": {
+          "avatarUrl": {
+            "description": "URL of the user's avatar image.",
+            "type": "string"
+          },
+          "email": {
+            "description": "The user's email address.",
+            "type": "string"
+          },
+          "githubLogin": {
+            "description": "The user's GitHub login.",
+            "type": "string"
+          },
+          "name": {
+            "description": "The user's display name.",
+            "type": "string"
+          },
+          "username": {
+            "description": "The user's Pulumi Cloud username (same as `githubLogin`).",
+            "type": "string"
+          }
+        },
+        "required": [
+          "username",
+          "githubLogin",
+          "name",
+          "email",
+          "avatarUrl"
+        ],
+        "type": "object"
+      }
+    },
     "pulumiservice:index:getInsightsAccount": {
       "description": "Get details about a specific Insights account.",
       "inputs": {

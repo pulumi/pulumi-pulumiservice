@@ -50,6 +50,11 @@ export type EnvironmentVersionTag = import("./environmentVersionTag").Environmen
 export const EnvironmentVersionTag: typeof import("./environmentVersionTag").EnvironmentVersionTag = null as any;
 utilities.lazyLoad(exports, ["EnvironmentVersionTag"], () => require("./environmentVersionTag"));
 
+export { GetCurrentUserArgs, GetCurrentUserResult } from "./getCurrentUser";
+export const getCurrentUser: typeof import("./getCurrentUser").getCurrentUser = null as any;
+export const getCurrentUserOutput: typeof import("./getCurrentUser").getCurrentUserOutput = null as any;
+utilities.lazyLoad(exports, ["getCurrentUser","getCurrentUserOutput"], () => require("./getCurrentUser"));
+
 export { GetInsightsAccountArgs, GetInsightsAccountResult, GetInsightsAccountOutputArgs } from "./getInsightsAccount";
 export const getInsightsAccount: typeof import("./getInsightsAccount").getInsightsAccount = null as any;
 export const getInsightsAccountOutput: typeof import("./getInsightsAccount").getInsightsAccountOutput = null as any;

@@ -22,7 +22,9 @@ resources:
         permissions:
           - stack:read
 
-  # A team that will receive the custom role.
+  # A team that will receive the custom role. Pulumi Cloud adds the team
+  # creator as the first member automatically, so we declare them here to
+  # keep refresh from detecting that as drift.
   rbacTeam:
     type: pulumiservice:Team
     properties:
@@ -31,7 +33,8 @@ resources:
       teamType: pulumi
       displayName: yaml-rbac team (${digits})
       description: Team created by the yaml-rbac example.
-      members: []
+      members:
+        - ${currentUser.username}
 
   # Assign the custom role to the team. The team's organization must have
   # the custom-roles feature enabled.
@@ -55,6 +58,11 @@ resources:
       roleId: ${readOnlyRole.roleId}
 
 variables:
+  # Data source: the authenticated Pulumi Cloud user (the stack's operator).
+  # Used to seed the new Team's member list below.
+  currentUser:
+    fn::invoke:
+      function: pulumiservice:getCurrentUser
   # Data source: list every member of the organization.
   currentMembers:
     fn::invoke:

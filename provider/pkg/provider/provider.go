@@ -98,6 +98,7 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 			infer.Resource(&resources.TeamRoleAssignment{}),
 		).
 		WithFunctions(
+			infer.Function(&functions.GetCurrentUserFunction{}),
 			infer.Function(&functions.GetInsightsAccountsFunction{}),
 			infer.Function(&functions.GetInsightsAccountFunction{}),
 			infer.Function(&functions.GetOrganizationMemberFunction{}),

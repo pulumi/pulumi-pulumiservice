@@ -9,6 +9,8 @@ import com.pulumi.deployment.Deployment;
 import com.pulumi.deployment.InvokeOptions;
 import com.pulumi.deployment.InvokeOutputOptions;
 import com.pulumi.pulumiservice.Utilities;
+import com.pulumi.pulumiservice.inputs.GetCurrentUserArgs;
+import com.pulumi.pulumiservice.inputs.GetCurrentUserPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetInsightsAccountArgs;
 import com.pulumi.pulumiservice.inputs.GetInsightsAccountPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetInsightsAccountsArgs;
@@ -23,6 +25,7 @@ import com.pulumi.pulumiservice.inputs.GetPolicyPackArgs;
 import com.pulumi.pulumiservice.inputs.GetPolicyPackPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetPolicyPacksArgs;
 import com.pulumi.pulumiservice.inputs.GetPolicyPacksPlainArgs;
+import com.pulumi.pulumiservice.outputs.GetCurrentUserResult;
 import com.pulumi.pulumiservice.outputs.GetInsightsAccountResult;
 import com.pulumi.pulumiservice.outputs.GetInsightsAccountsResult;
 import com.pulumi.pulumiservice.outputs.GetOrganizationMemberResult;
@@ -33,6 +36,55 @@ import com.pulumi.pulumiservice.outputs.GetPolicyPacksResult;
 import java.util.concurrent.CompletableFuture;
 
 public final class PulumiserviceFunctions {
+    /**
+     * Returns the Pulumi Cloud user that the provider&#39;s access token belongs to. Useful for seeding a newly-created `Team` with the creator as a member, since Pulumi Cloud auto-adds the creator and omitting them causes a refresh drift.
+     * 
+     */
+    public static Output<GetCurrentUserResult> getCurrentUser() {
+        return getCurrentUser(GetCurrentUserArgs.Empty, InvokeOptions.Empty);
+    }
+    /**
+     * Returns the Pulumi Cloud user that the provider&#39;s access token belongs to. Useful for seeding a newly-created `Team` with the creator as a member, since Pulumi Cloud auto-adds the creator and omitting them causes a refresh drift.
+     * 
+     */
+    public static CompletableFuture<GetCurrentUserResult> getCurrentUserPlain() {
+        return getCurrentUserPlain(GetCurrentUserPlainArgs.Empty, InvokeOptions.Empty);
+    }
+    /**
+     * Returns the Pulumi Cloud user that the provider&#39;s access token belongs to. Useful for seeding a newly-created `Team` with the creator as a member, since Pulumi Cloud auto-adds the creator and omitting them causes a refresh drift.
+     * 
+     */
+    public static Output<GetCurrentUserResult> getCurrentUser(GetCurrentUserArgs args) {
+        return getCurrentUser(args, InvokeOptions.Empty);
+    }
+    /**
+     * Returns the Pulumi Cloud user that the provider&#39;s access token belongs to. Useful for seeding a newly-created `Team` with the creator as a member, since Pulumi Cloud auto-adds the creator and omitting them causes a refresh drift.
+     * 
+     */
+    public static CompletableFuture<GetCurrentUserResult> getCurrentUserPlain(GetCurrentUserPlainArgs args) {
+        return getCurrentUserPlain(args, InvokeOptions.Empty);
+    }
+    /**
+     * Returns the Pulumi Cloud user that the provider&#39;s access token belongs to. Useful for seeding a newly-created `Team` with the creator as a member, since Pulumi Cloud auto-adds the creator and omitting them causes a refresh drift.
+     * 
+     */
+    public static Output<GetCurrentUserResult> getCurrentUser(GetCurrentUserArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getCurrentUser", TypeShape.of(GetCurrentUserResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Returns the Pulumi Cloud user that the provider&#39;s access token belongs to. Useful for seeding a newly-created `Team` with the creator as a member, since Pulumi Cloud auto-adds the creator and omitting them causes a refresh drift.
+     * 
+     */
+    public static Output<GetCurrentUserResult> getCurrentUser(GetCurrentUserArgs args, InvokeOutputOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getCurrentUser", TypeShape.of(GetCurrentUserResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Returns the Pulumi Cloud user that the provider&#39;s access token belongs to. Useful for seeding a newly-created `Team` with the creator as a member, since Pulumi Cloud auto-adds the creator and omitting them causes a refresh drift.
+     * 
+     */
+    public static CompletableFuture<GetCurrentUserResult> getCurrentUserPlain(GetCurrentUserPlainArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invokeAsync("pulumiservice:index:getCurrentUser", TypeShape.of(GetCurrentUserResult.class), args, Utilities.withVersion(options));
+    }
     /**
      * Get details about a specific Insights account.
      * 

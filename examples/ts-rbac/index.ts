@@ -17,7 +17,10 @@ const readOnlyRole = new service.OrganizationRole("readOnlyRole", {
     },
 });
 
-// A team that will receive the custom role.
+// A team that will receive the custom role. Pulumi Cloud adds the team
+// creator as the first member automatically, so we seed `members` with the
+// current user to keep refresh from detecting that as drift.
+const currentUser = service.getCurrentUserOutput();
 const teamName = `ts-rbac-team-${nameSuffix}`;
 const rbacTeam = new service.Team("rbacTeam", {
     organizationName,
@@ -25,7 +28,7 @@ const rbacTeam = new service.Team("rbacTeam", {
     teamType: "pulumi",
     displayName: `ts-rbac team (${nameSuffix})`,
     description: "Team created by the ts-rbac example.",
-    members: [],
+    members: [currentUser.username],
 });
 
 // Assign the custom role to the team. The team's organization must have

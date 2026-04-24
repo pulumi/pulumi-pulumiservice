@@ -56,6 +56,7 @@ type Client interface {
 	pulumiapi.StackTagClient
 	pulumiapi.TeamClient
 	pulumiapi.TeamRoleClient
+	pulumiapi.UserClient
 	pulumiapi.WebhookClient
 }
 

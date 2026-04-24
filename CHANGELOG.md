@@ -11,9 +11,10 @@
 - Documented the `all` enforcement-level wildcard on `PolicyGroupPolicyPackReference.config`, enabling a single entry to set the enforcement level for every policy in a pack with optional per-policy overrides. [#756](https://github.com/pulumi/pulumi-pulumiservice/pull/756)
 - Added `OrganizationMember` resource for managing a user's membership in an organization and their assigned role (built-in or custom).
 - Added `OrganizationRole` resource for defining custom fine-grained roles on an organization.
-- Added `TeamRoleAssignment` resource for assigning a custom role to a team, with automatic enablement of the team custom-roles feature on first use.
+- Added `TeamRoleAssignment` resource for assigning a custom role to a team. Requires the organization to already have the custom-roles feature enabled.
 - Added `getOrganizationMembers` data source for listing every member of a Pulumi Cloud organization and their assigned roles.
-- Added `getOrganizationMember` data source for looking up a single organization member by username or email (case-insensitive). [#41668](https://github.com/pulumi/pulumi-service/issues/41668)
+- Added `getOrganizationMember` data source for looking up a single organization member by username. [#41668](https://github.com/pulumi/pulumi-service/issues/41668)
+- Added `getCurrentUser` data source returning the Pulumi Cloud user the configured access token belongs to. Useful for seeding a newly-created `Team` with the creator (whom Pulumi Cloud auto-adds) so refresh doesn't detect drift.
 
 ### Bug Fixes
 - Fixed TeamEnvironmentPermission spurious replacement on upgrade from 0.29.2 caused by the optional `maxOpenDuration` field being serialized as an empty string in Check and Read [#751](https://github.com/pulumi/pulumi-pulumiservice/issues/751)
