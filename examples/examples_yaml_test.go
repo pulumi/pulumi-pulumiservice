@@ -503,6 +503,7 @@ func TestYamlInsightsAccountExample(t *testing.T) {
 		filepath.Join(getCwd(t), "yaml-insights-account"),
 		inMemoryProvider(),
 		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
 	)
 	test.SetConfig(t, "digits", generateRandomFiveDigits())
 	test.SetConfig(t, "organizationName", getOrgName())
@@ -531,6 +532,7 @@ func TestYamlRbacExample(t *testing.T) {
 		filepath.Join(getCwd(t), "yaml-rbac"),
 		inMemoryProvider(),
 		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
 	)
 	test.SetConfig(t, "digits", generateRandomFiveDigits())
 	test.SetConfig(t, "organizationName", orgName)

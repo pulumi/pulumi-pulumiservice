@@ -20,6 +20,7 @@ func TestAccessTokenExample(t *testing.T) {
 		inMemoryProvider(),
 		opttest.UseAmbientBackend(),
 		opttest.YarnLink("@pulumi/pulumiservice"),
+		opttest.StackName(randomStackName()),
 	)
 	runPulumiTest(t, test)
 }
@@ -30,6 +31,7 @@ func TestStackTagsExample(t *testing.T) {
 		inMemoryProvider(),
 		opttest.UseAmbientBackend(),
 		opttest.YarnLink("@pulumi/pulumiservice"),
+		opttest.StackName(randomStackName()),
 	)
 	runPulumiTest(t, test)
 }
@@ -40,6 +42,7 @@ func TestDeploymentSettingsExample(t *testing.T) {
 		inMemoryProvider(),
 		opttest.UseAmbientBackend(),
 		opttest.YarnLink("@pulumi/pulumiservice"),
+		opttest.StackName(randomStackName()),
 	)
 	test.SetConfig(t, "my_secret", "my_secret_value")
 	test.SetConfig(t, "password", "my_password")
@@ -52,6 +55,7 @@ func TestTeamStackPermissionsExample(t *testing.T) {
 		inMemoryProvider(),
 		opttest.UseAmbientBackend(),
 		opttest.YarnLink("@pulumi/pulumiservice"),
+		opttest.StackName(randomStackName()),
 	)
 	test.SetConfig(t, "digits", generateRandomFiveDigits())
 	runPulumiTest(t, test)
@@ -63,6 +67,7 @@ func TestTeamsExample(t *testing.T) {
 		inMemoryProvider(),
 		opttest.UseAmbientBackend(),
 		opttest.YarnLink("@pulumi/pulumiservice"),
+		opttest.StackName(randomStackName()),
 	)
 	runPulumiTest(t, test)
 }
@@ -73,21 +78,21 @@ func TestNodejsWebhookExample(t *testing.T) {
 		inMemoryProvider(),
 		opttest.UseAmbientBackend(),
 		opttest.YarnLink("@pulumi/pulumiservice"),
+		opttest.StackName(randomStackName()),
 	)
 	test.SetConfig(t, "digits", generateRandomFiveDigits())
 	runPulumiTest(t, test)
 }
 
 func TestNodejsSchedulesExample(t *testing.T) {
-	digits := generateRandomFiveDigits()
 	test := pulumitest.NewPulumiTest(t,
 		filepath.Join(getCwd(t), "ts-schedules"),
 		inMemoryProvider(),
 		opttest.UseAmbientBackend(),
 		opttest.YarnLink("@pulumi/pulumiservice"),
-		opttest.StackName("test-stack-"+digits),
+		opttest.StackName(randomStackName()),
 	)
-	test.SetConfig(t, "digits", digits)
+	test.SetConfig(t, "digits", generateRandomFiveDigits())
 	runPulumiTest(t, test)
 }
 
@@ -97,6 +102,7 @@ func TestNodejsEnvironmentsExample(t *testing.T) {
 		inMemoryProvider(),
 		opttest.UseAmbientBackend(),
 		opttest.YarnLink("@pulumi/pulumiservice"),
+		opttest.StackName(randomStackName()),
 	)
 	test.SetConfig(t, "digits", generateRandomFiveDigits())
 
@@ -120,6 +126,7 @@ func TestNodejsTemplateSourcesExample(t *testing.T) {
 		inMemoryProvider(),
 		opttest.UseAmbientBackend(),
 		opttest.YarnLink("@pulumi/pulumiservice"),
+		opttest.StackName(randomStackName()),
 	)
 	test.SetConfig(t, "digits", generateRandomFiveDigits())
 	runPulumiTest(t, test)
@@ -131,6 +138,7 @@ func TestNodejsEnvironmentsFileAssetExample(t *testing.T) {
 		inMemoryProvider(),
 		opttest.UseAmbientBackend(),
 		opttest.YarnLink("@pulumi/pulumiservice"),
+		opttest.StackName(randomStackName()),
 	)
 	test.SetConfig(t, "digits", generateRandomFiveDigits())
 	runPulumiTest(t, test)
@@ -142,6 +150,7 @@ func TestNodejsOidcIssuerExample(t *testing.T) {
 		inMemoryProvider(),
 		opttest.UseAmbientBackend(),
 		opttest.YarnLink("@pulumi/pulumiservice"),
+		opttest.StackName(randomStackName()),
 	)
 	runPulumiTest(t, test)
 }
@@ -152,6 +161,7 @@ func TestNodejsApprovalRulesExample(t *testing.T) {
 		inMemoryProvider(),
 		opttest.UseAmbientBackend(),
 		opttest.YarnLink("@pulumi/pulumiservice"),
+		opttest.StackName(randomStackName()),
 	)
 	test.SetConfig(t, "digits", generateRandomFiveDigits())
 	runPulumiTest(t, test)
@@ -164,6 +174,7 @@ func TestNodejsInsightsAccountInvokesExample(t *testing.T) {
 		inMemoryProvider(),
 		opttest.UseAmbientBackend(),
 		opttest.YarnLink("@pulumi/pulumiservice"),
+		opttest.StackName(randomStackName()),
 	)
 	test.SetConfig(t, "digits", digits)
 	test.SetConfig(t, "organizationName", getOrgName())

@@ -9,6 +9,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/uuid"
+
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
@@ -22,6 +24,16 @@ func getCwd(t *testing.T) string {
 
 func generateRandomFiveDigits() string {
 	return fmt.Sprintf("%05d", rand.Intn(100000)) //nolint:gosec // For testing.
+}
+
+// randomStackName returns a per-test-call stack name with enough entropy
+// to avoid collisions across CI shards, parallel PR runs, and previous
+// runs that left orphaned stacks behind. Use it via opttest.StackName so
+// every pulumitest invocation gets a distinct stack name; otherwise
+// pulumitest defaults to "test" and concurrent runs hit "stack already
+// exists" on init.
+func randomStackName() string {
+	return "test-" + uuid.NewString()[:8]
 }
 
 // getOrgName returns the organization name from PULUMI_TEST_OWNER env var,
