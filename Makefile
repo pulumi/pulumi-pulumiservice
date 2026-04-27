@@ -229,7 +229,7 @@ lint.fix: upstream
 	exit $$LINT_EXIT
 
 .PHONY: lint lint.fix
-build_provider_cmd = cd provider && GOOS=$(1) GOARCH=$(2) CGO_ENABLED=0 go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o "$(3)" -ldflags "$(LDFLAGS)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER)
+build_provider_cmd = cd provider && GOOS=$(1) GOARCH=$(2) CGO_ENABLED=0 go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) $(PROVIDER_BUILD_FLAGS) -o "$(3)" -ldflags "$(LDFLAGS)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER)
 
 provider: bin/$(PROVIDER)
 
@@ -295,7 +295,7 @@ upstream: .make/upstream
 # - Run make ci-mgmt to apply the change locally.
 #
 ci-mgmt: .ci-mgmt.yaml
-	go run github.com/pulumi/ci-mgmt/provider-ci@fdf6aa0d472d334cbfe7efb9f770586438bcfce2 generate
+	go run github.com/pulumi/ci-mgmt/provider-ci@54cf635e6f393350b06b7d3ab10ba71dbfa95b4f generate
 .PHONY: ci-mgmt
 
 # Start debug server for tfgen
