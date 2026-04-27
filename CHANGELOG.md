@@ -15,6 +15,7 @@
 - Added `getOrganizationMembers` data source for listing every member of a Pulumi Cloud organization and their assigned roles.
 - Added `getOrganizationMember` data source for looking up a single organization member by username. [#41668](https://github.com/pulumi/pulumi-service/issues/41668)
 - Added `getCurrentUser` data source returning the Pulumi Cloud user the configured access token belongs to. Useful for seeding a newly-created `Team` with the creator (whom Pulumi Cloud auto-adds) so refresh doesn't detect drift.
+- Added `getEnvironmentScopedPermissions`, `getStackScopedPermissions`, and `getInsightsAccountScopedPermissions` helper data sources that build an `OrganizationRole.permissions` descriptor for a single entity and a set of scopes, so callers no longer need to hand-roll the underlying `PermissionDescriptorGroup` / `PermissionDescriptorCondition` / `PermissionLiteralExpression*` JSON.
 
 ### Bug Fixes
 - Fixed TeamEnvironmentPermission spurious replacement on upgrade from 0.29.2 caused by the optional `maxOpenDuration` field being serialized as an empty string in Check and Read [#751](https://github.com/pulumi/pulumi-pulumiservice/issues/751)
@@ -24,6 +25,7 @@
 - `OrganizationMember.Update` and `OrganizationMember.Read` now preserve the `adopted` flag from prior state. Previously, either operation rebuilt state from the server (which does not expose adoption) and silently cleared `adopted`, causing a subsequent `pulumi destroy` to fall through the non-adopted branch and remove the user from the organization.
 - `OrganizationMember.Read` now resolves the server's `fgaRole` reference against the org's role catalogue to determine whether it is a built-in or custom role. Previously the lookup compared the role's display name (e.g. `Admin`) against the built-in slug list (`admin`, `member`, `billing-manager`); the case mismatch meant any refresh of a member assigned a built-in role reported spurious `+roleId -role` drift.
 - Added `getOrganizationRoleScopes` data source for discovering the permission scope names available for use in `OrganizationRole.permissions`.
+- `OrganizationRole.Check` no longer rejects `name` or `permissions` when they arrive as unknown/computed at preview. Wiring `permissions` to another resource's output (e.g. `Environment.environmentId` via `getEnvironmentScopedPermissionsOutput`) previously failed every fresh `pulumi preview` because the typed Go field decoded to its zero value and tripped the empty check. Pulumi guarantees concrete values by Create-time, so the empty checks now run only when the input is concrete.
 
 ## 0.36.0
 

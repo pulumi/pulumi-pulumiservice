@@ -33,6 +33,7 @@ class DeploymentSettingsArgs:
                  vcs: Optional[pulumi.Input['DeploymentSettingsVcsArgs']] = None):
         """
         The set of arguments for constructing a DeploymentSettings resource.
+
         :param pulumi.Input[_builtins.str] organization: Organization name.
         :param pulumi.Input[_builtins.str] project: Project name.
         :param pulumi.Input[_builtins.str] stack: Stack name.
@@ -215,6 +216,7 @@ class DeploymentSettings(pulumi.CustomResource):
          $ pulumi import pulumiservice:index:DeploymentSettings my_settings my-org/my-project/my-stack
         ```
 
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] agent_pool_id: The agent pool identifier to use for the deployment.
@@ -244,6 +246,7 @@ class DeploymentSettings(pulumi.CustomResource):
         ```sh
          $ pulumi import pulumiservice:index:DeploymentSettings my_settings my-org/my-project/my-stack
         ```
+
 
         :param str resource_name: The name of the resource.
         :param DeploymentSettingsArgs args: The arguments to use to populate this resource's properties.

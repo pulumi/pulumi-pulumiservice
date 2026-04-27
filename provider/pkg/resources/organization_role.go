@@ -22,6 +22,7 @@ import (
 
 	p "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi-go-provider/infer"
+	"github.com/pulumi/pulumi/sdk/v3/go/property"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
@@ -72,7 +73,10 @@ func (c *OrganizationRoleCore) Annotate(a infer.Annotator) {
 		&c.Permissions,
 		"The role's permission descriptor tree — passed to the service verbatim. This is the `details` "+
 			"field of a Pulumi Cloud PermissionDescriptor: an object with a `__type` discriminator (e.g. "+
-			"`PermissionDescriptorAllow`, `PermissionDescriptorCompose`) describing which scopes are granted.",
+			"`PermissionDescriptorAllow`, `PermissionDescriptorCompose`) describing which scopes are granted. "+
+			"For per-entity scoping, prefer the `getEnvironmentScopedPermissions`, `getStackScopedPermissions`, "+
+			"and `getInsightsAccountScopedPermissions` helpers, which build the underlying "+
+			"`PermissionDescriptorGroup` / `PermissionDescriptorCondition` tree for you.",
 	)
 }
 
@@ -99,16 +103,32 @@ func (*OrganizationRole) Check(
 	if err != nil {
 		return infer.CheckResponse[OrganizationRoleInput]{}, err
 	}
-	if in.Name == "" {
+	// Skip emptiness checks when the raw input arrived as unknown/computed
+	// (e.g. `permissions: someResource.environmentId.apply(...)` or the
+	// `_output` variant of `getEnvironmentScopedPermissions`). At preview
+	// the typed Go field decodes to its zero value, which would otherwise
+	// trip the empty checks. Pulumi guarantees these inputs are concrete
+	// by the time Create/Update runs, so the same checks belong there.
+	if !isUnknownInput(req.NewInputs, "name") && in.Name == "" {
 		failures = append(failures, p.CheckFailure{Property: "name", Reason: "name must not be empty"})
 	}
-	if len(in.Permissions) == 0 {
+	if !isUnknownInput(req.NewInputs, "permissions") && len(in.Permissions) == 0 {
 		failures = append(failures, p.CheckFailure{
 			Property: "permissions",
 			Reason:   "permissions must not be empty — supply a PermissionDescriptor tree",
 		})
 	}
 	return infer.CheckResponse[OrganizationRoleInput]{Inputs: in, Failures: failures}, nil
+}
+
+// isUnknownInput reports whether the value at key is present in the input map
+// but not yet known. Pulumi's newer property.Value normalises Output-typed
+// inputs that are still pending into the Computed form, so a single
+// IsComputed check covers both `someResource.x.apply(...)` and the `_output`
+// variant of a data-source helper.
+func isUnknownInput(m property.Map, key string) bool {
+	v, ok := m.GetOk(key)
+	return ok && v.IsComputed()
 }
 
 func (*OrganizationRole) Create(

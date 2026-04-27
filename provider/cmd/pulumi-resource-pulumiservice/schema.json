@@ -2104,7 +2104,7 @@
           "additionalProperties": {
             "$ref": "pulumi.json#/Any"
           },
-          "description": "The role's permission descriptor tree — passed to the service verbatim. This is the `details` field of a Pulumi Cloud PermissionDescriptor: an object with a `__type` discriminator (e.g. `PermissionDescriptorAllow`, `PermissionDescriptorCompose`) describing which scopes are granted."
+          "description": "The role's permission descriptor tree — passed to the service verbatim. This is the `details` field of a Pulumi Cloud PermissionDescriptor: an object with a `__type` discriminator (e.g. `PermissionDescriptorAllow`, `PermissionDescriptorCompose`) describing which scopes are granted. For per-entity scoping, prefer the `getEnvironmentScopedPermissions`, `getStackScopedPermissions`, and `getInsightsAccountScopedPermissions` helpers, which build the underlying `PermissionDescriptorGroup` / `PermissionDescriptorCondition` tree for you."
         },
         "resourceType": {
           "type": "string",
@@ -2145,7 +2145,7 @@
           "additionalProperties": {
             "$ref": "pulumi.json#/Any"
           },
-          "description": "The role's permission descriptor tree — passed to the service verbatim. This is the `details` field of a Pulumi Cloud PermissionDescriptor: an object with a `__type` discriminator (e.g. `PermissionDescriptorAllow`, `PermissionDescriptorCompose`) describing which scopes are granted."
+          "description": "The role's permission descriptor tree — passed to the service verbatim. This is the `details` field of a Pulumi Cloud PermissionDescriptor: an object with a `__type` discriminator (e.g. `PermissionDescriptorAllow`, `PermissionDescriptorCompose`) describing which scopes are granted. For per-entity scoping, prefer the `getEnvironmentScopedPermissions`, `getStackScopedPermissions`, and `getInsightsAccountScopedPermissions` helpers, which build the underlying `PermissionDescriptorGroup` / `PermissionDescriptorCondition` tree for you."
         },
         "resourceType": {
           "type": "string",
@@ -3098,6 +3098,44 @@
         "type": "object"
       }
     },
+    "pulumiservice:index:getEnvironmentScopedPermissions": {
+      "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the underlying `PermissionDescriptorGroup` / `PermissionDescriptorCondition` / `PermissionLiteralExpressionEnvironment` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.",
+      "inputs": {
+        "properties": {
+          "environmentId": {
+            "type": "string",
+            "description": "The target environment's UUID. Use the `environmentId` output of an `Environment` resource or the `getEnvironment` data source."
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The set of `environment:*` scopes to grant on the target environment (e.g. `environment:read`, `environment:open`, `environment:update`). Discover valid scope names via the `getOrganizationRoleScopes` data source."
+          }
+        },
+        "type": "object",
+        "required": [
+          "environmentId",
+          "permissions"
+        ]
+      },
+      "outputs": {
+        "properties": {
+          "permissions": {
+            "additionalProperties": {
+              "$ref": "pulumi.json#/Any"
+            },
+            "description": "A `PermissionDescriptor` tree ready to assign to `OrganizationRole.permissions`.",
+            "type": "object"
+          }
+        },
+        "required": [
+          "permissions"
+        ],
+        "type": "object"
+      }
+    },
     "pulumiservice:index:getInsightsAccount": {
       "description": "Get details about a specific Insights account.",
       "inputs": {
@@ -3172,6 +3210,44 @@
           "scanSchedule",
           "insightsAccountId",
           "scheduledScanEnabled"
+        ],
+        "type": "object"
+      }
+    },
+    "pulumiservice:index:getInsightsAccountScopedPermissions": {
+      "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `PermissionLiteralExpressionInsightsAccount` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.",
+      "inputs": {
+        "properties": {
+          "insightsAccountId": {
+            "type": "string",
+            "description": "The target insights account's identifier. Use the `insightsAccountId` output of an `InsightsAccount` resource or the `getInsightsAccount` data source."
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The set of `insights-account:*` scopes to grant on the target account. Discover valid scope names via the `getOrganizationRoleScopes` data source."
+          }
+        },
+        "type": "object",
+        "required": [
+          "insightsAccountId",
+          "permissions"
+        ]
+      },
+      "outputs": {
+        "properties": {
+          "permissions": {
+            "additionalProperties": {
+              "$ref": "pulumi.json#/Any"
+            },
+            "description": "A `PermissionDescriptor` tree ready to assign to `OrganizationRole.permissions`.",
+            "type": "object"
+          }
+        },
+        "required": [
+          "permissions"
         ],
         "type": "object"
       }
@@ -3399,6 +3475,44 @@
         "required": [
           "policyPacks"
         ]
+      }
+    },
+    "pulumiservice:index:getStackScopedPermissions": {
+      "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple — and is what `PermissionLiteralExpressionStack` expects. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.",
+      "inputs": {
+        "properties": {
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The set of `stack:*` scopes to grant on the target stack (e.g. `stack:read`, `stack:edit`, `stack:admin`). Discover valid scope names via the `getOrganizationRoleScopes` data source."
+          },
+          "stackId": {
+            "type": "string",
+            "description": "The target stack's opaque Pulumi Cloud identifier (not the `organization/project/stack` triple)."
+          }
+        },
+        "type": "object",
+        "required": [
+          "stackId",
+          "permissions"
+        ]
+      },
+      "outputs": {
+        "properties": {
+          "permissions": {
+            "additionalProperties": {
+              "$ref": "pulumi.json#/Any"
+            },
+            "description": "A `PermissionDescriptor` tree ready to assign to `OrganizationRole.permissions`.",
+            "type": "object"
+          }
+        },
+        "required": [
+          "permissions"
+        ],
+        "type": "object"
       }
     }
   }

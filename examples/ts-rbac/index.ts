@@ -65,30 +65,21 @@ const scopedEnv = new service.Environment("scopedEnv", {
 // specific env created above. Anywhere else in the org, the role grants
 // nothing. The role definition is org-scoped (resourceType defaults to
 // "global"); the permission tree is gated on the environment's UUID.
+//
+// `getEnvironmentScopedPermissions` builds the underlying
+// PermissionDescriptorGroup → PermissionDescriptorCondition →
+// PermissionLiteralExpressionEnvironment JSON so we don't have to.
 const scopedReadOnlyRole = new service.OrganizationRole("scopedReadOnlyRole", {
     organizationName,
     name: `ts-rbac-scoped-read-only-${nameSuffix}`,
     description: "Read+open access scoped to a single ESC environment.",
-    permissions: scopedEnv.environmentId.apply(envId => ({
-        __type: "PermissionDescriptorGroup",
-        entries: [
-            {
-                __type: "PermissionDescriptorCondition",
-                condition: {
-                    __type: "PermissionExpressionEqual",
-                    left: { __type: "PermissionExpressionEnvironment" },
-                    right: {
-                        __type: "PermissionLiteralExpressionEnvironment",
-                        identity: envId,
-                    },
-                },
-                subNode: {
-                    __type: "PermissionDescriptorAllow",
-                    permissions: ["environment:read", "environment:open"],
-                },
-            },
-        ],
-    })),
+    permissions: service.getEnvironmentScopedPermissionsOutput({
+        // `environmentId` is typed as optional in the SDK for backwards
+        // compatibility with legacy state that predates the field; for any
+        // env created today the service always populates it.
+        environmentId: scopedEnv.environmentId.apply(id => id!),
+        permissions: ["environment:read", "environment:open"],
+    }).permissions,
 });
 
 // Data source: list every member of the organization.

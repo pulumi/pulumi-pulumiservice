@@ -204,4 +204,42 @@ func TestOrganizationRoleCheck(t *testing.T) {
 		}
 		assert.True(t, props["permissions"])
 	})
+
+	// At preview, `permissions` (or `name`) may arrive as Computed when wired
+	// to another resource's output — e.g. `permissions =
+	// getEnvironmentScopedPermissionsOutput({...}).permissions`. The empty
+	// check would otherwise fire on the zero-value decoded Go field and break
+	// every fresh `pulumi preview`. The same emptiness checks belong in
+	// Create/Update, where Pulumi guarantees concrete values.
+	t.Run("tolerates computed permissions at preview", func(t *testing.T) {
+		resp, err := r.Check(context.Background(), infer.CheckRequest{
+			NewInputs: property.NewMap(map[string]property.Value{
+				"organizationName": property.New("acme"),
+				"name":             property.New("r"),
+				"permissions":      property.New(property.Computed),
+			}),
+		})
+		assert.NoError(t, err)
+		for _, f := range resp.Failures {
+			assert.NotEqual(t, "permissions", f.Property,
+				"Check must not reject a computed permissions input: %s", f.Reason)
+		}
+	})
+
+	t.Run("tolerates computed name at preview", func(t *testing.T) {
+		resp, err := r.Check(context.Background(), infer.CheckRequest{
+			NewInputs: property.NewMap(map[string]property.Value{
+				"organizationName": property.New("acme"),
+				"name":             property.New(property.Computed),
+				"permissions": property.New(property.NewMap(map[string]property.Value{
+					"__type": property.New("PermissionDescriptorAllow"),
+				})),
+			}),
+		})
+		assert.NoError(t, err)
+		for _, f := range resp.Failures {
+			assert.NotEqual(t, "name", f.Property,
+				"Check must not reject a computed name input: %s", f.Reason)
+		}
+	})
 }

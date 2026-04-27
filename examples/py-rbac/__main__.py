@@ -20,6 +20,7 @@ from pulumi_pulumiservice import (
     Team,
     TeamRoleAssignment,
     get_current_user_output,
+    get_environment_scoped_permissions_output,
     get_organization_members_output,
 )
 
@@ -123,35 +124,19 @@ scoped_env = Environment(
 #    The role definition is org-scoped (resourceType defaults to "global");
 #    the permission tree is gated on the env's UUID via a
 #    PermissionDescriptorCondition wrapping a PermissionLiteralExpressionEnvironment.
-#    Embed scoped_env.environment_id (an Output[str]) inline in the dict
-#    rather than wrapping the whole tree in an apply(). Otherwise the
-#    `permissions` field becomes Output[Mapping] and the resource's Check
-#    sees a computed sentinel during preview and rejects it as empty.
+#
+#    `get_environment_scoped_permissions_output` builds the descriptor for
+#    us, so we don't have to hand-roll the
+#    PermissionDescriptorGroup → Condition → LiteralExpression JSON.
 scoped_role = OrganizationRole(
     "scopedReadOnlyRole",
     organization_name=organization_name,
     name=f"py-rbac-scoped-read-only-{digits}",
     description="Read+open access scoped to a single ESC environment.",
-    permissions={
-        "__type": "PermissionDescriptorGroup",
-        "entries": [
-            {
-                "__type": "PermissionDescriptorCondition",
-                "condition": {
-                    "__type": "PermissionExpressionEqual",
-                    "left": {"__type": "PermissionExpressionEnvironment"},
-                    "right": {
-                        "__type": "PermissionLiteralExpressionEnvironment",
-                        "identity": scoped_env.environment_id,
-                    },
-                },
-                "subNode": {
-                    "__type": "PermissionDescriptorAllow",
-                    "permissions": ["environment:read", "environment:open"],
-                },
-            },
-        ],
-    },
+    permissions=get_environment_scoped_permissions_output(
+        environment_id=scoped_env.environment_id,
+        permissions=["environment:read", "environment:open"],
+    ).permissions,
 )
 
 pulumi.export("scopedEnvironmentId", scoped_env.environment_id)

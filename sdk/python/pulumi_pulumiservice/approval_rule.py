@@ -29,6 +29,7 @@ class ApprovalRuleArgs:
                  target_action_types: pulumi.Input[Sequence[pulumi.Input['TargetActionType']]]):
         """
         The set of arguments for constructing a ApprovalRule resource.
+
         :param pulumi.Input['ApprovalRuleConfigArgs'] approval_rule_config: The approval rule configuration.
         :param pulumi.Input[_builtins.bool] enabled: Whether the approval rule is enabled.
         :param pulumi.Input['EnvironmentIdentifierArgs'] environment_identifier: The environment this rule applies to.
@@ -117,6 +118,7 @@ class ApprovalRule(pulumi.CustomResource):
         """
         An approval rule for environment deployments.
 
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[Union['ApprovalRuleConfigArgs', 'ApprovalRuleConfigArgsDict']] approval_rule_config: The approval rule configuration.
@@ -133,6 +135,7 @@ class ApprovalRule(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         An approval rule for environment deployments.
+
 
         :param str resource_name: The name of the resource.
         :param ApprovalRuleArgs args: The arguments to use to populate this resource's properties.

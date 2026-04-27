@@ -67,14 +67,14 @@ public class OrganizationRole extends com.pulumi.resources.CustomResource {
         return this.organizationName;
     }
     /**
-     * The role&#39;s permission descriptor tree — passed to the service verbatim. This is the `details` field of a Pulumi Cloud PermissionDescriptor: an object with a `__type` discriminator (e.g. `PermissionDescriptorAllow`, `PermissionDescriptorCompose`) describing which scopes are granted.
+     * The role&#39;s permission descriptor tree — passed to the service verbatim. This is the `details` field of a Pulumi Cloud PermissionDescriptor: an object with a `__type` discriminator (e.g. `PermissionDescriptorAllow`, `PermissionDescriptorCompose`) describing which scopes are granted. For per-entity scoping, prefer the `getEnvironmentScopedPermissions`, `getStackScopedPermissions`, and `getInsightsAccountScopedPermissions` helpers, which build the underlying `PermissionDescriptorGroup` / `PermissionDescriptorCondition` tree for you.
      * 
      */
     @Export(name="permissions", refs={Map.class,String.class,Object.class}, tree="[0,1,2]")
     private Output<Map<String,Object>> permissions;
 
     /**
-     * @return The role&#39;s permission descriptor tree — passed to the service verbatim. This is the `details` field of a Pulumi Cloud PermissionDescriptor: an object with a `__type` discriminator (e.g. `PermissionDescriptorAllow`, `PermissionDescriptorCompose`) describing which scopes are granted.
+     * @return The role&#39;s permission descriptor tree — passed to the service verbatim. This is the `details` field of a Pulumi Cloud PermissionDescriptor: an object with a `__type` discriminator (e.g. `PermissionDescriptorAllow`, `PermissionDescriptorCompose`) describing which scopes are granted. For per-entity scoping, prefer the `getEnvironmentScopedPermissions`, `getStackScopedPermissions`, and `getInsightsAccountScopedPermissions` helpers, which build the underlying `PermissionDescriptorGroup` / `PermissionDescriptorCondition` tree for you.
      * 
      */
     public Output<Map<String,Object>> permissions() {

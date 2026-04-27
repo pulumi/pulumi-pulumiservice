@@ -60,10 +60,20 @@ export const getEnvironment: typeof import("./getEnvironment").getEnvironment = 
 export const getEnvironmentOutput: typeof import("./getEnvironment").getEnvironmentOutput = null as any;
 utilities.lazyLoad(exports, ["getEnvironment","getEnvironmentOutput"], () => require("./getEnvironment"));
 
+export { GetEnvironmentScopedPermissionsArgs, GetEnvironmentScopedPermissionsResult, GetEnvironmentScopedPermissionsOutputArgs } from "./getEnvironmentScopedPermissions";
+export const getEnvironmentScopedPermissions: typeof import("./getEnvironmentScopedPermissions").getEnvironmentScopedPermissions = null as any;
+export const getEnvironmentScopedPermissionsOutput: typeof import("./getEnvironmentScopedPermissions").getEnvironmentScopedPermissionsOutput = null as any;
+utilities.lazyLoad(exports, ["getEnvironmentScopedPermissions","getEnvironmentScopedPermissionsOutput"], () => require("./getEnvironmentScopedPermissions"));
+
 export { GetInsightsAccountArgs, GetInsightsAccountResult, GetInsightsAccountOutputArgs } from "./getInsightsAccount";
 export const getInsightsAccount: typeof import("./getInsightsAccount").getInsightsAccount = null as any;
 export const getInsightsAccountOutput: typeof import("./getInsightsAccount").getInsightsAccountOutput = null as any;
 utilities.lazyLoad(exports, ["getInsightsAccount","getInsightsAccountOutput"], () => require("./getInsightsAccount"));
+
+export { GetInsightsAccountScopedPermissionsArgs, GetInsightsAccountScopedPermissionsResult, GetInsightsAccountScopedPermissionsOutputArgs } from "./getInsightsAccountScopedPermissions";
+export const getInsightsAccountScopedPermissions: typeof import("./getInsightsAccountScopedPermissions").getInsightsAccountScopedPermissions = null as any;
+export const getInsightsAccountScopedPermissionsOutput: typeof import("./getInsightsAccountScopedPermissions").getInsightsAccountScopedPermissionsOutput = null as any;
+utilities.lazyLoad(exports, ["getInsightsAccountScopedPermissions","getInsightsAccountScopedPermissionsOutput"], () => require("./getInsightsAccountScopedPermissions"));
 
 export { GetInsightsAccountsArgs, GetInsightsAccountsResult, GetInsightsAccountsOutputArgs } from "./getInsightsAccounts";
 export const getInsightsAccounts: typeof import("./getInsightsAccounts").getInsightsAccounts = null as any;
@@ -94,6 +104,11 @@ export { GetPolicyPacksArgs, GetPolicyPacksResult, GetPolicyPacksOutputArgs } fr
 export const getPolicyPacks: typeof import("./getPolicyPacks").getPolicyPacks = null as any;
 export const getPolicyPacksOutput: typeof import("./getPolicyPacks").getPolicyPacksOutput = null as any;
 utilities.lazyLoad(exports, ["getPolicyPacks","getPolicyPacksOutput"], () => require("./getPolicyPacks"));
+
+export { GetStackScopedPermissionsArgs, GetStackScopedPermissionsResult, GetStackScopedPermissionsOutputArgs } from "./getStackScopedPermissions";
+export const getStackScopedPermissions: typeof import("./getStackScopedPermissions").getStackScopedPermissions = null as any;
+export const getStackScopedPermissionsOutput: typeof import("./getStackScopedPermissions").getStackScopedPermissionsOutput = null as any;
+utilities.lazyLoad(exports, ["getStackScopedPermissions","getStackScopedPermissionsOutput"], () => require("./getStackScopedPermissions"));
 
 export { InsightsAccountArgs } from "./insightsAccount";
 export type InsightsAccount = import("./insightsAccount").InsightsAccount;

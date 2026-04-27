@@ -100,11 +100,14 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 		WithFunctions(
 			infer.Function(&functions.GetCurrentUserFunction{}),
 			infer.Function(&functions.GetEnvironmentFunction{}),
+			infer.Function(&functions.GetEnvironmentScopedPermissionsFunction{}),
 			infer.Function(&functions.GetInsightsAccountsFunction{}),
 			infer.Function(&functions.GetInsightsAccountFunction{}),
+			infer.Function(&functions.GetInsightsAccountScopedPermissionsFunction{}),
 			infer.Function(&functions.GetOrganizationMemberFunction{}),
 			infer.Function(&functions.GetOrganizationMembersFunction{}),
 			infer.Function(&functions.GetOrganizationRoleScopesFunction{}),
+			infer.Function(&functions.GetStackScopedPermissionsFunction{}),
 		).
 		WithModuleMap(map[tokens.ModuleName]tokens.ModuleName{
 			"resources": "index",

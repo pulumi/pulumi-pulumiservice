@@ -49,7 +49,7 @@ export class OrganizationRole extends pulumi.CustomResource {
      */
     declare public readonly organizationName: pulumi.Output<string>;
     /**
-     * The role's permission descriptor tree — passed to the service verbatim. This is the `details` field of a Pulumi Cloud PermissionDescriptor: an object with a `__type` discriminator (e.g. `PermissionDescriptorAllow`, `PermissionDescriptorCompose`) describing which scopes are granted.
+     * The role's permission descriptor tree — passed to the service verbatim. This is the `details` field of a Pulumi Cloud PermissionDescriptor: an object with a `__type` discriminator (e.g. `PermissionDescriptorAllow`, `PermissionDescriptorCompose`) describing which scopes are granted. For per-entity scoping, prefer the `getEnvironmentScopedPermissions`, `getStackScopedPermissions`, and `getInsightsAccountScopedPermissions` helpers, which build the underlying `PermissionDescriptorGroup` / `PermissionDescriptorCondition` tree for you.
      */
     declare public readonly permissions: pulumi.Output<{[key: string]: any}>;
     /**
@@ -125,7 +125,7 @@ export interface OrganizationRoleArgs {
      */
     organizationName: pulumi.Input<string>;
     /**
-     * The role's permission descriptor tree — passed to the service verbatim. This is the `details` field of a Pulumi Cloud PermissionDescriptor: an object with a `__type` discriminator (e.g. `PermissionDescriptorAllow`, `PermissionDescriptorCompose`) describing which scopes are granted.
+     * The role's permission descriptor tree — passed to the service verbatim. This is the `details` field of a Pulumi Cloud PermissionDescriptor: an object with a `__type` discriminator (e.g. `PermissionDescriptorAllow`, `PermissionDescriptorCompose`) describing which scopes are granted. For per-entity scoping, prefer the `getEnvironmentScopedPermissions`, `getStackScopedPermissions`, and `getInsightsAccountScopedPermissions` helpers, which build the underlying `PermissionDescriptorGroup` / `PermissionDescriptorCondition` tree for you.
      */
     permissions: pulumi.Input<{[key: string]: any}>;
     /**
