@@ -30,8 +30,6 @@ type OrganizationRole struct {
 	ResourceType pulumi.StringPtrOutput `pulumi:"resourceType"`
 	// The unique identifier of the custom role.
 	RoleId pulumi.StringOutput `pulumi:"roleId"`
-	// How the role appears in the Pulumi Cloud console. One of `role`, `role_private`, `policy`, `set`. Defaults to `role`.
-	UxPurpose pulumi.StringPtrOutput `pulumi:"uxPurpose"`
 	// The service-maintained version number that increments on every update.
 	Version pulumi.IntOutput `pulumi:"version"`
 }
@@ -99,8 +97,6 @@ type organizationRoleArgs struct {
 	Permissions map[string]interface{} `pulumi:"permissions"`
 	// The resource type the role's permissions apply to. Defaults to `global` (the org-wide role that can be assigned to members and teams). Other valid values: `stack`, `environment`, `insights-account`.
 	ResourceType *string `pulumi:"resourceType"`
-	// How the role appears in the Pulumi Cloud console. One of `role`, `role_private`, `policy`, `set`. Defaults to `role`.
-	UxPurpose *string `pulumi:"uxPurpose"`
 }
 
 // The set of arguments for constructing a OrganizationRole resource.
@@ -115,8 +111,6 @@ type OrganizationRoleArgs struct {
 	Permissions pulumi.MapInput
 	// The resource type the role's permissions apply to. Defaults to `global` (the org-wide role that can be assigned to members and teams). Other valid values: `stack`, `environment`, `insights-account`.
 	ResourceType pulumi.StringPtrInput
-	// How the role appears in the Pulumi Cloud console. One of `role`, `role_private`, `policy`, `set`. Defaults to `role`.
-	UxPurpose pulumi.StringPtrInput
 }
 
 func (OrganizationRoleArgs) ElementType() reflect.Type {
@@ -234,11 +228,6 @@ func (o OrganizationRoleOutput) ResourceType() pulumi.StringPtrOutput {
 // The unique identifier of the custom role.
 func (o OrganizationRoleOutput) RoleId() pulumi.StringOutput {
 	return o.ApplyT(func(v *OrganizationRole) pulumi.StringOutput { return v.RoleId }).(pulumi.StringOutput)
-}
-
-// How the role appears in the Pulumi Cloud console. One of `role`, `role_private`, `policy`, `set`. Defaults to `role`.
-func (o OrganizationRoleOutput) UxPurpose() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *OrganizationRole) pulumi.StringPtrOutput { return v.UxPurpose }).(pulumi.StringPtrOutput)
 }
 
 // The service-maintained version number that increments on every update.

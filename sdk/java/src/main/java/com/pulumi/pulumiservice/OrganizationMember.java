@@ -49,20 +49,6 @@ public class OrganizationMember extends com.pulumi.resources.CustomResource {
         return this.email;
     }
     /**
-     * Whether the member has a Pulumi Cloud account.
-     * 
-     */
-    @Export(name="knownToPulumi", refs={Boolean.class}, tree="[0]")
-    private Output<Boolean> knownToPulumi;
-
-    /**
-     * @return Whether the member has a Pulumi Cloud account.
-     * 
-     */
-    public Output<Boolean> knownToPulumi() {
-        return this.knownToPulumi;
-    }
-    /**
      * The member&#39;s display name.
      * 
      */

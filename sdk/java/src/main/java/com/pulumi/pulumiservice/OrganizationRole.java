@@ -109,20 +109,6 @@ public class OrganizationRole extends com.pulumi.resources.CustomResource {
         return this.roleId;
     }
     /**
-     * How the role appears in the Pulumi Cloud console. One of `role`, `role_private`, `policy`, `set`. Defaults to `role`.
-     * 
-     */
-    @Export(name="uxPurpose", refs={String.class}, tree="[0]")
-    private Output</* @Nullable */ String> uxPurpose;
-
-    /**
-     * @return How the role appears in the Pulumi Cloud console. One of `role`, `role_private`, `policy`, `set`. Defaults to `role`.
-     * 
-     */
-    public Output<Optional<String>> uxPurpose() {
-        return Codegen.optional(this.uxPurpose);
-    }
-    /**
      * The service-maintained version number that increments on every update.
      * 
      */

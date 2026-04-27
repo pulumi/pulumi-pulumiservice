@@ -76,10 +76,6 @@ namespace Pulumi.PulumiService
     public sealed class GetOrganizationMemberResult
     {
         /// <summary>
-        /// Whether this member has a Pulumi Cloud account.
-        /// </summary>
-        public readonly bool KnownToPulumi;
-        /// <summary>
         /// The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.
         /// </summary>
         public readonly string? Role;
@@ -102,8 +98,6 @@ namespace Pulumi.PulumiService
 
         [OutputConstructor]
         private GetOrganizationMemberResult(
-            bool knownToPulumi,
-
             string? role,
 
             string? roleId,
@@ -114,7 +108,6 @@ namespace Pulumi.PulumiService
 
             bool virtualAdmin)
         {
-            KnownToPulumi = knownToPulumi;
             Role = role;
             RoleId = roleId;
             RoleName = roleName;

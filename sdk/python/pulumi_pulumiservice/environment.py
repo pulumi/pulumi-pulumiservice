@@ -157,6 +157,7 @@ class Environment(pulumi.CustomResource):
             if yaml is None and not opts.urn:
                 raise TypeError("Missing required property 'yaml'")
             __props__.__dict__["yaml"] = yaml
+            __props__.__dict__["environment_id"] = None
             __props__.__dict__["revision"] = None
         super(Environment, __self__).__init__(
             'pulumiservice:index:Environment',
@@ -180,12 +181,21 @@ class Environment(pulumi.CustomResource):
 
         __props__ = EnvironmentArgs.__new__(EnvironmentArgs)
 
+        __props__.__dict__["environment_id"] = None
         __props__.__dict__["name"] = None
         __props__.__dict__["organization"] = None
         __props__.__dict__["project"] = None
         __props__.__dict__["revision"] = None
         __props__.__dict__["yaml"] = None
         return Environment(resource_name, opts=opts, __props__=__props__)
+
+    @_builtins.property
+    @pulumi.getter(name="environmentId")
+    def environment_id(self) -> pulumi.Output[Optional[_builtins.str]]:
+        """
+        The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `PermissionLiteralExpressionEnvironment` expression in `OrganizationRole.permissions`.
+        """
+        return pulumi.get(self, "environment_id")
 
     @_builtins.property
     @pulumi.getter

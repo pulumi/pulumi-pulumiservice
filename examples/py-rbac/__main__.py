@@ -14,6 +14,7 @@ Exercises the full RBAC flow from Python:
 
 import pulumi
 from pulumi_pulumiservice import (
+    Environment,
     OrganizationMember,
     OrganizationRole,
     Team,
@@ -103,3 +104,53 @@ pulumi.export("roleId", custom_role.role_id)
 pulumi.export("assignedRoleName", team_role.role_name)
 pulumi.export("memberAdopted", member_role_change.adopted)
 pulumi.export("memberRole", member_role_change.role)
+
+# 7. ESC environment used to demonstrate per-env role scoping. The
+#    Environment resource exposes its UUID via `environment_id`, which the
+#    next role pins its grants to.
+scoped_env = Environment(
+    "scopedEnv",
+    organization=organization_name,
+    project="default",
+    name=f"py-rbac-scoped-env-{digits}",
+    yaml=pulumi.StringAsset(
+        'values:\n  placeholder: "py-rbac scoped env fixture"\n',
+    ),
+)
+
+# 8. A role that grants environment:read + environment:open ONLY on the
+#    env created above. Anywhere else in the org the role grants nothing.
+#    The role definition is org-scoped (resourceType defaults to "global");
+#    the permission tree is gated on the env's UUID via a
+#    PermissionDescriptorCondition wrapping a PermissionLiteralExpressionEnvironment.
+scoped_role = OrganizationRole(
+    "scopedReadOnlyRole",
+    organization_name=organization_name,
+    name=f"py-rbac-scoped-read-only-{digits}",
+    description="Read+open access scoped to a single ESC environment.",
+    permissions=scoped_env.environment_id.apply(
+        lambda env_id: {
+            "__type": "PermissionDescriptorGroup",
+            "entries": [
+                {
+                    "__type": "PermissionDescriptorCondition",
+                    "condition": {
+                        "__type": "PermissionExpressionEqual",
+                        "left": {"__type": "PermissionExpressionEnvironment"},
+                        "right": {
+                            "__type": "PermissionLiteralExpressionEnvironment",
+                            "identity": env_id,
+                        },
+                    },
+                    "subNode": {
+                        "__type": "PermissionDescriptorAllow",
+                        "permissions": ["environment:read", "environment:open"],
+                    },
+                },
+            ],
+        }
+    ),
+)
+
+pulumi.export("scopedEnvironmentId", scoped_env.environment_id)
+pulumi.export("scopedRoleId", scoped_role.role_id)

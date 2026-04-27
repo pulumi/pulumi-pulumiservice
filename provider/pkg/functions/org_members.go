@@ -39,14 +39,13 @@ type GetOrganizationMembersInput struct {
 // roster for Pulumi Cloud organizations. Display name and email are not
 // included: the backing identity provider (GitHub/GitLab/Bitbucket) does not
 // populate them in the member list, and Pulumi only knows those fields for
-// members who have already signed in (surfaced via `knownToPulumi`).
+// members who have already signed in.
 type OrganizationMemberInfo struct {
-	Username      string  `pulumi:"username"`
-	Role          *string `pulumi:"role,optional"`
-	RoleId        *string `pulumi:"roleId,optional"`
-	RoleName      *string `pulumi:"roleName,optional"`
-	KnownToPulumi bool    `pulumi:"knownToPulumi"`
-	VirtualAdmin  bool    `pulumi:"virtualAdmin"`
+	Username     string  `pulumi:"username"`
+	Role         *string `pulumi:"role,optional"`
+	RoleId       *string `pulumi:"roleId,optional"`
+	RoleName     *string `pulumi:"roleName,optional"`
+	VirtualAdmin bool    `pulumi:"virtualAdmin"`
 }
 
 type GetOrganizationMembersOutput struct {
@@ -74,7 +73,6 @@ func (m *OrganizationMemberInfo) Annotate(a infer.Annotator) {
 	)
 	a.Describe(&m.RoleId, "The custom role ID assigned to this member, if any.")
 	a.Describe(&m.RoleName, "The name of the currently assigned role (custom role name, or built-in role).")
-	a.Describe(&m.KnownToPulumi, "Whether this member has a Pulumi Cloud account.")
 	a.Describe(
 		&m.VirtualAdmin,
 		"Whether this member is an admin in Pulumi Cloud without admin access on the backing identity provider.",
@@ -171,9 +169,8 @@ var builtinOrgRoles = []string{"member", "admin", "billing-manager"}
 
 func memberInfoFrom(m pulumiapi.Member) OrganizationMemberInfo {
 	info := OrganizationMemberInfo{
-		Username:      m.User.GithubLogin,
-		KnownToPulumi: m.KnownToPulumi,
-		VirtualAdmin:  m.VirtualAdmin,
+		Username:     m.User.GithubLogin,
+		VirtualAdmin: m.VirtualAdmin,
 	}
 	if m.FGARole != nil {
 		name := m.FGARole.Name

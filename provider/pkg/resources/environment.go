@@ -16,13 +16,15 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
 const defaultProject = "default"
 
 type PulumiServiceEnvironmentResource struct {
-	Client esc_client.Client
+	Client         esc_client.Client
+	MetadataClient pulumiapi.EnvironmentMetadataClient
 }
 
 type PulumiServiceEnvironmentInput struct {
@@ -33,8 +35,9 @@ type PulumiServiceEnvironmentInput struct {
 }
 
 type PulumiServiceEnvironmentOutput struct {
-	input    PulumiServiceEnvironmentInput
-	revision int
+	input         PulumiServiceEnvironmentInput
+	revision      int
+	environmentID string
 }
 
 func (i *PulumiServiceEnvironmentInput) ToPropertyMap() (resource.PropertyMap, error) {
@@ -54,6 +57,9 @@ func (i *PulumiServiceEnvironmentOutput) ToPropertyMap() (resource.PropertyMap, 
 	}
 
 	propertyMap["revision"] = resource.NewPropertyValue(i.revision)
+	if i.environmentID != "" {
+		propertyMap["environmentId"] = resource.NewPropertyValue(i.environmentID)
+	}
 
 	return propertyMap, nil
 }
@@ -216,9 +222,15 @@ func (st *PulumiServiceEnvironmentResource) Create(req *pulumirpc.CreateRequest)
 		return nil, fmt.Errorf("failed to push yaml into environment due to error: %+v", err)
 	}
 
+	envID, err := st.fetchEnvironmentID(context.Background(), input.OrgName, input.ProjectName, input.EnvName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to resolve new environment's id: %w", err)
+	}
+
 	output := PulumiServiceEnvironmentOutput{
-		input:    *input,
-		revision: revision,
+		input:         *input,
+		revision:      revision,
+		environmentID: envID,
 	}
 
 	propertyMap, err := output.ToPropertyMap()
@@ -239,6 +251,27 @@ func (st *PulumiServiceEnvironmentResource) Create(req *pulumirpc.CreateRequest)
 		Id:         path.Join(input.OrgName, input.ProjectName, input.EnvName),
 		Properties: outputProperties,
 	}, nil
+}
+
+// fetchEnvironmentID resolves an environment's UUID via the metadata endpoint.
+// Returns "" with no error when the metadata client is not configured, so
+// tests that omit it behave as before — the resource simply skips emitting
+// `environmentId` rather than crashing.
+func (st *PulumiServiceEnvironmentResource) fetchEnvironmentID(
+	ctx context.Context,
+	orgName, projectName, envName string,
+) (string, error) {
+	if st.MetadataClient == nil {
+		return "", nil
+	}
+	meta, err := st.MetadataClient.GetEnvironmentMetadata(ctx, orgName, projectName, envName)
+	if err != nil {
+		return "", err
+	}
+	if meta == nil {
+		return "", nil
+	}
+	return meta.ID, nil
 }
 
 func (st *PulumiServiceEnvironmentResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
@@ -320,9 +353,15 @@ func (st *PulumiServiceEnvironmentResource) Update(req *pulumirpc.UpdateRequest)
 		return nil, fmt.Errorf("failed to update environment, yaml code failed following checks: %+v", diagnostics)
 	}
 
+	envID, err := st.fetchEnvironmentID(context.Background(), input.OrgName, input.ProjectName, input.EnvName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to resolve environment's id: %w", err)
+	}
+
 	output := PulumiServiceEnvironmentOutput{
-		input:    *input,
-		revision: revision,
+		input:         *input,
+		revision:      revision,
+		environmentID: envID,
 	}
 
 	propertyMap, err := output.ToPropertyMap()
@@ -387,9 +426,19 @@ func (st *PulumiServiceEnvironmentResource) Read(req *pulumirpc.ReadRequest) (*p
 		Yaml:        trimmedYaml,
 	}
 
+	// Best-effort: legacy state (pre-environmentId) refreshed against an
+	// older provider build can still be missing this field. Don't fail
+	// refresh just because the metadata fetch errored — if it returns
+	// empty, ToPropertyMap simply omits `environmentId`.
+	envID, err := st.fetchEnvironmentID(context.Background(), orgName, projectName, envName)
+	if err != nil {
+		envID = ""
+	}
+
 	result := PulumiServiceEnvironmentOutput{
-		input:    input,
-		revision: revision,
+		input:         input,
+		revision:      revision,
+		environmentID: envID,
 	}
 
 	inputMap, err := input.ToPropertyMap()

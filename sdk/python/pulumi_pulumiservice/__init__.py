@@ -17,6 +17,7 @@ from .environment import *
 from .environment_rotation_schedule import *
 from .environment_version_tag import *
 from .get_current_user import *
+from .get_environment import *
 from .get_insights_account import *
 from .get_insights_accounts import *
 from .get_organization_member import *

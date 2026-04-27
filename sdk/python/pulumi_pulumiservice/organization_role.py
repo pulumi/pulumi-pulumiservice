@@ -23,8 +23,7 @@ class OrganizationRoleArgs:
                  organization_name: pulumi.Input[_builtins.str],
                  permissions: pulumi.Input[Mapping[str, Any]],
                  description: Optional[pulumi.Input[_builtins.str]] = None,
-                 resource_type: Optional[pulumi.Input[_builtins.str]] = None,
-                 ux_purpose: Optional[pulumi.Input[_builtins.str]] = None):
+                 resource_type: Optional[pulumi.Input[_builtins.str]] = None):
         """
         The set of arguments for constructing a OrganizationRole resource.
         :param pulumi.Input[_builtins.str] name: The role's display name. Must be unique within the organization.
@@ -32,7 +31,6 @@ class OrganizationRoleArgs:
         :param pulumi.Input[Mapping[str, Any]] permissions: The role's permission descriptor tree — passed to the service verbatim. This is the `details` field of a Pulumi Cloud PermissionDescriptor: an object with a `__type` discriminator (e.g. `PermissionDescriptorAllow`, `PermissionDescriptorCompose`) describing which scopes are granted.
         :param pulumi.Input[_builtins.str] description: Human-readable description of what the role grants.
         :param pulumi.Input[_builtins.str] resource_type: The resource type the role's permissions apply to. Defaults to `global` (the org-wide role that can be assigned to members and teams). Other valid values: `stack`, `environment`, `insights-account`.
-        :param pulumi.Input[_builtins.str] ux_purpose: How the role appears in the Pulumi Cloud console. One of `role`, `role_private`, `policy`, `set`. Defaults to `role`.
         """
         pulumi.set(__self__, "name", name)
         pulumi.set(__self__, "organization_name", organization_name)
@@ -41,8 +39,6 @@ class OrganizationRoleArgs:
             pulumi.set(__self__, "description", description)
         if resource_type is not None:
             pulumi.set(__self__, "resource_type", resource_type)
-        if ux_purpose is not None:
-            pulumi.set(__self__, "ux_purpose", ux_purpose)
 
     @_builtins.property
     @pulumi.getter
@@ -104,18 +100,6 @@ class OrganizationRoleArgs:
     def resource_type(self, value: Optional[pulumi.Input[_builtins.str]]):
         pulumi.set(self, "resource_type", value)
 
-    @_builtins.property
-    @pulumi.getter(name="uxPurpose")
-    def ux_purpose(self) -> Optional[pulumi.Input[_builtins.str]]:
-        """
-        How the role appears in the Pulumi Cloud console. One of `role`, `role_private`, `policy`, `set`. Defaults to `role`.
-        """
-        return pulumi.get(self, "ux_purpose")
-
-    @ux_purpose.setter
-    def ux_purpose(self, value: Optional[pulumi.Input[_builtins.str]]):
-        pulumi.set(self, "ux_purpose", value)
-
 
 @pulumi.type_token("pulumiservice:index:OrganizationRole")
 class OrganizationRole(pulumi.CustomResource):
@@ -128,7 +112,6 @@ class OrganizationRole(pulumi.CustomResource):
                  organization_name: Optional[pulumi.Input[_builtins.str]] = None,
                  permissions: Optional[pulumi.Input[Mapping[str, Any]]] = None,
                  resource_type: Optional[pulumi.Input[_builtins.str]] = None,
-                 ux_purpose: Optional[pulumi.Input[_builtins.str]] = None,
                  __props__=None):
         """
         A custom (fine-grained) role defined on a Pulumi Cloud organization. Custom roles allow precise permission control beyond the built-in `admin` / `member` / `billing-manager` roles. Assign them to members via the `OrganizationMember.roleId` field or to teams via `TeamRoleAssignment`.
@@ -142,7 +125,6 @@ class OrganizationRole(pulumi.CustomResource):
         :param pulumi.Input[_builtins.str] organization_name: The Pulumi Cloud organization name.
         :param pulumi.Input[Mapping[str, Any]] permissions: The role's permission descriptor tree — passed to the service verbatim. This is the `details` field of a Pulumi Cloud PermissionDescriptor: an object with a `__type` discriminator (e.g. `PermissionDescriptorAllow`, `PermissionDescriptorCompose`) describing which scopes are granted.
         :param pulumi.Input[_builtins.str] resource_type: The resource type the role's permissions apply to. Defaults to `global` (the org-wide role that can be assigned to members and teams). Other valid values: `stack`, `environment`, `insights-account`.
-        :param pulumi.Input[_builtins.str] ux_purpose: How the role appears in the Pulumi Cloud console. One of `role`, `role_private`, `policy`, `set`. Defaults to `role`.
         """
         ...
     @overload
@@ -175,7 +157,6 @@ class OrganizationRole(pulumi.CustomResource):
                  organization_name: Optional[pulumi.Input[_builtins.str]] = None,
                  permissions: Optional[pulumi.Input[Mapping[str, Any]]] = None,
                  resource_type: Optional[pulumi.Input[_builtins.str]] = None,
-                 ux_purpose: Optional[pulumi.Input[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
@@ -196,7 +177,6 @@ class OrganizationRole(pulumi.CustomResource):
                 raise TypeError("Missing required property 'permissions'")
             __props__.__dict__["permissions"] = permissions
             __props__.__dict__["resource_type"] = resource_type
-            __props__.__dict__["ux_purpose"] = ux_purpose
             __props__.__dict__["role_id"] = None
             __props__.__dict__["version"] = None
         replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["organizationName"])
@@ -229,7 +209,6 @@ class OrganizationRole(pulumi.CustomResource):
         __props__.__dict__["permissions"] = None
         __props__.__dict__["resource_type"] = None
         __props__.__dict__["role_id"] = None
-        __props__.__dict__["ux_purpose"] = None
         __props__.__dict__["version"] = None
         return OrganizationRole(resource_name, opts=opts, __props__=__props__)
 
@@ -280,14 +259,6 @@ class OrganizationRole(pulumi.CustomResource):
         The unique identifier of the custom role.
         """
         return pulumi.get(self, "role_id")
-
-    @_builtins.property
-    @pulumi.getter(name="uxPurpose")
-    def ux_purpose(self) -> pulumi.Output[Optional[_builtins.str]]:
-        """
-        How the role appears in the Pulumi Cloud console. One of `role`, `role_private`, `policy`, `set`. Defaults to `role`.
-        """
-        return pulumi.get(self, "ux_purpose")
 
     @_builtins.property
     @pulumi.getter

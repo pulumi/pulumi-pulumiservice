@@ -3391,8 +3391,6 @@ func (o OperationContextOptionsPtrOutput) SkipIntermediateDeployments() pulumi.B
 }
 
 type OrganizationMemberInfo struct {
-	// Whether this member has a Pulumi Cloud account.
-	KnownToPulumi bool `pulumi:"knownToPulumi"`
 	// The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.
 	Role *string `pulumi:"role"`
 	// The custom role ID assigned to this member, if any.
@@ -3417,11 +3415,6 @@ func (o OrganizationMemberInfoOutput) ToOrganizationMemberInfoOutput() Organizat
 
 func (o OrganizationMemberInfoOutput) ToOrganizationMemberInfoOutputWithContext(ctx context.Context) OrganizationMemberInfoOutput {
 	return o
-}
-
-// Whether this member has a Pulumi Cloud account.
-func (o OrganizationMemberInfoOutput) KnownToPulumi() pulumi.BoolOutput {
-	return o.ApplyT(func(v OrganizationMemberInfo) bool { return v.KnownToPulumi }).(pulumi.BoolOutput)
 }
 
 // The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.

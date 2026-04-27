@@ -1416,21 +1416,18 @@ class OperationContextOptions(dict):
 @pulumi.output_type
 class OrganizationMemberInfo(dict):
     def __init__(__self__, *,
-                 known_to_pulumi: _builtins.bool,
                  username: _builtins.str,
                  virtual_admin: _builtins.bool,
                  role: Optional[_builtins.str] = None,
                  role_id: Optional[_builtins.str] = None,
                  role_name: Optional[_builtins.str] = None):
         """
-        :param _builtins.bool known_to_pulumi: Whether this member has a Pulumi Cloud account.
         :param _builtins.str username: The member's Pulumi Cloud username.
         :param _builtins.bool virtual_admin: Whether this member is an admin in Pulumi Cloud without admin access on the backing identity provider.
         :param _builtins.str role: The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.
         :param _builtins.str role_id: The custom role ID assigned to this member, if any.
         :param _builtins.str role_name: The name of the currently assigned role (custom role name, or built-in role).
         """
-        pulumi.set(__self__, "known_to_pulumi", known_to_pulumi)
         pulumi.set(__self__, "username", username)
         pulumi.set(__self__, "virtual_admin", virtual_admin)
         if role is not None:
@@ -1439,14 +1436,6 @@ class OrganizationMemberInfo(dict):
             pulumi.set(__self__, "role_id", role_id)
         if role_name is not None:
             pulumi.set(__self__, "role_name", role_name)
-
-    @_builtins.property
-    @pulumi.getter(name="knownToPulumi")
-    def known_to_pulumi(self) -> _builtins.bool:
-        """
-        Whether this member has a Pulumi Cloud account.
-        """
-        return pulumi.get(self, "known_to_pulumi")
 
     @_builtins.property
     @pulumi.getter

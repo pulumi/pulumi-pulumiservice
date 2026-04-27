@@ -101,10 +101,10 @@ type updateRoleReq struct {
 	Details     json.RawMessage `json:"details,omitempty"`
 }
 
-// CreateRole creates a new custom role on the organization. resourceType and
-// uxPurpose follow the service's PermissionDescriptorBase contract
-// ("global"/"role" is the shape for an org-wide role assignable to members
-// and teams).
+// CreateRole creates a new custom role on the organization. resourceType
+// follows the service's PermissionDescriptorBase contract ("global" is the
+// shape for an org-wide role assignable to members and teams). uxPurpose is
+// always "role" — the service's other discriminators are not exposed by PSP.
 func (c *Client) CreateRole(
 	ctx context.Context,
 	orgName string,
@@ -119,9 +119,7 @@ func (c *Client) CreateRole(
 	if req.ResourceType == "" {
 		req.ResourceType = "global"
 	}
-	if req.UXPurpose == "" {
-		req.UXPurpose = "role"
-	}
+	req.UXPurpose = "role"
 	if len(req.Details) == 0 {
 		return nil, errors.New("role permissions details must not be empty")
 	}
@@ -137,14 +135,13 @@ func (c *Client) CreateRole(
 // NewCreateRoleRequest is a small constructor for CreateRoleRequest. Exposed so
 // that resource code can build requests without touching the unexported type.
 func NewCreateRoleRequest(
-	name, description, resourceType, uxPurpose string,
+	name, description, resourceType string,
 	details json.RawMessage,
 ) CreateRoleRequest {
 	return CreateRoleRequest{
 		Name:         name,
 		Description:  description,
 		ResourceType: resourceType,
-		UXPurpose:    uxPurpose,
 		Details:      details,
 	}
 }

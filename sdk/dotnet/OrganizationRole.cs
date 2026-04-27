@@ -54,12 +54,6 @@ namespace Pulumi.PulumiService
         public Output<string> RoleId { get; private set; } = null!;
 
         /// <summary>
-        /// How the role appears in the Pulumi Cloud console. One of `role`, `role_private`, `policy`, `set`. Defaults to `role`.
-        /// </summary>
-        [Output("uxPurpose")]
-        public Output<string?> UxPurpose { get; private set; } = null!;
-
-        /// <summary>
         /// The service-maintained version number that increments on every update.
         /// </summary>
         [Output("version")]
@@ -149,12 +143,6 @@ namespace Pulumi.PulumiService
         /// </summary>
         [Input("resourceType")]
         public Input<string>? ResourceType { get; set; }
-
-        /// <summary>
-        /// How the role appears in the Pulumi Cloud console. One of `role`, `role_private`, `policy`, `set`. Defaults to `role`.
-        /// </summary>
-        [Input("uxPurpose")]
-        public Input<string>? UxPurpose { get; set; }
 
         public OrganizationRoleArgs()
         {

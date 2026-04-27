@@ -154,7 +154,6 @@ class OrganizationMember(pulumi.CustomResource):
             __props__.__dict__["username"] = username
             __props__.__dict__["adopted"] = None
             __props__.__dict__["email"] = None
-            __props__.__dict__["known_to_pulumi"] = None
             __props__.__dict__["name"] = None
             __props__.__dict__["role_name"] = None
         replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["organizationName", "username"])
@@ -183,7 +182,6 @@ class OrganizationMember(pulumi.CustomResource):
 
         __props__.__dict__["adopted"] = None
         __props__.__dict__["email"] = None
-        __props__.__dict__["known_to_pulumi"] = None
         __props__.__dict__["name"] = None
         __props__.__dict__["organization_name"] = None
         __props__.__dict__["role"] = None
@@ -207,14 +205,6 @@ class OrganizationMember(pulumi.CustomResource):
         The member's email address.
         """
         return pulumi.get(self, "email")
-
-    @_builtins.property
-    @pulumi.getter(name="knownToPulumi")
-    def known_to_pulumi(self) -> pulumi.Output[_builtins.bool]:
-        """
-        Whether the member has a Pulumi Cloud account.
-        """
-        return pulumi.get(self, "known_to_pulumi")
 
     @_builtins.property
     @pulumi.getter

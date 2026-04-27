@@ -41,7 +41,7 @@ func TestCreateRole(t *testing.T) {
 		})
 
 		got, err := c.CreateRole(ctx, testRoleOrgName, NewCreateRoleRequest(
-			"read-only", "read only access", "global", "role", testRoleDetails,
+			"read-only", "read only access", "global", testRoleDetails,
 		))
 		assert.NoError(t, err)
 		if assert.NotNil(t, got) {
@@ -50,7 +50,7 @@ func TestCreateRole(t *testing.T) {
 		}
 	})
 
-	t.Run("defaults resourceType and uxPurpose", func(t *testing.T) {
+	t.Run("defaults resourceType and forces uxPurpose=role", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodPost,
 			ExpectedReqPath:   "/api/orgs/an-organization/roles",
@@ -63,13 +63,13 @@ func TestCreateRole(t *testing.T) {
 			ResponseCode: 200,
 			ResponseBody: RoleDescriptor{ID: testRoleID, Name: "r"},
 		})
-		_, err := c.CreateRole(ctx, testRoleOrgName, NewCreateRoleRequest("r", "", "", "", testRoleDetails))
+		_, err := c.CreateRole(ctx, testRoleOrgName, NewCreateRoleRequest("r", "", "", testRoleDetails))
 		assert.NoError(t, err)
 	})
 
 	t.Run("empty details rejected", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{ResponseCode: 200})
-		_, err := c.CreateRole(ctx, testRoleOrgName, NewCreateRoleRequest("r", "", "", "", nil))
+		_, err := c.CreateRole(ctx, testRoleOrgName, NewCreateRoleRequest("r", "", "", nil))
 		assert.EqualError(t, err, "role permissions details must not be empty")
 	})
 }

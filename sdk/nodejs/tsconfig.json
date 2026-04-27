@@ -25,6 +25,7 @@
         "environmentRotationSchedule.ts",
         "environmentVersionTag.ts",
         "getCurrentUser.ts",
+        "getEnvironment.ts",
         "getInsightsAccount.ts",
         "getInsightsAccounts.ts",
         "getOrganizationMember.ts",

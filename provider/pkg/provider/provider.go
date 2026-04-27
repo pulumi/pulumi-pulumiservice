@@ -99,6 +99,7 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 		).
 		WithFunctions(
 			infer.Function(&functions.GetCurrentUserFunction{}),
+			infer.Function(&functions.GetEnvironmentFunction{}),
 			infer.Function(&functions.GetInsightsAccountsFunction{}),
 			infer.Function(&functions.GetInsightsAccountFunction{}),
 			infer.Function(&functions.GetOrganizationMemberFunction{}),
@@ -271,7 +272,8 @@ func (k *pulumiserviceProvider) Configure(
 			Client: client,
 		},
 		&resources.PulumiServiceEnvironmentResource{
-			Client: escClient,
+			Client:         escClient,
+			MetadataClient: client,
 		},
 		&resources.PulumiServiceTeamEnvironmentPermissionResource{
 			Client: client,

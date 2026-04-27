@@ -61,10 +61,6 @@ export class OrganizationRole extends pulumi.CustomResource {
      */
     declare public /*out*/ readonly roleId: pulumi.Output<string>;
     /**
-     * How the role appears in the Pulumi Cloud console. One of `role`, `role_private`, `policy`, `set`. Defaults to `role`.
-     */
-    declare public readonly uxPurpose: pulumi.Output<string | undefined>;
-    /**
      * The service-maintained version number that increments on every update.
      */
     declare public /*out*/ readonly version: pulumi.Output<number>;
@@ -94,7 +90,6 @@ export class OrganizationRole extends pulumi.CustomResource {
             resourceInputs["organizationName"] = args?.organizationName;
             resourceInputs["permissions"] = args?.permissions;
             resourceInputs["resourceType"] = args?.resourceType;
-            resourceInputs["uxPurpose"] = args?.uxPurpose;
             resourceInputs["roleId"] = undefined /*out*/;
             resourceInputs["version"] = undefined /*out*/;
         } else {
@@ -104,7 +99,6 @@ export class OrganizationRole extends pulumi.CustomResource {
             resourceInputs["permissions"] = undefined /*out*/;
             resourceInputs["resourceType"] = undefined /*out*/;
             resourceInputs["roleId"] = undefined /*out*/;
-            resourceInputs["uxPurpose"] = undefined /*out*/;
             resourceInputs["version"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
@@ -138,8 +132,4 @@ export interface OrganizationRoleArgs {
      * The resource type the role's permissions apply to. Defaults to `global` (the org-wide role that can be assigned to members and teams). Other valid values: `stack`, `environment`, `insights-account`.
      */
     resourceType?: pulumi.Input<string>;
-    /**
-     * How the role appears in the Pulumi Cloud console. One of `role`, `role_private`, `policy`, `set`. Defaults to `role`.
-     */
-    uxPurpose?: pulumi.Input<string>;
 }

@@ -57,6 +57,49 @@ resources:
       username: service-provider-example-user
       roleId: ${readOnlyRole.roleId}
 
+  # An ESC environment to demo per-env role scoping. The Environment
+  # resource exposes its UUID via `environmentId`, which is what the
+  # role below pins its grants to.
+  scopedEnv:
+    type: pulumiservice:Environment
+    properties:
+      organization: ${organizationName}
+      project: default
+      name: yaml-rbac-scoped-env-${digits}
+      yaml:
+        fn::stringAsset: |-
+          values:
+            placeholder: "yaml-rbac scoped env fixture"
+
+  # A role that ONLY grants `environment:read` and `environment:open` on
+  # the specific env created above — anywhere else in the org, the role
+  # grants nothing. This is the shape Pulumi Cloud's role evaluator
+  # expects (PermissionDescriptorCondition wrapping the per-env literal):
+  # the role definition itself is org-scoped (resourceType defaults to
+  # `global`), but the permission tree is gated on the environment ID.
+  scopedReadOnlyRole:
+    type: pulumiservice:OrganizationRole
+    properties:
+      organizationName: ${organizationName}
+      name: yaml-rbac-scoped-read-only-${digits}
+      description: Read+open access scoped to a single ESC environment.
+      permissions:
+        __type: PermissionDescriptorGroup
+        entries:
+          - __type: PermissionDescriptorCondition
+            condition:
+              __type: PermissionExpressionEqual
+              left:
+                __type: PermissionExpressionEnvironment
+              right:
+                __type: PermissionLiteralExpressionEnvironment
+                identity: ${scopedEnv.environmentId}
+            subNode:
+              __type: PermissionDescriptorAllow
+              permissions:
+                - environment:read
+                - environment:open
+
 variables:
   # Data source: the authenticated Pulumi Cloud user (the stack's operator).
   # Used to seed the new Team's member list below.
@@ -85,3 +128,7 @@ outputs:
   firstScope: ${availableScopes.scopes[0].name}
   memberAdopted: ${rbacMember.adopted}
   memberAssignedRole: ${rbacMember.roleName}
+  # Demonstrate the env-scoped role wiring: the env's UUID flows into
+  # the role's permission tree, so the test can verify both pieces line up.
+  scopedEnvironmentId: ${scopedEnv.environmentId}
+  scopedRoleId: ${scopedReadOnlyRole.roleId}

@@ -44,7 +44,7 @@ func (GetCurrentUserFunction) Annotate(a infer.Annotator) {
 		&GetCurrentUserFunction{},
 		"Returns the Pulumi Cloud user that the provider's access token belongs to. "+
 			"Useful for seeding a newly-created `Team` with the creator as a member, since "+
-			"Pulumi Cloud auto-adds the creator and omitting them causes a refresh drift.",
+			"Pulumi Cloud auto-adds the creator. Omitting this user from the team will result in a refresh drift.",
 	)
 	a.SetToken("index", "getCurrentUser")
 }

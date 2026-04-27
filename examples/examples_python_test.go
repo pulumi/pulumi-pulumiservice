@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/pulumi/pulumi/pkg/v3/testing/integration"
 )
 
@@ -79,6 +81,17 @@ func TestPythonRbacExample(t *testing.T) {
 		},
 		Dependencies: []string{
 			filepath.Join("..", "sdk", "python", "bin"),
+		},
+		ExtraRuntimeValidation: func(t *testing.T, stack integration.RuntimeValidationStackInfo) {
+			// Env-scoped role wiring must populate. An empty UUID would
+			// mean the metadata fetch silently skipped, leaving the
+			// role's `identity` unresolved.
+			if envID, ok := stack.Outputs["scopedEnvironmentId"]; ok {
+				assert.NotEmpty(t, envID, "expected Environment.environment_id to be populated")
+			}
+			if scopedRoleID, ok := stack.Outputs["scopedRoleId"]; ok {
+				assert.NotEmpty(t, scopedRoleID, "expected env-scoped OrganizationRole to be created")
+			}
 		},
 	})
 }

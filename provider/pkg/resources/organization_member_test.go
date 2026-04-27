@@ -97,8 +97,7 @@ func TestOrganizationMemberRead(t *testing.T) {
 						GithubLogin: "alice",
 						Email:       "alice@example.com",
 					},
-					KnownToPulumi: true,
-					FGARole:       &pulumiapi.FGARole{ID: "admin-fga", Name: "Admin"},
+					FGARole: &pulumiapi.FGARole{ID: "admin-fga", Name: "Admin"},
 				}, nil
 			},
 			listRolesFunc: stubBuiltinRoles,
@@ -131,10 +130,9 @@ func TestOrganizationMemberRead(t *testing.T) {
 		mock := &orgMemberClientMock{
 			getFunc: func(_ context.Context, _, _ string) (*pulumiapi.Member, error) {
 				return &pulumiapi.Member{
-					Role:          "member",
-					User:          pulumiapi.User{Name: "Bob", GithubLogin: "bob"},
-					KnownToPulumi: true,
-					FGARole:       &pulumiapi.FGARole{ID: fgaID, Name: "read-only-devops"},
+					Role:    "member",
+					User:    pulumiapi.User{Name: "Bob", GithubLogin: "bob"},
+					FGARole: &pulumiapi.FGARole{ID: fgaID, Name: "read-only-devops"},
 				}, nil
 			},
 			listRolesFunc: func(_ context.Context, _, _ string) ([]pulumiapi.RoleDescriptor, error) {

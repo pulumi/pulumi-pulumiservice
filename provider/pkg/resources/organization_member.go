@@ -73,10 +73,9 @@ type OrganizationMemberInput struct {
 
 type OrganizationMemberState struct {
 	OrganizationMemberCore
-	Name          string `pulumi:"name"`
-	Email         string `pulumi:"email"`
-	KnownToPulumi bool   `pulumi:"knownToPulumi"`
-	RoleName      string `pulumi:"roleName"`
+	Name     string `pulumi:"name"`
+	Email    string `pulumi:"email"`
+	RoleName string `pulumi:"roleName"`
 	// Adopted is true when Create found the user already in the org (409)
 	// and adopted the membership instead of adding it. When set, Delete
 	// does not remove the user from the org — it only resets the role.
@@ -86,7 +85,6 @@ type OrganizationMemberState struct {
 func (s *OrganizationMemberState) Annotate(a infer.Annotator) {
 	a.Describe(&s.Name, "The member's display name.")
 	a.Describe(&s.Email, "The member's email address.")
-	a.Describe(&s.KnownToPulumi, "Whether the member has a Pulumi Cloud account.")
 	a.Describe(&s.RoleName, "The name of the currently assigned role (custom role name, or built-in role).")
 	a.Describe(
 		&s.Adopted,
@@ -326,9 +324,8 @@ func readOrgMemberState(
 			Role:             core.Role,
 			RoleId:           core.RoleId,
 		},
-		Name:          member.User.Name,
-		Email:         member.User.Email,
-		KnownToPulumi: member.KnownToPulumi,
+		Name:  member.User.Name,
+		Email: member.User.Email,
 	}
 
 	if err := applyMemberRoleToState(ctx, client, orgName, member, &state); err != nil {

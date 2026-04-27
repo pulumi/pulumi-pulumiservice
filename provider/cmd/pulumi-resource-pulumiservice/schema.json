@@ -690,10 +690,6 @@
     },
     "pulumiservice:index:OrganizationMemberInfo": {
       "properties": {
-        "knownToPulumi": {
-          "type": "boolean",
-          "description": "Whether this member has a Pulumi Cloud account."
-        },
         "role": {
           "type": "string",
           "description": "The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case."
@@ -718,7 +714,6 @@
       "type": "object",
       "required": [
         "username",
-        "knownToPulumi",
         "virtualAdmin"
       ]
     },
@@ -1586,6 +1581,10 @@
     "pulumiservice:index:Environment": {
       "description": "An ESC Environment.",
       "properties": {
+        "environmentId": {
+          "type": "string",
+          "description": "The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `PermissionLiteralExpressionEnvironment` expression in `OrganizationRole.permissions`."
+        },
         "name": {
           "type": "string",
           "description": "Environment name."
@@ -2024,10 +2023,6 @@
           "type": "string",
           "description": "The member's email address."
         },
-        "knownToPulumi": {
-          "type": "boolean",
-          "description": "Whether the member has a Pulumi Cloud account."
-        },
         "name": {
           "type": "string",
           "description": "The member's display name."
@@ -2060,7 +2055,6 @@
         "username",
         "name",
         "email",
-        "knownToPulumi",
         "roleName",
         "adopted"
       ],
@@ -2120,10 +2114,6 @@
           "type": "string",
           "description": "The unique identifier of the custom role."
         },
-        "uxPurpose": {
-          "type": "string",
-          "description": "How the role appears in the Pulumi Cloud console. One of `role`, `role_private`, `policy`, `set`. Defaults to `role`."
-        },
         "version": {
           "type": "integer",
           "description": "The service-maintained version number that increments on every update."
@@ -2160,10 +2150,6 @@
         "resourceType": {
           "type": "string",
           "description": "The resource type the role's permissions apply to. Defaults to `global` (the org-wide role that can be assigned to members and teams). Other valid values: `stack`, `environment`, `insights-account`."
-        },
-        "uxPurpose": {
-          "type": "string",
-          "description": "How the role appears in the Pulumi Cloud console. One of `role`, `role_private`, `policy`, `set`. Defaults to `role`."
         }
       },
       "requiredInputs": [
@@ -3061,6 +3047,57 @@
         "type": "object"
       }
     },
+    "pulumiservice:index:getEnvironment": {
+      "description": "Looks up an existing ESC environment by name and returns its UUID. Use this to pin a custom RBAC role to a specific environment via `PermissionLiteralExpressionEnvironment` when the environment is not managed by the current Pulumi program. Errors when the environment is not found.",
+      "inputs": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The environment name."
+          },
+          "organizationName": {
+            "type": "string",
+            "description": "The Pulumi Cloud organization that owns the environment."
+          },
+          "projectName": {
+            "type": "string",
+            "description": "The ESC project name. Defaults to `default`."
+          }
+        },
+        "type": "object",
+        "required": [
+          "organizationName",
+          "name"
+        ]
+      },
+      "outputs": {
+        "properties": {
+          "environmentId": {
+            "description": "The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `PermissionLiteralExpressionEnvironment` expression.",
+            "type": "string"
+          },
+          "name": {
+            "description": "The environment name.",
+            "type": "string"
+          },
+          "organizationName": {
+            "description": "The Pulumi Cloud organization that owns the environment.",
+            "type": "string"
+          },
+          "projectName": {
+            "description": "The ESC project the environment lives in.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "organizationName",
+          "projectName",
+          "name",
+          "environmentId"
+        ],
+        "type": "object"
+      }
+    },
     "pulumiservice:index:getInsightsAccount": {
       "description": "Get details about a specific Insights account.",
       "inputs": {
@@ -3188,10 +3225,6 @@
       },
       "outputs": {
         "properties": {
-          "knownToPulumi": {
-            "description": "Whether this member has a Pulumi Cloud account.",
-            "type": "boolean"
-          },
           "role": {
             "description": "The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.",
             "type": "string"
@@ -3215,7 +3248,6 @@
         },
         "required": [
           "username",
-          "knownToPulumi",
           "virtualAdmin"
         ],
         "type": "object"

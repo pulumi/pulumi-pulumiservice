@@ -444,10 +444,6 @@ export interface OperationContextOptions {
 
 export interface OrganizationMemberInfo {
     /**
-     * Whether this member has a Pulumi Cloud account.
-     */
-    knownToPulumi: boolean;
-    /**
      * The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.
      */
     role?: string;

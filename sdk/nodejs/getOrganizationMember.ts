@@ -28,10 +28,6 @@ export interface GetOrganizationMemberArgs {
 
 export interface GetOrganizationMemberResult {
     /**
-     * Whether this member has a Pulumi Cloud account.
-     */
-    readonly knownToPulumi: boolean;
-    /**
      * The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.
      */
     readonly role?: string;

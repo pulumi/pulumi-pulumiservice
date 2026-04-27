@@ -55,7 +55,6 @@ type OrganizationRoleCore struct {
 	Name             string                 `pulumi:"name"`
 	Description      *string                `pulumi:"description,optional"`
 	ResourceType     *string                `pulumi:"resourceType,optional"`
-	UxPurpose        *string                `pulumi:"uxPurpose,optional"`
 	Permissions      map[string]interface{} `pulumi:"permissions"`
 }
 
@@ -68,11 +67,6 @@ func (c *OrganizationRoleCore) Annotate(a infer.Annotator) {
 		"The resource type the role's permissions apply to. Defaults to `global` (the org-wide role "+
 			"that can be assigned to members and teams). Other valid values: `stack`, `environment`, "+
 			"`insights-account`.",
-	)
-	a.Describe(
-		&c.UxPurpose,
-		"How the role appears in the Pulumi Cloud console. One of `role`, `role_private`, `policy`, `set`. "+
-			"Defaults to `role`.",
 	)
 	a.Describe(
 		&c.Permissions,
@@ -97,8 +91,6 @@ func (s *OrganizationRoleState) Annotate(a infer.Annotator) {
 	a.Describe(&s.Version, "The service-maintained version number that increments on every update.")
 }
 
-var validRoleUxPurposes = []string{"role", "role_private", "policy", "set"}
-
 func (*OrganizationRole) Check(
 	ctx context.Context,
 	req infer.CheckRequest,
@@ -115,21 +107,6 @@ func (*OrganizationRole) Check(
 			Property: "permissions",
 			Reason:   "permissions must not be empty — supply a PermissionDescriptor tree",
 		})
-	}
-	if in.UxPurpose != nil && *in.UxPurpose != "" {
-		ok := false
-		for _, v := range validRoleUxPurposes {
-			if v == *in.UxPurpose {
-				ok = true
-				break
-			}
-		}
-		if !ok {
-			failures = append(failures, p.CheckFailure{
-				Property: "uxPurpose",
-				Reason:   fmt.Sprintf("uxPurpose must be one of %v, got %q", validRoleUxPurposes, *in.UxPurpose),
-			})
-		}
 	}
 	return infer.CheckResponse[OrganizationRoleInput]{Inputs: in, Failures: failures}, nil
 }
@@ -158,7 +135,6 @@ func (*OrganizationRole) Create(
 		req.Inputs.Name,
 		util.OrZero(req.Inputs.Description),
 		util.OrZero(req.Inputs.ResourceType),
-		util.OrZero(req.Inputs.UxPurpose),
 		details,
 	))
 	if err != nil {
@@ -279,18 +255,14 @@ func orgRoleCoreFromAPI(
 		OrganizationName: orgName,
 		Name:             role.Name,
 		Description:      util.OrNil(role.Description),
-		// Preserve user intent for defaultable fields: if the user left
-		// resourceType/uxPurpose unset, don't let the service-computed
-		// default leak into state and cause refresh drift.
+		// Preserve user intent: if the user left resourceType unset, don't
+		// let the service-computed default leak into state and cause refresh
+		// drift.
 		ResourceType: prior.ResourceType,
-		UxPurpose:    prior.UxPurpose,
 		Permissions:  prior.Permissions,
 	}
 	if core.ResourceType == nil && role.ResourceType != "" && role.ResourceType != "global" {
 		core.ResourceType = util.OrNil(role.ResourceType)
-	}
-	if core.UxPurpose == nil && role.UXPurpose != "" && role.UXPurpose != "role" {
-		core.UxPurpose = util.OrNil(role.UXPurpose)
 	}
 	if len(role.Details) > 0 {
 		parsed := map[string]interface{}{}

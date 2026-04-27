@@ -28,12 +28,6 @@ namespace Pulumi.PulumiService
         public Output<string> Email { get; private set; } = null!;
 
         /// <summary>
-        /// Whether the member has a Pulumi Cloud account.
-        /// </summary>
-        [Output("knownToPulumi")]
-        public Output<bool> KnownToPulumi { get; private set; } = null!;
-
-        /// <summary>
         /// The member's display name.
         /// </summary>
         [Output("name")]

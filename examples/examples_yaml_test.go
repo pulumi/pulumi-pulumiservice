@@ -543,6 +543,16 @@ func TestYamlRbacExample(t *testing.T) {
 	if adopted, ok := up.Outputs["memberAdopted"]; ok {
 		assert.Equal(t, true, adopted.Value, "expected OrganizationMember to adopt the existing membership")
 	}
+	// Sanity-check env-scoped role wiring: the Environment resource must
+	// surface a non-empty UUID, and the role pinned to it must reach the
+	// service. An empty UUID would mean the metadata fetch silently
+	// skipped and the role's `identity` was never resolved.
+	if envID, ok := up.Outputs["scopedEnvironmentId"]; ok {
+		assert.NotEmpty(t, envID.Value, "expected Environment.environmentId to be populated")
+	}
+	if scopedRoleID, ok := up.Outputs["scopedRoleId"]; ok {
+		assert.NotEmpty(t, scopedRoleID.Value, "expected env-scoped OrganizationRole to be created")
+	}
 	preview := test.Preview(t)
 	assertpreview.HasNoChanges(t, preview)
 	refresh := test.Refresh(t)

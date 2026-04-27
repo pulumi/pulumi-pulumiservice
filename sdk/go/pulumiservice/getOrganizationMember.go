@@ -30,8 +30,6 @@ type LookupOrganizationMemberArgs struct {
 }
 
 type LookupOrganizationMemberResult struct {
-	// Whether this member has a Pulumi Cloud account.
-	KnownToPulumi bool `pulumi:"knownToPulumi"`
 	// The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.
 	Role *string `pulumi:"role"`
 	// The custom role ID assigned to this member, if any.
@@ -76,11 +74,6 @@ func (o LookupOrganizationMemberResultOutput) ToLookupOrganizationMemberResultOu
 
 func (o LookupOrganizationMemberResultOutput) ToLookupOrganizationMemberResultOutputWithContext(ctx context.Context) LookupOrganizationMemberResultOutput {
 	return o
-}
-
-// Whether this member has a Pulumi Cloud account.
-func (o LookupOrganizationMemberResultOutput) KnownToPulumi() pulumi.BoolOutput {
-	return o.ApplyT(func(v LookupOrganizationMemberResult) bool { return v.KnownToPulumi }).(pulumi.BoolOutput)
 }
 
 // The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.

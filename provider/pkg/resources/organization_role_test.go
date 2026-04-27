@@ -57,9 +57,8 @@ func TestOrganizationRoleCreate(t *testing.T) {
 			assert.Equal(t, "acme", org)
 			assert.Equal(t, "read-only", req.Name)
 			// Defaults are applied by the API client layer, so at this seam
-			// ResourceType/UXPurpose stay empty when the user didn't set them.
+			// ResourceType stays empty when the user didn't set it.
 			assert.Equal(t, "", req.ResourceType)
-			assert.Equal(t, "", req.UXPurpose)
 			// details should be the JSON-encoded permissions map.
 			var parsed map[string]interface{}
 			assert.NoError(t, json.Unmarshal(req.Details, &parsed))
@@ -112,7 +111,6 @@ func TestOrganizationRoleRead(t *testing.T) {
 					Name:         "read-only",
 					Description:  "ro",
 					ResourceType: "global",
-					UXPurpose:    "role",
 					Version:      2,
 					Details:      raw,
 				}, nil
@@ -205,26 +203,5 @@ func TestOrganizationRoleCheck(t *testing.T) {
 			props[f.Property] = true
 		}
 		assert.True(t, props["permissions"])
-	})
-
-	t.Run("rejects bad uxPurpose", func(t *testing.T) {
-		resp, err := r.Check(context.Background(), infer.CheckRequest{
-			NewInputs: property.NewMap(map[string]property.Value{
-				"organizationName": property.New("acme"),
-				"name":             property.New("r"),
-				"uxPurpose":        property.New("bogus"),
-				"permissions": property.New(property.NewMap(map[string]property.Value{
-					"__type": property.New("PermissionDescriptorAllow"),
-				})),
-			}),
-		})
-		assert.NoError(t, err)
-		found := false
-		for _, f := range resp.Failures {
-			if f.Property == "uxPurpose" {
-				found = true
-			}
-		}
-		assert.True(t, found)
 	})
 }

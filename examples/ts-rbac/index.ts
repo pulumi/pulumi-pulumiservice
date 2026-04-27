@@ -49,6 +49,48 @@ const rbacMember = new service.OrganizationMember("rbacMember", {
     roleId: readOnlyRole.roleId,
 });
 
+// An ESC environment to demo per-env role scoping. The Environment resource
+// exposes its UUID via `environmentId`, which is what the role below pins
+// its grants to.
+const scopedEnv = new service.Environment("scopedEnv", {
+    organization: organizationName,
+    project: "default",
+    name: `ts-rbac-scoped-env-${nameSuffix}`,
+    yaml: new pulumi.asset.StringAsset(
+        'values:\n  placeholder: "ts-rbac scoped env fixture"\n',
+    ),
+});
+
+// A role that ONLY grants `environment:read` and `environment:open` on the
+// specific env created above. Anywhere else in the org, the role grants
+// nothing. The role definition is org-scoped (resourceType defaults to
+// "global"); the permission tree is gated on the environment's UUID.
+const scopedReadOnlyRole = new service.OrganizationRole("scopedReadOnlyRole", {
+    organizationName,
+    name: `ts-rbac-scoped-read-only-${nameSuffix}`,
+    description: "Read+open access scoped to a single ESC environment.",
+    permissions: scopedEnv.environmentId.apply(envId => ({
+        __type: "PermissionDescriptorGroup",
+        entries: [
+            {
+                __type: "PermissionDescriptorCondition",
+                condition: {
+                    __type: "PermissionExpressionEqual",
+                    left: { __type: "PermissionExpressionEnvironment" },
+                    right: {
+                        __type: "PermissionLiteralExpressionEnvironment",
+                        identity: envId,
+                    },
+                },
+                subNode: {
+                    __type: "PermissionDescriptorAllow",
+                    permissions: ["environment:read", "environment:open"],
+                },
+            },
+        ],
+    })),
+});
+
 // Data source: list every member of the organization.
 const currentMembers = service.getOrganizationMembersOutput({ organizationName });
 
@@ -70,3 +112,6 @@ export const firstScope = availableScopes.scopes[0].name;
 export const memberAdopted = rbacMember.adopted;
 export const memberAssignedRole = rbacMember.roleName;
 export const lookedUpByUsernameRole = memberByUsername.role;
+// Env-scoped role wiring outputs.
+export const scopedEnvironmentId = scopedEnv.environmentId;
+export const scopedRoleId = scopedReadOnlyRole.roleId;

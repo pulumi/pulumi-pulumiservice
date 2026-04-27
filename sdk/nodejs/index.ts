@@ -55,6 +55,11 @@ export const getCurrentUser: typeof import("./getCurrentUser").getCurrentUser = 
 export const getCurrentUserOutput: typeof import("./getCurrentUser").getCurrentUserOutput = null as any;
 utilities.lazyLoad(exports, ["getCurrentUser","getCurrentUserOutput"], () => require("./getCurrentUser"));
 
+export { GetEnvironmentArgs, GetEnvironmentResult, GetEnvironmentOutputArgs } from "./getEnvironment";
+export const getEnvironment: typeof import("./getEnvironment").getEnvironment = null as any;
+export const getEnvironmentOutput: typeof import("./getEnvironment").getEnvironmentOutput = null as any;
+utilities.lazyLoad(exports, ["getEnvironment","getEnvironmentOutput"], () => require("./getEnvironment"));
+
 export { GetInsightsAccountArgs, GetInsightsAccountResult, GetInsightsAccountOutputArgs } from "./getInsightsAccount";
 export const getInsightsAccount: typeof import("./getInsightsAccount").getInsightsAccount = null as any;
 export const getInsightsAccountOutput: typeof import("./getInsightsAccount").getInsightsAccountOutput = null as any;

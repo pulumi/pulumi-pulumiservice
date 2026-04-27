@@ -14,11 +14,6 @@ import javax.annotation.Nullable;
 @CustomType
 public final class OrganizationMemberInfo {
     /**
-     * @return Whether this member has a Pulumi Cloud account.
-     * 
-     */
-    private Boolean knownToPulumi;
-    /**
      * @return The member&#39;s built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.
      * 
      */
@@ -45,13 +40,6 @@ public final class OrganizationMemberInfo {
     private Boolean virtualAdmin;
 
     private OrganizationMemberInfo() {}
-    /**
-     * @return Whether this member has a Pulumi Cloud account.
-     * 
-     */
-    public Boolean knownToPulumi() {
-        return this.knownToPulumi;
-    }
     /**
      * @return The member&#39;s built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.
      * 
@@ -97,7 +85,6 @@ public final class OrganizationMemberInfo {
     }
     @CustomType.Builder
     public static final class Builder {
-        private Boolean knownToPulumi;
         private @Nullable String role;
         private @Nullable String roleId;
         private @Nullable String roleName;
@@ -106,7 +93,6 @@ public final class OrganizationMemberInfo {
         public Builder() {}
         public Builder(OrganizationMemberInfo defaults) {
     	      Objects.requireNonNull(defaults);
-    	      this.knownToPulumi = defaults.knownToPulumi;
     	      this.role = defaults.role;
     	      this.roleId = defaults.roleId;
     	      this.roleName = defaults.roleName;
@@ -114,14 +100,6 @@ public final class OrganizationMemberInfo {
     	      this.virtualAdmin = defaults.virtualAdmin;
         }
 
-        @CustomType.Setter
-        public Builder knownToPulumi(Boolean knownToPulumi) {
-            if (knownToPulumi == null) {
-              throw new MissingRequiredPropertyException("OrganizationMemberInfo", "knownToPulumi");
-            }
-            this.knownToPulumi = knownToPulumi;
-            return this;
-        }
         @CustomType.Setter
         public Builder role(@Nullable String role) {
 
@@ -158,7 +136,6 @@ public final class OrganizationMemberInfo {
         }
         public OrganizationMemberInfo build() {
             final var _resultValue = new OrganizationMemberInfo();
-            _resultValue.knownToPulumi = knownToPulumi;
             _resultValue.role = role;
             _resultValue.roleId = roleId;
             _resultValue.roleName = roleName;

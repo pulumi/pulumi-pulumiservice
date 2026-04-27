@@ -93,21 +93,6 @@ public final class OrganizationRoleArgs extends com.pulumi.resources.ResourceArg
         return Optional.ofNullable(this.resourceType);
     }
 
-    /**
-     * How the role appears in the Pulumi Cloud console. One of `role`, `role_private`, `policy`, `set`. Defaults to `role`.
-     * 
-     */
-    @Import(name="uxPurpose")
-    private @Nullable Output<String> uxPurpose;
-
-    /**
-     * @return How the role appears in the Pulumi Cloud console. One of `role`, `role_private`, `policy`, `set`. Defaults to `role`.
-     * 
-     */
-    public Optional<Output<String>> uxPurpose() {
-        return Optional.ofNullable(this.uxPurpose);
-    }
-
     private OrganizationRoleArgs() {}
 
     private OrganizationRoleArgs(OrganizationRoleArgs $) {
@@ -116,7 +101,6 @@ public final class OrganizationRoleArgs extends com.pulumi.resources.ResourceArg
         this.organizationName = $.organizationName;
         this.permissions = $.permissions;
         this.resourceType = $.resourceType;
-        this.uxPurpose = $.uxPurpose;
     }
 
     public static Builder builder() {
@@ -240,27 +224,6 @@ public final class OrganizationRoleArgs extends com.pulumi.resources.ResourceArg
          */
         public Builder resourceType(String resourceType) {
             return resourceType(Output.of(resourceType));
-        }
-
-        /**
-         * @param uxPurpose How the role appears in the Pulumi Cloud console. One of `role`, `role_private`, `policy`, `set`. Defaults to `role`.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder uxPurpose(@Nullable Output<String> uxPurpose) {
-            $.uxPurpose = uxPurpose;
-            return this;
-        }
-
-        /**
-         * @param uxPurpose How the role appears in the Pulumi Cloud console. One of `role`, `role_private`, `policy`, `set`. Defaults to `role`.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder uxPurpose(String uxPurpose) {
-            return uxPurpose(Output.of(uxPurpose));
         }
 
         public OrganizationRoleArgs build() {

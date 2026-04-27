@@ -11,6 +11,8 @@ import com.pulumi.deployment.InvokeOutputOptions;
 import com.pulumi.pulumiservice.Utilities;
 import com.pulumi.pulumiservice.inputs.GetCurrentUserArgs;
 import com.pulumi.pulumiservice.inputs.GetCurrentUserPlainArgs;
+import com.pulumi.pulumiservice.inputs.GetEnvironmentArgs;
+import com.pulumi.pulumiservice.inputs.GetEnvironmentPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetInsightsAccountArgs;
 import com.pulumi.pulumiservice.inputs.GetInsightsAccountPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetInsightsAccountsArgs;
@@ -26,6 +28,7 @@ import com.pulumi.pulumiservice.inputs.GetPolicyPackPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetPolicyPacksArgs;
 import com.pulumi.pulumiservice.inputs.GetPolicyPacksPlainArgs;
 import com.pulumi.pulumiservice.outputs.GetCurrentUserResult;
+import com.pulumi.pulumiservice.outputs.GetEnvironmentResult;
 import com.pulumi.pulumiservice.outputs.GetInsightsAccountResult;
 import com.pulumi.pulumiservice.outputs.GetInsightsAccountsResult;
 import com.pulumi.pulumiservice.outputs.GetOrganizationMemberResult;
@@ -84,6 +87,41 @@ public final class PulumiserviceFunctions {
      */
     public static CompletableFuture<GetCurrentUserResult> getCurrentUserPlain(GetCurrentUserPlainArgs args, InvokeOptions options) {
         return Deployment.getInstance().invokeAsync("pulumiservice:index:getCurrentUser", TypeShape.of(GetCurrentUserResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Looks up an existing ESC environment by name and returns its UUID. Use this to pin a custom RBAC role to a specific environment via `PermissionLiteralExpressionEnvironment` when the environment is not managed by the current Pulumi program. Errors when the environment is not found.
+     * 
+     */
+    public static Output<GetEnvironmentResult> getEnvironment(GetEnvironmentArgs args) {
+        return getEnvironment(args, InvokeOptions.Empty);
+    }
+    /**
+     * Looks up an existing ESC environment by name and returns its UUID. Use this to pin a custom RBAC role to a specific environment via `PermissionLiteralExpressionEnvironment` when the environment is not managed by the current Pulumi program. Errors when the environment is not found.
+     * 
+     */
+    public static CompletableFuture<GetEnvironmentResult> getEnvironmentPlain(GetEnvironmentPlainArgs args) {
+        return getEnvironmentPlain(args, InvokeOptions.Empty);
+    }
+    /**
+     * Looks up an existing ESC environment by name and returns its UUID. Use this to pin a custom RBAC role to a specific environment via `PermissionLiteralExpressionEnvironment` when the environment is not managed by the current Pulumi program. Errors when the environment is not found.
+     * 
+     */
+    public static Output<GetEnvironmentResult> getEnvironment(GetEnvironmentArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getEnvironment", TypeShape.of(GetEnvironmentResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Looks up an existing ESC environment by name and returns its UUID. Use this to pin a custom RBAC role to a specific environment via `PermissionLiteralExpressionEnvironment` when the environment is not managed by the current Pulumi program. Errors when the environment is not found.
+     * 
+     */
+    public static Output<GetEnvironmentResult> getEnvironment(GetEnvironmentArgs args, InvokeOutputOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getEnvironment", TypeShape.of(GetEnvironmentResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Looks up an existing ESC environment by name and returns its UUID. Use this to pin a custom RBAC role to a specific environment via `PermissionLiteralExpressionEnvironment` when the environment is not managed by the current Pulumi program. Errors when the environment is not found.
+     * 
+     */
+    public static CompletableFuture<GetEnvironmentResult> getEnvironmentPlain(GetEnvironmentPlainArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invokeAsync("pulumiservice:index:getEnvironment", TypeShape.of(GetEnvironmentResult.class), args, Utilities.withVersion(options));
     }
     /**
      * Get details about a specific Insights account.
