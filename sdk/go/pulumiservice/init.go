@@ -37,6 +37,8 @@ func (m *module) Construct(ctx *pulumi.Context, name, typ, urn string) (r pulumi
 		r = &Environment{}
 	case "pulumiservice:index:EnvironmentRotationSchedule":
 		r = &EnvironmentRotationSchedule{}
+	case "pulumiservice:index:EnvironmentTag":
+		r = &EnvironmentTag{}
 	case "pulumiservice:index:EnvironmentVersionTag":
 		r = &EnvironmentVersionTag{}
 	case "pulumiservice:index:InsightsAccount":

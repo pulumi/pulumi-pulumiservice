@@ -1645,6 +1645,67 @@
         "environment"
       ]
     },
+    "pulumiservice:index:EnvironmentTag": {
+      "description": "A key/value tag on a Pulumi ESC environment.",
+      "properties": {
+        "environment": {
+          "type": "string",
+          "description": "Environment name."
+        },
+        "organization": {
+          "type": "string",
+          "description": "Organization name."
+        },
+        "project": {
+          "type": "string",
+          "description": "Project name."
+        },
+        "tagName": {
+          "type": "string",
+          "description": "Tag name."
+        },
+        "value": {
+          "type": "string",
+          "description": "Tag value."
+        }
+      },
+      "required": [
+        "organization",
+        "project",
+        "environment",
+        "tagName",
+        "value"
+      ],
+      "inputProperties": {
+        "environment": {
+          "type": "string",
+          "description": "Environment name."
+        },
+        "organization": {
+          "type": "string",
+          "description": "Organization name."
+        },
+        "project": {
+          "type": "string",
+          "description": "Project name.",
+          "default": "default"
+        },
+        "tagName": {
+          "type": "string",
+          "description": "Tag name."
+        },
+        "value": {
+          "type": "string",
+          "description": "Tag value."
+        }
+      },
+      "requiredInputs": [
+        "organization",
+        "environment",
+        "tagName",
+        "value"
+      ]
+    },
     "pulumiservice:index:EnvironmentVersionTag": {
       "description": "A tag on a specific revision of an environment.",
       "properties": {

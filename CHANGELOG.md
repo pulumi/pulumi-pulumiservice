@@ -9,6 +9,7 @@
 - Added `StackTags` resource for managing multiple stack tags as a single resource, with a `tags` map input. [#61](https://github.com/pulumi/pulumi-pulumiservice/issues/61)
 - Added `TwelveHours` (12h) scan schedule option for `InsightsAccount` resources. [#731](https://github.com/pulumi/pulumi-pulumiservice/pull/731)
 - Documented the `all` enforcement-level wildcard on `PolicyGroupPolicyPackReference.config`, enabling a single entry to set the enforcement level for every policy in a pack with optional per-policy overrides. [#756](https://github.com/pulumi/pulumi-pulumiservice/pull/756)
+- Added `EnvironmentTag` resource for managing key/value tags on Pulumi ESC environments. [#776](https://github.com/pulumi/pulumi-pulumiservice/pull/776)
 
 ### Bug Fixes
 - Fixed TeamEnvironmentPermission spurious replacement on upgrade from 0.29.2 caused by the optional `maxOpenDuration` field being serialized as an empty string in Check and Read [#751](https://github.com/pulumi/pulumi-pulumiservice/issues/751)

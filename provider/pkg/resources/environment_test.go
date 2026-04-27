@@ -25,9 +25,14 @@ type getEnvironmentRevisionTagFunc func(
 	ctx context.Context, orgName, envName, tagName string,
 ) (*client.EnvironmentRevisionTag, error)
 
+type getEnvironmentTagFunc func(
+	ctx context.Context, orgName, projectName, envName, tagName string,
+) (*client.EnvironmentTag, error)
+
 type EscClientMock struct {
 	getEnvironmentFunc            getEnvironmentFunc
 	getEnvironmentRevisionTagFunc getEnvironmentRevisionTagFunc
+	getEnvironmentTagFunc         getEnvironmentTagFunc
 }
 
 func (c *EscClientMock) GetEnvironment(
@@ -265,12 +270,12 @@ func (c *EscClientMock) CreateEnvironmentTag(
 }
 
 func (c *EscClientMock) GetEnvironmentTag(
-	context.Context,
-	string,
-	string,
-	string,
-	string,
+	ctx context.Context,
+	orgName, projectName, envName, tagName string,
 ) (*client.EnvironmentTag, error) {
+	if c.getEnvironmentTagFunc != nil {
+		return c.getEnvironmentTagFunc(ctx, orgName, projectName, envName, tagName)
+	}
 	return nil, nil
 }
 
@@ -356,8 +361,8 @@ func buildEscClientMock(
 	getEnvironmentRevisionTagFunc getEnvironmentRevisionTagFunc,
 ) *EscClientMock {
 	return &EscClientMock{
-		getEnvironmentFunc,
-		getEnvironmentRevisionTagFunc,
+		getEnvironmentFunc:            getEnvironmentFunc,
+		getEnvironmentRevisionTagFunc: getEnvironmentRevisionTagFunc,
 	}
 }
 
@@ -682,5 +687,89 @@ func TestEnvironmentVersionTag(t *testing.T) {
 
 		assert.NoError(t, err)
 		assert.Equal(t, resp.Id, "org/env/tag")
+	})
+}
+
+func TestEnvironmentTag(t *testing.T) {
+	t.Run("Read when the resource is not found", func(t *testing.T) {
+		mockedClient := buildEscClientMock(nil, nil)
+		mockedClient.getEnvironmentTagFunc = func(
+			_ context.Context, _, _, _, _ string,
+		) (*client.EnvironmentTag, error) {
+			return nil, fmt.Errorf("404 Not Found")
+		}
+
+		provider := PulumiServiceEnvironmentTagResource{
+			Client: mockedClient,
+		}
+
+		input := PulumiServiceEnvironmentTagInput{
+			Organization: "org",
+			Project:      "project",
+			Environment:  "env",
+			TagName:      "tag",
+			Value:        "v1",
+		}
+
+		propertyMap := input.ToPropertyMap()
+		outputProperties, _ := plugin.MarshalProperties(
+			propertyMap,
+			plugin.MarshalOptions{
+				KeepUnknowns: true,
+				SkipNulls:    true,
+			},
+		)
+		req := pulumirpc.ReadRequest{
+			Id:         "org/project/env/tag",
+			Properties: outputProperties,
+		}
+
+		resp, err := provider.Read(&req)
+
+		assert.NoError(t, err)
+		assert.Equal(t, resp.Id, "")
+		assert.Nil(t, resp.Properties)
+	})
+
+	t.Run("Read when the resource is found", func(t *testing.T) {
+		mockedClient := buildEscClientMock(nil, nil)
+		mockedClient.getEnvironmentTagFunc = func(
+			_ context.Context, _, _, _, tagName string,
+		) (*client.EnvironmentTag, error) {
+			return &client.EnvironmentTag{
+				Name:  tagName,
+				Value: "v1",
+			}, nil
+		}
+
+		provider := PulumiServiceEnvironmentTagResource{
+			Client: mockedClient,
+		}
+
+		input := PulumiServiceEnvironmentTagInput{
+			Organization: "org",
+			Project:      "project",
+			Environment:  "env",
+			TagName:      "tag",
+			Value:        "v1",
+		}
+
+		propertyMap := input.ToPropertyMap()
+		outputProperties, _ := plugin.MarshalProperties(
+			propertyMap,
+			plugin.MarshalOptions{
+				KeepUnknowns: true,
+				SkipNulls:    true,
+			},
+		)
+		req := pulumirpc.ReadRequest{
+			Id:         "org/project/env/tag",
+			Properties: outputProperties,
+		}
+
+		resp, err := provider.Read(&req)
+
+		assert.NoError(t, err)
+		assert.Equal(t, resp.Id, "org/project/env/tag")
 	})
 }

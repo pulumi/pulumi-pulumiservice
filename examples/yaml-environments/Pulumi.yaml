@@ -33,6 +33,14 @@ resources:
       revision: ${testing-environment.revision}
     options:
       retainOnDelete: true
+  ownerTag:
+    type: pulumiservice:EnvironmentTag
+    properties:
+      organization: ${testing-environment.organization}
+      project: ${testing-environment.project}
+      environment: ${testing-environment.name}
+      tagName: owner
+      value: platform-team
   team:
     type: pulumiservice:index:Team
     properties:
