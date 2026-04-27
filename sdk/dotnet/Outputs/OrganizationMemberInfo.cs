@@ -14,10 +14,6 @@ namespace Pulumi.PulumiService.Outputs
     public sealed class OrganizationMemberInfo
     {
         /// <summary>
-        /// The member's GitHub login.
-        /// </summary>
-        public readonly string GithubLogin;
-        /// <summary>
         /// Whether this member has a Pulumi Cloud account.
         /// </summary>
         public readonly bool KnownToPulumi;
@@ -44,8 +40,6 @@ namespace Pulumi.PulumiService.Outputs
 
         [OutputConstructor]
         private OrganizationMemberInfo(
-            string githubLogin,
-
             bool knownToPulumi,
 
             string? role,
@@ -58,7 +52,6 @@ namespace Pulumi.PulumiService.Outputs
 
             bool virtualAdmin)
         {
-            GithubLogin = githubLogin;
             KnownToPulumi = knownToPulumi;
             Role = role;
             RoleId = roleId;

@@ -33,11 +33,10 @@ type GetCurrentUserFunction struct{}
 type GetCurrentUserInput struct{}
 
 type GetCurrentUserOutput struct {
-	Username    string `pulumi:"username"`
-	GithubLogin string `pulumi:"githubLogin"`
-	Name        string `pulumi:"name"`
-	Email       string `pulumi:"email"`
-	AvatarUrl   string `pulumi:"avatarUrl"`
+	Username  string `pulumi:"username"`
+	Name      string `pulumi:"name"`
+	Email     string `pulumi:"email"`
+	AvatarUrl string `pulumi:"avatarUrl"`
 }
 
 func (GetCurrentUserFunction) Annotate(a infer.Annotator) {
@@ -51,8 +50,7 @@ func (GetCurrentUserFunction) Annotate(a infer.Annotator) {
 }
 
 func (o *GetCurrentUserOutput) Annotate(a infer.Annotator) {
-	a.Describe(&o.Username, "The user's Pulumi Cloud username (same as `githubLogin`).")
-	a.Describe(&o.GithubLogin, "The user's GitHub login.")
+	a.Describe(&o.Username, "The user's Pulumi Cloud username.")
 	a.Describe(&o.Name, "The user's display name.")
 	a.Describe(&o.Email, "The user's email address.")
 	a.Describe(&o.AvatarUrl, "URL of the user's avatar image.")
@@ -71,11 +69,10 @@ func (GetCurrentUserFunction) Invoke(
 	}
 	return infer.FunctionResponse[GetCurrentUserOutput]{
 		Output: GetCurrentUserOutput{
-			Username:    user.GithubLogin,
-			GithubLogin: user.GithubLogin,
-			Name:        user.Name,
-			Email:       user.Email,
-			AvatarUrl:   user.AvatarURL,
+			Username:  user.GithubLogin,
+			Name:      user.Name,
+			Email:     user.Email,
+			AvatarUrl: user.AvatarURL,
 		},
 	}, nil
 }

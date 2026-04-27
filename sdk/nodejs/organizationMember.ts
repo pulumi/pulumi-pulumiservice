@@ -43,10 +43,6 @@ export class OrganizationMember extends pulumi.CustomResource {
      */
     declare public /*out*/ readonly email: pulumi.Output<string>;
     /**
-     * The member's GitHub login.
-     */
-    declare public /*out*/ readonly githubLogin: pulumi.Output<string>;
-    /**
      * Whether the member has a Pulumi Cloud account.
      */
     declare public /*out*/ readonly knownToPulumi: pulumi.Output<boolean>;
@@ -98,14 +94,12 @@ export class OrganizationMember extends pulumi.CustomResource {
             resourceInputs["username"] = args?.username;
             resourceInputs["adopted"] = undefined /*out*/;
             resourceInputs["email"] = undefined /*out*/;
-            resourceInputs["githubLogin"] = undefined /*out*/;
             resourceInputs["knownToPulumi"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
             resourceInputs["roleName"] = undefined /*out*/;
         } else {
             resourceInputs["adopted"] = undefined /*out*/;
             resourceInputs["email"] = undefined /*out*/;
-            resourceInputs["githubLogin"] = undefined /*out*/;
             resourceInputs["knownToPulumi"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
             resourceInputs["organizationName"] = undefined /*out*/;

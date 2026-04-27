@@ -42,7 +42,6 @@ type GetOrganizationMembersInput struct {
 // members who have already signed in (surfaced via `knownToPulumi`).
 type OrganizationMemberInfo struct {
 	Username      string  `pulumi:"username"`
-	GithubLogin   string  `pulumi:"githubLogin"`
 	Role          *string `pulumi:"role,optional"`
 	RoleId        *string `pulumi:"roleId,optional"`
 	RoleName      *string `pulumi:"roleName,optional"`
@@ -68,7 +67,6 @@ func (i *GetOrganizationMembersInput) Annotate(a infer.Annotator) {
 
 func (m *OrganizationMemberInfo) Annotate(a infer.Annotator) {
 	a.Describe(&m.Username, "The member's Pulumi Cloud username.")
-	a.Describe(&m.GithubLogin, "The member's GitHub login.")
 	a.Describe(
 		&m.Role,
 		"The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned "+
@@ -174,7 +172,6 @@ var builtinOrgRoles = []string{"member", "admin", "billing-manager"}
 func memberInfoFrom(m pulumiapi.Member) OrganizationMemberInfo {
 	info := OrganizationMemberInfo{
 		Username:      m.User.GithubLogin,
-		GithubLogin:   m.User.GithubLogin,
 		KnownToPulumi: m.KnownToPulumi,
 		VirtualAdmin:  m.VirtualAdmin,
 	}

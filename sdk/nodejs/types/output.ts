@@ -444,10 +444,6 @@ export interface OperationContextOptions {
 
 export interface OrganizationMemberInfo {
     /**
-     * The member's GitHub login.
-     */
-    githubLogin: string;
-    /**
      * Whether this member has a Pulumi Cloud account.
      */
     knownToPulumi: boolean;

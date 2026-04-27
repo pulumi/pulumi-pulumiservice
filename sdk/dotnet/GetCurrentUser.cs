@@ -52,15 +52,11 @@ namespace Pulumi.PulumiService
         /// </summary>
         public readonly string Email;
         /// <summary>
-        /// The user's GitHub login.
-        /// </summary>
-        public readonly string GithubLogin;
-        /// <summary>
         /// The user's display name.
         /// </summary>
         public readonly string Name;
         /// <summary>
-        /// The user's Pulumi Cloud username (same as `githubLogin`).
+        /// The user's Pulumi Cloud username.
         /// </summary>
         public readonly string Username;
 
@@ -70,15 +66,12 @@ namespace Pulumi.PulumiService
 
             string email,
 
-            string githubLogin,
-
             string name,
 
             string username)
         {
             AvatarUrl = avatarUrl;
             Email = email;
-            GithubLogin = githubLogin;
             Name = name;
             Username = username;
         }

@@ -115,7 +115,7 @@ func TestOrganizationMemberRead(t *testing.T) {
 			assert.Equal(t, "admin", *resp.State.Role)
 		}
 		assert.Nil(t, resp.State.RoleId)
-		assert.Equal(t, "alice", resp.State.GithubLogin)
+		assert.Equal(t, "alice", resp.State.Username)
 	})
 
 	t.Run("custom role surfaces the catalogue ID, not the FGA-side ID", func(t *testing.T) {

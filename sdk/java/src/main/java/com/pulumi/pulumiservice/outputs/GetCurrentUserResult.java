@@ -21,17 +21,12 @@ public final class GetCurrentUserResult {
      */
     private String email;
     /**
-     * @return The user&#39;s GitHub login.
-     * 
-     */
-    private String githubLogin;
-    /**
      * @return The user&#39;s display name.
      * 
      */
     private String name;
     /**
-     * @return The user&#39;s Pulumi Cloud username (same as `githubLogin`).
+     * @return The user&#39;s Pulumi Cloud username.
      * 
      */
     private String username;
@@ -52,13 +47,6 @@ public final class GetCurrentUserResult {
         return this.email;
     }
     /**
-     * @return The user&#39;s GitHub login.
-     * 
-     */
-    public String githubLogin() {
-        return this.githubLogin;
-    }
-    /**
      * @return The user&#39;s display name.
      * 
      */
@@ -66,7 +54,7 @@ public final class GetCurrentUserResult {
         return this.name;
     }
     /**
-     * @return The user&#39;s Pulumi Cloud username (same as `githubLogin`).
+     * @return The user&#39;s Pulumi Cloud username.
      * 
      */
     public String username() {
@@ -84,7 +72,6 @@ public final class GetCurrentUserResult {
     public static final class Builder {
         private String avatarUrl;
         private String email;
-        private String githubLogin;
         private String name;
         private String username;
         public Builder() {}
@@ -92,7 +79,6 @@ public final class GetCurrentUserResult {
     	      Objects.requireNonNull(defaults);
     	      this.avatarUrl = defaults.avatarUrl;
     	      this.email = defaults.email;
-    	      this.githubLogin = defaults.githubLogin;
     	      this.name = defaults.name;
     	      this.username = defaults.username;
         }
@@ -111,14 +97,6 @@ public final class GetCurrentUserResult {
               throw new MissingRequiredPropertyException("GetCurrentUserResult", "email");
             }
             this.email = email;
-            return this;
-        }
-        @CustomType.Setter
-        public Builder githubLogin(String githubLogin) {
-            if (githubLogin == null) {
-              throw new MissingRequiredPropertyException("GetCurrentUserResult", "githubLogin");
-            }
-            this.githubLogin = githubLogin;
             return this;
         }
         @CustomType.Setter
@@ -141,7 +119,6 @@ public final class GetCurrentUserResult {
             final var _resultValue = new GetCurrentUserResult();
             _resultValue.avatarUrl = avatarUrl;
             _resultValue.email = email;
-            _resultValue.githubLogin = githubLogin;
             _resultValue.name = name;
             _resultValue.username = username;
             return _resultValue;

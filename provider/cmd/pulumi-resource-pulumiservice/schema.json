@@ -690,10 +690,6 @@
     },
     "pulumiservice:index:OrganizationMemberInfo": {
       "properties": {
-        "githubLogin": {
-          "type": "string",
-          "description": "The member's GitHub login."
-        },
         "knownToPulumi": {
           "type": "boolean",
           "description": "Whether this member has a Pulumi Cloud account."
@@ -722,7 +718,6 @@
       "type": "object",
       "required": [
         "username",
-        "githubLogin",
         "knownToPulumi",
         "virtualAdmin"
       ]
@@ -2029,10 +2024,6 @@
           "type": "string",
           "description": "The member's email address."
         },
-        "githubLogin": {
-          "type": "string",
-          "description": "The member's GitHub login."
-        },
         "knownToPulumi": {
           "type": "boolean",
           "description": "Whether the member has a Pulumi Cloud account."
@@ -2069,7 +2060,6 @@
         "username",
         "name",
         "email",
-        "githubLogin",
         "knownToPulumi",
         "roleName",
         "adopted"
@@ -3053,22 +3043,17 @@
             "description": "The user's email address.",
             "type": "string"
           },
-          "githubLogin": {
-            "description": "The user's GitHub login.",
-            "type": "string"
-          },
           "name": {
             "description": "The user's display name.",
             "type": "string"
           },
           "username": {
-            "description": "The user's Pulumi Cloud username (same as `githubLogin`).",
+            "description": "The user's Pulumi Cloud username.",
             "type": "string"
           }
         },
         "required": [
           "username",
-          "githubLogin",
           "name",
           "email",
           "avatarUrl"
@@ -3203,10 +3188,6 @@
       },
       "outputs": {
         "properties": {
-          "githubLogin": {
-            "description": "The member's GitHub login.",
-            "type": "string"
-          },
           "knownToPulumi": {
             "description": "Whether this member has a Pulumi Cloud account.",
             "type": "boolean"
@@ -3234,7 +3215,6 @@
         },
         "required": [
           "username",
-          "githubLogin",
           "knownToPulumi",
           "virtualAdmin"
         ],

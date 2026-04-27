@@ -75,7 +75,6 @@ type OrganizationMemberState struct {
 	OrganizationMemberCore
 	Name          string `pulumi:"name"`
 	Email         string `pulumi:"email"`
-	GithubLogin   string `pulumi:"githubLogin"`
 	KnownToPulumi bool   `pulumi:"knownToPulumi"`
 	RoleName      string `pulumi:"roleName"`
 	// Adopted is true when Create found the user already in the org (409)
@@ -87,7 +86,6 @@ type OrganizationMemberState struct {
 func (s *OrganizationMemberState) Annotate(a infer.Annotator) {
 	a.Describe(&s.Name, "The member's display name.")
 	a.Describe(&s.Email, "The member's email address.")
-	a.Describe(&s.GithubLogin, "The member's GitHub login.")
 	a.Describe(&s.KnownToPulumi, "Whether the member has a Pulumi Cloud account.")
 	a.Describe(&s.RoleName, "The name of the currently assigned role (custom role name, or built-in role).")
 	a.Describe(
@@ -330,7 +328,6 @@ func readOrgMemberState(
 		},
 		Name:          member.User.Name,
 		Email:         member.User.Email,
-		GithubLogin:   member.User.GithubLogin,
 		KnownToPulumi: member.KnownToPulumi,
 	}
 

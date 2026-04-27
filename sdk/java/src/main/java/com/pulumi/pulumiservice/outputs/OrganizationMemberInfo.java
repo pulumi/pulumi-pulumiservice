@@ -14,11 +14,6 @@ import javax.annotation.Nullable;
 @CustomType
 public final class OrganizationMemberInfo {
     /**
-     * @return The member&#39;s GitHub login.
-     * 
-     */
-    private String githubLogin;
-    /**
      * @return Whether this member has a Pulumi Cloud account.
      * 
      */
@@ -50,13 +45,6 @@ public final class OrganizationMemberInfo {
     private Boolean virtualAdmin;
 
     private OrganizationMemberInfo() {}
-    /**
-     * @return The member&#39;s GitHub login.
-     * 
-     */
-    public String githubLogin() {
-        return this.githubLogin;
-    }
     /**
      * @return Whether this member has a Pulumi Cloud account.
      * 
@@ -109,7 +97,6 @@ public final class OrganizationMemberInfo {
     }
     @CustomType.Builder
     public static final class Builder {
-        private String githubLogin;
         private Boolean knownToPulumi;
         private @Nullable String role;
         private @Nullable String roleId;
@@ -119,7 +106,6 @@ public final class OrganizationMemberInfo {
         public Builder() {}
         public Builder(OrganizationMemberInfo defaults) {
     	      Objects.requireNonNull(defaults);
-    	      this.githubLogin = defaults.githubLogin;
     	      this.knownToPulumi = defaults.knownToPulumi;
     	      this.role = defaults.role;
     	      this.roleId = defaults.roleId;
@@ -128,14 +114,6 @@ public final class OrganizationMemberInfo {
     	      this.virtualAdmin = defaults.virtualAdmin;
         }
 
-        @CustomType.Setter
-        public Builder githubLogin(String githubLogin) {
-            if (githubLogin == null) {
-              throw new MissingRequiredPropertyException("OrganizationMemberInfo", "githubLogin");
-            }
-            this.githubLogin = githubLogin;
-            return this;
-        }
         @CustomType.Setter
         public Builder knownToPulumi(Boolean knownToPulumi) {
             if (knownToPulumi == null) {
@@ -180,7 +158,6 @@ public final class OrganizationMemberInfo {
         }
         public OrganizationMemberInfo build() {
             final var _resultValue = new OrganizationMemberInfo();
-            _resultValue.githubLogin = githubLogin;
             _resultValue.knownToPulumi = knownToPulumi;
             _resultValue.role = role;
             _resultValue.roleId = roleId;

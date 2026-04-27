@@ -3391,8 +3391,6 @@ func (o OperationContextOptionsPtrOutput) SkipIntermediateDeployments() pulumi.B
 }
 
 type OrganizationMemberInfo struct {
-	// The member's GitHub login.
-	GithubLogin string `pulumi:"githubLogin"`
 	// Whether this member has a Pulumi Cloud account.
 	KnownToPulumi bool `pulumi:"knownToPulumi"`
 	// The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.
@@ -3419,11 +3417,6 @@ func (o OrganizationMemberInfoOutput) ToOrganizationMemberInfoOutput() Organizat
 
 func (o OrganizationMemberInfoOutput) ToOrganizationMemberInfoOutputWithContext(ctx context.Context) OrganizationMemberInfoOutput {
 	return o
-}
-
-// The member's GitHub login.
-func (o OrganizationMemberInfoOutput) GithubLogin() pulumi.StringOutput {
-	return o.ApplyT(func(v OrganizationMemberInfo) string { return v.GithubLogin }).(pulumi.StringOutput)
 }
 
 // Whether this member has a Pulumi Cloud account.

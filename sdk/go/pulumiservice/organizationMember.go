@@ -20,8 +20,6 @@ type OrganizationMember struct {
 	Adopted pulumi.BoolOutput `pulumi:"adopted"`
 	// The member's email address.
 	Email pulumi.StringOutput `pulumi:"email"`
-	// The member's GitHub login.
-	GithubLogin pulumi.StringOutput `pulumi:"githubLogin"`
 	// Whether the member has a Pulumi Cloud account.
 	KnownToPulumi pulumi.BoolOutput `pulumi:"knownToPulumi"`
 	// The member's display name.
@@ -206,11 +204,6 @@ func (o OrganizationMemberOutput) Adopted() pulumi.BoolOutput {
 // The member's email address.
 func (o OrganizationMemberOutput) Email() pulumi.StringOutput {
 	return o.ApplyT(func(v *OrganizationMember) pulumi.StringOutput { return v.Email }).(pulumi.StringOutput)
-}
-
-// The member's GitHub login.
-func (o OrganizationMemberOutput) GithubLogin() pulumi.StringOutput {
-	return o.ApplyT(func(v *OrganizationMember) pulumi.StringOutput { return v.GithubLogin }).(pulumi.StringOutput)
 }
 
 // Whether the member has a Pulumi Cloud account.

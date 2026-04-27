@@ -30,11 +30,9 @@ type GetCurrentUserResult struct {
 	AvatarUrl string `pulumi:"avatarUrl"`
 	// The user's email address.
 	Email string `pulumi:"email"`
-	// The user's GitHub login.
-	GithubLogin string `pulumi:"githubLogin"`
 	// The user's display name.
 	Name string `pulumi:"name"`
-	// The user's Pulumi Cloud username (same as `githubLogin`).
+	// The user's Pulumi Cloud username.
 	Username string `pulumi:"username"`
 }
 
@@ -78,17 +76,12 @@ func (o GetCurrentUserResultOutput) Email() pulumi.StringOutput {
 	return o.ApplyT(func(v GetCurrentUserResult) string { return v.Email }).(pulumi.StringOutput)
 }
 
-// The user's GitHub login.
-func (o GetCurrentUserResultOutput) GithubLogin() pulumi.StringOutput {
-	return o.ApplyT(func(v GetCurrentUserResult) string { return v.GithubLogin }).(pulumi.StringOutput)
-}
-
 // The user's display name.
 func (o GetCurrentUserResultOutput) Name() pulumi.StringOutput {
 	return o.ApplyT(func(v GetCurrentUserResult) string { return v.Name }).(pulumi.StringOutput)
 }
 
-// The user's Pulumi Cloud username (same as `githubLogin`).
+// The user's Pulumi Cloud username.
 func (o GetCurrentUserResultOutput) Username() pulumi.StringOutput {
 	return o.ApplyT(func(v GetCurrentUserResult) string { return v.Username }).(pulumi.StringOutput)
 }

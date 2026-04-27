@@ -28,12 +28,6 @@ namespace Pulumi.PulumiService
         public Output<string> Email { get; private set; } = null!;
 
         /// <summary>
-        /// The member's GitHub login.
-        /// </summary>
-        [Output("githubLogin")]
-        public Output<string> GithubLogin { get; private set; } = null!;
-
-        /// <summary>
         /// Whether the member has a Pulumi Cloud account.
         /// </summary>
         [Output("knownToPulumi")]

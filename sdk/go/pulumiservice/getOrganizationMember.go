@@ -30,8 +30,6 @@ type LookupOrganizationMemberArgs struct {
 }
 
 type LookupOrganizationMemberResult struct {
-	// The member's GitHub login.
-	GithubLogin string `pulumi:"githubLogin"`
 	// Whether this member has a Pulumi Cloud account.
 	KnownToPulumi bool `pulumi:"knownToPulumi"`
 	// The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.
@@ -78,11 +76,6 @@ func (o LookupOrganizationMemberResultOutput) ToLookupOrganizationMemberResultOu
 
 func (o LookupOrganizationMemberResultOutput) ToLookupOrganizationMemberResultOutputWithContext(ctx context.Context) LookupOrganizationMemberResultOutput {
 	return o
-}
-
-// The member's GitHub login.
-func (o LookupOrganizationMemberResultOutput) GithubLogin() pulumi.StringOutput {
-	return o.ApplyT(func(v LookupOrganizationMemberResult) string { return v.GithubLogin }).(pulumi.StringOutput)
 }
 
 // Whether this member has a Pulumi Cloud account.

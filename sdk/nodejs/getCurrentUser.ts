@@ -27,15 +27,11 @@ export interface GetCurrentUserResult {
      */
     readonly email: string;
     /**
-     * The user's GitHub login.
-     */
-    readonly githubLogin: string;
-    /**
      * The user's display name.
      */
     readonly name: string;
     /**
-     * The user's Pulumi Cloud username (same as `githubLogin`).
+     * The user's Pulumi Cloud username.
      */
     readonly username: string;
 }

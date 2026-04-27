@@ -23,10 +23,7 @@ __all__ = [
 
 @pulumi.output_type
 class GetOrganizationMemberResult:
-    def __init__(__self__, github_login=None, known_to_pulumi=None, role=None, role_id=None, role_name=None, username=None, virtual_admin=None):
-        if github_login and not isinstance(github_login, str):
-            raise TypeError("Expected argument 'github_login' to be a str")
-        pulumi.set(__self__, "github_login", github_login)
+    def __init__(__self__, known_to_pulumi=None, role=None, role_id=None, role_name=None, username=None, virtual_admin=None):
         if known_to_pulumi and not isinstance(known_to_pulumi, bool):
             raise TypeError("Expected argument 'known_to_pulumi' to be a bool")
         pulumi.set(__self__, "known_to_pulumi", known_to_pulumi)
@@ -45,14 +42,6 @@ class GetOrganizationMemberResult:
         if virtual_admin and not isinstance(virtual_admin, bool):
             raise TypeError("Expected argument 'virtual_admin' to be a bool")
         pulumi.set(__self__, "virtual_admin", virtual_admin)
-
-    @_builtins.property
-    @pulumi.getter(name="githubLogin")
-    def github_login(self) -> _builtins.str:
-        """
-        The member's GitHub login.
-        """
-        return pulumi.get(self, "github_login")
 
     @_builtins.property
     @pulumi.getter(name="knownToPulumi")
@@ -109,7 +98,6 @@ class AwaitableGetOrganizationMemberResult(GetOrganizationMemberResult):
         if False:
             yield self
         return GetOrganizationMemberResult(
-            github_login=self.github_login,
             known_to_pulumi=self.known_to_pulumi,
             role=self.role,
             role_id=self.role_id,
@@ -135,7 +123,6 @@ def get_organization_member(organization_name: Optional[_builtins.str] = None,
     __ret__ = pulumi.runtime.invoke('pulumiservice:index:getOrganizationMember', __args__, opts=opts, typ=GetOrganizationMemberResult).value
 
     return AwaitableGetOrganizationMemberResult(
-        github_login=pulumi.get(__ret__, 'github_login'),
         known_to_pulumi=pulumi.get(__ret__, 'known_to_pulumi'),
         role=pulumi.get(__ret__, 'role'),
         role_id=pulumi.get(__ret__, 'role_id'),
@@ -158,7 +145,6 @@ def get_organization_member_output(organization_name: Optional[pulumi.Input[_bui
     opts = pulumi.InvokeOutputOptions.merge(_utilities.get_invoke_opts_defaults(), opts)
     __ret__ = pulumi.runtime.invoke_output('pulumiservice:index:getOrganizationMember', __args__, opts=opts, typ=GetOrganizationMemberResult)
     return __ret__.apply(lambda __response__: GetOrganizationMemberResult(
-        github_login=pulumi.get(__response__, 'github_login'),
         known_to_pulumi=pulumi.get(__response__, 'known_to_pulumi'),
         role=pulumi.get(__response__, 'role'),
         role_id=pulumi.get(__response__, 'role_id'),

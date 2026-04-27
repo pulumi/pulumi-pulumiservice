@@ -23,16 +23,13 @@ __all__ = [
 
 @pulumi.output_type
 class GetCurrentUserResult:
-    def __init__(__self__, avatar_url=None, email=None, github_login=None, name=None, username=None):
+    def __init__(__self__, avatar_url=None, email=None, name=None, username=None):
         if avatar_url and not isinstance(avatar_url, str):
             raise TypeError("Expected argument 'avatar_url' to be a str")
         pulumi.set(__self__, "avatar_url", avatar_url)
         if email and not isinstance(email, str):
             raise TypeError("Expected argument 'email' to be a str")
         pulumi.set(__self__, "email", email)
-        if github_login and not isinstance(github_login, str):
-            raise TypeError("Expected argument 'github_login' to be a str")
-        pulumi.set(__self__, "github_login", github_login)
         if name and not isinstance(name, str):
             raise TypeError("Expected argument 'name' to be a str")
         pulumi.set(__self__, "name", name)
@@ -57,14 +54,6 @@ class GetCurrentUserResult:
         return pulumi.get(self, "email")
 
     @_builtins.property
-    @pulumi.getter(name="githubLogin")
-    def github_login(self) -> _builtins.str:
-        """
-        The user's GitHub login.
-        """
-        return pulumi.get(self, "github_login")
-
-    @_builtins.property
     @pulumi.getter
     def name(self) -> _builtins.str:
         """
@@ -76,7 +65,7 @@ class GetCurrentUserResult:
     @pulumi.getter
     def username(self) -> _builtins.str:
         """
-        The user's Pulumi Cloud username (same as `githubLogin`).
+        The user's Pulumi Cloud username.
         """
         return pulumi.get(self, "username")
 
@@ -89,7 +78,6 @@ class AwaitableGetCurrentUserResult(GetCurrentUserResult):
         return GetCurrentUserResult(
             avatar_url=self.avatar_url,
             email=self.email,
-            github_login=self.github_login,
             name=self.name,
             username=self.username)
 
@@ -105,7 +93,6 @@ def get_current_user(opts: Optional[pulumi.InvokeOptions] = None) -> AwaitableGe
     return AwaitableGetCurrentUserResult(
         avatar_url=pulumi.get(__ret__, 'avatar_url'),
         email=pulumi.get(__ret__, 'email'),
-        github_login=pulumi.get(__ret__, 'github_login'),
         name=pulumi.get(__ret__, 'name'),
         username=pulumi.get(__ret__, 'username'))
 def get_current_user_output(opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[GetCurrentUserResult]:
@@ -118,6 +105,5 @@ def get_current_user_output(opts: Optional[Union[pulumi.InvokeOptions, pulumi.In
     return __ret__.apply(lambda __response__: GetCurrentUserResult(
         avatar_url=pulumi.get(__response__, 'avatar_url'),
         email=pulumi.get(__response__, 'email'),
-        github_login=pulumi.get(__response__, 'github_login'),
         name=pulumi.get(__response__, 'name'),
         username=pulumi.get(__response__, 'username')))

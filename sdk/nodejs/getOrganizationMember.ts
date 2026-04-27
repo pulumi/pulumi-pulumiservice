@@ -28,10 +28,6 @@ export interface GetOrganizationMemberArgs {
 
 export interface GetOrganizationMemberResult {
     /**
-     * The member's GitHub login.
-     */
-    readonly githubLogin: string;
-    /**
      * Whether this member has a Pulumi Cloud account.
      */
     readonly knownToPulumi: boolean;

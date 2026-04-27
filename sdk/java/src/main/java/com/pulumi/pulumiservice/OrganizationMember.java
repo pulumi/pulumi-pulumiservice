@@ -49,20 +49,6 @@ public class OrganizationMember extends com.pulumi.resources.CustomResource {
         return this.email;
     }
     /**
-     * The member&#39;s GitHub login.
-     * 
-     */
-    @Export(name="githubLogin", refs={String.class}, tree="[0]")
-    private Output<String> githubLogin;
-
-    /**
-     * @return The member&#39;s GitHub login.
-     * 
-     */
-    public Output<String> githubLogin() {
-        return this.githubLogin;
-    }
-    /**
      * Whether the member has a Pulumi Cloud account.
      * 
      */
