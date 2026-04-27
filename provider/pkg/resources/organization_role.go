@@ -159,9 +159,8 @@ func (*OrganizationRole) Create(
 	))
 	if err != nil {
 		return infer.CreateResponse[OrganizationRoleState]{}, fmt.Errorf(
-			"failed to create role %q (details=%s): %w",
+			"failed to create role %q: %w",
 			req.Inputs.Name,
-			string(details),
 			err,
 		)
 	}
