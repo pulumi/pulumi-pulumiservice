@@ -28,7 +28,6 @@ class TeamArgs:
                  name: Optional[pulumi.Input[_builtins.str]] = None):
         """
         The set of arguments for constructing a Team resource.
-
         :param pulumi.Input[_builtins.str] organization_name: The name of the Pulumi organization the team belongs to.
         :param pulumi.Input[_builtins.str] team_type: The type of team. Must be either `pulumi` or `github`.
         :param pulumi.Input[_builtins.str] description: Optional. Team description.
@@ -152,7 +151,6 @@ class Team(pulumi.CustomResource):
         """
         The Pulumi Cloud offers role-based access control (RBAC) using teams. Teams allow organization admins to assign a set of stack permissions to a group of users.
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] description: Optional. Team description.
@@ -171,7 +169,6 @@ class Team(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         The Pulumi Cloud offers role-based access control (RBAC) using teams. Teams allow organization admins to assign a set of stack permissions to a group of users.
-
 
         :param str resource_name: The name of the resource.
         :param TeamArgs args: The arguments to use to populate this resource's properties.

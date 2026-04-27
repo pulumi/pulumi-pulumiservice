@@ -25,7 +25,6 @@ class OrgAccessTokenArgs:
                  description: Optional[pulumi.Input[_builtins.str]] = None):
         """
         The set of arguments for constructing a OrgAccessToken resource.
-
         :param pulumi.Input[_builtins.str] name: The name for the token.
         :param pulumi.Input[_builtins.str] organization_name: The organization's name.
         :param pulumi.Input[_builtins.bool] admin: Optional. True if this is an admin token.
@@ -103,7 +102,6 @@ class OrgAccessToken(pulumi.CustomResource):
         """
         The Pulumi Cloud allows users to create access tokens scoped to orgs. Org access tokens is a resource to create them and assign them to an org
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.bool] admin: Optional. True if this is an admin token.
@@ -119,7 +117,6 @@ class OrgAccessToken(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         The Pulumi Cloud allows users to create access tokens scoped to orgs. Org access tokens is a resource to create them and assign them to an org
-
 
         :param str resource_name: The name of the resource.
         :param OrgAccessTokenArgs args: The arguments to use to populate this resource's properties.
