@@ -43,7 +43,7 @@ export class TeamRoleAssignment extends pulumi.CustomResource {
      */
     declare public readonly roleId: pulumi.Output<string>;
     /**
-     * The name of the assigned role at the time of last refresh.
+     * The name of the currently assigned role (custom role name, or built-in role).
      */
     declare public /*out*/ readonly roleName: pulumi.Output<string>;
     /**

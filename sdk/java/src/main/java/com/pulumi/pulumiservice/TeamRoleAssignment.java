@@ -47,14 +47,14 @@ public class TeamRoleAssignment extends com.pulumi.resources.CustomResource {
         return this.roleId;
     }
     /**
-     * The name of the assigned role at the time of last refresh.
+     * The name of the currently assigned role (custom role name, or built-in role).
      * 
      */
     @Export(name="roleName", refs={String.class}, tree="[0]")
     private Output<String> roleName;
 
     /**
-     * @return The name of the assigned role at the time of last refresh.
+     * @return The name of the currently assigned role (custom role name, or built-in role).
      * 
      */
     public Output<String> roleName() {

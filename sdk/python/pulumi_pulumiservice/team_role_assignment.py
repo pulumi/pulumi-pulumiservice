@@ -184,7 +184,7 @@ class TeamRoleAssignment(pulumi.CustomResource):
     @pulumi.getter(name="roleName")
     def role_name(self) -> pulumi.Output[_builtins.str]:
         """
-        The name of the assigned role at the time of last refresh.
+        The name of the currently assigned role (custom role name, or built-in role).
         """
         return pulumi.get(self, "role_name")
 

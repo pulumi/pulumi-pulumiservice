@@ -20,7 +20,7 @@ type TeamRoleAssignment struct {
 	OrganizationName pulumi.StringOutput `pulumi:"organizationName"`
 	// The ID of the custom role to assign.
 	RoleId pulumi.StringOutput `pulumi:"roleId"`
-	// The name of the assigned role at the time of last refresh.
+	// The name of the currently assigned role (custom role name, or built-in role).
 	RoleName pulumi.StringOutput `pulumi:"roleName"`
 	// The team name.
 	TeamName pulumi.StringOutput `pulumi:"teamName"`
@@ -196,7 +196,7 @@ func (o TeamRoleAssignmentOutput) RoleId() pulumi.StringOutput {
 	return o.ApplyT(func(v *TeamRoleAssignment) pulumi.StringOutput { return v.RoleId }).(pulumi.StringOutput)
 }
 
-// The name of the assigned role at the time of last refresh.
+// The name of the currently assigned role (custom role name, or built-in role).
 func (o TeamRoleAssignmentOutput) RoleName() pulumi.StringOutput {
 	return o.ApplyT(func(v *TeamRoleAssignment) pulumi.StringOutput { return v.RoleName }).(pulumi.StringOutput)
 }

@@ -12,19 +12,19 @@ namespace Pulumi.PulumiService
     public static class GetCurrentUser
     {
         /// <summary>
-        /// Returns the Pulumi Cloud user that the provider's access token belongs to. Useful for seeding a newly-created `Team` with the creator as a member, since Pulumi Cloud auto-adds the creator and omitting them causes a refresh drift.
+        /// Returns the Pulumi Cloud user that the provider's access token belongs to. Useful for seeding a newly-created `Team` with the creator as a member, since Pulumi Cloud auto-adds the creator. Omitting this user from the team will result in a refresh drift.
         /// </summary>
         public static Task<GetCurrentUserResult> InvokeAsync(GetCurrentUserArgs? args = null, InvokeOptions? options = null)
             => global::Pulumi.Deployment.Instance.InvokeAsync<GetCurrentUserResult>("pulumiservice:index:getCurrentUser", args ?? new GetCurrentUserArgs(), options.WithDefaults());
 
         /// <summary>
-        /// Returns the Pulumi Cloud user that the provider's access token belongs to. Useful for seeding a newly-created `Team` with the creator as a member, since Pulumi Cloud auto-adds the creator and omitting them causes a refresh drift.
+        /// Returns the Pulumi Cloud user that the provider's access token belongs to. Useful for seeding a newly-created `Team` with the creator as a member, since Pulumi Cloud auto-adds the creator. Omitting this user from the team will result in a refresh drift.
         /// </summary>
         public static Output<GetCurrentUserResult> Invoke(InvokeOptions? options = null)
             => global::Pulumi.Deployment.Instance.Invoke<GetCurrentUserResult>("pulumiservice:index:getCurrentUser", InvokeArgs.Empty, options.WithDefaults());
 
         /// <summary>
-        /// Returns the Pulumi Cloud user that the provider's access token belongs to. Useful for seeding a newly-created `Team` with the creator as a member, since Pulumi Cloud auto-adds the creator and omitting them causes a refresh drift.
+        /// Returns the Pulumi Cloud user that the provider's access token belongs to. Useful for seeding a newly-created `Team` with the creator as a member, since Pulumi Cloud auto-adds the creator. Omitting this user from the team will result in a refresh drift.
         /// </summary>
         public static Output<GetCurrentUserResult> Invoke(InvokeOutputOptions options)
             => global::Pulumi.Deployment.Instance.Invoke<GetCurrentUserResult>("pulumiservice:index:getCurrentUser", InvokeArgs.Empty, options.WithDefaults());

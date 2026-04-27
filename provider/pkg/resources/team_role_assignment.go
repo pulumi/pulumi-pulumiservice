@@ -59,7 +59,7 @@ type TeamRoleAssignmentState struct {
 }
 
 func (s *TeamRoleAssignmentState) Annotate(a infer.Annotator) {
-	a.Describe(&s.RoleName, "The name of the assigned role at the time of last refresh.")
+	a.Describe(&s.RoleName, "The name of the currently assigned role (custom role name, or built-in role).")
 }
 
 func (*TeamRoleAssignment) Create(

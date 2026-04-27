@@ -28,7 +28,7 @@ namespace Pulumi.PulumiService
         public Output<string> RoleId { get; private set; } = null!;
 
         /// <summary>
-        /// The name of the assigned role at the time of last refresh.
+        /// The name of the currently assigned role (custom role name, or built-in role).
         /// </summary>
         [Output("roleName")]
         public Output<string> RoleName { get; private set; } = null!;
