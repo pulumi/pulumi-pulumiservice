@@ -125,6 +125,7 @@ func TestGetEnvironmentScopedPermissions(t *testing.T) {
 			"env-uuid-1",
 			[]string{"environment:read", "environment:open"},
 		)
+		assertPermissionsJSONMatches(t, resp.Output.PermissionsJson, resp.Output.Permissions)
 	})
 
 	t.Run("rejects empty environmentId", func(t *testing.T) {
@@ -154,6 +155,19 @@ func TestGetEnvironmentScopedPermissions(t *testing.T) {
 	})
 }
 
+// assertPermissionsJSONMatches confirms that the helper's `permissionsJson`
+// output decodes back to the structured `permissions` Mapping. The JSON
+// sibling is the workaround Python users round-trip through `json.loads` to
+// dodge the SDK's `__`-prefix strip on invoke responses; if it ever drifts
+// from the structured form the workaround quietly stops being equivalent.
+func assertPermissionsJSONMatches(t *testing.T, gotJSON string, gotMap map[string]interface{}) {
+	t.Helper()
+	require.NotEmpty(t, gotJSON, "permissionsJson must be set")
+	var parsed map[string]interface{}
+	require.NoError(t, json.Unmarshal([]byte(gotJSON), &parsed))
+	assert.Equal(t, gotMap, parsed, "permissionsJson must decode to the same descriptor as permissions")
+}
+
 func TestGetStackScopedPermissions(t *testing.T) {
 	t.Parallel()
 
@@ -176,6 +190,7 @@ func TestGetStackScopedPermissions(t *testing.T) {
 			"stack-id-1",
 			[]string{"stack:read"},
 		)
+		assertPermissionsJSONMatches(t, resp.Output.PermissionsJson, resp.Output.Permissions)
 	})
 
 	t.Run("rejects empty stackId", func(t *testing.T) {
@@ -227,6 +242,7 @@ func TestGetInsightsAccountScopedPermissions(t *testing.T) {
 			"acct-1",
 			[]string{"insights-account:read"},
 		)
+		assertPermissionsJSONMatches(t, resp.Output.PermissionsJson, resp.Output.Permissions)
 	})
 
 	t.Run("rejects empty insightsAccountId", func(t *testing.T) {

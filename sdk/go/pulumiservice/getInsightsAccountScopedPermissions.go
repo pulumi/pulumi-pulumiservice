@@ -32,6 +32,8 @@ type GetInsightsAccountScopedPermissionsArgs struct {
 type GetInsightsAccountScopedPermissionsResult struct {
 	// A `PermissionDescriptor` tree ready to assign to `OrganizationRole.permissions`.
 	Permissions map[string]interface{} `pulumi:"permissions"`
+	// A JSON-encoded copy of `permissions`. Pulumi's Python SDK strips `__`-prefixed keys from invoke responses (see `pulumi/sdk` Python `runtime/rpc.py:deserialize_property`), so the structured `permissions` Mapping arrives at downstream resources missing every `__type` discriminator and Pulumi Cloud rejects it. Python users should consume `permissionsJson` and `.apply(json.loads)` it instead — that re-creates the dict on the input path (`serialize_property`), which preserves `__` keys. TypeScript/Yaml/Go/.NET/Java callers can use either field; `permissions` is the more ergonomic default.
+	PermissionsJson string `pulumi:"permissionsJson"`
 }
 
 func GetInsightsAccountScopedPermissionsOutput(ctx *pulumi.Context, args GetInsightsAccountScopedPermissionsOutputArgs, opts ...pulumi.InvokeOption) GetInsightsAccountScopedPermissionsResultOutput {
@@ -71,6 +73,11 @@ func (o GetInsightsAccountScopedPermissionsResultOutput) ToGetInsightsAccountSco
 // A `PermissionDescriptor` tree ready to assign to `OrganizationRole.permissions`.
 func (o GetInsightsAccountScopedPermissionsResultOutput) Permissions() pulumi.MapOutput {
 	return o.ApplyT(func(v GetInsightsAccountScopedPermissionsResult) map[string]interface{} { return v.Permissions }).(pulumi.MapOutput)
+}
+
+// A JSON-encoded copy of `permissions`. Pulumi's Python SDK strips `__`-prefixed keys from invoke responses (see `pulumi/sdk` Python `runtime/rpc.py:deserialize_property`), so the structured `permissions` Mapping arrives at downstream resources missing every `__type` discriminator and Pulumi Cloud rejects it. Python users should consume `permissionsJson` and `.apply(json.loads)` it instead — that re-creates the dict on the input path (`serialize_property`), which preserves `__` keys. TypeScript/Yaml/Go/.NET/Java callers can use either field; `permissions` is the more ergonomic default.
+func (o GetInsightsAccountScopedPermissionsResultOutput) PermissionsJson() pulumi.StringOutput {
+	return o.ApplyT(func(v GetInsightsAccountScopedPermissionsResult) string { return v.PermissionsJson }).(pulumi.StringOutput)
 }
 
 func init() {

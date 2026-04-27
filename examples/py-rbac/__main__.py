@@ -12,6 +12,8 @@ Exercises the full RBAC flow from Python:
   built-in role to "admin".
 """
 
+import json
+
 import pulumi
 from pulumi_pulumiservice import (
     Environment,
@@ -20,6 +22,7 @@ from pulumi_pulumiservice import (
     Team,
     TeamRoleAssignment,
     get_current_user_output,
+    get_environment_scoped_permissions_output,
     get_organization_members_output,
 )
 
@@ -124,45 +127,26 @@ scoped_env = Environment(
 #    the permission tree is gated on the env's UUID via a
 #    PermissionDescriptorCondition wrapping a PermissionLiteralExpressionEnvironment.
 #
-#    Note: in Python we hand-roll the descriptor instead of using
-#    `get_environment_scoped_permissions_output`, because Pulumi's Python
-#    SDK strips `__`-prefixed keys from invoke responses (see
-#    pulumi/sdk Python `runtime/rpc.py` deserialize_property), which
-#    would erase the `__type` discriminators the API requires. Writing
-#    the dict literally bypasses that path — `serialize_property` for
-#    inputs preserves the keys. ts-rbac and yaml-rbac can use the helper
-#    safely; only Python is affected.
-#
-#    `scoped_env.environment_id` (an Output[str]) is embedded directly at
-#    the `identity` slot rather than wrapping the whole tree in an
-#    apply(); otherwise the entire `permissions` value would become an
-#    Output[Mapping] and OrganizationRole.Check would see it as empty
-#    during preview.
+#    Python note: we read `permissions_json` (the JSON-string sibling of
+#    `permissions`) and `apply(json.loads)` to rebuild the dict in user
+#    code. Pulumi's Python SDK strips `__`-prefixed keys from invoke
+#    responses (see `pulumi/sdk` Python `runtime/rpc.py`
+#    deserialize_property), which would otherwise erase the `__type`
+#    discriminators the Cloud API requires. Going through the JSON
+#    string sidesteps that filter — the dict is reconstructed on the
+#    input path (`serialize_property`), which preserves `__` keys.
+#    TS/Yaml can read `.permissions` directly; the JSON sibling is the
+#    Python-only workaround until the upstream SDK exposes
+#    `keep_internal=True` for invoke results.
 scoped_role = OrganizationRole(
     "scopedReadOnlyRole",
     organization_name=organization_name,
     name=f"py-rbac-scoped-read-only-{digits}",
     description="Read+open access scoped to a single ESC environment.",
-    permissions={
-        "__type": "PermissionDescriptorGroup",
-        "entries": [
-            {
-                "__type": "PermissionDescriptorCondition",
-                "condition": {
-                    "__type": "PermissionExpressionEqual",
-                    "left": {"__type": "PermissionExpressionEnvironment"},
-                    "right": {
-                        "__type": "PermissionLiteralExpressionEnvironment",
-                        "identity": scoped_env.environment_id,
-                    },
-                },
-                "subNode": {
-                    "__type": "PermissionDescriptorAllow",
-                    "permissions": ["environment:read", "environment:open"],
-                },
-            },
-        ],
-    },
+    permissions=get_environment_scoped_permissions_output(
+        environment_id=scoped_env.environment_id,
+        permissions=["environment:read", "environment:open"],
+    ).permissions_json.apply(json.loads),
 )
 
 pulumi.export("scopedEnvironmentId", scoped_env.environment_id)

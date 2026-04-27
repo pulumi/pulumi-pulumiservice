@@ -91,11 +91,19 @@ namespace Pulumi.PulumiService
         /// A `PermissionDescriptor` tree ready to assign to `OrganizationRole.permissions`.
         /// </summary>
         public readonly ImmutableDictionary<string, object> Permissions;
+        /// <summary>
+        /// A JSON-encoded copy of `permissions`. Pulumi's Python SDK strips `__`-prefixed keys from invoke responses (see `pulumi/sdk` Python `runtime/rpc.py:deserialize_property`), so the structured `permissions` Mapping arrives at downstream resources missing every `__type` discriminator and Pulumi Cloud rejects it. Python users should consume `permissionsJson` and `.apply(json.loads)` it instead — that re-creates the dict on the input path (`serialize_property`), which preserves `__` keys. TypeScript/Yaml/Go/.NET/Java callers can use either field; `permissions` is the more ergonomic default.
+        /// </summary>
+        public readonly string PermissionsJson;
 
         [OutputConstructor]
-        private GetStackScopedPermissionsResult(ImmutableDictionary<string, object> permissions)
+        private GetStackScopedPermissionsResult(
+            ImmutableDictionary<string, object> permissions,
+
+            string permissionsJson)
         {
             Permissions = permissions;
+            PermissionsJson = permissionsJson;
         }
     }
 }

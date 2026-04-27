@@ -16,10 +16,34 @@ package functions
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/pulumi/pulumi-go-provider/infer"
 )
+
+// scopedPermissionsJSONHelpDoc explains why we surface a JSON-string sibling
+// of `permissions` and when callers should pick it. Kept verbatim across the
+// three helpers so the codegen-generated docs stay consistent.
+const scopedPermissionsJSONHelpDoc = "A JSON-encoded copy of `permissions`. Pulumi's Python SDK strips " +
+	"`__`-prefixed keys from invoke responses (see `pulumi/sdk` Python `runtime/rpc.py:deserialize_property`), " +
+	"so the structured `permissions` Mapping arrives at downstream resources missing every `__type` " +
+	"discriminator and Pulumi Cloud rejects it. Python users should consume `permissionsJson` and " +
+	"`.apply(json.loads)` it instead — that re-creates the dict on the input path " +
+	"(`serialize_property`), which preserves `__` keys. TypeScript/Yaml/Go/.NET/Java callers can use " +
+	"either field; `permissions` is the more ergonomic default."
+
+// marshalDescriptor JSON-encodes a descriptor tree for the `permissionsJson`
+// helper output. The descriptor we build is closed-shape (only basic Go types
+// for keys and values), so `json.Marshal` cannot fail; we panic on the
+// theoretical error rather than threading it through every caller.
+func marshalDescriptor(d map[string]interface{}) string {
+	b, err := json.Marshal(d)
+	if err != nil {
+		panic(fmt.Sprintf("scoped-permissions descriptor failed to marshal: %v", err))
+	}
+	return string(b)
+}
 
 // scopedPermissionsDescriptor builds a PermissionDescriptor tree that grants
 // the supplied scopes only when the request targets the entity identified by
@@ -81,7 +105,8 @@ type GetEnvironmentScopedPermissionsInput struct {
 }
 
 type GetEnvironmentScopedPermissionsOutput struct {
-	Permissions map[string]interface{} `pulumi:"permissions"`
+	Permissions     map[string]interface{} `pulumi:"permissions"`
+	PermissionsJson string                 `pulumi:"permissionsJson"`
 }
 
 func (GetEnvironmentScopedPermissionsFunction) Annotate(a infer.Annotator) {
@@ -115,6 +140,7 @@ func (o *GetEnvironmentScopedPermissionsOutput) Annotate(a infer.Annotator) {
 		&o.Permissions,
 		"A `PermissionDescriptor` tree ready to assign to `OrganizationRole.permissions`.",
 	)
+	a.Describe(&o.PermissionsJson, scopedPermissionsJSONHelpDoc)
 }
 
 func (GetEnvironmentScopedPermissionsFunction) Invoke(
@@ -129,14 +155,16 @@ func (GetEnvironmentScopedPermissionsFunction) Invoke(
 		return infer.FunctionResponse[GetEnvironmentScopedPermissionsOutput]{},
 			fmt.Errorf("`permissions` must not be empty")
 	}
+	descriptor := scopedPermissionsDescriptor(
+		"PermissionExpressionEnvironment",
+		"PermissionLiteralExpressionEnvironment",
+		req.Input.EnvironmentID,
+		req.Input.Permissions,
+	)
 	return infer.FunctionResponse[GetEnvironmentScopedPermissionsOutput]{
 		Output: GetEnvironmentScopedPermissionsOutput{
-			Permissions: scopedPermissionsDescriptor(
-				"PermissionExpressionEnvironment",
-				"PermissionLiteralExpressionEnvironment",
-				req.Input.EnvironmentID,
-				req.Input.Permissions,
-			),
+			Permissions:     descriptor,
+			PermissionsJson: marshalDescriptor(descriptor),
 		},
 	}, nil
 }
@@ -155,7 +183,8 @@ type GetStackScopedPermissionsInput struct {
 }
 
 type GetStackScopedPermissionsOutput struct {
-	Permissions map[string]interface{} `pulumi:"permissions"`
+	Permissions     map[string]interface{} `pulumi:"permissions"`
+	PermissionsJson string                 `pulumi:"permissionsJson"`
 }
 
 func (GetStackScopedPermissionsFunction) Annotate(a infer.Annotator) {
@@ -187,6 +216,7 @@ func (o *GetStackScopedPermissionsOutput) Annotate(a infer.Annotator) {
 		&o.Permissions,
 		"A `PermissionDescriptor` tree ready to assign to `OrganizationRole.permissions`.",
 	)
+	a.Describe(&o.PermissionsJson, scopedPermissionsJSONHelpDoc)
 }
 
 func (GetStackScopedPermissionsFunction) Invoke(
@@ -201,14 +231,16 @@ func (GetStackScopedPermissionsFunction) Invoke(
 		return infer.FunctionResponse[GetStackScopedPermissionsOutput]{},
 			fmt.Errorf("`permissions` must not be empty")
 	}
+	descriptor := scopedPermissionsDescriptor(
+		"PermissionExpressionStack",
+		"PermissionLiteralExpressionStack",
+		req.Input.StackID,
+		req.Input.Permissions,
+	)
 	return infer.FunctionResponse[GetStackScopedPermissionsOutput]{
 		Output: GetStackScopedPermissionsOutput{
-			Permissions: scopedPermissionsDescriptor(
-				"PermissionExpressionStack",
-				"PermissionLiteralExpressionStack",
-				req.Input.StackID,
-				req.Input.Permissions,
-			),
+			Permissions:     descriptor,
+			PermissionsJson: marshalDescriptor(descriptor),
 		},
 	}, nil
 }
@@ -228,7 +260,8 @@ type GetInsightsAccountScopedPermissionsInput struct {
 }
 
 type GetInsightsAccountScopedPermissionsOutput struct {
-	Permissions map[string]interface{} `pulumi:"permissions"`
+	Permissions     map[string]interface{} `pulumi:"permissions"`
+	PermissionsJson string                 `pulumi:"permissionsJson"`
 }
 
 func (GetInsightsAccountScopedPermissionsFunction) Annotate(a infer.Annotator) {
@@ -260,6 +293,7 @@ func (o *GetInsightsAccountScopedPermissionsOutput) Annotate(a infer.Annotator) 
 		&o.Permissions,
 		"A `PermissionDescriptor` tree ready to assign to `OrganizationRole.permissions`.",
 	)
+	a.Describe(&o.PermissionsJson, scopedPermissionsJSONHelpDoc)
 }
 
 func (GetInsightsAccountScopedPermissionsFunction) Invoke(
@@ -274,14 +308,16 @@ func (GetInsightsAccountScopedPermissionsFunction) Invoke(
 		return infer.FunctionResponse[GetInsightsAccountScopedPermissionsOutput]{},
 			fmt.Errorf("`permissions` must not be empty")
 	}
+	descriptor := scopedPermissionsDescriptor(
+		"PermissionExpressionInsightsAccount",
+		"PermissionLiteralExpressionInsightsAccount",
+		req.Input.InsightsAccountID,
+		req.Input.Permissions,
+	)
 	return infer.FunctionResponse[GetInsightsAccountScopedPermissionsOutput]{
 		Output: GetInsightsAccountScopedPermissionsOutput{
-			Permissions: scopedPermissionsDescriptor(
-				"PermissionExpressionInsightsAccount",
-				"PermissionLiteralExpressionInsightsAccount",
-				req.Input.InsightsAccountID,
-				req.Input.Permissions,
-			),
+			Permissions:     descriptor,
+			PermissionsJson: marshalDescriptor(descriptor),
 		},
 	}, nil
 }
