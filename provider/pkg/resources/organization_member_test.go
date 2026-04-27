@@ -156,6 +156,36 @@ func TestOrganizationMemberRead(t *testing.T) {
 		assert.Equal(t, "read-only-devops", resp.State.RoleName)
 	})
 
+	t.Run("legacy member without FGARole clears prior roleId", func(t *testing.T) {
+		// Regression: when the service returns a member without an FGARole
+		// (legacy / uninitialized state), the built-in branch must clear any
+		// roleId carried over from prior state so the resource preserves the
+		// data-source contract: built-in → role set, custom → roleId set,
+		// never both.
+		mock := &orgMemberClientMock{
+			getFunc: func(_ context.Context, _, _ string) (*pulumiapi.Member, error) {
+				return &pulumiapi.Member{
+					Role:    "admin",
+					User:    pulumiapi.User{GithubLogin: "alice"},
+					FGARole: nil,
+				}, nil
+			},
+		}
+		ctx := config.WithMockClient(context.Background(), mock)
+		priorRoleID := "stale-role-id"
+
+		r := &OrganizationMember{}
+		resp, err := r.Read(ctx, infer.ReadRequest[OrganizationMemberInput, OrganizationMemberState]{
+			ID:     "acme/alice",
+			Inputs: OrganizationMemberInput{OrganizationMemberCore: OrganizationMemberCore{RoleId: &priorRoleID}},
+		})
+		assert.NoError(t, err)
+		if assert.NotNil(t, resp.State.Role) {
+			assert.Equal(t, "admin", *resp.State.Role)
+		}
+		assert.Nil(t, resp.State.RoleId, "RoleId must be cleared in built-in branch")
+	})
+
 	t.Run("bad id", func(t *testing.T) {
 		r := &OrganizationMember{}
 		_, err := r.Read(context.Background(), infer.ReadRequest[OrganizationMemberInput, OrganizationMemberState]{

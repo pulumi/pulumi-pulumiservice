@@ -351,6 +351,7 @@ func applyMemberRoleToState(
 	if member.FGARole == nil {
 		name := member.Role
 		state.Role = &name
+		state.RoleId = nil
 		state.RoleName = name
 		return nil
 	}
