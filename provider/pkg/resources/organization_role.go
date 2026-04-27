@@ -258,7 +258,10 @@ func (*OrganizationRole) Read(
 		return infer.ReadResponse[OrganizationRoleInput, OrganizationRoleState]{}, nil
 	}
 
-	core := orgRoleCoreFromAPI(orgName, req.Inputs.OrganizationRoleCore, role)
+	core, err := orgRoleCoreFromAPI(orgName, req.Inputs.OrganizationRoleCore, role)
+	if err != nil {
+		return infer.ReadResponse[OrganizationRoleInput, OrganizationRoleState]{}, err
+	}
 	state := orgRoleStateFromAPI(orgName, core, role)
 	return infer.ReadResponse[OrganizationRoleInput, OrganizationRoleState]{
 		ID:     req.ID,
@@ -271,7 +274,7 @@ func orgRoleCoreFromAPI(
 	orgName string,
 	prior OrganizationRoleCore,
 	role *pulumiapi.RoleDescriptor,
-) OrganizationRoleCore {
+) (OrganizationRoleCore, error) {
 	core := OrganizationRoleCore{
 		OrganizationName: orgName,
 		Name:             role.Name,
@@ -291,11 +294,12 @@ func orgRoleCoreFromAPI(
 	}
 	if len(role.Details) > 0 {
 		parsed := map[string]interface{}{}
-		if err := json.Unmarshal(role.Details, &parsed); err == nil {
-			core.Permissions = parsed
+		if err := json.Unmarshal(role.Details, &parsed); err != nil {
+			return OrganizationRoleCore{}, fmt.Errorf("parsing role details for %q: %w", role.ID, err)
 		}
+		core.Permissions = parsed
 	}
-	return core
+	return core, nil
 }
 
 func orgRoleStateFromAPI(
