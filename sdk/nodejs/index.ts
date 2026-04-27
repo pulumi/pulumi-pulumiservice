@@ -45,6 +45,11 @@ export type EnvironmentRotationSchedule = import("./environmentRotationSchedule"
 export const EnvironmentRotationSchedule: typeof import("./environmentRotationSchedule").EnvironmentRotationSchedule = null as any;
 utilities.lazyLoad(exports, ["EnvironmentRotationSchedule"], () => require("./environmentRotationSchedule"));
 
+export { EnvironmentTagArgs } from "./environmentTag";
+export type EnvironmentTag = import("./environmentTag").EnvironmentTag;
+export const EnvironmentTag: typeof import("./environmentTag").EnvironmentTag = null as any;
+utilities.lazyLoad(exports, ["EnvironmentTag"], () => require("./environmentTag"));
+
 export { EnvironmentVersionTagArgs } from "./environmentVersionTag";
 export type EnvironmentVersionTag = import("./environmentVersionTag").EnvironmentVersionTag;
 export const EnvironmentVersionTag: typeof import("./environmentVersionTag").EnvironmentVersionTag = null as any;
@@ -178,6 +183,8 @@ const _module = {
                 return new Environment(name, <any>undefined, { urn })
             case "pulumiservice:index:EnvironmentRotationSchedule":
                 return new EnvironmentRotationSchedule(name, <any>undefined, { urn })
+            case "pulumiservice:index:EnvironmentTag":
+                return new EnvironmentTag(name, <any>undefined, { urn })
             case "pulumiservice:index:EnvironmentVersionTag":
                 return new EnvironmentVersionTag(name, <any>undefined, { urn })
             case "pulumiservice:index:InsightsAccount":

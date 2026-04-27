@@ -15,6 +15,7 @@ from .deployment_settings import *
 from .drift_schedule import *
 from .environment import *
 from .environment_rotation_schedule import *
+from .environment_tag import *
 from .environment_version_tag import *
 from .get_insights_account import *
 from .get_insights_accounts import *
@@ -61,6 +62,7 @@ _utilities.register(
    "pulumiservice:index:DriftSchedule": "DriftSchedule",
    "pulumiservice:index:Environment": "Environment",
    "pulumiservice:index:EnvironmentRotationSchedule": "EnvironmentRotationSchedule",
+   "pulumiservice:index:EnvironmentTag": "EnvironmentTag",
    "pulumiservice:index:EnvironmentVersionTag": "EnvironmentVersionTag",
    "pulumiservice:index:InsightsAccount": "InsightsAccount",
    "pulumiservice:index:OidcIssuer": "OidcIssuer",

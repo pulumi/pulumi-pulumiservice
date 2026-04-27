@@ -23,6 +23,7 @@
         "driftSchedule.ts",
         "environment.ts",
         "environmentRotationSchedule.ts",
+        "environmentTag.ts",
         "environmentVersionTag.ts",
         "getInsightsAccount.ts",
         "getInsightsAccounts.ts",

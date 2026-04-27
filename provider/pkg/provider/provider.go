@@ -272,6 +272,9 @@ func (k *pulumiserviceProvider) Configure(
 		&resources.PulumiServiceEnvironmentVersionTagResource{
 			Client: escClient,
 		},
+		&resources.PulumiServiceEnvironmentTagResource{
+			Client: escClient,
+		},
 		&resources.PulumiServiceStackResource{
 			Client: client,
 		},
