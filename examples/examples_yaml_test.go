@@ -18,6 +18,8 @@ import (
 	"gopkg.in/yaml.v2"
 
 	"github.com/pulumi/providertest/pulumitest"
+	"github.com/pulumi/providertest/pulumitest/assertpreview"
+	"github.com/pulumi/providertest/pulumitest/assertrefresh"
 	"github.com/pulumi/providertest/pulumitest/opttest"
 	"github.com/pulumi/pulumi/pkg/v3/testing/integration"
 )
@@ -501,6 +503,7 @@ func TestYamlInsightsAccountExample(t *testing.T) {
 		filepath.Join(getCwd(t), "yaml-insights-account"),
 		inMemoryProvider(),
 		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
 	)
 	test.SetConfig(t, "digits", generateRandomFiveDigits())
 	test.SetConfig(t, "organizationName", getOrgName())
@@ -509,6 +512,52 @@ func TestYamlInsightsAccountExample(t *testing.T) {
 
 func TestYamlDeploymentSettingsVcsExample(t *testing.T) {
 	t.Skip("requires an existing Azure DevOps integration; run manually against a configured environment")
+}
+
+func TestYamlRbacExample(t *testing.T) {
+	// Requires the Custom Roles feature to be enabled on the test
+	// organization. If it isn't, CreateRole will return a feature-flag
+	// error and the test fails loudly — which is what we want to learn.
+	orgName := getOrgName()
+	const fixtureUser = "service-provider-example-user"
+
+	// Snapshot the fixture user's role before the test mutates it, and
+	// restore it on cleanup. OrganizationRole.Delete with force=true
+	// *should* revoke their custom role assignment on destroy, but if a
+	// mis-wired teardown leaves the user on the test's role, this hook
+	// still gets the org back to a known state.
+	t.Cleanup(snapshotFixtureOrgMember(t, orgName, fixtureUser))
+
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-rbac"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
+	)
+	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	test.SetConfig(t, "organizationName", orgName)
+
+	up := test.Up(t)
+	// Sanity-check adoption: OrganizationMember should have hit the 409
+	// branch and adopted the pre-existing membership.
+	if adopted, ok := up.Outputs["memberAdopted"]; ok {
+		assert.Equal(t, true, adopted.Value, "expected OrganizationMember to adopt the existing membership")
+	}
+	// Sanity-check env-scoped role wiring: the Environment resource must
+	// surface a non-empty UUID, and the role pinned to it must reach the
+	// service. An empty UUID would mean the metadata fetch silently
+	// skipped and the role's `identity` was never resolved.
+	if envID, ok := up.Outputs["scopedEnvironmentId"]; ok {
+		assert.NotEmpty(t, envID.Value, "expected Environment.environmentId to be populated")
+	}
+	if scopedRoleID, ok := up.Outputs["scopedRoleId"]; ok {
+		assert.NotEmpty(t, scopedRoleID.Value, "expected env-scoped OrganizationRole to be created")
+	}
+	preview := test.Preview(t)
+	assertpreview.HasNoChanges(t, preview)
+	refresh := test.Refresh(t)
+	assertrefresh.HasNoChanges(t, refresh)
+	test.Destroy(t)
 }
 
 func writePulumiYaml(t *testing.T, yamlContents interface{}) string {

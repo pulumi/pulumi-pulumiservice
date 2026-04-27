@@ -1,0 +1,13 @@
+name: py-rbac
+runtime:
+  name: python
+  options:
+    virtualenv: venv
+description: Exercises the RBAC resources and data sources from Python.
+
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  digits:
+    type: string

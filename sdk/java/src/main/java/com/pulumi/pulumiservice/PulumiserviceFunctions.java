@@ -9,21 +9,234 @@ import com.pulumi.deployment.Deployment;
 import com.pulumi.deployment.InvokeOptions;
 import com.pulumi.deployment.InvokeOutputOptions;
 import com.pulumi.pulumiservice.Utilities;
+import com.pulumi.pulumiservice.inputs.BuildEnvironmentScopedPermissionsArgs;
+import com.pulumi.pulumiservice.inputs.BuildEnvironmentScopedPermissionsPlainArgs;
+import com.pulumi.pulumiservice.inputs.BuildInsightsAccountScopedPermissionsArgs;
+import com.pulumi.pulumiservice.inputs.BuildInsightsAccountScopedPermissionsPlainArgs;
+import com.pulumi.pulumiservice.inputs.BuildStackScopedPermissionsArgs;
+import com.pulumi.pulumiservice.inputs.BuildStackScopedPermissionsPlainArgs;
+import com.pulumi.pulumiservice.inputs.GetCurrentUserArgs;
+import com.pulumi.pulumiservice.inputs.GetCurrentUserPlainArgs;
+import com.pulumi.pulumiservice.inputs.GetEnvironmentArgs;
+import com.pulumi.pulumiservice.inputs.GetEnvironmentPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetInsightsAccountArgs;
 import com.pulumi.pulumiservice.inputs.GetInsightsAccountPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetInsightsAccountsArgs;
 import com.pulumi.pulumiservice.inputs.GetInsightsAccountsPlainArgs;
+import com.pulumi.pulumiservice.inputs.GetOrganizationMemberArgs;
+import com.pulumi.pulumiservice.inputs.GetOrganizationMemberPlainArgs;
+import com.pulumi.pulumiservice.inputs.GetOrganizationMembersArgs;
+import com.pulumi.pulumiservice.inputs.GetOrganizationMembersPlainArgs;
+import com.pulumi.pulumiservice.inputs.GetOrganizationRoleScopesArgs;
+import com.pulumi.pulumiservice.inputs.GetOrganizationRoleScopesPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetPolicyPackArgs;
 import com.pulumi.pulumiservice.inputs.GetPolicyPackPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetPolicyPacksArgs;
 import com.pulumi.pulumiservice.inputs.GetPolicyPacksPlainArgs;
+import com.pulumi.pulumiservice.outputs.BuildEnvironmentScopedPermissionsResult;
+import com.pulumi.pulumiservice.outputs.BuildInsightsAccountScopedPermissionsResult;
+import com.pulumi.pulumiservice.outputs.BuildStackScopedPermissionsResult;
+import com.pulumi.pulumiservice.outputs.GetCurrentUserResult;
+import com.pulumi.pulumiservice.outputs.GetEnvironmentResult;
 import com.pulumi.pulumiservice.outputs.GetInsightsAccountResult;
 import com.pulumi.pulumiservice.outputs.GetInsightsAccountsResult;
+import com.pulumi.pulumiservice.outputs.GetOrganizationMemberResult;
+import com.pulumi.pulumiservice.outputs.GetOrganizationMembersResult;
+import com.pulumi.pulumiservice.outputs.GetOrganizationRoleScopesResult;
 import com.pulumi.pulumiservice.outputs.GetPolicyPackResult;
 import com.pulumi.pulumiservice.outputs.GetPolicyPacksResult;
 import java.util.concurrent.CompletableFuture;
 
 public final class PulumiserviceFunctions {
+    /**
+     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the underlying `PermissionDescriptorGroup` / `PermissionDescriptorCondition` / `PermissionLiteralExpressionEnvironment` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
+     * 
+     */
+    public static Output<BuildEnvironmentScopedPermissionsResult> buildEnvironmentScopedPermissions(BuildEnvironmentScopedPermissionsArgs args) {
+        return buildEnvironmentScopedPermissions(args, InvokeOptions.Empty);
+    }
+    /**
+     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the underlying `PermissionDescriptorGroup` / `PermissionDescriptorCondition` / `PermissionLiteralExpressionEnvironment` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
+     * 
+     */
+    public static CompletableFuture<BuildEnvironmentScopedPermissionsResult> buildEnvironmentScopedPermissionsPlain(BuildEnvironmentScopedPermissionsPlainArgs args) {
+        return buildEnvironmentScopedPermissionsPlain(args, InvokeOptions.Empty);
+    }
+    /**
+     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the underlying `PermissionDescriptorGroup` / `PermissionDescriptorCondition` / `PermissionLiteralExpressionEnvironment` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
+     * 
+     */
+    public static Output<BuildEnvironmentScopedPermissionsResult> buildEnvironmentScopedPermissions(BuildEnvironmentScopedPermissionsArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:buildEnvironmentScopedPermissions", TypeShape.of(BuildEnvironmentScopedPermissionsResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the underlying `PermissionDescriptorGroup` / `PermissionDescriptorCondition` / `PermissionLiteralExpressionEnvironment` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
+     * 
+     */
+    public static Output<BuildEnvironmentScopedPermissionsResult> buildEnvironmentScopedPermissions(BuildEnvironmentScopedPermissionsArgs args, InvokeOutputOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:buildEnvironmentScopedPermissions", TypeShape.of(BuildEnvironmentScopedPermissionsResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the underlying `PermissionDescriptorGroup` / `PermissionDescriptorCondition` / `PermissionLiteralExpressionEnvironment` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
+     * 
+     */
+    public static CompletableFuture<BuildEnvironmentScopedPermissionsResult> buildEnvironmentScopedPermissionsPlain(BuildEnvironmentScopedPermissionsPlainArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invokeAsync("pulumiservice:index:buildEnvironmentScopedPermissions", TypeShape.of(BuildEnvironmentScopedPermissionsResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `PermissionLiteralExpressionInsightsAccount` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
+     * 
+     */
+    public static Output<BuildInsightsAccountScopedPermissionsResult> buildInsightsAccountScopedPermissions(BuildInsightsAccountScopedPermissionsArgs args) {
+        return buildInsightsAccountScopedPermissions(args, InvokeOptions.Empty);
+    }
+    /**
+     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `PermissionLiteralExpressionInsightsAccount` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
+     * 
+     */
+    public static CompletableFuture<BuildInsightsAccountScopedPermissionsResult> buildInsightsAccountScopedPermissionsPlain(BuildInsightsAccountScopedPermissionsPlainArgs args) {
+        return buildInsightsAccountScopedPermissionsPlain(args, InvokeOptions.Empty);
+    }
+    /**
+     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `PermissionLiteralExpressionInsightsAccount` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
+     * 
+     */
+    public static Output<BuildInsightsAccountScopedPermissionsResult> buildInsightsAccountScopedPermissions(BuildInsightsAccountScopedPermissionsArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:buildInsightsAccountScopedPermissions", TypeShape.of(BuildInsightsAccountScopedPermissionsResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `PermissionLiteralExpressionInsightsAccount` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
+     * 
+     */
+    public static Output<BuildInsightsAccountScopedPermissionsResult> buildInsightsAccountScopedPermissions(BuildInsightsAccountScopedPermissionsArgs args, InvokeOutputOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:buildInsightsAccountScopedPermissions", TypeShape.of(BuildInsightsAccountScopedPermissionsResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `PermissionLiteralExpressionInsightsAccount` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
+     * 
+     */
+    public static CompletableFuture<BuildInsightsAccountScopedPermissionsResult> buildInsightsAccountScopedPermissionsPlain(BuildInsightsAccountScopedPermissionsPlainArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invokeAsync("pulumiservice:index:buildInsightsAccountScopedPermissions", TypeShape.of(BuildInsightsAccountScopedPermissionsResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack&#39;s opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple — and is what `PermissionLiteralExpressionStack` expects. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
+     * 
+     */
+    public static Output<BuildStackScopedPermissionsResult> buildStackScopedPermissions(BuildStackScopedPermissionsArgs args) {
+        return buildStackScopedPermissions(args, InvokeOptions.Empty);
+    }
+    /**
+     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack&#39;s opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple — and is what `PermissionLiteralExpressionStack` expects. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
+     * 
+     */
+    public static CompletableFuture<BuildStackScopedPermissionsResult> buildStackScopedPermissionsPlain(BuildStackScopedPermissionsPlainArgs args) {
+        return buildStackScopedPermissionsPlain(args, InvokeOptions.Empty);
+    }
+    /**
+     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack&#39;s opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple — and is what `PermissionLiteralExpressionStack` expects. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
+     * 
+     */
+    public static Output<BuildStackScopedPermissionsResult> buildStackScopedPermissions(BuildStackScopedPermissionsArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:buildStackScopedPermissions", TypeShape.of(BuildStackScopedPermissionsResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack&#39;s opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple — and is what `PermissionLiteralExpressionStack` expects. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
+     * 
+     */
+    public static Output<BuildStackScopedPermissionsResult> buildStackScopedPermissions(BuildStackScopedPermissionsArgs args, InvokeOutputOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:buildStackScopedPermissions", TypeShape.of(BuildStackScopedPermissionsResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack&#39;s opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple — and is what `PermissionLiteralExpressionStack` expects. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
+     * 
+     */
+    public static CompletableFuture<BuildStackScopedPermissionsResult> buildStackScopedPermissionsPlain(BuildStackScopedPermissionsPlainArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invokeAsync("pulumiservice:index:buildStackScopedPermissions", TypeShape.of(BuildStackScopedPermissionsResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Returns the Pulumi Cloud user that the provider&#39;s access token belongs to. Useful for seeding a newly-created `Team` with the creator as a member, since Pulumi Cloud auto-adds the creator. Omitting this user from the team will result in a refresh drift.
+     * 
+     */
+    public static Output<GetCurrentUserResult> getCurrentUser() {
+        return getCurrentUser(GetCurrentUserArgs.Empty, InvokeOptions.Empty);
+    }
+    /**
+     * Returns the Pulumi Cloud user that the provider&#39;s access token belongs to. Useful for seeding a newly-created `Team` with the creator as a member, since Pulumi Cloud auto-adds the creator. Omitting this user from the team will result in a refresh drift.
+     * 
+     */
+    public static CompletableFuture<GetCurrentUserResult> getCurrentUserPlain() {
+        return getCurrentUserPlain(GetCurrentUserPlainArgs.Empty, InvokeOptions.Empty);
+    }
+    /**
+     * Returns the Pulumi Cloud user that the provider&#39;s access token belongs to. Useful for seeding a newly-created `Team` with the creator as a member, since Pulumi Cloud auto-adds the creator. Omitting this user from the team will result in a refresh drift.
+     * 
+     */
+    public static Output<GetCurrentUserResult> getCurrentUser(GetCurrentUserArgs args) {
+        return getCurrentUser(args, InvokeOptions.Empty);
+    }
+    /**
+     * Returns the Pulumi Cloud user that the provider&#39;s access token belongs to. Useful for seeding a newly-created `Team` with the creator as a member, since Pulumi Cloud auto-adds the creator. Omitting this user from the team will result in a refresh drift.
+     * 
+     */
+    public static CompletableFuture<GetCurrentUserResult> getCurrentUserPlain(GetCurrentUserPlainArgs args) {
+        return getCurrentUserPlain(args, InvokeOptions.Empty);
+    }
+    /**
+     * Returns the Pulumi Cloud user that the provider&#39;s access token belongs to. Useful for seeding a newly-created `Team` with the creator as a member, since Pulumi Cloud auto-adds the creator. Omitting this user from the team will result in a refresh drift.
+     * 
+     */
+    public static Output<GetCurrentUserResult> getCurrentUser(GetCurrentUserArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getCurrentUser", TypeShape.of(GetCurrentUserResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Returns the Pulumi Cloud user that the provider&#39;s access token belongs to. Useful for seeding a newly-created `Team` with the creator as a member, since Pulumi Cloud auto-adds the creator. Omitting this user from the team will result in a refresh drift.
+     * 
+     */
+    public static Output<GetCurrentUserResult> getCurrentUser(GetCurrentUserArgs args, InvokeOutputOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getCurrentUser", TypeShape.of(GetCurrentUserResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Returns the Pulumi Cloud user that the provider&#39;s access token belongs to. Useful for seeding a newly-created `Team` with the creator as a member, since Pulumi Cloud auto-adds the creator. Omitting this user from the team will result in a refresh drift.
+     * 
+     */
+    public static CompletableFuture<GetCurrentUserResult> getCurrentUserPlain(GetCurrentUserPlainArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invokeAsync("pulumiservice:index:getCurrentUser", TypeShape.of(GetCurrentUserResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Looks up an existing ESC environment by name and returns its UUID. Use this to pin a custom RBAC role to a specific environment via `PermissionLiteralExpressionEnvironment` when the environment is not managed by the current Pulumi program. Errors when the environment is not found.
+     * 
+     */
+    public static Output<GetEnvironmentResult> getEnvironment(GetEnvironmentArgs args) {
+        return getEnvironment(args, InvokeOptions.Empty);
+    }
+    /**
+     * Looks up an existing ESC environment by name and returns its UUID. Use this to pin a custom RBAC role to a specific environment via `PermissionLiteralExpressionEnvironment` when the environment is not managed by the current Pulumi program. Errors when the environment is not found.
+     * 
+     */
+    public static CompletableFuture<GetEnvironmentResult> getEnvironmentPlain(GetEnvironmentPlainArgs args) {
+        return getEnvironmentPlain(args, InvokeOptions.Empty);
+    }
+    /**
+     * Looks up an existing ESC environment by name and returns its UUID. Use this to pin a custom RBAC role to a specific environment via `PermissionLiteralExpressionEnvironment` when the environment is not managed by the current Pulumi program. Errors when the environment is not found.
+     * 
+     */
+    public static Output<GetEnvironmentResult> getEnvironment(GetEnvironmentArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getEnvironment", TypeShape.of(GetEnvironmentResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Looks up an existing ESC environment by name and returns its UUID. Use this to pin a custom RBAC role to a specific environment via `PermissionLiteralExpressionEnvironment` when the environment is not managed by the current Pulumi program. Errors when the environment is not found.
+     * 
+     */
+    public static Output<GetEnvironmentResult> getEnvironment(GetEnvironmentArgs args, InvokeOutputOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getEnvironment", TypeShape.of(GetEnvironmentResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Looks up an existing ESC environment by name and returns its UUID. Use this to pin a custom RBAC role to a specific environment via `PermissionLiteralExpressionEnvironment` when the environment is not managed by the current Pulumi program. Errors when the environment is not found.
+     * 
+     */
+    public static CompletableFuture<GetEnvironmentResult> getEnvironmentPlain(GetEnvironmentPlainArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invokeAsync("pulumiservice:index:getEnvironment", TypeShape.of(GetEnvironmentResult.class), args, Utilities.withVersion(options));
+    }
     /**
      * Get details about a specific Insights account.
      * 
@@ -93,6 +306,111 @@ public final class PulumiserviceFunctions {
      */
     public static CompletableFuture<GetInsightsAccountsResult> getInsightsAccountsPlain(GetInsightsAccountsPlainArgs args, InvokeOptions options) {
         return Deployment.getInstance().invokeAsync("pulumiservice:index:getInsightsAccounts", TypeShape.of(GetInsightsAccountsResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Looks up a single member of a Pulumi Cloud organization by username (the backing identity-provider login, e.g. GitHub login). Returns an error when the member is not found.
+     * 
+     */
+    public static Output<GetOrganizationMemberResult> getOrganizationMember(GetOrganizationMemberArgs args) {
+        return getOrganizationMember(args, InvokeOptions.Empty);
+    }
+    /**
+     * Looks up a single member of a Pulumi Cloud organization by username (the backing identity-provider login, e.g. GitHub login). Returns an error when the member is not found.
+     * 
+     */
+    public static CompletableFuture<GetOrganizationMemberResult> getOrganizationMemberPlain(GetOrganizationMemberPlainArgs args) {
+        return getOrganizationMemberPlain(args, InvokeOptions.Empty);
+    }
+    /**
+     * Looks up a single member of a Pulumi Cloud organization by username (the backing identity-provider login, e.g. GitHub login). Returns an error when the member is not found.
+     * 
+     */
+    public static Output<GetOrganizationMemberResult> getOrganizationMember(GetOrganizationMemberArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getOrganizationMember", TypeShape.of(GetOrganizationMemberResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Looks up a single member of a Pulumi Cloud organization by username (the backing identity-provider login, e.g. GitHub login). Returns an error when the member is not found.
+     * 
+     */
+    public static Output<GetOrganizationMemberResult> getOrganizationMember(GetOrganizationMemberArgs args, InvokeOutputOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getOrganizationMember", TypeShape.of(GetOrganizationMemberResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Looks up a single member of a Pulumi Cloud organization by username (the backing identity-provider login, e.g. GitHub login). Returns an error when the member is not found.
+     * 
+     */
+    public static CompletableFuture<GetOrganizationMemberResult> getOrganizationMemberPlain(GetOrganizationMemberPlainArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invokeAsync("pulumiservice:index:getOrganizationMember", TypeShape.of(GetOrganizationMemberResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Lists all members of a Pulumi Cloud organization, including their role assignments.
+     * 
+     */
+    public static Output<GetOrganizationMembersResult> getOrganizationMembers(GetOrganizationMembersArgs args) {
+        return getOrganizationMembers(args, InvokeOptions.Empty);
+    }
+    /**
+     * Lists all members of a Pulumi Cloud organization, including their role assignments.
+     * 
+     */
+    public static CompletableFuture<GetOrganizationMembersResult> getOrganizationMembersPlain(GetOrganizationMembersPlainArgs args) {
+        return getOrganizationMembersPlain(args, InvokeOptions.Empty);
+    }
+    /**
+     * Lists all members of a Pulumi Cloud organization, including their role assignments.
+     * 
+     */
+    public static Output<GetOrganizationMembersResult> getOrganizationMembers(GetOrganizationMembersArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getOrganizationMembers", TypeShape.of(GetOrganizationMembersResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Lists all members of a Pulumi Cloud organization, including their role assignments.
+     * 
+     */
+    public static Output<GetOrganizationMembersResult> getOrganizationMembers(GetOrganizationMembersArgs args, InvokeOutputOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getOrganizationMembers", TypeShape.of(GetOrganizationMembersResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Lists all members of a Pulumi Cloud organization, including their role assignments.
+     * 
+     */
+    public static CompletableFuture<GetOrganizationMembersResult> getOrganizationMembersPlain(GetOrganizationMembersPlainArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invokeAsync("pulumiservice:index:getOrganizationMembers", TypeShape.of(GetOrganizationMembersResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Lists the permission scopes available for custom roles in an organization. Use this to discover valid scope names before setting `OrganizationRole.permissions`. The catalogue is flattened into a single list with resource type and group context, sorted deterministically.
+     * 
+     */
+    public static Output<GetOrganizationRoleScopesResult> getOrganizationRoleScopes(GetOrganizationRoleScopesArgs args) {
+        return getOrganizationRoleScopes(args, InvokeOptions.Empty);
+    }
+    /**
+     * Lists the permission scopes available for custom roles in an organization. Use this to discover valid scope names before setting `OrganizationRole.permissions`. The catalogue is flattened into a single list with resource type and group context, sorted deterministically.
+     * 
+     */
+    public static CompletableFuture<GetOrganizationRoleScopesResult> getOrganizationRoleScopesPlain(GetOrganizationRoleScopesPlainArgs args) {
+        return getOrganizationRoleScopesPlain(args, InvokeOptions.Empty);
+    }
+    /**
+     * Lists the permission scopes available for custom roles in an organization. Use this to discover valid scope names before setting `OrganizationRole.permissions`. The catalogue is flattened into a single list with resource type and group context, sorted deterministically.
+     * 
+     */
+    public static Output<GetOrganizationRoleScopesResult> getOrganizationRoleScopes(GetOrganizationRoleScopesArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getOrganizationRoleScopes", TypeShape.of(GetOrganizationRoleScopesResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Lists the permission scopes available for custom roles in an organization. Use this to discover valid scope names before setting `OrganizationRole.permissions`. The catalogue is flattened into a single list with resource type and group context, sorted deterministically.
+     * 
+     */
+    public static Output<GetOrganizationRoleScopesResult> getOrganizationRoleScopes(GetOrganizationRoleScopesArgs args, InvokeOutputOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:getOrganizationRoleScopes", TypeShape.of(GetOrganizationRoleScopesResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Lists the permission scopes available for custom roles in an organization. Use this to discover valid scope names before setting `OrganizationRole.permissions`. The catalogue is flattened into a single list with resource type and group context, sorted deterministically.
+     * 
+     */
+    public static CompletableFuture<GetOrganizationRoleScopesResult> getOrganizationRoleScopesPlain(GetOrganizationRoleScopesPlainArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invokeAsync("pulumiservice:index:getOrganizationRoleScopes", TypeShape.of(GetOrganizationRoleScopesResult.class), args, Utilities.withVersion(options));
     }
     /**
      * Get details about a specific version of a policy pack.

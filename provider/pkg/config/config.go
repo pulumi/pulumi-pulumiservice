@@ -48,11 +48,16 @@ type Client interface {
 	pulumiapi.AgentPoolClient
 	pulumiapi.ApprovalRuleClient
 	pulumiapi.DeploymentSettingsClient
+	pulumiapi.EnvironmentMetadataClient
 	pulumiapi.EnvironmentScheduleClient
 	pulumiapi.InsightsAccountClient
+	pulumiapi.MemberClient
 	pulumiapi.OidcClient
+	pulumiapi.RoleClient
 	pulumiapi.StackTagClient
 	pulumiapi.TeamClient
+	pulumiapi.TeamRoleClient
+	pulumiapi.UserClient
 	pulumiapi.WebhookClient
 }
 

@@ -37,8 +37,10 @@ __all__ = [
     'InsightsAccountState',
     'OperationContextOIDC',
     'OperationContextOptions',
+    'OrganizationMemberInfo',
     'PolicyGroupPolicyPackReference',
     'PolicyGroupStackReference',
+    'RoleScopeInfo',
     'TemplateSourceDestination',
 ]
 
@@ -1412,6 +1414,71 @@ class OperationContextOptions(dict):
 
 
 @pulumi.output_type
+class OrganizationMemberInfo(dict):
+    def __init__(__self__, *,
+                 username: _builtins.str,
+                 virtual_admin: _builtins.bool,
+                 role: Optional[_builtins.str] = None,
+                 role_id: Optional[_builtins.str] = None,
+                 role_name: Optional[_builtins.str] = None):
+        """
+        :param _builtins.str username: The member's Pulumi Cloud username.
+        :param _builtins.bool virtual_admin: Whether this member is an admin in Pulumi Cloud without admin access on the backing identity provider.
+        :param _builtins.str role: The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.
+        :param _builtins.str role_id: The custom role ID assigned to this member, if any.
+        :param _builtins.str role_name: The name of the currently assigned role (custom role name, or built-in role).
+        """
+        pulumi.set(__self__, "username", username)
+        pulumi.set(__self__, "virtual_admin", virtual_admin)
+        if role is not None:
+            pulumi.set(__self__, "role", role)
+        if role_id is not None:
+            pulumi.set(__self__, "role_id", role_id)
+        if role_name is not None:
+            pulumi.set(__self__, "role_name", role_name)
+
+    @_builtins.property
+    @pulumi.getter
+    def username(self) -> _builtins.str:
+        """
+        The member's Pulumi Cloud username.
+        """
+        return pulumi.get(self, "username")
+
+    @_builtins.property
+    @pulumi.getter(name="virtualAdmin")
+    def virtual_admin(self) -> _builtins.bool:
+        """
+        Whether this member is an admin in Pulumi Cloud without admin access on the backing identity provider.
+        """
+        return pulumi.get(self, "virtual_admin")
+
+    @_builtins.property
+    @pulumi.getter
+    def role(self) -> Optional[_builtins.str]:
+        """
+        The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.
+        """
+        return pulumi.get(self, "role")
+
+    @_builtins.property
+    @pulumi.getter(name="roleId")
+    def role_id(self) -> Optional[_builtins.str]:
+        """
+        The custom role ID assigned to this member, if any.
+        """
+        return pulumi.get(self, "role_id")
+
+    @_builtins.property
+    @pulumi.getter(name="roleName")
+    def role_name(self) -> Optional[_builtins.str]:
+        """
+        The name of the currently assigned role (custom role name, or built-in role).
+        """
+        return pulumi.get(self, "role_name")
+
+
+@pulumi.output_type
 class PolicyGroupPolicyPackReference(dict):
     """
     A reference to a policy pack within a policy group.
@@ -1548,6 +1615,57 @@ class PolicyGroupStackReference(dict):
         The routing project name (also known as project name).
         """
         return pulumi.get(self, "routing_project")
+
+
+@pulumi.output_type
+class RoleScopeInfo(dict):
+    def __init__(__self__, *,
+                 description: _builtins.str,
+                 group_name: _builtins.str,
+                 name: _builtins.str,
+                 resource_type: _builtins.str):
+        """
+        :param _builtins.str description: Human-readable description of what the scope grants.
+        :param _builtins.str group_name: The scope group label as shown in the Pulumi Cloud console (e.g. `Stacks`).
+        :param _builtins.str name: The scope name (e.g. `stack:read`).
+        :param _builtins.str resource_type: The resource-type bucket the scope belongs to (e.g. `stack`, `team`).
+        """
+        pulumi.set(__self__, "description", description)
+        pulumi.set(__self__, "group_name", group_name)
+        pulumi.set(__self__, "name", name)
+        pulumi.set(__self__, "resource_type", resource_type)
+
+    @_builtins.property
+    @pulumi.getter
+    def description(self) -> _builtins.str:
+        """
+        Human-readable description of what the scope grants.
+        """
+        return pulumi.get(self, "description")
+
+    @_builtins.property
+    @pulumi.getter(name="groupName")
+    def group_name(self) -> _builtins.str:
+        """
+        The scope group label as shown in the Pulumi Cloud console (e.g. `Stacks`).
+        """
+        return pulumi.get(self, "group_name")
+
+    @_builtins.property
+    @pulumi.getter
+    def name(self) -> _builtins.str:
+        """
+        The scope name (e.g. `stack:read`).
+        """
+        return pulumi.get(self, "name")
+
+    @_builtins.property
+    @pulumi.getter(name="resourceType")
+    def resource_type(self) -> _builtins.str:
+        """
+        The resource-type bucket the scope belongs to (e.g. `stack`, `team`).
+        """
+        return pulumi.get(self, "resource_type")
 
 
 @pulumi.output_type

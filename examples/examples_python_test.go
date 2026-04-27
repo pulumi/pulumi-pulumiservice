@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/pulumi/pulumi/pkg/v3/testing/integration"
 )
 
@@ -54,6 +56,42 @@ func TestPythonApprovalRulesExample(t *testing.T) {
 		},
 		Dependencies: []string{
 			filepath.Join("..", "sdk", "python", "bin"),
+		},
+	})
+}
+
+func TestPythonRbacExample(t *testing.T) {
+	// Requires the Custom Roles feature to be enabled on the test
+	// organization. If it isn't, CreateRole returns a feature-flag error
+	// and the test fails loudly, which is what we want to learn.
+	orgName := getOrgName()
+	const fixtureUser = "service-provider-example-user"
+
+	// Snapshot the fixture user's role before the test mutates it, and
+	// restore it on cleanup. OrganizationMember flips this user's role
+	// to "admin" during the test; the restore puts them back on whatever
+	// role they had pre-test (rather than blindly resetting to "member").
+	t.Cleanup(snapshotFixtureOrgMember(t, orgName, fixtureUser))
+
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Dir: path.Join(getCwd(t), "py-rbac"),
+		Config: map[string]string{
+			"organizationName": orgName,
+			"digits":           generateRandomFiveDigits(),
+		},
+		Dependencies: []string{
+			filepath.Join("..", "sdk", "python", "bin"),
+		},
+		ExtraRuntimeValidation: func(t *testing.T, stack integration.RuntimeValidationStackInfo) {
+			// Env-scoped role wiring must populate. An empty UUID would
+			// mean the metadata fetch silently skipped, leaving the
+			// role's `identity` unresolved.
+			if envID, ok := stack.Outputs["scopedEnvironmentId"]; ok {
+				assert.NotEmpty(t, envID, "expected Environment.environment_id to be populated")
+			}
+			if scopedRoleID, ok := stack.Outputs["scopedRoleId"]; ok {
+				assert.NotEmpty(t, scopedRoleID, "expected env-scoped OrganizationRole to be created")
+			}
 		},
 	})
 }

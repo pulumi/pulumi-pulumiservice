@@ -35,6 +35,10 @@ export class Environment extends pulumi.CustomResource {
     }
 
     /**
+     * The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `PermissionLiteralExpressionEnvironment` expression in `OrganizationRole.permissions`.
+     */
+    declare public /*out*/ readonly environmentId: pulumi.Output<string | undefined>;
+    /**
      * Environment name.
      */
     declare public readonly name: pulumi.Output<string>;
@@ -79,8 +83,10 @@ export class Environment extends pulumi.CustomResource {
             resourceInputs["organization"] = args?.organization;
             resourceInputs["project"] = (args?.project) ?? "default";
             resourceInputs["yaml"] = args?.yaml;
+            resourceInputs["environmentId"] = undefined /*out*/;
             resourceInputs["revision"] = undefined /*out*/;
         } else {
+            resourceInputs["environmentId"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
             resourceInputs["organization"] = undefined /*out*/;
             resourceInputs["project"] = undefined /*out*/;

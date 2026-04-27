@@ -442,6 +442,29 @@ export interface OperationContextOptions {
     skipIntermediateDeployments?: boolean;
 }
 
+export interface OrganizationMemberInfo {
+    /**
+     * The member's built-in role (member, admin, billing-manager). Absent when a custom role is assigned — check `roleId` in that case.
+     */
+    role?: string;
+    /**
+     * The custom role ID assigned to this member, if any.
+     */
+    roleId?: string;
+    /**
+     * The name of the currently assigned role (custom role name, or built-in role).
+     */
+    roleName?: string;
+    /**
+     * The member's Pulumi Cloud username.
+     */
+    username: string;
+    /**
+     * Whether this member is an admin in Pulumi Cloud without admin access on the backing identity provider.
+     */
+    virtualAdmin: boolean;
+}
+
 /**
  * A reference to a policy pack within a policy group.
  */
@@ -480,6 +503,25 @@ export interface PolicyGroupStackReference {
      * The routing project name (also known as project name).
      */
     routingProject: string;
+}
+
+export interface RoleScopeInfo {
+    /**
+     * Human-readable description of what the scope grants.
+     */
+    description: string;
+    /**
+     * The scope group label as shown in the Pulumi Cloud console (e.g. `Stacks`).
+     */
+    groupName: string;
+    /**
+     * The scope name (e.g. `stack:read`).
+     */
+    name: string;
+    /**
+     * The resource-type bucket the scope belongs to (e.g. `stack`, `team`).
+     */
+    resourceType: string;
 }
 
 export interface TemplateSourceDestination {

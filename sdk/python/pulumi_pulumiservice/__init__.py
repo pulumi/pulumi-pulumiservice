@@ -10,19 +10,29 @@ from ._enums import *
 from .access_token import *
 from .agent_pool import *
 from .approval_rule import *
+from .build_environment_scoped_permissions import *
+from .build_insights_account_scoped_permissions import *
+from .build_stack_scoped_permissions import *
 from .deployment_schedule import *
 from .deployment_settings import *
 from .drift_schedule import *
 from .environment import *
 from .environment_rotation_schedule import *
 from .environment_version_tag import *
+from .get_current_user import *
+from .get_environment import *
 from .get_insights_account import *
 from .get_insights_accounts import *
+from .get_organization_member import *
+from .get_organization_members import *
+from .get_organization_role_scopes import *
 from .get_policy_pack import *
 from .get_policy_packs import *
 from .insights_account import *
 from .oidc_issuer import *
 from .org_access_token import *
+from .organization_member import *
+from .organization_role import *
 from .policy_group import *
 from .provider import *
 from .stack import *
@@ -31,6 +41,7 @@ from .stack_tags import *
 from .team import *
 from .team_access_token import *
 from .team_environment_permission import *
+from .team_role_assignment import *
 from .team_stack_permission import *
 from .template_source import *
 from .ttl_schedule import *
@@ -65,6 +76,8 @@ _utilities.register(
    "pulumiservice:index:InsightsAccount": "InsightsAccount",
    "pulumiservice:index:OidcIssuer": "OidcIssuer",
    "pulumiservice:index:OrgAccessToken": "OrgAccessToken",
+   "pulumiservice:index:OrganizationMember": "OrganizationMember",
+   "pulumiservice:index:OrganizationRole": "OrganizationRole",
    "pulumiservice:index:PolicyGroup": "PolicyGroup",
    "pulumiservice:index:Stack": "Stack",
    "pulumiservice:index:StackTag": "StackTag",
@@ -72,6 +85,7 @@ _utilities.register(
    "pulumiservice:index:Team": "Team",
    "pulumiservice:index:TeamAccessToken": "TeamAccessToken",
    "pulumiservice:index:TeamEnvironmentPermission": "TeamEnvironmentPermission",
+   "pulumiservice:index:TeamRoleAssignment": "TeamRoleAssignment",
    "pulumiservice:index:TeamStackPermission": "TeamStackPermission",
    "pulumiservice:index:TemplateSource": "TemplateSource",
    "pulumiservice:index:TtlSchedule": "TtlSchedule",

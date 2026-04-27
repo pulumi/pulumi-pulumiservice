@@ -91,12 +91,23 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 		})).
 		WithResources(
 			infer.Resource(&resources.InsightsAccount{}),
+			infer.Resource(&resources.OrganizationMember{}),
+			infer.Resource(&resources.OrganizationRole{}),
 			infer.Resource(&resources.StackTag{}),
 			infer.Resource(&resources.Team{}),
+			infer.Resource(&resources.TeamRoleAssignment{}),
 		).
 		WithFunctions(
+			infer.Function(&functions.GetCurrentUserFunction{}),
+			infer.Function(&functions.GetEnvironmentFunction{}),
+			infer.Function(&functions.BuildEnvironmentScopedPermissionsFunction{}),
 			infer.Function(&functions.GetInsightsAccountsFunction{}),
 			infer.Function(&functions.GetInsightsAccountFunction{}),
+			infer.Function(&functions.BuildInsightsAccountScopedPermissionsFunction{}),
+			infer.Function(&functions.GetOrganizationMemberFunction{}),
+			infer.Function(&functions.GetOrganizationMembersFunction{}),
+			infer.Function(&functions.GetOrganizationRoleScopesFunction{}),
+			infer.Function(&functions.BuildStackScopedPermissionsFunction{}),
 		).
 		WithModuleMap(map[tokens.ModuleName]tokens.ModuleName{
 			"resources": "index",
@@ -264,7 +275,8 @@ func (k *pulumiserviceProvider) Configure(
 			Client: client,
 		},
 		&resources.PulumiServiceEnvironmentResource{
-			Client: escClient,
+			Client:         escClient,
+			MetadataClient: client,
 		},
 		&resources.PulumiServiceTeamEnvironmentPermissionResource{
 			Client: client,

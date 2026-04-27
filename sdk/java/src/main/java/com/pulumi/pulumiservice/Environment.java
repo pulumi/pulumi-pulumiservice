@@ -12,6 +12,7 @@ import com.pulumi.pulumiservice.EnvironmentArgs;
 import com.pulumi.pulumiservice.Utilities;
 import java.lang.Integer;
 import java.lang.String;
+import java.util.Optional;
 import javax.annotation.Nullable;
 
 /**
@@ -20,6 +21,20 @@ import javax.annotation.Nullable;
  */
 @ResourceType(type="pulumiservice:index:Environment")
 public class Environment extends com.pulumi.resources.CustomResource {
+    /**
+     * The environment&#39;s UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `PermissionLiteralExpressionEnvironment` expression in `OrganizationRole.permissions`.
+     * 
+     */
+    @Export(name="environmentId", refs={String.class}, tree="[0]")
+    private Output</* @Nullable */ String> environmentId;
+
+    /**
+     * @return The environment&#39;s UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `PermissionLiteralExpressionEnvironment` expression in `OrganizationRole.permissions`.
+     * 
+     */
+    public Output<Optional<String>> environmentId() {
+        return Codegen.optional(this.environmentId);
+    }
     /**
      * Environment name.
      * 

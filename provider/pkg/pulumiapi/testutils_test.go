@@ -60,3 +60,30 @@ func startTestServer(t *testing.T, config testServerConfig) *Client {
 	t.Cleanup(server.Close)
 	return c
 }
+
+// startTestServerMulti starts a test server driven by a per-request handler,
+// for tests that make multiple calls (pagination, retry flows, etc.).
+// The handler returns (statusCode, responseBody) for each request.
+func startTestServerMulti(t *testing.T, handler func(r *http.Request) (int, any)) *Client {
+	token := "abc123"
+	httpClient := http.Client{Timeout: 10 * time.Second}
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "token "+token, r.Header.Get("Authorization"))
+		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
+		assert.Equal(t, "application/vnd.pulumi+8", r.Header.Get("Accept"))
+		assert.Equal(t, "provider", r.Header.Get("X-Pulumi-Source"))
+
+		code, body := handler(r)
+		w.WriteHeader(code)
+		if body != nil {
+			resBytes, _ := json.Marshal(body)
+			_, _ = w.Write(resBytes)
+		}
+	}))
+	c, err := NewClient(&httpClient, token, server.URL)
+	if err != nil {
+		t.Fatalf("could not create client: %v", err)
+	}
+	t.Cleanup(server.Close)
+	return c
+}
