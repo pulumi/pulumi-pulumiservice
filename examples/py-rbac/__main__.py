@@ -123,33 +123,35 @@ scoped_env = Environment(
 #    The role definition is org-scoped (resourceType defaults to "global");
 #    the permission tree is gated on the env's UUID via a
 #    PermissionDescriptorCondition wrapping a PermissionLiteralExpressionEnvironment.
+#    Embed scoped_env.environment_id (an Output[str]) inline in the dict
+#    rather than wrapping the whole tree in an apply(). Otherwise the
+#    `permissions` field becomes Output[Mapping] and the resource's Check
+#    sees a computed sentinel during preview and rejects it as empty.
 scoped_role = OrganizationRole(
     "scopedReadOnlyRole",
     organization_name=organization_name,
     name=f"py-rbac-scoped-read-only-{digits}",
     description="Read+open access scoped to a single ESC environment.",
-    permissions=scoped_env.environment_id.apply(
-        lambda env_id: {
-            "__type": "PermissionDescriptorGroup",
-            "entries": [
-                {
-                    "__type": "PermissionDescriptorCondition",
-                    "condition": {
-                        "__type": "PermissionExpressionEqual",
-                        "left": {"__type": "PermissionExpressionEnvironment"},
-                        "right": {
-                            "__type": "PermissionLiteralExpressionEnvironment",
-                            "identity": env_id,
-                        },
-                    },
-                    "subNode": {
-                        "__type": "PermissionDescriptorAllow",
-                        "permissions": ["environment:read", "environment:open"],
+    permissions={
+        "__type": "PermissionDescriptorGroup",
+        "entries": [
+            {
+                "__type": "PermissionDescriptorCondition",
+                "condition": {
+                    "__type": "PermissionExpressionEqual",
+                    "left": {"__type": "PermissionExpressionEnvironment"},
+                    "right": {
+                        "__type": "PermissionLiteralExpressionEnvironment",
+                        "identity": scoped_env.environment_id,
                     },
                 },
-            ],
-        }
-    ),
+                "subNode": {
+                    "__type": "PermissionDescriptorAllow",
+                    "permissions": ["environment:read", "environment:open"],
+                },
+            },
+        ],
+    },
 )
 
 pulumi.export("scopedEnvironmentId", scoped_env.environment_id)
