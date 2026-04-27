@@ -375,7 +375,6 @@ class DeploymentSettingsCacheOptions(dict):
                  enable: Optional[_builtins.bool] = None):
         """
         Dependency cache settings for the deployment
-
         :param _builtins.bool enable: Enable dependency caching
         """
         if enable is None:
@@ -418,7 +417,6 @@ class DeploymentSettingsExecutorContext(dict):
                  executor_image: _builtins.str):
         """
         The executor context defines information about the executor where the deployment is executed. If unspecified, the default 'pulumi/pulumi' image is used.
-
         :param _builtins.str executor_image: Allows overriding the default executor image with a custom image. E.g. 'pulumi/pulumi-nodejs:latest'
         """
         pulumi.set(__self__, "executor_image", executor_image)
@@ -442,7 +440,6 @@ class DeploymentSettingsGitAuthBasicAuth(dict):
                  username: _builtins.str):
         """
         Git source settings for a deployment.
-
         :param _builtins.str password: Password for git basic authentication.
         :param _builtins.str username: User name for git basic authentication.
         """
@@ -493,7 +490,6 @@ class DeploymentSettingsGitAuthSSHAuth(dict):
                  password: Optional[_builtins.str] = None):
         """
         Git source settings for a deployment.
-
         :param _builtins.str ssh_private_key: SSH private key.
         :param _builtins.str password: Optional password for SSH authentication.
         """
@@ -552,7 +548,6 @@ class DeploymentSettingsGitSource(dict):
                  repo_url: Optional[_builtins.str] = None):
         """
         Git source settings for a deployment.
-
         :param _builtins.str branch: The branch to deploy. One of either `branch` or `commit` must be specified.
         :param _builtins.str commit: The commit to deploy. One of either `branch` or `commit` must be specified.
         :param 'DeploymentSettingsGitSourceGitAuth' git_auth: Git authentication configuration for this deployment. Should not be specified if there are `gitHub` settings for this deployment.
@@ -640,7 +635,6 @@ class DeploymentSettingsGitSourceGitAuth(dict):
                  ssh_auth: Optional['outputs.DeploymentSettingsGitAuthSSHAuth'] = None):
         """
         Git source settings for a deployment.
-
         :param 'DeploymentSettingsGitAuthBasicAuth' basic_auth: Basic auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
         :param 'DeploymentSettingsGitAuthSSHAuth' ssh_auth: SSH auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
         """
@@ -700,7 +694,6 @@ class DeploymentSettingsGithub(dict):
                  repository: Optional[_builtins.str] = None):
         """
         GitHub settings for the deployment.
-
         :param _builtins.bool deploy_commits: Trigger a deployment running `pulumi up` on commit.
         :param Sequence[_builtins.str] paths: The paths within the repo that deployments should be filtered to.
         :param _builtins.bool preview_pull_requests: Trigger a deployment running `pulumi preview` when a PR is opened.
@@ -796,7 +789,6 @@ class DeploymentSettingsOperationContext(dict):
                  pre_run_commands: Optional[Sequence[_builtins.str]] = None):
         """
         Settings related to the Pulumi operation environment during the deployment.
-
         :param Mapping[str, _builtins.str] environment_variables: Environment variables to set for the deployment.
         :param 'OperationContextOIDC' oidc: OIDC configuration to use during the deployment.
         :param 'OperationContextOptions' options: Options to override default behavior during the deployment.
@@ -853,7 +845,6 @@ class DeploymentSettingsSourceContext(dict):
                  git: Optional['outputs.DeploymentSettingsGitSource'] = None):
         """
         Settings related to the source of the deployment.
-
         :param 'DeploymentSettingsGitSource' git: Git source settings for a deployment.
         """
         if git is not None:
@@ -906,7 +897,6 @@ class DeploymentSettingsVcs(dict):
                  repository: Optional[_builtins.str] = None):
         """
         VCS settings for the deployment, supporting multiple VCS providers.
-
         :param _builtins.str provider: The VCS provider type.
         :param _builtins.bool deploy_commits: Trigger a deployment running `pulumi up` on commit.
         :param _builtins.int deploy_pull_request: Deploy a specific pull request number.
@@ -1520,7 +1510,6 @@ class PolicyGroupPolicyPackReference(dict):
                  version_tag: Optional[_builtins.str] = None):
         """
         A reference to a policy pack within a policy group.
-
         :param _builtins.str name: The name of the policy pack.
         :param Mapping[str, Any] config: Optional configuration for the policy pack. The special key `all` sets the default enforcement level for every policy in the pack; per-policy entries override it.
         :param _builtins.str display_name: The display name of the policy pack.
@@ -1605,7 +1594,6 @@ class PolicyGroupStackReference(dict):
                  routing_project: _builtins.str):
         """
         A reference to a stack within a policy group.
-
         :param _builtins.str name: The name of the stack.
         :param _builtins.str routing_project: The routing project name (also known as project name).
         """
