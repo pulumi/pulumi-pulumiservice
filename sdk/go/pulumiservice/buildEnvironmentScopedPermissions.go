@@ -12,74 +12,74 @@ import (
 )
 
 // Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the underlying `PermissionDescriptorGroup` / `PermissionDescriptorCondition` / `PermissionLiteralExpressionEnvironment` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
-func GetEnvironmentScopedPermissions(ctx *pulumi.Context, args *GetEnvironmentScopedPermissionsArgs, opts ...pulumi.InvokeOption) (*GetEnvironmentScopedPermissionsResult, error) {
+func BuildEnvironmentScopedPermissions(ctx *pulumi.Context, args *BuildEnvironmentScopedPermissionsArgs, opts ...pulumi.InvokeOption) (*BuildEnvironmentScopedPermissionsResult, error) {
 	opts = internal.PkgInvokeDefaultOpts(opts)
-	var rv GetEnvironmentScopedPermissionsResult
-	err := ctx.Invoke("pulumiservice:index:getEnvironmentScopedPermissions", args, &rv, opts...)
+	var rv BuildEnvironmentScopedPermissionsResult
+	err := ctx.Invoke("pulumiservice:index:buildEnvironmentScopedPermissions", args, &rv, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return &rv, nil
 }
 
-type GetEnvironmentScopedPermissionsArgs struct {
+type BuildEnvironmentScopedPermissionsArgs struct {
 	// The target environment's UUID. Use the `environmentId` output of an `Environment` resource or the `getEnvironment` data source.
 	EnvironmentId string `pulumi:"environmentId"`
 	// The set of `environment:*` scopes to grant on the target environment (e.g. `environment:read`, `environment:open`, `environment:update`). Discover valid scope names via the `getOrganizationRoleScopes` data source.
 	Permissions []string `pulumi:"permissions"`
 }
 
-type GetEnvironmentScopedPermissionsResult struct {
+type BuildEnvironmentScopedPermissionsResult struct {
 	// A `PermissionDescriptor` tree ready to assign to `OrganizationRole.permissions`.
 	Permissions map[string]interface{} `pulumi:"permissions"`
 	// A JSON-encoded copy of `permissions`. Pulumi's Python SDK strips `__`-prefixed keys from invoke responses (see `pulumi/sdk` Python `runtime/rpc.py:deserialize_property`), so the structured `permissions` Mapping arrives at downstream resources missing every `__type` discriminator and Pulumi Cloud rejects it. Python users should consume `permissionsJson` and `.apply(json.loads)` it instead — that re-creates the dict on the input path (`serialize_property`), which preserves `__` keys. TypeScript/Yaml/Go/.NET/Java callers can use either field; `permissions` is the more ergonomic default.
 	PermissionsJson string `pulumi:"permissionsJson"`
 }
 
-func GetEnvironmentScopedPermissionsOutput(ctx *pulumi.Context, args GetEnvironmentScopedPermissionsOutputArgs, opts ...pulumi.InvokeOption) GetEnvironmentScopedPermissionsResultOutput {
+func BuildEnvironmentScopedPermissionsOutput(ctx *pulumi.Context, args BuildEnvironmentScopedPermissionsOutputArgs, opts ...pulumi.InvokeOption) BuildEnvironmentScopedPermissionsResultOutput {
 	return pulumi.ToOutputWithContext(ctx.Context(), args).
-		ApplyT(func(v interface{}) (GetEnvironmentScopedPermissionsResultOutput, error) {
-			args := v.(GetEnvironmentScopedPermissionsArgs)
+		ApplyT(func(v interface{}) (BuildEnvironmentScopedPermissionsResultOutput, error) {
+			args := v.(BuildEnvironmentScopedPermissionsArgs)
 			options := pulumi.InvokeOutputOptions{InvokeOptions: internal.PkgInvokeDefaultOpts(opts)}
-			return ctx.InvokeOutput("pulumiservice:index:getEnvironmentScopedPermissions", args, GetEnvironmentScopedPermissionsResultOutput{}, options).(GetEnvironmentScopedPermissionsResultOutput), nil
-		}).(GetEnvironmentScopedPermissionsResultOutput)
+			return ctx.InvokeOutput("pulumiservice:index:buildEnvironmentScopedPermissions", args, BuildEnvironmentScopedPermissionsResultOutput{}, options).(BuildEnvironmentScopedPermissionsResultOutput), nil
+		}).(BuildEnvironmentScopedPermissionsResultOutput)
 }
 
-type GetEnvironmentScopedPermissionsOutputArgs struct {
+type BuildEnvironmentScopedPermissionsOutputArgs struct {
 	// The target environment's UUID. Use the `environmentId` output of an `Environment` resource or the `getEnvironment` data source.
 	EnvironmentId pulumi.StringInput `pulumi:"environmentId"`
 	// The set of `environment:*` scopes to grant on the target environment (e.g. `environment:read`, `environment:open`, `environment:update`). Discover valid scope names via the `getOrganizationRoleScopes` data source.
 	Permissions pulumi.StringArrayInput `pulumi:"permissions"`
 }
 
-func (GetEnvironmentScopedPermissionsOutputArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*GetEnvironmentScopedPermissionsArgs)(nil)).Elem()
+func (BuildEnvironmentScopedPermissionsOutputArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*BuildEnvironmentScopedPermissionsArgs)(nil)).Elem()
 }
 
-type GetEnvironmentScopedPermissionsResultOutput struct{ *pulumi.OutputState }
+type BuildEnvironmentScopedPermissionsResultOutput struct{ *pulumi.OutputState }
 
-func (GetEnvironmentScopedPermissionsResultOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*GetEnvironmentScopedPermissionsResult)(nil)).Elem()
+func (BuildEnvironmentScopedPermissionsResultOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*BuildEnvironmentScopedPermissionsResult)(nil)).Elem()
 }
 
-func (o GetEnvironmentScopedPermissionsResultOutput) ToGetEnvironmentScopedPermissionsResultOutput() GetEnvironmentScopedPermissionsResultOutput {
+func (o BuildEnvironmentScopedPermissionsResultOutput) ToBuildEnvironmentScopedPermissionsResultOutput() BuildEnvironmentScopedPermissionsResultOutput {
 	return o
 }
 
-func (o GetEnvironmentScopedPermissionsResultOutput) ToGetEnvironmentScopedPermissionsResultOutputWithContext(ctx context.Context) GetEnvironmentScopedPermissionsResultOutput {
+func (o BuildEnvironmentScopedPermissionsResultOutput) ToBuildEnvironmentScopedPermissionsResultOutputWithContext(ctx context.Context) BuildEnvironmentScopedPermissionsResultOutput {
 	return o
 }
 
 // A `PermissionDescriptor` tree ready to assign to `OrganizationRole.permissions`.
-func (o GetEnvironmentScopedPermissionsResultOutput) Permissions() pulumi.MapOutput {
-	return o.ApplyT(func(v GetEnvironmentScopedPermissionsResult) map[string]interface{} { return v.Permissions }).(pulumi.MapOutput)
+func (o BuildEnvironmentScopedPermissionsResultOutput) Permissions() pulumi.MapOutput {
+	return o.ApplyT(func(v BuildEnvironmentScopedPermissionsResult) map[string]interface{} { return v.Permissions }).(pulumi.MapOutput)
 }
 
 // A JSON-encoded copy of `permissions`. Pulumi's Python SDK strips `__`-prefixed keys from invoke responses (see `pulumi/sdk` Python `runtime/rpc.py:deserialize_property`), so the structured `permissions` Mapping arrives at downstream resources missing every `__type` discriminator and Pulumi Cloud rejects it. Python users should consume `permissionsJson` and `.apply(json.loads)` it instead — that re-creates the dict on the input path (`serialize_property`), which preserves `__` keys. TypeScript/Yaml/Go/.NET/Java callers can use either field; `permissions` is the more ergonomic default.
-func (o GetEnvironmentScopedPermissionsResultOutput) PermissionsJson() pulumi.StringOutput {
-	return o.ApplyT(func(v GetEnvironmentScopedPermissionsResult) string { return v.PermissionsJson }).(pulumi.StringOutput)
+func (o BuildEnvironmentScopedPermissionsResultOutput) PermissionsJson() pulumi.StringOutput {
+	return o.ApplyT(func(v BuildEnvironmentScopedPermissionsResult) string { return v.PermissionsJson }).(pulumi.StringOutput)
 }
 
 func init() {
-	pulumi.RegisterOutputType(GetEnvironmentScopedPermissionsResultOutput{})
+	pulumi.RegisterOutputType(BuildEnvironmentScopedPermissionsResultOutput{})
 }

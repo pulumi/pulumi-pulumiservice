@@ -9,29 +9,29 @@ using Pulumi.Serialization;
 
 namespace Pulumi.PulumiService
 {
-    public static class GetInsightsAccountScopedPermissions
+    public static class BuildInsightsAccountScopedPermissions
     {
         /// <summary>
         /// Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `PermissionLiteralExpressionInsightsAccount` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
         /// </summary>
-        public static Task<GetInsightsAccountScopedPermissionsResult> InvokeAsync(GetInsightsAccountScopedPermissionsArgs args, InvokeOptions? options = null)
-            => global::Pulumi.Deployment.Instance.InvokeAsync<GetInsightsAccountScopedPermissionsResult>("pulumiservice:index:getInsightsAccountScopedPermissions", args ?? new GetInsightsAccountScopedPermissionsArgs(), options.WithDefaults());
+        public static Task<BuildInsightsAccountScopedPermissionsResult> InvokeAsync(BuildInsightsAccountScopedPermissionsArgs args, InvokeOptions? options = null)
+            => global::Pulumi.Deployment.Instance.InvokeAsync<BuildInsightsAccountScopedPermissionsResult>("pulumiservice:index:buildInsightsAccountScopedPermissions", args ?? new BuildInsightsAccountScopedPermissionsArgs(), options.WithDefaults());
 
         /// <summary>
         /// Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `PermissionLiteralExpressionInsightsAccount` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
         /// </summary>
-        public static Output<GetInsightsAccountScopedPermissionsResult> Invoke(GetInsightsAccountScopedPermissionsInvokeArgs args, InvokeOptions? options = null)
-            => global::Pulumi.Deployment.Instance.Invoke<GetInsightsAccountScopedPermissionsResult>("pulumiservice:index:getInsightsAccountScopedPermissions", args ?? new GetInsightsAccountScopedPermissionsInvokeArgs(), options.WithDefaults());
+        public static Output<BuildInsightsAccountScopedPermissionsResult> Invoke(BuildInsightsAccountScopedPermissionsInvokeArgs args, InvokeOptions? options = null)
+            => global::Pulumi.Deployment.Instance.Invoke<BuildInsightsAccountScopedPermissionsResult>("pulumiservice:index:buildInsightsAccountScopedPermissions", args ?? new BuildInsightsAccountScopedPermissionsInvokeArgs(), options.WithDefaults());
 
         /// <summary>
         /// Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `PermissionLiteralExpressionInsightsAccount` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
         /// </summary>
-        public static Output<GetInsightsAccountScopedPermissionsResult> Invoke(GetInsightsAccountScopedPermissionsInvokeArgs args, InvokeOutputOptions options)
-            => global::Pulumi.Deployment.Instance.Invoke<GetInsightsAccountScopedPermissionsResult>("pulumiservice:index:getInsightsAccountScopedPermissions", args ?? new GetInsightsAccountScopedPermissionsInvokeArgs(), options.WithDefaults());
+        public static Output<BuildInsightsAccountScopedPermissionsResult> Invoke(BuildInsightsAccountScopedPermissionsInvokeArgs args, InvokeOutputOptions options)
+            => global::Pulumi.Deployment.Instance.Invoke<BuildInsightsAccountScopedPermissionsResult>("pulumiservice:index:buildInsightsAccountScopedPermissions", args ?? new BuildInsightsAccountScopedPermissionsInvokeArgs(), options.WithDefaults());
     }
 
 
-    public sealed class GetInsightsAccountScopedPermissionsArgs : global::Pulumi.InvokeArgs
+    public sealed class BuildInsightsAccountScopedPermissionsArgs : global::Pulumi.InvokeArgs
     {
         /// <summary>
         /// The target insights account's identifier. Use the `insightsAccountId` output of an `InsightsAccount` resource or the `getInsightsAccount` data source.
@@ -51,13 +51,13 @@ namespace Pulumi.PulumiService
             set => _permissions = value;
         }
 
-        public GetInsightsAccountScopedPermissionsArgs()
+        public BuildInsightsAccountScopedPermissionsArgs()
         {
         }
-        public static new GetInsightsAccountScopedPermissionsArgs Empty => new GetInsightsAccountScopedPermissionsArgs();
+        public static new BuildInsightsAccountScopedPermissionsArgs Empty => new BuildInsightsAccountScopedPermissionsArgs();
     }
 
-    public sealed class GetInsightsAccountScopedPermissionsInvokeArgs : global::Pulumi.InvokeArgs
+    public sealed class BuildInsightsAccountScopedPermissionsInvokeArgs : global::Pulumi.InvokeArgs
     {
         /// <summary>
         /// The target insights account's identifier. Use the `insightsAccountId` output of an `InsightsAccount` resource or the `getInsightsAccount` data source.
@@ -77,15 +77,15 @@ namespace Pulumi.PulumiService
             set => _permissions = value;
         }
 
-        public GetInsightsAccountScopedPermissionsInvokeArgs()
+        public BuildInsightsAccountScopedPermissionsInvokeArgs()
         {
         }
-        public static new GetInsightsAccountScopedPermissionsInvokeArgs Empty => new GetInsightsAccountScopedPermissionsInvokeArgs();
+        public static new BuildInsightsAccountScopedPermissionsInvokeArgs Empty => new BuildInsightsAccountScopedPermissionsInvokeArgs();
     }
 
 
     [OutputType]
-    public sealed class GetInsightsAccountScopedPermissionsResult
+    public sealed class BuildInsightsAccountScopedPermissionsResult
     {
         /// <summary>
         /// A `PermissionDescriptor` tree ready to assign to `OrganizationRole.permissions`.
@@ -97,7 +97,7 @@ namespace Pulumi.PulumiService
         public readonly string PermissionsJson;
 
         [OutputConstructor]
-        private GetInsightsAccountScopedPermissionsResult(
+        private BuildInsightsAccountScopedPermissionsResult(
             ImmutableDictionary<string, object> permissions,
 
             string permissionsJson)

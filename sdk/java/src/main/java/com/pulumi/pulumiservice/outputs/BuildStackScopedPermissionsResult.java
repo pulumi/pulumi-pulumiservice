@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 
 @CustomType
-public final class GetStackScopedPermissionsResult {
+public final class BuildStackScopedPermissionsResult {
     /**
      * @return A `PermissionDescriptor` tree ready to assign to `OrganizationRole.permissions`.
      * 
@@ -23,7 +23,7 @@ public final class GetStackScopedPermissionsResult {
      */
     private String permissionsJson;
 
-    private GetStackScopedPermissionsResult() {}
+    private BuildStackScopedPermissionsResult() {}
     /**
      * @return A `PermissionDescriptor` tree ready to assign to `OrganizationRole.permissions`.
      * 
@@ -43,7 +43,7 @@ public final class GetStackScopedPermissionsResult {
         return new Builder();
     }
 
-    public static Builder builder(GetStackScopedPermissionsResult defaults) {
+    public static Builder builder(BuildStackScopedPermissionsResult defaults) {
         return new Builder(defaults);
     }
     @CustomType.Builder
@@ -51,7 +51,7 @@ public final class GetStackScopedPermissionsResult {
         private Map<String,Object> permissions;
         private String permissionsJson;
         public Builder() {}
-        public Builder(GetStackScopedPermissionsResult defaults) {
+        public Builder(BuildStackScopedPermissionsResult defaults) {
     	      Objects.requireNonNull(defaults);
     	      this.permissions = defaults.permissions;
     	      this.permissionsJson = defaults.permissionsJson;
@@ -60,7 +60,7 @@ public final class GetStackScopedPermissionsResult {
         @CustomType.Setter
         public Builder permissions(Map<String,Object> permissions) {
             if (permissions == null) {
-              throw new MissingRequiredPropertyException("GetStackScopedPermissionsResult", "permissions");
+              throw new MissingRequiredPropertyException("BuildStackScopedPermissionsResult", "permissions");
             }
             this.permissions = permissions;
             return this;
@@ -68,13 +68,13 @@ public final class GetStackScopedPermissionsResult {
         @CustomType.Setter
         public Builder permissionsJson(String permissionsJson) {
             if (permissionsJson == null) {
-              throw new MissingRequiredPropertyException("GetStackScopedPermissionsResult", "permissionsJson");
+              throw new MissingRequiredPropertyException("BuildStackScopedPermissionsResult", "permissionsJson");
             }
             this.permissionsJson = permissionsJson;
             return this;
         }
-        public GetStackScopedPermissionsResult build() {
-            final var _resultValue = new GetStackScopedPermissionsResult();
+        public BuildStackScopedPermissionsResult build() {
+            final var _resultValue = new BuildStackScopedPermissionsResult();
             _resultValue.permissions = permissions;
             _resultValue.permissionsJson = permissionsJson;
             return _resultValue;

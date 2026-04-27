@@ -9,29 +9,29 @@ using Pulumi.Serialization;
 
 namespace Pulumi.PulumiService
 {
-    public static class GetStackScopedPermissions
+    public static class BuildStackScopedPermissions
     {
         /// <summary>
         /// Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple — and is what `PermissionLiteralExpressionStack` expects. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
         /// </summary>
-        public static Task<GetStackScopedPermissionsResult> InvokeAsync(GetStackScopedPermissionsArgs args, InvokeOptions? options = null)
-            => global::Pulumi.Deployment.Instance.InvokeAsync<GetStackScopedPermissionsResult>("pulumiservice:index:getStackScopedPermissions", args ?? new GetStackScopedPermissionsArgs(), options.WithDefaults());
+        public static Task<BuildStackScopedPermissionsResult> InvokeAsync(BuildStackScopedPermissionsArgs args, InvokeOptions? options = null)
+            => global::Pulumi.Deployment.Instance.InvokeAsync<BuildStackScopedPermissionsResult>("pulumiservice:index:buildStackScopedPermissions", args ?? new BuildStackScopedPermissionsArgs(), options.WithDefaults());
 
         /// <summary>
         /// Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple — and is what `PermissionLiteralExpressionStack` expects. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
         /// </summary>
-        public static Output<GetStackScopedPermissionsResult> Invoke(GetStackScopedPermissionsInvokeArgs args, InvokeOptions? options = null)
-            => global::Pulumi.Deployment.Instance.Invoke<GetStackScopedPermissionsResult>("pulumiservice:index:getStackScopedPermissions", args ?? new GetStackScopedPermissionsInvokeArgs(), options.WithDefaults());
+        public static Output<BuildStackScopedPermissionsResult> Invoke(BuildStackScopedPermissionsInvokeArgs args, InvokeOptions? options = null)
+            => global::Pulumi.Deployment.Instance.Invoke<BuildStackScopedPermissionsResult>("pulumiservice:index:buildStackScopedPermissions", args ?? new BuildStackScopedPermissionsInvokeArgs(), options.WithDefaults());
 
         /// <summary>
         /// Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple — and is what `PermissionLiteralExpressionStack` expects. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
         /// </summary>
-        public static Output<GetStackScopedPermissionsResult> Invoke(GetStackScopedPermissionsInvokeArgs args, InvokeOutputOptions options)
-            => global::Pulumi.Deployment.Instance.Invoke<GetStackScopedPermissionsResult>("pulumiservice:index:getStackScopedPermissions", args ?? new GetStackScopedPermissionsInvokeArgs(), options.WithDefaults());
+        public static Output<BuildStackScopedPermissionsResult> Invoke(BuildStackScopedPermissionsInvokeArgs args, InvokeOutputOptions options)
+            => global::Pulumi.Deployment.Instance.Invoke<BuildStackScopedPermissionsResult>("pulumiservice:index:buildStackScopedPermissions", args ?? new BuildStackScopedPermissionsInvokeArgs(), options.WithDefaults());
     }
 
 
-    public sealed class GetStackScopedPermissionsArgs : global::Pulumi.InvokeArgs
+    public sealed class BuildStackScopedPermissionsArgs : global::Pulumi.InvokeArgs
     {
         [Input("permissions", required: true)]
         private List<string>? _permissions;
@@ -51,13 +51,13 @@ namespace Pulumi.PulumiService
         [Input("stackId", required: true)]
         public string StackId { get; set; } = null!;
 
-        public GetStackScopedPermissionsArgs()
+        public BuildStackScopedPermissionsArgs()
         {
         }
-        public static new GetStackScopedPermissionsArgs Empty => new GetStackScopedPermissionsArgs();
+        public static new BuildStackScopedPermissionsArgs Empty => new BuildStackScopedPermissionsArgs();
     }
 
-    public sealed class GetStackScopedPermissionsInvokeArgs : global::Pulumi.InvokeArgs
+    public sealed class BuildStackScopedPermissionsInvokeArgs : global::Pulumi.InvokeArgs
     {
         [Input("permissions", required: true)]
         private InputList<string>? _permissions;
@@ -77,15 +77,15 @@ namespace Pulumi.PulumiService
         [Input("stackId", required: true)]
         public Input<string> StackId { get; set; } = null!;
 
-        public GetStackScopedPermissionsInvokeArgs()
+        public BuildStackScopedPermissionsInvokeArgs()
         {
         }
-        public static new GetStackScopedPermissionsInvokeArgs Empty => new GetStackScopedPermissionsInvokeArgs();
+        public static new BuildStackScopedPermissionsInvokeArgs Empty => new BuildStackScopedPermissionsInvokeArgs();
     }
 
 
     [OutputType]
-    public sealed class GetStackScopedPermissionsResult
+    public sealed class BuildStackScopedPermissionsResult
     {
         /// <summary>
         /// A `PermissionDescriptor` tree ready to assign to `OrganizationRole.permissions`.
@@ -97,7 +97,7 @@ namespace Pulumi.PulumiService
         public readonly string PermissionsJson;
 
         [OutputConstructor]
-        private GetStackScopedPermissionsResult(
+        private BuildStackScopedPermissionsResult(
             ImmutableDictionary<string, object> permissions,
 
             string permissionsJson)

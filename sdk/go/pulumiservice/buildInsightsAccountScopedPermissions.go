@@ -12,74 +12,74 @@ import (
 )
 
 // Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `PermissionLiteralExpressionInsightsAccount` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
-func GetInsightsAccountScopedPermissions(ctx *pulumi.Context, args *GetInsightsAccountScopedPermissionsArgs, opts ...pulumi.InvokeOption) (*GetInsightsAccountScopedPermissionsResult, error) {
+func BuildInsightsAccountScopedPermissions(ctx *pulumi.Context, args *BuildInsightsAccountScopedPermissionsArgs, opts ...pulumi.InvokeOption) (*BuildInsightsAccountScopedPermissionsResult, error) {
 	opts = internal.PkgInvokeDefaultOpts(opts)
-	var rv GetInsightsAccountScopedPermissionsResult
-	err := ctx.Invoke("pulumiservice:index:getInsightsAccountScopedPermissions", args, &rv, opts...)
+	var rv BuildInsightsAccountScopedPermissionsResult
+	err := ctx.Invoke("pulumiservice:index:buildInsightsAccountScopedPermissions", args, &rv, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return &rv, nil
 }
 
-type GetInsightsAccountScopedPermissionsArgs struct {
+type BuildInsightsAccountScopedPermissionsArgs struct {
 	// The target insights account's identifier. Use the `insightsAccountId` output of an `InsightsAccount` resource or the `getInsightsAccount` data source.
 	InsightsAccountId string `pulumi:"insightsAccountId"`
 	// The set of `insights-account:*` scopes to grant on the target account. Discover valid scope names via the `getOrganizationRoleScopes` data source.
 	Permissions []string `pulumi:"permissions"`
 }
 
-type GetInsightsAccountScopedPermissionsResult struct {
+type BuildInsightsAccountScopedPermissionsResult struct {
 	// A `PermissionDescriptor` tree ready to assign to `OrganizationRole.permissions`.
 	Permissions map[string]interface{} `pulumi:"permissions"`
 	// A JSON-encoded copy of `permissions`. Pulumi's Python SDK strips `__`-prefixed keys from invoke responses (see `pulumi/sdk` Python `runtime/rpc.py:deserialize_property`), so the structured `permissions` Mapping arrives at downstream resources missing every `__type` discriminator and Pulumi Cloud rejects it. Python users should consume `permissionsJson` and `.apply(json.loads)` it instead — that re-creates the dict on the input path (`serialize_property`), which preserves `__` keys. TypeScript/Yaml/Go/.NET/Java callers can use either field; `permissions` is the more ergonomic default.
 	PermissionsJson string `pulumi:"permissionsJson"`
 }
 
-func GetInsightsAccountScopedPermissionsOutput(ctx *pulumi.Context, args GetInsightsAccountScopedPermissionsOutputArgs, opts ...pulumi.InvokeOption) GetInsightsAccountScopedPermissionsResultOutput {
+func BuildInsightsAccountScopedPermissionsOutput(ctx *pulumi.Context, args BuildInsightsAccountScopedPermissionsOutputArgs, opts ...pulumi.InvokeOption) BuildInsightsAccountScopedPermissionsResultOutput {
 	return pulumi.ToOutputWithContext(ctx.Context(), args).
-		ApplyT(func(v interface{}) (GetInsightsAccountScopedPermissionsResultOutput, error) {
-			args := v.(GetInsightsAccountScopedPermissionsArgs)
+		ApplyT(func(v interface{}) (BuildInsightsAccountScopedPermissionsResultOutput, error) {
+			args := v.(BuildInsightsAccountScopedPermissionsArgs)
 			options := pulumi.InvokeOutputOptions{InvokeOptions: internal.PkgInvokeDefaultOpts(opts)}
-			return ctx.InvokeOutput("pulumiservice:index:getInsightsAccountScopedPermissions", args, GetInsightsAccountScopedPermissionsResultOutput{}, options).(GetInsightsAccountScopedPermissionsResultOutput), nil
-		}).(GetInsightsAccountScopedPermissionsResultOutput)
+			return ctx.InvokeOutput("pulumiservice:index:buildInsightsAccountScopedPermissions", args, BuildInsightsAccountScopedPermissionsResultOutput{}, options).(BuildInsightsAccountScopedPermissionsResultOutput), nil
+		}).(BuildInsightsAccountScopedPermissionsResultOutput)
 }
 
-type GetInsightsAccountScopedPermissionsOutputArgs struct {
+type BuildInsightsAccountScopedPermissionsOutputArgs struct {
 	// The target insights account's identifier. Use the `insightsAccountId` output of an `InsightsAccount` resource or the `getInsightsAccount` data source.
 	InsightsAccountId pulumi.StringInput `pulumi:"insightsAccountId"`
 	// The set of `insights-account:*` scopes to grant on the target account. Discover valid scope names via the `getOrganizationRoleScopes` data source.
 	Permissions pulumi.StringArrayInput `pulumi:"permissions"`
 }
 
-func (GetInsightsAccountScopedPermissionsOutputArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*GetInsightsAccountScopedPermissionsArgs)(nil)).Elem()
+func (BuildInsightsAccountScopedPermissionsOutputArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*BuildInsightsAccountScopedPermissionsArgs)(nil)).Elem()
 }
 
-type GetInsightsAccountScopedPermissionsResultOutput struct{ *pulumi.OutputState }
+type BuildInsightsAccountScopedPermissionsResultOutput struct{ *pulumi.OutputState }
 
-func (GetInsightsAccountScopedPermissionsResultOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*GetInsightsAccountScopedPermissionsResult)(nil)).Elem()
+func (BuildInsightsAccountScopedPermissionsResultOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*BuildInsightsAccountScopedPermissionsResult)(nil)).Elem()
 }
 
-func (o GetInsightsAccountScopedPermissionsResultOutput) ToGetInsightsAccountScopedPermissionsResultOutput() GetInsightsAccountScopedPermissionsResultOutput {
+func (o BuildInsightsAccountScopedPermissionsResultOutput) ToBuildInsightsAccountScopedPermissionsResultOutput() BuildInsightsAccountScopedPermissionsResultOutput {
 	return o
 }
 
-func (o GetInsightsAccountScopedPermissionsResultOutput) ToGetInsightsAccountScopedPermissionsResultOutputWithContext(ctx context.Context) GetInsightsAccountScopedPermissionsResultOutput {
+func (o BuildInsightsAccountScopedPermissionsResultOutput) ToBuildInsightsAccountScopedPermissionsResultOutputWithContext(ctx context.Context) BuildInsightsAccountScopedPermissionsResultOutput {
 	return o
 }
 
 // A `PermissionDescriptor` tree ready to assign to `OrganizationRole.permissions`.
-func (o GetInsightsAccountScopedPermissionsResultOutput) Permissions() pulumi.MapOutput {
-	return o.ApplyT(func(v GetInsightsAccountScopedPermissionsResult) map[string]interface{} { return v.Permissions }).(pulumi.MapOutput)
+func (o BuildInsightsAccountScopedPermissionsResultOutput) Permissions() pulumi.MapOutput {
+	return o.ApplyT(func(v BuildInsightsAccountScopedPermissionsResult) map[string]interface{} { return v.Permissions }).(pulumi.MapOutput)
 }
 
 // A JSON-encoded copy of `permissions`. Pulumi's Python SDK strips `__`-prefixed keys from invoke responses (see `pulumi/sdk` Python `runtime/rpc.py:deserialize_property`), so the structured `permissions` Mapping arrives at downstream resources missing every `__type` discriminator and Pulumi Cloud rejects it. Python users should consume `permissionsJson` and `.apply(json.loads)` it instead — that re-creates the dict on the input path (`serialize_property`), which preserves `__` keys. TypeScript/Yaml/Go/.NET/Java callers can use either field; `permissions` is the more ergonomic default.
-func (o GetInsightsAccountScopedPermissionsResultOutput) PermissionsJson() pulumi.StringOutput {
-	return o.ApplyT(func(v GetInsightsAccountScopedPermissionsResult) string { return v.PermissionsJson }).(pulumi.StringOutput)
+func (o BuildInsightsAccountScopedPermissionsResultOutput) PermissionsJson() pulumi.StringOutput {
+	return o.ApplyT(func(v BuildInsightsAccountScopedPermissionsResult) string { return v.PermissionsJson }).(pulumi.StringOutput)
 }
 
 func init() {
-	pulumi.RegisterOutputType(GetInsightsAccountScopedPermissionsResultOutput{})
+	pulumi.RegisterOutputType(BuildInsightsAccountScopedPermissionsResultOutput{})
 }

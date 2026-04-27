@@ -3,6 +3,7 @@
 
 package com.pulumi.pulumiservice.inputs;
 
+import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
 import java.lang.String;
@@ -10,22 +11,22 @@ import java.util.List;
 import java.util.Objects;
 
 
-public final class GetInsightsAccountScopedPermissionsPlainArgs extends com.pulumi.resources.InvokeArgs {
+public final class BuildInsightsAccountScopedPermissionsArgs extends com.pulumi.resources.InvokeArgs {
 
-    public static final GetInsightsAccountScopedPermissionsPlainArgs Empty = new GetInsightsAccountScopedPermissionsPlainArgs();
+    public static final BuildInsightsAccountScopedPermissionsArgs Empty = new BuildInsightsAccountScopedPermissionsArgs();
 
     /**
      * The target insights account&#39;s identifier. Use the `insightsAccountId` output of an `InsightsAccount` resource or the `getInsightsAccount` data source.
      * 
      */
     @Import(name="insightsAccountId", required=true)
-    private String insightsAccountId;
+    private Output<String> insightsAccountId;
 
     /**
      * @return The target insights account&#39;s identifier. Use the `insightsAccountId` output of an `InsightsAccount` resource or the `getInsightsAccount` data source.
      * 
      */
-    public String insightsAccountId() {
+    public Output<String> insightsAccountId() {
         return this.insightsAccountId;
     }
 
@@ -34,19 +35,19 @@ public final class GetInsightsAccountScopedPermissionsPlainArgs extends com.pulu
      * 
      */
     @Import(name="permissions", required=true)
-    private List<String> permissions;
+    private Output<List<String>> permissions;
 
     /**
      * @return The set of `insights-account:*` scopes to grant on the target account. Discover valid scope names via the `getOrganizationRoleScopes` data source.
      * 
      */
-    public List<String> permissions() {
+    public Output<List<String>> permissions() {
         return this.permissions;
     }
 
-    private GetInsightsAccountScopedPermissionsPlainArgs() {}
+    private BuildInsightsAccountScopedPermissionsArgs() {}
 
-    private GetInsightsAccountScopedPermissionsPlainArgs(GetInsightsAccountScopedPermissionsPlainArgs $) {
+    private BuildInsightsAccountScopedPermissionsArgs(BuildInsightsAccountScopedPermissionsArgs $) {
         this.insightsAccountId = $.insightsAccountId;
         this.permissions = $.permissions;
     }
@@ -54,19 +55,30 @@ public final class GetInsightsAccountScopedPermissionsPlainArgs extends com.pulu
     public static Builder builder() {
         return new Builder();
     }
-    public static Builder builder(GetInsightsAccountScopedPermissionsPlainArgs defaults) {
+    public static Builder builder(BuildInsightsAccountScopedPermissionsArgs defaults) {
         return new Builder(defaults);
     }
 
     public static final class Builder {
-        private GetInsightsAccountScopedPermissionsPlainArgs $;
+        private BuildInsightsAccountScopedPermissionsArgs $;
 
         public Builder() {
-            $ = new GetInsightsAccountScopedPermissionsPlainArgs();
+            $ = new BuildInsightsAccountScopedPermissionsArgs();
         }
 
-        public Builder(GetInsightsAccountScopedPermissionsPlainArgs defaults) {
-            $ = new GetInsightsAccountScopedPermissionsPlainArgs(Objects.requireNonNull(defaults));
+        public Builder(BuildInsightsAccountScopedPermissionsArgs defaults) {
+            $ = new BuildInsightsAccountScopedPermissionsArgs(Objects.requireNonNull(defaults));
+        }
+
+        /**
+         * @param insightsAccountId The target insights account&#39;s identifier. Use the `insightsAccountId` output of an `InsightsAccount` resource or the `getInsightsAccount` data source.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder insightsAccountId(Output<String> insightsAccountId) {
+            $.insightsAccountId = insightsAccountId;
+            return this;
         }
 
         /**
@@ -76,7 +88,17 @@ public final class GetInsightsAccountScopedPermissionsPlainArgs extends com.pulu
          * 
          */
         public Builder insightsAccountId(String insightsAccountId) {
-            $.insightsAccountId = insightsAccountId;
+            return insightsAccountId(Output.of(insightsAccountId));
+        }
+
+        /**
+         * @param permissions The set of `insights-account:*` scopes to grant on the target account. Discover valid scope names via the `getOrganizationRoleScopes` data source.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder permissions(Output<List<String>> permissions) {
+            $.permissions = permissions;
             return this;
         }
 
@@ -87,8 +109,7 @@ public final class GetInsightsAccountScopedPermissionsPlainArgs extends com.pulu
          * 
          */
         public Builder permissions(List<String> permissions) {
-            $.permissions = permissions;
-            return this;
+            return permissions(Output.of(permissions));
         }
 
         /**
@@ -101,12 +122,12 @@ public final class GetInsightsAccountScopedPermissionsPlainArgs extends com.pulu
             return permissions(List.of(permissions));
         }
 
-        public GetInsightsAccountScopedPermissionsPlainArgs build() {
+        public BuildInsightsAccountScopedPermissionsArgs build() {
             if ($.insightsAccountId == null) {
-                throw new MissingRequiredPropertyException("GetInsightsAccountScopedPermissionsPlainArgs", "insightsAccountId");
+                throw new MissingRequiredPropertyException("BuildInsightsAccountScopedPermissionsArgs", "insightsAccountId");
             }
             if ($.permissions == null) {
-                throw new MissingRequiredPropertyException("GetInsightsAccountScopedPermissionsPlainArgs", "permissions");
+                throw new MissingRequiredPropertyException("BuildInsightsAccountScopedPermissionsArgs", "permissions");
             }
             return $;
         }

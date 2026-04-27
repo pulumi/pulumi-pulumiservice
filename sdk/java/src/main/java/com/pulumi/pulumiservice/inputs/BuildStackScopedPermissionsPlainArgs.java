@@ -3,7 +3,6 @@
 
 package com.pulumi.pulumiservice.inputs;
 
-import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
 import java.lang.String;
@@ -11,22 +10,22 @@ import java.util.List;
 import java.util.Objects;
 
 
-public final class GetStackScopedPermissionsArgs extends com.pulumi.resources.InvokeArgs {
+public final class BuildStackScopedPermissionsPlainArgs extends com.pulumi.resources.InvokeArgs {
 
-    public static final GetStackScopedPermissionsArgs Empty = new GetStackScopedPermissionsArgs();
+    public static final BuildStackScopedPermissionsPlainArgs Empty = new BuildStackScopedPermissionsPlainArgs();
 
     /**
      * The set of `stack:*` scopes to grant on the target stack (e.g. `stack:read`, `stack:edit`, `stack:admin`). Discover valid scope names via the `getOrganizationRoleScopes` data source.
      * 
      */
     @Import(name="permissions", required=true)
-    private Output<List<String>> permissions;
+    private List<String> permissions;
 
     /**
      * @return The set of `stack:*` scopes to grant on the target stack (e.g. `stack:read`, `stack:edit`, `stack:admin`). Discover valid scope names via the `getOrganizationRoleScopes` data source.
      * 
      */
-    public Output<List<String>> permissions() {
+    public List<String> permissions() {
         return this.permissions;
     }
 
@@ -35,19 +34,19 @@ public final class GetStackScopedPermissionsArgs extends com.pulumi.resources.In
      * 
      */
     @Import(name="stackId", required=true)
-    private Output<String> stackId;
+    private String stackId;
 
     /**
      * @return The target stack&#39;s opaque Pulumi Cloud identifier (not the `organization/project/stack` triple).
      * 
      */
-    public Output<String> stackId() {
+    public String stackId() {
         return this.stackId;
     }
 
-    private GetStackScopedPermissionsArgs() {}
+    private BuildStackScopedPermissionsPlainArgs() {}
 
-    private GetStackScopedPermissionsArgs(GetStackScopedPermissionsArgs $) {
+    private BuildStackScopedPermissionsPlainArgs(BuildStackScopedPermissionsPlainArgs $) {
         this.permissions = $.permissions;
         this.stackId = $.stackId;
     }
@@ -55,30 +54,19 @@ public final class GetStackScopedPermissionsArgs extends com.pulumi.resources.In
     public static Builder builder() {
         return new Builder();
     }
-    public static Builder builder(GetStackScopedPermissionsArgs defaults) {
+    public static Builder builder(BuildStackScopedPermissionsPlainArgs defaults) {
         return new Builder(defaults);
     }
 
     public static final class Builder {
-        private GetStackScopedPermissionsArgs $;
+        private BuildStackScopedPermissionsPlainArgs $;
 
         public Builder() {
-            $ = new GetStackScopedPermissionsArgs();
+            $ = new BuildStackScopedPermissionsPlainArgs();
         }
 
-        public Builder(GetStackScopedPermissionsArgs defaults) {
-            $ = new GetStackScopedPermissionsArgs(Objects.requireNonNull(defaults));
-        }
-
-        /**
-         * @param permissions The set of `stack:*` scopes to grant on the target stack (e.g. `stack:read`, `stack:edit`, `stack:admin`). Discover valid scope names via the `getOrganizationRoleScopes` data source.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder permissions(Output<List<String>> permissions) {
-            $.permissions = permissions;
-            return this;
+        public Builder(BuildStackScopedPermissionsPlainArgs defaults) {
+            $ = new BuildStackScopedPermissionsPlainArgs(Objects.requireNonNull(defaults));
         }
 
         /**
@@ -88,7 +76,8 @@ public final class GetStackScopedPermissionsArgs extends com.pulumi.resources.In
          * 
          */
         public Builder permissions(List<String> permissions) {
-            return permissions(Output.of(permissions));
+            $.permissions = permissions;
+            return this;
         }
 
         /**
@@ -107,27 +96,17 @@ public final class GetStackScopedPermissionsArgs extends com.pulumi.resources.In
          * @return builder
          * 
          */
-        public Builder stackId(Output<String> stackId) {
+        public Builder stackId(String stackId) {
             $.stackId = stackId;
             return this;
         }
 
-        /**
-         * @param stackId The target stack&#39;s opaque Pulumi Cloud identifier (not the `organization/project/stack` triple).
-         * 
-         * @return builder
-         * 
-         */
-        public Builder stackId(String stackId) {
-            return stackId(Output.of(stackId));
-        }
-
-        public GetStackScopedPermissionsArgs build() {
+        public BuildStackScopedPermissionsPlainArgs build() {
             if ($.permissions == null) {
-                throw new MissingRequiredPropertyException("GetStackScopedPermissionsArgs", "permissions");
+                throw new MissingRequiredPropertyException("BuildStackScopedPermissionsPlainArgs", "permissions");
             }
             if ($.stackId == null) {
-                throw new MissingRequiredPropertyException("GetStackScopedPermissionsArgs", "stackId");
+                throw new MissingRequiredPropertyException("BuildStackScopedPermissionsPlainArgs", "stackId");
             }
             return $;
         }

@@ -95,33 +95,33 @@ const scopedPermissionsHelpDoc = "The result is directly assignable to " +
 // Environment-scoped helper
 // ----------------------------------------------------------------------------
 
-// GetEnvironmentScopedPermissionsFunction builds an OrganizationRole.permissions
+// BuildEnvironmentScopedPermissionsFunction builds an OrganizationRole.permissions
 // descriptor that grants the supplied scopes only on the named environment.
-type GetEnvironmentScopedPermissionsFunction struct{}
+type BuildEnvironmentScopedPermissionsFunction struct{}
 
-type GetEnvironmentScopedPermissionsInput struct {
+type BuildEnvironmentScopedPermissionsInput struct {
 	EnvironmentID string   `pulumi:"environmentId"`
 	Permissions   []string `pulumi:"permissions"`
 }
 
-type GetEnvironmentScopedPermissionsOutput struct {
+type BuildEnvironmentScopedPermissionsOutput struct {
 	Permissions     map[string]interface{} `pulumi:"permissions"`
 	PermissionsJson string                 `pulumi:"permissionsJson"`
 }
 
-func (GetEnvironmentScopedPermissionsFunction) Annotate(a infer.Annotator) {
+func (BuildEnvironmentScopedPermissionsFunction) Annotate(a infer.Annotator) {
 	a.Describe(
-		&GetEnvironmentScopedPermissionsFunction{},
+		&BuildEnvironmentScopedPermissionsFunction{},
 		"Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on "+
 			"the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data "+
 			"source) to avoid hand-rolling the underlying `PermissionDescriptorGroup` / "+
 			"`PermissionDescriptorCondition` / `PermissionLiteralExpressionEnvironment` JSON. "+
 			scopedPermissionsHelpDoc,
 	)
-	a.SetToken("index", "getEnvironmentScopedPermissions")
+	a.SetToken("index", "buildEnvironmentScopedPermissions")
 }
 
-func (i *GetEnvironmentScopedPermissionsInput) Annotate(a infer.Annotator) {
+func (i *BuildEnvironmentScopedPermissionsInput) Annotate(a infer.Annotator) {
 	a.Describe(
 		&i.EnvironmentID,
 		"The target environment's UUID. Use the `environmentId` output of an `Environment` resource "+
@@ -135,7 +135,7 @@ func (i *GetEnvironmentScopedPermissionsInput) Annotate(a infer.Annotator) {
 	)
 }
 
-func (o *GetEnvironmentScopedPermissionsOutput) Annotate(a infer.Annotator) {
+func (o *BuildEnvironmentScopedPermissionsOutput) Annotate(a infer.Annotator) {
 	a.Describe(
 		&o.Permissions,
 		"A `PermissionDescriptor` tree ready to assign to `OrganizationRole.permissions`.",
@@ -143,16 +143,16 @@ func (o *GetEnvironmentScopedPermissionsOutput) Annotate(a infer.Annotator) {
 	a.Describe(&o.PermissionsJson, scopedPermissionsJSONHelpDoc)
 }
 
-func (GetEnvironmentScopedPermissionsFunction) Invoke(
+func (BuildEnvironmentScopedPermissionsFunction) Invoke(
 	_ context.Context,
-	req infer.FunctionRequest[GetEnvironmentScopedPermissionsInput],
-) (infer.FunctionResponse[GetEnvironmentScopedPermissionsOutput], error) {
+	req infer.FunctionRequest[BuildEnvironmentScopedPermissionsInput],
+) (infer.FunctionResponse[BuildEnvironmentScopedPermissionsOutput], error) {
 	if req.Input.EnvironmentID == "" {
-		return infer.FunctionResponse[GetEnvironmentScopedPermissionsOutput]{},
+		return infer.FunctionResponse[BuildEnvironmentScopedPermissionsOutput]{},
 			fmt.Errorf("`environmentId` must not be empty")
 	}
 	if len(req.Input.Permissions) == 0 {
-		return infer.FunctionResponse[GetEnvironmentScopedPermissionsOutput]{},
+		return infer.FunctionResponse[BuildEnvironmentScopedPermissionsOutput]{},
 			fmt.Errorf("`permissions` must not be empty")
 	}
 	descriptor := scopedPermissionsDescriptor(
@@ -161,8 +161,8 @@ func (GetEnvironmentScopedPermissionsFunction) Invoke(
 		req.Input.EnvironmentID,
 		req.Input.Permissions,
 	)
-	return infer.FunctionResponse[GetEnvironmentScopedPermissionsOutput]{
-		Output: GetEnvironmentScopedPermissionsOutput{
+	return infer.FunctionResponse[BuildEnvironmentScopedPermissionsOutput]{
+		Output: BuildEnvironmentScopedPermissionsOutput{
 			Permissions:     descriptor,
 			PermissionsJson: marshalDescriptor(descriptor),
 		},
@@ -173,32 +173,32 @@ func (GetEnvironmentScopedPermissionsFunction) Invoke(
 // Stack-scoped helper
 // ----------------------------------------------------------------------------
 
-// GetStackScopedPermissionsFunction builds an OrganizationRole.permissions
+// BuildStackScopedPermissionsFunction builds an OrganizationRole.permissions
 // descriptor that grants the supplied scopes only on the named stack.
-type GetStackScopedPermissionsFunction struct{}
+type BuildStackScopedPermissionsFunction struct{}
 
-type GetStackScopedPermissionsInput struct {
+type BuildStackScopedPermissionsInput struct {
 	StackID     string   `pulumi:"stackId"`
 	Permissions []string `pulumi:"permissions"`
 }
 
-type GetStackScopedPermissionsOutput struct {
+type BuildStackScopedPermissionsOutput struct {
 	Permissions     map[string]interface{} `pulumi:"permissions"`
 	PermissionsJson string                 `pulumi:"permissionsJson"`
 }
 
-func (GetStackScopedPermissionsFunction) Annotate(a infer.Annotator) {
+func (BuildStackScopedPermissionsFunction) Annotate(a infer.Annotator) {
 	a.Describe(
-		&GetStackScopedPermissionsFunction{},
+		&BuildStackScopedPermissionsFunction{},
 		"Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on "+
 			"the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct "+
 			"from the `organization/project/stack` triple — and is what `PermissionLiteralExpressionStack` "+
 			"expects. "+scopedPermissionsHelpDoc,
 	)
-	a.SetToken("index", "getStackScopedPermissions")
+	a.SetToken("index", "buildStackScopedPermissions")
 }
 
-func (i *GetStackScopedPermissionsInput) Annotate(a infer.Annotator) {
+func (i *BuildStackScopedPermissionsInput) Annotate(a infer.Annotator) {
 	a.Describe(
 		&i.StackID,
 		"The target stack's opaque Pulumi Cloud identifier (not the `organization/project/stack` triple).",
@@ -211,7 +211,7 @@ func (i *GetStackScopedPermissionsInput) Annotate(a infer.Annotator) {
 	)
 }
 
-func (o *GetStackScopedPermissionsOutput) Annotate(a infer.Annotator) {
+func (o *BuildStackScopedPermissionsOutput) Annotate(a infer.Annotator) {
 	a.Describe(
 		&o.Permissions,
 		"A `PermissionDescriptor` tree ready to assign to `OrganizationRole.permissions`.",
@@ -219,16 +219,16 @@ func (o *GetStackScopedPermissionsOutput) Annotate(a infer.Annotator) {
 	a.Describe(&o.PermissionsJson, scopedPermissionsJSONHelpDoc)
 }
 
-func (GetStackScopedPermissionsFunction) Invoke(
+func (BuildStackScopedPermissionsFunction) Invoke(
 	_ context.Context,
-	req infer.FunctionRequest[GetStackScopedPermissionsInput],
-) (infer.FunctionResponse[GetStackScopedPermissionsOutput], error) {
+	req infer.FunctionRequest[BuildStackScopedPermissionsInput],
+) (infer.FunctionResponse[BuildStackScopedPermissionsOutput], error) {
 	if req.Input.StackID == "" {
-		return infer.FunctionResponse[GetStackScopedPermissionsOutput]{},
+		return infer.FunctionResponse[BuildStackScopedPermissionsOutput]{},
 			fmt.Errorf("`stackId` must not be empty")
 	}
 	if len(req.Input.Permissions) == 0 {
-		return infer.FunctionResponse[GetStackScopedPermissionsOutput]{},
+		return infer.FunctionResponse[BuildStackScopedPermissionsOutput]{},
 			fmt.Errorf("`permissions` must not be empty")
 	}
 	descriptor := scopedPermissionsDescriptor(
@@ -237,8 +237,8 @@ func (GetStackScopedPermissionsFunction) Invoke(
 		req.Input.StackID,
 		req.Input.Permissions,
 	)
-	return infer.FunctionResponse[GetStackScopedPermissionsOutput]{
-		Output: GetStackScopedPermissionsOutput{
+	return infer.FunctionResponse[BuildStackScopedPermissionsOutput]{
+		Output: BuildStackScopedPermissionsOutput{
 			Permissions:     descriptor,
 			PermissionsJson: marshalDescriptor(descriptor),
 		},
@@ -249,33 +249,33 @@ func (GetStackScopedPermissionsFunction) Invoke(
 // Insights-account-scoped helper
 // ----------------------------------------------------------------------------
 
-// GetInsightsAccountScopedPermissionsFunction builds an
+// BuildInsightsAccountScopedPermissionsFunction builds an
 // OrganizationRole.permissions descriptor that grants the supplied scopes only
 // on the named insights account.
-type GetInsightsAccountScopedPermissionsFunction struct{}
+type BuildInsightsAccountScopedPermissionsFunction struct{}
 
-type GetInsightsAccountScopedPermissionsInput struct {
+type BuildInsightsAccountScopedPermissionsInput struct {
 	InsightsAccountID string   `pulumi:"insightsAccountId"`
 	Permissions       []string `pulumi:"permissions"`
 }
 
-type GetInsightsAccountScopedPermissionsOutput struct {
+type BuildInsightsAccountScopedPermissionsOutput struct {
 	Permissions     map[string]interface{} `pulumi:"permissions"`
 	PermissionsJson string                 `pulumi:"permissionsJson"`
 }
 
-func (GetInsightsAccountScopedPermissionsFunction) Annotate(a infer.Annotator) {
+func (BuildInsightsAccountScopedPermissionsFunction) Annotate(a infer.Annotator) {
 	a.Describe(
-		&GetInsightsAccountScopedPermissionsFunction{},
+		&BuildInsightsAccountScopedPermissionsFunction{},
 		"Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on "+
 			"the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the "+
 			"`getInsightsAccount` data source) to avoid hand-rolling the underlying "+
 			"`PermissionLiteralExpressionInsightsAccount` JSON. "+scopedPermissionsHelpDoc,
 	)
-	a.SetToken("index", "getInsightsAccountScopedPermissions")
+	a.SetToken("index", "buildInsightsAccountScopedPermissions")
 }
 
-func (i *GetInsightsAccountScopedPermissionsInput) Annotate(a infer.Annotator) {
+func (i *BuildInsightsAccountScopedPermissionsInput) Annotate(a infer.Annotator) {
 	a.Describe(
 		&i.InsightsAccountID,
 		"The target insights account's identifier. Use the `insightsAccountId` output of an "+
@@ -288,7 +288,7 @@ func (i *GetInsightsAccountScopedPermissionsInput) Annotate(a infer.Annotator) {
 	)
 }
 
-func (o *GetInsightsAccountScopedPermissionsOutput) Annotate(a infer.Annotator) {
+func (o *BuildInsightsAccountScopedPermissionsOutput) Annotate(a infer.Annotator) {
 	a.Describe(
 		&o.Permissions,
 		"A `PermissionDescriptor` tree ready to assign to `OrganizationRole.permissions`.",
@@ -296,16 +296,16 @@ func (o *GetInsightsAccountScopedPermissionsOutput) Annotate(a infer.Annotator) 
 	a.Describe(&o.PermissionsJson, scopedPermissionsJSONHelpDoc)
 }
 
-func (GetInsightsAccountScopedPermissionsFunction) Invoke(
+func (BuildInsightsAccountScopedPermissionsFunction) Invoke(
 	_ context.Context,
-	req infer.FunctionRequest[GetInsightsAccountScopedPermissionsInput],
-) (infer.FunctionResponse[GetInsightsAccountScopedPermissionsOutput], error) {
+	req infer.FunctionRequest[BuildInsightsAccountScopedPermissionsInput],
+) (infer.FunctionResponse[BuildInsightsAccountScopedPermissionsOutput], error) {
 	if req.Input.InsightsAccountID == "" {
-		return infer.FunctionResponse[GetInsightsAccountScopedPermissionsOutput]{},
+		return infer.FunctionResponse[BuildInsightsAccountScopedPermissionsOutput]{},
 			fmt.Errorf("`insightsAccountId` must not be empty")
 	}
 	if len(req.Input.Permissions) == 0 {
-		return infer.FunctionResponse[GetInsightsAccountScopedPermissionsOutput]{},
+		return infer.FunctionResponse[BuildInsightsAccountScopedPermissionsOutput]{},
 			fmt.Errorf("`permissions` must not be empty")
 	}
 	descriptor := scopedPermissionsDescriptor(
@@ -314,8 +314,8 @@ func (GetInsightsAccountScopedPermissionsFunction) Invoke(
 		req.Input.InsightsAccountID,
 		req.Input.Permissions,
 	)
-	return infer.FunctionResponse[GetInsightsAccountScopedPermissionsOutput]{
-		Output: GetInsightsAccountScopedPermissionsOutput{
+	return infer.FunctionResponse[BuildInsightsAccountScopedPermissionsOutput]{
+		Output: BuildInsightsAccountScopedPermissionsOutput{
 			Permissions:     descriptor,
 			PermissionsJson: marshalDescriptor(descriptor),
 		},

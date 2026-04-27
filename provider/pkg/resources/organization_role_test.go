@@ -207,7 +207,7 @@ func TestOrganizationRoleCheck(t *testing.T) {
 
 	// At preview, `permissions` (or `name`) may arrive as Computed when wired
 	// to another resource's output — e.g. `permissions =
-	// getEnvironmentScopedPermissionsOutput({...}).permissions`. The empty
+	// buildEnvironmentScopedPermissionsOutput({...}).permissions`. The empty
 	// check would otherwise fire on the zero-value decoded Go field and break
 	// every fresh `pulumi preview`. The same emptiness checks belong in
 	// Create/Update, where Pulumi guarantees concrete values.

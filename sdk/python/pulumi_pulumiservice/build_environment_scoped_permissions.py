@@ -15,14 +15,14 @@ else:
 from . import _utilities
 
 __all__ = [
-    'GetEnvironmentScopedPermissionsResult',
-    'AwaitableGetEnvironmentScopedPermissionsResult',
-    'get_environment_scoped_permissions',
-    'get_environment_scoped_permissions_output',
+    'BuildEnvironmentScopedPermissionsResult',
+    'AwaitableBuildEnvironmentScopedPermissionsResult',
+    'build_environment_scoped_permissions',
+    'build_environment_scoped_permissions_output',
 ]
 
 @pulumi.output_type
-class GetEnvironmentScopedPermissionsResult:
+class BuildEnvironmentScopedPermissionsResult:
     def __init__(__self__, permissions=None, permissions_json=None):
         if permissions and not isinstance(permissions, dict):
             raise TypeError("Expected argument 'permissions' to be a dict")
@@ -48,19 +48,19 @@ class GetEnvironmentScopedPermissionsResult:
         return pulumi.get(self, "permissions_json")
 
 
-class AwaitableGetEnvironmentScopedPermissionsResult(GetEnvironmentScopedPermissionsResult):
+class AwaitableBuildEnvironmentScopedPermissionsResult(BuildEnvironmentScopedPermissionsResult):
     # pylint: disable=using-constant-test
     def __await__(self):
         if False:
             yield self
-        return GetEnvironmentScopedPermissionsResult(
+        return BuildEnvironmentScopedPermissionsResult(
             permissions=self.permissions,
             permissions_json=self.permissions_json)
 
 
-def get_environment_scoped_permissions(environment_id: Optional[_builtins.str] = None,
-                                       permissions: Optional[Sequence[_builtins.str]] = None,
-                                       opts: Optional[pulumi.InvokeOptions] = None) -> AwaitableGetEnvironmentScopedPermissionsResult:
+def build_environment_scoped_permissions(environment_id: Optional[_builtins.str] = None,
+                                         permissions: Optional[Sequence[_builtins.str]] = None,
+                                         opts: Optional[pulumi.InvokeOptions] = None) -> AwaitableBuildEnvironmentScopedPermissionsResult:
     """
     Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the underlying `PermissionDescriptorGroup` / `PermissionDescriptorCondition` / `PermissionLiteralExpressionEnvironment` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
 
@@ -72,14 +72,14 @@ def get_environment_scoped_permissions(environment_id: Optional[_builtins.str] =
     __args__['environmentId'] = environment_id
     __args__['permissions'] = permissions
     opts = pulumi.InvokeOptions.merge(_utilities.get_invoke_opts_defaults(), opts)
-    __ret__ = pulumi.runtime.invoke('pulumiservice:index:getEnvironmentScopedPermissions', __args__, opts=opts, typ=GetEnvironmentScopedPermissionsResult).value
+    __ret__ = pulumi.runtime.invoke('pulumiservice:index:buildEnvironmentScopedPermissions', __args__, opts=opts, typ=BuildEnvironmentScopedPermissionsResult).value
 
-    return AwaitableGetEnvironmentScopedPermissionsResult(
+    return AwaitableBuildEnvironmentScopedPermissionsResult(
         permissions=pulumi.get(__ret__, 'permissions'),
         permissions_json=pulumi.get(__ret__, 'permissions_json'))
-def get_environment_scoped_permissions_output(environment_id: Optional[pulumi.Input[_builtins.str]] = None,
-                                              permissions: Optional[pulumi.Input[Sequence[_builtins.str]]] = None,
-                                              opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[GetEnvironmentScopedPermissionsResult]:
+def build_environment_scoped_permissions_output(environment_id: Optional[pulumi.Input[_builtins.str]] = None,
+                                                permissions: Optional[pulumi.Input[Sequence[_builtins.str]]] = None,
+                                                opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[BuildEnvironmentScopedPermissionsResult]:
     """
     Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the underlying `PermissionDescriptorGroup` / `PermissionDescriptorCondition` / `PermissionLiteralExpressionEnvironment` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
 
@@ -91,7 +91,7 @@ def get_environment_scoped_permissions_output(environment_id: Optional[pulumi.In
     __args__['environmentId'] = environment_id
     __args__['permissions'] = permissions
     opts = pulumi.InvokeOutputOptions.merge(_utilities.get_invoke_opts_defaults(), opts)
-    __ret__ = pulumi.runtime.invoke_output('pulumiservice:index:getEnvironmentScopedPermissions', __args__, opts=opts, typ=GetEnvironmentScopedPermissionsResult)
-    return __ret__.apply(lambda __response__: GetEnvironmentScopedPermissionsResult(
+    __ret__ = pulumi.runtime.invoke_output('pulumiservice:index:buildEnvironmentScopedPermissions', __args__, opts=opts, typ=BuildEnvironmentScopedPermissionsResult)
+    return __ret__.apply(lambda __response__: BuildEnvironmentScopedPermissionsResult(
         permissions=pulumi.get(__response__, 'permissions'),
         permissions_json=pulumi.get(__response__, 'permissions_json')))

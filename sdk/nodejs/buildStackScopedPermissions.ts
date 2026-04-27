@@ -7,15 +7,15 @@ import * as utilities from "./utilities";
 /**
  * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple — and is what `PermissionLiteralExpressionStack` expects. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
  */
-export function getStackScopedPermissions(args: GetStackScopedPermissionsArgs, opts?: pulumi.InvokeOptions): Promise<GetStackScopedPermissionsResult> {
+export function buildStackScopedPermissions(args: BuildStackScopedPermissionsArgs, opts?: pulumi.InvokeOptions): Promise<BuildStackScopedPermissionsResult> {
     opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts || {});
-    return pulumi.runtime.invoke("pulumiservice:index:getStackScopedPermissions", {
+    return pulumi.runtime.invoke("pulumiservice:index:buildStackScopedPermissions", {
         "permissions": args.permissions,
         "stackId": args.stackId,
     }, opts);
 }
 
-export interface GetStackScopedPermissionsArgs {
+export interface BuildStackScopedPermissionsArgs {
     /**
      * The set of `stack:*` scopes to grant on the target stack (e.g. `stack:read`, `stack:edit`, `stack:admin`). Discover valid scope names via the `getOrganizationRoleScopes` data source.
      */
@@ -26,7 +26,7 @@ export interface GetStackScopedPermissionsArgs {
     stackId: string;
 }
 
-export interface GetStackScopedPermissionsResult {
+export interface BuildStackScopedPermissionsResult {
     /**
      * A `PermissionDescriptor` tree ready to assign to `OrganizationRole.permissions`.
      */
@@ -39,15 +39,15 @@ export interface GetStackScopedPermissionsResult {
 /**
  * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple — and is what `PermissionLiteralExpressionStack` expects. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
  */
-export function getStackScopedPermissionsOutput(args: GetStackScopedPermissionsOutputArgs, opts?: pulumi.InvokeOutputOptions): pulumi.Output<GetStackScopedPermissionsResult> {
+export function buildStackScopedPermissionsOutput(args: BuildStackScopedPermissionsOutputArgs, opts?: pulumi.InvokeOutputOptions): pulumi.Output<BuildStackScopedPermissionsResult> {
     opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts || {});
-    return pulumi.runtime.invokeOutput("pulumiservice:index:getStackScopedPermissions", {
+    return pulumi.runtime.invokeOutput("pulumiservice:index:buildStackScopedPermissions", {
         "permissions": args.permissions,
         "stackId": args.stackId,
     }, opts);
 }
 
-export interface GetStackScopedPermissionsOutputArgs {
+export interface BuildStackScopedPermissionsOutputArgs {
     /**
      * The set of `stack:*` scopes to grant on the target stack (e.g. `stack:read`, `stack:edit`, `stack:admin`). Discover valid scope names via the `getOrganizationRoleScopes` data source.
      */

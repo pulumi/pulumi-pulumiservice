@@ -12,74 +12,74 @@ import (
 )
 
 // Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple — and is what `PermissionLiteralExpressionStack` expects. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
-func GetStackScopedPermissions(ctx *pulumi.Context, args *GetStackScopedPermissionsArgs, opts ...pulumi.InvokeOption) (*GetStackScopedPermissionsResult, error) {
+func BuildStackScopedPermissions(ctx *pulumi.Context, args *BuildStackScopedPermissionsArgs, opts ...pulumi.InvokeOption) (*BuildStackScopedPermissionsResult, error) {
 	opts = internal.PkgInvokeDefaultOpts(opts)
-	var rv GetStackScopedPermissionsResult
-	err := ctx.Invoke("pulumiservice:index:getStackScopedPermissions", args, &rv, opts...)
+	var rv BuildStackScopedPermissionsResult
+	err := ctx.Invoke("pulumiservice:index:buildStackScopedPermissions", args, &rv, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return &rv, nil
 }
 
-type GetStackScopedPermissionsArgs struct {
+type BuildStackScopedPermissionsArgs struct {
 	// The set of `stack:*` scopes to grant on the target stack (e.g. `stack:read`, `stack:edit`, `stack:admin`). Discover valid scope names via the `getOrganizationRoleScopes` data source.
 	Permissions []string `pulumi:"permissions"`
 	// The target stack's opaque Pulumi Cloud identifier (not the `organization/project/stack` triple).
 	StackId string `pulumi:"stackId"`
 }
 
-type GetStackScopedPermissionsResult struct {
+type BuildStackScopedPermissionsResult struct {
 	// A `PermissionDescriptor` tree ready to assign to `OrganizationRole.permissions`.
 	Permissions map[string]interface{} `pulumi:"permissions"`
 	// A JSON-encoded copy of `permissions`. Pulumi's Python SDK strips `__`-prefixed keys from invoke responses (see `pulumi/sdk` Python `runtime/rpc.py:deserialize_property`), so the structured `permissions` Mapping arrives at downstream resources missing every `__type` discriminator and Pulumi Cloud rejects it. Python users should consume `permissionsJson` and `.apply(json.loads)` it instead — that re-creates the dict on the input path (`serialize_property`), which preserves `__` keys. TypeScript/Yaml/Go/.NET/Java callers can use either field; `permissions` is the more ergonomic default.
 	PermissionsJson string `pulumi:"permissionsJson"`
 }
 
-func GetStackScopedPermissionsOutput(ctx *pulumi.Context, args GetStackScopedPermissionsOutputArgs, opts ...pulumi.InvokeOption) GetStackScopedPermissionsResultOutput {
+func BuildStackScopedPermissionsOutput(ctx *pulumi.Context, args BuildStackScopedPermissionsOutputArgs, opts ...pulumi.InvokeOption) BuildStackScopedPermissionsResultOutput {
 	return pulumi.ToOutputWithContext(ctx.Context(), args).
-		ApplyT(func(v interface{}) (GetStackScopedPermissionsResultOutput, error) {
-			args := v.(GetStackScopedPermissionsArgs)
+		ApplyT(func(v interface{}) (BuildStackScopedPermissionsResultOutput, error) {
+			args := v.(BuildStackScopedPermissionsArgs)
 			options := pulumi.InvokeOutputOptions{InvokeOptions: internal.PkgInvokeDefaultOpts(opts)}
-			return ctx.InvokeOutput("pulumiservice:index:getStackScopedPermissions", args, GetStackScopedPermissionsResultOutput{}, options).(GetStackScopedPermissionsResultOutput), nil
-		}).(GetStackScopedPermissionsResultOutput)
+			return ctx.InvokeOutput("pulumiservice:index:buildStackScopedPermissions", args, BuildStackScopedPermissionsResultOutput{}, options).(BuildStackScopedPermissionsResultOutput), nil
+		}).(BuildStackScopedPermissionsResultOutput)
 }
 
-type GetStackScopedPermissionsOutputArgs struct {
+type BuildStackScopedPermissionsOutputArgs struct {
 	// The set of `stack:*` scopes to grant on the target stack (e.g. `stack:read`, `stack:edit`, `stack:admin`). Discover valid scope names via the `getOrganizationRoleScopes` data source.
 	Permissions pulumi.StringArrayInput `pulumi:"permissions"`
 	// The target stack's opaque Pulumi Cloud identifier (not the `organization/project/stack` triple).
 	StackId pulumi.StringInput `pulumi:"stackId"`
 }
 
-func (GetStackScopedPermissionsOutputArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*GetStackScopedPermissionsArgs)(nil)).Elem()
+func (BuildStackScopedPermissionsOutputArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*BuildStackScopedPermissionsArgs)(nil)).Elem()
 }
 
-type GetStackScopedPermissionsResultOutput struct{ *pulumi.OutputState }
+type BuildStackScopedPermissionsResultOutput struct{ *pulumi.OutputState }
 
-func (GetStackScopedPermissionsResultOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*GetStackScopedPermissionsResult)(nil)).Elem()
+func (BuildStackScopedPermissionsResultOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*BuildStackScopedPermissionsResult)(nil)).Elem()
 }
 
-func (o GetStackScopedPermissionsResultOutput) ToGetStackScopedPermissionsResultOutput() GetStackScopedPermissionsResultOutput {
+func (o BuildStackScopedPermissionsResultOutput) ToBuildStackScopedPermissionsResultOutput() BuildStackScopedPermissionsResultOutput {
 	return o
 }
 
-func (o GetStackScopedPermissionsResultOutput) ToGetStackScopedPermissionsResultOutputWithContext(ctx context.Context) GetStackScopedPermissionsResultOutput {
+func (o BuildStackScopedPermissionsResultOutput) ToBuildStackScopedPermissionsResultOutputWithContext(ctx context.Context) BuildStackScopedPermissionsResultOutput {
 	return o
 }
 
 // A `PermissionDescriptor` tree ready to assign to `OrganizationRole.permissions`.
-func (o GetStackScopedPermissionsResultOutput) Permissions() pulumi.MapOutput {
-	return o.ApplyT(func(v GetStackScopedPermissionsResult) map[string]interface{} { return v.Permissions }).(pulumi.MapOutput)
+func (o BuildStackScopedPermissionsResultOutput) Permissions() pulumi.MapOutput {
+	return o.ApplyT(func(v BuildStackScopedPermissionsResult) map[string]interface{} { return v.Permissions }).(pulumi.MapOutput)
 }
 
 // A JSON-encoded copy of `permissions`. Pulumi's Python SDK strips `__`-prefixed keys from invoke responses (see `pulumi/sdk` Python `runtime/rpc.py:deserialize_property`), so the structured `permissions` Mapping arrives at downstream resources missing every `__type` discriminator and Pulumi Cloud rejects it. Python users should consume `permissionsJson` and `.apply(json.loads)` it instead — that re-creates the dict on the input path (`serialize_property`), which preserves `__` keys. TypeScript/Yaml/Go/.NET/Java callers can use either field; `permissions` is the more ergonomic default.
-func (o GetStackScopedPermissionsResultOutput) PermissionsJson() pulumi.StringOutput {
-	return o.ApplyT(func(v GetStackScopedPermissionsResult) string { return v.PermissionsJson }).(pulumi.StringOutput)
+func (o BuildStackScopedPermissionsResultOutput) PermissionsJson() pulumi.StringOutput {
+	return o.ApplyT(func(v BuildStackScopedPermissionsResult) string { return v.PermissionsJson }).(pulumi.StringOutput)
 }
 
 func init() {
-	pulumi.RegisterOutputType(GetStackScopedPermissionsResultOutput{})
+	pulumi.RegisterOutputType(BuildStackScopedPermissionsResultOutput{})
 }

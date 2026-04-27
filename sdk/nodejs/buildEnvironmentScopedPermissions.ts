@@ -7,15 +7,15 @@ import * as utilities from "./utilities";
 /**
  * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the underlying `PermissionDescriptorGroup` / `PermissionDescriptorCondition` / `PermissionLiteralExpressionEnvironment` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
  */
-export function getEnvironmentScopedPermissions(args: GetEnvironmentScopedPermissionsArgs, opts?: pulumi.InvokeOptions): Promise<GetEnvironmentScopedPermissionsResult> {
+export function buildEnvironmentScopedPermissions(args: BuildEnvironmentScopedPermissionsArgs, opts?: pulumi.InvokeOptions): Promise<BuildEnvironmentScopedPermissionsResult> {
     opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts || {});
-    return pulumi.runtime.invoke("pulumiservice:index:getEnvironmentScopedPermissions", {
+    return pulumi.runtime.invoke("pulumiservice:index:buildEnvironmentScopedPermissions", {
         "environmentId": args.environmentId,
         "permissions": args.permissions,
     }, opts);
 }
 
-export interface GetEnvironmentScopedPermissionsArgs {
+export interface BuildEnvironmentScopedPermissionsArgs {
     /**
      * The target environment's UUID. Use the `environmentId` output of an `Environment` resource or the `getEnvironment` data source.
      */
@@ -26,7 +26,7 @@ export interface GetEnvironmentScopedPermissionsArgs {
     permissions: string[];
 }
 
-export interface GetEnvironmentScopedPermissionsResult {
+export interface BuildEnvironmentScopedPermissionsResult {
     /**
      * A `PermissionDescriptor` tree ready to assign to `OrganizationRole.permissions`.
      */
@@ -39,15 +39,15 @@ export interface GetEnvironmentScopedPermissionsResult {
 /**
  * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the underlying `PermissionDescriptorGroup` / `PermissionDescriptorCondition` / `PermissionLiteralExpressionEnvironment` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
  */
-export function getEnvironmentScopedPermissionsOutput(args: GetEnvironmentScopedPermissionsOutputArgs, opts?: pulumi.InvokeOutputOptions): pulumi.Output<GetEnvironmentScopedPermissionsResult> {
+export function buildEnvironmentScopedPermissionsOutput(args: BuildEnvironmentScopedPermissionsOutputArgs, opts?: pulumi.InvokeOutputOptions): pulumi.Output<BuildEnvironmentScopedPermissionsResult> {
     opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts || {});
-    return pulumi.runtime.invokeOutput("pulumiservice:index:getEnvironmentScopedPermissions", {
+    return pulumi.runtime.invokeOutput("pulumiservice:index:buildEnvironmentScopedPermissions", {
         "environmentId": args.environmentId,
         "permissions": args.permissions,
     }, opts);
 }
 
-export interface GetEnvironmentScopedPermissionsOutputArgs {
+export interface BuildEnvironmentScopedPermissionsOutputArgs {
     /**
      * The target environment's UUID. Use the `environmentId` output of an `Environment` resource or the `getEnvironment` data source.
      */

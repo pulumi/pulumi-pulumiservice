@@ -74,8 +74,8 @@ func (c *OrganizationRoleCore) Annotate(a infer.Annotator) {
 		"The role's permission descriptor tree — passed to the service verbatim. This is the `details` "+
 			"field of a Pulumi Cloud PermissionDescriptor: an object with a `__type` discriminator (e.g. "+
 			"`PermissionDescriptorAllow`, `PermissionDescriptorCompose`) describing which scopes are granted. "+
-			"For per-entity scoping, prefer the `getEnvironmentScopedPermissions`, `getStackScopedPermissions`, "+
-			"and `getInsightsAccountScopedPermissions` helpers, which build the underlying "+
+			"For per-entity scoping, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, "+
+			"and `buildInsightsAccountScopedPermissions` helpers, which build the underlying "+
 			"`PermissionDescriptorGroup` / `PermissionDescriptorCondition` tree for you.",
 	)
 }
@@ -105,7 +105,7 @@ func (*OrganizationRole) Check(
 	}
 	// Skip emptiness checks when the raw input arrived as unknown/computed
 	// (e.g. `permissions: someResource.environmentId.apply(...)` or the
-	// `_output` variant of `getEnvironmentScopedPermissions`). At preview
+	// `_output` variant of `buildEnvironmentScopedPermissions`). At preview
 	// the typed Go field decodes to its zero value, which would otherwise
 	// trip the empty checks. Pulumi guarantees these inputs are concrete
 	// by the time Create/Update runs, so the same checks belong there.

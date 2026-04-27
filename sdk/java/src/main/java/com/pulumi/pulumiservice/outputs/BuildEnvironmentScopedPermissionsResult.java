@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 
 @CustomType
-public final class GetEnvironmentScopedPermissionsResult {
+public final class BuildEnvironmentScopedPermissionsResult {
     /**
      * @return A `PermissionDescriptor` tree ready to assign to `OrganizationRole.permissions`.
      * 
@@ -23,7 +23,7 @@ public final class GetEnvironmentScopedPermissionsResult {
      */
     private String permissionsJson;
 
-    private GetEnvironmentScopedPermissionsResult() {}
+    private BuildEnvironmentScopedPermissionsResult() {}
     /**
      * @return A `PermissionDescriptor` tree ready to assign to `OrganizationRole.permissions`.
      * 
@@ -43,7 +43,7 @@ public final class GetEnvironmentScopedPermissionsResult {
         return new Builder();
     }
 
-    public static Builder builder(GetEnvironmentScopedPermissionsResult defaults) {
+    public static Builder builder(BuildEnvironmentScopedPermissionsResult defaults) {
         return new Builder(defaults);
     }
     @CustomType.Builder
@@ -51,7 +51,7 @@ public final class GetEnvironmentScopedPermissionsResult {
         private Map<String,Object> permissions;
         private String permissionsJson;
         public Builder() {}
-        public Builder(GetEnvironmentScopedPermissionsResult defaults) {
+        public Builder(BuildEnvironmentScopedPermissionsResult defaults) {
     	      Objects.requireNonNull(defaults);
     	      this.permissions = defaults.permissions;
     	      this.permissionsJson = defaults.permissionsJson;
@@ -60,7 +60,7 @@ public final class GetEnvironmentScopedPermissionsResult {
         @CustomType.Setter
         public Builder permissions(Map<String,Object> permissions) {
             if (permissions == null) {
-              throw new MissingRequiredPropertyException("GetEnvironmentScopedPermissionsResult", "permissions");
+              throw new MissingRequiredPropertyException("BuildEnvironmentScopedPermissionsResult", "permissions");
             }
             this.permissions = permissions;
             return this;
@@ -68,13 +68,13 @@ public final class GetEnvironmentScopedPermissionsResult {
         @CustomType.Setter
         public Builder permissionsJson(String permissionsJson) {
             if (permissionsJson == null) {
-              throw new MissingRequiredPropertyException("GetEnvironmentScopedPermissionsResult", "permissionsJson");
+              throw new MissingRequiredPropertyException("BuildEnvironmentScopedPermissionsResult", "permissionsJson");
             }
             this.permissionsJson = permissionsJson;
             return this;
         }
-        public GetEnvironmentScopedPermissionsResult build() {
-            final var _resultValue = new GetEnvironmentScopedPermissionsResult();
+        public BuildEnvironmentScopedPermissionsResult build() {
+            final var _resultValue = new BuildEnvironmentScopedPermissionsResult();
             _resultValue.permissions = permissions;
             _resultValue.permissionsJson = permissionsJson;
             return _resultValue;

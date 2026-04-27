@@ -22,7 +22,7 @@ from pulumi_pulumiservice import (
     Team,
     TeamRoleAssignment,
     get_current_user_output,
-    get_environment_scoped_permissions_output,
+    build_environment_scoped_permissions_output,
     get_organization_members_output,
 )
 
@@ -143,7 +143,7 @@ scoped_role = OrganizationRole(
     organization_name=organization_name,
     name=f"py-rbac-scoped-read-only-{digits}",
     description="Read+open access scoped to a single ESC environment.",
-    permissions=get_environment_scoped_permissions_output(
+    permissions=build_environment_scoped_permissions_output(
         environment_id=scoped_env.environment_id,
         permissions=["environment:read", "environment:open"],
     ).permissions_json.apply(json.loads),

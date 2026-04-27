@@ -7,15 +7,15 @@ import * as utilities from "./utilities";
 /**
  * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `PermissionLiteralExpressionInsightsAccount` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
  */
-export function getInsightsAccountScopedPermissions(args: GetInsightsAccountScopedPermissionsArgs, opts?: pulumi.InvokeOptions): Promise<GetInsightsAccountScopedPermissionsResult> {
+export function buildInsightsAccountScopedPermissions(args: BuildInsightsAccountScopedPermissionsArgs, opts?: pulumi.InvokeOptions): Promise<BuildInsightsAccountScopedPermissionsResult> {
     opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts || {});
-    return pulumi.runtime.invoke("pulumiservice:index:getInsightsAccountScopedPermissions", {
+    return pulumi.runtime.invoke("pulumiservice:index:buildInsightsAccountScopedPermissions", {
         "insightsAccountId": args.insightsAccountId,
         "permissions": args.permissions,
     }, opts);
 }
 
-export interface GetInsightsAccountScopedPermissionsArgs {
+export interface BuildInsightsAccountScopedPermissionsArgs {
     /**
      * The target insights account's identifier. Use the `insightsAccountId` output of an `InsightsAccount` resource or the `getInsightsAccount` data source.
      */
@@ -26,7 +26,7 @@ export interface GetInsightsAccountScopedPermissionsArgs {
     permissions: string[];
 }
 
-export interface GetInsightsAccountScopedPermissionsResult {
+export interface BuildInsightsAccountScopedPermissionsResult {
     /**
      * A `PermissionDescriptor` tree ready to assign to `OrganizationRole.permissions`.
      */
@@ -39,15 +39,15 @@ export interface GetInsightsAccountScopedPermissionsResult {
 /**
  * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `PermissionLiteralExpressionInsightsAccount` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
  */
-export function getInsightsAccountScopedPermissionsOutput(args: GetInsightsAccountScopedPermissionsOutputArgs, opts?: pulumi.InvokeOutputOptions): pulumi.Output<GetInsightsAccountScopedPermissionsResult> {
+export function buildInsightsAccountScopedPermissionsOutput(args: BuildInsightsAccountScopedPermissionsOutputArgs, opts?: pulumi.InvokeOutputOptions): pulumi.Output<BuildInsightsAccountScopedPermissionsResult> {
     opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts || {});
-    return pulumi.runtime.invokeOutput("pulumiservice:index:getInsightsAccountScopedPermissions", {
+    return pulumi.runtime.invokeOutput("pulumiservice:index:buildInsightsAccountScopedPermissions", {
         "insightsAccountId": args.insightsAccountId,
         "permissions": args.permissions,
     }, opts);
 }
 
-export interface GetInsightsAccountScopedPermissionsOutputArgs {
+export interface BuildInsightsAccountScopedPermissionsOutputArgs {
     /**
      * The target insights account's identifier. Use the `insightsAccountId` output of an `InsightsAccount` resource or the `getInsightsAccount` data source.
      */

@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.Objects;
 
 
-public final class GetEnvironmentScopedPermissionsPlainArgs extends com.pulumi.resources.InvokeArgs {
+public final class BuildEnvironmentScopedPermissionsPlainArgs extends com.pulumi.resources.InvokeArgs {
 
-    public static final GetEnvironmentScopedPermissionsPlainArgs Empty = new GetEnvironmentScopedPermissionsPlainArgs();
+    public static final BuildEnvironmentScopedPermissionsPlainArgs Empty = new BuildEnvironmentScopedPermissionsPlainArgs();
 
     /**
      * The target environment&#39;s UUID. Use the `environmentId` output of an `Environment` resource or the `getEnvironment` data source.
@@ -44,9 +44,9 @@ public final class GetEnvironmentScopedPermissionsPlainArgs extends com.pulumi.r
         return this.permissions;
     }
 
-    private GetEnvironmentScopedPermissionsPlainArgs() {}
+    private BuildEnvironmentScopedPermissionsPlainArgs() {}
 
-    private GetEnvironmentScopedPermissionsPlainArgs(GetEnvironmentScopedPermissionsPlainArgs $) {
+    private BuildEnvironmentScopedPermissionsPlainArgs(BuildEnvironmentScopedPermissionsPlainArgs $) {
         this.environmentId = $.environmentId;
         this.permissions = $.permissions;
     }
@@ -54,19 +54,19 @@ public final class GetEnvironmentScopedPermissionsPlainArgs extends com.pulumi.r
     public static Builder builder() {
         return new Builder();
     }
-    public static Builder builder(GetEnvironmentScopedPermissionsPlainArgs defaults) {
+    public static Builder builder(BuildEnvironmentScopedPermissionsPlainArgs defaults) {
         return new Builder(defaults);
     }
 
     public static final class Builder {
-        private GetEnvironmentScopedPermissionsPlainArgs $;
+        private BuildEnvironmentScopedPermissionsPlainArgs $;
 
         public Builder() {
-            $ = new GetEnvironmentScopedPermissionsPlainArgs();
+            $ = new BuildEnvironmentScopedPermissionsPlainArgs();
         }
 
-        public Builder(GetEnvironmentScopedPermissionsPlainArgs defaults) {
-            $ = new GetEnvironmentScopedPermissionsPlainArgs(Objects.requireNonNull(defaults));
+        public Builder(BuildEnvironmentScopedPermissionsPlainArgs defaults) {
+            $ = new BuildEnvironmentScopedPermissionsPlainArgs(Objects.requireNonNull(defaults));
         }
 
         /**
@@ -101,12 +101,12 @@ public final class GetEnvironmentScopedPermissionsPlainArgs extends com.pulumi.r
             return permissions(List.of(permissions));
         }
 
-        public GetEnvironmentScopedPermissionsPlainArgs build() {
+        public BuildEnvironmentScopedPermissionsPlainArgs build() {
             if ($.environmentId == null) {
-                throw new MissingRequiredPropertyException("GetEnvironmentScopedPermissionsPlainArgs", "environmentId");
+                throw new MissingRequiredPropertyException("BuildEnvironmentScopedPermissionsPlainArgs", "environmentId");
             }
             if ($.permissions == null) {
-                throw new MissingRequiredPropertyException("GetEnvironmentScopedPermissionsPlainArgs", "permissions");
+                throw new MissingRequiredPropertyException("BuildEnvironmentScopedPermissionsPlainArgs", "permissions");
             }
             return $;
         }

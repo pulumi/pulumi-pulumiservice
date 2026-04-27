@@ -9,16 +9,18 @@ import com.pulumi.deployment.Deployment;
 import com.pulumi.deployment.InvokeOptions;
 import com.pulumi.deployment.InvokeOutputOptions;
 import com.pulumi.pulumiservice.Utilities;
+import com.pulumi.pulumiservice.inputs.BuildEnvironmentScopedPermissionsArgs;
+import com.pulumi.pulumiservice.inputs.BuildEnvironmentScopedPermissionsPlainArgs;
+import com.pulumi.pulumiservice.inputs.BuildInsightsAccountScopedPermissionsArgs;
+import com.pulumi.pulumiservice.inputs.BuildInsightsAccountScopedPermissionsPlainArgs;
+import com.pulumi.pulumiservice.inputs.BuildStackScopedPermissionsArgs;
+import com.pulumi.pulumiservice.inputs.BuildStackScopedPermissionsPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetCurrentUserArgs;
 import com.pulumi.pulumiservice.inputs.GetCurrentUserPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetEnvironmentArgs;
 import com.pulumi.pulumiservice.inputs.GetEnvironmentPlainArgs;
-import com.pulumi.pulumiservice.inputs.GetEnvironmentScopedPermissionsArgs;
-import com.pulumi.pulumiservice.inputs.GetEnvironmentScopedPermissionsPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetInsightsAccountArgs;
 import com.pulumi.pulumiservice.inputs.GetInsightsAccountPlainArgs;
-import com.pulumi.pulumiservice.inputs.GetInsightsAccountScopedPermissionsArgs;
-import com.pulumi.pulumiservice.inputs.GetInsightsAccountScopedPermissionsPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetInsightsAccountsArgs;
 import com.pulumi.pulumiservice.inputs.GetInsightsAccountsPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetOrganizationMemberArgs;
@@ -31,23 +33,126 @@ import com.pulumi.pulumiservice.inputs.GetPolicyPackArgs;
 import com.pulumi.pulumiservice.inputs.GetPolicyPackPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetPolicyPacksArgs;
 import com.pulumi.pulumiservice.inputs.GetPolicyPacksPlainArgs;
-import com.pulumi.pulumiservice.inputs.GetStackScopedPermissionsArgs;
-import com.pulumi.pulumiservice.inputs.GetStackScopedPermissionsPlainArgs;
+import com.pulumi.pulumiservice.outputs.BuildEnvironmentScopedPermissionsResult;
+import com.pulumi.pulumiservice.outputs.BuildInsightsAccountScopedPermissionsResult;
+import com.pulumi.pulumiservice.outputs.BuildStackScopedPermissionsResult;
 import com.pulumi.pulumiservice.outputs.GetCurrentUserResult;
 import com.pulumi.pulumiservice.outputs.GetEnvironmentResult;
-import com.pulumi.pulumiservice.outputs.GetEnvironmentScopedPermissionsResult;
 import com.pulumi.pulumiservice.outputs.GetInsightsAccountResult;
-import com.pulumi.pulumiservice.outputs.GetInsightsAccountScopedPermissionsResult;
 import com.pulumi.pulumiservice.outputs.GetInsightsAccountsResult;
 import com.pulumi.pulumiservice.outputs.GetOrganizationMemberResult;
 import com.pulumi.pulumiservice.outputs.GetOrganizationMembersResult;
 import com.pulumi.pulumiservice.outputs.GetOrganizationRoleScopesResult;
 import com.pulumi.pulumiservice.outputs.GetPolicyPackResult;
 import com.pulumi.pulumiservice.outputs.GetPolicyPacksResult;
-import com.pulumi.pulumiservice.outputs.GetStackScopedPermissionsResult;
 import java.util.concurrent.CompletableFuture;
 
 public final class PulumiserviceFunctions {
+    /**
+     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the underlying `PermissionDescriptorGroup` / `PermissionDescriptorCondition` / `PermissionLiteralExpressionEnvironment` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
+     * 
+     */
+    public static Output<BuildEnvironmentScopedPermissionsResult> buildEnvironmentScopedPermissions(BuildEnvironmentScopedPermissionsArgs args) {
+        return buildEnvironmentScopedPermissions(args, InvokeOptions.Empty);
+    }
+    /**
+     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the underlying `PermissionDescriptorGroup` / `PermissionDescriptorCondition` / `PermissionLiteralExpressionEnvironment` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
+     * 
+     */
+    public static CompletableFuture<BuildEnvironmentScopedPermissionsResult> buildEnvironmentScopedPermissionsPlain(BuildEnvironmentScopedPermissionsPlainArgs args) {
+        return buildEnvironmentScopedPermissionsPlain(args, InvokeOptions.Empty);
+    }
+    /**
+     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the underlying `PermissionDescriptorGroup` / `PermissionDescriptorCondition` / `PermissionLiteralExpressionEnvironment` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
+     * 
+     */
+    public static Output<BuildEnvironmentScopedPermissionsResult> buildEnvironmentScopedPermissions(BuildEnvironmentScopedPermissionsArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:buildEnvironmentScopedPermissions", TypeShape.of(BuildEnvironmentScopedPermissionsResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the underlying `PermissionDescriptorGroup` / `PermissionDescriptorCondition` / `PermissionLiteralExpressionEnvironment` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
+     * 
+     */
+    public static Output<BuildEnvironmentScopedPermissionsResult> buildEnvironmentScopedPermissions(BuildEnvironmentScopedPermissionsArgs args, InvokeOutputOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:buildEnvironmentScopedPermissions", TypeShape.of(BuildEnvironmentScopedPermissionsResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the underlying `PermissionDescriptorGroup` / `PermissionDescriptorCondition` / `PermissionLiteralExpressionEnvironment` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
+     * 
+     */
+    public static CompletableFuture<BuildEnvironmentScopedPermissionsResult> buildEnvironmentScopedPermissionsPlain(BuildEnvironmentScopedPermissionsPlainArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invokeAsync("pulumiservice:index:buildEnvironmentScopedPermissions", TypeShape.of(BuildEnvironmentScopedPermissionsResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `PermissionLiteralExpressionInsightsAccount` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
+     * 
+     */
+    public static Output<BuildInsightsAccountScopedPermissionsResult> buildInsightsAccountScopedPermissions(BuildInsightsAccountScopedPermissionsArgs args) {
+        return buildInsightsAccountScopedPermissions(args, InvokeOptions.Empty);
+    }
+    /**
+     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `PermissionLiteralExpressionInsightsAccount` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
+     * 
+     */
+    public static CompletableFuture<BuildInsightsAccountScopedPermissionsResult> buildInsightsAccountScopedPermissionsPlain(BuildInsightsAccountScopedPermissionsPlainArgs args) {
+        return buildInsightsAccountScopedPermissionsPlain(args, InvokeOptions.Empty);
+    }
+    /**
+     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `PermissionLiteralExpressionInsightsAccount` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
+     * 
+     */
+    public static Output<BuildInsightsAccountScopedPermissionsResult> buildInsightsAccountScopedPermissions(BuildInsightsAccountScopedPermissionsArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:buildInsightsAccountScopedPermissions", TypeShape.of(BuildInsightsAccountScopedPermissionsResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `PermissionLiteralExpressionInsightsAccount` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
+     * 
+     */
+    public static Output<BuildInsightsAccountScopedPermissionsResult> buildInsightsAccountScopedPermissions(BuildInsightsAccountScopedPermissionsArgs args, InvokeOutputOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:buildInsightsAccountScopedPermissions", TypeShape.of(BuildInsightsAccountScopedPermissionsResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `PermissionLiteralExpressionInsightsAccount` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
+     * 
+     */
+    public static CompletableFuture<BuildInsightsAccountScopedPermissionsResult> buildInsightsAccountScopedPermissionsPlain(BuildInsightsAccountScopedPermissionsPlainArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invokeAsync("pulumiservice:index:buildInsightsAccountScopedPermissions", TypeShape.of(BuildInsightsAccountScopedPermissionsResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack&#39;s opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple — and is what `PermissionLiteralExpressionStack` expects. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
+     * 
+     */
+    public static Output<BuildStackScopedPermissionsResult> buildStackScopedPermissions(BuildStackScopedPermissionsArgs args) {
+        return buildStackScopedPermissions(args, InvokeOptions.Empty);
+    }
+    /**
+     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack&#39;s opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple — and is what `PermissionLiteralExpressionStack` expects. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
+     * 
+     */
+    public static CompletableFuture<BuildStackScopedPermissionsResult> buildStackScopedPermissionsPlain(BuildStackScopedPermissionsPlainArgs args) {
+        return buildStackScopedPermissionsPlain(args, InvokeOptions.Empty);
+    }
+    /**
+     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack&#39;s opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple — and is what `PermissionLiteralExpressionStack` expects. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
+     * 
+     */
+    public static Output<BuildStackScopedPermissionsResult> buildStackScopedPermissions(BuildStackScopedPermissionsArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:buildStackScopedPermissions", TypeShape.of(BuildStackScopedPermissionsResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack&#39;s opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple — and is what `PermissionLiteralExpressionStack` expects. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
+     * 
+     */
+    public static Output<BuildStackScopedPermissionsResult> buildStackScopedPermissions(BuildStackScopedPermissionsArgs args, InvokeOutputOptions options) {
+        return Deployment.getInstance().invoke("pulumiservice:index:buildStackScopedPermissions", TypeShape.of(BuildStackScopedPermissionsResult.class), args, Utilities.withVersion(options));
+    }
+    /**
+     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack&#39;s opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple — and is what `PermissionLiteralExpressionStack` expects. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
+     * 
+     */
+    public static CompletableFuture<BuildStackScopedPermissionsResult> buildStackScopedPermissionsPlain(BuildStackScopedPermissionsPlainArgs args, InvokeOptions options) {
+        return Deployment.getInstance().invokeAsync("pulumiservice:index:buildStackScopedPermissions", TypeShape.of(BuildStackScopedPermissionsResult.class), args, Utilities.withVersion(options));
+    }
     /**
      * Returns the Pulumi Cloud user that the provider&#39;s access token belongs to. Useful for seeding a newly-created `Team` with the creator as a member, since Pulumi Cloud auto-adds the creator. Omitting this user from the team will result in a refresh drift.
      * 
@@ -133,41 +238,6 @@ public final class PulumiserviceFunctions {
         return Deployment.getInstance().invokeAsync("pulumiservice:index:getEnvironment", TypeShape.of(GetEnvironmentResult.class), args, Utilities.withVersion(options));
     }
     /**
-     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the underlying `PermissionDescriptorGroup` / `PermissionDescriptorCondition` / `PermissionLiteralExpressionEnvironment` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
-     * 
-     */
-    public static Output<GetEnvironmentScopedPermissionsResult> getEnvironmentScopedPermissions(GetEnvironmentScopedPermissionsArgs args) {
-        return getEnvironmentScopedPermissions(args, InvokeOptions.Empty);
-    }
-    /**
-     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the underlying `PermissionDescriptorGroup` / `PermissionDescriptorCondition` / `PermissionLiteralExpressionEnvironment` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
-     * 
-     */
-    public static CompletableFuture<GetEnvironmentScopedPermissionsResult> getEnvironmentScopedPermissionsPlain(GetEnvironmentScopedPermissionsPlainArgs args) {
-        return getEnvironmentScopedPermissionsPlain(args, InvokeOptions.Empty);
-    }
-    /**
-     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the underlying `PermissionDescriptorGroup` / `PermissionDescriptorCondition` / `PermissionLiteralExpressionEnvironment` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
-     * 
-     */
-    public static Output<GetEnvironmentScopedPermissionsResult> getEnvironmentScopedPermissions(GetEnvironmentScopedPermissionsArgs args, InvokeOptions options) {
-        return Deployment.getInstance().invoke("pulumiservice:index:getEnvironmentScopedPermissions", TypeShape.of(GetEnvironmentScopedPermissionsResult.class), args, Utilities.withVersion(options));
-    }
-    /**
-     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the underlying `PermissionDescriptorGroup` / `PermissionDescriptorCondition` / `PermissionLiteralExpressionEnvironment` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
-     * 
-     */
-    public static Output<GetEnvironmentScopedPermissionsResult> getEnvironmentScopedPermissions(GetEnvironmentScopedPermissionsArgs args, InvokeOutputOptions options) {
-        return Deployment.getInstance().invoke("pulumiservice:index:getEnvironmentScopedPermissions", TypeShape.of(GetEnvironmentScopedPermissionsResult.class), args, Utilities.withVersion(options));
-    }
-    /**
-     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the underlying `PermissionDescriptorGroup` / `PermissionDescriptorCondition` / `PermissionLiteralExpressionEnvironment` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
-     * 
-     */
-    public static CompletableFuture<GetEnvironmentScopedPermissionsResult> getEnvironmentScopedPermissionsPlain(GetEnvironmentScopedPermissionsPlainArgs args, InvokeOptions options) {
-        return Deployment.getInstance().invokeAsync("pulumiservice:index:getEnvironmentScopedPermissions", TypeShape.of(GetEnvironmentScopedPermissionsResult.class), args, Utilities.withVersion(options));
-    }
-    /**
      * Get details about a specific Insights account.
      * 
      */
@@ -201,41 +271,6 @@ public final class PulumiserviceFunctions {
      */
     public static CompletableFuture<GetInsightsAccountResult> getInsightsAccountPlain(GetInsightsAccountPlainArgs args, InvokeOptions options) {
         return Deployment.getInstance().invokeAsync("pulumiservice:index:getInsightsAccount", TypeShape.of(GetInsightsAccountResult.class), args, Utilities.withVersion(options));
-    }
-    /**
-     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `PermissionLiteralExpressionInsightsAccount` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
-     * 
-     */
-    public static Output<GetInsightsAccountScopedPermissionsResult> getInsightsAccountScopedPermissions(GetInsightsAccountScopedPermissionsArgs args) {
-        return getInsightsAccountScopedPermissions(args, InvokeOptions.Empty);
-    }
-    /**
-     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `PermissionLiteralExpressionInsightsAccount` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
-     * 
-     */
-    public static CompletableFuture<GetInsightsAccountScopedPermissionsResult> getInsightsAccountScopedPermissionsPlain(GetInsightsAccountScopedPermissionsPlainArgs args) {
-        return getInsightsAccountScopedPermissionsPlain(args, InvokeOptions.Empty);
-    }
-    /**
-     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `PermissionLiteralExpressionInsightsAccount` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
-     * 
-     */
-    public static Output<GetInsightsAccountScopedPermissionsResult> getInsightsAccountScopedPermissions(GetInsightsAccountScopedPermissionsArgs args, InvokeOptions options) {
-        return Deployment.getInstance().invoke("pulumiservice:index:getInsightsAccountScopedPermissions", TypeShape.of(GetInsightsAccountScopedPermissionsResult.class), args, Utilities.withVersion(options));
-    }
-    /**
-     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `PermissionLiteralExpressionInsightsAccount` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
-     * 
-     */
-    public static Output<GetInsightsAccountScopedPermissionsResult> getInsightsAccountScopedPermissions(GetInsightsAccountScopedPermissionsArgs args, InvokeOutputOptions options) {
-        return Deployment.getInstance().invoke("pulumiservice:index:getInsightsAccountScopedPermissions", TypeShape.of(GetInsightsAccountScopedPermissionsResult.class), args, Utilities.withVersion(options));
-    }
-    /**
-     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `PermissionLiteralExpressionInsightsAccount` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
-     * 
-     */
-    public static CompletableFuture<GetInsightsAccountScopedPermissionsResult> getInsightsAccountScopedPermissionsPlain(GetInsightsAccountScopedPermissionsPlainArgs args, InvokeOptions options) {
-        return Deployment.getInstance().invokeAsync("pulumiservice:index:getInsightsAccountScopedPermissions", TypeShape.of(GetInsightsAccountScopedPermissionsResult.class), args, Utilities.withVersion(options));
     }
     /**
      * Get a list of all Insights accounts for an organization.
@@ -446,40 +481,5 @@ public final class PulumiserviceFunctions {
      */
     public static CompletableFuture<GetPolicyPacksResult> getPolicyPacksPlain(GetPolicyPacksPlainArgs args, InvokeOptions options) {
         return Deployment.getInstance().invokeAsync("pulumiservice:index:getPolicyPacks", TypeShape.of(GetPolicyPacksResult.class), args, Utilities.withVersion(options));
-    }
-    /**
-     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack&#39;s opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple — and is what `PermissionLiteralExpressionStack` expects. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
-     * 
-     */
-    public static Output<GetStackScopedPermissionsResult> getStackScopedPermissions(GetStackScopedPermissionsArgs args) {
-        return getStackScopedPermissions(args, InvokeOptions.Empty);
-    }
-    /**
-     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack&#39;s opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple — and is what `PermissionLiteralExpressionStack` expects. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
-     * 
-     */
-    public static CompletableFuture<GetStackScopedPermissionsResult> getStackScopedPermissionsPlain(GetStackScopedPermissionsPlainArgs args) {
-        return getStackScopedPermissionsPlain(args, InvokeOptions.Empty);
-    }
-    /**
-     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack&#39;s opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple — and is what `PermissionLiteralExpressionStack` expects. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
-     * 
-     */
-    public static Output<GetStackScopedPermissionsResult> getStackScopedPermissions(GetStackScopedPermissionsArgs args, InvokeOptions options) {
-        return Deployment.getInstance().invoke("pulumiservice:index:getStackScopedPermissions", TypeShape.of(GetStackScopedPermissionsResult.class), args, Utilities.withVersion(options));
-    }
-    /**
-     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack&#39;s opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple — and is what `PermissionLiteralExpressionStack` expects. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
-     * 
-     */
-    public static Output<GetStackScopedPermissionsResult> getStackScopedPermissions(GetStackScopedPermissionsArgs args, InvokeOutputOptions options) {
-        return Deployment.getInstance().invoke("pulumiservice:index:getStackScopedPermissions", TypeShape.of(GetStackScopedPermissionsResult.class), args, Utilities.withVersion(options));
-    }
-    /**
-     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack&#39;s opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple — and is what `PermissionLiteralExpressionStack` expects. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
-     * 
-     */
-    public static CompletableFuture<GetStackScopedPermissionsResult> getStackScopedPermissionsPlain(GetStackScopedPermissionsPlainArgs args, InvokeOptions options) {
-        return Deployment.getInstance().invokeAsync("pulumiservice:index:getStackScopedPermissions", TypeShape.of(GetStackScopedPermissionsResult.class), args, Utilities.withVersion(options));
     }
 }

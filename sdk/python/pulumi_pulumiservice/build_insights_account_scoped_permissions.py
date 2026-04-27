@@ -15,14 +15,14 @@ else:
 from . import _utilities
 
 __all__ = [
-    'GetInsightsAccountScopedPermissionsResult',
-    'AwaitableGetInsightsAccountScopedPermissionsResult',
-    'get_insights_account_scoped_permissions',
-    'get_insights_account_scoped_permissions_output',
+    'BuildInsightsAccountScopedPermissionsResult',
+    'AwaitableBuildInsightsAccountScopedPermissionsResult',
+    'build_insights_account_scoped_permissions',
+    'build_insights_account_scoped_permissions_output',
 ]
 
 @pulumi.output_type
-class GetInsightsAccountScopedPermissionsResult:
+class BuildInsightsAccountScopedPermissionsResult:
     def __init__(__self__, permissions=None, permissions_json=None):
         if permissions and not isinstance(permissions, dict):
             raise TypeError("Expected argument 'permissions' to be a dict")
@@ -48,19 +48,19 @@ class GetInsightsAccountScopedPermissionsResult:
         return pulumi.get(self, "permissions_json")
 
 
-class AwaitableGetInsightsAccountScopedPermissionsResult(GetInsightsAccountScopedPermissionsResult):
+class AwaitableBuildInsightsAccountScopedPermissionsResult(BuildInsightsAccountScopedPermissionsResult):
     # pylint: disable=using-constant-test
     def __await__(self):
         if False:
             yield self
-        return GetInsightsAccountScopedPermissionsResult(
+        return BuildInsightsAccountScopedPermissionsResult(
             permissions=self.permissions,
             permissions_json=self.permissions_json)
 
 
-def get_insights_account_scoped_permissions(insights_account_id: Optional[_builtins.str] = None,
-                                            permissions: Optional[Sequence[_builtins.str]] = None,
-                                            opts: Optional[pulumi.InvokeOptions] = None) -> AwaitableGetInsightsAccountScopedPermissionsResult:
+def build_insights_account_scoped_permissions(insights_account_id: Optional[_builtins.str] = None,
+                                              permissions: Optional[Sequence[_builtins.str]] = None,
+                                              opts: Optional[pulumi.InvokeOptions] = None) -> AwaitableBuildInsightsAccountScopedPermissionsResult:
     """
     Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `PermissionLiteralExpressionInsightsAccount` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
 
@@ -72,14 +72,14 @@ def get_insights_account_scoped_permissions(insights_account_id: Optional[_built
     __args__['insightsAccountId'] = insights_account_id
     __args__['permissions'] = permissions
     opts = pulumi.InvokeOptions.merge(_utilities.get_invoke_opts_defaults(), opts)
-    __ret__ = pulumi.runtime.invoke('pulumiservice:index:getInsightsAccountScopedPermissions', __args__, opts=opts, typ=GetInsightsAccountScopedPermissionsResult).value
+    __ret__ = pulumi.runtime.invoke('pulumiservice:index:buildInsightsAccountScopedPermissions', __args__, opts=opts, typ=BuildInsightsAccountScopedPermissionsResult).value
 
-    return AwaitableGetInsightsAccountScopedPermissionsResult(
+    return AwaitableBuildInsightsAccountScopedPermissionsResult(
         permissions=pulumi.get(__ret__, 'permissions'),
         permissions_json=pulumi.get(__ret__, 'permissions_json'))
-def get_insights_account_scoped_permissions_output(insights_account_id: Optional[pulumi.Input[_builtins.str]] = None,
-                                                   permissions: Optional[pulumi.Input[Sequence[_builtins.str]]] = None,
-                                                   opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[GetInsightsAccountScopedPermissionsResult]:
+def build_insights_account_scoped_permissions_output(insights_account_id: Optional[pulumi.Input[_builtins.str]] = None,
+                                                     permissions: Optional[pulumi.Input[Sequence[_builtins.str]]] = None,
+                                                     opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[BuildInsightsAccountScopedPermissionsResult]:
     """
     Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `PermissionLiteralExpressionInsightsAccount` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
 
@@ -91,7 +91,7 @@ def get_insights_account_scoped_permissions_output(insights_account_id: Optional
     __args__['insightsAccountId'] = insights_account_id
     __args__['permissions'] = permissions
     opts = pulumi.InvokeOutputOptions.merge(_utilities.get_invoke_opts_defaults(), opts)
-    __ret__ = pulumi.runtime.invoke_output('pulumiservice:index:getInsightsAccountScopedPermissions', __args__, opts=opts, typ=GetInsightsAccountScopedPermissionsResult)
-    return __ret__.apply(lambda __response__: GetInsightsAccountScopedPermissionsResult(
+    __ret__ = pulumi.runtime.invoke_output('pulumiservice:index:buildInsightsAccountScopedPermissions', __args__, opts=opts, typ=BuildInsightsAccountScopedPermissionsResult)
+    return __ret__.apply(lambda __response__: BuildInsightsAccountScopedPermissionsResult(
         permissions=pulumi.get(__response__, 'permissions'),
         permissions_json=pulumi.get(__response__, 'permissions_json')))
