@@ -1,3 +1,0 @@
-name: ts-insights-account-invokes
-runtime: nodejs
-description: Integration test for InsightsAccount invoke functions (getInsightsAccount, getInsightsAccounts)

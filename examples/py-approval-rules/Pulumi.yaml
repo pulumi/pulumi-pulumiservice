@@ -1,6 +1,0 @@
-name: py-approval-rules
-runtime:
-  name: python
-  options:
-    virtualenv: venv
-description: A minimal Python Approval Rules Example
