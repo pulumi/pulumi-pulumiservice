@@ -22,7 +22,6 @@ class AccessTokenArgs:
                  description: pulumi.Input[_builtins.str]):
         """
         The set of arguments for constructing a AccessToken resource.
-
         :param pulumi.Input[_builtins.str] description: Description of the access token.
         """
         pulumi.set(__self__, "description", description)
@@ -51,7 +50,6 @@ class AccessToken(pulumi.CustomResource):
         """
         Access tokens allow a user to authenticate against the Pulumi Cloud
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] description: Description of the access token.
@@ -64,7 +62,6 @@ class AccessToken(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Access tokens allow a user to authenticate against the Pulumi Cloud
-
 
         :param str resource_name: The name of the resource.
         :param AccessTokenArgs args: The arguments to use to populate this resource's properties.

@@ -35,15 +35,11 @@ type BuildEnvironmentScopedPermissionsResult struct {
 }
 
 func BuildEnvironmentScopedPermissionsOutput(ctx *pulumi.Context, args BuildEnvironmentScopedPermissionsOutputArgs, opts ...pulumi.InvokeOption) BuildEnvironmentScopedPermissionsResultOutput {
-	return pulumi.ToOutputWithContext(context.Background(), args).
-		ApplyT(func(v interface{}) (BuildEnvironmentScopedPermissionsResult, error) {
+	return pulumi.ToOutputWithContext(ctx.Context(), args).
+		ApplyT(func(v interface{}) (BuildEnvironmentScopedPermissionsResultOutput, error) {
 			args := v.(BuildEnvironmentScopedPermissionsArgs)
-			r, err := BuildEnvironmentScopedPermissions(ctx, &args, opts...)
-			var s BuildEnvironmentScopedPermissionsResult
-			if r != nil {
-				s = *r
-			}
-			return s, err
+			options := pulumi.InvokeOutputOptions{InvokeOptions: internal.PkgInvokeDefaultOpts(opts)}
+			return ctx.InvokeOutput("pulumiservice:index:buildEnvironmentScopedPermissions", args, BuildEnvironmentScopedPermissionsResultOutput{}, options).(BuildEnvironmentScopedPermissionsResultOutput), nil
 		}).(BuildEnvironmentScopedPermissionsResultOutput)
 }
 
