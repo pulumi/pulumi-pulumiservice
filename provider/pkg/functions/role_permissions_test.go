@@ -24,55 +24,32 @@ import (
 	"github.com/pulumi/pulumi-go-provider/infer"
 )
 
-// assertScopedPermissionsShape verifies the outer envelope produced by every
-// scoped-permissions helper is a single-entry Group → Condition(Equal(left,
-// right)) → Allow(perms), expressed in the user-facing `kind` form. Returns
-// the literal sub-tree for caller-specific assertions.
-func assertScopedPermissionsShape(
+// assertScopedAllowShape verifies a helper's output is the collapsed
+// {kind: "allow", on: {entityType: identity}, permissions: [...]} shape.
+func assertScopedAllowShape(
 	t *testing.T,
 	got map[string]interface{},
-	expectedExpressionKind, expectedLiteralKind string,
+	expectedEntityType string,
 	expectedIdentity string,
 	expectedPermissions []string,
-) map[string]interface{} {
+) {
 	t.Helper()
 
-	assert.Equal(t, "group", got["kind"])
+	assert.Equal(t, "allow", got["kind"])
 
-	entries, ok := got["entries"].([]interface{})
-	require.True(t, ok, "entries should be []interface{}")
-	require.Len(t, entries, 1)
+	on, ok := got["on"].(map[string]interface{})
+	require.True(t, ok, "on should be map[string]interface{}; got %T", got["on"])
+	require.Len(t, on, 1, "on must have exactly one key")
+	assert.Equal(t, expectedIdentity, on[expectedEntityType],
+		"on.%s should be %q", expectedEntityType, expectedIdentity)
 
-	condition, ok := entries[0].(map[string]interface{})
-	require.True(t, ok)
-	assert.Equal(t, "condition", condition["kind"])
-
-	cond, ok := condition["condition"].(map[string]interface{})
-	require.True(t, ok)
-	assert.Equal(t, "equal", cond["kind"])
-
-	left, ok := cond["left"].(map[string]interface{})
-	require.True(t, ok)
-	assert.Equal(t, expectedExpressionKind, left["kind"])
-
-	right, ok := cond["right"].(map[string]interface{})
-	require.True(t, ok)
-	assert.Equal(t, expectedLiteralKind, right["kind"])
-	assert.Equal(t, expectedIdentity, right["identity"])
-
-	subNode, ok := condition["subNode"].(map[string]interface{})
-	require.True(t, ok)
-	assert.Equal(t, "allow", subNode["kind"])
-
-	rawPerms, ok := subNode["permissions"].([]interface{})
-	require.True(t, ok)
+	rawPerms, ok := got["permissions"].([]interface{})
+	require.True(t, ok, "permissions should be []interface{}")
 	gotPerms := make([]string, len(rawPerms))
 	for i, p := range rawPerms {
 		gotPerms[i], _ = p.(string)
 	}
 	assert.Equal(t, expectedPermissions, gotPerms)
-
-	return right
 }
 
 func TestBuildEnvironmentScopedPermissions(t *testing.T) {
@@ -90,11 +67,9 @@ func TestBuildEnvironmentScopedPermissions(t *testing.T) {
 			},
 		)
 		require.NoError(t, err)
-		assertScopedPermissionsShape(
+		assertScopedAllowShape(
 			t, resp.Output.Permissions,
-			kindExpressionEnvironment,
-			kindLiteralEnvironment,
-			"env-uuid-1",
+			"environment", "env-uuid-1",
 			[]string{"environment:read", "environment:open"},
 		)
 	})
@@ -141,11 +116,9 @@ func TestBuildStackScopedPermissions(t *testing.T) {
 			},
 		)
 		require.NoError(t, err)
-		assertScopedPermissionsShape(
+		assertScopedAllowShape(
 			t, resp.Output.Permissions,
-			kindExpressionStack,
-			kindLiteralStack,
-			"stack-id-1",
+			"stack", "stack-id-1",
 			[]string{"stack:read"},
 		)
 	})
@@ -192,11 +165,9 @@ func TestBuildInsightsAccountScopedPermissions(t *testing.T) {
 			},
 		)
 		require.NoError(t, err)
-		assertScopedPermissionsShape(
+		assertScopedAllowShape(
 			t, resp.Output.Permissions,
-			kindExpressionInsightsAccount,
-			kindLiteralInsightsAccount,
-			"acct-1",
+			"insightsAccount", "acct-1",
 			[]string{"insights-account:read"},
 		)
 	})
