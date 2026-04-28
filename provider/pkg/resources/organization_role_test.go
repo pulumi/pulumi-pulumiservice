@@ -269,4 +269,72 @@ func TestOrganizationRoleCheck(t *testing.T) {
 		assert.Contains(t, props["permissions"], "totallyMadeUp",
 			"Check must reject unknown kind values upfront")
 	})
+
+	t.Run("rejects empty on map", func(t *testing.T) {
+		resp, err := r.Check(context.Background(), infer.CheckRequest{
+			NewInputs: property.NewMap(map[string]property.Value{
+				"organizationName": property.New("acme"),
+				"name":             property.New("r"),
+				"permissions": property.New(property.NewMap(map[string]property.Value{
+					"kind":        property.New("allow"),
+					"on":          property.New(property.NewMap(map[string]property.Value{})),
+					"permissions": property.New(property.NewArray([]property.Value{property.New("stack:read")})),
+				})),
+			}),
+		})
+		assert.NoError(t, err)
+		props := map[string]string{}
+		for _, f := range resp.Failures {
+			props[f.Property] = f.Reason
+		}
+		assert.Contains(t, props["permissions"], "on",
+			"empty on map should produce a permissions failure mentioning on")
+	})
+
+	t.Run("rejects multi-key on map", func(t *testing.T) {
+		resp, err := r.Check(context.Background(), infer.CheckRequest{
+			NewInputs: property.NewMap(map[string]property.Value{
+				"organizationName": property.New("acme"),
+				"name":             property.New("r"),
+				"permissions": property.New(property.NewMap(map[string]property.Value{
+					"kind": property.New("allow"),
+					"on": property.New(property.NewMap(map[string]property.Value{
+						"environment": property.New("e"),
+						"stack":       property.New("s"),
+					})),
+					"permissions": property.New(property.NewArray([]property.Value{property.New("stack:read")})),
+				})),
+			}),
+		})
+		assert.NoError(t, err)
+		props := map[string]string{}
+		for _, f := range resp.Failures {
+			props[f.Property] = f.Reason
+		}
+		assert.Contains(t, props["permissions"], "on",
+			"multi-key on should produce a permissions failure mentioning on")
+	})
+
+	t.Run("rejects unknown on entity type", func(t *testing.T) {
+		resp, err := r.Check(context.Background(), infer.CheckRequest{
+			NewInputs: property.NewMap(map[string]property.Value{
+				"organizationName": property.New("acme"),
+				"name":             property.New("r"),
+				"permissions": property.New(property.NewMap(map[string]property.Value{
+					"kind": property.New("allow"),
+					"on": property.New(property.NewMap(map[string]property.Value{
+						"unknownEntity": property.New("x"),
+					})),
+					"permissions": property.New(property.NewArray([]property.Value{property.New("stack:read")})),
+				})),
+			}),
+		})
+		assert.NoError(t, err)
+		props := map[string]string{}
+		for _, f := range resp.Failures {
+			props[f.Property] = f.Reason
+		}
+		assert.Contains(t, props["permissions"], "unknownEntity",
+			"unknown on entity should produce a permissions failure naming the bad key")
+	})
 }
