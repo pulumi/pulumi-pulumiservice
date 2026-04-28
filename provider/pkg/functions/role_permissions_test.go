@@ -37,7 +37,7 @@ func assertScopedPermissionsShape(
 ) map[string]interface{} {
 	t.Helper()
 
-	assert.Equal(t, "descriptorGroup", got["kind"])
+	assert.Equal(t, "group", got["kind"])
 
 	entries, ok := got["entries"].([]interface{})
 	require.True(t, ok, "entries should be []interface{}")
@@ -45,11 +45,11 @@ func assertScopedPermissionsShape(
 
 	condition, ok := entries[0].(map[string]interface{})
 	require.True(t, ok)
-	assert.Equal(t, "descriptorCondition", condition["kind"])
+	assert.Equal(t, "condition", condition["kind"])
 
 	cond, ok := condition["condition"].(map[string]interface{})
 	require.True(t, ok)
-	assert.Equal(t, "expressionEqual", cond["kind"])
+	assert.Equal(t, "equal", cond["kind"])
 
 	left, ok := cond["left"].(map[string]interface{})
 	require.True(t, ok)
@@ -62,7 +62,7 @@ func assertScopedPermissionsShape(
 
 	subNode, ok := condition["subNode"].(map[string]interface{})
 	require.True(t, ok)
-	assert.Equal(t, "descriptorAllow", subNode["kind"])
+	assert.Equal(t, "allow", subNode["kind"])
 
 	rawPerms, ok := subNode["permissions"].([]interface{})
 	require.True(t, ok)

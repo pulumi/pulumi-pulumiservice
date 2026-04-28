@@ -25,12 +25,12 @@ import (
 // handles. Mirrors the env-scoped role shape used in examples/*-rbac.
 func nestedDescriptorKind() map[string]interface{} {
 	return map[string]interface{}{
-		"kind": "descriptorGroup",
+		"kind": "group",
 		"entries": []interface{}{
 			map[string]interface{}{
-				"kind": "descriptorCondition",
+				"kind": "condition",
 				"condition": map[string]interface{}{
-					"kind": "expressionEqual",
+					"kind": "equal",
 					"left": map[string]interface{}{
 						"kind": "expressionEnvironment",
 					},
@@ -40,7 +40,7 @@ func nestedDescriptorKind() map[string]interface{} {
 					},
 				},
 				"subNode": map[string]interface{}{
-					"kind":        "descriptorAllow",
+					"kind":        "allow",
 					"permissions": []interface{}{"environment:read"},
 				},
 			},
@@ -129,7 +129,7 @@ func TestPermissionsKindToWire_PreservesNonDescriptorFields(t *testing.T) {
 	// and arbitrary leaf scalars must pass through untouched.
 	t.Parallel()
 	in := map[string]interface{}{
-		"kind":        "descriptorAllow",
+		"kind":        "allow",
 		"permissions": []interface{}{"stack:read", "stack:edit"},
 	}
 	out, err := permissionsKindToWire(in)

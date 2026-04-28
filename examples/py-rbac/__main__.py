@@ -69,7 +69,7 @@ custom_role = OrganizationRole(
     name=f"py-rbac-read-only-{digits}",
     description="Read-only access to stacks, created by the py-rbac example.",
     permissions={
-        "kind": "descriptorAllow",
+        "kind": "allow",
         "permissions": ["stack:read"],
     },
 )
@@ -126,7 +126,7 @@ scoped_env = Environment(
 #    env created above. Anywhere else in the org the role grants nothing.
 #    The role definition is org-scoped (resourceType defaults to "global");
 #    the permission tree is gated on the env's UUID via a
-#    descriptorCondition wrapping a literalEnvironment.
+#    condition wrapping a literalEnvironment.
 scoped_role = OrganizationRole(
     "scopedReadOnlyRole",
     organization_name=organization_name,

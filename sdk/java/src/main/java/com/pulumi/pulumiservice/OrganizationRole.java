@@ -68,14 +68,14 @@ public class OrganizationRole extends com.pulumi.resources.CustomResource {
         return this.organizationName;
     }
     /**
-     * The role&#39;s permission descriptor tree. Each node carries a `kind` field that picks one of: `descriptorAllow` (`{kind, permissions: [&#34;stack:read&#34;, ...]}`), `descriptorGroup` (`{kind, entries: [...]}`), or `descriptorCondition` (`{kind, condition, subNode}`). Conditions wrap an `expressionEqual` whose `left` is one of `expressionEnvironment` / `expressionStack` / `expressionInsightsAccount` and whose `right` is the matching `literalEnvironment` / `literalStack` / `literalInsightsAccount` carrying an `identity`. For per-entity scoping, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the underlying group/condition tree for you.
+     * The role&#39;s permission descriptor tree. Each node carries a `kind` field that picks one of: `allow` (`{kind, permissions: [&#34;stack:read&#34;, ...]}`), `group` (`{kind, entries: [...]}`), or `condition` (`{kind, condition, subNode}`). Conditions wrap an `equal` whose `left` is one of `expressionEnvironment` / `expressionStack` / `expressionInsightsAccount` and whose `right` is the matching `literalEnvironment` / `literalStack` / `literalInsightsAccount` carrying an `identity`. For per-entity scoping, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the underlying group/condition tree for you.
      * 
      */
     @Export(name="permissions", refs={Map.class,String.class,Object.class}, tree="[0,1,2]")
     private Output<Map<String,Object>> permissions;
 
     /**
-     * @return The role&#39;s permission descriptor tree. Each node carries a `kind` field that picks one of: `descriptorAllow` (`{kind, permissions: [&#34;stack:read&#34;, ...]}`), `descriptorGroup` (`{kind, entries: [...]}`), or `descriptorCondition` (`{kind, condition, subNode}`). Conditions wrap an `expressionEqual` whose `left` is one of `expressionEnvironment` / `expressionStack` / `expressionInsightsAccount` and whose `right` is the matching `literalEnvironment` / `literalStack` / `literalInsightsAccount` carrying an `identity`. For per-entity scoping, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the underlying group/condition tree for you.
+     * @return The role&#39;s permission descriptor tree. Each node carries a `kind` field that picks one of: `allow` (`{kind, permissions: [&#34;stack:read&#34;, ...]}`), `group` (`{kind, entries: [...]}`), or `condition` (`{kind, condition, subNode}`). Conditions wrap an `equal` whose `left` is one of `expressionEnvironment` / `expressionStack` / `expressionInsightsAccount` and whose `right` is the matching `literalEnvironment` / `literalStack` / `literalInsightsAccount` carrying an `identity`. For per-entity scoping, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the underlying group/condition tree for you.
      * 
      */
     public Output<Map<String,Object>> permissions() {

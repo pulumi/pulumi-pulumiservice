@@ -2104,7 +2104,7 @@
           "additionalProperties": {
             "$ref": "pulumi.json#/Any"
           },
-          "description": "The role's permission descriptor tree. Each node carries a `kind` field that picks one of: `descriptorAllow` (`{kind, permissions: [\"stack:read\", ...]}`), `descriptorGroup` (`{kind, entries: [...]}`), or `descriptorCondition` (`{kind, condition, subNode}`). Conditions wrap an `expressionEqual` whose `left` is one of `expressionEnvironment` / `expressionStack` / `expressionInsightsAccount` and whose `right` is the matching `literalEnvironment` / `literalStack` / `literalInsightsAccount` carrying an `identity`. For per-entity scoping, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the underlying group/condition tree for you."
+          "description": "The role's permission descriptor tree. Each node carries a `kind` field that picks one of: `allow` (`{kind, permissions: [\"stack:read\", ...]}`), `group` (`{kind, entries: [...]}`), or `condition` (`{kind, condition, subNode}`). Conditions wrap an `equal` whose `left` is one of `expressionEnvironment` / `expressionStack` / `expressionInsightsAccount` and whose `right` is the matching `literalEnvironment` / `literalStack` / `literalInsightsAccount` carrying an `identity`. For per-entity scoping, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the underlying group/condition tree for you."
         },
         "resourceType": {
           "type": "string",
@@ -2145,7 +2145,7 @@
           "additionalProperties": {
             "$ref": "pulumi.json#/Any"
           },
-          "description": "The role's permission descriptor tree. Each node carries a `kind` field that picks one of: `descriptorAllow` (`{kind, permissions: [\"stack:read\", ...]}`), `descriptorGroup` (`{kind, entries: [...]}`), or `descriptorCondition` (`{kind, condition, subNode}`). Conditions wrap an `expressionEqual` whose `left` is one of `expressionEnvironment` / `expressionStack` / `expressionInsightsAccount` and whose `right` is the matching `literalEnvironment` / `literalStack` / `literalInsightsAccount` carrying an `identity`. For per-entity scoping, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the underlying group/condition tree for you."
+          "description": "The role's permission descriptor tree. Each node carries a `kind` field that picks one of: `allow` (`{kind, permissions: [\"stack:read\", ...]}`), `group` (`{kind, entries: [...]}`), or `condition` (`{kind, condition, subNode}`). Conditions wrap an `equal` whose `left` is one of `expressionEnvironment` / `expressionStack` / `expressionInsightsAccount` and whose `right` is the matching `literalEnvironment` / `literalStack` / `literalInsightsAccount` carrying an `identity`. For per-entity scoping, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the underlying group/condition tree for you."
         },
         "resourceType": {
           "type": "string",
@@ -3015,7 +3015,7 @@
   },
   "functions": {
     "pulumiservice:index:buildEnvironmentScopedPermissions": {
-      "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the underlying `descriptorGroup` / `descriptorCondition` / `literalEnvironment` tree. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `descriptorGroup` whose `entries` list pulls a `descriptorCondition` from each helper output.",
+      "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the underlying `group` / `condition` / `literalEnvironment` tree. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `group` whose `entries` list pulls a `condition` from each helper output.",
       "inputs": {
         "properties": {
           "environmentId": {
@@ -3053,7 +3053,7 @@
       }
     },
     "pulumiservice:index:buildInsightsAccountScopedPermissions": {
-      "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `literalInsightsAccount` tree. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `descriptorGroup` whose `entries` list pulls a `descriptorCondition` from each helper output.",
+      "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `literalInsightsAccount` tree. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `group` whose `entries` list pulls a `condition` from each helper output.",
       "inputs": {
         "properties": {
           "insightsAccountId": {
@@ -3091,7 +3091,7 @@
       }
     },
     "pulumiservice:index:buildStackScopedPermissions": {
-      "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple — and is what `literalStack` expects. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `descriptorGroup` whose `entries` list pulls a `descriptorCondition` from each helper output.",
+      "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple — and is what `literalStack` expects. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `group` whose `entries` list pulls a `condition` from each helper output.",
       "inputs": {
         "properties": {
           "permissions": {

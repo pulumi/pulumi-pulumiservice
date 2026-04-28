@@ -49,7 +49,7 @@ export class OrganizationRole extends pulumi.CustomResource {
      */
     declare public readonly organizationName: pulumi.Output<string>;
     /**
-     * The role's permission descriptor tree. Each node carries a `kind` field that picks one of: `descriptorAllow` (`{kind, permissions: ["stack:read", ...]}`), `descriptorGroup` (`{kind, entries: [...]}`), or `descriptorCondition` (`{kind, condition, subNode}`). Conditions wrap an `expressionEqual` whose `left` is one of `expressionEnvironment` / `expressionStack` / `expressionInsightsAccount` and whose `right` is the matching `literalEnvironment` / `literalStack` / `literalInsightsAccount` carrying an `identity`. For per-entity scoping, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the underlying group/condition tree for you.
+     * The role's permission descriptor tree. Each node carries a `kind` field that picks one of: `allow` (`{kind, permissions: ["stack:read", ...]}`), `group` (`{kind, entries: [...]}`), or `condition` (`{kind, condition, subNode}`). Conditions wrap an `equal` whose `left` is one of `expressionEnvironment` / `expressionStack` / `expressionInsightsAccount` and whose `right` is the matching `literalEnvironment` / `literalStack` / `literalInsightsAccount` carrying an `identity`. For per-entity scoping, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the underlying group/condition tree for you.
      */
     declare public readonly permissions: pulumi.Output<{[key: string]: any}>;
     /**
@@ -125,7 +125,7 @@ export interface OrganizationRoleArgs {
      */
     organizationName: pulumi.Input<string>;
     /**
-     * The role's permission descriptor tree. Each node carries a `kind` field that picks one of: `descriptorAllow` (`{kind, permissions: ["stack:read", ...]}`), `descriptorGroup` (`{kind, entries: [...]}`), or `descriptorCondition` (`{kind, condition, subNode}`). Conditions wrap an `expressionEqual` whose `left` is one of `expressionEnvironment` / `expressionStack` / `expressionInsightsAccount` and whose `right` is the matching `literalEnvironment` / `literalStack` / `literalInsightsAccount` carrying an `identity`. For per-entity scoping, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the underlying group/condition tree for you.
+     * The role's permission descriptor tree. Each node carries a `kind` field that picks one of: `allow` (`{kind, permissions: ["stack:read", ...]}`), `group` (`{kind, entries: [...]}`), or `condition` (`{kind, condition, subNode}`). Conditions wrap an `equal` whose `left` is one of `expressionEnvironment` / `expressionStack` / `expressionInsightsAccount` and whose `right` is the matching `literalEnvironment` / `literalStack` / `literalInsightsAccount` carrying an `identity`. For per-entity scoping, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the underlying group/condition tree for you.
      */
     permissions: pulumi.Input<{[key: string]: any}>;
     /**

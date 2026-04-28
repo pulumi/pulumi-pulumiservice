@@ -72,10 +72,10 @@ func (c *OrganizationRoleCore) Annotate(a infer.Annotator) {
 	a.Describe(
 		&c.Permissions,
 		"The role's permission descriptor tree. Each node carries a `kind` field that picks one of: "+
-			"`descriptorAllow` (`{kind, permissions: [\"stack:read\", ...]}`), "+
-			"`descriptorGroup` (`{kind, entries: [...]}`), or "+
-			"`descriptorCondition` (`{kind, condition, subNode}`). Conditions wrap an "+
-			"`expressionEqual` whose `left` is one of `expressionEnvironment` / `expressionStack` / "+
+			"`allow` (`{kind, permissions: [\"stack:read\", ...]}`), "+
+			"`group` (`{kind, entries: [...]}`), or "+
+			"`condition` (`{kind, condition, subNode}`). Conditions wrap an "+
+			"`equal` whose `left` is one of `expressionEnvironment` / `expressionStack` / "+
 			"`expressionInsightsAccount` and whose `right` is the matching "+
 			"`literalEnvironment` / `literalStack` / `literalInsightsAccount` carrying an `identity`. "+
 			"For per-entity scoping, prefer the `buildEnvironmentScopedPermissions`, "+

@@ -50,7 +50,7 @@ def build_environment_scoped_permissions(environment_id: Optional[_builtins.str]
                                          permissions: Optional[Sequence[_builtins.str]] = None,
                                          opts: Optional[pulumi.InvokeOptions] = None) -> AwaitableBuildEnvironmentScopedPermissionsResult:
     """
-    Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the underlying `descriptorGroup` / `descriptorCondition` / `literalEnvironment` tree. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `descriptorGroup` whose `entries` list pulls a `descriptorCondition` from each helper output.
+    Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the underlying `group` / `condition` / `literalEnvironment` tree. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `group` whose `entries` list pulls a `condition` from each helper output.
 
 
     :param _builtins.str environment_id: The target environment's UUID. Use the `environmentId` output of an `Environment` resource or the `getEnvironment` data source.
@@ -68,7 +68,7 @@ def build_environment_scoped_permissions_output(environment_id: Optional[pulumi.
                                                 permissions: Optional[pulumi.Input[Sequence[_builtins.str]]] = None,
                                                 opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[BuildEnvironmentScopedPermissionsResult]:
     """
-    Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the underlying `descriptorGroup` / `descriptorCondition` / `literalEnvironment` tree. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `descriptorGroup` whose `entries` list pulls a `descriptorCondition` from each helper output.
+    Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the underlying `group` / `condition` / `literalEnvironment` tree. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `group` whose `entries` list pulls a `condition` from each helper output.
 
 
     :param _builtins.str environment_id: The target environment's UUID. Use the `environmentId` output of an `Environment` resource or the `getEnvironment` data source.

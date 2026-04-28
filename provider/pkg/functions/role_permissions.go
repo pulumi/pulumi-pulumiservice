@@ -39,11 +39,10 @@ const (
 // the supplied scopes only when the request targets the entity identified by
 // (expressionKind, literalKind, identity).
 //
-// Wire shape: a single-entry descriptorGroup whose entry is a
-// descriptorCondition wrapping a descriptorAllow. The condition compares the
-// request's entity expression to a literal identity. All three supported
-// entities (environment, stack, insights-account) share this flat
-// {kind, identity} literal shape.
+// Wire shape: a single-entry group whose entry is a condition wrapping an
+// allow. The condition compares the request's entity expression to a literal
+// identity. All three supported entities (environment, stack, insights-account)
+// share this flat {kind, identity} literal shape.
 func scopedPermissionsDescriptor(
 	expressionKind, literalKind, identity string,
 	permissions []string,
@@ -53,17 +52,17 @@ func scopedPermissionsDescriptor(
 		grants[i] = p
 	}
 	return map[string]interface{}{
-		"kind": "descriptorGroup",
+		"kind": "group",
 		"entries": []interface{}{
 			map[string]interface{}{
-				"kind": "descriptorCondition",
+				"kind": "condition",
 				"condition": map[string]interface{}{
-					"kind":  "expressionEqual",
+					"kind":  "equal",
 					"left":  map[string]interface{}{"kind": expressionKind},
 					"right": map[string]interface{}{"kind": literalKind, "identity": identity},
 				},
 				"subNode": map[string]interface{}{
-					"kind":        "descriptorAllow",
+					"kind":        "allow",
 					"permissions": grants,
 				},
 			},
@@ -75,8 +74,8 @@ func scopedPermissionsDescriptor(
 // descriptions, kept identical so codegen documentation stays consistent.
 const scopedPermissionsHelpDoc = "The result is directly assignable to " +
 	"`OrganizationRole.permissions`. To grant scopes on more than one entity " +
-	"in a single role, hand-roll a `descriptorGroup` whose `entries` " +
-	"list pulls a `descriptorCondition` from each helper output."
+	"in a single role, hand-roll a `group` whose `entries` " +
+	"list pulls a `condition` from each helper output."
 
 // ----------------------------------------------------------------------------
 // Environment-scoped helper
@@ -98,7 +97,7 @@ func (BuildEnvironmentScopedPermissionsFunction) Annotate(a infer.Annotator) {
 		&BuildEnvironmentScopedPermissionsFunction{},
 		"Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on "+
 			"the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data "+
-			"source) to avoid hand-rolling the underlying `descriptorGroup` / `descriptorCondition` / "+
+			"source) to avoid hand-rolling the underlying `group` / `condition` / "+
 			"`literalEnvironment` tree. "+scopedPermissionsHelpDoc,
 	)
 	a.SetToken("index", "buildEnvironmentScopedPermissions")

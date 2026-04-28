@@ -11,7 +11,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-// Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `literalInsightsAccount` tree. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `descriptorGroup` whose `entries` list pulls a `descriptorCondition` from each helper output.
+// Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `literalInsightsAccount` tree. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `group` whose `entries` list pulls a `condition` from each helper output.
 func BuildInsightsAccountScopedPermissions(ctx *pulumi.Context, args *BuildInsightsAccountScopedPermissionsArgs, opts ...pulumi.InvokeOption) (*BuildInsightsAccountScopedPermissionsResult, error) {
 	opts = internal.PkgInvokeDefaultOpts(opts)
 	var rv BuildInsightsAccountScopedPermissionsResult

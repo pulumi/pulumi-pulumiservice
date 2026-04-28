@@ -23,10 +23,10 @@ import "fmt"
 // `runtime/rpc.py:deserialize_property`). Translating at the provider boundary
 // keeps users out of that footgun.
 var kindToWireType = map[string]string{
-	"descriptorAllow":           "PermissionDescriptorAllow",
-	"descriptorGroup":           "PermissionDescriptorGroup",
-	"descriptorCondition":       "PermissionDescriptorCondition",
-	"expressionEqual":           "PermissionExpressionEqual",
+	"allow":                     "PermissionDescriptorAllow",
+	"group":                     "PermissionDescriptorGroup",
+	"condition":                 "PermissionDescriptorCondition",
+	"equal":                     "PermissionExpressionEqual",
 	"expressionEnvironment":     "PermissionExpressionEnvironment",
 	"expressionStack":           "PermissionExpressionStack",
 	"expressionInsightsAccount": "PermissionExpressionInsightsAccount",
@@ -47,8 +47,8 @@ var wireTypeToKind = func() map[string]string {
 
 // permissionsKindToWire walks a user-supplied PermissionDescriptor tree and
 // returns a wire-shaped copy with `kind` rewritten to `__type` everywhere it
-// appears. The descriptor tree is recursive — `descriptorGroup.entries[*]`,
-// `descriptorCondition.{condition,subNode}`, and `expressionEqual.{left,right}`
+// appears. The descriptor tree is recursive — `group.entries[*]`,
+// `condition.{condition,subNode}`, and `equal.{left,right}`
 // each carry another descriptor or expression — so the walk recurses through
 // every map-typed value it encounters.
 //

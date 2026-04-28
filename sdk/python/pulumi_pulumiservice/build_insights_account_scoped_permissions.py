@@ -50,7 +50,7 @@ def build_insights_account_scoped_permissions(insights_account_id: Optional[_bui
                                               permissions: Optional[Sequence[_builtins.str]] = None,
                                               opts: Optional[pulumi.InvokeOptions] = None) -> AwaitableBuildInsightsAccountScopedPermissionsResult:
     """
-    Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `literalInsightsAccount` tree. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `descriptorGroup` whose `entries` list pulls a `descriptorCondition` from each helper output.
+    Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `literalInsightsAccount` tree. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `group` whose `entries` list pulls a `condition` from each helper output.
 
 
     :param _builtins.str insights_account_id: The target insights account's identifier. Use the `insightsAccountId` output of an `InsightsAccount` resource or the `getInsightsAccount` data source.
@@ -68,7 +68,7 @@ def build_insights_account_scoped_permissions_output(insights_account_id: Option
                                                      permissions: Optional[pulumi.Input[Sequence[_builtins.str]]] = None,
                                                      opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[BuildInsightsAccountScopedPermissionsResult]:
     """
-    Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `literalInsightsAccount` tree. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `descriptorGroup` whose `entries` list pulls a `descriptorCondition` from each helper output.
+    Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `literalInsightsAccount` tree. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `group` whose `entries` list pulls a `condition` from each helper output.
 
 
     :param _builtins.str insights_account_id: The target insights account's identifier. Use the `insightsAccountId` output of an `InsightsAccount` resource or the `getInsightsAccount` data source.

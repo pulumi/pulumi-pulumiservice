@@ -47,7 +47,7 @@ func (c *orgRoleClientMock) DeleteRole(ctx context.Context, org, id string, forc
 }
 
 var testPermissions = map[string]interface{}{
-	"kind":        "descriptorAllow",
+	"kind":        "allow",
 	"permissions": []interface{}{"stack:read"},
 }
 
@@ -130,7 +130,7 @@ func TestOrganizationRoleRead(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, "acme/role-123", resp.ID)
 		// Read translates the wire __type back into the user-facing kind.
-		assert.Equal(t, "descriptorAllow", resp.State.Permissions["kind"])
+		assert.Equal(t, "allow", resp.State.Permissions["kind"])
 		assert.NotContains(t, resp.State.Permissions, "__type", "state must not leak `__type` to the SDK")
 	})
 }
@@ -240,7 +240,7 @@ func TestOrganizationRoleCheck(t *testing.T) {
 				"organizationName": property.New("acme"),
 				"name":             property.New(property.Computed),
 				"permissions": property.New(property.NewMap(map[string]property.Value{
-					"kind": property.New("descriptorAllow"),
+					"kind": property.New("allow"),
 				})),
 			}),
 		})
