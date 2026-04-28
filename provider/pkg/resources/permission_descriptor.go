@@ -16,164 +16,306 @@ package resources
 
 import "fmt"
 
-// kindToWireType maps the user-facing `kind` discriminator to the Pulumi Cloud
-// API's `__type` discriminator. Pulumi Cloud uses `__type` on the wire; the
-// SDK exposes `kind` because Python's runtime strips `__`-prefixed keys from
-// invoke responses (a long-standing convention; see `pulumi/sdk` Python
-// `runtime/rpc.py:deserialize_property`). Translating at the provider boundary
-// keeps users out of that footgun.
-var kindToWireType = map[string]string{
-	"allow":                     "PermissionDescriptorAllow",
-	"group":                     "PermissionDescriptorGroup",
-	"condition":                 "PermissionDescriptorCondition",
-	"equal":                     "PermissionExpressionEqual",
-	"expressionEnvironment":     "PermissionExpressionEnvironment",
-	"expressionStack":           "PermissionExpressionStack",
-	"expressionInsightsAccount": "PermissionExpressionInsightsAccount",
-	"literalEnvironment":        "PermissionLiteralExpressionEnvironment",
-	"literalStack":              "PermissionLiteralExpressionStack",
-	"literalInsightsAccount":    "PermissionLiteralExpressionInsightsAccount",
+// entityTypeWirePair maps a user-facing `on:` entity-type key to the wire-
+// format pair that represents it: an Expression<Entity> for the left side of
+// an Equal (the "what is in this request's context" placeholder) and a
+// LiteralExpression<Entity> for the right side (the named identity to match
+// against). The Pulumi Cloud REST API consumes both wire types verbatim; the
+// SDK exposes only the entity-type key plus an identity string.
+type entityTypeWirePair struct {
+	expression string // PermissionExpression<Entity>
+	literal    string // PermissionLiteralExpression<Entity>
 }
 
-// wireTypeToKind is the reverse direction, built from kindToWireType so the
-// two stay in lockstep.
-var wireTypeToKind = func() map[string]string {
-	m := make(map[string]string, len(kindToWireType))
-	for k, v := range kindToWireType {
-		m[v] = k
+var entityTypeToWire = map[string]entityTypeWirePair{
+	"environment": {
+		expression: "PermissionExpressionEnvironment",
+		literal:    "PermissionLiteralExpressionEnvironment",
+	},
+	"stack": {
+		expression: "PermissionExpressionStack",
+		literal:    "PermissionLiteralExpressionStack",
+	},
+	"insightsAccount": {
+		expression: "PermissionExpressionInsightsAccount",
+		literal:    "PermissionLiteralExpressionInsightsAccount",
+	},
+}
+
+// wireToEntityType is the reverse map, built from entityTypeToWire so the two
+// stay in lockstep. Keyed by the (expression, literal) pair concatenated with
+// a separator unlikely to appear in either name.
+var wireToEntityType = func() map[string]string {
+	m := make(map[string]string, len(entityTypeToWire))
+	for entity, pair := range entityTypeToWire {
+		m[pair.expression+"|"+pair.literal] = entity
 	}
 	return m
 }()
 
-// permissionsKindToWire walks a user-supplied PermissionDescriptor tree and
-// returns a wire-shaped copy with `kind` rewritten to `__type` everywhere it
-// appears. The descriptor tree is recursive — `group.entries[*]`,
-// `condition.{condition,subNode}`, and `equal.{left,right}`
-// each carry another descriptor or expression — so the walk recurses through
-// every map-typed value it encounters.
+// validEntityTypeNames returns the sorted list of valid `on:` keys for use in
+// error messages. Computed on demand because errors are rare.
+func validEntityTypeNames() []string {
+	names := make([]string, 0, len(entityTypeToWire))
+	for name := range entityTypeToWire {
+		names = append(names, name)
+	}
+	// Sort for stable error output across runs.
+	for i := 1; i < len(names); i++ {
+		for j := i; j > 0 && names[j-1] > names[j]; j-- {
+			names[j-1], names[j] = names[j], names[j-1]
+		}
+	}
+	return names
+}
+
+// permissionsKindToWire converts a user-facing PermissionDescriptor tree
+// (kind-shaped) to the Pulumi Cloud REST API's wire shape. The user-facing
+// shape has just two kinds (`allow`, `group`), each optionally carrying an
+// `on:` modifier that scopes the descriptor to a single entity. The wire
+// shape is the full PermissionDescriptor tagged-union tree
+// (Allow / Group / Condition(Equal(Expression<E>, Literal<E>(id)), <subNode>)).
 //
-// Returns an error if any node has a missing or unrecognised `kind`. Leaves
-// non-discriminator fields (e.g. `permissions: ["stack:read"]`,
-// `identity: "<uuid>"`) untouched.
+// Returns an error if the input is malformed: missing kind, unknown kind,
+// invalid `on:` shape, or invalid Allow/Group payload.
 func permissionsKindToWire(node map[string]interface{}) (map[string]interface{}, error) {
 	rawKind, ok := node["kind"]
 	if !ok {
-		return nil, fmt.Errorf("permissions descriptor node missing required `kind` field: %v", node)
+		return nil, fmt.Errorf("permissions descriptor missing required `kind` field")
 	}
 	kind, ok := rawKind.(string)
 	if !ok {
 		return nil, fmt.Errorf("permissions descriptor `kind` must be a string, got %T", rawKind)
 	}
-	wireType, ok := kindToWireType[kind]
-	if !ok {
-		return nil, fmt.Errorf("unknown permissions descriptor kind %q", kind)
-	}
-	out := make(map[string]interface{}, len(node))
-	for k, v := range node {
-		if k == "kind" {
-			continue
+
+	var inner map[string]interface{}
+	switch kind {
+	case "allow":
+		permsRaw, ok := node["permissions"]
+		if !ok {
+			return nil, fmt.Errorf("`allow` descriptor missing required `permissions` field")
 		}
-		translated, err := translateValueKindToWire(v)
+		perms, ok := permsRaw.([]interface{})
+		if !ok {
+			return nil, fmt.Errorf("`allow.permissions` must be a list, got %T", permsRaw)
+		}
+		inner = map[string]interface{}{
+			"__type":      "PermissionDescriptorAllow",
+			"permissions": perms,
+		}
+	case "group":
+		entriesRaw, ok := node["entries"]
+		if !ok {
+			return nil, fmt.Errorf("`group` descriptor missing required `entries` field")
+		}
+		entries, ok := entriesRaw.([]interface{})
+		if !ok {
+			return nil, fmt.Errorf("`group.entries` must be a list, got %T", entriesRaw)
+		}
+		translatedEntries := make([]interface{}, len(entries))
+		for i, entry := range entries {
+			entryMap, ok := entry.(map[string]interface{})
+			if !ok {
+				return nil, fmt.Errorf("`group.entries[%d]` must be an object, got %T", i, entry)
+			}
+			translated, err := permissionsKindToWire(entryMap)
+			if err != nil {
+				return nil, fmt.Errorf("group.entries[%d]: %w", i, err)
+			}
+			translatedEntries[i] = translated
+		}
+		inner = map[string]interface{}{
+			"__type":  "PermissionDescriptorGroup",
+			"entries": translatedEntries,
+		}
+	default:
+		return nil, fmt.Errorf("unknown permissions descriptor kind %q (valid: `allow`, `group`)", kind)
+	}
+
+	// If `on:` is set, wrap the inner descriptor in a Condition.
+	if onRaw, hasOn := node["on"]; hasOn {
+		condition, err := buildOnCondition(onRaw)
 		if err != nil {
 			return nil, err
 		}
-		out[k] = translated
+		return map[string]interface{}{
+			"__type":    "PermissionDescriptorCondition",
+			"condition": condition,
+			"subNode":   inner,
+		}, nil
 	}
-	out["__type"] = wireType
-	return out, nil
+	return inner, nil
 }
 
-// translateValueKindToWire recurses into nested maps and slices, applying
-// permissionsKindToWire to anything that has a `kind` field.
-func translateValueKindToWire(v interface{}) (interface{}, error) {
-	switch t := v.(type) {
-	case map[string]interface{}:
-		if _, hasKind := t["kind"]; hasKind {
-			return permissionsKindToWire(t)
-		}
-		// A non-discriminated nested object — copy through as-is.
-		out := make(map[string]interface{}, len(t))
-		for k, val := range t {
-			tv, err := translateValueKindToWire(val)
-			if err != nil {
-				return nil, err
-			}
-			out[k] = tv
-		}
-		return out, nil
-	case []interface{}:
-		out := make([]interface{}, len(t))
-		for i, item := range t {
-			ti, err := translateValueKindToWire(item)
-			if err != nil {
-				return nil, err
-			}
-			out[i] = ti
-		}
-		return out, nil
-	default:
-		return v, nil
+// buildOnCondition translates a user-facing `on:` map into a
+// PermissionExpressionEqual that compares the request-context expression for
+// the entity type to a literal identity. Validates that `on:` is exactly a
+// single-key map keyed by a known entity type with a string value.
+func buildOnCondition(onRaw interface{}) (map[string]interface{}, error) {
+	on, ok := onRaw.(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("`on` must be a map, got %T", onRaw)
 	}
+	if len(on) == 0 {
+		return nil, fmt.Errorf("`on` must have exactly one entity-type key (got an empty map); valid keys: %v", validEntityTypeNames())
+	}
+	if len(on) > 1 {
+		return nil, fmt.Errorf("`on` must have exactly one entity-type key (got %d); valid keys: %v", len(on), validEntityTypeNames())
+	}
+	for entityType, identityRaw := range on {
+		pair, known := entityTypeToWire[entityType]
+		if !known {
+			return nil, fmt.Errorf("`on` key %q is not a known entity type (valid: %v)", entityType, validEntityTypeNames())
+		}
+		identity, ok := identityRaw.(string)
+		if !ok {
+			return nil, fmt.Errorf("`on.%s` must be a string, got %T", entityType, identityRaw)
+		}
+		return map[string]interface{}{
+			"__type": "PermissionExpressionEqual",
+			"left":   map[string]interface{}{"__type": pair.expression},
+			"right":  map[string]interface{}{"__type": pair.literal, "identity": identity},
+		}, nil
+	}
+	// Unreachable — the loop returns on the first iteration when len(on) == 1.
+	return nil, fmt.Errorf("internal error: `on` validation fell through")
 }
 
-// permissionsWireToKind is the inverse of permissionsKindToWire: it walks a
-// wire-shaped descriptor returned by the Pulumi Cloud API and rewrites every
-// `__type` back to `kind`. Used in Read so the SDK-facing state matches what
-// the user originally supplied (no refresh drift).
+// permissionsWireToKind converts a wire-shape PermissionDescriptor (returned
+// by Pulumi Cloud's REST API) back into the user-facing kind-shape. The
+// reverse of permissionsKindToWire: collapses any Condition(Equal(...))
+// wrapping into an `on:` modifier on the inner descriptor, and rewrites
+// `__type` to `kind` for Allow / Group.
+//
+// Returns an error if the input has an unrecognised __type, or if a Condition
+// wraps a shape this provider doesn't recognise (the general boolean-
+// expression apparatus is intentionally not exposed at the SDK boundary).
 func permissionsWireToKind(node map[string]interface{}) (map[string]interface{}, error) {
 	rawType, ok := node["__type"]
 	if !ok {
-		return nil, fmt.Errorf("permissions descriptor node missing required `__type` field: %v", node)
+		return nil, fmt.Errorf("permissions descriptor missing required `__type` field")
 	}
 	wireType, ok := rawType.(string)
 	if !ok {
 		return nil, fmt.Errorf("permissions descriptor `__type` must be a string, got %T", rawType)
 	}
-	kind, ok := wireTypeToKind[wireType]
-	if !ok {
-		return nil, fmt.Errorf("unknown permissions descriptor __type %q", wireType)
-	}
-	out := make(map[string]interface{}, len(node))
-	for k, v := range node {
-		if k == "__type" {
-			continue
+	switch wireType {
+	case "PermissionDescriptorAllow":
+		permsRaw, ok := node["permissions"]
+		if !ok {
+			return nil, fmt.Errorf("`PermissionDescriptorAllow` missing required `permissions` field")
 		}
-		translated, err := translateValueWireToKind(v)
+		perms, ok := permsRaw.([]interface{})
+		if !ok {
+			return nil, fmt.Errorf("`PermissionDescriptorAllow.permissions` must be a list, got %T", permsRaw)
+		}
+		return map[string]interface{}{
+			"kind":        "allow",
+			"permissions": perms,
+		}, nil
+	case "PermissionDescriptorGroup":
+		entriesRaw, ok := node["entries"]
+		if !ok {
+			return nil, fmt.Errorf("`PermissionDescriptorGroup` missing required `entries` field")
+		}
+		entries, ok := entriesRaw.([]interface{})
+		if !ok {
+			return nil, fmt.Errorf("`PermissionDescriptorGroup.entries` must be a list, got %T", entriesRaw)
+		}
+		translatedEntries := make([]interface{}, len(entries))
+		for i, entry := range entries {
+			entryMap, ok := entry.(map[string]interface{})
+			if !ok {
+				return nil, fmt.Errorf("`PermissionDescriptorGroup.entries[%d]` must be an object, got %T", i, entry)
+			}
+			translated, err := permissionsWireToKind(entryMap)
+			if err != nil {
+				return nil, fmt.Errorf("PermissionDescriptorGroup.entries[%d]: %w", i, err)
+			}
+			translatedEntries[i] = translated
+		}
+		return map[string]interface{}{
+			"kind":    "group",
+			"entries": translatedEntries,
+		}, nil
+	case "PermissionDescriptorCondition":
+		condRaw, ok := node["condition"]
+		if !ok {
+			return nil, fmt.Errorf("`PermissionDescriptorCondition` missing required `condition` field")
+		}
+		cond, ok := condRaw.(map[string]interface{})
+		if !ok {
+			return nil, fmt.Errorf("`PermissionDescriptorCondition.condition` must be an object, got %T", condRaw)
+		}
+		on, err := extractOn(cond)
 		if err != nil {
 			return nil, err
 		}
-		out[k] = translated
+		subRaw, ok := node["subNode"]
+		if !ok {
+			return nil, fmt.Errorf("`PermissionDescriptorCondition` missing required `subNode` field")
+		}
+		sub, ok := subRaw.(map[string]interface{})
+		if !ok {
+			return nil, fmt.Errorf("`PermissionDescriptorCondition.subNode` must be an object, got %T", subRaw)
+		}
+		translated, err := permissionsWireToKind(sub)
+		if err != nil {
+			return nil, fmt.Errorf("PermissionDescriptorCondition.subNode: %w", err)
+		}
+		// Splice the on into the translated subNode.
+		translated["on"] = on
+		return translated, nil
+	default:
+		return nil, fmt.Errorf("unknown permissions descriptor __type %q", wireType)
 	}
-	out["kind"] = kind
-	return out, nil
 }
 
-func translateValueWireToKind(v interface{}) (interface{}, error) {
-	switch t := v.(type) {
-	case map[string]interface{}:
-		if _, hasType := t["__type"]; hasType {
-			return permissionsWireToKind(t)
-		}
-		out := make(map[string]interface{}, len(t))
-		for k, val := range t {
-			tv, err := translateValueWireToKind(val)
-			if err != nil {
-				return nil, err
-			}
-			out[k] = tv
-		}
-		return out, nil
-	case []interface{}:
-		out := make([]interface{}, len(t))
-		for i, item := range t {
-			ti, err := translateValueWireToKind(item)
-			if err != nil {
-				return nil, err
-			}
-			out[i] = ti
-		}
-		return out, nil
-	default:
-		return v, nil
+// extractOn collapses a wire-shape PermissionExpressionEqual into the user-
+// facing `on:` shape. The provider only emits Condition(Equal(Expr<E>,
+// Lit<E>(id))) — anything else (other boolean operators, mismatched
+// expression pairs, missing identity) is rejected with a clear error.
+func extractOn(condition map[string]interface{}) (map[string]interface{}, error) {
+	condTypeRaw, ok := condition["__type"]
+	if !ok {
+		return nil, fmt.Errorf("`condition` missing required `__type` field")
 	}
+	condType, ok := condTypeRaw.(string)
+	if !ok {
+		return nil, fmt.Errorf("`condition.__type` must be a string, got %T", condTypeRaw)
+	}
+	if condType != "PermissionExpressionEqual" {
+		return nil, fmt.Errorf("unsupported condition shape %q (only `PermissionExpressionEqual` is exposed by this provider)", condType)
+	}
+	leftRaw, ok := condition["left"]
+	if !ok {
+		return nil, fmt.Errorf("`PermissionExpressionEqual` missing required `left` field")
+	}
+	left, ok := leftRaw.(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("`PermissionExpressionEqual.left` must be an object, got %T", leftRaw)
+	}
+	rightRaw, ok := condition["right"]
+	if !ok {
+		return nil, fmt.Errorf("`PermissionExpressionEqual` missing required `right` field")
+	}
+	right, ok := rightRaw.(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("`PermissionExpressionEqual.right` must be an object, got %T", rightRaw)
+	}
+	leftType, _ := left["__type"].(string)
+	rightType, _ := right["__type"].(string)
+	entityType, known := wireToEntityType[leftType+"|"+rightType]
+	if !known {
+		return nil, fmt.Errorf("mismatched `PermissionExpressionEqual` operands: left=%q right=%q (this provider only emits matched expression/literal pairs for environment, stack, or insightsAccount)", leftType, rightType)
+	}
+	identityRaw, ok := right["identity"]
+	if !ok {
+		return nil, fmt.Errorf("`%s` missing required `identity` field", rightType)
+	}
+	identity, ok := identityRaw.(string)
+	if !ok {
+		return nil, fmt.Errorf("`%s.identity` must be a string, got %T", rightType, identityRaw)
+	}
+	return map[string]interface{}{entityType: identity}, nil
 }
