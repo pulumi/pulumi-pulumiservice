@@ -125,8 +125,9 @@ scoped_env = Environment(
 # 8. A role that grants environment:read + environment:open ONLY on the
 #    env created above. Anywhere else in the org the role grants nothing.
 #    The role definition is org-scoped (resourceType defaults to "global");
-#    the permission tree is gated on the env's UUID via a
-#    condition wrapping a literalEnvironment.
+#    the helper returns a `kind: "allow"` descriptor with an
+#    `on: { environment: <uuid> }` modifier — the provider expands that
+#    into the full Pulumi Cloud permission tree at apply time.
 scoped_role = OrganizationRole(
     "scopedReadOnlyRole",
     organization_name=organization_name,
