@@ -18,7 +18,7 @@ resources:
       name: yaml-rbac-read-only-${digits}
       description: Read-only access to stacks, created by the yaml-rbac example.
       permissions:
-        __type: PermissionDescriptorAllow
+        kind: descriptorAllow
         permissions:
           - stack:read
 
@@ -84,18 +84,18 @@ resources:
       name: yaml-rbac-scoped-read-only-${digits}
       description: Read+open access scoped to a single ESC environment.
       permissions:
-        __type: PermissionDescriptorGroup
+        kind: descriptorGroup
         entries:
-          - __type: PermissionDescriptorCondition
+          - kind: descriptorCondition
             condition:
-              __type: PermissionExpressionEqual
+              kind: expressionEqual
               left:
-                __type: PermissionExpressionEnvironment
+                kind: expressionEnvironment
               right:
-                __type: PermissionLiteralExpressionEnvironment
+                kind: literalEnvironment
                 identity: ${scopedEnv.environmentId}
             subNode:
-              __type: PermissionDescriptorAllow
+              kind: descriptorAllow
               permissions:
                 - environment:read
                 - environment:open
