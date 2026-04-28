@@ -11,7 +11,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-// Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple — and is what `literalStack` expects. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `group` whose `entries` list pulls a `condition` from each helper output.
+// Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `group` whose `entries` list pulls the output of each helper.
 func BuildStackScopedPermissions(ctx *pulumi.Context, args *BuildStackScopedPermissionsArgs, opts ...pulumi.InvokeOption) (*BuildStackScopedPermissionsResult, error) {
 	opts = internal.PkgInvokeDefaultOpts(opts)
 	var rv BuildStackScopedPermissionsResult
@@ -30,7 +30,7 @@ type BuildStackScopedPermissionsArgs struct {
 }
 
 type BuildStackScopedPermissionsResult struct {
-	// A `kind`-discriminated permission descriptor tree ready to assign to `OrganizationRole.permissions`.
+	// A `kind: allow` descriptor with an `on: { stack: <id> }` modifier, ready to assign to `OrganizationRole.permissions`.
 	Permissions map[string]interface{} `pulumi:"permissions"`
 }
 
@@ -72,7 +72,7 @@ func (o BuildStackScopedPermissionsResultOutput) ToBuildStackScopedPermissionsRe
 	return o
 }
 
-// A `kind`-discriminated permission descriptor tree ready to assign to `OrganizationRole.permissions`.
+// A `kind: allow` descriptor with an `on: { stack: <id> }` modifier, ready to assign to `OrganizationRole.permissions`.
 func (o BuildStackScopedPermissionsResultOutput) Permissions() pulumi.MapOutput {
 	return o.ApplyT(func(v BuildStackScopedPermissionsResult) map[string]interface{} { return v.Permissions }).(pulumi.MapOutput)
 }

@@ -36,7 +36,7 @@ namespace Pulumi.PulumiService
         public Output<string> OrganizationName { get; private set; } = null!;
 
         /// <summary>
-        /// The role's permission descriptor tree. Each node carries a `kind` field that picks one of: `allow` (`{kind, permissions: ["stack:read", ...]}`), `group` (`{kind, entries: [...]}`), or `condition` (`{kind, condition, subNode}`). Conditions wrap an `equal` whose `left` is one of `expressionEnvironment` / `expressionStack` / `expressionInsightsAccount` and whose `right` is the matching `literalEnvironment` / `literalStack` / `literalInsightsAccount` carrying an `identity`. For per-entity scoping, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the underlying group/condition tree for you.
+        /// The role's permission descriptor tree. Two kinds: `{kind: "allow", permissions: ["&lt;scope&gt;", ...]}` to grant scopes, or `{kind: "group", entries: [...]}` to compose multiple grants. Either may carry an optional `on:` modifier — a single-key map `{environment: &lt;uuid&gt;}` / `{stack: &lt;id&gt;}` / `{insightsAccount: &lt;id&gt;}` — to scope the descriptor to one entity. For per-entity scoping, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the `on:`-modified Allow for you.
         /// </summary>
         [Output("permissions")]
         public Output<ImmutableDictionary<string, object>> Permissions { get; private set; } = null!;
@@ -130,7 +130,7 @@ namespace Pulumi.PulumiService
         private InputMap<object>? _permissions;
 
         /// <summary>
-        /// The role's permission descriptor tree. Each node carries a `kind` field that picks one of: `allow` (`{kind, permissions: ["stack:read", ...]}`), `group` (`{kind, entries: [...]}`), or `condition` (`{kind, condition, subNode}`). Conditions wrap an `equal` whose `left` is one of `expressionEnvironment` / `expressionStack` / `expressionInsightsAccount` and whose `right` is the matching `literalEnvironment` / `literalStack` / `literalInsightsAccount` carrying an `identity`. For per-entity scoping, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the underlying group/condition tree for you.
+        /// The role's permission descriptor tree. Two kinds: `{kind: "allow", permissions: ["&lt;scope&gt;", ...]}` to grant scopes, or `{kind: "group", entries: [...]}` to compose multiple grants. Either may carry an optional `on:` modifier — a single-key map `{environment: &lt;uuid&gt;}` / `{stack: &lt;id&gt;}` / `{insightsAccount: &lt;id&gt;}` — to scope the descriptor to one entity. For per-entity scoping, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the `on:`-modified Allow for you.
         /// </summary>
         public InputMap<object> Permissions
         {

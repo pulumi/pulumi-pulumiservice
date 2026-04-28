@@ -13,14 +13,14 @@ import java.util.Objects;
 @CustomType
 public final class BuildInsightsAccountScopedPermissionsResult {
     /**
-     * @return A `kind`-discriminated permission descriptor tree ready to assign to `OrganizationRole.permissions`.
+     * @return A `kind: allow` descriptor with an `on: { insightsAccount: &lt;id&gt; }` modifier, ready to assign to `OrganizationRole.permissions`.
      * 
      */
     private Map<String,Object> permissions;
 
     private BuildInsightsAccountScopedPermissionsResult() {}
     /**
-     * @return A `kind`-discriminated permission descriptor tree ready to assign to `OrganizationRole.permissions`.
+     * @return A `kind: allow` descriptor with an `on: { insightsAccount: &lt;id&gt; }` modifier, ready to assign to `OrganizationRole.permissions`.
      * 
      */
     public Map<String,Object> permissions() {
