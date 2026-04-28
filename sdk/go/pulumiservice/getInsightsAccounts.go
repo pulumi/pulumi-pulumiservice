@@ -31,11 +31,15 @@ type GetInsightsAccountsResult struct {
 }
 
 func GetInsightsAccountsOutput(ctx *pulumi.Context, args GetInsightsAccountsOutputArgs, opts ...pulumi.InvokeOption) GetInsightsAccountsResultOutput {
-	return pulumi.ToOutputWithContext(ctx.Context(), args).
-		ApplyT(func(v interface{}) (GetInsightsAccountsResultOutput, error) {
+	return pulumi.ToOutputWithContext(context.Background(), args).
+		ApplyT(func(v interface{}) (GetInsightsAccountsResult, error) {
 			args := v.(GetInsightsAccountsArgs)
-			options := pulumi.InvokeOutputOptions{InvokeOptions: internal.PkgInvokeDefaultOpts(opts)}
-			return ctx.InvokeOutput("pulumiservice:index:getInsightsAccounts", args, GetInsightsAccountsResultOutput{}, options).(GetInsightsAccountsResultOutput), nil
+			r, err := GetInsightsAccounts(ctx, &args, opts...)
+			var s GetInsightsAccountsResult
+			if r != nil {
+				s = *r
+			}
+			return s, err
 		}).(GetInsightsAccountsResultOutput)
 }
 

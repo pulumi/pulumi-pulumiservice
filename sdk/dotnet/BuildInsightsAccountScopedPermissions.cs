@@ -12,19 +12,19 @@ namespace Pulumi.PulumiService
     public static class BuildInsightsAccountScopedPermissions
     {
         /// <summary>
-        /// Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `PermissionLiteralExpressionInsightsAccount` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
+        /// Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `literalInsightsAccount` tree. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `descriptorGroup` whose `entries` list pulls a `descriptorCondition` from each helper output.
         /// </summary>
         public static Task<BuildInsightsAccountScopedPermissionsResult> InvokeAsync(BuildInsightsAccountScopedPermissionsArgs args, InvokeOptions? options = null)
             => global::Pulumi.Deployment.Instance.InvokeAsync<BuildInsightsAccountScopedPermissionsResult>("pulumiservice:index:buildInsightsAccountScopedPermissions", args ?? new BuildInsightsAccountScopedPermissionsArgs(), options.WithDefaults());
 
         /// <summary>
-        /// Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `PermissionLiteralExpressionInsightsAccount` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
+        /// Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `literalInsightsAccount` tree. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `descriptorGroup` whose `entries` list pulls a `descriptorCondition` from each helper output.
         /// </summary>
         public static Output<BuildInsightsAccountScopedPermissionsResult> Invoke(BuildInsightsAccountScopedPermissionsInvokeArgs args, InvokeOptions? options = null)
             => global::Pulumi.Deployment.Instance.Invoke<BuildInsightsAccountScopedPermissionsResult>("pulumiservice:index:buildInsightsAccountScopedPermissions", args ?? new BuildInsightsAccountScopedPermissionsInvokeArgs(), options.WithDefaults());
 
         /// <summary>
-        /// Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `PermissionLiteralExpressionInsightsAccount` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
+        /// Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `literalInsightsAccount` tree. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `descriptorGroup` whose `entries` list pulls a `descriptorCondition` from each helper output.
         /// </summary>
         public static Output<BuildInsightsAccountScopedPermissionsResult> Invoke(BuildInsightsAccountScopedPermissionsInvokeArgs args, InvokeOutputOptions options)
             => global::Pulumi.Deployment.Instance.Invoke<BuildInsightsAccountScopedPermissionsResult>("pulumiservice:index:buildInsightsAccountScopedPermissions", args ?? new BuildInsightsAccountScopedPermissionsInvokeArgs(), options.WithDefaults());
@@ -88,22 +88,14 @@ namespace Pulumi.PulumiService
     public sealed class BuildInsightsAccountScopedPermissionsResult
     {
         /// <summary>
-        /// A `PermissionDescriptor` tree ready to assign to `OrganizationRole.permissions`.
+        /// A `kind`-discriminated permission descriptor tree ready to assign to `OrganizationRole.permissions`.
         /// </summary>
         public readonly ImmutableDictionary<string, object> Permissions;
-        /// <summary>
-        /// A JSON-encoded copy of `permissions`. Pulumi's Python SDK strips `__`-prefixed keys from invoke responses (see `pulumi/sdk` Python `runtime/rpc.py:deserialize_property`), so the structured `permissions` Mapping arrives at downstream resources missing every `__type` discriminator and Pulumi Cloud rejects it. Python users should consume `permissionsJson` and `.apply(json.loads)` it instead — that re-creates the dict on the input path (`serialize_property`), which preserves `__` keys. TypeScript/Yaml/Go/.NET/Java callers can use either field; `permissions` is the more ergonomic default.
-        /// </summary>
-        public readonly string PermissionsJson;
 
         [OutputConstructor]
-        private BuildInsightsAccountScopedPermissionsResult(
-            ImmutableDictionary<string, object> permissions,
-
-            string permissionsJson)
+        private BuildInsightsAccountScopedPermissionsResult(ImmutableDictionary<string, object> permissions)
         {
             Permissions = permissions;
-            PermissionsJson = permissionsJson;
         }
     }
 }

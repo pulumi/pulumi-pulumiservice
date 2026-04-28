@@ -43,11 +43,15 @@ type LookupEnvironmentResult struct {
 }
 
 func LookupEnvironmentOutput(ctx *pulumi.Context, args LookupEnvironmentOutputArgs, opts ...pulumi.InvokeOption) LookupEnvironmentResultOutput {
-	return pulumi.ToOutputWithContext(ctx.Context(), args).
-		ApplyT(func(v interface{}) (LookupEnvironmentResultOutput, error) {
+	return pulumi.ToOutputWithContext(context.Background(), args).
+		ApplyT(func(v interface{}) (LookupEnvironmentResult, error) {
 			args := v.(LookupEnvironmentArgs)
-			options := pulumi.InvokeOutputOptions{InvokeOptions: internal.PkgInvokeDefaultOpts(opts)}
-			return ctx.InvokeOutput("pulumiservice:index:getEnvironment", args, LookupEnvironmentResultOutput{}, options).(LookupEnvironmentResultOutput), nil
+			r, err := LookupEnvironment(ctx, &args, opts...)
+			var s LookupEnvironmentResult
+			if r != nil {
+				s = *r
+			}
+			return s, err
 		}).(LookupEnvironmentResultOutput)
 }
 

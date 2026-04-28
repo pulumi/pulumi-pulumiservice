@@ -32,11 +32,15 @@ type GetOrganizationRoleScopesResult struct {
 }
 
 func GetOrganizationRoleScopesOutput(ctx *pulumi.Context, args GetOrganizationRoleScopesOutputArgs, opts ...pulumi.InvokeOption) GetOrganizationRoleScopesResultOutput {
-	return pulumi.ToOutputWithContext(ctx.Context(), args).
-		ApplyT(func(v interface{}) (GetOrganizationRoleScopesResultOutput, error) {
+	return pulumi.ToOutputWithContext(context.Background(), args).
+		ApplyT(func(v interface{}) (GetOrganizationRoleScopesResult, error) {
 			args := v.(GetOrganizationRoleScopesArgs)
-			options := pulumi.InvokeOutputOptions{InvokeOptions: internal.PkgInvokeDefaultOpts(opts)}
-			return ctx.InvokeOutput("pulumiservice:index:getOrganizationRoleScopes", args, GetOrganizationRoleScopesResultOutput{}, options).(GetOrganizationRoleScopesResultOutput), nil
+			r, err := GetOrganizationRoleScopes(ctx, &args, opts...)
+			var s GetOrganizationRoleScopesResult
+			if r != nil {
+				s = *r
+			}
+			return s, err
 		}).(GetOrganizationRoleScopesResultOutput)
 }
 

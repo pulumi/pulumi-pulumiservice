@@ -13,30 +13,18 @@ import java.util.Objects;
 @CustomType
 public final class BuildEnvironmentScopedPermissionsResult {
     /**
-     * @return A `PermissionDescriptor` tree ready to assign to `OrganizationRole.permissions`.
+     * @return A `kind`-discriminated permission descriptor tree ready to assign to `OrganizationRole.permissions`.
      * 
      */
     private Map<String,Object> permissions;
-    /**
-     * @return A JSON-encoded copy of `permissions`. Pulumi&#39;s Python SDK strips `__`-prefixed keys from invoke responses (see `pulumi/sdk` Python `runtime/rpc.py:deserialize_property`), so the structured `permissions` Mapping arrives at downstream resources missing every `__type` discriminator and Pulumi Cloud rejects it. Python users should consume `permissionsJson` and `.apply(json.loads)` it instead — that re-creates the dict on the input path (`serialize_property`), which preserves `__` keys. TypeScript/Yaml/Go/.NET/Java callers can use either field; `permissions` is the more ergonomic default.
-     * 
-     */
-    private String permissionsJson;
 
     private BuildEnvironmentScopedPermissionsResult() {}
     /**
-     * @return A `PermissionDescriptor` tree ready to assign to `OrganizationRole.permissions`.
+     * @return A `kind`-discriminated permission descriptor tree ready to assign to `OrganizationRole.permissions`.
      * 
      */
     public Map<String,Object> permissions() {
         return this.permissions;
-    }
-    /**
-     * @return A JSON-encoded copy of `permissions`. Pulumi&#39;s Python SDK strips `__`-prefixed keys from invoke responses (see `pulumi/sdk` Python `runtime/rpc.py:deserialize_property`), so the structured `permissions` Mapping arrives at downstream resources missing every `__type` discriminator and Pulumi Cloud rejects it. Python users should consume `permissionsJson` and `.apply(json.loads)` it instead — that re-creates the dict on the input path (`serialize_property`), which preserves `__` keys. TypeScript/Yaml/Go/.NET/Java callers can use either field; `permissions` is the more ergonomic default.
-     * 
-     */
-    public String permissionsJson() {
-        return this.permissionsJson;
     }
 
     public static Builder builder() {
@@ -49,12 +37,10 @@ public final class BuildEnvironmentScopedPermissionsResult {
     @CustomType.Builder
     public static final class Builder {
         private Map<String,Object> permissions;
-        private String permissionsJson;
         public Builder() {}
         public Builder(BuildEnvironmentScopedPermissionsResult defaults) {
     	      Objects.requireNonNull(defaults);
     	      this.permissions = defaults.permissions;
-    	      this.permissionsJson = defaults.permissionsJson;
         }
 
         @CustomType.Setter
@@ -65,18 +51,9 @@ public final class BuildEnvironmentScopedPermissionsResult {
             this.permissions = permissions;
             return this;
         }
-        @CustomType.Setter
-        public Builder permissionsJson(String permissionsJson) {
-            if (permissionsJson == null) {
-              throw new MissingRequiredPropertyException("BuildEnvironmentScopedPermissionsResult", "permissionsJson");
-            }
-            this.permissionsJson = permissionsJson;
-            return this;
-        }
         public BuildEnvironmentScopedPermissionsResult build() {
             final var _resultValue = new BuildEnvironmentScopedPermissionsResult();
             _resultValue.permissions = permissions;
-            _resultValue.permissionsJson = permissionsJson;
             return _resultValue;
         }
     }

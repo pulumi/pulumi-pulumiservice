@@ -32,11 +32,15 @@ type GetOrganizationMembersResult struct {
 }
 
 func GetOrganizationMembersOutput(ctx *pulumi.Context, args GetOrganizationMembersOutputArgs, opts ...pulumi.InvokeOption) GetOrganizationMembersResultOutput {
-	return pulumi.ToOutputWithContext(ctx.Context(), args).
-		ApplyT(func(v interface{}) (GetOrganizationMembersResultOutput, error) {
+	return pulumi.ToOutputWithContext(context.Background(), args).
+		ApplyT(func(v interface{}) (GetOrganizationMembersResult, error) {
 			args := v.(GetOrganizationMembersArgs)
-			options := pulumi.InvokeOutputOptions{InvokeOptions: internal.PkgInvokeDefaultOpts(opts)}
-			return ctx.InvokeOutput("pulumiservice:index:getOrganizationMembers", args, GetOrganizationMembersResultOutput{}, options).(GetOrganizationMembersResultOutput), nil
+			r, err := GetOrganizationMembers(ctx, &args, opts...)
+			var s GetOrganizationMembersResult
+			if r != nil {
+				s = *r
+			}
+			return s, err
 		}).(GetOrganizationMembersResultOutput)
 }
 

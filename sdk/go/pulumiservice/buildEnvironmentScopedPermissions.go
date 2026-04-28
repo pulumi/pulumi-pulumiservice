@@ -11,7 +11,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-// Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the underlying `PermissionDescriptorGroup` / `PermissionDescriptorCondition` / `PermissionLiteralExpressionEnvironment` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
+// Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the underlying `descriptorGroup` / `descriptorCondition` / `literalEnvironment` tree. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `descriptorGroup` whose `entries` list pulls a `descriptorCondition` from each helper output.
 func BuildEnvironmentScopedPermissions(ctx *pulumi.Context, args *BuildEnvironmentScopedPermissionsArgs, opts ...pulumi.InvokeOption) (*BuildEnvironmentScopedPermissionsResult, error) {
 	opts = internal.PkgInvokeDefaultOpts(opts)
 	var rv BuildEnvironmentScopedPermissionsResult
@@ -30,18 +30,20 @@ type BuildEnvironmentScopedPermissionsArgs struct {
 }
 
 type BuildEnvironmentScopedPermissionsResult struct {
-	// A `PermissionDescriptor` tree ready to assign to `OrganizationRole.permissions`.
+	// A `kind`-discriminated permission descriptor tree ready to assign to `OrganizationRole.permissions`.
 	Permissions map[string]interface{} `pulumi:"permissions"`
-	// A JSON-encoded copy of `permissions`. Pulumi's Python SDK strips `__`-prefixed keys from invoke responses (see `pulumi/sdk` Python `runtime/rpc.py:deserialize_property`), so the structured `permissions` Mapping arrives at downstream resources missing every `__type` discriminator and Pulumi Cloud rejects it. Python users should consume `permissionsJson` and `.apply(json.loads)` it instead — that re-creates the dict on the input path (`serialize_property`), which preserves `__` keys. TypeScript/Yaml/Go/.NET/Java callers can use either field; `permissions` is the more ergonomic default.
-	PermissionsJson string `pulumi:"permissionsJson"`
 }
 
 func BuildEnvironmentScopedPermissionsOutput(ctx *pulumi.Context, args BuildEnvironmentScopedPermissionsOutputArgs, opts ...pulumi.InvokeOption) BuildEnvironmentScopedPermissionsResultOutput {
-	return pulumi.ToOutputWithContext(ctx.Context(), args).
-		ApplyT(func(v interface{}) (BuildEnvironmentScopedPermissionsResultOutput, error) {
+	return pulumi.ToOutputWithContext(context.Background(), args).
+		ApplyT(func(v interface{}) (BuildEnvironmentScopedPermissionsResult, error) {
 			args := v.(BuildEnvironmentScopedPermissionsArgs)
-			options := pulumi.InvokeOutputOptions{InvokeOptions: internal.PkgInvokeDefaultOpts(opts)}
-			return ctx.InvokeOutput("pulumiservice:index:buildEnvironmentScopedPermissions", args, BuildEnvironmentScopedPermissionsResultOutput{}, options).(BuildEnvironmentScopedPermissionsResultOutput), nil
+			r, err := BuildEnvironmentScopedPermissions(ctx, &args, opts...)
+			var s BuildEnvironmentScopedPermissionsResult
+			if r != nil {
+				s = *r
+			}
+			return s, err
 		}).(BuildEnvironmentScopedPermissionsResultOutput)
 }
 
@@ -70,14 +72,9 @@ func (o BuildEnvironmentScopedPermissionsResultOutput) ToBuildEnvironmentScopedP
 	return o
 }
 
-// A `PermissionDescriptor` tree ready to assign to `OrganizationRole.permissions`.
+// A `kind`-discriminated permission descriptor tree ready to assign to `OrganizationRole.permissions`.
 func (o BuildEnvironmentScopedPermissionsResultOutput) Permissions() pulumi.MapOutput {
 	return o.ApplyT(func(v BuildEnvironmentScopedPermissionsResult) map[string]interface{} { return v.Permissions }).(pulumi.MapOutput)
-}
-
-// A JSON-encoded copy of `permissions`. Pulumi's Python SDK strips `__`-prefixed keys from invoke responses (see `pulumi/sdk` Python `runtime/rpc.py:deserialize_property`), so the structured `permissions` Mapping arrives at downstream resources missing every `__type` discriminator and Pulumi Cloud rejects it. Python users should consume `permissionsJson` and `.apply(json.loads)` it instead — that re-creates the dict on the input path (`serialize_property`), which preserves `__` keys. TypeScript/Yaml/Go/.NET/Java callers can use either field; `permissions` is the more ergonomic default.
-func (o BuildEnvironmentScopedPermissionsResultOutput) PermissionsJson() pulumi.StringOutput {
-	return o.ApplyT(func(v BuildEnvironmentScopedPermissionsResult) string { return v.PermissionsJson }).(pulumi.StringOutput)
 }
 
 func init() {
