@@ -1583,7 +1583,7 @@
       "properties": {
         "environmentId": {
           "type": "string",
-          "description": "The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `PermissionLiteralExpressionEnvironment` expression in `OrganizationRole.permissions`."
+          "description": "The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `literalEnvironment` expression in `OrganizationRole.permissions`."
         },
         "name": {
           "type": "string",
@@ -3162,7 +3162,7 @@
       }
     },
     "pulumiservice:index:getEnvironment": {
-      "description": "Looks up an existing ESC environment by name and returns its UUID. Use this to pin a custom RBAC role to a specific environment via `PermissionLiteralExpressionEnvironment` when the environment is not managed by the current Pulumi program. Errors when the environment is not found.",
+      "description": "Looks up an existing ESC environment by name and returns its UUID. Use this to pin a custom RBAC role to a specific environment via a `literalEnvironment` expression when the environment is not managed by the current Pulumi program. Errors when the environment is not found.",
       "inputs": {
         "properties": {
           "name": {
@@ -3187,7 +3187,7 @@
       "outputs": {
         "properties": {
           "environmentId": {
-            "description": "The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `PermissionLiteralExpressionEnvironment` expression.",
+            "description": "The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `literalEnvironment` expression.",
             "type": "string"
           },
           "name": {

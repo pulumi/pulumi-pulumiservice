@@ -74,7 +74,7 @@ resources:
   # A role that ONLY grants `environment:read` and `environment:open` on
   # the specific env created above — anywhere else in the org, the role
   # grants nothing. This is the shape Pulumi Cloud's role evaluator
-  # expects (PermissionDescriptorCondition wrapping the per-env literal):
+  # expects (descriptorCondition wrapping the per-env literal):
   # the role definition itself is org-scoped (resourceType defaults to
   # `global`), but the permission tree is gated on the environment ID.
   scopedReadOnlyRole:

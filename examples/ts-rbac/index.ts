@@ -67,8 +67,8 @@ const scopedEnv = new service.Environment("scopedEnv", {
 // "global"); the permission tree is gated on the environment's UUID.
 //
 // `buildEnvironmentScopedPermissions` builds the underlying
-// PermissionDescriptorGroup → PermissionDescriptorCondition →
-// PermissionLiteralExpressionEnvironment JSON so we don't have to.
+// descriptorGroup → descriptorCondition → literalEnvironment tree
+// so we don't have to.
 const scopedReadOnlyRole = new service.OrganizationRole("scopedReadOnlyRole", {
     organizationName,
     name: `ts-rbac-scoped-read-only-${nameSuffix}`,

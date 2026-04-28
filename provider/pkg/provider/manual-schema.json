@@ -1779,7 +1779,7 @@
           "type": "integer"
         },
         "environmentId": {
-          "description": "The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `PermissionLiteralExpressionEnvironment` expression in `OrganizationRole.permissions`.",
+          "description": "The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `literalEnvironment` expression in `OrganizationRole.permissions`.",
           "type": "string"
         }
       },
