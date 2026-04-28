@@ -21,6 +21,20 @@ import (
 	"github.com/pulumi/pulumi-go-provider/infer"
 )
 
+// Kind discriminators threaded into scopedPermissionsDescriptor by each
+// helper. Centralising these as constants prevents a typo in an Invoke from
+// silently emitting a tree the OrganizationRole resource rejects at apply
+// time (the resource's Check skips translator validation when the helper's
+// output is computed at preview).
+const (
+	kindExpressionEnvironment     = "expressionEnvironment"
+	kindLiteralEnvironment        = "literalEnvironment"
+	kindExpressionStack           = "expressionStack"
+	kindLiteralStack              = "literalStack"
+	kindExpressionInsightsAccount = "expressionInsightsAccount"
+	kindLiteralInsightsAccount    = "literalInsightsAccount"
+)
+
 // scopedPermissionsDescriptor builds a PermissionDescriptor tree that grants
 // the supplied scopes only when the request targets the entity identified by
 // (expressionKind, literalKind, identity).
@@ -127,8 +141,8 @@ func (BuildEnvironmentScopedPermissionsFunction) Invoke(
 	return infer.FunctionResponse[BuildEnvironmentScopedPermissionsOutput]{
 		Output: BuildEnvironmentScopedPermissionsOutput{
 			Permissions: scopedPermissionsDescriptor(
-				"expressionEnvironment",
-				"literalEnvironment",
+				kindExpressionEnvironment,
+				kindLiteralEnvironment,
 				req.Input.EnvironmentID,
 				req.Input.Permissions,
 			),
@@ -198,8 +212,8 @@ func (BuildStackScopedPermissionsFunction) Invoke(
 	return infer.FunctionResponse[BuildStackScopedPermissionsOutput]{
 		Output: BuildStackScopedPermissionsOutput{
 			Permissions: scopedPermissionsDescriptor(
-				"expressionStack",
-				"literalStack",
+				kindExpressionStack,
+				kindLiteralStack,
 				req.Input.StackID,
 				req.Input.Permissions,
 			),
@@ -269,8 +283,8 @@ func (BuildInsightsAccountScopedPermissionsFunction) Invoke(
 	return infer.FunctionResponse[BuildInsightsAccountScopedPermissionsOutput]{
 		Output: BuildInsightsAccountScopedPermissionsOutput{
 			Permissions: scopedPermissionsDescriptor(
-				"expressionInsightsAccount",
-				"literalInsightsAccount",
+				kindExpressionInsightsAccount,
+				kindLiteralInsightsAccount,
 				req.Input.InsightsAccountID,
 				req.Input.Permissions,
 			),

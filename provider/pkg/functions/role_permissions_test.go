@@ -92,8 +92,8 @@ func TestBuildEnvironmentScopedPermissions(t *testing.T) {
 		require.NoError(t, err)
 		assertScopedPermissionsShape(
 			t, resp.Output.Permissions,
-			"expressionEnvironment",
-			"literalEnvironment",
+			kindExpressionEnvironment,
+			kindLiteralEnvironment,
 			"env-uuid-1",
 			[]string{"environment:read", "environment:open"},
 		)
@@ -143,8 +143,8 @@ func TestBuildStackScopedPermissions(t *testing.T) {
 		require.NoError(t, err)
 		assertScopedPermissionsShape(
 			t, resp.Output.Permissions,
-			"expressionStack",
-			"literalStack",
+			kindExpressionStack,
+			kindLiteralStack,
 			"stack-id-1",
 			[]string{"stack:read"},
 		)
@@ -194,8 +194,8 @@ func TestBuildInsightsAccountScopedPermissions(t *testing.T) {
 		require.NoError(t, err)
 		assertScopedPermissionsShape(
 			t, resp.Output.Permissions,
-			"expressionInsightsAccount",
-			"literalInsightsAccount",
+			kindExpressionInsightsAccount,
+			kindLiteralInsightsAccount,
 			"acct-1",
 			[]string{"insights-account:read"},
 		)
