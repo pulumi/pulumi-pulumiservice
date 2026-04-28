@@ -263,7 +263,15 @@ func permissionsWireToKind(node map[string]interface{}) (map[string]interface{},
 		if err != nil {
 			return nil, fmt.Errorf("PermissionDescriptorCondition.subNode: %w", err)
 		}
-		// Splice the on into the translated subNode.
+		// Splice the on into the translated subNode. If the subNode itself
+		// already produced an `on:` (i.e. the wire returned a Condition
+		// wrapping another Condition), the inner scope would be silently
+		// lost — error out explicitly instead. The provider never emits
+		// nested Conditions; if the Cloud API ever does, callers need a
+		// clear failure mode rather than a quiet collapse.
+		if _, alreadyHasOn := translated["on"]; alreadyHasOn {
+			return nil, fmt.Errorf("`PermissionDescriptorCondition` wraps another scoped descriptor; nested scoping is not supported by this provider")
+		}
 		translated["on"] = on
 		return translated, nil
 	default:

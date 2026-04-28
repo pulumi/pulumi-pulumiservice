@@ -548,6 +548,36 @@ func TestPermissionsWireToKind_Errors(t *testing.T) {
 			},
 			wantErrFrag: "permissions",
 		},
+		{
+			name: "Condition wraps another Condition (nested scoping)",
+			in: map[string]interface{}{
+				"__type": "PermissionDescriptorCondition",
+				"condition": map[string]interface{}{
+					"__type": "PermissionExpressionEqual",
+					"left":   map[string]interface{}{"__type": "PermissionExpressionStack"},
+					"right": map[string]interface{}{
+						"__type":   "PermissionLiteralExpressionStack",
+						"identity": "s1",
+					},
+				},
+				"subNode": map[string]interface{}{
+					"__type": "PermissionDescriptorCondition",
+					"condition": map[string]interface{}{
+						"__type": "PermissionExpressionEqual",
+						"left":   map[string]interface{}{"__type": "PermissionExpressionEnvironment"},
+						"right": map[string]interface{}{
+							"__type":   "PermissionLiteralExpressionEnvironment",
+							"identity": "e1",
+						},
+					},
+					"subNode": map[string]interface{}{
+						"__type":      "PermissionDescriptorAllow",
+						"permissions": []interface{}{"environment:read"},
+					},
+				},
+			},
+			wantErrFrag: "nested",
+		},
 	}
 	for _, tc := range cases {
 		tc := tc
