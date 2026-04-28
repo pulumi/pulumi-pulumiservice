@@ -1583,7 +1583,7 @@
       "properties": {
         "environmentId": {
           "type": "string",
-          "description": "The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `PermissionLiteralExpressionEnvironment` expression in `OrganizationRole.permissions`."
+          "description": "The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `literalEnvironment` expression in `OrganizationRole.permissions`."
         },
         "name": {
           "type": "string",
@@ -2104,7 +2104,7 @@
           "additionalProperties": {
             "$ref": "pulumi.json#/Any"
           },
-          "description": "The role's permission descriptor tree — passed to the service verbatim. This is the `details` field of a Pulumi Cloud PermissionDescriptor: an object with a `__type` discriminator (e.g. `PermissionDescriptorAllow`, `PermissionDescriptorCompose`) describing which scopes are granted. For per-entity scoping, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the underlying `PermissionDescriptorGroup` / `PermissionDescriptorCondition` tree for you."
+          "description": "The role's permission descriptor tree. Two kinds: `{kind: \"allow\", permissions: [\"<scope>\", ...]}` to grant scopes, or `{kind: \"group\", entries: [...]}` to compose multiple grants. Either may carry an optional `on:` modifier — a single-key map `{environment: <uuid>}` / `{stack: <id>}` / `{insightsAccount: <id>}` — to scope the descriptor to one entity. For per-entity scoping, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the `on:`-modified Allow for you."
         },
         "resourceType": {
           "type": "string",
@@ -2145,7 +2145,7 @@
           "additionalProperties": {
             "$ref": "pulumi.json#/Any"
           },
-          "description": "The role's permission descriptor tree — passed to the service verbatim. This is the `details` field of a Pulumi Cloud PermissionDescriptor: an object with a `__type` discriminator (e.g. `PermissionDescriptorAllow`, `PermissionDescriptorCompose`) describing which scopes are granted. For per-entity scoping, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the underlying `PermissionDescriptorGroup` / `PermissionDescriptorCondition` tree for you."
+          "description": "The role's permission descriptor tree. Two kinds: `{kind: \"allow\", permissions: [\"<scope>\", ...]}` to grant scopes, or `{kind: \"group\", entries: [...]}` to compose multiple grants. Either may carry an optional `on:` modifier — a single-key map `{environment: <uuid>}` / `{stack: <id>}` / `{insightsAccount: <id>}` — to scope the descriptor to one entity. For per-entity scoping, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the `on:`-modified Allow for you."
         },
         "resourceType": {
           "type": "string",
@@ -3015,7 +3015,7 @@
   },
   "functions": {
     "pulumiservice:index:buildEnvironmentScopedPermissions": {
-      "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the underlying `PermissionDescriptorGroup` / `PermissionDescriptorCondition` / `PermissionLiteralExpressionEnvironment` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.",
+      "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `on:` modifier yourself. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `group` whose `entries` list pulls the output of each helper.",
       "inputs": {
         "properties": {
           "environmentId": {
@@ -3042,23 +3042,18 @@
             "additionalProperties": {
               "$ref": "pulumi.json#/Any"
             },
-            "description": "A `PermissionDescriptor` tree ready to assign to `OrganizationRole.permissions`.",
+            "description": "A `kind: allow` descriptor with an `on: { environment: <uuid> }` modifier, ready to assign to `OrganizationRole.permissions`.",
             "type": "object"
-          },
-          "permissionsJson": {
-            "description": "A JSON-encoded copy of `permissions`. Pulumi's Python SDK strips `__`-prefixed keys from invoke responses (see `pulumi/sdk` Python `runtime/rpc.py:deserialize_property`), so the structured `permissions` Mapping arrives at downstream resources missing every `__type` discriminator and Pulumi Cloud rejects it. Python users should consume `permissionsJson` and `.apply(json.loads)` it instead — that re-creates the dict on the input path (`serialize_property`), which preserves `__` keys. TypeScript/Yaml/Go/.NET/Java callers can use either field; `permissions` is the more ergonomic default.",
-            "type": "string"
           }
         },
         "required": [
-          "permissions",
-          "permissionsJson"
+          "permissions"
         ],
         "type": "object"
       }
     },
     "pulumiservice:index:buildInsightsAccountScopedPermissions": {
-      "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source) to avoid hand-rolling the underlying `PermissionLiteralExpressionInsightsAccount` JSON. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.",
+      "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source). The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `group` whose `entries` list pulls the output of each helper.",
       "inputs": {
         "properties": {
           "insightsAccountId": {
@@ -3085,23 +3080,18 @@
             "additionalProperties": {
               "$ref": "pulumi.json#/Any"
             },
-            "description": "A `PermissionDescriptor` tree ready to assign to `OrganizationRole.permissions`.",
+            "description": "A `kind: allow` descriptor with an `on: { insightsAccount: <id> }` modifier, ready to assign to `OrganizationRole.permissions`.",
             "type": "object"
-          },
-          "permissionsJson": {
-            "description": "A JSON-encoded copy of `permissions`. Pulumi's Python SDK strips `__`-prefixed keys from invoke responses (see `pulumi/sdk` Python `runtime/rpc.py:deserialize_property`), so the structured `permissions` Mapping arrives at downstream resources missing every `__type` discriminator and Pulumi Cloud rejects it. Python users should consume `permissionsJson` and `.apply(json.loads)` it instead — that re-creates the dict on the input path (`serialize_property`), which preserves `__` keys. TypeScript/Yaml/Go/.NET/Java callers can use either field; `permissions` is the more ergonomic default.",
-            "type": "string"
           }
         },
         "required": [
-          "permissions",
-          "permissionsJson"
+          "permissions"
         ],
         "type": "object"
       }
     },
     "pulumiservice:index:buildStackScopedPermissions": {
-      "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple — and is what `PermissionLiteralExpressionStack` expects. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.",
+      "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `group` whose `entries` list pulls the output of each helper.",
       "inputs": {
         "properties": {
           "permissions": {
@@ -3128,17 +3118,12 @@
             "additionalProperties": {
               "$ref": "pulumi.json#/Any"
             },
-            "description": "A `PermissionDescriptor` tree ready to assign to `OrganizationRole.permissions`.",
+            "description": "A `kind: allow` descriptor with an `on: { stack: <id> }` modifier, ready to assign to `OrganizationRole.permissions`.",
             "type": "object"
-          },
-          "permissionsJson": {
-            "description": "A JSON-encoded copy of `permissions`. Pulumi's Python SDK strips `__`-prefixed keys from invoke responses (see `pulumi/sdk` Python `runtime/rpc.py:deserialize_property`), so the structured `permissions` Mapping arrives at downstream resources missing every `__type` discriminator and Pulumi Cloud rejects it. Python users should consume `permissionsJson` and `.apply(json.loads)` it instead — that re-creates the dict on the input path (`serialize_property`), which preserves `__` keys. TypeScript/Yaml/Go/.NET/Java callers can use either field; `permissions` is the more ergonomic default.",
-            "type": "string"
           }
         },
         "required": [
-          "permissions",
-          "permissionsJson"
+          "permissions"
         ],
         "type": "object"
       }
@@ -3177,7 +3162,7 @@
       }
     },
     "pulumiservice:index:getEnvironment": {
-      "description": "Looks up an existing ESC environment by name and returns its UUID. Use this to pin a custom RBAC role to a specific environment via `PermissionLiteralExpressionEnvironment` when the environment is not managed by the current Pulumi program. Errors when the environment is not found.",
+      "description": "Looks up an existing ESC environment by name and returns its UUID. Use this to pin a custom RBAC role to a specific environment via a `literalEnvironment` expression when the environment is not managed by the current Pulumi program. Errors when the environment is not found.",
       "inputs": {
         "properties": {
           "name": {
@@ -3202,7 +3187,7 @@
       "outputs": {
         "properties": {
           "environmentId": {
-            "description": "The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `PermissionLiteralExpressionEnvironment` expression.",
+            "description": "The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `literalEnvironment` expression.",
             "type": "string"
           },
           "name": {

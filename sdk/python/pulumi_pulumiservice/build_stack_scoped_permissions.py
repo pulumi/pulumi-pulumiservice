@@ -23,29 +23,18 @@ __all__ = [
 
 @pulumi.output_type
 class BuildStackScopedPermissionsResult:
-    def __init__(__self__, permissions=None, permissions_json=None):
+    def __init__(__self__, permissions=None):
         if permissions and not isinstance(permissions, dict):
             raise TypeError("Expected argument 'permissions' to be a dict")
         pulumi.set(__self__, "permissions", permissions)
-        if permissions_json and not isinstance(permissions_json, str):
-            raise TypeError("Expected argument 'permissions_json' to be a str")
-        pulumi.set(__self__, "permissions_json", permissions_json)
 
     @_builtins.property
     @pulumi.getter
     def permissions(self) -> Mapping[str, Any]:
         """
-        A `PermissionDescriptor` tree ready to assign to `OrganizationRole.permissions`.
+        A `kind: allow` descriptor with an `on: { stack: <id> }` modifier, ready to assign to `OrganizationRole.permissions`.
         """
         return pulumi.get(self, "permissions")
-
-    @_builtins.property
-    @pulumi.getter(name="permissionsJson")
-    def permissions_json(self) -> _builtins.str:
-        """
-        A JSON-encoded copy of `permissions`. Pulumi's Python SDK strips `__`-prefixed keys from invoke responses (see `pulumi/sdk` Python `runtime/rpc.py:deserialize_property`), so the structured `permissions` Mapping arrives at downstream resources missing every `__type` discriminator and Pulumi Cloud rejects it. Python users should consume `permissionsJson` and `.apply(json.loads)` it instead — that re-creates the dict on the input path (`serialize_property`), which preserves `__` keys. TypeScript/Yaml/Go/.NET/Java callers can use either field; `permissions` is the more ergonomic default.
-        """
-        return pulumi.get(self, "permissions_json")
 
 
 class AwaitableBuildStackScopedPermissionsResult(BuildStackScopedPermissionsResult):
@@ -54,15 +43,14 @@ class AwaitableBuildStackScopedPermissionsResult(BuildStackScopedPermissionsResu
         if False:
             yield self
         return BuildStackScopedPermissionsResult(
-            permissions=self.permissions,
-            permissions_json=self.permissions_json)
+            permissions=self.permissions)
 
 
 def build_stack_scoped_permissions(permissions: Optional[Sequence[_builtins.str]] = None,
                                    stack_id: Optional[_builtins.str] = None,
                                    opts: Optional[pulumi.InvokeOptions] = None) -> AwaitableBuildStackScopedPermissionsResult:
     """
-    Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple — and is what `PermissionLiteralExpressionStack` expects. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
+    Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `group` whose `entries` list pulls the output of each helper.
 
 
     :param Sequence[_builtins.str] permissions: The set of `stack:*` scopes to grant on the target stack (e.g. `stack:read`, `stack:edit`, `stack:admin`). Discover valid scope names via the `getOrganizationRoleScopes` data source.
@@ -75,13 +63,12 @@ def build_stack_scoped_permissions(permissions: Optional[Sequence[_builtins.str]
     __ret__ = pulumi.runtime.invoke('pulumiservice:index:buildStackScopedPermissions', __args__, opts=opts, typ=BuildStackScopedPermissionsResult).value
 
     return AwaitableBuildStackScopedPermissionsResult(
-        permissions=pulumi.get(__ret__, 'permissions'),
-        permissions_json=pulumi.get(__ret__, 'permissions_json'))
+        permissions=pulumi.get(__ret__, 'permissions'))
 def build_stack_scoped_permissions_output(permissions: Optional[pulumi.Input[Sequence[_builtins.str]]] = None,
                                           stack_id: Optional[pulumi.Input[_builtins.str]] = None,
                                           opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[BuildStackScopedPermissionsResult]:
     """
-    Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple — and is what `PermissionLiteralExpressionStack` expects. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls a `PermissionDescriptorCondition` from each helper output.
+    Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `group` whose `entries` list pulls the output of each helper.
 
 
     :param Sequence[_builtins.str] permissions: The set of `stack:*` scopes to grant on the target stack (e.g. `stack:read`, `stack:edit`, `stack:admin`). Discover valid scope names via the `getOrganizationRoleScopes` data source.
@@ -93,5 +80,4 @@ def build_stack_scoped_permissions_output(permissions: Optional[pulumi.Input[Seq
     opts = pulumi.InvokeOutputOptions.merge(_utilities.get_invoke_opts_defaults(), opts)
     __ret__ = pulumi.runtime.invoke_output('pulumiservice:index:buildStackScopedPermissions', __args__, opts=opts, typ=BuildStackScopedPermissionsResult)
     return __ret__.apply(lambda __response__: BuildStackScopedPermissionsResult(
-        permissions=pulumi.get(__response__, 'permissions'),
-        permissions_json=pulumi.get(__response__, 'permissions_json')))
+        permissions=pulumi.get(__response__, 'permissions')))

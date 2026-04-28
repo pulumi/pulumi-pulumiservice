@@ -18,7 +18,7 @@ resources:
       name: yaml-rbac-read-only-${digits}
       description: Read-only access to stacks, created by the yaml-rbac example.
       permissions:
-        __type: PermissionDescriptorAllow
+        kind: allow
         permissions:
           - stack:read
 
@@ -73,10 +73,9 @@ resources:
 
   # A role that ONLY grants `environment:read` and `environment:open` on
   # the specific env created above — anywhere else in the org, the role
-  # grants nothing. This is the shape Pulumi Cloud's role evaluator
-  # expects (PermissionDescriptorCondition wrapping the per-env literal):
-  # the role definition itself is org-scoped (resourceType defaults to
-  # `global`), but the permission tree is gated on the environment ID.
+  # grants nothing. The role definition is org-scoped (resourceType
+  # defaults to `global`); the `on:` modifier scopes the Allow to a
+  # single environment by UUID.
   scopedReadOnlyRole:
     type: pulumiservice:OrganizationRole
     properties:
@@ -84,21 +83,12 @@ resources:
       name: yaml-rbac-scoped-read-only-${digits}
       description: Read+open access scoped to a single ESC environment.
       permissions:
-        __type: PermissionDescriptorGroup
-        entries:
-          - __type: PermissionDescriptorCondition
-            condition:
-              __type: PermissionExpressionEqual
-              left:
-                __type: PermissionExpressionEnvironment
-              right:
-                __type: PermissionLiteralExpressionEnvironment
-                identity: ${scopedEnv.environmentId}
-            subNode:
-              __type: PermissionDescriptorAllow
-              permissions:
-                - environment:read
-                - environment:open
+        kind: allow
+        on:
+          environment: ${scopedEnv.environmentId}
+        permissions:
+          - environment:read
+          - environment:open
 
 variables:
   # Data source: the authenticated Pulumi Cloud user (the stack's operator).

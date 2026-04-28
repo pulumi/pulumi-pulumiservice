@@ -10,9 +10,10 @@ Exercises the full RBAC flow from Python:
 - Binds the custom role to the team via TeamRoleAssignment.
 - Adopts an existing org member via OrganizationMember and flips their
   built-in role to "admin".
+- Builds an environment-scoped role using
+  build_environment_scoped_permissions_output and assigns it to the
+  caller via the scopedReadOnlyRole resource.
 """
-
-import json
 
 import pulumi
 from pulumi_pulumiservice import (
@@ -68,7 +69,7 @@ custom_role = OrganizationRole(
     name=f"py-rbac-read-only-{digits}",
     description="Read-only access to stacks, created by the py-rbac example.",
     permissions={
-        "__type": "PermissionDescriptorAllow",
+        "kind": "allow",
         "permissions": ["stack:read"],
     },
 )
@@ -124,20 +125,9 @@ scoped_env = Environment(
 # 8. A role that grants environment:read + environment:open ONLY on the
 #    env created above. Anywhere else in the org the role grants nothing.
 #    The role definition is org-scoped (resourceType defaults to "global");
-#    the permission tree is gated on the env's UUID via a
-#    PermissionDescriptorCondition wrapping a PermissionLiteralExpressionEnvironment.
-#
-#    Python note: we read `permissions_json` (the JSON-string sibling of
-#    `permissions`) and `apply(json.loads)` to rebuild the dict in user
-#    code. Pulumi's Python SDK strips `__`-prefixed keys from invoke
-#    responses (see `pulumi/sdk` Python `runtime/rpc.py`
-#    deserialize_property), which would otherwise erase the `__type`
-#    discriminators the Cloud API requires. Going through the JSON
-#    string sidesteps that filter — the dict is reconstructed on the
-#    input path (`serialize_property`), which preserves `__` keys.
-#    TS/Yaml can read `.permissions` directly; the JSON sibling is the
-#    Python-only workaround until the upstream SDK exposes
-#    `keep_internal=True` for invoke results.
+#    the helper returns a `kind: "allow"` descriptor with an
+#    `on: { environment: <uuid> }` modifier — the provider expands that
+#    into the full Pulumi Cloud permission tree at apply time.
 scoped_role = OrganizationRole(
     "scopedReadOnlyRole",
     organization_name=organization_name,
@@ -146,7 +136,7 @@ scoped_role = OrganizationRole(
     permissions=build_environment_scoped_permissions_output(
         environment_id=scoped_env.environment_id,
         permissions=["environment:read", "environment:open"],
-    ).permissions_json.apply(json.loads),
+    ).permissions,
 )
 
 pulumi.export("scopedEnvironmentId", scoped_env.environment_id)

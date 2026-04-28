@@ -47,7 +47,7 @@ func (c *orgRoleClientMock) DeleteRole(ctx context.Context, org, id string, forc
 }
 
 var testPermissions = map[string]interface{}{
-	"__type":      "PermissionDescriptorAllow",
+	"kind":        "allow",
 	"permissions": []interface{}{"stack:read"},
 }
 
@@ -63,6 +63,7 @@ func TestOrganizationRoleCreate(t *testing.T) {
 			var parsed map[string]interface{}
 			assert.NoError(t, json.Unmarshal(req.Details, &parsed))
 			assert.Equal(t, "PermissionDescriptorAllow", parsed["__type"])
+			assert.NotContains(t, parsed, "kind", "wire body must not leak `kind` to the API")
 			return &pulumiapi.RoleDescriptor{
 				ID:      "role-123",
 				Name:    req.Name,
@@ -103,7 +104,12 @@ func TestOrganizationRoleRead(t *testing.T) {
 	})
 
 	t.Run("found parses details", func(t *testing.T) {
-		raw, _ := json.Marshal(testPermissions)
+		// The API returns wire format with __type; the provider must translate to kind.
+		wirePermissions := map[string]interface{}{
+			"__type":      "PermissionDescriptorAllow",
+			"permissions": []interface{}{"stack:read"},
+		}
+		raw, _ := json.Marshal(wirePermissions)
 		mock := &orgRoleClientMock{
 			get: func(_ context.Context, _, _ string) (*pulumiapi.RoleDescriptor, error) {
 				return &pulumiapi.RoleDescriptor{
@@ -123,7 +129,9 @@ func TestOrganizationRoleRead(t *testing.T) {
 		})
 		assert.NoError(t, err)
 		assert.Equal(t, "acme/role-123", resp.ID)
-		assert.Equal(t, "PermissionDescriptorAllow", resp.State.Permissions["__type"])
+		// Read translates the wire __type back into the user-facing kind.
+		assert.Equal(t, "allow", resp.State.Permissions["kind"])
+		assert.NotContains(t, resp.State.Permissions, "__type", "state must not leak `__type` to the SDK")
 	})
 }
 
@@ -232,7 +240,7 @@ func TestOrganizationRoleCheck(t *testing.T) {
 				"organizationName": property.New("acme"),
 				"name":             property.New(property.Computed),
 				"permissions": property.New(property.NewMap(map[string]property.Value{
-					"__type": property.New("PermissionDescriptorAllow"),
+					"kind": property.New("allow"),
 				})),
 			}),
 		})
@@ -241,5 +249,92 @@ func TestOrganizationRoleCheck(t *testing.T) {
 			assert.NotEqual(t, "name", f.Property,
 				"Check must not reject a computed name input: %s", f.Reason)
 		}
+	})
+
+	t.Run("rejects unknown kind", func(t *testing.T) {
+		resp, err := r.Check(context.Background(), infer.CheckRequest{
+			NewInputs: property.NewMap(map[string]property.Value{
+				"organizationName": property.New("acme"),
+				"name":             property.New("r"),
+				"permissions": property.New(property.NewMap(map[string]property.Value{
+					"kind": property.New("totallyMadeUp"),
+				})),
+			}),
+		})
+		assert.NoError(t, err)
+		props := map[string]string{}
+		for _, f := range resp.Failures {
+			props[f.Property] = f.Reason
+		}
+		assert.Contains(t, props["permissions"], "totallyMadeUp",
+			"Check must reject unknown kind values upfront")
+	})
+
+	t.Run("rejects empty on map", func(t *testing.T) {
+		resp, err := r.Check(context.Background(), infer.CheckRequest{
+			NewInputs: property.NewMap(map[string]property.Value{
+				"organizationName": property.New("acme"),
+				"name":             property.New("r"),
+				"permissions": property.New(property.NewMap(map[string]property.Value{
+					"kind":        property.New("allow"),
+					"on":          property.New(property.NewMap(map[string]property.Value{})),
+					"permissions": property.New(property.NewArray([]property.Value{property.New("stack:read")})),
+				})),
+			}),
+		})
+		assert.NoError(t, err)
+		props := map[string]string{}
+		for _, f := range resp.Failures {
+			props[f.Property] = f.Reason
+		}
+		assert.Contains(t, props["permissions"], "on",
+			"empty on map should produce a permissions failure mentioning on")
+	})
+
+	t.Run("rejects multi-key on map", func(t *testing.T) {
+		resp, err := r.Check(context.Background(), infer.CheckRequest{
+			NewInputs: property.NewMap(map[string]property.Value{
+				"organizationName": property.New("acme"),
+				"name":             property.New("r"),
+				"permissions": property.New(property.NewMap(map[string]property.Value{
+					"kind": property.New("allow"),
+					"on": property.New(property.NewMap(map[string]property.Value{
+						"environment": property.New("e"),
+						"stack":       property.New("s"),
+					})),
+					"permissions": property.New(property.NewArray([]property.Value{property.New("stack:read")})),
+				})),
+			}),
+		})
+		assert.NoError(t, err)
+		props := map[string]string{}
+		for _, f := range resp.Failures {
+			props[f.Property] = f.Reason
+		}
+		assert.Contains(t, props["permissions"], "on",
+			"multi-key on should produce a permissions failure mentioning on")
+	})
+
+	t.Run("rejects unknown on entity type", func(t *testing.T) {
+		resp, err := r.Check(context.Background(), infer.CheckRequest{
+			NewInputs: property.NewMap(map[string]property.Value{
+				"organizationName": property.New("acme"),
+				"name":             property.New("r"),
+				"permissions": property.New(property.NewMap(map[string]property.Value{
+					"kind": property.New("allow"),
+					"on": property.New(property.NewMap(map[string]property.Value{
+						"unknownEntity": property.New("x"),
+					})),
+					"permissions": property.New(property.NewArray([]property.Value{property.New("stack:read")})),
+				})),
+			}),
+		})
+		assert.NoError(t, err)
+		props := map[string]string{}
+		for _, f := range resp.Failures {
+			props[f.Property] = f.Reason
+		}
+		assert.Contains(t, props["permissions"], "unknownEntity",
+			"unknown on entity should produce a permissions failure naming the bad key")
 	})
 }
