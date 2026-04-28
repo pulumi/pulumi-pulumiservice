@@ -591,14 +591,90 @@ func TestPermissionsWireToKind_Errors(t *testing.T) {
 }
 
 // ----------------------------------------------------------------------------
-// Backwards-compat: the prior helpers (in the same PR's earlier commits)
-// emitted Group(entries: [Condition(...)]) — a single-entry Group wrapping
-// a Condition. The reverse translator must accept that shape and produce a
-// single-entry group with an `on:`-modified entry. Refresh would then detect
-// drift against the new flat helper output, but Read itself must succeed.
+// API-boundary wrap: permissionsKindToWireForAPI is what Create/Update call.
+// It runs permissionsKindToWire and then wraps a top-level Condition in a
+// single-entry Group, because Pulumi Cloud's role-detail UI 500s on a bare
+// top-level Condition. The reverse path collapses this wrap so refresh stays
+// idempotent against the user's input.
 // ----------------------------------------------------------------------------
 
-func TestPermissionsWireToKind_LegacySingleEntryGroup(t *testing.T) {
+func TestPermissionsKindToWireForAPI(t *testing.T) {
+	t.Parallel()
+
+	wrappedScopedAllowWire := func() map[string]interface{} {
+		return map[string]interface{}{
+			"__type":  "PermissionDescriptorGroup",
+			"entries": []interface{}{scopedAllowWire()},
+		}
+	}
+	wrappedScopedGroupWire := func() map[string]interface{} {
+		return map[string]interface{}{
+			"__type":  "PermissionDescriptorGroup",
+			"entries": []interface{}{scopedGroupWire()},
+		}
+	}
+
+	cases := []struct {
+		name string
+		in   map[string]interface{}
+		want map[string]interface{}
+	}{
+		// No wrap when the top-level wire shape is already Allow or Group.
+		{"flatAllow no wrap", flatAllowKind(), flatAllowWire()},
+		{"flatGroup no wrap", flatGroupKind(), flatGroupWire()},
+		{"mixedGroup no wrap", mixedGroupKind(), mixedGroupWire()},
+
+		// Wrap when the top-level wire shape would be a Condition.
+		{"scopedAllow wraps", scopedAllowKind(), wrappedScopedAllowWire()},
+		{"scopedGroup wraps", scopedGroupKind(), wrappedScopedGroupWire()},
+	}
+	for _, tc := range cases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			got, err := permissionsKindToWireForAPI(tc.in)
+			require.NoError(t, err)
+			assert.Equal(t, tc.want, got)
+		})
+	}
+}
+
+// TestPermissionsKindWireForAPIRoundTrip verifies the user's kind-shaped input
+// survives a round-trip through the API entry point (with its Condition→Group
+// wrap) and the reverse path (with its single-entry-Group-of-Condition
+// collapse). This is the contract Create+Refresh actually exercises.
+func TestPermissionsKindWireForAPIRoundTrip(t *testing.T) {
+	t.Parallel()
+	cases := []struct {
+		name string
+		kind map[string]interface{}
+	}{
+		{"flatAllow", flatAllowKind()},
+		{"scopedAllow", scopedAllowKind()},
+		{"flatGroup", flatGroupKind()},
+		{"scopedGroup", scopedGroupKind()},
+		{"mixedGroup", mixedGroupKind()},
+	}
+	for _, tc := range cases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			wire, err := permissionsKindToWireForAPI(tc.kind)
+			require.NoError(t, err)
+			back, err := permissionsWireToKind(wire)
+			require.NoError(t, err)
+			assert.Equal(t, tc.kind, back)
+		})
+	}
+}
+
+// TestPermissionsWireToKind_CollapseSingleEntryGroupOfCondition pins the
+// collapse: a single-entry Group whose entry is a Condition (i.e. has an
+// `on:` field after translation) reverses to just that entry, dropping the
+// Group wrapper. This is what makes `kind: allow, on: ...` round-trip
+// through the API-boundary wrap. (It also accepts the prior PR's helper
+// output, which produced the same wire shape.)
+func TestPermissionsWireToKind_CollapseSingleEntryGroupOfCondition(t *testing.T) {
 	t.Parallel()
 	in := map[string]interface{}{
 		"__type": "PermissionDescriptorGroup",
@@ -621,16 +697,67 @@ func TestPermissionsWireToKind_LegacySingleEntryGroup(t *testing.T) {
 		},
 	}
 	want := map[string]interface{}{
+		"kind":        "allow",
+		"on":          map[string]interface{}{"environment": "env-uuid-1"},
+		"permissions": []interface{}{"environment:read"},
+	}
+	got, err := permissionsWireToKind(in)
+	require.NoError(t, err)
+	assert.Equal(t, want, got)
+}
+
+// TestPermissionsWireToKind_PreservesUserSuppliedSingleEntryGroup pins the
+// other side of the collapse heuristic: a single-entry Group whose entry has
+// NO `on:` field (i.e. wasn't an artefact of the API-boundary wrap) is
+// preserved as-is. The collapse only fires when the entry has an `on:`,
+// which is the unambiguous fingerprint of a wrapped Condition.
+func TestPermissionsWireToKind_PreservesUserSuppliedSingleEntryGroup(t *testing.T) {
+	t.Parallel()
+	in := map[string]interface{}{
+		"__type": "PermissionDescriptorGroup",
+		"entries": []interface{}{
+			map[string]interface{}{
+				"__type":      "PermissionDescriptorAllow",
+				"permissions": []interface{}{"stack:read"},
+			},
+		},
+	}
+	want := map[string]interface{}{
 		"kind": "group",
 		"entries": []interface{}{
 			map[string]interface{}{
 				"kind":        "allow",
-				"on":          map[string]interface{}{"environment": "env-uuid-1"},
-				"permissions": []interface{}{"environment:read"},
+				"permissions": []interface{}{"stack:read"},
 			},
 		},
 	}
 	got, err := permissionsWireToKind(in)
 	require.NoError(t, err)
 	assert.Equal(t, want, got)
+}
+
+// TestPermissionsWireToKind_UnsupportedDescriptorVariantError verifies the
+// improved error message when the wire returns a descriptor variant this
+// provider doesn't yet support (Compose, IfThenElse, Select). The error
+// must name the unsupported variant and direct the user to file an issue.
+func TestPermissionsWireToKind_UnsupportedDescriptorVariantError(t *testing.T) {
+	t.Parallel()
+	for _, variant := range []string{
+		"PermissionDescriptorCompose",
+		"PermissionDescriptorIfThenElse",
+		"PermissionDescriptorSelect",
+	} {
+		variant := variant
+		t.Run(variant, func(t *testing.T) {
+			t.Parallel()
+			_, err := permissionsWireToKind(map[string]interface{}{"__type": variant})
+			require.Error(t, err)
+			assert.Contains(t, err.Error(), variant,
+				"error must name the unsupported variant")
+			assert.Contains(t, err.Error(), "not supported by this provider",
+				"error must say it's unsupported")
+			assert.Contains(t, err.Error(), "github.com/pulumi/pulumi-pulumiservice/issues",
+				"error must direct the user where to file an issue")
+		})
+	}
 }

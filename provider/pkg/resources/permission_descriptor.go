@@ -147,6 +147,28 @@ func permissionsKindToWire(node map[string]interface{}) (map[string]interface{},
 	return inner, nil
 }
 
+// permissionsKindToWireForAPI is the entry point for OrganizationRole's
+// Create/Update path. It runs permissionsKindToWire and then wraps the
+// result in a single-entry Group if the top-level wire shape is a
+// Condition. Pulumi Cloud's role-detail UI expects the top-level
+// descriptor to be a Group or Allow; a bare top-level Condition causes
+// the UI to 500 even though the API accepts the Create. The reverse
+// translator collapses this single-entry-Group-of-Condition wrap on
+// Read so refresh stays idempotent against the user's original input.
+func permissionsKindToWireForAPI(node map[string]interface{}) (map[string]interface{}, error) {
+	wire, err := permissionsKindToWire(node)
+	if err != nil {
+		return nil, err
+	}
+	if wire["__type"] == "PermissionDescriptorCondition" {
+		return map[string]interface{}{
+			"__type":  "PermissionDescriptorGroup",
+			"entries": []interface{}{wire},
+		}, nil
+	}
+	return wire, nil
+}
+
 // buildOnCondition translates a user-facing `on:` map into a
 // PermissionExpressionEqual that compares the request-context expression for
 // the entity type to a literal identity. Validates that `on:` is exactly a
@@ -240,6 +262,21 @@ func permissionsWireToKind(node map[string]interface{}) (map[string]interface{},
 			}
 			translatedEntries[i] = translated
 		}
+		// The Create/Update path wraps a top-level Condition in a single-entry
+		// Group (Pulumi Cloud's role-detail UI 500s on a bare top-level
+		// Condition). To keep refresh idempotent against the user's original
+		// input, collapse a single-entry Group whose entry has an `on:` field
+		// — the unambiguous fingerprint of the wrapped Condition — back to
+		// that entry. Groups with multiple entries, or single-entry Groups
+		// whose entry has no `on:`, are preserved as-is (they reflect a real
+		// user-supplied Group).
+		if len(translatedEntries) == 1 {
+			if entry, ok := translatedEntries[0].(map[string]interface{}); ok {
+				if _, hasOn := entry["on"]; hasOn {
+					return entry, nil
+				}
+			}
+		}
 		return map[string]interface{}{
 			"kind":    "group",
 			"entries": translatedEntries,
@@ -284,7 +321,22 @@ func permissionsWireToKind(node map[string]interface{}) (map[string]interface{},
 		translated["on"] = on
 		return translated, nil
 	default:
-		return nil, fmt.Errorf("unknown permissions descriptor __type %q", wireType)
+		// The Pulumi Cloud wire vocabulary also includes
+		// PermissionDescriptorCompose, PermissionDescriptorIfThenElse, and
+		// PermissionDescriptorSelect (see provider/pkg/pulumiapi/roles.go).
+		// This provider's typed API only exposes Allow / Group / Condition
+		// — other shapes can appear in roles created via the Pulumi Cloud
+		// UI but cannot yet be imported here. Surface that limitation
+		// explicitly rather than as a generic "unknown" error.
+		return nil, fmt.Errorf(
+			"permissions descriptor __type %q is not supported by this provider "+
+				"(supported: PermissionDescriptorAllow, PermissionDescriptorGroup, "+
+				"PermissionDescriptorCondition). Roles using PermissionDescriptorCompose, "+
+				"PermissionDescriptorIfThenElse, or PermissionDescriptorSelect cannot "+
+				"be imported yet — please file an issue at "+
+				"https://github.com/pulumi/pulumi-pulumiservice/issues if you need this",
+			wireType,
+		)
 	}
 }
 

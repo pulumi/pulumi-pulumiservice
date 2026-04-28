@@ -154,7 +154,7 @@ func (*OrganizationRole) Create(
 		}, nil
 	}
 
-	wire, err := permissionsKindToWire(req.Inputs.Permissions)
+	wire, err := permissionsKindToWireForAPI(req.Inputs.Permissions)
 	if err != nil {
 		return infer.CreateResponse[OrganizationRoleState]{}, fmt.Errorf(
 			"invalid permissions: %w",
@@ -206,7 +206,7 @@ func (*OrganizationRole) Update(
 		}, nil
 	}
 
-	wire, err := permissionsKindToWire(core.Permissions)
+	wire, err := permissionsKindToWireForAPI(core.Permissions)
 	if err != nil {
 		return infer.UpdateResponse[OrganizationRoleState]{}, fmt.Errorf(
 			"invalid permissions: %w",
