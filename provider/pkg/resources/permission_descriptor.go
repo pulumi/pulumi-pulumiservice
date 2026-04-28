@@ -157,10 +157,16 @@ func buildOnCondition(onRaw interface{}) (map[string]interface{}, error) {
 		return nil, fmt.Errorf("`on` must be a map, got %T", onRaw)
 	}
 	if len(on) == 0 {
-		return nil, fmt.Errorf("`on` must have exactly one entity-type key (got an empty map); valid keys: %v", validEntityTypeNames())
+		return nil, fmt.Errorf(
+			"`on` must have exactly one entity-type key (got an empty map); valid keys: %v",
+			validEntityTypeNames(),
+		)
 	}
 	if len(on) > 1 {
-		return nil, fmt.Errorf("`on` must have exactly one entity-type key (got %d); valid keys: %v", len(on), validEntityTypeNames())
+		return nil, fmt.Errorf(
+			"`on` must have exactly one entity-type key (got %d); valid keys: %v",
+			len(on), validEntityTypeNames(),
+		)
 	}
 	for entityType, identityRaw := range on {
 		pair, known := entityTypeToWire[entityType]
@@ -270,7 +276,10 @@ func permissionsWireToKind(node map[string]interface{}) (map[string]interface{},
 		// nested Conditions; if the Cloud API ever does, callers need a
 		// clear failure mode rather than a quiet collapse.
 		if _, alreadyHasOn := translated["on"]; alreadyHasOn {
-			return nil, fmt.Errorf("`PermissionDescriptorCondition` wraps another scoped descriptor; nested scoping is not supported by this provider")
+			return nil, fmt.Errorf(
+				"`PermissionDescriptorCondition` wraps another scoped descriptor; " +
+					"nested scoping is not supported by this provider",
+			)
 		}
 		translated["on"] = on
 		return translated, nil
@@ -293,7 +302,10 @@ func extractOn(condition map[string]interface{}) (map[string]interface{}, error)
 		return nil, fmt.Errorf("`condition.__type` must be a string, got %T", condTypeRaw)
 	}
 	if condType != "PermissionExpressionEqual" {
-		return nil, fmt.Errorf("unsupported condition shape %q (only `PermissionExpressionEqual` is exposed by this provider)", condType)
+		return nil, fmt.Errorf(
+			"unsupported condition shape %q (only `PermissionExpressionEqual` is exposed by this provider)",
+			condType,
+		)
 	}
 	leftRaw, ok := condition["left"]
 	if !ok {
@@ -315,7 +327,12 @@ func extractOn(condition map[string]interface{}) (map[string]interface{}, error)
 	rightType, _ := right["__type"].(string)
 	entityType, known := wireToEntityType[leftType+"|"+rightType]
 	if !known {
-		return nil, fmt.Errorf("mismatched `PermissionExpressionEqual` operands: left=%q right=%q (this provider only emits matched expression/literal pairs for environment, stack, or insightsAccount)", leftType, rightType)
+		return nil, fmt.Errorf(
+			"mismatched `PermissionExpressionEqual` operands: left=%q right=%q "+
+				"(this provider only emits matched expression/literal pairs for "+
+				"environment, stack, or insightsAccount)",
+			leftType, rightType,
+		)
 	}
 	identityRaw, ok := right["identity"]
 	if !ok {
