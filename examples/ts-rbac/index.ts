@@ -66,9 +66,10 @@ const scopedEnv = new service.Environment("scopedEnv", {
 // nothing. The role definition is org-scoped (resourceType defaults to
 // "global"); the permission tree is gated on the environment's UUID.
 //
-// `buildEnvironmentScopedPermissions` builds the underlying
-// group → condition → literalEnvironment tree
-// so we don't have to.
+// `buildEnvironmentScopedPermissions` returns a `kind: "allow"` descriptor
+// scoped via `on: { environment: <uuid> }` — the provider expands that
+// into the full Pulumi Cloud permission tree internally, so we don't
+// hand-roll any of it.
 const scopedReadOnlyRole = new service.OrganizationRole("scopedReadOnlyRole", {
     organizationName,
     name: `ts-rbac-scoped-read-only-${nameSuffix}`,
