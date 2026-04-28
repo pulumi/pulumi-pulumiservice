@@ -16,7 +16,6 @@ package functions
 
 import (
 	"context"
-	"encoding/json"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -27,18 +26,18 @@ import (
 
 // assertScopedPermissionsShape verifies the outer envelope produced by every
 // scoped-permissions helper is a single-entry Group → Condition(Equal(left,
-// right)) → Allow(perms), and returns the literal sub-tree for caller-specific
-// assertions.
+// right)) → Allow(perms), expressed in the user-facing `kind` form. Returns
+// the literal sub-tree for caller-specific assertions.
 func assertScopedPermissionsShape(
 	t *testing.T,
 	got map[string]interface{},
-	expectedExpression, expectedLiteral string,
+	expectedExpressionKind, expectedLiteralKind string,
 	expectedIdentity string,
 	expectedPermissions []string,
 ) map[string]interface{} {
 	t.Helper()
 
-	assert.Equal(t, "PermissionDescriptorGroup", got["__type"])
+	assert.Equal(t, "descriptorGroup", got["kind"])
 
 	entries, ok := got["entries"].([]interface{})
 	require.True(t, ok, "entries should be []interface{}")
@@ -46,24 +45,24 @@ func assertScopedPermissionsShape(
 
 	condition, ok := entries[0].(map[string]interface{})
 	require.True(t, ok)
-	assert.Equal(t, "PermissionDescriptorCondition", condition["__type"])
+	assert.Equal(t, "descriptorCondition", condition["kind"])
 
 	cond, ok := condition["condition"].(map[string]interface{})
 	require.True(t, ok)
-	assert.Equal(t, "PermissionExpressionEqual", cond["__type"])
+	assert.Equal(t, "expressionEqual", cond["kind"])
 
 	left, ok := cond["left"].(map[string]interface{})
 	require.True(t, ok)
-	assert.Equal(t, expectedExpression, left["__type"])
+	assert.Equal(t, expectedExpressionKind, left["kind"])
 
 	right, ok := cond["right"].(map[string]interface{})
 	require.True(t, ok)
-	assert.Equal(t, expectedLiteral, right["__type"])
+	assert.Equal(t, expectedLiteralKind, right["kind"])
 	assert.Equal(t, expectedIdentity, right["identity"])
 
 	subNode, ok := condition["subNode"].(map[string]interface{})
 	require.True(t, ok)
-	assert.Equal(t, "PermissionDescriptorAllow", subNode["__type"])
+	assert.Equal(t, "descriptorAllow", subNode["kind"])
 
 	rawPerms, ok := subNode["permissions"].([]interface{})
 	require.True(t, ok)
@@ -74,33 +73,6 @@ func assertScopedPermissionsShape(
 	assert.Equal(t, expectedPermissions, gotPerms)
 
 	return right
-}
-
-func TestScopedPermissionsDescriptor_RoundTripsThroughJSON(t *testing.T) {
-	t.Parallel()
-
-	d := scopedPermissionsDescriptor(
-		"PermissionExpressionEnvironment",
-		"PermissionLiteralExpressionEnvironment",
-		"env-uuid-1",
-		[]string{"environment:read"},
-	)
-
-	// Producing the descriptor via map[string]interface{} is only useful if it
-	// survives a round-trip through json.Marshal — that's how the role
-	// resource ships it to the service.
-	raw, err := json.Marshal(d)
-	require.NoError(t, err)
-	parsed := map[string]interface{}{}
-	require.NoError(t, json.Unmarshal(raw, &parsed))
-
-	assertScopedPermissionsShape(
-		t, parsed,
-		"PermissionExpressionEnvironment",
-		"PermissionLiteralExpressionEnvironment",
-		"env-uuid-1",
-		[]string{"environment:read"},
-	)
 }
 
 func TestBuildEnvironmentScopedPermissions(t *testing.T) {
@@ -120,12 +92,11 @@ func TestBuildEnvironmentScopedPermissions(t *testing.T) {
 		require.NoError(t, err)
 		assertScopedPermissionsShape(
 			t, resp.Output.Permissions,
-			"PermissionExpressionEnvironment",
-			"PermissionLiteralExpressionEnvironment",
+			"expressionEnvironment",
+			"literalEnvironment",
 			"env-uuid-1",
 			[]string{"environment:read", "environment:open"},
 		)
-		assertPermissionsJSONMatches(t, resp.Output.PermissionsJson, resp.Output.Permissions)
 	})
 
 	t.Run("rejects empty environmentId", func(t *testing.T) {
@@ -155,19 +126,6 @@ func TestBuildEnvironmentScopedPermissions(t *testing.T) {
 	})
 }
 
-// assertPermissionsJSONMatches confirms that the helper's `permissionsJson`
-// output decodes back to the structured `permissions` Mapping. The JSON
-// sibling is the workaround Python users round-trip through `json.loads` to
-// dodge the SDK's `__`-prefix strip on invoke responses; if it ever drifts
-// from the structured form the workaround quietly stops being equivalent.
-func assertPermissionsJSONMatches(t *testing.T, gotJSON string, gotMap map[string]interface{}) {
-	t.Helper()
-	require.NotEmpty(t, gotJSON, "permissionsJson must be set")
-	var parsed map[string]interface{}
-	require.NoError(t, json.Unmarshal([]byte(gotJSON), &parsed))
-	assert.Equal(t, gotMap, parsed, "permissionsJson must decode to the same descriptor as permissions")
-}
-
 func TestBuildStackScopedPermissions(t *testing.T) {
 	t.Parallel()
 
@@ -185,12 +143,11 @@ func TestBuildStackScopedPermissions(t *testing.T) {
 		require.NoError(t, err)
 		assertScopedPermissionsShape(
 			t, resp.Output.Permissions,
-			"PermissionExpressionStack",
-			"PermissionLiteralExpressionStack",
+			"expressionStack",
+			"literalStack",
 			"stack-id-1",
 			[]string{"stack:read"},
 		)
-		assertPermissionsJSONMatches(t, resp.Output.PermissionsJson, resp.Output.Permissions)
 	})
 
 	t.Run("rejects empty stackId", func(t *testing.T) {
@@ -237,12 +194,11 @@ func TestBuildInsightsAccountScopedPermissions(t *testing.T) {
 		require.NoError(t, err)
 		assertScopedPermissionsShape(
 			t, resp.Output.Permissions,
-			"PermissionExpressionInsightsAccount",
-			"PermissionLiteralExpressionInsightsAccount",
+			"expressionInsightsAccount",
+			"literalInsightsAccount",
 			"acct-1",
 			[]string{"insights-account:read"},
 		)
-		assertPermissionsJSONMatches(t, resp.Output.PermissionsJson, resp.Output.Permissions)
 	})
 
 	t.Run("rejects empty insightsAccountId", func(t *testing.T) {
