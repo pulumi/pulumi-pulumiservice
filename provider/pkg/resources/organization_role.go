@@ -71,12 +71,16 @@ func (c *OrganizationRoleCore) Annotate(a infer.Annotator) {
 	)
 	a.Describe(
 		&c.Permissions,
-		"The role's permission descriptor tree — passed to the service verbatim. This is the `details` "+
-			"field of a Pulumi Cloud PermissionDescriptor: an object with a `__type` discriminator (e.g. "+
-			"`PermissionDescriptorAllow`, `PermissionDescriptorCompose`) describing which scopes are granted. "+
-			"For per-entity scoping, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, "+
-			"and `buildInsightsAccountScopedPermissions` helpers, which build the underlying "+
-			"`PermissionDescriptorGroup` / `PermissionDescriptorCondition` tree for you.",
+		"The role's permission descriptor tree. Each node carries a `kind` field that picks one of: "+
+			"`descriptorAllow` (`{kind, permissions: [\"stack:read\", ...]}`), "+
+			"`descriptorGroup` (`{kind, entries: [...]}`), or "+
+			"`descriptorCondition` (`{kind, condition, subNode}`). Conditions wrap an "+
+			"`expressionEqual` whose `left` is one of `expressionEnvironment` / `expressionStack` / "+
+			"`expressionInsightsAccount` and whose `right` is the matching "+
+			"`literalEnvironment` / `literalStack` / `literalInsightsAccount` carrying an `identity`. "+
+			"For per-entity scoping, prefer the `buildEnvironmentScopedPermissions`, "+
+			"`buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, "+
+			"which build the underlying group/condition tree for you.",
 	)
 }
 
@@ -112,11 +116,20 @@ func (*OrganizationRole) Check(
 	if !isUnknownInput(req.NewInputs, "name") && in.Name == "" {
 		failures = append(failures, p.CheckFailure{Property: "name", Reason: "name must not be empty"})
 	}
-	if !isUnknownInput(req.NewInputs, "permissions") && len(in.Permissions) == 0 {
-		failures = append(failures, p.CheckFailure{
-			Property: "permissions",
-			Reason:   "permissions must not be empty — supply a PermissionDescriptor tree",
-		})
+	if !isUnknownInput(req.NewInputs, "permissions") {
+		if len(in.Permissions) == 0 {
+			failures = append(failures, p.CheckFailure{
+				Property: "permissions",
+				Reason:   "permissions must not be empty — supply a PermissionDescriptor tree",
+			})
+		} else if _, err := permissionsKindToWire(in.Permissions); err != nil {
+			// Validate the descriptor tree up front so users see a
+			// clear error at preview, not a 400 from the API at apply.
+			failures = append(failures, p.CheckFailure{
+				Property: "permissions",
+				Reason:   err.Error(),
+			})
+		}
 	}
 	return infer.CheckResponse[OrganizationRoleInput]{Inputs: in, Failures: failures}, nil
 }
@@ -142,7 +155,14 @@ func (*OrganizationRole) Create(
 		}, nil
 	}
 
-	details, err := json.Marshal(req.Inputs.Permissions)
+	wire, err := permissionsKindToWire(req.Inputs.Permissions)
+	if err != nil {
+		return infer.CreateResponse[OrganizationRoleState]{}, fmt.Errorf(
+			"invalid permissions: %w",
+			err,
+		)
+	}
+	details, err := json.Marshal(wire)
 	if err != nil {
 		return infer.CreateResponse[OrganizationRoleState]{}, fmt.Errorf(
 			"failed to marshal permissions: %w",
@@ -187,7 +207,14 @@ func (*OrganizationRole) Update(
 		}, nil
 	}
 
-	details, err := json.Marshal(core.Permissions)
+	wire, err := permissionsKindToWire(core.Permissions)
+	if err != nil {
+		return infer.UpdateResponse[OrganizationRoleState]{}, fmt.Errorf(
+			"invalid permissions: %w",
+			err,
+		)
+	}
+	details, err := json.Marshal(wire)
 	if err != nil {
 		return infer.UpdateResponse[OrganizationRoleState]{}, fmt.Errorf(
 			"failed to marshal permissions: %w",
@@ -285,9 +312,13 @@ func orgRoleCoreFromAPI(
 		core.ResourceType = util.OrNil(role.ResourceType)
 	}
 	if len(role.Details) > 0 {
-		parsed := map[string]interface{}{}
-		if err := json.Unmarshal(role.Details, &parsed); err != nil {
+		wire := map[string]interface{}{}
+		if err := json.Unmarshal(role.Details, &wire); err != nil {
 			return OrganizationRoleCore{}, fmt.Errorf("parsing role details for %q: %w", role.ID, err)
+		}
+		parsed, err := permissionsWireToKind(wire)
+		if err != nil {
+			return OrganizationRoleCore{}, fmt.Errorf("translating role details for %q: %w", role.ID, err)
 		}
 		core.Permissions = parsed
 	}
