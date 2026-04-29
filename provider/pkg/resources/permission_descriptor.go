@@ -106,6 +106,17 @@ func renameKey(node interface{}, from, to string) interface{} {
 	}
 }
 
+// isWireTypeName is a sanity check for pass-through kind values: we accept
+// any non-empty string starting with "Permission". This catches typos
+// (e.g. `kind: "deny"`) before the wire round-trip without us having to
+// enumerate every valid PermissionDescriptor* / PermissionExpression* /
+// PermissionLiteralExpression* type name. Cloud rejects unknown wire
+// types with its own error on Create/Update.
+func isWireTypeName(s string) bool {
+	const prefix = "Permission"
+	return len(s) > len(prefix) && s[:len(prefix)] == prefix
+}
+
 // permissionsKindToWire converts a user-facing PermissionDescriptor tree
 // (kind-shaped) to the Pulumi Cloud REST API's wire shape. The user-facing
 // shape has just two kinds (`allow`, `group`), each optionally carrying an
@@ -166,7 +177,27 @@ func permissionsKindToWire(node map[string]interface{}) (map[string]interface{},
 			"entries": translatedEntries,
 		}
 	default:
-		return nil, fmt.Errorf("unknown permissions descriptor kind %q (valid: `allow`, `group`)", kind)
+		// Pass-through: PascalCase wire-type names flow through with a
+		// blind kind → __type rename. The SDK does not interpret the
+		// node's other fields; Cloud validates the structure on
+		// Create/Update.
+		if !isWireTypeName(kind) {
+			return nil, fmt.Errorf(
+				"unknown permissions descriptor kind %q "+
+					"(valid: `allow`, `group`, or a PascalCase `Permission*` wire type name)",
+				kind,
+			)
+		}
+		// Pass-through nodes do not support the `on:` modifier — that
+		// sugar only wraps structured allow/group descriptors.
+		if _, hasOn := node["on"]; hasOn {
+			return nil, fmt.Errorf(
+				"`on:` modifier is only valid on `kind: allow` and `kind: group`; "+
+					"got `on:` on pass-through kind %q",
+				kind,
+			)
+		}
+		return renameKey(node, "kind", "__type").(map[string]interface{}), nil
 	}
 
 	// If `on:` is set, wrap the inner descriptor in a Condition.

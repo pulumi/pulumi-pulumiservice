@@ -628,6 +628,14 @@ func TestPermissionsKindToWire(t *testing.T) {
 		{"scopedGroup", scopedGroupKind(), scopedGroupWire()},
 		{"mixedGroup", mixedGroupKind(), mixedGroupWire()},
 		{"teamScopedAllow", teamScopedAllowKind(), teamScopedAllowWire()},
+		{"bareCompose", bareComposeKind(), bareComposeWire()},
+		{"ifThenElseDeeplyNested", ifThenElseDeeplyNestedKind(), ifThenElseDeeplyNestedWire()},
+		{"selectMixedLiteralTypes", selectMixedLiteralTypesKind(), selectMixedLiteralTypesWire()},
+		{"composeInsideGroup", composeInsideGroupKind(), composeInsideGroupWire()},
+		{"conditionAndOfEquals", conditionAndOfEqualsKind(), conditionAndOfEqualsWire()},
+		{"conditionMismatchedOperands", conditionMismatchedOperandsKind(), conditionMismatchedOperandsWire()},
+		{"conditionWrappingCompose", conditionWrappingComposeKind(), conditionWrappingComposeWire()},
+		{"conditionWrappingCondition", conditionWrappingConditionKind(), conditionWrappingConditionWire()},
 	}
 	for _, tc := range cases {
 		tc := tc
@@ -750,6 +758,14 @@ func TestPermissionsKindWireRoundTrip(t *testing.T) {
 		{"scopedGroup", scopedGroupKind()},
 		{"mixedGroup", mixedGroupKind()},
 		{"teamScopedAllow", teamScopedAllowKind()},
+		{"bareCompose", bareComposeKind()},
+		{"ifThenElseDeeplyNested", ifThenElseDeeplyNestedKind()},
+		{"selectMixedLiteralTypes", selectMixedLiteralTypesKind()},
+		{"composeInsideGroup", composeInsideGroupKind()},
+		{"conditionAndOfEquals", conditionAndOfEqualsKind()},
+		{"conditionMismatchedOperands", conditionMismatchedOperandsKind()},
+		{"conditionWrappingCompose", conditionWrappingComposeKind()},
+		{"conditionWrappingCondition", conditionWrappingConditionKind()},
 	}
 	for _, tc := range cases {
 		tc := tc
@@ -779,6 +795,14 @@ func TestPermissionsWireKindRoundTrip(t *testing.T) {
 		{"scopedGroup", scopedGroupWire()},
 		{"mixedGroup", mixedGroupWire()},
 		{"teamScopedAllow", teamScopedAllowWire()},
+		{"bareCompose", bareComposeWire()},
+		{"ifThenElseDeeplyNested", ifThenElseDeeplyNestedWire()},
+		{"selectMixedLiteralTypes", selectMixedLiteralTypesWire()},
+		{"composeInsideGroup", composeInsideGroupWire()},
+		{"conditionAndOfEquals", conditionAndOfEqualsWire()},
+		{"conditionMismatchedOperands", conditionMismatchedOperandsWire()},
+		{"conditionWrappingCompose", conditionWrappingComposeWire()},
+		{"conditionWrappingCondition", conditionWrappingConditionWire()},
 	}
 	for _, tc := range cases {
 		tc := tc
@@ -899,6 +923,15 @@ func TestPermissionsKindToWire_Errors(t *testing.T) {
 				},
 			},
 			wantErrFrag: "bogus",
+		},
+		{
+			name: "on: on pass-through kind",
+			in: map[string]interface{}{
+				"kind":                  "PermissionDescriptorCompose",
+				"on":                    map[string]interface{}{"environment": "e"},
+				"permissionDescriptors": []interface{}{"role-1"},
+			},
+			wantErrFrag: "on:",
 		},
 	}
 	for _, tc := range cases {
