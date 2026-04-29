@@ -62,14 +62,18 @@ team_members = current_user.username.apply(
     )
 )
 
-# 3. Custom org role that grants stack:read.
+# 3. Custom org role that grants stack:read. The simplest descriptor: a
+#    flat ``PermissionDescriptorAllow``. The SDK uses the same PascalCase
+#    ``kind`` values as Pulumi Cloud's REST API (``__type`` in the wire
+#    format is renamed to ``kind`` to dodge Python's underscore-prefix
+#    stripping — see pulumi/pulumi#22738).
 custom_role = OrganizationRole(
     "rbacRole",
     organization_name=organization_name,
     name=f"py-rbac-read-only-{digits}",
     description="Read-only access to stacks, created by the py-rbac example.",
     permissions={
-        "kind": "allow",
+        "kind": "PermissionDescriptorAllow",
         "permissions": ["stack:read"],
     },
 )
@@ -125,9 +129,10 @@ scoped_env = Environment(
 # 8. A role that grants environment:read + environment:open ONLY on the
 #    env created above. Anywhere else in the org the role grants nothing.
 #    The role definition is org-scoped (resourceType defaults to "global");
-#    the helper returns a `kind: "allow"` descriptor with an
-#    `on: { environment: <uuid> }` modifier — the provider expands that
-#    into the full Pulumi Cloud permission tree at apply time.
+#    the helper returns a ``PermissionDescriptorCondition(Equal(...),
+#    Allow)`` tree — the same wire shape Pulumi Cloud's REST API uses,
+#    modulo the ``__type`` → ``kind`` rename. The provider has no
+#    SDK-side translation; it sends the descriptor on the wire verbatim.
 scoped_role = OrganizationRole(
     "scopedReadOnlyRole",
     organization_name=organization_name,
@@ -141,3 +146,22 @@ scoped_role = OrganizationRole(
 
 pulumi.export("scopedEnvironmentId", scoped_env.environment_id)
 pulumi.export("scopedRoleId", scoped_role.role_id)
+
+# 9. Webflow import repro: a ``PermissionDescriptorCompose`` role
+#    referencing the read-only role above. Compose roles are authored in
+#    the Pulumi Cloud UI; before the blind-rename translator, importing
+#    one into PSP surfaced "unknown __type PermissionDescriptorCompose".
+#    The translator now passes every variant through verbatim — Compose,
+#    IfThenElse, Select, And/Or/Not, and any future Cloud addition.
+composed_role = OrganizationRole(
+    "composedRole",
+    organization_name=organization_name,
+    name=f"py-rbac-composed-{digits}",
+    description="Composed role exercising PermissionDescriptorCompose pass-through.",
+    permissions=custom_role.role_id.apply(lambda role_id: {
+        "kind": "PermissionDescriptorCompose",
+        "permissionDescriptors": [role_id],
+    }),
+)
+
+pulumi.export("composedRoleId", composed_role.role_id)

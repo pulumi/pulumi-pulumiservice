@@ -1,6 +1,6 @@
 name: yaml-rbac
 runtime: yaml
-description: Exercises the RBAC resources and data sources.
+description: Exercises the RBAC resources, data sources, and scoped-permission helpers.
 
 config:
   organizationName:
@@ -11,6 +11,7 @@ config:
 
 resources:
   # A custom organization-level role that grants stack read access.
+  # The simplest descriptor: a flat `PermissionDescriptorAllow`.
   readOnlyRole:
     type: pulumiservice:OrganizationRole
     properties:
@@ -18,7 +19,7 @@ resources:
       name: yaml-rbac-read-only-${digits}
       description: Read-only access to stacks, created by the yaml-rbac example.
       permissions:
-        kind: allow
+        kind: PermissionDescriptorAllow
         permissions:
           - stack:read
 
@@ -73,22 +74,35 @@ resources:
 
   # A role that ONLY grants `environment:read` and `environment:open` on
   # the specific env created above — anywhere else in the org, the role
-  # grants nothing. The role definition is org-scoped (resourceType
-  # defaults to `global`); the `on:` modifier scopes the Allow to a
-  # single environment by UUID.
+  # grants nothing. Built via `buildEnvironmentScopedPermissions`, which
+  # returns the Pulumi Cloud `PermissionDescriptorCondition(Equal, Allow)`
+  # tree gating the grant on the environment's UUID.
   scopedReadOnlyRole:
     type: pulumiservice:OrganizationRole
     properties:
       organizationName: ${organizationName}
       name: yaml-rbac-scoped-read-only-${digits}
       description: Read+open access scoped to a single ESC environment.
+      permissions: ${scopedPermissions.permissions}
+
+  # Webflow import repro: a `PermissionDescriptorCompose` role that
+  # references the read-only role above. Compose roles are authored in
+  # the Pulumi Cloud UI; before the blind-rename translator they could
+  # not be imported into PSP because the provider didn't recognise the
+  # `__type` value. Now they pass through verbatim.
+  composedRole:
+    type: pulumiservice:OrganizationRole
+    properties:
+      organizationName: ${organizationName}
+      name: yaml-rbac-composed-${digits}
+      description: |
+        A role that composes the read-only role's grants. Demonstrates
+        the pass-through grammar — PSP has no PermissionDescriptorCompose-
+        specific code; the wire shape round-trips unchanged.
       permissions:
-        kind: allow
-        on:
-          environment: ${scopedEnv.environmentId}
-        permissions:
-          - environment:read
-          - environment:open
+        kind: PermissionDescriptorCompose
+        permissionDescriptors:
+          - ${readOnlyRole.roleId}
 
 variables:
   # Data source: the authenticated Pulumi Cloud user (the stack's operator).
@@ -109,6 +123,18 @@ variables:
       function: pulumiservice:getOrganizationRoleScopes
       arguments:
         organizationName: ${organizationName}
+  # Data source: build the scoped-permission descriptor used by
+  # scopedReadOnlyRole. The helper returns the wire-shape Condition tree
+  # gating an Allow on the named environment; assigning to
+  # `OrganizationRole.permissions` works without any extra translation.
+  scopedPermissions:
+    fn::invoke:
+      function: pulumiservice:buildEnvironmentScopedPermissions
+      arguments:
+        environmentId: ${scopedEnv.environmentId}
+        permissions:
+          - environment:read
+          - environment:open
 
 outputs:
   roleId: ${readOnlyRole.roleId}
@@ -122,3 +148,5 @@ outputs:
   # the role's permission tree, so the test can verify both pieces line up.
   scopedEnvironmentId: ${scopedEnv.environmentId}
   scopedRoleId: ${scopedReadOnlyRole.roleId}
+  # Webflow Compose-import repro.
+  composedRoleId: ${composedRole.roleId}

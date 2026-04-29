@@ -6,13 +6,17 @@ const organizationName = config.require("organizationName");
 const targetUsername = config.require("targetUsername");
 const nameSuffix = config.get("nameSuffix") ?? "manual";
 
-// A custom organization-level role that grants stack read access.
+// A custom organization-level role that grants stack read access. The
+// simplest descriptor: a flat `PermissionDescriptorAllow`. The SDK uses
+// the same PascalCase `kind` values as Pulumi Cloud's REST API (`__type`
+// in the wire format is renamed to `kind` to dodge Python's underscore-
+// prefix stripping).
 const readOnlyRole = new service.OrganizationRole("readOnlyRole", {
     organizationName,
     name: `ts-rbac-read-only-${nameSuffix}`,
     description: "Read-only access to stacks, created by the ts-rbac example.",
     permissions: {
-        kind: "allow",
+        kind: "PermissionDescriptorAllow",
         permissions: ["stack:read"],
     },
 });
@@ -66,10 +70,11 @@ const scopedEnv = new service.Environment("scopedEnv", {
 // nothing. The role definition is org-scoped (resourceType defaults to
 // "global"); the permission tree is gated on the environment's UUID.
 //
-// `buildEnvironmentScopedPermissions` returns a `kind: "allow"` descriptor
-// scoped via `on: { environment: <uuid> }` — the provider expands that
-// into the full Pulumi Cloud permission tree internally, so we don't
-// hand-roll any of it.
+// `buildEnvironmentScopedPermissions` returns a
+// `PermissionDescriptorCondition(Equal(...), Allow)` tree — the same wire
+// shape Pulumi Cloud's REST API uses, modulo the `__type` → `kind` rename.
+// The provider has no SDK-side translation; it sends the descriptor on
+// the wire verbatim.
 const scopedReadOnlyRole = new service.OrganizationRole("scopedReadOnlyRole", {
     organizationName,
     name: `ts-rbac-scoped-read-only-${nameSuffix}`,
@@ -81,6 +86,24 @@ const scopedReadOnlyRole = new service.OrganizationRole("scopedReadOnlyRole", {
         environmentId: scopedEnv.environmentId.apply(id => id!),
         permissions: ["environment:read", "environment:open"],
     }).permissions,
+});
+
+// Webflow import repro: a `PermissionDescriptorCompose` role referencing
+// the read-only role above. Compose roles are authored in the Pulumi
+// Cloud UI; before the blind-rename translator, importing one into PSP
+// surfaced "unknown __type PermissionDescriptorCompose" because the
+// provider had a hard-coded allowlist of descriptor variants. Under the
+// new design every variant passes through verbatim — Compose, IfThenElse,
+// Select, And/Or/Not, and any future Cloud addition — so the import case
+// just works. This resource exercises that round-trip end to end.
+const composedRole = new service.OrganizationRole("composedRole", {
+    organizationName,
+    name: `ts-rbac-composed-${nameSuffix}`,
+    description: "Composed role exercising PermissionDescriptorCompose pass-through.",
+    permissions: readOnlyRole.roleId.apply(id => ({
+        kind: "PermissionDescriptorCompose",
+        permissionDescriptors: [id],
+    })),
 });
 
 // Data source: list every member of the organization.
@@ -107,3 +130,5 @@ export const lookedUpByUsernameRole = memberByUsername.role;
 // Env-scoped role wiring outputs.
 export const scopedEnvironmentId = scopedEnv.environmentId;
 export const scopedRoleId = scopedReadOnlyRole.roleId;
+// Webflow Compose-import repro.
+export const composedRoleId = composedRole.roleId;
