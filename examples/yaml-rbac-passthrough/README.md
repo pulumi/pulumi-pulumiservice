@@ -1,7 +1,10 @@
 # YAML RBAC pass-through example
 
-Demonstrates the pass-through grammar for `OrganizationRole.permissions` by
-composing two simple roles into a third using `kind: PermissionDescriptorCompose`.
+Demonstrates the pass-through grammar for `OrganizationRole.permissions` with three role shapes:
+
+1. **`kind: PermissionDescriptorCompose`** — composing two base roles into a third (the customer's UI-import case).
+2. **`on: { team: <id> }`** — the new `team` entity-type sugar on a structured `kind: allow` role.
+3. **`kind: PermissionDescriptorCondition` with `And(Equal, Equal)`** — a non-collapsible boolean expressed via the pass-through grammar.
 
 To run:
 
