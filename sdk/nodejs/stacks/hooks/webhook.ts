@@ -46,7 +46,7 @@ export class Webhook extends pulumi.CustomResource {
     /**
      * Environment the webhook belongs to (ESC-scoped webhooks only).
      */
-    declare public readonly environmentName: pulumi.Output<string>;
+    declare public readonly environmentName: pulumi.Output<string | undefined>;
     /**
      * Event filter strings restricting which events trigger the webhook.
      */
@@ -62,11 +62,11 @@ export class Webhook extends pulumi.CustomResource {
     /**
      * Webhook name, assigned by the server.
      */
-    declare public /*out*/ readonly name: pulumi.Output<string | undefined>;
+    declare public /*out*/ readonly name: pulumi.Output<string>;
     /**
      * Organization that owns the webhook.
      */
-    declare public readonly organizationName: pulumi.Output<string>;
+    declare public readonly organizationName: pulumi.Output<string | undefined>;
     /**
      * URL the webhook POSTs to.
      */
@@ -74,7 +74,7 @@ export class Webhook extends pulumi.CustomResource {
     /**
      * Project the webhook belongs to (stack- or ESC-scoped webhooks only).
      */
-    declare public readonly projectName: pulumi.Output<string>;
+    declare public readonly projectName: pulumi.Output<string | undefined>;
     /**
      * Shared secret used to sign webhook payloads (HMAC-SHA256).
      */
@@ -82,7 +82,7 @@ export class Webhook extends pulumi.CustomResource {
     /**
      * Stack the webhook belongs to (stack-scoped webhooks only).
      */
-    declare public readonly stackName: pulumi.Output<string>;
+    declare public readonly stackName: pulumi.Output<string | undefined>;
 
     /**
      * Create a Webhook resource with the given unique name, arguments, and options.

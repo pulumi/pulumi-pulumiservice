@@ -13,7 +13,15 @@ var _ = internal.GetEnvOrDefault
 
 // Access Token to authenticate with Pulumi Cloud.
 func GetAccessToken(ctx *pulumi.Context) string {
-	return config.Get(ctx, "pulumiservice:accessToken")
+	v, err := config.Try(ctx, "pulumiservice:accessToken")
+	if err == nil {
+		return v
+	}
+	var value string
+	if d := internal.GetEnvOrDefault(nil, nil, "PULUMI_ACCESS_TOKEN"); d != nil {
+		value = d.(string)
+	}
+	return value
 }
 
 // Optional override of Pulumi Cloud API endpoint.

@@ -13,18 +13,37 @@ package gen
 import (
 	"encoding/json"
 	"fmt"
+	"os"
+
+	"gopkg.in/yaml.v2"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/runtime"
-	"gopkg.in/yaml.v2"
 )
 
-// EmitMetadata produces the runtime metadata JSON.
+// EmitMetadata produces the runtime metadata JSON. Reads the spec +
+// resource-map from disk; for byte-based input (e.g. embedded copies),
+// see EmitMetadataFromBytes.
 func EmitMetadata(specPath, mapPath string) ([]byte, error) {
-	spec, err := LoadSpec(specPath)
+	specBytes, err := os.ReadFile(specPath)
+	if err != nil {
+		return nil, fmt.Errorf("reading spec %s: %w", specPath, err)
+	}
+	mapBytes, err := os.ReadFile(mapPath)
+	if err != nil {
+		return nil, fmt.Errorf("reading resource-map %s: %w", mapPath, err)
+	}
+	return EmitMetadataFromBytes(specBytes, mapBytes)
+}
+
+// EmitMetadataFromBytes is the path-free form of EmitMetadata — the
+// runtime calls it with bytes from the embedded copies of the spec and
+// map.
+func EmitMetadataFromBytes(specBytes, mapBytes []byte) ([]byte, error) {
+	spec, err := LoadSpecFromBytes(specBytes)
 	if err != nil {
 		return nil, err
 	}
-	rm, err := LoadResourceMap(mapPath)
+	rm, err := LoadResourceMapFromBytes(mapBytes)
 	if err != nil {
 		return nil, err
 	}
@@ -128,6 +147,8 @@ func buildRuntimeResource(token, modName string, res Resource, spec *Spec) (runt
 			Source:           p.Source,
 			CreateSource:     p.CreateSource,
 			CreateFrom:       p.CreateFrom,
+			PathName:         p.PathName,
+			BodyFrom:         p.BodyFrom,
 			Secret:           p.Secret,
 			Output:           p.Output,
 			WriteOnly:        p.WriteOnly,
@@ -174,9 +195,23 @@ func buildOperations(res *runtime.CloudAPIResource, ops yaml.MapSlice, spec *Spe
 			if op := buildOp(kv.Value, spec); op != nil {
 				res.Create = op
 				hasCanonicalCreate = true
-			} else if hasPolymorphicCreate(kv.Value) {
-				// Handled in the scopes branch; we still consider the
-				// resource to have a create operation.
+			} else if pm := extractPolymorphicCreate(kv.Value, spec); len(pm) > 0 {
+				// Per-verb polymorphic create (Team-style: pulumi vs.
+				// github discriminator). Materialize a PolymorphicScopes
+				// entry per variant; the shared verbs (read/update/
+				// delete) get fanned in below once we've finished the
+				// pass.
+				if res.PolymorphicScopes == nil {
+					res.PolymorphicScopes = &runtime.PolymorphicScopes{
+						Discriminator: res.Discriminator,
+						Scopes:        map[string]runtime.CloudAPIResourceOps{},
+					}
+				}
+				for scope, op := range pm {
+					b := res.PolymorphicScopes.Scopes[scope]
+					b.Create = op
+					res.PolymorphicScopes.Scopes[scope] = b
+				}
 				hasCanonicalCreate = true
 			}
 		case "read":
@@ -236,6 +271,27 @@ func buildOperations(res *runtime.CloudAPIResource, ops yaml.MapSlice, spec *Spe
 			}
 		}
 	}
+
+	// Per-verb polymorphic resources (Team-style) end up with a
+	// PolymorphicScopes whose entries only have Create populated —
+	// the read/update/delete are shared across all variants and live
+	// at the top level. Fan those into each scope's bundle so the
+	// dispatcher can pick a complete CRUD set off the scope alone,
+	// without falling back to the resource fields.
+	if res.PolymorphicScopes != nil && res.Read != nil {
+		for scope, b := range res.PolymorphicScopes.Scopes {
+			if b.Read == nil {
+				b.Read = res.Read
+			}
+			if b.Update == nil {
+				b.Update = res.Update
+			}
+			if b.Delete == nil {
+				b.Delete = res.Delete
+			}
+			res.PolymorphicScopes.Scopes[scope] = b
+		}
+	}
 	return hasCanonicalCreate
 }
 
@@ -244,6 +300,7 @@ func buildOperations(res *runtime.CloudAPIResource, ops yaml.MapSlice, spec *Spe
 //   - A bare string operationId (most common).
 //   - A yaml.MapSlice with at least `operationId:` + optional modifiers
 //     like `bodyOverride:` (for tombstone-style deletes via update ops).
+//
 // Returns nil for TODO markers or operationIds missing from the spec.
 // Polymorphic `create:` blocks return nil here — the caller detects them
 // separately via hasPolymorphicCreate and builds PolymorphicScopes instead.
@@ -259,6 +316,7 @@ func buildOp(v interface{}, spec *Spec) *runtime.CloudAPIOperation {
 		rawBodyFrom := ""
 		rawBodyTo := ""
 		contentType := ""
+		bodyAs := ""
 		for _, kv := range x {
 			k, _ := kv.Key.(string)
 			switch k {
@@ -276,6 +334,8 @@ func buildOp(v interface{}, spec *Spec) *runtime.CloudAPIOperation {
 				rawBodyTo, _ = kv.Value.(string)
 			case "contentType":
 				contentType, _ = kv.Value.(string)
+			case "bodyAs":
+				bodyAs, _ = kv.Value.(string)
 			}
 		}
 		if opID == "" {
@@ -293,6 +353,7 @@ func buildOp(v interface{}, spec *Spec) *runtime.CloudAPIOperation {
 		base.RawBodyFrom = rawBodyFrom
 		base.RawBodyTo = rawBodyTo
 		base.ContentType = contentType
+		base.BodyAs = bodyAs
 		return base
 	}
 	return nil
@@ -354,12 +415,41 @@ func yamlToJSONValue(v interface{}) interface{} {
 	return v
 }
 
-// hasPolymorphicCreate returns true if a `create:` node is a discriminated
-// MapSlice (as in Team: create has pulumi/github variants). The caller
-// treats this as "create exists" without trying to resolve one operationId.
-func hasPolymorphicCreate(v interface{}) bool {
-	_, ok := v.(yaml.MapSlice)
-	return ok
+// extractPolymorphicCreate decodes the per-verb-polymorphic `create:`
+// shape (Team-style: `case: teamType` plus a sibling key per variant
+// pointing at its own operationId). Returns scope→operation. The
+// `case:` key itself is metadata and is skipped. Returns nil for any
+// other shape (flat operationId string, op-with-modifiers MapSlice).
+func extractPolymorphicCreate(v interface{}, spec *Spec) map[string]*runtime.CloudAPIOperation {
+	ms, ok := v.(yaml.MapSlice)
+	if !ok {
+		return nil
+	}
+	// Refuse the op-with-modifiers shape — that has an `operationId:`
+	// key which buildOp already handles.
+	for _, kv := range ms {
+		if k, _ := kv.Key.(string); k == "operationId" {
+			return nil
+		}
+	}
+	out := map[string]*runtime.CloudAPIOperation{}
+	for _, kv := range ms {
+		k, _ := kv.Key.(string)
+		if k == "case" {
+			continue
+		}
+		s, isStr := kv.Value.(string)
+		if !isStr {
+			continue
+		}
+		if op := buildOpFromID(s, spec); op != nil {
+			out[k] = op
+		}
+	}
+	if len(out) == 0 {
+		return nil
+	}
+	return out
 }
 
 func buildReadVia(v interface{}) *runtime.CloudAPIReadVia {

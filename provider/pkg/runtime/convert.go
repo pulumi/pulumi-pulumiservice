@@ -102,6 +102,7 @@ func InputsToRequest(props map[string]CloudAPIProperty, inputs resource.Property
 	return out, nil
 }
 
+
 // writeTo places a value into the appropriate destination based on the
 // property metadata's Source field.
 func (s *Split) writeTo(meta CloudAPIProperty, name string, value interface{}) {
@@ -112,9 +113,28 @@ func (s *Split) writeTo(meta CloudAPIProperty, name string, value interface{}) {
 	switch meta.Source {
 	case "path":
 		s.Path[wireName] = fmt.Sprintf("%v", value)
+	case "pathAndBody":
+		// Some endpoints — Webhook in particular — require the
+		// identity fields in BOTH the URL path and the request body
+		// (the API validates they agree). The path-side wire name
+		// comes from From; the body-side wire name comes from
+		// BodyFrom (or the SDK name when unset).
+		s.Path[wireName] = fmt.Sprintf("%v", value)
+		bodyName := meta.BodyFrom
+		if bodyName == "" {
+			bodyName = name
+		}
+		s.Body[bodyName] = value
 	case "query":
 		s.Query[wireName] = fmt.Sprintf("%v", value)
 	case "body", "":
+		// BodyFrom overrides the body-side wire name when the API
+		// uses different names for writes vs reads (LogExport:
+		// `newEnabled` body / `enabled` response).
+		if meta.BodyFrom != "" {
+			s.Body[meta.BodyFrom] = value
+			return
+		}
 		// Default to body when unspecified. Body is a nested object; we
 		// populate top-level keys only for now — nested flattening is
 		// handled once the schema emitter lands richer type info.
@@ -160,8 +180,10 @@ func ResponseToOutputs(props map[string]CloudAPIProperty, response map[string]in
 		}
 
 		// WriteOnly inputs aren't echoed; carry the input value forward so
-		// the state persists the user's intent.
-		if !present && (meta.WriteOnly || meta.Source == "path" || meta.Source == "query") {
+		// the state persists the user's intent. Also covers identity
+		// properties that aren't always echoed by the response (path,
+		// query, pathAndBody).
+		if !present && (meta.WriteOnly || meta.Source == "path" || meta.Source == "query" || meta.Source == "pathAndBody") {
 			if v, ok := originalInputs[resource.PropertyKey(name)]; ok && !v.IsNull() {
 				out[resource.PropertyKey(name)] = v
 				continue
@@ -275,6 +297,90 @@ func sortPropertyArray(arr resource.PropertyValue) resource.PropertyValue {
 		sorted = append(sorted, it.val)
 	}
 	return resource.NewArrayProperty(sorted)
+}
+
+// InferScopeFromInputs picks the polymorphic scope whose
+// user-settable identity properties are all satisfied by the given
+// inputs. Used for resources like Webhook where scope isn't a single
+// discriminator field but is implied by which identity properties
+// the user sets: `organizationName` alone → org scope, plus
+// `stackName` → stack scope, plus `environmentName` + `projectName`
+// → esc scope.
+//
+// Server-assigned (output-only) placeholders in the ID template are
+// ignored — they're not present at dispatch time. Picks the most
+// specific scope (most user-input placeholders) when multiple match.
+// Returns "" when no scope's user-input placeholders are all
+// present.
+func InferScopeFromInputs(res *CloudAPIResource, inputs resource.PropertyMap) string {
+	if res.PolymorphicScopes == nil || res.ID == nil || len(res.ID.Templates) == 0 {
+		return ""
+	}
+	bestScope := ""
+	bestSpecificity := -1
+	for scope, tmpl := range res.ID.Templates {
+		placeholders := extractPathPlaceholders(tmpl)
+		matched := true
+		userPresent := 0
+		for _, ph := range placeholders {
+			sdkName := sdkNameForPlaceholder(res.Properties, ph)
+			meta := res.Properties[sdkName]
+			// Output-only properties (server-assigned IDs/names) are
+			// not in inputs at dispatch time. They don't contribute
+			// to scope selection.
+			if meta.Output {
+				continue
+			}
+			v, ok := inputs[resource.PropertyKey(sdkName)]
+			if !ok || v.IsNull() {
+				matched = false
+				break
+			}
+			userPresent++
+		}
+		if matched && userPresent > bestSpecificity {
+			bestScope = scope
+			bestSpecificity = userPresent
+		}
+	}
+	return bestScope
+}
+
+// extractPathPlaceholders pulls the {name} segments from a path or
+// ID template. Returns the inner names without braces.
+func extractPathPlaceholders(template string) []string {
+	var out []string
+	for i := 0; i < len(template); i++ {
+		if template[i] != '{' {
+			continue
+		}
+		j := i + 1
+		for j < len(template) && template[j] != '}' {
+			j++
+		}
+		if j >= len(template) {
+			break
+		}
+		out = append(out, template[i+1:j])
+		i = j
+	}
+	return out
+}
+
+// sdkNameForPlaceholder maps a path/ID-template placeholder back to
+// the resource's SDK property name. Tries direct match first (the
+// common case where the placeholder is the SDK name), then walks the
+// property map looking for a `From` or `PathName` match.
+func sdkNameForPlaceholder(props map[string]CloudAPIProperty, placeholder string) string {
+	if _, ok := props[placeholder]; ok {
+		return placeholder
+	}
+	for name, p := range props {
+		if p.From == placeholder || p.PathName == placeholder {
+			return name
+		}
+	}
+	return placeholder
 }
 
 // SelectOperations resolves which CRUD operation set applies based on the

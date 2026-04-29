@@ -16,8 +16,10 @@ import (
 type AgentPool struct {
 	pulumi.CustomResourceState
 
-	AgentPoolId      pulumi.StringOutput    `pulumi:"agentPoolId"`
-	Description      pulumi.StringPtrOutput `pulumi:"description"`
+	AgentPoolId pulumi.StringOutput `pulumi:"agentPoolId"`
+	// User-provided description of the pool's purpose.
+	Description pulumi.StringPtrOutput `pulumi:"description"`
+	// Agent pool display name. The Create response only echoes id+tokenValue, so we preserve `name` from inputs.
 	Name             pulumi.StringPtrOutput `pulumi:"name"`
 	OrganizationName pulumi.StringOutput    `pulumi:"organizationName"`
 	TokenValue       pulumi.StringOutput    `pulumi:"tokenValue"`
@@ -70,14 +72,18 @@ func (AgentPoolState) ElementType() reflect.Type {
 }
 
 type agentPoolArgs struct {
-	Description      *string `pulumi:"description"`
+	// User-provided description of the pool's purpose.
+	Description *string `pulumi:"description"`
+	// Agent pool display name. The Create response only echoes id+tokenValue, so we preserve `name` from inputs.
 	Name             *string `pulumi:"name"`
 	OrganizationName string  `pulumi:"organizationName"`
 }
 
 // The set of arguments for constructing a AgentPool resource.
 type AgentPoolArgs struct {
-	Description      pulumi.StringPtrInput
+	// User-provided description of the pool's purpose.
+	Description pulumi.StringPtrInput
+	// Agent pool display name. The Create response only echoes id+tokenValue, so we preserve `name` from inputs.
 	Name             pulumi.StringPtrInput
 	OrganizationName pulumi.StringInput
 }
@@ -173,10 +179,12 @@ func (o AgentPoolOutput) AgentPoolId() pulumi.StringOutput {
 	return o.ApplyT(func(v *AgentPool) pulumi.StringOutput { return v.AgentPoolId }).(pulumi.StringOutput)
 }
 
+// User-provided description of the pool's purpose.
 func (o AgentPoolOutput) Description() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *AgentPool) pulumi.StringPtrOutput { return v.Description }).(pulumi.StringPtrOutput)
 }
 
+// Agent pool display name. The Create response only echoes id+tokenValue, so we preserve `name` from inputs.
 func (o AgentPoolOutput) Name() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *AgentPool) pulumi.StringPtrOutput { return v.Name }).(pulumi.StringPtrOutput)
 }

@@ -16,6 +16,13 @@ import (
 type PolicyGroup struct {
 	pulumi.CustomResourceState
 
+	// Optional agent pool ID for policy evaluation. Defaults to the Pulumi-hosted pool.
+	AgentPoolId pulumi.StringPtrOutput `pulumi:"agentPoolId"`
+	// The type of entities this policy group applies to. Defaults to `stacks`.
+	EntityType pulumi.StringPtrOutput `pulumi:"entityType"`
+	// Enforcement mode. Defaults to `audit` for account groups, `preventative` for stack groups.
+	Mode pulumi.StringPtrOutput `pulumi:"mode"`
+	// Policy group name. Unique within the organization.
 	Name             pulumi.StringOutput `pulumi:"name"`
 	OrganizationName pulumi.StringOutput `pulumi:"organizationName"`
 }
@@ -32,6 +39,9 @@ func NewPolicyGroup(ctx *pulumi.Context,
 	}
 	if args.OrganizationName == nil {
 		return nil, errors.New("invalid value for required argument 'OrganizationName'")
+	}
+	if args.EntityType == nil {
+		args.EntityType = pulumi.StringPtr("stacks")
 	}
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource PolicyGroup
@@ -66,12 +76,26 @@ func (PolicyGroupState) ElementType() reflect.Type {
 }
 
 type policyGroupArgs struct {
+	// Optional agent pool ID for policy evaluation. Defaults to the Pulumi-hosted pool.
+	AgentPoolId *string `pulumi:"agentPoolId"`
+	// The type of entities this policy group applies to. Defaults to `stacks`.
+	EntityType *string `pulumi:"entityType"`
+	// Enforcement mode. Defaults to `audit` for account groups, `preventative` for stack groups.
+	Mode *string `pulumi:"mode"`
+	// Policy group name. Unique within the organization.
 	Name             string `pulumi:"name"`
 	OrganizationName string `pulumi:"organizationName"`
 }
 
 // The set of arguments for constructing a PolicyGroup resource.
 type PolicyGroupArgs struct {
+	// Optional agent pool ID for policy evaluation. Defaults to the Pulumi-hosted pool.
+	AgentPoolId pulumi.StringPtrInput
+	// The type of entities this policy group applies to. Defaults to `stacks`.
+	EntityType pulumi.StringPtrInput
+	// Enforcement mode. Defaults to `audit` for account groups, `preventative` for stack groups.
+	Mode pulumi.StringPtrInput
+	// Policy group name. Unique within the organization.
 	Name             pulumi.StringInput
 	OrganizationName pulumi.StringInput
 }
@@ -163,6 +187,22 @@ func (o PolicyGroupOutput) ToPolicyGroupOutputWithContext(ctx context.Context) P
 	return o
 }
 
+// Optional agent pool ID for policy evaluation. Defaults to the Pulumi-hosted pool.
+func (o PolicyGroupOutput) AgentPoolId() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *PolicyGroup) pulumi.StringPtrOutput { return v.AgentPoolId }).(pulumi.StringPtrOutput)
+}
+
+// The type of entities this policy group applies to. Defaults to `stacks`.
+func (o PolicyGroupOutput) EntityType() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *PolicyGroup) pulumi.StringPtrOutput { return v.EntityType }).(pulumi.StringPtrOutput)
+}
+
+// Enforcement mode. Defaults to `audit` for account groups, `preventative` for stack groups.
+func (o PolicyGroupOutput) Mode() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *PolicyGroup) pulumi.StringPtrOutput { return v.Mode }).(pulumi.StringPtrOutput)
+}
+
+// Policy group name. Unique within the organization.
 func (o PolicyGroupOutput) Name() pulumi.StringOutput {
 	return o.ApplyT(func(v *PolicyGroup) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
 }

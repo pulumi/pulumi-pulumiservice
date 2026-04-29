@@ -1,43 +1,41 @@
 // Copyright 2016-2026, Pulumi Corporation.
 //
 // pulumi-resource-pulumiservice is the Pulumi Service Provider v2 binary.
-// It embeds the generated schema.json and metadata.json emitted by
-// pulumi-gen-pulumiservice and serves Pulumi's gRPC protocol by delegating
-// every CRUD call to runtime.Dispatcher. v2 has zero hand-coded resources;
-// every supported resource is expressed in provider/resource-map.yaml.
+// It is built directly from the OpenAPI spec and resource map embedded
+// at provider/pkg/embedded — `go build ./provider/cmd/pulumi-resource-pulumiservice`
+// produces a runnable provider with no separate code-generation step.
+//
+// The runtime is built on github.com/pulumi/pulumi-go-provider; CRUD
+// dispatch is metadata-driven (see provider/pkg/runtime). v2 has zero
+// hand-coded resources; every supported resource is expressed in
+// resource-map.yaml.
 
 package main
 
 import (
-	_ "embed"
+	"context"
 
-	"github.com/pulumi/pulumi/pkg/v3/resource/provider"
+	pgo "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/util/cmdutil"
-	rpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/embedded"
 	pspprov "github.com/pulumi/pulumi-pulumiservice/provider/pkg/provider"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/version"
 )
 
-// Embedded at build time from the generator's bin/ output. `make v2_gen`
-// must have run first.
-//
-//go:embed schema.json
-var schemaBytes []byte
+const providerName = "pulumiservice"
 
-//go:embed metadata.json
-var metadataBytes []byte
-
-var providerName = "pulumiservice"
-
-// Overridden via LDFLAGS at build time.
+// Overridden via LDFLAGS at build time. Package-local var rather than
+// re-exported so we keep the old build pipeline (LDFLAGS_PROJ_VERSION
+// targets provider/pkg/version.Version) wired through unchanged.
 var Version = version.Version
 
 func main() {
-	err := provider.Main(providerName, func(host *provider.HostClient) (rpc.ResourceProviderServer, error) {
-		return pspprov.New(providerName, Version, schemaBytes, metadataBytes)
-	})
+	prov, err := pspprov.New(embedded.Spec(), embedded.ResourceMap())
 	if err != nil {
+		cmdutil.ExitError(err.Error())
+	}
+	if err := pgo.RunProvider(context.Background(), providerName, Version, prov); err != nil {
 		cmdutil.ExitError(err.Error())
 	}
 }

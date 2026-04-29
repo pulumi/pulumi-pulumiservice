@@ -1,21 +1,29 @@
 name: pulumiservice-canonical-08-approval-change-gates
 runtime: yaml
-description: |
-  Gate production deployments behind a human approval. Any attempt to
-  `pulumi up` against the production stack creates a change request;
-  until a named approver (or team) clicks approve in the Pulumi Console,
-  the deployment stays pending.
-
-  The canonical pattern for regulated workloads (SOX, PCI, HIPAA) where
-  all production changes must be attested by a different person than the
-  change author.
+description: Production deployments gated behind a human approval. Canonical pattern for regulated workloads (SOX, PCI, HIPAA). See README.
 
 config:
   organizationName:
     type: string
     default: service-provider-test-org
+  digits:
+    type: string
+    default: "00000"
 
 resources:
+  # The ESC environment the gate protects. In practice this is the
+  # production secrets environment — every deployment that opens it
+  # creates a change request.
+  productionEnv:
+    type: pulumiservice:esc:Environment
+    properties:
+      organization: ${organizationName}
+      project: production-${digits}
+      name: default
+      yaml: |
+        values:
+          gate-target: placeholder
+
   # The team whose members can approve production changes. Per SOX, this
   # must be distinct from the team that authors them.
   approvers:
@@ -23,7 +31,7 @@ resources:
     properties:
       organizationName: ${organizationName}
       teamType: pulumi
-      name: change-approvers
+      name: change-approvers-${digits}
       displayName: Production Change Approvers
       description: |
         Can approve/reject production change requests. Must NOT overlap
@@ -39,20 +47,16 @@ resources:
       organizationName: ${organizationName}
       name: production-deploys
       enabled: true
-      # Which kinds of actions this gate covers (deployments + ESC writes).
-      targetActionTypes:
-        - deployment
-      # Which environment(s) the gate applies to. `environment` here is
-      # an ESC environment, not an AWS environment — it's the change-gate
-      # scope, not a stack filter.
-      environmentIdentifier:
-        organization: ${organizationName}
-        project: production
-        environment: default
-      # Who can approve and under what conditions.
-      approvalRuleConfig:
+      target:
+        entityType: environment
+        qualifiedName: ${productionEnv.project}/${productionEnv.name}
+        actionTypes:
+          - update
+      rule:
+        ruleType: approval_required
         numApprovalsRequired: 1
+        allowSelfApproval: false
+        requireReapprovalOnChange: true
         eligibleApprovers:
-          teams:
-            - ${approvers.name}
-        preventSelfApproval: true
+          - eligibilityType: team_member
+            teamName: ${approvers.name}

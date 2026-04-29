@@ -1,29 +1,40 @@
 name: pulumiservice-canonical-09-tag-based-routing
 runtime: yaml
-description: |
-  Stack tags + per-tag webhooks. Events from production stacks go to the
-  on-call PagerDuty service; events from dev stacks go to a quiet Slack
-  channel. The canonical pattern for not waking engineers up over dev
-  stack drift.
+description: Stack tags + per-tag webhooks routing prod alerts to PagerDuty and dev notifications to Slack. See README for the routing pattern.
 
 config:
   organizationName:
     type: string
     default: service-provider-test-org
-  project:
+  digits:
     type: string
-    default: infrastructure
-  stack:
-    type: string
-    default: production
+    default: "00000"
   pagerdutyUrl:
     type: string
-    secret: true
+    default: https://example.com/pagerduty-webhook-placeholder
   slackDevUrl:
     type: string
-    secret: true
+    default: https://example.com/slack-dev-webhook-placeholder
 
 resources:
+  # Register the prod and dev stacks so we have something to attach
+  # tags + webhooks to. (Real programs typically reference stacks
+  # created elsewhere; we create them inline so the example is
+  # self-contained.)
+  prodStack:
+    type: pulumiservice:stacks:Stack
+    properties:
+      organizationName: ${organizationName}
+      projectName: infrastructure-${digits}
+      stackName: production
+
+  devStack:
+    type: pulumiservice:stacks:Stack
+    properties:
+      organizationName: ${organizationName}
+      projectName: infrastructure-${digits}
+      stackName: dev
+
   # Batch tag set — one resource manages the whole map, and delete
   # iterates per tag key (exercises the iterateOver primitive). Tags
   # drive downstream routing: webhooks, policies, and change gates all
@@ -31,9 +42,9 @@ resources:
   stackTags:
     type: pulumiservice:stacks/tags:Tags
     properties:
-      organization: ${organizationName}
-      project: ${project}
-      stack: ${stack}
+      organization: ${prodStack.organizationName}
+      project: ${prodStack.projectName}
+      stack: ${prodStack.stackName}
       tags:
         environment: production
         criticality: tier-1
@@ -45,17 +56,12 @@ resources:
   productionAlerts:
     type: pulumiservice:stacks/hooks:Webhook
     properties:
-      organizationName: ${organizationName}
-      projectName: ${project}
-      stackName: ${stack}
-      displayName: pagerduty-prod
+      organizationName: ${prodStack.organizationName}
+      projectName: ${prodStack.projectName}
+      stackName: ${prodStack.stackName}
+      displayName: pagerduty-prod-${digits}
       payloadUrl: ${pagerdutyUrl}
-      secret: ${pagerdutyUrl}
       format: raw
-      filters:
-        - stack_update_failed
-        - stack_drift_detected
-        - deployment_failed
       active: true
 
   # Dev-tier webhook — same shape, different stack, different filter set.
@@ -64,14 +70,10 @@ resources:
   devNotifications:
     type: pulumiservice:stacks/hooks:Webhook
     properties:
-      organizationName: ${organizationName}
-      projectName: ${project}
-      stackName: dev      # different stack, same project
-      displayName: slack-dev
+      organizationName: ${devStack.organizationName}
+      projectName: ${devStack.projectName}
+      stackName: ${devStack.stackName}
+      displayName: slack-dev-${digits}
       payloadUrl: ${slackDevUrl}
-      secret: ${slackDevUrl}
-      format: slack
-      filters:
-        - stack_update_succeeded
-        - stack_update_failed
+      format: raw
       active: true

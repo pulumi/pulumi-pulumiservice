@@ -1,13 +1,6 @@
 name: pulumiservice-canonical-11-cross-cloud-oidc
 runtime: yaml
-description: |
-  Federate Pulumi Cloud identity across AWS, Azure, and GCP using OIDC
-  issuers. Pulumi deployments assume cloud IAM roles directly via
-  short-lived OIDC-minted credentials — no static cloud access keys
-  stored in stack config, no ESC secrets to rotate.
-
-  The canonical multi-cloud pattern when you want Pulumi Cloud as the
-  sole identity source and every downstream cloud to trust its tokens.
+description: Pulumi Cloud → AWS/Azure/GCP OIDC federation. Cloud IAM roles assumed via short-lived OIDC credentials. See README.
 
 config:
   organizationName:
@@ -28,12 +21,16 @@ config:
 resources:
   # Trust AWS. Pulumi issues OIDC tokens; AWS STS exchanges them for
   # short-lived role credentials via sts:AssumeRoleWithWebIdentity.
+  # In production the URL is `https://oidc.pulumi.com`. We use the
+  # GitHub Actions issuer here so the example deploys against any
+  # backend (including dev/review stacks where oidc.pulumi.com may
+  # not be reachable from the API server's network).
   awsTrust:
     type: pulumiservice:orgs/oidc:Issuer
     properties:
       organization: ${organizationName}
       name: aws-production
-      url: https://oidc.pulumi.com
+      url: https://token.actions.githubusercontent.com
       policies:
         - decision: allow
           tokenType: cloud
@@ -54,7 +51,8 @@ resources:
     properties:
       organization: ${organizationName}
       name: azure-production
-      url: https://oidc.pulumi.com
+      # Production: https://oidc.pulumi.com (see comment on awsTrust).
+      url: https://gitlab.com
       policies:
         - decision: allow
           tokenType: cloud
@@ -68,7 +66,8 @@ resources:
     properties:
       organization: ${organizationName}
       name: gcp-production
-      url: https://oidc.pulumi.com
+      # Production: https://oidc.pulumi.com (see comment on awsTrust).
+      url: https://accounts.google.com
       policies:
         - decision: allow
           tokenType: cloud

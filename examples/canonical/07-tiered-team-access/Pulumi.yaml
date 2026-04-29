@@ -1,10 +1,6 @@
 name: pulumiservice-canonical-07-tiered-team-access
 runtime: yaml
-description: |
-  Three teams, three permission tiers, two stacks. The canonical RBAC
-  shape for any team larger than "a few people all trust each other":
-  platform admins can do everything, service owners can deploy their
-  own stack, developers have read-only everywhere.
+description: Three teams, three permission tiers, two stacks — canonical RBAC for teams larger than "everyone trusts everyone." See README.
 
 config:
   organizationName:
@@ -23,6 +19,23 @@ variables:
   permAdmin: 103
 
 resources:
+  # ── Stacks (created here so the example deploys against a fresh
+  # org; in practice these stacks are typically created by other
+  # Pulumi programs and just referenced here) ─────────────────────────
+  platformStack:
+    type: pulumiservice:stacks:Stack
+    properties:
+      organizationName: ${organizationName}
+      projectName: platform-${digits}
+      stackName: prod
+
+  billingStack:
+    type: pulumiservice:stacks:Stack
+    properties:
+      organizationName: ${organizationName}
+      projectName: billing-service-${digits}
+      stackName: prod
+
   # ── Teams ────────────────────────────────────────────────────────────
   platformAdmins:
     type: pulumiservice:orgs/teams:Team
@@ -56,8 +69,8 @@ resources:
     type: pulumiservice:stacks/permissions:TeamStackPermission
     properties:
       organization: ${organizationName}
-      project: platform
-      stack: prod
+      project: ${platformStack.projectName}
+      stack: ${platformStack.stackName}
       team: ${platformAdmins.name}
       permission: ${permAdmin}
 
@@ -65,8 +78,8 @@ resources:
     type: pulumiservice:stacks/permissions:TeamStackPermission
     properties:
       organization: ${organizationName}
-      project: platform
-      stack: prod
+      project: ${platformStack.projectName}
+      stack: ${platformStack.stackName}
       team: ${developers.name}
       permission: ${permRead}
 
@@ -75,8 +88,8 @@ resources:
     type: pulumiservice:stacks/permissions:TeamStackPermission
     properties:
       organization: ${organizationName}
-      project: billing-service
-      stack: prod
+      project: ${billingStack.projectName}
+      stack: ${billingStack.stackName}
       team: ${platformAdmins.name}
       permission: ${permAdmin}
 
@@ -84,8 +97,8 @@ resources:
     type: pulumiservice:stacks/permissions:TeamStackPermission
     properties:
       organization: ${organizationName}
-      project: billing-service
-      stack: prod
+      project: ${billingStack.projectName}
+      stack: ${billingStack.stackName}
       team: ${billingOwners.name}
       permission: ${permEdit}    # deploy, not admin — admins change permissions
 
@@ -93,7 +106,7 @@ resources:
     type: pulumiservice:stacks/permissions:TeamStackPermission
     properties:
       organization: ${organizationName}
-      project: billing-service
-      stack: prod
+      project: ${billingStack.projectName}
+      stack: ${billingStack.stackName}
       team: ${developers.name}
       permission: ${permRead}

@@ -22,7 +22,7 @@ type Webhook struct {
 	// Human-readable display name for the webhook.
 	DisplayName pulumi.StringPtrOutput `pulumi:"displayName"`
 	// Environment the webhook belongs to (ESC-scoped webhooks only).
-	EnvironmentName pulumi.StringOutput `pulumi:"environmentName"`
+	EnvironmentName pulumi.StringPtrOutput `pulumi:"environmentName"`
 	// Event filter strings restricting which events trigger the webhook.
 	Filters pulumi.StringArrayOutput `pulumi:"filters"`
 	// Payload encoding — "raw" by default; other options shape the body for specific consumers.
@@ -30,17 +30,17 @@ type Webhook struct {
 	// Event group filters (stacks, deployments, environments).
 	Groups pulumi.StringArrayOutput `pulumi:"groups"`
 	// Webhook name, assigned by the server.
-	Name pulumi.StringPtrOutput `pulumi:"name"`
+	Name pulumi.StringOutput `pulumi:"name"`
 	// Organization that owns the webhook.
-	OrganizationName pulumi.StringOutput `pulumi:"organizationName"`
+	OrganizationName pulumi.StringPtrOutput `pulumi:"organizationName"`
 	// URL the webhook POSTs to.
 	PayloadUrl pulumi.StringPtrOutput `pulumi:"payloadUrl"`
 	// Project the webhook belongs to (stack- or ESC-scoped webhooks only).
-	ProjectName pulumi.StringOutput `pulumi:"projectName"`
+	ProjectName pulumi.StringPtrOutput `pulumi:"projectName"`
 	// Shared secret used to sign webhook payloads (HMAC-SHA256).
 	Secret pulumi.StringPtrOutput `pulumi:"secret"`
 	// Stack the webhook belongs to (stack-scoped webhooks only).
-	StackName pulumi.StringOutput `pulumi:"stackName"`
+	StackName pulumi.StringPtrOutput `pulumi:"stackName"`
 }
 
 // NewWebhook registers a new resource with the given unique name, arguments, and options.
@@ -253,8 +253,8 @@ func (o WebhookOutput) DisplayName() pulumi.StringPtrOutput {
 }
 
 // Environment the webhook belongs to (ESC-scoped webhooks only).
-func (o WebhookOutput) EnvironmentName() pulumi.StringOutput {
-	return o.ApplyT(func(v *Webhook) pulumi.StringOutput { return v.EnvironmentName }).(pulumi.StringOutput)
+func (o WebhookOutput) EnvironmentName() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *Webhook) pulumi.StringPtrOutput { return v.EnvironmentName }).(pulumi.StringPtrOutput)
 }
 
 // Event filter strings restricting which events trigger the webhook.
@@ -273,13 +273,13 @@ func (o WebhookOutput) Groups() pulumi.StringArrayOutput {
 }
 
 // Webhook name, assigned by the server.
-func (o WebhookOutput) Name() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *Webhook) pulumi.StringPtrOutput { return v.Name }).(pulumi.StringPtrOutput)
+func (o WebhookOutput) Name() pulumi.StringOutput {
+	return o.ApplyT(func(v *Webhook) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
 }
 
 // Organization that owns the webhook.
-func (o WebhookOutput) OrganizationName() pulumi.StringOutput {
-	return o.ApplyT(func(v *Webhook) pulumi.StringOutput { return v.OrganizationName }).(pulumi.StringOutput)
+func (o WebhookOutput) OrganizationName() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *Webhook) pulumi.StringPtrOutput { return v.OrganizationName }).(pulumi.StringPtrOutput)
 }
 
 // URL the webhook POSTs to.
@@ -288,8 +288,8 @@ func (o WebhookOutput) PayloadUrl() pulumi.StringPtrOutput {
 }
 
 // Project the webhook belongs to (stack- or ESC-scoped webhooks only).
-func (o WebhookOutput) ProjectName() pulumi.StringOutput {
-	return o.ApplyT(func(v *Webhook) pulumi.StringOutput { return v.ProjectName }).(pulumi.StringOutput)
+func (o WebhookOutput) ProjectName() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *Webhook) pulumi.StringPtrOutput { return v.ProjectName }).(pulumi.StringPtrOutput)
 }
 
 // Shared secret used to sign webhook payloads (HMAC-SHA256).
@@ -298,8 +298,8 @@ func (o WebhookOutput) Secret() pulumi.StringPtrOutput {
 }
 
 // Stack the webhook belongs to (stack-scoped webhooks only).
-func (o WebhookOutput) StackName() pulumi.StringOutput {
-	return o.ApplyT(func(v *Webhook) pulumi.StringOutput { return v.StackName }).(pulumi.StringOutput)
+func (o WebhookOutput) StackName() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *Webhook) pulumi.StringPtrOutput { return v.StackName }).(pulumi.StringPtrOutput)
 }
 
 type WebhookArrayOutput struct{ *pulumi.OutputState }

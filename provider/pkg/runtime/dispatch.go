@@ -49,6 +49,9 @@ func (d *Dispatcher) Create(ctx context.Context, token string, inputs resource.P
 	if err != nil {
 		return "", nil, fmt.Errorf("preparing inputs: %w", err)
 	}
+	if split.Scope == "" {
+		split.Scope = InferScopeFromInputs(&res, inputs)
+	}
 	ops, err := SelectOperations(&res, split.Scope)
 	if err != nil {
 		return "", nil, err
@@ -178,6 +181,16 @@ func (d *Dispatcher) Read(ctx context.Context, token, id string, priorInputs res
 	if err != nil {
 		return "", nil, fmt.Errorf("decomposing ID %q: %w", id, err)
 	}
+	// Per-verb polymorphic resources (Team-style: same ID format,
+	// different create endpoint by discriminator) end up with
+	// scope="" from the ID alone. Fall back to the discriminator
+	// value carried in priorInputs (preserved across Create + Read
+	// via writeOnly) so SelectOperations can pick the right bundle.
+	if scope == "" && res.Discriminator != "" {
+		if v, ok := priorInputs[resource.PropertyKey(res.Discriminator)]; ok && v.IsString() {
+			scope = v.StringValue()
+		}
+	}
 	ops, err := SelectOperations(&res, scope)
 	if err != nil {
 		return "", nil, err
@@ -269,6 +282,9 @@ func (d *Dispatcher) Update(ctx context.Context, token, id string, olds, news re
 	if err != nil {
 		return nil, err
 	}
+	if split.Scope == "" {
+		split.Scope = InferScopeFromInputs(&res, news)
+	}
 	ops, err := SelectOperations(&res, split.Scope)
 	if err != nil {
 		return nil, err
@@ -333,12 +349,18 @@ func (d *Dispatcher) Delete(ctx context.Context, token, id string, state resourc
 	if !ok {
 		return fmt.Errorf("no metadata for resource %q", token)
 	}
-	// Derive scope from state (discriminator is itself a property).
+	// Derive scope from state. For resources with an explicit
+	// discriminator field (Team's teamType) read it directly; for
+	// path-implied scopes (Webhook), infer from which identity
+	// fields are populated.
 	scope := ""
 	if res.Discriminator != "" {
 		if v, ok := state[resource.PropertyKey(res.Discriminator)]; ok && v.IsString() {
 			scope = v.StringValue()
 		}
+	}
+	if scope == "" {
+		scope = InferScopeFromInputs(&res, state)
 	}
 	ops, err := SelectOperations(&res, scope)
 	if err != nil {
@@ -430,6 +452,15 @@ func bodyFor(op *CloudAPIOperation, inputBody map[string]interface{}) interface{
 	if op != nil && op.BodyOverride != nil {
 		return op.BodyOverride
 	}
+	// BodyAs: the named property's value IS the body (no wrapping).
+	if op != nil && op.BodyAs != "" {
+		if v, ok := inputBody[op.BodyAs]; ok {
+			return v
+		}
+		// Property not present in inputBody — send empty object so the
+		// caller's JSON encoding produces `{}` rather than `null`.
+		return map[string]interface{}{}
+	}
 	return asBody(inputBody)
 }
 
@@ -454,36 +485,27 @@ func rawBodyFor(op *CloudAPIOperation, inputs resource.PropertyMap) []byte {
 }
 
 // readViaListFilter implements the list-and-filter fallback for resources
-// whose spec has no single-resource GET.
+// whose spec has no single-resource GET. The list operationId may be
+// declared as a Pulumi function (most are) or may live only inside
+// another resource's read slot — the lookup walks all of metadata.
 func (d *Dispatcher) readViaListFilter(ctx context.Context, res *CloudAPIResource, rv *CloudAPIReadVia, pathValues map[string]string, id string, priorInputs resource.PropertyMap) (string, resource.PropertyMap, error) {
-	// The list operation lives in Functions (all list ops are exposed as
-	// Pulumi functions too). We look it up by operationId to get its
-	// path template. No explicit resource-level tracking needed.
-	fn, ok := lookupFunctionByOperationID(d.Metadata.Functions, rv.OperationID)
+	op, ok := lookupOperationByID(d.Metadata, rv.OperationID)
 	if !ok {
-		return "", nil, fmt.Errorf("readVia operationId %q not found in metadata.functions", rv.OperationID)
+		return "", nil, fmt.Errorf("readVia operationId %q not found in metadata", rv.OperationID)
 	}
-	path, err := ExpandPath(fn.Operation.PathTemplate, pathValues)
+	path, err := ExpandPath(op.PathTemplate, pathValues)
 	if err != nil {
 		return "", nil, err
 	}
-	resp, err := d.Client.Call(ctx, Request{Method: fn.Operation.Method, Path: path})
+	resp, err := d.Client.Call(ctx, Request{Method: op.Method, Path: path})
 	if err != nil {
 		return "", nil, err
 	}
-	var listed struct {
-		Items []map[string]interface{} `json:"items"`
+	items, err := decodeListItems(resp.Body)
+	if err != nil {
+		return "", nil, err
 	}
-	if err := json.Unmarshal(resp.Body, &listed); err != nil {
-		// Some endpoints return a bare JSON array; tolerate that shape too.
-		var bare []map[string]interface{}
-		if err2 := json.Unmarshal(resp.Body, &bare); err2 != nil {
-			return "", nil, fmt.Errorf("decoding list response: %w", err)
-		}
-		listed.Items = bare
-	}
-	// Match id against the configured filter field.
-	for _, item := range listed.Items {
+	for _, item := range items {
 		if v, ok := item[rv.FilterBy]; ok && fmt.Sprintf("%v", v) == tailOfID(id) {
 			return id, ResponseToOutputs(res.Properties, item, priorInputs), nil
 		}
@@ -491,13 +513,36 @@ func (d *Dispatcher) readViaListFilter(ctx context.Context, res *CloudAPIResourc
 	return "", nil, nil // not found — Pulumi will treat as needs recreate
 }
 
-func lookupFunctionByOperationID(fns map[string]CloudAPIFunction, oid string) (CloudAPIFunction, bool) {
-	for _, fn := range fns {
-		if fn.Operation.OperationID == oid {
-			return fn, true
+// decodeListItems extracts the list of items from a Pulumi Cloud list
+// response. The API isn't consistent about its envelope — some
+// endpoints wrap in `{"items": [...]}`, others in `{"tokens": [...]}`,
+// `{"teams": [...]}`, `{"agentPools": [...]}`, etc. We accept any of:
+//   - a bare top-level JSON array
+//   - an object with exactly one array-valued field (the canonical Pulumi
+//     Cloud shape — the wrapper key is the resource type's plural name)
+//   - an object with an `items` field (a few endpoints standardize on this)
+func decodeListItems(body []byte) ([]map[string]interface{}, error) {
+	var bare []map[string]interface{}
+	if err := json.Unmarshal(body, &bare); err == nil {
+		return bare, nil
+	}
+	var obj map[string]json.RawMessage
+	if err := json.Unmarshal(body, &obj); err != nil {
+		return nil, fmt.Errorf("decoding list response: %w", err)
+	}
+	if raw, ok := obj["items"]; ok {
+		var items []map[string]interface{}
+		if err := json.Unmarshal(raw, &items); err == nil {
+			return items, nil
 		}
 	}
-	return CloudAPIFunction{}, false
+	for _, raw := range obj {
+		var items []map[string]interface{}
+		if err := json.Unmarshal(raw, &items); err == nil {
+			return items, nil
+		}
+	}
+	return nil, nil
 }
 
 // lookupOperationByID finds a CloudAPIOperation with the given operationId
@@ -689,15 +734,20 @@ func asBody(m map[string]interface{}) interface{} {
 func translateSDKToWire(props map[string]CloudAPIProperty, sdkValues map[string]string) map[string]string {
 	out := make(map[string]string, len(sdkValues))
 	for k, v := range sdkValues {
-		wireName := k
-		if meta, ok := props[k]; ok && meta.From != "" {
-			wireName = meta.From
-		}
-		out[wireName] = v
-		// Also carry the SDK name through; path templates may legitimately
-		// use either form depending on how the spec named the placeholder.
-		// Duplicate entries are harmless.
+		// Always carry the SDK name. Path templates sometimes
+		// reference it directly (and ID templates always do).
 		out[k] = v
+		if meta, ok := props[k]; ok {
+			if meta.From != "" {
+				out[meta.From] = v
+			}
+			// PathName overrides for resources whose spec uses one
+			// name in the body/response and a different name in the
+			// URL path (AgentPool: `id` in body, `{poolId}` in path).
+			if meta.PathName != "" {
+				out[meta.PathName] = v
+			}
+		}
 	}
 	return out
 }

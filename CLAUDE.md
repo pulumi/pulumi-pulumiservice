@@ -15,43 +15,72 @@ Settings, etc.) from Pulumi programs.
 
 **The provider is generated, not hand-coded. There is no escape
 hatch — every supported resource lives in `resource-map.yaml`.** Two
-inputs compose into the shipped binary + SDKs:
+inputs compose into the shipped binary + SDKs, both `//go:embed`-ed
+directly into the runtime:
 
-1. `provider/spec/openapi_public.json` — pinned copy of the Pulumi
-   Cloud OpenAPI 3.0.3 spec.
-2. `provider/resource-map.yaml` — the editable mapping from
-   operationIds to Pulumi resources/functions/methods (plus per-property
-   metadata — renames, secrets, defaults, force-new, validation checks).
+1. `provider/pkg/embedded/openapi_public.json` — pinned copy of the
+   Pulumi Cloud OpenAPI 3.0.3 spec.
+2. `provider/pkg/embedded/resource-map.yaml` — the editable mapping
+   from operationIds to Pulumi resources/functions/methods (plus
+   per-property metadata — renames, secrets, defaults, force-new,
+   validation checks).
 
-A generator (`provider/cmd/pulumi-gen-pulumiservice`) emits
-`bin/schema.json` + `bin/metadata.json` from those inputs; the runtime
-dispatcher in `provider/pkg/runtime/` consumes the metadata to serve
-CRUD gRPC.
+There is one binary: `pulumi-resource-pulumiservice`. `go build` is
+all it takes. The runtime is built on
+`github.com/pulumi/pulumi-go-provider`; it derives the runtime
+metadata from the embedded inputs at startup, and serves the Pulumi
+schema lazily via `GetSchema` (regenerated from the same embedded
+inputs on first call). The CRUD dispatcher in `provider/pkg/runtime/`
+consumes the metadata.
+
+`GetSchema` errors loudly if the embedded resource-map is incomplete
+(any operationId in the spec without a claim — resource, function,
+method, or explicit exclusion). This is the same coverage gate that
+`go test ./provider/pkg/embedded/...` runs in CI.
 
 If a Pulumi Cloud API pattern can't be expressed in the current
 metadata shape, the answer is to **extend the metadata schema** in
 `provider/pkg/runtime/metadata.go` (plus parse + dispatch), not to add
 per-resource Go. The current primitives that cover the non-trivial
-cases: `createSource`/`createFrom` (per-verb property source rename),
-`bodyOverride` (tombstone-style delete via update op),
-`readVia.extractField`/`keyBy` (read as a field on a parent resource's
-GET), `iterateOver`+`iterateKeyParam` (delete one call per map key),
-`rawBodyFrom`/`rawBodyTo`+`contentType` (non-JSON bodies), `postCreate`
-(two-step create).
+cases:
+- `createSource`/`createFrom` — per-verb property source/wire-name
+  rename (`name` is body on POST, path on subsequent verbs).
+- `pathName` — URL path placeholder name when it differs from the
+  response/body wire name (AgentPool `id` ↔ `{poolId}`).
+- `bodyFrom` — request-body wire name when it differs from the
+  response wire name (LogExport `newEnabled` body ↔ `enabled` response).
+- `source: pathAndBody` — identity field that goes in BOTH the URL
+  path and the request body, with the API validating they agree
+  (Webhook).
+- `bodyAs` — operation-level: a single property's value IS the entire
+  request body (StackTags PATCH expects `{tagName: value}` directly).
+- `bodyOverride` — tombstone-style delete via update op
+  (TeamStackPermission).
+- `readVia.extractField`/`keyBy` — read as a field on a parent
+  resource's GET.
+- `iterateOver`+`iterateKeyParam` — delete one call per map key
+  (Tags batch).
+- `rawBodyFrom`/`rawBodyTo`+`contentType` — non-JSON bodies (ESC
+  Environment YAML PATCH).
+- `postCreate` — two-step create.
+- Polymorphic scope inference — when a polymorphic resource (Webhook)
+  has no explicit `discriminator:` field, the dispatcher picks the
+  scope whose ID-template path placeholders are all satisfied by user
+  inputs; output-only placeholders (server-assigned names) are
+  ignored.
 
 ## Repository Structure
 
 ```
 provider/
-  spec/openapi_public.json         pinned Pulumi Cloud OpenAPI spec
-  resource-map.yaml                THE editable mapping (source of truth)
   cmd/
-    pulumi-gen-pulumiservice/      generator CLI (schema, metadata, coverage)
-    pulumi-resource-pulumiservice/ provider binary (embeds schema + metadata)
+    pulumi-resource-pulumiservice/ provider binary (single binary; `go build`)
   pkg/
-    gen/                           generator internals
+    embedded/                      //go:embed of openapi_public.json + resource-map.yaml
+                                   (THE editable mapping lives here)
+    gen/                           schema/metadata/coverage emitters as a library
     runtime/                       metadata-driven CRUD dispatcher
-    provider/                      gRPC server, Check routing
+    provider/                      pulumi-go-provider Provider literal
     version/                       version variable injected via LDFLAGS
 
 sdk/                               generated SDKs; never edit by hand
@@ -72,15 +101,15 @@ docs/
 
 ## Build Commands
 
-### v2 generator + provider binary
+### Provider binary
 
 ```bash
-make v2_gen               # regenerate schema.json + metadata.json from the map
-make v2_provider          # v2_gen + build binary + write merged schema (with
-                          # custom-resource contributions) back to disk
-make coverage_report      # print coverage stats; doesn't fail on gaps
-make coverage_report_strict  # fails non-zero if any operationId is unmapped
-make update_spec          # refresh pinned spec from sibling ../pulumi-service/
+go build ./provider/cmd/pulumi-resource-pulumiservice  # plain `go build` works
+make v2_provider                                       # the same plus pulumi package get-schema
+                                                       # writes provider/cmd/.../schema.json for SDK gen
+make coverage_report                                   # `go test` against the coverage gate
+make coverage_report_strict                            # alias of coverage_report (the test is strict by default)
+make update_spec                                       # refresh embedded spec from sibling ../pulumi-service/
 ```
 
 ### SDK generation + build
@@ -88,7 +117,7 @@ make update_spec          # refresh pinned spec from sibling ../pulumi-service/
 ```bash
 make build_sdks           # regenerate all five language SDKs from schema.json
 make nodejs_sdk           # one language at a time
-make build                # everything: generator + provider + SDKs
+make build                # everything: provider + SDKs
 ```
 
 ### Testing
@@ -132,7 +161,7 @@ reference:
 
 ### Declarative (common case)
 
-Edit `provider/resource-map.yaml`, under the right sub-module:
+Edit `provider/pkg/embedded/resource-map.yaml`, under the right sub-module:
 
 ```yaml
 orgs/<module>:
@@ -302,14 +331,16 @@ cd provider && go test ./...
 
 ## Anti-patterns to avoid
 
-- **Editing `bin/schema.json` or `bin/metadata.json` directly.**
-  They'll be overwritten. Edit `resource-map.yaml` or custom-resource
-  `Schema()`.
+- **Editing `provider/cmd/pulumi-resource-pulumiservice/schema.json`
+  directly.** That file is regenerated by `make v2_provider` (it's
+  the binary's `GetSchema` output, captured for `make build_sdks`).
+  Edit `provider/pkg/embedded/resource-map.yaml` instead.
 - **Editing `sdk/**` directly.** Same — they're generated.
-- **Adding a hand-coded resource in `provider/pkg/customresources/`
-  before checking whether the metadata schema can be extended to cover
-  the case.** Budget is ≤5 custom resources; over that, extend the
-  metadata.
+- **Reintroducing a `pulumi-gen-pulumiservice` binary or a
+  `provider/pkg/customresources/` package.** v2 ships as a single
+  binary with `go build`; the metadata schema is the extension
+  surface. If a new Pulumi Cloud pattern doesn't fit, extend
+  `provider/pkg/runtime/metadata.go` (plus parse + dispatch).
 - **Excluding a new operationId without a written reason.** Every
   `exclusions:` entry must have a 1-sentence reason so a later
   maintainer can revisit.

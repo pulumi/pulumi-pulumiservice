@@ -35,6 +35,14 @@ export class AccessToken extends pulumi.CustomResource {
     }
 
     declare public readonly description: pulumi.Output<string | undefined>;
+    /**
+     * Unix epoch expiration. `0` (the default) means no expiry.
+     */
+    declare public readonly expires: pulumi.Output<number | undefined>;
+    /**
+     * Token name. Defaults to the description if omitted.
+     */
+    declare public readonly name: pulumi.Output<string | undefined>;
     declare public /*out*/ readonly tokenId: pulumi.Output<string>;
     declare public /*out*/ readonly value: pulumi.Output<string>;
 
@@ -50,10 +58,14 @@ export class AccessToken extends pulumi.CustomResource {
         opts = opts || {};
         if (!opts.id) {
             resourceInputs["description"] = args?.description;
+            resourceInputs["expires"] = (args?.expires) ?? 0;
+            resourceInputs["name"] = args?.name;
             resourceInputs["tokenId"] = undefined /*out*/;
             resourceInputs["value"] = undefined /*out*/;
         } else {
             resourceInputs["description"] = undefined /*out*/;
+            resourceInputs["expires"] = undefined /*out*/;
+            resourceInputs["name"] = undefined /*out*/;
             resourceInputs["tokenId"] = undefined /*out*/;
             resourceInputs["value"] = undefined /*out*/;
         }
@@ -69,4 +81,12 @@ export class AccessToken extends pulumi.CustomResource {
  */
 export interface AccessTokenArgs {
     description?: pulumi.Input<string>;
+    /**
+     * Unix epoch expiration. `0` (the default) means no expiry.
+     */
+    expires?: pulumi.Input<number>;
+    /**
+     * Token name. Defaults to the description if omitted.
+     */
+    name?: pulumi.Input<string>;
 }

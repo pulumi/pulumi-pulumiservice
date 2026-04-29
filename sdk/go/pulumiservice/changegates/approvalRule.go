@@ -15,20 +15,21 @@ import (
 type ApprovalRule struct {
 	pulumi.CustomResourceState
 
-	// Rule config — number of required approvals, eligible approvers, reapproval policy, self-approval toggle.
-	ApprovalRuleConfig pulumi.AnyOutput `pulumi:"approvalRuleConfig"`
 	// Whether the rule is active.
 	Enabled pulumi.BoolPtrOutput `pulumi:"enabled"`
-	// Target environment — organization/project/environment triple.
-	EnvironmentIdentifier pulumi.AnyOutput `pulumi:"environmentIdentifier"`
 	// Server-assigned rule ID.
 	GateId pulumi.StringOutput `pulumi:"gateId"`
 	// Human-readable name for the rule.
 	Name pulumi.StringPtrOutput `pulumi:"name"`
 	// Organization that owns the rule.
 	OrganizationName pulumi.StringOutput `pulumi:"organizationName"`
-	// Which action types the rule gates (e.g., deployment, environment_change).
-	TargetActionTypes pulumi.StringArrayOutput `pulumi:"targetActionTypes"`
+	// Rule shape — `{ruleType: "approval_required", numApprovalsRequired: <n>,
+	// eligibleApprovers: {teams: [...]}, preventSelfApproval: <bool>}`.
+	Rule pulumi.AnyOutput `pulumi:"rule"`
+	// Target shape — `{entityType: "environment", qualifiedName: "<project>/<env>", actionTypes: ["update"|"open"]}`.
+	// Pulumi Cloud only supports environment targets in
+	// v2.0.0-alpha; richer targeting lands in a later release.
+	Target pulumi.AnyOutput `pulumi:"target"`
 }
 
 // NewApprovalRule registers a new resource with the given unique name, arguments, and options.
@@ -38,20 +39,17 @@ func NewApprovalRule(ctx *pulumi.Context,
 		return nil, errors.New("missing one or more required arguments")
 	}
 
-	if args.ApprovalRuleConfig == nil {
-		return nil, errors.New("invalid value for required argument 'ApprovalRuleConfig'")
-	}
-	if args.EnvironmentIdentifier == nil {
-		return nil, errors.New("invalid value for required argument 'EnvironmentIdentifier'")
-	}
 	if args.Name == nil {
 		return nil, errors.New("invalid value for required argument 'Name'")
 	}
 	if args.OrganizationName == nil {
 		return nil, errors.New("invalid value for required argument 'OrganizationName'")
 	}
-	if args.TargetActionTypes == nil {
-		return nil, errors.New("invalid value for required argument 'TargetActionTypes'")
+	if args.Rule == nil {
+		return nil, errors.New("invalid value for required argument 'Rule'")
+	}
+	if args.Target == nil {
+		return nil, errors.New("invalid value for required argument 'Target'")
 	}
 	if args.Enabled == nil {
 		args.Enabled = pulumi.Bool(true)
@@ -89,34 +87,36 @@ func (ApprovalRuleState) ElementType() reflect.Type {
 }
 
 type approvalRuleArgs struct {
-	// Rule config — number of required approvals, eligible approvers, reapproval policy, self-approval toggle.
-	ApprovalRuleConfig interface{} `pulumi:"approvalRuleConfig"`
 	// Whether the rule is active.
 	Enabled bool `pulumi:"enabled"`
-	// Target environment — organization/project/environment triple.
-	EnvironmentIdentifier interface{} `pulumi:"environmentIdentifier"`
 	// Human-readable name for the rule.
 	Name string `pulumi:"name"`
 	// Organization that owns the rule.
 	OrganizationName string `pulumi:"organizationName"`
-	// Which action types the rule gates (e.g., deployment, environment_change).
-	TargetActionTypes []string `pulumi:"targetActionTypes"`
+	// Rule shape — `{ruleType: "approval_required", numApprovalsRequired: <n>,
+	// eligibleApprovers: {teams: [...]}, preventSelfApproval: <bool>}`.
+	Rule interface{} `pulumi:"rule"`
+	// Target shape — `{entityType: "environment", qualifiedName: "<project>/<env>", actionTypes: ["update"|"open"]}`.
+	// Pulumi Cloud only supports environment targets in
+	// v2.0.0-alpha; richer targeting lands in a later release.
+	Target interface{} `pulumi:"target"`
 }
 
 // The set of arguments for constructing a ApprovalRule resource.
 type ApprovalRuleArgs struct {
-	// Rule config — number of required approvals, eligible approvers, reapproval policy, self-approval toggle.
-	ApprovalRuleConfig pulumi.Input
 	// Whether the rule is active.
 	Enabled pulumi.BoolInput
-	// Target environment — organization/project/environment triple.
-	EnvironmentIdentifier pulumi.Input
 	// Human-readable name for the rule.
 	Name pulumi.StringInput
 	// Organization that owns the rule.
 	OrganizationName pulumi.StringInput
-	// Which action types the rule gates (e.g., deployment, environment_change).
-	TargetActionTypes pulumi.StringArrayInput
+	// Rule shape — `{ruleType: "approval_required", numApprovalsRequired: <n>,
+	// eligibleApprovers: {teams: [...]}, preventSelfApproval: <bool>}`.
+	Rule pulumi.Input
+	// Target shape — `{entityType: "environment", qualifiedName: "<project>/<env>", actionTypes: ["update"|"open"]}`.
+	// Pulumi Cloud only supports environment targets in
+	// v2.0.0-alpha; richer targeting lands in a later release.
+	Target pulumi.Input
 }
 
 func (ApprovalRuleArgs) ElementType() reflect.Type {
@@ -206,19 +206,9 @@ func (o ApprovalRuleOutput) ToApprovalRuleOutputWithContext(ctx context.Context)
 	return o
 }
 
-// Rule config — number of required approvals, eligible approvers, reapproval policy, self-approval toggle.
-func (o ApprovalRuleOutput) ApprovalRuleConfig() pulumi.AnyOutput {
-	return o.ApplyT(func(v *ApprovalRule) pulumi.AnyOutput { return v.ApprovalRuleConfig }).(pulumi.AnyOutput)
-}
-
 // Whether the rule is active.
 func (o ApprovalRuleOutput) Enabled() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v *ApprovalRule) pulumi.BoolPtrOutput { return v.Enabled }).(pulumi.BoolPtrOutput)
-}
-
-// Target environment — organization/project/environment triple.
-func (o ApprovalRuleOutput) EnvironmentIdentifier() pulumi.AnyOutput {
-	return o.ApplyT(func(v *ApprovalRule) pulumi.AnyOutput { return v.EnvironmentIdentifier }).(pulumi.AnyOutput)
 }
 
 // Server-assigned rule ID.
@@ -236,9 +226,17 @@ func (o ApprovalRuleOutput) OrganizationName() pulumi.StringOutput {
 	return o.ApplyT(func(v *ApprovalRule) pulumi.StringOutput { return v.OrganizationName }).(pulumi.StringOutput)
 }
 
-// Which action types the rule gates (e.g., deployment, environment_change).
-func (o ApprovalRuleOutput) TargetActionTypes() pulumi.StringArrayOutput {
-	return o.ApplyT(func(v *ApprovalRule) pulumi.StringArrayOutput { return v.TargetActionTypes }).(pulumi.StringArrayOutput)
+// Rule shape — `{ruleType: "approval_required", numApprovalsRequired: <n>,
+// eligibleApprovers: {teams: [...]}, preventSelfApproval: <bool>}`.
+func (o ApprovalRuleOutput) Rule() pulumi.AnyOutput {
+	return o.ApplyT(func(v *ApprovalRule) pulumi.AnyOutput { return v.Rule }).(pulumi.AnyOutput)
+}
+
+// Target shape — `{entityType: "environment", qualifiedName: "<project>/<env>", actionTypes: ["update"|"open"]}`.
+// Pulumi Cloud only supports environment targets in
+// v2.0.0-alpha; richer targeting lands in a later release.
+func (o ApprovalRuleOutput) Target() pulumi.AnyOutput {
+	return o.ApplyT(func(v *ApprovalRule) pulumi.AnyOutput { return v.Target }).(pulumi.AnyOutput)
 }
 
 type ApprovalRuleArrayOutput struct{ *pulumi.OutputState }

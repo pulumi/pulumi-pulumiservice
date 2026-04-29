@@ -56,15 +56,36 @@ integrations — land in subsequent 2.x releases.
 
 ### Improvements
 
+- **Single binary, `go build` only.** The OpenAPI spec and resource
+  map are `//go:embed`-ed into the runtime under
+  `provider/pkg/embedded`; metadata is derived in-process at startup
+  and the Pulumi schema is generated lazily by `GetSchema`. There is
+  no separate generator step, no committed `schema.json` /
+  `metadata.json` artifacts, and the runtime is built on
+  `github.com/pulumi/pulumi-go-provider` rather than a hand-rolled
+  gRPC server. `GetSchema` errors loudly when the resource map is
+  incomplete (any operationId in the spec without a claim) — the
+  same coverage gate that `go test ./provider/pkg/embedded/...`
+  enforces in CI. Parameterize is wired structurally for a follow-up
+  that lets self-hosted customers swap the embedded inputs at
+  runtime.
 - **OpenAPI-driven provider** — resources, properties, and validation
-  rules come from a single authoritative `provider/resource-map.yaml`
-  mapping file over the pinned Pulumi Cloud OpenAPI spec. New endpoints
-  land automatically once mapped; nothing is hand-coded per resource
-  with zero hand-coded resources — every CRUD path is declared in the
-  map, and the metadata schema was extended as needed (`createSource`,
-  `bodyOverride`, `readVia.extractField`, `iterateOver`, `rawBodyFrom`,
-  `postCreate`) to cover the v1 cases that didn't fit a one-op-per-verb
-  shape.
+  rules come from a single authoritative `resource-map.yaml` mapping
+  file over the pinned Pulumi Cloud OpenAPI spec (both under
+  `provider/pkg/embedded/`). New endpoints land automatically once
+  mapped; nothing is hand-coded per resource — every CRUD path is
+  declared in the map, and the metadata schema was extended as
+  needed to cover the v1 cases that didn't fit a one-op-per-verb
+  shape: `createSource`/`createFrom` (per-verb body↔path rename),
+  `pathName` (URL placeholder ≠ response wire name, e.g. AgentPool
+  `id` ↔ `{poolId}`), `bodyFrom` (body wire name ≠ response wire
+  name, e.g. LogExport `newEnabled` ↔ `enabled`), `source:
+  pathAndBody` (identity field in both URL and body, e.g. Webhook),
+  `bodyAs` (single-property promoted to the entire request body,
+  e.g. StackTags), `bodyOverride`, `readVia.extractField`,
+  `iterateOver`, `rawBodyFrom`, `postCreate`. Polymorphic resources
+  without an explicit discriminator (Webhook) infer scope from
+  which path-source identity properties the caller sets.
 - **Declarative cross-field validation** — `requireOneOf` /
   `requireTogether` / `requireIf` rules in the resource map are
   enforced during `pulumi preview`, giving immediate feedback when

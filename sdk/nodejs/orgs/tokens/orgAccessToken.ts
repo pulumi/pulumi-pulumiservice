@@ -32,6 +32,14 @@ export class OrgAccessToken extends pulumi.CustomResource {
     }
 
     declare public readonly description: pulumi.Output<string | undefined>;
+    /**
+     * Unix epoch expiration. `0` (the default) means no expiry.
+     */
+    declare public readonly expires: pulumi.Output<number | undefined>;
+    /**
+     * Token name. Unique across the organization (including deleted tokens). Defaults to the description if omitted.
+     */
+    declare public readonly name: pulumi.Output<string | undefined>;
     declare public readonly organizationName: pulumi.Output<string>;
     declare public /*out*/ readonly tokenId: pulumi.Output<string>;
     declare public /*out*/ readonly value: pulumi.Output<string>;
@@ -51,11 +59,15 @@ export class OrgAccessToken extends pulumi.CustomResource {
                 throw new Error("Missing required property 'organizationName'");
             }
             resourceInputs["description"] = args?.description;
+            resourceInputs["expires"] = (args?.expires) ?? 0;
+            resourceInputs["name"] = args?.name;
             resourceInputs["organizationName"] = args?.organizationName;
             resourceInputs["tokenId"] = undefined /*out*/;
             resourceInputs["value"] = undefined /*out*/;
         } else {
             resourceInputs["description"] = undefined /*out*/;
+            resourceInputs["expires"] = undefined /*out*/;
+            resourceInputs["name"] = undefined /*out*/;
             resourceInputs["organizationName"] = undefined /*out*/;
             resourceInputs["tokenId"] = undefined /*out*/;
             resourceInputs["value"] = undefined /*out*/;
@@ -72,5 +84,13 @@ export class OrgAccessToken extends pulumi.CustomResource {
  */
 export interface OrgAccessTokenArgs {
     description?: pulumi.Input<string>;
+    /**
+     * Unix epoch expiration. `0` (the default) means no expiry.
+     */
+    expires?: pulumi.Input<number>;
+    /**
+     * Token name. Unique across the organization (including deleted tokens). Defaults to the description if omitted.
+     */
+    name?: pulumi.Input<string>;
     organizationName: pulumi.Input<string>;
 }

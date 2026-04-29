@@ -25,7 +25,7 @@ class _ExportableConfig(types.ModuleType):
         """
         Access Token to authenticate with Pulumi Cloud.
         """
-        return __config__.get('accessToken')
+        return __config__.get('accessToken') or _utilities.get_env('PULUMI_ACCESS_TOKEN')
 
     @_builtins.property
     def api_url(self) -> str:

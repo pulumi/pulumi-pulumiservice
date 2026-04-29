@@ -35,7 +35,13 @@ export class AgentPool extends pulumi.CustomResource {
     }
 
     declare public /*out*/ readonly agentPoolId: pulumi.Output<string>;
+    /**
+     * User-provided description of the pool's purpose.
+     */
     declare public readonly description: pulumi.Output<string | undefined>;
+    /**
+     * Agent pool display name. The Create response only echoes id+tokenValue, so we preserve `name` from inputs.
+     */
     declare public readonly name: pulumi.Output<string | undefined>;
     declare public readonly organizationName: pulumi.Output<string>;
     declare public /*out*/ readonly tokenValue: pulumi.Output<string>;
@@ -77,7 +83,13 @@ export class AgentPool extends pulumi.CustomResource {
  * The set of arguments for constructing a AgentPool resource.
  */
 export interface AgentPoolArgs {
+    /**
+     * User-provided description of the pool's purpose.
+     */
     description?: pulumi.Input<string>;
+    /**
+     * Agent pool display name. The Create response only echoes id+tokenValue, so we preserve `name` from inputs.
+     */
     name?: pulumi.Input<string>;
     organizationName: pulumi.Input<string>;
 }

@@ -1,15 +1,6 @@
 name: pulumiservice-canonical-01-organization-bootstrap
 runtime: yaml
-description: |
-  Day 0 of a new Pulumi organization. Provisions the foundational
-  resources every Pulumi Cloud tenant needs: three teams (admin,
-  deploy, read-only), a team-scoped access token for CI, and a
-  default policy group that will gate every stack.
-
-  This is the scenario most users hit first. Wiring up GitHub OIDC
-  federation is a separate day-1 step — see canonical/02-github-oidc-ci.
-  Everything else downstream (stacks, environments, deployment settings)
-  assumes these foundational resources exist.
+description: Day-0 org bootstrap — three teams, a CI team-scoped access token, and a default policy group. See README and canonical/02 for the OIDC follow-up.
 
 config:
   organizationName:
@@ -56,6 +47,7 @@ resources:
     properties:
       organizationName: ${organizationName}
       teamName: ${deployers.name}
+      name: "ci-deploy-${digits}"
       description: "Used by GitHub Actions to deploy non-production stacks"
 
   # Default policy group every stack should inherit. Points at an org-published

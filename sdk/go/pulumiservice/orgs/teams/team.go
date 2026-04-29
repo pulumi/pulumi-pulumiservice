@@ -26,7 +26,7 @@ type Team struct {
 	// List of usernames in the team.
 	Members pulumi.StringArrayOutput `pulumi:"members"`
 	// Team name. Must be unique within the organization. Required for `pulumi` teams.
-	Name pulumi.StringPtrOutput `pulumi:"name"`
+	Name pulumi.StringOutput `pulumi:"name"`
 	// Organization the team lives in.
 	OrganizationName pulumi.StringOutput `pulumi:"organizationName"`
 	// Team type. "pulumi" for a Pulumi-managed team; "github" for a team synced from a GitHub organization.
@@ -221,8 +221,8 @@ func (o TeamOutput) Members() pulumi.StringArrayOutput {
 }
 
 // Team name. Must be unique within the organization. Required for `pulumi` teams.
-func (o TeamOutput) Name() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *Team) pulumi.StringPtrOutput { return v.Name }).(pulumi.StringPtrOutput)
+func (o TeamOutput) Name() pulumi.StringOutput {
+	return o.ApplyT(func(v *Team) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
 }
 
 // Organization the team lives in.

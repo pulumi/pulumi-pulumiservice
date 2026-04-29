@@ -15,7 +15,14 @@ import (
 type LogExport struct {
 	pulumi.CustomResourceState
 
+	// Whether the export is currently active. Set to false to pause without deleting.
+	Enabled pulumi.BoolPtrOutput `pulumi:"enabled"`
+	// Organization whose audit log is being exported.
 	OrganizationName pulumi.StringOutput `pulumi:"organizationName"`
+	// S3 destination settings — an object with `iamRoleArn`
+	// (role Pulumi Cloud assumes to write), `s3BucketName`,
+	// and optional `s3PathPrefix`.
+	S3Configuration pulumi.AnyOutput `pulumi:"s3Configuration"`
 }
 
 // NewLogExport registers a new resource with the given unique name, arguments, and options.
@@ -27,6 +34,12 @@ func NewLogExport(ctx *pulumi.Context,
 
 	if args.OrganizationName == nil {
 		return nil, errors.New("invalid value for required argument 'OrganizationName'")
+	}
+	if args.S3Configuration == nil {
+		return nil, errors.New("invalid value for required argument 'S3Configuration'")
+	}
+	if args.Enabled == nil {
+		args.Enabled = pulumi.Bool(true)
 	}
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource LogExport
@@ -61,12 +74,26 @@ func (LogExportState) ElementType() reflect.Type {
 }
 
 type logExportArgs struct {
+	// Whether the export is currently active. Set to false to pause without deleting.
+	Enabled bool `pulumi:"enabled"`
+	// Organization whose audit log is being exported.
 	OrganizationName string `pulumi:"organizationName"`
+	// S3 destination settings — an object with `iamRoleArn`
+	// (role Pulumi Cloud assumes to write), `s3BucketName`,
+	// and optional `s3PathPrefix`.
+	S3Configuration interface{} `pulumi:"s3Configuration"`
 }
 
 // The set of arguments for constructing a LogExport resource.
 type LogExportArgs struct {
+	// Whether the export is currently active. Set to false to pause without deleting.
+	Enabled pulumi.BoolInput
+	// Organization whose audit log is being exported.
 	OrganizationName pulumi.StringInput
+	// S3 destination settings — an object with `iamRoleArn`
+	// (role Pulumi Cloud assumes to write), `s3BucketName`,
+	// and optional `s3PathPrefix`.
+	S3Configuration pulumi.Input
 }
 
 func (LogExportArgs) ElementType() reflect.Type {
@@ -156,8 +183,21 @@ func (o LogExportOutput) ToLogExportOutputWithContext(ctx context.Context) LogEx
 	return o
 }
 
+// Whether the export is currently active. Set to false to pause without deleting.
+func (o LogExportOutput) Enabled() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *LogExport) pulumi.BoolPtrOutput { return v.Enabled }).(pulumi.BoolPtrOutput)
+}
+
+// Organization whose audit log is being exported.
 func (o LogExportOutput) OrganizationName() pulumi.StringOutput {
 	return o.ApplyT(func(v *LogExport) pulumi.StringOutput { return v.OrganizationName }).(pulumi.StringOutput)
+}
+
+// S3 destination settings — an object with `iamRoleArn`
+// (role Pulumi Cloud assumes to write), `s3BucketName`,
+// and optional `s3PathPrefix`.
+func (o LogExportOutput) S3Configuration() pulumi.AnyOutput {
+	return o.ApplyT(func(v *LogExport) pulumi.AnyOutput { return v.S3Configuration }).(pulumi.AnyOutput)
 }
 
 type LogExportArrayOutput struct{ *pulumi.OutputState }

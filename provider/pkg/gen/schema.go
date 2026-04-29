@@ -90,15 +90,29 @@ type pulumiEnumValue struct {
 	Description string      `json:"description,omitempty"`
 }
 
-// EmitSchema reads the spec + resource-map and returns the Pulumi schema
-// as a formatted JSON document. Errors short-circuit — a partial emit
-// isn't useful and masks the underlying problem.
+// EmitSchema reads the spec + resource-map from disk and returns the
+// Pulumi schema as a formatted JSON document. Errors short-circuit — a
+// partial emit isn't useful and masks the underlying problem.
 func EmitSchema(specPath, mapPath string) ([]byte, error) {
-	spec, err := LoadSpec(specPath)
+	specBytes, err := os.ReadFile(specPath)
+	if err != nil {
+		return nil, fmt.Errorf("reading spec %s: %w", specPath, err)
+	}
+	mapBytes, err := os.ReadFile(mapPath)
+	if err != nil {
+		return nil, fmt.Errorf("reading resource-map %s: %w", mapPath, err)
+	}
+	return EmitSchemaFromBytes(specBytes, mapBytes)
+}
+
+// EmitSchemaFromBytes is the path-free form of EmitSchema — the runtime
+// calls it with bytes from the embedded copies of the spec and map.
+func EmitSchemaFromBytes(specBytes, mapBytes []byte) ([]byte, error) {
+	spec, err := LoadSpecFromBytes(specBytes)
 	if err != nil {
 		return nil, err
 	}
-	rm, err := LoadResourceMap(mapPath)
+	rm, err := LoadResourceMapFromBytes(mapBytes)
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +135,7 @@ func EmitSchema(specPath, mapPath string) ([]byte, error) {
 	}
 
 	// Build an index of component schemas for description lookup.
-	compSchemas, err := loadComponentSchemas(specPath)
+	compSchemas, err := loadComponentSchemasFromBytes(specBytes)
 	if err != nil {
 		return nil, fmt.Errorf("loading component schemas: %w", err)
 	}
@@ -196,10 +210,10 @@ func buildResourceSpec(modName, resName string, res Resource, spec *Spec, compSc
 			inputs[name] = pp
 			// Required-input logic:
 			//   - Explicit `required: true/false` wins.
-			//   - Else default: `source: path` is required.
+			//   - Else default: `source: path` (or `pathAndBody`) is required.
 			//   - requireIf/requireOneOf membership overrides to optional
 			//     (those are runtime-enforced by Check).
-			required := p.Source == "path"
+			required := p.Source == "path" || p.Source == "pathAndBody"
 			if p.Required != nil {
 				required = *p.Required
 			} else if p.RequireIf != "" || isInCheckSet(res.Checks, name) {
@@ -478,15 +492,11 @@ type componentProperty struct {
 	Ref         string
 }
 
-// loadComponentSchemas reads the spec file a second time to extract just the
-// component schema descriptions we use for doc comments. Kept as a second
-// narrow parse (rather than expanding LoadSpec) so the coverage gate stays
-// cheap.
-func loadComponentSchemas(specPath string) (map[string]componentSchema, error) {
-	raw, err := os.ReadFile(specPath)
-	if err != nil {
-		return nil, err
-	}
+// loadComponentSchemasFromBytes parses the spec a second time to extract
+// just the component schema descriptions we use for doc comments. Kept
+// as a separate narrow parse (rather than expanding LoadSpec) so the
+// coverage gate stays cheap.
+func loadComponentSchemasFromBytes(raw []byte) (map[string]componentSchema, error) {
 	var doc struct {
 		Components struct {
 			Schemas map[string]struct {

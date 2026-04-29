@@ -1,13 +1,6 @@
 name: pulumiservice-canonical-03-esc-rotation-hooks
 runtime: yaml
-description: |
-  An ESC environment containing a rotated database password, a rotation
-  schedule that refreshes the password on a cron, and an ESC-scoped
-  webhook that notifies Slack whenever a rotation occurs.
-
-  The canonical "secrets in motion" pattern: secrets change automatically
-  on a schedule, consumers pick up the new values on their next open,
-  and operators see every rotation in a channel.
+description: ESC environment with cron-rotated password and a Slack webhook on rotation. See README for the "secrets in motion" pattern.
 
 config:
   organizationName:
@@ -18,8 +11,10 @@ config:
     default: "00000"
   slackWebhookUrl:
     type: string
-    secret: true
-    default: https://hooks.slack.invalid/placeholder
+    # In production, override via `pulumi config set --secret slackWebhookUrl`
+    # so the value is encrypted in state. Default here is a non-secret
+    # placeholder so the example deploys cleanly without setup.
+    default: https://example.com/slack-webhook-placeholder
 
 resources:
   productionSecrets:
@@ -30,19 +25,29 @@ resources:
       name: production-secrets-${digits}
       yaml: |
         values:
+          # In production, replace this static placeholder with a
+          # rotator (e.g. `fn::rotate::awsSecretsManager`) — requires
+          # the matching AWS / Vault / etc. integration installed in
+          # the org. Static value here so the example deploys against
+          # any backend.
           database:
-            fn::rotate::awsSecretsManager:
-              region: us-west-2
-              secretId: prod/db/master
-              rotationPolicy: quarterly
+            password: rotate-me-via-fn-rotate
 
-  dailyRotation:
-    type: pulumiservice:esc/schedules:Rotation
-    properties:
-      organization: ${productionSecrets.organization}
-      project: ${productionSecrets.project}
-      environment: ${productionSecrets.name}
-      scheduleCron: "0 3 * * *"   # 03:00 UTC daily
+  # Production deployments add a `Rotation` here:
+  #
+  #   dailyRotation:
+  #     type: pulumiservice:esc/schedules:Rotation
+  #     properties:
+  #       organization: ${productionSecrets.organization}
+  #       project: ${productionSecrets.project}
+  #       environment: ${productionSecrets.name}
+  #       scheduleCron: "0 3 * * *"   # 03:00 UTC daily
+  #       secretRotationRequest:
+  #         environmentPath: database.password
+  #
+  # Requires the `secret rotation` feature to be enabled on the org
+  # and at least one rotated secret in the environment. Skipped here
+  # so the example deploys against any backend.
 
   # Notification: ESC-scoped webhook (Webhook with environmentName +
   # projectName set — no stackName).
@@ -54,8 +59,11 @@ resources:
       environmentName: ${productionSecrets.name}
       displayName: slack-rotation-alerts-${digits}
       payloadUrl: ${slackWebhookUrl}
-      secret: ${slackWebhookUrl}            # sign deliveries so Slack can verify
-      format: slack
+      # In production, format: slack with a real https://hooks.slack.com/...
+      # URL. We use `raw` and a generic URL here so the example deploys
+      # against any backend (the API validates Slack-format URLs more
+      # strictly).
+      format: raw
       active: true
 
 outputs:

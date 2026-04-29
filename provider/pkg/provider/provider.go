@@ -1,291 +1,293 @@
 // Copyright 2016-2026, Pulumi Corporation.
 //
-// Package provider is the gRPC resource-provider server for the
-// OpenAPI-driven Pulumi Service Provider v2. It embeds the generated
-// schema.json and metadata.json at build time, and routes every CRUD RPC
-// through runtime.Dispatcher. No per-resource Go code — if a resource
-// can't be expressed in the metadata, the right answer is to extend the
-// metadata schema, not to add an escape hatch here.
+// Package provider hosts the Pulumi Service Provider v2 on top of
+// github.com/pulumi/pulumi-go-provider. It builds a Provider literal
+// whose function fields close over a metadata-driven runtime
+// dispatcher: every CRUD/Invoke RPC looks up the resource (or
+// function) in the metadata derived from resource-map.yaml, splits
+// inputs into path/query/body, and forwards to Pulumi Cloud over
+// HTTP. There is no per-resource Go code — the metadata schema is the
+// extension surface.
+//
+// Compared to v2's earlier raw-gRPC server, this layout:
+//   - Lets us reuse pulumi-go-provider's request marshaling, cancel,
+//     and Parameterize plumbing for free.
+//   - Defers schema generation to the first GetSchema call (lazy),
+//     so a freshly-built binary can serve CRUD before anyone asks
+//     for the schema.
+//   - Surfaces unmapped operationIds as an error from GetSchema,
+//     per iwahbe's design note that the runtime should fail loudly
+//     when the map is incomplete.
 
 package provider
 
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"os"
+	"strings"
+	"sync"
 
-	pbempty "google.golang.org/protobuf/types/known/emptypb"
-	structpb "google.golang.org/protobuf/types/known/structpb"
-
+	pgo "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
+	"github.com/pulumi/pulumi/sdk/v3/go/property"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/gen"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/runtime"
 )
 
-// Server implements pulumirpc.ResourceProviderServer for the v2 provider.
-// Embed UnimplementedResourceProviderServer so RPCs we haven't wired yet
-// — Construct, Call (resource methods), StreamInvoke — return a
-// consistent "not implemented" error. Invoke (data-source functions)
-// is implemented; Call will follow in a subsequent 2.x.
-type Server struct {
-	pulumirpc.UnimplementedResourceProviderServer
+// New builds a v2 provider Provider literal from the embedded OpenAPI
+// spec and resource-map bytes. Metadata is parsed eagerly so that
+// CRUD lookups don't pay a per-call generation cost; the Pulumi
+// schema is generated lazily on first GetSchema (it's bigger and
+// only needed when the engine asks).
+//
+// Iwahbe's design note: GetSchema must error if the map is incomplete
+// or incorrect. We keep the strict check there (it's the gate the
+// engine actually trips when the user runs `pulumi up` against a
+// freshly-refreshed spec) and the test-time variant lives in
+// embedded_test.go's TestEmbedded_CoverageGate.
+func New(specBytes, mapBytes []byte) (pgo.Provider, error) {
+	if len(specBytes) == 0 {
+		return pgo.Provider{}, errors.New("empty OpenAPI spec bytes")
+	}
+	if len(mapBytes) == 0 {
+		return pgo.Provider{}, errors.New("empty resource-map bytes")
+	}
 
-	name     string
-	version  string
-	schema   []byte // the embedded schema.json, returned by GetSchema verbatim
-	metadata *runtime.CloudAPIMetadata
+	metadataBytes, err := gen.EmitMetadataFromBytes(specBytes, mapBytes)
+	if err != nil {
+		return pgo.Provider{}, fmt.Errorf("emitting runtime metadata: %w", err)
+	}
+	var md runtime.CloudAPIMetadata
+	if err := json.Unmarshal(metadataBytes, &md); err != nil {
+		return pgo.Provider{}, fmt.Errorf("decoding runtime metadata: %w", err)
+	}
 
-	// Populated lazily when Configure arrives.
-	dispatcher *runtime.Dispatcher
-	client     *runtime.Client
-	config     config
+	st := &state{
+		spec:     specBytes,
+		mapBytes: mapBytes,
+		metadata: &md,
+	}
+
+	return pgo.Provider{
+		GetSchema:    st.getSchema,
+		CheckConfig:  st.checkConfig,
+		DiffConfig:   st.diffConfig,
+		Configure:    st.configure,
+		Check:        st.check,
+		Diff:         st.diff,
+		Create:       st.create,
+		Read:         st.read,
+		Update:       st.update,
+		Delete:       st.delete,
+		Invoke:       st.invoke,
+		Parameterize: st.parameterize,
+		Cancel:       st.cancel,
+	}, nil
 }
 
-// config holds the provider-level settings passed by the user.
+// ─── Provider config (CheckConfig / DiffConfig / Cancel) ─────────────────
+
+// checkConfig accepts any config bag the engine hands us. The two
+// configuration variables the provider supports — accessToken and
+// apiUrl — are validated implicitly by Configure (the API client
+// fails to authenticate if the token is wrong, the user sees a clear
+// error). Returning the inputs verbatim with no failures matches v1
+// semantics. The framework's default would return Unimplemented;
+// explicit is safer.
+func (s *state) checkConfig(_ context.Context, req pgo.CheckRequest) (pgo.CheckResponse, error) {
+	return pgo.CheckResponse{Inputs: req.Inputs}, nil
+}
+
+// diffConfig is invariant under any change: we treat config as
+// non-replacing (changing the token, swapping the API URL, etc. do
+// not destroy resources — they just affect how subsequent CRUD
+// calls authenticate). v1 had the same behavior.
+func (s *state) diffConfig(_ context.Context, _ pgo.DiffRequest) (pgo.DiffResponse, error) {
+	return pgo.DiffResponse{HasChanges: false}, nil
+}
+
+// cancel is a no-op. We don't hold long-running work; CRUD calls
+// are individual HTTP requests against Pulumi Cloud, and the engine
+// already cancels the context when the user aborts a run.
+func (s *state) cancel(_ context.Context) error {
+	return nil
+}
+
+// ─── State ──────────────────────────────────────────────────────────────
+
+// state holds the per-process resources the function-field callbacks
+// close over: the embedded inputs (so GetSchema can regenerate
+// lazily), the parsed metadata (used by every CRUD call), and the
+// HTTP client + dispatcher built at Configure time.
+type state struct {
+	spec     []byte
+	mapBytes []byte
+	metadata *runtime.CloudAPIMetadata
+
+	// Schema is computed once on first GetSchema and reused for every
+	// subsequent call. The error is sticky: if generation fails (e.g.
+	// the map is inconsistent), every GetSchema returns the same
+	// failure rather than re-running the (expensive) emission.
+	schemaOnce sync.Once
+	schemaJSON []byte
+	schemaErr  error
+
+	// Configure populates these. They're read concurrently across
+	// CRUD callbacks; we don't take a lock because the engine
+	// guarantees a happens-before edge between Configure and the
+	// first CRUD call, and they're never mutated afterwards.
+	cfg        config
+	client     *runtime.Client
+	dispatcher *runtime.Dispatcher
+}
+
+// config carries the provider-level settings the user supplied via
+// stack config or constructor args. Mirrors the schema's `config`
+// block.
 type config struct {
 	AccessToken string
 	APIURL      string
 }
 
-// New constructs a v2 Server. `schemaBytes` and `metadataBytes` are the
-// generator's output — typically embedded via //go:embed in the binary's
-// main package.
-func New(name, version string, schemaBytes, metadataBytes []byte) (*Server, error) {
-	var md runtime.CloudAPIMetadata
-	if err := json.Unmarshal(metadataBytes, &md); err != nil {
-		return nil, fmt.Errorf("loading embedded metadata.json: %w", err)
-	}
-	return &Server{
-		name:     name,
-		version:  version,
-		schema:   schemaBytes,
-		metadata: &md,
-	}, nil
-}
-
-// ─── Configuration ──────────────────────────────────────────────────────
-
-// CheckConfig validates provider-level config. We accept anything and
-// return it unchanged — Configure does the real work.
-func (s *Server) CheckConfig(ctx context.Context, req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	return &pulumirpc.CheckResponse{Inputs: req.GetNews()}, nil
-}
-
-// DiffConfig compares provider configs. The v1 provider treats everything
-// as non-replacing (changing the token or URL doesn't destroy resources);
-// we mirror that.
-func (s *Server) DiffConfig(ctx context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	return &pulumirpc.DiffResponse{Changes: pulumirpc.DiffResponse_DIFF_NONE}, nil
-}
-
-// Configure stashes provider credentials and builds the HTTP client +
-// dispatcher that every subsequent CRUD call uses.
-func (s *Server) Configure(ctx context.Context, req *pulumirpc.ConfigureRequest) (*pulumirpc.ConfigureResponse, error) {
-	args := req.GetArgs()
-	if args != nil {
-		if v, ok := args.GetFields()["accessToken"]; ok {
-			s.config.AccessToken = v.GetStringValue()
-		}
-		if v, ok := args.GetFields()["apiUrl"]; ok {
-			s.config.APIURL = v.GetStringValue()
-		}
-	}
-	s.client = runtime.NewClient(s.config.APIURL, s.config.AccessToken)
-	s.dispatcher = runtime.NewDispatcher(s.client, s.metadata)
-	return &pulumirpc.ConfigureResponse{
-		AcceptSecrets:   true,
-		AcceptResources: true,
-	}, nil
-}
-
 // ─── Schema ─────────────────────────────────────────────────────────────
 
-// GetSchema returns the embedded Pulumi schema. The engine calls this
-// to drive SDK-side type validation and code generation.
-func (s *Server) GetSchema(ctx context.Context, req *pulumirpc.GetSchemaRequest) (*pulumirpc.GetSchemaResponse, error) {
-	return &pulumirpc.GetSchemaResponse{Schema: string(s.schema)}, nil
+// getSchema runs gen.EmitSchemaFromBytes on the embedded inputs,
+// then verifies that every operationId in the spec is claimed by the
+// map. An unmapped operation is a "schema is incomplete" condition
+// and we surface it as a structured error so the engine doesn't try
+// to advertise an SDK that lies about coverage.
+func (s *state) getSchema(_ context.Context, _ pgo.GetSchemaRequest) (pgo.GetSchemaResponse, error) {
+	s.schemaOnce.Do(func() {
+		report, err := gen.CoverageReportFromBytes(s.spec, s.mapBytes)
+		if err != nil {
+			s.schemaErr = fmt.Errorf("running coverage gate: %w", err)
+			return
+		}
+		if report.UnmappedCount > 0 {
+			s.schemaErr = fmt.Errorf(
+				"resource map is incomplete: %d operationId(s) in the OpenAPI"+
+					" spec are neither mapped to a resource/function/method"+
+					" nor explicitly excluded; first few: %s",
+				report.UnmappedCount, firstUnmappedNames(report, 5))
+			return
+		}
+		raw, err := gen.EmitSchemaFromBytes(s.spec, s.mapBytes)
+		if err != nil {
+			s.schemaErr = fmt.Errorf("emitting Pulumi schema: %w", err)
+			return
+		}
+		s.schemaJSON = raw
+	})
+	if s.schemaErr != nil {
+		return pgo.GetSchemaResponse{}, s.schemaErr
+	}
+	return pgo.GetSchemaResponse{Schema: string(s.schemaJSON)}, nil
 }
 
-// GetPluginInfo reports the version. Engines use it for compatibility checks.
-func (s *Server) GetPluginInfo(ctx context.Context, _ *pbempty.Empty) (*pulumirpc.PluginInfo, error) {
-	return &pulumirpc.PluginInfo{Version: s.version}, nil
+func firstUnmappedNames(r *gen.Report, n int) string {
+	names := make([]string, 0, n)
+	for i, op := range r.Unmapped {
+		if i >= n {
+			break
+		}
+		names = append(names, op.OperationID)
+	}
+	return strings.Join(names, ", ")
 }
 
-// Cancel is a no-op for this provider — we don't hold long-running work
-// that needs graceful shutdown.
-func (s *Server) Cancel(ctx context.Context, _ *pbempty.Empty) (*pbempty.Empty, error) {
-	return &pbempty.Empty{}, nil
-}
+// ─── Configure ──────────────────────────────────────────────────────────
 
-// Attach is the "handshake" RPC the Pulumi engine calls when a provider
-// is running out-of-process (e.g., started manually for local
-// development via PULUMI_DEBUG_PROVIDERS). The request carries the
-// engine's gRPC address, which a more sophisticated provider would use
-// for log-passthrough or for issuing engine-side callbacks. This
-// provider doesn't need either — it simply acknowledges the attach so
-// the engine can proceed with GetSchema / Configure / CRUD.
-func (s *Server) Attach(ctx context.Context, _ *pulumirpc.PluginAttach) (*pbempty.Empty, error) {
-	return &pbempty.Empty{}, nil
+// configure stashes the access token and API URL, then constructs
+// the HTTP client + dispatcher every CRUD callback uses. Called once
+// per provider lifecycle.
+//
+// The schema declares PULUMI_ACCESS_TOKEN / PULUMI_BACKEND_URL as
+// env-var defaults, but the engine doesn't always materialize those
+// into the Configure RPC args (in particular not for in-process
+// integration harnesses), so we fall back to reading the env
+// directly. This matches v1 behavior — programs and tests can set
+// the env var instead of stack config and everything still works.
+func (s *state) configure(_ context.Context, req pgo.ConfigureRequest) error {
+	args := req.Args.AsMap()
+	if v, ok := args["accessToken"]; ok && v.IsString() {
+		s.cfg.AccessToken = v.AsString()
+	}
+	if v, ok := args["apiUrl"]; ok && v.IsString() {
+		s.cfg.APIURL = v.AsString()
+	}
+	if s.cfg.AccessToken == "" {
+		s.cfg.AccessToken = os.Getenv("PULUMI_ACCESS_TOKEN")
+	}
+	if s.cfg.APIURL == "" {
+		s.cfg.APIURL = os.Getenv("PULUMI_BACKEND_URL")
+	}
+	s.client = runtime.NewClient(s.cfg.APIURL, s.cfg.AccessToken)
+	s.dispatcher = runtime.NewDispatcher(s.client, s.metadata)
+	return nil
 }
 
 // ─── CRUD ───────────────────────────────────────────────────────────────
 
-// Check validates + normalizes inputs. Declarative Checks (requireOneOf,
-// requireTogether, requireIf) from the resource's metadata are evaluated
-// here, and any property with `sortOnRead: true` is canonicalized into
-// its sorted form so subsequent diffs against the server's (also
-// canonicalized) response don't flag spurious ordering changes.
-func (s *Server) Check(ctx context.Context, req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	token := tokenFromURN(req.GetUrn())
+// check evaluates declarative checks (requireOneOf / requireTogether
+// / requireIfSet / requireIf) and canonicalizes any sortOnRead
+// arrays so that subsequent diffs against the server's sorted
+// response don't flag spurious ordering changes.
+func (s *state) check(_ context.Context, req pgo.CheckRequest) (pgo.CheckResponse, error) {
+	token := tokenFromURN(string(req.Urn))
 	res, found := s.metadata.Resources[token]
 	if !found {
-		return &pulumirpc.CheckResponse{Inputs: req.GetNews()}, nil
+		return pgo.CheckResponse{Inputs: req.Inputs}, nil
 	}
 	if len(res.Checks) == 0 && !runtime.HasSortOnRead(res.Properties) {
-		return &pulumirpc.CheckResponse{Inputs: req.GetNews()}, nil
+		return pgo.CheckResponse{Inputs: req.Inputs}, nil
 	}
-	news, err := propertiesFromStruct(req.GetNews())
-	if err != nil {
-		return nil, err
-	}
+	news := resource.ToResourcePropertyMap(req.Inputs)
 	news = runtime.CanonicalizeSortedInputs(res.Properties, news)
 	failures := runtime.EvaluateChecks(&res, news)
-	return makeCheckResponse(news, failures)
+
+	resp := pgo.CheckResponse{Inputs: resource.FromResourcePropertyMap(news)}
+	for _, f := range failures {
+		resp.Failures = append(resp.Failures, pgo.CheckFailure{
+			Property: f.Property,
+			Reason:   f.Reason,
+		})
+	}
+	return resp, nil
 }
 
-// Diff reports whether a change is needed and which properties require
-// replacement. Any property in ForceNew that changed triggers replacement;
-// anything else is an in-place update.
-func (s *Server) Diff(ctx context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	return s.genericDiff(tokenFromURN(req.GetUrn()), req)
-}
-
-// Create dispatches through runtime.Dispatcher.
-func (s *Server) Create(ctx context.Context, req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
-	if s.dispatcher == nil {
-		return nil, fmt.Errorf("provider not configured; Configure must precede Create")
-	}
-	news, err := propertiesFromStruct(req.GetProperties())
-	if err != nil {
-		return nil, err
-	}
-	id, outputs, err := s.dispatcher.Create(ctx, tokenFromURN(req.GetUrn()), news)
-	if err != nil {
-		return nil, err
-	}
-	return makeCreateResponse(id, outputs)
-}
-
-// Read refreshes the resource's state. Empty outputs (nil map) signal
-// "resource no longer exists" — Pulumi will recreate on the next up.
-func (s *Server) Read(ctx context.Context, req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	if s.dispatcher == nil {
-		return nil, fmt.Errorf("provider not configured; Configure must precede Read")
-	}
-	olds, err := propertiesFromStruct(req.GetProperties())
-	if err != nil {
-		return nil, err
-	}
-	id, outputs, err := s.dispatcher.Read(ctx, tokenFromURN(req.GetUrn()), req.GetId(), olds)
-	if err != nil {
-		return nil, err
-	}
-	if outputs == nil {
-		// Resource no longer exists — Pulumi signals this via an empty ID.
-		return &pulumirpc.ReadResponse{}, nil
-	}
-	return makeReadResponse(id, outputs, olds)
-}
-
-// Update applies an in-place change.
-func (s *Server) Update(ctx context.Context, req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	if s.dispatcher == nil {
-		return nil, fmt.Errorf("provider not configured; Configure must precede Update")
-	}
-	olds, err := propertiesFromStruct(req.GetOlds())
-	if err != nil {
-		return nil, err
-	}
-	news, err := propertiesFromStruct(req.GetNews())
-	if err != nil {
-		return nil, err
-	}
-	outputs, err := s.dispatcher.Update(ctx, tokenFromURN(req.GetUrn()), req.GetId(), olds, news)
-	if err != nil {
-		return nil, err
-	}
-	return makeUpdateResponse(outputs)
-}
-
-// Delete removes the resource from the backing Pulumi Cloud API.
-func (s *Server) Delete(ctx context.Context, req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	if s.dispatcher == nil {
-		return nil, fmt.Errorf("provider not configured; Configure must precede Delete")
-	}
-	state, err := propertiesFromStruct(req.GetProperties())
-	if err != nil {
-		return nil, err
-	}
-	if err := s.dispatcher.Delete(ctx, tokenFromURN(req.GetUrn()), req.GetId(), state); err != nil {
-		return nil, err
-	}
-	return &pbempty.Empty{}, nil
-}
-
-// Invoke runs a data-source function. The tok identifies which
-// CloudAPIFunction in the metadata to call; args map to its path/query
-// parameters. Resource method calls (Call) are not yet implemented —
-// CloudAPIMethod entries are emitted into schema + metadata but the
-// Call RPC is deferred to a subsequent 2.x.
-func (s *Server) Invoke(ctx context.Context, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
-	if s.dispatcher == nil {
-		return nil, fmt.Errorf("provider not configured; Configure must precede Invoke")
-	}
-	args, err := propertiesFromStruct(req.GetArgs())
-	if err != nil {
-		return nil, err
-	}
-	out, err := s.dispatcher.Invoke(ctx, req.GetTok(), args)
-	if err != nil {
-		return nil, err
-	}
-	ret, err := propertiesToStruct(out)
-	if err != nil {
-		return nil, err
-	}
-	return &pulumirpc.InvokeResponse{Return: ret}, nil
-}
-
-// ─── Helpers ────────────────────────────────────────────────────────────
-
-// genericDiff compares old vs new property maps using ForceNew from metadata.
-// Any property in ForceNew that changed triggers replacement; any property
-// that differs at all is a diff.
-func (s *Server) genericDiff(token string, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+// diff compares old vs new inputs using ForceNew from metadata. Any
+// ForceNew property that changed becomes a replace; anything else
+// that differs is an in-place update.
+//
+// Pulumi engines from v3.74.0+ send the prior inputs separately
+// (OldInputs); compare against those rather than State (which is the
+// prior outputs). The two diverge whenever the API echoes server-
+// computed defaults — comparing inputs to inputs avoids spurious
+// "the server added members:[]" diffs on every refresh. Older
+// engines without OldInputs fall through to State as a best effort.
+func (s *state) diff(_ context.Context, req pgo.DiffRequest) (pgo.DiffResponse, error) {
+	token := tokenFromURN(string(req.Urn))
 	res, ok := s.metadata.Resources[token]
 	if !ok {
-		// Unknown resource — no diff, no change.
-		return &pulumirpc.DiffResponse{Changes: pulumirpc.DiffResponse_DIFF_NONE}, nil
+		return pgo.DiffResponse{}, nil
 	}
-	olds, err := propertiesFromStruct(req.GetOlds())
-	if err != nil {
-		return nil, err
+	priorInputs := req.OldInputs
+	if priorInputs.Len() == 0 {
+		priorInputs = req.State
 	}
-	news, err := propertiesFromStruct(req.GetNews())
-	if err != nil {
-		return nil, err
-	}
+	olds := resource.ToResourcePropertyMap(priorInputs)
+	news := resource.ToResourcePropertyMap(req.Inputs)
 
 	forceNew := map[string]bool{}
 	for _, f := range res.ForceNew {
 		forceNew[f] = true
 	}
-	var diffs, replaces []string
-	changes := pulumirpc.DiffResponse_DIFF_NONE
-	// Walk the union of keys in olds and news; ignore output-only fields
-	// (they're server-assigned and not meaningful for user-driven diffs).
+	detailed := map[string]pgo.PropertyDiff{}
+	hasChanges := false
 	seen := map[string]bool{}
 	consider := func(key resource.PropertyKey) {
 		name := string(key)
@@ -304,11 +306,25 @@ func (s *Server) genericDiff(token string, req *pulumirpc.DiffRequest) (*pulumir
 		if oldOk && newOk && oldV.DeepEquals(newV) {
 			return
 		}
-		diffs = append(diffs, name)
-		changes = pulumirpc.DiffResponse_DIFF_SOME
-		if forceNew[name] {
-			replaces = append(replaces, name)
+		hasChanges = true
+		kind := pgo.Update
+		switch {
+		case !oldOk && newOk:
+			kind = pgo.Add
+		case oldOk && !newOk:
+			kind = pgo.Delete
 		}
+		if forceNew[name] {
+			switch kind {
+			case pgo.Add:
+				kind = pgo.AddReplace
+			case pgo.Delete:
+				kind = pgo.DeleteReplace
+			default:
+				kind = pgo.UpdateReplace
+			}
+		}
+		detailed[name] = pgo.PropertyDiff{Kind: kind}
 	}
 	for k := range olds {
 		consider(k)
@@ -316,23 +332,122 @@ func (s *Server) genericDiff(token string, req *pulumirpc.DiffRequest) (*pulumir
 	for k := range news {
 		consider(k)
 	}
-	return &pulumirpc.DiffResponse{
-		Changes:  changes,
-		Diffs:    diffs,
-		Replaces: replaces,
+	return pgo.DiffResponse{
+		HasChanges:   hasChanges,
+		DetailedDiff: detailed,
 	}, nil
 }
+
+// create dispatches through runtime.Dispatcher.
+func (s *state) create(ctx context.Context, req pgo.CreateRequest) (pgo.CreateResponse, error) {
+	if s.dispatcher == nil {
+		return pgo.CreateResponse{}, errors.New("provider not configured; Configure must precede Create")
+	}
+	news := resource.ToResourcePropertyMap(req.Properties)
+	id, outputs, err := s.dispatcher.Create(ctx, tokenFromURN(string(req.Urn)), news)
+	if err != nil {
+		return pgo.CreateResponse{}, err
+	}
+	return pgo.CreateResponse{
+		ID:         id,
+		Properties: resource.FromResourcePropertyMap(outputs),
+	}, nil
+}
+
+// read refreshes the resource. A nil outputs map signals "resource no
+// longer exists" — the framework handles that via an empty ID in the
+// response.
+func (s *state) read(ctx context.Context, req pgo.ReadRequest) (pgo.ReadResponse, error) {
+	if s.dispatcher == nil {
+		return pgo.ReadResponse{}, errors.New("provider not configured; Configure must precede Read")
+	}
+	olds := resource.ToResourcePropertyMap(req.Properties)
+	id, outputs, err := s.dispatcher.Read(ctx, tokenFromURN(string(req.Urn)), req.ID, olds)
+	if err != nil {
+		return pgo.ReadResponse{}, err
+	}
+	if outputs == nil {
+		// Resource no longer exists.
+		return pgo.ReadResponse{}, nil
+	}
+	// Inputs in the response are the user-program-shaped inputs the
+	// engine compares against the program's current inputs on the
+	// next diff. Use req.Inputs (prior inputs from the engine) when
+	// they're present (refresh path); fall back to outputs only for
+	// import (where the engine has no prior inputs to hand us).
+	inputs := req.Inputs
+	if inputs.Len() == 0 {
+		inputs = resource.FromResourcePropertyMap(outputs)
+	}
+	return pgo.ReadResponse{
+		ID:         id,
+		Properties: resource.FromResourcePropertyMap(outputs),
+		Inputs:     inputs,
+	}, nil
+}
+
+// update applies an in-place change.
+func (s *state) update(ctx context.Context, req pgo.UpdateRequest) (pgo.UpdateResponse, error) {
+	if s.dispatcher == nil {
+		return pgo.UpdateResponse{}, errors.New("provider not configured; Configure must precede Update")
+	}
+	olds := resource.ToResourcePropertyMap(req.State)
+	news := resource.ToResourcePropertyMap(req.Inputs)
+	outputs, err := s.dispatcher.Update(ctx, tokenFromURN(string(req.Urn)), req.ID, olds, news)
+	if err != nil {
+		return pgo.UpdateResponse{}, err
+	}
+	return pgo.UpdateResponse{Properties: resource.FromResourcePropertyMap(outputs)}, nil
+}
+
+// delete removes the resource.
+func (s *state) delete(ctx context.Context, req pgo.DeleteRequest) error {
+	if s.dispatcher == nil {
+		return errors.New("provider not configured; Configure must precede Delete")
+	}
+	state := resource.ToResourcePropertyMap(req.Properties)
+	return s.dispatcher.Delete(ctx, tokenFromURN(string(req.Urn)), req.ID, state)
+}
+
+// invoke runs a data-source function (e.g. listAccounts).
+func (s *state) invoke(ctx context.Context, req pgo.InvokeRequest) (pgo.InvokeResponse, error) {
+	if s.dispatcher == nil {
+		return pgo.InvokeResponse{}, errors.New("provider not configured; Configure must precede Invoke")
+	}
+	args := resource.ToResourcePropertyMap(req.Args)
+	out, err := s.dispatcher.Invoke(ctx, string(req.Token), args)
+	if err != nil {
+		return pgo.InvokeResponse{}, err
+	}
+	return pgo.InvokeResponse{Return: resource.FromResourcePropertyMap(out)}, nil
+}
+
+// parameterize is the hook iwahbe flagged as a future capability:
+// a self-hosted customer could swap in a different OpenAPI spec /
+// resource map at runtime. v2.0.0-alpha.1 ships the structural
+// wiring (so callers don't get an "unimplemented at the framework
+// layer" error) but doesn't yet rebuild metadata from the
+// parameters; the Args/Value carry the bytes the next 2.x will
+// use. Returning a typed error rather than a panic so a misbehaving
+// consumer gets a clean failure.
+func (s *state) parameterize(_ context.Context, _ pgo.ParameterizeRequest) (pgo.ParameterizeResponse, error) {
+	return pgo.ParameterizeResponse{}, errors.New(
+		"parameterize is not yet implemented in pulumiservice v2.0.0-alpha.1;" +
+			" the wiring is in place for a follow-up to swap the OpenAPI spec /" +
+			" resource map at runtime")
+}
+
+// ─── Helpers ────────────────────────────────────────────────────────────
 
 // tokenFromURN extracts the resource-type token (e.g.
 // "pulumiservice:orgs/agents:AgentPool") from a URN.
 func tokenFromURN(urn string) string {
 	// URN format: urn:pulumi:<stack>::<project>::<type>::<name>
-	// The type token is the 3rd "::"-delimited segment from the right.
+	// The type token is the second-to-last "::"-delimited segment.
 	parts := splitURN(urn)
 	if len(parts) < 2 {
 		return urn
 	}
-	// parts[len-2] is the type token, parts[len-1] is the name.
 	return parts[len(parts)-2]
 }
 
@@ -350,71 +465,6 @@ func splitURN(urn string) []string {
 	return out
 }
 
-// propertiesFromStruct converts a protobuf Struct into a Pulumi PropertyMap.
-// Uses the SDK's plugin helper so secret/computed markers round-trip correctly.
-func propertiesFromStruct(s *structpb.Struct) (resource.PropertyMap, error) {
-	if s == nil {
-		return resource.PropertyMap{}, nil
-	}
-	return plugin.UnmarshalProperties(s, plugin.MarshalOptions{
-		KeepUnknowns:  true,
-		KeepSecrets:   true,
-		KeepResources: true,
-	})
-}
-
-// propertiesToStruct is the inverse — used when building response messages.
-func propertiesToStruct(props resource.PropertyMap) (*structpb.Struct, error) {
-	return plugin.MarshalProperties(props, plugin.MarshalOptions{
-		KeepUnknowns:  true,
-		KeepSecrets:   true,
-		KeepResources: true,
-	})
-}
-
-func makeCheckResponse(news resource.PropertyMap, failures []runtime.CheckFailure) (*pulumirpc.CheckResponse, error) {
-	s, err := propertiesToStruct(news)
-	if err != nil {
-		return nil, err
-	}
-	resp := &pulumirpc.CheckResponse{Inputs: s}
-	for _, f := range failures {
-		resp.Failures = append(resp.Failures, &pulumirpc.CheckFailure{
-			Property: f.Property,
-			Reason:   f.Reason,
-		})
-	}
-	return resp, nil
-}
-
-func makeCreateResponse(id string, outputs resource.PropertyMap) (*pulumirpc.CreateResponse, error) {
-	s, err := propertiesToStruct(outputs)
-	if err != nil {
-		return nil, err
-	}
-	return &pulumirpc.CreateResponse{Id: id, Properties: s}, nil
-}
-
-func makeReadResponse(id string, outputs, priorInputs resource.PropertyMap) (*pulumirpc.ReadResponse, error) {
-	outS, err := propertiesToStruct(outputs)
-	if err != nil {
-		return nil, err
-	}
-	// Inputs: a Read may produce changes Pulumi surfaces back to the program.
-	// For MVP we pass the prior inputs through unchanged; richer import
-	// support (e.g., deriving inputs from outputs) comes later.
-	inputsS, err := propertiesToStruct(priorInputs)
-	if err != nil {
-		return nil, err
-	}
-	return &pulumirpc.ReadResponse{Id: id, Properties: outS, Inputs: inputsS}, nil
-}
-
-func makeUpdateResponse(outputs resource.PropertyMap) (*pulumirpc.UpdateResponse, error) {
-	s, err := propertiesToStruct(outputs)
-	if err != nil {
-		return nil, err
-	}
-	return &pulumirpc.UpdateResponse{Properties: s}, nil
-}
-
+// Compile-time sanity check: property package is imported (some tests
+// reference it). Without this, `goimports` may strip the import.
+var _ = property.Map{}

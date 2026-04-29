@@ -13,7 +13,7 @@ const __config = new pulumi.Config("pulumiservice");
 export declare const accessToken: string | undefined;
 Object.defineProperty(exports, "accessToken", {
     get() {
-        return __config.get("accessToken");
+        return __config.get("accessToken") ?? utilities.getEnv("PULUMI_ACCESS_TOKEN");
     },
     enumerable: true,
 });

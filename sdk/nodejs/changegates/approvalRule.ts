@@ -32,17 +32,9 @@ export class ApprovalRule extends pulumi.CustomResource {
     }
 
     /**
-     * Rule config — number of required approvals, eligible approvers, reapproval policy, self-approval toggle.
-     */
-    declare public readonly approvalRuleConfig: pulumi.Output<any | undefined>;
-    /**
      * Whether the rule is active.
      */
     declare public readonly enabled: pulumi.Output<boolean | undefined>;
-    /**
-     * Target environment — organization/project/environment triple.
-     */
-    declare public readonly environmentIdentifier: pulumi.Output<any | undefined>;
     /**
      * Server-assigned rule ID.
      */
@@ -56,9 +48,16 @@ export class ApprovalRule extends pulumi.CustomResource {
      */
     declare public readonly organizationName: pulumi.Output<string>;
     /**
-     * Which action types the rule gates (e.g., deployment, environment_change).
+     * Rule shape — `{ruleType: "approval_required", numApprovalsRequired: <n>,
+     * eligibleApprovers: {teams: [...]}, preventSelfApproval: <bool>}`.
      */
-    declare public readonly targetActionTypes: pulumi.Output<string[] | undefined>;
+    declare public readonly rule: pulumi.Output<any | undefined>;
+    /**
+     * Target shape — `{entityType: "environment", qualifiedName: "<project>/<env>", actionTypes: ["update"|"open"]}`.
+     * Pulumi Cloud only supports environment targets in
+     * v2.0.0-alpha; richer targeting lands in a later release.
+     */
+    declare public readonly target: pulumi.Output<any | undefined>;
 
     /**
      * Create a ApprovalRule resource with the given unique name, arguments, and options.
@@ -71,14 +70,8 @@ export class ApprovalRule extends pulumi.CustomResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
-            if (args?.approvalRuleConfig === undefined && !opts.urn) {
-                throw new Error("Missing required property 'approvalRuleConfig'");
-            }
             if (args?.enabled === undefined && !opts.urn) {
                 throw new Error("Missing required property 'enabled'");
-            }
-            if (args?.environmentIdentifier === undefined && !opts.urn) {
-                throw new Error("Missing required property 'environmentIdentifier'");
             }
             if (args?.name === undefined && !opts.urn) {
                 throw new Error("Missing required property 'name'");
@@ -86,24 +79,25 @@ export class ApprovalRule extends pulumi.CustomResource {
             if (args?.organizationName === undefined && !opts.urn) {
                 throw new Error("Missing required property 'organizationName'");
             }
-            if (args?.targetActionTypes === undefined && !opts.urn) {
-                throw new Error("Missing required property 'targetActionTypes'");
+            if (args?.rule === undefined && !opts.urn) {
+                throw new Error("Missing required property 'rule'");
             }
-            resourceInputs["approvalRuleConfig"] = args?.approvalRuleConfig;
+            if (args?.target === undefined && !opts.urn) {
+                throw new Error("Missing required property 'target'");
+            }
             resourceInputs["enabled"] = (args?.enabled) ?? true;
-            resourceInputs["environmentIdentifier"] = args?.environmentIdentifier;
             resourceInputs["name"] = args?.name;
             resourceInputs["organizationName"] = args?.organizationName;
-            resourceInputs["targetActionTypes"] = args?.targetActionTypes;
+            resourceInputs["rule"] = args?.rule;
+            resourceInputs["target"] = args?.target;
             resourceInputs["gateId"] = undefined /*out*/;
         } else {
-            resourceInputs["approvalRuleConfig"] = undefined /*out*/;
             resourceInputs["enabled"] = undefined /*out*/;
-            resourceInputs["environmentIdentifier"] = undefined /*out*/;
             resourceInputs["gateId"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
             resourceInputs["organizationName"] = undefined /*out*/;
-            resourceInputs["targetActionTypes"] = undefined /*out*/;
+            resourceInputs["rule"] = undefined /*out*/;
+            resourceInputs["target"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         super(ApprovalRule.__pulumiType, name, resourceInputs, opts);
@@ -115,17 +109,9 @@ export class ApprovalRule extends pulumi.CustomResource {
  */
 export interface ApprovalRuleArgs {
     /**
-     * Rule config — number of required approvals, eligible approvers, reapproval policy, self-approval toggle.
-     */
-    approvalRuleConfig: any;
-    /**
      * Whether the rule is active.
      */
     enabled: pulumi.Input<boolean>;
-    /**
-     * Target environment — organization/project/environment triple.
-     */
-    environmentIdentifier: any;
     /**
      * Human-readable name for the rule.
      */
@@ -135,7 +121,14 @@ export interface ApprovalRuleArgs {
      */
     organizationName: pulumi.Input<string>;
     /**
-     * Which action types the rule gates (e.g., deployment, environment_change).
+     * Rule shape — `{ruleType: "approval_required", numApprovalsRequired: <n>,
+     * eligibleApprovers: {teams: [...]}, preventSelfApproval: <bool>}`.
      */
-    targetActionTypes: pulumi.Input<pulumi.Input<string>[]>;
+    rule: any;
+    /**
+     * Target shape — `{entityType: "environment", qualifiedName: "<project>/<env>", actionTypes: ["update"|"open"]}`.
+     * Pulumi Cloud only supports environment targets in
+     * v2.0.0-alpha; richer targeting lands in a later release.
+     */
+    target: any;
 }

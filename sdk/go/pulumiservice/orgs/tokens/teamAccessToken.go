@@ -15,7 +15,11 @@ import (
 type TeamAccessToken struct {
 	pulumi.CustomResourceState
 
-	Description      pulumi.StringPtrOutput `pulumi:"description"`
+	Description pulumi.StringPtrOutput `pulumi:"description"`
+	// Unix epoch expiration. `0` (the default) means no expiry.
+	Expires pulumi.IntPtrOutput `pulumi:"expires"`
+	// Token name. Unique within the team (including deleted tokens). Defaults to the description if omitted.
+	Name             pulumi.StringPtrOutput `pulumi:"name"`
 	OrganizationName pulumi.StringOutput    `pulumi:"organizationName"`
 	TeamName         pulumi.StringOutput    `pulumi:"teamName"`
 	TokenId          pulumi.StringOutput    `pulumi:"tokenId"`
@@ -34,6 +38,9 @@ func NewTeamAccessToken(ctx *pulumi.Context,
 	}
 	if args.TeamName == nil {
 		return nil, errors.New("invalid value for required argument 'TeamName'")
+	}
+	if args.Expires == nil {
+		args.Expires = pulumi.IntPtr(0)
 	}
 	secrets := pulumi.AdditionalSecretOutputs([]string{
 		"value",
@@ -72,14 +79,22 @@ func (TeamAccessTokenState) ElementType() reflect.Type {
 }
 
 type teamAccessTokenArgs struct {
-	Description      *string `pulumi:"description"`
+	Description *string `pulumi:"description"`
+	// Unix epoch expiration. `0` (the default) means no expiry.
+	Expires *int `pulumi:"expires"`
+	// Token name. Unique within the team (including deleted tokens). Defaults to the description if omitted.
+	Name             *string `pulumi:"name"`
 	OrganizationName string  `pulumi:"organizationName"`
 	TeamName         string  `pulumi:"teamName"`
 }
 
 // The set of arguments for constructing a TeamAccessToken resource.
 type TeamAccessTokenArgs struct {
-	Description      pulumi.StringPtrInput
+	Description pulumi.StringPtrInput
+	// Unix epoch expiration. `0` (the default) means no expiry.
+	Expires pulumi.IntPtrInput
+	// Token name. Unique within the team (including deleted tokens). Defaults to the description if omitted.
+	Name             pulumi.StringPtrInput
 	OrganizationName pulumi.StringInput
 	TeamName         pulumi.StringInput
 }
@@ -173,6 +188,16 @@ func (o TeamAccessTokenOutput) ToTeamAccessTokenOutputWithContext(ctx context.Co
 
 func (o TeamAccessTokenOutput) Description() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *TeamAccessToken) pulumi.StringPtrOutput { return v.Description }).(pulumi.StringPtrOutput)
+}
+
+// Unix epoch expiration. `0` (the default) means no expiry.
+func (o TeamAccessTokenOutput) Expires() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *TeamAccessToken) pulumi.IntPtrOutput { return v.Expires }).(pulumi.IntPtrOutput)
+}
+
+// Token name. Unique within the team (including deleted tokens). Defaults to the description if omitted.
+func (o TeamAccessTokenOutput) Name() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *TeamAccessToken) pulumi.StringPtrOutput { return v.Name }).(pulumi.StringPtrOutput)
 }
 
 func (o TeamAccessTokenOutput) OrganizationName() pulumi.StringOutput {

@@ -609,3 +609,226 @@ func TestPrimitive_RequireIfSet_TriggerPresent_FieldPresent_Passes(t *testing.T)
 	})
 	assert.Empty(t, failures)
 }
+
+// ─── pathName ───────────────────────────────────────────────────────────
+
+// PathName lets the URL path placeholder differ from the property's
+// response/body wire name. AgentPool's `id` field in body/response
+// vs `{poolId}` in the URL path is the canonical case.
+func TestPrimitive_PathName_BridgesPathAndResponseWireNames(t *testing.T) {
+	props := map[string]CloudAPIProperty{
+		"agentPoolId": {
+			From:     "id",
+			PathName: "poolId",
+			Source:   "response",
+			Output:   true,
+		},
+	}
+	out := translateSDKToWire(props, map[string]string{
+		"agentPoolId": "abc-123",
+	})
+	// All three lookup names must point at the same value: SDK,
+	// response wire name (From), and path placeholder (PathName).
+	assert.Equal(t, "abc-123", out["agentPoolId"], "SDK name carries through")
+	assert.Equal(t, "abc-123", out["id"], "response wire name (From)")
+	assert.Equal(t, "abc-123", out["poolId"], "path placeholder (PathName)")
+}
+
+// ─── bodyFrom ───────────────────────────────────────────────────────────
+
+// BodyFrom decouples request-body wire name from response wire name.
+// LogExport is the canonical case: PUT body uses `newEnabled`, GET
+// response returns `enabled`.
+func TestPrimitive_BodyFrom_DivergesFromResponseName(t *testing.T) {
+	props := map[string]CloudAPIProperty{
+		"enabled": {
+			From:     "enabled",     // response side
+			BodyFrom: "newEnabled",  // body side
+			Source:   "body",
+		},
+	}
+	split, err := InputsToRequest(props, resource.PropertyMap{
+		"enabled": resource.NewBoolProperty(true),
+	}, "", false)
+	require.NoError(t, err)
+	// Body must use the BodyFrom wire name, not From.
+	require.Contains(t, split.Body, "newEnabled")
+	assert.Equal(t, true, split.Body["newEnabled"])
+	assert.NotContains(t, split.Body, "enabled",
+		"`enabled` is the response wire name; body must use BodyFrom")
+}
+
+// ─── pathAndBody ────────────────────────────────────────────────────────
+
+// pathAndBody source duplicates the value into both the URL path and
+// the request body. Required for endpoints (Webhook) that validate
+// the body's identity fields against the URL.
+func TestPrimitive_PathAndBody_WritesToBothBuckets(t *testing.T) {
+	props := map[string]CloudAPIProperty{
+		"organizationName": {
+			From:   "orgName",
+			Source: "pathAndBody",
+		},
+	}
+	split, err := InputsToRequest(props, resource.PropertyMap{
+		"organizationName": resource.NewStringProperty("acme"),
+	}, "", false)
+	require.NoError(t, err)
+	// Path-side uses the `From` wire name.
+	assert.Equal(t, "acme", split.Path["orgName"])
+	// Body-side defaults to the SDK name (matches the typical
+	// component-schema field name in Pulumi Cloud's API).
+	assert.Equal(t, "acme", split.Body["organizationName"])
+}
+
+// pathAndBody honors BodyFrom for the body-side wire name when set,
+// for endpoints that diverge body and path naming on the same field.
+func TestPrimitive_PathAndBody_HonorsBodyFrom(t *testing.T) {
+	props := map[string]CloudAPIProperty{
+		"environmentName": {
+			From:     "envName",
+			BodyFrom: "envName",
+			Source:   "pathAndBody",
+		},
+	}
+	split, err := InputsToRequest(props, resource.PropertyMap{
+		"environmentName": resource.NewStringProperty("prod"),
+	}, "", false)
+	require.NoError(t, err)
+	assert.Equal(t, "prod", split.Path["envName"])
+	assert.Equal(t, "prod", split.Body["envName"])
+}
+
+// ─── bodyAs ─────────────────────────────────────────────────────────────
+
+// BodyAs lets a single property's value become the entire request
+// body (no wrapping). Used for the StackTags PATCH endpoint, which
+// expects `{tag1: val1, tag2: val2}` directly rather than nested
+// under a `tags:` key.
+func TestPrimitive_BodyAs_PromotesPropertyValueAsEntireBody(t *testing.T) {
+	var gotBody map[string]interface{}
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		body, _ := io.ReadAll(r.Body)
+		_ = json.Unmarshal(body, &gotBody)
+		w.WriteHeader(200)
+		_, _ = w.Write([]byte(`{}`))
+	}))
+	defer srv.Close()
+
+	md := &CloudAPIMetadata{Resources: map[string]CloudAPIResource{
+		"pulumiservice:stacks/tags:Tags": {
+			Token: "pulumiservice:stacks/tags:Tags",
+			Create: &CloudAPIOperation{
+				OperationID: "UpdateStackTags",
+				Method:      "PATCH",
+				PathTemplate: "/api/stacks/{orgName}/{projectName}/{stackName}/tags",
+				BodyAs:      "tags",
+			},
+			ID: &CloudAPIID{
+				Template: "{organization}/{project}/{stack}",
+				Params:   []string{"organization", "project", "stack"},
+			},
+			Properties: map[string]CloudAPIProperty{
+				"organization": {From: "orgName", Source: "path"},
+				"project":      {From: "projectName", Source: "path"},
+				"stack":        {From: "stackName", Source: "path"},
+				"tags":         {Source: "body"},
+			},
+		},
+	}}
+	d := &Dispatcher{Client: NewClient(srv.URL, "tok"), Metadata: md}
+
+	_, _, err := d.Create(context.Background(), "pulumiservice:stacks/tags:Tags",
+		resource.PropertyMap{
+			"organization": resource.NewStringProperty("acme"),
+			"project":      resource.NewStringProperty("infra"),
+			"stack":        resource.NewStringProperty("prod"),
+			"tags": resource.NewObjectProperty(resource.PropertyMap{
+				"environment": resource.NewStringProperty("production"),
+				"owner":       resource.NewStringProperty("platform"),
+			}),
+		})
+	require.NoError(t, err)
+	// Body is the tags map directly, NOT wrapped under `tags:`.
+	require.NotContains(t, gotBody, "tags",
+		"BodyAs should unwrap — the tags map IS the body")
+	assert.Equal(t, "production", gotBody["environment"])
+	assert.Equal(t, "platform", gotBody["owner"])
+}
+
+// ─── InferScopeFromInputs ───────────────────────────────────────────────
+
+// Polymorphic resources without an explicit discriminator field
+// (Webhook) rely on which path-source identity properties the user
+// sets to pick the scope. Most-specific scope wins.
+func TestPrimitive_InferScopeFromInputs_PicksMostSpecificMatch(t *testing.T) {
+	res := &CloudAPIResource{
+		PolymorphicScopes: &PolymorphicScopes{
+			Scopes: map[string]CloudAPIResourceOps{
+				"org":   {},
+				"stack": {},
+				"esc":   {},
+			},
+		},
+		ID: &CloudAPIID{
+			Templates: map[string]string{
+				"org":   "{organizationName}/{name}",
+				"stack": "{organizationName}/{projectName}/{stackName}/{name}",
+				"esc":   "{organizationName}/{projectName}/{environmentName}/{name}",
+			},
+		},
+		Properties: map[string]CloudAPIProperty{
+			"organizationName": {Source: "pathAndBody"},
+			"projectName":      {Source: "pathAndBody"},
+			"stackName":        {Source: "pathAndBody"},
+			"environmentName":  {Source: "pathAndBody"},
+			"name":             {Source: "response", Output: true},
+		},
+	}
+
+	// Just organizationName → org scope.
+	scope := InferScopeFromInputs(res, resource.PropertyMap{
+		"organizationName": resource.NewStringProperty("acme"),
+	})
+	assert.Equal(t, "org", scope)
+
+	// Add stackName → stack scope wins (most specific).
+	scope = InferScopeFromInputs(res, resource.PropertyMap{
+		"organizationName": resource.NewStringProperty("acme"),
+		"projectName":      resource.NewStringProperty("infra"),
+		"stackName":        resource.NewStringProperty("prod"),
+	})
+	assert.Equal(t, "stack", scope)
+
+	// Add environmentName instead of stackName → esc scope wins.
+	scope = InferScopeFromInputs(res, resource.PropertyMap{
+		"organizationName": resource.NewStringProperty("acme"),
+		"projectName":      resource.NewStringProperty("infra"),
+		"environmentName":  resource.NewStringProperty("dev"),
+	})
+	assert.Equal(t, "esc", scope)
+}
+
+// Output-only placeholders in the ID template (server-assigned
+// names like Webhook's `name`) shouldn't disqualify a scope match.
+func TestPrimitive_InferScopeFromInputs_IgnoresOutputOnlyPlaceholders(t *testing.T) {
+	res := &CloudAPIResource{
+		PolymorphicScopes: &PolymorphicScopes{
+			Scopes: map[string]CloudAPIResourceOps{"org": {}},
+		},
+		ID: &CloudAPIID{
+			Templates: map[string]string{
+				"org": "{organizationName}/{name}",
+			},
+		},
+		Properties: map[string]CloudAPIProperty{
+			"organizationName": {Source: "pathAndBody"},
+			// `name` is server-assigned, not in inputs.
+			"name": {Source: "response", Output: true},
+		},
+	}
+	scope := InferScopeFromInputs(res, resource.PropertyMap{
+		"organizationName": resource.NewStringProperty("acme"),
+	})
+	assert.Equal(t, "org", scope, "output-only placeholders shouldn't block the match")
+}

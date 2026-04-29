@@ -16,8 +16,12 @@ type AccessToken struct {
 	pulumi.CustomResourceState
 
 	Description pulumi.StringPtrOutput `pulumi:"description"`
-	TokenId     pulumi.StringOutput    `pulumi:"tokenId"`
-	Value       pulumi.StringOutput    `pulumi:"value"`
+	// Unix epoch expiration. `0` (the default) means no expiry.
+	Expires pulumi.IntPtrOutput `pulumi:"expires"`
+	// Token name. Defaults to the description if omitted.
+	Name    pulumi.StringPtrOutput `pulumi:"name"`
+	TokenId pulumi.StringOutput    `pulumi:"tokenId"`
+	Value   pulumi.StringOutput    `pulumi:"value"`
 }
 
 // NewAccessToken registers a new resource with the given unique name, arguments, and options.
@@ -27,6 +31,9 @@ func NewAccessToken(ctx *pulumi.Context,
 		args = &AccessTokenArgs{}
 	}
 
+	if args.Expires == nil {
+		args.Expires = pulumi.IntPtr(0)
+	}
 	secrets := pulumi.AdditionalSecretOutputs([]string{
 		"value",
 	})
@@ -65,11 +72,19 @@ func (AccessTokenState) ElementType() reflect.Type {
 
 type accessTokenArgs struct {
 	Description *string `pulumi:"description"`
+	// Unix epoch expiration. `0` (the default) means no expiry.
+	Expires *int `pulumi:"expires"`
+	// Token name. Defaults to the description if omitted.
+	Name *string `pulumi:"name"`
 }
 
 // The set of arguments for constructing a AccessToken resource.
 type AccessTokenArgs struct {
 	Description pulumi.StringPtrInput
+	// Unix epoch expiration. `0` (the default) means no expiry.
+	Expires pulumi.IntPtrInput
+	// Token name. Defaults to the description if omitted.
+	Name pulumi.StringPtrInput
 }
 
 func (AccessTokenArgs) ElementType() reflect.Type {
@@ -161,6 +176,16 @@ func (o AccessTokenOutput) ToAccessTokenOutputWithContext(ctx context.Context) A
 
 func (o AccessTokenOutput) Description() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *AccessToken) pulumi.StringPtrOutput { return v.Description }).(pulumi.StringPtrOutput)
+}
+
+// Unix epoch expiration. `0` (the default) means no expiry.
+func (o AccessTokenOutput) Expires() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *AccessToken) pulumi.IntPtrOutput { return v.Expires }).(pulumi.IntPtrOutput)
+}
+
+// Token name. Defaults to the description if omitted.
+func (o AccessTokenOutput) Name() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *AccessToken) pulumi.StringPtrOutput { return v.Name }).(pulumi.StringPtrOutput)
 }
 
 func (o AccessTokenOutput) TokenId() pulumi.StringOutput {

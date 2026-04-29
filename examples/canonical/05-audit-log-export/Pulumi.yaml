@@ -1,12 +1,6 @@
 name: pulumiservice-canonical-05-audit-log-export
 runtime: yaml
-description: |
-  Configure Pulumi Cloud to stream the organization audit log to an S3
-  bucket continuously. Every admin action (token creation, team membership
-  change, policy group update, stack delete, …) lands in your SIEM/compliance
-  pipeline without a human in the loop.
-
-  Required for SOC 2, ISO 27001, HIPAA, and similar compliance frameworks.
+description: Continuous Pulumi Cloud audit-log export to S3. Required for SOC 2, ISO 27001, HIPAA. See README.
 
 config:
   organizationName:

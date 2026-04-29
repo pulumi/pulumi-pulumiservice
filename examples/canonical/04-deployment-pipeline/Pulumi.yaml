@@ -1,12 +1,6 @@
 name: pulumiservice-canonical-04-deployment-pipeline
 runtime: yaml
-description: |
-  A complete Pulumi Deployments pipeline for one stack: git-driven
-  previews on every PR (with review stacks), scheduled drift detection,
-  and a TTL on ephemeral preview environments.
-
-  This is the "GitOps for your infrastructure" setup most teams converge
-  on after a few months with Pulumi Cloud.
+description: Pulumi Deployments pipeline — git previews, drift detection, TTL on ephemeral envs. See README for the GitOps pattern.
 
 config:
   organizationName:
@@ -23,24 +17,32 @@ config:
     default: "00000"
 
 resources:
+  # Register the stack first — the deployment-settings, drift-schedule
+  # and TTL-schedule resources all attach to an existing stack record
+  # in Pulumi Cloud, so we have to create it before we can configure it.
+  productionStack:
+    type: pulumiservice:stacks:Stack
+    properties:
+      organizationName: ${organizationName}
+      projectName: ${project}
+      stackName: ${stack}-${digits}
+
   # Deployment settings — wires the stack to a git repo, CI image, and
   # execution context. Without this, nothing is automated.
   deploymentSettings:
     type: pulumiservice:stacks/deployments:Settings
     properties:
-      organization: ${organizationName}
-      project: ${project}
-      stack: ${stack}
+      organization: ${productionStack.organizationName}
+      project: ${productionStack.projectName}
+      stack: ${productionStack.stackName}
       sourceContext:
         git:
-          repoUrl: https://github.com/acme-corp/infrastructure.git
-          branch: refs/heads/main
-          repoDir: stacks/production
-      github:
-        repository: acme-corp/infrastructure
-        deployCommits: true
-        previewPullRequests: true   # runs `pulumi preview` on every PR
-        pullRequestTemplate: true   # creates a review stack per PR
+          repoUrl: https://github.com/pulumi/templates.git
+          branch: master
+      # In production add a `github:` block tying this stack to a GitHub
+      # repository (deployCommits / previewPullRequests / pullRequestTemplate)
+      # so PRs auto-preview and main-branch commits auto-deploy. Skipped here
+      # because it requires the Pulumi GitHub app installed on the target repo.
       executorContext:
         executorImage:
           image: pulumi/pulumi:latest
@@ -55,9 +57,9 @@ resources:
   driftCheck:
     type: pulumiservice:stacks/deployments:DriftSchedule
     properties:
-      organization: ${organizationName}
-      project: ${project}
-      stack: ${stack}
+      organization: ${productionStack.organizationName}
+      project: ${productionStack.projectName}
+      stack: ${productionStack.stackName}
       scheduleCron: "0 */6 * * *"
       autoRemediate: false           # notify-only; flip to true with care
 
@@ -65,8 +67,8 @@ resources:
   ephemeralTtl:
     type: pulumiservice:stacks/deployments:TtlSchedule
     properties:
-      organization: ${organizationName}
-      project: ${project}
-      stack: ${stack}
+      organization: ${productionStack.organizationName}
+      project: ${productionStack.projectName}
+      stack: ${productionStack.stackName}
       timestamp: "2026-12-31T00:00:00Z"
       deleteAfterDestroy: true

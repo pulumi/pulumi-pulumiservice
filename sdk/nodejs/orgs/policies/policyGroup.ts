@@ -34,6 +34,21 @@ export class PolicyGroup extends pulumi.CustomResource {
         return obj['__pulumiType'] === PolicyGroup.__pulumiType;
     }
 
+    /**
+     * Optional agent pool ID for policy evaluation. Defaults to the Pulumi-hosted pool.
+     */
+    declare public readonly agentPoolId: pulumi.Output<string | undefined>;
+    /**
+     * The type of entities this policy group applies to. Defaults to `stacks`.
+     */
+    declare public readonly entityType: pulumi.Output<string | undefined>;
+    /**
+     * Enforcement mode. Defaults to `audit` for account groups, `preventative` for stack groups.
+     */
+    declare public readonly mode: pulumi.Output<string | undefined>;
+    /**
+     * Policy group name. Unique within the organization.
+     */
     declare public readonly name: pulumi.Output<string>;
     declare public readonly organizationName: pulumi.Output<string>;
 
@@ -54,9 +69,15 @@ export class PolicyGroup extends pulumi.CustomResource {
             if (args?.organizationName === undefined && !opts.urn) {
                 throw new Error("Missing required property 'organizationName'");
             }
+            resourceInputs["agentPoolId"] = args?.agentPoolId;
+            resourceInputs["entityType"] = (args?.entityType) ?? "stacks";
+            resourceInputs["mode"] = args?.mode;
             resourceInputs["name"] = args?.name;
             resourceInputs["organizationName"] = args?.organizationName;
         } else {
+            resourceInputs["agentPoolId"] = undefined /*out*/;
+            resourceInputs["entityType"] = undefined /*out*/;
+            resourceInputs["mode"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
             resourceInputs["organizationName"] = undefined /*out*/;
         }
@@ -69,6 +90,21 @@ export class PolicyGroup extends pulumi.CustomResource {
  * The set of arguments for constructing a PolicyGroup resource.
  */
 export interface PolicyGroupArgs {
+    /**
+     * Optional agent pool ID for policy evaluation. Defaults to the Pulumi-hosted pool.
+     */
+    agentPoolId?: pulumi.Input<string>;
+    /**
+     * The type of entities this policy group applies to. Defaults to `stacks`.
+     */
+    entityType?: pulumi.Input<string>;
+    /**
+     * Enforcement mode. Defaults to `audit` for account groups, `preventative` for stack groups.
+     */
+    mode?: pulumi.Input<string>;
+    /**
+     * Policy group name. Unique within the organization.
+     */
     name: pulumi.Input<string>;
     organizationName: pulumi.Input<string>;
 }

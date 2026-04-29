@@ -1,12 +1,10 @@
 package examples
 
 import (
-	"fmt"
 	"os"
-	"path/filepath"
-	"sync"
 	"testing"
 
+	pgo "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/providertest/providers"
 	"github.com/pulumi/providertest/pulumitest"
 	"github.com/pulumi/providertest/pulumitest/assertpreview"
@@ -15,7 +13,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/auto"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/gen"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/embedded"
 	psp "github.com/pulumi/pulumi-pulumiservice/provider/pkg/provider"
 )
 
@@ -38,56 +36,19 @@ func TestMain(m *testing.M) {
 }
 
 // inMemoryProvider attaches an in-process v2 provider server to the
-// pulumitest harness. Schema + metadata are generated from the pinned
-// OpenAPI spec and resource-map.yaml at test-setup time — the tests
-// don't depend on any pre-built artifacts under bin/ or
-// provider/cmd/..., so `go test ./...` works against a clean checkout
-// without first running `make v2_gen`.
+// pulumitest harness. The provider is built directly from the
+// embedded OpenAPI spec + resource map — the same inputs the
+// production binary uses — so the integration suite exercises the
+// real schema and metadata paths without any pre-built artifacts.
 func inMemoryProvider() opttest.Option {
 	return opttest.AttachProviderServer("pulumiservice",
 		func(_ providers.PulumiTest) (pulumirpc.ResourceProviderServer, error) {
-			schemaBytes, metadataBytes, err := generateSchemaAndMetadata()
+			prov, err := psp.New(embedded.Spec(), embedded.ResourceMap())
 			if err != nil {
 				return nil, err
 			}
-			return psp.New("pulumiservice", "2.0.0-alpha.1+dev", schemaBytes, metadataBytes)
+			return pgo.RawServer("pulumiservice", "2.0.0-alpha.1+dev", prov)(nil)
 		})
-}
-
-// generateSchemaAndMetadata runs the generator against the committed
-// spec + resource map. Memoized so the (non-trivial) emission only
-// happens once per test binary run.
-var (
-	genOnce     sync.Once
-	genSchema   []byte
-	genMetadata []byte
-	genErr      error
-)
-
-func generateSchemaAndMetadata() ([]byte, []byte, error) {
-	genOnce.Do(func() {
-		spec := filepath.Join(repoRoot(), "provider", "spec", "openapi_public.json")
-		resMap := filepath.Join(repoRoot(), "provider", "resource-map.yaml")
-		if genSchema, genErr = gen.EmitSchema(spec, resMap); genErr != nil {
-			genErr = fmt.Errorf("emitting schema: %w", genErr)
-			return
-		}
-		if genMetadata, genErr = gen.EmitMetadata(spec, resMap); genErr != nil {
-			genErr = fmt.Errorf("emitting metadata: %w", genErr)
-			return
-		}
-	})
-	return genSchema, genMetadata, genErr
-}
-
-// repoRoot walks up from the examples/ directory to find the repo root.
-// Tests always run with cwd=examples/, so this is a single parent hop.
-func repoRoot() string {
-	cwd, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
-	return filepath.Dir(cwd)
 }
 
 // runPulumiTest performs the same basic steps as

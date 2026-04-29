@@ -16,6 +16,7 @@ package gen
 
 import (
 	"fmt"
+	"os"
 	"sort"
 	"strings"
 )
@@ -28,12 +29,12 @@ type Report struct {
 	UnmappedCount   int
 
 	// Per-section lists, sorted for stable output.
-	Mapped       []OperationClaim
-	Unmapped     []SpecOperation
-	Excluded     []OperationClaim
-	Duplicates   []DuplicateClaim
-	Stale        []OperationClaim // claimed but not present in spec
-	TodoMarkers  []string         // e.g. "TODO:CreateOidcIssuer" — flagged for visibility
+	Mapped      []OperationClaim
+	Unmapped    []SpecOperation
+	Excluded    []OperationClaim
+	Duplicates  []DuplicateClaim
+	Stale       []OperationClaim // claimed but not present in spec
+	TodoMarkers []string         // e.g. "TODO:CreateOidcIssuer" — flagged for visibility
 }
 
 // DuplicateClaim means two map entries both claim the same operationId.
@@ -43,13 +44,28 @@ type DuplicateClaim struct {
 	Claims      []OperationClaim
 }
 
-// CoverageReport builds the report. Does not mutate any input file.
+// CoverageReport builds the report from spec + resource-map files on disk.
+// For byte-based input (e.g. embedded copies), see CoverageReportFromBytes.
+// Does not mutate any input file.
 func CoverageReport(specPath, mapPath string) (*Report, error) {
-	spec, err := LoadSpec(specPath)
+	specBytes, err := os.ReadFile(specPath)
+	if err != nil {
+		return nil, fmt.Errorf("reading spec %s: %w", specPath, err)
+	}
+	mapBytes, err := os.ReadFile(mapPath)
+	if err != nil {
+		return nil, fmt.Errorf("reading resource-map %s: %w", mapPath, err)
+	}
+	return CoverageReportFromBytes(specBytes, mapBytes)
+}
+
+// CoverageReportFromBytes is the path-free form of CoverageReport.
+func CoverageReportFromBytes(specBytes, mapBytes []byte) (*Report, error) {
+	spec, err := LoadSpecFromBytes(specBytes)
 	if err != nil {
 		return nil, err
 	}
-	rm, err := LoadResourceMap(mapPath)
+	rm, err := LoadResourceMapFromBytes(mapBytes)
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +129,7 @@ func CoverageReport(specPath, mapPath string) (*Report, error) {
 	// can see which mappings are incomplete without traversing the YAML.
 	// (We're kind to future-us: the bring-up file deliberately contains
 	// placeholders; this surfaces them cleanly.)
-	rep.TodoMarkers = collectTodoMarkers(mapPath)
+	rep.TodoMarkers = collectTodoMarkers(mapBytes)
 
 	rep.UnmappedCount = len(rep.Unmapped)
 
@@ -217,16 +233,12 @@ func (r *Report) Markdown() string {
 	return b.String()
 }
 
-// collectTodoMarkers greps the map file for TODO:... tokens. We keep this
-// as a text scan (not a structural decode) because TODOs appear in
-// value positions we otherwise don't decode.
-func collectTodoMarkers(mapPath string) []string {
-	data, err := readFile(mapPath)
-	if err != nil {
-		return nil
-	}
+// collectTodoMarkers greps the resource-map bytes for TODO:... tokens.
+// We keep this as a text scan (not a structural decode) because TODOs
+// appear in value positions we otherwise don't decode.
+func collectTodoMarkers(mapBytes []byte) []string {
 	var out []string
-	for _, line := range strings.Split(string(data), "\n") {
+	for _, line := range strings.Split(string(mapBytes), "\n") {
 		i := strings.Index(line, "TODO:")
 		if i < 0 {
 			continue

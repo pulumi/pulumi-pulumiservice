@@ -15,27 +15,29 @@ The provider is **generated, not hand-written**. Three inputs compose
 into the shipped artifacts:
 
 ```
-┌─────────────────────────────┐   ┌─────────────────────┐
-│ provider/spec/               │   │ provider/           │
-│   openapi_public.json        │   │   resource-map.yaml │
-│   (pinned Pulumi Cloud spec) │   │   (editable mapping)│
-└──────────────┬───────────────┘   └──────────┬──────────┘
-               │                              │
-               └──────────────┬───────────────┘
-                              ▼
-            ┌────────────────────────────────────┐
-            │ provider/cmd/pulumi-gen-pulumiservice│
-            │ (generator: parse, coverage,       │
-            │  schema emit, metadata emit)       │
-            └───────────────┬────────────────────┘
-                            │
-         ┌──────────────────┼──────────────────────┐
-         ▼                  ▼                      ▼
-   bin/schema.json    bin/metadata.json     bin/coverage-report.md
-         │                  │
-         ▼                  ▼
-   sdk/{nodejs,py,go,        embedded into
-        dotnet,java}         pulumi-resource-pulumiservice
+┌──────────────────────────────────────┐
+│ provider/pkg/embedded/                │
+│   openapi_public.json (pinned spec)   │
+│   resource-map.yaml   (editable)      │
+└──────────────────┬───────────────────┘
+                   │  //go:embed
+                   ▼
+   ┌────────────────────────────────────────┐
+   │ provider/cmd/pulumi-resource-pulumiservice│
+   │ ── single binary (`go build`) ──         │
+   │  • runtime metadata derived in-process   │
+   │  • Pulumi schema emitted lazily by       │
+   │    GetSchema (errors on unmapped ops)    │
+   │  • CRUD via metadata-driven dispatcher   │
+   └────────────────┬───────────────────────┘
+                    │
+       pulumi package get-schema
+                    │
+                    ▼
+   provider/cmd/pulumi-resource-pulumiservice/schema.json (build artifact)
+                    │
+                    ▼
+   sdk/{nodejs,python,go,dotnet,java}
 ```
 
 **Zero hand-coded resources.** Every supported resource is expressed
@@ -44,9 +46,13 @@ package. When a Pulumi Cloud API pattern doesn't fit the current
 metadata shape, the right response is to extend the metadata schema
 (see "Decision tree" below) — not to add per-resource Go.
 
-**Never edit `bin/*.json` or `sdk/*` by hand.** They're generated
-outputs; direct edits will be overwritten on the next
-`make v2_provider` / `make build_sdks`.
+**One binary; `go build` is the build.** No separate
+`pulumi-gen-pulumiservice`, no committed `schema.json` /
+`metadata.json` to keep in sync. The runtime is built on
+`github.com/pulumi/pulumi-go-provider`; the schema is the binary's
+`GetSchema` RPC, which is also how `make build_sdks` extracts it for
+SDK code generation. **Never edit `sdk/*` by hand** — they're
+regenerated.
 
 ## Cadence
 
@@ -70,33 +76,30 @@ make update_spec
 Requires a sibling checkout of `pulumi-service` at
 `../pulumi-service/` with a current `main`. Copies
 `pulumi-service/pkg/apitype/spec/openapi_public.json` into
-`provider/spec/openapi_public.json` in this repo.
+`provider/pkg/embedded/openapi_public.json` in this repo.
 
 Review the diff:
 
 ```bash
-git diff provider/spec/openapi_public.json | head -200
+git diff provider/pkg/embedded/openapi_public.json | head -200
 ```
 
 ### 2. See what changed from the coverage gate's perspective
 
 ```bash
-make coverage_report
-head -40 bin/coverage-report.md
+make coverage_report           # runs `go test` against the gate
 ```
 
-The report tells you:
+This is `go test ./provider/pkg/embedded/...` under the hood. The
+test passes if every operationId in the embedded spec is claimed
+(resource, function, method, or exclusion); it fails with a list of
+unmapped operationIds otherwise. The `coverage_report_strict` make
+target is an alias — the test is strict by default.
 
-- **Unmapped operations** — new operationIds the spec has that the map
-  doesn't cover. Each one needs a decision (next section).
-- **Duplicate claims** — usually benign (a shared read/delete endpoint,
-  a list op used as both readVia and a function). Review to confirm.
-- **TODO markers in the map** — placeholders you left on a previous
-  iteration. Resolve or re-justify.
-- **Mapped** / **Excluded** counts — bookkeeping.
-
-The `coverage_report_strict` variant fails with non-zero exit on any
-unmapped op. CI should run that one once we wire CI.
+For a richer view of unmapped / duplicate / stale / TODO entries,
+call `gen.CoverageReportFromBytes` from an ad-hoc test or `go run`
+script using `embedded.Spec()` / `embedded.ResourceMap()`. The
+`Report.Markdown()` helper renders it.
 
 ### 3. Triage each unmapped op
 
@@ -104,7 +107,7 @@ Use the decision tree in the next section. For each unmapped op,
 either:
 
 - Add it to a `resources:`/`functions:`/`methods:` block under the
-  correct sub-module in `provider/resource-map.yaml`, OR
+  correct sub-module in `provider/pkg/embedded/resource-map.yaml`, OR
 - Add it to `exclusions:` with a written reason (1 sentence).
 
 Err on the side of **excluding with a reason** if unsure. Exposing a
@@ -114,9 +117,10 @@ a later maintainer can revisit.
 ### 4. Regenerate
 
 ```bash
-make v2_provider   # generator → schema.json + metadata.json, rebuilds binary,
-                   # and writes the binary's final schema back to
+make v2_provider   # `go build` the runtime, then `pulumi package get-schema`
+                   # writes the binary's lazily-emitted schema to
                    # provider/cmd/pulumi-resource-pulumiservice/schema.json
+                   # (build artifact, not committed)
 
 make build_sdks    # regenerates sdk/{nodejs,python,go,dotnet,java}
 ```
@@ -255,7 +259,7 @@ above don't cover):
    gate ignores it correctly.
 4. Implement the dispatch behavior in `provider/pkg/runtime/dispatch.go`.
 5. Add a test exercising the primitive end-to-end.
-6. Use it from `provider/resource-map.yaml` on the affected resource.
+6. Use it from `provider/pkg/embedded/resource-map.yaml` on the affected resource.
 
 This is where engineering effort goes. The payoff is that the *next*
 resource with the same pattern lands in five lines of YAML instead of
@@ -271,7 +275,7 @@ For a resource that fits the declarative pattern (the common case).
    anti-stutter rule — the module noun shouldn't appear in the type
    name. Read the fully-qualified token out loud; if it stutters,
    rename the type.
-3. **Add the entry** to `provider/resource-map.yaml` under the right
+3. **Add the entry** to `provider/pkg/embedded/resource-map.yaml` under the right
    module:
    ```yaml
    orgs/foos:
@@ -330,8 +334,8 @@ Most spec changes are additive (new optional field). Workflow:
 2. Coverage gate won't flag additive field changes — it only tracks
    operationIds, not schema shapes. So this one's on the human
    reviewer: read the spec diff in
-   `provider/spec/openapi_public.json` for any resources you care
-   about.
+   `provider/pkg/embedded/openapi_public.json` for any resources you
+   care about.
 3. If new fields should be exposed, add them to the resource's
    `properties:` block. Set `source: body` / `required: <bool>` as
    appropriate.
@@ -365,7 +369,7 @@ When Pulumi Cloud retires an endpoint:
 
 ## Upstream migration (long-term)
 
-`provider/resource-map.yaml` is a stopgap. The durable home for the
+`provider/pkg/embedded/resource-map.yaml` is a stopgap. The durable home for the
 mapping is upstream in `pulumi-service/specification/src/` as Java
 annotations that emit `x-pulumi-*` extensions into the spec during
 `specification/generate_spec.sh`.
@@ -407,8 +411,8 @@ Before opening a PR that touches the provider:
       --noEmit`).
 - [ ] For any new resource or property: YAML example added, test
       wired, CHANGELOG entry written.
-- [ ] For any PR that bumps `provider/spec/openapi_public.json`: the
-      coverage report shows every new operationId triaged (mapped or
+- [ ] For any PR that bumps `provider/pkg/embedded/openapi_public.json`:
+      the coverage report shows every new operationId triaged (mapped or
       excluded with reason).
 - [ ] No `TODO:` markers left in `resource-map.yaml` operations.
 - [ ] Custom-resource count is still ≤5 (or you're explicitly
@@ -422,7 +426,7 @@ Useful one-liners for investigating the spec.
 ```bash
 python3 -c "
 import json
-with open('provider/spec/openapi_public.json') as f: d = json.load(f)
+with open('provider/pkg/embedded/openapi_public.json') as f: d = json.load(f)
 for path, methods in sorted(d['paths'].items()):
   if '/api/orgs/' in path:
     for m, op in methods.items():
@@ -435,7 +439,7 @@ for path, methods in sorted(d['paths'].items()):
 ```bash
 python3 -c "
 import json
-with open('provider/spec/openapi_public.json') as f: d = json.load(f)
+with open('provider/pkg/embedded/openapi_public.json') as f: d = json.load(f)
 for path, methods in d['paths'].items():
   for m, op in methods.items():
     if m in ['get','post','put','patch','delete']:
@@ -449,7 +453,7 @@ for path, methods in d['paths'].items():
 ```bash
 python3 -c "
 import json
-with open('provider/spec/openapi_public.json') as f: d = json.load(f)
+with open('provider/pkg/embedded/openapi_public.json') as f: d = json.load(f)
 print(json.dumps(d['components']['schemas'].get('AgentPool'), indent=2))
 "
 ```
@@ -482,15 +486,17 @@ PREREQUISITES
 
 PROCEDURE
 1. Run `make update_spec`. Inspect the diff in
-   provider/spec/openapi_public.json — report the top-level summary
-   (paths added, paths removed, paths changed) before proceeding.
-2. Run `make coverage_report` and read bin/coverage-report.md. Note
-   the counts (mapped / excluded / unmapped / duplicates / TODOs).
+   provider/pkg/embedded/openapi_public.json — report the top-level
+   summary (paths added, paths removed, paths changed) before
+   proceeding.
+2. Run `make coverage_report` (a `go test` against the embedded
+   inputs). On failure, the test output enumerates the unmapped
+   operationIds — proceed to the next step.
 3. For every newly-unmapped operationId, use the decision tree in
    docs/MAINTAINING.md ("Decision tree: resource / function / method
    / exclude / custom") to classify:
      - Resource   → add under `resources:` in the correct sub-module
-                    in provider/resource-map.yaml
+                    in provider/pkg/embedded/resource-map.yaml
      - Function   → add under `functions:`
      - Method     → add under `methods:` on the owning resource
      - Exclude    → add to top-level `exclusions:` with a 1-sentence
@@ -499,7 +505,7 @@ PROCEDURE
                     below)
 4. For any new resource, populate its full property block against the
    corresponding component schema in
-   provider/spec/openapi_public.json. Set `source`, `required`,
+   provider/pkg/embedded/openapi_public.json. Set `source`, `required`,
    `secret`, `forceNew`, `default`, `enum`, and `doc` per property.
    Apply the anti-stutter naming rule from CLAUDE.md when choosing
    the type name (read the fully-qualified token out loud; if it
@@ -555,8 +561,8 @@ DECISION AUTHORITY — STOP and bring to the user for:
 
 HARD RULES
 - Never hand-edit provider/cmd/pulumi-resource-pulumiservice/
-  schema.json or metadata.json. They're generated by
-  `make v2_provider`.
+  schema.json. It's a build artifact written by `make v2_provider`
+  (the binary's GetSchema output, captured for SDK gen).
 - Never hand-edit sdk/**. Regenerated by `make build_sdks`.
 - Never leave a `TODO:` marker in a new resource-map entry without
   STOPping and reporting it.
@@ -584,9 +590,9 @@ the triage decisions. Expected review pass:
    decision tree — especially any borderline "resource vs function
    vs method" calls.
 3. Read the CHANGELOG entry.
-4. Read the diff in `provider/resource-map.yaml`. It should be a
-   clean additive change (new entries under modules, new entries in
-   exclusions) plus CHANGELOG.
+4. Read the diff in `provider/pkg/embedded/resource-map.yaml`. It
+   should be a clean additive change (new entries under modules, new
+   entries in exclusions) plus CHANGELOG.
 5. Commit in logical groups — spec bump + map additions + regenerated
    artifacts, plus a separate commit per "real" new resource with
    its example and test.

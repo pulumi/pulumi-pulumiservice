@@ -42,10 +42,20 @@ modules:
         forceNew: [organizationName]
         properties:
           organizationName: { from: orgName,   source: path }
-          name:             { from: name,      source: body }
-          description:      { from: description, source: body }
-          tokenValue:       { from: tokenValue, source: response, secret: true, output: true }
-          agentPoolId:      { from: id,        source: response, output: true }
+          name:
+            from: name
+            source: body
+            writeOnly: true
+            doc: Agent pool display name. The Create response only echoes id+tokenValue, so we preserve `name` from inputs.
+          description:
+            from: description
+            source: body
+            writeOnly: true
+            doc: User-provided description of the pool's purpose.
+          tokenValue:  { from: tokenValue, source: response, secret: true, output: true }
+          # The spec uses `id` in the request/response body but `{poolId}`
+          # in the path — pathName bridges that.
+          agentPoolId: { from: id, pathName: poolId, source: response, output: true }
     functions:
       listAgentPools: { operationId: ListOrgAgentPool }
 
@@ -82,11 +92,25 @@ modules:
             type: string
             source: body
             required: true
+            # The polymorphic-create discriminator: which sub-path
+            # (CreatePulumiTeam / CreateGitHubTeam) gets called. The
+            # GetTeam response doesn't echo teamType back, so without
+            # writeOnly the value would silently disappear from state
+            # after refresh and Delete would have no scope to pick.
+            writeOnly: true
             enum: [pulumi, github]
             doc: Team type. "pulumi" for a Pulumi-managed team; "github" for a team synced from a GitHub organization.
           name:
             type: string
-            source: body
+            # On Read/Update/Delete the team name is a path param
+            # (`/api/orgs/{orgName}/teams/{teamName}`). On Create, the
+            # path is `/api/orgs/{orgName}/teams/pulumi` (no teamName)
+            # and the value goes in the request body as `name`.
+            # createSource/createFrom express that per-verb difference.
+            source: path
+            from: teamName
+            createSource: body
+            createFrom: name
             requireIf: "teamType == pulumi"
             doc: Team name. Must be unique within the organization. Required for `pulumi` teams.
           githubTeamId:
@@ -118,21 +142,41 @@ modules:
         operations:
           create: CreateOrgToken               # POST   /api/orgs/{orgName}/tokens
           delete: DeleteOrgToken               # DELETE /api/orgs/{orgName}/tokens/{tokenId}
-          # Note: spec has no per-token GET; Read falls back to listing and filtering.
-          # Handled by a `readVia: list` field on the operations block once
-          # the schema is extended (tracked in task #7).
+          # Spec has no per-token GET; Read falls back to listing and
+          # filtering by id.
           readVia:
             operationId: ListOrgTokens         # GET    /api/orgs/{orgName}/tokens
             filterBy: id
         id:
           template: "{organizationName}/{tokenId}"
           params: [organizationName, tokenId]
-        forceNew: [organizationName, description]
+        forceNew: [organizationName, name, description]
+        # The Create response only carries `id` and `tokenValue`; the
+        # body-sourced inputs (name, description, expires) aren't
+        # echoed back. Mark them writeOnly so ResponseToOutputs
+        # preserves them from inputs across Create + List-Read,
+        # otherwise the next diff would flag them as added.
         properties:
-          organizationName: { from: orgName,      source: path }
-          description:      { from: description,  source: body }
-          value:            { from: tokenValue,   source: response, secret: true, output: true }
-          tokenId:          { from: id,           source: response, output: true }
+          organizationName: { from: orgName, source: path }
+          name:
+            from: name
+            source: body
+            writeOnly: true
+            defaultFromField: description
+            doc: Token name. Unique across the organization (including deleted tokens). Defaults to the description if omitted.
+          description:
+            from: description
+            source: body
+            writeOnly: true
+          expires:
+            from: expires
+            source: body
+            type: integer
+            default: 0
+            writeOnly: true
+            doc: Unix epoch expiration. `0` (the default) means no expiry.
+          value:   { from: tokenValue, source: response, secret: true, output: true }
+          tokenId: { from: id,         source: response, output: true }
       TeamAccessToken:
         operations:
           create: CreateTeamToken              # POST   /api/orgs/{orgName}/teams/{teamName}/tokens
@@ -141,13 +185,29 @@ modules:
         id:
           template: "{organizationName}/{teamName}/{tokenId}"
           params: [organizationName, teamName, tokenId]
-        forceNew: [organizationName, teamName, description]
+        forceNew: [organizationName, teamName, name, description]
         properties:
-          organizationName: { from: orgName,      source: path }
-          teamName:         { from: teamName,     source: path }
-          description:      { from: description,  source: body }
-          value:            { from: tokenValue,   source: response, secret: true, output: true }
-          tokenId:          { from: id,           source: response, output: true }
+          organizationName: { from: orgName,  source: path }
+          teamName:         { from: teamName, source: path }
+          name:
+            from: name
+            source: body
+            writeOnly: true
+            defaultFromField: description
+            doc: Token name. Unique within the team (including deleted tokens). Defaults to the description if omitted.
+          description:
+            from: description
+            source: body
+            writeOnly: true
+          expires:
+            from: expires
+            source: body
+            type: integer
+            default: 0
+            writeOnly: true
+            doc: Unix epoch expiration. `0` (the default) means no expiry.
+          value:   { from: tokenValue, source: response, secret: true, output: true }
+          tokenId: { from: id,         source: response, output: true }
       AccessToken:                             # user/personal access token
         operations:
           create: CreatePersonalToken          # POST   /api/user/tokens
@@ -156,11 +216,35 @@ modules:
         id:
           template: "{tokenId}"
           params: [tokenId]
-        forceNew: [description]
+        forceNew: [name, description]
         properties:
-          description: { from: description,  source: body }
-          value:       { from: tokenValue,   source: response, secret: true, output: true }
-          tokenId:     { from: id,           source: response, output: true }
+          name:
+            from: name
+            source: body
+            writeOnly: true
+            defaultFromField: description
+            doc: Token name. Defaults to the description if omitted.
+          description:
+            from: description
+            source: body
+            writeOnly: true
+          expires:
+            from: expires
+            source: body
+            type: integer
+            default: 0
+            writeOnly: true
+            doc: Unix epoch expiration. `0` (the default) means no expiry.
+          value:   { from: tokenValue, source: response, secret: true, output: true }
+          tokenId: { from: id,         source: response, output: true }
+    functions:
+      # These list operations also serve as the readVia targets for
+      # the corresponding token resources — declaring them as
+      # functions makes them callable as data sources AND lets the
+      # readVia mechanism resolve them through metadata.
+      listOrgTokens:      { operationId: ListOrgTokens }
+      listTeamTokens:     { operationId: ListTeamTokens }
+      listPersonalTokens: { operationId: ListPersonalTokens }
 
   orgs/oidc:
     resources:
@@ -215,6 +299,9 @@ modules:
             doc: Authorization policies controlling which workloads can exchange OIDC tokens for Pulumi tokens.
           issuerId:
             type: string
+            # Response shape uses `id`; the SDK exposes `issuerId` per
+            # the v2 anti-stutter convention. Path-side uses `{issuerId}`.
+            from: id
             source: response
             output: true
             doc: Server-assigned issuer ID.
@@ -240,10 +327,39 @@ modules:
         id:
           template: "{organizationName}/{name}"
           params: [organizationName, name]
-        forceNew: [organizationName]
+        forceNew: [organizationName, entityType]
         properties:
-          organizationName: { from: orgName,  source: path }
-          name:             { from: policyGroup, source: path }
+          organizationName: { from: orgName, source: path }
+          name:
+            type: string
+            # On Read/Update/Delete the policy group name is a path
+            # param (`/api/.../policygroups/{policyGroup}`); on Create
+            # the path has no placeholder and the value goes in the
+            # body as `name`.
+            source: path
+            from: policyGroup
+            createSource: body
+            createFrom: name
+            required: true
+            doc: Policy group name. Unique within the organization.
+          entityType:
+            type: string
+            source: body
+            default: stacks
+            enum: [stacks, accounts]
+            writeOnly: true
+            doc: The type of entities this policy group applies to. Defaults to `stacks`.
+          mode:
+            type: string
+            source: body
+            enum: [audit, preventative]
+            writeOnly: true
+            doc: Enforcement mode. Defaults to `audit` for account groups, `preventative` for stack groups.
+          agentPoolId:
+            type: string
+            source: body
+            writeOnly: true
+            doc: Optional agent pool ID for policy evaluation. Defaults to the Pulumi-hosted pool.
     functions:
       getPolicyPack:  { operationId: GetPolicyPack }
       listPolicyPacks: { operationId: ListPolicyPacks_orgs }
@@ -273,6 +389,7 @@ modules:
           sourceName:
             type: string
             source: body
+            from: name
             required: true
             doc: Human-readable name for this template source.
           sourceURL:
@@ -286,9 +403,14 @@ modules:
             doc: Optional destination settings for rendered templates.
           templateId:
             type: string
+            from: id
+            pathName: templateID
             source: response
             output: true
             doc: Server-assigned template source ID.
+    functions:
+      # readVia target — also exposed as a list data source.
+      listTemplateSources: { operationId: GetOrgTemplateCollections }
 
   # ─── Stacks ─────────────────────────────────────────────────────────────
 
@@ -359,7 +481,7 @@ modules:
           templates:
             org:   "{organizationName}/{name}"
             stack: "{organizationName}/{projectName}/{stackName}/{name}"
-            esc:   "{organizationName}/environment/{projectName}/{envName}/{name}"
+            esc:   "{organizationName}/environment/{projectName}/{environmentName}/{name}"
         doc: |
           Pulumi Webhooks allow you to notify external services of events
           happening within your Pulumi organization, stack, or ESC
@@ -369,26 +491,41 @@ modules:
           `environmentName` (with `projectName`) → ESC-scoped.
         forceNew: [organizationName, projectName, stackName, environmentName]
         properties:
+          # Webhook identity fields go in BOTH the URL path AND the
+          # request body — the API validates they agree. `from`
+          # gives the path-side wire name; the body-side wire name
+          # is the SDK property name (matches the Webhook component
+          # schema's field names: `organizationName`, `projectName`,
+          # `envName`, `stackName`).
           organizationName:
             type: string
-            source: path
+            source: pathAndBody
+            from: orgName
             required: true
             doc: Organization that owns the webhook.
           projectName:
             type: string
-            source: path
+            source: pathAndBody
             doc: Project the webhook belongs to (stack- or ESC-scoped webhooks only).
           stackName:
             type: string
-            source: path
+            source: pathAndBody
             doc: Stack the webhook belongs to (stack-scoped webhooks only).
           environmentName:
             type: string
-            source: path
+            source: pathAndBody
+            # Path uses `{envName}`; body uses `envName` too
+            # (consistent here).
+            from: envName
+            bodyFrom: envName
             doc: Environment the webhook belongs to (ESC-scoped webhooks only).
           name:
             type: string
+            source: response
             output: true
+            # Spec uses `name` in the body/response and `{hookName}`
+            # in the URL path of resource-scoped verbs.
+            pathName: hookName
             doc: Webhook name, assigned by the server.
           displayName:
             type: string
@@ -714,8 +851,15 @@ modules:
           Create/Update use the batch PATCH endpoint. Delete iterates once
           per tag in the map (there's no batch-delete API).
         operations:
-          create: UpdateStackTags      # PATCH /api/stacks/.../tags  body {tags: {...}}
-          update: UpdateStackTags
+          # bodyAs: the tags map IS the body (the spec's PATCH endpoint
+          # accepts `{tagName: value, ...}` directly, not wrapped under
+          # a `tags:` key).
+          create:
+            operationId: UpdateStackTags
+            bodyAs: tags
+          update:
+            operationId: UpdateStackTags
+            bodyAs: tags
           delete:
             operationId: DeleteStackTag    # DELETE /.../tags/{tagName}
             iterateOver: tags
@@ -1079,17 +1223,30 @@ modules:
             required: true
             doc: Organization whose audit log is being exported.
           enabled:
-            from: newEnabled
             type: boolean
             source: body
+            # Body uses `newEnabled` (set-this-to semantics); the GET
+            # response returns the canonical `enabled`. bodyFrom keeps
+            # those two wire names separate without forcing the SDK
+            # name to match either. writeOnly preserves the input
+            # value across the Create response (which doesn't echo
+            # state) so subsequent diffs don't see drift.
+            from: enabled
+            bodyFrom: newEnabled
             required: true
             default: true
+            writeOnly: true
             doc: Whether the export is currently active. Set to false to pause without deleting.
           s3Configuration:
-            from: newS3Configuration
             ref: "pulumi.json#/Any"
             source: body
+            # GET response uses `s3Config`; PUT body uses
+            # `newS3Configuration`. The SDK name `s3Configuration`
+            # reads cleanly in user code; bridge to the wire names.
+            from: s3Config
+            bodyFrom: newS3Configuration
             required: true
+            writeOnly: true
             doc: |
               S3 destination settings — an object with `iamRoleArn`
               (role Pulumi Cloud assumes to write), `s3BucketName`,
@@ -1463,6 +1620,10 @@ modules:
           template: "{organizationName}/{gateId}"
           params: [organizationName, gateId]
         forceNew: [organizationName]
+        # Body shape per CreateChangeGateRequest:
+        #   { name, enabled, target: {entityType, qualifiedName, actionTypes},
+        #     rule: {ruleType: approval_required, ...} }
+        # The nested `target`/`rule` blocks pass through as-is.
         properties:
           organizationName:
             from: orgName
@@ -1481,23 +1642,24 @@ modules:
             required: true
             default: true
             doc: Whether the rule is active.
-          targetActionTypes:
-            type: array
-            source: body
-            required: true
-            items: { type: string }
-            doc: Which action types the rule gates (e.g., deployment, environment_change).
-          environmentIdentifier:
+          target:
             ref: "pulumi.json#/Any"
             source: body
             required: true
-            doc: Target environment — organization/project/environment triple.
-          approvalRuleConfig:
+            doc: |
+              Target shape — `{entityType: "environment", qualifiedName: "<project>/<env>", actionTypes: ["update"|"open"]}`.
+              Pulumi Cloud only supports environment targets in
+              v2.0.0-alpha; richer targeting lands in a later release.
+          rule:
             ref: "pulumi.json#/Any"
             source: body
             required: true
-            doc: Rule config — number of required approvals, eligible approvers, reapproval policy, self-approval toggle.
+            doc: |
+              Rule shape — `{ruleType: "approval_required", numApprovalsRequired: <n>,
+              eligibleApprovers: {teams: [...]}, preventSelfApproval: <bool>}`.
           gateId:
+            from: id
+            pathName: gateID
             type: string
             source: response
             output: true

@@ -40,11 +40,18 @@ func LoadSpec(path string) (*Spec, error) {
 	if err != nil {
 		return nil, fmt.Errorf("reading spec %s: %w", path, err)
 	}
+	return LoadSpecFromBytes(raw)
+}
+
+// LoadSpecFromBytes is the path-free form of LoadSpec — the runtime calls
+// it with bytes from the embedded copy of the spec, while the disk-based
+// LoadSpec is retained for tests that pass a path.
+func LoadSpecFromBytes(raw []byte) (*Spec, error) {
 	var doc struct {
 		Paths map[string]map[string]json.RawMessage `json:"paths"`
 	}
 	if err := json.Unmarshal(raw, &doc); err != nil {
-		return nil, fmt.Errorf("parsing spec %s: %w", path, err)
+		return nil, fmt.Errorf("parsing spec: %w", err)
 	}
 	httpVerbs := map[string]bool{"get": true, "post": true, "put": true, "patch": true, "delete": true}
 	sp := &Spec{ByID: map[string]SpecOperation{}}
@@ -79,9 +86,9 @@ func LoadSpec(path string) (*Spec, error) {
 // only parse the fields the coverage gate cares about; the full schema is
 // decoded into loosely-typed maps so additions don't require recompiling.
 type ResourceMap struct {
-	Modules    map[string]Module      `yaml:"modules"`
-	Methods    map[string]Method      `yaml:"methods"`
-	Exclusions []ExclusionEntry       `yaml:"exclusions"`
+	Modules    map[string]Module `yaml:"modules"`
+	Methods    map[string]Method `yaml:"methods"`
+	Exclusions []ExclusionEntry  `yaml:"exclusions"`
 	// Types holds named complex types referenced by resource properties via
 	// `ref:`. Key is the token fragment (e.g., "stacks/hooks:WebhookFilters");
 	// the emitter prefixes with "pulumiservice:" when emitting.
@@ -112,15 +119,15 @@ type Module struct {
 // typed because the schema emitter and runtime metadata emitter consume
 // them directly.
 type Resource struct {
-	Operations     yaml.MapSlice                 `yaml:"operations"`
-	ID             *ResourceID                   `yaml:"id,omitempty"`
-	ForceNew       []string                      `yaml:"forceNew,omitempty"`
-	Properties     map[string]ResourceProperty   `yaml:"properties,omitempty"`
-	Discriminator  *ResourceDiscriminator        `yaml:"discriminator,omitempty"`
-	Checks         []map[string]interface{}      `yaml:"checks,omitempty"`
-	SortProperties []string                      `yaml:"sortProperties,omitempty"`
-	AutoName       *ResourceAutoName             `yaml:"autoname,omitempty"`
-	Doc            string                        `yaml:"doc,omitempty"`
+	Operations     yaml.MapSlice               `yaml:"operations"`
+	ID             *ResourceID                 `yaml:"id,omitempty"`
+	ForceNew       []string                    `yaml:"forceNew,omitempty"`
+	Properties     map[string]ResourceProperty `yaml:"properties,omitempty"`
+	Discriminator  *ResourceDiscriminator      `yaml:"discriminator,omitempty"`
+	Checks         []map[string]interface{}    `yaml:"checks,omitempty"`
+	SortProperties []string                    `yaml:"sortProperties,omitempty"`
+	AutoName       *ResourceAutoName           `yaml:"autoname,omitempty"`
+	Doc            string                      `yaml:"doc,omitempty"`
 }
 
 // ResourceID holds the simple or polymorphic ID template configuration.
@@ -136,22 +143,24 @@ type ResourceID struct {
 // resource-map.yaml; runtime.CloudAPIProperty is what the generator emits
 // into metadata.json.)
 type ResourceProperty struct {
-	From             string            `yaml:"from,omitempty"`
-	Source           string            `yaml:"source,omitempty"`
-	CreateSource     string            `yaml:"createSource,omitempty"`
-	CreateFrom       string            `yaml:"createFrom,omitempty"`
-	Type             string            `yaml:"type,omitempty"`
-	Secret           bool              `yaml:"secret,omitempty"`
-	Output           bool              `yaml:"output,omitempty"`
-	WriteOnly        bool              `yaml:"writeOnly,omitempty"`
-	DiffMode         string            `yaml:"diffMode,omitempty"`
-	Default          interface{}       `yaml:"default,omitempty"`
-	DefaultFromField string            `yaml:"defaultFromField,omitempty"`
-	SortOnRead       bool              `yaml:"sortOnRead,omitempty"`
-	RequireIf        string            `yaml:"requireIf,omitempty"`
-	Enum             []string          `yaml:"enum,omitempty"`
-	Aliases          []string          `yaml:"aliases,omitempty"`
-	Doc              string            `yaml:"doc,omitempty"`
+	From             string      `yaml:"from,omitempty"`
+	Source           string      `yaml:"source,omitempty"`
+	CreateSource     string      `yaml:"createSource,omitempty"`
+	CreateFrom       string      `yaml:"createFrom,omitempty"`
+	PathName         string      `yaml:"pathName,omitempty"`
+	BodyFrom         string      `yaml:"bodyFrom,omitempty"`
+	Type             string      `yaml:"type,omitempty"`
+	Secret           bool        `yaml:"secret,omitempty"`
+	Output           bool        `yaml:"output,omitempty"`
+	WriteOnly        bool        `yaml:"writeOnly,omitempty"`
+	DiffMode         string      `yaml:"diffMode,omitempty"`
+	Default          interface{} `yaml:"default,omitempty"`
+	DefaultFromField string      `yaml:"defaultFromField,omitempty"`
+	SortOnRead       bool        `yaml:"sortOnRead,omitempty"`
+	RequireIf        string      `yaml:"requireIf,omitempty"`
+	Enum             []string    `yaml:"enum,omitempty"`
+	Aliases          []string    `yaml:"aliases,omitempty"`
+	Doc              string      `yaml:"doc,omitempty"`
 	// Required explicitly marks an input as required (true) or optional
 	// (false). If unset, the emitter falls back to "source: path" meaning
 	// required. Use `required: false` on path-sourced properties that are
@@ -204,9 +213,15 @@ func LoadResourceMap(path string) (*ResourceMap, error) {
 	if err != nil {
 		return nil, fmt.Errorf("reading resource-map %s: %w", path, err)
 	}
+	return LoadResourceMapFromBytes(raw)
+}
+
+// LoadResourceMapFromBytes is the path-free form of LoadResourceMap —
+// the runtime calls it with bytes from the embedded copy of the map.
+func LoadResourceMapFromBytes(raw []byte) (*ResourceMap, error) {
 	var rm ResourceMap
 	if err := yaml.Unmarshal(raw, &rm); err != nil {
-		return nil, fmt.Errorf("parsing resource-map %s: %w", path, err)
+		return nil, fmt.Errorf("parsing resource-map: %w", err)
 	}
 	return &rm, nil
 }

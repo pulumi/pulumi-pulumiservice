@@ -165,6 +165,15 @@ type CloudAPIOperation struct {
 	// ContentType overrides the request's Content-Type header (default
 	// application/json). Pairs with RawBodyFrom.
 	ContentType string `json:"contentType,omitempty"`
+
+	// BodyAs names a property whose JSON value becomes the entire
+	// request body (instead of the default {prop1: val1, prop2: ...}
+	// JSON object). Used for endpoints where the body is naturally
+	// a top-level map (e.g. UpdateStackTags expects `{tagName: value}`
+	// directly, not `{tags: {tagName: value}}`). Distinct from
+	// RawBodyFrom — RawBodyFrom is for non-JSON bodies (YAML, etc.);
+	// BodyAs still produces JSON.
+	BodyAs string `json:"bodyAs,omitempty"`
 }
 
 // CloudAPIReadVia configures a Read that piggybacks on another operation
@@ -317,6 +326,21 @@ type CloudAPIProperty struct {
 	// `name` is body field `name` at POST /.../tags but path param
 	// `tagName` at PATCH /.../tags/{tagName}.
 	CreateFrom string `json:"createFrom,omitempty"`
+
+	// PathName, if set, is the URL path-placeholder name for this
+	// property when expanding path templates. Needed when the spec
+	// uses one name in the request/response body and a different
+	// name in the URL path — e.g., AgentPool's `id` field vs the
+	// `{poolId}` path placeholder, or any other case where the
+	// generator can't infer the path parameter name from From alone.
+	PathName string `json:"pathName,omitempty"`
+
+	// BodyFrom, if set, overrides From specifically for the request
+	// body. Needed when the API uses one name in writes (e.g.
+	// `newEnabled` for set-this-to semantics) and a different name
+	// in reads (`enabled` as the canonical state). Default From
+	// continues to drive response decoding.
+	BodyFrom string `json:"bodyFrom,omitempty"`
 
 	// Secret wraps the output value in resource.MakeSecret.
 	Secret bool `json:"secret,omitempty"`

@@ -31,7 +31,20 @@ export class LogExport extends pulumi.CustomResource {
         return obj['__pulumiType'] === LogExport.__pulumiType;
     }
 
+    /**
+     * Whether the export is currently active. Set to false to pause without deleting.
+     */
+    declare public readonly enabled: pulumi.Output<boolean | undefined>;
+    /**
+     * Organization whose audit log is being exported.
+     */
     declare public readonly organizationName: pulumi.Output<string>;
+    /**
+     * S3 destination settings — an object with `iamRoleArn`
+     * (role Pulumi Cloud assumes to write), `s3BucketName`,
+     * and optional `s3PathPrefix`.
+     */
+    declare public readonly s3Configuration: pulumi.Output<any | undefined>;
 
     /**
      * Create a LogExport resource with the given unique name, arguments, and options.
@@ -44,12 +57,22 @@ export class LogExport extends pulumi.CustomResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
+            if (args?.enabled === undefined && !opts.urn) {
+                throw new Error("Missing required property 'enabled'");
+            }
             if (args?.organizationName === undefined && !opts.urn) {
                 throw new Error("Missing required property 'organizationName'");
             }
+            if (args?.s3Configuration === undefined && !opts.urn) {
+                throw new Error("Missing required property 's3Configuration'");
+            }
+            resourceInputs["enabled"] = (args?.enabled) ?? true;
             resourceInputs["organizationName"] = args?.organizationName;
+            resourceInputs["s3Configuration"] = args?.s3Configuration;
         } else {
+            resourceInputs["enabled"] = undefined /*out*/;
             resourceInputs["organizationName"] = undefined /*out*/;
+            resourceInputs["s3Configuration"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         super(LogExport.__pulumiType, name, resourceInputs, opts);
@@ -60,5 +83,18 @@ export class LogExport extends pulumi.CustomResource {
  * The set of arguments for constructing a LogExport resource.
  */
 export interface LogExportArgs {
+    /**
+     * Whether the export is currently active. Set to false to pause without deleting.
+     */
+    enabled: pulumi.Input<boolean>;
+    /**
+     * Organization whose audit log is being exported.
+     */
     organizationName: pulumi.Input<string>;
+    /**
+     * S3 destination settings — an object with `iamRoleArn`
+     * (role Pulumi Cloud assumes to write), `s3BucketName`,
+     * and optional `s3PathPrefix`.
+     */
+    s3Configuration: any;
 }

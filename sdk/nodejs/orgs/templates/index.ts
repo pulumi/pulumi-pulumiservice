@@ -5,6 +5,9 @@ import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "../../utilities";
 
 // Export members:
+export const listTemplateSources: typeof import("./listTemplateSources").listTemplateSources = null as any;
+utilities.lazyLoad(exports, ["listTemplateSources"], () => require("./listTemplateSources"));
+
 export { SourceArgs } from "./source";
 export type Source = import("./source").Source;
 export const Source: typeof import("./source").Source = null as any;

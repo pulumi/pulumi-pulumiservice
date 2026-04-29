@@ -1,11 +1,6 @@
 name: pulumiservice-canonical-10-template-catalog
 runtime: yaml
-description: |
-  Register a git-hosted catalog of internal templates so developers
-  can `pulumi new` from your curated set instead of copy-pasting
-  from the wiki. New services come online consistent by default.
-
-  The canonical "golden path" setup for platform engineering teams.
+description: Git-hosted catalog of internal templates for `pulumi new`. Canonical golden-path setup for platform engineering. See README.
 
 config:
   organizationName:
@@ -22,7 +17,9 @@ resources:
     properties:
       organizationName: ${organizationName}
       sourceName: acme-golden-path
-      sourceURL: https://github.com/acme-corp/pulumi-templates.git
+      # Pulumi's public templates repo — a real URL the API can validate.
+      # Swap for your own org's private template repo in production.
+      sourceURL: https://github.com/pulumi/templates.git
 
 outputs:
   templateId:

@@ -27,6 +27,8 @@ class ProviderArgs:
         :param pulumi.Input[_builtins.str] access_token: Access Token to authenticate with Pulumi Cloud.
         :param pulumi.Input[_builtins.str] api_url: Optional override of Pulumi Cloud API endpoint.
         """
+        if access_token is None:
+            access_token = _utilities.get_env('PULUMI_ACCESS_TOKEN')
         if access_token is not None:
             pulumi.set(__self__, "access_token", access_token)
         if api_url is None:
@@ -111,6 +113,8 @@ class Provider(pulumi.ProviderResource):
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
             __props__ = ProviderArgs.__new__(ProviderArgs)
 
+            if access_token is None:
+                access_token = _utilities.get_env('PULUMI_ACCESS_TOKEN')
             __props__.__dict__["access_token"] = None if access_token is None else pulumi.Output.secret(access_token)
             if api_url is None:
                 api_url = (_utilities.get_env('PULUMI_BACKEND_URL') or 'https://api.pulumi.com')

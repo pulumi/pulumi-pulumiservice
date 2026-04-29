@@ -32,6 +32,14 @@ export class TeamAccessToken extends pulumi.CustomResource {
     }
 
     declare public readonly description: pulumi.Output<string | undefined>;
+    /**
+     * Unix epoch expiration. `0` (the default) means no expiry.
+     */
+    declare public readonly expires: pulumi.Output<number | undefined>;
+    /**
+     * Token name. Unique within the team (including deleted tokens). Defaults to the description if omitted.
+     */
+    declare public readonly name: pulumi.Output<string | undefined>;
     declare public readonly organizationName: pulumi.Output<string>;
     declare public readonly teamName: pulumi.Output<string>;
     declare public /*out*/ readonly tokenId: pulumi.Output<string>;
@@ -55,12 +63,16 @@ export class TeamAccessToken extends pulumi.CustomResource {
                 throw new Error("Missing required property 'teamName'");
             }
             resourceInputs["description"] = args?.description;
+            resourceInputs["expires"] = (args?.expires) ?? 0;
+            resourceInputs["name"] = args?.name;
             resourceInputs["organizationName"] = args?.organizationName;
             resourceInputs["teamName"] = args?.teamName;
             resourceInputs["tokenId"] = undefined /*out*/;
             resourceInputs["value"] = undefined /*out*/;
         } else {
             resourceInputs["description"] = undefined /*out*/;
+            resourceInputs["expires"] = undefined /*out*/;
+            resourceInputs["name"] = undefined /*out*/;
             resourceInputs["organizationName"] = undefined /*out*/;
             resourceInputs["teamName"] = undefined /*out*/;
             resourceInputs["tokenId"] = undefined /*out*/;
@@ -78,6 +90,14 @@ export class TeamAccessToken extends pulumi.CustomResource {
  */
 export interface TeamAccessTokenArgs {
     description?: pulumi.Input<string>;
+    /**
+     * Unix epoch expiration. `0` (the default) means no expiry.
+     */
+    expires?: pulumi.Input<number>;
+    /**
+     * Token name. Unique within the team (including deleted tokens). Defaults to the description if omitted.
+     */
+    name?: pulumi.Input<string>;
     organizationName: pulumi.Input<string>;
     teamName: pulumi.Input<string>;
 }

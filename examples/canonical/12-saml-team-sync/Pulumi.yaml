@@ -1,16 +1,6 @@
 name: pulumiservice-canonical-12-saml-team-sync
 runtime: yaml
-description: |
-  Provision Pulumi teams that mirror the structure of your IdP (Okta,
-  Azure AD, Google Workspace) groups. Group-membership sync itself is
-  configured in the Pulumi Cloud admin UI under SSO → SAML Group
-  Mappings — there is no API resource for the mapping today; this
-  program just creates the *target* teams that the IdP-side mapping
-  points at.
-
-  The canonical pattern for organizations that already have a corporate
-  IdP and want "who has what in Pulumi?" answered by their existing IAM
-  audit pipeline.
+description: Provision Pulumi teams that mirror IdP group structure (Okta, Azure AD, Google Workspace). See README.
 
 config:
   organizationName:

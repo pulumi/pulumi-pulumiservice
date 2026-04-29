@@ -19,20 +19,61 @@ __all__ = ['LogExportArgs', 'LogExport']
 @pulumi.input_type
 class LogExportArgs:
     def __init__(__self__, *,
-                 organization_name: pulumi.Input[_builtins.str]):
+                 enabled: Optional[pulumi.Input[_builtins.bool]] = None,
+                 organization_name: pulumi.Input[_builtins.str],
+                 s3_configuration: Any):
         """
         The set of arguments for constructing a LogExport resource.
+
+        :param pulumi.Input[_builtins.bool] enabled: Whether the export is currently active. Set to false to pause without deleting.
+        :param pulumi.Input[_builtins.str] organization_name: Organization whose audit log is being exported.
+        :param Any s3_configuration: S3 destination settings — an object with `iamRoleArn`
+               (role Pulumi Cloud assumes to write), `s3BucketName`,
+               and optional `s3PathPrefix`.
         """
+        if enabled is None:
+            enabled = True
+        pulumi.set(__self__, "enabled", enabled)
         pulumi.set(__self__, "organization_name", organization_name)
+        pulumi.set(__self__, "s3_configuration", s3_configuration)
+
+    @_builtins.property
+    @pulumi.getter
+    def enabled(self) -> pulumi.Input[_builtins.bool]:
+        """
+        Whether the export is currently active. Set to false to pause without deleting.
+        """
+        return pulumi.get(self, "enabled")
+
+    @enabled.setter
+    def enabled(self, value: pulumi.Input[_builtins.bool]):
+        pulumi.set(self, "enabled", value)
 
     @_builtins.property
     @pulumi.getter(name="organizationName")
     def organization_name(self) -> pulumi.Input[_builtins.str]:
+        """
+        Organization whose audit log is being exported.
+        """
         return pulumi.get(self, "organization_name")
 
     @organization_name.setter
     def organization_name(self, value: pulumi.Input[_builtins.str]):
         pulumi.set(self, "organization_name", value)
+
+    @_builtins.property
+    @pulumi.getter(name="s3Configuration")
+    def s3_configuration(self) -> Any:
+        """
+        S3 destination settings — an object with `iamRoleArn`
+        (role Pulumi Cloud assumes to write), `s3BucketName`,
+        and optional `s3PathPrefix`.
+        """
+        return pulumi.get(self, "s3_configuration")
+
+    @s3_configuration.setter
+    def s3_configuration(self, value: Any):
+        pulumi.set(self, "s3_configuration", value)
 
 
 @pulumi.type_token("pulumiservice:orgs/audit:LogExport")
@@ -41,13 +82,20 @@ class LogExport(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 enabled: Optional[pulumi.Input[_builtins.bool]] = None,
                  organization_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 s3_configuration: Optional[Any] = None,
                  __props__=None):
         """
         Create a LogExport resource with the given unique name, props, and options.
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
+        :param pulumi.Input[_builtins.bool] enabled: Whether the export is currently active. Set to false to pause without deleting.
+        :param pulumi.Input[_builtins.str] organization_name: Organization whose audit log is being exported.
+        :param Any s3_configuration: S3 destination settings — an object with `iamRoleArn`
+               (role Pulumi Cloud assumes to write), `s3BucketName`,
+               and optional `s3PathPrefix`.
         """
         ...
     @overload
@@ -73,7 +121,9 @@ class LogExport(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 enabled: Optional[pulumi.Input[_builtins.bool]] = None,
                  organization_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 s3_configuration: Optional[Any] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
@@ -83,9 +133,17 @@ class LogExport(pulumi.CustomResource):
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
             __props__ = LogExportArgs.__new__(LogExportArgs)
 
+            if enabled is None:
+                enabled = True
+            if enabled is None and not opts.urn:
+                raise TypeError("Missing required property 'enabled'")
+            __props__.__dict__["enabled"] = enabled
             if organization_name is None and not opts.urn:
                 raise TypeError("Missing required property 'organization_name'")
             __props__.__dict__["organization_name"] = organization_name
+            if s3_configuration is None and not opts.urn:
+                raise TypeError("Missing required property 's3_configuration'")
+            __props__.__dict__["s3_configuration"] = s3_configuration
         super(LogExport, __self__).__init__(
             'pulumiservice:orgs/audit:LogExport',
             resource_name,
@@ -108,11 +166,34 @@ class LogExport(pulumi.CustomResource):
 
         __props__ = LogExportArgs.__new__(LogExportArgs)
 
+        __props__.__dict__["enabled"] = None
         __props__.__dict__["organization_name"] = None
+        __props__.__dict__["s3_configuration"] = None
         return LogExport(resource_name, opts=opts, __props__=__props__)
+
+    @_builtins.property
+    @pulumi.getter
+    def enabled(self) -> pulumi.Output[Optional[_builtins.bool]]:
+        """
+        Whether the export is currently active. Set to false to pause without deleting.
+        """
+        return pulumi.get(self, "enabled")
 
     @_builtins.property
     @pulumi.getter(name="organizationName")
     def organization_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        Organization whose audit log is being exported.
+        """
         return pulumi.get(self, "organization_name")
+
+    @_builtins.property
+    @pulumi.getter(name="s3Configuration")
+    def s3_configuration(self) -> pulumi.Output[Optional[Any]]:
+        """
+        S3 destination settings — an object with `iamRoleArn`
+        (role Pulumi Cloud assumes to write), `s3BucketName`,
+        and optional `s3PathPrefix`.
+        """
+        return pulumi.get(self, "s3_configuration")
 

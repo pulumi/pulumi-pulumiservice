@@ -39,7 +39,7 @@ export class Provider extends pulumi.ProviderResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         {
-            resourceInputs["accessToken"] = args?.accessToken ? pulumi.secret(args.accessToken) : undefined;
+            resourceInputs["accessToken"] = (args?.accessToken ? pulumi.secret(args.accessToken) : undefined) ?? utilities.getEnv("PULUMI_ACCESS_TOKEN");
             resourceInputs["apiUrl"] = (args?.apiUrl) ?? (utilities.getEnv("PULUMI_BACKEND_URL") || "https://api.pulumi.com");
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);

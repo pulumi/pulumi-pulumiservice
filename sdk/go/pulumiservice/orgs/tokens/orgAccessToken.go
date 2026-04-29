@@ -15,7 +15,11 @@ import (
 type OrgAccessToken struct {
 	pulumi.CustomResourceState
 
-	Description      pulumi.StringPtrOutput `pulumi:"description"`
+	Description pulumi.StringPtrOutput `pulumi:"description"`
+	// Unix epoch expiration. `0` (the default) means no expiry.
+	Expires pulumi.IntPtrOutput `pulumi:"expires"`
+	// Token name. Unique across the organization (including deleted tokens). Defaults to the description if omitted.
+	Name             pulumi.StringPtrOutput `pulumi:"name"`
 	OrganizationName pulumi.StringOutput    `pulumi:"organizationName"`
 	TokenId          pulumi.StringOutput    `pulumi:"tokenId"`
 	Value            pulumi.StringOutput    `pulumi:"value"`
@@ -30,6 +34,9 @@ func NewOrgAccessToken(ctx *pulumi.Context,
 
 	if args.OrganizationName == nil {
 		return nil, errors.New("invalid value for required argument 'OrganizationName'")
+	}
+	if args.Expires == nil {
+		args.Expires = pulumi.IntPtr(0)
 	}
 	secrets := pulumi.AdditionalSecretOutputs([]string{
 		"value",
@@ -68,13 +75,21 @@ func (OrgAccessTokenState) ElementType() reflect.Type {
 }
 
 type orgAccessTokenArgs struct {
-	Description      *string `pulumi:"description"`
+	Description *string `pulumi:"description"`
+	// Unix epoch expiration. `0` (the default) means no expiry.
+	Expires *int `pulumi:"expires"`
+	// Token name. Unique across the organization (including deleted tokens). Defaults to the description if omitted.
+	Name             *string `pulumi:"name"`
 	OrganizationName string  `pulumi:"organizationName"`
 }
 
 // The set of arguments for constructing a OrgAccessToken resource.
 type OrgAccessTokenArgs struct {
-	Description      pulumi.StringPtrInput
+	Description pulumi.StringPtrInput
+	// Unix epoch expiration. `0` (the default) means no expiry.
+	Expires pulumi.IntPtrInput
+	// Token name. Unique across the organization (including deleted tokens). Defaults to the description if omitted.
+	Name             pulumi.StringPtrInput
 	OrganizationName pulumi.StringInput
 }
 
@@ -167,6 +182,16 @@ func (o OrgAccessTokenOutput) ToOrgAccessTokenOutputWithContext(ctx context.Cont
 
 func (o OrgAccessTokenOutput) Description() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *OrgAccessToken) pulumi.StringPtrOutput { return v.Description }).(pulumi.StringPtrOutput)
+}
+
+// Unix epoch expiration. `0` (the default) means no expiry.
+func (o OrgAccessTokenOutput) Expires() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *OrgAccessToken) pulumi.IntPtrOutput { return v.Expires }).(pulumi.IntPtrOutput)
+}
+
+// Token name. Unique across the organization (including deleted tokens). Defaults to the description if omitted.
+func (o OrgAccessTokenOutput) Name() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *OrgAccessToken) pulumi.StringPtrOutput { return v.Name }).(pulumi.StringPtrOutput)
 }
 
 func (o OrgAccessTokenOutput) OrganizationName() pulumi.StringOutput {
