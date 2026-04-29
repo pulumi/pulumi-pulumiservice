@@ -29,9 +29,9 @@ class OrganizationRoleArgs:
         :param pulumi.Input[_builtins.str] name: The role's display name. Must be unique within the organization.
         :param pulumi.Input[_builtins.str] organization_name: The Pulumi Cloud organization name.
         :param pulumi.Input[Mapping[str, Any]] permissions: The role's permission descriptor tree. Two shapes are accepted, and may be mixed at any node boundary.
-
+               
                **Structured shape** — `{kind: "allow", permissions: ["<scope>", ...]}` to grant scopes, or `{kind: "group", entries: [...]}` to compose multiple grants. Either may carry an optional `on:` modifier — a single-key map `{environment: <uuid>}` / `{stack: <id>}` / `{insightsAccount: <id>}` / `{team: <id>}` — to scope the descriptor to one entity. For the common case prefer the `buildEnvironmentScopedPermissions` / `buildStackScopedPermissions` / `buildInsightsAccountScopedPermissions` helpers, which build the `on:`-modified Allow for you.
-
+               
                **Pass-through shape** — for richer Cloud-side descriptors (`Compose`, `Condition` with non-Equal booleans, `IfThenElse`, `Select`, future types), use the PascalCase wire type name as the kind value: `{kind: "PermissionDescriptorCompose", permissionDescriptors: [...]}`. The descriptor and any nested `PermissionExpression*` / `PermissionLiteralExpression*` nodes use `kind` as their discriminator (the provider renames it to `__type` at the wire boundary, which keeps Python's RPC deserializer compatible). The full Cloud-side schema lives in the `pulumi-service` repository at `specification/src/main/java/com/pulumi/model/PermissionDescriptor.java` and its sibling `Permission*.java` files.
         :param pulumi.Input[_builtins.str] description: Human-readable description of what the role grants.
         :param pulumi.Input[_builtins.str] resource_type: The resource type the role's permissions apply to. Defaults to `global` (the org-wide role that can be assigned to members and teams). Other valid values: `stack`, `environment`, `insights-account`.
@@ -132,9 +132,9 @@ class OrganizationRole(pulumi.CustomResource):
         :param pulumi.Input[_builtins.str] name: The role's display name. Must be unique within the organization.
         :param pulumi.Input[_builtins.str] organization_name: The Pulumi Cloud organization name.
         :param pulumi.Input[Mapping[str, Any]] permissions: The role's permission descriptor tree. Two shapes are accepted, and may be mixed at any node boundary.
-
+               
                **Structured shape** — `{kind: "allow", permissions: ["<scope>", ...]}` to grant scopes, or `{kind: "group", entries: [...]}` to compose multiple grants. Either may carry an optional `on:` modifier — a single-key map `{environment: <uuid>}` / `{stack: <id>}` / `{insightsAccount: <id>}` / `{team: <id>}` — to scope the descriptor to one entity. For the common case prefer the `buildEnvironmentScopedPermissions` / `buildStackScopedPermissions` / `buildInsightsAccountScopedPermissions` helpers, which build the `on:`-modified Allow for you.
-
+               
                **Pass-through shape** — for richer Cloud-side descriptors (`Compose`, `Condition` with non-Equal booleans, `IfThenElse`, `Select`, future types), use the PascalCase wire type name as the kind value: `{kind: "PermissionDescriptorCompose", permissionDescriptors: [...]}`. The descriptor and any nested `PermissionExpression*` / `PermissionLiteralExpression*` nodes use `kind` as their discriminator (the provider renames it to `__type` at the wire boundary, which keeps Python's RPC deserializer compatible). The full Cloud-side schema lives in the `pulumi-service` repository at `specification/src/main/java/com/pulumi/model/PermissionDescriptor.java` and its sibling `Permission*.java` files.
         :param pulumi.Input[_builtins.str] resource_type: The resource type the role's permissions apply to. Defaults to `global` (the org-wide role that can be assigned to members and teams). Other valid values: `stack`, `environment`, `insights-account`.
         """
