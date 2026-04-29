@@ -224,9 +224,9 @@ func bareComposeWire() map[string]interface{} {
 	}
 }
 
-// ifThenElseDeeplyNested: a maximally-nested IfThenElse to exercise the
-// blind discriminator rename at every level (IfThenElse → And → Equal /
-// Or → Not → HasTag → ContextEnvironment, with inner Allow descriptors).
+// ifThenElseDeeplyNested: a deeply-nested IfThenElse to exercise the
+// blind discriminator rename at multiple levels (IfThenElse → And →
+// Equal + Not → HasTag → ContextEnvironment, with inner Allow descriptors).
 func ifThenElseDeeplyNestedKind() map[string]interface{} {
 	return map[string]interface{}{
 		"kind": "PermissionDescriptorIfThenElse",

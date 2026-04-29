@@ -14,7 +14,10 @@
 
 package resources
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // entityTypeWirePair maps a user-facing `on:` entity-type key to the wire-
 // format pair that represents it: an Expression<Entity> for the left side of
@@ -113,8 +116,7 @@ func renameKey(node interface{}, from, to string) interface{} {
 // PermissionLiteralExpression* type name. Cloud rejects unknown wire
 // types with its own error on Create/Update.
 func isWireTypeName(s string) bool {
-	const prefix = "Permission"
-	return len(s) > len(prefix) && s[:len(prefix)] == prefix
+	return len(s) > len("Permission") && strings.HasPrefix(s, "Permission")
 }
 
 // permissionsKindToWire converts a user-facing PermissionDescriptor tree
