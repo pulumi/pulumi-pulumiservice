@@ -1,0 +1,59 @@
+name: yaml-rbac-passthrough
+runtime: yaml
+description: |
+  Demonstrates the pass-through grammar for OrganizationRole.permissions
+  by composing two simple roles into a third using
+  kind: PermissionDescriptorCompose. Run with `pulumi up`.
+
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  digits:
+    type: string
+
+resources:
+  # First base role — read-only on stacks.
+  baseRoleA:
+    type: pulumiservice:OrganizationRole
+    properties:
+      organizationName: ${organizationName}
+      name: yaml-rbac-passthrough-base-a-${digits}
+      description: Read-only on stacks. Composed by composedRole below.
+      permissions:
+        kind: allow
+        permissions:
+          - stack:read
+
+  # Second base role — read on environments.
+  baseRoleB:
+    type: pulumiservice:OrganizationRole
+    properties:
+      organizationName: ${organizationName}
+      name: yaml-rbac-passthrough-base-b-${digits}
+      description: Read on environments. Composed by composedRole below.
+      permissions:
+        kind: allow
+        permissions:
+          - environment:read
+
+  # Composed role — references both base roles' descriptor IDs.
+  # Demonstrates kind: PermissionDescriptorCompose pass-through.
+  composedRole:
+    type: pulumiservice:OrganizationRole
+    properties:
+      organizationName: ${organizationName}
+      name: yaml-rbac-passthrough-composed-${digits}
+      description: |
+        A role composed from two base roles. Demonstrates the pass-through
+        grammar (kind: PermissionDescriptorCompose).
+      permissions:
+        kind: PermissionDescriptorCompose
+        permissionDescriptors:
+          - ${baseRoleA.roleId}
+          - ${baseRoleB.roleId}
+
+outputs:
+  baseRoleAId: ${baseRoleA.roleId}
+  baseRoleBId: ${baseRoleB.roleId}
+  composedRoleId: ${composedRole.roleId}

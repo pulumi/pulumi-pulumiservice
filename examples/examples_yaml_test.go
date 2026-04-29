@@ -560,6 +560,22 @@ func TestYamlRbacExample(t *testing.T) {
 	test.Destroy(t)
 }
 
+func TestYamlRbacPassthroughExample(t *testing.T) {
+	// Requires the Custom Roles feature to be enabled on the test
+	// organization. Composes two base roles into a third using
+	// kind: PermissionDescriptorCompose to exercise the pass-through
+	// grammar end-to-end against Pulumi Cloud.
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-rbac-passthrough"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
+	)
+	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	test.SetConfig(t, "organizationName", getOrgName())
+	runPulumiTest(t, test)
+}
+
 func writePulumiYaml(t *testing.T, yamlContents interface{}) string {
 	tmpdir := t.TempDir()
 	b, err := yaml.Marshal(yamlContents)
