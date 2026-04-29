@@ -24,32 +24,69 @@ import (
 	"github.com/pulumi/pulumi-go-provider/infer"
 )
 
-// assertScopedAllowShape verifies a helper's output is the collapsed
-// {kind: "allow", on: {entityType: identity}, permissions: [...]} shape.
-func assertScopedAllowShape(
+// assertScopedConditionShape verifies a helper's output is the
+// `PermissionDescriptorCondition(Equal(Expression<E>, Literal<E>(id)),
+// Allow(perms))` wire shape — the same shape Pulumi Cloud's REST API uses,
+// modulo the `__type` → `kind` rename.
+func assertScopedConditionShape(
 	t *testing.T,
 	got map[string]interface{},
-	expectedEntityType string,
+	expectedExpressionKind string,
+	expectedLiteralKind string,
 	expectedIdentity string,
 	expectedPermissions []string,
 ) {
 	t.Helper()
 
-	assert.Equal(t, "allow", got["kind"])
+	assert.Equal(t, "PermissionDescriptorCondition", got["kind"],
+		"top-level kind must be PermissionDescriptorCondition")
 
-	on, ok := got["on"].(map[string]interface{})
-	require.True(t, ok, "on should be map[string]interface{}; got %T", got["on"])
-	require.Len(t, on, 1, "on must have exactly one key")
-	assert.Equal(t, expectedIdentity, on[expectedEntityType],
-		"on.%s should be %q", expectedEntityType, expectedIdentity)
+	cond, ok := got["condition"].(map[string]interface{})
+	require.True(t, ok, "condition must be a map; got %T", got["condition"])
+	assert.Equal(t, "PermissionExpressionEqual", cond["kind"],
+		"condition kind must be PermissionExpressionEqual")
 
-	rawPerms, ok := got["permissions"].([]interface{})
-	require.True(t, ok, "permissions should be []interface{}")
+	left, ok := cond["left"].(map[string]interface{})
+	require.True(t, ok, "condition.left must be a map; got %T", cond["left"])
+	assert.Equal(t, expectedExpressionKind, left["kind"])
+
+	right, ok := cond["right"].(map[string]interface{})
+	require.True(t, ok, "condition.right must be a map; got %T", cond["right"])
+	assert.Equal(t, expectedLiteralKind, right["kind"])
+	assert.Equal(t, expectedIdentity, right["identity"])
+
+	sub, ok := got["subNode"].(map[string]interface{})
+	require.True(t, ok, "subNode must be a map; got %T", got["subNode"])
+	assert.Equal(t, "PermissionDescriptorAllow", sub["kind"])
+
+	rawPerms, ok := sub["permissions"].([]interface{})
+	require.True(t, ok, "subNode.permissions must be a list; got %T", sub["permissions"])
 	gotPerms := make([]string, len(rawPerms))
 	for i, p := range rawPerms {
 		gotPerms[i], _ = p.(string)
 	}
 	assert.Equal(t, expectedPermissions, gotPerms)
+}
+
+// Each helper's output must be free of the wire-format `__type` discriminator
+// — the SDK boundary uses `kind` only. Pulumi's Python SDK silently strips
+// `__`-prefixed keys, so emitting `__type` would mean the field disappears at
+// the language boundary and the role gets created with a malformed body.
+// Recursive check, since the helpers emit nested expressions.
+func assertNoUnderscoreType(t *testing.T, v interface{}) {
+	t.Helper()
+	switch x := v.(type) {
+	case map[string]interface{}:
+		_, has := x["__type"]
+		assert.False(t, has, "helper output must not contain `__type`; the SDK boundary uses `kind`")
+		for _, val := range x {
+			assertNoUnderscoreType(t, val)
+		}
+	case []interface{}:
+		for _, item := range x {
+			assertNoUnderscoreType(t, item)
+		}
+	}
 }
 
 func TestBuildEnvironmentScopedPermissions(t *testing.T) {
@@ -67,11 +104,14 @@ func TestBuildEnvironmentScopedPermissions(t *testing.T) {
 			},
 		)
 		require.NoError(t, err)
-		assertScopedAllowShape(
+		assertScopedConditionShape(
 			t, resp.Output.Permissions,
-			"environment", "env-uuid-1",
+			"PermissionExpressionEnvironment",
+			"PermissionLiteralExpressionEnvironment",
+			"env-uuid-1",
 			[]string{"environment:read", "environment:open"},
 		)
+		assertNoUnderscoreType(t, resp.Output.Permissions)
 	})
 
 	t.Run("rejects empty environmentId", func(t *testing.T) {
@@ -116,11 +156,14 @@ func TestBuildStackScopedPermissions(t *testing.T) {
 			},
 		)
 		require.NoError(t, err)
-		assertScopedAllowShape(
+		assertScopedConditionShape(
 			t, resp.Output.Permissions,
-			"stack", "stack-id-1",
+			"PermissionExpressionStack",
+			"PermissionLiteralExpressionStack",
+			"stack-id-1",
 			[]string{"stack:read"},
 		)
+		assertNoUnderscoreType(t, resp.Output.Permissions)
 	})
 
 	t.Run("rejects empty stackId", func(t *testing.T) {
@@ -165,11 +208,14 @@ func TestBuildInsightsAccountScopedPermissions(t *testing.T) {
 			},
 		)
 		require.NoError(t, err)
-		assertScopedAllowShape(
+		assertScopedConditionShape(
 			t, resp.Output.Permissions,
-			"insightsAccount", "acct-1",
+			"PermissionExpressionInsightsAccount",
+			"PermissionLiteralExpressionInsightsAccount",
+			"acct-1",
 			[]string{"insights-account:read"},
 		)
+		assertNoUnderscoreType(t, resp.Output.Permissions)
 	})
 
 	t.Run("rejects empty insightsAccountId", func(t *testing.T) {
@@ -192,6 +238,58 @@ func TestBuildInsightsAccountScopedPermissions(t *testing.T) {
 			infer.FunctionRequest[BuildInsightsAccountScopedPermissionsInput]{
 				Input: BuildInsightsAccountScopedPermissionsInput{
 					InsightsAccountID: "acct-1",
+				},
+			},
+		)
+		assert.ErrorContains(t, err, "permissions")
+	})
+}
+
+func TestBuildTeamScopedPermissions(t *testing.T) {
+	t.Parallel()
+
+	t.Run("happy path", func(t *testing.T) {
+		t.Parallel()
+		resp, err := BuildTeamScopedPermissionsFunction{}.Invoke(
+			context.Background(),
+			infer.FunctionRequest[BuildTeamScopedPermissionsInput]{
+				Input: BuildTeamScopedPermissionsInput{
+					TeamName:    "rbac-team",
+					Permissions: []string{"stack:edit"},
+				},
+			},
+		)
+		require.NoError(t, err)
+		assertScopedConditionShape(
+			t, resp.Output.Permissions,
+			"PermissionExpressionTeam",
+			"PermissionLiteralExpressionTeam",
+			"rbac-team",
+			[]string{"stack:edit"},
+		)
+		assertNoUnderscoreType(t, resp.Output.Permissions)
+	})
+
+	t.Run("rejects empty teamName", func(t *testing.T) {
+		t.Parallel()
+		_, err := BuildTeamScopedPermissionsFunction{}.Invoke(
+			context.Background(),
+			infer.FunctionRequest[BuildTeamScopedPermissionsInput]{
+				Input: BuildTeamScopedPermissionsInput{
+					Permissions: []string{"stack:edit"},
+				},
+			},
+		)
+		assert.ErrorContains(t, err, "teamName")
+	})
+
+	t.Run("rejects empty permissions", func(t *testing.T) {
+		t.Parallel()
+		_, err := BuildTeamScopedPermissionsFunction{}.Invoke(
+			context.Background(),
+			infer.FunctionRequest[BuildTeamScopedPermissionsInput]{
+				Input: BuildTeamScopedPermissionsInput{
+					TeamName: "rbac-team",
 				},
 			},
 		)

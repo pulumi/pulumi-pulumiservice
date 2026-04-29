@@ -47,7 +47,7 @@ func (c *orgRoleClientMock) DeleteRole(ctx context.Context, org, id string, forc
 }
 
 var testPermissions = map[string]interface{}{
-	"kind":        "allow",
+	"kind":        "PermissionDescriptorAllow",
 	"permissions": []interface{}{"stack:read"},
 }
 
@@ -129,8 +129,9 @@ func TestOrganizationRoleRead(t *testing.T) {
 		})
 		assert.NoError(t, err)
 		assert.Equal(t, "acme/role-123", resp.ID)
-		// Read translates the wire __type back into the user-facing kind.
-		assert.Equal(t, "allow", resp.State.Permissions["kind"])
+		// Read renames the wire `__type` discriminator to `kind`. The
+		// PascalCase value is unchanged: SDK kinds are the wire kinds.
+		assert.Equal(t, "PermissionDescriptorAllow", resp.State.Permissions["kind"])
 		assert.NotContains(t, resp.State.Permissions, "__type", "state must not leak `__type` to the SDK")
 	})
 }
@@ -251,58 +252,44 @@ func TestOrganizationRoleCheck(t *testing.T) {
 		}
 	})
 
-	t.Run("rejects unknown kind", func(t *testing.T) {
+	// The translator is structurally agnostic: any `kind` value passes through
+	// to the wire format as a `__type` rename. Pulumi Cloud is the source of
+	// truth for which descriptor variants exist; the provider does not gate
+	// them. This test documents that contract — Check accepts a kind value
+	// the provider has no special knowledge of, and the role's validity is
+	// the API's call at apply time.
+	t.Run("accepts arbitrary kind values (no provider-side allowlist)", func(t *testing.T) {
 		resp, err := r.Check(context.Background(), infer.CheckRequest{
 			NewInputs: property.NewMap(map[string]property.Value{
 				"organizationName": property.New("acme"),
 				"name":             property.New("r"),
 				"permissions": property.New(property.NewMap(map[string]property.Value{
-					"kind": property.New("totallyMadeUp"),
+					"kind": property.New("PermissionDescriptorWhateverFutureCloudVariant"),
 				})),
 			}),
 		})
 		assert.NoError(t, err)
-		props := map[string]string{}
 		for _, f := range resp.Failures {
-			props[f.Property] = f.Reason
+			assert.NotEqual(t, "permissions", f.Property,
+				"Check must not gate descriptor `kind` values: %s", f.Reason)
 		}
-		assert.Contains(t, props["permissions"], "totallyMadeUp",
-			"Check must reject unknown kind values upfront")
 	})
 
-	t.Run("rejects empty on map", func(t *testing.T) {
+	// Pulumi's Python SDK silently strips `__`-prefixed keys from inputs
+	// (pulumi/pulumi#22738). A user pasting raw wire format from the REST
+	// API docs would see their `__type` discriminator disappear at the
+	// language boundary. Check rejects `__type` keys with a clear pointer
+	// to the right field, before the malformed body reaches the API.
+	t.Run("rejects __type at the SDK boundary", func(t *testing.T) {
 		resp, err := r.Check(context.Background(), infer.CheckRequest{
 			NewInputs: property.NewMap(map[string]property.Value{
 				"organizationName": property.New("acme"),
 				"name":             property.New("r"),
 				"permissions": property.New(property.NewMap(map[string]property.Value{
-					"kind":        property.New("allow"),
-					"on":          property.New(property.NewMap(map[string]property.Value{})),
-					"permissions": property.New(property.NewArray([]property.Value{property.New("stack:read")})),
-				})),
-			}),
-		})
-		assert.NoError(t, err)
-		props := map[string]string{}
-		for _, f := range resp.Failures {
-			props[f.Property] = f.Reason
-		}
-		assert.Contains(t, props["permissions"], "on",
-			"empty on map should produce a permissions failure mentioning on")
-	})
-
-	t.Run("rejects multi-key on map", func(t *testing.T) {
-		resp, err := r.Check(context.Background(), infer.CheckRequest{
-			NewInputs: property.NewMap(map[string]property.Value{
-				"organizationName": property.New("acme"),
-				"name":             property.New("r"),
-				"permissions": property.New(property.NewMap(map[string]property.Value{
-					"kind": property.New("allow"),
-					"on": property.New(property.NewMap(map[string]property.Value{
-						"environment": property.New("e"),
-						"stack":       property.New("s"),
+					"__type": property.New("PermissionDescriptorAllow"),
+					"permissions": property.New(property.NewArray([]property.Value{
+						property.New("stack:read"),
 					})),
-					"permissions": property.New(property.NewArray([]property.Value{property.New("stack:read")})),
 				})),
 			}),
 		})
@@ -311,30 +298,9 @@ func TestOrganizationRoleCheck(t *testing.T) {
 		for _, f := range resp.Failures {
 			props[f.Property] = f.Reason
 		}
-		assert.Contains(t, props["permissions"], "on",
-			"multi-key on should produce a permissions failure mentioning on")
-	})
-
-	t.Run("rejects unknown on entity type", func(t *testing.T) {
-		resp, err := r.Check(context.Background(), infer.CheckRequest{
-			NewInputs: property.NewMap(map[string]property.Value{
-				"organizationName": property.New("acme"),
-				"name":             property.New("r"),
-				"permissions": property.New(property.NewMap(map[string]property.Value{
-					"kind": property.New("allow"),
-					"on": property.New(property.NewMap(map[string]property.Value{
-						"unknownEntity": property.New("x"),
-					})),
-					"permissions": property.New(property.NewArray([]property.Value{property.New("stack:read")})),
-				})),
-			}),
-		})
-		assert.NoError(t, err)
-		props := map[string]string{}
-		for _, f := range resp.Failures {
-			props[f.Property] = f.Reason
-		}
-		assert.Contains(t, props["permissions"], "unknownEntity",
-			"unknown on entity should produce a permissions failure naming the bad key")
+		assert.Contains(t, props["permissions"], "__type",
+			"Check must name `__type` so the user knows what to fix")
+		assert.Contains(t, props["permissions"], "kind",
+			"Check must point the user at the correct field name")
 	})
 }

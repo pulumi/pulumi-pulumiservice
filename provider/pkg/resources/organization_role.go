@@ -71,15 +71,33 @@ func (c *OrganizationRoleCore) Annotate(a infer.Annotator) {
 	)
 	a.Describe(
 		&c.Permissions,
-		"The role's permission descriptor tree. Two kinds: "+
-			"`{kind: \"allow\", permissions: [\"<scope>\", ...]}` to grant scopes, or "+
-			"`{kind: \"group\", entries: [...]}` to compose multiple grants. "+
-			"Either may carry an optional `on:` modifier — a single-key map "+
-			"`{environment: <uuid>}` / `{stack: <id>}` / `{insightsAccount: <id>}` — "+
-			"to scope the descriptor to one entity. For per-entity scoping, prefer "+
+		"The role's permission descriptor tree, expressed in the Pulumi Cloud "+
+			"wire grammar with the discriminator field renamed from `__type` to "+
+			"`kind` (Pulumi's Python SDK strips `__`-prefixed keys from inputs, "+
+			"so the SDK uses `kind` for cross-language consistency).\n\n"+
+			"Common kinds:\n"+
+			"- `PermissionDescriptorAllow` — `{kind: \"PermissionDescriptorAllow\", "+
+			"permissions: [\"<scope>\", ...]}` grants the listed scopes.\n"+
+			"- `PermissionDescriptorGroup` — `{kind: \"PermissionDescriptorGroup\", "+
+			"entries: [<descriptor>, ...]}` composes multiple descriptors; the "+
+			"role grants the union of every entry.\n"+
+			"- `PermissionDescriptorCondition` — `{kind: "+
+			"\"PermissionDescriptorCondition\", condition: <expression>, subNode: "+
+			"<descriptor>}` gates a sub-descriptor on a boolean expression.\n"+
+			"- `PermissionDescriptorCompose` — references other roles by ID; "+
+			"`{kind: \"PermissionDescriptorCompose\", permissionDescriptors: "+
+			"[<roleId>, ...]}`.\n\n"+
+			"Pulumi Cloud's REST API also accepts `PermissionDescriptorIfThenElse`, "+
+			"`PermissionDescriptorSelect`, and the `PermissionExpression*` / "+
+			"`PermissionLiteralExpression*` boolean operators (And, Or, Not, Equal, "+
+			"Environment, Stack, Team, InsightsAccount, …); the provider passes "+
+			"every variant through transparently without inspecting it, so future "+
+			"Cloud additions work without a provider release.\n\n"+
+			"For the common case of granting a set of scopes on one entity, prefer "+
 			"the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, "+
-			"and `buildInsightsAccountScopedPermissions` helpers, which build the "+
-			"`on:`-modified Allow for you.",
+			"`buildInsightsAccountScopedPermissions`, and "+
+			"`buildTeamScopedPermissions` helpers, which build the corresponding "+
+			"`PermissionDescriptorCondition(Equal(...), Allow)` tree for you.",
 	)
 }
 
@@ -154,7 +172,7 @@ func (*OrganizationRole) Create(
 		}, nil
 	}
 
-	wire, err := permissionsKindToWire(req.Inputs.Permissions)
+	wire, err := permissionsKindToWireForAPI(req.Inputs.Permissions)
 	if err != nil {
 		return infer.CreateResponse[OrganizationRoleState]{}, fmt.Errorf(
 			"invalid permissions: %w",
@@ -206,7 +224,7 @@ func (*OrganizationRole) Update(
 		}, nil
 	}
 
-	wire, err := permissionsKindToWire(core.Permissions)
+	wire, err := permissionsKindToWireForAPI(core.Permissions)
 	if err != nil {
 		return infer.UpdateResponse[OrganizationRoleState]{}, fmt.Errorf(
 			"invalid permissions: %w",
@@ -315,7 +333,10 @@ func orgRoleCoreFromAPI(
 		if err := json.Unmarshal(role.Details, &wire); err != nil {
 			return OrganizationRoleCore{}, fmt.Errorf("parsing role details for %q: %w", role.ID, err)
 		}
-		parsed, err := permissionsWireToKind(wire)
+		// Pass the user's prior input shape so the translator can decide
+		// whether to collapse the API-boundary single-entry-Group-of-Condition
+		// wrap. See permissionsWireToKind's docstring for the gating rule.
+		parsed, err := permissionsWireToKind(wire, prior.Permissions)
 		if err != nil {
 			return OrganizationRoleCore{}, fmt.Errorf("translating role details for %q: %w", role.ID, err)
 		}

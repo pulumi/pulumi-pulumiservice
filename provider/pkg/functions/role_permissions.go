@@ -21,28 +21,51 @@ import (
 	"github.com/pulumi/pulumi-go-provider/infer"
 )
 
-// scopedAllow builds a kind-shaped Allow descriptor scoped to the supplied
-// entity. The result is directly assignable to OrganizationRole.permissions.
-// The provider's translator (in resources/permission_descriptor.go) expands
-// the on: modifier into the wire-format Condition wrapper at Create time.
-func scopedAllow(entityType, identity string, permissions []string) map[string]interface{} {
+// scopedAllowWire builds an `OrganizationRole.permissions` descriptor that
+// grants `permissions` only when the request's entity expression equals the
+// supplied identity. Returns the wire-format Condition shape verbatim — the
+// SDK boundary uses the same PascalCase `kind` values as Pulumi Cloud's REST
+// API. No provider-side translation is needed; OrganizationRole's
+// Create/Update wraps top-level Conditions in a single-entry Group only as a
+// Cloud UI workaround, and Read collapses the wrap so refresh stays
+// idempotent against the helper output.
+//
+// The (expressionKind, literalKind) pair is the per-entity-type
+// PermissionExpression / PermissionLiteralExpression vocabulary from the
+// Pulumi Cloud RBAC API:
+//
+//	environment      → PermissionExpressionEnvironment      / PermissionLiteralExpressionEnvironment
+//	stack            → PermissionExpressionStack            / PermissionLiteralExpressionStack
+//	team             → PermissionExpressionTeam             / PermissionLiteralExpressionTeam
+//	insightsAccount  → PermissionExpressionInsightsAccount  / PermissionLiteralExpressionInsightsAccount
+//
+// Adding a new scoped helper means adding a new entry above and a new
+// BuildXScopedPermissionsFunction below — no translator changes.
+func scopedAllowWire(expressionKind, literalKind, identity string, permissions []string) map[string]interface{} {
 	grants := make([]interface{}, len(permissions))
 	for i, p := range permissions {
 		grants[i] = p
 	}
 	return map[string]interface{}{
-		"kind":        "allow",
-		"on":          map[string]interface{}{entityType: identity},
-		"permissions": grants,
+		"kind": "PermissionDescriptorCondition",
+		"condition": map[string]interface{}{
+			"kind":  "PermissionExpressionEqual",
+			"left":  map[string]interface{}{"kind": expressionKind},
+			"right": map[string]interface{}{"kind": literalKind, "identity": identity},
+		},
+		"subNode": map[string]interface{}{
+			"kind":        "PermissionDescriptorAllow",
+			"permissions": grants,
+		},
 	}
 }
 
-// scopedPermissionsHelpDoc is the shared epilogue for the three helpers'
+// scopedPermissionsHelpDoc is the shared epilogue for the helpers'
 // descriptions, kept identical so codegen documentation stays consistent.
 const scopedPermissionsHelpDoc = "The result is directly assignable to " +
 	"`OrganizationRole.permissions`. To grant scopes on more than one entity " +
-	"in a single role, hand-roll a `group` whose `entries` list pulls the " +
-	"output of each helper."
+	"in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` " +
+	"list pulls the output of each helper."
 
 // ----------------------------------------------------------------------------
 // Environment-scoped helper
@@ -64,7 +87,8 @@ func (BuildEnvironmentScopedPermissionsFunction) Annotate(a infer.Annotator) {
 		&BuildEnvironmentScopedPermissionsFunction{},
 		"Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on "+
 			"the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data "+
-			"source) to avoid hand-rolling the `on:` modifier yourself. "+scopedPermissionsHelpDoc,
+			"source) to avoid hand-rolling the `PermissionDescriptorCondition` tree yourself. "+
+			scopedPermissionsHelpDoc,
 	)
 	a.SetToken("index", "buildEnvironmentScopedPermissions")
 }
@@ -86,8 +110,8 @@ func (i *BuildEnvironmentScopedPermissionsInput) Annotate(a infer.Annotator) {
 func (o *BuildEnvironmentScopedPermissionsOutput) Annotate(a infer.Annotator) {
 	a.Describe(
 		&o.Permissions,
-		"A `kind: allow` descriptor with an `on: { environment: <uuid> }` modifier, "+
-			"ready to assign to `OrganizationRole.permissions`.",
+		"A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` "+
+			"on the named environment, ready to assign to `OrganizationRole.permissions`.",
 	)
 }
 
@@ -105,7 +129,12 @@ func (BuildEnvironmentScopedPermissionsFunction) Invoke(
 	}
 	return infer.FunctionResponse[BuildEnvironmentScopedPermissionsOutput]{
 		Output: BuildEnvironmentScopedPermissionsOutput{
-			Permissions: scopedAllow("environment", req.Input.EnvironmentID, req.Input.Permissions),
+			Permissions: scopedAllowWire(
+				"PermissionExpressionEnvironment",
+				"PermissionLiteralExpressionEnvironment",
+				req.Input.EnvironmentID,
+				req.Input.Permissions,
+			),
 		},
 	}, nil
 }
@@ -151,8 +180,8 @@ func (i *BuildStackScopedPermissionsInput) Annotate(a infer.Annotator) {
 func (o *BuildStackScopedPermissionsOutput) Annotate(a infer.Annotator) {
 	a.Describe(
 		&o.Permissions,
-		"A `kind: allow` descriptor with an `on: { stack: <id> }` modifier, "+
-			"ready to assign to `OrganizationRole.permissions`.",
+		"A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` "+
+			"on the named stack, ready to assign to `OrganizationRole.permissions`.",
 	)
 }
 
@@ -170,7 +199,12 @@ func (BuildStackScopedPermissionsFunction) Invoke(
 	}
 	return infer.FunctionResponse[BuildStackScopedPermissionsOutput]{
 		Output: BuildStackScopedPermissionsOutput{
-			Permissions: scopedAllow("stack", req.Input.StackID, req.Input.Permissions),
+			Permissions: scopedAllowWire(
+				"PermissionExpressionStack",
+				"PermissionLiteralExpressionStack",
+				req.Input.StackID,
+				req.Input.Permissions,
+			),
 		},
 	}, nil
 }
@@ -216,8 +250,8 @@ func (i *BuildInsightsAccountScopedPermissionsInput) Annotate(a infer.Annotator)
 func (o *BuildInsightsAccountScopedPermissionsOutput) Annotate(a infer.Annotator) {
 	a.Describe(
 		&o.Permissions,
-		"A `kind: allow` descriptor with an `on: { insightsAccount: <id> }` modifier, "+
-			"ready to assign to `OrganizationRole.permissions`.",
+		"A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` "+
+			"on the named insights account, ready to assign to `OrganizationRole.permissions`.",
 	)
 }
 
@@ -235,7 +269,81 @@ func (BuildInsightsAccountScopedPermissionsFunction) Invoke(
 	}
 	return infer.FunctionResponse[BuildInsightsAccountScopedPermissionsOutput]{
 		Output: BuildInsightsAccountScopedPermissionsOutput{
-			Permissions: scopedAllow("insightsAccount", req.Input.InsightsAccountID, req.Input.Permissions),
+			Permissions: scopedAllowWire(
+				"PermissionExpressionInsightsAccount",
+				"PermissionLiteralExpressionInsightsAccount",
+				req.Input.InsightsAccountID,
+				req.Input.Permissions,
+			),
+		},
+	}, nil
+}
+
+// ----------------------------------------------------------------------------
+// Team-scoped helper
+// ----------------------------------------------------------------------------
+
+type BuildTeamScopedPermissionsFunction struct{}
+
+type BuildTeamScopedPermissionsInput struct {
+	TeamName    string   `pulumi:"teamName"`
+	Permissions []string `pulumi:"permissions"`
+}
+
+type BuildTeamScopedPermissionsOutput struct {
+	Permissions map[string]interface{} `pulumi:"permissions"`
+}
+
+func (BuildTeamScopedPermissionsFunction) Annotate(a infer.Annotator) {
+	a.Describe(
+		&BuildTeamScopedPermissionsFunction{},
+		"Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only when "+
+			"the request is on the named team. Pair with `Team.name` (or any team-name string) to scope "+
+			"a role to a specific team. "+scopedPermissionsHelpDoc,
+	)
+	a.SetToken("index", "buildTeamScopedPermissions")
+}
+
+func (i *BuildTeamScopedPermissionsInput) Annotate(a infer.Annotator) {
+	a.Describe(
+		&i.TeamName,
+		"The target team's name (e.g. `Team.name`). The Pulumi Cloud RBAC API keys team scopes by name.",
+	)
+	a.Describe(
+		&i.Permissions,
+		"The set of scopes to grant when the request is on the named team. "+
+			"Discover valid scope names via the `getOrganizationRoleScopes` data source.",
+	)
+}
+
+func (o *BuildTeamScopedPermissionsOutput) Annotate(a infer.Annotator) {
+	a.Describe(
+		&o.Permissions,
+		"A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` "+
+			"on the named team, ready to assign to `OrganizationRole.permissions`.",
+	)
+}
+
+func (BuildTeamScopedPermissionsFunction) Invoke(
+	_ context.Context,
+	req infer.FunctionRequest[BuildTeamScopedPermissionsInput],
+) (infer.FunctionResponse[BuildTeamScopedPermissionsOutput], error) {
+	if req.Input.TeamName == "" {
+		return infer.FunctionResponse[BuildTeamScopedPermissionsOutput]{},
+			fmt.Errorf("`teamName` must not be empty")
+	}
+	if len(req.Input.Permissions) == 0 {
+		return infer.FunctionResponse[BuildTeamScopedPermissionsOutput]{},
+			fmt.Errorf("`permissions` must not be empty")
+	}
+	return infer.FunctionResponse[BuildTeamScopedPermissionsOutput]{
+		Output: BuildTeamScopedPermissionsOutput{
+			Permissions: scopedAllowWire(
+				"PermissionExpressionTeam",
+				"PermissionLiteralExpressionTeam",
+				req.Input.TeamName,
+				req.Input.Permissions,
+			),
 		},
 	}, nil
 }
