@@ -15,6 +15,7 @@
 package resources
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -1147,4 +1148,75 @@ func TestPermissionsWireToKind_LegacySingleEntryGroup(t *testing.T) {
 	got, err := permissionsWireToKind(in)
 	require.NoError(t, err)
 	assert.Equal(t, want, got)
+}
+
+// ----------------------------------------------------------------------------
+// Python-safety property test.
+// ----------------------------------------------------------------------------
+
+// TestNoUnderscorePrefixInSdkShape is a property test guarding Python
+// compatibility. Pulumi's Python SDK strips every `__`-prefixed key from
+// deserialized RPC values (pulumi/sdk/python/lib/pulumi/runtime/rpc.py:866,
+// `if not keep_internal and k.startswith("__") and k != "__provider"`).
+// If any SDK-shape fixture contains a `__`-prefixed key, that key would
+// be stripped on the way to user code, breaking round-trip — so the
+// translator must never produce one.
+func TestNoUnderscorePrefixInSdkShape(t *testing.T) {
+	t.Parallel()
+	cases := []struct {
+		name string
+		kind map[string]interface{}
+	}{
+		{"flatAllow", flatAllowKind()},
+		{"scopedAllow", scopedAllowKind()},
+		{"flatGroup", flatGroupKind()},
+		{"scopedGroup", scopedGroupKind()},
+		{"mixedGroup", mixedGroupKind()},
+		{"teamScopedAllow", teamScopedAllowKind()},
+		{"bareCompose", bareComposeKind()},
+		{"ifThenElseDeeplyNested", ifThenElseDeeplyNestedKind()},
+		{"selectMixedLiteralTypes", selectMixedLiteralTypesKind()},
+		{"composeInsideGroup", composeInsideGroupKind()},
+		{"conditionAndOfEquals", conditionAndOfEqualsKind()},
+		{"conditionMismatchedOperands", conditionMismatchedOperandsKind()},
+		{"conditionWrappingCompose", conditionWrappingComposeKind()},
+		{"conditionWrappingCondition", conditionWrappingConditionKind()},
+	}
+	for _, tc := range cases {
+		tc := tc
+		t.Run(tc.name+"_fixture", func(t *testing.T) {
+			t.Parallel()
+			assertNoUnderscorePrefix(t, tc.kind, "")
+		})
+		t.Run(tc.name+"_decoded", func(t *testing.T) {
+			t.Parallel()
+			// Round-trip kind → wire → kind and assert the resulting
+			// SDK shape still has no `__` keys.
+			wire, err := permissionsKindToWire(tc.kind)
+			require.NoError(t, err)
+			back, err := permissionsWireToKind(wire)
+			require.NoError(t, err)
+			assertNoUnderscorePrefix(t, back, "")
+		})
+	}
+}
+
+// assertNoUnderscorePrefix walks a JSON-shaped tree and fails if any map
+// key starts with `__`.
+func assertNoUnderscorePrefix(t *testing.T, node interface{}, path string) {
+	t.Helper()
+	switch n := node.(type) {
+	case map[string]interface{}:
+		for k, v := range n {
+			child := path + "." + k
+			if len(k) >= 2 && k[:2] == "__" {
+				t.Errorf("found `__`-prefixed key at %s: %q", child, k)
+			}
+			assertNoUnderscorePrefix(t, v, child)
+		}
+	case []interface{}:
+		for i, v := range n {
+			assertNoUnderscorePrefix(t, v, fmt.Sprintf("%s[%d]", path, i))
+		}
+	}
 }
