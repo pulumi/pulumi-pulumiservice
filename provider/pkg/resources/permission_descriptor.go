@@ -73,6 +73,39 @@ func validEntityTypeNames() []string {
 	return names
 }
 
+// renameKey recursively walks a JSON-shaped tree (objects, arrays, scalars
+// represented as map[string]interface{} / []interface{} / primitives) and
+// renames every occurrence of `from` to `to` as a key. The transformation
+// is structural: it does not interpret values, so it is safe to call on
+// arbitrary subtrees. Returns a new tree; does not mutate the input.
+//
+// Used at the wire boundary to swap the discriminator name `__type` (used
+// by Pulumi Cloud's tagged-union serialization) for `kind` (used at the
+// SDK boundary, where Python's RPC deserializer would otherwise strip the
+// `__`-prefixed key — see pulumi/sdk/python/lib/pulumi/runtime/rpc.py:866).
+func renameKey(node interface{}, from, to string) interface{} {
+	switch n := node.(type) {
+	case map[string]interface{}:
+		out := make(map[string]interface{}, len(n))
+		for k, v := range n {
+			outKey := k
+			if k == from {
+				outKey = to
+			}
+			out[outKey] = renameKey(v, from, to)
+		}
+		return out
+	case []interface{}:
+		out := make([]interface{}, len(n))
+		for i, v := range n {
+			out[i] = renameKey(v, from, to)
+		}
+		return out
+	default:
+		return n
+	}
+}
+
 // permissionsKindToWire converts a user-facing PermissionDescriptor tree
 // (kind-shaped) to the Pulumi Cloud REST API's wire shape. The user-facing
 // shape has just two kinds (`allow`, `group`), each optionally carrying an

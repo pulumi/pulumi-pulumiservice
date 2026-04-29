@@ -622,6 +622,104 @@ func TestPermissionsWireToKind_Errors(t *testing.T) {
 }
 
 // ----------------------------------------------------------------------------
+// renameKey — blind recursive key rename.
+// ----------------------------------------------------------------------------
+
+func TestRenameKey_FlatObject(t *testing.T) {
+	t.Parallel()
+	in := map[string]interface{}{"__type": "X", "other": 1}
+	got := renameKey(in, "__type", "kind")
+	want := map[string]interface{}{"kind": "X", "other": 1}
+	assert.Equal(t, want, got)
+}
+
+func TestRenameKey_NestedObject(t *testing.T) {
+	t.Parallel()
+	in := map[string]interface{}{
+		"__type": "Outer",
+		"inner": map[string]interface{}{
+			"__type": "Inner",
+			"deeper": map[string]interface{}{
+				"__type": "Deepest",
+			},
+		},
+	}
+	got := renameKey(in, "__type", "kind")
+	want := map[string]interface{}{
+		"kind": "Outer",
+		"inner": map[string]interface{}{
+			"kind": "Inner",
+			"deeper": map[string]interface{}{
+				"kind": "Deepest",
+			},
+		},
+	}
+	assert.Equal(t, want, got)
+}
+
+func TestRenameKey_ArrayOfObjects(t *testing.T) {
+	t.Parallel()
+	in := map[string]interface{}{
+		"__type": "Outer",
+		"entries": []interface{}{
+			map[string]interface{}{"__type": "A"},
+			map[string]interface{}{"__type": "B", "nested": map[string]interface{}{"__type": "C"}},
+		},
+	}
+	got := renameKey(in, "__type", "kind")
+	want := map[string]interface{}{
+		"kind": "Outer",
+		"entries": []interface{}{
+			map[string]interface{}{"kind": "A"},
+			map[string]interface{}{"kind": "B", "nested": map[string]interface{}{"kind": "C"}},
+		},
+	}
+	assert.Equal(t, want, got)
+}
+
+func TestRenameKey_NoMatchUnchanged(t *testing.T) {
+	t.Parallel()
+	in := map[string]interface{}{
+		"foo": "bar",
+		"baz": map[string]interface{}{"qux": 1},
+	}
+	got := renameKey(in, "__type", "kind")
+	assert.Equal(t, in, got)
+}
+
+func TestRenameKey_Inverse(t *testing.T) {
+	t.Parallel()
+	// Round trip: rename A→B then B→A returns original
+	original := map[string]interface{}{
+		"__type": "X",
+		"sub":    map[string]interface{}{"__type": "Y"},
+	}
+	forward := renameKey(original, "__type", "kind")
+	back := renameKey(forward, "kind", "__type")
+	assert.Equal(t, original, back)
+}
+
+func TestRenameKey_PreservesNonStringValues(t *testing.T) {
+	t.Parallel()
+	in := map[string]interface{}{
+		"__type":  "X",
+		"number":  42,
+		"boolean": true,
+		"null":    nil,
+		"array":   []interface{}{1, "two", true},
+	}
+	got := renameKey(in, "__type", "kind")
+	want := map[string]interface{}{
+		"kind":    "X",
+		"number":  42,
+		"boolean": true,
+		"null":    nil,
+		"array":   []interface{}{1, "two", true},
+	}
+	assert.Equal(t, want, got)
+}
+
+// ----------------------------------------------------------------------------
 // Backwards-compat: the prior helpers (in the same PR's earlier commits)
 // emitted Group(entries: [Condition(...)]) — a single-entry Group wrapping
 // a Condition. The reverse translator must accept that shape and produce a
