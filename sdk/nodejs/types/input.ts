@@ -430,6 +430,28 @@ export interface PolicyGroupStackReferenceArgs {
     routingProject: pulumi.Input<string>;
 }
 
+/**
+ * Service-Backed Configuration: links a Stack to an ESC environment that holds its config and secrets. Set exactly one of `auto` (Stack-managed) or `project`+`environment` (reference an existing env).
+ */
+export interface StackConfigEnvironmentArgs {
+    /**
+     * When `true`, the Stack manages a dedicated ESC environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack. Mutually exclusive with `project`+`environment`.
+     */
+    auto?: pulumi.Input<boolean>;
+    /**
+     * The name of the ESC environment to link. Mutually exclusive with `auto`. Used together with `project` to reference an existing environment.
+     */
+    environment?: pulumi.Input<string>;
+    /**
+     * The project of the ESC environment to link. Mutually exclusive with `auto`. Used together with `environment` to reference an existing environment. Defaults to the ESC `default` project when omitted.
+     */
+    project?: pulumi.Input<string>;
+    /**
+     * Optional. Pin an existing environment link to a specific revision. Accepts a numeric revision (e.g. `"3"`) or a revision tag (e.g. `"prod"`). Not valid with `auto`.
+     */
+    version?: pulumi.Input<string>;
+}
+
 export interface TemplateSourceDestinationArgs {
     /**
      * Destination URL that gets filled in on new project creation.

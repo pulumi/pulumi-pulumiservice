@@ -13,6 +13,8 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from . import _utilities
+from . import outputs
+from ._inputs import *
 
 __all__ = ['StackArgs', 'Stack']
 
@@ -22,17 +24,21 @@ class StackArgs:
                  organization_name: pulumi.Input[_builtins.str],
                  project_name: pulumi.Input[_builtins.str],
                  stack_name: pulumi.Input[_builtins.str],
+                 config_environment: Optional[pulumi.Input['StackConfigEnvironmentArgs']] = None,
                  force_destroy: Optional[pulumi.Input[_builtins.bool]] = None):
         """
         The set of arguments for constructing a Stack resource.
         :param pulumi.Input[_builtins.str] organization_name: The name of the organization.
         :param pulumi.Input[_builtins.str] project_name: The name of the project.
         :param pulumi.Input[_builtins.str] stack_name: The name of the stack.
+        :param pulumi.Input['StackConfigEnvironmentArgs'] config_environment: Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set either `project`+`environment` to reference an existing environment, or `auto: true` to have the stack manage a dedicated environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack.
         :param pulumi.Input[_builtins.bool] force_destroy: Optional. Flag indicating whether to delete the stack even if it still contains resources.
         """
         pulumi.set(__self__, "organization_name", organization_name)
         pulumi.set(__self__, "project_name", project_name)
         pulumi.set(__self__, "stack_name", stack_name)
+        if config_environment is not None:
+            pulumi.set(__self__, "config_environment", config_environment)
         if force_destroy is not None:
             pulumi.set(__self__, "force_destroy", force_destroy)
 
@@ -73,6 +79,18 @@ class StackArgs:
         pulumi.set(self, "stack_name", value)
 
     @_builtins.property
+    @pulumi.getter(name="configEnvironment")
+    def config_environment(self) -> Optional[pulumi.Input['StackConfigEnvironmentArgs']]:
+        """
+        Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set either `project`+`environment` to reference an existing environment, or `auto: true` to have the stack manage a dedicated environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack.
+        """
+        return pulumi.get(self, "config_environment")
+
+    @config_environment.setter
+    def config_environment(self, value: Optional[pulumi.Input['StackConfigEnvironmentArgs']]):
+        pulumi.set(self, "config_environment", value)
+
+    @_builtins.property
     @pulumi.getter(name="forceDestroy")
     def force_destroy(self) -> Optional[pulumi.Input[_builtins.bool]]:
         """
@@ -91,6 +109,7 @@ class Stack(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 config_environment: Optional[pulumi.Input[Union['StackConfigEnvironmentArgs', 'StackConfigEnvironmentArgsDict']]] = None,
                  force_destroy: Optional[pulumi.Input[_builtins.bool]] = None,
                  organization_name: Optional[pulumi.Input[_builtins.str]] = None,
                  project_name: Optional[pulumi.Input[_builtins.str]] = None,
@@ -101,6 +120,7 @@ class Stack(pulumi.CustomResource):
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
+        :param pulumi.Input[Union['StackConfigEnvironmentArgs', 'StackConfigEnvironmentArgsDict']] config_environment: Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set either `project`+`environment` to reference an existing environment, or `auto: true` to have the stack manage a dedicated environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack.
         :param pulumi.Input[_builtins.bool] force_destroy: Optional. Flag indicating whether to delete the stack even if it still contains resources.
         :param pulumi.Input[_builtins.str] organization_name: The name of the organization.
         :param pulumi.Input[_builtins.str] project_name: The name of the project.
@@ -130,6 +150,7 @@ class Stack(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 config_environment: Optional[pulumi.Input[Union['StackConfigEnvironmentArgs', 'StackConfigEnvironmentArgsDict']]] = None,
                  force_destroy: Optional[pulumi.Input[_builtins.bool]] = None,
                  organization_name: Optional[pulumi.Input[_builtins.str]] = None,
                  project_name: Optional[pulumi.Input[_builtins.str]] = None,
@@ -143,6 +164,7 @@ class Stack(pulumi.CustomResource):
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
             __props__ = StackArgs.__new__(StackArgs)
 
+            __props__.__dict__["config_environment"] = config_environment
             __props__.__dict__["force_destroy"] = force_destroy
             if organization_name is None and not opts.urn:
                 raise TypeError("Missing required property 'organization_name'")
@@ -175,11 +197,20 @@ class Stack(pulumi.CustomResource):
 
         __props__ = StackArgs.__new__(StackArgs)
 
+        __props__.__dict__["config_environment"] = None
         __props__.__dict__["force_destroy"] = None
         __props__.__dict__["organization_name"] = None
         __props__.__dict__["project_name"] = None
         __props__.__dict__["stack_name"] = None
         return Stack(resource_name, opts=opts, __props__=__props__)
+
+    @_builtins.property
+    @pulumi.getter(name="configEnvironment")
+    def config_environment(self) -> pulumi.Output[Optional['outputs.StackConfigEnvironment']]:
+        """
+        Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set either `project`+`environment` to reference an existing environment, or `auto: true` to have the stack manage a dedicated environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack.
+        """
+        return pulumi.get(self, "config_environment")
 
     @_builtins.property
     @pulumi.getter(name="forceDestroy")

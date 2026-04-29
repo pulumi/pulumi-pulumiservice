@@ -2,6 +2,9 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
+import * as inputs from "./types/input";
+import * as outputs from "./types/output";
+import * as enums from "./types/enums";
 import * as utilities from "./utilities";
 
 /**
@@ -34,6 +37,10 @@ export class Stack extends pulumi.CustomResource {
         return obj['__pulumiType'] === Stack.__pulumiType;
     }
 
+    /**
+     * Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set either `project`+`environment` to reference an existing environment, or `auto: true` to have the stack manage a dedicated environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack.
+     */
+    declare public readonly configEnvironment: pulumi.Output<outputs.StackConfigEnvironment | undefined>;
     /**
      * Optional. Flag indicating whether to delete the stack even if it still contains resources.
      */
@@ -71,11 +78,13 @@ export class Stack extends pulumi.CustomResource {
             if (args?.stackName === undefined && !opts.urn) {
                 throw new Error("Missing required property 'stackName'");
             }
+            resourceInputs["configEnvironment"] = args?.configEnvironment;
             resourceInputs["forceDestroy"] = args?.forceDestroy;
             resourceInputs["organizationName"] = args?.organizationName;
             resourceInputs["projectName"] = args?.projectName;
             resourceInputs["stackName"] = args?.stackName;
         } else {
+            resourceInputs["configEnvironment"] = undefined /*out*/;
             resourceInputs["forceDestroy"] = undefined /*out*/;
             resourceInputs["organizationName"] = undefined /*out*/;
             resourceInputs["projectName"] = undefined /*out*/;
@@ -90,6 +99,10 @@ export class Stack extends pulumi.CustomResource {
  * The set of arguments for constructing a Stack resource.
  */
 export interface StackArgs {
+    /**
+     * Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set either `project`+`environment` to reference an existing environment, or `auto: true` to have the stack manage a dedicated environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack.
+     */
+    configEnvironment?: pulumi.Input<inputs.StackConfigEnvironmentArgs>;
     /**
      * Optional. Flag indicating whether to delete the stack even if it still contains resources.
      */

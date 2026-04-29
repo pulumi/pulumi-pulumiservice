@@ -58,6 +58,8 @@ __all__ = [
     'PolicyGroupPolicyPackReferenceInputArgsDict',
     'PolicyGroupStackReferenceArgs',
     'PolicyGroupStackReferenceArgsDict',
+    'StackConfigEnvironmentArgs',
+    'StackConfigEnvironmentArgsDict',
     'TemplateSourceDestinationArgs',
     'TemplateSourceDestinationArgsDict',
 ]
@@ -1809,6 +1811,102 @@ class PolicyGroupStackReferenceArgs:
     @routing_project.setter
     def routing_project(self, value: pulumi.Input[_builtins.str]):
         pulumi.set(self, "routing_project", value)
+
+
+if not MYPY:
+    class StackConfigEnvironmentArgsDict(TypedDict):
+        """
+        Service-Backed Configuration: links a Stack to an ESC environment that holds its config and secrets. Set exactly one of `auto` (Stack-managed) or `project`+`environment` (reference an existing env).
+        """
+        auto: NotRequired[pulumi.Input[_builtins.bool]]
+        """
+        When `true`, the Stack manages a dedicated ESC environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack. Mutually exclusive with `project`+`environment`.
+        """
+        environment: NotRequired[pulumi.Input[_builtins.str]]
+        """
+        The name of the ESC environment to link. Mutually exclusive with `auto`. Used together with `project` to reference an existing environment.
+        """
+        project: NotRequired[pulumi.Input[_builtins.str]]
+        """
+        The project of the ESC environment to link. Mutually exclusive with `auto`. Used together with `environment` to reference an existing environment. Defaults to the ESC `default` project when omitted.
+        """
+        version: NotRequired[pulumi.Input[_builtins.str]]
+        """
+        Optional. Pin an existing environment link to a specific revision. Accepts a numeric revision (e.g. `"3"`) or a revision tag (e.g. `"prod"`). Not valid with `auto`.
+        """
+elif False:
+    StackConfigEnvironmentArgsDict: TypeAlias = Mapping[str, Any]
+
+@pulumi.input_type
+class StackConfigEnvironmentArgs:
+    def __init__(__self__, *,
+                 auto: Optional[pulumi.Input[_builtins.bool]] = None,
+                 environment: Optional[pulumi.Input[_builtins.str]] = None,
+                 project: Optional[pulumi.Input[_builtins.str]] = None,
+                 version: Optional[pulumi.Input[_builtins.str]] = None):
+        """
+        Service-Backed Configuration: links a Stack to an ESC environment that holds its config and secrets. Set exactly one of `auto` (Stack-managed) or `project`+`environment` (reference an existing env).
+        :param pulumi.Input[_builtins.bool] auto: When `true`, the Stack manages a dedicated ESC environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack. Mutually exclusive with `project`+`environment`.
+        :param pulumi.Input[_builtins.str] environment: The name of the ESC environment to link. Mutually exclusive with `auto`. Used together with `project` to reference an existing environment.
+        :param pulumi.Input[_builtins.str] project: The project of the ESC environment to link. Mutually exclusive with `auto`. Used together with `environment` to reference an existing environment. Defaults to the ESC `default` project when omitted.
+        :param pulumi.Input[_builtins.str] version: Optional. Pin an existing environment link to a specific revision. Accepts a numeric revision (e.g. `"3"`) or a revision tag (e.g. `"prod"`). Not valid with `auto`.
+        """
+        if auto is not None:
+            pulumi.set(__self__, "auto", auto)
+        if environment is not None:
+            pulumi.set(__self__, "environment", environment)
+        if project is not None:
+            pulumi.set(__self__, "project", project)
+        if version is not None:
+            pulumi.set(__self__, "version", version)
+
+    @_builtins.property
+    @pulumi.getter
+    def auto(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        """
+        When `true`, the Stack manages a dedicated ESC environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack. Mutually exclusive with `project`+`environment`.
+        """
+        return pulumi.get(self, "auto")
+
+    @auto.setter
+    def auto(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "auto", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def environment(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        The name of the ESC environment to link. Mutually exclusive with `auto`. Used together with `project` to reference an existing environment.
+        """
+        return pulumi.get(self, "environment")
+
+    @environment.setter
+    def environment(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "environment", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def project(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        The project of the ESC environment to link. Mutually exclusive with `auto`. Used together with `environment` to reference an existing environment. Defaults to the ESC `default` project when omitted.
+        """
+        return pulumi.get(self, "project")
+
+    @project.setter
+    def project(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "project", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def version(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Optional. Pin an existing environment link to a specific revision. Accepts a numeric revision (e.g. `"3"`) or a revision tag (e.g. `"prod"`). Not valid with `auto`.
+        """
+        return pulumi.get(self, "version")
+
+    @version.setter
+    def version(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "version", value)
 
 
 if not MYPY:

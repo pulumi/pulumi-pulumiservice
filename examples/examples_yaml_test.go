@@ -498,6 +498,25 @@ func TestYamlStackExample(t *testing.T) {
 	})
 }
 
+// TestYamlStackSbcExample exercises Stack.configEnvironment in both modes.
+// Skipped by default because Service-Backed Configuration is gated behind the
+// `39623-service-backed-config` LaunchDarkly flag and not yet enabled for the
+// shared test org. Enable manually once the flag is on.
+func TestYamlStackSbcExample(t *testing.T) {
+	t.Skip("requires the Service-Backed Configuration feature flag to be enabled on the test org")
+
+	cwd := getCwd(t)
+	digits := generateRandomFiveDigits()
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Quick: true,
+		Dir:   path.Join(cwd, ".", "yaml-stack-sbc"),
+		Config: map[string]string{
+			"organizationName": getOrgName(),
+			"digits":           digits,
+		},
+	})
+}
+
 func TestYamlInsightsAccountExample(t *testing.T) {
 	test := pulumitest.NewPulumiTest(t,
 		filepath.Join(getCwd(t), "yaml-insights-account"),
