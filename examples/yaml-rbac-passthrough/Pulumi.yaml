@@ -2,13 +2,7 @@ name: yaml-rbac-passthrough
 runtime: yaml
 description: |
   Demonstrates the pass-through grammar for OrganizationRole.permissions.
-  Includes:
-    - A `kind: PermissionDescriptorCompose` role (the customer's UI-import case).
-    - A `kind: allow` role scoped via the new `on: { team: <id> }` sugar.
-    - A `kind: PermissionDescriptorCondition` role with a non-collapsible
-      And(Equal, Equal) boolean — hand-authored wire shape demonstrating the
-      pass-through path.
-  Run with `pulumi up`.
+  Includes Compose, on:{team:...}, and a non-collapsible Condition role.
 
 config:
   organizationName:
