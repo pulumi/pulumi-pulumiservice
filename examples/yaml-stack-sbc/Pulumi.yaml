@@ -1,0 +1,56 @@
+name: yaml-stack-sbc
+runtime: yaml
+description: Example of Stack resource with Service-Backed Configuration
+
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  digits:
+    type: string
+
+resources:
+  # An ESC environment that holds config/secrets shared by the linked stack.
+  sharedCfg:
+    type: pulumiservice:Environment
+    properties:
+      organization: ${organizationName}
+      project: default
+      name: sbc-shared-cfg-${digits}
+      yaml: |
+        values:
+          app:
+            greeting: "hello from ESC"
+
+  # Mode 1: reference an existing ESC environment as the stack's remote config.
+  # Stack lifecycle: PSP creates the stack, links the env, and on delete keeps
+  # the env (preserveEnvironment=true) because PSP doesn't own its lifecycle.
+  refStack:
+    type: pulumiservice:Stack
+    properties:
+      organizationName: ${organizationName}
+      projectName: sbc-test-${digits}
+      stackName: ref-${digits}
+      configEnvironment:
+        project: ${sharedCfg.project}
+        environment: ${sharedCfg.name}
+        # Pin to the latest revision Pulumi wrote, so subsequent edits to the
+        # env don't silently change this stack's config until the program is
+        # re-applied.
+        version: ${sharedCfg.revision}
+
+  # Mode 2: stack-managed env. The server creates an env named
+  # `${projectName}/${stackName}` alongside the stack, and deletes it when the
+  # stack is destroyed (preserveEnvironment=false).
+  autoStack:
+    type: pulumiservice:Stack
+    properties:
+      organizationName: ${organizationName}
+      projectName: sbc-test-${digits}
+      stackName: auto-${digits}
+      configEnvironment:
+        auto: true
+
+outputs:
+  refStackName: ${refStack.stackName}
+  autoStackName: ${autoStack.stackName}

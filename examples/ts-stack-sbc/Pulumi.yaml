@@ -1,0 +1,10 @@
+name: pulumi-service-stack-sbc-example-ts
+runtime: nodejs
+description: Example of Stack resource with Service-Backed Configuration in TypeScript
+
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  digits:
+    type: string

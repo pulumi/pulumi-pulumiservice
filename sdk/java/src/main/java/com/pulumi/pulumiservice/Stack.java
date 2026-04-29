@@ -9,6 +9,7 @@ import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.StackArgs;
 import com.pulumi.pulumiservice.Utilities;
+import com.pulumi.pulumiservice.outputs.StackConfigEnvironment;
 import java.lang.Boolean;
 import java.lang.String;
 import java.util.Optional;
@@ -20,6 +21,20 @@ import javax.annotation.Nullable;
  */
 @ResourceType(type="pulumiservice:index:Stack")
 public class Stack extends com.pulumi.resources.CustomResource {
+    /**
+     * Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set either `project`+`environment` to reference an existing environment, or `auto: true` to have the stack manage a dedicated environment (named `&lt;projectName&gt;/&lt;stackName&gt;`) that is created and destroyed alongside the stack.
+     * 
+     */
+    @Export(name="configEnvironment", refs={StackConfigEnvironment.class}, tree="[0]")
+    private Output</* @Nullable */ StackConfigEnvironment> configEnvironment;
+
+    /**
+     * @return Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set either `project`+`environment` to reference an existing environment, or `auto: true` to have the stack manage a dedicated environment (named `&lt;projectName&gt;/&lt;stackName&gt;`) that is created and destroyed alongside the stack.
+     * 
+     */
+    public Output<Optional<StackConfigEnvironment>> configEnvironment() {
+        return Codegen.optional(this.configEnvironment);
+    }
     /**
      * Optional. Flag indicating whether to delete the stack even if it still contains resources.
      * 

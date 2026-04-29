@@ -6,6 +6,7 @@ package com.pulumi.pulumiservice;
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
+import com.pulumi.pulumiservice.inputs.StackConfigEnvironmentArgs;
 import java.lang.Boolean;
 import java.lang.String;
 import java.util.Objects;
@@ -16,6 +17,21 @@ import javax.annotation.Nullable;
 public final class StackArgs extends com.pulumi.resources.ResourceArgs {
 
     public static final StackArgs Empty = new StackArgs();
+
+    /**
+     * Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set either `project`+`environment` to reference an existing environment, or `auto: true` to have the stack manage a dedicated environment (named `&lt;projectName&gt;/&lt;stackName&gt;`) that is created and destroyed alongside the stack.
+     * 
+     */
+    @Import(name="configEnvironment")
+    private @Nullable Output<StackConfigEnvironmentArgs> configEnvironment;
+
+    /**
+     * @return Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set either `project`+`environment` to reference an existing environment, or `auto: true` to have the stack manage a dedicated environment (named `&lt;projectName&gt;/&lt;stackName&gt;`) that is created and destroyed alongside the stack.
+     * 
+     */
+    public Optional<Output<StackConfigEnvironmentArgs>> configEnvironment() {
+        return Optional.ofNullable(this.configEnvironment);
+    }
 
     /**
      * Optional. Flag indicating whether to delete the stack even if it still contains resources.
@@ -80,6 +96,7 @@ public final class StackArgs extends com.pulumi.resources.ResourceArgs {
     private StackArgs() {}
 
     private StackArgs(StackArgs $) {
+        this.configEnvironment = $.configEnvironment;
         this.forceDestroy = $.forceDestroy;
         this.organizationName = $.organizationName;
         this.projectName = $.projectName;
@@ -102,6 +119,27 @@ public final class StackArgs extends com.pulumi.resources.ResourceArgs {
 
         public Builder(StackArgs defaults) {
             $ = new StackArgs(Objects.requireNonNull(defaults));
+        }
+
+        /**
+         * @param configEnvironment Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set either `project`+`environment` to reference an existing environment, or `auto: true` to have the stack manage a dedicated environment (named `&lt;projectName&gt;/&lt;stackName&gt;`) that is created and destroyed alongside the stack.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder configEnvironment(@Nullable Output<StackConfigEnvironmentArgs> configEnvironment) {
+            $.configEnvironment = configEnvironment;
+            return this;
+        }
+
+        /**
+         * @param configEnvironment Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set either `project`+`environment` to reference an existing environment, or `auto: true` to have the stack manage a dedicated environment (named `&lt;projectName&gt;/&lt;stackName&gt;`) that is created and destroyed alongside the stack.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder configEnvironment(StackConfigEnvironmentArgs configEnvironment) {
+            return configEnvironment(Output.of(configEnvironment));
         }
 
         /**

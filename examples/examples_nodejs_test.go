@@ -26,6 +26,19 @@ func TestAccessTokenExample(t *testing.T) {
 	runPulumiTest(t, test)
 }
 
+func TestNodejsStackSbcExample(t *testing.T) {
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "ts-stack-sbc"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.YarnLink("@pulumi/pulumiservice"),
+		opttest.StackName(randomStackName()),
+	)
+	test.SetConfig(t, "organizationName", getOrgName())
+	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	runPulumiTest(t, test)
+}
+
 func TestStackTagsExample(t *testing.T) {
 	test := pulumitest.NewPulumiTest(t,
 		filepath.Join(getCwd(t), "ts-stack-tags"),
