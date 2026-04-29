@@ -127,6 +127,22 @@ func isWireTypeName(s string) bool {
 // Returns an error if the input is malformed: missing kind, unknown kind,
 // invalid `on:` shape, or invalid Allow/Group payload.
 func permissionsKindToWire(node map[string]interface{}) (map[string]interface{}, error) {
+	_, hasKind := node["kind"]
+	_, hasType := node["__type"]
+	if hasKind && hasType {
+		return nil, fmt.Errorf(
+			"permissions descriptor has both `kind` and `__type`; " +
+				"use `kind` only at the SDK boundary (PR #778+) — `__type` is the wire-side discriminator",
+		)
+	}
+	if hasType && !hasKind {
+		return nil, fmt.Errorf(
+			"permissions descriptor uses `__type` instead of `kind`; " +
+				"use `kind` instead of `__type` at the SDK boundary " +
+				"(this provider renames the discriminator at the wire layer)",
+		)
+	}
+
 	rawKind, ok := node["kind"]
 	if !ok {
 		return nil, fmt.Errorf("permissions descriptor missing required `kind` field")

@@ -933,6 +933,23 @@ func TestPermissionsKindToWire_Errors(t *testing.T) {
 			},
 			wantErrFrag: "on:",
 		},
+		{
+			name: "top-level __type instead of kind",
+			in: map[string]interface{}{
+				"__type":      "PermissionDescriptorAllow",
+				"permissions": []interface{}{"stack:read"},
+			},
+			wantErrFrag: "use `kind` instead of `__type`",
+		},
+		{
+			name: "kind and __type both present",
+			in: map[string]interface{}{
+				"kind":        "allow",
+				"__type":      "PermissionDescriptorAllow",
+				"permissions": []interface{}{"stack:read"},
+			},
+			wantErrFrag: "both `kind` and `__type`",
+		},
 	}
 	for _, tc := range cases {
 		tc := tc
