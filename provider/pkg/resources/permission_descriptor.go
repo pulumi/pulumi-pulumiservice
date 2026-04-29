@@ -321,7 +321,11 @@ func permissionsWireToKind(node map[string]interface{}) (map[string]interface{},
 		translated["on"] = on
 		return translated, nil
 	default:
-		return nil, fmt.Errorf("unknown permissions descriptor __type %q", wireType)
+		// Unknown wire type — pass through verbatim with a blind
+		// __type → kind rename so Python's RPC deserializer doesn't
+		// strip the discriminators. Cloud validates the structure at
+		// Create/Update; we don't interpret pass-through fields.
+		return renameKey(node, "__type", "kind").(map[string]interface{}), nil
 	}
 }
 

@@ -202,6 +202,221 @@ func teamScopedAllowWire() map[string]interface{} {
 	}
 }
 
+// bareCompose: a Compose descriptor — list of descriptor IDs by reference.
+// The wire shape is the customer's UI-imported role.
+func bareComposeKind() map[string]interface{} {
+	return map[string]interface{}{
+		"kind": "PermissionDescriptorCompose",
+		"permissionDescriptors": []interface{}{
+			"046f4b97-ed29-43d3-a09a-2c5d8d0e44e0",
+			"7be8e8d2-9c0c-4d34-a4f5-2d0fdb5e2f1a",
+		},
+	}
+}
+func bareComposeWire() map[string]interface{} {
+	return map[string]interface{}{
+		"__type": "PermissionDescriptorCompose",
+		"permissionDescriptors": []interface{}{
+			"046f4b97-ed29-43d3-a09a-2c5d8d0e44e0",
+			"7be8e8d2-9c0c-4d34-a4f5-2d0fdb5e2f1a",
+		},
+	}
+}
+
+// ifThenElseDeeplyNested: a maximally-nested IfThenElse to exercise the
+// blind discriminator rename at every level (IfThenElse → And → Equal /
+// Or → Not → HasTag → ContextEnvironment, with inner Allow descriptors).
+func ifThenElseDeeplyNestedKind() map[string]interface{} {
+	return map[string]interface{}{
+		"kind": "PermissionDescriptorIfThenElse",
+		"condition": map[string]interface{}{
+			"kind": "PermissionExpressionAnd",
+			"left": map[string]interface{}{
+				"kind": "PermissionExpressionEqual",
+				"left": map[string]interface{}{"kind": "PermissionExpressionStack"},
+				"right": map[string]interface{}{
+					"kind":     "PermissionLiteralExpressionStack",
+					"identity": "stack-1",
+				},
+			},
+			"right": map[string]interface{}{
+				"kind": "PermissionExpressionNot",
+				"node": map[string]interface{}{
+					"kind":    "PermissionExpressionHasTag",
+					"context": map[string]interface{}{"kind": "PermissionExpressionEnvironment"},
+					"key":     "production",
+				},
+			},
+		},
+		"subNodeForTrue": map[string]interface{}{
+			"kind":        "PermissionDescriptorAllow",
+			"permissions": []interface{}{"environment:read"},
+		},
+		"subNodeForFalse": map[string]interface{}{
+			"kind":        "PermissionDescriptorAllow",
+			"permissions": []interface{}{"environment:read", "environment:write"},
+		},
+	}
+}
+func ifThenElseDeeplyNestedWire() map[string]interface{} {
+	return map[string]interface{}{
+		"__type": "PermissionDescriptorIfThenElse",
+		"condition": map[string]interface{}{
+			"__type": "PermissionExpressionAnd",
+			"left": map[string]interface{}{
+				"__type": "PermissionExpressionEqual",
+				"left":   map[string]interface{}{"__type": "PermissionExpressionStack"},
+				"right": map[string]interface{}{
+					"__type":   "PermissionLiteralExpressionStack",
+					"identity": "stack-1",
+				},
+			},
+			"right": map[string]interface{}{
+				"__type": "PermissionExpressionNot",
+				"node": map[string]interface{}{
+					"__type":  "PermissionExpressionHasTag",
+					"context": map[string]interface{}{"__type": "PermissionExpressionEnvironment"},
+					"key":     "production",
+				},
+			},
+		},
+		"subNodeForTrue": map[string]interface{}{
+			"__type":      "PermissionDescriptorAllow",
+			"permissions": []interface{}{"environment:read"},
+		},
+		"subNodeForFalse": map[string]interface{}{
+			"__type":      "PermissionDescriptorAllow",
+			"permissions": []interface{}{"environment:read", "environment:write"},
+		},
+	}
+}
+
+// selectMixedLiteralTypes: a Select with options keyed by three different
+// literal types (string, number, bool) — verifies the blind rename
+// handles each literal sub-type correctly.
+func selectMixedLiteralTypesKind() map[string]interface{} {
+	return map[string]interface{}{
+		"kind": "PermissionDescriptorSelect",
+		"selector": map[string]interface{}{
+			"kind":    "PermissionExpressionTag",
+			"context": map[string]interface{}{"kind": "PermissionExpressionEnvironment"},
+			"key":     "tier",
+		},
+		"options": []interface{}{
+			map[string]interface{}{
+				"value": map[string]interface{}{
+					"kind":  "PermissionLiteralExpressionString",
+					"value": "prod",
+				},
+				"node": map[string]interface{}{
+					"kind":        "PermissionDescriptorAllow",
+					"permissions": []interface{}{"environment:read"},
+				},
+			},
+			map[string]interface{}{
+				"value": map[string]interface{}{
+					"kind":  "PermissionLiteralExpressionNumber",
+					"value": 42,
+				},
+				"node": map[string]interface{}{
+					"kind":        "PermissionDescriptorAllow",
+					"permissions": []interface{}{"environment:write"},
+				},
+			},
+			map[string]interface{}{
+				"value": map[string]interface{}{
+					"kind":  "PermissionLiteralExpressionBool",
+					"value": true,
+				},
+				"node": map[string]interface{}{
+					"kind":        "PermissionDescriptorAllow",
+					"permissions": []interface{}{"environment:admin"},
+				},
+			},
+		},
+	}
+}
+func selectMixedLiteralTypesWire() map[string]interface{} {
+	return map[string]interface{}{
+		"__type": "PermissionDescriptorSelect",
+		"selector": map[string]interface{}{
+			"__type":  "PermissionExpressionTag",
+			"context": map[string]interface{}{"__type": "PermissionExpressionEnvironment"},
+			"key":     "tier",
+		},
+		"options": []interface{}{
+			map[string]interface{}{
+				"value": map[string]interface{}{
+					"__type": "PermissionLiteralExpressionString",
+					"value":  "prod",
+				},
+				"node": map[string]interface{}{
+					"__type":      "PermissionDescriptorAllow",
+					"permissions": []interface{}{"environment:read"},
+				},
+			},
+			map[string]interface{}{
+				"value": map[string]interface{}{
+					"__type": "PermissionLiteralExpressionNumber",
+					"value":  42,
+				},
+				"node": map[string]interface{}{
+					"__type":      "PermissionDescriptorAllow",
+					"permissions": []interface{}{"environment:write"},
+				},
+			},
+			map[string]interface{}{
+				"value": map[string]interface{}{
+					"__type": "PermissionLiteralExpressionBool",
+					"value":  true,
+				},
+				"node": map[string]interface{}{
+					"__type":      "PermissionDescriptorAllow",
+					"permissions": []interface{}{"environment:admin"},
+				},
+			},
+		},
+	}
+}
+
+// composeInsideGroup: a structured Group containing a pass-through Compose
+// entry. Verifies the boundary at entries[1]: the structured group recursion
+// hands off to pass-through when it encounters a non-Allow/non-Group entry.
+func composeInsideGroupKind() map[string]interface{} {
+	return map[string]interface{}{
+		"kind": "group",
+		"entries": []interface{}{
+			map[string]interface{}{
+				"kind":        "allow",
+				"permissions": []interface{}{"stack:read"},
+			},
+			map[string]interface{}{
+				"kind": "PermissionDescriptorCompose",
+				"permissionDescriptors": []interface{}{
+					"046f4b97-ed29-43d3-a09a-2c5d8d0e44e0",
+				},
+			},
+		},
+	}
+}
+func composeInsideGroupWire() map[string]interface{} {
+	return map[string]interface{}{
+		"__type": "PermissionDescriptorGroup",
+		"entries": []interface{}{
+			map[string]interface{}{
+				"__type":      "PermissionDescriptorAllow",
+				"permissions": []interface{}{"stack:read"},
+			},
+			map[string]interface{}{
+				"__type": "PermissionDescriptorCompose",
+				"permissionDescriptors": []interface{}{
+					"046f4b97-ed29-43d3-a09a-2c5d8d0e44e0",
+				},
+			},
+		},
+	}
+}
+
 // ----------------------------------------------------------------------------
 // Forward direction: kind → wire
 // ----------------------------------------------------------------------------
@@ -305,6 +520,10 @@ func TestPermissionsWireToKind(t *testing.T) {
 		{"scopedGroup", scopedGroupWire(), scopedGroupKind()},
 		{"mixedGroup", mixedGroupWire(), mixedGroupKind()},
 		{"teamScopedAllow", teamScopedAllowWire(), teamScopedAllowKind()},
+		{"bareCompose", bareComposeWire(), bareComposeKind()},
+		{"ifThenElseDeeplyNested", ifThenElseDeeplyNestedWire(), ifThenElseDeeplyNestedKind()},
+		{"selectMixedLiteralTypes", selectMixedLiteralTypesWire(), selectMixedLiteralTypesKind()},
+		{"composeInsideGroup", composeInsideGroupWire(), composeInsideGroupKind()},
 	}
 	for _, tc := range cases {
 		tc := tc
@@ -510,11 +729,6 @@ func TestPermissionsWireToKind_Errors(t *testing.T) {
 			name:        "missing __type",
 			in:          map[string]interface{}{"permissions": []interface{}{"stack:read"}},
 			wantErrFrag: "__type",
-		},
-		{
-			name:        "unknown __type",
-			in:          map[string]interface{}{"__type": "PermissionDescriptorBogus"},
-			wantErrFrag: "PermissionDescriptorBogus",
 		},
 		{
 			name: "Condition with non-Equal condition",
