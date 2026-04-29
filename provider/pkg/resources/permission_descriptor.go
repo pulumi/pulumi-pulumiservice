@@ -282,44 +282,13 @@ func permissionsWireToKind(node map[string]interface{}) (map[string]interface{},
 			"entries": translatedEntries,
 		}, nil
 	case "PermissionDescriptorCondition":
-		condRaw, ok := node["condition"]
-		if !ok {
-			return nil, fmt.Errorf("`PermissionDescriptorCondition` missing required `condition` field")
+		// Try to collapse Condition(Equal(Context<E>, Lit<E>(id)), Allow|Group)
+		// into an `on:` modifier on the inner descriptor. Falls back to
+		// pass-through for any wire shape outside that narrow pattern.
+		if collapsed, ok := tryCollapseOn(node); ok {
+			return collapsed, nil
 		}
-		cond, ok := condRaw.(map[string]interface{})
-		if !ok {
-			return nil, fmt.Errorf("`PermissionDescriptorCondition.condition` must be an object, got %T", condRaw)
-		}
-		on, err := extractOn(cond)
-		if err != nil {
-			return nil, err
-		}
-		subRaw, ok := node["subNode"]
-		if !ok {
-			return nil, fmt.Errorf("`PermissionDescriptorCondition` missing required `subNode` field")
-		}
-		sub, ok := subRaw.(map[string]interface{})
-		if !ok {
-			return nil, fmt.Errorf("`PermissionDescriptorCondition.subNode` must be an object, got %T", subRaw)
-		}
-		translated, err := permissionsWireToKind(sub)
-		if err != nil {
-			return nil, fmt.Errorf("PermissionDescriptorCondition.subNode: %w", err)
-		}
-		// Splice the on into the translated subNode. If the subNode itself
-		// already produced an `on:` (i.e. the wire returned a Condition
-		// wrapping another Condition), the inner scope would be silently
-		// lost — error out explicitly instead. The provider never emits
-		// nested Conditions; if the Cloud API ever does, callers need a
-		// clear failure mode rather than a quiet collapse.
-		if _, alreadyHasOn := translated["on"]; alreadyHasOn {
-			return nil, fmt.Errorf(
-				"`PermissionDescriptorCondition` wraps another scoped descriptor; " +
-					"nested scoping is not supported by this provider",
-			)
-		}
-		translated["on"] = on
-		return translated, nil
+		return renameKey(node, "__type", "kind").(map[string]interface{}), nil
 	default:
 		// Unknown wire type — pass through verbatim with a blind
 		// __type → kind rename so Python's RPC deserializer doesn't
@@ -329,59 +298,68 @@ func permissionsWireToKind(node map[string]interface{}) (map[string]interface{},
 	}
 }
 
-// extractOn collapses a wire-shape PermissionExpressionEqual into the user-
-// facing `on:` shape. The provider only emits Condition(Equal(Expr<E>,
-// Lit<E>(id))) — anything else (other boolean operators, mismatched
-// expression pairs, missing identity) is rejected with a clear error.
-func extractOn(condition map[string]interface{}) (map[string]interface{}, error) {
-	condTypeRaw, ok := condition["__type"]
+// tryCollapseOn attempts to collapse a wire-shape PermissionDescriptorCondition
+// into the user-facing `on:` sugar. The collapse fires only when:
+//
+//  1. The condition is exactly PermissionExpressionEqual whose left/right are
+//     a (Context<E>, Literal<E>(identity)) pair for one of the four supported
+//     entity types (environment, stack, insightsAccount, team), AND
+//  2. The wrapped subNode is a structured kind (PermissionDescriptorAllow or
+//     PermissionDescriptorGroup) that the SDK exposes as `kind: allow` or
+//     `kind: group`.
+//
+// If either guard fails, returns ok=false and the caller should fall back to
+// pass-through. tryCollapseOn never returns an error — any malformed condition
+// just doesn't collapse.
+func tryCollapseOn(node map[string]interface{}) (map[string]interface{}, bool) {
+	// Guard 2 first (cheaper): subNode must be Allow or Group on the wire.
+	subRaw, ok := node["subNode"].(map[string]interface{})
 	if !ok {
-		return nil, fmt.Errorf("`condition` missing required `__type` field")
+		return nil, false
 	}
-	condType, ok := condTypeRaw.(string)
+	subType, _ := subRaw["__type"].(string)
+	if subType != "PermissionDescriptorAllow" && subType != "PermissionDescriptorGroup" {
+		return nil, false
+	}
+
+	// Guard 1: condition must be Equal(Context<E>, Lit<E>(id)) for a known E.
+	condRaw, ok := node["condition"].(map[string]interface{})
 	if !ok {
-		return nil, fmt.Errorf("`condition.__type` must be a string, got %T", condTypeRaw)
+		return nil, false
 	}
-	if condType != "PermissionExpressionEqual" {
-		return nil, fmt.Errorf(
-			"unsupported condition shape %q (only `PermissionExpressionEqual` is exposed by this provider)",
-			condType,
-		)
+	if condType, _ := condRaw["__type"].(string); condType != "PermissionExpressionEqual" {
+		return nil, false
 	}
-	leftRaw, ok := condition["left"]
+	left, ok := condRaw["left"].(map[string]interface{})
 	if !ok {
-		return nil, fmt.Errorf("`PermissionExpressionEqual` missing required `left` field")
+		return nil, false
 	}
-	left, ok := leftRaw.(map[string]interface{})
+	right, ok := condRaw["right"].(map[string]interface{})
 	if !ok {
-		return nil, fmt.Errorf("`PermissionExpressionEqual.left` must be an object, got %T", leftRaw)
-	}
-	rightRaw, ok := condition["right"]
-	if !ok {
-		return nil, fmt.Errorf("`PermissionExpressionEqual` missing required `right` field")
-	}
-	right, ok := rightRaw.(map[string]interface{})
-	if !ok {
-		return nil, fmt.Errorf("`PermissionExpressionEqual.right` must be an object, got %T", rightRaw)
+		return nil, false
 	}
 	leftType, _ := left["__type"].(string)
 	rightType, _ := right["__type"].(string)
 	entityType, known := wireToEntityType[leftType+"|"+rightType]
 	if !known {
-		return nil, fmt.Errorf(
-			"mismatched `PermissionExpressionEqual` operands: left=%q right=%q "+
-				"(this provider only emits matched expression/literal pairs for "+
-				"known entity types: %v)",
-			leftType, rightType, validEntityTypeNames(),
-		)
+		return nil, false
 	}
-	identityRaw, ok := right["identity"]
+	identity, ok := right["identity"].(string)
 	if !ok {
-		return nil, fmt.Errorf("`%s` missing required `identity` field", rightType)
+		return nil, false
 	}
-	identity, ok := identityRaw.(string)
-	if !ok {
-		return nil, fmt.Errorf("`%s.identity` must be a string, got %T", rightType, identityRaw)
+
+	// Recurse into the subNode (we already checked it's Allow/Group, so the
+	// recursion goes through a structured arm and won't return an error
+	// for valid input).
+	translated, err := permissionsWireToKind(subRaw)
+	if err != nil {
+		// Sub-translation failed — don't swallow it; signal "no collapse" so
+		// the caller falls back to pass-through, which can't fail. The
+		// pass-through path won't surface the structural error, but that's
+		// fine: pass-through is for shapes the SDK doesn't fully validate.
+		return nil, false
 	}
-	return map[string]interface{}{entityType: identity}, nil
+	translated["on"] = map[string]interface{}{entityType: identity}
+	return translated, true
 }
