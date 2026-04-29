@@ -175,6 +175,33 @@ func mixedGroupWire() map[string]interface{} {
 	}
 }
 
+// teamScopedAllow: an Allow scoped to a single team. Validates the new
+// `team` entry in the on:-sugar entity-type table.
+func teamScopedAllowKind() map[string]interface{} {
+	return map[string]interface{}{
+		"kind":        "allow",
+		"on":          map[string]interface{}{"team": "team-id-1"},
+		"permissions": []interface{}{"stack:edit"},
+	}
+}
+func teamScopedAllowWire() map[string]interface{} {
+	return map[string]interface{}{
+		"__type": "PermissionDescriptorCondition",
+		"condition": map[string]interface{}{
+			"__type": "PermissionExpressionEqual",
+			"left":   map[string]interface{}{"__type": "PermissionExpressionTeam"},
+			"right": map[string]interface{}{
+				"__type":   "PermissionLiteralExpressionTeam",
+				"identity": "team-id-1",
+			},
+		},
+		"subNode": map[string]interface{}{
+			"__type":      "PermissionDescriptorAllow",
+			"permissions": []interface{}{"stack:edit"},
+		},
+	}
+}
+
 // ----------------------------------------------------------------------------
 // Forward direction: kind → wire
 // ----------------------------------------------------------------------------
@@ -191,6 +218,7 @@ func TestPermissionsKindToWire(t *testing.T) {
 		{"flatGroup", flatGroupKind(), flatGroupWire()},
 		{"scopedGroup", scopedGroupKind(), scopedGroupWire()},
 		{"mixedGroup", mixedGroupKind(), mixedGroupWire()},
+		{"teamScopedAllow", teamScopedAllowKind(), teamScopedAllowWire()},
 	}
 	for _, tc := range cases {
 		tc := tc
@@ -276,6 +304,7 @@ func TestPermissionsWireToKind(t *testing.T) {
 		{"flatGroup", flatGroupWire(), flatGroupKind()},
 		{"scopedGroup", scopedGroupWire(), scopedGroupKind()},
 		{"mixedGroup", mixedGroupWire(), mixedGroupKind()},
+		{"teamScopedAllow", teamScopedAllowWire(), teamScopedAllowKind()},
 	}
 	for _, tc := range cases {
 		tc := tc
@@ -303,6 +332,7 @@ func TestPermissionsKindWireRoundTrip(t *testing.T) {
 		{"flatGroup", flatGroupKind()},
 		{"scopedGroup", scopedGroupKind()},
 		{"mixedGroup", mixedGroupKind()},
+		{"teamScopedAllow", teamScopedAllowKind()},
 	}
 	for _, tc := range cases {
 		tc := tc
@@ -331,6 +361,7 @@ func TestPermissionsWireKindRoundTrip(t *testing.T) {
 		{"flatGroup", flatGroupWire()},
 		{"scopedGroup", scopedGroupWire()},
 		{"mixedGroup", mixedGroupWire()},
+		{"teamScopedAllow", teamScopedAllowWire()},
 	}
 	for _, tc := range cases {
 		tc := tc

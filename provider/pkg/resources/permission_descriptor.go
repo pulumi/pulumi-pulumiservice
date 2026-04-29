@@ -40,6 +40,10 @@ var entityTypeToWire = map[string]entityTypeWirePair{
 		expression: "PermissionExpressionInsightsAccount",
 		literal:    "PermissionLiteralExpressionInsightsAccount",
 	},
+	"team": {
+		expression: "PermissionExpressionTeam",
+		literal:    "PermissionLiteralExpressionTeam",
+	},
 }
 
 // wireToEntityType is the reverse map, built from entityTypeToWire so the two
@@ -330,8 +334,8 @@ func extractOn(condition map[string]interface{}) (map[string]interface{}, error)
 		return nil, fmt.Errorf(
 			"mismatched `PermissionExpressionEqual` operands: left=%q right=%q "+
 				"(this provider only emits matched expression/literal pairs for "+
-				"environment, stack, or insightsAccount)",
-			leftType, rightType,
+				"known entity types: %v)",
+			leftType, rightType, validEntityTypeNames(),
 		)
 	}
 	identityRaw, ok := right["identity"]
