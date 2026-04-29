@@ -64,14 +64,34 @@ public final class OrganizationRoleArgs extends com.pulumi.resources.ResourceArg
     }
 
     /**
-     * The role&#39;s permission descriptor tree. Two kinds: `{kind: &#34;allow&#34;, permissions: [&#34;&lt;scope&gt;&#34;, ...]}` to grant scopes, or `{kind: &#34;group&#34;, entries: [...]}` to compose multiple grants. Either may carry an optional `on:` modifier — a single-key map `{environment: &lt;uuid&gt;}` / `{stack: &lt;id&gt;}` / `{insightsAccount: &lt;id&gt;}` — to scope the descriptor to one entity. For per-entity scoping, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the `on:`-modified Allow for you.
+     * The role&#39;s permission descriptor tree, expressed in the Pulumi Cloud wire grammar with the discriminator field renamed from `__type` to `kind` (Pulumi&#39;s Python SDK strips `__`-prefixed keys from inputs, so the SDK uses `kind` for cross-language consistency).
+     * 
+     * Common kinds:
+     * - `PermissionDescriptorAllow` — `{kind: &#34;PermissionDescriptorAllow&#34;, permissions: [&#34;&lt;scope&gt;&#34;, ...]}` grants the listed scopes.
+     * - `PermissionDescriptorGroup` — `{kind: &#34;PermissionDescriptorGroup&#34;, entries: [&lt;descriptor&gt;, ...]}` composes multiple descriptors; the role grants the union of every entry.
+     * - `PermissionDescriptorCondition` — `{kind: &#34;PermissionDescriptorCondition&#34;, condition: &lt;expression&gt;, subNode: &lt;descriptor&gt;}` gates a sub-descriptor on a boolean expression.
+     * - `PermissionDescriptorCompose` — references other roles by ID; `{kind: &#34;PermissionDescriptorCompose&#34;, permissionDescriptors: [&lt;roleId&gt;, ...]}`.
+     * 
+     * Pulumi Cloud&#39;s REST API also accepts `PermissionDescriptorIfThenElse`, `PermissionDescriptorSelect`, and the `PermissionExpression*` / `PermissionLiteralExpression*` boolean operators (And, Or, Not, Equal, Environment, Stack, Team, InsightsAccount, …); the provider passes every variant through transparently without inspecting it, so future Cloud additions work without a provider release.
+     * 
+     * For the common case of granting a set of scopes on one entity, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, `buildInsightsAccountScopedPermissions`, and `buildTeamScopedPermissions` helpers, which build the corresponding `PermissionDescriptorCondition(Equal(...), Allow)` tree for you.
      * 
      */
     @Import(name="permissions", required=true)
     private Output<Map<String,Object>> permissions;
 
     /**
-     * @return The role&#39;s permission descriptor tree. Two kinds: `{kind: &#34;allow&#34;, permissions: [&#34;&lt;scope&gt;&#34;, ...]}` to grant scopes, or `{kind: &#34;group&#34;, entries: [...]}` to compose multiple grants. Either may carry an optional `on:` modifier — a single-key map `{environment: &lt;uuid&gt;}` / `{stack: &lt;id&gt;}` / `{insightsAccount: &lt;id&gt;}` — to scope the descriptor to one entity. For per-entity scoping, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the `on:`-modified Allow for you.
+     * @return The role&#39;s permission descriptor tree, expressed in the Pulumi Cloud wire grammar with the discriminator field renamed from `__type` to `kind` (Pulumi&#39;s Python SDK strips `__`-prefixed keys from inputs, so the SDK uses `kind` for cross-language consistency).
+     * 
+     * Common kinds:
+     * - `PermissionDescriptorAllow` — `{kind: &#34;PermissionDescriptorAllow&#34;, permissions: [&#34;&lt;scope&gt;&#34;, ...]}` grants the listed scopes.
+     * - `PermissionDescriptorGroup` — `{kind: &#34;PermissionDescriptorGroup&#34;, entries: [&lt;descriptor&gt;, ...]}` composes multiple descriptors; the role grants the union of every entry.
+     * - `PermissionDescriptorCondition` — `{kind: &#34;PermissionDescriptorCondition&#34;, condition: &lt;expression&gt;, subNode: &lt;descriptor&gt;}` gates a sub-descriptor on a boolean expression.
+     * - `PermissionDescriptorCompose` — references other roles by ID; `{kind: &#34;PermissionDescriptorCompose&#34;, permissionDescriptors: [&lt;roleId&gt;, ...]}`.
+     * 
+     * Pulumi Cloud&#39;s REST API also accepts `PermissionDescriptorIfThenElse`, `PermissionDescriptorSelect`, and the `PermissionExpression*` / `PermissionLiteralExpression*` boolean operators (And, Or, Not, Equal, Environment, Stack, Team, InsightsAccount, …); the provider passes every variant through transparently without inspecting it, so future Cloud additions work without a provider release.
+     * 
+     * For the common case of granting a set of scopes on one entity, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, `buildInsightsAccountScopedPermissions`, and `buildTeamScopedPermissions` helpers, which build the corresponding `PermissionDescriptorCondition(Equal(...), Allow)` tree for you.
      * 
      */
     public Output<Map<String,Object>> permissions() {
@@ -185,7 +205,17 @@ public final class OrganizationRoleArgs extends com.pulumi.resources.ResourceArg
         }
 
         /**
-         * @param permissions The role&#39;s permission descriptor tree. Two kinds: `{kind: &#34;allow&#34;, permissions: [&#34;&lt;scope&gt;&#34;, ...]}` to grant scopes, or `{kind: &#34;group&#34;, entries: [...]}` to compose multiple grants. Either may carry an optional `on:` modifier — a single-key map `{environment: &lt;uuid&gt;}` / `{stack: &lt;id&gt;}` / `{insightsAccount: &lt;id&gt;}` — to scope the descriptor to one entity. For per-entity scoping, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the `on:`-modified Allow for you.
+         * @param permissions The role&#39;s permission descriptor tree, expressed in the Pulumi Cloud wire grammar with the discriminator field renamed from `__type` to `kind` (Pulumi&#39;s Python SDK strips `__`-prefixed keys from inputs, so the SDK uses `kind` for cross-language consistency).
+         * 
+         * Common kinds:
+         * - `PermissionDescriptorAllow` — `{kind: &#34;PermissionDescriptorAllow&#34;, permissions: [&#34;&lt;scope&gt;&#34;, ...]}` grants the listed scopes.
+         * - `PermissionDescriptorGroup` — `{kind: &#34;PermissionDescriptorGroup&#34;, entries: [&lt;descriptor&gt;, ...]}` composes multiple descriptors; the role grants the union of every entry.
+         * - `PermissionDescriptorCondition` — `{kind: &#34;PermissionDescriptorCondition&#34;, condition: &lt;expression&gt;, subNode: &lt;descriptor&gt;}` gates a sub-descriptor on a boolean expression.
+         * - `PermissionDescriptorCompose` — references other roles by ID; `{kind: &#34;PermissionDescriptorCompose&#34;, permissionDescriptors: [&lt;roleId&gt;, ...]}`.
+         * 
+         * Pulumi Cloud&#39;s REST API also accepts `PermissionDescriptorIfThenElse`, `PermissionDescriptorSelect`, and the `PermissionExpression*` / `PermissionLiteralExpression*` boolean operators (And, Or, Not, Equal, Environment, Stack, Team, InsightsAccount, …); the provider passes every variant through transparently without inspecting it, so future Cloud additions work without a provider release.
+         * 
+         * For the common case of granting a set of scopes on one entity, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, `buildInsightsAccountScopedPermissions`, and `buildTeamScopedPermissions` helpers, which build the corresponding `PermissionDescriptorCondition(Equal(...), Allow)` tree for you.
          * 
          * @return builder
          * 
@@ -196,7 +226,17 @@ public final class OrganizationRoleArgs extends com.pulumi.resources.ResourceArg
         }
 
         /**
-         * @param permissions The role&#39;s permission descriptor tree. Two kinds: `{kind: &#34;allow&#34;, permissions: [&#34;&lt;scope&gt;&#34;, ...]}` to grant scopes, or `{kind: &#34;group&#34;, entries: [...]}` to compose multiple grants. Either may carry an optional `on:` modifier — a single-key map `{environment: &lt;uuid&gt;}` / `{stack: &lt;id&gt;}` / `{insightsAccount: &lt;id&gt;}` — to scope the descriptor to one entity. For per-entity scoping, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the `on:`-modified Allow for you.
+         * @param permissions The role&#39;s permission descriptor tree, expressed in the Pulumi Cloud wire grammar with the discriminator field renamed from `__type` to `kind` (Pulumi&#39;s Python SDK strips `__`-prefixed keys from inputs, so the SDK uses `kind` for cross-language consistency).
+         * 
+         * Common kinds:
+         * - `PermissionDescriptorAllow` — `{kind: &#34;PermissionDescriptorAllow&#34;, permissions: [&#34;&lt;scope&gt;&#34;, ...]}` grants the listed scopes.
+         * - `PermissionDescriptorGroup` — `{kind: &#34;PermissionDescriptorGroup&#34;, entries: [&lt;descriptor&gt;, ...]}` composes multiple descriptors; the role grants the union of every entry.
+         * - `PermissionDescriptorCondition` — `{kind: &#34;PermissionDescriptorCondition&#34;, condition: &lt;expression&gt;, subNode: &lt;descriptor&gt;}` gates a sub-descriptor on a boolean expression.
+         * - `PermissionDescriptorCompose` — references other roles by ID; `{kind: &#34;PermissionDescriptorCompose&#34;, permissionDescriptors: [&lt;roleId&gt;, ...]}`.
+         * 
+         * Pulumi Cloud&#39;s REST API also accepts `PermissionDescriptorIfThenElse`, `PermissionDescriptorSelect`, and the `PermissionExpression*` / `PermissionLiteralExpression*` boolean operators (And, Or, Not, Equal, Environment, Stack, Team, InsightsAccount, …); the provider passes every variant through transparently without inspecting it, so future Cloud additions work without a provider release.
+         * 
+         * For the common case of granting a set of scopes on one entity, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, `buildInsightsAccountScopedPermissions`, and `buildTeamScopedPermissions` helpers, which build the corresponding `PermissionDescriptorCondition(Equal(...), Allow)` tree for you.
          * 
          * @return builder
          * 

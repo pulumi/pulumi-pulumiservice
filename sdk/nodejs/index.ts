@@ -35,6 +35,11 @@ export const buildStackScopedPermissions: typeof import("./buildStackScopedPermi
 export const buildStackScopedPermissionsOutput: typeof import("./buildStackScopedPermissions").buildStackScopedPermissionsOutput = null as any;
 utilities.lazyLoad(exports, ["buildStackScopedPermissions","buildStackScopedPermissionsOutput"], () => require("./buildStackScopedPermissions"));
 
+export { BuildTeamScopedPermissionsArgs, BuildTeamScopedPermissionsResult, BuildTeamScopedPermissionsOutputArgs } from "./buildTeamScopedPermissions";
+export const buildTeamScopedPermissions: typeof import("./buildTeamScopedPermissions").buildTeamScopedPermissions = null as any;
+export const buildTeamScopedPermissionsOutput: typeof import("./buildTeamScopedPermissions").buildTeamScopedPermissionsOutput = null as any;
+utilities.lazyLoad(exports, ["buildTeamScopedPermissions","buildTeamScopedPermissionsOutput"], () => require("./buildTeamScopedPermissions"));
+
 export { DeploymentScheduleArgs } from "./deploymentSchedule";
 export type DeploymentSchedule = import("./deploymentSchedule").DeploymentSchedule;
 export const DeploymentSchedule: typeof import("./deploymentSchedule").DeploymentSchedule = null as any;

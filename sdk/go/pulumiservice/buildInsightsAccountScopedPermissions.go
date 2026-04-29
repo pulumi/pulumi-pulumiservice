@@ -11,7 +11,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-// Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source). The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `group` whose `entries` list pulls the output of each helper.
+// Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source). The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
 func BuildInsightsAccountScopedPermissions(ctx *pulumi.Context, args *BuildInsightsAccountScopedPermissionsArgs, opts ...pulumi.InvokeOption) (*BuildInsightsAccountScopedPermissionsResult, error) {
 	opts = internal.PkgInvokeDefaultOpts(opts)
 	var rv BuildInsightsAccountScopedPermissionsResult
@@ -30,7 +30,7 @@ type BuildInsightsAccountScopedPermissionsArgs struct {
 }
 
 type BuildInsightsAccountScopedPermissionsResult struct {
-	// A `kind: allow` descriptor with an `on: { insightsAccount: <id> }` modifier, ready to assign to `OrganizationRole.permissions`.
+	// A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` on the named insights account, ready to assign to `OrganizationRole.permissions`.
 	Permissions map[string]interface{} `pulumi:"permissions"`
 }
 
@@ -68,7 +68,7 @@ func (o BuildInsightsAccountScopedPermissionsResultOutput) ToBuildInsightsAccoun
 	return o
 }
 
-// A `kind: allow` descriptor with an `on: { insightsAccount: <id> }` modifier, ready to assign to `OrganizationRole.permissions`.
+// A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` on the named insights account, ready to assign to `OrganizationRole.permissions`.
 func (o BuildInsightsAccountScopedPermissionsResultOutput) Permissions() pulumi.MapOutput {
 	return o.ApplyT(func(v BuildInsightsAccountScopedPermissionsResult) map[string]interface{} { return v.Permissions }).(pulumi.MapOutput)
 }

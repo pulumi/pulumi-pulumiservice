@@ -25,6 +25,7 @@ class EnvironmentArgs:
                  project: Optional[pulumi.Input[_builtins.str]] = None):
         """
         The set of arguments for constructing a Environment resource.
+
         :param pulumi.Input[_builtins.str] name: Environment name.
         :param pulumi.Input[_builtins.str] organization: Organization name.
         :param pulumi.Input[Union[pulumi.Asset, pulumi.Archive]] yaml: Environment's yaml file.
@@ -101,6 +102,7 @@ class Environment(pulumi.CustomResource):
         """
         An ESC Environment.
 
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] name: Environment name.
@@ -116,6 +118,7 @@ class Environment(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         An ESC Environment.
+
 
         :param str resource_name: The name of the resource.
         :param EnvironmentArgs args: The arguments to use to populate this resource's properties.
@@ -193,7 +196,7 @@ class Environment(pulumi.CustomResource):
     @pulumi.getter(name="environmentId")
     def environment_id(self) -> pulumi.Output[Optional[_builtins.str]]:
         """
-        The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `literalEnvironment` expression in `OrganizationRole.permissions`.
+        The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`, or pass it directly to the `buildEnvironmentScopedPermissions` helper.
         """
         return pulumi.get(self, "environment_id")
 

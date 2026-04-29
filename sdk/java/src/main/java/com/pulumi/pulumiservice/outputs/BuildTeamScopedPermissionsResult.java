@@ -11,16 +11,16 @@ import java.util.Map;
 import java.util.Objects;
 
 @CustomType
-public final class BuildInsightsAccountScopedPermissionsResult {
+public final class BuildTeamScopedPermissionsResult {
     /**
-     * @return A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` on the named insights account, ready to assign to `OrganizationRole.permissions`.
+     * @return A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` on the named team, ready to assign to `OrganizationRole.permissions`.
      * 
      */
     private Map<String,Object> permissions;
 
-    private BuildInsightsAccountScopedPermissionsResult() {}
+    private BuildTeamScopedPermissionsResult() {}
     /**
-     * @return A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` on the named insights account, ready to assign to `OrganizationRole.permissions`.
+     * @return A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` on the named team, ready to assign to `OrganizationRole.permissions`.
      * 
      */
     public Map<String,Object> permissions() {
@@ -31,14 +31,14 @@ public final class BuildInsightsAccountScopedPermissionsResult {
         return new Builder();
     }
 
-    public static Builder builder(BuildInsightsAccountScopedPermissionsResult defaults) {
+    public static Builder builder(BuildTeamScopedPermissionsResult defaults) {
         return new Builder(defaults);
     }
     @CustomType.Builder
     public static final class Builder {
         private Map<String,Object> permissions;
         public Builder() {}
-        public Builder(BuildInsightsAccountScopedPermissionsResult defaults) {
+        public Builder(BuildTeamScopedPermissionsResult defaults) {
     	      Objects.requireNonNull(defaults);
     	      this.permissions = defaults.permissions;
         }
@@ -46,13 +46,13 @@ public final class BuildInsightsAccountScopedPermissionsResult {
         @CustomType.Setter
         public Builder permissions(Map<String,Object> permissions) {
             if (permissions == null) {
-              throw new MissingRequiredPropertyException("BuildInsightsAccountScopedPermissionsResult", "permissions");
+              throw new MissingRequiredPropertyException("BuildTeamScopedPermissionsResult", "permissions");
             }
             this.permissions = permissions;
             return this;
         }
-        public BuildInsightsAccountScopedPermissionsResult build() {
-            final var _resultValue = new BuildInsightsAccountScopedPermissionsResult();
+        public BuildTeamScopedPermissionsResult build() {
+            final var _resultValue = new BuildTeamScopedPermissionsResult();
             _resultValue.permissions = permissions;
             return _resultValue;
         }

@@ -13,6 +13,7 @@ from .approval_rule import *
 from .build_environment_scoped_permissions import *
 from .build_insights_account_scoped_permissions import *
 from .build_stack_scoped_permissions import *
+from .build_team_scoped_permissions import *
 from .deployment_schedule import *
 from .deployment_settings import *
 from .drift_schedule import *
