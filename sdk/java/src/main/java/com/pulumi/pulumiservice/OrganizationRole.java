@@ -77,7 +77,7 @@ public class OrganizationRole extends com.pulumi.resources.CustomResource {
      * 
      * Pulumi Cloud&#39;s REST API also accepts `PermissionDescriptorIfThenElse`, `PermissionDescriptorSelect`, and the `PermissionExpression*` / `PermissionLiteralExpression*` boolean operators (And, Or, Not, Equal, Environment, Stack, Team, InsightsAccount, …); the provider passes every variant through transparently without inspecting it, so future Cloud additions work without a provider release.
      * 
-     * For the common case of granting a set of scopes on one entity, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, `buildInsightsAccountScopedPermissions`, and `buildTeamScopedPermissions` helpers, which build the corresponding `PermissionDescriptorCondition(Equal(...), Allow)` tree for you.
+     * For the common case of granting a set of scopes on one entity, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the corresponding `PermissionDescriptorCondition(Equal(...), Allow)` tree for you. To grant a role to a team, use the `TeamRoleAssignment` resource — roles are *associated with* teams, not gated on them via a permission descriptor.
      * 
      */
     @Export(name="permissions", refs={Map.class,String.class,Object.class}, tree="[0,1,2]")
@@ -94,7 +94,7 @@ public class OrganizationRole extends com.pulumi.resources.CustomResource {
      * 
      * Pulumi Cloud&#39;s REST API also accepts `PermissionDescriptorIfThenElse`, `PermissionDescriptorSelect`, and the `PermissionExpression*` / `PermissionLiteralExpression*` boolean operators (And, Or, Not, Equal, Environment, Stack, Team, InsightsAccount, …); the provider passes every variant through transparently without inspecting it, so future Cloud additions work without a provider release.
      * 
-     * For the common case of granting a set of scopes on one entity, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, `buildInsightsAccountScopedPermissions`, and `buildTeamScopedPermissions` helpers, which build the corresponding `PermissionDescriptorCondition(Equal(...), Allow)` tree for you.
+     * For the common case of granting a set of scopes on one entity, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the corresponding `PermissionDescriptorCondition(Equal(...), Allow)` tree for you. To grant a role to a team, use the `TeamRoleAssignment` resource — roles are *associated with* teams, not gated on them via a permission descriptor.
      * 
      */
     public Output<Map<String,Object>> permissions() {

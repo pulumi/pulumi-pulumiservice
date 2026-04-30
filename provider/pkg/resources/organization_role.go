@@ -96,9 +96,11 @@ func (c *OrganizationRoleCore) Annotate(a infer.Annotator) {
 			"Cloud additions work without a provider release.\n\n"+
 			"For the common case of granting a set of scopes on one entity, prefer "+
 			"the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, "+
-			"`buildInsightsAccountScopedPermissions`, and "+
-			"`buildTeamScopedPermissions` helpers, which build the corresponding "+
-			"`PermissionDescriptorCondition(Equal(...), Allow)` tree for you.",
+			"and `buildInsightsAccountScopedPermissions` helpers, which build the "+
+			"corresponding `PermissionDescriptorCondition(Equal(...), Allow)` tree "+
+			"for you. To grant a role to a team, use the `TeamRoleAssignment` "+
+			"resource — roles are *associated with* teams, not gated on them via a "+
+			"permission descriptor.",
 	)
 }
 

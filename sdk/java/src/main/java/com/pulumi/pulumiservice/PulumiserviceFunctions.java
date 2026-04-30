@@ -15,8 +15,6 @@ import com.pulumi.pulumiservice.inputs.BuildInsightsAccountScopedPermissionsArgs
 import com.pulumi.pulumiservice.inputs.BuildInsightsAccountScopedPermissionsPlainArgs;
 import com.pulumi.pulumiservice.inputs.BuildStackScopedPermissionsArgs;
 import com.pulumi.pulumiservice.inputs.BuildStackScopedPermissionsPlainArgs;
-import com.pulumi.pulumiservice.inputs.BuildTeamScopedPermissionsArgs;
-import com.pulumi.pulumiservice.inputs.BuildTeamScopedPermissionsPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetCurrentUserArgs;
 import com.pulumi.pulumiservice.inputs.GetCurrentUserPlainArgs;
 import com.pulumi.pulumiservice.inputs.GetEnvironmentArgs;
@@ -38,7 +36,6 @@ import com.pulumi.pulumiservice.inputs.GetPolicyPacksPlainArgs;
 import com.pulumi.pulumiservice.outputs.BuildEnvironmentScopedPermissionsResult;
 import com.pulumi.pulumiservice.outputs.BuildInsightsAccountScopedPermissionsResult;
 import com.pulumi.pulumiservice.outputs.BuildStackScopedPermissionsResult;
-import com.pulumi.pulumiservice.outputs.BuildTeamScopedPermissionsResult;
 import com.pulumi.pulumiservice.outputs.GetCurrentUserResult;
 import com.pulumi.pulumiservice.outputs.GetEnvironmentResult;
 import com.pulumi.pulumiservice.outputs.GetInsightsAccountResult;
@@ -155,41 +152,6 @@ public final class PulumiserviceFunctions {
      */
     public static CompletableFuture<BuildStackScopedPermissionsResult> buildStackScopedPermissionsPlain(BuildStackScopedPermissionsPlainArgs args, InvokeOptions options) {
         return Deployment.getInstance().invokeAsync("pulumiservice:index:buildStackScopedPermissions", TypeShape.of(BuildStackScopedPermissionsResult.class), args, Utilities.withVersion(options));
-    }
-    /**
-     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only when the request is on the named team. Pair with `Team.name` (or any team-name string) to scope a role to a specific team. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
-     * 
-     */
-    public static Output<BuildTeamScopedPermissionsResult> buildTeamScopedPermissions(BuildTeamScopedPermissionsArgs args) {
-        return buildTeamScopedPermissions(args, InvokeOptions.Empty);
-    }
-    /**
-     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only when the request is on the named team. Pair with `Team.name` (or any team-name string) to scope a role to a specific team. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
-     * 
-     */
-    public static CompletableFuture<BuildTeamScopedPermissionsResult> buildTeamScopedPermissionsPlain(BuildTeamScopedPermissionsPlainArgs args) {
-        return buildTeamScopedPermissionsPlain(args, InvokeOptions.Empty);
-    }
-    /**
-     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only when the request is on the named team. Pair with `Team.name` (or any team-name string) to scope a role to a specific team. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
-     * 
-     */
-    public static Output<BuildTeamScopedPermissionsResult> buildTeamScopedPermissions(BuildTeamScopedPermissionsArgs args, InvokeOptions options) {
-        return Deployment.getInstance().invoke("pulumiservice:index:buildTeamScopedPermissions", TypeShape.of(BuildTeamScopedPermissionsResult.class), args, Utilities.withVersion(options));
-    }
-    /**
-     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only when the request is on the named team. Pair with `Team.name` (or any team-name string) to scope a role to a specific team. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
-     * 
-     */
-    public static Output<BuildTeamScopedPermissionsResult> buildTeamScopedPermissions(BuildTeamScopedPermissionsArgs args, InvokeOutputOptions options) {
-        return Deployment.getInstance().invoke("pulumiservice:index:buildTeamScopedPermissions", TypeShape.of(BuildTeamScopedPermissionsResult.class), args, Utilities.withVersion(options));
-    }
-    /**
-     * Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only when the request is on the named team. Pair with `Team.name` (or any team-name string) to scope a role to a specific team. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
-     * 
-     */
-    public static CompletableFuture<BuildTeamScopedPermissionsResult> buildTeamScopedPermissionsPlain(BuildTeamScopedPermissionsPlainArgs args, InvokeOptions options) {
-        return Deployment.getInstance().invokeAsync("pulumiservice:index:buildTeamScopedPermissions", TypeShape.of(BuildTeamScopedPermissionsResult.class), args, Utilities.withVersion(options));
     }
     /**
      * Returns the Pulumi Cloud user that the provider&#39;s access token belongs to. Useful for seeding a newly-created `Team` with the creator as a member, since Pulumi Cloud auto-adds the creator. Omitting this user from the team will result in a refresh drift.

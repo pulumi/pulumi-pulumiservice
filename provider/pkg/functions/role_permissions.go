@@ -36,11 +36,14 @@ import (
 //
 //	environment      → PermissionExpressionEnvironment      / PermissionLiteralExpressionEnvironment
 //	stack            → PermissionExpressionStack            / PermissionLiteralExpressionStack
-//	team             → PermissionExpressionTeam             / PermissionLiteralExpressionTeam
 //	insightsAccount  → PermissionExpressionInsightsAccount  / PermissionLiteralExpressionInsightsAccount
 //
-// Adding a new scoped helper means adding a new entry above and a new
-// BuildXScopedPermissionsFunction below — no translator changes.
+// Note: there is intentionally no "team" scoping helper. Roles are
+// *associated with* teams via the TeamRoleAssignment resource, not gated
+// on them via a permission descriptor; the wire grammar exposes
+// PermissionExpressionTeam for advanced cases (e.g. roles imported from
+// the Pulumi Cloud UI that mix team identity into a complex Compose),
+// but the SDK does not advertise that as a recommended pattern.
 func scopedAllowWire(expressionKind, literalKind, identity string, permissions []string) map[string]interface{} {
 	grants := make([]interface{}, len(permissions))
 	for i, p := range permissions {
@@ -273,75 +276,6 @@ func (BuildInsightsAccountScopedPermissionsFunction) Invoke(
 				"PermissionExpressionInsightsAccount",
 				"PermissionLiteralExpressionInsightsAccount",
 				req.Input.InsightsAccountID,
-				req.Input.Permissions,
-			),
-		},
-	}, nil
-}
-
-// ----------------------------------------------------------------------------
-// Team-scoped helper
-// ----------------------------------------------------------------------------
-
-type BuildTeamScopedPermissionsFunction struct{}
-
-type BuildTeamScopedPermissionsInput struct {
-	TeamName    string   `pulumi:"teamName"`
-	Permissions []string `pulumi:"permissions"`
-}
-
-type BuildTeamScopedPermissionsOutput struct {
-	Permissions map[string]interface{} `pulumi:"permissions"`
-}
-
-func (BuildTeamScopedPermissionsFunction) Annotate(a infer.Annotator) {
-	a.Describe(
-		&BuildTeamScopedPermissionsFunction{},
-		"Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only when "+
-			"the request is on the named team. Pair with `Team.name` (or any team-name string) to scope "+
-			"a role to a specific team. "+scopedPermissionsHelpDoc,
-	)
-	a.SetToken("index", "buildTeamScopedPermissions")
-}
-
-func (i *BuildTeamScopedPermissionsInput) Annotate(a infer.Annotator) {
-	a.Describe(
-		&i.TeamName,
-		"The target team's name (e.g. `Team.name`). The Pulumi Cloud RBAC API keys team scopes by name.",
-	)
-	a.Describe(
-		&i.Permissions,
-		"The set of scopes to grant when the request is on the named team. "+
-			"Discover valid scope names via the `getOrganizationRoleScopes` data source.",
-	)
-}
-
-func (o *BuildTeamScopedPermissionsOutput) Annotate(a infer.Annotator) {
-	a.Describe(
-		&o.Permissions,
-		"A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` "+
-			"on the named team, ready to assign to `OrganizationRole.permissions`.",
-	)
-}
-
-func (BuildTeamScopedPermissionsFunction) Invoke(
-	_ context.Context,
-	req infer.FunctionRequest[BuildTeamScopedPermissionsInput],
-) (infer.FunctionResponse[BuildTeamScopedPermissionsOutput], error) {
-	if req.Input.TeamName == "" {
-		return infer.FunctionResponse[BuildTeamScopedPermissionsOutput]{},
-			fmt.Errorf("`teamName` must not be empty")
-	}
-	if len(req.Input.Permissions) == 0 {
-		return infer.FunctionResponse[BuildTeamScopedPermissionsOutput]{},
-			fmt.Errorf("`permissions` must not be empty")
-	}
-	return infer.FunctionResponse[BuildTeamScopedPermissionsOutput]{
-		Output: BuildTeamScopedPermissionsOutput{
-			Permissions: scopedAllowWire(
-				"PermissionExpressionTeam",
-				"PermissionLiteralExpressionTeam",
-				req.Input.TeamName,
 				req.Input.Permissions,
 			),
 		},
