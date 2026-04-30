@@ -28,7 +28,6 @@ class DeploymentScheduleArgs:
                  timestamp: Optional[pulumi.Input[_builtins.str]] = None):
         """
         The set of arguments for constructing a DeploymentSchedule resource.
-
         :param pulumi.Input[_builtins.str] organization: Organization name.
         :param pulumi.Input[_builtins.str] project: Project name.
         :param pulumi.Input['PulumiOperation'] pulumi_operation: Which command to run.
@@ -134,7 +133,6 @@ class DeploymentSchedule(pulumi.CustomResource):
         """
         A scheduled recurring or single time run of a pulumi command.
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] organization: Organization name.
@@ -152,7 +150,6 @@ class DeploymentSchedule(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         A scheduled recurring or single time run of a pulumi command.
-
 
         :param str resource_name: The name of the resource.
         :param DeploymentScheduleArgs args: The arguments to use to populate this resource's properties.
