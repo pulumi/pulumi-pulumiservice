@@ -30,6 +30,7 @@
 - `OrganizationRole.Check` no longer rejects `name` or `permissions` when they arrive as unknown/computed at preview. Wiring `permissions` to another resource's output (e.g. `Environment.environmentId` via `buildEnvironmentScopedPermissionsOutput`) previously failed every fresh `pulumi preview` because the typed Go field decoded to its zero value and tripped the empty check. Pulumi guarantees concrete values by Create-time, so the empty checks now run only when the input is concrete.
 - `OrganizationRole.Read` now rejects `pulumi import` against a permission-descriptor record whose `uxPurpose` is not `"role"` (e.g. a policy). The error names the actual `uxPurpose` so the user knows what they pointed at; previously the non-role descriptor would silently round-trip through code that only understands roles.
 - `OrganizationRole.Delete` now wraps Pulumi Cloud's `409 Conflict` rejection with an actionable message naming `PermissionDescriptorCompose` as the typical cause and pointing the user to destroy composing role(s) first. `force=true` already covers member/team assignments; structural Compose references are protected by the API and cannot be force-deleted.
+- Added internal `pulumiapi.Client.CreatePolicy` method that POSTs to `/orgs/<org>/roles` with `uxPurpose:"policy"`. Used by integration tests to provision the policy fixtures required by faithful Compose-import repros (Pulumi Cloud rejects `role`-references-`role` at create time). PSP does not expose policies as a managed resource type today; the helper is internal API surface.
 
 ## 0.36.0
 

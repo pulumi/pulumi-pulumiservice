@@ -85,25 +85,6 @@ resources:
       description: Read+open access scoped to a single ESC environment.
       permissions: ${scopedPermissions.permissions}
 
-  # Webflow import repro: a `PermissionDescriptorCompose` role that
-  # references the read-only role above. Compose roles are authored in
-  # the Pulumi Cloud UI; before the blind-rename translator they could
-  # not be imported into PSP because the provider didn't recognise the
-  # `__type` value. Now they pass through verbatim.
-  composedRole:
-    type: pulumiservice:OrganizationRole
-    properties:
-      organizationName: ${organizationName}
-      name: yaml-rbac-composed-${digits}
-      description: |
-        A role that composes the read-only role's grants. Demonstrates
-        the pass-through grammar — PSP has no PermissionDescriptorCompose-
-        specific code; the wire shape round-trips unchanged.
-      permissions:
-        kind: PermissionDescriptorCompose
-        permissionDescriptors:
-          - ${readOnlyRole.roleId}
-
 variables:
   # Data source: the authenticated Pulumi Cloud user (the stack's operator).
   # Used to seed the new Team's member list below.
@@ -148,5 +129,3 @@ outputs:
   # the role's permission tree, so the test can verify both pieces line up.
   scopedEnvironmentId: ${scopedEnv.environmentId}
   scopedRoleId: ${scopedReadOnlyRole.roleId}
-  # Webflow Compose-import repro.
-  composedRoleId: ${composedRole.roleId}

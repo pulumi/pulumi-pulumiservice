@@ -88,24 +88,6 @@ const scopedReadOnlyRole = new service.OrganizationRole("scopedReadOnlyRole", {
     }).permissions,
 });
 
-// Webflow import repro: a `PermissionDescriptorCompose` role referencing
-// the read-only role above. Compose roles are authored in the Pulumi
-// Cloud UI; before the blind-rename translator, importing one into PSP
-// surfaced "unknown __type PermissionDescriptorCompose" because the
-// provider had a hard-coded allowlist of descriptor variants. Under the
-// new design every variant passes through verbatim — Compose, IfThenElse,
-// Select, And/Or/Not, and any future Cloud addition — so the import case
-// just works. This resource exercises that round-trip end to end.
-const composedRole = new service.OrganizationRole("composedRole", {
-    organizationName,
-    name: `ts-rbac-composed-${nameSuffix}`,
-    description: "Composed role exercising PermissionDescriptorCompose pass-through.",
-    permissions: readOnlyRole.roleId.apply(id => ({
-        kind: "PermissionDescriptorCompose",
-        permissionDescriptors: [id],
-    })),
-});
-
 // Data source: list every member of the organization.
 const currentMembers = service.getOrganizationMembersOutput({ organizationName });
 
@@ -130,5 +112,3 @@ export const lookedUpByUsernameRole = memberByUsername.role;
 // Env-scoped role wiring outputs.
 export const scopedEnvironmentId = scopedEnv.environmentId;
 export const scopedRoleId = scopedReadOnlyRole.roleId;
-// Webflow Compose-import repro.
-export const composedRoleId = composedRole.roleId;

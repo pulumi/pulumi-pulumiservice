@@ -146,22 +146,3 @@ scoped_role = OrganizationRole(
 
 pulumi.export("scopedEnvironmentId", scoped_env.environment_id)
 pulumi.export("scopedRoleId", scoped_role.role_id)
-
-# 9. Webflow import repro: a ``PermissionDescriptorCompose`` role
-#    referencing the read-only role above. Compose roles are authored in
-#    the Pulumi Cloud UI; before the blind-rename translator, importing
-#    one into PSP surfaced "unknown __type PermissionDescriptorCompose".
-#    The translator now passes every variant through verbatim — Compose,
-#    IfThenElse, Select, And/Or/Not, and any future Cloud addition.
-composed_role = OrganizationRole(
-    "composedRole",
-    organization_name=organization_name,
-    name=f"py-rbac-composed-{digits}",
-    description="Composed role exercising PermissionDescriptorCompose pass-through.",
-    permissions=custom_role.role_id.apply(lambda role_id: {
-        "kind": "PermissionDescriptorCompose",
-        "permissionDescriptors": [role_id],
-    }),
-)
-
-pulumi.export("composedRoleId", composed_role.role_id)

@@ -25,6 +25,7 @@ import (
 
 type RoleClient interface {
 	CreateRole(ctx context.Context, orgName string, req CreateRoleRequest) (*RoleDescriptor, error)
+	CreatePolicy(ctx context.Context, orgName string, req CreateRoleRequest) (*RoleDescriptor, error)
 	GetRole(ctx context.Context, orgName, roleID string) (*RoleDescriptor, error)
 	UpdateRole(
 		ctx context.Context, orgName, roleID string,
@@ -144,6 +145,49 @@ func NewCreateRoleRequest(
 		ResourceType: resourceType,
 		Details:      details,
 	}
+}
+
+// CreatePolicy creates a uxPurpose="policy" descriptor in the organization's
+// permission catalogue. Pulumi Cloud splits the catalogue into two purposes
+// over the same /orgs/<org>/roles endpoint: "role" entries (assignable units,
+// what `OrganizationRole` manages) and "policy" entries (building-block
+// descriptors that role-purpose `PermissionDescriptorCompose` references by
+// id).
+//
+// PSP does not expose policies as a managed resource type today — Davide's
+// review treats uxPurpose as legacy. The helper exists so integration tests
+// can provision the policy fixture required by a faithful Compose-import
+// repro: the Cloud rejects role-references-role at create time, so a real
+// Compose role needs at least one policy id in `permissionDescriptors`.
+//
+// Round-trip semantics are identical to CreateRole: same endpoint, same
+// response type, same delete path (`DeleteRole` works on any descriptor by
+// id regardless of uxPurpose).
+func (c *Client) CreatePolicy(
+	ctx context.Context,
+	orgName string,
+	req CreateRoleRequest,
+) (*RoleDescriptor, error) {
+	if len(orgName) == 0 {
+		return nil, errors.New("organization name must not be empty")
+	}
+	if req.Name == "" {
+		return nil, errors.New("policy name must not be empty")
+	}
+	if req.ResourceType == "" {
+		req.ResourceType = "global"
+	}
+	req.UXPurpose = "policy"
+	if len(req.Details) == 0 {
+		return nil, errors.New("policy permissions details must not be empty")
+	}
+
+	apiPath := path.Join("orgs", orgName, "roles")
+	var policy RoleDescriptor
+	if _, err := c.do(ctx, http.MethodPost, apiPath, req, &policy); err != nil {
+		return nil, fmt.Errorf("failed to create policy: %w", err)
+	}
+	return &policy, nil
 }
 
 // GetRole fetches a role by ID. Returns (nil, nil) if the role does not exist.
