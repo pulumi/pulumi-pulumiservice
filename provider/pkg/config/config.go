@@ -93,21 +93,10 @@ func (c *Config) Configure(context.Context) error {
 		return ErrAccessTokenNotFound
 	}
 
-	// Fall back to PULUMI_BACKEND_URL when the engine hands us an empty
-	// apiUrl. `pulumi import` persists the default-provider's config to
-	// state with empty `inputs: {}` — accessToken survives the round trip
-	// because of the manual env-var fallback above, but apiUrl had no
-	// symmetric fallback. On destroy of an imported resource against a
-	// non-prod Pulumi Cloud (review stack, self-hosted), c.APIURL would
-	// reach this point empty, NewClient would default to
-	// https://api.pulumi.com, the DELETE would dial production, and a
-	// non-prod token would get rejected with
-	//   401 API error: Unauthorized: No credentials provided or are invalid
-	// even though up/import worked moments earlier in the same shell.
-	//
-	// `pulumi up` is unaffected — it captures the resolved provider
-	// config (including SetDefault-applied apiUrl) and persists that.
-	// Only the import path's empty-inputs state needs this fallback.
+	// `pulumi import` persists default-provider state with empty inputs;
+	// on subsequent destroy, Configure receives apiUrl="" and would fall
+	// through to NewClient's api.pulumi.com default. Symmetric fallback
+	// to the AccessToken one above.
 	if c.APIURL == "" {
 		c.APIURL = os.Getenv(EnvVarPulumiBackendURL)
 	}
