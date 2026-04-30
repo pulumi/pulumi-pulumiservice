@@ -4,6 +4,7 @@
 package examples
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"path"
@@ -560,6 +561,103 @@ func TestYamlRbacExample(t *testing.T) {
 	refresh := test.Refresh(t)
 	assertrefresh.HasNoChanges(t, refresh)
 	test.Destroy(t)
+}
+
+// TestYamlRbacComposeImport pins the Webflow regression: a Pulumi Cloud role
+// authored with `PermissionDescriptorCompose` (the wire-format variant the
+// previous structural translator did not understand and rejected with
+// "unknown __type") must now import cleanly into PSP.
+//
+// Flow:
+//
+//  1. Up the yaml-rbac stack — its `composedRole` resource is a
+//     PermissionDescriptorCompose pointing at `readOnlyRole.roleId`. This
+//     gives the test a real cloud-side role authored in the variant the
+//     prior translator could not handle. Export `composedRoleId`.
+//  2. Create a fresh stack against the empty `yaml-rbac-import-target`
+//     fixture and run `pulumi import` against it for the role above.
+//     The blind-rename translator must turn the wire `__type:
+//     PermissionDescriptorCompose` into the SDK `kind:
+//     PermissionDescriptorCompose` and emit a well-formed YAML program.
+//  3. Assert: the imported program contains `kind:
+//     PermissionDescriptorCompose`, references the inner role's id, and
+//     never leaks `__type` (the wire-format discriminator the SDK boundary
+//     hides).
+//
+// Cleanup ordering matters and is handled by t.Cleanup's LIFO:
+//   - The import-target stack registers cleanup AFTER yaml-rbac, so its
+//     destroy runs FIRST and removes the role from Pulumi Cloud.
+//   - yaml-rbac's destroy then sees a 404 on the same role id; the API
+//     client swallows 404s on delete (see roles.go DeleteRole), so the
+//     rest of yaml-rbac's resources tear down cleanly.
+func TestYamlRbacComposeImport(t *testing.T) {
+	orgName := getOrgName()
+	const fixtureUser = "service-provider-example-user"
+	t.Cleanup(snapshotFixtureOrgMember(t, orgName, fixtureUser))
+
+	// Step 1: up yaml-rbac to create the PermissionDescriptorCompose role.
+	yamlRbac := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-rbac"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
+	)
+	yamlRbac.SetConfig(t, "digits", generateRandomFiveDigits())
+	yamlRbac.SetConfig(t, "organizationName", orgName)
+
+	up := yamlRbac.Up(t)
+	composedRoleIDOut, ok := up.Outputs["composedRoleId"]
+	require.True(t, ok, "yaml-rbac must export composedRoleId for the import test")
+	composedRoleID, ok := composedRoleIDOut.Value.(string)
+	require.True(t, ok, "composedRoleId must be a string; got %T", composedRoleIDOut.Value)
+	require.NotEmpty(t, composedRoleID, "composedRoleId must not be empty after up")
+
+	readOnlyRoleIDOut, ok := up.Outputs["roleId"]
+	require.True(t, ok, "yaml-rbac must export roleId (the inner read-only role) for the import test")
+	readOnlyRoleID, ok := readOnlyRoleIDOut.Value.(string)
+	require.True(t, ok, "roleId must be a string; got %T", readOnlyRoleIDOut.Value)
+	require.NotEmpty(t, readOnlyRoleID, "roleId must not be empty after up")
+
+	// Step 2: empty target stack. Registering this AFTER yamlRbac means
+	// its cleanup (destroy + remove-stack) runs first — see the function
+	// docstring for why that ordering matters.
+	importTarget := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-rbac-import-target"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
+	)
+
+	// Step 3: import the composed role into the empty target stack with
+	// `--out` so we can inspect the generated YAML directly.
+	outFile := filepath.Join(importTarget.CurrentStack().Workspace().WorkDir(), "imported.yaml")
+	importResult := importTarget.Import(t,
+		"pulumiservice:index:OrganizationRole",
+		"importedComposedRole",
+		fmt.Sprintf("%s/%s", orgName, composedRoleID),
+		"",
+		"--out", outFile,
+	)
+	require.Zero(t, importResult.ReturnCode,
+		"pulumi import must succeed; the blind-rename translator removed the prior unknown-__type error.\n"+
+			"stdout:\n%s\nstderr:\n%s", importResult.Stdout, importResult.Stderr)
+
+	// Step 4: assert the generated YAML carries the Compose descriptor in
+	// its SDK shape (kind, not __type). Use substring checks rather than
+	// a YAML parse so the assertions tolerate quoting variations from
+	// Pulumi's code-generation output.
+	contents, err := os.ReadFile(outFile)
+	require.NoError(t, err, "must be able to read the import --out file")
+	imported := string(contents)
+
+	assert.Contains(t, imported, "PermissionDescriptorCompose",
+		"imported program must carry the Compose discriminator value through the rename")
+	assert.Contains(t, imported, "kind:",
+		"imported program must use the SDK-shape `kind` discriminator key")
+	assert.Contains(t, imported, readOnlyRoleID,
+		"imported program must reference the inner role's id inside permissionDescriptors")
+	assert.NotContains(t, imported, "__type",
+		"imported program must not leak the wire-format `__type` discriminator anywhere")
 }
 
 func writePulumiYaml(t *testing.T, yamlContents interface{}) string {

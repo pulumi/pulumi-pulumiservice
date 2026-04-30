@@ -1,0 +1,17 @@
+name: yaml-rbac-import-target
+runtime: yaml
+description: |
+  Empty fixture used as the target of `pulumi import` in
+  TestYamlRbacComposeImport. The test creates a
+  PermissionDescriptorCompose role in the yaml-rbac stack, then runs
+  `pulumi import OrganizationRole imported <org>/<roleId>` against this
+  fixture and inspects the resulting program code to verify the
+  blind-rename translator produces the expected `kind:
+  PermissionDescriptorCompose` shape (no wire-shape `__type`, no
+  "unknown __type" import error).
+
+  This stack imports a role that the yaml-rbac stack also tracks; on
+  test cleanup the import-target stack destroys first (LIFO ordering of
+  t.Cleanup), removing the role from Pulumi Cloud. yaml-rbac's destroy
+  then sees a 404 on the same role id, which the API client swallows,
+  and proceeds to destroy the rest of yaml-rbac's resources.
