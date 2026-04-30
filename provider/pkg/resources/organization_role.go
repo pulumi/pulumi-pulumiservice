@@ -269,25 +269,39 @@ func (*OrganizationRole) Delete(
 	req infer.DeleteRequest[OrganizationRoleState],
 ) (infer.DeleteResponse, error) {
 	client := config.GetClient(ctx)
-	// Force=true: Pulumi destroy should succeed even if the role is still
-	// assigned to a member or team; the alternative is telling users to
-	// manually unassign before destroy.
-	//
-	// Force does *not* override structural references — Pulumi Cloud
-	// rejects the delete (HTTP 409) when another role's
-	// `PermissionDescriptorCompose` references this role's id, because
-	// removing the role would leave a dangling reference in the composing
-	// role's permission tree. Surface that case with an actionable error
-	// rather than the generic "409 API error" so the user knows what to do.
-	err := client.DeleteRole(ctx, req.State.OrganizationName, req.State.RoleId, true)
+	orgName := req.State.OrganizationName
+	roleID := req.State.RoleId
+
+	// Try the unprivileged delete first. Pulumi's normal destroy walks
+	// the dependency graph in reverse, so by the time the role is
+	// destroyed any TeamRoleAssignment or OrganizationMember that
+	// references it has typically been deleted already and the
+	// non-force path succeeds cleanly. Skipping `force=true` here lets
+	// tokens whose scope excludes force-delete-role (notably personal
+	// tokens on Pulumi Cloud review stacks) destroy clean roles
+	// without a 401 from the privileged endpoint.
+	err := client.DeleteRole(ctx, orgName, roleID, false)
 	if err != nil && pulumiapi.GetErrorStatusCode(err) == http.StatusConflict {
+		// Role is still referenced — typically a member/team assignment
+		// that wasn't part of the destroy graph (e.g. an out-of-band
+		// assignment, or an adopted member whose Delete is a no-op).
+		// Escalate to force=true; force overrides the assignment check
+		// and clears the assignments transitively.
+		err = client.DeleteRole(ctx, orgName, roleID, true)
+	}
+	if err != nil && pulumiapi.GetErrorStatusCode(err) == http.StatusConflict {
+		// 409 even after force=true — Pulumi Cloud refuses to remove a
+		// role referenced by another role's `PermissionDescriptorCompose`
+		// because that would leave a dangling reference in the composing
+		// role's permission tree. Force does NOT override this. Surface
+		// the case with an actionable error.
 		return infer.DeleteResponse{}, fmt.Errorf(
 			"cannot delete role %q: Pulumi Cloud reports it is still in use. "+
 				"This typically means another role's `PermissionDescriptorCompose` "+
 				"references this role's id; destroy the composing role(s) first or "+
 				"rewrite their `permissions` to drop the reference. Underlying "+
 				"error: %w",
-			req.State.RoleId, err,
+			roleID, err,
 		)
 	}
 	return infer.DeleteResponse{}, err

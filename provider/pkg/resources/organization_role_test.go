@@ -169,12 +169,15 @@ func TestOrganizationRoleRead(t *testing.T) {
 // TestOrganizationRoleDelete_InUseConflict pins the graceful handling of
 // the rejection Pulumi Cloud surfaces when another role's
 // PermissionDescriptorCompose still references the role being deleted.
-// `force=true` covers member/team assignments but does *not* override
-// structural Compose references, so the delete returns 409. The provider
-// must wrap that into a message that explains *why* and what to do.
+// `force=true` overrides member/team assignments but does *not* override
+// structural Compose references, so the delete returns 409 even after
+// the force escalation. The provider must wrap that into a message that
+// explains *why* and what to do.
 func TestOrganizationRoleDelete_InUseConflict(t *testing.T) {
+	var calls []bool
 	mock := &orgRoleClientMock{
-		del: func(_ context.Context, _, _ string, _ bool) error {
+		del: func(_ context.Context, _, _ string, force bool) error {
+			calls = append(calls, force)
 			return &pulumiapi.ErrorResponse{
 				StatusCode: 409,
 				Message:    "role is referenced by another role's compose",
@@ -189,6 +192,12 @@ func TestOrganizationRoleDelete_InUseConflict(t *testing.T) {
 			RoleId:               "role-123",
 		},
 	})
+	// Both attempts (non-force then force) must have been tried before
+	// surfacing the wrapped error — the force escalation is what we'd
+	// need against a member/team assignment, and only its failure
+	// proves the conflict is structural (Compose).
+	assert.Equal(t, []bool{false, true}, calls,
+		"must try force=false first, then escalate to force=true on 409")
 	assert.Error(t, err)
 	// Message must name the role, point at PermissionDescriptorCompose
 	// (the typical cause), and tell the user how to recover.
@@ -202,14 +211,47 @@ func TestOrganizationRoleDelete_InUseConflict(t *testing.T) {
 		"wrapped error must preserve the original 409 status code")
 }
 
+// TestOrganizationRoleDelete_EscalatesForceOnConflict pins the
+// member/team-assignment escalation path: the unprivileged delete returns
+// 409 (role still assigned), the force-true retry succeeds (force clears
+// assignments transitively), and Delete returns nil. Without this
+// escalation, destroy would fail any time the destroy graph didn't
+// happen to clean assignments first (e.g. adopted-member no-op deletes,
+// out-of-band assignments).
+func TestOrganizationRoleDelete_EscalatesForceOnConflict(t *testing.T) {
+	var calls []bool
+	mock := &orgRoleClientMock{
+		del: func(_ context.Context, _, _ string, force bool) error {
+			calls = append(calls, force)
+			if !force {
+				return &pulumiapi.ErrorResponse{
+					StatusCode: 409,
+					Message:    "role still assigned to a team",
+				}
+			}
+			return nil
+		},
+	}
+	ctx := config.WithMockClient(context.Background(), mock)
+	r := &OrganizationRole{}
+	_, err := r.Delete(ctx, infer.DeleteRequest[OrganizationRoleState]{
+		State: OrganizationRoleState{
+			OrganizationRoleCore: OrganizationRoleCore{OrganizationName: "acme"},
+			RoleId:               "role-123",
+		},
+	})
+	assert.NoError(t, err, "force-true retry must succeed when assignments are the only blocker")
+	assert.Equal(t, []bool{false, true}, calls,
+		"must try force=false first, then escalate to force=true on 409")
+}
+
 func TestOrganizationRoleDelete(t *testing.T) {
-	called := false
+	var calls []bool
 	mock := &orgRoleClientMock{
 		del: func(_ context.Context, org, id string, force bool) error {
-			called = true
+			calls = append(calls, force)
 			assert.Equal(t, "acme", org)
 			assert.Equal(t, "role-123", id)
-			assert.True(t, force)
 			return nil
 		},
 	}
@@ -222,7 +264,8 @@ func TestOrganizationRoleDelete(t *testing.T) {
 		},
 	})
 	assert.NoError(t, err)
-	assert.True(t, called)
+	assert.Equal(t, []bool{false}, calls,
+		"clean delete must succeed on the first (unprivileged) call without escalating to force=true")
 }
 
 func TestOrganizationRoleUpdateOmitsDescriptionWhenUnset(t *testing.T) {
