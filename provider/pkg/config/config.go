@@ -93,6 +93,21 @@ func (c *Config) Configure(context.Context) error {
 		return ErrAccessTokenNotFound
 	}
 
+	// Fall back to PULUMI_BACKEND_URL when the engine hands us an
+	// empty apiUrl. The infer.SetDefault registered in Annotate fires
+	// only for *absent* fields; an explicit empty string passes through.
+	// Destroy of a stack whose default-provider state was persisted
+	// without an apiUrl override (i.e. it was up-ed using only env-var
+	// config, never `pulumi config set pulumiservice:apiUrl`) reaches
+	// Configure with c.APIURL="" — without this fallback we'd default
+	// to https://api.pulumi.com per NewClient and dial production with
+	// a non-prod token. Symptom: the destroy returns
+	//   401 API error: Unauthorized: No credentials provided or are invalid
+	// even though up/import worked moments earlier in the same shell.
+	if c.APIURL == "" {
+		c.APIURL = os.Getenv(EnvVarPulumiBackendURL)
+	}
+
 	var err error
 	c.client, err = pulumiapi.NewClient(&http.Client{
 		Timeout: 60 * time.Second,
