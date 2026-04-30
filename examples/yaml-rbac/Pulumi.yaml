@@ -8,6 +8,16 @@ config:
     default: service-provider-test-org
   digits:
     type: string
+  # Username of the existing org member the example adopts via
+  # `OrganizationMember`. The default is the fixture user the canonical
+  # CI test org (`service-provider-test-org`) is seeded with; for manual
+  # runs against a different org, set this to a username that already
+  # exists there:
+  #
+  #     pulumi config set adoptedUsername <some-user>
+  adoptedUsername:
+    type: string
+    default: service-provider-example-user
 
 resources:
   # A custom organization-level role that grants stack read access.
@@ -55,7 +65,7 @@ resources:
     type: pulumiservice:OrganizationMember
     properties:
       organizationName: ${organizationName}
-      username: service-provider-example-user
+      username: ${adoptedUsername}
       roleId: ${readOnlyRole.roleId}
 
   # An ESC environment to demo per-env role scoping. The Environment
