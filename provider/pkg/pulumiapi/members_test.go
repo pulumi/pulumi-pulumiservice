@@ -109,6 +109,32 @@ func TestListOrgMembers(t *testing.T) {
 		}
 	})
 
+	// The backend roster emits a synthetic "org-as-user" entry for some
+	// orgs — username equals the org name, no real created timestamp,
+	// no fgaRole. Filter it out so `getOrganizationMembers` only
+	// surfaces real human members.
+	t.Run("Filters synthetic org-as-user entry", func(t *testing.T) {
+		backendBody := Members{Members: []Member{
+			{User: User{Name: "alice"}, Role: "member"},
+			{User: User{Name: orgName, GithubLogin: orgName}, Role: "member"},
+		}}
+		c := startTestServerMulti(t, func(r *http.Request) (int, any) {
+			switch r.URL.Query().Get("type") {
+			case rosterBackend:
+				return 200, backendBody
+			case rosterFrontend:
+				return 200, Members{Members: []Member{}}
+			}
+			t.Fatalf("unexpected type=%q", r.URL.Query().Get("type"))
+			return 500, nil
+		})
+		got, err := c.ListOrgMembers(ctx, orgName)
+		assert.NoError(t, err)
+		require.NotNil(t, got)
+		assert.Len(t, got.Members, 1, "synthetic org-as-user entry must be dropped")
+		assert.Equal(t, "alice", got.Members[0].User.Name)
+	})
+
 	// Members appearing in both rosters are deduped; backend's record wins.
 	// Members unique to either roster are included.
 	t.Run("Merges and dedups", func(t *testing.T) {

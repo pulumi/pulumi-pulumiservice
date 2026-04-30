@@ -178,15 +178,26 @@ func (c *Client) ListOrgMembers(ctx context.Context, orgName string) (*Members, 
 
 	seen := make(map[string]bool, len(backend))
 	out := make([]Member, 0, len(backend)+len(frontend))
-	for _, m := range backend {
+	add := func(m Member) {
+		key := memberKey(m)
+		// Skip the synthetic org-as-user entry the backend roster emits
+		// for some orgs (key matching orgName, epoch-zero `created`,
+		// empty fgaRole). Not a real member; should never appear in
+		// `getOrganizationMembers` output.
+		if key == orgName {
+			return
+		}
+		if seen[key] {
+			return
+		}
+		seen[key] = true
 		out = append(out, m)
-		seen[memberKey(m)] = true
+	}
+	for _, m := range backend {
+		add(m)
 	}
 	for _, m := range frontend {
-		if !seen[memberKey(m)] {
-			out = append(out, m)
-			seen[memberKey(m)] = true
-		}
+		add(m)
 	}
 
 	return &Members{Members: out}, nil
