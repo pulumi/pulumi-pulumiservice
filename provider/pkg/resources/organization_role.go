@@ -18,6 +18,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"strings"
 
 	p "github.com/pulumi/pulumi-go-provider"
@@ -267,13 +268,27 @@ func (*OrganizationRole) Delete(
 ) (infer.DeleteResponse, error) {
 	client := config.GetClient(ctx)
 	// Force=true: Pulumi destroy should succeed even if the role is still
-	// referenced; the alternative is telling users to manually unassign.
-	return infer.DeleteResponse{}, client.DeleteRole(
-		ctx,
-		req.State.OrganizationName,
-		req.State.RoleId,
-		true,
-	)
+	// assigned to a member or team; the alternative is telling users to
+	// manually unassign before destroy.
+	//
+	// Force does *not* override structural references — Pulumi Cloud
+	// rejects the delete (HTTP 409) when another role's
+	// `PermissionDescriptorCompose` references this role's id, because
+	// removing the role would leave a dangling reference in the composing
+	// role's permission tree. Surface that case with an actionable error
+	// rather than the generic "409 API error" so the user knows what to do.
+	err := client.DeleteRole(ctx, req.State.OrganizationName, req.State.RoleId, true)
+	if err != nil && pulumiapi.GetErrorStatusCode(err) == http.StatusConflict {
+		return infer.DeleteResponse{}, fmt.Errorf(
+			"cannot delete role %q: Pulumi Cloud reports it is still in use. "+
+				"This typically means another role's `PermissionDescriptorCompose` "+
+				"references this role's id; destroy the composing role(s) first or "+
+				"rewrite their `permissions` to drop the reference. Underlying "+
+				"error: %w",
+			req.State.RoleId, err,
+		)
+	}
+	return infer.DeleteResponse{}, err
 }
 
 func (*OrganizationRole) Read(
@@ -315,6 +330,21 @@ func orgRoleCoreFromAPI(
 	prior OrganizationRoleCore,
 	role *pulumiapi.RoleDescriptor,
 ) (OrganizationRoleCore, error) {
+	// uxPurpose is a Pulumi Cloud-internal discriminator that splits the
+	// permission-descriptor table into "role" entries (what this resource
+	// manages) and other entries (e.g. policies). It's not exposed in the
+	// SDK; Create hardcodes "role" and Update doesn't carry it. On Read
+	// (which is also the path `pulumi import` takes), guard against a
+	// caller pointing this resource at a non-role descriptor by ID — the
+	// alternative is silently round-tripping a Policy through code that
+	// only understands roles.
+	if role.UXPurpose != "" && role.UXPurpose != "role" {
+		return OrganizationRoleCore{}, fmt.Errorf(
+			"descriptor %q is not a role (uxPurpose=%q); `OrganizationRole` "+
+				"only manages entries with uxPurpose=\"role\"",
+			role.ID, role.UXPurpose,
+		)
+	}
 	core := OrganizationRoleCore{
 		OrganizationName: orgName,
 		Name:             role.Name,

@@ -117,6 +117,7 @@ func TestOrganizationRoleRead(t *testing.T) {
 					Name:         "read-only",
 					Description:  "ro",
 					ResourceType: "global",
+					UXPurpose:    "role",
 					Version:      2,
 					Details:      raw,
 				}, nil
@@ -134,6 +135,71 @@ func TestOrganizationRoleRead(t *testing.T) {
 		assert.Equal(t, "PermissionDescriptorAllow", resp.State.Permissions["kind"])
 		assert.NotContains(t, resp.State.Permissions, "__type", "state must not leak `__type` to the SDK")
 	})
+
+	// Pulumi Cloud's permission-descriptor table holds entries for both
+	// roles (this resource) and other things (e.g. policies) under the
+	// same /orgs/<org>/roles endpoint, distinguished by uxPurpose. A user
+	// who points `pulumi import` at a non-role descriptor's id should get
+	// a clear error rather than have the descriptor silently round-trip
+	// through code that only understands roles. uxPurpose is otherwise
+	// hidden from the SDK — Create hardcodes "role".
+	t.Run("rejects non-role uxPurpose", func(t *testing.T) {
+		mock := &orgRoleClientMock{
+			get: func(_ context.Context, _, _ string) (*pulumiapi.RoleDescriptor, error) {
+				return &pulumiapi.RoleDescriptor{
+					ID:        "policy-123",
+					Name:      "some-policy",
+					UXPurpose: "policy",
+				}, nil
+			},
+		}
+		ctx := config.WithMockClient(context.Background(), mock)
+		r := &OrganizationRole{}
+		_, err := r.Read(ctx, infer.ReadRequest[OrganizationRoleInput, OrganizationRoleState]{
+			ID: "acme/policy-123",
+		})
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "policy-123")
+		assert.Contains(t, err.Error(), "uxPurpose")
+		assert.Contains(t, err.Error(), "policy",
+			"error must name the actual uxPurpose so the user knows what they pointed at")
+	})
+}
+
+// TestOrganizationRoleDelete_InUseConflict pins the graceful handling of
+// the rejection Pulumi Cloud surfaces when another role's
+// PermissionDescriptorCompose still references the role being deleted.
+// `force=true` covers member/team assignments but does *not* override
+// structural Compose references, so the delete returns 409. The provider
+// must wrap that into a message that explains *why* and what to do.
+func TestOrganizationRoleDelete_InUseConflict(t *testing.T) {
+	mock := &orgRoleClientMock{
+		del: func(_ context.Context, _, _ string, _ bool) error {
+			return &pulumiapi.ErrorResponse{
+				StatusCode: 409,
+				Message:    "role is referenced by another role's compose",
+			}
+		},
+	}
+	ctx := config.WithMockClient(context.Background(), mock)
+	r := &OrganizationRole{}
+	_, err := r.Delete(ctx, infer.DeleteRequest[OrganizationRoleState]{
+		State: OrganizationRoleState{
+			OrganizationRoleCore: OrganizationRoleCore{OrganizationName: "acme"},
+			RoleId:               "role-123",
+		},
+	})
+	assert.Error(t, err)
+	// Message must name the role, point at PermissionDescriptorCompose
+	// (the typical cause), and tell the user how to recover.
+	assert.Contains(t, err.Error(), "role-123")
+	assert.Contains(t, err.Error(), "PermissionDescriptorCompose")
+	assert.Contains(t, err.Error(), "destroy",
+		"error should tell the user to destroy the composing role(s) first")
+	// The underlying API error must still be wrapped so callers can
+	// inspect the status code if they want.
+	assert.Equal(t, 409, pulumiapi.GetErrorStatusCode(err),
+		"wrapped error must preserve the original 409 status code")
 }
 
 func TestOrganizationRoleDelete(t *testing.T) {

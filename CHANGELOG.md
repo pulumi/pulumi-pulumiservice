@@ -28,6 +28,8 @@
 - `OrganizationMember.Read` now resolves the server's `fgaRole` reference against the org's role catalogue to determine whether it is a built-in or custom role. Previously the lookup compared the role's display name (e.g. `Admin`) against the built-in slug list (`admin`, `member`, `billing-manager`); the case mismatch meant any refresh of a member assigned a built-in role reported spurious `+roleId -role` drift.
 - Added `getOrganizationRoleScopes` data source for discovering the permission scope names available for use in `OrganizationRole.permissions`.
 - `OrganizationRole.Check` no longer rejects `name` or `permissions` when they arrive as unknown/computed at preview. Wiring `permissions` to another resource's output (e.g. `Environment.environmentId` via `buildEnvironmentScopedPermissionsOutput`) previously failed every fresh `pulumi preview` because the typed Go field decoded to its zero value and tripped the empty check. Pulumi guarantees concrete values by Create-time, so the empty checks now run only when the input is concrete.
+- `OrganizationRole.Read` now rejects `pulumi import` against a permission-descriptor record whose `uxPurpose` is not `"role"` (e.g. a policy). The error names the actual `uxPurpose` so the user knows what they pointed at; previously the non-role descriptor would silently round-trip through code that only understands roles.
+- `OrganizationRole.Delete` now wraps Pulumi Cloud's `409 Conflict` rejection with an actionable message naming `PermissionDescriptorCompose` as the typical cause and pointing the user to destroy composing role(s) first. `force=true` already covers member/team assignments; structural Compose references are protected by the API and cannot be force-deleted.
 
 ## 0.36.0
 
