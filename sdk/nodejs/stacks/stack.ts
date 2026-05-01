@@ -75,6 +75,18 @@ export class Stack extends pulumi.CustomResource {
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         super(Stack.__pulumiType, name, resourceInputs, opts);
     }
+
+    pauseDeployments(): void {
+        pulumi.runtime.call("pulumiservice:stacks:Stack/pauseDeployments", {
+            "__self__": this,
+        }, this);
+    }
+
+    resumeDeployments(): void {
+        pulumi.runtime.call("pulumiservice:stacks:Stack/resumeDeployments", {
+            "__self__": this,
+        }, this);
+    }
 }
 
 /**

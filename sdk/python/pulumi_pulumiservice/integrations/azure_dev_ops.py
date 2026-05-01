@@ -95,3 +95,13 @@ class AzureDevOps(pulumi.CustomResource):
 
         return AzureDevOps(resource_name, opts=opts, __props__=__props__)
 
+    def complete_o_auth(__self__) -> None:
+        __args__ = dict()
+        __args__['__self__'] = __self__
+        pulumi.runtime.call('pulumiservice:integrations:AzureDevOps/completeOAuth', __args__, res=__self__)
+
+    def initiate_o_auth(__self__) -> None:
+        __args__ = dict()
+        __args__['__self__'] = __self__
+        pulumi.runtime.call('pulumiservice:integrations:AzureDevOps/initiateOAuth', __args__, res=__self__)
+

@@ -52,6 +52,15 @@ namespace Pulumi.PulumiService.Orgs.Cmk
         {
             return new Key(name, id, options);
         }
+
+        public void DisableAll()
+            => global::Pulumi.Deployment.Instance.Call("pulumiservice:orgs/cmk:Key/disableAll", CallArgs.Empty, this);
+
+        public void RetryMigrations()
+            => global::Pulumi.Deployment.Instance.Call("pulumiservice:orgs/cmk:Key/retryMigrations", CallArgs.Empty, this);
+
+        public void SetDefault()
+            => global::Pulumi.Deployment.Instance.Call("pulumiservice:orgs/cmk:Key/setDefault", CallArgs.Empty, this);
     }
 
     public sealed class KeyArgs : global::Pulumi.ResourceArgs

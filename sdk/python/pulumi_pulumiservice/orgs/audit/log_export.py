@@ -197,3 +197,13 @@ class LogExport(pulumi.CustomResource):
         """
         return pulumi.get(self, "s3_configuration")
 
+    def force_export(__self__) -> None:
+        __args__ = dict()
+        __args__['__self__'] = __self__
+        pulumi.runtime.call('pulumiservice:orgs/audit:LogExport/forceExport', __args__, res=__self__)
+
+    def test_configuration(__self__) -> None:
+        __args__ = dict()
+        __args__['__self__'] = __self__
+        pulumi.runtime.call('pulumiservice:orgs/audit:LogExport/testConfiguration', __args__, res=__self__)
+

@@ -5,6 +5,12 @@ import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "../../utilities";
 
 // Export members:
+export const getProjectTemplate: typeof import("./getProjectTemplate").getProjectTemplate = null as any;
+utilities.lazyLoad(exports, ["getProjectTemplate"], () => require("./getProjectTemplate"));
+
+export const getProjectTemplateConfiguration: typeof import("./getProjectTemplateConfiguration").getProjectTemplateConfiguration = null as any;
+utilities.lazyLoad(exports, ["getProjectTemplateConfiguration"], () => require("./getProjectTemplateConfiguration"));
+
 export const listTemplateSources: typeof import("./listTemplateSources").listTemplateSources = null as any;
 utilities.lazyLoad(exports, ["listTemplateSources"], () => require("./listTemplateSources"));
 

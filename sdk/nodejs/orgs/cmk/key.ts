@@ -48,6 +48,24 @@ export class Key extends pulumi.CustomResource {
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         super(Key.__pulumiType, name, resourceInputs, opts);
     }
+
+    disableAll(): void {
+        pulumi.runtime.call("pulumiservice:orgs/cmk:Key/disableAll", {
+            "__self__": this,
+        }, this);
+    }
+
+    retryMigrations(): void {
+        pulumi.runtime.call("pulumiservice:orgs/cmk:Key/retryMigrations", {
+            "__self__": this,
+        }, this);
+    }
+
+    setDefault(): void {
+        pulumi.runtime.call("pulumiservice:orgs/cmk:Key/setDefault", {
+            "__self__": this,
+        }, this);
+    }
 }
 
 /**

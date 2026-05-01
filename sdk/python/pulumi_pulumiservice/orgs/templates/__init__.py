@@ -6,4 +6,7 @@ import builtins as _builtins
 from ... import _utilities
 import typing
 # Export this package's modules as members:
+from .get_project_template import *
+from .get_project_template_configuration import *
+from .list_template_sources import *
 from .source import *

@@ -22,6 +22,8 @@ if typing.TYPE_CHECKING:
     integrations = __integrations
     import pulumi_pulumiservice.orgs as __orgs
     orgs = __orgs
+    import pulumi_pulumiservice.registry as __registry
+    registry = __registry
     import pulumi_pulumiservice.stacks as __stacks
     stacks = __stacks
 else:
@@ -31,6 +33,7 @@ else:
     esc = _utilities.lazy_import('pulumi_pulumiservice.esc')
     integrations = _utilities.lazy_import('pulumi_pulumiservice.integrations')
     orgs = _utilities.lazy_import('pulumi_pulumiservice.orgs')
+    registry = _utilities.lazy_import('pulumi_pulumiservice.registry')
     stacks = _utilities.lazy_import('pulumi_pulumiservice.stacks')
 
 _utilities.register(
@@ -50,6 +53,14 @@ _utilities.register(
   "fqn": "pulumi_pulumiservice.esc",
   "classes": {
    "pulumiservice:esc:Environment": "Environment"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "esc/permissions",
+  "fqn": "pulumi_pulumiservice.esc.permissions",
+  "classes": {
+   "pulumiservice:esc/permissions:TeamEnvironmentPermission": "TeamEnvironmentPermission"
   }
  },
  {

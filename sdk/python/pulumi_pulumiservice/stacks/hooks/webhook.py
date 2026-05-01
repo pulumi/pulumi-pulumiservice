@@ -364,7 +364,7 @@ class Webhook(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter(name="environmentName")
-    def environment_name(self) -> pulumi.Output[_builtins.str]:
+    def environment_name(self) -> pulumi.Output[Optional[_builtins.str]]:
         """
         Environment the webhook belongs to (ESC-scoped webhooks only).
         """
@@ -396,7 +396,7 @@ class Webhook(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def name(self) -> pulumi.Output[Optional[_builtins.str]]:
+    def name(self) -> pulumi.Output[_builtins.str]:
         """
         Webhook name, assigned by the server.
         """
@@ -404,7 +404,7 @@ class Webhook(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter(name="organizationName")
-    def organization_name(self) -> pulumi.Output[_builtins.str]:
+    def organization_name(self) -> pulumi.Output[Optional[_builtins.str]]:
         """
         Organization that owns the webhook.
         """
@@ -420,7 +420,7 @@ class Webhook(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter(name="projectName")
-    def project_name(self) -> pulumi.Output[_builtins.str]:
+    def project_name(self) -> pulumi.Output[Optional[_builtins.str]]:
         """
         Project the webhook belongs to (stack- or ESC-scoped webhooks only).
         """
@@ -436,7 +436,7 @@ class Webhook(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter(name="stackName")
-    def stack_name(self) -> pulumi.Output[_builtins.str]:
+    def stack_name(self) -> pulumi.Output[Optional[_builtins.str]]:
         """
         Stack the webhook belongs to (stack-scoped webhooks only).
         """

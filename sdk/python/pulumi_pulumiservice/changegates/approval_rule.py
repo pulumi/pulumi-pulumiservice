@@ -19,42 +19,30 @@ __all__ = ['ApprovalRuleArgs', 'ApprovalRule']
 @pulumi.input_type
 class ApprovalRuleArgs:
     def __init__(__self__, *,
-                 approval_rule_config: Any,
                  enabled: Optional[pulumi.Input[_builtins.bool]] = None,
-                 environment_identifier: Any,
                  name: pulumi.Input[_builtins.str],
                  organization_name: pulumi.Input[_builtins.str],
-                 target_action_types: pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]):
+                 rule: Any,
+                 target: Any):
         """
         The set of arguments for constructing a ApprovalRule resource.
 
-        :param Any approval_rule_config: Rule config — number of required approvals, eligible approvers, reapproval policy, self-approval toggle.
         :param pulumi.Input[_builtins.bool] enabled: Whether the rule is active.
-        :param Any environment_identifier: Target environment — organization/project/environment triple.
         :param pulumi.Input[_builtins.str] name: Human-readable name for the rule.
         :param pulumi.Input[_builtins.str] organization_name: Organization that owns the rule.
-        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] target_action_types: Which action types the rule gates (e.g., deployment, environment_change).
+        :param Any rule: Rule shape — `{ruleType: "approval_required", numApprovalsRequired: <n>,
+               eligibleApprovers: {teams: [...]}, preventSelfApproval: <bool>}`.
+        :param Any target: Target shape — `{entityType: "environment", qualifiedName: "<project>/<env>", actionTypes: ["update"|"open"]}`.
+               Pulumi Cloud only supports environment targets in
+               v2.0.0-alpha; richer targeting lands in a later release.
         """
-        pulumi.set(__self__, "approval_rule_config", approval_rule_config)
         if enabled is None:
             enabled = True
         pulumi.set(__self__, "enabled", enabled)
-        pulumi.set(__self__, "environment_identifier", environment_identifier)
         pulumi.set(__self__, "name", name)
         pulumi.set(__self__, "organization_name", organization_name)
-        pulumi.set(__self__, "target_action_types", target_action_types)
-
-    @_builtins.property
-    @pulumi.getter(name="approvalRuleConfig")
-    def approval_rule_config(self) -> Any:
-        """
-        Rule config — number of required approvals, eligible approvers, reapproval policy, self-approval toggle.
-        """
-        return pulumi.get(self, "approval_rule_config")
-
-    @approval_rule_config.setter
-    def approval_rule_config(self, value: Any):
-        pulumi.set(self, "approval_rule_config", value)
+        pulumi.set(__self__, "rule", rule)
+        pulumi.set(__self__, "target", target)
 
     @_builtins.property
     @pulumi.getter
@@ -67,18 +55,6 @@ class ApprovalRuleArgs:
     @enabled.setter
     def enabled(self, value: pulumi.Input[_builtins.bool]):
         pulumi.set(self, "enabled", value)
-
-    @_builtins.property
-    @pulumi.getter(name="environmentIdentifier")
-    def environment_identifier(self) -> Any:
-        """
-        Target environment — organization/project/environment triple.
-        """
-        return pulumi.get(self, "environment_identifier")
-
-    @environment_identifier.setter
-    def environment_identifier(self, value: Any):
-        pulumi.set(self, "environment_identifier", value)
 
     @_builtins.property
     @pulumi.getter
@@ -105,16 +81,31 @@ class ApprovalRuleArgs:
         pulumi.set(self, "organization_name", value)
 
     @_builtins.property
-    @pulumi.getter(name="targetActionTypes")
-    def target_action_types(self) -> pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]:
+    @pulumi.getter
+    def rule(self) -> Any:
         """
-        Which action types the rule gates (e.g., deployment, environment_change).
+        Rule shape — `{ruleType: "approval_required", numApprovalsRequired: <n>,
+        eligibleApprovers: {teams: [...]}, preventSelfApproval: <bool>}`.
         """
-        return pulumi.get(self, "target_action_types")
+        return pulumi.get(self, "rule")
 
-    @target_action_types.setter
-    def target_action_types(self, value: pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]):
-        pulumi.set(self, "target_action_types", value)
+    @rule.setter
+    def rule(self, value: Any):
+        pulumi.set(self, "rule", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def target(self) -> Any:
+        """
+        Target shape — `{entityType: "environment", qualifiedName: "<project>/<env>", actionTypes: ["update"|"open"]}`.
+        Pulumi Cloud only supports environment targets in
+        v2.0.0-alpha; richer targeting lands in a later release.
+        """
+        return pulumi.get(self, "target")
+
+    @target.setter
+    def target(self, value: Any):
+        pulumi.set(self, "target", value)
 
 
 @pulumi.type_token("pulumiservice:changegates:ApprovalRule")
@@ -123,24 +114,25 @@ class ApprovalRule(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 approval_rule_config: Optional[Any] = None,
                  enabled: Optional[pulumi.Input[_builtins.bool]] = None,
-                 environment_identifier: Optional[Any] = None,
                  name: Optional[pulumi.Input[_builtins.str]] = None,
                  organization_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 target_action_types: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 rule: Optional[Any] = None,
+                 target: Optional[Any] = None,
                  __props__=None):
         """
         Create a ApprovalRule resource with the given unique name, props, and options.
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
-        :param Any approval_rule_config: Rule config — number of required approvals, eligible approvers, reapproval policy, self-approval toggle.
         :param pulumi.Input[_builtins.bool] enabled: Whether the rule is active.
-        :param Any environment_identifier: Target environment — organization/project/environment triple.
         :param pulumi.Input[_builtins.str] name: Human-readable name for the rule.
         :param pulumi.Input[_builtins.str] organization_name: Organization that owns the rule.
-        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] target_action_types: Which action types the rule gates (e.g., deployment, environment_change).
+        :param Any rule: Rule shape — `{ruleType: "approval_required", numApprovalsRequired: <n>,
+               eligibleApprovers: {teams: [...]}, preventSelfApproval: <bool>}`.
+        :param Any target: Target shape — `{entityType: "environment", qualifiedName: "<project>/<env>", actionTypes: ["update"|"open"]}`.
+               Pulumi Cloud only supports environment targets in
+               v2.0.0-alpha; richer targeting lands in a later release.
         """
         ...
     @overload
@@ -166,12 +158,11 @@ class ApprovalRule(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 approval_rule_config: Optional[Any] = None,
                  enabled: Optional[pulumi.Input[_builtins.bool]] = None,
-                 environment_identifier: Optional[Any] = None,
                  name: Optional[pulumi.Input[_builtins.str]] = None,
                  organization_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 target_action_types: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 rule: Optional[Any] = None,
+                 target: Optional[Any] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
@@ -181,26 +172,23 @@ class ApprovalRule(pulumi.CustomResource):
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
             __props__ = ApprovalRuleArgs.__new__(ApprovalRuleArgs)
 
-            if approval_rule_config is None and not opts.urn:
-                raise TypeError("Missing required property 'approval_rule_config'")
-            __props__.__dict__["approval_rule_config"] = approval_rule_config
             if enabled is None:
                 enabled = True
             if enabled is None and not opts.urn:
                 raise TypeError("Missing required property 'enabled'")
             __props__.__dict__["enabled"] = enabled
-            if environment_identifier is None and not opts.urn:
-                raise TypeError("Missing required property 'environment_identifier'")
-            __props__.__dict__["environment_identifier"] = environment_identifier
             if name is None and not opts.urn:
                 raise TypeError("Missing required property 'name'")
             __props__.__dict__["name"] = name
             if organization_name is None and not opts.urn:
                 raise TypeError("Missing required property 'organization_name'")
             __props__.__dict__["organization_name"] = organization_name
-            if target_action_types is None and not opts.urn:
-                raise TypeError("Missing required property 'target_action_types'")
-            __props__.__dict__["target_action_types"] = target_action_types
+            if rule is None and not opts.urn:
+                raise TypeError("Missing required property 'rule'")
+            __props__.__dict__["rule"] = rule
+            if target is None and not opts.urn:
+                raise TypeError("Missing required property 'target'")
+            __props__.__dict__["target"] = target
             __props__.__dict__["gate_id"] = None
         super(ApprovalRule, __self__).__init__(
             'pulumiservice:changegates:ApprovalRule',
@@ -224,22 +212,13 @@ class ApprovalRule(pulumi.CustomResource):
 
         __props__ = ApprovalRuleArgs.__new__(ApprovalRuleArgs)
 
-        __props__.__dict__["approval_rule_config"] = None
         __props__.__dict__["enabled"] = None
-        __props__.__dict__["environment_identifier"] = None
         __props__.__dict__["gate_id"] = None
         __props__.__dict__["name"] = None
         __props__.__dict__["organization_name"] = None
-        __props__.__dict__["target_action_types"] = None
+        __props__.__dict__["rule"] = None
+        __props__.__dict__["target"] = None
         return ApprovalRule(resource_name, opts=opts, __props__=__props__)
-
-    @_builtins.property
-    @pulumi.getter(name="approvalRuleConfig")
-    def approval_rule_config(self) -> pulumi.Output[Optional[Any]]:
-        """
-        Rule config — number of required approvals, eligible approvers, reapproval policy, self-approval toggle.
-        """
-        return pulumi.get(self, "approval_rule_config")
 
     @_builtins.property
     @pulumi.getter
@@ -248,14 +227,6 @@ class ApprovalRule(pulumi.CustomResource):
         Whether the rule is active.
         """
         return pulumi.get(self, "enabled")
-
-    @_builtins.property
-    @pulumi.getter(name="environmentIdentifier")
-    def environment_identifier(self) -> pulumi.Output[Optional[Any]]:
-        """
-        Target environment — organization/project/environment triple.
-        """
-        return pulumi.get(self, "environment_identifier")
 
     @_builtins.property
     @pulumi.getter(name="gateId")
@@ -282,10 +253,21 @@ class ApprovalRule(pulumi.CustomResource):
         return pulumi.get(self, "organization_name")
 
     @_builtins.property
-    @pulumi.getter(name="targetActionTypes")
-    def target_action_types(self) -> pulumi.Output[Optional[Sequence[_builtins.str]]]:
+    @pulumi.getter
+    def rule(self) -> pulumi.Output[Optional[Any]]:
         """
-        Which action types the rule gates (e.g., deployment, environment_change).
+        Rule shape — `{ruleType: "approval_required", numApprovalsRequired: <n>,
+        eligibleApprovers: {teams: [...]}, preventSelfApproval: <bool>}`.
         """
-        return pulumi.get(self, "target_action_types")
+        return pulumi.get(self, "rule")
+
+    @_builtins.property
+    @pulumi.getter
+    def target(self) -> pulumi.Output[Optional[Any]]:
+        """
+        Target shape — `{entityType: "environment", qualifiedName: "<project>/<env>", actionTypes: ["update"|"open"]}`.
+        Pulumi Cloud only supports environment targets in
+        v2.0.0-alpha; richer targeting lands in a later release.
+        """
+        return pulumi.get(self, "target")
 

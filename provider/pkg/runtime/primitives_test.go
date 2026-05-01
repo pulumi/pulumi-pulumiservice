@@ -756,6 +756,66 @@ func TestPrimitive_BodyAs_PromotesPropertyValueAsEntireBody(t *testing.T) {
 	assert.Equal(t, "platform", gotBody["owner"])
 }
 
+// ─── BodyWrap ───────────────────────────────────────────────────────────
+
+// BodyWrap puts the input-derived body under a single named field. Used
+// when a parent endpoint takes an action-discriminated body (e.g.
+// UpdateTeam carries the inputs under `addEnvironmentPermission` for
+// create vs `removeEnvironment` for delete).
+func TestPrimitive_BodyWrap_WrapsInputBodyUnderNamedField(t *testing.T) {
+	var gotBody map[string]interface{}
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		body, _ := io.ReadAll(r.Body)
+		_ = json.Unmarshal(body, &gotBody)
+		w.WriteHeader(200)
+		_, _ = w.Write([]byte(`{}`))
+	}))
+	defer srv.Close()
+
+	md := &CloudAPIMetadata{Resources: map[string]CloudAPIResource{
+		"pulumiservice:esc/permissions:TeamEnvironmentPermission": {
+			Token: "pulumiservice:esc/permissions:TeamEnvironmentPermission",
+			Create: &CloudAPIOperation{
+				OperationID:  "UpdateTeam",
+				Method:       "PATCH",
+				PathTemplate: "/api/orgs/{orgName}/teams/{teamName}",
+				BodyWrap:     "addEnvironmentPermission",
+			},
+			ID: &CloudAPIID{
+				Template: "{organizationName}/{teamName}/{projectName}/{envName}",
+				Params:   []string{"organizationName", "teamName", "projectName", "envName"},
+			},
+			Properties: map[string]CloudAPIProperty{
+				"organizationName": {From: "orgName", Source: "path"},
+				"teamName":         {Source: "path"},
+				"projectName":      {Source: "body"},
+				"envName":          {Source: "body"},
+				"permission":       {Source: "body"},
+			},
+		},
+	}}
+	d := &Dispatcher{Client: NewClient(srv.URL, "tok"), Metadata: md}
+
+	_, _, err := d.Create(context.Background(), "pulumiservice:esc/permissions:TeamEnvironmentPermission",
+		resource.PropertyMap{
+			"organizationName": resource.NewStringProperty("acme"),
+			"teamName":         resource.NewStringProperty("platform"),
+			"projectName":      resource.NewStringProperty("default"),
+			"envName":          resource.NewStringProperty("staging"),
+			"permission":       resource.NewStringProperty("read"),
+		})
+	require.NoError(t, err)
+	// Body is wrapped under `addEnvironmentPermission`.
+	wrapped, ok := gotBody["addEnvironmentPermission"].(map[string]interface{})
+	require.True(t, ok, "expected body wrapped under addEnvironmentPermission, got %v", gotBody)
+	assert.Equal(t, "default", wrapped["projectName"])
+	assert.Equal(t, "staging", wrapped["envName"])
+	assert.Equal(t, "read", wrapped["permission"])
+	// Unwrapped body fields should NOT appear at the top level.
+	assert.NotContains(t, gotBody, "projectName")
+	assert.NotContains(t, gotBody, "permission")
+}
+
 // ─── InferScopeFromInputs ───────────────────────────────────────────────
 
 // Polymorphic resources without an explicit discriminator field

@@ -7,17 +7,25 @@ from .. import _utilities
 import typing
 # Export this package's modules as members:
 from .environment import *
+from .get_provider_schema import *
+from .get_rotator_schema import *
+from .list_environments import *
+from .list_providers import *
+from .list_rotators import *
 
 # Make subpackages available:
 if typing.TYPE_CHECKING:
     import pulumi_pulumiservice.esc.cloudsetup as __cloudsetup
     cloudsetup = __cloudsetup
+    import pulumi_pulumiservice.esc.permissions as __permissions
+    permissions = __permissions
     import pulumi_pulumiservice.esc.schedules as __schedules
     schedules = __schedules
     import pulumi_pulumiservice.esc.versions as __versions
     versions = __versions
 else:
     cloudsetup = _utilities.lazy_import('pulumi_pulumiservice.esc.cloudsetup')
+    permissions = _utilities.lazy_import('pulumi_pulumiservice.esc.permissions')
     schedules = _utilities.lazy_import('pulumi_pulumiservice.esc.schedules')
     versions = _utilities.lazy_import('pulumi_pulumiservice.esc.versions')
 

@@ -95,3 +95,8 @@ class Role(pulumi.CustomResource):
 
         return Role(resource_name, opts=opts, __props__=__props__)
 
+    def set_organization_default(__self__) -> None:
+        __args__ = dict()
+        __args__['__self__'] = __self__
+        pulumi.runtime.call('pulumiservice:orgs/roles:Role/setOrganizationDefault', __args__, res=__self__)
+

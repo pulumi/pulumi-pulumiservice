@@ -99,3 +99,13 @@ class Service(pulumi.CustomResource):
 
         return Service(resource_name, opts=opts, __props__=__props__)
 
+    def add_items(__self__) -> None:
+        __args__ = dict()
+        __args__['__self__'] = __self__
+        pulumi.runtime.call('pulumiservice:orgs/services:Service/addItems', __args__, res=__self__)
+
+    def remove_item(__self__) -> None:
+        __args__ = dict()
+        __args__['__self__'] = __self__
+        pulumi.runtime.call('pulumiservice:orgs/services:Service/removeItem', __args__, res=__self__)
+

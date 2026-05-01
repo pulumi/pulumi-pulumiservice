@@ -52,6 +52,9 @@ namespace Pulumi.PulumiService.Orgs.Roles
         {
             return new Role(name, id, options);
         }
+
+        public void SetOrganizationDefault()
+            => global::Pulumi.Deployment.Instance.Call("pulumiservice:orgs/roles:Role/setOrganizationDefault", CallArgs.Empty, this);
     }
 
     public sealed class RoleArgs : global::Pulumi.ResourceArgs

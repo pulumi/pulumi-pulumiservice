@@ -283,3 +283,13 @@ class Schedule(pulumi.CustomResource):
         """
         return pulumi.get(self, "timestamp")
 
+    def pause(__self__) -> None:
+        __args__ = dict()
+        __args__['__self__'] = __self__
+        pulumi.runtime.call('pulumiservice:stacks/deployments:Schedule/pause', __args__, res=__self__)
+
+    def resume(__self__) -> None:
+        __args__ = dict()
+        __args__['__self__'] = __self__
+        pulumi.runtime.call('pulumiservice:stacks/deployments:Schedule/resume', __args__, res=__self__)
+

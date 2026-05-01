@@ -185,3 +185,13 @@ class Stack(pulumi.CustomResource):
         """
         return pulumi.get(self, "stack_name")
 
+    def pause_deployments(__self__) -> None:
+        __args__ = dict()
+        __args__['__self__'] = __self__
+        pulumi.runtime.call('pulumiservice:stacks:Stack/pauseDeployments', __args__, res=__self__)
+
+    def resume_deployments(__self__) -> None:
+        __args__ = dict()
+        __args__['__self__'] = __self__
+        pulumi.runtime.call('pulumiservice:stacks:Stack/resumeDeployments', __args__, res=__self__)
+

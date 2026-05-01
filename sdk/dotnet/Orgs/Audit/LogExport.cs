@@ -12,8 +12,25 @@ namespace Pulumi.PulumiService.Orgs.Audit
     [PulumiServiceResourceType("pulumiservice:orgs/audit:LogExport")]
     public partial class LogExport : global::Pulumi.CustomResource
     {
+        /// <summary>
+        /// Whether the export is currently active. Set to false to pause without deleting.
+        /// </summary>
+        [Output("enabled")]
+        public Output<bool?> Enabled { get; private set; } = null!;
+
+        /// <summary>
+        /// Organization whose audit log is being exported.
+        /// </summary>
         [Output("organizationName")]
         public Output<string> OrganizationName { get; private set; } = null!;
+
+        /// <summary>
+        /// S3 destination settings — an object with `iamRoleArn`
+        /// (role Pulumi Cloud assumes to write), `s3BucketName`,
+        /// and optional `s3PathPrefix`.
+        /// </summary>
+        [Output("s3Configuration")]
+        public Output<object?> S3Configuration { get; private set; } = null!;
 
 
         /// <summary>
@@ -56,15 +73,39 @@ namespace Pulumi.PulumiService.Orgs.Audit
         {
             return new LogExport(name, id, options);
         }
+
+        public void ForceExport()
+            => global::Pulumi.Deployment.Instance.Call("pulumiservice:orgs/audit:LogExport/forceExport", CallArgs.Empty, this);
+
+        public void TestConfiguration()
+            => global::Pulumi.Deployment.Instance.Call("pulumiservice:orgs/audit:LogExport/testConfiguration", CallArgs.Empty, this);
     }
 
     public sealed class LogExportArgs : global::Pulumi.ResourceArgs
     {
+        /// <summary>
+        /// Whether the export is currently active. Set to false to pause without deleting.
+        /// </summary>
+        [Input("enabled", required: true)]
+        public Input<bool> Enabled { get; set; } = null!;
+
+        /// <summary>
+        /// Organization whose audit log is being exported.
+        /// </summary>
         [Input("organizationName", required: true)]
         public Input<string> OrganizationName { get; set; } = null!;
 
+        /// <summary>
+        /// S3 destination settings — an object with `iamRoleArn`
+        /// (role Pulumi Cloud assumes to write), `s3BucketName`,
+        /// and optional `s3PathPrefix`.
+        /// </summary>
+        [Input("s3Configuration", required: true)]
+        public Input<object> S3Configuration { get; set; } = null!;
+
         public LogExportArgs()
         {
+            Enabled = true;
         }
         public static new LogExportArgs Empty => new LogExportArgs();
     }

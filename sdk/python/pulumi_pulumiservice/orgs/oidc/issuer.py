@@ -282,3 +282,13 @@ class Issuer(pulumi.CustomResource):
         """
         return pulumi.get(self, "url")
 
+    def regenerate_thumbprints(__self__) -> None:
+        __args__ = dict()
+        __args__['__self__'] = __self__
+        pulumi.runtime.call('pulumiservice:orgs/oidc:Issuer/regenerateThumbprints', __args__, res=__self__)
+
+    def update_auth_policy(__self__) -> None:
+        __args__ = dict()
+        __args__['__self__'] = __self__
+        pulumi.runtime.call('pulumiservice:orgs/oidc:Issuer/updateAuthPolicy', __args__, res=__self__)
+

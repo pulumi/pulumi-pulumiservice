@@ -77,6 +77,18 @@ export class LogExport extends pulumi.CustomResource {
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         super(LogExport.__pulumiType, name, resourceInputs, opts);
     }
+
+    forceExport(): void {
+        pulumi.runtime.call("pulumiservice:orgs/audit:LogExport/forceExport", {
+            "__self__": this,
+        }, this);
+    }
+
+    testConfiguration(): void {
+        pulumi.runtime.call("pulumiservice:orgs/audit:LogExport/testConfiguration", {
+            "__self__": this,
+        }, this);
+    }
 }
 
 /**

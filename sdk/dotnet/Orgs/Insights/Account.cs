@@ -107,6 +107,9 @@ namespace Pulumi.PulumiService.Orgs.Insights
         {
             return new Account(name, id, options);
         }
+
+        public void TriggerScan()
+            => global::Pulumi.Deployment.Instance.Call("pulumiservice:orgs/insights:Account/triggerScan", CallArgs.Empty, this);
     }
 
     public sealed class AccountArgs : global::Pulumi.ResourceArgs

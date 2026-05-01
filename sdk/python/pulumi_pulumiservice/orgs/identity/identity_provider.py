@@ -305,3 +305,18 @@ class IdentityProvider(pulumi.CustomResource):
         """
         return pulumi.get(self, "sso_url")
 
+    def set_sole_admin(__self__) -> None:
+        __args__ = dict()
+        __args__['__self__'] = __self__
+        pulumi.runtime.call('pulumiservice:orgs/identity:IdentityProvider/setSoleAdmin', __args__, res=__self__)
+
+    def sync_with_idp(__self__) -> None:
+        __args__ = dict()
+        __args__['__self__'] = __self__
+        pulumi.runtime.call('pulumiservice:orgs/identity:IdentityProvider/syncWithIdp', __args__, res=__self__)
+
+    def update_admins(__self__) -> None:
+        __args__ = dict()
+        __args__['__self__'] = __self__
+        pulumi.runtime.call('pulumiservice:orgs/identity:IdentityProvider/updateAdmins', __args__, res=__self__)
+

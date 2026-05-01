@@ -18,9 +18,15 @@ namespace Pulumi.PulumiService.Orgs.Agents
         [Output("agentPoolId")]
         public Output<string> AgentPoolId { get; private set; } = null!;
 
+        /// <summary>
+        /// User-provided description of the pool's purpose.
+        /// </summary>
         [Output("description")]
         public Output<string?> Description { get; private set; } = null!;
 
+        /// <summary>
+        /// Agent pool display name. The Create response only echoes id+tokenValue, so we preserve `name` from inputs.
+        /// </summary>
         [Output("name")]
         public Output<string?> Name { get; private set; } = null!;
 
@@ -79,9 +85,15 @@ namespace Pulumi.PulumiService.Orgs.Agents
 
     public sealed class AgentPoolArgs : global::Pulumi.ResourceArgs
     {
+        /// <summary>
+        /// User-provided description of the pool's purpose.
+        /// </summary>
         [Input("description")]
         public Input<string>? Description { get; set; }
 
+        /// <summary>
+        /// Agent pool display name. The Create response only echoes id+tokenValue, so we preserve `name` from inputs.
+        /// </summary>
         [Input("name")]
         public Input<string>? Name { get; set; }
 

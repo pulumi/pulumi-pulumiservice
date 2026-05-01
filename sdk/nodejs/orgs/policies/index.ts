@@ -5,11 +5,29 @@ import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "../../utilities";
 
 // Export members:
+export const getPolicyIssue: typeof import("./getPolicyIssue").getPolicyIssue = null as any;
+utilities.lazyLoad(exports, ["getPolicyIssue"], () => require("./getPolicyIssue"));
+
+export const getPolicyIssueFilters: typeof import("./getPolicyIssueFilters").getPolicyIssueFilters = null as any;
+utilities.lazyLoad(exports, ["getPolicyIssueFilters"], () => require("./getPolicyIssueFilters"));
+
 export const getPolicyPack: typeof import("./getPolicyPack").getPolicyPack = null as any;
 utilities.lazyLoad(exports, ["getPolicyPack"], () => require("./getPolicyPack"));
 
+export const getPolicyResultsMetadata: typeof import("./getPolicyResultsMetadata").getPolicyResultsMetadata = null as any;
+utilities.lazyLoad(exports, ["getPolicyResultsMetadata"], () => require("./getPolicyResultsMetadata"));
+
+export const listPoliciesCompliance: typeof import("./listPoliciesCompliance").listPoliciesCompliance = null as any;
+utilities.lazyLoad(exports, ["listPoliciesCompliance"], () => require("./listPoliciesCompliance"));
+
+export const listPolicyIssues: typeof import("./listPolicyIssues").listPolicyIssues = null as any;
+utilities.lazyLoad(exports, ["listPolicyIssues"], () => require("./listPolicyIssues"));
+
 export const listPolicyPacks: typeof import("./listPolicyPacks").listPolicyPacks = null as any;
 utilities.lazyLoad(exports, ["listPolicyPacks"], () => require("./listPolicyPacks"));
+
+export const listPolicyViolations: typeof import("./listPolicyViolations").listPolicyViolations = null as any;
+utilities.lazyLoad(exports, ["listPolicyViolations"], () => require("./listPolicyViolations"));
 
 export { PolicyGroupArgs } from "./policyGroup";
 export type PolicyGroup = import("./policyGroup").PolicyGroup;

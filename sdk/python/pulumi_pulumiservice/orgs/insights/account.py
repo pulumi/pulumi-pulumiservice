@@ -323,3 +323,8 @@ class Account(pulumi.CustomResource):
         """
         return pulumi.get(self, "tags")
 
+    def trigger_scan(__self__) -> None:
+        __args__ = dict()
+        __args__['__self__'] = __self__
+        pulumi.runtime.call('pulumiservice:orgs/insights:Account/triggerScan', __args__, res=__self__)
+

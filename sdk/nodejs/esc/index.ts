@@ -10,14 +10,31 @@ export type Environment = import("./environment").Environment;
 export const Environment: typeof import("./environment").Environment = null as any;
 utilities.lazyLoad(exports, ["Environment"], () => require("./environment"));
 
+export const getProviderSchema: typeof import("./getProviderSchema").getProviderSchema = null as any;
+utilities.lazyLoad(exports, ["getProviderSchema"], () => require("./getProviderSchema"));
+
+export const getRotatorSchema: typeof import("./getRotatorSchema").getRotatorSchema = null as any;
+utilities.lazyLoad(exports, ["getRotatorSchema"], () => require("./getRotatorSchema"));
+
+export const listEnvironments: typeof import("./listEnvironments").listEnvironments = null as any;
+utilities.lazyLoad(exports, ["listEnvironments"], () => require("./listEnvironments"));
+
+export const listProviders: typeof import("./listProviders").listProviders = null as any;
+utilities.lazyLoad(exports, ["listProviders"], () => require("./listProviders"));
+
+export const listRotators: typeof import("./listRotators").listRotators = null as any;
+utilities.lazyLoad(exports, ["listRotators"], () => require("./listRotators"));
+
 
 // Export sub-modules:
 import * as cloudsetup from "./cloudsetup";
+import * as permissions from "./permissions";
 import * as schedules from "./schedules";
 import * as versions from "./versions";
 
 export {
     cloudsetup,
+    permissions,
     schedules,
     versions,
 };

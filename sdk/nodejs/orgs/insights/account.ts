@@ -117,6 +117,12 @@ export class Account extends pulumi.CustomResource {
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         super(Account.__pulumiType, name, resourceInputs, opts);
     }
+
+    triggerScan(): void {
+        pulumi.runtime.call("pulumiservice:orgs/insights:Account/triggerScan", {
+            "__self__": this,
+        }, this);
+    }
 }
 
 /**

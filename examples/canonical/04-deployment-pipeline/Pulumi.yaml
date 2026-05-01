@@ -45,7 +45,7 @@ resources:
       # because it requires the Pulumi GitHub app installed on the target repo.
       executorContext:
         executorImage:
-          image: pulumi/pulumi:latest
+          reference: pulumi/pulumi:latest
       operationContext:
         preRunCommands:
           - "npm ci"
@@ -62,6 +62,9 @@ resources:
       stack: ${productionStack.stackName}
       scheduleCron: "0 */6 * * *"
       autoRemediate: false           # notify-only; flip to true with care
+    options:
+      dependsOn:
+        - ${deploymentSettings}
 
   # TTL for ephemeral preview stacks so they don't pile up after PRs merge.
   ephemeralTtl:
@@ -72,3 +75,6 @@ resources:
       stack: ${productionStack.stackName}
       timestamp: "2026-12-31T00:00:00Z"
       deleteAfterDestroy: true
+    options:
+      dependsOn:
+        - ${deploymentSettings}

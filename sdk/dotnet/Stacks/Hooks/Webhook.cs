@@ -32,7 +32,7 @@ namespace Pulumi.PulumiService.Stacks.Hooks
         /// Environment the webhook belongs to (ESC-scoped webhooks only).
         /// </summary>
         [Output("environmentName")]
-        public Output<string> EnvironmentName { get; private set; } = null!;
+        public Output<string?> EnvironmentName { get; private set; } = null!;
 
         /// <summary>
         /// Event filter strings restricting which events trigger the webhook.
@@ -56,13 +56,13 @@ namespace Pulumi.PulumiService.Stacks.Hooks
         /// Webhook name, assigned by the server.
         /// </summary>
         [Output("name")]
-        public Output<string?> Name { get; private set; } = null!;
+        public Output<string> Name { get; private set; } = null!;
 
         /// <summary>
         /// Organization that owns the webhook.
         /// </summary>
         [Output("organizationName")]
-        public Output<string> OrganizationName { get; private set; } = null!;
+        public Output<string?> OrganizationName { get; private set; } = null!;
 
         /// <summary>
         /// URL the webhook POSTs to.
@@ -74,7 +74,7 @@ namespace Pulumi.PulumiService.Stacks.Hooks
         /// Project the webhook belongs to (stack- or ESC-scoped webhooks only).
         /// </summary>
         [Output("projectName")]
-        public Output<string> ProjectName { get; private set; } = null!;
+        public Output<string?> ProjectName { get; private set; } = null!;
 
         /// <summary>
         /// Shared secret used to sign webhook payloads (HMAC-SHA256).
@@ -86,7 +86,7 @@ namespace Pulumi.PulumiService.Stacks.Hooks
         /// Stack the webhook belongs to (stack-scoped webhooks only).
         /// </summary>
         [Output("stackName")]
-        public Output<string> StackName { get; private set; } = null!;
+        public Output<string?> StackName { get; private set; } = null!;
 
 
         /// <summary>

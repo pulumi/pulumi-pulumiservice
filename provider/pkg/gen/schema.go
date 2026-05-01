@@ -13,9 +13,28 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"strings"
 
 	"gopkg.in/yaml.v2"
 )
+
+// parseResourceModule splits "modName:ResName" → modName. Falls back to
+// the caller's modName if the input has no colon.
+func parseResourceModule(s, fallback string) string {
+	if i := strings.LastIndex(s, ":"); i >= 0 {
+		return s[:i]
+	}
+	return fallback
+}
+
+// parseResourceName splits "modName:ResName" → ResName. Falls back to the
+// caller's resName if the input has no colon.
+func parseResourceName(s, fallback string) string {
+	if i := strings.LastIndex(s, ":"); i >= 0 {
+		return s[i+1:]
+	}
+	return fallback
+}
 
 // pulumiSchema is a minimal view of the Pulumi package schema format we
 // need to emit. Matches the JSON shape `pulumi package gen-sdk` consumes.
@@ -56,6 +75,7 @@ type pulumiResource struct {
 	Required          []string                  `json:"required,omitempty"`
 	InputProperties   map[string]pulumiProperty `json:"inputProperties,omitempty"`
 	RequiredInputs    []string                  `json:"requiredInputs,omitempty"`
+	Methods           map[string]string         `json:"methods,omitempty"`
 }
 
 type pulumiFunction struct {
@@ -153,6 +173,39 @@ func EmitSchemaFromBytes(specBytes, mapBytes []byte) ([]byte, error) {
 		for fnName, fn := range mod.Functions {
 			token := fmt.Sprintf("pulumiservice:%s:%s", modName, fnName)
 			sch.Functions[token] = buildFunctionSpec(fn, spec)
+		}
+		// Methods are emitted as a function entry (the call surface) plus a
+		// pointer from the owning resource's `methods` map. Method tokens
+		// use the form pulumiservice:<modName>:<resource>/<methodName>.
+		// Skip methods whose owning resource was itself skipped (e.g.,
+		// read-only resources without a create op are not emitted, and
+		// dangling method references would fail schema binding).
+		for fullName, m := range mod.Methods {
+			parts := strings.SplitN(fullName, ".", 2)
+			if len(parts) != 2 {
+				continue
+			}
+			resName, methodName := parts[0], parts[1]
+			resourceToken := fmt.Sprintf("pulumiservice:%s:%s", parseResourceModule(m.Resource, modName), parseResourceName(m.Resource, resName))
+			r, ok := sch.Resources[resourceToken]
+			if !ok {
+				continue // owning resource not emitted; skip the method too
+			}
+			fnToken := fmt.Sprintf("pulumiservice:%s:%s/%s", modName, resName, methodName)
+			fn := buildFunctionSpec(Function{OperationID: m.OperationID}, spec)
+			// Inject __self__ as a required input pointing at the owning
+			// resource — Pulumi method calling convention.
+			if fn.Inputs == nil {
+				fn.Inputs = &pulumiObjectType{Type: "object", Properties: map[string]pulumiProperty{}}
+			}
+			fn.Inputs.Properties["__self__"] = pulumiProperty{Ref: "#/resources/" + resourceToken}
+			fn.Inputs.Required = append([]string{"__self__"}, fn.Inputs.Required...)
+			sch.Functions[fnToken] = fn
+			if r.Methods == nil {
+				r.Methods = map[string]string{}
+			}
+			r.Methods[methodName] = fnToken
+			sch.Resources[resourceToken] = r
 		}
 	}
 

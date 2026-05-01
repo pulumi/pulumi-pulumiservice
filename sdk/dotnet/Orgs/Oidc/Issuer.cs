@@ -95,6 +95,12 @@ namespace Pulumi.PulumiService.Orgs.Oidc
         {
             return new Issuer(name, id, options);
         }
+
+        public void RegenerateThumbprints()
+            => global::Pulumi.Deployment.Instance.Call("pulumiservice:orgs/oidc:Issuer/regenerateThumbprints", CallArgs.Empty, this);
+
+        public void UpdateAuthPolicy()
+            => global::Pulumi.Deployment.Instance.Call("pulumiservice:orgs/oidc:Issuer/updateAuthPolicy", CallArgs.Empty, this);
     }
 
     public sealed class IssuerArgs : global::Pulumi.ResourceArgs

@@ -282,7 +282,7 @@ class Team(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def name(self) -> pulumi.Output[Optional[_builtins.str]]:
+    def name(self) -> pulumi.Output[_builtins.str]:
         """
         Team name. Must be unique within the organization. Required for `pulumi` teams.
         """

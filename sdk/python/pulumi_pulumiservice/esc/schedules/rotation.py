@@ -257,3 +257,13 @@ class Rotation(pulumi.CustomResource):
         """
         return pulumi.get(self, "timestamp")
 
+    def pause(__self__) -> None:
+        __args__ = dict()
+        __args__['__self__'] = __self__
+        pulumi.runtime.call('pulumiservice:esc/schedules:Rotation/pause', __args__, res=__self__)
+
+    def resume(__self__) -> None:
+        __args__ = dict()
+        __args__['__self__'] = __self__
+        pulumi.runtime.call('pulumiservice:esc/schedules:Rotation/resume', __args__, res=__self__)
+

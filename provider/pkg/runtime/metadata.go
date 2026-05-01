@@ -174,6 +174,15 @@ type CloudAPIOperation struct {
 	// RawBodyFrom — RawBodyFrom is for non-JSON bodies (YAML, etc.);
 	// BodyAs still produces JSON.
 	BodyAs string `json:"bodyAs,omitempty"`
+
+	// BodyWrap, if non-empty, wraps the input-derived body under a single
+	// top-level field. Used when a parent endpoint takes an
+	// action-discriminated request body — e.g. UpdateTeam carries the
+	// inputs under `addEnvironmentPermission` for create,
+	// `editEnvironmentPermission` for update, and `removeEnvironment` for
+	// delete. The CRUD verbs share the same operationId; only the wrap
+	// key changes per verb.
+	BodyWrap string `json:"bodyWrap,omitempty"`
 }
 
 // CloudAPIReadVia configures a Read that piggybacks on another operation

@@ -461,6 +461,12 @@ func bodyFor(op *CloudAPIOperation, inputBody map[string]interface{}) interface{
 		// caller's JSON encoding produces `{}` rather than `null`.
 		return map[string]interface{}{}
 	}
+	// BodyWrap: the input-derived body is wrapped under a single named
+	// field (used for action-discriminated parent endpoints like
+	// UpdateTeam's add/edit/removeEnvironmentPermission).
+	if op != nil && op.BodyWrap != "" {
+		return map[string]interface{}{op.BodyWrap: asBody(inputBody)}
+	}
 	return asBody(inputBody)
 }
 

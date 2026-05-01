@@ -48,6 +48,18 @@ export class AzureDevOps extends pulumi.CustomResource {
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         super(AzureDevOps.__pulumiType, name, resourceInputs, opts);
     }
+
+    completeOAuth(): void {
+        pulumi.runtime.call("pulumiservice:integrations:AzureDevOps/completeOAuth", {
+            "__self__": this,
+        }, this);
+    }
+
+    initiateOAuth(): void {
+        pulumi.runtime.call("pulumiservice:integrations:AzureDevOps/initiateOAuth", {
+            "__self__": this,
+        }, this);
+    }
 }
 
 /**

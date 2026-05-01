@@ -18,6 +18,7 @@ import * as config from "./config";
 import * as esc from "./esc";
 import * as integrations from "./integrations";
 import * as orgs from "./orgs";
+import * as registry from "./registry";
 import * as stacks from "./stacks";
 
 export {
@@ -27,6 +28,7 @@ export {
     esc,
     integrations,
     orgs,
+    registry,
     stacks,
 };
 pulumi.runtime.registerResourcePackage("pulumiservice", {

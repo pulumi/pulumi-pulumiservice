@@ -6,4 +6,7 @@ import builtins as _builtins
 from ... import _utilities
 import typing
 # Export this package's modules as members:
+from .get_org_registry_policy_pack import *
+from .get_policy_pack_config_schema import *
+from .list_policy_pack_versions import *
 from .policy_pack import *

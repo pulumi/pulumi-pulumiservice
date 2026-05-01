@@ -20,16 +20,35 @@ __all__ = ['PolicyGroupArgs', 'PolicyGroup']
 class PolicyGroupArgs:
     def __init__(__self__, *,
                  name: pulumi.Input[_builtins.str],
-                 organization_name: pulumi.Input[_builtins.str]):
+                 organization_name: pulumi.Input[_builtins.str],
+                 agent_pool_id: Optional[pulumi.Input[_builtins.str]] = None,
+                 entity_type: Optional[pulumi.Input[_builtins.str]] = None,
+                 mode: Optional[pulumi.Input[_builtins.str]] = None):
         """
         The set of arguments for constructing a PolicyGroup resource.
+
+        :param pulumi.Input[_builtins.str] name: Policy group name. Unique within the organization.
+        :param pulumi.Input[_builtins.str] agent_pool_id: Optional agent pool ID for policy evaluation. Defaults to the Pulumi-hosted pool.
+        :param pulumi.Input[_builtins.str] entity_type: The type of entities this policy group applies to. Defaults to `stacks`.
+        :param pulumi.Input[_builtins.str] mode: Enforcement mode. Defaults to `audit` for account groups, `preventative` for stack groups.
         """
         pulumi.set(__self__, "name", name)
         pulumi.set(__self__, "organization_name", organization_name)
+        if agent_pool_id is not None:
+            pulumi.set(__self__, "agent_pool_id", agent_pool_id)
+        if entity_type is None:
+            entity_type = 'stacks'
+        if entity_type is not None:
+            pulumi.set(__self__, "entity_type", entity_type)
+        if mode is not None:
+            pulumi.set(__self__, "mode", mode)
 
     @_builtins.property
     @pulumi.getter
     def name(self) -> pulumi.Input[_builtins.str]:
+        """
+        Policy group name. Unique within the organization.
+        """
         return pulumi.get(self, "name")
 
     @name.setter
@@ -45,6 +64,42 @@ class PolicyGroupArgs:
     def organization_name(self, value: pulumi.Input[_builtins.str]):
         pulumi.set(self, "organization_name", value)
 
+    @_builtins.property
+    @pulumi.getter(name="agentPoolId")
+    def agent_pool_id(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Optional agent pool ID for policy evaluation. Defaults to the Pulumi-hosted pool.
+        """
+        return pulumi.get(self, "agent_pool_id")
+
+    @agent_pool_id.setter
+    def agent_pool_id(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "agent_pool_id", value)
+
+    @_builtins.property
+    @pulumi.getter(name="entityType")
+    def entity_type(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        The type of entities this policy group applies to. Defaults to `stacks`.
+        """
+        return pulumi.get(self, "entity_type")
+
+    @entity_type.setter
+    def entity_type(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "entity_type", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def mode(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Enforcement mode. Defaults to `audit` for account groups, `preventative` for stack groups.
+        """
+        return pulumi.get(self, "mode")
+
+    @mode.setter
+    def mode(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "mode", value)
+
 
 @pulumi.type_token("pulumiservice:orgs/policies:PolicyGroup")
 class PolicyGroup(pulumi.CustomResource):
@@ -52,6 +107,9 @@ class PolicyGroup(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 agent_pool_id: Optional[pulumi.Input[_builtins.str]] = None,
+                 entity_type: Optional[pulumi.Input[_builtins.str]] = None,
+                 mode: Optional[pulumi.Input[_builtins.str]] = None,
                  name: Optional[pulumi.Input[_builtins.str]] = None,
                  organization_name: Optional[pulumi.Input[_builtins.str]] = None,
                  __props__=None):
@@ -61,6 +119,10 @@ class PolicyGroup(pulumi.CustomResource):
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
+        :param pulumi.Input[_builtins.str] agent_pool_id: Optional agent pool ID for policy evaluation. Defaults to the Pulumi-hosted pool.
+        :param pulumi.Input[_builtins.str] entity_type: The type of entities this policy group applies to. Defaults to `stacks`.
+        :param pulumi.Input[_builtins.str] mode: Enforcement mode. Defaults to `audit` for account groups, `preventative` for stack groups.
+        :param pulumi.Input[_builtins.str] name: Policy group name. Unique within the organization.
         """
         ...
     @overload
@@ -87,6 +149,9 @@ class PolicyGroup(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 agent_pool_id: Optional[pulumi.Input[_builtins.str]] = None,
+                 entity_type: Optional[pulumi.Input[_builtins.str]] = None,
+                 mode: Optional[pulumi.Input[_builtins.str]] = None,
                  name: Optional[pulumi.Input[_builtins.str]] = None,
                  organization_name: Optional[pulumi.Input[_builtins.str]] = None,
                  __props__=None):
@@ -98,6 +163,11 @@ class PolicyGroup(pulumi.CustomResource):
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
             __props__ = PolicyGroupArgs.__new__(PolicyGroupArgs)
 
+            __props__.__dict__["agent_pool_id"] = agent_pool_id
+            if entity_type is None:
+                entity_type = 'stacks'
+            __props__.__dict__["entity_type"] = entity_type
+            __props__.__dict__["mode"] = mode
             if name is None and not opts.urn:
                 raise TypeError("Missing required property 'name'")
             __props__.__dict__["name"] = name
@@ -126,13 +196,43 @@ class PolicyGroup(pulumi.CustomResource):
 
         __props__ = PolicyGroupArgs.__new__(PolicyGroupArgs)
 
+        __props__.__dict__["agent_pool_id"] = None
+        __props__.__dict__["entity_type"] = None
+        __props__.__dict__["mode"] = None
         __props__.__dict__["name"] = None
         __props__.__dict__["organization_name"] = None
         return PolicyGroup(resource_name, opts=opts, __props__=__props__)
 
     @_builtins.property
+    @pulumi.getter(name="agentPoolId")
+    def agent_pool_id(self) -> pulumi.Output[Optional[_builtins.str]]:
+        """
+        Optional agent pool ID for policy evaluation. Defaults to the Pulumi-hosted pool.
+        """
+        return pulumi.get(self, "agent_pool_id")
+
+    @_builtins.property
+    @pulumi.getter(name="entityType")
+    def entity_type(self) -> pulumi.Output[Optional[_builtins.str]]:
+        """
+        The type of entities this policy group applies to. Defaults to `stacks`.
+        """
+        return pulumi.get(self, "entity_type")
+
+    @_builtins.property
+    @pulumi.getter
+    def mode(self) -> pulumi.Output[Optional[_builtins.str]]:
+        """
+        Enforcement mode. Defaults to `audit` for account groups, `preventative` for stack groups.
+        """
+        return pulumi.get(self, "mode")
+
+    @_builtins.property
     @pulumi.getter
     def name(self) -> pulumi.Output[_builtins.str]:
+        """
+        Policy group name. Unique within the organization.
+        """
         return pulumi.get(self, "name")
 
     @_builtins.property

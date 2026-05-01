@@ -52,6 +52,12 @@ namespace Pulumi.PulumiService.Integrations
         {
             return new AzureDevOps(name, id, options);
         }
+
+        public void CompleteOAuth()
+            => global::Pulumi.Deployment.Instance.Call("pulumiservice:integrations:AzureDevOps/completeOAuth", CallArgs.Empty, this);
+
+        public void InitiateOAuth()
+            => global::Pulumi.Deployment.Instance.Call("pulumiservice:integrations:AzureDevOps/initiateOAuth", CallArgs.Empty, this);
     }
 
     public sealed class AzureDevOpsArgs : global::Pulumi.ResourceArgs

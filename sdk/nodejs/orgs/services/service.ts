@@ -52,6 +52,18 @@ export class Service extends pulumi.CustomResource {
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         super(Service.__pulumiType, name, resourceInputs, opts);
     }
+
+    addItems(): void {
+        pulumi.runtime.call("pulumiservice:orgs/services:Service/addItems", {
+            "__self__": this,
+        }, this);
+    }
+
+    removeItem(): void {
+        pulumi.runtime.call("pulumiservice:orgs/services:Service/removeItem", {
+            "__self__": this,
+        }, this);
+    }
 }
 
 /**

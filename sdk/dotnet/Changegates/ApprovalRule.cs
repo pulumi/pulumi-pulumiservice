@@ -13,22 +13,10 @@ namespace Pulumi.PulumiService.Changegates
     public partial class ApprovalRule : global::Pulumi.CustomResource
     {
         /// <summary>
-        /// Rule config — number of required approvals, eligible approvers, reapproval policy, self-approval toggle.
-        /// </summary>
-        [Output("approvalRuleConfig")]
-        public Output<object?> ApprovalRuleConfig { get; private set; } = null!;
-
-        /// <summary>
         /// Whether the rule is active.
         /// </summary>
         [Output("enabled")]
         public Output<bool?> Enabled { get; private set; } = null!;
-
-        /// <summary>
-        /// Target environment — organization/project/environment triple.
-        /// </summary>
-        [Output("environmentIdentifier")]
-        public Output<object?> EnvironmentIdentifier { get; private set; } = null!;
 
         /// <summary>
         /// Server-assigned rule ID.
@@ -49,10 +37,19 @@ namespace Pulumi.PulumiService.Changegates
         public Output<string> OrganizationName { get; private set; } = null!;
 
         /// <summary>
-        /// Which action types the rule gates (e.g., deployment, environment_change).
+        /// Rule shape — `{ruleType: "approval_required", numApprovalsRequired: &lt;n&gt;,
+        /// eligibleApprovers: {teams: [...]}, preventSelfApproval: &lt;bool&gt;}`.
         /// </summary>
-        [Output("targetActionTypes")]
-        public Output<ImmutableArray<string>> TargetActionTypes { get; private set; } = null!;
+        [Output("rule")]
+        public Output<object?> Rule { get; private set; } = null!;
+
+        /// <summary>
+        /// Target shape — `{entityType: "environment", qualifiedName: "&lt;project&gt;/&lt;env&gt;", actionTypes: ["update"|"open"]}`.
+        /// Pulumi Cloud only supports environment targets in
+        /// v2.0.0-alpha; richer targeting lands in a later release.
+        /// </summary>
+        [Output("target")]
+        public Output<object?> Target { get; private set; } = null!;
 
 
         /// <summary>
@@ -100,22 +97,10 @@ namespace Pulumi.PulumiService.Changegates
     public sealed class ApprovalRuleArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
-        /// Rule config — number of required approvals, eligible approvers, reapproval policy, self-approval toggle.
-        /// </summary>
-        [Input("approvalRuleConfig", required: true)]
-        public Input<object> ApprovalRuleConfig { get; set; } = null!;
-
-        /// <summary>
         /// Whether the rule is active.
         /// </summary>
         [Input("enabled", required: true)]
         public Input<bool> Enabled { get; set; } = null!;
-
-        /// <summary>
-        /// Target environment — organization/project/environment triple.
-        /// </summary>
-        [Input("environmentIdentifier", required: true)]
-        public Input<object> EnvironmentIdentifier { get; set; } = null!;
 
         /// <summary>
         /// Human-readable name for the rule.
@@ -129,17 +114,20 @@ namespace Pulumi.PulumiService.Changegates
         [Input("organizationName", required: true)]
         public Input<string> OrganizationName { get; set; } = null!;
 
-        [Input("targetActionTypes", required: true)]
-        private InputList<string>? _targetActionTypes;
+        /// <summary>
+        /// Rule shape — `{ruleType: "approval_required", numApprovalsRequired: &lt;n&gt;,
+        /// eligibleApprovers: {teams: [...]}, preventSelfApproval: &lt;bool&gt;}`.
+        /// </summary>
+        [Input("rule", required: true)]
+        public Input<object> Rule { get; set; } = null!;
 
         /// <summary>
-        /// Which action types the rule gates (e.g., deployment, environment_change).
+        /// Target shape — `{entityType: "environment", qualifiedName: "&lt;project&gt;/&lt;env&gt;", actionTypes: ["update"|"open"]}`.
+        /// Pulumi Cloud only supports environment targets in
+        /// v2.0.0-alpha; richer targeting lands in a later release.
         /// </summary>
-        public InputList<string> TargetActionTypes
-        {
-            get => _targetActionTypes ?? (_targetActionTypes = new InputList<string>());
-            set => _targetActionTypes = value;
-        }
+        [Input("target", required: true)]
+        public Input<object> Target { get; set; } = null!;
 
         public ApprovalRuleArgs()
         {

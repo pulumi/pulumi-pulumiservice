@@ -5,6 +5,15 @@ import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "../../utilities";
 
 // Export members:
+export const getEnvironmentWebhookDeliveries: typeof import("./getEnvironmentWebhookDeliveries").getEnvironmentWebhookDeliveries = null as any;
+utilities.lazyLoad(exports, ["getEnvironmentWebhookDeliveries"], () => require("./getEnvironmentWebhookDeliveries"));
+
+export const getOrganizationWebhookDeliveries: typeof import("./getOrganizationWebhookDeliveries").getOrganizationWebhookDeliveries = null as any;
+utilities.lazyLoad(exports, ["getOrganizationWebhookDeliveries"], () => require("./getOrganizationWebhookDeliveries"));
+
+export const getStackWebhookDeliveries: typeof import("./getStackWebhookDeliveries").getStackWebhookDeliveries = null as any;
+utilities.lazyLoad(exports, ["getStackWebhookDeliveries"], () => require("./getStackWebhookDeliveries"));
+
 export { WebhookArgs } from "./webhook";
 export type Webhook = import("./webhook").Webhook;
 export const Webhook: typeof import("./webhook").Webhook = null as any;

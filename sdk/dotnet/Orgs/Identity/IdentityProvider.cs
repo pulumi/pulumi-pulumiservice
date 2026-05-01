@@ -99,6 +99,15 @@ namespace Pulumi.PulumiService.Orgs.Identity
         {
             return new IdentityProvider(name, id, options);
         }
+
+        public void SetSoleAdmin()
+            => global::Pulumi.Deployment.Instance.Call("pulumiservice:orgs/identity:IdentityProvider/setSoleAdmin", CallArgs.Empty, this);
+
+        public void SyncWithIdp()
+            => global::Pulumi.Deployment.Instance.Call("pulumiservice:orgs/identity:IdentityProvider/syncWithIdp", CallArgs.Empty, this);
+
+        public void UpdateAdmins()
+            => global::Pulumi.Deployment.Instance.Call("pulumiservice:orgs/identity:IdentityProvider/updateAdmins", CallArgs.Empty, this);
     }
 
     public sealed class IdentityProviderArgs : global::Pulumi.ResourceArgs

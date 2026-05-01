@@ -317,6 +317,7 @@ func buildOp(v interface{}, spec *Spec) *runtime.CloudAPIOperation {
 		rawBodyTo := ""
 		contentType := ""
 		bodyAs := ""
+		bodyWrap := ""
 		for _, kv := range x {
 			k, _ := kv.Key.(string)
 			switch k {
@@ -336,6 +337,8 @@ func buildOp(v interface{}, spec *Spec) *runtime.CloudAPIOperation {
 				contentType, _ = kv.Value.(string)
 			case "bodyAs":
 				bodyAs, _ = kv.Value.(string)
+			case "bodyWrap":
+				bodyWrap, _ = kv.Value.(string)
 			}
 		}
 		if opID == "" {
@@ -354,6 +357,7 @@ func buildOp(v interface{}, spec *Spec) *runtime.CloudAPIOperation {
 		base.RawBodyTo = rawBodyTo
 		base.ContentType = contentType
 		base.BodyAs = bodyAs
+		base.BodyWrap = bodyWrap
 		return base
 	}
 	return nil

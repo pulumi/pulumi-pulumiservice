@@ -15,6 +15,27 @@ namespace Pulumi.PulumiService.Orgs.Policies
     [PulumiServiceResourceType("pulumiservice:orgs/policies:PolicyGroup")]
     public partial class PolicyGroup : global::Pulumi.CustomResource
     {
+        /// <summary>
+        /// Optional agent pool ID for policy evaluation. Defaults to the Pulumi-hosted pool.
+        /// </summary>
+        [Output("agentPoolId")]
+        public Output<string?> AgentPoolId { get; private set; } = null!;
+
+        /// <summary>
+        /// The type of entities this policy group applies to. Defaults to `stacks`.
+        /// </summary>
+        [Output("entityType")]
+        public Output<string?> EntityType { get; private set; } = null!;
+
+        /// <summary>
+        /// Enforcement mode. Defaults to `audit` for account groups, `preventative` for stack groups.
+        /// </summary>
+        [Output("mode")]
+        public Output<string?> Mode { get; private set; } = null!;
+
+        /// <summary>
+        /// Policy group name. Unique within the organization.
+        /// </summary>
         [Output("name")]
         public Output<string> Name { get; private set; } = null!;
 
@@ -66,6 +87,27 @@ namespace Pulumi.PulumiService.Orgs.Policies
 
     public sealed class PolicyGroupArgs : global::Pulumi.ResourceArgs
     {
+        /// <summary>
+        /// Optional agent pool ID for policy evaluation. Defaults to the Pulumi-hosted pool.
+        /// </summary>
+        [Input("agentPoolId")]
+        public Input<string>? AgentPoolId { get; set; }
+
+        /// <summary>
+        /// The type of entities this policy group applies to. Defaults to `stacks`.
+        /// </summary>
+        [Input("entityType")]
+        public Input<string>? EntityType { get; set; }
+
+        /// <summary>
+        /// Enforcement mode. Defaults to `audit` for account groups, `preventative` for stack groups.
+        /// </summary>
+        [Input("mode")]
+        public Input<string>? Mode { get; set; }
+
+        /// <summary>
+        /// Policy group name. Unique within the organization.
+        /// </summary>
         [Input("name", required: true)]
         public Input<string> Name { get; set; } = null!;
 
@@ -74,6 +116,7 @@ namespace Pulumi.PulumiService.Orgs.Policies
 
         public PolicyGroupArgs()
         {
+            EntityType = "stacks";
         }
         public static new PolicyGroupArgs Empty => new PolicyGroupArgs();
     }

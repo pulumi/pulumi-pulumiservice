@@ -5,6 +5,15 @@ import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "../../utilities";
 
 // Export members:
+export const getOrgRegistryPolicyPack: typeof import("./getOrgRegistryPolicyPack").getOrgRegistryPolicyPack = null as any;
+utilities.lazyLoad(exports, ["getOrgRegistryPolicyPack"], () => require("./getOrgRegistryPolicyPack"));
+
+export const getPolicyPackConfigSchema: typeof import("./getPolicyPackConfigSchema").getPolicyPackConfigSchema = null as any;
+utilities.lazyLoad(exports, ["getPolicyPackConfigSchema"], () => require("./getPolicyPackConfigSchema"));
+
+export const listPolicyPackVersions: typeof import("./listPolicyPackVersions").listPolicyPackVersions = null as any;
+utilities.lazyLoad(exports, ["listPolicyPackVersions"], () => require("./listPolicyPackVersions"));
+
 export { PolicyPackArgs } from "./policyPack";
 export type PolicyPack = import("./policyPack").PolicyPack;
 export const PolicyPack: typeof import("./policyPack").PolicyPack = null as any;

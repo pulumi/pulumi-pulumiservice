@@ -18,6 +18,18 @@ namespace Pulumi.PulumiService.Orgs.Tokens
         [Output("description")]
         public Output<string?> Description { get; private set; } = null!;
 
+        /// <summary>
+        /// Unix epoch expiration. `0` (the default) means no expiry.
+        /// </summary>
+        [Output("expires")]
+        public Output<int?> Expires { get; private set; } = null!;
+
+        /// <summary>
+        /// Token name. Defaults to the description if omitted.
+        /// </summary>
+        [Output("name")]
+        public Output<string?> Name { get; private set; } = null!;
+
         [Output("tokenId")]
         public Output<string> TokenId { get; private set; } = null!;
 
@@ -76,8 +88,21 @@ namespace Pulumi.PulumiService.Orgs.Tokens
         [Input("description")]
         public Input<string>? Description { get; set; }
 
+        /// <summary>
+        /// Unix epoch expiration. `0` (the default) means no expiry.
+        /// </summary>
+        [Input("expires")]
+        public Input<int>? Expires { get; set; }
+
+        /// <summary>
+        /// Token name. Defaults to the description if omitted.
+        /// </summary>
+        [Input("name")]
+        public Input<string>? Name { get; set; }
+
         public AccessTokenArgs()
         {
+            Expires = 0;
         }
         public static new AccessTokenArgs Empty => new AccessTokenArgs();
     }

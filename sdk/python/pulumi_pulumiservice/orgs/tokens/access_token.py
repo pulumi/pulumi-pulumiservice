@@ -19,12 +19,23 @@ __all__ = ['AccessTokenArgs', 'AccessToken']
 @pulumi.input_type
 class AccessTokenArgs:
     def __init__(__self__, *,
-                 description: Optional[pulumi.Input[_builtins.str]] = None):
+                 description: Optional[pulumi.Input[_builtins.str]] = None,
+                 expires: Optional[pulumi.Input[_builtins.int]] = None,
+                 name: Optional[pulumi.Input[_builtins.str]] = None):
         """
         The set of arguments for constructing a AccessToken resource.
+
+        :param pulumi.Input[_builtins.int] expires: Unix epoch expiration. `0` (the default) means no expiry.
+        :param pulumi.Input[_builtins.str] name: Token name. Defaults to the description if omitted.
         """
         if description is not None:
             pulumi.set(__self__, "description", description)
+        if expires is None:
+            expires = 0
+        if expires is not None:
+            pulumi.set(__self__, "expires", expires)
+        if name is not None:
+            pulumi.set(__self__, "name", name)
 
     @_builtins.property
     @pulumi.getter
@@ -35,6 +46,30 @@ class AccessTokenArgs:
     def description(self, value: Optional[pulumi.Input[_builtins.str]]):
         pulumi.set(self, "description", value)
 
+    @_builtins.property
+    @pulumi.getter
+    def expires(self) -> Optional[pulumi.Input[_builtins.int]]:
+        """
+        Unix epoch expiration. `0` (the default) means no expiry.
+        """
+        return pulumi.get(self, "expires")
+
+    @expires.setter
+    def expires(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "expires", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def name(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Token name. Defaults to the description if omitted.
+        """
+        return pulumi.get(self, "name")
+
+    @name.setter
+    def name(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "name", value)
+
 
 @pulumi.type_token("pulumiservice:orgs/tokens:AccessToken")
 class AccessToken(pulumi.CustomResource):
@@ -43,6 +78,8 @@ class AccessToken(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  description: Optional[pulumi.Input[_builtins.str]] = None,
+                 expires: Optional[pulumi.Input[_builtins.int]] = None,
+                 name: Optional[pulumi.Input[_builtins.str]] = None,
                  __props__=None):
         """
         AccessToken holds a pulumi access token and some associated metadata
@@ -50,6 +87,8 @@ class AccessToken(pulumi.CustomResource):
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
+        :param pulumi.Input[_builtins.int] expires: Unix epoch expiration. `0` (the default) means no expiry.
+        :param pulumi.Input[_builtins.str] name: Token name. Defaults to the description if omitted.
         """
         ...
     @overload
@@ -77,6 +116,8 @@ class AccessToken(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  description: Optional[pulumi.Input[_builtins.str]] = None,
+                 expires: Optional[pulumi.Input[_builtins.int]] = None,
+                 name: Optional[pulumi.Input[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
@@ -87,6 +128,10 @@ class AccessToken(pulumi.CustomResource):
             __props__ = AccessTokenArgs.__new__(AccessTokenArgs)
 
             __props__.__dict__["description"] = description
+            if expires is None:
+                expires = 0
+            __props__.__dict__["expires"] = expires
+            __props__.__dict__["name"] = name
             __props__.__dict__["token_id"] = None
             __props__.__dict__["value"] = None
         secret_opts = pulumi.ResourceOptions(additional_secret_outputs=["value"])
@@ -114,6 +159,8 @@ class AccessToken(pulumi.CustomResource):
         __props__ = AccessTokenArgs.__new__(AccessTokenArgs)
 
         __props__.__dict__["description"] = None
+        __props__.__dict__["expires"] = None
+        __props__.__dict__["name"] = None
         __props__.__dict__["token_id"] = None
         __props__.__dict__["value"] = None
         return AccessToken(resource_name, opts=opts, __props__=__props__)
@@ -122,6 +169,22 @@ class AccessToken(pulumi.CustomResource):
     @pulumi.getter
     def description(self) -> pulumi.Output[Optional[_builtins.str]]:
         return pulumi.get(self, "description")
+
+    @_builtins.property
+    @pulumi.getter
+    def expires(self) -> pulumi.Output[Optional[_builtins.int]]:
+        """
+        Unix epoch expiration. `0` (the default) means no expiry.
+        """
+        return pulumi.get(self, "expires")
+
+    @_builtins.property
+    @pulumi.getter
+    def name(self) -> pulumi.Output[Optional[_builtins.str]]:
+        """
+        Token name. Defaults to the description if omitted.
+        """
+        return pulumi.get(self, "name")
 
     @_builtins.property
     @pulumi.getter(name="tokenId")

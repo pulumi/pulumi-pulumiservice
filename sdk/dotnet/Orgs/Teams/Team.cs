@@ -44,7 +44,7 @@ namespace Pulumi.PulumiService.Orgs.Teams
         /// Team name. Must be unique within the organization. Required for `pulumi` teams.
         /// </summary>
         [Output("name")]
-        public Output<string?> Name { get; private set; } = null!;
+        public Output<string> Name { get; private set; } = null!;
 
         /// <summary>
         /// Organization the team lives in.

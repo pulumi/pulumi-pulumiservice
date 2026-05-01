@@ -95,6 +95,12 @@ namespace Pulumi.PulumiService.Stacks.Deployments
         {
             return new Schedule(name, id, options);
         }
+
+        public void Pause()
+            => global::Pulumi.Deployment.Instance.Call("pulumiservice:stacks/deployments:Schedule/pause", CallArgs.Empty, this);
+
+        public void Resume()
+            => global::Pulumi.Deployment.Instance.Call("pulumiservice:stacks/deployments:Schedule/resume", CallArgs.Empty, this);
     }
 
     public sealed class ScheduleArgs : global::Pulumi.ResourceArgs

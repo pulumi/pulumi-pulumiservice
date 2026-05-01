@@ -24,6 +24,9 @@ class AgentPoolArgs:
                  name: Optional[pulumi.Input[_builtins.str]] = None):
         """
         The set of arguments for constructing a AgentPool resource.
+
+        :param pulumi.Input[_builtins.str] description: User-provided description of the pool's purpose.
+        :param pulumi.Input[_builtins.str] name: Agent pool display name. The Create response only echoes id+tokenValue, so we preserve `name` from inputs.
         """
         pulumi.set(__self__, "organization_name", organization_name)
         if description is not None:
@@ -43,6 +46,9 @@ class AgentPoolArgs:
     @_builtins.property
     @pulumi.getter
     def description(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        User-provided description of the pool's purpose.
+        """
         return pulumi.get(self, "description")
 
     @description.setter
@@ -52,6 +58,9 @@ class AgentPoolArgs:
     @_builtins.property
     @pulumi.getter
     def name(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Agent pool display name. The Create response only echoes id+tokenValue, so we preserve `name` from inputs.
+        """
         return pulumi.get(self, "name")
 
     @name.setter
@@ -75,6 +84,8 @@ class AgentPool(pulumi.CustomResource):
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
+        :param pulumi.Input[_builtins.str] description: User-provided description of the pool's purpose.
+        :param pulumi.Input[_builtins.str] name: Agent pool display name. The Create response only echoes id+tokenValue, so we preserve `name` from inputs.
         """
         ...
     @overload
@@ -159,11 +170,17 @@ class AgentPool(pulumi.CustomResource):
     @_builtins.property
     @pulumi.getter
     def description(self) -> pulumi.Output[Optional[_builtins.str]]:
+        """
+        User-provided description of the pool's purpose.
+        """
         return pulumi.get(self, "description")
 
     @_builtins.property
     @pulumi.getter
     def name(self) -> pulumi.Output[Optional[_builtins.str]]:
+        """
+        Agent pool display name. The Create response only echoes id+tokenValue, so we preserve `name` from inputs.
+        """
         return pulumi.get(self, "name")
 
     @_builtins.property

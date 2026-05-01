@@ -48,6 +48,12 @@ export class Role extends pulumi.CustomResource {
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         super(Role.__pulumiType, name, resourceInputs, opts);
     }
+
+    setOrganizationDefault(): void {
+        pulumi.runtime.call("pulumiservice:orgs/roles:Role/setOrganizationDefault", {
+            "__self__": this,
+        }, this);
+    }
 }
 
 /**

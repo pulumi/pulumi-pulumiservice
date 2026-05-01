@@ -95,6 +95,24 @@ export class IdentityProvider extends pulumi.CustomResource {
         opts = pulumi.mergeOptions(opts, secretOpts);
         super(IdentityProvider.__pulumiType, name, resourceInputs, opts);
     }
+
+    setSoleAdmin(): void {
+        pulumi.runtime.call("pulumiservice:orgs/identity:IdentityProvider/setSoleAdmin", {
+            "__self__": this,
+        }, this);
+    }
+
+    syncWithIdp(): void {
+        pulumi.runtime.call("pulumiservice:orgs/identity:IdentityProvider/syncWithIdp", {
+            "__self__": this,
+        }, this);
+    }
+
+    updateAdmins(): void {
+        pulumi.runtime.call("pulumiservice:orgs/identity:IdentityProvider/updateAdmins", {
+            "__self__": this,
+        }, this);
+    }
 }
 
 /**

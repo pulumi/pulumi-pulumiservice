@@ -89,6 +89,12 @@ namespace Pulumi.PulumiService.Esc.Schedules
         {
             return new Rotation(name, id, options);
         }
+
+        public void Pause()
+            => global::Pulumi.Deployment.Instance.Call("pulumiservice:esc/schedules:Rotation/pause", CallArgs.Empty, this);
+
+        public void Resume()
+            => global::Pulumi.Deployment.Instance.Call("pulumiservice:esc/schedules:Rotation/resume", CallArgs.Empty, this);
     }
 
     public sealed class RotationArgs : global::Pulumi.ResourceArgs

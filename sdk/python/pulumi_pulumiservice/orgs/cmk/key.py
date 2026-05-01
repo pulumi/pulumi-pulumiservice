@@ -95,3 +95,18 @@ class Key(pulumi.CustomResource):
 
         return Key(resource_name, opts=opts, __props__=__props__)
 
+    def disable_all(__self__) -> None:
+        __args__ = dict()
+        __args__['__self__'] = __self__
+        pulumi.runtime.call('pulumiservice:orgs/cmk:Key/disableAll', __args__, res=__self__)
+
+    def retry_migrations(__self__) -> None:
+        __args__ = dict()
+        __args__['__self__'] = __self__
+        pulumi.runtime.call('pulumiservice:orgs/cmk:Key/retryMigrations', __args__, res=__self__)
+
+    def set_default(__self__) -> None:
+        __args__ = dict()
+        __args__['__self__'] = __self__
+        pulumi.runtime.call('pulumiservice:orgs/cmk:Key/setDefault', __args__, res=__self__)
+

@@ -16,6 +16,9 @@ config:
   stack:
     type: string
     default: production-isolated
+  digits:
+    type: string
+    default: "00000"
 
 resources:
   # Create the agent pool. The returned `tokenValue` is used to register
@@ -24,8 +27,17 @@ resources:
     type: pulumiservice:orgs/agents:AgentPool
     properties:
       organizationName: ${organizationName}
-      name: vpc-isolated
+      name: vpc-isolated-${digits}
       description: Runs deployments inside the isolated VPC; no SaaS egress.
+
+  # Register the stack first — deployment settings can only attach to an
+  # existing Pulumi Cloud stack record.
+  isolatedStack:
+    type: pulumiservice:stacks:Stack
+    properties:
+      organizationName: ${organizationName}
+      projectName: ${project}
+      stackName: ${stack}-${digits}
 
   # Point the stack's deployment settings at the pool. The executor runs
   # on YOUR infrastructure, but the control plane (state, updates, RBAC)
@@ -33,9 +45,9 @@ resources:
   deploymentSettings:
     type: pulumiservice:stacks/deployments:Settings
     properties:
-      organization: ${organizationName}
-      project: ${project}
-      stack: ${stack}
+      organization: ${isolatedStack.organizationName}
+      project: ${isolatedStack.projectName}
+      stack: ${isolatedStack.stackName}
       agentPoolId: ${isolatedPool.agentPoolId}
       sourceContext:
         git:

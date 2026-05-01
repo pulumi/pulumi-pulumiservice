@@ -93,6 +93,18 @@ export class Rotation extends pulumi.CustomResource {
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         super(Rotation.__pulumiType, name, resourceInputs, opts);
     }
+
+    pause(): void {
+        pulumi.runtime.call("pulumiservice:esc/schedules:Rotation/pause", {
+            "__self__": this,
+        }, this);
+    }
+
+    resume(): void {
+        pulumi.runtime.call("pulumiservice:esc/schedules:Rotation/resume", {
+            "__self__": this,
+        }, this);
+    }
 }
 
 /**

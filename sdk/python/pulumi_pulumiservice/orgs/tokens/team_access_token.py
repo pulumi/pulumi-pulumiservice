@@ -21,14 +21,25 @@ class TeamAccessTokenArgs:
     def __init__(__self__, *,
                  organization_name: pulumi.Input[_builtins.str],
                  team_name: pulumi.Input[_builtins.str],
-                 description: Optional[pulumi.Input[_builtins.str]] = None):
+                 description: Optional[pulumi.Input[_builtins.str]] = None,
+                 expires: Optional[pulumi.Input[_builtins.int]] = None,
+                 name: Optional[pulumi.Input[_builtins.str]] = None):
         """
         The set of arguments for constructing a TeamAccessToken resource.
+
+        :param pulumi.Input[_builtins.int] expires: Unix epoch expiration. `0` (the default) means no expiry.
+        :param pulumi.Input[_builtins.str] name: Token name. Unique within the team (including deleted tokens). Defaults to the description if omitted.
         """
         pulumi.set(__self__, "organization_name", organization_name)
         pulumi.set(__self__, "team_name", team_name)
         if description is not None:
             pulumi.set(__self__, "description", description)
+        if expires is None:
+            expires = 0
+        if expires is not None:
+            pulumi.set(__self__, "expires", expires)
+        if name is not None:
+            pulumi.set(__self__, "name", name)
 
     @_builtins.property
     @pulumi.getter(name="organizationName")
@@ -57,6 +68,30 @@ class TeamAccessTokenArgs:
     def description(self, value: Optional[pulumi.Input[_builtins.str]]):
         pulumi.set(self, "description", value)
 
+    @_builtins.property
+    @pulumi.getter
+    def expires(self) -> Optional[pulumi.Input[_builtins.int]]:
+        """
+        Unix epoch expiration. `0` (the default) means no expiry.
+        """
+        return pulumi.get(self, "expires")
+
+    @expires.setter
+    def expires(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "expires", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def name(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Token name. Unique within the team (including deleted tokens). Defaults to the description if omitted.
+        """
+        return pulumi.get(self, "name")
+
+    @name.setter
+    def name(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "name", value)
+
 
 @pulumi.type_token("pulumiservice:orgs/tokens:TeamAccessToken")
 class TeamAccessToken(pulumi.CustomResource):
@@ -65,6 +100,8 @@ class TeamAccessToken(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  description: Optional[pulumi.Input[_builtins.str]] = None,
+                 expires: Optional[pulumi.Input[_builtins.int]] = None,
+                 name: Optional[pulumi.Input[_builtins.str]] = None,
                  organization_name: Optional[pulumi.Input[_builtins.str]] = None,
                  team_name: Optional[pulumi.Input[_builtins.str]] = None,
                  __props__=None):
@@ -73,6 +110,8 @@ class TeamAccessToken(pulumi.CustomResource):
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
+        :param pulumi.Input[_builtins.int] expires: Unix epoch expiration. `0` (the default) means no expiry.
+        :param pulumi.Input[_builtins.str] name: Token name. Unique within the team (including deleted tokens). Defaults to the description if omitted.
         """
         ...
     @overload
@@ -99,6 +138,8 @@ class TeamAccessToken(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  description: Optional[pulumi.Input[_builtins.str]] = None,
+                 expires: Optional[pulumi.Input[_builtins.int]] = None,
+                 name: Optional[pulumi.Input[_builtins.str]] = None,
                  organization_name: Optional[pulumi.Input[_builtins.str]] = None,
                  team_name: Optional[pulumi.Input[_builtins.str]] = None,
                  __props__=None):
@@ -111,6 +152,10 @@ class TeamAccessToken(pulumi.CustomResource):
             __props__ = TeamAccessTokenArgs.__new__(TeamAccessTokenArgs)
 
             __props__.__dict__["description"] = description
+            if expires is None:
+                expires = 0
+            __props__.__dict__["expires"] = expires
+            __props__.__dict__["name"] = name
             if organization_name is None and not opts.urn:
                 raise TypeError("Missing required property 'organization_name'")
             __props__.__dict__["organization_name"] = organization_name
@@ -144,6 +189,8 @@ class TeamAccessToken(pulumi.CustomResource):
         __props__ = TeamAccessTokenArgs.__new__(TeamAccessTokenArgs)
 
         __props__.__dict__["description"] = None
+        __props__.__dict__["expires"] = None
+        __props__.__dict__["name"] = None
         __props__.__dict__["organization_name"] = None
         __props__.__dict__["team_name"] = None
         __props__.__dict__["token_id"] = None
@@ -154,6 +201,22 @@ class TeamAccessToken(pulumi.CustomResource):
     @pulumi.getter
     def description(self) -> pulumi.Output[Optional[_builtins.str]]:
         return pulumi.get(self, "description")
+
+    @_builtins.property
+    @pulumi.getter
+    def expires(self) -> pulumi.Output[Optional[_builtins.int]]:
+        """
+        Unix epoch expiration. `0` (the default) means no expiry.
+        """
+        return pulumi.get(self, "expires")
+
+    @_builtins.property
+    @pulumi.getter
+    def name(self) -> pulumi.Output[Optional[_builtins.str]]:
+        """
+        Token name. Unique within the team (including deleted tokens). Defaults to the description if omitted.
+        """
+        return pulumi.get(self, "name")
 
     @_builtins.property
     @pulumi.getter(name="organizationName")

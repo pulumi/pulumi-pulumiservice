@@ -66,6 +66,27 @@ resources:
       format: raw
       active: true
 
+  # Team allowed to read the environment (and its decrypted secrets).
+  # Useful when a service team owns an env shared with sibling services'
+  # CI; only the owning team can edit, but readers can `esc env open`.
+  secretsReadersTeam:
+    type: pulumiservice:orgs/teams:Team
+    properties:
+      organizationName: ${organizationName}
+      teamType: pulumi
+      name: secrets-readers-${digits}
+      displayName: Secrets readers (canonical/03)
+      description: Read access to production-secrets ESC env. Used by sibling-service CI.
+
+  secretsReadersGrant:
+    type: pulumiservice:esc/permissions:TeamEnvironmentPermission
+    properties:
+      organizationName: ${organizationName}
+      teamName: ${secretsReadersTeam.name}
+      projectName: ${productionSecrets.project}
+      envName: ${productionSecrets.name}
+      permission: read
+
 outputs:
   environmentRef:
     value: "${productionSecrets.organization}/${productionSecrets.project}/${productionSecrets.name}"

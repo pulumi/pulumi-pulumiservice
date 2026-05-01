@@ -102,6 +102,18 @@ export class Schedule extends pulumi.CustomResource {
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         super(Schedule.__pulumiType, name, resourceInputs, opts);
     }
+
+    pause(): void {
+        pulumi.runtime.call("pulumiservice:stacks/deployments:Schedule/pause", {
+            "__self__": this,
+        }, this);
+    }
+
+    resume(): void {
+        pulumi.runtime.call("pulumiservice:stacks/deployments:Schedule/resume", {
+            "__self__": this,
+        }, this);
+    }
 }
 
 /**

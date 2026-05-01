@@ -5,6 +5,9 @@ import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "../../utilities";
 
 // Export members:
+export const listTeamRoles: typeof import("./listTeamRoles").listTeamRoles = null as any;
+utilities.lazyLoad(exports, ["listTeamRoles"], () => require("./listTeamRoles"));
+
 export const listTeams: typeof import("./listTeams").listTeams = null as any;
 utilities.lazyLoad(exports, ["listTeams"], () => require("./listTeams"));
 

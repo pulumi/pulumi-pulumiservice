@@ -27,6 +27,12 @@ modules:
         forceNew: [name]
         properties:
           name: { from: orgName, source: path }
+    functions:
+      # Org-wide deployment pause/resume — admin switches surfaced as
+      # functions (not methods) because the Organization resource is
+      # read-only and not emitted into SDKs.
+      pauseOrgDeployments:  { operationId: PauseOrgDeployments }
+      resumeOrgDeployments: { operationId: ResumeOrgDeployments }
 
   orgs/agents:
     resources:
@@ -134,7 +140,8 @@ modules:
             items: { type: string }
             doc: List of usernames in the team.
     functions:
-      listTeams: { operationId: ListTeams }
+      listTeams:     { operationId: ListTeams }
+      listTeamRoles: { operationId: ListTeamRoles }
 
   orgs/tokens:
     resources:
@@ -363,6 +370,15 @@ modules:
     functions:
       getPolicyPack:  { operationId: GetPolicyPack }
       listPolicyPacks: { operationId: ListPolicyPacks_orgs }
+      # Policy enforcement reporting — read-only views of policy-pack runs and
+      # violations. Useful for alerting/remediation programs that need to
+      # query "what's failing under policy X across the org."
+      listPolicyViolations: { operationId: ListPolicyViolationsV2 }
+      listPolicyIssues:     { operationId: ListPolicyIssues }
+      getPolicyIssue:       { operationId: GetPolicyIssue }
+      getPolicyIssueFilters: { operationId: GetPolicyIssuesFilters }
+      getPolicyResultsMetadata: { operationId: GetPolicyResultsMetadata }
+      listPoliciesCompliance: { operationId: ListPoliciesCompliance }
 
   orgs/templates:
     resources:
@@ -411,6 +427,9 @@ modules:
     functions:
       # readVia target — also exposed as a list data source.
       listTemplateSources: { operationId: GetOrgTemplateCollections }
+      # Project template discovery — what `pulumi new` would scaffold for a project.
+      getProjectTemplate:              { operationId: GetProjectTemplate }
+      getProjectTemplateConfiguration: { operationId: GetProjectTemplateConfiguration }
 
   # ─── Stacks ─────────────────────────────────────────────────────────────
 
@@ -451,6 +470,13 @@ modules:
             createSource: body   # POSTed on create, then path-addressable
             required: true
             doc: Stack name.
+    methods:
+      Stack.pauseDeployments:
+        resource: stacks:Stack
+        operationId: PauseStackDeployments
+      Stack.resumeDeployments:
+        resource: stacks:Stack
+        operationId: ResumeStackDeployments
 
   stacks/hooks:
     resources:
@@ -581,6 +607,15 @@ modules:
           - requireIfSet: environmentName
             field: projectName
         sortProperties: [groups, filters]
+    functions:
+      # Per-scope delivery audit views. The Webhook resource itself is
+      # polymorphic over scope; methods on it would also need to dispatch
+      # by scope (no method-polymorphism in the runtime today), so the
+      # delivery views are surfaced as separate scope-specific functions
+      # instead — callers know which scope their webhook lives in.
+      getOrganizationWebhookDeliveries: { operationId: GetOrganizationWebhookDeliveries }
+      getStackWebhookDeliveries:        { operationId: GetStackWebhookDeliveries }
+      getEnvironmentWebhookDeliveries:  { operationId: GetWebhookDeliveries_esc_environments }
 
   stacks/deployments:
     resources:
@@ -633,6 +668,8 @@ modules:
             source: body
             doc: RFC3339 timestamp for a single-time run. Mutually exclusive with `scheduleCron`.
           scheduleId:
+            from: id
+            pathName: scheduleID
             type: string
             source: response
             output: true
@@ -642,8 +679,8 @@ modules:
         operations:
           create: CreateScheduledDriftDeployment
           update: UpdateScheduledDriftDeployment
+          read:   ReadScheduledDeployment      # shared read endpoint
           delete: DeleteScheduledDeployment    # shared delete endpoint
-          readVia: { operationId: ReadScheduledDeployment }
         id:
           template: "{organization}/{project}/{stack}/{scheduleId}"
           params: [organization, project, stack, scheduleId]
@@ -677,6 +714,8 @@ modules:
             source: body
             doc: When true, automatically run an update to reconcile detected drift.
           scheduleId:
+            from: id
+            pathName: scheduleID
             type: string
             source: response
             output: true
@@ -686,8 +725,8 @@ modules:
         operations:
           create: CreateScheduledTTLDeployment
           update: UpdateScheduledTTLDeployment
+          read:   ReadScheduledDeployment      # shared read endpoint
           delete: DeleteScheduledDeployment    # shared delete endpoint
-          readVia: { operationId: ReadScheduledDeployment }
         id:
           template: "{organization}/{project}/{stack}/{scheduleId}"
           params: [organization, project, stack, scheduleId]
@@ -721,6 +760,8 @@ modules:
             source: body
             doc: When true, delete the stack itself (not just resources) after the destroy succeeds.
           scheduleId:
+            from: id
+            pathName: scheduleID
             type: string
             source: response
             output: true
@@ -791,6 +832,13 @@ modules:
             ref: "pulumi.json#/Any"
             source: body
             doc: Generic VCS settings (used when `github` isn't applicable).
+    methods:
+      Schedule.pause:
+        resource: stacks/deployments:Schedule
+        operationId: PauseScheduledDeployment
+      Schedule.resume:
+        resource: stacks/deployments:Schedule
+        operationId: ResumeScheduledDeployment
 
   stacks/tags:
     # `Tag` (per-tag) and `Tags` (whole-map) are both metadata-driven.
@@ -1014,6 +1062,16 @@ modules:
               The environment definition as YAML text. ESC documents carry
               secrets; the property is marked secret so Pulumi state keeps
               it encrypted.
+    functions:
+      # ESC environment listing — useful for org dashboards / drift reports.
+      listEnvironments: { operationId: ListOrgEnvironments_esc }
+      # ESC provider + rotator catalogs — discoverable via the API. These
+      # power the editor's "imports" suggestions and rotation-schedule
+      # configuration UIs; useful to teams generating ESC YAML programmatically.
+      listProviders:     { operationId: ListProviders_esc }
+      getProviderSchema: { operationId: GetProviderSchema_esc }
+      listRotators:      { operationId: ListRotators }
+      getRotatorSchema:  { operationId: GetRotatorSchema }
 
   esc/schedules:
     resources:
@@ -1059,10 +1117,19 @@ modules:
             source: body
             doc: RFC3339 timestamp for a single rotation. Mutually exclusive with `scheduleCron`.
           scheduleId:
+            from: id
+            pathName: scheduleID
             type: string
             source: response
             output: true
             doc: Server-assigned schedule ID.
+    methods:
+      Rotation.pause:
+        resource: esc/schedules:Rotation
+        operationId: PauseEnvironmentSchedule
+      Rotation.resume:
+        resource: esc/schedules:Rotation
+        operationId: ResumeEnvironmentSchedule
 
   esc/versions:
     resources:
@@ -1112,15 +1179,56 @@ modules:
   esc/permissions:
     resources:
       TeamEnvironmentPermission:
+        doc: |
+          Grants a team a specific permission level on an ESC environment.
+          The Pulumi Cloud API does not expose a dedicated CRUD endpoint —
+          membership is mutated through `UpdateTeam` with the body wrapped
+          under `addEnvironmentPermission` (create), `editEnvironmentPermission`
+          (update), or `removeEnvironment` (delete). The `bodyWrap:` primitive
+          on each verb selects the right wrapper. No dedicated GET — Read
+          falls through to the prior inputs (matches how `TeamStackPermission`
+          is structured).
         operations:
-          # TODO (task #7): locate the ESC team-permission operationIds in the spec
-          create: TODO:SetTeamEnvironmentPermission
-          read:   TODO:GetTeamEnvironmentPermission
-          delete: TODO:RemoveTeamEnvironmentPermission
+          create:
+            operationId: UpdateTeam
+            bodyWrap: addEnvironmentPermission
+          update:
+            operationId: UpdateTeam
+            bodyWrap: editEnvironmentPermission
+          delete:
+            operationId: UpdateTeam
+            bodyWrap: removeEnvironment
         id:
-          template: "{organizationName}/{projectName}/{envName}/{teamName}"
-          params: [organizationName, projectName, envName, teamName]
-        forceNew: [organizationName, projectName, envName, teamName]
+          template: "{organizationName}/{teamName}/{projectName}/{envName}"
+          params: [organizationName, teamName, projectName, envName]
+        forceNew: [organizationName, teamName, projectName, envName]
+        properties:
+          organizationName:
+            from: orgName
+            type: string
+            source: path
+            required: true
+            doc: Organization name.
+          teamName:
+            type: string
+            source: path
+            required: true
+            doc: Team being granted environment access.
+          projectName:
+            type: string
+            source: body
+            required: true
+            doc: ESC project the environment belongs to.
+          envName:
+            type: string
+            source: body
+            required: true
+            doc: ESC environment name.
+          permission:
+            type: string
+            source: body
+            enum: [none, read, open, write, admin]
+            doc: Permission level granted to the team. Omit on delete.
 
   # ─── SAML / SSO identity providers ──────────────────────────────────────
 
@@ -1385,6 +1493,12 @@ modules:
       listChangeRequests:        { operationId: List_change_requests }
       listChangeRequestEvents:   { operationId: ListEvents }
     methods:
+      # ChangeRequest is read-only (no create — change requests are produced
+      # by the engine, not authored). Methods stay defined so the runtime
+      # can dispatch them; the schema emitter currently skips resources
+      # without create, so these methods aren't surfaced in SDKs yet.
+      # Tracked as a follow-up: support read-only resources in the schema
+      # emitter so these become callable as `cr.approve()` etc.
       ChangeRequest.approve:
         resource: changerequests:ChangeRequest
         operationId: Approve
@@ -1516,6 +1630,12 @@ modules:
           template: "{organizationName}/{name}"
           params: [organizationName, name]
         forceNew: [organizationName]
+    functions:
+      # Pack registry queries — config schema for a published pack version,
+      # the org's view of a registry pack, and a list of available versions.
+      getPolicyPackConfigSchema: { operationId: GetPolicyPackConfigSchema }
+      getOrgRegistryPolicyPack:  { operationId: GetOrgRegistryPolicyPack }
+      listPolicyPackVersions:    { operationId: ListPolicyPackVersions }
 
   # ─── Insights (preview) ─────────────────────────────────────────────────
   # `Account` manages a cloud-resource-scanning account under the insights
@@ -1666,6 +1786,18 @@ modules:
             doc: Server-assigned rule ID.
     functions:
       listApprovalRules: { operationId: ListGates }
+
+  # ─── Pulumi Registry (read-only catalog) ────────────────────────────────
+  # Public registry of Pulumi packages and project templates. Only functions
+  # — Pulumi Cloud writes happen via package-publish CLI tooling.
+
+  registry:
+    functions:
+      listPackages:         { operationId: ListPackages }
+      getPackageVersion:    { operationId: GetPackageVersion }
+      listTemplates:        { operationId: ListTemplates }
+      listTemplateVersions: { operationId: ListTemplateVersions }
+      getTemplateVersion:   { operationId: GetTemplateVersion }
 
 # ─── Cross-module resource methods (non-CRUD POST actions surfaced as methods) ──
 # (Method entries live under their owning module. This section is reserved
@@ -1838,16 +1970,9 @@ exclusions:
   - { operationId: ReadEnvironmentDraft,    reason: "ESC draft workflow; CLI/console" }
   - { operationId: UpdateEnvironmentDraft,  reason: "ESC draft workflow; CLI/console" }
   - { operationId: OpenEnvironmentDraft,    reason: "ESC draft workflow; CLI/console" }
-  - { operationId: GetProviderSchema_esc,   reason: "ESC provider schema discovery; data source — candidate for follow-up" }
-  - { operationId: GetRotatorSchema,        reason: "ESC rotator schema discovery; data source — candidate for follow-up" }
-  - { operationId: ListProviders_esc,       reason: "ESC provider list; data source — candidate for follow-up" }
-  - { operationId: ListRotators,            reason: "ESC rotator list; data source — candidate for follow-up" }
   - { operationId: ListEnvironments_esc,    reason: "cross-org listing; use ListOrgEnvironments_esc" }
-  - { operationId: ListOrgEnvironments_esc, reason: "listing; candidate for a future `listEnvironments` function" }
   - { operationId: ListEnvironmentSchedule, reason: "listing; subset of esc/schedules:Rotation CRUD" }
   - { operationId: ListEnvironmentScheduleHistory, reason: "history view; operational" }
-  - { operationId: PauseEnvironmentSchedule,  reason: "imperative pause; expose as method if demanded" }
-  - { operationId: ResumeEnvironmentSchedule, reason: "imperative resume; expose as method if demanded" }
 
   # ── ESC environment tags (covered by esc/versions:Tag + per-tag ops) ──
   - { operationId: CreateEnvironmentTag_esc_environments, reason: "per-tag mutation; use esc/versions:Tag resource" }
@@ -1857,9 +1982,6 @@ exclusions:
   - { operationId: ListEnvironmentTags_esc_environments,  reason: "per-tag mutation; use esc/versions:Tag resource" }
 
   # ── Webhook deliveries / pings (actions on existing Webhook) ────────
-  - { operationId: GetOrganizationWebhookDeliveries, reason: "delivery audit view; candidate for method" }
-  - { operationId: GetStackWebhookDeliveries,        reason: "delivery audit view; candidate for method" }
-  - { operationId: GetWebhookDeliveries_esc_environments, reason: "delivery audit view; candidate for method" }
   - { operationId: PingOrganizationWebhook,          reason: "manual test trigger; CLI action" }
   - { operationId: PingStackWebhook,                 reason: "manual test trigger; CLI action" }
   - { operationId: PingWebhook_esc_environments,     reason: "manual test trigger; CLI action" }
@@ -1871,16 +1993,10 @@ exclusions:
   - { operationId: ListAuditLogEventsHandlerV1,   reason: "v1 audit API; v2 is canonical" }
   - { operationId: ExportAuditLogEventsHandlerV1, reason: "v1 audit API; v2 is canonical" }
 
-  # ── Policy-results read endpoints (reporting, not declarative) ──────
-  - { operationId: GetPolicyIssue,              reason: "policy-run reporting view" }
+  # ── Policy-results read endpoints (now exposed as functions in orgs/policies) ──
   - { operationId: UpdatePolicyIssue,           reason: "policy-run triage; expose as method if demanded" }
-  - { operationId: GetPolicyIssuesFilters,      reason: "policy-run reporting view" }
-  - { operationId: ExportPolicyIssues,          reason: "policy-run reporting export" }
-  - { operationId: GetPolicyComplianceResults,  reason: "policy-run compliance snapshot" }
-  - { operationId: GetPolicyResultsMetadata,    reason: "policy-run reporting view" }
-  - { operationId: ListPolicyViolationsV2,      reason: "policy-run reporting view" }
-  - { operationId: ListPolicyIssues,            reason: "policy-run reporting view" }
-  - { operationId: ListPoliciesCompliance,      reason: "policy-run reporting view" }
+  - { operationId: ExportPolicyIssues,          reason: "policy-run reporting export; CSV download (not JSON)" }
+  - { operationId: GetPolicyComplianceResults,  reason: "policy-run compliance snapshot; subset of ListPoliciesCompliance" }
   - { operationId: BatchUpdatePolicyGroup,      reason: "batch mutation; use PolicyGroup + per-pack operations" }
 
   # ── Policy pack publishing (CLI/tooling, not declarative) ────────────
@@ -1889,9 +2005,6 @@ exclusions:
   - { operationId: DeletePolicyPack_preview_registry_policypacks,  reason: "legacy preview; use orgs/policypacks:PolicyPack" }
   - { operationId: DeletePolicyPack_preview_registry_policypacks_versions, reason: "legacy preview; version management is CLI" }
   - { operationId: GetPolicyPackVersion,                 reason: "version read; use GetPolicyPack" }
-  - { operationId: GetPolicyPackConfigSchema,            reason: "schema discovery; data source candidate" }
-  - { operationId: GetOrgRegistryPolicyPack,             reason: "registry view; data source candidate" }
-  - { operationId: ListPolicyPackVersions,               reason: "version list; data source candidate" }
   - { operationId: ListPolicyPacks_preview_registry,     reason: "legacy preview; use ListPolicyPacks_orgs" }
   - { operationId: ListPolicyPacks_preview_registry_post, reason: "legacy preview search" }
   - { operationId: PostPublishPolicyPackVersion,         reason: "CLI publish step" }
@@ -1900,16 +2013,11 @@ exclusions:
   # ── Template publishing (CLI/tooling) ────────────────────────────────
   - { operationId: DeleteTemplateVersion,                reason: "CLI publish step" }
   - { operationId: DeleteTemplateVersion_preview,        reason: "legacy preview" }
-  - { operationId: GetProjectTemplate,                   reason: "template discovery view; data source candidate" }
-  - { operationId: GetProjectTemplateConfiguration,      reason: "template discovery view; data source candidate" }
-  - { operationId: GetTemplateVersion,                   reason: "version read; data source candidate" }
   - { operationId: GetTemplateVersion_preview,           reason: "legacy preview" }
   - { operationId: GetOrgTemplates,                      reason: "listing; use GetOrgTemplateCollections" }
   - { operationId: GetOrgTemplateDownload,               reason: "CLI download step" }
   - { operationId: GetOrgTemplateReadme,                 reason: "UI readme view" }
-  - { operationId: ListTemplates,                        reason: "registry listing; data source candidate" }
   - { operationId: ListTemplates_preview,                reason: "legacy preview" }
-  - { operationId: ListTemplateVersions,                 reason: "version list; data source candidate" }
   - { operationId: PostPublishTemplateVersion,           reason: "CLI publish step" }
   - { operationId: PostPublishTemplateVersionComplete,   reason: "CLI publish step" }
   - { operationId: PostPublishTemplateVersion_preview,   reason: "legacy preview publish" }
@@ -1918,9 +2026,7 @@ exclusions:
   # ── Registry package publishing (CLI/tooling) ────────────────────────
   - { operationId: DeletePublishPackageVersion,          reason: "CLI publish step" }
   - { operationId: DeletePublishPackageVersion_preview,  reason: "legacy preview" }
-  - { operationId: GetPackageVersion,                    reason: "version read; data source candidate" }
   - { operationId: GetPackageVersion_preview,            reason: "legacy preview" }
-  - { operationId: ListPackages,                         reason: "registry listing; data source candidate" }
   - { operationId: ListPackages_preview,                 reason: "legacy preview" }
   # (ListPackageVersions not in spec; future spec addition will cover it.)
   - { operationId: PostPublishPackageVersion,            reason: "CLI publish step" }
@@ -1942,7 +2048,6 @@ exclusions:
 
   # ── Team role enablement (auxiliary; part of Role / Team) ───────────
   - { operationId: EnableTeamRoles,   reason: "auxiliary feature flag; belongs to Team" }
-  - { operationId: ListTeamRoles,     reason: "view; data source candidate" }
   - { operationId: UpdateTeamRoles,   reason: "auxiliary mutation; fold into Team update in a follow-up" }
   - { operationId: DeleteTeamRole,    reason: "auxiliary mutation; fold into Team update in a follow-up" }
 
@@ -2096,12 +2201,6 @@ exclusions:
   - { operationId: ListScheduledDeploymentHistory, reason: "history view; operational" }
   - { operationId: ListStackDeploymentsHandlerV2, reason: "history view; operational" }
   - { operationId: ListDriftRuns,            reason: "drift history view; operational" }
-  - { operationId: PauseOrgDeployments,      reason: "admin pause switch; candidate for method" }
-  - { operationId: ResumeOrgDeployments,     reason: "admin pause switch; candidate for method" }
-  - { operationId: PauseStackDeployments,    reason: "admin pause switch; candidate for method" }
-  - { operationId: ResumeStackDeployments,   reason: "admin pause switch; candidate for method" }
-  - { operationId: PauseScheduledDeployment, reason: "admin pause switch; candidate for method" }
-  - { operationId: ResumeScheduledDeployment, reason: "admin pause switch; candidate for method" }
   - { operationId: OrgDeploymentsMetadata,   reason: "metadata view; operational" }
   - { operationId: StackDeploymentsMetadata, reason: "metadata view; operational" }
   - { operationId: GetStackUpdates,          reason: "update history view; operational" }

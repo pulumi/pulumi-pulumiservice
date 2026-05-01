@@ -99,6 +99,18 @@ export class Issuer extends pulumi.CustomResource {
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         super(Issuer.__pulumiType, name, resourceInputs, opts);
     }
+
+    regenerateThumbprints(): void {
+        pulumi.runtime.call("pulumiservice:orgs/oidc:Issuer/regenerateThumbprints", {
+            "__self__": this,
+        }, this);
+    }
+
+    updateAuthPolicy(): void {
+        pulumi.runtime.call("pulumiservice:orgs/oidc:Issuer/updateAuthPolicy", {
+            "__self__": this,
+        }, this);
+    }
 }
 
 /**

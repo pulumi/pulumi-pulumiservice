@@ -6,5 +6,6 @@ import builtins as _builtins
 from ... import _utilities
 import typing
 # Export this package's modules as members:
+from .list_team_roles import *
 from .list_teams import *
 from .team import *

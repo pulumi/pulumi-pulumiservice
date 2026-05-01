@@ -71,6 +71,12 @@ namespace Pulumi.PulumiService.Stacks
         {
             return new Stack(name, id, options);
         }
+
+        public void PauseDeployments()
+            => global::Pulumi.Deployment.Instance.Call("pulumiservice:stacks:Stack/pauseDeployments", CallArgs.Empty, this);
+
+        public void ResumeDeployments()
+            => global::Pulumi.Deployment.Instance.Call("pulumiservice:stacks:Stack/resumeDeployments", CallArgs.Empty, this);
     }
 
     public sealed class StackArgs : global::Pulumi.ResourceArgs

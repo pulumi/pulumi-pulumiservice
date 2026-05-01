@@ -56,6 +56,12 @@ namespace Pulumi.PulumiService.Orgs.Services
         {
             return new Service(name, id, options);
         }
+
+        public void AddItems()
+            => global::Pulumi.Deployment.Instance.Call("pulumiservice:orgs/services:Service/addItems", CallArgs.Empty, this);
+
+        public void RemoveItem()
+            => global::Pulumi.Deployment.Instance.Call("pulumiservice:orgs/services:Service/removeItem", CallArgs.Empty, this);
     }
 
     public sealed class ServiceArgs : global::Pulumi.ResourceArgs
