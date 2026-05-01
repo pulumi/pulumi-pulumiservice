@@ -63,7 +63,7 @@ jobs:
         with:
           tag: v2.1.5-procursus2
       - name: Setup mise
-        uses: jdx/mise-action@1c5f70fd400ce6c745085c93ea80026272f8d346
+        uses: jdx/mise-action@b287efda3dc5f4f3c328507653b6617da783ff84
         env:
           MISE_FETCH_REMOTE_VERSIONS_TIMEOUT: 30s
         with:
