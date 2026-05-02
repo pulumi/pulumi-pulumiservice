@@ -1,0 +1,328 @@
+{
+  "version": 1,
+  "package": "pulumiservice",
+  "resources": {
+    "pulumiservice:v2:Account": {
+      "operations": {
+        "create": "CreateAccount",
+        "delete": "DeleteAccount",
+        "read": "ReadAccount",
+        "update": "UpdateAccount"
+      }
+    },
+    "pulumiservice:v2:AuditLogExportConfiguration": {
+      "operations": {
+        "create": "UpdateAuditLogExportConfiguration",
+        "delete": "DeleteAuditLogExportConfiguration",
+        "read": "GetAuditLogExportConfiguration",
+        "update": "UpdateAuditLogExportConfiguration"
+      }
+    },
+    "pulumiservice:v2:AuthPolicy": {
+      "operations": {
+        "create": "UpdateAuthPolicy",
+        "read": "GetAuthPolicy",
+        "update": "UpdateAuthPolicy"
+      }
+    },
+    "pulumiservice:v2:AzureDevOpsIntegration": {
+      "operations": {
+        "create": "UpdateAzureDevOpsIntegration",
+        "delete": "DeleteAzureDevOpsIntegration",
+        "read": "GetAzureDevOpsIntegration",
+        "update": "UpdateAzureDevOpsIntegration"
+      }
+    },
+    "pulumiservice:v2:BitBucketIntegration": {
+      "operations": {
+        "create": "UpdateBitBucketIntegration",
+        "delete": "DeleteBitBucketIntegration",
+        "read": "GetBitBucketIntegration",
+        "update": "UpdateBitBucketIntegration"
+      }
+    },
+    "pulumiservice:v2:DefaultOrganization": {
+      "operations": {
+        "create": "UpdateDefaultOrganization",
+        "read": "GetDefaultOrganization",
+        "update": "UpdateDefaultOrganization"
+      }
+    },
+    "pulumiservice:v2:DeploymentSettings": {
+      "operations": {
+        "create": "PatchDeploymentSettings",
+        "delete": "DeleteDeploymentSettings",
+        "read": "GetDeploymentSettings",
+        "update": "PatchDeploymentSettings"
+      }
+    },
+    "pulumiservice:v2:EnvironmentDraft": {
+      "operations": {
+        "create": "CreateEnvironmentDraft",
+        "read": "ReadEnvironmentDraft",
+        "update": "UpdateEnvironmentDraft"
+      }
+    },
+    "pulumiservice:v2:EnvironmentDraft_preview": {
+      "operations": {
+        "create": "CreateEnvironmentDraft_preview",
+        "read": "ReadEnvironmentDraft_preview",
+        "update": "UpdateEnvironmentDraft_preview"
+      }
+    },
+    "pulumiservice:v2:EnvironmentSchedule": {
+      "operations": {
+        "create": "CreateEnvironmentSchedule",
+        "delete": "DeleteEnvironmentSchedule",
+        "read": "ReadEnvironmentSchedule",
+        "update": "UpdateEnvironmentSchedule"
+      }
+    },
+    "pulumiservice:v2:EnvironmentSettings": {
+      "operations": {
+        "create": "PatchEnvironmentSettings",
+        "read": "GetEnvironmentSettings",
+        "update": "PatchEnvironmentSettings"
+      }
+    },
+    "pulumiservice:v2:EnvironmentTag_esc_environments": {
+      "operations": {
+        "create": "CreateEnvironmentTag_esc_environments",
+        "delete": "DeleteEnvironmentTag_esc_environments",
+        "read": "GetEnvironmentTag_esc_environments",
+        "update": "UpdateEnvironmentTag_esc_environments"
+      }
+    },
+    "pulumiservice:v2:EnvironmentTag_preview_environments": {
+      "operations": {
+        "create": "CreateEnvironmentTag_preview_environments",
+        "delete": "DeleteEnvironmentTag_preview_environments",
+        "read": "GetEnvironmentTag_preview_environments",
+        "update": "UpdateEnvironmentTag_preview_environments"
+      }
+    },
+    "pulumiservice:v2:Environment_esc_environments": {
+      "operations": {
+        "create": "CreateEnvironment_esc_environments",
+        "delete": "DeleteEnvironment_esc_environments",
+        "read": "ReadEnvironment_esc_environments",
+        "update": "UpdateEnvironment_esc_environments"
+      }
+    },
+    "pulumiservice:v2:Environment_preview_environments": {
+      "operations": {
+        "create": "CreateEnvironment_preview_environments",
+        "delete": "DeleteEnvironment_preview_environments",
+        "read": "ReadEnvironment_preview_environments",
+        "update": "UpdateEnvironment_preview_environments"
+      }
+    },
+    "pulumiservice:v2:Gate": {
+      "operations": {
+        "create": "CreateGate",
+        "delete": "DeleteGate",
+        "read": "ReadGate",
+        "update": "UpdateGate"
+      }
+    },
+    "pulumiservice:v2:GitHubEnterpriseIntegration": {
+      "operations": {
+        "create": "UpdateGitHubEnterpriseIntegration",
+        "delete": "DeleteGitHubEnterpriseIntegration",
+        "read": "GetGitHubEnterpriseIntegration",
+        "update": "UpdateGitHubEnterpriseIntegration"
+      }
+    },
+    "pulumiservice:v2:GitHubIntegration": {
+      "operations": {
+        "create": "UpdateGitHubIntegration",
+        "delete": "DeleteGitHubIntegration",
+        "read": "GetGitHubIntegration",
+        "update": "UpdateGitHubIntegration"
+      }
+    },
+    "pulumiservice:v2:GitLabIntegration": {
+      "operations": {
+        "create": "UpdateGitLabIntegration",
+        "delete": "DeleteGitLabIntegration",
+        "read": "GetGitLabIntegration",
+        "update": "UpdateGitLabIntegration"
+      }
+    },
+    "pulumiservice:v2:OidcIssuer": {
+      "operations": {
+        "create": "UpdateOidcIssuer",
+        "delete": "DeleteOidcIssuer",
+        "read": "GetOidcIssuer",
+        "update": "UpdateOidcIssuer"
+      }
+    },
+    "pulumiservice:v2:OpenEnvironmentRequest": {
+      "operations": {
+        "create": "CreateOpenEnvironmentRequest",
+        "read": "ReadOpenEnvironmentRequest",
+        "update": "UpdateOpenEnvironmentRequest"
+      }
+    },
+    "pulumiservice:v2:OrganizationWebhook": {
+      "operations": {
+        "create": "CreateOrganizationWebhook",
+        "delete": "DeleteOrganizationWebhook",
+        "read": "GetOrganizationWebhook",
+        "update": "UpdateOrganizationWebhook"
+      },
+      "fields": {
+        "orgName": {
+          "forceNew": true
+        },
+        "hookName": {
+          "forceNew": true
+        },
+        "name": {
+          "forceNew": true
+        },
+        "organizationName": {
+          "forceNew": true
+        },
+        "secret": {
+          "secret": true
+        },
+        "secretCiphertext": {
+          "secret": true
+        }
+      },
+      "outputsExclude": []
+    },
+    "pulumiservice:v2:PolicyGroup": {
+      "operations": {
+        "create": "BatchUpdatePolicyGroup",
+        "delete": "DeletePolicyGroup",
+        "read": "GetPolicyGroup",
+        "update": "BatchUpdatePolicyGroup"
+      }
+    },
+    "pulumiservice:v2:PolicyIssue": {
+      "operations": {
+        "create": "UpdatePolicyIssue",
+        "read": "GetPolicyIssue",
+        "update": "UpdatePolicyIssue"
+      },
+      "outputsExclude": ["policyIssue"]
+    },
+    "pulumiservice:v2:PolicyPack": {
+      "operations": {
+        "create": "CreatePolicyPack",
+        "read": "GetPolicyPack"
+      }
+    },
+    "pulumiservice:v2:RevisionTag_esc_environments": {
+      "operations": {
+        "create": "UpdateRevisionTag_esc_environments",
+        "delete": "DeleteRevisionTag_esc_environments",
+        "read": "ReadRevisionTag_esc_environments",
+        "update": "UpdateRevisionTag_esc_environments"
+      }
+    },
+    "pulumiservice:v2:RevisionTag_preview_environments": {
+      "operations": {
+        "create": "UpdateRevisionTag_preview_environments",
+        "delete": "DeleteRevisionTag_preview_environments",
+        "read": "ReadRevisionTag_preview_environments",
+        "update": "UpdateRevisionTag_preview_environments"
+      }
+    },
+    "pulumiservice:v2:Role": {
+      "operations": {
+        "create": "CreateRole",
+        "delete": "DeleteRole",
+        "read": "GetRole",
+        "update": "UpdateRole"
+      }
+    },
+    "pulumiservice:v2:SAMLOrganization": {
+      "operations": {
+        "create": "UpdateSAMLOrganization",
+        "read": "GetSAMLOrganization",
+        "update": "UpdateSAMLOrganization"
+      }
+    },
+    "pulumiservice:v2:ScheduledDeployment": {
+      "operations": {
+        "create": "CreateScheduledDeployment",
+        "delete": "DeleteScheduledDeployment",
+        "read": "ReadScheduledDeployment",
+        "update": "UpdateScheduledDeployment"
+      }
+    },
+    "pulumiservice:v2:ScheduledScanSettings": {
+      "operations": {
+        "create": "UpdateScheduledScanSettings",
+        "read": "ReadScheduledScanSettings",
+        "update": "UpdateScheduledScanSettings"
+      }
+    },
+    "pulumiservice:v2:Service": {
+      "operations": {
+        "create": "CreateService",
+        "delete": "DeleteService",
+        "read": "GetService",
+        "update": "UpdateService"
+      },
+      "outputsExclude": ["service"]
+    },
+    "pulumiservice:v2:Stack": {
+      "operations": {
+        "create": "CreateStack",
+        "delete": "DeleteStack",
+        "read": "GetStack"
+      }
+    },
+    "pulumiservice:v2:StackConfig": {
+      "operations": {
+        "create": "UpdateStackConfig",
+        "delete": "DeleteStackConfig",
+        "read": "GetStackConfig",
+        "update": "UpdateStackConfig"
+      }
+    },
+    "pulumiservice:v2:StackWebhook": {
+      "operations": {
+        "create": "CreateStackWebhook",
+        "delete": "DeleteStackWebhook",
+        "read": "GetStackWebhook",
+        "update": "UpdateStackWebhook"
+      }
+    },
+    "pulumiservice:v2:Task": {
+      "operations": {
+        "create": "UpdateTask",
+        "read": "GetTask",
+        "update": "UpdateTask"
+      }
+    },
+    "pulumiservice:v2:Team": {
+      "operations": {
+        "create": "UpdateTeam",
+        "delete": "DeleteTeam",
+        "read": "GetTeam",
+        "update": "UpdateTeam"
+      }
+    },
+    "pulumiservice:v2:Webhook_esc_environments": {
+      "operations": {
+        "create": "CreateWebhook_esc_environments",
+        "delete": "DeleteWebhook_esc_environments",
+        "read": "GetWebhook_esc_environments",
+        "update": "UpdateWebhook_esc_environments"
+      }
+    },
+    "pulumiservice:v2:Webhook_preview_environments": {
+      "operations": {
+        "create": "CreateWebhook_preview_environments",
+        "delete": "DeleteWebhook_preview_environments",
+        "read": "GetWebhook_preview_environments",
+        "update": "UpdateWebhook_preview_environments"
+      }
+    }
+  }
+}

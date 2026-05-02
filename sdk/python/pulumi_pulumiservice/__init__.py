@@ -53,8 +53,11 @@ from . import outputs
 if typing.TYPE_CHECKING:
     import pulumi_pulumiservice.config as __config
     config = __config
+    import pulumi_pulumiservice.v2 as __v2
+    v2 = __v2
 else:
     config = _utilities.lazy_import('pulumi_pulumiservice.config')
+    v2 = _utilities.lazy_import('pulumi_pulumiservice.v2')
 
 _utilities.register(
     resource_modules="""
@@ -90,6 +93,52 @@ _utilities.register(
    "pulumiservice:index:TemplateSource": "TemplateSource",
    "pulumiservice:index:TtlSchedule": "TtlSchedule",
    "pulumiservice:index:Webhook": "Webhook"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "v2",
+  "fqn": "pulumi_pulumiservice.v2",
+  "classes": {
+   "pulumiservice:v2:Account": "Account",
+   "pulumiservice:v2:AuditLogExportConfiguration": "AuditLogExportConfiguration",
+   "pulumiservice:v2:AuthPolicy": "AuthPolicy",
+   "pulumiservice:v2:AzureDevOpsIntegration": "AzureDevOpsIntegration",
+   "pulumiservice:v2:BitBucketIntegration": "BitBucketIntegration",
+   "pulumiservice:v2:DefaultOrganization": "DefaultOrganization",
+   "pulumiservice:v2:DeploymentSettings": "DeploymentSettings",
+   "pulumiservice:v2:EnvironmentDraft": "EnvironmentDraft",
+   "pulumiservice:v2:EnvironmentDraft_preview": "EnvironmentDraft_preview",
+   "pulumiservice:v2:EnvironmentSchedule": "EnvironmentSchedule",
+   "pulumiservice:v2:EnvironmentSettings": "EnvironmentSettings",
+   "pulumiservice:v2:EnvironmentTag_esc_environments": "EnvironmentTag_esc_environments",
+   "pulumiservice:v2:EnvironmentTag_preview_environments": "EnvironmentTag_preview_environments",
+   "pulumiservice:v2:Environment_esc_environments": "Environment_esc_environments",
+   "pulumiservice:v2:Environment_preview_environments": "Environment_preview_environments",
+   "pulumiservice:v2:Gate": "Gate",
+   "pulumiservice:v2:GitHubEnterpriseIntegration": "GitHubEnterpriseIntegration",
+   "pulumiservice:v2:GitHubIntegration": "GitHubIntegration",
+   "pulumiservice:v2:GitLabIntegration": "GitLabIntegration",
+   "pulumiservice:v2:OidcIssuer": "OidcIssuer",
+   "pulumiservice:v2:OpenEnvironmentRequest": "OpenEnvironmentRequest",
+   "pulumiservice:v2:OrganizationWebhook": "OrganizationWebhook",
+   "pulumiservice:v2:PolicyGroup": "PolicyGroup",
+   "pulumiservice:v2:PolicyIssue": "PolicyIssue",
+   "pulumiservice:v2:PolicyPack": "PolicyPack",
+   "pulumiservice:v2:RevisionTag_esc_environments": "RevisionTag_esc_environments",
+   "pulumiservice:v2:RevisionTag_preview_environments": "RevisionTag_preview_environments",
+   "pulumiservice:v2:Role": "Role",
+   "pulumiservice:v2:SAMLOrganization": "SAMLOrganization",
+   "pulumiservice:v2:ScheduledDeployment": "ScheduledDeployment",
+   "pulumiservice:v2:ScheduledScanSettings": "ScheduledScanSettings",
+   "pulumiservice:v2:Service": "Service",
+   "pulumiservice:v2:Stack": "Stack",
+   "pulumiservice:v2:StackConfig": "StackConfig",
+   "pulumiservice:v2:StackWebhook": "StackWebhook",
+   "pulumiservice:v2:Task": "Task",
+   "pulumiservice:v2:Team": "Team",
+   "pulumiservice:v2:Webhook_esc_environments": "Webhook_esc_environments",
+   "pulumiservice:v2:Webhook_preview_environments": "Webhook_preview_environments"
   }
  }
 ]
