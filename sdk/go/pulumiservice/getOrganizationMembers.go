@@ -11,7 +11,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-// Lists all members of a Pulumi Cloud organization, including their role assignments.
+// Lists all members of a Pulumi Cloud organization, including their role assignments. Merges Pulumi Cloud's identity-provider roster (paginated; includes users who haven't signed in to Pulumi yet) with the seat-count roster, deduped by username, so SAML- and non-SAML-provisioned members both appear regardless of which roster they're tracked in.
 func GetOrganizationMembers(ctx *pulumi.Context, args *GetOrganizationMembersArgs, opts ...pulumi.InvokeOption) (*GetOrganizationMembersResult, error) {
 	opts = internal.PkgInvokeDefaultOpts(opts)
 	var rv GetOrganizationMembersResult

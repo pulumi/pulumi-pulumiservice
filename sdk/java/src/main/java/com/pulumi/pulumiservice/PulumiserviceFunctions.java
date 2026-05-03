@@ -343,35 +343,35 @@ public final class PulumiserviceFunctions {
         return Deployment.getInstance().invokeAsync("pulumiservice:index:getOrganizationMember", TypeShape.of(GetOrganizationMemberResult.class), args, Utilities.withVersion(options));
     }
     /**
-     * Lists all members of a Pulumi Cloud organization, including their role assignments.
+     * Lists all members of a Pulumi Cloud organization, including their role assignments. Merges Pulumi Cloud&#39;s identity-provider roster (paginated; includes users who haven&#39;t signed in to Pulumi yet) with the seat-count roster, deduped by username, so SAML- and non-SAML-provisioned members both appear regardless of which roster they&#39;re tracked in.
      * 
      */
     public static Output<GetOrganizationMembersResult> getOrganizationMembers(GetOrganizationMembersArgs args) {
         return getOrganizationMembers(args, InvokeOptions.Empty);
     }
     /**
-     * Lists all members of a Pulumi Cloud organization, including their role assignments.
+     * Lists all members of a Pulumi Cloud organization, including their role assignments. Merges Pulumi Cloud&#39;s identity-provider roster (paginated; includes users who haven&#39;t signed in to Pulumi yet) with the seat-count roster, deduped by username, so SAML- and non-SAML-provisioned members both appear regardless of which roster they&#39;re tracked in.
      * 
      */
     public static CompletableFuture<GetOrganizationMembersResult> getOrganizationMembersPlain(GetOrganizationMembersPlainArgs args) {
         return getOrganizationMembersPlain(args, InvokeOptions.Empty);
     }
     /**
-     * Lists all members of a Pulumi Cloud organization, including their role assignments.
+     * Lists all members of a Pulumi Cloud organization, including their role assignments. Merges Pulumi Cloud&#39;s identity-provider roster (paginated; includes users who haven&#39;t signed in to Pulumi yet) with the seat-count roster, deduped by username, so SAML- and non-SAML-provisioned members both appear regardless of which roster they&#39;re tracked in.
      * 
      */
     public static Output<GetOrganizationMembersResult> getOrganizationMembers(GetOrganizationMembersArgs args, InvokeOptions options) {
         return Deployment.getInstance().invoke("pulumiservice:index:getOrganizationMembers", TypeShape.of(GetOrganizationMembersResult.class), args, Utilities.withVersion(options));
     }
     /**
-     * Lists all members of a Pulumi Cloud organization, including their role assignments.
+     * Lists all members of a Pulumi Cloud organization, including their role assignments. Merges Pulumi Cloud&#39;s identity-provider roster (paginated; includes users who haven&#39;t signed in to Pulumi yet) with the seat-count roster, deduped by username, so SAML- and non-SAML-provisioned members both appear regardless of which roster they&#39;re tracked in.
      * 
      */
     public static Output<GetOrganizationMembersResult> getOrganizationMembers(GetOrganizationMembersArgs args, InvokeOutputOptions options) {
         return Deployment.getInstance().invoke("pulumiservice:index:getOrganizationMembers", TypeShape.of(GetOrganizationMembersResult.class), args, Utilities.withVersion(options));
     }
     /**
-     * Lists all members of a Pulumi Cloud organization, including their role assignments.
+     * Lists all members of a Pulumi Cloud organization, including their role assignments. Merges Pulumi Cloud&#39;s identity-provider roster (paginated; includes users who haven&#39;t signed in to Pulumi yet) with the seat-count roster, deduped by username, so SAML- and non-SAML-provisioned members both appear regardless of which roster they&#39;re tracked in.
      * 
      */
     public static CompletableFuture<GetOrganizationMembersResult> getOrganizationMembersPlain(GetOrganizationMembersPlainArgs args, InvokeOptions options) {
