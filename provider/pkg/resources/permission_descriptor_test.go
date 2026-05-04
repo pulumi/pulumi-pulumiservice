@@ -710,4 +710,3 @@ func mustJSON(t *testing.T, v interface{}) string {
 	require.NoError(t, err)
 	return strings.ReplaceAll(string(b), " ", "")
 }
-

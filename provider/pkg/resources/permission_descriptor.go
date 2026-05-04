@@ -178,4 +178,3 @@ func assertNoUnderscoreType(v interface{}) error {
 	}
 	return nil
 }
-
