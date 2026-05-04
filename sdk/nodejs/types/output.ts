@@ -271,6 +271,10 @@ export interface DeploymentSettingsVcs {
      */
     deployPullRequest?: number;
     /**
+     * The VCS integration installation ID. Use to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps). If omitted, the API resolves the integration automatically from `provider` and `repository`.
+     */
+    installationId?: string;
+    /**
      * The paths within the repo that deployments should be filtered to.
      */
     paths?: string[];
