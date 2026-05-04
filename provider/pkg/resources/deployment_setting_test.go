@@ -127,6 +127,7 @@ func TestDeploymentSettingsVcsRoundtrip(t *testing.T) {
 			VCS: &pulumiapi.VCSConfiguration{
 				Provider:            "azure-devops",
 				Repository:          "my-org/my-repo",
+				InstallationID:      "129444790",
 				DeployCommits:       true,
 				PreviewPullRequests: true,
 				PullRequestTemplate: false,

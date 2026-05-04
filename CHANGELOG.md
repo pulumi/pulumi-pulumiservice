@@ -6,6 +6,7 @@
 - Removed the numeric `version` field from `PolicyGroup.policyPacks` inputs; it is now output-only, since the value is server-derived from `versionTag`. Use `versionTag` to pin pack versions. [#737](https://github.com/pulumi/pulumi-pulumiservice/issues/737)
 
 ### Improvements
+- Added `installationId` to `DeploymentSettings.vcs` to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps installed against different sets of repos). When omitted, the API resolves the integration automatically from `provider` and `repository` as before.
 - Added `StackTags` resource for managing multiple stack tags as a single resource, with a `tags` map input. [#61](https://github.com/pulumi/pulumi-pulumiservice/issues/61)
 - Added `TwelveHours` (12h) scan schedule option for `InsightsAccount` resources. [#731](https://github.com/pulumi/pulumi-pulumiservice/pull/731)
 - Documented the `all` enforcement-level wildcard on `PolicyGroupPolicyPackReference.config`, enabling a single entry to set the enforcement level for every policy in a pack with optional per-policy overrides. [#756](https://github.com/pulumi/pulumi-pulumiservice/pull/756)
