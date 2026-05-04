@@ -179,6 +179,7 @@ func TestNodejsInsightsAccountInvokesExample(t *testing.T) {
 	)
 	test.SetConfig(t, "digits", digits)
 	test.SetConfig(t, "organizationName", getOrgName())
+	test.SetConfig(t, "roleArn", getInsightsRoleArn(t))
 	upResult := runPulumiTest(t, test)
 
 	// Verify the resource outputs

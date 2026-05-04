@@ -45,6 +45,29 @@ func getOrgName() string {
 	return "service-provider-test-org"
 }
 
+// getInsightsRoleArn returns the AWS IAM role ARN that the Insights example
+// tests embed in their generated ESC environments. The role's trust policy
+// must allow `sts:AssumeRoleWithWebIdentity` from Pulumi Cloud's OIDC issuer
+// for the test org; see infra/test-aws-oidc/ for the program that
+// provisions it. Locally, the value to set is the `roleArn` output of that
+// stack:
+//
+//	pulumi -C infra/test-aws-oidc stack -s ci output roleArn
+//
+// Fails the test if PULUMI_TEST_AWS_INSIGHTS_ROLE_ARN is unset rather than
+// falling back to a placeholder, since after pulumi-service#41970 the
+// Insights API rejects environments without working provider credentials at
+// account-create time.
+func getInsightsRoleArn(t *testing.T) string {
+	t.Helper()
+	arn := os.Getenv("PULUMI_TEST_AWS_INSIGHTS_ROLE_ARN")
+	if arn == "" {
+		t.Fatal("PULUMI_TEST_AWS_INSIGHTS_ROLE_ARN is required for Insights example tests; " +
+			"set it to the `roleArn` output of the infra/test-aws-oidc stack")
+	}
+	return arn
+}
+
 // snapshotFixtureOrgMember reads the user's current role from the org and
 // returns a closure that restores it. Pass the closure to t.Cleanup so the
 // shared test org returns to its pre-test state regardless of how the test
