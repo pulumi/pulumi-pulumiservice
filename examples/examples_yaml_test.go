@@ -610,7 +610,7 @@ func TestYamlRbacExample(t *testing.T) {
 //     stack.
 //  5. Assert: import succeeded (return code 0; previously failed with
 //     "unknown __type PermissionDescriptorCompose"); generated program
-//     carries `kind: PermissionDescriptorCompose` and the policy id; no
+//     carries `discriminator: PermissionDescriptorCompose` and the policy id; no
 //     `__type` leakage anywhere.
 //
 // Cleanup, in registration order (LIFO):
@@ -713,8 +713,8 @@ func TestYamlRbacComposeImport(t *testing.T) {
 
 	assert.Contains(t, imported, "PermissionDescriptorCompose",
 		"imported program must carry the Compose discriminator value through the rename")
-	assert.Contains(t, imported, "kind:",
-		"imported program must use the SDK-shape `kind` discriminator key")
+	assert.Contains(t, imported, "discriminator:",
+		"imported program must use the SDK-shape `discriminator` key")
 	assert.Contains(t, imported, policy.ID,
 		"imported program must reference the policy id inside permissionDescriptors")
 	assert.NotContains(t, imported, "__type",
