@@ -25,6 +25,10 @@ namespace Pulumi.PulumiService.Outputs
         /// </summary>
         public readonly int? DeployPullRequest;
         /// <summary>
+        /// The VCS integration installation ID. Use to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps). If omitted, the API resolves the integration automatically from `provider` and `repository`.
+        /// </summary>
+        public readonly string? InstallationId;
+        /// <summary>
         /// The paths within the repo that deployments should be filtered to.
         /// </summary>
         public readonly ImmutableArray<string> Paths;
@@ -51,6 +55,8 @@ namespace Pulumi.PulumiService.Outputs
 
             int? deployPullRequest,
 
+            string? installationId,
+
             ImmutableArray<string> paths,
 
             bool? previewPullRequests,
@@ -63,6 +69,7 @@ namespace Pulumi.PulumiService.Outputs
         {
             DeployCommits = deployCommits;
             DeployPullRequest = deployPullRequest;
+            InstallationId = installationId;
             Paths = paths;
             PreviewPullRequests = previewPullRequests;
             Provider = provider;

@@ -871,6 +871,8 @@ class DeploymentSettingsVcs(dict):
             suggest = "deploy_commits"
         elif key == "deployPullRequest":
             suggest = "deploy_pull_request"
+        elif key == "installationId":
+            suggest = "installation_id"
         elif key == "previewPullRequests":
             suggest = "preview_pull_requests"
         elif key == "pullRequestTemplate":
@@ -891,6 +893,7 @@ class DeploymentSettingsVcs(dict):
                  provider: _builtins.str,
                  deploy_commits: Optional[_builtins.bool] = None,
                  deploy_pull_request: Optional[_builtins.int] = None,
+                 installation_id: Optional[_builtins.str] = None,
                  paths: Optional[Sequence[_builtins.str]] = None,
                  preview_pull_requests: Optional[_builtins.bool] = None,
                  pull_request_template: Optional[_builtins.bool] = None,
@@ -900,6 +903,7 @@ class DeploymentSettingsVcs(dict):
         :param _builtins.str provider: The VCS provider type.
         :param _builtins.bool deploy_commits: Trigger a deployment running `pulumi up` on commit.
         :param _builtins.int deploy_pull_request: Deploy a specific pull request number.
+        :param _builtins.str installation_id: The VCS integration installation ID. Use to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps). If omitted, the API resolves the integration automatically from `provider` and `repository`.
         :param Sequence[_builtins.str] paths: The paths within the repo that deployments should be filtered to.
         :param _builtins.bool preview_pull_requests: Trigger a deployment running `pulumi preview` when a PR is opened.
         :param _builtins.bool pull_request_template: Use this stack as a template for pull request review stacks.
@@ -912,6 +916,8 @@ class DeploymentSettingsVcs(dict):
             pulumi.set(__self__, "deploy_commits", deploy_commits)
         if deploy_pull_request is not None:
             pulumi.set(__self__, "deploy_pull_request", deploy_pull_request)
+        if installation_id is not None:
+            pulumi.set(__self__, "installation_id", installation_id)
         if paths is not None:
             pulumi.set(__self__, "paths", paths)
         if preview_pull_requests is None:
@@ -948,6 +954,14 @@ class DeploymentSettingsVcs(dict):
         Deploy a specific pull request number.
         """
         return pulumi.get(self, "deploy_pull_request")
+
+    @_builtins.property
+    @pulumi.getter(name="installationId")
+    def installation_id(self) -> Optional[_builtins.str]:
+        """
+        The VCS integration installation ID. Use to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps). If omitted, the API resolves the integration automatically from `provider` and `repository`.
+        """
+        return pulumi.get(self, "installation_id")
 
     @_builtins.property
     @pulumi.getter

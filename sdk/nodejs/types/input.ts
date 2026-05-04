@@ -271,6 +271,10 @@ export interface DeploymentSettingsVcsArgs {
      */
     deployPullRequest?: pulumi.Input<number>;
     /**
+     * The VCS integration installation ID. Use to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps). If omitted, the API resolves the integration automatically from `provider` and `repository`.
+     */
+    installationId?: pulumi.Input<string>;
+    /**
      * The paths within the repo that deployments should be filtered to.
      */
     paths?: pulumi.Input<pulumi.Input<string>[]>;
