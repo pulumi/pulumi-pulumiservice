@@ -21,18 +21,20 @@ import (
 	"github.com/pulumi/pulumi-go-provider/infer"
 )
 
-// scopedAllowWire builds an `OrganizationRole.permissions` descriptor that
-// grants `permissions` only when the request's entity expression equals the
-// supplied identity. Returns the wire-format Condition shape verbatim — the
-// SDK boundary uses the same PascalCase `kind` values as Pulumi Cloud's REST
-// API. No provider-side translation is needed; OrganizationRole's
-// Create/Update wraps top-level Conditions in a single-entry Group only as a
-// Cloud UI workaround, and Read collapses the wrap so refresh stays
-// idempotent against the helper output.
+// scopedAllowDescriptor builds an `OrganizationRole.permissions` descriptor
+// that grants `permissions` only when the request's entity expression
+// equals the supplied identity. The result is shaped to match the
+// provider's translation contract: `discriminator` at the top (the SDK
+// boundary the provider renames to `__type` for the wire) and `__type`
+// at every nested level (the wire format Pulumi Cloud expects, passed
+// through verbatim). The provider's `permissions` schema is `map[string]Any`
+// so anything below the top is opaque — this helper provides the
+// nested wire format because there is no provider machinery to do it
+// for us.
 //
-// The (expressionKind, literalKind) pair is the per-entity-type
-// PermissionExpression / PermissionLiteralExpression vocabulary from the
-// Pulumi Cloud RBAC API:
+// The (expressionDiscriminator, literalDiscriminator) pair is the per-
+// entity-type PermissionExpression / PermissionLiteralExpression
+// vocabulary from the Pulumi Cloud RBAC API:
 //
 //	environment      → PermissionExpressionEnvironment      / PermissionLiteralExpressionEnvironment
 //	stack            → PermissionExpressionStack            / PermissionLiteralExpressionStack
@@ -44,20 +46,25 @@ import (
 // PermissionExpressionTeam for advanced cases (e.g. roles imported from
 // the Pulumi Cloud UI that mix team identity into a complex Compose),
 // but the SDK does not advertise that as a recommended pattern.
-func scopedAllowWire(expressionKind, literalKind, identity string, permissions []string) map[string]interface{} {
+func scopedAllowDescriptor(
+	expressionDiscriminator, literalDiscriminator, identity string, permissions []string,
+) map[string]interface{} {
 	grants := make([]interface{}, len(permissions))
 	for i, p := range permissions {
 		grants[i] = p
 	}
 	return map[string]interface{}{
-		"kind": "PermissionDescriptorCondition",
+		// SDK boundary at the top — provider promotes this to __type.
+		"discriminator": "PermissionDescriptorCondition",
+		// Below the top: wire format, opaque to the provider, forwarded
+		// verbatim to Pulumi Cloud.
 		"condition": map[string]interface{}{
-			"kind":  "PermissionExpressionEqual",
-			"left":  map[string]interface{}{"kind": expressionKind},
-			"right": map[string]interface{}{"kind": literalKind, "identity": identity},
+			"__type": "PermissionExpressionEqual",
+			"left":   map[string]interface{}{"__type": expressionDiscriminator},
+			"right":  map[string]interface{}{"__type": literalDiscriminator, "identity": identity},
 		},
 		"subNode": map[string]interface{}{
-			"kind":        "PermissionDescriptorAllow",
+			"__type":      "PermissionDescriptorAllow",
 			"permissions": grants,
 		},
 	}
@@ -132,7 +139,7 @@ func (BuildEnvironmentScopedPermissionsFunction) Invoke(
 	}
 	return infer.FunctionResponse[BuildEnvironmentScopedPermissionsOutput]{
 		Output: BuildEnvironmentScopedPermissionsOutput{
-			Permissions: scopedAllowWire(
+			Permissions: scopedAllowDescriptor(
 				"PermissionExpressionEnvironment",
 				"PermissionLiteralExpressionEnvironment",
 				req.Input.EnvironmentID,
@@ -202,7 +209,7 @@ func (BuildStackScopedPermissionsFunction) Invoke(
 	}
 	return infer.FunctionResponse[BuildStackScopedPermissionsOutput]{
 		Output: BuildStackScopedPermissionsOutput{
-			Permissions: scopedAllowWire(
+			Permissions: scopedAllowDescriptor(
 				"PermissionExpressionStack",
 				"PermissionLiteralExpressionStack",
 				req.Input.StackID,
@@ -272,7 +279,7 @@ func (BuildInsightsAccountScopedPermissionsFunction) Invoke(
 	}
 	return infer.FunctionResponse[BuildInsightsAccountScopedPermissionsOutput]{
 		Output: BuildInsightsAccountScopedPermissionsOutput{
-			Permissions: scopedAllowWire(
+			Permissions: scopedAllowDescriptor(
 				"PermissionExpressionInsightsAccount",
 				"PermissionLiteralExpressionInsightsAccount",
 				req.Input.InsightsAccountID,

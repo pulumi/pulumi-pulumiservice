@@ -8,9 +8,11 @@ const nameSuffix = config.get("nameSuffix") ?? "manual";
 
 // A custom organization-level role that grants stack read access. The
 // simplest descriptor: a flat `PermissionDescriptorAllow`. The SDK uses
-// the same PascalCase `kind` values as Pulumi Cloud's REST API (`__type`
-// in the wire format is renamed to `kind` to dodge Python's underscore-
-// prefix stripping).
+// the same PascalCase descriptor values as Pulumi Cloud's REST API; the
+// wire format's `__type` field is exposed as `discriminator` at the SDK
+// boundary so the field doesn't collide with future Cloud models that
+// may carry a domain `kind` field, and so the `__`-prefix doesn't get
+// stripped by Python's input-key sanitiser.
 const readOnlyRole = new service.OrganizationRole("readOnlyRole", {
     organizationName,
     name: `ts-rbac-read-only-${nameSuffix}`,
@@ -71,10 +73,10 @@ const scopedEnv = new service.Environment("scopedEnv", {
 // "global"); the permission tree is gated on the environment's UUID.
 //
 // `buildEnvironmentScopedPermissions` returns a
-// `PermissionDescriptorCondition(Equal(...), Allow)` tree — the same wire
-// shape Pulumi Cloud's REST API uses, modulo the `__type` → `kind` rename.
-// The provider has no SDK-side translation; it sends the descriptor on
-// the wire verbatim.
+// `PermissionDescriptorCondition(Equal(...), Allow)` tree shaped to match
+// the provider's contract: `discriminator` at the top (the SDK boundary
+// the provider promotes to the wire's `__type`) and `__type` at every
+// nested level (forwarded verbatim to Pulumi Cloud).
 const scopedReadOnlyRole = new service.OrganizationRole("scopedReadOnlyRole", {
     organizationName,
     name: `ts-rbac-scoped-read-only-${nameSuffix}`,

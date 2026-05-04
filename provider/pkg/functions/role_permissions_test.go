@@ -26,38 +26,47 @@ import (
 
 // assertScopedConditionShape verifies a helper's output is the
 // `PermissionDescriptorCondition(Equal(Expression<E>, Literal<E>(id)),
-// Allow(perms))` wire shape — the same shape Pulumi Cloud's REST API uses,
-// modulo the `__type` → `kind` rename.
+// Allow(perms))` shape. The provider treats `permissions` as
+// `map[string]Any` and only renames the top-level discriminator, so the
+// helper must emit:
+//
+//   - `discriminator` at the top (the SDK boundary the provider promotes
+//     to the wire's `__type`).
+//   - `__type` at every nested level (passed through verbatim to Pulumi
+//     Cloud, which expects `__type` everywhere on the wire).
 func assertScopedConditionShape(
 	t *testing.T,
 	got map[string]interface{},
-	expectedExpressionKind string,
-	expectedLiteralKind string,
+	expectedExpressionDiscriminator string,
+	expectedLiteralDiscriminator string,
 	expectedIdentity string,
 	expectedPermissions []string,
 ) {
 	t.Helper()
 
-	assert.Equal(t, "PermissionDescriptorCondition", got["kind"],
-		"top-level kind must be PermissionDescriptorCondition")
+	assert.Equal(t, "PermissionDescriptorCondition", got["discriminator"],
+		"top-level discriminator must be PermissionDescriptorCondition")
+	_, hasUnderscoreAtTop := got["__type"]
+	assert.False(t, hasUnderscoreAtTop,
+		"top must use `discriminator`, not the wire-format `__type`")
 
 	cond, ok := got["condition"].(map[string]interface{})
 	require.True(t, ok, "condition must be a map; got %T", got["condition"])
-	assert.Equal(t, "PermissionExpressionEqual", cond["kind"],
-		"condition kind must be PermissionExpressionEqual")
+	assert.Equal(t, "PermissionExpressionEqual", cond["__type"],
+		"nested `condition` uses the wire-format `__type` discriminator")
 
 	left, ok := cond["left"].(map[string]interface{})
 	require.True(t, ok, "condition.left must be a map; got %T", cond["left"])
-	assert.Equal(t, expectedExpressionKind, left["kind"])
+	assert.Equal(t, expectedExpressionDiscriminator, left["__type"])
 
 	right, ok := cond["right"].(map[string]interface{})
 	require.True(t, ok, "condition.right must be a map; got %T", cond["right"])
-	assert.Equal(t, expectedLiteralKind, right["kind"])
+	assert.Equal(t, expectedLiteralDiscriminator, right["__type"])
 	assert.Equal(t, expectedIdentity, right["identity"])
 
 	sub, ok := got["subNode"].(map[string]interface{})
 	require.True(t, ok, "subNode must be a map; got %T", got["subNode"])
-	assert.Equal(t, "PermissionDescriptorAllow", sub["kind"])
+	assert.Equal(t, "PermissionDescriptorAllow", sub["__type"])
 
 	rawPerms, ok := sub["permissions"].([]interface{})
 	require.True(t, ok, "subNode.permissions must be a list; got %T", sub["permissions"])
@@ -66,27 +75,6 @@ func assertScopedConditionShape(
 		gotPerms[i], _ = p.(string)
 	}
 	assert.Equal(t, expectedPermissions, gotPerms)
-}
-
-// Each helper's output must be free of the wire-format `__type` discriminator
-// — the SDK boundary uses `kind` only. Pulumi's Python SDK silently strips
-// `__`-prefixed keys, so emitting `__type` would mean the field disappears at
-// the language boundary and the role gets created with a malformed body.
-// Recursive check, since the helpers emit nested expressions.
-func assertNoUnderscoreType(t *testing.T, v interface{}) {
-	t.Helper()
-	switch x := v.(type) {
-	case map[string]interface{}:
-		_, has := x["__type"]
-		assert.False(t, has, "helper output must not contain `__type`; the SDK boundary uses `kind`")
-		for _, val := range x {
-			assertNoUnderscoreType(t, val)
-		}
-	case []interface{}:
-		for _, item := range x {
-			assertNoUnderscoreType(t, item)
-		}
-	}
 }
 
 func TestBuildEnvironmentScopedPermissions(t *testing.T) {
@@ -111,7 +99,6 @@ func TestBuildEnvironmentScopedPermissions(t *testing.T) {
 			"env-uuid-1",
 			[]string{"environment:read", "environment:open"},
 		)
-		assertNoUnderscoreType(t, resp.Output.Permissions)
 	})
 
 	t.Run("rejects empty environmentId", func(t *testing.T) {
@@ -163,7 +150,6 @@ func TestBuildStackScopedPermissions(t *testing.T) {
 			"stack-id-1",
 			[]string{"stack:read"},
 		)
-		assertNoUnderscoreType(t, resp.Output.Permissions)
 	})
 
 	t.Run("rejects empty stackId", func(t *testing.T) {
@@ -215,7 +201,6 @@ func TestBuildInsightsAccountScopedPermissions(t *testing.T) {
 			"acct-1",
 			[]string{"insights-account:read"},
 		)
-		assertNoUnderscoreType(t, resp.Output.Permissions)
 	})
 
 	t.Run("rejects empty insightsAccountId", func(t *testing.T) {

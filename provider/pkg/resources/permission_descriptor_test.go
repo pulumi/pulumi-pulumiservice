@@ -15,8 +15,6 @@
 package resources
 
 import (
-	"encoding/json"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -60,12 +58,12 @@ func flatGroupKind() map[string]interface{} {
 		"discriminator": "PermissionDescriptorGroup",
 		"entries": []interface{}{
 			map[string]interface{}{
-				"discriminator": "PermissionDescriptorAllow",
-				"permissions":   []interface{}{"stack:read"},
+				"__type":      "PermissionDescriptorAllow",
+				"permissions": []interface{}{"stack:read"},
 			},
 			map[string]interface{}{
-				"discriminator": "PermissionDescriptorAllow",
-				"permissions":   []interface{}{"stack:edit"},
+				"__type":      "PermissionDescriptorAllow",
+				"permissions": []interface{}{"stack:edit"},
 			},
 		},
 	}
@@ -94,18 +92,18 @@ func scopedConditionKind() map[string]interface{} {
 	return map[string]interface{}{
 		"discriminator": "PermissionDescriptorCondition",
 		"condition": map[string]interface{}{
-			"discriminator": "PermissionExpressionEqual",
+			"__type": "PermissionExpressionEqual",
 			"left": map[string]interface{}{
-				"discriminator": "PermissionExpressionEnvironment",
+				"__type": "PermissionExpressionEnvironment",
 			},
 			"right": map[string]interface{}{
-				"discriminator": "PermissionLiteralExpressionEnvironment",
-				"identity":      "env-uuid-1",
+				"__type":   "PermissionLiteralExpressionEnvironment",
+				"identity": "env-uuid-1",
 			},
 		},
 		"subNode": map[string]interface{}{
-			"discriminator": "PermissionDescriptorAllow",
-			"permissions":   []interface{}{"environment:read"},
+			"__type":      "PermissionDescriptorAllow",
+			"permissions": []interface{}{"environment:read"},
 		},
 	}
 }
@@ -157,31 +155,31 @@ func andConditionKind() map[string]interface{} {
 	return map[string]interface{}{
 		"discriminator": "PermissionDescriptorCondition",
 		"condition": map[string]interface{}{
-			"discriminator": "PermissionExpressionAnd",
+			"__type": "PermissionExpressionAnd",
 			"left": map[string]interface{}{
-				"discriminator": "PermissionExpressionEqual",
+				"__type": "PermissionExpressionEqual",
 				"left": map[string]interface{}{
-					"discriminator": "PermissionExpressionTeam",
+					"__type": "PermissionExpressionTeam",
 				},
 				"right": map[string]interface{}{
-					"discriminator": "PermissionLiteralExpressionTeam",
-					"identity":      "team-a",
+					"__type":   "PermissionLiteralExpressionTeam",
+					"identity": "team-a",
 				},
 			},
 			"right": map[string]interface{}{
-				"discriminator": "PermissionExpressionEqual",
+				"__type": "PermissionExpressionEqual",
 				"left": map[string]interface{}{
-					"discriminator": "PermissionExpressionTeam",
+					"__type": "PermissionExpressionTeam",
 				},
 				"right": map[string]interface{}{
-					"discriminator": "PermissionLiteralExpressionTeam",
-					"identity":      "team-b",
+					"__type":   "PermissionLiteralExpressionTeam",
+					"identity": "team-b",
 				},
 			},
 		},
 		"subNode": map[string]interface{}{
-			"discriminator": "PermissionDescriptorAllow",
-			"permissions":   []interface{}{"stack:edit"},
+			"__type":      "PermissionDescriptorAllow",
+			"permissions": []interface{}{"stack:edit"},
 		},
 	}
 }
@@ -226,15 +224,15 @@ func ifThenElseKind() map[string]interface{} {
 	return map[string]interface{}{
 		"discriminator": "PermissionDescriptorIfThenElse",
 		"if": map[string]interface{}{
-			"discriminator": "PermissionExpressionTeam",
+			"__type": "PermissionExpressionTeam",
 		},
 		"then": map[string]interface{}{
-			"discriminator": "PermissionDescriptorAllow",
-			"permissions":   []interface{}{"stack:edit"},
+			"__type":      "PermissionDescriptorAllow",
+			"permissions": []interface{}{"stack:edit"},
 		},
 		"else": map[string]interface{}{
-			"discriminator": "PermissionDescriptorAllow",
-			"permissions":   []interface{}{"stack:read"},
+			"__type":      "PermissionDescriptorAllow",
+			"permissions": []interface{}{"stack:read"},
 		},
 	}
 }
@@ -299,72 +297,46 @@ func TestPermissionsToWire_TopLevelValidation(t *testing.T) {
 	})
 }
 
-// permissionsToWire rejects any `__type` key in the input — defensive
-// guard against users pasting raw wire format from the REST API docs. See
-// the function docstring and pulumi/pulumi#22738 for the rationale.
-func TestPermissionsToWire_RejectsUnderscoreType(t *testing.T) {
+// permissionsToWire rejects `__type` only at the top level — it's a
+// defensive guard against users pasting raw wire format from the REST
+// API docs and missing the SDK boundary's `discriminator` rename.
+// Nested `__type` is the wire format itself (helpers emit it; direct
+// authors must use it for nested levels) and passes through unchanged.
+func TestPermissionsToWire_RejectsTopLevelUnderscoreType(t *testing.T) {
 	t.Parallel()
-	cases := []struct {
-		name string
-		in   map[string]interface{}
-	}{
-		{
-			name: "top-level __type",
-			in: map[string]interface{}{
+	t.Run("top-level __type", func(t *testing.T) {
+		t.Parallel()
+		_, err := permissionsToWire(map[string]interface{}{
+			"__type":      "PermissionDescriptorAllow",
+			"permissions": []interface{}{"stack:read"},
+		})
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "__type")
+		assert.Contains(t, err.Error(), "discriminator",
+			"error must point the user at the correct field name")
+	})
+
+	t.Run("nested __type passes through", func(t *testing.T) {
+		t.Parallel()
+		// `__type` at any nested level is valid — it's the wire format
+		// the provider forwards to Pulumi Cloud verbatim.
+		got, err := permissionsToWire(map[string]interface{}{
+			"discriminator": "PermissionDescriptorCondition",
+			"condition": map[string]interface{}{
+				"__type": "PermissionExpressionEqual",
+			},
+			"subNode": map[string]interface{}{
 				"__type":      "PermissionDescriptorAllow",
 				"permissions": []interface{}{"stack:read"},
 			},
-		},
-		{
-			name: "nested __type in subNode",
-			in: map[string]interface{}{
-				"discriminator": "PermissionDescriptorCondition",
-				"condition": map[string]interface{}{
-					"discriminator": "PermissionExpressionEqual",
-					"left":          map[string]interface{}{"discriminator": "PermissionExpressionStack"},
-					"right": map[string]interface{}{
-						"discriminator": "PermissionLiteralExpressionStack",
-						"identity":      "s",
-					},
-				},
-				"subNode": map[string]interface{}{
-					"__type":      "PermissionDescriptorAllow",
-					"permissions": []interface{}{"stack:read"},
-				},
-			},
-		},
-		{
-			name: "nested __type inside an entries list",
-			in: map[string]interface{}{
-				"discriminator": "PermissionDescriptorGroup",
-				"entries": []interface{}{
-					map[string]interface{}{
-						"__type":      "PermissionDescriptorAllow",
-						"permissions": []interface{}{"stack:read"},
-					},
-				},
-			},
-		},
-		{
-			name: "__type at the same level as discriminator (mixed paste)",
-			in: map[string]interface{}{
-				"discriminator": "PermissionDescriptorAllow",
-				"__type":        "PermissionDescriptorAllow",
-				"permissions":   []interface{}{"stack:read"},
-			},
-		},
-	}
-	for _, tc := range cases {
-		tc := tc
-		t.Run(tc.name, func(t *testing.T) {
-			t.Parallel()
-			_, err := permissionsToWire(tc.in)
-			require.Error(t, err)
-			assert.Contains(t, err.Error(), "__type")
-			assert.Contains(t, err.Error(), "discriminator",
-				"error must point the user at the correct field name")
 		})
-	}
+		require.NoError(t, err)
+		assert.Equal(t, "PermissionDescriptorCondition", got["__type"])
+		// Nested levels untouched — translator is top-only.
+		cond, ok := got["condition"].(map[string]interface{})
+		require.True(t, ok)
+		assert.Equal(t, "PermissionExpressionEqual", cond["__type"])
+	})
 }
 
 // ----------------------------------------------------------------------------
@@ -484,9 +456,12 @@ func TestPermissionsWireToKind_CollapseHeuristic(t *testing.T) {
 
 	t.Run("prior Group preserves Group(Condition)", func(t *testing.T) {
 		t.Parallel()
+		// The Condition is at a nested position inside `entries`, so it
+		// carries the wire-format `__type` at its top — same as what
+		// helpers emit and what the API returns.
 		groupOfCondition := map[string]interface{}{
 			"discriminator": "PermissionDescriptorGroup",
-			"entries":       []interface{}{scopedConditionKind()},
+			"entries":       []interface{}{scopedConditionWire()},
 		}
 		got, err := permissionsFromWire(wrap, groupOfCondition)
 		require.NoError(t, err)
@@ -562,15 +537,15 @@ func TestPermissionsRoundTrip(t *testing.T) {
 
 // TestPermissionsRoundTrip_GroupOfConditionPriorIsHonored proves that a
 // customer who deliberately authors a single-entry Group of Condition gets
-// it back unchanged on Read. The wrap fires on the inner Condition's
-// passage to the wire (via permissionsToWire's rename only — the outer
-// Group prevents permissionsToWireForAPI's wrap from firing); the
-// collapse heuristic is suppressed by prior == Group.
+// it back unchanged on Read. The collapse heuristic is suppressed by
+// prior == Group.
 func TestPermissionsRoundTrip_GroupOfConditionPriorIsHonored(t *testing.T) {
 	t.Parallel()
+	// The Condition entry is nested under Group.entries, so it uses the
+	// wire-format `__type` at its top.
 	groupOfCondition := map[string]interface{}{
 		"discriminator": "PermissionDescriptorGroup",
-		"entries":       []interface{}{scopedConditionKind()},
+		"entries":       []interface{}{scopedConditionWire()},
 	}
 	wire, err := permissionsToWireForAPI(groupOfCondition)
 	require.NoError(t, err)
@@ -609,91 +584,95 @@ func TestImportRepro_Compose(t *testing.T) {
 // happen to look like a discriminator.
 // ----------------------------------------------------------------------------
 
-// TestRoundTrip_DeepNesting builds an arbitrary deep tree and verifies it
-// round-trips losslessly — every level swaps the discriminator key and
-// recurses into every map and list value.
+// TestRoundTrip_DeepNesting builds an arbitrary deep tree authored against
+// the new contract — `discriminator` only at the top, `__type` everywhere
+// nested — and verifies it round-trips losslessly. Top-only translation
+// means the deep interior is forwarded verbatim in both directions.
 func TestRoundTrip_DeepNesting(t *testing.T) {
 	t.Parallel()
 	deep := map[string]interface{}{
 		"discriminator": "PermissionDescriptorGroup",
 		"entries": []interface{}{
 			map[string]interface{}{
-				"discriminator": "PermissionDescriptorCondition",
+				"__type": "PermissionDescriptorCondition",
 				"condition": map[string]interface{}{
-					"discriminator": "PermissionExpressionAnd",
+					"__type": "PermissionExpressionAnd",
 					"left": map[string]interface{}{
-						"discriminator": "PermissionExpressionOr",
+						"__type": "PermissionExpressionOr",
 						"left": map[string]interface{}{
-							"discriminator": "PermissionExpressionEqual",
+							"__type": "PermissionExpressionEqual",
 							"left": map[string]interface{}{
-								"discriminator": "PermissionExpressionStack",
+								"__type": "PermissionExpressionStack",
 							},
 							"right": map[string]interface{}{
-								"discriminator": "PermissionLiteralExpressionStack",
-								"identity":      "s1",
+								"__type":   "PermissionLiteralExpressionStack",
+								"identity": "s1",
 							},
 						},
 						"right": map[string]interface{}{
-							"discriminator": "PermissionExpressionEqual",
+							"__type": "PermissionExpressionEqual",
 							"left": map[string]interface{}{
-								"discriminator": "PermissionExpressionStack",
+								"__type": "PermissionExpressionStack",
 							},
 							"right": map[string]interface{}{
-								"discriminator": "PermissionLiteralExpressionStack",
-								"identity":      "s2",
+								"__type":   "PermissionLiteralExpressionStack",
+								"identity": "s2",
 							},
 						},
 					},
 					"right": map[string]interface{}{
-						"discriminator": "PermissionExpressionNot",
+						"__type": "PermissionExpressionNot",
 						"operand": map[string]interface{}{
-							"discriminator": "PermissionExpressionEqual",
+							"__type": "PermissionExpressionEqual",
 							"left": map[string]interface{}{
-								"discriminator": "PermissionExpressionEnvironment",
+								"__type": "PermissionExpressionEnvironment",
 							},
 							"right": map[string]interface{}{
-								"discriminator": "PermissionLiteralExpressionEnvironment",
-								"identity":      "env-evil",
+								"__type":   "PermissionLiteralExpressionEnvironment",
+								"identity": "env-evil",
 							},
 						},
 					},
 				},
 				"subNode": map[string]interface{}{
-					"discriminator": "PermissionDescriptorAllow",
-					"permissions":   []interface{}{"stack:edit"},
+					"__type":      "PermissionDescriptorAllow",
+					"permissions": []interface{}{"stack:edit"},
 				},
 			},
 		},
 	}
 	wire, err := permissionsToWireForAPI(deep)
 	require.NoError(t, err)
-	assert.NotContains(t, mustJSON(t, wire), `"discriminator":`,
-		"after input→wire translation, no `discriminator` key may remain anywhere")
+	assert.Equal(t, "PermissionDescriptorGroup", wire["__type"],
+		"top must be the wire-format `__type`")
+	_, hasTopDisc := wire["discriminator"]
+	assert.False(t, hasTopDisc, "top `discriminator` must have been promoted to `__type`")
 	back, err := permissionsFromWire(wire, deep)
 	require.NoError(t, err)
 	assert.Equal(t, deep, back)
 }
 
 // TestRoundTrip_IdentityValueLooksLikeDiscriminator pins down that the
-// translator only renames map *keys*, not values. An identity field whose
-// string value is "discriminator" or "__type" must survive untouched.
+// translator only renames the top-level discriminator *key*, never values.
+// An identity field whose string value happens to look like a discriminator
+// keyword must survive untouched.
 func TestRoundTrip_IdentityValueLooksLikeDiscriminator(t *testing.T) {
 	t.Parallel()
 	in := map[string]interface{}{
 		"discriminator": "PermissionDescriptorCondition",
 		"condition": map[string]interface{}{
-			"discriminator": "PermissionExpressionEqual",
+			"__type": "PermissionExpressionEqual",
 			"left": map[string]interface{}{
-				"discriminator": "PermissionExpressionStack",
+				"__type": "PermissionExpressionStack",
 			},
 			"right": map[string]interface{}{
-				"discriminator": "PermissionLiteralExpressionStack",
-				"identity":      "discriminator", // looks like a discriminator
+				"__type":   "PermissionLiteralExpressionStack",
+				"identity": "discriminator", // identity value happens to look like a discriminator key
 			},
 		},
 		"subNode": map[string]interface{}{
-			"discriminator": "PermissionDescriptorAllow",
-			"permissions":   []interface{}{"__type"}, // looks like a discriminator
+			"__type":      "PermissionDescriptorAllow",
+			"permissions": []interface{}{"__type"}, // permission value happens to match the wire-side discriminator key
 		},
 	}
 	wire, err := permissionsToWireForAPI(in)
@@ -701,12 +680,4 @@ func TestRoundTrip_IdentityValueLooksLikeDiscriminator(t *testing.T) {
 	back, err := permissionsFromWire(wire, in)
 	require.NoError(t, err)
 	assert.Equal(t, in, back)
-}
-
-// mustJSON marshals a value to compact JSON for substring assertions.
-func mustJSON(t *testing.T, v interface{}) string {
-	t.Helper()
-	b, err := json.Marshal(v)
-	require.NoError(t, err)
-	return strings.ReplaceAll(string(b), " ", "")
 }

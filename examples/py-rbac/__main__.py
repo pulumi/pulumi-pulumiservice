@@ -63,10 +63,12 @@ team_members = current_user.username.apply(
 )
 
 # 3. Custom org role that grants stack:read. The simplest descriptor: a
-#    flat ``PermissionDescriptorAllow``. The SDK uses the same PascalCase
-#    ``kind`` values as Pulumi Cloud's REST API (``__type`` in the wire
-#    format is renamed to ``kind`` to dodge Python's underscore-prefix
-#    stripping — see pulumi/pulumi#22738).
+#    flat ``PermissionDescriptorAllow``. The provider only renames the
+#    top-level discriminator key — ``discriminator`` at the SDK boundary
+#    is promoted to the wire's ``__type``. Nested levels (when present)
+#    use ``__type`` directly. ``discriminator`` is used at the SDK
+#    boundary instead of ``__type`` because Python's SDK strips
+#    ``__``-prefixed input keys (pulumi/pulumi#22738).
 custom_role = OrganizationRole(
     "rbacRole",
     organization_name=organization_name,
@@ -130,9 +132,10 @@ scoped_env = Environment(
 #    env created above. Anywhere else in the org the role grants nothing.
 #    The role definition is org-scoped (resourceType defaults to "global");
 #    the helper returns a ``PermissionDescriptorCondition(Equal(...),
-#    Allow)`` tree — the same wire shape Pulumi Cloud's REST API uses,
-#    modulo the ``__type`` → ``kind`` rename. The provider has no
-#    SDK-side translation; it sends the descriptor on the wire verbatim.
+#    Allow)`` tree shaped to match the provider's contract:
+#    ``discriminator`` at the top, ``__type`` at every nested level. The
+#    provider promotes the top to the wire's ``__type`` and forwards the
+#    interior to Pulumi Cloud verbatim.
 scoped_role = OrganizationRole(
     "scopedReadOnlyRole",
     organization_name=organization_name,
