@@ -77,6 +77,45 @@ func assertScopedConditionShape(
 	assert.Equal(t, expectedPermissions, gotPerms)
 }
 
+func TestBuildAllowPermissions(t *testing.T) {
+	t.Parallel()
+
+	t.Run("happy path", func(t *testing.T) {
+		t.Parallel()
+		resp, err := BuildAllowPermissionsFunction{}.Invoke(
+			context.Background(),
+			infer.FunctionRequest[BuildAllowPermissionsInput]{
+				Input: BuildAllowPermissionsInput{
+					Permissions: []string{"stack:read", "environment:open"},
+				},
+			},
+		)
+		require.NoError(t, err)
+		got := resp.Output.Permissions
+		// Top uses the SDK boundary's `discriminator` — the provider's
+		// translator promotes it to `__type` on Create/Update.
+		assert.Equal(t, "PermissionDescriptorAllow", got["discriminator"])
+		_, hasUnderscore := got["__type"]
+		assert.False(t, hasUnderscore,
+			"top must use `discriminator`, not the wire-format `__type`")
+		// Permissions list passes through verbatim.
+		perms, ok := got["permissions"].([]interface{})
+		require.True(t, ok)
+		assert.Equal(t, []interface{}{"stack:read", "environment:open"}, perms)
+	})
+
+	t.Run("rejects empty permissions", func(t *testing.T) {
+		t.Parallel()
+		_, err := BuildAllowPermissionsFunction{}.Invoke(
+			context.Background(),
+			infer.FunctionRequest[BuildAllowPermissionsInput]{
+				Input: BuildAllowPermissionsInput{},
+			},
+		)
+		assert.ErrorContains(t, err, "permissions")
+	})
+}
+
 func TestBuildEnvironmentScopedPermissions(t *testing.T) {
 	t.Parallel()
 

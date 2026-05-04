@@ -20,18 +20,17 @@ config:
     default: service-provider-example-user
 
 resources:
-  # A custom organization-level role that grants stack read access.
-  # The simplest descriptor: a flat `PermissionDescriptorAllow`.
+  # A custom organization-level role that grants stack read access. Built
+  # via `buildAllowPermissions`, which returns a flat
+  # `PermissionDescriptorAllow` ready to assign — no need to spell out
+  # the descriptor's discriminator field by hand.
   readOnlyRole:
     type: pulumiservice:OrganizationRole
     properties:
       organizationName: ${organizationName}
       name: yaml-rbac-read-only-${digits}
       description: Read-only access to stacks, created by the yaml-rbac example.
-      permissions:
-        discriminator: PermissionDescriptorAllow
-        permissions:
-          - stack:read
+      permissions: ${readOnlyPermissions.permissions}
 
   # A team that will receive the custom role. Pulumi Cloud adds the team
   # creator as the first member automatically, so we declare them here to
@@ -114,6 +113,16 @@ variables:
       function: pulumiservice:getOrganizationRoleScopes
       arguments:
         organizationName: ${organizationName}
+  # Data source: build the global Allow descriptor used by readOnlyRole.
+  # `buildAllowPermissions` is the trivial helper for the common case of
+  # "grant these scopes everywhere"; the result is directly assignable to
+  # `OrganizationRole.permissions`.
+  readOnlyPermissions:
+    fn::invoke:
+      function: pulumiservice:buildAllowPermissions
+      arguments:
+        permissions:
+          - stack:read
   # Data source: build the scoped-permission descriptor used by
   # scopedReadOnlyRole. The helper returns the wire-shape Condition tree
   # gating an Allow on the named environment; assigning to

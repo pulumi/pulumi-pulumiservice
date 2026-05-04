@@ -10,6 +10,7 @@ from ._enums import *
 from .access_token import *
 from .agent_pool import *
 from .approval_rule import *
+from .build_allow_permissions import *
 from .build_environment_scoped_permissions import *
 from .build_insights_account_scoped_permissions import *
 from .build_stack_scoped_permissions import *

@@ -25,6 +25,7 @@ class StackTagsArgs:
                  tags: pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]):
         """
         The set of arguments for constructing a StackTags resource.
+
         :param pulumi.Input[_builtins.str] organization: Organization name.
         :param pulumi.Input[_builtins.str] project: Project name.
         :param pulumi.Input[_builtins.str] stack: Stack name.
@@ -102,6 +103,7 @@ class StackTags(pulumi.CustomResource):
 
         Importing with ID `{organization}/{project}/{stack}/tags` adopts every tag currently on the stack; declare `tags` explicitly after import so subsequent updates match your intent. See the [registry docs](https://www.pulumi.com/registry/packages/pulumiservice/api-docs/stacktags/) for full usage and examples.
 
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] organization: Organization name.
@@ -121,6 +123,7 @@ class StackTags(pulumi.CustomResource):
         Only tags declared in `tags` are managed; tags added out-of-band (CLI, pulumibot, a singular `StackTag` resource) are left alone. Tag values are immutable in Pulumi Cloud, so a value change is implemented as delete-and-recreate.
 
         Importing with ID `{organization}/{project}/{stack}/tags` adopts every tag currently on the stack; declare `tags` explicitly after import so subsequent updates match your intent. See the [registry docs](https://www.pulumi.com/registry/packages/pulumiservice/api-docs/stacktags/) for full usage and examples.
+
 
         :param str resource_name: The name of the resource.
         :param StackTagsArgs args: The arguments to use to populate this resource's properties.

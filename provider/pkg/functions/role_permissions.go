@@ -78,6 +78,80 @@ const scopedPermissionsHelpDoc = "The result is directly assignable to " +
 	"list pulls the output of each helper."
 
 // ----------------------------------------------------------------------------
+// Global Allow helper
+// ----------------------------------------------------------------------------
+
+type BuildAllowPermissionsFunction struct{}
+
+type BuildAllowPermissionsInput struct {
+	Permissions []string `pulumi:"permissions"`
+}
+
+type BuildAllowPermissionsOutput struct {
+	Permissions map[string]interface{} `pulumi:"permissions"`
+}
+
+func (BuildAllowPermissionsFunction) Annotate(a infer.Annotator) {
+	a.Describe(
+		&BuildAllowPermissionsFunction{},
+		"Builds an `OrganizationRole.permissions` descriptor that grants the "+
+			"supplied scopes globally — i.e. on every entity of the matching "+
+			"resource type. This is the simplest descriptor: a flat "+
+			"`PermissionDescriptorAllow`. Use this helper instead of hand-"+
+			"authoring `{discriminator: \"PermissionDescriptorAllow\", "+
+			"permissions: [...]}` so the SDK boundary's discriminator field "+
+			"name stays an implementation detail. For grants scoped to a "+
+			"specific entity, see `buildEnvironmentScopedPermissions`, "+
+			"`buildStackScopedPermissions`, or `buildInsightsAccountScopedPermissions`. "+
+			scopedPermissionsHelpDoc,
+	)
+	a.SetToken("index", "buildAllowPermissions")
+}
+
+func (i *BuildAllowPermissionsInput) Annotate(a infer.Annotator) {
+	a.Describe(
+		&i.Permissions,
+		"The set of scopes to grant globally (e.g. `stack:read`, `environment:open`, "+
+			"`organization:billingManager`). Discover valid scope names via the "+
+			"`getOrganizationRoleScopes` data source.",
+	)
+}
+
+func (o *BuildAllowPermissionsOutput) Annotate(a infer.Annotator) {
+	a.Describe(
+		&o.Permissions,
+		"A `PermissionDescriptorAllow` granting the supplied scopes on every "+
+			"entity of the matching resource type, ready to assign to "+
+			"`OrganizationRole.permissions`.",
+	)
+}
+
+func (BuildAllowPermissionsFunction) Invoke(
+	_ context.Context,
+	req infer.FunctionRequest[BuildAllowPermissionsInput],
+) (infer.FunctionResponse[BuildAllowPermissionsOutput], error) {
+	if len(req.Input.Permissions) == 0 {
+		return infer.FunctionResponse[BuildAllowPermissionsOutput]{},
+			fmt.Errorf("`permissions` must not be empty")
+	}
+	grants := make([]interface{}, len(req.Input.Permissions))
+	for i, p := range req.Input.Permissions {
+		grants[i] = p
+	}
+	return infer.FunctionResponse[BuildAllowPermissionsOutput]{
+		Output: BuildAllowPermissionsOutput{
+			Permissions: map[string]interface{}{
+				// Top-level uses the SDK boundary's `discriminator` key —
+				// the provider's translator promotes it to the wire's
+				// `__type` on Create/Update.
+				"discriminator": "PermissionDescriptorAllow",
+				"permissions":   grants,
+			},
+		},
+	}, nil
+}
+
+// ----------------------------------------------------------------------------
 // Environment-scoped helper
 // ----------------------------------------------------------------------------
 

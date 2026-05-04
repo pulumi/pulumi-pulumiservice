@@ -2108,7 +2108,7 @@
           "additionalProperties": {
             "$ref": "pulumi.json#/Any"
           },
-          "description": "The role's permission descriptor tree, expressed in the Pulumi Cloud wire grammar with the discriminator field renamed from `__type` to `kind` (Pulumi's Python SDK strips `__`-prefixed keys from inputs, so the SDK uses `kind` for cross-language consistency).\n\nCommon kinds:\n- `PermissionDescriptorAllow` — `{kind: \"PermissionDescriptorAllow\", permissions: [\"<scope>\", ...]}` grants the listed scopes.\n- `PermissionDescriptorGroup` — `{kind: \"PermissionDescriptorGroup\", entries: [<descriptor>, ...]}` composes multiple descriptors; the role grants the union of every entry.\n- `PermissionDescriptorCondition` — `{kind: \"PermissionDescriptorCondition\", condition: <expression>, subNode: <descriptor>}` gates a sub-descriptor on a boolean expression.\n- `PermissionDescriptorCompose` — references other roles by ID; `{kind: \"PermissionDescriptorCompose\", permissionDescriptors: [<roleId>, ...]}`.\n\nPulumi Cloud's REST API also accepts `PermissionDescriptorIfThenElse`, `PermissionDescriptorSelect`, and the `PermissionExpression*` / `PermissionLiteralExpression*` boolean operators (And, Or, Not, Equal, Environment, Stack, Team, InsightsAccount, …); the provider passes every variant through transparently without inspecting it, so future Cloud additions work without a provider release.\n\nFor the common case of granting a set of scopes on one entity, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the corresponding `PermissionDescriptorCondition(Equal(...), Allow)` tree for you. To grant a role to a team, use the `TeamRoleAssignment` resource — roles are *associated with* teams, not gated on them via a permission descriptor."
+          "description": "The role's permission descriptor tree, expressed in the Pulumi Cloud wire grammar. The provider exposes the descriptor as `map[string]Any` and only renames the top-level discriminator key: `discriminator` at the SDK boundary is promoted to the wire's `__type` on Create/Update and back on Read. Nested levels are opaque to the provider — they carry the wire-format `__type` directly and pass through unchanged.\n\nCommon top-level descriptors (note `discriminator` at the top, `__type` everywhere below):\n- `PermissionDescriptorAllow` — `{discriminator: \"PermissionDescriptorAllow\", permissions: [\"<scope>\", ...]}` grants the listed scopes.\n- `PermissionDescriptorGroup` — `{discriminator: \"PermissionDescriptorGroup\", entries: [{__type: \"PermissionDescriptorAllow\", ...}, ...]}` composes multiple descriptors; the role grants the union of every entry.\n- `PermissionDescriptorCondition` — `{discriminator: \"PermissionDescriptorCondition\", condition: {__type: ...}, subNode: {__type: ...}}` gates a sub-descriptor on a boolean expression.\n- `PermissionDescriptorCompose` — references other roles by ID; `{discriminator: \"PermissionDescriptorCompose\", permissionDescriptors: [<roleId>, ...]}`.\n\nPulumi Cloud's REST API also accepts `PermissionDescriptorIfThenElse`, `PermissionDescriptorSelect`, and the `PermissionExpression*` / `PermissionLiteralExpression*` boolean operators (And, Or, Not, Equal, Environment, Stack, Team, InsightsAccount, …); the provider does not inspect anything below the top, so future Cloud additions work without a provider release.\n\nFor the common case of granting a set of scopes on one entity, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the corresponding `PermissionDescriptorCondition(Equal(...), Allow)` tree for you. To grant a role to a team, use the `TeamRoleAssignment` resource — roles are *associated with* teams, not gated on them via a permission descriptor."
         },
         "resourceType": {
           "type": "string",
@@ -2149,7 +2149,7 @@
           "additionalProperties": {
             "$ref": "pulumi.json#/Any"
           },
-          "description": "The role's permission descriptor tree, expressed in the Pulumi Cloud wire grammar with the discriminator field renamed from `__type` to `kind` (Pulumi's Python SDK strips `__`-prefixed keys from inputs, so the SDK uses `kind` for cross-language consistency).\n\nCommon kinds:\n- `PermissionDescriptorAllow` — `{kind: \"PermissionDescriptorAllow\", permissions: [\"<scope>\", ...]}` grants the listed scopes.\n- `PermissionDescriptorGroup` — `{kind: \"PermissionDescriptorGroup\", entries: [<descriptor>, ...]}` composes multiple descriptors; the role grants the union of every entry.\n- `PermissionDescriptorCondition` — `{kind: \"PermissionDescriptorCondition\", condition: <expression>, subNode: <descriptor>}` gates a sub-descriptor on a boolean expression.\n- `PermissionDescriptorCompose` — references other roles by ID; `{kind: \"PermissionDescriptorCompose\", permissionDescriptors: [<roleId>, ...]}`.\n\nPulumi Cloud's REST API also accepts `PermissionDescriptorIfThenElse`, `PermissionDescriptorSelect`, and the `PermissionExpression*` / `PermissionLiteralExpression*` boolean operators (And, Or, Not, Equal, Environment, Stack, Team, InsightsAccount, …); the provider passes every variant through transparently without inspecting it, so future Cloud additions work without a provider release.\n\nFor the common case of granting a set of scopes on one entity, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the corresponding `PermissionDescriptorCondition(Equal(...), Allow)` tree for you. To grant a role to a team, use the `TeamRoleAssignment` resource — roles are *associated with* teams, not gated on them via a permission descriptor."
+          "description": "The role's permission descriptor tree, expressed in the Pulumi Cloud wire grammar. The provider exposes the descriptor as `map[string]Any` and only renames the top-level discriminator key: `discriminator` at the SDK boundary is promoted to the wire's `__type` on Create/Update and back on Read. Nested levels are opaque to the provider — they carry the wire-format `__type` directly and pass through unchanged.\n\nCommon top-level descriptors (note `discriminator` at the top, `__type` everywhere below):\n- `PermissionDescriptorAllow` — `{discriminator: \"PermissionDescriptorAllow\", permissions: [\"<scope>\", ...]}` grants the listed scopes.\n- `PermissionDescriptorGroup` — `{discriminator: \"PermissionDescriptorGroup\", entries: [{__type: \"PermissionDescriptorAllow\", ...}, ...]}` composes multiple descriptors; the role grants the union of every entry.\n- `PermissionDescriptorCondition` — `{discriminator: \"PermissionDescriptorCondition\", condition: {__type: ...}, subNode: {__type: ...}}` gates a sub-descriptor on a boolean expression.\n- `PermissionDescriptorCompose` — references other roles by ID; `{discriminator: \"PermissionDescriptorCompose\", permissionDescriptors: [<roleId>, ...]}`.\n\nPulumi Cloud's REST API also accepts `PermissionDescriptorIfThenElse`, `PermissionDescriptorSelect`, and the `PermissionExpression*` / `PermissionLiteralExpression*` boolean operators (And, Or, Not, Equal, Environment, Stack, Team, InsightsAccount, …); the provider does not inspect anything below the top, so future Cloud additions work without a provider release.\n\nFor the common case of granting a set of scopes on one entity, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the corresponding `PermissionDescriptorCondition(Equal(...), Allow)` tree for you. To grant a role to a team, use the `TeamRoleAssignment` resource — roles are *associated with* teams, not gated on them via a permission descriptor."
         },
         "resourceType": {
           "type": "string",
@@ -3018,6 +3018,39 @@
     }
   },
   "functions": {
+    "pulumiservice:index:buildAllowPermissions": {
+      "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes globally — i.e. on every entity of the matching resource type. This is the simplest descriptor: a flat `PermissionDescriptorAllow`. Use this helper instead of hand-authoring `{discriminator: \"PermissionDescriptorAllow\", permissions: [...]}` so the SDK boundary's discriminator field name stays an implementation detail. For grants scoped to a specific entity, see `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, or `buildInsightsAccountScopedPermissions`. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.",
+      "inputs": {
+        "properties": {
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The set of scopes to grant globally (e.g. `stack:read`, `environment:open`, `organization:billingManager`). Discover valid scope names via the `getOrganizationRoleScopes` data source."
+          }
+        },
+        "type": "object",
+        "required": [
+          "permissions"
+        ]
+      },
+      "outputs": {
+        "properties": {
+          "permissions": {
+            "additionalProperties": {
+              "$ref": "pulumi.json#/Any"
+            },
+            "description": "A `PermissionDescriptorAllow` granting the supplied scopes on every entity of the matching resource type, ready to assign to `OrganizationRole.permissions`.",
+            "type": "object"
+          }
+        },
+        "required": [
+          "permissions"
+        ],
+        "type": "object"
+      }
+    },
     "pulumiservice:index:buildEnvironmentScopedPermissions": {
       "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `PermissionDescriptorCondition` tree yourself. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.",
       "inputs": {
