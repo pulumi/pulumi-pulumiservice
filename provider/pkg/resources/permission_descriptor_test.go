@@ -21,6 +21,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/apitype"
 )
 
 // ----------------------------------------------------------------------------
@@ -710,3 +712,145 @@ func mustJSON(t *testing.T, v interface{}) string {
 	require.NoError(t, err)
 	return strings.ReplaceAll(string(b), " ", "")
 }
+
+// envScopedAllowsKind builds a top-level Group of N Allow descriptors, each
+// carrying an `on:{environment: <id>}` constraint plus a `permissions` list.
+// This shape comes from a real customer role descriptor — testing it pins
+// down whether our pipeline preserves the `on` field across both layers:
+//
+//  1. The structurally-blind translator (kind → wire → kind), which has no
+//     knowledge of descriptor variants and should pass `on` through verbatim.
+//  2. The full SDK pipeline (kind → wire → typed apitype.PermissionDescriptor
+//     → wire JSON → kind), which round-trips through the generated
+//     UnmarshalJSONPermissionDescriptor. The generated permissionDescriptor
+//     AllowImpl only models `permissions` and `constraints` — anything else
+//     is silently dropped.
+func envScopedAllowsKind(envIDs []string) map[string]interface{} {
+	entries := make([]interface{}, 0, len(envIDs))
+	for _, id := range envIDs {
+		entries = append(entries, map[string]interface{}{
+			"kind":        "PermissionDescriptorAllow",
+			"on":          map[string]interface{}{"environment": id},
+			"permissions": []interface{}{"environment:read", "environment:open"},
+		})
+	}
+	return map[string]interface{}{
+		"kind":    "PermissionDescriptorGroup",
+		"entries": entries,
+	}
+}
+
+// TestRoundTrip_EnvScopedAllows_PureTranslator pins that the structurally-
+// blind translator preserves Allow's `on` field intact through the
+// kind ↔ __type rename. This is the contract that lets the provider accept
+// novel descriptor variants without code changes.
+func TestRoundTrip_EnvScopedAllows_PureTranslator(t *testing.T) {
+	t.Parallel()
+	envIDs := []string{
+		"c5549aa1-87db-4d67-a195-455b56772900",
+		"3cb9b7ad-0848-4e0d-aeff-8e9f093fd2d9",
+		"1b4d9a82-3291-4f42-bc68-532e4d9cf22a",
+	}
+	in := envScopedAllowsKind(envIDs)
+	wire, err := permissionsKindToWireForAPI(in)
+	require.NoError(t, err)
+	// Confirm the wire shape carries every `on` block on every entry.
+	wireJSON := mustJSON(t, wire)
+	for _, id := range envIDs {
+		assert.Contains(t, wireJSON, `"environment":"`+id+`"`,
+			"translator must not drop the `on:{environment:...}` field")
+	}
+	back, err := permissionsWireToKind(wire, in)
+	require.NoError(t, err)
+	assert.Equal(t, in, back, "structurally-blind translator must round-trip `on` losslessly")
+}
+
+// TestRoundTrip_EnvScopedAllows_TypedSDK_DropsOn proves the regression we
+// inherit from migrating onto apitype.PermissionDescriptor: the generated
+// permissionDescriptorAllowImpl ignores any field that isn't `permissions` or
+// `constraints`. A user-authored Allow with `on:{environment:...}` survives
+// the translator but loses the `on` field once it passes through the typed
+// tree on Create or Read.
+//
+// If/when the spec adds `on` to PermissionDescriptorAllow (or any equivalent),
+// this test will start failing and signal the regression is fixed; flip the
+// assertions accordingly.
+func TestRoundTrip_EnvScopedAllows_TypedSDK_DropsOn(t *testing.T) {
+	t.Parallel()
+	envIDs := []string{
+		"c5549aa1-87db-4d67-a195-455b56772900",
+		"3cb9b7ad-0848-4e0d-aeff-8e9f093fd2d9",
+		"1b4d9a82-3291-4f42-bc68-532e4d9cf22a",
+	}
+	in := envScopedAllowsKind(envIDs)
+
+	// Step 1: kind → typed PermissionDescriptor (the path Create/Update use).
+	typed, err := buildPermissionDescriptorForAPI(in)
+	require.NoError(t, err)
+	require.NotNil(t, typed)
+
+	// Step 2: typed → wire JSON (what gets sent to the API).
+	rawSent, err := json.Marshal(typed)
+	require.NoError(t, err)
+
+	// Step 3: wire JSON → wire map → kind (the Read path's translation).
+	wireMap := map[string]interface{}{}
+	require.NoError(t, json.Unmarshal(rawSent, &wireMap))
+	roundTripped, err := permissionsWireToKind(wireMap, in)
+	require.NoError(t, err)
+
+	// The typed pipeline must round-trip the discriminator and the
+	// modeled fields. The Group → entries → Allow → permissions chain
+	// survives.
+	require.Equal(t, "PermissionDescriptorGroup", roundTripped["kind"])
+	entries, ok := roundTripped["entries"].([]interface{})
+	require.True(t, ok, "Group must round-trip its `entries` slice")
+	require.Len(t, entries, len(envIDs))
+	for i, e := range entries {
+		entry, ok := e.(map[string]interface{})
+		require.True(t, ok)
+		assert.Equal(t, "PermissionDescriptorAllow", entry["kind"], "entry %d", i)
+		assert.Equal(t, []interface{}{"environment:read", "environment:open"}, entry["permissions"], "entry %d", i)
+
+		// THE REGRESSION: the typed Allow impl has no `on` field, so the
+		// generated unmarshaller drops it on the inbound JSON and the
+		// outbound JSON never re-emits it.
+		_, hasOn := entry["on"]
+		assert.False(t, hasOn,
+			"entry %d: typed SDK pipeline silently drops the `on` field — see permissionDescriptorAllowImpl", i)
+	}
+
+	// Sanity: the typed JSON we'd send to the API doesn't carry `on` either.
+	assert.NotContains(t, string(rawSent), `"on":`,
+		"wire JSON sent to API must not have `on` — confirms the typed-pipeline drop")
+	// And it definitely doesn't carry the `kind` discriminator (we send `__type`).
+	assert.NotContains(t, string(rawSent), `"kind":`)
+}
+
+// TestRoundTrip_EnvScopedAllows_TypedSDK_LowercaseKindRejected pins how the
+// pipeline reacts to the lowercase `kind: "allow"` shape (vs the canonical
+// `kind: "PermissionDescriptorAllow"`). The translator passes the value
+// through unchanged; UnmarshalJSONPermissionDescriptor doesn't recognise it
+// and yields a nil typed tree, which buildPermissionDescriptorForAPI flags
+// as an unknown discriminator.
+func TestRoundTrip_EnvScopedAllows_TypedSDK_LowercaseKindRejected(t *testing.T) {
+	t.Parallel()
+	in := map[string]interface{}{
+		"kind": "PermissionDescriptorGroup",
+		"entries": []interface{}{
+			map[string]interface{}{
+				"kind":        "allow", // lowercase — not a known discriminator
+				"on":          map[string]interface{}{"environment": "x"},
+				"permissions": []interface{}{"environment:read"},
+			},
+		},
+	}
+	_, err := buildPermissionDescriptorForAPI(in)
+	require.Error(t, err, "lowercase `allow` kind must be rejected, not silently coerced")
+	assert.Contains(t, err.Error(), "permission descriptor",
+		"error must point at the descriptor, not a generic JSON parse failure")
+}
+
+// _ uses the apitype import; without this Go would flag it as unused if the
+// tests above are temporarily commented out for triage.
+var _ = apitype.PermissionDescriptorUXPurposeRole
