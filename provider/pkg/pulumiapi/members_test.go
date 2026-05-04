@@ -8,6 +8,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/apitype"
 )
 
 const (
@@ -206,11 +208,19 @@ func TestUpdateOrgMemberRole(t *testing.T) {
 
 	t.Run("built-in role resolves to FGA ID before PATCH", func(t *testing.T) {
 		roles := struct {
-			Roles []RoleDescriptor `json:"roles"`
+			Roles []apitype.PermissionDescriptorRecord `json:"roles"`
 		}{
-			Roles: []RoleDescriptor{
-				{ID: "admin-fga-id", Name: "Admin", DefaultIdentifier: "admin"},
-				{ID: "member-fga-id", Name: "Member", DefaultIdentifier: "member"},
+			Roles: []apitype.PermissionDescriptorRecord{
+				{
+					PermissionDescriptorBase: apitype.PermissionDescriptorBase{Name: "Admin"},
+					ID:                       "admin-fga-id",
+					DefaultIdentifier:        "admin",
+				},
+				{
+					PermissionDescriptorBase: apitype.PermissionDescriptorBase{Name: "Member"},
+					ID:                       "member-fga-id",
+					DefaultIdentifier:        "member",
+				},
 			},
 		}
 		adminID := "admin-fga-id"

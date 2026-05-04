@@ -9,6 +9,7 @@ import (
 	"github.com/pulumi/pulumi-go-provider/infer"
 	"github.com/pulumi/pulumi/sdk/v3/go/property"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/apitype"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
@@ -21,7 +22,7 @@ type orgMemberClientMock struct {
 	updateFunc    func(ctx context.Context, orgName, userName, role string, fgaRoleID *string) error
 	deleteFunc    func(ctx context.Context, orgName, userName string) error
 	getFunc       func(ctx context.Context, orgName, userName string) (*pulumiapi.Member, error)
-	listRolesFunc func(ctx context.Context, orgName, uxPurpose string) ([]pulumiapi.RoleDescriptor, error)
+	listRolesFunc func(ctx context.Context, orgName, uxPurpose string) ([]apitype.PermissionDescriptorRecord, error)
 }
 
 func (c *orgMemberClientMock) AddMemberToOrg(ctx context.Context, userName, orgName, role string) error {
@@ -46,7 +47,7 @@ func (c *orgMemberClientMock) GetOrgMember(
 
 func (c *orgMemberClientMock) ListOrgRoles(
 	ctx context.Context, orgName, uxPurpose string,
-) ([]pulumiapi.RoleDescriptor, error) {
+) ([]apitype.PermissionDescriptorRecord, error) {
 	if c.listRolesFunc == nil {
 		return nil, nil
 	}
@@ -57,13 +58,25 @@ func (c *orgMemberClientMock) ListOrgRoles(
 // about the exact role layout, only that ListOrgRoles returns the standard
 // built-in slugs so applyMemberRoleToState can round-trip an FGARole back
 // to the matching built-in Role string.
-var builtinRoles = []pulumiapi.RoleDescriptor{
-	{ID: "admin-fga", Name: "Admin", DefaultIdentifier: "admin"},
-	{ID: "member-fga", Name: "Member", DefaultIdentifier: "member"},
-	{ID: "billing-fga", Name: "Billing Manager", DefaultIdentifier: "billing-manager"},
+var builtinRoles = []apitype.PermissionDescriptorRecord{
+	{
+		PermissionDescriptorBase: apitype.PermissionDescriptorBase{Name: "Admin"},
+		ID:                       "admin-fga",
+		DefaultIdentifier:        "admin",
+	},
+	{
+		PermissionDescriptorBase: apitype.PermissionDescriptorBase{Name: "Member"},
+		ID:                       "member-fga",
+		DefaultIdentifier:        "member",
+	},
+	{
+		PermissionDescriptorBase: apitype.PermissionDescriptorBase{Name: "Billing Manager"},
+		ID:                       "billing-fga",
+		DefaultIdentifier:        "billing-manager",
+	},
 }
 
-func stubBuiltinRoles(_ context.Context, _, _ string) ([]pulumiapi.RoleDescriptor, error) {
+func stubBuiltinRoles(_ context.Context, _, _ string) ([]apitype.PermissionDescriptorRecord, error) {
 	return builtinRoles, nil
 }
 
@@ -135,9 +148,12 @@ func TestOrganizationMemberRead(t *testing.T) {
 					FGARole: &pulumiapi.FGARole{ID: fgaID, Name: "read-only-devops"},
 				}, nil
 			},
-			listRolesFunc: func(_ context.Context, _, _ string) ([]pulumiapi.RoleDescriptor, error) {
-				return append([]pulumiapi.RoleDescriptor{
-					{ID: catalogueID, Name: "read-only-devops"},
+			listRolesFunc: func(_ context.Context, _, _ string) ([]apitype.PermissionDescriptorRecord, error) {
+				return append([]apitype.PermissionDescriptorRecord{
+					{
+						PermissionDescriptorBase: apitype.PermissionDescriptorBase{Name: "read-only-devops"},
+						ID:                       catalogueID,
+					},
 				}, builtinRoles...), nil
 			},
 		}

@@ -6,44 +6,56 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/pulumi/pulumi-go-provider/infer"
 	"github.com/pulumi/pulumi/sdk/v3/go/property"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/apitype"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
 type orgRoleClientMock struct {
 	config.Client
-	create func(ctx context.Context, org string, req pulumiapi.CreateRoleRequest) (*pulumiapi.RoleDescriptor, error)
-	get    func(ctx context.Context, org, id string) (*pulumiapi.RoleDescriptor, error)
+	create func(ctx context.Context, org string, req apitype.PermissionDescriptorBase) (*apitype.PermissionDescriptorRecord, error)
+	get    func(ctx context.Context, org, id string) (*apitype.PermissionDescriptorRecord, error)
 	update func(
-		ctx context.Context, org, id string, name, desc *string, details json.RawMessage,
-	) (*pulumiapi.RoleDescriptor, error)
+		ctx context.Context, org, id string, name, desc *string, details apitype.PermissionDescriptor,
+	) (*apitype.PermissionDescriptorRecord, error)
 	del func(ctx context.Context, org, id string, force bool) error
 }
 
 func (c *orgRoleClientMock) CreateRole(
-	ctx context.Context, org string, req pulumiapi.CreateRoleRequest,
-) (*pulumiapi.RoleDescriptor, error) {
+	ctx context.Context, org string, req apitype.PermissionDescriptorBase,
+) (*apitype.PermissionDescriptorRecord, error) {
 	return c.create(ctx, org, req)
 }
 
 func (c *orgRoleClientMock) GetRole(
 	ctx context.Context, org, id string,
-) (*pulumiapi.RoleDescriptor, error) {
+) (*apitype.PermissionDescriptorRecord, error) {
 	return c.get(ctx, org, id)
 }
 
 func (c *orgRoleClientMock) UpdateRole(
-	ctx context.Context, org, id string, name, desc *string, details json.RawMessage,
-) (*pulumiapi.RoleDescriptor, error) {
+	ctx context.Context, org, id string, name, desc *string, details apitype.PermissionDescriptor,
+) (*apitype.PermissionDescriptorRecord, error) {
 	return c.update(ctx, org, id, name, desc, details)
 }
 
 func (c *orgRoleClientMock) DeleteRole(ctx context.Context, org, id string, force bool) error {
 	return c.del(ctx, org, id, force)
+}
+
+// mustParseDescriptor builds a typed PermissionDescriptor from wire-shape JSON
+// using the same generated unmarshaller the production code uses.
+func mustParseDescriptor(t *testing.T, wireJSON string) apitype.PermissionDescriptor {
+	t.Helper()
+	var d apitype.PermissionDescriptor
+	require.NoError(t, apitype.UnmarshalJSONPermissionDescriptor([]byte(wireJSON), &d))
+	require.NotNil(t, d)
+	return d
 }
 
 var testPermissions = map[string]interface{}{
@@ -53,22 +65,29 @@ var testPermissions = map[string]interface{}{
 
 func TestOrganizationRoleCreate(t *testing.T) {
 	mock := &orgRoleClientMock{
-		create: func(_ context.Context, org string, req pulumiapi.CreateRoleRequest) (*pulumiapi.RoleDescriptor, error) {
+		create: func(_ context.Context, org string, req apitype.PermissionDescriptorBase) (*apitype.PermissionDescriptorRecord, error) {
 			assert.Equal(t, "acme", org)
 			assert.Equal(t, "read-only", req.Name)
-			// Defaults are applied by the API client layer, so at this seam
-			// ResourceType stays empty when the user didn't set it.
-			assert.Equal(t, "", req.ResourceType)
-			// details should be the JSON-encoded permissions map.
+			// Defaulting moved into the resource layer: empty user input
+			// becomes "global" before reaching the API.
+			assert.Equal(t, "global", req.ResourceType)
+			assert.Equal(t, apitype.PermissionDescriptorUXPurposeRole, req.UxPurpose)
+			require.NotNil(t, req.Details, "Details must be a typed descriptor")
+			// Round-trip the typed descriptor back through JSON to assert the
+			// wire shape — the resource layer must emit __type, never `kind`.
+			raw, err := json.Marshal(req.Details)
+			require.NoError(t, err)
 			var parsed map[string]interface{}
-			assert.NoError(t, json.Unmarshal(req.Details, &parsed))
+			require.NoError(t, json.Unmarshal(raw, &parsed))
 			assert.Equal(t, "PermissionDescriptorAllow", parsed["__type"])
 			assert.NotContains(t, parsed, "kind", "wire body must not leak `kind` to the API")
-			return &pulumiapi.RoleDescriptor{
+			return &apitype.PermissionDescriptorRecord{
+				PermissionDescriptorBase: apitype.PermissionDescriptorBase{
+					Name:    req.Name,
+					Details: req.Details,
+				},
 				ID:      "role-123",
-				Name:    req.Name,
 				Version: 1,
-				Details: req.Details,
 			}, nil
 		},
 	}
@@ -92,7 +111,7 @@ func TestOrganizationRoleCreate(t *testing.T) {
 func TestOrganizationRoleRead(t *testing.T) {
 	t.Run("not found", func(t *testing.T) {
 		mock := &orgRoleClientMock{
-			get: func(_ context.Context, _, _ string) (*pulumiapi.RoleDescriptor, error) { return nil, nil },
+			get: func(_ context.Context, _, _ string) (*apitype.PermissionDescriptorRecord, error) { return nil, nil },
 		}
 		ctx := config.WithMockClient(context.Background(), mock)
 		r := &OrganizationRole{}
@@ -105,21 +124,20 @@ func TestOrganizationRoleRead(t *testing.T) {
 
 	t.Run("found parses details", func(t *testing.T) {
 		// The API returns wire format with __type; the provider must translate to kind.
-		wirePermissions := map[string]interface{}{
-			"__type":      "PermissionDescriptorAllow",
-			"permissions": []interface{}{"stack:read"},
-		}
-		raw, _ := json.Marshal(wirePermissions)
+		details := mustParseDescriptor(t,
+			`{"__type":"PermissionDescriptorAllow","permissions":["stack:read"]}`)
 		mock := &orgRoleClientMock{
-			get: func(_ context.Context, _, _ string) (*pulumiapi.RoleDescriptor, error) {
-				return &pulumiapi.RoleDescriptor{
-					ID:           "role-123",
-					Name:         "read-only",
-					Description:  "ro",
-					ResourceType: "global",
-					UXPurpose:    "role",
-					Version:      2,
-					Details:      raw,
+			get: func(_ context.Context, _, _ string) (*apitype.PermissionDescriptorRecord, error) {
+				return &apitype.PermissionDescriptorRecord{
+					PermissionDescriptorBase: apitype.PermissionDescriptorBase{
+						Name:         "read-only",
+						Description:  "ro",
+						ResourceType: "global",
+						UxPurpose:    apitype.PermissionDescriptorUXPurposeRole,
+						Details:      details,
+					},
+					ID:      "role-123",
+					Version: 2,
 				}, nil
 			},
 		}
@@ -145,11 +163,13 @@ func TestOrganizationRoleRead(t *testing.T) {
 	// hidden from the SDK — Create hardcodes "role".
 	t.Run("rejects non-role uxPurpose", func(t *testing.T) {
 		mock := &orgRoleClientMock{
-			get: func(_ context.Context, _, _ string) (*pulumiapi.RoleDescriptor, error) {
-				return &pulumiapi.RoleDescriptor{
-					ID:        "policy-123",
-					Name:      "some-policy",
-					UXPurpose: "policy",
+			get: func(_ context.Context, _, _ string) (*apitype.PermissionDescriptorRecord, error) {
+				return &apitype.PermissionDescriptorRecord{
+					PermissionDescriptorBase: apitype.PermissionDescriptorBase{
+						Name:      "some-policy",
+						UxPurpose: apitype.PermissionDescriptorUXPurposePolicy,
+					},
+					ID: "policy-123",
 				}, nil
 			},
 		}
@@ -273,16 +293,24 @@ func TestOrganizationRoleUpdateOmitsDescriptionWhenUnset(t *testing.T) {
 	// pointer when the user had not set one. With `omitempty` on *string only
 	// eliding nil (not empty), the PATCH body included `"description": ""` and
 	// cleared any existing description on the server.
-	raw, _ := json.Marshal(testPermissions)
+	details := mustParseDescriptor(t,
+		`{"__type":"PermissionDescriptorAllow","permissions":["stack:read"]}`)
 	var gotDesc *string
 	gotDesc = new(string) // sentinel so we can distinguish "passed nil" from "test hasn't run"
 	*gotDesc = "__sentinel__"
 	mock := &orgRoleClientMock{
 		update: func(
-			_ context.Context, _, _ string, _, desc *string, _ json.RawMessage,
-		) (*pulumiapi.RoleDescriptor, error) {
+			_ context.Context, _, _ string, _, desc *string, _ apitype.PermissionDescriptor,
+		) (*apitype.PermissionDescriptorRecord, error) {
 			gotDesc = desc
-			return &pulumiapi.RoleDescriptor{ID: "role-123", Name: "read-only", Version: 3, Details: raw}, nil
+			return &apitype.PermissionDescriptorRecord{
+				PermissionDescriptorBase: apitype.PermissionDescriptorBase{
+					Name:    "read-only",
+					Details: details,
+				},
+				ID:      "role-123",
+				Version: 3,
+			}, nil
 		},
 	}
 	ctx := config.WithMockClient(context.Background(), mock)

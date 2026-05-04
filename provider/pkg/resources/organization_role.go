@@ -25,6 +25,7 @@ import (
 	"github.com/pulumi/pulumi-go-provider/infer"
 	"github.com/pulumi/pulumi/sdk/v3/go/property"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/apitype"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
@@ -175,28 +176,26 @@ func (*OrganizationRole) Create(
 		}, nil
 	}
 
-	wire, err := permissionsKindToWireForAPI(req.Inputs.Permissions)
+	details, err := buildPermissionDescriptorForAPI(req.Inputs.Permissions)
 	if err != nil {
 		return infer.CreateResponse[OrganizationRoleState]{}, fmt.Errorf(
 			"invalid permissions: %w",
 			err,
 		)
 	}
-	details, err := json.Marshal(wire)
-	if err != nil {
-		return infer.CreateResponse[OrganizationRoleState]{}, fmt.Errorf(
-			"failed to marshal permissions: %w",
-			err,
-		)
+	resourceType := util.OrZero(req.Inputs.ResourceType)
+	if resourceType == "" {
+		resourceType = "global"
 	}
 
 	client := config.GetClient(ctx)
-	role, err := client.CreateRole(ctx, req.Inputs.OrganizationName, pulumiapi.NewCreateRoleRequest(
-		req.Inputs.Name,
-		util.OrZero(req.Inputs.Description),
-		util.OrZero(req.Inputs.ResourceType),
-		details,
-	))
+	role, err := client.CreateRole(ctx, req.Inputs.OrganizationName, apitype.PermissionDescriptorBase{
+		Name:         req.Inputs.Name,
+		Description:  util.OrZero(req.Inputs.Description),
+		ResourceType: resourceType,
+		UxPurpose:    apitype.PermissionDescriptorUXPurposeRole,
+		Details:      details,
+	})
 	if err != nil {
 		return infer.CreateResponse[OrganizationRoleState]{}, fmt.Errorf(
 			"failed to create role %q: %w",
@@ -227,17 +226,10 @@ func (*OrganizationRole) Update(
 		}, nil
 	}
 
-	wire, err := permissionsKindToWireForAPI(core.Permissions)
+	details, err := buildPermissionDescriptorForAPI(core.Permissions)
 	if err != nil {
 		return infer.UpdateResponse[OrganizationRoleState]{}, fmt.Errorf(
 			"invalid permissions: %w",
-			err,
-		)
-	}
-	details, err := json.Marshal(wire)
-	if err != nil {
-		return infer.UpdateResponse[OrganizationRoleState]{}, fmt.Errorf(
-			"failed to marshal permissions: %w",
 			err,
 		)
 	}
@@ -344,7 +336,7 @@ func (*OrganizationRole) Read(
 func orgRoleCoreFromAPI(
 	orgName string,
 	prior OrganizationRoleCore,
-	role *pulumiapi.RoleDescriptor,
+	role *apitype.PermissionDescriptorRecord,
 ) (OrganizationRoleCore, error) {
 	// uxPurpose is a Pulumi Cloud-internal discriminator that splits the
 	// permission-descriptor table into "role" entries (what this resource
@@ -354,11 +346,11 @@ func orgRoleCoreFromAPI(
 	// caller pointing this resource at a non-role descriptor by ID — the
 	// alternative is silently round-tripping a Policy through code that
 	// only understands roles.
-	if role.UXPurpose != "" && role.UXPurpose != "role" {
+	if role.UxPurpose != "" && role.UxPurpose != apitype.PermissionDescriptorUXPurposeRole {
 		return OrganizationRoleCore{}, fmt.Errorf(
 			"descriptor %q is not a role (uxPurpose=%q); `OrganizationRole` "+
 				"only manages entries with uxPurpose=\"role\"",
-			role.ID, role.UXPurpose,
+			role.ID, role.UxPurpose,
 		)
 	}
 	core := OrganizationRoleCore{
@@ -374,9 +366,18 @@ func orgRoleCoreFromAPI(
 	if core.ResourceType == nil && role.ResourceType != "" && role.ResourceType != "global" {
 		core.ResourceType = util.OrNil(role.ResourceType)
 	}
-	if len(role.Details) > 0 {
+	if role.Details != nil {
+		// Round-trip the typed Details through JSON to recover the wire-shape
+		// map that permissionsWireToKind expects. The marshal call dispatches
+		// through the typed descriptor's MarshalJSON, which emits the
+		// __type-discriminated wire form.
+		raw, err := json.Marshal(role.Details)
+		if err != nil {
+			return OrganizationRoleCore{}, fmt.Errorf(
+				"marshalling role details for %q: %w", role.ID, err)
+		}
 		wire := map[string]interface{}{}
-		if err := json.Unmarshal(role.Details, &wire); err != nil {
+		if err := json.Unmarshal(raw, &wire); err != nil {
 			return OrganizationRoleCore{}, fmt.Errorf("parsing role details for %q: %w", role.ID, err)
 		}
 		// Pass the user's prior input shape so the translator can decide
@@ -394,14 +395,40 @@ func orgRoleCoreFromAPI(
 func orgRoleStateFromAPI(
 	orgName string,
 	core OrganizationRoleCore,
-	role *pulumiapi.RoleDescriptor,
+	role *apitype.PermissionDescriptorRecord,
 ) OrganizationRoleState {
 	core.OrganizationName = orgName
 	return OrganizationRoleState{
 		OrganizationRoleCore: core,
 		RoleId:               role.ID,
-		Version:              role.Version,
+		Version:              int(role.Version),
 	}
+}
+
+// buildPermissionDescriptorForAPI converts a user-facing kind-shape permissions
+// map into the typed apitype.PermissionDescriptor tree expected by the
+// generated SDK. The translation runs the existing kind→__type rename plus
+// the top-level Condition→Group wrap, then hands the JSON off to the
+// generated UnmarshalJSONPermissionDescriptor for discriminator dispatch.
+func buildPermissionDescriptorForAPI(
+	permissions map[string]interface{},
+) (apitype.PermissionDescriptor, error) {
+	wire, err := permissionsKindToWireForAPI(permissions)
+	if err != nil {
+		return nil, err
+	}
+	raw, err := json.Marshal(wire)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal permissions: %w", err)
+	}
+	var details apitype.PermissionDescriptor
+	if err := apitype.UnmarshalJSONPermissionDescriptor(raw, &details); err != nil {
+		return nil, fmt.Errorf("failed to parse permission descriptor: %w", err)
+	}
+	if details == nil {
+		return nil, fmt.Errorf("permission descriptor parsed to nil — missing or unknown discriminator")
+	}
+	return details, nil
 }
 
 func splitOrgRoleID(id string) (string, string, error) {
