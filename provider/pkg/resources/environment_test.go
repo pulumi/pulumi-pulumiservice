@@ -351,6 +351,29 @@ func (c *EscClientMock) URL() string {
 	return ""
 }
 
+func (c *EscClientMock) CreateEnvironmentOpenRequest(
+	_ context.Context,
+	_, _, _ string,
+	_, _ int,
+) (*client.CreateEnvironmentOpenRequestResponse, error) {
+	return nil, nil
+}
+
+func (c *EscClientMock) GetEnvironmentSettings(
+	_ context.Context,
+	_, _, _ string,
+) (*client.EnvironmentSettings, error) {
+	return nil, nil
+}
+
+func (c *EscClientMock) PatchEnvironmentSettings(
+	_ context.Context,
+	_, _, _ string,
+	_ client.PatchEnvironmentSettingsRequest,
+) error {
+	return nil
+}
+
 func buildEscClientMock(
 	getEnvironmentFunc getEnvironmentFunc,
 	getEnvironmentRevisionTagFunc getEnvironmentRevisionTagFunc,
