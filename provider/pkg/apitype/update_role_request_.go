@@ -15,18 +15,18 @@ import (
 // Request to update a custom role.
 type UpdateRoleRequest struct {
 	// The new name for the role.
-	Name *string `json:"Name" yaml:"Name"`
+	Name *string `json:"name,omitempty" yaml:"name,omitempty"`
 	// The new description for the role.
-	Description *string `json:"Description" yaml:"Description"`
+	Description *string `json:"description,omitempty" yaml:"description,omitempty"`
 	// The permission details for the role.
-	Details PermissionDescriptor `json:"Details" yaml:"Details"`
+	Details PermissionDescriptor `json:"details,omitempty" yaml:"details,omitempty"`
 }
 
 func (m *UpdateRoleRequest) UnmarshalJSON(bytes []byte) error {
 	type decoder struct {
-		FieldName        *string         `json:"Name"`
-		FieldDescription *string         `json:"Description"`
-		FieldDetails     json.RawMessage `json:"Details"`
+		FieldName        *string         `json:"name,omitempty"`
+		FieldDescription *string         `json:"description,omitempty"`
+		FieldDetails     json.RawMessage `json:"details,omitempty"`
 	}
 
 	var v decoder
@@ -46,9 +46,9 @@ func (m *UpdateRoleRequest) UnmarshalJSON(bytes []byte) error {
 
 func (m *UpdateRoleRequest) UnmarshalYAML(value *yaml.Node) error {
 	type decoder struct {
-		FieldName        *string   `yaml:"Name,omitempty"`
-		FieldDescription *string   `yaml:"Description,omitempty"`
-		FieldDetails     yaml.Node `yaml:"Details,omitempty"`
+		FieldName        *string   `yaml:"name,omitempty"`
+		FieldDescription *string   `yaml:"description,omitempty"`
+		FieldDetails     yaml.Node `yaml:"details,omitempty"`
 	}
 
 	var v decoder

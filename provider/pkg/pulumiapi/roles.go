@@ -29,8 +29,7 @@ type RoleClient interface {
 	) (*apitype.PermissionDescriptorRecord, error)
 	GetRole(ctx context.Context, orgName, roleID string) (*apitype.PermissionDescriptorRecord, error)
 	UpdateRole(
-		ctx context.Context, orgName, roleID string,
-		name, description *string, details apitype.PermissionDescriptor,
+		ctx context.Context, orgName, roleID string, req apitype.UpdateRoleRequest,
 	) (*apitype.PermissionDescriptorRecord, error)
 	DeleteRole(ctx context.Context, orgName, roleID string, force bool) error
 	ListAvailableRoleScopes(ctx context.Context, orgName string) (map[string][]RoleScopeGroup, error)
@@ -69,16 +68,6 @@ type RoleScopeGroup struct {
 type rbacScopeGroup struct {
 	Name   string      `json:"name"`
 	Scopes []rbacScope `json:"scopes"`
-}
-
-// updateRoleReqWire is the legacy hand-rolled PATCH body. Stays until the
-// upstream OpenAPI spec for `apitype.UpdateRoleRequest` is fixed — the
-// generated type currently emits Pascal-case JSON keys (`Name`, `Description`,
-// `Details`), which the API rejects. See UpdateRole below.
-type updateRoleReqWire struct {
-	Name        *string                      `json:"name,omitempty"`
-	Description *string                      `json:"description,omitempty"`
-	Details     apitype.PermissionDescriptor `json:"details,omitempty"`
 }
 
 // CreateRole creates a new permission descriptor on the organization. The
@@ -129,17 +118,12 @@ func (c *Client) GetRole(
 }
 
 // UpdateRole updates a role's name, description, and/or permission details.
-// Any of the three may be nil to leave unchanged; details as nil preserves the
-// existing permission tree.
-//
-// Transport stays on the hand-rolled PATCH because `apitype.UpdateRoleRequest`
-// is currently mis-specified (Pascal-case JSON tags). Migrate when the spec
-// upstream is corrected.
+// Any field of req may be nil to leave unchanged; Details as nil preserves
+// the existing permission tree.
 func (c *Client) UpdateRole(
 	ctx context.Context,
 	orgName, roleID string,
-	name, description *string,
-	details apitype.PermissionDescriptor,
+	req apitype.UpdateRoleRequest,
 ) (*apitype.PermissionDescriptorRecord, error) {
 	if len(orgName) == 0 {
 		return nil, errors.New("organization name must not be empty")
@@ -148,13 +132,11 @@ func (c *Client) UpdateRole(
 		return nil, errors.New("role id must not be empty")
 	}
 
-	apiPath := path.Join("orgs", orgName, "roles", roleID)
-	req := updateRoleReqWire{Name: name, Description: description, Details: details}
-	var role apitype.PermissionDescriptorRecord
-	if _, err := c.do(ctx, http.MethodPatch, apiPath, req, &role); err != nil {
+	role, err := c.SDK.UpdateRole(ctx, orgName, roleID, req)
+	if err != nil {
 		return nil, fmt.Errorf("failed to update role: %w", err)
 	}
-	return &role, nil
+	return role, nil
 }
 
 // ListAvailableRoleScopes returns the permission scope catalogue, bucketed by

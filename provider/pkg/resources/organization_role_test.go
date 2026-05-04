@@ -23,7 +23,7 @@ type orgRoleClientMock struct {
 	) (*apitype.PermissionDescriptorRecord, error)
 	get    func(ctx context.Context, org, id string) (*apitype.PermissionDescriptorRecord, error)
 	update func(
-		ctx context.Context, org, id string, name, desc *string, details apitype.PermissionDescriptor,
+		ctx context.Context, org, id string, req apitype.UpdateRoleRequest,
 	) (*apitype.PermissionDescriptorRecord, error)
 	del func(ctx context.Context, org, id string, force bool) error
 }
@@ -41,9 +41,9 @@ func (c *orgRoleClientMock) GetRole(
 }
 
 func (c *orgRoleClientMock) UpdateRole(
-	ctx context.Context, org, id string, name, desc *string, details apitype.PermissionDescriptor,
+	ctx context.Context, org, id string, req apitype.UpdateRoleRequest,
 ) (*apitype.PermissionDescriptorRecord, error) {
-	return c.update(ctx, org, id, name, desc, details)
+	return c.update(ctx, org, id, req)
 }
 
 func (c *orgRoleClientMock) DeleteRole(ctx context.Context, org, id string, force bool) error {
@@ -304,9 +304,9 @@ func TestOrganizationRoleUpdateOmitsDescriptionWhenUnset(t *testing.T) {
 	*gotDesc = "__sentinel__"
 	mock := &orgRoleClientMock{
 		update: func(
-			_ context.Context, _, _ string, _, desc *string, _ apitype.PermissionDescriptor,
+			_ context.Context, _, _ string, req apitype.UpdateRoleRequest,
 		) (*apitype.PermissionDescriptorRecord, error) {
-			gotDesc = desc
+			gotDesc = req.Description
 			return &apitype.PermissionDescriptorRecord{
 				PermissionDescriptorBase: apitype.PermissionDescriptorBase{
 					Name:    "read-only",

@@ -240,9 +240,11 @@ func (*OrganizationRole) Update(
 		ctx,
 		req.State.OrganizationName,
 		req.State.RoleId,
-		&name,
-		core.Description,
-		details,
+		apitype.UpdateRoleRequest{
+			Name:        &name,
+			Description: core.Description,
+			Details:     details,
+		},
 	)
 	if err != nil {
 		return infer.UpdateResponse[OrganizationRoleState]{}, fmt.Errorf(

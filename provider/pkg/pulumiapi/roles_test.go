@@ -117,11 +117,12 @@ func TestUpdateRole(t *testing.T) {
 	name := "new-name"
 	desc := "new description"
 	details := mustParseDetails(t)
+	req := apitype.UpdateRoleRequest{Name: &name, Description: &desc, Details: details}
 
 	c := startTestServer(t, testServerConfig{
 		ExpectedReqMethod: http.MethodPatch,
 		ExpectedReqPath:   "/api/orgs/an-organization/roles/" + testRoleID,
-		ExpectedReqBody:   updateRoleReqWire{Name: &name, Description: &desc, Details: details},
+		ExpectedReqBody:   req,
 		ResponseCode:      200,
 		ResponseBody: apitype.PermissionDescriptorRecord{
 			PermissionDescriptorBase: apitype.PermissionDescriptorBase{Name: name, Description: desc},
@@ -130,7 +131,7 @@ func TestUpdateRole(t *testing.T) {
 		},
 	})
 
-	got, err := c.UpdateRole(ctx, testRoleOrgName, testRoleID, &name, &desc, details)
+	got, err := c.UpdateRole(ctx, testRoleOrgName, testRoleID, req)
 	assert.NoError(t, err)
 	if assert.NotNil(t, got) {
 		assert.Equal(t, int32(3), got.Version)
