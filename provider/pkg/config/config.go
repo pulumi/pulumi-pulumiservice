@@ -54,6 +54,7 @@ type Client interface {
 	pulumiapi.InsightsAccountClient
 	pulumiapi.MemberClient
 	pulumiapi.OidcClient
+	pulumiapi.OrgAccessTokenClient
 	pulumiapi.RoleClient
 	pulumiapi.StackTagClient
 	pulumiapi.TeamAccessTokenClient

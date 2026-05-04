@@ -92,6 +92,7 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 		WithResources(
 			infer.Resource(&resources.AccessToken{}),
 			infer.Resource(&resources.InsightsAccount{}),
+			infer.Resource(&resources.OrgAccessToken{}),
 			infer.Resource(&resources.OrganizationMember{}),
 			infer.Resource(&resources.OrganizationRole{}),
 			infer.Resource(&resources.StackTag{}),
@@ -250,9 +251,6 @@ func (k *pulumiserviceProvider) Configure(
 			Client: client,
 		},
 		&resources.TeamStackPermissionResource{
-			Client: client,
-		},
-		&resources.PulumiServiceOrgAccessTokenResource{
 			Client: client,
 		},
 		&resources.PulumiServiceDeploymentSettingsResource{

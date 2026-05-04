@@ -19,10 +19,7 @@ import (
 	"fmt"
 
 	"github.com/pulumi/pulumi-go-provider/infer"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	"github.com/pulumi/pulumi/sdk/v3/go/property"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 )
@@ -136,43 +133,4 @@ func migrateAccessTokenLegacyInputs(
 		state.Value = v.AsString()
 	}
 	return infer.MigrationResult[AccessTokenState]{Result: &state}, nil
-}
-
-// diffAccessTokenProperties is shared with the legacy gRPC-style access-token
-// resources (org_access_token.go, team_access_token.go) which still rely on the
-// "__inputs" property layout. Remove this when those resources are migrated.
-func diffAccessTokenProperties(req *pulumirpc.DiffRequest, replaceProps []string) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
-
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: false})
-	if err != nil {
-		return nil, err
-	}
-
-	inputs, ok := olds["__inputs"]
-	if !ok {
-		return nil, fmt.Errorf("missing __inputs property")
-	}
-	diffs := inputs.ObjectValue().Diff(news)
-	if diffs == nil {
-		return &pulumirpc.DiffResponse{
-			Changes: pulumirpc.DiffResponse_DIFF_NONE,
-		}, nil
-	}
-
-	changes, replaces := pulumirpc.DiffResponse_DIFF_NONE, []string(nil)
-	for _, k := range replaceProps {
-		if diffs.Changed(resource.PropertyKey(k)) {
-			changes = pulumirpc.DiffResponse_DIFF_SOME
-			replaces = append(replaces, k)
-		}
-	}
-
-	return &pulumirpc.DiffResponse{
-		Changes:  changes,
-		Replaces: replaces,
-	}, nil
 }
