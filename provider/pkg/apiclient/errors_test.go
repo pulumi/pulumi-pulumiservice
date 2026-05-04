@@ -47,10 +47,10 @@ func TestAPIError_Accessors(t *testing.T) {
 
 func TestAPIError_StatusPredicates(t *testing.T) {
 	cases := []struct {
-		name       string
-		status     int
-		isNotFound bool
-		isConflict bool
+		name        string
+		status      int
+		isNotFound  bool
+		isConflict  bool
 		isNoContent bool
 	}{
 		{"404", http.StatusNotFound, true, false, false},

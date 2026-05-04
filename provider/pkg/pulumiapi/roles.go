@@ -76,8 +76,8 @@ type rbacScopeGroup struct {
 // generated type currently emits Pascal-case JSON keys (`Name`, `Description`,
 // `Details`), which the API rejects. See UpdateRole below.
 type updateRoleReqWire struct {
-	Name        *string                    `json:"name,omitempty"`
-	Description *string                    `json:"description,omitempty"`
+	Name        *string                      `json:"name,omitempty"`
+	Description *string                      `json:"description,omitempty"`
 	Details     apitype.PermissionDescriptor `json:"details,omitempty"`
 }
 
@@ -249,4 +249,3 @@ func (c *Client) DeleteRole(ctx context.Context, orgName, roleID string, force b
 	}
 	return nil
 }
-

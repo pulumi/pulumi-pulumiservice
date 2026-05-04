@@ -18,7 +18,9 @@ import (
 
 type orgRoleClientMock struct {
 	config.Client
-	create func(ctx context.Context, org string, req apitype.PermissionDescriptorBase) (*apitype.PermissionDescriptorRecord, error)
+	create func(
+		ctx context.Context, org string, req apitype.PermissionDescriptorBase,
+	) (*apitype.PermissionDescriptorRecord, error)
 	get    func(ctx context.Context, org, id string) (*apitype.PermissionDescriptorRecord, error)
 	update func(
 		ctx context.Context, org, id string, name, desc *string, details apitype.PermissionDescriptor,
@@ -65,7 +67,9 @@ var testPermissions = map[string]interface{}{
 
 func TestOrganizationRoleCreate(t *testing.T) {
 	mock := &orgRoleClientMock{
-		create: func(_ context.Context, org string, req apitype.PermissionDescriptorBase) (*apitype.PermissionDescriptorRecord, error) {
+		create: func(
+			_ context.Context, org string, req apitype.PermissionDescriptorBase,
+		) (*apitype.PermissionDescriptorRecord, error) {
 			assert.Equal(t, "acme", org)
 			assert.Equal(t, "read-only", req.Name)
 			// Defaulting moved into the resource layer: empty user input

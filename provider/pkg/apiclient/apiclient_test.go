@@ -108,8 +108,8 @@ func TestCloudClient_Invoke_AppliesCustomHeaders(t *testing.T) {
 	require.NoError(t, err)
 
 	headers := []http.Header{{
-		"Accept":      []string{"text/plain"},
-		"X-Custom":    []string{"one", "two"},
+		"Accept":   []string{"text/plain"},
+		"X-Custom": []string{"one", "two"},
 	}}
 	require.NoError(t, c.invoke(req, headers))
 

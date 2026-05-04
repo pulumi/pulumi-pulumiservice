@@ -38,8 +38,8 @@ func TestCreateRole(t *testing.T) {
 				ResourceType: "global",
 				UxPurpose:    apitype.PermissionDescriptorUXPurposeRole,
 			},
-			ID:    testRoleID,
-			OrgID: "org-id",
+			ID:      testRoleID,
+			OrgID:   "org-id",
 			Version: 1,
 		}
 		c := startTestServer(t, testServerConfig{
@@ -204,4 +204,3 @@ func TestDeleteRole(t *testing.T) {
 		assert.NoError(t, c.DeleteRole(ctx, testRoleOrgName, testRoleID, false))
 	})
 }
-
