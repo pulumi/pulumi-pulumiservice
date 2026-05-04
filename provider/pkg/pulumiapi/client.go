@@ -50,7 +50,17 @@ func NewClient(client *http.Client, token, URL string) (*Client, error) {
 	}
 
 	sendRequest := func(req *http.Request) (*http.Response, error) {
-		req.Header.Set("Accept", "application/vnd.pulumi+3")
+		// Match the headers the hand-rolled c.do() flow attaches in
+		// createRequest below — Accept defaults to vnd.pulumi+8 (let the
+		// SDK's invokeRaw default win; do not override here),
+		// X-Pulumi-Source attributes provider writes for Cloud audit, and
+		// Content-Type is set unconditionally to mirror the legacy path.
+		if req.Header.Get("X-Pulumi-Source") == "" {
+			req.Header.Set("X-Pulumi-Source", "provider")
+		}
+		if req.Header.Get("Content-Type") == "" {
+			req.Header.Set("Content-Type", "application/json")
+		}
 		req.Header.Set("Authorization", fmt.Sprintf("token %s", token))
 		req.Header.Set("User-Agent", "pulumi-admin/1")
 

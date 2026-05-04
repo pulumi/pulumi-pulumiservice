@@ -18,7 +18,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"net/url"
 	"path"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/apitype"
@@ -101,12 +100,11 @@ func (c *Client) CreateRole(
 		return nil, errors.New("role permissions details must not be empty")
 	}
 
-	apiPath := path.Join("orgs", orgName, "roles")
-	var role apitype.PermissionDescriptorRecord
-	if _, err := c.do(ctx, http.MethodPost, apiPath, req, &role); err != nil {
+	role, err := c.SDK.CreateRole(ctx, orgName, nil, req)
+	if err != nil {
 		return nil, fmt.Errorf("failed to create role: %w", err)
 	}
-	return &role, nil
+	return role, nil
 }
 
 // GetRole fetches a role by ID. Returns (nil, nil) if the role does not exist.
@@ -120,15 +118,14 @@ func (c *Client) GetRole(
 		return nil, errors.New("role id must not be empty")
 	}
 
-	apiPath := path.Join("orgs", orgName, "roles", roleID)
-	var role apitype.PermissionDescriptorRecord
-	if _, err := c.do(ctx, http.MethodGet, apiPath, nil, &role); err != nil {
+	role, err := c.SDK.GetRole(ctx, orgName, roleID)
+	if err != nil {
 		if GetErrorStatusCode(err) == http.StatusNotFound {
 			return nil, nil
 		}
 		return nil, fmt.Errorf("failed to get role: %w", err)
 	}
-	return &role, nil
+	return role, nil
 }
 
 // UpdateRole updates a role's name, description, and/or permission details.
@@ -206,15 +203,11 @@ func (c *Client) ListOrgRoles(
 		return nil, errors.New("uxPurpose must not be empty")
 	}
 
-	apiPath := path.Join("orgs", orgName, "roles")
-	q := url.Values{"uxPurpose": []string{uxPurpose}}
-	var body struct {
-		Roles []apitype.PermissionDescriptorRecord `json:"roles"`
-	}
-	if _, err := c.doWithQuery(ctx, http.MethodGet, apiPath, q, nil, &body); err != nil {
+	resp, err := c.SDK.ListRolesByOrgIDAndUXPurpose(ctx, orgName, &uxPurpose)
+	if err != nil {
 		return nil, fmt.Errorf("failed to list organization roles: %w", err)
 	}
-	return body.Roles, nil
+	return resp.Roles, nil
 }
 
 // ResolveBuiltInRoleID returns the FGA role ID for a Pulumi Cloud built-in
@@ -244,12 +237,11 @@ func (c *Client) DeleteRole(ctx context.Context, orgName, roleID string, force b
 		return errors.New("role id must not be empty")
 	}
 
-	apiPath := path.Join("orgs", orgName, "roles", roleID)
-	q := url.Values{}
+	var forcePtr *bool
 	if force {
-		q.Set("force", "true")
+		forcePtr = &force
 	}
-	if _, err := c.doWithQuery(ctx, http.MethodDelete, apiPath, q, nil, nil); err != nil {
+	if err := c.SDK.DeleteRole(ctx, orgName, roleID, forcePtr); err != nil {
 		if GetErrorStatusCode(err) == http.StatusNotFound {
 			return nil
 		}
