@@ -6,8 +6,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
-	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
 )
 
 const (
@@ -24,10 +22,10 @@ func TestGetDeploymentSettings(t *testing.T) {
 
 	t.Run("Happy Path", func(t *testing.T) {
 		dsValue := DeploymentSettings{
-			OperationContext: &OperationContext{},
-			GitHub:           &GitHubConfiguration{},
-			SourceContext:    &SourceContext{},
-			ExecutorContext:  &apitype.ExecutorContext{},
+			Operation:     &OperationContext{},
+			GitHub:        &DeploymentSettingsGitHub{},
+			SourceContext: &SourceContext{},
+			Executor:      &ExecutorContext{},
 		}
 
 		c := startTestServer(t, testServerConfig{
@@ -93,11 +91,11 @@ func TestCreateDeploymentSettings(t *testing.T) {
 
 	t.Run("Happy Path", func(t *testing.T) {
 		dsValue := DeploymentSettings{
-			OperationContext: &OperationContext{},
-			GitHub:           &GitHubConfiguration{},
-			SourceContext:    &SourceContext{},
-			ExecutorContext:  &apitype.ExecutorContext{},
-			CacheOptions:     &CacheOptions{},
+			Operation:     &OperationContext{},
+			GitHub:        &DeploymentSettingsGitHub{},
+			SourceContext: &SourceContext{},
+			Executor:      &ExecutorContext{},
+			CacheOptions:  &CacheOptions{},
 		}
 
 		c := startTestServer(t, testServerConfig{

@@ -22,12 +22,15 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/apiclient"
 )
 
 type Client struct {
 	httpClient *http.Client
 	token      string
 	baseurl    *url.URL
+	SDK        *apiclient.CloudClient
 }
 
 func NewClient(client *http.Client, token, URL string) (*Client, error) {
@@ -46,7 +49,21 @@ func NewClient(client *http.Client, token, URL string) (*Client, error) {
 		baseURL.Path = "/api/"
 	}
 
+	sendRequest := func(req *http.Request) (*http.Response, error) {
+		req.Header.Set("Accept", "application/vnd.pulumi+3")
+		req.Header.Set("Authorization", fmt.Sprintf("token %s", token))
+		req.Header.Set("User-Agent", "pulumi-admin/1")
+
+		return client.Do(req) //nolint:gosec // G704 — URL is from trusted admin config
+	}
+
+	pulumiAPI := &apiclient.CloudClient{
+		BaseURL:  baseURL.String(),
+		Executor: sendRequest,
+	}
+
 	return &Client{
+		SDK:        pulumiAPI,
 		httpClient: client,
 		token:      token,
 		baseurl:    baseURL,

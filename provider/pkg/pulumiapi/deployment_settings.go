@@ -2,12 +2,11 @@ package pulumiapi
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"path"
 
-	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/apitype"
 )
 
 type DeploymentSettingsClient interface {
@@ -25,144 +24,58 @@ type DeploymentSettingsClient interface {
 	DeleteDeploymentSettings(ctx context.Context, stack StackIdentifier) error
 }
 
-type DeploymentSettings struct {
-	OperationContext *OperationContext        `json:"operationContext,omitempty"`
-	GitHub           *GitHubConfiguration     `json:"gitHub,omitempty"`
-	SourceContext    *SourceContext           `json:"sourceContext,omitempty"`
-	ExecutorContext  *apitype.ExecutorContext `json:"executorContext,omitempty"`
-	AgentPoolID      string                   `json:"agentPoolId,omitempty"`
-	Source           *string                  `json:"source,omitempty"`
-	CacheOptions     *CacheOptions            `json:"cacheOptions,omitempty"`
-	VCS              *VCSConfiguration        `json:"vcs,omitempty"`
-}
+type DeploymentSettings = apitype.DeploymentSettings
 
-type OperationContext struct {
-	Options              *OperationContextOptions `json:"options,omitempty"`
-	PreRunCommands       []string                 `json:"PreRunCommands,omitempty"`
-	EnvironmentVariables map[string]SecretValue   `json:"environmentVariables,omitempty"`
-	OIDC                 *OIDCConfiguration       `json:"oidc,omitempty"`
-}
+type OperationContext = apitype.OperationContext
 
-type OIDCConfiguration struct {
-	AWS   *AWSOIDCConfiguration   `json:"aws,omitempty"`
-	GCP   *GCPOIDCConfiguration   `json:"gcp,omitempty"`
-	Azure *AzureOIDCConfiguration `json:"azure,omitempty"`
-}
+type OperationContextOIDCConfiguration = apitype.OperationContextOIDCConfiguration
 
-type AWSOIDCConfiguration struct {
-	Duration    string   `json:"duration,omitempty"`
-	PolicyARNs  []string `json:"policyArns,omitempty"`
-	RoleARN     string   `json:"roleArn"`
-	SessionName string   `json:"sessionName"`
-}
+type OperationContextAWSOIDCConfiguration = apitype.OperationContextAWSOIDCConfiguration
 
-type GCPOIDCConfiguration struct {
-	ProjectID      string `json:"projectId,omitempty"`
-	Region         string `json:"region"`
-	WorkloadPoolID string `json:"workloadPoolId,omitempty"`
-	ProviderID     string `json:"providerId,omitempty"`
-	ServiceAccount string `json:"serviceAccount,omitempty"`
-	TokenLifetime  string `json:"tokenLifetime"`
-}
+type OperationContextGCPOIDCConfiguration = apitype.OperationContextGCPOIDCConfiguration
 
-type AzureOIDCConfiguration struct {
-	ClientID       string `json:"clientId"`
-	TenantID       string `json:"tenantId"`
-	SubscriptionID string `json:"subscriptionId"`
-}
+type OperationContextAzureOIDCConfiguration = apitype.OperationContextAzureOIDCConfiguration
 
-type OperationContextOptions struct {
-	SkipInstallDependencies     bool   `json:"skipInstallDependencies,omitempty"`
-	SkipIntermediateDeployments bool   `json:"skipIntermediateDeployments,omitempty"`
-	Shell                       string `json:"shell,omitempty"`
-	DeleteAfterDestroy          bool   `json:"deleteAfterDestroy,omitempty"`
-}
+type OperationContextOptions = apitype.OperationContextOptions
 
-type GitHubConfiguration struct {
-	Repository          string   `json:"repository,omitempty"`
-	DeployCommits       bool     `json:"deployCommits,omitempty"`
-	PreviewPullRequests bool     `json:"previewPullRequests,omitempty"`
-	PullRequestTemplate bool     `json:"pullRequestTemplate,omitempty"`
-	Paths               []string `json:"paths,omitempty"`
-}
+type DeploymentSettingsGitHub = apitype.DeploymentSettingsGitHub
 
-type VCSConfiguration struct {
-	Provider            string   `json:"provider"`
-	Repository          string   `json:"repository,omitempty"`
-	InstallationID      string   `json:"installationId,omitempty"`
-	DeployCommits       bool     `json:"deployCommits"`
-	PreviewPullRequests bool     `json:"previewPullRequests"`
-	PullRequestTemplate bool     `json:"pullRequestTemplate"`
-	Paths               []string `json:"paths,omitempty"`
-	DeployPullRequest   *int     `json:"deployPullRequest,omitempty"`
-}
+type DeploymentSettingsVCS = apitype.DeploymentSettingsVCS
 
-type SourceContext struct {
-	Git *SourceContextGit `json:"git,omitempty"`
-}
+type DeploymentSettingsVCSAzureDevOps = apitype.DeploymentSettingsVCSAzureDevOps
+type DeploymentSettingsVCSAzureDevOpsBuilder = apitype.DeploymentSettingsVCSAzureDevOpsBuilder
 
-type SourceContextGit struct {
-	RepoURL string         `json:"repoURL"`
-	Branch  string         `json:"branch"`
-	RepoDir string         `json:"repoDir,omitempty"`
-	Commit  string         `json:"commit,omitempty"`
-	GitAuth *GitAuthConfig `json:"gitAuth,omitempty"`
-}
+type DeploymentSettingsVCSBitbucket = apitype.DeploymentSettingsVCSBitbucket
+type DeploymentSettingsVCSBitbucketBuilder = apitype.DeploymentSettingsVCSBitbucketBuilder
 
-type GitAuthConfig struct {
-	PersonalAccessToken *SecretValue `json:"accessToken,omitempty"`
-	SSHAuth             *SSHAuth     `json:"sshAuth,omitempty"`
-	BasicAuth           *BasicAuth   `json:"basicAuth,omitempty"`
-}
+type DeploymentSettingsVCSCustom = apitype.DeploymentSettingsVCSCustom
+type DeploymentSettingsVCSCustomBuilder = apitype.DeploymentSettingsVCSCustomBuilder
 
-type SSHAuth struct {
-	SSHPrivateKey SecretValue  `json:"sshPrivateKey"`
-	Password      *SecretValue `json:"password,omitempty"`
-}
+type DeploymentSettingsVCSGitHub = apitype.DeploymentSettingsVCSGitHub
+type DeploymentSettingsVCSGitHubBuilder = apitype.DeploymentSettingsVCSGitHubBuilder
 
-type BasicAuth struct {
-	UserName SecretValue `json:"userName"`
-	Password SecretValue `json:"password"`
-}
+type DeploymentSettingsVCSGitLab = apitype.DeploymentSettingsVCSGitLab
+type DeploymentSettingsVCSGitLabBuilder = apitype.DeploymentSettingsVCSGitLabBuilder
 
-type SecretValue struct {
-	Value  string // Plaintext if Secret is false; ciphertext otherwise.
-	Secret bool
-}
+type DeploymentSettingsVCSBuilder = apitype.DeploymentSettingsVCSBuilder
 
-type CacheOptions struct {
-	Enable bool `json:"enable"`
-}
+type SourceContext = apitype.SourceContext
 
-type secretCiphertextValue struct {
-	Ciphertext string `json:"ciphertext"`
-}
+type ExecutorContext = apitype.ExecutorContext
 
-type secretWorkflowValue struct {
-	Secret string `json:"secret" yaml:"secret"`
-}
+type DockerImage = apitype.DockerImage
 
-func (v SecretValue) MarshalJSON() ([]byte, error) {
-	if v.Secret {
-		return json.Marshal(secretWorkflowValue{Secret: v.Value})
-	}
-	return json.Marshal(v.Value)
-}
+type SourceContextGit = apitype.SourceContextGit
 
-func (v *SecretValue) UnmarshalJSON(bytes []byte) error {
-	var secret secretCiphertextValue
-	if err := json.Unmarshal(bytes, &secret); err == nil {
-		v.Value, v.Secret = secret.Ciphertext, true
-		return nil
-	}
+type GitAuthConfig = apitype.GitAuthConfig
 
-	var plaintext string
-	if err := json.Unmarshal(bytes, &plaintext); err != nil {
-		return err
-	}
-	v.Value, v.Secret = plaintext, false
-	return nil
-}
+type SSHAuth = apitype.SSHAuth
+
+type BasicAuth = apitype.BasicAuth
+
+type SecretValue = apitype.SecretValue
+
+type CacheOptions = apitype.CacheOptions
 
 func (c *Client) CreateDeploymentSettings(
 	ctx context.Context,

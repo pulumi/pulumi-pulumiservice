@@ -8,7 +8,6 @@ import (
 
 	pbempty "google.golang.org/protobuf/types/known/emptypb"
 
-	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
@@ -54,8 +53,8 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(
 	pm["project"] = resource.NewPropertyValue(ds.Stack.ProjectName)
 	pm["stack"] = resource.NewPropertyValue(ds.Stack.StackName)
 
-	if ds.AgentPoolID != "" {
-		pm["agentPoolId"] = resource.NewPropertyValue(ds.AgentPoolID)
+	if ds.AgentPoolID != nil {
+		pm["agentPoolId"] = resource.NewPropertyValue(*ds.AgentPoolID)
 	}
 
 	if ds.SourceContext != nil {
@@ -180,26 +179,26 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(
 		pm["sourceContext"] = resource.PropertyValue{V: scMap}
 	}
 
-	if ds.OperationContext != nil {
+	if ds.Operation != nil {
 		ocMap := resource.PropertyMap{}
-		if ds.OperationContext.PreRunCommands != nil {
-			ocMap["preRunCommands"] = resource.NewPropertyValue(ds.OperationContext.PreRunCommands)
+		if ds.Operation.PreRunCommands != nil {
+			ocMap["preRunCommands"] = resource.NewPropertyValue(ds.Operation.PreRunCommands)
 		}
-		if ds.OperationContext.EnvironmentVariables != nil {
+		if ds.Operation.EnvironmentVariables != nil {
 			evMap := resource.PropertyMap{}
-			for k, v := range ds.OperationContext.EnvironmentVariables {
+			for k, v := range ds.Operation.EnvironmentVariables {
 				if v.Secret {
 					if mergeMode {
 						var plaintextValue pulumiapi.SecretValue
 						var currentCipherValue pulumiapi.SecretValue
-						if currentStateCipherSettings.OperationContext != nil {
-							plaintextValue = plaintextInputSettings.OperationContext.EnvironmentVariables[k]
-							currentCipherValue = currentStateCipherSettings.OperationContext.EnvironmentVariables[k]
+						if currentStateCipherSettings.Operation != nil {
+							plaintextValue = plaintextInputSettings.Operation.EnvironmentVariables[k]
+							currentCipherValue = currentStateCipherSettings.Operation.EnvironmentVariables[k]
 						}
 						util.MergeSecretValue(evMap, k, v, &plaintextValue, &currentCipherValue, isInput)
 					} else if createMode {
 						util.CreateSecretValue(evMap, k, v,
-							plaintextInputSettings.OperationContext.EnvironmentVariables[k], isInput)
+							plaintextInputSettings.Operation.EnvironmentVariables[k], isInput)
 					} else {
 						util.ImportSecretValue(evMap, k, v, isInput)
 					}
@@ -209,79 +208,79 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(
 			}
 			ocMap["environmentVariables"] = resource.PropertyValue{V: evMap}
 		}
-		if ds.OperationContext.Options != nil {
+		if ds.Operation.Options != nil {
 			optionsMap := resource.PropertyMap{}
-			if ds.OperationContext.Options.Shell != "" {
-				optionsMap["shell"] = resource.NewPropertyValue(ds.OperationContext.Options.Shell)
+			if ds.Operation.Options.Shell != "" {
+				optionsMap["shell"] = resource.NewPropertyValue(ds.Operation.Options.Shell)
 			}
-			if ds.OperationContext.Options.SkipInstallDependencies {
+			if ds.Operation.Options.SkipInstallDependencies {
 				optionsMap["skipInstallDependencies"] = resource.NewPropertyValue(true)
 			}
-			if ds.OperationContext.Options.SkipIntermediateDeployments {
+			if ds.Operation.Options.SkipIntermediateDeployments {
 				optionsMap["skipIntermediateDeployments"] = resource.NewPropertyValue(true)
 			}
-			if ds.OperationContext.Options.DeleteAfterDestroy {
+			if ds.Operation.Options.DeleteAfterDestroy {
 				optionsMap["deleteAfterDestroy"] = resource.NewPropertyValue(true)
 			}
 			ocMap["options"] = resource.PropertyValue{V: optionsMap}
 		}
-		if ds.OperationContext.OIDC != nil {
-			if ds.OperationContext.OIDC.AWS != nil || ds.OperationContext.OIDC.GCP != nil ||
-				ds.OperationContext.OIDC.Azure != nil {
+		if ds.Operation.OIDC != nil {
+			if ds.Operation.OIDC.AWS != nil || ds.Operation.OIDC.GCP != nil ||
+				ds.Operation.OIDC.Azure != nil {
 				oidcMap := resource.PropertyMap{}
-				if ds.OperationContext.OIDC.AWS != nil {
+				if ds.Operation.OIDC.AWS != nil {
 					awsMap := resource.PropertyMap{}
-					if ds.OperationContext.OIDC.AWS.RoleARN != "" {
-						awsMap["roleARN"] = resource.NewPropertyValue(ds.OperationContext.OIDC.AWS.RoleARN)
+					if ds.Operation.OIDC.AWS.RoleARN != "" {
+						awsMap["roleARN"] = resource.NewPropertyValue(ds.Operation.OIDC.AWS.RoleARN)
 					}
-					if ds.OperationContext.OIDC.AWS.SessionName != "" {
-						awsMap["sessionName"] = resource.NewPropertyValue(ds.OperationContext.OIDC.AWS.SessionName)
+					if ds.Operation.OIDC.AWS.SessionName != "" {
+						awsMap["sessionName"] = resource.NewPropertyValue(ds.Operation.OIDC.AWS.SessionName)
 					}
-					if ds.OperationContext.OIDC.AWS.PolicyARNs != nil {
-						awsMap["policyARNs"] = resource.NewPropertyValue(ds.OperationContext.OIDC.AWS.PolicyARNs)
+					if ds.Operation.OIDC.AWS.PolicyARNs != nil {
+						awsMap["policyARNs"] = resource.NewPropertyValue(ds.Operation.OIDC.AWS.PolicyARNs)
 					}
-					if ds.OperationContext.OIDC.AWS.Duration != "" {
-						awsMap["duration"] = resource.NewPropertyValue(ds.OperationContext.OIDC.AWS.Duration)
+					if ds.Operation.OIDC.AWS.Duration != "" {
+						awsMap["duration"] = resource.NewPropertyValue(ds.Operation.OIDC.AWS.Duration)
 					}
 					oidcMap["aws"] = resource.PropertyValue{V: awsMap}
 				}
-				if ds.OperationContext.OIDC.GCP != nil {
+				if ds.Operation.OIDC.GCP != nil {
 					gcpMap := resource.PropertyMap{}
-					if ds.OperationContext.OIDC.GCP.ProviderID != "" {
-						gcpMap["providerId"] = resource.NewPropertyValue(ds.OperationContext.OIDC.GCP.ProviderID)
+					if ds.Operation.OIDC.GCP.ProviderID != "" {
+						gcpMap["providerId"] = resource.NewPropertyValue(ds.Operation.OIDC.GCP.ProviderID)
 					}
-					if ds.OperationContext.OIDC.GCP.ServiceAccount != "" {
+					if ds.Operation.OIDC.GCP.ServiceAccount != "" {
 						gcpMap["serviceAccount"] = resource.NewPropertyValue(
-							ds.OperationContext.OIDC.GCP.ServiceAccount,
+							ds.Operation.OIDC.GCP.ServiceAccount,
 						)
 					}
-					if ds.OperationContext.OIDC.GCP.Region != "" {
-						gcpMap["region"] = resource.NewPropertyValue(ds.OperationContext.OIDC.GCP.Region)
+					if ds.Operation.OIDC.GCP.Region != "" {
+						gcpMap["region"] = resource.NewPropertyValue(ds.Operation.OIDC.GCP.Region)
 					}
-					if ds.OperationContext.OIDC.GCP.WorkloadPoolID != "" {
+					if ds.Operation.OIDC.GCP.WorkloadPoolID != "" {
 						gcpMap["workloadPoolId"] = resource.NewPropertyValue(
-							ds.OperationContext.OIDC.GCP.WorkloadPoolID,
+							ds.Operation.OIDC.GCP.WorkloadPoolID,
 						)
 					}
-					if ds.OperationContext.OIDC.GCP.ProjectID != "" {
-						gcpMap["projectId"] = resource.NewPropertyValue(ds.OperationContext.OIDC.GCP.ProjectID)
+					if ds.Operation.OIDC.GCP.ProjectID != "" {
+						gcpMap["projectId"] = resource.NewPropertyValue(ds.Operation.OIDC.GCP.ProjectID)
 					}
-					if ds.OperationContext.OIDC.GCP.TokenLifetime != "" {
-						gcpMap["tokenLifetime"] = resource.NewPropertyValue(ds.OperationContext.OIDC.GCP.TokenLifetime)
+					if ds.Operation.OIDC.GCP.TokenLifetime != "" {
+						gcpMap["tokenLifetime"] = resource.NewPropertyValue(ds.Operation.OIDC.GCP.TokenLifetime)
 					}
 					oidcMap["gcp"] = resource.PropertyValue{V: gcpMap}
 				}
-				if ds.OperationContext.OIDC.Azure != nil {
+				if ds.Operation.OIDC.Azure != nil {
 					azureMap := resource.PropertyMap{}
-					if ds.OperationContext.OIDC.Azure.TenantID != "" {
-						azureMap["tenantId"] = resource.NewPropertyValue(ds.OperationContext.OIDC.Azure.TenantID)
+					if ds.Operation.OIDC.Azure.TenantID != "" {
+						azureMap["tenantId"] = resource.NewPropertyValue(ds.Operation.OIDC.Azure.TenantID)
 					}
-					if ds.OperationContext.OIDC.Azure.ClientID != "" {
-						azureMap["clientId"] = resource.NewPropertyValue(ds.OperationContext.OIDC.Azure.ClientID)
+					if ds.Operation.OIDC.Azure.ClientID != "" {
+						azureMap["clientId"] = resource.NewPropertyValue(ds.Operation.OIDC.Azure.ClientID)
 					}
-					if ds.OperationContext.OIDC.Azure.SubscriptionID != "" {
+					if ds.Operation.OIDC.Azure.SubscriptionID != "" {
 						azureMap["subscriptionId"] = resource.NewPropertyValue(
-							ds.OperationContext.OIDC.Azure.SubscriptionID,
+							ds.Operation.OIDC.Azure.SubscriptionID,
 						)
 					}
 					oidcMap["azure"] = resource.PropertyValue{V: azureMap}
@@ -306,31 +305,32 @@ func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(
 		pm["github"] = resource.PropertyValue{V: githubMap}
 	}
 
-	if ds.VCS != nil {
+	if ds.Vcs != nil {
 		vcsMap := resource.PropertyMap{}
-		vcsMap["provider"] = resource.NewPropertyValue(ds.VCS.Provider)
-		vcsMap["deployCommits"] = resource.NewPropertyValue(ds.VCS.DeployCommits)
-		vcsMap["previewPullRequests"] = resource.NewPropertyValue(ds.VCS.PreviewPullRequests)
-		vcsMap["pullRequestTemplate"] = resource.NewPropertyValue(ds.VCS.PullRequestTemplate)
-		if ds.VCS.Repository != "" {
-			vcsMap["repository"] = resource.NewPropertyValue(ds.VCS.Repository)
+		provider, _ := ds.Vcs.GetDiscriminatorValue()
+		vcsMap["provider"] = resource.NewPropertyValue(provider)
+		vcsMap["deployCommits"] = resource.NewPropertyValue(ds.Vcs.DeployCommits())
+		vcsMap["previewPullRequests"] = resource.NewPropertyValue(ds.Vcs.PreviewPullRequests())
+		vcsMap["pullRequestTemplate"] = resource.NewPropertyValue(ds.Vcs.PullRequestTemplate())
+		if ds.Vcs.Repository() != "" {
+			vcsMap["repository"] = resource.NewPropertyValue(ds.Vcs.Repository())
 		}
-		if ds.VCS.InstallationID != "" {
-			vcsMap["installationId"] = resource.NewPropertyValue(ds.VCS.InstallationID)
+		if ds.Vcs.InstallationID() != "" {
+			vcsMap["installationId"] = resource.NewPropertyValue(ds.Vcs.InstallationID())
 		}
-		if len(ds.VCS.Paths) > 0 {
-			vcsMap["paths"] = resource.NewPropertyValue(ds.VCS.Paths)
+		if len(ds.Vcs.Paths()) > 0 {
+			vcsMap["paths"] = resource.NewPropertyValue(ds.Vcs.Paths())
 		}
-		if ds.VCS.DeployPullRequest != nil {
-			vcsMap["deployPullRequest"] = resource.NewPropertyValue(float64(*ds.VCS.DeployPullRequest))
+		if ds.Vcs.DeployPullRequest() != nil {
+			vcsMap["deployPullRequest"] = resource.NewPropertyValue(float64(*ds.Vcs.DeployPullRequest()))
 		}
 		pm["vcs"] = resource.PropertyValue{V: vcsMap}
 	}
 
-	if ds.ExecutorContext != nil && ds.ExecutorContext.ExecutorImage != nil &&
-		ds.ExecutorContext.ExecutorImage.Reference != "" {
+	if ds.Executor != nil && ds.Executor.ExecutorImage != nil &&
+		ds.Executor.ExecutorImage.Reference != "" {
 		ecMap := resource.PropertyMap{}
-		ecMap["executorImage"] = resource.NewPropertyValue(ds.ExecutorContext.ExecutorImage.Reference)
+		ecMap["executorImage"] = resource.NewPropertyValue(ds.Executor.ExecutorImage.Reference)
 		pm["executorContext"] = resource.PropertyValue{V: ecMap}
 	}
 
@@ -357,29 +357,30 @@ func (ds *PulumiServiceDeploymentSettingsResource) ToPulumiServiceDeploymentSett
 	input.Stack.StackName = util.GetSecretOrStringValue(inputMap["stack"])
 
 	if inputMap["agentPoolId"].HasValue() {
-		input.AgentPoolID = util.GetSecretOrStringValue(inputMap["agentPoolId"])
+		value := util.GetSecretOrStringValue(inputMap["agentPoolId"])
+		input.AgentPoolID = &value
 	}
 
-	input.ExecutorContext = toExecutorContext(inputMap)
+	input.Executor = toExecutorContext(inputMap)
 	input.GitHub = toGitHubConfig(inputMap)
 	input.SourceContext = toSourceContext(inputMap)
-	input.OperationContext = toOperationContext(inputMap)
+	input.Operation = toOperationContext(inputMap)
 	input.CacheOptions = toCacheOptions(inputMap)
-	input.VCS = toVCSConfig(inputMap)
+	input.Vcs = toVCSConfig(inputMap)
 
 	return input
 }
 
-func toExecutorContext(inputMap resource.PropertyMap) *apitype.ExecutorContext {
+func toExecutorContext(inputMap resource.PropertyMap) *pulumiapi.ExecutorContext {
 	if !inputMap["executorContext"].HasValue() {
 		return nil
 	}
 
 	ecInput := util.GetSecretOrObjectValue(inputMap["executorContext"])
-	var ec apitype.ExecutorContext
+	var ec pulumiapi.ExecutorContext
 
 	if ecInput["executorImage"].HasValue() {
-		ec.ExecutorImage = &apitype.DockerImage{
+		ec.ExecutorImage = &pulumiapi.DockerImage{
 			Reference: util.GetSecretOrStringValue(ecInput["executorImage"]),
 		}
 	}
@@ -387,13 +388,13 @@ func toExecutorContext(inputMap resource.PropertyMap) *apitype.ExecutorContext {
 	return &ec
 }
 
-func toGitHubConfig(inputMap resource.PropertyMap) *pulumiapi.GitHubConfiguration {
+func toGitHubConfig(inputMap resource.PropertyMap) *pulumiapi.DeploymentSettingsGitHub {
 	if !inputMap["github"].HasValue() {
 		return nil
 	}
 
 	githubInput := util.GetSecretOrObjectValue(inputMap["github"])
-	var github pulumiapi.GitHubConfiguration
+	var github pulumiapi.DeploymentSettingsGitHub
 
 	if githubInput["repository"].HasValue() {
 		github.Repository = util.GetSecretOrStringValue(githubInput["repository"])
@@ -422,31 +423,51 @@ func toGitHubConfig(inputMap resource.PropertyMap) *pulumiapi.GitHubConfiguratio
 	return &github
 }
 
-func toVCSConfig(inputMap resource.PropertyMap) *pulumiapi.VCSConfiguration {
+func toVCSConfig(inputMap resource.PropertyMap) pulumiapi.DeploymentSettingsVCS {
 	if !inputMap["vcs"].HasValue() {
 		return nil
 	}
 
 	vcsInput := util.GetSecretOrObjectValue(inputMap["vcs"])
-	var vcs pulumiapi.VCSConfiguration
+	var vcs pulumiapi.DeploymentSettingsVCS
 
-	if vcsInput["provider"].HasValue() {
-		vcs.Provider = util.GetSecretOrStringValue(vcsInput["provider"])
+	if !vcsInput["provider"].HasValue() {
+		return nil
 	}
+	switch util.GetSecretOrStringValue(vcsInput["provider"]) {
+	case "azure_devops":
+		vcs = pulumiapi.DeploymentSettingsVCSAzureDevOpsBuilder{}.Build()
+
+	case "bitbucket":
+		vcs = pulumiapi.DeploymentSettingsVCSBitbucketBuilder{}.Build()
+
+	case "custom":
+		vcs = pulumiapi.DeploymentSettingsVCSCustomBuilder{}.Build()
+
+	case "github":
+		vcs = pulumiapi.DeploymentSettingsVCSGitHubBuilder{}.Build()
+
+	case "gitlab":
+		vcs = pulumiapi.DeploymentSettingsVCSGitLabBuilder{}.Build()
+
+	default:
+		return nil
+	}
+
 	if vcsInput["repository"].HasValue() {
-		vcs.Repository = util.GetSecretOrStringValue(vcsInput["repository"])
+		_ = vcs.SetRepository(util.GetSecretOrStringValue(vcsInput["repository"]))
 	}
 	if vcsInput["installationId"].HasValue() {
-		vcs.InstallationID = util.GetSecretOrStringValue(vcsInput["installationId"])
+		_ = vcs.SetInstallationID(util.GetSecretOrStringValue(vcsInput["installationId"]))
 	}
 	if vcsInput["deployCommits"].HasValue() {
-		vcs.DeployCommits = util.GetSecretOrBoolValue(vcsInput["deployCommits"])
+		_ = vcs.SetDeployCommits(util.GetSecretOrBoolValue(vcsInput["deployCommits"]))
 	}
 	if vcsInput["previewPullRequests"].HasValue() {
-		vcs.PreviewPullRequests = util.GetSecretOrBoolValue(vcsInput["previewPullRequests"])
+		_ = vcs.SetPreviewPullRequests(util.GetSecretOrBoolValue(vcsInput["previewPullRequests"]))
 	}
 	if vcsInput["pullRequestTemplate"].HasValue() {
-		vcs.PullRequestTemplate = util.GetSecretOrBoolValue(vcsInput["pullRequestTemplate"])
+		_ = vcs.SetPullRequestTemplate(util.GetSecretOrBoolValue(vcsInput["pullRequestTemplate"]))
 	}
 	if vcsInput["paths"].HasValue() {
 		pathsInput := util.GetSecretOrArrayValue(vcsInput["paths"])
@@ -454,14 +475,14 @@ func toVCSConfig(inputMap resource.PropertyMap) *pulumiapi.VCSConfiguration {
 		for i, v := range pathsInput {
 			paths[i] = util.GetSecretOrStringValue(v)
 		}
-		vcs.Paths = paths
+		_ = vcs.SetPaths(paths)
 	}
 	if vcsInput["deployPullRequest"].HasValue() {
-		val := int(util.GetSecretOrNumberValue(vcsInput["deployPullRequest"]))
-		vcs.DeployPullRequest = &val
+		val := int64(util.GetSecretOrNumberValue(vcsInput["deployPullRequest"]))
+		_ = vcs.SetDeployPullRequest(&val)
 	}
 
-	return &vcs
+	return vcs
 }
 
 func toSourceContext(inputMap resource.PropertyMap) *pulumiapi.SourceContext {
@@ -604,11 +625,11 @@ func toOperationContext(inputMap resource.PropertyMap) *pulumiapi.OperationConte
 
 	if ocInput["oidc"].HasValue() {
 		oidcInput := util.GetSecretOrObjectValue(ocInput["oidc"])
-		var oidc pulumiapi.OIDCConfiguration
+		var oidc pulumiapi.OperationContextOIDCConfiguration
 
 		if oidcInput["aws"].HasValue() {
 			awsInput := util.GetSecretOrObjectValue(oidcInput["aws"])
-			var aws pulumiapi.AWSOIDCConfiguration
+			var aws pulumiapi.OperationContextAWSOIDCConfiguration
 
 			if awsInput["roleARN"].HasValue() {
 				aws.RoleARN = util.GetSecretOrStringValue(awsInput["roleARN"])
@@ -635,7 +656,7 @@ func toOperationContext(inputMap resource.PropertyMap) *pulumiapi.OperationConte
 
 		if oidcInput["gcp"].HasValue() {
 			gcpInput := util.GetSecretOrObjectValue(oidcInput["gcp"])
-			var gcp pulumiapi.GCPOIDCConfiguration
+			var gcp pulumiapi.OperationContextGCPOIDCConfiguration
 
 			if gcpInput["projectId"].HasValue() {
 				gcp.ProjectID = util.GetSecretOrStringValue(gcpInput["projectId"])
@@ -661,7 +682,7 @@ func toOperationContext(inputMap resource.PropertyMap) *pulumiapi.OperationConte
 
 		if oidcInput["azure"].HasValue() {
 			azureInput := util.GetSecretOrObjectValue(oidcInput["azure"])
-			var azure pulumiapi.AzureOIDCConfiguration
+			var azure pulumiapi.OperationContextAzureOIDCConfiguration
 
 			if azureInput["tenantId"].HasValue() {
 				azure.TenantID = util.GetSecretOrStringValue(azureInput["tenantId"])
