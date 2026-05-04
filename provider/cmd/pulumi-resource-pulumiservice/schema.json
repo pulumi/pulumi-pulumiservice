@@ -2840,11 +2840,13 @@
         },
         "organization": {
           "type": "string",
-          "description": "Organization name."
+          "description": "Organization name.",
+          "replaceOnChanges": true
         },
         "project": {
           "type": "string",
-          "description": "Project name."
+          "description": "Project name.",
+          "replaceOnChanges": true
         },
         "scheduleId": {
           "type": "string",
@@ -2852,12 +2854,13 @@
         },
         "stack": {
           "type": "string",
-          "description": "Stack name."
+          "description": "Stack name.",
+          "replaceOnChanges": true
         },
         "timestamp": {
           "type": "string",
           "description": "The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         }
       },
       "required": [
@@ -2876,22 +2879,22 @@
         "organization": {
           "type": "string",
           "description": "Organization name.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         },
         "project": {
           "type": "string",
           "description": "Project name.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         },
         "stack": {
           "type": "string",
           "description": "Stack name.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         },
         "timestamp": {
           "type": "string",
           "description": "The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         }
       },
       "requiredInputs": [
