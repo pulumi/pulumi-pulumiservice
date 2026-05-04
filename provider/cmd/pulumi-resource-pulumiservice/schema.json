@@ -1525,11 +1525,13 @@
         },
         "organization": {
           "type": "string",
-          "description": "Organization name."
+          "description": "Organization name.",
+          "replaceOnChanges": true
         },
         "project": {
           "type": "string",
-          "description": "Project name."
+          "description": "Project name.",
+          "replaceOnChanges": true
         },
         "scheduleCron": {
           "type": "string",
@@ -1541,7 +1543,8 @@
         },
         "stack": {
           "type": "string",
-          "description": "Stack name."
+          "description": "Stack name.",
+          "replaceOnChanges": true
         }
       },
       "required": [
@@ -1560,12 +1563,12 @@
         "organization": {
           "type": "string",
           "description": "Organization name.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         },
         "project": {
           "type": "string",
           "description": "Project name.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         },
         "scheduleCron": {
           "type": "string",
@@ -1574,7 +1577,7 @@
         "stack": {
           "type": "string",
           "description": "Stack name.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         }
       },
       "requiredInputs": [

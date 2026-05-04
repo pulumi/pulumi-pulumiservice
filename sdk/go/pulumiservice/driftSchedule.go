@@ -52,6 +52,12 @@ func NewDriftSchedule(ctx *pulumi.Context,
 	if args.AutoRemediate == nil {
 		args.AutoRemediate = pulumi.BoolPtr(false)
 	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"organization",
+		"project",
+		"stack",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource DriftSchedule
 	err := ctx.RegisterResource("pulumiservice:index:DriftSchedule", name, args, &resource, opts...)

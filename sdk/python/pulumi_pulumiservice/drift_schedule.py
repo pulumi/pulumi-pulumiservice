@@ -179,6 +179,8 @@ class DriftSchedule(pulumi.CustomResource):
                 raise TypeError("Missing required property 'stack'")
             __props__.__dict__["stack"] = stack
             __props__.__dict__["schedule_id"] = None
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["organization", "project", "stack"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(DriftSchedule, __self__).__init__(
             'pulumiservice:index:DriftSchedule',
             resource_name,
