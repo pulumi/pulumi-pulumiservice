@@ -12,58 +12,51 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// The provider owns only the top of the permission descriptor tree.
-// `OrganizationRole.permissions` is typed `map[string]Any` in the schema, so
-// the Pulumi infra has no opinion about anything below the outer map.
-// Translation is one rename at the top:
+// The descriptor translator is structurally blind: it walks the JSON-ish
+// tree and renames the discriminator field at every level. The user-facing
+// SDK boundary uses `discriminator`; the Pulumi Cloud REST API uses
+// `__type`. The translator's two directions both reduce to a single
+// recursive rename via renameDiscriminator.
 //
-//	SDK boundary  →  wire (Create/Update)    discriminator → __type
-//	wire          →  SDK boundary (Read)     __type        → discriminator
-//
-// Everything below the top is opaque pass-through. Helper functions like
-// `buildEnvironmentScopedPermissions` and direct authors put the wire-format
-// (`__type` at every nested level) inside; the provider forwards it to
-// Pulumi Cloud verbatim. The SDK boundary uses `discriminator` rather than
-// `__type` for two reasons:
-//
-//  1. Pulumi's Python SDK strips `__`-prefixed input keys
-//     (pulumi/pulumi#22738), so `__type` would silently disappear at the
-//     language boundary.
-//  2. `discriminator` is reserved against future Pulumi Cloud models that may
-//     legitimately carry a domain `kind` field (we already have `TeamKind`,
-//     `PolicyIssueKind`, `ScheduledActionKind`, … in the public types).
-//
-// The reason this stays a single rename and not a recursive walk: the schema
-// does not type the nested fields. They are not part of the provider's
-// contract; they are payload the user assembled (often via a helper) that
-// the provider hands off to the API. Any structural opinion on nested levels
-// belongs in the helper that builds the tree, not in the translator.
+// Why recursive (not top-only): Pulumi's Python SDK strips `__`-prefixed
+// keys from resource inputs at *every nesting level* (pulumi/pulumi#22738),
+// not just the top. Helpers like `buildEnvironmentScopedPermissions` produce
+// trees with discriminators at four levels (Condition → Equal → Operand →
+// Allow); if those used `__type` directly, Python would strip the nested
+// `__type` keys before the input reached the provider, leaving an empty
+// discriminator the typed API cannot dispatch on. So helpers and direct
+// authors both use `discriminator` at every level, and the provider does
+// the wholesale rename. The schema doesn't type the nested fields — but
+// the Python SDK does transform them, which is what compels the recursion.
 
 package resources
 
 import "fmt"
 
-// permissionsToWire promotes the SDK-boundary `discriminator` key to the
-// wire's `__type`. Top-level only: nested fields pass through unchanged.
-// Returns an error if the input is missing `discriminator` or is using
-// `__type` directly (a clear signal the user pasted raw wire format).
+// permissionsToWire converts a user-facing PermissionDescriptor tree into
+// the Pulumi Cloud REST API's wire shape. Recursive rename: every map node
+// with a `discriminator` key has it replaced by `__type`. No descriptor
+// variant is hard-coded — Allow, Group, Condition, Compose, IfThenElse,
+// Select, the boolean operators, and any future variant Pulumi Cloud adds
+// pass through unchanged.
+//
+// Returns an error if the input contains a `__type` key anywhere — that
+// almost always means the user copied raw wire format from the REST API
+// docs and is one rebuild away from a Python SDK that silently drops the
+// field. Pointing them at `discriminator` here gives a clear signal.
 func permissionsToWire(node map[string]interface{}) (map[string]interface{}, error) {
-	if node == nil {
-		return nil, fmt.Errorf("permissions descriptor must be an object")
+	if err := assertNoUnderscoreType(node); err != nil {
+		return nil, err
 	}
-	if _, hasUnderscore := node["__type"]; hasUnderscore {
-		return nil, fmt.Errorf(
-			"permissions descriptor uses `__type` at the top — use `discriminator` " +
-				"instead at the SDK boundary. (Nested levels of the descriptor tree " +
-				"continue to use the wire-format `__type`; only the top is renamed. " +
-				"Pulumi's Python SDK strips `__`-prefixed input keys — pulumi/pulumi#22738.)",
-		)
-	}
-	discriminator, ok := node["discriminator"]
+	out := renameDiscriminator(node, "discriminator", "__type")
+	outMap, ok := out.(map[string]interface{})
 	if !ok {
-		return nil, fmt.Errorf("permissions descriptor missing required `discriminator` field at the top")
+		return nil, fmt.Errorf("permissions descriptor must be an object, got %T", node)
 	}
-	return swapTopKey(node, "discriminator", "__type", discriminator), nil
+	if _, hasDiscriminator := outMap["__type"]; !hasDiscriminator {
+		return nil, fmt.Errorf("permissions descriptor missing required `discriminator` field")
+	}
+	return outMap, nil
 }
 
 // permissionsToWireForAPI is the entry point used by Create/Update. It runs
@@ -88,18 +81,19 @@ func permissionsToWireForAPI(node map[string]interface{}) (map[string]interface{
 	return wire, nil
 }
 
-// permissionsFromWire promotes the wire's `__type` key back to the SDK
-// boundary's `discriminator`. Top-level only — the rest of the tree carries
-// `__type` verbatim from Pulumi Cloud's response.
+// permissionsFromWire converts a wire-shape PermissionDescriptor tree
+// returned by Pulumi Cloud's REST API back into the user-facing shape.
+// Reverse of permissionsToWire: a recursive rename of `__type` to
+// `discriminator`.
 //
-// At the top, optionally collapses a single-entry Group whose only entry is
-// a Condition — the artefact of permissionsToWireForAPI's UI-workaround
-// wrap. The collapse is gated on the user's prior input shape so the
+// At the top level, optionally collapses a single-entry Group whose only
+// entry is a Condition — the artefact of the API-boundary wrap added by
+// permissionsToWireForAPI. The collapse is gated on `prior` so the
 // round-trip is non-lossy:
 //
 //   - If the user authored a top-level Condition (or imported a role with
 //     no prior input), collapse — the wrapped Group(Condition) wire shape
-//     reads back as Condition, matching helper output.
+//     reads back as Condition. Matches helper output.
 //   - If the user authored a top-level Group, do not collapse — preserve
 //     their Group(Condition) shape verbatim.
 //   - All other prior shapes (Allow, Compose, IfThenElse, …) cannot produce
@@ -109,60 +103,87 @@ func permissionsFromWire(
 	node map[string]interface{},
 	prior map[string]interface{},
 ) (map[string]interface{}, error) {
-	if node == nil {
-		return nil, fmt.Errorf("permissions descriptor must be an object")
+	out := renameDiscriminator(node, "__type", "discriminator")
+	outMap, ok := out.(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("permissions descriptor must be an object, got %T", node)
 	}
-	out := topWireToSDK(node)
 
 	preserveGroupShape := prior != nil && prior["discriminator"] == "PermissionDescriptorGroup"
 	if preserveGroupShape {
-		return out, nil
+		return outMap, nil
 	}
-	if out["discriminator"] != "PermissionDescriptorGroup" {
-		return out, nil
+	if outMap["discriminator"] != "PermissionDescriptorGroup" {
+		return outMap, nil
 	}
-	entries, ok := out["entries"].([]interface{})
+	entries, ok := outMap["entries"].([]interface{})
 	if !ok || len(entries) != 1 {
-		return out, nil
+		return outMap, nil
 	}
 	entry, ok := entries[0].(map[string]interface{})
-	// The entry is at a nested level, so it still carries `__type` (we
-	// don't recurse on Read either). Promote it through topWireToSDK now
-	// that it's becoming the new top.
-	if !ok || entry["__type"] != "PermissionDescriptorCondition" {
-		return out, nil
+	if !ok || entry["discriminator"] != "PermissionDescriptorCondition" {
+		return outMap, nil
 	}
-	return topWireToSDK(entry), nil
+	return entry, nil
 }
 
-// topWireToSDK is the shared top-level rename used by permissionsFromWire
-// and the collapse path. `__type` → `discriminator`; everything else
-// passes through unchanged.
-func topWireToSDK(node map[string]interface{}) map[string]interface{} {
-	t, ok := node["__type"]
-	if !ok {
-		// No discriminator on the wire — nothing to promote. Return a copy
-		// so callers can safely mutate.
-		out := make(map[string]interface{}, len(node))
-		for k, v := range node {
-			out[k] = v
+// renameDiscriminator walks a JSON-ish tree (map[string]interface{} /
+// []interface{} / scalars) and returns a deep copy with every occurrence of
+// the `from` key on a map node replaced by `to`. Other keys, values, and
+// nesting are preserved verbatim.
+func renameDiscriminator(v interface{}, from, to string) interface{} {
+	switch x := v.(type) {
+	case map[string]interface{}:
+		out := make(map[string]interface{}, len(x))
+		for k, val := range x {
+			outKey := k
+			if k == from {
+				outKey = to
+			}
+			out[outKey] = renameDiscriminator(val, from, to)
 		}
 		return out
+	case []interface{}:
+		out := make([]interface{}, len(x))
+		for i, item := range x {
+			out[i] = renameDiscriminator(item, from, to)
+		}
+		return out
+	default:
+		return v
 	}
-	return swapTopKey(node, "__type", "discriminator", t)
 }
 
-// swapTopKey returns a copy of node with `from` removed and `to` set to
-// value. Other keys pass through. The deep contents of the tree are not
-// touched — top-level only by design.
-func swapTopKey(node map[string]interface{}, from, to string, value interface{}) map[string]interface{} {
-	out := make(map[string]interface{}, len(node))
-	for k, v := range node {
-		if k == from {
-			continue
+// assertNoUnderscoreType walks a JSON-ish tree and returns an error if any
+// map node contains a `__type` key. Defensive: Pulumi's Python SDK strips
+// `__`-prefixed input keys (pulumi/pulumi#22738), so a Python user pasting
+// raw wire format from the REST API docs would have the discriminator
+// quietly disappear at the language boundary and the role would be created
+// with a malformed descriptor. Rejecting `__type` at the SDK boundary
+// surfaces a clear error pointing at `discriminator`.
+func assertNoUnderscoreType(v interface{}) error {
+	switch x := v.(type) {
+	case map[string]interface{}:
+		if _, has := x["__type"]; has {
+			return fmt.Errorf(
+				"permissions descriptor uses `__type` field — use `discriminator` instead. " +
+					"Pulumi's Python SDK strips `__`-prefixed input keys at every nesting level " +
+					"(pulumi/pulumi#22738), so the SDK boundary uses `discriminator` for every " +
+					"language. The field's values are unchanged " +
+					"(`PermissionDescriptorAllow`, `PermissionDescriptorGroup`, etc.)",
+			)
 		}
-		out[k] = v
+		for _, val := range x {
+			if err := assertNoUnderscoreType(val); err != nil {
+				return err
+			}
+		}
+	case []interface{}:
+		for _, item := range x {
+			if err := assertNoUnderscoreType(item); err != nil {
+				return err
+			}
+		}
 	}
-	out[to] = value
-	return out
+	return nil
 }

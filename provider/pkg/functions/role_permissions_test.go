@@ -48,25 +48,26 @@ func assertScopedConditionShape(
 		"top-level discriminator must be PermissionDescriptorCondition")
 	_, hasUnderscoreAtTop := got["__type"]
 	assert.False(t, hasUnderscoreAtTop,
-		"top must use `discriminator`, not the wire-format `__type`")
+		"output must use `discriminator` at every level — Python's SDK strips "+
+			"`__`-prefixed keys from inputs (pulumi/pulumi#22738)")
 
 	cond, ok := got["condition"].(map[string]interface{})
 	require.True(t, ok, "condition must be a map; got %T", got["condition"])
-	assert.Equal(t, "PermissionExpressionEqual", cond["__type"],
-		"nested `condition` uses the wire-format `__type` discriminator")
+	assert.Equal(t, "PermissionExpressionEqual", cond["discriminator"],
+		"nested condition must also use `discriminator` (recursive rename)")
 
 	left, ok := cond["left"].(map[string]interface{})
 	require.True(t, ok, "condition.left must be a map; got %T", cond["left"])
-	assert.Equal(t, expectedExpressionDiscriminator, left["__type"])
+	assert.Equal(t, expectedExpressionDiscriminator, left["discriminator"])
 
 	right, ok := cond["right"].(map[string]interface{})
 	require.True(t, ok, "condition.right must be a map; got %T", cond["right"])
-	assert.Equal(t, expectedLiteralDiscriminator, right["__type"])
+	assert.Equal(t, expectedLiteralDiscriminator, right["discriminator"])
 	assert.Equal(t, expectedIdentity, right["identity"])
 
 	sub, ok := got["subNode"].(map[string]interface{})
 	require.True(t, ok, "subNode must be a map; got %T", got["subNode"])
-	assert.Equal(t, "PermissionDescriptorAllow", sub["__type"])
+	assert.Equal(t, "PermissionDescriptorAllow", sub["discriminator"])
 
 	rawPerms, ok := sub["permissions"].([]interface{})
 	require.True(t, ok, "subNode.permissions must be a list; got %T", sub["permissions"])
@@ -97,7 +98,7 @@ func TestBuildAllowPermissions(t *testing.T) {
 		assert.Equal(t, "PermissionDescriptorAllow", got["discriminator"])
 		_, hasUnderscore := got["__type"]
 		assert.False(t, hasUnderscore,
-			"top must use `discriminator`, not the wire-format `__type`")
+			"helper output must use `discriminator`, not the wire-format `__type`")
 		// Permissions list passes through verbatim.
 		perms, ok := got["permissions"].([]interface{})
 		require.True(t, ok)
@@ -228,7 +229,7 @@ func TestBuildInsightsAccountScopedPermissions(t *testing.T) {
 			infer.FunctionRequest[BuildInsightsAccountScopedPermissionsInput]{
 				Input: BuildInsightsAccountScopedPermissionsInput{
 					InsightsAccountID: "acct-1",
-					Permissions:       []string{"insights-account:read"},
+					Permissions:       []string{"insights_account:read"},
 				},
 			},
 		)
@@ -238,7 +239,7 @@ func TestBuildInsightsAccountScopedPermissions(t *testing.T) {
 			"PermissionExpressionInsightsAccount",
 			"PermissionLiteralExpressionInsightsAccount",
 			"acct-1",
-			[]string{"insights-account:read"},
+			[]string{"insights_account:read"},
 		)
 	})
 
@@ -248,7 +249,7 @@ func TestBuildInsightsAccountScopedPermissions(t *testing.T) {
 			context.Background(),
 			infer.FunctionRequest[BuildInsightsAccountScopedPermissionsInput]{
 				Input: BuildInsightsAccountScopedPermissionsInput{
-					Permissions: []string{"insights-account:read"},
+					Permissions: []string{"insights_account:read"},
 				},
 			},
 		)
