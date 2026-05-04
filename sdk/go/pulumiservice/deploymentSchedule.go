@@ -20,7 +20,7 @@ type DeploymentSchedule struct {
 	Organization pulumi.StringOutput `pulumi:"organization"`
 	// Project name.
 	Project pulumi.StringOutput `pulumi:"project"`
-	// Which operation to run.
+	// Which command to run.
 	PulumiOperation PulumiOperationOutput `pulumi:"pulumiOperation"`
 	// Cron expression for recurring scheduled runs. If you are supplying this, do not supply timestamp.
 	ScheduleCron pulumi.StringPtrOutput `pulumi:"scheduleCron"`
@@ -51,6 +51,13 @@ func NewDeploymentSchedule(ctx *pulumi.Context,
 	if args.Stack == nil {
 		return nil, errors.New("invalid value for required argument 'Stack'")
 	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"organization",
+		"project",
+		"stack",
+		"timestamp",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource DeploymentSchedule
 	err := ctx.RegisterResource("pulumiservice:index:DeploymentSchedule", name, args, &resource, opts...)
@@ -211,7 +218,7 @@ func (o DeploymentScheduleOutput) Project() pulumi.StringOutput {
 	return o.ApplyT(func(v *DeploymentSchedule) pulumi.StringOutput { return v.Project }).(pulumi.StringOutput)
 }
 
-// Which operation to run.
+// Which command to run.
 func (o DeploymentScheduleOutput) PulumiOperation() PulumiOperationOutput {
 	return o.ApplyT(func(v *DeploymentSchedule) PulumiOperationOutput { return v.PulumiOperation }).(PulumiOperationOutput)
 }

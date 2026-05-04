@@ -28,7 +28,7 @@ namespace Pulumi.PulumiService
         public Output<string> Project { get; private set; } = null!;
 
         /// <summary>
-        /// Which operation to run.
+        /// Which command to run.
         /// </summary>
         [Output("pulumiOperation")]
         public Output<Pulumi.PulumiService.PulumiOperation> PulumiOperation { get; private set; } = null!;
@@ -80,6 +80,13 @@ namespace Pulumi.PulumiService
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
+                ReplaceOnChanges =
+                {
+                    "organization",
+                    "project",
+                    "stack",
+                    "timestamp",
+                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.

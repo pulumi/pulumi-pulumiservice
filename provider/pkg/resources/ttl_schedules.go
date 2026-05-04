@@ -17,6 +17,7 @@ package resources
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	p "github.com/pulumi/pulumi-go-provider"
@@ -228,9 +229,15 @@ func stackScheduleID(stack pulumiapi.StackIdentifier, scheduleType, scheduleID s
 }
 
 func parseStackScheduleID(id, scheduleType string) (pulumiapi.StackIdentifier, string, error) {
-	stack, sched, err := ParseStackScheduleID(id, scheduleType)
-	if err != nil {
-		return pulumiapi.StackIdentifier{}, "", err
+	parts := strings.Split(id, "/")
+	if len(parts) != 5 || parts[3] != scheduleType {
+		return pulumiapi.StackIdentifier{}, "", fmt.Errorf(
+			"%q is invalid, expected organization/project/stack/%s/scheduleId", id, scheduleType,
+		)
 	}
-	return *stack, *sched, nil
+	return pulumiapi.StackIdentifier{
+		OrgName:     parts[0],
+		ProjectName: parts[1],
+		StackName:   parts[2],
+	}, parts[4], nil
 }
