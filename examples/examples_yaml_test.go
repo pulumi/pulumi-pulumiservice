@@ -5,7 +5,6 @@ package examples
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -27,6 +26,7 @@ import (
 	"github.com/pulumi/providertest/pulumitest/opttest"
 	"github.com/pulumi/pulumi/pkg/v3/testing/integration"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/apitype"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
@@ -40,6 +40,17 @@ type YamlProgram struct {
 	Runtime     string              `yaml:"runtime"`
 	Description string              `yaml:"description"`
 	Resources   map[string]Resource `yaml:"resources"`
+}
+
+// mustParseDescriptor builds a typed apitype.PermissionDescriptor from a
+// wire-shape JSON literal — used by RBAC integration fixtures that author
+// permission descriptors via direct REST.
+func mustParseDescriptor(t *testing.T, wireJSON string) apitype.PermissionDescriptor {
+	t.Helper()
+	var d apitype.PermissionDescriptor
+	require.NoError(t, apitype.UnmarshalJSONPermissionDescriptor([]byte(wireJSON), &d))
+	require.NotNil(t, d, "wire JSON must parse to a known descriptor variant")
+	return d
 }
 
 func TestYamlTeamsExample(t *testing.T) {
@@ -627,15 +638,17 @@ func TestYamlRbacComposeImport(t *testing.T) {
 	require.NoError(t, err, "must be able to construct a pulumiapi client")
 
 	// Step 1: policy fixture. Carries a trivial Allow descriptor so
-	// CreatePolicy's `details must not be empty` validation passes.
+	// CreateRole's `details must not be empty` validation passes.
 	policyName := fmt.Sprintf("yaml-rbac-import-policy-%s", digits)
-	policyDetails := json.RawMessage(`{"__type":"PermissionDescriptorAllow","permissions":["stack:read"]}`)
-	policy, err := client.CreatePolicy(ctx, orgName, pulumiapi.NewCreateRoleRequest(
-		policyName,
-		"Compose-import test policy fixture",
-		"global",
-		policyDetails,
-	))
+	policyDetails := mustParseDescriptor(t,
+		`{"__type":"PermissionDescriptorAllow","permissions":["stack:read"]}`)
+	policy, err := client.CreateRole(ctx, orgName, apitype.PermissionDescriptorBase{
+		Name:         policyName,
+		Description:  "Compose-import test policy fixture",
+		ResourceType: "global",
+		UxPurpose:    apitype.PermissionDescriptorUXPurposePolicy,
+		Details:      policyDetails,
+	})
 	require.NoError(t, err, "must be able to create a uxPurpose=policy fixture via direct REST")
 	require.NotEmpty(t, policy.ID)
 	t.Cleanup(func() {
@@ -648,16 +661,17 @@ func TestYamlRbacComposeImport(t *testing.T) {
 	// direct REST (rather than a PSP resource) simulates a UI-authored or
 	// out-of-band role — what `pulumi import` actually faces in the wild.
 	roleName := fmt.Sprintf("yaml-rbac-import-role-%s", digits)
-	composeDetails := json.RawMessage(fmt.Sprintf(
+	composeDetails := mustParseDescriptor(t, fmt.Sprintf(
 		`{"__type":"PermissionDescriptorCompose","permissionDescriptors":[%q]}`,
 		policy.ID,
 	))
-	role, err := client.CreateRole(ctx, orgName, pulumiapi.NewCreateRoleRequest(
-		roleName,
-		"Compose-import test role; references policy via Compose",
-		"global",
-		composeDetails,
-	))
+	role, err := client.CreateRole(ctx, orgName, apitype.PermissionDescriptorBase{
+		Name:         roleName,
+		Description:  "Compose-import test role; references policy via Compose",
+		ResourceType: "global",
+		UxPurpose:    apitype.PermissionDescriptorUXPurposeRole,
+		Details:      composeDetails,
+	})
 	require.NoError(t, err, "must be able to create a Compose role referencing the policy")
 	require.NotEmpty(t, role.ID)
 	t.Cleanup(func() {
