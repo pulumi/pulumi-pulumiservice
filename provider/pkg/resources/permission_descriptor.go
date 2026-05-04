@@ -35,9 +35,6 @@ func permissionsKindToWire(node map[string]interface{}) (map[string]interface{},
 	if err := assertNoUnderscoreType(node); err != nil {
 		return nil, err
 	}
-	if err := assertNoOnField(node); err != nil {
-		return nil, err
-	}
 	out := renameDiscriminator(node, "kind", "__type")
 	outMap, ok := out.(map[string]interface{})
 	if !ok {
@@ -182,44 +179,3 @@ func assertNoUnderscoreType(v interface{}) error {
 	return nil
 }
 
-// assertNoOnField walks a JSON-ish tree and returns an error if any map
-// contains an `on` key. The Pulumi Cloud REST API has historically accepted
-// an `on:{environment:<id>}` shortcut on PermissionDescriptorAllow as a way
-// to scope the grant to a specific resource, but it is fundamentally broken:
-// it doesn't generalise to teams (team scoping requires a TeamRoleAssignment
-// resource, not a permission-tree shape) and the canonical wire grammar has
-// no representation for it. Reject it at the SDK boundary with a pointer to
-// the supported alternatives so users don't author roles that work for
-// environments but silently fail for teams.
-func assertNoOnField(v interface{}) error {
-	switch x := v.(type) {
-	case map[string]interface{}:
-		if _, has := x["on"]; has {
-			return fmt.Errorf(
-				"permissions descriptor uses unsupported `on` field. The `on` " +
-					"shortcut on PermissionDescriptorAllow is not supported by " +
-					"this provider; it does not generalise across resource " +
-					"types (notably teams). To scope permissions, use one of:\n" +
-					"  - `buildEnvironmentScopedPermissions` / " +
-					"`buildStackScopedPermissions` / " +
-					"`buildInsightsAccountScopedPermissions` to construct the " +
-					"canonical `PermissionDescriptorCondition(Equal(...), Allow)` " +
-					"tree the API expects.\n" +
-					"  - `TeamRoleAssignment` to assign a role to a team — team " +
-					"scoping is a separate resource, not a permission-tree field",
-			)
-		}
-		for _, val := range x {
-			if err := assertNoOnField(val); err != nil {
-				return err
-			}
-		}
-	case []interface{}:
-		for _, item := range x {
-			if err := assertNoOnField(item); err != nil {
-				return err
-			}
-		}
-	}
-	return nil
-}
