@@ -26,7 +26,6 @@ class TtlScheduleArgs:
                  delete_after_destroy: Optional[pulumi.Input[_builtins.bool]] = None):
         """
         The set of arguments for constructing a TtlSchedule resource.
-
         :param pulumi.Input[_builtins.str] organization: Organization name.
         :param pulumi.Input[_builtins.str] project: Project name.
         :param pulumi.Input[_builtins.str] stack: Stack name.
@@ -118,7 +117,6 @@ class TtlSchedule(pulumi.CustomResource):
         """
         A scheduled stack destroy run.
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.bool] delete_after_destroy: True if the stack and all associated history and settings should be deleted.
@@ -135,7 +133,6 @@ class TtlSchedule(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         A scheduled stack destroy run.
-
 
         :param str resource_name: The name of the resource.
         :param TtlScheduleArgs args: The arguments to use to populate this resource's properties.
