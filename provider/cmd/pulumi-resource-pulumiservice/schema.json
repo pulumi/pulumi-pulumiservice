@@ -2529,19 +2529,23 @@
       "properties": {
         "description": {
           "type": "string",
-          "description": "Optional. Description for the token."
+          "description": "Optional. Description for the token.",
+          "replaceOnChanges": true
         },
         "name": {
           "type": "string",
-          "description": "The name for the token. This must be unique amongst all machine tokens within your organization."
+          "description": "The name for the token. This must be unique amongst all machine tokens within your organization.",
+          "replaceOnChanges": true
         },
         "organizationName": {
           "type": "string",
-          "description": "The organization's name."
+          "description": "The organization's name.",
+          "replaceOnChanges": true
         },
         "teamName": {
           "type": "string",
-          "description": "The team name."
+          "description": "The team name.",
+          "replaceOnChanges": true
         },
         "value": {
           "type": "string",
@@ -2551,35 +2555,36 @@
       },
       "required": [
         "name",
-        "teamName",
         "organizationName",
+        "teamName",
         "value"
       ],
       "inputProperties": {
         "description": {
           "type": "string",
-          "description": "Optional. Team description."
+          "description": "Optional. Description for the token.",
+          "replaceOnChanges": true
         },
         "name": {
           "type": "string",
           "description": "The name for the token. This must be unique amongst all machine tokens within your organization.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         },
         "organizationName": {
           "type": "string",
           "description": "The organization's name.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         },
         "teamName": {
           "type": "string",
           "description": "The team name.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         }
       },
       "requiredInputs": [
         "name",
-        "teamName",
-        "organizationName"
+        "organizationName",
+        "teamName"
       ]
     },
     "pulumiservice:index:TeamEnvironmentPermission": {

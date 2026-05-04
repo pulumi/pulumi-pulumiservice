@@ -28,7 +28,7 @@ class TeamAccessTokenArgs:
         :param pulumi.Input[_builtins.str] name: The name for the token. This must be unique amongst all machine tokens within your organization.
         :param pulumi.Input[_builtins.str] organization_name: The organization's name.
         :param pulumi.Input[_builtins.str] team_name: The team name.
-        :param pulumi.Input[_builtins.str] description: Optional. Team description.
+        :param pulumi.Input[_builtins.str] description: Optional. Description for the token.
         """
         pulumi.set(__self__, "name", name)
         pulumi.set(__self__, "organization_name", organization_name)
@@ -76,7 +76,7 @@ class TeamAccessTokenArgs:
     @pulumi.getter
     def description(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        Optional. Team description.
+        Optional. Description for the token.
         """
         return pulumi.get(self, "description")
 
@@ -101,7 +101,7 @@ class TeamAccessToken(pulumi.CustomResource):
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
-        :param pulumi.Input[_builtins.str] description: Optional. Team description.
+        :param pulumi.Input[_builtins.str] description: Optional. Description for the token.
         :param pulumi.Input[_builtins.str] name: The name for the token. This must be unique amongst all machine tokens within your organization.
         :param pulumi.Input[_builtins.str] organization_name: The organization's name.
         :param pulumi.Input[_builtins.str] team_name: The team name.
@@ -156,6 +156,8 @@ class TeamAccessToken(pulumi.CustomResource):
             __props__.__dict__["value"] = None
         secret_opts = pulumi.ResourceOptions(additional_secret_outputs=["value"])
         opts = pulumi.ResourceOptions.merge(opts, secret_opts)
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["description", "name", "organizationName", "teamName"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(TeamAccessToken, __self__).__init__(
             'pulumiservice:index:TeamAccessToken',
             resource_name,

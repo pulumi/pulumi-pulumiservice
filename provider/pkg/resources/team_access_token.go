@@ -1,3 +1,17 @@
+// Copyright 2026, Pulumi Corporation.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//	http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package resources
 
 import (
@@ -5,218 +19,180 @@ import (
 	"fmt"
 	"strings"
 
-	pbempty "google.golang.org/protobuf/types/known/emptypb"
-	"google.golang.org/protobuf/types/known/structpb"
+	"github.com/pulumi/pulumi-go-provider/infer"
+	"github.com/pulumi/pulumi/sdk/v3/go/property"
 
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
-
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 )
 
-type PulumiServiceTeamAccessTokenResource struct {
-	Client *pulumiapi.Client
-}
+type TeamAccessToken struct{}
 
-type PulumiServiceTeamAccessTokenInput struct {
-	Name        string
-	OrgName     string
-	TeamName    string
-	Description string
-}
+var (
+	_ infer.CustomCreate[TeamAccessTokenInput, TeamAccessTokenState] = &TeamAccessToken{}
+	_ infer.CustomDelete[TeamAccessTokenState]                       = &TeamAccessToken{}
+	_ infer.CustomRead[TeamAccessTokenInput, TeamAccessTokenState]   = &TeamAccessToken{}
+	_ infer.CustomStateMigrations[TeamAccessTokenState]              = &TeamAccessToken{}
+)
 
-func GenerateTeamAccessTokenProperties(
-	input PulumiServiceTeamAccessTokenInput,
-	teamAccessToken pulumiapi.AccessToken,
-) (outputs *structpb.Struct, inputs *structpb.Struct, err error) {
-	inputMap := input.ToPropertyMap()
-
-	outputMap := inputMap.Copy()
-	outputMap["__inputs"] = resource.NewObjectProperty(inputMap)
-	outputMap["value"] = resource.MakeSecret(resource.NewPropertyValue(teamAccessToken.TokenValue))
-
-	inputs, err = plugin.MarshalProperties(inputMap, plugin.MarshalOptions{})
-	if err != nil {
-		return nil, nil, err
-	}
-
-	outputs, err = plugin.MarshalProperties(outputMap, plugin.MarshalOptions{})
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return outputs, inputs, err
-}
-
-func (i *PulumiServiceTeamAccessTokenInput) ToPropertyMap() resource.PropertyMap {
-	pm := resource.PropertyMap{}
-	pm["name"] = resource.NewPropertyValue(i.Name)
-	pm["description"] = resource.NewPropertyValue(i.Description)
-	pm["organizationName"] = resource.NewPropertyValue(i.OrgName)
-	pm["teamName"] = resource.NewPropertyValue(i.TeamName)
-	return pm
-}
-
-func (t *PulumiServiceTeamAccessTokenResource) ToPulumiServiceAccessTokenInput(
-	inputMap resource.PropertyMap,
-) PulumiServiceTeamAccessTokenInput {
-	input := PulumiServiceTeamAccessTokenInput{}
-
-	if inputMap["name"].HasValue() && inputMap["name"].IsString() {
-		input.Name = inputMap["name"].StringValue()
-	}
-
-	if inputMap["description"].HasValue() && inputMap["description"].IsString() {
-		input.Description = inputMap["description"].StringValue()
-	}
-
-	if inputMap["teamName"].HasValue() && inputMap["teamName"].IsString() {
-		input.TeamName = inputMap["teamName"].StringValue()
-	}
-
-	if inputMap["organizationName"].HasValue() && inputMap["organizationName"].IsString() {
-		input.OrgName = inputMap["organizationName"].StringValue()
-	}
-
-	return input
-}
-
-func (t *PulumiServiceTeamAccessTokenResource) Name() string {
-	return "pulumiservice:index:TeamAccessToken"
-}
-
-func (t *PulumiServiceTeamAccessTokenResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	return diffAccessTokenProperties(req, []string{"name", "organizationName", "teamName", "description"})
-}
-
-func (t *PulumiServiceTeamAccessTokenResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	ctx := context.Background()
-	err := t.deleteTeamAccessToken(ctx, req.Id)
-
-	if err != nil {
-		return &pbempty.Empty{}, err
-	}
-
-	return &pbempty.Empty{}, nil
-}
-
-func (t *PulumiServiceTeamAccessTokenResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
-	ctx := context.Background()
-	inputMap, err := plugin.UnmarshalProperties(
-		req.GetProperties(),
-		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
+func (*TeamAccessToken) Annotate(a infer.Annotator) {
+	a.Describe(
+		&TeamAccessToken{},
+		"The Pulumi Cloud allows users to create access tokens scoped to team. "+
+			"Team access tokens is a resource to create them and assign them to a team",
 	)
-	if err != nil {
-		return nil, err
-	}
-
-	input := t.ToPulumiServiceAccessTokenInput(inputMap)
-
-	accessToken, err := t.createTeamAccessToken(ctx, input)
-	if err != nil {
-		return nil, fmt.Errorf("error creating access token '%s': %s", input.Name, err.Error())
-	}
-
-	outputs, _, err := GenerateTeamAccessTokenProperties(input, *accessToken)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.CreateResponse{
-		Id:         fmt.Sprintf("%s/%s/%s/%s", input.OrgName, input.TeamName, input.Name, accessToken.ID),
-		Properties: outputs,
-	}, nil
 }
 
-func (t *PulumiServiceTeamAccessTokenResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: nil}, nil
+type TeamAccessTokenInput struct {
+	Name             string  `pulumi:"name"             provider:"replaceOnChanges"`
+	OrganizationName string  `pulumi:"organizationName" provider:"replaceOnChanges"`
+	TeamName         string  `pulumi:"teamName"         provider:"replaceOnChanges"`
+	Description      *string `pulumi:"description,optional" provider:"replaceOnChanges"`
 }
 
-func (t *PulumiServiceTeamAccessTokenResource) Update(_ *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	// all updates are destructive, so we just call Create.
-	return nil, fmt.Errorf("unexpected call to update, expected create to be called instead")
+func (i *TeamAccessTokenInput) Annotate(a infer.Annotator) {
+	a.Describe(&i.Name, "The name for the token. This must be unique amongst all machine tokens within your organization.")
+	a.Describe(&i.OrganizationName, "The organization's name.")
+	a.Describe(&i.TeamName, "The team name.")
+	a.Describe(&i.Description, "Optional. Description for the token.")
 }
 
-func (t *PulumiServiceTeamAccessTokenResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	ctx := context.Background()
-	urn := req.GetId()
-
-	orgName, teamName, tokenName, tokenID, err := splitTeamAccessTokenID(urn)
-	if err != nil {
-		return nil, err
-	}
-
-	// the team access token is immutable; if we get nil it got deleted, otherwise all data is the same
-	accessToken, err := t.Client.GetTeamAccessToken(ctx, tokenID, orgName, teamName)
-	if err != nil {
-		return nil, err
-	}
-	if accessToken == nil {
-		return &pulumirpc.ReadResponse{}, nil
-	}
-
-	var input = PulumiServiceTeamAccessTokenInput{
-		Name:        tokenName,
-		OrgName:     orgName,
-		Description: accessToken.Description,
-		TeamName:    teamName,
-	}
-
-	propertyMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{})
-	if err != nil {
-		return nil, err
-	}
-	if propertyMap["value"].HasValue() {
-		accessToken.TokenValue = util.GetSecretOrStringValue(propertyMap["value"])
-	}
-
-	outputs, inputs, err := GenerateTeamAccessTokenProperties(input, *accessToken)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.ReadResponse{
-		Id:         req.GetId(),
-		Properties: outputs,
-		Inputs:     inputs,
-	}, nil
+type TeamAccessTokenState struct {
+	TeamAccessTokenInput
+	Value string `pulumi:"value" provider:"secret"`
 }
 
-func (t *PulumiServiceTeamAccessTokenResource) createTeamAccessToken(
+func (s *TeamAccessTokenState) Annotate(a infer.Annotator) {
+	a.Describe(&s.Value, "The token's value.")
+}
+
+func (*TeamAccessToken) Create(
 	ctx context.Context,
-	input PulumiServiceTeamAccessTokenInput,
-) (*pulumiapi.AccessToken, error) {
-
-	accessToken, err := t.Client.CreateTeamAccessToken(
-		ctx,
-		input.Name,
-		input.OrgName,
-		input.TeamName,
-		input.Description,
+	req infer.CreateRequest[TeamAccessTokenInput],
+) (infer.CreateResponse[TeamAccessTokenState], error) {
+	if req.DryRun {
+		return infer.CreateResponse[TeamAccessTokenState]{
+			Output: TeamAccessTokenState{TeamAccessTokenInput: req.Inputs},
+		}, nil
+	}
+	desc := ""
+	if req.Inputs.Description != nil {
+		desc = *req.Inputs.Description
+	}
+	token, err := config.GetClient(ctx).CreateTeamAccessToken(
+		ctx, req.Inputs.Name, req.Inputs.OrganizationName, req.Inputs.TeamName, desc,
 	)
 	if err != nil {
-		return nil, err
+		return infer.CreateResponse[TeamAccessTokenState]{}, fmt.Errorf(
+			"error creating team access token %q: %w", req.Inputs.Name, err,
+		)
 	}
-
-	return accessToken, nil
+	return infer.CreateResponse[TeamAccessTokenState]{
+		ID: teamAccessTokenID(req.Inputs.OrganizationName, req.Inputs.TeamName, req.Inputs.Name, token.ID),
+		Output: TeamAccessTokenState{
+			TeamAccessTokenInput: req.Inputs,
+			Value:                token.TokenValue,
+		},
+	}, nil
 }
 
-func (t *PulumiServiceTeamAccessTokenResource) deleteTeamAccessToken(ctx context.Context, id string) error {
-	orgName, teamName, _, tokenID, err := splitTeamAccessTokenID(id)
+func (*TeamAccessToken) Delete(
+	ctx context.Context,
+	req infer.DeleteRequest[TeamAccessTokenState],
+) (infer.DeleteResponse, error) {
+	orgName, teamName, _, tokenID, err := splitTeamAccessTokenID(req.ID)
 	if err != nil {
-		return err
+		return infer.DeleteResponse{}, err
 	}
-	return t.Client.DeleteTeamAccessToken(ctx, tokenID, orgName, teamName)
+	return infer.DeleteResponse{}, config.GetClient(ctx).DeleteTeamAccessToken(ctx, tokenID, orgName, teamName)
+}
 
+func (*TeamAccessToken) Read(
+	ctx context.Context,
+	req infer.ReadRequest[TeamAccessTokenInput, TeamAccessTokenState],
+) (infer.ReadResponse[TeamAccessTokenInput, TeamAccessTokenState], error) {
+	orgName, teamName, tokenName, tokenID, err := splitTeamAccessTokenID(req.ID)
+	if err != nil {
+		return infer.ReadResponse[TeamAccessTokenInput, TeamAccessTokenState]{}, err
+	}
+
+	token, err := config.GetClient(ctx).GetTeamAccessToken(ctx, tokenID, orgName, teamName)
+	if err != nil {
+		return infer.ReadResponse[TeamAccessTokenInput, TeamAccessTokenState]{}, err
+	}
+	if token == nil {
+		return infer.ReadResponse[TeamAccessTokenInput, TeamAccessTokenState]{}, nil
+	}
+
+	inputs := TeamAccessTokenInput{
+		Name:             tokenName,
+		OrganizationName: orgName,
+		TeamName:         teamName,
+		Description:      stringPtrIfNonEmpty(token.Description),
+	}
+	return infer.ReadResponse[TeamAccessTokenInput, TeamAccessTokenState]{
+		ID:     req.ID,
+		Inputs: inputs,
+		State: TeamAccessTokenState{
+			TeamAccessTokenInput: inputs,
+			// Token values aren't retrievable from the API after creation; carry
+			// the existing secret from state so refresh does not erase it.
+			Value: req.State.Value,
+		},
+	}, nil
+}
+
+// StateMigrations strips the legacy "__inputs" outputs property that the
+// pre-infer TeamAccessToken resource embedded in state. infer rejects unknown
+// fields when decoding state, so without this migration a refresh against an
+// existing stack errors with "Unrecognized field '__inputs'".
+func (*TeamAccessToken) StateMigrations(context.Context) []infer.StateMigrationFunc[TeamAccessTokenState] {
+	return []infer.StateMigrationFunc[TeamAccessTokenState]{
+		infer.StateMigration(migrateTeamAccessTokenLegacyInputs),
+	}
+}
+
+func migrateTeamAccessTokenLegacyInputs(
+	_ context.Context, old property.Map,
+) (infer.MigrationResult[TeamAccessTokenState], error) {
+	if _, ok := old.GetOk("__inputs"); !ok {
+		return infer.MigrationResult[TeamAccessTokenState]{}, nil
+	}
+	state := TeamAccessTokenState{}
+	if v, ok := old.GetOk("name"); ok && v.IsString() {
+		state.Name = v.AsString()
+	}
+	if v, ok := old.GetOk("organizationName"); ok && v.IsString() {
+		state.OrganizationName = v.AsString()
+	}
+	if v, ok := old.GetOk("teamName"); ok && v.IsString() {
+		state.TeamName = v.AsString()
+	}
+	if v, ok := old.GetOk("description"); ok && v.IsString() {
+		s := v.AsString()
+		state.Description = &s
+	}
+	if v, ok := old.GetOk("value"); ok && v.IsString() {
+		state.Value = v.AsString()
+	}
+	return infer.MigrationResult[TeamAccessTokenState]{Result: &state}, nil
+}
+
+func teamAccessTokenID(org, team, name, tokenID string) string {
+	return fmt.Sprintf("%s/%s/%s/%s", org, team, name, tokenID)
 }
 
 func splitTeamAccessTokenID(id string) (string, string, string, string, error) {
 	// format: organization/teamName/tokenName/tokenID
 	s := strings.Split(id, "/")
 	if len(s) != 4 {
-		return "", "", "", "", fmt.Errorf("%q is invalid, must contain a single slash ('/')", id)
+		return "", "", "", "", fmt.Errorf("%q is invalid, must be of the form organization/team/name/tokenId", id)
 	}
 	return s[0], s[1], s[2], s[3], nil
+}
+
+func stringPtrIfNonEmpty(s string) *string {
+	if s == "" {
+		return nil
+	}
+	return &s
 }
