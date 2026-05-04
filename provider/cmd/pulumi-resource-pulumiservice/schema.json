@@ -460,6 +460,10 @@
           "type": "integer",
           "description": "Deploy a specific pull request number."
         },
+        "installationId": {
+          "type": "string",
+          "description": "The VCS integration installation ID. Use to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps). If omitted, the API resolves the integration automatically from `provider` and `repository`."
+        },
         "paths": {
           "type": "array",
           "items": {
