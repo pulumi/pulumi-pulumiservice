@@ -73,8 +73,10 @@ func TestPythonRbacExample(t *testing.T) {
 	// role they had pre-test (rather than blindly resetting to "member").
 	t.Cleanup(snapshotFixtureOrgMember(t, orgName, fixtureUser))
 
+	rbacDir := path.Join(getCwd(t), "py-rbac")
+
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Dir: path.Join(getCwd(t), "py-rbac"),
+		Dir: rbacDir,
 		Config: map[string]string{
 			"organizationName": orgName,
 			"digits":           generateRandomFiveDigits(),
@@ -92,6 +94,20 @@ func TestPythonRbacExample(t *testing.T) {
 			if scopedRoleID, ok := stack.Outputs["scopedRoleId"]; ok {
 				assert.NotEmpty(t, scopedRoleID, "expected env-scoped OrganizationRole to be created")
 			}
+		},
+		// Re-apply the same program to pin the descriptor round-trip:
+		// helper output (`discriminator` at every level) → wire body
+		// (`__type` after recursive rename) → server-side role record →
+		// Read response → state → next preview must converge to no
+		// changes. Drift in either rename direction, or in the
+		// Group(Condition) wrap/unwrap heuristic, would surface here as
+		// a `~` on `permissions` instead.
+		EditDirs: []integration.EditDir{
+			{
+				Dir:             rbacDir,
+				Additive:        true, // preserve venv from initial deploy
+				ExpectNoChanges: true,
+			},
 		},
 	})
 }

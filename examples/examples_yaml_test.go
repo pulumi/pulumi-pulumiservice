@@ -719,6 +719,20 @@ func TestYamlRbacComposeImport(t *testing.T) {
 		"imported program must reference the policy id inside permissionDescriptors")
 	assert.NotContains(t, imported, "__type",
 		"imported program must not leak the wire-format `__type` discriminator anywhere")
+
+	// Step 6: drift check. The import populated state from Read; if the
+	// imported program (which the Read codegen produced) deploys cleanly
+	// against that state, the descriptor round-trip is non-lossy. Replace
+	// the empty target's Pulumi.yaml with the imported program and run
+	// `pulumi preview` — any `~` on `permissions` would mean Read's
+	// recursive `__type` → `discriminator` rename or the
+	// Group(Condition) wrap/unwrap heuristic disagrees with Create's
+	// inverse transform.
+	pulumiYamlPath := filepath.Join(importTarget.CurrentStack().Workspace().WorkDir(), "Pulumi.yaml")
+	require.NoError(t, os.WriteFile(pulumiYamlPath, contents, 0600),
+		"must be able to overwrite the target stack's Pulumi.yaml with the imported program")
+	preview := importTarget.Preview(t)
+	assertpreview.HasNoChanges(t, preview)
 }
 
 func writePulumiYaml(t *testing.T, yamlContents interface{}) string {
