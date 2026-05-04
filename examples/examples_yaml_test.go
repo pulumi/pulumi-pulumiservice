@@ -722,15 +722,20 @@ func TestYamlRbacComposeImport(t *testing.T) {
 
 	// Step 6: drift check. The import populated state from Read; if the
 	// imported program (which the Read codegen produced) deploys cleanly
-	// against that state, the descriptor round-trip is non-lossy. Replace
-	// the empty target's Pulumi.yaml with the imported program and run
-	// `pulumi preview` — any `~` on `permissions` would mean Read's
-	// recursive `__type` → `discriminator` rename or the
-	// Group(Condition) wrap/unwrap heuristic disagrees with Create's
+	// against that state, the descriptor round-trip is non-lossy. Append
+	// the imported `resources:` block to the target stack's existing
+	// Pulumi.yaml (keeping the project's `name`/`runtime`/`description`
+	// header intact) and run `pulumi preview` — any `~` on `permissions`
+	// would mean Read's recursive `__type` → `discriminator` rename or
+	// the Group(Condition) wrap/unwrap heuristic disagrees with Create's
 	// inverse transform.
 	pulumiYamlPath := filepath.Join(importTarget.CurrentStack().Workspace().WorkDir(), "Pulumi.yaml")
-	require.NoError(t, os.WriteFile(pulumiYamlPath, contents, 0600),
-		"must be able to overwrite the target stack's Pulumi.yaml with the imported program")
+	existingProject, err := os.ReadFile(pulumiYamlPath)
+	require.NoError(t, err, "must be able to read the target stack's Pulumi.yaml")
+	merged := append(existingProject, '\n')
+	merged = append(merged, contents...)
+	require.NoError(t, os.WriteFile(pulumiYamlPath, merged, 0600),
+		"must be able to merge the imported resources into the target stack's Pulumi.yaml")
 	preview := importTarget.Preview(t)
 	assertpreview.HasNoChanges(t, preview)
 }
