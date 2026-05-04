@@ -46,6 +46,13 @@ func NewEnvironmentRotationSchedule(ctx *pulumi.Context,
 	if args.Project == nil {
 		return nil, errors.New("invalid value for required argument 'Project'")
 	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"environment",
+		"organization",
+		"project",
+		"timestamp",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource EnvironmentRotationSchedule
 	err := ctx.RegisterResource("pulumiservice:index:EnvironmentRotationSchedule", name, args, &resource, opts...)

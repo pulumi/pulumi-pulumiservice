@@ -1652,15 +1652,18 @@
       "properties": {
         "environment": {
           "type": "string",
-          "description": "Environment name."
+          "description": "Environment name.",
+          "replaceOnChanges": true
         },
         "organization": {
           "type": "string",
-          "description": "Organization name."
+          "description": "Organization name.",
+          "replaceOnChanges": true
         },
         "project": {
           "type": "string",
-          "description": "Project name."
+          "description": "Project name.",
+          "replaceOnChanges": true
         },
         "scheduleCron": {
           "type": "string",
@@ -1673,7 +1676,7 @@
         "timestamp": {
           "type": "string",
           "description": "The time at which the rotation should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are supplying this, do not supply scheduleCron.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         }
       },
       "required": [
@@ -1686,17 +1689,17 @@
         "environment": {
           "type": "string",
           "description": "Environment name.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         },
         "organization": {
           "type": "string",
           "description": "Organization name.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         },
         "project": {
           "type": "string",
           "description": "Project name.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         },
         "scheduleCron": {
           "type": "string",
@@ -1705,7 +1708,7 @@
         "timestamp": {
           "type": "string",
           "description": "The time at which the rotation should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are supplying this, do not supply scheduleCron.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         }
       },
       "requiredInputs": [

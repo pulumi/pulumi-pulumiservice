@@ -1,407 +1,260 @@
+// Copyright 2026, Pulumi Corporation.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//	http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package resources
 
 import (
 	"context"
 	"fmt"
-	"path"
 	"strings"
 	"time"
 
-	pbempty "google.golang.org/protobuf/types/known/emptypb"
-	"google.golang.org/protobuf/types/known/structpb"
+	p "github.com/pulumi/pulumi-go-provider"
+	"github.com/pulumi/pulumi-go-provider/infer"
 
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
-
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
-type PulumiServiceEnvironmentRotationScheduleResource struct {
-	Client pulumiapi.EnvironmentScheduleClient
+type EnvironmentRotationSchedule struct{}
+
+type (
+	rotIn  = EnvironmentRotationScheduleInput
+	rotOut = EnvironmentRotationScheduleState
+)
+
+var (
+	_ infer.CustomCheck[rotIn]          = &EnvironmentRotationSchedule{}
+	_ infer.CustomCreate[rotIn, rotOut] = &EnvironmentRotationSchedule{}
+	_ infer.CustomUpdate[rotIn, rotOut] = &EnvironmentRotationSchedule{}
+	_ infer.CustomDelete[rotOut]        = &EnvironmentRotationSchedule{}
+	_ infer.CustomRead[rotIn, rotOut]   = &EnvironmentRotationSchedule{}
+)
+
+func (*EnvironmentRotationSchedule) Annotate(a infer.Annotator) {
+	a.Describe(&EnvironmentRotationSchedule{}, "A scheduled recurring or single time environment rotation.")
+	a.SetToken("index", "EnvironmentRotationSchedule")
 }
 
-type PulumiServiceEnvironmentRotationScheduleInput struct {
-	Environment  pulumiapi.EnvironmentIdentifier
-	ScheduleCron *string    `pulumi:"scheduleCron"`
-	ScheduleOnce *time.Time `pulumi:"scheduleOnce"`
+type EnvironmentRotationScheduleInput struct {
+	Organization string  `pulumi:"organization" provider:"replaceOnChanges"`
+	Project      string  `pulumi:"project"      provider:"replaceOnChanges"`
+	Environment  string  `pulumi:"environment"  provider:"replaceOnChanges"`
+	ScheduleCron *string `pulumi:"scheduleCron,optional"`
+	Timestamp    *string `pulumi:"timestamp,optional"    provider:"replaceOnChanges"`
 }
 
-type PulumiServiceEnvironmentRotationScheduleOutput struct {
-	Environment pulumiapi.EnvironmentIdentifier
-	ScheduleID  string `pulumi:"scheduleId"`
-}
-
-func EnvironmentToPropertyMap(environment pulumiapi.EnvironmentIdentifier) resource.PropertyMap {
-	propertyMap := resource.PropertyMap{}
-	propertyMap["organization"] = resource.NewPropertyValue(environment.OrgName)
-	propertyMap["project"] = resource.NewPropertyValue(environment.ProjectName)
-	propertyMap["environment"] = resource.NewPropertyValue(environment.EnvName)
-	return propertyMap
-}
-
-func (i *PulumiServiceEnvironmentRotationScheduleInput) ToPropertyMap() resource.PropertyMap {
-	propertyMap := EnvironmentToPropertyMap(i.Environment)
-
-	if i.ScheduleCron != nil {
-		propertyMap["scheduleCron"] = resource.NewPropertyValue(i.ScheduleCron)
-	}
-	if i.ScheduleOnce != nil {
-		propertyMap["timestamp"] = resource.NewPropertyValue(i.ScheduleOnce.Format(time.RFC3339))
-	}
-
-	return propertyMap
-}
-
-func ParseEnvironment(inputMap resource.PropertyMap) (*pulumiapi.EnvironmentIdentifier, error) {
-	var environment pulumiapi.EnvironmentIdentifier
-	if inputMap["organization"].HasValue() && inputMap["organization"].IsString() {
-		organization := inputMap["organization"].StringValue()
-		environment.OrgName = organization
-	} else {
-		return nil, fmt.Errorf("failed to unmarshal organization value from properties: %s", inputMap)
-	}
-	if inputMap["project"].HasValue() && inputMap["project"].IsString() {
-		project := inputMap["project"].StringValue()
-		environment.ProjectName = project
-	} else {
-		return nil, fmt.Errorf("failed to unmarshal project value from properties: %s", inputMap)
-	}
-	if inputMap["environment"].HasValue() && inputMap["environment"].IsString() {
-		environmentName := inputMap["environment"].StringValue()
-		environment.EnvName = environmentName
-	} else {
-		return nil, fmt.Errorf("failed to unmarshal environmentName value from properties: %s", inputMap)
-	}
-	return &environment, nil
-}
-
-func ToPulumiServiceEnvironmentRotationScheduleInput(
-	properties *structpb.Struct,
-) (*PulumiServiceEnvironmentRotationScheduleInput, error) {
-	inputMap, err := plugin.UnmarshalProperties(properties, util.StandardUnmarshal)
-	if err != nil {
-		return nil, err
-	}
-
-	input := PulumiServiceEnvironmentRotationScheduleInput{}
-	environmentIdentifier, err := ParseEnvironment(inputMap)
-	if err != nil {
-		return nil, err
-	}
-	input.Environment = *environmentIdentifier
-
-	if inputMap["scheduleCron"].HasValue() && inputMap["scheduleCron"].IsString() {
-		scheduleCron := inputMap["scheduleCron"].StringValue()
-		input.ScheduleCron = &scheduleCron
-	}
-
-	if inputMap["timestamp"].HasValue() && inputMap["timestamp"].IsString() {
-		timestamp, err := time.Parse(time.RFC3339, inputMap["timestamp"].StringValue())
-		if err != nil {
-			return nil, err
-		}
-		input.ScheduleOnce = &timestamp
-	}
-
-	return &input, nil
-}
-
-func ToPulumiServiceEnvironmentRotationScheduleOutput(
-	properties *structpb.Struct,
-) (*PulumiServiceEnvironmentRotationScheduleOutput, error) {
-	inputMap, err := plugin.UnmarshalProperties(properties, util.StandardUnmarshal)
-	if err != nil {
-		return nil, err
-	}
-	environment, err := ParseEnvironment(inputMap)
-	if err != nil {
-		return nil, err
-	}
-
-	output := PulumiServiceEnvironmentRotationScheduleOutput{}
-	output.Environment = *environment
-
-	if inputMap["scheduleId"].HasValue() && inputMap["scheduleId"].IsString() {
-		output.ScheduleID = inputMap["scheduleId"].StringValue()
-	}
-
-	return &output, nil
-}
-
-func EnvironmentScheduleSharedDiffMaps(
-	olds resource.PropertyMap,
-	news resource.PropertyMap,
-) (*pulumirpc.DiffResponse, error) {
-	diffs := olds.Diff(news)
-	if diffs == nil {
-		return &pulumirpc.DiffResponse{
-			Changes: pulumirpc.DiffResponse_DIFF_NONE,
-		}, nil
-	}
-
-	dd := plugin.NewDetailedDiffFromObjectDiff(diffs, false)
-
-	detailedDiffs := map[string]*pulumirpc.PropertyDiff{}
-	replaces := []string(nil)
-	replaceProperties := map[string]bool{
-		"organization": true,
-		"project":      true,
-		"stack":        true,
-		"timestamp":    true,
-	}
-	for k, v := range dd {
-		if _, ok := replaceProperties[k]; ok {
-			v.Kind = v.Kind.AsReplace()
-			replaces = append(replaces, k)
-		}
-		detailedDiffs[k] = &pulumirpc.PropertyDiff{
-			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind), //nolint:gosec // safe conversion from plugin.DiffKind
-			InputDiff: v.InputDiff,
-		}
-	}
-
-	changes := pulumirpc.DiffResponse_DIFF_NONE
-	if len(detailedDiffs) > 0 {
-		changes = pulumirpc.DiffResponse_DIFF_SOME
-	}
-	return &pulumirpc.DiffResponse{
-		Changes:             changes,
-		Replaces:            replaces,
-		DetailedDiff:        detailedDiffs,
-		HasDetailedDiff:     true,
-		DeleteBeforeReplace: len(replaces) > 0,
-	}, nil
-}
-
-func (st *PulumiServiceEnvironmentRotationScheduleResource) Diff(
-	req *pulumirpc.DiffRequest,
-) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), util.StandardUnmarshal)
-	if err != nil {
-		return nil, err
-	}
-
-	news, err := plugin.UnmarshalProperties(req.GetNews(), util.StandardUnmarshal)
-	if err != nil {
-		return nil, err
-	}
-
-	return EnvironmentScheduleSharedDiffMaps(olds, news)
-}
-
-func EnvironmentScheduleSharedDelete(
-	req *pulumirpc.DeleteRequest,
-	client pulumiapi.EnvironmentScheduleClient,
-) (*pbempty.Empty, error) {
-	output, err := ToPulumiServiceEnvironmentRotationScheduleOutput(req.GetProperties())
-	if err != nil {
-		return nil, err
-	}
-
-	err = client.DeleteEnvironmentSchedule(context.Background(), output.Environment, output.ScheduleID)
-	if err != nil {
-		return nil, err
-	}
-	return &pbempty.Empty{}, nil
-}
-
-func (st *PulumiServiceEnvironmentRotationScheduleResource) Delete(
-	req *pulumirpc.DeleteRequest,
-) (*pbempty.Empty, error) {
-	return EnvironmentScheduleSharedDelete(req, st.Client)
-}
-
-func (st *PulumiServiceEnvironmentRotationScheduleResource) Create(
-	req *pulumirpc.CreateRequest,
-) (*pulumirpc.CreateResponse, error) {
-	input, err := ToPulumiServiceEnvironmentRotationScheduleInput(req.GetProperties())
-	if err != nil {
-		return nil, err
-	}
-
-	scheduleReq := pulumiapi.CreateEnvironmentRotationScheduleRequest{
-		ScheduleCron: input.ScheduleCron,
-		ScheduleOnce: input.ScheduleOnce,
-	}
-	scheduleID, err := st.Client.CreateEnvironmentRotationSchedule(context.Background(), input.Environment, scheduleReq)
-	if err != nil {
-		return nil, err
-	}
-
-	outputProperties, err := plugin.MarshalProperties(
-		AddScheduleIDToPropertyMap(*scheduleID, input.ToPropertyMap()),
-		util.StandardMarshal,
+func (i *EnvironmentRotationScheduleInput) Annotate(a infer.Annotator) {
+	a.Describe(&i.Organization, "Organization name.")
+	a.Describe(&i.Project, "Project name.")
+	a.Describe(&i.Environment, "Environment name.")
+	a.Describe(
+		&i.ScheduleCron,
+		"Cron expression for recurring scheduled rotations. If you are supplying this, do not supply timestamp.",
 	)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.CreateResponse{
-		Id: path.Join(
-			input.Environment.OrgName,
-			input.Environment.ProjectName,
-			input.Environment.EnvName,
-			"rotations",
-			*scheduleID,
-		),
-		Properties: outputProperties,
-	}, nil
+	a.Describe(
+		&i.Timestamp,
+		"The time at which the rotation should run, in ISO 8601 format. "+
+			"Eg: 2020-01-01T00:00:00Z. If you are supplying this, do not supply scheduleCron.",
+	)
 }
 
-func (st *PulumiServiceEnvironmentRotationScheduleResource) Check(
-	req *pulumirpc.CheckRequest,
-) (*pulumirpc.CheckResponse, error) {
-	inputMap, err := plugin.UnmarshalProperties(req.GetNews(), util.StandardUnmarshal)
+type EnvironmentRotationScheduleState struct {
+	EnvironmentRotationScheduleInput
+	ScheduleID string `pulumi:"scheduleId"`
+}
+
+func (s *EnvironmentRotationScheduleState) Annotate(a infer.Annotator) {
+	a.Describe(&s.ScheduleID, "Schedule ID of the created rotation schedule, assigned by Pulumi Cloud.")
+}
+
+func (*EnvironmentRotationSchedule) Check(
+	ctx context.Context, req infer.CheckRequest,
+) (infer.CheckResponse[EnvironmentRotationScheduleInput], error) {
+	i, failures, err := infer.DefaultCheck[EnvironmentRotationScheduleInput](ctx, req.NewInputs)
 	if err != nil {
-		return nil, err
+		return infer.CheckResponse[EnvironmentRotationScheduleInput]{}, err
 	}
-
-	var failures []*pulumirpc.CheckFailure
-	for _, p := range []resource.PropertyKey{"organization", "project", "environment"} {
-		if !inputMap[(p)].HasValue() {
-			failures = append(failures, &pulumirpc.CheckFailure{
-				Reason:   fmt.Sprintf("missing required property '%s'", p),
-				Property: string(p),
-			})
-		}
-	}
-
-	if (inputMap["scheduleCron"].HasValue() && inputMap["timestamp"].HasValue()) ||
-		(!inputMap["scheduleCron"].HasValue() && !inputMap["timestamp"].HasValue()) {
-		failures = append(failures, &pulumirpc.CheckFailure{
-			Reason:   "One of scheduleCron or timestamp must be specified but not both",
+	hasCron := i.ScheduleCron != nil && *i.ScheduleCron != ""
+	hasTimestamp := i.Timestamp != nil && *i.Timestamp != ""
+	if hasCron == hasTimestamp {
+		failures = append(failures, p.CheckFailure{
 			Property: "scheduleCron",
+			Reason:   "exactly one of scheduleCron or timestamp must be specified",
 		})
 	}
-
-	if inputMap["timestamp"].HasValue() && inputMap["timestamp"].IsString() {
-		_, err := time.Parse(time.RFC3339, inputMap["timestamp"].StringValue())
-		if err != nil {
-			failures = append(failures, &pulumirpc.CheckFailure{
-				Reason:   fmt.Sprintf("timestamp failed to parse due to: %s", err),
+	if hasTimestamp {
+		if _, perr := time.Parse(time.RFC3339, *i.Timestamp); perr != nil {
+			failures = append(failures, p.CheckFailure{
 				Property: "timestamp",
+				Reason:   fmt.Sprintf("timestamp must be in RFC 3339 format: %s", perr),
 			})
 		}
 	}
-
-	return &pulumirpc.CheckResponse{Inputs: req.GetNews(), Failures: failures}, nil
+	return infer.CheckResponse[EnvironmentRotationScheduleInput]{Inputs: i, Failures: failures}, nil
 }
 
-func (st *PulumiServiceEnvironmentRotationScheduleResource) Update(
-	req *pulumirpc.UpdateRequest,
-) (*pulumirpc.UpdateResponse, error) {
-	previousOutput, err := ToPulumiServiceEnvironmentRotationScheduleOutput(req.GetOlds())
+func (*EnvironmentRotationSchedule) Create(
+	ctx context.Context,
+	req infer.CreateRequest[EnvironmentRotationScheduleInput],
+) (infer.CreateResponse[EnvironmentRotationScheduleState], error) {
+	if req.DryRun {
+		return infer.CreateResponse[EnvironmentRotationScheduleState]{
+			Output: EnvironmentRotationScheduleState{EnvironmentRotationScheduleInput: req.Inputs},
+		}, nil
+	}
+	env, scheduleReq, err := req.Inputs.toAPI()
 	if err != nil {
-		return nil, err
+		return infer.CreateResponse[EnvironmentRotationScheduleState]{}, err
 	}
-	input, err := ToPulumiServiceEnvironmentRotationScheduleInput(req.GetNews())
+	scheduleID, err := config.GetClient(ctx).CreateEnvironmentRotationSchedule(ctx, env, scheduleReq)
 	if err != nil {
-		return nil, err
+		return infer.CreateResponse[EnvironmentRotationScheduleState]{}, fmt.Errorf(
+			"error creating environment rotation schedule: %w", err,
+		)
 	}
-
-	updateReq := pulumiapi.CreateEnvironmentRotationScheduleRequest{
-		ScheduleCron: input.ScheduleCron,
-		ScheduleOnce: input.ScheduleOnce,
-	}
-	scheduleID, err := st.Client.UpdateEnvironmentRotationSchedule(
-		context.Background(),
-		input.Environment,
-		updateReq,
-		previousOutput.ScheduleID,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	outputProperties, err := plugin.MarshalProperties(
-		AddScheduleIDToPropertyMap(*scheduleID, input.ToPropertyMap()),
-		util.StandardMarshal,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &pulumirpc.UpdateResponse{
-		Properties: outputProperties,
+	return infer.CreateResponse[EnvironmentRotationScheduleState]{
+		ID: environmentScheduleID(env, "rotations", *scheduleID),
+		Output: EnvironmentRotationScheduleState{
+			EnvironmentRotationScheduleInput: req.Inputs,
+			ScheduleID:                       *scheduleID,
+		},
 	}, nil
 }
 
-func (st *PulumiServiceEnvironmentRotationScheduleResource) Read(
-	req *pulumirpc.ReadRequest,
-) (*pulumirpc.ReadResponse, error) {
-	environment, scheduleID, err := ParseEnvironmentScheduleID(req.Id, "rotations")
+func (*EnvironmentRotationSchedule) Update(
+	ctx context.Context,
+	req infer.UpdateRequest[EnvironmentRotationScheduleInput, EnvironmentRotationScheduleState],
+) (infer.UpdateResponse[EnvironmentRotationScheduleState], error) {
+	if req.DryRun {
+		return infer.UpdateResponse[EnvironmentRotationScheduleState]{
+			Output: EnvironmentRotationScheduleState{
+				EnvironmentRotationScheduleInput: req.Inputs,
+				ScheduleID:                       req.State.ScheduleID,
+			},
+		}, nil
+	}
+	env, scheduleReq, err := req.Inputs.toAPI()
 	if err != nil {
-		return nil, err
+		return infer.UpdateResponse[EnvironmentRotationScheduleState]{}, err
+	}
+	scheduleID, err := config.GetClient(ctx).UpdateEnvironmentRotationSchedule(
+		ctx, env, scheduleReq, req.State.ScheduleID,
+	)
+	if err != nil {
+		return infer.UpdateResponse[EnvironmentRotationScheduleState]{}, fmt.Errorf(
+			"error updating environment rotation schedule: %w", err,
+		)
+	}
+	return infer.UpdateResponse[EnvironmentRotationScheduleState]{
+		Output: EnvironmentRotationScheduleState{
+			EnvironmentRotationScheduleInput: req.Inputs,
+			ScheduleID:                       *scheduleID,
+		},
+	}, nil
+}
+
+func (*EnvironmentRotationSchedule) Delete(
+	ctx context.Context,
+	req infer.DeleteRequest[EnvironmentRotationScheduleState],
+) (infer.DeleteResponse, error) {
+	env := pulumiapi.EnvironmentIdentifier{
+		OrgName:     req.State.Organization,
+		ProjectName: req.State.Project,
+		EnvName:     req.State.Environment,
+	}
+	return infer.DeleteResponse{}, config.GetClient(ctx).DeleteEnvironmentSchedule(ctx, env, req.State.ScheduleID)
+}
+
+func (*EnvironmentRotationSchedule) Read(
+	ctx context.Context,
+	req infer.ReadRequest[EnvironmentRotationScheduleInput, EnvironmentRotationScheduleState],
+) (infer.ReadResponse[EnvironmentRotationScheduleInput, EnvironmentRotationScheduleState], error) {
+	env, scheduleID, err := parseEnvironmentScheduleID(req.ID, "rotations")
+	if err != nil {
+		return infer.ReadResponse[EnvironmentRotationScheduleInput, EnvironmentRotationScheduleState]{}, err
 	}
 
-	scheduleResponse, err := st.Client.GetEnvironmentSchedule(context.Background(), *environment, *scheduleID)
+	resp, err := config.GetClient(ctx).GetEnvironmentSchedule(ctx, env, scheduleID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read EnvironmentRotationSchedule (%q): %w", req.Id, err)
+		return infer.ReadResponse[EnvironmentRotationScheduleInput, EnvironmentRotationScheduleState]{},
+			fmt.Errorf("failed to read EnvironmentRotationSchedule (%q): %w", req.ID, err)
 	}
-	if scheduleResponse == nil {
-		// if schedule doesn't exist, then return empty response to delete it from state
-		return &pulumirpc.ReadResponse{}, nil
+	if resp == nil {
+		return infer.ReadResponse[EnvironmentRotationScheduleInput, EnvironmentRotationScheduleState]{}, nil
 	}
 
-	var scheduleOnce *time.Time
-	if scheduleResponse.ScheduleOnce != nil {
-		parsed, err := time.Parse(time.DateTime, *scheduleResponse.ScheduleOnce)
+	inputs := EnvironmentRotationScheduleInput{
+		Organization: env.OrgName,
+		Project:      env.ProjectName,
+		Environment:  env.EnvName,
+		ScheduleCron: resp.ScheduleCron,
+	}
+	if resp.ScheduleOnce != nil {
+		parsed, err := time.Parse(time.DateTime, *resp.ScheduleOnce)
 		if err != nil {
-			return nil, fmt.Errorf("failed to read EnvironmentRotationSchedule (%q): %w", req.Id, err)
+			return infer.ReadResponse[EnvironmentRotationScheduleInput, EnvironmentRotationScheduleState]{},
+				fmt.Errorf("failed to read EnvironmentRotationSchedule (%q): %w", req.ID, err)
 		}
-		scheduleOnce = &parsed
+		ts := parsed.UTC().Format(time.RFC3339)
+		inputs.Timestamp = &ts
 	}
-	input := PulumiServiceEnvironmentRotationScheduleInput{
-		Environment:  *environment,
-		ScheduleCron: scheduleResponse.ScheduleCron,
-		ScheduleOnce: scheduleOnce,
-	}
-
-	inputs, err := plugin.MarshalProperties(
-		input.ToPropertyMap(),
-		util.StandardMarshal,
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read EnvironmentRotationSchedule (%q): %w", req.Id, err)
-	}
-	outputProperties, err := plugin.MarshalProperties(
-		AddScheduleIDToPropertyMap(*scheduleID, input.ToPropertyMap()),
-		util.StandardMarshal,
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read EnvironmentRotationSchedule (%q): %w", req.Id, err)
-	}
-
-	return &pulumirpc.ReadResponse{
-		Id:         req.Id,
-		Properties: outputProperties,
-		Inputs:     inputs,
+	return infer.ReadResponse[EnvironmentRotationScheduleInput, EnvironmentRotationScheduleState]{
+		ID:     req.ID,
+		Inputs: inputs,
+		State: EnvironmentRotationScheduleState{
+			EnvironmentRotationScheduleInput: inputs,
+			ScheduleID:                       scheduleID,
+		},
 	}, nil
 }
 
-func (st *PulumiServiceEnvironmentRotationScheduleResource) Name() string {
-	return "pulumiservice:index:EnvironmentRotationSchedule"
+func (i EnvironmentRotationScheduleInput) toAPI() (
+	pulumiapi.EnvironmentIdentifier, pulumiapi.CreateEnvironmentRotationScheduleRequest, error,
+) {
+	env := pulumiapi.EnvironmentIdentifier{
+		OrgName:     i.Organization,
+		ProjectName: i.Project,
+		EnvName:     i.Environment,
+	}
+	scheduleReq := pulumiapi.CreateEnvironmentRotationScheduleRequest{
+		ScheduleCron: i.ScheduleCron,
+	}
+	if i.Timestamp != nil && *i.Timestamp != "" {
+		ts, err := time.Parse(time.RFC3339, *i.Timestamp)
+		if err != nil {
+			return pulumiapi.EnvironmentIdentifier{}, pulumiapi.CreateEnvironmentRotationScheduleRequest{},
+				fmt.Errorf("invalid timestamp %q: %w", *i.Timestamp, err)
+		}
+		scheduleReq.ScheduleOnce = &ts
+	}
+	return env, scheduleReq, nil
 }
 
-func ParseEnvironmentScheduleID(id string, scheduleType string) (*pulumiapi.EnvironmentIdentifier, *string, error) {
-	splitID := strings.Split(id, "/")
-	if len(splitID) < 4 {
-		return nil, nil, fmt.Errorf("invalid environment id: %s", id)
+func environmentScheduleID(env pulumiapi.EnvironmentIdentifier, scheduleType, scheduleID string) string {
+	return fmt.Sprintf("%s/%s/%s/%s/%s", env.OrgName, env.ProjectName, env.EnvName, scheduleType, scheduleID)
+}
+
+func parseEnvironmentScheduleID(id, scheduleType string) (pulumiapi.EnvironmentIdentifier, string, error) {
+	parts := strings.Split(id, "/")
+	if len(parts) != 5 || parts[3] != scheduleType {
+		return pulumiapi.EnvironmentIdentifier{}, "",
+			fmt.Errorf("%q is invalid, expected organization/project/environment/%s/scheduleId", id, scheduleType)
 	}
-	envID := pulumiapi.EnvironmentIdentifier{
-		OrgName:     splitID[0],
-		ProjectName: splitID[1],
-		EnvName:     splitID[2],
-	}
-	if scheduleType == "" {
-		if len(splitID) != 4 {
-			return nil, nil, fmt.Errorf("invalid schedule id: %s", id)
-		}
-		return &envID, &splitID[3], nil
-	}
-	if len(splitID) != 5 || splitID[3] != scheduleType {
-		return nil, nil, fmt.Errorf("invalid schedule id: %s", id)
-	}
-	return &envID, &splitID[4], nil
+	return pulumiapi.EnvironmentIdentifier{
+		OrgName:     parts[0],
+		ProjectName: parts[1],
+		EnvName:     parts[2],
+	}, parts[4], nil
 }
