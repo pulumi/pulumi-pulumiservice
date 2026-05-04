@@ -29,7 +29,7 @@ resources:
       name: yaml-rbac-read-only-${digits}
       description: Read-only access to stacks, created by the yaml-rbac example.
       permissions:
-        kind: PermissionDescriptorAllow
+        discriminator: PermissionDescriptorAllow
         permissions:
           - stack:read
 

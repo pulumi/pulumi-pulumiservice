@@ -73,7 +73,7 @@ custom_role = OrganizationRole(
     name=f"py-rbac-read-only-{digits}",
     description="Read-only access to stacks, created by the py-rbac example.",
     permissions={
-        "kind": "PermissionDescriptorAllow",
+        "discriminator": "PermissionDescriptorAllow",
         "permissions": ["stack:read"],
     },
 )

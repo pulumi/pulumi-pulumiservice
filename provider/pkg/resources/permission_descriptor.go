@@ -16,47 +16,51 @@ package resources
 
 import "fmt"
 
-// permissionsKindToWire converts a user-facing PermissionDescriptor tree into
+// permissionsToWire converts a user-facing PermissionDescriptor tree into
 // the Pulumi Cloud REST API's wire shape. The translation is a structurally-
-// blind recursive rename of the discriminator field from `kind` to `__type`;
-// no descriptor variant is hard-coded. PermissionDescriptorAllow,
+// blind recursive rename of the discriminator field from `discriminator` to
+// `__type`; no descriptor variant is hard-coded. PermissionDescriptorAllow,
 // PermissionDescriptorGroup, PermissionDescriptorCondition,
 // PermissionDescriptorCompose, PermissionDescriptorIfThenElse,
 // PermissionDescriptorSelect, And/Or/Not boolean operators, and any future
 // variant Pulumi Cloud adds all pass through unchanged.
 //
+// The user-facing field is `discriminator` rather than `kind` to avoid
+// collisions with future Cloud models that might use `kind` as a domain
+// field; `__type` itself can't be exposed because Pulumi's Python SDK
+// silently strips `__`-prefixed keys from inputs (pulumi/pulumi#22738), so
+// the field would just disappear at the language boundary.
+//
 // Returns an error if the input contains a `__type` key anywhere — that
 // almost always means the user copied raw wire format from the REST API
-// docs. Pulumi's Python SDK silently strips `__`-prefixed keys from inputs
-// (see pulumi/pulumi#22738), so the field would just disappear at the
-// language boundary; rejecting it here gives a clear error pointing the
-// user at `kind` instead.
-func permissionsKindToWire(node map[string]interface{}) (map[string]interface{}, error) {
+// docs. Rejecting it here gives a clear error pointing the user at
+// `discriminator` instead.
+func permissionsToWire(node map[string]interface{}) (map[string]interface{}, error) {
 	if err := assertNoUnderscoreType(node); err != nil {
 		return nil, err
 	}
-	out := renameDiscriminator(node, "kind", "__type")
+	out := renameDiscriminator(node, "discriminator", "__type")
 	outMap, ok := out.(map[string]interface{})
 	if !ok {
 		return nil, fmt.Errorf("permissions descriptor must be an object, got %T", node)
 	}
-	if _, hasKind := outMap["__type"]; !hasKind {
-		return nil, fmt.Errorf("permissions descriptor missing required `kind` field")
+	if _, hasDiscriminator := outMap["__type"]; !hasDiscriminator {
+		return nil, fmt.Errorf("permissions descriptor missing required `discriminator` field")
 	}
 	return outMap, nil
 }
 
-// permissionsKindToWireForAPI is the entry point used by Create/Update. It
-// runs permissionsKindToWire and, if the top-level descriptor is a Condition,
+// permissionsToWireForAPI is the entry point used by Create/Update. It
+// runs permissionsToWire and, if the top-level descriptor is a Condition,
 // wraps it in a single-entry Group. Pulumi Cloud's role-detail UI 500s on a
 // bare top-level Condition descriptor — the API itself accepts the Create,
 // it's just the UI that breaks. Wrapping in a Group fixes the UI.
 //
-// permissionsWireToKind reverses the wrap on Read so refresh stays idempotent.
+// permissionsFromWire reverses the wrap on Read so refresh stays idempotent.
 // The reverse-direction collapse is gated on the user's prior input shape
 // (see comments there).
-func permissionsKindToWireForAPI(node map[string]interface{}) (map[string]interface{}, error) {
-	wire, err := permissionsKindToWire(node)
+func permissionsToWireForAPI(node map[string]interface{}) (map[string]interface{}, error) {
+	wire, err := permissionsToWire(node)
 	if err != nil {
 		return nil, err
 	}
@@ -69,14 +73,14 @@ func permissionsKindToWireForAPI(node map[string]interface{}) (map[string]interf
 	return wire, nil
 }
 
-// permissionsWireToKind converts a wire-shape PermissionDescriptor tree
-// returned by Pulumi Cloud's REST API back into the user-facing kind-shape.
-// Reverse of permissionsKindToWire: a structurally-blind recursive rename
-// of `__type` to `kind`.
+// permissionsFromWire converts a wire-shape PermissionDescriptor tree
+// returned by Pulumi Cloud's REST API back into the user-facing shape.
+// Reverse of permissionsToWire: a structurally-blind recursive rename of
+// `__type` to `discriminator`.
 //
 // At the top level, optionally collapses a single-entry Group whose only
 // entry is a Condition — the artefact of the API-boundary wrap added by
-// permissionsKindToWireForAPI. The collapse is gated on `prior` so the
+// permissionsToWireForAPI. The collapse is gated on `prior` so the
 // round-trip is non-lossy:
 //
 //   - If the user authored a top-level Condition (or imported a role with
@@ -88,21 +92,21 @@ func permissionsKindToWireForAPI(node map[string]interface{}) (map[string]interf
 //   - All other prior shapes (Allow, Compose, IfThenElse, …) cannot
 //     produce a single-entry Group(Condition) on the wire, so the collapse
 //     gate has no effect on them.
-func permissionsWireToKind(
+func permissionsFromWire(
 	node map[string]interface{},
 	prior map[string]interface{},
 ) (map[string]interface{}, error) {
-	out := renameDiscriminator(node, "__type", "kind")
+	out := renameDiscriminator(node, "__type", "discriminator")
 	outMap, ok := out.(map[string]interface{})
 	if !ok {
 		return nil, fmt.Errorf("permissions descriptor must be an object, got %T", node)
 	}
 
-	preserveGroupShape := prior != nil && prior["kind"] == "PermissionDescriptorGroup"
+	preserveGroupShape := prior != nil && prior["discriminator"] == "PermissionDescriptorGroup"
 	if preserveGroupShape {
 		return outMap, nil
 	}
-	if outMap["kind"] != "PermissionDescriptorGroup" {
+	if outMap["discriminator"] != "PermissionDescriptorGroup" {
 		return outMap, nil
 	}
 	entries, ok := outMap["entries"].([]interface{})
@@ -110,7 +114,7 @@ func permissionsWireToKind(
 		return outMap, nil
 	}
 	entry, ok := entries[0].(map[string]interface{})
-	if !ok || entry["kind"] != "PermissionDescriptorCondition" {
+	if !ok || entry["discriminator"] != "PermissionDescriptorCondition" {
 		return outMap, nil
 	}
 	return entry, nil
@@ -151,15 +155,16 @@ func renameDiscriminator(v interface{}, from, to string) interface{} {
 // user pasting raw wire format from the REST API docs would have the
 // discriminator quietly disappear at the language boundary and the role
 // would be created with a malformed descriptor. Rejecting `__type` at the
-// SDK boundary gives every language a clear error pointing at `kind`.
+// SDK boundary gives every language a clear error pointing at
+// `discriminator`.
 func assertNoUnderscoreType(v interface{}) error {
 	switch x := v.(type) {
 	case map[string]interface{}:
 		if _, has := x["__type"]; has {
 			return fmt.Errorf(
-				"permissions descriptor uses `__type` field — use `kind` instead. " +
+				"permissions descriptor uses `__type` field — use `discriminator` instead. " +
 					"Pulumi's Python SDK strips `__`-prefixed keys from inputs " +
-					"(pulumi/pulumi#22738), so the SDK boundary uses `kind` for " +
+					"(pulumi/pulumi#22738), so the SDK boundary uses `discriminator` for " +
 					"every language. The field's values are unchanged " +
 					"(`PermissionDescriptorAllow`, `PermissionDescriptorGroup`, etc.)",
 			)

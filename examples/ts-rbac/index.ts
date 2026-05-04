@@ -16,7 +16,7 @@ const readOnlyRole = new service.OrganizationRole("readOnlyRole", {
     name: `ts-rbac-read-only-${nameSuffix}`,
     description: "Read-only access to stacks, created by the ts-rbac example.",
     permissions: {
-        kind: "PermissionDescriptorAllow",
+        discriminator: "PermissionDescriptorAllow",
         permissions: ["stack:read"],
     },
 });

@@ -74,20 +74,21 @@ func (c *OrganizationRoleCore) Annotate(a infer.Annotator) {
 	a.Describe(
 		&c.Permissions,
 		"The role's permission descriptor tree, expressed in the Pulumi Cloud "+
-			"wire grammar with the discriminator field renamed from `__type` to "+
-			"`kind` (Pulumi's Python SDK strips `__`-prefixed keys from inputs, "+
-			"so the SDK uses `kind` for cross-language consistency).\n\n"+
-			"Common kinds:\n"+
-			"- `PermissionDescriptorAllow` — `{kind: \"PermissionDescriptorAllow\", "+
+			"wire grammar with the descriptor-type field renamed from `__type` to "+
+			"`discriminator` (Pulumi's Python SDK strips `__`-prefixed keys from "+
+			"inputs, and `discriminator` avoids collisions with future Cloud models "+
+			"that may carry a domain `kind` field).\n\n"+
+			"Common descriptors:\n"+
+			"- `PermissionDescriptorAllow` — `{discriminator: \"PermissionDescriptorAllow\", "+
 			"permissions: [\"<scope>\", ...]}` grants the listed scopes.\n"+
-			"- `PermissionDescriptorGroup` — `{kind: \"PermissionDescriptorGroup\", "+
+			"- `PermissionDescriptorGroup` — `{discriminator: \"PermissionDescriptorGroup\", "+
 			"entries: [<descriptor>, ...]}` composes multiple descriptors; the "+
 			"role grants the union of every entry.\n"+
-			"- `PermissionDescriptorCondition` — `{kind: "+
+			"- `PermissionDescriptorCondition` — `{discriminator: "+
 			"\"PermissionDescriptorCondition\", condition: <expression>, subNode: "+
 			"<descriptor>}` gates a sub-descriptor on a boolean expression.\n"+
 			"- `PermissionDescriptorCompose` — references other roles by ID; "+
-			"`{kind: \"PermissionDescriptorCompose\", permissionDescriptors: "+
+			"`{discriminator: \"PermissionDescriptorCompose\", permissionDescriptors: "+
 			"[<roleId>, ...]}`.\n\n"+
 			"Pulumi Cloud's REST API also accepts `PermissionDescriptorIfThenElse`, "+
 			"`PermissionDescriptorSelect`, and the `PermissionExpression*` / "+
@@ -143,7 +144,7 @@ func (*OrganizationRole) Check(
 				Property: "permissions",
 				Reason:   "permissions must not be empty — supply a PermissionDescriptor tree",
 			})
-		} else if _, err := permissionsKindToWire(in.Permissions); err != nil {
+		} else if _, err := permissionsToWire(in.Permissions); err != nil {
 			// Validate the descriptor tree up front so users see a
 			// clear error at preview, not a 400 from the API at apply.
 			failures = append(failures, p.CheckFailure{
@@ -370,7 +371,7 @@ func orgRoleCoreFromAPI(
 	}
 	if role.Details != nil {
 		// Round-trip the typed Details through JSON to recover the wire-shape
-		// map that permissionsWireToKind expects. The marshal call dispatches
+		// map that permissionsFromWire expects. The marshal call dispatches
 		// through the typed descriptor's MarshalJSON, which emits the
 		// __type-discriminated wire form.
 		raw, err := json.Marshal(role.Details)
@@ -384,8 +385,8 @@ func orgRoleCoreFromAPI(
 		}
 		// Pass the user's prior input shape so the translator can decide
 		// whether to collapse the API-boundary single-entry-Group-of-Condition
-		// wrap. See permissionsWireToKind's docstring for the gating rule.
-		parsed, err := permissionsWireToKind(wire, prior.Permissions)
+		// wrap. See permissionsFromWire's docstring for the gating rule.
+		parsed, err := permissionsFromWire(wire, prior.Permissions)
 		if err != nil {
 			return OrganizationRoleCore{}, fmt.Errorf("translating role details for %q: %w", role.ID, err)
 		}
@@ -415,7 +416,7 @@ func orgRoleStateFromAPI(
 func buildPermissionDescriptorForAPI(
 	permissions map[string]interface{},
 ) (apitype.PermissionDescriptor, error) {
-	wire, err := permissionsKindToWireForAPI(permissions)
+	wire, err := permissionsToWireForAPI(permissions)
 	if err != nil {
 		return nil, err
 	}

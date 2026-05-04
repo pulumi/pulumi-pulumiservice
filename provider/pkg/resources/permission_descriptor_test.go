@@ -35,7 +35,7 @@ import (
 //   - Allow         — leaf grant.
 //   - Group         — composition.
 //   - Condition     — gate on an Equal expression. Top-level instances are
-//                     wrapped by permissionsKindToWireForAPI.
+//                     wrapped by permissionsToWireForAPI.
 //   - Compose       — references other roles by ID. Pass-through only.
 //   - And/Or/Not    — boolean operators. Pass-through only.
 //   - IfThenElse    — variant we don't understand structurally; pass-through
@@ -44,8 +44,8 @@ import (
 
 func flatAllowKind() map[string]interface{} {
 	return map[string]interface{}{
-		"kind":        "PermissionDescriptorAllow",
-		"permissions": []interface{}{"stack:read"},
+		"discriminator": "PermissionDescriptorAllow",
+		"permissions":   []interface{}{"stack:read"},
 	}
 }
 func flatAllowWire() map[string]interface{} {
@@ -57,15 +57,15 @@ func flatAllowWire() map[string]interface{} {
 
 func flatGroupKind() map[string]interface{} {
 	return map[string]interface{}{
-		"kind": "PermissionDescriptorGroup",
+		"discriminator": "PermissionDescriptorGroup",
 		"entries": []interface{}{
 			map[string]interface{}{
-				"kind":        "PermissionDescriptorAllow",
-				"permissions": []interface{}{"stack:read"},
+				"discriminator": "PermissionDescriptorAllow",
+				"permissions":   []interface{}{"stack:read"},
 			},
 			map[string]interface{}{
-				"kind":        "PermissionDescriptorAllow",
-				"permissions": []interface{}{"stack:edit"},
+				"discriminator": "PermissionDescriptorAllow",
+				"permissions":   []interface{}{"stack:edit"},
 			},
 		},
 	}
@@ -87,25 +87,25 @@ func flatGroupWire() map[string]interface{} {
 }
 
 // scopedConditionKind / scopedConditionWire: the post-collapse Condition shape
-// the helpers emit. permissionsKindToWireForAPI wraps this in a single-entry
-// Group for the Cloud UI; permissionsWireToKind collapses the wrap on Read
+// the helpers emit. permissionsToWireForAPI wraps this in a single-entry
+// Group for the Cloud UI; permissionsFromWire collapses the wrap on Read
 // when the user's prior input was not a Group.
 func scopedConditionKind() map[string]interface{} {
 	return map[string]interface{}{
-		"kind": "PermissionDescriptorCondition",
+		"discriminator": "PermissionDescriptorCondition",
 		"condition": map[string]interface{}{
-			"kind": "PermissionExpressionEqual",
+			"discriminator": "PermissionExpressionEqual",
 			"left": map[string]interface{}{
-				"kind": "PermissionExpressionEnvironment",
+				"discriminator": "PermissionExpressionEnvironment",
 			},
 			"right": map[string]interface{}{
-				"kind":     "PermissionLiteralExpressionEnvironment",
-				"identity": "env-uuid-1",
+				"discriminator": "PermissionLiteralExpressionEnvironment",
+				"identity":      "env-uuid-1",
 			},
 		},
 		"subNode": map[string]interface{}{
-			"kind":        "PermissionDescriptorAllow",
-			"permissions": []interface{}{"environment:read"},
+			"discriminator": "PermissionDescriptorAllow",
+			"permissions":   []interface{}{"environment:read"},
 		},
 	}
 }
@@ -133,7 +133,7 @@ func scopedConditionWire() map[string]interface{} {
 // has no Compose-specific code; it passes through verbatim.
 func composeKind() map[string]interface{} {
 	return map[string]interface{}{
-		"kind": "PermissionDescriptorCompose",
+		"discriminator": "PermissionDescriptorCompose",
 		"permissionDescriptors": []interface{}{
 			"role-id-base-a",
 			"role-id-base-b",
@@ -155,33 +155,33 @@ func composeWire() map[string]interface{} {
 // the point is to exercise a non-Equal boolean operator end to end.
 func andConditionKind() map[string]interface{} {
 	return map[string]interface{}{
-		"kind": "PermissionDescriptorCondition",
+		"discriminator": "PermissionDescriptorCondition",
 		"condition": map[string]interface{}{
-			"kind": "PermissionExpressionAnd",
+			"discriminator": "PermissionExpressionAnd",
 			"left": map[string]interface{}{
-				"kind": "PermissionExpressionEqual",
+				"discriminator": "PermissionExpressionEqual",
 				"left": map[string]interface{}{
-					"kind": "PermissionExpressionTeam",
+					"discriminator": "PermissionExpressionTeam",
 				},
 				"right": map[string]interface{}{
-					"kind":     "PermissionLiteralExpressionTeam",
-					"identity": "team-a",
+					"discriminator": "PermissionLiteralExpressionTeam",
+					"identity":      "team-a",
 				},
 			},
 			"right": map[string]interface{}{
-				"kind": "PermissionExpressionEqual",
+				"discriminator": "PermissionExpressionEqual",
 				"left": map[string]interface{}{
-					"kind": "PermissionExpressionTeam",
+					"discriminator": "PermissionExpressionTeam",
 				},
 				"right": map[string]interface{}{
-					"kind":     "PermissionLiteralExpressionTeam",
-					"identity": "team-b",
+					"discriminator": "PermissionLiteralExpressionTeam",
+					"identity":      "team-b",
 				},
 			},
 		},
 		"subNode": map[string]interface{}{
-			"kind":        "PermissionDescriptorAllow",
-			"permissions": []interface{}{"stack:edit"},
+			"discriminator": "PermissionDescriptorAllow",
+			"permissions":   []interface{}{"stack:edit"},
 		},
 	}
 }
@@ -224,17 +224,17 @@ func andConditionWire() map[string]interface{} {
 // — adding a new variant to Pulumi Cloud requires zero provider changes.
 func ifThenElseKind() map[string]interface{} {
 	return map[string]interface{}{
-		"kind": "PermissionDescriptorIfThenElse",
+		"discriminator": "PermissionDescriptorIfThenElse",
 		"if": map[string]interface{}{
-			"kind": "PermissionExpressionTeam",
+			"discriminator": "PermissionExpressionTeam",
 		},
 		"then": map[string]interface{}{
-			"kind":        "PermissionDescriptorAllow",
-			"permissions": []interface{}{"stack:edit"},
+			"discriminator": "PermissionDescriptorAllow",
+			"permissions":   []interface{}{"stack:edit"},
 		},
 		"else": map[string]interface{}{
-			"kind":        "PermissionDescriptorAllow",
-			"permissions": []interface{}{"stack:read"},
+			"discriminator": "PermissionDescriptorAllow",
+			"permissions":   []interface{}{"stack:read"},
 		},
 	}
 }
@@ -256,10 +256,10 @@ func ifThenElseWire() map[string]interface{} {
 }
 
 // ----------------------------------------------------------------------------
-// Forward direction: kind → wire. Pure blind rename.
+// Forward direction: discriminator → wire. Pure blind rename.
 // ----------------------------------------------------------------------------
 
-func TestPermissionsKindToWire(t *testing.T) {
+func TestPermissionsToWire(t *testing.T) {
 	t.Parallel()
 	cases := []struct {
 		name string
@@ -277,32 +277,32 @@ func TestPermissionsKindToWire(t *testing.T) {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
-			got, err := permissionsKindToWire(tc.in)
+			got, err := permissionsToWire(tc.in)
 			require.NoError(t, err)
 			assert.Equal(t, tc.want, got)
 		})
 	}
 }
 
-// permissionsKindToWire validates the input is at least a map with a `kind`
-// field at the top level. Anything below the top level can be arbitrary
-// Pulumi Cloud wire grammar — we don't second-guess.
-func TestPermissionsKindToWire_TopLevelValidation(t *testing.T) {
+// permissionsToWire validates the input is at least a map with a
+// `discriminator` field at the top level. Anything below the top level can
+// be arbitrary Pulumi Cloud wire grammar — we don't second-guess.
+func TestPermissionsToWire_TopLevelValidation(t *testing.T) {
 	t.Parallel()
-	t.Run("missing top-level kind", func(t *testing.T) {
+	t.Run("missing top-level discriminator", func(t *testing.T) {
 		t.Parallel()
-		_, err := permissionsKindToWire(map[string]interface{}{
+		_, err := permissionsToWire(map[string]interface{}{
 			"permissions": []interface{}{"stack:read"},
 		})
 		require.Error(t, err)
-		assert.Contains(t, err.Error(), "kind")
+		assert.Contains(t, err.Error(), "discriminator")
 	})
 }
 
-// permissionsKindToWire rejects any `__type` key in the input — defensive
+// permissionsToWire rejects any `__type` key in the input — defensive
 // guard against users pasting raw wire format from the REST API docs. See
 // the function docstring and pulumi/pulumi#22738 for the rationale.
-func TestPermissionsKindToWire_RejectsUnderscoreType(t *testing.T) {
+func TestPermissionsToWire_RejectsUnderscoreType(t *testing.T) {
 	t.Parallel()
 	cases := []struct {
 		name string
@@ -318,13 +318,13 @@ func TestPermissionsKindToWire_RejectsUnderscoreType(t *testing.T) {
 		{
 			name: "nested __type in subNode",
 			in: map[string]interface{}{
-				"kind": "PermissionDescriptorCondition",
+				"discriminator": "PermissionDescriptorCondition",
 				"condition": map[string]interface{}{
-					"kind": "PermissionExpressionEqual",
-					"left": map[string]interface{}{"kind": "PermissionExpressionStack"},
+					"discriminator": "PermissionExpressionEqual",
+					"left":          map[string]interface{}{"discriminator": "PermissionExpressionStack"},
 					"right": map[string]interface{}{
-						"kind":     "PermissionLiteralExpressionStack",
-						"identity": "s",
+						"discriminator": "PermissionLiteralExpressionStack",
+						"identity":      "s",
 					},
 				},
 				"subNode": map[string]interface{}{
@@ -336,7 +336,7 @@ func TestPermissionsKindToWire_RejectsUnderscoreType(t *testing.T) {
 		{
 			name: "nested __type inside an entries list",
 			in: map[string]interface{}{
-				"kind": "PermissionDescriptorGroup",
+				"discriminator": "PermissionDescriptorGroup",
 				"entries": []interface{}{
 					map[string]interface{}{
 						"__type":      "PermissionDescriptorAllow",
@@ -346,11 +346,11 @@ func TestPermissionsKindToWire_RejectsUnderscoreType(t *testing.T) {
 			},
 		},
 		{
-			name: "__type at the same level as kind (mixed paste)",
+			name: "__type at the same level as discriminator (mixed paste)",
 			in: map[string]interface{}{
-				"kind":        "PermissionDescriptorAllow",
-				"__type":      "PermissionDescriptorAllow",
-				"permissions": []interface{}{"stack:read"},
+				"discriminator": "PermissionDescriptorAllow",
+				"__type":        "PermissionDescriptorAllow",
+				"permissions":   []interface{}{"stack:read"},
 			},
 		},
 	}
@@ -358,23 +358,23 @@ func TestPermissionsKindToWire_RejectsUnderscoreType(t *testing.T) {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
-			_, err := permissionsKindToWire(tc.in)
+			_, err := permissionsToWire(tc.in)
 			require.Error(t, err)
 			assert.Contains(t, err.Error(), "__type")
-			assert.Contains(t, err.Error(), "kind",
+			assert.Contains(t, err.Error(), "discriminator",
 				"error must point the user at the correct field name")
 		})
 	}
 }
 
 // ----------------------------------------------------------------------------
-// API-boundary wrap: permissionsKindToWireForAPI is what Create/Update call.
-// It runs permissionsKindToWire and then wraps the result in a single-entry
+// API-boundary wrap: permissionsToWireForAPI is what Create/Update call.
+// It runs permissionsToWire and then wraps the result in a single-entry
 // Group only when the top-level wire shape is a Condition. Pulumi Cloud's
 // role-detail UI 500s on a bare top-level Condition; the wrap fixes it.
 // ----------------------------------------------------------------------------
 
-func TestPermissionsKindToWireForAPI(t *testing.T) {
+func TestPermissionsToWireForAPI(t *testing.T) {
 	t.Parallel()
 	wrappedScopedCondition := func() map[string]interface{} {
 		return map[string]interface{}{
@@ -413,7 +413,7 @@ func TestPermissionsKindToWireForAPI(t *testing.T) {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
-			got, err := permissionsKindToWireForAPI(tc.in)
+			got, err := permissionsToWireForAPI(tc.in)
 			require.NoError(t, err)
 			assert.Equal(t, tc.want, got)
 		})
@@ -446,7 +446,7 @@ func TestPermissionsWireToKind(t *testing.T) {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
-			got, err := permissionsWireToKind(tc.in, nil)
+			got, err := permissionsFromWire(tc.in, nil)
 			require.NoError(t, err)
 			assert.Equal(t, tc.want, got)
 		})
@@ -470,14 +470,14 @@ func TestPermissionsWireToKind_CollapseHeuristic(t *testing.T) {
 
 	t.Run("nil prior collapses to Condition", func(t *testing.T) {
 		t.Parallel()
-		got, err := permissionsWireToKind(wrap, nil)
+		got, err := permissionsFromWire(wrap, nil)
 		require.NoError(t, err)
 		assert.Equal(t, scopedConditionKind(), got)
 	})
 
 	t.Run("prior Condition collapses to Condition", func(t *testing.T) {
 		t.Parallel()
-		got, err := permissionsWireToKind(wrap, scopedConditionKind())
+		got, err := permissionsFromWire(wrap, scopedConditionKind())
 		require.NoError(t, err)
 		assert.Equal(t, scopedConditionKind(), got)
 	})
@@ -485,10 +485,10 @@ func TestPermissionsWireToKind_CollapseHeuristic(t *testing.T) {
 	t.Run("prior Group preserves Group(Condition)", func(t *testing.T) {
 		t.Parallel()
 		groupOfCondition := map[string]interface{}{
-			"kind":    "PermissionDescriptorGroup",
-			"entries": []interface{}{scopedConditionKind()},
+			"discriminator": "PermissionDescriptorGroup",
+			"entries":       []interface{}{scopedConditionKind()},
 		}
-		got, err := permissionsWireToKind(wrap, groupOfCondition)
+		got, err := permissionsFromWire(wrap, groupOfCondition)
 		require.NoError(t, err)
 		assert.Equal(t, groupOfCondition, got)
 	})
@@ -502,9 +502,9 @@ func TestPermissionsWireToKind_CollapseHeuristic(t *testing.T) {
 				flatAllowWire(),
 			},
 		}
-		got, err := permissionsWireToKind(multi, nil)
+		got, err := permissionsFromWire(multi, nil)
 		require.NoError(t, err)
-		assert.Equal(t, "PermissionDescriptorGroup", got["kind"])
+		assert.Equal(t, "PermissionDescriptorGroup", got["discriminator"])
 		entries := got["entries"].([]interface{})
 		assert.Len(t, entries, 2)
 	})
@@ -517,9 +517,9 @@ func TestPermissionsWireToKind_CollapseHeuristic(t *testing.T) {
 				flatAllowWire(),
 			},
 		}
-		got, err := permissionsWireToKind(nonCondition, nil)
+		got, err := permissionsFromWire(nonCondition, nil)
 		require.NoError(t, err)
-		assert.Equal(t, "PermissionDescriptorGroup", got["kind"])
+		assert.Equal(t, "PermissionDescriptorGroup", got["discriminator"])
 	})
 }
 
@@ -527,18 +527,18 @@ func TestPermissionsWireToKind_CollapseHeuristic(t *testing.T) {
 // Round-trip: every shape the customer can author survives a Create + Read
 // without drift.
 //
-// The full path on Create/Update is permissionsKindToWireForAPI, which adds
+// The full path on Create/Update is permissionsToWireForAPI, which adds
 // the single-entry-Group wrap for top-level Conditions. On Read,
-// permissionsWireToKind reverses the wrap iff the prior input wasn't a Group.
-// This block tests the *whole* pipeline — kind → wire → kind = original —
+// permissionsFromWire reverses the wrap iff the prior input wasn't a Group.
+// This block tests the *whole* pipeline — input → wire → input = original —
 // as the customer experiences it.
 // ----------------------------------------------------------------------------
 
-func TestKindWireKindRoundTrip(t *testing.T) {
+func TestPermissionsRoundTrip(t *testing.T) {
 	t.Parallel()
 	cases := []struct {
 		name string
-		kind map[string]interface{}
+		in   map[string]interface{}
 	}{
 		{"flatAllow", flatAllowKind()},
 		{"flatGroup", flatGroupKind()},
@@ -551,32 +551,32 @@ func TestKindWireKindRoundTrip(t *testing.T) {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
-			wire, err := permissionsKindToWireForAPI(tc.kind)
+			wire, err := permissionsToWireForAPI(tc.in)
 			require.NoError(t, err)
-			back, err := permissionsWireToKind(wire, tc.kind)
+			back, err := permissionsFromWire(wire, tc.in)
 			require.NoError(t, err)
-			assert.Equal(t, tc.kind, back)
+			assert.Equal(t, tc.in, back)
 		})
 	}
 }
 
-// TestKindWireKindRoundTrip_GroupOfConditionPriorIsHonored proves that a
+// TestPermissionsRoundTrip_GroupOfConditionPriorIsHonored proves that a
 // customer who deliberately authors a single-entry Group of Condition gets
 // it back unchanged on Read. The wrap fires on the inner Condition's
-// passage to the wire (via permissionsKindToWire's rename only — the outer
-// Group prevents permissionsKindToWireForAPI's wrap from firing); the
+// passage to the wire (via permissionsToWire's rename only — the outer
+// Group prevents permissionsToWireForAPI's wrap from firing); the
 // collapse heuristic is suppressed by prior == Group.
-func TestKindWireKindRoundTrip_GroupOfConditionPriorIsHonored(t *testing.T) {
+func TestPermissionsRoundTrip_GroupOfConditionPriorIsHonored(t *testing.T) {
 	t.Parallel()
 	groupOfCondition := map[string]interface{}{
-		"kind":    "PermissionDescriptorGroup",
-		"entries": []interface{}{scopedConditionKind()},
+		"discriminator": "PermissionDescriptorGroup",
+		"entries":       []interface{}{scopedConditionKind()},
 	}
-	wire, err := permissionsKindToWireForAPI(groupOfCondition)
+	wire, err := permissionsToWireForAPI(groupOfCondition)
 	require.NoError(t, err)
 	// Top-level was already Group, so no extra wrap.
 	assert.Equal(t, "PermissionDescriptorGroup", wire["__type"])
-	back, err := permissionsWireToKind(wire, groupOfCondition)
+	back, err := permissionsFromWire(wire, groupOfCondition)
 	require.NoError(t, err)
 	assert.Equal(t, groupOfCondition, back)
 }
@@ -590,13 +590,13 @@ func TestImportRepro_Compose(t *testing.T) {
 	// Wire shape as the Cloud REST API would return it.
 	wire := composeWire()
 	// On `pulumi import`, prior is empty.
-	got, err := permissionsWireToKind(wire, nil)
+	got, err := permissionsFromWire(wire, nil)
 	require.NoError(t, err)
 	// The provider hands the Compose tree to the user's program verbatim
-	// (modulo the __type → kind rename). No "unknown __type" error.
+	// (modulo the __type → discriminator rename). No "unknown __type" error.
 	assert.Equal(t, composeKind(), got)
 	// A subsequent up round-trips cleanly.
-	wire2, err := permissionsKindToWireForAPI(got)
+	wire2, err := permissionsToWireForAPI(got)
 	require.NoError(t, err)
 	assert.Equal(t, composeWire(), wire2)
 }
@@ -615,90 +615,90 @@ func TestImportRepro_Compose(t *testing.T) {
 func TestRoundTrip_DeepNesting(t *testing.T) {
 	t.Parallel()
 	deep := map[string]interface{}{
-		"kind": "PermissionDescriptorGroup",
+		"discriminator": "PermissionDescriptorGroup",
 		"entries": []interface{}{
 			map[string]interface{}{
-				"kind": "PermissionDescriptorCondition",
+				"discriminator": "PermissionDescriptorCondition",
 				"condition": map[string]interface{}{
-					"kind": "PermissionExpressionAnd",
+					"discriminator": "PermissionExpressionAnd",
 					"left": map[string]interface{}{
-						"kind": "PermissionExpressionOr",
+						"discriminator": "PermissionExpressionOr",
 						"left": map[string]interface{}{
-							"kind": "PermissionExpressionEqual",
+							"discriminator": "PermissionExpressionEqual",
 							"left": map[string]interface{}{
-								"kind": "PermissionExpressionStack",
+								"discriminator": "PermissionExpressionStack",
 							},
 							"right": map[string]interface{}{
-								"kind":     "PermissionLiteralExpressionStack",
-								"identity": "s1",
+								"discriminator": "PermissionLiteralExpressionStack",
+								"identity":      "s1",
 							},
 						},
 						"right": map[string]interface{}{
-							"kind": "PermissionExpressionEqual",
+							"discriminator": "PermissionExpressionEqual",
 							"left": map[string]interface{}{
-								"kind": "PermissionExpressionStack",
+								"discriminator": "PermissionExpressionStack",
 							},
 							"right": map[string]interface{}{
-								"kind":     "PermissionLiteralExpressionStack",
-								"identity": "s2",
+								"discriminator": "PermissionLiteralExpressionStack",
+								"identity":      "s2",
 							},
 						},
 					},
 					"right": map[string]interface{}{
-						"kind": "PermissionExpressionNot",
+						"discriminator": "PermissionExpressionNot",
 						"operand": map[string]interface{}{
-							"kind": "PermissionExpressionEqual",
+							"discriminator": "PermissionExpressionEqual",
 							"left": map[string]interface{}{
-								"kind": "PermissionExpressionEnvironment",
+								"discriminator": "PermissionExpressionEnvironment",
 							},
 							"right": map[string]interface{}{
-								"kind":     "PermissionLiteralExpressionEnvironment",
-								"identity": "env-evil",
+								"discriminator": "PermissionLiteralExpressionEnvironment",
+								"identity":      "env-evil",
 							},
 						},
 					},
 				},
 				"subNode": map[string]interface{}{
-					"kind":        "PermissionDescriptorAllow",
-					"permissions": []interface{}{"stack:edit"},
+					"discriminator": "PermissionDescriptorAllow",
+					"permissions":   []interface{}{"stack:edit"},
 				},
 			},
 		},
 	}
-	wire, err := permissionsKindToWireForAPI(deep)
+	wire, err := permissionsToWireForAPI(deep)
 	require.NoError(t, err)
-	assert.NotContains(t, mustJSON(t, wire), `"kind":`,
-		"after kind→wire, no `kind` key may remain anywhere")
-	back, err := permissionsWireToKind(wire, deep)
+	assert.NotContains(t, mustJSON(t, wire), `"discriminator":`,
+		"after input→wire translation, no `discriminator` key may remain anywhere")
+	back, err := permissionsFromWire(wire, deep)
 	require.NoError(t, err)
 	assert.Equal(t, deep, back)
 }
 
 // TestRoundTrip_IdentityValueLooksLikeDiscriminator pins down that the
 // translator only renames map *keys*, not values. An identity field whose
-// string value is "kind" or "__type" must survive untouched.
+// string value is "discriminator" or "__type" must survive untouched.
 func TestRoundTrip_IdentityValueLooksLikeDiscriminator(t *testing.T) {
 	t.Parallel()
 	in := map[string]interface{}{
-		"kind": "PermissionDescriptorCondition",
+		"discriminator": "PermissionDescriptorCondition",
 		"condition": map[string]interface{}{
-			"kind": "PermissionExpressionEqual",
+			"discriminator": "PermissionExpressionEqual",
 			"left": map[string]interface{}{
-				"kind": "PermissionExpressionStack",
+				"discriminator": "PermissionExpressionStack",
 			},
 			"right": map[string]interface{}{
-				"kind":     "PermissionLiteralExpressionStack",
-				"identity": "kind", // looks like a discriminator
+				"discriminator": "PermissionLiteralExpressionStack",
+				"identity":      "discriminator", // looks like a discriminator
 			},
 		},
 		"subNode": map[string]interface{}{
-			"kind":        "PermissionDescriptorAllow",
-			"permissions": []interface{}{"__type"}, // looks like a discriminator
+			"discriminator": "PermissionDescriptorAllow",
+			"permissions":   []interface{}{"__type"}, // looks like a discriminator
 		},
 	}
-	wire, err := permissionsKindToWireForAPI(in)
+	wire, err := permissionsToWireForAPI(in)
 	require.NoError(t, err)
-	back, err := permissionsWireToKind(wire, in)
+	back, err := permissionsFromWire(wire, in)
 	require.NoError(t, err)
 	assert.Equal(t, in, back)
 }

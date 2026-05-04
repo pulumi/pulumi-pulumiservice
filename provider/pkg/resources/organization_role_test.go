@@ -61,8 +61,8 @@ func mustParseDescriptor(t *testing.T, wireJSON string) apitype.PermissionDescri
 }
 
 var testPermissions = map[string]interface{}{
-	"kind":        "PermissionDescriptorAllow",
-	"permissions": []interface{}{"stack:read"},
+	"discriminator": "PermissionDescriptorAllow",
+	"permissions":   []interface{}{"stack:read"},
 }
 
 func TestOrganizationRoleCreate(t *testing.T) {
@@ -78,13 +78,15 @@ func TestOrganizationRoleCreate(t *testing.T) {
 			assert.Equal(t, apitype.PermissionDescriptorUXPurposeRole, req.UxPurpose)
 			require.NotNil(t, req.Details, "Details must be a typed descriptor")
 			// Round-trip the typed descriptor back through JSON to assert the
-			// wire shape — the resource layer must emit __type, never `kind`.
+			// wire shape — the resource layer must emit __type, never the
+			// SDK-side `discriminator` field.
 			raw, err := json.Marshal(req.Details)
 			require.NoError(t, err)
 			var parsed map[string]interface{}
 			require.NoError(t, json.Unmarshal(raw, &parsed))
 			assert.Equal(t, "PermissionDescriptorAllow", parsed["__type"])
-			assert.NotContains(t, parsed, "kind", "wire body must not leak `kind` to the API")
+			assert.NotContains(t, parsed, "discriminator",
+				"wire body must not leak `discriminator` to the API")
 			return &apitype.PermissionDescriptorRecord{
 				PermissionDescriptorBase: apitype.PermissionDescriptorBase{
 					Name:    req.Name,
@@ -152,9 +154,9 @@ func TestOrganizationRoleRead(t *testing.T) {
 		})
 		assert.NoError(t, err)
 		assert.Equal(t, "acme/role-123", resp.ID)
-		// Read renames the wire `__type` discriminator to `kind`. The
-		// PascalCase value is unchanged: SDK kinds are the wire kinds.
-		assert.Equal(t, "PermissionDescriptorAllow", resp.State.Permissions["kind"])
+		// Read renames the wire `__type` discriminator to `discriminator`.
+		// The PascalCase value is unchanged.
+		assert.Equal(t, "PermissionDescriptorAllow", resp.State.Permissions["discriminator"])
 		assert.NotContains(t, resp.State.Permissions, "__type", "state must not leak `__type` to the SDK")
 	})
 
@@ -382,7 +384,7 @@ func TestOrganizationRoleCheck(t *testing.T) {
 				"organizationName": property.New("acme"),
 				"name":             property.New(property.Computed),
 				"permissions": property.New(property.NewMap(map[string]property.Value{
-					"kind": property.New("allow"),
+					"discriminator": property.New("allow"),
 				})),
 			}),
 		})
@@ -393,26 +395,26 @@ func TestOrganizationRoleCheck(t *testing.T) {
 		}
 	})
 
-	// The translator is structurally agnostic: any `kind` value passes through
-	// to the wire format as a `__type` rename. Pulumi Cloud is the source of
-	// truth for which descriptor variants exist; the provider does not gate
-	// them. This test documents that contract — Check accepts a kind value
-	// the provider has no special knowledge of, and the role's validity is
-	// the API's call at apply time.
-	t.Run("accepts arbitrary kind values (no provider-side allowlist)", func(t *testing.T) {
+	// The translator is structurally agnostic: any `discriminator` value
+	// passes through to the wire format as a `__type` rename. Pulumi Cloud is
+	// the source of truth for which descriptor variants exist; the provider
+	// does not gate them. This test documents that contract — Check accepts
+	// a discriminator value the provider has no special knowledge of, and
+	// the role's validity is the API's call at apply time.
+	t.Run("accepts arbitrary discriminator values (no provider-side allowlist)", func(t *testing.T) {
 		resp, err := r.Check(context.Background(), infer.CheckRequest{
 			NewInputs: property.NewMap(map[string]property.Value{
 				"organizationName": property.New("acme"),
 				"name":             property.New("r"),
 				"permissions": property.New(property.NewMap(map[string]property.Value{
-					"kind": property.New("PermissionDescriptorWhateverFutureCloudVariant"),
+					"discriminator": property.New("PermissionDescriptorWhateverFutureCloudVariant"),
 				})),
 			}),
 		})
 		assert.NoError(t, err)
 		for _, f := range resp.Failures {
 			assert.NotEqual(t, "permissions", f.Property,
-				"Check must not gate descriptor `kind` values: %s", f.Reason)
+				"Check must not gate descriptor values: %s", f.Reason)
 		}
 	})
 
@@ -441,7 +443,7 @@ func TestOrganizationRoleCheck(t *testing.T) {
 		}
 		assert.Contains(t, props["permissions"], "__type",
 			"Check must name `__type` so the user knows what to fix")
-		assert.Contains(t, props["permissions"], "kind",
+		assert.Contains(t, props["permissions"], "discriminator",
 			"Check must point the user at the correct field name")
 	})
 }
