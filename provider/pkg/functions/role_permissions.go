@@ -40,8 +40,8 @@ func validateRbacPermissions(permissions []string) error {
 	for _, p := range permissions {
 		if !apitype.RbacPermission(p).IsValid() {
 			return fmt.Errorf(
-				"%q is not a valid permission scope. Discover valid scope names "+
-					"via the `getOrganizationRoleScopes` data source.",
+				"%q is not a valid permission scope; discover valid scope names "+
+					"via the `getOrganizationRoleScopes` data source",
 				p,
 			)
 		}
