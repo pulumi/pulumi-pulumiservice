@@ -7,8 +7,11 @@ const orgName =
   config.get("organizationName") ||
   process.env.PULUMI_TEST_OWNER ||
   "service-provider-test-org";
+// AWS IAM role assumed by Pulumi Insights via OIDC. The role's trust
+// policy must allow sts:AssumeRoleWithWebIdentity from the Pulumi Cloud
+// OIDC issuer for `orgName`. See infra/test-aws-oidc/.
+const roleArn = config.require("roleArn");
 
-// Create an ESC environment with AWS credentials for the insights account
 const credentialsEnv = new service.Environment("credentials-env", {
   organization: orgName,
   project: `insights-invoke-project-${digits}`,
@@ -18,9 +21,12 @@ const credentialsEnv = new service.Environment("credentials-env", {
     login:
       fn::open::aws-login:
         oidc:
-          roleArn: arn:aws:iam::123456789012:role/PulumiInsightsRole
+          roleArn: ${roleArn}
           sessionName: pulumi-insights-session
   environmentVariables:
+    AWS_ACCESS_KEY_ID: \${aws.login.accessKeyId}
+    AWS_SECRET_ACCESS_KEY: \${aws.login.secretAccessKey}
+    AWS_SESSION_TOKEN: \${aws.login.sessionToken}
     AWS_REGION: us-west-2
 `),
 });

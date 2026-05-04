@@ -1,0 +1,91 @@
+name: pulumiservice-test-aws-oidc
+runtime: yaml
+description: |
+  AWS-side trust setup for the Pulumi Insights example tests (yaml-insights-account,
+  yaml-policy-groups-accounts, ts-insights-account-invokes).
+
+config:
+  # Pulumi Cloud organization that issues the OIDC token. The ESC `aws-login.oidc`
+  # provider embeds this in the JWT's `sub` claim.  Default matches the org these tests
+  # run against; override for a different test org.
+  orgName:
+    type: string
+    default: service-provider-test-org
+  # Pulumi Cloud OIDC issuer host+path (no scheme). This is what AWS uses as the IAM
+  # condition key prefix and as the path of the OIDC provider URL. Default matches the
+  # staging backend the failing CI runs talk to
+  # (`PULUMI_BACKEND_URL=https://api.pulumi-staging.io` observed in the run env). Set to
+  # `api.pulumi.com/oidc` for production.
+  issuerHost:
+    type: string
+    default: api.pulumi-staging.io/oidc
+  # OIDC `aud` claim. The CI logs show the assume-role attempt uses
+  # `aws:service-provider-test-org`; that matches ESC's `aws-login.oidc` default of
+  # `aws:<orgName>`. Override only if you change `orgName` or the ESC env sets `audience:`
+  # explicitly.
+  audience:
+    type: string
+    default: aws:service-provider-test-org
+  # IAM role name. The example ESC environments currently reference `PulumiInsightsRole`;
+  # change both sides if you rename.
+  roleName:
+    type: string
+    default: PulumiInsightsRole
+  # Managed policy granting Pulumi Insights read access to the resources it should
+  # scan. ReadOnlyAccess is the broadest reasonable starting point; tighten as required.
+  scanPolicyArn:
+    type: string
+    default: arn:aws:iam::aws:policy/ReadOnlyAccess
+
+variables:
+  # Pulumi Cloud's IAM OIDC provider is a per-account, per-issuer-URL singleton
+  # and is typically already registered in the AWS account that runs these tests
+  # (Pulumi Cloud staging registers it once). Look it up rather than create it
+  # so this program is safe to apply against pre-existing infrastructure. If
+  # the account doesn't have one, register it manually first
+  # (`aws iam create-open-id-connect-provider --url https://<issuerHost> ...`).
+  pulumiOidcProvider:
+    fn::invoke:
+      function: aws:iam:getOpenIdConnectProvider
+      arguments:
+        url: https://${issuerHost}
+
+resources:
+  scanRole:
+    type: aws:iam:Role
+    properties:
+      name: ${roleName}
+      # Pulumi Insights' aws-login.oidc requests sessions longer than the IAM
+      # default of 3600s; without raising this, AssumeRoleWithWebIdentity
+      # returns ValidationError("DurationSeconds exceeds MaxSessionDuration").
+      # 43200s (12h) is the AWS-imposed maximum.
+      maxSessionDuration: 43200
+      # The IAM condition key prefix is the issuer host+path, so the keys
+      # are dynamic. Pulumi YAML interpolates `${...}` inside map keys, so
+      # we can build the policy as a structured object and hand it to
+      # `fn::toJSON`. The ESC aws-login.oidc provider mints a token whose
+      # `sub` claim is `pulumi:environments:org:<orgName>:env:<project>/<env>`;
+      # the wildcard scopes trust to any test ESC env in the org.
+      assumeRolePolicy:
+        fn::toJSON:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Federated: ${pulumiOidcProvider.arn}
+              Action: sts:AssumeRoleWithWebIdentity
+              Condition:
+                StringEquals:
+                  ${issuerHost}:aud: ${audience}
+                StringLike:
+                  ${issuerHost}:sub: pulumi:environments:org:${orgName}:env:*
+
+  scanReadonly:
+    type: aws:iam:RolePolicyAttachment
+    properties:
+      role: ${scanRole.name}
+      policyArn: ${scanPolicyArn}
+
+outputs:
+  roleArn: ${scanRole.arn}
+  oidcProviderArn: ${pulumiOidcProvider.arn}

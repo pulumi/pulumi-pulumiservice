@@ -73,7 +73,7 @@ jobs:
           .pulumi/examples-cache
         key: ${{ runner.os }}-${{ hashFiles('provider/go.sum') }}
     - name: Setup mise
-      uses: jdx/mise-action@1c5f70fd400ce6c745085c93ea80026272f8d346
+      uses: jdx/mise-action@c6a35e2d7dc8cf1493e7465af7460b4748cd4806
       env:
         MISE_FETCH_REMOTE_VERSIONS_TIMEOUT: 30s
       with:
@@ -103,6 +103,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         PULUMI_ACCESS_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_ACCESS_TOKEN_STAGING }}
+        PULUMI_TEST_AWS_INSIGHTS_ROLE_ARN: ${{ steps.esc-secrets.outputs.PULUMI_TEST_AWS_INSIGHTS_ROLE_ARN }}
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
       env:
