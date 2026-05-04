@@ -650,7 +650,7 @@ func TestRoundTrip_DeepNesting(t *testing.T) {
 				},
 				"subNode": map[string]interface{}{
 					"discriminator": "PermissionDescriptorAllow",
-					"permissions": []interface{}{"stack:edit"},
+					"permissions":   []interface{}{"stack:edit"},
 				},
 			},
 		},
