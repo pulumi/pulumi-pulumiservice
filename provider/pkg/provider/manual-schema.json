@@ -1038,33 +1038,6 @@
         "organizationName"
       ]
     },
-    "pulumiservice:index:AccessToken": {
-      "description": "Access tokens allow a user to authenticate against the Pulumi Cloud",
-      "properties": {
-        "description": {
-          "description": "Description of the access token.",
-          "type": "string"
-        },
-        "value": {
-          "description": "The token's value.",
-          "type": "string",
-          "secret": true
-        }
-      },
-      "required": [
-        "description",
-        "value"
-      ],
-      "inputProperties": {
-        "description": {
-          "description": "Description of the access token.",
-          "type": "string"
-        }
-      },
-      "requiredInputs": [
-        "description"
-      ]
-    },
     "pulumiservice:index:TeamAccessToken": {
       "description": "The Pulumi Cloud allows users to create access tokens scoped to team. Team access tokens is a resource to create them and assign them to a team",
       "properties": {

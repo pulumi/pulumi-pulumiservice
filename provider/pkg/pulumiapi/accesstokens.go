@@ -21,6 +21,12 @@ import (
 	"path"
 )
 
+type AccessTokenClient interface {
+	CreateAccessToken(ctx context.Context, description string) (*AccessToken, error)
+	DeleteAccessToken(ctx context.Context, tokenID string) error
+	GetAccessToken(ctx context.Context, id string) (*AccessToken, error)
+}
+
 type AccessToken struct {
 	ID          string `json:"id"`
 	Name        string `json:"name"`

@@ -10,7 +10,7 @@ using Pulumi.Serialization;
 namespace Pulumi.PulumiService
 {
     /// <summary>
-    /// Access tokens allow a user to authenticate against the Pulumi Cloud
+    /// Access tokens allow a user to authenticate against the Pulumi Cloud.
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:index:AccessToken")]
     public partial class AccessToken : global::Pulumi.CustomResource
@@ -53,6 +53,10 @@ namespace Pulumi.PulumiService
                 AdditionalSecretOutputs =
                 {
                     "value",
+                },
+                ReplaceOnChanges =
+                {
+                    "description",
                 },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);

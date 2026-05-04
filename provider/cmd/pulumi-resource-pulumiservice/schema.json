@@ -1176,11 +1176,12 @@
   },
   "resources": {
     "pulumiservice:index:AccessToken": {
-      "description": "Access tokens allow a user to authenticate against the Pulumi Cloud",
+      "description": "Access tokens allow a user to authenticate against the Pulumi Cloud.",
       "properties": {
         "description": {
           "type": "string",
-          "description": "Description of the access token."
+          "description": "Description of the access token.",
+          "replaceOnChanges": true
         },
         "value": {
           "type": "string",
@@ -1195,7 +1196,8 @@
       "inputProperties": {
         "description": {
           "type": "string",
-          "description": "Description of the access token."
+          "description": "Description of the access token.",
+          "replaceOnChanges": true
         }
       },
       "requiredInputs": [

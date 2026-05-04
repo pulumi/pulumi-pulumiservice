@@ -90,6 +90,7 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 			version: version,
 		})).
 		WithResources(
+			infer.Resource(&resources.AccessToken{}),
 			infer.Resource(&resources.InsightsAccount{}),
 			infer.Resource(&resources.OrganizationMember{}),
 			infer.Resource(&resources.OrganizationRole{}),
@@ -241,9 +242,6 @@ func (k *pulumiserviceProvider) Configure(
 	k.client = client
 
 	k.pulumiResources = []PulumiServiceResource{
-		&resources.PulumiServiceAccessTokenResource{
-			Client: client,
-		},
 		&resources.PulumiServiceWebhookResource{
 			Client: client,
 		},
