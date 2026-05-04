@@ -23,6 +23,8 @@ func (m *module) Construct(ctx *pulumi.Context, name, typ, urn string) (r pulumi
 	switch typ {
 	case "pulumiservice:v2:Account":
 		r = &Account{}
+	case "pulumiservice:v2:AgentPool":
+		r = &AgentPool{}
 	case "pulumiservice:v2:AuditLogExportConfiguration":
 		r = &AuditLogExportConfiguration{}
 	case "pulumiservice:v2:AuthPolicy":
@@ -31,14 +33,16 @@ func (m *module) Construct(ctx *pulumi.Context, name, typ, urn string) (r pulumi
 		r = &AzureDevOpsIntegration{}
 	case "pulumiservice:v2:BitBucketIntegration":
 		r = &BitBucketIntegration{}
+	case "pulumiservice:v2:CustomVCSIntegration":
+		r = &CustomVCSIntegration{}
+	case "pulumiservice:v2:CustomVCSRepository":
+		r = &CustomVCSRepository{}
 	case "pulumiservice:v2:DefaultOrganization":
 		r = &DefaultOrganization{}
 	case "pulumiservice:v2:DeploymentSettings":
 		r = &DeploymentSettings{}
 	case "pulumiservice:v2:EnvironmentDraft":
 		r = &EnvironmentDraft{}
-	case "pulumiservice:v2:EnvironmentDraft_preview":
-		r = &EnvironmentDraft_preview{}
 	case "pulumiservice:v2:EnvironmentSchedule":
 		r = &EnvironmentSchedule{}
 	case "pulumiservice:v2:EnvironmentSettings":
@@ -63,8 +67,16 @@ func (m *module) Construct(ctx *pulumi.Context, name, typ, urn string) (r pulumi
 		r = &OidcIssuer{}
 	case "pulumiservice:v2:OpenEnvironmentRequest":
 		r = &OpenEnvironmentRequest{}
+	case "pulumiservice:v2:OrgTemplateCollection":
+		r = &OrgTemplateCollection{}
+	case "pulumiservice:v2:OrgToken":
+		r = &OrgToken{}
+	case "pulumiservice:v2:OrganizationMember":
+		r = &OrganizationMember{}
 	case "pulumiservice:v2:OrganizationWebhook":
 		r = &OrganizationWebhook{}
+	case "pulumiservice:v2:PersonalToken":
+		r = &PersonalToken{}
 	case "pulumiservice:v2:PolicyGroup":
 		r = &PolicyGroup{}
 	case "pulumiservice:v2:PolicyIssue":
@@ -89,12 +101,16 @@ func (m *module) Construct(ctx *pulumi.Context, name, typ, urn string) (r pulumi
 		r = &Stack{}
 	case "pulumiservice:v2:StackConfig":
 		r = &StackConfig{}
+	case "pulumiservice:v2:StackTag":
+		r = &StackTag{}
 	case "pulumiservice:v2:StackWebhook":
 		r = &StackWebhook{}
 	case "pulumiservice:v2:Task":
 		r = &Task{}
 	case "pulumiservice:v2:Team":
 		r = &Team{}
+	case "pulumiservice:v2:TeamToken":
+		r = &TeamToken{}
 	case "pulumiservice:v2:Webhook_esc_environments":
 		r = &Webhook_esc_environments{}
 	case "pulumiservice:v2:Webhook_preview_environments":

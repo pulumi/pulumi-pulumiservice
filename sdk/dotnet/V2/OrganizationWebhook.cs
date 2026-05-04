@@ -132,13 +132,9 @@ namespace Pulumi.PulumiService.V2
                 Version = Utilities.Version,
                 AdditionalSecretOutputs =
                 {
+                    "hasSecret",
                     "secret",
                     "secretCiphertext",
-                },
-                ReplaceOnChanges =
-                {
-                    "name",
-                    "organizationName",
                 },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
@@ -211,22 +207,10 @@ namespace Pulumi.PulumiService.V2
         }
 
         /// <summary>
-        /// The webhook name identifier
-        /// </summary>
-        [Input("hookName")]
-        public Input<string>? HookName { get; set; }
-
-        /// <summary>
         /// The unique identifier name for the webhook within its scope.
         /// </summary>
         [Input("name", required: true)]
         public Input<string> Name { get; set; } = null!;
-
-        /// <summary>
-        /// The organization name
-        /// </summary>
-        [Input("orgName", required: true)]
-        public Input<string> OrgName { get; set; } = null!;
 
         /// <summary>
         /// The organization that owns this webhook.
@@ -246,21 +230,11 @@ namespace Pulumi.PulumiService.V2
         [Input("projectName")]
         public Input<string>? ProjectName { get; set; }
 
-        [Input("secret")]
-        private Input<string>? _secret;
-
         /// <summary>
         /// Secret will be omitted when returned from the service.
         /// </summary>
-        public Input<string>? Secret
-        {
-            get => _secret;
-            set
-            {
-                var emptySecret = Output.CreateSecret(0);
-                _secret = Output.Tuple<Input<string>?, int>(value, emptySecret).Apply(t => t.Item1);
-            }
-        }
+        [Input("secret")]
+        public Input<string>? Secret { get; set; }
 
         /// <summary>
         /// The stack name. Set when the webhook is scoped to a specific stack.

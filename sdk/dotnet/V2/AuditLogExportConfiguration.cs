@@ -28,6 +28,12 @@ namespace Pulumi.PulumiService.V2
         public Output<object> LastResult { get; private set; } = null!;
 
         /// <summary>
+        /// The organization name
+        /// </summary>
+        [Output("orgName")]
+        public Output<string> OrgName { get; private set; } = null!;
+
+        /// <summary>
         /// The S3 configuration for exporting audit logs.
         /// </summary>
         [Output("s3Config")]
@@ -56,6 +62,10 @@ namespace Pulumi.PulumiService.V2
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
+                ReplaceOnChanges =
+                {
+                    "orgName",
+                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.

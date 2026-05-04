@@ -35,6 +35,10 @@ export class Account extends pulumi.CustomResource {
     }
 
     /**
+     * The Insights account name
+     */
+    declare public readonly accountName: pulumi.Output<string>;
+    /**
      * The ID of the agent pool to run account discovery workflows.
      * If not specified, discovery will use the default agent pool.
      */
@@ -43,6 +47,10 @@ export class Account extends pulumi.CustomResource {
      * The name of the account.
      */
     declare public /*out*/ readonly name: pulumi.Output<string>;
+    /**
+     * The organization name
+     */
+    declare public readonly orgName: pulumi.Output<string>;
     /**
      * The user with ownership of this Insights account
      */
@@ -111,8 +119,10 @@ export class Account extends pulumi.CustomResource {
             resourceInputs["scanStatus"] = undefined /*out*/;
             resourceInputs["scheduledScanEnabled"] = undefined /*out*/;
         } else {
+            resourceInputs["accountName"] = undefined /*out*/;
             resourceInputs["agentPoolID"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
+            resourceInputs["orgName"] = undefined /*out*/;
             resourceInputs["ownedBy"] = undefined /*out*/;
             resourceInputs["provider"] = undefined /*out*/;
             resourceInputs["providerConfig"] = undefined /*out*/;
@@ -122,6 +132,8 @@ export class Account extends pulumi.CustomResource {
             resourceInputs["scheduledScanEnabled"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["accountName", "orgName"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(Account.__pulumiType, name, resourceInputs, opts);
     }
 }

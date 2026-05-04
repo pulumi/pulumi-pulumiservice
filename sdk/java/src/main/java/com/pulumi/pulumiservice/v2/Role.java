@@ -135,6 +135,20 @@ public class Role extends com.pulumi.resources.CustomResource {
         return this.orgId;
     }
     /**
+     * The organization name
+     * 
+     */
+    @Export(name="orgName", refs={String.class}, tree="[0]")
+    private Output<String> orgName;
+
+    /**
+     * @return The organization name
+     * 
+     */
+    public Output<String> orgName() {
+        return this.orgName;
+    }
+    /**
      * The resource type this permission descriptor applies to.
      * 
      */
@@ -147,6 +161,20 @@ public class Role extends com.pulumi.resources.CustomResource {
      */
     public Output<Optional<String>> resourceType() {
         return Codegen.optional(this.resourceType);
+    }
+    /**
+     * The unique identifier for this role.
+     * 
+     */
+    @Export(name="roleID", refs={String.class}, tree="[0]")
+    private Output<String> roleID;
+
+    /**
+     * @return The unique identifier for this role.
+     * 
+     */
+    public Output<String> roleID() {
+        return this.roleID;
     }
     /**
      * The UX purpose of this permission descriptor (e.g. role, policy, set).

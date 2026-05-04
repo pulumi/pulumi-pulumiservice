@@ -1,0 +1,25 @@
+resources:
+  parentStack:
+    type: pulumiservice:v2:Stack
+    properties:
+      orgName: ${serviceOrg}
+      projectName: ${projectName}
+      stackName: ${stackName}
+  ownerTag:
+    type: pulumiservice:v2:StackTag
+    properties:
+      orgName: ${serviceOrg}
+      projectName: ${parentStack.projectName}
+      stackName: ${parentStack.stackName}
+      name: owner
+      value: pulumicloud-v2-example
+  customTag:
+    type: pulumiservice:v2:StackTag
+    properties:
+      orgName: ${serviceOrg}
+      projectName: ${parentStack.projectName}
+      stackName: ${parentStack.stackName}
+      name: purpose
+      value: ${tagValue}
+outputs:
+  parent: ${parentStack.id}

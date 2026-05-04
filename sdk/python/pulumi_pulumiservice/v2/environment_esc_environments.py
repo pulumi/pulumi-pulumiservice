@@ -21,25 +21,17 @@ class Environment_esc_environmentsArgs:
     def __init__(__self__, *,
                  name: pulumi.Input[_builtins.str],
                  org_name: pulumi.Input[_builtins.str],
-                 project: pulumi.Input[_builtins.str],
-                 env_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 project_name: Optional[pulumi.Input[_builtins.str]] = None):
+                 project: pulumi.Input[_builtins.str]):
         """
         The set of arguments for constructing a Environment_esc_environments resource.
 
         :param pulumi.Input[_builtins.str] name: The name of the environment.
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] project: The project name for the environment.
-        :param pulumi.Input[_builtins.str] env_name: The environment name
-        :param pulumi.Input[_builtins.str] project_name: The project name
         """
         pulumi.set(__self__, "name", name)
         pulumi.set(__self__, "org_name", org_name)
         pulumi.set(__self__, "project", project)
-        if env_name is not None:
-            pulumi.set(__self__, "env_name", env_name)
-        if project_name is not None:
-            pulumi.set(__self__, "project_name", project_name)
 
     @_builtins.property
     @pulumi.getter
@@ -77,30 +69,6 @@ class Environment_esc_environmentsArgs:
     def project(self, value: pulumi.Input[_builtins.str]):
         pulumi.set(self, "project", value)
 
-    @_builtins.property
-    @pulumi.getter(name="envName")
-    def env_name(self) -> Optional[pulumi.Input[_builtins.str]]:
-        """
-        The environment name
-        """
-        return pulumi.get(self, "env_name")
-
-    @env_name.setter
-    def env_name(self, value: Optional[pulumi.Input[_builtins.str]]):
-        pulumi.set(self, "env_name", value)
-
-    @_builtins.property
-    @pulumi.getter(name="projectName")
-    def project_name(self) -> Optional[pulumi.Input[_builtins.str]]:
-        """
-        The project name
-        """
-        return pulumi.get(self, "project_name")
-
-    @project_name.setter
-    def project_name(self, value: Optional[pulumi.Input[_builtins.str]]):
-        pulumi.set(self, "project_name", value)
-
 
 @pulumi.type_token("pulumiservice:v2:Environment_esc_environments")
 class Environment_esc_environments(pulumi.CustomResource):
@@ -108,11 +76,9 @@ class Environment_esc_environments(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 env_name: Optional[pulumi.Input[_builtins.str]] = None,
                  name: Optional[pulumi.Input[_builtins.str]] = None,
                  org_name: Optional[pulumi.Input[_builtins.str]] = None,
                  project: Optional[pulumi.Input[_builtins.str]] = None,
-                 project_name: Optional[pulumi.Input[_builtins.str]] = None,
                  __props__=None):
         """
         Creates a new Pulumi ESC (Environments, Secrets, and Configuration) environment within the specified organization. The request body must include the project name and the environment name. Environment names must be unique within a project and may only contain alphanumeric characters, hyphens, underscores, and periods. The newly created environment starts with an empty YAML definition that can be updated via the UpdateEnvironment endpoint.
@@ -120,11 +86,9 @@ class Environment_esc_environments(pulumi.CustomResource):
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
-        :param pulumi.Input[_builtins.str] env_name: The environment name
         :param pulumi.Input[_builtins.str] name: The name of the environment.
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] project: The project name for the environment.
-        :param pulumi.Input[_builtins.str] project_name: The project name
         """
         ...
     @overload
@@ -151,11 +115,9 @@ class Environment_esc_environments(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 env_name: Optional[pulumi.Input[_builtins.str]] = None,
                  name: Optional[pulumi.Input[_builtins.str]] = None,
                  org_name: Optional[pulumi.Input[_builtins.str]] = None,
                  project: Optional[pulumi.Input[_builtins.str]] = None,
-                 project_name: Optional[pulumi.Input[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
@@ -165,7 +127,6 @@ class Environment_esc_environments(pulumi.CustomResource):
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
             __props__ = Environment_esc_environmentsArgs.__new__(Environment_esc_environmentsArgs)
 
-            __props__.__dict__["env_name"] = env_name
             if name is None and not opts.urn:
                 raise TypeError("Missing required property 'name'")
             __props__.__dict__["name"] = name
@@ -175,7 +136,8 @@ class Environment_esc_environments(pulumi.CustomResource):
             if project is None and not opts.urn:
                 raise TypeError("Missing required property 'project'")
             __props__.__dict__["project"] = project
-            __props__.__dict__["project_name"] = project_name
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["name", "orgName", "project"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(Environment_esc_environments, __self__).__init__(
             'pulumiservice:v2:Environment_esc_environments',
             resource_name,
@@ -198,5 +160,32 @@ class Environment_esc_environments(pulumi.CustomResource):
 
         __props__ = Environment_esc_environmentsArgs.__new__(Environment_esc_environmentsArgs)
 
+        __props__.__dict__["name"] = None
+        __props__.__dict__["org_name"] = None
+        __props__.__dict__["project"] = None
         return Environment_esc_environments(resource_name, opts=opts, __props__=__props__)
+
+    @_builtins.property
+    @pulumi.getter
+    def name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The environment name
+        """
+        return pulumi.get(self, "name")
+
+    @_builtins.property
+    @pulumi.getter(name="orgName")
+    def org_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The organization name
+        """
+        return pulumi.get(self, "org_name")
+
+    @_builtins.property
+    @pulumi.getter
+    def project(self) -> pulumi.Output[_builtins.str]:
+        """
+        The project name
+        """
+        return pulumi.get(self, "project")
 

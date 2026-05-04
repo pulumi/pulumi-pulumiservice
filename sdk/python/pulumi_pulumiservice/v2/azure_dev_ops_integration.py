@@ -180,6 +180,8 @@ class AzureDevOpsIntegration(pulumi.CustomResource):
             __props__.__dict__["organization"] = None
             __props__.__dict__["project"] = None
             __props__.__dict__["valid"] = None
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["integrationId", "orgName"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(AzureDevOpsIntegration, __self__).__init__(
             'pulumiservice:v2:AzureDevOpsIntegration',
             resource_name,
@@ -207,6 +209,8 @@ class AzureDevOpsIntegration(pulumi.CustomResource):
         __props__.__dict__["disable_neo_summaries"] = None
         __props__.__dict__["disable_pr_comments"] = None
         __props__.__dict__["installed"] = None
+        __props__.__dict__["integration_id"] = None
+        __props__.__dict__["org_name"] = None
         __props__.__dict__["organization"] = None
         __props__.__dict__["project"] = None
         __props__.__dict__["valid"] = None
@@ -251,6 +255,22 @@ class AzureDevOpsIntegration(pulumi.CustomResource):
         Does the org have an Azure DevOps app integration configured
         """
         return pulumi.get(self, "installed")
+
+    @_builtins.property
+    @pulumi.getter(name="integrationId")
+    def integration_id(self) -> pulumi.Output[_builtins.str]:
+        """
+        The Azure DevOps integration identifier
+        """
+        return pulumi.get(self, "integration_id")
+
+    @_builtins.property
+    @pulumi.getter(name="orgName")
+    def org_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The organization name
+        """
+        return pulumi.get(self, "org_name")
 
     @_builtins.property
     @pulumi.getter

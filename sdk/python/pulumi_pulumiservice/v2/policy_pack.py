@@ -25,7 +25,6 @@ class PolicyPackArgs:
                  policies: pulumi.Input[Sequence[Any]],
                  description: Optional[pulumi.Input[_builtins.str]] = None,
                  metadata: Optional[pulumi.Input[Mapping[str, Any]]] = None,
-                 policy_pack_name: Optional[pulumi.Input[_builtins.str]] = None,
                  provider: Optional[pulumi.Input[_builtins.str]] = None,
                  readme: Optional[pulumi.Input[_builtins.str]] = None,
                  repository: Optional[pulumi.Input[_builtins.str]] = None,
@@ -46,7 +45,6 @@ class PolicyPackArgs:
         :param pulumi.Input[_builtins.str] description: A brief description of the policy pack.
         :param pulumi.Input[Mapping[str, Any]] metadata: Metadata contains optional data about the environment performing the publish operation,
                e.g. the current source code control commit information.
-        :param pulumi.Input[_builtins.str] policy_pack_name: The policy pack name
         :param pulumi.Input[_builtins.str] provider: The cloud provider/platform this policy pack is associated with, e.g. AWS, Azure, etc.
         :param pulumi.Input[_builtins.str] readme: README text about the policy pack.
         :param pulumi.Input[_builtins.str] repository: A URL to the repository where the policy pack is defined.
@@ -63,8 +61,6 @@ class PolicyPackArgs:
             pulumi.set(__self__, "description", description)
         if metadata is not None:
             pulumi.set(__self__, "metadata", metadata)
-        if policy_pack_name is not None:
-            pulumi.set(__self__, "policy_pack_name", policy_pack_name)
         if provider is not None:
             pulumi.set(__self__, "provider", provider)
         if readme is not None:
@@ -156,18 +152,6 @@ class PolicyPackArgs:
         pulumi.set(self, "metadata", value)
 
     @_builtins.property
-    @pulumi.getter(name="policyPackName")
-    def policy_pack_name(self) -> Optional[pulumi.Input[_builtins.str]]:
-        """
-        The policy pack name
-        """
-        return pulumi.get(self, "policy_pack_name")
-
-    @policy_pack_name.setter
-    def policy_pack_name(self, value: Optional[pulumi.Input[_builtins.str]]):
-        pulumi.set(self, "policy_pack_name", value)
-
-    @_builtins.property
     @pulumi.getter
     def provider(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
@@ -253,7 +237,6 @@ class PolicyPack(pulumi.CustomResource):
                  name: Optional[pulumi.Input[_builtins.str]] = None,
                  org_name: Optional[pulumi.Input[_builtins.str]] = None,
                  policies: Optional[pulumi.Input[Sequence[Any]]] = None,
-                 policy_pack_name: Optional[pulumi.Input[_builtins.str]] = None,
                  provider: Optional[pulumi.Input[_builtins.str]] = None,
                  readme: Optional[pulumi.Input[_builtins.str]] = None,
                  repository: Optional[pulumi.Input[_builtins.str]] = None,
@@ -278,7 +261,6 @@ class PolicyPack(pulumi.CustomResource):
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[Sequence[Any]] policies: The Policies outline the specific Policies in the package, and are derived
                from the package by the CLI.
-        :param pulumi.Input[_builtins.str] policy_pack_name: The policy pack name
         :param pulumi.Input[_builtins.str] provider: The cloud provider/platform this policy pack is associated with, e.g. AWS, Azure, etc.
         :param pulumi.Input[_builtins.str] readme: README text about the policy pack.
         :param pulumi.Input[_builtins.str] repository: A URL to the repository where the policy pack is defined.
@@ -318,7 +300,6 @@ class PolicyPack(pulumi.CustomResource):
                  name: Optional[pulumi.Input[_builtins.str]] = None,
                  org_name: Optional[pulumi.Input[_builtins.str]] = None,
                  policies: Optional[pulumi.Input[Sequence[Any]]] = None,
-                 policy_pack_name: Optional[pulumi.Input[_builtins.str]] = None,
                  provider: Optional[pulumi.Input[_builtins.str]] = None,
                  readme: Optional[pulumi.Input[_builtins.str]] = None,
                  repository: Optional[pulumi.Input[_builtins.str]] = None,
@@ -348,7 +329,6 @@ class PolicyPack(pulumi.CustomResource):
             if policies is None and not opts.urn:
                 raise TypeError("Missing required property 'policies'")
             __props__.__dict__["policies"] = policies
-            __props__.__dict__["policy_pack_name"] = policy_pack_name
             __props__.__dict__["provider"] = provider
             __props__.__dict__["readme"] = readme
             __props__.__dict__["repository"] = repository
@@ -356,6 +336,8 @@ class PolicyPack(pulumi.CustomResource):
             __props__.__dict__["version"] = version
             __props__.__dict__["version_tag"] = version_tag
             __props__.__dict__["applied"] = None
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["orgName"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(PolicyPack, __self__).__init__(
             'pulumiservice:v2:PolicyPack',
             resource_name,
@@ -381,6 +363,7 @@ class PolicyPack(pulumi.CustomResource):
         __props__.__dict__["applied"] = None
         __props__.__dict__["display_name"] = None
         __props__.__dict__["name"] = None
+        __props__.__dict__["org_name"] = None
         __props__.__dict__["policies"] = None
         __props__.__dict__["version"] = None
         __props__.__dict__["version_tag"] = None
@@ -409,6 +392,14 @@ class PolicyPack(pulumi.CustomResource):
         The unique name of the policy pack.
         """
         return pulumi.get(self, "name")
+
+    @_builtins.property
+    @pulumi.getter(name="orgName")
+    def org_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The organization name
+        """
+        return pulumi.get(self, "org_name")
 
     @_builtins.property
     @pulumi.getter

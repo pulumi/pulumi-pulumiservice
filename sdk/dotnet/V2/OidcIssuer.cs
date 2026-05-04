@@ -10,7 +10,7 @@ using Pulumi.Serialization;
 namespace Pulumi.PulumiService.V2
 {
     /// <summary>
-    /// Updates an existing OIDC issuer registration for an organization. This can be used to modify the issuer name, audience restrictions, trust policies, or other configuration. The issuer URL itself cannot be changed after creation. The issuer name is required in the update request.
+    /// Registers a new OIDC issuer for an organization, establishing a trust relationship with an external identity provider. Once registered, the identity provider can issue signed, short-lived tokens that are exchanged for temporary Pulumi Cloud credentials during deployments. This eliminates the need to store long-lived access tokens. Supported providers include AWS, Azure, Google Cloud, GitHub Actions, and any OIDC-compliant identity provider. The request must include the issuer URL, and the service will fetch the provider's public signing keys to verify token authenticity.
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:v2:OidcIssuer")]
     public partial class OidcIssuer : global::Pulumi.CustomResource
@@ -26,6 +26,12 @@ namespace Pulumi.PulumiService.V2
         /// </summary>
         [Output("issuer")]
         public Output<string> Issuer { get; private set; } = null!;
+
+        /// <summary>
+        /// The unique identifier of the registered OIDC issuer.
+        /// </summary>
+        [Output("issuerId")]
+        public Output<string> IssuerId { get; private set; } = null!;
 
         /// <summary>
         /// The JSON Web Key Set for the OIDC issuer.
@@ -56,6 +62,12 @@ namespace Pulumi.PulumiService.V2
         /// </summary>
         [Output("name")]
         public Output<string> Name { get; private set; } = null!;
+
+        /// <summary>
+        /// The organization name
+        /// </summary>
+        [Output("orgName")]
+        public Output<string> OrgName { get; private set; } = null!;
 
         /// <summary>
         /// SHA-1 certificate thumbprints used to verify the OIDC issuer's TLS certificate.
@@ -92,6 +104,10 @@ namespace Pulumi.PulumiService.V2
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
+                ReplaceOnChanges =
+                {
+                    "orgName",
+                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.
@@ -117,26 +133,26 @@ namespace Pulumi.PulumiService.V2
         /// <summary>
         /// The OIDC issuer identifier
         /// </summary>
-        [Input("issuerId", required: true)]
-        public Input<string> IssuerId { get; set; } = null!;
+        [Input("issuerId")]
+        public Input<string>? IssuerId { get; set; }
 
         /// <summary>
-        /// The updated JSON Web Key Set for the OIDC issuer.
+        /// The JSON Web Key Set for the OIDC issuer.
         /// </summary>
         [Input("jwks")]
         public Input<object>? Jwks { get; set; }
 
         /// <summary>
-        /// The updated maximum token expiration time in seconds.
+        /// The maximum token expiration time in seconds.
         /// </summary>
         [Input("maxExpiration")]
         public Input<int>? MaxExpiration { get; set; }
 
         /// <summary>
-        /// The updated display name of the OIDC issuer.
+        /// The display name of the OIDC issuer.
         /// </summary>
-        [Input("name")]
-        public Input<string>? Name { get; set; }
+        [Input("name", required: true)]
+        public Input<string> Name { get; set; } = null!;
 
         /// <summary>
         /// The organization name
@@ -148,13 +164,19 @@ namespace Pulumi.PulumiService.V2
         private InputList<string>? _thumbprints;
 
         /// <summary>
-        /// Updated SHA-1 certificate thumbprints used to verify the OIDC issuer's TLS certificate.
+        /// SHA-1 certificate thumbprints used to verify the OIDC issuer's TLS certificate.
         /// </summary>
         public InputList<string> Thumbprints
         {
             get => _thumbprints ?? (_thumbprints = new InputList<string>());
             set => _thumbprints = value;
         }
+
+        /// <summary>
+        /// The URL of the OIDC issuer.
+        /// </summary>
+        [Input("url", required: true)]
+        public Input<string> Url { get; set; } = null!;
 
         public OidcIssuerArgs()
         {

@@ -198,6 +198,8 @@ class Gate(pulumi.CustomResource):
             if target is None and not opts.urn:
                 raise TypeError("Missing required property 'target'")
             __props__.__dict__["target"] = target
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["orgName"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(Gate, __self__).__init__(
             'pulumiservice:v2:Gate',
             resource_name,
@@ -221,7 +223,9 @@ class Gate(pulumi.CustomResource):
         __props__ = GateArgs.__new__(GateArgs)
 
         __props__.__dict__["enabled"] = None
+        __props__.__dict__["gate_id"] = None
         __props__.__dict__["name"] = None
+        __props__.__dict__["org_name"] = None
         __props__.__dict__["rule"] = None
         __props__.__dict__["target"] = None
         return Gate(resource_name, opts=opts, __props__=__props__)
@@ -235,12 +239,28 @@ class Gate(pulumi.CustomResource):
         return pulumi.get(self, "enabled")
 
     @_builtins.property
+    @pulumi.getter(name="gateID")
+    def gate_id(self) -> pulumi.Output[_builtins.str]:
+        """
+        Unique identifier of the change gate
+        """
+        return pulumi.get(self, "gate_id")
+
+    @_builtins.property
     @pulumi.getter
     def name(self) -> pulumi.Output[_builtins.str]:
         """
         Name of the change gate
         """
         return pulumi.get(self, "name")
+
+    @_builtins.property
+    @pulumi.getter(name="orgName")
+    def org_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The organization name
+        """
+        return pulumi.get(self, "org_name")
 
     @_builtins.property
     @pulumi.getter

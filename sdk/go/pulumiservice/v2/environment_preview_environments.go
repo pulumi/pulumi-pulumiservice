@@ -15,6 +15,11 @@ import (
 // Creates a new Pulumi ESC (Environments, Secrets, and Configuration) environment within the specified organization. The request body must include the project name and the environment name. Environment names must be unique within a project and may only contain alphanumeric characters, hyphens, underscores, and periods. The newly created environment starts with an empty YAML definition that can be updated via the UpdateEnvironment endpoint.
 type Environment_preview_environments struct {
 	pulumi.CustomResourceState
+
+	// The environment name
+	EnvName pulumi.StringOutput `pulumi:"envName"`
+	// The organization name
+	OrgName pulumi.StringOutput `pulumi:"orgName"`
 }
 
 // NewEnvironment_preview_environments registers a new resource with the given unique name, arguments, and options.
@@ -36,6 +41,11 @@ func NewEnvironment_preview_environments(ctx *pulumi.Context,
 	if args.Project == nil {
 		return nil, errors.New("invalid value for required argument 'Project'")
 	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"envName",
+		"orgName",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Environment_preview_environments
 	err := ctx.RegisterResource("pulumiservice:v2:Environment_preview_environments", name, args, &resource, opts...)
@@ -176,6 +186,16 @@ func (o Environment_preview_environmentsOutput) ToEnvironment_preview_environmen
 
 func (o Environment_preview_environmentsOutput) ToEnvironment_preview_environmentsOutputWithContext(ctx context.Context) Environment_preview_environmentsOutput {
 	return o
+}
+
+// The environment name
+func (o Environment_preview_environmentsOutput) EnvName() pulumi.StringOutput {
+	return o.ApplyT(func(v *Environment_preview_environments) pulumi.StringOutput { return v.EnvName }).(pulumi.StringOutput)
+}
+
+// The organization name
+func (o Environment_preview_environmentsOutput) OrgName() pulumi.StringOutput {
+	return o.ApplyT(func(v *Environment_preview_environments) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
 }
 
 type Environment_preview_environmentsArrayOutput struct{ *pulumi.OutputState }

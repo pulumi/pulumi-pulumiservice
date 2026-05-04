@@ -7,14 +7,16 @@ from .. import _utilities
 import typing
 # Export this package's modules as members:
 from .account import *
+from .agent_pool import *
 from .audit_log_export_configuration import *
 from .auth_policy import *
 from .azure_dev_ops_integration import *
 from .bit_bucket_integration import *
+from .custom_vcs_integration import *
+from .custom_vcs_repository import *
 from .default_organization import *
 from .deployment_settings import *
 from .environment_draft import *
-from .environment_draft_preview import *
 from .environment_esc_environments import *
 from .environment_preview_environments import *
 from .environment_schedule import *
@@ -27,7 +29,11 @@ from .git_hub_integration import *
 from .git_lab_integration import *
 from .oidc_issuer import *
 from .open_environment_request import *
+from .org_template_collection import *
+from .org_token import *
+from .organization_member import *
 from .organization_webhook import *
+from .personal_token import *
 from .policy_group import *
 from .policy_issue import *
 from .policy_pack import *
@@ -40,8 +46,10 @@ from .scheduled_scan_settings import *
 from .service import *
 from .stack import *
 from .stack_config import *
+from .stack_tag import *
 from .stack_webhook import *
 from .task import *
 from .team import *
+from .team_token import *
 from .webhook_esc_environments import *
 from .webhook_preview_environments import *

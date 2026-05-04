@@ -1,0 +1,18 @@
+name: pulumicloud-v2-schedules
+runtime: yaml
+config:
+  serviceOrg:
+    type: string
+    default: service-provider-test-org
+  projectName:
+    type: string
+    default: pulumi-service-schedules-example
+  stackName:
+    type: string
+    default: dev
+  envName:
+    type: string
+    default: my-env
+  scheduleCron:
+    type: string
+    default: 0 7 * * *

@@ -1,0 +1,12 @@
+name: pulumicloud-v2-teams
+runtime: yaml
+config:
+  serviceOrg:
+    type: string
+    default: service-provider-test-org
+  teamSuffix:
+    type: string
+    default: dev
+  teamDescription:
+    type: string
+    default: A team created by the v2 example.

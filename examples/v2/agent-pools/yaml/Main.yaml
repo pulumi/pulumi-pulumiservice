@@ -1,0 +1,9 @@
+resources:
+  pool:
+    type: pulumiservice:v2:AgentPool
+    properties:
+      orgName: ${serviceOrg}
+      name: v2-agent-pool-${poolSuffix}
+      description: ${poolDescription}
+outputs:
+  poolName: ${pool.name}

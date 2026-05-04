@@ -8,11 +8,73 @@ import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
 import java.lang.String;
 import java.util.Objects;
+import java.util.Optional;
+import javax.annotation.Nullable;
 
 
 public final class PolicyGroupArgs extends com.pulumi.resources.ResourceArgs {
 
     public static final PolicyGroupArgs Empty = new PolicyGroupArgs();
+
+    /**
+     * Agent pool ID for policy evaluation. Defaults to Pulumi hosted pool if not specified.
+     * 
+     */
+    @Import(name="agentPoolId")
+    private @Nullable Output<String> agentPoolId;
+
+    /**
+     * @return Agent pool ID for policy evaluation. Defaults to Pulumi hosted pool if not specified.
+     * 
+     */
+    public Optional<Output<String>> agentPoolId() {
+        return Optional.ofNullable(this.agentPoolId);
+    }
+
+    /**
+     * The type of entities this policy group applies to (stacks or accounts).
+     * 
+     */
+    @Import(name="entityType", required=true)
+    private Output<String> entityType;
+
+    /**
+     * @return The type of entities this policy group applies to (stacks or accounts).
+     * 
+     */
+    public Output<String> entityType() {
+        return this.entityType;
+    }
+
+    /**
+     * The enforcement mode for the policy group (audit or preventative). Defaults to &#39;audit&#39; for account policy groups, &#39;preventative&#39; for stack policy groups.
+     * 
+     */
+    @Import(name="mode")
+    private @Nullable Output<String> mode;
+
+    /**
+     * @return The enforcement mode for the policy group (audit or preventative). Defaults to &#39;audit&#39; for account policy groups, &#39;preventative&#39; for stack policy groups.
+     * 
+     */
+    public Optional<Output<String>> mode() {
+        return Optional.ofNullable(this.mode);
+    }
+
+    /**
+     * The name of the new policy group.
+     * 
+     */
+    @Import(name="name", required=true)
+    private Output<String> name;
+
+    /**
+     * @return The name of the new policy group.
+     * 
+     */
+    public Output<String> name() {
+        return this.name;
+    }
 
     /**
      * The organization name
@@ -29,26 +91,14 @@ public final class PolicyGroupArgs extends com.pulumi.resources.ResourceArgs {
         return this.orgName;
     }
 
-    /**
-     * The policy group name
-     * 
-     */
-    @Import(name="policyGroup", required=true)
-    private Output<String> policyGroup;
-
-    /**
-     * @return The policy group name
-     * 
-     */
-    public Output<String> policyGroup() {
-        return this.policyGroup;
-    }
-
     private PolicyGroupArgs() {}
 
     private PolicyGroupArgs(PolicyGroupArgs $) {
+        this.agentPoolId = $.agentPoolId;
+        this.entityType = $.entityType;
+        this.mode = $.mode;
+        this.name = $.name;
         this.orgName = $.orgName;
-        this.policyGroup = $.policyGroup;
     }
 
     public static Builder builder() {
@@ -67,6 +117,90 @@ public final class PolicyGroupArgs extends com.pulumi.resources.ResourceArgs {
 
         public Builder(PolicyGroupArgs defaults) {
             $ = new PolicyGroupArgs(Objects.requireNonNull(defaults));
+        }
+
+        /**
+         * @param agentPoolId Agent pool ID for policy evaluation. Defaults to Pulumi hosted pool if not specified.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder agentPoolId(@Nullable Output<String> agentPoolId) {
+            $.agentPoolId = agentPoolId;
+            return this;
+        }
+
+        /**
+         * @param agentPoolId Agent pool ID for policy evaluation. Defaults to Pulumi hosted pool if not specified.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder agentPoolId(String agentPoolId) {
+            return agentPoolId(Output.of(agentPoolId));
+        }
+
+        /**
+         * @param entityType The type of entities this policy group applies to (stacks or accounts).
+         * 
+         * @return builder
+         * 
+         */
+        public Builder entityType(Output<String> entityType) {
+            $.entityType = entityType;
+            return this;
+        }
+
+        /**
+         * @param entityType The type of entities this policy group applies to (stacks or accounts).
+         * 
+         * @return builder
+         * 
+         */
+        public Builder entityType(String entityType) {
+            return entityType(Output.of(entityType));
+        }
+
+        /**
+         * @param mode The enforcement mode for the policy group (audit or preventative). Defaults to &#39;audit&#39; for account policy groups, &#39;preventative&#39; for stack policy groups.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder mode(@Nullable Output<String> mode) {
+            $.mode = mode;
+            return this;
+        }
+
+        /**
+         * @param mode The enforcement mode for the policy group (audit or preventative). Defaults to &#39;audit&#39; for account policy groups, &#39;preventative&#39; for stack policy groups.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder mode(String mode) {
+            return mode(Output.of(mode));
+        }
+
+        /**
+         * @param name The name of the new policy group.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder name(Output<String> name) {
+            $.name = name;
+            return this;
+        }
+
+        /**
+         * @param name The name of the new policy group.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder name(String name) {
+            return name(Output.of(name));
         }
 
         /**
@@ -90,33 +224,15 @@ public final class PolicyGroupArgs extends com.pulumi.resources.ResourceArgs {
             return orgName(Output.of(orgName));
         }
 
-        /**
-         * @param policyGroup The policy group name
-         * 
-         * @return builder
-         * 
-         */
-        public Builder policyGroup(Output<String> policyGroup) {
-            $.policyGroup = policyGroup;
-            return this;
-        }
-
-        /**
-         * @param policyGroup The policy group name
-         * 
-         * @return builder
-         * 
-         */
-        public Builder policyGroup(String policyGroup) {
-            return policyGroup(Output.of(policyGroup));
-        }
-
         public PolicyGroupArgs build() {
+            if ($.entityType == null) {
+                throw new MissingRequiredPropertyException("PolicyGroupArgs", "entityType");
+            }
+            if ($.name == null) {
+                throw new MissingRequiredPropertyException("PolicyGroupArgs", "name");
+            }
             if ($.orgName == null) {
                 throw new MissingRequiredPropertyException("PolicyGroupArgs", "orgName");
-            }
-            if ($.policyGroup == null) {
-                throw new MissingRequiredPropertyException("PolicyGroupArgs", "policyGroup");
             }
             return $;
         }

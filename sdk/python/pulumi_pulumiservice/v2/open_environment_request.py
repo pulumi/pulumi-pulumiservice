@@ -198,6 +198,8 @@ class OpenEnvironmentRequest(pulumi.CustomResource):
             if project_name is None and not opts.urn:
                 raise TypeError("Missing required property 'project_name'")
             __props__.__dict__["project_name"] = project_name
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["changeRequestID", "envName", "orgName", "projectName"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(OpenEnvironmentRequest, __self__).__init__(
             'pulumiservice:v2:OpenEnvironmentRequest',
             resource_name,
@@ -221,7 +223,11 @@ class OpenEnvironmentRequest(pulumi.CustomResource):
         __props__ = OpenEnvironmentRequestArgs.__new__(OpenEnvironmentRequestArgs)
 
         __props__.__dict__["access_duration_seconds"] = None
+        __props__.__dict__["change_request_id"] = None
+        __props__.__dict__["env_name"] = None
         __props__.__dict__["grant_expiration_seconds"] = None
+        __props__.__dict__["org_name"] = None
+        __props__.__dict__["project_name"] = None
         return OpenEnvironmentRequest(resource_name, opts=opts, __props__=__props__)
 
     @_builtins.property
@@ -233,10 +239,42 @@ class OpenEnvironmentRequest(pulumi.CustomResource):
         return pulumi.get(self, "access_duration_seconds")
 
     @_builtins.property
+    @pulumi.getter(name="changeRequestID")
+    def change_request_id(self) -> pulumi.Output[_builtins.str]:
+        """
+        The change request ID
+        """
+        return pulumi.get(self, "change_request_id")
+
+    @_builtins.property
+    @pulumi.getter(name="envName")
+    def env_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The environment name
+        """
+        return pulumi.get(self, "env_name")
+
+    @_builtins.property
     @pulumi.getter(name="grantExpirationSeconds")
     def grant_expiration_seconds(self) -> pulumi.Output[_builtins.int]:
         """
         Time from application of the request until the resulting grant expires
         """
         return pulumi.get(self, "grant_expiration_seconds")
+
+    @_builtins.property
+    @pulumi.getter(name="orgName")
+    def org_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The organization name
+        """
+        return pulumi.get(self, "org_name")
+
+    @_builtins.property
+    @pulumi.getter(name="projectName")
+    def project_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The project name
+        """
+        return pulumi.get(self, "project_name")
 

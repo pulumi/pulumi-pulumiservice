@@ -30,14 +30,16 @@ import (
 // Spec source: https://api.pulumi.com/api/openapi/pulumi-spec.json
 //
 // `go generate` runs two steps in order:
-//  1. openapi-fetch  — refresh spec.json from the upstream URL
-//  2. scaffold-metadata — re-derive metadata.candidate.json from the spec
-//     so newly introduced API operations surface in PR diffs. metadata.json
-//     itself is hand-curated; copy entries from the candidate file when
-//     adding resources.
+//  1. openapi-fetch     — refresh spec.json from the upstream URL
+//  2. scaffold-metadata — refresh per-resource operations in metadata.json.
+//     The scaffolder writes only the auto-derived `operations` block on
+//     each entry; idField, renames, fields, outputs, and other hand-curated
+//     fields round-trip untouched. New tokens get an empty entry the human
+//     can decorate with overrides; tokens listed under top-level
+//     `_excluded` are skipped.
 //
 //go:generate go run ../../tools/openapi-fetch -out spec.json
-//go:generate go run ../../tools/scaffold-metadata -in spec.json -out metadata.candidate.json
+//go:generate go run ../../tools/scaffold-metadata -in spec.json -out metadata.json
 
 //go:embed spec.json
 var specJSON []byte

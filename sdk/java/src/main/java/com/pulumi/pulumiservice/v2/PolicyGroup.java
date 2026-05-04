@@ -17,7 +17,7 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 
 /**
- * BatchUpdatePolicyGroup applies multiple update operations to the Policy Group efficiently. Each operation in the list uses the same fields as UpdatePolicyGroupRequest. Operations are grouped by type (adds, removes) and processed in batches for efficiency.
+ * Creates a new Policy Group for an organization. Policy Groups define which Policy Packs are enforced on which stacks or cloud accounts, with configurable enforcement levels (advisory, mandatory, or disabled) per pack. This allows different policy strictness for different environments, such as advisory-only in development and mandatory in production.
  * 
  */
 @ResourceType(type="pulumiservice:v2:PolicyGroup")
@@ -119,6 +119,20 @@ public class PolicyGroup extends com.pulumi.resources.CustomResource {
      */
     public Output<String> name() {
         return this.name;
+    }
+    /**
+     * The organization name
+     * 
+     */
+    @Export(name="orgName", refs={String.class}, tree="[0]")
+    private Output<String> orgName;
+
+    /**
+     * @return The organization name
+     * 
+     */
+    public Output<String> orgName() {
+        return this.orgName;
     }
     /**
      * List of stacks that are members of this policy group.

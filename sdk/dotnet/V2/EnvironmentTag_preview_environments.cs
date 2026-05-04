@@ -34,6 +34,12 @@ namespace Pulumi.PulumiService.V2
         public Output<string> EditorName { get; private set; } = null!;
 
         /// <summary>
+        /// The environment name
+        /// </summary>
+        [Output("envName")]
+        public Output<string> EnvName { get; private set; } = null!;
+
+        /// <summary>
         /// The timestamp when the tag was last modified.
         /// </summary>
         [Output("modified")]
@@ -44,6 +50,12 @@ namespace Pulumi.PulumiService.V2
         /// </summary>
         [Output("name")]
         public Output<string> Name { get; private set; } = null!;
+
+        /// <summary>
+        /// The organization name
+        /// </summary>
+        [Output("orgName")]
+        public Output<string> OrgName { get; private set; } = null!;
 
         /// <summary>
         /// The value of the tag.
@@ -74,6 +86,11 @@ namespace Pulumi.PulumiService.V2
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
+                ReplaceOnChanges =
+                {
+                    "envName",
+                    "orgName",
+                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.
@@ -113,12 +130,6 @@ namespace Pulumi.PulumiService.V2
         /// </summary>
         [Input("orgName", required: true)]
         public Input<string> OrgName { get; set; } = null!;
-
-        /// <summary>
-        /// The environment tag name
-        /// </summary>
-        [Input("tagName")]
-        public Input<string>? TagName { get; set; }
 
         /// <summary>
         /// The value

@@ -29,10 +29,16 @@ type AuthPolicy struct {
 
 	// The creation timestamp
 	Created pulumi.StringPtrOutput `pulumi:"created"`
+	// The unique identifier
+	IssuerId pulumi.StringOutput `pulumi:"issuerId"`
 	// The last modification timestamp
 	Modified pulumi.StringPtrOutput `pulumi:"modified"`
+	// The organization name
+	OrgName pulumi.StringOutput `pulumi:"orgName"`
 	// List of policies
 	Policies pulumi.ArrayOutput `pulumi:"policies"`
+	// The policy identifier
+	PolicyId pulumi.StringOutput `pulumi:"policyId"`
 	// The version number
 	Version pulumi.IntOutput `pulumi:"version"`
 }
@@ -53,6 +59,11 @@ func NewAuthPolicy(ctx *pulumi.Context,
 	if args.PolicyId == nil {
 		return nil, errors.New("invalid value for required argument 'PolicyId'")
 	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"orgName",
+		"policyId",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource AuthPolicy
 	err := ctx.RegisterResource("pulumiservice:v2:AuthPolicy", name, args, &resource, opts...)
@@ -200,14 +211,29 @@ func (o AuthPolicyOutput) Created() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *AuthPolicy) pulumi.StringPtrOutput { return v.Created }).(pulumi.StringPtrOutput)
 }
 
+// The unique identifier
+func (o AuthPolicyOutput) IssuerId() pulumi.StringOutput {
+	return o.ApplyT(func(v *AuthPolicy) pulumi.StringOutput { return v.IssuerId }).(pulumi.StringOutput)
+}
+
 // The last modification timestamp
 func (o AuthPolicyOutput) Modified() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *AuthPolicy) pulumi.StringPtrOutput { return v.Modified }).(pulumi.StringPtrOutput)
 }
 
+// The organization name
+func (o AuthPolicyOutput) OrgName() pulumi.StringOutput {
+	return o.ApplyT(func(v *AuthPolicy) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
+}
+
 // List of policies
 func (o AuthPolicyOutput) Policies() pulumi.ArrayOutput {
 	return o.ApplyT(func(v *AuthPolicy) pulumi.ArrayOutput { return v.Policies }).(pulumi.ArrayOutput)
+}
+
+// The policy identifier
+func (o AuthPolicyOutput) PolicyId() pulumi.StringOutput {
+	return o.ApplyT(func(v *AuthPolicy) pulumi.StringOutput { return v.PolicyId }).(pulumi.StringOutput)
 }
 
 // The version number

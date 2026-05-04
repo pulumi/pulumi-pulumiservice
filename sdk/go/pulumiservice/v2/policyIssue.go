@@ -20,6 +20,10 @@ import (
 type PolicyIssue struct {
 	pulumi.CustomResourceState
 
+	// The issue identifier
+	IssueId pulumi.StringOutput `pulumi:"issueId"`
+	// The organization name
+	OrgName pulumi.StringOutput `pulumi:"orgName"`
 	// The policy definition that caused this issue. May be null if the policy has been deleted or is unavailable.
 	Policy pulumi.AnyOutput `pulumi:"policy"`
 	// The registry policy pack metadata. May be null if the policy pack is unavailable.
@@ -39,6 +43,11 @@ func NewPolicyIssue(ctx *pulumi.Context,
 	if args.OrgName == nil {
 		return nil, errors.New("invalid value for required argument 'OrgName'")
 	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"issueId",
+		"orgName",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource PolicyIssue
 	err := ctx.RegisterResource("pulumiservice:v2:PolicyIssue", name, args, &resource, opts...)
@@ -183,6 +192,16 @@ func (o PolicyIssueOutput) ToPolicyIssueOutput() PolicyIssueOutput {
 
 func (o PolicyIssueOutput) ToPolicyIssueOutputWithContext(ctx context.Context) PolicyIssueOutput {
 	return o
+}
+
+// The issue identifier
+func (o PolicyIssueOutput) IssueId() pulumi.StringOutput {
+	return o.ApplyT(func(v *PolicyIssue) pulumi.StringOutput { return v.IssueId }).(pulumi.StringOutput)
+}
+
+// The organization name
+func (o PolicyIssueOutput) OrgName() pulumi.StringOutput {
+	return o.ApplyT(func(v *PolicyIssue) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
 }
 
 // The policy definition that caused this issue. May be null if the policy has been deleted or is unavailable.

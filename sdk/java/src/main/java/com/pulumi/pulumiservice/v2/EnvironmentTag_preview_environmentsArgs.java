@@ -8,8 +8,6 @@ import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
 import java.lang.String;
 import java.util.Objects;
-import java.util.Optional;
-import javax.annotation.Nullable;
 
 
 public final class EnvironmentTag_preview_environmentsArgs extends com.pulumi.resources.ResourceArgs {
@@ -62,21 +60,6 @@ public final class EnvironmentTag_preview_environmentsArgs extends com.pulumi.re
     }
 
     /**
-     * The environment tag name
-     * 
-     */
-    @Import(name="tagName")
-    private @Nullable Output<String> tagName;
-
-    /**
-     * @return The environment tag name
-     * 
-     */
-    public Optional<Output<String>> tagName() {
-        return Optional.ofNullable(this.tagName);
-    }
-
-    /**
      * The value
      * 
      */
@@ -97,7 +80,6 @@ public final class EnvironmentTag_preview_environmentsArgs extends com.pulumi.re
         this.envName = $.envName;
         this.name = $.name;
         this.orgName = $.orgName;
-        this.tagName = $.tagName;
         this.value = $.value;
     }
 
@@ -180,27 +162,6 @@ public final class EnvironmentTag_preview_environmentsArgs extends com.pulumi.re
          */
         public Builder orgName(String orgName) {
             return orgName(Output.of(orgName));
-        }
-
-        /**
-         * @param tagName The environment tag name
-         * 
-         * @return builder
-         * 
-         */
-        public Builder tagName(@Nullable Output<String> tagName) {
-            $.tagName = tagName;
-            return this;
-        }
-
-        /**
-         * @param tagName The environment tag name
-         * 
-         * @return builder
-         * 
-         */
-        public Builder tagName(String tagName) {
-            return tagName(Output.of(tagName));
         }
 
         /**

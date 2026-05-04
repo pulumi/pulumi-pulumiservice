@@ -184,6 +184,10 @@ class GitLabIntegration(pulumi.CustomResource):
             __props__.__dict__["group_path"] = None
             __props__.__dict__["installed"] = None
             __props__.__dict__["valid"] = None
+        secret_opts = pulumi.ResourceOptions(additional_secret_outputs=["groupAccessTokenExpiration"])
+        opts = pulumi.ResourceOptions.merge(opts, secret_opts)
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["integrationId", "orgName"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(GitLabIntegration, __self__).__init__(
             'pulumiservice:v2:GitLabIntegration',
             resource_name,
@@ -217,6 +221,8 @@ class GitLabIntegration(pulumi.CustomResource):
         __props__.__dict__["group_name"] = None
         __props__.__dict__["group_path"] = None
         __props__.__dict__["installed"] = None
+        __props__.__dict__["integration_id"] = None
+        __props__.__dict__["org_name"] = None
         __props__.__dict__["valid"] = None
         return GitLabIntegration(resource_name, opts=opts, __props__=__props__)
 
@@ -307,6 +313,22 @@ class GitLabIntegration(pulumi.CustomResource):
         Whether the integration has been fully installed.
         """
         return pulumi.get(self, "installed")
+
+    @_builtins.property
+    @pulumi.getter(name="integrationId")
+    def integration_id(self) -> pulumi.Output[_builtins.str]:
+        """
+        The GitLab integration identifier
+        """
+        return pulumi.get(self, "integration_id")
+
+    @_builtins.property
+    @pulumi.getter(name="orgName")
+    def org_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The organization name
+        """
+        return pulumi.get(self, "org_name")
 
     @_builtins.property
     @pulumi.getter

@@ -46,6 +46,18 @@ namespace Pulumi.PulumiService.V2
         public Output<object?> OperationContext { get; private set; } = null!;
 
         /// <summary>
+        /// The organization name
+        /// </summary>
+        [Output("orgName")]
+        public Output<string> OrgName { get; private set; } = null!;
+
+        /// <summary>
+        /// The project name
+        /// </summary>
+        [Output("projectName")]
+        public Output<string> ProjectName { get; private set; } = null!;
+
+        /// <summary>
         /// The source from which the deployment settings were created.
         /// </summary>
         [Output("source")]
@@ -56,6 +68,12 @@ namespace Pulumi.PulumiService.V2
         /// </summary>
         [Output("sourceContext")]
         public Output<object?> SourceContext { get; private set; } = null!;
+
+        /// <summary>
+        /// The stack name
+        /// </summary>
+        [Output("stackName")]
+        public Output<string> StackName { get; private set; } = null!;
 
         /// <summary>
         /// A tag to identify the deployment settings configuration.
@@ -98,6 +116,12 @@ namespace Pulumi.PulumiService.V2
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
+                ReplaceOnChanges =
+                {
+                    "orgName",
+                    "projectName",
+                    "stackName",
+                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.

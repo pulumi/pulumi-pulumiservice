@@ -12,7 +12,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-// BatchUpdatePolicyGroup applies multiple update operations to the Policy Group efficiently. Each operation in the list uses the same fields as UpdatePolicyGroupRequest. Operations are grouped by type (adds, removes) and processed in batches for efficiency.
+// Creates a new Policy Group for an organization. Policy Groups define which Policy Packs are enforced on which stacks or cloud accounts, with configurable enforcement levels (advisory, mandatory, or disabled) per pack. This allows different policy strictness for different environments, such as advisory-only in development and mandatory in production.
 type PolicyGroup struct {
 	pulumi.CustomResourceState
 
@@ -30,6 +30,8 @@ type PolicyGroup struct {
 	Mode pulumi.StringOutput `pulumi:"mode"`
 	// The name of the policy group.
 	Name pulumi.StringOutput `pulumi:"name"`
+	// The organization name
+	OrgName pulumi.StringOutput `pulumi:"orgName"`
 	// List of stacks that are members of this policy group.
 	Stacks pulumi.ArrayOutput `pulumi:"stacks"`
 }
@@ -41,12 +43,19 @@ func NewPolicyGroup(ctx *pulumi.Context,
 		return nil, errors.New("missing one or more required arguments")
 	}
 
+	if args.EntityType == nil {
+		return nil, errors.New("invalid value for required argument 'EntityType'")
+	}
+	if args.Name == nil {
+		return nil, errors.New("invalid value for required argument 'Name'")
+	}
 	if args.OrgName == nil {
 		return nil, errors.New("invalid value for required argument 'OrgName'")
 	}
-	if args.PolicyGroup == nil {
-		return nil, errors.New("invalid value for required argument 'PolicyGroup'")
-	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"orgName",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource PolicyGroup
 	err := ctx.RegisterResource("pulumiservice:v2:PolicyGroup", name, args, &resource, opts...)
@@ -80,18 +89,30 @@ func (PolicyGroupState) ElementType() reflect.Type {
 }
 
 type policyGroupArgs struct {
+	// Agent pool ID for policy evaluation. Defaults to Pulumi hosted pool if not specified.
+	AgentPoolId *string `pulumi:"agentPoolId"`
+	// The type of entities this policy group applies to (stacks or accounts).
+	EntityType string `pulumi:"entityType"`
+	// The enforcement mode for the policy group (audit or preventative). Defaults to 'audit' for account policy groups, 'preventative' for stack policy groups.
+	Mode *string `pulumi:"mode"`
+	// The name of the new policy group.
+	Name string `pulumi:"name"`
 	// The organization name
 	OrgName string `pulumi:"orgName"`
-	// The policy group name
-	PolicyGroup string `pulumi:"policyGroup"`
 }
 
 // The set of arguments for constructing a PolicyGroup resource.
 type PolicyGroupArgs struct {
+	// Agent pool ID for policy evaluation. Defaults to Pulumi hosted pool if not specified.
+	AgentPoolId pulumi.StringPtrInput
+	// The type of entities this policy group applies to (stacks or accounts).
+	EntityType pulumi.StringInput
+	// The enforcement mode for the policy group (audit or preventative). Defaults to 'audit' for account policy groups, 'preventative' for stack policy groups.
+	Mode pulumi.StringPtrInput
+	// The name of the new policy group.
+	Name pulumi.StringInput
 	// The organization name
 	OrgName pulumi.StringInput
-	// The policy group name
-	PolicyGroup pulumi.StringInput
 }
 
 func (PolicyGroupArgs) ElementType() reflect.Type {
@@ -214,6 +235,11 @@ func (o PolicyGroupOutput) Mode() pulumi.StringOutput {
 // The name of the policy group.
 func (o PolicyGroupOutput) Name() pulumi.StringOutput {
 	return o.ApplyT(func(v *PolicyGroup) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
+}
+
+// The organization name
+func (o PolicyGroupOutput) OrgName() pulumi.StringOutput {
+	return o.ApplyT(func(v *PolicyGroup) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
 }
 
 // List of stacks that are members of this policy group.

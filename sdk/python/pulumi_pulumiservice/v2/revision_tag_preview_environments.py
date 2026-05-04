@@ -161,6 +161,8 @@ class RevisionTag_preview_environments(pulumi.CustomResource):
             __props__.__dict__["editor_name"] = None
             __props__.__dict__["modified"] = None
             __props__.__dict__["name"] = None
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["envName", "orgName", "tagName"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(RevisionTag_preview_environments, __self__).__init__(
             'pulumiservice:v2:RevisionTag_preview_environments',
             resource_name,
@@ -186,9 +188,12 @@ class RevisionTag_preview_environments(pulumi.CustomResource):
         __props__.__dict__["created"] = None
         __props__.__dict__["editor_login"] = None
         __props__.__dict__["editor_name"] = None
+        __props__.__dict__["env_name"] = None
         __props__.__dict__["modified"] = None
         __props__.__dict__["name"] = None
+        __props__.__dict__["org_name"] = None
         __props__.__dict__["revision"] = None
+        __props__.__dict__["tag_name"] = None
         return RevisionTag_preview_environments(resource_name, opts=opts, __props__=__props__)
 
     @_builtins.property
@@ -216,6 +221,14 @@ class RevisionTag_preview_environments(pulumi.CustomResource):
         return pulumi.get(self, "editor_name")
 
     @_builtins.property
+    @pulumi.getter(name="envName")
+    def env_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The environment name
+        """
+        return pulumi.get(self, "env_name")
+
+    @_builtins.property
     @pulumi.getter
     def modified(self) -> pulumi.Output[_builtins.str]:
         """
@@ -232,10 +245,26 @@ class RevisionTag_preview_environments(pulumi.CustomResource):
         return pulumi.get(self, "name")
 
     @_builtins.property
+    @pulumi.getter(name="orgName")
+    def org_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The organization name
+        """
+        return pulumi.get(self, "org_name")
+
+    @_builtins.property
     @pulumi.getter
     def revision(self) -> pulumi.Output[_builtins.int]:
         """
         The revision number this tag points to.
         """
         return pulumi.get(self, "revision")
+
+    @_builtins.property
+    @pulumi.getter(name="tagName")
+    def tag_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The revision tag name
+        """
+        return pulumi.get(self, "tag_name")
 

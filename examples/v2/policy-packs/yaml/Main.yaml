@@ -1,0 +1,15 @@
+resources:
+  pack:
+    type: pulumiservice:v2:PolicyPack
+    properties:
+      orgName: ${serviceOrg}
+      name: v2-example-policy-pack
+      displayName: v2 example policy pack
+      description: Demo policy pack created via v2 metadata-driven provider.
+      policies:
+        - name: no-public-buckets
+          description: Reject S3 buckets with public ACLs
+          enforcementLevel: advisory
+outputs:
+  policyPackName: ${pack.name}
+  policyPackVersion: ${pack.version}

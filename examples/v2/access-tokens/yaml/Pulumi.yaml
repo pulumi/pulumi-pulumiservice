@@ -1,0 +1,12 @@
+name: pulumicloud-v2-access-tokens
+runtime: yaml
+config:
+  serviceOrg:
+    type: string
+    default: service-provider-test-org
+  tokenSuffix:
+    type: string
+    default: dev
+  tokenDescription:
+    type: string
+    default: example v2 access token

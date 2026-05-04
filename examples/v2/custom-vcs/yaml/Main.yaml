@@ -1,0 +1,23 @@
+# CustomVCSIntegration registers a self-hosted git provider so Pulumi
+# Deployments can pull source from it. CustomVCSRepository declares an
+# individual repo on top of that integration. Real registration needs
+# valid credentials in the referenced ESC environment.
+resources:
+  integration:
+    type: pulumiservice:v2:CustomVCSIntegration
+    properties:
+      orgName: ${serviceOrg}
+      name: v2-custom-vcs-${vcsSuffix}
+      baseUrl: ${baseUrl}
+      vcsType: gitea
+      environment: ${envRef}
+  repository:
+    type: pulumiservice:v2:CustomVCSRepository
+    properties:
+      orgName: ${serviceOrg}
+      integrationId: ${integration.integrationId}
+      name: example-repo-${vcsSuffix}
+      displayName: Example Repository
+outputs:
+  integrationId: ${integration.integrationId}
+  repositoryId: ${repository.id}

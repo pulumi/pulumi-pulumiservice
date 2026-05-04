@@ -3016,6 +3016,12 @@
     "pulumiservice:v2:Account": {
       "description": "Creates a new Insights account. An Insights account represents a cloud provider account (e.g., AWS, Azure, OCI) configured for resource discovery.",
       "properties": {
+        "accountName": {
+          "type": "string",
+          "description": "The Insights account name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
         "agentPoolID": {
           "type": "string",
           "description": "The ID of the agent pool to run account discovery workflows.\nIf not specified, discovery will use the default agent pool."
@@ -3023,6 +3029,12 @@
         "name": {
           "type": "string",
           "description": "The name of the account."
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
         },
         "ownedBy": {
           "$ref": "pulumi.json#/Any",
@@ -3061,7 +3073,9 @@
         "name",
         "ownedBy",
         "provider",
-        "scheduledScanEnabled"
+        "scheduledScanEnabled",
+        "orgName",
+        "accountName"
       ],
       "inputProperties": {
         "accountName": {
@@ -3111,6 +3125,76 @@
         "provider"
       ]
     },
+    "pulumiservice:v2:AgentPool": {
+      "description": "Creates a new agent pool for an organization. Agent pools enable self-hosted deployment agents, allowing organizations to run Pulumi Deployments on their own infrastructure rather than Pulumi-managed infrastructure. This is useful for accessing private networks, meeting compliance requirements, or using custom execution environments. The response includes an access token (agent pool secret) that self-hosted agents use to authenticate when polling for deployment work. This token is only returned once at creation time and cannot be retrieved later.",
+      "properties": {
+        "agents": {
+          "type": "array",
+          "items": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "The agents"
+        },
+        "created": {
+          "type": "integer",
+          "description": "The creation timestamp"
+        },
+        "description": {
+          "type": "string",
+          "description": "The description"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name"
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "poolId": {
+          "type": "string",
+          "description": "The unique identifier"
+        }
+      },
+      "type": "object",
+      "required": [
+        "agents",
+        "created",
+        "description",
+        "name",
+        "poolId",
+        "orgName"
+      ],
+      "inputProperties": {
+        "description": {
+          "type": "string",
+          "description": "The description"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name"
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "poolId": {
+          "type": "string",
+          "description": "The agent pool identifier",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        }
+      },
+      "requiredInputs": [
+        "description",
+        "name",
+        "orgName"
+      ]
+    },
     "pulumiservice:v2:AuditLogExportConfiguration": {
       "description": "Creates or updates the organization's automated audit log export configuration. Audit log export enables automatic delivery of audit events to an S3 bucket for long-term retention and SIEM integration. The configuration includes the S3 bucket details and IAM role for authentication. This feature is available on Business Critical edition.",
       "properties": {
@@ -3122,6 +3206,12 @@
           "$ref": "pulumi.json#/Any",
           "description": "The result of the last audit log export attempt."
         },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
         "s3Config": {
           "$ref": "pulumi.json#/Any",
           "description": "The S3 configuration for exporting audit logs."
@@ -3131,7 +3221,8 @@
       "required": [
         "enabled",
         "lastResult",
-        "s3Config"
+        "s3Config",
+        "orgName"
       ],
       "inputProperties": {
         "newEnabled": {
@@ -3162,9 +3253,19 @@
           "type": "string",
           "description": "The creation timestamp"
         },
+        "issuerId": {
+          "type": "string",
+          "description": "The unique identifier"
+        },
         "modified": {
           "type": "string",
           "description": "The last modification timestamp"
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
         },
         "policies": {
           "type": "array",
@@ -3173,6 +3274,12 @@
           },
           "description": "List of policies"
         },
+        "policyId": {
+          "type": "string",
+          "description": "The policy identifier",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
         "version": {
           "type": "integer",
           "description": "The version number"
@@ -3180,8 +3287,11 @@
       },
       "type": "object",
       "required": [
+        "issuerId",
         "policies",
-        "version"
+        "version",
+        "orgName",
+        "policyId"
       ],
       "inputProperties": {
         "issuerId": {
@@ -3239,6 +3349,18 @@
           "type": "boolean",
           "description": "Does the org have an Azure DevOps app integration configured"
         },
+        "integrationId": {
+          "type": "string",
+          "description": "The Azure DevOps integration identifier",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
         "organization": {
           "$ref": "pulumi.json#/Any",
           "description": "Metadata about the Azure DevOps organization linked to the Pulumi organization"
@@ -3255,7 +3377,9 @@
       "type": "object",
       "required": [
         "installed",
-        "valid"
+        "valid",
+        "orgName",
+        "integrationId"
       ],
       "inputProperties": {
         "disableDetailedDiff": {
@@ -3319,6 +3443,18 @@
           "type": "boolean",
           "description": "Whether this integration is fully installed and operational."
         },
+        "integrationId": {
+          "type": "string",
+          "description": "The BitBucket integration identifier",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
         "valid": {
           "type": "boolean",
           "description": "Whether the integration's credentials are currently valid."
@@ -3344,7 +3480,9 @@
         "installed",
         "valid",
         "workspaceSlug",
-        "workspaceUuid"
+        "workspaceUuid",
+        "orgName",
+        "integrationId"
       ],
       "inputProperties": {
         "disableDetailedDiff": {
@@ -3377,6 +3515,157 @@
         "orgName"
       ]
     },
+    "pulumiservice:v2:CustomVCSIntegration": {
+      "description": "Creates a new custom VCS integration for an organization. Custom VCS integrations allow connecting self-hosted or third-party version control systems (e.g. Gitea, Forgejo, Bitbucket Server) to Pulumi Deployments. Credentials are managed via ESC environments, and deployments are triggered by inbound webhooks. Returns the created integration including its webhook URL and HMAC secret for signature verification.",
+      "properties": {
+        "baseUrl": {
+          "type": "string",
+          "description": "URL prefix for repositories covered by this integration"
+        },
+        "created": {
+          "type": "string",
+          "description": "ISO 8601 timestamp of when the integration was created"
+        },
+        "environment": {
+          "type": "string",
+          "description": "ESC environment reference in 'project/envName' format containing VCS credentials"
+        },
+        "integrationId": {
+          "type": "string",
+          "description": "Unique identifier (UUID) for this integration"
+        },
+        "modified": {
+          "type": "string",
+          "description": "ISO 8601 timestamp of when the integration was last modified"
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable name for the integration"
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "repositories": {
+          "type": "array",
+          "items": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "List of repositories configured on this integration"
+        },
+        "vcsType": {
+          "type": "string",
+          "description": "Version control system type"
+        },
+        "webhookSecret": {
+          "type": "string",
+          "description": "HMAC secret for webhook signature verification. Only returned on integration creation; subsequent GET requests omit this field.",
+          "secret": true
+        },
+        "webhookUrl": {
+          "type": "string",
+          "description": "Full webhook endpoint URL that the external VCS should POST events to. This URL is generated by the service and includes the integration ID."
+        }
+      },
+      "type": "object",
+      "required": [
+        "baseUrl",
+        "created",
+        "environment",
+        "integrationId",
+        "modified",
+        "name",
+        "vcsType",
+        "orgName"
+      ],
+      "inputProperties": {
+        "baseUrl": {
+          "type": "string",
+          "description": "URL prefix for repositories covered by this integration (e.g. 'https://gitea.example.com/myorg'). Used to match repositories to integrations."
+        },
+        "environment": {
+          "type": "string",
+          "description": "ESC environment reference in 'project/envName' format containing VCS credentials (e.g. SSH keys, access tokens) used for repository operations"
+        },
+        "integrationId": {
+          "type": "string",
+          "description": "The custom VCS integration identifier",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable name for the integration, unique within the organization (e.g. 'Gitea Production')"
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "vcsType": {
+          "type": "string",
+          "description": "Version control system type. Defaults to 'git' if not specified."
+        }
+      },
+      "requiredInputs": [
+        "baseUrl",
+        "environment",
+        "name",
+        "orgName"
+      ]
+    },
+    "pulumiservice:v2:CustomVCSRepository": {
+      "description": "Adds a repository to a custom VCS integration. The repository name must be unique within the integration. Returns 409 Conflict if a repository with the same name is already configured.",
+      "properties": {
+        "integrationId": {
+          "type": "string",
+          "description": "The custom VCS integration identifier",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        }
+      },
+      "type": "object",
+      "required": [
+        "orgName",
+        "integrationId"
+      ],
+      "inputProperties": {
+        "displayName": {
+          "type": "string",
+          "description": "Human-readable display name for the repository. If not provided, the name is used for display purposes."
+        },
+        "integrationId": {
+          "type": "string",
+          "description": "The custom VCS integration identifier",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "name": {
+          "type": "string",
+          "description": "Repository name or path, joined with the integration's base URL to form the clone URL (e.g. 'myrepo' or 'subgroup/myrepo')"
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        }
+      },
+      "requiredInputs": [
+        "integrationId",
+        "name",
+        "orgName"
+      ]
+    },
     "pulumiservice:v2:DefaultOrganization": {
       "description": "UpdateDefaultOrganization sets the default organization for the current user.",
       "properties": {
@@ -3390,12 +3679,19 @@
             "$ref": "pulumi.json#/Any"
           },
           "description": "Messages is a list of messages that should be displayed to the user that contextualize\nthe default org; for example: warning new users if their default org as returned by the\nservice is on an expiring trial and not free tier, with possible recommendations\non how to configure their default org locally.\nCan be possibly empty."
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
         }
       },
       "type": "object",
       "required": [
         "GitHubLogin",
-        "Messages"
+        "Messages",
+        "orgName"
       ],
       "inputProperties": {
         "orgName": {
@@ -3432,6 +3728,18 @@
           "$ref": "pulumi.json#/Any",
           "description": "The operation context defining pre-run and post-run commands and environment variables."
         },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "projectName": {
+          "type": "string",
+          "description": "The project name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
         "source": {
           "type": "string",
           "description": "The source from which the deployment settings were created."
@@ -3439,6 +3747,12 @@
         "sourceContext": {
           "$ref": "pulumi.json#/Any",
           "description": "The source context defining where the source code is located."
+        },
+        "stackName": {
+          "type": "string",
+          "description": "The stack name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
         },
         "tag": {
           "type": "string",
@@ -3454,6 +3768,11 @@
         }
       },
       "type": "object",
+      "required": [
+        "orgName",
+        "projectName",
+        "stackName"
+      ],
       "inputProperties": {
         "agentPoolID": {
           "type": "string",
@@ -3515,28 +3834,25 @@
     "pulumiservice:v2:EnvironmentDraft": {
       "description": "Creates a new draft change request for a Pulumi ESC environment. Drafts allow proposing changes to an environment definition that can be reviewed and approved before being applied. This is part of the approvals workflow for environments. Returns a ChangeRequestRef containing the draft identifier. Requires the Approvals feature to be enabled for the organization.",
       "properties": {
-        "changeRequestId": {
-          "type": "string",
-          "description": "The change request identifier"
-        },
-        "latestRevisionNumber": {
-          "type": "integer",
-          "description": "The latest revision number"
-        }
-      },
-      "type": "object",
-      "inputProperties": {
         "changeRequestID": {
           "type": "string",
           "description": "The change request ID",
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
         },
+        "changeRequestId": {
+          "type": "string",
+          "description": "The change request identifier"
+        },
         "envName": {
           "type": "string",
           "description": "The environment name",
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
+        },
+        "latestRevisionNumber": {
+          "type": "integer",
+          "description": "The latest revision number"
         },
         "orgName": {
           "type": "string",
@@ -3551,25 +3867,13 @@
           "willReplaceOnChanges": true
         }
       },
-      "requiredInputs": [
-        "envName",
-        "orgName",
-        "projectName"
-      ]
-    },
-    "pulumiservice:v2:EnvironmentDraft_preview": {
-      "description": "Creates a new draft change request for a Pulumi ESC environment. Drafts allow proposing changes to an environment definition that can be reviewed and approved before being applied. This is part of the approvals workflow for environments. Returns a ChangeRequestRef containing the draft identifier. Requires the Approvals feature to be enabled for the organization.",
-      "properties": {
-        "changeRequestId": {
-          "type": "string",
-          "description": "The change request identifier"
-        },
-        "latestRevisionNumber": {
-          "type": "integer",
-          "description": "The latest revision number"
-        }
-      },
       "type": "object",
+      "required": [
+        "orgName",
+        "projectName",
+        "envName",
+        "changeRequestID"
+      ],
       "inputProperties": {
         "changeRequestID": {
           "type": "string",
@@ -3616,6 +3920,12 @@
           },
           "description": "The action definition, which varies based on the action kind."
         },
+        "envName": {
+          "type": "string",
+          "description": "The environment name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
         "kind": {
           "type": "string",
           "description": "The kind of action to be executed."
@@ -3636,13 +3946,29 @@
           "type": "string",
           "description": "The organization ID that owns this scheduled action."
         },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
         "paused": {
           "type": "boolean",
           "description": "Whether the scheduled action is currently paused."
         },
+        "projectName": {
+          "type": "string",
+          "description": "The project name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
         "scheduleCron": {
           "type": "string",
           "description": "A cron expression defining the recurring schedule."
+        },
+        "scheduleID": {
+          "type": "string",
+          "description": "The unique identifier for this scheduled action."
         },
         "scheduleOnce": {
           "type": "string",
@@ -3658,7 +3984,11 @@
         "modified",
         "nextExecution",
         "orgID",
-        "paused"
+        "paused",
+        "scheduleID",
+        "orgName",
+        "projectName",
+        "envName"
       ],
       "inputProperties": {
         "envName": {
@@ -3710,11 +4040,32 @@
         "deletionProtected": {
           "type": "boolean",
           "description": "Whether the environment is protected from deletion."
+        },
+        "envName": {
+          "type": "string",
+          "description": "The environment name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "projectName": {
+          "type": "string",
+          "description": "The project name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
         }
       },
       "type": "object",
       "required": [
-        "deletionProtected"
+        "deletionProtected",
+        "orgName",
+        "projectName",
+        "envName"
       ],
       "inputProperties": {
         "deletionProtected": {
@@ -3761,6 +4112,12 @@
           "type": "string",
           "description": "The display name of the user who last edited the tag."
         },
+        "envName": {
+          "type": "string",
+          "description": "The environment name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
         "modified": {
           "type": "string",
           "description": "The timestamp when the tag was last modified."
@@ -3768,6 +4125,18 @@
         "name": {
           "type": "string",
           "description": "The name of the tag."
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "projectName": {
+          "type": "string",
+          "description": "The project name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
         },
         "value": {
           "type": "string",
@@ -3781,7 +4150,10 @@
         "editorName",
         "modified",
         "name",
-        "value"
+        "value",
+        "orgName",
+        "projectName",
+        "envName"
       ],
       "inputProperties": {
         "envName": {
@@ -3803,12 +4175,6 @@
         "projectName": {
           "type": "string",
           "description": "The project name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "tagName": {
-          "type": "string",
-          "description": "The environment tag name",
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
         },
@@ -3840,6 +4206,12 @@
           "type": "string",
           "description": "The display name of the user who last edited the tag."
         },
+        "envName": {
+          "type": "string",
+          "description": "The environment name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
         "modified": {
           "type": "string",
           "description": "The timestamp when the tag was last modified."
@@ -3847,6 +4219,12 @@
         "name": {
           "type": "string",
           "description": "The name of the tag."
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
         },
         "value": {
           "type": "string",
@@ -3860,7 +4238,9 @@
         "editorName",
         "modified",
         "name",
-        "value"
+        "value",
+        "orgName",
+        "envName"
       ],
       "inputProperties": {
         "envName": {
@@ -3879,12 +4259,6 @@
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
         },
-        "tagName": {
-          "type": "string",
-          "description": "The environment tag name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
         "value": {
           "type": "string",
           "description": "The value"
@@ -3899,14 +4273,33 @@
     },
     "pulumiservice:v2:Environment_esc_environments": {
       "description": "Creates a new Pulumi ESC (Environments, Secrets, and Configuration) environment within the specified organization. The request body must include the project name and the environment name. Environment names must be unique within a project and may only contain alphanumeric characters, hyphens, underscores, and periods. The newly created environment starts with an empty YAML definition that can be updated via the UpdateEnvironment endpoint.",
-      "type": "object",
-      "inputProperties": {
-        "envName": {
+      "properties": {
+        "name": {
           "type": "string",
           "description": "The environment name",
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
         },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "project": {
+          "type": "string",
+          "description": "The project name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        }
+      },
+      "type": "object",
+      "required": [
+        "orgName",
+        "project",
+        "name"
+      ],
+      "inputProperties": {
         "name": {
           "type": "string",
           "description": "The name of the environment."
@@ -3920,12 +4313,6 @@
         "project": {
           "type": "string",
           "description": "The project name for the environment."
-        },
-        "projectName": {
-          "type": "string",
-          "description": "The project name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
         }
       },
       "requiredInputs": [
@@ -3936,7 +4323,25 @@
     },
     "pulumiservice:v2:Environment_preview_environments": {
       "description": "Creates a new Pulumi ESC (Environments, Secrets, and Configuration) environment within the specified organization. The request body must include the project name and the environment name. Environment names must be unique within a project and may only contain alphanumeric characters, hyphens, underscores, and periods. The newly created environment starts with an empty YAML definition that can be updated via the UpdateEnvironment endpoint.",
+      "properties": {
+        "envName": {
+          "type": "string",
+          "description": "The environment name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        }
+      },
       "type": "object",
+      "required": [
+        "orgName",
+        "envName"
+      ],
       "inputProperties": {
         "envName": {
           "type": "string",
@@ -3973,9 +4378,19 @@
           "type": "boolean",
           "description": "Whether the change gate is enabled"
         },
+        "gateID": {
+          "type": "string",
+          "description": "Unique identifier of the change gate"
+        },
         "name": {
           "type": "string",
           "description": "Name of the change gate"
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
         },
         "rule": {
           "$ref": "pulumi.json#/Any",
@@ -3989,9 +4404,11 @@
       "type": "object",
       "required": [
         "enabled",
+        "gateID",
         "name",
         "rule",
-        "target"
+        "target",
+        "orgName"
       ],
       "inputProperties": {
         "enabled": {
@@ -4082,6 +4499,12 @@
           "type": "integer",
           "description": "The GitHub installation ID."
         },
+        "integrationId": {
+          "type": "string",
+          "description": "The GitHub Enterprise integration identifier",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
         "isOrganization": {
           "type": "boolean",
           "description": "Whether the GitHub account is an organization (as opposed to a personal account)."
@@ -4096,6 +4519,12 @@
             "$ref": "pulumi.json#/Any"
           },
           "description": "Neo GitHub App permission requirements for this installation."
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
         }
       },
       "type": "object",
@@ -4108,7 +4537,9 @@
         "hasMembersPermission",
         "installationID",
         "isOrganization",
-        "isSelfHosted"
+        "isSelfHosted",
+        "orgName",
+        "integrationId"
       ],
       "inputProperties": {
         "disableCodeAccessForReviews": {
@@ -4196,6 +4627,12 @@
           "type": "integer",
           "description": "The GitHub installation ID."
         },
+        "integrationId": {
+          "type": "string",
+          "description": "The GitHub App integration identifier",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
         "isOrganization": {
           "type": "boolean",
           "description": "Whether the GitHub account is an organization (as opposed to a personal account)."
@@ -4210,6 +4647,12 @@
             "$ref": "pulumi.json#/Any"
           },
           "description": "Neo GitHub App permission requirements for this installation."
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
         }
       },
       "type": "object",
@@ -4222,7 +4665,9 @@
         "hasMembersPermission",
         "installationID",
         "isOrganization",
-        "isSelfHosted"
+        "isSelfHosted",
+        "orgName",
+        "integrationId"
       ],
       "inputProperties": {
         "disableCodeAccessForReviews": {
@@ -4292,7 +4737,8 @@
         },
         "groupAccessTokenExpiration": {
           "type": "string",
-          "description": "The expiration date of the group access token, if one is being used for authentication."
+          "description": "The expiration date of the group access token, if one is being used for authentication.",
+          "secret": true
         },
         "groupName": {
           "type": "string",
@@ -4306,6 +4752,18 @@
           "type": "boolean",
           "description": "Whether the integration has been fully installed."
         },
+        "integrationId": {
+          "type": "string",
+          "description": "The GitLab integration identifier",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
         "valid": {
           "type": "boolean",
           "description": "Whether the integration is currently valid (tokens, hooks, etc.)."
@@ -4318,7 +4776,9 @@
         "disablePRComments",
         "gitLabGroupId",
         "installed",
-        "valid"
+        "valid",
+        "orgName",
+        "integrationId"
       ],
       "inputProperties": {
         "disableDetailedDiff": {
@@ -4352,7 +4812,7 @@
       ]
     },
     "pulumiservice:v2:OidcIssuer": {
-      "description": "Updates an existing OIDC issuer registration for an organization. This can be used to modify the issuer name, audience restrictions, trust policies, or other configuration. The issuer URL itself cannot be changed after creation. The issuer name is required in the update request.",
+      "description": "Registers a new OIDC issuer for an organization, establishing a trust relationship with an external identity provider. Once registered, the identity provider can issue signed, short-lived tokens that are exchanged for temporary Pulumi Cloud credentials during deployments. This eliminates the need to store long-lived access tokens. Supported providers include AWS, Azure, Google Cloud, GitHub Actions, and any OIDC-compliant identity provider. The request must include the issuer URL, and the service will fetch the provider's public signing keys to verify token authenticity.",
       "properties": {
         "created": {
           "type": "string",
@@ -4361,6 +4821,10 @@
         "issuer": {
           "type": "string",
           "description": "The OIDC issuer identifier, typically a URL that uniquely identifies the identity provider."
+        },
+        "issuerId": {
+          "type": "string",
+          "description": "The unique identifier of the registered OIDC issuer."
         },
         "jwks": {
           "$ref": "pulumi.json#/Any",
@@ -4382,6 +4846,12 @@
           "type": "string",
           "description": "The display name of the OIDC issuer."
         },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
         "thumbprints": {
           "type": "array",
           "items": {
@@ -4397,8 +4867,10 @@
       "type": "object",
       "required": [
         "issuer",
+        "issuerId",
         "name",
-        "url"
+        "url",
+        "orgName"
       ],
       "inputProperties": {
         "issuerId": {
@@ -4409,15 +4881,15 @@
         },
         "jwks": {
           "$ref": "pulumi.json#/Any",
-          "description": "The updated JSON Web Key Set for the OIDC issuer."
+          "description": "The JSON Web Key Set for the OIDC issuer."
         },
         "maxExpiration": {
           "type": "integer",
-          "description": "The updated maximum token expiration time in seconds."
+          "description": "The maximum token expiration time in seconds."
         },
         "name": {
           "type": "string",
-          "description": "The updated display name of the OIDC issuer."
+          "description": "The display name of the OIDC issuer."
         },
         "orgName": {
           "type": "string",
@@ -4430,12 +4902,17 @@
           "items": {
             "type": "string"
           },
-          "description": "Updated SHA-1 certificate thumbprints used to verify the OIDC issuer's TLS certificate."
+          "description": "SHA-1 certificate thumbprints used to verify the OIDC issuer's TLS certificate."
+        },
+        "url": {
+          "type": "string",
+          "description": "The URL of the OIDC issuer."
         }
       },
       "requiredInputs": [
-        "issuerId",
-        "orgName"
+        "name",
+        "orgName",
+        "url"
       ]
     },
     "pulumiservice:v2:OpenEnvironmentRequest": {
@@ -4445,15 +4922,43 @@
           "type": "integer",
           "description": "Total duration that the resulting grant can be used to access the environment open endpoint (after first open)"
         },
+        "changeRequestID": {
+          "type": "string",
+          "description": "The change request ID",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "envName": {
+          "type": "string",
+          "description": "The environment name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
         "grantExpirationSeconds": {
           "type": "integer",
           "description": "Time from application of the request until the resulting grant expires"
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "projectName": {
+          "type": "string",
+          "description": "The project name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
         }
       },
       "type": "object",
       "required": [
         "accessDurationSeconds",
-        "grantExpirationSeconds"
+        "grantExpirationSeconds",
+        "orgName",
+        "projectName",
+        "envName",
+        "changeRequestID"
       ],
       "inputProperties": {
         "accessDurationSeconds": {
@@ -4497,6 +5002,228 @@
         "projectName"
       ]
     },
+    "pulumiservice:v2:OrgTemplateCollection": {
+      "description": "Creates a new template collection (source) for an organization. Template collections define where project templates are sourced from, such as a Git repository. Organization members can use these templates to create new stacks with pre-configured infrastructure code.",
+      "properties": {
+        "destination": {
+          "$ref": "pulumi.json#/Any",
+          "description": "Deprecated - use destinationURL instead."
+        },
+        "destinationURL": {
+          "type": "string",
+          "description": "The destination URL for the template source."
+        },
+        "error": {
+          "type": "string",
+          "description": "An error message if the template source is invalid. Omitted or empty when the source is valid."
+        },
+        "isValid": {
+          "type": "boolean",
+          "description": "Whether the template source configuration is valid."
+        },
+        "name": {
+          "type": "string",
+          "description": "The human-readable name for this template source."
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "sourceURL": {
+          "type": "string",
+          "description": "The source URL to fetch templates from."
+        },
+        "templateID": {
+          "type": "string",
+          "description": "The unique identifier of the template source."
+        }
+      },
+      "type": "object",
+      "required": [
+        "isValid",
+        "name",
+        "sourceURL",
+        "templateID",
+        "orgName"
+      ],
+      "inputProperties": {
+        "destination": {
+          "$ref": "pulumi.json#/Any",
+          "description": "deprecated - use DestinationURL instead"
+        },
+        "destinationURL": {
+          "type": "string",
+          "description": "The destination URL for the template source."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the template source."
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "sourceURL": {
+          "type": "string",
+          "description": "The source URL to fetch templates from."
+        }
+      },
+      "requiredInputs": [
+        "name",
+        "orgName",
+        "sourceURL"
+      ]
+    },
+    "pulumiservice:v2:OrgToken": {
+      "description": "Generates a new access token scoped to the organization for use in CI/CD pipelines and automated workflows. Organization tokens belong to the organization rather than individual users, ensuring that access is not disrupted when team members leave.\n\nThe `name` field must be unique across the organization (including deleted tokens) and cannot exceed 40 characters. The `expires` field accepts a unix epoch timestamp up to two years from the present, or `0` for no expiry (default).\n\n**Important:** The token value in the response is only returned once at creation time and cannot be retrieved later. Audit logs for actions performed with organization tokens are attributed to the organization rather than an individual user.",
+      "properties": {
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "tokenId": {
+          "type": "string",
+          "description": "The unique identifier"
+        },
+        "tokenValue": {
+          "type": "string",
+          "description": "The token value",
+          "secret": true
+        }
+      },
+      "type": "object",
+      "required": [
+        "tokenId",
+        "tokenValue",
+        "orgName"
+      ],
+      "inputProperties": {
+        "admin": {
+          "type": "boolean",
+          "description": "Whether the entity has admin privileges"
+        },
+        "description": {
+          "type": "string",
+          "description": "The description"
+        },
+        "expires": {
+          "type": "integer",
+          "description": "The expiration time"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name"
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "reason": {
+          "type": "string",
+          "description": "Audit log reason for creating this token",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "roleID": {
+          "type": "string",
+          "description": "The role identifier"
+        }
+      },
+      "requiredInputs": [
+        "admin",
+        "description",
+        "expires",
+        "name",
+        "orgName"
+      ]
+    },
+    "pulumiservice:v2:OrganizationMember": {
+      "description": "Adds an existing Pulumi user to an organization with a built-in role. **Important:** The user must have already signed up for a Pulumi account before they can be added to an organization.\n\nThis endpoint only assigns built-in roles. To onboard a user with a custom role, use the organization invite flow (`BatchCreateOrgInviteEmail`) and set `roleId` on the invite — the custom role is applied when the user accepts. Alternatively, add the user here with a built-in role and then call `UpdateOrganizationMember` with `fgaRoleId` to reassign.\n\nReturns the newly created organization member record. Returns 409 if the user is already a member of the organization.",
+      "properties": {
+        "created": {
+          "type": "string",
+          "description": "When the member joined the organization."
+        },
+        "fgaRole": {
+          "$ref": "pulumi.json#/Any",
+          "description": "The role currently assigned to this member — either a built-in role (member, admin, billingManager) or a custom role. Falls back to the organization's default role if no role is assigned directly."
+        },
+        "knownToPulumi": {
+          "type": "boolean",
+          "description": "KnownToPulumi returns if the organization member has a Pulumi account."
+        },
+        "links": {
+          "$ref": "pulumi.json#/Any",
+          "description": "Links to the member in the Pulumi Console"
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "role": {
+          "type": "string",
+          "description": "**Deprecated:** Use `fgaRole` instead. The member's built-in role within the organization. For members assigned a custom role, this is the closest built-in projection (`member`, `admin`, or `billingManager`) and may lose detail; `fgaRole` is authoritative."
+        },
+        "user": {
+          "$ref": "pulumi.json#/Any",
+          "description": "The user information for this organization member."
+        },
+        "userLogin": {
+          "type": "string",
+          "description": "The user login name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "virtualAdmin": {
+          "type": "boolean",
+          "description": "VirtualAdmin indicates that the member does not have admin access on the\nbacking identity provider, but does have admin access to the Pulumi organization."
+        }
+      },
+      "type": "object",
+      "required": [
+        "created",
+        "fgaRole",
+        "knownToPulumi",
+        "role",
+        "user",
+        "virtualAdmin",
+        "orgName",
+        "userLogin"
+      ],
+      "inputProperties": {
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "role": {
+          "type": "string",
+          "description": "The built-in role assigned to the new member. Must be `member`, `admin`, or `billingManager`."
+        },
+        "userLogin": {
+          "type": "string",
+          "description": "The user login name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        }
+      },
+      "requiredInputs": [
+        "orgName",
+        "role",
+        "userLogin"
+      ]
+    },
     "pulumiservice:v2:OrganizationWebhook": {
       "description": "Creates a new webhook for an organization to notify external services when events occur. Webhooks can be configured to fire on stack events (created, deleted, update succeeded/failed), deployment events (queued, started, succeeded, failed), drift detection events, and policy violation events (mandatory, advisory).\n\nThe `format` field accepts: `raw` (default), `slack`, `ms_teams`, or `pulumi_deployments`.\n\nThe `filters` field accepts a list of event types to subscribe to. See the [webhook event filtering documentation](https://www.pulumi.com/docs/pulumi-cloud/webhooks/#event-filtering) for available filters.\n\nThe optional `secret` field sets the HMAC key for signature verification via the `Pulumi-Webhook-Signature` header. See the [webhook headers documentation](https://www.pulumi.com/docs/pulumi-cloud/webhooks/#headers) for details.",
       "properties": {
@@ -4532,19 +5259,16 @@
         },
         "hasSecret": {
           "type": "boolean",
-          "description": "HasSecret is true if the webhook has a secret. This is used to determine whether\nto show that there is a secret in the UI."
+          "description": "HasSecret is true if the webhook has a secret. This is used to determine whether\nto show that there is a secret in the UI.",
+          "secret": true
         },
         "name": {
           "type": "string",
-          "description": "The unique identifier name for the webhook within its scope.",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
+          "description": "The unique identifier name for the webhook within its scope."
         },
         "organizationName": {
           "type": "string",
-          "description": "The organization that owns this webhook.",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
+          "description": "The organization that owns this webhook."
         },
         "payloadUrl": {
           "type": "string",
@@ -4610,29 +5334,13 @@
           },
           "description": "Event groups this webhook subscribes to (e.g., 'stacks', 'deployments')."
         },
-        "hookName": {
-          "type": "string",
-          "description": "The webhook name identifier",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
         "name": {
           "type": "string",
-          "description": "The unique identifier name for the webhook within its scope.",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
+          "description": "The unique identifier name for the webhook within its scope."
         },
         "organizationName": {
           "type": "string",
-          "description": "The organization that owns this webhook.",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
+          "description": "The organization that owns this webhook."
         },
         "payloadUrl": {
           "type": "string",
@@ -4644,8 +5352,7 @@
         },
         "secret": {
           "type": "string",
-          "description": "Secret will be omitted when returned from the service.",
-          "secret": true
+          "description": "Secret will be omitted when returned from the service."
         },
         "stackName": {
           "type": "string",
@@ -4656,13 +5363,51 @@
         "active",
         "displayName",
         "name",
-        "orgName",
         "organizationName",
         "payloadUrl"
       ]
     },
+    "pulumiservice:v2:PersonalToken": {
+      "description": "Creates a new personal access token for the authenticated user. The request body includes a description for the token and an optional expiration time. The response includes the token ID and the tokenValue (prefixed with 'pul-'). The token value is only returned once at creation time and cannot be retrieved later.",
+      "properties": {
+        "tokenId": {
+          "type": "string",
+          "description": "The unique identifier"
+        },
+        "tokenValue": {
+          "type": "string",
+          "description": "The token value",
+          "secret": true
+        }
+      },
+      "type": "object",
+      "required": [
+        "tokenId",
+        "tokenValue"
+      ],
+      "inputProperties": {
+        "description": {
+          "type": "string",
+          "description": "The description"
+        },
+        "expires": {
+          "type": "integer",
+          "description": "The expiration time"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Tracks the context that triggered token creation (e.g., redirect URL or referral source)",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        }
+      },
+      "requiredInputs": [
+        "description",
+        "expires"
+      ]
+    },
     "pulumiservice:v2:PolicyGroup": {
-      "description": "BatchUpdatePolicyGroup applies multiple update operations to the Policy Group efficiently. Each operation in the list uses the same fields as UpdatePolicyGroupRequest. Operations are grouped by type (adds, removes) and processed in batches for efficiency.",
+      "description": "Creates a new Policy Group for an organization. Policy Groups define which Policy Packs are enforced on which stacks or cloud accounts, with configurable enforcement levels (advisory, mandatory, or disabled) per pack. This allows different policy strictness for different environments, such as advisory-only in development and mandatory in production.",
       "properties": {
         "accounts": {
           "type": "array",
@@ -4698,6 +5443,12 @@
           "type": "string",
           "description": "The name of the policy group."
         },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
         "stacks": {
           "type": "array",
           "items": {
@@ -4714,30 +5465,54 @@
         "isOrgDefault",
         "mode",
         "name",
-        "stacks"
+        "stacks",
+        "orgName"
       ],
       "inputProperties": {
+        "agentPoolId": {
+          "type": "string",
+          "description": "Agent pool ID for policy evaluation. Defaults to Pulumi hosted pool if not specified."
+        },
+        "entityType": {
+          "type": "string",
+          "description": "The type of entities this policy group applies to (stacks or accounts)."
+        },
+        "mode": {
+          "type": "string",
+          "description": "The enforcement mode for the policy group (audit or preventative). Defaults to 'audit' for account policy groups, 'preventative' for stack policy groups."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the new policy group."
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        }
+      },
+      "requiredInputs": [
+        "entityType",
+        "name",
+        "orgName"
+      ]
+    },
+    "pulumiservice:v2:PolicyIssue": {
+      "description": "Updates a policy issue's triage status and other mutable fields. All body fields are optional — only provide the fields you want to update.\n\n- `status`: `open`, `in_progress`, `by_design`, `fixed`, or `ignored`\n- `priority`: `p0`, `p1`, `p2`, `p3`, or `p4`\n- `assignedTo`: username to assign the issue to, or `null` to unassign",
+      "properties": {
+        "issueId": {
+          "type": "string",
+          "description": "The issue identifier",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
         "orgName": {
           "type": "string",
           "description": "The organization name",
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
         },
-        "policyGroup": {
-          "type": "string",
-          "description": "The policy group name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        }
-      },
-      "requiredInputs": [
-        "orgName",
-        "policyGroup"
-      ]
-    },
-    "pulumiservice:v2:PolicyIssue": {
-      "description": "Updates a policy issue's triage status and other mutable fields. All body fields are optional — only provide the fields you want to update.\n\n- `status`: `open`, `in_progress`, `by_design`, `fixed`, or `ignored`\n- `priority`: `p0`, `p1`, `p2`, `p3`, or `p4`\n- `assignedTo`: username to assign the issue to, or `null` to unassign",
-      "properties": {
         "policy": {
           "$ref": "pulumi.json#/Any",
           "description": "The policy definition that caused this issue. May be null if the policy has been deleted or is unavailable."
@@ -4748,6 +5523,10 @@
         }
       },
       "type": "object",
+      "required": [
+        "orgName",
+        "issueId"
+      ],
       "inputProperties": {
         "assignedTo": {
           "type": "string",
@@ -4794,6 +5573,12 @@
           "type": "string",
           "description": "The unique name of the policy pack."
         },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
         "policies": {
           "type": "array",
           "items": {
@@ -4817,7 +5602,8 @@
         "name",
         "policies",
         "version",
-        "versionTag"
+        "versionTag",
+        "orgName"
       ],
       "inputProperties": {
         "description": {
@@ -4851,12 +5637,6 @@
             "$ref": "pulumi.json#/Any"
           },
           "description": "The Policies outline the specific Policies in the package, and are derived\nfrom the package by the CLI."
-        },
-        "policyPackName": {
-          "type": "string",
-          "description": "The policy pack name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
         },
         "provider": {
           "type": "string",
@@ -4910,6 +5690,12 @@
           "type": "string",
           "description": "The display name of the user who last edited the tag."
         },
+        "envName": {
+          "type": "string",
+          "description": "The environment name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
         "modified": {
           "type": "string",
           "description": "The timestamp when the tag was last modified."
@@ -4918,9 +5704,27 @@
           "type": "string",
           "description": "The name of the tag."
         },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "projectName": {
+          "type": "string",
+          "description": "The project name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
         "revision": {
           "type": "integer",
           "description": "The revision number this tag points to."
+        },
+        "tagName": {
+          "type": "string",
+          "description": "The revision tag name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
         }
       },
       "type": "object",
@@ -4928,7 +5732,11 @@
         "created",
         "modified",
         "name",
-        "revision"
+        "revision",
+        "orgName",
+        "projectName",
+        "envName",
+        "tagName"
       ],
       "inputProperties": {
         "envName": {
@@ -4982,6 +5790,12 @@
           "type": "string",
           "description": "The display name of the user who last edited the tag."
         },
+        "envName": {
+          "type": "string",
+          "description": "The environment name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
         "modified": {
           "type": "string",
           "description": "The timestamp when the tag was last modified."
@@ -4990,9 +5804,21 @@
           "type": "string",
           "description": "The name of the tag."
         },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
         "revision": {
           "type": "integer",
           "description": "The revision number this tag points to."
+        },
+        "tagName": {
+          "type": "string",
+          "description": "The revision tag name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
         }
       },
       "type": "object",
@@ -5000,7 +5826,10 @@
         "created",
         "modified",
         "name",
-        "revision"
+        "revision",
+        "orgName",
+        "envName",
+        "tagName"
       ],
       "inputProperties": {
         "envName": {
@@ -5067,9 +5896,19 @@
           "type": "string",
           "description": "The ID of the organization this role belongs to."
         },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
         "resourceType": {
           "type": "string",
           "description": "The resource type this permission descriptor applies to."
+        },
+        "roleID": {
+          "type": "string",
+          "description": "The unique identifier for this role."
         },
         "uxPurpose": {
           "type": "string",
@@ -5086,7 +5925,9 @@
         "isOrgDefault",
         "modified",
         "orgId",
-        "version"
+        "roleID",
+        "version",
+        "orgName"
       ],
       "inputProperties": {
         "createPolicyAndRole": {
@@ -5147,6 +5988,12 @@
           "type": "string",
           "description": "The SAML NameID format used by the identity provider."
         },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
         "organization": {
           "$ref": "pulumi.json#/Any",
           "description": "The Pulumi organization."
@@ -5167,7 +6014,8 @@
       "type": "object",
       "required": [
         "idpSsoDescriptor",
-        "organization"
+        "organization",
+        "orgName"
       ],
       "inputProperties": {
         "newIdpSsoDescriptor": {
@@ -5219,17 +6067,39 @@
           "type": "string",
           "description": "The organization ID that owns this scheduled action."
         },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
         "paused": {
           "type": "boolean",
           "description": "Whether the scheduled action is currently paused."
+        },
+        "projectName": {
+          "type": "string",
+          "description": "The project name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
         },
         "scheduleCron": {
           "type": "string",
           "description": "A cron expression defining the recurring schedule."
         },
+        "scheduleID": {
+          "type": "string",
+          "description": "The unique identifier for this scheduled action."
+        },
         "scheduleOnce": {
           "type": "string",
           "description": "A timestamp for a one-time scheduled execution."
+        },
+        "stackName": {
+          "type": "string",
+          "description": "The stack name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
         }
       },
       "type": "object",
@@ -5241,7 +6111,11 @@
         "modified",
         "nextExecution",
         "orgID",
-        "paused"
+        "paused",
+        "scheduleID",
+        "orgName",
+        "projectName",
+        "stackName"
       ],
       "inputProperties": {
         "orgName": {
@@ -5290,6 +6164,12 @@
     "pulumiservice:v2:ScheduledScanSettings": {
       "description": "Updates the scheduled scan configuration for an Insights account, such as scan frequency and schedule.",
       "properties": {
+        "accountName": {
+          "type": "string",
+          "description": "The Insights account name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
         "batchSize": {
           "type": "integer",
           "description": "The batch size for processing resources during the scan."
@@ -5297,6 +6177,12 @@
         "listConcurrency": {
           "type": "integer",
           "description": "The concurrency level for list operations during the scan."
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
         },
         "paused": {
           "type": "boolean",
@@ -5318,7 +6204,9 @@
       "type": "object",
       "required": [
         "paused",
-        "scheduleCron"
+        "scheduleCron",
+        "orgName",
+        "accountName"
       ],
       "inputProperties": {
         "accountName": {
@@ -5377,11 +6265,39 @@
             "$ref": "pulumi.json#/Any"
           },
           "description": "The list of service items"
+        },
+        "name": {
+          "type": "string",
+          "description": "The service name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "ownerName": {
+          "type": "string",
+          "description": "The owner name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "ownerType": {
+          "type": "string",
+          "description": "The owner type",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
         }
       },
       "type": "object",
       "required": [
-        "items"
+        "items",
+        "orgName",
+        "ownerType",
+        "ownerName",
+        "name"
       ],
       "inputProperties": {
         "description": {
@@ -5419,12 +6335,6 @@
             "$ref": "pulumi.json#/Any"
           },
           "description": "an optional list of properties to set on the service"
-        },
-        "serviceName": {
-          "type": "string",
-          "description": "The service name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
         }
       },
       "requiredInputs": [
@@ -5545,14 +6455,36 @@
           "type": "string",
           "description": "Reference to ESC environment to use as stack configuration."
         },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "projectName": {
+          "type": "string",
+          "description": "The project name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
         "secretsProvider": {
           "type": "string",
-          "description": "The stack's secrets provider."
+          "description": "The stack's secrets provider.",
+          "secret": true
+        },
+        "stackName": {
+          "type": "string",
+          "description": "The stack name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
         }
       },
       "type": "object",
       "required": [
-        "environment"
+        "environment",
+        "orgName",
+        "projectName",
+        "stackName"
       ],
       "inputProperties": {
         "encryptedKey": {
@@ -5597,6 +6529,70 @@
         "stackName"
       ]
     },
+    "pulumiservice:v2:StackTag": {
+      "description": "Creates a new tag on the specified stack. Tags are key-value metadata pairs that can be used for organization, filtering, and storing additional information about stacks. The request body must include both a tag name and value. Returns 400 if the tag name is invalid or the tag already exists. Built-in tags (such as those automatically set by the Pulumi CLI) follow specific naming conventions.",
+      "properties": {
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "projectName": {
+          "type": "string",
+          "description": "The project name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "stackName": {
+          "type": "string",
+          "description": "The stack name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        }
+      },
+      "type": "object",
+      "required": [
+        "orgName",
+        "projectName",
+        "stackName"
+      ],
+      "inputProperties": {
+        "name": {
+          "type": "string",
+          "description": "The tag key, which must conform to the stack tag naming rules."
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "projectName": {
+          "type": "string",
+          "description": "The project name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "stackName": {
+          "type": "string",
+          "description": "The stack name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "value": {
+          "type": "string",
+          "description": "The tag value associated with this key."
+        }
+      },
+      "requiredInputs": [
+        "name",
+        "orgName",
+        "projectName",
+        "stackName",
+        "value"
+      ]
+    },
     "pulumiservice:v2:StackWebhook": {
       "description": "Creates a new webhook for the specified stack. The request body must include the webhook name, payload URL, and format.\n\nThe `format` field accepts: `raw` (default), `slack`, `ms_teams`, or `pulumi_deployments`.\n\nThe `filters` field accepts a list of event types to subscribe to. See the [webhook event filtering documentation](https://www.pulumi.com/docs/pulumi-cloud/webhooks/#event-filtering) for available filters.\n\nThe optional `secret` field sets the HMAC key for signature verification. See the [webhook headers documentation](https://www.pulumi.com/docs/pulumi-cloud/webhooks/#headers) for details.\n\nReturns 409 if a webhook with the same name already exists. Returns 400 if the organization or stack name in the request body does not match the URL path parameters.",
       "properties": {
@@ -5632,7 +6628,8 @@
         },
         "hasSecret": {
           "type": "boolean",
-          "description": "HasSecret is true if the webhook has a secret. This is used to determine whether\nto show that there is a secret in the UI."
+          "description": "HasSecret is true if the webhook has a secret. This is used to determine whether\nto show that there is a secret in the UI.",
+          "secret": true
         },
         "name": {
           "type": "string",
@@ -5652,11 +6649,13 @@
         },
         "secret": {
           "type": "string",
-          "description": "Secret will be omitted when returned from the service."
+          "description": "Secret will be omitted when returned from the service.",
+          "secret": true
         },
         "secretCiphertext": {
           "type": "string",
-          "description": "SecretCiphertext is the ciphertext value of the webhook's secret.\nIt's used to check whether the secret was changed by the PSP"
+          "description": "SecretCiphertext is the ciphertext value of the webhook's secret.\nIt's used to check whether the secret was changed by the PSP",
+          "secret": true
         },
         "stackName": {
           "type": "string",
@@ -5704,21 +6703,9 @@
           },
           "description": "Event groups this webhook subscribes to (e.g., 'stacks', 'deployments')."
         },
-        "hookName": {
-          "type": "string",
-          "description": "The webhook name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
         "name": {
           "type": "string",
           "description": "The unique identifier name for the webhook within its scope."
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
         },
         "organizationName": {
           "type": "string",
@@ -5745,7 +6732,6 @@
         "active",
         "displayName",
         "name",
-        "orgName",
         "organizationName",
         "payloadUrl",
         "projectName",
@@ -5798,6 +6784,12 @@
           "type": "string",
           "description": "Display name for the task, typically auto-generated from the initial user message."
         },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
         "permissionMode": {
           "type": "string",
           "description": "The permission scope for the task."
@@ -5826,6 +6818,12 @@
           "type": "string",
           "description": "Current execution status of the task."
         },
+        "taskID": {
+          "type": "string",
+          "description": "The agent task identifier",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
         "taskType": {
           "type": "string",
           "description": "Whether the task was started synchronously by a user or asynchronously by background automation."
@@ -5845,7 +6843,9 @@
         "name",
         "planMode",
         "status",
-        "taskType"
+        "taskType",
+        "orgName",
+        "taskID"
       ],
       "inputProperties": {
         "approvalMode": {
@@ -5883,7 +6883,7 @@
       ]
     },
     "pulumiservice:v2:Team": {
-      "description": "Updates a team's membership and configuration. This multi-purpose endpoint supports several operations:\n\n**Update membership:** Use `member` (username) and `memberAction` (`add` or `remove`) to manage team members.\n\n**Grant stack access:** Use `addStackPermission` with `projectName`, `stackName`, and `permission` (integer: `101` = read, `102` = edit, `103` = admin).\n\n**Remove stack access:** Use `removeStack` with `projectName` and `stackName`.\n\nMembers added to a team inherit the team's stack permissions. Teams are not available to individual (single-user) organizations.",
+      "description": "CreatePulumiTeam creates a \"Pulumi\" team, i.e. one whose membership is managed by Pulumi.\n(As opposed to a GitHub or GitLab-based team.)",
       "properties": {
         "accounts": {
           "type": "array",
@@ -5926,6 +6926,12 @@
           "type": "string",
           "description": "The unique identifier name of the team within the organization."
         },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
         "roleIds": {
           "type": "array",
           "items": {
@@ -5950,40 +6956,80 @@
         "description",
         "displayName",
         "kind",
-        "name"
+        "name",
+        "orgName"
       ],
       "inputProperties": {
-        "addEnvironmentPermission": {
-          "$ref": "pulumi.json#/Any",
-          "description": "An environment permission to add to the team."
-        },
-        "addStackPermission": {
-          "$ref": "pulumi.json#/Any",
-          "description": "A stack permission to add to the team."
-        },
-        "editEnvironmentPermission": {
-          "$ref": "pulumi.json#/Any",
-          "description": "An environment permission to edit on the team."
-        },
-        "editStackPermission": {
-          "$ref": "pulumi.json#/Any",
-          "description": "A stack permission to edit on the team."
-        },
-        "member": {
+        "description": {
           "type": "string",
-          "description": "Member to be added or removed based on MemberAction."
+          "description": "The description"
         },
-        "memberAction": {
+        "displayName": {
           "type": "string",
-          "description": "MemberAction is the action to perform."
+          "description": "The display name"
         },
-        "newDescription": {
+        "name": {
           "type": "string",
-          "description": "The new description for the team."
+          "description": "The name"
         },
-        "newDisplayName": {
+        "orgName": {
           "type": "string",
-          "description": "The new display name for the team."
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        }
+      },
+      "requiredInputs": [
+        "description",
+        "displayName",
+        "name",
+        "orgName"
+      ]
+    },
+    "pulumiservice:v2:TeamToken": {
+      "description": "Generates a new access token scoped to a specific team within an organization. Team tokens inherit the stack permissions assigned to the team, making them suitable for CI/CD pipelines that need access limited to a specific set of stacks.\n\nThe `name` field must be unique across the organization (including deleted tokens) and cannot exceed 40 characters. The `expires` field accepts a unix epoch timestamp up to two years from the present, or `0` for no expiry (default).\n\n**Important:** The token value in the response is only returned once at creation time and cannot be retrieved later.",
+      "properties": {
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "teamName": {
+          "type": "string",
+          "description": "The team name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "tokenId": {
+          "type": "string",
+          "description": "The unique identifier"
+        },
+        "tokenValue": {
+          "type": "string",
+          "description": "The token value",
+          "secret": true
+        }
+      },
+      "type": "object",
+      "required": [
+        "tokenId",
+        "tokenValue",
+        "orgName",
+        "teamName"
+      ],
+      "inputProperties": {
+        "description": {
+          "type": "string",
+          "description": "The description"
+        },
+        "expires": {
+          "type": "integer",
+          "description": "The expiration time"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name"
         },
         "orgName": {
           "type": "string",
@@ -5991,13 +7037,11 @@
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
         },
-        "removeEnvironment": {
-          "$ref": "pulumi.json#/Any",
-          "description": "An environment to remove from the team."
-        },
-        "removeStack": {
-          "$ref": "pulumi.json#/Any",
-          "description": "A stack to remove from the team."
+        "reason": {
+          "type": "string",
+          "description": "Audit log reason for creating this token",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
         },
         "teamName": {
           "type": "string",
@@ -6007,6 +7051,9 @@
         }
       },
       "requiredInputs": [
+        "description",
+        "expires",
+        "name",
         "orgName",
         "teamName"
       ]
@@ -6046,7 +7093,8 @@
         },
         "hasSecret": {
           "type": "boolean",
-          "description": "HasSecret is true if the webhook has a secret. This is used to determine whether\nto show that there is a secret in the UI."
+          "description": "HasSecret is true if the webhook has a secret. This is used to determine whether\nto show that there is a secret in the UI.",
+          "secret": true
         },
         "name": {
           "type": "string",
@@ -6066,11 +7114,13 @@
         },
         "secret": {
           "type": "string",
-          "description": "Secret will be omitted when returned from the service."
+          "description": "Secret will be omitted when returned from the service.",
+          "secret": true
         },
         "secretCiphertext": {
           "type": "string",
-          "description": "SecretCiphertext is the ciphertext value of the webhook's secret.\nIt's used to check whether the secret was changed by the PSP"
+          "description": "SecretCiphertext is the ciphertext value of the webhook's secret.\nIt's used to check whether the secret was changed by the PSP",
+          "secret": true
         },
         "stackName": {
           "type": "string",
@@ -6118,21 +7168,9 @@
           },
           "description": "Event groups this webhook subscribes to (e.g., 'stacks', 'deployments')."
         },
-        "hookName": {
-          "type": "string",
-          "description": "The webhook name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
         "name": {
           "type": "string",
           "description": "The unique identifier name for the webhook within its scope."
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
         },
         "organizationName": {
           "type": "string",
@@ -6160,7 +7198,6 @@
         "displayName",
         "envName",
         "name",
-        "orgName",
         "organizationName",
         "payloadUrl",
         "projectName"
@@ -6201,7 +7238,8 @@
         },
         "hasSecret": {
           "type": "boolean",
-          "description": "HasSecret is true if the webhook has a secret. This is used to determine whether\nto show that there is a secret in the UI."
+          "description": "HasSecret is true if the webhook has a secret. This is used to determine whether\nto show that there is a secret in the UI.",
+          "secret": true
         },
         "name": {
           "type": "string",
@@ -6221,11 +7259,13 @@
         },
         "secret": {
           "type": "string",
-          "description": "Secret will be omitted when returned from the service."
+          "description": "Secret will be omitted when returned from the service.",
+          "secret": true
         },
         "secretCiphertext": {
           "type": "string",
-          "description": "SecretCiphertext is the ciphertext value of the webhook's secret.\nIt's used to check whether the secret was changed by the PSP"
+          "description": "SecretCiphertext is the ciphertext value of the webhook's secret.\nIt's used to check whether the secret was changed by the PSP",
+          "secret": true
         },
         "stackName": {
           "type": "string",
@@ -6273,21 +7313,9 @@
           },
           "description": "Event groups this webhook subscribes to (e.g., 'stacks', 'deployments')."
         },
-        "hookName": {
-          "type": "string",
-          "description": "The webhook name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
         "name": {
           "type": "string",
           "description": "The unique identifier name for the webhook within its scope."
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
         },
         "organizationName": {
           "type": "string",
@@ -6315,7 +7343,6 @@
         "displayName",
         "envName",
         "name",
-        "orgName",
         "organizationName",
         "payloadUrl"
       ]

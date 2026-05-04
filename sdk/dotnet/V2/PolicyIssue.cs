@@ -20,6 +20,18 @@ namespace Pulumi.PulumiService.V2
     public partial class PolicyIssue : global::Pulumi.CustomResource
     {
         /// <summary>
+        /// The issue identifier
+        /// </summary>
+        [Output("issueId")]
+        public Output<string> IssueId { get; private set; } = null!;
+
+        /// <summary>
+        /// The organization name
+        /// </summary>
+        [Output("orgName")]
+        public Output<string> OrgName { get; private set; } = null!;
+
+        /// <summary>
         /// The policy definition that caused this issue. May be null if the policy has been deleted or is unavailable.
         /// </summary>
         [Output("policy")]
@@ -54,6 +66,11 @@ namespace Pulumi.PulumiService.V2
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
+                ReplaceOnChanges =
+                {
+                    "issueId",
+                    "orgName",
+                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.

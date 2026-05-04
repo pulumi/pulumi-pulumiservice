@@ -185,6 +185,8 @@ class PolicyIssue(pulumi.CustomResource):
             __props__.__dict__["status"] = status
             __props__.__dict__["policy"] = None
             __props__.__dict__["policy_pack"] = None
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["issueId", "orgName"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(PolicyIssue, __self__).__init__(
             'pulumiservice:v2:PolicyIssue',
             resource_name,
@@ -207,9 +209,27 @@ class PolicyIssue(pulumi.CustomResource):
 
         __props__ = PolicyIssueArgs.__new__(PolicyIssueArgs)
 
+        __props__.__dict__["issue_id"] = None
+        __props__.__dict__["org_name"] = None
         __props__.__dict__["policy"] = None
         __props__.__dict__["policy_pack"] = None
         return PolicyIssue(resource_name, opts=opts, __props__=__props__)
+
+    @_builtins.property
+    @pulumi.getter(name="issueId")
+    def issue_id(self) -> pulumi.Output[_builtins.str]:
+        """
+        The issue identifier
+        """
+        return pulumi.get(self, "issue_id")
+
+    @_builtins.property
+    @pulumi.getter(name="orgName")
+    def org_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The organization name
+        """
+        return pulumi.get(self, "org_name")
 
     @_builtins.property
     @pulumi.getter

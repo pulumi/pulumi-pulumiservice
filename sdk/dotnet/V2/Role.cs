@@ -64,10 +64,22 @@ namespace Pulumi.PulumiService.V2
         public Output<string> OrgId { get; private set; } = null!;
 
         /// <summary>
+        /// The organization name
+        /// </summary>
+        [Output("orgName")]
+        public Output<string> OrgName { get; private set; } = null!;
+
+        /// <summary>
         /// The resource type this permission descriptor applies to.
         /// </summary>
         [Output("resourceType")]
         public Output<string?> ResourceType { get; private set; } = null!;
+
+        /// <summary>
+        /// The unique identifier for this role.
+        /// </summary>
+        [Output("roleID")]
+        public Output<string> RoleID { get; private set; } = null!;
 
         /// <summary>
         /// The UX purpose of this permission descriptor (e.g. role, policy, set).
@@ -104,6 +116,10 @@ namespace Pulumi.PulumiService.V2
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
+                ReplaceOnChanges =
+                {
+                    "orgName",
+                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.

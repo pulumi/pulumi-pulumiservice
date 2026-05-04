@@ -34,6 +34,18 @@ export class Environment_esc_environments extends pulumi.CustomResource {
         return obj['__pulumiType'] === Environment_esc_environments.__pulumiType;
     }
 
+    /**
+     * The environment name
+     */
+    declare public readonly name: pulumi.Output<string>;
+    /**
+     * The organization name
+     */
+    declare public readonly orgName: pulumi.Output<string>;
+    /**
+     * The project name
+     */
+    declare public readonly project: pulumi.Output<string>;
 
     /**
      * Create a Environment_esc_environments resource with the given unique name, arguments, and options.
@@ -55,14 +67,17 @@ export class Environment_esc_environments extends pulumi.CustomResource {
             if (args?.project === undefined && !opts.urn) {
                 throw new Error("Missing required property 'project'");
             }
-            resourceInputs["envName"] = args?.envName;
             resourceInputs["name"] = args?.name;
             resourceInputs["orgName"] = args?.orgName;
             resourceInputs["project"] = args?.project;
-            resourceInputs["projectName"] = args?.projectName;
         } else {
+            resourceInputs["name"] = undefined /*out*/;
+            resourceInputs["orgName"] = undefined /*out*/;
+            resourceInputs["project"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["name", "orgName", "project"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(Environment_esc_environments.__pulumiType, name, resourceInputs, opts);
     }
 }
@@ -71,10 +86,6 @@ export class Environment_esc_environments extends pulumi.CustomResource {
  * The set of arguments for constructing a Environment_esc_environments resource.
  */
 export interface Environment_esc_environmentsArgs {
-    /**
-     * The environment name
-     */
-    envName?: pulumi.Input<string>;
     /**
      * The name of the environment.
      */
@@ -87,8 +98,4 @@ export interface Environment_esc_environmentsArgs {
      * The project name for the environment.
      */
     project: pulumi.Input<string>;
-    /**
-     * The project name
-     */
-    projectName?: pulumi.Input<string>;
 }

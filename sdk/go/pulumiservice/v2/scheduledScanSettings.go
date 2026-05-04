@@ -16,10 +16,14 @@ import (
 type ScheduledScanSettings struct {
 	pulumi.CustomResourceState
 
+	// The Insights account name
+	AccountName pulumi.StringOutput `pulumi:"accountName"`
 	// The batch size for processing resources during the scan.
 	BatchSize pulumi.IntPtrOutput `pulumi:"batchSize"`
 	// The concurrency level for list operations during the scan.
 	ListConcurrency pulumi.IntPtrOutput `pulumi:"listConcurrency"`
+	// The organization name
+	OrgName pulumi.StringOutput `pulumi:"orgName"`
 	// Whether the scheduled scan is paused.
 	Paused pulumi.BoolOutput `pulumi:"paused"`
 	// The concurrency level for read operations during the scan.
@@ -46,6 +50,11 @@ func NewScheduledScanSettings(ctx *pulumi.Context,
 	if args.Paused == nil {
 		return nil, errors.New("invalid value for required argument 'Paused'")
 	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"accountName",
+		"orgName",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource ScheduledScanSettings
 	err := ctx.RegisterResource("pulumiservice:v2:ScheduledScanSettings", name, args, &resource, opts...)
@@ -204,6 +213,11 @@ func (o ScheduledScanSettingsOutput) ToScheduledScanSettingsOutputWithContext(ct
 	return o
 }
 
+// The Insights account name
+func (o ScheduledScanSettingsOutput) AccountName() pulumi.StringOutput {
+	return o.ApplyT(func(v *ScheduledScanSettings) pulumi.StringOutput { return v.AccountName }).(pulumi.StringOutput)
+}
+
 // The batch size for processing resources during the scan.
 func (o ScheduledScanSettingsOutput) BatchSize() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *ScheduledScanSettings) pulumi.IntPtrOutput { return v.BatchSize }).(pulumi.IntPtrOutput)
@@ -212,6 +226,11 @@ func (o ScheduledScanSettingsOutput) BatchSize() pulumi.IntPtrOutput {
 // The concurrency level for list operations during the scan.
 func (o ScheduledScanSettingsOutput) ListConcurrency() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *ScheduledScanSettings) pulumi.IntPtrOutput { return v.ListConcurrency }).(pulumi.IntPtrOutput)
+}
+
+// The organization name
+func (o ScheduledScanSettingsOutput) OrgName() pulumi.StringOutput {
+	return o.ApplyT(func(v *ScheduledScanSettings) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
 }
 
 // Whether the scheduled scan is paused.

@@ -47,6 +47,10 @@ export class EnvironmentTag_esc_environments extends pulumi.CustomResource {
      */
     declare public /*out*/ readonly editorName: pulumi.Output<string>;
     /**
+     * The environment name
+     */
+    declare public readonly envName: pulumi.Output<string>;
+    /**
      * The timestamp when the tag was last modified.
      */
     declare public /*out*/ readonly modified: pulumi.Output<string>;
@@ -54,6 +58,14 @@ export class EnvironmentTag_esc_environments extends pulumi.CustomResource {
      * The name of the tag.
      */
     declare public readonly name: pulumi.Output<string>;
+    /**
+     * The organization name
+     */
+    declare public readonly orgName: pulumi.Output<string>;
+    /**
+     * The project name
+     */
+    declare public readonly projectName: pulumi.Output<string>;
     /**
      * The value of the tag.
      */
@@ -89,7 +101,6 @@ export class EnvironmentTag_esc_environments extends pulumi.CustomResource {
             resourceInputs["name"] = args?.name;
             resourceInputs["orgName"] = args?.orgName;
             resourceInputs["projectName"] = args?.projectName;
-            resourceInputs["tagName"] = args?.tagName;
             resourceInputs["value"] = args?.value;
             resourceInputs["created"] = undefined /*out*/;
             resourceInputs["editorLogin"] = undefined /*out*/;
@@ -99,11 +110,16 @@ export class EnvironmentTag_esc_environments extends pulumi.CustomResource {
             resourceInputs["created"] = undefined /*out*/;
             resourceInputs["editorLogin"] = undefined /*out*/;
             resourceInputs["editorName"] = undefined /*out*/;
+            resourceInputs["envName"] = undefined /*out*/;
             resourceInputs["modified"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
+            resourceInputs["orgName"] = undefined /*out*/;
+            resourceInputs["projectName"] = undefined /*out*/;
             resourceInputs["value"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["envName", "orgName", "projectName"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(EnvironmentTag_esc_environments.__pulumiType, name, resourceInputs, opts);
     }
 }
@@ -128,10 +144,6 @@ export interface EnvironmentTag_esc_environmentsArgs {
      * The project name
      */
     projectName: pulumi.Input<string>;
-    /**
-     * The environment tag name
-     */
-    tagName?: pulumi.Input<string>;
     /**
      * The value
      */

@@ -10,15 +10,8 @@ using Pulumi.Serialization;
 namespace Pulumi.PulumiService.V2
 {
     /// <summary>
-    /// Updates a team's membership and configuration. This multi-purpose endpoint supports several operations:
-    /// 
-    /// **Update membership:** Use `member` (username) and `memberAction` (`add` or `remove`) to manage team members.
-    /// 
-    /// **Grant stack access:** Use `addStackPermission` with `projectName`, `stackName`, and `permission` (integer: `101` = read, `102` = edit, `103` = admin).
-    /// 
-    /// **Remove stack access:** Use `removeStack` with `projectName` and `stackName`.
-    /// 
-    /// Members added to a team inherit the team's stack permissions. Teams are not available to individual (single-user) organizations.
+    /// CreatePulumiTeam creates a "Pulumi" team, i.e. one whose membership is managed by Pulumi.
+    /// (As opposed to a GitHub or GitLab-based team.)
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:v2:Team")]
     public partial class Team : global::Pulumi.CustomResource
@@ -74,6 +67,12 @@ namespace Pulumi.PulumiService.V2
         public Output<string> Name { get; private set; } = null!;
 
         /// <summary>
+        /// The organization name
+        /// </summary>
+        [Output("orgName")]
+        public Output<string> OrgName { get; private set; } = null!;
+
+        /// <summary>
         /// RoleIDs are the IDs of the FGA roles assigned to the team, if any.
         /// Currently only one role per team is supported.
         /// </summary>
@@ -115,6 +114,10 @@ namespace Pulumi.PulumiService.V2
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
+                ReplaceOnChanges =
+                {
+                    "orgName",
+                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.
@@ -138,76 +141,28 @@ namespace Pulumi.PulumiService.V2
     public sealed class TeamArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
-        /// An environment permission to add to the team.
+        /// The description
         /// </summary>
-        [Input("addEnvironmentPermission")]
-        public Input<object>? AddEnvironmentPermission { get; set; }
+        [Input("description", required: true)]
+        public Input<string> Description { get; set; } = null!;
 
         /// <summary>
-        /// A stack permission to add to the team.
+        /// The display name
         /// </summary>
-        [Input("addStackPermission")]
-        public Input<object>? AddStackPermission { get; set; }
+        [Input("displayName", required: true)]
+        public Input<string> DisplayName { get; set; } = null!;
 
         /// <summary>
-        /// An environment permission to edit on the team.
+        /// The name
         /// </summary>
-        [Input("editEnvironmentPermission")]
-        public Input<object>? EditEnvironmentPermission { get; set; }
-
-        /// <summary>
-        /// A stack permission to edit on the team.
-        /// </summary>
-        [Input("editStackPermission")]
-        public Input<object>? EditStackPermission { get; set; }
-
-        /// <summary>
-        /// Member to be added or removed based on MemberAction.
-        /// </summary>
-        [Input("member")]
-        public Input<string>? Member { get; set; }
-
-        /// <summary>
-        /// MemberAction is the action to perform.
-        /// </summary>
-        [Input("memberAction")]
-        public Input<string>? MemberAction { get; set; }
-
-        /// <summary>
-        /// The new description for the team.
-        /// </summary>
-        [Input("newDescription")]
-        public Input<string>? NewDescription { get; set; }
-
-        /// <summary>
-        /// The new display name for the team.
-        /// </summary>
-        [Input("newDisplayName")]
-        public Input<string>? NewDisplayName { get; set; }
+        [Input("name", required: true)]
+        public Input<string> Name { get; set; } = null!;
 
         /// <summary>
         /// The organization name
         /// </summary>
         [Input("orgName", required: true)]
         public Input<string> OrgName { get; set; } = null!;
-
-        /// <summary>
-        /// An environment to remove from the team.
-        /// </summary>
-        [Input("removeEnvironment")]
-        public Input<object>? RemoveEnvironment { get; set; }
-
-        /// <summary>
-        /// A stack to remove from the team.
-        /// </summary>
-        [Input("removeStack")]
-        public Input<object>? RemoveStack { get; set; }
-
-        /// <summary>
-        /// The team name
-        /// </summary>
-        [Input("teamName", required: true)]
-        public Input<string> TeamName { get; set; } = null!;
 
         public TeamArgs()
         {

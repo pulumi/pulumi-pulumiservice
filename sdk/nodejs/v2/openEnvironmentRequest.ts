@@ -39,9 +39,25 @@ export class OpenEnvironmentRequest extends pulumi.CustomResource {
      */
     declare public readonly accessDurationSeconds: pulumi.Output<number>;
     /**
+     * The change request ID
+     */
+    declare public readonly changeRequestID: pulumi.Output<string>;
+    /**
+     * The environment name
+     */
+    declare public readonly envName: pulumi.Output<string>;
+    /**
      * Time from application of the request until the resulting grant expires
      */
     declare public readonly grantExpirationSeconds: pulumi.Output<number>;
+    /**
+     * The organization name
+     */
+    declare public readonly orgName: pulumi.Output<string>;
+    /**
+     * The project name
+     */
+    declare public readonly projectName: pulumi.Output<string>;
 
     /**
      * Create a OpenEnvironmentRequest resource with the given unique name, arguments, and options.
@@ -77,9 +93,15 @@ export class OpenEnvironmentRequest extends pulumi.CustomResource {
             resourceInputs["projectName"] = args?.projectName;
         } else {
             resourceInputs["accessDurationSeconds"] = undefined /*out*/;
+            resourceInputs["changeRequestID"] = undefined /*out*/;
+            resourceInputs["envName"] = undefined /*out*/;
             resourceInputs["grantExpirationSeconds"] = undefined /*out*/;
+            resourceInputs["orgName"] = undefined /*out*/;
+            resourceInputs["projectName"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["changeRequestID", "envName", "orgName", "projectName"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(OpenEnvironmentRequest.__pulumiType, name, resourceInputs, opts);
     }
 }

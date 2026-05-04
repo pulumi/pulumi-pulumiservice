@@ -1,5 +1,8 @@
-module webhooks
+module pulumicloud-v2-webhooks
 
-go 1.25
+go 1.23
 
-require github.com/pulumi/pulumi/sdk/v3 v3.30.0
+require (
+	github.com/pulumi/pulumi-pulumiservice/sdk v0.0.0
+	github.com/pulumi/pulumi/sdk/v3 v3.218.0
+)

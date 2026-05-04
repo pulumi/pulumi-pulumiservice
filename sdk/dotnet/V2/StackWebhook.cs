@@ -132,6 +132,12 @@ namespace Pulumi.PulumiService.V2
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
+                AdditionalSecretOutputs =
+                {
+                    "hasSecret",
+                    "secret",
+                    "secretCiphertext",
+                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.
@@ -203,22 +209,10 @@ namespace Pulumi.PulumiService.V2
         }
 
         /// <summary>
-        /// The webhook name
-        /// </summary>
-        [Input("hookName")]
-        public Input<string>? HookName { get; set; }
-
-        /// <summary>
         /// The unique identifier name for the webhook within its scope.
         /// </summary>
         [Input("name", required: true)]
         public Input<string> Name { get; set; } = null!;
-
-        /// <summary>
-        /// The organization name
-        /// </summary>
-        [Input("orgName", required: true)]
-        public Input<string> OrgName { get; set; } = null!;
 
         /// <summary>
         /// The organization that owns this webhook.

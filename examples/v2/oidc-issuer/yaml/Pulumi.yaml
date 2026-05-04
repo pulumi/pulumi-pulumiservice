@@ -1,2 +1,12 @@
-name: oidc-issuer
+name: pulumicloud-v2-oidc-issuer
 runtime: yaml
+config:
+  serviceOrg:
+    type: string
+    default: service-provider-test-org
+  issuerSuffix:
+    type: string
+    default: dev
+  maxExpiration:
+    type: integer
+    default: 3600

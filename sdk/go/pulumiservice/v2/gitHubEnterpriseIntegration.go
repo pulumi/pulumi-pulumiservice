@@ -40,12 +40,16 @@ type GitHubEnterpriseIntegration struct {
 	HasMembersPermission pulumi.BoolOutput `pulumi:"hasMembersPermission"`
 	// The GitHub installation ID.
 	InstallationID pulumi.IntOutput `pulumi:"installationID"`
+	// The GitHub Enterprise integration identifier
+	IntegrationId pulumi.StringOutput `pulumi:"integrationId"`
 	// Whether the GitHub account is an organization (as opposed to a personal account).
 	IsOrganization pulumi.BoolOutput `pulumi:"isOrganization"`
 	// Whether this is a self-hosted GitHub Enterprise installation.
 	IsSelfHosted pulumi.BoolOutput `pulumi:"isSelfHosted"`
 	// Neo GitHub App permission requirements for this installation.
 	NeoGitHubAppPermissionRequirements pulumi.ArrayOutput `pulumi:"neoGitHubAppPermissionRequirements"`
+	// The organization name
+	OrgName pulumi.StringOutput `pulumi:"orgName"`
 }
 
 // NewGitHubEnterpriseIntegration registers a new resource with the given unique name, arguments, and options.
@@ -61,6 +65,11 @@ func NewGitHubEnterpriseIntegration(ctx *pulumi.Context,
 	if args.OrgName == nil {
 		return nil, errors.New("invalid value for required argument 'OrgName'")
 	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"integrationId",
+		"orgName",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource GitHubEnterpriseIntegration
 	err := ctx.RegisterResource("pulumiservice:v2:GitHubEnterpriseIntegration", name, args, &resource, opts...)
@@ -271,6 +280,11 @@ func (o GitHubEnterpriseIntegrationOutput) InstallationID() pulumi.IntOutput {
 	return o.ApplyT(func(v *GitHubEnterpriseIntegration) pulumi.IntOutput { return v.InstallationID }).(pulumi.IntOutput)
 }
 
+// The GitHub Enterprise integration identifier
+func (o GitHubEnterpriseIntegrationOutput) IntegrationId() pulumi.StringOutput {
+	return o.ApplyT(func(v *GitHubEnterpriseIntegration) pulumi.StringOutput { return v.IntegrationId }).(pulumi.StringOutput)
+}
+
 // Whether the GitHub account is an organization (as opposed to a personal account).
 func (o GitHubEnterpriseIntegrationOutput) IsOrganization() pulumi.BoolOutput {
 	return o.ApplyT(func(v *GitHubEnterpriseIntegration) pulumi.BoolOutput { return v.IsOrganization }).(pulumi.BoolOutput)
@@ -284,6 +298,11 @@ func (o GitHubEnterpriseIntegrationOutput) IsSelfHosted() pulumi.BoolOutput {
 // Neo GitHub App permission requirements for this installation.
 func (o GitHubEnterpriseIntegrationOutput) NeoGitHubAppPermissionRequirements() pulumi.ArrayOutput {
 	return o.ApplyT(func(v *GitHubEnterpriseIntegration) pulumi.ArrayOutput { return v.NeoGitHubAppPermissionRequirements }).(pulumi.ArrayOutput)
+}
+
+// The organization name
+func (o GitHubEnterpriseIntegrationOutput) OrgName() pulumi.StringOutput {
+	return o.ApplyT(func(v *GitHubEnterpriseIntegration) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
 }
 
 type GitHubEnterpriseIntegrationArrayOutput struct{ *pulumi.OutputState }

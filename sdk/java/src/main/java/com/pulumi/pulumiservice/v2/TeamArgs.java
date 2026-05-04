@@ -6,11 +6,8 @@ package com.pulumi.pulumiservice.v2;
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
-import java.lang.Object;
 import java.lang.String;
 import java.util.Objects;
-import java.util.Optional;
-import javax.annotation.Nullable;
 
 
 public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
@@ -18,123 +15,48 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
     public static final TeamArgs Empty = new TeamArgs();
 
     /**
-     * An environment permission to add to the team.
+     * The description
      * 
      */
-    @Import(name="addEnvironmentPermission")
-    private @Nullable Output<Object> addEnvironmentPermission;
+    @Import(name="description", required=true)
+    private Output<String> description;
 
     /**
-     * @return An environment permission to add to the team.
+     * @return The description
      * 
      */
-    public Optional<Output<Object>> addEnvironmentPermission() {
-        return Optional.ofNullable(this.addEnvironmentPermission);
+    public Output<String> description() {
+        return this.description;
     }
 
     /**
-     * A stack permission to add to the team.
+     * The display name
      * 
      */
-    @Import(name="addStackPermission")
-    private @Nullable Output<Object> addStackPermission;
+    @Import(name="displayName", required=true)
+    private Output<String> displayName;
 
     /**
-     * @return A stack permission to add to the team.
+     * @return The display name
      * 
      */
-    public Optional<Output<Object>> addStackPermission() {
-        return Optional.ofNullable(this.addStackPermission);
+    public Output<String> displayName() {
+        return this.displayName;
     }
 
     /**
-     * An environment permission to edit on the team.
+     * The name
      * 
      */
-    @Import(name="editEnvironmentPermission")
-    private @Nullable Output<Object> editEnvironmentPermission;
+    @Import(name="name", required=true)
+    private Output<String> name;
 
     /**
-     * @return An environment permission to edit on the team.
+     * @return The name
      * 
      */
-    public Optional<Output<Object>> editEnvironmentPermission() {
-        return Optional.ofNullable(this.editEnvironmentPermission);
-    }
-
-    /**
-     * A stack permission to edit on the team.
-     * 
-     */
-    @Import(name="editStackPermission")
-    private @Nullable Output<Object> editStackPermission;
-
-    /**
-     * @return A stack permission to edit on the team.
-     * 
-     */
-    public Optional<Output<Object>> editStackPermission() {
-        return Optional.ofNullable(this.editStackPermission);
-    }
-
-    /**
-     * Member to be added or removed based on MemberAction.
-     * 
-     */
-    @Import(name="member")
-    private @Nullable Output<String> member;
-
-    /**
-     * @return Member to be added or removed based on MemberAction.
-     * 
-     */
-    public Optional<Output<String>> member() {
-        return Optional.ofNullable(this.member);
-    }
-
-    /**
-     * MemberAction is the action to perform.
-     * 
-     */
-    @Import(name="memberAction")
-    private @Nullable Output<String> memberAction;
-
-    /**
-     * @return MemberAction is the action to perform.
-     * 
-     */
-    public Optional<Output<String>> memberAction() {
-        return Optional.ofNullable(this.memberAction);
-    }
-
-    /**
-     * The new description for the team.
-     * 
-     */
-    @Import(name="newDescription")
-    private @Nullable Output<String> newDescription;
-
-    /**
-     * @return The new description for the team.
-     * 
-     */
-    public Optional<Output<String>> newDescription() {
-        return Optional.ofNullable(this.newDescription);
-    }
-
-    /**
-     * The new display name for the team.
-     * 
-     */
-    @Import(name="newDisplayName")
-    private @Nullable Output<String> newDisplayName;
-
-    /**
-     * @return The new display name for the team.
-     * 
-     */
-    public Optional<Output<String>> newDisplayName() {
-        return Optional.ofNullable(this.newDisplayName);
+    public Output<String> name() {
+        return this.name;
     }
 
     /**
@@ -152,66 +74,13 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
         return this.orgName;
     }
 
-    /**
-     * An environment to remove from the team.
-     * 
-     */
-    @Import(name="removeEnvironment")
-    private @Nullable Output<Object> removeEnvironment;
-
-    /**
-     * @return An environment to remove from the team.
-     * 
-     */
-    public Optional<Output<Object>> removeEnvironment() {
-        return Optional.ofNullable(this.removeEnvironment);
-    }
-
-    /**
-     * A stack to remove from the team.
-     * 
-     */
-    @Import(name="removeStack")
-    private @Nullable Output<Object> removeStack;
-
-    /**
-     * @return A stack to remove from the team.
-     * 
-     */
-    public Optional<Output<Object>> removeStack() {
-        return Optional.ofNullable(this.removeStack);
-    }
-
-    /**
-     * The team name
-     * 
-     */
-    @Import(name="teamName", required=true)
-    private Output<String> teamName;
-
-    /**
-     * @return The team name
-     * 
-     */
-    public Output<String> teamName() {
-        return this.teamName;
-    }
-
     private TeamArgs() {}
 
     private TeamArgs(TeamArgs $) {
-        this.addEnvironmentPermission = $.addEnvironmentPermission;
-        this.addStackPermission = $.addStackPermission;
-        this.editEnvironmentPermission = $.editEnvironmentPermission;
-        this.editStackPermission = $.editStackPermission;
-        this.member = $.member;
-        this.memberAction = $.memberAction;
-        this.newDescription = $.newDescription;
-        this.newDisplayName = $.newDisplayName;
+        this.description = $.description;
+        this.displayName = $.displayName;
+        this.name = $.name;
         this.orgName = $.orgName;
-        this.removeEnvironment = $.removeEnvironment;
-        this.removeStack = $.removeStack;
-        this.teamName = $.teamName;
     }
 
     public static Builder builder() {
@@ -233,171 +102,66 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param addEnvironmentPermission An environment permission to add to the team.
+         * @param description The description
          * 
          * @return builder
          * 
          */
-        public Builder addEnvironmentPermission(@Nullable Output<Object> addEnvironmentPermission) {
-            $.addEnvironmentPermission = addEnvironmentPermission;
+        public Builder description(Output<String> description) {
+            $.description = description;
             return this;
         }
 
         /**
-         * @param addEnvironmentPermission An environment permission to add to the team.
+         * @param description The description
          * 
          * @return builder
          * 
          */
-        public Builder addEnvironmentPermission(Object addEnvironmentPermission) {
-            return addEnvironmentPermission(Output.of(addEnvironmentPermission));
+        public Builder description(String description) {
+            return description(Output.of(description));
         }
 
         /**
-         * @param addStackPermission A stack permission to add to the team.
+         * @param displayName The display name
          * 
          * @return builder
          * 
          */
-        public Builder addStackPermission(@Nullable Output<Object> addStackPermission) {
-            $.addStackPermission = addStackPermission;
+        public Builder displayName(Output<String> displayName) {
+            $.displayName = displayName;
             return this;
         }
 
         /**
-         * @param addStackPermission A stack permission to add to the team.
+         * @param displayName The display name
          * 
          * @return builder
          * 
          */
-        public Builder addStackPermission(Object addStackPermission) {
-            return addStackPermission(Output.of(addStackPermission));
+        public Builder displayName(String displayName) {
+            return displayName(Output.of(displayName));
         }
 
         /**
-         * @param editEnvironmentPermission An environment permission to edit on the team.
+         * @param name The name
          * 
          * @return builder
          * 
          */
-        public Builder editEnvironmentPermission(@Nullable Output<Object> editEnvironmentPermission) {
-            $.editEnvironmentPermission = editEnvironmentPermission;
+        public Builder name(Output<String> name) {
+            $.name = name;
             return this;
         }
 
         /**
-         * @param editEnvironmentPermission An environment permission to edit on the team.
+         * @param name The name
          * 
          * @return builder
          * 
          */
-        public Builder editEnvironmentPermission(Object editEnvironmentPermission) {
-            return editEnvironmentPermission(Output.of(editEnvironmentPermission));
-        }
-
-        /**
-         * @param editStackPermission A stack permission to edit on the team.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder editStackPermission(@Nullable Output<Object> editStackPermission) {
-            $.editStackPermission = editStackPermission;
-            return this;
-        }
-
-        /**
-         * @param editStackPermission A stack permission to edit on the team.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder editStackPermission(Object editStackPermission) {
-            return editStackPermission(Output.of(editStackPermission));
-        }
-
-        /**
-         * @param member Member to be added or removed based on MemberAction.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder member(@Nullable Output<String> member) {
-            $.member = member;
-            return this;
-        }
-
-        /**
-         * @param member Member to be added or removed based on MemberAction.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder member(String member) {
-            return member(Output.of(member));
-        }
-
-        /**
-         * @param memberAction MemberAction is the action to perform.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder memberAction(@Nullable Output<String> memberAction) {
-            $.memberAction = memberAction;
-            return this;
-        }
-
-        /**
-         * @param memberAction MemberAction is the action to perform.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder memberAction(String memberAction) {
-            return memberAction(Output.of(memberAction));
-        }
-
-        /**
-         * @param newDescription The new description for the team.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder newDescription(@Nullable Output<String> newDescription) {
-            $.newDescription = newDescription;
-            return this;
-        }
-
-        /**
-         * @param newDescription The new description for the team.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder newDescription(String newDescription) {
-            return newDescription(Output.of(newDescription));
-        }
-
-        /**
-         * @param newDisplayName The new display name for the team.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder newDisplayName(@Nullable Output<String> newDisplayName) {
-            $.newDisplayName = newDisplayName;
-            return this;
-        }
-
-        /**
-         * @param newDisplayName The new display name for the team.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder newDisplayName(String newDisplayName) {
-            return newDisplayName(Output.of(newDisplayName));
+        public Builder name(String name) {
+            return name(Output.of(name));
         }
 
         /**
@@ -421,75 +185,18 @@ public final class TeamArgs extends com.pulumi.resources.ResourceArgs {
             return orgName(Output.of(orgName));
         }
 
-        /**
-         * @param removeEnvironment An environment to remove from the team.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder removeEnvironment(@Nullable Output<Object> removeEnvironment) {
-            $.removeEnvironment = removeEnvironment;
-            return this;
-        }
-
-        /**
-         * @param removeEnvironment An environment to remove from the team.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder removeEnvironment(Object removeEnvironment) {
-            return removeEnvironment(Output.of(removeEnvironment));
-        }
-
-        /**
-         * @param removeStack A stack to remove from the team.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder removeStack(@Nullable Output<Object> removeStack) {
-            $.removeStack = removeStack;
-            return this;
-        }
-
-        /**
-         * @param removeStack A stack to remove from the team.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder removeStack(Object removeStack) {
-            return removeStack(Output.of(removeStack));
-        }
-
-        /**
-         * @param teamName The team name
-         * 
-         * @return builder
-         * 
-         */
-        public Builder teamName(Output<String> teamName) {
-            $.teamName = teamName;
-            return this;
-        }
-
-        /**
-         * @param teamName The team name
-         * 
-         * @return builder
-         * 
-         */
-        public Builder teamName(String teamName) {
-            return teamName(Output.of(teamName));
-        }
-
         public TeamArgs build() {
+            if ($.description == null) {
+                throw new MissingRequiredPropertyException("TeamArgs", "description");
+            }
+            if ($.displayName == null) {
+                throw new MissingRequiredPropertyException("TeamArgs", "displayName");
+            }
+            if ($.name == null) {
+                throw new MissingRequiredPropertyException("TeamArgs", "name");
+            }
             if ($.orgName == null) {
                 throw new MissingRequiredPropertyException("TeamArgs", "orgName");
-            }
-            if ($.teamName == null) {
-                throw new MissingRequiredPropertyException("TeamArgs", "teamName");
             }
             return $;
         }

@@ -35,13 +35,29 @@ export class EnvironmentDraft extends pulumi.CustomResource {
     }
 
     /**
+     * The change request ID
+     */
+    declare public readonly changeRequestID: pulumi.Output<string>;
+    /**
      * The change request identifier
      */
     declare public /*out*/ readonly changeRequestId: pulumi.Output<string | undefined>;
     /**
+     * The environment name
+     */
+    declare public readonly envName: pulumi.Output<string>;
+    /**
      * The latest revision number
      */
     declare public /*out*/ readonly latestRevisionNumber: pulumi.Output<number | undefined>;
+    /**
+     * The organization name
+     */
+    declare public readonly orgName: pulumi.Output<string>;
+    /**
+     * The project name
+     */
+    declare public readonly projectName: pulumi.Output<string>;
 
     /**
      * Create a EnvironmentDraft resource with the given unique name, arguments, and options.
@@ -70,10 +86,16 @@ export class EnvironmentDraft extends pulumi.CustomResource {
             resourceInputs["changeRequestId"] = undefined /*out*/;
             resourceInputs["latestRevisionNumber"] = undefined /*out*/;
         } else {
+            resourceInputs["changeRequestID"] = undefined /*out*/;
             resourceInputs["changeRequestId"] = undefined /*out*/;
+            resourceInputs["envName"] = undefined /*out*/;
             resourceInputs["latestRevisionNumber"] = undefined /*out*/;
+            resourceInputs["orgName"] = undefined /*out*/;
+            resourceInputs["projectName"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["changeRequestID", "envName", "orgName", "projectName"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(EnvironmentDraft.__pulumiType, name, resourceInputs, opts);
     }
 }

@@ -26,6 +26,10 @@ type AzureDevOpsIntegration struct {
 	DisablePRComments pulumi.BoolPtrOutput `pulumi:"disablePRComments"`
 	// Does the org have an Azure DevOps app integration configured
 	Installed pulumi.BoolOutput `pulumi:"installed"`
+	// The Azure DevOps integration identifier
+	IntegrationId pulumi.StringOutput `pulumi:"integrationId"`
+	// The organization name
+	OrgName pulumi.StringOutput `pulumi:"orgName"`
 	// Metadata about the Azure DevOps organization linked to the Pulumi organization
 	Organization pulumi.AnyOutput `pulumi:"organization"`
 	// Metadata about the Azure DevOps project linked to the Pulumi organization
@@ -47,6 +51,11 @@ func NewAzureDevOpsIntegration(ctx *pulumi.Context,
 	if args.OrgName == nil {
 		return nil, errors.New("invalid value for required argument 'OrgName'")
 	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"integrationId",
+		"orgName",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource AzureDevOpsIntegration
 	err := ctx.RegisterResource("pulumiservice:v2:AzureDevOpsIntegration", name, args, &resource, opts...)
@@ -216,6 +225,16 @@ func (o AzureDevOpsIntegrationOutput) DisablePRComments() pulumi.BoolPtrOutput {
 // Does the org have an Azure DevOps app integration configured
 func (o AzureDevOpsIntegrationOutput) Installed() pulumi.BoolOutput {
 	return o.ApplyT(func(v *AzureDevOpsIntegration) pulumi.BoolOutput { return v.Installed }).(pulumi.BoolOutput)
+}
+
+// The Azure DevOps integration identifier
+func (o AzureDevOpsIntegrationOutput) IntegrationId() pulumi.StringOutput {
+	return o.ApplyT(func(v *AzureDevOpsIntegration) pulumi.StringOutput { return v.IntegrationId }).(pulumi.StringOutput)
+}
+
+// The organization name
+func (o AzureDevOpsIntegrationOutput) OrgName() pulumi.StringOutput {
+	return o.ApplyT(func(v *AzureDevOpsIntegration) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
 }
 
 // Metadata about the Azure DevOps organization linked to the Pulumi organization

@@ -30,12 +30,20 @@ type ScheduledDeployment struct {
 	NextExecution pulumi.StringOutput `pulumi:"nextExecution"`
 	// The organization ID that owns this scheduled action.
 	OrgID pulumi.StringOutput `pulumi:"orgID"`
+	// The organization name
+	OrgName pulumi.StringOutput `pulumi:"orgName"`
 	// Whether the scheduled action is currently paused.
 	Paused pulumi.BoolOutput `pulumi:"paused"`
+	// The project name
+	ProjectName pulumi.StringOutput `pulumi:"projectName"`
 	// A cron expression defining the recurring schedule.
 	ScheduleCron pulumi.StringPtrOutput `pulumi:"scheduleCron"`
+	// The unique identifier for this scheduled action.
+	ScheduleID pulumi.StringOutput `pulumi:"scheduleID"`
 	// A timestamp for a one-time scheduled execution.
 	ScheduleOnce pulumi.StringPtrOutput `pulumi:"scheduleOnce"`
+	// The stack name
+	StackName pulumi.StringOutput `pulumi:"stackName"`
 }
 
 // NewScheduledDeployment registers a new resource with the given unique name, arguments, and options.
@@ -54,6 +62,12 @@ func NewScheduledDeployment(ctx *pulumi.Context,
 	if args.StackName == nil {
 		return nil, errors.New("invalid value for required argument 'StackName'")
 	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"orgName",
+		"projectName",
+		"stackName",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource ScheduledDeployment
 	err := ctx.RegisterResource("pulumiservice:v2:ScheduledDeployment", name, args, &resource, opts...)
@@ -243,9 +257,19 @@ func (o ScheduledDeploymentOutput) OrgID() pulumi.StringOutput {
 	return o.ApplyT(func(v *ScheduledDeployment) pulumi.StringOutput { return v.OrgID }).(pulumi.StringOutput)
 }
 
+// The organization name
+func (o ScheduledDeploymentOutput) OrgName() pulumi.StringOutput {
+	return o.ApplyT(func(v *ScheduledDeployment) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
+}
+
 // Whether the scheduled action is currently paused.
 func (o ScheduledDeploymentOutput) Paused() pulumi.BoolOutput {
 	return o.ApplyT(func(v *ScheduledDeployment) pulumi.BoolOutput { return v.Paused }).(pulumi.BoolOutput)
+}
+
+// The project name
+func (o ScheduledDeploymentOutput) ProjectName() pulumi.StringOutput {
+	return o.ApplyT(func(v *ScheduledDeployment) pulumi.StringOutput { return v.ProjectName }).(pulumi.StringOutput)
 }
 
 // A cron expression defining the recurring schedule.
@@ -253,9 +277,19 @@ func (o ScheduledDeploymentOutput) ScheduleCron() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *ScheduledDeployment) pulumi.StringPtrOutput { return v.ScheduleCron }).(pulumi.StringPtrOutput)
 }
 
+// The unique identifier for this scheduled action.
+func (o ScheduledDeploymentOutput) ScheduleID() pulumi.StringOutput {
+	return o.ApplyT(func(v *ScheduledDeployment) pulumi.StringOutput { return v.ScheduleID }).(pulumi.StringOutput)
+}
+
 // A timestamp for a one-time scheduled execution.
 func (o ScheduledDeploymentOutput) ScheduleOnce() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *ScheduledDeployment) pulumi.StringPtrOutput { return v.ScheduleOnce }).(pulumi.StringPtrOutput)
+}
+
+// The stack name
+func (o ScheduledDeploymentOutput) StackName() pulumi.StringOutput {
+	return o.ApplyT(func(v *ScheduledDeployment) pulumi.StringOutput { return v.StackName }).(pulumi.StringOutput)
 }
 
 type ScheduledDeploymentArrayOutput struct{ *pulumi.OutputState }

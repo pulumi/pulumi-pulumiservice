@@ -23,26 +23,26 @@ public final class OidcIssuerArgs extends com.pulumi.resources.ResourceArgs {
      * The OIDC issuer identifier
      * 
      */
-    @Import(name="issuerId", required=true)
-    private Output<String> issuerId;
+    @Import(name="issuerId")
+    private @Nullable Output<String> issuerId;
 
     /**
      * @return The OIDC issuer identifier
      * 
      */
-    public Output<String> issuerId() {
-        return this.issuerId;
+    public Optional<Output<String>> issuerId() {
+        return Optional.ofNullable(this.issuerId);
     }
 
     /**
-     * The updated JSON Web Key Set for the OIDC issuer.
+     * The JSON Web Key Set for the OIDC issuer.
      * 
      */
     @Import(name="jwks")
     private @Nullable Output<Object> jwks;
 
     /**
-     * @return The updated JSON Web Key Set for the OIDC issuer.
+     * @return The JSON Web Key Set for the OIDC issuer.
      * 
      */
     public Optional<Output<Object>> jwks() {
@@ -50,14 +50,14 @@ public final class OidcIssuerArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * The updated maximum token expiration time in seconds.
+     * The maximum token expiration time in seconds.
      * 
      */
     @Import(name="maxExpiration")
     private @Nullable Output<Integer> maxExpiration;
 
     /**
-     * @return The updated maximum token expiration time in seconds.
+     * @return The maximum token expiration time in seconds.
      * 
      */
     public Optional<Output<Integer>> maxExpiration() {
@@ -65,18 +65,18 @@ public final class OidcIssuerArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * The updated display name of the OIDC issuer.
+     * The display name of the OIDC issuer.
      * 
      */
-    @Import(name="name")
-    private @Nullable Output<String> name;
+    @Import(name="name", required=true)
+    private Output<String> name;
 
     /**
-     * @return The updated display name of the OIDC issuer.
+     * @return The display name of the OIDC issuer.
      * 
      */
-    public Optional<Output<String>> name() {
-        return Optional.ofNullable(this.name);
+    public Output<String> name() {
+        return this.name;
     }
 
     /**
@@ -95,18 +95,33 @@ public final class OidcIssuerArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * Updated SHA-1 certificate thumbprints used to verify the OIDC issuer&#39;s TLS certificate.
+     * SHA-1 certificate thumbprints used to verify the OIDC issuer&#39;s TLS certificate.
      * 
      */
     @Import(name="thumbprints")
     private @Nullable Output<List<String>> thumbprints;
 
     /**
-     * @return Updated SHA-1 certificate thumbprints used to verify the OIDC issuer&#39;s TLS certificate.
+     * @return SHA-1 certificate thumbprints used to verify the OIDC issuer&#39;s TLS certificate.
      * 
      */
     public Optional<Output<List<String>>> thumbprints() {
         return Optional.ofNullable(this.thumbprints);
+    }
+
+    /**
+     * The URL of the OIDC issuer.
+     * 
+     */
+    @Import(name="url", required=true)
+    private Output<String> url;
+
+    /**
+     * @return The URL of the OIDC issuer.
+     * 
+     */
+    public Output<String> url() {
+        return this.url;
     }
 
     private OidcIssuerArgs() {}
@@ -118,6 +133,7 @@ public final class OidcIssuerArgs extends com.pulumi.resources.ResourceArgs {
         this.name = $.name;
         this.orgName = $.orgName;
         this.thumbprints = $.thumbprints;
+        this.url = $.url;
     }
 
     public static Builder builder() {
@@ -144,7 +160,7 @@ public final class OidcIssuerArgs extends com.pulumi.resources.ResourceArgs {
          * @return builder
          * 
          */
-        public Builder issuerId(Output<String> issuerId) {
+        public Builder issuerId(@Nullable Output<String> issuerId) {
             $.issuerId = issuerId;
             return this;
         }
@@ -160,7 +176,7 @@ public final class OidcIssuerArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param jwks The updated JSON Web Key Set for the OIDC issuer.
+         * @param jwks The JSON Web Key Set for the OIDC issuer.
          * 
          * @return builder
          * 
@@ -171,7 +187,7 @@ public final class OidcIssuerArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param jwks The updated JSON Web Key Set for the OIDC issuer.
+         * @param jwks The JSON Web Key Set for the OIDC issuer.
          * 
          * @return builder
          * 
@@ -181,7 +197,7 @@ public final class OidcIssuerArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param maxExpiration The updated maximum token expiration time in seconds.
+         * @param maxExpiration The maximum token expiration time in seconds.
          * 
          * @return builder
          * 
@@ -192,7 +208,7 @@ public final class OidcIssuerArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param maxExpiration The updated maximum token expiration time in seconds.
+         * @param maxExpiration The maximum token expiration time in seconds.
          * 
          * @return builder
          * 
@@ -202,18 +218,18 @@ public final class OidcIssuerArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param name The updated display name of the OIDC issuer.
+         * @param name The display name of the OIDC issuer.
          * 
          * @return builder
          * 
          */
-        public Builder name(@Nullable Output<String> name) {
+        public Builder name(Output<String> name) {
             $.name = name;
             return this;
         }
 
         /**
-         * @param name The updated display name of the OIDC issuer.
+         * @param name The display name of the OIDC issuer.
          * 
          * @return builder
          * 
@@ -244,7 +260,7 @@ public final class OidcIssuerArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param thumbprints Updated SHA-1 certificate thumbprints used to verify the OIDC issuer&#39;s TLS certificate.
+         * @param thumbprints SHA-1 certificate thumbprints used to verify the OIDC issuer&#39;s TLS certificate.
          * 
          * @return builder
          * 
@@ -255,7 +271,7 @@ public final class OidcIssuerArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param thumbprints Updated SHA-1 certificate thumbprints used to verify the OIDC issuer&#39;s TLS certificate.
+         * @param thumbprints SHA-1 certificate thumbprints used to verify the OIDC issuer&#39;s TLS certificate.
          * 
          * @return builder
          * 
@@ -265,7 +281,7 @@ public final class OidcIssuerArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param thumbprints Updated SHA-1 certificate thumbprints used to verify the OIDC issuer&#39;s TLS certificate.
+         * @param thumbprints SHA-1 certificate thumbprints used to verify the OIDC issuer&#39;s TLS certificate.
          * 
          * @return builder
          * 
@@ -274,12 +290,36 @@ public final class OidcIssuerArgs extends com.pulumi.resources.ResourceArgs {
             return thumbprints(List.of(thumbprints));
         }
 
+        /**
+         * @param url The URL of the OIDC issuer.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder url(Output<String> url) {
+            $.url = url;
+            return this;
+        }
+
+        /**
+         * @param url The URL of the OIDC issuer.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder url(String url) {
+            return url(Output.of(url));
+        }
+
         public OidcIssuerArgs build() {
-            if ($.issuerId == null) {
-                throw new MissingRequiredPropertyException("OidcIssuerArgs", "issuerId");
+            if ($.name == null) {
+                throw new MissingRequiredPropertyException("OidcIssuerArgs", "name");
             }
             if ($.orgName == null) {
                 throw new MissingRequiredPropertyException("OidcIssuerArgs", "orgName");
+            }
+            if ($.url == null) {
+                throw new MissingRequiredPropertyException("OidcIssuerArgs", "url");
             }
             return $;
         }

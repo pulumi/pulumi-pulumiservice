@@ -1,2 +1,2 @@
-name: oidc-issuer
+name: pulumicloud-v2-oidc-issuer
 runtime: python

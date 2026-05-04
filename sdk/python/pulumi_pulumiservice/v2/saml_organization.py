@@ -121,6 +121,8 @@ class SAMLOrganization(pulumi.CustomResource):
             __props__.__dict__["sso_url"] = None
             __props__.__dict__["valid_until"] = None
             __props__.__dict__["validation_error"] = None
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["orgName"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(SAMLOrganization, __self__).__init__(
             'pulumiservice:v2:SAMLOrganization',
             resource_name,
@@ -146,6 +148,7 @@ class SAMLOrganization(pulumi.CustomResource):
         __props__.__dict__["entity_id"] = None
         __props__.__dict__["idp_sso_descriptor"] = None
         __props__.__dict__["name_id_format"] = None
+        __props__.__dict__["org_name"] = None
         __props__.__dict__["organization"] = None
         __props__.__dict__["sso_url"] = None
         __props__.__dict__["valid_until"] = None
@@ -176,6 +179,14 @@ class SAMLOrganization(pulumi.CustomResource):
         The SAML NameID format used by the identity provider.
         """
         return pulumi.get(self, "name_id_format")
+
+    @_builtins.property
+    @pulumi.getter(name="orgName")
+    def org_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The organization name
+        """
+        return pulumi.get(self, "org_name")
 
     @_builtins.property
     @pulumi.getter

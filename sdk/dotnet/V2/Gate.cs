@@ -22,10 +22,22 @@ namespace Pulumi.PulumiService.V2
         public Output<bool> Enabled { get; private set; } = null!;
 
         /// <summary>
+        /// Unique identifier of the change gate
+        /// </summary>
+        [Output("gateID")]
+        public Output<string> GateID { get; private set; } = null!;
+
+        /// <summary>
         /// Name of the change gate
         /// </summary>
         [Output("name")]
         public Output<string> Name { get; private set; } = null!;
+
+        /// <summary>
+        /// The organization name
+        /// </summary>
+        [Output("orgName")]
+        public Output<string> OrgName { get; private set; } = null!;
 
         /// <summary>
         /// Rule configuration for the gate
@@ -62,6 +74,10 @@ namespace Pulumi.PulumiService.V2
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
+                ReplaceOnChanges =
+                {
+                    "orgName",
+                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.

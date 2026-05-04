@@ -35,6 +35,12 @@ namespace Pulumi.PulumiService.V2
         public Output<string?> NameIdFormat { get; private set; } = null!;
 
         /// <summary>
+        /// The organization name
+        /// </summary>
+        [Output("orgName")]
+        public Output<string> OrgName { get; private set; } = null!;
+
+        /// <summary>
         /// The Pulumi organization.
         /// </summary>
         [Output("organization")]
@@ -82,6 +88,10 @@ namespace Pulumi.PulumiService.V2
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
+                ReplaceOnChanges =
+                {
+                    "orgName",
+                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.

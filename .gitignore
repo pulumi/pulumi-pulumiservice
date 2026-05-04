@@ -37,3 +37,7 @@ coverage.txt
 
 # Claude Code workspace artifacts
 .claude/
+
+# Local plugin schema cache written by `pulumi plugin install -f` and
+# `pulumi convert` when loading a development build of the provider.
+schema-pulumiservice-*.json

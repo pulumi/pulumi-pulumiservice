@@ -12,15 +12,8 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-// Updates a team's membership and configuration. This multi-purpose endpoint supports several operations:
-//
-// **Update membership:** Use `member` (username) and `memberAction` (`add` or `remove`) to manage team members.
-//
-// **Grant stack access:** Use `addStackPermission` with `projectName`, `stackName`, and `permission` (integer: `101` = read, `102` = edit, `103` = admin).
-//
-// **Remove stack access:** Use `removeStack` with `projectName` and `stackName`.
-//
-// Members added to a team inherit the team's stack permissions. Teams are not available to individual (single-user) organizations.
+// CreatePulumiTeam creates a "Pulumi" team, i.e. one whose membership is managed by Pulumi.
+// (As opposed to a GitHub or GitLab-based team.)
 type Team struct {
 	pulumi.CustomResourceState
 
@@ -42,6 +35,8 @@ type Team struct {
 	Members pulumi.ArrayOutput `pulumi:"members"`
 	// The unique identifier name of the team within the organization.
 	Name pulumi.StringOutput `pulumi:"name"`
+	// The organization name
+	OrgName pulumi.StringOutput `pulumi:"orgName"`
 	// RoleIDs are the IDs of the FGA roles assigned to the team, if any.
 	// Currently only one role per team is supported.
 	RoleIds pulumi.StringArrayOutput `pulumi:"roleIds"`
@@ -58,12 +53,22 @@ func NewTeam(ctx *pulumi.Context,
 		return nil, errors.New("missing one or more required arguments")
 	}
 
+	if args.Description == nil {
+		return nil, errors.New("invalid value for required argument 'Description'")
+	}
+	if args.DisplayName == nil {
+		return nil, errors.New("invalid value for required argument 'DisplayName'")
+	}
+	if args.Name == nil {
+		return nil, errors.New("invalid value for required argument 'Name'")
+	}
 	if args.OrgName == nil {
 		return nil, errors.New("invalid value for required argument 'OrgName'")
 	}
-	if args.TeamName == nil {
-		return nil, errors.New("invalid value for required argument 'TeamName'")
-	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"orgName",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Team
 	err := ctx.RegisterResource("pulumiservice:v2:Team", name, args, &resource, opts...)
@@ -97,58 +102,26 @@ func (TeamState) ElementType() reflect.Type {
 }
 
 type teamArgs struct {
-	// An environment permission to add to the team.
-	AddEnvironmentPermission interface{} `pulumi:"addEnvironmentPermission"`
-	// A stack permission to add to the team.
-	AddStackPermission interface{} `pulumi:"addStackPermission"`
-	// An environment permission to edit on the team.
-	EditEnvironmentPermission interface{} `pulumi:"editEnvironmentPermission"`
-	// A stack permission to edit on the team.
-	EditStackPermission interface{} `pulumi:"editStackPermission"`
-	// Member to be added or removed based on MemberAction.
-	Member *string `pulumi:"member"`
-	// MemberAction is the action to perform.
-	MemberAction *string `pulumi:"memberAction"`
-	// The new description for the team.
-	NewDescription *string `pulumi:"newDescription"`
-	// The new display name for the team.
-	NewDisplayName *string `pulumi:"newDisplayName"`
+	// The description
+	Description string `pulumi:"description"`
+	// The display name
+	DisplayName string `pulumi:"displayName"`
+	// The name
+	Name string `pulumi:"name"`
 	// The organization name
 	OrgName string `pulumi:"orgName"`
-	// An environment to remove from the team.
-	RemoveEnvironment interface{} `pulumi:"removeEnvironment"`
-	// A stack to remove from the team.
-	RemoveStack interface{} `pulumi:"removeStack"`
-	// The team name
-	TeamName string `pulumi:"teamName"`
 }
 
 // The set of arguments for constructing a Team resource.
 type TeamArgs struct {
-	// An environment permission to add to the team.
-	AddEnvironmentPermission pulumi.Input
-	// A stack permission to add to the team.
-	AddStackPermission pulumi.Input
-	// An environment permission to edit on the team.
-	EditEnvironmentPermission pulumi.Input
-	// A stack permission to edit on the team.
-	EditStackPermission pulumi.Input
-	// Member to be added or removed based on MemberAction.
-	Member pulumi.StringPtrInput
-	// MemberAction is the action to perform.
-	MemberAction pulumi.StringPtrInput
-	// The new description for the team.
-	NewDescription pulumi.StringPtrInput
-	// The new display name for the team.
-	NewDisplayName pulumi.StringPtrInput
+	// The description
+	Description pulumi.StringInput
+	// The display name
+	DisplayName pulumi.StringInput
+	// The name
+	Name pulumi.StringInput
 	// The organization name
 	OrgName pulumi.StringInput
-	// An environment to remove from the team.
-	RemoveEnvironment pulumi.Input
-	// A stack to remove from the team.
-	RemoveStack pulumi.Input
-	// The team name
-	TeamName pulumi.StringInput
 }
 
 func (TeamArgs) ElementType() reflect.Type {
@@ -278,6 +251,11 @@ func (o TeamOutput) Members() pulumi.ArrayOutput {
 // The unique identifier name of the team within the organization.
 func (o TeamOutput) Name() pulumi.StringOutput {
 	return o.ApplyT(func(v *Team) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
+}
+
+// The organization name
+func (o TeamOutput) OrgName() pulumi.StringOutput {
+	return o.ApplyT(func(v *Team) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
 }
 
 // RoleIDs are the IDs of the FGA roles assigned to the team, if any.

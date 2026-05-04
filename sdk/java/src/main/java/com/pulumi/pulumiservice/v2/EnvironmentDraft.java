@@ -21,6 +21,20 @@ import javax.annotation.Nullable;
 @ResourceType(type="pulumiservice:v2:EnvironmentDraft")
 public class EnvironmentDraft extends com.pulumi.resources.CustomResource {
     /**
+     * The change request ID
+     * 
+     */
+    @Export(name="changeRequestID", refs={String.class}, tree="[0]")
+    private Output<String> changeRequestID;
+
+    /**
+     * @return The change request ID
+     * 
+     */
+    public Output<String> changeRequestID() {
+        return this.changeRequestID;
+    }
+    /**
      * The change request identifier
      * 
      */
@@ -35,6 +49,20 @@ public class EnvironmentDraft extends com.pulumi.resources.CustomResource {
         return Codegen.optional(this.changeRequestId);
     }
     /**
+     * The environment name
+     * 
+     */
+    @Export(name="envName", refs={String.class}, tree="[0]")
+    private Output<String> envName;
+
+    /**
+     * @return The environment name
+     * 
+     */
+    public Output<String> envName() {
+        return this.envName;
+    }
+    /**
      * The latest revision number
      * 
      */
@@ -47,6 +75,34 @@ public class EnvironmentDraft extends com.pulumi.resources.CustomResource {
      */
     public Output<Optional<Integer>> latestRevisionNumber() {
         return Codegen.optional(this.latestRevisionNumber);
+    }
+    /**
+     * The organization name
+     * 
+     */
+    @Export(name="orgName", refs={String.class}, tree="[0]")
+    private Output<String> orgName;
+
+    /**
+     * @return The organization name
+     * 
+     */
+    public Output<String> orgName() {
+        return this.orgName;
+    }
+    /**
+     * The project name
+     * 
+     */
+    @Export(name="projectName", refs={String.class}, tree="[0]")
+    private Output<String> projectName;
+
+    /**
+     * @return The project name
+     * 
+     */
+    public Output<String> projectName() {
+        return this.projectName;
     }
 
     /**

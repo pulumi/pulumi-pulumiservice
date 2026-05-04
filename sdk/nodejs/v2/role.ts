@@ -67,9 +67,17 @@ export class Role extends pulumi.CustomResource {
      */
     declare public /*out*/ readonly orgId: pulumi.Output<string>;
     /**
+     * The organization name
+     */
+    declare public readonly orgName: pulumi.Output<string>;
+    /**
      * The resource type this permission descriptor applies to.
      */
     declare public readonly resourceType: pulumi.Output<string | undefined>;
+    /**
+     * The unique identifier for this role.
+     */
+    declare public readonly roleID: pulumi.Output<string>;
     /**
      * The UX purpose of this permission descriptor (e.g. role, policy, set).
      */
@@ -116,11 +124,15 @@ export class Role extends pulumi.CustomResource {
             resourceInputs["modified"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
             resourceInputs["orgId"] = undefined /*out*/;
+            resourceInputs["orgName"] = undefined /*out*/;
             resourceInputs["resourceType"] = undefined /*out*/;
+            resourceInputs["roleID"] = undefined /*out*/;
             resourceInputs["uxPurpose"] = undefined /*out*/;
             resourceInputs["version"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["orgName"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(Role.__pulumiType, name, resourceInputs, opts);
     }
 }

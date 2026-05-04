@@ -47,9 +47,21 @@ export class StackConfig extends pulumi.CustomResource {
      */
     declare public readonly environment: pulumi.Output<string>;
     /**
+     * The organization name
+     */
+    declare public readonly orgName: pulumi.Output<string>;
+    /**
+     * The project name
+     */
+    declare public readonly projectName: pulumi.Output<string>;
+    /**
      * The stack's secrets provider.
      */
     declare public readonly secretsProvider: pulumi.Output<string | undefined>;
+    /**
+     * The stack name
+     */
+    declare public readonly stackName: pulumi.Output<string>;
 
     /**
      * Create a StackConfig resource with the given unique name, arguments, and options.
@@ -85,9 +97,16 @@ export class StackConfig extends pulumi.CustomResource {
             resourceInputs["encryptedKey"] = undefined /*out*/;
             resourceInputs["encryptionSalt"] = undefined /*out*/;
             resourceInputs["environment"] = undefined /*out*/;
+            resourceInputs["orgName"] = undefined /*out*/;
+            resourceInputs["projectName"] = undefined /*out*/;
             resourceInputs["secretsProvider"] = undefined /*out*/;
+            resourceInputs["stackName"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const secretOpts = { additionalSecretOutputs: ["secretsProvider"] };
+        opts = pulumi.mergeOptions(opts, secretOpts);
+        const replaceOnChanges = { replaceOnChanges: ["orgName", "projectName", "stackName"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(StackConfig.__pulumiType, name, resourceInputs, opts);
     }
 }

@@ -8,28 +8,11 @@ import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
 import java.lang.String;
 import java.util.Objects;
-import java.util.Optional;
-import javax.annotation.Nullable;
 
 
 public final class Environment_esc_environmentsArgs extends com.pulumi.resources.ResourceArgs {
 
     public static final Environment_esc_environmentsArgs Empty = new Environment_esc_environmentsArgs();
-
-    /**
-     * The environment name
-     * 
-     */
-    @Import(name="envName")
-    private @Nullable Output<String> envName;
-
-    /**
-     * @return The environment name
-     * 
-     */
-    public Optional<Output<String>> envName() {
-        return Optional.ofNullable(this.envName);
-    }
 
     /**
      * The name of the environment.
@@ -76,29 +59,12 @@ public final class Environment_esc_environmentsArgs extends com.pulumi.resources
         return this.project;
     }
 
-    /**
-     * The project name
-     * 
-     */
-    @Import(name="projectName")
-    private @Nullable Output<String> projectName;
-
-    /**
-     * @return The project name
-     * 
-     */
-    public Optional<Output<String>> projectName() {
-        return Optional.ofNullable(this.projectName);
-    }
-
     private Environment_esc_environmentsArgs() {}
 
     private Environment_esc_environmentsArgs(Environment_esc_environmentsArgs $) {
-        this.envName = $.envName;
         this.name = $.name;
         this.orgName = $.orgName;
         this.project = $.project;
-        this.projectName = $.projectName;
     }
 
     public static Builder builder() {
@@ -117,27 +83,6 @@ public final class Environment_esc_environmentsArgs extends com.pulumi.resources
 
         public Builder(Environment_esc_environmentsArgs defaults) {
             $ = new Environment_esc_environmentsArgs(Objects.requireNonNull(defaults));
-        }
-
-        /**
-         * @param envName The environment name
-         * 
-         * @return builder
-         * 
-         */
-        public Builder envName(@Nullable Output<String> envName) {
-            $.envName = envName;
-            return this;
-        }
-
-        /**
-         * @param envName The environment name
-         * 
-         * @return builder
-         * 
-         */
-        public Builder envName(String envName) {
-            return envName(Output.of(envName));
         }
 
         /**
@@ -201,27 +146,6 @@ public final class Environment_esc_environmentsArgs extends com.pulumi.resources
          */
         public Builder project(String project) {
             return project(Output.of(project));
-        }
-
-        /**
-         * @param projectName The project name
-         * 
-         * @return builder
-         * 
-         */
-        public Builder projectName(@Nullable Output<String> projectName) {
-            $.projectName = projectName;
-            return this;
-        }
-
-        /**
-         * @param projectName The project name
-         * 
-         * @return builder
-         * 
-         */
-        public Builder projectName(String projectName) {
-            return projectName(Output.of(projectName));
         }
 
         public Environment_esc_environmentsArgs build() {

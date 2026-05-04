@@ -1,5 +1,5 @@
 {
-	"name": "oidc-issuer",
+	"name": "pulumicloud-v2-oidc-issuer",
 	"devDependencies": {
 		"@types/node": "^18"
 	},

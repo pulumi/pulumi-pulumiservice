@@ -16,11 +16,15 @@ import (
 type Account struct {
 	pulumi.CustomResourceState
 
+	// The Insights account name
+	AccountName pulumi.StringOutput `pulumi:"accountName"`
 	// The ID of the agent pool to run account discovery workflows.
 	// If not specified, discovery will use the default agent pool.
 	AgentPoolID pulumi.StringPtrOutput `pulumi:"agentPoolID"`
 	// The name of the account.
 	Name pulumi.StringOutput `pulumi:"name"`
+	// The organization name
+	OrgName pulumi.StringOutput `pulumi:"orgName"`
 	// The user with ownership of this Insights account
 	OwnedBy pulumi.AnyOutput `pulumi:"ownedBy"`
 	// The cloud provider for the account (e.g., aws, gcp, azure-native).
@@ -57,6 +61,11 @@ func NewAccount(ctx *pulumi.Context,
 	if args.Provider == nil {
 		return nil, errors.New("invalid value for required argument 'Provider'")
 	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"accountName",
+		"orgName",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Account
 	err := ctx.RegisterResource("pulumiservice:v2:Account", name, args, &resource, opts...)
@@ -219,6 +228,11 @@ func (o AccountOutput) ToAccountOutputWithContext(ctx context.Context) AccountOu
 	return o
 }
 
+// The Insights account name
+func (o AccountOutput) AccountName() pulumi.StringOutput {
+	return o.ApplyT(func(v *Account) pulumi.StringOutput { return v.AccountName }).(pulumi.StringOutput)
+}
+
 // The ID of the agent pool to run account discovery workflows.
 // If not specified, discovery will use the default agent pool.
 func (o AccountOutput) AgentPoolID() pulumi.StringPtrOutput {
@@ -228,6 +242,11 @@ func (o AccountOutput) AgentPoolID() pulumi.StringPtrOutput {
 // The name of the account.
 func (o AccountOutput) Name() pulumi.StringOutput {
 	return o.ApplyT(func(v *Account) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
+}
+
+// The organization name
+func (o AccountOutput) OrgName() pulumi.StringOutput {
+	return o.ApplyT(func(v *Account) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
 }
 
 // The user with ownership of this Insights account

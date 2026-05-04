@@ -63,6 +63,20 @@ public class RevisionTag_esc_environments extends com.pulumi.resources.CustomRes
         return Codegen.optional(this.editorName);
     }
     /**
+     * The environment name
+     * 
+     */
+    @Export(name="envName", refs={String.class}, tree="[0]")
+    private Output<String> envName;
+
+    /**
+     * @return The environment name
+     * 
+     */
+    public Output<String> envName() {
+        return this.envName;
+    }
+    /**
      * The timestamp when the tag was last modified.
      * 
      */
@@ -91,6 +105,34 @@ public class RevisionTag_esc_environments extends com.pulumi.resources.CustomRes
         return this.name;
     }
     /**
+     * The organization name
+     * 
+     */
+    @Export(name="orgName", refs={String.class}, tree="[0]")
+    private Output<String> orgName;
+
+    /**
+     * @return The organization name
+     * 
+     */
+    public Output<String> orgName() {
+        return this.orgName;
+    }
+    /**
+     * The project name
+     * 
+     */
+    @Export(name="projectName", refs={String.class}, tree="[0]")
+    private Output<String> projectName;
+
+    /**
+     * @return The project name
+     * 
+     */
+    public Output<String> projectName() {
+        return this.projectName;
+    }
+    /**
      * The revision number this tag points to.
      * 
      */
@@ -103,6 +145,20 @@ public class RevisionTag_esc_environments extends com.pulumi.resources.CustomRes
      */
     public Output<Integer> revision() {
         return this.revision;
+    }
+    /**
+     * The revision tag name
+     * 
+     */
+    @Export(name="tagName", refs={String.class}, tree="[0]")
+    private Output<String> tagName;
+
+    /**
+     * @return The revision tag name
+     * 
+     */
+    public Output<String> tagName() {
+        return this.tagName;
     }
 
     /**

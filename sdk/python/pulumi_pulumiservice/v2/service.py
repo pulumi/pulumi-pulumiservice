@@ -25,8 +25,7 @@ class ServiceArgs:
                  org_name: pulumi.Input[_builtins.str],
                  owner_name: pulumi.Input[_builtins.str],
                  owner_type: pulumi.Input[_builtins.str],
-                 properties: pulumi.Input[Sequence[Any]],
-                 service_name: Optional[pulumi.Input[_builtins.str]] = None):
+                 properties: pulumi.Input[Sequence[Any]]):
         """
         The set of arguments for constructing a Service resource.
 
@@ -37,7 +36,6 @@ class ServiceArgs:
         :param pulumi.Input[_builtins.str] owner_name: the service owner name
         :param pulumi.Input[_builtins.str] owner_type: the service owner type
         :param pulumi.Input[Sequence[Any]] properties: an optional list of properties to set on the service
-        :param pulumi.Input[_builtins.str] service_name: The service name
         """
         pulumi.set(__self__, "description", description)
         pulumi.set(__self__, "items", items)
@@ -46,8 +44,6 @@ class ServiceArgs:
         pulumi.set(__self__, "owner_name", owner_name)
         pulumi.set(__self__, "owner_type", owner_type)
         pulumi.set(__self__, "properties", properties)
-        if service_name is not None:
-            pulumi.set(__self__, "service_name", service_name)
 
     @_builtins.property
     @pulumi.getter
@@ -133,18 +129,6 @@ class ServiceArgs:
     def properties(self, value: pulumi.Input[Sequence[Any]]):
         pulumi.set(self, "properties", value)
 
-    @_builtins.property
-    @pulumi.getter(name="serviceName")
-    def service_name(self) -> Optional[pulumi.Input[_builtins.str]]:
-        """
-        The service name
-        """
-        return pulumi.get(self, "service_name")
-
-    @service_name.setter
-    def service_name(self, value: Optional[pulumi.Input[_builtins.str]]):
-        pulumi.set(self, "service_name", value)
-
 
 @pulumi.type_token("pulumiservice:v2:Service")
 class Service(pulumi.CustomResource):
@@ -159,7 +143,6 @@ class Service(pulumi.CustomResource):
                  owner_name: Optional[pulumi.Input[_builtins.str]] = None,
                  owner_type: Optional[pulumi.Input[_builtins.str]] = None,
                  properties: Optional[pulumi.Input[Sequence[Any]]] = None,
-                 service_name: Optional[pulumi.Input[_builtins.str]] = None,
                  __props__=None):
         """
         Creates a new service account in an organization. Service accounts provide programmatic, non-human identities for accessing Pulumi Cloud resources. They are scoped to an organization and can hold access tokens, belong to teams, and have stack permissions. The service name must be unique within the organization.
@@ -174,7 +157,6 @@ class Service(pulumi.CustomResource):
         :param pulumi.Input[_builtins.str] owner_name: the service owner name
         :param pulumi.Input[_builtins.str] owner_type: the service owner type
         :param pulumi.Input[Sequence[Any]] properties: an optional list of properties to set on the service
-        :param pulumi.Input[_builtins.str] service_name: The service name
         """
         ...
     @overload
@@ -208,7 +190,6 @@ class Service(pulumi.CustomResource):
                  owner_name: Optional[pulumi.Input[_builtins.str]] = None,
                  owner_type: Optional[pulumi.Input[_builtins.str]] = None,
                  properties: Optional[pulumi.Input[Sequence[Any]]] = None,
-                 service_name: Optional[pulumi.Input[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
@@ -239,8 +220,9 @@ class Service(pulumi.CustomResource):
             if properties is None and not opts.urn:
                 raise TypeError("Missing required property 'properties'")
             __props__.__dict__["properties"] = properties
-            __props__.__dict__["service_name"] = service_name
             __props__.__dict__["continuation_token"] = None
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["name", "orgName", "ownerName", "ownerType"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(Service, __self__).__init__(
             'pulumiservice:v2:Service',
             resource_name,
@@ -265,6 +247,10 @@ class Service(pulumi.CustomResource):
 
         __props__.__dict__["continuation_token"] = None
         __props__.__dict__["items"] = None
+        __props__.__dict__["name"] = None
+        __props__.__dict__["org_name"] = None
+        __props__.__dict__["owner_name"] = None
+        __props__.__dict__["owner_type"] = None
         return Service(resource_name, opts=opts, __props__=__props__)
 
     @_builtins.property
@@ -283,4 +269,36 @@ class Service(pulumi.CustomResource):
         The list of service items
         """
         return pulumi.get(self, "items")
+
+    @_builtins.property
+    @pulumi.getter
+    def name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The service name
+        """
+        return pulumi.get(self, "name")
+
+    @_builtins.property
+    @pulumi.getter(name="orgName")
+    def org_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The organization name
+        """
+        return pulumi.get(self, "org_name")
+
+    @_builtins.property
+    @pulumi.getter(name="ownerName")
+    def owner_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The owner name
+        """
+        return pulumi.get(self, "owner_name")
+
+    @_builtins.property
+    @pulumi.getter(name="ownerType")
+    def owner_type(self) -> pulumi.Output[_builtins.str]:
+        """
+        The owner type
+        """
+        return pulumi.get(self, "owner_type")
 

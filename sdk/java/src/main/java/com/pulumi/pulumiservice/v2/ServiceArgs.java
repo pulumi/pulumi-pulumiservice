@@ -10,8 +10,6 @@ import java.lang.Object;
 import java.lang.String;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import javax.annotation.Nullable;
 
 
 public final class ServiceArgs extends com.pulumi.resources.ResourceArgs {
@@ -123,21 +121,6 @@ public final class ServiceArgs extends com.pulumi.resources.ResourceArgs {
         return this.properties;
     }
 
-    /**
-     * The service name
-     * 
-     */
-    @Import(name="serviceName")
-    private @Nullable Output<String> serviceName;
-
-    /**
-     * @return The service name
-     * 
-     */
-    public Optional<Output<String>> serviceName() {
-        return Optional.ofNullable(this.serviceName);
-    }
-
     private ServiceArgs() {}
 
     private ServiceArgs(ServiceArgs $) {
@@ -148,7 +131,6 @@ public final class ServiceArgs extends com.pulumi.resources.ResourceArgs {
         this.ownerName = $.ownerName;
         this.ownerType = $.ownerType;
         this.properties = $.properties;
-        this.serviceName = $.serviceName;
     }
 
     public static Builder builder() {
@@ -334,27 +316,6 @@ public final class ServiceArgs extends com.pulumi.resources.ResourceArgs {
          */
         public Builder properties(Object... properties) {
             return properties(List.of(properties));
-        }
-
-        /**
-         * @param serviceName The service name
-         * 
-         * @return builder
-         * 
-         */
-        public Builder serviceName(@Nullable Output<String> serviceName) {
-            $.serviceName = serviceName;
-            return this;
-        }
-
-        /**
-         * @param serviceName The service name
-         * 
-         * @return builder
-         * 
-         */
-        public Builder serviceName(String serviceName) {
-            return serviceName(Output.of(serviceName));
         }
 
         public ServiceArgs build() {

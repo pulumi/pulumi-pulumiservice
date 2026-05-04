@@ -55,6 +55,14 @@ export class AzureDevOpsIntegration extends pulumi.CustomResource {
      */
     declare public /*out*/ readonly installed: pulumi.Output<boolean>;
     /**
+     * The Azure DevOps integration identifier
+     */
+    declare public readonly integrationId: pulumi.Output<string>;
+    /**
+     * The organization name
+     */
+    declare public readonly orgName: pulumi.Output<string>;
+    /**
      * Metadata about the Azure DevOps organization linked to the Pulumi organization
      */
     declare public /*out*/ readonly organization: pulumi.Output<any | undefined>;
@@ -100,11 +108,15 @@ export class AzureDevOpsIntegration extends pulumi.CustomResource {
             resourceInputs["disableNeoSummaries"] = undefined /*out*/;
             resourceInputs["disablePRComments"] = undefined /*out*/;
             resourceInputs["installed"] = undefined /*out*/;
+            resourceInputs["integrationId"] = undefined /*out*/;
+            resourceInputs["orgName"] = undefined /*out*/;
             resourceInputs["organization"] = undefined /*out*/;
             resourceInputs["project"] = undefined /*out*/;
             resourceInputs["valid"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["integrationId", "orgName"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(AzureDevOpsIntegration.__pulumiType, name, resourceInputs, opts);
     }
 }

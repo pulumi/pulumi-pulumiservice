@@ -4,10 +4,12 @@
 package com.pulumi.pulumiservice.v2;
 
 import com.pulumi.core.Output;
+import com.pulumi.core.annotations.Export;
 import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.Utilities;
 import com.pulumi.pulumiservice.v2.Environment_preview_environmentsArgs;
+import java.lang.String;
 import javax.annotation.Nullable;
 
 /**
@@ -16,6 +18,35 @@ import javax.annotation.Nullable;
  */
 @ResourceType(type="pulumiservice:v2:Environment_preview_environments")
 public class Environment_preview_environments extends com.pulumi.resources.CustomResource {
+    /**
+     * The environment name
+     * 
+     */
+    @Export(name="envName", refs={String.class}, tree="[0]")
+    private Output<String> envName;
+
+    /**
+     * @return The environment name
+     * 
+     */
+    public Output<String> envName() {
+        return this.envName;
+    }
+    /**
+     * The organization name
+     * 
+     */
+    @Export(name="orgName", refs={String.class}, tree="[0]")
+    private Output<String> orgName;
+
+    /**
+     * @return The organization name
+     * 
+     */
+    public Output<String> orgName() {
+        return this.orgName;
+    }
+
     /**
      *
      * @param name The _unique_ name of the resulting resource.

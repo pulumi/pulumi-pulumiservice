@@ -298,6 +298,8 @@ class DeploymentSettings(pulumi.CustomResource):
             __props__.__dict__["vcs"] = vcs
             __props__.__dict__["source"] = None
             __props__.__dict__["version"] = None
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["orgName", "projectName", "stackName"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(DeploymentSettings, __self__).__init__(
             'pulumiservice:v2:DeploymentSettings',
             resource_name,
@@ -325,8 +327,11 @@ class DeploymentSettings(pulumi.CustomResource):
         __props__.__dict__["executor_context"] = None
         __props__.__dict__["git_hub"] = None
         __props__.__dict__["operation_context"] = None
+        __props__.__dict__["org_name"] = None
+        __props__.__dict__["project_name"] = None
         __props__.__dict__["source"] = None
         __props__.__dict__["source_context"] = None
+        __props__.__dict__["stack_name"] = None
         __props__.__dict__["tag"] = None
         __props__.__dict__["vcs"] = None
         __props__.__dict__["version"] = None
@@ -373,6 +378,22 @@ class DeploymentSettings(pulumi.CustomResource):
         return pulumi.get(self, "operation_context")
 
     @_builtins.property
+    @pulumi.getter(name="orgName")
+    def org_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The organization name
+        """
+        return pulumi.get(self, "org_name")
+
+    @_builtins.property
+    @pulumi.getter(name="projectName")
+    def project_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The project name
+        """
+        return pulumi.get(self, "project_name")
+
+    @_builtins.property
     @pulumi.getter
     def source(self) -> pulumi.Output[Optional[_builtins.str]]:
         """
@@ -387,6 +408,14 @@ class DeploymentSettings(pulumi.CustomResource):
         The source context defining where the source code is located.
         """
         return pulumi.get(self, "source_context")
+
+    @_builtins.property
+    @pulumi.getter(name="stackName")
+    def stack_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The stack name
+        """
+        return pulumi.get(self, "stack_name")
 
     @_builtins.property
     @pulumi.getter

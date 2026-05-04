@@ -1,2 +1,12 @@
-name: webhooks
+name: pulumicloud-v2-webhooks
 runtime: yaml
+config:
+  serviceOrg:
+    type: string
+    default: service-provider-test-org
+  secretValue:
+    type: string
+    default: shhh
+  hookSuffix:
+    type: string
+    default: dev

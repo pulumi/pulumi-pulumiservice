@@ -63,6 +63,14 @@ export class BitBucketIntegration extends pulumi.CustomResource {
      */
     declare public /*out*/ readonly installed: pulumi.Output<boolean>;
     /**
+     * The BitBucket integration identifier
+     */
+    declare public readonly integrationId: pulumi.Output<string>;
+    /**
+     * The organization name
+     */
+    declare public readonly orgName: pulumi.Output<string>;
+    /**
      * Whether the integration's credentials are currently valid.
      */
     declare public /*out*/ readonly valid: pulumi.Output<boolean>;
@@ -117,12 +125,16 @@ export class BitBucketIntegration extends pulumi.CustomResource {
             resourceInputs["disableNeoSummaries"] = undefined /*out*/;
             resourceInputs["disablePRComments"] = undefined /*out*/;
             resourceInputs["installed"] = undefined /*out*/;
+            resourceInputs["integrationId"] = undefined /*out*/;
+            resourceInputs["orgName"] = undefined /*out*/;
             resourceInputs["valid"] = undefined /*out*/;
             resourceInputs["workspaceName"] = undefined /*out*/;
             resourceInputs["workspaceSlug"] = undefined /*out*/;
             resourceInputs["workspaceUuid"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["integrationId", "orgName"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(BitBucketIntegration.__pulumiType, name, resourceInputs, opts);
     }
 }

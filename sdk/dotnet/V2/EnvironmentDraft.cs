@@ -16,16 +16,40 @@ namespace Pulumi.PulumiService.V2
     public partial class EnvironmentDraft : global::Pulumi.CustomResource
     {
         /// <summary>
+        /// The change request ID
+        /// </summary>
+        [Output("changeRequestID")]
+        public Output<string> ChangeRequestID { get; private set; } = null!;
+
+        /// <summary>
         /// The change request identifier
         /// </summary>
         [Output("changeRequestId")]
         public Output<string?> ChangeRequestId { get; private set; } = null!;
 
         /// <summary>
+        /// The environment name
+        /// </summary>
+        [Output("envName")]
+        public Output<string> EnvName { get; private set; } = null!;
+
+        /// <summary>
         /// The latest revision number
         /// </summary>
         [Output("latestRevisionNumber")]
         public Output<int?> LatestRevisionNumber { get; private set; } = null!;
+
+        /// <summary>
+        /// The organization name
+        /// </summary>
+        [Output("orgName")]
+        public Output<string> OrgName { get; private set; } = null!;
+
+        /// <summary>
+        /// The project name
+        /// </summary>
+        [Output("projectName")]
+        public Output<string> ProjectName { get; private set; } = null!;
 
 
         /// <summary>
@@ -50,6 +74,13 @@ namespace Pulumi.PulumiService.V2
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
+                ReplaceOnChanges =
+                {
+                    "changeRequestID",
+                    "envName",
+                    "orgName",
+                    "projectName",
+                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.

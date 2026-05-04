@@ -34,10 +34,28 @@ namespace Pulumi.PulumiService.V2
         public Output<string> Environment { get; private set; } = null!;
 
         /// <summary>
+        /// The organization name
+        /// </summary>
+        [Output("orgName")]
+        public Output<string> OrgName { get; private set; } = null!;
+
+        /// <summary>
+        /// The project name
+        /// </summary>
+        [Output("projectName")]
+        public Output<string> ProjectName { get; private set; } = null!;
+
+        /// <summary>
         /// The stack's secrets provider.
         /// </summary>
         [Output("secretsProvider")]
         public Output<string?> SecretsProvider { get; private set; } = null!;
+
+        /// <summary>
+        /// The stack name
+        /// </summary>
+        [Output("stackName")]
+        public Output<string> StackName { get; private set; } = null!;
 
 
         /// <summary>
@@ -62,6 +80,16 @@ namespace Pulumi.PulumiService.V2
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
+                AdditionalSecretOutputs =
+                {
+                    "secretsProvider",
+                },
+                ReplaceOnChanges =
+                {
+                    "orgName",
+                    "projectName",
+                    "stackName",
+                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.

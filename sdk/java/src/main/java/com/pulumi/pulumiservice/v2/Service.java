@@ -51,6 +51,62 @@ public class Service extends com.pulumi.resources.CustomResource {
     public Output<List<Object>> items() {
         return this.items;
     }
+    /**
+     * The service name
+     * 
+     */
+    @Export(name="name", refs={String.class}, tree="[0]")
+    private Output<String> name;
+
+    /**
+     * @return The service name
+     * 
+     */
+    public Output<String> name() {
+        return this.name;
+    }
+    /**
+     * The organization name
+     * 
+     */
+    @Export(name="orgName", refs={String.class}, tree="[0]")
+    private Output<String> orgName;
+
+    /**
+     * @return The organization name
+     * 
+     */
+    public Output<String> orgName() {
+        return this.orgName;
+    }
+    /**
+     * The owner name
+     * 
+     */
+    @Export(name="ownerName", refs={String.class}, tree="[0]")
+    private Output<String> ownerName;
+
+    /**
+     * @return The owner name
+     * 
+     */
+    public Output<String> ownerName() {
+        return this.ownerName;
+    }
+    /**
+     * The owner type
+     * 
+     */
+    @Export(name="ownerType", refs={String.class}, tree="[0]")
+    private Output<String> ownerType;
+
+    /**
+     * @return The owner type
+     * 
+     */
+    public Output<String> ownerType() {
+        return this.ownerType;
+    }
 
     /**
      *

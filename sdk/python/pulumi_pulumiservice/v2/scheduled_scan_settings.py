@@ -236,6 +236,8 @@ class ScheduledScanSettings(pulumi.CustomResource):
             __props__.__dict__["read_concurrency"] = read_concurrency
             __props__.__dict__["read_timeout"] = read_timeout
             __props__.__dict__["schedule_cron"] = schedule_cron
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["accountName", "orgName"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(ScheduledScanSettings, __self__).__init__(
             'pulumiservice:v2:ScheduledScanSettings',
             resource_name,
@@ -258,13 +260,23 @@ class ScheduledScanSettings(pulumi.CustomResource):
 
         __props__ = ScheduledScanSettingsArgs.__new__(ScheduledScanSettingsArgs)
 
+        __props__.__dict__["account_name"] = None
         __props__.__dict__["batch_size"] = None
         __props__.__dict__["list_concurrency"] = None
+        __props__.__dict__["org_name"] = None
         __props__.__dict__["paused"] = None
         __props__.__dict__["read_concurrency"] = None
         __props__.__dict__["read_timeout"] = None
         __props__.__dict__["schedule_cron"] = None
         return ScheduledScanSettings(resource_name, opts=opts, __props__=__props__)
+
+    @_builtins.property
+    @pulumi.getter(name="accountName")
+    def account_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The Insights account name
+        """
+        return pulumi.get(self, "account_name")
 
     @_builtins.property
     @pulumi.getter(name="batchSize")
@@ -281,6 +293,14 @@ class ScheduledScanSettings(pulumi.CustomResource):
         The concurrency level for list operations during the scan.
         """
         return pulumi.get(self, "list_concurrency")
+
+    @_builtins.property
+    @pulumi.getter(name="orgName")
+    def org_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The organization name
+        """
+        return pulumi.get(self, "org_name")
 
     @_builtins.property
     @pulumi.getter

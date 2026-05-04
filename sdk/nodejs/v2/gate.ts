@@ -39,9 +39,17 @@ export class Gate extends pulumi.CustomResource {
      */
     declare public readonly enabled: pulumi.Output<boolean>;
     /**
+     * Unique identifier of the change gate
+     */
+    declare public readonly gateID: pulumi.Output<string>;
+    /**
      * Name of the change gate
      */
     declare public readonly name: pulumi.Output<string>;
+    /**
+     * The organization name
+     */
+    declare public readonly orgName: pulumi.Output<string>;
     /**
      * Rule configuration for the gate
      */
@@ -85,11 +93,15 @@ export class Gate extends pulumi.CustomResource {
             resourceInputs["target"] = args?.target;
         } else {
             resourceInputs["enabled"] = undefined /*out*/;
+            resourceInputs["gateID"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
+            resourceInputs["orgName"] = undefined /*out*/;
             resourceInputs["rule"] = undefined /*out*/;
             resourceInputs["target"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["orgName"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(Gate.__pulumiType, name, resourceInputs, opts);
     }
 }

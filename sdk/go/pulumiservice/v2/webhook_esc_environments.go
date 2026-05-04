@@ -67,9 +67,6 @@ func NewWebhook_esc_environments(ctx *pulumi.Context,
 	if args.Name == nil {
 		return nil, errors.New("invalid value for required argument 'Name'")
 	}
-	if args.OrgName == nil {
-		return nil, errors.New("invalid value for required argument 'OrgName'")
-	}
 	if args.OrganizationName == nil {
 		return nil, errors.New("invalid value for required argument 'OrganizationName'")
 	}
@@ -79,6 +76,12 @@ func NewWebhook_esc_environments(ctx *pulumi.Context,
 	if args.ProjectName == nil {
 		return nil, errors.New("invalid value for required argument 'ProjectName'")
 	}
+	secrets := pulumi.AdditionalSecretOutputs([]string{
+		"hasSecret",
+		"secret",
+		"secretCiphertext",
+	})
+	opts = append(opts, secrets)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Webhook_esc_environments
 	err := ctx.RegisterResource("pulumiservice:v2:Webhook_esc_environments", name, args, &resource, opts...)
@@ -124,12 +127,8 @@ type webhook_esc_environmentsArgs struct {
 	Format *string `pulumi:"format"`
 	// Event groups this webhook subscribes to (e.g., 'stacks', 'deployments').
 	Groups []string `pulumi:"groups"`
-	// The webhook name
-	HookName *string `pulumi:"hookName"`
 	// The unique identifier name for the webhook within its scope.
 	Name string `pulumi:"name"`
-	// The organization name
-	OrgName string `pulumi:"orgName"`
 	// The organization that owns this webhook.
 	OrganizationName string `pulumi:"organizationName"`
 	// The URL to which webhook payloads are delivered.
@@ -156,12 +155,8 @@ type Webhook_esc_environmentsArgs struct {
 	Format pulumi.StringPtrInput
 	// Event groups this webhook subscribes to (e.g., 'stacks', 'deployments').
 	Groups pulumi.StringArrayInput
-	// The webhook name
-	HookName pulumi.StringPtrInput
 	// The unique identifier name for the webhook within its scope.
 	Name pulumi.StringInput
-	// The organization name
-	OrgName pulumi.StringInput
 	// The organization that owns this webhook.
 	OrganizationName pulumi.StringInput
 	// The URL to which webhook payloads are delivered.

@@ -17,7 +17,7 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 
 /**
- * Updates an existing OIDC issuer registration for an organization. This can be used to modify the issuer name, audience restrictions, trust policies, or other configuration. The issuer URL itself cannot be changed after creation. The issuer name is required in the update request.
+ * Registers a new OIDC issuer for an organization, establishing a trust relationship with an external identity provider. Once registered, the identity provider can issue signed, short-lived tokens that are exchanged for temporary Pulumi Cloud credentials during deployments. This eliminates the need to store long-lived access tokens. Supported providers include AWS, Azure, Google Cloud, GitHub Actions, and any OIDC-compliant identity provider. The request must include the issuer URL, and the service will fetch the provider&#39;s public signing keys to verify token authenticity.
  * 
  */
 @ResourceType(type="pulumiservice:v2:OidcIssuer")
@@ -49,6 +49,20 @@ public class OidcIssuer extends com.pulumi.resources.CustomResource {
      */
     public Output<String> issuer() {
         return this.issuer;
+    }
+    /**
+     * The unique identifier of the registered OIDC issuer.
+     * 
+     */
+    @Export(name="issuerId", refs={String.class}, tree="[0]")
+    private Output<String> issuerId;
+
+    /**
+     * @return The unique identifier of the registered OIDC issuer.
+     * 
+     */
+    public Output<String> issuerId() {
+        return this.issuerId;
     }
     /**
      * The JSON Web Key Set for the OIDC issuer.
@@ -119,6 +133,20 @@ public class OidcIssuer extends com.pulumi.resources.CustomResource {
      */
     public Output<String> name() {
         return this.name;
+    }
+    /**
+     * The organization name
+     * 
+     */
+    @Export(name="orgName", refs={String.class}, tree="[0]")
+    private Output<String> orgName;
+
+    /**
+     * @return The organization name
+     * 
+     */
+    public Output<String> orgName() {
+        return this.orgName;
     }
     /**
      * SHA-1 certificate thumbprints used to verify the OIDC issuer&#39;s TLS certificate.

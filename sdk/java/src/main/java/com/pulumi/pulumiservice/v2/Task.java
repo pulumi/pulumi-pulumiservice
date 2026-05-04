@@ -164,6 +164,20 @@ public class Task extends com.pulumi.resources.CustomResource {
         return this.name;
     }
     /**
+     * The organization name
+     * 
+     */
+    @Export(name="orgName", refs={String.class}, tree="[0]")
+    private Output<String> orgName;
+
+    /**
+     * @return The organization name
+     * 
+     */
+    public Output<String> orgName() {
+        return this.orgName;
+    }
+    /**
      * The permission scope for the task.
      * 
      */
@@ -260,6 +274,20 @@ public class Task extends com.pulumi.resources.CustomResource {
      */
     public Output<String> status() {
         return this.status;
+    }
+    /**
+     * The agent task identifier
+     * 
+     */
+    @Export(name="taskID", refs={String.class}, tree="[0]")
+    private Output<String> taskID;
+
+    /**
+     * @return The agent task identifier
+     * 
+     */
+    public Output<String> taskID() {
+        return this.taskID;
     }
     /**
      * Whether the task was started synchronously by a user or asynchronously by background automation.

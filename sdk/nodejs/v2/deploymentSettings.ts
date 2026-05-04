@@ -55,6 +55,14 @@ export class DeploymentSettings extends pulumi.CustomResource {
      */
     declare public readonly operationContext: pulumi.Output<any | undefined>;
     /**
+     * The organization name
+     */
+    declare public readonly orgName: pulumi.Output<string>;
+    /**
+     * The project name
+     */
+    declare public readonly projectName: pulumi.Output<string>;
+    /**
      * The source from which the deployment settings were created.
      */
     declare public /*out*/ readonly source: pulumi.Output<string | undefined>;
@@ -62,6 +70,10 @@ export class DeploymentSettings extends pulumi.CustomResource {
      * The source context defining where the source code is located.
      */
     declare public readonly sourceContext: pulumi.Output<any | undefined>;
+    /**
+     * The stack name
+     */
+    declare public readonly stackName: pulumi.Output<string>;
     /**
      * A tag to identify the deployment settings configuration.
      */
@@ -114,13 +126,18 @@ export class DeploymentSettings extends pulumi.CustomResource {
             resourceInputs["executorContext"] = undefined /*out*/;
             resourceInputs["gitHub"] = undefined /*out*/;
             resourceInputs["operationContext"] = undefined /*out*/;
+            resourceInputs["orgName"] = undefined /*out*/;
+            resourceInputs["projectName"] = undefined /*out*/;
             resourceInputs["source"] = undefined /*out*/;
             resourceInputs["sourceContext"] = undefined /*out*/;
+            resourceInputs["stackName"] = undefined /*out*/;
             resourceInputs["tag"] = undefined /*out*/;
             resourceInputs["vcs"] = undefined /*out*/;
             resourceInputs["version"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["orgName", "projectName", "stackName"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(DeploymentSettings.__pulumiType, name, resourceInputs, opts);
     }
 }

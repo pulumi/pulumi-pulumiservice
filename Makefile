@@ -145,12 +145,23 @@ build_java: .make/build_java
 .make/generate_java: | mise_env
 	PULUMI_HOME=$(GEN_PULUMI_HOME) PULUMI_CONVERT_EXAMPLES_CACHE_DIR=$(GEN_PULUMI_CONVERT_EXAMPLES_CACHE_DIR) pulumi package gen-sdk provider/cmd/$(PROVIDER)/schema.json --version ${PROVIDER_VERSION} --language java --out sdk/
 	printf "module fake_java_module // Exclude this directory from Go tools\n\ngo 1.17\n" > sdk/java/go.mod
+	# Patch two pulumi-java-gen template bugs that otherwise break gradle build:
+	# 1. settings.gradle ships an `include("lib")` for a subproject that doesn't exist on disk.
+	# 2. build.gradle inlines the package description (multi-line, with backticks) into a
+	#    Groovy single-quoted-style string literal without escaping the newlines.
+	# Both patches are idempotent on subsequent regenerations.
+	sed -i.bak '/^include("lib")$$/d' sdk/java/settings.gradle && rm -f sdk/java/settings.gradle.bak
+	perl -i -0pe 's/description = "[^"]*"/description = "Pulumi Service Provider for Pulumi Cloud."/s' sdk/java/build.gradle
+	# pulumi-java-gen pins Java toolchain to 11; raise to 17 (LTS) to match what
+	# the repo's mise install provides on macOS.
+	perl -i -pe 's/JavaLanguageVersion\.of\(11\)/JavaLanguageVersion.of(17)/g' sdk/java/build.gradle
 	@touch $@
 .make/build_java: PACKAGE_VERSION := $(PROVIDER_VERSION)
 .make/build_java: .make/generate_java
 	cd sdk/java/ && \
 		gradle --console=plain build && \
-		gradle --console=plain javadoc
+		gradle --console=plain javadoc && \
+		gradle --console=plain publishToMavenLocal
 	@touch $@
 .PHONY: generate_java build_java
 

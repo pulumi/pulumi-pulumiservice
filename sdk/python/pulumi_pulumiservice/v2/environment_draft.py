@@ -158,6 +158,8 @@ class EnvironmentDraft(pulumi.CustomResource):
             __props__.__dict__["project_name"] = project_name
             __props__.__dict__["change_request_id"] = None
             __props__.__dict__["latest_revision_number"] = None
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["changeRequestID", "envName", "orgName", "projectName"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(EnvironmentDraft, __self__).__init__(
             'pulumiservice:v2:EnvironmentDraft',
             resource_name,
@@ -181,8 +183,20 @@ class EnvironmentDraft(pulumi.CustomResource):
         __props__ = EnvironmentDraftArgs.__new__(EnvironmentDraftArgs)
 
         __props__.__dict__["change_request_id"] = None
+        __props__.__dict__["change_request_id"] = None
+        __props__.__dict__["env_name"] = None
         __props__.__dict__["latest_revision_number"] = None
+        __props__.__dict__["org_name"] = None
+        __props__.__dict__["project_name"] = None
         return EnvironmentDraft(resource_name, opts=opts, __props__=__props__)
+
+    @_builtins.property
+    @pulumi.getter(name="changeRequestID")
+    def change_request_id(self) -> pulumi.Output[_builtins.str]:
+        """
+        The change request ID
+        """
+        return pulumi.get(self, "change_request_id")
 
     @_builtins.property
     @pulumi.getter(name="changeRequestId")
@@ -193,10 +207,34 @@ class EnvironmentDraft(pulumi.CustomResource):
         return pulumi.get(self, "change_request_id")
 
     @_builtins.property
+    @pulumi.getter(name="envName")
+    def env_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The environment name
+        """
+        return pulumi.get(self, "env_name")
+
+    @_builtins.property
     @pulumi.getter(name="latestRevisionNumber")
     def latest_revision_number(self) -> pulumi.Output[Optional[_builtins.int]]:
         """
         The latest revision number
         """
         return pulumi.get(self, "latest_revision_number")
+
+    @_builtins.property
+    @pulumi.getter(name="orgName")
+    def org_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The organization name
+        """
+        return pulumi.get(self, "org_name")
+
+    @_builtins.property
+    @pulumi.getter(name="projectName")
+    def project_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The project name
+        """
+        return pulumi.get(self, "project_name")
 

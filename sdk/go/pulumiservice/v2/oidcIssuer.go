@@ -12,7 +12,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-// Updates an existing OIDC issuer registration for an organization. This can be used to modify the issuer name, audience restrictions, trust policies, or other configuration. The issuer URL itself cannot be changed after creation. The issuer name is required in the update request.
+// Registers a new OIDC issuer for an organization, establishing a trust relationship with an external identity provider. Once registered, the identity provider can issue signed, short-lived tokens that are exchanged for temporary Pulumi Cloud credentials during deployments. This eliminates the need to store long-lived access tokens. Supported providers include AWS, Azure, Google Cloud, GitHub Actions, and any OIDC-compliant identity provider. The request must include the issuer URL, and the service will fetch the provider's public signing keys to verify token authenticity.
 type OidcIssuer struct {
 	pulumi.CustomResourceState
 
@@ -20,6 +20,8 @@ type OidcIssuer struct {
 	Created pulumi.StringPtrOutput `pulumi:"created"`
 	// The OIDC issuer identifier, typically a URL that uniquely identifies the identity provider.
 	Issuer pulumi.StringOutput `pulumi:"issuer"`
+	// The unique identifier of the registered OIDC issuer.
+	IssuerId pulumi.StringOutput `pulumi:"issuerId"`
 	// The JSON Web Key Set for the OIDC issuer.
 	Jwks pulumi.AnyOutput `pulumi:"jwks"`
 	// The ISO 8601 timestamp when the OIDC issuer was last used for token exchange.
@@ -30,6 +32,8 @@ type OidcIssuer struct {
 	Modified pulumi.StringPtrOutput `pulumi:"modified"`
 	// The display name of the OIDC issuer.
 	Name pulumi.StringOutput `pulumi:"name"`
+	// The organization name
+	OrgName pulumi.StringOutput `pulumi:"orgName"`
 	// SHA-1 certificate thumbprints used to verify the OIDC issuer's TLS certificate.
 	Thumbprints pulumi.StringArrayOutput `pulumi:"thumbprints"`
 	// The URL of the OIDC issuer.
@@ -43,12 +47,19 @@ func NewOidcIssuer(ctx *pulumi.Context,
 		return nil, errors.New("missing one or more required arguments")
 	}
 
-	if args.IssuerId == nil {
-		return nil, errors.New("invalid value for required argument 'IssuerId'")
+	if args.Name == nil {
+		return nil, errors.New("invalid value for required argument 'Name'")
 	}
 	if args.OrgName == nil {
 		return nil, errors.New("invalid value for required argument 'OrgName'")
 	}
+	if args.Url == nil {
+		return nil, errors.New("invalid value for required argument 'Url'")
+	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"orgName",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource OidcIssuer
 	err := ctx.RegisterResource("pulumiservice:v2:OidcIssuer", name, args, &resource, opts...)
@@ -83,33 +94,37 @@ func (OidcIssuerState) ElementType() reflect.Type {
 
 type oidcIssuerArgs struct {
 	// The OIDC issuer identifier
-	IssuerId string `pulumi:"issuerId"`
-	// The updated JSON Web Key Set for the OIDC issuer.
+	IssuerId *string `pulumi:"issuerId"`
+	// The JSON Web Key Set for the OIDC issuer.
 	Jwks interface{} `pulumi:"jwks"`
-	// The updated maximum token expiration time in seconds.
+	// The maximum token expiration time in seconds.
 	MaxExpiration *int `pulumi:"maxExpiration"`
-	// The updated display name of the OIDC issuer.
-	Name *string `pulumi:"name"`
+	// The display name of the OIDC issuer.
+	Name string `pulumi:"name"`
 	// The organization name
 	OrgName string `pulumi:"orgName"`
-	// Updated SHA-1 certificate thumbprints used to verify the OIDC issuer's TLS certificate.
+	// SHA-1 certificate thumbprints used to verify the OIDC issuer's TLS certificate.
 	Thumbprints []string `pulumi:"thumbprints"`
+	// The URL of the OIDC issuer.
+	Url string `pulumi:"url"`
 }
 
 // The set of arguments for constructing a OidcIssuer resource.
 type OidcIssuerArgs struct {
 	// The OIDC issuer identifier
-	IssuerId pulumi.StringInput
-	// The updated JSON Web Key Set for the OIDC issuer.
+	IssuerId pulumi.StringPtrInput
+	// The JSON Web Key Set for the OIDC issuer.
 	Jwks pulumi.Input
-	// The updated maximum token expiration time in seconds.
+	// The maximum token expiration time in seconds.
 	MaxExpiration pulumi.IntPtrInput
-	// The updated display name of the OIDC issuer.
-	Name pulumi.StringPtrInput
+	// The display name of the OIDC issuer.
+	Name pulumi.StringInput
 	// The organization name
 	OrgName pulumi.StringInput
-	// Updated SHA-1 certificate thumbprints used to verify the OIDC issuer's TLS certificate.
+	// SHA-1 certificate thumbprints used to verify the OIDC issuer's TLS certificate.
 	Thumbprints pulumi.StringArrayInput
+	// The URL of the OIDC issuer.
+	Url pulumi.StringInput
 }
 
 func (OidcIssuerArgs) ElementType() reflect.Type {
@@ -209,6 +224,11 @@ func (o OidcIssuerOutput) Issuer() pulumi.StringOutput {
 	return o.ApplyT(func(v *OidcIssuer) pulumi.StringOutput { return v.Issuer }).(pulumi.StringOutput)
 }
 
+// The unique identifier of the registered OIDC issuer.
+func (o OidcIssuerOutput) IssuerId() pulumi.StringOutput {
+	return o.ApplyT(func(v *OidcIssuer) pulumi.StringOutput { return v.IssuerId }).(pulumi.StringOutput)
+}
+
 // The JSON Web Key Set for the OIDC issuer.
 func (o OidcIssuerOutput) Jwks() pulumi.AnyOutput {
 	return o.ApplyT(func(v *OidcIssuer) pulumi.AnyOutput { return v.Jwks }).(pulumi.AnyOutput)
@@ -232,6 +252,11 @@ func (o OidcIssuerOutput) Modified() pulumi.StringPtrOutput {
 // The display name of the OIDC issuer.
 func (o OidcIssuerOutput) Name() pulumi.StringOutput {
 	return o.ApplyT(func(v *OidcIssuer) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
+}
+
+// The organization name
+func (o OidcIssuerOutput) OrgName() pulumi.StringOutput {
+	return o.ApplyT(func(v *OidcIssuer) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
 }
 
 // SHA-1 certificate thumbprints used to verify the OIDC issuer's TLS certificate.

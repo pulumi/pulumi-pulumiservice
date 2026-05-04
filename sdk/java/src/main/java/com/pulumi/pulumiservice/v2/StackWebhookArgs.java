@@ -109,21 +109,6 @@ public final class StackWebhookArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * The webhook name
-     * 
-     */
-    @Import(name="hookName")
-    private @Nullable Output<String> hookName;
-
-    /**
-     * @return The webhook name
-     * 
-     */
-    public Optional<Output<String>> hookName() {
-        return Optional.ofNullable(this.hookName);
-    }
-
-    /**
      * The unique identifier name for the webhook within its scope.
      * 
      */
@@ -136,21 +121,6 @@ public final class StackWebhookArgs extends com.pulumi.resources.ResourceArgs {
      */
     public Output<String> name() {
         return this.name;
-    }
-
-    /**
-     * The organization name
-     * 
-     */
-    @Import(name="orgName", required=true)
-    private Output<String> orgName;
-
-    /**
-     * @return The organization name
-     * 
-     */
-    public Output<String> orgName() {
-        return this.orgName;
     }
 
     /**
@@ -237,9 +207,7 @@ public final class StackWebhookArgs extends com.pulumi.resources.ResourceArgs {
         this.filters = $.filters;
         this.format = $.format;
         this.groups = $.groups;
-        this.hookName = $.hookName;
         this.name = $.name;
-        this.orgName = $.orgName;
         this.organizationName = $.organizationName;
         this.payloadUrl = $.payloadUrl;
         this.projectName = $.projectName;
@@ -412,27 +380,6 @@ public final class StackWebhookArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param hookName The webhook name
-         * 
-         * @return builder
-         * 
-         */
-        public Builder hookName(@Nullable Output<String> hookName) {
-            $.hookName = hookName;
-            return this;
-        }
-
-        /**
-         * @param hookName The webhook name
-         * 
-         * @return builder
-         * 
-         */
-        public Builder hookName(String hookName) {
-            return hookName(Output.of(hookName));
-        }
-
-        /**
          * @param name The unique identifier name for the webhook within its scope.
          * 
          * @return builder
@@ -451,27 +398,6 @@ public final class StackWebhookArgs extends com.pulumi.resources.ResourceArgs {
          */
         public Builder name(String name) {
             return name(Output.of(name));
-        }
-
-        /**
-         * @param orgName The organization name
-         * 
-         * @return builder
-         * 
-         */
-        public Builder orgName(Output<String> orgName) {
-            $.orgName = orgName;
-            return this;
-        }
-
-        /**
-         * @param orgName The organization name
-         * 
-         * @return builder
-         * 
-         */
-        public Builder orgName(String orgName) {
-            return orgName(Output.of(orgName));
         }
 
         /**
@@ -588,9 +514,6 @@ public final class StackWebhookArgs extends com.pulumi.resources.ResourceArgs {
             }
             if ($.name == null) {
                 throw new MissingRequiredPropertyException("StackWebhookArgs", "name");
-            }
-            if ($.orgName == null) {
-                throw new MissingRequiredPropertyException("StackWebhookArgs", "orgName");
             }
             if ($.organizationName == null) {
                 throw new MissingRequiredPropertyException("StackWebhookArgs", "organizationName");

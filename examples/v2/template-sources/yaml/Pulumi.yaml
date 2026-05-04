@@ -1,0 +1,12 @@
+name: pulumicloud-v2-template-sources
+runtime: yaml
+config:
+  serviceOrg:
+    type: string
+    default: service-provider-test-org
+  templateSuffix:
+    type: string
+    default: dev
+  sourceUrl:
+    type: string
+    default: https://github.com/pulumi/examples

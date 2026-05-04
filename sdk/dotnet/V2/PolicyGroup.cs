@@ -10,7 +10,7 @@ using Pulumi.Serialization;
 namespace Pulumi.PulumiService.V2
 {
     /// <summary>
-    /// BatchUpdatePolicyGroup applies multiple update operations to the Policy Group efficiently. Each operation in the list uses the same fields as UpdatePolicyGroupRequest. Operations are grouped by type (adds, removes) and processed in batches for efficiency.
+    /// Creates a new Policy Group for an organization. Policy Groups define which Policy Packs are enforced on which stacks or cloud accounts, with configurable enforcement levels (advisory, mandatory, or disabled) per pack. This allows different policy strictness for different environments, such as advisory-only in development and mandatory in production.
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:v2:PolicyGroup")]
     public partial class PolicyGroup : global::Pulumi.CustomResource
@@ -58,6 +58,12 @@ namespace Pulumi.PulumiService.V2
         public Output<string> Name { get; private set; } = null!;
 
         /// <summary>
+        /// The organization name
+        /// </summary>
+        [Output("orgName")]
+        public Output<string> OrgName { get; private set; } = null!;
+
+        /// <summary>
         /// List of stacks that are members of this policy group.
         /// </summary>
         [Output("stacks")]
@@ -86,6 +92,10 @@ namespace Pulumi.PulumiService.V2
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
+                ReplaceOnChanges =
+                {
+                    "orgName",
+                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.
@@ -109,16 +119,34 @@ namespace Pulumi.PulumiService.V2
     public sealed class PolicyGroupArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
+        /// Agent pool ID for policy evaluation. Defaults to Pulumi hosted pool if not specified.
+        /// </summary>
+        [Input("agentPoolId")]
+        public Input<string>? AgentPoolId { get; set; }
+
+        /// <summary>
+        /// The type of entities this policy group applies to (stacks or accounts).
+        /// </summary>
+        [Input("entityType", required: true)]
+        public Input<string> EntityType { get; set; } = null!;
+
+        /// <summary>
+        /// The enforcement mode for the policy group (audit or preventative). Defaults to 'audit' for account policy groups, 'preventative' for stack policy groups.
+        /// </summary>
+        [Input("mode")]
+        public Input<string>? Mode { get; set; }
+
+        /// <summary>
+        /// The name of the new policy group.
+        /// </summary>
+        [Input("name", required: true)]
+        public Input<string> Name { get; set; } = null!;
+
+        /// <summary>
         /// The organization name
         /// </summary>
         [Input("orgName", required: true)]
         public Input<string> OrgName { get; set; } = null!;
-
-        /// <summary>
-        /// The policy group name
-        /// </summary>
-        [Input("policyGroup", required: true)]
-        public Input<string> PolicyGroup { get; set; } = null!;
 
         public PolicyGroupArgs()
         {

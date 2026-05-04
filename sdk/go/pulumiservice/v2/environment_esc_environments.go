@@ -15,6 +15,13 @@ import (
 // Creates a new Pulumi ESC (Environments, Secrets, and Configuration) environment within the specified organization. The request body must include the project name and the environment name. Environment names must be unique within a project and may only contain alphanumeric characters, hyphens, underscores, and periods. The newly created environment starts with an empty YAML definition that can be updated via the UpdateEnvironment endpoint.
 type Environment_esc_environments struct {
 	pulumi.CustomResourceState
+
+	// The environment name
+	Name pulumi.StringOutput `pulumi:"name"`
+	// The organization name
+	OrgName pulumi.StringOutput `pulumi:"orgName"`
+	// The project name
+	Project pulumi.StringOutput `pulumi:"project"`
 }
 
 // NewEnvironment_esc_environments registers a new resource with the given unique name, arguments, and options.
@@ -33,6 +40,12 @@ func NewEnvironment_esc_environments(ctx *pulumi.Context,
 	if args.Project == nil {
 		return nil, errors.New("invalid value for required argument 'Project'")
 	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"name",
+		"orgName",
+		"project",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Environment_esc_environments
 	err := ctx.RegisterResource("pulumiservice:v2:Environment_esc_environments", name, args, &resource, opts...)
@@ -66,30 +79,22 @@ func (Environment_esc_environmentsState) ElementType() reflect.Type {
 }
 
 type environment_esc_environmentsArgs struct {
-	// The environment name
-	EnvName *string `pulumi:"envName"`
 	// The name of the environment.
 	Name string `pulumi:"name"`
 	// The organization name
 	OrgName string `pulumi:"orgName"`
 	// The project name for the environment.
 	Project string `pulumi:"project"`
-	// The project name
-	ProjectName *string `pulumi:"projectName"`
 }
 
 // The set of arguments for constructing a Environment_esc_environments resource.
 type Environment_esc_environmentsArgs struct {
-	// The environment name
-	EnvName pulumi.StringPtrInput
 	// The name of the environment.
 	Name pulumi.StringInput
 	// The organization name
 	OrgName pulumi.StringInput
 	// The project name for the environment.
 	Project pulumi.StringInput
-	// The project name
-	ProjectName pulumi.StringPtrInput
 }
 
 func (Environment_esc_environmentsArgs) ElementType() reflect.Type {
@@ -177,6 +182,21 @@ func (o Environment_esc_environmentsOutput) ToEnvironment_esc_environmentsOutput
 
 func (o Environment_esc_environmentsOutput) ToEnvironment_esc_environmentsOutputWithContext(ctx context.Context) Environment_esc_environmentsOutput {
 	return o
+}
+
+// The environment name
+func (o Environment_esc_environmentsOutput) Name() pulumi.StringOutput {
+	return o.ApplyT(func(v *Environment_esc_environments) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
+}
+
+// The organization name
+func (o Environment_esc_environmentsOutput) OrgName() pulumi.StringOutput {
+	return o.ApplyT(func(v *Environment_esc_environments) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
+}
+
+// The project name
+func (o Environment_esc_environmentsOutput) Project() pulumi.StringOutput {
+	return o.ApplyT(func(v *Environment_esc_environments) pulumi.StringOutput { return v.Project }).(pulumi.StringOutput)
 }
 
 type Environment_esc_environmentsArrayOutput struct{ *pulumi.OutputState }

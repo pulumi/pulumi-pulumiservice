@@ -35,6 +35,20 @@ public class Gate extends com.pulumi.resources.CustomResource {
         return this.enabled;
     }
     /**
+     * Unique identifier of the change gate
+     * 
+     */
+    @Export(name="gateID", refs={String.class}, tree="[0]")
+    private Output<String> gateID;
+
+    /**
+     * @return Unique identifier of the change gate
+     * 
+     */
+    public Output<String> gateID() {
+        return this.gateID;
+    }
+    /**
      * Name of the change gate
      * 
      */
@@ -47,6 +61,20 @@ public class Gate extends com.pulumi.resources.CustomResource {
      */
     public Output<String> name() {
         return this.name;
+    }
+    /**
+     * The organization name
+     * 
+     */
+    @Export(name="orgName", refs={String.class}, tree="[0]")
+    private Output<String> orgName;
+
+    /**
+     * @return The organization name
+     * 
+     */
+    public Output<String> orgName() {
+        return this.orgName;
     }
     /**
      * Rule configuration for the gate

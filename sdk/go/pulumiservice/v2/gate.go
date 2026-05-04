@@ -18,8 +18,12 @@ type Gate struct {
 
 	// Whether the change gate is enabled
 	Enabled pulumi.BoolOutput `pulumi:"enabled"`
+	// Unique identifier of the change gate
+	GateID pulumi.StringOutput `pulumi:"gateID"`
 	// Name of the change gate
 	Name pulumi.StringOutput `pulumi:"name"`
+	// The organization name
+	OrgName pulumi.StringOutput `pulumi:"orgName"`
 	// Rule configuration for the gate
 	Rule pulumi.AnyOutput `pulumi:"rule"`
 	// Target configuration for the gate
@@ -48,6 +52,10 @@ func NewGate(ctx *pulumi.Context,
 	if args.Target == nil {
 		return nil, errors.New("invalid value for required argument 'Target'")
 	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"orgName",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Gate
 	err := ctx.RegisterResource("pulumiservice:v2:Gate", name, args, &resource, opts...)
@@ -203,9 +211,19 @@ func (o GateOutput) Enabled() pulumi.BoolOutput {
 	return o.ApplyT(func(v *Gate) pulumi.BoolOutput { return v.Enabled }).(pulumi.BoolOutput)
 }
 
+// Unique identifier of the change gate
+func (o GateOutput) GateID() pulumi.StringOutput {
+	return o.ApplyT(func(v *Gate) pulumi.StringOutput { return v.GateID }).(pulumi.StringOutput)
+}
+
 // Name of the change gate
 func (o GateOutput) Name() pulumi.StringOutput {
 	return o.ApplyT(func(v *Gate) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
+}
+
+// The organization name
+func (o GateOutput) OrgName() pulumi.StringOutput {
+	return o.ApplyT(func(v *Gate) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
 }
 
 // Rule configuration for the gate

@@ -1,0 +1,48 @@
+# A consolidated example showing the toggles available on each
+# org-installed VCS integration. Each integration is identified by a
+# stable integrationId path-parameter — the actual OAuth setup happens
+# out-of-band via the Pulumi Cloud UI; this resource owns Pulumi-managed
+# behavior flags (PR comments, code-access for review previews, etc.).
+resources:
+  github:
+    type: pulumiservice:v2:GitHubIntegration
+    properties:
+      orgName: ${serviceOrg}
+      integrationId: ${githubIntegrationId}
+      disablePRComments: false
+      disableDetailedDiff: false
+      disableNeoSummaries: false
+      disableCodeAccessForReviews: false
+  githubEnterprise:
+    type: pulumiservice:v2:GitHubEnterpriseIntegration
+    properties:
+      orgName: ${serviceOrg}
+      integrationId: ${githubEnterpriseIntegrationId}
+      disablePRComments: true
+      disableDetailedDiff: false
+      disableNeoSummaries: false
+      disableCodeAccessForReviews: true
+  gitlab:
+    type: pulumiservice:v2:GitLabIntegration
+    properties:
+      orgName: ${serviceOrg}
+      integrationId: ${gitlabIntegrationId}
+      disablePRComments: false
+      disableDetailedDiff: false
+      disableNeoSummaries: true
+  bitbucket:
+    type: pulumiservice:v2:BitBucketIntegration
+    properties:
+      orgName: ${serviceOrg}
+      integrationId: ${bitbucketIntegrationId}
+      disablePRComments: false
+      disableDetailedDiff: false
+      disableNeoSummaries: false
+  azureDevOps:
+    type: pulumiservice:v2:AzureDevOpsIntegration
+    properties:
+      orgName: ${serviceOrg}
+      integrationId: ${azureDevOpsIntegrationId}
+      disablePRComments: true
+      disableDetailedDiff: true
+      disableNeoSummaries: true

@@ -224,6 +224,8 @@ class ScheduledDeployment(pulumi.CustomResource):
             __props__.__dict__["next_execution"] = None
             __props__.__dict__["org_id"] = None
             __props__.__dict__["paused"] = None
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["orgName", "projectName", "stackName"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(ScheduledDeployment, __self__).__init__(
             'pulumiservice:v2:ScheduledDeployment',
             resource_name,
@@ -253,9 +255,13 @@ class ScheduledDeployment(pulumi.CustomResource):
         __props__.__dict__["modified"] = None
         __props__.__dict__["next_execution"] = None
         __props__.__dict__["org_id"] = None
+        __props__.__dict__["org_name"] = None
         __props__.__dict__["paused"] = None
+        __props__.__dict__["project_name"] = None
         __props__.__dict__["schedule_cron"] = None
+        __props__.__dict__["schedule_id"] = None
         __props__.__dict__["schedule_once"] = None
+        __props__.__dict__["stack_name"] = None
         return ScheduledDeployment(resource_name, opts=opts, __props__=__props__)
 
     @_builtins.property
@@ -315,12 +321,28 @@ class ScheduledDeployment(pulumi.CustomResource):
         return pulumi.get(self, "org_id")
 
     @_builtins.property
+    @pulumi.getter(name="orgName")
+    def org_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The organization name
+        """
+        return pulumi.get(self, "org_name")
+
+    @_builtins.property
     @pulumi.getter
     def paused(self) -> pulumi.Output[_builtins.bool]:
         """
         Whether the scheduled action is currently paused.
         """
         return pulumi.get(self, "paused")
+
+    @_builtins.property
+    @pulumi.getter(name="projectName")
+    def project_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The project name
+        """
+        return pulumi.get(self, "project_name")
 
     @_builtins.property
     @pulumi.getter(name="scheduleCron")
@@ -331,10 +353,26 @@ class ScheduledDeployment(pulumi.CustomResource):
         return pulumi.get(self, "schedule_cron")
 
     @_builtins.property
+    @pulumi.getter(name="scheduleID")
+    def schedule_id(self) -> pulumi.Output[_builtins.str]:
+        """
+        The unique identifier for this scheduled action.
+        """
+        return pulumi.get(self, "schedule_id")
+
+    @_builtins.property
     @pulumi.getter(name="scheduleOnce")
     def schedule_once(self) -> pulumi.Output[Optional[_builtins.str]]:
         """
         A timestamp for a one-time scheduled execution.
         """
         return pulumi.get(self, "schedule_once")
+
+    @_builtins.property
+    @pulumi.getter(name="stackName")
+    def stack_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The stack name
+        """
+        return pulumi.get(self, "stack_name")
 

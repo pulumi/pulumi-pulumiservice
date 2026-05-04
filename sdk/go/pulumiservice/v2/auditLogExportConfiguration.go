@@ -20,6 +20,8 @@ type AuditLogExportConfiguration struct {
 	Enabled pulumi.BoolOutput `pulumi:"enabled"`
 	// The result of the last audit log export attempt.
 	LastResult pulumi.AnyOutput `pulumi:"lastResult"`
+	// The organization name
+	OrgName pulumi.StringOutput `pulumi:"orgName"`
 	// The S3 configuration for exporting audit logs.
 	S3Config pulumi.AnyOutput `pulumi:"s3Config"`
 }
@@ -40,6 +42,10 @@ func NewAuditLogExportConfiguration(ctx *pulumi.Context,
 	if args.OrgName == nil {
 		return nil, errors.New("invalid value for required argument 'OrgName'")
 	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"orgName",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource AuditLogExportConfiguration
 	err := ctx.RegisterResource("pulumiservice:v2:AuditLogExportConfiguration", name, args, &resource, opts...)
@@ -186,6 +192,11 @@ func (o AuditLogExportConfigurationOutput) Enabled() pulumi.BoolOutput {
 // The result of the last audit log export attempt.
 func (o AuditLogExportConfigurationOutput) LastResult() pulumi.AnyOutput {
 	return o.ApplyT(func(v *AuditLogExportConfiguration) pulumi.AnyOutput { return v.LastResult }).(pulumi.AnyOutput)
+}
+
+// The organization name
+func (o AuditLogExportConfigurationOutput) OrgName() pulumi.StringOutput {
+	return o.ApplyT(func(v *AuditLogExportConfiguration) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
 }
 
 // The S3 configuration for exporting audit logs.

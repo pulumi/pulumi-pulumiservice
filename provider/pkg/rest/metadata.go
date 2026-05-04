@@ -114,3 +114,4 @@ func ParseMetadata(data []byte) (*Metadata, error) {
 	}
 	return &m, nil
 }
+

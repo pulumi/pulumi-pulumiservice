@@ -58,10 +58,22 @@ namespace Pulumi.PulumiService.V2
         public Output<string> OrgID { get; private set; } = null!;
 
         /// <summary>
+        /// The organization name
+        /// </summary>
+        [Output("orgName")]
+        public Output<string> OrgName { get; private set; } = null!;
+
+        /// <summary>
         /// Whether the scheduled action is currently paused.
         /// </summary>
         [Output("paused")]
         public Output<bool> Paused { get; private set; } = null!;
+
+        /// <summary>
+        /// The project name
+        /// </summary>
+        [Output("projectName")]
+        public Output<string> ProjectName { get; private set; } = null!;
 
         /// <summary>
         /// A cron expression defining the recurring schedule.
@@ -70,10 +82,22 @@ namespace Pulumi.PulumiService.V2
         public Output<string?> ScheduleCron { get; private set; } = null!;
 
         /// <summary>
+        /// The unique identifier for this scheduled action.
+        /// </summary>
+        [Output("scheduleID")]
+        public Output<string> ScheduleID { get; private set; } = null!;
+
+        /// <summary>
         /// A timestamp for a one-time scheduled execution.
         /// </summary>
         [Output("scheduleOnce")]
         public Output<string?> ScheduleOnce { get; private set; } = null!;
+
+        /// <summary>
+        /// The stack name
+        /// </summary>
+        [Output("stackName")]
+        public Output<string> StackName { get; private set; } = null!;
 
 
         /// <summary>
@@ -98,6 +122,12 @@ namespace Pulumi.PulumiService.V2
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
+                ReplaceOnChanges =
+                {
+                    "orgName",
+                    "projectName",
+                    "stackName",
+                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.

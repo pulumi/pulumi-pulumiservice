@@ -1,0 +1,17 @@
+# AuthPolicy installs an org-wide auth policy. The `policies` field is a
+# list of scoped permission rules. This example sets a "deny" baseline,
+# overriding to allow members read access to the org. policyId scopes the
+# policy to either the org root ("org") or a child issuer.
+resources:
+  policy:
+    type: pulumiservice:v2:AuthPolicy
+    properties:
+      orgName: ${serviceOrg}
+      policyId: ${policyId}
+      policies:
+        - decision: allow
+          permission: read
+          tokenType: organization
+        - decision: deny
+          permission: admin
+          tokenType: organization

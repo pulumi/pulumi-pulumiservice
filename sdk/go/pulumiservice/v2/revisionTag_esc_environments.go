@@ -22,12 +22,20 @@ type RevisionTag_esc_environments struct {
 	EditorLogin pulumi.StringPtrOutput `pulumi:"editorLogin"`
 	// The display name of the user who last edited the tag.
 	EditorName pulumi.StringPtrOutput `pulumi:"editorName"`
+	// The environment name
+	EnvName pulumi.StringOutput `pulumi:"envName"`
 	// The timestamp when the tag was last modified.
 	Modified pulumi.StringOutput `pulumi:"modified"`
 	// The name of the tag.
 	Name pulumi.StringOutput `pulumi:"name"`
+	// The organization name
+	OrgName pulumi.StringOutput `pulumi:"orgName"`
+	// The project name
+	ProjectName pulumi.StringOutput `pulumi:"projectName"`
 	// The revision number this tag points to.
 	Revision pulumi.IntOutput `pulumi:"revision"`
+	// The revision tag name
+	TagName pulumi.StringOutput `pulumi:"tagName"`
 }
 
 // NewRevisionTag_esc_environments registers a new resource with the given unique name, arguments, and options.
@@ -49,6 +57,13 @@ func NewRevisionTag_esc_environments(ctx *pulumi.Context,
 	if args.TagName == nil {
 		return nil, errors.New("invalid value for required argument 'TagName'")
 	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"envName",
+		"orgName",
+		"projectName",
+		"tagName",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource RevisionTag_esc_environments
 	err := ctx.RegisterResource("pulumiservice:v2:RevisionTag_esc_environments", name, args, &resource, opts...)
@@ -210,6 +225,11 @@ func (o RevisionTag_esc_environmentsOutput) EditorName() pulumi.StringPtrOutput 
 	return o.ApplyT(func(v *RevisionTag_esc_environments) pulumi.StringPtrOutput { return v.EditorName }).(pulumi.StringPtrOutput)
 }
 
+// The environment name
+func (o RevisionTag_esc_environmentsOutput) EnvName() pulumi.StringOutput {
+	return o.ApplyT(func(v *RevisionTag_esc_environments) pulumi.StringOutput { return v.EnvName }).(pulumi.StringOutput)
+}
+
 // The timestamp when the tag was last modified.
 func (o RevisionTag_esc_environmentsOutput) Modified() pulumi.StringOutput {
 	return o.ApplyT(func(v *RevisionTag_esc_environments) pulumi.StringOutput { return v.Modified }).(pulumi.StringOutput)
@@ -220,9 +240,24 @@ func (o RevisionTag_esc_environmentsOutput) Name() pulumi.StringOutput {
 	return o.ApplyT(func(v *RevisionTag_esc_environments) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
 }
 
+// The organization name
+func (o RevisionTag_esc_environmentsOutput) OrgName() pulumi.StringOutput {
+	return o.ApplyT(func(v *RevisionTag_esc_environments) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
+}
+
+// The project name
+func (o RevisionTag_esc_environmentsOutput) ProjectName() pulumi.StringOutput {
+	return o.ApplyT(func(v *RevisionTag_esc_environments) pulumi.StringOutput { return v.ProjectName }).(pulumi.StringOutput)
+}
+
 // The revision number this tag points to.
 func (o RevisionTag_esc_environmentsOutput) Revision() pulumi.IntOutput {
 	return o.ApplyT(func(v *RevisionTag_esc_environments) pulumi.IntOutput { return v.Revision }).(pulumi.IntOutput)
+}
+
+// The revision tag name
+func (o RevisionTag_esc_environmentsOutput) TagName() pulumi.StringOutput {
+	return o.ApplyT(func(v *RevisionTag_esc_environments) pulumi.StringOutput { return v.TagName }).(pulumi.StringOutput)
 }
 
 type RevisionTag_esc_environmentsArrayOutput struct{ *pulumi.OutputState }

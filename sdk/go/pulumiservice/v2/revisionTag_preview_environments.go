@@ -22,12 +22,18 @@ type RevisionTag_preview_environments struct {
 	EditorLogin pulumi.StringPtrOutput `pulumi:"editorLogin"`
 	// The display name of the user who last edited the tag.
 	EditorName pulumi.StringPtrOutput `pulumi:"editorName"`
+	// The environment name
+	EnvName pulumi.StringOutput `pulumi:"envName"`
 	// The timestamp when the tag was last modified.
 	Modified pulumi.StringOutput `pulumi:"modified"`
 	// The name of the tag.
 	Name pulumi.StringOutput `pulumi:"name"`
+	// The organization name
+	OrgName pulumi.StringOutput `pulumi:"orgName"`
 	// The revision number this tag points to.
 	Revision pulumi.IntOutput `pulumi:"revision"`
+	// The revision tag name
+	TagName pulumi.StringOutput `pulumi:"tagName"`
 }
 
 // NewRevisionTag_preview_environments registers a new resource with the given unique name, arguments, and options.
@@ -46,6 +52,12 @@ func NewRevisionTag_preview_environments(ctx *pulumi.Context,
 	if args.TagName == nil {
 		return nil, errors.New("invalid value for required argument 'TagName'")
 	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"envName",
+		"orgName",
+		"tagName",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource RevisionTag_preview_environments
 	err := ctx.RegisterResource("pulumiservice:v2:RevisionTag_preview_environments", name, args, &resource, opts...)
@@ -203,6 +215,11 @@ func (o RevisionTag_preview_environmentsOutput) EditorName() pulumi.StringPtrOut
 	return o.ApplyT(func(v *RevisionTag_preview_environments) pulumi.StringPtrOutput { return v.EditorName }).(pulumi.StringPtrOutput)
 }
 
+// The environment name
+func (o RevisionTag_preview_environmentsOutput) EnvName() pulumi.StringOutput {
+	return o.ApplyT(func(v *RevisionTag_preview_environments) pulumi.StringOutput { return v.EnvName }).(pulumi.StringOutput)
+}
+
 // The timestamp when the tag was last modified.
 func (o RevisionTag_preview_environmentsOutput) Modified() pulumi.StringOutput {
 	return o.ApplyT(func(v *RevisionTag_preview_environments) pulumi.StringOutput { return v.Modified }).(pulumi.StringOutput)
@@ -213,9 +230,19 @@ func (o RevisionTag_preview_environmentsOutput) Name() pulumi.StringOutput {
 	return o.ApplyT(func(v *RevisionTag_preview_environments) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
 }
 
+// The organization name
+func (o RevisionTag_preview_environmentsOutput) OrgName() pulumi.StringOutput {
+	return o.ApplyT(func(v *RevisionTag_preview_environments) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
+}
+
 // The revision number this tag points to.
 func (o RevisionTag_preview_environmentsOutput) Revision() pulumi.IntOutput {
 	return o.ApplyT(func(v *RevisionTag_preview_environments) pulumi.IntOutput { return v.Revision }).(pulumi.IntOutput)
+}
+
+// The revision tag name
+func (o RevisionTag_preview_environmentsOutput) TagName() pulumi.StringOutput {
+	return o.ApplyT(func(v *RevisionTag_preview_environments) pulumi.StringOutput { return v.TagName }).(pulumi.StringOutput)
 }
 
 type RevisionTag_preview_environmentsArrayOutput struct{ *pulumi.OutputState }

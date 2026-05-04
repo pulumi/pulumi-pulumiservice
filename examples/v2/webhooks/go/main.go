@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2"
+	v2 "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
 )
@@ -9,45 +9,46 @@ import (
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
 		cfg := config.New(ctx, "")
-		serviceOrg := "service-provider-test-org"
-		if param := cfg.Get("serviceOrg"); param != "" {
-			serviceOrg = param
+		serviceOrg := cfg.Get("serviceOrg")
+		if serviceOrg == "" {
+			serviceOrg = "service-provider-test-org"
 		}
-		secretValue := "shhh"
-		if param := cfg.Get("secretValue"); param != "" {
-			secretValue = param
+		secretValue := cfg.Get("secretValue")
+		if secretValue == "" {
+			secretValue = "shhh"
 		}
-		// Organization-scoped webhook subscribed to all events.
-		orgWebhookAll, err := v2.NewOrganizationWebhook(ctx, "orgWebhookAll", &v2.OrganizationWebhookArgs{
-			OrgName:          serviceOrg,
-			OrganizationName: serviceOrg,
-			Name:             "org-webhook-all",
-			DisplayName:      "webhook-from-provider",
-			PayloadUrl:       "https://google.com",
-			Active:           true,
-			Secret:           secretValue,
+		hookSuffix := cfg.Get("hookSuffix")
+		if hookSuffix == "" {
+			hookSuffix = "dev"
+		}
+
+		orgAll, err := v2.NewOrganizationWebhook(ctx, "orgWebhookAll", &v2.OrganizationWebhookArgs{
+			OrganizationName: pulumi.String(serviceOrg),
+			Name:             pulumi.String("org-webhook-all-" + hookSuffix),
+			DisplayName:      pulumi.String("webhook-from-provider"),
+			PayloadUrl:       pulumi.String("https://google.com"),
+			Active:           pulumi.Bool(true),
+			Secret:           pulumi.String(secretValue),
 		})
 		if err != nil {
 			return err
 		}
-		// Organization-scoped webhook subscribed only to environments and stacks groups.
-		_, err = v2.NewOrganizationWebhook(ctx, "orgWebhookGroups", &v2.OrganizationWebhookArgs{
-			OrgName:          serviceOrg,
-			OrganizationName: serviceOrg,
-			Name:             "org-webhook-groups",
-			DisplayName:      "webhook-from-provider",
-			PayloadUrl:       "https://google.com",
-			Active:           true,
-			Groups: []string{
-				"environments",
-				"stacks",
-			},
-			Secret: secretValue,
+
+		orgGroups, err := v2.NewOrganizationWebhook(ctx, "orgWebhookGroups", &v2.OrganizationWebhookArgs{
+			OrganizationName: pulumi.String(serviceOrg),
+			Name:             pulumi.String("org-webhook-groups-" + hookSuffix),
+			DisplayName:      pulumi.String("webhook-from-provider"),
+			PayloadUrl:       pulumi.String("https://google.com"),
+			Active:           pulumi.Bool(true),
+			Groups:           pulumi.StringArray{pulumi.String("environments"), pulumi.String("stacks")},
+			Secret:           pulumi.String(secretValue),
 		})
 		if err != nil {
 			return err
 		}
-		ctx.Export("orgWebhookId", pulumi.Any(orgWebhookAll.Id))
+
+		ctx.Export("orgWebhookId", orgAll.ID())
+		ctx.Export("orgWebhookGroupsId", orgGroups.ID())
 		return nil
 	})
 }

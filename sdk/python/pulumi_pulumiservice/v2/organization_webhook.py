@@ -22,14 +22,12 @@ class OrganizationWebhookArgs:
                  active: pulumi.Input[_builtins.bool],
                  display_name: pulumi.Input[_builtins.str],
                  name: pulumi.Input[_builtins.str],
-                 org_name: pulumi.Input[_builtins.str],
                  organization_name: pulumi.Input[_builtins.str],
                  payload_url: pulumi.Input[_builtins.str],
                  env_name: Optional[pulumi.Input[_builtins.str]] = None,
                  filters: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  format: Optional[pulumi.Input[_builtins.str]] = None,
                  groups: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
-                 hook_name: Optional[pulumi.Input[_builtins.str]] = None,
                  project_name: Optional[pulumi.Input[_builtins.str]] = None,
                  secret: Optional[pulumi.Input[_builtins.str]] = None,
                  stack_name: Optional[pulumi.Input[_builtins.str]] = None):
@@ -39,14 +37,12 @@ class OrganizationWebhookArgs:
         :param pulumi.Input[_builtins.bool] active: Whether the webhook is active and will receive deliveries.
         :param pulumi.Input[_builtins.str] display_name: The human-readable display name shown in the UI.
         :param pulumi.Input[_builtins.str] name: The unique identifier name for the webhook within its scope.
-        :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] organization_name: The organization that owns this webhook.
         :param pulumi.Input[_builtins.str] payload_url: The URL to which webhook payloads are delivered.
         :param pulumi.Input[_builtins.str] env_name: The environment name. Set when the webhook is scoped to a specific environment.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] filters: Specific event types this webhook subscribes to. If empty, all events are delivered.
         :param pulumi.Input[_builtins.str] format: The format of the webhook payload (e.g., 'raw', 'slack', 'ms_teams').
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] groups: Event groups this webhook subscribes to (e.g., 'stacks', 'deployments').
-        :param pulumi.Input[_builtins.str] hook_name: The webhook name identifier
         :param pulumi.Input[_builtins.str] project_name: The project name. Set when the webhook is scoped to a specific stack.
         :param pulumi.Input[_builtins.str] secret: Secret will be omitted when returned from the service.
         :param pulumi.Input[_builtins.str] stack_name: The stack name. Set when the webhook is scoped to a specific stack.
@@ -54,7 +50,6 @@ class OrganizationWebhookArgs:
         pulumi.set(__self__, "active", active)
         pulumi.set(__self__, "display_name", display_name)
         pulumi.set(__self__, "name", name)
-        pulumi.set(__self__, "org_name", org_name)
         pulumi.set(__self__, "organization_name", organization_name)
         pulumi.set(__self__, "payload_url", payload_url)
         if env_name is not None:
@@ -65,8 +60,6 @@ class OrganizationWebhookArgs:
             pulumi.set(__self__, "format", format)
         if groups is not None:
             pulumi.set(__self__, "groups", groups)
-        if hook_name is not None:
-            pulumi.set(__self__, "hook_name", hook_name)
         if project_name is not None:
             pulumi.set(__self__, "project_name", project_name)
         if secret is not None:
@@ -109,18 +102,6 @@ class OrganizationWebhookArgs:
     @name.setter
     def name(self, value: pulumi.Input[_builtins.str]):
         pulumi.set(self, "name", value)
-
-    @_builtins.property
-    @pulumi.getter(name="orgName")
-    def org_name(self) -> pulumi.Input[_builtins.str]:
-        """
-        The organization name
-        """
-        return pulumi.get(self, "org_name")
-
-    @org_name.setter
-    def org_name(self, value: pulumi.Input[_builtins.str]):
-        pulumi.set(self, "org_name", value)
 
     @_builtins.property
     @pulumi.getter(name="organizationName")
@@ -195,18 +176,6 @@ class OrganizationWebhookArgs:
         pulumi.set(self, "groups", value)
 
     @_builtins.property
-    @pulumi.getter(name="hookName")
-    def hook_name(self) -> Optional[pulumi.Input[_builtins.str]]:
-        """
-        The webhook name identifier
-        """
-        return pulumi.get(self, "hook_name")
-
-    @hook_name.setter
-    def hook_name(self, value: Optional[pulumi.Input[_builtins.str]]):
-        pulumi.set(self, "hook_name", value)
-
-    @_builtins.property
     @pulumi.getter(name="projectName")
     def project_name(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
@@ -255,9 +224,7 @@ class OrganizationWebhook(pulumi.CustomResource):
                  filters: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  format: Optional[pulumi.Input[_builtins.str]] = None,
                  groups: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
-                 hook_name: Optional[pulumi.Input[_builtins.str]] = None,
                  name: Optional[pulumi.Input[_builtins.str]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
                  organization_name: Optional[pulumi.Input[_builtins.str]] = None,
                  payload_url: Optional[pulumi.Input[_builtins.str]] = None,
                  project_name: Optional[pulumi.Input[_builtins.str]] = None,
@@ -282,9 +249,7 @@ class OrganizationWebhook(pulumi.CustomResource):
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] filters: Specific event types this webhook subscribes to. If empty, all events are delivered.
         :param pulumi.Input[_builtins.str] format: The format of the webhook payload (e.g., 'raw', 'slack', 'ms_teams').
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] groups: Event groups this webhook subscribes to (e.g., 'stacks', 'deployments').
-        :param pulumi.Input[_builtins.str] hook_name: The webhook name identifier
         :param pulumi.Input[_builtins.str] name: The unique identifier name for the webhook within its scope.
-        :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] organization_name: The organization that owns this webhook.
         :param pulumi.Input[_builtins.str] payload_url: The URL to which webhook payloads are delivered.
         :param pulumi.Input[_builtins.str] project_name: The project name. Set when the webhook is scoped to a specific stack.
@@ -328,9 +293,7 @@ class OrganizationWebhook(pulumi.CustomResource):
                  filters: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  format: Optional[pulumi.Input[_builtins.str]] = None,
                  groups: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
-                 hook_name: Optional[pulumi.Input[_builtins.str]] = None,
                  name: Optional[pulumi.Input[_builtins.str]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
                  organization_name: Optional[pulumi.Input[_builtins.str]] = None,
                  payload_url: Optional[pulumi.Input[_builtins.str]] = None,
                  project_name: Optional[pulumi.Input[_builtins.str]] = None,
@@ -355,13 +318,9 @@ class OrganizationWebhook(pulumi.CustomResource):
             __props__.__dict__["filters"] = filters
             __props__.__dict__["format"] = format
             __props__.__dict__["groups"] = groups
-            __props__.__dict__["hook_name"] = hook_name
             if name is None and not opts.urn:
                 raise TypeError("Missing required property 'name'")
             __props__.__dict__["name"] = name
-            if org_name is None and not opts.urn:
-                raise TypeError("Missing required property 'org_name'")
-            __props__.__dict__["org_name"] = org_name
             if organization_name is None and not opts.urn:
                 raise TypeError("Missing required property 'organization_name'")
             __props__.__dict__["organization_name"] = organization_name
@@ -369,14 +328,12 @@ class OrganizationWebhook(pulumi.CustomResource):
                 raise TypeError("Missing required property 'payload_url'")
             __props__.__dict__["payload_url"] = payload_url
             __props__.__dict__["project_name"] = project_name
-            __props__.__dict__["secret"] = None if secret is None else pulumi.Output.secret(secret)
+            __props__.__dict__["secret"] = secret
             __props__.__dict__["stack_name"] = stack_name
             __props__.__dict__["has_secret"] = None
             __props__.__dict__["secret_ciphertext"] = None
-        secret_opts = pulumi.ResourceOptions(additional_secret_outputs=["secret", "secretCiphertext"])
+        secret_opts = pulumi.ResourceOptions(additional_secret_outputs=["hasSecret", "secret", "secretCiphertext"])
         opts = pulumi.ResourceOptions.merge(opts, secret_opts)
-        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["name", "organizationName"])
-        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(OrganizationWebhook, __self__).__init__(
             'pulumiservice:v2:OrganizationWebhook',
             resource_name,

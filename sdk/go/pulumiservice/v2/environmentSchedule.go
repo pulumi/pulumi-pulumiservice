@@ -20,6 +20,8 @@ type EnvironmentSchedule struct {
 	Created pulumi.StringOutput `pulumi:"created"`
 	// The action definition, which varies based on the action kind.
 	Definition pulumi.MapOutput `pulumi:"definition"`
+	// The environment name
+	EnvName pulumi.StringOutput `pulumi:"envName"`
 	// The kind of action to be executed.
 	Kind pulumi.StringOutput `pulumi:"kind"`
 	// The timestamp of the last execution, if any.
@@ -30,10 +32,16 @@ type EnvironmentSchedule struct {
 	NextExecution pulumi.StringOutput `pulumi:"nextExecution"`
 	// The organization ID that owns this scheduled action.
 	OrgID pulumi.StringOutput `pulumi:"orgID"`
+	// The organization name
+	OrgName pulumi.StringOutput `pulumi:"orgName"`
 	// Whether the scheduled action is currently paused.
 	Paused pulumi.BoolOutput `pulumi:"paused"`
+	// The project name
+	ProjectName pulumi.StringOutput `pulumi:"projectName"`
 	// A cron expression defining the recurring schedule.
 	ScheduleCron pulumi.StringPtrOutput `pulumi:"scheduleCron"`
+	// The unique identifier for this scheduled action.
+	ScheduleID pulumi.StringOutput `pulumi:"scheduleID"`
 	// A timestamp for a one-time scheduled execution.
 	ScheduleOnce pulumi.StringPtrOutput `pulumi:"scheduleOnce"`
 }
@@ -54,6 +62,12 @@ func NewEnvironmentSchedule(ctx *pulumi.Context,
 	if args.ProjectName == nil {
 		return nil, errors.New("invalid value for required argument 'ProjectName'")
 	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"envName",
+		"orgName",
+		"projectName",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource EnvironmentSchedule
 	err := ctx.RegisterResource("pulumiservice:v2:EnvironmentSchedule", name, args, &resource, opts...)
@@ -218,6 +232,11 @@ func (o EnvironmentScheduleOutput) Definition() pulumi.MapOutput {
 	return o.ApplyT(func(v *EnvironmentSchedule) pulumi.MapOutput { return v.Definition }).(pulumi.MapOutput)
 }
 
+// The environment name
+func (o EnvironmentScheduleOutput) EnvName() pulumi.StringOutput {
+	return o.ApplyT(func(v *EnvironmentSchedule) pulumi.StringOutput { return v.EnvName }).(pulumi.StringOutput)
+}
+
 // The kind of action to be executed.
 func (o EnvironmentScheduleOutput) Kind() pulumi.StringOutput {
 	return o.ApplyT(func(v *EnvironmentSchedule) pulumi.StringOutput { return v.Kind }).(pulumi.StringOutput)
@@ -243,14 +262,29 @@ func (o EnvironmentScheduleOutput) OrgID() pulumi.StringOutput {
 	return o.ApplyT(func(v *EnvironmentSchedule) pulumi.StringOutput { return v.OrgID }).(pulumi.StringOutput)
 }
 
+// The organization name
+func (o EnvironmentScheduleOutput) OrgName() pulumi.StringOutput {
+	return o.ApplyT(func(v *EnvironmentSchedule) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
+}
+
 // Whether the scheduled action is currently paused.
 func (o EnvironmentScheduleOutput) Paused() pulumi.BoolOutput {
 	return o.ApplyT(func(v *EnvironmentSchedule) pulumi.BoolOutput { return v.Paused }).(pulumi.BoolOutput)
 }
 
+// The project name
+func (o EnvironmentScheduleOutput) ProjectName() pulumi.StringOutput {
+	return o.ApplyT(func(v *EnvironmentSchedule) pulumi.StringOutput { return v.ProjectName }).(pulumi.StringOutput)
+}
+
 // A cron expression defining the recurring schedule.
 func (o EnvironmentScheduleOutput) ScheduleCron() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *EnvironmentSchedule) pulumi.StringPtrOutput { return v.ScheduleCron }).(pulumi.StringPtrOutput)
+}
+
+// The unique identifier for this scheduled action.
+func (o EnvironmentScheduleOutput) ScheduleID() pulumi.StringOutput {
+	return o.ApplyT(func(v *EnvironmentSchedule) pulumi.StringOutput { return v.ScheduleID }).(pulumi.StringOutput)
 }
 
 // A timestamp for a one-time scheduled execution.

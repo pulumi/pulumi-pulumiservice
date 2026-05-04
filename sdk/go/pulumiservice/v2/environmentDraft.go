@@ -16,10 +16,18 @@ import (
 type EnvironmentDraft struct {
 	pulumi.CustomResourceState
 
+	// The change request ID
+	ChangeRequestID pulumi.StringOutput `pulumi:"changeRequestID"`
 	// The change request identifier
 	ChangeRequestId pulumi.StringPtrOutput `pulumi:"changeRequestId"`
+	// The environment name
+	EnvName pulumi.StringOutput `pulumi:"envName"`
 	// The latest revision number
 	LatestRevisionNumber pulumi.IntPtrOutput `pulumi:"latestRevisionNumber"`
+	// The organization name
+	OrgName pulumi.StringOutput `pulumi:"orgName"`
+	// The project name
+	ProjectName pulumi.StringOutput `pulumi:"projectName"`
 }
 
 // NewEnvironmentDraft registers a new resource with the given unique name, arguments, and options.
@@ -38,6 +46,13 @@ func NewEnvironmentDraft(ctx *pulumi.Context,
 	if args.ProjectName == nil {
 		return nil, errors.New("invalid value for required argument 'ProjectName'")
 	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"changeRequestID",
+		"envName",
+		"orgName",
+		"projectName",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource EnvironmentDraft
 	err := ctx.RegisterResource("pulumiservice:v2:EnvironmentDraft", name, args, &resource, opts...)
@@ -180,14 +195,34 @@ func (o EnvironmentDraftOutput) ToEnvironmentDraftOutputWithContext(ctx context.
 	return o
 }
 
+// The change request ID
+func (o EnvironmentDraftOutput) ChangeRequestID() pulumi.StringOutput {
+	return o.ApplyT(func(v *EnvironmentDraft) pulumi.StringOutput { return v.ChangeRequestID }).(pulumi.StringOutput)
+}
+
 // The change request identifier
 func (o EnvironmentDraftOutput) ChangeRequestId() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *EnvironmentDraft) pulumi.StringPtrOutput { return v.ChangeRequestId }).(pulumi.StringPtrOutput)
 }
 
+// The environment name
+func (o EnvironmentDraftOutput) EnvName() pulumi.StringOutput {
+	return o.ApplyT(func(v *EnvironmentDraft) pulumi.StringOutput { return v.EnvName }).(pulumi.StringOutput)
+}
+
 // The latest revision number
 func (o EnvironmentDraftOutput) LatestRevisionNumber() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *EnvironmentDraft) pulumi.IntPtrOutput { return v.LatestRevisionNumber }).(pulumi.IntPtrOutput)
+}
+
+// The organization name
+func (o EnvironmentDraftOutput) OrgName() pulumi.StringOutput {
+	return o.ApplyT(func(v *EnvironmentDraft) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
+}
+
+// The project name
+func (o EnvironmentDraftOutput) ProjectName() pulumi.StringOutput {
+	return o.ApplyT(func(v *EnvironmentDraft) pulumi.StringOutput { return v.ProjectName }).(pulumi.StringOutput)
 }
 
 type EnvironmentDraftArrayOutput struct{ *pulumi.OutputState }

@@ -1,0 +1,13 @@
+# SAMLOrganization configures the org's SAML SSO setup. Real configuration
+# requires an EntityDescriptor XML blob from your IdP; the placeholder below
+# is structurally valid for preview but won't authenticate.
+resources:
+  saml:
+    type: pulumiservice:v2:SAMLOrganization
+    properties:
+      orgName: ${serviceOrg}
+      newIdpSsoDescriptor: |
+        <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
+                             entityID="https://example-idp.invalid/metadata">
+          <md:IDPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol"/>
+        </md:EntityDescriptor>

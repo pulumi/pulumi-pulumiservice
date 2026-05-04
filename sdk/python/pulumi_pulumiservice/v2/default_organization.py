@@ -96,6 +96,8 @@ class DefaultOrganization(pulumi.CustomResource):
             __props__.__dict__["org_name"] = org_name
             __props__.__dict__["git_hub_login"] = None
             __props__.__dict__["messages"] = None
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["orgName"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(DefaultOrganization, __self__).__init__(
             'pulumiservice:v2:DefaultOrganization',
             resource_name,
@@ -120,6 +122,7 @@ class DefaultOrganization(pulumi.CustomResource):
 
         __props__.__dict__["git_hub_login"] = None
         __props__.__dict__["messages"] = None
+        __props__.__dict__["org_name"] = None
         return DefaultOrganization(resource_name, opts=opts, __props__=__props__)
 
     @_builtins.property
@@ -141,4 +144,12 @@ class DefaultOrganization(pulumi.CustomResource):
         Can be possibly empty.
         """
         return pulumi.get(self, "messages")
+
+    @_builtins.property
+    @pulumi.getter(name="orgName")
+    def org_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The organization name
+        """
+        return pulumi.get(self, "org_name")
 

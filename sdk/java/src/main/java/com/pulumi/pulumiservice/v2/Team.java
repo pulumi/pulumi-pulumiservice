@@ -16,15 +16,8 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 
 /**
- * Updates a team&#39;s membership and configuration. This multi-purpose endpoint supports several operations:
- * 
- * **Update membership:** Use `member` (username) and `memberAction` (`add` or `remove`) to manage team members.
- * 
- * **Grant stack access:** Use `addStackPermission` with `projectName`, `stackName`, and `permission` (integer: `101` = read, `102` = edit, `103` = admin).
- * 
- * **Remove stack access:** Use `removeStack` with `projectName` and `stackName`.
- * 
- * Members added to a team inherit the team&#39;s stack permissions. Teams are not available to individual (single-user) organizations.
+ * CreatePulumiTeam creates a &#34;Pulumi&#34; team, i.e. one whose membership is managed by Pulumi.
+ * (As opposed to a GitHub or GitLab-based team.)
  * 
  */
 @ResourceType(type="pulumiservice:v2:Team")
@@ -144,6 +137,20 @@ public class Team extends com.pulumi.resources.CustomResource {
      */
     public Output<String> name() {
         return this.name;
+    }
+    /**
+     * The organization name
+     * 
+     */
+    @Export(name="orgName", refs={String.class}, tree="[0]")
+    private Output<String> orgName;
+
+    /**
+     * @return The organization name
+     * 
+     */
+    public Output<String> orgName() {
+        return this.orgName;
     }
     /**
      * RoleIDs are the IDs of the FGA roles assigned to the team, if any.

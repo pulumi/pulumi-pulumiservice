@@ -16,6 +16,25 @@ namespace Pulumi.PulumiService.V2
     public partial class Environment_esc_environments : global::Pulumi.CustomResource
     {
         /// <summary>
+        /// The environment name
+        /// </summary>
+        [Output("name")]
+        public Output<string> Name { get; private set; } = null!;
+
+        /// <summary>
+        /// The organization name
+        /// </summary>
+        [Output("orgName")]
+        public Output<string> OrgName { get; private set; } = null!;
+
+        /// <summary>
+        /// The project name
+        /// </summary>
+        [Output("project")]
+        public Output<string> Project { get; private set; } = null!;
+
+
+        /// <summary>
         /// Create a Environment_esc_environments resource with the given unique name, arguments, and options.
         /// </summary>
         ///
@@ -37,6 +56,12 @@ namespace Pulumi.PulumiService.V2
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
+                ReplaceOnChanges =
+                {
+                    "name",
+                    "orgName",
+                    "project",
+                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.
@@ -60,12 +85,6 @@ namespace Pulumi.PulumiService.V2
     public sealed class Environment_esc_environmentsArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
-        /// The environment name
-        /// </summary>
-        [Input("envName")]
-        public Input<string>? EnvName { get; set; }
-
-        /// <summary>
         /// The name of the environment.
         /// </summary>
         [Input("name", required: true)]
@@ -82,12 +101,6 @@ namespace Pulumi.PulumiService.V2
         /// </summary>
         [Input("project", required: true)]
         public Input<string> Project { get; set; } = null!;
-
-        /// <summary>
-        /// The project name
-        /// </summary>
-        [Input("projectName")]
-        public Input<string>? ProjectName { get; set; }
 
         public Environment_esc_environmentsArgs()
         {

@@ -75,6 +75,10 @@ export class Task extends pulumi.CustomResource {
      */
     declare public readonly name: pulumi.Output<string>;
     /**
+     * The organization name
+     */
+    declare public readonly orgName: pulumi.Output<string>;
+    /**
      * The permission scope for the task.
      */
     declare public readonly permissionMode: pulumi.Output<string | undefined>;
@@ -102,6 +106,10 @@ export class Task extends pulumi.CustomResource {
      * Current execution status of the task.
      */
     declare public /*out*/ readonly status: pulumi.Output<string>;
+    /**
+     * The agent task identifier
+     */
+    declare public readonly taskID: pulumi.Output<string>;
     /**
      * Whether the task was started synchronously by a user or asynchronously by background automation.
      */
@@ -160,6 +168,7 @@ export class Task extends pulumi.CustomResource {
             resourceInputs["isShared"] = undefined /*out*/;
             resourceInputs["lastHeartbeat"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
+            resourceInputs["orgName"] = undefined /*out*/;
             resourceInputs["permissionMode"] = undefined /*out*/;
             resourceInputs["planMode"] = undefined /*out*/;
             resourceInputs["runtimePhase"] = undefined /*out*/;
@@ -167,10 +176,13 @@ export class Task extends pulumi.CustomResource {
             resourceInputs["source"] = undefined /*out*/;
             resourceInputs["sourceAutomationID"] = undefined /*out*/;
             resourceInputs["status"] = undefined /*out*/;
+            resourceInputs["taskID"] = undefined /*out*/;
             resourceInputs["taskType"] = undefined /*out*/;
             resourceInputs["toolExecutionMode"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["orgName", "taskID"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(Task.__pulumiType, name, resourceInputs, opts);
     }
 }

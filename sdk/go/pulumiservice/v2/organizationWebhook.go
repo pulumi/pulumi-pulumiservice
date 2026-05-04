@@ -70,28 +70,18 @@ func NewOrganizationWebhook(ctx *pulumi.Context,
 	if args.Name == nil {
 		return nil, errors.New("invalid value for required argument 'Name'")
 	}
-	if args.OrgName == nil {
-		return nil, errors.New("invalid value for required argument 'OrgName'")
-	}
 	if args.OrganizationName == nil {
 		return nil, errors.New("invalid value for required argument 'OrganizationName'")
 	}
 	if args.PayloadUrl == nil {
 		return nil, errors.New("invalid value for required argument 'PayloadUrl'")
 	}
-	if args.Secret != nil {
-		args.Secret = pulumi.ToSecret(args.Secret).(pulumi.StringPtrInput)
-	}
 	secrets := pulumi.AdditionalSecretOutputs([]string{
+		"hasSecret",
 		"secret",
 		"secretCiphertext",
 	})
 	opts = append(opts, secrets)
-	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
-		"name",
-		"organizationName",
-	})
-	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource OrganizationWebhook
 	err := ctx.RegisterResource("pulumiservice:v2:OrganizationWebhook", name, args, &resource, opts...)
@@ -137,12 +127,8 @@ type organizationWebhookArgs struct {
 	Format *string `pulumi:"format"`
 	// Event groups this webhook subscribes to (e.g., 'stacks', 'deployments').
 	Groups []string `pulumi:"groups"`
-	// The webhook name identifier
-	HookName *string `pulumi:"hookName"`
 	// The unique identifier name for the webhook within its scope.
 	Name string `pulumi:"name"`
-	// The organization name
-	OrgName string `pulumi:"orgName"`
 	// The organization that owns this webhook.
 	OrganizationName string `pulumi:"organizationName"`
 	// The URL to which webhook payloads are delivered.
@@ -169,12 +155,8 @@ type OrganizationWebhookArgs struct {
 	Format pulumi.StringPtrInput
 	// Event groups this webhook subscribes to (e.g., 'stacks', 'deployments').
 	Groups pulumi.StringArrayInput
-	// The webhook name identifier
-	HookName pulumi.StringPtrInput
 	// The unique identifier name for the webhook within its scope.
 	Name pulumi.StringInput
-	// The organization name
-	OrgName pulumi.StringInput
 	// The organization that owns this webhook.
 	OrganizationName pulumi.StringInput
 	// The URL to which webhook payloads are delivered.

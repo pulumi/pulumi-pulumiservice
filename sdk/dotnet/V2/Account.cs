@@ -16,6 +16,12 @@ namespace Pulumi.PulumiService.V2
     public partial class Account : global::Pulumi.CustomResource
     {
         /// <summary>
+        /// The Insights account name
+        /// </summary>
+        [Output("accountName")]
+        public Output<string> AccountName { get; private set; } = null!;
+
+        /// <summary>
         /// The ID of the agent pool to run account discovery workflows.
         /// If not specified, discovery will use the default agent pool.
         /// </summary>
@@ -27,6 +33,12 @@ namespace Pulumi.PulumiService.V2
         /// </summary>
         [Output("name")]
         public Output<string> Name { get; private set; } = null!;
+
+        /// <summary>
+        /// The organization name
+        /// </summary>
+        [Output("orgName")]
+        public Output<string> OrgName { get; private set; } = null!;
 
         /// <summary>
         /// The user with ownership of this Insights account
@@ -94,6 +106,11 @@ namespace Pulumi.PulumiService.V2
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
+                ReplaceOnChanges =
+                {
+                    "accountName",
+                    "orgName",
+                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.

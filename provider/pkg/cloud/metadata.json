@@ -1,8 +1,10 @@
 {
   "version": 1,
   "package": "pulumiservice",
+  "_note": "Single source of truth for v2 resource metadata. The `operations` block on each entry is auto-derived from spec.json by `go run ./tools/scaffold-metadata` (run via `go generate ./pkg/cloud/...`). Other fields (idField, renames, fields, outputs, examples, description, aliases) are hand-curated and round-trip through the scaffolder untouched. Add tokens to `_excluded` to keep the scaffolder from re-deriving them.",
   "resources": {
     "pulumiservice:v2:Account": {
+      "idField": "{orgName}/{accountName}",
       "operations": {
         "create": "CreateAccount",
         "delete": "DeleteAccount",
@@ -10,7 +12,19 @@
         "update": "UpdateAccount"
       }
     },
+    "pulumiservice:v2:AgentPool": {
+      "operations": {
+        "create": "CreateOrgAgentPool",
+        "delete": "DeleteOrgAgentPool",
+        "read": "GetAgentPool",
+        "update": "PatchOrgAgentPool"
+      },
+      "renames": {
+        "poolId": "id"
+      }
+    },
     "pulumiservice:v2:AuditLogExportConfiguration": {
+      "idField": "{orgName}",
       "operations": {
         "create": "UpdateAuditLogExportConfiguration",
         "delete": "DeleteAuditLogExportConfiguration",
@@ -23,9 +37,13 @@
         "create": "UpdateAuthPolicy",
         "read": "GetAuthPolicy",
         "update": "UpdateAuthPolicy"
+      },
+      "renames": {
+        "issuerId": "id"
       }
     },
     "pulumiservice:v2:AzureDevOpsIntegration": {
+      "idField": "{orgName}/{integrationId}",
       "operations": {
         "create": "UpdateAzureDevOpsIntegration",
         "delete": "DeleteAzureDevOpsIntegration",
@@ -34,6 +52,7 @@
       }
     },
     "pulumiservice:v2:BitBucketIntegration": {
+      "idField": "{orgName}/{integrationId}",
       "operations": {
         "create": "UpdateBitBucketIntegration",
         "delete": "DeleteBitBucketIntegration",
@@ -41,7 +60,26 @@
         "update": "UpdateBitBucketIntegration"
       }
     },
+    "pulumiservice:v2:CustomVCSIntegration": {
+      "operations": {
+        "create": "CreateCustomVCSIntegration",
+        "delete": "DeleteCustomVCSIntegration",
+        "read": "GetCustomVCSIntegration",
+        "update": "UpdateCustomVCSIntegration"
+      },
+      "renames": {
+        "integrationId": "id"
+      }
+    },
+    "pulumiservice:v2:CustomVCSRepository": {
+      "idField": "{orgName}/{integrationId}",
+      "operations": {
+        "create": "AddCustomVCSRepository",
+        "delete": "RemoveCustomVCSRepository"
+      }
+    },
     "pulumiservice:v2:DefaultOrganization": {
+      "idField": "{orgName}",
       "operations": {
         "create": "UpdateDefaultOrganization",
         "read": "GetDefaultOrganization",
@@ -49,6 +87,7 @@
       }
     },
     "pulumiservice:v2:DeploymentSettings": {
+      "idField": "{orgName}/{projectName}/{stackName}",
       "operations": {
         "create": "PatchDeploymentSettings",
         "delete": "DeleteDeploymentSettings",
@@ -57,17 +96,11 @@
       }
     },
     "pulumiservice:v2:EnvironmentDraft": {
+      "idField": "{orgName}/{projectName}/{envName}/{changeRequestID}",
       "operations": {
         "create": "CreateEnvironmentDraft",
         "read": "ReadEnvironmentDraft",
         "update": "UpdateEnvironmentDraft"
-      }
-    },
-    "pulumiservice:v2:EnvironmentDraft_preview": {
-      "operations": {
-        "create": "CreateEnvironmentDraft_preview",
-        "read": "ReadEnvironmentDraft_preview",
-        "update": "UpdateEnvironmentDraft_preview"
       }
     },
     "pulumiservice:v2:EnvironmentSchedule": {
@@ -76,9 +109,13 @@
         "delete": "DeleteEnvironmentSchedule",
         "read": "ReadEnvironmentSchedule",
         "update": "UpdateEnvironmentSchedule"
+      },
+      "renames": {
+        "scheduleID": "id"
       }
     },
     "pulumiservice:v2:EnvironmentSettings": {
+      "idField": "{orgName}/{projectName}/{envName}",
       "operations": {
         "create": "PatchEnvironmentSettings",
         "read": "GetEnvironmentSettings",
@@ -86,30 +123,44 @@
       }
     },
     "pulumiservice:v2:EnvironmentTag_esc_environments": {
+      "idField": "{orgName}/{projectName}/{envName}/{tagName}",
       "operations": {
         "create": "CreateEnvironmentTag_esc_environments",
         "delete": "DeleteEnvironmentTag_esc_environments",
         "read": "GetEnvironmentTag_esc_environments",
         "update": "UpdateEnvironmentTag_esc_environments"
+      },
+      "renames": {
+        "name": "tagName"
       }
     },
     "pulumiservice:v2:EnvironmentTag_preview_environments": {
+      "idField": "{orgName}/{envName}/{tagName}",
       "operations": {
         "create": "CreateEnvironmentTag_preview_environments",
         "delete": "DeleteEnvironmentTag_preview_environments",
         "read": "GetEnvironmentTag_preview_environments",
         "update": "UpdateEnvironmentTag_preview_environments"
+      },
+      "renames": {
+        "name": "tagName"
       }
     },
     "pulumiservice:v2:Environment_esc_environments": {
+      "idField": "{orgName}/{projectName}/{envName}",
       "operations": {
         "create": "CreateEnvironment_esc_environments",
         "delete": "DeleteEnvironment_esc_environments",
         "read": "ReadEnvironment_esc_environments",
         "update": "UpdateEnvironment_esc_environments"
+      },
+      "renames": {
+        "name": "envName",
+        "project": "projectName"
       }
     },
     "pulumiservice:v2:Environment_preview_environments": {
+      "idField": "{orgName}/{envName}",
       "operations": {
         "create": "CreateEnvironment_preview_environments",
         "delete": "DeleteEnvironment_preview_environments",
@@ -123,9 +174,13 @@
         "delete": "DeleteGate",
         "read": "ReadGate",
         "update": "UpdateGate"
+      },
+      "renames": {
+        "gateID": "id"
       }
     },
     "pulumiservice:v2:GitHubEnterpriseIntegration": {
+      "idField": "{orgName}/{integrationId}",
       "operations": {
         "create": "UpdateGitHubEnterpriseIntegration",
         "delete": "DeleteGitHubEnterpriseIntegration",
@@ -134,6 +189,7 @@
       }
     },
     "pulumiservice:v2:GitHubIntegration": {
+      "idField": "{orgName}/{integrationId}",
       "operations": {
         "create": "UpdateGitHubIntegration",
         "delete": "DeleteGitHubIntegration",
@@ -142,6 +198,7 @@
       }
     },
     "pulumiservice:v2:GitLabIntegration": {
+      "idField": "{orgName}/{integrationId}",
       "operations": {
         "create": "UpdateGitLabIntegration",
         "delete": "DeleteGitLabIntegration",
@@ -151,71 +208,107 @@
     },
     "pulumiservice:v2:OidcIssuer": {
       "operations": {
-        "create": "UpdateOidcIssuer",
+        "create": "RegisterOidcIssuer",
         "delete": "DeleteOidcIssuer",
         "read": "GetOidcIssuer",
         "update": "UpdateOidcIssuer"
+      },
+      "renames": {
+        "issuerId": "id"
       }
     },
     "pulumiservice:v2:OpenEnvironmentRequest": {
+      "idField": "{orgName}/{projectName}/{envName}/{changeRequestID}",
       "operations": {
         "create": "CreateOpenEnvironmentRequest",
         "read": "ReadOpenEnvironmentRequest",
         "update": "UpdateOpenEnvironmentRequest"
       }
     },
+    "pulumiservice:v2:OrgTemplateCollection": {
+      "operations": {
+        "create": "CreateOrgTemplateCollection",
+        "delete": "DeleteOrgTemplateCollection",
+        "update": "UpdateOrgTemplateCollection"
+      },
+      "renames": {
+        "templateID": "id"
+      }
+    },
+    "pulumiservice:v2:OrgToken": {
+      "operations": {
+        "create": "CreateOrgToken",
+        "delete": "DeleteOrgToken"
+      },
+      "renames": {
+        "tokenId": "id"
+      }
+    },
+    "pulumiservice:v2:OrganizationMember": {
+      "idField": "{orgName}/{userLogin}",
+      "operations": {
+        "create": "AddOrganizationMember",
+        "delete": "DeleteOrganizationMember",
+        "update": "UpdateOrganizationMember"
+      }
+    },
     "pulumiservice:v2:OrganizationWebhook": {
+      "idField": "{orgName}/{hookName}",
       "operations": {
         "create": "CreateOrganizationWebhook",
         "delete": "DeleteOrganizationWebhook",
         "read": "GetOrganizationWebhook",
         "update": "UpdateOrganizationWebhook"
       },
-      "fields": {
-        "orgName": {
-          "forceNew": true
-        },
-        "hookName": {
-          "forceNew": true
-        },
-        "name": {
-          "forceNew": true
-        },
-        "organizationName": {
-          "forceNew": true
-        },
-        "secret": {
-          "secret": true
-        },
-        "secretCiphertext": {
-          "secret": true
-        }
+      "renames": {
+        "name": "hookName",
+        "organizationName": "orgName"
+      }
+    },
+    "pulumiservice:v2:PersonalToken": {
+      "operations": {
+        "create": "CreatePersonalToken",
+        "delete": "DeletePersonalToken"
       },
-      "outputsExclude": []
+      "renames": {
+        "tokenId": "id"
+      }
     },
     "pulumiservice:v2:PolicyGroup": {
+      "idField": "{orgName}/{policyGroup}",
       "operations": {
-        "create": "BatchUpdatePolicyGroup",
+        "create": "NewPolicyGroup",
         "delete": "DeletePolicyGroup",
         "read": "GetPolicyGroup",
-        "update": "BatchUpdatePolicyGroup"
+        "update": "UpdatePolicyGroup"
+      },
+      "renames": {
+        "name": "policyGroup"
       }
     },
     "pulumiservice:v2:PolicyIssue": {
+      "idField": "{orgName}/{issueId}",
       "operations": {
         "create": "UpdatePolicyIssue",
         "read": "GetPolicyIssue",
         "update": "UpdatePolicyIssue"
       },
-      "outputsExclude": ["policyIssue"]
+      "outputsExclude": [
+        "policyIssue"
+      ]
     },
     "pulumiservice:v2:PolicyPack": {
+      "idField": "{orgName}/{policyPackName}/{version}",
       "operations": {
         "create": "CreatePolicyPack",
         "read": "GetPolicyPack"
+      },
+      "renames": {
+        "name": "policyPackName"
       }
     },
     "pulumiservice:v2:RevisionTag_esc_environments": {
+      "idField": "{orgName}/{projectName}/{envName}/{tagName}",
       "operations": {
         "create": "UpdateRevisionTag_esc_environments",
         "delete": "DeleteRevisionTag_esc_environments",
@@ -224,6 +317,7 @@
       }
     },
     "pulumiservice:v2:RevisionTag_preview_environments": {
+      "idField": "{orgName}/{envName}/{tagName}",
       "operations": {
         "create": "UpdateRevisionTag_preview_environments",
         "delete": "DeleteRevisionTag_preview_environments",
@@ -237,9 +331,13 @@
         "delete": "DeleteRole",
         "read": "GetRole",
         "update": "UpdateRole"
+      },
+      "renames": {
+        "roleID": "id"
       }
     },
     "pulumiservice:v2:SAMLOrganization": {
+      "idField": "{orgName}",
       "operations": {
         "create": "UpdateSAMLOrganization",
         "read": "GetSAMLOrganization",
@@ -252,9 +350,13 @@
         "delete": "DeleteScheduledDeployment",
         "read": "ReadScheduledDeployment",
         "update": "UpdateScheduledDeployment"
+      },
+      "renames": {
+        "scheduleID": "id"
       }
     },
     "pulumiservice:v2:ScheduledScanSettings": {
+      "idField": "{orgName}/{accountName}",
       "operations": {
         "create": "UpdateScheduledScanSettings",
         "read": "ReadScheduledScanSettings",
@@ -262,15 +364,22 @@
       }
     },
     "pulumiservice:v2:Service": {
+      "idField": "{orgName}/{ownerType}/{ownerName}/{serviceName}",
       "operations": {
         "create": "CreateService",
         "delete": "DeleteService",
         "read": "GetService",
         "update": "UpdateService"
       },
-      "outputsExclude": ["service"]
+      "outputsExclude": [
+        "service"
+      ],
+      "renames": {
+        "name": "serviceName"
+      }
     },
     "pulumiservice:v2:Stack": {
+      "idField": "{orgName}/{projectName}/{stackName}",
       "operations": {
         "create": "CreateStack",
         "delete": "DeleteStack",
@@ -278,6 +387,7 @@
       }
     },
     "pulumiservice:v2:StackConfig": {
+      "idField": "{orgName}/{projectName}/{stackName}",
       "operations": {
         "create": "UpdateStackConfig",
         "delete": "DeleteStackConfig",
@@ -285,12 +395,28 @@
         "update": "UpdateStackConfig"
       }
     },
+    "pulumiservice:v2:StackTag": {
+      "idField": "{orgName}/{projectName}/{stackName}/{tagName}",
+      "operations": {
+        "create": "AddStackTag",
+        "delete": "DeleteStackTag",
+        "update": "UpdateStackTag"
+      },
+      "renames": {
+        "name": "tagName"
+      }
+    },
     "pulumiservice:v2:StackWebhook": {
+      "idField": "{orgName}/{projectName}/{stackName}/{hookName}",
       "operations": {
         "create": "CreateStackWebhook",
         "delete": "DeleteStackWebhook",
         "read": "GetStackWebhook",
         "update": "UpdateStackWebhook"
+      },
+      "renames": {
+        "name": "hookName",
+        "organizationName": "orgName"
       }
     },
     "pulumiservice:v2:Task": {
@@ -301,27 +427,50 @@
       }
     },
     "pulumiservice:v2:Team": {
+      "idField": "{orgName}/{teamName}",
       "operations": {
-        "create": "UpdateTeam",
+        "create": "CreatePulumiTeam",
         "delete": "DeleteTeam",
         "read": "GetTeam",
         "update": "UpdateTeam"
+      },
+      "renames": {
+        "name": "teamName"
+      }
+    },
+    "pulumiservice:v2:TeamToken": {
+      "operations": {
+        "create": "CreateTeamToken",
+        "delete": "DeleteTeamToken"
+      },
+      "renames": {
+        "tokenId": "id"
       }
     },
     "pulumiservice:v2:Webhook_esc_environments": {
+      "idField": "{orgName}/{projectName}/{envName}/{hookName}",
       "operations": {
         "create": "CreateWebhook_esc_environments",
         "delete": "DeleteWebhook_esc_environments",
         "read": "GetWebhook_esc_environments",
         "update": "UpdateWebhook_esc_environments"
+      },
+      "renames": {
+        "name": "hookName",
+        "organizationName": "orgName"
       }
     },
     "pulumiservice:v2:Webhook_preview_environments": {
+      "idField": "{orgName}/{envName}/{hookName}",
       "operations": {
         "create": "CreateWebhook_preview_environments",
         "delete": "DeleteWebhook_preview_environments",
         "read": "GetWebhook_preview_environments",
         "update": "UpdateWebhook_preview_environments"
+      },
+      "renames": {
+        "name": "hookName",
+        "organizationName": "orgName"
       }
     }
   }

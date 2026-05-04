@@ -32,8 +32,12 @@ type Role struct {
 	Name pulumi.StringPtrOutput `pulumi:"name"`
 	// The ID of the organization this role belongs to.
 	OrgId pulumi.StringOutput `pulumi:"orgId"`
+	// The organization name
+	OrgName pulumi.StringOutput `pulumi:"orgName"`
 	// The resource type this permission descriptor applies to.
 	ResourceType pulumi.StringPtrOutput `pulumi:"resourceType"`
+	// The unique identifier for this role.
+	RoleID pulumi.StringOutput `pulumi:"roleID"`
 	// The UX purpose of this permission descriptor (e.g. role, policy, set).
 	UxPurpose pulumi.StringPtrOutput `pulumi:"uxPurpose"`
 	// The version of this role.
@@ -50,6 +54,10 @@ func NewRole(ctx *pulumi.Context,
 	if args.OrgName == nil {
 		return nil, errors.New("invalid value for required argument 'OrgName'")
 	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"orgName",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Role
 	err := ctx.RegisterResource("pulumiservice:v2:Role", name, args, &resource, opts...)
@@ -248,9 +256,19 @@ func (o RoleOutput) OrgId() pulumi.StringOutput {
 	return o.ApplyT(func(v *Role) pulumi.StringOutput { return v.OrgId }).(pulumi.StringOutput)
 }
 
+// The organization name
+func (o RoleOutput) OrgName() pulumi.StringOutput {
+	return o.ApplyT(func(v *Role) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
+}
+
 // The resource type this permission descriptor applies to.
 func (o RoleOutput) ResourceType() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *Role) pulumi.StringPtrOutput { return v.ResourceType }).(pulumi.StringPtrOutput)
+}
+
+// The unique identifier for this role.
+func (o RoleOutput) RoleID() pulumi.StringOutput {
+	return o.ApplyT(func(v *Role) pulumi.StringOutput { return v.RoleID }).(pulumi.StringOutput)
 }
 
 // The UX purpose of this permission descriptor (e.g. role, policy, set).

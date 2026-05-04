@@ -139,6 +139,8 @@ class AuditLogExportConfiguration(pulumi.CustomResource):
             __props__.__dict__["enabled"] = None
             __props__.__dict__["last_result"] = None
             __props__.__dict__["s3_config"] = None
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["orgName"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(AuditLogExportConfiguration, __self__).__init__(
             'pulumiservice:v2:AuditLogExportConfiguration',
             resource_name,
@@ -163,6 +165,7 @@ class AuditLogExportConfiguration(pulumi.CustomResource):
 
         __props__.__dict__["enabled"] = None
         __props__.__dict__["last_result"] = None
+        __props__.__dict__["org_name"] = None
         __props__.__dict__["s3_config"] = None
         return AuditLogExportConfiguration(resource_name, opts=opts, __props__=__props__)
 
@@ -181,6 +184,14 @@ class AuditLogExportConfiguration(pulumi.CustomResource):
         The result of the last audit log export attempt.
         """
         return pulumi.get(self, "last_result")
+
+    @_builtins.property
+    @pulumi.getter(name="orgName")
+    def org_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The organization name
+        """
+        return pulumi.get(self, "org_name")
 
     @_builtins.property
     @pulumi.getter(name="s3Config")

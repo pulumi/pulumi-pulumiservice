@@ -192,6 +192,20 @@ public class GitHubEnterpriseIntegration extends com.pulumi.resources.CustomReso
         return this.installationID;
     }
     /**
+     * The GitHub Enterprise integration identifier
+     * 
+     */
+    @Export(name="integrationId", refs={String.class}, tree="[0]")
+    private Output<String> integrationId;
+
+    /**
+     * @return The GitHub Enterprise integration identifier
+     * 
+     */
+    public Output<String> integrationId() {
+        return this.integrationId;
+    }
+    /**
      * Whether the GitHub account is an organization (as opposed to a personal account).
      * 
      */
@@ -232,6 +246,20 @@ public class GitHubEnterpriseIntegration extends com.pulumi.resources.CustomReso
      */
     public Output<Optional<List<Object>>> neoGitHubAppPermissionRequirements() {
         return Codegen.optional(this.neoGitHubAppPermissionRequirements);
+    }
+    /**
+     * The organization name
+     * 
+     */
+    @Export(name="orgName", refs={String.class}, tree="[0]")
+    private Output<String> orgName;
+
+    /**
+     * @return The organization name
+     * 
+     */
+    public Output<String> orgName() {
+        return this.orgName;
     }
 
     /**

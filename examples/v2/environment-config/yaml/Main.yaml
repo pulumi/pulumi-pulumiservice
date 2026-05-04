@@ -1,0 +1,23 @@
+# Auxiliary configuration on an existing ESC environment:
+#   - EnvironmentDraft opens a change-request session for an environment.
+#   - EnvironmentSettings configures per-environment guardrails (deletion
+#     protection, etc.).
+# Both target an environment that already exists at the given path; this
+# example is preview-only because we don't create the environment here.
+resources:
+  draft:
+    type: pulumiservice:v2:EnvironmentDraft
+    properties:
+      orgName: ${serviceOrg}
+      projectName: ${projectName}
+      envName: ${envName}
+  settings:
+    type: pulumiservice:v2:EnvironmentSettings
+    properties:
+      orgName: ${serviceOrg}
+      projectName: ${projectName}
+      envName: ${envName}
+      deletionProtected: true
+outputs:
+  draftId: ${draft.changeRequestID}
+  protected: ${settings.deletionProtected}

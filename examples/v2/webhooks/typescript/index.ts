@@ -1,31 +1,29 @@
 import * as pulumi from "@pulumi/pulumi";
-import * as pulumiservice from "@pulumi/pulumiservice";
+import * as ps from "@pulumi/pulumiservice";
 
 const config = new pulumi.Config();
-const serviceOrg = config.get("serviceOrg") || "service-provider-test-org";
-const secretValue = config.get("secretValue") || "shhh";
-// Organization-scoped webhook subscribed to all events.
-const orgWebhookAll = new pulumiservice.v2.OrganizationWebhook("orgWebhookAll", {
-    orgName: serviceOrg,
+const serviceOrg = config.get("serviceOrg") ?? "service-provider-test-org";
+const secretValue = config.get("secretValue") ?? "shhh";
+const hookSuffix = config.get("hookSuffix") ?? "dev";
+
+const orgWebhookAll = new ps.v2.OrganizationWebhook("orgWebhookAll", {
     organizationName: serviceOrg,
-    name: "org-webhook-all",
+    name: `org-webhook-all-${hookSuffix}`,
     displayName: "webhook-from-provider",
     payloadUrl: "https://google.com",
     active: true,
     secret: secretValue,
 });
-// Organization-scoped webhook subscribed only to environments and stacks groups.
-const orgWebhookGroups = new pulumiservice.v2.OrganizationWebhook("orgWebhookGroups", {
-    orgName: serviceOrg,
+
+const orgWebhookGroups = new ps.v2.OrganizationWebhook("orgWebhookGroups", {
     organizationName: serviceOrg,
-    name: "org-webhook-groups",
+    name: `org-webhook-groups-${hookSuffix}`,
     displayName: "webhook-from-provider",
     payloadUrl: "https://google.com",
     active: true,
-    groups: [
-        "environments",
-        "stacks",
-    ],
+    groups: ["environments", "stacks"],
     secret: secretValue,
 });
+
 export const orgWebhookId = orgWebhookAll.id;
+export const orgWebhookGroupsId = orgWebhookGroups.id;

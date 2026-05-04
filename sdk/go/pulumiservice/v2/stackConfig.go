@@ -22,8 +22,14 @@ type StackConfig struct {
 	EncryptionSalt pulumi.StringPtrOutput `pulumi:"encryptionSalt"`
 	// Reference to ESC environment to use as stack configuration.
 	Environment pulumi.StringOutput `pulumi:"environment"`
+	// The organization name
+	OrgName pulumi.StringOutput `pulumi:"orgName"`
+	// The project name
+	ProjectName pulumi.StringOutput `pulumi:"projectName"`
 	// The stack's secrets provider.
 	SecretsProvider pulumi.StringPtrOutput `pulumi:"secretsProvider"`
+	// The stack name
+	StackName pulumi.StringOutput `pulumi:"stackName"`
 }
 
 // NewStackConfig registers a new resource with the given unique name, arguments, and options.
@@ -45,6 +51,16 @@ func NewStackConfig(ctx *pulumi.Context,
 	if args.StackName == nil {
 		return nil, errors.New("invalid value for required argument 'StackName'")
 	}
+	secrets := pulumi.AdditionalSecretOutputs([]string{
+		"secretsProvider",
+	})
+	opts = append(opts, secrets)
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"orgName",
+		"projectName",
+		"stackName",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource StackConfig
 	err := ctx.RegisterResource("pulumiservice:v2:StackConfig", name, args, &resource, opts...)
@@ -214,9 +230,24 @@ func (o StackConfigOutput) Environment() pulumi.StringOutput {
 	return o.ApplyT(func(v *StackConfig) pulumi.StringOutput { return v.Environment }).(pulumi.StringOutput)
 }
 
+// The organization name
+func (o StackConfigOutput) OrgName() pulumi.StringOutput {
+	return o.ApplyT(func(v *StackConfig) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
+}
+
+// The project name
+func (o StackConfigOutput) ProjectName() pulumi.StringOutput {
+	return o.ApplyT(func(v *StackConfig) pulumi.StringOutput { return v.ProjectName }).(pulumi.StringOutput)
+}
+
 // The stack's secrets provider.
 func (o StackConfigOutput) SecretsProvider() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *StackConfig) pulumi.StringPtrOutput { return v.SecretsProvider }).(pulumi.StringPtrOutput)
+}
+
+// The stack name
+func (o StackConfigOutput) StackName() pulumi.StringOutput {
+	return o.ApplyT(func(v *StackConfig) pulumi.StringOutput { return v.StackName }).(pulumi.StringOutput)
 }
 
 type StackConfigArrayOutput struct{ *pulumi.OutputState }

@@ -10,6 +10,11 @@ export type Account = import("./account").Account;
 export const Account: typeof import("./account").Account = null as any;
 utilities.lazyLoad(exports, ["Account"], () => require("./account"));
 
+export { AgentPoolArgs } from "./agentPool";
+export type AgentPool = import("./agentPool").AgentPool;
+export const AgentPool: typeof import("./agentPool").AgentPool = null as any;
+utilities.lazyLoad(exports, ["AgentPool"], () => require("./agentPool"));
+
 export { AuditLogExportConfigurationArgs } from "./auditLogExportConfiguration";
 export type AuditLogExportConfiguration = import("./auditLogExportConfiguration").AuditLogExportConfiguration;
 export const AuditLogExportConfiguration: typeof import("./auditLogExportConfiguration").AuditLogExportConfiguration = null as any;
@@ -30,6 +35,16 @@ export type BitBucketIntegration = import("./bitBucketIntegration").BitBucketInt
 export const BitBucketIntegration: typeof import("./bitBucketIntegration").BitBucketIntegration = null as any;
 utilities.lazyLoad(exports, ["BitBucketIntegration"], () => require("./bitBucketIntegration"));
 
+export { CustomVCSIntegrationArgs } from "./customVCSIntegration";
+export type CustomVCSIntegration = import("./customVCSIntegration").CustomVCSIntegration;
+export const CustomVCSIntegration: typeof import("./customVCSIntegration").CustomVCSIntegration = null as any;
+utilities.lazyLoad(exports, ["CustomVCSIntegration"], () => require("./customVCSIntegration"));
+
+export { CustomVCSRepositoryArgs } from "./customVCSRepository";
+export type CustomVCSRepository = import("./customVCSRepository").CustomVCSRepository;
+export const CustomVCSRepository: typeof import("./customVCSRepository").CustomVCSRepository = null as any;
+utilities.lazyLoad(exports, ["CustomVCSRepository"], () => require("./customVCSRepository"));
+
 export { DefaultOrganizationArgs } from "./defaultOrganization";
 export type DefaultOrganization = import("./defaultOrganization").DefaultOrganization;
 export const DefaultOrganization: typeof import("./defaultOrganization").DefaultOrganization = null as any;
@@ -44,11 +59,6 @@ export { EnvironmentDraftArgs } from "./environmentDraft";
 export type EnvironmentDraft = import("./environmentDraft").EnvironmentDraft;
 export const EnvironmentDraft: typeof import("./environmentDraft").EnvironmentDraft = null as any;
 utilities.lazyLoad(exports, ["EnvironmentDraft"], () => require("./environmentDraft"));
-
-export { EnvironmentDraft_previewArgs } from "./environmentDraft_preview";
-export type EnvironmentDraft_preview = import("./environmentDraft_preview").EnvironmentDraft_preview;
-export const EnvironmentDraft_preview: typeof import("./environmentDraft_preview").EnvironmentDraft_preview = null as any;
-utilities.lazyLoad(exports, ["EnvironmentDraft_preview"], () => require("./environmentDraft_preview"));
 
 export { EnvironmentScheduleArgs } from "./environmentSchedule";
 export type EnvironmentSchedule = import("./environmentSchedule").EnvironmentSchedule;
@@ -110,10 +120,30 @@ export type OpenEnvironmentRequest = import("./openEnvironmentRequest").OpenEnvi
 export const OpenEnvironmentRequest: typeof import("./openEnvironmentRequest").OpenEnvironmentRequest = null as any;
 utilities.lazyLoad(exports, ["OpenEnvironmentRequest"], () => require("./openEnvironmentRequest"));
 
+export { OrgTemplateCollectionArgs } from "./orgTemplateCollection";
+export type OrgTemplateCollection = import("./orgTemplateCollection").OrgTemplateCollection;
+export const OrgTemplateCollection: typeof import("./orgTemplateCollection").OrgTemplateCollection = null as any;
+utilities.lazyLoad(exports, ["OrgTemplateCollection"], () => require("./orgTemplateCollection"));
+
+export { OrgTokenArgs } from "./orgToken";
+export type OrgToken = import("./orgToken").OrgToken;
+export const OrgToken: typeof import("./orgToken").OrgToken = null as any;
+utilities.lazyLoad(exports, ["OrgToken"], () => require("./orgToken"));
+
+export { OrganizationMemberArgs } from "./organizationMember";
+export type OrganizationMember = import("./organizationMember").OrganizationMember;
+export const OrganizationMember: typeof import("./organizationMember").OrganizationMember = null as any;
+utilities.lazyLoad(exports, ["OrganizationMember"], () => require("./organizationMember"));
+
 export { OrganizationWebhookArgs } from "./organizationWebhook";
 export type OrganizationWebhook = import("./organizationWebhook").OrganizationWebhook;
 export const OrganizationWebhook: typeof import("./organizationWebhook").OrganizationWebhook = null as any;
 utilities.lazyLoad(exports, ["OrganizationWebhook"], () => require("./organizationWebhook"));
+
+export { PersonalTokenArgs } from "./personalToken";
+export type PersonalToken = import("./personalToken").PersonalToken;
+export const PersonalToken: typeof import("./personalToken").PersonalToken = null as any;
+utilities.lazyLoad(exports, ["PersonalToken"], () => require("./personalToken"));
 
 export { PolicyGroupArgs } from "./policyGroup";
 export type PolicyGroup = import("./policyGroup").PolicyGroup;
@@ -175,6 +205,11 @@ export type StackConfig = import("./stackConfig").StackConfig;
 export const StackConfig: typeof import("./stackConfig").StackConfig = null as any;
 utilities.lazyLoad(exports, ["StackConfig"], () => require("./stackConfig"));
 
+export { StackTagArgs } from "./stackTag";
+export type StackTag = import("./stackTag").StackTag;
+export const StackTag: typeof import("./stackTag").StackTag = null as any;
+utilities.lazyLoad(exports, ["StackTag"], () => require("./stackTag"));
+
 export { StackWebhookArgs } from "./stackWebhook";
 export type StackWebhook = import("./stackWebhook").StackWebhook;
 export const StackWebhook: typeof import("./stackWebhook").StackWebhook = null as any;
@@ -189,6 +224,11 @@ export { TeamArgs } from "./team";
 export type Team = import("./team").Team;
 export const Team: typeof import("./team").Team = null as any;
 utilities.lazyLoad(exports, ["Team"], () => require("./team"));
+
+export { TeamTokenArgs } from "./teamToken";
+export type TeamToken = import("./teamToken").TeamToken;
+export const TeamToken: typeof import("./teamToken").TeamToken = null as any;
+utilities.lazyLoad(exports, ["TeamToken"], () => require("./teamToken"));
 
 export { Webhook_esc_environmentsArgs } from "./webhook_esc_environments";
 export type Webhook_esc_environments = import("./webhook_esc_environments").Webhook_esc_environments;
@@ -207,6 +247,8 @@ const _module = {
         switch (type) {
             case "pulumiservice:v2:Account":
                 return new Account(name, <any>undefined, { urn })
+            case "pulumiservice:v2:AgentPool":
+                return new AgentPool(name, <any>undefined, { urn })
             case "pulumiservice:v2:AuditLogExportConfiguration":
                 return new AuditLogExportConfiguration(name, <any>undefined, { urn })
             case "pulumiservice:v2:AuthPolicy":
@@ -215,14 +257,16 @@ const _module = {
                 return new AzureDevOpsIntegration(name, <any>undefined, { urn })
             case "pulumiservice:v2:BitBucketIntegration":
                 return new BitBucketIntegration(name, <any>undefined, { urn })
+            case "pulumiservice:v2:CustomVCSIntegration":
+                return new CustomVCSIntegration(name, <any>undefined, { urn })
+            case "pulumiservice:v2:CustomVCSRepository":
+                return new CustomVCSRepository(name, <any>undefined, { urn })
             case "pulumiservice:v2:DefaultOrganization":
                 return new DefaultOrganization(name, <any>undefined, { urn })
             case "pulumiservice:v2:DeploymentSettings":
                 return new DeploymentSettings(name, <any>undefined, { urn })
             case "pulumiservice:v2:EnvironmentDraft":
                 return new EnvironmentDraft(name, <any>undefined, { urn })
-            case "pulumiservice:v2:EnvironmentDraft_preview":
-                return new EnvironmentDraft_preview(name, <any>undefined, { urn })
             case "pulumiservice:v2:EnvironmentSchedule":
                 return new EnvironmentSchedule(name, <any>undefined, { urn })
             case "pulumiservice:v2:EnvironmentSettings":
@@ -247,8 +291,16 @@ const _module = {
                 return new OidcIssuer(name, <any>undefined, { urn })
             case "pulumiservice:v2:OpenEnvironmentRequest":
                 return new OpenEnvironmentRequest(name, <any>undefined, { urn })
+            case "pulumiservice:v2:OrgTemplateCollection":
+                return new OrgTemplateCollection(name, <any>undefined, { urn })
+            case "pulumiservice:v2:OrgToken":
+                return new OrgToken(name, <any>undefined, { urn })
+            case "pulumiservice:v2:OrganizationMember":
+                return new OrganizationMember(name, <any>undefined, { urn })
             case "pulumiservice:v2:OrganizationWebhook":
                 return new OrganizationWebhook(name, <any>undefined, { urn })
+            case "pulumiservice:v2:PersonalToken":
+                return new PersonalToken(name, <any>undefined, { urn })
             case "pulumiservice:v2:PolicyGroup":
                 return new PolicyGroup(name, <any>undefined, { urn })
             case "pulumiservice:v2:PolicyIssue":
@@ -273,12 +325,16 @@ const _module = {
                 return new Stack(name, <any>undefined, { urn })
             case "pulumiservice:v2:StackConfig":
                 return new StackConfig(name, <any>undefined, { urn })
+            case "pulumiservice:v2:StackTag":
+                return new StackTag(name, <any>undefined, { urn })
             case "pulumiservice:v2:StackWebhook":
                 return new StackWebhook(name, <any>undefined, { urn })
             case "pulumiservice:v2:Task":
                 return new Task(name, <any>undefined, { urn })
             case "pulumiservice:v2:Team":
                 return new Team(name, <any>undefined, { urn })
+            case "pulumiservice:v2:TeamToken":
+                return new TeamToken(name, <any>undefined, { urn })
             case "pulumiservice:v2:Webhook_esc_environments":
                 return new Webhook_esc_environments(name, <any>undefined, { urn })
             case "pulumiservice:v2:Webhook_preview_environments":

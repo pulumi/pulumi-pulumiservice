@@ -5,7 +5,7 @@ import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "../utilities";
 
 /**
- * Updates an existing OIDC issuer registration for an organization. This can be used to modify the issuer name, audience restrictions, trust policies, or other configuration. The issuer URL itself cannot be changed after creation. The issuer name is required in the update request.
+ * Registers a new OIDC issuer for an organization, establishing a trust relationship with an external identity provider. Once registered, the identity provider can issue signed, short-lived tokens that are exchanged for temporary Pulumi Cloud credentials during deployments. This eliminates the need to store long-lived access tokens. Supported providers include AWS, Azure, Google Cloud, GitHub Actions, and any OIDC-compliant identity provider. The request must include the issuer URL, and the service will fetch the provider's public signing keys to verify token authenticity.
  */
 export class OidcIssuer extends pulumi.CustomResource {
     /**
@@ -43,6 +43,10 @@ export class OidcIssuer extends pulumi.CustomResource {
      */
     declare public /*out*/ readonly issuer: pulumi.Output<string>;
     /**
+     * The unique identifier of the registered OIDC issuer.
+     */
+    declare public readonly issuerId: pulumi.Output<string>;
+    /**
      * The JSON Web Key Set for the OIDC issuer.
      */
     declare public readonly jwks: pulumi.Output<any | undefined>;
@@ -63,13 +67,17 @@ export class OidcIssuer extends pulumi.CustomResource {
      */
     declare public readonly name: pulumi.Output<string>;
     /**
+     * The organization name
+     */
+    declare public readonly orgName: pulumi.Output<string>;
+    /**
      * SHA-1 certificate thumbprints used to verify the OIDC issuer's TLS certificate.
      */
     declare public readonly thumbprints: pulumi.Output<string[] | undefined>;
     /**
      * The URL of the OIDC issuer.
      */
-    declare public /*out*/ readonly url: pulumi.Output<string>;
+    declare public readonly url: pulumi.Output<string>;
 
     /**
      * Create a OidcIssuer resource with the given unique name, arguments, and options.
@@ -82,11 +90,14 @@ export class OidcIssuer extends pulumi.CustomResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
-            if (args?.issuerId === undefined && !opts.urn) {
-                throw new Error("Missing required property 'issuerId'");
+            if (args?.name === undefined && !opts.urn) {
+                throw new Error("Missing required property 'name'");
             }
             if (args?.orgName === undefined && !opts.urn) {
                 throw new Error("Missing required property 'orgName'");
+            }
+            if (args?.url === undefined && !opts.urn) {
+                throw new Error("Missing required property 'url'");
             }
             resourceInputs["issuerId"] = args?.issuerId;
             resourceInputs["jwks"] = args?.jwks;
@@ -94,23 +105,27 @@ export class OidcIssuer extends pulumi.CustomResource {
             resourceInputs["name"] = args?.name;
             resourceInputs["orgName"] = args?.orgName;
             resourceInputs["thumbprints"] = args?.thumbprints;
+            resourceInputs["url"] = args?.url;
             resourceInputs["created"] = undefined /*out*/;
             resourceInputs["issuer"] = undefined /*out*/;
             resourceInputs["lastUsed"] = undefined /*out*/;
             resourceInputs["modified"] = undefined /*out*/;
-            resourceInputs["url"] = undefined /*out*/;
         } else {
             resourceInputs["created"] = undefined /*out*/;
             resourceInputs["issuer"] = undefined /*out*/;
+            resourceInputs["issuerId"] = undefined /*out*/;
             resourceInputs["jwks"] = undefined /*out*/;
             resourceInputs["lastUsed"] = undefined /*out*/;
             resourceInputs["maxExpiration"] = undefined /*out*/;
             resourceInputs["modified"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
+            resourceInputs["orgName"] = undefined /*out*/;
             resourceInputs["thumbprints"] = undefined /*out*/;
             resourceInputs["url"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["orgName"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(OidcIssuer.__pulumiType, name, resourceInputs, opts);
     }
 }
@@ -122,25 +137,29 @@ export interface OidcIssuerArgs {
     /**
      * The OIDC issuer identifier
      */
-    issuerId: pulumi.Input<string>;
+    issuerId?: pulumi.Input<string>;
     /**
-     * The updated JSON Web Key Set for the OIDC issuer.
+     * The JSON Web Key Set for the OIDC issuer.
      */
     jwks?: any;
     /**
-     * The updated maximum token expiration time in seconds.
+     * The maximum token expiration time in seconds.
      */
     maxExpiration?: pulumi.Input<number>;
     /**
-     * The updated display name of the OIDC issuer.
+     * The display name of the OIDC issuer.
      */
-    name?: pulumi.Input<string>;
+    name: pulumi.Input<string>;
     /**
      * The organization name
      */
     orgName: pulumi.Input<string>;
     /**
-     * Updated SHA-1 certificate thumbprints used to verify the OIDC issuer's TLS certificate.
+     * SHA-1 certificate thumbprints used to verify the OIDC issuer's TLS certificate.
      */
     thumbprints?: pulumi.Input<pulumi.Input<string>[]>;
+    /**
+     * The URL of the OIDC issuer.
+     */
+    url: pulumi.Input<string>;
 }

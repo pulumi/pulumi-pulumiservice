@@ -5,15 +5,8 @@ import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "../utilities";
 
 /**
- * Updates a team's membership and configuration. This multi-purpose endpoint supports several operations:
- *
- * **Update membership:** Use `member` (username) and `memberAction` (`add` or `remove`) to manage team members.
- *
- * **Grant stack access:** Use `addStackPermission` with `projectName`, `stackName`, and `permission` (integer: `101` = read, `102` = edit, `103` = admin).
- *
- * **Remove stack access:** Use `removeStack` with `projectName` and `stackName`.
- *
- * Members added to a team inherit the team's stack permissions. Teams are not available to individual (single-user) organizations.
+ * CreatePulumiTeam creates a "Pulumi" team, i.e. one whose membership is managed by Pulumi.
+ * (As opposed to a GitHub or GitLab-based team.)
  */
 export class Team extends pulumi.CustomResource {
     /**
@@ -49,11 +42,11 @@ export class Team extends pulumi.CustomResource {
     /**
      * A free-form text description of the team's purpose.
      */
-    declare public /*out*/ readonly description: pulumi.Output<string>;
+    declare public readonly description: pulumi.Output<string>;
     /**
      * The human-readable display name shown in the UI.
      */
-    declare public /*out*/ readonly displayName: pulumi.Output<string>;
+    declare public readonly displayName: pulumi.Output<string>;
     /**
      * The list of environment settings for the team.
      */
@@ -75,7 +68,11 @@ export class Team extends pulumi.CustomResource {
     /**
      * The unique identifier name of the team within the organization.
      */
-    declare public /*out*/ readonly name: pulumi.Output<string>;
+    declare public readonly name: pulumi.Output<string>;
+    /**
+     * The organization name
+     */
+    declare public readonly orgName: pulumi.Output<string>;
     /**
      * RoleIDs are the IDs of the FGA roles assigned to the team, if any.
      * Currently only one role per team is supported.
@@ -101,32 +98,27 @@ export class Team extends pulumi.CustomResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
+            if (args?.description === undefined && !opts.urn) {
+                throw new Error("Missing required property 'description'");
+            }
+            if (args?.displayName === undefined && !opts.urn) {
+                throw new Error("Missing required property 'displayName'");
+            }
+            if (args?.name === undefined && !opts.urn) {
+                throw new Error("Missing required property 'name'");
+            }
             if (args?.orgName === undefined && !opts.urn) {
                 throw new Error("Missing required property 'orgName'");
             }
-            if (args?.teamName === undefined && !opts.urn) {
-                throw new Error("Missing required property 'teamName'");
-            }
-            resourceInputs["addEnvironmentPermission"] = args?.addEnvironmentPermission;
-            resourceInputs["addStackPermission"] = args?.addStackPermission;
-            resourceInputs["editEnvironmentPermission"] = args?.editEnvironmentPermission;
-            resourceInputs["editStackPermission"] = args?.editStackPermission;
-            resourceInputs["member"] = args?.member;
-            resourceInputs["memberAction"] = args?.memberAction;
-            resourceInputs["newDescription"] = args?.newDescription;
-            resourceInputs["newDisplayName"] = args?.newDisplayName;
+            resourceInputs["description"] = args?.description;
+            resourceInputs["displayName"] = args?.displayName;
+            resourceInputs["name"] = args?.name;
             resourceInputs["orgName"] = args?.orgName;
-            resourceInputs["removeEnvironment"] = args?.removeEnvironment;
-            resourceInputs["removeStack"] = args?.removeStack;
-            resourceInputs["teamName"] = args?.teamName;
             resourceInputs["accounts"] = undefined /*out*/;
-            resourceInputs["description"] = undefined /*out*/;
-            resourceInputs["displayName"] = undefined /*out*/;
             resourceInputs["environments"] = undefined /*out*/;
             resourceInputs["kind"] = undefined /*out*/;
             resourceInputs["listMembersError"] = undefined /*out*/;
             resourceInputs["members"] = undefined /*out*/;
-            resourceInputs["name"] = undefined /*out*/;
             resourceInputs["roleIds"] = undefined /*out*/;
             resourceInputs["stacks"] = undefined /*out*/;
             resourceInputs["userRole"] = undefined /*out*/;
@@ -139,11 +131,14 @@ export class Team extends pulumi.CustomResource {
             resourceInputs["listMembersError"] = undefined /*out*/;
             resourceInputs["members"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
+            resourceInputs["orgName"] = undefined /*out*/;
             resourceInputs["roleIds"] = undefined /*out*/;
             resourceInputs["stacks"] = undefined /*out*/;
             resourceInputs["userRole"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["orgName"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(Team.__pulumiType, name, resourceInputs, opts);
     }
 }
@@ -153,51 +148,19 @@ export class Team extends pulumi.CustomResource {
  */
 export interface TeamArgs {
     /**
-     * An environment permission to add to the team.
+     * The description
      */
-    addEnvironmentPermission?: any;
+    description: pulumi.Input<string>;
     /**
-     * A stack permission to add to the team.
+     * The display name
      */
-    addStackPermission?: any;
+    displayName: pulumi.Input<string>;
     /**
-     * An environment permission to edit on the team.
+     * The name
      */
-    editEnvironmentPermission?: any;
-    /**
-     * A stack permission to edit on the team.
-     */
-    editStackPermission?: any;
-    /**
-     * Member to be added or removed based on MemberAction.
-     */
-    member?: pulumi.Input<string>;
-    /**
-     * MemberAction is the action to perform.
-     */
-    memberAction?: pulumi.Input<string>;
-    /**
-     * The new description for the team.
-     */
-    newDescription?: pulumi.Input<string>;
-    /**
-     * The new display name for the team.
-     */
-    newDisplayName?: pulumi.Input<string>;
+    name: pulumi.Input<string>;
     /**
      * The organization name
      */
     orgName: pulumi.Input<string>;
-    /**
-     * An environment to remove from the team.
-     */
-    removeEnvironment?: any;
-    /**
-     * A stack to remove from the team.
-     */
-    removeStack?: any;
-    /**
-     * The team name
-     */
-    teamName: pulumi.Input<string>;
 }

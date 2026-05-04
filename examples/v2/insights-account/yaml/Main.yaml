@@ -1,0 +1,22 @@
+# Insights Accounts back the Pulumi Insights cloud-resource scanner. The
+# `environment` value points at an ESC environment that opens AWS/GCP/Azure
+# credentials at scan time. Real scans need real credentials there; this
+# example uses a placeholder so it compiles and previews cleanly.
+resources:
+  account:
+    type: pulumiservice:v2:Account
+    properties:
+      orgName: ${serviceOrg}
+      accountName: v2-insights-${accountSuffix}
+      provider: aws
+      environment: ${insightsEnvironment}
+      scanSchedule: none
+  scanSettings:
+    type: pulumiservice:v2:ScheduledScanSettings
+    properties:
+      orgName: ${serviceOrg}
+      accountName: ${account.accountName}
+      paused: true
+      scheduleCron: 0 6 * * *
+outputs:
+  accountName: ${account.accountName}

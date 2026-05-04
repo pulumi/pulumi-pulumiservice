@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"regexp"
 	"strings"
 
@@ -100,13 +101,14 @@ func (r *DynamicResource) Create(ctx context.Context, req p.CreateRequest) (p.Cr
 	if err != nil {
 		return p.CreateResponse{}, err
 	}
-	id, err := extractID(body, r.meta.IDField)
+	id, err := extractID(body, r.meta.IDField, req.Properties, r.meta.Renames)
 	if err != nil {
 		return p.CreateResponse{}, fmt.Errorf("create: %w", err)
 	}
 	if id == "" {
 		return p.CreateResponse{}, fmt.Errorf("create: response did not contain an ID at %q", idFieldOrDefault(r.meta.IDField))
 	}
+	state = r.populatePathParams(state, req.Properties)
 	return p.CreateResponse{ID: id, Properties: state}, nil
 }
 
@@ -119,12 +121,16 @@ func (r *DynamicResource) Read(ctx context.Context, req p.ReadRequest) (p.ReadRe
 		return p.ReadResponse{}, err
 	}
 	if op == nil {
-		return p.ReadResponse{}, fmt.Errorf("read: resource has no read operation declared")
+		// Read is optional: some Pulumi Cloud resources (tokens, tags,
+		// memberships) don't expose a per-instance Get endpoint — only
+		// list-on-the-org. For those we treat refresh as a no-op and
+		// return the prior state unchanged.
+		return p.ReadResponse{ID: req.ID, Inputs: req.Inputs, Properties: req.Properties}, nil
 	}
-	source := req.Inputs
-	if source.Len() == 0 {
-		source = req.Properties
-	}
+	// Read needs the path params from prior state (e.g. server-generated
+	// IDs that don't appear in user inputs); merge state in so they're
+	// reachable.
+	source := mergeMaps(req.Inputs, req.Properties)
 	_, state, err := r.execAndDecode(ctx, op, source)
 	if err != nil {
 		return p.ReadResponse{}, err
@@ -144,15 +150,21 @@ func (r *DynamicResource) Update(ctx context.Context, req p.UpdateRequest) (p.Up
 	if req.DryRun {
 		return p.UpdateResponse{Properties: req.Inputs}, nil
 	}
-	_, state, err := r.execAndDecode(ctx, op, req.Inputs)
+	src := mergeMaps(req.Inputs, req.OldInputs, req.State)
+	_, state, err := r.execAndDecode(ctx, op, src)
 	if err != nil {
 		return p.UpdateResponse{}, err
 	}
+	state = r.populatePathParams(state, src)
 	return p.UpdateResponse{Properties: state}, nil
 }
 
 // Delete fires the delete op (if declared). Resources without a delete op
 // quietly succeed; the engine drops the state.
+//
+// Path parameters are sourced from a union of (state, OldInputs) so that
+// stacks created before path params were round-tripped into outputs can
+// still be deleted: OldInputs preserves the original user inputs.
 func (r *DynamicResource) Delete(ctx context.Context, req p.DeleteRequest) error {
 	op, err := r.resolveOp("delete", r.meta.Operations.Delete)
 	if err != nil {
@@ -161,8 +173,60 @@ func (r *DynamicResource) Delete(ctx context.Context, req p.DeleteRequest) error
 	if op == nil {
 		return nil
 	}
-	_, _, err = r.execAndDecode(ctx, op, req.Properties)
+	src := mergeMaps(req.Properties, req.OldInputs)
+	_, _, err = r.execAndDecode(ctx, op, src)
 	return err
+}
+
+// populatePathParams enriches the response state with path-parameter
+// values from inputs. Pulumi Cloud endpoints frequently return empty or
+// minimal bodies (e.g. POST /api/stacks/{orgName}/{projectName}
+// returns `{}` on success). Without this enrichment, downstream resources
+// referencing `${parent.projectName}` get a missing-input error because
+// the parent's state never carried projectName forward — even though the
+// schema declares it as an output.
+//
+// Walks the path params of create + read ops, copying each Pulumi-named
+// input into state when state doesn't already carry that key.
+func (r *DynamicResource) populatePathParams(state, inputs property.Map) property.Map {
+	out := map[string]property.Value{}
+	for k, v := range state.AllStable {
+		out[k] = v
+	}
+	for _, opID := range []string{r.meta.Operations.Create, r.meta.Operations.Read} {
+		if opID == "" {
+			continue
+		}
+		op, ok := r.spec.Op(opID)
+		if !ok {
+			continue
+		}
+		for _, m := range pathParamRE.FindAllStringSubmatch(op.Path, -1) {
+			wireName := m[1]
+			pulName := pulumiName(wireName, r.meta.Renames, false)
+			if _, exists := out[pulName]; exists {
+				continue
+			}
+			if v, ok := inputs.GetOk(pulName); ok {
+				out[pulName] = v
+			}
+		}
+	}
+	return property.NewMap(out)
+}
+
+// mergeMaps returns a property.Map that exposes every key from any of the
+// supplied maps. Earlier maps take precedence on conflict.
+func mergeMaps(maps ...property.Map) property.Map {
+	out := map[string]property.Value{}
+	// Walk in reverse so earlier maps overwrite later ones (since later
+	// maps are inserted first; later iterations replace earlier values).
+	for i := len(maps) - 1; i >= 0; i-- {
+		for k, v := range maps[i].AllStable {
+			out[k] = v
+		}
+	}
+	return property.NewMap(out)
 }
 
 // execAndDecode performs the HTTP round-trip. The returned state Map is the
@@ -214,20 +278,44 @@ func (r *DynamicResource) execAndDecode(ctx context.Context, op *Operation, inpu
 	if len(respBody) == 0 || resp.StatusCode == http.StatusNoContent {
 		return respBody, property.NewMap(nil), nil
 	}
+	// Some endpoints return non-object bodies (e.g. DeleteDeploymentSettings
+	// returns a bare boolean for legacy reasons). For state-construction
+	// purposes we only care about object responses; treat anything else as
+	// an empty state map.
+	trimmed := bytes.TrimSpace(respBody)
+	if len(trimmed) == 0 || trimmed[0] != '{' {
+		return respBody, property.NewMap(nil), nil
+	}
 	var raw map[string]any
 	if err := json.Unmarshal(respBody, &raw); err != nil {
 		return respBody, property.Map{}, fmt.Errorf("rest: decode response for %s: %w", op.ID, err)
 	}
+	// Translate response keys from wire-side to Pulumi-side so the resulting
+	// property map can be looked up using Pulumi names (matching the schema's
+	// inputProperties keys and the path resolver in buildURL).
+	if len(r.meta.Renames) > 0 {
+		raw = renameMapKeys(raw, r.meta.Renames)
+	}
 	return respBody, anyMapToPropertyMap(raw), nil
 }
 
-// buildURL substitutes {path} placeholders from inputs. Returns an absolute
-// URL; the spec's first server is used as the base. The transport may
-// override the host before sending.
-func (r *DynamicResource) buildURL(op *Operation, inputs property.Map) (string, error) {
-	if len(r.spec.Servers) == 0 {
-		return "", fmt.Errorf("rest: spec has no servers; cannot build URL for %s", op.ID)
+// renameMapKeys returns a copy of m with any wire-side keys translated to
+// their Pulumi-side equivalents per the renames map. Nested maps are not
+// renamed (renames only apply at the top level of resource I/O).
+func renameMapKeys(m map[string]any, renames map[string]string) map[string]any {
+	out := make(map[string]any, len(m))
+	for k, v := range m {
+		out[pulumiName(k, renames, false)] = v
 	}
+	return out
+}
+
+// buildURL substitutes {path} placeholders from inputs. Returns an absolute
+// URL string that http.NewRequest can parse — the spec's first server is
+// used as the base when present, otherwise a sentinel host is used. In
+// either case the Transport is expected to override scheme+host before
+// sending the request.
+func (r *DynamicResource) buildURL(op *Operation, inputs property.Map) (string, error) {
 	matches := pathParamRE.FindAllStringSubmatchIndex(op.Path, -1)
 	var b strings.Builder
 	last := 0
@@ -239,11 +327,15 @@ func (r *DynamicResource) buildURL(op *Operation, inputs property.Map) (string, 
 		if !ok {
 			return "", fmt.Errorf("rest: path parameter %q (Pulumi name %q) missing from inputs", wireName, pulName)
 		}
-		b.WriteString(propertyValueToString(v))
+		b.WriteString(url.PathEscape(propertyValueToString(v)))
 		last = m[1]
 	}
 	b.WriteString(op.Path[last:])
-	return strings.TrimRight(r.spec.Servers[0], "/") + b.String(), nil
+	base := "https://transport.invalid"
+	if len(r.spec.Servers) > 0 {
+		base = strings.TrimRight(r.spec.Servers[0], "/")
+	}
+	return base + b.String(), nil
 }
 
 func needsBody(method string) bool {
@@ -254,9 +346,24 @@ func needsBody(method string) bool {
 	return false
 }
 
-// extractID resolves a JSON-pointer-ish path against a JSON-decoded body.
-func extractID(body []byte, ptr string) (string, error) {
+// extractID resolves the resource ID from one of two idField formats:
+//
+//  1. Pointer-style ("/id" or "/foo/bar") — looks up a JSON path in the
+//     create-response body.
+//  2. Template-style ("{name}" or "{orgName}/{projectName}/{stackName}") —
+//     interpolates wire-side parameter names from the input map. Used for
+//     resources whose Create returns 204 No Content (no body to extract
+//     from), where the caller-supplied inputs already uniquely identify
+//     the resource.
+//
+// The template form is detected by the presence of `{`. Parameter names
+// inside `{...}` are wire-side names; pulumiName + renames maps them to
+// the corresponding pulumi-side input keys before lookup.
+func extractID(body []byte, ptr string, inputs property.Map, renames map[string]string) (string, error) {
 	ptr = idFieldOrDefault(ptr)
+	if strings.Contains(ptr, "{") {
+		return interpolateTemplateID(ptr, inputs, renames)
+	}
 	if len(body) == 0 {
 		return "", nil
 	}
@@ -286,6 +393,28 @@ func extractID(body []byte, ptr string) (string, error) {
 	default:
 		return fmt.Sprintf("%v", v), nil
 	}
+}
+
+// interpolateTemplateID expands a "{wireName}/{wireName2}" template by
+// looking each parameter up in the input map (after applying renames to
+// resolve wire→pulumi names).
+func interpolateTemplateID(tmpl string, inputs property.Map, renames map[string]string) (string, error) {
+	matches := pathParamRE.FindAllStringSubmatchIndex(tmpl, -1)
+	var b strings.Builder
+	last := 0
+	for _, m := range matches {
+		b.WriteString(tmpl[last:m[0]])
+		wireName := tmpl[m[2]:m[3]]
+		pulName := pulumiName(wireName, renames, true)
+		v, ok := inputs.GetOk(pulName)
+		if !ok {
+			return "", fmt.Errorf("idField template parameter %q (Pulumi name %q) missing from inputs", wireName, pulName)
+		}
+		b.WriteString(propertyValueToString(v))
+		last = m[1]
+	}
+	b.WriteString(tmpl[last:])
+	return b.String(), nil
 }
 
 func idFieldOrDefault(p string) string {

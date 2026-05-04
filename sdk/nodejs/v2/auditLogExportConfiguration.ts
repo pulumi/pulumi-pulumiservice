@@ -43,6 +43,10 @@ export class AuditLogExportConfiguration extends pulumi.CustomResource {
      */
     declare public /*out*/ readonly lastResult: pulumi.Output<any>;
     /**
+     * The organization name
+     */
+    declare public readonly orgName: pulumi.Output<string>;
+    /**
      * The S3 configuration for exporting audit logs.
      */
     declare public /*out*/ readonly s3Config: pulumi.Output<any>;
@@ -76,9 +80,12 @@ export class AuditLogExportConfiguration extends pulumi.CustomResource {
         } else {
             resourceInputs["enabled"] = undefined /*out*/;
             resourceInputs["lastResult"] = undefined /*out*/;
+            resourceInputs["orgName"] = undefined /*out*/;
             resourceInputs["s3Config"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["orgName"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(AuditLogExportConfiguration.__pulumiType, name, resourceInputs, opts);
     }
 }

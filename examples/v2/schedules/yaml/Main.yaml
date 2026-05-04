@@ -1,0 +1,39 @@
+resources:
+  # ScheduledDeployment requires a Stack with DeploymentSettings.
+  # EnvironmentSchedule requires an Environment.
+  parentStack:
+    type: pulumiservice:v2:Stack
+    properties:
+      orgName: ${serviceOrg}
+      projectName: ${projectName}
+      stackName: ${stackName}
+  parentSettings:
+    type: pulumiservice:v2:DeploymentSettings
+    properties:
+      orgName: ${serviceOrg}
+      projectName: ${projectName}
+      stackName: ${stackName}
+      sourceContext:
+        git:
+          repoUrl: https://github.com/example/example.git
+          branch: refs/heads/main
+    options:
+      dependsOn:
+        - ${parentStack}
+  nightlyDeploy:
+    type: pulumiservice:v2:ScheduledDeployment
+    properties:
+      orgName: ${serviceOrg}
+      projectName: ${projectName}
+      stackName: ${stackName}
+      scheduleCron: ${scheduleCron}
+      request:
+        operation: update
+    options:
+      dependsOn:
+        - ${parentSettings}
+# EnvironmentSchedule v2 requires a `secretRotationRequest` body even
+# for cron-only schedules; modeling that body shape end-to-end is out
+# of scope for this example.
+outputs:
+  nightlyCron: ${nightlyDeploy.scheduleCron}

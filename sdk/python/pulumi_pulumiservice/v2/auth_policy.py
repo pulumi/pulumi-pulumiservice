@@ -181,6 +181,8 @@ class AuthPolicy(pulumi.CustomResource):
             __props__.__dict__["created"] = None
             __props__.__dict__["modified"] = None
             __props__.__dict__["version"] = None
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["orgName", "policyId"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(AuthPolicy, __self__).__init__(
             'pulumiservice:v2:AuthPolicy',
             resource_name,
@@ -204,8 +206,11 @@ class AuthPolicy(pulumi.CustomResource):
         __props__ = AuthPolicyArgs.__new__(AuthPolicyArgs)
 
         __props__.__dict__["created"] = None
+        __props__.__dict__["issuer_id"] = None
         __props__.__dict__["modified"] = None
+        __props__.__dict__["org_name"] = None
         __props__.__dict__["policies"] = None
+        __props__.__dict__["policy_id"] = None
         __props__.__dict__["version"] = None
         return AuthPolicy(resource_name, opts=opts, __props__=__props__)
 
@@ -218,6 +223,14 @@ class AuthPolicy(pulumi.CustomResource):
         return pulumi.get(self, "created")
 
     @_builtins.property
+    @pulumi.getter(name="issuerId")
+    def issuer_id(self) -> pulumi.Output[_builtins.str]:
+        """
+        The unique identifier
+        """
+        return pulumi.get(self, "issuer_id")
+
+    @_builtins.property
     @pulumi.getter
     def modified(self) -> pulumi.Output[Optional[_builtins.str]]:
         """
@@ -226,12 +239,28 @@ class AuthPolicy(pulumi.CustomResource):
         return pulumi.get(self, "modified")
 
     @_builtins.property
+    @pulumi.getter(name="orgName")
+    def org_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The organization name
+        """
+        return pulumi.get(self, "org_name")
+
+    @_builtins.property
     @pulumi.getter
     def policies(self) -> pulumi.Output[Sequence[Any]]:
         """
         List of policies
         """
         return pulumi.get(self, "policies")
+
+    @_builtins.property
+    @pulumi.getter(name="policyId")
+    def policy_id(self) -> pulumi.Output[_builtins.str]:
+        """
+        The policy identifier
+        """
+        return pulumi.get(self, "policy_id")
 
     @_builtins.property
     @pulumi.getter

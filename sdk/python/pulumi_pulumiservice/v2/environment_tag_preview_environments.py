@@ -22,8 +22,7 @@ class EnvironmentTag_preview_environmentsArgs:
                  env_name: pulumi.Input[_builtins.str],
                  name: pulumi.Input[_builtins.str],
                  org_name: pulumi.Input[_builtins.str],
-                 value: pulumi.Input[_builtins.str],
-                 tag_name: Optional[pulumi.Input[_builtins.str]] = None):
+                 value: pulumi.Input[_builtins.str]):
         """
         The set of arguments for constructing a EnvironmentTag_preview_environments resource.
 
@@ -31,14 +30,11 @@ class EnvironmentTag_preview_environmentsArgs:
         :param pulumi.Input[_builtins.str] name: The name
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] value: The value
-        :param pulumi.Input[_builtins.str] tag_name: The environment tag name
         """
         pulumi.set(__self__, "env_name", env_name)
         pulumi.set(__self__, "name", name)
         pulumi.set(__self__, "org_name", org_name)
         pulumi.set(__self__, "value", value)
-        if tag_name is not None:
-            pulumi.set(__self__, "tag_name", tag_name)
 
     @_builtins.property
     @pulumi.getter(name="envName")
@@ -88,18 +84,6 @@ class EnvironmentTag_preview_environmentsArgs:
     def value(self, value: pulumi.Input[_builtins.str]):
         pulumi.set(self, "value", value)
 
-    @_builtins.property
-    @pulumi.getter(name="tagName")
-    def tag_name(self) -> Optional[pulumi.Input[_builtins.str]]:
-        """
-        The environment tag name
-        """
-        return pulumi.get(self, "tag_name")
-
-    @tag_name.setter
-    def tag_name(self, value: Optional[pulumi.Input[_builtins.str]]):
-        pulumi.set(self, "tag_name", value)
-
 
 @pulumi.type_token("pulumiservice:v2:EnvironmentTag_preview_environments")
 class EnvironmentTag_preview_environments(pulumi.CustomResource):
@@ -110,7 +94,6 @@ class EnvironmentTag_preview_environments(pulumi.CustomResource):
                  env_name: Optional[pulumi.Input[_builtins.str]] = None,
                  name: Optional[pulumi.Input[_builtins.str]] = None,
                  org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 tag_name: Optional[pulumi.Input[_builtins.str]] = None,
                  value: Optional[pulumi.Input[_builtins.str]] = None,
                  __props__=None):
         """
@@ -122,7 +105,6 @@ class EnvironmentTag_preview_environments(pulumi.CustomResource):
         :param pulumi.Input[_builtins.str] env_name: The environment name
         :param pulumi.Input[_builtins.str] name: The name
         :param pulumi.Input[_builtins.str] org_name: The organization name
-        :param pulumi.Input[_builtins.str] tag_name: The environment tag name
         :param pulumi.Input[_builtins.str] value: The value
         """
         ...
@@ -153,7 +135,6 @@ class EnvironmentTag_preview_environments(pulumi.CustomResource):
                  env_name: Optional[pulumi.Input[_builtins.str]] = None,
                  name: Optional[pulumi.Input[_builtins.str]] = None,
                  org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 tag_name: Optional[pulumi.Input[_builtins.str]] = None,
                  value: Optional[pulumi.Input[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
@@ -173,7 +154,6 @@ class EnvironmentTag_preview_environments(pulumi.CustomResource):
             if org_name is None and not opts.urn:
                 raise TypeError("Missing required property 'org_name'")
             __props__.__dict__["org_name"] = org_name
-            __props__.__dict__["tag_name"] = tag_name
             if value is None and not opts.urn:
                 raise TypeError("Missing required property 'value'")
             __props__.__dict__["value"] = value
@@ -181,6 +161,8 @@ class EnvironmentTag_preview_environments(pulumi.CustomResource):
             __props__.__dict__["editor_login"] = None
             __props__.__dict__["editor_name"] = None
             __props__.__dict__["modified"] = None
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["envName", "orgName"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(EnvironmentTag_preview_environments, __self__).__init__(
             'pulumiservice:v2:EnvironmentTag_preview_environments',
             resource_name,
@@ -206,8 +188,10 @@ class EnvironmentTag_preview_environments(pulumi.CustomResource):
         __props__.__dict__["created"] = None
         __props__.__dict__["editor_login"] = None
         __props__.__dict__["editor_name"] = None
+        __props__.__dict__["env_name"] = None
         __props__.__dict__["modified"] = None
         __props__.__dict__["name"] = None
+        __props__.__dict__["org_name"] = None
         __props__.__dict__["value"] = None
         return EnvironmentTag_preview_environments(resource_name, opts=opts, __props__=__props__)
 
@@ -236,6 +220,14 @@ class EnvironmentTag_preview_environments(pulumi.CustomResource):
         return pulumi.get(self, "editor_name")
 
     @_builtins.property
+    @pulumi.getter(name="envName")
+    def env_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The environment name
+        """
+        return pulumi.get(self, "env_name")
+
+    @_builtins.property
     @pulumi.getter
     def modified(self) -> pulumi.Output[_builtins.str]:
         """
@@ -250,6 +242,14 @@ class EnvironmentTag_preview_environments(pulumi.CustomResource):
         The name of the tag.
         """
         return pulumi.get(self, "name")
+
+    @_builtins.property
+    @pulumi.getter(name="orgName")
+    def org_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The organization name
+        """
+        return pulumi.get(self, "org_name")
 
     @_builtins.property
     @pulumi.getter

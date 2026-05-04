@@ -1,0 +1,20 @@
+# Service registers an org-wide service catalog entry. Owners reference
+# either a team or user; items list the stacks/components that compose
+# the service.
+resources:
+  catalogService:
+    type: pulumiservice:v2:Service
+    properties:
+      orgName: ${serviceOrg}
+      name: v2-service-${serviceSuffix}
+      description: An example v2 service catalog entry.
+      ownerType: team
+      ownerName: platform
+      items:
+        - kind: stack
+          ref: service-provider-test-org/example-app/dev
+      properties:
+        - key: tier
+          value: gold
+        - key: oncall
+          value: platform-ops

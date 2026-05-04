@@ -1,0 +1,9 @@
+resources:
+  source:
+    type: pulumiservice:v2:OrgTemplateCollection
+    properties:
+      orgName: ${serviceOrg}
+      name: v2-templates-${templateSuffix}
+      sourceURL: ${sourceUrl}
+outputs:
+  collectionName: ${source.name}

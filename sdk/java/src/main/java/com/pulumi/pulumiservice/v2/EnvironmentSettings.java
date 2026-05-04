@@ -10,6 +10,7 @@ import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.Utilities;
 import com.pulumi.pulumiservice.v2.EnvironmentSettingsArgs;
 import java.lang.Boolean;
+import java.lang.String;
 import javax.annotation.Nullable;
 
 /**
@@ -31,6 +32,48 @@ public class EnvironmentSettings extends com.pulumi.resources.CustomResource {
      */
     public Output<Boolean> deletionProtected() {
         return this.deletionProtected;
+    }
+    /**
+     * The environment name
+     * 
+     */
+    @Export(name="envName", refs={String.class}, tree="[0]")
+    private Output<String> envName;
+
+    /**
+     * @return The environment name
+     * 
+     */
+    public Output<String> envName() {
+        return this.envName;
+    }
+    /**
+     * The organization name
+     * 
+     */
+    @Export(name="orgName", refs={String.class}, tree="[0]")
+    private Output<String> orgName;
+
+    /**
+     * @return The organization name
+     * 
+     */
+    public Output<String> orgName() {
+        return this.orgName;
+    }
+    /**
+     * The project name
+     * 
+     */
+    @Export(name="projectName", refs={String.class}, tree="[0]")
+    private Output<String> projectName;
+
+    /**
+     * @return The project name
+     * 
+     */
+    public Output<String> projectName() {
+        return this.projectName;
     }
 
     /**

@@ -120,21 +120,6 @@ public final class PolicyPackArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * The policy pack name
-     * 
-     */
-    @Import(name="policyPackName")
-    private @Nullable Output<String> policyPackName;
-
-    /**
-     * @return The policy pack name
-     * 
-     */
-    public Optional<Output<String>> policyPackName() {
-        return Optional.ofNullable(this.policyPackName);
-    }
-
-    /**
      * The cloud provider/platform this policy pack is associated with, e.g. AWS, Azure, etc.
      * 
      */
@@ -235,7 +220,6 @@ public final class PolicyPackArgs extends com.pulumi.resources.ResourceArgs {
         this.name = $.name;
         this.orgName = $.orgName;
         this.policies = $.policies;
-        this.policyPackName = $.policyPackName;
         this.provider = $.provider;
         this.readme = $.readme;
         this.repository = $.repository;
@@ -407,27 +391,6 @@ public final class PolicyPackArgs extends com.pulumi.resources.ResourceArgs {
          */
         public Builder policies(Object... policies) {
             return policies(List.of(policies));
-        }
-
-        /**
-         * @param policyPackName The policy pack name
-         * 
-         * @return builder
-         * 
-         */
-        public Builder policyPackName(@Nullable Output<String> policyPackName) {
-            $.policyPackName = policyPackName;
-            return this;
-        }
-
-        /**
-         * @param policyPackName The policy pack name
-         * 
-         * @return builder
-         * 
-         */
-        public Builder policyPackName(String policyPackName) {
-            return policyPackName(Output.of(policyPackName));
         }
 
         /**

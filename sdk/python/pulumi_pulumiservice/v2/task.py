@@ -210,6 +210,8 @@ class Task(pulumi.CustomResource):
             __props__.__dict__["status"] = None
             __props__.__dict__["task_type"] = None
             __props__.__dict__["tool_execution_mode"] = None
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["orgName", "taskID"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(Task, __self__).__init__(
             'pulumiservice:v2:Task',
             resource_name,
@@ -242,6 +244,7 @@ class Task(pulumi.CustomResource):
         __props__.__dict__["is_shared"] = None
         __props__.__dict__["last_heartbeat"] = None
         __props__.__dict__["name"] = None
+        __props__.__dict__["org_name"] = None
         __props__.__dict__["permission_mode"] = None
         __props__.__dict__["plan_mode"] = None
         __props__.__dict__["runtime_phase"] = None
@@ -249,6 +252,7 @@ class Task(pulumi.CustomResource):
         __props__.__dict__["source"] = None
         __props__.__dict__["source_automation_id"] = None
         __props__.__dict__["status"] = None
+        __props__.__dict__["task_id"] = None
         __props__.__dict__["task_type"] = None
         __props__.__dict__["tool_execution_mode"] = None
         return Task(resource_name, opts=opts, __props__=__props__)
@@ -334,6 +338,14 @@ class Task(pulumi.CustomResource):
         return pulumi.get(self, "name")
 
     @_builtins.property
+    @pulumi.getter(name="orgName")
+    def org_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The organization name
+        """
+        return pulumi.get(self, "org_name")
+
+    @_builtins.property
     @pulumi.getter(name="permissionMode")
     def permission_mode(self) -> pulumi.Output[Optional[_builtins.str]]:
         """
@@ -388,6 +400,14 @@ class Task(pulumi.CustomResource):
         Current execution status of the task.
         """
         return pulumi.get(self, "status")
+
+    @_builtins.property
+    @pulumi.getter(name="taskID")
+    def task_id(self) -> pulumi.Output[_builtins.str]:
+        """
+        The agent task identifier
+        """
+        return pulumi.get(self, "task_id")
 
     @_builtins.property
     @pulumi.getter(name="taskType")

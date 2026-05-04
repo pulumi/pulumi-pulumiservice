@@ -1,0 +1,12 @@
+name: pulumicloud-v2-insights-account
+runtime: yaml
+config:
+  serviceOrg:
+    type: string
+    default: service-provider-test-org
+  accountSuffix:
+    type: string
+    default: dev
+  insightsEnvironment:
+    type: string
+    default: insights/credentials

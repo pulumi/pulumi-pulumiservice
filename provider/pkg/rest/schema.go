@@ -61,17 +61,17 @@ func buildResource(spec *Spec, _ *Metadata, _ string, rm ResourceMeta) (*schema.
 	if createID == "" {
 		return nil, fmt.Errorf("operations.create is required")
 	}
-	if readID == "" {
-		return nil, fmt.Errorf("operations.read is required")
-	}
 
 	create, ok := spec.Op(createID)
 	if !ok {
 		return nil, fmt.Errorf("operations.create %q not found in spec", createID)
 	}
-	read, ok := spec.Op(readID)
-	if !ok {
-		return nil, fmt.Errorf("operations.read %q not found in spec", readID)
+	var read *Operation
+	if readID != "" {
+		read, ok = spec.Op(readID)
+		if !ok {
+			return nil, fmt.Errorf("operations.read %q not found in spec", readID)
+		}
 	}
 	for verb, opID := range map[string]string{
 		"update": rm.Operations.Update,
@@ -97,7 +97,11 @@ func buildResource(spec *Spec, _ *Metadata, _ string, rm ResourceMeta) (*schema.
 		if op == nil {
 			continue
 		}
-		if err := mergePathParamsAsInputs(inputs, requiredInputs, op, rm); err != nil {
+		// Read-path params (e.g. server-generated IDs like issuerId,
+		// poolId, scheduleID) surface as inputs so users _can_ supply
+		// them on import, but they're not required on create — the
+		// server returns them in the create response.
+		if err := mergePathParamsAsInputs(inputs, nil, op, rm); err != nil {
 			return nil, fmt.Errorf("inputs (read path params): %w", err)
 		}
 	}
@@ -112,6 +116,21 @@ func buildResource(spec *Spec, _ *Metadata, _ string, rm ResourceMeta) (*schema.
 		outputs, requiredOutputs, err = operationOutputs(spec, create, rm)
 		if err != nil {
 			return nil, fmt.Errorf("outputs (fallback to create): %w", err)
+		}
+	}
+	// Path parameters need to round-trip through state so Delete (which
+	// reads from saved state, not from inputs) can construct its URL.
+	// Without this, deleting a resource fails with "path parameter X
+	// missing from inputs" because X never made it into outputs.
+	if outputs == nil {
+		outputs = map[string]schema.PropertySpec{}
+	}
+	for _, op := range []*Operation{create, read} {
+		if op == nil {
+			continue
+		}
+		if err := mergePathParamsAsInputs(outputs, &requiredOutputs, op, rm); err != nil {
+			return nil, fmt.Errorf("outputs (path params): %w", err)
 		}
 	}
 
@@ -199,7 +218,7 @@ func operationInputs(spec *Spec, op *Operation, rm ResourceMeta) (map[string]sch
 // mergePathParamsAsInputs adds path parameters from op to the inputs map if
 // they aren't already present. Covers cases like read/update/delete using
 // {id}-style path params that don't appear on create.
-func mergePathParamsAsInputs(inputs map[string]schema.PropertySpec, _ []string, op *Operation, rm ResourceMeta) error {
+func mergePathParamsAsInputs(inputs map[string]schema.PropertySpec, required *[]string, op *Operation, rm ResourceMeta) error {
 	for _, pp := range op.Parameters {
 		if pp.In != "path" {
 			continue
@@ -216,6 +235,9 @@ func mergePathParamsAsInputs(inputs map[string]schema.PropertySpec, _ []string, 
 		}
 		applyFieldMeta(&ps, rm.Fields[name], true)
 		inputs[name] = ps
+		if required != nil {
+			*required = append(*required, name)
+		}
 	}
 	return nil
 }
@@ -224,7 +246,7 @@ func mergePathParamsAsInputs(inputs map[string]schema.PropertySpec, _ []string, 
 // response body schema, then applies the metadata.outputs allowlist or
 // metadata.outputsExclude denylist.
 func operationOutputs(spec *Spec, op *Operation, rm ResourceMeta) (map[string]schema.PropertySpec, []string, error) {
-	if op.ResponseRef == "" {
+	if op == nil || op.ResponseRef == "" {
 		return nil, nil, nil
 	}
 	bodyProps, bodyRequired, err := flattenObjectSchema(spec, op.ResponseRef)
@@ -255,6 +277,9 @@ func operationOutputs(spec *Spec, op *Operation, rm ResourceMeta) (map[string]sc
 		}
 		ps := openAPIToProperty(p)
 		applyFieldMeta(&ps, rm.Fields[name], false)
+		if looksSecret(name) {
+			ps.Secret = true
+		}
 		props[name] = ps
 	}
 	for _, r := range bodyRequired {
@@ -415,6 +440,21 @@ func applyFieldMeta(ps *schema.PropertySpec, fm FieldMeta, isPathParam bool) {
 	if fm.Description != "" {
 		ps.Description = fm.Description
 	}
+}
+
+// looksSecret heuristically detects whether a field name implies the
+// value is sensitive. Catches OrganizationWebhook's `secret` and
+// `secretCiphertext`, OrgToken/TeamToken/PersonalToken's `tokenValue`,
+// and the AgentPool's response `tokenValue`. The OpenAPI spec doesn't
+// carry an x-secret extension we can rely on, so this fills the gap.
+func looksSecret(name string) bool {
+	lower := strings.ToLower(name)
+	for _, sub := range []string{"secret", "tokenvalue", "password", "apikey", "accesstoken", "ciphertext"} {
+		if strings.Contains(lower, sub) {
+			return true
+		}
+	}
+	return false
 }
 
 func defaultParamType(t string) string {

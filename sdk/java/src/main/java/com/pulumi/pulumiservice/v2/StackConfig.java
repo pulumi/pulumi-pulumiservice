@@ -10,6 +10,7 @@ import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.Utilities;
 import com.pulumi.pulumiservice.v2.StackConfigArgs;
 import java.lang.String;
+import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
 
@@ -62,6 +63,34 @@ public class StackConfig extends com.pulumi.resources.CustomResource {
         return this.environment;
     }
     /**
+     * The organization name
+     * 
+     */
+    @Export(name="orgName", refs={String.class}, tree="[0]")
+    private Output<String> orgName;
+
+    /**
+     * @return The organization name
+     * 
+     */
+    public Output<String> orgName() {
+        return this.orgName;
+    }
+    /**
+     * The project name
+     * 
+     */
+    @Export(name="projectName", refs={String.class}, tree="[0]")
+    private Output<String> projectName;
+
+    /**
+     * @return The project name
+     * 
+     */
+    public Output<String> projectName() {
+        return this.projectName;
+    }
+    /**
      * The stack&#39;s secrets provider.
      * 
      */
@@ -74,6 +103,20 @@ public class StackConfig extends com.pulumi.resources.CustomResource {
      */
     public Output<Optional<String>> secretsProvider() {
         return Codegen.optional(this.secretsProvider);
+    }
+    /**
+     * The stack name
+     * 
+     */
+    @Export(name="stackName", refs={String.class}, tree="[0]")
+    private Output<String> stackName;
+
+    /**
+     * @return The stack name
+     * 
+     */
+    public Output<String> stackName() {
+        return this.stackName;
     }
 
     /**
@@ -115,6 +158,9 @@ public class StackConfig extends com.pulumi.resources.CustomResource {
     private static com.pulumi.resources.CustomResourceOptions makeResourceOptions(@Nullable com.pulumi.resources.CustomResourceOptions options, @Nullable Output<java.lang.String> id) {
         var defaultOptions = com.pulumi.resources.CustomResourceOptions.builder()
             .version(Utilities.getVersion())
+            .additionalSecretOutputs(List.of(
+                "secretsProvider"
+            ))
             .build();
         return com.pulumi.resources.CustomResourceOptions.merge(defaultOptions, options, id);
     }

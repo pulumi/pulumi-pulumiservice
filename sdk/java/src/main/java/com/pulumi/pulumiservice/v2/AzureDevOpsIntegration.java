@@ -11,6 +11,7 @@ import com.pulumi.pulumiservice.Utilities;
 import com.pulumi.pulumiservice.v2.AzureDevOpsIntegrationArgs;
 import java.lang.Boolean;
 import java.lang.Object;
+import java.lang.String;
 import java.util.Optional;
 import javax.annotation.Nullable;
 
@@ -89,6 +90,34 @@ public class AzureDevOpsIntegration extends com.pulumi.resources.CustomResource 
      */
     public Output<Boolean> installed() {
         return this.installed;
+    }
+    /**
+     * The Azure DevOps integration identifier
+     * 
+     */
+    @Export(name="integrationId", refs={String.class}, tree="[0]")
+    private Output<String> integrationId;
+
+    /**
+     * @return The Azure DevOps integration identifier
+     * 
+     */
+    public Output<String> integrationId() {
+        return this.integrationId;
+    }
+    /**
+     * The organization name
+     * 
+     */
+    @Export(name="orgName", refs={String.class}, tree="[0]")
+    private Output<String> orgName;
+
+    /**
+     * @return The organization name
+     * 
+     */
+    public Output<String> orgName() {
+        return this.orgName;
     }
     /**
      * Metadata about the Azure DevOps organization linked to the Pulumi organization

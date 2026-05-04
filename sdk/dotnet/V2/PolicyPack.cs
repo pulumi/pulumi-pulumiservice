@@ -34,6 +34,12 @@ namespace Pulumi.PulumiService.V2
         public Output<string> Name { get; private set; } = null!;
 
         /// <summary>
+        /// The organization name
+        /// </summary>
+        [Output("orgName")]
+        public Output<string> OrgName { get; private set; } = null!;
+
+        /// <summary>
         /// The individual policies contained in this policy pack.
         /// </summary>
         [Output("policies")]
@@ -74,6 +80,10 @@ namespace Pulumi.PulumiService.V2
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
+                ReplaceOnChanges =
+                {
+                    "orgName",
+                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.
@@ -148,12 +158,6 @@ namespace Pulumi.PulumiService.V2
             get => _policies ?? (_policies = new InputList<object>());
             set => _policies = value;
         }
-
-        /// <summary>
-        /// The policy pack name
-        /// </summary>
-        [Input("policyPackName")]
-        public Input<string>? PolicyPackName { get; set; }
 
         /// <summary>
         /// The cloud provider/platform this policy pack is associated with, e.g. AWS, Azure, etc.

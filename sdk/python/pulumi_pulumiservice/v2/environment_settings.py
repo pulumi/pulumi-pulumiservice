@@ -156,6 +156,8 @@ class EnvironmentSettings(pulumi.CustomResource):
             if project_name is None and not opts.urn:
                 raise TypeError("Missing required property 'project_name'")
             __props__.__dict__["project_name"] = project_name
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["envName", "orgName", "projectName"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(EnvironmentSettings, __self__).__init__(
             'pulumiservice:v2:EnvironmentSettings',
             resource_name,
@@ -179,6 +181,9 @@ class EnvironmentSettings(pulumi.CustomResource):
         __props__ = EnvironmentSettingsArgs.__new__(EnvironmentSettingsArgs)
 
         __props__.__dict__["deletion_protected"] = None
+        __props__.__dict__["env_name"] = None
+        __props__.__dict__["org_name"] = None
+        __props__.__dict__["project_name"] = None
         return EnvironmentSettings(resource_name, opts=opts, __props__=__props__)
 
     @_builtins.property
@@ -188,4 +193,28 @@ class EnvironmentSettings(pulumi.CustomResource):
         Whether the environment is protected from deletion.
         """
         return pulumi.get(self, "deletion_protected")
+
+    @_builtins.property
+    @pulumi.getter(name="envName")
+    def env_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The environment name
+        """
+        return pulumi.get(self, "env_name")
+
+    @_builtins.property
+    @pulumi.getter(name="orgName")
+    def org_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The organization name
+        """
+        return pulumi.get(self, "org_name")
+
+    @_builtins.property
+    @pulumi.getter(name="projectName")
+    def project_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The project name
+        """
+        return pulumi.get(self, "project_name")
 

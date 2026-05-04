@@ -1,0 +1,12 @@
+resources:
+  exampleStack:
+    type: pulumiservice:v2:Stack
+    properties:
+      orgName: ${serviceOrg}
+      projectName: ${projectName}
+      stackName: ${stackName}
+      tags:
+        owner: pulumicloud-v2-example
+        purpose: ${stackPurpose}
+outputs:
+  stackName: ${exampleStack.stackName}

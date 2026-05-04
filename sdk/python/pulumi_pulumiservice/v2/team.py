@@ -19,56 +19,58 @@ __all__ = ['TeamArgs', 'Team']
 @pulumi.input_type
 class TeamArgs:
     def __init__(__self__, *,
-                 org_name: pulumi.Input[_builtins.str],
-                 team_name: pulumi.Input[_builtins.str],
-                 add_environment_permission: Optional[Any] = None,
-                 add_stack_permission: Optional[Any] = None,
-                 edit_environment_permission: Optional[Any] = None,
-                 edit_stack_permission: Optional[Any] = None,
-                 member: Optional[pulumi.Input[_builtins.str]] = None,
-                 member_action: Optional[pulumi.Input[_builtins.str]] = None,
-                 new_description: Optional[pulumi.Input[_builtins.str]] = None,
-                 new_display_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 remove_environment: Optional[Any] = None,
-                 remove_stack: Optional[Any] = None):
+                 description: pulumi.Input[_builtins.str],
+                 display_name: pulumi.Input[_builtins.str],
+                 name: pulumi.Input[_builtins.str],
+                 org_name: pulumi.Input[_builtins.str]):
         """
         The set of arguments for constructing a Team resource.
 
+        :param pulumi.Input[_builtins.str] description: The description
+        :param pulumi.Input[_builtins.str] display_name: The display name
+        :param pulumi.Input[_builtins.str] name: The name
         :param pulumi.Input[_builtins.str] org_name: The organization name
-        :param pulumi.Input[_builtins.str] team_name: The team name
-        :param Any add_environment_permission: An environment permission to add to the team.
-        :param Any add_stack_permission: A stack permission to add to the team.
-        :param Any edit_environment_permission: An environment permission to edit on the team.
-        :param Any edit_stack_permission: A stack permission to edit on the team.
-        :param pulumi.Input[_builtins.str] member: Member to be added or removed based on MemberAction.
-        :param pulumi.Input[_builtins.str] member_action: MemberAction is the action to perform.
-        :param pulumi.Input[_builtins.str] new_description: The new description for the team.
-        :param pulumi.Input[_builtins.str] new_display_name: The new display name for the team.
-        :param Any remove_environment: An environment to remove from the team.
-        :param Any remove_stack: A stack to remove from the team.
         """
+        pulumi.set(__self__, "description", description)
+        pulumi.set(__self__, "display_name", display_name)
+        pulumi.set(__self__, "name", name)
         pulumi.set(__self__, "org_name", org_name)
-        pulumi.set(__self__, "team_name", team_name)
-        if add_environment_permission is not None:
-            pulumi.set(__self__, "add_environment_permission", add_environment_permission)
-        if add_stack_permission is not None:
-            pulumi.set(__self__, "add_stack_permission", add_stack_permission)
-        if edit_environment_permission is not None:
-            pulumi.set(__self__, "edit_environment_permission", edit_environment_permission)
-        if edit_stack_permission is not None:
-            pulumi.set(__self__, "edit_stack_permission", edit_stack_permission)
-        if member is not None:
-            pulumi.set(__self__, "member", member)
-        if member_action is not None:
-            pulumi.set(__self__, "member_action", member_action)
-        if new_description is not None:
-            pulumi.set(__self__, "new_description", new_description)
-        if new_display_name is not None:
-            pulumi.set(__self__, "new_display_name", new_display_name)
-        if remove_environment is not None:
-            pulumi.set(__self__, "remove_environment", remove_environment)
-        if remove_stack is not None:
-            pulumi.set(__self__, "remove_stack", remove_stack)
+
+    @_builtins.property
+    @pulumi.getter
+    def description(self) -> pulumi.Input[_builtins.str]:
+        """
+        The description
+        """
+        return pulumi.get(self, "description")
+
+    @description.setter
+    def description(self, value: pulumi.Input[_builtins.str]):
+        pulumi.set(self, "description", value)
+
+    @_builtins.property
+    @pulumi.getter(name="displayName")
+    def display_name(self) -> pulumi.Input[_builtins.str]:
+        """
+        The display name
+        """
+        return pulumi.get(self, "display_name")
+
+    @display_name.setter
+    def display_name(self, value: pulumi.Input[_builtins.str]):
+        pulumi.set(self, "display_name", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def name(self) -> pulumi.Input[_builtins.str]:
+        """
+        The name
+        """
+        return pulumi.get(self, "name")
+
+    @name.setter
+    def name(self, value: pulumi.Input[_builtins.str]):
+        pulumi.set(self, "name", value)
 
     @_builtins.property
     @pulumi.getter(name="orgName")
@@ -82,138 +84,6 @@ class TeamArgs:
     def org_name(self, value: pulumi.Input[_builtins.str]):
         pulumi.set(self, "org_name", value)
 
-    @_builtins.property
-    @pulumi.getter(name="teamName")
-    def team_name(self) -> pulumi.Input[_builtins.str]:
-        """
-        The team name
-        """
-        return pulumi.get(self, "team_name")
-
-    @team_name.setter
-    def team_name(self, value: pulumi.Input[_builtins.str]):
-        pulumi.set(self, "team_name", value)
-
-    @_builtins.property
-    @pulumi.getter(name="addEnvironmentPermission")
-    def add_environment_permission(self) -> Optional[Any]:
-        """
-        An environment permission to add to the team.
-        """
-        return pulumi.get(self, "add_environment_permission")
-
-    @add_environment_permission.setter
-    def add_environment_permission(self, value: Optional[Any]):
-        pulumi.set(self, "add_environment_permission", value)
-
-    @_builtins.property
-    @pulumi.getter(name="addStackPermission")
-    def add_stack_permission(self) -> Optional[Any]:
-        """
-        A stack permission to add to the team.
-        """
-        return pulumi.get(self, "add_stack_permission")
-
-    @add_stack_permission.setter
-    def add_stack_permission(self, value: Optional[Any]):
-        pulumi.set(self, "add_stack_permission", value)
-
-    @_builtins.property
-    @pulumi.getter(name="editEnvironmentPermission")
-    def edit_environment_permission(self) -> Optional[Any]:
-        """
-        An environment permission to edit on the team.
-        """
-        return pulumi.get(self, "edit_environment_permission")
-
-    @edit_environment_permission.setter
-    def edit_environment_permission(self, value: Optional[Any]):
-        pulumi.set(self, "edit_environment_permission", value)
-
-    @_builtins.property
-    @pulumi.getter(name="editStackPermission")
-    def edit_stack_permission(self) -> Optional[Any]:
-        """
-        A stack permission to edit on the team.
-        """
-        return pulumi.get(self, "edit_stack_permission")
-
-    @edit_stack_permission.setter
-    def edit_stack_permission(self, value: Optional[Any]):
-        pulumi.set(self, "edit_stack_permission", value)
-
-    @_builtins.property
-    @pulumi.getter
-    def member(self) -> Optional[pulumi.Input[_builtins.str]]:
-        """
-        Member to be added or removed based on MemberAction.
-        """
-        return pulumi.get(self, "member")
-
-    @member.setter
-    def member(self, value: Optional[pulumi.Input[_builtins.str]]):
-        pulumi.set(self, "member", value)
-
-    @_builtins.property
-    @pulumi.getter(name="memberAction")
-    def member_action(self) -> Optional[pulumi.Input[_builtins.str]]:
-        """
-        MemberAction is the action to perform.
-        """
-        return pulumi.get(self, "member_action")
-
-    @member_action.setter
-    def member_action(self, value: Optional[pulumi.Input[_builtins.str]]):
-        pulumi.set(self, "member_action", value)
-
-    @_builtins.property
-    @pulumi.getter(name="newDescription")
-    def new_description(self) -> Optional[pulumi.Input[_builtins.str]]:
-        """
-        The new description for the team.
-        """
-        return pulumi.get(self, "new_description")
-
-    @new_description.setter
-    def new_description(self, value: Optional[pulumi.Input[_builtins.str]]):
-        pulumi.set(self, "new_description", value)
-
-    @_builtins.property
-    @pulumi.getter(name="newDisplayName")
-    def new_display_name(self) -> Optional[pulumi.Input[_builtins.str]]:
-        """
-        The new display name for the team.
-        """
-        return pulumi.get(self, "new_display_name")
-
-    @new_display_name.setter
-    def new_display_name(self, value: Optional[pulumi.Input[_builtins.str]]):
-        pulumi.set(self, "new_display_name", value)
-
-    @_builtins.property
-    @pulumi.getter(name="removeEnvironment")
-    def remove_environment(self) -> Optional[Any]:
-        """
-        An environment to remove from the team.
-        """
-        return pulumi.get(self, "remove_environment")
-
-    @remove_environment.setter
-    def remove_environment(self, value: Optional[Any]):
-        pulumi.set(self, "remove_environment", value)
-
-    @_builtins.property
-    @pulumi.getter(name="removeStack")
-    def remove_stack(self) -> Optional[Any]:
-        """
-        A stack to remove from the team.
-        """
-        return pulumi.get(self, "remove_stack")
-
-    @remove_stack.setter
-    def remove_stack(self, value: Optional[Any]):
-        pulumi.set(self, "remove_stack", value)
-
 
 @pulumi.type_token("pulumiservice:v2:Team")
 class Team(pulumi.CustomResource):
@@ -221,45 +91,22 @@ class Team(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 add_environment_permission: Optional[Any] = None,
-                 add_stack_permission: Optional[Any] = None,
-                 edit_environment_permission: Optional[Any] = None,
-                 edit_stack_permission: Optional[Any] = None,
-                 member: Optional[pulumi.Input[_builtins.str]] = None,
-                 member_action: Optional[pulumi.Input[_builtins.str]] = None,
-                 new_description: Optional[pulumi.Input[_builtins.str]] = None,
-                 new_display_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 description: Optional[pulumi.Input[_builtins.str]] = None,
+                 display_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 name: Optional[pulumi.Input[_builtins.str]] = None,
                  org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 remove_environment: Optional[Any] = None,
-                 remove_stack: Optional[Any] = None,
-                 team_name: Optional[pulumi.Input[_builtins.str]] = None,
                  __props__=None):
         """
-        Updates a team's membership and configuration. This multi-purpose endpoint supports several operations:
-
-        **Update membership:** Use `member` (username) and `memberAction` (`add` or `remove`) to manage team members.
-
-        **Grant stack access:** Use `addStackPermission` with `projectName`, `stackName`, and `permission` (integer: `101` = read, `102` = edit, `103` = admin).
-
-        **Remove stack access:** Use `removeStack` with `projectName` and `stackName`.
-
-        Members added to a team inherit the team's stack permissions. Teams are not available to individual (single-user) organizations.
+        CreatePulumiTeam creates a "Pulumi" team, i.e. one whose membership is managed by Pulumi.
+        (As opposed to a GitHub or GitLab-based team.)
 
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
-        :param Any add_environment_permission: An environment permission to add to the team.
-        :param Any add_stack_permission: A stack permission to add to the team.
-        :param Any edit_environment_permission: An environment permission to edit on the team.
-        :param Any edit_stack_permission: A stack permission to edit on the team.
-        :param pulumi.Input[_builtins.str] member: Member to be added or removed based on MemberAction.
-        :param pulumi.Input[_builtins.str] member_action: MemberAction is the action to perform.
-        :param pulumi.Input[_builtins.str] new_description: The new description for the team.
-        :param pulumi.Input[_builtins.str] new_display_name: The new display name for the team.
+        :param pulumi.Input[_builtins.str] description: The description
+        :param pulumi.Input[_builtins.str] display_name: The display name
+        :param pulumi.Input[_builtins.str] name: The name
         :param pulumi.Input[_builtins.str] org_name: The organization name
-        :param Any remove_environment: An environment to remove from the team.
-        :param Any remove_stack: A stack to remove from the team.
-        :param pulumi.Input[_builtins.str] team_name: The team name
         """
         ...
     @overload
@@ -268,15 +115,8 @@ class Team(pulumi.CustomResource):
                  args: TeamArgs,
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
-        Updates a team's membership and configuration. This multi-purpose endpoint supports several operations:
-
-        **Update membership:** Use `member` (username) and `memberAction` (`add` or `remove`) to manage team members.
-
-        **Grant stack access:** Use `addStackPermission` with `projectName`, `stackName`, and `permission` (integer: `101` = read, `102` = edit, `103` = admin).
-
-        **Remove stack access:** Use `removeStack` with `projectName` and `stackName`.
-
-        Members added to a team inherit the team's stack permissions. Teams are not available to individual (single-user) organizations.
+        CreatePulumiTeam creates a "Pulumi" team, i.e. one whose membership is managed by Pulumi.
+        (As opposed to a GitHub or GitLab-based team.)
 
 
         :param str resource_name: The name of the resource.
@@ -294,18 +134,10 @@ class Team(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 add_environment_permission: Optional[Any] = None,
-                 add_stack_permission: Optional[Any] = None,
-                 edit_environment_permission: Optional[Any] = None,
-                 edit_stack_permission: Optional[Any] = None,
-                 member: Optional[pulumi.Input[_builtins.str]] = None,
-                 member_action: Optional[pulumi.Input[_builtins.str]] = None,
-                 new_description: Optional[pulumi.Input[_builtins.str]] = None,
-                 new_display_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 description: Optional[pulumi.Input[_builtins.str]] = None,
+                 display_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 name: Optional[pulumi.Input[_builtins.str]] = None,
                  org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 remove_environment: Optional[Any] = None,
-                 remove_stack: Optional[Any] = None,
-                 team_name: Optional[pulumi.Input[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
@@ -315,33 +147,28 @@ class Team(pulumi.CustomResource):
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
             __props__ = TeamArgs.__new__(TeamArgs)
 
-            __props__.__dict__["add_environment_permission"] = add_environment_permission
-            __props__.__dict__["add_stack_permission"] = add_stack_permission
-            __props__.__dict__["edit_environment_permission"] = edit_environment_permission
-            __props__.__dict__["edit_stack_permission"] = edit_stack_permission
-            __props__.__dict__["member"] = member
-            __props__.__dict__["member_action"] = member_action
-            __props__.__dict__["new_description"] = new_description
-            __props__.__dict__["new_display_name"] = new_display_name
+            if description is None and not opts.urn:
+                raise TypeError("Missing required property 'description'")
+            __props__.__dict__["description"] = description
+            if display_name is None and not opts.urn:
+                raise TypeError("Missing required property 'display_name'")
+            __props__.__dict__["display_name"] = display_name
+            if name is None and not opts.urn:
+                raise TypeError("Missing required property 'name'")
+            __props__.__dict__["name"] = name
             if org_name is None and not opts.urn:
                 raise TypeError("Missing required property 'org_name'")
             __props__.__dict__["org_name"] = org_name
-            __props__.__dict__["remove_environment"] = remove_environment
-            __props__.__dict__["remove_stack"] = remove_stack
-            if team_name is None and not opts.urn:
-                raise TypeError("Missing required property 'team_name'")
-            __props__.__dict__["team_name"] = team_name
             __props__.__dict__["accounts"] = None
-            __props__.__dict__["description"] = None
-            __props__.__dict__["display_name"] = None
             __props__.__dict__["environments"] = None
             __props__.__dict__["kind"] = None
             __props__.__dict__["list_members_error"] = None
             __props__.__dict__["members"] = None
-            __props__.__dict__["name"] = None
             __props__.__dict__["role_ids"] = None
             __props__.__dict__["stacks"] = None
             __props__.__dict__["user_role"] = None
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["orgName"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(Team, __self__).__init__(
             'pulumiservice:v2:Team',
             resource_name,
@@ -372,6 +199,7 @@ class Team(pulumi.CustomResource):
         __props__.__dict__["list_members_error"] = None
         __props__.__dict__["members"] = None
         __props__.__dict__["name"] = None
+        __props__.__dict__["org_name"] = None
         __props__.__dict__["role_ids"] = None
         __props__.__dict__["stacks"] = None
         __props__.__dict__["user_role"] = None
@@ -442,6 +270,14 @@ class Team(pulumi.CustomResource):
         The unique identifier name of the team within the organization.
         """
         return pulumi.get(self, "name")
+
+    @_builtins.property
+    @pulumi.getter(name="orgName")
+    def org_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The organization name
+        """
+        return pulumi.get(self, "org_name")
 
     @_builtins.property
     @pulumi.getter(name="roleIds")

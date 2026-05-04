@@ -217,6 +217,10 @@ class StackConfig(pulumi.CustomResource):
             if stack_name is None and not opts.urn:
                 raise TypeError("Missing required property 'stack_name'")
             __props__.__dict__["stack_name"] = stack_name
+        secret_opts = pulumi.ResourceOptions(additional_secret_outputs=["secretsProvider"])
+        opts = pulumi.ResourceOptions.merge(opts, secret_opts)
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["orgName", "projectName", "stackName"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(StackConfig, __self__).__init__(
             'pulumiservice:v2:StackConfig',
             resource_name,
@@ -242,7 +246,10 @@ class StackConfig(pulumi.CustomResource):
         __props__.__dict__["encrypted_key"] = None
         __props__.__dict__["encryption_salt"] = None
         __props__.__dict__["environment"] = None
+        __props__.__dict__["org_name"] = None
+        __props__.__dict__["project_name"] = None
         __props__.__dict__["secrets_provider"] = None
+        __props__.__dict__["stack_name"] = None
         return StackConfig(resource_name, opts=opts, __props__=__props__)
 
     @_builtins.property
@@ -270,10 +277,34 @@ class StackConfig(pulumi.CustomResource):
         return pulumi.get(self, "environment")
 
     @_builtins.property
+    @pulumi.getter(name="orgName")
+    def org_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The organization name
+        """
+        return pulumi.get(self, "org_name")
+
+    @_builtins.property
+    @pulumi.getter(name="projectName")
+    def project_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The project name
+        """
+        return pulumi.get(self, "project_name")
+
+    @_builtins.property
     @pulumi.getter(name="secretsProvider")
     def secrets_provider(self) -> pulumi.Output[Optional[_builtins.str]]:
         """
         The stack's secrets provider.
         """
         return pulumi.get(self, "secrets_provider")
+
+    @_builtins.property
+    @pulumi.getter(name="stackName")
+    def stack_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The stack name
+        """
+        return pulumi.get(self, "stack_name")
 

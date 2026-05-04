@@ -51,6 +51,20 @@ public class EnvironmentSchedule extends com.pulumi.resources.CustomResource {
         return this.definition;
     }
     /**
+     * The environment name
+     * 
+     */
+    @Export(name="envName", refs={String.class}, tree="[0]")
+    private Output<String> envName;
+
+    /**
+     * @return The environment name
+     * 
+     */
+    public Output<String> envName() {
+        return this.envName;
+    }
+    /**
      * The kind of action to be executed.
      * 
      */
@@ -121,6 +135,20 @@ public class EnvironmentSchedule extends com.pulumi.resources.CustomResource {
         return this.orgID;
     }
     /**
+     * The organization name
+     * 
+     */
+    @Export(name="orgName", refs={String.class}, tree="[0]")
+    private Output<String> orgName;
+
+    /**
+     * @return The organization name
+     * 
+     */
+    public Output<String> orgName() {
+        return this.orgName;
+    }
+    /**
      * Whether the scheduled action is currently paused.
      * 
      */
@@ -135,6 +163,20 @@ public class EnvironmentSchedule extends com.pulumi.resources.CustomResource {
         return this.paused;
     }
     /**
+     * The project name
+     * 
+     */
+    @Export(name="projectName", refs={String.class}, tree="[0]")
+    private Output<String> projectName;
+
+    /**
+     * @return The project name
+     * 
+     */
+    public Output<String> projectName() {
+        return this.projectName;
+    }
+    /**
      * A cron expression defining the recurring schedule.
      * 
      */
@@ -147,6 +189,20 @@ public class EnvironmentSchedule extends com.pulumi.resources.CustomResource {
      */
     public Output<Optional<String>> scheduleCron() {
         return Codegen.optional(this.scheduleCron);
+    }
+    /**
+     * The unique identifier for this scheduled action.
+     * 
+     */
+    @Export(name="scheduleID", refs={String.class}, tree="[0]")
+    private Output<String> scheduleID;
+
+    /**
+     * @return The unique identifier for this scheduled action.
+     * 
+     */
+    public Output<String> scheduleID() {
+        return this.scheduleID;
     }
     /**
      * A timestamp for a one-time scheduled execution.

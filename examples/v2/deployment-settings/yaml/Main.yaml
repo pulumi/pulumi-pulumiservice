@@ -1,0 +1,31 @@
+resources:
+  # DeploymentSettings is a singleton-per-stack — it requires the stack to
+  # already exist on the backend.
+  parentStack:
+    type: pulumiservice:v2:Stack
+    properties:
+      orgName: ${serviceOrg}
+      projectName: ${projectName}
+      stackName: ${stackName}
+  settings:
+    type: pulumiservice:v2:DeploymentSettings
+    properties:
+      orgName: ${serviceOrg}
+      projectName: ${projectName}
+      stackName: ${stackName}
+      executorContext:
+        executorImage: pulumi-cli
+      operationContext:
+        preRunCommands:
+          - yarn
+        environmentVariables:
+          TEST_VAR: foo
+        options:
+          skipInstallDependencies: true
+      sourceContext:
+        git:
+          repoUrl: https://github.com/example/example.git
+          branch: refs/heads/main
+    options:
+      dependsOn:
+        - ${parentStack}

@@ -23,6 +23,8 @@ type SAMLOrganization struct {
 	IdpSsoDescriptor pulumi.StringOutput `pulumi:"idpSsoDescriptor"`
 	// The SAML NameID format used by the identity provider.
 	NameIdFormat pulumi.StringPtrOutput `pulumi:"nameIdFormat"`
+	// The organization name
+	OrgName pulumi.StringOutput `pulumi:"orgName"`
 	// The Pulumi organization.
 	Organization pulumi.AnyOutput `pulumi:"organization"`
 	// The SSO URL for the identity provider.
@@ -44,6 +46,10 @@ func NewSAMLOrganization(ctx *pulumi.Context,
 	if args.OrgName == nil {
 		return nil, errors.New("invalid value for required argument 'OrgName'")
 	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"orgName",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource SAMLOrganization
 	err := ctx.RegisterResource("pulumiservice:v2:SAMLOrganization", name, args, &resource, opts...)
@@ -192,6 +198,11 @@ func (o SAMLOrganizationOutput) IdpSsoDescriptor() pulumi.StringOutput {
 // The SAML NameID format used by the identity provider.
 func (o SAMLOrganizationOutput) NameIdFormat() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *SAMLOrganization) pulumi.StringPtrOutput { return v.NameIdFormat }).(pulumi.StringPtrOutput)
+}
+
+// The organization name
+func (o SAMLOrganizationOutput) OrgName() pulumi.StringOutput {
+	return o.ApplyT(func(v *SAMLOrganization) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
 }
 
 // The Pulumi organization.

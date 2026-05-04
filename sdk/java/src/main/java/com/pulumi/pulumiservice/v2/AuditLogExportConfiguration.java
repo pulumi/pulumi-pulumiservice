@@ -11,6 +11,7 @@ import com.pulumi.pulumiservice.Utilities;
 import com.pulumi.pulumiservice.v2.AuditLogExportConfigurationArgs;
 import java.lang.Boolean;
 import java.lang.Object;
+import java.lang.String;
 import javax.annotation.Nullable;
 
 /**
@@ -46,6 +47,20 @@ public class AuditLogExportConfiguration extends com.pulumi.resources.CustomReso
      */
     public Output<Object> lastResult() {
         return this.lastResult;
+    }
+    /**
+     * The organization name
+     * 
+     */
+    @Export(name="orgName", refs={String.class}, tree="[0]")
+    private Output<String> orgName;
+
+    /**
+     * @return The organization name
+     * 
+     */
+    public Output<String> orgName() {
+        return this.orgName;
     }
     /**
      * The S3 configuration for exporting audit logs.

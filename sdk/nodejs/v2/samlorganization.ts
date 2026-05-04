@@ -48,6 +48,10 @@ export class SAMLOrganization extends pulumi.CustomResource {
      */
     declare public /*out*/ readonly nameIdFormat: pulumi.Output<string | undefined>;
     /**
+     * The organization name
+     */
+    declare public readonly orgName: pulumi.Output<string>;
+    /**
      * The Pulumi organization.
      */
     declare public /*out*/ readonly organization: pulumi.Output<any>;
@@ -92,12 +96,15 @@ export class SAMLOrganization extends pulumi.CustomResource {
             resourceInputs["entityId"] = undefined /*out*/;
             resourceInputs["idpSsoDescriptor"] = undefined /*out*/;
             resourceInputs["nameIdFormat"] = undefined /*out*/;
+            resourceInputs["orgName"] = undefined /*out*/;
             resourceInputs["organization"] = undefined /*out*/;
             resourceInputs["ssoUrl"] = undefined /*out*/;
             resourceInputs["validUntil"] = undefined /*out*/;
             resourceInputs["validationError"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["orgName"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(SAMLOrganization.__pulumiType, name, resourceInputs, opts);
     }
 }

@@ -24,6 +24,8 @@ type DefaultOrganization struct {
 	// on how to configure their default org locally.
 	// Can be possibly empty.
 	Messages pulumi.ArrayOutput `pulumi:"Messages"`
+	// The organization name
+	OrgName pulumi.StringOutput `pulumi:"orgName"`
 }
 
 // NewDefaultOrganization registers a new resource with the given unique name, arguments, and options.
@@ -36,6 +38,10 @@ func NewDefaultOrganization(ctx *pulumi.Context,
 	if args.OrgName == nil {
 		return nil, errors.New("invalid value for required argument 'OrgName'")
 	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"orgName",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource DefaultOrganization
 	err := ctx.RegisterResource("pulumiservice:v2:DefaultOrganization", name, args, &resource, opts...)
@@ -178,6 +184,11 @@ func (o DefaultOrganizationOutput) GitHubLogin() pulumi.StringOutput {
 // Can be possibly empty.
 func (o DefaultOrganizationOutput) Messages() pulumi.ArrayOutput {
 	return o.ApplyT(func(v *DefaultOrganization) pulumi.ArrayOutput { return v.Messages }).(pulumi.ArrayOutput)
+}
+
+// The organization name
+func (o DefaultOrganizationOutput) OrgName() pulumi.StringOutput {
+	return o.ApplyT(func(v *DefaultOrganization) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
 }
 
 type DefaultOrganizationArrayOutput struct{ *pulumi.OutputState }

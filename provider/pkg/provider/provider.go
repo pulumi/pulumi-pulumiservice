@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"runtime"
 	"strings"
 	"time"
@@ -194,6 +195,31 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 	return p.RawServer(name, version, provider)(host)
 }
 
+type authedTransport struct {
+	baseURL string
+	token   string
+	client  *http.Client
+}
+
+func (t *authedTransport) Do(_ context.Context, req *http.Request) (*http.Response, error) {
+	base, err := url.Parse(t.baseURL)
+	if err != nil {
+		return nil, fmt.Errorf("authedTransport: parse base URL %q: %w", t.baseURL, err)
+	}
+
+	req.URL.Scheme = base.Scheme
+	req.URL.Host = base.Host
+	req.Host = base.Host
+
+	req.Header.Set("Authorization", "token "+t.token)
+	if req.Header.Get("Accept") == "" {
+		req.Header.Set("Accept", "application/vnd.pulumi+8")
+	}
+	req.Header.Set("X-Pulumi-Source", "provider")
+
+	return t.client.Do(req)
+}
+
 func withCloudV2Schema(prov p.Provider, spec *rest.Spec, metadata *rest.Metadata, pkg string) p.Provider {
 	inner := prov.GetSchema
 	prov.GetSchema = func(ctx context.Context, req p.GetSchemaRequest) (p.GetSchemaResponse, error) {
@@ -305,6 +331,14 @@ func (k *pulumiserviceProvider) Configure(
 		return nil, err
 	}
 	client, err := pulumiapi.NewClient(&httpClient, *token, *url)
+
+	rest.SetTransportResolver(func(ctx context.Context) (rest.Transport, error) {
+		return &authedTransport{
+			baseURL: *url,
+			token:   *token,
+			client:  &httpClient,
+		}, nil
+	})
 
 	escClient := esc_client.New(
 		fmt.Sprintf("provider-pulumiservice/1 (%s; %s)", version.Version, runtime.GOOS),

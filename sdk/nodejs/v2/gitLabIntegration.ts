@@ -79,6 +79,14 @@ export class GitLabIntegration extends pulumi.CustomResource {
      */
     declare public /*out*/ readonly installed: pulumi.Output<boolean>;
     /**
+     * The GitLab integration identifier
+     */
+    declare public readonly integrationId: pulumi.Output<string>;
+    /**
+     * The organization name
+     */
+    declare public readonly orgName: pulumi.Output<string>;
+    /**
      * Whether the integration is currently valid (tokens, hooks, etc.).
      */
     declare public /*out*/ readonly valid: pulumi.Output<boolean>;
@@ -126,9 +134,15 @@ export class GitLabIntegration extends pulumi.CustomResource {
             resourceInputs["groupName"] = undefined /*out*/;
             resourceInputs["groupPath"] = undefined /*out*/;
             resourceInputs["installed"] = undefined /*out*/;
+            resourceInputs["integrationId"] = undefined /*out*/;
+            resourceInputs["orgName"] = undefined /*out*/;
             resourceInputs["valid"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const secretOpts = { additionalSecretOutputs: ["groupAccessTokenExpiration"] };
+        opts = pulumi.mergeOptions(opts, secretOpts);
+        const replaceOnChanges = { replaceOnChanges: ["integrationId", "orgName"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(GitLabIntegration.__pulumiType, name, resourceInputs, opts);
     }
 }

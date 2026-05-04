@@ -183,6 +183,8 @@ class BitBucketIntegration(pulumi.CustomResource):
             __props__.__dict__["workspace_name"] = None
             __props__.__dict__["workspace_slug"] = None
             __props__.__dict__["workspace_uuid"] = None
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["integrationId", "orgName"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(BitBucketIntegration, __self__).__init__(
             'pulumiservice:v2:BitBucketIntegration',
             resource_name,
@@ -212,6 +214,8 @@ class BitBucketIntegration(pulumi.CustomResource):
         __props__.__dict__["disable_neo_summaries"] = None
         __props__.__dict__["disable_pr_comments"] = None
         __props__.__dict__["installed"] = None
+        __props__.__dict__["integration_id"] = None
+        __props__.__dict__["org_name"] = None
         __props__.__dict__["valid"] = None
         __props__.__dict__["workspace_name"] = None
         __props__.__dict__["workspace_slug"] = None
@@ -273,6 +277,22 @@ class BitBucketIntegration(pulumi.CustomResource):
         Whether this integration is fully installed and operational.
         """
         return pulumi.get(self, "installed")
+
+    @_builtins.property
+    @pulumi.getter(name="integrationId")
+    def integration_id(self) -> pulumi.Output[_builtins.str]:
+        """
+        The BitBucket integration identifier
+        """
+        return pulumi.get(self, "integration_id")
+
+    @_builtins.property
+    @pulumi.getter(name="orgName")
+    def org_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The organization name
+        """
+        return pulumi.get(self, "org_name")
 
     @_builtins.property
     @pulumi.getter

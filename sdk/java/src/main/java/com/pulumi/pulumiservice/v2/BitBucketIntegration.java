@@ -120,6 +120,34 @@ public class BitBucketIntegration extends com.pulumi.resources.CustomResource {
         return this.installed;
     }
     /**
+     * The BitBucket integration identifier
+     * 
+     */
+    @Export(name="integrationId", refs={String.class}, tree="[0]")
+    private Output<String> integrationId;
+
+    /**
+     * @return The BitBucket integration identifier
+     * 
+     */
+    public Output<String> integrationId() {
+        return this.integrationId;
+    }
+    /**
+     * The organization name
+     * 
+     */
+    @Export(name="orgName", refs={String.class}, tree="[0]")
+    private Output<String> orgName;
+
+    /**
+     * @return The organization name
+     * 
+     */
+    public Output<String> orgName() {
+        return this.orgName;
+    }
+    /**
      * Whether the integration&#39;s credentials are currently valid.
      * 
      */

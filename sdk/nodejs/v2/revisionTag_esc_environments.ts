@@ -47,6 +47,10 @@ export class RevisionTag_esc_environments extends pulumi.CustomResource {
      */
     declare public /*out*/ readonly editorName: pulumi.Output<string | undefined>;
     /**
+     * The environment name
+     */
+    declare public readonly envName: pulumi.Output<string>;
+    /**
      * The timestamp when the tag was last modified.
      */
     declare public /*out*/ readonly modified: pulumi.Output<string>;
@@ -55,9 +59,21 @@ export class RevisionTag_esc_environments extends pulumi.CustomResource {
      */
     declare public /*out*/ readonly name: pulumi.Output<string>;
     /**
+     * The organization name
+     */
+    declare public readonly orgName: pulumi.Output<string>;
+    /**
+     * The project name
+     */
+    declare public readonly projectName: pulumi.Output<string>;
+    /**
      * The revision number this tag points to.
      */
     declare public readonly revision: pulumi.Output<number>;
+    /**
+     * The revision tag name
+     */
+    declare public readonly tagName: pulumi.Output<string>;
 
     /**
      * Create a RevisionTag_esc_environments resource with the given unique name, arguments, and options.
@@ -96,11 +112,17 @@ export class RevisionTag_esc_environments extends pulumi.CustomResource {
             resourceInputs["created"] = undefined /*out*/;
             resourceInputs["editorLogin"] = undefined /*out*/;
             resourceInputs["editorName"] = undefined /*out*/;
+            resourceInputs["envName"] = undefined /*out*/;
             resourceInputs["modified"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
+            resourceInputs["orgName"] = undefined /*out*/;
+            resourceInputs["projectName"] = undefined /*out*/;
             resourceInputs["revision"] = undefined /*out*/;
+            resourceInputs["tagName"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["envName", "orgName", "projectName", "tagName"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(RevisionTag_esc_environments.__pulumiType, name, resourceInputs, opts);
     }
 }

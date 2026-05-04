@@ -206,6 +206,8 @@ class GitHubEnterpriseIntegration(pulumi.CustomResource):
             __props__.__dict__["is_organization"] = None
             __props__.__dict__["is_self_hosted"] = None
             __props__.__dict__["neo_git_hub_app_permission_requirements"] = None
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["integrationId", "orgName"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(GitHubEnterpriseIntegration, __self__).__init__(
             'pulumiservice:v2:GitHubEnterpriseIntegration',
             resource_name,
@@ -240,9 +242,11 @@ class GitHubEnterpriseIntegration(pulumi.CustomResource):
         __props__.__dict__["has_contents_permission"] = None
         __props__.__dict__["has_members_permission"] = None
         __props__.__dict__["installation_id"] = None
+        __props__.__dict__["integration_id"] = None
         __props__.__dict__["is_organization"] = None
         __props__.__dict__["is_self_hosted"] = None
         __props__.__dict__["neo_git_hub_app_permission_requirements"] = None
+        __props__.__dict__["org_name"] = None
         return GitHubEnterpriseIntegration(resource_name, opts=opts, __props__=__props__)
 
     @_builtins.property
@@ -342,6 +346,14 @@ class GitHubEnterpriseIntegration(pulumi.CustomResource):
         return pulumi.get(self, "installation_id")
 
     @_builtins.property
+    @pulumi.getter(name="integrationId")
+    def integration_id(self) -> pulumi.Output[_builtins.str]:
+        """
+        The GitHub Enterprise integration identifier
+        """
+        return pulumi.get(self, "integration_id")
+
+    @_builtins.property
     @pulumi.getter(name="isOrganization")
     def is_organization(self) -> pulumi.Output[_builtins.bool]:
         """
@@ -364,4 +376,12 @@ class GitHubEnterpriseIntegration(pulumi.CustomResource):
         Neo GitHub App permission requirements for this installation.
         """
         return pulumi.get(self, "neo_git_hub_app_permission_requirements")
+
+    @_builtins.property
+    @pulumi.getter(name="orgName")
+    def org_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The organization name
+        """
+        return pulumi.get(self, "org_name")
 

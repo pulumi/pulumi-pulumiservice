@@ -22,6 +22,20 @@ import javax.annotation.Nullable;
 @ResourceType(type="pulumiservice:v2:ScheduledScanSettings")
 public class ScheduledScanSettings extends com.pulumi.resources.CustomResource {
     /**
+     * The Insights account name
+     * 
+     */
+    @Export(name="accountName", refs={String.class}, tree="[0]")
+    private Output<String> accountName;
+
+    /**
+     * @return The Insights account name
+     * 
+     */
+    public Output<String> accountName() {
+        return this.accountName;
+    }
+    /**
      * The batch size for processing resources during the scan.
      * 
      */
@@ -48,6 +62,20 @@ public class ScheduledScanSettings extends com.pulumi.resources.CustomResource {
      */
     public Output<Optional<Integer>> listConcurrency() {
         return Codegen.optional(this.listConcurrency);
+    }
+    /**
+     * The organization name
+     * 
+     */
+    @Export(name="orgName", refs={String.class}, tree="[0]")
+    private Output<String> orgName;
+
+    /**
+     * @return The organization name
+     * 
+     */
+    public Output<String> orgName() {
+        return this.orgName;
     }
     /**
      * Whether the scheduled scan is paused.

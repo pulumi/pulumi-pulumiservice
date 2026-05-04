@@ -22,10 +22,16 @@ type EnvironmentTag_esc_environments struct {
 	EditorLogin pulumi.StringOutput `pulumi:"editorLogin"`
 	// The display name of the user who last edited the tag.
 	EditorName pulumi.StringOutput `pulumi:"editorName"`
+	// The environment name
+	EnvName pulumi.StringOutput `pulumi:"envName"`
 	// The timestamp when the tag was last modified.
 	Modified pulumi.StringOutput `pulumi:"modified"`
 	// The name of the tag.
 	Name pulumi.StringOutput `pulumi:"name"`
+	// The organization name
+	OrgName pulumi.StringOutput `pulumi:"orgName"`
+	// The project name
+	ProjectName pulumi.StringOutput `pulumi:"projectName"`
 	// The value of the tag.
 	Value pulumi.StringOutput `pulumi:"value"`
 }
@@ -52,6 +58,12 @@ func NewEnvironmentTag_esc_environments(ctx *pulumi.Context,
 	if args.Value == nil {
 		return nil, errors.New("invalid value for required argument 'Value'")
 	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"envName",
+		"orgName",
+		"projectName",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource EnvironmentTag_esc_environments
 	err := ctx.RegisterResource("pulumiservice:v2:EnvironmentTag_esc_environments", name, args, &resource, opts...)
@@ -93,8 +105,6 @@ type environmentTag_esc_environmentsArgs struct {
 	OrgName string `pulumi:"orgName"`
 	// The project name
 	ProjectName string `pulumi:"projectName"`
-	// The environment tag name
-	TagName *string `pulumi:"tagName"`
 	// The value
 	Value string `pulumi:"value"`
 }
@@ -109,8 +119,6 @@ type EnvironmentTag_esc_environmentsArgs struct {
 	OrgName pulumi.StringInput
 	// The project name
 	ProjectName pulumi.StringInput
-	// The environment tag name
-	TagName pulumi.StringPtrInput
 	// The value
 	Value pulumi.StringInput
 }
@@ -217,6 +225,11 @@ func (o EnvironmentTag_esc_environmentsOutput) EditorName() pulumi.StringOutput 
 	return o.ApplyT(func(v *EnvironmentTag_esc_environments) pulumi.StringOutput { return v.EditorName }).(pulumi.StringOutput)
 }
 
+// The environment name
+func (o EnvironmentTag_esc_environmentsOutput) EnvName() pulumi.StringOutput {
+	return o.ApplyT(func(v *EnvironmentTag_esc_environments) pulumi.StringOutput { return v.EnvName }).(pulumi.StringOutput)
+}
+
 // The timestamp when the tag was last modified.
 func (o EnvironmentTag_esc_environmentsOutput) Modified() pulumi.StringOutput {
 	return o.ApplyT(func(v *EnvironmentTag_esc_environments) pulumi.StringOutput { return v.Modified }).(pulumi.StringOutput)
@@ -225,6 +238,16 @@ func (o EnvironmentTag_esc_environmentsOutput) Modified() pulumi.StringOutput {
 // The name of the tag.
 func (o EnvironmentTag_esc_environmentsOutput) Name() pulumi.StringOutput {
 	return o.ApplyT(func(v *EnvironmentTag_esc_environments) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
+}
+
+// The organization name
+func (o EnvironmentTag_esc_environmentsOutput) OrgName() pulumi.StringOutput {
+	return o.ApplyT(func(v *EnvironmentTag_esc_environments) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
+}
+
+// The project name
+func (o EnvironmentTag_esc_environmentsOutput) ProjectName() pulumi.StringOutput {
+	return o.ApplyT(func(v *EnvironmentTag_esc_environments) pulumi.StringOutput { return v.ProjectName }).(pulumi.StringOutput)
 }
 
 // The value of the tag.

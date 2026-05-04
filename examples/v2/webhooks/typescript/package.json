@@ -1,5 +1,5 @@
 {
-	"name": "webhooks",
+	"name": "pulumicloud-v2-webhooks",
 	"devDependencies": {
 		"@types/node": "^18"
 	},

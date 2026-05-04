@@ -61,6 +61,20 @@ public class EnvironmentTag_preview_environments extends com.pulumi.resources.Cu
         return this.editorName;
     }
     /**
+     * The environment name
+     * 
+     */
+    @Export(name="envName", refs={String.class}, tree="[0]")
+    private Output<String> envName;
+
+    /**
+     * @return The environment name
+     * 
+     */
+    public Output<String> envName() {
+        return this.envName;
+    }
+    /**
      * The timestamp when the tag was last modified.
      * 
      */
@@ -87,6 +101,20 @@ public class EnvironmentTag_preview_environments extends com.pulumi.resources.Cu
      */
     public Output<String> name() {
         return this.name;
+    }
+    /**
+     * The organization name
+     * 
+     */
+    @Export(name="orgName", refs={String.class}, tree="[0]")
+    private Output<String> orgName;
+
+    /**
+     * @return The organization name
+     * 
+     */
+    public Output<String> orgName() {
+        return this.orgName;
     }
     /**
      * The value of the tag.

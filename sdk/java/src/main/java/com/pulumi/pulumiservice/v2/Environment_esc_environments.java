@@ -4,10 +4,12 @@
 package com.pulumi.pulumiservice.v2;
 
 import com.pulumi.core.Output;
+import com.pulumi.core.annotations.Export;
 import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.Utilities;
 import com.pulumi.pulumiservice.v2.Environment_esc_environmentsArgs;
+import java.lang.String;
 import javax.annotation.Nullable;
 
 /**
@@ -16,6 +18,49 @@ import javax.annotation.Nullable;
  */
 @ResourceType(type="pulumiservice:v2:Environment_esc_environments")
 public class Environment_esc_environments extends com.pulumi.resources.CustomResource {
+    /**
+     * The environment name
+     * 
+     */
+    @Export(name="name", refs={String.class}, tree="[0]")
+    private Output<String> name;
+
+    /**
+     * @return The environment name
+     * 
+     */
+    public Output<String> name() {
+        return this.name;
+    }
+    /**
+     * The organization name
+     * 
+     */
+    @Export(name="orgName", refs={String.class}, tree="[0]")
+    private Output<String> orgName;
+
+    /**
+     * @return The organization name
+     * 
+     */
+    public Output<String> orgName() {
+        return this.orgName;
+    }
+    /**
+     * The project name
+     * 
+     */
+    @Export(name="project", refs={String.class}, tree="[0]")
+    private Output<String> project;
+
+    /**
+     * @return The project name
+     * 
+     */
+    public Output<String> project() {
+        return this.project;
+    }
+
     /**
      *
      * @param name The _unique_ name of the resulting resource.

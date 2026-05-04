@@ -18,8 +18,16 @@ type OpenEnvironmentRequest struct {
 
 	// Total duration that the resulting grant can be used to access the environment open endpoint (after first open)
 	AccessDurationSeconds pulumi.IntOutput `pulumi:"accessDurationSeconds"`
+	// The change request ID
+	ChangeRequestID pulumi.StringOutput `pulumi:"changeRequestID"`
+	// The environment name
+	EnvName pulumi.StringOutput `pulumi:"envName"`
 	// Time from application of the request until the resulting grant expires
 	GrantExpirationSeconds pulumi.IntOutput `pulumi:"grantExpirationSeconds"`
+	// The organization name
+	OrgName pulumi.StringOutput `pulumi:"orgName"`
+	// The project name
+	ProjectName pulumi.StringOutput `pulumi:"projectName"`
 }
 
 // NewOpenEnvironmentRequest registers a new resource with the given unique name, arguments, and options.
@@ -44,6 +52,13 @@ func NewOpenEnvironmentRequest(ctx *pulumi.Context,
 	if args.ProjectName == nil {
 		return nil, errors.New("invalid value for required argument 'ProjectName'")
 	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"changeRequestID",
+		"envName",
+		"orgName",
+		"projectName",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource OpenEnvironmentRequest
 	err := ctx.RegisterResource("pulumiservice:v2:OpenEnvironmentRequest", name, args, &resource, opts...)
@@ -199,9 +214,29 @@ func (o OpenEnvironmentRequestOutput) AccessDurationSeconds() pulumi.IntOutput {
 	return o.ApplyT(func(v *OpenEnvironmentRequest) pulumi.IntOutput { return v.AccessDurationSeconds }).(pulumi.IntOutput)
 }
 
+// The change request ID
+func (o OpenEnvironmentRequestOutput) ChangeRequestID() pulumi.StringOutput {
+	return o.ApplyT(func(v *OpenEnvironmentRequest) pulumi.StringOutput { return v.ChangeRequestID }).(pulumi.StringOutput)
+}
+
+// The environment name
+func (o OpenEnvironmentRequestOutput) EnvName() pulumi.StringOutput {
+	return o.ApplyT(func(v *OpenEnvironmentRequest) pulumi.StringOutput { return v.EnvName }).(pulumi.StringOutput)
+}
+
 // Time from application of the request until the resulting grant expires
 func (o OpenEnvironmentRequestOutput) GrantExpirationSeconds() pulumi.IntOutput {
 	return o.ApplyT(func(v *OpenEnvironmentRequest) pulumi.IntOutput { return v.GrantExpirationSeconds }).(pulumi.IntOutput)
+}
+
+// The organization name
+func (o OpenEnvironmentRequestOutput) OrgName() pulumi.StringOutput {
+	return o.ApplyT(func(v *OpenEnvironmentRequest) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
+}
+
+// The project name
+func (o OpenEnvironmentRequestOutput) ProjectName() pulumi.StringOutput {
+	return o.ApplyT(func(v *OpenEnvironmentRequest) pulumi.StringOutput { return v.ProjectName }).(pulumi.StringOutput)
 }
 
 type OpenEnvironmentRequestArrayOutput struct{ *pulumi.OutputState }

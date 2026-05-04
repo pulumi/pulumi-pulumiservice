@@ -5,7 +5,7 @@ import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "../utilities";
 
 /**
- * BatchUpdatePolicyGroup applies multiple update operations to the Policy Group efficiently. Each operation in the list uses the same fields as UpdatePolicyGroupRequest. Operations are grouped by type (adds, removes) and processed in batches for efficiency.
+ * Creates a new Policy Group for an organization. Policy Groups define which Policy Packs are enforced on which stacks or cloud accounts, with configurable enforcement levels (advisory, mandatory, or disabled) per pack. This allows different policy strictness for different environments, such as advisory-only in development and mandatory in production.
  */
 export class PolicyGroup extends pulumi.CustomResource {
     /**
@@ -41,7 +41,7 @@ export class PolicyGroup extends pulumi.CustomResource {
     /**
      * Agent pool ID for audit policy evaluation. Defaults to Pulumi hosted pool if not specified.
      */
-    declare public /*out*/ readonly agentPoolId: pulumi.Output<string | undefined>;
+    declare public readonly agentPoolId: pulumi.Output<string | undefined>;
     /**
      * List of policy packs that are applied to this policy group.
      */
@@ -49,7 +49,7 @@ export class PolicyGroup extends pulumi.CustomResource {
     /**
      * The type of entities this policy group applies to (stacks or accounts).
      */
-    declare public /*out*/ readonly entityType: pulumi.Output<string>;
+    declare public readonly entityType: pulumi.Output<string>;
     /**
      * True if this is either the default stacks or default accounts policy group for the organization.
      */
@@ -57,11 +57,15 @@ export class PolicyGroup extends pulumi.CustomResource {
     /**
      * The enforcement mode for the policy group (audit or preventative).
      */
-    declare public /*out*/ readonly mode: pulumi.Output<string>;
+    declare public readonly mode: pulumi.Output<string>;
     /**
      * The name of the policy group.
      */
-    declare public /*out*/ readonly name: pulumi.Output<string>;
+    declare public readonly name: pulumi.Output<string>;
+    /**
+     * The organization name
+     */
+    declare public readonly orgName: pulumi.Output<string>;
     /**
      * List of stacks that are members of this policy group.
      */
@@ -78,21 +82,23 @@ export class PolicyGroup extends pulumi.CustomResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
+            if (args?.entityType === undefined && !opts.urn) {
+                throw new Error("Missing required property 'entityType'");
+            }
+            if (args?.name === undefined && !opts.urn) {
+                throw new Error("Missing required property 'name'");
+            }
             if (args?.orgName === undefined && !opts.urn) {
                 throw new Error("Missing required property 'orgName'");
             }
-            if (args?.policyGroup === undefined && !opts.urn) {
-                throw new Error("Missing required property 'policyGroup'");
-            }
+            resourceInputs["agentPoolId"] = args?.agentPoolId;
+            resourceInputs["entityType"] = args?.entityType;
+            resourceInputs["mode"] = args?.mode;
+            resourceInputs["name"] = args?.name;
             resourceInputs["orgName"] = args?.orgName;
-            resourceInputs["policyGroup"] = args?.policyGroup;
             resourceInputs["accounts"] = undefined /*out*/;
-            resourceInputs["agentPoolId"] = undefined /*out*/;
             resourceInputs["appliedPolicyPacks"] = undefined /*out*/;
-            resourceInputs["entityType"] = undefined /*out*/;
             resourceInputs["isOrgDefault"] = undefined /*out*/;
-            resourceInputs["mode"] = undefined /*out*/;
-            resourceInputs["name"] = undefined /*out*/;
             resourceInputs["stacks"] = undefined /*out*/;
         } else {
             resourceInputs["accounts"] = undefined /*out*/;
@@ -102,9 +108,12 @@ export class PolicyGroup extends pulumi.CustomResource {
             resourceInputs["isOrgDefault"] = undefined /*out*/;
             resourceInputs["mode"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
+            resourceInputs["orgName"] = undefined /*out*/;
             resourceInputs["stacks"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["orgName"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(PolicyGroup.__pulumiType, name, resourceInputs, opts);
     }
 }
@@ -114,11 +123,23 @@ export class PolicyGroup extends pulumi.CustomResource {
  */
 export interface PolicyGroupArgs {
     /**
+     * Agent pool ID for policy evaluation. Defaults to Pulumi hosted pool if not specified.
+     */
+    agentPoolId?: pulumi.Input<string>;
+    /**
+     * The type of entities this policy group applies to (stacks or accounts).
+     */
+    entityType: pulumi.Input<string>;
+    /**
+     * The enforcement mode for the policy group (audit or preventative). Defaults to 'audit' for account policy groups, 'preventative' for stack policy groups.
+     */
+    mode?: pulumi.Input<string>;
+    /**
+     * The name of the new policy group.
+     */
+    name: pulumi.Input<string>;
+    /**
      * The organization name
      */
     orgName: pulumi.Input<string>;
-    /**
-     * The policy group name
-     */
-    policyGroup: pulumi.Input<string>;
 }

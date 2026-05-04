@@ -157,6 +157,8 @@ class Environment_preview_environments(pulumi.CustomResource):
             if project is None and not opts.urn:
                 raise TypeError("Missing required property 'project'")
             __props__.__dict__["project"] = project
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["envName", "orgName"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(Environment_preview_environments, __self__).__init__(
             'pulumiservice:v2:Environment_preview_environments',
             resource_name,
@@ -179,5 +181,23 @@ class Environment_preview_environments(pulumi.CustomResource):
 
         __props__ = Environment_preview_environmentsArgs.__new__(Environment_preview_environmentsArgs)
 
+        __props__.__dict__["env_name"] = None
+        __props__.__dict__["org_name"] = None
         return Environment_preview_environments(resource_name, opts=opts, __props__=__props__)
+
+    @_builtins.property
+    @pulumi.getter(name="envName")
+    def env_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The environment name
+        """
+        return pulumi.get(self, "env_name")
+
+    @_builtins.property
+    @pulumi.getter(name="orgName")
+    def org_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The organization name
+        """
+        return pulumi.get(self, "org_name")
 

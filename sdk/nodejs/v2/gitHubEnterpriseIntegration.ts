@@ -83,6 +83,10 @@ export class GitHubEnterpriseIntegration extends pulumi.CustomResource {
      */
     declare public /*out*/ readonly installationID: pulumi.Output<number>;
     /**
+     * The GitHub Enterprise integration identifier
+     */
+    declare public readonly integrationId: pulumi.Output<string>;
+    /**
      * Whether the GitHub account is an organization (as opposed to a personal account).
      */
     declare public /*out*/ readonly isOrganization: pulumi.Output<boolean>;
@@ -94,6 +98,10 @@ export class GitHubEnterpriseIntegration extends pulumi.CustomResource {
      * Neo GitHub App permission requirements for this installation.
      */
     declare public /*out*/ readonly neoGitHubAppPermissionRequirements: pulumi.Output<any[] | undefined>;
+    /**
+     * The organization name
+     */
+    declare public readonly orgName: pulumi.Output<string>;
 
     /**
      * Create a GitHubEnterpriseIntegration resource with the given unique name, arguments, and options.
@@ -142,11 +150,15 @@ export class GitHubEnterpriseIntegration extends pulumi.CustomResource {
             resourceInputs["hasContentsPermission"] = undefined /*out*/;
             resourceInputs["hasMembersPermission"] = undefined /*out*/;
             resourceInputs["installationID"] = undefined /*out*/;
+            resourceInputs["integrationId"] = undefined /*out*/;
             resourceInputs["isOrganization"] = undefined /*out*/;
             resourceInputs["isSelfHosted"] = undefined /*out*/;
             resourceInputs["neoGitHubAppPermissionRequirements"] = undefined /*out*/;
+            resourceInputs["orgName"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["integrationId", "orgName"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(GitHubEnterpriseIntegration.__pulumiType, name, resourceInputs, opts);
     }
 }

@@ -16,6 +16,19 @@ namespace Pulumi.PulumiService.V2
     public partial class Environment_preview_environments : global::Pulumi.CustomResource
     {
         /// <summary>
+        /// The environment name
+        /// </summary>
+        [Output("envName")]
+        public Output<string> EnvName { get; private set; } = null!;
+
+        /// <summary>
+        /// The organization name
+        /// </summary>
+        [Output("orgName")]
+        public Output<string> OrgName { get; private set; } = null!;
+
+
+        /// <summary>
         /// Create a Environment_preview_environments resource with the given unique name, arguments, and options.
         /// </summary>
         ///
@@ -37,6 +50,11 @@ namespace Pulumi.PulumiService.V2
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
+                ReplaceOnChanges =
+                {
+                    "envName",
+                    "orgName",
+                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.

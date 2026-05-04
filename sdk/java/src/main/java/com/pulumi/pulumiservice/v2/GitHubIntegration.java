@@ -192,6 +192,20 @@ public class GitHubIntegration extends com.pulumi.resources.CustomResource {
         return this.installationID;
     }
     /**
+     * The GitHub App integration identifier
+     * 
+     */
+    @Export(name="integrationId", refs={String.class}, tree="[0]")
+    private Output<String> integrationId;
+
+    /**
+     * @return The GitHub App integration identifier
+     * 
+     */
+    public Output<String> integrationId() {
+        return this.integrationId;
+    }
+    /**
      * Whether the GitHub account is an organization (as opposed to a personal account).
      * 
      */
@@ -232,6 +246,20 @@ public class GitHubIntegration extends com.pulumi.resources.CustomResource {
      */
     public Output<Optional<List<Object>>> neoGitHubAppPermissionRequirements() {
         return Codegen.optional(this.neoGitHubAppPermissionRequirements);
+    }
+    /**
+     * The organization name
+     * 
+     */
+    @Export(name="orgName", refs={String.class}, tree="[0]")
+    private Output<String> orgName;
+
+    /**
+     * @return The organization name
+     * 
+     */
+    public Output<String> orgName() {
+        return this.orgName;
     }
 
     /**

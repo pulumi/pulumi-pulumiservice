@@ -312,6 +312,25 @@
         ],
         "type": "object"
       },
+      "AddCustomVCSRepositoryRequest": {
+        "description": "Request to add a repository to a custom VCS integration. The repository name must be unique within the integration; adding a duplicate name returns 409 Conflict.",
+        "properties": {
+          "displayName": {
+            "description": "Human-readable display name for the repository. If not provided, the name is used for display purposes.",
+            "type": "string",
+            "x-order": 2
+          },
+          "name": {
+            "description": "Repository name or path, joined with the integration's base URL to form the clone URL (e.g. 'myrepo' or 'subgroup/myrepo')",
+            "type": "string",
+            "x-order": 1
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
       "AddOrganizationMemberRequest": {
         "description": "AddOrganizationMemberRequest is the request type for adding a new member to an organization.",
         "properties": {
@@ -9335,6 +9354,49 @@
         ],
         "type": "object"
       },
+      "CreateCustomVCSIntegrationRequest": {
+        "description": "Request to create a new custom VCS integration for an organization. Custom VCS integrations allow connecting self-hosted or third-party version control systems (e.g. Gitea, Forgejo, Bitbucket Server) to Pulumi Deployments via ESC-managed credentials and inbound webhooks.",
+        "properties": {
+          "baseUrl": {
+            "description": "URL prefix for repositories covered by this integration (e.g. 'https://gitea.example.com/myorg'). Used to match repositories to integrations.",
+            "type": "string",
+            "x-order": 2
+          },
+          "environment": {
+            "description": "ESC environment reference in 'project/envName' format containing VCS credentials (e.g. SSH keys, access tokens) used for repository operations",
+            "type": "string",
+            "x-order": 3
+          },
+          "name": {
+            "description": "Human-readable name for the integration, unique within the organization (e.g. 'Gitea Production')",
+            "type": "string",
+            "x-order": 1
+          },
+          "vcsType": {
+            "description": "Version control system type. Defaults to 'git' if not specified.",
+            "enum": [
+              "git",
+              "hg"
+            ],
+            "type": "string",
+            "x-order": 4,
+            "x-pulumi-model-property": {
+              "enumComments": "VCSType describes the version control system type for a custom VCS integration.",
+              "enumFieldComments": [
+                "Git version control system",
+                "Mercurial version control system"
+              ],
+              "enumTypeName": "VCSType"
+            }
+          }
+        },
+        "required": [
+          "baseUrl",
+          "environment",
+          "name"
+        ],
+        "type": "object"
+      },
       "CreateDeploymentRequest": {
         "allOf": [
           {
@@ -9893,6 +9955,105 @@
             "type": "object"
           }
         ]
+      },
+      "CustomVCSIntegrationResponse": {
+        "description": "Response containing the details of a custom VCS integration, including its configuration, webhook endpoint, and configured repositories.",
+        "properties": {
+          "baseUrl": {
+            "description": "URL prefix for repositories covered by this integration",
+            "type": "string",
+            "x-order": 3
+          },
+          "created": {
+            "description": "ISO 8601 timestamp of when the integration was created",
+            "type": "string",
+            "x-order": 9
+          },
+          "environment": {
+            "description": "ESC environment reference in 'project/envName' format containing VCS credentials",
+            "type": "string",
+            "x-order": 4
+          },
+          "id": {
+            "description": "Unique identifier (UUID) for this integration",
+            "type": "string",
+            "x-order": 1
+          },
+          "modified": {
+            "description": "ISO 8601 timestamp of when the integration was last modified",
+            "type": "string",
+            "x-order": 10
+          },
+          "name": {
+            "description": "Human-readable name for the integration",
+            "type": "string",
+            "x-order": 2
+          },
+          "repositories": {
+            "description": "List of repositories configured on this integration",
+            "items": {
+              "$ref": "#/components/schemas/CustomVCSRepository"
+            },
+            "type": "array",
+            "x-order": 8
+          },
+          "vcsType": {
+            "description": "Version control system type",
+            "enum": [
+              "git",
+              "hg"
+            ],
+            "type": "string",
+            "x-order": 5,
+            "x-pulumi-model-property": {
+              "enumComments": "VCSType describes the version control system type for a custom VCS integration.",
+              "enumFieldComments": [
+                "Git version control system",
+                "Mercurial version control system"
+              ],
+              "enumTypeName": "VCSType"
+            }
+          },
+          "webhookSecret": {
+            "description": "HMAC secret for webhook signature verification. Only returned on integration creation; subsequent GET requests omit this field.",
+            "type": "string",
+            "x-order": 7
+          },
+          "webhookUrl": {
+            "description": "Full webhook endpoint URL that the external VCS should POST events to. This URL is generated by the service and includes the integration ID.",
+            "type": "string",
+            "x-order": 6
+          }
+        },
+        "required": [
+          "baseUrl",
+          "created",
+          "environment",
+          "id",
+          "modified",
+          "name",
+          "vcsType"
+        ],
+        "type": "object"
+      },
+      "CustomVCSRepository": {
+        "description": "A repository configured on a custom VCS integration. Each repository is identified by its name, which is joined with the integration's base URL to form the full clone URL.",
+        "properties": {
+          "displayName": {
+            "description": "Human-readable display name for the repository. If not provided, the name is used for display purposes.",
+            "type": "string",
+            "x-order": 2
+          },
+          "name": {
+            "description": "Repository name or path, joined with the integration's base URL to form the clone URL (e.g. 'myrepo' or 'subgroup/myrepo')",
+            "type": "string",
+            "x-order": 1
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
       },
       "CustomerManagedKey": {
         "description": "Represents customer managed key.",
@@ -10788,7 +10949,7 @@
           "mapping": {
             "azure_devops": "#/components/schemas/DeploymentSettingsVCSAzureDevOps",
             "bitbucket": "#/components/schemas/DeploymentSettingsVCSBitbucket",
-            "generic": "#/components/schemas/DeploymentSettingsVCSGeneric",
+            "custom": "#/components/schemas/DeploymentSettingsVCSCustom",
             "github": "#/components/schemas/DeploymentSettingsVCSGitHub",
             "gitlab": "#/components/schemas/DeploymentSettingsVCSGitLab"
           },
@@ -10865,13 +11026,13 @@
           }
         ]
       },
-      "DeploymentSettingsVCSGeneric": {
+      "DeploymentSettingsVCSCustom": {
         "allOf": [
           {
             "$ref": "#/components/schemas/DeploymentSettingsVCS"
           },
           {
-            "description": "Generic VCS deployment settings for user-managed version control systems.",
+            "description": "Custom VCS deployment settings for user-managed version control systems.",
             "type": "object"
           }
         ]
@@ -15252,6 +15413,23 @@
         ],
         "type": "object"
       },
+      "ListCustomVCSIntegrationsResponse": {
+        "description": "Response containing a list of all custom VCS integrations configured for an organization.",
+        "properties": {
+          "integrations": {
+            "description": "List of custom VCS integrations for the organization",
+            "items": {
+              "$ref": "#/components/schemas/CustomVCSIntegrationResponse"
+            },
+            "type": "array",
+            "x-order": 1
+          }
+        },
+        "required": [
+          "integrations"
+        ],
+        "type": "object"
+      },
       "ListDeletedStacksResponse": {
         "description": "Response containing a list of deleted stacks.",
         "properties": {
@@ -17603,6 +17781,11 @@
             "type": "boolean",
             "x-order": 12
           },
+          "customVCSEnabled": {
+            "description": "Whether custom VCS integrations are enabled.",
+            "type": "boolean",
+            "x-order": 53
+          },
           "dashboardOnboardingUIEnabled": {
             "description": "Whether the dashboard onboarding UI is enabled.",
             "type": "boolean",
@@ -17677,11 +17860,6 @@
             "description": "Whether fixing drift with Neo is enabled.",
             "type": "boolean",
             "x-order": 56
-          },
-          "genericVCSEnabled": {
-            "description": "Whether generic VCS integrations are enabled.",
-            "type": "boolean",
-            "x-order": 53
           },
           "getStartedOnboardEnabled": {
             "description": "Whether the getting started onboarding flow is enabled.",
@@ -17825,6 +18003,7 @@
           "customRoleCondition",
           "customRolesEnabled",
           "customTemplatesEnabled",
+          "customVCSEnabled",
           "dashboardOnboardingUIEnabled",
           "dependencyCachingEnabled",
           "deployEnabled",
@@ -17840,7 +18019,6 @@
           "escOnboardingGcpOAuthClientEnabled",
           "escOnboardingV2Enabled",
           "fixDriftWithNeoEnabled",
-          "genericVCSEnabled",
           "getStartedOnboardEnabled",
           "ghAppDetailedDiffEnabled",
           "gitHubEnterpriseIntegrationEnabled",
@@ -18457,6 +18635,9 @@
                 }
               }
             },
+            "required": [
+              "role"
+            ],
             "type": "object"
           }
         ]
@@ -22358,6 +22539,20 @@
         ],
         "type": "object"
       },
+      "RemoveCustomVCSRepositoryRequest": {
+        "description": "Request to remove a repository from a custom VCS integration. The repository is identified by its name.",
+        "properties": {
+          "name": {
+            "description": "Repository name to remove (must match a previously added name exactly)",
+            "type": "string",
+            "x-order": 1
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
       "RemoveEnvironmentIdentifier": {
         "description": "Identifier used when removing an environment from a team.",
         "properties": {
@@ -25350,6 +25545,32 @@
         ],
         "type": "object"
       },
+      "UpdateCustomVCSIntegrationRequest": {
+        "description": "Request to update an existing custom VCS integration. All fields are optional; only provided fields are updated. Use regenerateWebhookSecret to rotate the webhook HMAC secret.",
+        "properties": {
+          "baseUrl": {
+            "description": "Updated URL prefix for repositories covered by this integration",
+            "type": "string",
+            "x-order": 2
+          },
+          "environment": {
+            "description": "Updated ESC environment reference in 'project/envName' format",
+            "type": "string",
+            "x-order": 3
+          },
+          "name": {
+            "description": "Updated human-readable name for the integration",
+            "type": "string",
+            "x-order": 1
+          },
+          "regenerateWebhookSecret": {
+            "description": "When true, generates a new webhook HMAC secret and invalidates the previous one. The new secret is returned in the response.",
+            "type": "boolean",
+            "x-order": 4
+          }
+        },
+        "type": "object"
+      },
       "UpdateEnvironmentResponse": {
         "allOf": [
           {
@@ -26664,7 +26885,7 @@
             "x-order": 2
           },
           "baseUrl": {
-            "description": "The base URL for generic VCS integrations (e.g., \"https://github.com/myorg\" or \"git@git.sr.ht:~user\"). Used by the console to construct repository URLs. Empty for native providers.",
+            "description": "The base URL for custom VCS integrations (e.g., \"https://github.com/myorg\" or \"git@git.sr.ht:~user\"). Used by the console to construct repository URLs. Empty for native providers.",
             "type": "string",
             "x-order": 7
           },
@@ -26695,7 +26916,7 @@
               "gitlab",
               "bitbucket",
               "azure_devops",
-              "generic",
+              "custom",
               "github_enterprise"
             ],
             "type": "string",
@@ -26707,7 +26928,7 @@
                 "GitLab version control system",
                 "Bitbucket version control system",
                 "Azure DevOps version control system",
-                "Generic version control system",
+                "Custom version control system",
                 "GitHub Enterprise Server version control system"
               ],
               "enumFieldNames": [
@@ -26715,7 +26936,7 @@
                 "GitLab",
                 "Bitbucket",
                 "AzureDevOps",
-                "Generic",
+                "Custom",
                 "GitHubEnterprise"
               ],
               "enumTypeName": "VCSProvider"
@@ -28379,7 +28600,7 @@
     },
     "/api/console/orgs/{orgName}/integrations": {
       "get": {
-        "description": "Returns a summary of all VCS integrations across all providers (GitHub, GitLab, Azure DevOps, Generic) for an organization. Each integration includes a hasIndividualAccess flag indicating whether the current user has an OAuth token for that provider.",
+        "description": "Returns a summary of all VCS integrations across all providers (GitHub, GitLab, Azure DevOps, Custom) for an organization. Each integration includes a hasIndividualAccess flag indicating whether the current user has an OAuth token for that provider.",
         "operationId": "ListAllVCSIntegrations",
         "parameters": [
           {
@@ -29085,6 +29306,341 @@
         }
       }
     },
+    "/api/console/orgs/{orgName}/integrations/custom": {
+      "get": {
+        "description": "Lists all custom VCS integrations configured for an organization. Returns each integration's configuration, webhook URL, and configured repositories. Webhook secrets are not included in list responses.",
+        "operationId": "ListCustomVCSIntegrations",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListCustomVCSIntegrationsResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "ListCustomVCSIntegrations",
+        "tags": [
+          "VCS Integrations"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      },
+      "post": {
+        "description": "Creates a new custom VCS integration for an organization. Custom VCS integrations allow connecting self-hosted or third-party version control systems (e.g. Gitea, Forgejo, Bitbucket Server) to Pulumi Deployments. Credentials are managed via ESC environments, and deployments are triggered by inbound webhooks. Returns the created integration including its webhook URL and HMAC secret for signature verification.",
+        "operationId": "CreateCustomVCSIntegration",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCustomVCSIntegrationRequest"
+              }
+            }
+          },
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomVCSIntegrationResponse"
+                }
+              }
+            },
+            "description": "Created"
+          },
+          "400": {
+            "description": "Invalid request: missing required fields or invalid vcsType"
+          },
+          "409": {
+            "description": "An integration with this name already exists in the organization"
+          }
+        },
+        "summary": "CreateCustomVCSIntegration",
+        "tags": [
+          "VCS Integrations"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      }
+    },
+    "/api/console/orgs/{orgName}/integrations/custom/{integrationId}": {
+      "delete": {
+        "description": "Removes a specific custom VCS integration from the organization. This permanently deletes the integration, its webhook endpoint, and all configured repository associations.",
+        "operationId": "DeleteCustomVCSIntegration",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The custom VCS integration identifier",
+            "in": "path",
+            "name": "integrationId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Custom VCS integration not found"
+          }
+        },
+        "summary": "DeleteCustomVCSIntegration",
+        "tags": [
+          "VCS Integrations"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      },
+      "get": {
+        "description": "Gets a specific custom VCS integration by its integration ID. Returns the integration details including its configuration, webhook URL, and configured repositories. The webhook secret is not included; it is only returned at creation time or when regenerated via update.",
+        "operationId": "GetCustomVCSIntegration",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The custom VCS integration identifier",
+            "in": "path",
+            "name": "integrationId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomVCSIntegrationResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Custom VCS integration not found"
+          }
+        },
+        "summary": "GetCustomVCSIntegration",
+        "tags": [
+          "VCS Integrations"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      },
+      "patch": {
+        "description": "Updates an existing custom VCS integration's settings. All fields are optional; only provided fields are modified. Set regenerateWebhookSecret to true to rotate the webhook HMAC secret, which invalidates the previous secret immediately.",
+        "operationId": "UpdateCustomVCSIntegration",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The custom VCS integration identifier",
+            "in": "path",
+            "name": "integrationId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCustomVCSIntegrationRequest"
+              }
+            }
+          },
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomVCSIntegrationResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request: invalid vcsType or other validation failure"
+          },
+          "404": {
+            "description": "Custom VCS integration not found"
+          }
+        },
+        "summary": "UpdateCustomVCSIntegration",
+        "tags": [
+          "VCS Integrations"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      }
+    },
+    "/api/console/orgs/{orgName}/integrations/custom/{integrationId}/repos": {
+      "delete": {
+        "description": "Removes a repository from a custom VCS integration. The repository is identified by its name, as provided in the request. Returns 404 if the integration or repository is not found.",
+        "operationId": "RemoveCustomVCSRepository",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The custom VCS integration identifier",
+            "in": "path",
+            "name": "integrationId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveCustomVCSRepositoryRequest"
+              }
+            }
+          },
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Custom VCS integration or repository not found"
+          }
+        },
+        "summary": "RemoveCustomVCSRepository",
+        "tags": [
+          "VCS Integrations"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      },
+      "post": {
+        "description": "Adds a repository to a custom VCS integration. The repository name must be unique within the integration. Returns 409 Conflict if a repository with the same name is already configured.",
+        "operationId": "AddCustomVCSRepository",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The custom VCS integration identifier",
+            "in": "path",
+            "name": "integrationId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddCustomVCSRepositoryRequest"
+              }
+            }
+          },
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Custom VCS integration not found"
+          },
+          "409": {
+            "description": "Repository name already configured on this integration"
+          }
+        },
+        "summary": "AddCustomVCSRepository",
+        "tags": [
+          "VCS Integrations"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      }
+    },
     "/api/console/orgs/{orgName}/integrations/github": {
       "get": {
         "description": "Lists all GitHub App integrations for an organization.",
@@ -29742,7 +30298,7 @@
                 "gitlab",
                 "bitbucket",
                 "azure_devops",
-                "generic",
+                "custom",
                 "github_enterprise"
               ],
               "type": "string",
@@ -29753,7 +30309,7 @@
                   "GitLab version control system",
                   "Bitbucket version control system",
                   "Azure DevOps version control system",
-                  "Generic version control system",
+                  "Custom version control system",
                   "GitHub Enterprise Server version control system"
                 ],
                 "enumFieldNames": [
@@ -29761,7 +30317,7 @@
                   "GitLab",
                   "Bitbucket",
                   "AzureDevOps",
-                  "Generic",
+                  "Custom",
                   "GitHubEnterprise"
                 ],
                 "enumTypeName": "VCSProvider"
@@ -29842,7 +30398,7 @@
                 "gitlab",
                 "bitbucket",
                 "azure_devops",
-                "generic",
+                "custom",
                 "github_enterprise"
               ],
               "type": "string",
@@ -29853,7 +30409,7 @@
                   "GitLab version control system",
                   "Bitbucket version control system",
                   "Azure DevOps version control system",
-                  "Generic version control system",
+                  "Custom version control system",
                   "GitHub Enterprise Server version control system"
                 ],
                 "enumFieldNames": [
@@ -29861,7 +30417,7 @@
                   "GitLab",
                   "Bitbucket",
                   "AzureDevOps",
-                  "Generic",
+                  "Custom",
                   "GitHubEnterprise"
                 ],
                 "enumTypeName": "VCSProvider"
@@ -29930,7 +30486,7 @@
                 "gitlab",
                 "bitbucket",
                 "azure_devops",
-                "generic",
+                "custom",
                 "github_enterprise"
               ],
               "type": "string",
@@ -29941,7 +30497,7 @@
                   "GitLab version control system",
                   "Bitbucket version control system",
                   "Azure DevOps version control system",
-                  "Generic version control system",
+                  "Custom version control system",
                   "GitHub Enterprise Server version control system"
                 ],
                 "enumFieldNames": [
@@ -29949,7 +30505,7 @@
                   "GitLab",
                   "Bitbucket",
                   "AzureDevOps",
-                  "Generic",
+                  "Custom",
                   "GitHubEnterprise"
                 ],
                 "enumTypeName": "VCSProvider"

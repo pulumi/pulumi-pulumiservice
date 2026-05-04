@@ -10,6 +10,7 @@ import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.Utilities;
 import com.pulumi.pulumiservice.v2.PolicyIssueArgs;
 import java.lang.Object;
+import java.lang.String;
 import java.util.Optional;
 import javax.annotation.Nullable;
 
@@ -23,6 +24,34 @@ import javax.annotation.Nullable;
  */
 @ResourceType(type="pulumiservice:v2:PolicyIssue")
 public class PolicyIssue extends com.pulumi.resources.CustomResource {
+    /**
+     * The issue identifier
+     * 
+     */
+    @Export(name="issueId", refs={String.class}, tree="[0]")
+    private Output<String> issueId;
+
+    /**
+     * @return The issue identifier
+     * 
+     */
+    public Output<String> issueId() {
+        return this.issueId;
+    }
+    /**
+     * The organization name
+     * 
+     */
+    @Export(name="orgName", refs={String.class}, tree="[0]")
+    private Output<String> orgName;
+
+    /**
+     * @return The organization name
+     * 
+     */
+    public Output<String> orgName() {
+        return this.orgName;
+    }
     /**
      * The policy definition that caused this issue. May be null if the policy has been deleted or is unavailable.
      * 

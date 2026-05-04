@@ -121,9 +121,6 @@ export class StackWebhook extends pulumi.CustomResource {
             if (args?.name === undefined && !opts.urn) {
                 throw new Error("Missing required property 'name'");
             }
-            if (args?.orgName === undefined && !opts.urn) {
-                throw new Error("Missing required property 'orgName'");
-            }
             if (args?.organizationName === undefined && !opts.urn) {
                 throw new Error("Missing required property 'organizationName'");
             }
@@ -142,9 +139,7 @@ export class StackWebhook extends pulumi.CustomResource {
             resourceInputs["filters"] = args?.filters;
             resourceInputs["format"] = args?.format;
             resourceInputs["groups"] = args?.groups;
-            resourceInputs["hookName"] = args?.hookName;
             resourceInputs["name"] = args?.name;
-            resourceInputs["orgName"] = args?.orgName;
             resourceInputs["organizationName"] = args?.organizationName;
             resourceInputs["payloadUrl"] = args?.payloadUrl;
             resourceInputs["projectName"] = args?.projectName;
@@ -169,6 +164,8 @@ export class StackWebhook extends pulumi.CustomResource {
             resourceInputs["stackName"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const secretOpts = { additionalSecretOutputs: ["hasSecret", "secret", "secretCiphertext"] };
+        opts = pulumi.mergeOptions(opts, secretOpts);
         super(StackWebhook.__pulumiType, name, resourceInputs, opts);
     }
 }
@@ -202,17 +199,9 @@ export interface StackWebhookArgs {
      */
     groups?: pulumi.Input<pulumi.Input<string>[]>;
     /**
-     * The webhook name
-     */
-    hookName?: pulumi.Input<string>;
-    /**
      * The unique identifier name for the webhook within its scope.
      */
     name: pulumi.Input<string>;
-    /**
-     * The organization name
-     */
-    orgName: pulumi.Input<string>;
     /**
      * The organization that owns this webhook.
      */

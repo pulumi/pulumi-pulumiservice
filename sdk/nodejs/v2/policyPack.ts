@@ -47,6 +47,10 @@ export class PolicyPack extends pulumi.CustomResource {
      */
     declare public readonly name: pulumi.Output<string>;
     /**
+     * The organization name
+     */
+    declare public readonly orgName: pulumi.Output<string>;
+    /**
      * The individual policies contained in this policy pack.
      */
     declare public readonly policies: pulumi.Output<any[]>;
@@ -88,7 +92,6 @@ export class PolicyPack extends pulumi.CustomResource {
             resourceInputs["name"] = args?.name;
             resourceInputs["orgName"] = args?.orgName;
             resourceInputs["policies"] = args?.policies;
-            resourceInputs["policyPackName"] = args?.policyPackName;
             resourceInputs["provider"] = args?.provider;
             resourceInputs["readme"] = args?.readme;
             resourceInputs["repository"] = args?.repository;
@@ -100,11 +103,14 @@ export class PolicyPack extends pulumi.CustomResource {
             resourceInputs["applied"] = undefined /*out*/;
             resourceInputs["displayName"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
+            resourceInputs["orgName"] = undefined /*out*/;
             resourceInputs["policies"] = undefined /*out*/;
             resourceInputs["version"] = undefined /*out*/;
             resourceInputs["versionTag"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["orgName"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(PolicyPack.__pulumiType, name, resourceInputs, opts);
     }
 }
@@ -142,10 +148,6 @@ export interface PolicyPackArgs {
      * from the package by the CLI.
      */
     policies: pulumi.Input<any[]>;
-    /**
-     * The policy pack name
-     */
-    policyPackName?: pulumi.Input<string>;
     /**
      * The cloud provider/platform this policy pack is associated with, e.g. AWS, Azure, etc.
      */

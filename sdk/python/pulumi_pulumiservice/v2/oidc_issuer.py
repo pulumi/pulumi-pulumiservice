@@ -19,44 +19,47 @@ __all__ = ['OidcIssuerArgs', 'OidcIssuer']
 @pulumi.input_type
 class OidcIssuerArgs:
     def __init__(__self__, *,
-                 issuer_id: pulumi.Input[_builtins.str],
+                 name: pulumi.Input[_builtins.str],
                  org_name: pulumi.Input[_builtins.str],
+                 url: pulumi.Input[_builtins.str],
+                 issuer_id: Optional[pulumi.Input[_builtins.str]] = None,
                  jwks: Optional[Any] = None,
                  max_expiration: Optional[pulumi.Input[_builtins.int]] = None,
-                 name: Optional[pulumi.Input[_builtins.str]] = None,
                  thumbprints: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None):
         """
         The set of arguments for constructing a OidcIssuer resource.
 
-        :param pulumi.Input[_builtins.str] issuer_id: The OIDC issuer identifier
+        :param pulumi.Input[_builtins.str] name: The display name of the OIDC issuer.
         :param pulumi.Input[_builtins.str] org_name: The organization name
-        :param Any jwks: The updated JSON Web Key Set for the OIDC issuer.
-        :param pulumi.Input[_builtins.int] max_expiration: The updated maximum token expiration time in seconds.
-        :param pulumi.Input[_builtins.str] name: The updated display name of the OIDC issuer.
-        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] thumbprints: Updated SHA-1 certificate thumbprints used to verify the OIDC issuer's TLS certificate.
+        :param pulumi.Input[_builtins.str] url: The URL of the OIDC issuer.
+        :param pulumi.Input[_builtins.str] issuer_id: The OIDC issuer identifier
+        :param Any jwks: The JSON Web Key Set for the OIDC issuer.
+        :param pulumi.Input[_builtins.int] max_expiration: The maximum token expiration time in seconds.
+        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] thumbprints: SHA-1 certificate thumbprints used to verify the OIDC issuer's TLS certificate.
         """
-        pulumi.set(__self__, "issuer_id", issuer_id)
+        pulumi.set(__self__, "name", name)
         pulumi.set(__self__, "org_name", org_name)
+        pulumi.set(__self__, "url", url)
+        if issuer_id is not None:
+            pulumi.set(__self__, "issuer_id", issuer_id)
         if jwks is not None:
             pulumi.set(__self__, "jwks", jwks)
         if max_expiration is not None:
             pulumi.set(__self__, "max_expiration", max_expiration)
-        if name is not None:
-            pulumi.set(__self__, "name", name)
         if thumbprints is not None:
             pulumi.set(__self__, "thumbprints", thumbprints)
 
     @_builtins.property
-    @pulumi.getter(name="issuerId")
-    def issuer_id(self) -> pulumi.Input[_builtins.str]:
+    @pulumi.getter
+    def name(self) -> pulumi.Input[_builtins.str]:
         """
-        The OIDC issuer identifier
+        The display name of the OIDC issuer.
         """
-        return pulumi.get(self, "issuer_id")
+        return pulumi.get(self, "name")
 
-    @issuer_id.setter
-    def issuer_id(self, value: pulumi.Input[_builtins.str]):
-        pulumi.set(self, "issuer_id", value)
+    @name.setter
+    def name(self, value: pulumi.Input[_builtins.str]):
+        pulumi.set(self, "name", value)
 
     @_builtins.property
     @pulumi.getter(name="orgName")
@@ -72,9 +75,33 @@ class OidcIssuerArgs:
 
     @_builtins.property
     @pulumi.getter
+    def url(self) -> pulumi.Input[_builtins.str]:
+        """
+        The URL of the OIDC issuer.
+        """
+        return pulumi.get(self, "url")
+
+    @url.setter
+    def url(self, value: pulumi.Input[_builtins.str]):
+        pulumi.set(self, "url", value)
+
+    @_builtins.property
+    @pulumi.getter(name="issuerId")
+    def issuer_id(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        The OIDC issuer identifier
+        """
+        return pulumi.get(self, "issuer_id")
+
+    @issuer_id.setter
+    def issuer_id(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "issuer_id", value)
+
+    @_builtins.property
+    @pulumi.getter
     def jwks(self) -> Optional[Any]:
         """
-        The updated JSON Web Key Set for the OIDC issuer.
+        The JSON Web Key Set for the OIDC issuer.
         """
         return pulumi.get(self, "jwks")
 
@@ -86,7 +113,7 @@ class OidcIssuerArgs:
     @pulumi.getter(name="maxExpiration")
     def max_expiration(self) -> Optional[pulumi.Input[_builtins.int]]:
         """
-        The updated maximum token expiration time in seconds.
+        The maximum token expiration time in seconds.
         """
         return pulumi.get(self, "max_expiration")
 
@@ -96,21 +123,9 @@ class OidcIssuerArgs:
 
     @_builtins.property
     @pulumi.getter
-    def name(self) -> Optional[pulumi.Input[_builtins.str]]:
-        """
-        The updated display name of the OIDC issuer.
-        """
-        return pulumi.get(self, "name")
-
-    @name.setter
-    def name(self, value: Optional[pulumi.Input[_builtins.str]]):
-        pulumi.set(self, "name", value)
-
-    @_builtins.property
-    @pulumi.getter
     def thumbprints(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]:
         """
-        Updated SHA-1 certificate thumbprints used to verify the OIDC issuer's TLS certificate.
+        SHA-1 certificate thumbprints used to verify the OIDC issuer's TLS certificate.
         """
         return pulumi.get(self, "thumbprints")
 
@@ -131,19 +146,21 @@ class OidcIssuer(pulumi.CustomResource):
                  name: Optional[pulumi.Input[_builtins.str]] = None,
                  org_name: Optional[pulumi.Input[_builtins.str]] = None,
                  thumbprints: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 url: Optional[pulumi.Input[_builtins.str]] = None,
                  __props__=None):
         """
-        Updates an existing OIDC issuer registration for an organization. This can be used to modify the issuer name, audience restrictions, trust policies, or other configuration. The issuer URL itself cannot be changed after creation. The issuer name is required in the update request.
+        Registers a new OIDC issuer for an organization, establishing a trust relationship with an external identity provider. Once registered, the identity provider can issue signed, short-lived tokens that are exchanged for temporary Pulumi Cloud credentials during deployments. This eliminates the need to store long-lived access tokens. Supported providers include AWS, Azure, Google Cloud, GitHub Actions, and any OIDC-compliant identity provider. The request must include the issuer URL, and the service will fetch the provider's public signing keys to verify token authenticity.
 
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] issuer_id: The OIDC issuer identifier
-        :param Any jwks: The updated JSON Web Key Set for the OIDC issuer.
-        :param pulumi.Input[_builtins.int] max_expiration: The updated maximum token expiration time in seconds.
-        :param pulumi.Input[_builtins.str] name: The updated display name of the OIDC issuer.
+        :param Any jwks: The JSON Web Key Set for the OIDC issuer.
+        :param pulumi.Input[_builtins.int] max_expiration: The maximum token expiration time in seconds.
+        :param pulumi.Input[_builtins.str] name: The display name of the OIDC issuer.
         :param pulumi.Input[_builtins.str] org_name: The organization name
-        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] thumbprints: Updated SHA-1 certificate thumbprints used to verify the OIDC issuer's TLS certificate.
+        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] thumbprints: SHA-1 certificate thumbprints used to verify the OIDC issuer's TLS certificate.
+        :param pulumi.Input[_builtins.str] url: The URL of the OIDC issuer.
         """
         ...
     @overload
@@ -152,7 +169,7 @@ class OidcIssuer(pulumi.CustomResource):
                  args: OidcIssuerArgs,
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
-        Updates an existing OIDC issuer registration for an organization. This can be used to modify the issuer name, audience restrictions, trust policies, or other configuration. The issuer URL itself cannot be changed after creation. The issuer name is required in the update request.
+        Registers a new OIDC issuer for an organization, establishing a trust relationship with an external identity provider. Once registered, the identity provider can issue signed, short-lived tokens that are exchanged for temporary Pulumi Cloud credentials during deployments. This eliminates the need to store long-lived access tokens. Supported providers include AWS, Azure, Google Cloud, GitHub Actions, and any OIDC-compliant identity provider. The request must include the issuer URL, and the service will fetch the provider's public signing keys to verify token authenticity.
 
 
         :param str resource_name: The name of the resource.
@@ -176,6 +193,7 @@ class OidcIssuer(pulumi.CustomResource):
                  name: Optional[pulumi.Input[_builtins.str]] = None,
                  org_name: Optional[pulumi.Input[_builtins.str]] = None,
                  thumbprints: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 url: Optional[pulumi.Input[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
@@ -185,21 +203,25 @@ class OidcIssuer(pulumi.CustomResource):
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
             __props__ = OidcIssuerArgs.__new__(OidcIssuerArgs)
 
-            if issuer_id is None and not opts.urn:
-                raise TypeError("Missing required property 'issuer_id'")
             __props__.__dict__["issuer_id"] = issuer_id
             __props__.__dict__["jwks"] = jwks
             __props__.__dict__["max_expiration"] = max_expiration
+            if name is None and not opts.urn:
+                raise TypeError("Missing required property 'name'")
             __props__.__dict__["name"] = name
             if org_name is None and not opts.urn:
                 raise TypeError("Missing required property 'org_name'")
             __props__.__dict__["org_name"] = org_name
             __props__.__dict__["thumbprints"] = thumbprints
+            if url is None and not opts.urn:
+                raise TypeError("Missing required property 'url'")
+            __props__.__dict__["url"] = url
             __props__.__dict__["created"] = None
             __props__.__dict__["issuer"] = None
             __props__.__dict__["last_used"] = None
             __props__.__dict__["modified"] = None
-            __props__.__dict__["url"] = None
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["orgName"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(OidcIssuer, __self__).__init__(
             'pulumiservice:v2:OidcIssuer',
             resource_name,
@@ -224,11 +246,13 @@ class OidcIssuer(pulumi.CustomResource):
 
         __props__.__dict__["created"] = None
         __props__.__dict__["issuer"] = None
+        __props__.__dict__["issuer_id"] = None
         __props__.__dict__["jwks"] = None
         __props__.__dict__["last_used"] = None
         __props__.__dict__["max_expiration"] = None
         __props__.__dict__["modified"] = None
         __props__.__dict__["name"] = None
+        __props__.__dict__["org_name"] = None
         __props__.__dict__["thumbprints"] = None
         __props__.__dict__["url"] = None
         return OidcIssuer(resource_name, opts=opts, __props__=__props__)
@@ -248,6 +272,14 @@ class OidcIssuer(pulumi.CustomResource):
         The OIDC issuer identifier, typically a URL that uniquely identifies the identity provider.
         """
         return pulumi.get(self, "issuer")
+
+    @_builtins.property
+    @pulumi.getter(name="issuerId")
+    def issuer_id(self) -> pulumi.Output[_builtins.str]:
+        """
+        The unique identifier of the registered OIDC issuer.
+        """
+        return pulumi.get(self, "issuer_id")
 
     @_builtins.property
     @pulumi.getter
@@ -288,6 +320,14 @@ class OidcIssuer(pulumi.CustomResource):
         The display name of the OIDC issuer.
         """
         return pulumi.get(self, "name")
+
+    @_builtins.property
+    @pulumi.getter(name="orgName")
+    def org_name(self) -> pulumi.Output[_builtins.str]:
+        """
+        The organization name
+        """
+        return pulumi.get(self, "org_name")
 
     @_builtins.property
     @pulumi.getter
