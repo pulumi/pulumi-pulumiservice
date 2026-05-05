@@ -1,10 +1,10 @@
 package generated_program;
 
 import com.pulumi.Pulumi;
-import com.pulumi.pulumiservice.v2.CustomVCSIntegration;
-import com.pulumi.pulumiservice.v2.CustomVCSIntegrationArgs;
-import com.pulumi.pulumiservice.v2.CustomVCSRepository;
-import com.pulumi.pulumiservice.v2.CustomVCSRepositoryArgs;
+import com.pulumi.pulumiservice.v2_integrations.CustomVCSIntegration;
+import com.pulumi.pulumiservice.v2_integrations.CustomVCSIntegrationArgs;
+import com.pulumi.pulumiservice.v2_integrations.CustomVCSRepository;
+import com.pulumi.pulumiservice.v2_integrations.CustomVCSRepositoryArgs;
 
 public class App {
     public static void main(String[] args) {

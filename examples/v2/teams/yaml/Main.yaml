@@ -1,6 +1,6 @@
 resources:
   team:
-    type: pulumiservice:v2:Team
+    type: pulumiservice:v2/teams:Team
     properties:
       orgName: ${serviceOrg}
       name: v2-team-${teamSuffix}

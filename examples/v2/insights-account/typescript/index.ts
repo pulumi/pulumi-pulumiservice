@@ -6,7 +6,7 @@ const serviceOrg = config.get("serviceOrg") ?? "service-provider-test-org";
 const accountSuffix = config.get("accountSuffix") ?? "dev";
 const insightsEnvironment = config.get("insightsEnvironment") ?? "insights/credentials";
 
-const account = new ps.v2.Account("account", {
+const account = new ps.v2.insights.Account("account", {
     orgName: serviceOrg,
     accountName: `v2-insights-${accountSuffix}`,
     provider: "aws",
@@ -14,7 +14,7 @@ const account = new ps.v2.Account("account", {
     scanSchedule: "none",
 });
 
-new ps.v2.ScheduledScanSettings("scanSettings", {
+new ps.v2.insights.ScheduledScanSettings("scanSettings", {
     orgName: serviceOrg,
     accountName: account.accountName,
     paused: true,

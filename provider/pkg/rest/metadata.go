@@ -49,9 +49,12 @@ type ResourceMeta struct {
 	// may be empty (no deletion semantics on the API side).
 	Operations Operations `json:"operations"`
 
-	// IDField is a JSON-pointer-style path into the response body where the
-	// resource ID lives. Defaults to "/id".
-	IDField string `json:"idField,omitempty"`
+	// Token, when non-empty, overrides the metadata-key as the user-facing
+	// Pulumi token for this resource. Lets us expose a clean module path
+	// (e.g. "pulumiservice:v2/esc:Environment") while keeping the map key
+	// as the canonical OpenAPI-derived identifier the scaffolder rebuilds
+	// from spec.json (so go generate stays a no-op on these entries).
+	Token string `json:"token,omitempty"`
 
 	// Aliases are fully-qualified Pulumi tokens that the engine should treat as
 	// equivalent to this resource (used for in-place migration after renames).

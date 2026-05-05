@@ -1,14 +1,14 @@
 package generated_program;
 
 import com.pulumi.Pulumi;
-import com.pulumi.pulumiservice.v2.OrgToken;
-import com.pulumi.pulumiservice.v2.OrgTokenArgs;
-import com.pulumi.pulumiservice.v2.PersonalToken;
-import com.pulumi.pulumiservice.v2.PersonalTokenArgs;
-import com.pulumi.pulumiservice.v2.Team;
-import com.pulumi.pulumiservice.v2.TeamArgs;
-import com.pulumi.pulumiservice.v2.TeamToken;
-import com.pulumi.pulumiservice.v2.TeamTokenArgs;
+import com.pulumi.pulumiservice.v2_tokens.OrgToken;
+import com.pulumi.pulumiservice.v2_tokens.OrgTokenArgs;
+import com.pulumi.pulumiservice.v2_tokens.PersonalToken;
+import com.pulumi.pulumiservice.v2_tokens.PersonalTokenArgs;
+import com.pulumi.pulumiservice.v2_teams.Team;
+import com.pulumi.pulumiservice.v2_teams.TeamArgs;
+import com.pulumi.pulumiservice.v2_tokens.TeamToken;
+import com.pulumi.pulumiservice.v2_tokens.TeamTokenArgs;
 
 public class App {
     public static void main(String[] args) {

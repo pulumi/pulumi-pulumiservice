@@ -40,7 +40,11 @@ func BuildSchema(spec *Spec, metadata *Metadata, pkg string) (*schema.PackageSpe
 	}
 
 	var errs []string
-	for token, rm := range metadata.Resources {
+	for key, rm := range metadata.Resources {
+		token := key
+		if rm.Token != "" {
+			token = rm.Token
+		}
 		rs, err := buildResource(spec, metadata, token, rm)
 		if err != nil {
 			errs = append(errs, fmt.Sprintf("%s: %v", token, err))
@@ -263,8 +267,8 @@ func operationOutputs(spec *Spec, op *Operation, rm ResourceMeta) (map[string]sc
 	for k, p := range bodyProps {
 		name := pulumiName(k, rm.Renames, false)
 		// "id" is reserved by Pulumi for resources — the resource ID is
-		// extracted from the response separately via Ops.IDField. Skip it
-		// from outputs so SDK codegen doesn't emit a colliding property.
+		// synthesized from path-param values, not exposed as an output. Skip
+		// it so SDK codegen doesn't emit a colliding property.
 		if name == "id" {
 			continue
 		}

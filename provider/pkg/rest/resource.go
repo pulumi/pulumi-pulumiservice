@@ -42,7 +42,11 @@ var pathParamRE = regexp.MustCompile(`\{([^/{}]+)\}`)
 // first CRUD call.
 func Resources(spec *Spec, metadata *Metadata) map[string]*DynamicResource {
 	out := make(map[string]*DynamicResource, len(metadata.Resources))
-	for token, rm := range metadata.Resources {
+	for key, rm := range metadata.Resources {
+		token := key
+		if rm.Token != "" {
+			token = rm.Token
+		}
 		out[token] = &DynamicResource{meta: rm, spec: spec}
 	}
 	return out
@@ -85,7 +89,7 @@ func (r *DynamicResource) Diff(_ context.Context, req p.DiffRequest) (p.DiffResp
 
 // Create executes the create operation: substitutes path params, JSON-encodes
 // the inputs as the request body, fires the request, decodes the response,
-// extracts the resource ID, returns the new state.
+// synthesizes the resource ID from path-param values, returns the new state.
 func (r *DynamicResource) Create(ctx context.Context, req p.CreateRequest) (p.CreateResponse, error) {
 	if req.DryRun {
 		return p.CreateResponse{Properties: req.Properties}, nil
@@ -97,19 +101,68 @@ func (r *DynamicResource) Create(ctx context.Context, req p.CreateRequest) (p.Cr
 	if op == nil {
 		return p.CreateResponse{}, fmt.Errorf("create: resource has no create operation declared")
 	}
-	body, state, err := r.execAndDecode(ctx, op, req.Properties)
+	_, state, err := r.execAndDecode(ctx, op, req.Properties)
 	if err != nil {
 		return p.CreateResponse{}, err
 	}
-	id, err := extractID(body, r.meta.IDField, req.Properties, r.meta.Renames)
+	state = r.populatePathParams(state, req.Properties)
+	id, err := r.synthesizeID(state, req.Properties)
 	if err != nil {
 		return p.CreateResponse{}, fmt.Errorf("create: %w", err)
 	}
-	if id == "" {
-		return p.CreateResponse{}, fmt.Errorf("create: response did not contain an ID at %q", idFieldOrDefault(r.meta.IDField))
-	}
-	state = r.populatePathParams(state, req.Properties)
 	return p.CreateResponse{ID: id, Properties: state}, nil
+}
+
+// synthesizeID returns the resource ID by concatenating path-parameter
+// values. The path comes from the most authoritative non-create op (read,
+// update, delete) — falling back to create when nothing else is declared.
+// Values are looked up in state first (covers server-generated fields
+// returned from create) and then inputs (covers user-supplied fields that
+// weren't echoed in the response, e.g., the body `name` that maps via
+// rename to a path param like `tagName`).
+func (r *DynamicResource) synthesizeID(state, inputs property.Map) (string, error) {
+	var op *Operation
+	for _, opID := range []string{r.meta.Operations.Read, r.meta.Operations.Update, r.meta.Operations.Delete, r.meta.Operations.Create} {
+		if opID == "" {
+			continue
+		}
+		candidate, ok := r.spec.Op(opID)
+		if !ok {
+			continue
+		}
+		if hasPathParams(candidate) {
+			op = candidate
+			break
+		}
+	}
+	if op == nil {
+		return "", fmt.Errorf("no operation with path parameters available to synthesize ID")
+	}
+	var parts []string
+	for _, pp := range op.Parameters {
+		if pp.In != "path" {
+			continue
+		}
+		pulName := pulumiName(pp.Name, r.meta.Renames, true)
+		v, ok := state.GetOk(pulName)
+		if !ok {
+			v, ok = inputs.GetOk(pulName)
+		}
+		if !ok {
+			return "", fmt.Errorf("path parameter %q (Pulumi name %q) missing from state and inputs", pp.Name, pulName)
+		}
+		parts = append(parts, propertyValueToString(v))
+	}
+	return strings.Join(parts, "/"), nil
+}
+
+func hasPathParams(op *Operation) bool {
+	for _, p := range op.Parameters {
+		if p.In == "path" {
+			return true
+		}
+	}
+	return false
 }
 
 // Read fetches the current state. Path parameters come from the inputs (which
@@ -344,84 +397,6 @@ func needsBody(method string) bool {
 		return true
 	}
 	return false
-}
-
-// extractID resolves the resource ID from one of two idField formats:
-//
-//  1. Pointer-style ("/id" or "/foo/bar") — looks up a JSON path in the
-//     create-response body.
-//  2. Template-style ("{name}" or "{orgName}/{projectName}/{stackName}") —
-//     interpolates wire-side parameter names from the input map. Used for
-//     resources whose Create returns 204 No Content (no body to extract
-//     from), where the caller-supplied inputs already uniquely identify
-//     the resource.
-//
-// The template form is detected by the presence of `{`. Parameter names
-// inside `{...}` are wire-side names; pulumiName + renames maps them to
-// the corresponding pulumi-side input keys before lookup.
-func extractID(body []byte, ptr string, inputs property.Map, renames map[string]string) (string, error) {
-	ptr = idFieldOrDefault(ptr)
-	if strings.Contains(ptr, "{") {
-		return interpolateTemplateID(ptr, inputs, renames)
-	}
-	if len(body) == 0 {
-		return "", nil
-	}
-	var raw any
-	if err := json.Unmarshal(body, &raw); err != nil {
-		return "", fmt.Errorf("decode response for ID extraction: %w", err)
-	}
-	cursor := raw
-	for _, seg := range strings.Split(strings.TrimPrefix(ptr, "/"), "/") {
-		if seg == "" {
-			continue
-		}
-		m, ok := cursor.(map[string]any)
-		if !ok {
-			return "", nil
-		}
-		cursor, ok = m[seg]
-		if !ok {
-			return "", nil
-		}
-	}
-	switch v := cursor.(type) {
-	case string:
-		return v, nil
-	case float64:
-		return fmt.Sprintf("%v", v), nil
-	default:
-		return fmt.Sprintf("%v", v), nil
-	}
-}
-
-// interpolateTemplateID expands a "{wireName}/{wireName2}" template by
-// looking each parameter up in the input map (after applying renames to
-// resolve wire→pulumi names).
-func interpolateTemplateID(tmpl string, inputs property.Map, renames map[string]string) (string, error) {
-	matches := pathParamRE.FindAllStringSubmatchIndex(tmpl, -1)
-	var b strings.Builder
-	last := 0
-	for _, m := range matches {
-		b.WriteString(tmpl[last:m[0]])
-		wireName := tmpl[m[2]:m[3]]
-		pulName := pulumiName(wireName, renames, true)
-		v, ok := inputs.GetOk(pulName)
-		if !ok {
-			return "", fmt.Errorf("idField template parameter %q (Pulumi name %q) missing from inputs", wireName, pulName)
-		}
-		b.WriteString(propertyValueToString(v))
-		last = m[1]
-	}
-	b.WriteString(tmpl[last:])
-	return b.String(), nil
-}
-
-func idFieldOrDefault(p string) string {
-	if p == "" {
-		return "/id"
-	}
-	return p
 }
 
 // propertyValueToString stringifies a Value for path/URL substitution.

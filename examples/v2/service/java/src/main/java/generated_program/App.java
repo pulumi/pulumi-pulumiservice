@@ -1,8 +1,8 @@
 package generated_program;
 
 import com.pulumi.Pulumi;
-import com.pulumi.pulumiservice.v2.Service;
-import com.pulumi.pulumiservice.v2.ServiceArgs;
+import com.pulumi.pulumiservice.v2_services.Service;
+import com.pulumi.pulumiservice.v2_services.ServiceArgs;
 
 import java.util.List;
 import java.util.Map;

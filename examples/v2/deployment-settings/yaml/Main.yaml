@@ -2,13 +2,13 @@ resources:
   # DeploymentSettings is a singleton-per-stack — it requires the stack to
   # already exist on the backend.
   parentStack:
-    type: pulumiservice:v2:Stack
+    type: pulumiservice:v2/stacks:Stack
     properties:
       orgName: ${serviceOrg}
       projectName: ${projectName}
       stackName: ${stackName}
   settings:
-    type: pulumiservice:v2:DeploymentSettings
+    type: pulumiservice:v2/deployments:Settings
     properties:
       orgName: ${serviceOrg}
       projectName: ${projectName}

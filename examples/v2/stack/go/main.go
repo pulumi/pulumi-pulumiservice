@@ -1,7 +1,7 @@
 package main
 
 import (
-	v2 "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2"
+	stacks "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2/stacks"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
 )
@@ -26,7 +26,7 @@ func main() {
 			stackPurpose = "demo"
 		}
 
-		exampleStack, err := v2.NewStack(ctx, "exampleStack", &v2.StackArgs{
+		exampleStack, err := stacks.NewStack(ctx, "exampleStack", &stacks.StackArgs{
 			OrgName:     pulumi.String(serviceOrg),
 			ProjectName: pulumi.String(projectName),
 			StackName:   pulumi.String(stackName),

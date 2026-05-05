@@ -1,7 +1,7 @@
 package main
 
 import (
-	v2 "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2"
+	teams "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2/teams"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
 )
@@ -22,7 +22,7 @@ func main() {
 			teamDescription = "A team created by the v2 example."
 		}
 
-		team, err := v2.NewTeam(ctx, "team", &v2.TeamArgs{
+		team, err := teams.NewTeam(ctx, "team", &teams.TeamArgs{
 			OrgName:     pulumi.String(serviceOrg),
 			Name:        pulumi.String("v2-team-" + teamSuffix),
 			DisplayName: pulumi.String("v2 Team " + teamSuffix),

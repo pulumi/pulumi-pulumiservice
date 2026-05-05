@@ -8,13 +8,13 @@ const stackName = config.get("stackName") ?? "dev";
 const executorImage = config.get("executorImage") ?? "pulumi-cli";
 
 // DeploymentSettings is a singleton-per-stack — ensure the stack exists first.
-const parentStack = new ps.v2.Stack("parentStack", {
+const parentStack = new ps.v2.stacks.Stack("parentStack", {
     orgName: serviceOrg,
     projectName: projectName,
     stackName: stackName,
 });
 
-const settings = new ps.v2.DeploymentSettings("settings", {
+const settings = new ps.v2.deployments.Settings("settings", {
     orgName: serviceOrg,
     projectName: projectName,
     stackName: stackName,

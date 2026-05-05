@@ -9,7 +9,7 @@ return await Deployment.RunAsync(() =>
     var projectName = config.Get("projectName") ?? "test-project";
     var envSuffix = config.Get("envSuffix") ?? "dev";
 
-    var environment = new Ps.V2.Environment_esc_environments("environment", new()
+    var environment = new Ps.V2.Esc.Environment("environment", new()
     {
         OrgName = serviceOrg,
         Project = projectName,

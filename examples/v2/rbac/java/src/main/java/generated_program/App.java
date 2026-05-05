@@ -3,8 +3,8 @@ package generated_program;
 import com.pulumi.Pulumi;
 import com.pulumi.pulumiservice.v2.Role;
 import com.pulumi.pulumiservice.v2.RoleArgs;
-import com.pulumi.pulumiservice.v2.Team;
-import com.pulumi.pulumiservice.v2.TeamArgs;
+import com.pulumi.pulumiservice.v2_teams.Team;
+import com.pulumi.pulumiservice.v2_teams.TeamArgs;
 
 import java.util.List;
 import java.util.Map;

@@ -9,7 +9,7 @@ const gitlabIntegrationId = config.get("gitlabIntegrationId") ?? "gl-org-integra
 const bitbucketIntegrationId = config.get("bitbucketIntegrationId") ?? "bb-org-integration";
 const azureDevOpsIntegrationId = config.get("azureDevOpsIntegrationId") ?? "ado-org-integration";
 
-new ps.v2.GitHubIntegration("github", {
+new ps.v2.integrations.GitHubIntegration("github", {
     orgName: serviceOrg,
     integrationId: githubIntegrationId,
     disablePRComments: false,
@@ -18,7 +18,7 @@ new ps.v2.GitHubIntegration("github", {
     disableCodeAccessForReviews: false,
 });
 
-new ps.v2.GitHubEnterpriseIntegration("githubEnterprise", {
+new ps.v2.integrations.GitHubEnterpriseIntegration("githubEnterprise", {
     orgName: serviceOrg,
     integrationId: githubEnterpriseIntegrationId,
     disablePRComments: true,
@@ -27,7 +27,7 @@ new ps.v2.GitHubEnterpriseIntegration("githubEnterprise", {
     disableCodeAccessForReviews: true,
 });
 
-new ps.v2.GitLabIntegration("gitlab", {
+new ps.v2.integrations.GitLabIntegration("gitlab", {
     orgName: serviceOrg,
     integrationId: gitlabIntegrationId,
     disablePRComments: false,
@@ -35,7 +35,7 @@ new ps.v2.GitLabIntegration("gitlab", {
     disableNeoSummaries: true,
 });
 
-new ps.v2.BitBucketIntegration("bitbucket", {
+new ps.v2.integrations.BitBucketIntegration("bitbucket", {
     orgName: serviceOrg,
     integrationId: bitbucketIntegrationId,
     disablePRComments: false,
@@ -43,7 +43,7 @@ new ps.v2.BitBucketIntegration("bitbucket", {
     disableNeoSummaries: false,
 });
 
-new ps.v2.AzureDevOpsIntegration("azureDevOps", {
+new ps.v2.integrations.AzureDevOpsIntegration("azureDevOps", {
     orgName: serviceOrg,
     integrationId: azureDevOpsIntegrationId,
     disablePRComments: true,

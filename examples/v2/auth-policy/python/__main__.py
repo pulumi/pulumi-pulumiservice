@@ -5,7 +5,7 @@ config = pulumi.Config()
 service_org = config.get("serviceOrg") or "service-provider-test-org"
 policy_id = config.get("policyId") or "org"
 
-ps_v2.AuthPolicy(
+ps_v2.auth.Policy(
     "policy",
     org_name=service_org,
     policy_id=policy_id,

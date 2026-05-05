@@ -1,8 +1,8 @@
 package generated_program;
 
 import com.pulumi.Pulumi;
-import com.pulumi.pulumiservice.v2.SAMLOrganization;
-import com.pulumi.pulumiservice.v2.SAMLOrganizationArgs;
+import com.pulumi.pulumiservice.v2_auth.SAML;
+import com.pulumi.pulumiservice.v2_auth.SAMLArgs;
 
 public class App {
     public static void main(String[] args) {
@@ -16,8 +16,8 @@ public class App {
                 "  <md:IDPSSODescriptor protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\"/>\n" +
                 "</md:EntityDescriptor>";
 
-            new SAMLOrganization("saml",
-                SAMLOrganizationArgs.builder()
+            new SAML("saml",
+                SAMLArgs.builder()
                     .orgName(serviceOrg)
                     .newIdpSsoDescriptor(idpDescriptor)
                     .build());

@@ -1,0 +1,123 @@
+resources:
+  # Owner team for the catalog entries below. Created fresh so the demo
+  # is self-contained and works against any org.
+  ownerTeam:
+    type: pulumiservice:v2/teams:Team
+    properties:
+      orgName: ${serviceOrg}
+      name: catalog-owner-${nameSuffix}
+      displayName: Catalog Demo Owner
+      description: Owner team for the service catalog demo.
+
+  # Placeholder stacks the catalog entries point at. Created empty;
+  # the catalog stores them as references, not as deployed state.
+  checkoutStack:
+    type: pulumiservice:Stack
+    properties:
+      organizationName: ${serviceOrg}
+      projectName: catalog-demo-${nameSuffix}
+      stackName: checkout-prod
+      forceDestroy: true
+  searchStack:
+    type: pulumiservice:Stack
+    properties:
+      organizationName: ${serviceOrg}
+      projectName: catalog-demo-${nameSuffix}
+      stackName: search-prod
+      forceDestroy: true
+  notificationStack:
+    type: pulumiservice:Stack
+    properties:
+      organizationName: ${serviceOrg}
+      projectName: catalog-demo-${nameSuffix}
+      stackName: notification-prod
+      forceDestroy: true
+
+  checkoutService:
+    type: pulumiservice:v2/services:Service
+    properties:
+      orgName: ${serviceOrg}
+      name: checkout-api-${nameSuffix}
+      description: Customer-facing checkout REST API. Handles cart submission, payment authorization, and order placement. SLO 99.95% / p99 250ms.
+      ownerType: team
+      ownerName: ${ownerTeam.name}
+      items:
+        - name: ${serviceOrg}/${checkoutStack.projectName}/${checkoutStack.stackName}
+          type: stack
+      properties:
+        - key: tier
+          value: tier-1
+          type: string
+          order: 0
+        - key: oncall
+          value: payments-pager
+          type: string
+          order: 1
+        - key: slack
+          value: '#payments-oncall'
+          type: string
+          order: 2
+        - key: runbook
+          value: https://runbooks.example.com/checkout-api
+          type: string
+          order: 3
+
+  searchService:
+    type: pulumiservice:v2/services:Service
+    properties:
+      orgName: ${serviceOrg}
+      name: search-frontend-${nameSuffix}
+      description: Search results UI surface. Owns the search experience across web and mobile clients.
+      ownerType: team
+      ownerName: ${ownerTeam.name}
+      items:
+        - name: ${serviceOrg}/${searchStack.projectName}/${searchStack.stackName}
+          type: stack
+      properties:
+        - key: tier
+          value: tier-2
+          type: string
+          order: 0
+        - key: oncall
+          value: discovery-pager
+          type: string
+          order: 1
+        - key: slack
+          value: '#discovery-eng'
+          type: string
+          order: 2
+        - key: runbook
+          value: https://runbooks.example.com/search
+          type: string
+          order: 3
+
+  notificationService:
+    type: pulumiservice:v2/services:Service
+    properties:
+      orgName: ${serviceOrg}
+      name: notification-worker-${nameSuffix}
+      description: Async fan-out worker for email, SMS, and push notifications. Consumes events from the platform event bus.
+      ownerType: team
+      ownerName: ${ownerTeam.name}
+      items:
+        - name: ${serviceOrg}/${notificationStack.projectName}/${notificationStack.stackName}
+          type: stack
+      properties:
+        - key: tier
+          value: tier-2
+          type: string
+          order: 0
+        - key: oncall
+          value: platform-pager
+          type: string
+          order: 1
+        - key: slack
+          value: '#platform-oncall'
+          type: string
+          order: 2
+
+outputs:
+  ownerTeamName: ${ownerTeam.name}
+  checkoutServiceName: ${checkoutService.name}
+  searchServiceName: ${searchService.name}
+  notificationServiceName: ${notificationService.name}

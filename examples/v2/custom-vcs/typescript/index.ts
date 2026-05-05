@@ -7,7 +7,7 @@ const vcsSuffix = config.get("vcsSuffix") ?? "dev";
 const baseUrl = config.get("baseUrl") ?? "https://git.example.invalid";
 const envRef = config.get("envRef") ?? "organization/vcs-credentials";
 
-const integration = new ps.v2.CustomVCSIntegration("integration", {
+const integration = new ps.v2.integrations.CustomVCSIntegration("integration", {
     orgName: serviceOrg,
     name: `v2-custom-vcs-${vcsSuffix}`,
     baseUrl: baseUrl,
@@ -15,7 +15,7 @@ const integration = new ps.v2.CustomVCSIntegration("integration", {
     environment: envRef,
 });
 
-const repository = new ps.v2.CustomVCSRepository("repository", {
+const repository = new ps.v2.integrations.CustomVCSRepository("repository", {
     orgName: serviceOrg,
     integrationId: integration.integrationId,
     name: `example-repo-${vcsSuffix}`,

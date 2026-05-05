@@ -7,14 +7,14 @@ project_name = config.get("projectName") or "v2-stack-tags-example"
 stack_name = config.get("stackName") or "dev"
 tag_value = config.get("tagValue") or "v2-tag-value"
 
-parent_stack = ps_v2.Stack(
+parent_stack = ps_v2.stacks.Stack(
     "parentStack",
     org_name=service_org,
     project_name=project_name,
     stack_name=stack_name,
 )
 
-ps_v2.StackTag(
+ps_v2.stacks.Tag(
     "ownerTag",
     org_name=service_org,
     project_name=parent_stack.project_name,
@@ -23,7 +23,7 @@ ps_v2.StackTag(
     value="pulumicloud-v2-example",
 )
 
-ps_v2.StackTag(
+ps_v2.stacks.Tag(
     "customTag",
     org_name=service_org,
     project_name=parent_stack.project_name,

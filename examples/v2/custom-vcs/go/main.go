@@ -1,7 +1,7 @@
 package main
 
 import (
-	v2 "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2"
+	integrations "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2/integrations"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
 )
@@ -26,7 +26,7 @@ func main() {
 			envRef = "organization/vcs-credentials"
 		}
 
-		integration, err := v2.NewCustomVCSIntegration(ctx, "integration", &v2.CustomVCSIntegrationArgs{
+		integration, err := integrations.NewCustomVCSIntegration(ctx, "integration", &integrations.CustomVCSIntegrationArgs{
 			OrgName:     pulumi.String(serviceOrg),
 			Name:        pulumi.String("v2-custom-vcs-" + vcsSuffix),
 			BaseUrl:     pulumi.String(baseUrl),
@@ -37,7 +37,7 @@ func main() {
 			return err
 		}
 
-		repository, err := v2.NewCustomVCSRepository(ctx, "repository", &v2.CustomVCSRepositoryArgs{
+		repository, err := integrations.NewCustomVCSRepository(ctx, "repository", &integrations.CustomVCSRepositoryArgs{
 			OrgName:       pulumi.String(serviceOrg),
 			IntegrationId: integration.IntegrationId,
 			Name:          pulumi.String("example-repo-" + vcsSuffix),

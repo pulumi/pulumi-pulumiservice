@@ -9,7 +9,7 @@ return await Deployment.RunAsync(() =>
     var teamSuffix = config.Get("teamSuffix") ?? "dev";
     var teamDescription = config.Get("teamDescription") ?? "A team created by the v2 example.";
 
-    var team = new Ps.V2.Team("team", new()
+    var team = new Ps.V2.Teams.Team("team", new()
     {
         OrgName = serviceOrg,
         Name = $"v2-team-{teamSuffix}",

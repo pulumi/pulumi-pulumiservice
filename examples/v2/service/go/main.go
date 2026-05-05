@@ -1,7 +1,7 @@
 package main
 
 import (
-	v2 "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2"
+	services "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2/services"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
 )
@@ -18,7 +18,7 @@ func main() {
 			serviceSuffix = "dev"
 		}
 
-		_, err := v2.NewService(ctx, "catalogService", &v2.ServiceArgs{
+		_, err := services.NewService(ctx, "catalogService", &services.ServiceArgs{
 			OrgName:     pulumi.String(serviceOrg),
 			Name:        pulumi.String("v2-service-" + serviceSuffix),
 			Description: pulumi.String("An example v2 service catalog entry."),

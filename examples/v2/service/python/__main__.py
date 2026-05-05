@@ -5,7 +5,7 @@ config = pulumi.Config()
 service_org = config.get("serviceOrg") or "service-provider-test-org"
 service_suffix = config.get("serviceSuffix") or "dev"
 
-ps_v2.Service(
+ps_v2.services.Service(
     "catalogService",
     org_name=service_org,
     name=f"v2-service-{service_suffix}",

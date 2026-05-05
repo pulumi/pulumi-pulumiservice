@@ -1,10 +1,10 @@
 package generated_program;
 
 import com.pulumi.Pulumi;
-import com.pulumi.pulumiservice.v2.Stack;
-import com.pulumi.pulumiservice.v2.StackArgs;
-import com.pulumi.pulumiservice.v2.DeploymentSettings;
-import com.pulumi.pulumiservice.v2.DeploymentSettingsArgs;
+import com.pulumi.pulumiservice.v2_stacks.Stack;
+import com.pulumi.pulumiservice.v2_stacks.StackArgs;
+import com.pulumi.pulumiservice.v2_deployments.Settings;
+import com.pulumi.pulumiservice.v2_deployments.SettingsArgs;
 import com.pulumi.resources.CustomResourceOptions;
 
 import java.util.List;
@@ -26,8 +26,8 @@ public class App {
                     .stackName(stackName)
                     .build());
 
-            var settings = new DeploymentSettings("settings",
-                DeploymentSettingsArgs.builder()
+            var settings = new Settings("settings",
+                SettingsArgs.builder()
                     .orgName(serviceOrg)
                     .projectName(projectName)
                     .stackName(stackName)

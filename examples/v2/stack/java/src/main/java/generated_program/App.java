@@ -1,8 +1,8 @@
 package generated_program;
 
 import com.pulumi.Pulumi;
-import com.pulumi.pulumiservice.v2.Stack;
-import com.pulumi.pulumiservice.v2.StackArgs;
+import com.pulumi.pulumiservice.v2_stacks.Stack;
+import com.pulumi.pulumiservice.v2_stacks.StackArgs;
 
 import java.util.Map;
 

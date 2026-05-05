@@ -11,14 +11,14 @@ return await Deployment.RunAsync(() =>
     var stackName = config.Get("stackName") ?? "dev";
     var executorImage = config.Get("executorImage") ?? "pulumi-cli";
 
-    var parentStack = new Ps.V2.Stack("parentStack", new()
+    var parentStack = new Ps.V2.Stacks.Stack("parentStack", new()
     {
         OrgName = serviceOrg,
         ProjectName = projectName,
         StackName = stackName,
     });
 
-    var settings = new Ps.V2.DeploymentSettings("settings", new()
+    var settings = new Ps.V2.Deployments.Settings("settings", new()
     {
         OrgName = serviceOrg,
         ProjectName = projectName,

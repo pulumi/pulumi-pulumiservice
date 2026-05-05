@@ -16,14 +16,14 @@
 // embedded OpenAPI spec and merges them into metadata.json in place.
 //
 // metadata.json is the single source of truth at runtime. It is BOTH
-// auto-generated (operations) AND hand-curated (idField, renames,
-// fields, outputs, examples, etc.) — `go generate` re-runs this tool
-// to refresh operations from the spec while preserving every other
-// field on each entry.
+// auto-generated (operations, idField, renames, outputsExclude, token)
+// AND hand-curated (examples, descriptions, aliases, _excluded). The
+// scaffolder rewrites the auto-generated fields on every regen and
+// preserves the hand-curated ones via json.RawMessage round-tripping.
 //
 // To exclude a derived token, add it to the top-level `_excluded`
-// array in metadata.json. The scaffolder will skip those tokens on
-// every regen so they never resurface.
+// array in metadata.json. The scaffolder also drops anything tagged
+// with `x-pulumi-route-property.Visibility = "Deprecated"`.
 package main
 
 import (
@@ -40,56 +40,53 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/rest"
 )
 
-// verb prefixes mapped to CRUD slots. Order matters: longest first so
-// "BatchCreate" wins over "Create".
+// verbPrefixes are operationId prefixes the scaffolder recognizes when
+// extracting nouns. The slot column is a fallback used only when the
+// HTTP method doesn't disambiguate (e.g., POST on an instance path that
+// is logically an update). Order matters: longest first so "BatchCreate"
+// wins over "Create".
 var verbPrefixes = []struct {
 	prefix string
 	slot   string
 }{
-	{"BatchCreate", "create"},
-	{"BatchUpdate", "update"},
-	{"BatchDelete", "delete"},
-	{"Create", "create"},
-	{"Register", "create"}, // RegisterOidcIssuer, RegisterX patterns
-	{"Add", "create"},      // AddOrganizationMember, AddStackTag patterns
-	{"New", "create"},      // NewPolicyGroup pattern
-	{"Update", "update"},
-	{"Delete", "delete"},
-	{"Remove", "delete"}, // RemoveX as delete-shaped verb
-	{"Patch", "update"},
-	{"Replace", "update"},
-	{"Put", "update"},
-	{"Get", "read"},
-	{"Read", "read"},
-	{"Describe", "read"},
+	{"BatchCreate", "create"}, {"BatchUpdate", "update"}, {"BatchDelete", "delete"},
+	{"Create", "create"}, {"Register", "create"}, {"Add", "create"}, {"New", "create"},
+	{"Update", "update"}, {"Patch", "update"}, {"Replace", "update"}, {"Put", "update"},
+	{"Delete", "delete"}, {"Remove", "delete"},
+	{"Get", "read"}, {"Read", "read"}, {"Describe", "read"},
+	// Non-CRUD verbs: recognized so noun extraction works on action ops.
+	{"List", ""}, {"Search", ""}, {"Find", ""}, {"Cancel", ""}, {"Approve", ""},
+	{"Reject", ""}, {"Reset", ""}, {"Refresh", ""}, {"Restore", ""}, {"Validate", ""},
+	{"Trigger", ""}, {"Poll", ""}, {"Open", ""}, {"Close", ""}, {"Encrypt", ""},
+	{"Decrypt", ""}, {"Apply", ""}, {"Complete", ""}, {"Append", ""}, {"Bulk", ""},
+	{"Accept", ""},
 }
 
-// nonCRUDVerbs are recognized so noun extraction works on them, but they
-// don't map to a CRUD slot.
-var nonCRUDVerbs = []string{
-	"List", "Search", "Find", "Cancel", "Approve",
-	"Reject", "Reset", "Refresh", "Restore", "Validate", "Trigger",
-	"Poll", "Open", "Close", "Encrypt", "Decrypt", "Apply", "Complete",
-	"Append", "Bulk", "Accept",
-}
-
-// scopePrefixes are noun prefixes that hint at the path context rather
-// than the resource itself. When operations split into "Org{X}" + "{X}"
-// nouns, we fold them together — the Pulumi resource is keyed off the
-// bare noun. Order matters: longest first so "Organization" wins over
-// "Org".
+// scopePrefixes fold qualified nouns onto their bare form (OrgAgentPool →
+// AgentPool, PulumiTeam → Team) when the unqualified resource also exists.
+// Order matters: longest first so "Organization" wins over "Org".
 var scopePrefixes = []string{
-	"Organization", "Org",
-	"Pulumi",
-	"Team",
-	"Project",
-	"Stack",
-	"User",
+	"Organization", "Org", "Pulumi", "Team", "Project", "Stack", "User",
 }
 
-// metadataDoc mirrors the on-disk shape of metadata.json. Operations
-// are serialized via json.RawMessage so the scaffolder doesn't drop
-// future fields it doesn't recognize.
+// moduleAliases maps URL-derived module paths to the user-facing Pulumi
+// module name. Lives here rather than in metadata.json since it's a
+// scaffolder-internal mapping driven by service URL conventions.
+var moduleAliases = map[string]string{
+	"agent-pools":          "agents",
+	"auth/policies":        "auth",
+	"esc/environments":     "esc",
+	"oidc/issuers":         "auth",
+	"preview/agents":       "agents",
+	"preview/environments": "preview",
+	"preview/insights":     "insights",
+	"saml":                 "auth",
+	"stacks/deployments":   "deployments",
+	"teams/tokens":         "tokens",
+}
+
+// metadataDoc mirrors metadata.json. Resources serialize via RawMessage so
+// the scaffolder doesn't drop fields it doesn't recognize.
 type metadataDoc struct {
 	Version   int                        `json:"version"`
 	Package   string                     `json:"package,omitempty"`
@@ -98,9 +95,6 @@ type metadataDoc struct {
 	Resources map[string]json.RawMessage `json:"resources"`
 }
 
-// derivedOps is the only field the scaffolder writes into a per-
-// resource entry. Everything else on an entry is preserved as-is via
-// json.RawMessage round-tripping.
 type derivedOps struct {
 	Create string `json:"create,omitempty"`
 	Read   string `json:"read,omitempty"`
@@ -129,23 +123,25 @@ func main() {
 	}
 
 	doc := loadMetadata(*out)
-
-	candidates, totalOps, skipped, unmapped := derive(rawSpec.Paths)
+	candidates, stats := derive(rawSpec.Paths)
 
 	excluded := map[string]bool{}
 	for _, tok := range doc.Excluded {
 		excluded[tok] = true
 	}
 
+	modules := deriveModules(candidates, parsedSpec)
+
 	added, updated := 0, 0
-	for tok, derivedOpsForTok := range candidates {
+	for tok, ops := range candidates {
 		if excluded[tok] {
 			continue
 		}
 		entry, exists := doc.Resources[tok]
-		idField, renames := inferOverrides(parsedSpec, derivedOpsForTok)
-		outputsExclude := inferOutputsExclude(parsedSpec, tok, derivedOpsForTok)
-		merged, changed, err := mergeOperations(entry, derivedOpsForTok, idField, renames, outputsExclude)
+		renames := inferRenames(parsedSpec, opOrNil(parsedSpec, ops.Create), opOrNil(parsedSpec, ops.Read), opOrNil(parsedSpec, ops.Update), opOrNil(parsedSpec, ops.Delete))
+		outputsExclude := inferOutputsExclude(parsedSpec, tok, ops)
+		token := deriveToken(doc.Package, tok, modules[tok])
+		merged, changed, err := mergeOperations(entry, ops, renames, outputsExclude, token)
 		if err != nil {
 			fail("merge %s: %v", tok, err)
 		}
@@ -157,9 +153,7 @@ func main() {
 		doc.Resources[tok] = merged
 	}
 
-	// Surface tokens that exist in metadata.json but the scaffolder no
-	// longer derives — they may be stale (spec dropped the op) or hand-
-	// added in error.
+	// Orphans: tokens in metadata.json that the scaffolder no longer derives.
 	var orphans []string
 	for tok := range doc.Resources {
 		if _, ok := candidates[tok]; !ok && !excluded[tok] {
@@ -173,20 +167,18 @@ func main() {
 	}
 
 	fmt.Fprintf(os.Stderr, "scaffold-metadata: %s\n", *out)
-	fmt.Fprintf(os.Stderr, "  operations in spec:        %d\n", totalOps)
+	fmt.Fprintf(os.Stderr, "  operations in spec:        %d\n", stats.totalOps)
 	fmt.Fprintf(os.Stderr, "  candidates derived:        %d\n", len(candidates))
 	fmt.Fprintf(os.Stderr, "  added new entries:         %d\n", added)
 	fmt.Fprintf(os.Stderr, "  updated existing entries:  %d\n", updated)
-	fmt.Fprintf(os.Stderr, "  excluded:                  %d\n", len(excluded))
-	fmt.Fprintf(os.Stderr, "  skipped (no Create+Read|Delete): %d\n", len(skipped))
+	fmt.Fprintf(os.Stderr, "  excluded (_excluded):      %d\n", len(excluded))
+	fmt.Fprintf(os.Stderr, "  excluded (Deprecated):     %d\n", len(stats.deprecated))
+	fmt.Fprintf(os.Stderr, "  skipped (no Create+Read|Delete): %d\n", len(stats.skipped))
 	if len(orphans) > 0 {
 		fmt.Fprintf(os.Stderr, "  orphans (in metadata.json, not derived from spec): %d\n", len(orphans))
 		for _, o := range orphans {
 			fmt.Fprintf(os.Stderr, "    %s\n", o)
 		}
-	}
-	if len(unmapped) > 0 {
-		fmt.Fprintf(os.Stderr, "  noun groups with non-CRUD verbs only: %d\n", len(unmapped))
 	}
 }
 
@@ -217,17 +209,12 @@ func loadMetadata(path string) *metadataDoc {
 	return doc
 }
 
-// mergeOperations layers derived operations on top of an existing
-// per-resource entry. The entry is decoded into a generic map, the
-// `operations` key is replaced wholesale with the derived block, and
-// the entry is re-encoded in deterministic key order.
-//
-// Inferred idField/renames fill in defaults the spec implies but a human
-// can override: an entry that already declares `idField` keeps its
-// value, and the existing `renames` map wins on per-key collision (so
-// curators can add or correct the inference without it being clobbered
-// on the next regen).
-func mergeOperations(existing json.RawMessage, ops derivedOps, inferredIDField string, inferredRenames map[string]string, inferredOutputsExclude []string) (json.RawMessage, bool, error) {
+// mergeOperations layers derived fields onto an existing per-resource entry.
+// The `operations` block is replaced wholesale. renames, token, and
+// outputsExclude fill in defaults if absent — humans can override by setting
+// them and the override survives regen. (Resource ID is synthesized at
+// runtime from path-param values; no idField is written.)
+func mergeOperations(existing json.RawMessage, ops derivedOps, renames map[string]string, outputsExclude []string, token string) (json.RawMessage, bool, error) {
 	var entry map[string]any
 	if len(existing) > 0 {
 		if err := json.Unmarshal(existing, &entry); err != nil {
@@ -256,35 +243,28 @@ func mergeOperations(existing json.RawMessage, ops derivedOps, inferredIDField s
 	changed := !sameOps(prev, newOps)
 	entry["operations"] = newOps
 
-	// idField: keep human override, otherwise drop in the inference.
-	if inferredIDField != "" {
-		if _, has := entry["idField"]; !has {
-			entry["idField"] = inferredIDField
-		}
-	}
-
-	// renames: union of inferred + existing; existing keys win.
-	if len(inferredRenames) > 0 {
+	if len(renames) > 0 {
 		merged := map[string]any{}
-		for k, v := range inferredRenames {
+		for k, v := range renames {
 			merged[k] = v
 		}
-		if existingRenames, ok := entry["renames"].(map[string]any); ok {
-			for k, v := range existingRenames {
-				merged[k] = v
-			}
+		if existing, ok := entry["renames"].(map[string]any); ok {
+			maps.Copy(merged, existing)
 		}
 		entry["renames"] = merged
 	}
-
-	// outputsExclude: keep human override; drop in inference otherwise.
-	if len(inferredOutputsExclude) > 0 {
+	if len(outputsExclude) > 0 {
 		if _, has := entry["outputsExclude"]; !has {
-			arr := make([]any, len(inferredOutputsExclude))
-			for i, v := range inferredOutputsExclude {
+			arr := make([]any, len(outputsExclude))
+			for i, v := range outputsExclude {
 				arr[i] = v
 			}
 			entry["outputsExclude"] = arr
+		}
+	}
+	if token != "" {
+		if _, has := entry["token"]; !has {
+			entry["token"] = token
 		}
 	}
 
@@ -295,42 +275,6 @@ func mergeOperations(existing json.RawMessage, ops derivedOps, inferredIDField s
 	return encoded, changed, nil
 }
 
-// inferOverrides walks the create + read operations and returns the
-// idField and rename map the spec implies. Returns "" / nil when nothing
-// can be inferred. The caller decides whether to apply them.
-//
-// Inference rules:
-//
-//  1. Composite idField when Create has no usable id in its response —
-//     we synthesize "{p1}/{p2}/...{pN}" from the read (or update/delete)
-//     path's parameters. Resources whose Create returns 204 No Content
-//     (StackTag, OrganizationMember) need this, since extractID can't
-//     pull "/id" from an empty body.
-//
-//  2. Server-id renames: a path parameter that appears in read/update/
-//     delete but NOT in create is a server-generated identifier.
-//     If Create's response body has a top-level `id` field, the
-//     parameter on the wire is `id` while the path uses a more specific
-//     name (issuerId, poolId, scheduleID, templateID, tokenId, etc.).
-//     We emit `<wireParam> -> id` so response decoding renames the
-//     server's `id` field to the parameter name in state.
-//
-//  3. Body-vs-path renames: same trigger as (2), but when the response
-//     body has no `id` field, we look at Create's request body for a
-//     plausible matching field. For "{noun}Name" style params (tagName,
-//     hookName), if the request body has `name`, we emit `<wireParam>
-//     -> name`.
-func inferOverrides(spec *rest.Spec, ops derivedOps) (idField string, renames map[string]string) {
-	createOp := opOrNil(spec, ops.Create)
-	readOp := opOrNil(spec, ops.Read)
-	updateOp := opOrNil(spec, ops.Update)
-	deleteOp := opOrNil(spec, ops.Delete)
-
-	idField = inferIDField(spec, createOp, readOp, updateOp, deleteOp)
-	renames = inferRenames(spec, createOp, readOp, updateOp, deleteOp)
-	return idField, renames
-}
-
 func opOrNil(spec *rest.Spec, id string) *rest.Operation {
 	if id == "" {
 		return nil
@@ -339,8 +283,6 @@ func opOrNil(spec *rest.Spec, id string) *rest.Operation {
 	return op
 }
 
-// pathParamsOf returns the path parameter names of an op in order. Empty
-// when op is nil.
 func pathParamsOf(op *rest.Operation) []string {
 	if op == nil {
 		return nil
@@ -356,8 +298,6 @@ func pathParamsOf(op *rest.Operation) []string {
 
 // flattenedProps walks a $ref into an object schema and returns its
 // top-level properties, recursively flattening allOf composition.
-// Mirrors rest/schema.go's flattenObjectSchema but lighter: we only
-// need property names here, not the full schema entries.
 func flattenedProps(spec *rest.Spec, ref string) map[string]any {
 	if ref == "" {
 		return nil
@@ -384,9 +324,7 @@ func flattenedProps(spec *rest.Spec, ref string) map[string]any {
 			}
 		}
 		if props, ok := node["properties"].(map[string]any); ok {
-			for k, v := range props {
-				out[k] = v
-			}
+			maps.Copy(out, props)
 		}
 	}
 	if root, ok := spec.ResolveSchema(ref); ok {
@@ -395,8 +333,6 @@ func flattenedProps(spec *rest.Spec, ref string) map[string]any {
 	return out
 }
 
-// responseHasField reports whether the create response body schema
-// (after flattening allOf) has a top-level field with the given name.
 func responseHasField(spec *rest.Spec, op *rest.Operation, field string) bool {
 	if op == nil {
 		return false
@@ -405,8 +341,6 @@ func responseHasField(spec *rest.Spec, op *rest.Operation, field string) bool {
 	return has
 }
 
-// requestHasField reports whether the create request body schema
-// (after flattening allOf) has a top-level field with the given name.
 func requestHasField(spec *rest.Spec, op *rest.Operation, field string) bool {
 	if op == nil {
 		return false
@@ -415,12 +349,10 @@ func requestHasField(spec *rest.Spec, op *rest.Operation, field string) bool {
 	return has
 }
 
-// inferOutputsExclude flags response-body fields that collide with the
-// resource's own type name (a "service" field on the Service resource,
-// "policyIssue" on PolicyIssue). Pulumi's per-language SDK codegen
-// rejects these as member-vs-class collisions; the dispatcher doesn't
-// need them either, since they're typically envelope wrappers around
-// the same data already present at the top level.
+// inferOutputsExclude flags response-body envelope fields that collide with
+// the resource's own type name (a "service" field on the Service resource).
+// Pulumi's per-language SDK codegen rejects these as member-vs-class
+// collisions.
 func inferOutputsExclude(spec *rest.Spec, token string, ops derivedOps) []string {
 	noun := token
 	if i := strings.LastIndex(noun, ":"); i >= 0 {
@@ -450,9 +382,8 @@ func inferOutputsExclude(spec *rest.Spec, token string, ops derivedOps) []string
 	return nil
 }
 
-// splitTrailingSuffix breaks a CamelCased path param like "tagName"
-// into ("tag", "name", true). Returns ok=false when there's no
-// recognized trailing suffix.
+// splitTrailingSuffix breaks a CamelCased path param like "tagName" into
+// ("tag", "name", true). Returns ok=false when no recognized suffix.
 func splitTrailingSuffix(name string) (prefix, bareSuffix string, ok bool) {
 	for _, s := range []string{"Name", "ID", "Id"} {
 		if strings.HasSuffix(name, s) && len(name) > len(s) {
@@ -462,48 +393,17 @@ func splitTrailingSuffix(name string) (prefix, bareSuffix string, ok bool) {
 	return "", "", false
 }
 
-func inferIDField(spec *rest.Spec, createOp, readOp, updateOp, deleteOp *rest.Operation) string {
-	// If create's response carries `id`, the default extractID lookup
-	// at "/id" works — no override needed.
-	if responseHasField(spec, createOp, "id") {
-		return ""
-	}
-	// Otherwise fall back to a composite from the next-best path.
-	for _, op := range []*rest.Operation{readOp, updateOp, deleteOp} {
-		if op == nil {
-			continue
-		}
-		params := pathParamsOf(op)
-		if len(params) == 0 {
-			continue
-		}
-		var b strings.Builder
-		for i, p := range params {
-			if i > 0 {
-				b.WriteByte('/')
-			}
-			b.WriteString("{" + p + "}")
-		}
-		return b.String()
-	}
-	return ""
-}
-
-// inferRenames picks renames for path parameters that aren't already
-// present in the create op's path. Two patterns:
+// inferRenames picks renames for path parameters that aren't already on the
+// create op's path. Three patterns:
 //
-//  1. Server-generated id: the create response carries `id` and the
-//     path uses a noun-prefixed form (issuerId, poolId, scheduleID,
-//     templateID, tokenId, gateID). The Pulumi-side name keeps the
-//     descriptive path form; the rename teaches the dispatcher that
-//     the wire `id` is that field. Output: {path-param → "id"}.
+//  1. Server-id (path uses noun-prefixed form, body returns "id"): emit
+//     {path-param → "id"}.
+//  2. Body field mirrors path under suffix-strip ({tagName} ↔ body `name`):
+//     emit {body-field → path-param}.
+//  3. Bare path param matched by body `name` (catch-all when (1)/(2) miss).
 //
-//  2. Body field mirrors the path: the create body has a field whose
-//     name matches the path-param's stripped form (`projectName` →
-//     body `project`, `tagName` → body `name`, `hookName` → body
-//     `name`). The user types the body-side spelling; the rename
-//     teaches the dispatcher that the wire path-param is that field.
-//     Output: {body-field → path-param}.
+// Plus: rule (4) for verbose body aliases (`organizationName` body ↔
+// `orgName` path), detected by suffix match + stem prefix relationship.
 func inferRenames(spec *rest.Spec, createOp, readOp, updateOp, deleteOp *rest.Operation) map[string]string {
 	createParams := map[string]bool{}
 	for _, p := range pathParamsOf(createOp) {
@@ -513,18 +413,14 @@ func inferRenames(spec *rest.Spec, createOp, readOp, updateOp, deleteOp *rest.Op
 	out := map[string]string{}
 	seen := map[string]bool{}
 
-	// Pass 1: precise matches (rules 1 + 2). These claim body keys
-	// before the catch-all rule (3) gets a chance. Without two passes,
-	// Service's `ownerType` (no recognized suffix) would steal `name`
-	// before `serviceName` (suffix match) was visited.
+	// Pass 1: precise matches (rules 1, 2). These claim body keys before the
+	// catch-all rule (3) gets a chance.
 	for _, op := range []*rest.Operation{readOp, updateOp, deleteOp} {
 		for _, p := range pathParamsOf(op) {
 			if createParams[p] || seen[p] {
 				continue
 			}
-			// Path param that's also a body field is a duplicate
-			// (Service's `ownerName` and `ownerType` appear in both).
-			// They're not aliases — skip rename inference for them.
+			// Path param that's also a body field is a duplicate, not an alias.
 			if requestHasField(spec, createOp, p) {
 				seen[p] = true
 				continue
@@ -553,10 +449,7 @@ func inferRenames(spec *rest.Spec, createOp, readOp, updateOp, deleteOp *rest.Op
 		}
 	}
 
-	// Pass 2: rule (3) — bare path param matched by body `name`. Only
-	// fires when the path param isn't itself a body field (in which
-	// case it's a duplicate, not an alias) and `name` hasn't already
-	// been claimed.
+	// Pass 2: rule (3) — bare path param matched by body `name`.
 	for _, op := range []*rest.Operation{readOp, updateOp, deleteOp} {
 		for _, p := range pathParamsOf(op) {
 			if createParams[p] || seen[p] {
@@ -574,10 +467,7 @@ func inferRenames(spec *rest.Spec, createOp, readOp, updateOp, deleteOp *rest.Op
 		}
 	}
 
-	// (4) Body fields that duplicate a path param under a verbose alias
-	// (`organizationName` body ↔ `orgName` path). The user supplies one
-	// value; the dispatcher fans it out to both wire fields. Detect by
-	// matching trailing suffix and a stem prefix relationship.
+	// Rule (4): body field that duplicates a path param under a verbose alias.
 	if createOp != nil {
 		bodyProps := flattenedProps(spec, createOp.RequestRef)
 		for _, p := range pathParamsOf(createOp) {
@@ -619,10 +509,8 @@ func sameOps(prev map[string]any, next map[string]string) bool {
 	return true
 }
 
-// encodeStable marshals a map with deterministic key ordering: a
-// preferred order for known fields, then alphabetical for the rest.
-// json.Marshal already sorts map[string]any keys alphabetically, but
-// this helper makes diffs prefer "operations" near the top.
+// encodeStable marshals a map with deterministic key ordering: a preferred
+// order for known fields, then alphabetical for the rest.
 func encodeStable(entry map[string]any) (json.RawMessage, error) {
 	preferred := []string{"operations", "idField", "aliases", "renames", "fields", "outputs", "outputsExclude", "description", "examples"}
 	var keys []string
@@ -665,8 +553,6 @@ func encodeStable(entry map[string]any) (json.RawMessage, error) {
 }
 
 func writeMetadata(path string, doc *metadataDoc) error {
-	// Marshal the envelope, then re-encode the resources map in sorted
-	// token order so diffs stay clean across regens.
 	var b strings.Builder
 	b.WriteString("{\n")
 	fmt.Fprintf(&b, "  \"version\": %d,\n", doc.Version)
@@ -685,7 +571,6 @@ func writeMetadata(path string, doc *metadataDoc) error {
 		b.Write(ex)
 		b.WriteString(",\n")
 	}
-
 	tokens := slices.Collect(maps.Keys(doc.Resources))
 	sort.Strings(tokens)
 
@@ -715,39 +600,34 @@ func writeMetadata(path string, doc *metadataDoc) error {
 	return os.WriteFile(path, []byte(b.String()), 0o644)
 }
 
-// indentJSON re-renders a raw JSON value with 2-space indentation
-// matching the surrounding metadata.json formatting.
 func indentJSON(raw json.RawMessage, prefix string) ([]byte, error) {
 	var v any
 	if err := json.Unmarshal(raw, &v); err != nil {
 		return nil, err
 	}
-	formatted, err := json.MarshalIndent(v, prefix, "  ")
-	if err != nil {
-		return nil, err
-	}
-	return formatted, nil
+	return json.MarshalIndent(v, prefix, "  ")
 }
 
-// derive walks every operationId and returns the candidates we'd
-// emit, plus diagnostics: total ops seen, skipped noun groups, and
-// noun groups consisting solely of non-CRUD verbs.
-func derive(paths map[string]map[string]any) (
-	candidates map[string]derivedOps,
-	totalOps int,
-	skipped []string,
-	unmapped map[string][]string,
-) {
+type deriveStats struct {
+	totalOps   int
+	skipped    []string
+	deprecated []string
+}
+
+// derive walks every operation and returns the candidate resources we'd
+// emit. Resources are grouped by operationId noun; each candidate's slot
+// (create/read/update/delete) comes from the HTTP method, with the verb
+// prefix as a tiebreaker for ambiguous POSTs.
+func derive(paths map[string]map[string]any) (map[string]derivedOps, deriveStats) {
 	type ops = map[string]string
 	byNoun := map[string]ops{}
 	otherOps := map[string][]string{}
+	stats := deriveStats{}
 
-	pathKeys := slices.Collect(maps.Keys(paths))
-	sort.Strings(pathKeys)
+	pathKeys := slices.Sorted(maps.Keys(paths))
 	for _, pathKey := range pathKeys {
 		item := paths[pathKey]
-		methodKeys := slices.Collect(maps.Keys(item))
-		sort.Strings(methodKeys)
+		methodKeys := slices.Sorted(maps.Keys(item))
 		for _, method := range methodKeys {
 			obj, ok := item[method].(map[string]any)
 			if !ok {
@@ -757,7 +637,12 @@ func derive(paths map[string]map[string]any) (
 			if id == "" {
 				continue
 			}
-			totalOps++
+			stats.totalOps++
+
+			if isDeprecated(obj) {
+				stats.deprecated = append(stats.deprecated, id)
+				continue
+			}
 
 			verb, noun, slot := splitOperationID(id)
 			if slot != "" {
@@ -773,12 +658,70 @@ func derive(paths map[string]map[string]any) (
 		}
 	}
 
+	// Scope-prefix folding: OrgAgentPool → AgentPool when both nouns exist
+	// but the unqualified one lacks a Create op.
+	for _, longer := range mapKeys(byNoun) {
+		for shorter := range byNoun {
+			if shorter == longer || !strings.HasPrefix(longer, shorter+"_") {
+				continue
+			}
+			if _, hasCreate := byNoun[shorter]["create"]; hasCreate {
+				continue
+			}
+			c, ok := byNoun[longer]["create"]
+			if !ok {
+				continue
+			}
+			byNoun[shorter]["create"] = c
+			otherOps[shorter] = append(otherOps[shorter], otherOps[longer]...)
+			delete(byNoun, longer)
+			delete(otherOps, longer)
+			break
+		}
+	}
+
+	// Plural folding: "Tasks" plural feeds non-read slots into "Task" singular.
+	for _, plural := range mapKeys(byNoun) {
+		if !strings.HasSuffix(plural, "s") || len(plural) <= 1 {
+			continue
+		}
+		singular := strings.TrimSuffix(plural, "s")
+		if _, ok := byNoun[singular]; !ok {
+			continue
+		}
+		for slot, opID := range byNoun[plural] {
+			if slot == "read" {
+				continue
+			}
+			if _, set := byNoun[singular][slot]; !set {
+				byNoun[singular][slot] = opID
+			}
+		}
+		hasOnlyReadLeft := true
+		for slot := range byNoun[plural] {
+			if slot != "read" {
+				hasOnlyReadLeft = false
+				break
+			}
+		}
+		otherOps[singular] = append(otherOps[singular], otherOps[plural]...)
+		if hasOnlyReadLeft {
+			otherOps[singular] = append(otherOps[singular], byNoun[plural]["read"])
+		}
+		delete(byNoun, plural)
+		delete(otherOps, plural)
+	}
+
+	// Scope-prefix-strip: OrgX → X when both exist and X has no own Create.
 	for _, scoped := range mapKeys(byNoun) {
 		bare := stripScopePrefix(scoped)
 		if bare == scoped {
 			continue
 		}
 		if _, ok := byNoun[bare]; !ok {
+			continue
+		}
+		if _, hasOwnCreate := byNoun[bare]["create"]; hasOwnCreate {
 			continue
 		}
 		for slot, opID := range byNoun[scoped] {
@@ -791,18 +734,13 @@ func derive(paths map[string]map[string]any) (
 		delete(otherOps, scoped)
 	}
 
-	candidates = map[string]derivedOps{}
+	candidates := map[string]derivedOps{}
 	for noun, o := range byNoun {
-		// Drop update-kind suffixes (`_destroy`, `_preview`, `_update`,
-		// `_refresh`). These are internal RPC variants of stack-update
-		// operations, not resources. Real resources with disambiguating
-		// path suffixes (`_esc_environments`, `_preview_environments`)
-		// stay — they're hand-keyed by the example programs.
 		if isUpdateKindNoun(noun) {
 			continue
 		}
 		final := maps.Clone(o)
-		// Upsert pattern: PUT /resource/{id} acts as create+update.
+		// Upsert: PUT /resource/{id} acts as create+update.
 		if _, hasCreate := final["create"]; !hasCreate {
 			if u, hasUpdate := final["update"]; hasUpdate {
 				final["create"] = u
@@ -811,19 +749,16 @@ func derive(paths map[string]map[string]any) (
 		_, hasCreate := final["create"]
 		_, hasRead := final["read"]
 		_, hasDelete := final["delete"]
-		// Emit only if Create plus at least one of (Read, Delete).
-		// Lone-Create endpoints are RPC-style actions, not resources.
 		if !hasCreate || (!hasRead && !hasDelete) {
 			slots := make([]string, 0, len(o))
 			for k := range o {
 				slots = append(slots, k)
 			}
 			sort.Strings(slots)
-			skipped = append(skipped, fmt.Sprintf("%s [%s]", noun, strings.Join(slots, ",")))
+			stats.skipped = append(stats.skipped, fmt.Sprintf("%s [%s]", noun, strings.Join(slots, ",")))
 			continue
 		}
-		tok := "pulumiservice:v2:" + noun
-		candidates[tok] = derivedOps{
+		candidates["pulumiservice:v2:"+noun] = derivedOps{
 			Create: final["create"],
 			Read:   final["read"],
 			Update: final["update"],
@@ -831,23 +766,125 @@ func derive(paths map[string]map[string]any) (
 		}
 	}
 
-	unmapped = map[string][]string{}
-	for noun, ids := range otherOps {
-		if _, derived := candidates["pulumiservice:v2:"+noun]; derived {
+	return candidates, stats
+}
+
+// isDeprecated returns true when an operation carries the existing
+// x-pulumi-route-property.Visibility extension set to "Deprecated".
+// Preview endpoints still scaffold so the provider can expose them
+// behind their own resources; only deprecated routes are filtered.
+func isDeprecated(op map[string]any) bool {
+	rp, ok := op["x-pulumi-route-property"].(map[string]any)
+	if !ok {
+		return false
+	}
+	v, _ := rp["Visibility"].(string)
+	return v == "Deprecated"
+}
+
+// deriveModules assigns each candidate a (module, originalPrefix) pair when
+// at least two candidates share the same first-or-aliased URL segment. The
+// module ends up in the user-facing token (pulumiservice:v2/<module>:Type).
+func deriveModules(candidates map[string]derivedOps, spec *rest.Spec) map[string]moduleAssignment {
+	type pair struct{ canonical, original string }
+	prefixes := map[string]pair{}
+	for tok, ops := range candidates {
+		op, ok := spec.Op(ops.Create)
+		if !ok {
 			continue
 		}
-		dedup := map[string]struct{}{}
-		for _, x := range ids {
-			dedup[x] = struct{}{}
+		original := routePrefix(op.Path)
+		canonical := original
+		if alias, ok := moduleAliases[canonical]; ok {
+			canonical = alias
+		} else if i := strings.Index(canonical, "/"); i > 0 {
+			canonical = canonical[:i]
 		}
-		uniq := make([]string, 0, len(dedup))
-		for k := range dedup {
-			uniq = append(uniq, k)
-		}
-		sort.Strings(uniq)
-		unmapped[noun] = uniq
+		prefixes[tok] = pair{canonical, original}
 	}
-	return candidates, totalOps, skipped, unmapped
+	counts := map[string]int{}
+	for _, p := range prefixes {
+		counts[p.canonical]++
+	}
+	out := map[string]moduleAssignment{}
+	for tok, p := range prefixes {
+		if counts[p.canonical] >= 2 {
+			out[tok] = moduleAssignment{Module: p.canonical, OriginalPrefix: p.original}
+		}
+	}
+	return out
+}
+
+type moduleAssignment struct {
+	Module         string
+	OriginalPrefix string
+}
+
+func routePrefix(path string) string {
+	var parts []string
+	for _, seg := range strings.Split(strings.Trim(path, "/"), "/") {
+		if seg == "" || strings.HasPrefix(seg, "{") {
+			continue
+		}
+		switch seg {
+		case "api", "orgs", "user", "console":
+			continue
+		}
+		parts = append(parts, seg)
+		if len(parts) == 2 {
+			break
+		}
+	}
+	return strings.Join(parts, "/")
+}
+
+// deriveToken constructs the user-facing Pulumi token. Empty when the
+// candidate is a singleton (no shared module); resource then stays at the
+// metadata-key form. Type name is shortened by dropping a redundant module
+// prefix (AgentPool in module agents → Pool) and a trailing route-mangled
+// suffix (Environment_esc_environments in module esc → Environment).
+func deriveToken(pkg, key string, ma moduleAssignment) string {
+	if ma.Module == "" {
+		return ""
+	}
+	typ := key
+	if i := strings.LastIndex(key, ":"); i >= 0 {
+		typ = key[i+1:]
+	}
+	typ = stripRouteSuffix(typ, ma.OriginalPrefix)
+	typ = stripModulePrefix(typ, ma.Module)
+	return fmt.Sprintf("%s:v2/%s:%s", pkg, ma.Module, typ)
+}
+
+func stripRouteSuffix(typ, originalPrefix string) string {
+	if originalPrefix == "" {
+		return typ
+	}
+	suffix := "_" + strings.ReplaceAll(originalPrefix, "/", "_")
+	if strings.HasSuffix(typ, suffix) && len(typ) > len(suffix) {
+		return typ[:len(typ)-len(suffix)]
+	}
+	return typ
+}
+
+func stripModulePrefix(typ, module string) string {
+	base := module
+	if i := strings.LastIndex(module, "/"); i >= 0 {
+		base = module[i+1:]
+	}
+	for _, c := range []string{base, strings.TrimSuffix(base, "s")} {
+		if c == "" {
+			continue
+		}
+		cap := strings.ToUpper(c[:1]) + c[1:]
+		if !strings.HasPrefix(typ, cap) || len(typ) <= len(cap) {
+			continue
+		}
+		if r := rune(typ[len(cap)]); r >= 'A' && r <= 'Z' {
+			return typ[len(cap):]
+		}
+	}
+	return typ
 }
 
 // splitOperationID returns (verb, noun, slot). slot is "" when the verb
@@ -859,17 +896,12 @@ func splitOperationID(id string) (verb, noun, slot string) {
 			return vp.prefix, id[len(vp.prefix):], vp.slot
 		}
 	}
-	for _, v := range nonCRUDVerbs {
-		if matchPrefix(id, v) {
-			return v, id[len(v):], ""
-		}
-	}
 	return "", id, ""
 }
 
-// matchPrefix checks that prefix is at the start of id AND the next
-// character is uppercase (so "Update" matches "UpdateStack" but not
-// "Updater"). Returns false if prefix consumes the whole string.
+// matchPrefix checks that prefix is at the start of id AND the next char
+// is uppercase (so "Update" matches "UpdateStack" not "Updater"). Returns
+// false if prefix consumes the whole string.
 func matchPrefix(id, prefix string) bool {
 	if !strings.HasPrefix(id, prefix) {
 		return false
@@ -881,7 +913,7 @@ func matchPrefix(id, prefix string) bool {
 }
 
 // isUpdateKindNoun reports whether a noun ends with an internal stack-
-// update kind suffix. These are not user-facing resources.
+// update kind suffix. These are RPC variants, not user-facing resources.
 func isUpdateKindNoun(noun string) bool {
 	for _, suffix := range []string{"_destroy", "_preview", "_update", "_refresh"} {
 		if strings.HasSuffix(noun, suffix) {
@@ -891,10 +923,8 @@ func isUpdateKindNoun(noun string) bool {
 	return false
 }
 
-// stripScopePrefix removes a leading scope qualifier ("Org", "Team",
-// "Project", "Stack", "User", "Organization") from a noun if doing so
-// leaves a non-empty CamelCase remainder. Returns noun unchanged when
-// no prefix matches.
+// stripScopePrefix removes a leading scope qualifier ("Org", "Team", etc.)
+// from a noun if doing so leaves a non-empty CamelCase remainder.
 func stripScopePrefix(noun string) string {
 	for _, p := range scopePrefixes {
 		if matchPrefix(noun, p) {

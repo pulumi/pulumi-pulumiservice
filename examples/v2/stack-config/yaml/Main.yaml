@@ -3,20 +3,20 @@
 # delivers events from this specific stack to an external endpoint.
 resources:
   parentStack:
-    type: pulumiservice:v2:Stack
+    type: pulumiservice:v2/stacks:Stack
     properties:
       orgName: ${serviceOrg}
       projectName: ${projectName}
       stackName: ${stackName}
   config:
-    type: pulumiservice:v2:StackConfig
+    type: pulumiservice:v2/stacks:Config
     properties:
       orgName: ${serviceOrg}
       projectName: ${parentStack.projectName}
       stackName: ${parentStack.stackName}
       environment: ${envRef}
   hook:
-    type: pulumiservice:v2:StackWebhook
+    type: pulumiservice:v2/stacks:Webhook
     properties:
       organizationName: ${serviceOrg}
       projectName: ${parentStack.projectName}

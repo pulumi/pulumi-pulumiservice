@@ -18,7 +18,7 @@ read_only_role = ps_v2.Role(
     },
 )
 
-rbac_team = ps_v2.Team(
+rbac_team = ps_v2.teams.Team(
     "rbacTeam",
     org_name=service_org,
     name=f"v2-rbac-team-{name_suffix}",

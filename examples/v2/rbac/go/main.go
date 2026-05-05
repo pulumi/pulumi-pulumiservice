@@ -2,6 +2,7 @@ package main
 
 import (
 	v2 "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2"
+	teams "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2/teams"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
 )
@@ -36,7 +37,7 @@ func main() {
 			return err
 		}
 
-		rbacTeam, err := v2.NewTeam(ctx, "rbacTeam", &v2.TeamArgs{
+		rbacTeam, err := teams.NewTeam(ctx, "rbacTeam", &teams.TeamArgs{
 			OrgName:     pulumi.String(serviceOrg),
 			Name:        pulumi.String("v2-rbac-team-" + nameSuffix),
 			DisplayName: pulumi.String("v2 RBAC Team " + nameSuffix),

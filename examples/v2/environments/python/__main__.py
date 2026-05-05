@@ -6,7 +6,7 @@ service_org = config.get("serviceOrg") or "service-provider-test-org"
 project_name = config.get("projectName") or "test-project"
 env_suffix = config.get("envSuffix") or "dev"
 
-environment = ps_v2.Environment_esc_environments(
+environment = ps_v2.esc.Environment(
     "environment",
     org_name=service_org,
     project=project_name,

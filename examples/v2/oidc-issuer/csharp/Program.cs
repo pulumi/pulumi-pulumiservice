@@ -9,7 +9,7 @@ return await Deployment.RunAsync(() =>
     var issuerSuffix = config.Get("issuerSuffix") ?? "dev";
     var maxExpiration = config.GetInt32("maxExpiration") ?? 3600;
 
-    var pulumiIssuer = new Ps.V2.OidcIssuer("pulumiIssuer", new()
+    var pulumiIssuer = new Ps.V2.Auth.OidcIssuer("pulumiIssuer", new()
     {
         OrgName = serviceOrg,
         Name = $"pulumi_issuer_{issuerSuffix}",
@@ -17,7 +17,7 @@ return await Deployment.RunAsync(() =>
         Thumbprints = new[] { "57d3e89f6b25dde3c174dc558e2b2623306a9d81f88a12e8ae7090a86c12f1da" },
     });
 
-    var githubIssuer = new Ps.V2.OidcIssuer("githubIssuer", new()
+    var githubIssuer = new Ps.V2.Auth.OidcIssuer("githubIssuer", new()
     {
         OrgName = serviceOrg,
         Name = $"github_issuer_{issuerSuffix}",

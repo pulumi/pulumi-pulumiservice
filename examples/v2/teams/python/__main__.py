@@ -6,7 +6,7 @@ service_org = config.get("serviceOrg") or "service-provider-test-org"
 team_suffix = config.get("teamSuffix") or "dev"
 team_description = config.get("teamDescription") or "A team created by the v2 example."
 
-team = ps_v2.Team(
+team = ps_v2.teams.Team(
     "team",
     org_name=service_org,
     name=f"v2-team-{team_suffix}",

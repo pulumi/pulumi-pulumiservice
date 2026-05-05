@@ -1,12 +1,12 @@
 package generated_program;
 
 import com.pulumi.Pulumi;
-import com.pulumi.pulumiservice.v2.Stack;
-import com.pulumi.pulumiservice.v2.StackArgs;
-import com.pulumi.pulumiservice.v2.DeploymentSettings;
-import com.pulumi.pulumiservice.v2.DeploymentSettingsArgs;
-import com.pulumi.pulumiservice.v2.ScheduledDeployment;
-import com.pulumi.pulumiservice.v2.ScheduledDeploymentArgs;
+import com.pulumi.pulumiservice.v2_stacks.Stack;
+import com.pulumi.pulumiservice.v2_stacks.StackArgs;
+import com.pulumi.pulumiservice.v2_deployments.Settings;
+import com.pulumi.pulumiservice.v2_deployments.SettingsArgs;
+import com.pulumi.pulumiservice.v2_deployments.ScheduledDeployment;
+import com.pulumi.pulumiservice.v2_deployments.ScheduledDeploymentArgs;
 import com.pulumi.resources.CustomResourceOptions;
 
 import java.util.List;
@@ -28,8 +28,8 @@ public class App {
                     .stackName(stackName)
                     .build());
 
-            var parentSettings = new DeploymentSettings("parentSettings",
-                DeploymentSettingsArgs.builder()
+            var parentSettings = new Settings("parentSettings",
+                SettingsArgs.builder()
                     .orgName(serviceOrg)
                     .projectName(projectName)
                     .stackName(stackName)

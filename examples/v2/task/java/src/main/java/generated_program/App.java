@@ -1,10 +1,10 @@
 package generated_program;
 
 import com.pulumi.Pulumi;
-import com.pulumi.pulumiservice.v2.AgentPool;
-import com.pulumi.pulumiservice.v2.AgentPoolArgs;
-import com.pulumi.pulumiservice.v2.Task;
-import com.pulumi.pulumiservice.v2.TaskArgs;
+import com.pulumi.pulumiservice.v2_agents.Pool;
+import com.pulumi.pulumiservice.v2_agents.PoolArgs;
+import com.pulumi.pulumiservice.v2_agents.Task;
+import com.pulumi.pulumiservice.v2_agents.TaskArgs;
 
 public class App {
     public static void main(String[] args) {
@@ -14,8 +14,8 @@ public class App {
             var taskSuffix = config.get("taskSuffix").orElse("dev");
             var taskID = config.get("taskID").orElse("example-task-id");
 
-            var pool = new AgentPool("pool",
-                AgentPoolArgs.builder()
+            var pool = new Pool("pool",
+                PoolArgs.builder()
                     .orgName(serviceOrg)
                     .name("v2-task-pool-" + taskSuffix)
                     .description("Pool used by the v2 task example")
@@ -25,10 +25,10 @@ public class App {
                 TaskArgs.builder()
                     .orgName(serviceOrg)
                     .taskID(taskID)
-                    .name("v2-task-" + taskSuffix)
                     .approvalMode("manual")
-                    .permissionMode("maintainer")
-                    .isShared(false)
+                    .permissionMode("default")
+                    .source("api")
+                    .planMode(false)
                     .build());
 
             ctx.export("poolName", pool.name());

@@ -2,13 +2,13 @@ resources:
   # ScheduledDeployment requires a Stack with DeploymentSettings.
   # EnvironmentSchedule requires an Environment.
   parentStack:
-    type: pulumiservice:v2:Stack
+    type: pulumiservice:v2/stacks:Stack
     properties:
       orgName: ${serviceOrg}
       projectName: ${projectName}
       stackName: ${stackName}
   parentSettings:
-    type: pulumiservice:v2:DeploymentSettings
+    type: pulumiservice:v2/deployments:Settings
     properties:
       orgName: ${serviceOrg}
       projectName: ${projectName}
@@ -21,7 +21,7 @@ resources:
       dependsOn:
         - ${parentStack}
   nightlyDeploy:
-    type: pulumiservice:v2:ScheduledDeployment
+    type: pulumiservice:v2/deployments:ScheduledDeployment
     properties:
       orgName: ${serviceOrg}
       projectName: ${projectName}

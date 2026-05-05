@@ -1,0 +1,15 @@
+name: pulumicloud-v2-service-catalog-demo
+runtime: yaml
+description: |
+  Service Catalog v2 demo — provisions an owner team, three placeholder
+  stacks, and three catalog entries (checkout-api, search-frontend,
+  notification-worker) wired together with realistic owner / tier /
+  oncall metadata. The catalog is a v2-only resource surface; no v1
+  pulumiservice resource models org-wide service catalog entries.
+config:
+  serviceOrg:
+    type: string
+    default: service-provider-test-org
+  nameSuffix:
+    type: string
+    default: demo

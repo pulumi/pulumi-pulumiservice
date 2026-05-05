@@ -1,7 +1,8 @@
 package main
 
 import (
-	v2 "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2"
+	teams "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2/teams"
+	tokens "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2/tokens"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
 )
@@ -22,7 +23,7 @@ func main() {
 			tokenDescription = "example v2 access token"
 		}
 
-		team, err := v2.NewTeam(ctx, "team", &v2.TeamArgs{
+		team, err := teams.NewTeam(ctx, "team", &teams.TeamArgs{
 			OrgName:     pulumi.String(serviceOrg),
 			Name:        pulumi.String("v2-tokens-team-" + tokenSuffix),
 			DisplayName: pulumi.String("v2 Tokens Team " + tokenSuffix),
@@ -32,7 +33,7 @@ func main() {
 			return err
 		}
 
-		orgToken, err := v2.NewOrgToken(ctx, "orgToken", &v2.OrgTokenArgs{
+		orgToken, err := tokens.NewOrgToken(ctx, "orgToken", &tokens.OrgTokenArgs{
 			OrgName:     pulumi.String(serviceOrg),
 			Name:        pulumi.String("v2-org-token-" + tokenSuffix),
 			Description: pulumi.String(tokenDescription),
@@ -43,7 +44,7 @@ func main() {
 			return err
 		}
 
-		teamToken, err := v2.NewTeamToken(ctx, "teamToken", &v2.TeamTokenArgs{
+		teamToken, err := tokens.NewTeamToken(ctx, "teamToken", &tokens.TeamTokenArgs{
 			OrgName:     pulumi.String(serviceOrg),
 			TeamName:    team.Name,
 			Name:        pulumi.String("v2-team-token-" + tokenSuffix),
@@ -54,7 +55,7 @@ func main() {
 			return err
 		}
 
-		_, err = v2.NewPersonalToken(ctx, "personalToken", &v2.PersonalTokenArgs{
+		_, err = tokens.NewPersonalToken(ctx, "personalToken", &tokens.PersonalTokenArgs{
 			Description: pulumi.String(tokenDescription),
 			Expires:     pulumi.Int(0),
 		})

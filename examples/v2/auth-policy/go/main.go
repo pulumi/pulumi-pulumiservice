@@ -1,7 +1,7 @@
 package main
 
 import (
-	v2 "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2"
+	auth "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2/auth"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
 )
@@ -18,7 +18,7 @@ func main() {
 			policyId = "org"
 		}
 
-		_, err := v2.NewAuthPolicy(ctx, "policy", &v2.AuthPolicyArgs{
+		_, err := auth.NewPolicy(ctx, "policy", &auth.PolicyArgs{
 			OrgName:  pulumi.String(serviceOrg),
 			PolicyId: pulumi.String(policyId),
 			Policies: pulumi.Array{

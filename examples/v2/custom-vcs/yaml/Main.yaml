@@ -4,7 +4,7 @@
 # valid credentials in the referenced ESC environment.
 resources:
   integration:
-    type: pulumiservice:v2:CustomVCSIntegration
+    type: pulumiservice:v2/integrations:CustomVCSIntegration
     properties:
       orgName: ${serviceOrg}
       name: v2-custom-vcs-${vcsSuffix}
@@ -12,7 +12,7 @@ resources:
       vcsType: gitea
       environment: ${envRef}
   repository:
-    type: pulumiservice:v2:CustomVCSRepository
+    type: pulumiservice:v2/integrations:CustomVCSRepository
     properties:
       orgName: ${serviceOrg}
       integrationId: ${integration.integrationId}

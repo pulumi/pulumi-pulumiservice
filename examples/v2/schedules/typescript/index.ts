@@ -7,13 +7,13 @@ const projectName = config.get("projectName") ?? "pulumi-service-schedules-examp
 const stackName = config.get("stackName") ?? "dev";
 const scheduleCron = config.get("scheduleCron") ?? "0 7 * * *";
 
-const parentStack = new ps.v2.Stack("parentStack", {
+const parentStack = new ps.v2.stacks.Stack("parentStack", {
     orgName: serviceOrg,
     projectName: projectName,
     stackName: stackName,
 });
 
-const parentSettings = new ps.v2.DeploymentSettings("parentSettings", {
+const parentSettings = new ps.v2.deployments.Settings("parentSettings", {
     orgName: serviceOrg,
     projectName: projectName,
     stackName: stackName,
@@ -22,7 +22,7 @@ const parentSettings = new ps.v2.DeploymentSettings("parentSettings", {
     },
 }, { dependsOn: [parentStack] });
 
-const nightlyDeploy = new ps.v2.ScheduledDeployment("nightlyDeploy", {
+const nightlyDeploy = new ps.v2.deployments.ScheduledDeployment("nightlyDeploy", {
     orgName: serviceOrg,
     projectName: projectName,
     stackName: stackName,

@@ -1,7 +1,7 @@
 package main
 
 import (
-	v2 "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2"
+	agents "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2/agents"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
 )
@@ -22,7 +22,7 @@ func main() {
 			poolDescription = "v2 example agent pool"
 		}
 
-		pool, err := v2.NewAgentPool(ctx, "pool", &v2.AgentPoolArgs{
+		pool, err := agents.NewPool(ctx, "pool", &agents.PoolArgs{
 			OrgName:     pulumi.String(serviceOrg),
 			Name:        pulumi.String("v2-agent-pool-" + poolSuffix),
 			Description: pulumi.String(poolDescription),

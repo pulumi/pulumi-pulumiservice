@@ -5,7 +5,7 @@
 # behavior flags (PR comments, code-access for review previews, etc.).
 resources:
   github:
-    type: pulumiservice:v2:GitHubIntegration
+    type: pulumiservice:v2/integrations:GitHubIntegration
     properties:
       orgName: ${serviceOrg}
       integrationId: ${githubIntegrationId}
@@ -14,7 +14,7 @@ resources:
       disableNeoSummaries: false
       disableCodeAccessForReviews: false
   githubEnterprise:
-    type: pulumiservice:v2:GitHubEnterpriseIntegration
+    type: pulumiservice:v2/integrations:GitHubEnterpriseIntegration
     properties:
       orgName: ${serviceOrg}
       integrationId: ${githubEnterpriseIntegrationId}
@@ -23,7 +23,7 @@ resources:
       disableNeoSummaries: false
       disableCodeAccessForReviews: true
   gitlab:
-    type: pulumiservice:v2:GitLabIntegration
+    type: pulumiservice:v2/integrations:GitLabIntegration
     properties:
       orgName: ${serviceOrg}
       integrationId: ${gitlabIntegrationId}
@@ -31,7 +31,7 @@ resources:
       disableDetailedDiff: false
       disableNeoSummaries: true
   bitbucket:
-    type: pulumiservice:v2:BitBucketIntegration
+    type: pulumiservice:v2/integrations:BitBucketIntegration
     properties:
       orgName: ${serviceOrg}
       integrationId: ${bitbucketIntegrationId}
@@ -39,7 +39,7 @@ resources:
       disableDetailedDiff: false
       disableNeoSummaries: false
   azureDevOps:
-    type: pulumiservice:v2:AzureDevOpsIntegration
+    type: pulumiservice:v2/integrations:AzureDevOpsIntegration
     properties:
       orgName: ${serviceOrg}
       integrationId: ${azureDevOpsIntegrationId}

@@ -10,7 +10,7 @@ return await Deployment.RunAsync(() =>
     var stackName = config.Get("stackName") ?? "dev";
     var stackPurpose = config.Get("stackPurpose") ?? "demo";
 
-    var exampleStack = new Ps.V2.Stack("exampleStack", new()
+    var exampleStack = new Ps.V2.Stacks.Stack("exampleStack", new()
     {
         OrgName = serviceOrg,
         ProjectName = projectName,

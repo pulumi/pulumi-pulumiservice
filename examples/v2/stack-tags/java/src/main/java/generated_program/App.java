@@ -1,10 +1,10 @@
 package generated_program;
 
 import com.pulumi.Pulumi;
-import com.pulumi.pulumiservice.v2.Stack;
-import com.pulumi.pulumiservice.v2.StackArgs;
-import com.pulumi.pulumiservice.v2.StackTag;
-import com.pulumi.pulumiservice.v2.StackTagArgs;
+import com.pulumi.pulumiservice.v2_stacks.Stack;
+import com.pulumi.pulumiservice.v2_stacks.StackArgs;
+import com.pulumi.pulumiservice.v2_stacks.Tag;
+import com.pulumi.pulumiservice.v2_stacks.TagArgs;
 
 public class App {
     public static void main(String[] args) {
@@ -22,8 +22,8 @@ public class App {
                     .stackName(stackName)
                     .build());
 
-            new StackTag("ownerTag",
-                StackTagArgs.builder()
+            new Tag("ownerTag",
+                TagArgs.builder()
                     .orgName(serviceOrg)
                     .projectName(parentStack.projectName())
                     .stackName(parentStack.stackName())
@@ -31,8 +31,8 @@ public class App {
                     .value("pulumicloud-v2-example")
                     .build());
 
-            new StackTag("customTag",
-                StackTagArgs.builder()
+            new Tag("customTag",
+                TagArgs.builder()
                     .orgName(serviceOrg)
                     .projectName(parentStack.projectName())
                     .stackName(parentStack.stackName())

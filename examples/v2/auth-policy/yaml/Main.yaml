@@ -4,7 +4,7 @@
 # policy to either the org root ("org") or a child issuer.
 resources:
   policy:
-    type: pulumiservice:v2:AuthPolicy
+    type: pulumiservice:v2/auth:Policy
     properties:
       orgName: ${serviceOrg}
       policyId: ${policyId}

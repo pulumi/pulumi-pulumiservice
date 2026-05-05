@@ -6,7 +6,7 @@ service_org = config.get("serviceOrg") or "service-provider-test-org"
 account_suffix = config.get("accountSuffix") or "dev"
 insights_environment = config.get("insightsEnvironment") or "insights/credentials"
 
-account = ps_v2.Account(
+account = ps_v2.insights.Account(
     "account",
     org_name=service_org,
     account_name=f"v2-insights-{account_suffix}",
@@ -15,7 +15,7 @@ account = ps_v2.Account(
     scan_schedule="none",
 )
 
-ps_v2.ScheduledScanSettings(
+ps_v2.insights.ScheduledScanSettings(
     "scanSettings",
     org_name=service_org,
     account_name=account.account_name,

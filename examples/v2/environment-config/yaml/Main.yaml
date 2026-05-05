@@ -6,13 +6,13 @@
 # example is preview-only because we don't create the environment here.
 resources:
   draft:
-    type: pulumiservice:v2:EnvironmentDraft
+    type: pulumiservice:v2/esc:EnvironmentDraft
     properties:
       orgName: ${serviceOrg}
       projectName: ${projectName}
       envName: ${envName}
   settings:
-    type: pulumiservice:v2:EnvironmentSettings
+    type: pulumiservice:v2/esc:EnvironmentSettings
     properties:
       orgName: ${serviceOrg}
       projectName: ${projectName}

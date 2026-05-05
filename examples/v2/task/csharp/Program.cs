@@ -9,21 +9,21 @@ return await Deployment.RunAsync(() =>
     var taskSuffix = config.Get("taskSuffix") ?? "dev";
     var taskID = config.Get("taskID") ?? "example-task-id";
 
-    var pool = new Ps.V2.AgentPool("pool", new()
+    var pool = new Ps.V2.Agents.Pool("pool", new()
     {
         OrgName = serviceOrg,
         Name = $"v2-task-pool-{taskSuffix}",
         Description = "Pool used by the v2 task example",
     });
 
-    new Ps.V2.Task("task", new()
+    new Ps.V2.Agents.Task("task", new()
     {
         OrgName = serviceOrg,
         TaskID = taskID,
-        Name = $"v2-task-{taskSuffix}",
         ApprovalMode = "manual",
-        PermissionMode = "maintainer",
-        IsShared = false,
+        PermissionMode = "default",
+        Source = "api",
+        PlanMode = false,
     });
 
     return new Dictionary<string, object?>

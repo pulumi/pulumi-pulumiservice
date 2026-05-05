@@ -249,8 +249,14 @@ provider: bin/$(PROVIDER)
 # To create a release ready binary, you should use `make provider`.
 provider_no_deps:
 	$(call build_provider_cmd,$(shell go env GOOS),$(shell go env GOARCH),$(WORKING_DIR)/bin/$(PROVIDER))
-# New approach: No schema dependency (schema depends on provider instead)
-bin/$(PROVIDER):
+# Provider sources: Go files under provider/{cmd,pkg} plus the OpenAPI spec
+# and per-resource metadata that get embedded into the binary at build time.
+# Excludes provider/tools/* — those compile into separate codegen binaries.
+PROVIDER_SOURCES := $(shell find provider/cmd provider/pkg -name '*.go') \
+                    provider/pkg/cloud/spec.json \
+                    provider/pkg/cloud/metadata.json \
+                    go.mod go.sum
+bin/$(PROVIDER): $(PROVIDER_SOURCES)
 	$(call build_provider_cmd,$(shell go env GOOS),$(shell go env GOARCH),$(WORKING_DIR)/bin/$(PROVIDER))
 .PHONY: provider provider_no_deps
 

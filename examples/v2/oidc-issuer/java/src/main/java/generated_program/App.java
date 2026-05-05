@@ -1,8 +1,8 @@
 package generated_program;
 
 import com.pulumi.Pulumi;
-import com.pulumi.pulumiservice.v2.OidcIssuer;
-import com.pulumi.pulumiservice.v2.OidcIssuerArgs;
+import com.pulumi.pulumiservice.v2_auth.OidcIssuer;
+import com.pulumi.pulumiservice.v2_auth.OidcIssuerArgs;
 
 import java.util.List;
 

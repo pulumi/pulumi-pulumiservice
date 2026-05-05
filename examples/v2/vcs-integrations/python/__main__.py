@@ -9,7 +9,7 @@ gitlab_id = config.get("gitlabIntegrationId") or "gl-org-integration"
 bitbucket_id = config.get("bitbucketIntegrationId") or "bb-org-integration"
 azure_devops_id = config.get("azureDevOpsIntegrationId") or "ado-org-integration"
 
-ps_v2.GitHubIntegration(
+ps_v2.integrations.GitHubIntegration(
     "github",
     org_name=service_org,
     integration_id=github_id,
@@ -19,7 +19,7 @@ ps_v2.GitHubIntegration(
     disable_code_access_for_reviews=False,
 )
 
-ps_v2.GitHubEnterpriseIntegration(
+ps_v2.integrations.GitHubEnterpriseIntegration(
     "githubEnterprise",
     org_name=service_org,
     integration_id=github_enterprise_id,
@@ -29,7 +29,7 @@ ps_v2.GitHubEnterpriseIntegration(
     disable_code_access_for_reviews=True,
 )
 
-ps_v2.GitLabIntegration(
+ps_v2.integrations.GitLabIntegration(
     "gitlab",
     org_name=service_org,
     integration_id=gitlab_id,
@@ -38,7 +38,7 @@ ps_v2.GitLabIntegration(
     disable_neo_summaries=True,
 )
 
-ps_v2.BitBucketIntegration(
+ps_v2.integrations.BitBucketIntegration(
     "bitbucket",
     org_name=service_org,
     integration_id=bitbucket_id,
@@ -47,7 +47,7 @@ ps_v2.BitBucketIntegration(
     disable_neo_summaries=False,
 )
 
-ps_v2.AzureDevOpsIntegration(
+ps_v2.integrations.AzureDevOpsIntegration(
     "azureDevOps",
     org_name=service_org,
     integration_id=azure_devops_id,

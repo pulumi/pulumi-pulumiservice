@@ -1,8 +1,8 @@
 package generated_program;
 
 import com.pulumi.Pulumi;
-import com.pulumi.pulumiservice.v2.AgentPool;
-import com.pulumi.pulumiservice.v2.AgentPoolArgs;
+import com.pulumi.pulumiservice.v2_agents.Pool;
+import com.pulumi.pulumiservice.v2_agents.PoolArgs;
 
 public class App {
     public static void main(String[] args) {
@@ -12,8 +12,8 @@ public class App {
             var poolSuffix = config.get("poolSuffix").orElse("dev");
             var poolDescription = config.get("poolDescription").orElse("v2 example agent pool");
 
-            var pool = new AgentPool("pool",
-                AgentPoolArgs.builder()
+            var pool = new Pool("pool",
+                PoolArgs.builder()
                     .orgName(serviceOrg)
                     .name("v2-agent-pool-" + poolSuffix)
                     .description(poolDescription)

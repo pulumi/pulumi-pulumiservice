@@ -8,20 +8,20 @@ const stackName = config.get("stackName") ?? "dev";
 const hookUrl = config.get("hookUrl") ?? "https://example.invalid/hooks/example";
 const envRef = config.get("envRef") ?? "organization/credentials";
 
-const parentStack = new ps.v2.Stack("parentStack", {
+const parentStack = new ps.v2.stacks.Stack("parentStack", {
     orgName: serviceOrg,
     projectName: projectName,
     stackName: stackName,
 });
 
-new ps.v2.StackConfig("config", {
+new ps.v2.stacks.Config("config", {
     orgName: serviceOrg,
     projectName: parentStack.projectName,
     stackName: parentStack.stackName,
     environment: envRef,
 });
 
-new ps.v2.StackWebhook("hook", {
+new ps.v2.stacks.Webhook("hook", {
     organizationName: serviceOrg,
     projectName: parentStack.projectName,
     stackName: parentStack.stackName,

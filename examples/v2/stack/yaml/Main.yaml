@@ -1,6 +1,6 @@
 resources:
   exampleStack:
-    type: pulumiservice:v2:Stack
+    type: pulumiservice:v2/stacks:Stack
     properties:
       orgName: ${serviceOrg}
       projectName: ${projectName}

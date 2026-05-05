@@ -7,14 +7,14 @@ project_name = config.get("projectName") or "my-new-project"
 stack_name = config.get("stackName") or "dev"
 executor_image = config.get("executorImage") or "pulumi-cli"
 
-parent_stack = ps_v2.Stack(
+parent_stack = ps_v2.stacks.Stack(
     "parentStack",
     org_name=service_org,
     project_name=project_name,
     stack_name=stack_name,
 )
 
-settings = ps_v2.DeploymentSettings(
+settings = ps_v2.deployments.Settings(
     "settings",
     org_name=service_org,
     project_name=project_name,

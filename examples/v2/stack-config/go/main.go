@@ -1,7 +1,7 @@
 package main
 
 import (
-	v2 "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2"
+	stacks "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2/stacks"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
 )
@@ -30,7 +30,7 @@ func main() {
 			envRef = "organization/credentials"
 		}
 
-		parentStack, err := v2.NewStack(ctx, "parentStack", &v2.StackArgs{
+		parentStack, err := stacks.NewStack(ctx, "parentStack", &stacks.StackArgs{
 			OrgName:     pulumi.String(serviceOrg),
 			ProjectName: pulumi.String(projectName),
 			StackName:   pulumi.String(stackName),
@@ -39,7 +39,7 @@ func main() {
 			return err
 		}
 
-		if _, err := v2.NewStackConfig(ctx, "config", &v2.StackConfigArgs{
+		if _, err := stacks.NewConfig(ctx, "config", &stacks.ConfigArgs{
 			OrgName:     pulumi.String(serviceOrg),
 			ProjectName: parentStack.ProjectName,
 			StackName:   parentStack.StackName,
@@ -48,7 +48,7 @@ func main() {
 			return err
 		}
 
-		if _, err := v2.NewStackWebhook(ctx, "hook", &v2.StackWebhookArgs{
+		if _, err := stacks.NewWebhook(ctx, "hook", &stacks.WebhookArgs{
 			OrganizationName: pulumi.String(serviceOrg),
 			ProjectName:      parentStack.ProjectName,
 			StackName:        parentStack.StackName,

@@ -1,16 +1,16 @@
 package generated_program;
 
 import com.pulumi.Pulumi;
-import com.pulumi.pulumiservice.v2.AzureDevOpsIntegration;
-import com.pulumi.pulumiservice.v2.AzureDevOpsIntegrationArgs;
-import com.pulumi.pulumiservice.v2.BitBucketIntegration;
-import com.pulumi.pulumiservice.v2.BitBucketIntegrationArgs;
-import com.pulumi.pulumiservice.v2.GitHubEnterpriseIntegration;
-import com.pulumi.pulumiservice.v2.GitHubEnterpriseIntegrationArgs;
-import com.pulumi.pulumiservice.v2.GitHubIntegration;
-import com.pulumi.pulumiservice.v2.GitHubIntegrationArgs;
-import com.pulumi.pulumiservice.v2.GitLabIntegration;
-import com.pulumi.pulumiservice.v2.GitLabIntegrationArgs;
+import com.pulumi.pulumiservice.v2_integrations.AzureDevOpsIntegration;
+import com.pulumi.pulumiservice.v2_integrations.AzureDevOpsIntegrationArgs;
+import com.pulumi.pulumiservice.v2_integrations.BitBucketIntegration;
+import com.pulumi.pulumiservice.v2_integrations.BitBucketIntegrationArgs;
+import com.pulumi.pulumiservice.v2_integrations.GitHubEnterpriseIntegration;
+import com.pulumi.pulumiservice.v2_integrations.GitHubEnterpriseIntegrationArgs;
+import com.pulumi.pulumiservice.v2_integrations.GitHubIntegration;
+import com.pulumi.pulumiservice.v2_integrations.GitHubIntegrationArgs;
+import com.pulumi.pulumiservice.v2_integrations.GitLabIntegration;
+import com.pulumi.pulumiservice.v2_integrations.GitLabIntegrationArgs;
 
 public class App {
     public static void main(String[] args) {

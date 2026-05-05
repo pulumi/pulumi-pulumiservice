@@ -7,7 +7,7 @@ project_name = config.get("projectName") or "pulumi-service-stack-example"
 stack_name = config.get("stackName") or "dev"
 stack_purpose = config.get("stackPurpose") or "demo"
 
-example_stack = ps_v2.Stack(
+example_stack = ps_v2.stacks.Stack(
     "exampleStack",
     org_name=service_org,
     project_name=project_name,

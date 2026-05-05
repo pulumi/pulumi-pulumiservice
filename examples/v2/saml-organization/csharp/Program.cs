@@ -11,7 +11,7 @@ return await Deployment.RunAsync(() =>
   <md:IDPSSODescriptor protocolSupportEnumeration=""urn:oasis:names:tc:SAML:2.0:protocol""/>
 </md:EntityDescriptor>";
 
-    new Ps.V2.SAMLOrganization("saml", new()
+    new Ps.V2.Auth.SAML("saml", new()
     {
         OrgName = serviceOrg,
         NewIdpSsoDescriptor = idpDescriptor,

@@ -6,50 +6,51 @@ import builtins as _builtins
 from .. import _utilities
 import typing
 # Export this package's modules as members:
-from .account import *
-from .agent_pool import *
 from .audit_log_export_configuration import *
-from .auth_policy import *
-from .azure_dev_ops_integration import *
-from .bit_bucket_integration import *
-from .custom_vcs_integration import *
-from .custom_vcs_repository import *
 from .default_organization import *
-from .deployment_settings import *
-from .environment_draft import *
-from .environment_esc_environments import *
-from .environment_preview_environments import *
-from .environment_schedule import *
-from .environment_settings import *
-from .environment_tag_esc_environments import *
-from .environment_tag_preview_environments import *
 from .gate import *
-from .git_hub_enterprise_integration import *
-from .git_hub_integration import *
-from .git_lab_integration import *
-from .oidc_issuer import *
-from .open_environment_request import *
 from .org_template_collection import *
-from .org_token import *
 from .organization_member import *
 from .organization_webhook import *
-from .personal_token import *
 from .policy_group import *
 from .policy_issue import *
 from .policy_pack import *
-from .revision_tag_esc_environments import *
-from .revision_tag_preview_environments import *
 from .role import *
-from .saml_organization import *
-from .scheduled_deployment import *
-from .scheduled_scan_settings import *
-from .service import *
-from .stack import *
-from .stack_config import *
-from .stack_tag import *
-from .stack_webhook import *
-from .task import *
-from .team import *
-from .team_token import *
-from .webhook_esc_environments import *
-from .webhook_preview_environments import *
+
+# Make subpackages available:
+if typing.TYPE_CHECKING:
+    import pulumi_pulumiservice.v2.agents as __agents
+    agents = __agents
+    import pulumi_pulumiservice.v2.auth as __auth
+    auth = __auth
+    import pulumi_pulumiservice.v2.deployments as __deployments
+    deployments = __deployments
+    import pulumi_pulumiservice.v2.esc as __esc
+    esc = __esc
+    import pulumi_pulumiservice.v2.insights as __insights
+    insights = __insights
+    import pulumi_pulumiservice.v2.integrations as __integrations
+    integrations = __integrations
+    import pulumi_pulumiservice.v2.preview as __preview
+    preview = __preview
+    import pulumi_pulumiservice.v2.services as __services
+    services = __services
+    import pulumi_pulumiservice.v2.stacks as __stacks
+    stacks = __stacks
+    import pulumi_pulumiservice.v2.teams as __teams
+    teams = __teams
+    import pulumi_pulumiservice.v2.tokens as __tokens
+    tokens = __tokens
+else:
+    agents = _utilities.lazy_import('pulumi_pulumiservice.v2.agents')
+    auth = _utilities.lazy_import('pulumi_pulumiservice.v2.auth')
+    deployments = _utilities.lazy_import('pulumi_pulumiservice.v2.deployments')
+    esc = _utilities.lazy_import('pulumi_pulumiservice.v2.esc')
+    insights = _utilities.lazy_import('pulumi_pulumiservice.v2.insights')
+    integrations = _utilities.lazy_import('pulumi_pulumiservice.v2.integrations')
+    preview = _utilities.lazy_import('pulumi_pulumiservice.v2.preview')
+    services = _utilities.lazy_import('pulumi_pulumiservice.v2.services')
+    stacks = _utilities.lazy_import('pulumi_pulumiservice.v2.stacks')
+    teams = _utilities.lazy_import('pulumi_pulumiservice.v2.teams')
+    tokens = _utilities.lazy_import('pulumi_pulumiservice.v2.tokens')
+

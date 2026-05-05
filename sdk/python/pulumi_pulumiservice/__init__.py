@@ -100,53 +100,132 @@ _utilities.register(
   "mod": "v2",
   "fqn": "pulumi_pulumiservice.v2",
   "classes": {
-   "pulumiservice:v2:Account": "Account",
-   "pulumiservice:v2:AgentPool": "AgentPool",
    "pulumiservice:v2:AuditLogExportConfiguration": "AuditLogExportConfiguration",
-   "pulumiservice:v2:AuthPolicy": "AuthPolicy",
-   "pulumiservice:v2:AzureDevOpsIntegration": "AzureDevOpsIntegration",
-   "pulumiservice:v2:BitBucketIntegration": "BitBucketIntegration",
-   "pulumiservice:v2:CustomVCSIntegration": "CustomVCSIntegration",
-   "pulumiservice:v2:CustomVCSRepository": "CustomVCSRepository",
    "pulumiservice:v2:DefaultOrganization": "DefaultOrganization",
-   "pulumiservice:v2:DeploymentSettings": "DeploymentSettings",
-   "pulumiservice:v2:EnvironmentDraft": "EnvironmentDraft",
-   "pulumiservice:v2:EnvironmentSchedule": "EnvironmentSchedule",
-   "pulumiservice:v2:EnvironmentSettings": "EnvironmentSettings",
-   "pulumiservice:v2:EnvironmentTag_esc_environments": "EnvironmentTag_esc_environments",
-   "pulumiservice:v2:EnvironmentTag_preview_environments": "EnvironmentTag_preview_environments",
-   "pulumiservice:v2:Environment_esc_environments": "Environment_esc_environments",
-   "pulumiservice:v2:Environment_preview_environments": "Environment_preview_environments",
    "pulumiservice:v2:Gate": "Gate",
-   "pulumiservice:v2:GitHubEnterpriseIntegration": "GitHubEnterpriseIntegration",
-   "pulumiservice:v2:GitHubIntegration": "GitHubIntegration",
-   "pulumiservice:v2:GitLabIntegration": "GitLabIntegration",
-   "pulumiservice:v2:OidcIssuer": "OidcIssuer",
-   "pulumiservice:v2:OpenEnvironmentRequest": "OpenEnvironmentRequest",
    "pulumiservice:v2:OrgTemplateCollection": "OrgTemplateCollection",
-   "pulumiservice:v2:OrgToken": "OrgToken",
    "pulumiservice:v2:OrganizationMember": "OrganizationMember",
    "pulumiservice:v2:OrganizationWebhook": "OrganizationWebhook",
-   "pulumiservice:v2:PersonalToken": "PersonalToken",
    "pulumiservice:v2:PolicyGroup": "PolicyGroup",
    "pulumiservice:v2:PolicyIssue": "PolicyIssue",
    "pulumiservice:v2:PolicyPack": "PolicyPack",
-   "pulumiservice:v2:RevisionTag_esc_environments": "RevisionTag_esc_environments",
-   "pulumiservice:v2:RevisionTag_preview_environments": "RevisionTag_preview_environments",
-   "pulumiservice:v2:Role": "Role",
-   "pulumiservice:v2:SAMLOrganization": "SAMLOrganization",
-   "pulumiservice:v2:ScheduledDeployment": "ScheduledDeployment",
-   "pulumiservice:v2:ScheduledScanSettings": "ScheduledScanSettings",
-   "pulumiservice:v2:Service": "Service",
-   "pulumiservice:v2:Stack": "Stack",
-   "pulumiservice:v2:StackConfig": "StackConfig",
-   "pulumiservice:v2:StackTag": "StackTag",
-   "pulumiservice:v2:StackWebhook": "StackWebhook",
-   "pulumiservice:v2:Task": "Task",
-   "pulumiservice:v2:Team": "Team",
-   "pulumiservice:v2:TeamToken": "TeamToken",
-   "pulumiservice:v2:Webhook_esc_environments": "Webhook_esc_environments",
-   "pulumiservice:v2:Webhook_preview_environments": "Webhook_preview_environments"
+   "pulumiservice:v2:Role": "Role"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "v2/agents",
+  "fqn": "pulumi_pulumiservice.v2.agents",
+  "classes": {
+   "pulumiservice:v2/agents:Pool": "Pool",
+   "pulumiservice:v2/agents:Task": "Task"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "v2/auth",
+  "fqn": "pulumi_pulumiservice.v2.auth",
+  "classes": {
+   "pulumiservice:v2/auth:OidcIssuer": "OidcIssuer",
+   "pulumiservice:v2/auth:Policy": "Policy",
+   "pulumiservice:v2/auth:SAML": "SAML"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "v2/deployments",
+  "fqn": "pulumi_pulumiservice.v2.deployments",
+  "classes": {
+   "pulumiservice:v2/deployments:ScheduledDeployment": "ScheduledDeployment",
+   "pulumiservice:v2/deployments:Settings": "Settings"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "v2/esc",
+  "fqn": "pulumi_pulumiservice.v2.esc",
+  "classes": {
+   "pulumiservice:v2/esc:Environment": "Environment",
+   "pulumiservice:v2/esc:EnvironmentDraft": "EnvironmentDraft",
+   "pulumiservice:v2/esc:EnvironmentSchedule": "EnvironmentSchedule",
+   "pulumiservice:v2/esc:EnvironmentSettings": "EnvironmentSettings",
+   "pulumiservice:v2/esc:EnvironmentTag": "EnvironmentTag",
+   "pulumiservice:v2/esc:OpenEnvironmentRequest": "OpenEnvironmentRequest",
+   "pulumiservice:v2/esc:RevisionTag": "RevisionTag",
+   "pulumiservice:v2/esc:Webhook": "Webhook"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "v2/insights",
+  "fqn": "pulumi_pulumiservice.v2.insights",
+  "classes": {
+   "pulumiservice:v2/insights:Account": "Account",
+   "pulumiservice:v2/insights:ScheduledScanSettings": "ScheduledScanSettings"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "v2/integrations",
+  "fqn": "pulumi_pulumiservice.v2.integrations",
+  "classes": {
+   "pulumiservice:v2/integrations:AzureDevOpsIntegration": "AzureDevOpsIntegration",
+   "pulumiservice:v2/integrations:BitBucketIntegration": "BitBucketIntegration",
+   "pulumiservice:v2/integrations:CustomVCSIntegration": "CustomVCSIntegration",
+   "pulumiservice:v2/integrations:CustomVCSRepository": "CustomVCSRepository",
+   "pulumiservice:v2/integrations:GitHubEnterpriseIntegration": "GitHubEnterpriseIntegration",
+   "pulumiservice:v2/integrations:GitHubIntegration": "GitHubIntegration",
+   "pulumiservice:v2/integrations:GitLabIntegration": "GitLabIntegration"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "v2/preview",
+  "fqn": "pulumi_pulumiservice.v2.preview",
+  "classes": {
+   "pulumiservice:v2/preview:Environment": "Environment",
+   "pulumiservice:v2/preview:EnvironmentTag": "EnvironmentTag",
+   "pulumiservice:v2/preview:RevisionTag": "RevisionTag",
+   "pulumiservice:v2/preview:Webhook": "Webhook"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "v2/services",
+  "fqn": "pulumi_pulumiservice.v2.services",
+  "classes": {
+   "pulumiservice:v2/services:Item": "Item",
+   "pulumiservice:v2/services:Service": "Service"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "v2/stacks",
+  "fqn": "pulumi_pulumiservice.v2.stacks",
+  "classes": {
+   "pulumiservice:v2/stacks:Config": "Config",
+   "pulumiservice:v2/stacks:Stack": "Stack",
+   "pulumiservice:v2/stacks:Tag": "Tag",
+   "pulumiservice:v2/stacks:Webhook": "Webhook"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "v2/teams",
+  "fqn": "pulumi_pulumiservice.v2.teams",
+  "classes": {
+   "pulumiservice:v2/teams:Role": "Role",
+   "pulumiservice:v2/teams:Team": "Team"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "v2/tokens",
+  "fqn": "pulumi_pulumiservice.v2.tokens",
+  "classes": {
+   "pulumiservice:v2/tokens:OrgToken": "OrgToken",
+   "pulumiservice:v2/tokens:PersonalToken": "PersonalToken",
+   "pulumiservice:v2/tokens:TeamToken": "TeamToken"
   }
  }
 ]

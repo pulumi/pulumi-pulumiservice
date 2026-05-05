@@ -10,7 +10,7 @@ return await Deployment.RunAsync(() =>
     var baseUrl = config.Get("baseUrl") ?? "https://git.example.invalid";
     var envRef = config.Get("envRef") ?? "organization/vcs-credentials";
 
-    var integration = new Ps.V2.CustomVCSIntegration("integration", new()
+    var integration = new Ps.V2.Integrations.CustomVCSIntegration("integration", new()
     {
         OrgName = serviceOrg,
         Name = $"v2-custom-vcs-{vcsSuffix}",
@@ -19,7 +19,7 @@ return await Deployment.RunAsync(() =>
         Environment = envRef,
     });
 
-    var repository = new Ps.V2.CustomVCSRepository("repository", new()
+    var repository = new Ps.V2.Integrations.CustomVCSRepository("repository", new()
     {
         OrgName = serviceOrg,
         IntegrationId = integration.IntegrationId,

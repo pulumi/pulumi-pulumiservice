@@ -1,6 +1,6 @@
 resources:
   pulumiIssuer:
-    type: pulumiservice:v2:OidcIssuer
+    type: pulumiservice:v2/auth:OidcIssuer
     properties:
       orgName: ${serviceOrg}
       name: pulumi_issuer_${issuerSuffix}
@@ -8,7 +8,7 @@ resources:
       thumbprints:
         - 57d3e89f6b25dde3c174dc558e2b2623306a9d81f88a12e8ae7090a86c12f1da
   githubIssuer:
-    type: pulumiservice:v2:OidcIssuer
+    type: pulumiservice:v2/auth:OidcIssuer
     properties:
       orgName: ${serviceOrg}
       name: github_issuer_${issuerSuffix}

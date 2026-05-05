@@ -1,6 +1,6 @@
 resources:
   pool:
-    type: pulumiservice:v2:AgentPool
+    type: pulumiservice:v2/agents:Pool
     properties:
       orgName: ${serviceOrg}
       name: v2-agent-pool-${poolSuffix}

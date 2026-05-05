@@ -17,7 +17,7 @@ const readOnlyRole = new ps.v2.Role("readOnlyRole", {
     },
 });
 
-const rbacTeam = new ps.v2.Team("rbacTeam", {
+const rbacTeam = new ps.v2.teams.Team("rbacTeam", {
     orgName: serviceOrg,
     name: `v2-rbac-team-${nameSuffix}`,
     displayName: `v2 RBAC Team ${nameSuffix}`,

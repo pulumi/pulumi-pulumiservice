@@ -1,12 +1,12 @@
 package generated_program;
 
 import com.pulumi.Pulumi;
-import com.pulumi.pulumiservice.v2.Stack;
-import com.pulumi.pulumiservice.v2.StackArgs;
-import com.pulumi.pulumiservice.v2.StackConfig;
-import com.pulumi.pulumiservice.v2.StackConfigArgs;
-import com.pulumi.pulumiservice.v2.StackWebhook;
-import com.pulumi.pulumiservice.v2.StackWebhookArgs;
+import com.pulumi.pulumiservice.v2_stacks.Stack;
+import com.pulumi.pulumiservice.v2_stacks.StackArgs;
+import com.pulumi.pulumiservice.v2_stacks.Config;
+import com.pulumi.pulumiservice.v2_stacks.ConfigArgs;
+import com.pulumi.pulumiservice.v2_stacks.Webhook;
+import com.pulumi.pulumiservice.v2_stacks.WebhookArgs;
 
 public class App {
     public static void main(String[] args) {
@@ -25,16 +25,16 @@ public class App {
                     .stackName(stackName)
                     .build());
 
-            new StackConfig("config",
-                StackConfigArgs.builder()
+            new Config("config",
+                ConfigArgs.builder()
                     .orgName(serviceOrg)
                     .projectName(parentStack.projectName())
                     .stackName(parentStack.stackName())
                     .environment(envRef)
                     .build());
 
-            new StackWebhook("hook",
-                StackWebhookArgs.builder()
+            new Webhook("hook",
+                WebhookArgs.builder()
                     .organizationName(serviceOrg)
                     .projectName(parentStack.projectName())
                     .stackName(parentStack.stackName())

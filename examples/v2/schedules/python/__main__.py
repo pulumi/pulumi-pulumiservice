@@ -7,14 +7,14 @@ project_name = config.get("projectName") or "pulumi-service-schedules-example"
 stack_name = config.get("stackName") or "dev"
 schedule_cron = config.get("scheduleCron") or "0 7 * * *"
 
-parent_stack = ps_v2.Stack(
+parent_stack = ps_v2.stacks.Stack(
     "parentStack",
     org_name=service_org,
     project_name=project_name,
     stack_name=stack_name,
 )
 
-parent_settings = ps_v2.DeploymentSettings(
+parent_settings = ps_v2.deployments.Settings(
     "parentSettings",
     org_name=service_org,
     project_name=project_name,
@@ -23,7 +23,7 @@ parent_settings = ps_v2.DeploymentSettings(
     opts=pulumi.ResourceOptions(depends_on=[parent_stack]),
 )
 
-nightly_deploy = ps_v2.ScheduledDeployment(
+nightly_deploy = ps_v2.deployments.ScheduledDeployment(
     "nightlyDeploy",
     org_name=service_org,
     project_name=project_name,

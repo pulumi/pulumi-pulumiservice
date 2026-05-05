@@ -7,13 +7,13 @@ const projectName = config.get("projectName") ?? "v2-stack-tags-example";
 const stackName = config.get("stackName") ?? "dev";
 const tagValue = config.get("tagValue") ?? "v2-tag-value";
 
-const parentStack = new ps.v2.Stack("parentStack", {
+const parentStack = new ps.v2.stacks.Stack("parentStack", {
     orgName: serviceOrg,
     projectName: projectName,
     stackName: stackName,
 });
 
-new ps.v2.StackTag("ownerTag", {
+new ps.v2.stacks.Tag("ownerTag", {
     orgName: serviceOrg,
     projectName: parentStack.projectName,
     stackName: parentStack.stackName,
@@ -21,7 +21,7 @@ new ps.v2.StackTag("ownerTag", {
     value: "pulumicloud-v2-example",
 });
 
-new ps.v2.StackTag("customTag", {
+new ps.v2.stacks.Tag("customTag", {
     orgName: serviceOrg,
     projectName: parentStack.projectName,
     stackName: parentStack.stackName,

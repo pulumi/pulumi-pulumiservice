@@ -3,7 +3,7 @@
 # the service.
 resources:
   catalogService:
-    type: pulumiservice:v2:Service
+    type: pulumiservice:v2/services:Service
     properties:
       orgName: ${serviceOrg}
       name: v2-service-${serviceSuffix}

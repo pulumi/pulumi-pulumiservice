@@ -6,7 +6,7 @@ service_org = config.get("serviceOrg") or "service-provider-test-org"
 token_suffix = config.get("tokenSuffix") or "dev"
 token_description = config.get("tokenDescription") or "example v2 access token"
 
-team = ps_v2.Team(
+team = ps_v2.teams.Team(
     "team",
     org_name=service_org,
     name=f"v2-tokens-team-{token_suffix}",
@@ -14,7 +14,7 @@ team = ps_v2.Team(
     description="Owner team for the v2 access-tokens example",
 )
 
-org_token = ps_v2.OrgToken(
+org_token = ps_v2.tokens.OrgToken(
     "orgToken",
     org_name=service_org,
     name=f"v2-org-token-{token_suffix}",
@@ -23,7 +23,7 @@ org_token = ps_v2.OrgToken(
     expires=0,
 )
 
-team_token = ps_v2.TeamToken(
+team_token = ps_v2.tokens.TeamToken(
     "teamToken",
     org_name=service_org,
     team_name=team.name,
@@ -32,7 +32,7 @@ team_token = ps_v2.TeamToken(
     expires=0,
 )
 
-ps_v2.PersonalToken(
+ps_v2.tokens.PersonalToken(
     "personalToken",
     description=token_description,
     expires=0,

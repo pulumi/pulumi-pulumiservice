@@ -1,8 +1,8 @@
 package generated_program;
 
 import com.pulumi.Pulumi;
-import com.pulumi.pulumiservice.v2.AuthPolicy;
-import com.pulumi.pulumiservice.v2.AuthPolicyArgs;
+import com.pulumi.pulumiservice.v2_auth.Policy;
+import com.pulumi.pulumiservice.v2_auth.PolicyArgs;
 
 import java.util.List;
 import java.util.Map;
@@ -14,8 +14,8 @@ public class App {
             var serviceOrg = config.get("serviceOrg").orElse("service-provider-test-org");
             var policyId = config.get("policyId").orElse("org");
 
-            new AuthPolicy("policy",
-                AuthPolicyArgs.builder()
+            new Policy("policy",
+                PolicyArgs.builder()
                     .orgName(serviceOrg)
                     .policyId(policyId)
                     .policies(List.of(

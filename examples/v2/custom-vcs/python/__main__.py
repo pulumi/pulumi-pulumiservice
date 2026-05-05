@@ -7,7 +7,7 @@ vcs_suffix = config.get("vcsSuffix") or "dev"
 base_url = config.get("baseUrl") or "https://git.example.invalid"
 env_ref = config.get("envRef") or "organization/vcs-credentials"
 
-integration = ps_v2.CustomVCSIntegration(
+integration = ps_v2.integrations.CustomVCSIntegration(
     "integration",
     org_name=service_org,
     name=f"v2-custom-vcs-{vcs_suffix}",
@@ -16,7 +16,7 @@ integration = ps_v2.CustomVCSIntegration(
     environment=env_ref,
 )
 
-repository = ps_v2.CustomVCSRepository(
+repository = ps_v2.integrations.CustomVCSRepository(
     "repository",
     org_name=service_org,
     integration_id=integration.integration_id,

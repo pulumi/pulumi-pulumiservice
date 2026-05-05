@@ -1,10 +1,10 @@
 package generated_program;
 
 import com.pulumi.Pulumi;
-import com.pulumi.pulumiservice.v2.EnvironmentDraft;
-import com.pulumi.pulumiservice.v2.EnvironmentDraftArgs;
-import com.pulumi.pulumiservice.v2.EnvironmentSettings;
-import com.pulumi.pulumiservice.v2.EnvironmentSettingsArgs;
+import com.pulumi.pulumiservice.v2_esc.EnvironmentDraft;
+import com.pulumi.pulumiservice.v2_esc.EnvironmentDraftArgs;
+import com.pulumi.pulumiservice.v2_esc.EnvironmentSettings;
+import com.pulumi.pulumiservice.v2_esc.EnvironmentSettingsArgs;
 
 public class App {
     public static void main(String[] args) {

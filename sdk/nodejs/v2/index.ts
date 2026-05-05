@@ -5,130 +5,25 @@ import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "../utilities";
 
 // Export members:
-export { AccountArgs } from "./account";
-export type Account = import("./account").Account;
-export const Account: typeof import("./account").Account = null as any;
-utilities.lazyLoad(exports, ["Account"], () => require("./account"));
-
-export { AgentPoolArgs } from "./agentPool";
-export type AgentPool = import("./agentPool").AgentPool;
-export const AgentPool: typeof import("./agentPool").AgentPool = null as any;
-utilities.lazyLoad(exports, ["AgentPool"], () => require("./agentPool"));
-
 export { AuditLogExportConfigurationArgs } from "./auditLogExportConfiguration";
 export type AuditLogExportConfiguration = import("./auditLogExportConfiguration").AuditLogExportConfiguration;
 export const AuditLogExportConfiguration: typeof import("./auditLogExportConfiguration").AuditLogExportConfiguration = null as any;
 utilities.lazyLoad(exports, ["AuditLogExportConfiguration"], () => require("./auditLogExportConfiguration"));
-
-export { AuthPolicyArgs } from "./authPolicy";
-export type AuthPolicy = import("./authPolicy").AuthPolicy;
-export const AuthPolicy: typeof import("./authPolicy").AuthPolicy = null as any;
-utilities.lazyLoad(exports, ["AuthPolicy"], () => require("./authPolicy"));
-
-export { AzureDevOpsIntegrationArgs } from "./azureDevOpsIntegration";
-export type AzureDevOpsIntegration = import("./azureDevOpsIntegration").AzureDevOpsIntegration;
-export const AzureDevOpsIntegration: typeof import("./azureDevOpsIntegration").AzureDevOpsIntegration = null as any;
-utilities.lazyLoad(exports, ["AzureDevOpsIntegration"], () => require("./azureDevOpsIntegration"));
-
-export { BitBucketIntegrationArgs } from "./bitBucketIntegration";
-export type BitBucketIntegration = import("./bitBucketIntegration").BitBucketIntegration;
-export const BitBucketIntegration: typeof import("./bitBucketIntegration").BitBucketIntegration = null as any;
-utilities.lazyLoad(exports, ["BitBucketIntegration"], () => require("./bitBucketIntegration"));
-
-export { CustomVCSIntegrationArgs } from "./customVCSIntegration";
-export type CustomVCSIntegration = import("./customVCSIntegration").CustomVCSIntegration;
-export const CustomVCSIntegration: typeof import("./customVCSIntegration").CustomVCSIntegration = null as any;
-utilities.lazyLoad(exports, ["CustomVCSIntegration"], () => require("./customVCSIntegration"));
-
-export { CustomVCSRepositoryArgs } from "./customVCSRepository";
-export type CustomVCSRepository = import("./customVCSRepository").CustomVCSRepository;
-export const CustomVCSRepository: typeof import("./customVCSRepository").CustomVCSRepository = null as any;
-utilities.lazyLoad(exports, ["CustomVCSRepository"], () => require("./customVCSRepository"));
 
 export { DefaultOrganizationArgs } from "./defaultOrganization";
 export type DefaultOrganization = import("./defaultOrganization").DefaultOrganization;
 export const DefaultOrganization: typeof import("./defaultOrganization").DefaultOrganization = null as any;
 utilities.lazyLoad(exports, ["DefaultOrganization"], () => require("./defaultOrganization"));
 
-export { DeploymentSettingsArgs } from "./deploymentSettings";
-export type DeploymentSettings = import("./deploymentSettings").DeploymentSettings;
-export const DeploymentSettings: typeof import("./deploymentSettings").DeploymentSettings = null as any;
-utilities.lazyLoad(exports, ["DeploymentSettings"], () => require("./deploymentSettings"));
-
-export { EnvironmentDraftArgs } from "./environmentDraft";
-export type EnvironmentDraft = import("./environmentDraft").EnvironmentDraft;
-export const EnvironmentDraft: typeof import("./environmentDraft").EnvironmentDraft = null as any;
-utilities.lazyLoad(exports, ["EnvironmentDraft"], () => require("./environmentDraft"));
-
-export { EnvironmentScheduleArgs } from "./environmentSchedule";
-export type EnvironmentSchedule = import("./environmentSchedule").EnvironmentSchedule;
-export const EnvironmentSchedule: typeof import("./environmentSchedule").EnvironmentSchedule = null as any;
-utilities.lazyLoad(exports, ["EnvironmentSchedule"], () => require("./environmentSchedule"));
-
-export { EnvironmentSettingsArgs } from "./environmentSettings";
-export type EnvironmentSettings = import("./environmentSettings").EnvironmentSettings;
-export const EnvironmentSettings: typeof import("./environmentSettings").EnvironmentSettings = null as any;
-utilities.lazyLoad(exports, ["EnvironmentSettings"], () => require("./environmentSettings"));
-
-export { EnvironmentTag_esc_environmentsArgs } from "./environmentTag_esc_environments";
-export type EnvironmentTag_esc_environments = import("./environmentTag_esc_environments").EnvironmentTag_esc_environments;
-export const EnvironmentTag_esc_environments: typeof import("./environmentTag_esc_environments").EnvironmentTag_esc_environments = null as any;
-utilities.lazyLoad(exports, ["EnvironmentTag_esc_environments"], () => require("./environmentTag_esc_environments"));
-
-export { EnvironmentTag_preview_environmentsArgs } from "./environmentTag_preview_environments";
-export type EnvironmentTag_preview_environments = import("./environmentTag_preview_environments").EnvironmentTag_preview_environments;
-export const EnvironmentTag_preview_environments: typeof import("./environmentTag_preview_environments").EnvironmentTag_preview_environments = null as any;
-utilities.lazyLoad(exports, ["EnvironmentTag_preview_environments"], () => require("./environmentTag_preview_environments"));
-
-export { Environment_esc_environmentsArgs } from "./environment_esc_environments";
-export type Environment_esc_environments = import("./environment_esc_environments").Environment_esc_environments;
-export const Environment_esc_environments: typeof import("./environment_esc_environments").Environment_esc_environments = null as any;
-utilities.lazyLoad(exports, ["Environment_esc_environments"], () => require("./environment_esc_environments"));
-
-export { Environment_preview_environmentsArgs } from "./environment_preview_environments";
-export type Environment_preview_environments = import("./environment_preview_environments").Environment_preview_environments;
-export const Environment_preview_environments: typeof import("./environment_preview_environments").Environment_preview_environments = null as any;
-utilities.lazyLoad(exports, ["Environment_preview_environments"], () => require("./environment_preview_environments"));
-
 export { GateArgs } from "./gate";
 export type Gate = import("./gate").Gate;
 export const Gate: typeof import("./gate").Gate = null as any;
 utilities.lazyLoad(exports, ["Gate"], () => require("./gate"));
 
-export { GitHubEnterpriseIntegrationArgs } from "./gitHubEnterpriseIntegration";
-export type GitHubEnterpriseIntegration = import("./gitHubEnterpriseIntegration").GitHubEnterpriseIntegration;
-export const GitHubEnterpriseIntegration: typeof import("./gitHubEnterpriseIntegration").GitHubEnterpriseIntegration = null as any;
-utilities.lazyLoad(exports, ["GitHubEnterpriseIntegration"], () => require("./gitHubEnterpriseIntegration"));
-
-export { GitHubIntegrationArgs } from "./gitHubIntegration";
-export type GitHubIntegration = import("./gitHubIntegration").GitHubIntegration;
-export const GitHubIntegration: typeof import("./gitHubIntegration").GitHubIntegration = null as any;
-utilities.lazyLoad(exports, ["GitHubIntegration"], () => require("./gitHubIntegration"));
-
-export { GitLabIntegrationArgs } from "./gitLabIntegration";
-export type GitLabIntegration = import("./gitLabIntegration").GitLabIntegration;
-export const GitLabIntegration: typeof import("./gitLabIntegration").GitLabIntegration = null as any;
-utilities.lazyLoad(exports, ["GitLabIntegration"], () => require("./gitLabIntegration"));
-
-export { OidcIssuerArgs } from "./oidcIssuer";
-export type OidcIssuer = import("./oidcIssuer").OidcIssuer;
-export const OidcIssuer: typeof import("./oidcIssuer").OidcIssuer = null as any;
-utilities.lazyLoad(exports, ["OidcIssuer"], () => require("./oidcIssuer"));
-
-export { OpenEnvironmentRequestArgs } from "./openEnvironmentRequest";
-export type OpenEnvironmentRequest = import("./openEnvironmentRequest").OpenEnvironmentRequest;
-export const OpenEnvironmentRequest: typeof import("./openEnvironmentRequest").OpenEnvironmentRequest = null as any;
-utilities.lazyLoad(exports, ["OpenEnvironmentRequest"], () => require("./openEnvironmentRequest"));
-
 export { OrgTemplateCollectionArgs } from "./orgTemplateCollection";
 export type OrgTemplateCollection = import("./orgTemplateCollection").OrgTemplateCollection;
 export const OrgTemplateCollection: typeof import("./orgTemplateCollection").OrgTemplateCollection = null as any;
 utilities.lazyLoad(exports, ["OrgTemplateCollection"], () => require("./orgTemplateCollection"));
-
-export { OrgTokenArgs } from "./orgToken";
-export type OrgToken = import("./orgToken").OrgToken;
-export const OrgToken: typeof import("./orgToken").OrgToken = null as any;
-utilities.lazyLoad(exports, ["OrgToken"], () => require("./orgToken"));
 
 export { OrganizationMemberArgs } from "./organizationMember";
 export type OrganizationMember = import("./organizationMember").OrganizationMember;
@@ -139,11 +34,6 @@ export { OrganizationWebhookArgs } from "./organizationWebhook";
 export type OrganizationWebhook = import("./organizationWebhook").OrganizationWebhook;
 export const OrganizationWebhook: typeof import("./organizationWebhook").OrganizationWebhook = null as any;
 utilities.lazyLoad(exports, ["OrganizationWebhook"], () => require("./organizationWebhook"));
-
-export { PersonalTokenArgs } from "./personalToken";
-export type PersonalToken = import("./personalToken").PersonalToken;
-export const PersonalToken: typeof import("./personalToken").PersonalToken = null as any;
-utilities.lazyLoad(exports, ["PersonalToken"], () => require("./personalToken"));
 
 export { PolicyGroupArgs } from "./policyGroup";
 export type PolicyGroup = import("./policyGroup").PolicyGroup;
@@ -160,185 +50,63 @@ export type PolicyPack = import("./policyPack").PolicyPack;
 export const PolicyPack: typeof import("./policyPack").PolicyPack = null as any;
 utilities.lazyLoad(exports, ["PolicyPack"], () => require("./policyPack"));
 
-export { RevisionTag_esc_environmentsArgs } from "./revisionTag_esc_environments";
-export type RevisionTag_esc_environments = import("./revisionTag_esc_environments").RevisionTag_esc_environments;
-export const RevisionTag_esc_environments: typeof import("./revisionTag_esc_environments").RevisionTag_esc_environments = null as any;
-utilities.lazyLoad(exports, ["RevisionTag_esc_environments"], () => require("./revisionTag_esc_environments"));
-
-export { RevisionTag_preview_environmentsArgs } from "./revisionTag_preview_environments";
-export type RevisionTag_preview_environments = import("./revisionTag_preview_environments").RevisionTag_preview_environments;
-export const RevisionTag_preview_environments: typeof import("./revisionTag_preview_environments").RevisionTag_preview_environments = null as any;
-utilities.lazyLoad(exports, ["RevisionTag_preview_environments"], () => require("./revisionTag_preview_environments"));
-
 export { RoleArgs } from "./role";
 export type Role = import("./role").Role;
 export const Role: typeof import("./role").Role = null as any;
 utilities.lazyLoad(exports, ["Role"], () => require("./role"));
 
-export { SAMLOrganizationArgs } from "./samlorganization";
-export type SAMLOrganization = import("./samlorganization").SAMLOrganization;
-export const SAMLOrganization: typeof import("./samlorganization").SAMLOrganization = null as any;
-utilities.lazyLoad(exports, ["SAMLOrganization"], () => require("./samlorganization"));
 
-export { ScheduledDeploymentArgs } from "./scheduledDeployment";
-export type ScheduledDeployment = import("./scheduledDeployment").ScheduledDeployment;
-export const ScheduledDeployment: typeof import("./scheduledDeployment").ScheduledDeployment = null as any;
-utilities.lazyLoad(exports, ["ScheduledDeployment"], () => require("./scheduledDeployment"));
+// Export sub-modules:
+import * as agents from "./agents";
+import * as auth from "./auth";
+import * as deployments from "./deployments";
+import * as esc from "./esc";
+import * as insights from "./insights";
+import * as integrations from "./integrations";
+import * as preview from "./preview";
+import * as services from "./services";
+import * as stacks from "./stacks";
+import * as teams from "./teams";
+import * as tokens from "./tokens";
 
-export { ScheduledScanSettingsArgs } from "./scheduledScanSettings";
-export type ScheduledScanSettings = import("./scheduledScanSettings").ScheduledScanSettings;
-export const ScheduledScanSettings: typeof import("./scheduledScanSettings").ScheduledScanSettings = null as any;
-utilities.lazyLoad(exports, ["ScheduledScanSettings"], () => require("./scheduledScanSettings"));
-
-export { ServiceArgs } from "./service";
-export type Service = import("./service").Service;
-export const Service: typeof import("./service").Service = null as any;
-utilities.lazyLoad(exports, ["Service"], () => require("./service"));
-
-export { StackArgs } from "./stack";
-export type Stack = import("./stack").Stack;
-export const Stack: typeof import("./stack").Stack = null as any;
-utilities.lazyLoad(exports, ["Stack"], () => require("./stack"));
-
-export { StackConfigArgs } from "./stackConfig";
-export type StackConfig = import("./stackConfig").StackConfig;
-export const StackConfig: typeof import("./stackConfig").StackConfig = null as any;
-utilities.lazyLoad(exports, ["StackConfig"], () => require("./stackConfig"));
-
-export { StackTagArgs } from "./stackTag";
-export type StackTag = import("./stackTag").StackTag;
-export const StackTag: typeof import("./stackTag").StackTag = null as any;
-utilities.lazyLoad(exports, ["StackTag"], () => require("./stackTag"));
-
-export { StackWebhookArgs } from "./stackWebhook";
-export type StackWebhook = import("./stackWebhook").StackWebhook;
-export const StackWebhook: typeof import("./stackWebhook").StackWebhook = null as any;
-utilities.lazyLoad(exports, ["StackWebhook"], () => require("./stackWebhook"));
-
-export { TaskArgs } from "./task";
-export type Task = import("./task").Task;
-export const Task: typeof import("./task").Task = null as any;
-utilities.lazyLoad(exports, ["Task"], () => require("./task"));
-
-export { TeamArgs } from "./team";
-export type Team = import("./team").Team;
-export const Team: typeof import("./team").Team = null as any;
-utilities.lazyLoad(exports, ["Team"], () => require("./team"));
-
-export { TeamTokenArgs } from "./teamToken";
-export type TeamToken = import("./teamToken").TeamToken;
-export const TeamToken: typeof import("./teamToken").TeamToken = null as any;
-utilities.lazyLoad(exports, ["TeamToken"], () => require("./teamToken"));
-
-export { Webhook_esc_environmentsArgs } from "./webhook_esc_environments";
-export type Webhook_esc_environments = import("./webhook_esc_environments").Webhook_esc_environments;
-export const Webhook_esc_environments: typeof import("./webhook_esc_environments").Webhook_esc_environments = null as any;
-utilities.lazyLoad(exports, ["Webhook_esc_environments"], () => require("./webhook_esc_environments"));
-
-export { Webhook_preview_environmentsArgs } from "./webhook_preview_environments";
-export type Webhook_preview_environments = import("./webhook_preview_environments").Webhook_preview_environments;
-export const Webhook_preview_environments: typeof import("./webhook_preview_environments").Webhook_preview_environments = null as any;
-utilities.lazyLoad(exports, ["Webhook_preview_environments"], () => require("./webhook_preview_environments"));
-
+export {
+    agents,
+    auth,
+    deployments,
+    esc,
+    insights,
+    integrations,
+    preview,
+    services,
+    stacks,
+    teams,
+    tokens,
+};
 
 const _module = {
     version: utilities.getVersion(),
     construct: (name: string, type: string, urn: string): pulumi.Resource => {
         switch (type) {
-            case "pulumiservice:v2:Account":
-                return new Account(name, <any>undefined, { urn })
-            case "pulumiservice:v2:AgentPool":
-                return new AgentPool(name, <any>undefined, { urn })
             case "pulumiservice:v2:AuditLogExportConfiguration":
                 return new AuditLogExportConfiguration(name, <any>undefined, { urn })
-            case "pulumiservice:v2:AuthPolicy":
-                return new AuthPolicy(name, <any>undefined, { urn })
-            case "pulumiservice:v2:AzureDevOpsIntegration":
-                return new AzureDevOpsIntegration(name, <any>undefined, { urn })
-            case "pulumiservice:v2:BitBucketIntegration":
-                return new BitBucketIntegration(name, <any>undefined, { urn })
-            case "pulumiservice:v2:CustomVCSIntegration":
-                return new CustomVCSIntegration(name, <any>undefined, { urn })
-            case "pulumiservice:v2:CustomVCSRepository":
-                return new CustomVCSRepository(name, <any>undefined, { urn })
             case "pulumiservice:v2:DefaultOrganization":
                 return new DefaultOrganization(name, <any>undefined, { urn })
-            case "pulumiservice:v2:DeploymentSettings":
-                return new DeploymentSettings(name, <any>undefined, { urn })
-            case "pulumiservice:v2:EnvironmentDraft":
-                return new EnvironmentDraft(name, <any>undefined, { urn })
-            case "pulumiservice:v2:EnvironmentSchedule":
-                return new EnvironmentSchedule(name, <any>undefined, { urn })
-            case "pulumiservice:v2:EnvironmentSettings":
-                return new EnvironmentSettings(name, <any>undefined, { urn })
-            case "pulumiservice:v2:EnvironmentTag_esc_environments":
-                return new EnvironmentTag_esc_environments(name, <any>undefined, { urn })
-            case "pulumiservice:v2:EnvironmentTag_preview_environments":
-                return new EnvironmentTag_preview_environments(name, <any>undefined, { urn })
-            case "pulumiservice:v2:Environment_esc_environments":
-                return new Environment_esc_environments(name, <any>undefined, { urn })
-            case "pulumiservice:v2:Environment_preview_environments":
-                return new Environment_preview_environments(name, <any>undefined, { urn })
             case "pulumiservice:v2:Gate":
                 return new Gate(name, <any>undefined, { urn })
-            case "pulumiservice:v2:GitHubEnterpriseIntegration":
-                return new GitHubEnterpriseIntegration(name, <any>undefined, { urn })
-            case "pulumiservice:v2:GitHubIntegration":
-                return new GitHubIntegration(name, <any>undefined, { urn })
-            case "pulumiservice:v2:GitLabIntegration":
-                return new GitLabIntegration(name, <any>undefined, { urn })
-            case "pulumiservice:v2:OidcIssuer":
-                return new OidcIssuer(name, <any>undefined, { urn })
-            case "pulumiservice:v2:OpenEnvironmentRequest":
-                return new OpenEnvironmentRequest(name, <any>undefined, { urn })
             case "pulumiservice:v2:OrgTemplateCollection":
                 return new OrgTemplateCollection(name, <any>undefined, { urn })
-            case "pulumiservice:v2:OrgToken":
-                return new OrgToken(name, <any>undefined, { urn })
             case "pulumiservice:v2:OrganizationMember":
                 return new OrganizationMember(name, <any>undefined, { urn })
             case "pulumiservice:v2:OrganizationWebhook":
                 return new OrganizationWebhook(name, <any>undefined, { urn })
-            case "pulumiservice:v2:PersonalToken":
-                return new PersonalToken(name, <any>undefined, { urn })
             case "pulumiservice:v2:PolicyGroup":
                 return new PolicyGroup(name, <any>undefined, { urn })
             case "pulumiservice:v2:PolicyIssue":
                 return new PolicyIssue(name, <any>undefined, { urn })
             case "pulumiservice:v2:PolicyPack":
                 return new PolicyPack(name, <any>undefined, { urn })
-            case "pulumiservice:v2:RevisionTag_esc_environments":
-                return new RevisionTag_esc_environments(name, <any>undefined, { urn })
-            case "pulumiservice:v2:RevisionTag_preview_environments":
-                return new RevisionTag_preview_environments(name, <any>undefined, { urn })
             case "pulumiservice:v2:Role":
                 return new Role(name, <any>undefined, { urn })
-            case "pulumiservice:v2:SAMLOrganization":
-                return new SAMLOrganization(name, <any>undefined, { urn })
-            case "pulumiservice:v2:ScheduledDeployment":
-                return new ScheduledDeployment(name, <any>undefined, { urn })
-            case "pulumiservice:v2:ScheduledScanSettings":
-                return new ScheduledScanSettings(name, <any>undefined, { urn })
-            case "pulumiservice:v2:Service":
-                return new Service(name, <any>undefined, { urn })
-            case "pulumiservice:v2:Stack":
-                return new Stack(name, <any>undefined, { urn })
-            case "pulumiservice:v2:StackConfig":
-                return new StackConfig(name, <any>undefined, { urn })
-            case "pulumiservice:v2:StackTag":
-                return new StackTag(name, <any>undefined, { urn })
-            case "pulumiservice:v2:StackWebhook":
-                return new StackWebhook(name, <any>undefined, { urn })
-            case "pulumiservice:v2:Task":
-                return new Task(name, <any>undefined, { urn })
-            case "pulumiservice:v2:Team":
-                return new Team(name, <any>undefined, { urn })
-            case "pulumiservice:v2:TeamToken":
-                return new TeamToken(name, <any>undefined, { urn })
-            case "pulumiservice:v2:Webhook_esc_environments":
-                return new Webhook_esc_environments(name, <any>undefined, { urn })
-            case "pulumiservice:v2:Webhook_preview_environments":
-                return new Webhook_preview_environments(name, <any>undefined, { urn })
             default:
                 throw new Error(`unknown resource type ${type}`);
         }

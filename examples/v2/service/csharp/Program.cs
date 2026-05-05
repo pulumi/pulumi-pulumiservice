@@ -18,7 +18,7 @@ return await Deployment.RunAsync(() =>
         .Add("key", "oncall")
         .Add("value", "platform-ops");
 
-    new Ps.V2.Service("catalogService", new()
+    new Ps.V2.Services.Service("catalogService", new()
     {
         OrgName = serviceOrg,
         Name = $"v2-service-{serviceSuffix}",

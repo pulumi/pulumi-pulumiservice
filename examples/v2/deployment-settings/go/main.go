@@ -1,7 +1,8 @@
 package main
 
 import (
-	v2 "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2"
+	stacks "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2/stacks"
+	deployments "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2/deployments"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
 )
@@ -26,7 +27,7 @@ func main() {
 			executorImage = "pulumi-cli"
 		}
 
-		parentStack, err := v2.NewStack(ctx, "parentStack", &v2.StackArgs{
+		parentStack, err := stacks.NewStack(ctx, "parentStack", &stacks.StackArgs{
 			OrgName:     pulumi.String(serviceOrg),
 			ProjectName: pulumi.String(projectName),
 			StackName:   pulumi.String(stackName),
@@ -35,7 +36,7 @@ func main() {
 			return err
 		}
 
-		settings, err := v2.NewDeploymentSettings(ctx, "settings", &v2.DeploymentSettingsArgs{
+		settings, err := deployments.NewSettings(ctx, "settings", &deployments.SettingsArgs{
 			OrgName:     pulumi.String(serviceOrg),
 			ProjectName: pulumi.String(projectName),
 			StackName:   pulumi.String(stackName),

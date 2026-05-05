@@ -1,7 +1,7 @@
 package main
 
 import (
-	v2 "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2"
+	agents "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2/agents"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
 )
@@ -22,7 +22,7 @@ func main() {
 			taskID = "example-task-id"
 		}
 
-		pool, err := v2.NewAgentPool(ctx, "pool", &v2.AgentPoolArgs{
+		pool, err := agents.NewPool(ctx, "pool", &agents.PoolArgs{
 			OrgName:     pulumi.String(serviceOrg),
 			Name:        pulumi.String("v2-task-pool-" + taskSuffix),
 			Description: pulumi.String("Pool used by the v2 task example"),
@@ -31,13 +31,13 @@ func main() {
 			return err
 		}
 
-		if _, err := v2.NewTask(ctx, "task", &v2.TaskArgs{
+		if _, err := agents.NewTask(ctx, "task", &agents.TaskArgs{
 			OrgName:        pulumi.String(serviceOrg),
 			TaskID:         pulumi.String(taskID),
-			Name:           pulumi.String("v2-task-" + taskSuffix),
 			ApprovalMode:   pulumi.String("manual"),
-			PermissionMode: pulumi.String("maintainer"),
-			IsShared:       pulumi.Bool(false),
+			PermissionMode: pulumi.String("default"),
+			Source:         pulumi.String("api"),
+			PlanMode:       pulumi.Bool(false),
 		}); err != nil {
 			return err
 		}

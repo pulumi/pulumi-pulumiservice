@@ -11,14 +11,14 @@ return await Deployment.RunAsync(() =>
     var hookUrl = config.Get("hookUrl") ?? "https://example.invalid/hooks/example";
     var envRef = config.Get("envRef") ?? "organization/credentials";
 
-    var parentStack = new Ps.V2.Stack("parentStack", new()
+    var parentStack = new Ps.V2.Stacks.Stack("parentStack", new()
     {
         OrgName = serviceOrg,
         ProjectName = projectName,
         StackName = stackName,
     });
 
-    new Ps.V2.StackConfig("config", new()
+    new Ps.V2.Stacks.Config("config", new()
     {
         OrgName = serviceOrg,
         ProjectName = parentStack.ProjectName,
@@ -26,7 +26,7 @@ return await Deployment.RunAsync(() =>
         Environment = envRef,
     });
 
-    new Ps.V2.StackWebhook("hook", new()
+    new Ps.V2.Stacks.Webhook("hook", new()
     {
         OrganizationName = serviceOrg,
         ProjectName = parentStack.ProjectName,

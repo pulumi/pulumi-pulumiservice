@@ -6,7 +6,7 @@ const serviceOrg = config.get("serviceOrg") ?? "service-provider-test-org";
 const projectName = config.get("projectName") ?? "test-project";
 const envSuffix = config.get("envSuffix") ?? "dev";
 
-const environment = new ps.v2.Environment_esc_environments("environment", {
+const environment = new ps.v2.esc.Environment("environment", {
     orgName: serviceOrg,
     project: projectName,
     name: `testing-environment-${envSuffix}`,

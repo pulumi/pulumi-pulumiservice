@@ -5,7 +5,7 @@ const config = new pulumi.Config();
 const serviceOrg = config.get("serviceOrg") ?? "service-provider-test-org";
 const policyId = config.get("policyId") ?? "org";
 
-new ps.v2.AuthPolicy("policy", {
+new ps.v2.auth.Policy("policy", {
     orgName: serviceOrg,
     policyId: policyId,
     policies: [

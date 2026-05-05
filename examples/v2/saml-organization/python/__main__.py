@@ -9,7 +9,7 @@ idp_descriptor = """<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:m
   <md:IDPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol"/>
 </md:EntityDescriptor>"""
 
-ps_v2.SAMLOrganization(
+ps_v2.auth.SAML(
     "saml",
     org_name=service_org,
     new_idp_sso_descriptor=idp_descriptor,

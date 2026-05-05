@@ -11,7 +11,7 @@ return await Deployment.RunAsync(() =>
     var bitbucketId = config.Get("bitbucketIntegrationId") ?? "bb-org-integration";
     var azureDevOpsId = config.Get("azureDevOpsIntegrationId") ?? "ado-org-integration";
 
-    new Ps.V2.GitHubIntegration("github", new()
+    new Ps.V2.Integrations.GitHubIntegration("github", new()
     {
         OrgName = serviceOrg,
         IntegrationId = githubId,
@@ -21,7 +21,7 @@ return await Deployment.RunAsync(() =>
         DisableCodeAccessForReviews = false,
     });
 
-    new Ps.V2.GitHubEnterpriseIntegration("githubEnterprise", new()
+    new Ps.V2.Integrations.GitHubEnterpriseIntegration("githubEnterprise", new()
     {
         OrgName = serviceOrg,
         IntegrationId = githubEnterpriseId,
@@ -31,7 +31,7 @@ return await Deployment.RunAsync(() =>
         DisableCodeAccessForReviews = true,
     });
 
-    new Ps.V2.GitLabIntegration("gitlab", new()
+    new Ps.V2.Integrations.GitLabIntegration("gitlab", new()
     {
         OrgName = serviceOrg,
         IntegrationId = gitlabId,
@@ -40,7 +40,7 @@ return await Deployment.RunAsync(() =>
         DisableNeoSummaries = true,
     });
 
-    new Ps.V2.BitBucketIntegration("bitbucket", new()
+    new Ps.V2.Integrations.BitBucketIntegration("bitbucket", new()
     {
         OrgName = serviceOrg,
         IntegrationId = bitbucketId,
@@ -49,7 +49,7 @@ return await Deployment.RunAsync(() =>
         DisableNeoSummaries = false,
     });
 
-    new Ps.V2.AzureDevOpsIntegration("azureDevOps", new()
+    new Ps.V2.Integrations.AzureDevOpsIntegration("azureDevOps", new()
     {
         OrgName = serviceOrg,
         IntegrationId = azureDevOpsId,

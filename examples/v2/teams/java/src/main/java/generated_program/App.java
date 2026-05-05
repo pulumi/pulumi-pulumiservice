@@ -1,8 +1,8 @@
 package generated_program;
 
 import com.pulumi.Pulumi;
-import com.pulumi.pulumiservice.v2.Team;
-import com.pulumi.pulumiservice.v2.TeamArgs;
+import com.pulumi.pulumiservice.v2_teams.Team;
+import com.pulumi.pulumiservice.v2_teams.TeamArgs;
 
 public class App {
     public static void main(String[] args) {

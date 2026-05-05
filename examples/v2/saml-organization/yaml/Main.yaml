@@ -3,7 +3,7 @@
 # is structurally valid for preview but won't authenticate.
 resources:
   saml:
-    type: pulumiservice:v2:SAMLOrganization
+    type: pulumiservice:v2/auth:SAML
     properties:
       orgName: ${serviceOrg}
       newIdpSsoDescriptor: |

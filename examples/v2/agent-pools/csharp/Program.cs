@@ -9,7 +9,7 @@ return await Deployment.RunAsync(() =>
     var poolSuffix = config.Get("poolSuffix") ?? "dev";
     var poolDescription = config.Get("poolDescription") ?? "v2 example agent pool";
 
-    var pool = new Ps.V2.AgentPool("pool", new()
+    var pool = new Ps.V2.Agents.Pool("pool", new()
     {
         OrgName = serviceOrg,
         Name = $"v2-agent-pool-{poolSuffix}",

@@ -3013,119 +3013,7 @@
         "payloadUrl"
       ]
     },
-    "pulumiservice:v2:Account": {
-      "description": "Creates a new Insights account. An Insights account represents a cloud provider account (e.g., AWS, Azure, OCI) configured for resource discovery.",
-      "properties": {
-        "accountName": {
-          "type": "string",
-          "description": "The Insights account name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "agentPoolID": {
-          "type": "string",
-          "description": "The ID of the agent pool to run account discovery workflows.\nIf not specified, discovery will use the default agent pool."
-        },
-        "name": {
-          "type": "string",
-          "description": "The name of the account."
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "ownedBy": {
-          "$ref": "pulumi.json#/Any",
-          "description": "The user with ownership of this Insights account"
-        },
-        "provider": {
-          "type": "string",
-          "description": "The cloud provider for the account (e.g., aws, gcp, azure-native)."
-        },
-        "providerConfig": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "pulumi.json#/Any"
-          },
-          "description": "Provider-specific configuration for the account."
-        },
-        "providerEnvRef": {
-          "type": "string",
-          "description": "Reference to an ESC environment containing provider credentials,\nin the format 'project/environment' with an optional @version suffix."
-        },
-        "providerVersion": {
-          "type": "string",
-          "description": "The version of the Pulumi provider package used for discovery."
-        },
-        "scanStatus": {
-          "$ref": "pulumi.json#/Any",
-          "description": "Status of the last discovery scan for this account."
-        },
-        "scheduledScanEnabled": {
-          "type": "boolean",
-          "description": "If true, the account is scheduled for recurring discovery."
-        }
-      },
-      "type": "object",
-      "required": [
-        "name",
-        "ownedBy",
-        "provider",
-        "scheduledScanEnabled",
-        "orgName",
-        "accountName"
-      ],
-      "inputProperties": {
-        "accountName": {
-          "type": "string",
-          "description": "The Insights account name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "agentPoolID": {
-          "type": "string",
-          "description": "The ID of the agent pool to run account discovery workflows.\nIf not specified, discovery will use the default agent pool."
-        },
-        "cron": {
-          "type": "string",
-          "description": "Deprecated: Use scanSchedule instead. Cron expression for scheduling scans."
-        },
-        "environment": {
-          "type": "string",
-          "description": "Reference to an ESC environment containing provider credentials,\nin the format 'project/environment' with an optional @version suffix."
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "provider": {
-          "type": "string",
-          "description": "The cloud provider for the account (e.g., aws, gcp, azure-native)."
-        },
-        "providerConfig": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "pulumi.json#/Any"
-          },
-          "description": "Provider-specific configuration for the account."
-        },
-        "scanSchedule": {
-          "type": "string",
-          "description": "Schedule for automated discovery scans (e.g., 'none', 'daily')."
-        }
-      },
-      "requiredInputs": [
-        "accountName",
-        "environment",
-        "orgName",
-        "provider"
-      ]
-    },
-    "pulumiservice:v2:AgentPool": {
+    "pulumiservice:v2/agents:Pool": {
       "description": "Creates a new agent pool for an organization. Agent pools enable self-hosted deployment agents, allowing organizations to run Pulumi Deployments on their own infrastructure rather than Pulumi-managed infrastructure. This is useful for accessing private networks, meeting compliance requirements, or using custom execution environments. The response includes an access token (agent pool secret) that self-hosted agents use to authenticate when polling for deployment work. This token is only returned once at creation time and cannot be retrieved later.",
       "properties": {
         "agents": {
@@ -3195,16 +3083,51 @@
         "orgName"
       ]
     },
-    "pulumiservice:v2:AuditLogExportConfiguration": {
-      "description": "Creates or updates the organization's automated audit log export configuration. Audit log export enables automatic delivery of audit events to an S3 bucket for long-term retention and SIEM integration. The configuration includes the S3 bucket details and IAM role for authentication. This feature is available on Business Critical edition.",
+    "pulumiservice:v2/agents:Task": {
+      "description": "Creates a new agent task for the specified organization. The request must include a prompt (the user event message) that initiates the task. Set the 'permissionMode' field in the request body to restrict the agent to read-only operations. Returns the created task details including task ID, name, status, and timestamp.",
       "properties": {
-        "enabled": {
-          "type": "boolean",
-          "description": "Whether audit log export is currently active. May be paused automatically if the configured destination repeatedly fails to authenticate."
+        "approvalMode": {
+          "type": "string",
+          "description": "Approval mode for this task. Valid values: 'manual', 'auto', 'balanced'."
         },
-        "lastResult": {
+        "asyncTriggerType": {
+          "type": "string",
+          "description": "The async trigger source for this task. Null for sync tasks."
+        },
+        "contextUsedTokens": {
+          "type": "integer",
+          "description": "Total input tokens consumed across all model invocations for this task. Approximate context window usage."
+        },
+        "contextWindowTokens": {
+          "type": "integer",
+          "description": "Maximum context window size in tokens for the primary model used by this task."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "When the task was created, in ISO 8601 format."
+        },
+        "createdBy": {
           "$ref": "pulumi.json#/Any",
-          "description": "The result of the last audit log export attempt."
+          "description": "Information about the user who created this task."
+        },
+        "entities": {
+          "type": "array",
+          "items": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "Pulumi entities (stacks, projects, etc.) that provide context for the agent."
+        },
+        "isShared": {
+          "type": "boolean",
+          "description": "Whether this task is shared with other org members."
+        },
+        "lastHeartbeat": {
+          "type": "string",
+          "description": "When the task runtime last reported a heartbeat. Null if the runtime has never checked in."
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name for the task, typically auto-generated from the initial user message."
         },
         "orgName": {
           "type": "string",
@@ -3212,41 +3135,217 @@
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
         },
-        "s3Config": {
-          "$ref": "pulumi.json#/Any",
-          "description": "The S3 configuration for exporting audit logs."
+        "permissionMode": {
+          "type": "string",
+          "description": "The permission scope for the task."
+        },
+        "planMode": {
+          "type": "boolean",
+          "description": "Whether the task is in plan mode. Set based on the first user message."
+        },
+        "runtimePhase": {
+          "type": "string",
+          "description": "The current runtime phase for this task. Null until the runtime checks in."
+        },
+        "sharedAt": {
+          "type": "string",
+          "description": "When the task was first shared. Null if never shared."
+        },
+        "source": {
+          "type": "string",
+          "description": "The origin that triggered this task. Valid values: 'console', 'cli', 'slack', 'schedule', 'api', 'github'."
+        },
+        "sourceAutomationID": {
+          "type": "string",
+          "description": "The automation that spawned this task, if the task was created by an automation run."
+        },
+        "status": {
+          "type": "string",
+          "description": "Current execution status of the task."
+        },
+        "taskID": {
+          "type": "string",
+          "description": "The agent task identifier",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "taskType": {
+          "type": "string",
+          "description": "Whether the task was started synchronously by a user or asynchronously by background automation."
+        },
+        "toolExecutionMode": {
+          "type": "string",
+          "description": "Where tools are executed for this task. Valid values: 'cloud', 'cli'."
         }
       },
       "type": "object",
       "required": [
-        "enabled",
-        "lastResult",
-        "s3Config",
-        "orgName"
+        "approvalMode",
+        "createdAt",
+        "createdBy",
+        "entities",
+        "isShared",
+        "name",
+        "planMode",
+        "status",
+        "taskType",
+        "orgName",
+        "taskID"
       ],
       "inputProperties": {
-        "newEnabled": {
-          "type": "boolean",
-          "description": "Whether the audit log export is enabled."
+        "approvalMode": {
+          "type": "string",
+          "description": "Optional approval mode override for this task. If omitted, org default is used."
         },
-        "newS3Configuration": {
+        "enabledIntegrations": {
+          "type": "array",
+          "items": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "Optional list of integrations to enable for this task. Semantics: omitted/null → inherit all org-enabled integrations; empty list → explicit opt-out (no integration credentials for this task); populated list → whitelist of specific integrations by ID. Modeled as an object array rather than a bare string array so multi-instance support (instance_name, scope, etc.) can be added later without a wire break."
+        },
+        "message": {
           "$ref": "pulumi.json#/Any",
-          "description": "The new S3 configuration for audit log export."
+          "description": "The message content"
         },
         "orgName": {
           "type": "string",
           "description": "The organization name",
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
+        },
+        "permissionMode": {
+          "type": "string",
+          "description": "Controls the permission scope for the task. When omitted, defaults to 'default' (the agent uses the creating user's full permissions)."
+        },
+        "planMode": {
+          "type": "boolean",
+          "description": "Whether to enable plan mode for this task."
+        },
+        "source": {
+          "type": "string",
+          "description": "The origin that triggered this task. Defaults to 'api' if omitted."
+        },
+        "taskID": {
+          "type": "string",
+          "description": "The agent task identifier",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "toolExecutionMode": {
+          "type": "string",
+          "description": "Where tools should be executed. Defaults to 'cloud' if omitted."
         }
       },
       "requiredInputs": [
-        "newEnabled",
-        "newS3Configuration",
         "orgName"
       ]
     },
-    "pulumiservice:v2:AuthPolicy": {
+    "pulumiservice:v2/auth:OidcIssuer": {
+      "description": "Registers a new OIDC issuer for an organization, establishing a trust relationship with an external identity provider. Once registered, the identity provider can issue signed, short-lived tokens that are exchanged for temporary Pulumi Cloud credentials during deployments. This eliminates the need to store long-lived access tokens. Supported providers include AWS, Azure, Google Cloud, GitHub Actions, and any OIDC-compliant identity provider. The request must include the issuer URL, and the service will fetch the provider's public signing keys to verify token authenticity.",
+      "properties": {
+        "created": {
+          "type": "string",
+          "description": "The ISO 8601 timestamp when the OIDC issuer was created."
+        },
+        "issuer": {
+          "type": "string",
+          "description": "The OIDC issuer identifier, typically a URL that uniquely identifies the identity provider."
+        },
+        "issuerId": {
+          "type": "string",
+          "description": "The unique identifier of the registered OIDC issuer."
+        },
+        "jwks": {
+          "$ref": "pulumi.json#/Any",
+          "description": "The JSON Web Key Set for the OIDC issuer."
+        },
+        "lastUsed": {
+          "type": "string",
+          "description": "The ISO 8601 timestamp when the OIDC issuer was last used for token exchange."
+        },
+        "maxExpiration": {
+          "type": "integer",
+          "description": "The maximum token expiration time in seconds."
+        },
+        "modified": {
+          "type": "string",
+          "description": "The ISO 8601 timestamp when the OIDC issuer was last modified."
+        },
+        "name": {
+          "type": "string",
+          "description": "The display name of the OIDC issuer."
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "thumbprints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "SHA-1 certificate thumbprints used to verify the OIDC issuer's TLS certificate."
+        },
+        "url": {
+          "type": "string",
+          "description": "The URL of the OIDC issuer."
+        }
+      },
+      "type": "object",
+      "required": [
+        "issuer",
+        "issuerId",
+        "name",
+        "url",
+        "orgName"
+      ],
+      "inputProperties": {
+        "issuerId": {
+          "type": "string",
+          "description": "The OIDC issuer identifier",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "jwks": {
+          "$ref": "pulumi.json#/Any",
+          "description": "The JSON Web Key Set for the OIDC issuer."
+        },
+        "maxExpiration": {
+          "type": "integer",
+          "description": "The maximum token expiration time in seconds."
+        },
+        "name": {
+          "type": "string",
+          "description": "The display name of the OIDC issuer."
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "thumbprints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "SHA-1 certificate thumbprints used to verify the OIDC issuer's TLS certificate."
+        },
+        "url": {
+          "type": "string",
+          "description": "The URL of the OIDC issuer."
+        }
+      },
+      "requiredInputs": [
+        "name",
+        "orgName",
+        "url"
+      ]
+    },
+    "pulumiservice:v2/auth:Policy": {
       "description": "Updates an authentication policy for an organization. Authentication policies define rules for how OIDC tokens are validated and what access they grant, including claim mappings, trust conditions, and role assignments. The policy definition cannot be empty.\n\nThe request body contains a `policies` array where each policy object includes:\n- `decision`: `allow` or `deny`\n- `tokenType`: `organization`, `team`, `personal`, or `runner`\n- `teamName`: required when tokenType is `team`\n- `userLogin`: required when tokenType is `personal`\n- `runnerID`: required when tokenType is `runner`\n- `authorizedPermissions`: array of permissions (only `admin` is supported for organization tokens)\n- `rules`: object defining claim-matching rules for the token\n\nFor more information about authorization rules, refer to the [OIDC authorization policies documentation](https://www.pulumi.com/docs/pulumi-cloud/access-management/oidc/client/#configure-the-authorization-policies).",
       "properties": {
         "created": {
@@ -3326,34 +3425,20 @@
         "policyId"
       ]
     },
-    "pulumiservice:v2:AzureDevOpsIntegration": {
-      "description": "Updates an existing Azure DevOps integration's settings. Can modify the Azure DevOps organization, project, or authentication configuration.",
+    "pulumiservice:v2/auth:SAML": {
+      "description": "Updates the SAML configuration for a SAML-backed organization, including the identity provider SSO descriptor, attribute mappings, and other SAML settings. The new IDP SSO descriptor is required in the update request.",
       "properties": {
-        "authUser": {
-          "$ref": "pulumi.json#/Any",
-          "description": "The Pulumi user whose Azure DevOps authentication token is being used"
-        },
-        "disableDetailedDiff": {
-          "type": "boolean",
-          "description": "Whether detailed property-level diffs are disabled for PR comments"
-        },
-        "disableNeoSummaries": {
-          "type": "boolean",
-          "description": "Whether Neo AI summaries are disabled for this integration"
-        },
-        "disablePRComments": {
-          "type": "boolean",
-          "description": "Whether PR comments are disabled for this integration"
-        },
-        "installed": {
-          "type": "boolean",
-          "description": "Does the org have an Azure DevOps app integration configured"
-        },
-        "integrationId": {
+        "entityId": {
           "type": "string",
-          "description": "The Azure DevOps integration identifier",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
+          "description": "The following fields can be empty if the metadata (IDPSSODescriptor)\nitself is empty for the organization."
+        },
+        "idpSsoDescriptor": {
+          "type": "string",
+          "description": "The SAML Identity Provider SSO descriptor XML."
+        },
+        "nameIdFormat": {
+          "type": "string",
+          "description": "The SAML NameID format used by the identity provider."
         },
         "orgName": {
           "type": "string",
@@ -3363,42 +3448,31 @@
         },
         "organization": {
           "$ref": "pulumi.json#/Any",
-          "description": "Metadata about the Azure DevOps organization linked to the Pulumi organization"
+          "description": "The Pulumi organization."
         },
-        "project": {
-          "$ref": "pulumi.json#/Any",
-          "description": "Metadata about the Azure DevOps project linked to the Pulumi organization"
+        "ssoUrl": {
+          "type": "string",
+          "description": "The SSO URL for the identity provider."
         },
-        "valid": {
-          "type": "boolean",
-          "description": "Is the app integration valid"
+        "validUntil": {
+          "type": "string",
+          "description": "ValidUntil is the date until which the X.509 Certificate\nissued to the organization by the identity provider is valid."
+        },
+        "validationError": {
+          "type": "string",
+          "description": "ValidationError will be set only if there is an error validating the SAML org's metadata XML."
         }
       },
       "type": "object",
       "required": [
-        "installed",
-        "valid",
-        "orgName",
-        "integrationId"
+        "idpSsoDescriptor",
+        "organization",
+        "orgName"
       ],
       "inputProperties": {
-        "disableDetailedDiff": {
-          "type": "boolean",
-          "description": "Whether detailed property-level diffs are disabled for PR comments"
-        },
-        "disableNeoSummaries": {
-          "type": "boolean",
-          "description": "Whether Neo AI summaries are disabled for this integration"
-        },
-        "disablePRComments": {
-          "type": "boolean",
-          "description": "Whether PR comments are disabled for this integration"
-        },
-        "integrationId": {
+        "newIdpSsoDescriptor": {
           "type": "string",
-          "description": "The Azure DevOps integration identifier",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
+          "description": "The new IDP SSO descriptor XML for the SAML configuration."
         },
         "orgName": {
           "type": "string",
@@ -3408,139 +3482,42 @@
         }
       },
       "requiredInputs": [
-        "integrationId",
         "orgName"
       ]
     },
-    "pulumiservice:v2:BitBucketIntegration": {
-      "description": "Updates an existing BitBucket integration's settings, such as PR comment preferences and AI summary options.",
+    "pulumiservice:v2/deployments:ScheduledDeployment": {
+      "description": "Creates a custom deployment schedule for a stack using Pulumi Deployments. Custom schedules allow you to automate recurring or one-time Pulumi operations on a stack. The request must include exactly one of 'scheduleCron' (a cron expression for recurring executions, e.g. '0 */4 * * *' for every 4 hours) or 'scheduleOnce' (an ISO 8601 timestamp for a one-time execution). The 'request' field contains the deployment configuration that will be executed on each scheduled run, including the Pulumi operation type and any settings overrides. The stack must have deployment settings configured before a schedule can be created.",
       "properties": {
-        "authType": {
-          "type": "string",
-          "description": "The authentication type used: 'workspace_token', 'user_token', or 'pat'."
-        },
-        "authUser": {
-          "$ref": "pulumi.json#/Any",
-          "description": "The user whose BitBucket OAuth token is being used for authentication, if user-based auth is configured."
-        },
-        "avatarUrl": {
-          "type": "string",
-          "description": "URL of the BitBucket workspace avatar image."
-        },
-        "disableDetailedDiff": {
-          "type": "boolean",
-          "description": "Whether detailed property-level diffs are disabled for PR comments."
-        },
-        "disableNeoSummaries": {
-          "type": "boolean",
-          "description": "Whether Neo AI summaries are disabled for this integration."
-        },
-        "disablePRComments": {
-          "type": "boolean",
-          "description": "Whether PR comments are disabled for this integration."
-        },
-        "installed": {
-          "type": "boolean",
-          "description": "Whether this integration is fully installed and operational."
-        },
-        "integrationId": {
-          "type": "string",
-          "description": "The BitBucket integration identifier",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "valid": {
-          "type": "boolean",
-          "description": "Whether the integration's credentials are currently valid."
-        },
-        "workspaceName": {
-          "type": "string",
-          "description": "Display name of the BitBucket workspace."
-        },
-        "workspaceSlug": {
-          "type": "string",
-          "description": "The slug (URL-friendly name) of the linked BitBucket workspace."
-        },
-        "workspaceUuid": {
-          "type": "string",
-          "description": "The UUID of the linked BitBucket workspace."
-        }
-      },
-      "type": "object",
-      "required": [
-        "disableDetailedDiff",
-        "disableNeoSummaries",
-        "disablePRComments",
-        "installed",
-        "valid",
-        "workspaceSlug",
-        "workspaceUuid",
-        "orgName",
-        "integrationId"
-      ],
-      "inputProperties": {
-        "disableDetailedDiff": {
-          "type": "boolean",
-          "description": "If true, disable detailed property-level diffs in PR comments."
-        },
-        "disableNeoSummaries": {
-          "type": "boolean",
-          "description": "If true, disable Neo AI-generated deployment summaries in PR comments."
-        },
-        "disablePRComments": {
-          "type": "boolean",
-          "description": "If true, disable automatic PR comments on deployments."
-        },
-        "integrationId": {
-          "type": "string",
-          "description": "The BitBucket integration identifier",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        }
-      },
-      "requiredInputs": [
-        "integrationId",
-        "orgName"
-      ]
-    },
-    "pulumiservice:v2:CustomVCSIntegration": {
-      "description": "Creates a new custom VCS integration for an organization. Custom VCS integrations allow connecting self-hosted or third-party version control systems (e.g. Gitea, Forgejo, Bitbucket Server) to Pulumi Deployments. Credentials are managed via ESC environments, and deployments are triggered by inbound webhooks. Returns the created integration including its webhook URL and HMAC secret for signature verification.",
-      "properties": {
-        "baseUrl": {
-          "type": "string",
-          "description": "URL prefix for repositories covered by this integration"
-        },
         "created": {
           "type": "string",
-          "description": "ISO 8601 timestamp of when the integration was created"
+          "description": "The timestamp when this scheduled action was created."
         },
-        "environment": {
-          "type": "string",
-          "description": "ESC environment reference in 'project/envName' format containing VCS credentials"
+        "definition": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "The action definition, which varies based on the action kind."
         },
-        "integrationId": {
+        "kind": {
           "type": "string",
-          "description": "Unique identifier (UUID) for this integration"
+          "description": "The kind of action to be executed."
+        },
+        "lastExecuted": {
+          "type": "string",
+          "description": "The timestamp of the last execution, if any."
         },
         "modified": {
           "type": "string",
-          "description": "ISO 8601 timestamp of when the integration was last modified"
+          "description": "The timestamp when this scheduled action was last modified."
         },
-        "name": {
+        "nextExecution": {
           "type": "string",
-          "description": "Human-readable name for the integration"
+          "description": "The timestamp of the next scheduled execution."
+        },
+        "orgID": {
+          "type": "string",
+          "description": "The organization ID that owns this scheduled action."
         },
         "orgName": {
           "type": "string",
@@ -3548,150 +3525,49 @@
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
         },
-        "repositories": {
-          "type": "array",
-          "items": {
-            "$ref": "pulumi.json#/Any"
-          },
-          "description": "List of repositories configured on this integration"
+        "paused": {
+          "type": "boolean",
+          "description": "Whether the scheduled action is currently paused."
         },
-        "vcsType": {
+        "projectName": {
           "type": "string",
-          "description": "Version control system type"
+          "description": "The project name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
         },
-        "webhookSecret": {
+        "scheduleCron": {
           "type": "string",
-          "description": "HMAC secret for webhook signature verification. Only returned on integration creation; subsequent GET requests omit this field.",
-          "secret": true
+          "description": "A cron expression defining the recurring schedule."
         },
-        "webhookUrl": {
+        "scheduleID": {
           "type": "string",
-          "description": "Full webhook endpoint URL that the external VCS should POST events to. This URL is generated by the service and includes the integration ID."
+          "description": "The unique identifier for this scheduled action."
+        },
+        "scheduleOnce": {
+          "type": "string",
+          "description": "A timestamp for a one-time scheduled execution."
+        },
+        "stackName": {
+          "type": "string",
+          "description": "The stack name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
         }
       },
       "type": "object",
       "required": [
-        "baseUrl",
         "created",
-        "environment",
-        "integrationId",
+        "definition",
+        "kind",
+        "lastExecuted",
         "modified",
-        "name",
-        "vcsType",
-        "orgName"
-      ],
-      "inputProperties": {
-        "baseUrl": {
-          "type": "string",
-          "description": "URL prefix for repositories covered by this integration (e.g. 'https://gitea.example.com/myorg'). Used to match repositories to integrations."
-        },
-        "environment": {
-          "type": "string",
-          "description": "ESC environment reference in 'project/envName' format containing VCS credentials (e.g. SSH keys, access tokens) used for repository operations"
-        },
-        "integrationId": {
-          "type": "string",
-          "description": "The custom VCS integration identifier",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "name": {
-          "type": "string",
-          "description": "Human-readable name for the integration, unique within the organization (e.g. 'Gitea Production')"
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "vcsType": {
-          "type": "string",
-          "description": "Version control system type. Defaults to 'git' if not specified."
-        }
-      },
-      "requiredInputs": [
-        "baseUrl",
-        "environment",
-        "name",
-        "orgName"
-      ]
-    },
-    "pulumiservice:v2:CustomVCSRepository": {
-      "description": "Adds a repository to a custom VCS integration. The repository name must be unique within the integration. Returns 409 Conflict if a repository with the same name is already configured.",
-      "properties": {
-        "integrationId": {
-          "type": "string",
-          "description": "The custom VCS integration identifier",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        }
-      },
-      "type": "object",
-      "required": [
+        "nextExecution",
+        "orgID",
+        "paused",
+        "scheduleID",
         "orgName",
-        "integrationId"
-      ],
-      "inputProperties": {
-        "displayName": {
-          "type": "string",
-          "description": "Human-readable display name for the repository. If not provided, the name is used for display purposes."
-        },
-        "integrationId": {
-          "type": "string",
-          "description": "The custom VCS integration identifier",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "name": {
-          "type": "string",
-          "description": "Repository name or path, joined with the integration's base URL to form the clone URL (e.g. 'myrepo' or 'subgroup/myrepo')"
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        }
-      },
-      "requiredInputs": [
-        "integrationId",
-        "name",
-        "orgName"
-      ]
-    },
-    "pulumiservice:v2:DefaultOrganization": {
-      "description": "UpdateDefaultOrganization sets the default organization for the current user.",
-      "properties": {
-        "GitHubLogin": {
-          "type": "string",
-          "description": "Returns the organization name. Can be an empty string, if the user is a member of no organizations"
-        },
-        "Messages": {
-          "type": "array",
-          "items": {
-            "$ref": "pulumi.json#/Any"
-          },
-          "description": "Messages is a list of messages that should be displayed to the user that contextualize\nthe default org; for example: warning new users if their default org as returned by the\nservice is on an expiring trial and not free tier, with possible recommendations\non how to configure their default org locally.\nCan be possibly empty."
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        }
-      },
-      "type": "object",
-      "required": [
-        "GitHubLogin",
-        "Messages",
-        "orgName"
+        "projectName",
+        "stackName"
       ],
       "inputProperties": {
         "orgName": {
@@ -3699,13 +3575,45 @@
           "description": "The organization name",
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
+        },
+        "projectName": {
+          "type": "string",
+          "description": "The project name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "request": {
+          "$ref": "pulumi.json#/Any",
+          "description": "Deployment request payload to execute when the schedule fires. This has the same shape and semantics as CreateDeploymentRequest used for immediate deployments."
+        },
+        "scheduleCron": {
+          "type": "string",
+          "description": "Cron expression defining a recurring schedule for this deployment. When set, scheduleOnce must be null. Uses standard 5-field cron syntax (MIN HOUR DOM MON DOW) and is evaluated in UTC."
+        },
+        "scheduleID": {
+          "type": "string",
+          "description": "The schedule identifier",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "scheduleOnce": {
+          "type": "string",
+          "description": "Single point-in-time schedule for this deployment. When set, scheduleCron must be null. The value must be an ISO 8601 timestamp with timezone."
+        },
+        "stackName": {
+          "type": "string",
+          "description": "The stack name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
         }
       },
       "requiredInputs": [
-        "orgName"
+        "orgName",
+        "projectName",
+        "stackName"
       ]
     },
-    "pulumiservice:v2:DeploymentSettings": {
+    "pulumiservice:v2/deployments:Settings": {
       "description": "Creates or updates Pulumi Deployments settings for a stack using a merge operation. If no settings exist, they are created. If settings already exist, the request body is merged with the current settings using the following logic: for each property, start with the current value, remove it if the patch specifies null, or merge the new non-null value with the existing one. Non-object properties (strings, numbers, booleans) are replaced entirely. Settings include source context (git repository URL, branch, directory), operation context (environment variables, pre-run commands, OIDC configuration), executor context, GitHub integration settings, and cache options. Requires a Team Growth or higher subscription. Cannot be used to configure Pulumi Deployments for Terraform stacks.",
       "properties": {
         "agentPoolID": {
@@ -3831,7 +3739,57 @@
         "stackName"
       ]
     },
-    "pulumiservice:v2:EnvironmentDraft": {
+    "pulumiservice:v2/esc:Environment": {
+      "description": "Creates a new Pulumi ESC (Environments, Secrets, and Configuration) environment within the specified organization. The request body must include the project name and the environment name. Environment names must be unique within a project and may only contain alphanumeric characters, hyphens, underscores, and periods. The newly created environment starts with an empty YAML definition that can be updated via the UpdateEnvironment endpoint.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The environment name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "project": {
+          "type": "string",
+          "description": "The project name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        }
+      },
+      "type": "object",
+      "required": [
+        "orgName",
+        "project",
+        "name"
+      ],
+      "inputProperties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the environment."
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "project": {
+          "type": "string",
+          "description": "The project name for the environment."
+        }
+      },
+      "requiredInputs": [
+        "name",
+        "orgName",
+        "project"
+      ]
+    },
+    "pulumiservice:v2/esc:EnvironmentDraft": {
       "description": "Creates a new draft change request for a Pulumi ESC environment. Drafts allow proposing changes to an environment definition that can be reviewed and approved before being applied. This is part of the approvals workflow for environments. Returns a ChangeRequestRef containing the draft identifier. Requires the Approvals feature to be enabled for the organization.",
       "properties": {
         "changeRequestID": {
@@ -3906,7 +3864,7 @@
         "projectName"
       ]
     },
-    "pulumiservice:v2:EnvironmentSchedule": {
+    "pulumiservice:v2/esc:EnvironmentSchedule": {
       "description": "Creates a new scheduled action for a Pulumi ESC environment. Schedules can be used to automate recurring operations on environments, such as secret rotation. The request body specifies the schedule timing and the action to perform. Returns the created ScheduledAction on success. Requires the secret rotation feature to be enabled for the organization.",
       "properties": {
         "created": {
@@ -4034,7 +3992,7 @@
         "projectName"
       ]
     },
-    "pulumiservice:v2:EnvironmentSettings": {
+    "pulumiservice:v2/esc:EnvironmentSettings": {
       "description": "Updates settings for a Pulumi ESC environment using a partial update (patch) approach. Currently supports toggling deletion protection via the deletionProtected field. When deletionProtected is set to true, the environment cannot be deleted until the setting is explicitly disabled. Only the fields included in the request body are modified; omitted fields retain their current values.",
       "properties": {
         "deletionProtected": {
@@ -4097,7 +4055,7 @@
         "projectName"
       ]
     },
-    "pulumiservice:v2:EnvironmentTag_esc_environments": {
+    "pulumiservice:v2/esc:EnvironmentTag": {
       "description": "Adds a new user-defined tag to a Pulumi ESC environment. Tags are key-value pairs that provide contextual metadata for organizing and searching environments (e.g., region=us-east-1, team=platform). The tag name and value are provided in the request body. Returns the created EnvironmentTag on success. Returns 409 if a tag with the same name already exists on the environment.",
       "properties": {
         "created": {
@@ -4191,8 +4149,95 @@
         "value"
       ]
     },
-    "pulumiservice:v2:EnvironmentTag_preview_environments": {
-      "description": "Adds a new user-defined tag to a Pulumi ESC environment. Tags are key-value pairs that provide contextual metadata for organizing and searching environments (e.g., region=us-east-1, team=platform). The tag name and value are provided in the request body. Returns the created EnvironmentTag on success. Returns 409 if a tag with the same name already exists on the environment.",
+    "pulumiservice:v2/esc:OpenEnvironmentRequest": {
+      "description": "Creates an open request for a Pulumi ESC environment that has gated opens enabled. When an environment has open gates configured, opening the environment requires an approval workflow. This endpoint initiates that process by creating an open request, and also creates corresponding open requests for each imported environment that has open gates. Requires the Approvals feature to be enabled for the organization. Returns 400 if the environment does not have gated opens.",
+      "properties": {
+        "accessDurationSeconds": {
+          "type": "integer",
+          "description": "Total duration that the resulting grant can be used to access the environment open endpoint (after first open)"
+        },
+        "changeRequestID": {
+          "type": "string",
+          "description": "The change request ID",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "envName": {
+          "type": "string",
+          "description": "The environment name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "grantExpirationSeconds": {
+          "type": "integer",
+          "description": "Time from application of the request until the resulting grant expires"
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "projectName": {
+          "type": "string",
+          "description": "The project name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        }
+      },
+      "type": "object",
+      "required": [
+        "accessDurationSeconds",
+        "grantExpirationSeconds",
+        "orgName",
+        "projectName",
+        "envName",
+        "changeRequestID"
+      ],
+      "inputProperties": {
+        "accessDurationSeconds": {
+          "type": "integer",
+          "description": "Total duration that the resulting grant can be used to access the environment open endpoint (after first open)"
+        },
+        "changeRequestID": {
+          "type": "string",
+          "description": "The change request ID",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "envName": {
+          "type": "string",
+          "description": "The environment name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "grantExpirationSeconds": {
+          "type": "integer",
+          "description": "Time from application of the request until the resulting grant expires"
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "projectName": {
+          "type": "string",
+          "description": "The project name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        }
+      },
+      "requiredInputs": [
+        "accessDurationSeconds",
+        "envName",
+        "grantExpirationSeconds",
+        "orgName",
+        "projectName"
+      ]
+    },
+    "pulumiservice:v2/esc:RevisionTag": {
+      "description": "Creates a new revision tag for a Pulumi ESC environment. Revision tags are named references that point to specific revision numbers, similar to Git tags. They allow pinning a stable reference to a known-good version of an environment. Tagged versions can be used in imports and Pulumi stack configuration (e.g., myproject/env@prod) to ensure stable references unaffected by subsequent changes. The built-in 'latest' tag always points to the most recent revision.",
       "properties": {
         "created": {
           "type": "string",
@@ -4226,20 +4271,25 @@
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
         },
-        "value": {
+        "projectName": {
           "type": "string",
-          "description": "The value of the tag."
+          "description": "The project name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "revision": {
+          "type": "integer",
+          "description": "The revision number this tag points to."
         }
       },
       "type": "object",
       "required": [
         "created",
-        "editorLogin",
-        "editorName",
         "modified",
         "name",
-        "value",
+        "revision",
         "orgName",
+        "projectName",
         "envName"
       ],
       "inputProperties": {
@@ -4259,132 +4309,185 @@
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
         },
-        "value": {
-          "type": "string",
-          "description": "The value"
-        }
-      },
-      "requiredInputs": [
-        "envName",
-        "name",
-        "orgName",
-        "value"
-      ]
-    },
-    "pulumiservice:v2:Environment_esc_environments": {
-      "description": "Creates a new Pulumi ESC (Environments, Secrets, and Configuration) environment within the specified organization. The request body must include the project name and the environment name. Environment names must be unique within a project and may only contain alphanumeric characters, hyphens, underscores, and periods. The newly created environment starts with an empty YAML definition that can be updated via the UpdateEnvironment endpoint.",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "The environment name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "project": {
+        "projectName": {
           "type": "string",
           "description": "The project name",
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
-        }
-      },
-      "type": "object",
-      "required": [
-        "orgName",
-        "project",
-        "name"
-      ],
-      "inputProperties": {
-        "name": {
-          "type": "string",
-          "description": "The name of the environment."
         },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "project": {
-          "type": "string",
-          "description": "The project name for the environment."
-        }
-      },
-      "requiredInputs": [
-        "name",
-        "orgName",
-        "project"
-      ]
-    },
-    "pulumiservice:v2:Environment_preview_environments": {
-      "description": "Creates a new Pulumi ESC (Environments, Secrets, and Configuration) environment within the specified organization. The request body must include the project name and the environment name. Environment names must be unique within a project and may only contain alphanumeric characters, hyphens, underscores, and periods. The newly created environment starts with an empty YAML definition that can be updated via the UpdateEnvironment endpoint.",
-      "properties": {
-        "envName": {
-          "type": "string",
-          "description": "The environment name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        }
-      },
-      "type": "object",
-      "required": [
-        "orgName",
-        "envName"
-      ],
-      "inputProperties": {
-        "envName": {
-          "type": "string",
-          "description": "The environment name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "name": {
-          "type": "string",
-          "description": "The name of the environment."
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "project": {
-          "type": "string",
-          "description": "The project name for the environment."
+        "revision": {
+          "type": "integer",
+          "description": "The revision"
         }
       },
       "requiredInputs": [
         "envName",
         "name",
         "orgName",
-        "project"
+        "projectName"
       ]
     },
-    "pulumiservice:v2:Gate": {
-      "description": "Creates a new change gate for an entity in the organization. Change gates enforce approval workflows by requiring one or more approvals before infrastructure changes can be applied to the protected resource.",
+    "pulumiservice:v2/esc:Webhook": {
+      "description": "Creates a new webhook for a Pulumi ESC environment. Webhooks allow external services to be notified when environment events occur, such as updates or opens. The request body specifies the webhook configuration including the destination URL, event filters, and format. Returns 400 if the organization name in the request body does not match the URL path parameter. Returns 409 if a webhook with the same name already exists.",
       "properties": {
-        "enabled": {
+        "active": {
           "type": "boolean",
-          "description": "Whether the change gate is enabled"
+          "description": "Whether the webhook is active and will receive deliveries."
         },
-        "gateID": {
+        "displayName": {
           "type": "string",
-          "description": "Unique identifier of the change gate"
+          "description": "The human-readable display name shown in the UI."
+        },
+        "envName": {
+          "type": "string",
+          "description": "The environment name. Set when the webhook is scoped to a specific environment."
+        },
+        "filters": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Specific event types this webhook subscribes to. If empty, all events are delivered."
+        },
+        "format": {
+          "type": "string",
+          "description": "The format of the webhook payload (e.g., 'raw', 'slack', 'ms_teams')."
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Event groups this webhook subscribes to (e.g., 'stacks', 'deployments')."
+        },
+        "hasSecret": {
+          "type": "boolean",
+          "description": "HasSecret is true if the webhook has a secret. This is used to determine whether\nto show that there is a secret in the UI.",
+          "secret": true
         },
         "name": {
           "type": "string",
-          "description": "Name of the change gate"
+          "description": "The unique identifier name for the webhook within its scope."
+        },
+        "organizationName": {
+          "type": "string",
+          "description": "The organization that owns this webhook."
+        },
+        "payloadUrl": {
+          "type": "string",
+          "description": "The URL to which webhook payloads are delivered."
+        },
+        "projectName": {
+          "type": "string",
+          "description": "The project name. Set when the webhook is scoped to a specific stack."
+        },
+        "secret": {
+          "type": "string",
+          "description": "Secret will be omitted when returned from the service.",
+          "secret": true
+        },
+        "secretCiphertext": {
+          "type": "string",
+          "description": "SecretCiphertext is the ciphertext value of the webhook's secret.\nIt's used to check whether the secret was changed by the PSP",
+          "secret": true
+        },
+        "stackName": {
+          "type": "string",
+          "description": "The stack name. Set when the webhook is scoped to a specific stack."
+        }
+      },
+      "type": "object",
+      "required": [
+        "active",
+        "displayName",
+        "hasSecret",
+        "name",
+        "organizationName",
+        "payloadUrl",
+        "secretCiphertext"
+      ],
+      "inputProperties": {
+        "active": {
+          "type": "boolean",
+          "description": "Whether the webhook is active and will receive deliveries."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The human-readable display name shown in the UI."
+        },
+        "envName": {
+          "type": "string",
+          "description": "The environment name. Set when the webhook is scoped to a specific environment."
+        },
+        "filters": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Specific event types this webhook subscribes to. If empty, all events are delivered."
+        },
+        "format": {
+          "type": "string",
+          "description": "The format of the webhook payload (e.g., 'raw', 'slack', 'ms_teams')."
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Event groups this webhook subscribes to (e.g., 'stacks', 'deployments')."
+        },
+        "name": {
+          "type": "string",
+          "description": "The unique identifier name for the webhook within its scope."
+        },
+        "organizationName": {
+          "type": "string",
+          "description": "The organization that owns this webhook."
+        },
+        "payloadUrl": {
+          "type": "string",
+          "description": "The URL to which webhook payloads are delivered."
+        },
+        "projectName": {
+          "type": "string",
+          "description": "The project name. Set when the webhook is scoped to a specific stack."
+        },
+        "secret": {
+          "type": "string",
+          "description": "Secret will be omitted when returned from the service."
+        },
+        "stackName": {
+          "type": "string",
+          "description": "The stack name. Set when the webhook is scoped to a specific stack."
+        }
+      },
+      "requiredInputs": [
+        "active",
+        "displayName",
+        "envName",
+        "name",
+        "organizationName",
+        "payloadUrl",
+        "projectName"
+      ]
+    },
+    "pulumiservice:v2/insights:Account": {
+      "description": "Creates a new Insights account. An Insights account represents a cloud provider account (e.g., AWS, Azure, OCI) configured for resource discovery.",
+      "properties": {
+        "accountName": {
+          "type": "string",
+          "description": "The Insights account name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "agentPoolID": {
+          "type": "string",
+          "description": "The ID of the agent pool to run account discovery workflows.\nIf not specified, discovery will use the default agent pool."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the account."
         },
         "orgName": {
           "type": "string",
@@ -4392,38 +4495,458 @@
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
         },
-        "rule": {
+        "ownedBy": {
           "$ref": "pulumi.json#/Any",
-          "description": "Rule configuration for the gate"
+          "description": "The user with ownership of this Insights account"
         },
-        "target": {
+        "provider": {
+          "type": "string",
+          "description": "The cloud provider for the account (e.g., aws, gcp, azure-native)."
+        },
+        "providerConfig": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "Provider-specific configuration for the account."
+        },
+        "providerEnvRef": {
+          "type": "string",
+          "description": "Reference to an ESC environment containing provider credentials,\nin the format 'project/environment' with an optional @version suffix."
+        },
+        "providerVersion": {
+          "type": "string",
+          "description": "The version of the Pulumi provider package used for discovery."
+        },
+        "scanStatus": {
           "$ref": "pulumi.json#/Any",
-          "description": "Target configuration for the gate"
+          "description": "Status of the last discovery scan for this account."
+        },
+        "scheduledScanEnabled": {
+          "type": "boolean",
+          "description": "If true, the account is scheduled for recurring discovery."
         }
       },
       "type": "object",
       "required": [
-        "enabled",
-        "gateID",
         "name",
-        "rule",
-        "target",
+        "ownedBy",
+        "provider",
+        "scheduledScanEnabled",
+        "orgName",
+        "accountName"
+      ],
+      "inputProperties": {
+        "accountName": {
+          "type": "string",
+          "description": "The Insights account name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "agentPoolID": {
+          "type": "string",
+          "description": "The ID of the agent pool to run account discovery workflows.\nIf not specified, discovery will use the default agent pool."
+        },
+        "cron": {
+          "type": "string",
+          "description": "Deprecated: Use scanSchedule instead. Cron expression for scheduling scans."
+        },
+        "environment": {
+          "type": "string",
+          "description": "Reference to an ESC environment containing provider credentials,\nin the format 'project/environment' with an optional @version suffix."
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "provider": {
+          "type": "string",
+          "description": "The cloud provider for the account (e.g., aws, gcp, azure-native)."
+        },
+        "providerConfig": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "Provider-specific configuration for the account."
+        },
+        "scanSchedule": {
+          "type": "string",
+          "description": "Schedule for automated discovery scans (e.g., 'none', 'daily')."
+        }
+      },
+      "requiredInputs": [
+        "accountName",
+        "environment",
+        "orgName",
+        "provider"
+      ]
+    },
+    "pulumiservice:v2/insights:ScheduledScanSettings": {
+      "description": "Updates the scheduled scan configuration for an Insights account, such as scan frequency and schedule.",
+      "properties": {
+        "accountName": {
+          "type": "string",
+          "description": "The Insights account name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "batchSize": {
+          "type": "integer",
+          "description": "The batch size for processing resources during the scan."
+        },
+        "listConcurrency": {
+          "type": "integer",
+          "description": "The concurrency level for list operations during the scan."
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "paused": {
+          "type": "boolean",
+          "description": "Whether the scheduled scan is paused."
+        },
+        "readConcurrency": {
+          "type": "integer",
+          "description": "The concurrency level for read operations during the scan."
+        },
+        "readTimeout": {
+          "type": "string",
+          "description": "The timeout duration for read operations, as a Go duration string (e.g., '30s', '5m')."
+        },
+        "scheduleCron": {
+          "type": "string",
+          "description": "The cron expression defining the scan schedule."
+        }
+      },
+      "type": "object",
+      "required": [
+        "paused",
+        "scheduleCron",
+        "orgName",
+        "accountName"
+      ],
+      "inputProperties": {
+        "accountName": {
+          "type": "string",
+          "description": "The Insights account name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "batchSize": {
+          "type": "integer",
+          "description": "The batch size for processing resources during the scan."
+        },
+        "listConcurrency": {
+          "type": "integer",
+          "description": "The concurrency level for list operations during the scan."
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "paused": {
+          "type": "boolean",
+          "description": "Whether the scheduled scan is paused."
+        },
+        "readConcurrency": {
+          "type": "integer",
+          "description": "The concurrency level for read operations during the scan."
+        },
+        "readTimeout": {
+          "type": "string",
+          "description": "The timeout duration for read operations, as a Go duration string (e.g., '30s', '5m')."
+        },
+        "scheduleCron": {
+          "type": "string",
+          "description": "The cron expression defining the scan schedule."
+        }
+      },
+      "requiredInputs": [
+        "accountName",
+        "orgName",
+        "paused"
+      ]
+    },
+    "pulumiservice:v2/integrations:AzureDevOpsIntegration": {
+      "description": "Updates an existing Azure DevOps integration's settings. Can modify the Azure DevOps organization, project, or authentication configuration.",
+      "properties": {
+        "authUser": {
+          "$ref": "pulumi.json#/Any",
+          "description": "The Pulumi user whose Azure DevOps authentication token is being used"
+        },
+        "disableDetailedDiff": {
+          "type": "boolean",
+          "description": "Whether detailed property-level diffs are disabled for PR comments"
+        },
+        "disableNeoSummaries": {
+          "type": "boolean",
+          "description": "Whether Neo AI summaries are disabled for this integration"
+        },
+        "disablePRComments": {
+          "type": "boolean",
+          "description": "Whether PR comments are disabled for this integration"
+        },
+        "installed": {
+          "type": "boolean",
+          "description": "Does the org have an Azure DevOps app integration configured"
+        },
+        "integrationId": {
+          "type": "string",
+          "description": "The Azure DevOps integration identifier",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "organization": {
+          "$ref": "pulumi.json#/Any",
+          "description": "Metadata about the Azure DevOps organization linked to the Pulumi organization"
+        },
+        "project": {
+          "$ref": "pulumi.json#/Any",
+          "description": "Metadata about the Azure DevOps project linked to the Pulumi organization"
+        },
+        "valid": {
+          "type": "boolean",
+          "description": "Is the app integration valid"
+        }
+      },
+      "type": "object",
+      "required": [
+        "installed",
+        "valid",
+        "orgName",
+        "integrationId"
+      ],
+      "inputProperties": {
+        "disableDetailedDiff": {
+          "type": "boolean",
+          "description": "Whether detailed property-level diffs are disabled for PR comments"
+        },
+        "disableNeoSummaries": {
+          "type": "boolean",
+          "description": "Whether Neo AI summaries are disabled for this integration"
+        },
+        "disablePRComments": {
+          "type": "boolean",
+          "description": "Whether PR comments are disabled for this integration"
+        },
+        "integrationId": {
+          "type": "string",
+          "description": "The Azure DevOps integration identifier",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        }
+      },
+      "requiredInputs": [
+        "integrationId",
+        "orgName"
+      ]
+    },
+    "pulumiservice:v2/integrations:BitBucketIntegration": {
+      "description": "Updates an existing BitBucket integration's settings, such as PR comment preferences and AI summary options.",
+      "properties": {
+        "authType": {
+          "type": "string",
+          "description": "The authentication type used: 'workspace_token', 'user_token', or 'pat'."
+        },
+        "authUser": {
+          "$ref": "pulumi.json#/Any",
+          "description": "The user whose BitBucket OAuth token is being used for authentication, if user-based auth is configured."
+        },
+        "avatarUrl": {
+          "type": "string",
+          "description": "URL of the BitBucket workspace avatar image."
+        },
+        "disableDetailedDiff": {
+          "type": "boolean",
+          "description": "Whether detailed property-level diffs are disabled for PR comments."
+        },
+        "disableNeoSummaries": {
+          "type": "boolean",
+          "description": "Whether Neo AI summaries are disabled for this integration."
+        },
+        "disablePRComments": {
+          "type": "boolean",
+          "description": "Whether PR comments are disabled for this integration."
+        },
+        "installed": {
+          "type": "boolean",
+          "description": "Whether this integration is fully installed and operational."
+        },
+        "integrationId": {
+          "type": "string",
+          "description": "The BitBucket integration identifier",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "valid": {
+          "type": "boolean",
+          "description": "Whether the integration's credentials are currently valid."
+        },
+        "workspaceName": {
+          "type": "string",
+          "description": "Display name of the BitBucket workspace."
+        },
+        "workspaceSlug": {
+          "type": "string",
+          "description": "The slug (URL-friendly name) of the linked BitBucket workspace."
+        },
+        "workspaceUuid": {
+          "type": "string",
+          "description": "The UUID of the linked BitBucket workspace."
+        }
+      },
+      "type": "object",
+      "required": [
+        "disableDetailedDiff",
+        "disableNeoSummaries",
+        "disablePRComments",
+        "installed",
+        "valid",
+        "workspaceSlug",
+        "workspaceUuid",
+        "orgName",
+        "integrationId"
+      ],
+      "inputProperties": {
+        "disableDetailedDiff": {
+          "type": "boolean",
+          "description": "If true, disable detailed property-level diffs in PR comments."
+        },
+        "disableNeoSummaries": {
+          "type": "boolean",
+          "description": "If true, disable Neo AI-generated deployment summaries in PR comments."
+        },
+        "disablePRComments": {
+          "type": "boolean",
+          "description": "If true, disable automatic PR comments on deployments."
+        },
+        "integrationId": {
+          "type": "string",
+          "description": "The BitBucket integration identifier",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        }
+      },
+      "requiredInputs": [
+        "integrationId",
+        "orgName"
+      ]
+    },
+    "pulumiservice:v2/integrations:CustomVCSIntegration": {
+      "description": "Creates a new custom VCS integration for an organization. Custom VCS integrations allow connecting self-hosted or third-party version control systems (e.g. Gitea, Forgejo, Bitbucket Server) to Pulumi Deployments. Credentials are managed via ESC environments, and deployments are triggered by inbound webhooks. Returns the created integration including its webhook URL and HMAC secret for signature verification.",
+      "properties": {
+        "baseUrl": {
+          "type": "string",
+          "description": "URL prefix for repositories covered by this integration"
+        },
+        "created": {
+          "type": "string",
+          "description": "ISO 8601 timestamp of when the integration was created"
+        },
+        "environment": {
+          "type": "string",
+          "description": "ESC environment reference in 'project/envName' format containing VCS credentials"
+        },
+        "integrationId": {
+          "type": "string",
+          "description": "Unique identifier (UUID) for this integration"
+        },
+        "modified": {
+          "type": "string",
+          "description": "ISO 8601 timestamp of when the integration was last modified"
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable name for the integration"
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "repositories": {
+          "type": "array",
+          "items": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "List of repositories configured on this integration"
+        },
+        "vcsType": {
+          "type": "string",
+          "description": "Version control system type"
+        },
+        "webhookSecret": {
+          "type": "string",
+          "description": "HMAC secret for webhook signature verification. Only returned on integration creation; subsequent GET requests omit this field.",
+          "secret": true
+        },
+        "webhookUrl": {
+          "type": "string",
+          "description": "Full webhook endpoint URL that the external VCS should POST events to. This URL is generated by the service and includes the integration ID."
+        }
+      },
+      "type": "object",
+      "required": [
+        "baseUrl",
+        "created",
+        "environment",
+        "integrationId",
+        "modified",
+        "name",
+        "vcsType",
         "orgName"
       ],
       "inputProperties": {
-        "enabled": {
-          "type": "boolean",
-          "description": "Whether the change gate is enabled"
-        },
-        "gateID": {
+        "baseUrl": {
           "type": "string",
-          "description": "The change gate identifier",
+          "description": "URL prefix for repositories covered by this integration (e.g. 'https://gitea.example.com/myorg'). Used to match repositories to integrations."
+        },
+        "environment": {
+          "type": "string",
+          "description": "ESC environment reference in 'project/envName' format containing VCS credentials (e.g. SSH keys, access tokens) used for repository operations"
+        },
+        "integrationId": {
+          "type": "string",
+          "description": "The custom VCS integration identifier",
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
         },
         "name": {
           "type": "string",
-          "description": "Name of the change gate"
+          "description": "Human-readable name for the integration, unique within the organization (e.g. 'Gitea Production')"
         },
         "orgName": {
           "type": "string",
@@ -4431,24 +4954,68 @@
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
         },
-        "rule": {
-          "$ref": "pulumi.json#/Any",
-          "description": "Rule configuration for the gate"
-        },
-        "target": {
-          "$ref": "pulumi.json#/Any",
-          "description": "Target configuration for the gate"
+        "vcsType": {
+          "type": "string",
+          "description": "Version control system type. Defaults to 'git' if not specified."
         }
       },
       "requiredInputs": [
-        "enabled",
+        "baseUrl",
+        "environment",
         "name",
-        "orgName",
-        "rule",
-        "target"
+        "orgName"
       ]
     },
-    "pulumiservice:v2:GitHubEnterpriseIntegration": {
+    "pulumiservice:v2/integrations:CustomVCSRepository": {
+      "description": "Adds a repository to a custom VCS integration. The repository name must be unique within the integration. Returns 409 Conflict if a repository with the same name is already configured.",
+      "properties": {
+        "integrationId": {
+          "type": "string",
+          "description": "The custom VCS integration identifier",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        }
+      },
+      "type": "object",
+      "required": [
+        "orgName",
+        "integrationId"
+      ],
+      "inputProperties": {
+        "displayName": {
+          "type": "string",
+          "description": "Human-readable display name for the repository. If not provided, the name is used for display purposes."
+        },
+        "integrationId": {
+          "type": "string",
+          "description": "The custom VCS integration identifier",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "name": {
+          "type": "string",
+          "description": "Repository name or path, joined with the integration's base URL to form the clone URL (e.g. 'myrepo' or 'subgroup/myrepo')"
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        }
+      },
+      "requiredInputs": [
+        "integrationId",
+        "name",
+        "orgName"
+      ]
+    },
+    "pulumiservice:v2/integrations:GitHubEnterpriseIntegration": {
       "description": "Updates GitHub Enterprise Server integration settings.",
       "properties": {
         "accountID": {
@@ -4576,7 +5143,7 @@
         "orgName"
       ]
     },
-    "pulumiservice:v2:GitHubIntegration": {
+    "pulumiservice:v2/integrations:GitHubIntegration": {
       "description": "Updates GitHub App integration settings.",
       "properties": {
         "accountID": {
@@ -4704,7 +5271,7 @@
         "orgName"
       ]
     },
-    "pulumiservice:v2:GitLabIntegration": {
+    "pulumiservice:v2/integrations:GitLabIntegration": {
       "description": "Updates an existing GitLab integration's settings, such as PR comment preferences and AI summary options.",
       "properties": {
         "authUser": {
@@ -4811,40 +5378,84 @@
         "orgName"
       ]
     },
-    "pulumiservice:v2:OidcIssuer": {
-      "description": "Registers a new OIDC issuer for an organization, establishing a trust relationship with an external identity provider. Once registered, the identity provider can issue signed, short-lived tokens that are exchanged for temporary Pulumi Cloud credentials during deployments. This eliminates the need to store long-lived access tokens. Supported providers include AWS, Azure, Google Cloud, GitHub Actions, and any OIDC-compliant identity provider. The request must include the issuer URL, and the service will fetch the provider's public signing keys to verify token authenticity.",
+    "pulumiservice:v2/preview:Environment": {
+      "description": "Creates a new Pulumi ESC (Environments, Secrets, and Configuration) environment within the specified organization. The request body must include the project name and the environment name. Environment names must be unique within a project and may only contain alphanumeric characters, hyphens, underscores, and periods. The newly created environment starts with an empty YAML definition that can be updated via the UpdateEnvironment endpoint.",
+      "properties": {
+        "envName": {
+          "type": "string",
+          "description": "The environment name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        }
+      },
+      "type": "object",
+      "required": [
+        "orgName",
+        "envName"
+      ],
+      "inputProperties": {
+        "envName": {
+          "type": "string",
+          "description": "The environment name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the environment."
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "project": {
+          "type": "string",
+          "description": "The project name for the environment."
+        }
+      },
+      "requiredInputs": [
+        "envName",
+        "name",
+        "orgName",
+        "project"
+      ]
+    },
+    "pulumiservice:v2/preview:EnvironmentTag": {
+      "description": "Adds a new user-defined tag to a Pulumi ESC environment. Tags are key-value pairs that provide contextual metadata for organizing and searching environments (e.g., region=us-east-1, team=platform). The tag name and value are provided in the request body. Returns the created EnvironmentTag on success. Returns 409 if a tag with the same name already exists on the environment.",
       "properties": {
         "created": {
           "type": "string",
-          "description": "The ISO 8601 timestamp when the OIDC issuer was created."
+          "description": "The timestamp when the tag was created."
         },
-        "issuer": {
+        "editorLogin": {
           "type": "string",
-          "description": "The OIDC issuer identifier, typically a URL that uniquely identifies the identity provider."
+          "description": "The login name of the user who last edited the tag."
         },
-        "issuerId": {
+        "editorName": {
           "type": "string",
-          "description": "The unique identifier of the registered OIDC issuer."
+          "description": "The display name of the user who last edited the tag."
         },
-        "jwks": {
-          "$ref": "pulumi.json#/Any",
-          "description": "The JSON Web Key Set for the OIDC issuer."
-        },
-        "lastUsed": {
+        "envName": {
           "type": "string",
-          "description": "The ISO 8601 timestamp when the OIDC issuer was last used for token exchange."
-        },
-        "maxExpiration": {
-          "type": "integer",
-          "description": "The maximum token expiration time in seconds."
+          "description": "The environment name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
         },
         "modified": {
           "type": "string",
-          "description": "The ISO 8601 timestamp when the OIDC issuer was last modified."
+          "description": "The timestamp when the tag was last modified."
         },
         "name": {
           "type": "string",
-          "description": "The display name of the OIDC issuer."
+          "description": "The name of the tag."
         },
         "orgName": {
           "type": "string",
@@ -4852,91 +5463,1064 @@
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
         },
-        "thumbprints": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "SHA-1 certificate thumbprints used to verify the OIDC issuer's TLS certificate."
-        },
-        "url": {
+        "value": {
           "type": "string",
-          "description": "The URL of the OIDC issuer."
+          "description": "The value of the tag."
         }
       },
       "type": "object",
       "required": [
-        "issuer",
-        "issuerId",
+        "created",
+        "editorLogin",
+        "editorName",
+        "modified",
         "name",
-        "url",
+        "value",
+        "orgName",
+        "envName"
+      ],
+      "inputProperties": {
+        "envName": {
+          "type": "string",
+          "description": "The environment name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "name": {
+          "type": "string",
+          "description": "The name"
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "value": {
+          "type": "string",
+          "description": "The value"
+        }
+      },
+      "requiredInputs": [
+        "envName",
+        "name",
+        "orgName",
+        "value"
+      ]
+    },
+    "pulumiservice:v2/preview:RevisionTag": {
+      "description": "Creates a new revision tag for a Pulumi ESC environment. Revision tags are named references that point to specific revision numbers, similar to Git tags. They allow pinning a stable reference to a known-good version of an environment. Tagged versions can be used in imports and Pulumi stack configuration (e.g., myproject/env@prod) to ensure stable references unaffected by subsequent changes. The built-in 'latest' tag always points to the most recent revision.",
+      "properties": {
+        "created": {
+          "type": "string",
+          "description": "The timestamp when the tag was created."
+        },
+        "editorLogin": {
+          "type": "string",
+          "description": "The login name of the user who last edited the tag."
+        },
+        "editorName": {
+          "type": "string",
+          "description": "The display name of the user who last edited the tag."
+        },
+        "envName": {
+          "type": "string",
+          "description": "The environment name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "modified": {
+          "type": "string",
+          "description": "The timestamp when the tag was last modified."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the tag."
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "revision": {
+          "type": "integer",
+          "description": "The revision number this tag points to."
+        },
+        "tagName": {
+          "type": "string",
+          "description": "The revision tag name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        }
+      },
+      "type": "object",
+      "required": [
+        "created",
+        "modified",
+        "name",
+        "revision",
+        "orgName",
+        "envName",
+        "tagName"
+      ],
+      "inputProperties": {
+        "envName": {
+          "type": "string",
+          "description": "The environment name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "name": {
+          "type": "string",
+          "description": "The name"
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "revision": {
+          "type": "integer",
+          "description": "The revision"
+        },
+        "tagName": {
+          "type": "string",
+          "description": "The revision tag name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        }
+      },
+      "requiredInputs": [
+        "envName",
+        "name",
+        "orgName",
+        "tagName"
+      ]
+    },
+    "pulumiservice:v2/preview:Webhook": {
+      "description": "Creates a new webhook for a Pulumi ESC environment. Webhooks allow external services to be notified when environment events occur, such as updates or opens. The request body specifies the webhook configuration including the destination URL, event filters, and format. Returns 400 if the organization name in the request body does not match the URL path parameter. Returns 409 if a webhook with the same name already exists.",
+      "properties": {
+        "active": {
+          "type": "boolean",
+          "description": "Whether the webhook is active and will receive deliveries."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The human-readable display name shown in the UI."
+        },
+        "envName": {
+          "type": "string",
+          "description": "The environment name. Set when the webhook is scoped to a specific environment."
+        },
+        "filters": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Specific event types this webhook subscribes to. If empty, all events are delivered."
+        },
+        "format": {
+          "type": "string",
+          "description": "The format of the webhook payload (e.g., 'raw', 'slack', 'ms_teams')."
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Event groups this webhook subscribes to (e.g., 'stacks', 'deployments')."
+        },
+        "hasSecret": {
+          "type": "boolean",
+          "description": "HasSecret is true if the webhook has a secret. This is used to determine whether\nto show that there is a secret in the UI.",
+          "secret": true
+        },
+        "name": {
+          "type": "string",
+          "description": "The unique identifier name for the webhook within its scope."
+        },
+        "organizationName": {
+          "type": "string",
+          "description": "The organization that owns this webhook."
+        },
+        "payloadUrl": {
+          "type": "string",
+          "description": "The URL to which webhook payloads are delivered."
+        },
+        "projectName": {
+          "type": "string",
+          "description": "The project name. Set when the webhook is scoped to a specific stack."
+        },
+        "secret": {
+          "type": "string",
+          "description": "Secret will be omitted when returned from the service.",
+          "secret": true
+        },
+        "secretCiphertext": {
+          "type": "string",
+          "description": "SecretCiphertext is the ciphertext value of the webhook's secret.\nIt's used to check whether the secret was changed by the PSP",
+          "secret": true
+        },
+        "stackName": {
+          "type": "string",
+          "description": "The stack name. Set when the webhook is scoped to a specific stack."
+        }
+      },
+      "type": "object",
+      "required": [
+        "active",
+        "displayName",
+        "hasSecret",
+        "name",
+        "organizationName",
+        "payloadUrl",
+        "secretCiphertext"
+      ],
+      "inputProperties": {
+        "active": {
+          "type": "boolean",
+          "description": "Whether the webhook is active and will receive deliveries."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The human-readable display name shown in the UI."
+        },
+        "envName": {
+          "type": "string",
+          "description": "The environment name. Set when the webhook is scoped to a specific environment."
+        },
+        "filters": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Specific event types this webhook subscribes to. If empty, all events are delivered."
+        },
+        "format": {
+          "type": "string",
+          "description": "The format of the webhook payload (e.g., 'raw', 'slack', 'ms_teams')."
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Event groups this webhook subscribes to (e.g., 'stacks', 'deployments')."
+        },
+        "name": {
+          "type": "string",
+          "description": "The unique identifier name for the webhook within its scope."
+        },
+        "organizationName": {
+          "type": "string",
+          "description": "The organization that owns this webhook."
+        },
+        "payloadUrl": {
+          "type": "string",
+          "description": "The URL to which webhook payloads are delivered."
+        },
+        "projectName": {
+          "type": "string",
+          "description": "The project name. Set when the webhook is scoped to a specific stack."
+        },
+        "secret": {
+          "type": "string",
+          "description": "Secret will be omitted when returned from the service."
+        },
+        "stackName": {
+          "type": "string",
+          "description": "The stack name. Set when the webhook is scoped to a specific stack."
+        }
+      },
+      "requiredInputs": [
+        "active",
+        "displayName",
+        "envName",
+        "name",
+        "organizationName",
+        "payloadUrl"
+      ]
+    },
+    "pulumiservice:v2/services:Item": {
+      "description": "Adds items (such as access tokens, team memberships, or stack permissions) to an existing service account. Service accounts provide programmatic, non-human access to Pulumi Cloud resources and are scoped to an organization. Items define what the service account can access and what credentials it holds. Returns the updated service details.",
+      "properties": {
+        "continuationToken": {
+          "type": "string",
+          "description": "ContinuationToken is an opaque value the client can send to fetch additional\nitems. Will be nil once all items have been returned."
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "The list of service items"
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "ownerName": {
+          "type": "string",
+          "description": "The owner name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "ownerType": {
+          "type": "string",
+          "description": "The owner type",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "service": {
+          "$ref": "pulumi.json#/Any",
+          "description": "The service details"
+        },
+        "serviceName": {
+          "type": "string",
+          "description": "The service name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        }
+      },
+      "type": "object",
+      "required": [
+        "items",
+        "service",
+        "orgName",
+        "ownerType",
+        "ownerName",
+        "serviceName"
+      ],
+      "inputProperties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "List of items"
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "ownerName": {
+          "type": "string",
+          "description": "The owner name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "ownerType": {
+          "type": "string",
+          "description": "The owner type",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "serviceName": {
+          "type": "string",
+          "description": "The service name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        }
+      },
+      "requiredInputs": [
+        "items",
+        "orgName",
+        "ownerName",
+        "ownerType",
+        "serviceName"
+      ]
+    },
+    "pulumiservice:v2/services:Service": {
+      "description": "Creates a new service account in an organization. Service accounts provide programmatic, non-human identities for accessing Pulumi Cloud resources. They are scoped to an organization and can hold access tokens, belong to teams, and have stack permissions. The service name must be unique within the organization.",
+      "properties": {
+        "continuationToken": {
+          "type": "string",
+          "description": "ContinuationToken is an opaque value the client can send to fetch additional\nitems. Will be nil once all items have been returned."
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "The list of service items"
+        },
+        "name": {
+          "type": "string",
+          "description": "The service name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "ownerName": {
+          "type": "string",
+          "description": "The owner name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "ownerType": {
+          "type": "string",
+          "description": "The owner type",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        }
+      },
+      "type": "object",
+      "required": [
+        "items",
+        "orgName",
+        "ownerType",
+        "ownerName",
+        "name"
+      ],
+      "inputProperties": {
+        "description": {
+          "type": "string",
+          "description": "an optional description of the service"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "an optional list of items to add during service creation"
+        },
+        "name": {
+          "type": "string",
+          "description": "the name of the service"
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "ownerName": {
+          "type": "string",
+          "description": "the service owner name"
+        },
+        "ownerType": {
+          "type": "string",
+          "description": "the service owner type"
+        },
+        "properties": {
+          "type": "array",
+          "items": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "an optional list of properties to set on the service"
+        }
+      },
+      "requiredInputs": [
+        "description",
+        "items",
+        "name",
+        "orgName",
+        "ownerName",
+        "ownerType",
+        "properties"
+      ]
+    },
+    "pulumiservice:v2/stacks:Config": {
+      "description": "Updates the service-managed configuration for a stack. The request body may include the ESC environment reference, secrets provider type, encrypted key, and encryption salt. If stack configuration is returned by the API, it is used in place of the local stack config file (e.g. Pulumi.[stack].yaml). Returns the updated configuration object. Returns 400 if the environment reference is invalid or not found.",
+      "properties": {
+        "encryptedKey": {
+          "type": "string",
+          "description": "The KMS-encrypted ciphertext for the data key used for secrets encryption. Only used for cloud-based secrets providers."
+        },
+        "encryptionSalt": {
+          "type": "string",
+          "description": "The stack's base64-encoded encryption salt. Only used for passphrase-based secrets providers."
+        },
+        "environment": {
+          "type": "string",
+          "description": "Reference to ESC environment to use as stack configuration."
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "projectName": {
+          "type": "string",
+          "description": "The project name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "secretsProvider": {
+          "type": "string",
+          "description": "The stack's secrets provider.",
+          "secret": true
+        },
+        "stackName": {
+          "type": "string",
+          "description": "The stack name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        }
+      },
+      "type": "object",
+      "required": [
+        "environment",
+        "orgName",
+        "projectName",
+        "stackName"
+      ],
+      "inputProperties": {
+        "encryptedKey": {
+          "type": "string",
+          "description": "The KMS-encrypted ciphertext for the data key used for secrets encryption. Only used for cloud-based secrets providers."
+        },
+        "encryptionSalt": {
+          "type": "string",
+          "description": "The stack's base64-encoded encryption salt. Only used for passphrase-based secrets providers."
+        },
+        "environment": {
+          "type": "string",
+          "description": "Reference to ESC environment to use as stack configuration."
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "projectName": {
+          "type": "string",
+          "description": "The project name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "secretsProvider": {
+          "type": "string",
+          "description": "The stack's secrets provider."
+        },
+        "stackName": {
+          "type": "string",
+          "description": "The stack name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        }
+      },
+      "requiredInputs": [
+        "environment",
+        "orgName",
+        "projectName",
+        "stackName"
+      ]
+    },
+    "pulumiservice:v2/stacks:Stack": {
+      "description": "Creates a new stack within a project in the organization. If the project does not exist, it will be created. A stack is an isolated, independently configurable instance of a Pulumi program, typically representing a deployment environment (e.g., development, staging, production). The stack name must be unique within the project.\n\nThe optional `config` object supports:\n- `environment`: reference to an ESC environment for storing stack configuration (must not already exist)\n- `secretsProvider`: the secrets provider for the stack\n- `encryptedKey`: KMS-encrypted ciphertext for the data key (cloud-based secrets providers only)\n- `encryptionSalt`: base64-encoded encryption salt (passphrase-based secrets providers only)",
+      "properties": {
+        "activeUpdate": {
+          "type": "string",
+          "description": "The active update"
+        },
+        "config": {
+          "$ref": "pulumi.json#/Any",
+          "description": "Optional cloud-persisted stack configuration.\nIf set, then the stack's configuration is loaded from the cloud and not a file on disk."
+        },
+        "currentOperation": {
+          "$ref": "pulumi.json#/Any",
+          "description": "CurrentOperation provides information about a stack operation in-progress, as applicable."
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name"
+        },
+        "projectName": {
+          "type": "string",
+          "description": "The project name"
+        },
+        "stackName": {
+          "type": "string",
+          "description": "The stack name"
+        },
+        "tags": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "Map of tags"
+        },
+        "version": {
+          "type": "integer",
+          "description": "The version number"
+        }
+      },
+      "type": "object",
+      "required": [
+        "activeUpdate",
+        "orgName",
+        "projectName",
+        "stackName",
+        "version"
+      ],
+      "inputProperties": {
+        "config": {
+          "$ref": "pulumi.json#/Any",
+          "description": "The configuration for the new stack."
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "projectName": {
+          "type": "string",
+          "description": "The project name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "stackName": {
+          "type": "string",
+          "description": "The name of the stack being created."
+        },
+        "state": {
+          "$ref": "pulumi.json#/Any",
+          "description": "An optional state to initialize the stack with."
+        },
+        "tags": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "An optional set of tags to apply to the stack."
+        },
+        "teams": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "An optional set of teams to assign to the stack."
+        }
+      },
+      "requiredInputs": [
+        "orgName",
+        "projectName",
+        "stackName"
+      ]
+    },
+    "pulumiservice:v2/stacks:Tag": {
+      "description": "Creates a new tag on the specified stack. Tags are key-value metadata pairs that can be used for organization, filtering, and storing additional information about stacks. The request body must include both a tag name and value. Returns 400 if the tag name is invalid or the tag already exists. Built-in tags (such as those automatically set by the Pulumi CLI) follow specific naming conventions.",
+      "properties": {
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "projectName": {
+          "type": "string",
+          "description": "The project name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "stackName": {
+          "type": "string",
+          "description": "The stack name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        }
+      },
+      "type": "object",
+      "required": [
+        "orgName",
+        "projectName",
+        "stackName"
+      ],
+      "inputProperties": {
+        "name": {
+          "type": "string",
+          "description": "The tag key, which must conform to the stack tag naming rules."
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "projectName": {
+          "type": "string",
+          "description": "The project name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "stackName": {
+          "type": "string",
+          "description": "The stack name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "value": {
+          "type": "string",
+          "description": "The tag value associated with this key."
+        }
+      },
+      "requiredInputs": [
+        "name",
+        "orgName",
+        "projectName",
+        "stackName",
+        "value"
+      ]
+    },
+    "pulumiservice:v2/stacks:Webhook": {
+      "description": "Creates a new webhook for the specified stack. The request body must include the webhook name, payload URL, and format.\n\nThe `format` field accepts: `raw` (default), `slack`, `ms_teams`, or `pulumi_deployments`.\n\nThe `filters` field accepts a list of event types to subscribe to. See the [webhook event filtering documentation](https://www.pulumi.com/docs/pulumi-cloud/webhooks/#event-filtering) for available filters.\n\nThe optional `secret` field sets the HMAC key for signature verification. See the [webhook headers documentation](https://www.pulumi.com/docs/pulumi-cloud/webhooks/#headers) for details.\n\nReturns 409 if a webhook with the same name already exists. Returns 400 if the organization or stack name in the request body does not match the URL path parameters.",
+      "properties": {
+        "active": {
+          "type": "boolean",
+          "description": "Whether the webhook is active and will receive deliveries."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The human-readable display name shown in the UI."
+        },
+        "envName": {
+          "type": "string",
+          "description": "The environment name. Set when the webhook is scoped to a specific environment."
+        },
+        "filters": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Specific event types this webhook subscribes to. If empty, all events are delivered."
+        },
+        "format": {
+          "type": "string",
+          "description": "The format of the webhook payload (e.g., 'raw', 'slack', 'ms_teams')."
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Event groups this webhook subscribes to (e.g., 'stacks', 'deployments')."
+        },
+        "hasSecret": {
+          "type": "boolean",
+          "description": "HasSecret is true if the webhook has a secret. This is used to determine whether\nto show that there is a secret in the UI.",
+          "secret": true
+        },
+        "name": {
+          "type": "string",
+          "description": "The unique identifier name for the webhook within its scope."
+        },
+        "organizationName": {
+          "type": "string",
+          "description": "The organization that owns this webhook."
+        },
+        "payloadUrl": {
+          "type": "string",
+          "description": "The URL to which webhook payloads are delivered."
+        },
+        "projectName": {
+          "type": "string",
+          "description": "The project name. Set when the webhook is scoped to a specific stack."
+        },
+        "secret": {
+          "type": "string",
+          "description": "Secret will be omitted when returned from the service.",
+          "secret": true
+        },
+        "secretCiphertext": {
+          "type": "string",
+          "description": "SecretCiphertext is the ciphertext value of the webhook's secret.\nIt's used to check whether the secret was changed by the PSP",
+          "secret": true
+        },
+        "stackName": {
+          "type": "string",
+          "description": "The stack name. Set when the webhook is scoped to a specific stack."
+        }
+      },
+      "type": "object",
+      "required": [
+        "active",
+        "displayName",
+        "hasSecret",
+        "name",
+        "organizationName",
+        "payloadUrl",
+        "secretCiphertext"
+      ],
+      "inputProperties": {
+        "active": {
+          "type": "boolean",
+          "description": "Whether the webhook is active and will receive deliveries."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The human-readable display name shown in the UI."
+        },
+        "envName": {
+          "type": "string",
+          "description": "The environment name. Set when the webhook is scoped to a specific environment."
+        },
+        "filters": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Specific event types this webhook subscribes to. If empty, all events are delivered."
+        },
+        "format": {
+          "type": "string",
+          "description": "The format of the webhook payload (e.g., 'raw', 'slack', 'ms_teams')."
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Event groups this webhook subscribes to (e.g., 'stacks', 'deployments')."
+        },
+        "name": {
+          "type": "string",
+          "description": "The unique identifier name for the webhook within its scope."
+        },
+        "organizationName": {
+          "type": "string",
+          "description": "The organization that owns this webhook."
+        },
+        "payloadUrl": {
+          "type": "string",
+          "description": "The URL to which webhook payloads are delivered."
+        },
+        "projectName": {
+          "type": "string",
+          "description": "The project name. Set when the webhook is scoped to a specific stack."
+        },
+        "secret": {
+          "type": "string",
+          "description": "Secret will be omitted when returned from the service."
+        },
+        "stackName": {
+          "type": "string",
+          "description": "The stack name. Set when the webhook is scoped to a specific stack."
+        }
+      },
+      "requiredInputs": [
+        "active",
+        "displayName",
+        "name",
+        "organizationName",
+        "payloadUrl",
+        "projectName",
+        "stackName"
+      ]
+    },
+    "pulumiservice:v2/teams:Role": {
+      "description": "UpdateTeamRoles upserts the role assigned to a team since we currently only support\na 1:1 mapping of teams to roles.",
+      "properties": {
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "roleID": {
+          "type": "string",
+          "description": "The role identifier",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "teamName": {
+          "type": "string",
+          "description": "The team name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        }
+      },
+      "type": "object",
+      "required": [
+        "orgName",
+        "teamName",
+        "roleID"
+      ],
+      "inputProperties": {
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "roleID": {
+          "type": "string",
+          "description": "The role identifier",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "teamName": {
+          "type": "string",
+          "description": "The team name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        }
+      },
+      "requiredInputs": [
+        "orgName",
+        "roleID",
+        "teamName"
+      ]
+    },
+    "pulumiservice:v2/teams:Team": {
+      "description": "CreatePulumiTeam creates a \"Pulumi\" team, i.e. one whose membership is managed by Pulumi.\n(As opposed to a GitHub or GitLab-based team.)",
+      "properties": {
+        "accounts": {
+          "type": "array",
+          "items": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "The list of account permissions granted to the team."
+        },
+        "description": {
+          "type": "string",
+          "description": "A free-form text description of the team's purpose."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The human-readable display name shown in the UI."
+        },
+        "environments": {
+          "type": "array",
+          "items": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "The list of environment settings for the team."
+        },
+        "kind": {
+          "type": "string",
+          "description": "The kind of team (e.g., pulumi or GitHub-backed)."
+        },
+        "listMembersError": {
+          "type": "string",
+          "description": "ListMembersError is the error message if an error was encountered whilst trying to\ncontact the team's backend (eg. GitHub). The UI will only show this error if it is non-nil\nand if Members itself is an empty slice."
+        },
+        "members": {
+          "type": "array",
+          "items": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "The list of team members."
+        },
+        "name": {
+          "type": "string",
+          "description": "The unique identifier name of the team within the organization."
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "roleIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "RoleIDs are the IDs of the FGA roles assigned to the team, if any.\nCurrently only one role per team is supported."
+        },
+        "stacks": {
+          "type": "array",
+          "items": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "The list of stack permissions granted to the team."
+        },
+        "userRole": {
+          "type": "string",
+          "description": "UserRole is the calling user's role on the given team."
+        }
+      },
+      "type": "object",
+      "required": [
+        "description",
+        "displayName",
+        "kind",
+        "name",
         "orgName"
       ],
       "inputProperties": {
-        "issuerId": {
+        "description": {
           "type": "string",
-          "description": "The OIDC issuer identifier",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
+          "description": "The description"
         },
-        "jwks": {
-          "$ref": "pulumi.json#/Any",
-          "description": "The JSON Web Key Set for the OIDC issuer."
-        },
-        "maxExpiration": {
-          "type": "integer",
-          "description": "The maximum token expiration time in seconds."
+        "displayName": {
+          "type": "string",
+          "description": "The display name"
         },
         "name": {
           "type": "string",
-          "description": "The display name of the OIDC issuer."
+          "description": "The name"
         },
         "orgName": {
           "type": "string",
           "description": "The organization name",
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
-        },
-        "thumbprints": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "SHA-1 certificate thumbprints used to verify the OIDC issuer's TLS certificate."
-        },
-        "url": {
-          "type": "string",
-          "description": "The URL of the OIDC issuer."
         }
       },
       "requiredInputs": [
+        "description",
+        "displayName",
         "name",
-        "orgName",
-        "url"
+        "orgName"
       ]
     },
-    "pulumiservice:v2:OpenEnvironmentRequest": {
-      "description": "Creates an open request for a Pulumi ESC environment that has gated opens enabled. When an environment has open gates configured, opening the environment requires an approval workflow. This endpoint initiates that process by creating an open request, and also creates corresponding open requests for each imported environment that has open gates. Requires the Approvals feature to be enabled for the organization. Returns 400 if the environment does not have gated opens.",
+    "pulumiservice:v2/tokens:OrgToken": {
+      "description": "Generates a new access token scoped to the organization for use in CI/CD pipelines and automated workflows. Organization tokens belong to the organization rather than individual users, ensuring that access is not disrupted when team members leave.\n\nThe `name` field must be unique across the organization (including deleted tokens) and cannot exceed 40 characters. The `expires` field accepts a unix epoch timestamp up to two years from the present, or `0` for no expiry (default).\n\n**Important:** The token value in the response is only returned once at creation time and cannot be retrieved later. Audit logs for actions performed with organization tokens are attributed to the organization rather than an individual user.",
       "properties": {
-        "accessDurationSeconds": {
-          "type": "integer",
-          "description": "Total duration that the resulting grant can be used to access the environment open endpoint (after first open)"
-        },
-        "changeRequestID": {
+        "orgName": {
           "type": "string",
-          "description": "The change request ID",
+          "description": "The organization name",
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
         },
-        "envName": {
+        "tokenId": {
           "type": "string",
-          "description": "The environment name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
+          "description": "The unique identifier"
         },
-        "grantExpirationSeconds": {
+        "tokenValue": {
+          "type": "string",
+          "description": "The token value",
+          "secret": true
+        }
+      },
+      "type": "object",
+      "required": [
+        "tokenId",
+        "tokenValue",
+        "orgName"
+      ],
+      "inputProperties": {
+        "admin": {
+          "type": "boolean",
+          "description": "Whether the entity has admin privileges"
+        },
+        "description": {
+          "type": "string",
+          "description": "The description"
+        },
+        "expires": {
           "type": "integer",
-          "description": "Time from application of the request until the resulting grant expires"
+          "description": "The expiration time"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name"
         },
         "orgName": {
           "type": "string",
@@ -4944,42 +6528,240 @@
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
         },
-        "projectName": {
+        "reason": {
           "type": "string",
-          "description": "The project name",
+          "description": "Audit log reason for creating this token",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "roleID": {
+          "type": "string",
+          "description": "The role identifier"
+        }
+      },
+      "requiredInputs": [
+        "admin",
+        "description",
+        "expires",
+        "name",
+        "orgName"
+      ]
+    },
+    "pulumiservice:v2/tokens:PersonalToken": {
+      "description": "Creates a new personal access token for the authenticated user. The request body includes a description for the token and an optional expiration time. The response includes the token ID and the tokenValue (prefixed with 'pul-'). The token value is only returned once at creation time and cannot be retrieved later.",
+      "properties": {
+        "tokenId": {
+          "type": "string",
+          "description": "The unique identifier"
+        },
+        "tokenValue": {
+          "type": "string",
+          "description": "The token value",
+          "secret": true
+        }
+      },
+      "type": "object",
+      "required": [
+        "tokenId",
+        "tokenValue"
+      ],
+      "inputProperties": {
+        "description": {
+          "type": "string",
+          "description": "The description"
+        },
+        "expires": {
+          "type": "integer",
+          "description": "The expiration time"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Tracks the context that triggered token creation (e.g., redirect URL or referral source)",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        }
+      },
+      "requiredInputs": [
+        "description",
+        "expires"
+      ]
+    },
+    "pulumiservice:v2/tokens:TeamToken": {
+      "description": "Generates a new access token scoped to a specific team within an organization. Team tokens inherit the stack permissions assigned to the team, making them suitable for CI/CD pipelines that need access limited to a specific set of stacks.\n\nThe `name` field must be unique across the organization (including deleted tokens) and cannot exceed 40 characters. The `expires` field accepts a unix epoch timestamp up to two years from the present, or `0` for no expiry (default).\n\n**Important:** The token value in the response is only returned once at creation time and cannot be retrieved later.",
+      "properties": {
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "teamName": {
+          "type": "string",
+          "description": "The team name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "tokenId": {
+          "type": "string",
+          "description": "The unique identifier"
+        },
+        "tokenValue": {
+          "type": "string",
+          "description": "The token value",
+          "secret": true
+        }
+      },
+      "type": "object",
+      "required": [
+        "tokenId",
+        "tokenValue",
+        "orgName",
+        "teamName"
+      ],
+      "inputProperties": {
+        "description": {
+          "type": "string",
+          "description": "The description"
+        },
+        "expires": {
+          "type": "integer",
+          "description": "The expiration time"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name"
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "reason": {
+          "type": "string",
+          "description": "Audit log reason for creating this token",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "teamName": {
+          "type": "string",
+          "description": "The team name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        }
+      },
+      "requiredInputs": [
+        "description",
+        "expires",
+        "name",
+        "orgName",
+        "teamName"
+      ]
+    },
+    "pulumiservice:v2:AuditLogExportConfiguration": {
+      "description": "Creates or updates the organization's automated audit log export configuration. Audit log export enables automatic delivery of audit events to an S3 bucket for long-term retention and SIEM integration. The configuration includes the S3 bucket details and IAM role for authentication. This feature is available on Business Critical edition.",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether audit log export is currently active. May be paused automatically if the configured destination repeatedly fails to authenticate."
+        },
+        "lastResult": {
+          "$ref": "pulumi.json#/Any",
+          "description": "The result of the last audit log export attempt."
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "s3Config": {
+          "$ref": "pulumi.json#/Any",
+          "description": "The S3 configuration for exporting audit logs."
+        }
+      },
+      "type": "object",
+      "required": [
+        "enabled",
+        "lastResult",
+        "s3Config",
+        "orgName"
+      ],
+      "inputProperties": {
+        "newEnabled": {
+          "type": "boolean",
+          "description": "Whether the audit log export is enabled."
+        },
+        "newS3Configuration": {
+          "$ref": "pulumi.json#/Any",
+          "description": "The new S3 configuration for audit log export."
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        }
+      },
+      "requiredInputs": [
+        "newEnabled",
+        "newS3Configuration",
+        "orgName"
+      ]
+    },
+    "pulumiservice:v2:DefaultOrganization": {
+      "description": "UpdateDefaultOrganization sets the default organization for the current user.",
+      "properties": {
+        "GitHubLogin": {
+          "type": "string",
+          "description": "Returns the organization name. Can be an empty string, if the user is a member of no organizations"
+        },
+        "Messages": {
+          "type": "array",
+          "items": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "Messages is a list of messages that should be displayed to the user that contextualize\nthe default org; for example: warning new users if their default org as returned by the\nservice is on an expiring trial and not free tier, with possible recommendations\non how to configure their default org locally.\nCan be possibly empty."
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
         }
       },
       "type": "object",
       "required": [
-        "accessDurationSeconds",
-        "grantExpirationSeconds",
-        "orgName",
-        "projectName",
-        "envName",
-        "changeRequestID"
+        "GitHubLogin",
+        "Messages",
+        "orgName"
       ],
       "inputProperties": {
-        "accessDurationSeconds": {
-          "type": "integer",
-          "description": "Total duration that the resulting grant can be used to access the environment open endpoint (after first open)"
-        },
-        "changeRequestID": {
+        "orgName": {
           "type": "string",
-          "description": "The change request ID",
+          "description": "The organization name",
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
+        }
+      },
+      "requiredInputs": [
+        "orgName"
+      ]
+    },
+    "pulumiservice:v2:Gate": {
+      "description": "Creates a new change gate for an entity in the organization. Change gates enforce approval workflows by requiring one or more approvals before infrastructure changes can be applied to the protected resource.",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether the change gate is enabled"
         },
-        "envName": {
+        "gateID": {
           "type": "string",
-          "description": "The environment name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
+          "description": "Unique identifier of the change gate"
         },
-        "grantExpirationSeconds": {
-          "type": "integer",
-          "description": "Time from application of the request until the resulting grant expires"
+        "name": {
+          "type": "string",
+          "description": "Name of the change gate"
         },
         "orgName": {
           "type": "string",
@@ -4987,19 +6769,60 @@
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
         },
-        "projectName": {
+        "rule": {
+          "$ref": "pulumi.json#/Any",
+          "description": "Rule configuration for the gate"
+        },
+        "target": {
+          "$ref": "pulumi.json#/Any",
+          "description": "Target configuration for the gate"
+        }
+      },
+      "type": "object",
+      "required": [
+        "enabled",
+        "gateID",
+        "name",
+        "rule",
+        "target",
+        "orgName"
+      ],
+      "inputProperties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether the change gate is enabled"
+        },
+        "gateID": {
           "type": "string",
-          "description": "The project name",
+          "description": "The change gate identifier",
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the change gate"
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "rule": {
+          "$ref": "pulumi.json#/Any",
+          "description": "Rule configuration for the gate"
+        },
+        "target": {
+          "$ref": "pulumi.json#/Any",
+          "description": "Target configuration for the gate"
         }
       },
       "requiredInputs": [
-        "accessDurationSeconds",
-        "envName",
-        "grantExpirationSeconds",
+        "enabled",
+        "name",
         "orgName",
-        "projectName"
+        "rule",
+        "target"
       ]
     },
     "pulumiservice:v2:OrgTemplateCollection": {
@@ -5076,73 +6899,6 @@
         "name",
         "orgName",
         "sourceURL"
-      ]
-    },
-    "pulumiservice:v2:OrgToken": {
-      "description": "Generates a new access token scoped to the organization for use in CI/CD pipelines and automated workflows. Organization tokens belong to the organization rather than individual users, ensuring that access is not disrupted when team members leave.\n\nThe `name` field must be unique across the organization (including deleted tokens) and cannot exceed 40 characters. The `expires` field accepts a unix epoch timestamp up to two years from the present, or `0` for no expiry (default).\n\n**Important:** The token value in the response is only returned once at creation time and cannot be retrieved later. Audit logs for actions performed with organization tokens are attributed to the organization rather than an individual user.",
-      "properties": {
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "tokenId": {
-          "type": "string",
-          "description": "The unique identifier"
-        },
-        "tokenValue": {
-          "type": "string",
-          "description": "The token value",
-          "secret": true
-        }
-      },
-      "type": "object",
-      "required": [
-        "tokenId",
-        "tokenValue",
-        "orgName"
-      ],
-      "inputProperties": {
-        "admin": {
-          "type": "boolean",
-          "description": "Whether the entity has admin privileges"
-        },
-        "description": {
-          "type": "string",
-          "description": "The description"
-        },
-        "expires": {
-          "type": "integer",
-          "description": "The expiration time"
-        },
-        "name": {
-          "type": "string",
-          "description": "The name"
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "reason": {
-          "type": "string",
-          "description": "Audit log reason for creating this token",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "roleID": {
-          "type": "string",
-          "description": "The role identifier"
-        }
-      },
-      "requiredInputs": [
-        "admin",
-        "description",
-        "expires",
-        "name",
-        "orgName"
       ]
     },
     "pulumiservice:v2:OrganizationMember": {
@@ -5365,45 +7121,6 @@
         "name",
         "organizationName",
         "payloadUrl"
-      ]
-    },
-    "pulumiservice:v2:PersonalToken": {
-      "description": "Creates a new personal access token for the authenticated user. The request body includes a description for the token and an optional expiration time. The response includes the token ID and the tokenValue (prefixed with 'pul-'). The token value is only returned once at creation time and cannot be retrieved later.",
-      "properties": {
-        "tokenId": {
-          "type": "string",
-          "description": "The unique identifier"
-        },
-        "tokenValue": {
-          "type": "string",
-          "description": "The token value",
-          "secret": true
-        }
-      },
-      "type": "object",
-      "required": [
-        "tokenId",
-        "tokenValue"
-      ],
-      "inputProperties": {
-        "description": {
-          "type": "string",
-          "description": "The description"
-        },
-        "expires": {
-          "type": "integer",
-          "description": "The expiration time"
-        },
-        "reason": {
-          "type": "string",
-          "description": "Tracks the context that triggered token creation (e.g., redirect URL or referral source)",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        }
-      },
-      "requiredInputs": [
-        "description",
-        "expires"
       ]
     },
     "pulumiservice:v2:PolicyGroup": {
@@ -5675,192 +7392,6 @@
         "policies"
       ]
     },
-    "pulumiservice:v2:RevisionTag_esc_environments": {
-      "description": "Updates an existing revision tag for a Pulumi ESC environment to point to a different revision number. The tag is identified by its name in the URL path. The request body specifies the new revision number. This allows advancing or rolling back a named reference (e.g., moving the 'prod' tag to a newer or older revision). Returns 204 on success with no response body.",
-      "properties": {
-        "created": {
-          "type": "string",
-          "description": "The timestamp when the tag was created."
-        },
-        "editorLogin": {
-          "type": "string",
-          "description": "The login name of the user who last edited the tag."
-        },
-        "editorName": {
-          "type": "string",
-          "description": "The display name of the user who last edited the tag."
-        },
-        "envName": {
-          "type": "string",
-          "description": "The environment name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "modified": {
-          "type": "string",
-          "description": "The timestamp when the tag was last modified."
-        },
-        "name": {
-          "type": "string",
-          "description": "The name of the tag."
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "projectName": {
-          "type": "string",
-          "description": "The project name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "revision": {
-          "type": "integer",
-          "description": "The revision number this tag points to."
-        },
-        "tagName": {
-          "type": "string",
-          "description": "The revision tag name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        }
-      },
-      "type": "object",
-      "required": [
-        "created",
-        "modified",
-        "name",
-        "revision",
-        "orgName",
-        "projectName",
-        "envName",
-        "tagName"
-      ],
-      "inputProperties": {
-        "envName": {
-          "type": "string",
-          "description": "The environment name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "projectName": {
-          "type": "string",
-          "description": "The project name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "revision": {
-          "type": "integer",
-          "description": "The revision number to associate with the tag."
-        },
-        "tagName": {
-          "type": "string",
-          "description": "The revision tag name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        }
-      },
-      "requiredInputs": [
-        "envName",
-        "orgName",
-        "projectName",
-        "tagName"
-      ]
-    },
-    "pulumiservice:v2:RevisionTag_preview_environments": {
-      "description": "Updates an existing revision tag for a Pulumi ESC environment to point to a different revision number. The tag is identified by its name in the URL path. The request body specifies the new revision number. This allows advancing or rolling back a named reference (e.g., moving the 'prod' tag to a newer or older revision). Returns 204 on success with no response body.",
-      "properties": {
-        "created": {
-          "type": "string",
-          "description": "The timestamp when the tag was created."
-        },
-        "editorLogin": {
-          "type": "string",
-          "description": "The login name of the user who last edited the tag."
-        },
-        "editorName": {
-          "type": "string",
-          "description": "The display name of the user who last edited the tag."
-        },
-        "envName": {
-          "type": "string",
-          "description": "The environment name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "modified": {
-          "type": "string",
-          "description": "The timestamp when the tag was last modified."
-        },
-        "name": {
-          "type": "string",
-          "description": "The name of the tag."
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "revision": {
-          "type": "integer",
-          "description": "The revision number this tag points to."
-        },
-        "tagName": {
-          "type": "string",
-          "description": "The revision tag name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        }
-      },
-      "type": "object",
-      "required": [
-        "created",
-        "modified",
-        "name",
-        "revision",
-        "orgName",
-        "envName",
-        "tagName"
-      ],
-      "inputProperties": {
-        "envName": {
-          "type": "string",
-          "description": "The environment name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "revision": {
-          "type": "integer",
-          "description": "The revision number to associate with the tag."
-        },
-        "tagName": {
-          "type": "string",
-          "description": "The revision tag name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        }
-      },
-      "requiredInputs": [
-        "envName",
-        "orgName",
-        "tagName"
-      ]
-    },
     "pulumiservice:v2:Role": {
       "description": "Creates a new custom role for an organization. Custom roles define fine-grained permission sets that can be assigned to organization members and teams, enabling precise access control beyond the built-in admin and member roles. Optionally, an associated policy and role binding can be created alongside the role.",
       "properties": {
@@ -5971,1380 +7502,6 @@
       },
       "requiredInputs": [
         "orgName"
-      ]
-    },
-    "pulumiservice:v2:SAMLOrganization": {
-      "description": "Updates the SAML configuration for a SAML-backed organization, including the identity provider SSO descriptor, attribute mappings, and other SAML settings. The new IDP SSO descriptor is required in the update request.",
-      "properties": {
-        "entityId": {
-          "type": "string",
-          "description": "The following fields can be empty if the metadata (IDPSSODescriptor)\nitself is empty for the organization."
-        },
-        "idpSsoDescriptor": {
-          "type": "string",
-          "description": "The SAML Identity Provider SSO descriptor XML."
-        },
-        "nameIdFormat": {
-          "type": "string",
-          "description": "The SAML NameID format used by the identity provider."
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "organization": {
-          "$ref": "pulumi.json#/Any",
-          "description": "The Pulumi organization."
-        },
-        "ssoUrl": {
-          "type": "string",
-          "description": "The SSO URL for the identity provider."
-        },
-        "validUntil": {
-          "type": "string",
-          "description": "ValidUntil is the date until which the X.509 Certificate\nissued to the organization by the identity provider is valid."
-        },
-        "validationError": {
-          "type": "string",
-          "description": "ValidationError will be set only if there is an error validating the SAML org's metadata XML."
-        }
-      },
-      "type": "object",
-      "required": [
-        "idpSsoDescriptor",
-        "organization",
-        "orgName"
-      ],
-      "inputProperties": {
-        "newIdpSsoDescriptor": {
-          "type": "string",
-          "description": "The new IDP SSO descriptor XML for the SAML configuration."
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        }
-      },
-      "requiredInputs": [
-        "orgName"
-      ]
-    },
-    "pulumiservice:v2:ScheduledDeployment": {
-      "description": "Creates a custom deployment schedule for a stack using Pulumi Deployments. Custom schedules allow you to automate recurring or one-time Pulumi operations on a stack. The request must include exactly one of 'scheduleCron' (a cron expression for recurring executions, e.g. '0 */4 * * *' for every 4 hours) or 'scheduleOnce' (an ISO 8601 timestamp for a one-time execution). The 'request' field contains the deployment configuration that will be executed on each scheduled run, including the Pulumi operation type and any settings overrides. The stack must have deployment settings configured before a schedule can be created.",
-      "properties": {
-        "created": {
-          "type": "string",
-          "description": "The timestamp when this scheduled action was created."
-        },
-        "definition": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "pulumi.json#/Any"
-          },
-          "description": "The action definition, which varies based on the action kind."
-        },
-        "kind": {
-          "type": "string",
-          "description": "The kind of action to be executed."
-        },
-        "lastExecuted": {
-          "type": "string",
-          "description": "The timestamp of the last execution, if any."
-        },
-        "modified": {
-          "type": "string",
-          "description": "The timestamp when this scheduled action was last modified."
-        },
-        "nextExecution": {
-          "type": "string",
-          "description": "The timestamp of the next scheduled execution."
-        },
-        "orgID": {
-          "type": "string",
-          "description": "The organization ID that owns this scheduled action."
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "paused": {
-          "type": "boolean",
-          "description": "Whether the scheduled action is currently paused."
-        },
-        "projectName": {
-          "type": "string",
-          "description": "The project name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "scheduleCron": {
-          "type": "string",
-          "description": "A cron expression defining the recurring schedule."
-        },
-        "scheduleID": {
-          "type": "string",
-          "description": "The unique identifier for this scheduled action."
-        },
-        "scheduleOnce": {
-          "type": "string",
-          "description": "A timestamp for a one-time scheduled execution."
-        },
-        "stackName": {
-          "type": "string",
-          "description": "The stack name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        }
-      },
-      "type": "object",
-      "required": [
-        "created",
-        "definition",
-        "kind",
-        "lastExecuted",
-        "modified",
-        "nextExecution",
-        "orgID",
-        "paused",
-        "scheduleID",
-        "orgName",
-        "projectName",
-        "stackName"
-      ],
-      "inputProperties": {
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "projectName": {
-          "type": "string",
-          "description": "The project name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "request": {
-          "$ref": "pulumi.json#/Any",
-          "description": "Deployment request payload to execute when the schedule fires. This has the same shape and semantics as CreateDeploymentRequest used for immediate deployments."
-        },
-        "scheduleCron": {
-          "type": "string",
-          "description": "Cron expression defining a recurring schedule for this deployment. When set, scheduleOnce must be null. Uses standard 5-field cron syntax (MIN HOUR DOM MON DOW) and is evaluated in UTC."
-        },
-        "scheduleID": {
-          "type": "string",
-          "description": "The schedule identifier",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "scheduleOnce": {
-          "type": "string",
-          "description": "Single point-in-time schedule for this deployment. When set, scheduleCron must be null. The value must be an ISO 8601 timestamp with timezone."
-        },
-        "stackName": {
-          "type": "string",
-          "description": "The stack name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        }
-      },
-      "requiredInputs": [
-        "orgName",
-        "projectName",
-        "stackName"
-      ]
-    },
-    "pulumiservice:v2:ScheduledScanSettings": {
-      "description": "Updates the scheduled scan configuration for an Insights account, such as scan frequency and schedule.",
-      "properties": {
-        "accountName": {
-          "type": "string",
-          "description": "The Insights account name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "batchSize": {
-          "type": "integer",
-          "description": "The batch size for processing resources during the scan."
-        },
-        "listConcurrency": {
-          "type": "integer",
-          "description": "The concurrency level for list operations during the scan."
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "paused": {
-          "type": "boolean",
-          "description": "Whether the scheduled scan is paused."
-        },
-        "readConcurrency": {
-          "type": "integer",
-          "description": "The concurrency level for read operations during the scan."
-        },
-        "readTimeout": {
-          "type": "string",
-          "description": "The timeout duration for read operations, as a Go duration string (e.g., '30s', '5m')."
-        },
-        "scheduleCron": {
-          "type": "string",
-          "description": "The cron expression defining the scan schedule."
-        }
-      },
-      "type": "object",
-      "required": [
-        "paused",
-        "scheduleCron",
-        "orgName",
-        "accountName"
-      ],
-      "inputProperties": {
-        "accountName": {
-          "type": "string",
-          "description": "The Insights account name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "batchSize": {
-          "type": "integer",
-          "description": "The batch size for processing resources during the scan."
-        },
-        "listConcurrency": {
-          "type": "integer",
-          "description": "The concurrency level for list operations during the scan."
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "paused": {
-          "type": "boolean",
-          "description": "Whether the scheduled scan is paused."
-        },
-        "readConcurrency": {
-          "type": "integer",
-          "description": "The concurrency level for read operations during the scan."
-        },
-        "readTimeout": {
-          "type": "string",
-          "description": "The timeout duration for read operations, as a Go duration string (e.g., '30s', '5m')."
-        },
-        "scheduleCron": {
-          "type": "string",
-          "description": "The cron expression defining the scan schedule."
-        }
-      },
-      "requiredInputs": [
-        "accountName",
-        "orgName",
-        "paused"
-      ]
-    },
-    "pulumiservice:v2:Service": {
-      "description": "Creates a new service account in an organization. Service accounts provide programmatic, non-human identities for accessing Pulumi Cloud resources. They are scoped to an organization and can hold access tokens, belong to teams, and have stack permissions. The service name must be unique within the organization.",
-      "properties": {
-        "continuationToken": {
-          "type": "string",
-          "description": "ContinuationToken is an opaque value the client can send to fetch additional\nitems. Will be nil once all items have been returned."
-        },
-        "items": {
-          "type": "array",
-          "items": {
-            "$ref": "pulumi.json#/Any"
-          },
-          "description": "The list of service items"
-        },
-        "name": {
-          "type": "string",
-          "description": "The service name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "ownerName": {
-          "type": "string",
-          "description": "The owner name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "ownerType": {
-          "type": "string",
-          "description": "The owner type",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        }
-      },
-      "type": "object",
-      "required": [
-        "items",
-        "orgName",
-        "ownerType",
-        "ownerName",
-        "name"
-      ],
-      "inputProperties": {
-        "description": {
-          "type": "string",
-          "description": "an optional description of the service"
-        },
-        "items": {
-          "type": "array",
-          "items": {
-            "$ref": "pulumi.json#/Any"
-          },
-          "description": "an optional list of items to add during service creation"
-        },
-        "name": {
-          "type": "string",
-          "description": "the name of the service"
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "ownerName": {
-          "type": "string",
-          "description": "the service owner name"
-        },
-        "ownerType": {
-          "type": "string",
-          "description": "the service owner type"
-        },
-        "properties": {
-          "type": "array",
-          "items": {
-            "$ref": "pulumi.json#/Any"
-          },
-          "description": "an optional list of properties to set on the service"
-        }
-      },
-      "requiredInputs": [
-        "description",
-        "items",
-        "name",
-        "orgName",
-        "ownerName",
-        "ownerType",
-        "properties"
-      ]
-    },
-    "pulumiservice:v2:Stack": {
-      "description": "Creates a new stack within a project in the organization. If the project does not exist, it will be created. A stack is an isolated, independently configurable instance of a Pulumi program, typically representing a deployment environment (e.g., development, staging, production). The stack name must be unique within the project.\n\nThe optional `config` object supports:\n- `environment`: reference to an ESC environment for storing stack configuration (must not already exist)\n- `secretsProvider`: the secrets provider for the stack\n- `encryptedKey`: KMS-encrypted ciphertext for the data key (cloud-based secrets providers only)\n- `encryptionSalt`: base64-encoded encryption salt (passphrase-based secrets providers only)",
-      "properties": {
-        "activeUpdate": {
-          "type": "string",
-          "description": "The active update"
-        },
-        "config": {
-          "$ref": "pulumi.json#/Any",
-          "description": "Optional cloud-persisted stack configuration.\nIf set, then the stack's configuration is loaded from the cloud and not a file on disk."
-        },
-        "currentOperation": {
-          "$ref": "pulumi.json#/Any",
-          "description": "CurrentOperation provides information about a stack operation in-progress, as applicable."
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name"
-        },
-        "projectName": {
-          "type": "string",
-          "description": "The project name"
-        },
-        "stackName": {
-          "type": "string",
-          "description": "The stack name"
-        },
-        "tags": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "pulumi.json#/Any"
-          },
-          "description": "Map of tags"
-        },
-        "version": {
-          "type": "integer",
-          "description": "The version number"
-        }
-      },
-      "type": "object",
-      "required": [
-        "activeUpdate",
-        "orgName",
-        "projectName",
-        "stackName",
-        "version"
-      ],
-      "inputProperties": {
-        "config": {
-          "$ref": "pulumi.json#/Any",
-          "description": "The configuration for the new stack."
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "projectName": {
-          "type": "string",
-          "description": "The project name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "stackName": {
-          "type": "string",
-          "description": "The name of the stack being created."
-        },
-        "state": {
-          "$ref": "pulumi.json#/Any",
-          "description": "An optional state to initialize the stack with."
-        },
-        "tags": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "pulumi.json#/Any"
-          },
-          "description": "An optional set of tags to apply to the stack."
-        },
-        "teams": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "An optional set of teams to assign to the stack."
-        }
-      },
-      "requiredInputs": [
-        "orgName",
-        "projectName",
-        "stackName"
-      ]
-    },
-    "pulumiservice:v2:StackConfig": {
-      "description": "Updates the service-managed configuration for a stack. The request body may include the ESC environment reference, secrets provider type, encrypted key, and encryption salt. If stack configuration is returned by the API, it is used in place of the local stack config file (e.g. Pulumi.[stack].yaml). Returns the updated configuration object. Returns 400 if the environment reference is invalid or not found.",
-      "properties": {
-        "encryptedKey": {
-          "type": "string",
-          "description": "The KMS-encrypted ciphertext for the data key used for secrets encryption. Only used for cloud-based secrets providers."
-        },
-        "encryptionSalt": {
-          "type": "string",
-          "description": "The stack's base64-encoded encryption salt. Only used for passphrase-based secrets providers."
-        },
-        "environment": {
-          "type": "string",
-          "description": "Reference to ESC environment to use as stack configuration."
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "projectName": {
-          "type": "string",
-          "description": "The project name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "secretsProvider": {
-          "type": "string",
-          "description": "The stack's secrets provider.",
-          "secret": true
-        },
-        "stackName": {
-          "type": "string",
-          "description": "The stack name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        }
-      },
-      "type": "object",
-      "required": [
-        "environment",
-        "orgName",
-        "projectName",
-        "stackName"
-      ],
-      "inputProperties": {
-        "encryptedKey": {
-          "type": "string",
-          "description": "The KMS-encrypted ciphertext for the data key used for secrets encryption. Only used for cloud-based secrets providers."
-        },
-        "encryptionSalt": {
-          "type": "string",
-          "description": "The stack's base64-encoded encryption salt. Only used for passphrase-based secrets providers."
-        },
-        "environment": {
-          "type": "string",
-          "description": "Reference to ESC environment to use as stack configuration."
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "projectName": {
-          "type": "string",
-          "description": "The project name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "secretsProvider": {
-          "type": "string",
-          "description": "The stack's secrets provider."
-        },
-        "stackName": {
-          "type": "string",
-          "description": "The stack name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        }
-      },
-      "requiredInputs": [
-        "environment",
-        "orgName",
-        "projectName",
-        "stackName"
-      ]
-    },
-    "pulumiservice:v2:StackTag": {
-      "description": "Creates a new tag on the specified stack. Tags are key-value metadata pairs that can be used for organization, filtering, and storing additional information about stacks. The request body must include both a tag name and value. Returns 400 if the tag name is invalid or the tag already exists. Built-in tags (such as those automatically set by the Pulumi CLI) follow specific naming conventions.",
-      "properties": {
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "projectName": {
-          "type": "string",
-          "description": "The project name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "stackName": {
-          "type": "string",
-          "description": "The stack name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        }
-      },
-      "type": "object",
-      "required": [
-        "orgName",
-        "projectName",
-        "stackName"
-      ],
-      "inputProperties": {
-        "name": {
-          "type": "string",
-          "description": "The tag key, which must conform to the stack tag naming rules."
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "projectName": {
-          "type": "string",
-          "description": "The project name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "stackName": {
-          "type": "string",
-          "description": "The stack name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "value": {
-          "type": "string",
-          "description": "The tag value associated with this key."
-        }
-      },
-      "requiredInputs": [
-        "name",
-        "orgName",
-        "projectName",
-        "stackName",
-        "value"
-      ]
-    },
-    "pulumiservice:v2:StackWebhook": {
-      "description": "Creates a new webhook for the specified stack. The request body must include the webhook name, payload URL, and format.\n\nThe `format` field accepts: `raw` (default), `slack`, `ms_teams`, or `pulumi_deployments`.\n\nThe `filters` field accepts a list of event types to subscribe to. See the [webhook event filtering documentation](https://www.pulumi.com/docs/pulumi-cloud/webhooks/#event-filtering) for available filters.\n\nThe optional `secret` field sets the HMAC key for signature verification. See the [webhook headers documentation](https://www.pulumi.com/docs/pulumi-cloud/webhooks/#headers) for details.\n\nReturns 409 if a webhook with the same name already exists. Returns 400 if the organization or stack name in the request body does not match the URL path parameters.",
-      "properties": {
-        "active": {
-          "type": "boolean",
-          "description": "Whether the webhook is active and will receive deliveries."
-        },
-        "displayName": {
-          "type": "string",
-          "description": "The human-readable display name shown in the UI."
-        },
-        "envName": {
-          "type": "string",
-          "description": "The environment name. Set when the webhook is scoped to a specific environment."
-        },
-        "filters": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Specific event types this webhook subscribes to. If empty, all events are delivered."
-        },
-        "format": {
-          "type": "string",
-          "description": "The format of the webhook payload (e.g., 'raw', 'slack', 'ms_teams')."
-        },
-        "groups": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Event groups this webhook subscribes to (e.g., 'stacks', 'deployments')."
-        },
-        "hasSecret": {
-          "type": "boolean",
-          "description": "HasSecret is true if the webhook has a secret. This is used to determine whether\nto show that there is a secret in the UI.",
-          "secret": true
-        },
-        "name": {
-          "type": "string",
-          "description": "The unique identifier name for the webhook within its scope."
-        },
-        "organizationName": {
-          "type": "string",
-          "description": "The organization that owns this webhook."
-        },
-        "payloadUrl": {
-          "type": "string",
-          "description": "The URL to which webhook payloads are delivered."
-        },
-        "projectName": {
-          "type": "string",
-          "description": "The project name. Set when the webhook is scoped to a specific stack."
-        },
-        "secret": {
-          "type": "string",
-          "description": "Secret will be omitted when returned from the service.",
-          "secret": true
-        },
-        "secretCiphertext": {
-          "type": "string",
-          "description": "SecretCiphertext is the ciphertext value of the webhook's secret.\nIt's used to check whether the secret was changed by the PSP",
-          "secret": true
-        },
-        "stackName": {
-          "type": "string",
-          "description": "The stack name. Set when the webhook is scoped to a specific stack."
-        }
-      },
-      "type": "object",
-      "required": [
-        "active",
-        "displayName",
-        "hasSecret",
-        "name",
-        "organizationName",
-        "payloadUrl",
-        "secretCiphertext"
-      ],
-      "inputProperties": {
-        "active": {
-          "type": "boolean",
-          "description": "Whether the webhook is active and will receive deliveries."
-        },
-        "displayName": {
-          "type": "string",
-          "description": "The human-readable display name shown in the UI."
-        },
-        "envName": {
-          "type": "string",
-          "description": "The environment name. Set when the webhook is scoped to a specific environment."
-        },
-        "filters": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Specific event types this webhook subscribes to. If empty, all events are delivered."
-        },
-        "format": {
-          "type": "string",
-          "description": "The format of the webhook payload (e.g., 'raw', 'slack', 'ms_teams')."
-        },
-        "groups": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Event groups this webhook subscribes to (e.g., 'stacks', 'deployments')."
-        },
-        "name": {
-          "type": "string",
-          "description": "The unique identifier name for the webhook within its scope."
-        },
-        "organizationName": {
-          "type": "string",
-          "description": "The organization that owns this webhook."
-        },
-        "payloadUrl": {
-          "type": "string",
-          "description": "The URL to which webhook payloads are delivered."
-        },
-        "projectName": {
-          "type": "string",
-          "description": "The project name. Set when the webhook is scoped to a specific stack."
-        },
-        "secret": {
-          "type": "string",
-          "description": "Secret will be omitted when returned from the service."
-        },
-        "stackName": {
-          "type": "string",
-          "description": "The stack name. Set when the webhook is scoped to a specific stack."
-        }
-      },
-      "requiredInputs": [
-        "active",
-        "displayName",
-        "name",
-        "organizationName",
-        "payloadUrl",
-        "projectName",
-        "stackName"
-      ]
-    },
-    "pulumiservice:v2:Task": {
-      "description": "Updates the settings or metadata of an agent task. Only the user who created the task can modify it.",
-      "properties": {
-        "approvalMode": {
-          "type": "string",
-          "description": "Approval mode for this task. Valid values: 'manual', 'auto', 'balanced'."
-        },
-        "asyncTriggerType": {
-          "type": "string",
-          "description": "The async trigger source for this task. Null for sync tasks."
-        },
-        "contextUsedTokens": {
-          "type": "integer",
-          "description": "Total input tokens consumed across all model invocations for this task. Approximate context window usage."
-        },
-        "contextWindowTokens": {
-          "type": "integer",
-          "description": "Maximum context window size in tokens for the primary model used by this task."
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "When the task was created, in ISO 8601 format."
-        },
-        "createdBy": {
-          "$ref": "pulumi.json#/Any",
-          "description": "Information about the user who created this task."
-        },
-        "entities": {
-          "type": "array",
-          "items": {
-            "$ref": "pulumi.json#/Any"
-          },
-          "description": "Pulumi entities (stacks, projects, etc.) that provide context for the agent."
-        },
-        "isShared": {
-          "type": "boolean",
-          "description": "Whether this task is shared with other org members."
-        },
-        "lastHeartbeat": {
-          "type": "string",
-          "description": "When the task runtime last reported a heartbeat. Null if the runtime has never checked in."
-        },
-        "name": {
-          "type": "string",
-          "description": "Display name for the task, typically auto-generated from the initial user message."
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "permissionMode": {
-          "type": "string",
-          "description": "The permission scope for the task."
-        },
-        "planMode": {
-          "type": "boolean",
-          "description": "Whether the task is in plan mode. Set based on the first user message."
-        },
-        "runtimePhase": {
-          "type": "string",
-          "description": "The current runtime phase for this task. Null until the runtime checks in."
-        },
-        "sharedAt": {
-          "type": "string",
-          "description": "When the task was first shared. Null if never shared."
-        },
-        "source": {
-          "type": "string",
-          "description": "The origin that triggered this task. Valid values: 'console', 'cli', 'slack', 'schedule', 'api', 'github'."
-        },
-        "sourceAutomationID": {
-          "type": "string",
-          "description": "The automation that spawned this task, if the task was created by an automation run."
-        },
-        "status": {
-          "type": "string",
-          "description": "Current execution status of the task."
-        },
-        "taskID": {
-          "type": "string",
-          "description": "The agent task identifier",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "taskType": {
-          "type": "string",
-          "description": "Whether the task was started synchronously by a user or asynchronously by background automation."
-        },
-        "toolExecutionMode": {
-          "type": "string",
-          "description": "Where tools are executed for this task. Valid values: 'cloud', 'cli'."
-        }
-      },
-      "type": "object",
-      "required": [
-        "approvalMode",
-        "createdAt",
-        "createdBy",
-        "entities",
-        "isShared",
-        "name",
-        "planMode",
-        "status",
-        "taskType",
-        "orgName",
-        "taskID"
-      ],
-      "inputProperties": {
-        "approvalMode": {
-          "type": "string",
-          "description": "Approval mode for this task. Null means no change. Valid values: 'manual', 'auto', 'balanced'."
-        },
-        "isShared": {
-          "type": "boolean",
-          "description": "Whether to share the task with other org members. Null means no change."
-        },
-        "name": {
-          "type": "string",
-          "description": "A new display name for the task. Null means no change. Must be between 1 and 255 characters after trimming whitespace."
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "permissionMode": {
-          "type": "string",
-          "description": "The permission scope for the task. Null means no change."
-        },
-        "taskID": {
-          "type": "string",
-          "description": "The agent task identifier",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        }
-      },
-      "requiredInputs": [
-        "orgName",
-        "taskID"
-      ]
-    },
-    "pulumiservice:v2:Team": {
-      "description": "CreatePulumiTeam creates a \"Pulumi\" team, i.e. one whose membership is managed by Pulumi.\n(As opposed to a GitHub or GitLab-based team.)",
-      "properties": {
-        "accounts": {
-          "type": "array",
-          "items": {
-            "$ref": "pulumi.json#/Any"
-          },
-          "description": "The list of account permissions granted to the team."
-        },
-        "description": {
-          "type": "string",
-          "description": "A free-form text description of the team's purpose."
-        },
-        "displayName": {
-          "type": "string",
-          "description": "The human-readable display name shown in the UI."
-        },
-        "environments": {
-          "type": "array",
-          "items": {
-            "$ref": "pulumi.json#/Any"
-          },
-          "description": "The list of environment settings for the team."
-        },
-        "kind": {
-          "type": "string",
-          "description": "The kind of team (e.g., pulumi or GitHub-backed)."
-        },
-        "listMembersError": {
-          "type": "string",
-          "description": "ListMembersError is the error message if an error was encountered whilst trying to\ncontact the team's backend (eg. GitHub). The UI will only show this error if it is non-nil\nand if Members itself is an empty slice."
-        },
-        "members": {
-          "type": "array",
-          "items": {
-            "$ref": "pulumi.json#/Any"
-          },
-          "description": "The list of team members."
-        },
-        "name": {
-          "type": "string",
-          "description": "The unique identifier name of the team within the organization."
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "roleIds": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "RoleIDs are the IDs of the FGA roles assigned to the team, if any.\nCurrently only one role per team is supported."
-        },
-        "stacks": {
-          "type": "array",
-          "items": {
-            "$ref": "pulumi.json#/Any"
-          },
-          "description": "The list of stack permissions granted to the team."
-        },
-        "userRole": {
-          "type": "string",
-          "description": "UserRole is the calling user's role on the given team."
-        }
-      },
-      "type": "object",
-      "required": [
-        "description",
-        "displayName",
-        "kind",
-        "name",
-        "orgName"
-      ],
-      "inputProperties": {
-        "description": {
-          "type": "string",
-          "description": "The description"
-        },
-        "displayName": {
-          "type": "string",
-          "description": "The display name"
-        },
-        "name": {
-          "type": "string",
-          "description": "The name"
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        }
-      },
-      "requiredInputs": [
-        "description",
-        "displayName",
-        "name",
-        "orgName"
-      ]
-    },
-    "pulumiservice:v2:TeamToken": {
-      "description": "Generates a new access token scoped to a specific team within an organization. Team tokens inherit the stack permissions assigned to the team, making them suitable for CI/CD pipelines that need access limited to a specific set of stacks.\n\nThe `name` field must be unique across the organization (including deleted tokens) and cannot exceed 40 characters. The `expires` field accepts a unix epoch timestamp up to two years from the present, or `0` for no expiry (default).\n\n**Important:** The token value in the response is only returned once at creation time and cannot be retrieved later.",
-      "properties": {
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "teamName": {
-          "type": "string",
-          "description": "The team name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "tokenId": {
-          "type": "string",
-          "description": "The unique identifier"
-        },
-        "tokenValue": {
-          "type": "string",
-          "description": "The token value",
-          "secret": true
-        }
-      },
-      "type": "object",
-      "required": [
-        "tokenId",
-        "tokenValue",
-        "orgName",
-        "teamName"
-      ],
-      "inputProperties": {
-        "description": {
-          "type": "string",
-          "description": "The description"
-        },
-        "expires": {
-          "type": "integer",
-          "description": "The expiration time"
-        },
-        "name": {
-          "type": "string",
-          "description": "The name"
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "reason": {
-          "type": "string",
-          "description": "Audit log reason for creating this token",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "teamName": {
-          "type": "string",
-          "description": "The team name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        }
-      },
-      "requiredInputs": [
-        "description",
-        "expires",
-        "name",
-        "orgName",
-        "teamName"
-      ]
-    },
-    "pulumiservice:v2:Webhook_esc_environments": {
-      "description": "Creates a new webhook for a Pulumi ESC environment. Webhooks allow external services to be notified when environment events occur, such as updates or opens. The request body specifies the webhook configuration including the destination URL, event filters, and format. Returns 400 if the organization name in the request body does not match the URL path parameter. Returns 409 if a webhook with the same name already exists.",
-      "properties": {
-        "active": {
-          "type": "boolean",
-          "description": "Whether the webhook is active and will receive deliveries."
-        },
-        "displayName": {
-          "type": "string",
-          "description": "The human-readable display name shown in the UI."
-        },
-        "envName": {
-          "type": "string",
-          "description": "The environment name. Set when the webhook is scoped to a specific environment."
-        },
-        "filters": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Specific event types this webhook subscribes to. If empty, all events are delivered."
-        },
-        "format": {
-          "type": "string",
-          "description": "The format of the webhook payload (e.g., 'raw', 'slack', 'ms_teams')."
-        },
-        "groups": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Event groups this webhook subscribes to (e.g., 'stacks', 'deployments')."
-        },
-        "hasSecret": {
-          "type": "boolean",
-          "description": "HasSecret is true if the webhook has a secret. This is used to determine whether\nto show that there is a secret in the UI.",
-          "secret": true
-        },
-        "name": {
-          "type": "string",
-          "description": "The unique identifier name for the webhook within its scope."
-        },
-        "organizationName": {
-          "type": "string",
-          "description": "The organization that owns this webhook."
-        },
-        "payloadUrl": {
-          "type": "string",
-          "description": "The URL to which webhook payloads are delivered."
-        },
-        "projectName": {
-          "type": "string",
-          "description": "The project name. Set when the webhook is scoped to a specific stack."
-        },
-        "secret": {
-          "type": "string",
-          "description": "Secret will be omitted when returned from the service.",
-          "secret": true
-        },
-        "secretCiphertext": {
-          "type": "string",
-          "description": "SecretCiphertext is the ciphertext value of the webhook's secret.\nIt's used to check whether the secret was changed by the PSP",
-          "secret": true
-        },
-        "stackName": {
-          "type": "string",
-          "description": "The stack name. Set when the webhook is scoped to a specific stack."
-        }
-      },
-      "type": "object",
-      "required": [
-        "active",
-        "displayName",
-        "hasSecret",
-        "name",
-        "organizationName",
-        "payloadUrl",
-        "secretCiphertext"
-      ],
-      "inputProperties": {
-        "active": {
-          "type": "boolean",
-          "description": "Whether the webhook is active and will receive deliveries."
-        },
-        "displayName": {
-          "type": "string",
-          "description": "The human-readable display name shown in the UI."
-        },
-        "envName": {
-          "type": "string",
-          "description": "The environment name. Set when the webhook is scoped to a specific environment."
-        },
-        "filters": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Specific event types this webhook subscribes to. If empty, all events are delivered."
-        },
-        "format": {
-          "type": "string",
-          "description": "The format of the webhook payload (e.g., 'raw', 'slack', 'ms_teams')."
-        },
-        "groups": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Event groups this webhook subscribes to (e.g., 'stacks', 'deployments')."
-        },
-        "name": {
-          "type": "string",
-          "description": "The unique identifier name for the webhook within its scope."
-        },
-        "organizationName": {
-          "type": "string",
-          "description": "The organization that owns this webhook."
-        },
-        "payloadUrl": {
-          "type": "string",
-          "description": "The URL to which webhook payloads are delivered."
-        },
-        "projectName": {
-          "type": "string",
-          "description": "The project name. Set when the webhook is scoped to a specific stack."
-        },
-        "secret": {
-          "type": "string",
-          "description": "Secret will be omitted when returned from the service."
-        },
-        "stackName": {
-          "type": "string",
-          "description": "The stack name. Set when the webhook is scoped to a specific stack."
-        }
-      },
-      "requiredInputs": [
-        "active",
-        "displayName",
-        "envName",
-        "name",
-        "organizationName",
-        "payloadUrl",
-        "projectName"
-      ]
-    },
-    "pulumiservice:v2:Webhook_preview_environments": {
-      "description": "Creates a new webhook for a Pulumi ESC environment. Webhooks allow external services to be notified when environment events occur, such as updates or opens. The request body specifies the webhook configuration including the destination URL, event filters, and format. Returns 400 if the organization name in the request body does not match the URL path parameter. Returns 409 if a webhook with the same name already exists.",
-      "properties": {
-        "active": {
-          "type": "boolean",
-          "description": "Whether the webhook is active and will receive deliveries."
-        },
-        "displayName": {
-          "type": "string",
-          "description": "The human-readable display name shown in the UI."
-        },
-        "envName": {
-          "type": "string",
-          "description": "The environment name. Set when the webhook is scoped to a specific environment."
-        },
-        "filters": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Specific event types this webhook subscribes to. If empty, all events are delivered."
-        },
-        "format": {
-          "type": "string",
-          "description": "The format of the webhook payload (e.g., 'raw', 'slack', 'ms_teams')."
-        },
-        "groups": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Event groups this webhook subscribes to (e.g., 'stacks', 'deployments')."
-        },
-        "hasSecret": {
-          "type": "boolean",
-          "description": "HasSecret is true if the webhook has a secret. This is used to determine whether\nto show that there is a secret in the UI.",
-          "secret": true
-        },
-        "name": {
-          "type": "string",
-          "description": "The unique identifier name for the webhook within its scope."
-        },
-        "organizationName": {
-          "type": "string",
-          "description": "The organization that owns this webhook."
-        },
-        "payloadUrl": {
-          "type": "string",
-          "description": "The URL to which webhook payloads are delivered."
-        },
-        "projectName": {
-          "type": "string",
-          "description": "The project name. Set when the webhook is scoped to a specific stack."
-        },
-        "secret": {
-          "type": "string",
-          "description": "Secret will be omitted when returned from the service.",
-          "secret": true
-        },
-        "secretCiphertext": {
-          "type": "string",
-          "description": "SecretCiphertext is the ciphertext value of the webhook's secret.\nIt's used to check whether the secret was changed by the PSP",
-          "secret": true
-        },
-        "stackName": {
-          "type": "string",
-          "description": "The stack name. Set when the webhook is scoped to a specific stack."
-        }
-      },
-      "type": "object",
-      "required": [
-        "active",
-        "displayName",
-        "hasSecret",
-        "name",
-        "organizationName",
-        "payloadUrl",
-        "secretCiphertext"
-      ],
-      "inputProperties": {
-        "active": {
-          "type": "boolean",
-          "description": "Whether the webhook is active and will receive deliveries."
-        },
-        "displayName": {
-          "type": "string",
-          "description": "The human-readable display name shown in the UI."
-        },
-        "envName": {
-          "type": "string",
-          "description": "The environment name. Set when the webhook is scoped to a specific environment."
-        },
-        "filters": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Specific event types this webhook subscribes to. If empty, all events are delivered."
-        },
-        "format": {
-          "type": "string",
-          "description": "The format of the webhook payload (e.g., 'raw', 'slack', 'ms_teams')."
-        },
-        "groups": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Event groups this webhook subscribes to (e.g., 'stacks', 'deployments')."
-        },
-        "name": {
-          "type": "string",
-          "description": "The unique identifier name for the webhook within its scope."
-        },
-        "organizationName": {
-          "type": "string",
-          "description": "The organization that owns this webhook."
-        },
-        "payloadUrl": {
-          "type": "string",
-          "description": "The URL to which webhook payloads are delivered."
-        },
-        "projectName": {
-          "type": "string",
-          "description": "The project name. Set when the webhook is scoped to a specific stack."
-        },
-        "secret": {
-          "type": "string",
-          "description": "Secret will be omitted when returned from the service."
-        },
-        "stackName": {
-          "type": "string",
-          "description": "The stack name. Set when the webhook is scoped to a specific stack."
-        }
-      },
-      "requiredInputs": [
-        "active",
-        "displayName",
-        "envName",
-        "name",
-        "organizationName",
-        "payloadUrl"
       ]
     }
   },

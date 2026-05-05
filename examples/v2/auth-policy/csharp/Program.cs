@@ -17,7 +17,7 @@ return await Deployment.RunAsync(() =>
         .Add("permission", "admin")
         .Add("tokenType", "organization");
 
-    new Ps.V2.AuthPolicy("policy", new()
+    new Ps.V2.Auth.Policy("policy", new()
     {
         OrgName = serviceOrg,
         PolicyId = policyId,

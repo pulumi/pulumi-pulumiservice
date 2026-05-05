@@ -1,7 +1,7 @@
 package main
 
 import (
-	v2 "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2"
+	auth "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2/auth"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
 )
@@ -22,7 +22,7 @@ func main() {
 			maxExpiration = 3600
 		}
 
-		pulumiIssuer, err := v2.NewOidcIssuer(ctx, "pulumiIssuer", &v2.OidcIssuerArgs{
+		pulumiIssuer, err := auth.NewOidcIssuer(ctx, "pulumiIssuer", &auth.OidcIssuerArgs{
 			OrgName:     pulumi.String(serviceOrg),
 			Name:        pulumi.String("pulumi_issuer_" + issuerSuffix),
 			Url:         pulumi.String("https://api.pulumi.com/oidc"),
@@ -32,7 +32,7 @@ func main() {
 			return err
 		}
 
-		githubIssuer, err := v2.NewOidcIssuer(ctx, "githubIssuer", &v2.OidcIssuerArgs{
+		githubIssuer, err := auth.NewOidcIssuer(ctx, "githubIssuer", &auth.OidcIssuerArgs{
 			OrgName:       pulumi.String(serviceOrg),
 			Name:          pulumi.String("github_issuer_" + issuerSuffix),
 			Url:           pulumi.String("https://token.actions.githubusercontent.com"),

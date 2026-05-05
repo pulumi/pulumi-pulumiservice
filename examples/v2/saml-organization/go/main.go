@@ -1,7 +1,7 @@
 package main
 
 import (
-	v2 "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2"
+	auth "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2/auth"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
 )
@@ -19,7 +19,7 @@ func main() {
 			serviceOrg = "service-provider-test-org"
 		}
 
-		_, err := v2.NewSAMLOrganization(ctx, "saml", &v2.SAMLOrganizationArgs{
+		_, err := auth.NewSAML(ctx, "saml", &auth.SAMLArgs{
 			OrgName:             pulumi.String(serviceOrg),
 			NewIdpSsoDescriptor: pulumi.String(idpDescriptor),
 		})

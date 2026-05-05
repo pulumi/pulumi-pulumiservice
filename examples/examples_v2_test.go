@@ -242,6 +242,11 @@ var v2Cases = []v2Case{
 		Config:         customVcsConfig,
 		PreviewOnlyAll: true, // Custom VCS registration needs valid creds in the referenced ESC env.
 	},
+	{
+		Name:           "platform-bootstrap",
+		Config:         platformBootstrapConfig,
+		PreviewOnlyAll: true, // Composite demo (~18 resources). FullE2E is too entangled to run automatically — OrgTemplateCollection has no read op so leftover state from a failed run conflicts on subsequent attempts.
+	},
 }
 
 var v2Languages = []string{"yaml", "typescript", "python", "go", "csharp", "java"}
@@ -827,5 +832,15 @@ func customVcsConfig() map[string]string {
 		"vcsSuffix":  generateRandomFiveDigits(),
 		"baseUrl":    "https://git.example.invalid",
 		"envRef":     "organization/vcs-credentials",
+	}
+}
+
+func platformBootstrapConfig() map[string]string {
+	return map[string]string{
+		"serviceOrg":          ServiceProviderTestOrg,
+		"suffix":              generateRandomFiveDigits(),
+		"prodApprovalEnabled": "true",
+		"slackWebhookUrl":     "https://hooks.slack.com/services/T00000000/B00000000/v2platformbootstrap",
+		"pagerDutyWebhookUrl": "https://events.pagerduty.com/v2/enqueue",
 	}
 }

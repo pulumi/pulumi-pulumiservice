@@ -8,14 +8,14 @@ stack_name = config.get("stackName") or "dev"
 hook_url = config.get("hookUrl") or "https://example.invalid/hooks/example"
 env_ref = config.get("envRef") or "organization/credentials"
 
-parent_stack = ps_v2.Stack(
+parent_stack = ps_v2.stacks.Stack(
     "parentStack",
     org_name=service_org,
     project_name=project_name,
     stack_name=stack_name,
 )
 
-ps_v2.StackConfig(
+ps_v2.stacks.Config(
     "config",
     org_name=service_org,
     project_name=parent_stack.project_name,
@@ -23,7 +23,7 @@ ps_v2.StackConfig(
     environment=env_ref,
 )
 
-ps_v2.StackWebhook(
+ps_v2.stacks.Webhook(
     "hook",
     organization_name=service_org,
     project_name=parent_stack.project_name,

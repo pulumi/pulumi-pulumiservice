@@ -1,7 +1,7 @@
 package main
 
 import (
-	v2 "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2"
+	stacks "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2/stacks"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
 )
@@ -26,7 +26,7 @@ func main() {
 			tagValue = "v2-tag-value"
 		}
 
-		parentStack, err := v2.NewStack(ctx, "parentStack", &v2.StackArgs{
+		parentStack, err := stacks.NewStack(ctx, "parentStack", &stacks.StackArgs{
 			OrgName:     pulumi.String(serviceOrg),
 			ProjectName: pulumi.String(projectName),
 			StackName:   pulumi.String(stackName),
@@ -35,7 +35,7 @@ func main() {
 			return err
 		}
 
-		if _, err := v2.NewStackTag(ctx, "ownerTag", &v2.StackTagArgs{
+		if _, err := stacks.NewTag(ctx, "ownerTag", &stacks.TagArgs{
 			OrgName:     pulumi.String(serviceOrg),
 			ProjectName: parentStack.ProjectName,
 			StackName:   parentStack.StackName,
@@ -45,7 +45,7 @@ func main() {
 			return err
 		}
 
-		if _, err := v2.NewStackTag(ctx, "customTag", &v2.StackTagArgs{
+		if _, err := stacks.NewTag(ctx, "customTag", &stacks.TagArgs{
 			OrgName:     pulumi.String(serviceOrg),
 			ProjectName: parentStack.ProjectName,
 			StackName:   parentStack.StackName,

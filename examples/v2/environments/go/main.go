@@ -1,7 +1,7 @@
 package main
 
 import (
-	v2 "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2"
+	esc "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2/esc"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
 )
@@ -22,7 +22,7 @@ func main() {
 			envSuffix = "dev"
 		}
 
-		environment, err := v2.NewEnvironment_esc_environments(ctx, "environment", &v2.Environment_esc_environmentsArgs{
+		environment, err := esc.NewEnvironment(ctx, "environment", &esc.EnvironmentArgs{
 			OrgName: pulumi.String(serviceOrg),
 			Project: pulumi.String(projectName),
 			Name:    pulumi.String("testing-environment-" + envSuffix),

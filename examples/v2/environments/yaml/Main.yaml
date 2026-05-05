@@ -1,11 +1,11 @@
 resources:
   environment:
-    type: pulumiservice:v2:Environment_esc_environments
+    type: pulumiservice:v2/esc:Environment
     properties:
       orgName: ${serviceOrg}
       project: ${projectName}
       name: testing-environment-${envSuffix}
-# Note: RevisionTag_esc_environments isn't covered here because tagging
+# Note: pulumiservice:v2/esc:RevisionTag isn't covered here because tagging
 # requires an existing revision, and a freshly-created environment has
 # no definition (and therefore no revisions). To exercise tags we'd
 # first need to push a definition via the Open/Update flow, which is

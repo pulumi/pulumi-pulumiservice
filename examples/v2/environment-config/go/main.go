@@ -1,7 +1,7 @@
 package main
 
 import (
-	v2 "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2"
+	esc "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2/esc"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
 )
@@ -22,7 +22,7 @@ func main() {
 			envName = "v2-envcfg-env"
 		}
 
-		draft, err := v2.NewEnvironmentDraft(ctx, "draft", &v2.EnvironmentDraftArgs{
+		draft, err := esc.NewEnvironmentDraft(ctx, "draft", &esc.EnvironmentDraftArgs{
 			OrgName:     pulumi.String(serviceOrg),
 			ProjectName: pulumi.String(projectName),
 			EnvName:     pulumi.String(envName),
@@ -31,7 +31,7 @@ func main() {
 			return err
 		}
 
-		settings, err := v2.NewEnvironmentSettings(ctx, "settings", &v2.EnvironmentSettingsArgs{
+		settings, err := esc.NewEnvironmentSettings(ctx, "settings", &esc.EnvironmentSettingsArgs{
 			OrgName:           pulumi.String(serviceOrg),
 			ProjectName:       pulumi.String(projectName),
 			EnvName:           pulumi.String(envName),

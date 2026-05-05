@@ -21,100 +21,26 @@ func (m *module) Version() semver.Version {
 
 func (m *module) Construct(ctx *pulumi.Context, name, typ, urn string) (r pulumi.Resource, err error) {
 	switch typ {
-	case "pulumiservice:v2:Account":
-		r = &Account{}
-	case "pulumiservice:v2:AgentPool":
-		r = &AgentPool{}
 	case "pulumiservice:v2:AuditLogExportConfiguration":
 		r = &AuditLogExportConfiguration{}
-	case "pulumiservice:v2:AuthPolicy":
-		r = &AuthPolicy{}
-	case "pulumiservice:v2:AzureDevOpsIntegration":
-		r = &AzureDevOpsIntegration{}
-	case "pulumiservice:v2:BitBucketIntegration":
-		r = &BitBucketIntegration{}
-	case "pulumiservice:v2:CustomVCSIntegration":
-		r = &CustomVCSIntegration{}
-	case "pulumiservice:v2:CustomVCSRepository":
-		r = &CustomVCSRepository{}
 	case "pulumiservice:v2:DefaultOrganization":
 		r = &DefaultOrganization{}
-	case "pulumiservice:v2:DeploymentSettings":
-		r = &DeploymentSettings{}
-	case "pulumiservice:v2:EnvironmentDraft":
-		r = &EnvironmentDraft{}
-	case "pulumiservice:v2:EnvironmentSchedule":
-		r = &EnvironmentSchedule{}
-	case "pulumiservice:v2:EnvironmentSettings":
-		r = &EnvironmentSettings{}
-	case "pulumiservice:v2:EnvironmentTag_esc_environments":
-		r = &EnvironmentTag_esc_environments{}
-	case "pulumiservice:v2:EnvironmentTag_preview_environments":
-		r = &EnvironmentTag_preview_environments{}
-	case "pulumiservice:v2:Environment_esc_environments":
-		r = &Environment_esc_environments{}
-	case "pulumiservice:v2:Environment_preview_environments":
-		r = &Environment_preview_environments{}
 	case "pulumiservice:v2:Gate":
 		r = &Gate{}
-	case "pulumiservice:v2:GitHubEnterpriseIntegration":
-		r = &GitHubEnterpriseIntegration{}
-	case "pulumiservice:v2:GitHubIntegration":
-		r = &GitHubIntegration{}
-	case "pulumiservice:v2:GitLabIntegration":
-		r = &GitLabIntegration{}
-	case "pulumiservice:v2:OidcIssuer":
-		r = &OidcIssuer{}
-	case "pulumiservice:v2:OpenEnvironmentRequest":
-		r = &OpenEnvironmentRequest{}
 	case "pulumiservice:v2:OrgTemplateCollection":
 		r = &OrgTemplateCollection{}
-	case "pulumiservice:v2:OrgToken":
-		r = &OrgToken{}
 	case "pulumiservice:v2:OrganizationMember":
 		r = &OrganizationMember{}
 	case "pulumiservice:v2:OrganizationWebhook":
 		r = &OrganizationWebhook{}
-	case "pulumiservice:v2:PersonalToken":
-		r = &PersonalToken{}
 	case "pulumiservice:v2:PolicyGroup":
 		r = &PolicyGroup{}
 	case "pulumiservice:v2:PolicyIssue":
 		r = &PolicyIssue{}
 	case "pulumiservice:v2:PolicyPack":
 		r = &PolicyPack{}
-	case "pulumiservice:v2:RevisionTag_esc_environments":
-		r = &RevisionTag_esc_environments{}
-	case "pulumiservice:v2:RevisionTag_preview_environments":
-		r = &RevisionTag_preview_environments{}
 	case "pulumiservice:v2:Role":
 		r = &Role{}
-	case "pulumiservice:v2:SAMLOrganization":
-		r = &SAMLOrganization{}
-	case "pulumiservice:v2:ScheduledDeployment":
-		r = &ScheduledDeployment{}
-	case "pulumiservice:v2:ScheduledScanSettings":
-		r = &ScheduledScanSettings{}
-	case "pulumiservice:v2:Service":
-		r = &Service{}
-	case "pulumiservice:v2:Stack":
-		r = &Stack{}
-	case "pulumiservice:v2:StackConfig":
-		r = &StackConfig{}
-	case "pulumiservice:v2:StackTag":
-		r = &StackTag{}
-	case "pulumiservice:v2:StackWebhook":
-		r = &StackWebhook{}
-	case "pulumiservice:v2:Task":
-		r = &Task{}
-	case "pulumiservice:v2:Team":
-		r = &Team{}
-	case "pulumiservice:v2:TeamToken":
-		r = &TeamToken{}
-	case "pulumiservice:v2:Webhook_esc_environments":
-		r = &Webhook_esc_environments{}
-	case "pulumiservice:v2:Webhook_preview_environments":
-		r = &Webhook_preview_environments{}
 	default:
 		return nil, fmt.Errorf("unknown resource type: %s", typ)
 	}

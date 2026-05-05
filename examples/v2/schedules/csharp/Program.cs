@@ -11,14 +11,14 @@ return await Deployment.RunAsync(() =>
     var stackName = config.Get("stackName") ?? "dev";
     var scheduleCron = config.Get("scheduleCron") ?? "0 7 * * *";
 
-    var parentStack = new Ps.V2.Stack("parentStack", new()
+    var parentStack = new Ps.V2.Stacks.Stack("parentStack", new()
     {
         OrgName = serviceOrg,
         ProjectName = projectName,
         StackName = stackName,
     });
 
-    var parentSettings = new Ps.V2.DeploymentSettings("parentSettings", new()
+    var parentSettings = new Ps.V2.Deployments.Settings("parentSettings", new()
     {
         OrgName = serviceOrg,
         ProjectName = projectName,
@@ -33,7 +33,7 @@ return await Deployment.RunAsync(() =>
         }),
     }, new CustomResourceOptions { DependsOn = { parentStack } });
 
-    var nightlyDeploy = new Ps.V2.ScheduledDeployment("nightlyDeploy", new()
+    var nightlyDeploy = new Ps.V2.Deployments.ScheduledDeployment("nightlyDeploy", new()
     {
         OrgName = serviceOrg,
         ProjectName = projectName,

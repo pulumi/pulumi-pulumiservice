@@ -7,7 +7,7 @@ const projectName = config.get("projectName") ?? "pulumi-service-stack-example";
 const stackName = config.get("stackName") ?? "dev";
 const stackPurpose = config.get("stackPurpose") ?? "demo";
 
-const exampleStack = new ps.v2.Stack("exampleStack", {
+const exampleStack = new ps.v2.stacks.Stack("exampleStack", {
     orgName: serviceOrg,
     projectName: projectName,
     stackName: stackName,

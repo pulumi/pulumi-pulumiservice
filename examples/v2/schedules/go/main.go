@@ -1,7 +1,8 @@
 package main
 
 import (
-	v2 "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2"
+	stacks "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2/stacks"
+	deployments "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2/deployments"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
 )
@@ -26,7 +27,7 @@ func main() {
 			scheduleCron = "0 7 * * *"
 		}
 
-		parentStack, err := v2.NewStack(ctx, "parentStack", &v2.StackArgs{
+		parentStack, err := stacks.NewStack(ctx, "parentStack", &stacks.StackArgs{
 			OrgName:     pulumi.String(serviceOrg),
 			ProjectName: pulumi.String(projectName),
 			StackName:   pulumi.String(stackName),
@@ -35,7 +36,7 @@ func main() {
 			return err
 		}
 
-		parentSettings, err := v2.NewDeploymentSettings(ctx, "parentSettings", &v2.DeploymentSettingsArgs{
+		parentSettings, err := deployments.NewSettings(ctx, "parentSettings", &deployments.SettingsArgs{
 			OrgName:     pulumi.String(serviceOrg),
 			ProjectName: pulumi.String(projectName),
 			StackName:   pulumi.String(stackName),
@@ -50,7 +51,7 @@ func main() {
 			return err
 		}
 
-		nightlyDeploy, err := v2.NewScheduledDeployment(ctx, "nightlyDeploy", &v2.ScheduledDeploymentArgs{
+		nightlyDeploy, err := deployments.NewScheduledDeployment(ctx, "nightlyDeploy", &deployments.ScheduledDeploymentArgs{
 			OrgName:      pulumi.String(serviceOrg),
 			ProjectName:  pulumi.String(projectName),
 			StackName:    pulumi.String(stackName),

@@ -1,7 +1,7 @@
 package main
 
 import (
-	v2 "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2"
+	integrations "github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice/v2/integrations"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
 )
@@ -34,7 +34,7 @@ func main() {
 			azureDevOpsID = "ado-org-integration"
 		}
 
-		if _, err := v2.NewGitHubIntegration(ctx, "github", &v2.GitHubIntegrationArgs{
+		if _, err := integrations.NewGitHubIntegration(ctx, "github", &integrations.GitHubIntegrationArgs{
 			OrgName:                     pulumi.String(serviceOrg),
 			IntegrationId:               pulumi.String(githubID),
 			DisablePRComments:           pulumi.Bool(false),
@@ -45,7 +45,7 @@ func main() {
 			return err
 		}
 
-		if _, err := v2.NewGitHubEnterpriseIntegration(ctx, "githubEnterprise", &v2.GitHubEnterpriseIntegrationArgs{
+		if _, err := integrations.NewGitHubEnterpriseIntegration(ctx, "githubEnterprise", &integrations.GitHubEnterpriseIntegrationArgs{
 			OrgName:                     pulumi.String(serviceOrg),
 			IntegrationId:               pulumi.String(githubEnterpriseID),
 			DisablePRComments:           pulumi.Bool(true),
@@ -56,7 +56,7 @@ func main() {
 			return err
 		}
 
-		if _, err := v2.NewGitLabIntegration(ctx, "gitlab", &v2.GitLabIntegrationArgs{
+		if _, err := integrations.NewGitLabIntegration(ctx, "gitlab", &integrations.GitLabIntegrationArgs{
 			OrgName:             pulumi.String(serviceOrg),
 			IntegrationId:       pulumi.String(gitlabID),
 			DisablePRComments:   pulumi.Bool(false),
@@ -66,7 +66,7 @@ func main() {
 			return err
 		}
 
-		if _, err := v2.NewBitBucketIntegration(ctx, "bitbucket", &v2.BitBucketIntegrationArgs{
+		if _, err := integrations.NewBitBucketIntegration(ctx, "bitbucket", &integrations.BitBucketIntegrationArgs{
 			OrgName:             pulumi.String(serviceOrg),
 			IntegrationId:       pulumi.String(bitbucketID),
 			DisablePRComments:   pulumi.Bool(false),
@@ -76,7 +76,7 @@ func main() {
 			return err
 		}
 
-		if _, err := v2.NewAzureDevOpsIntegration(ctx, "azureDevOps", &v2.AzureDevOpsIntegrationArgs{
+		if _, err := integrations.NewAzureDevOpsIntegration(ctx, "azureDevOps", &integrations.AzureDevOpsIntegrationArgs{
 			OrgName:             pulumi.String(serviceOrg),
 			IntegrationId:       pulumi.String(azureDevOpsID),
 			DisablePRComments:   pulumi.Bool(true),

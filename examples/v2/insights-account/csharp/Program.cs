@@ -9,7 +9,7 @@ return await Deployment.RunAsync(() =>
     var accountSuffix = config.Get("accountSuffix") ?? "dev";
     var insightsEnvironment = config.Get("insightsEnvironment") ?? "insights/credentials";
 
-    var account = new Ps.V2.Account("account", new()
+    var account = new Ps.V2.Insights.Account("account", new()
     {
         OrgName = serviceOrg,
         AccountName = $"v2-insights-{accountSuffix}",
@@ -18,7 +18,7 @@ return await Deployment.RunAsync(() =>
         ScanSchedule = "none",
     });
 
-    new Ps.V2.ScheduledScanSettings("scanSettings", new()
+    new Ps.V2.Insights.ScheduledScanSettings("scanSettings", new()
     {
         OrgName = serviceOrg,
         AccountName = account.AccountName,

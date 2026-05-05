@@ -1,10 +1,10 @@
 package generated_program;
 
 import com.pulumi.Pulumi;
-import com.pulumi.pulumiservice.v2.Account;
-import com.pulumi.pulumiservice.v2.AccountArgs;
-import com.pulumi.pulumiservice.v2.ScheduledScanSettings;
-import com.pulumi.pulumiservice.v2.ScheduledScanSettingsArgs;
+import com.pulumi.pulumiservice.v2_insights.Account;
+import com.pulumi.pulumiservice.v2_insights.AccountArgs;
+import com.pulumi.pulumiservice.v2_insights.ScheduledScanSettings;
+import com.pulumi.pulumiservice.v2_insights.ScheduledScanSettingsArgs;
 
 public class App {
     public static void main(String[] args) {

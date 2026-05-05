@@ -10,14 +10,14 @@ return await Deployment.RunAsync(() =>
     var stackName = config.Get("stackName") ?? "dev";
     var tagValue = config.Get("tagValue") ?? "v2-tag-value";
 
-    var parentStack = new Ps.V2.Stack("parentStack", new()
+    var parentStack = new Ps.V2.Stacks.Stack("parentStack", new()
     {
         OrgName = serviceOrg,
         ProjectName = projectName,
         StackName = stackName,
     });
 
-    new Ps.V2.StackTag("ownerTag", new()
+    new Ps.V2.Stacks.Tag("ownerTag", new()
     {
         OrgName = serviceOrg,
         ProjectName = parentStack.ProjectName,
@@ -26,7 +26,7 @@ return await Deployment.RunAsync(() =>
         Value = "pulumicloud-v2-example",
     });
 
-    new Ps.V2.StackTag("customTag", new()
+    new Ps.V2.Stacks.Tag("customTag", new()
     {
         OrgName = serviceOrg,
         ProjectName = parentStack.ProjectName,

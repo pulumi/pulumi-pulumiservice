@@ -23,7 +23,7 @@ return await Deployment.RunAsync(() =>
         }),
     });
 
-    var rbacTeam = new Ps.V2.Team("rbacTeam", new()
+    var rbacTeam = new Ps.V2.Teams.Team("rbacTeam", new()
     {
         OrgName = serviceOrg,
         Name = $"v2-rbac-team-{nameSuffix}",
