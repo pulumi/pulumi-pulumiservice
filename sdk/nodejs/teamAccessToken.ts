@@ -90,6 +90,8 @@ export class TeamAccessToken extends pulumi.CustomResource {
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         const secretOpts = { additionalSecretOutputs: ["value"] };
         opts = pulumi.mergeOptions(opts, secretOpts);
+        const replaceOnChanges = { replaceOnChanges: ["description", "name", "organizationName", "teamName"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(TeamAccessToken.__pulumiType, name, resourceInputs, opts);
     }
 }
@@ -99,7 +101,7 @@ export class TeamAccessToken extends pulumi.CustomResource {
  */
 export interface TeamAccessTokenArgs {
     /**
-     * Optional. Team description.
+     * Optional. Description for the token.
      */
     description?: pulumi.Input<string>;
     /**

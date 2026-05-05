@@ -90,11 +90,14 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 			version: version,
 		})).
 		WithResources(
+			infer.Resource(&resources.AccessToken{}),
 			infer.Resource(&resources.InsightsAccount{}),
+			infer.Resource(&resources.OrgAccessToken{}),
 			infer.Resource(&resources.OrganizationMember{}),
 			infer.Resource(&resources.OrganizationRole{}),
 			infer.Resource(&resources.StackTag{}),
 			infer.Resource(&resources.Team{}),
+			infer.Resource(&resources.TeamAccessToken{}),
 			infer.Resource(&resources.TeamRoleAssignment{}),
 		).
 		WithFunctions(
@@ -241,9 +244,6 @@ func (k *pulumiserviceProvider) Configure(
 	k.client = client
 
 	k.pulumiResources = []PulumiServiceResource{
-		&resources.PulumiServiceAccessTokenResource{
-			Client: client,
-		},
 		&resources.PulumiServiceWebhookResource{
 			Client: client,
 		},
@@ -251,12 +251,6 @@ func (k *pulumiserviceProvider) Configure(
 			Client: client,
 		},
 		&resources.TeamStackPermissionResource{
-			Client: client,
-		},
-		&resources.PulumiServiceTeamAccessTokenResource{
-			Client: client,
-		},
-		&resources.PulumiServiceOrgAccessTokenResource{
 			Client: client,
 		},
 		&resources.PulumiServiceDeploymentSettingsResource{

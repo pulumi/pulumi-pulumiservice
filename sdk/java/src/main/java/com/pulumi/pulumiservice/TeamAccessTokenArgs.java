@@ -17,14 +17,14 @@ public final class TeamAccessTokenArgs extends com.pulumi.resources.ResourceArgs
     public static final TeamAccessTokenArgs Empty = new TeamAccessTokenArgs();
 
     /**
-     * Optional. Team description.
+     * Optional. Description for the token.
      * 
      */
     @Import(name="description")
     private @Nullable Output<String> description;
 
     /**
-     * @return Optional. Team description.
+     * @return Optional. Description for the token.
      * 
      */
     public Optional<Output<String>> description() {
@@ -104,7 +104,7 @@ public final class TeamAccessTokenArgs extends com.pulumi.resources.ResourceArgs
         }
 
         /**
-         * @param description Optional. Team description.
+         * @param description Optional. Description for the token.
          * 
          * @return builder
          * 
@@ -115,7 +115,7 @@ public final class TeamAccessTokenArgs extends com.pulumi.resources.ResourceArgs
         }
 
         /**
-         * @param description Optional. Team description.
+         * @param description Optional. Description for the token.
          * 
          * @return builder
          * 
