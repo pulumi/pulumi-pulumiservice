@@ -254,22 +254,27 @@
       "type": "string",
       "enum": [
         {
+          "name": "aws",
           "description": "Amazon Web Services",
           "value": "aws"
         },
         {
+          "name": "azure-native",
           "description": "Microsoft Azure",
           "value": "azure-native"
         },
         {
+          "name": "gcp",
           "description": "Google Cloud Platform",
           "value": "gcp"
         },
         {
+          "name": "kubernetes",
           "description": "Kubernetes",
           "value": "kubernetes"
         },
         {
+          "name": "oci",
           "description": "Oracle Cloud Infrastructure",
           "value": "oci"
         }
@@ -891,14 +896,17 @@
       "type": "string",
       "enum": [
         {
+          "name": "none",
           "description": "Disable automated scanning.",
           "value": "none"
         },
         {
+          "name": "TwelveHours",
           "description": "Run automated scans every twelve hours.",
           "value": "12h"
         },
         {
+          "name": "daily",
           "description": "Run automated scans once per day.",
           "value": "daily"
         }

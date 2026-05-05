@@ -29,6 +29,7 @@ class InsightsAccountArgs:
                  tags: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None):
         """
         The set of arguments for constructing a InsightsAccount resource.
+
         :param pulumi.Input[_builtins.str] account_name: Name of the insights account.
         :param pulumi.Input[_builtins.str] environment: The ESC environment used for provider credentials. Format: 'project/environment' with optional '@version' suffix (e.g., 'my-project/prod-env' or 'my-project/prod-env@v1.0').
         :param pulumi.Input[_builtins.str] organization_name: The organization's name.
@@ -151,6 +152,7 @@ class InsightsAccount(pulumi.CustomResource):
         """
         Insights Account for cloud resource scanning and analysis across AWS, Azure, and GCP.
 
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] account_name: Name of the insights account.
@@ -169,6 +171,7 @@ class InsightsAccount(pulumi.CustomResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Insights Account for cloud resource scanning and analysis across AWS, Azure, and GCP.
+
 
         :param str resource_name: The name of the resource.
         :param InsightsAccountArgs args: The arguments to use to populate this resource's properties.

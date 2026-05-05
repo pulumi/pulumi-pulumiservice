@@ -23,6 +23,7 @@ class ProviderArgs:
                  api_url: Optional[pulumi.Input[_builtins.str]] = None):
         """
         The set of arguments for constructing a Provider resource.
+
         :param pulumi.Input[_builtins.str] access_token: Access Token to authenticate with Pulumi Cloud.
         :param pulumi.Input[_builtins.str] api_url: Optional override of Pulumi Cloud API endpoint.
         """
@@ -69,6 +70,7 @@ class Provider(pulumi.ProviderResource):
                  __props__=None):
         """
         Create a Pulumiservice resource with the given unique name, props, and options.
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] access_token: Access Token to authenticate with Pulumi Cloud.
@@ -82,6 +84,7 @@ class Provider(pulumi.ProviderResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Create a Pulumiservice resource with the given unique name, props, and options.
+
         :param str resource_name: The name of the resource.
         :param ProviderArgs args: The arguments to use to populate this resource's properties.
         :param pulumi.ResourceOptions opts: Options for the resource.
