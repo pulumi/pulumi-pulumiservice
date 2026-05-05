@@ -14,6 +14,8 @@
   ```
   The wire format and SDK boundary now use `__type` directly, made possible by [pulumi/pulumi#22834](https://github.com/pulumi/pulumi/pull/22834) (released in pulumi 3.235.0+; the Python SDK pins this minimum runtime via `pulumi>=3.235.0,<4.0.0`). Earlier pulumi runtimes silently strip `__`-prefixed input keys; the runtime pin prevents that footgun. The `buildAllowPermissions` / `build*ScopedPermissions` helper data sources continue to hide the discriminator entirely — prefer those over hand-authored descriptors. The RBAC feature is unreleased so impact is limited to early adopters.
 
+  Known limitation: `pulumi import` of a custom role currently drops the `__type` line from the generated source code. Pulumi's import-codegen path (`pkg/importer/hcl2.go`) treats `__`-prefixed map keys as internal properties and omits them when emitting source. Users importing a custom role need to hand-add the corresponding `__type` line to their generated program before `pulumi up` will pass Check. Tracked upstream; the runtime path (Create/Update/Read/Refresh) is unaffected.
+
 ### Improvements
 - Added `installationId` to `DeploymentSettings.vcs` to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps installed against different sets of repos). When omitted, the API resolves the integration automatically from `provider` and `repository` as before.
 - Added `StackTags` resource for managing multiple stack tags as a single resource, with a `tags` map input. [#61](https://github.com/pulumi/pulumi-pulumiservice/issues/61)
