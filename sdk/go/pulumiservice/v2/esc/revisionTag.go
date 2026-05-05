@@ -57,6 +57,7 @@ func NewRevisionTag(ctx *pulumi.Context,
 	}
 	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
 		"envName",
+		"name",
 		"orgName",
 		"projectName",
 	})

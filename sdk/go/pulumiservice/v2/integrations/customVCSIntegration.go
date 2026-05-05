@@ -64,6 +64,7 @@ func NewCustomVCSIntegration(ctx *pulumi.Context,
 	})
 	opts = append(opts, secrets)
 	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"integrationId",
 		"orgName",
 	})
 	opts = append(opts, replaceOnChanges)

@@ -94,6 +94,7 @@ namespace Pulumi.PulumiService.V2
                 Version = Utilities.Version,
                 ReplaceOnChanges =
                 {
+                    "name",
                     "orgName",
                 },
             };

@@ -110,6 +110,7 @@ namespace Pulumi.PulumiService.V2.Integrations
                 },
                 ReplaceOnChanges =
                 {
+                    "integrationId",
                     "orgName",
                 },
             };

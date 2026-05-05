@@ -131,7 +131,7 @@ export class Role extends pulumi.CustomResource {
             resourceInputs["version"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
-        const replaceOnChanges = { replaceOnChanges: ["orgName"] };
+        const replaceOnChanges = { replaceOnChanges: ["orgName", "roleID"] };
         opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(Role.__pulumiType, name, resourceInputs, opts);
     }

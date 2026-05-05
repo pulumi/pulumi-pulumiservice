@@ -95,6 +95,7 @@ namespace Pulumi.PulumiService.V2.Esc
                 ReplaceOnChanges =
                 {
                     "envName",
+                    "name",
                     "orgName",
                     "projectName",
                 },

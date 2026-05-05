@@ -119,6 +119,7 @@ namespace Pulumi.PulumiService.V2
                 ReplaceOnChanges =
                 {
                     "orgName",
+                    "roleID",
                 },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);

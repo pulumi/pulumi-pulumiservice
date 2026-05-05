@@ -220,7 +220,7 @@ class OidcIssuer(pulumi.CustomResource):
             __props__.__dict__["issuer"] = None
             __props__.__dict__["last_used"] = None
             __props__.__dict__["modified"] = None
-        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["orgName"])
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["issuerId", "orgName"])
         opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(OidcIssuer, __self__).__init__(
             'pulumiservice:v2/auth:OidcIssuer',

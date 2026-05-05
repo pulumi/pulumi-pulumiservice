@@ -109,7 +109,7 @@ export class PolicyPack extends pulumi.CustomResource {
             resourceInputs["versionTag"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
-        const replaceOnChanges = { replaceOnChanges: ["orgName"] };
+        const replaceOnChanges = { replaceOnChanges: ["name", "orgName", "version"] };
         opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(PolicyPack.__pulumiType, name, resourceInputs, opts);
     }

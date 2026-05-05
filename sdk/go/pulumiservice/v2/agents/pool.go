@@ -28,6 +28,8 @@ type Pool struct {
 	OrgName pulumi.StringOutput `pulumi:"orgName"`
 	// The unique identifier
 	PoolId pulumi.StringOutput `pulumi:"poolId"`
+	// The token value
+	TokenValue pulumi.StringPtrOutput `pulumi:"tokenValue"`
 }
 
 // NewPool registers a new resource with the given unique name, arguments, and options.
@@ -46,8 +48,13 @@ func NewPool(ctx *pulumi.Context,
 	if args.OrgName == nil {
 		return nil, errors.New("invalid value for required argument 'OrgName'")
 	}
+	secrets := pulumi.AdditionalSecretOutputs([]string{
+		"tokenValue",
+	})
+	opts = append(opts, secrets)
 	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
 		"orgName",
+		"poolId",
 	})
 	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
@@ -220,6 +227,11 @@ func (o PoolOutput) OrgName() pulumi.StringOutput {
 // The unique identifier
 func (o PoolOutput) PoolId() pulumi.StringOutput {
 	return o.ApplyT(func(v *Pool) pulumi.StringOutput { return v.PoolId }).(pulumi.StringOutput)
+}
+
+// The token value
+func (o PoolOutput) TokenValue() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *Pool) pulumi.StringPtrOutput { return v.TokenValue }).(pulumi.StringPtrOutput)
 }
 
 type PoolArrayOutput struct{ *pulumi.OutputState }

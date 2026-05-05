@@ -65,6 +65,7 @@ func NewScheduledDeployment(ctx *pulumi.Context,
 	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
 		"orgName",
 		"projectName",
+		"scheduleID",
 		"stackName",
 	})
 	opts = append(opts, replaceOnChanges)

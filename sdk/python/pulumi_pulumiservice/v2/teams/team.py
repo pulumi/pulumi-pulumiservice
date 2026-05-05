@@ -167,7 +167,7 @@ class Team(pulumi.CustomResource):
             __props__.__dict__["role_ids"] = None
             __props__.__dict__["stacks"] = None
             __props__.__dict__["user_role"] = None
-        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["orgName"])
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["name", "orgName"])
         opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(Team, __self__).__init__(
             'pulumiservice:v2/teams:Team',

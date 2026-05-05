@@ -63,7 +63,6 @@ import * as deployments from "./deployments";
 import * as esc from "./esc";
 import * as insights from "./insights";
 import * as integrations from "./integrations";
-import * as preview from "./preview";
 import * as services from "./services";
 import * as stacks from "./stacks";
 import * as teams from "./teams";
@@ -76,7 +75,6 @@ export {
     esc,
     insights,
     integrations,
-    preview,
     services,
     stacks,
     teams,

@@ -76,6 +76,7 @@ namespace Pulumi.PulumiService.V2
                 Version = Utilities.Version,
                 ReplaceOnChanges =
                 {
+                    "gateID",
                     "orgName",
                 },
             };

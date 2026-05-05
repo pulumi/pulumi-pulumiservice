@@ -115,7 +115,7 @@ export class RevisionTag extends pulumi.CustomResource {
             resourceInputs["revision"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
-        const replaceOnChanges = { replaceOnChanges: ["envName", "orgName", "projectName"] };
+        const replaceOnChanges = { replaceOnChanges: ["envName", "name", "orgName", "projectName"] };
         opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(RevisionTag.__pulumiType, name, resourceInputs, opts);
     }

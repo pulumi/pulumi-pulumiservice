@@ -198,7 +198,7 @@ class Gate(pulumi.CustomResource):
             if target is None and not opts.urn:
                 raise TypeError("Missing required property 'target'")
             __props__.__dict__["target"] = target
-        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["orgName"])
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["gateID", "orgName"])
         opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(Gate, __self__).__init__(
             'pulumiservice:v2:Gate',

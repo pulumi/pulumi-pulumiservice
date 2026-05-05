@@ -231,6 +231,8 @@ class Stack(pulumi.CustomResource):
             __props__.__dict__["active_update"] = None
             __props__.__dict__["current_operation"] = None
             __props__.__dict__["version"] = None
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["orgName", "projectName", "stackName"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(Stack, __self__).__init__(
             'pulumiservice:v2/stacks:Stack',
             resource_name,

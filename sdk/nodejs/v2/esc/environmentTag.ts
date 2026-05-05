@@ -118,7 +118,7 @@ export class EnvironmentTag extends pulumi.CustomResource {
             resourceInputs["value"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
-        const replaceOnChanges = { replaceOnChanges: ["envName", "orgName", "projectName"] };
+        const replaceOnChanges = { replaceOnChanges: ["envName", "name", "orgName", "projectName"] };
         opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(EnvironmentTag.__pulumiType, name, resourceInputs, opts);
     }

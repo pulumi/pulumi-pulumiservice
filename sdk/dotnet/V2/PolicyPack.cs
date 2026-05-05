@@ -82,7 +82,9 @@ namespace Pulumi.PulumiService.V2
                 Version = Utilities.Version,
                 ReplaceOnChanges =
                 {
+                    "name",
                     "orgName",
+                    "version",
                 },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);

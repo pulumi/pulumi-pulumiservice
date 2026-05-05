@@ -66,6 +66,7 @@ func NewEnvironmentSchedule(ctx *pulumi.Context,
 		"envName",
 		"orgName",
 		"projectName",
+		"scheduleID",
 	})
 	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)

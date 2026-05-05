@@ -336,7 +336,7 @@ class PolicyPack(pulumi.CustomResource):
             __props__.__dict__["version"] = version
             __props__.__dict__["version_tag"] = version_tag
             __props__.__dict__["applied"] = None
-        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["orgName"])
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["name", "orgName", "version"])
         opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(PolicyPack, __self__).__init__(
             'pulumiservice:v2:PolicyPack',

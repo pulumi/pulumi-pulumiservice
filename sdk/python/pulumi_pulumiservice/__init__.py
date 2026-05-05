@@ -180,17 +180,6 @@ _utilities.register(
  },
  {
   "pkg": "pulumiservice",
-  "mod": "v2/preview",
-  "fqn": "pulumi_pulumiservice.v2.preview",
-  "classes": {
-   "pulumiservice:v2/preview:Environment": "Environment",
-   "pulumiservice:v2/preview:EnvironmentTag": "EnvironmentTag",
-   "pulumiservice:v2/preview:RevisionTag": "RevisionTag",
-   "pulumiservice:v2/preview:Webhook": "Webhook"
-  }
- },
- {
-  "pkg": "pulumiservice",
   "mod": "v2/services",
   "fqn": "pulumi_pulumiservice.v2.services",
   "classes": {

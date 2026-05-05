@@ -116,6 +116,7 @@ namespace Pulumi.PulumiService.V2.Teams
                 Version = Utilities.Version,
                 ReplaceOnChanges =
                 {
+                    "name",
                     "orgName",
                 },
             };

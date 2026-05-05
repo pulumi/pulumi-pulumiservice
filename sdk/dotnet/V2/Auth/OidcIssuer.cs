@@ -106,6 +106,7 @@ namespace Pulumi.PulumiService.V2.Auth
                 Version = Utilities.Version,
                 ReplaceOnChanges =
                 {
+                    "issuerId",
                     "orgName",
                 },
             };

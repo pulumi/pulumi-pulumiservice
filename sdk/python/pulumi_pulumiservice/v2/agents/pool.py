@@ -158,7 +158,10 @@ class Pool(pulumi.CustomResource):
             __props__.__dict__["pool_id"] = pool_id
             __props__.__dict__["agents"] = None
             __props__.__dict__["created"] = None
-        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["orgName"])
+            __props__.__dict__["token_value"] = None
+        secret_opts = pulumi.ResourceOptions(additional_secret_outputs=["tokenValue"])
+        opts = pulumi.ResourceOptions.merge(opts, secret_opts)
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["orgName", "poolId"])
         opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(Pool, __self__).__init__(
             'pulumiservice:v2/agents:Pool',
@@ -188,6 +191,7 @@ class Pool(pulumi.CustomResource):
         __props__.__dict__["name"] = None
         __props__.__dict__["org_name"] = None
         __props__.__dict__["pool_id"] = None
+        __props__.__dict__["token_value"] = None
         return Pool(resource_name, opts=opts, __props__=__props__)
 
     @_builtins.property
@@ -237,4 +241,12 @@ class Pool(pulumi.CustomResource):
         The unique identifier
         """
         return pulumi.get(self, "pool_id")
+
+    @_builtins.property
+    @pulumi.getter(name="tokenValue")
+    def token_value(self) -> pulumi.Output[Optional[_builtins.str]]:
+        """
+        The token value
+        """
+        return pulumi.get(self, "token_value")
 

@@ -224,7 +224,7 @@ class EnvironmentSchedule(pulumi.CustomResource):
             __props__.__dict__["next_execution"] = None
             __props__.__dict__["org_id"] = None
             __props__.__dict__["paused"] = None
-        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["envName", "orgName", "projectName"])
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["envName", "orgName", "projectName", "scheduleID"])
         opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(EnvironmentSchedule, __self__).__init__(
             'pulumiservice:v2/esc:EnvironmentSchedule',

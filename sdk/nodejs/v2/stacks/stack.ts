@@ -115,6 +115,8 @@ export class Stack extends pulumi.CustomResource {
             resourceInputs["version"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["orgName", "projectName", "stackName"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(Stack.__pulumiType, name, resourceInputs, opts);
     }
 }

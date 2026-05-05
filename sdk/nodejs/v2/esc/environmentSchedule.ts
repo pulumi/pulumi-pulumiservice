@@ -143,7 +143,7 @@ export class EnvironmentSchedule extends pulumi.CustomResource {
             resourceInputs["scheduleOnce"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
-        const replaceOnChanges = { replaceOnChanges: ["envName", "orgName", "projectName"] };
+        const replaceOnChanges = { replaceOnChanges: ["envName", "orgName", "projectName", "scheduleID"] };
         opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(EnvironmentSchedule.__pulumiType, name, resourceInputs, opts);
     }

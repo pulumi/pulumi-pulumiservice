@@ -181,7 +181,7 @@ class RevisionTag(pulumi.CustomResource):
             __props__.__dict__["editor_login"] = None
             __props__.__dict__["editor_name"] = None
             __props__.__dict__["modified"] = None
-        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["envName", "orgName", "projectName"])
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["envName", "name", "orgName", "projectName"])
         opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(RevisionTag, __self__).__init__(
             'pulumiservice:v2/esc:RevisionTag',

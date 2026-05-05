@@ -66,6 +66,7 @@ func NewTeam(ctx *pulumi.Context,
 		return nil, errors.New("invalid value for required argument 'OrgName'")
 	}
 	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"name",
 		"orgName",
 	})
 	opts = append(opts, replaceOnChanges)

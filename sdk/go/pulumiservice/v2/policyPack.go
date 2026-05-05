@@ -52,7 +52,9 @@ func NewPolicyPack(ctx *pulumi.Context,
 		return nil, errors.New("invalid value for required argument 'Policies'")
 	}
 	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"name",
 		"orgName",
+		"version",
 	})
 	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)

@@ -138,6 +138,12 @@ func buildResource(spec *Spec, _ *Metadata, _ string, rm ResourceMeta) (*schema.
 		}
 	}
 
+	if err := mergeEmitOnCreateOutputs(spec, create, rm, outputs); err != nil {
+		return nil, fmt.Errorf("outputs (emitOnCreate): %w", err)
+	}
+
+	requiredInputs = filterAutoNamedRequired(requiredInputs, rm)
+
 	// Validate that every metadata.fields key matches an input or output.
 	for fieldName := range rm.Fields {
 		_, inInputs := inputs[fieldName]
@@ -219,16 +225,26 @@ func operationInputs(spec *Spec, op *Operation, rm ResourceMeta) (map[string]sch
 	return props, sortedKeys(required), nil
 }
 
-// mergePathParamsAsInputs adds path parameters from op to the inputs map if
-// they aren't already present. Covers cases like read/update/delete using
-// {id}-style path params that don't appear on create.
+// mergePathParamsAsInputs ensures every path parameter from op contributes a
+// replace-on-change entry in the inputs map. Covers two cases:
+//
+//   - Path param not yet in inputs (e.g. server-generated IDs surfaced by
+//     read/update/delete that don't appear on create) — added fresh.
+//   - Path param's Pulumi-side name collides with an existing body-field
+//     entry (e.g. Team's body `name` renames to path's `teamName`) — the
+//     existing entry is upgraded with `replaceOnChanges`. Without this,
+//     mutating the field would trigger an update against the new name and
+//     404, when the engine should have triggered a replace.
 func mergePathParamsAsInputs(inputs map[string]schema.PropertySpec, required *[]string, op *Operation, rm ResourceMeta) error {
 	for _, pp := range op.Parameters {
 		if pp.In != "path" {
 			continue
 		}
 		name := pulumiName(pp.Name, rm.Renames, true)
-		if _, ok := inputs[name]; ok {
+		if existing, ok := inputs[name]; ok {
+			existing.WillReplaceOnChanges = true
+			existing.ReplaceOnChanges = true
+			inputs[name] = existing
 			continue
 		}
 		ps := schema.PropertySpec{
@@ -525,5 +541,59 @@ func sortedKeys(m map[string]bool) []string {
 		out = append(out, k)
 	}
 	slices.Sort(out)
+	return out
+}
+
+// mergeEmitOnCreateOutputs adds fields marked emitOnCreate from the create-op
+// response into outputs when they're missing. Fields not present in the
+// create response are silently skipped — there's no shape information to
+// emit.
+func mergeEmitOnCreateOutputs(spec *Spec, create *Operation, rm ResourceMeta, outputs map[string]schema.PropertySpec) error {
+	hasAny := false
+	for _, fm := range rm.Fields {
+		if fm.EmitOnCreate {
+			hasAny = true
+			break
+		}
+	}
+	if !hasAny || create == nil || create.ResponseRef == "" {
+		return nil
+	}
+	createBody, _, err := flattenObjectSchema(spec, create.ResponseRef)
+	if err != nil {
+		return err
+	}
+	for name, fm := range rm.Fields {
+		if !fm.EmitOnCreate {
+			continue
+		}
+		if _, exists := outputs[name]; exists {
+			continue
+		}
+		wireName := wireSideName(name, rm.Renames)
+		raw, ok := createBody[wireName]
+		if !ok {
+			continue
+		}
+		ps := openAPIToProperty(raw)
+		applyFieldMeta(&ps, fm, false)
+		if looksSecret(name) {
+			ps.Secret = true
+		}
+		outputs[name] = ps
+	}
+	return nil
+}
+
+// filterAutoNamedRequired strips auto-named fields from the required-inputs
+// list so the user can leave them unset on create.
+func filterAutoNamedRequired(required []string, rm ResourceMeta) []string {
+	out := make([]string, 0, len(required))
+	for _, name := range required {
+		if rm.Fields[name].AutoName > 0 {
+			continue
+		}
+		out = append(out, name)
+	}
 	return out
 }

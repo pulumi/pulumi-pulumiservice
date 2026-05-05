@@ -51,6 +51,12 @@ namespace Pulumi.PulumiService.V2.Agents
         [Output("poolId")]
         public Output<string> PoolId { get; private set; } = null!;
 
+        /// <summary>
+        /// The token value
+        /// </summary>
+        [Output("tokenValue")]
+        public Output<string?> TokenValue { get; private set; } = null!;
+
 
         /// <summary>
         /// Create a Pool resource with the given unique name, arguments, and options.
@@ -74,9 +80,14 @@ namespace Pulumi.PulumiService.V2.Agents
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
+                AdditionalSecretOutputs =
+                {
+                    "tokenValue",
+                },
                 ReplaceOnChanges =
                 {
                     "orgName",
+                    "poolId",
                 },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);

@@ -240,7 +240,7 @@ class Role(pulumi.CustomResource):
             __props__.__dict__["modified"] = None
             __props__.__dict__["org_id"] = None
             __props__.__dict__["version"] = None
-        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["orgName"])
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["orgName", "roleID"])
         opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(Role, __self__).__init__(
             'pulumiservice:v2:Role',

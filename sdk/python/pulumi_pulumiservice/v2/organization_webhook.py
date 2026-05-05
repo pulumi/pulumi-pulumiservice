@@ -334,6 +334,8 @@ class OrganizationWebhook(pulumi.CustomResource):
             __props__.__dict__["secret_ciphertext"] = None
         secret_opts = pulumi.ResourceOptions(additional_secret_outputs=["hasSecret", "secret", "secretCiphertext"])
         opts = pulumi.ResourceOptions.merge(opts, secret_opts)
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["name", "organizationName"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(OrganizationWebhook, __self__).__init__(
             'pulumiservice:v2:OrganizationWebhook',
             resource_name,

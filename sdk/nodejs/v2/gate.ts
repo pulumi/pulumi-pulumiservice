@@ -100,7 +100,7 @@ export class Gate extends pulumi.CustomResource {
             resourceInputs["target"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
-        const replaceOnChanges = { replaceOnChanges: ["orgName"] };
+        const replaceOnChanges = { replaceOnChanges: ["gateID", "orgName"] };
         opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(Gate.__pulumiType, name, resourceInputs, opts);
     }

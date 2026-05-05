@@ -77,6 +77,19 @@ type ResourceMeta struct {
 	// schema. Mutually exclusive with Outputs (Outputs wins if both set).
 	OutputsExclude []string `json:"outputsExclude,omitempty"`
 
+	// IDFormat is a template controlling resource-ID synthesis and import-time
+	// parsing. Use "{paramName}" placeholders for path-parameter values
+	// (Pulumi-side names after Renames). Example: "{org}/{name}". When unset,
+	// the synthesizer slash-joins path-parameter values from the most
+	// authoritative non-create op.
+	IDFormat string `json:"idFormat,omitempty"`
+
+	// DeleteBeforeReplace makes Pulumi delete the old instance before creating
+	// the new one on a replacement (instead of the default create-new-then-
+	// delete-old). Use for resources whose names collide on duplicate create
+	// and that aren't auto-named.
+	DeleteBeforeReplace bool `json:"deleteBeforeReplace,omitempty"`
+
 	// Description is an optional override of the resource description in the
 	// generated schema. If empty, the schema builder falls back to the create
 	// operation's description.
@@ -104,6 +117,21 @@ type FieldMeta struct {
 	ForceNew    bool   `json:"forceNew,omitempty"`
 	Secret      bool   `json:"secret,omitempty"`
 	Description string `json:"description,omitempty"`
+
+	// EmitOnCreate marks a field that's only present in the create response,
+	// never readable thereafter. The runtime preserves it from prior state
+	// during refresh; the schema builder includes it in outputs even if the
+	// read-response schema doesn't carry it.
+	EmitOnCreate bool `json:"emitOnCreate,omitempty"`
+
+	// Unordered marks an array field as set-like; Check sorts the values
+	// before returning so user-side reordering doesn't trigger spurious diffs.
+	Unordered bool `json:"unordered,omitempty"`
+
+	// AutoName, when >0, makes the field optional on create. If the user
+	// doesn't provide a value, Check generates one from the resource URN and
+	// the engine-supplied random seed, capped at this max length.
+	AutoName int `json:"autoName,omitempty"`
 }
 
 // ParseMetadata parses metadata.json.

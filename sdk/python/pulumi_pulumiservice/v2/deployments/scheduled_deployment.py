@@ -224,7 +224,7 @@ class ScheduledDeployment(pulumi.CustomResource):
             __props__.__dict__["next_execution"] = None
             __props__.__dict__["org_id"] = None
             __props__.__dict__["paused"] = None
-        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["orgName", "projectName", "stackName"])
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["orgName", "projectName", "scheduleID", "stackName"])
         opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(ScheduledDeployment, __self__).__init__(
             'pulumiservice:v2/deployments:ScheduledDeployment',

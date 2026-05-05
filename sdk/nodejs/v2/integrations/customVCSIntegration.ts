@@ -129,7 +129,7 @@ export class CustomVCSIntegration extends pulumi.CustomResource {
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         const secretOpts = { additionalSecretOutputs: ["webhookSecret"] };
         opts = pulumi.mergeOptions(opts, secretOpts);
-        const replaceOnChanges = { replaceOnChanges: ["orgName"] };
+        const replaceOnChanges = { replaceOnChanges: ["integrationId", "orgName"] };
         opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(CustomVCSIntegration.__pulumiType, name, resourceInputs, opts);
     }

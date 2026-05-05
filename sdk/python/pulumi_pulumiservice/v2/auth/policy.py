@@ -181,7 +181,7 @@ class Policy(pulumi.CustomResource):
             __props__.__dict__["created"] = None
             __props__.__dict__["modified"] = None
             __props__.__dict__["version"] = None
-        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["orgName", "policyId"])
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["issuerId", "orgName", "policyId"])
         opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(Policy, __self__).__init__(
             'pulumiservice:v2/auth:Policy',

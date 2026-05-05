@@ -143,7 +143,7 @@ export class ScheduledDeployment extends pulumi.CustomResource {
             resourceInputs["stackName"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
-        const replaceOnChanges = { replaceOnChanges: ["orgName", "projectName", "stackName"] };
+        const replaceOnChanges = { replaceOnChanges: ["orgName", "projectName", "scheduleID", "stackName"] };
         opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(ScheduledDeployment.__pulumiType, name, resourceInputs, opts);
     }

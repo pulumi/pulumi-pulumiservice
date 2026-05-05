@@ -60,6 +60,7 @@ func NewPolicy(ctx *pulumi.Context,
 		return nil, errors.New("invalid value for required argument 'PolicyId'")
 	}
 	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"issuerId",
 		"orgName",
 		"policyId",
 	})

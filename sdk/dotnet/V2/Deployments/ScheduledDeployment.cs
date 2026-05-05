@@ -126,6 +126,7 @@ namespace Pulumi.PulumiService.V2.Deployments
                 {
                     "orgName",
                     "projectName",
+                    "scheduleID",
                     "stackName",
                 },
             };

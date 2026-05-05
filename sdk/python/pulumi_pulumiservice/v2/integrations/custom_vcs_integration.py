@@ -204,7 +204,7 @@ class CustomVCSIntegration(pulumi.CustomResource):
             __props__.__dict__["webhook_url"] = None
         secret_opts = pulumi.ResourceOptions(additional_secret_outputs=["webhookSecret"])
         opts = pulumi.ResourceOptions.merge(opts, secret_opts)
-        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["orgName"])
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["integrationId", "orgName"])
         opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(CustomVCSIntegration, __self__).__init__(
             'pulumiservice:v2/integrations:CustomVCSIntegration',

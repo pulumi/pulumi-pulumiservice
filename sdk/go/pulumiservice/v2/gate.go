@@ -53,6 +53,7 @@ func NewGate(ctx *pulumi.Context,
 		return nil, errors.New("invalid value for required argument 'Target'")
 	}
 	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"gateID",
 		"orgName",
 	})
 	opts = append(opts, replaceOnChanges)

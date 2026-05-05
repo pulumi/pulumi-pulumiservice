@@ -65,6 +65,10 @@ type v2Case struct {
 	SkipReason string
 	// SkipLang skips specific language lanes for this example.
 	SkipLang map[string]string
+	// Dir overrides the example directory under examples/v2/. Defaults to
+	// Name when empty. Useful for running multiple tests against the same
+	// example (e.g. one for in-place update, another for replace).
+	Dir string
 }
 
 var v2Cases = []v2Case{
@@ -151,6 +155,22 @@ var v2Cases = []v2Case{
 		// Rotate the team description — exercises UpdateTeam.
 		UpdateOverrides: func() map[string]string {
 			return map[string]string{"teamDescription": "Rotated description from update test."}
+		},
+	},
+	{
+		// Reuses the teams example. Mutates teamSuffix on the second Up,
+		// which changes the team's name (a path-param-derived field marked
+		// replaceOnChanges) and forces a replace cycle. Without
+		// deleteBeforeReplace=true on Team, the engine would create-new-
+		// then-delete-old and the new POST would 409-conflict against the
+		// still-existing team. With dbr, the engine destroys the old team
+		// first, then creates the renamed one.
+		Name:    "teams-replace",
+		Dir:     "teams",
+		Config:  teamsConfig,
+		FullE2E: true,
+		UpdateOverrides: func() map[string]string {
+			return map[string]string{"teamSuffix": "rep-" + generateRandomFiveDigits()}
 		},
 	},
 	{
@@ -278,7 +298,11 @@ func TestV2(t *testing.T) {
 // language-specific local-SDK linkage, and runs preview (or full E2E for
 // the yaml lane on FullE2E cases).
 func runV2Case(t *testing.T, ex v2Case, lang string) {
-	src := filepath.Join(getCwd(t), "v2", ex.Name, lang)
+	dir := ex.Dir
+	if dir == "" {
+		dir = ex.Name
+	}
+	src := filepath.Join(getCwd(t), "v2", dir, lang)
 	if _, err := os.Stat(src); err != nil {
 		t.Fatalf("%s example missing for %s: %v", lang, ex.Name, err)
 	}

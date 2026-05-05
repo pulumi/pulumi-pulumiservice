@@ -13,6 +13,7 @@ import java.lang.Integer;
 import java.lang.Object;
 import java.lang.String;
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Nullable;
 
 /**
@@ -105,6 +106,20 @@ public class Pool extends com.pulumi.resources.CustomResource {
     public Output<String> poolId() {
         return this.poolId;
     }
+    /**
+     * The token value
+     * 
+     */
+    @Export(name="tokenValue", refs={String.class}, tree="[0]")
+    private Output</* @Nullable */ String> tokenValue;
+
+    /**
+     * @return The token value
+     * 
+     */
+    public Output<Optional<String>> tokenValue() {
+        return Codegen.optional(this.tokenValue);
+    }
 
     /**
      *
@@ -145,6 +160,9 @@ public class Pool extends com.pulumi.resources.CustomResource {
     private static com.pulumi.resources.CustomResourceOptions makeResourceOptions(@Nullable com.pulumi.resources.CustomResourceOptions options, @Nullable Output<java.lang.String> id) {
         var defaultOptions = com.pulumi.resources.CustomResourceOptions.builder()
             .version(Utilities.getVersion())
+            .additionalSecretOutputs(List.of(
+                "tokenValue"
+            ))
             .build();
         return com.pulumi.resources.CustomResourceOptions.merge(defaultOptions, options, id);
     }

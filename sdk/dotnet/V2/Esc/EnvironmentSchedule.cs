@@ -127,6 +127,7 @@ namespace Pulumi.PulumiService.V2.Esc
                     "envName",
                     "orgName",
                     "projectName",
+                    "scheduleID",
                 },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
