@@ -373,26 +373,18 @@ func orgRoleCoreFromAPI(
 	}
 	if role.Details != nil {
 		// Round-trip the typed Details through JSON to recover the
-		// `__type`-discriminated map shape the SDK exposes. The marshal call
-		// dispatches through the typed descriptor's MarshalJSON, which emits
-		// `__type` natively.
+		// `__type`-discriminated map shape the SDK exposes. The marshal
+		// call dispatches through the typed descriptor's MarshalJSON,
+		// which emits `__type` natively.
 		raw, err := json.Marshal(role.Details)
 		if err != nil {
 			return OrganizationRoleCore{}, fmt.Errorf(
 				"marshalling role details for %q: %w", role.ID, err)
 		}
-		wire := map[string]interface{}{}
-		if err := json.Unmarshal(raw, &wire); err != nil {
+		core.Permissions = map[string]interface{}{}
+		if err := json.Unmarshal(raw, &core.Permissions); err != nil {
 			return OrganizationRoleCore{}, fmt.Errorf("parsing role details for %q: %w", role.ID, err)
 		}
-		// Pass the user's prior input shape so the translator can decide
-		// whether to collapse the API-boundary single-entry-Group-of-Condition
-		// wrap. See permissionsFromAPI's docstring for the gating rule.
-		parsed, err := permissionsFromAPI(wire, prior.Permissions)
-		if err != nil {
-			return OrganizationRoleCore{}, fmt.Errorf("translating role details for %q: %w", role.ID, err)
-		}
-		core.Permissions = parsed
 	}
 	return core, nil
 }
@@ -412,18 +404,16 @@ func orgRoleStateFromAPI(
 
 // buildPermissionDescriptorForAPI converts a user-facing `__type`-shape
 // permissions map into the typed apitype.PermissionDescriptor tree
-// expected by the generated SDK. It applies the top-level
-// Condition→Group(Condition) wrap (Cloud UI workaround) and then hands
-// the JSON off to the generated UnmarshalJSONPermissionDescriptor for
-// discriminator dispatch.
+// expected by the generated SDK. The user's tree passes through to the
+// API verbatim; this routine just hands the JSON off to the generated
+// UnmarshalJSONPermissionDescriptor for `__type` dispatch.
 func buildPermissionDescriptorForAPI(
 	permissions map[string]interface{},
 ) (apitype.PermissionDescriptor, error) {
-	wire, err := permissionsForAPI(permissions)
-	if err != nil {
+	if err := validatePermissions(permissions); err != nil {
 		return nil, err
 	}
-	raw, err := json.Marshal(wire)
+	raw, err := json.Marshal(permissions)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal permissions: %w", err)
 	}
@@ -432,7 +422,7 @@ func buildPermissionDescriptorForAPI(
 		return nil, fmt.Errorf("failed to parse permission descriptor: %w", err)
 	}
 	if details == nil {
-		return nil, fmt.Errorf("permission descriptor parsed to nil — missing or unknown discriminator")
+		return nil, fmt.Errorf("permission descriptor parsed to nil — missing or unknown __type")
 	}
 	return details, nil
 }

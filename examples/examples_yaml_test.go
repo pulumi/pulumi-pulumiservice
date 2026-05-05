@@ -721,8 +721,7 @@ func TestYamlRbacComposeImport(t *testing.T) {
 	// the imported `resources:` block to the target stack's existing
 	// Pulumi.yaml (keeping the project's `name`/`runtime`/`description`
 	// header intact) and run `pulumi preview` — any `~` on `permissions`
-	// would mean the Group(Condition) wrap/unwrap heuristic disagrees
-	// with Create's inverse transform.
+	// would mean the descriptor pass-through is lossy.
 	pulumiYamlPath := filepath.Join(importTarget.CurrentStack().Workspace().WorkDir(), "Pulumi.yaml")
 	existingProject, err := os.ReadFile(pulumiYamlPath)
 	require.NoError(t, err, "must be able to read the target stack's Pulumi.yaml")
