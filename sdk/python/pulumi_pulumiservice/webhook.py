@@ -33,7 +33,6 @@ class WebhookArgs:
                  stack_name: Optional[pulumi.Input[_builtins.str]] = None):
         """
         The set of arguments for constructing a Webhook resource.
-
         :param pulumi.Input[_builtins.bool] active: Indicates whether this webhook is enabled or not.
         :param pulumi.Input[_builtins.str] display_name: The friendly name displayed in the Pulumi Cloud.
         :param pulumi.Input[_builtins.str] organization_name: Name of the organization.
@@ -229,7 +228,6 @@ class Webhook(pulumi.CustomResource):
          $ pulumi import pulumiservice:index:Webhook my_webhook my-org/my-project/my-stack/4b0d0671
         ```
 
-
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.bool] active: Indicates whether this webhook is enabled or not.
@@ -260,7 +258,6 @@ class Webhook(pulumi.CustomResource):
         ```sh
          $ pulumi import pulumiservice:index:Webhook my_webhook my-org/my-project/my-stack/4b0d0671
         ```
-
 
         :param str resource_name: The name of the resource.
         :param WebhookArgs args: The arguments to use to populate this resource's properties.
