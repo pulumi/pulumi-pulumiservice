@@ -132,9 +132,9 @@ def get_policy_pack(organization_name: Optional[_builtins.str] = None,
         policies=pulumi.get(__ret__, 'policies'),
         version=pulumi.get(__ret__, 'version'),
         version_tag=pulumi.get(__ret__, 'version_tag'))
-def get_policy_pack_output(organization_name: Optional[pulumi.Input[_builtins.str]] = None,
-                           policy_pack_name: Optional[pulumi.Input[_builtins.str]] = None,
-                           version: Optional[pulumi.Input[Optional[_builtins.int]]] = None,
+def get_policy_pack_output(organization_name: pulumi.Input[Optional[_builtins.str]] = None,
+                           policy_pack_name: pulumi.Input[Optional[_builtins.str]] = None,
+                           version: pulumi.Input[Optional[Optional[_builtins.int]]] = None,
                            opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[GetPolicyPackResult]:
     """
     Get details about a specific version of a policy pack.

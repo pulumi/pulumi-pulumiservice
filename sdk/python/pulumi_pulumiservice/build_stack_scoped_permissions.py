@@ -64,8 +64,8 @@ def build_stack_scoped_permissions(permissions: Optional[Sequence[_builtins.str]
 
     return AwaitableBuildStackScopedPermissionsResult(
         permissions=pulumi.get(__ret__, 'permissions'))
-def build_stack_scoped_permissions_output(permissions: Optional[pulumi.Input[Sequence[_builtins.str]]] = None,
-                                          stack_id: Optional[pulumi.Input[_builtins.str]] = None,
+def build_stack_scoped_permissions_output(permissions: pulumi.Input[Optional[Sequence[_builtins.str]]] = None,
+                                          stack_id: pulumi.Input[Optional[_builtins.str]] = None,
                                           opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[BuildStackScopedPermissionsResult]:
     """
     Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `group` whose `entries` list pulls the output of each helper.

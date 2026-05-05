@@ -61,7 +61,7 @@ def get_policy_packs(organization_name: Optional[_builtins.str] = None,
 
     return AwaitableGetPolicyPacksResult(
         policy_packs=pulumi.get(__ret__, 'policy_packs'))
-def get_policy_packs_output(organization_name: Optional[pulumi.Input[_builtins.str]] = None,
+def get_policy_packs_output(organization_name: pulumi.Input[Optional[_builtins.str]] = None,
                             opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[GetPolicyPacksResult]:
     """
     Get a list of all policy packs for an organization.

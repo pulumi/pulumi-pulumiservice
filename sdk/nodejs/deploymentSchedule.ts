@@ -129,7 +129,7 @@ export interface DeploymentScheduleArgs {
     /**
      * Cron expression for recurring scheduled runs. If you are supplying this, do not supply timestamp.
      */
-    scheduleCron?: pulumi.Input<string>;
+    scheduleCron?: pulumi.Input<string | undefined>;
     /**
      * Stack name.
      */
@@ -137,5 +137,5 @@ export interface DeploymentScheduleArgs {
     /**
      * The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are supplying this, do not supply scheduleCron.
      */
-    timestamp?: pulumi.Input<string>;
+    timestamp?: pulumi.Input<string | undefined>;
 }

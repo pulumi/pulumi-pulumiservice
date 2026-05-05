@@ -59,7 +59,7 @@ def get_organization_role_scopes(organization_name: Optional[_builtins.str] = No
 
     return AwaitableGetOrganizationRoleScopesResult(
         scopes=pulumi.get(__ret__, 'scopes'))
-def get_organization_role_scopes_output(organization_name: Optional[pulumi.Input[_builtins.str]] = None,
+def get_organization_role_scopes_output(organization_name: pulumi.Input[Optional[_builtins.str]] = None,
                                         opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[GetOrganizationRoleScopesResult]:
     """
     Lists the permission scopes available for custom roles in an organization. Use this to discover valid scope names before setting `OrganizationRole.permissions`. The catalogue is flattened into a single list with resource type and group context, sorted deterministically.

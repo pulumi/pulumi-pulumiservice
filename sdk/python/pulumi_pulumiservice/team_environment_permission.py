@@ -24,8 +24,8 @@ class TeamEnvironmentPermissionArgs:
                  organization: pulumi.Input[_builtins.str],
                  permission: pulumi.Input['EnvironmentPermission'],
                  team: pulumi.Input[_builtins.str],
-                 max_open_duration: Optional[pulumi.Input[_builtins.str]] = None,
-                 project: Optional[pulumi.Input[_builtins.str]] = None):
+                 max_open_duration: pulumi.Input[Optional[_builtins.str]] = None,
+                 project: pulumi.Input[Optional[_builtins.str]] = None):
         """
         The set of arguments for constructing a TeamEnvironmentPermission resource.
 
@@ -97,26 +97,26 @@ class TeamEnvironmentPermissionArgs:
 
     @_builtins.property
     @pulumi.getter(name="maxOpenDuration")
-    def max_open_duration(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def max_open_duration(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The maximum duration for which members of this team may open the environment.
         """
         return pulumi.get(self, "max_open_duration")
 
     @max_open_duration.setter
-    def max_open_duration(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def max_open_duration(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "max_open_duration", value)
 
     @_builtins.property
     @pulumi.getter
-    def project(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def project(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         Project name.
         """
         return pulumi.get(self, "project")
 
     @project.setter
-    def project(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def project(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "project", value)
 
 
@@ -126,12 +126,12 @@ class TeamEnvironmentPermission(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 environment: Optional[pulumi.Input[_builtins.str]] = None,
-                 max_open_duration: Optional[pulumi.Input[_builtins.str]] = None,
-                 organization: Optional[pulumi.Input[_builtins.str]] = None,
-                 permission: Optional[pulumi.Input['EnvironmentPermission']] = None,
-                 project: Optional[pulumi.Input[_builtins.str]] = None,
-                 team: Optional[pulumi.Input[_builtins.str]] = None,
+                 environment: pulumi.Input[Optional[_builtins.str]] = None,
+                 max_open_duration: pulumi.Input[Optional[_builtins.str]] = None,
+                 organization: pulumi.Input[Optional[_builtins.str]] = None,
+                 permission: pulumi.Input[Optional['EnvironmentPermission']] = None,
+                 project: pulumi.Input[Optional[_builtins.str]] = None,
+                 team: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
         A permission for a team to use an environment.
@@ -171,12 +171,12 @@ class TeamEnvironmentPermission(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 environment: Optional[pulumi.Input[_builtins.str]] = None,
-                 max_open_duration: Optional[pulumi.Input[_builtins.str]] = None,
-                 organization: Optional[pulumi.Input[_builtins.str]] = None,
-                 permission: Optional[pulumi.Input['EnvironmentPermission']] = None,
-                 project: Optional[pulumi.Input[_builtins.str]] = None,
-                 team: Optional[pulumi.Input[_builtins.str]] = None,
+                 environment: pulumi.Input[Optional[_builtins.str]] = None,
+                 max_open_duration: pulumi.Input[Optional[_builtins.str]] = None,
+                 organization: pulumi.Input[Optional[_builtins.str]] = None,
+                 permission: pulumi.Input[Optional['EnvironmentPermission']] = None,
+                 project: pulumi.Input[Optional[_builtins.str]] = None,
+                 team: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

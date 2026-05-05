@@ -108,7 +108,7 @@ export interface TtlScheduleArgs {
     /**
      * True if the stack and all associated history and settings should be deleted.
      */
-    deleteAfterDestroy?: pulumi.Input<boolean>;
+    deleteAfterDestroy?: pulumi.Input<boolean | undefined>;
     /**
      * Organization name.
      */

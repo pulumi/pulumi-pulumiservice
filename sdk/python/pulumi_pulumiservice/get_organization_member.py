@@ -116,8 +116,8 @@ def get_organization_member(organization_name: Optional[_builtins.str] = None,
         role_name=pulumi.get(__ret__, 'role_name'),
         username=pulumi.get(__ret__, 'username'),
         virtual_admin=pulumi.get(__ret__, 'virtual_admin'))
-def get_organization_member_output(organization_name: Optional[pulumi.Input[_builtins.str]] = None,
-                                   username: Optional[pulumi.Input[_builtins.str]] = None,
+def get_organization_member_output(organization_name: pulumi.Input[Optional[_builtins.str]] = None,
+                                   username: pulumi.Input[Optional[_builtins.str]] = None,
                                    opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[GetOrganizationMemberResult]:
     """
     Looks up a single member of a Pulumi Cloud organization by username (the backing identity-provider login, e.g. GitHub login). Returns an error when the member is not found.

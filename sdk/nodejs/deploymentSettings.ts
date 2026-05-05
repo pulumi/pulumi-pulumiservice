@@ -109,15 +109,15 @@ export class DeploymentSettings extends pulumi.CustomResource {
                 throw new Error("Missing required property 'stack'");
             }
             resourceInputs["agentPoolId"] = args?.agentPoolId;
-            resourceInputs["cacheOptions"] = args ? (args.cacheOptions ? pulumi.output(args.cacheOptions).apply(inputs.deploymentSettingsCacheOptionsArgsProvideDefaults) : undefined) : undefined;
+            resourceInputs["cacheOptions"] = args ? pulumi.output(args.cacheOptions).apply(v => v === undefined ? undefined : inputs.deploymentSettingsCacheOptionsArgsProvideDefaults(v)) : undefined;
             resourceInputs["executorContext"] = args?.executorContext;
-            resourceInputs["github"] = args ? (args.github ? pulumi.output(args.github).apply(inputs.deploymentSettingsGithubArgsProvideDefaults) : undefined) : undefined;
+            resourceInputs["github"] = args ? pulumi.output(args.github).apply(v => v === undefined ? undefined : inputs.deploymentSettingsGithubArgsProvideDefaults(v)) : undefined;
             resourceInputs["operationContext"] = args?.operationContext;
             resourceInputs["organization"] = args?.organization;
             resourceInputs["project"] = args?.project;
             resourceInputs["sourceContext"] = args?.sourceContext;
             resourceInputs["stack"] = args?.stack;
-            resourceInputs["vcs"] = args ? (args.vcs ? pulumi.output(args.vcs).apply(inputs.deploymentSettingsVcsArgsProvideDefaults) : undefined) : undefined;
+            resourceInputs["vcs"] = args ? pulumi.output(args.vcs).apply(v => v === undefined ? undefined : inputs.deploymentSettingsVcsArgsProvideDefaults(v)) : undefined;
         } else {
             resourceInputs["agentPoolId"] = undefined /*out*/;
             resourceInputs["cacheOptions"] = undefined /*out*/;
@@ -142,25 +142,25 @@ export interface DeploymentSettingsArgs {
     /**
      * The agent pool identifier to use for the deployment.
      */
-    agentPoolId?: pulumi.Input<string>;
+    agentPoolId?: pulumi.Input<string | undefined>;
     /**
      * Dependency cache settings for the deployment
      */
-    cacheOptions?: pulumi.Input<inputs.DeploymentSettingsCacheOptionsArgs>;
+    cacheOptions?: pulumi.Input<inputs.DeploymentSettingsCacheOptionsArgs | undefined>;
     /**
      * Settings related to the deployment executor.
      */
-    executorContext?: pulumi.Input<inputs.DeploymentSettingsExecutorContextArgs>;
+    executorContext?: pulumi.Input<inputs.DeploymentSettingsExecutorContextArgs | undefined>;
     /**
      * GitHub settings for the deployment.
      *
      * @deprecated Use the 'vcs' property instead, which supports both GitHub and Azure DevOps.
      */
-    github?: pulumi.Input<inputs.DeploymentSettingsGithubArgs>;
+    github?: pulumi.Input<inputs.DeploymentSettingsGithubArgs | undefined>;
     /**
      * Settings related to the Pulumi operation environment during the deployment.
      */
-    operationContext?: pulumi.Input<inputs.DeploymentSettingsOperationContextArgs>;
+    operationContext?: pulumi.Input<inputs.DeploymentSettingsOperationContextArgs | undefined>;
     /**
      * Organization name.
      */
@@ -172,7 +172,7 @@ export interface DeploymentSettingsArgs {
     /**
      * Settings related to the source of the deployment.
      */
-    sourceContext?: pulumi.Input<inputs.DeploymentSettingsSourceContextArgs>;
+    sourceContext?: pulumi.Input<inputs.DeploymentSettingsSourceContextArgs | undefined>;
     /**
      * Stack name.
      */
@@ -180,5 +180,5 @@ export interface DeploymentSettingsArgs {
     /**
      * VCS settings for the deployment. Supports Azure DevOps and GitHub via the 'provider' discriminator field.
      */
-    vcs?: pulumi.Input<inputs.DeploymentSettingsVcsArgs>;
+    vcs?: pulumi.Input<inputs.DeploymentSettingsVcsArgs | undefined>;
 }

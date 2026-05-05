@@ -23,7 +23,7 @@ class TtlScheduleArgs:
                  project: pulumi.Input[_builtins.str],
                  stack: pulumi.Input[_builtins.str],
                  timestamp: pulumi.Input[_builtins.str],
-                 delete_after_destroy: Optional[pulumi.Input[_builtins.bool]] = None):
+                 delete_after_destroy: pulumi.Input[Optional[_builtins.bool]] = None):
         """
         The set of arguments for constructing a TtlSchedule resource.
 
@@ -92,14 +92,14 @@ class TtlScheduleArgs:
 
     @_builtins.property
     @pulumi.getter(name="deleteAfterDestroy")
-    def delete_after_destroy(self) -> Optional[pulumi.Input[_builtins.bool]]:
+    def delete_after_destroy(self) -> pulumi.Input[Optional[_builtins.bool]]:
         """
         True if the stack and all associated history and settings should be deleted.
         """
         return pulumi.get(self, "delete_after_destroy")
 
     @delete_after_destroy.setter
-    def delete_after_destroy(self, value: Optional[pulumi.Input[_builtins.bool]]):
+    def delete_after_destroy(self, value: pulumi.Input[Optional[_builtins.bool]]):
         pulumi.set(self, "delete_after_destroy", value)
 
 
@@ -109,11 +109,11 @@ class TtlSchedule(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 delete_after_destroy: Optional[pulumi.Input[_builtins.bool]] = None,
-                 organization: Optional[pulumi.Input[_builtins.str]] = None,
-                 project: Optional[pulumi.Input[_builtins.str]] = None,
-                 stack: Optional[pulumi.Input[_builtins.str]] = None,
-                 timestamp: Optional[pulumi.Input[_builtins.str]] = None,
+                 delete_after_destroy: pulumi.Input[Optional[_builtins.bool]] = None,
+                 organization: pulumi.Input[Optional[_builtins.str]] = None,
+                 project: pulumi.Input[Optional[_builtins.str]] = None,
+                 stack: pulumi.Input[Optional[_builtins.str]] = None,
+                 timestamp: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
         A scheduled stack destroy run.
@@ -152,11 +152,11 @@ class TtlSchedule(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 delete_after_destroy: Optional[pulumi.Input[_builtins.bool]] = None,
-                 organization: Optional[pulumi.Input[_builtins.str]] = None,
-                 project: Optional[pulumi.Input[_builtins.str]] = None,
-                 stack: Optional[pulumi.Input[_builtins.str]] = None,
-                 timestamp: Optional[pulumi.Input[_builtins.str]] = None,
+                 delete_after_destroy: pulumi.Input[Optional[_builtins.bool]] = None,
+                 organization: pulumi.Input[Optional[_builtins.str]] = None,
+                 project: pulumi.Input[Optional[_builtins.str]] = None,
+                 stack: pulumi.Input[Optional[_builtins.str]] = None,
+                 timestamp: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

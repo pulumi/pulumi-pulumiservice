@@ -96,7 +96,7 @@ export interface TemplateSourceArgs {
     /**
      * The default destination for projects using templates from this source.
      */
-    destination?: pulumi.Input<inputs.TemplateSourceDestinationArgs>;
+    destination?: pulumi.Input<inputs.TemplateSourceDestinationArgs | undefined>;
     /**
      * Organization name.
      */

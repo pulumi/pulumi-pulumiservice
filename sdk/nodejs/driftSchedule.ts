@@ -108,7 +108,7 @@ export interface DriftScheduleArgs {
     /**
      * Whether any drift detected should be remediated after a drift run.
      */
-    autoRemediate?: pulumi.Input<boolean>;
+    autoRemediate?: pulumi.Input<boolean | undefined>;
     /**
      * Organization name.
      */

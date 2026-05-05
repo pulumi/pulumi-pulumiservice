@@ -81,5 +81,5 @@ export interface GetPolicyPackOutputArgs {
     /**
      * The version number of the policy pack. If not specified, returns the latest version.
      */
-    version?: pulumi.Input<number>;
+    version?: pulumi.Input<number | undefined>;
 }
