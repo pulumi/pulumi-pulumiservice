@@ -70,6 +70,7 @@ func TestTeamsExample(t *testing.T) {
 		opttest.YarnLink("@pulumi/pulumiservice"),
 		opttest.StackName(randomStackName()),
 	)
+	test.SetConfig(t, "nameSuffix", generateRandomFiveDigits())
 	runPulumiTest(t, test)
 }
 
