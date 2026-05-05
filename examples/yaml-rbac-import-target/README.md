@@ -2,9 +2,8 @@
 
 Empty fixture used by `TestYamlRbacComposeImport` as the destination of a
 `pulumi import` invocation. The test verifies that a custom role authored
-with `discriminator: PermissionDescriptorCompose` (the Webflow regression
-case) imports cleanly without the prior translator's "unknown `__type`"
-error.
+with `__type: PermissionDescriptorCompose` imports cleanly without the
+prior "unknown `__type`" error from earlier translators.
 
 This fixture has no resources of its own — the test populates it via
 `pulumi import` at runtime. See `examples/examples_yaml_test.go`'s

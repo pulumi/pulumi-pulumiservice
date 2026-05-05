@@ -61,8 +61,8 @@ func mustParseDescriptor(t *testing.T, wireJSON string) apitype.PermissionDescri
 }
 
 var testPermissions = map[string]interface{}{
-	"discriminator": "PermissionDescriptorAllow",
-	"permissions":   []interface{}{"stack:read"},
+	"__type":      "PermissionDescriptorAllow",
+	"permissions": []interface{}{"stack:read"},
 }
 
 func TestOrganizationRoleCreate(t *testing.T) {
@@ -77,16 +77,14 @@ func TestOrganizationRoleCreate(t *testing.T) {
 			assert.Equal(t, "global", req.ResourceType)
 			assert.Equal(t, apitype.PermissionDescriptorUXPurposeRole, req.UxPurpose)
 			require.NotNil(t, req.Details, "Details must be a typed descriptor")
-			// Round-trip the typed descriptor back through JSON to assert the
-			// wire shape — the resource layer must emit __type, never the
-			// SDK-side `discriminator` field.
+			// Round-trip the typed descriptor back through JSON to assert
+			// the wire shape uses `__type` (the wire format and SDK boundary
+			// share this discriminator now).
 			raw, err := json.Marshal(req.Details)
 			require.NoError(t, err)
 			var parsed map[string]interface{}
 			require.NoError(t, json.Unmarshal(raw, &parsed))
 			assert.Equal(t, "PermissionDescriptorAllow", parsed["__type"])
-			assert.NotContains(t, parsed, "discriminator",
-				"wire body must not leak `discriminator` to the API")
 			return &apitype.PermissionDescriptorRecord{
 				PermissionDescriptorBase: apitype.PermissionDescriptorBase{
 					Name:    req.Name,
@@ -129,7 +127,8 @@ func TestOrganizationRoleRead(t *testing.T) {
 	})
 
 	t.Run("found parses details", func(t *testing.T) {
-		// The API returns wire format with __type; the provider must translate to kind.
+		// The API returns wire format with __type; the provider passes it
+		// through unchanged — the SDK boundary uses `__type` too.
 		details := mustParseDescriptor(t,
 			`{"__type":"PermissionDescriptorAllow","permissions":["stack:read"]}`)
 		mock := &orgRoleClientMock{
@@ -154,10 +153,7 @@ func TestOrganizationRoleRead(t *testing.T) {
 		})
 		assert.NoError(t, err)
 		assert.Equal(t, "acme/role-123", resp.ID)
-		// Read renames the wire `__type` discriminator to `discriminator`.
-		// The PascalCase value is unchanged.
-		assert.Equal(t, "PermissionDescriptorAllow", resp.State.Permissions["discriminator"])
-		assert.NotContains(t, resp.State.Permissions, "__type", "state must not leak `__type` to the SDK")
+		assert.Equal(t, "PermissionDescriptorAllow", resp.State.Permissions["__type"])
 	})
 
 	// Pulumi Cloud's permission-descriptor table holds entries for both
@@ -384,7 +380,7 @@ func TestOrganizationRoleCheck(t *testing.T) {
 				"organizationName": property.New("acme"),
 				"name":             property.New(property.Computed),
 				"permissions": property.New(property.NewMap(map[string]property.Value{
-					"discriminator": property.New("allow"),
+					"__type": property.New("allow"),
 				})),
 			}),
 		})
@@ -395,19 +391,18 @@ func TestOrganizationRoleCheck(t *testing.T) {
 		}
 	})
 
-	// The translator is structurally agnostic: any `discriminator` value
-	// passes through to the wire format as a `__type` rename. Pulumi Cloud is
-	// the source of truth for which descriptor variants exist; the provider
-	// does not gate them. This test documents that contract — Check accepts
-	// a discriminator value the provider has no special knowledge of, and
-	// the role's validity is the API's call at apply time.
-	t.Run("accepts arbitrary discriminator values (no provider-side allowlist)", func(t *testing.T) {
+	// Pulumi Cloud is the source of truth for which descriptor variants
+	// exist; the provider does not gate them. This test documents that
+	// contract — Check accepts a `__type` value the provider has no
+	// special knowledge of, and the role's validity is the API's call at
+	// apply time.
+	t.Run("accepts arbitrary __type values (no provider-side allowlist)", func(t *testing.T) {
 		resp, err := r.Check(context.Background(), infer.CheckRequest{
 			NewInputs: property.NewMap(map[string]property.Value{
 				"organizationName": property.New("acme"),
 				"name":             property.New("r"),
 				"permissions": property.New(property.NewMap(map[string]property.Value{
-					"discriminator": property.New("PermissionDescriptorWhateverFutureCloudVariant"),
+					"__type": property.New("PermissionDescriptorWhateverFutureCloudVariant"),
 				})),
 			}),
 		})
@@ -418,18 +413,15 @@ func TestOrganizationRoleCheck(t *testing.T) {
 		}
 	})
 
-	// Pulumi's Python SDK silently strips `__`-prefixed keys from inputs
-	// (pulumi/pulumi#22738). A user pasting raw wire format from the REST
-	// API docs would see their `__type` discriminator disappear at the
-	// language boundary. Check rejects `__type` keys with a clear pointer
-	// to the right field, before the malformed body reaches the API.
-	t.Run("rejects __type at the SDK boundary", func(t *testing.T) {
+	// A descriptor missing the top-level `__type` discriminator is rejected
+	// at preview rather than reaching the API. The error names the missing
+	// field so the user knows what to fix.
+	t.Run("rejects descriptor missing __type", func(t *testing.T) {
 		resp, err := r.Check(context.Background(), infer.CheckRequest{
 			NewInputs: property.NewMap(map[string]property.Value{
 				"organizationName": property.New("acme"),
 				"name":             property.New("r"),
 				"permissions": property.New(property.NewMap(map[string]property.Value{
-					"__type": property.New("PermissionDescriptorAllow"),
 					"permissions": property.New(property.NewArray([]property.Value{
 						property.New("stack:read"),
 					})),
@@ -442,8 +434,6 @@ func TestOrganizationRoleCheck(t *testing.T) {
 			props[f.Property] = f.Reason
 		}
 		assert.Contains(t, props["permissions"], "__type",
-			"Check must name `__type` so the user knows what to fix")
-		assert.Contains(t, props["permissions"], "discriminator",
-			"Check must point the user at the correct field name")
+			"Check must name the missing `__type` field so the user knows what to fix")
 	})
 }

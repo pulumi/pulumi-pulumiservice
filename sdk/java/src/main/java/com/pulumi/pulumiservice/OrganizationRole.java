@@ -67,34 +67,38 @@ public class OrganizationRole extends com.pulumi.resources.CustomResource {
         return this.organizationName;
     }
     /**
-     * The role&#39;s permission descriptor tree, expressed in the Pulumi Cloud wire grammar. The provider exposes the descriptor as `map[string]Any` and only renames the top-level discriminator key: `discriminator` at the SDK boundary is promoted to the wire&#39;s `__type` on Create/Update and back on Read. Nested levels are opaque to the provider — they carry the wire-format `__type` directly and pass through unchanged.
+     * The role&#39;s permission descriptor tree, expressed in the Pulumi Cloud wire grammar. The provider exposes the descriptor as `map[string]Any` and passes it through verbatim — the wire-format `__type` discriminator is used at every level (SDK and API alike).
      * 
-     * Common top-level descriptors (note `discriminator` at the top, `__type` everywhere below):
-     * - `PermissionDescriptorAllow` — `{discriminator: &#34;PermissionDescriptorAllow&#34;, permissions: [&#34;&lt;scope&gt;&#34;, ...]}` grants the listed scopes.
-     * - `PermissionDescriptorGroup` — `{discriminator: &#34;PermissionDescriptorGroup&#34;, entries: [{__type: &#34;PermissionDescriptorAllow&#34;, ...}, ...]}` composes multiple descriptors; the role grants the union of every entry.
-     * - `PermissionDescriptorCondition` — `{discriminator: &#34;PermissionDescriptorCondition&#34;, condition: {__type: ...}, subNode: {__type: ...}}` gates a sub-descriptor on a boolean expression.
-     * - `PermissionDescriptorCompose` — references other roles by ID; `{discriminator: &#34;PermissionDescriptorCompose&#34;, permissionDescriptors: [&lt;roleId&gt;, ...]}`.
+     * Common top-level descriptors:
+     * - `PermissionDescriptorAllow` — `{__type: &#34;PermissionDescriptorAllow&#34;, permissions: [&#34;&lt;scope&gt;&#34;, ...]}` grants the listed scopes.
+     * - `PermissionDescriptorGroup` — `{__type: &#34;PermissionDescriptorGroup&#34;, entries: [{__type: &#34;PermissionDescriptorAllow&#34;, ...}, ...]}` composes multiple descriptors; the role grants the union of every entry.
+     * - `PermissionDescriptorCondition` — `{__type: &#34;PermissionDescriptorCondition&#34;, condition: {__type: ...}, subNode: {__type: ...}}` gates a sub-descriptor on a boolean expression.
+     * - `PermissionDescriptorCompose` — references other roles by ID; `{__type: &#34;PermissionDescriptorCompose&#34;, permissionDescriptors: [&lt;roleId&gt;, ...]}`.
      * 
      * Pulumi Cloud&#39;s REST API also accepts `PermissionDescriptorIfThenElse`, `PermissionDescriptorSelect`, and the `PermissionExpression*` / `PermissionLiteralExpression*` boolean operators (And, Or, Not, Equal, Environment, Stack, Team, InsightsAccount, …); the provider does not inspect anything below the top, so future Cloud additions work without a provider release.
      * 
-     * For the common case of granting a set of scopes on one entity, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the corresponding `PermissionDescriptorCondition(Equal(...), Allow)` tree for you. To grant a role to a team, use the `TeamRoleAssignment` resource — roles are *associated with* teams, not gated on them via a permission descriptor.
+     * For the common case of granting a set of scopes on one entity, prefer the `buildAllowPermissions`, `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the descriptor tree for you. To grant a role to a team, use the `TeamRoleAssignment` resource — roles are *associated with* teams, not gated on them via a permission descriptor.
+     * 
+     * Note: the `__type` field name uses Pulumi&#39;s `__`-prefixed-key passthrough (pulumi/pulumi#22834, available in pulumi 3.235.0+). Earlier pulumi runtimes will drop these keys at the SDK boundary; the Python SDK pins the minimum runtime version automatically.
      * 
      */
     @Export(name="permissions", refs={Map.class,String.class,Object.class}, tree="[0,1,2]")
     private Output<Map<String,Object>> permissions;
 
     /**
-     * @return The role&#39;s permission descriptor tree, expressed in the Pulumi Cloud wire grammar. The provider exposes the descriptor as `map[string]Any` and only renames the top-level discriminator key: `discriminator` at the SDK boundary is promoted to the wire&#39;s `__type` on Create/Update and back on Read. Nested levels are opaque to the provider — they carry the wire-format `__type` directly and pass through unchanged.
+     * @return The role&#39;s permission descriptor tree, expressed in the Pulumi Cloud wire grammar. The provider exposes the descriptor as `map[string]Any` and passes it through verbatim — the wire-format `__type` discriminator is used at every level (SDK and API alike).
      * 
-     * Common top-level descriptors (note `discriminator` at the top, `__type` everywhere below):
-     * - `PermissionDescriptorAllow` — `{discriminator: &#34;PermissionDescriptorAllow&#34;, permissions: [&#34;&lt;scope&gt;&#34;, ...]}` grants the listed scopes.
-     * - `PermissionDescriptorGroup` — `{discriminator: &#34;PermissionDescriptorGroup&#34;, entries: [{__type: &#34;PermissionDescriptorAllow&#34;, ...}, ...]}` composes multiple descriptors; the role grants the union of every entry.
-     * - `PermissionDescriptorCondition` — `{discriminator: &#34;PermissionDescriptorCondition&#34;, condition: {__type: ...}, subNode: {__type: ...}}` gates a sub-descriptor on a boolean expression.
-     * - `PermissionDescriptorCompose` — references other roles by ID; `{discriminator: &#34;PermissionDescriptorCompose&#34;, permissionDescriptors: [&lt;roleId&gt;, ...]}`.
+     * Common top-level descriptors:
+     * - `PermissionDescriptorAllow` — `{__type: &#34;PermissionDescriptorAllow&#34;, permissions: [&#34;&lt;scope&gt;&#34;, ...]}` grants the listed scopes.
+     * - `PermissionDescriptorGroup` — `{__type: &#34;PermissionDescriptorGroup&#34;, entries: [{__type: &#34;PermissionDescriptorAllow&#34;, ...}, ...]}` composes multiple descriptors; the role grants the union of every entry.
+     * - `PermissionDescriptorCondition` — `{__type: &#34;PermissionDescriptorCondition&#34;, condition: {__type: ...}, subNode: {__type: ...}}` gates a sub-descriptor on a boolean expression.
+     * - `PermissionDescriptorCompose` — references other roles by ID; `{__type: &#34;PermissionDescriptorCompose&#34;, permissionDescriptors: [&lt;roleId&gt;, ...]}`.
      * 
      * Pulumi Cloud&#39;s REST API also accepts `PermissionDescriptorIfThenElse`, `PermissionDescriptorSelect`, and the `PermissionExpression*` / `PermissionLiteralExpression*` boolean operators (And, Or, Not, Equal, Environment, Stack, Team, InsightsAccount, …); the provider does not inspect anything below the top, so future Cloud additions work without a provider release.
      * 
-     * For the common case of granting a set of scopes on one entity, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the corresponding `PermissionDescriptorCondition(Equal(...), Allow)` tree for you. To grant a role to a team, use the `TeamRoleAssignment` resource — roles are *associated with* teams, not gated on them via a permission descriptor.
+     * For the common case of granting a set of scopes on one entity, prefer the `buildAllowPermissions`, `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the descriptor tree for you. To grant a role to a team, use the `TeamRoleAssignment` resource — roles are *associated with* teams, not gated on them via a permission descriptor.
+     * 
+     * Note: the `__type` field name uses Pulumi&#39;s `__`-prefixed-key passthrough (pulumi/pulumi#22834, available in pulumi 3.235.0+). Earlier pulumi runtimes will drop these keys at the SDK boundary; the Python SDK pins the minimum runtime version automatically.
      * 
      */
     public Output<Map<String,Object>> permissions() {

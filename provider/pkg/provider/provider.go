@@ -153,7 +153,12 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 			"python": map[string]any{
 				"packageName": "pulumi_pulumiservice",
 				"requires": map[string]any{
-					"pulumi": ">=3.0.0,<4.0.0",
+					// 3.235.0 is the first runtime that preserves
+					// `__`-prefixed input keys (pulumi/pulumi#22834),
+					// which OrganizationRole.permissions relies on for
+					// the `__type` discriminator at every level of the
+					// descriptor tree.
+					"pulumi": ">=3.235.0,<4.0.0",
 				},
 				"pyproject": map[string]any{
 					"enabled": true,

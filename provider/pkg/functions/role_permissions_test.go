@@ -26,48 +26,38 @@ import (
 
 // assertScopedConditionShape verifies a helper's output is the
 // `PermissionDescriptorCondition(Equal(Expression<E>, Literal<E>(id)),
-// Allow(perms))` shape. The provider treats `permissions` as
-// `map[string]Any` and only renames the top-level discriminator, so the
-// helper must emit:
-//
-//   - `discriminator` at the top (the SDK boundary the provider promotes
-//     to the wire's `__type`).
-//   - `__type` at every nested level (passed through verbatim to Pulumi
-//     Cloud, which expects `__type` everywhere on the wire).
+// Allow(perms))` shape. The wire format and SDK boundary share the
+// `__type` discriminator at every level (Pulumi's Python SDK preserves
+// `__`-prefixed keys as of pulumi/pulumi#22834).
 func assertScopedConditionShape(
 	t *testing.T,
 	got map[string]interface{},
-	expectedExpressionDiscriminator string,
-	expectedLiteralDiscriminator string,
+	expectedExpressionType string,
+	expectedLiteralType string,
 	expectedIdentity string,
 	expectedPermissions []string,
 ) {
 	t.Helper()
 
-	assert.Equal(t, "PermissionDescriptorCondition", got["discriminator"],
-		"top-level discriminator must be PermissionDescriptorCondition")
-	_, hasUnderscoreAtTop := got["__type"]
-	assert.False(t, hasUnderscoreAtTop,
-		"output must use `discriminator` at every level — Python's SDK strips "+
-			"`__`-prefixed keys from inputs (pulumi/pulumi#22738)")
+	assert.Equal(t, "PermissionDescriptorCondition", got["__type"],
+		"top-level __type must be PermissionDescriptorCondition")
 
 	cond, ok := got["condition"].(map[string]interface{})
 	require.True(t, ok, "condition must be a map; got %T", got["condition"])
-	assert.Equal(t, "PermissionExpressionEqual", cond["discriminator"],
-		"nested condition must also use `discriminator` (recursive rename)")
+	assert.Equal(t, "PermissionExpressionEqual", cond["__type"])
 
 	left, ok := cond["left"].(map[string]interface{})
 	require.True(t, ok, "condition.left must be a map; got %T", cond["left"])
-	assert.Equal(t, expectedExpressionDiscriminator, left["discriminator"])
+	assert.Equal(t, expectedExpressionType, left["__type"])
 
 	right, ok := cond["right"].(map[string]interface{})
 	require.True(t, ok, "condition.right must be a map; got %T", cond["right"])
-	assert.Equal(t, expectedLiteralDiscriminator, right["discriminator"])
+	assert.Equal(t, expectedLiteralType, right["__type"])
 	assert.Equal(t, expectedIdentity, right["identity"])
 
 	sub, ok := got["subNode"].(map[string]interface{})
 	require.True(t, ok, "subNode must be a map; got %T", got["subNode"])
-	assert.Equal(t, "PermissionDescriptorAllow", sub["discriminator"])
+	assert.Equal(t, "PermissionDescriptorAllow", sub["__type"])
 
 	rawPerms, ok := sub["permissions"].([]interface{})
 	require.True(t, ok, "subNode.permissions must be a list; got %T", sub["permissions"])
@@ -93,12 +83,7 @@ func TestBuildAllowPermissions(t *testing.T) {
 		)
 		require.NoError(t, err)
 		got := resp.Output.Permissions
-		// Top uses the SDK boundary's `discriminator` — the provider's
-		// translator promotes it to `__type` on Create/Update.
-		assert.Equal(t, "PermissionDescriptorAllow", got["discriminator"])
-		_, hasUnderscore := got["__type"]
-		assert.False(t, hasUnderscore,
-			"helper output must use `discriminator`, not the wire-format `__type`")
+		assert.Equal(t, "PermissionDescriptorAllow", got["__type"])
 		// Permissions list passes through verbatim.
 		perms, ok := got["permissions"].([]interface{})
 		require.True(t, ok)

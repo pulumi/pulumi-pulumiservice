@@ -23,7 +23,7 @@ resources:
   # A custom organization-level role that grants stack read access. Built
   # via `buildAllowPermissions`, which returns a flat
   # `PermissionDescriptorAllow` ready to assign — no need to spell out
-  # the descriptor's discriminator field by hand.
+  # the descriptor's `__type` field by hand.
   readOnlyRole:
     type: pulumiservice:OrganizationRole
     properties:

@@ -63,19 +63,21 @@ team_members = current_user.username.apply(
 )
 
 # 3. Custom org role that grants stack:read. The simplest descriptor: a
-#    flat ``PermissionDescriptorAllow``. The provider only renames the
-#    top-level discriminator key — ``discriminator`` at the SDK boundary
-#    is promoted to the wire's ``__type``. Nested levels (when present)
-#    use ``__type`` directly. ``discriminator`` is used at the SDK
-#    boundary instead of ``__type`` because Python's SDK strips
-#    ``__``-prefixed input keys (pulumi/pulumi#22738).
+#    flat ``PermissionDescriptorAllow``. The descriptor uses the wire
+#    format's ``__type`` discriminator at every level — Pulumi's Python
+#    SDK preserves ``__``-prefixed keys as of pulumi/pulumi#22834
+#    (3.235.0+), so authoring this map in Python works identically to
+#    the other languages.
+#
+#    For the common case, prefer the ``build_*_permissions_output``
+#    helpers — see ``scoped_role`` below.
 custom_role = OrganizationRole(
     "rbacRole",
     organization_name=organization_name,
     name=f"py-rbac-read-only-{digits}",
     description="Read-only access to stacks, created by the py-rbac example.",
     permissions={
-        "discriminator": "PermissionDescriptorAllow",
+        "__type": "PermissionDescriptorAllow",
         "permissions": ["stack:read"],
     },
 )
@@ -132,10 +134,8 @@ scoped_env = Environment(
 #    env created above. Anywhere else in the org the role grants nothing.
 #    The role definition is org-scoped (resourceType defaults to "global");
 #    the helper returns a ``PermissionDescriptorCondition(Equal(...),
-#    Allow)`` tree shaped to match the provider's contract:
-#    ``discriminator`` at the top, ``__type`` at every nested level. The
-#    provider promotes the top to the wire's ``__type`` and forwards the
-#    interior to Pulumi Cloud verbatim.
+#    Allow)`` tree using the wire format's ``__type`` discriminator at
+#    every level, ready to assign.
 scoped_role = OrganizationRole(
     "scopedReadOnlyRole",
     organization_name=organization_name,

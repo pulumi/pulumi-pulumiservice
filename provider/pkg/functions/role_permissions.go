@@ -50,53 +50,22 @@ func validateRbacPermissions(permissions []string) error {
 }
 
 // descriptorToSDKMap marshals a typed apitype.PermissionDescriptor to the
-// SDK-boundary map shape the provider expects on `OrganizationRole.permissions`.
-// The typed Marshaler emits the wire format (`__type` discriminator at every
-// level); a recursive rename turns it into `discriminator` everywhere — the
-// only form Pulumi's Python SDK preserves through resource inputs (see
-// pulumi/pulumi#22738; the strip applies at every nesting level, not just
-// the top, so non-`__` keys are required throughout).
+// SDK-boundary map shape the provider expects on
+// `OrganizationRole.permissions`. The typed Marshaler emits the wire format
+// directly (`__type` discriminator at every level), which is exactly what
+// the SDK boundary now uses — the Python SDK preserves `__`-prefixed keys
+// across resource inputs as of pulumi/pulumi#22834 (3.235.0+, pinned via
+// the Python SDK's runtime requirement), so no rename is needed.
 func descriptorToSDKMap(descriptor apitype.PermissionDescriptor) (map[string]any, error) {
 	raw, err := json.Marshal(descriptor)
 	if err != nil {
 		return nil, fmt.Errorf("marshalling typed descriptor: %w", err)
 	}
-	var wire map[string]any
-	if err := json.Unmarshal(raw, &wire); err != nil {
-		return nil, fmt.Errorf("decoding wire JSON: %w", err)
-	}
-	out, ok := renameKey(wire, "__type", "discriminator").(map[string]any)
-	if !ok {
-		return nil, fmt.Errorf("expected object after rename, got %T", out)
+	var out map[string]any
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("decoding descriptor JSON: %w", err)
 	}
 	return out, nil
-}
-
-// renameKey recursively walks a JSON-ish tree and returns a deep copy with
-// every occurrence of the `from` key on a map node replaced by `to`. Other
-// keys, values, and nesting are preserved verbatim. Pure helper — duplicates
-// the resource-package equivalent rather than adding a cross-package import.
-func renameKey(v any, from, to string) any {
-	switch x := v.(type) {
-	case map[string]any:
-		out := make(map[string]any, len(x))
-		for k, val := range x {
-			outKey := k
-			if k == from {
-				outKey = to
-			}
-			out[outKey] = renameKey(val, from, to)
-		}
-		return out
-	case []any:
-		out := make([]any, len(x))
-		for i, item := range x {
-			out[i] = renameKey(item, from, to)
-		}
-		return out
-	default:
-		return v
-	}
 }
 
 // rbacPermissionSlice converts a []string of scope names to the typed
@@ -114,7 +83,7 @@ func rbacPermissionSlice(scopes []string) apitype.RbacPermissionSlice {
 // (Environment, Stack, InsightsAccount) supplies its own typed
 // expression/literal pair; this routine assembles the typed
 // `PermissionDescriptorCondition` via the apitype builders, then converts
-// it to the SDK boundary's `discriminator` shape.
+// it to the SDK boundary's `__type`-discriminated map.
 //
 // Note: there is intentionally no "team" scoping helper. Roles are
 // *associated with* teams via the TeamRoleAssignment resource, not gated
@@ -163,11 +132,11 @@ func (BuildAllowPermissionsFunction) Annotate(a infer.Annotator) {
 			"supplied scopes globally — i.e. on every entity of the matching "+
 			"resource type. This is the simplest descriptor: a flat "+
 			"`PermissionDescriptorAllow`. Use this helper instead of hand-"+
-			"authoring the descriptor literal so the SDK boundary's "+
-			"discriminator field name stays an implementation detail. For "+
-			"grants scoped to a specific entity, see "+
-			"`buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, "+
-			"or `buildInsightsAccountScopedPermissions`. "+
+			"authoring the descriptor literal so the wire-format `__type` "+
+			"discriminator stays an implementation detail. For grants scoped "+
+			"to a specific entity, see `buildEnvironmentScopedPermissions`, "+
+			"`buildStackScopedPermissions`, or "+
+			"`buildInsightsAccountScopedPermissions`. "+
 			scopedPermissionsHelpDoc,
 	)
 	a.SetToken("index", "buildAllowPermissions")

@@ -75,22 +75,19 @@ func (c *OrganizationRoleCore) Annotate(a infer.Annotator) {
 		&c.Permissions,
 		"The role's permission descriptor tree, expressed in the Pulumi Cloud "+
 			"wire grammar. The provider exposes the descriptor as `map[string]Any` "+
-			"and only renames the top-level discriminator key: `discriminator` at "+
-			"the SDK boundary is promoted to the wire's `__type` on Create/Update "+
-			"and back on Read. Nested levels are opaque to the provider — they "+
-			"carry the wire-format `__type` directly and pass through unchanged.\n\n"+
-			"Common top-level descriptors (note `discriminator` at the top, "+
-			"`__type` everywhere below):\n"+
-			"- `PermissionDescriptorAllow` — `{discriminator: \"PermissionDescriptorAllow\", "+
+			"and passes it through verbatim — the wire-format `__type` "+
+			"discriminator is used at every level (SDK and API alike).\n\n"+
+			"Common top-level descriptors:\n"+
+			"- `PermissionDescriptorAllow` — `{__type: \"PermissionDescriptorAllow\", "+
 			"permissions: [\"<scope>\", ...]}` grants the listed scopes.\n"+
-			"- `PermissionDescriptorGroup` — `{discriminator: \"PermissionDescriptorGroup\", "+
+			"- `PermissionDescriptorGroup` — `{__type: \"PermissionDescriptorGroup\", "+
 			"entries: [{__type: \"PermissionDescriptorAllow\", ...}, ...]}` composes "+
 			"multiple descriptors; the role grants the union of every entry.\n"+
-			"- `PermissionDescriptorCondition` — `{discriminator: "+
+			"- `PermissionDescriptorCondition` — `{__type: "+
 			"\"PermissionDescriptorCondition\", condition: {__type: ...}, subNode: "+
 			"{__type: ...}}` gates a sub-descriptor on a boolean expression.\n"+
 			"- `PermissionDescriptorCompose` — references other roles by ID; "+
-			"`{discriminator: \"PermissionDescriptorCompose\", permissionDescriptors: "+
+			"`{__type: \"PermissionDescriptorCompose\", permissionDescriptors: "+
 			"[<roleId>, ...]}`.\n\n"+
 			"Pulumi Cloud's REST API also accepts `PermissionDescriptorIfThenElse`, "+
 			"`PermissionDescriptorSelect`, and the `PermissionExpression*` / "+
@@ -99,12 +96,15 @@ func (c *OrganizationRoleCore) Annotate(a infer.Annotator) {
 			"inspect anything below the top, so future Cloud additions work without "+
 			"a provider release.\n\n"+
 			"For the common case of granting a set of scopes on one entity, prefer "+
-			"the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, "+
-			"and `buildInsightsAccountScopedPermissions` helpers, which build the "+
-			"corresponding `PermissionDescriptorCondition(Equal(...), Allow)` tree "+
-			"for you. To grant a role to a team, use the `TeamRoleAssignment` "+
-			"resource — roles are *associated with* teams, not gated on them via a "+
-			"permission descriptor.",
+			"the `buildAllowPermissions`, `buildEnvironmentScopedPermissions`, "+
+			"`buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` "+
+			"helpers, which build the descriptor tree for you. To grant a role to a "+
+			"team, use the `TeamRoleAssignment` resource — roles are *associated "+
+			"with* teams, not gated on them via a permission descriptor.\n\n"+
+			"Note: the `__type` field name uses Pulumi's `__`-prefixed-key passthrough "+
+			"(pulumi/pulumi#22834, available in pulumi 3.235.0+). Earlier pulumi "+
+			"runtimes will drop these keys at the SDK boundary; the Python SDK pins "+
+			"the minimum runtime version automatically.",
 	)
 }
 
@@ -146,7 +146,7 @@ func (*OrganizationRole) Check(
 				Property: "permissions",
 				Reason:   "permissions must not be empty — supply a PermissionDescriptor tree",
 			})
-		} else if _, err := permissionsToWire(in.Permissions); err != nil {
+		} else if err := validatePermissions(in.Permissions); err != nil {
 			// Validate the descriptor tree up front so users see a
 			// clear error at preview, not a 400 from the API at apply.
 			failures = append(failures, p.CheckFailure{
@@ -372,10 +372,10 @@ func orgRoleCoreFromAPI(
 		core.ResourceType = util.OrNil(role.ResourceType)
 	}
 	if role.Details != nil {
-		// Round-trip the typed Details through JSON to recover the wire-shape
-		// map that permissionsFromWire expects. The marshal call dispatches
-		// through the typed descriptor's MarshalJSON, which emits the
-		// __type-discriminated wire form.
+		// Round-trip the typed Details through JSON to recover the
+		// `__type`-discriminated map shape the SDK exposes. The marshal call
+		// dispatches through the typed descriptor's MarshalJSON, which emits
+		// `__type` natively.
 		raw, err := json.Marshal(role.Details)
 		if err != nil {
 			return OrganizationRoleCore{}, fmt.Errorf(
@@ -387,8 +387,8 @@ func orgRoleCoreFromAPI(
 		}
 		// Pass the user's prior input shape so the translator can decide
 		// whether to collapse the API-boundary single-entry-Group-of-Condition
-		// wrap. See permissionsFromWire's docstring for the gating rule.
-		parsed, err := permissionsFromWire(wire, prior.Permissions)
+		// wrap. See permissionsFromAPI's docstring for the gating rule.
+		parsed, err := permissionsFromAPI(wire, prior.Permissions)
 		if err != nil {
 			return OrganizationRoleCore{}, fmt.Errorf("translating role details for %q: %w", role.ID, err)
 		}
@@ -410,15 +410,16 @@ func orgRoleStateFromAPI(
 	}
 }
 
-// buildPermissionDescriptorForAPI converts a user-facing kind-shape permissions
-// map into the typed apitype.PermissionDescriptor tree expected by the
-// generated SDK. The translation runs the existing kind→__type rename plus
-// the top-level Condition→Group wrap, then hands the JSON off to the
-// generated UnmarshalJSONPermissionDescriptor for discriminator dispatch.
+// buildPermissionDescriptorForAPI converts a user-facing `__type`-shape
+// permissions map into the typed apitype.PermissionDescriptor tree
+// expected by the generated SDK. It applies the top-level
+// Condition→Group(Condition) wrap (Cloud UI workaround) and then hands
+// the JSON off to the generated UnmarshalJSONPermissionDescriptor for
+// discriminator dispatch.
 func buildPermissionDescriptorForAPI(
 	permissions map[string]interface{},
 ) (apitype.PermissionDescriptor, error) {
-	wire, err := permissionsToWireForAPI(permissions)
+	wire, err := permissionsForAPI(permissions)
 	if err != nil {
 		return nil, err
 	}

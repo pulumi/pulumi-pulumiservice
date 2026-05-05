@@ -1,3 +1,3 @@
 name: yaml-rbac-import-target
 runtime: yaml
-description: Empty fixture used by TestYamlRbacComposeImport as the destination of `pulumi import`. The test creates a PermissionDescriptorCompose role out-of-band, then imports it here to verify the translator yields the expected `kind` shape.
+description: Empty fixture used by TestYamlRbacComposeImport as the destination of `pulumi import`. The test creates a PermissionDescriptorCompose role out-of-band, then imports it here to verify the imported program carries the wire-format `__type` discriminator.

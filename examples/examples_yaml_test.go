@@ -577,14 +577,14 @@ func TestYamlRbacExample(t *testing.T) {
 	test.Destroy(t)
 }
 
-// TestYamlRbacComposeImport pins the Webflow regression at the engine
-// level: a Pulumi Cloud role authored with `PermissionDescriptorCompose`
-// (the wire-format variant the previous structural translator rejected
-// with "unknown __type") must now import cleanly into PSP. The unit-level
-// proof lives in TestImportRepro_Compose; this test exercises the full
+// TestYamlRbacComposeImport pins a regression at the engine level: a
+// Pulumi Cloud role authored with `PermissionDescriptorCompose` (the
+// wire-format variant a previous structural translator rejected with
+// "unknown __type") must import cleanly into PSP. The unit-level proof
+// lives in TestImportRepro_Compose; this test exercises the full
 // pipeline — Cloud has the role, `pulumi import` calls the resource's
-// Read, the translator renames `__type` → `kind`, the engine generates
-// well-formed program code.
+// Read, and the engine generates well-formed program code carrying the
+// `__type` discriminator unchanged.
 //
 // Cloud requires a `uxPurpose:"role"` entry to reference `uxPurpose:"policy"`
 // entries via Compose's `permissionDescriptors`; role-references-role is
@@ -608,8 +608,7 @@ func TestYamlRbacExample(t *testing.T) {
 //     stack.
 //  5. Assert: import succeeded (return code 0; previously failed with
 //     "unknown __type PermissionDescriptorCompose"); generated program
-//     carries `discriminator: PermissionDescriptorCompose` and the policy id; no
-//     `__type` leakage anywhere.
+//     carries `__type: PermissionDescriptorCompose` and the policy id.
 //
 // Cleanup, in registration order (LIFO):
 //
@@ -699,24 +698,22 @@ func TestYamlRbacComposeImport(t *testing.T) {
 		"--out", outFile,
 	)
 	require.Zero(t, importResult.ReturnCode,
-		"pulumi import must succeed; the blind-rename translator removed the prior unknown-__type error.\n"+
-			"stdout:\n%s\nstderr:\n%s", importResult.Stdout, importResult.Stderr)
+		"pulumi import must succeed.\nstdout:\n%s\nstderr:\n%s",
+		importResult.Stdout, importResult.Stderr)
 
-	// Step 5: assert the generated YAML carries the Compose descriptor in
-	// its SDK shape (kind, not __type). Substring checks tolerate quoting
-	// variations in the codegen output.
+	// Step 5: assert the generated YAML carries the Compose descriptor
+	// using the wire-format `__type` discriminator. Substring checks
+	// tolerate quoting variations in the codegen output.
 	contents, err := os.ReadFile(outFile)
 	require.NoError(t, err, "must be able to read the import --out file")
 	imported := string(contents)
 
 	assert.Contains(t, imported, "PermissionDescriptorCompose",
-		"imported program must carry the Compose discriminator value through the rename")
-	assert.Contains(t, imported, "discriminator:",
-		"imported program must use the SDK-shape `discriminator` key")
+		"imported program must carry the Compose descriptor value")
+	assert.Contains(t, imported, "__type:",
+		"imported program must use the wire-format `__type` discriminator")
 	assert.Contains(t, imported, policy.ID,
 		"imported program must reference the policy id inside permissionDescriptors")
-	assert.NotContains(t, imported, "__type",
-		"imported program must not leak the wire-format `__type` discriminator anywhere")
 
 	// Step 6: drift check. The import populated state from Read; if the
 	// imported program (which the Read codegen produced) deploys cleanly
@@ -724,9 +721,8 @@ func TestYamlRbacComposeImport(t *testing.T) {
 	// the imported `resources:` block to the target stack's existing
 	// Pulumi.yaml (keeping the project's `name`/`runtime`/`description`
 	// header intact) and run `pulumi preview` — any `~` on `permissions`
-	// would mean Read's recursive `__type` → `discriminator` rename or
-	// the Group(Condition) wrap/unwrap heuristic disagrees with Create's
-	// inverse transform.
+	// would mean the Group(Condition) wrap/unwrap heuristic disagrees
+	// with Create's inverse transform.
 	pulumiYamlPath := filepath.Join(importTarget.CurrentStack().Workspace().WorkDir(), "Pulumi.yaml")
 	existingProject, err := os.ReadFile(pulumiYamlPath)
 	require.NoError(t, err, "must be able to read the target stack's Pulumi.yaml")

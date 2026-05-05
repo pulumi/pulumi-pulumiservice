@@ -45,7 +45,6 @@ func getOrgName() string {
 	return "service-provider-test-org"
 }
 
-
 // snapshotFixtureOrgMember reads the user's current role from the org and
 // returns a closure that restores it. Pass the closure to t.Cleanup so the
 // shared test org returns to its pre-test state regardless of how the test

@@ -7,18 +7,21 @@ const targetUsername = config.require("targetUsername");
 const nameSuffix = config.get("nameSuffix") ?? "manual";
 
 // A custom organization-level role that grants stack read access. The
-// simplest descriptor: a flat `PermissionDescriptorAllow`. The SDK uses
-// the same PascalCase descriptor values as Pulumi Cloud's REST API; the
-// wire format's `__type` field is exposed as `discriminator` at the SDK
-// boundary so the field doesn't collide with future Cloud models that
-// may carry a domain `kind` field, and so the `__`-prefix doesn't get
-// stripped by Python's input-key sanitiser.
+// simplest descriptor: a flat `PermissionDescriptorAllow`. The SDK
+// exposes the descriptor as a free-form map and uses the wire format's
+// `__type` field directly at every level — Pulumi's Python SDK preserves
+// `__`-prefixed keys as of pulumi/pulumi#22834 (3.235.0+).
+//
+// For the common case of "grant these scopes" use the
+// `buildAllowPermissions` / `buildEnvironmentScopedPermissions` /
+// `buildStackScopedPermissions` / `buildInsightsAccountScopedPermissions`
+// helpers — see `scopedReadOnlyRole` below.
 const readOnlyRole = new service.OrganizationRole("readOnlyRole", {
     organizationName,
     name: `ts-rbac-read-only-${nameSuffix}`,
     description: "Read-only access to stacks, created by the ts-rbac example.",
     permissions: {
-        discriminator: "PermissionDescriptorAllow",
+        __type: "PermissionDescriptorAllow",
         permissions: ["stack:read"],
     },
 });
@@ -73,10 +76,8 @@ const scopedEnv = new service.Environment("scopedEnv", {
 // "global"); the permission tree is gated on the environment's UUID.
 //
 // `buildEnvironmentScopedPermissions` returns a
-// `PermissionDescriptorCondition(Equal(...), Allow)` tree shaped to match
-// the provider's contract: `discriminator` at the top (the SDK boundary
-// the provider promotes to the wire's `__type`) and `__type` at every
-// nested level (forwarded verbatim to Pulumi Cloud).
+// `PermissionDescriptorCondition(Equal(...), Allow)` tree using the wire
+// format's `__type` discriminator at every level, ready to assign.
 const scopedReadOnlyRole = new service.OrganizationRole("scopedReadOnlyRole", {
     organizationName,
     name: `ts-rbac-scoped-read-only-${nameSuffix}`,

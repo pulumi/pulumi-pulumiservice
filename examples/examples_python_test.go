@@ -96,12 +96,10 @@ func TestPythonRbacExample(t *testing.T) {
 			}
 		},
 		// Re-apply the same program to pin the descriptor round-trip:
-		// helper output (`discriminator` at every level) → wire body
-		// (`__type` after recursive rename) → server-side role record →
-		// Read response → state → next preview must converge to no
-		// changes. Drift in either rename direction, or in the
-		// Group(Condition) wrap/unwrap heuristic, would surface here as
-		// a `~` on `permissions` instead.
+		// helper output (`__type` at every level) → API → role record
+		// → Read response → state → next preview must converge to no
+		// changes. Drift in the Group(Condition) wrap/unwrap heuristic
+		// would surface here as a `~` on `permissions` instead.
 		EditDirs: []integration.EditDir{
 			{
 				Dir:             rbacDir,
