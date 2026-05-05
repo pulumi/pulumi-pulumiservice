@@ -6,7 +6,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/pgavlin/fx/v2 v2.0.12
 	github.com/pulumi/esc v0.23.0
-	github.com/pulumi/providertest v0.3.1
+	github.com/pulumi/providertest v0.7.0
 	github.com/pulumi/pulumi/pkg/v3 v3.234.0
 	github.com/pulumi/pulumi/sdk/v3 v3.234.0
 	github.com/stretchr/testify v1.11.1
