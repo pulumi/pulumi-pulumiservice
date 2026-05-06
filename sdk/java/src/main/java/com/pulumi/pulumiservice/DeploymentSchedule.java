@@ -49,14 +49,14 @@ public class DeploymentSchedule extends com.pulumi.resources.CustomResource {
         return this.project;
     }
     /**
-     * Which operation to run.
+     * Which command to run.
      * 
      */
     @Export(name="pulumiOperation", refs={PulumiOperation.class}, tree="[0]")
     private Output<PulumiOperation> pulumiOperation;
 
     /**
-     * @return Which operation to run.
+     * @return Which command to run.
      * 
      */
     public Output<PulumiOperation> pulumiOperation() {

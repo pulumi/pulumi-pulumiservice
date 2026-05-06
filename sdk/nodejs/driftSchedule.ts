@@ -97,6 +97,8 @@ export class DriftSchedule extends pulumi.CustomResource {
             resourceInputs["stack"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["organization", "project", "stack"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(DriftSchedule.__pulumiType, name, resourceInputs, opts);
     }
 }

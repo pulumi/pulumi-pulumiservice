@@ -1,435 +1,282 @@
+// Copyright 2026, Pulumi Corporation.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//	http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package resources
 
 import (
 	"context"
 	"fmt"
-	"path"
 	"strings"
 	"time"
 
-	pbempty "google.golang.org/protobuf/types/known/emptypb"
-	"google.golang.org/protobuf/types/known/structpb"
+	p "github.com/pulumi/pulumi-go-provider"
+	"github.com/pulumi/pulumi-go-provider/infer"
 
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
-
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
-type PulumiServiceDeploymentScheduleResource struct {
-	Client pulumiapi.StackScheduleClient
+type PulumiOperation string
+
+const (
+	PulumiOperationUpdate  PulumiOperation = "update"
+	PulumiOperationPreview PulumiOperation = "preview"
+	PulumiOperationRefresh PulumiOperation = "refresh"
+	PulumiOperationDestroy PulumiOperation = "destroy"
+)
+
+func (PulumiOperation) Values() []infer.EnumValue[PulumiOperation] {
+	return []infer.EnumValue[PulumiOperation]{
+		{Name: "update", Value: PulumiOperationUpdate, Description: "Analogous to `pulumi up` command."},
+		{Name: "preview", Value: PulumiOperationPreview, Description: "Analogous to `pulumi preview` command."},
+		{Name: "refresh", Value: PulumiOperationRefresh, Description: "Analogous to `pulumi refresh` command."},
+		{Name: "destroy", Value: PulumiOperationDestroy, Description: "Analogous to `pulumi destroy` command."},
+	}
 }
 
-type PulumiServiceDeploymentScheduleInput struct {
-	Stack           pulumiapi.StackIdentifier
-	ScheduleCron    *string    `pulumi:"scheduleCron"`
-	ScheduleOnce    *time.Time `pulumi:"scheduleOnce"`
-	PulumiOperation string     `pulumi:"pulumiOperation"`
+type DeploymentSchedule struct{}
+
+type (
+	depIn  = DeploymentScheduleInput
+	depOut = DeploymentScheduleState
+)
+
+var (
+	_ infer.CustomCheck[depIn]          = &DeploymentSchedule{}
+	_ infer.CustomCreate[depIn, depOut] = &DeploymentSchedule{}
+	_ infer.CustomUpdate[depIn, depOut] = &DeploymentSchedule{}
+	_ infer.CustomDelete[depOut]        = &DeploymentSchedule{}
+	_ infer.CustomRead[depIn, depOut]   = &DeploymentSchedule{}
+)
+
+func (*DeploymentSchedule) Annotate(a infer.Annotator) {
+	a.Describe(&DeploymentSchedule{}, "A scheduled recurring or single time run of a pulumi command.")
+	a.SetToken("index", "DeploymentSchedule")
 }
 
-type PulumiServiceStackScheduleOutput struct {
-	Stack      pulumiapi.StackIdentifier
+type DeploymentScheduleInput struct {
+	Organization    string          `pulumi:"organization"          provider:"replaceOnChanges"`
+	Project         string          `pulumi:"project"               provider:"replaceOnChanges"`
+	Stack           string          `pulumi:"stack"                 provider:"replaceOnChanges"`
+	ScheduleCron    *string         `pulumi:"scheduleCron,optional"`
+	Timestamp       *string         `pulumi:"timestamp,optional"    provider:"replaceOnChanges"`
+	PulumiOperation PulumiOperation `pulumi:"pulumiOperation"`
+}
+
+func (i *DeploymentScheduleInput) Annotate(a infer.Annotator) {
+	a.Describe(&i.Organization, "Organization name.")
+	a.Describe(&i.Project, "Project name.")
+	a.Describe(&i.Stack, "Stack name.")
+	a.Describe(
+		&i.ScheduleCron,
+		"Cron expression for recurring scheduled runs. If you are supplying this, do not supply timestamp.",
+	)
+	a.Describe(
+		&i.Timestamp,
+		"The time at which the schedule should run, in ISO 8601 format. "+
+			"Eg: 2020-01-01T00:00:00Z. If you are supplying this, do not supply scheduleCron.",
+	)
+	a.Describe(&i.PulumiOperation, "Which command to run.")
+}
+
+type DeploymentScheduleState struct {
+	DeploymentScheduleInput
 	ScheduleID string `pulumi:"scheduleId"`
 }
 
-func StackToPropertyMap(stack pulumiapi.StackIdentifier) resource.PropertyMap {
-	propertyMap := resource.PropertyMap{}
-	propertyMap["organization"] = resource.NewPropertyValue(stack.OrgName)
-	propertyMap["project"] = resource.NewPropertyValue(stack.ProjectName)
-	propertyMap["stack"] = resource.NewPropertyValue(stack.StackName)
-	return propertyMap
+func (s *DeploymentScheduleState) Annotate(a infer.Annotator) {
+	a.Describe(&s.ScheduleID, "Schedule ID of the created schedule, assigned by Pulumi Cloud.")
 }
 
-func (i *PulumiServiceDeploymentScheduleInput) ToPropertyMap() resource.PropertyMap {
-	propertyMap := StackToPropertyMap(i.Stack)
-
-	if i.ScheduleCron != nil {
-		propertyMap["scheduleCron"] = resource.NewPropertyValue(i.ScheduleCron)
-	}
-	if i.ScheduleOnce != nil {
-		propertyMap["timestamp"] = resource.NewPropertyValue(i.ScheduleOnce.Format(time.RFC3339))
-	}
-	propertyMap["pulumiOperation"] = resource.NewPropertyValue(i.PulumiOperation)
-
-	return propertyMap
-}
-
-func AddScheduleIDToPropertyMap(scheduleID string, propertyMap resource.PropertyMap) resource.PropertyMap {
-	propertyMap["scheduleId"] = resource.NewPropertyValue(scheduleID)
-	return propertyMap
-}
-
-func ParseStack(inputMap resource.PropertyMap) (*pulumiapi.StackIdentifier, error) {
-	var stack pulumiapi.StackIdentifier
-	if inputMap["organization"].HasValue() && inputMap["organization"].IsString() {
-		organization := inputMap["organization"].StringValue()
-		stack.OrgName = organization
-	} else {
-		return nil, fmt.Errorf("failed to unmarshal organization value from properties: %s", inputMap)
-	}
-	if inputMap["project"].HasValue() && inputMap["project"].IsString() {
-		project := inputMap["project"].StringValue()
-		stack.ProjectName = project
-	} else {
-		return nil, fmt.Errorf("failed to unmarshal project value from properties: %s", inputMap)
-	}
-	if inputMap["stack"].HasValue() && inputMap["stack"].IsString() {
-		stackName := inputMap["stack"].StringValue()
-		stack.StackName = stackName
-	} else {
-		return nil, fmt.Errorf("failed to unmarshal stackName value from properties: %s", inputMap)
-	}
-	return &stack, nil
-}
-
-func ToPulumiServiceDeploymentScheduleInput(
-	properties *structpb.Struct,
-) (*PulumiServiceDeploymentScheduleInput, error) {
-	inputMap, err := plugin.UnmarshalProperties(properties, plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+func (*DeploymentSchedule) Check(
+	ctx context.Context, req infer.CheckRequest,
+) (infer.CheckResponse[DeploymentScheduleInput], error) {
+	i, failures, err := infer.DefaultCheck[DeploymentScheduleInput](ctx, req.NewInputs)
 	if err != nil {
-		return nil, err
+		return infer.CheckResponse[DeploymentScheduleInput]{}, err
 	}
-
-	input := PulumiServiceDeploymentScheduleInput{}
-	stack, err := ParseStack(inputMap)
-	if err != nil {
-		return nil, err
-	}
-	input.Stack = *stack
-
-	if inputMap["pulumiOperation"].HasValue() && inputMap["pulumiOperation"].IsString() {
-		pulumiOperation := inputMap["pulumiOperation"].StringValue()
-		input.PulumiOperation = pulumiOperation
-	} else {
-		return nil, fmt.Errorf("failed to unmarshal pulumiOperation value from properties: %s", inputMap)
-	}
-
-	if inputMap["scheduleCron"].HasValue() && inputMap["scheduleCron"].IsString() {
-		scheduleCron := inputMap["scheduleCron"].StringValue()
-		input.ScheduleCron = &scheduleCron
-	}
-
-	if inputMap["timestamp"].HasValue() && inputMap["timestamp"].IsString() {
-		timestamp, err := time.Parse(time.RFC3339, inputMap["timestamp"].StringValue())
-		if err != nil {
-			return nil, err
-		}
-		input.ScheduleOnce = &timestamp
-	}
-
-	return &input, nil
-}
-
-func ToPulumiServiceStackScheduleOutput(properties *structpb.Struct) (*PulumiServiceStackScheduleOutput, error) {
-	inputMap, err := plugin.UnmarshalProperties(properties, plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
-	stack, err := ParseStack(inputMap)
-	if err != nil {
-		return nil, err
-	}
-
-	output := PulumiServiceStackScheduleOutput{}
-	output.Stack = *stack
-
-	if inputMap["scheduleId"].HasValue() && inputMap["scheduleId"].IsString() {
-		output.ScheduleID = inputMap["scheduleId"].StringValue()
-	}
-
-	return &output, nil
-}
-
-func ScheduleSharedDiff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(
-		req.GetOldInputs(),
-		plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
-
-	return StackScheduleSharedDiffMaps(olds, news)
-}
-
-func StackScheduleSharedDiffMaps(
-	olds resource.PropertyMap,
-	news resource.PropertyMap,
-) (*pulumirpc.DiffResponse, error) {
-	diffs := olds.Diff(news)
-	if diffs == nil {
-		return &pulumirpc.DiffResponse{
-			Changes: pulumirpc.DiffResponse_DIFF_NONE,
-		}, nil
-	}
-
-	dd := plugin.NewDetailedDiffFromObjectDiff(diffs, false)
-
-	detailedDiffs := map[string]*pulumirpc.PropertyDiff{}
-	replaces := []string(nil)
-	replaceProperties := map[string]bool{
-		"organization": true,
-		"project":      true,
-		"stack":        true,
-		"timestamp":    true,
-	}
-	for k, v := range dd {
-		if _, ok := replaceProperties[k]; ok {
-			v.Kind = v.Kind.AsReplace()
-			replaces = append(replaces, k)
-		}
-		detailedDiffs[k] = &pulumirpc.PropertyDiff{
-			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind), //nolint:gosec // safe conversion from plugin.DiffKind
-			InputDiff: v.InputDiff,
-		}
-	}
-
-	changes := pulumirpc.DiffResponse_DIFF_NONE
-	if len(detailedDiffs) > 0 {
-		changes = pulumirpc.DiffResponse_DIFF_SOME
-	}
-	return &pulumirpc.DiffResponse{
-		Changes:             changes,
-		Replaces:            replaces,
-		DetailedDiff:        detailedDiffs,
-		HasDetailedDiff:     true,
-		DeleteBeforeReplace: len(replaces) > 0,
-	}, nil
-}
-
-func (st *PulumiServiceDeploymentScheduleResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	return ScheduleSharedDiff(req)
-}
-
-func StackScheduleSharedDelete(
-	req *pulumirpc.DeleteRequest,
-	client pulumiapi.StackScheduleClient,
-) (*pbempty.Empty, error) {
-	output, err := ToPulumiServiceStackScheduleOutput(req.GetProperties())
-	if err != nil {
-		return nil, err
-	}
-
-	err = client.DeleteStackSchedule(context.Background(), output.Stack, output.ScheduleID)
-	if err != nil {
-		return nil, err
-	}
-	return &pbempty.Empty{}, nil
-}
-
-func (st *PulumiServiceDeploymentScheduleResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	return StackScheduleSharedDelete(req, st.Client)
-}
-
-func (st *PulumiServiceDeploymentScheduleResource) Create(
-	req *pulumirpc.CreateRequest,
-) (*pulumirpc.CreateResponse, error) {
-	input, err := ToPulumiServiceDeploymentScheduleInput(req.GetProperties())
-	if err != nil {
-		return nil, err
-	}
-
-	scheduleReq := pulumiapi.CreateDeploymentScheduleRequest{
-		ScheduleCron: input.ScheduleCron,
-		ScheduleOnce: input.ScheduleOnce,
-		Request: pulumiapi.CreateDeploymentRequest{
-			PulumiOperation: input.PulumiOperation,
-		},
-	}
-	scheduleID, err := st.Client.CreateDeploymentSchedule(context.Background(), input.Stack, scheduleReq)
-	if err != nil {
-		return nil, err
-	}
-
-	outputProperties, err := plugin.MarshalProperties(
-		AddScheduleIDToPropertyMap(*scheduleID, input.ToPropertyMap()),
-		plugin.MarshalOptions{
-			KeepUnknowns: true,
-			SkipNulls:    true,
-		},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.CreateResponse{
-		Id:         path.Join(input.Stack.OrgName, input.Stack.ProjectName, input.Stack.StackName, *scheduleID),
-		Properties: outputProperties,
-	}, nil
-}
-
-func (st *PulumiServiceDeploymentScheduleResource) Check(
-	req *pulumirpc.CheckRequest,
-) (*pulumirpc.CheckResponse, error) {
-	inputMap, err := plugin.UnmarshalProperties(
-		req.GetNews(),
-		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	var failures []*pulumirpc.CheckFailure
-	for _, p := range []resource.PropertyKey{"organization", "project", "stack", "pulumiOperation"} {
-		if !inputMap[(p)].HasValue() {
-			failures = append(failures, &pulumirpc.CheckFailure{
-				Reason:   fmt.Sprintf("missing required property '%s'", p),
-				Property: string(p),
-			})
-		}
-	}
-
-	if (inputMap["scheduleCron"].HasValue() && inputMap["timestamp"].HasValue()) ||
-		(!inputMap["scheduleCron"].HasValue() && !inputMap["timestamp"].HasValue()) {
-		failures = append(failures, &pulumirpc.CheckFailure{
-			Reason:   "One of scheduleCron or timestamp must be specified but not both",
+	hasCron := i.ScheduleCron != nil && *i.ScheduleCron != ""
+	hasTimestamp := i.Timestamp != nil && *i.Timestamp != ""
+	if hasCron == hasTimestamp {
+		failures = append(failures, p.CheckFailure{
 			Property: "scheduleCron",
+			Reason:   "exactly one of scheduleCron or timestamp must be specified",
 		})
 	}
-
-	if inputMap["timestamp"].HasValue() && inputMap["timestamp"].IsString() {
-		_, err := time.Parse(time.RFC3339, inputMap["timestamp"].StringValue())
-		if err != nil {
-			failures = append(failures, &pulumirpc.CheckFailure{
-				Reason:   fmt.Sprintf("timestamp failed to parse due to: %s", err),
+	if hasTimestamp {
+		if _, perr := time.Parse(time.RFC3339, *i.Timestamp); perr != nil {
+			failures = append(failures, p.CheckFailure{
 				Property: "timestamp",
+				Reason:   fmt.Sprintf("timestamp must be in RFC 3339 format: %s", perr),
 			})
 		}
 	}
-
-	return &pulumirpc.CheckResponse{Inputs: req.GetNews(), Failures: failures}, nil
+	return infer.CheckResponse[DeploymentScheduleInput]{Inputs: i, Failures: failures}, nil
 }
 
-func (st *PulumiServiceDeploymentScheduleResource) Update(
-	req *pulumirpc.UpdateRequest,
-) (*pulumirpc.UpdateResponse, error) {
-	previousOutput, err := ToPulumiServiceStackScheduleOutput(req.GetOlds())
-	if err != nil {
-		return nil, err
+func (*DeploymentSchedule) Create(
+	ctx context.Context,
+	req infer.CreateRequest[DeploymentScheduleInput],
+) (infer.CreateResponse[DeploymentScheduleState], error) {
+	if req.DryRun {
+		return infer.CreateResponse[DeploymentScheduleState]{
+			Output: DeploymentScheduleState{DeploymentScheduleInput: req.Inputs},
+		}, nil
 	}
-	input, err := ToPulumiServiceDeploymentScheduleInput(req.GetNews())
+	stack, scheduleReq, err := req.Inputs.toAPI()
 	if err != nil {
-		return nil, err
+		return infer.CreateResponse[DeploymentScheduleState]{}, err
 	}
-
-	updateReq := pulumiapi.CreateDeploymentScheduleRequest{
-		ScheduleCron: input.ScheduleCron,
-		ScheduleOnce: input.ScheduleOnce,
-		Request: pulumiapi.CreateDeploymentRequest{
-			PulumiOperation: input.PulumiOperation,
+	scheduleID, err := config.GetClient(ctx).CreateDeploymentSchedule(ctx, stack, scheduleReq)
+	if err != nil {
+		return infer.CreateResponse[DeploymentScheduleState]{}, fmt.Errorf("error creating deployment schedule: %w", err)
+	}
+	return infer.CreateResponse[DeploymentScheduleState]{
+		ID: deploymentScheduleID(stack, *scheduleID),
+		Output: DeploymentScheduleState{
+			DeploymentScheduleInput: req.Inputs,
+			ScheduleID:              *scheduleID,
 		},
-	}
-	scheduleID, err := st.Client.UpdateDeploymentSchedule(
-		context.Background(),
-		input.Stack,
-		updateReq,
-		previousOutput.ScheduleID,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	outputProperties, err := plugin.MarshalProperties(
-		AddScheduleIDToPropertyMap(*scheduleID, input.ToPropertyMap()),
-		plugin.MarshalOptions{
-			KeepUnknowns: true,
-			SkipNulls:    true,
-		},
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &pulumirpc.UpdateResponse{
-		Properties: outputProperties,
 	}, nil
 }
 
-func (st *PulumiServiceDeploymentScheduleResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	stack, scheduleID, err := ParseStackScheduleID(req.Id, "")
+func (*DeploymentSchedule) Update(
+	ctx context.Context,
+	req infer.UpdateRequest[DeploymentScheduleInput, DeploymentScheduleState],
+) (infer.UpdateResponse[DeploymentScheduleState], error) {
+	if req.DryRun {
+		return infer.UpdateResponse[DeploymentScheduleState]{
+			Output: DeploymentScheduleState{
+				DeploymentScheduleInput: req.Inputs,
+				ScheduleID:              req.State.ScheduleID,
+			},
+		}, nil
+	}
+	stack, scheduleReq, err := req.Inputs.toAPI()
 	if err != nil {
-		return nil, err
+		return infer.UpdateResponse[DeploymentScheduleState]{}, err
 	}
-
-	scheduleResponse, err := st.Client.GetStackSchedule(context.Background(), *stack, *scheduleID)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read DeploymentSchedule (%q): %w", req.Id, err)
-	}
-	if scheduleResponse == nil {
-		// if schedule doesn't exist, then return empty response to delete it from state
-		return &pulumirpc.ReadResponse{}, nil
-	}
-
-	var scheduleOnce *time.Time
-	if scheduleResponse.ScheduleOnce != nil {
-		parsed, err := time.Parse(time.DateTime, *scheduleResponse.ScheduleOnce)
-		if err != nil {
-			return nil, fmt.Errorf("failed to read DeploymentSchedule (%q): %w", req.Id, err)
-		}
-		scheduleOnce = &parsed
-	}
-	input := PulumiServiceDeploymentScheduleInput{
-		Stack:           *stack,
-		ScheduleCron:    scheduleResponse.ScheduleCron,
-		ScheduleOnce:    scheduleOnce,
-		PulumiOperation: scheduleResponse.Definition.Request.PulumiOperation,
-	}
-
-	inputs, err := plugin.MarshalProperties(
-		input.ToPropertyMap(),
-		plugin.MarshalOptions{
-			KeepUnknowns: true,
-			SkipNulls:    true,
-		},
+	scheduleID, err := config.GetClient(ctx).UpdateDeploymentSchedule(
+		ctx, stack, scheduleReq, req.State.ScheduleID,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read DeploymentSchedule (%q): %w", req.Id, err)
+		return infer.UpdateResponse[DeploymentScheduleState]{}, fmt.Errorf("error updating deployment schedule: %w", err)
 	}
-	outputProperties, err := plugin.MarshalProperties(
-		AddScheduleIDToPropertyMap(*scheduleID, input.ToPropertyMap()),
-		plugin.MarshalOptions{
-			KeepUnknowns: true,
-			SkipNulls:    true,
+	return infer.UpdateResponse[DeploymentScheduleState]{
+		Output: DeploymentScheduleState{
+			DeploymentScheduleInput: req.Inputs,
+			ScheduleID:              *scheduleID,
 		},
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read DeploymentSchedule (%q): %w", req.Id, err)
-	}
-
-	return &pulumirpc.ReadResponse{
-		Id:         req.Id,
-		Properties: outputProperties,
-		Inputs:     inputs,
 	}, nil
 }
 
-func (st *PulumiServiceDeploymentScheduleResource) Name() string {
-	return "pulumiservice:index:DeploymentSchedule"
-}
-
-func ParseStackScheduleID(id string, scheduleType string) (*pulumiapi.StackIdentifier, *string, error) {
-	splitID := strings.Split(id, "/")
-	if len(splitID) < 4 {
-		return nil, nil, fmt.Errorf("invalid stack id: %s", id)
-	}
+func (*DeploymentSchedule) Delete(
+	ctx context.Context,
+	req infer.DeleteRequest[DeploymentScheduleState],
+) (infer.DeleteResponse, error) {
 	stack := pulumiapi.StackIdentifier{
-		OrgName:     splitID[0],
-		ProjectName: splitID[1],
-		StackName:   splitID[2],
+		OrgName:     req.State.Organization,
+		ProjectName: req.State.Project,
+		StackName:   req.State.Stack,
 	}
-	if scheduleType == "" {
-		if len(splitID) != 4 {
-			return nil, nil, fmt.Errorf("invalid schedule id: %s", id)
+	return infer.DeleteResponse{}, config.GetClient(ctx).DeleteStackSchedule(ctx, stack, req.State.ScheduleID)
+}
+
+func (*DeploymentSchedule) Read(
+	ctx context.Context,
+	req infer.ReadRequest[DeploymentScheduleInput, DeploymentScheduleState],
+) (infer.ReadResponse[DeploymentScheduleInput, DeploymentScheduleState], error) {
+	stack, scheduleID, err := parseDeploymentScheduleID(req.ID)
+	if err != nil {
+		return infer.ReadResponse[DeploymentScheduleInput, DeploymentScheduleState]{}, err
+	}
+
+	resp, err := config.GetClient(ctx).GetStackSchedule(ctx, stack, scheduleID)
+	if err != nil {
+		return infer.ReadResponse[DeploymentScheduleInput, DeploymentScheduleState]{}, fmt.Errorf(
+			"failed to read DeploymentSchedule (%q): %w", req.ID, err,
+		)
+	}
+	if resp == nil {
+		return infer.ReadResponse[DeploymentScheduleInput, DeploymentScheduleState]{}, nil
+	}
+
+	inputs := DeploymentScheduleInput{
+		Organization:    stack.OrgName,
+		Project:         stack.ProjectName,
+		Stack:           stack.StackName,
+		ScheduleCron:    resp.ScheduleCron,
+		PulumiOperation: PulumiOperation(resp.Definition.Request.PulumiOperation),
+	}
+	if resp.ScheduleOnce != nil {
+		parsed, err := time.Parse(time.DateTime, *resp.ScheduleOnce)
+		if err != nil {
+			return infer.ReadResponse[DeploymentScheduleInput, DeploymentScheduleState]{}, fmt.Errorf(
+				"failed to read DeploymentSchedule (%q): %w", req.ID, err,
+			)
 		}
-		return &stack, &splitID[3], nil
+		ts := parsed.UTC().Format(time.RFC3339)
+		inputs.Timestamp = &ts
 	}
-	if len(splitID) != 5 || splitID[3] != scheduleType {
-		return nil, nil, fmt.Errorf("invalid schedule id: %s", id)
+	return infer.ReadResponse[DeploymentScheduleInput, DeploymentScheduleState]{
+		ID:     req.ID,
+		Inputs: inputs,
+		State: DeploymentScheduleState{
+			DeploymentScheduleInput: inputs,
+			ScheduleID:              scheduleID,
+		},
+	}, nil
+}
+
+func (i DeploymentScheduleInput) toAPI() (
+	pulumiapi.StackIdentifier, pulumiapi.CreateDeploymentScheduleRequest, error,
+) {
+	stack := pulumiapi.StackIdentifier{
+		OrgName:     i.Organization,
+		ProjectName: i.Project,
+		StackName:   i.Stack,
 	}
-	return &stack, &splitID[4], nil
+	scheduleReq := pulumiapi.CreateDeploymentScheduleRequest{
+		ScheduleCron: i.ScheduleCron,
+		Request: pulumiapi.CreateDeploymentRequest{
+			PulumiOperation: string(i.PulumiOperation),
+		},
+	}
+	if i.Timestamp != nil && *i.Timestamp != "" {
+		ts, err := time.Parse(time.RFC3339, *i.Timestamp)
+		if err != nil {
+			return pulumiapi.StackIdentifier{}, pulumiapi.CreateDeploymentScheduleRequest{},
+				fmt.Errorf("invalid timestamp %q: %w", *i.Timestamp, err)
+		}
+		scheduleReq.ScheduleOnce = &ts
+	}
+	return stack, scheduleReq, nil
+}
+
+func deploymentScheduleID(stack pulumiapi.StackIdentifier, scheduleID string) string {
+	return fmt.Sprintf("%s/%s/%s/%s", stack.OrgName, stack.ProjectName, stack.StackName, scheduleID)
+}
+
+func parseDeploymentScheduleID(id string) (pulumiapi.StackIdentifier, string, error) {
+	parts := strings.Split(id, "/")
+	if len(parts) != 4 {
+		return pulumiapi.StackIdentifier{}, "",
+			fmt.Errorf("%q is invalid, expected organization/project/stack/scheduleId", id)
+	}
+	return pulumiapi.StackIdentifier{
+		OrgName:     parts[0],
+		ProjectName: parts[1],
+		StackName:   parts[2],
+	}, parts[3], nil
 }

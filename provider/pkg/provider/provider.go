@@ -91,11 +91,15 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 		})).
 		WithResources(
 			infer.Resource(&resources.AccessToken{}),
+			infer.Resource(&resources.DeploymentSchedule{}),
+			infer.Resource(&resources.DriftSchedule{}),
+			infer.Resource(&resources.EnvironmentRotationSchedule{}),
 			infer.Resource(&resources.InsightsAccount{}),
 			infer.Resource(&resources.OrgAccessToken{}),
 			infer.Resource(&resources.OrganizationMember{}),
 			infer.Resource(&resources.OrganizationRole{}),
 			infer.Resource(&resources.StackTag{}),
+			infer.Resource(&resources.TTLSchedule{}),
 			infer.Resource(&resources.Team{}),
 			infer.Resource(&resources.TeamAccessToken{}),
 			infer.Resource(&resources.TeamRoleAssignment{}),
@@ -259,15 +263,6 @@ func (k *pulumiserviceProvider) Configure(
 		&resources.PulumiServiceAgentPoolResource{
 			Client: client,
 		},
-		&resources.PulumiServiceDeploymentScheduleResource{
-			Client: client,
-		},
-		&resources.PulumiServiceDriftScheduleResource{
-			Client: client,
-		},
-		&resources.PulumiServiceTTLScheduleResource{
-			Client: client,
-		},
 		&resources.PulumiServiceEnvironmentResource{
 			Client:         escClient,
 			MetadataClient: client,
@@ -285,9 +280,6 @@ func (k *pulumiserviceProvider) Configure(
 			Client: client,
 		},
 		&resources.PulumiServiceOidcIssuerResource{
-			Client: client,
-		},
-		&resources.PulumiServiceEnvironmentRotationScheduleResource{
 			Client: client,
 		},
 		&resources.PulumiServiceApprovalRuleResource{

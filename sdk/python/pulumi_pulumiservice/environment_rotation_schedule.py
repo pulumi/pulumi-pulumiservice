@@ -174,6 +174,8 @@ class EnvironmentRotationSchedule(pulumi.CustomResource):
             __props__.__dict__["schedule_cron"] = schedule_cron
             __props__.__dict__["timestamp"] = timestamp
             __props__.__dict__["schedule_id"] = None
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["environment", "organization", "project", "timestamp"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(EnvironmentRotationSchedule, __self__).__init__(
             'pulumiservice:index:EnvironmentRotationSchedule',
             resource_name,

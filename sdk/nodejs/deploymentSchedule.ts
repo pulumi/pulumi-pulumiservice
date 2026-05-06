@@ -46,7 +46,7 @@ export class DeploymentSchedule extends pulumi.CustomResource {
      */
     declare public readonly project: pulumi.Output<string>;
     /**
-     * Which operation to run.
+     * Which command to run.
      */
     declare public readonly pulumiOperation: pulumi.Output<enums.PulumiOperation>;
     /**
@@ -106,6 +106,8 @@ export class DeploymentSchedule extends pulumi.CustomResource {
             resourceInputs["timestamp"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["organization", "project", "stack", "timestamp"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(DeploymentSchedule.__pulumiType, name, resourceInputs, opts);
     }
 }
