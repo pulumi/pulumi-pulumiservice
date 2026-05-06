@@ -60,6 +60,10 @@ resources:
       # returns ValidationError("DurationSeconds exceeds MaxSessionDuration").
       # 43200s (12h) is the AWS-imposed maximum.
       maxSessionDuration: 43200
+      tags:
+        Owner: pulumi/pulumi-pulumiservice # Prevents automatic cleanup in this account
+        Project: ${pulumi.project}
+        Stack: ${pulumi.stack}
       # The IAM condition key prefix is the issuer host+path, so the keys
       # are dynamic. Pulumi YAML interpolates `${...}` inside map keys, so
       # we can build the policy as a structured object and hand it to
