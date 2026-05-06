@@ -33,12 +33,8 @@ type Policy struct {
 	IssuerId pulumi.StringOutput `pulumi:"issuerId"`
 	// The last modification timestamp
 	Modified pulumi.StringPtrOutput `pulumi:"modified"`
-	// The organization name
-	OrgName pulumi.StringOutput `pulumi:"orgName"`
 	// List of policies
 	Policies pulumi.ArrayOutput `pulumi:"policies"`
-	// The policy identifier
-	PolicyId pulumi.StringOutput `pulumi:"policyId"`
 	// The version number
 	Version pulumi.IntOutput `pulumi:"version"`
 }
@@ -59,12 +55,6 @@ func NewPolicy(ctx *pulumi.Context,
 	if args.PolicyId == nil {
 		return nil, errors.New("invalid value for required argument 'PolicyId'")
 	}
-	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
-		"issuerId",
-		"orgName",
-		"policyId",
-	})
-	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Policy
 	err := ctx.RegisterResource("pulumiservice:v2/auth:Policy", name, args, &resource, opts...)
@@ -222,19 +212,9 @@ func (o PolicyOutput) Modified() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *Policy) pulumi.StringPtrOutput { return v.Modified }).(pulumi.StringPtrOutput)
 }
 
-// The organization name
-func (o PolicyOutput) OrgName() pulumi.StringOutput {
-	return o.ApplyT(func(v *Policy) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
-}
-
 // List of policies
 func (o PolicyOutput) Policies() pulumi.ArrayOutput {
 	return o.ApplyT(func(v *Policy) pulumi.ArrayOutput { return v.Policies }).(pulumi.ArrayOutput)
-}
-
-// The policy identifier
-func (o PolicyOutput) PolicyId() pulumi.StringOutput {
-	return o.ApplyT(func(v *Policy) pulumi.StringOutput { return v.PolicyId }).(pulumi.StringOutput)
 }
 
 // The version number

@@ -22,16 +22,10 @@ type RevisionTag struct {
 	EditorLogin pulumi.StringPtrOutput `pulumi:"editorLogin"`
 	// The display name of the user who last edited the tag.
 	EditorName pulumi.StringPtrOutput `pulumi:"editorName"`
-	// The environment name
-	EnvName pulumi.StringOutput `pulumi:"envName"`
 	// The timestamp when the tag was last modified.
 	Modified pulumi.StringOutput `pulumi:"modified"`
 	// The name of the tag.
 	Name pulumi.StringOutput `pulumi:"name"`
-	// The organization name
-	OrgName pulumi.StringOutput `pulumi:"orgName"`
-	// The project name
-	ProjectName pulumi.StringOutput `pulumi:"projectName"`
 	// The revision number this tag points to.
 	Revision pulumi.IntOutput `pulumi:"revision"`
 }
@@ -55,13 +49,6 @@ func NewRevisionTag(ctx *pulumi.Context,
 	if args.ProjectName == nil {
 		return nil, errors.New("invalid value for required argument 'ProjectName'")
 	}
-	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
-		"envName",
-		"name",
-		"orgName",
-		"projectName",
-	})
-	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource RevisionTag
 	err := ctx.RegisterResource("pulumiservice:v2/esc:RevisionTag", name, args, &resource, opts...)
@@ -223,11 +210,6 @@ func (o RevisionTagOutput) EditorName() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *RevisionTag) pulumi.StringPtrOutput { return v.EditorName }).(pulumi.StringPtrOutput)
 }
 
-// The environment name
-func (o RevisionTagOutput) EnvName() pulumi.StringOutput {
-	return o.ApplyT(func(v *RevisionTag) pulumi.StringOutput { return v.EnvName }).(pulumi.StringOutput)
-}
-
 // The timestamp when the tag was last modified.
 func (o RevisionTagOutput) Modified() pulumi.StringOutput {
 	return o.ApplyT(func(v *RevisionTag) pulumi.StringOutput { return v.Modified }).(pulumi.StringOutput)
@@ -236,16 +218,6 @@ func (o RevisionTagOutput) Modified() pulumi.StringOutput {
 // The name of the tag.
 func (o RevisionTagOutput) Name() pulumi.StringOutput {
 	return o.ApplyT(func(v *RevisionTag) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
-}
-
-// The organization name
-func (o RevisionTagOutput) OrgName() pulumi.StringOutput {
-	return o.ApplyT(func(v *RevisionTag) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
-}
-
-// The project name
-func (o RevisionTagOutput) ProjectName() pulumi.StringOutput {
-	return o.ApplyT(func(v *RevisionTag) pulumi.StringOutput { return v.ProjectName }).(pulumi.StringOutput)
 }
 
 // The revision number this tag points to.

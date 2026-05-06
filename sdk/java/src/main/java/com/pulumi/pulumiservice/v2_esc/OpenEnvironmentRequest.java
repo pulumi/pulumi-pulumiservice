@@ -10,7 +10,6 @@ import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.Utilities;
 import com.pulumi.pulumiservice.v2_esc.OpenEnvironmentRequestArgs;
 import java.lang.Integer;
-import java.lang.String;
 import javax.annotation.Nullable;
 
 /**
@@ -34,34 +33,6 @@ public class OpenEnvironmentRequest extends com.pulumi.resources.CustomResource 
         return this.accessDurationSeconds;
     }
     /**
-     * The change request ID
-     * 
-     */
-    @Export(name="changeRequestID", refs={String.class}, tree="[0]")
-    private Output<String> changeRequestID;
-
-    /**
-     * @return The change request ID
-     * 
-     */
-    public Output<String> changeRequestID() {
-        return this.changeRequestID;
-    }
-    /**
-     * The environment name
-     * 
-     */
-    @Export(name="envName", refs={String.class}, tree="[0]")
-    private Output<String> envName;
-
-    /**
-     * @return The environment name
-     * 
-     */
-    public Output<String> envName() {
-        return this.envName;
-    }
-    /**
      * Time from application of the request until the resulting grant expires
      * 
      */
@@ -74,34 +45,6 @@ public class OpenEnvironmentRequest extends com.pulumi.resources.CustomResource 
      */
     public Output<Integer> grantExpirationSeconds() {
         return this.grantExpirationSeconds;
-    }
-    /**
-     * The organization name
-     * 
-     */
-    @Export(name="orgName", refs={String.class}, tree="[0]")
-    private Output<String> orgName;
-
-    /**
-     * @return The organization name
-     * 
-     */
-    public Output<String> orgName() {
-        return this.orgName;
-    }
-    /**
-     * The project name
-     * 
-     */
-    @Export(name="projectName", refs={String.class}, tree="[0]")
-    private Output<String> projectName;
-
-    /**
-     * @return The project name
-     * 
-     */
-    public Output<String> projectName() {
-        return this.projectName;
     }
 
     /**

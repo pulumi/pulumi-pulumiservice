@@ -34,18 +34,6 @@ export class Environment extends pulumi.CustomResource {
         return obj['__pulumiType'] === Environment.__pulumiType;
     }
 
-    /**
-     * The environment name
-     */
-    declare public readonly name: pulumi.Output<string>;
-    /**
-     * The organization name
-     */
-    declare public readonly orgName: pulumi.Output<string>;
-    /**
-     * The project name
-     */
-    declare public readonly project: pulumi.Output<string>;
 
     /**
      * Create a Environment resource with the given unique name, arguments, and options.
@@ -71,13 +59,8 @@ export class Environment extends pulumi.CustomResource {
             resourceInputs["orgName"] = args?.orgName;
             resourceInputs["project"] = args?.project;
         } else {
-            resourceInputs["name"] = undefined /*out*/;
-            resourceInputs["orgName"] = undefined /*out*/;
-            resourceInputs["project"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
-        const replaceOnChanges = { replaceOnChanges: ["name", "orgName", "project"] };
-        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(Environment.__pulumiType, name, resourceInputs, opts);
     }
 }

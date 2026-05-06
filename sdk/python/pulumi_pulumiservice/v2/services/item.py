@@ -180,8 +180,6 @@ class Item(pulumi.CustomResource):
             __props__.__dict__["service_name"] = service_name
             __props__.__dict__["continuation_token"] = None
             __props__.__dict__["service"] = None
-        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["orgName", "ownerName", "ownerType", "serviceName"])
-        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(Item, __self__).__init__(
             'pulumiservice:v2/services:Item',
             resource_name,
@@ -206,11 +204,7 @@ class Item(pulumi.CustomResource):
 
         __props__.__dict__["continuation_token"] = None
         __props__.__dict__["items"] = None
-        __props__.__dict__["org_name"] = None
-        __props__.__dict__["owner_name"] = None
-        __props__.__dict__["owner_type"] = None
         __props__.__dict__["service"] = None
-        __props__.__dict__["service_name"] = None
         return Item(resource_name, opts=opts, __props__=__props__)
 
     @_builtins.property
@@ -231,42 +225,10 @@ class Item(pulumi.CustomResource):
         return pulumi.get(self, "items")
 
     @_builtins.property
-    @pulumi.getter(name="orgName")
-    def org_name(self) -> pulumi.Output[_builtins.str]:
-        """
-        The organization name
-        """
-        return pulumi.get(self, "org_name")
-
-    @_builtins.property
-    @pulumi.getter(name="ownerName")
-    def owner_name(self) -> pulumi.Output[_builtins.str]:
-        """
-        The owner name
-        """
-        return pulumi.get(self, "owner_name")
-
-    @_builtins.property
-    @pulumi.getter(name="ownerType")
-    def owner_type(self) -> pulumi.Output[_builtins.str]:
-        """
-        The owner type
-        """
-        return pulumi.get(self, "owner_type")
-
-    @_builtins.property
     @pulumi.getter
     def service(self) -> pulumi.Output[Any]:
         """
         The service details
         """
         return pulumi.get(self, "service")
-
-    @_builtins.property
-    @pulumi.getter(name="serviceName")
-    def service_name(self) -> pulumi.Output[_builtins.str]:
-        """
-        The service name
-        """
-        return pulumi.get(self, "service_name")
 

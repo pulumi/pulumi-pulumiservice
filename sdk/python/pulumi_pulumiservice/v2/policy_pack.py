@@ -336,8 +336,6 @@ class PolicyPack(pulumi.CustomResource):
             __props__.__dict__["version"] = version
             __props__.__dict__["version_tag"] = version_tag
             __props__.__dict__["applied"] = None
-        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["name", "orgName", "version"])
-        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(PolicyPack, __self__).__init__(
             'pulumiservice:v2:PolicyPack',
             resource_name,
@@ -363,7 +361,6 @@ class PolicyPack(pulumi.CustomResource):
         __props__.__dict__["applied"] = None
         __props__.__dict__["display_name"] = None
         __props__.__dict__["name"] = None
-        __props__.__dict__["org_name"] = None
         __props__.__dict__["policies"] = None
         __props__.__dict__["version"] = None
         __props__.__dict__["version_tag"] = None
@@ -392,14 +389,6 @@ class PolicyPack(pulumi.CustomResource):
         The unique name of the policy pack.
         """
         return pulumi.get(self, "name")
-
-    @_builtins.property
-    @pulumi.getter(name="orgName")
-    def org_name(self) -> pulumi.Output[_builtins.str]:
-        """
-        The organization name
-        """
-        return pulumi.get(self, "org_name")
 
     @_builtins.property
     @pulumi.getter

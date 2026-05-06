@@ -15,13 +15,6 @@ import (
 // Creates a new tag on the specified stack. Tags are key-value metadata pairs that can be used for organization, filtering, and storing additional information about stacks. The request body must include both a tag name and value. Returns 400 if the tag name is invalid or the tag already exists. Built-in tags (such as those automatically set by the Pulumi CLI) follow specific naming conventions.
 type Tag struct {
 	pulumi.CustomResourceState
-
-	// The organization name
-	OrgName pulumi.StringOutput `pulumi:"orgName"`
-	// The project name
-	ProjectName pulumi.StringOutput `pulumi:"projectName"`
-	// The stack name
-	StackName pulumi.StringOutput `pulumi:"stackName"`
 }
 
 // NewTag registers a new resource with the given unique name, arguments, and options.
@@ -46,12 +39,6 @@ func NewTag(ctx *pulumi.Context,
 	if args.Value == nil {
 		return nil, errors.New("invalid value for required argument 'Value'")
 	}
-	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
-		"orgName",
-		"projectName",
-		"stackName",
-	})
-	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Tag
 	err := ctx.RegisterResource("pulumiservice:v2/stacks:Tag", name, args, &resource, opts...)
@@ -196,21 +183,6 @@ func (o TagOutput) ToTagOutput() TagOutput {
 
 func (o TagOutput) ToTagOutputWithContext(ctx context.Context) TagOutput {
 	return o
-}
-
-// The organization name
-func (o TagOutput) OrgName() pulumi.StringOutput {
-	return o.ApplyT(func(v *Tag) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
-}
-
-// The project name
-func (o TagOutput) ProjectName() pulumi.StringOutput {
-	return o.ApplyT(func(v *Tag) pulumi.StringOutput { return v.ProjectName }).(pulumi.StringOutput)
-}
-
-// The stack name
-func (o TagOutput) StackName() pulumi.StringOutput {
-	return o.ApplyT(func(v *Tag) pulumi.StringOutput { return v.StackName }).(pulumi.StringOutput)
 }
 
 type TagArrayOutput struct{ *pulumi.OutputState }

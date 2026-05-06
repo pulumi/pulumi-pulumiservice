@@ -240,8 +240,6 @@ class Role(pulumi.CustomResource):
             __props__.__dict__["modified"] = None
             __props__.__dict__["org_id"] = None
             __props__.__dict__["version"] = None
-        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["orgName", "roleID"])
-        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(Role, __self__).__init__(
             'pulumiservice:v2:Role',
             resource_name,
@@ -272,7 +270,6 @@ class Role(pulumi.CustomResource):
         __props__.__dict__["modified"] = None
         __props__.__dict__["name"] = None
         __props__.__dict__["org_id"] = None
-        __props__.__dict__["org_name"] = None
         __props__.__dict__["resource_type"] = None
         __props__.__dict__["role_id"] = None
         __props__.__dict__["ux_purpose"] = None
@@ -342,14 +339,6 @@ class Role(pulumi.CustomResource):
         The ID of the organization this role belongs to.
         """
         return pulumi.get(self, "org_id")
-
-    @_builtins.property
-    @pulumi.getter(name="orgName")
-    def org_name(self) -> pulumi.Output[_builtins.str]:
-        """
-        The organization name
-        """
-        return pulumi.get(self, "org_name")
 
     @_builtins.property
     @pulumi.getter(name="resourceType")

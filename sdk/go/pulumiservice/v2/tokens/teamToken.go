@@ -20,10 +20,6 @@ import (
 type TeamToken struct {
 	pulumi.CustomResourceState
 
-	// The organization name
-	OrgName pulumi.StringOutput `pulumi:"orgName"`
-	// The team name
-	TeamName pulumi.StringOutput `pulumi:"teamName"`
 	// The unique identifier
 	TokenId pulumi.StringOutput `pulumi:"tokenId"`
 	// The token value
@@ -56,11 +52,6 @@ func NewTeamToken(ctx *pulumi.Context,
 		"tokenValue",
 	})
 	opts = append(opts, secrets)
-	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
-		"orgName",
-		"teamName",
-	})
-	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource TeamToken
 	err := ctx.RegisterResource("pulumiservice:v2/tokens:TeamToken", name, args, &resource, opts...)
@@ -209,16 +200,6 @@ func (o TeamTokenOutput) ToTeamTokenOutput() TeamTokenOutput {
 
 func (o TeamTokenOutput) ToTeamTokenOutputWithContext(ctx context.Context) TeamTokenOutput {
 	return o
-}
-
-// The organization name
-func (o TeamTokenOutput) OrgName() pulumi.StringOutput {
-	return o.ApplyT(func(v *TeamToken) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
-}
-
-// The team name
-func (o TeamTokenOutput) TeamName() pulumi.StringOutput {
-	return o.ApplyT(func(v *TeamToken) pulumi.StringOutput { return v.TeamName }).(pulumi.StringOutput)
 }
 
 // The unique identifier

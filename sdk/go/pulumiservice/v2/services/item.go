@@ -21,16 +21,8 @@ type Item struct {
 	ContinuationToken pulumi.StringPtrOutput `pulumi:"continuationToken"`
 	// The list of service items
 	Items pulumi.ArrayOutput `pulumi:"items"`
-	// The organization name
-	OrgName pulumi.StringOutput `pulumi:"orgName"`
-	// The owner name
-	OwnerName pulumi.StringOutput `pulumi:"ownerName"`
-	// The owner type
-	OwnerType pulumi.StringOutput `pulumi:"ownerType"`
 	// The service details
 	Service pulumi.AnyOutput `pulumi:"service"`
-	// The service name
-	ServiceName pulumi.StringOutput `pulumi:"serviceName"`
 }
 
 // NewItem registers a new resource with the given unique name, arguments, and options.
@@ -55,13 +47,6 @@ func NewItem(ctx *pulumi.Context,
 	if args.ServiceName == nil {
 		return nil, errors.New("invalid value for required argument 'ServiceName'")
 	}
-	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
-		"orgName",
-		"ownerName",
-		"ownerType",
-		"serviceName",
-	})
-	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Item
 	err := ctx.RegisterResource("pulumiservice:v2/services:Item", name, args, &resource, opts...)
@@ -219,29 +204,9 @@ func (o ItemOutput) Items() pulumi.ArrayOutput {
 	return o.ApplyT(func(v *Item) pulumi.ArrayOutput { return v.Items }).(pulumi.ArrayOutput)
 }
 
-// The organization name
-func (o ItemOutput) OrgName() pulumi.StringOutput {
-	return o.ApplyT(func(v *Item) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
-}
-
-// The owner name
-func (o ItemOutput) OwnerName() pulumi.StringOutput {
-	return o.ApplyT(func(v *Item) pulumi.StringOutput { return v.OwnerName }).(pulumi.StringOutput)
-}
-
-// The owner type
-func (o ItemOutput) OwnerType() pulumi.StringOutput {
-	return o.ApplyT(func(v *Item) pulumi.StringOutput { return v.OwnerType }).(pulumi.StringOutput)
-}
-
 // The service details
 func (o ItemOutput) Service() pulumi.AnyOutput {
 	return o.ApplyT(func(v *Item) pulumi.AnyOutput { return v.Service }).(pulumi.AnyOutput)
-}
-
-// The service name
-func (o ItemOutput) ServiceName() pulumi.StringOutput {
-	return o.ApplyT(func(v *Item) pulumi.StringOutput { return v.ServiceName }).(pulumi.StringOutput)
 }
 
 type ItemArrayOutput struct{ *pulumi.OutputState }

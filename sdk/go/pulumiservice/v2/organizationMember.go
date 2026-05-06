@@ -28,14 +28,10 @@ type OrganizationMember struct {
 	KnownToPulumi pulumi.BoolOutput `pulumi:"knownToPulumi"`
 	// Links to the member in the Pulumi Console
 	Links pulumi.AnyOutput `pulumi:"links"`
-	// The organization name
-	OrgName pulumi.StringOutput `pulumi:"orgName"`
 	// **Deprecated:** Use `fgaRole` instead. The member's built-in role within the organization. For members assigned a custom role, this is the closest built-in projection (`member`, `admin`, or `billingManager`) and may lose detail; `fgaRole` is authoritative.
 	Role pulumi.StringOutput `pulumi:"role"`
 	// The user information for this organization member.
 	User pulumi.AnyOutput `pulumi:"user"`
-	// The user login name
-	UserLogin pulumi.StringOutput `pulumi:"userLogin"`
 	// VirtualAdmin indicates that the member does not have admin access on the
 	// backing identity provider, but does have admin access to the Pulumi organization.
 	VirtualAdmin pulumi.BoolOutput `pulumi:"virtualAdmin"`
@@ -57,11 +53,6 @@ func NewOrganizationMember(ctx *pulumi.Context,
 	if args.UserLogin == nil {
 		return nil, errors.New("invalid value for required argument 'UserLogin'")
 	}
-	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
-		"orgName",
-		"userLogin",
-	})
-	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource OrganizationMember
 	err := ctx.RegisterResource("pulumiservice:v2:OrganizationMember", name, args, &resource, opts...)
@@ -220,11 +211,6 @@ func (o OrganizationMemberOutput) Links() pulumi.AnyOutput {
 	return o.ApplyT(func(v *OrganizationMember) pulumi.AnyOutput { return v.Links }).(pulumi.AnyOutput)
 }
 
-// The organization name
-func (o OrganizationMemberOutput) OrgName() pulumi.StringOutput {
-	return o.ApplyT(func(v *OrganizationMember) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
-}
-
 // **Deprecated:** Use `fgaRole` instead. The member's built-in role within the organization. For members assigned a custom role, this is the closest built-in projection (`member`, `admin`, or `billingManager`) and may lose detail; `fgaRole` is authoritative.
 func (o OrganizationMemberOutput) Role() pulumi.StringOutput {
 	return o.ApplyT(func(v *OrganizationMember) pulumi.StringOutput { return v.Role }).(pulumi.StringOutput)
@@ -233,11 +219,6 @@ func (o OrganizationMemberOutput) Role() pulumi.StringOutput {
 // The user information for this organization member.
 func (o OrganizationMemberOutput) User() pulumi.AnyOutput {
 	return o.ApplyT(func(v *OrganizationMember) pulumi.AnyOutput { return v.User }).(pulumi.AnyOutput)
-}
-
-// The user login name
-func (o OrganizationMemberOutput) UserLogin() pulumi.StringOutput {
-	return o.ApplyT(func(v *OrganizationMember) pulumi.StringOutput { return v.UserLogin }).(pulumi.StringOutput)
 }
 
 // VirtualAdmin indicates that the member does not have admin access on the

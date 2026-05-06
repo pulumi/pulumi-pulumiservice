@@ -38,18 +38,6 @@ export class EnvironmentSettings extends pulumi.CustomResource {
      * Whether the environment is protected from deletion.
      */
     declare public readonly deletionProtected: pulumi.Output<boolean>;
-    /**
-     * The environment name
-     */
-    declare public readonly envName: pulumi.Output<string>;
-    /**
-     * The organization name
-     */
-    declare public readonly orgName: pulumi.Output<string>;
-    /**
-     * The project name
-     */
-    declare public readonly projectName: pulumi.Output<string>;
 
     /**
      * Create a EnvironmentSettings resource with the given unique name, arguments, and options.
@@ -77,13 +65,8 @@ export class EnvironmentSettings extends pulumi.CustomResource {
             resourceInputs["projectName"] = args?.projectName;
         } else {
             resourceInputs["deletionProtected"] = undefined /*out*/;
-            resourceInputs["envName"] = undefined /*out*/;
-            resourceInputs["orgName"] = undefined /*out*/;
-            resourceInputs["projectName"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
-        const replaceOnChanges = { replaceOnChanges: ["envName", "orgName", "projectName"] };
-        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(EnvironmentSettings.__pulumiType, name, resourceInputs, opts);
     }
 }

@@ -204,8 +204,6 @@ class CustomVCSIntegration(pulumi.CustomResource):
             __props__.__dict__["webhook_url"] = None
         secret_opts = pulumi.ResourceOptions(additional_secret_outputs=["webhookSecret"])
         opts = pulumi.ResourceOptions.merge(opts, secret_opts)
-        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["integrationId", "orgName"])
-        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(CustomVCSIntegration, __self__).__init__(
             'pulumiservice:v2/integrations:CustomVCSIntegration',
             resource_name,
@@ -234,7 +232,6 @@ class CustomVCSIntegration(pulumi.CustomResource):
         __props__.__dict__["integration_id"] = None
         __props__.__dict__["modified"] = None
         __props__.__dict__["name"] = None
-        __props__.__dict__["org_name"] = None
         __props__.__dict__["repositories"] = None
         __props__.__dict__["vcs_type"] = None
         __props__.__dict__["webhook_secret"] = None
@@ -288,14 +285,6 @@ class CustomVCSIntegration(pulumi.CustomResource):
         Human-readable name for the integration
         """
         return pulumi.get(self, "name")
-
-    @_builtins.property
-    @pulumi.getter(name="orgName")
-    def org_name(self) -> pulumi.Output[_builtins.str]:
-        """
-        The organization name
-        """
-        return pulumi.get(self, "org_name")
 
     @_builtins.property
     @pulumi.getter

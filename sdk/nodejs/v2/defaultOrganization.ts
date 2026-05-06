@@ -46,10 +46,6 @@ export class DefaultOrganization extends pulumi.CustomResource {
      * Can be possibly empty.
      */
     declare public /*out*/ readonly Messages: pulumi.Output<any[]>;
-    /**
-     * The organization name
-     */
-    declare public readonly orgName: pulumi.Output<string>;
 
     /**
      * Create a DefaultOrganization resource with the given unique name, arguments, and options.
@@ -71,11 +67,8 @@ export class DefaultOrganization extends pulumi.CustomResource {
         } else {
             resourceInputs["GitHubLogin"] = undefined /*out*/;
             resourceInputs["Messages"] = undefined /*out*/;
-            resourceInputs["orgName"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
-        const replaceOnChanges = { replaceOnChanges: ["orgName"] };
-        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(DefaultOrganization.__pulumiType, name, resourceInputs, opts);
     }
 }

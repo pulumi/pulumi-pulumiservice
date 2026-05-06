@@ -43,10 +43,6 @@ export class EnvironmentSchedule extends pulumi.CustomResource {
      */
     declare public /*out*/ readonly definition: pulumi.Output<{[key: string]: any}>;
     /**
-     * The environment name
-     */
-    declare public readonly envName: pulumi.Output<string>;
-    /**
      * The kind of action to be executed.
      */
     declare public /*out*/ readonly kind: pulumi.Output<string>;
@@ -67,17 +63,9 @@ export class EnvironmentSchedule extends pulumi.CustomResource {
      */
     declare public /*out*/ readonly orgID: pulumi.Output<string>;
     /**
-     * The organization name
-     */
-    declare public readonly orgName: pulumi.Output<string>;
-    /**
      * Whether the scheduled action is currently paused.
      */
     declare public /*out*/ readonly paused: pulumi.Output<boolean>;
-    /**
-     * The project name
-     */
-    declare public readonly projectName: pulumi.Output<string>;
     /**
      * A cron expression defining the recurring schedule.
      */
@@ -129,22 +117,17 @@ export class EnvironmentSchedule extends pulumi.CustomResource {
         } else {
             resourceInputs["created"] = undefined /*out*/;
             resourceInputs["definition"] = undefined /*out*/;
-            resourceInputs["envName"] = undefined /*out*/;
             resourceInputs["kind"] = undefined /*out*/;
             resourceInputs["lastExecuted"] = undefined /*out*/;
             resourceInputs["modified"] = undefined /*out*/;
             resourceInputs["nextExecution"] = undefined /*out*/;
             resourceInputs["orgID"] = undefined /*out*/;
-            resourceInputs["orgName"] = undefined /*out*/;
             resourceInputs["paused"] = undefined /*out*/;
-            resourceInputs["projectName"] = undefined /*out*/;
             resourceInputs["scheduleCron"] = undefined /*out*/;
             resourceInputs["scheduleID"] = undefined /*out*/;
             resourceInputs["scheduleOnce"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
-        const replaceOnChanges = { replaceOnChanges: ["envName", "orgName", "projectName", "scheduleID"] };
-        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(EnvironmentSchedule.__pulumiType, name, resourceInputs, opts);
     }
 }

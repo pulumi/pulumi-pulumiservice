@@ -45,22 +45,10 @@ namespace Pulumi.PulumiService.V2.Auth
         public Output<string?> Modified { get; private set; } = null!;
 
         /// <summary>
-        /// The organization name
-        /// </summary>
-        [Output("orgName")]
-        public Output<string> OrgName { get; private set; } = null!;
-
-        /// <summary>
         /// List of policies
         /// </summary>
         [Output("policies")]
         public Output<ImmutableArray<object>> Policies { get; private set; } = null!;
-
-        /// <summary>
-        /// The policy identifier
-        /// </summary>
-        [Output("policyId")]
-        public Output<string> PolicyId { get; private set; } = null!;
 
         /// <summary>
         /// The version number
@@ -91,12 +79,6 @@ namespace Pulumi.PulumiService.V2.Auth
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
-                ReplaceOnChanges =
-                {
-                    "issuerId",
-                    "orgName",
-                    "policyId",
-                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.

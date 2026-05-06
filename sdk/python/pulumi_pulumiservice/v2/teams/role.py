@@ -138,8 +138,6 @@ class Role(pulumi.CustomResource):
             if team_name is None and not opts.urn:
                 raise TypeError("Missing required property 'team_name'")
             __props__.__dict__["team_name"] = team_name
-        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["orgName", "roleID", "teamName"])
-        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(Role, __self__).__init__(
             'pulumiservice:v2/teams:Role',
             resource_name,
@@ -162,32 +160,5 @@ class Role(pulumi.CustomResource):
 
         __props__ = RoleArgs.__new__(RoleArgs)
 
-        __props__.__dict__["org_name"] = None
-        __props__.__dict__["role_id"] = None
-        __props__.__dict__["team_name"] = None
         return Role(resource_name, opts=opts, __props__=__props__)
-
-    @_builtins.property
-    @pulumi.getter(name="orgName")
-    def org_name(self) -> pulumi.Output[_builtins.str]:
-        """
-        The organization name
-        """
-        return pulumi.get(self, "org_name")
-
-    @_builtins.property
-    @pulumi.getter(name="roleID")
-    def role_id(self) -> pulumi.Output[_builtins.str]:
-        """
-        The role identifier
-        """
-        return pulumi.get(self, "role_id")
-
-    @_builtins.property
-    @pulumi.getter(name="teamName")
-    def team_name(self) -> pulumi.Output[_builtins.str]:
-        """
-        The team name
-        """
-        return pulumi.get(self, "team_name")
 

@@ -167,8 +167,6 @@ class Team(pulumi.CustomResource):
             __props__.__dict__["role_ids"] = None
             __props__.__dict__["stacks"] = None
             __props__.__dict__["user_role"] = None
-        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["name", "orgName"])
-        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(Team, __self__).__init__(
             'pulumiservice:v2/teams:Team',
             resource_name,
@@ -199,7 +197,6 @@ class Team(pulumi.CustomResource):
         __props__.__dict__["list_members_error"] = None
         __props__.__dict__["members"] = None
         __props__.__dict__["name"] = None
-        __props__.__dict__["org_name"] = None
         __props__.__dict__["role_ids"] = None
         __props__.__dict__["stacks"] = None
         __props__.__dict__["user_role"] = None
@@ -270,14 +267,6 @@ class Team(pulumi.CustomResource):
         The unique identifier name of the team within the organization.
         """
         return pulumi.get(self, "name")
-
-    @_builtins.property
-    @pulumi.getter(name="orgName")
-    def org_name(self) -> pulumi.Output[_builtins.str]:
-        """
-        The organization name
-        """
-        return pulumi.get(self, "org_name")
 
     @_builtins.property
     @pulumi.getter(name="roleIds")

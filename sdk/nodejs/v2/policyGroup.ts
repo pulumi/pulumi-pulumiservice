@@ -63,10 +63,6 @@ export class PolicyGroup extends pulumi.CustomResource {
      */
     declare public readonly name: pulumi.Output<string>;
     /**
-     * The organization name
-     */
-    declare public readonly orgName: pulumi.Output<string>;
-    /**
      * List of stacks that are members of this policy group.
      */
     declare public /*out*/ readonly stacks: pulumi.Output<any[]>;
@@ -108,12 +104,9 @@ export class PolicyGroup extends pulumi.CustomResource {
             resourceInputs["isOrgDefault"] = undefined /*out*/;
             resourceInputs["mode"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
-            resourceInputs["orgName"] = undefined /*out*/;
             resourceInputs["stacks"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
-        const replaceOnChanges = { replaceOnChanges: ["name", "orgName"] };
-        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(PolicyGroup.__pulumiType, name, resourceInputs, opts);
     }
 }

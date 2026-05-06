@@ -221,8 +221,6 @@ class Service(pulumi.CustomResource):
                 raise TypeError("Missing required property 'properties'")
             __props__.__dict__["properties"] = properties
             __props__.__dict__["continuation_token"] = None
-        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["name", "orgName", "ownerName", "ownerType"])
-        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(Service, __self__).__init__(
             'pulumiservice:v2/services:Service',
             resource_name,
@@ -247,10 +245,6 @@ class Service(pulumi.CustomResource):
 
         __props__.__dict__["continuation_token"] = None
         __props__.__dict__["items"] = None
-        __props__.__dict__["name"] = None
-        __props__.__dict__["org_name"] = None
-        __props__.__dict__["owner_name"] = None
-        __props__.__dict__["owner_type"] = None
         return Service(resource_name, opts=opts, __props__=__props__)
 
     @_builtins.property
@@ -269,36 +263,4 @@ class Service(pulumi.CustomResource):
         The list of service items
         """
         return pulumi.get(self, "items")
-
-    @_builtins.property
-    @pulumi.getter
-    def name(self) -> pulumi.Output[_builtins.str]:
-        """
-        The service name
-        """
-        return pulumi.get(self, "name")
-
-    @_builtins.property
-    @pulumi.getter(name="orgName")
-    def org_name(self) -> pulumi.Output[_builtins.str]:
-        """
-        The organization name
-        """
-        return pulumi.get(self, "org_name")
-
-    @_builtins.property
-    @pulumi.getter(name="ownerName")
-    def owner_name(self) -> pulumi.Output[_builtins.str]:
-        """
-        The owner name
-        """
-        return pulumi.get(self, "owner_name")
-
-    @_builtins.property
-    @pulumi.getter(name="ownerType")
-    def owner_type(self) -> pulumi.Output[_builtins.str]:
-        """
-        The owner type
-        """
-        return pulumi.get(self, "owner_type")
 

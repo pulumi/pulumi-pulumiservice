@@ -39,14 +39,6 @@ export class PolicyIssue extends pulumi.CustomResource {
     }
 
     /**
-     * The issue identifier
-     */
-    declare public readonly issueId: pulumi.Output<string>;
-    /**
-     * The organization name
-     */
-    declare public readonly orgName: pulumi.Output<string>;
-    /**
      * The policy definition that caused this issue. May be null if the policy has been deleted or is unavailable.
      */
     declare public /*out*/ readonly policy: pulumi.Output<any | undefined>;
@@ -80,14 +72,10 @@ export class PolicyIssue extends pulumi.CustomResource {
             resourceInputs["policy"] = undefined /*out*/;
             resourceInputs["policyPack"] = undefined /*out*/;
         } else {
-            resourceInputs["issueId"] = undefined /*out*/;
-            resourceInputs["orgName"] = undefined /*out*/;
             resourceInputs["policy"] = undefined /*out*/;
             resourceInputs["policyPack"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
-        const replaceOnChanges = { replaceOnChanges: ["issueId", "orgName"] };
-        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(PolicyIssue.__pulumiType, name, resourceInputs, opts);
     }
 }

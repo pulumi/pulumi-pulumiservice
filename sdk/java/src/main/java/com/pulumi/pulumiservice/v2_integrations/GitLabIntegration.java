@@ -178,34 +178,6 @@ public class GitLabIntegration extends com.pulumi.resources.CustomResource {
         return this.installed;
     }
     /**
-     * The GitLab integration identifier
-     * 
-     */
-    @Export(name="integrationId", refs={String.class}, tree="[0]")
-    private Output<String> integrationId;
-
-    /**
-     * @return The GitLab integration identifier
-     * 
-     */
-    public Output<String> integrationId() {
-        return this.integrationId;
-    }
-    /**
-     * The organization name
-     * 
-     */
-    @Export(name="orgName", refs={String.class}, tree="[0]")
-    private Output<String> orgName;
-
-    /**
-     * @return The organization name
-     * 
-     */
-    public Output<String> orgName() {
-        return this.orgName;
-    }
-    /**
      * Whether the integration is currently valid (tokens, hooks, etc.).
      * 
      */

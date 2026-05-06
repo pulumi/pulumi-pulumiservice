@@ -52,12 +52,6 @@ namespace Pulumi.PulumiService.V2.Integrations
         public Output<string> Name { get; private set; } = null!;
 
         /// <summary>
-        /// The organization name
-        /// </summary>
-        [Output("orgName")]
-        public Output<string> OrgName { get; private set; } = null!;
-
-        /// <summary>
         /// List of repositories configured on this integration
         /// </summary>
         [Output("repositories")]
@@ -107,11 +101,6 @@ namespace Pulumi.PulumiService.V2.Integrations
                 AdditionalSecretOutputs =
                 {
                     "webhookSecret",
-                },
-                ReplaceOnChanges =
-                {
-                    "integrationId",
-                    "orgName",
                 },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);

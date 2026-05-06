@@ -22,34 +22,10 @@ namespace Pulumi.PulumiService.V2.Esc
         public Output<int> AccessDurationSeconds { get; private set; } = null!;
 
         /// <summary>
-        /// The change request ID
-        /// </summary>
-        [Output("changeRequestID")]
-        public Output<string> ChangeRequestID { get; private set; } = null!;
-
-        /// <summary>
-        /// The environment name
-        /// </summary>
-        [Output("envName")]
-        public Output<string> EnvName { get; private set; } = null!;
-
-        /// <summary>
         /// Time from application of the request until the resulting grant expires
         /// </summary>
         [Output("grantExpirationSeconds")]
         public Output<int> GrantExpirationSeconds { get; private set; } = null!;
-
-        /// <summary>
-        /// The organization name
-        /// </summary>
-        [Output("orgName")]
-        public Output<string> OrgName { get; private set; } = null!;
-
-        /// <summary>
-        /// The project name
-        /// </summary>
-        [Output("projectName")]
-        public Output<string> ProjectName { get; private set; } = null!;
 
 
         /// <summary>
@@ -74,13 +50,6 @@ namespace Pulumi.PulumiService.V2.Esc
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
-                ReplaceOnChanges =
-                {
-                    "changeRequestID",
-                    "envName",
-                    "orgName",
-                    "projectName",
-                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.

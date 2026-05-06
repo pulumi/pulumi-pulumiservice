@@ -70,10 +70,6 @@ export class Team extends pulumi.CustomResource {
      */
     declare public readonly name: pulumi.Output<string>;
     /**
-     * The organization name
-     */
-    declare public readonly orgName: pulumi.Output<string>;
-    /**
      * RoleIDs are the IDs of the FGA roles assigned to the team, if any.
      * Currently only one role per team is supported.
      */
@@ -131,14 +127,11 @@ export class Team extends pulumi.CustomResource {
             resourceInputs["listMembersError"] = undefined /*out*/;
             resourceInputs["members"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
-            resourceInputs["orgName"] = undefined /*out*/;
             resourceInputs["roleIds"] = undefined /*out*/;
             resourceInputs["stacks"] = undefined /*out*/;
             resourceInputs["userRole"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
-        const replaceOnChanges = { replaceOnChanges: ["name", "orgName"] };
-        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(Team.__pulumiType, name, resourceInputs, opts);
     }
 }

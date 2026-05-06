@@ -180,8 +180,6 @@ class PolicyGroup(pulumi.CustomResource):
             __props__.__dict__["applied_policy_packs"] = None
             __props__.__dict__["is_org_default"] = None
             __props__.__dict__["stacks"] = None
-        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["name", "orgName"])
-        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(PolicyGroup, __self__).__init__(
             'pulumiservice:v2:PolicyGroup',
             resource_name,
@@ -211,7 +209,6 @@ class PolicyGroup(pulumi.CustomResource):
         __props__.__dict__["is_org_default"] = None
         __props__.__dict__["mode"] = None
         __props__.__dict__["name"] = None
-        __props__.__dict__["org_name"] = None
         __props__.__dict__["stacks"] = None
         return PolicyGroup(resource_name, opts=opts, __props__=__props__)
 
@@ -270,14 +267,6 @@ class PolicyGroup(pulumi.CustomResource):
         The name of the policy group.
         """
         return pulumi.get(self, "name")
-
-    @_builtins.property
-    @pulumi.getter(name="orgName")
-    def org_name(self) -> pulumi.Output[_builtins.str]:
-        """
-        The organization name
-        """
-        return pulumi.get(self, "org_name")
 
     @_builtins.property
     @pulumi.getter

@@ -47,10 +47,6 @@ export class RevisionTag extends pulumi.CustomResource {
      */
     declare public /*out*/ readonly editorName: pulumi.Output<string | undefined>;
     /**
-     * The environment name
-     */
-    declare public readonly envName: pulumi.Output<string>;
-    /**
      * The timestamp when the tag was last modified.
      */
     declare public /*out*/ readonly modified: pulumi.Output<string>;
@@ -58,14 +54,6 @@ export class RevisionTag extends pulumi.CustomResource {
      * The name of the tag.
      */
     declare public readonly name: pulumi.Output<string>;
-    /**
-     * The organization name
-     */
-    declare public readonly orgName: pulumi.Output<string>;
-    /**
-     * The project name
-     */
-    declare public readonly projectName: pulumi.Output<string>;
     /**
      * The revision number this tag points to.
      */
@@ -107,16 +95,11 @@ export class RevisionTag extends pulumi.CustomResource {
             resourceInputs["created"] = undefined /*out*/;
             resourceInputs["editorLogin"] = undefined /*out*/;
             resourceInputs["editorName"] = undefined /*out*/;
-            resourceInputs["envName"] = undefined /*out*/;
             resourceInputs["modified"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
-            resourceInputs["orgName"] = undefined /*out*/;
-            resourceInputs["projectName"] = undefined /*out*/;
             resourceInputs["revision"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
-        const replaceOnChanges = { replaceOnChanges: ["envName", "name", "orgName", "projectName"] };
-        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(RevisionTag.__pulumiType, name, resourceInputs, opts);
     }
 }

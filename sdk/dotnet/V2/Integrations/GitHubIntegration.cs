@@ -88,12 +88,6 @@ namespace Pulumi.PulumiService.V2.Integrations
         public Output<int> InstallationID { get; private set; } = null!;
 
         /// <summary>
-        /// The GitHub App integration identifier
-        /// </summary>
-        [Output("integrationId")]
-        public Output<string> IntegrationId { get; private set; } = null!;
-
-        /// <summary>
         /// Whether the GitHub account is an organization (as opposed to a personal account).
         /// </summary>
         [Output("isOrganization")]
@@ -110,12 +104,6 @@ namespace Pulumi.PulumiService.V2.Integrations
         /// </summary>
         [Output("neoGitHubAppPermissionRequirements")]
         public Output<ImmutableArray<object>> NeoGitHubAppPermissionRequirements { get; private set; } = null!;
-
-        /// <summary>
-        /// The organization name
-        /// </summary>
-        [Output("orgName")]
-        public Output<string> OrgName { get; private set; } = null!;
 
 
         /// <summary>
@@ -140,11 +128,6 @@ namespace Pulumi.PulumiService.V2.Integrations
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
-                ReplaceOnChanges =
-                {
-                    "integrationId",
-                    "orgName",
-                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.

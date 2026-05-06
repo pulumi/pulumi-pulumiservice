@@ -35,18 +35,6 @@ export class Role extends pulumi.CustomResource {
         return obj['__pulumiType'] === Role.__pulumiType;
     }
 
-    /**
-     * The organization name
-     */
-    declare public readonly orgName: pulumi.Output<string>;
-    /**
-     * The role identifier
-     */
-    declare public readonly roleID: pulumi.Output<string>;
-    /**
-     * The team name
-     */
-    declare public readonly teamName: pulumi.Output<string>;
 
     /**
      * Create a Role resource with the given unique name, arguments, and options.
@@ -72,13 +60,8 @@ export class Role extends pulumi.CustomResource {
             resourceInputs["roleID"] = args?.roleID;
             resourceInputs["teamName"] = args?.teamName;
         } else {
-            resourceInputs["orgName"] = undefined /*out*/;
-            resourceInputs["roleID"] = undefined /*out*/;
-            resourceInputs["teamName"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
-        const replaceOnChanges = { replaceOnChanges: ["orgName", "roleID", "teamName"] };
-        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(Role.__pulumiType, name, resourceInputs, opts);
     }
 }

@@ -24,20 +24,6 @@ import javax.annotation.Nullable;
 @ResourceType(type="pulumiservice:v2/tokens:OrgToken")
 public class OrgToken extends com.pulumi.resources.CustomResource {
     /**
-     * The organization name
-     * 
-     */
-    @Export(name="orgName", refs={String.class}, tree="[0]")
-    private Output<String> orgName;
-
-    /**
-     * @return The organization name
-     * 
-     */
-    public Output<String> orgName() {
-        return this.orgName;
-    }
-    /**
      * The unique identifier
      * 
      */

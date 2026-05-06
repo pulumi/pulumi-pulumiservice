@@ -139,20 +139,6 @@ public class Team extends com.pulumi.resources.CustomResource {
         return this.name;
     }
     /**
-     * The organization name
-     * 
-     */
-    @Export(name="orgName", refs={String.class}, tree="[0]")
-    private Output<String> orgName;
-
-    /**
-     * @return The organization name
-     * 
-     */
-    public Output<String> orgName() {
-        return this.orgName;
-    }
-    /**
      * RoleIDs are the IDs of the FGA roles assigned to the team, if any.
      * Currently only one role per team is supported.
      * 

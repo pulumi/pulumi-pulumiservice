@@ -51,10 +51,6 @@ export class Pool extends pulumi.CustomResource {
      */
     declare public readonly name: pulumi.Output<string>;
     /**
-     * The organization name
-     */
-    declare public readonly orgName: pulumi.Output<string>;
-    /**
      * The unique identifier
      */
     declare public readonly poolId: pulumi.Output<string>;
@@ -95,15 +91,12 @@ export class Pool extends pulumi.CustomResource {
             resourceInputs["created"] = undefined /*out*/;
             resourceInputs["description"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
-            resourceInputs["orgName"] = undefined /*out*/;
             resourceInputs["poolId"] = undefined /*out*/;
             resourceInputs["tokenValue"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         const secretOpts = { additionalSecretOutputs: ["tokenValue"] };
         opts = pulumi.mergeOptions(opts, secretOpts);
-        const replaceOnChanges = { replaceOnChanges: ["orgName", "poolId"] };
-        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(Pool.__pulumiType, name, resourceInputs, opts);
     }
 }

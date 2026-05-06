@@ -55,10 +55,6 @@ export class OrgTemplateCollection extends pulumi.CustomResource {
      */
     declare public readonly name: pulumi.Output<string>;
     /**
-     * The organization name
-     */
-    declare public readonly orgName: pulumi.Output<string>;
-    /**
      * The source URL to fetch templates from.
      */
     declare public readonly sourceURL: pulumi.Output<string>;
@@ -101,13 +97,10 @@ export class OrgTemplateCollection extends pulumi.CustomResource {
             resourceInputs["error"] = undefined /*out*/;
             resourceInputs["isValid"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
-            resourceInputs["orgName"] = undefined /*out*/;
             resourceInputs["sourceURL"] = undefined /*out*/;
             resourceInputs["templateID"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
-        const replaceOnChanges = { replaceOnChanges: ["orgName"] };
-        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(OrgTemplateCollection.__pulumiType, name, resourceInputs, opts);
     }
 }

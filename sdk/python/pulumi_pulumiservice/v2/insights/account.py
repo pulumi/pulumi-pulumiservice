@@ -249,8 +249,6 @@ class Account(pulumi.CustomResource):
             __props__.__dict__["provider_version"] = None
             __props__.__dict__["scan_status"] = None
             __props__.__dict__["scheduled_scan_enabled"] = None
-        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["accountName", "orgName"])
-        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(Account, __self__).__init__(
             'pulumiservice:v2/insights:Account',
             resource_name,
@@ -273,10 +271,8 @@ class Account(pulumi.CustomResource):
 
         __props__ = AccountArgs.__new__(AccountArgs)
 
-        __props__.__dict__["account_name"] = None
         __props__.__dict__["agent_pool_id"] = None
         __props__.__dict__["name"] = None
-        __props__.__dict__["org_name"] = None
         __props__.__dict__["owned_by"] = None
         __props__.__dict__["provider"] = None
         __props__.__dict__["provider_config"] = None
@@ -285,14 +281,6 @@ class Account(pulumi.CustomResource):
         __props__.__dict__["scan_status"] = None
         __props__.__dict__["scheduled_scan_enabled"] = None
         return Account(resource_name, opts=opts, __props__=__props__)
-
-    @_builtins.property
-    @pulumi.getter(name="accountName")
-    def account_name(self) -> pulumi.Output[_builtins.str]:
-        """
-        The Insights account name
-        """
-        return pulumi.get(self, "account_name")
 
     @_builtins.property
     @pulumi.getter(name="agentPoolID")
@@ -310,14 +298,6 @@ class Account(pulumi.CustomResource):
         The name of the account.
         """
         return pulumi.get(self, "name")
-
-    @_builtins.property
-    @pulumi.getter(name="orgName")
-    def org_name(self) -> pulumi.Output[_builtins.str]:
-        """
-        The organization name
-        """
-        return pulumi.get(self, "org_name")
 
     @_builtins.property
     @pulumi.getter(name="ownedBy")

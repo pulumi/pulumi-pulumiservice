@@ -135,20 +135,6 @@ public class Role extends com.pulumi.resources.CustomResource {
         return this.orgId;
     }
     /**
-     * The organization name
-     * 
-     */
-    @Export(name="orgName", refs={String.class}, tree="[0]")
-    private Output<String> orgName;
-
-    /**
-     * @return The organization name
-     * 
-     */
-    public Output<String> orgName() {
-        return this.orgName;
-    }
-    /**
      * The resource type this permission descriptor applies to.
      * 
      */

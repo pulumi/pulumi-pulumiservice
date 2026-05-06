@@ -18,12 +18,6 @@ type EnvironmentSettings struct {
 
 	// Whether the environment is protected from deletion.
 	DeletionProtected pulumi.BoolOutput `pulumi:"deletionProtected"`
-	// The environment name
-	EnvName pulumi.StringOutput `pulumi:"envName"`
-	// The organization name
-	OrgName pulumi.StringOutput `pulumi:"orgName"`
-	// The project name
-	ProjectName pulumi.StringOutput `pulumi:"projectName"`
 }
 
 // NewEnvironmentSettings registers a new resource with the given unique name, arguments, and options.
@@ -42,12 +36,6 @@ func NewEnvironmentSettings(ctx *pulumi.Context,
 	if args.ProjectName == nil {
 		return nil, errors.New("invalid value for required argument 'ProjectName'")
 	}
-	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
-		"envName",
-		"orgName",
-		"projectName",
-	})
-	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource EnvironmentSettings
 	err := ctx.RegisterResource("pulumiservice:v2/esc:EnvironmentSettings", name, args, &resource, opts...)
@@ -193,21 +181,6 @@ func (o EnvironmentSettingsOutput) ToEnvironmentSettingsOutputWithContext(ctx co
 // Whether the environment is protected from deletion.
 func (o EnvironmentSettingsOutput) DeletionProtected() pulumi.BoolOutput {
 	return o.ApplyT(func(v *EnvironmentSettings) pulumi.BoolOutput { return v.DeletionProtected }).(pulumi.BoolOutput)
-}
-
-// The environment name
-func (o EnvironmentSettingsOutput) EnvName() pulumi.StringOutput {
-	return o.ApplyT(func(v *EnvironmentSettings) pulumi.StringOutput { return v.EnvName }).(pulumi.StringOutput)
-}
-
-// The organization name
-func (o EnvironmentSettingsOutput) OrgName() pulumi.StringOutput {
-	return o.ApplyT(func(v *EnvironmentSettings) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
-}
-
-// The project name
-func (o EnvironmentSettingsOutput) ProjectName() pulumi.StringOutput {
-	return o.ApplyT(func(v *EnvironmentSettings) pulumi.StringOutput { return v.ProjectName }).(pulumi.StringOutput)
 }
 
 type EnvironmentSettingsArrayOutput struct{ *pulumi.OutputState }

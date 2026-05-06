@@ -22,8 +22,7 @@
 // preserves the hand-curated ones via json.RawMessage round-tripping.
 //
 // To exclude a derived token, add it to the top-level `_excluded`
-// array in metadata.json. The scaffolder also drops anything tagged
-// with `x-pulumi-route-property.Visibility = "Deprecated"`.
+// array in metadata.json.
 package main
 
 import (
@@ -138,7 +137,6 @@ type metadataDoc struct {
 	Package   string                     `json:"package,omitempty"`
 	Note      string                     `json:"_note,omitempty"`
 	Excluded  []string                   `json:"_excluded,omitempty"`
-	V0Aliases map[string][]string        `json:"_v0Aliases,omitempty"`
 	Resources map[string]json.RawMessage `json:"resources"`
 }
 
@@ -170,11 +168,7 @@ func main() {
 	}
 
 	doc := loadMetadata(*out)
-	candidates, stats := derive(rawSpec.Paths, true)
-	// Re-derive without the deprecation filter so we can distinguish two
-	// orphan classes: dropped-because-deprecated (auto-prunable) vs.
-	// dropped-because-spec-changed-or-heuristic-miss (warn only).
-	candidatesIfKept, _ := derive(rawSpec.Paths, false)
+	candidates, stats := derive(rawSpec.Paths)
 
 	excluded := map[string]bool{}
 	for _, tok := range doc.Excluded {
@@ -182,16 +176,6 @@ func main() {
 	}
 
 	modules := deriveModules(candidates, parsedSpec)
-
-	// Validate _v0Aliases keys reference real v2 tokens. Catches typos that
-	// would otherwise silently fail to populate.
-	for v2tok := range doc.V0Aliases {
-		if _, ok := doc.Resources[v2tok]; !ok {
-			if _, ok := candidates[v2tok]; !ok {
-				fail("_v0Aliases references unknown v2 token %q (no entry in resources or candidates)", v2tok)
-			}
-		}
-	}
 
 	added, updated := 0, 0
 	autoNameRecommendations := map[string]map[string]int{}
@@ -210,7 +194,6 @@ func main() {
 			RequireImport:       inferRequireImport(parsedSpec, ops),
 			EmitOnCreateFields:  inferEmitOnCreate(parsedSpec, ops, renames),
 			UnorderedFields:     inferUnordered(parsedSpec, ops, renames),
-			V0Aliases:           doc.V0Aliases[tok],
 		}
 		if rec := inferAutoNameRecommendations(parsedSpec, ops, renames); len(rec) > 0 {
 			autoNameRecommendations[tok] = rec
@@ -227,9 +210,9 @@ func main() {
 		doc.Resources[tok] = merged
 	}
 
-	// Split tokens that survived in metadata.json but didn't make it into
-	// candidates: deprecation-induced ones are pruned; the rest just warn.
-	var orphans, prunedDeprecated []string
+	// Tokens that survived in metadata.json but didn't make it into candidates
+	// are reported as orphans — typically a spec change or heuristic miss.
+	var orphans []string
 	for tok := range doc.Resources {
 		if _, ok := candidates[tok]; ok {
 			continue
@@ -237,15 +220,9 @@ func main() {
 		if excluded[tok] {
 			continue
 		}
-		if _, wouldBeIfKept := candidatesIfKept[tok]; wouldBeIfKept {
-			delete(doc.Resources, tok)
-			prunedDeprecated = append(prunedDeprecated, tok)
-		} else {
-			orphans = append(orphans, tok)
-		}
+		orphans = append(orphans, tok)
 	}
 	sort.Strings(orphans)
-	sort.Strings(prunedDeprecated)
 
 	if err := writeMetadata(*out, doc); err != nil {
 		fail("write %s: %v", *out, err)
@@ -257,14 +234,8 @@ func main() {
 	fmt.Fprintf(os.Stderr, "  added new entries:         %d\n", added)
 	fmt.Fprintf(os.Stderr, "  updated existing entries:  %d\n", updated)
 	fmt.Fprintf(os.Stderr, "  excluded (_excluded):      %d\n", len(excluded))
-	fmt.Fprintf(os.Stderr, "  excluded (Deprecated):     %d\n", len(stats.deprecated))
+	fmt.Fprintf(os.Stderr, "  deprecated (kept):         %d\n", len(stats.deprecated))
 	fmt.Fprintf(os.Stderr, "  skipped (no Create+Read|Delete): %d\n", len(stats.skipped))
-	if len(prunedDeprecated) > 0 {
-		fmt.Fprintf(os.Stderr, "  auto-pruned (deprecated upstream): %d\n", len(prunedDeprecated))
-		for _, o := range prunedDeprecated {
-			fmt.Fprintf(os.Stderr, "    %s\n", o)
-		}
-	}
 	if len(orphans) > 0 {
 		fmt.Fprintf(os.Stderr, "  orphans (in metadata.json, not derived from spec): %d\n", len(orphans))
 		for _, o := range orphans {
@@ -513,7 +484,6 @@ type derivations struct {
 	RequireImport       bool
 	EmitOnCreateFields  []string // Pulumi-side field names
 	UnorderedFields     []string // Pulumi-side field names
-	V0Aliases           []string // v0 tokens to add to aliases when present
 }
 
 // mergeOperations layers derived fields onto an existing per-resource entry.
@@ -591,9 +561,6 @@ func mergeOperations(existing json.RawMessage, ops derivedOps, d derivations) (j
 			entry["requireImport"] = true
 		}
 	}
-	for _, a := range d.V0Aliases {
-		addAlias(entry, a)
-	}
 	for _, name := range d.EmitOnCreateFields {
 		setFieldFlag(entry, name, "emitOnCreate", true)
 	}
@@ -606,19 +573,6 @@ func mergeOperations(existing json.RawMessage, ops derivedOps, d derivations) (j
 		return nil, false, err
 	}
 	return encoded, changed, nil
-}
-
-// addAlias appends the given token to entry.aliases if it's not already
-// present. Aliases is a list to allow multiple v0 → v2 lineages on a
-// single resource.
-func addAlias(entry map[string]any, token string) {
-	existing, _ := entry["aliases"].([]any)
-	for _, a := range existing {
-		if s, ok := a.(string); ok && s == token {
-			return
-		}
-	}
-	entry["aliases"] = append(existing, token)
 }
 
 // setFieldFlag sets entry.fields[fieldName].flag = value, but only when the
@@ -939,15 +893,6 @@ func writeMetadata(path string, doc *metadataDoc) error {
 		b.Write(ex)
 		b.WriteString(",\n")
 	}
-	if len(doc.V0Aliases) > 0 {
-		ex, err := json.MarshalIndent(doc.V0Aliases, "  ", "  ")
-		if err != nil {
-			return err
-		}
-		b.WriteString("  \"_v0Aliases\": ")
-		b.Write(ex)
-		b.WriteString(",\n")
-	}
 	tokens := slices.Collect(maps.Keys(doc.Resources))
 	sort.Strings(tokens)
 
@@ -994,11 +939,9 @@ type deriveStats struct {
 // derive walks every operation and returns the candidate resources we'd
 // emit. Resources are grouped by operationId noun; each candidate's slot
 // (create/read/update/delete) comes from the HTTP method, with the verb
-// prefix as a tiebreaker for ambiguous POSTs. When filterDeprecated is
-// false, ops marked deprecated upstream still contribute to candidates —
-// used by the orphan-classification pass to detect which entries dropped
-// out specifically because of the deprecation filter.
-func derive(paths map[string]map[string]any, filterDeprecated bool) (map[string]derivedOps, deriveStats) {
+// prefix as a tiebreaker for ambiguous POSTs. Ops marked deprecated
+// upstream still contribute to candidates — tracked in stats for reporting.
+func derive(paths map[string]map[string]any) (map[string]derivedOps, deriveStats) {
 	type ops = map[string]string
 	byNoun := map[string]ops{}
 	otherOps := map[string][]string{}
@@ -1021,9 +964,6 @@ func derive(paths map[string]map[string]any, filterDeprecated bool) (map[string]
 
 			if isDeprecated(obj) {
 				stats.deprecated = append(stats.deprecated, id)
-				if filterDeprecated {
-					continue
-				}
 			}
 
 			verb, noun, slot := splitOperationID(id)
@@ -1153,9 +1093,8 @@ func derive(paths map[string]map[string]any, filterDeprecated bool) (map[string]
 
 // isDeprecated returns true when an operation is marked deprecated, either via
 // the OpenAPI standard `deprecated: true` boolean or the legacy Pulumi-custom
-// `x-pulumi-route-property.Visibility = "Deprecated"` extension. Preview
-// endpoints still scaffold so the provider can expose them behind their own
-// resources; only deprecated routes are filtered.
+// `x-pulumi-route-property.Visibility = "Deprecated"` extension. Used for
+// reporting only — deprecated ops still scaffold as v2 resources.
 func isDeprecated(op map[string]any) bool {
 	if dep, _ := op["deprecated"].(bool); dep {
 		return true

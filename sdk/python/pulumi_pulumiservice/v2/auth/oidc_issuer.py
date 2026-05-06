@@ -220,8 +220,6 @@ class OidcIssuer(pulumi.CustomResource):
             __props__.__dict__["issuer"] = None
             __props__.__dict__["last_used"] = None
             __props__.__dict__["modified"] = None
-        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["issuerId", "orgName"])
-        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(OidcIssuer, __self__).__init__(
             'pulumiservice:v2/auth:OidcIssuer',
             resource_name,
@@ -252,7 +250,6 @@ class OidcIssuer(pulumi.CustomResource):
         __props__.__dict__["max_expiration"] = None
         __props__.__dict__["modified"] = None
         __props__.__dict__["name"] = None
-        __props__.__dict__["org_name"] = None
         __props__.__dict__["thumbprints"] = None
         __props__.__dict__["url"] = None
         return OidcIssuer(resource_name, opts=opts, __props__=__props__)
@@ -320,14 +317,6 @@ class OidcIssuer(pulumi.CustomResource):
         The display name of the OIDC issuer.
         """
         return pulumi.get(self, "name")
-
-    @_builtins.property
-    @pulumi.getter(name="orgName")
-    def org_name(self) -> pulumi.Output[_builtins.str]:
-        """
-        The organization name
-        """
-        return pulumi.get(self, "org_name")
 
     @_builtins.property
     @pulumi.getter

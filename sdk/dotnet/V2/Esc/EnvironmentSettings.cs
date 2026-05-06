@@ -21,24 +21,6 @@ namespace Pulumi.PulumiService.V2.Esc
         [Output("deletionProtected")]
         public Output<bool> DeletionProtected { get; private set; } = null!;
 
-        /// <summary>
-        /// The environment name
-        /// </summary>
-        [Output("envName")]
-        public Output<string> EnvName { get; private set; } = null!;
-
-        /// <summary>
-        /// The organization name
-        /// </summary>
-        [Output("orgName")]
-        public Output<string> OrgName { get; private set; } = null!;
-
-        /// <summary>
-        /// The project name
-        /// </summary>
-        [Output("projectName")]
-        public Output<string> ProjectName { get; private set; } = null!;
-
 
         /// <summary>
         /// Create a EnvironmentSettings resource with the given unique name, arguments, and options.
@@ -62,12 +44,6 @@ namespace Pulumi.PulumiService.V2.Esc
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
-                ReplaceOnChanges =
-                {
-                    "envName",
-                    "orgName",
-                    "projectName",
-                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.

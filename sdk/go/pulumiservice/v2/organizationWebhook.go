@@ -82,11 +82,6 @@ func NewOrganizationWebhook(ctx *pulumi.Context,
 		"secretCiphertext",
 	})
 	opts = append(opts, secrets)
-	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
-		"name",
-		"organizationName",
-	})
-	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource OrganizationWebhook
 	err := ctx.RegisterResource("pulumiservice:v2:OrganizationWebhook", name, args, &resource, opts...)

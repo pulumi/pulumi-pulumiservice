@@ -24,8 +24,6 @@ type Pool struct {
 	Description pulumi.StringOutput `pulumi:"description"`
 	// The name
 	Name pulumi.StringOutput `pulumi:"name"`
-	// The organization name
-	OrgName pulumi.StringOutput `pulumi:"orgName"`
 	// The unique identifier
 	PoolId pulumi.StringOutput `pulumi:"poolId"`
 	// The token value
@@ -52,11 +50,6 @@ func NewPool(ctx *pulumi.Context,
 		"tokenValue",
 	})
 	opts = append(opts, secrets)
-	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
-		"orgName",
-		"poolId",
-	})
-	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Pool
 	err := ctx.RegisterResource("pulumiservice:v2/agents:Pool", name, args, &resource, opts...)
@@ -217,11 +210,6 @@ func (o PoolOutput) Description() pulumi.StringOutput {
 // The name
 func (o PoolOutput) Name() pulumi.StringOutput {
 	return o.ApplyT(func(v *Pool) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
-}
-
-// The organization name
-func (o PoolOutput) OrgName() pulumi.StringOutput {
-	return o.ApplyT(func(v *Pool) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
 }
 
 // The unique identifier

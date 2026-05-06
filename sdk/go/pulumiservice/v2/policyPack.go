@@ -22,8 +22,6 @@ type PolicyPack struct {
 	DisplayName pulumi.StringOutput `pulumi:"displayName"`
 	// The unique name of the policy pack.
 	Name pulumi.StringOutput `pulumi:"name"`
-	// The organization name
-	OrgName pulumi.StringOutput `pulumi:"orgName"`
 	// The individual policies contained in this policy pack.
 	Policies pulumi.ArrayOutput `pulumi:"policies"`
 	// Numeric version of the policy pack, auto-incremented on each publish.
@@ -51,12 +49,6 @@ func NewPolicyPack(ctx *pulumi.Context,
 	if args.Policies == nil {
 		return nil, errors.New("invalid value for required argument 'Policies'")
 	}
-	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
-		"name",
-		"orgName",
-		"version",
-	})
-	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource PolicyPack
 	err := ctx.RegisterResource("pulumiservice:v2:PolicyPack", name, args, &resource, opts...)
@@ -256,11 +248,6 @@ func (o PolicyPackOutput) DisplayName() pulumi.StringOutput {
 // The unique name of the policy pack.
 func (o PolicyPackOutput) Name() pulumi.StringOutput {
 	return o.ApplyT(func(v *PolicyPack) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
-}
-
-// The organization name
-func (o PolicyPackOutput) OrgName() pulumi.StringOutput {
-	return o.ApplyT(func(v *PolicyPack) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
 }
 
 // The individual policies contained in this policy pack.

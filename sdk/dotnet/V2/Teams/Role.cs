@@ -17,25 +17,6 @@ namespace Pulumi.PulumiService.V2.Teams
     public partial class Role : global::Pulumi.CustomResource
     {
         /// <summary>
-        /// The organization name
-        /// </summary>
-        [Output("orgName")]
-        public Output<string> OrgName { get; private set; } = null!;
-
-        /// <summary>
-        /// The role identifier
-        /// </summary>
-        [Output("roleID")]
-        public Output<string> RoleID { get; private set; } = null!;
-
-        /// <summary>
-        /// The team name
-        /// </summary>
-        [Output("teamName")]
-        public Output<string> TeamName { get; private set; } = null!;
-
-
-        /// <summary>
         /// Create a Role resource with the given unique name, arguments, and options.
         /// </summary>
         ///
@@ -57,12 +38,6 @@ namespace Pulumi.PulumiService.V2.Teams
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
-                ReplaceOnChanges =
-                {
-                    "orgName",
-                    "roleID",
-                    "teamName",
-                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.

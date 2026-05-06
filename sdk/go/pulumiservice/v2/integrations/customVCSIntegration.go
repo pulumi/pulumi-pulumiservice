@@ -28,8 +28,6 @@ type CustomVCSIntegration struct {
 	Modified pulumi.StringOutput `pulumi:"modified"`
 	// Human-readable name for the integration
 	Name pulumi.StringOutput `pulumi:"name"`
-	// The organization name
-	OrgName pulumi.StringOutput `pulumi:"orgName"`
 	// List of repositories configured on this integration
 	Repositories pulumi.ArrayOutput `pulumi:"repositories"`
 	// Version control system type
@@ -63,11 +61,6 @@ func NewCustomVCSIntegration(ctx *pulumi.Context,
 		"webhookSecret",
 	})
 	opts = append(opts, secrets)
-	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
-		"integrationId",
-		"orgName",
-	})
-	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource CustomVCSIntegration
 	err := ctx.RegisterResource("pulumiservice:v2/integrations:CustomVCSIntegration", name, args, &resource, opts...)
@@ -246,11 +239,6 @@ func (o CustomVCSIntegrationOutput) Modified() pulumi.StringOutput {
 // Human-readable name for the integration
 func (o CustomVCSIntegrationOutput) Name() pulumi.StringOutput {
 	return o.ApplyT(func(v *CustomVCSIntegration) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
-}
-
-// The organization name
-func (o CustomVCSIntegrationOutput) OrgName() pulumi.StringOutput {
-	return o.ApplyT(func(v *CustomVCSIntegration) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
 }
 
 // List of repositories configured on this integration

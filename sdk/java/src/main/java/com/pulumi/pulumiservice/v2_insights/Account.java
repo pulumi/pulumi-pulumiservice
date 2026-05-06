@@ -23,20 +23,6 @@ import javax.annotation.Nullable;
 @ResourceType(type="pulumiservice:v2/insights:Account")
 public class Account extends com.pulumi.resources.CustomResource {
     /**
-     * The Insights account name
-     * 
-     */
-    @Export(name="accountName", refs={String.class}, tree="[0]")
-    private Output<String> accountName;
-
-    /**
-     * @return The Insights account name
-     * 
-     */
-    public Output<String> accountName() {
-        return this.accountName;
-    }
-    /**
      * The ID of the agent pool to run account discovery workflows.
      * If not specified, discovery will use the default agent pool.
      * 
@@ -65,20 +51,6 @@ public class Account extends com.pulumi.resources.CustomResource {
      */
     public Output<String> name() {
         return this.name;
-    }
-    /**
-     * The organization name
-     * 
-     */
-    @Export(name="orgName", refs={String.class}, tree="[0]")
-    private Output<String> orgName;
-
-    /**
-     * @return The organization name
-     * 
-     */
-    public Output<String> orgName() {
-        return this.orgName;
     }
     /**
      * The user with ownership of this Insights account

@@ -58,12 +58,6 @@ namespace Pulumi.PulumiService.V2
         public Output<string> Name { get; private set; } = null!;
 
         /// <summary>
-        /// The organization name
-        /// </summary>
-        [Output("orgName")]
-        public Output<string> OrgName { get; private set; } = null!;
-
-        /// <summary>
         /// List of stacks that are members of this policy group.
         /// </summary>
         [Output("stacks")]
@@ -92,11 +86,6 @@ namespace Pulumi.PulumiService.V2
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
-                ReplaceOnChanges =
-                {
-                    "name",
-                    "orgName",
-                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.

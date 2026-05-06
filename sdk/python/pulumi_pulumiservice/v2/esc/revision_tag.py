@@ -181,8 +181,6 @@ class RevisionTag(pulumi.CustomResource):
             __props__.__dict__["editor_login"] = None
             __props__.__dict__["editor_name"] = None
             __props__.__dict__["modified"] = None
-        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["envName", "name", "orgName", "projectName"])
-        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(RevisionTag, __self__).__init__(
             'pulumiservice:v2/esc:RevisionTag',
             resource_name,
@@ -208,11 +206,8 @@ class RevisionTag(pulumi.CustomResource):
         __props__.__dict__["created"] = None
         __props__.__dict__["editor_login"] = None
         __props__.__dict__["editor_name"] = None
-        __props__.__dict__["env_name"] = None
         __props__.__dict__["modified"] = None
         __props__.__dict__["name"] = None
-        __props__.__dict__["org_name"] = None
-        __props__.__dict__["project_name"] = None
         __props__.__dict__["revision"] = None
         return RevisionTag(resource_name, opts=opts, __props__=__props__)
 
@@ -241,14 +236,6 @@ class RevisionTag(pulumi.CustomResource):
         return pulumi.get(self, "editor_name")
 
     @_builtins.property
-    @pulumi.getter(name="envName")
-    def env_name(self) -> pulumi.Output[_builtins.str]:
-        """
-        The environment name
-        """
-        return pulumi.get(self, "env_name")
-
-    @_builtins.property
     @pulumi.getter
     def modified(self) -> pulumi.Output[_builtins.str]:
         """
@@ -263,22 +250,6 @@ class RevisionTag(pulumi.CustomResource):
         The name of the tag.
         """
         return pulumi.get(self, "name")
-
-    @_builtins.property
-    @pulumi.getter(name="orgName")
-    def org_name(self) -> pulumi.Output[_builtins.str]:
-        """
-        The organization name
-        """
-        return pulumi.get(self, "org_name")
-
-    @_builtins.property
-    @pulumi.getter(name="projectName")
-    def project_name(self) -> pulumi.Output[_builtins.str]:
-        """
-        The project name
-        """
-        return pulumi.get(self, "project_name")
 
     @_builtins.property
     @pulumi.getter

@@ -156,8 +156,6 @@ class CustomVCSRepository(pulumi.CustomResource):
             if org_name is None and not opts.urn:
                 raise TypeError("Missing required property 'org_name'")
             __props__.__dict__["org_name"] = org_name
-        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["integrationId", "orgName"])
-        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(CustomVCSRepository, __self__).__init__(
             'pulumiservice:v2/integrations:CustomVCSRepository',
             resource_name,
@@ -180,23 +178,5 @@ class CustomVCSRepository(pulumi.CustomResource):
 
         __props__ = CustomVCSRepositoryArgs.__new__(CustomVCSRepositoryArgs)
 
-        __props__.__dict__["integration_id"] = None
-        __props__.__dict__["org_name"] = None
         return CustomVCSRepository(resource_name, opts=opts, __props__=__props__)
-
-    @_builtins.property
-    @pulumi.getter(name="integrationId")
-    def integration_id(self) -> pulumi.Output[_builtins.str]:
-        """
-        The custom VCS integration identifier
-        """
-        return pulumi.get(self, "integration_id")
-
-    @_builtins.property
-    @pulumi.getter(name="orgName")
-    def org_name(self) -> pulumi.Output[_builtins.str]:
-        """
-        The organization name
-        """
-        return pulumi.get(self, "org_name")
 

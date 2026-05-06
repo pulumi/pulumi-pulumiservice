@@ -181,8 +181,6 @@ class Policy(pulumi.CustomResource):
             __props__.__dict__["created"] = None
             __props__.__dict__["modified"] = None
             __props__.__dict__["version"] = None
-        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["issuerId", "orgName", "policyId"])
-        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(Policy, __self__).__init__(
             'pulumiservice:v2/auth:Policy',
             resource_name,
@@ -208,9 +206,7 @@ class Policy(pulumi.CustomResource):
         __props__.__dict__["created"] = None
         __props__.__dict__["issuer_id"] = None
         __props__.__dict__["modified"] = None
-        __props__.__dict__["org_name"] = None
         __props__.__dict__["policies"] = None
-        __props__.__dict__["policy_id"] = None
         __props__.__dict__["version"] = None
         return Policy(resource_name, opts=opts, __props__=__props__)
 
@@ -239,28 +235,12 @@ class Policy(pulumi.CustomResource):
         return pulumi.get(self, "modified")
 
     @_builtins.property
-    @pulumi.getter(name="orgName")
-    def org_name(self) -> pulumi.Output[_builtins.str]:
-        """
-        The organization name
-        """
-        return pulumi.get(self, "org_name")
-
-    @_builtins.property
     @pulumi.getter
     def policies(self) -> pulumi.Output[Sequence[Any]]:
         """
         List of policies
         """
         return pulumi.get(self, "policies")
-
-    @_builtins.property
-    @pulumi.getter(name="policyId")
-    def policy_id(self) -> pulumi.Output[_builtins.str]:
-        """
-        The policy identifier
-        """
-        return pulumi.get(self, "policy_id")
 
     @_builtins.property
     @pulumi.getter

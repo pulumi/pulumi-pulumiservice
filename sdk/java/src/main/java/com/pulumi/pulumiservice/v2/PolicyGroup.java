@@ -121,20 +121,6 @@ public class PolicyGroup extends com.pulumi.resources.CustomResource {
         return this.name;
     }
     /**
-     * The organization name
-     * 
-     */
-    @Export(name="orgName", refs={String.class}, tree="[0]")
-    private Output<String> orgName;
-
-    /**
-     * @return The organization name
-     * 
-     */
-    public Output<String> orgName() {
-        return this.orgName;
-    }
-    /**
      * List of stacks that are members of this policy group.
      * 
      */

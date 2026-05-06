@@ -63,34 +63,6 @@ public class Config extends com.pulumi.resources.CustomResource {
         return this.environment;
     }
     /**
-     * The organization name
-     * 
-     */
-    @Export(name="orgName", refs={String.class}, tree="[0]")
-    private Output<String> orgName;
-
-    /**
-     * @return The organization name
-     * 
-     */
-    public Output<String> orgName() {
-        return this.orgName;
-    }
-    /**
-     * The project name
-     * 
-     */
-    @Export(name="projectName", refs={String.class}, tree="[0]")
-    private Output<String> projectName;
-
-    /**
-     * @return The project name
-     * 
-     */
-    public Output<String> projectName() {
-        return this.projectName;
-    }
-    /**
      * The stack&#39;s secrets provider.
      * 
      */
@@ -103,20 +75,6 @@ public class Config extends com.pulumi.resources.CustomResource {
      */
     public Output<Optional<String>> secretsProvider() {
         return Codegen.optional(this.secretsProvider);
-    }
-    /**
-     * The stack name
-     * 
-     */
-    @Export(name="stackName", refs={String.class}, tree="[0]")
-    private Output<String> stackName;
-
-    /**
-     * @return The stack name
-     * 
-     */
-    public Output<String> stackName() {
-        return this.stackName;
     }
 
     /**

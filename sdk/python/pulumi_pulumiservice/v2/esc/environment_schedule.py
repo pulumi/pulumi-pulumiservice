@@ -224,8 +224,6 @@ class EnvironmentSchedule(pulumi.CustomResource):
             __props__.__dict__["next_execution"] = None
             __props__.__dict__["org_id"] = None
             __props__.__dict__["paused"] = None
-        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["envName", "orgName", "projectName", "scheduleID"])
-        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(EnvironmentSchedule, __self__).__init__(
             'pulumiservice:v2/esc:EnvironmentSchedule',
             resource_name,
@@ -250,15 +248,12 @@ class EnvironmentSchedule(pulumi.CustomResource):
 
         __props__.__dict__["created"] = None
         __props__.__dict__["definition"] = None
-        __props__.__dict__["env_name"] = None
         __props__.__dict__["kind"] = None
         __props__.__dict__["last_executed"] = None
         __props__.__dict__["modified"] = None
         __props__.__dict__["next_execution"] = None
         __props__.__dict__["org_id"] = None
-        __props__.__dict__["org_name"] = None
         __props__.__dict__["paused"] = None
-        __props__.__dict__["project_name"] = None
         __props__.__dict__["schedule_cron"] = None
         __props__.__dict__["schedule_id"] = None
         __props__.__dict__["schedule_once"] = None
@@ -279,14 +274,6 @@ class EnvironmentSchedule(pulumi.CustomResource):
         The action definition, which varies based on the action kind.
         """
         return pulumi.get(self, "definition")
-
-    @_builtins.property
-    @pulumi.getter(name="envName")
-    def env_name(self) -> pulumi.Output[_builtins.str]:
-        """
-        The environment name
-        """
-        return pulumi.get(self, "env_name")
 
     @_builtins.property
     @pulumi.getter
@@ -329,28 +316,12 @@ class EnvironmentSchedule(pulumi.CustomResource):
         return pulumi.get(self, "org_id")
 
     @_builtins.property
-    @pulumi.getter(name="orgName")
-    def org_name(self) -> pulumi.Output[_builtins.str]:
-        """
-        The organization name
-        """
-        return pulumi.get(self, "org_name")
-
-    @_builtins.property
     @pulumi.getter
     def paused(self) -> pulumi.Output[_builtins.bool]:
         """
         Whether the scheduled action is currently paused.
         """
         return pulumi.get(self, "paused")
-
-    @_builtins.property
-    @pulumi.getter(name="projectName")
-    def project_name(self) -> pulumi.Output[_builtins.str]:
-        """
-        The project name
-        """
-        return pulumi.get(self, "project_name")
 
     @_builtins.property
     @pulumi.getter(name="scheduleCron")

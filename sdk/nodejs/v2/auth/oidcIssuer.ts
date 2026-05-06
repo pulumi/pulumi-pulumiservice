@@ -67,10 +67,6 @@ export class OidcIssuer extends pulumi.CustomResource {
      */
     declare public readonly name: pulumi.Output<string>;
     /**
-     * The organization name
-     */
-    declare public readonly orgName: pulumi.Output<string>;
-    /**
      * SHA-1 certificate thumbprints used to verify the OIDC issuer's TLS certificate.
      */
     declare public readonly thumbprints: pulumi.Output<string[] | undefined>;
@@ -119,13 +115,10 @@ export class OidcIssuer extends pulumi.CustomResource {
             resourceInputs["maxExpiration"] = undefined /*out*/;
             resourceInputs["modified"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
-            resourceInputs["orgName"] = undefined /*out*/;
             resourceInputs["thumbprints"] = undefined /*out*/;
             resourceInputs["url"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
-        const replaceOnChanges = { replaceOnChanges: ["issuerId", "orgName"] };
-        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(OidcIssuer.__pulumiType, name, resourceInputs, opts);
     }
 }

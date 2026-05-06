@@ -136,8 +136,6 @@ class Environment(pulumi.CustomResource):
             if project is None and not opts.urn:
                 raise TypeError("Missing required property 'project'")
             __props__.__dict__["project"] = project
-        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["name", "orgName", "project"])
-        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(Environment, __self__).__init__(
             'pulumiservice:v2/esc:Environment',
             resource_name,
@@ -160,32 +158,5 @@ class Environment(pulumi.CustomResource):
 
         __props__ = EnvironmentArgs.__new__(EnvironmentArgs)
 
-        __props__.__dict__["name"] = None
-        __props__.__dict__["org_name"] = None
-        __props__.__dict__["project"] = None
         return Environment(resource_name, opts=opts, __props__=__props__)
-
-    @_builtins.property
-    @pulumi.getter
-    def name(self) -> pulumi.Output[_builtins.str]:
-        """
-        The environment name
-        """
-        return pulumi.get(self, "name")
-
-    @_builtins.property
-    @pulumi.getter(name="orgName")
-    def org_name(self) -> pulumi.Output[_builtins.str]:
-        """
-        The organization name
-        """
-        return pulumi.get(self, "org_name")
-
-    @_builtins.property
-    @pulumi.getter
-    def project(self) -> pulumi.Output[_builtins.str]:
-        """
-        The project name
-        """
-        return pulumi.get(self, "project")
 

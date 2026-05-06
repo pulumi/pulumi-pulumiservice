@@ -28,12 +28,6 @@ namespace Pulumi.PulumiService.V2.Esc
         public Output<ImmutableDictionary<string, object>> Definition { get; private set; } = null!;
 
         /// <summary>
-        /// The environment name
-        /// </summary>
-        [Output("envName")]
-        public Output<string> EnvName { get; private set; } = null!;
-
-        /// <summary>
         /// The kind of action to be executed.
         /// </summary>
         [Output("kind")]
@@ -64,22 +58,10 @@ namespace Pulumi.PulumiService.V2.Esc
         public Output<string> OrgID { get; private set; } = null!;
 
         /// <summary>
-        /// The organization name
-        /// </summary>
-        [Output("orgName")]
-        public Output<string> OrgName { get; private set; } = null!;
-
-        /// <summary>
         /// Whether the scheduled action is currently paused.
         /// </summary>
         [Output("paused")]
         public Output<bool> Paused { get; private set; } = null!;
-
-        /// <summary>
-        /// The project name
-        /// </summary>
-        [Output("projectName")]
-        public Output<string> ProjectName { get; private set; } = null!;
 
         /// <summary>
         /// A cron expression defining the recurring schedule.
@@ -122,13 +104,6 @@ namespace Pulumi.PulumiService.V2.Esc
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
-                ReplaceOnChanges =
-                {
-                    "envName",
-                    "orgName",
-                    "projectName",
-                    "scheduleID",
-                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.

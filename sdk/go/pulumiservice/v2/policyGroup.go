@@ -30,8 +30,6 @@ type PolicyGroup struct {
 	Mode pulumi.StringOutput `pulumi:"mode"`
 	// The name of the policy group.
 	Name pulumi.StringOutput `pulumi:"name"`
-	// The organization name
-	OrgName pulumi.StringOutput `pulumi:"orgName"`
 	// List of stacks that are members of this policy group.
 	Stacks pulumi.ArrayOutput `pulumi:"stacks"`
 }
@@ -52,11 +50,6 @@ func NewPolicyGroup(ctx *pulumi.Context,
 	if args.OrgName == nil {
 		return nil, errors.New("invalid value for required argument 'OrgName'")
 	}
-	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
-		"name",
-		"orgName",
-	})
-	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource PolicyGroup
 	err := ctx.RegisterResource("pulumiservice:v2:PolicyGroup", name, args, &resource, opts...)
@@ -236,11 +229,6 @@ func (o PolicyGroupOutput) Mode() pulumi.StringOutput {
 // The name of the policy group.
 func (o PolicyGroupOutput) Name() pulumi.StringOutput {
 	return o.ApplyT(func(v *PolicyGroup) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
-}
-
-// The organization name
-func (o PolicyGroupOutput) OrgName() pulumi.StringOutput {
-	return o.ApplyT(func(v *PolicyGroup) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
 }
 
 // List of stacks that are members of this policy group.

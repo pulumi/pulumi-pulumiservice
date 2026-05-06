@@ -22,14 +22,8 @@ type Config struct {
 	EncryptionSalt pulumi.StringPtrOutput `pulumi:"encryptionSalt"`
 	// Reference to ESC environment to use as stack configuration.
 	Environment pulumi.StringOutput `pulumi:"environment"`
-	// The organization name
-	OrgName pulumi.StringOutput `pulumi:"orgName"`
-	// The project name
-	ProjectName pulumi.StringOutput `pulumi:"projectName"`
 	// The stack's secrets provider.
 	SecretsProvider pulumi.StringPtrOutput `pulumi:"secretsProvider"`
-	// The stack name
-	StackName pulumi.StringOutput `pulumi:"stackName"`
 }
 
 // NewConfig registers a new resource with the given unique name, arguments, and options.
@@ -55,12 +49,6 @@ func NewConfig(ctx *pulumi.Context,
 		"secretsProvider",
 	})
 	opts = append(opts, secrets)
-	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
-		"orgName",
-		"projectName",
-		"stackName",
-	})
-	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Config
 	err := ctx.RegisterResource("pulumiservice:v2/stacks:Config", name, args, &resource, opts...)
@@ -230,24 +218,9 @@ func (o ConfigOutput) Environment() pulumi.StringOutput {
 	return o.ApplyT(func(v *Config) pulumi.StringOutput { return v.Environment }).(pulumi.StringOutput)
 }
 
-// The organization name
-func (o ConfigOutput) OrgName() pulumi.StringOutput {
-	return o.ApplyT(func(v *Config) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
-}
-
-// The project name
-func (o ConfigOutput) ProjectName() pulumi.StringOutput {
-	return o.ApplyT(func(v *Config) pulumi.StringOutput { return v.ProjectName }).(pulumi.StringOutput)
-}
-
 // The stack's secrets provider.
 func (o ConfigOutput) SecretsProvider() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *Config) pulumi.StringPtrOutput { return v.SecretsProvider }).(pulumi.StringPtrOutput)
-}
-
-// The stack name
-func (o ConfigOutput) StackName() pulumi.StringOutput {
-	return o.ApplyT(func(v *Config) pulumi.StringOutput { return v.StackName }).(pulumi.StringOutput)
 }
 
 type ConfigArrayOutput struct{ *pulumi.OutputState }

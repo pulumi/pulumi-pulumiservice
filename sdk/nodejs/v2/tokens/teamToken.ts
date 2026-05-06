@@ -39,14 +39,6 @@ export class TeamToken extends pulumi.CustomResource {
     }
 
     /**
-     * The organization name
-     */
-    declare public readonly orgName: pulumi.Output<string>;
-    /**
-     * The team name
-     */
-    declare public readonly teamName: pulumi.Output<string>;
-    /**
      * The unique identifier
      */
     declare public /*out*/ readonly tokenId: pulumi.Output<string>;
@@ -90,16 +82,12 @@ export class TeamToken extends pulumi.CustomResource {
             resourceInputs["tokenId"] = undefined /*out*/;
             resourceInputs["tokenValue"] = undefined /*out*/;
         } else {
-            resourceInputs["orgName"] = undefined /*out*/;
-            resourceInputs["teamName"] = undefined /*out*/;
             resourceInputs["tokenId"] = undefined /*out*/;
             resourceInputs["tokenValue"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         const secretOpts = { additionalSecretOutputs: ["tokenValue"] };
         opts = pulumi.mergeOptions(opts, secretOpts);
-        const replaceOnChanges = { replaceOnChanges: ["orgName", "teamName"] };
-        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(TeamToken.__pulumiType, name, resourceInputs, opts);
     }
 }

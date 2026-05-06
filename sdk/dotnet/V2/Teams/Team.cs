@@ -67,12 +67,6 @@ namespace Pulumi.PulumiService.V2.Teams
         public Output<string> Name { get; private set; } = null!;
 
         /// <summary>
-        /// The organization name
-        /// </summary>
-        [Output("orgName")]
-        public Output<string> OrgName { get; private set; } = null!;
-
-        /// <summary>
         /// RoleIDs are the IDs of the FGA roles assigned to the team, if any.
         /// Currently only one role per team is supported.
         /// </summary>
@@ -114,11 +108,6 @@ namespace Pulumi.PulumiService.V2.Teams
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
-                ReplaceOnChanges =
-                {
-                    "name",
-                    "orgName",
-                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.

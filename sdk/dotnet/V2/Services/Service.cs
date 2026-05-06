@@ -28,30 +28,6 @@ namespace Pulumi.PulumiService.V2.Services
         [Output("items")]
         public Output<ImmutableArray<object>> Items { get; private set; } = null!;
 
-        /// <summary>
-        /// The service name
-        /// </summary>
-        [Output("name")]
-        public Output<string> Name { get; private set; } = null!;
-
-        /// <summary>
-        /// The organization name
-        /// </summary>
-        [Output("orgName")]
-        public Output<string> OrgName { get; private set; } = null!;
-
-        /// <summary>
-        /// The owner name
-        /// </summary>
-        [Output("ownerName")]
-        public Output<string> OwnerName { get; private set; } = null!;
-
-        /// <summary>
-        /// The owner type
-        /// </summary>
-        [Output("ownerType")]
-        public Output<string> OwnerType { get; private set; } = null!;
-
 
         /// <summary>
         /// Create a Service resource with the given unique name, arguments, and options.
@@ -75,13 +51,6 @@ namespace Pulumi.PulumiService.V2.Services
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
-                ReplaceOnChanges =
-                {
-                    "name",
-                    "orgName",
-                    "ownerName",
-                    "ownerType",
-                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.

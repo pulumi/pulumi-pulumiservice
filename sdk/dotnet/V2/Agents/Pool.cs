@@ -40,12 +40,6 @@ namespace Pulumi.PulumiService.V2.Agents
         public Output<string> Name { get; private set; } = null!;
 
         /// <summary>
-        /// The organization name
-        /// </summary>
-        [Output("orgName")]
-        public Output<string> OrgName { get; private set; } = null!;
-
-        /// <summary>
         /// The unique identifier
         /// </summary>
         [Output("poolId")]
@@ -83,11 +77,6 @@ namespace Pulumi.PulumiService.V2.Agents
                 AdditionalSecretOutputs =
                 {
                     "tokenValue",
-                },
-                ReplaceOnChanges =
-                {
-                    "orgName",
-                    "poolId",
                 },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);

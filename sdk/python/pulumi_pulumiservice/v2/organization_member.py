@@ -150,8 +150,6 @@ class OrganizationMember(pulumi.CustomResource):
             __props__.__dict__["links"] = None
             __props__.__dict__["user"] = None
             __props__.__dict__["virtual_admin"] = None
-        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["orgName", "userLogin"])
-        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(OrganizationMember, __self__).__init__(
             'pulumiservice:v2:OrganizationMember',
             resource_name,
@@ -178,10 +176,8 @@ class OrganizationMember(pulumi.CustomResource):
         __props__.__dict__["fga_role"] = None
         __props__.__dict__["known_to_pulumi"] = None
         __props__.__dict__["links"] = None
-        __props__.__dict__["org_name"] = None
         __props__.__dict__["role"] = None
         __props__.__dict__["user"] = None
-        __props__.__dict__["user_login"] = None
         __props__.__dict__["virtual_admin"] = None
         return OrganizationMember(resource_name, opts=opts, __props__=__props__)
 
@@ -218,14 +214,6 @@ class OrganizationMember(pulumi.CustomResource):
         return pulumi.get(self, "links")
 
     @_builtins.property
-    @pulumi.getter(name="orgName")
-    def org_name(self) -> pulumi.Output[_builtins.str]:
-        """
-        The organization name
-        """
-        return pulumi.get(self, "org_name")
-
-    @_builtins.property
     @pulumi.getter
     def role(self) -> pulumi.Output[_builtins.str]:
         """
@@ -240,14 +228,6 @@ class OrganizationMember(pulumi.CustomResource):
         The user information for this organization member.
         """
         return pulumi.get(self, "user")
-
-    @_builtins.property
-    @pulumi.getter(name="userLogin")
-    def user_login(self) -> pulumi.Output[_builtins.str]:
-        """
-        The user login name
-        """
-        return pulumi.get(self, "user_login")
 
     @_builtins.property
     @pulumi.getter(name="virtualAdmin")

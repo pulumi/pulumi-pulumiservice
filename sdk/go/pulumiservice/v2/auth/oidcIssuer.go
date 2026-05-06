@@ -32,8 +32,6 @@ type OidcIssuer struct {
 	Modified pulumi.StringPtrOutput `pulumi:"modified"`
 	// The display name of the OIDC issuer.
 	Name pulumi.StringOutput `pulumi:"name"`
-	// The organization name
-	OrgName pulumi.StringOutput `pulumi:"orgName"`
 	// SHA-1 certificate thumbprints used to verify the OIDC issuer's TLS certificate.
 	Thumbprints pulumi.StringArrayOutput `pulumi:"thumbprints"`
 	// The URL of the OIDC issuer.
@@ -56,11 +54,6 @@ func NewOidcIssuer(ctx *pulumi.Context,
 	if args.Url == nil {
 		return nil, errors.New("invalid value for required argument 'Url'")
 	}
-	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
-		"issuerId",
-		"orgName",
-	})
-	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource OidcIssuer
 	err := ctx.RegisterResource("pulumiservice:v2/auth:OidcIssuer", name, args, &resource, opts...)
@@ -253,11 +246,6 @@ func (o OidcIssuerOutput) Modified() pulumi.StringPtrOutput {
 // The display name of the OIDC issuer.
 func (o OidcIssuerOutput) Name() pulumi.StringOutput {
 	return o.ApplyT(func(v *OidcIssuer) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
-}
-
-// The organization name
-func (o OidcIssuerOutput) OrgName() pulumi.StringOutput {
-	return o.ApplyT(func(v *OidcIssuer) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
 }
 
 // SHA-1 certificate thumbprints used to verify the OIDC issuer's TLS certificate.

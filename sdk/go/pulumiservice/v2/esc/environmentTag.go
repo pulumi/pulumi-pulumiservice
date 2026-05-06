@@ -22,16 +22,10 @@ type EnvironmentTag struct {
 	EditorLogin pulumi.StringOutput `pulumi:"editorLogin"`
 	// The display name of the user who last edited the tag.
 	EditorName pulumi.StringOutput `pulumi:"editorName"`
-	// The environment name
-	EnvName pulumi.StringOutput `pulumi:"envName"`
 	// The timestamp when the tag was last modified.
 	Modified pulumi.StringOutput `pulumi:"modified"`
 	// The name of the tag.
 	Name pulumi.StringOutput `pulumi:"name"`
-	// The organization name
-	OrgName pulumi.StringOutput `pulumi:"orgName"`
-	// The project name
-	ProjectName pulumi.StringOutput `pulumi:"projectName"`
 	// The value of the tag.
 	Value pulumi.StringOutput `pulumi:"value"`
 }
@@ -58,13 +52,6 @@ func NewEnvironmentTag(ctx *pulumi.Context,
 	if args.Value == nil {
 		return nil, errors.New("invalid value for required argument 'Value'")
 	}
-	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
-		"envName",
-		"name",
-		"orgName",
-		"projectName",
-	})
-	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource EnvironmentTag
 	err := ctx.RegisterResource("pulumiservice:v2/esc:EnvironmentTag", name, args, &resource, opts...)
@@ -226,11 +213,6 @@ func (o EnvironmentTagOutput) EditorName() pulumi.StringOutput {
 	return o.ApplyT(func(v *EnvironmentTag) pulumi.StringOutput { return v.EditorName }).(pulumi.StringOutput)
 }
 
-// The environment name
-func (o EnvironmentTagOutput) EnvName() pulumi.StringOutput {
-	return o.ApplyT(func(v *EnvironmentTag) pulumi.StringOutput { return v.EnvName }).(pulumi.StringOutput)
-}
-
 // The timestamp when the tag was last modified.
 func (o EnvironmentTagOutput) Modified() pulumi.StringOutput {
 	return o.ApplyT(func(v *EnvironmentTag) pulumi.StringOutput { return v.Modified }).(pulumi.StringOutput)
@@ -239,16 +221,6 @@ func (o EnvironmentTagOutput) Modified() pulumi.StringOutput {
 // The name of the tag.
 func (o EnvironmentTagOutput) Name() pulumi.StringOutput {
 	return o.ApplyT(func(v *EnvironmentTag) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
-}
-
-// The organization name
-func (o EnvironmentTagOutput) OrgName() pulumi.StringOutput {
-	return o.ApplyT(func(v *EnvironmentTag) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
-}
-
-// The project name
-func (o EnvironmentTagOutput) ProjectName() pulumi.StringOutput {
-	return o.ApplyT(func(v *EnvironmentTag) pulumi.StringOutput { return v.ProjectName }).(pulumi.StringOutput)
 }
 
 // The value of the tag.

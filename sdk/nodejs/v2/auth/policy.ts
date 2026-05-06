@@ -58,17 +58,9 @@ export class Policy extends pulumi.CustomResource {
      */
     declare public /*out*/ readonly modified: pulumi.Output<string | undefined>;
     /**
-     * The organization name
-     */
-    declare public readonly orgName: pulumi.Output<string>;
-    /**
      * List of policies
      */
     declare public readonly policies: pulumi.Output<any[]>;
-    /**
-     * The policy identifier
-     */
-    declare public readonly policyId: pulumi.Output<string>;
     /**
      * The version number
      */
@@ -105,14 +97,10 @@ export class Policy extends pulumi.CustomResource {
             resourceInputs["created"] = undefined /*out*/;
             resourceInputs["issuerId"] = undefined /*out*/;
             resourceInputs["modified"] = undefined /*out*/;
-            resourceInputs["orgName"] = undefined /*out*/;
             resourceInputs["policies"] = undefined /*out*/;
-            resourceInputs["policyId"] = undefined /*out*/;
             resourceInputs["version"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
-        const replaceOnChanges = { replaceOnChanges: ["issuerId", "orgName", "policyId"] };
-        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(Policy.__pulumiType, name, resourceInputs, opts);
     }
 }

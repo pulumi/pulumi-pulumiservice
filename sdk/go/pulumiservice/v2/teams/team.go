@@ -35,8 +35,6 @@ type Team struct {
 	Members pulumi.ArrayOutput `pulumi:"members"`
 	// The unique identifier name of the team within the organization.
 	Name pulumi.StringOutput `pulumi:"name"`
-	// The organization name
-	OrgName pulumi.StringOutput `pulumi:"orgName"`
 	// RoleIDs are the IDs of the FGA roles assigned to the team, if any.
 	// Currently only one role per team is supported.
 	RoleIds pulumi.StringArrayOutput `pulumi:"roleIds"`
@@ -65,11 +63,6 @@ func NewTeam(ctx *pulumi.Context,
 	if args.OrgName == nil {
 		return nil, errors.New("invalid value for required argument 'OrgName'")
 	}
-	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
-		"name",
-		"orgName",
-	})
-	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Team
 	err := ctx.RegisterResource("pulumiservice:v2/teams:Team", name, args, &resource, opts...)
@@ -252,11 +245,6 @@ func (o TeamOutput) Members() pulumi.ArrayOutput {
 // The unique identifier name of the team within the organization.
 func (o TeamOutput) Name() pulumi.StringOutput {
 	return o.ApplyT(func(v *Team) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
-}
-
-// The organization name
-func (o TeamOutput) OrgName() pulumi.StringOutput {
-	return o.ApplyT(func(v *Team) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
 }
 
 // RoleIDs are the IDs of the FGA roles assigned to the team, if any.

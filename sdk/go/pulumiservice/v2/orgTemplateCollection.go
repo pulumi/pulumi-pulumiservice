@@ -26,8 +26,6 @@ type OrgTemplateCollection struct {
 	IsValid pulumi.BoolOutput `pulumi:"isValid"`
 	// The human-readable name for this template source.
 	Name pulumi.StringOutput `pulumi:"name"`
-	// The organization name
-	OrgName pulumi.StringOutput `pulumi:"orgName"`
 	// The source URL to fetch templates from.
 	SourceURL pulumi.StringOutput `pulumi:"sourceURL"`
 	// The unique identifier of the template source.
@@ -50,10 +48,6 @@ func NewOrgTemplateCollection(ctx *pulumi.Context,
 	if args.SourceURL == nil {
 		return nil, errors.New("invalid value for required argument 'SourceURL'")
 	}
-	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
-		"orgName",
-	})
-	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource OrgTemplateCollection
 	err := ctx.RegisterResource("pulumiservice:v2:OrgTemplateCollection", name, args, &resource, opts...)
@@ -223,11 +217,6 @@ func (o OrgTemplateCollectionOutput) IsValid() pulumi.BoolOutput {
 // The human-readable name for this template source.
 func (o OrgTemplateCollectionOutput) Name() pulumi.StringOutput {
 	return o.ApplyT(func(v *OrgTemplateCollection) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
-}
-
-// The organization name
-func (o OrgTemplateCollectionOutput) OrgName() pulumi.StringOutput {
-	return o.ApplyT(func(v *OrgTemplateCollection) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
 }
 
 // The source URL to fetch templates from.

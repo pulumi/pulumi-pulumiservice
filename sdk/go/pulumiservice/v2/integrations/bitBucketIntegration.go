@@ -30,10 +30,6 @@ type BitBucketIntegration struct {
 	DisablePRComments pulumi.BoolOutput `pulumi:"disablePRComments"`
 	// Whether this integration is fully installed and operational.
 	Installed pulumi.BoolOutput `pulumi:"installed"`
-	// The BitBucket integration identifier
-	IntegrationId pulumi.StringOutput `pulumi:"integrationId"`
-	// The organization name
-	OrgName pulumi.StringOutput `pulumi:"orgName"`
 	// Whether the integration's credentials are currently valid.
 	Valid pulumi.BoolOutput `pulumi:"valid"`
 	// Display name of the BitBucket workspace.
@@ -57,11 +53,6 @@ func NewBitBucketIntegration(ctx *pulumi.Context,
 	if args.OrgName == nil {
 		return nil, errors.New("invalid value for required argument 'OrgName'")
 	}
-	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
-		"integrationId",
-		"orgName",
-	})
-	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource BitBucketIntegration
 	err := ctx.RegisterResource("pulumiservice:v2/integrations:BitBucketIntegration", name, args, &resource, opts...)
@@ -241,16 +232,6 @@ func (o BitBucketIntegrationOutput) DisablePRComments() pulumi.BoolOutput {
 // Whether this integration is fully installed and operational.
 func (o BitBucketIntegrationOutput) Installed() pulumi.BoolOutput {
 	return o.ApplyT(func(v *BitBucketIntegration) pulumi.BoolOutput { return v.Installed }).(pulumi.BoolOutput)
-}
-
-// The BitBucket integration identifier
-func (o BitBucketIntegrationOutput) IntegrationId() pulumi.StringOutput {
-	return o.ApplyT(func(v *BitBucketIntegration) pulumi.StringOutput { return v.IntegrationId }).(pulumi.StringOutput)
-}
-
-// The organization name
-func (o BitBucketIntegrationOutput) OrgName() pulumi.StringOutput {
-	return o.ApplyT(func(v *BitBucketIntegration) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
 }
 
 // Whether the integration's credentials are currently valid.

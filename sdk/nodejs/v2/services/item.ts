@@ -44,25 +44,9 @@ export class Item extends pulumi.CustomResource {
      */
     declare public readonly items: pulumi.Output<any[]>;
     /**
-     * The organization name
-     */
-    declare public readonly orgName: pulumi.Output<string>;
-    /**
-     * The owner name
-     */
-    declare public readonly ownerName: pulumi.Output<string>;
-    /**
-     * The owner type
-     */
-    declare public readonly ownerType: pulumi.Output<string>;
-    /**
      * The service details
      */
     declare public /*out*/ readonly service: pulumi.Output<any>;
-    /**
-     * The service name
-     */
-    declare public readonly serviceName: pulumi.Output<string>;
 
     /**
      * Create a Item resource with the given unique name, arguments, and options.
@@ -100,15 +84,9 @@ export class Item extends pulumi.CustomResource {
         } else {
             resourceInputs["continuationToken"] = undefined /*out*/;
             resourceInputs["items"] = undefined /*out*/;
-            resourceInputs["orgName"] = undefined /*out*/;
-            resourceInputs["ownerName"] = undefined /*out*/;
-            resourceInputs["ownerType"] = undefined /*out*/;
             resourceInputs["service"] = undefined /*out*/;
-            resourceInputs["serviceName"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
-        const replaceOnChanges = { replaceOnChanges: ["orgName", "ownerName", "ownerType", "serviceName"] };
-        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(Item.__pulumiType, name, resourceInputs, opts);
     }
 }

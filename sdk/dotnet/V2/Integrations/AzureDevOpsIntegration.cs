@@ -46,18 +46,6 @@ namespace Pulumi.PulumiService.V2.Integrations
         public Output<bool> Installed { get; private set; } = null!;
 
         /// <summary>
-        /// The Azure DevOps integration identifier
-        /// </summary>
-        [Output("integrationId")]
-        public Output<string> IntegrationId { get; private set; } = null!;
-
-        /// <summary>
-        /// The organization name
-        /// </summary>
-        [Output("orgName")]
-        public Output<string> OrgName { get; private set; } = null!;
-
-        /// <summary>
         /// Metadata about the Azure DevOps organization linked to the Pulumi organization
         /// </summary>
         [Output("organization")]
@@ -98,11 +86,6 @@ namespace Pulumi.PulumiService.V2.Integrations
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
-                ReplaceOnChanges =
-                {
-                    "integrationId",
-                    "orgName",
-                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.

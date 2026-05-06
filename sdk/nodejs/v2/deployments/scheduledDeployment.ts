@@ -63,17 +63,9 @@ export class ScheduledDeployment extends pulumi.CustomResource {
      */
     declare public /*out*/ readonly orgID: pulumi.Output<string>;
     /**
-     * The organization name
-     */
-    declare public readonly orgName: pulumi.Output<string>;
-    /**
      * Whether the scheduled action is currently paused.
      */
     declare public /*out*/ readonly paused: pulumi.Output<boolean>;
-    /**
-     * The project name
-     */
-    declare public readonly projectName: pulumi.Output<string>;
     /**
      * A cron expression defining the recurring schedule.
      */
@@ -86,10 +78,6 @@ export class ScheduledDeployment extends pulumi.CustomResource {
      * A timestamp for a one-time scheduled execution.
      */
     declare public readonly scheduleOnce: pulumi.Output<string | undefined>;
-    /**
-     * The stack name
-     */
-    declare public readonly stackName: pulumi.Output<string>;
 
     /**
      * Create a ScheduledDeployment resource with the given unique name, arguments, and options.
@@ -134,17 +122,12 @@ export class ScheduledDeployment extends pulumi.CustomResource {
             resourceInputs["modified"] = undefined /*out*/;
             resourceInputs["nextExecution"] = undefined /*out*/;
             resourceInputs["orgID"] = undefined /*out*/;
-            resourceInputs["orgName"] = undefined /*out*/;
             resourceInputs["paused"] = undefined /*out*/;
-            resourceInputs["projectName"] = undefined /*out*/;
             resourceInputs["scheduleCron"] = undefined /*out*/;
             resourceInputs["scheduleID"] = undefined /*out*/;
             resourceInputs["scheduleOnce"] = undefined /*out*/;
-            resourceInputs["stackName"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
-        const replaceOnChanges = { replaceOnChanges: ["orgName", "projectName", "scheduleID", "stackName"] };
-        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(ScheduledDeployment.__pulumiType, name, resourceInputs, opts);
     }
 }

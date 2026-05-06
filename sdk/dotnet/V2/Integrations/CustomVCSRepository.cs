@@ -16,19 +16,6 @@ namespace Pulumi.PulumiService.V2.Integrations
     public partial class CustomVCSRepository : global::Pulumi.CustomResource
     {
         /// <summary>
-        /// The custom VCS integration identifier
-        /// </summary>
-        [Output("integrationId")]
-        public Output<string> IntegrationId { get; private set; } = null!;
-
-        /// <summary>
-        /// The organization name
-        /// </summary>
-        [Output("orgName")]
-        public Output<string> OrgName { get; private set; } = null!;
-
-
-        /// <summary>
         /// Create a CustomVCSRepository resource with the given unique name, arguments, and options.
         /// </summary>
         ///
@@ -50,11 +37,6 @@ namespace Pulumi.PulumiService.V2.Integrations
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
-                ReplaceOnChanges =
-                {
-                    "integrationId",
-                    "orgName",
-                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.

@@ -44,12 +44,6 @@ namespace Pulumi.PulumiService.V2
         public Output<object?> Links { get; private set; } = null!;
 
         /// <summary>
-        /// The organization name
-        /// </summary>
-        [Output("orgName")]
-        public Output<string> OrgName { get; private set; } = null!;
-
-        /// <summary>
         /// **Deprecated:** Use `fgaRole` instead. The member's built-in role within the organization. For members assigned a custom role, this is the closest built-in projection (`member`, `admin`, or `billingManager`) and may lose detail; `fgaRole` is authoritative.
         /// </summary>
         [Output("role")]
@@ -60,12 +54,6 @@ namespace Pulumi.PulumiService.V2
         /// </summary>
         [Output("user")]
         public Output<object> User { get; private set; } = null!;
-
-        /// <summary>
-        /// The user login name
-        /// </summary>
-        [Output("userLogin")]
-        public Output<string> UserLogin { get; private set; } = null!;
 
         /// <summary>
         /// VirtualAdmin indicates that the member does not have admin access on the
@@ -97,11 +85,6 @@ namespace Pulumi.PulumiService.V2
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
-                ReplaceOnChanges =
-                {
-                    "orgName",
-                    "userLogin",
-                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.

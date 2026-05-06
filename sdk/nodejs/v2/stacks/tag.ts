@@ -34,18 +34,6 @@ export class Tag extends pulumi.CustomResource {
         return obj['__pulumiType'] === Tag.__pulumiType;
     }
 
-    /**
-     * The organization name
-     */
-    declare public readonly orgName: pulumi.Output<string>;
-    /**
-     * The project name
-     */
-    declare public readonly projectName: pulumi.Output<string>;
-    /**
-     * The stack name
-     */
-    declare public readonly stackName: pulumi.Output<string>;
 
     /**
      * Create a Tag resource with the given unique name, arguments, and options.
@@ -79,13 +67,8 @@ export class Tag extends pulumi.CustomResource {
             resourceInputs["stackName"] = args?.stackName;
             resourceInputs["value"] = args?.value;
         } else {
-            resourceInputs["orgName"] = undefined /*out*/;
-            resourceInputs["projectName"] = undefined /*out*/;
-            resourceInputs["stackName"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
-        const replaceOnChanges = { replaceOnChanges: ["orgName", "projectName", "stackName"] };
-        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(Tag.__pulumiType, name, resourceInputs, opts);
     }
 }

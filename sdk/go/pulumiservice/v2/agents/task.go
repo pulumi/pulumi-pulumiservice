@@ -36,8 +36,6 @@ type Task struct {
 	LastHeartbeat pulumi.StringPtrOutput `pulumi:"lastHeartbeat"`
 	// Display name for the task, typically auto-generated from the initial user message.
 	Name pulumi.StringOutput `pulumi:"name"`
-	// The organization name
-	OrgName pulumi.StringOutput `pulumi:"orgName"`
 	// The permission scope for the task.
 	PermissionMode pulumi.StringPtrOutput `pulumi:"permissionMode"`
 	// Whether the task is in plan mode. Set based on the first user message.
@@ -52,8 +50,6 @@ type Task struct {
 	SourceAutomationID pulumi.StringPtrOutput `pulumi:"sourceAutomationID"`
 	// Current execution status of the task.
 	Status pulumi.StringOutput `pulumi:"status"`
-	// The agent task identifier
-	TaskID pulumi.StringOutput `pulumi:"taskID"`
 	// Whether the task was started synchronously by a user or asynchronously by background automation.
 	TaskType pulumi.StringOutput `pulumi:"taskType"`
 	// Where tools are executed for this task. Valid values: 'cloud', 'cli'.
@@ -70,11 +66,6 @@ func NewTask(ctx *pulumi.Context,
 	if args.OrgName == nil {
 		return nil, errors.New("invalid value for required argument 'OrgName'")
 	}
-	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
-		"orgName",
-		"taskID",
-	})
-	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Task
 	err := ctx.RegisterResource("pulumiservice:v2/agents:Task", name, args, &resource, opts...)
@@ -287,11 +278,6 @@ func (o TaskOutput) Name() pulumi.StringOutput {
 	return o.ApplyT(func(v *Task) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
 }
 
-// The organization name
-func (o TaskOutput) OrgName() pulumi.StringOutput {
-	return o.ApplyT(func(v *Task) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
-}
-
 // The permission scope for the task.
 func (o TaskOutput) PermissionMode() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *Task) pulumi.StringPtrOutput { return v.PermissionMode }).(pulumi.StringPtrOutput)
@@ -325,11 +311,6 @@ func (o TaskOutput) SourceAutomationID() pulumi.StringPtrOutput {
 // Current execution status of the task.
 func (o TaskOutput) Status() pulumi.StringOutput {
 	return o.ApplyT(func(v *Task) pulumi.StringOutput { return v.Status }).(pulumi.StringOutput)
-}
-
-// The agent task identifier
-func (o TaskOutput) TaskID() pulumi.StringOutput {
-	return o.ApplyT(func(v *Task) pulumi.StringOutput { return v.TaskID }).(pulumi.StringOutput)
 }
 
 // Whether the task was started synchronously by a user or asynchronously by background automation.

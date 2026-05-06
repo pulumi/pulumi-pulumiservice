@@ -4,12 +4,10 @@
 package com.pulumi.pulumiservice.v2_integrations;
 
 import com.pulumi.core.Output;
-import com.pulumi.core.annotations.Export;
 import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.Utilities;
 import com.pulumi.pulumiservice.v2_integrations.CustomVCSRepositoryArgs;
-import java.lang.String;
 import javax.annotation.Nullable;
 
 /**
@@ -18,35 +16,6 @@ import javax.annotation.Nullable;
  */
 @ResourceType(type="pulumiservice:v2/integrations:CustomVCSRepository")
 public class CustomVCSRepository extends com.pulumi.resources.CustomResource {
-    /**
-     * The custom VCS integration identifier
-     * 
-     */
-    @Export(name="integrationId", refs={String.class}, tree="[0]")
-    private Output<String> integrationId;
-
-    /**
-     * @return The custom VCS integration identifier
-     * 
-     */
-    public Output<String> integrationId() {
-        return this.integrationId;
-    }
-    /**
-     * The organization name
-     * 
-     */
-    @Export(name="orgName", refs={String.class}, tree="[0]")
-    private Output<String> orgName;
-
-    /**
-     * @return The organization name
-     * 
-     */
-    public Output<String> orgName() {
-        return this.orgName;
-    }
-
     /**
      *
      * @param name The _unique_ name of the resulting resource.

@@ -135,20 +135,6 @@ public class OidcIssuer extends com.pulumi.resources.CustomResource {
         return this.name;
     }
     /**
-     * The organization name
-     * 
-     */
-    @Export(name="orgName", refs={String.class}, tree="[0]")
-    private Output<String> orgName;
-
-    /**
-     * @return The organization name
-     * 
-     */
-    public Output<String> orgName() {
-        return this.orgName;
-    }
-    /**
      * SHA-1 certificate thumbprints used to verify the OIDC issuer&#39;s TLS certificate.
      * 
      */

@@ -178,8 +178,6 @@ class Tag(pulumi.CustomResource):
             if value is None and not opts.urn:
                 raise TypeError("Missing required property 'value'")
             __props__.__dict__["value"] = value
-        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["orgName", "projectName", "stackName"])
-        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(Tag, __self__).__init__(
             'pulumiservice:v2/stacks:Tag',
             resource_name,
@@ -202,32 +200,5 @@ class Tag(pulumi.CustomResource):
 
         __props__ = TagArgs.__new__(TagArgs)
 
-        __props__.__dict__["org_name"] = None
-        __props__.__dict__["project_name"] = None
-        __props__.__dict__["stack_name"] = None
         return Tag(resource_name, opts=opts, __props__=__props__)
-
-    @_builtins.property
-    @pulumi.getter(name="orgName")
-    def org_name(self) -> pulumi.Output[_builtins.str]:
-        """
-        The organization name
-        """
-        return pulumi.get(self, "org_name")
-
-    @_builtins.property
-    @pulumi.getter(name="projectName")
-    def project_name(self) -> pulumi.Output[_builtins.str]:
-        """
-        The project name
-        """
-        return pulumi.get(self, "project_name")
-
-    @_builtins.property
-    @pulumi.getter(name="stackName")
-    def stack_name(self) -> pulumi.Output[_builtins.str]:
-        """
-        The stack name
-        """
-        return pulumi.get(self, "stack_name")
 

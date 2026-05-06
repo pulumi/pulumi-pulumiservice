@@ -82,20 +82,6 @@ public class OrganizationMember extends com.pulumi.resources.CustomResource {
         return Codegen.optional(this.links);
     }
     /**
-     * The organization name
-     * 
-     */
-    @Export(name="orgName", refs={String.class}, tree="[0]")
-    private Output<String> orgName;
-
-    /**
-     * @return The organization name
-     * 
-     */
-    public Output<String> orgName() {
-        return this.orgName;
-    }
-    /**
      * **Deprecated:** Use `fgaRole` instead. The member&#39;s built-in role within the organization. For members assigned a custom role, this is the closest built-in projection (`member`, `admin`, or `billingManager`) and may lose detail; `fgaRole` is authoritative.
      * 
      */
@@ -122,20 +108,6 @@ public class OrganizationMember extends com.pulumi.resources.CustomResource {
      */
     public Output<Object> user() {
         return this.user;
-    }
-    /**
-     * The user login name
-     * 
-     */
-    @Export(name="userLogin", refs={String.class}, tree="[0]")
-    private Output<String> userLogin;
-
-    /**
-     * @return The user login name
-     * 
-     */
-    public Output<String> userLogin() {
-        return this.userLogin;
     }
     /**
      * VirtualAdmin indicates that the member does not have admin access on the

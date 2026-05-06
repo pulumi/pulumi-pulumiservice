@@ -40,11 +40,6 @@ type Metadata struct {
 
 	// Functions keyed by fully-qualified Pulumi token. Reserved for future use.
 	Functions map[string]ResourceMeta `json:"functions,omitempty"`
-
-	// V0Aliases maps a v2 token to the corresponding v0 token(s), used by
-	// the scaffolder to auto-populate the per-resource Aliases list during
-	// regen. Round-trips untouched.
-	V0Aliases map[string][]string `json:"_v0Aliases,omitempty"`
 }
 
 // ResourceMeta describes one Pulumi resource derived from OpenAPI operations.

@@ -24,34 +24,6 @@ import javax.annotation.Nullable;
 @ResourceType(type="pulumiservice:v2/tokens:TeamToken")
 public class TeamToken extends com.pulumi.resources.CustomResource {
     /**
-     * The organization name
-     * 
-     */
-    @Export(name="orgName", refs={String.class}, tree="[0]")
-    private Output<String> orgName;
-
-    /**
-     * @return The organization name
-     * 
-     */
-    public Output<String> orgName() {
-        return this.orgName;
-    }
-    /**
-     * The team name
-     * 
-     */
-    @Export(name="teamName", refs={String.class}, tree="[0]")
-    private Output<String> teamName;
-
-    /**
-     * @return The team name
-     * 
-     */
-    public Output<String> teamName() {
-        return this.teamName;
-    }
-    /**
      * The unique identifier
      * 
      */

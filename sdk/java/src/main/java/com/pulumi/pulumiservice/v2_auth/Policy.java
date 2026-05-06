@@ -76,20 +76,6 @@ public class Policy extends com.pulumi.resources.CustomResource {
         return Codegen.optional(this.modified);
     }
     /**
-     * The organization name
-     * 
-     */
-    @Export(name="orgName", refs={String.class}, tree="[0]")
-    private Output<String> orgName;
-
-    /**
-     * @return The organization name
-     * 
-     */
-    public Output<String> orgName() {
-        return this.orgName;
-    }
-    /**
      * List of policies
      * 
      */
@@ -102,20 +88,6 @@ public class Policy extends com.pulumi.resources.CustomResource {
      */
     public Output<List<Object>> policies() {
         return this.policies;
-    }
-    /**
-     * The policy identifier
-     * 
-     */
-    @Export(name="policyId", refs={String.class}, tree="[0]")
-    private Output<String> policyId;
-
-    /**
-     * @return The policy identifier
-     * 
-     */
-    public Output<String> policyId() {
-        return this.policyId;
     }
     /**
      * The version number

@@ -16,12 +16,6 @@ namespace Pulumi.PulumiService.V2.Insights
     public partial class ScheduledScanSettings : global::Pulumi.CustomResource
     {
         /// <summary>
-        /// The Insights account name
-        /// </summary>
-        [Output("accountName")]
-        public Output<string> AccountName { get; private set; } = null!;
-
-        /// <summary>
         /// The batch size for processing resources during the scan.
         /// </summary>
         [Output("batchSize")]
@@ -32,12 +26,6 @@ namespace Pulumi.PulumiService.V2.Insights
         /// </summary>
         [Output("listConcurrency")]
         public Output<int?> ListConcurrency { get; private set; } = null!;
-
-        /// <summary>
-        /// The organization name
-        /// </summary>
-        [Output("orgName")]
-        public Output<string> OrgName { get; private set; } = null!;
 
         /// <summary>
         /// Whether the scheduled scan is paused.
@@ -86,11 +74,6 @@ namespace Pulumi.PulumiService.V2.Insights
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
-                ReplaceOnChanges =
-                {
-                    "accountName",
-                    "orgName",
-                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.

@@ -15,13 +15,6 @@ import (
 // Creates a new Pulumi ESC (Environments, Secrets, and Configuration) environment within the specified organization. The request body must include the project name and the environment name. Environment names must be unique within a project and may only contain alphanumeric characters, hyphens, underscores, and periods. The newly created environment starts with an empty YAML definition that can be updated via the UpdateEnvironment endpoint.
 type Environment struct {
 	pulumi.CustomResourceState
-
-	// The environment name
-	Name pulumi.StringOutput `pulumi:"name"`
-	// The organization name
-	OrgName pulumi.StringOutput `pulumi:"orgName"`
-	// The project name
-	Project pulumi.StringOutput `pulumi:"project"`
 }
 
 // NewEnvironment registers a new resource with the given unique name, arguments, and options.
@@ -40,12 +33,6 @@ func NewEnvironment(ctx *pulumi.Context,
 	if args.Project == nil {
 		return nil, errors.New("invalid value for required argument 'Project'")
 	}
-	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
-		"name",
-		"orgName",
-		"project",
-	})
-	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Environment
 	err := ctx.RegisterResource("pulumiservice:v2/esc:Environment", name, args, &resource, opts...)
@@ -182,21 +169,6 @@ func (o EnvironmentOutput) ToEnvironmentOutput() EnvironmentOutput {
 
 func (o EnvironmentOutput) ToEnvironmentOutputWithContext(ctx context.Context) EnvironmentOutput {
 	return o
-}
-
-// The environment name
-func (o EnvironmentOutput) Name() pulumi.StringOutput {
-	return o.ApplyT(func(v *Environment) pulumi.StringOutput { return v.Name }).(pulumi.StringOutput)
-}
-
-// The organization name
-func (o EnvironmentOutput) OrgName() pulumi.StringOutput {
-	return o.ApplyT(func(v *Environment) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
-}
-
-// The project name
-func (o EnvironmentOutput) Project() pulumi.StringOutput {
-	return o.ApplyT(func(v *Environment) pulumi.StringOutput { return v.Project }).(pulumi.StringOutput)
 }
 
 type EnvironmentArrayOutput struct{ *pulumi.OutputState }

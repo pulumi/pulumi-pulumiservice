@@ -47,10 +47,6 @@ export class Gate extends pulumi.CustomResource {
      */
     declare public readonly name: pulumi.Output<string>;
     /**
-     * The organization name
-     */
-    declare public readonly orgName: pulumi.Output<string>;
-    /**
      * Rule configuration for the gate
      */
     declare public readonly rule: pulumi.Output<any>;
@@ -95,13 +91,10 @@ export class Gate extends pulumi.CustomResource {
             resourceInputs["enabled"] = undefined /*out*/;
             resourceInputs["gateID"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
-            resourceInputs["orgName"] = undefined /*out*/;
             resourceInputs["rule"] = undefined /*out*/;
             resourceInputs["target"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
-        const replaceOnChanges = { replaceOnChanges: ["gateID", "orgName"] };
-        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(Gate.__pulumiType, name, resourceInputs, opts);
     }
 }

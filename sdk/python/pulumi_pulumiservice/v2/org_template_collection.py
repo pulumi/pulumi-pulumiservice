@@ -179,8 +179,6 @@ class OrgTemplateCollection(pulumi.CustomResource):
             __props__.__dict__["error"] = None
             __props__.__dict__["is_valid"] = None
             __props__.__dict__["template_id"] = None
-        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["orgName"])
-        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(OrgTemplateCollection, __self__).__init__(
             'pulumiservice:v2:OrgTemplateCollection',
             resource_name,
@@ -208,7 +206,6 @@ class OrgTemplateCollection(pulumi.CustomResource):
         __props__.__dict__["error"] = None
         __props__.__dict__["is_valid"] = None
         __props__.__dict__["name"] = None
-        __props__.__dict__["org_name"] = None
         __props__.__dict__["source_url"] = None
         __props__.__dict__["template_id"] = None
         return OrgTemplateCollection(resource_name, opts=opts, __props__=__props__)
@@ -252,14 +249,6 @@ class OrgTemplateCollection(pulumi.CustomResource):
         The human-readable name for this template source.
         """
         return pulumi.get(self, "name")
-
-    @_builtins.property
-    @pulumi.getter(name="orgName")
-    def org_name(self) -> pulumi.Output[_builtins.str]:
-        """
-        The organization name
-        """
-        return pulumi.get(self, "org_name")
 
     @_builtins.property
     @pulumi.getter(name="sourceURL")

@@ -16,13 +16,6 @@ import (
 // a 1:1 mapping of teams to roles.
 type Role struct {
 	pulumi.CustomResourceState
-
-	// The organization name
-	OrgName pulumi.StringOutput `pulumi:"orgName"`
-	// The role identifier
-	RoleID pulumi.StringOutput `pulumi:"roleID"`
-	// The team name
-	TeamName pulumi.StringOutput `pulumi:"teamName"`
 }
 
 // NewRole registers a new resource with the given unique name, arguments, and options.
@@ -41,12 +34,6 @@ func NewRole(ctx *pulumi.Context,
 	if args.TeamName == nil {
 		return nil, errors.New("invalid value for required argument 'TeamName'")
 	}
-	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
-		"orgName",
-		"roleID",
-		"teamName",
-	})
-	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Role
 	err := ctx.RegisterResource("pulumiservice:v2/teams:Role", name, args, &resource, opts...)
@@ -183,21 +170,6 @@ func (o RoleOutput) ToRoleOutput() RoleOutput {
 
 func (o RoleOutput) ToRoleOutputWithContext(ctx context.Context) RoleOutput {
 	return o
-}
-
-// The organization name
-func (o RoleOutput) OrgName() pulumi.StringOutput {
-	return o.ApplyT(func(v *Role) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
-}
-
-// The role identifier
-func (o RoleOutput) RoleID() pulumi.StringOutput {
-	return o.ApplyT(func(v *Role) pulumi.StringOutput { return v.RoleID }).(pulumi.StringOutput)
-}
-
-// The team name
-func (o RoleOutput) TeamName() pulumi.StringOutput {
-	return o.ApplyT(func(v *Role) pulumi.StringOutput { return v.TeamName }).(pulumi.StringOutput)
 }
 
 type RoleArrayOutput struct{ *pulumi.OutputState }

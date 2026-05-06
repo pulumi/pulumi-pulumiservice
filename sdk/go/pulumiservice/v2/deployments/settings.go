@@ -26,16 +26,10 @@ type Settings struct {
 	GitHub pulumi.AnyOutput `pulumi:"gitHub"`
 	// The operation context defining pre-run and post-run commands and environment variables.
 	OperationContext pulumi.AnyOutput `pulumi:"operationContext"`
-	// The organization name
-	OrgName pulumi.StringOutput `pulumi:"orgName"`
-	// The project name
-	ProjectName pulumi.StringOutput `pulumi:"projectName"`
 	// The source from which the deployment settings were created.
 	Source pulumi.StringPtrOutput `pulumi:"source"`
 	// The source context defining where the source code is located.
 	SourceContext pulumi.AnyOutput `pulumi:"sourceContext"`
-	// The stack name
-	StackName pulumi.StringOutput `pulumi:"stackName"`
 	// A tag to identify the deployment settings configuration.
 	Tag pulumi.StringPtrOutput `pulumi:"tag"`
 	// VCS provider settings
@@ -60,12 +54,6 @@ func NewSettings(ctx *pulumi.Context,
 	if args.StackName == nil {
 		return nil, errors.New("invalid value for required argument 'StackName'")
 	}
-	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
-		"orgName",
-		"projectName",
-		"stackName",
-	})
-	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Settings
 	err := ctx.RegisterResource("pulumiservice:v2/deployments:Settings", name, args, &resource, opts...)
@@ -261,16 +249,6 @@ func (o SettingsOutput) OperationContext() pulumi.AnyOutput {
 	return o.ApplyT(func(v *Settings) pulumi.AnyOutput { return v.OperationContext }).(pulumi.AnyOutput)
 }
 
-// The organization name
-func (o SettingsOutput) OrgName() pulumi.StringOutput {
-	return o.ApplyT(func(v *Settings) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
-}
-
-// The project name
-func (o SettingsOutput) ProjectName() pulumi.StringOutput {
-	return o.ApplyT(func(v *Settings) pulumi.StringOutput { return v.ProjectName }).(pulumi.StringOutput)
-}
-
 // The source from which the deployment settings were created.
 func (o SettingsOutput) Source() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *Settings) pulumi.StringPtrOutput { return v.Source }).(pulumi.StringPtrOutput)
@@ -279,11 +257,6 @@ func (o SettingsOutput) Source() pulumi.StringPtrOutput {
 // The source context defining where the source code is located.
 func (o SettingsOutput) SourceContext() pulumi.AnyOutput {
 	return o.ApplyT(func(v *Settings) pulumi.AnyOutput { return v.SourceContext }).(pulumi.AnyOutput)
-}
-
-// The stack name
-func (o SettingsOutput) StackName() pulumi.StringOutput {
-	return o.ApplyT(func(v *Settings) pulumi.StringOutput { return v.StackName }).(pulumi.StringOutput)
 }
 
 // A tag to identify the deployment settings configuration.

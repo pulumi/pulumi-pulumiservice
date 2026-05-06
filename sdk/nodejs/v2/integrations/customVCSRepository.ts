@@ -34,14 +34,6 @@ export class CustomVCSRepository extends pulumi.CustomResource {
         return obj['__pulumiType'] === CustomVCSRepository.__pulumiType;
     }
 
-    /**
-     * The custom VCS integration identifier
-     */
-    declare public readonly integrationId: pulumi.Output<string>;
-    /**
-     * The organization name
-     */
-    declare public readonly orgName: pulumi.Output<string>;
 
     /**
      * Create a CustomVCSRepository resource with the given unique name, arguments, and options.
@@ -68,12 +60,8 @@ export class CustomVCSRepository extends pulumi.CustomResource {
             resourceInputs["name"] = args?.name;
             resourceInputs["orgName"] = args?.orgName;
         } else {
-            resourceInputs["integrationId"] = undefined /*out*/;
-            resourceInputs["orgName"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
-        const replaceOnChanges = { replaceOnChanges: ["integrationId", "orgName"] };
-        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(CustomVCSRepository.__pulumiType, name, resourceInputs, opts);
     }
 }

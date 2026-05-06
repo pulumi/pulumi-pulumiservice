@@ -20,12 +20,6 @@ namespace Pulumi.PulumiService.V2.Tokens
     public partial class OrgToken : global::Pulumi.CustomResource
     {
         /// <summary>
-        /// The organization name
-        /// </summary>
-        [Output("orgName")]
-        public Output<string> OrgName { get; private set; } = null!;
-
-        /// <summary>
         /// The unique identifier
         /// </summary>
         [Output("tokenId")]
@@ -63,10 +57,6 @@ namespace Pulumi.PulumiService.V2.Tokens
                 AdditionalSecretOutputs =
                 {
                     "tokenValue",
-                },
-                ReplaceOnChanges =
-                {
-                    "orgName",
                 },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);

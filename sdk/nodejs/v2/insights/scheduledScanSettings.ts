@@ -35,10 +35,6 @@ export class ScheduledScanSettings extends pulumi.CustomResource {
     }
 
     /**
-     * The Insights account name
-     */
-    declare public readonly accountName: pulumi.Output<string>;
-    /**
      * The batch size for processing resources during the scan.
      */
     declare public readonly batchSize: pulumi.Output<number | undefined>;
@@ -46,10 +42,6 @@ export class ScheduledScanSettings extends pulumi.CustomResource {
      * The concurrency level for list operations during the scan.
      */
     declare public readonly listConcurrency: pulumi.Output<number | undefined>;
-    /**
-     * The organization name
-     */
-    declare public readonly orgName: pulumi.Output<string>;
     /**
      * Whether the scheduled scan is paused.
      */
@@ -96,18 +88,14 @@ export class ScheduledScanSettings extends pulumi.CustomResource {
             resourceInputs["readTimeout"] = args?.readTimeout;
             resourceInputs["scheduleCron"] = args?.scheduleCron;
         } else {
-            resourceInputs["accountName"] = undefined /*out*/;
             resourceInputs["batchSize"] = undefined /*out*/;
             resourceInputs["listConcurrency"] = undefined /*out*/;
-            resourceInputs["orgName"] = undefined /*out*/;
             resourceInputs["paused"] = undefined /*out*/;
             resourceInputs["readConcurrency"] = undefined /*out*/;
             resourceInputs["readTimeout"] = undefined /*out*/;
             resourceInputs["scheduleCron"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
-        const replaceOnChanges = { replaceOnChanges: ["accountName", "orgName"] };
-        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(ScheduledScanSettings.__pulumiType, name, resourceInputs, opts);
     }
 }

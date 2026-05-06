@@ -55,10 +55,6 @@ export class OrganizationMember extends pulumi.CustomResource {
      */
     declare public /*out*/ readonly links: pulumi.Output<any | undefined>;
     /**
-     * The organization name
-     */
-    declare public readonly orgName: pulumi.Output<string>;
-    /**
      * **Deprecated:** Use `fgaRole` instead. The member's built-in role within the organization. For members assigned a custom role, this is the closest built-in projection (`member`, `admin`, or `billingManager`) and may lose detail; `fgaRole` is authoritative.
      */
     declare public readonly role: pulumi.Output<string>;
@@ -66,10 +62,6 @@ export class OrganizationMember extends pulumi.CustomResource {
      * The user information for this organization member.
      */
     declare public /*out*/ readonly user: pulumi.Output<any>;
-    /**
-     * The user login name
-     */
-    declare public readonly userLogin: pulumi.Output<string>;
     /**
      * VirtualAdmin indicates that the member does not have admin access on the
      * backing identity provider, but does have admin access to the Pulumi organization.
@@ -110,15 +102,11 @@ export class OrganizationMember extends pulumi.CustomResource {
             resourceInputs["fgaRole"] = undefined /*out*/;
             resourceInputs["knownToPulumi"] = undefined /*out*/;
             resourceInputs["links"] = undefined /*out*/;
-            resourceInputs["orgName"] = undefined /*out*/;
             resourceInputs["role"] = undefined /*out*/;
             resourceInputs["user"] = undefined /*out*/;
-            resourceInputs["userLogin"] = undefined /*out*/;
             resourceInputs["virtualAdmin"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
-        const replaceOnChanges = { replaceOnChanges: ["orgName", "userLogin"] };
-        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(OrganizationMember.__pulumiType, name, resourceInputs, opts);
     }
 }

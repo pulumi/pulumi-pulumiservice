@@ -64,12 +64,6 @@ namespace Pulumi.PulumiService.V2.Auth
         public Output<string> Name { get; private set; } = null!;
 
         /// <summary>
-        /// The organization name
-        /// </summary>
-        [Output("orgName")]
-        public Output<string> OrgName { get; private set; } = null!;
-
-        /// <summary>
         /// SHA-1 certificate thumbprints used to verify the OIDC issuer's TLS certificate.
         /// </summary>
         [Output("thumbprints")]
@@ -104,11 +98,6 @@ namespace Pulumi.PulumiService.V2.Auth
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
-                ReplaceOnChanges =
-                {
-                    "issuerId",
-                    "orgName",
-                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.

@@ -20,18 +20,6 @@ namespace Pulumi.PulumiService.V2.Tokens
     public partial class TeamToken : global::Pulumi.CustomResource
     {
         /// <summary>
-        /// The organization name
-        /// </summary>
-        [Output("orgName")]
-        public Output<string> OrgName { get; private set; } = null!;
-
-        /// <summary>
-        /// The team name
-        /// </summary>
-        [Output("teamName")]
-        public Output<string> TeamName { get; private set; } = null!;
-
-        /// <summary>
         /// The unique identifier
         /// </summary>
         [Output("tokenId")]
@@ -69,11 +57,6 @@ namespace Pulumi.PulumiService.V2.Tokens
                 AdditionalSecretOutputs =
                 {
                     "tokenValue",
-                },
-                ReplaceOnChanges =
-                {
-                    "orgName",
-                    "teamName",
                 },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);

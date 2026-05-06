@@ -20,8 +20,6 @@ import (
 type OrgToken struct {
 	pulumi.CustomResourceState
 
-	// The organization name
-	OrgName pulumi.StringOutput `pulumi:"orgName"`
 	// The unique identifier
 	TokenId pulumi.StringOutput `pulumi:"tokenId"`
 	// The token value
@@ -54,10 +52,6 @@ func NewOrgToken(ctx *pulumi.Context,
 		"tokenValue",
 	})
 	opts = append(opts, secrets)
-	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
-		"orgName",
-	})
-	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource OrgToken
 	err := ctx.RegisterResource("pulumiservice:v2/tokens:OrgToken", name, args, &resource, opts...)
@@ -210,11 +204,6 @@ func (o OrgTokenOutput) ToOrgTokenOutput() OrgTokenOutput {
 
 func (o OrgTokenOutput) ToOrgTokenOutputWithContext(ctx context.Context) OrgTokenOutput {
 	return o
-}
-
-// The organization name
-func (o OrgTokenOutput) OrgName() pulumi.StringOutput {
-	return o.ApplyT(func(v *OrgToken) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
 }
 
 // The unique identifier

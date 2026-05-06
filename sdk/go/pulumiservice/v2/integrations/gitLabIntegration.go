@@ -38,10 +38,6 @@ type GitLabIntegration struct {
 	GroupPath pulumi.StringPtrOutput `pulumi:"groupPath"`
 	// Whether the integration has been fully installed.
 	Installed pulumi.BoolOutput `pulumi:"installed"`
-	// The GitLab integration identifier
-	IntegrationId pulumi.StringOutput `pulumi:"integrationId"`
-	// The organization name
-	OrgName pulumi.StringOutput `pulumi:"orgName"`
 	// Whether the integration is currently valid (tokens, hooks, etc.).
 	Valid pulumi.BoolOutput `pulumi:"valid"`
 }
@@ -63,11 +59,6 @@ func NewGitLabIntegration(ctx *pulumi.Context,
 		"groupAccessTokenExpiration",
 	})
 	opts = append(opts, secrets)
-	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
-		"integrationId",
-		"orgName",
-	})
-	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource GitLabIntegration
 	err := ctx.RegisterResource("pulumiservice:v2/integrations:GitLabIntegration", name, args, &resource, opts...)
@@ -267,16 +258,6 @@ func (o GitLabIntegrationOutput) GroupPath() pulumi.StringPtrOutput {
 // Whether the integration has been fully installed.
 func (o GitLabIntegrationOutput) Installed() pulumi.BoolOutput {
 	return o.ApplyT(func(v *GitLabIntegration) pulumi.BoolOutput { return v.Installed }).(pulumi.BoolOutput)
-}
-
-// The GitLab integration identifier
-func (o GitLabIntegrationOutput) IntegrationId() pulumi.StringOutput {
-	return o.ApplyT(func(v *GitLabIntegration) pulumi.StringOutput { return v.IntegrationId }).(pulumi.StringOutput)
-}
-
-// The organization name
-func (o GitLabIntegrationOutput) OrgName() pulumi.StringOutput {
-	return o.ApplyT(func(v *GitLabIntegration) pulumi.StringOutput { return v.OrgName }).(pulumi.StringOutput)
 }
 
 // Whether the integration is currently valid (tokens, hooks, etc.).

@@ -16,25 +16,6 @@ namespace Pulumi.PulumiService.V2.Esc
     public partial class Environment : global::Pulumi.CustomResource
     {
         /// <summary>
-        /// The environment name
-        /// </summary>
-        [Output("name")]
-        public Output<string> Name { get; private set; } = null!;
-
-        /// <summary>
-        /// The organization name
-        /// </summary>
-        [Output("orgName")]
-        public Output<string> OrgName { get; private set; } = null!;
-
-        /// <summary>
-        /// The project name
-        /// </summary>
-        [Output("project")]
-        public Output<string> Project { get; private set; } = null!;
-
-
-        /// <summary>
         /// Create a Environment resource with the given unique name, arguments, and options.
         /// </summary>
         ///
@@ -56,12 +37,6 @@ namespace Pulumi.PulumiService.V2.Esc
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
-                ReplaceOnChanges =
-                {
-                    "name",
-                    "orgName",
-                    "project",
-                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.

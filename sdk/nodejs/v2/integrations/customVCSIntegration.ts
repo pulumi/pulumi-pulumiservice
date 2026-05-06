@@ -59,10 +59,6 @@ export class CustomVCSIntegration extends pulumi.CustomResource {
      */
     declare public readonly name: pulumi.Output<string>;
     /**
-     * The organization name
-     */
-    declare public readonly orgName: pulumi.Output<string>;
-    /**
      * List of repositories configured on this integration
      */
     declare public /*out*/ readonly repositories: pulumi.Output<any[] | undefined>;
@@ -120,7 +116,6 @@ export class CustomVCSIntegration extends pulumi.CustomResource {
             resourceInputs["integrationId"] = undefined /*out*/;
             resourceInputs["modified"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
-            resourceInputs["orgName"] = undefined /*out*/;
             resourceInputs["repositories"] = undefined /*out*/;
             resourceInputs["vcsType"] = undefined /*out*/;
             resourceInputs["webhookSecret"] = undefined /*out*/;
@@ -129,8 +124,6 @@ export class CustomVCSIntegration extends pulumi.CustomResource {
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         const secretOpts = { additionalSecretOutputs: ["webhookSecret"] };
         opts = pulumi.mergeOptions(opts, secretOpts);
-        const replaceOnChanges = { replaceOnChanges: ["integrationId", "orgName"] };
-        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(CustomVCSIntegration.__pulumiType, name, resourceInputs, opts);
     }
 }
