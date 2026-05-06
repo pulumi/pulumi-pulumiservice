@@ -926,7 +926,7 @@
       ]
     },
     "pulumiservice:index:TeamStackPermissionScope": {
-      "type": "number",
+      "type": "integer",
       "enum": [
         {
           "name": "read",
@@ -2738,66 +2738,69 @@
       "properties": {
         "organization": {
           "type": "string",
-          "description": "The organization or the personal account name of the stack."
+          "description": "The organization or the personal account name of the stack.",
+          "replaceOnChanges": true
         },
         "permission": {
           "$ref": "#/types/pulumiservice:index:TeamStackPermissionScope",
-          "plain": true,
-          "description": "Sets the permission level that this team will be granted to the stack."
+          "description": "Sets the permission level that this team will be granted to the stack.",
+          "replaceOnChanges": true
         },
         "project": {
           "type": "string",
-          "description": "The project name for this stack."
+          "description": "The project name for this stack.",
+          "replaceOnChanges": true
         },
         "stack": {
           "type": "string",
-          "description": "The name of the stack that the team will be granted permissions to."
+          "description": "The name of the stack that the team will be granted permissions to.",
+          "replaceOnChanges": true
         },
         "team": {
           "type": "string",
-          "description": "The name of the team to grant this stack permissions to. This is not the display name."
+          "description": "The name of the team to grant this stack permissions to. This is not the display name.",
+          "replaceOnChanges": true
         }
       },
       "required": [
-        "team",
         "organization",
         "project",
         "stack",
+        "team",
         "permission"
       ],
       "inputProperties": {
         "organization": {
           "type": "string",
           "description": "The organization or the personal account name of the stack.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         },
         "permission": {
           "$ref": "#/types/pulumiservice:index:TeamStackPermissionScope",
-          "plain": true,
           "description": "Sets the permission level that this team will be granted to the stack.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         },
         "project": {
           "type": "string",
           "description": "The project name for this stack.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         },
         "stack": {
           "type": "string",
           "description": "The name of the stack that the team will be granted permissions to.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         },
         "team": {
           "type": "string",
           "description": "The name of the team to grant this stack permissions to. This is not the display name.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         }
       },
       "requiredInputs": [
-        "team",
         "organization",
         "project",
         "stack",
+        "team",
         "permission"
       ]
     },

@@ -68,6 +68,14 @@ namespace Pulumi.PulumiService
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
+                ReplaceOnChanges =
+                {
+                    "organization",
+                    "permission",
+                    "project",
+                    "stack",
+                    "team",
+                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.
@@ -100,7 +108,7 @@ namespace Pulumi.PulumiService
         /// Sets the permission level that this team will be granted to the stack.
         /// </summary>
         [Input("permission", required: true)]
-        public Pulumi.PulumiService.TeamStackPermissionScope Permission { get; set; }
+        public Input<Pulumi.PulumiService.TeamStackPermissionScope> Permission { get; set; } = null!;
 
         /// <summary>
         /// The project name for this stack.
