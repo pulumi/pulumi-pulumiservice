@@ -173,7 +173,7 @@ class ScanSchedule(_builtins.str, Enum):
     """
     Disable automated scanning.
     """
-    SCAN_SCHEDULE_12H = "12h"
+    TWELVE_HOURS = "12h"
     """
     Run automated scans every twelve hours.
     """

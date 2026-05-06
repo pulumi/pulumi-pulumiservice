@@ -322,7 +322,7 @@ namespace Pulumi.PulumiService
         /// <summary>
         /// Run automated scans every twelve hours.
         /// </summary>
-        public static ScanSchedule ScanSchedule_12h { get; } = new ScanSchedule("12h");
+        public static ScanSchedule TwelveHours { get; } = new ScanSchedule("12h");
         /// <summary>
         /// Run automated scans once per day.
         /// </summary>

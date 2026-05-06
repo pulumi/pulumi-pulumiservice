@@ -19,7 +19,7 @@ import java.util.StringJoiner;
          * Run automated scans every twelve hours.
          * 
          */
-        _12h("12h"),
+        TwelveHours("12h"),
         /**
          * Run automated scans once per day.
          * 
