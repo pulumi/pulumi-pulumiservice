@@ -4293,6 +4293,346 @@
         "projectName"
       ]
     },
+    "pulumiservice:v2/escPreview:Environment": {
+      "description": "Creates a new Pulumi ESC (Environments, Secrets, and Configuration) environment within the specified organization. The request body must include the project name and the environment name. Environment names must be unique within a project and may only contain alphanumeric characters, hyphens, underscores, and periods. The newly created environment starts with an empty YAML definition that can be updated via the UpdateEnvironment endpoint.",
+      "type": "object",
+      "inputProperties": {
+        "envName": {
+          "type": "string",
+          "description": "The environment name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the environment."
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "project": {
+          "type": "string",
+          "description": "The project name for the environment."
+        }
+      },
+      "requiredInputs": [
+        "envName",
+        "name",
+        "orgName",
+        "project"
+      ],
+      "aliases": [
+        {
+          "type": "pulumiservice:v2/preview:Environment"
+        }
+      ]
+    },
+    "pulumiservice:v2/escPreview:EnvironmentTag": {
+      "description": "Adds a new user-defined tag to a Pulumi ESC environment. Tags are key-value pairs that provide contextual metadata for organizing and searching environments (e.g., region=us-east-1, team=platform). The tag name and value are provided in the request body. Returns the created EnvironmentTag on success. Returns 409 if a tag with the same name already exists on the environment.",
+      "properties": {
+        "created": {
+          "type": "string",
+          "description": "The timestamp when the tag was created."
+        },
+        "editorLogin": {
+          "type": "string",
+          "description": "The login name of the user who last edited the tag."
+        },
+        "editorName": {
+          "type": "string",
+          "description": "The display name of the user who last edited the tag."
+        },
+        "modified": {
+          "type": "string",
+          "description": "The timestamp when the tag was last modified."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the tag."
+        },
+        "value": {
+          "type": "string",
+          "description": "The value of the tag."
+        }
+      },
+      "type": "object",
+      "required": [
+        "created",
+        "editorLogin",
+        "editorName",
+        "modified",
+        "name",
+        "value"
+      ],
+      "inputProperties": {
+        "envName": {
+          "type": "string",
+          "description": "The environment name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "name": {
+          "type": "string",
+          "description": "The name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "value": {
+          "type": "string",
+          "description": "The value"
+        }
+      },
+      "requiredInputs": [
+        "envName",
+        "name",
+        "orgName",
+        "value"
+      ],
+      "aliases": [
+        {
+          "type": "pulumiservice:v2/preview:EnvironmentTag"
+        }
+      ]
+    },
+    "pulumiservice:v2/escPreview:RevisionTag": {
+      "description": "Creates a new revision tag for a Pulumi ESC environment. Revision tags are named references that point to specific revision numbers, similar to Git tags. They allow pinning a stable reference to a known-good version of an environment. Tagged versions can be used in imports and Pulumi stack configuration (e.g., myproject/env@prod) to ensure stable references unaffected by subsequent changes. The built-in 'latest' tag always points to the most recent revision.",
+      "properties": {
+        "created": {
+          "type": "string",
+          "description": "The timestamp when the tag was created."
+        },
+        "editorLogin": {
+          "type": "string",
+          "description": "The login name of the user who last edited the tag."
+        },
+        "editorName": {
+          "type": "string",
+          "description": "The display name of the user who last edited the tag."
+        },
+        "modified": {
+          "type": "string",
+          "description": "The timestamp when the tag was last modified."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the tag."
+        },
+        "revision": {
+          "type": "integer",
+          "description": "The revision number this tag points to."
+        }
+      },
+      "type": "object",
+      "required": [
+        "created",
+        "modified",
+        "name",
+        "revision"
+      ],
+      "inputProperties": {
+        "envName": {
+          "type": "string",
+          "description": "The environment name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "name": {
+          "type": "string",
+          "description": "The name"
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The organization name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "revision": {
+          "type": "integer",
+          "description": "The revision"
+        },
+        "tagName": {
+          "type": "string",
+          "description": "The revision tag name",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        }
+      },
+      "requiredInputs": [
+        "envName",
+        "name",
+        "orgName",
+        "tagName"
+      ],
+      "aliases": [
+        {
+          "type": "pulumiservice:v2/preview:RevisionTag"
+        }
+      ]
+    },
+    "pulumiservice:v2/escPreview:Webhook": {
+      "description": "Creates a new webhook for a Pulumi ESC environment. Webhooks allow external services to be notified when environment events occur, such as updates or opens. The request body specifies the webhook configuration including the destination URL, event filters, and format. Returns 400 if the organization name in the request body does not match the URL path parameter. Returns 409 if a webhook with the same name already exists.",
+      "properties": {
+        "active": {
+          "type": "boolean",
+          "description": "Whether the webhook is active and will receive deliveries."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The human-readable display name shown in the UI."
+        },
+        "envName": {
+          "type": "string",
+          "description": "The environment name. Set when the webhook is scoped to a specific environment."
+        },
+        "filters": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Specific event types this webhook subscribes to. If empty, all events are delivered."
+        },
+        "format": {
+          "type": "string",
+          "description": "The format of the webhook payload (e.g., 'raw', 'slack', 'ms_teams')."
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Event groups this webhook subscribes to (e.g., 'stacks', 'deployments')."
+        },
+        "hasSecret": {
+          "type": "boolean",
+          "description": "HasSecret is true if the webhook has a secret. This is used to determine whether\nto show that there is a secret in the UI.",
+          "secret": true
+        },
+        "name": {
+          "type": "string",
+          "description": "The unique identifier name for the webhook within its scope."
+        },
+        "organizationName": {
+          "type": "string",
+          "description": "The organization that owns this webhook."
+        },
+        "payloadUrl": {
+          "type": "string",
+          "description": "The URL to which webhook payloads are delivered."
+        },
+        "projectName": {
+          "type": "string",
+          "description": "The project name. Set when the webhook is scoped to a specific stack."
+        },
+        "secret": {
+          "type": "string",
+          "description": "Secret will be omitted when returned from the service.",
+          "secret": true
+        },
+        "secretCiphertext": {
+          "type": "string",
+          "description": "SecretCiphertext is the ciphertext value of the webhook's secret.\nIt's used to check whether the secret was changed by the PSP",
+          "secret": true
+        },
+        "stackName": {
+          "type": "string",
+          "description": "The stack name. Set when the webhook is scoped to a specific stack."
+        }
+      },
+      "type": "object",
+      "required": [
+        "active",
+        "displayName",
+        "hasSecret",
+        "name",
+        "organizationName",
+        "payloadUrl",
+        "secretCiphertext"
+      ],
+      "inputProperties": {
+        "active": {
+          "type": "boolean",
+          "description": "Whether the webhook is active and will receive deliveries."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The human-readable display name shown in the UI."
+        },
+        "envName": {
+          "type": "string",
+          "description": "The environment name. Set when the webhook is scoped to a specific environment.",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "filters": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Specific event types this webhook subscribes to. If empty, all events are delivered."
+        },
+        "format": {
+          "type": "string",
+          "description": "The format of the webhook payload (e.g., 'raw', 'slack', 'ms_teams')."
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Event groups this webhook subscribes to (e.g., 'stacks', 'deployments')."
+        },
+        "name": {
+          "type": "string",
+          "description": "The unique identifier name for the webhook within its scope.",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "organizationName": {
+          "type": "string",
+          "description": "The organization that owns this webhook.",
+          "replaceOnChanges": true,
+          "willReplaceOnChanges": true
+        },
+        "payloadUrl": {
+          "type": "string",
+          "description": "The URL to which webhook payloads are delivered."
+        },
+        "projectName": {
+          "type": "string",
+          "description": "The project name. Set when the webhook is scoped to a specific stack."
+        },
+        "secret": {
+          "type": "string",
+          "description": "Secret will be omitted when returned from the service."
+        },
+        "stackName": {
+          "type": "string",
+          "description": "The stack name. Set when the webhook is scoped to a specific stack."
+        }
+      },
+      "requiredInputs": [
+        "active",
+        "displayName",
+        "envName",
+        "name",
+        "organizationName",
+        "payloadUrl"
+      ],
+      "aliases": [
+        {
+          "type": "pulumiservice:v2/preview:Webhook"
+        }
+      ]
+    },
     "pulumiservice:v2/insights:Account": {
       "description": "Creates a new Insights account. An Insights account represents a cloud provider account (e.g., AWS, Azure, OCI) configured for resource discovery.",
       "properties": {
@@ -5074,326 +5414,6 @@
       "requiredInputs": [
         "integrationId",
         "orgName"
-      ]
-    },
-    "pulumiservice:v2/preview:Environment": {
-      "description": "Creates a new Pulumi ESC (Environments, Secrets, and Configuration) environment within the specified organization. The request body must include the project name and the environment name. Environment names must be unique within a project and may only contain alphanumeric characters, hyphens, underscores, and periods. The newly created environment starts with an empty YAML definition that can be updated via the UpdateEnvironment endpoint.",
-      "type": "object",
-      "inputProperties": {
-        "envName": {
-          "type": "string",
-          "description": "The environment name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "name": {
-          "type": "string",
-          "description": "The name of the environment."
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "project": {
-          "type": "string",
-          "description": "The project name for the environment."
-        }
-      },
-      "requiredInputs": [
-        "envName",
-        "name",
-        "orgName",
-        "project"
-      ]
-    },
-    "pulumiservice:v2/preview:EnvironmentTag": {
-      "description": "Adds a new user-defined tag to a Pulumi ESC environment. Tags are key-value pairs that provide contextual metadata for organizing and searching environments (e.g., region=us-east-1, team=platform). The tag name and value are provided in the request body. Returns the created EnvironmentTag on success. Returns 409 if a tag with the same name already exists on the environment.",
-      "properties": {
-        "created": {
-          "type": "string",
-          "description": "The timestamp when the tag was created."
-        },
-        "editorLogin": {
-          "type": "string",
-          "description": "The login name of the user who last edited the tag."
-        },
-        "editorName": {
-          "type": "string",
-          "description": "The display name of the user who last edited the tag."
-        },
-        "modified": {
-          "type": "string",
-          "description": "The timestamp when the tag was last modified."
-        },
-        "name": {
-          "type": "string",
-          "description": "The name of the tag."
-        },
-        "value": {
-          "type": "string",
-          "description": "The value of the tag."
-        }
-      },
-      "type": "object",
-      "required": [
-        "created",
-        "editorLogin",
-        "editorName",
-        "modified",
-        "name",
-        "value"
-      ],
-      "inputProperties": {
-        "envName": {
-          "type": "string",
-          "description": "The environment name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "name": {
-          "type": "string",
-          "description": "The name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "value": {
-          "type": "string",
-          "description": "The value"
-        }
-      },
-      "requiredInputs": [
-        "envName",
-        "name",
-        "orgName",
-        "value"
-      ]
-    },
-    "pulumiservice:v2/preview:RevisionTag": {
-      "description": "Creates a new revision tag for a Pulumi ESC environment. Revision tags are named references that point to specific revision numbers, similar to Git tags. They allow pinning a stable reference to a known-good version of an environment. Tagged versions can be used in imports and Pulumi stack configuration (e.g., myproject/env@prod) to ensure stable references unaffected by subsequent changes. The built-in 'latest' tag always points to the most recent revision.",
-      "properties": {
-        "created": {
-          "type": "string",
-          "description": "The timestamp when the tag was created."
-        },
-        "editorLogin": {
-          "type": "string",
-          "description": "The login name of the user who last edited the tag."
-        },
-        "editorName": {
-          "type": "string",
-          "description": "The display name of the user who last edited the tag."
-        },
-        "modified": {
-          "type": "string",
-          "description": "The timestamp when the tag was last modified."
-        },
-        "name": {
-          "type": "string",
-          "description": "The name of the tag."
-        },
-        "revision": {
-          "type": "integer",
-          "description": "The revision number this tag points to."
-        }
-      },
-      "type": "object",
-      "required": [
-        "created",
-        "modified",
-        "name",
-        "revision"
-      ],
-      "inputProperties": {
-        "envName": {
-          "type": "string",
-          "description": "The environment name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "name": {
-          "type": "string",
-          "description": "The name"
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "revision": {
-          "type": "integer",
-          "description": "The revision"
-        },
-        "tagName": {
-          "type": "string",
-          "description": "The revision tag name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        }
-      },
-      "requiredInputs": [
-        "envName",
-        "name",
-        "orgName",
-        "tagName"
-      ]
-    },
-    "pulumiservice:v2/preview:Webhook": {
-      "description": "Creates a new webhook for a Pulumi ESC environment. Webhooks allow external services to be notified when environment events occur, such as updates or opens. The request body specifies the webhook configuration including the destination URL, event filters, and format. Returns 400 if the organization name in the request body does not match the URL path parameter. Returns 409 if a webhook with the same name already exists.",
-      "properties": {
-        "active": {
-          "type": "boolean",
-          "description": "Whether the webhook is active and will receive deliveries."
-        },
-        "displayName": {
-          "type": "string",
-          "description": "The human-readable display name shown in the UI."
-        },
-        "envName": {
-          "type": "string",
-          "description": "The environment name. Set when the webhook is scoped to a specific environment."
-        },
-        "filters": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Specific event types this webhook subscribes to. If empty, all events are delivered."
-        },
-        "format": {
-          "type": "string",
-          "description": "The format of the webhook payload (e.g., 'raw', 'slack', 'ms_teams')."
-        },
-        "groups": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Event groups this webhook subscribes to (e.g., 'stacks', 'deployments')."
-        },
-        "hasSecret": {
-          "type": "boolean",
-          "description": "HasSecret is true if the webhook has a secret. This is used to determine whether\nto show that there is a secret in the UI.",
-          "secret": true
-        },
-        "name": {
-          "type": "string",
-          "description": "The unique identifier name for the webhook within its scope."
-        },
-        "organizationName": {
-          "type": "string",
-          "description": "The organization that owns this webhook."
-        },
-        "payloadUrl": {
-          "type": "string",
-          "description": "The URL to which webhook payloads are delivered."
-        },
-        "projectName": {
-          "type": "string",
-          "description": "The project name. Set when the webhook is scoped to a specific stack."
-        },
-        "secret": {
-          "type": "string",
-          "description": "Secret will be omitted when returned from the service.",
-          "secret": true
-        },
-        "secretCiphertext": {
-          "type": "string",
-          "description": "SecretCiphertext is the ciphertext value of the webhook's secret.\nIt's used to check whether the secret was changed by the PSP",
-          "secret": true
-        },
-        "stackName": {
-          "type": "string",
-          "description": "The stack name. Set when the webhook is scoped to a specific stack."
-        }
-      },
-      "type": "object",
-      "required": [
-        "active",
-        "displayName",
-        "hasSecret",
-        "name",
-        "organizationName",
-        "payloadUrl",
-        "secretCiphertext"
-      ],
-      "inputProperties": {
-        "active": {
-          "type": "boolean",
-          "description": "Whether the webhook is active and will receive deliveries."
-        },
-        "displayName": {
-          "type": "string",
-          "description": "The human-readable display name shown in the UI."
-        },
-        "envName": {
-          "type": "string",
-          "description": "The environment name. Set when the webhook is scoped to a specific environment.",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "filters": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Specific event types this webhook subscribes to. If empty, all events are delivered."
-        },
-        "format": {
-          "type": "string",
-          "description": "The format of the webhook payload (e.g., 'raw', 'slack', 'ms_teams')."
-        },
-        "groups": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Event groups this webhook subscribes to (e.g., 'stacks', 'deployments')."
-        },
-        "name": {
-          "type": "string",
-          "description": "The unique identifier name for the webhook within its scope.",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "organizationName": {
-          "type": "string",
-          "description": "The organization that owns this webhook.",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "payloadUrl": {
-          "type": "string",
-          "description": "The URL to which webhook payloads are delivered."
-        },
-        "projectName": {
-          "type": "string",
-          "description": "The project name. Set when the webhook is scoped to a specific stack."
-        },
-        "secret": {
-          "type": "string",
-          "description": "Secret will be omitted when returned from the service."
-        },
-        "stackName": {
-          "type": "string",
-          "description": "The stack name. Set when the webhook is scoped to a specific stack."
-        }
-      },
-      "requiredInputs": [
-        "active",
-        "displayName",
-        "envName",
-        "name",
-        "organizationName",
-        "payloadUrl"
       ]
     },
     "pulumiservice:v2/services:Item": {

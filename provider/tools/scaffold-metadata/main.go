@@ -123,7 +123,7 @@ var moduleAliases = map[string]string{
 	"esc/environments":     "esc",
 	"oidc/issuers":         "auth",
 	"preview/agents":       "agents",
-	"preview/environments": "preview",
+	"preview/environments": "escPreview",
 	"preview/insights":     "insights",
 	"saml":                 "auth",
 	"stacks/deployments":   "deployments",

@@ -1790,6 +1790,7 @@
         "description": "Defines an agent workflow.",
         "properties": {
           "deploymentID": {
+            "deprecated": true,
             "description": "Deprecated: use typeSpecificID instead.",
             "type": "string",
             "x-order": 4
@@ -2075,7 +2076,8 @@
               "copilot-summarize-error",
               "copilot-explain-preview",
               "deployment-schema-version",
-              "stack-policy-packs"
+              "stack-policy-packs",
+              "api-version"
             ],
             "type": "string",
             "x-order": 1,
@@ -2088,7 +2090,8 @@
                 "Indicates whether the service supports summarizing errors via Copilot.",
                 "Indicates whether the service supports the Copilot explainer.",
                 "Indicates the maximum deployment schema version that the service supports.",
-                "Indicates whether the service supports retrieving a stack's required policy packs."
+                "Indicates whether the service supports retrieving a stack's required policy packs.",
+                "Advertises the REST API versions (the `Accept: application/vnd.pulumi+N` header) that the service supports. The configuration object carries `maxVersion`, `minVersion`, and `defaultVersion`."
               ],
               "enumFieldNames": [
                 "DeltaCheckpointUploads",
@@ -2097,7 +2100,8 @@
                 "CopilotSummarizeError",
                 "CopilotExplainPreview",
                 "DeploymentSchemaVersion",
-                "StackPolicyPacks"
+                "StackPolicyPacks",
+                "APIVersion"
               ],
               "enumTypeName": "AppAPICapability"
             }
@@ -13254,6 +13258,48 @@
         ],
         "type": "object"
       },
+      "GetPackageExamplesResponse": {
+        "description": "Code examples aggregated from a registry package version. Examples are extracted from PulumiCodeChooser blocks in resource and function descriptions and carry per-example token and kind so the flat list is self-contained. Filtered by the optional 'q' search parameter and capped by 'limit'.",
+        "properties": {
+          "examples": {
+            "description": "Examples in deterministic order: sorted by token (alphabetical), then by index within each token. Capped at 'limit'.",
+            "items": {
+              "$ref": "#/components/schemas/RegistryExample"
+            },
+            "type": "array",
+            "x-order": 4
+          },
+          "language": {
+            "description": "The language all snippets are filtered to.",
+            "type": "string",
+            "x-order": 3
+          },
+          "navUrl": {
+            "description": "Path to the package navigation endpoint for this version.",
+            "type": "string",
+            "x-order": 2
+          },
+          "totalCount": {
+            "description": "Total number of examples matching the query before 'limit' was applied. When greater than the length of 'examples', more results exist that were not returned.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 5
+          },
+          "version": {
+            "description": "The resolved semantic version of the package.",
+            "type": "string",
+            "x-order": 1
+          }
+        },
+        "required": [
+          "examples",
+          "language",
+          "navUrl",
+          "totalCount",
+          "version"
+        ],
+        "type": "object"
+      },
       "GetPackageInstallationResponse": {
         "description": "Installation configuration content for a registry package, structured as an ordered list of content nodes. When a language or OS filter is applied, language- and OS-specific content is collapsed to the requested value. Returns 404 if the package does not include installation configuration.",
         "properties": {
@@ -17209,7 +17255,7 @@
             "x-order": 3
           },
           "sessionName": {
-            "description": "The name of the assume-role session.",
+            "description": "The name of the assume-role session, sent to AWS STS as RoleSessionName. Supports ${var} placeholders for ${organization.name}, ${project.name}, ${stack.name}, ${operation}, ${deployment.version}, and ${deployment.id}. Recommended: include ${deployment.version} so each run is traceable in AWS CloudTrail (for example, 'pulumi-${deployment.version}'). AWS caps RoleSessionName at 64 characters; if a rendered template would exceed that, the name variables (organization, project, stack) are truncated to fit while ${operation}, ${deployment.version}, and ${deployment.id} are preserved.",
             "type": "string",
             "x-order": 4
           }
@@ -17761,6 +17807,11 @@
             "type": "boolean",
             "x-order": 31
           },
+          "cliIntegrationCatalogEnabled": {
+            "description": "Whether the CLI integration catalog is enabled.",
+            "type": "boolean",
+            "x-order": 57
+          },
           "crossGuardEnabled": {
             "description": "Whether CrossGuard policy enforcement is enabled.",
             "type": "boolean",
@@ -17976,6 +18027,11 @@
             "type": "boolean",
             "x-order": 29
           },
+          "serviceBackedConfigEnabled": {
+            "description": "Whether service-backed stack config is enabled.",
+            "type": "boolean",
+            "x-order": 58
+          },
           "themingEnabled": {
             "description": "Whether UI theming is enabled.",
             "type": "boolean",
@@ -17999,6 +18055,7 @@
           "auditLogsEnabled",
           "bitbucketVCSEnabled",
           "bringYourOwnKeyEnabled",
+          "cliIntegrationCatalogEnabled",
           "crossGuardEnabled",
           "customRoleCondition",
           "customRolesEnabled",
@@ -18042,6 +18099,7 @@
           "scimEnabled",
           "selfHostedDeploymentsEnabled",
           "selfServeIDPRemoval",
+          "serviceBackedConfigEnabled",
           "themingEnabled",
           "webhooksEnabled"
         ],
@@ -18072,6 +18130,7 @@
             "x-order": 6
           },
           "role": {
+            "deprecated": true,
             "description": "**Deprecated:** Use `fgaRole` instead. The member's built-in role within the organization. For members assigned a custom role, this is the closest built-in projection (`member`, `admin`, or `billingManager`) and may lose detail; `fgaRole` is authoritative.",
             "enum": [
               "none",
@@ -22445,6 +22504,44 @@
         ],
         "type": "object"
       },
+      "RegistryExample": {
+        "description": "A single code example extracted from a resource or function description. Composed of a stable identifier, a human-readable title derived from the surrounding documentation, and the code snippet in the requested language.",
+        "properties": {
+          "code": {
+            "description": "The example source code in the requested language.",
+            "type": "string",
+            "x-order": 3
+          },
+          "id": {
+            "description": "Stable identifier for this example within the package version. Format: '<token>#<index>', e.g. 'aws:ec2/instance:Instance#0'. The index is the zero-based position of the example among siblings on the same token. Stable only within a single package version.",
+            "type": "string",
+            "x-order": 1
+          },
+          "kind": {
+            "description": "Whether 'token' refers to a 'resource' or 'function'.",
+            "type": "string",
+            "x-order": 5
+          },
+          "title": {
+            "description": "Human-readable title derived from the schema's surrounding heading or preceding paragraph caption. Capped at 120 characters with word-boundary truncation. Empty when no heading or caption was available; consumers can render their own fallback (e.g. 'Example #' + index). May be the same for sibling examples when the schema does not differentiate them; rely on 'id' for addressability.",
+            "type": "string",
+            "x-order": 2
+          },
+          "token": {
+            "description": "The Pulumi token of the resource or function this example belongs to.",
+            "type": "string",
+            "x-order": 4
+          }
+        },
+        "required": [
+          "code",
+          "id",
+          "kind",
+          "title",
+          "token"
+        ],
+        "type": "object"
+      },
       "RegistryPolicyPack": {
         "description": "RegistryPolicyPack represents the core metadata for a policy pack in the registry.\nThis is the primary data structure returned by most registry API endpoints.",
         "properties": {
@@ -26094,26 +26191,26 @@
       "UpdateRoleRequest": {
         "description": "Request to update a custom role.",
         "properties": {
-          "Description": {
+          "description": {
             "description": "The new description for the role.",
             "type": "string",
             "x-order": 2
           },
-          "Details": {
+          "details": {
             "$ref": "#/components/schemas/PermissionDescriptor",
             "description": "The permission details for the role.",
             "x-order": 3
           },
-          "Name": {
+          "name": {
             "description": "The new name for the role.",
             "type": "string",
             "x-order": 1
           }
         },
         "required": [
-          "Description",
-          "Details",
-          "Name"
+          "description",
+          "details",
+          "name"
         ],
         "type": "object"
       },
@@ -50885,6 +50982,106 @@
           }
         },
         "summary": "GetPackageDocs",
+        "tags": [
+          "Registry"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      }
+    },
+    "/api/registry/packages/{source}/{publisher}/{name}/versions/{version}/examples": {
+      "get": {
+        "description": "Returns code examples aggregated from all resources and functions in a registry package version. Examples are extracted from PulumiCodeChooser blocks in each token's description; each example carries its 'token' and 'kind' so the flat list is self-contained. The 'lang' parameter is required and selects the snippet language. Use the 'q' parameter for case-insensitive substring search across each example's title and token; non-matching examples are omitted. The 'q' value must be URL-encoded (e.g. spaces as '%20', '/' as '%2F'). Results are sorted by token (alphabetical) then by index within token. Use 'limit' to cap the number of examples returned (default 20); the response reports 'totalCount' (after filter, before limit) so consumers can detect when more results exist. Supports content negotiation via the Accept header: send 'text/markdown' to receive a rendered listing instead of structured JSON. The version parameter accepts a specific semantic version string or 'latest'. Returns 404 if the package version does not exist.",
+        "operationId": "GetPackageExamples",
+        "parameters": [
+          {
+            "description": "The package source: 'pulumi', 'opentofu', or 'private'",
+            "in": "path",
+            "name": "source",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Organization that owns the package",
+            "in": "path",
+            "name": "publisher",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The package name",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Semantic version string or 'latest'",
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Snippet language. Values: typescript, python, go, csharp, java, yaml",
+            "in": "query",
+            "name": "lang",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Maximum number of examples to return (default: 20)",
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "URL-encoded search query. Case-insensitive substring matching against each example's title and token",
+            "in": "query",
+            "name": "q",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetPackageExamplesResponse"
+                }
+              },
+              "text/markdown": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "description": "invalid query parameter"
+          },
+          "404": {
+            "description": "package version"
+          }
+        },
+        "summary": "GetPackageExamples",
         "tags": [
           "Registry"
         ],

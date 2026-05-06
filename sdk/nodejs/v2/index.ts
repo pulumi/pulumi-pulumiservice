@@ -61,9 +61,9 @@ import * as agents from "./agents";
 import * as auth from "./auth";
 import * as deployments from "./deployments";
 import * as esc from "./esc";
+import * as escpreview from "./escpreview";
 import * as insights from "./insights";
 import * as integrations from "./integrations";
-import * as preview from "./preview";
 import * as services from "./services";
 import * as stacks from "./stacks";
 import * as teams from "./teams";
@@ -74,9 +74,9 @@ export {
     auth,
     deployments,
     esc,
+    escpreview,
     insights,
     integrations,
-    preview,
     services,
     stacks,
     teams,

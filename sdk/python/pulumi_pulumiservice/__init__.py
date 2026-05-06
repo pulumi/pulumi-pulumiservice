@@ -158,6 +158,17 @@ _utilities.register(
  },
  {
   "pkg": "pulumiservice",
+  "mod": "v2/escPreview",
+  "fqn": "pulumi_pulumiservice.v2.escpreview",
+  "classes": {
+   "pulumiservice:v2/escPreview:Environment": "Environment",
+   "pulumiservice:v2/escPreview:EnvironmentTag": "EnvironmentTag",
+   "pulumiservice:v2/escPreview:RevisionTag": "RevisionTag",
+   "pulumiservice:v2/escPreview:Webhook": "Webhook"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
   "mod": "v2/insights",
   "fqn": "pulumi_pulumiservice.v2.insights",
   "classes": {
@@ -177,17 +188,6 @@ _utilities.register(
    "pulumiservice:v2/integrations:GitHubEnterpriseIntegration": "GitHubEnterpriseIntegration",
    "pulumiservice:v2/integrations:GitHubIntegration": "GitHubIntegration",
    "pulumiservice:v2/integrations:GitLabIntegration": "GitLabIntegration"
-  }
- },
- {
-  "pkg": "pulumiservice",
-  "mod": "v2/preview",
-  "fqn": "pulumi_pulumiservice.v2.preview",
-  "classes": {
-   "pulumiservice:v2/preview:Environment": "Environment",
-   "pulumiservice:v2/preview:EnvironmentTag": "EnvironmentTag",
-   "pulumiservice:v2/preview:RevisionTag": "RevisionTag",
-   "pulumiservice:v2/preview:Webhook": "Webhook"
   }
  },
  {

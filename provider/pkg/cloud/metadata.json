@@ -173,6 +173,9 @@
       "token": "pulumiservice:v2/esc:EnvironmentTag"
     },
     "pulumiservice:v2:EnvironmentTag_preview_environments": {
+      "aliases": [
+        "pulumiservice:v2/preview:EnvironmentTag"
+      ],
       "deleteBeforeReplace": true,
       "idFormat": "{orgName}/{envName}/{name}",
       "operations": {
@@ -184,7 +187,7 @@
       "renames": {
         "name": "tagName"
       },
-      "token": "pulumiservice:v2/preview:EnvironmentTag"
+      "token": "pulumiservice:v2/escPreview:EnvironmentTag"
     },
     "pulumiservice:v2:Environment_esc_environments": {
       "deleteBeforeReplace": true,
@@ -202,6 +205,9 @@
       "token": "pulumiservice:v2/esc:Environment"
     },
     "pulumiservice:v2:Environment_preview_environments": {
+      "aliases": [
+        "pulumiservice:v2/preview:Environment"
+      ],
       "deleteBeforeReplace": true,
       "idFormat": "{orgName}/{envName}",
       "operations": {
@@ -210,7 +216,7 @@
         "read": "ReadEnvironment_preview_environments",
         "update": "UpdateEnvironment_preview_environments"
       },
-      "token": "pulumiservice:v2/preview:Environment"
+      "token": "pulumiservice:v2/escPreview:Environment"
     },
     "pulumiservice:v2:Gate": {
       "deleteBeforeReplace": true,
@@ -422,6 +428,9 @@
       "token": "pulumiservice:v2/esc:RevisionTag"
     },
     "pulumiservice:v2:RevisionTag_preview_environments": {
+      "aliases": [
+        "pulumiservice:v2/preview:RevisionTag"
+      ],
       "deleteBeforeReplace": true,
       "idFormat": "{orgName}/{envName}/{tagName}",
       "operations": {
@@ -430,7 +439,7 @@
         "read": "ReadRevisionTag_preview_environments",
         "update": "UpdateRevisionTag_preview_environments"
       },
-      "token": "pulumiservice:v2/preview:RevisionTag"
+      "token": "pulumiservice:v2/escPreview:RevisionTag"
     },
     "pulumiservice:v2:Role": {
       "deleteBeforeReplace": true,
@@ -632,6 +641,9 @@
       "token": "pulumiservice:v2/esc:Webhook"
     },
     "pulumiservice:v2:Webhook_preview_environments": {
+      "aliases": [
+        "pulumiservice:v2/preview:Webhook"
+      ],
       "deleteBeforeReplace": true,
       "fields": {
         "groups": {
@@ -649,7 +661,7 @@
         "name": "hookName",
         "organizationName": "orgName"
       },
-      "token": "pulumiservice:v2/preview:Webhook"
+      "token": "pulumiservice:v2/escPreview:Webhook"
     }
   }
 }

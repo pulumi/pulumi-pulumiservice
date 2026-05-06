@@ -27,12 +27,12 @@ if typing.TYPE_CHECKING:
     deployments = __deployments
     import pulumi_pulumiservice.v2.esc as __esc
     esc = __esc
+    import pulumi_pulumiservice.v2.escpreview as __escpreview
+    escpreview = __escpreview
     import pulumi_pulumiservice.v2.insights as __insights
     insights = __insights
     import pulumi_pulumiservice.v2.integrations as __integrations
     integrations = __integrations
-    import pulumi_pulumiservice.v2.preview as __preview
-    preview = __preview
     import pulumi_pulumiservice.v2.services as __services
     services = __services
     import pulumi_pulumiservice.v2.stacks as __stacks
@@ -46,9 +46,9 @@ else:
     auth = _utilities.lazy_import('pulumi_pulumiservice.v2.auth')
     deployments = _utilities.lazy_import('pulumi_pulumiservice.v2.deployments')
     esc = _utilities.lazy_import('pulumi_pulumiservice.v2.esc')
+    escpreview = _utilities.lazy_import('pulumi_pulumiservice.v2.escpreview')
     insights = _utilities.lazy_import('pulumi_pulumiservice.v2.insights')
     integrations = _utilities.lazy_import('pulumi_pulumiservice.v2.integrations')
-    preview = _utilities.lazy_import('pulumi_pulumiservice.v2.preview')
     services = _utilities.lazy_import('pulumi_pulumiservice.v2.services')
     stacks = _utilities.lazy_import('pulumi_pulumiservice.v2.stacks')
     teams = _utilities.lazy_import('pulumi_pulumiservice.v2.teams')
