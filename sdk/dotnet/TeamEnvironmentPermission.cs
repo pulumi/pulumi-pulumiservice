@@ -19,7 +19,7 @@ namespace Pulumi.PulumiService
         /// Environment name.
         /// </summary>
         [Output("environment")]
-        public Output<string?> Environment { get; private set; } = null!;
+        public Output<string> Environment { get; private set; } = null!;
 
         /// <summary>
         /// The maximum duration for which members of this team may open the environment.
@@ -31,13 +31,13 @@ namespace Pulumi.PulumiService
         /// Organization name.
         /// </summary>
         [Output("organization")]
-        public Output<string?> Organization { get; private set; } = null!;
+        public Output<string> Organization { get; private set; } = null!;
 
         /// <summary>
         /// Which permission level to grant to the specified team.
         /// </summary>
         [Output("permission")]
-        public Output<Pulumi.PulumiService.EnvironmentPermission?> Permission { get; private set; } = null!;
+        public Output<Pulumi.PulumiService.EnvironmentPermission> Permission { get; private set; } = null!;
 
         /// <summary>
         /// Project name.
@@ -49,7 +49,7 @@ namespace Pulumi.PulumiService
         /// Team name.
         /// </summary>
         [Output("team")]
-        public Output<string?> Team { get; private set; } = null!;
+        public Output<string> Team { get; private set; } = null!;
 
 
         /// <summary>
@@ -74,6 +74,15 @@ namespace Pulumi.PulumiService
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
+                ReplaceOnChanges =
+                {
+                    "environment",
+                    "maxOpenDuration",
+                    "organization",
+                    "permission",
+                    "project",
+                    "team",
+                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.

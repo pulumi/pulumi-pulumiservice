@@ -202,6 +202,8 @@ class TeamEnvironmentPermission(pulumi.CustomResource):
             if team is None and not opts.urn:
                 raise TypeError("Missing required property 'team'")
             __props__.__dict__["team"] = team
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["environment", "maxOpenDuration", "organization", "permission", "project", "team"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(TeamEnvironmentPermission, __self__).__init__(
             'pulumiservice:index:TeamEnvironmentPermission',
             resource_name,
@@ -234,7 +236,7 @@ class TeamEnvironmentPermission(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def environment(self) -> pulumi.Output[Optional[_builtins.str]]:
+    def environment(self) -> pulumi.Output[_builtins.str]:
         """
         Environment name.
         """
@@ -250,7 +252,7 @@ class TeamEnvironmentPermission(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def organization(self) -> pulumi.Output[Optional[_builtins.str]]:
+    def organization(self) -> pulumi.Output[_builtins.str]:
         """
         Organization name.
         """
@@ -258,7 +260,7 @@ class TeamEnvironmentPermission(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def permission(self) -> pulumi.Output[Optional['EnvironmentPermission']]:
+    def permission(self) -> pulumi.Output['EnvironmentPermission']:
         """
         Which permission level to grant to the specified team.
         """
@@ -274,7 +276,7 @@ class TeamEnvironmentPermission(pulumi.CustomResource):
 
     @_builtins.property
     @pulumi.getter
-    def team(self) -> pulumi.Output[Optional[_builtins.str]]:
+    def team(self) -> pulumi.Output[_builtins.str]:
         """
         Team name.
         """

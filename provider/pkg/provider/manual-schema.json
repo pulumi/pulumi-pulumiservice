@@ -565,31 +565,6 @@
       },
       "type": "object"
     },
-    "pulumiservice:index:EnvironmentPermission": {
-      "type": "string",
-      "enum": [
-        {
-          "description": "No permissions.",
-          "value": "none"
-        },
-        {
-          "description": "Permission to read environment definition only.",
-          "value": "read"
-        },
-        {
-          "description": "Permission to open and read the environment.",
-          "value": "open"
-        },
-        {
-          "description": "Permission to open, read and update the environment.",
-          "value": "write"
-        },
-        {
-          "description": "Permission for all operations on the environment.",
-          "value": "admin"
-        }
-      ]
-    },
     "pulumiservice:index:TemplateSourceDestination": {
       "type": "object",
       "properties": {
@@ -1350,69 +1325,6 @@
         "organization",
         "name",
         "yaml"
-      ]
-    },
-    "pulumiservice:index:TeamEnvironmentPermission": {
-      "description": "A permission for a team to use an environment.",
-      "properties": {
-        "organization": {
-          "description": "Organization name.",
-          "type": "string"
-        },
-        "team": {
-          "description": "Team name.",
-          "type": "string"
-        },
-        "project": {
-          "description": "Project name.",
-          "default": "default",
-          "type": "string"
-        },
-        "environment": {
-          "description": "Environment name.",
-          "type": "string"
-        },
-        "permission": {
-          "description": "Which permission level to grant to the specified team.",
-          "$ref": "#/types/pulumiservice:index:EnvironmentPermission"
-        },
-        "maxOpenDuration": {
-          "description": "The maximum duration for which members of this team may open the environment.",
-          "type": "string"
-        }
-      },
-      "inputProperties": {
-        "organization": {
-          "description": "Organization name.",
-          "type": "string"
-        },
-        "team": {
-          "description": "Team name.",
-          "type": "string"
-        },
-        "project": {
-          "description": "Project name.",
-          "default": "default",
-          "type": "string"
-        },
-        "environment": {
-          "description": "Environment name.",
-          "type": "string"
-        },
-        "permission": {
-          "description": "Which permission level to grant to the specified team.",
-          "$ref": "#/types/pulumiservice:index:EnvironmentPermission"
-        },
-        "maxOpenDuration": {
-          "description": "The maximum duration for which members of this team may open the environment.",
-          "type": "string"
-        }
-      },
-      "requiredInputs": [
-        "organization",
-        "team",
-        "environment",
-        "permission"
       ]
     },
     "pulumiservice:index:EnvironmentVersionTag": {

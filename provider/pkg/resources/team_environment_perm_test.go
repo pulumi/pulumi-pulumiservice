@@ -1,4 +1,4 @@
-// Copyright 2016-2026, Pulumi Corporation.
+// Copyright 2026, Pulumi Corporation.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,353 +21,211 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"google.golang.org/protobuf/types/known/structpb"
 
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
+	"github.com/pulumi/pulumi-go-provider/infer"
+	"github.com/pulumi/pulumi/sdk/v3/go/property"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
-// teamEnvPermClientMock satisfies pulumiapi.TeamClient for the handful of
-// tests below. Only the methods that TeamEnvironmentPermission actually calls
-// are wired up; the rest return zero values.
 type teamEnvPermClientMock struct {
-	getEnvSettingsFunc func() (*string, *pulumiapi.Duration, error)
-}
-
-func (*teamEnvPermClientMock) ListTeams(_ context.Context, _ string) ([]pulumiapi.Team, error) {
-	return nil, nil
-}
-
-func (*teamEnvPermClientMock) GetTeam(_ context.Context, _, _ string) (*pulumiapi.Team, error) {
-	return nil, nil
-}
-
-func (*teamEnvPermClientMock) CreateTeam(
-	_ context.Context, _, _, _, _, _ string, _ int64,
-) (*pulumiapi.Team, error) {
-	return nil, nil
-}
-
-func (*teamEnvPermClientMock) UpdateTeam(_ context.Context, _, _, _, _ string) error {
-	return nil
-}
-
-func (*teamEnvPermClientMock) DeleteTeam(_ context.Context, _, _ string) error { return nil }
-
-func (*teamEnvPermClientMock) AddMemberToTeam(_ context.Context, _, _, _ string) error { return nil }
-
-func (*teamEnvPermClientMock) DeleteMemberFromTeam(_ context.Context, _, _, _ string) error {
-	return nil
-}
-
-func (*teamEnvPermClientMock) AddStackPermission(
-	_ context.Context, _ pulumiapi.StackIdentifier, _ string, _ int,
-) error {
-	return nil
-}
-
-func (*teamEnvPermClientMock) RemoveStackPermission(
-	_ context.Context, _ pulumiapi.StackIdentifier, _ string,
-) error {
-	return nil
-}
-
-func (*teamEnvPermClientMock) GetTeamStackPermission(
-	_ context.Context, _ pulumiapi.StackIdentifier, _ string,
-) (*int, error) {
-	return nil, nil
-}
-
-func (*teamEnvPermClientMock) AddEnvironmentSettings(
-	_ context.Context, _ pulumiapi.CreateTeamEnvironmentSettingsRequest,
-) error {
-	return nil
-}
-
-func (*teamEnvPermClientMock) RemoveEnvironmentSettings(
-	_ context.Context, _ pulumiapi.TeamEnvironmentSettingsRequest,
-) error {
-	return nil
+	config.Client
+	getFunc func() (*string, *pulumiapi.Duration, error)
 }
 
 func (c *teamEnvPermClientMock) GetTeamEnvironmentSettings(
 	_ context.Context, _ pulumiapi.TeamEnvironmentSettingsRequest,
 ) (*string, *pulumiapi.Duration, error) {
-	return c.getEnvSettingsFunc()
+	return c.getFunc()
 }
 
-func newTeamEnvPermResource(client pulumiapi.TeamClient) *PulumiServiceTeamEnvironmentPermissionResource {
-	return &PulumiServiceTeamEnvironmentPermissionResource{Client: client}
-}
-
-func toStruct(t *testing.T, m resource.PropertyMap) *structpb.Struct {
+func newTeamEnvPermCheckRequest(t *testing.T, props map[string]property.Value) infer.CheckRequest {
 	t.Helper()
-	s, err := structpb.NewStruct(m.Mappable())
-	require.NoError(t, err)
-	return s
+	return infer.CheckRequest{NewInputs: property.NewMap(props)}
 }
 
-func TestTeamEnvironmentPermission_Check_OmitsUnsetMaxOpenDuration(t *testing.T) {
-	// Regression: when upgrading from a provider version that did not have
-	// maxOpenDuration, Check must not inject an empty-string maxOpenDuration
-	// into the returned inputs. Otherwise Diff sees a "new" key against the
-	// saved state and forces replacement.
-	r := newTeamEnvPermResource(&teamEnvPermClientMock{})
-
-	news := resource.PropertyMap{
-		"organization": resource.NewStringProperty("org"),
-		"team":         resource.NewStringProperty("team"),
-		"project":      resource.NewStringProperty("proj"),
-		"environment":  resource.NewStringProperty("env"),
-		"permission":   resource.NewStringProperty("open"),
+func TestTeamEnvironmentPermissionCheck(t *testing.T) {
+	r := &TeamEnvironmentPermission{}
+	base := func() map[string]property.Value {
+		return map[string]property.Value{
+			"organization": property.New("org"),
+			"team":         property.New("team"),
+			"project":      property.New("proj"),
+			"environment":  property.New("env"),
+			"permission":   property.New("open"),
+		}
 	}
 
-	resp, err := r.Check(&pulumirpc.CheckRequest{News: toStruct(t, news)})
-	require.NoError(t, err)
-	assert.Empty(t, resp.Failures)
+	t.Run("omits unset maxOpenDuration", func(t *testing.T) {
+		// Regression: when upgrading from a provider version that did not have
+		// maxOpenDuration, Check must not inject a maxOpenDuration into the
+		// returned inputs.
+		resp, err := r.Check(t.Context(), newTeamEnvPermCheckRequest(t, base()))
+		require.NoError(t, err)
+		assert.Empty(t, resp.Failures)
+		assert.Nil(t, resp.Inputs.MaxOpenDuration)
+	})
 
-	out, err := plugin.UnmarshalProperties(resp.Inputs, plugin.MarshalOptions{})
-	require.NoError(t, err)
-	_, present := out["maxOpenDuration"]
-	assert.False(t, present, "maxOpenDuration must not be emitted when the user did not set it")
+	t.Run("normalizes maxOpenDuration", func(t *testing.T) {
+		props := base()
+		props["maxOpenDuration"] = property.New("60m")
+
+		resp, err := r.Check(t.Context(), newTeamEnvPermCheckRequest(t, props))
+		require.NoError(t, err)
+		assert.Empty(t, resp.Failures)
+		require.NotNil(t, resp.Inputs.MaxOpenDuration)
+		assert.Equal(t, "1h0m0s", *resp.Inputs.MaxOpenDuration)
+	})
+
+	t.Run("treats empty-string maxOpenDuration as unset", func(t *testing.T) {
+		props := base()
+		props["maxOpenDuration"] = property.New("")
+
+		resp, err := r.Check(t.Context(), newTeamEnvPermCheckRequest(t, props))
+		require.NoError(t, err)
+		assert.Empty(t, resp.Failures)
+		assert.Nil(t, resp.Inputs.MaxOpenDuration)
+	})
+
+	t.Run("rejects invalid maxOpenDuration", func(t *testing.T) {
+		props := base()
+		props["maxOpenDuration"] = property.New("not-a-duration")
+
+		resp, err := r.Check(t.Context(), newTeamEnvPermCheckRequest(t, props))
+		require.NoError(t, err)
+		require.Len(t, resp.Failures, 1)
+		assert.Equal(t, "maxOpenDuration", resp.Failures[0].Property)
+	})
 }
 
-func TestTeamEnvironmentPermission_Check_NormalizesMaxOpenDuration(t *testing.T) {
-	r := newTeamEnvPermResource(&teamEnvPermClientMock{})
-
-	news := resource.PropertyMap{
-		"organization":    resource.NewStringProperty("org"),
-		"team":            resource.NewStringProperty("team"),
-		"project":         resource.NewStringProperty("proj"),
-		"environment":     resource.NewStringProperty("env"),
-		"permission":      resource.NewStringProperty("open"),
-		"maxOpenDuration": resource.NewStringProperty("60m"),
+func TestTeamEnvironmentPermissionDiff(t *testing.T) {
+	r := &TeamEnvironmentPermission{}
+	state := func() TeamEnvironmentPermissionState {
+		return TeamEnvironmentPermissionState{
+			TeamEnvironmentPermissionInput: TeamEnvironmentPermissionInput{
+				Organization: "org",
+				Team:         "team",
+				Project:      "proj",
+				Environment:  "env",
+				Permission:   EnvironmentPermissionOpen,
+			},
+		}
 	}
 
-	resp, err := r.Check(&pulumirpc.CheckRequest{News: toStruct(t, news)})
-	require.NoError(t, err)
-	assert.Empty(t, resp.Failures)
-
-	out, err := plugin.UnmarshalProperties(resp.Inputs, plugin.MarshalOptions{})
-	require.NoError(t, err)
-	require.True(t, out["maxOpenDuration"].IsString())
-	assert.Equal(t, "1h0m0s", out["maxOpenDuration"].StringValue())
-}
-
-func TestTeamEnvironmentPermission_Check_EmptyStringMaxOpenDurationTreatedAsUnset(t *testing.T) {
-	r := newTeamEnvPermResource(&teamEnvPermClientMock{})
-
-	news := resource.PropertyMap{
-		"organization":    resource.NewStringProperty("org"),
-		"team":            resource.NewStringProperty("team"),
-		"project":         resource.NewStringProperty("proj"),
-		"environment":     resource.NewStringProperty("env"),
-		"permission":      resource.NewStringProperty("open"),
-		"maxOpenDuration": resource.NewStringProperty(""),
-	}
-
-	resp, err := r.Check(&pulumirpc.CheckRequest{News: toStruct(t, news)})
-	require.NoError(t, err)
-	assert.Empty(t, resp.Failures)
-
-	out, err := plugin.UnmarshalProperties(resp.Inputs, plugin.MarshalOptions{})
-	require.NoError(t, err)
-	_, present := out["maxOpenDuration"]
-	assert.False(t, present, "an explicit empty string must be stripped so it never triggers a spurious diff")
-}
-
-func TestTeamEnvironmentPermission_Check_InvalidMaxOpenDurationReportsFailure(t *testing.T) {
-	r := newTeamEnvPermResource(&teamEnvPermClientMock{})
-
-	news := resource.PropertyMap{
-		"organization":    resource.NewStringProperty("org"),
-		"team":            resource.NewStringProperty("team"),
-		"project":         resource.NewStringProperty("proj"),
-		"environment":     resource.NewStringProperty("env"),
-		"permission":      resource.NewStringProperty("open"),
-		"maxOpenDuration": resource.NewStringProperty("not-a-duration"),
-	}
-
-	resp, err := r.Check(&pulumirpc.CheckRequest{News: toStruct(t, news)})
-	require.NoError(t, err)
-	require.Len(t, resp.Failures, 1)
-	assert.Equal(t, "maxOpenDuration", resp.Failures[0].Property)
-}
-
-func TestTeamEnvironmentPermission_Check_NonStringMaxOpenDurationReportsFailure(t *testing.T) {
-	cases := map[string]resource.PropertyValue{
-		"number": resource.NewNumberProperty(3600),
-		"bool":   resource.NewBoolProperty(true),
-		"array":  resource.NewArrayProperty([]resource.PropertyValue{resource.NewStringProperty("60m")}),
-		"object": resource.NewObjectProperty(resource.PropertyMap{
-			"value": resource.NewStringProperty("60m"),
-		}),
-	}
-	for name, value := range cases {
-		t.Run(name, func(t *testing.T) {
-			r := newTeamEnvPermResource(&teamEnvPermClientMock{})
-			news := resource.PropertyMap{
-				"organization":    resource.NewStringProperty("org"),
-				"team":            resource.NewStringProperty("team"),
-				"project":         resource.NewStringProperty("proj"),
-				"environment":     resource.NewStringProperty("env"),
-				"permission":      resource.NewStringProperty("open"),
-				"maxOpenDuration": value,
-			}
-
-			resp, err := r.Check(&pulumirpc.CheckRequest{News: toStruct(t, news)})
-			require.NoError(t, err)
-			require.Len(t, resp.Failures, 1)
-			assert.Equal(t, "maxOpenDuration", resp.Failures[0].Property)
-			assert.Contains(t, resp.Failures[0].Reason, "can't be parsed as string")
+	t.Run("no changes when nothing changed", func(t *testing.T) {
+		// Regression: 0.29.2 -> 0.29.3 upgrade path. State has no
+		// maxOpenDuration; inputs don't set it. Diff must report no changes.
+		resp, err := r.Diff(t.Context(), infer.DiffRequest[
+			TeamEnvironmentPermissionInput, TeamEnvironmentPermissionState,
+		]{
+			State:  state(),
+			Inputs: state().TeamEnvironmentPermissionInput,
 		})
-	}
-}
-
-func TestTeamEnvironmentPermission_Diff_UpgradeFromPreMaxOpenDuration(t *testing.T) {
-	// End-to-end regression for the 0.29.2 -> 0.29.3 upgrade path:
-	//   - OldInputs has no maxOpenDuration (was saved before the field existed)
-	//   - The user's program still doesn't set maxOpenDuration
-	//   - Check + Diff together must report no changes and no replaces
-	r := newTeamEnvPermResource(&teamEnvPermClientMock{})
-
-	inputs := resource.PropertyMap{
-		"organization": resource.NewStringProperty("org"),
-		"team":         resource.NewStringProperty("team"),
-		"project":      resource.NewStringProperty("proj"),
-		"environment":  resource.NewStringProperty("env"),
-		"permission":   resource.NewStringProperty("open"),
-	}
-
-	checkResp, err := r.Check(&pulumirpc.CheckRequest{News: toStruct(t, inputs)})
-	require.NoError(t, err)
-	require.Empty(t, checkResp.Failures)
-
-	diffResp, err := r.Diff(&pulumirpc.DiffRequest{
-		OldInputs: toStruct(t, inputs),
-		News:      checkResp.Inputs,
+		require.NoError(t, err)
+		assert.False(t, resp.HasChanges)
 	})
-	require.NoError(t, err)
-	assert.Equal(t, pulumirpc.DiffResponse_DIFF_NONE, diffResp.Changes)
-	assert.Empty(t, diffResp.Replaces, "maxOpenDuration should not drive a spurious replacement on upgrade")
-}
 
-func TestTeamEnvironmentPermission_Diff_UpgradeFromEmptyStringMaxOpenDuration(t *testing.T) {
-	// Regression for the residual 0.29.3–0.36.0 upgrade path that #752 did
-	// not cover: those provider versions wrote `maxOpenDuration: ""` into
-	// state whenever the user did not set the field. After #752, Check no
-	// longer emits the empty string, but state written by the old versions
-	// still carries it. Without Diff-side normalization, the first preview
-	// after upgrading would see the key as deleted and force one more
-	// spurious replacement.
-	r := newTeamEnvPermResource(&teamEnvPermClientMock{})
+	t.Run("treats empty-string maxOpenDuration in state as unset", func(t *testing.T) {
+		// 0.29.3-0.36.0 wrote `""` into state when the user did not set the
+		// field. After the migration, refreshes against that state must not
+		// force a spurious replacement.
+		empty := ""
+		oldState := state()
+		oldState.MaxOpenDuration = &empty
 
-	// State on disk from a buggy 0.29.3–0.36.0 run: contains the empty string.
-	oldInputs := resource.PropertyMap{
-		"organization":    resource.NewStringProperty("org"),
-		"team":            resource.NewStringProperty("team"),
-		"project":         resource.NewStringProperty("proj"),
-		"environment":     resource.NewStringProperty("env"),
-		"permission":      resource.NewStringProperty("open"),
-		"maxOpenDuration": resource.NewStringProperty(""),
-	}
-
-	// User program (unchanged): never sets maxOpenDuration.
-	news := resource.PropertyMap{
-		"organization": resource.NewStringProperty("org"),
-		"team":         resource.NewStringProperty("team"),
-		"project":      resource.NewStringProperty("proj"),
-		"environment":  resource.NewStringProperty("env"),
-		"permission":   resource.NewStringProperty("open"),
-	}
-
-	checkResp, err := r.Check(&pulumirpc.CheckRequest{News: toStruct(t, news)})
-	require.NoError(t, err)
-	require.Empty(t, checkResp.Failures)
-
-	diffResp, err := r.Diff(&pulumirpc.DiffRequest{
-		OldInputs: toStruct(t, oldInputs),
-		News:      checkResp.Inputs,
+		resp, err := r.Diff(t.Context(), infer.DiffRequest[
+			TeamEnvironmentPermissionInput, TeamEnvironmentPermissionState,
+		]{
+			State:  oldState,
+			Inputs: state().TeamEnvironmentPermissionInput,
+		})
+		require.NoError(t, err)
+		assert.False(t, resp.HasChanges)
 	})
-	require.NoError(t, err)
-	assert.Equal(t, pulumirpc.DiffResponse_DIFF_NONE, diffResp.Changes)
-	assert.Empty(
-		t, diffResp.Replaces,
-		"an empty-string maxOpenDuration in old state must compare equal to an absent field",
-	)
-}
 
-func TestTeamEnvironmentPermission_Diff_DetectsRealMaxOpenDurationChange(t *testing.T) {
-	// Guard against over-aggressive normalization: a real value change must
-	// still be reported as a change (and, for this resource, a replace).
-	r := newTeamEnvPermResource(&teamEnvPermClientMock{})
+	t.Run("detects real maxOpenDuration change", func(t *testing.T) {
+		// Guard against over-aggressive normalization.
+		oldDur := "30m0s"
+		newDur := "1h0m0s"
+		oldState := state()
+		oldState.MaxOpenDuration = &oldDur
+		newInputs := state().TeamEnvironmentPermissionInput
+		newInputs.MaxOpenDuration = &newDur
 
-	oldInputs := resource.PropertyMap{
-		"organization":    resource.NewStringProperty("org"),
-		"team":            resource.NewStringProperty("team"),
-		"project":         resource.NewStringProperty("proj"),
-		"environment":     resource.NewStringProperty("env"),
-		"permission":      resource.NewStringProperty("open"),
-		"maxOpenDuration": resource.NewStringProperty("30m0s"),
-	}
-	news := resource.PropertyMap{
-		"organization":    resource.NewStringProperty("org"),
-		"team":            resource.NewStringProperty("team"),
-		"project":         resource.NewStringProperty("proj"),
-		"environment":     resource.NewStringProperty("env"),
-		"permission":      resource.NewStringProperty("open"),
-		"maxOpenDuration": resource.NewStringProperty("1h0m0s"),
-	}
-
-	diffResp, err := r.Diff(&pulumirpc.DiffRequest{
-		OldInputs: toStruct(t, oldInputs),
-		News:      toStruct(t, news),
+		resp, err := r.Diff(t.Context(), infer.DiffRequest[
+			TeamEnvironmentPermissionInput, TeamEnvironmentPermissionState,
+		]{State: oldState, Inputs: newInputs})
+		require.NoError(t, err)
+		assert.True(t, resp.HasChanges)
+		assert.Contains(t, resp.DetailedDiff, "maxOpenDuration")
+		assert.True(t, resp.DeleteBeforeReplace)
 	})
-	require.NoError(t, err)
-	assert.Equal(t, pulumirpc.DiffResponse_DIFF_SOME, diffResp.Changes)
-	assert.Contains(t, diffResp.Replaces, "maxOpenDuration")
 }
 
-func TestTeamEnvironmentPermission_Read_OmitsMaxOpenDurationWhenUnset(t *testing.T) {
-	// When the Pulumi Cloud API does not return a maxOpenDuration for the
-	// environment, Read must not bake an empty string into state. Otherwise
-	// a follow-up against a program that doesn't set the field would
-	// observe a spurious diff (same root cause as the Check path).
-	permission := "open"
-	client := &teamEnvPermClientMock{
-		getEnvSettingsFunc: func() (*string, *pulumiapi.Duration, error) {
-			return &permission, nil, nil
-		},
-	}
-	r := newTeamEnvPermResource(client)
+func TestTeamEnvironmentPermissionRead(t *testing.T) {
+	r := &TeamEnvironmentPermission{}
 
-	resp, err := r.Read(&pulumirpc.ReadRequest{Id: "org/team/proj+env"})
-	require.NoError(t, err)
+	t.Run("omits maxOpenDuration when API returns none", func(t *testing.T) {
+		permission := "open"
+		mock := &teamEnvPermClientMock{
+			getFunc: func() (*string, *pulumiapi.Duration, error) {
+				return &permission, nil, nil
+			},
+		}
+		ctx := config.WithMockClient(t.Context(), mock)
 
-	out, err := plugin.UnmarshalProperties(resp.Inputs, plugin.MarshalOptions{})
-	require.NoError(t, err)
-	_, present := out["maxOpenDuration"]
-	assert.False(t, present, "Read must omit maxOpenDuration when the API did not return one")
+		resp, err := r.Read(ctx, infer.ReadRequest[
+			TeamEnvironmentPermissionInput, TeamEnvironmentPermissionState,
+		]{ID: "org/team/proj+env"})
+		require.NoError(t, err)
+		assert.Nil(t, resp.Inputs.MaxOpenDuration)
+	})
+
+	t.Run("includes maxOpenDuration when API returns one", func(t *testing.T) {
+		permission := "open"
+		d := pulumiapi.Duration(30 * time.Minute)
+		mock := &teamEnvPermClientMock{
+			getFunc: func() (*string, *pulumiapi.Duration, error) {
+				return &permission, &d, nil
+			},
+		}
+		ctx := config.WithMockClient(t.Context(), mock)
+
+		resp, err := r.Read(ctx, infer.ReadRequest[
+			TeamEnvironmentPermissionInput, TeamEnvironmentPermissionState,
+		]{ID: "org/team/proj+env"})
+		require.NoError(t, err)
+		require.NotNil(t, resp.Inputs.MaxOpenDuration)
+		assert.Equal(t, "30m0s", *resp.Inputs.MaxOpenDuration)
+	})
 }
 
-func TestTeamEnvironmentPermission_Read_IncludesMaxOpenDurationWhenSet(t *testing.T) {
-	permission := "open"
-	d := pulumiapi.Duration(30 * time.Minute)
-	client := &teamEnvPermClientMock{
-		getEnvSettingsFunc: func() (*string, *pulumiapi.Duration, error) {
-			return &permission, &d, nil
-		},
-	}
-	r := newTeamEnvPermResource(client)
+func TestSplitTeamEnvironmentPermissionID(t *testing.T) {
+	t.Run("project+environment form", func(t *testing.T) {
+		got, err := splitTeamEnvironmentPermissionID("org/team/proj+env")
+		require.NoError(t, err)
+		assert.Equal(t, teamEnvironmentPermissionID{
+			Organization: "org",
+			Team:         "team",
+			Project:      "proj",
+			Environment:  "env",
+		}, got)
+	})
 
-	resp, err := r.Read(&pulumirpc.ReadRequest{Id: "org/team/proj+env"})
-	require.NoError(t, err)
+	t.Run("legacy environment-only form defaults project", func(t *testing.T) {
+		got, err := splitTeamEnvironmentPermissionID("org/team/env")
+		require.NoError(t, err)
+		assert.Equal(t, teamEnvironmentPermissionID{
+			Organization: "org",
+			Team:         "team",
+			Project:      "default",
+			Environment:  "env",
+		}, got)
+	})
 
-	out, err := plugin.UnmarshalProperties(resp.Inputs, plugin.MarshalOptions{})
-	require.NoError(t, err)
-	require.True(t, out["maxOpenDuration"].IsString())
-	assert.Equal(t, "30m0s", out["maxOpenDuration"].StringValue())
+	t.Run("rejects malformed id", func(t *testing.T) {
+		_, err := splitTeamEnvironmentPermissionID("org/team")
+		assert.Error(t, err)
+	})
 }

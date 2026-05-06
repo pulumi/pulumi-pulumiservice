@@ -40,7 +40,7 @@ export class TeamEnvironmentPermission extends pulumi.CustomResource {
     /**
      * Environment name.
      */
-    declare public readonly environment: pulumi.Output<string | undefined>;
+    declare public readonly environment: pulumi.Output<string>;
     /**
      * The maximum duration for which members of this team may open the environment.
      */
@@ -48,11 +48,11 @@ export class TeamEnvironmentPermission extends pulumi.CustomResource {
     /**
      * Organization name.
      */
-    declare public readonly organization: pulumi.Output<string | undefined>;
+    declare public readonly organization: pulumi.Output<string>;
     /**
      * Which permission level to grant to the specified team.
      */
-    declare public readonly permission: pulumi.Output<enums.EnvironmentPermission | undefined>;
+    declare public readonly permission: pulumi.Output<enums.EnvironmentPermission>;
     /**
      * Project name.
      */
@@ -60,7 +60,7 @@ export class TeamEnvironmentPermission extends pulumi.CustomResource {
     /**
      * Team name.
      */
-    declare public readonly team: pulumi.Output<string | undefined>;
+    declare public readonly team: pulumi.Output<string>;
 
     /**
      * Create a TeamEnvironmentPermission resource with the given unique name, arguments, and options.
@@ -100,6 +100,8 @@ export class TeamEnvironmentPermission extends pulumi.CustomResource {
             resourceInputs["team"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["environment", "maxOpenDuration", "organization", "permission", "project", "team"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(TeamEnvironmentPermission.__pulumiType, name, resourceInputs, opts);
     }
 }

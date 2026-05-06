@@ -2623,55 +2623,73 @@
       "properties": {
         "environment": {
           "type": "string",
-          "description": "Environment name."
+          "description": "Environment name.",
+          "replaceOnChanges": true
         },
         "maxOpenDuration": {
           "type": "string",
-          "description": "The maximum duration for which members of this team may open the environment."
+          "description": "The maximum duration for which members of this team may open the environment.",
+          "replaceOnChanges": true
         },
         "organization": {
           "type": "string",
-          "description": "Organization name."
+          "description": "Organization name.",
+          "replaceOnChanges": true
         },
         "permission": {
           "$ref": "#/types/pulumiservice:index:EnvironmentPermission",
-          "description": "Which permission level to grant to the specified team."
+          "description": "Which permission level to grant to the specified team.",
+          "replaceOnChanges": true
         },
         "project": {
           "type": "string",
           "description": "Project name.",
-          "default": "default"
+          "default": "default",
+          "replaceOnChanges": true
         },
         "team": {
           "type": "string",
-          "description": "Team name."
+          "description": "Team name.",
+          "replaceOnChanges": true
         }
       },
+      "required": [
+        "organization",
+        "team",
+        "environment",
+        "permission"
+      ],
       "inputProperties": {
         "environment": {
           "type": "string",
-          "description": "Environment name."
+          "description": "Environment name.",
+          "replaceOnChanges": true
         },
         "maxOpenDuration": {
           "type": "string",
-          "description": "The maximum duration for which members of this team may open the environment."
+          "description": "The maximum duration for which members of this team may open the environment.",
+          "replaceOnChanges": true
         },
         "organization": {
           "type": "string",
-          "description": "Organization name."
+          "description": "Organization name.",
+          "replaceOnChanges": true
         },
         "permission": {
           "$ref": "#/types/pulumiservice:index:EnvironmentPermission",
-          "description": "Which permission level to grant to the specified team."
+          "description": "Which permission level to grant to the specified team.",
+          "replaceOnChanges": true
         },
         "project": {
           "type": "string",
           "description": "Project name.",
-          "default": "default"
+          "default": "default",
+          "replaceOnChanges": true
         },
         "team": {
           "type": "string",
-          "description": "Team name."
+          "description": "Team name.",
+          "replaceOnChanges": true
         }
       },
       "requiredInputs": [
