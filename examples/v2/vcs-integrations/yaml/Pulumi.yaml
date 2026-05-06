@@ -1,0 +1,21 @@
+name: pulumicloud-v2-vcs-integrations
+runtime: yaml
+config:
+  serviceOrg:
+    type: string
+    default: service-provider-test-org
+  githubIntegrationId:
+    type: string
+    default: gh-org-integration
+  githubEnterpriseIntegrationId:
+    type: string
+    default: ghe-org-integration
+  gitlabIntegrationId:
+    type: string
+    default: gl-org-integration
+  bitbucketIntegrationId:
+    type: string
+    default: bb-org-integration
+  azureDevOpsIntegrationId:
+    type: string
+    default: ado-org-integration

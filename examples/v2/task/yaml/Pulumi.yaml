@@ -1,0 +1,12 @@
+name: pulumicloud-v2-task
+runtime: yaml
+config:
+  serviceOrg:
+    type: string
+    default: service-provider-test-org
+  taskSuffix:
+    type: string
+    default: dev
+  taskID:
+    type: string
+    default: example-task-id

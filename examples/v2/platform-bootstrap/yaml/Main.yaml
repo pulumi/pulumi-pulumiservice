@@ -1,0 +1,295 @@
+# =============================================================================
+# Day-1 platform-bootstrap for a fresh Pulumi Cloud org.
+#
+# Layout:
+#   1. DefaultOrganization      org-level user preference
+#   2. OidcIssuer x2            GitHub Actions trust + Pulumi self-trust
+#   4. Team + Role              platform team + a stack-readonly role
+#   5. OrgToken + TeamToken     CI machine + team-scoped tokens
+#   6. AgentPool                self-hosted deployment runner
+#   7. OrgTemplateCollection    new-project template seed
+#   8. Environment              shared/credentials ESC env (empty)
+#   9. EnvironmentTag           "stable" version label on the env
+#   10. Stack x2                staging + prod
+#   11. StackConfig x2          per-stack ESC env binding
+#   12. StackTag x3             owner / tier / cost-center on prod
+#   13. StackWebhook            per-stack PagerDuty target on prod
+#   14. DeploymentSettings x2   different executor image per stack tier
+#   15. Gate                    approval gate on the credentials env
+#   16. ScheduledDeployment     nightly redeploy of prod
+#   17. OrganizationWebhook     org-level Slack target
+#   18. PolicyGroup             starter group; PolicyPacks attach later
+#
+# What's intentionally OUT (need real external state we can't supply
+# from a bare new-org bootstrap):
+#   - SAMLOrganization                 needs IdP EntityDescriptor cert
+#   - AuditLogExportConfiguration      needs real S3 bucket + IAM role
+#   - GitHub/GitLab/BitBucket/AzureDevOps/CustomVCSIntegration  needs OAuth integrationId
+#   - PolicyPack                       needs zip uploaded to a presigned URL
+#   - OrganizationMember               adds real users — unsafe in CI
+#   - EnvironmentSchedule              needs secretRotationRequest pointing at real openers
+#   - Account + ScheduledScanSettings  needs the ESC env to expose real cloud creds
+#   - AuthPolicy                       PATCH-only; policy `org` isn't auto-created on a new org
+#
+# Update knob: setting `prodApprovalEnabled` to false flips the Gate off.
+# The test suite uses this to exercise UpdateGate.
+# =============================================================================
+
+resources:
+
+  # --- 1. Org-level singleton settings -------------------------------------
+  defaultOrg:
+    type: pulumiservice:v2:DefaultOrganization
+    properties:
+      orgName: ${serviceOrg}
+
+  # --- 3. OIDC issuers: GitHub Actions + Pulumi Cloud self-trust -----------
+  githubIssuer:
+    type: pulumiservice:v2/auth:OidcIssuer
+    properties:
+      orgName: ${serviceOrg}
+      name: github_issuer_${suffix}
+      url: https://token.actions.githubusercontent.com
+      thumbprints:
+        - caef08400c87bedb0db28f1a0dc0b49e658c8e90a985b8c3e6a6e7f51a2d09d7
+      maxExpiration: 3600
+  pulumiSelfIssuer:
+    type: pulumiservice:v2/auth:OidcIssuer
+    properties:
+      orgName: ${serviceOrg}
+      name: pulumi_issuer_${suffix}
+      url: https://api.pulumi.com/oidc
+      thumbprints:
+        - 57d3e89f6b25dde3c174dc558e2b2623306a9d81f88a12e8ae7090a86c12f1da
+
+  # --- 4. Platform team + a stack-readonly role ----------------------------
+  platformTeam:
+    type: pulumiservice:v2/teams:Team
+    properties:
+      orgName: ${serviceOrg}
+      name: platform-team-${suffix}
+      displayName: Platform Team ${suffix}
+      description: Owns shared infra, runs the deployments engine.
+  stackReadonlyRole:
+    type: pulumiservice:v2:Role
+    properties:
+      orgName: ${serviceOrg}
+      name: stack-readonly-${suffix}
+      description: Read-only access to stacks, scoped via the platform team.
+      uxPurpose: role
+      details:
+        __type: PermissionDescriptorAllow
+        permissions:
+          - stack:read
+
+  # --- 5. CI machine token + team-scoped token -----------------------------
+  ciToken:
+    type: pulumiservice:v2/tokens:OrgToken
+    properties:
+      orgName: ${serviceOrg}
+      name: ci-${suffix}
+      description: Used by CI/CD to deploy non-prod stacks.
+      admin: false
+      expires: 0
+  teamToken:
+    type: pulumiservice:v2/tokens:TeamToken
+    properties:
+      orgName: ${serviceOrg}
+      teamName: ${platformTeam.name}
+      name: platform-team-token-${suffix}
+      description: Platform-team-scoped token for shared automation.
+      expires: 0
+
+  # --- 6. Self-hosted deployment runner ------------------------------------
+  runnersPool:
+    type: pulumiservice:v2/agents:Pool
+    properties:
+      orgName: ${serviceOrg}
+      name: platform-runners-${suffix}
+      description: Self-hosted deployment runner pool.
+
+  # --- 7. New-project template seed ----------------------------------------
+  templates:
+    type: pulumiservice:v2:OrgTemplateCollection
+    properties:
+      orgName: ${serviceOrg}
+      name: platform-templates-${suffix}
+      sourceURL: https://github.com/pulumi/examples
+
+  # --- 8. ESC: shared credentials env + rotation schedule ------------------
+  sharedCredentials:
+    type: pulumiservice:v2/esc:Environment
+    properties:
+      orgName: ${serviceOrg}
+      project: shared
+      name: credentials-${suffix}
+
+  # --- 9. EnvironmentTag: mark the current revision "stable" --------------
+  stableTag:
+    type: pulumiservice:v2/esc:EnvironmentTag
+    properties:
+      orgName: ${serviceOrg}
+      projectName: ${sharedCredentials.project}
+      envName: ${sharedCredentials.name}
+      name: stable
+      value: "1"
+
+  # --- 10. Stacks: staging + prod ------------------------------------------
+  stagingStack:
+    type: pulumiservice:v2/stacks:Stack
+    properties:
+      orgName: ${serviceOrg}
+      projectName: platform-app-${suffix}
+      stackName: staging
+  prodStack:
+    type: pulumiservice:v2/stacks:Stack
+    properties:
+      orgName: ${serviceOrg}
+      projectName: platform-app-${suffix}
+      stackName: prod
+
+  # --- 11. StackConfig: bind each stack to the shared ESC env --------------
+  stagingConfig:
+    type: pulumiservice:v2/stacks:Config
+    properties:
+      orgName: ${serviceOrg}
+      projectName: ${stagingStack.projectName}
+      stackName: ${stagingStack.stackName}
+      environment: ${sharedCredentials.project}/${sharedCredentials.name}
+  prodConfig:
+    type: pulumiservice:v2/stacks:Config
+    properties:
+      orgName: ${serviceOrg}
+      projectName: ${prodStack.projectName}
+      stackName: ${prodStack.stackName}
+      environment: ${sharedCredentials.project}/${sharedCredentials.name}
+
+  # --- 12. Tags on prod ----------------------------------------------------
+  prodOwnerTag:
+    type: pulumiservice:v2/stacks:Tag
+    properties:
+      orgName: ${serviceOrg}
+      projectName: ${prodStack.projectName}
+      stackName: ${prodStack.stackName}
+      name: owner
+      value: platform-team
+  prodTierTag:
+    type: pulumiservice:v2/stacks:Tag
+    properties:
+      orgName: ${serviceOrg}
+      projectName: ${prodStack.projectName}
+      stackName: ${prodStack.stackName}
+      name: tier
+      value: gold
+  prodCostCenterTag:
+    type: pulumiservice:v2/stacks:Tag
+    properties:
+      orgName: ${serviceOrg}
+      projectName: ${prodStack.projectName}
+      stackName: ${prodStack.stackName}
+      name: cost-center
+      value: platform
+
+  # --- 13. Per-stack PagerDuty webhook on prod -----------------------------
+  prodPagerDuty:
+    type: pulumiservice:v2/stacks:Webhook
+    properties:
+      organizationName: ${serviceOrg}
+      projectName: ${prodStack.projectName}
+      stackName: ${prodStack.stackName}
+      name: prod-pagerduty
+      displayName: prod stack PagerDuty
+      payloadUrl: ${pagerDutyWebhookUrl}
+      active: true
+      format: raw
+
+  # --- 14. DeploymentSettings: different executor per environment ----------
+  stagingDeploySettings:
+    type: pulumiservice:v2/deployments:Settings
+    properties:
+      orgName: ${serviceOrg}
+      projectName: ${stagingStack.projectName}
+      stackName: ${stagingStack.stackName}
+      executorContext:
+        executorImage:
+          reference: pulumi/pulumi:latest
+  prodDeploySettings:
+    type: pulumiservice:v2/deployments:Settings
+    properties:
+      orgName: ${serviceOrg}
+      projectName: ${prodStack.projectName}
+      stackName: ${prodStack.stackName}
+      executorContext:
+        executorImage:
+          reference: pulumi/pulumi:3-nonroot
+
+  # --- 15. Gate: 1-approval required on shared credentials env updates -----
+  credsApprovalGate:
+    type: pulumiservice:v2:Gate
+    properties:
+      orgName: ${serviceOrg}
+      name: creds-approval-${suffix}
+      enabled: ${prodApprovalEnabled}
+      rule:
+        ruleType: approval_required
+        numApprovalsRequired: 1
+        allowSelfApproval: false
+        requireReapprovalOnChange: true
+        eligibleApprovers:
+          - eligibilityType: team_member
+            teamName: ${platformTeam.name}
+      target:
+        entityType: environment
+        actionTypes:
+          - update
+        qualifiedName: ${sharedCredentials.project}/${sharedCredentials.name}
+
+  # --- 16. ScheduledDeployment: nightly redeploy of prod -------------------
+  prodNightlyDeploy:
+    type: pulumiservice:v2/deployments:ScheduledDeployment
+    properties:
+      orgName: ${serviceOrg}
+      projectName: ${prodStack.projectName}
+      stackName: ${prodStack.stackName}
+      scheduleCron: 0 7 * * *
+      request:
+        operation: update
+        inheritSettings: true
+    options:
+      dependsOn:
+        - ${prodDeploySettings}
+
+  # --- 17. Org-level Slack webhook -----------------------------------------
+  slack:
+    type: pulumiservice:v2:OrganizationWebhook
+    properties:
+      organizationName: ${serviceOrg}
+      name: org-slack-${suffix}
+      displayName: Org Slack notifications
+      payloadUrl: ${slackWebhookUrl}
+      active: true
+      format: slack
+
+  # --- 18. PolicyGroup: empty starter; attach packs separately ------------
+  starterPolicyGroup:
+    type: pulumiservice:v2:PolicyGroup
+    properties:
+      orgName: ${serviceOrg}
+      name: platform-policies-${suffix}
+      entityType: stacks
+
+  # --- 19. TeamRole: bind the stack-readonly role to the platform team -----
+  platformTeamRole:
+    type: pulumiservice:v2/teams:Role
+    properties:
+      orgName: ${serviceOrg}
+      teamName: ${platformTeam.name}
+      roleID: ${stackReadonlyRole.id}
+
+outputs:
+  platformTeamName: ${platformTeam.name}
+  ciTokenId: ${ciToken.tokenId}
+  agentPoolName: ${runnersPool.name}
+  templatesName: ${templates.name}
+  sharedCredsEnv: ${sharedCredentials.project}/${sharedCredentials.name}
+  prodStackId: ${prodStack.id}

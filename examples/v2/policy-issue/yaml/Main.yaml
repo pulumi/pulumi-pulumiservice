@@ -1,0 +1,13 @@
+# PolicyIssue manages metadata on a single policy violation: priority,
+# assignee, and status. The issueId path-parameter is generated when the
+# policy engine flags a violation; this example uses a placeholder so the
+# program previews cleanly.
+resources:
+  issue:
+    type: pulumiservice:v2:PolicyIssue
+    properties:
+      orgName: ${serviceOrg}
+      issueId: ${issueId}
+      priority: high
+      status: in_progress
+      assignedTo: pulumi-bot

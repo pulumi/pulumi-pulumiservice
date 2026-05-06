@@ -1,0 +1,15 @@
+name: pulumicloud-v2-deployment-settings
+runtime: yaml
+config:
+  serviceOrg:
+    type: string
+    default: service-provider-test-org
+  projectName:
+    type: string
+    default: my-new-project
+  stackName:
+    type: string
+    default: dev
+  executorImage:
+    type: string
+    default: pulumi-cli

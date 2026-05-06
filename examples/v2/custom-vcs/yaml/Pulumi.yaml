@@ -1,0 +1,15 @@
+name: pulumicloud-v2-custom-vcs
+runtime: yaml
+config:
+  serviceOrg:
+    type: string
+    default: service-provider-test-org
+  vcsSuffix:
+    type: string
+    default: dev
+  baseUrl:
+    type: string
+    default: https://git.example.invalid
+  envRef:
+    type: string
+    default: organization/vcs-credentials

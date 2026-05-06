@@ -1,0 +1,19 @@
+name: pulumicloud-v2-platform-bootstrap
+runtime: yaml
+description: Day-1 platform bootstrap for a fresh Pulumi Cloud org.
+config:
+  serviceOrg:
+    type: string
+    default: service-provider-test-org
+  suffix:
+    type: string
+    default: dev
+  prodApprovalEnabled:
+    type: boolean
+    default: true
+  slackWebhookUrl:
+    type: string
+    default: https://example.invalid/hooks/slack
+  pagerDutyWebhookUrl:
+    type: string
+    default: https://example.invalid/hooks/pagerduty

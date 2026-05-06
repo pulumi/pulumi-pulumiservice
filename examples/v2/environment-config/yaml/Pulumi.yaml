@@ -1,0 +1,12 @@
+name: pulumicloud-v2-environment-config
+runtime: yaml
+config:
+  serviceOrg:
+    type: string
+    default: service-provider-test-org
+  projectName:
+    type: string
+    default: v2-envcfg-example
+  envName:
+    type: string
+    default: v2-envcfg-env

@@ -1,0 +1,6 @@
+name: pulumicloud-v2-approval-rules
+runtime: yaml
+config:
+  serviceOrg:
+    type: string
+    default: service-provider-test-org

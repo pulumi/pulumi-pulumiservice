@@ -1,0 +1,9 @@
+name: pulumicloud-v2-policy-issue
+runtime: yaml
+config:
+  serviceOrg:
+    type: string
+    default: service-provider-test-org
+  issueId:
+    type: string
+    default: example-issue-id

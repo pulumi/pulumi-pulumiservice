@@ -1,0 +1,22 @@
+# Task is the agent task definition (used by Pulumi Deployments). It runs
+# on an AgentPool, so we provision a pool first. taskID is the path
+# parameter identifying an existing task; the example uses a placeholder
+# so the program previews cleanly without binding to a real task.
+resources:
+  pool:
+    type: pulumiservice:v2/agents:Pool
+    properties:
+      orgName: ${serviceOrg}
+      name: v2-task-pool-${taskSuffix}
+      description: Pool used by the v2 task example
+  task:
+    type: pulumiservice:v2/agents:Task
+    properties:
+      orgName: ${serviceOrg}
+      taskID: ${taskID}
+      approvalMode: manual
+      permissionMode: default
+      source: api
+      planMode: false
+outputs:
+  poolName: ${pool.name}

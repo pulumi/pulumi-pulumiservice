@@ -17,7 +17,7 @@
 - `TeamEnvironmentPermission` outputs (`organization`, `team`, `environment`, `permission`) are now typed as definitely-present (`Output<string>`, `Output<EnvironmentPermission>`) rather than optional (`Output<string | undefined>`). The values were always populated; the schema previously misrepresented them.
 
 ### Improvements
-- Added `installationId` to `DeploymentSettings.vcs` to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps installed against different sets of repos). When omitted, the API resolves the integration automatically from `provider` and `repository` as before.
+- Added the `pulumiservice:v2:*` resource namespace, an OpenAPI-driven layer covering Stacks, Teams, Tokens, Webhooks, ESC Environments, Deployment Settings, OIDC Issuers, Roles, Policy Groups/Packs, VCS Integrations, and related Pulumi Cloud resources. Existing `pulumiservice:index:*` resources continue to work unchanged; v2 resources are accessed under `pulumiservice.v2.*` in user code.
 - Added `StackTags` resource for managing multiple stack tags as a single resource, with a `tags` map input. [#61](https://github.com/pulumi/pulumi-pulumiservice/issues/61)
 - Added `TwelveHours` (12h) scan schedule option for `InsightsAccount` resources. [#731](https://github.com/pulumi/pulumi-pulumiservice/pull/731)
 - Documented the `all` enforcement-level wildcard on `PolicyGroupPolicyPackReference.config`, enabling a single entry to set the enforcement level for every policy in a pack with optional per-policy overrides. [#756](https://github.com/pulumi/pulumi-pulumiservice/pull/756)

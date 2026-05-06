@@ -1,0 +1,15 @@
+# AuditLogExportConfiguration streams the org's audit log to an S3 bucket.
+# Real exports require valid AWS credentials in the bucket's role; this
+# example uses placeholder values for preview/compile validation only.
+resources:
+  exportConfig:
+    type: pulumiservice:v2:AuditLogExportConfiguration
+    properties:
+      orgName: ${serviceOrg}
+      newEnabled: true
+      newS3Configuration:
+        bucketName: ${bucketName}
+        region: ${region}
+        roleArn: arn:aws:iam::123456789012:role/PulumiAuditLogExportRole
+outputs:
+  exportEnabled: ${exportConfig.enabled}

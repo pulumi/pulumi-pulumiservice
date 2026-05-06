@@ -1,0 +1,11 @@
+{
+	"name": "pulumicloud-v2-custom-vcs",
+	"devDependencies": {
+		"@types/node": "^18"
+	},
+	"dependencies": {
+		"typescript": "^4.0.0",
+		"@pulumi/pulumi": "^3.0.0",
+		"@pulumi/pulumiservice": "0.34.0"
+	}
+}
