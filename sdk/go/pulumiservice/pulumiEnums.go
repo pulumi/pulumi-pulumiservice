@@ -1275,7 +1275,7 @@ const (
 	// Disable automated scanning.
 	ScanScheduleNone = ScanSchedule("none")
 	// Run automated scans every twelve hours.
-	ScanScheduleTwelveHours = ScanSchedule("12h")
+	ScanSchedule_12h = ScanSchedule("12h")
 	// Run automated scans once per day.
 	ScanScheduleDaily = ScanSchedule("daily")
 )
@@ -1403,7 +1403,7 @@ func (o ScanSchedulePtrOutput) ToStringPtrOutputWithContext(ctx context.Context)
 // A concrete instance of `ScanScheduleInput` can be one of the following:
 //
 //	ScanScheduleNone
-//	ScanScheduleTwelveHours
+//	ScanSchedule_12h
 //	ScanScheduleDaily
 type ScanScheduleInput interface {
 	pulumi.Input

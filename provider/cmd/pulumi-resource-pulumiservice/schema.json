@@ -905,7 +905,6 @@
           "value": "none"
         },
         {
-          "name": "TwelveHours",
           "description": "Run automated scans every twelve hours.",
           "value": "12h"
         },

@@ -71,7 +71,7 @@ const (
 func (ScanSchedule) Values() []infer.EnumValue[ScanSchedule] {
 	return []infer.EnumValue[ScanSchedule]{
 		{Name: "none", Value: ScanScheduleNone, Description: "Disable automated scanning."},
-		{Name: "TwelveHours", Value: ScanScheduleTwelveHours, Description: "Run automated scans every twelve hours."},
+		{Value: ScanScheduleTwelveHours, Description: "Run automated scans every twelve hours."},
 		{Name: "daily", Value: ScanScheduleDaily, Description: "Run automated scans once per day."},
 	}
 }

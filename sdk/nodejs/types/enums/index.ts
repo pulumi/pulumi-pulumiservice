@@ -161,7 +161,7 @@ export const ScanSchedule = {
     /**
      * Run automated scans every twelve hours.
      */
-    TwelveHours: "12h",
+    ScanSchedule_12h: "12h",
     /**
      * Run automated scans once per day.
      */
