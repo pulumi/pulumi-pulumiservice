@@ -26,6 +26,7 @@ class StackTagArgs:
                  value: pulumi.Input[_builtins.str]):
         """
         The set of arguments for constructing a StackTag resource.
+
         :param pulumi.Input[_builtins.str] name: Name of the tag. The 'key' part of the key=value pair
         :param pulumi.Input[_builtins.str] organization: Organization name.
         :param pulumi.Input[_builtins.str] project: Project name.
@@ -105,14 +106,15 @@ class StackTag(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 name: Optional[pulumi.Input[_builtins.str]] = None,
-                 organization: Optional[pulumi.Input[_builtins.str]] = None,
-                 project: Optional[pulumi.Input[_builtins.str]] = None,
-                 stack: Optional[pulumi.Input[_builtins.str]] = None,
-                 value: Optional[pulumi.Input[_builtins.str]] = None,
+                 name: pulumi.Input[Optional[_builtins.str]] = None,
+                 organization: pulumi.Input[Optional[_builtins.str]] = None,
+                 project: pulumi.Input[Optional[_builtins.str]] = None,
+                 stack: pulumi.Input[Optional[_builtins.str]] = None,
+                 value: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
         Stacks have associated metadata in the form of tags. Each tag consists of a name and value.
+
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
@@ -131,6 +133,7 @@ class StackTag(pulumi.CustomResource):
         """
         Stacks have associated metadata in the form of tags. Each tag consists of a name and value.
 
+
         :param str resource_name: The name of the resource.
         :param StackTagArgs args: The arguments to use to populate this resource's properties.
         :param pulumi.ResourceOptions opts: Options for the resource.
@@ -146,11 +149,11 @@ class StackTag(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 name: Optional[pulumi.Input[_builtins.str]] = None,
-                 organization: Optional[pulumi.Input[_builtins.str]] = None,
-                 project: Optional[pulumi.Input[_builtins.str]] = None,
-                 stack: Optional[pulumi.Input[_builtins.str]] = None,
-                 value: Optional[pulumi.Input[_builtins.str]] = None,
+                 name: pulumi.Input[Optional[_builtins.str]] = None,
+                 organization: pulumi.Input[Optional[_builtins.str]] = None,
+                 project: pulumi.Input[Optional[_builtins.str]] = None,
+                 stack: pulumi.Input[Optional[_builtins.str]] = None,
+                 value: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

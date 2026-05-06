@@ -111,15 +111,15 @@ export interface PolicyGroupArgs {
     /**
      * List of accounts that belong to this policy group.
      */
-    accounts?: pulumi.Input<pulumi.Input<string>[]>;
+    accounts?: pulumi.Input<pulumi.Input<string>[] | undefined>;
     /**
      * The entity type for the policy group. Valid values are 'stacks' or 'accounts'. Defaults to 'stacks'.
      */
-    entityType?: pulumi.Input<string>;
+    entityType?: pulumi.Input<string | undefined>;
     /**
      * The mode for the policy group. Valid values are 'audit' (reports violations) or 'preventative' (blocks operations). Defaults to 'audit'.
      */
-    mode?: pulumi.Input<string>;
+    mode?: pulumi.Input<string | undefined>;
     /**
      * The name of the policy group.
      */
@@ -131,9 +131,9 @@ export interface PolicyGroupArgs {
     /**
      * List of policy packs applied to this policy group.
      */
-    policyPacks?: pulumi.Input<pulumi.Input<inputs.PolicyGroupPolicyPackReferenceInputArgs>[]>;
+    policyPacks?: pulumi.Input<pulumi.Input<inputs.PolicyGroupPolicyPackReferenceInputArgs>[] | undefined>;
     /**
      * List of stack references that belong to this policy group.
      */
-    stacks?: pulumi.Input<pulumi.Input<inputs.PolicyGroupStackReferenceArgs>[]>;
+    stacks?: pulumi.Input<pulumi.Input<inputs.PolicyGroupStackReferenceArgs>[] | undefined>;
 }

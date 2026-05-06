@@ -64,8 +64,8 @@ def build_insights_account_scoped_permissions(insights_account_id: Optional[_bui
 
     return AwaitableBuildInsightsAccountScopedPermissionsResult(
         permissions=pulumi.get(__ret__, 'permissions'))
-def build_insights_account_scoped_permissions_output(insights_account_id: Optional[pulumi.Input[_builtins.str]] = None,
-                                                     permissions: Optional[pulumi.Input[Sequence[_builtins.str]]] = None,
+def build_insights_account_scoped_permissions_output(insights_account_id: pulumi.Input[Optional[_builtins.str]] = None,
+                                                     permissions: pulumi.Input[Optional[Sequence[_builtins.str]]] = None,
                                                      opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[BuildInsightsAccountScopedPermissionsResult]:
     """
     Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source). The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `group` whose `entries` list pulls the output of each helper.

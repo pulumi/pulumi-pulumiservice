@@ -21,10 +21,11 @@ class OrgAccessTokenArgs:
     def __init__(__self__, *,
                  name: pulumi.Input[_builtins.str],
                  organization_name: pulumi.Input[_builtins.str],
-                 admin: Optional[pulumi.Input[_builtins.bool]] = None,
-                 description: Optional[pulumi.Input[_builtins.str]] = None):
+                 admin: pulumi.Input[Optional[_builtins.bool]] = None,
+                 description: pulumi.Input[Optional[_builtins.str]] = None):
         """
         The set of arguments for constructing a OrgAccessToken resource.
+
         :param pulumi.Input[_builtins.str] name: The name for the token.
         :param pulumi.Input[_builtins.str] organization_name: The organization's name.
         :param pulumi.Input[_builtins.bool] admin: Optional. True if this is an admin token.
@@ -65,26 +66,26 @@ class OrgAccessTokenArgs:
 
     @_builtins.property
     @pulumi.getter
-    def admin(self) -> Optional[pulumi.Input[_builtins.bool]]:
+    def admin(self) -> pulumi.Input[Optional[_builtins.bool]]:
         """
         Optional. True if this is an admin token.
         """
         return pulumi.get(self, "admin")
 
     @admin.setter
-    def admin(self, value: Optional[pulumi.Input[_builtins.bool]]):
+    def admin(self, value: pulumi.Input[Optional[_builtins.bool]]):
         pulumi.set(self, "admin", value)
 
     @_builtins.property
     @pulumi.getter
-    def description(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def description(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         Optional. Description for the token.
         """
         return pulumi.get(self, "description")
 
     @description.setter
-    def description(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def description(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "description", value)
 
 
@@ -94,13 +95,14 @@ class OrgAccessToken(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 admin: Optional[pulumi.Input[_builtins.bool]] = None,
-                 description: Optional[pulumi.Input[_builtins.str]] = None,
-                 name: Optional[pulumi.Input[_builtins.str]] = None,
-                 organization_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 admin: pulumi.Input[Optional[_builtins.bool]] = None,
+                 description: pulumi.Input[Optional[_builtins.str]] = None,
+                 name: pulumi.Input[Optional[_builtins.str]] = None,
+                 organization_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
         The Pulumi Cloud allows users to create access tokens scoped to orgs. Org access tokens is a resource to create them and assign them to an org
+
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
@@ -118,6 +120,7 @@ class OrgAccessToken(pulumi.CustomResource):
         """
         The Pulumi Cloud allows users to create access tokens scoped to orgs. Org access tokens is a resource to create them and assign them to an org
 
+
         :param str resource_name: The name of the resource.
         :param OrgAccessTokenArgs args: The arguments to use to populate this resource's properties.
         :param pulumi.ResourceOptions opts: Options for the resource.
@@ -133,10 +136,10 @@ class OrgAccessToken(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 admin: Optional[pulumi.Input[_builtins.bool]] = None,
-                 description: Optional[pulumi.Input[_builtins.str]] = None,
-                 name: Optional[pulumi.Input[_builtins.str]] = None,
-                 organization_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 admin: pulumi.Input[Optional[_builtins.bool]] = None,
+                 description: pulumi.Input[Optional[_builtins.str]] = None,
+                 name: pulumi.Input[Optional[_builtins.str]] = None,
+                 organization_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

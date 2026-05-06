@@ -110,7 +110,7 @@ export interface OidcIssuerArgs {
     /**
      * The maximum duration of the Pulumi access token working after an exchange, specified in seconds.
      */
-    maxExpirationSeconds?: pulumi.Input<number>;
+    maxExpirationSeconds?: pulumi.Input<number | undefined>;
     /**
      * Issuer name.
      */
@@ -122,11 +122,11 @@ export interface OidcIssuerArgs {
     /**
      * The auth policies for this Oidc Issuer.
      */
-    policies?: pulumi.Input<pulumi.Input<inputs.AuthPolicyDefinitionArgs>[]>;
+    policies?: pulumi.Input<pulumi.Input<inputs.AuthPolicyDefinitionArgs>[] | undefined>;
     /**
      * The thumbprints of issuer's TLS certificates. By default, Pulumi will store the thumbprint of the certificate used to serve the OpenID configuration. If the provider uses multiple certificates to serve content, it is required to manually configure these.
      */
-    thumbprints?: pulumi.Input<pulumi.Input<string>[]>;
+    thumbprints?: pulumi.Input<pulumi.Input<string>[] | undefined>;
     /**
      * The OIDC issuer URL.
      */

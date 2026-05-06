@@ -93,7 +93,7 @@ export interface StackArgs {
     /**
      * Optional. Flag indicating whether to delete the stack even if it still contains resources.
      */
-    forceDestroy?: pulumi.Input<boolean>;
+    forceDestroy?: pulumi.Input<boolean | undefined>;
     /**
      * The name of the organization.
      */

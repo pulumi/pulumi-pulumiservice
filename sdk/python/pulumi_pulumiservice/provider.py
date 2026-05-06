@@ -19,10 +19,11 @@ __all__ = ['ProviderArgs', 'Provider']
 @pulumi.input_type
 class ProviderArgs:
     def __init__(__self__, *,
-                 access_token: Optional[pulumi.Input[_builtins.str]] = None,
-                 api_url: Optional[pulumi.Input[_builtins.str]] = None):
+                 access_token: pulumi.Input[Optional[_builtins.str]] = None,
+                 api_url: pulumi.Input[Optional[_builtins.str]] = None):
         """
         The set of arguments for constructing a Provider resource.
+
         :param pulumi.Input[_builtins.str] access_token: Access Token to authenticate with Pulumi Cloud.
         :param pulumi.Input[_builtins.str] api_url: Optional override of Pulumi Cloud API endpoint.
         """
@@ -35,26 +36,26 @@ class ProviderArgs:
 
     @_builtins.property
     @pulumi.getter(name="accessToken")
-    def access_token(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def access_token(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         Access Token to authenticate with Pulumi Cloud.
         """
         return pulumi.get(self, "access_token")
 
     @access_token.setter
-    def access_token(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def access_token(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "access_token", value)
 
     @_builtins.property
     @pulumi.getter(name="apiUrl")
-    def api_url(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def api_url(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         Optional override of Pulumi Cloud API endpoint.
         """
         return pulumi.get(self, "api_url")
 
     @api_url.setter
-    def api_url(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def api_url(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "api_url", value)
 
 
@@ -64,11 +65,12 @@ class Provider(pulumi.ProviderResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 access_token: Optional[pulumi.Input[_builtins.str]] = None,
-                 api_url: Optional[pulumi.Input[_builtins.str]] = None,
+                 access_token: pulumi.Input[Optional[_builtins.str]] = None,
+                 api_url: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
         Create a Pulumiservice resource with the given unique name, props, and options.
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] access_token: Access Token to authenticate with Pulumi Cloud.
@@ -82,6 +84,7 @@ class Provider(pulumi.ProviderResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Create a Pulumiservice resource with the given unique name, props, and options.
+
         :param str resource_name: The name of the resource.
         :param ProviderArgs args: The arguments to use to populate this resource's properties.
         :param pulumi.ResourceOptions opts: Options for the resource.
@@ -97,8 +100,8 @@ class Provider(pulumi.ProviderResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 access_token: Optional[pulumi.Input[_builtins.str]] = None,
-                 api_url: Optional[pulumi.Input[_builtins.str]] = None,
+                 access_token: pulumi.Input[Optional[_builtins.str]] = None,
+                 api_url: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
