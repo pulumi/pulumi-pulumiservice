@@ -1,3 +1,17 @@
+// Copyright 2026, Pulumi Corporation.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//	http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package resources
 
 import (
@@ -5,220 +19,187 @@ import (
 	"fmt"
 	"strings"
 
-	pbempty "google.golang.org/protobuf/types/known/emptypb"
-	"google.golang.org/protobuf/types/known/structpb"
+	"github.com/pulumi/pulumi-go-provider/infer"
+	"github.com/pulumi/pulumi/sdk/v3/go/property"
 
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
-
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 )
 
-type PulumiServiceOrgAccessTokenResource struct {
-	Client *pulumiapi.Client
+type OrgAccessToken struct{}
+
+var (
+	_ infer.CustomCreate[OrgAccessTokenInput, OrgAccessTokenState] = &OrgAccessToken{}
+	_ infer.CustomDelete[OrgAccessTokenState]                      = &OrgAccessToken{}
+	_ infer.CustomRead[OrgAccessTokenInput, OrgAccessTokenState]   = &OrgAccessToken{}
+	_ infer.CustomStateMigrations[OrgAccessTokenState]             = &OrgAccessToken{}
+)
+
+func (*OrgAccessToken) Annotate(a infer.Annotator) {
+	a.Describe(
+		&OrgAccessToken{},
+		"The Pulumi Cloud allows users to create access tokens scoped to orgs. "+
+			"Org access tokens is a resource to create them and assign them to an org",
+	)
 }
 
-type PulumiServiceOrgAccessTokenInput struct {
-	OrgName     string
-	Description string
-	Name        string
-	Admin       bool
+type OrgAccessTokenInput struct {
+	Name             string  `pulumi:"name"                 provider:"replaceOnChanges"`
+	OrganizationName string  `pulumi:"organizationName"     provider:"replaceOnChanges"`
+	Description      *string `pulumi:"description,optional" provider:"replaceOnChanges"`
+	Admin            *bool   `pulumi:"admin,optional"       provider:"replaceOnChanges"`
 }
 
-func GenerateOrgAccessTokenProperties(
-	input PulumiServiceOrgAccessTokenInput,
-	orgAccessToken pulumiapi.AccessToken,
-) (outputs *structpb.Struct, inputs *structpb.Struct, err error) {
-	inputMap := input.ToPropertyMap()
+func (i *OrgAccessTokenInput) Annotate(a infer.Annotator) {
+	a.Describe(&i.Name, "The name for the token.")
+	a.Describe(&i.OrganizationName, "The organization's name.")
+	a.Describe(&i.Description, "Optional. Description for the token.")
+	a.Describe(&i.Admin, "Optional. True if this is an admin token.")
+	a.SetDefault(&i.Admin, false)
+}
 
-	outputMap := inputMap.Copy()
-	outputMap["__inputs"] = resource.NewObjectProperty(inputMap)
-	outputMap["value"] = resource.MakeSecret(resource.NewPropertyValue(orgAccessToken.TokenValue))
+type OrgAccessTokenState struct {
+	OrgAccessTokenInput
+	Value string `pulumi:"value" provider:"secret"`
+}
 
-	inputs, err = plugin.MarshalProperties(inputMap, plugin.MarshalOptions{})
-	if err != nil {
-		return nil, nil, err
+func (s *OrgAccessTokenState) Annotate(a infer.Annotator) {
+	a.Describe(&s.Value, "The token's value.")
+}
+
+func (*OrgAccessToken) Create(
+	ctx context.Context,
+	req infer.CreateRequest[OrgAccessTokenInput],
+) (infer.CreateResponse[OrgAccessTokenState], error) {
+	if req.DryRun {
+		return infer.CreateResponse[OrgAccessTokenState]{
+			Output: OrgAccessTokenState{OrgAccessTokenInput: req.Inputs},
+		}, nil
 	}
-
-	outputs, err = plugin.MarshalProperties(outputMap, plugin.MarshalOptions{})
-	if err != nil {
-		return nil, nil, err
+	desc := ""
+	if req.Inputs.Description != nil {
+		desc = *req.Inputs.Description
 	}
-
-	return outputs, inputs, err
-}
-
-func (i *PulumiServiceOrgAccessTokenInput) ToPropertyMap() resource.PropertyMap {
-	pm := resource.PropertyMap{}
-	pm["name"] = resource.NewPropertyValue(i.Name)
-	pm["description"] = resource.NewPropertyValue(i.Description)
-	pm["organizationName"] = resource.NewPropertyValue(i.OrgName)
-	pm["admin"] = resource.NewPropertyValue(i.Admin)
-	return pm
-}
-
-func (ot *PulumiServiceOrgAccessTokenResource) ToPulumiServiceOrgAccessTokenInput(
-	inputMap resource.PropertyMap,
-) PulumiServiceOrgAccessTokenInput {
-	input := PulumiServiceOrgAccessTokenInput{}
-
-	if inputMap["name"].HasValue() && inputMap["name"].IsString() {
-		input.Name = inputMap["name"].StringValue()
+	admin := false
+	if req.Inputs.Admin != nil {
+		admin = *req.Inputs.Admin
 	}
-
-	if inputMap["description"].HasValue() && inputMap["description"].IsString() {
-		input.Description = inputMap["description"].StringValue()
-	}
-
-	if inputMap["organizationName"].HasValue() && inputMap["organizationName"].IsString() {
-		input.OrgName = inputMap["organizationName"].StringValue()
-	}
-
-	if inputMap["admin"].HasValue() && inputMap["admin"].IsBool() {
-		input.Admin = inputMap["admin"].BoolValue()
-	}
-
-	return input
-}
-
-func (ot *PulumiServiceOrgAccessTokenResource) Name() string {
-	return "pulumiservice:index:OrgAccessToken"
-}
-
-func (ot *PulumiServiceOrgAccessTokenResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	return diffAccessTokenProperties(req, []string{"name", "organizationName", "description", "admin"})
-}
-
-func (ot *PulumiServiceOrgAccessTokenResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	ctx := context.Background()
-	err := ot.deleteOrgAccessToken(ctx, req.Id)
-
-	if err != nil {
-		return &pbempty.Empty{}, err
-	}
-
-	return &pbempty.Empty{}, nil
-}
-
-func (ot *PulumiServiceOrgAccessTokenResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
-	ctx := context.Background()
-	inputMap, err := plugin.UnmarshalProperties(
-		req.GetProperties(),
-		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
+	token, err := config.GetClient(ctx).CreateOrgAccessToken(
+		ctx, req.Inputs.Name, req.Inputs.OrganizationName, desc, admin,
 	)
 	if err != nil {
-		return nil, err
+		return infer.CreateResponse[OrgAccessTokenState]{}, fmt.Errorf(
+			"error creating org access token %q: %w", req.Inputs.Name, err,
+		)
 	}
-
-	input := ot.ToPulumiServiceOrgAccessTokenInput(inputMap)
-
-	accessToken, err := ot.createOrgAccessToken(ctx, input)
-	if err != nil {
-		return nil, fmt.Errorf("error creating access token '%s': %s", input.Name, err.Error())
-	}
-
-	outputs, _, err := GenerateOrgAccessTokenProperties(input, *accessToken)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.CreateResponse{
-		Id:         fmt.Sprintf("%s/%s/%s", input.OrgName, input.Name, accessToken.ID),
-		Properties: outputs,
-	}, nil
-
-}
-
-func (ot *PulumiServiceOrgAccessTokenResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: nil}, nil
-}
-
-func (ot *PulumiServiceOrgAccessTokenResource) Update(_ *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	// all updates are destructive, so we just call Create.
-	return nil, fmt.Errorf("unexpected call to update, expected create to be called instead")
-}
-
-func (ot *PulumiServiceOrgAccessTokenResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	ctx := context.Background()
-	urn := req.GetId()
-
-	orgName, _, tokenID, err := splitOrgAccessTokenID(urn)
-	if err != nil {
-		return nil, err
-	}
-
-	// the org access token is immutable; if we get nil it got deleted, otherwise all data is the same
-	accessToken, err := ot.Client.GetOrgAccessToken(ctx, tokenID, orgName)
-	if err != nil {
-		return nil, err
-	}
-	if accessToken == nil {
-		return &pulumirpc.ReadResponse{}, nil
-	}
-
-	var input = PulumiServiceOrgAccessTokenInput{
-		Name:        accessToken.Name,
-		OrgName:     orgName,
-		Description: accessToken.Description,
-		Admin:       accessToken.Admin,
-	}
-
-	propertyMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{})
-	if err != nil {
-		return nil, err
-	}
-	if propertyMap["value"].HasValue() {
-		accessToken.TokenValue = util.GetSecretOrStringValue(propertyMap["value"])
-	}
-
-	outputs, inputs, err := GenerateOrgAccessTokenProperties(input, *accessToken)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.ReadResponse{
-		Id:         req.GetId(),
-		Properties: outputs,
-		Inputs:     inputs,
+	return infer.CreateResponse[OrgAccessTokenState]{
+		ID: orgAccessTokenID(req.Inputs.OrganizationName, req.Inputs.Name, token.ID),
+		Output: OrgAccessTokenState{
+			OrgAccessTokenInput: req.Inputs,
+			Value:               token.TokenValue,
+		},
 	}, nil
 }
 
-func (ot *PulumiServiceOrgAccessTokenResource) createOrgAccessToken(
+func (*OrgAccessToken) Delete(
 	ctx context.Context,
-	input PulumiServiceOrgAccessTokenInput,
-) (*pulumiapi.AccessToken, error) {
-
-	accessToken, err := ot.Client.CreateOrgAccessToken(ctx, input.Name, input.OrgName, input.Description, input.Admin)
+	req infer.DeleteRequest[OrgAccessTokenState],
+) (infer.DeleteResponse, error) {
+	orgName, _, tokenID, err := splitOrgAccessTokenID(req.ID)
 	if err != nil {
-		return nil, err
+		return infer.DeleteResponse{}, err
 	}
-
-	return accessToken, nil
+	return infer.DeleteResponse{}, config.GetClient(ctx).DeleteOrgAccessToken(ctx, tokenID, orgName)
 }
 
-func (ot *PulumiServiceOrgAccessTokenResource) deleteOrgAccessToken(ctx context.Context, id string) error {
-	// we don't need the token name when we delete
-	orgName, _, tokenID, err := splitOrgAccessTokenID(id)
+func (*OrgAccessToken) Read(
+	ctx context.Context,
+	req infer.ReadRequest[OrgAccessTokenInput, OrgAccessTokenState],
+) (infer.ReadResponse[OrgAccessTokenInput, OrgAccessTokenState], error) {
+	orgName, _, tokenID, err := splitOrgAccessTokenID(req.ID)
 	if err != nil {
-		return err
+		return infer.ReadResponse[OrgAccessTokenInput, OrgAccessTokenState]{}, err
 	}
-	return ot.Client.DeleteOrgAccessToken(ctx, tokenID, orgName)
 
+	token, err := config.GetClient(ctx).GetOrgAccessToken(ctx, tokenID, orgName)
+	if err != nil {
+		return infer.ReadResponse[OrgAccessTokenInput, OrgAccessTokenState]{}, err
+	}
+	if token == nil {
+		return infer.ReadResponse[OrgAccessTokenInput, OrgAccessTokenState]{}, nil
+	}
+
+	admin := token.Admin
+	inputs := OrgAccessTokenInput{
+		Name:             token.Name,
+		OrganizationName: orgName,
+		Description:      stringPtrIfNonEmpty(token.Description),
+		Admin:            &admin,
+	}
+	return infer.ReadResponse[OrgAccessTokenInput, OrgAccessTokenState]{
+		ID:     req.ID,
+		Inputs: inputs,
+		State: OrgAccessTokenState{
+			OrgAccessTokenInput: inputs,
+			// Token values aren't retrievable from the API after creation; carry
+			// the existing secret from state so refresh does not erase it.
+			Value: req.State.Value,
+		},
+	}, nil
+}
+
+// StateMigrations strips the legacy "__inputs" outputs property that the
+// pre-infer OrgAccessToken resource embedded in state. infer rejects unknown
+// fields when decoding state, so without this migration a refresh against an
+// existing stack errors with "Unrecognized field '__inputs'".
+func (*OrgAccessToken) StateMigrations(context.Context) []infer.StateMigrationFunc[OrgAccessTokenState] {
+	return []infer.StateMigrationFunc[OrgAccessTokenState]{
+		infer.StateMigration(migrateOrgAccessTokenLegacyInputs),
+	}
+}
+
+func migrateOrgAccessTokenLegacyInputs(
+	_ context.Context, old property.Map,
+) (infer.MigrationResult[OrgAccessTokenState], error) {
+	if _, ok := old.GetOk("__inputs"); !ok {
+		return infer.MigrationResult[OrgAccessTokenState]{}, nil
+	}
+	state := OrgAccessTokenState{}
+	if v, ok := old.GetOk("name"); ok && v.IsString() {
+		state.Name = v.AsString()
+	}
+	if v, ok := old.GetOk("organizationName"); ok && v.IsString() {
+		state.OrganizationName = v.AsString()
+	}
+	if v, ok := old.GetOk("description"); ok && v.IsString() {
+		s := v.AsString()
+		state.Description = &s
+	}
+	if v, ok := old.GetOk("admin"); ok && v.IsBool() {
+		b := v.AsBool()
+		state.Admin = &b
+	}
+	if v, ok := old.GetOk("value"); ok && v.IsString() {
+		state.Value = v.AsString()
+	}
+	return infer.MigrationResult[OrgAccessTokenState]{Result: &state}, nil
+}
+
+func orgAccessTokenID(org, name, tokenID string) string {
+	return fmt.Sprintf("%s/%s/%s", org, name, tokenID)
 }
 
 func splitOrgAccessTokenID(id string) (string, string, string, error) {
-	// format: organization/name/tokenID
+	// format: organization/name/tokenID. Name may itself contain slashes,
+	// so org is the first segment and tokenID is the last.
 	s := strings.Split(id, "/")
 	if len(s) < 3 {
-		return "", "", "", fmt.Errorf("%q is invalid, must contain a single slash ('/')", id)
+		return "", "", "", fmt.Errorf(
+			"%q is invalid, must be of the form organization/name/tokenId",
+			id,
+		)
 	}
-
 	org := s[0]
 	tokenID := s[len(s)-1]
-	// Name can contain slashes so this joins the split parts except for first and last
 	name := strings.Join(s[1:len(s)-1], "/")
-
 	return org, name, tokenID, nil
 }

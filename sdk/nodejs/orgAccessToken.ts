@@ -87,6 +87,8 @@ export class OrgAccessToken extends pulumi.CustomResource {
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         const secretOpts = { additionalSecretOutputs: ["value"] };
         opts = pulumi.mergeOptions(opts, secretOpts);
+        const replaceOnChanges = { replaceOnChanges: ["admin", "description", "name", "organizationName"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(OrgAccessToken.__pulumiType, name, resourceInputs, opts);
     }
 }
@@ -100,7 +102,7 @@ export interface OrgAccessTokenArgs {
      */
     admin?: pulumi.Input<boolean>;
     /**
-     * Optional. Team description.
+     * Optional. Description for the token.
      */
     description?: pulumi.Input<string>;
     /**

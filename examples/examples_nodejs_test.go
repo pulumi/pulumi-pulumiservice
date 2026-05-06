@@ -70,7 +70,7 @@ func TestTeamsExample(t *testing.T) {
 		opttest.YarnLink("@pulumi/pulumiservice"),
 		opttest.StackName(randomStackName()),
 	)
-	test.SetConfig(t, "nameSuffix", generateRandomFiveDigits())
+	test.SetConfig(t, "digits", generateRandomFiveDigits())
 	runPulumiTest(t, test)
 }
 
@@ -180,6 +180,7 @@ func TestNodejsInsightsAccountInvokesExample(t *testing.T) {
 	)
 	test.SetConfig(t, "digits", digits)
 	test.SetConfig(t, "organizationName", getOrgName())
+	test.SetConfig(t, "roleArn", getInsightsRoleArn(t))
 	upResult := runPulumiTest(t, test)
 
 	// Verify the resource outputs

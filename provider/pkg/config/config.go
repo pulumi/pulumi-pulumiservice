@@ -45,6 +45,7 @@ var (
 //
 // All client interfaces from [pulumiapi] should be added to this interface.
 type Client interface {
+	pulumiapi.AccessTokenClient
 	pulumiapi.AgentPoolClient
 	pulumiapi.ApprovalRuleClient
 	pulumiapi.DeploymentSettingsClient
@@ -53,8 +54,10 @@ type Client interface {
 	pulumiapi.InsightsAccountClient
 	pulumiapi.MemberClient
 	pulumiapi.OidcClient
+	pulumiapi.OrgAccessTokenClient
 	pulumiapi.RoleClient
 	pulumiapi.StackTagClient
+	pulumiapi.TeamAccessTokenClient
 	pulumiapi.TeamClient
 	pulumiapi.TeamRoleClient
 	pulumiapi.UserClient

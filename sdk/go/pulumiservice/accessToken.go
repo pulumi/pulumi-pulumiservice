@@ -12,7 +12,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-// Access tokens allow a user to authenticate against the Pulumi Cloud
+// Access tokens allow a user to authenticate against the Pulumi Cloud.
 type AccessToken struct {
 	pulumi.CustomResourceState
 
@@ -36,6 +36,10 @@ func NewAccessToken(ctx *pulumi.Context,
 		"value",
 	})
 	opts = append(opts, secrets)
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"description",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource AccessToken
 	err := ctx.RegisterResource("pulumiservice:index:AccessToken", name, args, &resource, opts...)
