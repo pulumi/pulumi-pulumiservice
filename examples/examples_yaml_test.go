@@ -485,6 +485,7 @@ func TestYamlPolicyGroupsAccountsExample(t *testing.T) {
 		Config: map[string]string{
 			"digits":           digits,
 			"organizationName": getOrgName(),
+			"roleArn":          getInsightsRoleArn(t),
 		},
 	})
 }
@@ -524,6 +525,7 @@ func TestYamlInsightsAccountExample(t *testing.T) {
 	)
 	test.SetConfig(t, "digits", generateRandomFiveDigits())
 	test.SetConfig(t, "organizationName", getOrgName())
+	test.SetConfig(t, "roleArn", getInsightsRoleArn(t))
 	runPulumiTest(t, test)
 }
 
