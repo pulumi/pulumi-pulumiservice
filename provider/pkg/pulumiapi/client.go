@@ -22,12 +22,15 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/apiclient"
 )
 
 type Client struct {
 	httpClient *http.Client
 	token      string
 	baseurl    *url.URL
+	SDK        *apiclient.CloudClient
 }
 
 func NewClient(client *http.Client, token, URL string) (*Client, error) {
@@ -46,7 +49,31 @@ func NewClient(client *http.Client, token, URL string) (*Client, error) {
 		baseURL.Path = "/api/"
 	}
 
+	sendRequest := func(req *http.Request) (*http.Response, error) {
+		// Match the headers the hand-rolled c.do() flow attaches in
+		// createRequest below — Accept defaults to vnd.pulumi+8 (let the
+		// SDK's invokeRaw default win; do not override here),
+		// X-Pulumi-Source attributes provider writes for Cloud audit, and
+		// Content-Type is set unconditionally to mirror the legacy path.
+		if req.Header.Get("X-Pulumi-Source") == "" {
+			req.Header.Set("X-Pulumi-Source", "provider")
+		}
+		if req.Header.Get("Content-Type") == "" {
+			req.Header.Set("Content-Type", "application/json")
+		}
+		req.Header.Set("Authorization", fmt.Sprintf("token %s", token))
+		req.Header.Set("User-Agent", "pulumi-admin/1")
+
+		return client.Do(req) //nolint:gosec // G704 — URL is from trusted admin config
+	}
+
+	pulumiAPI := &apiclient.CloudClient{
+		BaseURL:  baseURL.String(),
+		Executor: sendRequest,
+	}
+
 	return &Client{
+		SDK:        pulumiAPI,
 		httpClient: client,
 		token:      token,
 		baseurl:    baseURL,

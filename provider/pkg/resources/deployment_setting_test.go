@@ -6,7 +6,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
@@ -82,10 +81,10 @@ func TestDeploymentSettings(t *testing.T) {
 		mockedClient := buildDeploymentSettingsClientMock(
 			func() (*pulumiapi.DeploymentSettings, error) {
 				return &pulumiapi.DeploymentSettings{
-					OperationContext: &pulumiapi.OperationContext{},
-					GitHub:           &pulumiapi.GitHubConfiguration{},
-					SourceContext:    &pulumiapi.SourceContext{},
-					ExecutorContext:  &apitype.ExecutorContext{},
+					Operation:     &pulumiapi.OperationContext{},
+					GitHub:        &pulumiapi.DeploymentSettingsGitHub{},
+					SourceContext: &pulumiapi.SourceContext{},
+					Executor:      &pulumiapi.ExecutorContext{},
 				}, nil
 			},
 		)
@@ -121,19 +120,20 @@ func TestDeploymentSettingsRoundtrip(t *testing.T) {
 }
 
 func TestDeploymentSettingsVcsRoundtrip(t *testing.T) {
-	deployPR := 1
+	deployPR := int64(1)
 	initial := PulumiServiceDeploymentSettingsInput{
 		DeploymentSettings: pulumiapi.DeploymentSettings{
-			VCS: &pulumiapi.VCSConfiguration{
-				Provider:            "azure-devops",
-				Repository:          "my-org/my-repo",
-				InstallationID:      "129444790",
-				DeployCommits:       true,
-				PreviewPullRequests: true,
-				PullRequestTemplate: false,
-				Paths:               []string{"infra/**"},
-				DeployPullRequest:   &deployPR,
-			},
+			Vcs: pulumiapi.DeploymentSettingsVCSAzureDevOpsBuilder{
+				DeploymentSettingsVCSBuilder: pulumiapi.DeploymentSettingsVCSBuilder{
+					Repository:          "my-org/my-repo",
+					InstallationID:      "129444790",
+					DeployCommits:       true,
+					PreviewPullRequests: true,
+					PullRequestTemplate: false,
+					Paths:               []string{"infra/**"},
+					DeployPullRequest:   &deployPR,
+				},
+			}.Build(),
 		},
 	}
 

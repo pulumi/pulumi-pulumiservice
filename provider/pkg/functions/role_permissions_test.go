@@ -24,32 +24,82 @@ import (
 	"github.com/pulumi/pulumi-go-provider/infer"
 )
 
-// assertScopedAllowShape verifies a helper's output is the collapsed
-// {kind: "allow", on: {entityType: identity}, permissions: [...]} shape.
-func assertScopedAllowShape(
+// assertScopedConditionShape verifies a helper's output is the
+// `PermissionDescriptorCondition(Equal(Expression<E>, Literal<E>(id)),
+// Allow(perms))` shape. The wire format and SDK boundary share the
+// `__type` discriminator at every level (Pulumi's Python SDK preserves
+// `__`-prefixed keys as of pulumi/pulumi#22834).
+func assertScopedConditionShape(
 	t *testing.T,
 	got map[string]interface{},
-	expectedEntityType string,
+	expectedExpressionType string,
+	expectedLiteralType string,
 	expectedIdentity string,
 	expectedPermissions []string,
 ) {
 	t.Helper()
 
-	assert.Equal(t, "allow", got["kind"])
+	assert.Equal(t, "PermissionDescriptorCondition", got["__type"],
+		"top-level __type must be PermissionDescriptorCondition")
 
-	on, ok := got["on"].(map[string]interface{})
-	require.True(t, ok, "on should be map[string]interface{}; got %T", got["on"])
-	require.Len(t, on, 1, "on must have exactly one key")
-	assert.Equal(t, expectedIdentity, on[expectedEntityType],
-		"on.%s should be %q", expectedEntityType, expectedIdentity)
+	cond, ok := got["condition"].(map[string]interface{})
+	require.True(t, ok, "condition must be a map; got %T", got["condition"])
+	assert.Equal(t, "PermissionExpressionEqual", cond["__type"])
 
-	rawPerms, ok := got["permissions"].([]interface{})
-	require.True(t, ok, "permissions should be []interface{}")
+	left, ok := cond["left"].(map[string]interface{})
+	require.True(t, ok, "condition.left must be a map; got %T", cond["left"])
+	assert.Equal(t, expectedExpressionType, left["__type"])
+
+	right, ok := cond["right"].(map[string]interface{})
+	require.True(t, ok, "condition.right must be a map; got %T", cond["right"])
+	assert.Equal(t, expectedLiteralType, right["__type"])
+	assert.Equal(t, expectedIdentity, right["identity"])
+
+	sub, ok := got["subNode"].(map[string]interface{})
+	require.True(t, ok, "subNode must be a map; got %T", got["subNode"])
+	assert.Equal(t, "PermissionDescriptorAllow", sub["__type"])
+
+	rawPerms, ok := sub["permissions"].([]interface{})
+	require.True(t, ok, "subNode.permissions must be a list; got %T", sub["permissions"])
 	gotPerms := make([]string, len(rawPerms))
 	for i, p := range rawPerms {
 		gotPerms[i], _ = p.(string)
 	}
 	assert.Equal(t, expectedPermissions, gotPerms)
+}
+
+func TestBuildAllowPermissions(t *testing.T) {
+	t.Parallel()
+
+	t.Run("happy path", func(t *testing.T) {
+		t.Parallel()
+		resp, err := BuildAllowPermissionsFunction{}.Invoke(
+			context.Background(),
+			infer.FunctionRequest[BuildAllowPermissionsInput]{
+				Input: BuildAllowPermissionsInput{
+					Permissions: []string{"stack:read", "environment:open"},
+				},
+			},
+		)
+		require.NoError(t, err)
+		got := resp.Output.Permissions
+		assert.Equal(t, "PermissionDescriptorAllow", got["__type"])
+		// Permissions list passes through verbatim.
+		perms, ok := got["permissions"].([]interface{})
+		require.True(t, ok)
+		assert.Equal(t, []interface{}{"stack:read", "environment:open"}, perms)
+	})
+
+	t.Run("rejects empty permissions", func(t *testing.T) {
+		t.Parallel()
+		_, err := BuildAllowPermissionsFunction{}.Invoke(
+			context.Background(),
+			infer.FunctionRequest[BuildAllowPermissionsInput]{
+				Input: BuildAllowPermissionsInput{},
+			},
+		)
+		assert.ErrorContains(t, err, "permissions")
+	})
 }
 
 func TestBuildEnvironmentScopedPermissions(t *testing.T) {
@@ -67,9 +117,11 @@ func TestBuildEnvironmentScopedPermissions(t *testing.T) {
 			},
 		)
 		require.NoError(t, err)
-		assertScopedAllowShape(
+		assertScopedConditionShape(
 			t, resp.Output.Permissions,
-			"environment", "env-uuid-1",
+			"PermissionExpressionEnvironment",
+			"PermissionLiteralExpressionEnvironment",
+			"env-uuid-1",
 			[]string{"environment:read", "environment:open"},
 		)
 	})
@@ -116,9 +168,11 @@ func TestBuildStackScopedPermissions(t *testing.T) {
 			},
 		)
 		require.NoError(t, err)
-		assertScopedAllowShape(
+		assertScopedConditionShape(
 			t, resp.Output.Permissions,
-			"stack", "stack-id-1",
+			"PermissionExpressionStack",
+			"PermissionLiteralExpressionStack",
+			"stack-id-1",
 			[]string{"stack:read"},
 		)
 	})
@@ -160,15 +214,17 @@ func TestBuildInsightsAccountScopedPermissions(t *testing.T) {
 			infer.FunctionRequest[BuildInsightsAccountScopedPermissionsInput]{
 				Input: BuildInsightsAccountScopedPermissionsInput{
 					InsightsAccountID: "acct-1",
-					Permissions:       []string{"insights-account:read"},
+					Permissions:       []string{"insights_account:read"},
 				},
 			},
 		)
 		require.NoError(t, err)
-		assertScopedAllowShape(
+		assertScopedConditionShape(
 			t, resp.Output.Permissions,
-			"insightsAccount", "acct-1",
-			[]string{"insights-account:read"},
+			"PermissionExpressionInsightsAccount",
+			"PermissionLiteralExpressionInsightsAccount",
+			"acct-1",
+			[]string{"insights_account:read"},
 		)
 	})
 
@@ -178,7 +234,7 @@ func TestBuildInsightsAccountScopedPermissions(t *testing.T) {
 			context.Background(),
 			infer.FunctionRequest[BuildInsightsAccountScopedPermissionsInput]{
 				Input: BuildInsightsAccountScopedPermissionsInput{
-					Permissions: []string{"insights-account:read"},
+					Permissions: []string{"insights_account:read"},
 				},
 			},
 		)

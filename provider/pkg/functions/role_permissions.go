@@ -16,33 +16,172 @@ package functions
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/pulumi/pulumi-go-provider/infer"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/apitype"
 )
 
-// scopedAllow builds a kind-shaped Allow descriptor scoped to the supplied
-// entity. The result is directly assignable to OrganizationRole.permissions.
-// The provider's translator (in resources/permission_descriptor.go) expands
-// the on: modifier into the wire-format Condition wrapper at Create time.
-func scopedAllow(entityType, identity string, permissions []string) map[string]interface{} {
-	grants := make([]interface{}, len(permissions))
-	for i, p := range permissions {
-		grants[i] = p
-	}
-	return map[string]interface{}{
-		"kind":        "allow",
-		"on":          map[string]interface{}{entityType: identity},
-		"permissions": grants,
-	}
-}
-
-// scopedPermissionsHelpDoc is the shared epilogue for the three helpers'
+// scopedPermissionsHelpDoc is the shared epilogue for the helpers'
 // descriptions, kept identical so codegen documentation stays consistent.
 const scopedPermissionsHelpDoc = "The result is directly assignable to " +
 	"`OrganizationRole.permissions`. To grant scopes on more than one entity " +
-	"in a single role, hand-roll a `group` whose `entries` list pulls the " +
-	"output of each helper."
+	"in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` " +
+	"list pulls the output of each helper."
+
+// validateRbacPermissions checks each scope string against the typed
+// apitype.RbacPermission enum. The IsValid() method is generated from the
+// same OpenAPI spec the API uses, so the catalogue stays in sync without
+// the provider having to maintain its own list. An invalid scope here
+// surfaces as a clear preview-time error rather than a 400 at apply.
+func validateRbacPermissions(permissions []string) error {
+	for _, p := range permissions {
+		if !apitype.RbacPermission(p).IsValid() {
+			return fmt.Errorf(
+				"%q is not a valid permission scope; discover valid scope names "+
+					"via the `getOrganizationRoleScopes` data source",
+				p,
+			)
+		}
+	}
+	return nil
+}
+
+// descriptorToSDKMap marshals a typed apitype.PermissionDescriptor to the
+// SDK-boundary map shape the provider expects on
+// `OrganizationRole.permissions`. The typed Marshaler emits the wire format
+// directly (`__type` discriminator at every level), which is exactly what
+// the SDK boundary now uses — the Python SDK preserves `__`-prefixed keys
+// across resource inputs as of pulumi/pulumi#22834 (3.235.0+, pinned via
+// the Python SDK's runtime requirement), so no rename is needed.
+func descriptorToSDKMap(descriptor apitype.PermissionDescriptor) (map[string]any, error) {
+	raw, err := json.Marshal(descriptor)
+	if err != nil {
+		return nil, fmt.Errorf("marshalling typed descriptor: %w", err)
+	}
+	var out map[string]any
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("decoding descriptor JSON: %w", err)
+	}
+	return out, nil
+}
+
+// rbacPermissionSlice converts a []string of scope names to the typed
+// apitype.RbacPermissionSlice the apitype builders consume.
+func rbacPermissionSlice(scopes []string) apitype.RbacPermissionSlice {
+	out := make(apitype.RbacPermissionSlice, len(scopes))
+	for i, s := range scopes {
+		out[i] = apitype.RbacPermission(s)
+	}
+	return out
+}
+
+// scopedAllowDescriptor builds an `OrganizationRole.permissions` SDK-shape
+// map for a Condition gating an Allow on the given entity. Each helper
+// (Environment, Stack, InsightsAccount) supplies its own typed
+// expression/literal pair; this routine assembles the typed
+// `PermissionDescriptorCondition` via the apitype builders, then converts
+// it to the SDK boundary's `__type`-discriminated map.
+//
+// Note: there is intentionally no "team" scoping helper. Roles are
+// *associated with* teams via the TeamRoleAssignment resource, not gated
+// on them via a permission descriptor; the wire grammar exposes
+// `PermissionExpressionTeam` for advanced cases (e.g. roles imported from
+// the Pulumi Cloud UI that mix team identity into a complex Compose),
+// but the SDK does not advertise that as a recommended pattern.
+func scopedAllowDescriptor(
+	expression apitype.PermissionExpression,
+	literal apitype.PermissionExpression,
+	permissions []string,
+) (map[string]any, error) {
+	if err := validateRbacPermissions(permissions); err != nil {
+		return nil, err
+	}
+	descriptor := apitype.PermissionDescriptorConditionBuilder{
+		Condition: apitype.PermissionExpressionEqualBuilder{
+			Left:  expression,
+			Right: literal,
+		}.Build(),
+		SubNode: apitype.PermissionDescriptorAllowBuilder{
+			Permissions: rbacPermissionSlice(permissions),
+		}.Build(),
+	}.Build()
+	return descriptorToSDKMap(descriptor)
+}
+
+// ----------------------------------------------------------------------------
+// Global Allow helper
+// ----------------------------------------------------------------------------
+
+type BuildAllowPermissionsFunction struct{}
+
+type BuildAllowPermissionsInput struct {
+	Permissions []string `pulumi:"permissions"`
+}
+
+type BuildAllowPermissionsOutput struct {
+	Permissions map[string]any `pulumi:"permissions"`
+}
+
+func (BuildAllowPermissionsFunction) Annotate(a infer.Annotator) {
+	a.Describe(
+		&BuildAllowPermissionsFunction{},
+		"Builds an `OrganizationRole.permissions` descriptor that grants the "+
+			"supplied scopes globally — i.e. on every entity of the matching "+
+			"resource type. This is the simplest descriptor: a flat "+
+			"`PermissionDescriptorAllow`. Use this helper instead of hand-"+
+			"authoring the descriptor literal so the wire-format `__type` "+
+			"discriminator stays an implementation detail. For grants scoped "+
+			"to a specific entity, see `buildEnvironmentScopedPermissions`, "+
+			"`buildStackScopedPermissions`, or "+
+			"`buildInsightsAccountScopedPermissions`. "+
+			scopedPermissionsHelpDoc,
+	)
+	a.SetToken("index", "buildAllowPermissions")
+}
+
+func (i *BuildAllowPermissionsInput) Annotate(a infer.Annotator) {
+	a.Describe(
+		&i.Permissions,
+		"The set of scopes to grant globally (e.g. `stack:read`, `environment:open`, "+
+			"`organization:billingManager`). Discover valid scope names via the "+
+			"`getOrganizationRoleScopes` data source.",
+	)
+}
+
+func (o *BuildAllowPermissionsOutput) Annotate(a infer.Annotator) {
+	a.Describe(
+		&o.Permissions,
+		"A `PermissionDescriptorAllow` granting the supplied scopes on every "+
+			"entity of the matching resource type, ready to assign to "+
+			"`OrganizationRole.permissions`.",
+	)
+}
+
+func (BuildAllowPermissionsFunction) Invoke(
+	_ context.Context,
+	req infer.FunctionRequest[BuildAllowPermissionsInput],
+) (infer.FunctionResponse[BuildAllowPermissionsOutput], error) {
+	if len(req.Input.Permissions) == 0 {
+		return infer.FunctionResponse[BuildAllowPermissionsOutput]{},
+			fmt.Errorf("`permissions` must not be empty")
+	}
+	if err := validateRbacPermissions(req.Input.Permissions); err != nil {
+		return infer.FunctionResponse[BuildAllowPermissionsOutput]{}, err
+	}
+	descriptor := apitype.PermissionDescriptorAllowBuilder{
+		Permissions: rbacPermissionSlice(req.Input.Permissions),
+	}.Build()
+	out, err := descriptorToSDKMap(descriptor)
+	if err != nil {
+		return infer.FunctionResponse[BuildAllowPermissionsOutput]{}, err
+	}
+	return infer.FunctionResponse[BuildAllowPermissionsOutput]{
+		Output: BuildAllowPermissionsOutput{Permissions: out},
+	}, nil
+}
 
 // ----------------------------------------------------------------------------
 // Environment-scoped helper
@@ -56,7 +195,7 @@ type BuildEnvironmentScopedPermissionsInput struct {
 }
 
 type BuildEnvironmentScopedPermissionsOutput struct {
-	Permissions map[string]interface{} `pulumi:"permissions"`
+	Permissions map[string]any `pulumi:"permissions"`
 }
 
 func (BuildEnvironmentScopedPermissionsFunction) Annotate(a infer.Annotator) {
@@ -64,7 +203,8 @@ func (BuildEnvironmentScopedPermissionsFunction) Annotate(a infer.Annotator) {
 		&BuildEnvironmentScopedPermissionsFunction{},
 		"Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on "+
 			"the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data "+
-			"source) to avoid hand-rolling the `on:` modifier yourself. "+scopedPermissionsHelpDoc,
+			"source) to avoid hand-rolling the `PermissionDescriptorCondition` tree yourself. "+
+			scopedPermissionsHelpDoc,
 	)
 	a.SetToken("index", "buildEnvironmentScopedPermissions")
 }
@@ -86,8 +226,8 @@ func (i *BuildEnvironmentScopedPermissionsInput) Annotate(a infer.Annotator) {
 func (o *BuildEnvironmentScopedPermissionsOutput) Annotate(a infer.Annotator) {
 	a.Describe(
 		&o.Permissions,
-		"A `kind: allow` descriptor with an `on: { environment: <uuid> }` modifier, "+
-			"ready to assign to `OrganizationRole.permissions`.",
+		"A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` "+
+			"on the named environment, ready to assign to `OrganizationRole.permissions`.",
 	)
 }
 
@@ -103,10 +243,16 @@ func (BuildEnvironmentScopedPermissionsFunction) Invoke(
 		return infer.FunctionResponse[BuildEnvironmentScopedPermissionsOutput]{},
 			fmt.Errorf("`permissions` must not be empty")
 	}
+	out, err := scopedAllowDescriptor(
+		apitype.PermissionExpressionEnvironmentBuilder{}.Build(),
+		apitype.PermissionLiteralExpressionEnvironmentBuilder{Identity: req.Input.EnvironmentID}.Build(),
+		req.Input.Permissions,
+	)
+	if err != nil {
+		return infer.FunctionResponse[BuildEnvironmentScopedPermissionsOutput]{}, err
+	}
 	return infer.FunctionResponse[BuildEnvironmentScopedPermissionsOutput]{
-		Output: BuildEnvironmentScopedPermissionsOutput{
-			Permissions: scopedAllow("environment", req.Input.EnvironmentID, req.Input.Permissions),
-		},
+		Output: BuildEnvironmentScopedPermissionsOutput{Permissions: out},
 	}, nil
 }
 
@@ -122,7 +268,7 @@ type BuildStackScopedPermissionsInput struct {
 }
 
 type BuildStackScopedPermissionsOutput struct {
-	Permissions map[string]interface{} `pulumi:"permissions"`
+	Permissions map[string]any `pulumi:"permissions"`
 }
 
 func (BuildStackScopedPermissionsFunction) Annotate(a infer.Annotator) {
@@ -151,8 +297,8 @@ func (i *BuildStackScopedPermissionsInput) Annotate(a infer.Annotator) {
 func (o *BuildStackScopedPermissionsOutput) Annotate(a infer.Annotator) {
 	a.Describe(
 		&o.Permissions,
-		"A `kind: allow` descriptor with an `on: { stack: <id> }` modifier, "+
-			"ready to assign to `OrganizationRole.permissions`.",
+		"A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` "+
+			"on the named stack, ready to assign to `OrganizationRole.permissions`.",
 	)
 }
 
@@ -168,10 +314,16 @@ func (BuildStackScopedPermissionsFunction) Invoke(
 		return infer.FunctionResponse[BuildStackScopedPermissionsOutput]{},
 			fmt.Errorf("`permissions` must not be empty")
 	}
+	out, err := scopedAllowDescriptor(
+		apitype.PermissionExpressionStackBuilder{}.Build(),
+		apitype.PermissionLiteralExpressionStackBuilder{Identity: req.Input.StackID}.Build(),
+		req.Input.Permissions,
+	)
+	if err != nil {
+		return infer.FunctionResponse[BuildStackScopedPermissionsOutput]{}, err
+	}
 	return infer.FunctionResponse[BuildStackScopedPermissionsOutput]{
-		Output: BuildStackScopedPermissionsOutput{
-			Permissions: scopedAllow("stack", req.Input.StackID, req.Input.Permissions),
-		},
+		Output: BuildStackScopedPermissionsOutput{Permissions: out},
 	}, nil
 }
 
@@ -187,7 +339,7 @@ type BuildInsightsAccountScopedPermissionsInput struct {
 }
 
 type BuildInsightsAccountScopedPermissionsOutput struct {
-	Permissions map[string]interface{} `pulumi:"permissions"`
+	Permissions map[string]any `pulumi:"permissions"`
 }
 
 func (BuildInsightsAccountScopedPermissionsFunction) Annotate(a infer.Annotator) {
@@ -216,8 +368,8 @@ func (i *BuildInsightsAccountScopedPermissionsInput) Annotate(a infer.Annotator)
 func (o *BuildInsightsAccountScopedPermissionsOutput) Annotate(a infer.Annotator) {
 	a.Describe(
 		&o.Permissions,
-		"A `kind: allow` descriptor with an `on: { insightsAccount: <id> }` modifier, "+
-			"ready to assign to `OrganizationRole.permissions`.",
+		"A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` "+
+			"on the named insights account, ready to assign to `OrganizationRole.permissions`.",
 	)
 }
 
@@ -233,9 +385,15 @@ func (BuildInsightsAccountScopedPermissionsFunction) Invoke(
 		return infer.FunctionResponse[BuildInsightsAccountScopedPermissionsOutput]{},
 			fmt.Errorf("`permissions` must not be empty")
 	}
+	out, err := scopedAllowDescriptor(
+		apitype.PermissionExpressionInsightsAccountBuilder{}.Build(),
+		apitype.PermissionLiteralExpressionInsightsAccountBuilder{Identity: req.Input.InsightsAccountID}.Build(),
+		req.Input.Permissions,
+	)
+	if err != nil {
+		return infer.FunctionResponse[BuildInsightsAccountScopedPermissionsOutput]{}, err
+	}
 	return infer.FunctionResponse[BuildInsightsAccountScopedPermissionsOutput]{
-		Output: BuildInsightsAccountScopedPermissionsOutput{
-			Permissions: scopedAllow("insightsAccount", req.Input.InsightsAccountID, req.Input.Permissions),
-		},
+		Output: BuildInsightsAccountScopedPermissionsOutput{Permissions: out},
 	}, nil
 }

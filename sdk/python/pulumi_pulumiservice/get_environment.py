@@ -41,7 +41,7 @@ class GetEnvironmentResult:
     @pulumi.getter(name="environmentId")
     def environment_id(self) -> _builtins.str:
         """
-        The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `literalEnvironment` expression.
+        The environment's UUID. Pass it to `buildEnvironmentScopedPermissions` (preferred) or use it as the `identity` field of a hand-rolled `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`.
         """
         return pulumi.get(self, "environment_id")
 
@@ -87,7 +87,7 @@ def get_environment(name: Optional[_builtins.str] = None,
                     project_name: Optional[_builtins.str] = None,
                     opts: Optional[pulumi.InvokeOptions] = None) -> AwaitableGetEnvironmentResult:
     """
-    Looks up an existing ESC environment by name and returns its UUID. Use this to pin a custom RBAC role to a specific environment via a `literalEnvironment` expression when the environment is not managed by the current Pulumi program. Errors when the environment is not found.
+    Looks up an existing ESC environment by name and returns its UUID. Use this to scope a custom RBAC role to a specific environment — pass the returned UUID into `buildEnvironmentScopedPermissions`, or use it as the `identity` field of a hand-rolled `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`. Errors when the environment is not found.
 
 
     :param _builtins.str name: The environment name.
@@ -111,7 +111,7 @@ def get_environment_output(name: Optional[pulumi.Input[_builtins.str]] = None,
                            project_name: Optional[pulumi.Input[Optional[_builtins.str]]] = None,
                            opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[GetEnvironmentResult]:
     """
-    Looks up an existing ESC environment by name and returns its UUID. Use this to pin a custom RBAC role to a specific environment via a `literalEnvironment` expression when the environment is not managed by the current Pulumi program. Errors when the environment is not found.
+    Looks up an existing ESC environment by name and returns its UUID. Use this to scope a custom RBAC role to a specific environment — pass the returned UUID into `buildEnvironmentScopedPermissions`, or use it as the `identity` field of a hand-rolled `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`. Errors when the environment is not found.
 
 
     :param _builtins.str name: The environment name.

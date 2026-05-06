@@ -54,7 +54,7 @@
       },
       "readme": "# Pulumi Service Provider\n\n[![Slack](http://www.pulumi.com/images/docs/badges/slack.svg)](https://slack.pulumi.com)\n[![NPM version](https://badge.fury.io/js/%40pulumi%2Fpulumiservice.svg)](https://www.npmjs.com/package/@pulumi/pulumiservice)\n[![Python version](https://badge.fury.io/py/pulumi-pulumiservice.svg)](https://pypi.org/project/pulumi-pulumiservice)\n[![NuGet version](https://badge.fury.io/nu/pulumi.pulumiservice.svg)](https://badge.fury.io/nu/pulumi.pulumiservice)\n[![PkgGoDev](https://pkg.go.dev/badge/github.com/pulumi/pulumi-pulumiservice/sdk/go/pulumiservice)](https://pkg.go.dev/github.com/pulumi/pulumi-pulumiservice/sdk/go)\n[![License](https://img.shields.io/npm/l/%40pulumi%2Fpulumiservice.svg)](https://github.com/pulumi/pulumi-pulumiservice/blob/main/LICENSE)\n\nPulumi Service Provider for creating Pulumi Cloud resources.\n\nThe Pulumi Service Provider (PSP) is built on top of the [Pulumi Cloud REST API](https://www.pulumi.com/docs/pulumi-cloud/reference/cloud-rest-api/), allowing Pulumi customers to create Pulumi Cloud resources using Pulumi programs. That includes Stacks, Environments, Teams, Tokens, Webhooks, Tags, Deployment Settings, Deployment Schedules and much more! Pulumi Service Provider is especially powerful when used in combination with the [Automation API](https://pulumi.com/automation).\n\nFor a full list of supported resources, visit the [Pulumi Registry](https://www.pulumi.com/registry/packages/pulumiservice/). For the REST API reference documentation, visit [Pulumi Cloud API Documentation](https://www.pulumi.com/docs/pulumi-cloud/reference/cloud-rest-api/).\n\nFor now, PSP is in public preview, but we're working on releasing v1.0 in the near future.\n\n## Installing\n\nThis package is available in many languages in the standard packaging formats.\n\n### Node.js (Javascript/TypeScript)\n\nTo use from JavaScript or TypeScript in Node.js, install using either `npm`:\n\n```sh\nnpm install @pulumi/pulumiservice\n```\n\nor `yarn`:\n\n```sh\nyarn add @pulumi/pulumiservice\n```\n\n### Python\n\nTo use from Python, install using `pip`:\n\n```sh\npip install pulumi_pulumiservice\n```\n\n### Go\n\nTo use from Go, use `go get` to grab the latest version of the library\n\n```sh\ngo get github.com/pulumi/pulumi-pulumiservice/sdk/go\n```\n\n### .NET\n\nTo use from .NET, install using `dotnet add package`:\n\n```sh\ndotnet add package Pulumi.PulumiService\n```\n\n### Java\n\nTo use from Java, add an entry to your `build.gradle` file:\n\n```groovy\nimplementation 'com.pulumi:pulumiservice:%Fill in latest version from the badge up top%'\n```\n\nOr to your `pom.xml` file:\n\n```xml\n<dependency>\n    <groupId>com.pulumi</groupId>\n    <artifactId>pulumiservice</artifactId>\n    <version>%Fill in latest version from the badge up top%</version>\n</dependency>\n```\n\n## Setup\n\nEnsure that you have ran `pulumi login`. Run `pulumi whoami` to verify that you are logged in.\n\n### Configuration Options\n\nUse `pulumi config set pulumiservice:<option>` or pass options to the [constructor of `new pulumiservice.Provider`][1].\n\n| Option        | Environment Variable Name | Required/Optional | Description                                                                           |\n|---------------|---------------------------|-------------------|---------------------------------------------------------------------------------------|\n| `accessToken` | `PULUMI_ACCESS_TOKEN`     | Optional          | Overrides [Pulumi Service Access Tokens][2]                                           |\n| `apiUrl`      | `PULUMI_BACKEND_URL`      | Optional          | Allows overriding default [Pulumi Service API URL][3] for [self hosted customers][4]. |\n|               |                           |                   |                                                                                       |\n\n## Examples\n\n```typescript\nimport * as aws from \"@pulumi/awsx\"\nimport * as pulumi from \"@pulumi/pulumi\";\nimport * as service from \"@pulumi/pulumiservice\";\n\nconst team = new service.Team(\"team\", {\n    name: \"pulumi-service-team\",\n    displayName: \"Pulumi Service\",\n    description: \"The Pulumi Service Team\",\n    organizationName: \"pulumi\",\n    teamType: \"pulumi\",\n    members: [\n        \"piers\",\n        \"bryce\",\n        \"casey\"\n        \"evan\",\n        \"devon\",\n        \"meagan\",\n        \"myles\",\n        \"steve\"\n    ],\n});\n\nexport const members = team.members;\n```\n\nCheck out the [examples/](examples/) directory for more examples.\n\n[1]: https://www.pulumi.com/registry/packages/pulumiservice/api-docs/provider/\n[2]: https://www.pulumi.com/docs/pulumi-cloud/access-management/access-tokens/\n[3]: https://www.pulumi.com/docs/pulumi-cloud/reference/cloud-rest-api/\n[4]: https://www.pulumi.com/docs/pulumi-cloud/self-hosted/\n",
       "requires": {
-        "pulumi": ">=3.0.0,<4.0.0"
+        "pulumi": ">=3.235.0,<4.0.0"
       },
       "respectSchemaVersion": true
     }
@@ -1589,7 +1589,7 @@
       "properties": {
         "environmentId": {
           "type": "string",
-          "description": "The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `literalEnvironment` expression in `OrganizationRole.permissions`."
+          "description": "The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`, or pass it directly to the `buildEnvironmentScopedPermissions` helper."
         },
         "name": {
           "type": "string",
@@ -2117,7 +2117,7 @@
           "additionalProperties": {
             "$ref": "pulumi.json#/Any"
           },
-          "description": "The role's permission descriptor tree. Two kinds: `{kind: \"allow\", permissions: [\"<scope>\", ...]}` to grant scopes, or `{kind: \"group\", entries: [...]}` to compose multiple grants. Either may carry an optional `on:` modifier — a single-key map `{environment: <uuid>}` / `{stack: <id>}` / `{insightsAccount: <id>}` — to scope the descriptor to one entity. For per-entity scoping, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the `on:`-modified Allow for you."
+          "description": "The role's permission descriptor tree, expressed in the Pulumi Cloud wire grammar. The provider exposes the descriptor as `map[string]Any` and passes it through verbatim — the wire-format `__type` discriminator is used at every level (SDK and API alike).\n\nCommon top-level descriptors:\n- `PermissionDescriptorAllow` — `{__type: \"PermissionDescriptorAllow\", permissions: [\"<scope>\", ...]}` grants the listed scopes.\n- `PermissionDescriptorGroup` — `{__type: \"PermissionDescriptorGroup\", entries: [{__type: \"PermissionDescriptorAllow\", ...}, ...]}` composes multiple descriptors; the role grants the union of every entry.\n- `PermissionDescriptorCondition` — `{__type: \"PermissionDescriptorCondition\", condition: {__type: ...}, subNode: {__type: ...}}` gates a sub-descriptor on a boolean expression.\n- `PermissionDescriptorCompose` — references other roles by ID; `{__type: \"PermissionDescriptorCompose\", permissionDescriptors: [<roleId>, ...]}`.\n\nPulumi Cloud's REST API also accepts `PermissionDescriptorIfThenElse`, `PermissionDescriptorSelect`, and the `PermissionExpression*` / `PermissionLiteralExpression*` boolean operators (And, Or, Not, Equal, Environment, Stack, Team, InsightsAccount, …); the provider does not inspect anything below the top, so future Cloud additions work without a provider release.\n\nFor the common case of granting a set of scopes on one entity, prefer the `buildAllowPermissions`, `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the descriptor tree for you. To grant a role to a team, use the `TeamRoleAssignment` resource — roles are *associated with* teams, not gated on them via a permission descriptor.\n\nNote: the `__type` field name uses Pulumi's `__`-prefixed-key passthrough (pulumi/pulumi#22834, available in pulumi 3.235.0+). Earlier pulumi runtimes will drop these keys at the SDK boundary; the Python SDK pins the minimum runtime version automatically."
         },
         "resourceType": {
           "type": "string",
@@ -2158,7 +2158,7 @@
           "additionalProperties": {
             "$ref": "pulumi.json#/Any"
           },
-          "description": "The role's permission descriptor tree. Two kinds: `{kind: \"allow\", permissions: [\"<scope>\", ...]}` to grant scopes, or `{kind: \"group\", entries: [...]}` to compose multiple grants. Either may carry an optional `on:` modifier — a single-key map `{environment: <uuid>}` / `{stack: <id>}` / `{insightsAccount: <id>}` — to scope the descriptor to one entity. For per-entity scoping, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the `on:`-modified Allow for you."
+          "description": "The role's permission descriptor tree, expressed in the Pulumi Cloud wire grammar. The provider exposes the descriptor as `map[string]Any` and passes it through verbatim — the wire-format `__type` discriminator is used at every level (SDK and API alike).\n\nCommon top-level descriptors:\n- `PermissionDescriptorAllow` — `{__type: \"PermissionDescriptorAllow\", permissions: [\"<scope>\", ...]}` grants the listed scopes.\n- `PermissionDescriptorGroup` — `{__type: \"PermissionDescriptorGroup\", entries: [{__type: \"PermissionDescriptorAllow\", ...}, ...]}` composes multiple descriptors; the role grants the union of every entry.\n- `PermissionDescriptorCondition` — `{__type: \"PermissionDescriptorCondition\", condition: {__type: ...}, subNode: {__type: ...}}` gates a sub-descriptor on a boolean expression.\n- `PermissionDescriptorCompose` — references other roles by ID; `{__type: \"PermissionDescriptorCompose\", permissionDescriptors: [<roleId>, ...]}`.\n\nPulumi Cloud's REST API also accepts `PermissionDescriptorIfThenElse`, `PermissionDescriptorSelect`, and the `PermissionExpression*` / `PermissionLiteralExpression*` boolean operators (And, Or, Not, Equal, Environment, Stack, Team, InsightsAccount, …); the provider does not inspect anything below the top, so future Cloud additions work without a provider release.\n\nFor the common case of granting a set of scopes on one entity, prefer the `buildAllowPermissions`, `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the descriptor tree for you. To grant a role to a team, use the `TeamRoleAssignment` resource — roles are *associated with* teams, not gated on them via a permission descriptor.\n\nNote: the `__type` field name uses Pulumi's `__`-prefixed-key passthrough (pulumi/pulumi#22834, available in pulumi 3.235.0+). Earlier pulumi runtimes will drop these keys at the SDK boundary; the Python SDK pins the minimum runtime version automatically."
         },
         "resourceType": {
           "type": "string",
@@ -3032,8 +3032,41 @@
     }
   },
   "functions": {
+    "pulumiservice:index:buildAllowPermissions": {
+      "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes globally — i.e. on every entity of the matching resource type. This is the simplest descriptor: a flat `PermissionDescriptorAllow`. Use this helper instead of hand-authoring the descriptor literal so the wire-format `__type` discriminator stays an implementation detail. For grants scoped to a specific entity, see `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, or `buildInsightsAccountScopedPermissions`. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.",
+      "inputs": {
+        "properties": {
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The set of scopes to grant globally (e.g. `stack:read`, `environment:open`, `organization:billingManager`). Discover valid scope names via the `getOrganizationRoleScopes` data source."
+          }
+        },
+        "type": "object",
+        "required": [
+          "permissions"
+        ]
+      },
+      "outputs": {
+        "properties": {
+          "permissions": {
+            "additionalProperties": {
+              "$ref": "pulumi.json#/Any"
+            },
+            "description": "A `PermissionDescriptorAllow` granting the supplied scopes on every entity of the matching resource type, ready to assign to `OrganizationRole.permissions`.",
+            "type": "object"
+          }
+        },
+        "required": [
+          "permissions"
+        ],
+        "type": "object"
+      }
+    },
     "pulumiservice:index:buildEnvironmentScopedPermissions": {
-      "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `on:` modifier yourself. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `group` whose `entries` list pulls the output of each helper.",
+      "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `PermissionDescriptorCondition` tree yourself. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.",
       "inputs": {
         "properties": {
           "environmentId": {
@@ -3060,7 +3093,7 @@
             "additionalProperties": {
               "$ref": "pulumi.json#/Any"
             },
-            "description": "A `kind: allow` descriptor with an `on: { environment: <uuid> }` modifier, ready to assign to `OrganizationRole.permissions`.",
+            "description": "A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` on the named environment, ready to assign to `OrganizationRole.permissions`.",
             "type": "object"
           }
         },
@@ -3071,7 +3104,7 @@
       }
     },
     "pulumiservice:index:buildInsightsAccountScopedPermissions": {
-      "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source). The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `group` whose `entries` list pulls the output of each helper.",
+      "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named insights account. Pair with `InsightsAccount.insightsAccountId` (or the `getInsightsAccount` data source). The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.",
       "inputs": {
         "properties": {
           "insightsAccountId": {
@@ -3098,7 +3131,7 @@
             "additionalProperties": {
               "$ref": "pulumi.json#/Any"
             },
-            "description": "A `kind: allow` descriptor with an `on: { insightsAccount: <id> }` modifier, ready to assign to `OrganizationRole.permissions`.",
+            "description": "A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` on the named insights account, ready to assign to `OrganizationRole.permissions`.",
             "type": "object"
           }
         },
@@ -3109,7 +3142,7 @@
       }
     },
     "pulumiservice:index:buildStackScopedPermissions": {
-      "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `group` whose `entries` list pulls the output of each helper.",
+      "description": "Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named stack. The `stackId` is the stack's opaque Pulumi Cloud identifier — distinct from the `organization/project/stack` triple. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.",
       "inputs": {
         "properties": {
           "permissions": {
@@ -3136,7 +3169,7 @@
             "additionalProperties": {
               "$ref": "pulumi.json#/Any"
             },
-            "description": "A `kind: allow` descriptor with an `on: { stack: <id> }` modifier, ready to assign to `OrganizationRole.permissions`.",
+            "description": "A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` on the named stack, ready to assign to `OrganizationRole.permissions`.",
             "type": "object"
           }
         },
@@ -3180,7 +3213,7 @@
       }
     },
     "pulumiservice:index:getEnvironment": {
-      "description": "Looks up an existing ESC environment by name and returns its UUID. Use this to pin a custom RBAC role to a specific environment via a `literalEnvironment` expression when the environment is not managed by the current Pulumi program. Errors when the environment is not found.",
+      "description": "Looks up an existing ESC environment by name and returns its UUID. Use this to scope a custom RBAC role to a specific environment — pass the returned UUID into `buildEnvironmentScopedPermissions`, or use it as the `identity` field of a hand-rolled `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`. Errors when the environment is not found.",
       "inputs": {
         "properties": {
           "name": {
@@ -3205,7 +3238,7 @@
       "outputs": {
         "properties": {
           "environmentId": {
-            "description": "The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `literalEnvironment` expression.",
+            "description": "The environment's UUID. Pass it to `buildEnvironmentScopedPermissions` (preferred) or use it as the `identity` field of a hand-rolled `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`.",
             "type": "string"
           },
           "name": {
@@ -3386,7 +3419,7 @@
       }
     },
     "pulumiservice:index:getOrganizationMembers": {
-      "description": "Lists all members of a Pulumi Cloud organization, including their role assignments.",
+      "description": "Lists all members of a Pulumi Cloud organization, including their role assignments. Merges Pulumi Cloud's identity-provider roster (paginated; includes users who haven't signed in to Pulumi yet) with the seat-count roster, deduped by username, so SAML- and non-SAML-provisioned members both appear regardless of which roster they're tracked in.",
       "inputs": {
         "properties": {
           "organizationName": {

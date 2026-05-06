@@ -96,6 +96,14 @@ func (c *Config) Configure(context.Context) error {
 		return ErrAccessTokenNotFound
 	}
 
+	// `pulumi import` persists default-provider state with empty inputs;
+	// on subsequent destroy, Configure receives apiUrl="" and would fall
+	// through to NewClient's api.pulumi.com default. Symmetric fallback
+	// to the AccessToken one above.
+	if c.APIURL == "" {
+		c.APIURL = os.Getenv(EnvVarPulumiBackendURL)
+	}
+
 	var err error
 	c.client, err = pulumiapi.NewClient(&http.Client{
 		Timeout: 60 * time.Second,

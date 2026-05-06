@@ -101,16 +101,17 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 			infer.Resource(&resources.TeamRoleAssignment{}),
 		).
 		WithFunctions(
+			infer.Function(&functions.BuildAllowPermissionsFunction{}),
+			infer.Function(&functions.BuildEnvironmentScopedPermissionsFunction{}),
+			infer.Function(&functions.BuildInsightsAccountScopedPermissionsFunction{}),
+			infer.Function(&functions.BuildStackScopedPermissionsFunction{}),
 			infer.Function(&functions.GetCurrentUserFunction{}),
 			infer.Function(&functions.GetEnvironmentFunction{}),
-			infer.Function(&functions.BuildEnvironmentScopedPermissionsFunction{}),
-			infer.Function(&functions.GetInsightsAccountsFunction{}),
 			infer.Function(&functions.GetInsightsAccountFunction{}),
-			infer.Function(&functions.BuildInsightsAccountScopedPermissionsFunction{}),
+			infer.Function(&functions.GetInsightsAccountsFunction{}),
 			infer.Function(&functions.GetOrganizationMemberFunction{}),
 			infer.Function(&functions.GetOrganizationMembersFunction{}),
 			infer.Function(&functions.GetOrganizationRoleScopesFunction{}),
-			infer.Function(&functions.BuildStackScopedPermissionsFunction{}),
 		).
 		WithModuleMap(map[tokens.ModuleName]tokens.ModuleName{
 			"resources": "index",
@@ -155,7 +156,12 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 			"python": map[string]any{
 				"packageName": "pulumi_pulumiservice",
 				"requires": map[string]any{
-					"pulumi": ">=3.0.0,<4.0.0",
+					// 3.235.0 is the first runtime that preserves
+					// `__`-prefixed input keys (pulumi/pulumi#22834),
+					// which OrganizationRole.permissions relies on for
+					// the `__type` discriminator at every level of the
+					// descriptor tree.
+					"pulumi": ">=3.235.0,<4.0.0",
 				},
 				"pyproject": map[string]any{
 					"enabled": true,

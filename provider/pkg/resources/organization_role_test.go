@@ -6,69 +6,92 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/pulumi/pulumi-go-provider/infer"
 	"github.com/pulumi/pulumi/sdk/v3/go/property"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/apitype"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
 type orgRoleClientMock struct {
 	config.Client
-	create func(ctx context.Context, org string, req pulumiapi.CreateRoleRequest) (*pulumiapi.RoleDescriptor, error)
-	get    func(ctx context.Context, org, id string) (*pulumiapi.RoleDescriptor, error)
+	create func(
+		ctx context.Context, org string, req apitype.PermissionDescriptorBase,
+	) (*apitype.PermissionDescriptorRecord, error)
+	get    func(ctx context.Context, org, id string) (*apitype.PermissionDescriptorRecord, error)
 	update func(
-		ctx context.Context, org, id string, name, desc *string, details json.RawMessage,
-	) (*pulumiapi.RoleDescriptor, error)
+		ctx context.Context, org, id string, req apitype.UpdateRoleRequest,
+	) (*apitype.PermissionDescriptorRecord, error)
 	del func(ctx context.Context, org, id string, force bool) error
 }
 
 func (c *orgRoleClientMock) CreateRole(
-	ctx context.Context, org string, req pulumiapi.CreateRoleRequest,
-) (*pulumiapi.RoleDescriptor, error) {
+	ctx context.Context, org string, req apitype.PermissionDescriptorBase,
+) (*apitype.PermissionDescriptorRecord, error) {
 	return c.create(ctx, org, req)
 }
 
 func (c *orgRoleClientMock) GetRole(
 	ctx context.Context, org, id string,
-) (*pulumiapi.RoleDescriptor, error) {
+) (*apitype.PermissionDescriptorRecord, error) {
 	return c.get(ctx, org, id)
 }
 
 func (c *orgRoleClientMock) UpdateRole(
-	ctx context.Context, org, id string, name, desc *string, details json.RawMessage,
-) (*pulumiapi.RoleDescriptor, error) {
-	return c.update(ctx, org, id, name, desc, details)
+	ctx context.Context, org, id string, req apitype.UpdateRoleRequest,
+) (*apitype.PermissionDescriptorRecord, error) {
+	return c.update(ctx, org, id, req)
 }
 
 func (c *orgRoleClientMock) DeleteRole(ctx context.Context, org, id string, force bool) error {
 	return c.del(ctx, org, id, force)
 }
 
+// mustParseDescriptor builds a typed PermissionDescriptor from wire-shape JSON
+// using the same generated unmarshaller the production code uses.
+func mustParseDescriptor(t *testing.T, wireJSON string) apitype.PermissionDescriptor {
+	t.Helper()
+	var d apitype.PermissionDescriptor
+	require.NoError(t, apitype.UnmarshalJSONPermissionDescriptor([]byte(wireJSON), &d))
+	require.NotNil(t, d)
+	return d
+}
+
 var testPermissions = map[string]interface{}{
-	"kind":        "allow",
+	"__type":      "PermissionDescriptorAllow",
 	"permissions": []interface{}{"stack:read"},
 }
 
 func TestOrganizationRoleCreate(t *testing.T) {
 	mock := &orgRoleClientMock{
-		create: func(_ context.Context, org string, req pulumiapi.CreateRoleRequest) (*pulumiapi.RoleDescriptor, error) {
+		create: func(
+			_ context.Context, org string, req apitype.PermissionDescriptorBase,
+		) (*apitype.PermissionDescriptorRecord, error) {
 			assert.Equal(t, "acme", org)
 			assert.Equal(t, "read-only", req.Name)
-			// Defaults are applied by the API client layer, so at this seam
-			// ResourceType stays empty when the user didn't set it.
-			assert.Equal(t, "", req.ResourceType)
-			// details should be the JSON-encoded permissions map.
+			// Defaulting moved into the resource layer: empty user input
+			// becomes "global" before reaching the API.
+			assert.Equal(t, "global", req.ResourceType)
+			assert.Equal(t, apitype.PermissionDescriptorUXPurposeRole, req.UxPurpose)
+			require.NotNil(t, req.Details, "Details must be a typed descriptor")
+			// Round-trip the typed descriptor back through JSON to assert
+			// the wire shape uses `__type` (the wire format and SDK boundary
+			// share this discriminator now).
+			raw, err := json.Marshal(req.Details)
+			require.NoError(t, err)
 			var parsed map[string]interface{}
-			assert.NoError(t, json.Unmarshal(req.Details, &parsed))
+			require.NoError(t, json.Unmarshal(raw, &parsed))
 			assert.Equal(t, "PermissionDescriptorAllow", parsed["__type"])
-			assert.NotContains(t, parsed, "kind", "wire body must not leak `kind` to the API")
-			return &pulumiapi.RoleDescriptor{
+			return &apitype.PermissionDescriptorRecord{
+				PermissionDescriptorBase: apitype.PermissionDescriptorBase{
+					Name:    req.Name,
+					Details: req.Details,
+				},
 				ID:      "role-123",
-				Name:    req.Name,
 				Version: 1,
-				Details: req.Details,
 			}, nil
 		},
 	}
@@ -92,7 +115,7 @@ func TestOrganizationRoleCreate(t *testing.T) {
 func TestOrganizationRoleRead(t *testing.T) {
 	t.Run("not found", func(t *testing.T) {
 		mock := &orgRoleClientMock{
-			get: func(_ context.Context, _, _ string) (*pulumiapi.RoleDescriptor, error) { return nil, nil },
+			get: func(_ context.Context, _, _ string) (*apitype.PermissionDescriptorRecord, error) { return nil, nil },
 		}
 		ctx := config.WithMockClient(context.Background(), mock)
 		r := &OrganizationRole{}
@@ -104,21 +127,22 @@ func TestOrganizationRoleRead(t *testing.T) {
 	})
 
 	t.Run("found parses details", func(t *testing.T) {
-		// The API returns wire format with __type; the provider must translate to kind.
-		wirePermissions := map[string]interface{}{
-			"__type":      "PermissionDescriptorAllow",
-			"permissions": []interface{}{"stack:read"},
-		}
-		raw, _ := json.Marshal(wirePermissions)
+		// The API returns wire format with __type; the provider passes it
+		// through unchanged — the SDK boundary uses `__type` too.
+		details := mustParseDescriptor(t,
+			`{"__type":"PermissionDescriptorAllow","permissions":["stack:read"]}`)
 		mock := &orgRoleClientMock{
-			get: func(_ context.Context, _, _ string) (*pulumiapi.RoleDescriptor, error) {
-				return &pulumiapi.RoleDescriptor{
-					ID:           "role-123",
-					Name:         "read-only",
-					Description:  "ro",
-					ResourceType: "global",
-					Version:      2,
-					Details:      raw,
+			get: func(_ context.Context, _, _ string) (*apitype.PermissionDescriptorRecord, error) {
+				return &apitype.PermissionDescriptorRecord{
+					PermissionDescriptorBase: apitype.PermissionDescriptorBase{
+						Name:         "read-only",
+						Description:  "ro",
+						ResourceType: "global",
+						UxPurpose:    apitype.PermissionDescriptorUXPurposeRole,
+						Details:      details,
+					},
+					ID:      "role-123",
+					Version: 2,
 				}, nil
 			},
 		}
@@ -129,20 +153,127 @@ func TestOrganizationRoleRead(t *testing.T) {
 		})
 		assert.NoError(t, err)
 		assert.Equal(t, "acme/role-123", resp.ID)
-		// Read translates the wire __type back into the user-facing kind.
-		assert.Equal(t, "allow", resp.State.Permissions["kind"])
-		assert.NotContains(t, resp.State.Permissions, "__type", "state must not leak `__type` to the SDK")
+		assert.Equal(t, "PermissionDescriptorAllow", resp.State.Permissions["__type"])
+	})
+
+	// Pulumi Cloud's permission-descriptor table holds entries for both
+	// roles (this resource) and other things (e.g. policies) under the
+	// same /orgs/<org>/roles endpoint, distinguished by uxPurpose. A user
+	// who points `pulumi import` at a non-role descriptor's id should get
+	// a clear error rather than have the descriptor silently round-trip
+	// through code that only understands roles. uxPurpose is otherwise
+	// hidden from the SDK — Create hardcodes "role".
+	t.Run("rejects non-role uxPurpose", func(t *testing.T) {
+		mock := &orgRoleClientMock{
+			get: func(_ context.Context, _, _ string) (*apitype.PermissionDescriptorRecord, error) {
+				return &apitype.PermissionDescriptorRecord{
+					PermissionDescriptorBase: apitype.PermissionDescriptorBase{
+						Name:      "some-policy",
+						UxPurpose: apitype.PermissionDescriptorUXPurposePolicy,
+					},
+					ID: "policy-123",
+				}, nil
+			},
+		}
+		ctx := config.WithMockClient(context.Background(), mock)
+		r := &OrganizationRole{}
+		_, err := r.Read(ctx, infer.ReadRequest[OrganizationRoleInput, OrganizationRoleState]{
+			ID: "acme/policy-123",
+		})
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "policy-123")
+		assert.Contains(t, err.Error(), "uxPurpose")
+		assert.Contains(t, err.Error(), "policy",
+			"error must name the actual uxPurpose so the user knows what they pointed at")
 	})
 }
 
+// TestOrganizationRoleDelete_InUseConflict pins the graceful handling of
+// the rejection Pulumi Cloud surfaces when another role's
+// PermissionDescriptorCompose still references the role being deleted.
+// `force=true` overrides member/team assignments but does *not* override
+// structural Compose references, so the delete returns 409 even after
+// the force escalation. The provider must wrap that into a message that
+// explains *why* and what to do.
+func TestOrganizationRoleDelete_InUseConflict(t *testing.T) {
+	var calls []bool
+	mock := &orgRoleClientMock{
+		del: func(_ context.Context, _, _ string, force bool) error {
+			calls = append(calls, force)
+			return &pulumiapi.ErrorResponse{
+				StatusCode: 409,
+				Message:    "role is referenced by another role's compose",
+			}
+		},
+	}
+	ctx := config.WithMockClient(context.Background(), mock)
+	r := &OrganizationRole{}
+	_, err := r.Delete(ctx, infer.DeleteRequest[OrganizationRoleState]{
+		State: OrganizationRoleState{
+			OrganizationRoleCore: OrganizationRoleCore{OrganizationName: "acme"},
+			RoleId:               "role-123",
+		},
+	})
+	// Both attempts (non-force then force) must have been tried before
+	// surfacing the wrapped error — the force escalation is what we'd
+	// need against a member/team assignment, and only its failure
+	// proves the conflict is structural (Compose).
+	assert.Equal(t, []bool{false, true}, calls,
+		"must try force=false first, then escalate to force=true on 409")
+	assert.Error(t, err)
+	// Message must name the role, point at PermissionDescriptorCompose
+	// (the typical cause), and tell the user how to recover.
+	assert.Contains(t, err.Error(), "role-123")
+	assert.Contains(t, err.Error(), "PermissionDescriptorCompose")
+	assert.Contains(t, err.Error(), "destroy",
+		"error should tell the user to destroy the composing role(s) first")
+	// The underlying API error must still be wrapped so callers can
+	// inspect the status code if they want.
+	assert.Equal(t, 409, pulumiapi.GetErrorStatusCode(err),
+		"wrapped error must preserve the original 409 status code")
+}
+
+// TestOrganizationRoleDelete_EscalatesForceOnConflict pins the
+// member/team-assignment escalation path: the unprivileged delete returns
+// 409 (role still assigned), the force-true retry succeeds (force clears
+// assignments transitively), and Delete returns nil. Without this
+// escalation, destroy would fail any time the destroy graph didn't
+// happen to clean assignments first (e.g. adopted-member no-op deletes,
+// out-of-band assignments).
+func TestOrganizationRoleDelete_EscalatesForceOnConflict(t *testing.T) {
+	var calls []bool
+	mock := &orgRoleClientMock{
+		del: func(_ context.Context, _, _ string, force bool) error {
+			calls = append(calls, force)
+			if !force {
+				return &pulumiapi.ErrorResponse{
+					StatusCode: 409,
+					Message:    "role still assigned to a team",
+				}
+			}
+			return nil
+		},
+	}
+	ctx := config.WithMockClient(context.Background(), mock)
+	r := &OrganizationRole{}
+	_, err := r.Delete(ctx, infer.DeleteRequest[OrganizationRoleState]{
+		State: OrganizationRoleState{
+			OrganizationRoleCore: OrganizationRoleCore{OrganizationName: "acme"},
+			RoleId:               "role-123",
+		},
+	})
+	assert.NoError(t, err, "force-true retry must succeed when assignments are the only blocker")
+	assert.Equal(t, []bool{false, true}, calls,
+		"must try force=false first, then escalate to force=true on 409")
+}
+
 func TestOrganizationRoleDelete(t *testing.T) {
-	called := false
+	var calls []bool
 	mock := &orgRoleClientMock{
 		del: func(_ context.Context, org, id string, force bool) error {
-			called = true
+			calls = append(calls, force)
 			assert.Equal(t, "acme", org)
 			assert.Equal(t, "role-123", id)
-			assert.True(t, force)
 			return nil
 		},
 	}
@@ -155,7 +286,8 @@ func TestOrganizationRoleDelete(t *testing.T) {
 		},
 	})
 	assert.NoError(t, err)
-	assert.True(t, called)
+	assert.Equal(t, []bool{false}, calls,
+		"clean delete must succeed on the first (unprivileged) call without escalating to force=true")
 }
 
 func TestOrganizationRoleUpdateOmitsDescriptionWhenUnset(t *testing.T) {
@@ -163,16 +295,24 @@ func TestOrganizationRoleUpdateOmitsDescriptionWhenUnset(t *testing.T) {
 	// pointer when the user had not set one. With `omitempty` on *string only
 	// eliding nil (not empty), the PATCH body included `"description": ""` and
 	// cleared any existing description on the server.
-	raw, _ := json.Marshal(testPermissions)
+	details := mustParseDescriptor(t,
+		`{"__type":"PermissionDescriptorAllow","permissions":["stack:read"]}`)
 	var gotDesc *string
 	gotDesc = new(string) // sentinel so we can distinguish "passed nil" from "test hasn't run"
 	*gotDesc = "__sentinel__"
 	mock := &orgRoleClientMock{
 		update: func(
-			_ context.Context, _, _ string, _, desc *string, _ json.RawMessage,
-		) (*pulumiapi.RoleDescriptor, error) {
-			gotDesc = desc
-			return &pulumiapi.RoleDescriptor{ID: "role-123", Name: "read-only", Version: 3, Details: raw}, nil
+			_ context.Context, _, _ string, req apitype.UpdateRoleRequest,
+		) (*apitype.PermissionDescriptorRecord, error) {
+			gotDesc = req.Description
+			return &apitype.PermissionDescriptorRecord{
+				PermissionDescriptorBase: apitype.PermissionDescriptorBase{
+					Name:    "read-only",
+					Details: details,
+				},
+				ID:      "role-123",
+				Version: 3,
+			}, nil
 		},
 	}
 	ctx := config.WithMockClient(context.Background(), mock)
@@ -240,7 +380,7 @@ func TestOrganizationRoleCheck(t *testing.T) {
 				"organizationName": property.New("acme"),
 				"name":             property.New(property.Computed),
 				"permissions": property.New(property.NewMap(map[string]property.Value{
-					"kind": property.New("allow"),
+					"__type": property.New("allow"),
 				})),
 			}),
 		})
@@ -251,58 +391,40 @@ func TestOrganizationRoleCheck(t *testing.T) {
 		}
 	})
 
-	t.Run("rejects unknown kind", func(t *testing.T) {
+	// Pulumi Cloud is the source of truth for which descriptor variants
+	// exist; the provider does not gate them. This test documents that
+	// contract — Check accepts a `__type` value the provider has no
+	// special knowledge of, and the role's validity is the API's call at
+	// apply time.
+	t.Run("accepts arbitrary __type values (no provider-side allowlist)", func(t *testing.T) {
 		resp, err := r.Check(context.Background(), infer.CheckRequest{
 			NewInputs: property.NewMap(map[string]property.Value{
 				"organizationName": property.New("acme"),
 				"name":             property.New("r"),
 				"permissions": property.New(property.NewMap(map[string]property.Value{
-					"kind": property.New("totallyMadeUp"),
+					"__type": property.New("PermissionDescriptorWhateverFutureCloudVariant"),
 				})),
 			}),
 		})
 		assert.NoError(t, err)
-		props := map[string]string{}
 		for _, f := range resp.Failures {
-			props[f.Property] = f.Reason
+			assert.NotEqual(t, "permissions", f.Property,
+				"Check must not gate descriptor values: %s", f.Reason)
 		}
-		assert.Contains(t, props["permissions"], "totallyMadeUp",
-			"Check must reject unknown kind values upfront")
 	})
 
-	t.Run("rejects empty on map", func(t *testing.T) {
+	// A descriptor missing the top-level `__type` discriminator is rejected
+	// at preview rather than reaching the API. The error names the missing
+	// field so the user knows what to fix.
+	t.Run("rejects descriptor missing __type", func(t *testing.T) {
 		resp, err := r.Check(context.Background(), infer.CheckRequest{
 			NewInputs: property.NewMap(map[string]property.Value{
 				"organizationName": property.New("acme"),
 				"name":             property.New("r"),
 				"permissions": property.New(property.NewMap(map[string]property.Value{
-					"kind":        property.New("allow"),
-					"on":          property.New(property.NewMap(map[string]property.Value{})),
-					"permissions": property.New(property.NewArray([]property.Value{property.New("stack:read")})),
-				})),
-			}),
-		})
-		assert.NoError(t, err)
-		props := map[string]string{}
-		for _, f := range resp.Failures {
-			props[f.Property] = f.Reason
-		}
-		assert.Contains(t, props["permissions"], "on",
-			"empty on map should produce a permissions failure mentioning on")
-	})
-
-	t.Run("rejects multi-key on map", func(t *testing.T) {
-		resp, err := r.Check(context.Background(), infer.CheckRequest{
-			NewInputs: property.NewMap(map[string]property.Value{
-				"organizationName": property.New("acme"),
-				"name":             property.New("r"),
-				"permissions": property.New(property.NewMap(map[string]property.Value{
-					"kind": property.New("allow"),
-					"on": property.New(property.NewMap(map[string]property.Value{
-						"environment": property.New("e"),
-						"stack":       property.New("s"),
+					"permissions": property.New(property.NewArray([]property.Value{
+						property.New("stack:read"),
 					})),
-					"permissions": property.New(property.NewArray([]property.Value{property.New("stack:read")})),
 				})),
 			}),
 		})
@@ -311,30 +433,7 @@ func TestOrganizationRoleCheck(t *testing.T) {
 		for _, f := range resp.Failures {
 			props[f.Property] = f.Reason
 		}
-		assert.Contains(t, props["permissions"], "on",
-			"multi-key on should produce a permissions failure mentioning on")
-	})
-
-	t.Run("rejects unknown on entity type", func(t *testing.T) {
-		resp, err := r.Check(context.Background(), infer.CheckRequest{
-			NewInputs: property.NewMap(map[string]property.Value{
-				"organizationName": property.New("acme"),
-				"name":             property.New("r"),
-				"permissions": property.New(property.NewMap(map[string]property.Value{
-					"kind": property.New("allow"),
-					"on": property.New(property.NewMap(map[string]property.Value{
-						"unknownEntity": property.New("x"),
-					})),
-					"permissions": property.New(property.NewArray([]property.Value{property.New("stack:read")})),
-				})),
-			}),
-		})
-		assert.NoError(t, err)
-		props := map[string]string{}
-		for _, f := range resp.Failures {
-			props[f.Property] = f.Reason
-		}
-		assert.Contains(t, props["permissions"], "unknownEntity",
-			"unknown on entity should produce a permissions failure naming the bad key")
+		assert.Contains(t, props["permissions"], "__type",
+			"Check must name the missing `__type` field so the user knows what to fix")
 	})
 }

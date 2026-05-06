@@ -16,6 +16,7 @@
         "accessToken.ts",
         "agentPool.ts",
         "approvalRule.ts",
+        "buildAllowPermissions.ts",
         "buildEnvironmentScopedPermissions.ts",
         "buildInsightsAccountScopedPermissions.ts",
         "buildStackScopedPermissions.ts",

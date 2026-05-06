@@ -15,24 +15,25 @@ package pulumiapi
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
-	"net/url"
 	"path"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/apitype"
 )
 
 type RoleClient interface {
-	CreateRole(ctx context.Context, orgName string, req CreateRoleRequest) (*RoleDescriptor, error)
-	GetRole(ctx context.Context, orgName, roleID string) (*RoleDescriptor, error)
+	CreateRole(
+		ctx context.Context, orgName string, req apitype.PermissionDescriptorBase,
+	) (*apitype.PermissionDescriptorRecord, error)
+	GetRole(ctx context.Context, orgName, roleID string) (*apitype.PermissionDescriptorRecord, error)
 	UpdateRole(
-		ctx context.Context, orgName, roleID string,
-		name, description *string, details json.RawMessage,
-	) (*RoleDescriptor, error)
+		ctx context.Context, orgName, roleID string, req apitype.UpdateRoleRequest,
+	) (*apitype.PermissionDescriptorRecord, error)
 	DeleteRole(ctx context.Context, orgName, roleID string, force bool) error
 	ListAvailableRoleScopes(ctx context.Context, orgName string) (map[string][]RoleScopeGroup, error)
-	ListOrgRoles(ctx context.Context, orgName, uxPurpose string) ([]RoleDescriptor, error)
+	ListOrgRoles(ctx context.Context, orgName, uxPurpose string) ([]apitype.PermissionDescriptorRecord, error)
 	ResolveBuiltInRoleID(ctx context.Context, orgName, builtInRole string) (string, error)
 }
 
@@ -69,85 +70,36 @@ type rbacScopeGroup struct {
 	Scopes []rbacScope `json:"scopes"`
 }
 
-// RoleDescriptor mirrors the Pulumi Cloud PermissionDescriptorRecord. The
-// `Details` field holds the opaque permission tree (allow/compose/condition/
-// group/if-then-else/select) that the Cloud uses to evaluate permissions.
-// We keep it as raw JSON so customers can supply the shape produced by the
-// Cloud console without PSP having to model the entire tree.
-type RoleDescriptor struct {
-	ID                string          `json:"id"`
-	Name              string          `json:"name"`
-	Description       string          `json:"description"`
-	ResourceType      string          `json:"resourceType"`
-	UXPurpose         string          `json:"uxPurpose"`
-	Details           json.RawMessage `json:"details,omitempty"`
-	OrgID             string          `json:"orgId"`
-	Version           int             `json:"version"`
-	IsOrgDefault      bool            `json:"isOrgDefault"`
-	DefaultIdentifier string          `json:"defaultIdentifier,omitempty"`
-}
-
-type CreateRoleRequest struct {
-	Name         string          `json:"name"`
-	Description  string          `json:"description,omitempty"`
-	ResourceType string          `json:"resourceType"`
-	UXPurpose    string          `json:"uxPurpose"`
-	Details      json.RawMessage `json:"details"`
-}
-
-type updateRoleReq struct {
-	Name        *string         `json:"name,omitempty"`
-	Description *string         `json:"description,omitempty"`
-	Details     json.RawMessage `json:"details,omitempty"`
-}
-
-// CreateRole creates a new custom role on the organization. resourceType
-// follows the service's PermissionDescriptorBase contract ("global" is the
-// shape for an org-wide role assignable to members and teams). uxPurpose is
-// always "role" — the service's other discriminators are not exposed by PSP.
+// CreateRole creates a new permission descriptor on the organization. The
+// caller chooses whether the entry is a role, policy, or other kind via
+// `req.UxPurpose`; resource-layer policy on which kinds are valid is enforced
+// there, not here.
 func (c *Client) CreateRole(
 	ctx context.Context,
 	orgName string,
-	req CreateRoleRequest,
-) (*RoleDescriptor, error) {
+	req apitype.PermissionDescriptorBase,
+) (*apitype.PermissionDescriptorRecord, error) {
 	if len(orgName) == 0 {
 		return nil, errors.New("organization name must not be empty")
 	}
 	if req.Name == "" {
 		return nil, errors.New("role name must not be empty")
 	}
-	if req.ResourceType == "" {
-		req.ResourceType = "global"
-	}
-	req.UXPurpose = "role"
-	if len(req.Details) == 0 {
+	if req.Details == nil {
 		return nil, errors.New("role permissions details must not be empty")
 	}
 
-	apiPath := path.Join("orgs", orgName, "roles")
-	var role RoleDescriptor
-	if _, err := c.do(ctx, http.MethodPost, apiPath, req, &role); err != nil {
+	role, err := c.SDK.CreateRole(ctx, orgName, nil, req)
+	if err != nil {
 		return nil, fmt.Errorf("failed to create role: %w", err)
 	}
-	return &role, nil
-}
-
-// NewCreateRoleRequest is a small constructor for CreateRoleRequest. Exposed so
-// that resource code can build requests without touching the unexported type.
-func NewCreateRoleRequest(
-	name, description, resourceType string,
-	details json.RawMessage,
-) CreateRoleRequest {
-	return CreateRoleRequest{
-		Name:         name,
-		Description:  description,
-		ResourceType: resourceType,
-		Details:      details,
-	}
+	return role, nil
 }
 
 // GetRole fetches a role by ID. Returns (nil, nil) if the role does not exist.
-func (c *Client) GetRole(ctx context.Context, orgName, roleID string) (*RoleDescriptor, error) {
+func (c *Client) GetRole(
+	ctx context.Context, orgName, roleID string,
+) (*apitype.PermissionDescriptorRecord, error) {
 	if len(orgName) == 0 {
 		return nil, errors.New("organization name must not be empty")
 	}
@@ -155,26 +107,24 @@ func (c *Client) GetRole(ctx context.Context, orgName, roleID string) (*RoleDesc
 		return nil, errors.New("role id must not be empty")
 	}
 
-	apiPath := path.Join("orgs", orgName, "roles", roleID)
-	var role RoleDescriptor
-	if _, err := c.do(ctx, http.MethodGet, apiPath, nil, &role); err != nil {
+	role, err := c.SDK.GetRole(ctx, orgName, roleID)
+	if err != nil {
 		if GetErrorStatusCode(err) == http.StatusNotFound {
 			return nil, nil
 		}
 		return nil, fmt.Errorf("failed to get role: %w", err)
 	}
-	return &role, nil
+	return role, nil
 }
 
 // UpdateRole updates a role's name, description, and/or permission details.
-// Any of the three may be nil to leave unchanged; Details as nil preserves the
-// existing permission tree.
+// Any field of req may be nil to leave unchanged; Details as nil preserves
+// the existing permission tree.
 func (c *Client) UpdateRole(
 	ctx context.Context,
 	orgName, roleID string,
-	name, description *string,
-	details json.RawMessage,
-) (*RoleDescriptor, error) {
+	req apitype.UpdateRoleRequest,
+) (*apitype.PermissionDescriptorRecord, error) {
 	if len(orgName) == 0 {
 		return nil, errors.New("organization name must not be empty")
 	}
@@ -182,13 +132,11 @@ func (c *Client) UpdateRole(
 		return nil, errors.New("role id must not be empty")
 	}
 
-	apiPath := path.Join("orgs", orgName, "roles", roleID)
-	req := updateRoleReq{Name: name, Description: description, Details: details}
-	var role RoleDescriptor
-	if _, err := c.do(ctx, http.MethodPatch, apiPath, req, &role); err != nil {
+	role, err := c.SDK.UpdateRole(ctx, orgName, roleID, req)
+	if err != nil {
 		return nil, fmt.Errorf("failed to update role: %w", err)
 	}
-	return &role, nil
+	return role, nil
 }
 
 // ListAvailableRoleScopes returns the permission scope catalogue, bucketed by
@@ -227,7 +175,9 @@ func (c *Client) ListAvailableRoleScopes(
 // ListOrgRoles returns the role catalogue for an organization filtered by
 // uxPurpose (e.g. "role", "policy"). The service requires uxPurpose — calling
 // the endpoint without it returns 400 Bad Request.
-func (c *Client) ListOrgRoles(ctx context.Context, orgName, uxPurpose string) ([]RoleDescriptor, error) {
+func (c *Client) ListOrgRoles(
+	ctx context.Context, orgName, uxPurpose string,
+) ([]apitype.PermissionDescriptorRecord, error) {
 	if len(orgName) == 0 {
 		return nil, errors.New("organization name must not be empty")
 	}
@@ -235,15 +185,11 @@ func (c *Client) ListOrgRoles(ctx context.Context, orgName, uxPurpose string) ([
 		return nil, errors.New("uxPurpose must not be empty")
 	}
 
-	apiPath := path.Join("orgs", orgName, "roles")
-	q := url.Values{"uxPurpose": []string{uxPurpose}}
-	var body struct {
-		Roles []RoleDescriptor `json:"roles"`
-	}
-	if _, err := c.doWithQuery(ctx, http.MethodGet, apiPath, q, nil, &body); err != nil {
+	resp, err := c.SDK.ListRolesByOrgIDAndUXPurpose(ctx, orgName, &uxPurpose)
+	if err != nil {
 		return nil, fmt.Errorf("failed to list organization roles: %w", err)
 	}
-	return body.Roles, nil
+	return resp.Roles, nil
 }
 
 // ResolveBuiltInRoleID returns the FGA role ID for a Pulumi Cloud built-in
@@ -273,12 +219,11 @@ func (c *Client) DeleteRole(ctx context.Context, orgName, roleID string, force b
 		return errors.New("role id must not be empty")
 	}
 
-	apiPath := path.Join("orgs", orgName, "roles", roleID)
-	q := url.Values{}
+	var forcePtr *bool
 	if force {
-		q.Set("force", "true")
+		forcePtr = &force
 	}
-	if _, err := c.doWithQuery(ctx, http.MethodDelete, apiPath, q, nil, nil); err != nil {
+	if err := c.SDK.DeleteRole(ctx, orgName, roleID, forcePtr); err != nil {
 		if GetErrorStatusCode(err) == http.StatusNotFound {
 			return nil
 		}

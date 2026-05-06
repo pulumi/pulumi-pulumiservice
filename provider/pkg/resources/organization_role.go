@@ -18,12 +18,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"strings"
 
 	p "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi-go-provider/infer"
 	"github.com/pulumi/pulumi/sdk/v3/go/property"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/apitype"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
@@ -71,15 +73,38 @@ func (c *OrganizationRoleCore) Annotate(a infer.Annotator) {
 	)
 	a.Describe(
 		&c.Permissions,
-		"The role's permission descriptor tree. Two kinds: "+
-			"`{kind: \"allow\", permissions: [\"<scope>\", ...]}` to grant scopes, or "+
-			"`{kind: \"group\", entries: [...]}` to compose multiple grants. "+
-			"Either may carry an optional `on:` modifier — a single-key map "+
-			"`{environment: <uuid>}` / `{stack: <id>}` / `{insightsAccount: <id>}` — "+
-			"to scope the descriptor to one entity. For per-entity scoping, prefer "+
-			"the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, "+
-			"and `buildInsightsAccountScopedPermissions` helpers, which build the "+
-			"`on:`-modified Allow for you.",
+		"The role's permission descriptor tree, expressed in the Pulumi Cloud "+
+			"wire grammar. The provider exposes the descriptor as `map[string]Any` "+
+			"and passes it through verbatim — the wire-format `__type` "+
+			"discriminator is used at every level (SDK and API alike).\n\n"+
+			"Common top-level descriptors:\n"+
+			"- `PermissionDescriptorAllow` — `{__type: \"PermissionDescriptorAllow\", "+
+			"permissions: [\"<scope>\", ...]}` grants the listed scopes.\n"+
+			"- `PermissionDescriptorGroup` — `{__type: \"PermissionDescriptorGroup\", "+
+			"entries: [{__type: \"PermissionDescriptorAllow\", ...}, ...]}` composes "+
+			"multiple descriptors; the role grants the union of every entry.\n"+
+			"- `PermissionDescriptorCondition` — `{__type: "+
+			"\"PermissionDescriptorCondition\", condition: {__type: ...}, subNode: "+
+			"{__type: ...}}` gates a sub-descriptor on a boolean expression.\n"+
+			"- `PermissionDescriptorCompose` — references other roles by ID; "+
+			"`{__type: \"PermissionDescriptorCompose\", permissionDescriptors: "+
+			"[<roleId>, ...]}`.\n\n"+
+			"Pulumi Cloud's REST API also accepts `PermissionDescriptorIfThenElse`, "+
+			"`PermissionDescriptorSelect`, and the `PermissionExpression*` / "+
+			"`PermissionLiteralExpression*` boolean operators (And, Or, Not, Equal, "+
+			"Environment, Stack, Team, InsightsAccount, …); the provider does not "+
+			"inspect anything below the top, so future Cloud additions work without "+
+			"a provider release.\n\n"+
+			"For the common case of granting a set of scopes on one entity, prefer "+
+			"the `buildAllowPermissions`, `buildEnvironmentScopedPermissions`, "+
+			"`buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` "+
+			"helpers, which build the descriptor tree for you. To grant a role to a "+
+			"team, use the `TeamRoleAssignment` resource — roles are *associated "+
+			"with* teams, not gated on them via a permission descriptor.\n\n"+
+			"Note: the `__type` field name uses Pulumi's `__`-prefixed-key passthrough "+
+			"(pulumi/pulumi#22834, available in pulumi 3.235.0+). Earlier pulumi "+
+			"runtimes will drop these keys at the SDK boundary; the Python SDK pins "+
+			"the minimum runtime version automatically.",
 	)
 }
 
@@ -121,7 +146,7 @@ func (*OrganizationRole) Check(
 				Property: "permissions",
 				Reason:   "permissions must not be empty — supply a PermissionDescriptor tree",
 			})
-		} else if _, err := permissionsKindToWire(in.Permissions); err != nil {
+		} else if err := validatePermissions(in.Permissions); err != nil {
 			// Validate the descriptor tree up front so users see a
 			// clear error at preview, not a 400 from the API at apply.
 			failures = append(failures, p.CheckFailure{
@@ -154,28 +179,26 @@ func (*OrganizationRole) Create(
 		}, nil
 	}
 
-	wire, err := permissionsKindToWire(req.Inputs.Permissions)
+	details, err := buildPermissionDescriptorForAPI(req.Inputs.Permissions)
 	if err != nil {
 		return infer.CreateResponse[OrganizationRoleState]{}, fmt.Errorf(
 			"invalid permissions: %w",
 			err,
 		)
 	}
-	details, err := json.Marshal(wire)
-	if err != nil {
-		return infer.CreateResponse[OrganizationRoleState]{}, fmt.Errorf(
-			"failed to marshal permissions: %w",
-			err,
-		)
+	resourceType := util.OrZero(req.Inputs.ResourceType)
+	if resourceType == "" {
+		resourceType = "global"
 	}
 
 	client := config.GetClient(ctx)
-	role, err := client.CreateRole(ctx, req.Inputs.OrganizationName, pulumiapi.NewCreateRoleRequest(
-		req.Inputs.Name,
-		util.OrZero(req.Inputs.Description),
-		util.OrZero(req.Inputs.ResourceType),
-		details,
-	))
+	role, err := client.CreateRole(ctx, req.Inputs.OrganizationName, apitype.PermissionDescriptorBase{
+		Name:         req.Inputs.Name,
+		Description:  util.OrZero(req.Inputs.Description),
+		ResourceType: resourceType,
+		UxPurpose:    apitype.PermissionDescriptorUXPurposeRole,
+		Details:      details,
+	})
 	if err != nil {
 		return infer.CreateResponse[OrganizationRoleState]{}, fmt.Errorf(
 			"failed to create role %q: %w",
@@ -206,17 +229,10 @@ func (*OrganizationRole) Update(
 		}, nil
 	}
 
-	wire, err := permissionsKindToWire(core.Permissions)
+	details, err := buildPermissionDescriptorForAPI(core.Permissions)
 	if err != nil {
 		return infer.UpdateResponse[OrganizationRoleState]{}, fmt.Errorf(
 			"invalid permissions: %w",
-			err,
-		)
-	}
-	details, err := json.Marshal(wire)
-	if err != nil {
-		return infer.UpdateResponse[OrganizationRoleState]{}, fmt.Errorf(
-			"failed to marshal permissions: %w",
 			err,
 		)
 	}
@@ -227,9 +243,11 @@ func (*OrganizationRole) Update(
 		ctx,
 		req.State.OrganizationName,
 		req.State.RoleId,
-		&name,
-		core.Description,
-		details,
+		apitype.UpdateRoleRequest{
+			Name:        &name,
+			Description: core.Description,
+			Details:     details,
+		},
 	)
 	if err != nil {
 		return infer.UpdateResponse[OrganizationRoleState]{}, fmt.Errorf(
@@ -248,14 +266,42 @@ func (*OrganizationRole) Delete(
 	req infer.DeleteRequest[OrganizationRoleState],
 ) (infer.DeleteResponse, error) {
 	client := config.GetClient(ctx)
-	// Force=true: Pulumi destroy should succeed even if the role is still
-	// referenced; the alternative is telling users to manually unassign.
-	return infer.DeleteResponse{}, client.DeleteRole(
-		ctx,
-		req.State.OrganizationName,
-		req.State.RoleId,
-		true,
-	)
+	orgName := req.State.OrganizationName
+	roleID := req.State.RoleId
+
+	// Try the unprivileged delete first. Pulumi's normal destroy walks
+	// the dependency graph in reverse, so by the time the role is
+	// destroyed any TeamRoleAssignment or OrganizationMember that
+	// references it has typically been deleted already and the
+	// non-force path succeeds cleanly. Skipping `force=true` here lets
+	// tokens whose scope excludes force-delete-role (notably personal
+	// tokens on Pulumi Cloud review stacks) destroy clean roles
+	// without a 401 from the privileged endpoint.
+	err := client.DeleteRole(ctx, orgName, roleID, false)
+	if err != nil && pulumiapi.GetErrorStatusCode(err) == http.StatusConflict {
+		// Role is still referenced — typically a member/team assignment
+		// that wasn't part of the destroy graph (e.g. an out-of-band
+		// assignment, or an adopted member whose Delete is a no-op).
+		// Escalate to force=true; force overrides the assignment check
+		// and clears the assignments transitively.
+		err = client.DeleteRole(ctx, orgName, roleID, true)
+	}
+	if err != nil && pulumiapi.GetErrorStatusCode(err) == http.StatusConflict {
+		// 409 even after force=true — Pulumi Cloud refuses to remove a
+		// role referenced by another role's `PermissionDescriptorCompose`
+		// because that would leave a dangling reference in the composing
+		// role's permission tree. Force does NOT override this. Surface
+		// the case with an actionable error.
+		return infer.DeleteResponse{}, fmt.Errorf(
+			"cannot delete role %q: Pulumi Cloud reports it is still in use. "+
+				"This typically means another role's `PermissionDescriptorCompose` "+
+				"references this role's id; destroy the composing role(s) first or "+
+				"rewrite their `permissions` to drop the reference. Underlying "+
+				"error: %w",
+			roleID, err,
+		)
+	}
+	return infer.DeleteResponse{}, err
 }
 
 func (*OrganizationRole) Read(
@@ -295,8 +341,23 @@ func (*OrganizationRole) Read(
 func orgRoleCoreFromAPI(
 	orgName string,
 	prior OrganizationRoleCore,
-	role *pulumiapi.RoleDescriptor,
+	role *apitype.PermissionDescriptorRecord,
 ) (OrganizationRoleCore, error) {
+	// uxPurpose is a Pulumi Cloud-internal discriminator that splits the
+	// permission-descriptor table into "role" entries (what this resource
+	// manages) and other entries (e.g. policies). It's not exposed in the
+	// SDK; Create hardcodes "role" and Update doesn't carry it. On Read
+	// (which is also the path `pulumi import` takes), guard against a
+	// caller pointing this resource at a non-role descriptor by ID — the
+	// alternative is silently round-tripping a Policy through code that
+	// only understands roles.
+	if role.UxPurpose != "" && role.UxPurpose != apitype.PermissionDescriptorUXPurposeRole {
+		return OrganizationRoleCore{}, fmt.Errorf(
+			"descriptor %q is not a role (uxPurpose=%q); `OrganizationRole` "+
+				"only manages entries with uxPurpose=\"role\"",
+			role.ID, role.UxPurpose,
+		)
+	}
 	core := OrganizationRoleCore{
 		OrganizationName: orgName,
 		Name:             role.Name,
@@ -310,16 +371,20 @@ func orgRoleCoreFromAPI(
 	if core.ResourceType == nil && role.ResourceType != "" && role.ResourceType != "global" {
 		core.ResourceType = util.OrNil(role.ResourceType)
 	}
-	if len(role.Details) > 0 {
-		wire := map[string]interface{}{}
-		if err := json.Unmarshal(role.Details, &wire); err != nil {
+	if role.Details != nil {
+		// Round-trip the typed Details through JSON to recover the
+		// `__type`-discriminated map shape the SDK exposes. The marshal
+		// call dispatches through the typed descriptor's MarshalJSON,
+		// which emits `__type` natively.
+		raw, err := json.Marshal(role.Details)
+		if err != nil {
+			return OrganizationRoleCore{}, fmt.Errorf(
+				"marshalling role details for %q: %w", role.ID, err)
+		}
+		core.Permissions = map[string]interface{}{}
+		if err := json.Unmarshal(raw, &core.Permissions); err != nil {
 			return OrganizationRoleCore{}, fmt.Errorf("parsing role details for %q: %w", role.ID, err)
 		}
-		parsed, err := permissionsWireToKind(wire)
-		if err != nil {
-			return OrganizationRoleCore{}, fmt.Errorf("translating role details for %q: %w", role.ID, err)
-		}
-		core.Permissions = parsed
 	}
 	return core, nil
 }
@@ -327,14 +392,39 @@ func orgRoleCoreFromAPI(
 func orgRoleStateFromAPI(
 	orgName string,
 	core OrganizationRoleCore,
-	role *pulumiapi.RoleDescriptor,
+	role *apitype.PermissionDescriptorRecord,
 ) OrganizationRoleState {
 	core.OrganizationName = orgName
 	return OrganizationRoleState{
 		OrganizationRoleCore: core,
 		RoleId:               role.ID,
-		Version:              role.Version,
+		Version:              int(role.Version),
 	}
+}
+
+// buildPermissionDescriptorForAPI converts a user-facing `__type`-shape
+// permissions map into the typed apitype.PermissionDescriptor tree
+// expected by the generated SDK. The user's tree passes through to the
+// API verbatim; this routine just hands the JSON off to the generated
+// UnmarshalJSONPermissionDescriptor for `__type` dispatch.
+func buildPermissionDescriptorForAPI(
+	permissions map[string]interface{},
+) (apitype.PermissionDescriptor, error) {
+	if err := validatePermissions(permissions); err != nil {
+		return nil, err
+	}
+	raw, err := json.Marshal(permissions)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal permissions: %w", err)
+	}
+	var details apitype.PermissionDescriptor
+	if err := apitype.UnmarshalJSONPermissionDescriptor(raw, &details); err != nil {
+		return nil, fmt.Errorf("failed to parse permission descriptor: %w", err)
+	}
+	if details == nil {
+		return nil, fmt.Errorf("permission descriptor parsed to nil — missing or unknown __type")
+	}
+	return details, nil
 }
 
 func splitOrgRoleID(id string) (string, string, error) {
