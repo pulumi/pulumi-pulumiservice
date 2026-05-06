@@ -36,18 +36,26 @@ func TestBuildSchemaSucceeds(t *testing.T) {
 	}
 }
 
-// TestPathParamsRoundTripIntoOutputs pins the architecture invariant that
-// path parameters appear in BOTH inputs and outputs — the latter so Delete
-// can reconstruct its URL from saved state alone. Removing path params from
-// outputs would silently break refresh-after-restart for resources whose
-// engine handle hasn't carried inputs forward.
-func TestPathParamsRoundTripIntoOutputs(t *testing.T) {
+// TestPathParamsAreInputOnly pins the architecture invariant that path
+// parameters appear ONLY in inputs, not in outputs. Path params are program-
+// owned (the user types them); they live in inputProperties and inside the
+// synthesized resource ID. Read recovers them from req.Inputs (refresh) or
+// from req.ID (import); Delete recovers them from req.OldInputs.
+//
+// Note: a Pulumi-side name that is both a path param (via rename) AND a body
+// field — like Team's `name`, which renames to wire-side `teamName` for path
+// substitution but is also a legitimate body field echoed by Read — stays in
+// outputs because the read response carries it. The invariant only fails when
+// a name is purely a path param.
+func TestPathParamsAreInputOnly(t *testing.T) {
 	spec, meta := loadFixtures(t)
 	pkg, err := BuildSchema(spec, meta, "pulumiservice")
 	if err != nil {
 		t.Fatalf("BuildSchema: %v", err)
 	}
-	// Pick a representative resource with multi-segment path params.
+	// Pick a representative resource with multi-segment path params. orgName
+	// is purely a path param on Team (no body field of that name); `name` is
+	// a path param AND a body field, so it doesn't fit this assertion.
 	rm := meta.Resources["pulumiservice:v2:Team"]
 	tok := rm.Token
 	if tok == "" {
@@ -57,13 +65,11 @@ func TestPathParamsRoundTripIntoOutputs(t *testing.T) {
 	if !ok {
 		t.Fatalf("Team resource missing from package: %q", tok)
 	}
-	for _, name := range []string{"orgName", "name"} {
-		if _, ok := rs.InputProperties[name]; !ok {
-			t.Errorf("input %q missing from Team", name)
-		}
-		if _, ok := rs.Properties[name]; !ok {
-			t.Errorf("output %q missing from Team — Delete cannot reconstruct URL after process restart", name)
-		}
+	if _, ok := rs.InputProperties["orgName"]; !ok {
+		t.Errorf("input \"orgName\" missing from Team")
+	}
+	if _, ok := rs.Properties["orgName"]; ok {
+		t.Errorf("output \"orgName\" should not appear on Team — purely-path-param fields are input-only")
 	}
 }
 
@@ -342,6 +348,119 @@ func mustOp(t *testing.T, spec *Spec, id string) *Operation {
 		t.Fatalf("spec missing op %q", id)
 	}
 	return op
+}
+
+// TestBuildResourceOmitsPathParamsFromOutputs confirms that path parameters
+// appear in InputProperties only, not in ObjectTypeSpec.Properties. Identity-
+// bearing fields are program-owned (inputs + resource ID) and not echoed into
+// the cloud-owned output namespace.
+func TestBuildResourceOmitsPathParamsFromOutputs(t *testing.T) {
+	const specJSON = `{
+	  "openapi": "3.0.0",
+	  "components": {"schemas": {
+	    "Body": {"type": "object", "properties": {"name": {"type": "string"}}},
+	    "Read": {"type": "object", "properties": {
+	      "id":   {"type": "string"},
+	      "name": {"type": "string"}
+	    }}
+	  }},
+	  "paths": {
+	    "/things/{org}": {
+	      "post": {
+	        "operationId": "CreateThing",
+	        "parameters": [{"name": "org", "in": "path", "required": true, "schema": {"type": "string"}}],
+	        "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Body"}}}},
+	        "responses": {"200": {"content": {"application/json": {"schema": {"type": "object"}}}}}
+	      }
+	    },
+	    "/things/{org}/{id}": {
+	      "get": {
+	        "operationId": "GetThing",
+	        "parameters": [
+	          {"name": "org", "in": "path", "required": true, "schema": {"type": "string"}},
+	          {"name": "id",  "in": "path", "required": true, "schema": {"type": "string"}}
+	        ],
+	        "responses": {"200": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Read"}}}}}
+	      }
+	    }
+	  }
+	}`
+	spec, _ := ParseSpec([]byte(specJSON))
+	rm := ResourceMeta{
+		Operations: Operations{Create: "CreateThing", Read: "GetThing"},
+		IDFormat:   "{org}/{id}",
+	}
+	rs, err := buildResource(spec, nil, "test:index:Thing", rm)
+	if err != nil {
+		t.Fatalf("build: %v", err)
+	}
+	if _, ok := rs.InputProperties["org"]; !ok {
+		t.Errorf("inputs missing 'org' (path param should be input)")
+	}
+	if _, ok := rs.Properties["org"]; ok {
+		t.Errorf("outputs should not include 'org' (path param is input-only)")
+	}
+	if _, ok := rs.Properties["name"]; !ok {
+		t.Errorf("outputs missing 'name' (body field returned by read should be output)")
+	}
+}
+
+// TestBuildResourceRejectsPathParamsWithoutIDFormat confirms that any resource
+// declaring path parameters but no idFormat fails build with a clear error.
+// idFormat is the canonical identity carrier; without it, import is broken
+// and Delete cannot recover path params from state once disjointness lands.
+func TestBuildResourceRejectsPathParamsWithoutIDFormat(t *testing.T) {
+	const specJSON = `{
+	  "openapi": "3.0.0",
+	  "components": {"schemas": {
+	    "Body": {"type": "object", "properties": {"name": {"type": "string"}}}
+	  }},
+	  "paths": {
+	    "/things/{org}": {
+	      "post": {
+	        "operationId": "CreateThing",
+	        "parameters": [{"name": "org", "in": "path", "required": true, "schema": {"type": "string"}}],
+	        "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Body"}}}},
+	        "responses": {"200": {"content": {"application/json": {"schema": {"type": "object"}}}}}
+	      }
+	    }
+	  }
+	}`
+	spec, err := ParseSpec([]byte(specJSON))
+	if err != nil {
+		t.Fatalf("spec: %v", err)
+	}
+	rm := ResourceMeta{Operations: Operations{Create: "CreateThing"}}
+	_, err = buildResource(spec, nil, "test:index:Thing", rm)
+	if err == nil || !strings.Contains(err.Error(), "idFormat") {
+		t.Fatalf("expected idFormat error, got: %v", err)
+	}
+}
+
+// TestBuildResourceAcceptsResourceWithoutPathParams covers the other side of
+// the validation: a resource whose operations have no path params shouldn't
+// require idFormat.
+func TestBuildResourceAcceptsResourceWithoutPathParams(t *testing.T) {
+	const specJSON = `{
+	  "openapi": "3.0.0",
+	  "components": {"schemas": {
+	    "Body": {"type": "object", "properties": {"name": {"type": "string"}}}
+	  }},
+	  "paths": {
+	    "/things": {
+	      "post": {
+	        "operationId": "CreateThing",
+	        "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Body"}}}},
+	        "responses": {"200": {"content": {"application/json": {"schema": {"type": "object", "properties": {"id": {"type": "string"}}}}}}}
+	      }
+	    }
+	  }
+	}`
+	spec, _ := ParseSpec([]byte(specJSON))
+	rm := ResourceMeta{Operations: Operations{Create: "CreateThing"}}
+	if _, err := buildResource(spec, nil, "test:index:Thing", rm); err != nil {
+		t.Errorf("path-param-free resource should build without idFormat: %v", err)
+	}
 }
 
 // TestExamplesAppendedToDescription guards the format that SDK codegen relies

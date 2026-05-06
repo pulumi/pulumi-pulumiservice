@@ -21,10 +21,12 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"regexp"
 	"slices"
 	"strings"
@@ -35,6 +37,26 @@ import (
 
 // pathParamRE matches OpenAPI {param} placeholders in path strings.
 var pathParamRE = regexp.MustCompile(`\{([^/{}]+)\}`)
+
+// HTTPError is returned by execAndDecode when the upstream returns a non-2xx
+// status. Callers that need to branch on status (e.g., the requireImport
+// probe matching 404) can use errors.As to extract it.
+type HTTPError struct {
+	Method     string
+	URL        string
+	StatusCode int
+	Body       []byte
+}
+
+func (e *HTTPError) Error() string {
+	return fmt.Sprintf("rest: %s %s returned %d: %s", e.Method, e.URL, e.StatusCode, strings.TrimSpace(string(e.Body)))
+}
+
+// IsNotFound reports whether err is an HTTPError with status 404.
+func IsNotFound(err error) bool {
+	var herr *HTTPError
+	return errors.As(err, &herr) && herr.StatusCode == http.StatusNotFound
+}
 
 // Resources builds dispatchable handlers — one per metadata.resources entry —
 // suitable for registration with a runtime dispatcher.
@@ -50,6 +72,9 @@ func Resources(spec *Spec, metadata *Metadata) map[string]*Resource {
 		token := key
 		if rm.Token != "" {
 			token = rm.Token
+		}
+		if rm.Operations.Create != "" && rm.Operations.Create == rm.Operations.Update && !rm.RequireImport {
+			fmt.Fprintf(os.Stderr, "rest: %s has create==update operationId %q but requireImport is unset; re-run scaffold-metadata\n", token, rm.Operations.Create)
 		}
 		out[token] = &Resource{meta: rm, spec: spec}
 	}
@@ -335,21 +360,55 @@ func (r *Resource) Create(ctx context.Context, req p.CreateRequest) (p.CreateRes
 	if op == nil {
 		return p.CreateResponse{}, fmt.Errorf("create: resource has no create operation declared")
 	}
+	if r.meta.RequireImport {
+		if err := r.checkAlreadyExists(ctx, req.Properties); err != nil {
+			return p.CreateResponse{}, err
+		}
+	}
 	_, state, err := r.execAndDecode(ctx, op, req.Properties)
 	if err != nil {
 		return p.CreateResponse{}, err
 	}
-	state = r.populatePathParams(state, req.Properties)
-	if fetched, ok, err := r.fetchState(ctx, state, state); err != nil {
+	// Read-after-create must source path-parameter values from the inputs
+	// (req.Properties), not from state — most Pulumi Cloud create endpoints
+	// return sparse bodies (e.g. `{}`), so state alone won't carry path params
+	// once they're no longer echoed into outputs.
+	source := mergeMaps(req.Properties, state)
+	if fetched, ok, err := r.fetchState(ctx, source, state); err != nil {
 		return p.CreateResponse{}, fmt.Errorf("create: read-after-create: %w", err)
 	} else if ok {
-		state = r.populatePathParams(fetched, req.Properties)
+		state = fetched
 	}
 	id, err := r.synthesizeID(state, req.Properties)
 	if err != nil {
 		return p.CreateResponse{}, fmt.Errorf("create: %w", err)
 	}
 	return p.CreateResponse{ID: id, Properties: state}, nil
+}
+
+// checkAlreadyExists is the requireImport pre-flight: issue the read op
+// against the user's inputs and treat any 200 as "the resource exists; the
+// user must adopt it via pulumi import rather than blindly upserting."
+// 404 means it doesn't exist, proceed with create. Other errors propagate.
+//
+// Resources without a read op opt out of this check (the dispatch can't
+// probe what it can't read).
+func (r *Resource) checkAlreadyExists(ctx context.Context, inputs property.Map) error {
+	readOp, err := r.resolveOp("read", r.meta.Operations.Read)
+	if err != nil {
+		return err
+	}
+	if readOp == nil {
+		return nil
+	}
+	_, _, err = r.execAndDecode(ctx, readOp, inputs)
+	if err == nil {
+		return fmt.Errorf("resource already exists; use the `import` resource option to bring it under Pulumi management instead of creating a new one")
+	}
+	if IsNotFound(err) {
+		return nil
+	}
+	return fmt.Errorf("requireImport probe: %w", err)
 }
 
 // synthesizeID returns the resource ID. When meta.IDFormat is set, it's used
@@ -423,11 +482,13 @@ func synthesizeIDFromFormat(format string, state, inputs property.Map) (string, 
 
 // parseIDIntoInputs is the inverse of synthesizeIDFromFormat: given a Pulumi
 // resource ID and the format template, recover the placeholder values and
-// merge them into inputs. Returns the original inputs unchanged when no
-// IDFormat is declared, or when inputs are already non-empty (engine-driven
-// refresh — only the import path arrives with empty inputs).
+// merge them into inputs without overwriting existing keys. Returns the
+// original inputs unchanged when no IDFormat is declared or the ID doesn't
+// match the format. Used by the import path (empty inputs) and by Read /
+// Delete to recover path params no longer carried in state after the
+// disjointness change.
 func (r *Resource) parseIDIntoInputs(id string, inputs property.Map) property.Map {
-	if r.meta.IDFormat == "" || inputs.Len() > 0 {
+	if r.meta.IDFormat == "" {
 		return inputs
 	}
 	re, names, err := compileIDFormatRegex(r.meta.IDFormat)
@@ -439,9 +500,15 @@ func (r *Resource) parseIDIntoInputs(id string, inputs property.Map) property.Ma
 		return inputs
 	}
 	out := map[string]property.Value{}
+	for k, v := range inputs.AllStable {
+		out[k] = v
+	}
 	for i, name := range names {
 		if i+1 >= len(matches) {
 			break
+		}
+		if _, exists := out[name]; exists {
+			continue
 		}
 		out[name] = property.New(matches[i+1])
 	}
@@ -561,16 +628,16 @@ func (r *Resource) Update(ctx context.Context, req p.UpdateRequest) (p.UpdateRes
 	if err != nil {
 		return p.UpdateResponse{}, err
 	}
-	state = r.populatePathParams(state, src)
 	return p.UpdateResponse{Properties: state}, nil
 }
 
 // Delete fires the delete op (if declared). Resources without a delete op
 // quietly succeed; the engine drops the state.
 //
-// Path parameters are sourced from a union of (state, OldInputs) so that
-// stacks created before path params were round-tripped into outputs can
-// still be deleted: OldInputs preserves the original user inputs.
+// Path parameters are sourced from req.OldInputs (always present at delete
+// time) merged with req.Properties as a fallback. State no longer carries
+// path params after the disjointness change — they live only in inputs and
+// the synthesized ID.
 func (r *Resource) Delete(ctx context.Context, req p.DeleteRequest) error {
 	op, err := r.resolveOp("delete", r.meta.Operations.Delete)
 	if err != nil {
@@ -582,43 +649,6 @@ func (r *Resource) Delete(ctx context.Context, req p.DeleteRequest) error {
 	src := mergeMaps(req.Properties, req.OldInputs)
 	_, _, err = r.execAndDecode(ctx, op, src)
 	return err
-}
-
-// populatePathParams enriches the response state with path-parameter
-// values from inputs. Pulumi Cloud endpoints frequently return empty or
-// minimal bodies (e.g. POST /api/stacks/{orgName}/{projectName}
-// returns `{}` on success). Without this enrichment, downstream resources
-// referencing `${parent.projectName}` get a missing-input error because
-// the parent's state never carried projectName forward — even though the
-// schema declares it as an output.
-//
-// Walks the path params of create + read ops, copying each Pulumi-named
-// input into state when state doesn't already carry that key.
-func (r *Resource) populatePathParams(state, inputs property.Map) property.Map {
-	out := map[string]property.Value{}
-	for k, v := range state.AllStable {
-		out[k] = v
-	}
-	for _, opID := range []string{r.meta.Operations.Create, r.meta.Operations.Read} {
-		if opID == "" {
-			continue
-		}
-		op, ok := r.spec.Op(opID)
-		if !ok {
-			continue
-		}
-		for _, m := range pathParamRE.FindAllStringSubmatch(op.Path, -1) {
-			wireName := m[1]
-			pulName := pulumiName(wireName, r.meta.Renames)
-			if _, exists := out[pulName]; exists {
-				continue
-			}
-			if v, ok := inputs.GetOk(pulName); ok {
-				out[pulName] = v
-			}
-		}
-	}
-	return property.NewMap(out)
 }
 
 // mergeMaps returns a property.Map that exposes every key from any of the
@@ -678,7 +708,12 @@ func (r *Resource) execAndDecode(ctx context.Context, op *Operation, inputs prop
 		return nil, property.Map{}, fmt.Errorf("rest: read response body: %w", err)
 	}
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return respBody, property.Map{}, fmt.Errorf("rest: %s %s returned %d: %s", op.Method, url, resp.StatusCode, strings.TrimSpace(string(respBody)))
+		return respBody, property.Map{}, &HTTPError{
+			Method:     op.Method,
+			URL:        url,
+			StatusCode: resp.StatusCode,
+			Body:       respBody,
+		}
 	}
 
 	if len(respBody) == 0 || resp.StatusCode == http.StatusNoContent {

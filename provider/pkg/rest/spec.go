@@ -29,6 +29,7 @@ type Operation struct {
 	RequestRef string         // $ref into components.schemas, if the body is a $ref
 	ResponseRef string        // $ref of the 2xx response body, if any
 	Description string
+	Deprecated bool           // true when the upstream spec marks this op deprecated
 	Raw        map[string]any // entire operation object, for callers that need fields we don't model
 }
 
@@ -106,6 +107,17 @@ func (s *Spec) Op(id string) (*Operation, bool) {
 	return op, ok
 }
 
+// AllOps returns a defensive copy of the operationId → Operation map,
+// for callers that need to enumerate every op in the spec (e.g., a test
+// that asserts every op is classified).
+func (s *Spec) AllOps() map[string]*Operation {
+	out := make(map[string]*Operation, len(s.ops))
+	for id, op := range s.ops {
+		out[id] = op
+	}
+	return out
+}
+
 // ResolveSchema looks up a $ref string of the form "#/components/schemas/Name"
 // and returns the raw schema object. Returns false for $refs we can't resolve
 // (external references, malformed strings).
@@ -133,6 +145,14 @@ func parseOperation(id, path, method string, raw map[string]any) *Operation {
 	}
 	if d, ok := raw["description"].(string); ok {
 		op.Description = d
+	}
+	if dep, _ := raw["deprecated"].(bool); dep {
+		op.Deprecated = true
+	}
+	if rp, ok := raw["x-pulumi-route-property"].(map[string]any); ok {
+		if v, _ := rp["Visibility"].(string); v == "Deprecated" {
+			op.Deprecated = true
+		}
 	}
 	if params, ok := raw["parameters"].([]any); ok {
 		for _, p := range params {

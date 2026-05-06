@@ -243,7 +243,12 @@ func TestParseIDIntoInputsRecoversPathParams(t *testing.T) {
 	}
 }
 
-func TestParseIDIntoInputs_NonEmptyInputsPreserved(t *testing.T) {
+// TestParseIDIntoInputs_FillsMissingKeys confirms that parseIDIntoInputs
+// merges ID-derived path params into a non-empty inputs map, only filling
+// keys that aren't already present. This is the Delete/refresh case where
+// inputs may be partially populated and existing values must not be
+// overwritten by ID-derived ones.
+func TestParseIDIntoInputs_FillsMissingKeys(t *testing.T) {
 	spec := syntheticSpec(t)
 	r := fooResource(spec, nil, "{org}/{name}", false)
 	original := property.NewMap(map[string]property.Value{
@@ -253,7 +258,17 @@ func TestParseIDIntoInputs_NonEmptyInputsPreserved(t *testing.T) {
 	got := r.parseIDIntoInputs("other/different", original)
 	gotOrg, _ := got.GetOk("org")
 	if gotOrg.AsString() != "existing-org" {
-		t.Errorf("non-empty inputs were overwritten: %q", gotOrg.AsString())
+		t.Errorf("org: got %q, want %q (existing inputs must not be overwritten)", gotOrg.AsString(), "existing-org")
+	}
+	gotName, ok := got.GetOk("name")
+	if !ok {
+		t.Errorf("name: missing — should have been filled from ID")
+	} else if gotName.AsString() != "different" {
+		t.Errorf("name: got %q, want %q (filled from ID)", gotName.AsString(), "different")
+	}
+	gotExtra, _ := got.GetOk("extra")
+	if gotExtra.AsString() != "user-data" {
+		t.Errorf("extra: got %q, want %q (user-supplied keys preserved)", gotExtra.AsString(), "user-data")
 	}
 }
 

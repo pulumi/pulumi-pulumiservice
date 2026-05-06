@@ -89,6 +89,25 @@ func buildResource(spec *Spec, _ *Metadata, _ string, rm ResourceMeta) (*schema.
 		}
 	}
 
+	// idFormat is the canonical identity carrier for any resource with path
+	// parameters. Without it, Read on import cannot recover path-param values
+	// from the resource ID and Delete (after path params are removed from
+	// state) has no fallback. Resources without path params don't need one.
+	if rm.IDFormat == "" {
+		ops := []*Operation{create, read}
+		if uop, _ := spec.Op(rm.Operations.Update); uop != nil {
+			ops = append(ops, uop)
+		}
+		if dop, _ := spec.Op(rm.Operations.Delete); dop != nil {
+			ops = append(ops, dop)
+		}
+		for _, op := range ops {
+			if op != nil && hasPathParams(op) {
+				return nil, fmt.Errorf("idFormat is required for resources with path parameters")
+			}
+		}
+	}
+
 	// Inputs come from the create op: path params + request body schema.
 	// Path params from read/update/delete are also exposed as inputs since
 	// users supply them on create (the resource's identifier is part of the
@@ -122,20 +141,8 @@ func buildResource(spec *Spec, _ *Metadata, _ string, rm ResourceMeta) (*schema.
 			return nil, fmt.Errorf("outputs (fallback to create): %w", err)
 		}
 	}
-	// Path parameters need to round-trip through state so Delete (which
-	// reads from saved state, not from inputs) can construct its URL.
-	// Without this, deleting a resource fails with "path parameter X
-	// missing from inputs" because X never made it into outputs.
 	if outputs == nil {
 		outputs = map[string]schema.PropertySpec{}
-	}
-	for _, op := range []*Operation{create, read} {
-		if op == nil {
-			continue
-		}
-		if err := mergePathParamsAsInputs(outputs, &requiredOutputs, op, rm); err != nil {
-			return nil, fmt.Errorf("outputs (path params): %w", err)
-		}
 	}
 
 	if err := mergeEmitOnCreateOutputs(spec, create, rm, outputs); err != nil {

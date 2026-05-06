@@ -138,6 +138,7 @@ type metadataDoc struct {
 	Package   string                     `json:"package,omitempty"`
 	Note      string                     `json:"_note,omitempty"`
 	Excluded  []string                   `json:"_excluded,omitempty"`
+	V0Aliases map[string][]string        `json:"_v0Aliases,omitempty"`
 	Resources map[string]json.RawMessage `json:"resources"`
 }
 
@@ -182,6 +183,16 @@ func main() {
 
 	modules := deriveModules(candidates, parsedSpec)
 
+	// Validate _v0Aliases keys reference real v2 tokens. Catches typos that
+	// would otherwise silently fail to populate.
+	for v2tok := range doc.V0Aliases {
+		if _, ok := doc.Resources[v2tok]; !ok {
+			if _, ok := candidates[v2tok]; !ok {
+				fail("_v0Aliases references unknown v2 token %q (no entry in resources or candidates)", v2tok)
+			}
+		}
+	}
+
 	added, updated := 0, 0
 	autoNameRecommendations := map[string]map[string]int{}
 	for tok, ops := range candidates {
@@ -196,8 +207,10 @@ func main() {
 			Token:               deriveToken(doc.Package, tok, modules[tok]),
 			IDFormat:            inferIDFormat(parsedSpec, ops, renames),
 			DeleteBeforeReplace: inferDeleteBeforeReplace(parsedSpec, ops, renames),
+			RequireImport:       inferRequireImport(parsedSpec, ops),
 			EmitOnCreateFields:  inferEmitOnCreate(parsedSpec, ops, renames),
 			UnorderedFields:     inferUnordered(parsedSpec, ops, renames),
+			V0Aliases:           doc.V0Aliases[tok],
 		}
 		if rec := inferAutoNameRecommendations(parsedSpec, ops, renames); len(rec) > 0 {
 			autoNameRecommendations[tok] = rec
@@ -332,6 +345,29 @@ func inferEmitOnCreate(spec *rest.Spec, ops derivedOps, renames map[string]strin
 	}
 	sort.Strings(out)
 	return out
+}
+
+// inferRequireImport returns true when the create op is upsert-shaped:
+//   - HTTP method PUT or PATCH (configuration singleton), OR
+//   - create operationId equals update operationId (e.g., the upsert
+//     promotion in derive() below, or a hand-curated mapping).
+//
+// Both signals indicate the upstream API has no separate "create" — calling
+// it twice silently overwrites instead of erroring on conflict (Pulumi#9925).
+// The runtime uses this flag to gate Create on a pre-flight read probe.
+func inferRequireImport(spec *rest.Spec, ops derivedOps) bool {
+	if ops.Create != "" && ops.Create == ops.Update {
+		return true
+	}
+	createOp := opOrNil(spec, ops.Create)
+	if createOp == nil {
+		return false
+	}
+	switch createOp.Method {
+	case "PUT", "PATCH":
+		return true
+	}
+	return false
 }
 
 // inferDeleteBeforeReplace returns true when a duplicate create would collide
@@ -474,8 +510,10 @@ type derivations struct {
 	Token               string
 	IDFormat            string
 	DeleteBeforeReplace bool
+	RequireImport       bool
 	EmitOnCreateFields  []string // Pulumi-side field names
 	UnorderedFields     []string // Pulumi-side field names
+	V0Aliases           []string // v0 tokens to add to aliases when present
 }
 
 // mergeOperations layers derived fields onto an existing per-resource entry.
@@ -530,7 +568,11 @@ func mergeOperations(existing json.RawMessage, ops derivedOps, d derivations) (j
 		}
 	}
 	if d.Token != "" {
-		if _, has := entry["token"]; !has {
+		if existing, has := entry["token"].(string); has {
+			if existing != d.Token {
+				fmt.Fprintf(os.Stderr, "  INFO: token pinned at %q; heuristic now suggests %q (preserving pin)\n", existing, d.Token)
+			}
+		} else {
 			entry["token"] = d.Token
 		}
 	}
@@ -544,6 +586,14 @@ func mergeOperations(existing json.RawMessage, ops derivedOps, d derivations) (j
 			entry["deleteBeforeReplace"] = true
 		}
 	}
+	if d.RequireImport {
+		if _, has := entry["requireImport"]; !has {
+			entry["requireImport"] = true
+		}
+	}
+	for _, a := range d.V0Aliases {
+		addAlias(entry, a)
+	}
 	for _, name := range d.EmitOnCreateFields {
 		setFieldFlag(entry, name, "emitOnCreate", true)
 	}
@@ -556,6 +606,19 @@ func mergeOperations(existing json.RawMessage, ops derivedOps, d derivations) (j
 		return nil, false, err
 	}
 	return encoded, changed, nil
+}
+
+// addAlias appends the given token to entry.aliases if it's not already
+// present. Aliases is a list to allow multiple v0 → v2 lineages on a
+// single resource.
+func addAlias(entry map[string]any, token string) {
+	existing, _ := entry["aliases"].([]any)
+	for _, a := range existing {
+		if s, ok := a.(string); ok && s == token {
+			return
+		}
+	}
+	entry["aliases"] = append(existing, token)
 }
 
 // setFieldFlag sets entry.fields[fieldName].flag = value, but only when the
@@ -814,7 +877,10 @@ func sameOps(prev map[string]any, next map[string]string) bool {
 // encodeStable marshals a map with deterministic key ordering: a preferred
 // order for known fields, then alphabetical for the rest.
 func encodeStable(entry map[string]any) (json.RawMessage, error) {
-	preferred := []string{"operations", "idField", "idFormat", "deleteBeforeReplace", "token", "aliases", "renames", "fields", "outputs", "outputsExclude", "description", "examples"}
+	preferred := []string{"operations", "idField", "idFormat",
+		"deleteBeforeReplace", "requireImport", "token",
+		"aliases", "renames", "fields", "outputs",
+		"outputsExclude", "description", "examples"}
 	var keys []string
 	seen := map[string]bool{}
 	for _, k := range preferred {
@@ -870,6 +936,15 @@ func writeMetadata(path string, doc *metadataDoc) error {
 			return err
 		}
 		b.WriteString("  \"_excluded\": ")
+		b.Write(ex)
+		b.WriteString(",\n")
+	}
+	if len(doc.V0Aliases) > 0 {
+		ex, err := json.MarshalIndent(doc.V0Aliases, "  ", "  ")
+		if err != nil {
+			return err
+		}
+		b.WriteString("  \"_v0Aliases\": ")
 		b.Write(ex)
 		b.WriteString(",\n")
 	}
@@ -1149,14 +1224,17 @@ func routePrefix(path string) string {
 	return strings.Join(parts, "/")
 }
 
-// deriveToken constructs the user-facing Pulumi token. Empty when the
-// candidate is a singleton (no shared module); resource then stays at the
-// metadata-key form. Type name is shortened by dropping a redundant module
-// prefix (AgentPool in module agents → Pool) and a trailing route-mangled
-// suffix (Environment_esc_environments in module esc → Environment).
+// deriveToken constructs the user-facing Pulumi token. For singletons (no
+// shared module), it returns the metadata-key form so the token is locked
+// from first appearance — this prevents a later sibling URL silently
+// promoting the resource into a module and shifting its user-facing token.
+// For multi-resource modules, type name is shortened by dropping a
+// redundant module prefix (AgentPool in module agents → Pool) and a
+// trailing route-mangled suffix (Environment_esc_environments in module
+// esc → Environment).
 func deriveToken(pkg, key string, ma moduleAssignment) string {
 	if ma.Module == "" {
-		return ""
+		return key
 	}
 	typ := key
 	if i := strings.LastIndex(key, ":"); i >= 0 {

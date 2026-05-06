@@ -30,10 +30,14 @@ import (
 )
 
 // mockTransport returns canned responses keyed by HTTP method+path. Path
-// matching is exact against the request URL's path component.
+// matching is exact against the request URL's path component. Tests that
+// need stateful behavior (e.g., GET returns 404 before PUT, 200 after) can
+// set responseFn instead, which is called for every request and overrides
+// the responses map.
 type mockTransport struct {
-	responses map[string]mockResponse
-	calls     []string // method + " " + path, in order
+	responses  map[string]mockResponse
+	responseFn func(req *http.Request) mockResponse
+	calls      []string // method + " " + path, in order
 }
 
 type mockResponse struct {
@@ -44,6 +48,13 @@ type mockResponse struct {
 func (m *mockTransport) Do(_ context.Context, req *http.Request) (*http.Response, error) {
 	key := req.Method + " " + req.URL.Path
 	m.calls = append(m.calls, key)
+	if m.responseFn != nil {
+		resp := m.responseFn(req)
+		return &http.Response{
+			StatusCode: resp.status,
+			Body:       io.NopCloser(bytes.NewReader([]byte(resp.body))),
+		}, nil
+	}
 	resp, ok := m.responses[key]
 	if !ok {
 		return &http.Response{
@@ -110,8 +121,14 @@ func TestCreateSynthesizesID(t *testing.T) {
 	cases := []struct {
 		// Lookup token (the metadata.json key).
 		token string
-		// Mock HTTP responses keyed by "<METHOD> <path>".
+		// Mock HTTP responses keyed by "<METHOD> <path>". Mutually exclusive
+		// with responseFn.
 		responses map[string]mockResponse
+		// responseFn, if set, overrides responses for stateful behavior
+		// (e.g., GET returns 404 before mutating call, 200 after — needed
+		// for resources with requireImport, where the read op fires both
+		// as a pre-flight probe and as read-after-create).
+		responseFn func() func(req *http.Request) mockResponse
 		// Inputs supplied by the user.
 		inputs map[string]any
 		// Expected resource ID after Create.
@@ -176,18 +193,24 @@ func TestCreateSynthesizesID(t *testing.T) {
 			wantID: "test-org/infra",
 		},
 		{
-			// DefaultOrganization: singleton at /api/user/organizations/default;
-			// create path is POST /api/user/organizations/{orgName}/default.
+			// DefaultOrganization: requireImport singleton — GET returns 404
+			// for the probe (resource doesn't exist), then 200 for the post-
+			// create read after the mutating call writes it.
 			token: "pulumiservice:v2:DefaultOrganization",
-			responses: map[string]mockResponse{
-				"POST /api/user/organizations/test-org/default": {
-					status: 200,
-					body:   `{}`,
-				},
-				"GET /api/user/organizations/default": {
-					status: 200,
-					body:   `{"orgName":"test-org"}`,
-				},
+			responseFn: func() func(req *http.Request) mockResponse {
+				written := false
+				return func(req *http.Request) mockResponse {
+					switch {
+					case req.Method == "GET" && !written:
+						return mockResponse{status: 404, body: `{"error":"not found"}`}
+					case req.Method == "GET":
+						return mockResponse{status: 200, body: `{"orgName":"test-org"}`}
+					case req.URL.Path == "/api/user/organizations/test-org/default":
+						written = true
+						return mockResponse{status: 200, body: `{}`}
+					}
+					return mockResponse{status: 500, body: "unexpected"}
+				}
 			},
 			inputs: map[string]any{
 				"orgName": "test-org",
@@ -195,17 +218,23 @@ func TestCreateSynthesizesID(t *testing.T) {
 			wantID: "test-org",
 		},
 		{
-			// AuditLogExportConfiguration: singleton, all ops on the same path.
+			// AuditLogExportConfiguration: requireImport singleton, all ops
+			// on the same path — same staging pattern as DefaultOrganization.
 			token: "pulumiservice:v2:AuditLogExportConfiguration",
-			responses: map[string]mockResponse{
-				"POST /api/orgs/test-org/auditlogs/export/config": {
-					status: 200,
-					body:   `{}`,
-				},
-				"GET /api/orgs/test-org/auditlogs/export/config": {
-					status: 200,
-					body:   `{}`,
-				},
+			responseFn: func() func(req *http.Request) mockResponse {
+				written := false
+				return func(req *http.Request) mockResponse {
+					switch {
+					case req.Method == "GET" && !written:
+						return mockResponse{status: 404, body: `{"error":"not found"}`}
+					case req.Method == "GET":
+						return mockResponse{status: 200, body: `{}`}
+					case req.Method == "POST":
+						written = true
+						return mockResponse{status: 200, body: `{}`}
+					}
+					return mockResponse{status: 500, body: "unexpected"}
+				}
 			},
 			inputs: map[string]any{
 				"orgName": "test-org",
@@ -252,6 +281,9 @@ func TestCreateSynthesizesID(t *testing.T) {
 			}
 
 			mock := &mockTransport{responses: tc.responses}
+			if tc.responseFn != nil {
+				mock.responseFn = tc.responseFn()
+			}
 			SetTransportResolver(func(_ context.Context) (Transport, error) {
 				return mock, nil
 			})
@@ -266,6 +298,72 @@ func TestCreateSynthesizesID(t *testing.T) {
 			}
 			t.Logf("OK %s -> ID=%q (calls: %v)", tc.token, resp.ID, mock.calls)
 		})
+	}
+}
+
+// TestCreateReadAfterCreateSourcesFromInputs confirms that the read-after-
+// create URL is built from the user inputs (req.Properties), not from the
+// (potentially sparse) create response. This is what lets Phase D drop path
+// params from state without breaking the read-after-create round-trip: the
+// read URL substitution still finds path-param values via inputs, even when
+// the create response carried only a server-assigned id.
+func TestCreateReadAfterCreateSourcesFromInputs(t *testing.T) {
+	const specJSON = `{
+	  "openapi": "3.0.0",
+	  "components": {"schemas": {
+	    "Body":  {"type": "object", "properties": {"name": {"type": "string"}}},
+	    "Read":  {"type": "object", "properties": {
+	      "id":     {"type": "string"},
+	      "name":   {"type": "string"},
+	      "status": {"type": "string"}
+	    }}
+	  }},
+	  "paths": {
+	    "/things/{org}": {
+	      "post": {
+	        "operationId": "CreateThing",
+	        "parameters": [{"name": "org", "in": "path", "required": true, "schema": {"type": "string"}}],
+	        "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Body"}}}},
+	        "responses": {"200": {"content": {"application/json": {"schema": {"type": "object", "properties": {"id": {"type": "string"}}}}}}}
+	      }
+	    },
+	    "/things/{org}/{id}": {
+	      "get": {
+	        "operationId": "GetThing",
+	        "parameters": [
+	          {"name": "org", "in": "path", "required": true, "schema": {"type": "string"}},
+	          {"name": "id",  "in": "path", "required": true, "schema": {"type": "string"}}
+	        ],
+	        "responses": {"200": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Read"}}}}}
+	      }
+	    }
+	  }
+	}`
+	spec, _ := ParseSpec([]byte(specJSON))
+	r := &Resource{
+		spec: spec,
+		meta: ResourceMeta{
+			Operations: Operations{Create: "CreateThing", Read: "GetThing"},
+			IDFormat:   "{org}/{id}",
+		},
+	}
+	mock := &mockTransport{responses: map[string]mockResponse{
+		"POST /things/acme":        {status: 200, body: `{"id":"thing-1"}`},
+		"GET /things/acme/thing-1": {status: 200, body: `{"id":"thing-1","name":"foo","status":"ready"}`},
+	}}
+	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+
+	resp, err := r.Create(context.Background(), p.CreateRequest{
+		Properties: propMap(map[string]any{"org": "acme", "name": "foo"}),
+	})
+	if err != nil {
+		t.Fatalf("create: %v\n  calls: %v", err, mock.calls)
+	}
+	if len(mock.calls) != 2 || mock.calls[1] != "GET /things/acme/thing-1" {
+		t.Errorf("expected POST then GET /things/acme/thing-1, got: %v", mock.calls)
+	}
+	if v, ok := resp.Properties.GetOk("status"); !ok || v.AsString() != "ready" {
+		t.Errorf("state missing read-only field 'status': ok=%v v=%q", ok, v.AsString())
 	}
 }
 
@@ -348,14 +446,159 @@ func TestCreateReadsAfterCreate(t *testing.T) {
 			t.Errorf("state[%q] is empty; want value from read response", key)
 		}
 	}
-	// Path params should still be present (populatePathParams runs after fetchState).
-	if v, ok := resp.Properties.GetOk("org"); !ok || v.AsString() != "acme" {
-		t.Errorf("state lost path-param `org` after read-after-create: ok=%v v=%q", ok, v.AsString())
+	// Path params are program-owned: they belong in inputs and the resource ID,
+	// not in cloud-owned state. After read-after-create, state should carry only
+	// what the read response returned, plus any emit-on-create preserves.
+	if _, ok := resp.Properties.GetOk("org"); ok {
+		t.Errorf("state should not carry path-param `org` (program owns inputs, cloud owns outputs)")
 	}
 	// ID is unchanged by read.
 	if resp.ID != "acme/thing-1" {
 		t.Errorf("ID: got %q, want %q", resp.ID, "acme/thing-1")
 	}
+}
+
+// TestCreateRequireImport_BlocksWhenExists verifies that Create with
+// RequireImport=true issues the read op first and aborts when the resource
+// already exists upstream, instead of silently upserting.
+func TestCreateRequireImport_BlocksWhenExists(t *testing.T) {
+	spec := requireImportSpec(t)
+	r := &Resource{
+		spec: spec,
+		meta: ResourceMeta{
+			Operations:    Operations{Create: "PutThing", Read: "GetThing", Update: "PutThing"},
+			IDFormat:      "{org}",
+			RequireImport: true,
+		},
+	}
+	mock := &mockTransport{responses: map[string]mockResponse{
+		"GET /things/acme": {status: 200, body: `{"org":"acme","value":"existing"}`},
+	}}
+	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+
+	_, err := r.Create(context.Background(), p.CreateRequest{
+		Properties: propMap(map[string]any{"org": "acme", "value": "new"}),
+	})
+	if err == nil {
+		t.Fatalf("expected error when resource already exists, got nil")
+	}
+	if !strings.Contains(err.Error(), "already exists") || !strings.Contains(err.Error(), "import") {
+		t.Errorf("error message should mention `already exists` and `import`: %v", err)
+	}
+	if len(mock.calls) != 1 || mock.calls[0] != "GET /things/acme" {
+		t.Errorf("expected exactly one GET, got: %v", mock.calls)
+	}
+}
+
+// TestCreateRequireImport_ProceedsOn404 verifies that a 404 from the probe
+// is treated as "not yet exists" and Create proceeds with the upsert call.
+func TestCreateRequireImport_ProceedsOn404(t *testing.T) {
+	spec := requireImportSpec(t)
+	r := &Resource{
+		spec: spec,
+		meta: ResourceMeta{
+			Operations:    Operations{Create: "PutThing", Read: "GetThing", Update: "PutThing"},
+			IDFormat:      "{org}",
+			RequireImport: true,
+		},
+	}
+	var putCalled bool
+	mock := &mockTransport{responseFn: func(req *http.Request) mockResponse {
+		switch req.Method {
+		case "PUT":
+			putCalled = true
+			return mockResponse{status: 200, body: `{"org":"acme","value":"new"}`}
+		case "GET":
+			if putCalled {
+				return mockResponse{status: 200, body: `{"org":"acme","value":"new"}`}
+			}
+			return mockResponse{status: 404, body: `{"error":"not found"}`}
+		}
+		return mockResponse{status: 500, body: "unexpected"}
+	}}
+	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+
+	resp, err := r.Create(context.Background(), p.CreateRequest{
+		Properties: propMap(map[string]any{"org": "acme", "value": "new"}),
+	})
+	if err != nil {
+		t.Fatalf("create should proceed on 404, got: %v\n  calls: %v", err, mock.calls)
+	}
+	if resp.ID != "acme" {
+		t.Errorf("ID: got %q, want %q", resp.ID, "acme")
+	}
+	// Probe (GET, 404) → create (PUT) → read-after-create (GET, now 200).
+	wantCalls := []string{"GET /things/acme", "PUT /things/acme", "GET /things/acme"}
+	if len(mock.calls) != len(wantCalls) {
+		t.Fatalf("expected %d calls, got %d: %v", len(wantCalls), len(mock.calls), mock.calls)
+	}
+	for i, want := range wantCalls {
+		if mock.calls[i] != want {
+			t.Errorf("call %d: got %q, want %q", i, mock.calls[i], want)
+		}
+	}
+}
+
+// TestCreateRequireImport_NoReadOp_OptsOut verifies that RequireImport is a
+// no-op for resources without a read op declared. The dispatch can't probe
+// what it can't read.
+func TestCreateRequireImport_NoReadOp_OptsOut(t *testing.T) {
+	spec := requireImportSpec(t)
+	r := &Resource{
+		spec: spec,
+		meta: ResourceMeta{
+			Operations:    Operations{Create: "PutThing", Update: "PutThing"},
+			IDFormat:      "{org}",
+			RequireImport: true,
+		},
+	}
+	mock := &mockTransport{responses: map[string]mockResponse{
+		"PUT /things/acme": {status: 200, body: `{"org":"acme","value":"new"}`},
+	}}
+	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+
+	_, err := r.Create(context.Background(), p.CreateRequest{
+		Properties: propMap(map[string]any{"org": "acme", "value": "new"}),
+	})
+	if err != nil {
+		t.Fatalf("create should proceed without probe, got: %v\n  calls: %v", err, mock.calls)
+	}
+	if len(mock.calls) != 1 || mock.calls[0] != "PUT /things/acme" {
+		t.Errorf("expected only the PUT call, got: %v", mock.calls)
+	}
+}
+
+// requireImportSpec builds a minimal synthetic spec with a single PUT-shaped
+// upsert resource at /things/{org}, used by the RequireImport tests.
+func requireImportSpec(t *testing.T) *Spec {
+	t.Helper()
+	const specJSON = `{
+	  "openapi": "3.0.0",
+	  "components": {"schemas": {
+	    "Body":  {"type": "object", "properties": {"value": {"type": "string"}}},
+	    "Read":  {"type": "object", "properties": {"org": {"type": "string"}, "value": {"type": "string"}}}
+	  }},
+	  "paths": {
+	    "/things/{org}": {
+	      "put": {
+	        "operationId": "PutThing",
+	        "parameters": [{"name": "org", "in": "path", "required": true, "schema": {"type": "string"}}],
+	        "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Body"}}}},
+	        "responses": {"200": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Read"}}}}}
+	      },
+	      "get": {
+	        "operationId": "GetThing",
+	        "parameters": [{"name": "org", "in": "path", "required": true, "schema": {"type": "string"}}],
+	        "responses": {"200": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Read"}}}}}
+	      }
+	    }
+	  }
+	}`
+	spec, err := ParseSpec([]byte(specJSON))
+	if err != nil {
+		t.Fatalf("parse synthetic spec: %v", err)
+	}
+	return spec
 }
 
 // TestCreateMissingPathParam verifies that synthesizeID returns a clear
