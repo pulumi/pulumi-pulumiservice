@@ -90,6 +90,14 @@ type ResourceMeta struct {
 	// and that aren't auto-named.
 	DeleteBeforeReplace bool `json:"deleteBeforeReplace,omitempty"`
 
+	// RequireImport gates Create on a pre-flight existence check. When true,
+	// Create issues the read op first; a 200 response means the resource
+	// already exists and Create fails with an "import this resource" error
+	// instead of silently upserting. Use for resources whose underlying API
+	// is PUT/PATCH-shaped (configuration singletons) or where create and
+	// update map to the same operationId.
+	RequireImport bool `json:"requireImport,omitempty"`
+
 	// Description is an optional override of the resource description in the
 	// generated schema. If empty, the schema builder falls back to the create
 	// operation's description.
