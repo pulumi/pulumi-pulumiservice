@@ -24,7 +24,11 @@ type OrganizationRole struct {
 	Name pulumi.StringOutput `pulumi:"name"`
 	// The Pulumi Cloud organization name.
 	OrganizationName pulumi.StringOutput `pulumi:"organizationName"`
-	// The role's permission descriptor tree. Two kinds: `{kind: "allow", permissions: ["<scope>", ...]}` to grant scopes, or `{kind: "group", entries: [...]}` to compose multiple grants. Either may carry an optional `on:` modifier — a single-key map `{environment: <uuid>}` / `{stack: <id>}` / `{insightsAccount: <id>}` — to scope the descriptor to one entity. For per-entity scoping, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the `on:`-modified Allow for you.
+	// The role's permission descriptor tree. Two shapes are accepted, and may be mixed at any node boundary.
+	//
+	// **Structured shape** — `{kind: "allow", permissions: ["<scope>", ...]}` to grant scopes, or `{kind: "group", entries: [...]}` to compose multiple grants. Either may carry an optional `on:` modifier — a single-key map `{environment: <uuid>}` / `{stack: <id>}` / `{insightsAccount: <id>}` / `{team: <id>}` — to scope the descriptor to one entity. For the common case prefer the `buildEnvironmentScopedPermissions` / `buildStackScopedPermissions` / `buildInsightsAccountScopedPermissions` helpers, which build the `on:`-modified Allow for you.
+	//
+	// **Pass-through shape** — for richer Cloud-side descriptors (`Compose`, `Condition` with non-Equal booleans, `IfThenElse`, `Select`, future types), use the PascalCase wire type name as the kind value: `{kind: "PermissionDescriptorCompose", permissionDescriptors: [...]}`. The descriptor and any nested `PermissionExpression*` / `PermissionLiteralExpression*` nodes use `kind` as their discriminator (the provider renames it to `__type` at the wire boundary, which keeps Python's RPC deserializer compatible). The full Cloud-side schema lives in the `pulumi-service` repository at `specification/src/main/java/com/pulumi/model/PermissionDescriptor.java` and its sibling `Permission*.java` files.
 	Permissions pulumi.MapOutput `pulumi:"permissions"`
 	// The resource type the role's permissions apply to. Defaults to `global` (the org-wide role that can be assigned to members and teams). Other valid values: `stack`, `environment`, `insights-account`.
 	ResourceType pulumi.StringPtrOutput `pulumi:"resourceType"`
@@ -93,7 +97,11 @@ type organizationRoleArgs struct {
 	Name string `pulumi:"name"`
 	// The Pulumi Cloud organization name.
 	OrganizationName string `pulumi:"organizationName"`
-	// The role's permission descriptor tree. Two kinds: `{kind: "allow", permissions: ["<scope>", ...]}` to grant scopes, or `{kind: "group", entries: [...]}` to compose multiple grants. Either may carry an optional `on:` modifier — a single-key map `{environment: <uuid>}` / `{stack: <id>}` / `{insightsAccount: <id>}` — to scope the descriptor to one entity. For per-entity scoping, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the `on:`-modified Allow for you.
+	// The role's permission descriptor tree. Two shapes are accepted, and may be mixed at any node boundary.
+	//
+	// **Structured shape** — `{kind: "allow", permissions: ["<scope>", ...]}` to grant scopes, or `{kind: "group", entries: [...]}` to compose multiple grants. Either may carry an optional `on:` modifier — a single-key map `{environment: <uuid>}` / `{stack: <id>}` / `{insightsAccount: <id>}` / `{team: <id>}` — to scope the descriptor to one entity. For the common case prefer the `buildEnvironmentScopedPermissions` / `buildStackScopedPermissions` / `buildInsightsAccountScopedPermissions` helpers, which build the `on:`-modified Allow for you.
+	//
+	// **Pass-through shape** — for richer Cloud-side descriptors (`Compose`, `Condition` with non-Equal booleans, `IfThenElse`, `Select`, future types), use the PascalCase wire type name as the kind value: `{kind: "PermissionDescriptorCompose", permissionDescriptors: [...]}`. The descriptor and any nested `PermissionExpression*` / `PermissionLiteralExpression*` nodes use `kind` as their discriminator (the provider renames it to `__type` at the wire boundary, which keeps Python's RPC deserializer compatible). The full Cloud-side schema lives in the `pulumi-service` repository at `specification/src/main/java/com/pulumi/model/PermissionDescriptor.java` and its sibling `Permission*.java` files.
 	Permissions map[string]interface{} `pulumi:"permissions"`
 	// The resource type the role's permissions apply to. Defaults to `global` (the org-wide role that can be assigned to members and teams). Other valid values: `stack`, `environment`, `insights-account`.
 	ResourceType *string `pulumi:"resourceType"`
@@ -107,7 +115,11 @@ type OrganizationRoleArgs struct {
 	Name pulumi.StringInput
 	// The Pulumi Cloud organization name.
 	OrganizationName pulumi.StringInput
-	// The role's permission descriptor tree. Two kinds: `{kind: "allow", permissions: ["<scope>", ...]}` to grant scopes, or `{kind: "group", entries: [...]}` to compose multiple grants. Either may carry an optional `on:` modifier — a single-key map `{environment: <uuid>}` / `{stack: <id>}` / `{insightsAccount: <id>}` — to scope the descriptor to one entity. For per-entity scoping, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the `on:`-modified Allow for you.
+	// The role's permission descriptor tree. Two shapes are accepted, and may be mixed at any node boundary.
+	//
+	// **Structured shape** — `{kind: "allow", permissions: ["<scope>", ...]}` to grant scopes, or `{kind: "group", entries: [...]}` to compose multiple grants. Either may carry an optional `on:` modifier — a single-key map `{environment: <uuid>}` / `{stack: <id>}` / `{insightsAccount: <id>}` / `{team: <id>}` — to scope the descriptor to one entity. For the common case prefer the `buildEnvironmentScopedPermissions` / `buildStackScopedPermissions` / `buildInsightsAccountScopedPermissions` helpers, which build the `on:`-modified Allow for you.
+	//
+	// **Pass-through shape** — for richer Cloud-side descriptors (`Compose`, `Condition` with non-Equal booleans, `IfThenElse`, `Select`, future types), use the PascalCase wire type name as the kind value: `{kind: "PermissionDescriptorCompose", permissionDescriptors: [...]}`. The descriptor and any nested `PermissionExpression*` / `PermissionLiteralExpression*` nodes use `kind` as their discriminator (the provider renames it to `__type` at the wire boundary, which keeps Python's RPC deserializer compatible). The full Cloud-side schema lives in the `pulumi-service` repository at `specification/src/main/java/com/pulumi/model/PermissionDescriptor.java` and its sibling `Permission*.java` files.
 	Permissions pulumi.MapInput
 	// The resource type the role's permissions apply to. Defaults to `global` (the org-wide role that can be assigned to members and teams). Other valid values: `stack`, `environment`, `insights-account`.
 	ResourceType pulumi.StringPtrInput
@@ -215,7 +227,11 @@ func (o OrganizationRoleOutput) OrganizationName() pulumi.StringOutput {
 	return o.ApplyT(func(v *OrganizationRole) pulumi.StringOutput { return v.OrganizationName }).(pulumi.StringOutput)
 }
 
-// The role's permission descriptor tree. Two kinds: `{kind: "allow", permissions: ["<scope>", ...]}` to grant scopes, or `{kind: "group", entries: [...]}` to compose multiple grants. Either may carry an optional `on:` modifier — a single-key map `{environment: <uuid>}` / `{stack: <id>}` / `{insightsAccount: <id>}` — to scope the descriptor to one entity. For per-entity scoping, prefer the `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, and `buildInsightsAccountScopedPermissions` helpers, which build the `on:`-modified Allow for you.
+// The role's permission descriptor tree. Two shapes are accepted, and may be mixed at any node boundary.
+//
+// **Structured shape** — `{kind: "allow", permissions: ["<scope>", ...]}` to grant scopes, or `{kind: "group", entries: [...]}` to compose multiple grants. Either may carry an optional `on:` modifier — a single-key map `{environment: <uuid>}` / `{stack: <id>}` / `{insightsAccount: <id>}` / `{team: <id>}` — to scope the descriptor to one entity. For the common case prefer the `buildEnvironmentScopedPermissions` / `buildStackScopedPermissions` / `buildInsightsAccountScopedPermissions` helpers, which build the `on:`-modified Allow for you.
+//
+// **Pass-through shape** — for richer Cloud-side descriptors (`Compose`, `Condition` with non-Equal booleans, `IfThenElse`, `Select`, future types), use the PascalCase wire type name as the kind value: `{kind: "PermissionDescriptorCompose", permissionDescriptors: [...]}`. The descriptor and any nested `PermissionExpression*` / `PermissionLiteralExpression*` nodes use `kind` as their discriminator (the provider renames it to `__type` at the wire boundary, which keeps Python's RPC deserializer compatible). The full Cloud-side schema lives in the `pulumi-service` repository at `specification/src/main/java/com/pulumi/model/PermissionDescriptor.java` and its sibling `Permission*.java` files.
 func (o OrganizationRoleOutput) Permissions() pulumi.MapOutput {
 	return o.ApplyT(func(v *OrganizationRole) pulumi.MapOutput { return v.Permissions }).(pulumi.MapOutput)
 }

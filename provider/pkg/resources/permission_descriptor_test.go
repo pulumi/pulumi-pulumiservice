@@ -15,6 +15,7 @@
 package resources
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -175,6 +176,442 @@ func mixedGroupWire() map[string]interface{} {
 	}
 }
 
+// teamScopedAllow: an Allow scoped to a single team. Validates the new
+// `team` entry in the on:-sugar entity-type table.
+func teamScopedAllowKind() map[string]interface{} {
+	return map[string]interface{}{
+		"kind":        "allow",
+		"on":          map[string]interface{}{"team": "team-id-1"},
+		"permissions": []interface{}{"stack:edit"},
+	}
+}
+func teamScopedAllowWire() map[string]interface{} {
+	return map[string]interface{}{
+		"__type": "PermissionDescriptorCondition",
+		"condition": map[string]interface{}{
+			"__type": "PermissionExpressionEqual",
+			"left":   map[string]interface{}{"__type": "PermissionExpressionTeam"},
+			"right": map[string]interface{}{
+				"__type":   "PermissionLiteralExpressionTeam",
+				"identity": "team-id-1",
+			},
+		},
+		"subNode": map[string]interface{}{
+			"__type":      "PermissionDescriptorAllow",
+			"permissions": []interface{}{"stack:edit"},
+		},
+	}
+}
+
+// bareCompose: a Compose descriptor — list of descriptor IDs by reference.
+// The wire shape is the customer's UI-imported role.
+func bareComposeKind() map[string]interface{} {
+	return map[string]interface{}{
+		"kind": "PermissionDescriptorCompose",
+		"permissionDescriptors": []interface{}{
+			"046f4b97-ed29-43d3-a09a-2c5d8d0e44e0",
+			"7be8e8d2-9c0c-4d34-a4f5-2d0fdb5e2f1a",
+		},
+	}
+}
+func bareComposeWire() map[string]interface{} {
+	return map[string]interface{}{
+		"__type": "PermissionDescriptorCompose",
+		"permissionDescriptors": []interface{}{
+			"046f4b97-ed29-43d3-a09a-2c5d8d0e44e0",
+			"7be8e8d2-9c0c-4d34-a4f5-2d0fdb5e2f1a",
+		},
+	}
+}
+
+// ifThenElseDeeplyNested: a deeply-nested IfThenElse to exercise the
+// blind discriminator rename at multiple levels (IfThenElse → And →
+// Equal + Not → HasTag → ContextEnvironment, with inner Allow descriptors).
+func ifThenElseDeeplyNestedKind() map[string]interface{} {
+	return map[string]interface{}{
+		"kind": "PermissionDescriptorIfThenElse",
+		"condition": map[string]interface{}{
+			"kind": "PermissionExpressionAnd",
+			"left": map[string]interface{}{
+				"kind": "PermissionExpressionEqual",
+				"left": map[string]interface{}{"kind": "PermissionExpressionStack"},
+				"right": map[string]interface{}{
+					"kind":     "PermissionLiteralExpressionStack",
+					"identity": "stack-1",
+				},
+			},
+			"right": map[string]interface{}{
+				"kind": "PermissionExpressionNot",
+				"node": map[string]interface{}{
+					"kind":    "PermissionExpressionHasTag",
+					"context": map[string]interface{}{"kind": "PermissionExpressionEnvironment"},
+					"key":     "production",
+				},
+			},
+		},
+		"subNodeForTrue": map[string]interface{}{
+			"kind":        "PermissionDescriptorAllow",
+			"permissions": []interface{}{"environment:read"},
+		},
+		"subNodeForFalse": map[string]interface{}{
+			"kind":        "PermissionDescriptorAllow",
+			"permissions": []interface{}{"environment:read", "environment:write"},
+		},
+	}
+}
+func ifThenElseDeeplyNestedWire() map[string]interface{} {
+	return map[string]interface{}{
+		"__type": "PermissionDescriptorIfThenElse",
+		"condition": map[string]interface{}{
+			"__type": "PermissionExpressionAnd",
+			"left": map[string]interface{}{
+				"__type": "PermissionExpressionEqual",
+				"left":   map[string]interface{}{"__type": "PermissionExpressionStack"},
+				"right": map[string]interface{}{
+					"__type":   "PermissionLiteralExpressionStack",
+					"identity": "stack-1",
+				},
+			},
+			"right": map[string]interface{}{
+				"__type": "PermissionExpressionNot",
+				"node": map[string]interface{}{
+					"__type":  "PermissionExpressionHasTag",
+					"context": map[string]interface{}{"__type": "PermissionExpressionEnvironment"},
+					"key":     "production",
+				},
+			},
+		},
+		"subNodeForTrue": map[string]interface{}{
+			"__type":      "PermissionDescriptorAllow",
+			"permissions": []interface{}{"environment:read"},
+		},
+		"subNodeForFalse": map[string]interface{}{
+			"__type":      "PermissionDescriptorAllow",
+			"permissions": []interface{}{"environment:read", "environment:write"},
+		},
+	}
+}
+
+// selectMixedLiteralTypes: a Select with options keyed by three different
+// literal types (string, number, bool) — verifies the blind rename
+// handles each literal sub-type correctly.
+func selectMixedLiteralTypesKind() map[string]interface{} {
+	return map[string]interface{}{
+		"kind": "PermissionDescriptorSelect",
+		"selector": map[string]interface{}{
+			"kind":    "PermissionExpressionTag",
+			"context": map[string]interface{}{"kind": "PermissionExpressionEnvironment"},
+			"key":     "tier",
+		},
+		"options": []interface{}{
+			map[string]interface{}{
+				"value": map[string]interface{}{
+					"kind":  "PermissionLiteralExpressionString",
+					"value": "prod",
+				},
+				"node": map[string]interface{}{
+					"kind":        "PermissionDescriptorAllow",
+					"permissions": []interface{}{"environment:read"},
+				},
+			},
+			map[string]interface{}{
+				"value": map[string]interface{}{
+					"kind":  "PermissionLiteralExpressionNumber",
+					"value": 42,
+				},
+				"node": map[string]interface{}{
+					"kind":        "PermissionDescriptorAllow",
+					"permissions": []interface{}{"environment:write"},
+				},
+			},
+			map[string]interface{}{
+				"value": map[string]interface{}{
+					"kind":  "PermissionLiteralExpressionBool",
+					"value": true,
+				},
+				"node": map[string]interface{}{
+					"kind":        "PermissionDescriptorAllow",
+					"permissions": []interface{}{"environment:admin"},
+				},
+			},
+		},
+	}
+}
+func selectMixedLiteralTypesWire() map[string]interface{} {
+	return map[string]interface{}{
+		"__type": "PermissionDescriptorSelect",
+		"selector": map[string]interface{}{
+			"__type":  "PermissionExpressionTag",
+			"context": map[string]interface{}{"__type": "PermissionExpressionEnvironment"},
+			"key":     "tier",
+		},
+		"options": []interface{}{
+			map[string]interface{}{
+				"value": map[string]interface{}{
+					"__type": "PermissionLiteralExpressionString",
+					"value":  "prod",
+				},
+				"node": map[string]interface{}{
+					"__type":      "PermissionDescriptorAllow",
+					"permissions": []interface{}{"environment:read"},
+				},
+			},
+			map[string]interface{}{
+				"value": map[string]interface{}{
+					"__type": "PermissionLiteralExpressionNumber",
+					"value":  42,
+				},
+				"node": map[string]interface{}{
+					"__type":      "PermissionDescriptorAllow",
+					"permissions": []interface{}{"environment:write"},
+				},
+			},
+			map[string]interface{}{
+				"value": map[string]interface{}{
+					"__type": "PermissionLiteralExpressionBool",
+					"value":  true,
+				},
+				"node": map[string]interface{}{
+					"__type":      "PermissionDescriptorAllow",
+					"permissions": []interface{}{"environment:admin"},
+				},
+			},
+		},
+	}
+}
+
+// conditionAndOfEquals: a Condition whose boolean is a non-Equal And. Must
+// surface as a pass-through PermissionDescriptorCondition (not collapsed).
+func conditionAndOfEqualsKind() map[string]interface{} {
+	return map[string]interface{}{
+		"kind": "PermissionDescriptorCondition",
+		"condition": map[string]interface{}{
+			"kind": "PermissionExpressionAnd",
+			"left": map[string]interface{}{
+				"kind": "PermissionExpressionEqual",
+				"left": map[string]interface{}{"kind": "PermissionExpressionStack"},
+				"right": map[string]interface{}{
+					"kind":     "PermissionLiteralExpressionStack",
+					"identity": "stack-1",
+				},
+			},
+			"right": map[string]interface{}{
+				"kind": "PermissionExpressionEqual",
+				"left": map[string]interface{}{"kind": "PermissionExpressionTeam"},
+				"right": map[string]interface{}{
+					"kind":     "PermissionLiteralExpressionTeam",
+					"identity": "team-1",
+				},
+			},
+		},
+		"subNode": map[string]interface{}{
+			"kind":        "PermissionDescriptorAllow",
+			"permissions": []interface{}{"stack:edit"},
+		},
+	}
+}
+func conditionAndOfEqualsWire() map[string]interface{} {
+	return map[string]interface{}{
+		"__type": "PermissionDescriptorCondition",
+		"condition": map[string]interface{}{
+			"__type": "PermissionExpressionAnd",
+			"left": map[string]interface{}{
+				"__type": "PermissionExpressionEqual",
+				"left":   map[string]interface{}{"__type": "PermissionExpressionStack"},
+				"right": map[string]interface{}{
+					"__type":   "PermissionLiteralExpressionStack",
+					"identity": "stack-1",
+				},
+			},
+			"right": map[string]interface{}{
+				"__type": "PermissionExpressionEqual",
+				"left":   map[string]interface{}{"__type": "PermissionExpressionTeam"},
+				"right": map[string]interface{}{
+					"__type":   "PermissionLiteralExpressionTeam",
+					"identity": "team-1",
+				},
+			},
+		},
+		"subNode": map[string]interface{}{
+			"__type":      "PermissionDescriptorAllow",
+			"permissions": []interface{}{"stack:edit"},
+		},
+	}
+}
+
+// conditionMismatchedOperands: Equal whose left/right are wrong-pair (e.g.
+// ContextEnvironment vs LitStack). Must surface as pass-through.
+func conditionMismatchedOperandsKind() map[string]interface{} {
+	return map[string]interface{}{
+		"kind": "PermissionDescriptorCondition",
+		"condition": map[string]interface{}{
+			"kind": "PermissionExpressionEqual",
+			"left": map[string]interface{}{"kind": "PermissionExpressionEnvironment"},
+			"right": map[string]interface{}{
+				"kind":     "PermissionLiteralExpressionStack",
+				"identity": "x",
+			},
+		},
+		"subNode": map[string]interface{}{
+			"kind":        "PermissionDescriptorAllow",
+			"permissions": []interface{}{"stack:read"},
+		},
+	}
+}
+func conditionMismatchedOperandsWire() map[string]interface{} {
+	return map[string]interface{}{
+		"__type": "PermissionDescriptorCondition",
+		"condition": map[string]interface{}{
+			"__type": "PermissionExpressionEqual",
+			"left":   map[string]interface{}{"__type": "PermissionExpressionEnvironment"},
+			"right": map[string]interface{}{
+				"__type":   "PermissionLiteralExpressionStack",
+				"identity": "x",
+			},
+		},
+		"subNode": map[string]interface{}{
+			"__type":      "PermissionDescriptorAllow",
+			"permissions": []interface{}{"stack:read"},
+		},
+	}
+}
+
+// conditionWrappingCompose: collapsible Equal but subNode is Compose
+// (a pass-through kind, not a structured Allow/Group). Must surface as
+// pass-through PermissionDescriptorCondition (not collapse to on:).
+func conditionWrappingComposeKind() map[string]interface{} {
+	return map[string]interface{}{
+		"kind": "PermissionDescriptorCondition",
+		"condition": map[string]interface{}{
+			"kind": "PermissionExpressionEqual",
+			"left": map[string]interface{}{"kind": "PermissionExpressionEnvironment"},
+			"right": map[string]interface{}{
+				"kind":     "PermissionLiteralExpressionEnvironment",
+				"identity": "env-1",
+			},
+		},
+		"subNode": map[string]interface{}{
+			"kind":                  "PermissionDescriptorCompose",
+			"permissionDescriptors": []interface{}{"role-id-1"},
+		},
+	}
+}
+func conditionWrappingComposeWire() map[string]interface{} {
+	return map[string]interface{}{
+		"__type": "PermissionDescriptorCondition",
+		"condition": map[string]interface{}{
+			"__type": "PermissionExpressionEqual",
+			"left":   map[string]interface{}{"__type": "PermissionExpressionEnvironment"},
+			"right": map[string]interface{}{
+				"__type":   "PermissionLiteralExpressionEnvironment",
+				"identity": "env-1",
+			},
+		},
+		"subNode": map[string]interface{}{
+			"__type":                "PermissionDescriptorCompose",
+			"permissionDescriptors": []interface{}{"role-id-1"},
+		},
+	}
+}
+
+// conditionWrappingCondition: nested scoping. Outer collapse fires only
+// if subNode is Allow/Group, so this surfaces as pass-through. The inner
+// Condition is inside a pass-through subtree and stays in PascalCase.
+func conditionWrappingConditionKind() map[string]interface{} {
+	return map[string]interface{}{
+		"kind": "PermissionDescriptorCondition",
+		"condition": map[string]interface{}{
+			"kind": "PermissionExpressionEqual",
+			"left": map[string]interface{}{"kind": "PermissionExpressionStack"},
+			"right": map[string]interface{}{
+				"kind":     "PermissionLiteralExpressionStack",
+				"identity": "stack-1",
+			},
+		},
+		"subNode": map[string]interface{}{
+			"kind": "PermissionDescriptorCondition",
+			"condition": map[string]interface{}{
+				"kind": "PermissionExpressionEqual",
+				"left": map[string]interface{}{"kind": "PermissionExpressionEnvironment"},
+				"right": map[string]interface{}{
+					"kind":     "PermissionLiteralExpressionEnvironment",
+					"identity": "env-1",
+				},
+			},
+			"subNode": map[string]interface{}{
+				"kind":        "PermissionDescriptorAllow",
+				"permissions": []interface{}{"environment:read"},
+			},
+		},
+	}
+}
+func conditionWrappingConditionWire() map[string]interface{} {
+	return map[string]interface{}{
+		"__type": "PermissionDescriptorCondition",
+		"condition": map[string]interface{}{
+			"__type": "PermissionExpressionEqual",
+			"left":   map[string]interface{}{"__type": "PermissionExpressionStack"},
+			"right": map[string]interface{}{
+				"__type":   "PermissionLiteralExpressionStack",
+				"identity": "stack-1",
+			},
+		},
+		"subNode": map[string]interface{}{
+			"__type": "PermissionDescriptorCondition",
+			"condition": map[string]interface{}{
+				"__type": "PermissionExpressionEqual",
+				"left":   map[string]interface{}{"__type": "PermissionExpressionEnvironment"},
+				"right": map[string]interface{}{
+					"__type":   "PermissionLiteralExpressionEnvironment",
+					"identity": "env-1",
+				},
+			},
+			"subNode": map[string]interface{}{
+				"__type":      "PermissionDescriptorAllow",
+				"permissions": []interface{}{"environment:read"},
+			},
+		},
+	}
+}
+
+// composeInsideGroup: a structured Group containing a pass-through Compose
+// entry. Verifies the boundary at entries[1]: the structured group recursion
+// hands off to pass-through when it encounters a non-Allow/non-Group entry.
+func composeInsideGroupKind() map[string]interface{} {
+	return map[string]interface{}{
+		"kind": "group",
+		"entries": []interface{}{
+			map[string]interface{}{
+				"kind":        "allow",
+				"permissions": []interface{}{"stack:read"},
+			},
+			map[string]interface{}{
+				"kind": "PermissionDescriptorCompose",
+				"permissionDescriptors": []interface{}{
+					"046f4b97-ed29-43d3-a09a-2c5d8d0e44e0",
+				},
+			},
+		},
+	}
+}
+func composeInsideGroupWire() map[string]interface{} {
+	return map[string]interface{}{
+		"__type": "PermissionDescriptorGroup",
+		"entries": []interface{}{
+			map[string]interface{}{
+				"__type":      "PermissionDescriptorAllow",
+				"permissions": []interface{}{"stack:read"},
+			},
+			map[string]interface{}{
+				"__type": "PermissionDescriptorCompose",
+				"permissionDescriptors": []interface{}{
+					"046f4b97-ed29-43d3-a09a-2c5d8d0e44e0",
+				},
+			},
+		},
+	}
+}
+
 // ----------------------------------------------------------------------------
 // Forward direction: kind → wire
 // ----------------------------------------------------------------------------
@@ -191,6 +628,15 @@ func TestPermissionsKindToWire(t *testing.T) {
 		{"flatGroup", flatGroupKind(), flatGroupWire()},
 		{"scopedGroup", scopedGroupKind(), scopedGroupWire()},
 		{"mixedGroup", mixedGroupKind(), mixedGroupWire()},
+		{"teamScopedAllow", teamScopedAllowKind(), teamScopedAllowWire()},
+		{"bareCompose", bareComposeKind(), bareComposeWire()},
+		{"ifThenElseDeeplyNested", ifThenElseDeeplyNestedKind(), ifThenElseDeeplyNestedWire()},
+		{"selectMixedLiteralTypes", selectMixedLiteralTypesKind(), selectMixedLiteralTypesWire()},
+		{"composeInsideGroup", composeInsideGroupKind(), composeInsideGroupWire()},
+		{"conditionAndOfEquals", conditionAndOfEqualsKind(), conditionAndOfEqualsWire()},
+		{"conditionMismatchedOperands", conditionMismatchedOperandsKind(), conditionMismatchedOperandsWire()},
+		{"conditionWrappingCompose", conditionWrappingComposeKind(), conditionWrappingComposeWire()},
+		{"conditionWrappingCondition", conditionWrappingConditionKind(), conditionWrappingConditionWire()},
 	}
 	for _, tc := range cases {
 		tc := tc
@@ -276,6 +722,15 @@ func TestPermissionsWireToKind(t *testing.T) {
 		{"flatGroup", flatGroupWire(), flatGroupKind()},
 		{"scopedGroup", scopedGroupWire(), scopedGroupKind()},
 		{"mixedGroup", mixedGroupWire(), mixedGroupKind()},
+		{"teamScopedAllow", teamScopedAllowWire(), teamScopedAllowKind()},
+		{"bareCompose", bareComposeWire(), bareComposeKind()},
+		{"ifThenElseDeeplyNested", ifThenElseDeeplyNestedWire(), ifThenElseDeeplyNestedKind()},
+		{"selectMixedLiteralTypes", selectMixedLiteralTypesWire(), selectMixedLiteralTypesKind()},
+		{"composeInsideGroup", composeInsideGroupWire(), composeInsideGroupKind()},
+		{"conditionAndOfEquals", conditionAndOfEqualsWire(), conditionAndOfEqualsKind()},
+		{"conditionMismatchedOperands", conditionMismatchedOperandsWire(), conditionMismatchedOperandsKind()},
+		{"conditionWrappingCompose", conditionWrappingComposeWire(), conditionWrappingComposeKind()},
+		{"conditionWrappingCondition", conditionWrappingConditionWire(), conditionWrappingConditionKind()},
 	}
 	for _, tc := range cases {
 		tc := tc
@@ -303,6 +758,15 @@ func TestPermissionsKindWireRoundTrip(t *testing.T) {
 		{"flatGroup", flatGroupKind()},
 		{"scopedGroup", scopedGroupKind()},
 		{"mixedGroup", mixedGroupKind()},
+		{"teamScopedAllow", teamScopedAllowKind()},
+		{"bareCompose", bareComposeKind()},
+		{"ifThenElseDeeplyNested", ifThenElseDeeplyNestedKind()},
+		{"selectMixedLiteralTypes", selectMixedLiteralTypesKind()},
+		{"composeInsideGroup", composeInsideGroupKind()},
+		{"conditionAndOfEquals", conditionAndOfEqualsKind()},
+		{"conditionMismatchedOperands", conditionMismatchedOperandsKind()},
+		{"conditionWrappingCompose", conditionWrappingComposeKind()},
+		{"conditionWrappingCondition", conditionWrappingConditionKind()},
 	}
 	for _, tc := range cases {
 		tc := tc
@@ -331,6 +795,15 @@ func TestPermissionsWireKindRoundTrip(t *testing.T) {
 		{"flatGroup", flatGroupWire()},
 		{"scopedGroup", scopedGroupWire()},
 		{"mixedGroup", mixedGroupWire()},
+		{"teamScopedAllow", teamScopedAllowWire()},
+		{"bareCompose", bareComposeWire()},
+		{"ifThenElseDeeplyNested", ifThenElseDeeplyNestedWire()},
+		{"selectMixedLiteralTypes", selectMixedLiteralTypesWire()},
+		{"composeInsideGroup", composeInsideGroupWire()},
+		{"conditionAndOfEquals", conditionAndOfEqualsWire()},
+		{"conditionMismatchedOperands", conditionMismatchedOperandsWire()},
+		{"conditionWrappingCompose", conditionWrappingComposeWire()},
+		{"conditionWrappingCondition", conditionWrappingConditionWire()},
 	}
 	for _, tc := range cases {
 		tc := tc
@@ -452,6 +925,32 @@ func TestPermissionsKindToWire_Errors(t *testing.T) {
 			},
 			wantErrFrag: "bogus",
 		},
+		{
+			name: "on: on pass-through kind",
+			in: map[string]interface{}{
+				"kind":                  "PermissionDescriptorCompose",
+				"on":                    map[string]interface{}{"environment": "e"},
+				"permissionDescriptors": []interface{}{"role-1"},
+			},
+			wantErrFrag: "on:",
+		},
+		{
+			name: "top-level __type instead of kind",
+			in: map[string]interface{}{
+				"__type":      "PermissionDescriptorAllow",
+				"permissions": []interface{}{"stack:read"},
+			},
+			wantErrFrag: "use `kind` instead of `__type`",
+		},
+		{
+			name: "kind and __type both present",
+			in: map[string]interface{}{
+				"kind":        "allow",
+				"__type":      "PermissionDescriptorAllow",
+				"permissions": []interface{}{"stack:read"},
+			},
+			wantErrFrag: "both `kind` and `__type`",
+		},
 	}
 	for _, tc := range cases {
 		tc := tc
@@ -481,58 +980,6 @@ func TestPermissionsWireToKind_Errors(t *testing.T) {
 			wantErrFrag: "__type",
 		},
 		{
-			name:        "unknown __type",
-			in:          map[string]interface{}{"__type": "PermissionDescriptorBogus"},
-			wantErrFrag: "PermissionDescriptorBogus",
-		},
-		{
-			name: "Condition with non-Equal condition",
-			in: map[string]interface{}{
-				"__type":    "PermissionDescriptorCondition",
-				"condition": map[string]interface{}{"__type": "PermissionExpressionAnd"},
-				"subNode": map[string]interface{}{
-					"__type":      "PermissionDescriptorAllow",
-					"permissions": []interface{}{"stack:read"},
-				},
-			},
-			wantErrFrag: "PermissionExpressionAnd",
-		},
-		{
-			name: "Equal with mismatched left/right entity types",
-			in: map[string]interface{}{
-				"__type": "PermissionDescriptorCondition",
-				"condition": map[string]interface{}{
-					"__type": "PermissionExpressionEqual",
-					"left":   map[string]interface{}{"__type": "PermissionExpressionEnvironment"},
-					"right": map[string]interface{}{
-						"__type":   "PermissionLiteralExpressionStack",
-						"identity": "x",
-					},
-				},
-				"subNode": map[string]interface{}{
-					"__type":      "PermissionDescriptorAllow",
-					"permissions": []interface{}{"stack:read"},
-				},
-			},
-			wantErrFrag: "mismatched",
-		},
-		{
-			name: "Equal with right missing identity",
-			in: map[string]interface{}{
-				"__type": "PermissionDescriptorCondition",
-				"condition": map[string]interface{}{
-					"__type": "PermissionExpressionEqual",
-					"left":   map[string]interface{}{"__type": "PermissionExpressionEnvironment"},
-					"right":  map[string]interface{}{"__type": "PermissionLiteralExpressionEnvironment"},
-				},
-				"subNode": map[string]interface{}{
-					"__type":      "PermissionDescriptorAllow",
-					"permissions": []interface{}{"stack:read"},
-				},
-			},
-			wantErrFrag: "identity",
-		},
-		{
 			name: "Group with non-list entries",
 			in: map[string]interface{}{
 				"__type":  "PermissionDescriptorGroup",
@@ -548,36 +995,6 @@ func TestPermissionsWireToKind_Errors(t *testing.T) {
 			},
 			wantErrFrag: "permissions",
 		},
-		{
-			name: "Condition wraps another Condition (nested scoping)",
-			in: map[string]interface{}{
-				"__type": "PermissionDescriptorCondition",
-				"condition": map[string]interface{}{
-					"__type": "PermissionExpressionEqual",
-					"left":   map[string]interface{}{"__type": "PermissionExpressionStack"},
-					"right": map[string]interface{}{
-						"__type":   "PermissionLiteralExpressionStack",
-						"identity": "s1",
-					},
-				},
-				"subNode": map[string]interface{}{
-					"__type": "PermissionDescriptorCondition",
-					"condition": map[string]interface{}{
-						"__type": "PermissionExpressionEqual",
-						"left":   map[string]interface{}{"__type": "PermissionExpressionEnvironment"},
-						"right": map[string]interface{}{
-							"__type":   "PermissionLiteralExpressionEnvironment",
-							"identity": "e1",
-						},
-					},
-					"subNode": map[string]interface{}{
-						"__type":      "PermissionDescriptorAllow",
-						"permissions": []interface{}{"environment:read"},
-					},
-				},
-			},
-			wantErrFrag: "nested",
-		},
 	}
 	for _, tc := range cases {
 		tc := tc
@@ -588,6 +1005,104 @@ func TestPermissionsWireToKind_Errors(t *testing.T) {
 			assert.Contains(t, err.Error(), tc.wantErrFrag)
 		})
 	}
+}
+
+// ----------------------------------------------------------------------------
+// renameKey — blind recursive key rename.
+// ----------------------------------------------------------------------------
+
+func TestRenameKey_FlatObject(t *testing.T) {
+	t.Parallel()
+	in := map[string]interface{}{"__type": "X", "other": 1}
+	got := renameKey(in, "__type", "kind")
+	want := map[string]interface{}{"kind": "X", "other": 1}
+	assert.Equal(t, want, got)
+}
+
+func TestRenameKey_NestedObject(t *testing.T) {
+	t.Parallel()
+	in := map[string]interface{}{
+		"__type": "Outer",
+		"inner": map[string]interface{}{
+			"__type": "Inner",
+			"deeper": map[string]interface{}{
+				"__type": "Deepest",
+			},
+		},
+	}
+	got := renameKey(in, "__type", "kind")
+	want := map[string]interface{}{
+		"kind": "Outer",
+		"inner": map[string]interface{}{
+			"kind": "Inner",
+			"deeper": map[string]interface{}{
+				"kind": "Deepest",
+			},
+		},
+	}
+	assert.Equal(t, want, got)
+}
+
+func TestRenameKey_ArrayOfObjects(t *testing.T) {
+	t.Parallel()
+	in := map[string]interface{}{
+		"__type": "Outer",
+		"entries": []interface{}{
+			map[string]interface{}{"__type": "A"},
+			map[string]interface{}{"__type": "B", "nested": map[string]interface{}{"__type": "C"}},
+		},
+	}
+	got := renameKey(in, "__type", "kind")
+	want := map[string]interface{}{
+		"kind": "Outer",
+		"entries": []interface{}{
+			map[string]interface{}{"kind": "A"},
+			map[string]interface{}{"kind": "B", "nested": map[string]interface{}{"kind": "C"}},
+		},
+	}
+	assert.Equal(t, want, got)
+}
+
+func TestRenameKey_NoMatchUnchanged(t *testing.T) {
+	t.Parallel()
+	in := map[string]interface{}{
+		"foo": "bar",
+		"baz": map[string]interface{}{"qux": 1},
+	}
+	got := renameKey(in, "__type", "kind")
+	assert.Equal(t, in, got)
+}
+
+func TestRenameKey_Inverse(t *testing.T) {
+	t.Parallel()
+	// Round trip: rename A→B then B→A returns original
+	original := map[string]interface{}{
+		"__type": "X",
+		"sub":    map[string]interface{}{"__type": "Y"},
+	}
+	forward := renameKey(original, "__type", "kind")
+	back := renameKey(forward, "kind", "__type")
+	assert.Equal(t, original, back)
+}
+
+func TestRenameKey_PreservesNonStringValues(t *testing.T) {
+	t.Parallel()
+	in := map[string]interface{}{
+		"__type":  "X",
+		"number":  42,
+		"boolean": true,
+		"null":    nil,
+		"array":   []interface{}{1, "two", true},
+	}
+	got := renameKey(in, "__type", "kind")
+	want := map[string]interface{}{
+		"kind":    "X",
+		"number":  42,
+		"boolean": true,
+		"null":    nil,
+		"array":   []interface{}{1, "two", true},
+	}
+	assert.Equal(t, want, got)
 }
 
 // ----------------------------------------------------------------------------
@@ -633,4 +1148,75 @@ func TestPermissionsWireToKind_LegacySingleEntryGroup(t *testing.T) {
 	got, err := permissionsWireToKind(in)
 	require.NoError(t, err)
 	assert.Equal(t, want, got)
+}
+
+// ----------------------------------------------------------------------------
+// Python-safety property test.
+// ----------------------------------------------------------------------------
+
+// TestNoUnderscorePrefixInSdkShape is a property test guarding Python
+// compatibility. Pulumi's Python SDK strips every `__`-prefixed key from
+// deserialized RPC values (pulumi/sdk/python/lib/pulumi/runtime/rpc.py:866,
+// `if not keep_internal and k.startswith("__") and k != "__provider"`).
+// If any SDK-shape fixture contains a `__`-prefixed key, that key would
+// be stripped on the way to user code, breaking round-trip — so the
+// translator must never produce one.
+func TestNoUnderscorePrefixInSdkShape(t *testing.T) {
+	t.Parallel()
+	cases := []struct {
+		name string
+		kind map[string]interface{}
+	}{
+		{"flatAllow", flatAllowKind()},
+		{"scopedAllow", scopedAllowKind()},
+		{"flatGroup", flatGroupKind()},
+		{"scopedGroup", scopedGroupKind()},
+		{"mixedGroup", mixedGroupKind()},
+		{"teamScopedAllow", teamScopedAllowKind()},
+		{"bareCompose", bareComposeKind()},
+		{"ifThenElseDeeplyNested", ifThenElseDeeplyNestedKind()},
+		{"selectMixedLiteralTypes", selectMixedLiteralTypesKind()},
+		{"composeInsideGroup", composeInsideGroupKind()},
+		{"conditionAndOfEquals", conditionAndOfEqualsKind()},
+		{"conditionMismatchedOperands", conditionMismatchedOperandsKind()},
+		{"conditionWrappingCompose", conditionWrappingComposeKind()},
+		{"conditionWrappingCondition", conditionWrappingConditionKind()},
+	}
+	for _, tc := range cases {
+		tc := tc
+		t.Run(tc.name+"_fixture", func(t *testing.T) {
+			t.Parallel()
+			assertNoUnderscorePrefix(t, tc.kind, "")
+		})
+		t.Run(tc.name+"_decoded", func(t *testing.T) {
+			t.Parallel()
+			// Round-trip kind → wire → kind and assert the resulting
+			// SDK shape still has no `__` keys.
+			wire, err := permissionsKindToWire(tc.kind)
+			require.NoError(t, err)
+			back, err := permissionsWireToKind(wire)
+			require.NoError(t, err)
+			assertNoUnderscorePrefix(t, back, "")
+		})
+	}
+}
+
+// assertNoUnderscorePrefix walks a JSON-shaped tree and fails if any map
+// key starts with `__`.
+func assertNoUnderscorePrefix(t *testing.T, node interface{}, path string) {
+	t.Helper()
+	switch n := node.(type) {
+	case map[string]interface{}:
+		for k, v := range n {
+			child := path + "." + k
+			if len(k) >= 2 && k[:2] == "__" {
+				t.Errorf("found `__`-prefixed key at %s: %q", child, k)
+			}
+			assertNoUnderscorePrefix(t, v, child)
+		}
+	case []interface{}:
+		for i, v := range n {
+			assertNoUnderscorePrefix(t, v, fmt.Sprintf("%s[%d]", path, i))
+		}
+	}
 }

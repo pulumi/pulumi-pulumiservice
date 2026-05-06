@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/pulumi/pulumi-go-provider/infer"
 	"github.com/pulumi/pulumi/sdk/v3/go/property"
@@ -337,4 +338,132 @@ func TestOrganizationRoleCheck(t *testing.T) {
 		assert.Contains(t, props["permissions"], "unknownEntity",
 			"unknown on entity should produce a permissions failure naming the bad key")
 	})
+}
+
+// TestOrgRoleCoreFromAPI_ComposeDetails is the resource-layer regression
+// test for the customer's reported error:
+//
+//	error: Preview failed: translating role details for "46c2cba1-...":
+//	unknown permissions descriptor __type "PermissionDescriptorCompose"
+//
+// A role whose Cloud-side Details is Compose must Read successfully and
+// surface as `kind: PermissionDescriptorCompose` (pass-through, not the
+// short `kind: compose` — there's no compose sugar in this design).
+func TestOrgRoleCoreFromAPI_ComposeDetails(t *testing.T) {
+	t.Parallel()
+	role := &pulumiapi.RoleDescriptor{
+		ID:           "46c2cba1-119d-432d-a1ba-2cff24d9a833",
+		Name:         "composed-role",
+		Description:  "A role composed of two other descriptors",
+		ResourceType: "global",
+		Details: json.RawMessage(`{
+			"__type": "PermissionDescriptorCompose",
+			"permissionDescriptors": [
+				"046f4b97-ed29-43d3-a09a-2c5d8d0e44e0",
+				"7be8e8d2-9c0c-4d34-a4f5-2d0fdb5e2f1a"
+			]
+		}`),
+		Version: 1,
+	}
+	core, err := orgRoleCoreFromAPI("test-org", OrganizationRoleCore{}, role)
+	require.NoError(t, err)
+	assert.Equal(t, "composed-role", core.Name)
+	require.NotNil(t, core.Permissions)
+	assert.Equal(t, "PermissionDescriptorCompose", core.Permissions["kind"])
+	assert.Equal(t, []interface{}{
+		"046f4b97-ed29-43d3-a09a-2c5d8d0e44e0",
+		"7be8e8d2-9c0c-4d34-a4f5-2d0fdb5e2f1a",
+	}, core.Permissions["permissionDescriptors"])
+
+	// Round-trip: re-encode and verify the wire shape matches the original Details.
+	back, err := permissionsKindToWire(core.Permissions)
+	require.NoError(t, err)
+	var original map[string]interface{}
+	require.NoError(t, json.Unmarshal(role.Details, &original))
+	assert.Equal(t, original, back)
+}
+
+// TestOrgRoleCoreFromAPI_IfThenElseDetails verifies the deep-rename
+// round-trip path through the resource layer end-to-end with a complex
+// IfThenElse + nested expressions shape.
+func TestOrgRoleCoreFromAPI_IfThenElseDetails(t *testing.T) {
+	t.Parallel()
+	role := &pulumiapi.RoleDescriptor{
+		ID:           "abc-123",
+		Name:         "branching-role",
+		ResourceType: "global",
+		Details: json.RawMessage(`{
+			"__type": "PermissionDescriptorIfThenElse",
+			"condition": {
+				"__type": "PermissionExpressionHasTag",
+				"context": {"__type": "PermissionExpressionEnvironment"},
+				"key": "production"
+			},
+			"subNodeForTrue": {
+				"__type": "PermissionDescriptorAllow",
+				"permissions": ["environment:read"]
+			},
+			"subNodeForFalse": {
+				"__type": "PermissionDescriptorAllow",
+				"permissions": ["environment:read", "environment:write"]
+			}
+		}`),
+		Version: 1,
+	}
+	core, err := orgRoleCoreFromAPI("test-org", OrganizationRoleCore{}, role)
+	require.NoError(t, err)
+	require.NotNil(t, core.Permissions)
+	// Top-level kind is renamed.
+	assert.Equal(t, "PermissionDescriptorIfThenElse", core.Permissions["kind"])
+
+	// Verify the deep nesting kept all `__type`s renamed: walk to the
+	// HasTag's context and assert it has `kind`, not `__type`.
+	cond := core.Permissions["condition"].(map[string]interface{})
+	assert.Equal(t, "PermissionExpressionHasTag", cond["kind"])
+	ctx := cond["context"].(map[string]interface{})
+	assert.Equal(t, "PermissionExpressionEnvironment", ctx["kind"])
+	_, hasUnderscore := ctx["__type"]
+	assert.False(t, hasUnderscore, "context should not have __type after Read")
+
+	// Round-trip back to wire and compare byte-equal to the original Details.
+	back, err := permissionsKindToWire(core.Permissions)
+	require.NoError(t, err)
+	var original map[string]interface{}
+	require.NoError(t, json.Unmarshal(role.Details, &original))
+	assert.Equal(t, original, back)
+}
+
+// TestOrgRoleCoreFromAPI_CollapsibleConditionStillCollapses is the
+// backward-compat test: a role whose Details is the canonical
+// Condition(Equal(ContextEnv, LitEnv(id)), Allow(...)) shape still
+// collapses to the on: sugar form on Read.
+func TestOrgRoleCoreFromAPI_CollapsibleConditionStillCollapses(t *testing.T) {
+	t.Parallel()
+	role := &pulumiapi.RoleDescriptor{
+		ID:           "def-456",
+		Name:         "env-scoped-role",
+		ResourceType: "global",
+		Details: json.RawMessage(`{
+			"__type": "PermissionDescriptorCondition",
+			"condition": {
+				"__type": "PermissionExpressionEqual",
+				"left": {"__type": "PermissionExpressionEnvironment"},
+				"right": {
+					"__type": "PermissionLiteralExpressionEnvironment",
+					"identity": "env-uuid-1"
+				}
+			},
+			"subNode": {
+				"__type": "PermissionDescriptorAllow",
+				"permissions": ["environment:read"]
+			}
+		}`),
+		Version: 1,
+	}
+	core, err := orgRoleCoreFromAPI("test-org", OrganizationRoleCore{}, role)
+	require.NoError(t, err)
+	assert.Equal(t, "allow", core.Permissions["kind"])
+	on, ok := core.Permissions["on"].(map[string]interface{})
+	require.True(t, ok)
+	assert.Equal(t, "env-uuid-1", on["environment"])
 }

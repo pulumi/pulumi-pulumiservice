@@ -562,6 +562,38 @@ func TestYamlRbacExample(t *testing.T) {
 	test.Destroy(t)
 }
 
+func TestYamlRbacPassthroughExample(t *testing.T) {
+	// Requires the Custom Roles feature to be enabled on the test
+	// organization. Composes two base roles into a third (Compose),
+	// scopes a role to a team (on: { team: ... }), and gates a role
+	// on a non-collapsible And(Equal, Equal) boolean.
+	test := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-rbac-passthrough"),
+		inMemoryProvider(),
+		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
+	)
+	test.SetConfig(t, "digits", generateRandomFiveDigits())
+	test.SetConfig(t, "organizationName", getOrgName())
+
+	up := test.Up(t)
+	for _, key := range []string{
+		"baseRoleAId", "baseRoleBId", "composedRoleId",
+		"teamName", "teamScopedRoleId", "andConditionRoleId",
+	} {
+		if v, ok := up.Outputs[key]; ok {
+			assert.NotEmpty(t, v.Value, "expected non-empty output %s", key)
+		} else {
+			t.Errorf("expected output %s to be present", key)
+		}
+	}
+	preview := test.Preview(t)
+	assertpreview.HasNoChanges(t, preview)
+	refresh := test.Refresh(t)
+	assertrefresh.HasNoChanges(t, refresh)
+	test.Destroy(t)
+}
+
 func writePulumiYaml(t *testing.T, yamlContents interface{}) string {
 	tmpdir := t.TempDir()
 	b, err := yaml.Marshal(yamlContents)

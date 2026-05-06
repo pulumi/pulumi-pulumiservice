@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Bug Fixes
+- Importing `OrganizationRole`s using `Compose`, `IfThenElse`, `Select`, or non-`Equal` `Condition` permission descriptors no longer fails on Read. The translator now passes through any wire-shape `PermissionDescriptor*` or `PermissionExpression*` node that the SDK doesn't structurally model, while keeping the `kind: allow` / `kind: group` / `on:` sugar for the common cases. The `on:` modifier also now accepts `team` alongside `environment`, `stack`, and `insightsAccount`.
+
 ### Breaking Changes
 - Removed the numeric `version` field from `PolicyGroup.policyPacks` inputs; it is now output-only, since the value is server-derived from `versionTag`. Use `versionTag` to pin pack versions. [#737](https://github.com/pulumi/pulumi-pulumiservice/issues/737)
 

@@ -1,0 +1,134 @@
+name: yaml-rbac-passthrough
+runtime: yaml
+description: |
+  Demonstrates the pass-through grammar for OrganizationRole.permissions.
+  Includes Compose, on:{team:...}, and a non-collapsible Condition role.
+
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  digits:
+    type: string
+
+variables:
+  # Used to seed the new Team's member list. Pulumi Cloud auto-adds the
+  # team creator as the first member, so refresh detects drift unless we
+  # declare them here. Same pattern as yaml-rbac.
+  currentUser:
+    fn::invoke:
+      function: pulumiservice:getCurrentUser
+
+resources:
+  # First base role — read-only on stacks.
+  baseRoleA:
+    type: pulumiservice:OrganizationRole
+    properties:
+      organizationName: ${organizationName}
+      name: yaml-rbac-passthrough-base-a-${digits}
+      description: Read-only on stacks. Composed by composedRole below.
+      permissions:
+        kind: allow
+        permissions:
+          - stack:read
+
+  # Second base role — read on environments.
+  baseRoleB:
+    type: pulumiservice:OrganizationRole
+    properties:
+      organizationName: ${organizationName}
+      name: yaml-rbac-passthrough-base-b-${digits}
+      description: Read on environments. Composed by composedRole below.
+      permissions:
+        kind: allow
+        permissions:
+          - environment:read
+
+  # Composed role — references both base roles' descriptor IDs.
+  # Demonstrates kind: PermissionDescriptorCompose pass-through.
+  composedRole:
+    type: pulumiservice:OrganizationRole
+    properties:
+      organizationName: ${organizationName}
+      name: yaml-rbac-passthrough-composed-${digits}
+      description: |
+        A role composed from two base roles. Demonstrates the pass-through
+        grammar (kind: PermissionDescriptorCompose).
+      permissions:
+        kind: PermissionDescriptorCompose
+        permissionDescriptors:
+          - ${baseRoleA.roleId}
+          - ${baseRoleB.roleId}
+
+  # Team — used by the team-scoped roles below.
+  rbacTeam:
+    type: pulumiservice:Team
+    properties:
+      organizationName: ${organizationName}
+      name: yaml-rbac-passthrough-team-${digits}
+      teamType: pulumi
+      displayName: yaml-rbac-passthrough team (${digits})
+      description: Team created by the yaml-rbac-passthrough example.
+      members:
+        - ${currentUser.username}
+
+  # Team-scoped role — demonstrates the new `on: { team: <id> }` sugar
+  # added in this PR. The translator wraps this in
+  # Condition(Equal(ContextTeam, LitTeam(team-name)), Allow) on the wire.
+  teamScopedRole:
+    type: pulumiservice:OrganizationRole
+    properties:
+      organizationName: ${organizationName}
+      name: yaml-rbac-passthrough-team-scoped-${digits}
+      description: |
+        A role scoped to one team via the new `on: { team: <id> }` sugar.
+        Grants stack:edit only when the request is on the named team.
+      permissions:
+        kind: allow
+        on:
+          team: ${rbacTeam.name}
+        permissions:
+          - stack:edit
+
+  # And-condition role — demonstrates the non-collapsible-Condition
+  # pass-through path. The condition is And(Equal, Equal) against the
+  # same team (tautological but valid). The translator passes this
+  # through with a blind kind ↔ __type rename rather than collapsing
+  # to `on:` sugar (which only collapses single-Equal Conditions).
+  andConditionRole:
+    type: pulumiservice:OrganizationRole
+    properties:
+      organizationName: ${organizationName}
+      name: yaml-rbac-passthrough-and-condition-${digits}
+      description: |
+        A role gated on a non-collapsible And(Equal, Equal) boolean.
+        Demonstrates the pass-through path for `kind:
+        PermissionDescriptorCondition` with a complex boolean.
+      permissions:
+        kind: PermissionDescriptorCondition
+        condition:
+          kind: PermissionExpressionAnd
+          left:
+            kind: PermissionExpressionEqual
+            left: { kind: PermissionExpressionTeam }
+            right:
+              kind: PermissionLiteralExpressionTeam
+              identity: ${rbacTeam.name}
+          right:
+            kind: PermissionExpressionEqual
+            left: { kind: PermissionExpressionTeam }
+            right:
+              kind: PermissionLiteralExpressionTeam
+              identity: ${rbacTeam.name}
+        subNode:
+          kind: PermissionDescriptorAllow
+          permissions:
+            - stack:edit
+
+outputs:
+  baseRoleAId: ${baseRoleA.roleId}
+  baseRoleBId: ${baseRoleB.roleId}
+  composedRoleId: ${composedRole.roleId}
+  teamName: ${rbacTeam.name}
+  teamScopedRoleId: ${teamScopedRole.roleId}
+  andConditionRoleId: ${andConditionRole.roleId}
