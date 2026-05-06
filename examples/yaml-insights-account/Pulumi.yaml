@@ -7,6 +7,12 @@ config:
   organizationName:
     type: string
     default: service-provider-test-org
+  # AWS IAM role assumed by Pulumi Insights via OIDC. The role's trust
+  # policy must allow sts:AssumeRoleWithWebIdentity from the Pulumi Cloud
+  # OIDC issuer for `${organizationName}`. See infra/test-aws-oidc/.
+  roleArn:
+    type: string
+
 resources:
   credentials-env:
     type: pulumiservice:Environment
@@ -17,15 +23,16 @@ resources:
       yaml:
         fn::stringAsset: |-
           values:
+            aws:
+              login:
+                fn::open::aws-login:
+                  oidc:
+                    roleArn: ${roleArn}
+                    sessionName: pulumi-insights-session
             environmentVariables:
-              # Static placeholder credentials — InsightsAccount only
-              # validates that AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY
-              # are present at environment open time, not that they
-              # authenticate. Skipping the `fn::open::aws-login` OIDC
-              # exchange keeps this test independent of the AWS trust
-              # policy in the test org (see infra/test-aws-oidc/).
-              AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
-              AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+              AWS_ACCESS_KEY_ID: $${aws.login.accessKeyId}
+              AWS_SECRET_ACCESS_KEY: $${aws.login.secretAccessKey}
+              AWS_SESSION_TOKEN: $${aws.login.sessionToken}
               AWS_REGION: us-west-2
 
   # Insights account for AWS scanning
