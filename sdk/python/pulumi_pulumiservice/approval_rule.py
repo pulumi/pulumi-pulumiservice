@@ -29,6 +29,7 @@ class ApprovalRuleArgs:
                  target_action_types: pulumi.Input[Sequence[pulumi.Input['TargetActionType']]]):
         """
         The set of arguments for constructing a ApprovalRule resource.
+
         :param pulumi.Input['ApprovalRuleConfigArgs'] approval_rule_config: The approval rule configuration.
         :param pulumi.Input[_builtins.bool] enabled: Whether the approval rule is enabled.
         :param pulumi.Input['EnvironmentIdentifierArgs'] environment_identifier: The environment this rule applies to.
@@ -108,14 +109,15 @@ class ApprovalRule(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 approval_rule_config: Optional[pulumi.Input[Union['ApprovalRuleConfigArgs', 'ApprovalRuleConfigArgsDict']]] = None,
-                 enabled: Optional[pulumi.Input[_builtins.bool]] = None,
-                 environment_identifier: Optional[pulumi.Input[Union['EnvironmentIdentifierArgs', 'EnvironmentIdentifierArgsDict']]] = None,
-                 name: Optional[pulumi.Input[_builtins.str]] = None,
-                 target_action_types: Optional[pulumi.Input[Sequence[pulumi.Input['TargetActionType']]]] = None,
+                 approval_rule_config: pulumi.Input[Optional[Union['ApprovalRuleConfigArgs', 'ApprovalRuleConfigArgsDict']]] = None,
+                 enabled: pulumi.Input[Optional[_builtins.bool]] = None,
+                 environment_identifier: pulumi.Input[Optional[Union['EnvironmentIdentifierArgs', 'EnvironmentIdentifierArgsDict']]] = None,
+                 name: pulumi.Input[Optional[_builtins.str]] = None,
+                 target_action_types: pulumi.Input[Optional[Sequence[pulumi.Input['TargetActionType']]]] = None,
                  __props__=None):
         """
         An approval rule for environment deployments.
+
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
@@ -134,6 +136,7 @@ class ApprovalRule(pulumi.CustomResource):
         """
         An approval rule for environment deployments.
 
+
         :param str resource_name: The name of the resource.
         :param ApprovalRuleArgs args: The arguments to use to populate this resource's properties.
         :param pulumi.ResourceOptions opts: Options for the resource.
@@ -149,11 +152,11 @@ class ApprovalRule(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 approval_rule_config: Optional[pulumi.Input[Union['ApprovalRuleConfigArgs', 'ApprovalRuleConfigArgsDict']]] = None,
-                 enabled: Optional[pulumi.Input[_builtins.bool]] = None,
-                 environment_identifier: Optional[pulumi.Input[Union['EnvironmentIdentifierArgs', 'EnvironmentIdentifierArgsDict']]] = None,
-                 name: Optional[pulumi.Input[_builtins.str]] = None,
-                 target_action_types: Optional[pulumi.Input[Sequence[pulumi.Input['TargetActionType']]]] = None,
+                 approval_rule_config: pulumi.Input[Optional[Union['ApprovalRuleConfigArgs', 'ApprovalRuleConfigArgsDict']]] = None,
+                 enabled: pulumi.Input[Optional[_builtins.bool]] = None,
+                 environment_identifier: pulumi.Input[Optional[Union['EnvironmentIdentifierArgs', 'EnvironmentIdentifierArgsDict']]] = None,
+                 name: pulumi.Input[Optional[_builtins.str]] = None,
+                 target_action_types: pulumi.Input[Optional[Sequence[pulumi.Input['TargetActionType']]]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

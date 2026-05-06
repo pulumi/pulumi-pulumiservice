@@ -12,11 +12,11 @@ export interface AWSOIDCConfigurationArgs {
     /**
      * Duration of the assume-role session in “XhYmZs” format
      */
-    duration?: pulumi.Input<string>;
+    duration?: pulumi.Input<string | undefined>;
     /**
      * Optional set of IAM policy ARNs that further restrict the assume-role session
      */
-    policyARNs?: pulumi.Input<pulumi.Input<string>[]>;
+    policyARNs?: pulumi.Input<pulumi.Input<string>[] | undefined>;
     /**
      * The ARN of the role to assume using the OIDC token.
      */
@@ -50,7 +50,7 @@ export interface AuthPolicyDefinitionArgs {
     /**
      * The permission level for organization tokens.
      */
-    authorizedPermissions?: pulumi.Input<pulumi.Input<enums.AuthPolicyPermissionLevel>[]>;
+    authorizedPermissions?: pulumi.Input<pulumi.Input<enums.AuthPolicyPermissionLevel>[] | undefined>;
     /**
      * The rule type of this policy definition
      */
@@ -62,11 +62,11 @@ export interface AuthPolicyDefinitionArgs {
     /**
      * The runner ID for deployment runner tokens.
      */
-    runnerID?: pulumi.Input<string>;
+    runnerID?: pulumi.Input<string | undefined>;
     /**
      * The team name for team tokens.
      */
-    teamName?: pulumi.Input<string>;
+    teamName?: pulumi.Input<string | undefined>;
     /**
      * The token type for this policy definition
      */
@@ -74,7 +74,7 @@ export interface AuthPolicyDefinitionArgs {
     /**
      * The user login for personal tokens.
      */
-    userLogin?: pulumi.Input<string>;
+    userLogin?: pulumi.Input<string | undefined>;
 }
 
 export interface AzureOIDCConfigurationArgs {
@@ -99,7 +99,7 @@ export interface DeploymentSettingsCacheOptionsArgs {
     /**
      * Enable dependency caching
      */
-    enable?: pulumi.Input<boolean>;
+    enable?: pulumi.Input<boolean | undefined>;
 }
 /**
  * deploymentSettingsCacheOptionsArgsProvideDefaults sets the appropriate defaults for DeploymentSettingsCacheOptionsArgs
@@ -142,7 +142,7 @@ export interface DeploymentSettingsGitAuthSSHAuthArgs {
     /**
      * Optional password for SSH authentication.
      */
-    password?: pulumi.Input<string>;
+    password?: pulumi.Input<string | undefined>;
     /**
      * SSH private key.
      */
@@ -156,23 +156,23 @@ export interface DeploymentSettingsGitSourceArgs {
     /**
      * The branch to deploy. One of either `branch` or `commit` must be specified.
      */
-    branch?: pulumi.Input<string>;
+    branch?: pulumi.Input<string | undefined>;
     /**
      * The commit to deploy. One of either `branch` or `commit` must be specified.
      */
-    commit?: pulumi.Input<string>;
+    commit?: pulumi.Input<string | undefined>;
     /**
      * Git authentication configuration for this deployment. Should not be specified if there are `gitHub` settings for this deployment.
      */
-    gitAuth?: pulumi.Input<inputs.DeploymentSettingsGitSourceGitAuthArgs>;
+    gitAuth?: pulumi.Input<inputs.DeploymentSettingsGitSourceGitAuthArgs | undefined>;
     /**
      * The directory within the repository where the Pulumi.yaml is located.
      */
-    repoDir?: pulumi.Input<string>;
+    repoDir?: pulumi.Input<string | undefined>;
     /**
      * The repository URL to use for git settings. Should not be specified if there are `gitHub` settings for this deployment.
      */
-    repoUrl?: pulumi.Input<string>;
+    repoUrl?: pulumi.Input<string | undefined>;
 }
 
 /**
@@ -182,11 +182,11 @@ export interface DeploymentSettingsGitSourceGitAuthArgs {
     /**
      * Basic auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
      */
-    basicAuth?: pulumi.Input<inputs.DeploymentSettingsGitAuthBasicAuthArgs>;
+    basicAuth?: pulumi.Input<inputs.DeploymentSettingsGitAuthBasicAuthArgs | undefined>;
     /**
      * SSH auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
      */
-    sshAuth?: pulumi.Input<inputs.DeploymentSettingsGitAuthSSHAuthArgs>;
+    sshAuth?: pulumi.Input<inputs.DeploymentSettingsGitAuthSSHAuthArgs | undefined>;
 }
 
 /**
@@ -196,23 +196,23 @@ export interface DeploymentSettingsGithubArgs {
     /**
      * Trigger a deployment running `pulumi up` on commit.
      */
-    deployCommits?: pulumi.Input<boolean>;
+    deployCommits?: pulumi.Input<boolean | undefined>;
     /**
      * The paths within the repo that deployments should be filtered to.
      */
-    paths?: pulumi.Input<pulumi.Input<string>[]>;
+    paths?: pulumi.Input<pulumi.Input<string>[] | undefined>;
     /**
      * Trigger a deployment running `pulumi preview` when a PR is opened.
      */
-    previewPullRequests?: pulumi.Input<boolean>;
+    previewPullRequests?: pulumi.Input<boolean | undefined>;
     /**
      * Use this stack as a template for pull request review stacks.
      */
-    pullRequestTemplate?: pulumi.Input<boolean>;
+    pullRequestTemplate?: pulumi.Input<boolean | undefined>;
     /**
      * The GitHub repository in the format org/repo.
      */
-    repository?: pulumi.Input<string>;
+    repository?: pulumi.Input<string | undefined>;
 }
 /**
  * deploymentSettingsGithubArgsProvideDefaults sets the appropriate defaults for DeploymentSettingsGithubArgs
@@ -233,19 +233,19 @@ export interface DeploymentSettingsOperationContextArgs {
     /**
      * Environment variables to set for the deployment.
      */
-    environmentVariables?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
+    environmentVariables?: pulumi.Input<{[key: string]: pulumi.Input<string>} | undefined>;
     /**
      * OIDC configuration to use during the deployment.
      */
-    oidc?: pulumi.Input<inputs.OperationContextOIDCArgs>;
+    oidc?: pulumi.Input<inputs.OperationContextOIDCArgs | undefined>;
     /**
      * Options to override default behavior during the deployment.
      */
-    options?: pulumi.Input<inputs.OperationContextOptionsArgs>;
+    options?: pulumi.Input<inputs.OperationContextOptionsArgs | undefined>;
     /**
      * Shell commands to run before the Pulumi operation executes.
      */
-    preRunCommands?: pulumi.Input<pulumi.Input<string>[]>;
+    preRunCommands?: pulumi.Input<pulumi.Input<string>[] | undefined>;
 }
 
 /**
@@ -255,7 +255,7 @@ export interface DeploymentSettingsSourceContextArgs {
     /**
      * Git source settings for a deployment.
      */
-    git?: pulumi.Input<inputs.DeploymentSettingsGitSourceArgs>;
+    git?: pulumi.Input<inputs.DeploymentSettingsGitSourceArgs | undefined>;
 }
 
 /**
@@ -265,23 +265,23 @@ export interface DeploymentSettingsVcsArgs {
     /**
      * Trigger a deployment running `pulumi up` on commit.
      */
-    deployCommits?: pulumi.Input<boolean>;
+    deployCommits?: pulumi.Input<boolean | undefined>;
     /**
      * Deploy a specific pull request number.
      */
-    deployPullRequest?: pulumi.Input<number>;
+    deployPullRequest?: pulumi.Input<number | undefined>;
     /**
      * The VCS integration installation ID. Use to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps). If omitted, the API resolves the integration automatically from `provider` and `repository`.
      */
-    installationId?: pulumi.Input<string>;
+    installationId?: pulumi.Input<string | undefined>;
     /**
      * The paths within the repo that deployments should be filtered to.
      */
-    paths?: pulumi.Input<pulumi.Input<string>[]>;
+    paths?: pulumi.Input<pulumi.Input<string>[] | undefined>;
     /**
      * Trigger a deployment running `pulumi preview` when a PR is opened.
      */
-    previewPullRequests?: pulumi.Input<boolean>;
+    previewPullRequests?: pulumi.Input<boolean | undefined>;
     /**
      * The VCS provider type.
      */
@@ -289,11 +289,11 @@ export interface DeploymentSettingsVcsArgs {
     /**
      * Use this stack as a template for pull request review stacks.
      */
-    pullRequestTemplate?: pulumi.Input<boolean>;
+    pullRequestTemplate?: pulumi.Input<boolean | undefined>;
     /**
      * The repository identifier (e.g., 'ProjectName/RepoName' for Azure DevOps, 'org/repo' for GitHub).
      */
-    repository?: pulumi.Input<string>;
+    repository?: pulumi.Input<string | undefined>;
 }
 /**
  * deploymentSettingsVcsArgsProvideDefaults sets the appropriate defaults for DeploymentSettingsVcsArgs
@@ -311,15 +311,15 @@ export interface EligibleApproverArgs {
     /**
      * RBAC permission that gives right to approve.
      */
-    rbacPermission?: pulumi.Input<enums.RbacPermission>;
+    rbacPermission?: pulumi.Input<enums.RbacPermission | undefined>;
     /**
      * Name of the team that can approve.
      */
-    teamName?: pulumi.Input<string>;
+    teamName?: pulumi.Input<string | undefined>;
     /**
      * Login of the user that can approve.
      */
-    user?: pulumi.Input<string>;
+    user?: pulumi.Input<string | undefined>;
 }
 
 export interface EnvironmentIdentifierArgs {
@@ -349,7 +349,7 @@ export interface GCPOIDCConfigurationArgs {
     /**
      * The region of the GCP project.
      */
-    region?: pulumi.Input<string>;
+    region?: pulumi.Input<string | undefined>;
     /**
      * The email address of the service account to use.
      */
@@ -357,7 +357,7 @@ export interface GCPOIDCConfigurationArgs {
     /**
      * The lifetime of the temporary credentials in “XhYmZs” format.
      */
-    tokenLifetime?: pulumi.Input<string>;
+    tokenLifetime?: pulumi.Input<string | undefined>;
     /**
      * The ID of the workload pool to use.
      */
@@ -368,34 +368,34 @@ export interface OperationContextOIDCArgs {
     /**
      * AWS-specific OIDC configuration.
      */
-    aws?: pulumi.Input<inputs.AWSOIDCConfigurationArgs>;
+    aws?: pulumi.Input<inputs.AWSOIDCConfigurationArgs | undefined>;
     /**
      * Azure-specific OIDC configuration.
      */
-    azure?: pulumi.Input<inputs.AzureOIDCConfigurationArgs>;
+    azure?: pulumi.Input<inputs.AzureOIDCConfigurationArgs | undefined>;
     /**
      * GCP-specific OIDC configuration.
      */
-    gcp?: pulumi.Input<inputs.GCPOIDCConfigurationArgs>;
+    gcp?: pulumi.Input<inputs.GCPOIDCConfigurationArgs | undefined>;
 }
 
 export interface OperationContextOptionsArgs {
     /**
      * Whether the stack should be deleted after it is destroyed.
      */
-    deleteAfterDestroy?: pulumi.Input<boolean>;
+    deleteAfterDestroy?: pulumi.Input<boolean | undefined>;
     /**
      * The shell to use to run commands during the deployment. Defaults to 'bash'.
      */
-    shell?: pulumi.Input<string>;
+    shell?: pulumi.Input<string | undefined>;
     /**
      * Skip the default dependency installation step - use this to customize the dependency installation (e.g. if using yarn or poetry)
      */
-    skipInstallDependencies?: pulumi.Input<boolean>;
+    skipInstallDependencies?: pulumi.Input<boolean | undefined>;
     /**
      * Skip intermediate deployments (Consolidate multiple deployments of the same type into one deployment)
      */
-    skipIntermediateDeployments?: pulumi.Input<boolean>;
+    skipIntermediateDeployments?: pulumi.Input<boolean | undefined>;
 }
 
 /**
@@ -405,11 +405,11 @@ export interface PolicyGroupPolicyPackReferenceInputArgs {
     /**
      * Optional configuration for the policy pack. The special key `all` sets the default enforcement level for every policy in the pack; per-policy entries override it.
      */
-    config?: pulumi.Input<{[key: string]: any}>;
+    config?: pulumi.Input<{[key: string]: any} | undefined>;
     /**
      * The display name of the policy pack.
      */
-    displayName?: pulumi.Input<string>;
+    displayName?: pulumi.Input<string | undefined>;
     /**
      * The name of the policy pack.
      */
@@ -417,7 +417,7 @@ export interface PolicyGroupPolicyPackReferenceInputArgs {
     /**
      * The version tag of the policy pack.
      */
-    versionTag?: pulumi.Input<string>;
+    versionTag?: pulumi.Input<string | undefined>;
 }
 
 /**
@@ -438,5 +438,5 @@ export interface TemplateSourceDestinationArgs {
     /**
      * Destination URL that gets filled in on new project creation.
      */
-    url?: pulumi.Input<string>;
+    url?: pulumi.Input<string | undefined>;
 }

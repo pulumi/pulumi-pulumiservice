@@ -73,5 +73,5 @@ export interface GetEnvironmentOutputArgs {
     /**
      * The ESC project name. Defaults to `default`.
      */
-    projectName?: pulumi.Input<string>;
+    projectName?: pulumi.Input<string | undefined>;
 }

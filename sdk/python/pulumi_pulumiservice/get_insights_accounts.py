@@ -57,7 +57,7 @@ def get_insights_accounts(organization_name: Optional[_builtins.str] = None,
 
     return AwaitableGetInsightsAccountsResult(
         accounts=pulumi.get(__ret__, 'accounts'))
-def get_insights_accounts_output(organization_name: Optional[pulumi.Input[_builtins.str]] = None,
+def get_insights_accounts_output(organization_name: pulumi.Input[Optional[_builtins.str]] = None,
                                  opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[GetInsightsAccountsResult]:
     """
     Get a list of all Insights accounts for an organization.

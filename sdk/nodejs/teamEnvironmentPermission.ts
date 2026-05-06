@@ -115,7 +115,7 @@ export interface TeamEnvironmentPermissionArgs {
     /**
      * The maximum duration for which members of this team may open the environment.
      */
-    maxOpenDuration?: pulumi.Input<string>;
+    maxOpenDuration?: pulumi.Input<string | undefined>;
     /**
      * Organization name.
      */
@@ -127,7 +127,7 @@ export interface TeamEnvironmentPermissionArgs {
     /**
      * Project name.
      */
-    project?: pulumi.Input<string>;
+    project?: pulumi.Input<string | undefined>;
     /**
      * Team name.
      */
