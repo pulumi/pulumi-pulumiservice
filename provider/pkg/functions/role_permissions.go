@@ -31,24 +31,6 @@ const scopedPermissionsHelpDoc = "The result is directly assignable to " +
 	"in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` " +
 	"list pulls the output of each helper."
 
-// validateRbacPermissions checks each scope string against the typed
-// apitype.RbacPermission enum. The IsValid() method is generated from the
-// same OpenAPI spec the API uses, so the catalogue stays in sync without
-// the provider having to maintain its own list. An invalid scope here
-// surfaces as a clear preview-time error rather than a 400 at apply.
-func validateRbacPermissions(permissions []string) error {
-	for _, p := range permissions {
-		if !apitype.RbacPermission(p).IsValid() {
-			return fmt.Errorf(
-				"%q is not a valid permission scope; discover valid scope names "+
-					"via the `getOrganizationRoleScopes` data source",
-				p,
-			)
-		}
-	}
-	return nil
-}
-
 // descriptorToSDKMap marshals a typed apitype.PermissionDescriptor to the
 // SDK-boundary map shape the provider expects on
 // `OrganizationRole.permissions`. The typed Marshaler emits the wire format
@@ -69,13 +51,26 @@ func descriptorToSDKMap(descriptor apitype.PermissionDescriptor) (map[string]any
 }
 
 // rbacPermissionSlice converts a []string of scope names to the typed
-// apitype.RbacPermissionSlice the apitype builders consume.
-func rbacPermissionSlice(scopes []string) apitype.RbacPermissionSlice {
+// apitype.RbacPermissionSlice the apitype builders consume, validating
+// each scope against the generated apitype.RbacPermission enum as it
+// goes. The IsValid() method is generated from the same OpenAPI spec
+// the API uses, so the catalogue stays in sync without the provider
+// having to maintain its own list. An invalid scope here surfaces as
+// a clear preview-time error rather than a 400 at apply.
+func rbacPermissionSlice(scopes []string) (apitype.RbacPermissionSlice, error) {
 	out := make(apitype.RbacPermissionSlice, len(scopes))
 	for i, s := range scopes {
-		out[i] = apitype.RbacPermission(s)
+		p := apitype.RbacPermission(s)
+		if !p.IsValid() {
+			return nil, fmt.Errorf(
+				"%q is not a valid permission scope; discover valid scope names "+
+					"via the `getOrganizationRoleScopes` data source",
+				s,
+			)
+		}
+		out[i] = p
 	}
-	return out
+	return out, nil
 }
 
 // scopedAllowDescriptor builds an `OrganizationRole.permissions` SDK-shape
@@ -96,7 +91,8 @@ func scopedAllowDescriptor(
 	literal apitype.PermissionExpression,
 	permissions []string,
 ) (map[string]any, error) {
-	if err := validateRbacPermissions(permissions); err != nil {
+	scopes, err := rbacPermissionSlice(permissions)
+	if err != nil {
 		return nil, err
 	}
 	descriptor := apitype.PermissionDescriptorConditionBuilder{
@@ -105,7 +101,7 @@ func scopedAllowDescriptor(
 			Right: literal,
 		}.Build(),
 		SubNode: apitype.PermissionDescriptorAllowBuilder{
-			Permissions: rbacPermissionSlice(permissions),
+			Permissions: scopes,
 		}.Build(),
 	}.Build()
 	return descriptorToSDKMap(descriptor)
@@ -168,11 +164,12 @@ func (BuildAllowPermissionsFunction) Invoke(
 		return infer.FunctionResponse[BuildAllowPermissionsOutput]{},
 			fmt.Errorf("`permissions` must not be empty")
 	}
-	if err := validateRbacPermissions(req.Input.Permissions); err != nil {
+	scopes, err := rbacPermissionSlice(req.Input.Permissions)
+	if err != nil {
 		return infer.FunctionResponse[BuildAllowPermissionsOutput]{}, err
 	}
 	descriptor := apitype.PermissionDescriptorAllowBuilder{
-		Permissions: rbacPermissionSlice(req.Input.Permissions),
+		Permissions: scopes,
 	}.Build()
 	out, err := descriptorToSDKMap(descriptor)
 	if err != nil {
