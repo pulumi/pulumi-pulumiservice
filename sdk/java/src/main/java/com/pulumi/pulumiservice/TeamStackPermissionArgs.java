@@ -35,13 +35,13 @@ public final class TeamStackPermissionArgs extends com.pulumi.resources.Resource
      * 
      */
     @Import(name="permission", required=true)
-    private TeamStackPermissionScope permission;
+    private Output<TeamStackPermissionScope> permission;
 
     /**
      * @return Sets the permission level that this team will be granted to the stack.
      * 
      */
-    public TeamStackPermissionScope permission() {
+    public Output<TeamStackPermissionScope> permission() {
         return this.permission;
     }
 
@@ -145,9 +145,19 @@ public final class TeamStackPermissionArgs extends com.pulumi.resources.Resource
          * @return builder
          * 
          */
-        public Builder permission(TeamStackPermissionScope permission) {
+        public Builder permission(Output<TeamStackPermissionScope> permission) {
             $.permission = permission;
             return this;
+        }
+
+        /**
+         * @param permission Sets the permission level that this team will be granted to the stack.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder permission(TeamStackPermissionScope permission) {
+            return permission(Output.of(permission));
         }
 
         /**

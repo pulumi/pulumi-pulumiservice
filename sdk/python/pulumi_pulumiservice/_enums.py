@@ -192,7 +192,7 @@ class TargetActionType(_builtins.str, Enum):
 
 
 @pulumi.type_token("pulumiservice:index:TeamStackPermissionScope")
-class TeamStackPermissionScope(_builtins.float, Enum):
+class TeamStackPermissionScope(_builtins.int, Enum):
     READ = 101
     """
     Grants read permissions to stack.

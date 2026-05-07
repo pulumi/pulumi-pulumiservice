@@ -1,3 +1,17 @@
+// Copyright 2026, Pulumi Corporation.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//	http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package resources
 
 import (
@@ -6,276 +20,254 @@ import (
 	"strings"
 	"time"
 
-	pbempty "google.golang.org/protobuf/types/known/emptypb"
+	p "github.com/pulumi/pulumi-go-provider"
+	"github.com/pulumi/pulumi-go-provider/infer"
 
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
-
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
-type PulumiServiceTeamEnvironmentPermissionResource struct {
-	Client pulumiapi.TeamClient
+type EnvironmentPermission string
+
+const (
+	EnvironmentPermissionNone  EnvironmentPermission = "none"
+	EnvironmentPermissionRead  EnvironmentPermission = "read"
+	EnvironmentPermissionOpen  EnvironmentPermission = "open"
+	EnvironmentPermissionWrite EnvironmentPermission = "write"
+	EnvironmentPermissionAdmin EnvironmentPermission = "admin"
+)
+
+func (EnvironmentPermission) Values() []infer.EnumValue[EnvironmentPermission] {
+	return []infer.EnumValue[EnvironmentPermission]{
+		{Value: EnvironmentPermissionNone, Description: "No permissions."},
+		{Value: EnvironmentPermissionRead, Description: "Permission to read environment definition only."},
+		{Value: EnvironmentPermissionOpen, Description: "Permission to open and read the environment."},
+		{Value: EnvironmentPermissionWrite, Description: "Permission to open, read and update the environment."},
+		{Value: EnvironmentPermissionAdmin, Description: "Permission for all operations on the environment."},
+	}
+}
+
+type TeamEnvironmentPermission struct{}
+
+type (
+	tepIn  = TeamEnvironmentPermissionInput
+	tepOut = TeamEnvironmentPermissionState
+)
+
+var (
+	_ infer.CustomCheck[tepIn]          = &TeamEnvironmentPermission{}
+	_ infer.CustomDiff[tepIn, tepOut]   = &TeamEnvironmentPermission{}
+	_ infer.CustomCreate[tepIn, tepOut] = &TeamEnvironmentPermission{}
+	_ infer.CustomDelete[tepOut]        = &TeamEnvironmentPermission{}
+	_ infer.CustomRead[tepIn, tepOut]   = &TeamEnvironmentPermission{}
+)
+
+func (*TeamEnvironmentPermission) Annotate(a infer.Annotator) {
+	a.Describe(&TeamEnvironmentPermission{}, "A permission for a team to use an environment.")
+	a.SetToken("index", "TeamEnvironmentPermission")
 }
 
 type TeamEnvironmentPermissionInput struct {
-	Organization    string `pulumi:"organization"`
-	Team            string `pulumi:"team"`
-	Environment     string `pulumi:"environment"`
-	Project         string `pulumi:"project"`
-	Permission      string `pulumi:"permission"`
-	MaxOpenDuration string `pulumi:"maxOpenDuration"`
+	Organization    string                `pulumi:"organization"              provider:"replaceOnChanges"`
+	Team            string                `pulumi:"team"                      provider:"replaceOnChanges"`
+	Project         string                `pulumi:"project,optional"          provider:"replaceOnChanges"`
+	Environment     string                `pulumi:"environment"               provider:"replaceOnChanges"`
+	Permission      EnvironmentPermission `pulumi:"permission"                provider:"replaceOnChanges"`
+	MaxOpenDuration *string               `pulumi:"maxOpenDuration,optional"  provider:"replaceOnChanges"`
 }
 
-func (i *TeamEnvironmentPermissionInput) ToPropertyMap() resource.PropertyMap {
-	return util.ToPropertyMap(*i)
+func (i *TeamEnvironmentPermissionInput) Annotate(a infer.Annotator) {
+	a.Describe(&i.Organization, "Organization name.")
+	a.Describe(&i.Team, "Team name.")
+	a.Describe(&i.Project, "Project name.")
+	a.SetDefault(&i.Project, "default")
+	a.Describe(&i.Environment, "Environment name.")
+	a.Describe(&i.Permission, "Which permission level to grant to the specified team.")
+	a.Describe(
+		&i.MaxOpenDuration,
+		"The maximum duration for which members of this team may open the environment.",
+	)
 }
 
-func (tp *PulumiServiceTeamEnvironmentPermissionResource) ToPulumiServiceTeamInput(
-	inputMap resource.PropertyMap,
-) (*TeamEnvironmentPermissionInput, error) {
-	input := TeamEnvironmentPermissionInput{}
-	return &input, util.FromPropertyMap(inputMap, &input)
+type TeamEnvironmentPermissionState struct {
+	TeamEnvironmentPermissionInput
 }
 
-func (tp *PulumiServiceTeamEnvironmentPermissionResource) Name() string {
-	return "pulumiservice:index:TeamEnvironmentPermission"
-}
-
-func (tp *PulumiServiceTeamEnvironmentPermissionResource) Check(
-	req *pulumirpc.CheckRequest,
-) (*pulumirpc.CheckResponse, error) {
-	// Work on the property map directly so we only touch fields the user
-	// actually supplied. Re-serializing the input struct would emit every
-	// tagged field (including empty strings), which introduces spurious
-	// diffs for optional fields that weren't present in state written by
-	// older provider versions.
-	news, err := plugin.UnmarshalProperties(req.GetNews(), util.StandardUnmarshal)
-	if err != nil {
-		return nil, err
+func (*TeamEnvironmentPermission) Check(
+	ctx context.Context, req infer.CheckRequest,
+) (infer.CheckResponse[TeamEnvironmentPermissionInput], error) {
+	// Strip an explicit empty-string maxOpenDuration before decoding.
+	// Provider versions 0.29.3–0.36.0 wrote `""` into state when the user
+	// did not set the field; treating that as "unset" keeps re-applies
+	// against that state from forcing a spurious replacement.
+	if v, ok := req.NewInputs.GetOk("maxOpenDuration"); ok && v.IsString() && v.AsString() == "" {
+		req.NewInputs = req.NewInputs.Delete("maxOpenDuration")
 	}
 
-	var failures []*pulumirpc.CheckFailure
-	if prop, ok := news["maxOpenDuration"]; ok {
-		if !prop.IsString() {
-			// Reject non-string values deterministically at preview; otherwise
-			// util.FromPropertyMap panics during Create when asserting a
-			// number into the string field.
-			failures = append(failures, &pulumirpc.CheckFailure{
+	i, failures, err := infer.DefaultCheck[TeamEnvironmentPermissionInput](ctx, req.NewInputs)
+	if err != nil {
+		return infer.CheckResponse[TeamEnvironmentPermissionInput]{}, err
+	}
+	if i.MaxOpenDuration != nil {
+		d, perr := time.ParseDuration(*i.MaxOpenDuration)
+		if perr != nil {
+			failures = append(failures, p.CheckFailure{
 				Property: "maxOpenDuration",
-				Reason:   "maxOpenDuration property is present but can't be parsed as string",
+				Reason:   fmt.Sprintf("malformed duration: %v", perr),
 			})
-		} else {
-			raw := prop.StringValue()
-			if raw == "" {
-				// Treat an explicit empty string as "unset" to stay consistent
-				// with state saved before this field existed.
-				delete(news, "maxOpenDuration")
-			} else {
-				d, err := time.ParseDuration(raw)
-				if err != nil {
-					failures = append(failures, &pulumirpc.CheckFailure{
-						Property: "maxOpenDuration",
-						Reason:   fmt.Sprintf("malformed duration: %v", err),
-					})
-				} else if normalized := d.String(); normalized != raw {
-					// Normalize the duration to prevent spurious diffs.
-					news["maxOpenDuration"] = resource.NewStringProperty(normalized)
-				}
-			}
+		} else if normalized := d.String(); normalized != *i.MaxOpenDuration {
+			i.MaxOpenDuration = &normalized
 		}
 	}
+	return infer.CheckResponse[TeamEnvironmentPermissionInput]{Inputs: i, Failures: failures}, nil
+}
 
-	inputs, err := plugin.MarshalProperties(news, util.StandardMarshal)
-	if err != nil {
-		return nil, err
+func (*TeamEnvironmentPermission) Diff(
+	_ context.Context,
+	req infer.DiffRequest[TeamEnvironmentPermissionInput, TeamEnvironmentPermissionState],
+) (infer.DiffResponse, error) {
+	diff := map[string]p.PropertyDiff{}
+	add := func(key string) { diff[key] = p.PropertyDiff{Kind: p.UpdateReplace, InputDiff: true} }
+
+	if req.State.Organization != req.Inputs.Organization {
+		add("organization")
+	}
+	if req.State.Team != req.Inputs.Team {
+		add("team")
+	}
+	if req.State.Project != req.Inputs.Project {
+		add("project")
+	}
+	if req.State.Environment != req.Inputs.Environment {
+		add("environment")
+	}
+	if req.State.Permission != req.Inputs.Permission {
+		add("permission")
+	}
+	if normalizedDuration(req.State.MaxOpenDuration) != normalizedDuration(req.Inputs.MaxOpenDuration) {
+		add("maxOpenDuration")
 	}
 
-	return &pulumirpc.CheckResponse{
-		Inputs:   inputs,
-		Failures: failures,
+	return infer.DiffResponse{
+		HasChanges:          len(diff) > 0,
+		DetailedDiff:        diff,
+		DeleteBeforeReplace: true,
 	}, nil
 }
 
-func (tp *PulumiServiceTeamEnvironmentPermissionResource) Read(
-	req *pulumirpc.ReadRequest,
-) (*pulumirpc.ReadResponse, error) {
-	ctx := context.Background()
-	permID, err := splitTeamEnvironmentPermissionID(req.GetId())
-	if err != nil {
-		return nil, err
+// normalizedDuration treats nil and an empty string as equivalent so a
+// pre-#752 empty-string in state does not diff against an absent field.
+func normalizedDuration(d *string) string {
+	if d == nil {
+		return ""
 	}
+	return *d
+}
 
-	request := pulumiapi.TeamEnvironmentSettingsRequest{
+func (*TeamEnvironmentPermission) Create(
+	ctx context.Context,
+	req infer.CreateRequest[TeamEnvironmentPermissionInput],
+) (infer.CreateResponse[TeamEnvironmentPermissionState], error) {
+	if req.DryRun {
+		return infer.CreateResponse[TeamEnvironmentPermissionState]{
+			Output: TeamEnvironmentPermissionState{TeamEnvironmentPermissionInput: req.Inputs},
+		}, nil
+	}
+	apiReq, err := req.Inputs.toCreateRequest()
+	if err != nil {
+		return infer.CreateResponse[TeamEnvironmentPermissionState]{}, err
+	}
+	if err := config.GetClient(ctx).AddEnvironmentSettings(ctx, apiReq); err != nil {
+		return infer.CreateResponse[TeamEnvironmentPermissionState]{},
+			fmt.Errorf("error granting team environment permission: %w", err)
+	}
+	id := teamEnvironmentPermissionID{
+		Organization: req.Inputs.Organization,
+		Team:         req.Inputs.Team,
+		Project:      req.Inputs.Project,
+		Environment:  req.Inputs.Environment,
+	}
+	return infer.CreateResponse[TeamEnvironmentPermissionState]{
+		ID:     id.String(),
+		Output: TeamEnvironmentPermissionState{TeamEnvironmentPermissionInput: req.Inputs},
+	}, nil
+}
+
+func (*TeamEnvironmentPermission) Delete(
+	ctx context.Context,
+	req infer.DeleteRequest[TeamEnvironmentPermissionState],
+) (infer.DeleteResponse, error) {
+	apiReq := pulumiapi.TeamEnvironmentSettingsRequest{
+		Organization: req.State.Organization,
+		Team:         req.State.Team,
+		Project:      req.State.Project,
+		Environment:  req.State.Environment,
+	}
+	return infer.DeleteResponse{}, config.GetClient(ctx).RemoveEnvironmentSettings(ctx, apiReq)
+}
+
+func (*TeamEnvironmentPermission) Read(
+	ctx context.Context,
+	req infer.ReadRequest[TeamEnvironmentPermissionInput, TeamEnvironmentPermissionState],
+) (infer.ReadResponse[TeamEnvironmentPermissionInput, TeamEnvironmentPermissionState], error) {
+	permID, err := splitTeamEnvironmentPermissionID(req.ID)
+	if err != nil {
+		return infer.ReadResponse[TeamEnvironmentPermissionInput, TeamEnvironmentPermissionState]{}, err
+	}
+	apiReq := pulumiapi.TeamEnvironmentSettingsRequest{
 		Organization: permID.Organization,
 		Team:         permID.Team,
-		Environment:  permID.Environment,
 		Project:      permID.Project,
+		Environment:  permID.Environment,
 	}
-	permission, maxOpenDuration, err := tp.Client.GetTeamEnvironmentSettings(ctx, request)
+	permission, maxOpenDuration, err := config.GetClient(ctx).GetTeamEnvironmentSettings(ctx, apiReq)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get team environment permission: %w", err)
+		return infer.ReadResponse[TeamEnvironmentPermissionInput, TeamEnvironmentPermissionState]{},
+			fmt.Errorf("failed to get team environment permission: %w", err)
 	}
 	if permission == nil {
-		return &pulumirpc.ReadResponse{}, nil
+		return infer.ReadResponse[TeamEnvironmentPermissionInput, TeamEnvironmentPermissionState]{}, nil
 	}
-
 	inputs := TeamEnvironmentPermissionInput{
 		Organization: permID.Organization,
 		Team:         permID.Team,
 		Project:      permID.Project,
 		Environment:  permID.Environment,
-		Permission:   *permission,
+		Permission:   EnvironmentPermission(*permission),
 	}
 	if maxOpenDuration != nil {
-		inputs.MaxOpenDuration = (time.Duration)(*maxOpenDuration).String()
+		s := time.Duration(*maxOpenDuration).String()
+		inputs.MaxOpenDuration = &s
 	}
-
-	// Omit maxOpenDuration when it wasn't set on the remote resource; emitting
-	// an empty string would cause a spurious replacement on the next update
-	// against state written by providers that didn't have this field.
-	propertyMap := inputs.ToPropertyMap()
-	if inputs.MaxOpenDuration == "" {
-		delete(propertyMap, "maxOpenDuration")
-	}
-
-	properties, err := plugin.MarshalProperties(propertyMap, plugin.MarshalOptions{})
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal inputs to properties: %w", err)
-	}
-	return &pulumirpc.ReadResponse{
-		Id:         req.Id,
-		Properties: properties,
-		Inputs:     properties,
+	return infer.ReadResponse[TeamEnvironmentPermissionInput, TeamEnvironmentPermissionState]{
+		ID:     req.ID,
+		Inputs: inputs,
+		State:  TeamEnvironmentPermissionState{TeamEnvironmentPermissionInput: inputs},
 	}, nil
 }
 
-func (tp *PulumiServiceTeamEnvironmentPermissionResource) Create(
-	req *pulumirpc.CreateRequest,
-) (*pulumirpc.CreateResponse, error) {
-	ctx := context.Background()
-	var input TeamEnvironmentPermissionInput
-	err := util.FromProperties(req.GetProperties(), &input)
-	if err != nil {
-		return nil, err
-	}
-
-	var maxOpenDuration *pulumiapi.Duration
-	if input.MaxOpenDuration != "" {
-		d, err := time.ParseDuration(input.MaxOpenDuration)
-		if err != nil {
-			return nil, err
-		}
-		maxOpenDuration = (*pulumiapi.Duration)(&d)
-	}
-
-	request := pulumiapi.CreateTeamEnvironmentSettingsRequest{
+func (i TeamEnvironmentPermissionInput) toCreateRequest() (
+	pulumiapi.CreateTeamEnvironmentSettingsRequest, error,
+) {
+	apiReq := pulumiapi.CreateTeamEnvironmentSettingsRequest{
 		TeamEnvironmentSettingsRequest: pulumiapi.TeamEnvironmentSettingsRequest{
-			Organization: input.Organization,
-			Team:         input.Team,
-			Project:      input.Project,
-			Environment:  input.Environment,
+			Organization: i.Organization,
+			Team:         i.Team,
+			Project:      i.Project,
+			Environment:  i.Environment,
 		},
-		Permission:      input.Permission,
-		MaxOpenDuration: maxOpenDuration,
+		Permission: string(i.Permission),
 	}
-
-	err = tp.Client.AddEnvironmentSettings(ctx, request)
-	if err != nil {
-		return nil, err
+	if i.MaxOpenDuration != nil {
+		d, err := time.ParseDuration(*i.MaxOpenDuration)
+		if err != nil {
+			return pulumiapi.CreateTeamEnvironmentSettingsRequest{},
+				fmt.Errorf("invalid maxOpenDuration %q: %w", *i.MaxOpenDuration, err)
+		}
+		mod := pulumiapi.Duration(d)
+		apiReq.MaxOpenDuration = &mod
 	}
-
-	environmentPermissionID := teamEnvironmentPermissionID{
-		Organization: input.Organization,
-		Team:         input.Team,
-		Project:      input.Project,
-		Environment:  input.Environment,
-	}
-
-	return &pulumirpc.CreateResponse{
-		Id:         environmentPermissionID.String(),
-		Properties: req.GetProperties(),
-	}, nil
-}
-
-func (tp *PulumiServiceTeamEnvironmentPermissionResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	ctx := context.Background()
-	var input TeamEnvironmentPermissionInput
-	err := util.FromProperties(req.GetProperties(), &input)
-	if err != nil {
-		return nil, err
-	}
-	request := pulumiapi.TeamEnvironmentSettingsRequest{
-		Organization: input.Organization,
-		Team:         input.Team,
-		Project:      input.Project,
-		Environment:  input.Environment,
-	}
-	err = tp.Client.RemoveEnvironmentSettings(ctx, request)
-	if err != nil {
-		return nil, err
-	}
-	return &pbempty.Empty{}, nil
-}
-
-func (tp *PulumiServiceTeamEnvironmentPermissionResource) Diff(
-	req *pulumirpc.DiffRequest,
-) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(
-		req.GetOldInputs(),
-		plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true},
-	)
-	if err != nil {
-		return nil, err
-	}
-	news, err := plugin.UnmarshalProperties(
-		req.GetNews(),
-		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: false},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	// Provider versions 0.29.3–0.36.0 wrote `maxOpenDuration: ""` into state
-	// whenever the user did not set the field. #752 fixed the Check/Read
-	// paths, but state saved by those versions still carries the empty
-	// string. Without this normalization, the first preview after upgrading
-	// from that window would observe the key as deleted and force one more
-	// spurious replacement — the exact failure mode #751 set out to remove.
-	normalizeEmptyMaxOpenDuration(olds)
-	normalizeEmptyMaxOpenDuration(news)
-
-	var changedKeys []string
-	for _, k := range olds.Diff(news).ChangedKeys() {
-		changedKeys = append(changedKeys, string(k))
-	}
-
-	changes := pulumirpc.DiffResponse_DIFF_NONE
-	if len(changedKeys) > 0 {
-		changes = pulumirpc.DiffResponse_DIFF_SOME
-	}
-	return &pulumirpc.DiffResponse{
-		Changes:             changes,
-		Replaces:            changedKeys,
-		DeleteBeforeReplace: true,
-	}, nil
-}
-
-// normalizeEmptyMaxOpenDuration removes a zero-value `maxOpenDuration` so it
-// compares equal to an absent field. See Diff() for the history.
-func normalizeEmptyMaxOpenDuration(m resource.PropertyMap) {
-	if v, ok := m["maxOpenDuration"]; ok && v.IsString() && v.StringValue() == "" {
-		delete(m, "maxOpenDuration")
-	}
-}
-
-// Update does nothing because we always replace on changes, never an update
-func (tp *PulumiServiceTeamEnvironmentPermissionResource) Update(
-	_ *pulumirpc.UpdateRequest,
-) (*pulumirpc.UpdateResponse, error) {
-	return nil, fmt.Errorf("unexpected call to update, expected create to be called instead")
+	return apiReq, nil
 }
 
 type teamEnvironmentPermissionID struct {
@@ -285,7 +277,7 @@ type teamEnvironmentPermissionID struct {
 	Environment  string
 }
 
-func (s *teamEnvironmentPermissionID) String() string {
+func (s teamEnvironmentPermissionID) String() string {
 	return fmt.Sprintf("%s/%s/%s+%s", s.Organization, s.Team, s.Project, s.Environment)
 }
 
@@ -294,17 +286,16 @@ func splitTeamEnvironmentPermissionID(id string) (teamEnvironmentPermissionID, e
 	if len(split) != 3 {
 		return teamEnvironmentPermissionID{}, fmt.Errorf("invalid id %q, expected 3 parts", id)
 	}
-
 	splitProjectEnv := strings.Split(split[2], "+")
-	if len(splitProjectEnv) == 1 {
+	switch len(splitProjectEnv) {
+	case 1:
 		return teamEnvironmentPermissionID{
 			Organization: split[0],
 			Team:         split[1],
 			Project:      "default",
 			Environment:  splitProjectEnv[0],
 		}, nil
-	}
-	if len(splitProjectEnv) == 2 {
+	case 2:
 		return teamEnvironmentPermissionID{
 			Organization: split[0],
 			Team:         split[1],
@@ -312,9 +303,7 @@ func splitTeamEnvironmentPermissionID(id string) (teamEnvironmentPermissionID, e
 			Environment:  splitProjectEnv[1],
 		}, nil
 	}
-
 	return teamEnvironmentPermissionID{}, fmt.Errorf(
-		"invalid id %q, expected environment name or project/environment in last part",
-		id,
+		"invalid id %q, expected environment name or project/environment in last part", id,
 	)
 }

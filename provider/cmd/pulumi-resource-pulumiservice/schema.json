@@ -926,7 +926,7 @@
       ]
     },
     "pulumiservice:index:TeamStackPermissionScope": {
-      "type": "number",
+      "type": "integer",
       "enum": [
         {
           "name": "read",
@@ -2623,55 +2623,73 @@
       "properties": {
         "environment": {
           "type": "string",
-          "description": "Environment name."
+          "description": "Environment name.",
+          "replaceOnChanges": true
         },
         "maxOpenDuration": {
           "type": "string",
-          "description": "The maximum duration for which members of this team may open the environment."
+          "description": "The maximum duration for which members of this team may open the environment.",
+          "replaceOnChanges": true
         },
         "organization": {
           "type": "string",
-          "description": "Organization name."
+          "description": "Organization name.",
+          "replaceOnChanges": true
         },
         "permission": {
           "$ref": "#/types/pulumiservice:index:EnvironmentPermission",
-          "description": "Which permission level to grant to the specified team."
+          "description": "Which permission level to grant to the specified team.",
+          "replaceOnChanges": true
         },
         "project": {
           "type": "string",
           "description": "Project name.",
-          "default": "default"
+          "default": "default",
+          "replaceOnChanges": true
         },
         "team": {
           "type": "string",
-          "description": "Team name."
+          "description": "Team name.",
+          "replaceOnChanges": true
         }
       },
+      "required": [
+        "organization",
+        "team",
+        "environment",
+        "permission"
+      ],
       "inputProperties": {
         "environment": {
           "type": "string",
-          "description": "Environment name."
+          "description": "Environment name.",
+          "replaceOnChanges": true
         },
         "maxOpenDuration": {
           "type": "string",
-          "description": "The maximum duration for which members of this team may open the environment."
+          "description": "The maximum duration for which members of this team may open the environment.",
+          "replaceOnChanges": true
         },
         "organization": {
           "type": "string",
-          "description": "Organization name."
+          "description": "Organization name.",
+          "replaceOnChanges": true
         },
         "permission": {
           "$ref": "#/types/pulumiservice:index:EnvironmentPermission",
-          "description": "Which permission level to grant to the specified team."
+          "description": "Which permission level to grant to the specified team.",
+          "replaceOnChanges": true
         },
         "project": {
           "type": "string",
           "description": "Project name.",
-          "default": "default"
+          "default": "default",
+          "replaceOnChanges": true
         },
         "team": {
           "type": "string",
-          "description": "Team name."
+          "description": "Team name.",
+          "replaceOnChanges": true
         }
       },
       "requiredInputs": [
@@ -2738,66 +2756,69 @@
       "properties": {
         "organization": {
           "type": "string",
-          "description": "The organization or the personal account name of the stack."
+          "description": "The organization or the personal account name of the stack.",
+          "replaceOnChanges": true
         },
         "permission": {
           "$ref": "#/types/pulumiservice:index:TeamStackPermissionScope",
-          "plain": true,
-          "description": "Sets the permission level that this team will be granted to the stack."
+          "description": "Sets the permission level that this team will be granted to the stack.",
+          "replaceOnChanges": true
         },
         "project": {
           "type": "string",
-          "description": "The project name for this stack."
+          "description": "The project name for this stack.",
+          "replaceOnChanges": true
         },
         "stack": {
           "type": "string",
-          "description": "The name of the stack that the team will be granted permissions to."
+          "description": "The name of the stack that the team will be granted permissions to.",
+          "replaceOnChanges": true
         },
         "team": {
           "type": "string",
-          "description": "The name of the team to grant this stack permissions to. This is not the display name."
+          "description": "The name of the team to grant this stack permissions to. This is not the display name.",
+          "replaceOnChanges": true
         }
       },
       "required": [
-        "team",
         "organization",
         "project",
         "stack",
+        "team",
         "permission"
       ],
       "inputProperties": {
         "organization": {
           "type": "string",
           "description": "The organization or the personal account name of the stack.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         },
         "permission": {
           "$ref": "#/types/pulumiservice:index:TeamStackPermissionScope",
-          "plain": true,
           "description": "Sets the permission level that this team will be granted to the stack.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         },
         "project": {
           "type": "string",
           "description": "The project name for this stack.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         },
         "stack": {
           "type": "string",
           "description": "The name of the stack that the team will be granted permissions to.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         },
         "team": {
           "type": "string",
           "description": "The name of the team to grant this stack permissions to. This is not the display name.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         }
       },
       "requiredInputs": [
-        "team",
         "organization",
         "project",
         "stack",
+        "team",
         "permission"
       ]
     },

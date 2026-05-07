@@ -4,6 +4,8 @@
 
 ### Breaking Changes
 - Removed the numeric `version` field from `PolicyGroup.policyPacks` inputs; it is now output-only, since the value is server-derived from `versionTag`. Use `versionTag` to pin pack versions. [#737](https://github.com/pulumi/pulumi-pulumiservice/issues/737)
+- `TeamStackPermission.permission` is no longer marked `plain` in the schema. The output is now an `Output<TeamStackPermissionScope>` rather than a plain value; consumers reading `myPerm.permission` need `.apply(...)` to access the underlying value. The input side is strictly more permissive — callers may now wire `permission` to another resource's output. The Go SDK type also changes from `float64` to `int` to match the wire format.
+- `TeamEnvironmentPermission` outputs (`organization`, `team`, `environment`, `permission`) are now typed as definitely-present (`Output<string>`, `Output<EnvironmentPermission>`) rather than optional (`Output<string | undefined>`). The values were always populated; the schema previously misrepresented them.
 
 ### Improvements
 - Added `installationId` to `DeploymentSettings.vcs` to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps installed against different sets of repos). When omitted, the API resolves the integration automatically from `provider` and `repository` as before.

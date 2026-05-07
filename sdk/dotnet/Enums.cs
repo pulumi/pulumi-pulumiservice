@@ -373,42 +373,20 @@ namespace Pulumi.PulumiService
         public override string ToString() => _value;
     }
 
-    [EnumType]
-    public readonly struct TeamStackPermissionScope : IEquatable<TeamStackPermissionScope>
+    public enum TeamStackPermissionScope
     {
-        private readonly double _value;
-
-        private TeamStackPermissionScope(double value)
-        {
-            _value = value;
-        }
-
         /// <summary>
         /// Grants read permissions to stack.
         /// </summary>
-        public static TeamStackPermissionScope Read { get; } = new TeamStackPermissionScope(101);
+        Read = 101,
         /// <summary>
         /// Grants edit permissions to stack.
         /// </summary>
-        public static TeamStackPermissionScope Edit { get; } = new TeamStackPermissionScope(102);
+        Edit = 102,
         /// <summary>
         /// Grants admin permissions to stack.
         /// </summary>
-        public static TeamStackPermissionScope Admin { get; } = new TeamStackPermissionScope(103);
-
-        public static bool operator ==(TeamStackPermissionScope left, TeamStackPermissionScope right) => left.Equals(right);
-        public static bool operator !=(TeamStackPermissionScope left, TeamStackPermissionScope right) => !left.Equals(right);
-
-        public static explicit operator double(TeamStackPermissionScope value) => value._value;
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public override bool Equals(object? obj) => obj is TeamStackPermissionScope other && Equals(other);
-        public bool Equals(TeamStackPermissionScope other) => _value == other._value;
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public override int GetHashCode() => _value.GetHashCode();
-
-        public override string ToString() => _value.ToString();
+        Admin = 103,
     }
 
     [EnumType]

@@ -102,7 +102,9 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 			infer.Resource(&resources.TTLSchedule{}),
 			infer.Resource(&resources.Team{}),
 			infer.Resource(&resources.TeamAccessToken{}),
+			infer.Resource(&resources.TeamEnvironmentPermission{}),
 			infer.Resource(&resources.TeamRoleAssignment{}),
+			infer.Resource(&resources.TeamStackPermission{}),
 		).
 		WithFunctions(
 			infer.Function(&functions.GetCurrentUserFunction{}),
@@ -254,9 +256,6 @@ func (k *pulumiserviceProvider) Configure(
 		&resources.PulumiServiceStackTagsResource{
 			Client: client,
 		},
-		&resources.TeamStackPermissionResource{
-			Client: client,
-		},
 		&resources.PulumiServiceDeploymentSettingsResource{
 			Client: client,
 		},
@@ -266,9 +265,6 @@ func (k *pulumiserviceProvider) Configure(
 		&resources.PulumiServiceEnvironmentResource{
 			Client:         escClient,
 			MetadataClient: client,
-		},
-		&resources.PulumiServiceTeamEnvironmentPermissionResource{
-			Client: client,
 		},
 		&resources.PulumiServiceEnvironmentVersionTagResource{
 			Client: escClient,

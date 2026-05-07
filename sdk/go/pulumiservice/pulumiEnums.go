@@ -1648,7 +1648,7 @@ func (o TargetActionTypeArrayOutput) Index(i pulumi.IntInput) TargetActionTypeOu
 	}).(TargetActionTypeOutput)
 }
 
-type TeamStackPermissionScope float64
+type TeamStackPermissionScope int
 
 const (
 	// Grants read permissions to stack.
@@ -1658,6 +1658,42 @@ const (
 	// Grants admin permissions to stack.
 	TeamStackPermissionScopeAdmin = TeamStackPermissionScope(103)
 )
+
+func (TeamStackPermissionScope) ElementType() reflect.Type {
+	return reflect.TypeOf((*TeamStackPermissionScope)(nil)).Elem()
+}
+
+func (e TeamStackPermissionScope) ToTeamStackPermissionScopeOutput() TeamStackPermissionScopeOutput {
+	return pulumi.ToOutput(e).(TeamStackPermissionScopeOutput)
+}
+
+func (e TeamStackPermissionScope) ToTeamStackPermissionScopeOutputWithContext(ctx context.Context) TeamStackPermissionScopeOutput {
+	return pulumi.ToOutputWithContext(ctx, e).(TeamStackPermissionScopeOutput)
+}
+
+func (e TeamStackPermissionScope) ToTeamStackPermissionScopePtrOutput() TeamStackPermissionScopePtrOutput {
+	return e.ToTeamStackPermissionScopePtrOutputWithContext(context.Background())
+}
+
+func (e TeamStackPermissionScope) ToTeamStackPermissionScopePtrOutputWithContext(ctx context.Context) TeamStackPermissionScopePtrOutput {
+	return TeamStackPermissionScope(e).ToTeamStackPermissionScopeOutputWithContext(ctx).ToTeamStackPermissionScopePtrOutputWithContext(ctx)
+}
+
+func (e TeamStackPermissionScope) ToIntOutput() pulumi.IntOutput {
+	return pulumi.ToOutput(pulumi.Int(e)).(pulumi.IntOutput)
+}
+
+func (e TeamStackPermissionScope) ToIntOutputWithContext(ctx context.Context) pulumi.IntOutput {
+	return pulumi.ToOutputWithContext(ctx, pulumi.Int(e)).(pulumi.IntOutput)
+}
+
+func (e TeamStackPermissionScope) ToIntPtrOutput() pulumi.IntPtrOutput {
+	return pulumi.Int(e).ToIntPtrOutputWithContext(context.Background())
+}
+
+func (e TeamStackPermissionScope) ToIntPtrOutputWithContext(ctx context.Context) pulumi.IntPtrOutput {
+	return pulumi.Int(e).ToIntOutputWithContext(ctx).ToIntPtrOutputWithContext(ctx)
+}
 
 type TeamStackPermissionScopeOutput struct{ *pulumi.OutputState }
 
@@ -1683,25 +1719,25 @@ func (o TeamStackPermissionScopeOutput) ToTeamStackPermissionScopePtrOutputWithC
 	}).(TeamStackPermissionScopePtrOutput)
 }
 
-func (o TeamStackPermissionScopeOutput) ToFloat64Output() pulumi.Float64Output {
-	return o.ToFloat64OutputWithContext(context.Background())
+func (o TeamStackPermissionScopeOutput) ToIntOutput() pulumi.IntOutput {
+	return o.ToIntOutputWithContext(context.Background())
 }
 
-func (o TeamStackPermissionScopeOutput) ToFloat64OutputWithContext(ctx context.Context) pulumi.Float64Output {
-	return o.ApplyTWithContext(ctx, func(_ context.Context, e TeamStackPermissionScope) float64 {
-		return float64(e)
-	}).(pulumi.Float64Output)
+func (o TeamStackPermissionScopeOutput) ToIntOutputWithContext(ctx context.Context) pulumi.IntOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e TeamStackPermissionScope) int {
+		return int(e)
+	}).(pulumi.IntOutput)
 }
 
-func (o TeamStackPermissionScopeOutput) ToFloat64PtrOutput() pulumi.Float64PtrOutput {
-	return o.ToFloat64PtrOutputWithContext(context.Background())
+func (o TeamStackPermissionScopeOutput) ToIntPtrOutput() pulumi.IntPtrOutput {
+	return o.ToIntPtrOutputWithContext(context.Background())
 }
 
-func (o TeamStackPermissionScopeOutput) ToFloat64PtrOutputWithContext(ctx context.Context) pulumi.Float64PtrOutput {
-	return o.ApplyTWithContext(ctx, func(_ context.Context, e TeamStackPermissionScope) *float64 {
-		v := float64(e)
+func (o TeamStackPermissionScopeOutput) ToIntPtrOutputWithContext(ctx context.Context) pulumi.IntPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e TeamStackPermissionScope) *int {
+		v := int(e)
 		return &v
-	}).(pulumi.Float64PtrOutput)
+	}).(pulumi.IntPtrOutput)
 }
 
 type TeamStackPermissionScopePtrOutput struct{ *pulumi.OutputState }
@@ -1728,18 +1764,58 @@ func (o TeamStackPermissionScopePtrOutput) Elem() TeamStackPermissionScopeOutput
 	}).(TeamStackPermissionScopeOutput)
 }
 
-func (o TeamStackPermissionScopePtrOutput) ToFloat64PtrOutput() pulumi.Float64PtrOutput {
-	return o.ToFloat64PtrOutputWithContext(context.Background())
+func (o TeamStackPermissionScopePtrOutput) ToIntPtrOutput() pulumi.IntPtrOutput {
+	return o.ToIntPtrOutputWithContext(context.Background())
 }
 
-func (o TeamStackPermissionScopePtrOutput) ToFloat64PtrOutputWithContext(ctx context.Context) pulumi.Float64PtrOutput {
-	return o.ApplyTWithContext(ctx, func(_ context.Context, e *TeamStackPermissionScope) *float64 {
+func (o TeamStackPermissionScopePtrOutput) ToIntPtrOutputWithContext(ctx context.Context) pulumi.IntPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e *TeamStackPermissionScope) *int {
 		if e == nil {
 			return nil
 		}
-		v := float64(*e)
+		v := int(*e)
 		return &v
-	}).(pulumi.Float64PtrOutput)
+	}).(pulumi.IntPtrOutput)
+}
+
+// TeamStackPermissionScopeInput is an input type that accepts values of the TeamStackPermissionScope enum
+// A concrete instance of `TeamStackPermissionScopeInput` can be one of the following:
+//
+//	TeamStackPermissionScopeRead
+//	TeamStackPermissionScopeEdit
+//	TeamStackPermissionScopeAdmin
+type TeamStackPermissionScopeInput interface {
+	pulumi.Input
+
+	ToTeamStackPermissionScopeOutput() TeamStackPermissionScopeOutput
+	ToTeamStackPermissionScopeOutputWithContext(context.Context) TeamStackPermissionScopeOutput
+}
+
+var teamStackPermissionScopePtrType = reflect.TypeOf((**TeamStackPermissionScope)(nil)).Elem()
+
+type TeamStackPermissionScopePtrInput interface {
+	pulumi.Input
+
+	ToTeamStackPermissionScopePtrOutput() TeamStackPermissionScopePtrOutput
+	ToTeamStackPermissionScopePtrOutputWithContext(context.Context) TeamStackPermissionScopePtrOutput
+}
+
+type teamStackPermissionScopePtr int
+
+func TeamStackPermissionScopePtr(v int) TeamStackPermissionScopePtrInput {
+	return (*teamStackPermissionScopePtr)(&v)
+}
+
+func (*teamStackPermissionScopePtr) ElementType() reflect.Type {
+	return teamStackPermissionScopePtrType
+}
+
+func (in *teamStackPermissionScopePtr) ToTeamStackPermissionScopePtrOutput() TeamStackPermissionScopePtrOutput {
+	return pulumi.ToOutput(in).(TeamStackPermissionScopePtrOutput)
+}
+
+func (in *teamStackPermissionScopePtr) ToTeamStackPermissionScopePtrOutputWithContext(ctx context.Context) TeamStackPermissionScopePtrOutput {
+	return pulumi.ToOutputWithContext(ctx, in).(TeamStackPermissionScopePtrOutput)
 }
 
 type WebhookFilters string
@@ -2447,6 +2523,8 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*TargetActionTypeInput)(nil)).Elem(), TargetActionType("update"))
 	pulumi.RegisterInputType(reflect.TypeOf((*TargetActionTypePtrInput)(nil)).Elem(), TargetActionType("update"))
 	pulumi.RegisterInputType(reflect.TypeOf((*TargetActionTypeArrayInput)(nil)).Elem(), TargetActionTypeArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*TeamStackPermissionScopeInput)(nil)).Elem(), TeamStackPermissionScope(101))
+	pulumi.RegisterInputType(reflect.TypeOf((*TeamStackPermissionScopePtrInput)(nil)).Elem(), TeamStackPermissionScope(101))
 	pulumi.RegisterInputType(reflect.TypeOf((*WebhookFiltersInput)(nil)).Elem(), WebhookFilters("stack_created"))
 	pulumi.RegisterInputType(reflect.TypeOf((*WebhookFiltersPtrInput)(nil)).Elem(), WebhookFilters("stack_created"))
 	pulumi.RegisterInputType(reflect.TypeOf((*WebhookFiltersArrayInput)(nil)).Elem(), WebhookFiltersArray{})

@@ -38,6 +38,9 @@ func NewTeamStackPermission(ctx *pulumi.Context,
 	if args.Organization == nil {
 		return nil, errors.New("invalid value for required argument 'Organization'")
 	}
+	if args.Permission == nil {
+		return nil, errors.New("invalid value for required argument 'Permission'")
+	}
 	if args.Project == nil {
 		return nil, errors.New("invalid value for required argument 'Project'")
 	}
@@ -47,6 +50,14 @@ func NewTeamStackPermission(ctx *pulumi.Context,
 	if args.Team == nil {
 		return nil, errors.New("invalid value for required argument 'Team'")
 	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"organization",
+		"permission",
+		"project",
+		"stack",
+		"team",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource TeamStackPermission
 	err := ctx.RegisterResource("pulumiservice:index:TeamStackPermission", name, args, &resource, opts...)
@@ -97,7 +108,7 @@ type TeamStackPermissionArgs struct {
 	// The organization or the personal account name of the stack.
 	Organization pulumi.StringInput
 	// Sets the permission level that this team will be granted to the stack.
-	Permission TeamStackPermissionScope
+	Permission TeamStackPermissionScopeInput
 	// The project name for this stack.
 	Project pulumi.StringInput
 	// The name of the stack that the team will be granted permissions to.
