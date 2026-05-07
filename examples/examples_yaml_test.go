@@ -632,6 +632,18 @@ func TestYamlRbacExample(t *testing.T) {
 //   - `t.Cleanup(deletePolicy)` runs last; nothing references the policy
 //     by then, so the delete succeeds.
 func TestYamlRbacComposeImport(t *testing.T) {
+	// Pulumi 3.232+ regressed the `import` flow against `pulumitest`'s
+	// attached/inMemoryProvider mode: the provider's Read RPC consistently
+	// fails with `context canceled` after ~1 second, before the HTTP call
+	// to Pulumi Cloud completes. Reproduces with stock pulumi 3.232.0,
+	// 3.234.0 (CI's current pin), and 3.236.0; does NOT reproduce when
+	// the provider is loaded as a binary on $PATH. The provider-level
+	// descriptor-grammar pass-through is still pinned by the unit test
+	// `TestImportRepro_Compose` in provider/pkg/resources. Re-enable
+	// here once the upstream attached-provider import regression is
+	// resolved.
+	t.Skip("upstream regression: pulumi 3.232+ `import` cancels Read against attached providers")
+
 	token := os.Getenv("PULUMI_ACCESS_TOKEN")
 	apiURL := os.Getenv("PULUMI_BACKEND_URL")
 	if token == "" || apiURL == "" {
