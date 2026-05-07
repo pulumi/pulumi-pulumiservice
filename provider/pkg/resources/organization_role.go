@@ -409,9 +409,9 @@ func orgRoleStateFromAPI(
 // expected by the generated SDK. The user's tree passes through to the
 // API verbatim; this routine just hands the JSON off to the generated
 // UnmarshalJSONPermissionDescriptor for `__type` dispatch. The
-// unmarshaller surfaces a clear error for missing/unknown
-// discriminators (`type '' not recognized` / `type 'X' not recognized`),
-// so we don't structurally inspect the map ourselves.
+// unmarshaller surfaces a clear "type X not recognized" error for
+// missing or unknown discriminators, so we don't structurally inspect
+// the map ourselves.
 func buildPermissionDescriptorForAPI(
 	permissions map[string]interface{},
 ) (apitype.PermissionDescriptor, error) {
