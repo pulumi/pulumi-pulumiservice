@@ -391,12 +391,13 @@ func TestOrganizationRoleCheck(t *testing.T) {
 		}
 	})
 
-	// Pulumi Cloud is the source of truth for which descriptor variants
-	// exist; the provider does not gate them. This test documents that
-	// contract — Check accepts a `__type` value the provider has no
-	// special knowledge of, and the role's validity is the API's call at
-	// apply time.
-	t.Run("accepts arbitrary __type values (no provider-side allowlist)", func(t *testing.T) {
+	// The provider validates `__type` against the typed
+	// `apitype.PermissionDescriptor` discriminator catalogue (generated
+	// from the OpenAPI spec the API uses). Unknown variants are rejected
+	// at preview with a clear "type 'X' not recognized" message rather
+	// than blindly forwarded to the API. New variants Pulumi Cloud adds
+	// reach this provider through `apitype` regen.
+	t.Run("rejects unknown __type values", func(t *testing.T) {
 		resp, err := r.Check(context.Background(), infer.CheckRequest{
 			NewInputs: property.NewMap(map[string]property.Value{
 				"organizationName": property.New("acme"),
@@ -407,15 +408,19 @@ func TestOrganizationRoleCheck(t *testing.T) {
 			}),
 		})
 		assert.NoError(t, err)
+		props := map[string]string{}
 		for _, f := range resp.Failures {
-			assert.NotEqual(t, "permissions", f.Property,
-				"Check must not gate descriptor values: %s", f.Reason)
+			props[f.Property] = f.Reason
 		}
+		assert.Contains(t, props["permissions"], "PermissionDescriptorWhateverFutureCloudVariant",
+			"Check must name the unrecognized variant so the user knows what to fix")
+		assert.Contains(t, props["permissions"], "not recognized",
+			"Check must surface the typed unmarshaller's diagnostic")
 	})
 
-	// A descriptor missing the top-level `__type` discriminator is rejected
-	// at preview rather than reaching the API. The error names the missing
-	// field so the user knows what to fix.
+	// A descriptor missing the top-level `__type` discriminator is
+	// rejected at preview by the typed unmarshaller (`type '' not
+	// recognized`) rather than reaching the API.
 	t.Run("rejects descriptor missing __type", func(t *testing.T) {
 		resp, err := r.Check(context.Background(), infer.CheckRequest{
 			NewInputs: property.NewMap(map[string]property.Value{
@@ -433,7 +438,7 @@ func TestOrganizationRoleCheck(t *testing.T) {
 		for _, f := range resp.Failures {
 			props[f.Property] = f.Reason
 		}
-		assert.Contains(t, props["permissions"], "__type",
-			"Check must name the missing `__type` field so the user knows what to fix")
+		assert.Contains(t, props["permissions"], "not recognized",
+			"Check must reject a descriptor with no `__type` discriminator")
 	})
 }

@@ -146,9 +146,11 @@ func (*OrganizationRole) Check(
 				Property: "permissions",
 				Reason:   "permissions must not be empty — supply a PermissionDescriptor tree",
 			})
-		} else if err := validatePermissions(in.Permissions); err != nil {
+		} else if _, err := buildPermissionDescriptorForAPI(in.Permissions); err != nil {
 			// Validate the descriptor tree up front so users see a
 			// clear error at preview, not a 400 from the API at apply.
+			// The typed JSON unmarshaller dispatches on `__type` and
+			// rejects missing/unknown discriminators with a clear message.
 			failures = append(failures, p.CheckFailure{
 				Property: "permissions",
 				Reason:   err.Error(),
@@ -406,13 +408,13 @@ func orgRoleStateFromAPI(
 // permissions map into the typed apitype.PermissionDescriptor tree
 // expected by the generated SDK. The user's tree passes through to the
 // API verbatim; this routine just hands the JSON off to the generated
-// UnmarshalJSONPermissionDescriptor for `__type` dispatch.
+// UnmarshalJSONPermissionDescriptor for `__type` dispatch. The
+// unmarshaller surfaces a clear error for missing/unknown
+// discriminators (`type '' not recognized` / `type 'X' not recognized`),
+// so we don't structurally inspect the map ourselves.
 func buildPermissionDescriptorForAPI(
 	permissions map[string]interface{},
 ) (apitype.PermissionDescriptor, error) {
-	if err := validatePermissions(permissions); err != nil {
-		return nil, err
-	}
 	raw, err := json.Marshal(permissions)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal permissions: %w", err)
