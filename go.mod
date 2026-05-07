@@ -7,11 +7,11 @@ require (
 	github.com/pgavlin/fx/v2 v2.0.12
 	github.com/pulumi/esc v0.23.0
 	github.com/pulumi/providertest v0.7.0
-	github.com/pulumi/pulumi/pkg/v3 v3.234.0
-	github.com/pulumi/pulumi/sdk/v3 v3.234.0
+	github.com/pulumi/pulumi/pkg/v3 v3.236.0
+	github.com/pulumi/pulumi/sdk/v3 v3.236.0
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/exp v0.0.0-20250718183923-645b1fa84792
-	google.golang.org/grpc v1.80.0
+	google.golang.org/grpc v1.81.0
 	google.golang.org/protobuf v1.36.11
 	gopkg.in/yaml.v2 v2.4.0
 )
@@ -33,6 +33,7 @@ require (
 	github.com/git-pkgs/packageurl-go v0.3.1 // indirect
 	github.com/git-pkgs/purl v0.1.10 // indirect
 	github.com/git-pkgs/vers v0.2.4 // indirect
+	github.com/golang/glog v1.2.5 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.29.0 // indirect
 	github.com/hashicorp/go-version v1.9.0 // indirect
 	github.com/iwdgo/sigintwindows v0.2.2 // indirect
@@ -207,8 +208,8 @@ require (
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
 	google.golang.org/api v0.169.0 // indirect
 	google.golang.org/genproto v0.0.0-20240311173647-c811ad7063a7 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20260427160629-7cedc36a6bc4 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260427160629-7cedc36a6bc4 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20260504160031-60b97b32f348 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260504160031-60b97b32f348 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	lukechampine.com/frand v1.5.1 // indirect
