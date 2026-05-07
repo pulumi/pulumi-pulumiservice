@@ -1,0 +1,20 @@
+resources:
+  environment:
+    type: pulumiservice:v2/esc:Environment
+    properties:
+      orgName: ${serviceOrg}
+      project: ${projectName}
+      name: ${envName}
+  schedule:
+    type: pulumiservice:v2/esc:EnvironmentSchedule
+    properties:
+      orgName: ${serviceOrg}
+      projectName: ${projectName}
+      envName: ${envName}
+      scheduleCron: ${scheduleCron}
+    options:
+      dependsOn:
+        - ${environment}
+outputs:
+  environmentId: ${environment.id}
+  scheduleId: ${schedule.id}

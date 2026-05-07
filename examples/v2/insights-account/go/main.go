@@ -22,9 +22,10 @@ func main() {
 			insightsEnv = "insights/credentials"
 		}
 
+		accountNameValue := "v2-insights-" + accountSuffix
 		account, err := insights.NewAccount(ctx, "account", &insights.AccountArgs{
 			OrgName:      pulumi.String(serviceOrg),
-			AccountName:  pulumi.String("v2-insights-" + accountSuffix),
+			AccountName:  pulumi.String(accountNameValue),
 			Provider:     pulumi.String("aws"),
 			Environment:  pulumi.String(insightsEnv),
 			ScanSchedule: pulumi.String("none"),
@@ -35,14 +36,14 @@ func main() {
 
 		if _, err := insights.NewScheduledScanSettings(ctx, "scanSettings", &insights.ScheduledScanSettingsArgs{
 			OrgName:      pulumi.String(serviceOrg),
-			AccountName:  account.AccountName,
+			AccountName:  pulumi.String(accountNameValue),
 			Paused:       pulumi.Bool(true),
 			ScheduleCron: pulumi.String("0 6 * * *"),
-		}); err != nil {
+		}, pulumi.DependsOn([]pulumi.Resource{account})); err != nil {
 			return err
 		}
 
-		ctx.Export("accountName", account.AccountName)
+		ctx.Export("accountName", account.Name)
 		return nil
 	})
 }

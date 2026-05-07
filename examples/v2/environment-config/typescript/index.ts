@@ -19,5 +19,5 @@ const settings = new ps.v2.esc.EnvironmentSettings("settings", {
     deletionProtected: true,
 });
 
-export const draftId = draft.changeRequestID;
+export const draftId = draft.changeRequestId;
 export const protect = settings.deletionProtected;

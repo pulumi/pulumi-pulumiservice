@@ -37,7 +37,7 @@ export class EnvironmentDraft extends pulumi.CustomResource {
     /**
      * The change request identifier
      */
-    declare public /*out*/ readonly changeRequestId: pulumi.Output<string | undefined>;
+    declare public readonly changeRequestId: pulumi.Output<string | undefined>;
     /**
      * The latest revision number
      */
@@ -63,11 +63,10 @@ export class EnvironmentDraft extends pulumi.CustomResource {
             if (args?.projectName === undefined && !opts.urn) {
                 throw new Error("Missing required property 'projectName'");
             }
-            resourceInputs["changeRequestID"] = args?.changeRequestID;
+            resourceInputs["changeRequestId"] = args?.changeRequestId;
             resourceInputs["envName"] = args?.envName;
             resourceInputs["orgName"] = args?.orgName;
             resourceInputs["projectName"] = args?.projectName;
-            resourceInputs["changeRequestId"] = undefined /*out*/;
             resourceInputs["latestRevisionNumber"] = undefined /*out*/;
         } else {
             resourceInputs["changeRequestId"] = undefined /*out*/;
@@ -85,7 +84,7 @@ export interface EnvironmentDraftArgs {
     /**
      * The change request ID
      */
-    changeRequestID?: pulumi.Input<string>;
+    changeRequestId?: pulumi.Input<string>;
     /**
      * The environment name
      */

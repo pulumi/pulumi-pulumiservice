@@ -9,4 +9,5 @@ default = ps_v2.DefaultOrganization(
     org_name=service_org,
 )
 
-pulumi.export("defaultOrg", default.org_name)
+pulumi.export("defaultOrg", service_org)
+pulumi.export("defaultOrgGitHubLogin", default.git_hub_login)

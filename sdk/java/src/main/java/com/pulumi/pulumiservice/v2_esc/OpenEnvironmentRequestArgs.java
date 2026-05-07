@@ -36,15 +36,15 @@ public final class OpenEnvironmentRequestArgs extends com.pulumi.resources.Resou
      * The change request ID
      * 
      */
-    @Import(name="changeRequestID")
-    private @Nullable Output<String> changeRequestID;
+    @Import(name="changeRequestId")
+    private @Nullable Output<String> changeRequestId;
 
     /**
      * @return The change request ID
      * 
      */
-    public Optional<Output<String>> changeRequestID() {
-        return Optional.ofNullable(this.changeRequestID);
+    public Optional<Output<String>> changeRequestId() {
+        return Optional.ofNullable(this.changeRequestId);
     }
 
     /**
@@ -111,7 +111,7 @@ public final class OpenEnvironmentRequestArgs extends com.pulumi.resources.Resou
 
     private OpenEnvironmentRequestArgs(OpenEnvironmentRequestArgs $) {
         this.accessDurationSeconds = $.accessDurationSeconds;
-        this.changeRequestID = $.changeRequestID;
+        this.changeRequestId = $.changeRequestId;
         this.envName = $.envName;
         this.grantExpirationSeconds = $.grantExpirationSeconds;
         this.orgName = $.orgName;
@@ -158,24 +158,24 @@ public final class OpenEnvironmentRequestArgs extends com.pulumi.resources.Resou
         }
 
         /**
-         * @param changeRequestID The change request ID
+         * @param changeRequestId The change request ID
          * 
          * @return builder
          * 
          */
-        public Builder changeRequestID(@Nullable Output<String> changeRequestID) {
-            $.changeRequestID = changeRequestID;
+        public Builder changeRequestId(@Nullable Output<String> changeRequestId) {
+            $.changeRequestId = changeRequestId;
             return this;
         }
 
         /**
-         * @param changeRequestID The change request ID
+         * @param changeRequestId The change request ID
          * 
          * @return builder
          * 
          */
-        public Builder changeRequestID(String changeRequestID) {
-            return changeRequestID(Output.of(changeRequestID));
+        public Builder changeRequestId(String changeRequestId) {
+            return changeRequestId(Output.of(changeRequestId));
         }
 
         /**

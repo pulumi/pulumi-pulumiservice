@@ -19,7 +19,7 @@ public class App {
                     .name("testing-environment-" + envSuffix)
                     .build());
 
-            ctx.export("envName", environment.name());
+            ctx.export("environmentId", environment.id());
         });
     }
 }

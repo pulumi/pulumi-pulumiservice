@@ -74,7 +74,7 @@ class EnvironmentDraftArgs:
         pulumi.set(self, "project_name", value)
 
     @_builtins.property
-    @pulumi.getter(name="changeRequestID")
+    @pulumi.getter(name="changeRequestId")
     def change_request_id(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
         The change request ID
@@ -156,7 +156,6 @@ class EnvironmentDraft(pulumi.CustomResource):
             if project_name is None and not opts.urn:
                 raise TypeError("Missing required property 'project_name'")
             __props__.__dict__["project_name"] = project_name
-            __props__.__dict__["change_request_id"] = None
             __props__.__dict__["latest_revision_number"] = None
         super(EnvironmentDraft, __self__).__init__(
             'pulumiservice:v2/esc:EnvironmentDraft',

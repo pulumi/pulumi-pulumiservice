@@ -43,7 +43,7 @@ public class App {
                     .build(),
                 CustomResourceOptions.builder().dependsOn(List.of(parentStack)).build());
 
-            ctx.export("stackId", settings.stackName());
+            ctx.export("stackId", com.pulumi.core.Output.of(serviceOrg + "/" + projectName + "/" + stackName));
         });
     }
 }

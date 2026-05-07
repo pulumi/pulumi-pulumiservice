@@ -11,4 +11,7 @@ resources:
 # first need to push a definition via the Open/Update flow, which is
 # out of scope for these v2 examples.
 outputs:
-  envName: ${environment.name}
+  # esc:Environment exposes only id/urn — path-param inputs (orgName,
+  # project, name) follow the program-owns-inputs / cloud-owns-outputs
+  # disjointness; recover them from the slash-joined id if needed.
+  environmentId: ${environment.id}

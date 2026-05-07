@@ -61,7 +61,8 @@ func main() {
 			return err
 		}
 
-		ctx.Export("stackId", settings.StackName)
+		_ = settings
+		ctx.Export("stackId", pulumi.String(serviceOrg+"/"+projectName+"/"+stackName))
 		return nil
 	})
 }

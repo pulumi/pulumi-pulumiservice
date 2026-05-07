@@ -104,7 +104,7 @@ class OpenEnvironmentRequestArgs:
         pulumi.set(self, "project_name", value)
 
     @_builtins.property
-    @pulumi.getter(name="changeRequestID")
+    @pulumi.getter(name="changeRequestId")
     def change_request_id(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
         The change request ID

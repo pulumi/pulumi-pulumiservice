@@ -70,7 +70,7 @@ export class OpenEnvironmentRequest extends pulumi.CustomResource {
                 throw new Error("Missing required property 'projectName'");
             }
             resourceInputs["accessDurationSeconds"] = args?.accessDurationSeconds;
-            resourceInputs["changeRequestID"] = args?.changeRequestID;
+            resourceInputs["changeRequestId"] = args?.changeRequestId;
             resourceInputs["envName"] = args?.envName;
             resourceInputs["grantExpirationSeconds"] = args?.grantExpirationSeconds;
             resourceInputs["orgName"] = args?.orgName;
@@ -95,7 +95,7 @@ export interface OpenEnvironmentRequestArgs {
     /**
      * The change request ID
      */
-    changeRequestID?: pulumi.Input<string>;
+    changeRequestId?: pulumi.Input<string>;
     /**
      * The environment name
      */

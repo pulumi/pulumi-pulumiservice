@@ -72,7 +72,7 @@ func (EnvironmentDraftState) ElementType() reflect.Type {
 
 type environmentDraftArgs struct {
 	// The change request ID
-	ChangeRequestID *string `pulumi:"changeRequestID"`
+	ChangeRequestId *string `pulumi:"changeRequestId"`
 	// The environment name
 	EnvName string `pulumi:"envName"`
 	// The organization name
@@ -84,7 +84,7 @@ type environmentDraftArgs struct {
 // The set of arguments for constructing a EnvironmentDraft resource.
 type EnvironmentDraftArgs struct {
 	// The change request ID
-	ChangeRequestID pulumi.StringPtrInput
+	ChangeRequestId pulumi.StringPtrInput
 	// The environment name
 	EnvName pulumi.StringInput
 	// The organization name

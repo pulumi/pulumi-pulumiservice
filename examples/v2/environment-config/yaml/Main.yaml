@@ -19,5 +19,5 @@ resources:
       envName: ${envName}
       deletionProtected: true
 outputs:
-  draftId: ${draft.changeRequestID}
+  draftId: ${draft.changeRequestId}
   protected: ${settings.deletionProtected}

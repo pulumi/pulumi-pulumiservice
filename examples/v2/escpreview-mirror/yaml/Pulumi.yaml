@@ -1,0 +1,21 @@
+name: pulumicloud-v2-escpreview-mirror
+runtime: yaml
+config:
+  serviceOrg:
+    type: string
+    default: service-provider-test-org
+  envName:
+    type: string
+    default: legacy-preview-env
+  tagName:
+    type: string
+    default: legacy-tag
+  tagValue:
+    type: string
+    default: legacy-tag-value
+  hookName:
+    type: string
+    default: legacy-preview-hook
+  payloadUrl:
+    type: string
+    default: https://example.invalid/hook

@@ -18,6 +18,6 @@ return await Deployment.RunAsync(() =>
 
     return new Dictionary<string, object?>
     {
-        ["envName"] = environment.Name,
+        ["environmentId"] = environment.Id,
     };
 });

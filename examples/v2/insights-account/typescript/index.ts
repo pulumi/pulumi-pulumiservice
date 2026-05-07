@@ -6,19 +6,21 @@ const serviceOrg = config.get("serviceOrg") ?? "service-provider-test-org";
 const accountSuffix = config.get("accountSuffix") ?? "dev";
 const insightsEnvironment = config.get("insightsEnvironment") ?? "insights/credentials";
 
+const accountNameValue = `v2-insights-${accountSuffix}`;
 const account = new ps.v2.insights.Account("account", {
     orgName: serviceOrg,
-    accountName: `v2-insights-${accountSuffix}`,
+    accountName: accountNameValue,
     provider: "aws",
     environment: insightsEnvironment,
     scanSchedule: "none",
 });
 
+// accountName is an input (program-owned); reuse the source value.
 new ps.v2.insights.ScheduledScanSettings("scanSettings", {
     orgName: serviceOrg,
-    accountName: account.accountName,
+    accountName: accountNameValue,
     paused: true,
     scheduleCron: "0 6 * * *",
-});
+}, { dependsOn: [account] });
 
-export const accountName = account.accountName;
+export const accountName = account.name;

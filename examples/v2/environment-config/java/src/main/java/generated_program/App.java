@@ -29,7 +29,7 @@ public class App {
                     .deletionProtected(true)
                     .build());
 
-            ctx.export("draftId", draft.changeRequestID());
+            ctx.export("draftId", draft.changeRequestId());
             ctx.export("protected", settings.deletionProtected());
         });
     }

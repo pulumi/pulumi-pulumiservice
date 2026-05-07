@@ -31,7 +31,7 @@ func main() {
 			return err
 		}
 
-		ctx.Export("envName", environment.Name)
+		ctx.Export("environmentId", environment.ID())
 		return nil
 	})
 }

@@ -8,4 +8,7 @@ const def = new ps.v2.DefaultOrganization("default", {
     orgName: serviceOrg,
 });
 
-export const defaultOrg = def.orgName;
+// orgName is an input (program-owned); reference the source value.
+// def's outputs are GitHubLogin/Messages — surface those instead.
+export const defaultOrg = serviceOrg;
+export const defaultOrgGitHubLogin = def.GitHubLogin;

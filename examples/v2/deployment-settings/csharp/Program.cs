@@ -49,8 +49,9 @@ return await Deployment.RunAsync(() =>
         }),
     }, new CustomResourceOptions { DependsOn = { parentStack } });
 
+    _ = settings;
     return new Dictionary<string, object?>
     {
-        ["stackId"] = settings.StackName,
+        ["stackId"] = $"{serviceOrg}/{projectName}/{stackName}",
     };
 });

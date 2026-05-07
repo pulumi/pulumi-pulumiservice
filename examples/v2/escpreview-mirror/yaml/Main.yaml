@@ -1,0 +1,41 @@
+# Mirror of esc/* resources via the legacy /api/preview/environments
+# endpoints. These tokens exist primarily to host stack-state aliases for
+# users who were on the older `pulumiservice:v2/preview:*` tokens before
+# the rename to `escPreview` (see metadata_test.go's alias coverage).
+#
+# The example is preview-only: it validates that the program compiles
+# and the v2 dispatch resolves each escPreview type token. The legacy
+# API expects pre-existing /preview/* state, so a real Up isn't safe to
+# run automatically.
+resources:
+  legacyEnv:
+    type: pulumiservice:v2/escPreview:Environment
+    properties:
+      orgName: ${serviceOrg}
+      envName: ${envName}
+      project: default
+      name: ${envName}
+  legacyTag:
+    type: pulumiservice:v2/escPreview:EnvironmentTag
+    properties:
+      orgName: ${serviceOrg}
+      envName: ${envName}
+      name: ${tagName}
+      value: ${tagValue}
+  legacyRevisionTag:
+    type: pulumiservice:v2/escPreview:RevisionTag
+    properties:
+      orgName: ${serviceOrg}
+      envName: ${envName}
+      name: ${tagName}
+      tagName: ${tagName}
+      revision: 1
+  legacyHook:
+    type: pulumiservice:v2/escPreview:Webhook
+    properties:
+      organizationName: ${serviceOrg}
+      envName: ${envName}
+      name: ${hookName}
+      displayName: legacy preview webhook
+      payloadUrl: ${payloadUrl}
+      active: true

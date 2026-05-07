@@ -26,7 +26,7 @@ return await Deployment.RunAsync(() =>
 
     return new Dictionary<string, object?>
     {
-        ["draftId"] = draft.ChangeRequestID,
+        ["draftId"] = draft.ChangeRequestId,
         ["protected"] = settings.DeletionProtected,
     };
 });

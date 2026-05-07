@@ -32,4 +32,6 @@ const settings = new ps.v2.deployments.Settings("settings", {
     },
 }, { dependsOn: [parentStack] });
 
-export const stackId = settings.stackName;
+// stackName is a path-param input; reference the source value rather than
+// the resource (deployments:Settings doesn't surface stackName on state).
+export const stackId = pulumi.interpolate`${serviceOrg}/${projectName}/${stackName}`;

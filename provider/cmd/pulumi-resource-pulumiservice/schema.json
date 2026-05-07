@@ -3754,7 +3754,7 @@
       },
       "type": "object",
       "inputProperties": {
-        "changeRequestID": {
+        "changeRequestId": {
           "type": "string",
           "description": "The change request ID",
           "replaceOnChanges": true,
@@ -4031,7 +4031,7 @@
           "type": "integer",
           "description": "Total duration that the resulting grant can be used to access the environment open endpoint (after first open)"
         },
-        "changeRequestID": {
+        "changeRequestId": {
           "type": "string",
           "description": "The change request ID",
           "replaceOnChanges": true,

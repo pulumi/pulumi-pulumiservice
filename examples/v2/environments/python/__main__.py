@@ -13,4 +13,4 @@ environment = ps_v2.esc.Environment(
     name=f"testing-environment-{env_suffix}",
 )
 
-pulumi.export("envName", environment.name)
+pulumi.export("environmentId", environment.id)

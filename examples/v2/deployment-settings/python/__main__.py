@@ -34,4 +34,4 @@ settings = ps_v2.deployments.Settings(
     opts=pulumi.ResourceOptions(depends_on=[parent_stack]),
 )
 
-pulumi.export("stackId", settings.stack_name)
+pulumi.export("stackId", f"{service_org}/{project_name}/{stack_name}")

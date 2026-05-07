@@ -14,10 +14,11 @@ public class App {
             var accountSuffix = config.get("accountSuffix").orElse("dev");
             var insightsEnv = config.get("insightsEnvironment").orElse("insights/credentials");
 
+            var accountNameValue = "v2-insights-" + accountSuffix;
             var account = new Account("account",
                 AccountArgs.builder()
                     .orgName(serviceOrg)
-                    .accountName("v2-insights-" + accountSuffix)
+                    .accountName(accountNameValue)
                     .provider("aws")
                     .environment(insightsEnv)
                     .scanSchedule("none")
@@ -26,12 +27,15 @@ public class App {
             new ScheduledScanSettings("scanSettings",
                 ScheduledScanSettingsArgs.builder()
                     .orgName(serviceOrg)
-                    .accountName(account.accountName())
+                    .accountName(accountNameValue)
                     .paused(true)
                     .scheduleCron("0 6 * * *")
+                    .build(),
+                com.pulumi.resources.CustomResourceOptions.builder()
+                    .dependsOn(account)
                     .build());
 
-            ctx.export("accountName", account.accountName());
+            ctx.export("accountName", account.name());
         });
     }
 }

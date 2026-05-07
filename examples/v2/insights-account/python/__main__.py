@@ -6,10 +6,11 @@ service_org = config.get("serviceOrg") or "service-provider-test-org"
 account_suffix = config.get("accountSuffix") or "dev"
 insights_environment = config.get("insightsEnvironment") or "insights/credentials"
 
+account_name_value = f"v2-insights-{account_suffix}"
 account = ps_v2.insights.Account(
     "account",
     org_name=service_org,
-    account_name=f"v2-insights-{account_suffix}",
+    account_name=account_name_value,
     provider="aws",
     environment=insights_environment,
     scan_schedule="none",
@@ -18,9 +19,10 @@ account = ps_v2.insights.Account(
 ps_v2.insights.ScheduledScanSettings(
     "scanSettings",
     org_name=service_org,
-    account_name=account.account_name,
+    account_name=account_name_value,
     paused=True,
     schedule_cron="0 6 * * *",
+    opts=pulumi.ResourceOptions(depends_on=[account]),
 )
 
-pulumi.export("accountName", account.account_name)
+pulumi.export("accountName", account.name)

@@ -21,7 +21,8 @@ func main() {
 			return err
 		}
 
-		ctx.Export("defaultOrg", def.OrgName)
+		ctx.Export("defaultOrg", pulumi.String(serviceOrg))
+		ctx.Export("defaultOrgGitHubLogin", def.GitHubLogin)
 		return nil
 	})
 }

@@ -1,0 +1,25 @@
+# Tagging a specific revision requires the env to have a definition
+# pushed (revision 1+). Newly-created envs created via the v2
+# Environment resource are empty (no definition) so this case is
+# preview-only — the program compiles and resolves the v2 type token,
+# but a real Up would 404 on the revision.
+resources:
+  environment:
+    type: pulumiservice:v2/esc:Environment
+    properties:
+      orgName: ${serviceOrg}
+      project: ${projectName}
+      name: ${envName}
+  revisionTag:
+    type: pulumiservice:v2/esc:RevisionTag
+    properties:
+      orgName: ${serviceOrg}
+      projectName: ${projectName}
+      envName: ${envName}
+      name: ${tagName}
+      revision: ${tagRevision}
+    options:
+      dependsOn:
+        - ${environment}
+outputs:
+  tagName: ${revisionTag.name}

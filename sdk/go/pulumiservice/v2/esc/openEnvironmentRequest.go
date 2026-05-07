@@ -80,7 +80,7 @@ type openEnvironmentRequestArgs struct {
 	// Total duration that the resulting grant can be used to access the environment open endpoint (after first open)
 	AccessDurationSeconds int `pulumi:"accessDurationSeconds"`
 	// The change request ID
-	ChangeRequestID *string `pulumi:"changeRequestID"`
+	ChangeRequestId *string `pulumi:"changeRequestId"`
 	// The environment name
 	EnvName string `pulumi:"envName"`
 	// Time from application of the request until the resulting grant expires
@@ -96,7 +96,7 @@ type OpenEnvironmentRequestArgs struct {
 	// Total duration that the resulting grant can be used to access the environment open endpoint (after first open)
 	AccessDurationSeconds pulumi.IntInput
 	// The change request ID
-	ChangeRequestID pulumi.StringPtrInput
+	ChangeRequestId pulumi.StringPtrInput
 	// The environment name
 	EnvName pulumi.StringInput
 	// Time from application of the request until the resulting grant expires

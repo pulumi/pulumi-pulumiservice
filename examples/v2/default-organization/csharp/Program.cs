@@ -14,6 +14,7 @@ return await Deployment.RunAsync(() =>
 
     return new Dictionary<string, object?>
     {
-        ["defaultOrg"] = def.OrgName,
+        ["defaultOrg"] = serviceOrg,
+        ["defaultOrgGitHubLogin"] = def.GitHubLogin,
     };
 });

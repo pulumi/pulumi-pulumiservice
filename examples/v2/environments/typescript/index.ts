@@ -12,4 +12,6 @@ const environment = new ps.v2.esc.Environment("environment", {
     name: `testing-environment-${envSuffix}`,
 });
 
-export const envNameOut = environment.name;
+// esc:Environment exposes only id/urn — path-param inputs (orgName,
+// project, name) are program-owned and don't surface on the resource.
+export const environmentIdOut = environment.id;

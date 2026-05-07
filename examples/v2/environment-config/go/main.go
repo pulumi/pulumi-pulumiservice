@@ -41,7 +41,7 @@ func main() {
 			return err
 		}
 
-		ctx.Export("draftId", draft.ChangeRequestID)
+		ctx.Export("draftId", draft.ChangeRequestId)
 		ctx.Export("protected", settings.DeletionProtected)
 		return nil
 	})

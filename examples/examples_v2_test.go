@@ -263,10 +263,59 @@ var v2Cases = []v2Case{
 		PreviewOnlyAll: true, // Custom VCS registration needs valid creds in the referenced ESC env.
 	},
 	{
-		Name:           "platform-bootstrap",
-		Config:         platformBootstrapConfig,
-		PreviewOnlyAll: true, // Composite demo (~18 resources). FullE2E is too entangled to run automatically — OrgTemplateCollection has no read op so leftover state from a failed run conflicts on subsequent attempts.
+		Name:       "platform-bootstrap",
+		Config:     platformBootstrapConfig,
+		SkipReason: "Composite demo (~18 resources, ~290 lines yaml) kept around as documentation but not exercised by CI. Resources are individually covered by the focused examples above.",
 	},
+	{
+		Name:    "esc-webhook",
+		Config:  escWebhookConfig,
+		FullE2E: true,
+		// Mutate the payload URL on the second Up — exercises
+		// UpdateWebhook_esc_environments against the live backend.
+		UpdateOverrides: func() map[string]string {
+			suffix := generateRandomFiveDigits()
+			return map[string]string{"payloadUrl": "https://example.invalid/hook-rotated/" + suffix}
+		},
+		SkipLang: yamlOnlyLangs("esc-webhook example is yaml-only"),
+	},
+	{
+		Name:           "esc-environment-schedule",
+		Config:         escEnvironmentScheduleConfig,
+		PreviewOnlyAll: true, // Cloud API requires `secretRotationRequest` even for cron-only schedules; modeling that body shape end-to-end is out of scope for this example. Mirrors the equivalent comment in the existing schedules/yaml composite.
+		SkipLang:       yamlOnlyLangs("esc-environment-schedule example is yaml-only"),
+	},
+	{
+		Name:           "esc-revision-tag",
+		Config:         escRevisionTagConfig,
+		PreviewOnlyAll: true, // Tagging a specific revision needs a definition pushed to the env (revision 1+); a freshly-created v2 Environment has no revisions, so a real Up would 404.
+		SkipLang:       yamlOnlyLangs("esc-revision-tag example is yaml-only"),
+	},
+	{
+		Name:           "escpreview-mirror",
+		Config:         escPreviewMirrorConfig,
+		PreviewOnlyAll: true, // Legacy /api/preview/environments mirror; alias path validation only — exercising real API requires pre-existing preview state.
+		SkipLang:       yamlOnlyLangs("escpreview-mirror example is yaml-only"),
+	},
+	{
+		Name:           "service-items",
+		Config:         serviceItemsConfig,
+		PreviewOnlyAll: true, // services:Item attaches stacks to a Service; the referenced stacks aren't provisioned in this example.
+		SkipLang:       yamlOnlyLangs("service-items example is yaml-only"),
+	},
+}
+
+// yamlOnlyLangs returns a SkipLang map that skips every non-yaml lane with
+// the same reason. Used by examples whose only-yaml programs validate the
+// type-token plumbing but aren't reproduced in TS/Python/Go/.NET/Java.
+func yamlOnlyLangs(reason string) map[string]string {
+	return map[string]string{
+		"typescript": reason,
+		"python":     reason,
+		"go":         reason,
+		"csharp":     reason,
+		"java":       reason,
+	}
 }
 
 var v2Languages = []string{"yaml", "typescript", "python", "go", "csharp", "java"}
@@ -866,5 +915,59 @@ func platformBootstrapConfig() map[string]string {
 		"prodApprovalEnabled": "true",
 		"slackWebhookUrl":     "https://hooks.slack.com/services/T00000000/B00000000/v2platformbootstrap",
 		"pagerDutyWebhookUrl": "https://events.pagerduty.com/v2/enqueue",
+	}
+}
+
+func escWebhookConfig() map[string]string {
+	suffix := generateRandomFiveDigits()
+	return map[string]string{
+		"serviceOrg":  ServiceProviderTestOrg,
+		"projectName": "v2-esc-hook-" + suffix,
+		"envName":     "env-with-hook-" + suffix,
+		"hookName":    "hook-" + suffix,
+		"payloadUrl":  "https://example.invalid/hook/" + suffix,
+		"secretValue": "shhh-" + suffix,
+	}
+}
+
+func escEnvironmentScheduleConfig() map[string]string {
+	suffix := generateRandomFiveDigits()
+	return map[string]string{
+		"serviceOrg":   ServiceProviderTestOrg,
+		"projectName":  "v2-esc-sched-" + suffix,
+		"envName":      "env-with-schedule-" + suffix,
+		"scheduleCron": "0 7 * * *",
+	}
+}
+
+func escRevisionTagConfig() map[string]string {
+	suffix := generateRandomFiveDigits()
+	return map[string]string{
+		"serviceOrg":  ServiceProviderTestOrg,
+		"projectName": "v2-esc-revtag-" + suffix,
+		"envName":     "env-with-revtag-" + suffix,
+		"tagName":     "stable-" + suffix,
+		"tagRevision": "1",
+	}
+}
+
+func escPreviewMirrorConfig() map[string]string {
+	suffix := generateRandomFiveDigits()
+	return map[string]string{
+		"serviceOrg": ServiceProviderTestOrg,
+		"envName":    "legacy-preview-env-" + suffix,
+		"tagName":    "legacy-tag-" + suffix,
+		"tagValue":   "legacy-value-" + suffix,
+		"hookName":   "legacy-hook-" + suffix,
+		"payloadUrl": "https://example.invalid/preview-hook/" + suffix,
+	}
+}
+
+func serviceItemsConfig() map[string]string {
+	return map[string]string{
+		"serviceOrg":    ServiceProviderTestOrg,
+		"serviceSuffix": generateRandomFiveDigits(),
+		"ownerType":     "team",
+		"ownerName":     "platform",
 	}
 }

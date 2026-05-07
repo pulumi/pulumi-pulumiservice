@@ -81,8 +81,8 @@ namespace Pulumi.PulumiService.V2.Esc
         /// <summary>
         /// The change request ID
         /// </summary>
-        [Input("changeRequestID")]
-        public Input<string>? ChangeRequestID { get; set; }
+        [Input("changeRequestId")]
+        public Input<string>? ChangeRequestId { get; set; }
 
         /// <summary>
         /// The environment name

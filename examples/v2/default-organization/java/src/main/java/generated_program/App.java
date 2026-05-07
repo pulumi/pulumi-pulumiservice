@@ -15,7 +15,8 @@ public class App {
                     .orgName(serviceOrg)
                     .build());
 
-            ctx.export("defaultOrg", def.orgName());
+            ctx.export("defaultOrg", com.pulumi.core.Output.of(serviceOrg));
+            ctx.export("defaultOrgGitHubLogin", def.GitHubLogin());
         });
     }
 }

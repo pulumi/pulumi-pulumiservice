@@ -1,0 +1,21 @@
+name: pulumicloud-v2-esc-webhook
+runtime: yaml
+config:
+  serviceOrg:
+    type: string
+    default: service-provider-test-org
+  projectName:
+    type: string
+    default: test-project
+  envName:
+    type: string
+    default: env-with-webhook
+  hookName:
+    type: string
+    default: webhook-test
+  payloadUrl:
+    type: string
+    default: https://example.invalid/hook
+  secretValue:
+    type: string
+    default: shhh

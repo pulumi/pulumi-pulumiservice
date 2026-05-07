@@ -546,10 +546,9 @@ func mergeOperations(existing json.RawMessage, ops derivedOps, d derivations) (j
 			entry["token"] = d.Token
 		}
 	}
+
 	if d.IDFormat != "" {
-		if _, has := entry["idFormat"]; !has {
-			entry["idFormat"] = d.IDFormat
-		}
+		entry["idFormat"] = d.IDFormat
 	}
 	if d.DeleteBeforeReplace {
 		if _, has := entry["deleteBeforeReplace"]; !has {
@@ -809,6 +808,45 @@ func inferRenames(spec *rest.Spec, createOp, readOp, updateOp, deleteOp *rest.Op
 				if _, exists := out[body]; !exists {
 					out[body] = p
 				}
+			}
+		}
+	}
+
+	// Rule (5): case-insensitive path-param ↔ response body alias. When the
+	// OpenAPI spec is inconsistent — path uses {changeRequestID} but the
+	// response body returns "changeRequestId" — the same logical field
+	// surfaces under two casings and chained references break. Pick the
+	// response form as the Pulumi-side: response casing tends to be the more
+	// idiomatic JSON-camelCase shape and is what users see when reading state.
+	for _, op := range []*rest.Operation{createOp, readOp, updateOp, deleteOp} {
+		if op == nil || op.ResponseRef == "" {
+			continue
+		}
+		responseFields := flattenedProps(spec, op.ResponseRef)
+		if len(responseFields) == 0 {
+			continue
+		}
+		for _, p := range pathParamsOf(op) {
+			if seen[p] {
+				continue
+			}
+			if _, exact := responseFields[p]; exact {
+				continue
+			}
+			pLower := strings.ToLower(p)
+			for f := range responseFields {
+				if f == p {
+					continue
+				}
+				if strings.ToLower(f) != pLower {
+					continue
+				}
+				if _, claimed := out[f]; claimed {
+					continue
+				}
+				out[f] = p
+				seen[p] = true
+				break
 			}
 		}
 	}

@@ -126,11 +126,14 @@
     },
     "pulumiservice:v2:EnvironmentDraft": {
       "deleteBeforeReplace": true,
-      "idFormat": "{orgName}/{projectName}/{envName}/{changeRequestID}",
+      "idFormat": "{orgName}/{projectName}/{envName}/{changeRequestId}",
       "operations": {
         "create": "CreateEnvironmentDraft",
         "read": "ReadEnvironmentDraft",
         "update": "UpdateEnvironmentDraft"
+      },
+      "renames": {
+        "changeRequestId": "changeRequestID"
       },
       "token": "pulumiservice:v2/esc:EnvironmentDraft"
     },
@@ -286,11 +289,14 @@
     },
     "pulumiservice:v2:OpenEnvironmentRequest": {
       "deleteBeforeReplace": true,
-      "idFormat": "{orgName}/{projectName}/{envName}/{changeRequestID}",
+      "idFormat": "{orgName}/{projectName}/{envName}/{changeRequestId}",
       "operations": {
         "create": "CreateOpenEnvironmentRequest",
         "read": "ReadOpenEnvironmentRequest",
         "update": "UpdateOpenEnvironmentRequest"
+      },
+      "renames": {
+        "changeRequestId": "changeRequestID"
       },
       "token": "pulumiservice:v2/esc:OpenEnvironmentRequest"
     },

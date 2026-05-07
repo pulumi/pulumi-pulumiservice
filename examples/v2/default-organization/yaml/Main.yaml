@@ -7,4 +7,7 @@ resources:
     properties:
       orgName: ${serviceOrg}
 outputs:
-  defaultOrg: ${default.orgName}
+  # orgName is an input (program-owned), so reference the source value
+  # rather than an output that doesn't exist on DefaultOrganization.
+  defaultOrg: ${serviceOrg}
+  defaultOrgGitHubLogin: ${default.GitHubLogin}
