@@ -97,6 +97,8 @@ export class TeamStackPermission extends pulumi.CustomResource {
             resourceInputs["team"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["organization", "permission", "project", "stack", "team"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(TeamStackPermission.__pulumiType, name, resourceInputs, opts);
     }
 }
@@ -112,7 +114,7 @@ export interface TeamStackPermissionArgs {
     /**
      * Sets the permission level that this team will be granted to the stack.
      */
-    permission: enums.TeamStackPermissionScope;
+    permission: pulumi.Input<enums.TeamStackPermissionScope>;
     /**
      * The project name for this stack.
      */

@@ -94,6 +94,8 @@ export class EnvironmentRotationSchedule extends pulumi.CustomResource {
             resourceInputs["timestamp"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["environment", "organization", "project", "timestamp"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(EnvironmentRotationSchedule.__pulumiType, name, resourceInputs, opts);
     }
 }

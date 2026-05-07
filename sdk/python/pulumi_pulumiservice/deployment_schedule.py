@@ -196,6 +196,8 @@ class DeploymentSchedule(pulumi.CustomResource):
             __props__.__dict__["stack"] = stack
             __props__.__dict__["timestamp"] = timestamp
             __props__.__dict__["schedule_id"] = None
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["organization", "project", "stack", "timestamp"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(DeploymentSchedule, __self__).__init__(
             'pulumiservice:index:DeploymentSchedule',
             resource_name,
@@ -247,7 +249,7 @@ class DeploymentSchedule(pulumi.CustomResource):
     @pulumi.getter(name="pulumiOperation")
     def pulumi_operation(self) -> pulumi.Output['PulumiOperation']:
         """
-        Which operation to run.
+        Which command to run.
         """
         return pulumi.get(self, "pulumi_operation")
 

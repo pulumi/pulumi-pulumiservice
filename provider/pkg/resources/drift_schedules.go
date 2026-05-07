@@ -1,249 +1,185 @@
+// Copyright 2026, Pulumi Corporation.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//	http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package resources
 
 import (
 	"context"
 	"fmt"
-	"path"
 
-	pbempty "google.golang.org/protobuf/types/known/emptypb"
-	"google.golang.org/protobuf/types/known/structpb"
+	"github.com/pulumi/pulumi-go-provider/infer"
 
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
-
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
-type PulumiServiceDriftScheduleResource struct {
-	Client pulumiapi.StackScheduleClient
+type DriftSchedule struct{}
+
+var (
+	_ infer.CustomCreate[DriftScheduleInput, DriftScheduleState] = &DriftSchedule{}
+	_ infer.CustomUpdate[DriftScheduleInput, DriftScheduleState] = &DriftSchedule{}
+	_ infer.CustomDelete[DriftScheduleState]                     = &DriftSchedule{}
+	_ infer.CustomRead[DriftScheduleInput, DriftScheduleState]   = &DriftSchedule{}
+)
+
+func (*DriftSchedule) Annotate(a infer.Annotator) {
+	a.Describe(&DriftSchedule{}, "A cron schedule to run drift detection.")
+	a.SetToken("index", "DriftSchedule")
 }
 
-type PulumiServiceDriftScheduleInput struct {
-	Stack         pulumiapi.StackIdentifier
+type DriftScheduleInput struct {
+	Organization  string `pulumi:"organization" provider:"replaceOnChanges"`
+	Project       string `pulumi:"project"      provider:"replaceOnChanges"`
+	Stack         string `pulumi:"stack"        provider:"replaceOnChanges"`
 	ScheduleCron  string `pulumi:"scheduleCron"`
-	AutoRemediate bool   `pulumi:"autoRemediate"`
+	AutoRemediate *bool  `pulumi:"autoRemediate,optional"`
 }
 
-type PulumiServiceDriftScheduleOutput struct {
-	Input      PulumiServiceDriftScheduleInput
+func (i *DriftScheduleInput) Annotate(a infer.Annotator) {
+	a.Describe(&i.Organization, "Organization name.")
+	a.Describe(&i.Project, "Project name.")
+	a.Describe(&i.Stack, "Stack name.")
+	a.Describe(&i.ScheduleCron, "Cron expression for when to run drift detection.")
+	a.Describe(&i.AutoRemediate, "Whether any drift detected should be remediated after a drift run.")
+	a.SetDefault(&i.AutoRemediate, false)
+}
+
+type DriftScheduleState struct {
+	DriftScheduleInput
 	ScheduleID string `pulumi:"scheduleId"`
 }
 
-func (i *PulumiServiceDriftScheduleInput) ToPropertyMap() resource.PropertyMap {
-	propertyMap := StackToPropertyMap(i.Stack)
-
-	propertyMap["scheduleCron"] = resource.NewPropertyValue(i.ScheduleCron)
-	propertyMap["autoRemediate"] = resource.NewPropertyValue(i.AutoRemediate)
-
-	return propertyMap
+func (s *DriftScheduleState) Annotate(a infer.Annotator) {
+	a.Describe(&s.ScheduleID, "Schedule ID of the created schedule, assigned by Pulumi Cloud.")
 }
 
-func ToPulumiServiceDriftScheduleInput(properties *structpb.Struct) (*PulumiServiceDriftScheduleInput, error) {
-	inputMap, err := plugin.UnmarshalProperties(properties, plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+func (*DriftSchedule) Create(
+	ctx context.Context,
+	req infer.CreateRequest[DriftScheduleInput],
+) (infer.CreateResponse[DriftScheduleState], error) {
+	if req.DryRun {
+		return infer.CreateResponse[DriftScheduleState]{
+			Output: DriftScheduleState{DriftScheduleInput: req.Inputs},
+		}, nil
+	}
+	stack, autoRemediate := req.Inputs.toAPI()
+	scheduleID, err := config.GetClient(ctx).CreateDriftSchedule(ctx, stack, pulumiapi.CreateDriftScheduleRequest{
+		ScheduleCron:  req.Inputs.ScheduleCron,
+		AutoRemediate: autoRemediate,
+	})
 	if err != nil {
-		return nil, err
+		return infer.CreateResponse[DriftScheduleState]{}, fmt.Errorf("error creating drift schedule: %w", err)
 	}
-
-	input := PulumiServiceDriftScheduleInput{}
-	stack, err := ParseStack(inputMap)
-	if err != nil {
-		return nil, err
-	}
-	input.Stack = *stack
-
-	if inputMap["scheduleCron"].HasValue() && inputMap["scheduleCron"].IsString() {
-		scheduleCron := inputMap["scheduleCron"].StringValue()
-		input.ScheduleCron = scheduleCron
-	}
-
-	if inputMap["autoRemediate"].HasValue() && inputMap["autoRemediate"].IsBool() {
-		input.AutoRemediate = inputMap["autoRemediate"].BoolValue()
-	}
-
-	return &input, nil
-}
-
-func (st *PulumiServiceDriftScheduleResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(
-		req.GetOldInputs(),
-		plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
-
-	if !news["autoRemediate"].HasValue() {
-		news["autoRemediate"] = resource.NewBoolProperty(false)
-	}
-
-	return StackScheduleSharedDiffMaps(olds, news)
-}
-
-func (st *PulumiServiceDriftScheduleResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	return StackScheduleSharedDelete(req, st.Client)
-}
-
-func (st *PulumiServiceDriftScheduleResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
-	input, err := ToPulumiServiceDriftScheduleInput(req.GetProperties())
-	if err != nil {
-		return nil, err
-	}
-
-	scheduleReq := pulumiapi.CreateDriftScheduleRequest{
-		ScheduleCron:  input.ScheduleCron,
-		AutoRemediate: input.AutoRemediate,
-	}
-	scheduleID, err := st.Client.CreateDriftSchedule(context.Background(), input.Stack, scheduleReq)
-	if err != nil {
-		return nil, err
-	}
-
-	outputProperties, err := plugin.MarshalProperties(
-		AddScheduleIDToPropertyMap(*scheduleID, input.ToPropertyMap()),
-		plugin.MarshalOptions{
-			KeepUnknowns: true,
-			SkipNulls:    true,
+	return infer.CreateResponse[DriftScheduleState]{
+		ID: stackScheduleID(stack, "drift", *scheduleID),
+		Output: DriftScheduleState{
+			DriftScheduleInput: req.Inputs,
+			ScheduleID:         *scheduleID,
 		},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.CreateResponse{
-		Id: path.Join(
-			input.Stack.OrgName,
-			input.Stack.ProjectName,
-			input.Stack.StackName,
-			"drift",
-			*scheduleID,
-		),
-		Properties: outputProperties,
 	}, nil
 }
 
-func (st *PulumiServiceDriftScheduleResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	inputMap, err := plugin.UnmarshalProperties(
-		req.GetNews(),
-		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
-	)
+func (*DriftSchedule) Update(
+	ctx context.Context,
+	req infer.UpdateRequest[DriftScheduleInput, DriftScheduleState],
+) (infer.UpdateResponse[DriftScheduleState], error) {
+	if req.DryRun {
+		return infer.UpdateResponse[DriftScheduleState]{
+			Output: DriftScheduleState{
+				DriftScheduleInput: req.Inputs,
+				ScheduleID:         req.State.ScheduleID,
+			},
+		}, nil
+	}
+	stack, autoRemediate := req.Inputs.toAPI()
+	scheduleID, err := config.GetClient(ctx).UpdateDriftSchedule(ctx, stack, pulumiapi.CreateDriftScheduleRequest{
+		ScheduleCron:  req.Inputs.ScheduleCron,
+		AutoRemediate: autoRemediate,
+	}, req.State.ScheduleID)
 	if err != nil {
-		return nil, err
+		return infer.UpdateResponse[DriftScheduleState]{}, fmt.Errorf("error updating drift schedule: %w", err)
 	}
-
-	var failures []*pulumirpc.CheckFailure
-	for _, p := range []resource.PropertyKey{"organization", "project", "stack", "scheduleCron"} {
-		if !inputMap[(p)].HasValue() {
-			failures = append(failures, &pulumirpc.CheckFailure{
-				Reason:   fmt.Sprintf("missing required property '%s'", p),
-				Property: string(p),
-			})
-		}
-	}
-
-	if inputMap["autoRemediate"].HasValue() && !inputMap["autoRemediate"].IsBool() {
-		failures = append(failures, &pulumirpc.CheckFailure{
-			Reason:   "autoRemediate property is present but can't be parsed as bool",
-			Property: "autoRemediate",
-		})
-	}
-
-	return &pulumirpc.CheckResponse{Inputs: req.GetNews(), Failures: failures}, nil
-}
-
-func (st *PulumiServiceDriftScheduleResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	previousOutput, err := ToPulumiServiceStackScheduleOutput(req.GetOlds())
-	if err != nil {
-		return nil, err
-	}
-	input, err := ToPulumiServiceDriftScheduleInput(req.GetNews())
-	if err != nil {
-		return nil, err
-	}
-
-	updateReq := pulumiapi.CreateDriftScheduleRequest{
-		ScheduleCron:  input.ScheduleCron,
-		AutoRemediate: input.AutoRemediate,
-	}
-	scheduleID, err := st.Client.UpdateDriftSchedule(
-		context.Background(),
-		input.Stack,
-		updateReq,
-		previousOutput.ScheduleID,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	outputProperties, err := plugin.MarshalProperties(
-		AddScheduleIDToPropertyMap(*scheduleID, input.ToPropertyMap()),
-		plugin.MarshalOptions{
-			KeepUnknowns: true,
-			SkipNulls:    true,
+	return infer.UpdateResponse[DriftScheduleState]{
+		Output: DriftScheduleState{
+			DriftScheduleInput: req.Inputs,
+			ScheduleID:         *scheduleID,
 		},
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &pulumirpc.UpdateResponse{
-		Properties: outputProperties,
 	}, nil
 }
 
-func (st *PulumiServiceDriftScheduleResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	stack, scheduleID, err := ParseStackScheduleID(req.Id, "drift")
+func (*DriftSchedule) Delete(
+	ctx context.Context,
+	req infer.DeleteRequest[DriftScheduleState],
+) (infer.DeleteResponse, error) {
+	stack := pulumiapi.StackIdentifier{
+		OrgName:     req.State.Organization,
+		ProjectName: req.State.Project,
+		StackName:   req.State.Stack,
+	}
+	return infer.DeleteResponse{}, config.GetClient(ctx).DeleteStackSchedule(ctx, stack, req.State.ScheduleID)
+}
+
+func (*DriftSchedule) Read(
+	ctx context.Context,
+	req infer.ReadRequest[DriftScheduleInput, DriftScheduleState],
+) (infer.ReadResponse[DriftScheduleInput, DriftScheduleState], error) {
+	stack, scheduleID, err := parseStackScheduleID(req.ID, "drift")
 	if err != nil {
-		return nil, err
+		return infer.ReadResponse[DriftScheduleInput, DriftScheduleState]{}, err
 	}
 
-	scheduleResponse, err := st.Client.GetStackSchedule(context.Background(), *stack, *scheduleID)
+	resp, err := config.GetClient(ctx).GetStackSchedule(ctx, stack, scheduleID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read DriftSchedule (%q): %w", req.Id, err)
+		return infer.ReadResponse[DriftScheduleInput, DriftScheduleState]{}, fmt.Errorf(
+			"failed to read DriftSchedule (%q): %w", req.ID, err,
+		)
 	}
-	if scheduleResponse == nil {
-		// if schedule doesn't exist, then return empty response to delete it from state
-		return &pulumirpc.ReadResponse{}, nil
+	if resp == nil {
+		return infer.ReadResponse[DriftScheduleInput, DriftScheduleState]{}, nil
 	}
-
-	input := PulumiServiceDriftScheduleInput{
-		Stack:         *stack,
-		ScheduleCron:  *scheduleResponse.ScheduleCron,
-		AutoRemediate: scheduleResponse.Definition.Request.OperationContext.Options.AutoRemediate,
+	if resp.ScheduleCron == nil {
+		return infer.ReadResponse[DriftScheduleInput, DriftScheduleState]{}, fmt.Errorf(
+			"DriftSchedule (%q) has no scheduleCron", req.ID,
+		)
 	}
-
-	inputs, err := plugin.MarshalProperties(
-		input.ToPropertyMap(),
-		plugin.MarshalOptions{
-			KeepUnknowns: true,
-			SkipNulls:    true,
+	autoRemediate := resp.Definition.Request.OperationContext.Options.AutoRemediate
+	inputs := DriftScheduleInput{
+		Organization:  stack.OrgName,
+		Project:       stack.ProjectName,
+		Stack:         stack.StackName,
+		ScheduleCron:  *resp.ScheduleCron,
+		AutoRemediate: &autoRemediate,
+	}
+	return infer.ReadResponse[DriftScheduleInput, DriftScheduleState]{
+		ID:     req.ID,
+		Inputs: inputs,
+		State: DriftScheduleState{
+			DriftScheduleInput: inputs,
+			ScheduleID:         scheduleID,
 		},
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read DriftSchedule (%q): %w", req.Id, err)
-	}
-	outputProperties, err := plugin.MarshalProperties(
-		AddScheduleIDToPropertyMap(*scheduleID, input.ToPropertyMap()),
-		plugin.MarshalOptions{
-			KeepUnknowns: true,
-			SkipNulls:    true,
-		},
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read DriftSchedule (%q): %w", req.Id, err)
-	}
-
-	return &pulumirpc.ReadResponse{
-		Id:         req.Id,
-		Properties: outputProperties,
-		Inputs:     inputs,
 	}, nil
 }
 
-func (st *PulumiServiceDriftScheduleResource) Name() string {
-	return "pulumiservice:index:DriftSchedule"
+func (i DriftScheduleInput) toAPI() (pulumiapi.StackIdentifier, bool) {
+	stack := pulumiapi.StackIdentifier{
+		OrgName:     i.Organization,
+		ProjectName: i.Project,
+		StackName:   i.Stack,
+	}
+	autoRemediate := false
+	if i.AutoRemediate != nil {
+		autoRemediate = *i.AutoRemediate
+	}
+	return stack, autoRemediate
 }

@@ -4,7 +4,7 @@
 package com.pulumi.pulumiservice.enums;
 
 import com.pulumi.core.annotations.EnumType;
-import java.lang.Double;
+import java.lang.Integer;
 import java.util.StringJoiner;
 
     @EnumType
@@ -13,26 +13,26 @@ import java.util.StringJoiner;
          * Grants read permissions to stack.
          * 
          */
-        Read(101.000000),
+        Read(101),
         /**
          * Grants edit permissions to stack.
          * 
          */
-        Edit(102.000000),
+        Edit(102),
         /**
          * Grants admin permissions to stack.
          * 
          */
-        Admin(103.000000);
+        Admin(103);
 
-        private final Double value;
+        private final Integer value;
 
-        TeamStackPermissionScope(Double value) {
+        TeamStackPermissionScope(Integer value) {
             this.value = value;
         }
 
         @EnumType.Converter
-        public Double getValue() {
+        public Integer getValue() {
             return this.value;
         }
 

@@ -91,14 +91,20 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 		})).
 		WithResources(
 			infer.Resource(&resources.AccessToken{}),
+			infer.Resource(&resources.DeploymentSchedule{}),
+			infer.Resource(&resources.DriftSchedule{}),
+			infer.Resource(&resources.EnvironmentRotationSchedule{}),
 			infer.Resource(&resources.InsightsAccount{}),
 			infer.Resource(&resources.OrgAccessToken{}),
 			infer.Resource(&resources.OrganizationMember{}),
 			infer.Resource(&resources.OrganizationRole{}),
 			infer.Resource(&resources.StackTag{}),
+			infer.Resource(&resources.TTLSchedule{}),
 			infer.Resource(&resources.Team{}),
 			infer.Resource(&resources.TeamAccessToken{}),
+			infer.Resource(&resources.TeamEnvironmentPermission{}),
 			infer.Resource(&resources.TeamRoleAssignment{}),
+			infer.Resource(&resources.TeamStackPermission{}),
 		).
 		WithFunctions(
 			infer.Function(&functions.BuildAllowPermissionsFunction{}),
@@ -256,30 +262,15 @@ func (k *pulumiserviceProvider) Configure(
 		&resources.PulumiServiceStackTagsResource{
 			Client: client,
 		},
-		&resources.TeamStackPermissionResource{
-			Client: client,
-		},
 		&resources.PulumiServiceDeploymentSettingsResource{
 			Client: client,
 		},
 		&resources.PulumiServiceAgentPoolResource{
 			Client: client,
 		},
-		&resources.PulumiServiceDeploymentScheduleResource{
-			Client: client,
-		},
-		&resources.PulumiServiceDriftScheduleResource{
-			Client: client,
-		},
-		&resources.PulumiServiceTTLScheduleResource{
-			Client: client,
-		},
 		&resources.PulumiServiceEnvironmentResource{
 			Client:         escClient,
 			MetadataClient: client,
-		},
-		&resources.PulumiServiceTeamEnvironmentPermissionResource{
-			Client: client,
 		},
 		&resources.PulumiServiceEnvironmentVersionTagResource{
 			Client: escClient,
@@ -291,9 +282,6 @@ func (k *pulumiserviceProvider) Configure(
 			Client: client,
 		},
 		&resources.PulumiServiceOidcIssuerResource{
-			Client: client,
-		},
-		&resources.PulumiServiceEnvironmentRotationScheduleResource{
 			Client: client,
 		},
 		&resources.PulumiServiceApprovalRuleResource{

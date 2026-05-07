@@ -21,14 +21,14 @@ __all__ = ['TeamStackPermissionArgs', 'TeamStackPermission']
 class TeamStackPermissionArgs:
     def __init__(__self__, *,
                  organization: pulumi.Input[_builtins.str],
-                 permission: 'TeamStackPermissionScope',
+                 permission: pulumi.Input['TeamStackPermissionScope'],
                  project: pulumi.Input[_builtins.str],
                  stack: pulumi.Input[_builtins.str],
                  team: pulumi.Input[_builtins.str]):
         """
         The set of arguments for constructing a TeamStackPermission resource.
         :param pulumi.Input[_builtins.str] organization: The organization or the personal account name of the stack.
-        :param 'TeamStackPermissionScope' permission: Sets the permission level that this team will be granted to the stack.
+        :param pulumi.Input['TeamStackPermissionScope'] permission: Sets the permission level that this team will be granted to the stack.
         :param pulumi.Input[_builtins.str] project: The project name for this stack.
         :param pulumi.Input[_builtins.str] stack: The name of the stack that the team will be granted permissions to.
         :param pulumi.Input[_builtins.str] team: The name of the team to grant this stack permissions to. This is not the display name.
@@ -53,14 +53,14 @@ class TeamStackPermissionArgs:
 
     @_builtins.property
     @pulumi.getter
-    def permission(self) -> 'TeamStackPermissionScope':
+    def permission(self) -> pulumi.Input['TeamStackPermissionScope']:
         """
         Sets the permission level that this team will be granted to the stack.
         """
         return pulumi.get(self, "permission")
 
     @permission.setter
-    def permission(self, value: 'TeamStackPermissionScope'):
+    def permission(self, value: pulumi.Input['TeamStackPermissionScope']):
         pulumi.set(self, "permission", value)
 
     @_builtins.property
@@ -107,7 +107,7 @@ class TeamStackPermission(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  organization: Optional[pulumi.Input[_builtins.str]] = None,
-                 permission: Optional['TeamStackPermissionScope'] = None,
+                 permission: Optional[pulumi.Input['TeamStackPermissionScope']] = None,
                  project: Optional[pulumi.Input[_builtins.str]] = None,
                  stack: Optional[pulumi.Input[_builtins.str]] = None,
                  team: Optional[pulumi.Input[_builtins.str]] = None,
@@ -118,7 +118,7 @@ class TeamStackPermission(pulumi.CustomResource):
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] organization: The organization or the personal account name of the stack.
-        :param 'TeamStackPermissionScope' permission: Sets the permission level that this team will be granted to the stack.
+        :param pulumi.Input['TeamStackPermissionScope'] permission: Sets the permission level that this team will be granted to the stack.
         :param pulumi.Input[_builtins.str] project: The project name for this stack.
         :param pulumi.Input[_builtins.str] stack: The name of the stack that the team will be granted permissions to.
         :param pulumi.Input[_builtins.str] team: The name of the team to grant this stack permissions to. This is not the display name.
@@ -148,7 +148,7 @@ class TeamStackPermission(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  organization: Optional[pulumi.Input[_builtins.str]] = None,
-                 permission: Optional['TeamStackPermissionScope'] = None,
+                 permission: Optional[pulumi.Input['TeamStackPermissionScope']] = None,
                  project: Optional[pulumi.Input[_builtins.str]] = None,
                  stack: Optional[pulumi.Input[_builtins.str]] = None,
                  team: Optional[pulumi.Input[_builtins.str]] = None,
@@ -176,6 +176,8 @@ class TeamStackPermission(pulumi.CustomResource):
             if team is None and not opts.urn:
                 raise TypeError("Missing required property 'team'")
             __props__.__dict__["team"] = team
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["organization", "permission", "project", "stack", "team"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(TeamStackPermission, __self__).__init__(
             'pulumiservice:index:TeamStackPermission',
             resource_name,

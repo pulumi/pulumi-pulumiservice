@@ -17,17 +17,17 @@ type TeamEnvironmentPermission struct {
 	pulumi.CustomResourceState
 
 	// Environment name.
-	Environment pulumi.StringPtrOutput `pulumi:"environment"`
+	Environment pulumi.StringOutput `pulumi:"environment"`
 	// The maximum duration for which members of this team may open the environment.
 	MaxOpenDuration pulumi.StringPtrOutput `pulumi:"maxOpenDuration"`
 	// Organization name.
-	Organization pulumi.StringPtrOutput `pulumi:"organization"`
+	Organization pulumi.StringOutput `pulumi:"organization"`
 	// Which permission level to grant to the specified team.
-	Permission EnvironmentPermissionPtrOutput `pulumi:"permission"`
+	Permission EnvironmentPermissionOutput `pulumi:"permission"`
 	// Project name.
 	Project pulumi.StringPtrOutput `pulumi:"project"`
 	// Team name.
-	Team pulumi.StringPtrOutput `pulumi:"team"`
+	Team pulumi.StringOutput `pulumi:"team"`
 }
 
 // NewTeamEnvironmentPermission registers a new resource with the given unique name, arguments, and options.
@@ -52,6 +52,15 @@ func NewTeamEnvironmentPermission(ctx *pulumi.Context,
 	if args.Project == nil {
 		args.Project = pulumi.StringPtr("default")
 	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"environment",
+		"maxOpenDuration",
+		"organization",
+		"permission",
+		"project",
+		"team",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource TeamEnvironmentPermission
 	err := ctx.RegisterResource("pulumiservice:index:TeamEnvironmentPermission", name, args, &resource, opts...)
@@ -203,8 +212,8 @@ func (o TeamEnvironmentPermissionOutput) ToTeamEnvironmentPermissionOutputWithCo
 }
 
 // Environment name.
-func (o TeamEnvironmentPermissionOutput) Environment() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *TeamEnvironmentPermission) pulumi.StringPtrOutput { return v.Environment }).(pulumi.StringPtrOutput)
+func (o TeamEnvironmentPermissionOutput) Environment() pulumi.StringOutput {
+	return o.ApplyT(func(v *TeamEnvironmentPermission) pulumi.StringOutput { return v.Environment }).(pulumi.StringOutput)
 }
 
 // The maximum duration for which members of this team may open the environment.
@@ -213,13 +222,13 @@ func (o TeamEnvironmentPermissionOutput) MaxOpenDuration() pulumi.StringPtrOutpu
 }
 
 // Organization name.
-func (o TeamEnvironmentPermissionOutput) Organization() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *TeamEnvironmentPermission) pulumi.StringPtrOutput { return v.Organization }).(pulumi.StringPtrOutput)
+func (o TeamEnvironmentPermissionOutput) Organization() pulumi.StringOutput {
+	return o.ApplyT(func(v *TeamEnvironmentPermission) pulumi.StringOutput { return v.Organization }).(pulumi.StringOutput)
 }
 
 // Which permission level to grant to the specified team.
-func (o TeamEnvironmentPermissionOutput) Permission() EnvironmentPermissionPtrOutput {
-	return o.ApplyT(func(v *TeamEnvironmentPermission) EnvironmentPermissionPtrOutput { return v.Permission }).(EnvironmentPermissionPtrOutput)
+func (o TeamEnvironmentPermissionOutput) Permission() EnvironmentPermissionOutput {
+	return o.ApplyT(func(v *TeamEnvironmentPermission) EnvironmentPermissionOutput { return v.Permission }).(EnvironmentPermissionOutput)
 }
 
 // Project name.
@@ -228,8 +237,8 @@ func (o TeamEnvironmentPermissionOutput) Project() pulumi.StringPtrOutput {
 }
 
 // Team name.
-func (o TeamEnvironmentPermissionOutput) Team() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *TeamEnvironmentPermission) pulumi.StringPtrOutput { return v.Team }).(pulumi.StringPtrOutput)
+func (o TeamEnvironmentPermissionOutput) Team() pulumi.StringOutput {
+	return o.ApplyT(func(v *TeamEnvironmentPermission) pulumi.StringOutput { return v.Team }).(pulumi.StringOutput)
 }
 
 type TeamEnvironmentPermissionArrayOutput struct{ *pulumi.OutputState }
