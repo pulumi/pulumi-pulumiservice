@@ -165,19 +165,19 @@ export interface WebhookArgs {
     /**
      * Name of the environment. Only specified if this is an environment webhook.
      */
-    environmentName?: pulumi.Input<string>;
+    environmentName?: pulumi.Input<string | undefined>;
     /**
      * Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.
      */
-    filters?: pulumi.Input<pulumi.Input<enums.WebhookFilters>[]>;
+    filters?: pulumi.Input<pulumi.Input<enums.WebhookFilters>[] | undefined>;
     /**
      * Format of the webhook payload. Can be either `raw` or `slack`. Defaults to `raw`.
      */
-    format?: pulumi.Input<enums.WebhookFormat>;
+    format?: pulumi.Input<enums.WebhookFormat | undefined>;
     /**
      * Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#groups) for more information.
      */
-    groups?: pulumi.Input<pulumi.Input<enums.WebhookGroup>[]>;
+    groups?: pulumi.Input<pulumi.Input<enums.WebhookGroup>[] | undefined>;
     /**
      * Name of the organization.
      */
@@ -189,13 +189,13 @@ export interface WebhookArgs {
     /**
      * Name of the project. Only specified if this is a stack or environment webhook.
      */
-    projectName?: pulumi.Input<string>;
+    projectName?: pulumi.Input<string | undefined>;
     /**
      * Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.
      */
-    secret?: pulumi.Input<string>;
+    secret?: pulumi.Input<string | undefined>;
     /**
      * Name of the stack. Only needed if this is a stack webhook.
      */
-    stackName?: pulumi.Input<string>;
+    stackName?: pulumi.Input<string | undefined>;
 }

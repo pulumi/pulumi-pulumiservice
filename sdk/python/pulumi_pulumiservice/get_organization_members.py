@@ -59,7 +59,7 @@ def get_organization_members(organization_name: Optional[_builtins.str] = None,
 
     return AwaitableGetOrganizationMembersResult(
         members=pulumi.get(__ret__, 'members'))
-def get_organization_members_output(organization_name: Optional[pulumi.Input[_builtins.str]] = None,
+def get_organization_members_output(organization_name: pulumi.Input[Optional[_builtins.str]] = None,
                                     opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[GetOrganizationMembersResult]:
     """
     Lists all members of a Pulumi Cloud organization, including their role assignments. Merges Pulumi Cloud's identity-provider roster (paginated; includes users who haven't signed in to Pulumi yet) with the seat-count roster, deduped by username, so SAML- and non-SAML-provisioned members both appear regardless of which roster they're tracked in.

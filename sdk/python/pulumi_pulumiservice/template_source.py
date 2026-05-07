@@ -24,9 +24,10 @@ class TemplateSourceArgs:
                  organization_name: pulumi.Input[_builtins.str],
                  source_name: pulumi.Input[_builtins.str],
                  source_url: pulumi.Input[_builtins.str],
-                 destination: Optional[pulumi.Input['TemplateSourceDestinationArgs']] = None):
+                 destination: pulumi.Input[Optional['TemplateSourceDestinationArgs']] = None):
         """
         The set of arguments for constructing a TemplateSource resource.
+
         :param pulumi.Input[_builtins.str] organization_name: Organization name.
         :param pulumi.Input[_builtins.str] source_name: Source name.
         :param pulumi.Input[_builtins.str] source_url: Github URL of the repository from which to grab templates.
@@ -76,14 +77,14 @@ class TemplateSourceArgs:
 
     @_builtins.property
     @pulumi.getter
-    def destination(self) -> Optional[pulumi.Input['TemplateSourceDestinationArgs']]:
+    def destination(self) -> pulumi.Input[Optional['TemplateSourceDestinationArgs']]:
         """
         The default destination for projects using templates from this source.
         """
         return pulumi.get(self, "destination")
 
     @destination.setter
-    def destination(self, value: Optional[pulumi.Input['TemplateSourceDestinationArgs']]):
+    def destination(self, value: pulumi.Input[Optional['TemplateSourceDestinationArgs']]):
         pulumi.set(self, "destination", value)
 
 
@@ -93,13 +94,14 @@ class TemplateSource(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 destination: Optional[pulumi.Input[Union['TemplateSourceDestinationArgs', 'TemplateSourceDestinationArgsDict']]] = None,
-                 organization_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 source_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 source_url: Optional[pulumi.Input[_builtins.str]] = None,
+                 destination: pulumi.Input[Optional[Union['TemplateSourceDestinationArgs', 'TemplateSourceDestinationArgsDict']]] = None,
+                 organization_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 source_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 source_url: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
         A source for Pulumi templates
+
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
@@ -117,6 +119,7 @@ class TemplateSource(pulumi.CustomResource):
         """
         A source for Pulumi templates
 
+
         :param str resource_name: The name of the resource.
         :param TemplateSourceArgs args: The arguments to use to populate this resource's properties.
         :param pulumi.ResourceOptions opts: Options for the resource.
@@ -132,10 +135,10 @@ class TemplateSource(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 destination: Optional[pulumi.Input[Union['TemplateSourceDestinationArgs', 'TemplateSourceDestinationArgsDict']]] = None,
-                 organization_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 source_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 source_url: Optional[pulumi.Input[_builtins.str]] = None,
+                 destination: pulumi.Input[Optional[Union['TemplateSourceDestinationArgs', 'TemplateSourceDestinationArgsDict']]] = None,
+                 organization_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 source_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 source_url: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

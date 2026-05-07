@@ -150,7 +150,7 @@ export interface InsightsAccountArgs {
     /**
      * Provider-specific configuration as a JSON object. For AWS, specify regions to scan: {"regions": ["us-west-1", "us-west-2"]}.
      */
-    providerConfig?: pulumi.Input<{[key: string]: any}>;
+    providerConfig?: pulumi.Input<{[key: string]: any} | undefined>;
     /**
      * Schedule for automated scanning. Use 'daily' for daily scans, '12h' for scans every twelve hours, or 'none' to disable scheduled scanning. Defaults to 'none'.
      */
@@ -158,5 +158,5 @@ export interface InsightsAccountArgs {
     /**
      * Key-value tags to associate with the insights account.
      */
-    tags?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
+    tags?: pulumi.Input<{[key: string]: pulumi.Input<string>} | undefined>;
 }
