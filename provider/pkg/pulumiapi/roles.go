@@ -25,16 +25,36 @@ import (
 
 type RoleClient interface {
 	CreateRole(
-		ctx context.Context, orgName string, req apitype.PermissionDescriptorBase,
+		ctx context.Context,
+		orgName string,
+		req apitype.PermissionDescriptorBase,
 	) (*apitype.PermissionDescriptorRecord, error)
-	GetRole(ctx context.Context, orgName, roleID string) (*apitype.PermissionDescriptorRecord, error)
+	GetRole(
+		ctx context.Context,
+		orgName, roleID string,
+	) (*apitype.PermissionDescriptorRecord, error)
 	UpdateRole(
-		ctx context.Context, orgName, roleID string, req apitype.UpdateRoleRequest,
+		ctx context.Context,
+		orgName, roleID string,
+		req apitype.UpdateRoleRequest,
 	) (*apitype.PermissionDescriptorRecord, error)
-	DeleteRole(ctx context.Context, orgName, roleID string, force bool) error
-	ListAvailableRoleScopes(ctx context.Context, orgName string) (map[string][]RoleScopeGroup, error)
-	ListOrgRoles(ctx context.Context, orgName, uxPurpose string) ([]apitype.PermissionDescriptorRecord, error)
-	ResolveBuiltInRoleID(ctx context.Context, orgName, builtInRole string) (string, error)
+	DeleteRole(
+		ctx context.Context,
+		orgName, roleID string,
+		force bool,
+	) error
+	ListAvailableRoleScopes(
+		ctx context.Context,
+		orgName string,
+	) (map[string][]RoleScopeGroup, error)
+	ListOrgRoles(
+		ctx context.Context,
+		orgName, uxPurpose string,
+	) ([]apitype.PermissionDescriptorRecord, error)
+	ResolveBuiltInRoleID(
+		ctx context.Context,
+		orgName, builtInRole string,
+	) (string, error)
 }
 
 // RoleScope is a single permission scope (e.g. "stack:read") plus its
