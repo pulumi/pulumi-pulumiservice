@@ -3,6 +3,7 @@
 ## Unreleased
 
 ### Breaking Changes
+- The .NET SDK (`Pulumi.PulumiService`) now targets `net8.0` and no longer supports `net6.0`. Pulumi NuGet 3.106.0 dropped `net6.0`, which made the previously-targeted framework unbuildable. Consumers must build against the .NET 8 SDK.
 - Removed the numeric `version` field from `PolicyGroup.policyPacks` inputs; it is now output-only, since the value is server-derived from `versionTag`. Use `versionTag` to pin pack versions. [#737](https://github.com/pulumi/pulumi-pulumiservice/issues/737)
 - `TeamStackPermission.permission` is no longer marked `plain` in the schema. The output is now an `Output<TeamStackPermissionScope>` rather than a plain value; consumers reading `myPerm.permission` need `.apply(...)` to access the underlying value. The input side is strictly more permissive — callers may now wire `permission` to another resource's output. The Go SDK type also changes from `float64` to `int` to match the wire format.
 - `TeamEnvironmentPermission` outputs (`organization`, `team`, `environment`, `permission`) are now typed as definitely-present (`Output<string>`, `Output<EnvironmentPermission>`) rather than optional (`Output<string | undefined>`). The values were always populated; the schema previously misrepresented them.

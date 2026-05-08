@@ -120,6 +120,9 @@ build_dotnet: .make/build_dotnet
 .make/generate_dotnet: | mise_env
 	PULUMI_HOME=$(GEN_PULUMI_HOME) PULUMI_CONVERT_EXAMPLES_CACHE_DIR=$(GEN_PULUMI_CONVERT_EXAMPLES_CACHE_DIR) pulumi package gen-sdk provider/cmd/$(PROVIDER)/schema.json --version ${PROVIDER_VERSION} --language dotnet --out sdk/
 	printf "module fake_dotnet_module // Exclude this directory from Go tools\n\ngo 1.17\n" > sdk/dotnet/go.mod
+	# Bump TargetFramework: pulumi codegen still emits net6.0, but Pulumi NuGet
+	# 3.106.0+ dropped net6.0 support. Drop this once pulumi codegen ships net8.0.
+	perl -i -pe 's|<TargetFramework>net6\.0</TargetFramework>|<TargetFramework>net8.0</TargetFramework>|' sdk/dotnet/Pulumi.PulumiService.csproj
 	@touch $@
 .make/build_dotnet: .make/generate_dotnet
 	cd sdk/dotnet/ && dotnet build
