@@ -16,6 +16,13 @@ namespace Pulumi.PulumiService.V2.Esc
     public partial class Environment : global::Pulumi.CustomResource
     {
         /// <summary>
+        /// Raw YAML body content.
+        /// </summary>
+        [Output("yaml")]
+        public Output<string?> Yaml { get; private set; } = null!;
+
+
+        /// <summary>
         /// Create a Environment resource with the given unique name, arguments, and options.
         /// </summary>
         ///
@@ -37,6 +44,10 @@ namespace Pulumi.PulumiService.V2.Esc
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
+                AdditionalSecretOutputs =
+                {
+                    "yaml",
+                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.

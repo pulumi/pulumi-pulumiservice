@@ -121,12 +121,6 @@ const env = new ps.v2.esc.Environment("bootstrapEnv", {
     ].join("\n") + "\n",
 });
 
-// Daily secret rotation schedule. Despite the generic name, v2's
-// EnvironmentSchedule is a secret-rotation schedule — it requires
-// `secretRotationRequest`. Empty `environmentPath` means rotate every
-// rotated secret in the env (none here, but the schedule still installs).
-// envName is the literal string (v2 esc Environment surfaces no `name`
-// output); `dependsOn` preserves the create-before-schedule ordering.
 const envSchedule = new ps.v2.esc.EnvironmentSchedule("envSchedule", {
     orgName: serviceOrg,
     projectName: envProject,

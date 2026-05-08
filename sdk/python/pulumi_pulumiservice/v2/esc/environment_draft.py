@@ -157,6 +157,9 @@ class EnvironmentDraft(pulumi.CustomResource):
                 raise TypeError("Missing required property 'project_name'")
             __props__.__dict__["project_name"] = project_name
             __props__.__dict__["latest_revision_number"] = None
+            __props__.__dict__["yaml"] = None
+        secret_opts = pulumi.ResourceOptions(additional_secret_outputs=["yaml"])
+        opts = pulumi.ResourceOptions.merge(opts, secret_opts)
         super(EnvironmentDraft, __self__).__init__(
             'pulumiservice:v2/esc:EnvironmentDraft',
             resource_name,
@@ -181,6 +184,7 @@ class EnvironmentDraft(pulumi.CustomResource):
 
         __props__.__dict__["change_request_id"] = None
         __props__.__dict__["latest_revision_number"] = None
+        __props__.__dict__["yaml"] = None
         return EnvironmentDraft(resource_name, opts=opts, __props__=__props__)
 
     @_builtins.property
@@ -198,4 +202,12 @@ class EnvironmentDraft(pulumi.CustomResource):
         The latest revision number
         """
         return pulumi.get(self, "latest_revision_number")
+
+    @_builtins.property
+    @pulumi.getter
+    def yaml(self) -> pulumi.Output[Optional[_builtins.str]]:
+        """
+        Raw YAML body content.
+        """
+        return pulumi.get(self, "yaml")
 

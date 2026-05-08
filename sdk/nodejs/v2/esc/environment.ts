@@ -34,6 +34,10 @@ export class Environment extends pulumi.CustomResource {
         return obj['__pulumiType'] === Environment.__pulumiType;
     }
 
+    /**
+     * Raw YAML body content.
+     */
+    declare public readonly yaml: pulumi.Output<string | undefined>;
 
     /**
      * Create a Environment resource with the given unique name, arguments, and options.
@@ -60,8 +64,11 @@ export class Environment extends pulumi.CustomResource {
             resourceInputs["project"] = args?.project;
             resourceInputs["yaml"] = args?.yaml ? pulumi.secret(args.yaml) : undefined;
         } else {
+            resourceInputs["yaml"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const secretOpts = { additionalSecretOutputs: ["yaml"] };
+        opts = pulumi.mergeOptions(opts, secretOpts);
         super(Environment.__pulumiType, name, resourceInputs, opts);
     }
 }

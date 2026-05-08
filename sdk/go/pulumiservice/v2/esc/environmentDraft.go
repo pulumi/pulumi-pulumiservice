@@ -20,6 +20,8 @@ type EnvironmentDraft struct {
 	ChangeRequestId pulumi.StringPtrOutput `pulumi:"changeRequestId"`
 	// The latest revision number
 	LatestRevisionNumber pulumi.IntPtrOutput `pulumi:"latestRevisionNumber"`
+	// Raw YAML body content.
+	Yaml pulumi.StringPtrOutput `pulumi:"yaml"`
 }
 
 // NewEnvironmentDraft registers a new resource with the given unique name, arguments, and options.
@@ -38,6 +40,10 @@ func NewEnvironmentDraft(ctx *pulumi.Context,
 	if args.ProjectName == nil {
 		return nil, errors.New("invalid value for required argument 'ProjectName'")
 	}
+	secrets := pulumi.AdditionalSecretOutputs([]string{
+		"yaml",
+	})
+	opts = append(opts, secrets)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource EnvironmentDraft
 	err := ctx.RegisterResource("pulumiservice:v2/esc:EnvironmentDraft", name, args, &resource, opts...)
@@ -188,6 +194,11 @@ func (o EnvironmentDraftOutput) ChangeRequestId() pulumi.StringPtrOutput {
 // The latest revision number
 func (o EnvironmentDraftOutput) LatestRevisionNumber() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *EnvironmentDraft) pulumi.IntPtrOutput { return v.LatestRevisionNumber }).(pulumi.IntPtrOutput)
+}
+
+// Raw YAML body content.
+func (o EnvironmentDraftOutput) Yaml() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *EnvironmentDraft) pulumi.StringPtrOutput { return v.Yaml }).(pulumi.StringPtrOutput)
 }
 
 type EnvironmentDraftArrayOutput struct{ *pulumi.OutputState }

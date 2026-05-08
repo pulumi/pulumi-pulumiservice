@@ -15,6 +15,9 @@ import (
 // Creates a new Pulumi ESC (Environments, Secrets, and Configuration) environment within the specified organization. The request body must include the project name and the environment name. Environment names must be unique within a project and may only contain alphanumeric characters, hyphens, underscores, and periods. The newly created environment starts with an empty YAML definition that can be updated via the UpdateEnvironment endpoint.
 type Environment struct {
 	pulumi.CustomResourceState
+
+	// Raw YAML body content.
+	Yaml pulumi.StringPtrOutput `pulumi:"yaml"`
 }
 
 // NewEnvironment registers a new resource with the given unique name, arguments, and options.
@@ -45,6 +48,10 @@ func NewEnvironment(ctx *pulumi.Context,
 	if args.Yaml != nil {
 		args.Yaml = pulumi.ToSecret(args.Yaml).(pulumi.StringPtrInput)
 	}
+	secrets := pulumi.AdditionalSecretOutputs([]string{
+		"yaml",
+	})
+	opts = append(opts, secrets)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Environment
 	err := ctx.RegisterResource("pulumiservice:v2/escPreview:Environment", name, args, &resource, opts...)
@@ -189,6 +196,11 @@ func (o EnvironmentOutput) ToEnvironmentOutput() EnvironmentOutput {
 
 func (o EnvironmentOutput) ToEnvironmentOutputWithContext(ctx context.Context) EnvironmentOutput {
 	return o
+}
+
+// Raw YAML body content.
+func (o EnvironmentOutput) Yaml() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *Environment) pulumi.StringPtrOutput { return v.Yaml }).(pulumi.StringPtrOutput)
 }
 
 type EnvironmentArrayOutput struct{ *pulumi.OutputState }

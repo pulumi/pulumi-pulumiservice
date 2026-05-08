@@ -29,11 +29,8 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/property"
 )
 
-// mockTransport returns canned responses keyed by HTTP method+path. Path
-// matching is exact against the request URL's path component. Tests that
-// need stateful behavior (e.g., GET returns 404 before PUT, 200 after) can
-// set responseFn instead, which is called for every request and overrides
-// the responses map.
+// mockTransport serves canned responses keyed by "<METHOD> <path>". Set
+// responseFn for stateful behavior; it overrides responses if non-nil.
 type mockTransport struct {
 	responses  map[string]mockResponse
 	responseFn func(req *http.Request) mockResponse
@@ -68,8 +65,7 @@ func (m *mockTransport) Do(_ context.Context, req *http.Request) (*http.Response
 	}, nil
 }
 
-// loadFixtures reads the embedded spec.json and metadata.json from the
-// cloud package fixtures.
+// loadFixtures reads spec.json and metadata.json from ../cloud.
 func loadFixtures(t *testing.T) (*Spec, *Metadata) {
 	t.Helper()
 	_, here, _, _ := runtime.Caller(0)
@@ -101,43 +97,22 @@ func propMap(m map[string]any) property.Map {
 	return property.NewMap(out)
 }
 
-// TestCreateSynthesizesID exercises Create end-to-end against the real
-// spec for representative resources, verifying the synthesized ID matches
-// expected composite-from-path-params form. Covers the four interesting
-// shapes:
-//
-//   - server-generated id (AgentPool, Role): create response carries id;
-//     ID = {orgName}/{serverID}
-//   - 204 no-content (StackTag): all path-param values come from inputs;
-//     ID = {orgName}/{projectName}/{stackName}/{tagName}
-//   - composite from path (Team): create response includes resource body;
-//     ID = {orgName}/{teamName}
-//   - singleton (DefaultOrganization, AuditLogExportConfiguration): ID =
-//     {orgName}
+// TestCreateSynthesizesID exercises Create against the real spec, covering
+// server-generated id, 204 no-content, composite-from-path, and singleton
+// shapes.
 func TestCreateSynthesizesID(t *testing.T) {
 	spec, meta := loadFixtures(t)
 	resources := Resources(spec, meta)
 
 	cases := []struct {
-		// Lookup token (the metadata.json key).
-		token string
-		// Mock HTTP responses keyed by "<METHOD> <path>". Mutually exclusive
-		// with responseFn.
-		responses map[string]mockResponse
-		// responseFn, if set, overrides responses for stateful behavior
-		// (e.g., GET returns 404 before mutating call, 200 after — needed
-		// for resources with requireImport, where the read op fires both
-		// as a pre-flight probe and as read-after-create).
-		responseFn func() func(req *http.Request) mockResponse
-		// Inputs supplied by the user.
-		inputs map[string]any
-		// Expected resource ID after Create.
-		wantID string
+		token      string
+		responses  map[string]mockResponse
+		responseFn func() func(req *http.Request) mockResponse // stateful, overrides responses
+		inputs     map[string]any
+		wantID     string
 	}{
 		{
-			// AgentPool: server-generated id, response renamed `id`→`poolId`.
-			// Old behavior: ID = "<uuid>".
-			// New behavior: ID = "<orgName>/<uuid>".
+			// AgentPool: server-generated id, ID = {orgName}/{uuid}.
 			token: "pulumiservice:v2:AgentPool",
 			responses: map[string]mockResponse{
 				"POST /api/orgs/test-org/agent-pools": {
@@ -157,8 +132,7 @@ func TestCreateSynthesizesID(t *testing.T) {
 			wantID: "test-org/abc-123",
 		},
 		{
-			// StackTag: 204 No Content, identity entirely from inputs. No
-			// read op declared, so no GET fires after create.
+			// StackTag: 204 No Content, identity entirely from inputs.
 			token: "pulumiservice:v2:StackTag",
 			responses: map[string]mockResponse{
 				"POST /api/stacks/test-org/myproj/mystack/tags": {status: 204, body: ""},
@@ -173,7 +147,7 @@ func TestCreateSynthesizesID(t *testing.T) {
 			wantID: "test-org/myproj/mystack/owner",
 		},
 		{
-			// Team: response body has resource fields, composite identity from path.
+			// Team: composite identity from path.
 			token: "pulumiservice:v2:Team",
 			responses: map[string]mockResponse{
 				"POST /api/orgs/test-org/teams/pulumi": {
@@ -193,9 +167,8 @@ func TestCreateSynthesizesID(t *testing.T) {
 			wantID: "test-org/infra",
 		},
 		{
-			// DefaultOrganization: requireImport singleton — GET returns 404
-			// for the probe (resource doesn't exist), then 200 for the post-
-			// create read after the mutating call writes it.
+			// DefaultOrganization: requireImport singleton; GET returns 404
+			// for the probe, 200 after the mutating call writes it.
 			token: "pulumiservice:v2:DefaultOrganization",
 			responseFn: func() func(req *http.Request) mockResponse {
 				written := false
@@ -218,8 +191,8 @@ func TestCreateSynthesizesID(t *testing.T) {
 			wantID: "test-org",
 		},
 		{
-			// AuditLogExportConfiguration: requireImport singleton, all ops
-			// on the same path — same staging pattern as DefaultOrganization.
+			// AuditLogExportConfiguration: requireImport singleton, same
+			// staging pattern as DefaultOrganization.
 			token: "pulumiservice:v2:AuditLogExportConfiguration",
 			responseFn: func() func(req *http.Request) mockResponse {
 				written := false
@@ -242,7 +215,7 @@ func TestCreateSynthesizesID(t *testing.T) {
 			wantID: "test-org",
 		},
 		{
-			// Role: server-generated id, response renamed `id`→`roleID`.
+			// Role: server-generated id, response rename id→roleID.
 			token: "pulumiservice:v2:Role",
 			responses: map[string]mockResponse{
 				"POST /api/orgs/test-org/roles": {
@@ -301,10 +274,8 @@ func TestCreateSynthesizesID(t *testing.T) {
 	}
 }
 
-// TestCreateFusesYamlUpdateAfterJsonCreate verifies the ESC-shaped pattern:
-// Create takes a JSON body (project+name) and Update takes raw yaml. When
-// the user supplies a yaml input on Create, the dispatch should fire create
-// then a follow-up update with the yaml as request body.
+// TestCreateFusesYamlUpdateAfterJsonCreate: when create is JSON and update
+// is yaml, supplying a yaml input fires create then a follow-up yaml update.
 func TestCreateFusesYamlUpdateAfterJsonCreate(t *testing.T) {
 	const specJSON = `{
 	  "openapi": "3.0.0",
@@ -365,8 +336,7 @@ func TestCreateFusesYamlUpdateAfterJsonCreate(t *testing.T) {
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 
 	yamlBody := "values:\n  bootstrap:\n    appVersion: 1.0.0\n"
-	// Secret-wrapped yaml mirrors what the SDK sends — codegen wraps the
-	// input via pulumi.secret(...) when the schema marks the field Secret.
+	// Secret-wrapped yaml mirrors what codegen sends for Secret fields.
 	yamlVal := property.New(yamlBody).WithSecret(true)
 	inputs := property.NewMap(map[string]property.Value{
 		"org":     property.New("acme"),
@@ -399,12 +369,60 @@ func TestCreateFusesYamlUpdateAfterJsonCreate(t *testing.T) {
 	}
 }
 
-// TestCreateReadAfterCreateSourcesFromInputs confirms that the read-after-
-// create URL is built from the user inputs (req.Properties), not from the
-// (potentially sparse) create response. This is what lets Phase D drop path
-// params from state without breaking the read-after-create round-trip: the
-// read URL substitution still finds path-param values via inputs, even when
-// the create response carried only a server-assigned id.
+// TestReadDecodesYamlResponseBody: an application/x-yaml response binds
+// to state["yaml"] instead of being JSON-unmarshaled.
+func TestReadDecodesYamlResponseBody(t *testing.T) {
+	const specJSON = `{
+	  "openapi": "3.0.0",
+	  "paths": {
+	    "/envs/{org}/{project}/{name}": {
+	      "get": {
+	        "operationId": "ReadEnv",
+	        "parameters": [
+	          {"name": "org",     "in": "path", "required": true, "schema": {"type": "string"}},
+	          {"name": "project", "in": "path", "required": true, "schema": {"type": "string"}},
+	          {"name": "name",    "in": "path", "required": true, "schema": {"type": "string"}}
+	        ],
+	        "responses": {"200": {"content": {"application/x-yaml": {"schema": {"type": "string"}}}}}
+	      }
+	    }
+	  }
+	}`
+	spec, _ := ParseSpec([]byte(specJSON))
+	r := &Resource{
+		spec: spec,
+		meta: ResourceMeta{
+			Operations: Operations{Read: "ReadEnv"},
+			IDFormat:   "{org}/{project}/{name}",
+		},
+	}
+
+	yamlBody := "values:\n  bootstrap:\n    appVersion: 1.0.0\n"
+	mock := &mockTransport{
+		responseFn: func(req *http.Request) mockResponse {
+			return mockResponse{status: 200, body: yamlBody}
+		},
+	}
+	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+
+	resp, err := r.Read(context.Background(), p.ReadRequest{
+		ID:         "acme/default/platform-bootstrap",
+		Properties: property.NewMap(map[string]property.Value{}),
+	})
+	if err != nil {
+		t.Fatalf("read: %v", err)
+	}
+	v, ok := resp.Properties.GetOk("yaml")
+	if !ok {
+		t.Fatalf("read response missing 'yaml': %#v", resp.Properties)
+	}
+	if v.AsString() != yamlBody {
+		t.Errorf("yaml mismatch:\ngot:  %q\nwant: %q", v.AsString(), yamlBody)
+	}
+}
+
+// TestCreateReadAfterCreateSourcesFromInputs: the read URL is built from
+// user inputs, not from the (potentially sparse) create response.
 func TestCreateReadAfterCreateSourcesFromInputs(t *testing.T) {
 	const specJSON = `{
 	  "openapi": "3.0.0",
@@ -465,14 +483,9 @@ func TestCreateReadAfterCreateSourcesFromInputs(t *testing.T) {
 	}
 }
 
-// TestCreateReadsAfterCreate verifies that Create fires the read op after
-// the create call and returns state populated from the read response, not
-// just whatever sparse body the create endpoint echoed. Many Pulumi Cloud
-// create endpoints return `{}` or a stripped object; without read-after-
-// create, downstream resources referencing read-only outputs would dereference
-// missing values until the next refresh.
+// TestCreateReadsAfterCreate: Create fires read after the create call and
+// returns state from the read response, not the (sparse) create echo.
 func TestCreateReadsAfterCreate(t *testing.T) {
-	// Synthetic spec: create returns just `{id}`, read returns rich state.
 	const specJSON = `{
 	  "openapi": "3.0.0",
 	  "components": {"schemas": {
@@ -529,11 +542,9 @@ func TestCreateReadsAfterCreate(t *testing.T) {
 		t.Fatalf("create: %v\n  calls: %v", err, mock.calls)
 	}
 
-	// The GET must have fired after the POST.
 	if len(mock.calls) != 2 || mock.calls[0] != "POST /things/acme" || mock.calls[1] != "GET /things/acme/thing-1" {
 		t.Errorf("expected POST then GET, got: %v", mock.calls)
 	}
-	// State should now carry the read-only fields, not just the create echo.
 	for _, key := range []string{"lastUpdate", "status"} {
 		v, ok := resp.Properties.GetOk(key)
 		if !ok {
@@ -544,21 +555,17 @@ func TestCreateReadsAfterCreate(t *testing.T) {
 			t.Errorf("state[%q] is empty; want value from read response", key)
 		}
 	}
-	// Path params are program-owned: they belong in inputs and the resource ID,
-	// not in cloud-owned state. After read-after-create, state should carry only
-	// what the read response returned, plus any emit-on-create preserves.
+	// Path params are program-owned: they live in inputs and the ID, not state.
 	if _, ok := resp.Properties.GetOk("org"); ok {
-		t.Errorf("state should not carry path-param `org` (program owns inputs, cloud owns outputs)")
+		t.Errorf("state should not carry path-param `org`")
 	}
-	// ID is unchanged by read.
 	if resp.ID != "acme/thing-1" {
 		t.Errorf("ID: got %q, want %q", resp.ID, "acme/thing-1")
 	}
 }
 
-// TestCreateRequireImport_BlocksWhenExists verifies that Create with
-// RequireImport=true issues the read op first and aborts when the resource
-// already exists upstream, instead of silently upserting.
+// TestCreateRequireImport_BlocksWhenExists: RequireImport aborts Create
+// when the read probe returns 200.
 func TestCreateRequireImport_BlocksWhenExists(t *testing.T) {
 	spec := requireImportSpec(t)
 	r := &Resource{
@@ -588,8 +595,7 @@ func TestCreateRequireImport_BlocksWhenExists(t *testing.T) {
 	}
 }
 
-// TestCreateRequireImport_ProceedsOn404 verifies that a 404 from the probe
-// is treated as "not yet exists" and Create proceeds with the upsert call.
+// TestCreateRequireImport_ProceedsOn404: a 404 from the probe means proceed.
 func TestCreateRequireImport_ProceedsOn404(t *testing.T) {
 	spec := requireImportSpec(t)
 	r := &Resource{
@@ -625,7 +631,6 @@ func TestCreateRequireImport_ProceedsOn404(t *testing.T) {
 	if resp.ID != "acme" {
 		t.Errorf("ID: got %q, want %q", resp.ID, "acme")
 	}
-	// Probe (GET, 404) → create (PUT) → read-after-create (GET, now 200).
 	wantCalls := []string{"GET /things/acme", "PUT /things/acme", "GET /things/acme"}
 	if len(mock.calls) != len(wantCalls) {
 		t.Fatalf("expected %d calls, got %d: %v", len(wantCalls), len(mock.calls), mock.calls)
@@ -637,9 +642,8 @@ func TestCreateRequireImport_ProceedsOn404(t *testing.T) {
 	}
 }
 
-// TestCreateRequireImport_NoReadOp_OptsOut verifies that RequireImport is a
-// no-op for resources without a read op declared. The dispatch can't probe
-// what it can't read.
+// TestCreateRequireImport_NoReadOp_OptsOut: RequireImport is a no-op
+// without a read op (the dispatch can't probe what it can't read).
 func TestCreateRequireImport_NoReadOp_OptsOut(t *testing.T) {
 	spec := requireImportSpec(t)
 	r := &Resource{
@@ -666,8 +670,7 @@ func TestCreateRequireImport_NoReadOp_OptsOut(t *testing.T) {
 	}
 }
 
-// requireImportSpec builds a minimal synthetic spec with a single PUT-shaped
-// upsert resource at /things/{org}, used by the RequireImport tests.
+// requireImportSpec is a minimal PUT-shaped upsert spec for RequireImport tests.
 func requireImportSpec(t *testing.T) *Spec {
 	t.Helper()
 	const specJSON = `{
@@ -699,10 +702,8 @@ func requireImportSpec(t *testing.T) *Spec {
 	return spec
 }
 
-// TestCreateMissingPathParam verifies that synthesizeID returns a clear
-// error when a required path-param value can't be found in state. This
-// catches bugs where a rename mismatch or input omission would otherwise
-// produce a malformed ID.
+// TestCreateMissingPathParam: synthesizeID returns a clear error when a
+// required path param is missing.
 func TestCreateMissingPathParam(t *testing.T) {
 	spec, meta := loadFixtures(t)
 	resources := Resources(spec, meta)
@@ -723,7 +724,7 @@ func TestCreateMissingPathParam(t *testing.T) {
 		return mock, nil
 	})
 
-	// Omit `name` — the body field that maps via rename to teamName for the path.
+	// Omit `name` — the body field that renames to teamName for the path.
 	req := p.CreateRequest{Properties: propMap(map[string]any{
 		"orgName": "test-org",
 	})}
@@ -731,7 +732,6 @@ func TestCreateMissingPathParam(t *testing.T) {
 	if err == nil {
 		t.Fatalf("expected error on missing path param, got nil")
 	}
-	// Surface the error so we can see what shape it has.
 	if !strings.Contains(err.Error(), "missing") && !strings.Contains(err.Error(), "teamName") {
 		t.Logf("error message: %v", err)
 	}

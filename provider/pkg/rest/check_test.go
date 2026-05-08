@@ -24,9 +24,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/property"
 )
 
-// syntheticSpec constructs a minimal in-memory Spec covering one create op
-// with a request body that has an enum field, an array field, and a name
-// field — enough to exercise Check normalization paths.
+// syntheticSpec is a minimal Spec covering Check normalization paths.
 func syntheticSpec(t *testing.T) *Spec {
 	t.Helper()
 	const specJSON = `{
@@ -89,8 +87,6 @@ func syntheticSpec(t *testing.T) *Spec {
 	return spec
 }
 
-// fooResource builds a Resource against the synthetic spec with custom
-// FieldMeta — used by each test to express what's being checked.
 func fooResource(spec *Spec, fields map[string]FieldMeta, idFormat string, dbr bool) *Resource {
 	return &Resource{
 		spec: spec,
@@ -243,11 +239,8 @@ func TestParseIDIntoInputsRecoversPathParams(t *testing.T) {
 	}
 }
 
-// TestParseIDIntoInputs_FillsMissingKeys confirms that parseIDIntoInputs
-// merges ID-derived path params into a non-empty inputs map, only filling
-// keys that aren't already present. This is the Delete/refresh case where
-// inputs may be partially populated and existing values must not be
-// overwritten by ID-derived ones.
+// TestParseIDIntoInputs_FillsMissingKeys: ID-derived params fill missing
+// keys without overwriting existing inputs.
 func TestParseIDIntoInputs_FillsMissingKeys(t *testing.T) {
 	spec := syntheticSpec(t)
 	r := fooResource(spec, nil, "{org}/{name}", false)

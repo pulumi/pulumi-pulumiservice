@@ -26,36 +26,32 @@ type Operation struct {
 	Path                string
 	Method              string
 	Parameters          []Parameter
-	RequestRef          string // $ref into components.schemas, set only for application/json bodies with a $ref schema
-	RequestContentType  string // wire content type of the request body, if any (e.g. "application/json", "application/x-yaml")
-	ResponseRef         string // $ref of the 2xx response body, set only for application/json responses with a $ref schema
-	ResponseContentType string // wire content type of the chosen 2xx response, if any
+	RequestRef          string // $ref of the JSON body schema, if any
+	RequestContentType  string // e.g. "application/json", "application/x-yaml"
+	ResponseRef         string // $ref of the 2xx JSON body schema, if any
+	ResponseContentType string
 	Description         string
-	Deprecated          bool           // true when the upstream spec marks this op deprecated
-	Raw                 map[string]any // entire operation object, for callers that need fields we don't model
+	Deprecated          bool
+	Raw                 map[string]any // raw operation object
 }
 
 // Parameter is the subset of an OpenAPI parameter needed at runtime.
 type Parameter struct {
-	Name        string // wire name (matches the {placeholder} in Path for in=path)
+	Name        string // wire name (matches {placeholder} for in=path)
 	In          string // "path" | "query" | "header" | "cookie"
 	Required    bool
 	Description string
-	SchemaType  string // "string" | "integer" | "number" | "boolean" | "" if absent
+	SchemaType  string // "string" | "integer" | "number" | "boolean" | ""
 }
 
-// Spec is a parsed OpenAPI 3 document indexed for fast lookup.
-//
-// We only model what BuildSchema and the dynamic resource handler need:
-// the operation index by operationId, and components.schemas resolution
-// (for following $ref chains in request/response bodies).
+// Spec is a parsed OpenAPI 3 document indexed by operationId.
 type Spec struct {
 	Servers   []string
 	ops       map[string]*Operation
 	schemas   map[string]map[string]any // components/schemas by name
 }
 
-// ParseSchema parses an OpenAPI 3 JSON document.
+// ParseSpec parses an OpenAPI 3 JSON document.
 func ParseSpec(data []byte) (*Spec, error) {
 	var doc struct {
 		Servers []struct {
@@ -109,9 +105,7 @@ func (s *Spec) Op(id string) (*Operation, bool) {
 	return op, ok
 }
 
-// AllOps returns a defensive copy of the operationId → Operation map,
-// for callers that need to enumerate every op in the spec (e.g., a test
-// that asserts every op is classified).
+// AllOps returns a defensive copy of the operationId → Operation map.
 func (s *Spec) AllOps() map[string]*Operation {
 	out := make(map[string]*Operation, len(s.ops))
 	for id, op := range s.ops {
@@ -120,9 +114,8 @@ func (s *Spec) AllOps() map[string]*Operation {
 	return out
 }
 
-// ResolveSchema looks up a $ref string of the form "#/components/schemas/Name"
-// and returns the raw schema object. Returns false for $refs we can't resolve
-// (external references, malformed strings).
+// ResolveSchema resolves a "#/components/schemas/Name" $ref. Returns false
+// for external or malformed refs.
 func (s *Spec) ResolveSchema(ref string) (map[string]any, bool) {
 	const prefix = "#/components/schemas/"
 	if !strings.HasPrefix(ref, prefix) {
@@ -182,9 +175,8 @@ func parseOperation(id, path, method string, raw map[string]any) *Operation {
 		}
 	}
 	if resps, ok := raw["responses"].(map[string]any); ok {
-		// Pick the first 2xx with a JSON $ref body, preserving the
-		// existing JSON-first preference. Fall back to application/x-yaml
-		// only when no JSON body is found at any 2xx code.
+		// JSON $ref body wins; fall back to application/x-yaml only if no JSON
+		// body is found at any 2xx code.
 		for _, code := range []string{"200", "201", "202", "204"} {
 			if r, ok := resps[code].(map[string]any); ok {
 				if ref := jsonContentRef(r); ref != "" {
@@ -208,9 +200,7 @@ func parseOperation(id, path, method string, raw map[string]any) *Operation {
 	return op
 }
 
-// jsonContentRef extracts content["application/json"].schema.$ref from a
-// requestBody or response object. Returns "" when the body is not JSON or
-// has an inline (non-$ref) schema.
+// jsonContentRef returns content["application/json"].schema.$ref, or "".
 func jsonContentRef(o map[string]any) string {
 	sch := bodySchema(o, "application/json")
 	if sch == nil {
@@ -220,8 +210,7 @@ func jsonContentRef(o map[string]any) string {
 	return ref
 }
 
-// bodySchema returns the schema object for the given content type from a
-// requestBody or response object, or nil if absent.
+// bodySchema returns the schema for the given content type, or nil.
 func bodySchema(o map[string]any, contentType string) map[string]any {
 	content, ok := o["content"].(map[string]any)
 	if !ok {

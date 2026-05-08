@@ -11,6 +11,7 @@ import com.pulumi.pulumiservice.Utilities;
 import com.pulumi.pulumiservice.v2_esc.EnvironmentDraftArgs;
 import java.lang.Integer;
 import java.lang.String;
+import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
 
@@ -47,6 +48,20 @@ public class EnvironmentDraft extends com.pulumi.resources.CustomResource {
      */
     public Output<Optional<Integer>> latestRevisionNumber() {
         return Codegen.optional(this.latestRevisionNumber);
+    }
+    /**
+     * Raw YAML body content.
+     * 
+     */
+    @Export(name="yaml", refs={String.class}, tree="[0]")
+    private Output</* @Nullable */ String> yaml;
+
+    /**
+     * @return Raw YAML body content.
+     * 
+     */
+    public Output<Optional<String>> yaml() {
+        return Codegen.optional(this.yaml);
     }
 
     /**
@@ -88,6 +103,9 @@ public class EnvironmentDraft extends com.pulumi.resources.CustomResource {
     private static com.pulumi.resources.CustomResourceOptions makeResourceOptions(@Nullable com.pulumi.resources.CustomResourceOptions options, @Nullable Output<java.lang.String> id) {
         var defaultOptions = com.pulumi.resources.CustomResourceOptions.builder()
             .version(Utilities.getVersion())
+            .additionalSecretOutputs(List.of(
+                "yaml"
+            ))
             .build();
         return com.pulumi.resources.CustomResourceOptions.merge(defaultOptions, options, id);
     }

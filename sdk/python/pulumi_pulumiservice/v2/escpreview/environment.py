@@ -179,6 +179,8 @@ class Environment(pulumi.CustomResource):
             __props__.__dict__["yaml"] = None if yaml is None else pulumi.Output.secret(yaml)
         alias_opts = pulumi.ResourceOptions(aliases=[pulumi.Alias(type_="pulumiservice:v2/preview:Environment")])
         opts = pulumi.ResourceOptions.merge(opts, alias_opts)
+        secret_opts = pulumi.ResourceOptions(additional_secret_outputs=["yaml"])
+        opts = pulumi.ResourceOptions.merge(opts, secret_opts)
         super(Environment, __self__).__init__(
             'pulumiservice:v2/escPreview:Environment',
             resource_name,
@@ -201,5 +203,14 @@ class Environment(pulumi.CustomResource):
 
         __props__ = EnvironmentArgs.__new__(EnvironmentArgs)
 
+        __props__.__dict__["yaml"] = None
         return Environment(resource_name, opts=opts, __props__=__props__)
+
+    @_builtins.property
+    @pulumi.getter
+    def yaml(self) -> pulumi.Output[Optional[_builtins.str]]:
+        """
+        Raw YAML body content.
+        """
+        return pulumi.get(self, "yaml")
 

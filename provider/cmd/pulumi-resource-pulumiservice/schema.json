@@ -3713,6 +3713,13 @@
     },
     "pulumiservice:v2/esc:Environment": {
       "description": "Creates a new Pulumi ESC (Environments, Secrets, and Configuration) environment within the specified organization. The request body must include the project name and the environment name. Environment names must be unique within a project and may only contain alphanumeric characters, hyphens, underscores, and periods. The newly created environment starts with an empty YAML definition that can be updated via the UpdateEnvironment endpoint.",
+      "properties": {
+        "yaml": {
+          "type": "string",
+          "description": "Raw YAML body content.",
+          "secret": true
+        }
+      },
       "type": "object",
       "inputProperties": {
         "name": {
@@ -3755,6 +3762,11 @@
         "latestRevisionNumber": {
           "type": "integer",
           "description": "The latest revision number"
+        },
+        "yaml": {
+          "type": "string",
+          "description": "Raw YAML body content.",
+          "secret": true
         }
       },
       "type": "object",
@@ -4300,6 +4312,13 @@
     },
     "pulumiservice:v2/escPreview:Environment": {
       "description": "Creates a new Pulumi ESC (Environments, Secrets, and Configuration) environment within the specified organization. The request body must include the project name and the environment name. Environment names must be unique within a project and may only contain alphanumeric characters, hyphens, underscores, and periods. The newly created environment starts with an empty YAML definition that can be updated via the UpdateEnvironment endpoint.",
+      "properties": {
+        "yaml": {
+          "type": "string",
+          "description": "Raw YAML body content.",
+          "secret": true
+        }
+      },
       "type": "object",
       "inputProperties": {
         "envName": {

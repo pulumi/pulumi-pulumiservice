@@ -22,15 +22,8 @@ import (
 	"github.com/pulumi/pulumi/pkg/v3/codegen/schema"
 )
 
-// BuildSchema produces a Pulumi PackageSpec describing every resource declared
-// in metadata, using spec for type information.
-//
-// pkg is the schema package name (e.g. "pulumicloud") used to qualify token
-// references emitted into the schema.
-//
-// Errors aggregate per-resource validation failures (missing operationIds,
-// unresolvable $refs, unsupported constructs) so callers can see every
-// problem from a single GetSchema call.
+// BuildSchema produces a Pulumi PackageSpec from spec + metadata. Per-resource
+// validation failures are aggregated so a single call surfaces every problem.
 func BuildSchema(spec *Spec, metadata *Metadata, pkg string) (*schema.PackageSpec, error) {
 	out := &schema.PackageSpec{
 		Name:      pkg,
@@ -89,10 +82,8 @@ func buildResource(spec *Spec, _ *Metadata, _ string, rm ResourceMeta) (*schema.
 		}
 	}
 
-	// idFormat is the canonical identity carrier for any resource with path
-	// parameters. Without it, Read on import cannot recover path-param values
-	// from the resource ID and Delete (after path params are removed from
-	// state) has no fallback. Resources without path params don't need one.
+	// idFormat is required whenever the resource has path parameters; without
+	// it import can't recover path-param values from the resource ID.
 	if rm.IDFormat == "" {
 		ops := []*Operation{create, read}
 		if uop, _ := spec.Op(rm.Operations.Update); uop != nil {
@@ -108,10 +99,8 @@ func buildResource(spec *Spec, _ *Metadata, _ string, rm ResourceMeta) (*schema.
 		}
 	}
 
-	// Inputs come from the create op: path params + request body schema.
-	// Path params from read/update/delete are also exposed as inputs since
-	// users supply them on create (the resource's identifier is part of the
-	// state thereafter). Path params are forceNew by default.
+	// Inputs: create op's path params + request body, plus path params from
+	// other ops (forceNew by default).
 	inputs, requiredInputs, err := operationInputs(spec, create, rm)
 	if err != nil {
 		return nil, fmt.Errorf("inputs: %w", err)
@@ -120,19 +109,15 @@ func buildResource(spec *Spec, _ *Metadata, _ string, rm ResourceMeta) (*schema.
 		if op == nil {
 			continue
 		}
-		// Read-path params (e.g. server-generated IDs like issuerId,
-		// poolId, scheduleID) surface as inputs so users _can_ supply
-		// them on import, but they're not required on create — the
-		// server returns them in the create response.
+		// Read-only path params (e.g. server-generated IDs) surface as inputs
+		// so users can supply them on import, but aren't required on create.
 		if err := mergePathParamsAsInputs(inputs, nil, op, rm); err != nil {
 			return nil, fmt.Errorf("inputs (read path params): %w", err)
 		}
 	}
 
-	// Yaml-body fusion: when the create or update op accepts an
-	// application/x-yaml body, expose a single string input field named
-	// "yaml" that carries the raw YAML payload. The dispatch sends it as the
-	// request body with Content-Type: application/x-yaml.
+	// Yaml-body fusion (input): create or update accepts application/x-yaml
+	// → expose a single string "yaml" input carrying the raw payload.
 	if hasYamlBody(create) || hasYamlBody(opOrNil(spec, rm.Operations.Update)) {
 		if _, exists := inputs["yaml"]; !exists {
 			ps := schema.PropertySpec{
@@ -145,8 +130,8 @@ func buildResource(spec *Spec, _ *Metadata, _ string, rm ResourceMeta) (*schema.
 		}
 	}
 
-	// Outputs come from the read op's response schema (read is the source of
-	// truth for State); fall back to create's response if read has none.
+	// Outputs come from the read op (source of truth for state), falling
+	// back to create's response.
 	outputs, requiredOutputs, err := operationOutputs(spec, read, rm)
 	if err != nil {
 		return nil, fmt.Errorf("outputs: %w", err)
@@ -159,6 +144,20 @@ func buildResource(spec *Spec, _ *Metadata, _ string, rm ResourceMeta) (*schema.
 	}
 	if outputs == nil {
 		outputs = map[string]schema.PropertySpec{}
+	}
+
+	// Yaml-body fusion (output): pairs with the input side so refresh
+	// round-trips cleanly and drift detection works.
+	if hasYamlResponse(opOrNil(spec, rm.Operations.Read)) || hasYamlResponse(create) {
+		if _, exists := outputs["yaml"]; !exists {
+			ps := schema.PropertySpec{
+				TypeSpec:    schema.TypeSpec{Type: "string"},
+				Description: "Raw YAML body content.",
+				Secret:      true,
+			}
+			applyFieldMeta(&ps, rm.Fields["yaml"], false)
+			outputs["yaml"] = ps
+		}
 	}
 
 	if err := mergeEmitOnCreateOutputs(spec, create, rm, outputs); err != nil {
@@ -200,13 +199,15 @@ func buildResource(spec *Spec, _ *Metadata, _ string, rm ResourceMeta) (*schema.
 	return rs, nil
 }
 
-// hasYamlBody reports whether op declares an application/x-yaml request body.
 func hasYamlBody(op *Operation) bool {
 	return op != nil && op.RequestContentType == "application/x-yaml"
 }
 
-// opOrNil resolves an operationId to an Operation, returning nil when the id
-// is empty or absent from the spec.
+func hasYamlResponse(op *Operation) bool {
+	return op != nil && op.ResponseContentType == "application/x-yaml"
+}
+
+// opOrNil resolves an operationId, returning nil when id is empty or absent.
 func opOrNil(spec *Spec, id string) *Operation {
 	if id == "" {
 		return nil
@@ -215,15 +216,13 @@ func opOrNil(spec *Spec, id string) *Operation {
 	return op
 }
 
-// operationInputs builds the input PropertySpec map for a create operation:
-// path/query parameters plus the request body schema's top-level properties.
+// operationInputs builds the input PropertySpec map: path/query parameters
+// plus the request body schema's top-level properties.
 func operationInputs(spec *Spec, op *Operation, rm ResourceMeta) (map[string]schema.PropertySpec, []string, error) {
 	props := map[string]schema.PropertySpec{}
 	required := map[string]bool{}
 
-	// Path/query params first. These are always required (per OpenAPI's
-	// constraints for path) and default to forceNew=true since they typically
-	// participate in URL identity.
+	// Path/query params first; path params are forceNew (URL identity).
 	for _, p := range op.Parameters {
 		if p.In != "path" && p.In != "query" {
 			continue
@@ -263,16 +262,10 @@ func operationInputs(spec *Spec, op *Operation, rm ResourceMeta) (map[string]sch
 	return props, sortedKeys(required), nil
 }
 
-// mergePathParamsAsInputs ensures every path parameter from op contributes a
-// replace-on-change entry in the inputs map. Covers two cases:
-//
-//   - Path param not yet in inputs (e.g. server-generated IDs surfaced by
-//     read/update/delete that don't appear on create) — added fresh.
-//   - Path param's Pulumi-side name collides with an existing body-field
-//     entry (e.g. Team's body `name` renames to path's `teamName`) — the
-//     existing entry is upgraded with `replaceOnChanges`. Without this,
-//     mutating the field would trigger an update against the new name and
-//     404, when the engine should have triggered a replace.
+// mergePathParamsAsInputs ensures every path parameter contributes a
+// replace-on-change entry. New params are added; existing entries that
+// collide with a renamed body field are upgraded to replaceOnChanges so
+// mutating them triggers a replace instead of a 404-ing in-place update.
 func mergePathParamsAsInputs(inputs map[string]schema.PropertySpec, required *[]string, op *Operation, rm ResourceMeta) error {
 	for _, pp := range op.Parameters {
 		if pp.In != "path" {
@@ -301,8 +294,7 @@ func mergePathParamsAsInputs(inputs map[string]schema.PropertySpec, required *[]
 }
 
 // operationOutputs builds the State output PropertySpec map from an op's
-// response body schema, then applies the metadata.outputs allowlist or
-// metadata.outputsExclude denylist.
+// response body, applying the metadata allowlist or denylist.
 func operationOutputs(spec *Spec, op *Operation, rm ResourceMeta) (map[string]schema.PropertySpec, []string, error) {
 	if op == nil || op.ResponseRef == "" {
 		return nil, nil, nil
@@ -320,9 +312,7 @@ func operationOutputs(spec *Spec, op *Operation, rm ResourceMeta) (map[string]sc
 
 	for k, p := range bodyProps {
 		name := pulumiName(k, rm.Renames)
-		// "id" is reserved by Pulumi for resources — the resource ID is
-		// synthesized from path-param values, not exposed as an output. Skip
-		// it so SDK codegen doesn't emit a colliding property.
+		// Pulumi reserves "id" for the synthesized resource ID; skip it.
 		if name == "id" {
 			continue
 		}
@@ -349,12 +339,9 @@ func operationOutputs(spec *Spec, op *Operation, rm ResourceMeta) (map[string]sc
 	return props, sortedKeys(required), nil
 }
 
-// flattenObjectSchema resolves a $ref and walks any allOf chain, producing the
-// merged set of top-level properties and the union of required fields.
-//
-// Returns an error for OpenAPI constructs we don't yet support (oneOf, anyOf,
-// nested $refs in the union, additionalProperties, polymorphism). Aggregates
-// require fields across all allOf branches.
+// flattenObjectSchema resolves a $ref and walks any allOf chain, producing
+// the merged set of top-level properties and the union of required fields.
+// Returns an error for unsupported OpenAPI constructs (oneOf, anyOf, etc.).
 func flattenObjectSchema(spec *Spec, ref string) (map[string]any, []string, error) {
 	visited := map[string]bool{}
 	props := map[string]any{}
@@ -383,7 +370,6 @@ func flattenObjectSchema(spec *Spec, ref string) (map[string]any, []string, erro
 					return err
 				}
 			}
-			// allOf members may also carry properties at the same level.
 		}
 		if _, ok := node["oneOf"]; ok {
 			return fmt.Errorf("oneOf not yet supported (at %s)", source)
@@ -422,8 +408,7 @@ func flattenObjectSchema(spec *Spec, ref string) (map[string]any, []string, erro
 		return nil, nil, err
 	}
 
-	// Drop any required entries we didn't see as properties (e.g. inherited
-	// requirements that another allOf branch satisfied; we union by name).
+	// Drop required entries we didn't see as properties.
 	finalRequired := []string{}
 	for r := range required {
 		if _, ok := props[r]; ok {
@@ -434,8 +419,7 @@ func flattenObjectSchema(spec *Spec, ref string) (map[string]any, []string, erro
 	return props, finalRequired, nil
 }
 
-// openAPIToProperty converts an OpenAPI property object to a Pulumi
-// PropertySpec.
+// openAPIToProperty converts an OpenAPI property to a Pulumi PropertySpec.
 func openAPIToProperty(node any) schema.PropertySpec {
 	nm, ok := node.(map[string]any)
 	if !ok {
@@ -447,12 +431,8 @@ func openAPIToProperty(node any) schema.PropertySpec {
 }
 
 // openAPIToType converts an OpenAPI schema node to a Pulumi TypeSpec.
-//
-// Constructs that aren't yet handled (nested $ref, oneOf, additionalProperties)
-// degrade to "pulumi.json#/Any" so the schema is still serializable. The
-// resource-level validator catches metadata that references fields whose
-// shapes can't be modeled; for unrecognized payload fields we accept and
-// pass through as untyped values.
+// Unhandled constructs degrade to "pulumi.json#/Any" so the schema stays
+// serializable.
 func openAPIToType(node map[string]any) schema.TypeSpec {
 	if _, ok := node["$ref"].(string); ok {
 		return schema.TypeSpec{Ref: "pulumi.json#/Any"}
@@ -477,7 +457,7 @@ func openAPIToType(node map[string]any) schema.TypeSpec {
 		}
 		return schema.TypeSpec{Type: "array", Items: &itemTS}
 	case "object", "":
-		// Anonymous object — emit as a free-form object for now.
+		// Anonymous object → free-form.
 		return schema.TypeSpec{
 			Type:                 "object",
 			AdditionalProperties: &schema.TypeSpec{Ref: "pulumi.json#/Any"},
@@ -500,11 +480,8 @@ func applyFieldMeta(ps *schema.PropertySpec, fm FieldMeta, isPathParam bool) {
 	}
 }
 
-// looksSecret heuristically detects whether a field name implies the
-// value is sensitive. Catches OrganizationWebhook's `secret` and
-// `secretCiphertext`, OrgToken/TeamToken/PersonalToken's `tokenValue`,
-// and the AgentPool's response `tokenValue`. The OpenAPI spec doesn't
-// carry an x-secret extension we can rely on, so this fills the gap.
+// looksSecret heuristically flags sensitive field names. The OpenAPI spec
+// has no x-secret extension we can rely on, so this fills the gap.
 func looksSecret(name string) bool {
 	lower := strings.ToLower(name)
 	for _, sub := range []string{"secret", "tokenvalue", "password", "apikey", "accesstoken", "ciphertext"} {
@@ -522,10 +499,9 @@ func defaultParamType(t string) string {
 	return t
 }
 
-// pulumiName translates a wire-side name (OpenAPI path-param or response
-// key) to its Pulumi-side equivalent per the renames map. The map's *keys*
-// are Pulumi names; values are wire names. Inputs not targeted by any
-// rename pass through unchanged. Use wireSideName for the inverse direction.
+// pulumiName translates a wire-side name to its Pulumi-side equivalent.
+// The renames map's keys are Pulumi names; values are wire names.
+// wireSideName is the inverse.
 func pulumiName(name string, renames map[string]string) string {
 	for pul, wire := range renames {
 		if wire == name {
@@ -543,10 +519,8 @@ func stringSet(ss []string) map[string]struct{} {
 	return out
 }
 
-// appendExamples concatenates an `## Example Usage` section onto a resource
-// description, with each PCL snippet wrapped in a ```pulumi``` fenced block.
-// Pulumi's SDK codegen recognizes the pulumi-tagged fence and runs
-// `pulumi convert` per target language at gen time.
+// appendExamples appends an `## Example Usage` section, wrapping each PCL
+// snippet in a ```pulumi``` fence so SDK codegen runs `pulumi convert`.
 func appendExamples(desc string, examples []string) string {
 	var b strings.Builder
 	b.WriteString(strings.TrimRight(desc, "\n"))
@@ -571,10 +545,9 @@ func sortedKeys(m map[string]bool) []string {
 	return out
 }
 
-// mergeEmitOnCreateOutputs adds fields marked emitOnCreate from the create-op
-// response into outputs when they're missing. Fields not present in the
-// create response are silently skipped — there's no shape information to
-// emit.
+// mergeEmitOnCreateOutputs adds emitOnCreate fields from the create-op
+// response into outputs. Fields absent from the create response are
+// silently skipped (no shape to emit).
 func mergeEmitOnCreateOutputs(spec *Spec, create *Operation, rm ResourceMeta, outputs map[string]schema.PropertySpec) error {
 	hasAny := false
 	for _, fm := range rm.Fields {
@@ -612,8 +585,7 @@ func mergeEmitOnCreateOutputs(spec *Spec, create *Operation, rm ResourceMeta, ou
 	return nil
 }
 
-// filterAutoNamedRequired strips auto-named fields from the required-inputs
-// list so the user can leave them unset on create.
+// filterAutoNamedRequired strips auto-named fields from required inputs.
 func filterAutoNamedRequired(required []string, rm ResourceMeta) []string {
 	out := make([]string, 0, len(required))
 	for _, name := range required {

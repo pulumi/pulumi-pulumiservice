@@ -5,11 +5,14 @@ package com.pulumi.pulumiservice.v2_escPreview;
 
 import com.pulumi.core.Alias;
 import com.pulumi.core.Output;
+import com.pulumi.core.annotations.Export;
 import com.pulumi.core.annotations.ResourceType;
 import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.Utilities;
 import com.pulumi.pulumiservice.v2_escPreview.EnvironmentArgs;
+import java.lang.String;
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Nullable;
 
 /**
@@ -18,6 +21,21 @@ import javax.annotation.Nullable;
  */
 @ResourceType(type="pulumiservice:v2/escPreview:Environment")
 public class Environment extends com.pulumi.resources.CustomResource {
+    /**
+     * Raw YAML body content.
+     * 
+     */
+    @Export(name="yaml", refs={String.class}, tree="[0]")
+    private Output</* @Nullable */ String> yaml;
+
+    /**
+     * @return Raw YAML body content.
+     * 
+     */
+    public Output<Optional<String>> yaml() {
+        return Codegen.optional(this.yaml);
+    }
+
     /**
      *
      * @param name The _unique_ name of the resulting resource.
@@ -59,6 +77,9 @@ public class Environment extends com.pulumi.resources.CustomResource {
             .version(Utilities.getVersion())
             .aliases(List.of(
                 Output.of(Alias.builder().type("pulumiservice:v2/preview:Environment").build())
+            ))
+            .additionalSecretOutputs(List.of(
+                "yaml"
             ))
             .build();
         return com.pulumi.resources.CustomResourceOptions.merge(defaultOptions, options, id);

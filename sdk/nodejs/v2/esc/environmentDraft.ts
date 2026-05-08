@@ -42,6 +42,10 @@ export class EnvironmentDraft extends pulumi.CustomResource {
      * The latest revision number
      */
     declare public /*out*/ readonly latestRevisionNumber: pulumi.Output<number | undefined>;
+    /**
+     * Raw YAML body content.
+     */
+    declare public /*out*/ readonly yaml: pulumi.Output<string | undefined>;
 
     /**
      * Create a EnvironmentDraft resource with the given unique name, arguments, and options.
@@ -68,11 +72,15 @@ export class EnvironmentDraft extends pulumi.CustomResource {
             resourceInputs["orgName"] = args?.orgName;
             resourceInputs["projectName"] = args?.projectName;
             resourceInputs["latestRevisionNumber"] = undefined /*out*/;
+            resourceInputs["yaml"] = undefined /*out*/;
         } else {
             resourceInputs["changeRequestId"] = undefined /*out*/;
             resourceInputs["latestRevisionNumber"] = undefined /*out*/;
+            resourceInputs["yaml"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const secretOpts = { additionalSecretOutputs: ["yaml"] };
+        opts = pulumi.mergeOptions(opts, secretOpts);
         super(EnvironmentDraft.__pulumiType, name, resourceInputs, opts);
     }
 }

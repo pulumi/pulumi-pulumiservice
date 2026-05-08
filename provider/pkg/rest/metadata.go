@@ -19,20 +19,14 @@ import (
 	"fmt"
 )
 
-// Metadata is the parsed contents of metadata.json.
-//
-// This file is the human-curated bridge between OpenAPI operations and Pulumi
-// resources. It declares which operationIds form which resources, plus
-// Pulumi-only metadata that the OpenAPI spec doesn't carry (forceNew, secret,
-// aliases, etc.). Field shapes are derived from the OpenAPI spec; this
-// document only carries Pulumi-only overrides.
+// Metadata is the parsed contents of metadata.json: the Pulumi-only overrides
+// (operationId → resource mapping, forceNew, secret, aliases, etc.) layered
+// over the OpenAPI spec.
 type Metadata struct {
 	// Version pins the schema version of this file. Currently 1.
 	Version int `json:"version"`
 
-	// Package is the default package name for any token that doesn't already
-	// include a package prefix (most metadata uses fully-qualified tokens
-	// instead).
+	// Package is the default package name when a token lacks a prefix.
 	Package string `json:"package,omitempty"`
 
 	// Resources keyed by fully-qualified Pulumi token ("pkg:module:Name").
@@ -44,71 +38,53 @@ type Metadata struct {
 
 // ResourceMeta describes one Pulumi resource derived from OpenAPI operations.
 type ResourceMeta struct {
-	// Operations names the operationIds that implement each CRUD verb. Create
-	// and Read are required; Update may be empty (replace-on-change); Delete
-	// may be empty (no deletion semantics on the API side).
+	// Operations names the operationIds for each CRUD verb. Create is
+	// required; Update and Delete may be empty.
 	Operations Operations `json:"operations"`
 
-	// Token, when non-empty, overrides the metadata-key as the user-facing
-	// Pulumi token for this resource. Lets us expose a clean module path
-	// (e.g. "pulumiservice:v2/esc:Environment") while keeping the map key
-	// as the canonical OpenAPI-derived identifier the scaffolder rebuilds
-	// from spec.json (so go generate stays a no-op on these entries).
+	// Token overrides the user-facing Pulumi token. Keeps the map key as
+	// the canonical OpenAPI-derived identifier for scaffolding while
+	// exposing a clean module path (e.g. "pulumiservice:v2/esc:Environment").
 	Token string `json:"token,omitempty"`
 
-	// Aliases are fully-qualified Pulumi tokens that the engine should treat as
-	// equivalent to this resource (used for in-place migration after renames).
+	// Aliases are tokens the engine treats as equivalent (for renames).
 	Aliases []string `json:"aliases,omitempty"`
 
-	// Fields applies Pulumi-only overrides per field. Keys are Pulumi-side
-	// field names.
+	// Fields holds Pulumi-only per-field overrides (Pulumi-side keys).
 	Fields map[string]FieldMeta `json:"fields,omitempty"`
 
-	// Renames maps Pulumi-side field names to OpenAPI-side names. Used when
-	// the SDK-facing name should differ from the wire name.
+	// Renames maps Pulumi-side field names to OpenAPI-side names.
 	Renames map[string]string `json:"renames,omitempty"`
 
-	// Outputs is an optional allowlist of response field names exposed as
-	// State outputs. If empty, all response fields are exposed. Corresponds to
-	// design option B from the brainstorm.
+	// Outputs is an allowlist of response fields exposed as State.
+	// Empty means expose all.
 	Outputs []string `json:"outputs,omitempty"`
 
-	// OutputsExclude is an optional denylist subtracted from the response
-	// schema. Mutually exclusive with Outputs (Outputs wins if both set).
+	// OutputsExclude is a denylist. Outputs wins if both are set.
 	OutputsExclude []string `json:"outputsExclude,omitempty"`
 
-	// IDFormat is a template controlling resource-ID synthesis and import-time
-	// parsing. Use "{paramName}" placeholders for path-parameter values
-	// (Pulumi-side names after Renames). Example: "{org}/{name}". When unset,
-	// the synthesizer slash-joins path-parameter values from the most
-	// authoritative non-create op.
+	// IDFormat is the resource-ID template ("{org}/{name}"). When unset,
+	// path-parameter values from the most authoritative non-create op are
+	// slash-joined.
 	IDFormat string `json:"idFormat,omitempty"`
 
-	// DeleteBeforeReplace makes Pulumi delete the old instance before creating
-	// the new one on a replacement (instead of the default create-new-then-
-	// delete-old). Use for resources whose names collide on duplicate create
-	// and that aren't auto-named.
+	// DeleteBeforeReplace destroys the old instance before creating the
+	// new on a replacement. Use for resources whose names collide on
+	// duplicate create and that aren't auto-named.
 	DeleteBeforeReplace bool `json:"deleteBeforeReplace,omitempty"`
 
-	// RequireImport gates Create on a pre-flight existence check. When true,
-	// Create issues the read op first; a 200 response means the resource
-	// already exists and Create fails with an "import this resource" error
-	// instead of silently upserting. Use for resources whose underlying API
-	// is PUT/PATCH-shaped (configuration singletons) or where create and
-	// update map to the same operationId.
+	// RequireImport gates Create on a pre-flight read; a 200 fails with
+	// an "import this resource" error instead of silently upserting. Use
+	// for PUT/PATCH-shaped singletons or when create and update share an
+	// operationId.
 	RequireImport bool `json:"requireImport,omitempty"`
 
-	// Description is an optional override of the resource description in the
-	// generated schema. If empty, the schema builder falls back to the create
-	// operation's description.
+	// Description overrides the generated resource description; empty
+	// falls back to the create op's description.
 	Description string `json:"description,omitempty"`
 
-	// Examples are canonical PCL (Pulumi Configuration Language) snippets
-	// rendered into the resource's description as `## Example Usage` blocks.
-	// Pulumi's SDK codegen runs `pulumi convert` from PCL to each target
-	// language at gen time, so a single PCL example becomes per-language
-	// snippets in TypeScript/Python/Go/.NET/Java docstrings and on the
-	// Registry doc page.
+	// Examples are PCL snippets rendered as `## Example Usage` blocks.
+	// SDK codegen runs `pulumi convert` per target language at gen time.
 	Examples []string `json:"examples,omitempty"`
 }
 
@@ -126,19 +102,15 @@ type FieldMeta struct {
 	Secret      bool   `json:"secret,omitempty"`
 	Description string `json:"description,omitempty"`
 
-	// EmitOnCreate marks a field that's only present in the create response,
-	// never readable thereafter. The runtime preserves it from prior state
-	// during refresh; the schema builder includes it in outputs even if the
-	// read-response schema doesn't carry it.
+	// EmitOnCreate marks a field present only in the create response.
+	// The runtime preserves it from prior state on refresh.
 	EmitOnCreate bool `json:"emitOnCreate,omitempty"`
 
-	// Unordered marks an array field as set-like; Check sorts the values
-	// before returning so user-side reordering doesn't trigger spurious diffs.
+	// Unordered marks an array as set-like; Check sorts the values.
 	Unordered bool `json:"unordered,omitempty"`
 
-	// AutoName, when >0, makes the field optional on create. If the user
-	// doesn't provide a value, Check generates one from the resource URN and
-	// the engine-supplied random seed, capped at this max length.
+	// AutoName, when >0, makes the field optional on create and Check
+	// generates one (from URN + random seed) capped at this max length.
 	AutoName int `json:"autoName,omitempty"`
 }
 

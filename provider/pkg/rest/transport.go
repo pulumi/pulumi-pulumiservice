@@ -21,18 +21,13 @@ import (
 	"sync"
 )
 
-// Transport executes HTTP requests against the API described by a Schema.
-//
-// Implementations are responsible for setting the request URL's host (the
-// dynamic resource handler emits a path-only URL by default), authentication,
-// timeouts, and retries.
+// Transport executes HTTP requests. Implementations own scheme/host
+// rewriting, authentication, timeouts, and retries.
 type Transport interface {
 	Do(ctx context.Context, req *http.Request) (*http.Response, error)
 }
 
-// TransportResolver returns the Transport to use for a given context. Typical
-// implementations read provider config from ctx and construct an
-// authenticated client.
+// TransportResolver returns the Transport to use for a given context.
 type TransportResolver func(ctx context.Context) (Transport, error)
 
 var (
@@ -40,9 +35,8 @@ var (
 	resolver   TransportResolver
 )
 
-// SetTransportResolver registers the function the dispatcher calls to obtain
-// a Transport per request. The provider's Configure step is the natural place
-// to call this. Replaces any previously registered resolver.
+// SetTransportResolver registers the per-request Transport resolver,
+// replacing any previously registered one.
 func SetTransportResolver(r TransportResolver) {
 	resolverMu.Lock()
 	defer resolverMu.Unlock()

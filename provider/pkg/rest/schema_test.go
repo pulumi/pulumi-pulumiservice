@@ -22,9 +22,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/property"
 )
 
-// TestBuildSchemaSucceeds ensures the live spec.json + metadata.json pair
-// builds a complete schema with no per-resource errors. Catches drift like
-// metadata referring to operationIds the spec no longer carries.
+// TestBuildSchemaSucceeds catches drift between metadata and spec.json.
 func TestBuildSchemaSucceeds(t *testing.T) {
 	spec, meta := loadFixtures(t)
 	pkg, err := BuildSchema(spec, meta, "pulumiservice")
@@ -36,26 +34,15 @@ func TestBuildSchemaSucceeds(t *testing.T) {
 	}
 }
 
-// TestPathParamsAreInputOnly pins the architecture invariant that path
-// parameters appear ONLY in inputs, not in outputs. Path params are program-
-// owned (the user types them); they live in inputProperties and inside the
-// synthesized resource ID. Read recovers them from req.Inputs (refresh) or
-// from req.ID (import); Delete recovers them from req.OldInputs.
-//
-// Note: a Pulumi-side name that is both a path param (via rename) AND a body
-// field — like Team's `name`, which renames to wire-side `teamName` for path
-// substitution but is also a legitimate body field echoed by Read — stays in
-// outputs because the read response carries it. The invariant only fails when
-// a name is purely a path param.
+// TestPathParamsAreInputOnly pins that purely-path-param fields appear only
+// in inputs. Names that are both a renamed path param and a body field
+// (like Team's `name`) stay in outputs because the read response carries them.
 func TestPathParamsAreInputOnly(t *testing.T) {
 	spec, meta := loadFixtures(t)
 	pkg, err := BuildSchema(spec, meta, "pulumiservice")
 	if err != nil {
 		t.Fatalf("BuildSchema: %v", err)
 	}
-	// Pick a representative resource with multi-segment path params. orgName
-	// is purely a path param on Team (no body field of that name); `name` is
-	// a path param AND a body field, so it doesn't fit this assertion.
 	rm := meta.Resources["pulumiservice:v2:Team"]
 	tok := rm.Token
 	if tok == "" {
@@ -73,10 +60,8 @@ func TestPathParamsAreInputOnly(t *testing.T) {
 	}
 }
 
-// TestPathParamInputsAreReplaceOnChanges pins that path params are marked
-// replaceOnChanges so the engine triggers a replace (not an in-place update)
-// when their values change. Without it, mutating a path param would update
-// against the new URL and 404 on a non-existent resource.
+// TestPathParamInputsAreReplaceOnChanges pins that path params trigger
+// replace; without it mutating one would update against a non-existent URL.
 func TestPathParamInputsAreReplaceOnChanges(t *testing.T) {
 	spec, meta := loadFixtures(t)
 	pkg, err := BuildSchema(spec, meta, "pulumiservice")
@@ -100,10 +85,8 @@ func TestPathParamInputsAreReplaceOnChanges(t *testing.T) {
 	}
 }
 
-// TestIDIsSkippedFromOutputs pins that any response field literally named
-// "id" is dropped from outputs, since Pulumi reserves that name for the
-// resource ID. Resources whose API returns server-generated identifiers under
-// that name expose them through path-parameter renames instead.
+// TestIDIsSkippedFromOutputs: response fields literally named "id" must not
+// appear as outputs (Pulumi reserves the name).
 func TestIDIsSkippedFromOutputs(t *testing.T) {
 	spec, meta := loadFixtures(t)
 	pkg, err := BuildSchema(spec, meta, "pulumiservice")
@@ -117,10 +100,8 @@ func TestIDIsSkippedFromOutputs(t *testing.T) {
 	}
 }
 
-// TestSecretFieldsAreMarkedSecret pins the secret heuristic for known
-// sensitive field names (tokenValue, secret, password, apiKey, accessToken,
-// ciphertext). Catches metadata edits that drop the override AND
-// resources whose schema name matches but isn't yet known.
+// TestSecretFieldsAreMarkedSecret pins the looksSecret heuristic against
+// representative resources.
 func TestSecretFieldsAreMarkedSecret(t *testing.T) {
 	spec, meta := loadFixtures(t)
 	pkg, err := BuildSchema(spec, meta, "pulumiservice")
@@ -131,7 +112,6 @@ func TestSecretFieldsAreMarkedSecret(t *testing.T) {
 		token string
 		field string
 	}{
-		// Token-value resources rely on the heuristic.
 		{"pulumiservice:v2:OrgToken", "tokenValue"},
 		{"pulumiservice:v2:TeamToken", "tokenValue"},
 		{"pulumiservice:v2:PersonalToken", "tokenValue"},
@@ -158,10 +138,8 @@ func TestSecretFieldsAreMarkedSecret(t *testing.T) {
 	}
 }
 
-// TestIDFormatRoundTrip verifies synthesizeIDFromFormat → parseIDIntoInputs
-// recovers the same path-param values across every metadata entry. Catches
-// idFormat templates whose placeholders don't survive escape-and-recompile,
-// or whose values would collide with the slash separator.
+// TestIDFormatRoundTrip pins synthesize → parse round-trip across every
+// metadata entry.
 func TestIDFormatRoundTrip(t *testing.T) {
 	_, meta := loadFixtures(t)
 	for tok, rm := range meta.Resources {
@@ -169,7 +147,6 @@ func TestIDFormatRoundTrip(t *testing.T) {
 			t.Errorf("%s: idFormat is empty (every v2 resource should declare one)", tok)
 			continue
 		}
-		// Build inputs that match every placeholder in the format string.
 		re, names, err := compileIDFormatRegex(rm.IDFormat)
 		if err != nil {
 			t.Errorf("%s: compile idFormat %q: %v", tok, rm.IDFormat, err)
@@ -198,9 +175,8 @@ func TestIDFormatRoundTrip(t *testing.T) {
 	}
 }
 
-// TestRequiredInputsExist pins that every name listed in RequiredInputs is
-// also present in InputProperties. A drift here means the schema declares a
-// required field the SDK can't surface — Pulumi engine errors out.
+// TestRequiredInputsExist pins that every RequiredInputs entry exists in
+// InputProperties (drift would cause engine errors).
 func TestRequiredInputsExist(t *testing.T) {
 	spec, meta := loadFixtures(t)
 	pkg, err := BuildSchema(spec, meta, "pulumiservice")
@@ -216,10 +192,8 @@ func TestRequiredInputsExist(t *testing.T) {
 	}
 }
 
-// TestEmitOnCreateSurfacesAsOutput pins that fields marked emitOnCreate in
-// metadata appear as outputs even when the read response schema doesn't
-// carry them. Token resources rely on this — the create response is the
-// only place tokenValue ever appears.
+// TestEmitOnCreateSurfacesAsOutput: emitOnCreate fields appear as outputs
+// even when the read schema doesn't carry them.
 func TestEmitOnCreateSurfacesAsOutput(t *testing.T) {
 	spec, meta := loadFixtures(t)
 	pkg, err := BuildSchema(spec, meta, "pulumiservice")
@@ -246,9 +220,7 @@ func TestEmitOnCreateSurfacesAsOutput(t *testing.T) {
 	}
 }
 
-// TestAutoNameNotRequired pins that fields marked autoName>0 are not in the
-// required-inputs list — users must be able to leave them unset and let
-// Check generate one.
+// TestAutoNameNotRequired: autoName>0 fields must not be in RequiredInputs.
 func TestAutoNameNotRequired(t *testing.T) {
 	spec, meta := loadFixtures(t)
 	pkg, err := BuildSchema(spec, meta, "pulumiservice")
@@ -275,8 +247,7 @@ func TestAutoNameNotRequired(t *testing.T) {
 	}
 }
 
-// TestLooksSecret covers the substring set the heuristic recognizes; callers
-// outside the cloud spec rely on this contract too.
+// TestLooksSecret pins the substring set the heuristic recognizes.
 func TestLooksSecret(t *testing.T) {
 	cases := map[string]bool{
 		"tokenValue":       true,
@@ -296,9 +267,7 @@ func TestLooksSecret(t *testing.T) {
 	}
 }
 
-// TestPulumiNameRoundTrip pins the rename helper's contract: wire-side names
-// translate to their Pulumi-side counterpart, and unmapped names pass
-// through. wireSideName is the inverse direction.
+// TestPulumiNameRoundTrip pins pulumiName ↔ wireSideName.
 func TestPulumiNameRoundTrip(t *testing.T) {
 	renames := map[string]string{
 		"hookName":         "name",
@@ -314,11 +283,8 @@ func TestPulumiNameRoundTrip(t *testing.T) {
 			t.Errorf("pulumiName(%q): got %q, want %q", wire, got, wantPulumi)
 		}
 	}
-	// Inverse: wireSideName(pul) → wire.
 	for wire, pul := range cases {
 		if got := wireSideName(pul, renames); got != wire && wire != pul {
-			// Unmapped names round-trip through both helpers unchanged; only
-			// check explicit renames here.
 			if _, mapped := renames[pul]; mapped {
 				t.Errorf("wireSideName(%q): got %q, want %q", pul, got, wire)
 			}
@@ -326,10 +292,8 @@ func TestPulumiNameRoundTrip(t *testing.T) {
 	}
 }
 
-// TestCheckEnumCasePreservedForUnknownValue pins that values not present in
-// the spec's enum list pass through unchanged (rather than being silently
-// rewritten). A bad input should surface at the API call, not be papered
-// over by Check.
+// TestCheckEnumCasePreservedForUnknownValue: values absent from the spec's
+// enum list pass through unchanged so bad input surfaces at the API call.
 func TestCheckEnumCasePreservedForUnknownValue(t *testing.T) {
 	spec := syntheticSpec(t)
 	r := fooResource(spec, nil, "", false)
@@ -350,10 +314,8 @@ func mustOp(t *testing.T, spec *Spec, id string) *Operation {
 	return op
 }
 
-// TestBuildResourceOmitsPathParamsFromOutputs confirms that path parameters
-// appear in InputProperties only, not in ObjectTypeSpec.Properties. Identity-
-// bearing fields are program-owned (inputs + resource ID) and not echoed into
-// the cloud-owned output namespace.
+// TestBuildResourceOmitsPathParamsFromOutputs: path params live only in
+// InputProperties, never in ObjectTypeSpec.Properties.
 func TestBuildResourceOmitsPathParamsFromOutputs(t *testing.T) {
 	const specJSON = `{
 	  "openapi": "3.0.0",
@@ -405,10 +367,8 @@ func TestBuildResourceOmitsPathParamsFromOutputs(t *testing.T) {
 	}
 }
 
-// TestBuildResourceRejectsPathParamsWithoutIDFormat confirms that any resource
-// declaring path parameters but no idFormat fails build with a clear error.
-// idFormat is the canonical identity carrier; without it, import is broken
-// and Delete cannot recover path params from state once disjointness lands.
+// TestBuildResourceRejectsPathParamsWithoutIDFormat: a resource with path
+// params but no idFormat must fail build (otherwise import would be broken).
 func TestBuildResourceRejectsPathParamsWithoutIDFormat(t *testing.T) {
 	const specJSON = `{
 	  "openapi": "3.0.0",
@@ -437,10 +397,8 @@ func TestBuildResourceRejectsPathParamsWithoutIDFormat(t *testing.T) {
 	}
 }
 
-// TestBuildResourceSurfacesYamlBody covers the ESC-shaped pattern: create
-// takes a structured JSON body (project+name) and update takes a raw yaml
-// body. The dispatch should expose a single string "yaml" input on the
-// resource and let users supply the body through that field.
+// TestBuildResourceSurfacesYamlBody covers the ESC-shaped pattern: JSON
+// create + yaml update fuses into a single "yaml" input.
 func TestBuildResourceSurfacesYamlBody(t *testing.T) {
 	const specJSON = `{
 	  "openapi": "3.0.0",
@@ -498,9 +456,8 @@ func TestBuildResourceSurfacesYamlBody(t *testing.T) {
 	}
 }
 
-// TestBuildResourceAcceptsResourceWithoutPathParams covers the other side of
-// the validation: a resource whose operations have no path params shouldn't
-// require idFormat.
+// TestBuildResourceAcceptsResourceWithoutPathParams: a path-param-free
+// resource builds without an idFormat.
 func TestBuildResourceAcceptsResourceWithoutPathParams(t *testing.T) {
 	const specJSON = `{
 	  "openapi": "3.0.0",
@@ -524,8 +481,8 @@ func TestBuildResourceAcceptsResourceWithoutPathParams(t *testing.T) {
 	}
 }
 
-// TestExamplesAppendedToDescription guards the format that SDK codegen relies
-// on for auto-translating PCL example snippets to per-language code blocks.
+// TestExamplesAppendedToDescription pins the format SDK codegen relies on
+// for auto-translating PCL examples per language.
 func TestExamplesAppendedToDescription(t *testing.T) {
 	got := appendExamples("Manages a Foo.", []string{`resource "foo" "pulumiservice:v2:Foo" {}`})
 	if !strings.Contains(got, "## Example Usage") {

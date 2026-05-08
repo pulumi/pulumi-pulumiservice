@@ -38,9 +38,8 @@ import (
 // pathParamRE matches OpenAPI {param} placeholders in path strings.
 var pathParamRE = regexp.MustCompile(`\{([^/{}]+)\}`)
 
-// HTTPError is returned by execAndDecode when the upstream returns a non-2xx
-// status. Callers that need to branch on status (e.g., the requireImport
-// probe matching 404) can use errors.As to extract it.
+// HTTPError carries the response status and body for a non-2xx upstream
+// response. Callers branch on status via errors.As.
 type HTTPError struct {
 	Method     string
 	URL        string
@@ -58,14 +57,10 @@ func IsNotFound(err error) bool {
 	return errors.As(err, &herr) && herr.StatusCode == http.StatusNotFound
 }
 
-// Resources builds dispatchable handlers — one per metadata.resources entry —
-// suitable for registration with a runtime dispatcher.
-//
-// Mapping validation does NOT happen here. Operation IDs are resolved
-// lazily at call time so that a half-broken metadata document doesn't fail
-// the running provider; broken mappings surface either via BuildSchema
-// (during GetSchema) or as runtime errors on the affected resource's
-// first CRUD call.
+// Resources builds one handler per metadata.resources entry. Operation IDs
+// resolve lazily at call time, so a half-broken metadata document doesn't
+// fail the running provider — broken mappings surface via BuildSchema or
+// at the first CRUD call.
 func Resources(spec *Spec, metadata *Metadata) map[string]*Resource {
 	out := make(map[string]*Resource, len(metadata.Resources))
 	for key, rm := range metadata.Resources {
@@ -81,16 +76,14 @@ func Resources(spec *Spec, metadata *Metadata) map[string]*Resource {
 	return out
 }
 
-// Resource is a metadata-driven resource handler. It satisfies
-// pulumi-go-provider/middleware.CustomResource. Operation IDs are resolved
-// against the spec at call time, not at construction.
+// Resource is a metadata-driven CRUD handler. Operation IDs resolve at
+// call time, not at construction.
 type Resource struct {
 	meta ResourceMeta
 	spec *Spec
 }
 
-// resolveOp looks up an operation ID against the bound spec. Returns
-// (nil, nil) when id is empty (verb not declared on this resource).
+// resolveOp looks up an operation ID. Returns (nil, nil) when id is empty.
 func (r *Resource) resolveOp(verb, id string) (*Operation, error) {
 	if id == "" {
 		return nil, nil
@@ -102,20 +95,8 @@ func (r *Resource) resolveOp(verb, id string) (*Operation, error) {
 	return op, nil
 }
 
-// Check normalizes user inputs so spurious diffs don't fire on each preview.
-// Three normalizations apply, all driven by the create-op's body schema and
-// per-field metadata:
-//
-//  1. Enum canonicalization: case-fold string values to match the spec's
-//     declared enum (e.g. "up" → "UP").
-//  2. Set-like array sorting: fields marked `unordered` in metadata are sorted
-//     so user-side reordering doesn't trigger updates.
-//  3. Auto-naming: fields marked with `autoName: <maxLen>` get a generated
-//     name from the resource URN + engine-supplied random seed when the user
-//     leaves them unset.
-//
-// The schema's `replaceOnChanges` tags still drive replacement decisions —
-// Check only normalizes the values, not the diff outcome.
+// Check normalizes user inputs to suppress spurious diffs: enum case-folding,
+// set-like array sorting (Unordered), and autoName generation.
 func (r *Resource) Check(_ context.Context, req p.CheckRequest) (p.CheckResponse, error) {
 	op, _ := r.spec.Op(r.meta.Operations.Create)
 	if op == nil {
@@ -139,9 +120,8 @@ func (r *Resource) Check(_ context.Context, req p.CheckRequest) (p.CheckResponse
 	return p.CheckResponse{Inputs: property.NewMap(out)}, nil
 }
 
-// normalizeValue canonicalizes one input value against its schema property.
-// Strings with matching enums case-fold to canonical; arrays with Unordered
-// metadata sort. Other shapes pass through.
+// normalizeValue canonicalizes one input: enum case-fold for strings,
+// sort for Unordered arrays. Other shapes pass through.
 func normalizeValue(v property.Value, pulumiName string, bodyProps map[string]any, meta ResourceMeta) property.Value {
 	wireName := wireSideName(pulumiName, meta.Renames)
 	prop, ok := bodyProps[wireName].(map[string]any)
@@ -159,9 +139,8 @@ func normalizeValue(v property.Value, pulumiName string, bodyProps map[string]an
 	return v
 }
 
-// matchEnumCase looks at a property's `enum` list and returns the canonical
-// value matching `s` case-insensitively. Returns ("", false) when the property
-// has no enum or no match — leave the value alone in that case.
+// matchEnumCase returns the canonical enum value matching s case-insensitively,
+// or ("", false) when the property has no enum or no match.
 func matchEnumCase(s string, prop map[string]any) (string, bool) {
 	rawEnum, ok := prop["enum"].([]any)
 	if !ok {
@@ -179,9 +158,8 @@ func matchEnumCase(s string, prop map[string]any) (string, bool) {
 	return "", false
 }
 
-// sortArrayValue stable-sorts an array of strings (the common case for
-// set-like fields: tags, scopes, allowed actions). Mixed-type or nested-object
-// arrays pass through unchanged — sort semantics are ill-defined there.
+// sortArrayValue stable-sorts an array of strings. Mixed-type or
+// nested-object arrays pass through (sort semantics ill-defined).
 func sortArrayValue(arr property.Array) property.Array {
 	values := arr.AsSlice()
 	if len(values) < 2 {
@@ -200,10 +178,9 @@ func sortArrayValue(arr property.Array) property.Array {
 	return property.NewArray(sorted)
 }
 
-// generateAutoName produces a deterministic name from the resource URN and
-// engine-provided random seed, capped at maxLen. When seed is nil (no engine
-// stability guarantee), falls back to crypto/rand. The base is the URN's last
-// "::"-delimited segment; the suffix is 7 hex chars derived from the seed.
+// generateAutoName produces a deterministic name from the URN and the
+// engine-supplied random seed, capped at maxLen. Falls back to crypto/rand
+// when seed is nil.
 func generateAutoName(urn string, seed []byte, maxLen int) string {
 	parts := strings.Split(urn, "::")
 	base := parts[len(parts)-1]
@@ -231,9 +208,7 @@ func generateAutoName(urn string, seed []byte, maxLen int) string {
 	return candidate
 }
 
-// wireSideName inverts the renames map: given a Pulumi-side name, return the
-// matching wire-side name (the OpenAPI property key). Returns the input
-// unchanged when no rename targets it.
+// wireSideName inverts the renames map: Pulumi-side → wire-side.
 func wireSideName(pulumiName string, renames map[string]string) string {
 	if wire, ok := renames[pulumiName]; ok {
 		return wire
@@ -241,9 +216,8 @@ func wireSideName(pulumiName string, renames map[string]string) string {
 	return pulumiName
 }
 
-// flattenedRequestProperties returns the create op's body properties,
-// resolving $refs and walking allOf composition. Returns nil for ops with no
-// body (GET-only paths, etc).
+// flattenedRequestProperties returns the op's request body properties,
+// resolving $refs and allOf. Returns nil when the op has no body.
 func flattenedRequestProperties(spec *Spec, op *Operation) map[string]any {
 	if op == nil || op.RequestRef == "" {
 		return nil
@@ -256,15 +230,9 @@ func flattenedRequestProperties(spec *Spec, op *Operation) map[string]any {
 }
 
 // Diff classifies each changed input as Update or UpdateReplace. Path
-// parameters (and fields explicitly marked forceNew in metadata) trigger
-// replacement; everything else is an in-place update. When the resource is
-// marked DeleteBeforeReplace, the engine destroys the old instance first
-// before creating the new — used for resources whose names collide on
-// duplicate-create and that aren't auto-named.
-//
-// Without an explicit DetailedDiff, the engine treats every change as an
-// update and never triggers replace, even when the schema marks a field
-// replaceOnChanges. Provider must spell out the replace semantics here.
+// params and forceNew fields trigger replacement. Without an explicit
+// DetailedDiff the engine never triggers replace, so the replace semantics
+// must be spelled out here.
 func (r *Resource) Diff(_ context.Context, req p.DiffRequest) (p.DiffResponse, error) {
 	if mapEqual(req.OldInputs, req.Inputs) {
 		return p.DiffResponse{}, nil
@@ -293,10 +261,8 @@ func (r *Resource) Diff(_ context.Context, req p.DiffRequest) (p.DiffResponse, e
 	}, nil
 }
 
-// replaceTriggeringFields returns the set of Pulumi-side input names whose
-// changes force a replace. Path parameters from any operation are included
-// (path values participate in URL identity), as are fields with
-// FieldMeta.ForceNew = true.
+// replaceTriggeringFields returns input names whose changes force a replace:
+// every op's path params plus any FieldMeta.ForceNew fields.
 func (r *Resource) replaceTriggeringFields() map[string]bool {
 	out := map[string]bool{}
 	for _, opID := range []string{r.meta.Operations.Create, r.meta.Operations.Read, r.meta.Operations.Update, r.meta.Operations.Delete} {
@@ -339,16 +305,10 @@ func deleteKind(replace bool) p.DiffKind {
 	return p.Delete
 }
 
-// Create executes the create operation: substitutes path params, JSON-encodes
-// the inputs as the request body, fires the request, decodes the response,
-// synthesizes the resource ID from path-param values, returns the new state.
-//
-// Many Pulumi Cloud create endpoints return a sparse body (e.g. POST stack
-// returns `{}`). Outputs declared by the read schema but missing from the
-// create response are then absent from state until the next refresh, and
-// downstream resources referencing them fail to converge. Create therefore
-// fires the read op (when declared) and merges its response in, so callers
-// see the full output set as soon as Create returns.
+// Create executes the create operation, then fires the read op (when
+// declared) and merges its response in. Many Pulumi Cloud create endpoints
+// return a sparse body, so without read-after-create downstream resources
+// referencing read-only outputs would fail to converge until refresh.
 func (r *Resource) Create(ctx context.Context, req p.CreateRequest) (p.CreateResponse, error) {
 	if req.DryRun {
 		return p.CreateResponse{Properties: req.Properties}, nil
@@ -380,10 +340,8 @@ func (r *Resource) Create(ctx context.Context, req p.CreateRequest) (p.CreateRes
 			state = mergeMaps(updState, state)
 		}
 	}
-	// Read-after-create must source path-parameter values from the inputs
-	// (req.Properties), not from state — most Pulumi Cloud create endpoints
-	// return sparse bodies (e.g. `{}`), so state alone won't carry path params
-	// once they're no longer echoed into outputs.
+	// Path-parameter values must come from inputs, not state: create endpoints
+	// often return sparse bodies that don't echo path params back.
 	source := mergeMaps(req.Properties, state)
 	if fetched, ok, err := r.fetchState(ctx, source, state); err != nil {
 		return p.CreateResponse{}, fmt.Errorf("create: read-after-create: %w", err)
@@ -397,13 +355,9 @@ func (r *Resource) Create(ctx context.Context, req p.CreateRequest) (p.CreateRes
 	return p.CreateResponse{ID: id, Properties: state}, nil
 }
 
-// checkAlreadyExists is the requireImport pre-flight: issue the read op
-// against the user's inputs and treat any 200 as "the resource exists; the
-// user must adopt it via pulumi import rather than blindly upserting."
-// 404 means it doesn't exist, proceed with create. Other errors propagate.
-//
-// Resources without a read op opt out of this check (the dispatch can't
-// probe what it can't read).
+// checkAlreadyExists is the requireImport pre-flight: a 200 from read fails
+// with an "import this resource" error; 404 means proceed; other errors
+// propagate. Resources without a read op opt out.
 func (r *Resource) checkAlreadyExists(ctx context.Context, inputs property.Map) error {
 	readOp, err := r.resolveOp("read", r.meta.Operations.Read)
 	if err != nil {
@@ -422,14 +376,10 @@ func (r *Resource) checkAlreadyExists(ctx context.Context, inputs property.Map) 
 	return fmt.Errorf("requireImport probe: %w", err)
 }
 
-// synthesizeID returns the resource ID. When meta.IDFormat is set, it's used
-// as a template ("{org}/{name}") with placeholder values resolved from state
-// then inputs. Otherwise the path comes from the most authoritative non-create
-// op (read, update, delete) — falling back to create — and path-parameter
-// values are slash-joined. Values are looked up in state first (covers
-// server-generated fields returned from create) and then inputs (covers
-// user-supplied fields that weren't echoed in the response, e.g., the body
-// `name` that maps via rename to a path param like `tagName`).
+// synthesizeID returns the resource ID, using meta.IDFormat when set or
+// slash-joining path-parameter values from the most authoritative non-create
+// op. Values resolve from state first (covers server-generated fields), then
+// inputs (covers user-supplied fields not echoed in the response).
 func (r *Resource) synthesizeID(state, inputs property.Map) (string, error) {
 	if r.meta.IDFormat != "" {
 		return synthesizeIDFromFormat(r.meta.IDFormat, state, inputs)
@@ -469,8 +419,7 @@ func (r *Resource) synthesizeID(state, inputs property.Map) (string, error) {
 	return strings.Join(parts, "/"), nil
 }
 
-// synthesizeIDFromFormat substitutes "{name}" placeholders in the format
-// template with values from state then inputs.
+// synthesizeIDFromFormat substitutes {name} placeholders from state then inputs.
 func synthesizeIDFromFormat(format string, state, inputs property.Map) (string, error) {
 	var missing []string
 	out := pathParamRE.ReplaceAllStringFunc(format, func(m string) string {
@@ -491,13 +440,10 @@ func synthesizeIDFromFormat(format string, state, inputs property.Map) (string, 
 	return out, nil
 }
 
-// parseIDIntoInputs is the inverse of synthesizeIDFromFormat: given a Pulumi
-// resource ID and the format template, recover the placeholder values and
-// merge them into inputs without overwriting existing keys. Returns the
-// original inputs unchanged when no IDFormat is declared or the ID doesn't
-// match the format. Used by the import path (empty inputs) and by Read /
-// Delete to recover path params no longer carried in state after the
-// disjointness change.
+// parseIDIntoInputs is the inverse of synthesizeIDFromFormat: it recovers
+// placeholder values from the resource ID and merges them into inputs
+// without overwriting existing keys. Returns inputs unchanged when no
+// IDFormat is declared or the ID doesn't match.
 func (r *Resource) parseIDIntoInputs(id string, inputs property.Map) property.Map {
 	if r.meta.IDFormat == "" {
 		return inputs
@@ -527,7 +473,7 @@ func (r *Resource) parseIDIntoInputs(id string, inputs property.Map) property.Ma
 }
 
 // compileIDFormatRegex turns "{org}/{name}" into ^([^/]+)/([^/]+)$, returning
-// the compiled regex plus the placeholder names in match-group order.
+// the regex and the placeholder names in match-group order.
 func compileIDFormatRegex(format string) (*regexp.Regexp, []string, error) {
 	var names []string
 	var pattern strings.Builder
@@ -557,13 +503,9 @@ func hasPathParams(op *Operation) bool {
 	return false
 }
 
-// Read fetches the current state. Path parameters come from inputs (which the
-// engine threads through). Imports arrive with empty inputs; when meta.IDFormat
-// is declared, parseIDIntoInputs recovers them from the resource ID — without
-// it, the user must supply enough inputs to identify the resource.
-//
-// EmitOnCreate fields (e.g. token values returned only at create-time) are
-// preserved from prior state so refresh doesn't wipe them.
+// Read fetches current state. Imports arrive with empty inputs; when
+// IDFormat is declared, path params are recovered from the resource ID.
+// EmitOnCreate fields are preserved from prior state.
 func (r *Resource) Read(ctx context.Context, req p.ReadRequest) (p.ReadResponse, error) {
 	inputs := r.parseIDIntoInputs(req.ID, req.Inputs)
 	source := mergeMaps(inputs, req.Properties)
@@ -572,18 +514,14 @@ func (r *Resource) Read(ctx context.Context, req p.ReadRequest) (p.ReadResponse,
 		return p.ReadResponse{}, err
 	}
 	if !ok {
-		// Read is optional: some Pulumi Cloud resources (tokens, tags,
-		// memberships) don't expose a per-instance Get endpoint — only
-		// list-on-the-org. For those we treat refresh as a no-op and
-		// return the prior state unchanged.
+		// No read op declared: refresh is a no-op, return prior state.
 		return p.ReadResponse{ID: req.ID, Inputs: inputs, Properties: req.Properties}, nil
 	}
 	return p.ReadResponse{ID: req.ID, Properties: state, Inputs: inputs}, nil
 }
 
-// fetchState executes the read op against source and returns the decoded
-// response with EmitOnCreate fields carried over from prior. Returns
-// (prior, false, nil) when the resource has no read op declared.
+// fetchState runs the read op and merges EmitOnCreate fields from prior.
+// Returns (prior, false, nil) when no read op is declared.
 func (r *Resource) fetchState(ctx context.Context, source, prior property.Map) (property.Map, bool, error) {
 	op, err := r.resolveOp("read", r.meta.Operations.Read)
 	if err != nil {
@@ -599,10 +537,8 @@ func (r *Resource) fetchState(ctx context.Context, source, prior property.Map) (
 	return r.preserveEmitOnCreate(state, prior), true, nil
 }
 
-// preserveEmitOnCreate copies fields marked EmitOnCreate from oldState into
-// newState when they're missing from the read response. Token values are the
-// canonical case: the create endpoint returns them once, the read endpoint
-// returns metadata-only.
+// preserveEmitOnCreate copies EmitOnCreate fields from oldState into
+// newState when missing. Token values are the canonical case.
 func (r *Resource) preserveEmitOnCreate(newState, oldState property.Map) property.Map {
 	out := map[string]property.Value{}
 	for k, v := range newState.AllStable {
@@ -642,13 +578,9 @@ func (r *Resource) Update(ctx context.Context, req p.UpdateRequest) (p.UpdateRes
 	return p.UpdateResponse{Properties: state}, nil
 }
 
-// Delete fires the delete op (if declared). Resources without a delete op
-// quietly succeed; the engine drops the state.
-//
-// Path parameters are sourced from req.OldInputs (always present at delete
-// time) merged with req.Properties as a fallback. State no longer carries
-// path params after the disjointness change — they live only in inputs and
-// the synthesized ID.
+// Delete fires the delete op (if declared). Without one the engine drops
+// state silently. Path params come from req.OldInputs with req.Properties
+// as a fallback.
 func (r *Resource) Delete(ctx context.Context, req p.DeleteRequest) error {
 	op, err := r.resolveOp("delete", r.meta.Operations.Delete)
 	if err != nil {
@@ -662,12 +594,10 @@ func (r *Resource) Delete(ctx context.Context, req p.DeleteRequest) error {
 	return err
 }
 
-// mergeMaps returns a property.Map that exposes every key from any of the
-// supplied maps. Earlier maps take precedence on conflict.
+// mergeMaps unions every key. Earlier maps take precedence on conflict.
 func mergeMaps(maps ...property.Map) property.Map {
 	out := map[string]property.Value{}
-	// Walk in reverse so earlier maps overwrite later ones (since later
-	// maps are inserted first; later iterations replace earlier values).
+	// Walk in reverse so earlier maps overwrite later ones.
 	for i := len(maps) - 1; i >= 0; i-- {
 		for k, v := range maps[i].AllStable {
 			out[k] = v
@@ -676,9 +606,8 @@ func mergeMaps(maps ...property.Map) property.Map {
 	return property.NewMap(out)
 }
 
-// execAndDecode performs the HTTP round-trip. The returned state Map is the
-// JSON response body decoded as Pulumi properties; the returned []byte is
-// the raw response body (used for ID extraction).
+// execAndDecode performs the HTTP round-trip and returns the raw body and
+// its decoded property.Map.
 func (r *Resource) execAndDecode(ctx context.Context, op *Operation, inputs property.Map) ([]byte, property.Map, error) {
 	transport, err := resolveTransport(ctx)
 	if err != nil {
@@ -695,9 +624,7 @@ func (r *Resource) execAndDecode(ctx context.Context, op *Operation, inputs prop
 	if needsBody(op.Method) {
 		switch op.RequestContentType {
 		case "application/x-yaml":
-			// Raw-string body sourced from the conventional "yaml" input.
-			// Absent / null yaml leaves the body empty (no-op for upsert-style
-			// yaml endpoints).
+			// Raw-string body from the "yaml" input; absent leaves the body empty.
 			if v, ok := inputs.GetOk("yaml"); ok && v.IsString() {
 				body = strings.NewReader(v.AsString())
 				contentType = "application/x-yaml"
@@ -743,10 +670,15 @@ func (r *Resource) execAndDecode(ctx context.Context, op *Operation, inputs prop
 	if len(respBody) == 0 || resp.StatusCode == http.StatusNoContent {
 		return respBody, property.NewMap(nil), nil
 	}
-	// Some endpoints return non-object bodies (e.g. DeleteDeploymentSettings
-	// returns a bare boolean for legacy reasons). For state-construction
-	// purposes we only care about object responses; treat anything else as
-	// an empty state map.
+	// Yaml response → bind raw body to state["yaml"].
+	if op.ResponseContentType == "application/x-yaml" {
+		state := property.NewMap(map[string]property.Value{
+			"yaml": property.New(string(respBody)),
+		})
+		return respBody, state, nil
+	}
+	// Some endpoints return non-object bodies (e.g. a bare boolean); we only
+	// build state from object responses, so treat anything else as empty.
 	trimmed := bytes.TrimSpace(respBody)
 	if len(trimmed) == 0 || trimmed[0] != '{' {
 		return respBody, property.NewMap(nil), nil
@@ -755,18 +687,15 @@ func (r *Resource) execAndDecode(ctx context.Context, op *Operation, inputs prop
 	if err := json.Unmarshal(respBody, &raw); err != nil {
 		return respBody, property.Map{}, fmt.Errorf("rest: decode response for %s: %w", op.ID, err)
 	}
-	// Translate response keys from wire-side to Pulumi-side so the resulting
-	// property map can be looked up using Pulumi names (matching the schema's
-	// inputProperties keys and the path resolver in buildURL).
+	// Translate top-level response keys wire-side → Pulumi-side.
 	if len(r.meta.Renames) > 0 {
 		raw = renameMapKeys(raw, r.meta.Renames)
 	}
 	return respBody, anyMapToPropertyMap(raw), nil
 }
 
-// renameMapKeys returns a copy of m with any wire-side keys translated to
-// their Pulumi-side equivalents per the renames map. Nested maps are not
-// renamed (renames only apply at the top level of resource I/O).
+// renameMapKeys translates wire-side keys to Pulumi-side. Nested maps are
+// not touched — renames only apply at the top level of resource I/O.
 func renameMapKeys(m map[string]any, renames map[string]string) map[string]any {
 	out := make(map[string]any, len(m))
 	for k, v := range m {
@@ -775,11 +704,9 @@ func renameMapKeys(m map[string]any, renames map[string]string) map[string]any {
 	return out
 }
 
-// buildURL substitutes {path} placeholders from inputs. Returns an absolute
-// URL string that http.NewRequest can parse — the spec's first server is
-// used as the base when present, otherwise a sentinel host is used. In
-// either case the Transport is expected to override scheme+host before
-// sending the request.
+// buildURL substitutes {path} placeholders and prepends the spec's first
+// server (or a sentinel host); the Transport is expected to overwrite
+// scheme+host before sending.
 func (r *Resource) buildURL(op *Operation, inputs property.Map) (string, error) {
 	matches := pathParamRE.FindAllStringSubmatchIndex(op.Path, -1)
 	var b strings.Builder
@@ -827,8 +754,8 @@ func propertyValueToString(v property.Value) string {
 	}
 }
 
-// propertyMapToAny converts a property.Map to a generic any tree suitable for
-// json.Marshal. Secrets are unwrapped (the wire shape doesn't preserve them).
+// propertyMapToAny converts a property.Map to a json-marshal-ready any tree.
+// Secrets are unwrapped — the wire shape doesn't preserve them.
 func propertyMapToAny(m property.Map) map[string]any {
 	out := make(map[string]any, m.Len())
 	for k, v := range m.AllStable {

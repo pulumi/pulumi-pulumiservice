@@ -156,6 +156,8 @@ class Environment(pulumi.CustomResource):
                 raise TypeError("Missing required property 'project'")
             __props__.__dict__["project"] = project
             __props__.__dict__["yaml"] = None if yaml is None else pulumi.Output.secret(yaml)
+        secret_opts = pulumi.ResourceOptions(additional_secret_outputs=["yaml"])
+        opts = pulumi.ResourceOptions.merge(opts, secret_opts)
         super(Environment, __self__).__init__(
             'pulumiservice:v2/esc:Environment',
             resource_name,
@@ -178,5 +180,14 @@ class Environment(pulumi.CustomResource):
 
         __props__ = EnvironmentArgs.__new__(EnvironmentArgs)
 
+        __props__.__dict__["yaml"] = None
         return Environment(resource_name, opts=opts, __props__=__props__)
+
+    @_builtins.property
+    @pulumi.getter
+    def yaml(self) -> pulumi.Output[Optional[_builtins.str]]:
+        """
+        Raw YAML body content.
+        """
+        return pulumi.get(self, "yaml")
 

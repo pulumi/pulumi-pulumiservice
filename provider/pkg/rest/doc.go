@@ -12,26 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package rest builds Pulumi resources from a pair of inputs:
-//
-//   - an OpenAPI 3 spec describing the wire shapes
-//   - a metadata document declaring which operationIds form which Pulumi
-//     resources, plus per-field overrides (forceNew, secret, renames,
-//     output allow/deny lists) and per-resource aliases
-//
-// Both are loaded at runtime; nothing is generated at build time. The
-// schema returned by the provider is computed from (spec, metadata) on
-// demand. Mapping errors surface at GetSchema time, not at startup —
-// this keeps `go build` simple and makes the provider amenable to
-// runtime parameterization (a future feature: replacing the embedded
-// spec/metadata via the Pulumi engine's Parameterize RPC).
-//
-// The two main entry points:
-//
-//   - BuildSchema(spec, meta, pkg) emits a complete schema.PackageSpec.
-//   - Resources(spec, meta, pkg) emits a slice of mw.CustomResource
-//     handlers ready to register with dispatch.Wrap.
-//
-// Resource decoded I/O uses resource.PropertyMap throughout — there are
-// no per-resource Go types to maintain.
+// Package rest builds Pulumi resources at runtime from an OpenAPI 3 spec
+// and a metadata document declaring which operationIds form which resources.
+// BuildSchema emits the package schema; Resources emits the CRUD handlers.
 package rest

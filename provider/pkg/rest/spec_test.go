@@ -54,10 +54,8 @@ const yamlBodySpec = `{
   }
 }`
 
-// TestRealSpecRecognizesEnvironmentYamlBody is a sanity check against the
-// embedded Pulumi Cloud spec — confirms UpdateEnvironment_esc_environments
-// is correctly classified as application/x-yaml so the dispatch fuses the
-// post-create PATCH for v2 esc:Environment.
+// TestRealSpecRecognizesEnvironmentYamlBody pins yaml-body classification
+// against the embedded Pulumi Cloud spec.
 func TestRealSpecRecognizesEnvironmentYamlBody(t *testing.T) {
 	spec, _ := loadFixtures(t)
 	op, ok := spec.Op("UpdateEnvironment_esc_environments")
