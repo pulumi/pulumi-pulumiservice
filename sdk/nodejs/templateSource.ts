@@ -8,7 +8,7 @@ import * as enums from "./types/enums";
 import * as utilities from "./utilities";
 
 /**
- * A source for Pulumi templates
+ * A source for Pulumi templates.
  */
 export class TemplateSource extends pulumi.CustomResource {
     /**
@@ -85,6 +85,8 @@ export class TemplateSource extends pulumi.CustomResource {
             resourceInputs["sourceURL"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["organizationName"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(TemplateSource.__pulumiType, name, resourceInputs, opts);
     }
 }

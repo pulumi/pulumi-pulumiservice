@@ -10,7 +10,7 @@ using Pulumi.Serialization;
 namespace Pulumi.PulumiService
 {
     /// <summary>
-    /// Agent Pool for customer managed deployments
+    /// Agent Pool for customer managed deployments.
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:index:AgentPool")]
     public partial class AgentPool : global::Pulumi.CustomResource
@@ -34,7 +34,7 @@ namespace Pulumi.PulumiService
         public Output<bool?> ForceDestroy { get; private set; } = null!;
 
         /// <summary>
-        /// The name of the agent pool.
+        /// Name of the agent pool.
         /// </summary>
         [Output("name")]
         public Output<string> Name { get; private set; } = null!;
@@ -77,6 +77,10 @@ namespace Pulumi.PulumiService
                 AdditionalSecretOutputs =
                 {
                     "tokenValue",
+                },
+                ReplaceOnChanges =
+                {
+                    "organizationName",
                 },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);

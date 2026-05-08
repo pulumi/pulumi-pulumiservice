@@ -10,7 +10,7 @@ using Pulumi.Serialization;
 namespace Pulumi.PulumiService
 {
     /// <summary>
-    /// A source for Pulumi templates
+    /// A source for Pulumi templates.
     /// </summary>
     [PulumiServiceResourceType("pulumiservice:index:TemplateSource")]
     public partial class TemplateSource : global::Pulumi.CustomResource
@@ -62,6 +62,10 @@ namespace Pulumi.PulumiService
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
+                ReplaceOnChanges =
+                {
+                    "organizationName",
+                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.

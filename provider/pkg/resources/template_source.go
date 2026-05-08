@@ -1,3 +1,17 @@
+// Copyright 2026, Pulumi Corporation.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//	http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package resources
 
 import (
@@ -6,268 +20,179 @@ import (
 	"path"
 	"strings"
 
-	pbempty "google.golang.org/protobuf/types/known/emptypb"
+	"github.com/pulumi/pulumi-go-provider/infer"
+	"github.com/pulumi/pulumi/sdk/v3/go/property"
 
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
-
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
-type PulumiServiceTemplateSourceResource struct {
-	Client *pulumiapi.Client
+type TemplateSource struct{}
+
+var (
+	_ infer.CustomCreate[TemplateSourceInput, TemplateSourceState] = &TemplateSource{}
+	_ infer.CustomUpdate[TemplateSourceInput, TemplateSourceState] = &TemplateSource{}
+	_ infer.CustomDelete[TemplateSourceState]                      = &TemplateSource{}
+	_ infer.CustomRead[TemplateSourceInput, TemplateSourceState]   = &TemplateSource{}
+	_ infer.CustomStateMigrations[TemplateSourceState]             = &TemplateSource{}
+)
+
+func (*TemplateSource) Annotate(a infer.Annotator) {
+	a.Describe(&TemplateSource{}, "A source for Pulumi templates.")
+	a.SetToken("index", "TemplateSource")
 }
 
-type PulumiServiceTemplateSourceDestination struct {
-	URL *string
+type TemplateSourceDestination struct {
+	URL *string `pulumi:"url,optional"`
 }
 
-type PulumiServiceTemplateSourceInput struct {
-	OrganizationName string
-	SourceName       string
-	SourceURL        string
-	Destination      *PulumiServiceTemplateSourceDestination
+func (d *TemplateSourceDestination) Annotate(a infer.Annotator) {
+	a.Describe(&d.URL, "Destination URL that gets filled in on new project creation.")
 }
 
-func (i *PulumiServiceTemplateSourceInput) ToPropertyMap() resource.PropertyMap {
-	pm := resource.PropertyMap{}
-	pm["organizationName"] = resource.NewPropertyValue(i.OrganizationName)
-	pm["sourceName"] = resource.NewPropertyValue(i.SourceName)
-	pm["sourceURL"] = resource.NewPropertyValue(i.SourceURL)
-	if i.Destination != nil {
-		destinationMap := resource.PropertyMap{}
-		if i.Destination.URL != nil {
-			destinationMap["url"] = resource.NewPropertyValue(i.Destination.URL)
-		}
-		pm["destination"] = resource.NewObjectProperty(destinationMap)
-	}
-	return pm
+type TemplateSourceInput struct {
+	OrganizationName string                     `pulumi:"organizationName" provider:"replaceOnChanges"`
+	SourceName       string                     `pulumi:"sourceName"`
+	SourceURL        string                     `pulumi:"sourceURL"`
+	Destination      *TemplateSourceDestination `pulumi:"destination,optional"`
 }
 
-func (s *PulumiServiceTemplateSourceResource) ToPulumiServiceTemplateSourceInput(
-	inputMap resource.PropertyMap,
-) (*PulumiServiceTemplateSourceInput, error) {
-	input := PulumiServiceTemplateSourceInput{}
-
-	input.OrganizationName = inputMap["organizationName"].StringValue()
-	input.SourceName = inputMap["sourceName"].StringValue()
-	input.SourceURL = inputMap["sourceURL"].StringValue()
-
-	if inputMap["destination"].HasValue() && inputMap["destination"].IsObject() {
-		destinationMap := inputMap["destination"].ObjectValue()
-		destination := PulumiServiceTemplateSourceDestination{}
-		if destinationMap["url"].HasValue() && destinationMap["url"].IsString() {
-			value := destinationMap["url"].StringValue()
-			destination.URL = &value
-		}
-		input.Destination = &destination
-	}
-	return &input, nil
+func (i *TemplateSourceInput) Annotate(a infer.Annotator) {
+	a.Describe(&i.OrganizationName, "Organization name.")
+	a.Describe(&i.SourceName, "Source name.")
+	a.Describe(&i.SourceURL, "Github URL of the repository from which to grab templates.")
+	a.Describe(&i.Destination, "The default destination for projects using templates from this source.")
 }
 
-func (s *PulumiServiceTemplateSourceResource) Name() string {
-	return "pulumiservice:index:TemplateSource"
+type TemplateSourceState struct {
+	TemplateSourceInput
 }
 
-func (s *PulumiServiceTemplateSourceResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(
-		req.GetOldInputs(),
-		plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
-
-	diffs := olds.Diff(news)
-	if diffs == nil {
-		return &pulumirpc.DiffResponse{
-			Changes: pulumirpc.DiffResponse_DIFF_NONE,
+func (*TemplateSource) Create(
+	ctx context.Context,
+	req infer.CreateRequest[TemplateSourceInput],
+) (infer.CreateResponse[TemplateSourceState], error) {
+	if req.DryRun {
+		return infer.CreateResponse[TemplateSourceState]{
+			Output: TemplateSourceState{TemplateSourceInput: req.Inputs},
 		}, nil
 	}
-
-	dd := plugin.NewDetailedDiffFromObjectDiff(diffs, false)
-
-	detailedDiffs := map[string]*pulumirpc.PropertyDiff{}
-	replaces := []string(nil)
-	replaceProperties := map[string]bool{
-		"organizationName": true,
+	resp, err := config.GetClient(ctx).CreateTemplateSource(
+		ctx, req.Inputs.OrganizationName, req.Inputs.toAPIRequest(),
+	)
+	if err != nil {
+		return infer.CreateResponse[TemplateSourceState]{}, err
 	}
-	for k, v := range dd {
-		if _, ok := replaceProperties[k]; ok {
-			v.Kind = v.Kind.AsReplace()
-			replaces = append(replaces, k)
-		}
-		detailedDiffs[k] = &pulumirpc.PropertyDiff{
-			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind), //nolint:gosec // safe conversion from plugin.DiffKind
-			InputDiff: v.InputDiff,
-		}
-	}
-
-	return &pulumirpc.DiffResponse{
-		Changes:             pulumirpc.DiffResponse_DIFF_SOME,
-		Replaces:            replaces,
-		DetailedDiff:        detailedDiffs,
-		HasDetailedDiff:     true,
-		DeleteBeforeReplace: true,
+	return infer.CreateResponse[TemplateSourceState]{
+		ID:     templateSourceID(req.Inputs.OrganizationName, resp.ID),
+		Output: TemplateSourceState{TemplateSourceInput: templateSourceInputFromResponse(req.Inputs.OrganizationName, *resp)},
 	}, nil
 }
 
-func (s *PulumiServiceTemplateSourceResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	ctx := context.Background()
-	orgName, templateID, err := parseTemplateSourceID(req.Id)
-	if err != nil {
-		return nil, err
+func (*TemplateSource) Update(
+	ctx context.Context,
+	req infer.UpdateRequest[TemplateSourceInput, TemplateSourceState],
+) (infer.UpdateResponse[TemplateSourceState], error) {
+	if req.DryRun {
+		return infer.UpdateResponse[TemplateSourceState]{
+			Output: TemplateSourceState{TemplateSourceInput: req.Inputs},
+		}, nil
 	}
-	err = s.Client.DeleteTemplateSource(ctx, *orgName, *templateID)
+	_, templateID, err := parseTemplateSourceID(req.ID)
 	if err != nil {
-		return nil, err
+		return infer.UpdateResponse[TemplateSourceState]{}, err
 	}
-	return &pbempty.Empty{}, nil
-}
-
-func (s *PulumiServiceTemplateSourceResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
-	ctx := context.Background()
-	inputMap, err := plugin.UnmarshalProperties(
-		req.GetProperties(),
-		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
+	resp, err := config.GetClient(ctx).UpdateTemplateSource(
+		ctx, req.Inputs.OrganizationName, templateID, req.Inputs.toAPIRequest(),
 	)
 	if err != nil {
-		return nil, err
+		return infer.UpdateResponse[TemplateSourceState]{}, err
 	}
-
-	input, err := s.ToPulumiServiceTemplateSourceInput(inputMap)
-	if err != nil {
-		return nil, err
-	}
-
-	response, err := s.Client.CreateTemplateSource(ctx, input.OrganizationName, input.toRequest())
-	if err != nil {
-		return nil, err
-	}
-
-	outputProperties, err := plugin.MarshalProperties(
-		toProperties(input.OrganizationName, *response).ToPropertyMap(),
-		plugin.MarshalOptions{
-			KeepUnknowns: true,
-			SkipNulls:    true,
-			KeepSecrets:  true,
-		},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.CreateResponse{
-		Id:         path.Join(input.OrganizationName, response.ID),
-		Properties: outputProperties,
+	return infer.UpdateResponse[TemplateSourceState]{
+		Output: TemplateSourceState{TemplateSourceInput: templateSourceInputFromResponse(req.Inputs.OrganizationName, *resp)},
 	}, nil
 }
 
-func (s *PulumiServiceTemplateSourceResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: nil}, nil
+func (*TemplateSource) Delete(
+	ctx context.Context,
+	req infer.DeleteRequest[TemplateSourceState],
+) (infer.DeleteResponse, error) {
+	orgName, templateID, err := parseTemplateSourceID(req.ID)
+	if err != nil {
+		return infer.DeleteResponse{}, err
+	}
+	return infer.DeleteResponse{}, config.GetClient(ctx).DeleteTemplateSource(ctx, orgName, templateID)
 }
 
-func (s *PulumiServiceTemplateSourceResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	ctx := context.Background()
-	inputMap, err := plugin.UnmarshalProperties(
-		req.GetNews(),
-		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
-	)
+func (*TemplateSource) Read(
+	ctx context.Context,
+	req infer.ReadRequest[TemplateSourceInput, TemplateSourceState],
+) (infer.ReadResponse[TemplateSourceInput, TemplateSourceState], error) {
+	orgName, templateID, err := parseTemplateSourceID(req.ID)
 	if err != nil {
-		return nil, err
+		return infer.ReadResponse[TemplateSourceInput, TemplateSourceState]{}, err
 	}
-
-	input, err := s.ToPulumiServiceTemplateSourceInput(inputMap)
+	resp, err := config.GetClient(ctx).GetTemplateSource(ctx, orgName, templateID)
 	if err != nil {
-		return nil, err
-	}
-
-	_, templateID, err := parseTemplateSourceID(req.Id)
-	if err != nil {
-		return nil, err
-	}
-
-	response, err := s.Client.UpdateTemplateSource(ctx, input.OrganizationName, *templateID, input.toRequest())
-	if err != nil {
-		return nil, err
-	}
-
-	outputProperties, err := plugin.MarshalProperties(
-		toProperties(input.OrganizationName, *response).ToPropertyMap(),
-		plugin.MarshalOptions{
-			KeepUnknowns: true,
-			SkipNulls:    true,
-			KeepSecrets:  true,
-		},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.UpdateResponse{
-		Properties: outputProperties,
-	}, nil
-}
-
-func (s *PulumiServiceTemplateSourceResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	ctx := context.Background()
-	orgName, templateID, err := parseTemplateSourceID(req.Id)
-	if err != nil {
-		return nil, err
-	}
-
-	response, err := s.Client.GetTemplateSource(ctx, *orgName, *templateID)
-	if err != nil {
-		return nil, fmt.Errorf(
+		return infer.ReadResponse[TemplateSourceInput, TemplateSourceState]{}, fmt.Errorf(
 			"failed to get template source during Read. org: %s id: %s due to error: %w",
-			*orgName,
-			*templateID,
-			err,
+			orgName, templateID, err,
 		)
 	}
-	if response == nil {
-		return &pulumirpc.ReadResponse{}, nil
+	if resp == nil {
+		return infer.ReadResponse[TemplateSourceInput, TemplateSourceState]{}, nil
 	}
-
-	properties, err := plugin.MarshalProperties(
-		toProperties(*orgName, *response).ToPropertyMap(),
-		plugin.MarshalOptions{},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.ReadResponse{
-		Id:         path.Join(*orgName, *templateID),
-		Properties: properties,
-		Inputs:     properties,
+	inputs := templateSourceInputFromResponse(orgName, *resp)
+	return infer.ReadResponse[TemplateSourceInput, TemplateSourceState]{
+		ID:     req.ID,
+		Inputs: inputs,
+		State:  TemplateSourceState{TemplateSourceInput: inputs},
 	}, nil
 }
 
-func parseTemplateSourceID(id string) (organizationName *string, templateID *string, err error) {
-	splitID := strings.Split(id, "/")
-	if len(splitID) != 2 {
-		return nil, nil, fmt.Errorf("invalid template source id: %s", id)
+// StateMigrations strips the legacy `__inputs` field that the pre-infer
+// TemplateSource resource embedded in state. infer rejects unknown fields when
+// decoding state, so without this migration a refresh against an existing
+// stack errors with "Unrecognized field '__inputs'".
+func (*TemplateSource) StateMigrations(context.Context) []infer.StateMigrationFunc[TemplateSourceState] {
+	return []infer.StateMigrationFunc[TemplateSourceState]{
+		infer.StateMigration(migrateTemplateSourceLegacyInputs),
 	}
-	return &splitID[0], &splitID[1], nil
 }
 
-func (i *PulumiServiceTemplateSourceInput) toRequest() pulumiapi.CreateTemplateSourceRequest {
+func migrateTemplateSourceLegacyInputs(
+	_ context.Context, old property.Map,
+) (infer.MigrationResult[TemplateSourceState], error) {
+	if _, ok := old.GetOk("__inputs"); !ok {
+		return infer.MigrationResult[TemplateSourceState]{}, nil
+	}
+	state := TemplateSourceState{}
+	if v, ok := old.GetOk("organizationName"); ok && v.IsString() {
+		state.OrganizationName = v.AsString()
+	}
+	if v, ok := old.GetOk("sourceName"); ok && v.IsString() {
+		state.SourceName = v.AsString()
+	}
+	if v, ok := old.GetOk("sourceURL"); ok && v.IsString() {
+		state.SourceURL = v.AsString()
+	}
+	if v, ok := old.GetOk("destination"); ok && v.IsMap() {
+		dest := TemplateSourceDestination{}
+		dm := v.AsMap()
+		if u, ok := dm.GetOk("url"); ok && u.IsString() {
+			s := u.AsString()
+			dest.URL = &s
+		}
+		state.Destination = &dest
+	}
+	return infer.MigrationResult[TemplateSourceState]{Result: &state}, nil
+}
+
+func (i *TemplateSourceInput) toAPIRequest() pulumiapi.CreateTemplateSourceRequest {
 	var destination *pulumiapi.CreateTemplateSourceRequestDestination
 	if i.Destination != nil {
-		destination = &pulumiapi.CreateTemplateSourceRequestDestination{
-			URL: i.Destination.URL,
-		}
-	} else {
-		destination = nil
+		destination = &pulumiapi.CreateTemplateSourceRequestDestination{URL: i.Destination.URL}
 	}
-
 	return pulumiapi.CreateTemplateSourceRequest{
 		Name:        i.SourceName,
 		SourceURL:   i.SourceURL,
@@ -275,20 +200,29 @@ func (i *PulumiServiceTemplateSourceInput) toRequest() pulumiapi.CreateTemplateS
 	}
 }
 
-func toProperties(organization string, response pulumiapi.TemplateSourceResponse) *PulumiServiceTemplateSourceInput {
-	var destination *PulumiServiceTemplateSourceDestination
+func templateSourceInputFromResponse(
+	organization string, response pulumiapi.TemplateSourceResponse,
+) TemplateSourceInput {
+	var destination *TemplateSourceDestination
 	if response.Destination != nil {
-		destination = &PulumiServiceTemplateSourceDestination{
-			URL: response.Destination.URL,
-		}
-	} else {
-		destination = nil
+		destination = &TemplateSourceDestination{URL: response.Destination.URL}
 	}
-
-	return &PulumiServiceTemplateSourceInput{
+	return TemplateSourceInput{
 		OrganizationName: organization,
 		SourceName:       response.Name,
 		SourceURL:        response.SourceURL,
 		Destination:      destination,
 	}
+}
+
+func templateSourceID(orgName, templateID string) string {
+	return path.Join(orgName, templateID)
+}
+
+func parseTemplateSourceID(id string) (organizationName, templateID string, err error) {
+	splitID := strings.Split(id, "/")
+	if len(splitID) != 2 {
+		return "", "", fmt.Errorf("invalid template source id: %s", id)
+	}
+	return splitID[0], splitID[1], nil
 }

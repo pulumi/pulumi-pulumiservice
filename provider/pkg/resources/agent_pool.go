@@ -1,3 +1,17 @@
+// Copyright 2026, Pulumi Corporation.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//	http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package resources
 
 import (
@@ -5,323 +19,212 @@ import (
 	"fmt"
 	"strings"
 
-	pbempty "google.golang.org/protobuf/types/known/emptypb"
-	"google.golang.org/protobuf/types/known/structpb"
+	"github.com/pulumi/pulumi-go-provider/infer"
+	"github.com/pulumi/pulumi/sdk/v3/go/property"
 
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
-
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 )
 
-type PulumiServiceAgentPoolResource struct {
-	Client pulumiapi.AgentPoolClient
+type AgentPool struct{}
+
+var (
+	_ infer.CustomCreate[AgentPoolInput, AgentPoolState] = &AgentPool{}
+	_ infer.CustomUpdate[AgentPoolInput, AgentPoolState] = &AgentPool{}
+	_ infer.CustomDelete[AgentPoolState]                 = &AgentPool{}
+	_ infer.CustomRead[AgentPoolInput, AgentPoolState]   = &AgentPool{}
+	_ infer.CustomStateMigrations[AgentPoolState]        = &AgentPool{}
+)
+
+func (*AgentPool) Annotate(a infer.Annotator) {
+	a.Describe(&AgentPool{}, "Agent Pool for customer managed deployments.")
+	a.SetToken("index", "AgentPool")
 }
 
-type PulumiServiceAgentPoolInput struct {
-	OrgName      string
-	Description  string
-	Name         string
-	ForceDestroy bool
+type AgentPoolInput struct {
+	OrganizationName string `pulumi:"organizationName"     provider:"replaceOnChanges"`
+	Name             string `pulumi:"name"`
+	Description      string `pulumi:"description,optional"`
+	ForceDestroy     bool   `pulumi:"forceDestroy,optional"`
 }
 
-func GenerateAgentPoolProperties(
-	input PulumiServiceAgentPoolInput,
-	agentPool pulumiapi.AgentPool,
-) (outputs *structpb.Struct, inputs *structpb.Struct, err error) {
-	inputMap := resource.PropertyMap{}
-	inputMap["name"] = resource.NewPropertyValue(input.Name)
-	inputMap["organizationName"] = resource.NewPropertyValue(input.OrgName)
-	if input.Description != "" {
-		inputMap["description"] = resource.NewPropertyValue(input.Description)
-	}
-	if input.ForceDestroy {
-		inputMap["forceDestroy"] = resource.NewPropertyValue(input.ForceDestroy)
-	}
-
-	outputMap := resource.PropertyMap{}
-	outputMap["agentPoolID"] = resource.NewPropertyValue(agentPool.ID)
-	outputMap["name"] = inputMap["name"]
-	outputMap["organizationName"] = inputMap["organizationName"]
-	outputMap["tokenValue"] = resource.NewPropertyValue(agentPool.TokenValue)
-	if input.Description != "" {
-		outputMap["description"] = inputMap["description"]
-	}
-	if input.ForceDestroy {
-		outputMap["forceDestroy"] = inputMap["forceDestroy"]
-	}
-
-	inputs, err = plugin.MarshalProperties(inputMap, plugin.MarshalOptions{})
-	if err != nil {
-		return nil, nil, err
-	}
-
-	outputs, err = plugin.MarshalProperties(outputMap, plugin.MarshalOptions{})
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return outputs, inputs, err
-}
-
-func (ap *PulumiServiceAgentPoolResource) ToPulumiServiceAgentPoolInput(
-	inputMap resource.PropertyMap,
-) PulumiServiceAgentPoolInput {
-	input := PulumiServiceAgentPoolInput{}
-
-	if inputMap["name"].HasValue() && inputMap["name"].IsString() {
-		input.Name = inputMap["name"].StringValue()
-	}
-
-	if inputMap["description"].HasValue() && inputMap["description"].IsString() {
-		input.Description = inputMap["description"].StringValue()
-	}
-
-	if inputMap["organizationName"].HasValue() && inputMap["organizationName"].IsString() {
-		input.OrgName = inputMap["organizationName"].StringValue()
-	}
-
-	if inputMap["forceDestroy"].HasValue() && inputMap["forceDestroy"].IsBool() {
-		input.ForceDestroy = inputMap["forceDestroy"].BoolValue()
-	}
-
-	return input
-}
-
-func (ap *PulumiServiceAgentPoolResource) Name() string {
-	return "pulumiservice:index:AgentPool"
-}
-
-func (ap *PulumiServiceAgentPoolResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(
-		req.GetOldInputs(),
-		plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true},
+func (i *AgentPoolInput) Annotate(a infer.Annotator) {
+	a.Describe(&i.OrganizationName, "The organization's name.")
+	a.Describe(&i.Name, "Name of the agent pool.")
+	a.Describe(&i.Description, "Description of the agent pool.")
+	a.Describe(
+		&i.ForceDestroy,
+		"Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.",
 	)
-	if err != nil {
-		return nil, err
-	}
+}
 
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
+type AgentPoolState struct {
+	AgentPoolInput
+	AgentPoolID string `pulumi:"agentPoolId"`
+	TokenValue  string `pulumi:"tokenValue" provider:"secret"`
+}
 
-	diffs := olds.Diff(news)
-	if diffs == nil {
-		return &pulumirpc.DiffResponse{
-			Changes: pulumirpc.DiffResponse_DIFF_NONE,
+func (s *AgentPoolState) Annotate(a infer.Annotator) {
+	a.Describe(&s.AgentPoolID, "The agent pool identifier.")
+	a.Describe(&s.TokenValue, "The agent pool's token's value.")
+}
+
+func (*AgentPool) Create(
+	ctx context.Context,
+	req infer.CreateRequest[AgentPoolInput],
+) (infer.CreateResponse[AgentPoolState], error) {
+	if req.DryRun {
+		return infer.CreateResponse[AgentPoolState]{
+			Output: AgentPoolState{AgentPoolInput: req.Inputs},
 		}, nil
 	}
-
-	dd := plugin.NewDetailedDiffFromObjectDiff(diffs, false)
-
-	detailedDiffs := map[string]*pulumirpc.PropertyDiff{}
-	replaceProperties := map[string]bool{
-		"organizationName": true,
+	pool, err := config.GetClient(ctx).CreateAgentPool(
+		ctx, req.Inputs.OrganizationName, req.Inputs.Name, req.Inputs.Description,
+	)
+	if err != nil {
+		return infer.CreateResponse[AgentPoolState]{}, fmt.Errorf(
+			"error creating agent pool %q: %w", req.Inputs.Name, err,
+		)
 	}
-	for k, v := range dd {
-		if _, ok := replaceProperties[k]; ok {
-			v.Kind = v.Kind.AsReplace()
-		}
-		detailedDiffs[k] = &pulumirpc.PropertyDiff{
-			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind), //nolint:gosec // safe conversion from plugin.DiffKind
-			InputDiff: v.InputDiff,
-		}
-	}
-
-	changes := pulumirpc.DiffResponse_DIFF_NONE
-	if len(detailedDiffs) > 0 {
-		changes = pulumirpc.DiffResponse_DIFF_SOME
-	}
-	return &pulumirpc.DiffResponse{
-		Changes:         changes,
-		DetailedDiff:    detailedDiffs,
-		HasDetailedDiff: true,
+	return infer.CreateResponse[AgentPoolState]{
+		ID: agentPoolResourceID(req.Inputs.OrganizationName, req.Inputs.Name, pool.ID),
+		Output: AgentPoolState{
+			AgentPoolInput: req.Inputs,
+			AgentPoolID:    pool.ID,
+			TokenValue:     pool.TokenValue,
+		},
 	}, nil
 }
 
-func (ap *PulumiServiceAgentPoolResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	ctx := context.Background()
-	inputs, err := plugin.UnmarshalProperties(
-		req.GetProperties(),
-		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	pool := ap.ToPulumiServiceAgentPoolInput(inputs)
-	if err != nil {
-		return nil, err
-	}
-
-	err = ap.deleteAgentPool(ctx, req.Id, pool.ForceDestroy)
-
-	if err != nil {
-		return &pbempty.Empty{}, err
-	}
-
-	return &pbempty.Empty{}, nil
-}
-
-func (ap *PulumiServiceAgentPoolResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
-	ctx := context.Background()
-	inputMap, err := plugin.UnmarshalProperties(
-		req.GetProperties(),
-		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	input := ap.ToPulumiServiceAgentPoolInput(inputMap)
-	agentPool, err := ap.createAgentPool(ctx, input)
-	if err != nil {
-		return nil, fmt.Errorf("error creating agent pool '%s': %s", input.Name, err.Error())
-	}
-
-	outputProperties, _, err := GenerateAgentPoolProperties(input, *agentPool)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.CreateResponse{
-		Id:         input.OrgName + "/" + input.Name + "/" + agentPool.ID,
-		Properties: outputProperties,
-	}, nil
-
-}
-
-func (ap *PulumiServiceAgentPoolResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: nil}, nil
-}
-
-func (ap *PulumiServiceAgentPoolResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	ctx := context.Background()
-
-	// ignore orgName because if that changed, we would have done a replace, so update would never have been called
-	_, _, agentPoolID, err := splitAgentPoolID(req.GetId())
-	if err != nil {
-		return nil, fmt.Errorf("invalid resource id: %v", err)
-	}
-
-	olds, err := plugin.UnmarshalProperties(
-		req.GetOldInputs(),
-		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
-
-	changedInputs := olds
-	changedInputs["name"] = news["name"]
-	changedInputs["description"] = news["description"]
-	changedInputs["forceDestroy"] = news["forceDestroy"]
-
-	inputsAgentPool := ap.ToPulumiServiceAgentPoolInput(changedInputs)
-	err = ap.updateAgentPool(ctx, agentPoolID, inputsAgentPool)
-	if err != nil {
-		return nil, fmt.Errorf("error updating agent pool '%s': %s", inputsAgentPool.Name, err.Error())
-	}
-
-	outputProperties, err := plugin.MarshalProperties(
-		changedInputs,
-		plugin.MarshalOptions{},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.UpdateResponse{
-		Properties: outputProperties,
-	}, nil
-}
-
-func (ap *PulumiServiceAgentPoolResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	ctx := context.Background()
-	urn := req.GetId()
-
-	orgName, _, agentPoolID, err := splitAgentPoolID(urn)
-	if err != nil {
-		return nil, err
-	}
-
-	// the agent id is immutable; if we get nil it got deleted, otherwise all data is the same
-	agentPool, err := ap.Client.GetAgentPool(ctx, agentPoolID, orgName)
-	if err != nil {
-		return nil, err
-	}
-	if agentPool == nil {
-		return &pulumirpc.ReadResponse{}, nil
-	}
-
-	propertyMap, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepSecrets: true})
-	if err != nil {
-		return nil, err
-	}
-	if propertyMap["tokenValue"].HasValue() {
-		agentPool.TokenValue = util.GetSecretOrStringValue(propertyMap["tokenValue"])
-	}
-
-	input := PulumiServiceAgentPoolInput{
-		OrgName:     orgName,
-		Description: agentPool.Description,
-		Name:        agentPool.Name,
-	}
-	outputProperties, inputs, err := GenerateAgentPoolProperties(input, *agentPool)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.ReadResponse{
-		Id:         req.GetId(),
-		Properties: outputProperties,
-		Inputs:     inputs,
-	}, nil
-}
-
-func (ap *PulumiServiceAgentPoolResource) createAgentPool(
+func (*AgentPool) Update(
 	ctx context.Context,
-	input PulumiServiceAgentPoolInput,
-) (*pulumiapi.AgentPool, error) {
-	agentPool, err := ap.Client.CreateAgentPool(ctx, input.OrgName, input.Name, input.Description)
-	if err != nil {
-		return nil, err
+	req infer.UpdateRequest[AgentPoolInput, AgentPoolState],
+) (infer.UpdateResponse[AgentPoolState], error) {
+	if req.DryRun {
+		return infer.UpdateResponse[AgentPoolState]{
+			Output: AgentPoolState{
+				AgentPoolInput: req.Inputs,
+				AgentPoolID:    req.State.AgentPoolID,
+				TokenValue:     req.State.TokenValue,
+			},
+		}, nil
 	}
-
-	return agentPool, nil
+	err := config.GetClient(ctx).UpdateAgentPool(
+		ctx, req.State.AgentPoolID, req.Inputs.OrganizationName, req.Inputs.Name, req.Inputs.Description,
+	)
+	if err != nil {
+		return infer.UpdateResponse[AgentPoolState]{}, fmt.Errorf(
+			"error updating agent pool %q: %w", req.Inputs.Name, err,
+		)
+	}
+	return infer.UpdateResponse[AgentPoolState]{
+		Output: AgentPoolState{
+			AgentPoolInput: req.Inputs,
+			AgentPoolID:    req.State.AgentPoolID,
+			TokenValue:     req.State.TokenValue,
+		},
+	}, nil
 }
 
-func (ap *PulumiServiceAgentPoolResource) updateAgentPool(
+func (*AgentPool) Delete(
 	ctx context.Context,
-	agentPoolID string,
-	input PulumiServiceAgentPoolInput,
-) error {
-	return ap.Client.UpdateAgentPool(ctx, agentPoolID, input.OrgName, input.Name, input.Description)
+	req infer.DeleteRequest[AgentPoolState],
+) (infer.DeleteResponse, error) {
+	return infer.DeleteResponse{}, config.GetClient(ctx).DeleteAgentPool(
+		ctx, req.State.AgentPoolID, req.State.OrganizationName, req.State.ForceDestroy,
+	)
 }
 
-func (ap *PulumiServiceAgentPoolResource) deleteAgentPool(ctx context.Context, id string, forceDestroy bool) error {
-	// we don't need the token name when we delete
-	orgName, _, agentPoolID, err := splitAgentPoolID(id)
+func (*AgentPool) Read(
+	ctx context.Context,
+	req infer.ReadRequest[AgentPoolInput, AgentPoolState],
+) (infer.ReadResponse[AgentPoolInput, AgentPoolState], error) {
+	orgName, _, agentPoolID, err := splitAgentPoolID(req.ID)
 	if err != nil {
-		return err
+		return infer.ReadResponse[AgentPoolInput, AgentPoolState]{}, err
 	}
-	return ap.Client.DeleteAgentPool(ctx, agentPoolID, orgName, forceDestroy)
-
+	pool, err := config.GetClient(ctx).GetAgentPool(ctx, agentPoolID, orgName)
+	if err != nil {
+		return infer.ReadResponse[AgentPoolInput, AgentPoolState]{}, err
+	}
+	if pool == nil {
+		return infer.ReadResponse[AgentPoolInput, AgentPoolState]{}, nil
+	}
+	inputs := AgentPoolInput{
+		OrganizationName: orgName,
+		Name:             pool.Name,
+		Description:      pool.Description,
+		ForceDestroy:     req.State.ForceDestroy,
+	}
+	tokenValue := pool.TokenValue
+	if tokenValue == "" {
+		// The Get-agent-pool API does not return the token value; carry the
+		// existing secret from state so refresh does not erase it.
+		tokenValue = req.State.TokenValue
+	}
+	return infer.ReadResponse[AgentPoolInput, AgentPoolState]{
+		ID:     req.ID,
+		Inputs: inputs,
+		State: AgentPoolState{
+			AgentPoolInput: inputs,
+			AgentPoolID:    agentPoolID,
+			TokenValue:     tokenValue,
+		},
+	}, nil
 }
 
-func splitAgentPoolID(id string) (string, string, string, error) {
-	// format: organization/name/agentPoolID
+// StateMigrations adapts state written by the pre-infer AgentPool resource:
+//   - the legacy framework embedded a "__inputs" outputs property which infer
+//     rejects as an unrecognized field;
+//   - the legacy code wrote the agent pool ID under the key "agentPoolID"
+//     (capital D) even though the schema declared it as "agentPoolId".
+func (*AgentPool) StateMigrations(context.Context) []infer.StateMigrationFunc[AgentPoolState] {
+	return []infer.StateMigrationFunc[AgentPoolState]{
+		infer.StateMigration(migrateAgentPoolLegacyState),
+	}
+}
+
+func migrateAgentPoolLegacyState(
+	_ context.Context, old property.Map,
+) (infer.MigrationResult[AgentPoolState], error) {
+	_, hasLegacyInputs := old.GetOk("__inputs")
+	_, hasMisnamedID := old.GetOk("agentPoolID")
+	if !hasLegacyInputs && !hasMisnamedID {
+		return infer.MigrationResult[AgentPoolState]{}, nil
+	}
+	state := AgentPoolState{}
+	if v, ok := old.GetOk("organizationName"); ok && v.IsString() {
+		state.OrganizationName = v.AsString()
+	}
+	if v, ok := old.GetOk("name"); ok && v.IsString() {
+		state.Name = v.AsString()
+	}
+	if v, ok := old.GetOk("description"); ok && v.IsString() {
+		state.Description = v.AsString()
+	}
+	if v, ok := old.GetOk("forceDestroy"); ok && v.IsBool() {
+		state.ForceDestroy = v.AsBool()
+	}
+	if v, ok := old.GetOk("agentPoolId"); ok && v.IsString() {
+		state.AgentPoolID = v.AsString()
+	} else if v, ok := old.GetOk("agentPoolID"); ok && v.IsString() {
+		state.AgentPoolID = v.AsString()
+	}
+	if v, ok := old.GetOk("tokenValue"); ok && v.IsString() {
+		state.TokenValue = v.AsString()
+	}
+	return infer.MigrationResult[AgentPoolState]{Result: &state}, nil
+}
+
+func agentPoolResourceID(orgName, name, agentPoolID string) string {
+	return fmt.Sprintf("%s/%s/%s", orgName, name, agentPoolID)
+}
+
+func splitAgentPoolID(id string) (orgName, name, agentPoolID string, err error) {
 	s := strings.Split(id, "/")
 	if len(s) != 3 {
-		return "", "", "", fmt.Errorf("%q is invalid, must be in the format: organization/name/agentPoolID", id)
+		return "", "", "", fmt.Errorf(
+			"%q is invalid, must be in the format: organization/name/agentPoolID", id,
+		)
 	}
 	return s[0], s[1], s[2], nil
 }
