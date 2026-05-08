@@ -12,7 +12,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-// A source for Pulumi templates
+// A source for Pulumi templates.
 type TemplateSource struct {
 	pulumi.CustomResourceState
 
@@ -42,6 +42,10 @@ func NewTemplateSource(ctx *pulumi.Context,
 	if args.SourceURL == nil {
 		return nil, errors.New("invalid value for required argument 'SourceURL'")
 	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"organizationName",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource TemplateSource
 	err := ctx.RegisterResource("pulumiservice:index:TemplateSource", name, args, &resource, opts...)
