@@ -8,6 +8,8 @@ import com.pulumi.core.annotations.Import;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
 import java.lang.String;
 import java.util.Objects;
+import java.util.Optional;
+import javax.annotation.Nullable;
 
 
 public final class EnvironmentArgs extends com.pulumi.resources.ResourceArgs {
@@ -74,6 +76,21 @@ public final class EnvironmentArgs extends com.pulumi.resources.ResourceArgs {
         return this.project;
     }
 
+    /**
+     * Raw YAML body content.
+     * 
+     */
+    @Import(name="yaml")
+    private @Nullable Output<String> yaml;
+
+    /**
+     * @return Raw YAML body content.
+     * 
+     */
+    public Optional<Output<String>> yaml() {
+        return Optional.ofNullable(this.yaml);
+    }
+
     private EnvironmentArgs() {}
 
     private EnvironmentArgs(EnvironmentArgs $) {
@@ -81,6 +98,7 @@ public final class EnvironmentArgs extends com.pulumi.resources.ResourceArgs {
         this.name = $.name;
         this.orgName = $.orgName;
         this.project = $.project;
+        this.yaml = $.yaml;
     }
 
     public static Builder builder() {
@@ -183,6 +201,27 @@ public final class EnvironmentArgs extends com.pulumi.resources.ResourceArgs {
          */
         public Builder project(String project) {
             return project(Output.of(project));
+        }
+
+        /**
+         * @param yaml Raw YAML body content.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder yaml(@Nullable Output<String> yaml) {
+            $.yaml = yaml;
+            return this;
+        }
+
+        /**
+         * @param yaml Raw YAML body content.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder yaml(String yaml) {
+            return yaml(Output.of(yaml));
         }
 
         public EnvironmentArgs build() {

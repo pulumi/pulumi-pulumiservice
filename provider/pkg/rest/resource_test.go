@@ -301,6 +301,104 @@ func TestCreateSynthesizesID(t *testing.T) {
 	}
 }
 
+// TestCreateFusesYamlUpdateAfterJsonCreate verifies the ESC-shaped pattern:
+// Create takes a JSON body (project+name) and Update takes raw yaml. When
+// the user supplies a yaml input on Create, the dispatch should fire create
+// then a follow-up update with the yaml as request body.
+func TestCreateFusesYamlUpdateAfterJsonCreate(t *testing.T) {
+	const specJSON = `{
+	  "openapi": "3.0.0",
+	  "components": {"schemas": {
+	    "CreateBody": {"type": "object", "properties": {"project": {"type": "string"}, "name": {"type": "string"}}}
+	  }},
+	  "paths": {
+	    "/envs/{org}": {
+	      "post": {
+	        "operationId": "CreateEnv",
+	        "parameters": [{"name": "org", "in": "path", "required": true, "schema": {"type": "string"}}],
+	        "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/CreateBody"}}}},
+	        "responses": {"200": {"description": "OK"}}
+	      }
+	    },
+	    "/envs/{org}/{project}/{name}": {
+	      "patch": {
+	        "operationId": "UpdateEnv",
+	        "parameters": [
+	          {"name": "org",     "in": "path", "required": true, "schema": {"type": "string"}},
+	          {"name": "project", "in": "path", "required": true, "schema": {"type": "string"}},
+	          {"name": "name",    "in": "path", "required": true, "schema": {"type": "string"}}
+	        ],
+	        "requestBody": {"content": {"application/x-yaml": {"schema": {"type": "string"}}}},
+	        "responses": {"204": {"description": "no content"}}
+	      }
+	    }
+	  }
+	}`
+	spec, _ := ParseSpec([]byte(specJSON))
+	r := &Resource{
+		spec: spec,
+		meta: ResourceMeta{
+			Operations: Operations{Create: "CreateEnv", Update: "UpdateEnv"},
+			IDFormat:   "{org}/{project}/{name}",
+		},
+	}
+
+	type captured struct {
+		method      string
+		path        string
+		contentType string
+		body        string
+	}
+	var seen []captured
+	mock := &mockTransport{
+		responseFn: func(req *http.Request) mockResponse {
+			b, _ := io.ReadAll(req.Body)
+			seen = append(seen, captured{
+				method:      req.Method,
+				path:        req.URL.Path,
+				contentType: req.Header.Get("Content-Type"),
+				body:        string(b),
+			})
+			return mockResponse{status: 200, body: ""}
+		},
+	}
+	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+
+	yamlBody := "values:\n  bootstrap:\n    appVersion: 1.0.0\n"
+	// Secret-wrapped yaml mirrors what the SDK sends — codegen wraps the
+	// input via pulumi.secret(...) when the schema marks the field Secret.
+	yamlVal := property.New(yamlBody).WithSecret(true)
+	inputs := property.NewMap(map[string]property.Value{
+		"org":     property.New("acme"),
+		"project": property.New("default"),
+		"name":    property.New("platform-bootstrap"),
+		"yaml":    yamlVal,
+	})
+	_, err := r.Create(context.Background(), p.CreateRequest{Properties: inputs})
+	if err != nil {
+		t.Fatalf("create: %v\n  calls: %v", err, mock.calls)
+	}
+
+	if len(seen) != 2 {
+		t.Fatalf("expected 2 HTTP calls (create + yaml apply), got %d: %#v", len(seen), seen)
+	}
+	if seen[0].method != "POST" || seen[0].path != "/envs/acme" {
+		t.Errorf("first call: got %s %s, want POST /envs/acme", seen[0].method, seen[0].path)
+	}
+	if seen[0].contentType != "application/json" {
+		t.Errorf("first call content-type: got %q, want application/json", seen[0].contentType)
+	}
+	if seen[1].method != "PATCH" || seen[1].path != "/envs/acme/default/platform-bootstrap" {
+		t.Errorf("second call: got %s %s, want PATCH /envs/acme/default/platform-bootstrap", seen[1].method, seen[1].path)
+	}
+	if seen[1].contentType != "application/x-yaml" {
+		t.Errorf("second call content-type: got %q, want application/x-yaml", seen[1].contentType)
+	}
+	if seen[1].body != yamlBody {
+		t.Errorf("second call body:\ngot:  %q\nwant: %q", seen[1].body, yamlBody)
+	}
+}
+
 // TestCreateReadAfterCreateSourcesFromInputs confirms that the read-after-
 // create URL is built from the user inputs (req.Properties), not from the
 // (potentially sparse) create response. This is what lets Phase D drop path

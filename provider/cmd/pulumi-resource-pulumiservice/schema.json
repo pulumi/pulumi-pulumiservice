@@ -3732,6 +3732,11 @@
           "description": "The project name for the environment.",
           "replaceOnChanges": true,
           "willReplaceOnChanges": true
+        },
+        "yaml": {
+          "type": "string",
+          "description": "Raw YAML body content.",
+          "secret": true
         }
       },
       "requiredInputs": [
@@ -4316,6 +4321,11 @@
         "project": {
           "type": "string",
           "description": "The project name for the environment."
+        },
+        "yaml": {
+          "type": "string",
+          "description": "Raw YAML body content.",
+          "secret": true
         }
       },
       "requiredInputs": [

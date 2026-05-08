@@ -21,17 +21,21 @@ class EnvironmentArgs:
     def __init__(__self__, *,
                  name: pulumi.Input[_builtins.str],
                  org_name: pulumi.Input[_builtins.str],
-                 project: pulumi.Input[_builtins.str]):
+                 project: pulumi.Input[_builtins.str],
+                 yaml: Optional[pulumi.Input[_builtins.str]] = None):
         """
         The set of arguments for constructing a Environment resource.
 
         :param pulumi.Input[_builtins.str] name: The name of the environment.
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] project: The project name for the environment.
+        :param pulumi.Input[_builtins.str] yaml: Raw YAML body content.
         """
         pulumi.set(__self__, "name", name)
         pulumi.set(__self__, "org_name", org_name)
         pulumi.set(__self__, "project", project)
+        if yaml is not None:
+            pulumi.set(__self__, "yaml", yaml)
 
     @_builtins.property
     @pulumi.getter
@@ -69,6 +73,18 @@ class EnvironmentArgs:
     def project(self, value: pulumi.Input[_builtins.str]):
         pulumi.set(self, "project", value)
 
+    @_builtins.property
+    @pulumi.getter
+    def yaml(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Raw YAML body content.
+        """
+        return pulumi.get(self, "yaml")
+
+    @yaml.setter
+    def yaml(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "yaml", value)
+
 
 @pulumi.type_token("pulumiservice:v2/esc:Environment")
 class Environment(pulumi.CustomResource):
@@ -79,6 +95,7 @@ class Environment(pulumi.CustomResource):
                  name: Optional[pulumi.Input[_builtins.str]] = None,
                  org_name: Optional[pulumi.Input[_builtins.str]] = None,
                  project: Optional[pulumi.Input[_builtins.str]] = None,
+                 yaml: Optional[pulumi.Input[_builtins.str]] = None,
                  __props__=None):
         """
         Creates a new Pulumi ESC (Environments, Secrets, and Configuration) environment within the specified organization. The request body must include the project name and the environment name. Environment names must be unique within a project and may only contain alphanumeric characters, hyphens, underscores, and periods. The newly created environment starts with an empty YAML definition that can be updated via the UpdateEnvironment endpoint.
@@ -89,6 +106,7 @@ class Environment(pulumi.CustomResource):
         :param pulumi.Input[_builtins.str] name: The name of the environment.
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] project: The project name for the environment.
+        :param pulumi.Input[_builtins.str] yaml: Raw YAML body content.
         """
         ...
     @overload
@@ -118,6 +136,7 @@ class Environment(pulumi.CustomResource):
                  name: Optional[pulumi.Input[_builtins.str]] = None,
                  org_name: Optional[pulumi.Input[_builtins.str]] = None,
                  project: Optional[pulumi.Input[_builtins.str]] = None,
+                 yaml: Optional[pulumi.Input[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
@@ -136,6 +155,7 @@ class Environment(pulumi.CustomResource):
             if project is None and not opts.urn:
                 raise TypeError("Missing required property 'project'")
             __props__.__dict__["project"] = project
+            __props__.__dict__["yaml"] = None if yaml is None else pulumi.Output.secret(yaml)
         super(Environment, __self__).__init__(
             'pulumiservice:v2/esc:Environment',
             resource_name,

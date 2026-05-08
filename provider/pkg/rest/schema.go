@@ -129,6 +129,22 @@ func buildResource(spec *Spec, _ *Metadata, _ string, rm ResourceMeta) (*schema.
 		}
 	}
 
+	// Yaml-body fusion: when the create or update op accepts an
+	// application/x-yaml body, expose a single string input field named
+	// "yaml" that carries the raw YAML payload. The dispatch sends it as the
+	// request body with Content-Type: application/x-yaml.
+	if hasYamlBody(create) || hasYamlBody(opOrNil(spec, rm.Operations.Update)) {
+		if _, exists := inputs["yaml"]; !exists {
+			ps := schema.PropertySpec{
+				TypeSpec:    schema.TypeSpec{Type: "string"},
+				Description: "Raw YAML body content.",
+				Secret:      true,
+			}
+			applyFieldMeta(&ps, rm.Fields["yaml"], false)
+			inputs["yaml"] = ps
+		}
+	}
+
 	// Outputs come from the read op's response schema (read is the source of
 	// truth for State); fall back to create's response if read has none.
 	outputs, requiredOutputs, err := operationOutputs(spec, read, rm)
@@ -182,6 +198,21 @@ func buildResource(spec *Spec, _ *Metadata, _ string, rm ResourceMeta) (*schema.
 		rs.Aliases = append(rs.Aliases, schema.AliasSpec{Type: alias})
 	}
 	return rs, nil
+}
+
+// hasYamlBody reports whether op declares an application/x-yaml request body.
+func hasYamlBody(op *Operation) bool {
+	return op != nil && op.RequestContentType == "application/x-yaml"
+}
+
+// opOrNil resolves an operationId to an Operation, returning nil when the id
+// is empty or absent from the spec.
+func opOrNil(spec *Spec, id string) *Operation {
+	if id == "" {
+		return nil
+	}
+	op, _ := spec.Op(id)
+	return op
 }
 
 // operationInputs builds the input PropertySpec map for a create operation:

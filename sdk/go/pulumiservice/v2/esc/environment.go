@@ -33,6 +33,9 @@ func NewEnvironment(ctx *pulumi.Context,
 	if args.Project == nil {
 		return nil, errors.New("invalid value for required argument 'Project'")
 	}
+	if args.Yaml != nil {
+		args.Yaml = pulumi.ToSecret(args.Yaml).(pulumi.StringPtrInput)
+	}
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Environment
 	err := ctx.RegisterResource("pulumiservice:v2/esc:Environment", name, args, &resource, opts...)
@@ -72,6 +75,8 @@ type environmentArgs struct {
 	OrgName string `pulumi:"orgName"`
 	// The project name for the environment.
 	Project string `pulumi:"project"`
+	// Raw YAML body content.
+	Yaml *string `pulumi:"yaml"`
 }
 
 // The set of arguments for constructing a Environment resource.
@@ -82,6 +87,8 @@ type EnvironmentArgs struct {
 	OrgName pulumi.StringInput
 	// The project name for the environment.
 	Project pulumi.StringInput
+	// Raw YAML body content.
+	Yaml pulumi.StringPtrInput
 }
 
 func (EnvironmentArgs) ElementType() reflect.Type {

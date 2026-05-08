@@ -17,35 +17,25 @@ const ownerTeam = new ps.v2.teams.Team("ownerTeam", {
     description: "Owner team for the service catalog demo.",
 });
 
-// === Default org for the demo runner (NEW in v2) ===
-// Per-user preference: every user who runs `pulumi up` lands on this org
-// when they next open pulumi.com.
-const defaultOrg = new ps.v2.DefaultOrganization("defaultOrg", {
-    orgName: serviceOrg,
-});
-
 const stacks = {
-    checkout: new ps.Stack("checkoutStack", {
-        organizationName: serviceOrg,
+    checkout: new ps.v2.stacks.Stack("checkoutStack", {
+        orgName: serviceOrg,
         projectName,
         stackName: "checkout-prod",
-        forceDestroy: true,
     }),
-    search: new ps.Stack("searchStack", {
-        organizationName: serviceOrg,
+    search: new ps.v2.stacks.Stack("searchStack", {
+        orgName: serviceOrg,
         projectName,
         stackName: "search-prod",
-        forceDestroy: true,
     }),
-    notification: new ps.Stack("notificationStack", {
-        organizationName: serviceOrg,
+    notification: new ps.v2.stacks.Stack("notificationStack", {
+        orgName: serviceOrg,
         projectName,
         stackName: "notification-prod",
-        forceDestroy: true,
     }),
 };
 
-const checkoutService = new ps.v2.services.Service("checkoutService", {
+new ps.v2.services.Service("checkoutService", {
     orgName: serviceOrg,
     name: `checkout-api-${nameSuffix}`,
     description: "Customer-facing checkout REST API. Handles cart submission, payment authorization, and order placement. SLO 99.95% / p99 250ms.",
@@ -62,7 +52,7 @@ const checkoutService = new ps.v2.services.Service("checkoutService", {
     ],
 });
 
-const searchService = new ps.v2.services.Service("searchService", {
+new ps.v2.services.Service("searchService", {
     orgName: serviceOrg,
     name: `search-frontend-${nameSuffix}`,
     description: "Search results UI surface. Owns the search experience across web and mobile clients.",
@@ -79,7 +69,7 @@ const searchService = new ps.v2.services.Service("searchService", {
     ],
 });
 
-const notificationService = new ps.v2.services.Service("notificationService", {
+new ps.v2.services.Service("notificationService", {
     orgName: serviceOrg,
     name: `notification-worker-${nameSuffix}`,
     description: "Async fan-out worker for email, SMS, and push notifications. Consumes events from the platform event bus.",
@@ -116,44 +106,53 @@ const webhook = new ps.v2.OrganizationWebhook("webhook", {
 });
 
 // === ESC environment + schedule + revision tag ===
-// We use the v1 Environment because v2/esc:Environment takes no `yaml`
-// input — it would create an empty env with no revisions.
-const env = new ps.Environment("bootstrapEnv", {
-    organization: serviceOrg,
+// `yaml` is a synthesized input surfaced by the v2 dispatch when an op
+// declares an application/x-yaml request body. On Create, the dispatch
+// fires the JSON CreateEnvironment op then PATCH-es the yaml via Update.
+const env = new ps.v2.esc.Environment("bootstrapEnv", {
+    orgName: serviceOrg,
     project: envProject,
     name: envName,
-    yaml: new pulumi.asset.StringAsset(
-        [
-            "values:",
-            "  bootstrap:",
-            "    appVersion: 1.0.0",
-            "    region: us-west-2",
-        ].join("\n") + "\n",
-    ),
+    yaml: [
+        "values:",
+        "  bootstrap:",
+        "    appVersion: 1.0.0",
+        "    region: us-west-2",
+    ].join("\n") + "\n",
 });
 
 // Daily secret rotation schedule. Despite the generic name, v2's
 // EnvironmentSchedule is a secret-rotation schedule — it requires
 // `secretRotationRequest`. Empty `environmentPath` means rotate every
 // rotated secret in the env (none here, but the schedule still installs).
+// envName is the literal string (v2 esc Environment surfaces no `name`
+// output); `dependsOn` preserves the create-before-schedule ordering.
 const envSchedule = new ps.v2.esc.EnvironmentSchedule("envSchedule", {
     orgName: serviceOrg,
     projectName: envProject,
-    envName: env.name,
+    envName: envName,
     scheduleCron: "0 9 * * *",
     secretRotationRequest: { environmentPath: "" },
-});
+}, { dependsOn: [env] });
 
-// NOTE: `v2/esc:RevisionTag` was tried but its v2 metadata maps Create →
-// UpdateRevisionTag (PATCH /tags/{name}), which returns 404 on a new tag.
-// Provider bug — needs Create → POST. Dropped pending a fix.
+// const customRoleID = "";
+
+// const customRole = new ps.v2.Role("customRole", {
+//     orgName: serviceOrg,
+//     roleID: customRoleID,
+// }, { import: `${serviceOrg}/${customRoleID}` });
+
+// new ps.v2.teams.Role("customRoleAssignment", {
+//     orgName: serviceOrg,
+//     teamName: ownerTeam.name,
+//     roleID: customRoleID,
+// }, {
+//     import: `${serviceOrg}/catalog-owner-${nameSuffix}/${customRoleID}`,
+//     dependsOn: [customRole],
+// });
 
 export const ownerTeamName = ownerTeam.name;
-export const defaultOrgName = defaultOrg.orgName;
-export const checkoutServiceName = checkoutService.name;
-export const searchServiceName = searchService.name;
-export const notificationServiceName = notificationService.name;
 export const templateCollectionName = templates.name;
 export const webhookName = webhook.name;
-export const bootstrapEnvName = env.name;
+export const bootstrapEnvName = env.id;
 export const envScheduleCron = envSchedule.scheduleCron;

@@ -77,6 +77,22 @@ namespace Pulumi.PulumiService.V2.Esc
         [Input("project", required: true)]
         public Input<string> Project { get; set; } = null!;
 
+        [Input("yaml")]
+        private Input<string>? _yaml;
+
+        /// <summary>
+        /// Raw YAML body content.
+        /// </summary>
+        public Input<string>? Yaml
+        {
+            get => _yaml;
+            set
+            {
+                var emptySecret = Output.CreateSecret(0);
+                _yaml = Output.Tuple<Input<string>?, int>(value, emptySecret).Apply(t => t.Item1);
+            }
+        }
+
         public EnvironmentArgs()
         {
         }

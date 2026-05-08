@@ -437,6 +437,67 @@ func TestBuildResourceRejectsPathParamsWithoutIDFormat(t *testing.T) {
 	}
 }
 
+// TestBuildResourceSurfacesYamlBody covers the ESC-shaped pattern: create
+// takes a structured JSON body (project+name) and update takes a raw yaml
+// body. The dispatch should expose a single string "yaml" input on the
+// resource and let users supply the body through that field.
+func TestBuildResourceSurfacesYamlBody(t *testing.T) {
+	const specJSON = `{
+	  "openapi": "3.0.0",
+	  "components": {"schemas": {
+	    "CreateBody": {"type": "object", "properties": {"project": {"type": "string"}, "name": {"type": "string"}}}
+	  }},
+	  "paths": {
+	    "/things/{org}": {
+	      "post": {
+	        "operationId": "CreateThing",
+	        "parameters": [{"name": "org", "in": "path", "required": true, "schema": {"type": "string"}}],
+	        "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/CreateBody"}}}},
+	        "responses": {"200": {"description": "OK"}}
+	      }
+	    },
+	    "/things/{org}/{project}/{name}": {
+	      "patch": {
+	        "operationId": "UpdateThing",
+	        "parameters": [
+	          {"name": "org",     "in": "path", "required": true, "schema": {"type": "string"}},
+	          {"name": "project", "in": "path", "required": true, "schema": {"type": "string"}},
+	          {"name": "name",    "in": "path", "required": true, "schema": {"type": "string"}}
+	        ],
+	        "requestBody": {"content": {"application/x-yaml": {"schema": {"type": "string"}}}},
+	        "responses": {"204": {"description": "no content"}}
+	      }
+	    }
+	  }
+	}`
+	spec, err := ParseSpec([]byte(specJSON))
+	if err != nil {
+		t.Fatalf("spec: %v", err)
+	}
+	rm := ResourceMeta{
+		Operations: Operations{Create: "CreateThing", Update: "UpdateThing"},
+		IDFormat:   "{org}/{project}/{name}",
+	}
+	rs, err := buildResource(spec, nil, "test:index:Thing", rm)
+	if err != nil {
+		t.Fatalf("build: %v", err)
+	}
+	yaml, ok := rs.InputProperties["yaml"]
+	if !ok {
+		var got []string
+		for k := range rs.InputProperties {
+			got = append(got, k)
+		}
+		t.Fatalf("expected synthesized 'yaml' input field, got inputs: %v", got)
+	}
+	if yaml.Type != "string" {
+		t.Errorf("yaml input type: got %q, want string", yaml.Type)
+	}
+	if !yaml.Secret {
+		t.Errorf("yaml input should default to Secret=true")
+	}
+}
+
 // TestBuildResourceAcceptsResourceWithoutPathParams covers the other side of
 // the validation: a resource whose operations have no path params shouldn't
 // require idFormat.

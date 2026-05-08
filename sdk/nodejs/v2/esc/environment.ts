@@ -58,6 +58,7 @@ export class Environment extends pulumi.CustomResource {
             resourceInputs["name"] = args?.name;
             resourceInputs["orgName"] = args?.orgName;
             resourceInputs["project"] = args?.project;
+            resourceInputs["yaml"] = args?.yaml ? pulumi.secret(args.yaml) : undefined;
         } else {
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
@@ -81,4 +82,8 @@ export interface EnvironmentArgs {
      * The project name for the environment.
      */
     project: pulumi.Input<string>;
+    /**
+     * Raw YAML body content.
+     */
+    yaml?: pulumi.Input<string>;
 }

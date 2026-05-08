@@ -369,6 +369,17 @@ func (r *Resource) Create(ctx context.Context, req p.CreateRequest) (p.CreateRes
 	if err != nil {
 		return p.CreateResponse{}, err
 	}
+	if updOp, _ := r.resolveOp("update", r.meta.Operations.Update); updOp != nil &&
+		updOp.RequestContentType == "application/x-yaml" &&
+		op.RequestContentType != "application/x-yaml" {
+		if v, ok := req.Properties.GetOk("yaml"); ok && v.IsString() && v.AsString() != "" {
+			_, updState, err := r.execAndDecode(ctx, updOp, req.Properties)
+			if err != nil {
+				return p.CreateResponse{}, fmt.Errorf("create: post-create yaml apply: %w", err)
+			}
+			state = mergeMaps(updState, state)
+		}
+	}
 	// Read-after-create must source path-parameter values from the inputs
 	// (req.Properties), not from state — most Pulumi Cloud create endpoints
 	// return sparse bodies (e.g. `{}`), so state alone won't carry path params
@@ -680,20 +691,33 @@ func (r *Resource) execAndDecode(ctx context.Context, op *Operation, inputs prop
 	}
 
 	var body io.Reader
+	contentType := ""
 	if needsBody(op.Method) {
-		bodyJSON, err := json.Marshal(propertyMapToAny(inputs))
-		if err != nil {
-			return nil, property.Map{}, fmt.Errorf("rest: marshal request body for %s: %w", op.ID, err)
+		switch op.RequestContentType {
+		case "application/x-yaml":
+			// Raw-string body sourced from the conventional "yaml" input.
+			// Absent / null yaml leaves the body empty (no-op for upsert-style
+			// yaml endpoints).
+			if v, ok := inputs.GetOk("yaml"); ok && v.IsString() {
+				body = strings.NewReader(v.AsString())
+				contentType = "application/x-yaml"
+			}
+		default:
+			bodyJSON, err := json.Marshal(propertyMapToAny(inputs))
+			if err != nil {
+				return nil, property.Map{}, fmt.Errorf("rest: marshal request body for %s: %w", op.ID, err)
+			}
+			body = bytes.NewReader(bodyJSON)
+			contentType = "application/json"
 		}
-		body = bytes.NewReader(bodyJSON)
 	}
 
 	httpReq, err := http.NewRequestWithContext(ctx, op.Method, url, body)
 	if err != nil {
 		return nil, property.Map{}, fmt.Errorf("rest: build HTTP request for %s: %w", op.ID, err)
 	}
-	if body != nil {
-		httpReq.Header.Set("Content-Type", "application/json")
+	if body != nil && contentType != "" {
+		httpReq.Header.Set("Content-Type", contentType)
 	}
 	httpReq.Header.Set("Accept", "application/json")
 

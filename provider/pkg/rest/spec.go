@@ -22,15 +22,17 @@ import (
 
 // Operation is the subset of an OpenAPI operation needed at runtime.
 type Operation struct {
-	ID         string
-	Path       string
-	Method     string
-	Parameters []Parameter
-	RequestRef string         // $ref into components.schemas, if the body is a $ref
-	ResponseRef string        // $ref of the 2xx response body, if any
-	Description string
-	Deprecated bool           // true when the upstream spec marks this op deprecated
-	Raw        map[string]any // entire operation object, for callers that need fields we don't model
+	ID                  string
+	Path                string
+	Method              string
+	Parameters          []Parameter
+	RequestRef          string // $ref into components.schemas, set only for application/json bodies with a $ref schema
+	RequestContentType  string // wire content type of the request body, if any (e.g. "application/json", "application/x-yaml")
+	ResponseRef         string // $ref of the 2xx response body, set only for application/json responses with a $ref schema
+	ResponseContentType string // wire content type of the chosen 2xx response, if any
+	Description         string
+	Deprecated          bool           // true when the upstream spec marks this op deprecated
+	Raw                 map[string]any // entire operation object, for callers that need fields we don't model
 }
 
 // Parameter is the subset of an OpenAPI parameter needed at runtime.
@@ -172,15 +174,33 @@ func parseOperation(id, path, method string, raw map[string]any) *Operation {
 		}
 	}
 	if rb, ok := raw["requestBody"].(map[string]any); ok {
-		op.RequestRef = jsonContentRef(rb)
+		if ref := jsonContentRef(rb); ref != "" {
+			op.RequestRef = ref
+			op.RequestContentType = "application/json"
+		} else if bodySchema(rb, "application/x-yaml") != nil {
+			op.RequestContentType = "application/x-yaml"
+		}
 	}
 	if resps, ok := raw["responses"].(map[string]any); ok {
-		// Pick the first 2xx response with a JSON content body.
+		// Pick the first 2xx with a JSON $ref body, preserving the
+		// existing JSON-first preference. Fall back to application/x-yaml
+		// only when no JSON body is found at any 2xx code.
 		for _, code := range []string{"200", "201", "202", "204"} {
 			if r, ok := resps[code].(map[string]any); ok {
 				if ref := jsonContentRef(r); ref != "" {
 					op.ResponseRef = ref
+					op.ResponseContentType = "application/json"
 					break
+				}
+			}
+		}
+		if op.ResponseContentType == "" {
+			for _, code := range []string{"200", "201", "202", "204"} {
+				if r, ok := resps[code].(map[string]any); ok {
+					if bodySchema(r, "application/x-yaml") != nil {
+						op.ResponseContentType = "application/x-yaml"
+						break
+					}
 				}
 			}
 		}
@@ -189,22 +209,30 @@ func parseOperation(id, path, method string, raw map[string]any) *Operation {
 }
 
 // jsonContentRef extracts content["application/json"].schema.$ref from a
-// requestBody or response object.
+// requestBody or response object. Returns "" when the body is not JSON or
+// has an inline (non-$ref) schema.
 func jsonContentRef(o map[string]any) string {
-	content, ok := o["content"].(map[string]any)
-	if !ok {
-		return ""
-	}
-	js, ok := content["application/json"].(map[string]any)
-	if !ok {
-		return ""
-	}
-	sch, ok := js["schema"].(map[string]any)
-	if !ok {
+	sch := bodySchema(o, "application/json")
+	if sch == nil {
 		return ""
 	}
 	ref, _ := sch["$ref"].(string)
 	return ref
+}
+
+// bodySchema returns the schema object for the given content type from a
+// requestBody or response object, or nil if absent.
+func bodySchema(o map[string]any, contentType string) map[string]any {
+	content, ok := o["content"].(map[string]any)
+	if !ok {
+		return nil
+	}
+	entry, ok := content[contentType].(map[string]any)
+	if !ok {
+		return nil
+	}
+	sch, _ := entry["schema"].(map[string]any)
+	return sch
 }
 
 func isHTTPMethod(m string) bool {
