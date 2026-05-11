@@ -85,17 +85,12 @@ new ps.v2.services.Service("notificationService", {
     ],
 });
 
-// === Curated template gallery (NEW in v2) ===
-// Visible to every org member in the "New Project" UI immediately.
 const templates = new ps.v2.OrgTemplateCollection("templates", {
     orgName: serviceOrg,
     name: `platform-templates-${nameSuffix}`,
     sourceURL: "https://github.com/pulumi/templates.git",
 });
 
-// === Org-wide notification webhook (NEW in v2) ===
-// v1's `Webhook` was monolithic; v2 splits webhooks into typed,
-// scope-specific resources. Placeholder URL — the API doesn't ping it.
 const webhook = new ps.v2.OrganizationWebhook("webhook", {
     organizationName: serviceOrg,
     name: `bootstrap-webhook-${nameSuffix}`,
@@ -105,10 +100,6 @@ const webhook = new ps.v2.OrganizationWebhook("webhook", {
     format: "raw",
 });
 
-// === ESC environment + schedule + revision tag ===
-// `yaml` is a synthesized input surfaced by the v2 dispatch when an op
-// declares an application/x-yaml request body. On Create, the dispatch
-// fires the JSON CreateEnvironment op then PATCH-es the yaml via Update.
 const env = new ps.v2.esc.Environment("bootstrapEnv", {
     orgName: serviceOrg,
     project: envProject,
