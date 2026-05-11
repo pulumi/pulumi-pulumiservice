@@ -26,8 +26,10 @@ import (
 // GetEnvironmentFunction looks up an existing ESC environment by
 // (organization, project, name) and returns its UUID. Useful when the
 // environment is managed outside Pulumi (or in a different stack) and the
-// caller needs its `environmentId` to pin a custom RBAC role to it via
-// a `literalEnvironment` expression's `identity` field.
+// caller needs its `environmentId` to scope a custom RBAC role to it
+// (typically via the `buildEnvironmentScopedPermissions` helper, or a
+// hand-rolled `PermissionLiteralExpressionEnvironment` in
+// `OrganizationRole.permissions`).
 type GetEnvironmentFunction struct{}
 
 type GetEnvironmentInput struct {
@@ -46,9 +48,11 @@ type GetEnvironmentOutput struct {
 func (GetEnvironmentFunction) Annotate(a infer.Annotator) {
 	a.Describe(
 		&GetEnvironmentFunction{},
-		"Looks up an existing ESC environment by name and returns its UUID. Use this to pin a custom "+
-			"RBAC role to a specific environment via a `literalEnvironment` expression when the "+
-			"environment is not managed by the current Pulumi program. Errors when the environment is not found.",
+		"Looks up an existing ESC environment by name and returns its UUID. Use this to scope a custom "+
+			"RBAC role to a specific environment — pass the returned UUID into "+
+			"`buildEnvironmentScopedPermissions`, or use it as the `identity` field of a "+
+			"hand-rolled `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`. "+
+			"Errors when the environment is not found.",
 	)
 	a.SetToken("index", "getEnvironment")
 }
@@ -65,8 +69,9 @@ func (o *GetEnvironmentOutput) Annotate(a infer.Annotator) {
 	a.Describe(&o.Name, "The environment name.")
 	a.Describe(
 		&o.EnvironmentID,
-		"The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this "+
-			"environment via a `literalEnvironment` expression.",
+		"The environment's UUID. Pass it to `buildEnvironmentScopedPermissions` (preferred) or use it "+
+			"as the `identity` field of a hand-rolled `PermissionLiteralExpressionEnvironment` in "+
+			"`OrganizationRole.permissions`.",
 	)
 }
 

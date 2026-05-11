@@ -16,7 +16,7 @@ import (
 type Environment struct {
 	pulumi.CustomResourceState
 
-	// The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `literalEnvironment` expression in `OrganizationRole.permissions`.
+	// The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`, or pass it directly to the `buildEnvironmentScopedPermissions` helper.
 	EnvironmentId pulumi.StringPtrOutput `pulumi:"environmentId"`
 	// Environment name.
 	Name pulumi.StringOutput `pulumi:"name"`
@@ -191,7 +191,7 @@ func (o EnvironmentOutput) ToEnvironmentOutputWithContext(ctx context.Context) E
 	return o
 }
 
-// The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `literalEnvironment` expression in `OrganizationRole.permissions`.
+// The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`, or pass it directly to the `buildEnvironmentScopedPermissions` helper.
 func (o EnvironmentOutput) EnvironmentId() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *Environment) pulumi.StringPtrOutput { return v.EnvironmentId }).(pulumi.StringPtrOutput)
 }

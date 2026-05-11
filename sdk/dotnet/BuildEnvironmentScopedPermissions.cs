@@ -12,19 +12,19 @@ namespace Pulumi.PulumiService
     public static class BuildEnvironmentScopedPermissions
     {
         /// <summary>
-        /// Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `on:` modifier yourself. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `group` whose `entries` list pulls the output of each helper.
+        /// Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `PermissionDescriptorCondition` tree yourself. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
         /// </summary>
         public static Task<BuildEnvironmentScopedPermissionsResult> InvokeAsync(BuildEnvironmentScopedPermissionsArgs args, InvokeOptions? options = null)
             => global::Pulumi.Deployment.Instance.InvokeAsync<BuildEnvironmentScopedPermissionsResult>("pulumiservice:index:buildEnvironmentScopedPermissions", args ?? new BuildEnvironmentScopedPermissionsArgs(), options.WithDefaults());
 
         /// <summary>
-        /// Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `on:` modifier yourself. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `group` whose `entries` list pulls the output of each helper.
+        /// Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `PermissionDescriptorCondition` tree yourself. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
         /// </summary>
         public static Output<BuildEnvironmentScopedPermissionsResult> Invoke(BuildEnvironmentScopedPermissionsInvokeArgs args, InvokeOptions? options = null)
             => global::Pulumi.Deployment.Instance.Invoke<BuildEnvironmentScopedPermissionsResult>("pulumiservice:index:buildEnvironmentScopedPermissions", args ?? new BuildEnvironmentScopedPermissionsInvokeArgs(), options.WithDefaults());
 
         /// <summary>
-        /// Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `on:` modifier yourself. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `group` whose `entries` list pulls the output of each helper.
+        /// Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes only on the named environment. Pair with `Environment.environmentId` (or the `getEnvironment` data source) to avoid hand-rolling the `PermissionDescriptorCondition` tree yourself. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.
         /// </summary>
         public static Output<BuildEnvironmentScopedPermissionsResult> Invoke(BuildEnvironmentScopedPermissionsInvokeArgs args, InvokeOutputOptions options)
             => global::Pulumi.Deployment.Instance.Invoke<BuildEnvironmentScopedPermissionsResult>("pulumiservice:index:buildEnvironmentScopedPermissions", args ?? new BuildEnvironmentScopedPermissionsInvokeArgs(), options.WithDefaults());
@@ -88,7 +88,7 @@ namespace Pulumi.PulumiService
     public sealed class BuildEnvironmentScopedPermissionsResult
     {
         /// <summary>
-        /// A `kind: allow` descriptor with an `on: { environment: &lt;uuid&gt; }` modifier, ready to assign to `OrganizationRole.permissions`.
+        /// A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` on the named environment, ready to assign to `OrganizationRole.permissions`.
         /// </summary>
         public readonly ImmutableDictionary<string, object> Permissions;
 

@@ -16,6 +16,8 @@ package pulumiapi
 import (
 	"errors"
 	"fmt"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/apiclient"
 )
 
 // ErrorResponse is returned from pulumi service api when there's been an error
@@ -28,10 +30,18 @@ func (err *ErrorResponse) Error() string {
 	return fmt.Sprintf("%d API error: %s", err.StatusCode, err.Message)
 }
 
+// GetErrorStatusCode returns the HTTP status code carried by err, or 0 if err
+// is not an API error. Recognises both the hand-rolled `*ErrorResponse` from
+// the legacy c.do() path and the generated SDK's `*apiclient.APIError` so
+// callers can switch on status uniformly during the SDK migration.
 func GetErrorStatusCode(err error) int {
 	var errResp *ErrorResponse
 	if errors.As(err, &errResp) {
 		return errResp.StatusCode
+	}
+	var apiErr *apiclient.APIError
+	if errors.As(err, &apiErr) {
+		return apiErr.HTTPStatusCode()
 	}
 	return 0
 }

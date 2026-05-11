@@ -20,6 +20,11 @@ export type ApprovalRule = import("./approvalRule").ApprovalRule;
 export const ApprovalRule: typeof import("./approvalRule").ApprovalRule = null as any;
 utilities.lazyLoad(exports, ["ApprovalRule"], () => require("./approvalRule"));
 
+export { BuildAllowPermissionsArgs, BuildAllowPermissionsResult, BuildAllowPermissionsOutputArgs } from "./buildAllowPermissions";
+export const buildAllowPermissions: typeof import("./buildAllowPermissions").buildAllowPermissions = null as any;
+export const buildAllowPermissionsOutput: typeof import("./buildAllowPermissions").buildAllowPermissionsOutput = null as any;
+utilities.lazyLoad(exports, ["buildAllowPermissions","buildAllowPermissionsOutput"], () => require("./buildAllowPermissions"));
+
 export { BuildEnvironmentScopedPermissionsArgs, BuildEnvironmentScopedPermissionsResult, BuildEnvironmentScopedPermissionsOutputArgs } from "./buildEnvironmentScopedPermissions";
 export const buildEnvironmentScopedPermissions: typeof import("./buildEnvironmentScopedPermissions").buildEnvironmentScopedPermissions = null as any;
 export const buildEnvironmentScopedPermissionsOutput: typeof import("./buildEnvironmentScopedPermissions").buildEnvironmentScopedPermissionsOutput = null as any;

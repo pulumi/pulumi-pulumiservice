@@ -1,6 +1,6 @@
 name: yaml-rbac
 runtime: yaml
-description: Exercises the RBAC resources and data sources.
+description: Exercises the RBAC resources, data sources, and scoped-permission helpers.
 
 config:
   organizationName:
@@ -8,19 +8,29 @@ config:
     default: service-provider-test-org
   digits:
     type: string
+  # Username of the existing org member the example adopts via
+  # `OrganizationMember`. The default is the fixture user the canonical
+  # CI test org (`service-provider-test-org`) is seeded with; for manual
+  # runs against a different org, set this to a username that already
+  # exists there:
+  #
+  #     pulumi config set adoptedUsername <some-user>
+  adoptedUsername:
+    type: string
+    default: service-provider-example-user
 
 resources:
-  # A custom organization-level role that grants stack read access.
+  # A custom organization-level role that grants stack read access. Built
+  # via `buildAllowPermissions`, which returns a flat
+  # `PermissionDescriptorAllow` ready to assign — no need to spell out
+  # the descriptor's `__type` field by hand.
   readOnlyRole:
     type: pulumiservice:OrganizationRole
     properties:
       organizationName: ${organizationName}
       name: yaml-rbac-read-only-${digits}
       description: Read-only access to stacks, created by the yaml-rbac example.
-      permissions:
-        kind: allow
-        permissions:
-          - stack:read
+      permissions: ${readOnlyPermissions.permissions}
 
   # A team that will receive the custom role. Pulumi Cloud adds the team
   # creator as the first member automatically, so we declare them here to
@@ -54,7 +64,7 @@ resources:
     type: pulumiservice:OrganizationMember
     properties:
       organizationName: ${organizationName}
-      username: service-provider-example-user
+      username: ${adoptedUsername}
       roleId: ${readOnlyRole.roleId}
 
   # An ESC environment to demo per-env role scoping. The Environment
@@ -73,22 +83,16 @@ resources:
 
   # A role that ONLY grants `environment:read` and `environment:open` on
   # the specific env created above — anywhere else in the org, the role
-  # grants nothing. The role definition is org-scoped (resourceType
-  # defaults to `global`); the `on:` modifier scopes the Allow to a
-  # single environment by UUID.
+  # grants nothing. Built via `buildEnvironmentScopedPermissions`, which
+  # returns the Pulumi Cloud `PermissionDescriptorCondition(Equal, Allow)`
+  # tree gating the grant on the environment's UUID.
   scopedReadOnlyRole:
     type: pulumiservice:OrganizationRole
     properties:
       organizationName: ${organizationName}
       name: yaml-rbac-scoped-read-only-${digits}
       description: Read+open access scoped to a single ESC environment.
-      permissions:
-        kind: allow
-        on:
-          environment: ${scopedEnv.environmentId}
-        permissions:
-          - environment:read
-          - environment:open
+      permissions: ${scopedPermissions.permissions}
 
 variables:
   # Data source: the authenticated Pulumi Cloud user (the stack's operator).
@@ -109,6 +113,28 @@ variables:
       function: pulumiservice:getOrganizationRoleScopes
       arguments:
         organizationName: ${organizationName}
+  # Data source: build the global Allow descriptor used by readOnlyRole.
+  # `buildAllowPermissions` is the trivial helper for the common case of
+  # "grant these scopes everywhere"; the result is directly assignable to
+  # `OrganizationRole.permissions`.
+  readOnlyPermissions:
+    fn::invoke:
+      function: pulumiservice:buildAllowPermissions
+      arguments:
+        permissions:
+          - stack:read
+  # Data source: build the scoped-permission descriptor used by
+  # scopedReadOnlyRole. The helper returns the wire-shape Condition tree
+  # gating an Allow on the named environment; assigning to
+  # `OrganizationRole.permissions` works without any extra translation.
+  scopedPermissions:
+    fn::invoke:
+      function: pulumiservice:buildEnvironmentScopedPermissions
+      arguments:
+        environmentId: ${scopedEnv.environmentId}
+        permissions:
+          - environment:read
+          - environment:open
 
 outputs:
   roleId: ${readOnlyRole.roleId}

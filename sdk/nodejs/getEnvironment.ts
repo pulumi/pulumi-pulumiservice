@@ -5,7 +5,7 @@ import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "./utilities";
 
 /**
- * Looks up an existing ESC environment by name and returns its UUID. Use this to pin a custom RBAC role to a specific environment via a `literalEnvironment` expression when the environment is not managed by the current Pulumi program. Errors when the environment is not found.
+ * Looks up an existing ESC environment by name and returns its UUID. Use this to scope a custom RBAC role to a specific environment — pass the returned UUID into `buildEnvironmentScopedPermissions`, or use it as the `identity` field of a hand-rolled `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`. Errors when the environment is not found.
  */
 export function getEnvironment(args: GetEnvironmentArgs, opts?: pulumi.InvokeOptions): Promise<GetEnvironmentResult> {
     opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts || {});
@@ -33,7 +33,7 @@ export interface GetEnvironmentArgs {
 
 export interface GetEnvironmentResult {
     /**
-     * The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `literalEnvironment` expression.
+     * The environment's UUID. Pass it to `buildEnvironmentScopedPermissions` (preferred) or use it as the `identity` field of a hand-rolled `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`.
      */
     readonly environmentId: string;
     /**
@@ -50,7 +50,7 @@ export interface GetEnvironmentResult {
     readonly projectName: string;
 }
 /**
- * Looks up an existing ESC environment by name and returns its UUID. Use this to pin a custom RBAC role to a specific environment via a `literalEnvironment` expression when the environment is not managed by the current Pulumi program. Errors when the environment is not found.
+ * Looks up an existing ESC environment by name and returns its UUID. Use this to scope a custom RBAC role to a specific environment — pass the returned UUID into `buildEnvironmentScopedPermissions`, or use it as the `identity` field of a hand-rolled `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`. Errors when the environment is not found.
  */
 export function getEnvironmentOutput(args: GetEnvironmentOutputArgs, opts?: pulumi.InvokeOutputOptions): pulumi.Output<GetEnvironmentResult> {
     opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts || {});

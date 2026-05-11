@@ -12,19 +12,19 @@ namespace Pulumi.PulumiService
     public static class GetOrganizationMembers
     {
         /// <summary>
-        /// Lists all members of a Pulumi Cloud organization, including their role assignments.
+        /// Lists all members of a Pulumi Cloud organization, including their role assignments. Merges Pulumi Cloud's identity-provider roster (paginated; includes users who haven't signed in to Pulumi yet) with the seat-count roster, deduped by username, so SAML- and non-SAML-provisioned members both appear regardless of which roster they're tracked in.
         /// </summary>
         public static Task<GetOrganizationMembersResult> InvokeAsync(GetOrganizationMembersArgs args, InvokeOptions? options = null)
             => global::Pulumi.Deployment.Instance.InvokeAsync<GetOrganizationMembersResult>("pulumiservice:index:getOrganizationMembers", args ?? new GetOrganizationMembersArgs(), options.WithDefaults());
 
         /// <summary>
-        /// Lists all members of a Pulumi Cloud organization, including their role assignments.
+        /// Lists all members of a Pulumi Cloud organization, including their role assignments. Merges Pulumi Cloud's identity-provider roster (paginated; includes users who haven't signed in to Pulumi yet) with the seat-count roster, deduped by username, so SAML- and non-SAML-provisioned members both appear regardless of which roster they're tracked in.
         /// </summary>
         public static Output<GetOrganizationMembersResult> Invoke(GetOrganizationMembersInvokeArgs args, InvokeOptions? options = null)
             => global::Pulumi.Deployment.Instance.Invoke<GetOrganizationMembersResult>("pulumiservice:index:getOrganizationMembers", args ?? new GetOrganizationMembersInvokeArgs(), options.WithDefaults());
 
         /// <summary>
-        /// Lists all members of a Pulumi Cloud organization, including their role assignments.
+        /// Lists all members of a Pulumi Cloud organization, including their role assignments. Merges Pulumi Cloud's identity-provider roster (paginated; includes users who haven't signed in to Pulumi yet) with the seat-count roster, deduped by username, so SAML- and non-SAML-provisioned members both appear regardless of which roster they're tracked in.
         /// </summary>
         public static Output<GetOrganizationMembersResult> Invoke(GetOrganizationMembersInvokeArgs args, InvokeOutputOptions options)
             => global::Pulumi.Deployment.Instance.Invoke<GetOrganizationMembersResult>("pulumiservice:index:getOrganizationMembers", args ?? new GetOrganizationMembersInvokeArgs(), options.WithDefaults());

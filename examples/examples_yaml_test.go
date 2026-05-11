@@ -4,7 +4,10 @@
 package examples
 
 import (
+	"context"
+	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"path"
 	"path/filepath"
@@ -22,6 +25,9 @@ import (
 	"github.com/pulumi/providertest/pulumitest/assertrefresh"
 	"github.com/pulumi/providertest/pulumitest/opttest"
 	"github.com/pulumi/pulumi/pkg/v3/testing/integration"
+
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/apitype"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
 type Resource struct {
@@ -34,6 +40,17 @@ type YamlProgram struct {
 	Runtime     string              `yaml:"runtime"`
 	Description string              `yaml:"description"`
 	Resources   map[string]Resource `yaml:"resources"`
+}
+
+// mustParseDescriptor builds a typed apitype.PermissionDescriptor from a
+// wire-shape JSON literal — used by RBAC integration fixtures that author
+// permission descriptors via direct REST.
+func mustParseDescriptor(t *testing.T, wireJSON string) apitype.PermissionDescriptor {
+	t.Helper()
+	var d apitype.PermissionDescriptor
+	require.NoError(t, apitype.UnmarshalJSONPermissionDescriptor([]byte(wireJSON), &d))
+	require.NotNil(t, d, "wire JSON must parse to a known descriptor variant")
+	return d
 }
 
 func TestYamlTeamsExample(t *testing.T) {
@@ -560,6 +577,180 @@ func TestYamlRbacExample(t *testing.T) {
 	refresh := test.Refresh(t)
 	assertrefresh.HasNoChanges(t, refresh)
 	test.Destroy(t)
+}
+
+// TestYamlRbacComposeImport pins the headline regression: a Pulumi
+// Cloud role authored with `PermissionDescriptorCompose` (the variant
+// an earlier structural translator rejected with "unknown __type")
+// must import cleanly into PSP. The unit-level proof lives in
+// TestImportRepro_Compose; this test exercises the full pipeline —
+// Cloud has the role, `pulumi import` calls the resource's Read, the
+// engine generates well-formed program code carrying the `__type`
+// discriminator unchanged, and a follow-up preview against that
+// generated program shows no drift.
+//
+// Cloud requires a `uxPurpose:"role"` entry to reference
+// `uxPurpose:"policy"` entries via Compose's `permissionDescriptors`;
+// role-references-role is a 400. PSP doesn't expose policies as a
+// managed resource type today, so the test provisions both the policy
+// fixture and the Compose role directly via `pulumiapi.Client`
+// (bypassing PSP's resource layer).
+//
+// Requires pulumi >= 3.237.0 — earlier versions of `pkg/importer/hcl2.go`
+// strip `__`-prefixed map keys as "internal properties" during import
+// codegen, which would drop the `__type` line from the generated
+// source and break the round-trip ([pulumi/pulumi#22856] fixed this).
+//
+// Flow:
+//
+//  1. Build a `pulumiapi.Client` from PULUMI_ACCESS_TOKEN /
+//     PULUMI_BACKEND_URL. Skip the test if either is unset (local dev
+//     without creds).
+//  2. Create a policy fixture (uxPurpose=policy) carrying a trivial
+//     PermissionDescriptorAllow for `stack:read`.
+//  3. Create the Compose role (uxPurpose=role) whose `details` is
+//     `{"__type":"PermissionDescriptorCompose","permissionDescriptors":[<policyId>]}`.
+//  4. Run `pulumi import pulumiservice:index:OrganizationRole importedComposedRole
+//     <org>/<roleId> --out <tmpdir>/imported.yaml` against an empty
+//     target stack.
+//  5. Assert: import succeeded; generated YAML carries
+//     `__type: PermissionDescriptorCompose` and the policy id.
+//  6. Drift check: append the imported `resources:` block to the
+//     target stack's existing Pulumi.yaml and run `pulumi preview` —
+//     any `~` on `permissions` would mean the descriptor
+//     pass-through is lossy.
+//
+// Cleanup, in registration order (LIFO):
+//
+//   - `pulumitest.NewPulumiTest(importTarget)` registers a destroy hook
+//     that runs first. Its destroy attempts to delete the role (now in
+//     state from `import`); the role is gone after this.
+//   - `t.Cleanup(deleteRole)` runs next; the role is already gone, so
+//     `client.DeleteRole`'s 404-swallow path returns nil.
+//   - `t.Cleanup(deletePolicy)` runs last; nothing references the policy
+//     by then, so the delete succeeds.
+func TestYamlRbacComposeImport(t *testing.T) {
+	token := os.Getenv("PULUMI_ACCESS_TOKEN")
+	apiURL := os.Getenv("PULUMI_BACKEND_URL")
+	if token == "" || apiURL == "" {
+		t.Skip("requires PULUMI_ACCESS_TOKEN and PULUMI_BACKEND_URL to provision the policy + role fixtures via direct REST")
+	}
+
+	orgName := getOrgName()
+	digits := generateRandomFiveDigits()
+	ctx := context.Background()
+
+	httpClient := &http.Client{Timeout: 60 * time.Second}
+	client, err := pulumiapi.NewClient(httpClient, token, apiURL)
+	require.NoError(t, err, "must be able to construct a pulumiapi client")
+
+	// Step 1: policy fixture. Carries a trivial Allow descriptor so
+	// CreateRole's `details must not be empty` validation passes.
+	policyName := fmt.Sprintf("yaml-rbac-import-policy-%s", digits)
+	policyDetails := mustParseDescriptor(t,
+		`{"__type":"PermissionDescriptorAllow","permissions":["stack:read"]}`)
+	policy, err := client.CreateRole(ctx, orgName, apitype.PermissionDescriptorBase{
+		Name:         policyName,
+		Description:  "Compose-import test policy fixture",
+		ResourceType: "global",
+		UxPurpose:    apitype.PermissionDescriptorUXPurposePolicy,
+		Details:      policyDetails,
+	})
+	require.NoError(t, err, "must be able to create a uxPurpose=policy fixture via direct REST")
+	require.NotEmpty(t, policy.ID)
+	t.Cleanup(func() {
+		if err := client.DeleteRole(ctx, orgName, policy.ID, true); err != nil {
+			t.Logf("cleanup: failed to delete policy %q: %v", policy.ID, err)
+		}
+	})
+
+	// Step 2: Compose role referencing the policy. Authoring this via
+	// direct REST (rather than a PSP resource) simulates a UI-authored or
+	// out-of-band role — what `pulumi import` actually faces in the wild.
+	roleName := fmt.Sprintf("yaml-rbac-import-role-%s", digits)
+	composeDetails := mustParseDescriptor(t, fmt.Sprintf(
+		`{"__type":"PermissionDescriptorCompose","permissionDescriptors":[%q]}`,
+		policy.ID,
+	))
+	role, err := client.CreateRole(ctx, orgName, apitype.PermissionDescriptorBase{
+		Name:         roleName,
+		Description:  "Compose-import test role; references policy via Compose",
+		ResourceType: "global",
+		UxPurpose:    apitype.PermissionDescriptorUXPurposeRole,
+		Details:      composeDetails,
+	})
+	require.NoError(t, err, "must be able to create a Compose role referencing the policy")
+	require.NotEmpty(t, role.ID)
+	t.Cleanup(func() {
+		if err := client.DeleteRole(ctx, orgName, role.ID, true); err != nil {
+			t.Logf("cleanup: failed to delete role %q: %v", role.ID, err)
+		}
+	})
+
+	// Step 3: empty target stack. Registered AFTER the role so its
+	// destroy runs first (LIFO), removing the role from Cloud before our
+	// own DeleteRole cleanup hook fires.
+	//
+	// Pulumi 3.232+ regressed the `import` flow against pulumitest's
+	// attached/inMemoryProvider mode: the provider's Read RPC is
+	// canceled after ~1s with `context canceled`, before the HTTP call
+	// to Pulumi Cloud completes. Routing the provider via
+	// `LocalProviderPath` (binary-on-disk) sidesteps the regression —
+	// `pulumi import` reads through the provider as a separate process
+	// and the cancellation doesn't fire. Other tests in this suite use
+	// `inMemoryProvider()` because they go through `up`/`preview`/
+	// `refresh`/`destroy`, which the regression doesn't touch.
+	importTarget := pulumitest.NewPulumiTest(t,
+		filepath.Join(getCwd(t), "yaml-rbac-import-target"),
+		opttest.LocalProviderPath("pulumiservice", filepath.Join(getCwd(t), "..", "bin")),
+		opttest.UseAmbientBackend(),
+		opttest.StackName(randomStackName()),
+	)
+
+	// Step 4: import the Compose role into the empty target stack with
+	// `--out` so we can inspect the generated YAML directly.
+	outFile := filepath.Join(importTarget.CurrentStack().Workspace().WorkDir(), "imported.yaml")
+	importResult := importTarget.Import(t,
+		"pulumiservice:index:OrganizationRole",
+		"importedComposedRole",
+		fmt.Sprintf("%s/%s", orgName, role.ID),
+		"",
+		"--out", outFile,
+	)
+	require.Zero(t, importResult.ReturnCode,
+		"pulumi import must succeed.\nstdout:\n%s\nstderr:\n%s",
+		importResult.Stdout, importResult.Stderr)
+
+	// Step 5: assert the generated YAML carries the Compose descriptor
+	// with the wire-format `__type` discriminator preserved. Substring
+	// checks tolerate quoting variations in the codegen output.
+	contents, err := os.ReadFile(outFile)
+	require.NoError(t, err, "must be able to read the import --out file")
+	imported := string(contents)
+
+	assert.Contains(t, imported, "PermissionDescriptorCompose",
+		"imported program must carry the Compose descriptor value")
+	assert.Contains(t, imported, "__type:",
+		"imported program must use the wire-format `__type` discriminator")
+	assert.Contains(t, imported, policy.ID,
+		"imported program must reference the policy id inside permissionDescriptors")
+
+	// Step 6: drift check. The import populated state from Read; if the
+	// imported program (which the Read codegen produced) deploys cleanly
+	// against that state, the descriptor round-trip is non-lossy. Append
+	// the imported `resources:` block to the target stack's existing
+	// Pulumi.yaml (keeping the project's `name`/`runtime`/`description`
+	// header intact) and run `pulumi preview` — any `~` on
+	// `permissions` would mean the descriptor pass-through is lossy.
+	pulumiYamlPath := filepath.Join(importTarget.CurrentStack().Workspace().WorkDir(), "Pulumi.yaml")
+	existingProject, err := os.ReadFile(pulumiYamlPath)
+	require.NoError(t, err, "must be able to read the target stack's Pulumi.yaml")
+	merged := append(existingProject, '\n')
+	merged = append(merged, contents...)
+	require.NoError(t, os.WriteFile(pulumiYamlPath, merged, 0600),
+		"must be able to merge the imported resources into the target stack's Pulumi.yaml")
+	preview := importTarget.Preview(t)
+	assertpreview.HasNoChanges(t, preview)
 }
 
 func writePulumiYaml(t *testing.T, yamlContents interface{}) string {

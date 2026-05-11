@@ -35,11 +35,11 @@ type GetOrganizationMembersInput struct {
 	OrganizationName string `pulumi:"organizationName"`
 }
 
-// OrganizationMemberInfo carries the fields returned by the backend member
-// roster for Pulumi Cloud organizations. Display name and email are not
-// included: the backing identity provider (GitHub/GitLab/Bitbucket) does not
-// populate them in the member list, and Pulumi only knows those fields for
-// members who have already signed in.
+// OrganizationMemberInfo carries the fields returned by the merged
+// member roster for Pulumi Cloud organizations. Display name and email
+// are not included: the backing identity provider does not populate them
+// in the member list, and Pulumi only knows those fields for members who
+// have already signed in.
 type OrganizationMemberInfo struct {
 	Username     string  `pulumi:"username"`
 	Role         *string `pulumi:"role,optional"`
@@ -55,7 +55,10 @@ type GetOrganizationMembersOutput struct {
 func (GetOrganizationMembersFunction) Annotate(a infer.Annotator) {
 	a.Describe(
 		&GetOrganizationMembersFunction{},
-		"Lists all members of a Pulumi Cloud organization, including their role assignments.",
+		"Lists all members of a Pulumi Cloud organization, including their role assignments. "+
+			"Merges Pulumi Cloud's identity-provider roster (paginated; includes users who haven't "+
+			"signed in to Pulumi yet) with the seat-count roster, deduped by username, so SAML- and "+
+			"non-SAML-provisioned members both appear regardless of which roster they're tracked in.",
 	)
 	a.SetToken("index", "getOrganizationMembers")
 }
