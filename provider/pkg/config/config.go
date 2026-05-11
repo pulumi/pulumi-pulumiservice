@@ -61,6 +61,7 @@ type Client interface {
 	pulumiapi.TeamAccessTokenClient
 	pulumiapi.TeamClient
 	pulumiapi.TeamRoleClient
+	pulumiapi.TemplateSourceClient
 	pulumiapi.UserClient
 	pulumiapi.WebhookClient
 }

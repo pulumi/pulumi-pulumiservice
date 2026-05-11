@@ -1220,7 +1220,7 @@
       ]
     },
     "pulumiservice:index:AgentPool": {
-      "description": "Agent Pool for customer managed deployments",
+      "description": "Agent Pool for customer managed deployments.",
       "properties": {
         "agentPoolId": {
           "type": "string",
@@ -1236,11 +1236,12 @@
         },
         "name": {
           "type": "string",
-          "description": "The name of the agent pool."
+          "description": "Name of the agent pool."
         },
         "organizationName": {
           "type": "string",
-          "description": "The organization's name."
+          "description": "The organization's name.",
+          "replaceOnChanges": true
         },
         "tokenValue": {
           "type": "string",
@@ -1249,9 +1250,9 @@
         }
       },
       "required": [
-        "agentPoolId",
-        "name",
         "organizationName",
+        "name",
+        "agentPoolId",
         "tokenValue"
       ],
       "inputProperties": {
@@ -1265,18 +1266,17 @@
         },
         "name": {
           "type": "string",
-          "description": "Name of the agent pool.",
-          "willReplaceOnChanges": true
+          "description": "Name of the agent pool."
         },
         "organizationName": {
           "type": "string",
           "description": "The organization's name.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         }
       },
       "requiredInputs": [
-        "name",
-        "organizationName"
+        "organizationName",
+        "name"
       ]
     },
     "pulumiservice:index:ApprovalRule": {
@@ -2823,7 +2823,7 @@
       ]
     },
     "pulumiservice:index:TemplateSource": {
-      "description": "A source for Pulumi templates",
+      "description": "A source for Pulumi templates.",
       "properties": {
         "destination": {
           "$ref": "#/types/pulumiservice:index:TemplateSourceDestination",
@@ -2831,7 +2831,8 @@
         },
         "organizationName": {
           "type": "string",
-          "description": "Organization name."
+          "description": "Organization name.",
+          "replaceOnChanges": true
         },
         "sourceName": {
           "type": "string",
@@ -2854,7 +2855,8 @@
         },
         "organizationName": {
           "type": "string",
-          "description": "Organization name."
+          "description": "Organization name.",
+          "replaceOnChanges": true
         },
         "sourceName": {
           "type": "string",

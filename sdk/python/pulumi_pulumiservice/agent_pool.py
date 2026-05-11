@@ -99,7 +99,7 @@ class AgentPool(pulumi.CustomResource):
                  organization_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
-        Agent Pool for customer managed deployments
+        Agent Pool for customer managed deployments.
 
 
         :param str resource_name: The name of the resource.
@@ -116,7 +116,7 @@ class AgentPool(pulumi.CustomResource):
                  args: AgentPoolArgs,
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
-        Agent Pool for customer managed deployments
+        Agent Pool for customer managed deployments.
 
 
         :param str resource_name: The name of the resource.
@@ -159,6 +159,8 @@ class AgentPool(pulumi.CustomResource):
             __props__.__dict__["token_value"] = None
         secret_opts = pulumi.ResourceOptions(additional_secret_outputs=["tokenValue"])
         opts = pulumi.ResourceOptions.merge(opts, secret_opts)
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["organizationName"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(AgentPool, __self__).__init__(
             'pulumiservice:index:AgentPool',
             resource_name,
@@ -217,7 +219,7 @@ class AgentPool(pulumi.CustomResource):
     @pulumi.getter
     def name(self) -> pulumi.Output[_builtins.str]:
         """
-        The name of the agent pool.
+        Name of the agent pool.
         """
         return pulumi.get(self, "name")
 

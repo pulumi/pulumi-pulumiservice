@@ -16,7 +16,7 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 
 /**
- * Agent Pool for customer managed deployments
+ * Agent Pool for customer managed deployments.
  * 
  */
 @ResourceType(type="pulumiservice:index:AgentPool")
@@ -64,14 +64,14 @@ public class AgentPool extends com.pulumi.resources.CustomResource {
         return Codegen.optional(this.forceDestroy);
     }
     /**
-     * The name of the agent pool.
+     * Name of the agent pool.
      * 
      */
     @Export(name="name", refs={String.class}, tree="[0]")
     private Output<String> name;
 
     /**
-     * @return The name of the agent pool.
+     * @return Name of the agent pool.
      * 
      */
     public Output<String> name() {
@@ -147,6 +147,9 @@ public class AgentPool extends com.pulumi.resources.CustomResource {
             .version(Utilities.getVersion())
             .additionalSecretOutputs(List.of(
                 "tokenValue"
+            ))
+            .replaceOnChanges(List.of(
+                "organizationName"
             ))
             .build();
         return com.pulumi.resources.CustomResourceOptions.merge(defaultOptions, options, id);

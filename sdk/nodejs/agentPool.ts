@@ -5,7 +5,7 @@ import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "./utilities";
 
 /**
- * Agent Pool for customer managed deployments
+ * Agent Pool for customer managed deployments.
  */
 export class AgentPool extends pulumi.CustomResource {
     /**
@@ -47,7 +47,7 @@ export class AgentPool extends pulumi.CustomResource {
      */
     declare public readonly forceDestroy: pulumi.Output<boolean | undefined>;
     /**
-     * The name of the agent pool.
+     * Name of the agent pool.
      */
     declare public readonly name: pulumi.Output<string>;
     /**
@@ -93,6 +93,8 @@ export class AgentPool extends pulumi.CustomResource {
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         const secretOpts = { additionalSecretOutputs: ["tokenValue"] };
         opts = pulumi.mergeOptions(opts, secretOpts);
+        const replaceOnChanges = { replaceOnChanges: ["organizationName"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(AgentPool.__pulumiType, name, resourceInputs, opts);
     }
 }

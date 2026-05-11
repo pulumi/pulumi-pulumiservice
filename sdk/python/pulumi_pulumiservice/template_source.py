@@ -100,7 +100,7 @@ class TemplateSource(pulumi.CustomResource):
                  source_url: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
-        A source for Pulumi templates
+        A source for Pulumi templates.
 
 
         :param str resource_name: The name of the resource.
@@ -117,7 +117,7 @@ class TemplateSource(pulumi.CustomResource):
                  args: TemplateSourceArgs,
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
-        A source for Pulumi templates
+        A source for Pulumi templates.
 
 
         :param str resource_name: The name of the resource.
@@ -158,6 +158,8 @@ class TemplateSource(pulumi.CustomResource):
             if source_url is None and not opts.urn:
                 raise TypeError("Missing required property 'source_url'")
             __props__.__dict__["source_url"] = source_url
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["organizationName"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(TemplateSource, __self__).__init__(
             'pulumiservice:index:TemplateSource',
             resource_name,
