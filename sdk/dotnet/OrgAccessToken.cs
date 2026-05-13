@@ -72,6 +72,13 @@ namespace Pulumi.PulumiService
                 {
                     "value",
                 },
+                ReplaceOnChanges =
+                {
+                    "admin",
+                    "description",
+                    "name",
+                    "organizationName",
+                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.
@@ -101,7 +108,7 @@ namespace Pulumi.PulumiService
         public Input<bool>? Admin { get; set; }
 
         /// <summary>
-        /// Optional. Team description.
+        /// Optional. Description for the token.
         /// </summary>
         [Input("description")]
         public Input<string>? Description { get; set; }

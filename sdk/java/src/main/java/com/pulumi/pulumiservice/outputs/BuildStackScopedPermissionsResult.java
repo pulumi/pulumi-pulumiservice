@@ -13,14 +13,14 @@ import java.util.Objects;
 @CustomType
 public final class BuildStackScopedPermissionsResult {
     /**
-     * @return A `kind: allow` descriptor with an `on: { stack: &lt;id&gt; }` modifier, ready to assign to `OrganizationRole.permissions`.
+     * @return A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` on the named stack, ready to assign to `OrganizationRole.permissions`.
      * 
      */
     private Map<String,Object> permissions;
 
     private BuildStackScopedPermissionsResult() {}
     /**
-     * @return A `kind: allow` descriptor with an `on: { stack: &lt;id&gt; }` modifier, ready to assign to `OrganizationRole.permissions`.
+     * @return A `PermissionDescriptorCondition` tree gating a `PermissionDescriptorAllow` on the named stack, ready to assign to `OrganizationRole.permissions`.
      * 
      */
     public Map<String,Object> permissions() {

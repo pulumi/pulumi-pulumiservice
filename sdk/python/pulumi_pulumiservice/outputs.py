@@ -376,6 +376,7 @@ class DeploymentSettingsCacheOptions(dict):
                  enable: Optional[_builtins.bool] = None):
         """
         Dependency cache settings for the deployment
+
         :param _builtins.bool enable: Enable dependency caching
         """
         if enable is None:
@@ -418,6 +419,7 @@ class DeploymentSettingsExecutorContext(dict):
                  executor_image: _builtins.str):
         """
         The executor context defines information about the executor where the deployment is executed. If unspecified, the default 'pulumi/pulumi' image is used.
+
         :param _builtins.str executor_image: Allows overriding the default executor image with a custom image. E.g. 'pulumi/pulumi-nodejs:latest'
         """
         pulumi.set(__self__, "executor_image", executor_image)
@@ -441,6 +443,7 @@ class DeploymentSettingsGitAuthBasicAuth(dict):
                  username: _builtins.str):
         """
         Git source settings for a deployment.
+
         :param _builtins.str password: Password for git basic authentication.
         :param _builtins.str username: User name for git basic authentication.
         """
@@ -491,6 +494,7 @@ class DeploymentSettingsGitAuthSSHAuth(dict):
                  password: Optional[_builtins.str] = None):
         """
         Git source settings for a deployment.
+
         :param _builtins.str ssh_private_key: SSH private key.
         :param _builtins.str password: Optional password for SSH authentication.
         """
@@ -549,6 +553,7 @@ class DeploymentSettingsGitSource(dict):
                  repo_url: Optional[_builtins.str] = None):
         """
         Git source settings for a deployment.
+
         :param _builtins.str branch: The branch to deploy. One of either `branch` or `commit` must be specified.
         :param _builtins.str commit: The commit to deploy. One of either `branch` or `commit` must be specified.
         :param 'DeploymentSettingsGitSourceGitAuth' git_auth: Git authentication configuration for this deployment. Should not be specified if there are `gitHub` settings for this deployment.
@@ -636,6 +641,7 @@ class DeploymentSettingsGitSourceGitAuth(dict):
                  ssh_auth: Optional['outputs.DeploymentSettingsGitAuthSSHAuth'] = None):
         """
         Git source settings for a deployment.
+
         :param 'DeploymentSettingsGitAuthBasicAuth' basic_auth: Basic auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
         :param 'DeploymentSettingsGitAuthSSHAuth' ssh_auth: SSH auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
         """
@@ -695,6 +701,7 @@ class DeploymentSettingsGithub(dict):
                  repository: Optional[_builtins.str] = None):
         """
         GitHub settings for the deployment.
+
         :param _builtins.bool deploy_commits: Trigger a deployment running `pulumi up` on commit.
         :param Sequence[_builtins.str] paths: The paths within the repo that deployments should be filtered to.
         :param _builtins.bool preview_pull_requests: Trigger a deployment running `pulumi preview` when a PR is opened.
@@ -790,6 +797,7 @@ class DeploymentSettingsOperationContext(dict):
                  pre_run_commands: Optional[Sequence[_builtins.str]] = None):
         """
         Settings related to the Pulumi operation environment during the deployment.
+
         :param Mapping[str, _builtins.str] environment_variables: Environment variables to set for the deployment.
         :param 'OperationContextOIDC' oidc: OIDC configuration to use during the deployment.
         :param 'OperationContextOptions' options: Options to override default behavior during the deployment.
@@ -846,6 +854,7 @@ class DeploymentSettingsSourceContext(dict):
                  git: Optional['outputs.DeploymentSettingsGitSource'] = None):
         """
         Settings related to the source of the deployment.
+
         :param 'DeploymentSettingsGitSource' git: Git source settings for a deployment.
         """
         if git is not None:
@@ -872,6 +881,8 @@ class DeploymentSettingsVcs(dict):
             suggest = "deploy_commits"
         elif key == "deployPullRequest":
             suggest = "deploy_pull_request"
+        elif key == "installationId":
+            suggest = "installation_id"
         elif key == "previewPullRequests":
             suggest = "preview_pull_requests"
         elif key == "pullRequestTemplate":
@@ -892,15 +903,18 @@ class DeploymentSettingsVcs(dict):
                  provider: _builtins.str,
                  deploy_commits: Optional[_builtins.bool] = None,
                  deploy_pull_request: Optional[_builtins.int] = None,
+                 installation_id: Optional[_builtins.str] = None,
                  paths: Optional[Sequence[_builtins.str]] = None,
                  preview_pull_requests: Optional[_builtins.bool] = None,
                  pull_request_template: Optional[_builtins.bool] = None,
                  repository: Optional[_builtins.str] = None):
         """
         VCS settings for the deployment, supporting multiple VCS providers.
+
         :param _builtins.str provider: The VCS provider type.
         :param _builtins.bool deploy_commits: Trigger a deployment running `pulumi up` on commit.
         :param _builtins.int deploy_pull_request: Deploy a specific pull request number.
+        :param _builtins.str installation_id: The VCS integration installation ID. Use to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps). If omitted, the API resolves the integration automatically from `provider` and `repository`.
         :param Sequence[_builtins.str] paths: The paths within the repo that deployments should be filtered to.
         :param _builtins.bool preview_pull_requests: Trigger a deployment running `pulumi preview` when a PR is opened.
         :param _builtins.bool pull_request_template: Use this stack as a template for pull request review stacks.
@@ -913,6 +927,8 @@ class DeploymentSettingsVcs(dict):
             pulumi.set(__self__, "deploy_commits", deploy_commits)
         if deploy_pull_request is not None:
             pulumi.set(__self__, "deploy_pull_request", deploy_pull_request)
+        if installation_id is not None:
+            pulumi.set(__self__, "installation_id", installation_id)
         if paths is not None:
             pulumi.set(__self__, "paths", paths)
         if preview_pull_requests is None:
@@ -949,6 +965,14 @@ class DeploymentSettingsVcs(dict):
         Deploy a specific pull request number.
         """
         return pulumi.get(self, "deploy_pull_request")
+
+    @_builtins.property
+    @pulumi.getter(name="installationId")
+    def installation_id(self) -> Optional[_builtins.str]:
+        """
+        The VCS integration installation ID. Use to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps). If omitted, the API resolves the integration automatically from `provider` and `repository`.
+        """
+        return pulumi.get(self, "installation_id")
 
     @_builtins.property
     @pulumi.getter
@@ -1511,6 +1535,7 @@ class PolicyGroupPolicyPackReference(dict):
                  version_tag: Optional[_builtins.str] = None):
         """
         A reference to a policy pack within a policy group.
+
         :param _builtins.str name: The name of the policy pack.
         :param Mapping[str, Any] config: Optional configuration for the policy pack. The special key `all` sets the default enforcement level for every policy in the pack; per-policy entries override it.
         :param _builtins.str display_name: The display name of the policy pack.
@@ -1595,6 +1620,7 @@ class PolicyGroupStackReference(dict):
                  routing_project: _builtins.str):
         """
         A reference to a stack within a policy group.
+
         :param _builtins.str name: The name of the stack.
         :param _builtins.str routing_project: The routing project name (also known as project name).
         """
@@ -1681,6 +1707,7 @@ class StackConfigEnvironment(dict):
                  version: Optional[_builtins.str] = None):
         """
         Service-Backed Configuration: links a Stack to an ESC environment that holds its config and secrets. Set exactly one of `auto` (Stack-managed) or `project`+`environment` (reference an existing env).
+
         :param _builtins.bool auto: When `true`, the Stack manages a dedicated ESC environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack. Mutually exclusive with `project`+`environment`.
         :param _builtins.str environment: The name of the ESC environment to link. Mutually exclusive with `auto`. Used together with `project` to reference an existing environment.
         :param _builtins.str project: The project of the ESC environment to link. Mutually exclusive with `auto`. Used together with `environment` to reference an existing environment. Defaults to the ESC `default` project when omitted.

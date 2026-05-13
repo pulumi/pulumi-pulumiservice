@@ -64,36 +64,31 @@ __all__ = [
     'TemplateSourceDestinationArgsDict',
 ]
 
-MYPY = False
-
-if not MYPY:
-    class AWSOIDCConfigurationArgsDict(TypedDict):
-        role_arn: pulumi.Input[_builtins.str]
-        """
-        The ARN of the role to assume using the OIDC token.
-        """
-        session_name: pulumi.Input[_builtins.str]
-        """
-        The name of the assume-role session.
-        """
-        duration: NotRequired[pulumi.Input[_builtins.str]]
-        """
-        Duration of the assume-role session in “XhYmZs” format
-        """
-        policy_arns: NotRequired[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]
-        """
-        Optional set of IAM policy ARNs that further restrict the assume-role session
-        """
-elif False:
-    AWSOIDCConfigurationArgsDict: TypeAlias = Mapping[str, Any]
+class AWSOIDCConfigurationArgsDict(TypedDict):
+    role_arn: pulumi.Input[_builtins.str]
+    """
+    The ARN of the role to assume using the OIDC token.
+    """
+    session_name: pulumi.Input[_builtins.str]
+    """
+    The name of the assume-role session.
+    """
+    duration: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    """
+    Duration of the assume-role session in “XhYmZs” format
+    """
+    policy_arns: NotRequired[pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]]
+    """
+    Optional set of IAM policy ARNs that further restrict the assume-role session
+    """
 
 @pulumi.input_type
 class AWSOIDCConfigurationArgs:
     def __init__(__self__, *,
                  role_arn: pulumi.Input[_builtins.str],
                  session_name: pulumi.Input[_builtins.str],
-                 duration: Optional[pulumi.Input[_builtins.str]] = None,
-                 policy_arns: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None):
+                 duration: pulumi.Input[Optional[_builtins.str]] = None,
+                 policy_arns: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None):
         """
         :param pulumi.Input[_builtins.str] role_arn: The ARN of the role to assume using the OIDC token.
         :param pulumi.Input[_builtins.str] session_name: The name of the assume-role session.
@@ -133,49 +128,46 @@ class AWSOIDCConfigurationArgs:
 
     @_builtins.property
     @pulumi.getter
-    def duration(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def duration(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         Duration of the assume-role session in “XhYmZs” format
         """
         return pulumi.get(self, "duration")
 
     @duration.setter
-    def duration(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def duration(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "duration", value)
 
     @_builtins.property
     @pulumi.getter(name="policyARNs")
-    def policy_arns(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]:
+    def policy_arns(self) -> pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]:
         """
         Optional set of IAM policy ARNs that further restrict the assume-role session
         """
         return pulumi.get(self, "policy_arns")
 
     @policy_arns.setter
-    def policy_arns(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]):
+    def policy_arns(self, value: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]):
         pulumi.set(self, "policy_arns", value)
 
 
-if not MYPY:
-    class ApprovalRuleConfigArgsDict(TypedDict):
-        allow_self_approval: pulumi.Input[_builtins.bool]
-        """
-        Whether self-approval is allowed.
-        """
-        eligible_approvers: pulumi.Input[Sequence[pulumi.Input['EligibleApproverArgsDict']]]
-        """
-        List of eligible approvers.
-        """
-        num_approvals_required: pulumi.Input[_builtins.int]
-        """
-        Number of approvals required.
-        """
-        require_reapproval_on_change: pulumi.Input[_builtins.bool]
-        """
-        Whether reapproval is required on changes.
-        """
-elif False:
-    ApprovalRuleConfigArgsDict: TypeAlias = Mapping[str, Any]
+class ApprovalRuleConfigArgsDict(TypedDict):
+    allow_self_approval: pulumi.Input[_builtins.bool]
+    """
+    Whether self-approval is allowed.
+    """
+    eligible_approvers: pulumi.Input[Sequence[pulumi.Input['EligibleApproverArgsDict']]]
+    """
+    List of eligible approvers.
+    """
+    num_approvals_required: pulumi.Input[_builtins.int]
+    """
+    Number of approvals required.
+    """
+    require_reapproval_on_change: pulumi.Input[_builtins.bool]
+    """
+    Whether reapproval is required on changes.
+    """
 
 @pulumi.input_type
 class ApprovalRuleConfigArgs:
@@ -244,38 +236,35 @@ class ApprovalRuleConfigArgs:
         pulumi.set(self, "require_reapproval_on_change", value)
 
 
-if not MYPY:
-    class AuthPolicyDefinitionArgsDict(TypedDict):
-        decision: pulumi.Input['AuthPolicyDecision']
-        """
-        The rule type of this policy definition
-        """
-        rules: pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]
-        """
-        OIDC rules to set for this policy.
-        """
-        token_type: pulumi.Input['AuthPolicyTokenType']
-        """
-        The token type for this policy definition
-        """
-        authorized_permissions: NotRequired[pulumi.Input[Sequence[pulumi.Input['AuthPolicyPermissionLevel']]]]
-        """
-        The permission level for organization tokens.
-        """
-        runner_id: NotRequired[pulumi.Input[_builtins.str]]
-        """
-        The runner ID for deployment runner tokens.
-        """
-        team_name: NotRequired[pulumi.Input[_builtins.str]]
-        """
-        The team name for team tokens.
-        """
-        user_login: NotRequired[pulumi.Input[_builtins.str]]
-        """
-        The user login for personal tokens.
-        """
-elif False:
-    AuthPolicyDefinitionArgsDict: TypeAlias = Mapping[str, Any]
+class AuthPolicyDefinitionArgsDict(TypedDict):
+    decision: pulumi.Input['AuthPolicyDecision']
+    """
+    The rule type of this policy definition
+    """
+    rules: pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]
+    """
+    OIDC rules to set for this policy.
+    """
+    token_type: pulumi.Input['AuthPolicyTokenType']
+    """
+    The token type for this policy definition
+    """
+    authorized_permissions: NotRequired[pulumi.Input[Optional[Sequence[pulumi.Input['AuthPolicyPermissionLevel']]]]]
+    """
+    The permission level for organization tokens.
+    """
+    runner_id: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    """
+    The runner ID for deployment runner tokens.
+    """
+    team_name: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    """
+    The team name for team tokens.
+    """
+    user_login: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    """
+    The user login for personal tokens.
+    """
 
 @pulumi.input_type
 class AuthPolicyDefinitionArgs:
@@ -283,10 +272,10 @@ class AuthPolicyDefinitionArgs:
                  decision: pulumi.Input['AuthPolicyDecision'],
                  rules: pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]],
                  token_type: pulumi.Input['AuthPolicyTokenType'],
-                 authorized_permissions: Optional[pulumi.Input[Sequence[pulumi.Input['AuthPolicyPermissionLevel']]]] = None,
-                 runner_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 team_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 user_login: Optional[pulumi.Input[_builtins.str]] = None):
+                 authorized_permissions: pulumi.Input[Optional[Sequence[pulumi.Input['AuthPolicyPermissionLevel']]]] = None,
+                 runner_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 team_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 user_login: pulumi.Input[Optional[_builtins.str]] = None):
         """
         :param pulumi.Input['AuthPolicyDecision'] decision: The rule type of this policy definition
         :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] rules: OIDC rules to set for this policy.
@@ -346,69 +335,66 @@ class AuthPolicyDefinitionArgs:
 
     @_builtins.property
     @pulumi.getter(name="authorizedPermissions")
-    def authorized_permissions(self) -> Optional[pulumi.Input[Sequence[pulumi.Input['AuthPolicyPermissionLevel']]]]:
+    def authorized_permissions(self) -> pulumi.Input[Optional[Sequence[pulumi.Input['AuthPolicyPermissionLevel']]]]:
         """
         The permission level for organization tokens.
         """
         return pulumi.get(self, "authorized_permissions")
 
     @authorized_permissions.setter
-    def authorized_permissions(self, value: Optional[pulumi.Input[Sequence[pulumi.Input['AuthPolicyPermissionLevel']]]]):
+    def authorized_permissions(self, value: pulumi.Input[Optional[Sequence[pulumi.Input['AuthPolicyPermissionLevel']]]]):
         pulumi.set(self, "authorized_permissions", value)
 
     @_builtins.property
     @pulumi.getter(name="runnerID")
-    def runner_id(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def runner_id(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The runner ID for deployment runner tokens.
         """
         return pulumi.get(self, "runner_id")
 
     @runner_id.setter
-    def runner_id(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def runner_id(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "runner_id", value)
 
     @_builtins.property
     @pulumi.getter(name="teamName")
-    def team_name(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def team_name(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The team name for team tokens.
         """
         return pulumi.get(self, "team_name")
 
     @team_name.setter
-    def team_name(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def team_name(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "team_name", value)
 
     @_builtins.property
     @pulumi.getter(name="userLogin")
-    def user_login(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def user_login(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The user login for personal tokens.
         """
         return pulumi.get(self, "user_login")
 
     @user_login.setter
-    def user_login(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def user_login(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "user_login", value)
 
 
-if not MYPY:
-    class AzureOIDCConfigurationArgsDict(TypedDict):
-        client_id: pulumi.Input[_builtins.str]
-        """
-        The client ID of the federated workload identity.
-        """
-        subscription_id: pulumi.Input[_builtins.str]
-        """
-        The subscription ID of the federated workload identity.
-        """
-        tenant_id: pulumi.Input[_builtins.str]
-        """
-        The tenant ID of the federated workload identity.
-        """
-elif False:
-    AzureOIDCConfigurationArgsDict: TypeAlias = Mapping[str, Any]
+class AzureOIDCConfigurationArgsDict(TypedDict):
+    client_id: pulumi.Input[_builtins.str]
+    """
+    The client ID of the federated workload identity.
+    """
+    subscription_id: pulumi.Input[_builtins.str]
+    """
+    The subscription ID of the federated workload identity.
+    """
+    tenant_id: pulumi.Input[_builtins.str]
+    """
+    The tenant ID of the federated workload identity.
+    """
 
 @pulumi.input_type
 class AzureOIDCConfigurationArgs:
@@ -462,24 +448,22 @@ class AzureOIDCConfigurationArgs:
         pulumi.set(self, "tenant_id", value)
 
 
-if not MYPY:
-    class DeploymentSettingsCacheOptionsArgsDict(TypedDict):
-        """
-        Dependency cache settings for the deployment
-        """
-        enable: NotRequired[pulumi.Input[_builtins.bool]]
-        """
-        Enable dependency caching
-        """
-elif False:
-    DeploymentSettingsCacheOptionsArgsDict: TypeAlias = Mapping[str, Any]
+class DeploymentSettingsCacheOptionsArgsDict(TypedDict):
+    """
+    Dependency cache settings for the deployment
+    """
+    enable: NotRequired[pulumi.Input[Optional[_builtins.bool]]]
+    """
+    Enable dependency caching
+    """
 
 @pulumi.input_type
 class DeploymentSettingsCacheOptionsArgs:
     def __init__(__self__, *,
-                 enable: Optional[pulumi.Input[_builtins.bool]] = None):
+                 enable: pulumi.Input[Optional[_builtins.bool]] = None):
         """
         Dependency cache settings for the deployment
+
         :param pulumi.Input[_builtins.bool] enable: Enable dependency caching
         """
         if enable is None:
@@ -489,28 +473,25 @@ class DeploymentSettingsCacheOptionsArgs:
 
     @_builtins.property
     @pulumi.getter
-    def enable(self) -> Optional[pulumi.Input[_builtins.bool]]:
+    def enable(self) -> pulumi.Input[Optional[_builtins.bool]]:
         """
         Enable dependency caching
         """
         return pulumi.get(self, "enable")
 
     @enable.setter
-    def enable(self, value: Optional[pulumi.Input[_builtins.bool]]):
+    def enable(self, value: pulumi.Input[Optional[_builtins.bool]]):
         pulumi.set(self, "enable", value)
 
 
-if not MYPY:
-    class DeploymentSettingsExecutorContextArgsDict(TypedDict):
-        """
-        The executor context defines information about the executor where the deployment is executed. If unspecified, the default 'pulumi/pulumi' image is used.
-        """
-        executor_image: pulumi.Input[_builtins.str]
-        """
-        Allows overriding the default executor image with a custom image. E.g. 'pulumi/pulumi-nodejs:latest'
-        """
-elif False:
-    DeploymentSettingsExecutorContextArgsDict: TypeAlias = Mapping[str, Any]
+class DeploymentSettingsExecutorContextArgsDict(TypedDict):
+    """
+    The executor context defines information about the executor where the deployment is executed. If unspecified, the default 'pulumi/pulumi' image is used.
+    """
+    executor_image: pulumi.Input[_builtins.str]
+    """
+    Allows overriding the default executor image with a custom image. E.g. 'pulumi/pulumi-nodejs:latest'
+    """
 
 @pulumi.input_type
 class DeploymentSettingsExecutorContextArgs:
@@ -518,6 +499,7 @@ class DeploymentSettingsExecutorContextArgs:
                  executor_image: pulumi.Input[_builtins.str]):
         """
         The executor context defines information about the executor where the deployment is executed. If unspecified, the default 'pulumi/pulumi' image is used.
+
         :param pulumi.Input[_builtins.str] executor_image: Allows overriding the default executor image with a custom image. E.g. 'pulumi/pulumi-nodejs:latest'
         """
         pulumi.set(__self__, "executor_image", executor_image)
@@ -535,21 +517,18 @@ class DeploymentSettingsExecutorContextArgs:
         pulumi.set(self, "executor_image", value)
 
 
-if not MYPY:
-    class DeploymentSettingsGitAuthBasicAuthArgsDict(TypedDict):
-        """
-        Git source settings for a deployment.
-        """
-        password: pulumi.Input[_builtins.str]
-        """
-        Password for git basic authentication.
-        """
-        username: pulumi.Input[_builtins.str]
-        """
-        User name for git basic authentication.
-        """
-elif False:
-    DeploymentSettingsGitAuthBasicAuthArgsDict: TypeAlias = Mapping[str, Any]
+class DeploymentSettingsGitAuthBasicAuthArgsDict(TypedDict):
+    """
+    Git source settings for a deployment.
+    """
+    password: pulumi.Input[_builtins.str]
+    """
+    Password for git basic authentication.
+    """
+    username: pulumi.Input[_builtins.str]
+    """
+    User name for git basic authentication.
+    """
 
 @pulumi.input_type
 class DeploymentSettingsGitAuthBasicAuthArgs:
@@ -558,6 +537,7 @@ class DeploymentSettingsGitAuthBasicAuthArgs:
                  username: pulumi.Input[_builtins.str]):
         """
         Git source settings for a deployment.
+
         :param pulumi.Input[_builtins.str] password: Password for git basic authentication.
         :param pulumi.Input[_builtins.str] username: User name for git basic authentication.
         """
@@ -589,29 +569,27 @@ class DeploymentSettingsGitAuthBasicAuthArgs:
         pulumi.set(self, "username", value)
 
 
-if not MYPY:
-    class DeploymentSettingsGitAuthSSHAuthArgsDict(TypedDict):
-        """
-        Git source settings for a deployment.
-        """
-        ssh_private_key: pulumi.Input[_builtins.str]
-        """
-        SSH private key.
-        """
-        password: NotRequired[pulumi.Input[_builtins.str]]
-        """
-        Optional password for SSH authentication.
-        """
-elif False:
-    DeploymentSettingsGitAuthSSHAuthArgsDict: TypeAlias = Mapping[str, Any]
+class DeploymentSettingsGitAuthSSHAuthArgsDict(TypedDict):
+    """
+    Git source settings for a deployment.
+    """
+    ssh_private_key: pulumi.Input[_builtins.str]
+    """
+    SSH private key.
+    """
+    password: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    """
+    Optional password for SSH authentication.
+    """
 
 @pulumi.input_type
 class DeploymentSettingsGitAuthSSHAuthArgs:
     def __init__(__self__, *,
                  ssh_private_key: pulumi.Input[_builtins.str],
-                 password: Optional[pulumi.Input[_builtins.str]] = None):
+                 password: pulumi.Input[Optional[_builtins.str]] = None):
         """
         Git source settings for a deployment.
+
         :param pulumi.Input[_builtins.str] ssh_private_key: SSH private key.
         :param pulumi.Input[_builtins.str] password: Optional password for SSH authentication.
         """
@@ -633,40 +611,38 @@ class DeploymentSettingsGitAuthSSHAuthArgs:
 
     @_builtins.property
     @pulumi.getter
-    def password(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def password(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         Optional password for SSH authentication.
         """
         return pulumi.get(self, "password")
 
     @password.setter
-    def password(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def password(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "password", value)
 
 
-if not MYPY:
-    class DeploymentSettingsGitSourceGitAuthArgsDict(TypedDict):
-        """
-        Git source settings for a deployment.
-        """
-        basic_auth: NotRequired[pulumi.Input['DeploymentSettingsGitAuthBasicAuthArgsDict']]
-        """
-        Basic auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
-        """
-        ssh_auth: NotRequired[pulumi.Input['DeploymentSettingsGitAuthSSHAuthArgsDict']]
-        """
-        SSH auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
-        """
-elif False:
-    DeploymentSettingsGitSourceGitAuthArgsDict: TypeAlias = Mapping[str, Any]
+class DeploymentSettingsGitSourceGitAuthArgsDict(TypedDict):
+    """
+    Git source settings for a deployment.
+    """
+    basic_auth: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitAuthBasicAuthArgs']]]
+    """
+    Basic auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
+    """
+    ssh_auth: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitAuthSSHAuthArgs']]]
+    """
+    SSH auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
+    """
 
 @pulumi.input_type
 class DeploymentSettingsGitSourceGitAuthArgs:
     def __init__(__self__, *,
-                 basic_auth: Optional[pulumi.Input['DeploymentSettingsGitAuthBasicAuthArgs']] = None,
-                 ssh_auth: Optional[pulumi.Input['DeploymentSettingsGitAuthSSHAuthArgs']] = None):
+                 basic_auth: pulumi.Input[Optional['DeploymentSettingsGitAuthBasicAuthArgs']] = None,
+                 ssh_auth: pulumi.Input[Optional['DeploymentSettingsGitAuthSSHAuthArgs']] = None):
         """
         Git source settings for a deployment.
+
         :param pulumi.Input['DeploymentSettingsGitAuthBasicAuthArgs'] basic_auth: Basic auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
         :param pulumi.Input['DeploymentSettingsGitAuthSSHAuthArgs'] ssh_auth: SSH auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
         """
@@ -677,67 +653,65 @@ class DeploymentSettingsGitSourceGitAuthArgs:
 
     @_builtins.property
     @pulumi.getter(name="basicAuth")
-    def basic_auth(self) -> Optional[pulumi.Input['DeploymentSettingsGitAuthBasicAuthArgs']]:
+    def basic_auth(self) -> pulumi.Input[Optional['DeploymentSettingsGitAuthBasicAuthArgs']]:
         """
         Basic auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
         """
         return pulumi.get(self, "basic_auth")
 
     @basic_auth.setter
-    def basic_auth(self, value: Optional[pulumi.Input['DeploymentSettingsGitAuthBasicAuthArgs']]):
+    def basic_auth(self, value: pulumi.Input[Optional['DeploymentSettingsGitAuthBasicAuthArgs']]):
         pulumi.set(self, "basic_auth", value)
 
     @_builtins.property
     @pulumi.getter(name="sshAuth")
-    def ssh_auth(self) -> Optional[pulumi.Input['DeploymentSettingsGitAuthSSHAuthArgs']]:
+    def ssh_auth(self) -> pulumi.Input[Optional['DeploymentSettingsGitAuthSSHAuthArgs']]:
         """
         SSH auth for git authentication. Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.
         """
         return pulumi.get(self, "ssh_auth")
 
     @ssh_auth.setter
-    def ssh_auth(self, value: Optional[pulumi.Input['DeploymentSettingsGitAuthSSHAuthArgs']]):
+    def ssh_auth(self, value: pulumi.Input[Optional['DeploymentSettingsGitAuthSSHAuthArgs']]):
         pulumi.set(self, "ssh_auth", value)
 
 
-if not MYPY:
-    class DeploymentSettingsGitSourceArgsDict(TypedDict):
-        """
-        Git source settings for a deployment.
-        """
-        branch: NotRequired[pulumi.Input[_builtins.str]]
-        """
-        The branch to deploy. One of either `branch` or `commit` must be specified.
-        """
-        commit: NotRequired[pulumi.Input[_builtins.str]]
-        """
-        The commit to deploy. One of either `branch` or `commit` must be specified.
-        """
-        git_auth: NotRequired[pulumi.Input['DeploymentSettingsGitSourceGitAuthArgsDict']]
-        """
-        Git authentication configuration for this deployment. Should not be specified if there are `gitHub` settings for this deployment.
-        """
-        repo_dir: NotRequired[pulumi.Input[_builtins.str]]
-        """
-        The directory within the repository where the Pulumi.yaml is located.
-        """
-        repo_url: NotRequired[pulumi.Input[_builtins.str]]
-        """
-        The repository URL to use for git settings. Should not be specified if there are `gitHub` settings for this deployment.
-        """
-elif False:
-    DeploymentSettingsGitSourceArgsDict: TypeAlias = Mapping[str, Any]
+class DeploymentSettingsGitSourceArgsDict(TypedDict):
+    """
+    Git source settings for a deployment.
+    """
+    branch: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    """
+    The branch to deploy. One of either `branch` or `commit` must be specified.
+    """
+    commit: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    """
+    The commit to deploy. One of either `branch` or `commit` must be specified.
+    """
+    git_auth: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitSourceGitAuthArgs']]]
+    """
+    Git authentication configuration for this deployment. Should not be specified if there are `gitHub` settings for this deployment.
+    """
+    repo_dir: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    """
+    The directory within the repository where the Pulumi.yaml is located.
+    """
+    repo_url: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    """
+    The repository URL to use for git settings. Should not be specified if there are `gitHub` settings for this deployment.
+    """
 
 @pulumi.input_type
 class DeploymentSettingsGitSourceArgs:
     def __init__(__self__, *,
-                 branch: Optional[pulumi.Input[_builtins.str]] = None,
-                 commit: Optional[pulumi.Input[_builtins.str]] = None,
-                 git_auth: Optional[pulumi.Input['DeploymentSettingsGitSourceGitAuthArgs']] = None,
-                 repo_dir: Optional[pulumi.Input[_builtins.str]] = None,
-                 repo_url: Optional[pulumi.Input[_builtins.str]] = None):
+                 branch: pulumi.Input[Optional[_builtins.str]] = None,
+                 commit: pulumi.Input[Optional[_builtins.str]] = None,
+                 git_auth: pulumi.Input[Optional['DeploymentSettingsGitSourceGitAuthArgs']] = None,
+                 repo_dir: pulumi.Input[Optional[_builtins.str]] = None,
+                 repo_url: pulumi.Input[Optional[_builtins.str]] = None):
         """
         Git source settings for a deployment.
+
         :param pulumi.Input[_builtins.str] branch: The branch to deploy. One of either `branch` or `commit` must be specified.
         :param pulumi.Input[_builtins.str] commit: The commit to deploy. One of either `branch` or `commit` must be specified.
         :param pulumi.Input['DeploymentSettingsGitSourceGitAuthArgs'] git_auth: Git authentication configuration for this deployment. Should not be specified if there are `gitHub` settings for this deployment.
@@ -757,103 +731,101 @@ class DeploymentSettingsGitSourceArgs:
 
     @_builtins.property
     @pulumi.getter
-    def branch(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def branch(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The branch to deploy. One of either `branch` or `commit` must be specified.
         """
         return pulumi.get(self, "branch")
 
     @branch.setter
-    def branch(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def branch(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "branch", value)
 
     @_builtins.property
     @pulumi.getter
-    def commit(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def commit(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The commit to deploy. One of either `branch` or `commit` must be specified.
         """
         return pulumi.get(self, "commit")
 
     @commit.setter
-    def commit(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def commit(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "commit", value)
 
     @_builtins.property
     @pulumi.getter(name="gitAuth")
-    def git_auth(self) -> Optional[pulumi.Input['DeploymentSettingsGitSourceGitAuthArgs']]:
+    def git_auth(self) -> pulumi.Input[Optional['DeploymentSettingsGitSourceGitAuthArgs']]:
         """
         Git authentication configuration for this deployment. Should not be specified if there are `gitHub` settings for this deployment.
         """
         return pulumi.get(self, "git_auth")
 
     @git_auth.setter
-    def git_auth(self, value: Optional[pulumi.Input['DeploymentSettingsGitSourceGitAuthArgs']]):
+    def git_auth(self, value: pulumi.Input[Optional['DeploymentSettingsGitSourceGitAuthArgs']]):
         pulumi.set(self, "git_auth", value)
 
     @_builtins.property
     @pulumi.getter(name="repoDir")
-    def repo_dir(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def repo_dir(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The directory within the repository where the Pulumi.yaml is located.
         """
         return pulumi.get(self, "repo_dir")
 
     @repo_dir.setter
-    def repo_dir(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def repo_dir(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "repo_dir", value)
 
     @_builtins.property
     @pulumi.getter(name="repoUrl")
-    def repo_url(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def repo_url(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The repository URL to use for git settings. Should not be specified if there are `gitHub` settings for this deployment.
         """
         return pulumi.get(self, "repo_url")
 
     @repo_url.setter
-    def repo_url(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def repo_url(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "repo_url", value)
 
 
-if not MYPY:
-    class DeploymentSettingsGithubArgsDict(TypedDict):
-        """
-        GitHub settings for the deployment.
-        """
-        deploy_commits: NotRequired[pulumi.Input[_builtins.bool]]
-        """
-        Trigger a deployment running `pulumi up` on commit.
-        """
-        paths: NotRequired[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]
-        """
-        The paths within the repo that deployments should be filtered to.
-        """
-        preview_pull_requests: NotRequired[pulumi.Input[_builtins.bool]]
-        """
-        Trigger a deployment running `pulumi preview` when a PR is opened.
-        """
-        pull_request_template: NotRequired[pulumi.Input[_builtins.bool]]
-        """
-        Use this stack as a template for pull request review stacks.
-        """
-        repository: NotRequired[pulumi.Input[_builtins.str]]
-        """
-        The GitHub repository in the format org/repo.
-        """
-elif False:
-    DeploymentSettingsGithubArgsDict: TypeAlias = Mapping[str, Any]
+class DeploymentSettingsGithubArgsDict(TypedDict):
+    """
+    GitHub settings for the deployment.
+    """
+    deploy_commits: NotRequired[pulumi.Input[Optional[_builtins.bool]]]
+    """
+    Trigger a deployment running `pulumi up` on commit.
+    """
+    paths: NotRequired[pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]]
+    """
+    The paths within the repo that deployments should be filtered to.
+    """
+    preview_pull_requests: NotRequired[pulumi.Input[Optional[_builtins.bool]]]
+    """
+    Trigger a deployment running `pulumi preview` when a PR is opened.
+    """
+    pull_request_template: NotRequired[pulumi.Input[Optional[_builtins.bool]]]
+    """
+    Use this stack as a template for pull request review stacks.
+    """
+    repository: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    """
+    The GitHub repository in the format org/repo.
+    """
 
 @pulumi.input_type
 class DeploymentSettingsGithubArgs:
     def __init__(__self__, *,
-                 deploy_commits: Optional[pulumi.Input[_builtins.bool]] = None,
-                 paths: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
-                 preview_pull_requests: Optional[pulumi.Input[_builtins.bool]] = None,
-                 pull_request_template: Optional[pulumi.Input[_builtins.bool]] = None,
-                 repository: Optional[pulumi.Input[_builtins.str]] = None):
+                 deploy_commits: pulumi.Input[Optional[_builtins.bool]] = None,
+                 paths: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 preview_pull_requests: pulumi.Input[Optional[_builtins.bool]] = None,
+                 pull_request_template: pulumi.Input[Optional[_builtins.bool]] = None,
+                 repository: pulumi.Input[Optional[_builtins.str]] = None):
         """
         GitHub settings for the deployment.
+
         :param pulumi.Input[_builtins.bool] deploy_commits: Trigger a deployment running `pulumi up` on commit.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] paths: The paths within the repo that deployments should be filtered to.
         :param pulumi.Input[_builtins.bool] preview_pull_requests: Trigger a deployment running `pulumi preview` when a PR is opened.
@@ -879,98 +851,96 @@ class DeploymentSettingsGithubArgs:
 
     @_builtins.property
     @pulumi.getter(name="deployCommits")
-    def deploy_commits(self) -> Optional[pulumi.Input[_builtins.bool]]:
+    def deploy_commits(self) -> pulumi.Input[Optional[_builtins.bool]]:
         """
         Trigger a deployment running `pulumi up` on commit.
         """
         return pulumi.get(self, "deploy_commits")
 
     @deploy_commits.setter
-    def deploy_commits(self, value: Optional[pulumi.Input[_builtins.bool]]):
+    def deploy_commits(self, value: pulumi.Input[Optional[_builtins.bool]]):
         pulumi.set(self, "deploy_commits", value)
 
     @_builtins.property
     @pulumi.getter
-    def paths(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]:
+    def paths(self) -> pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]:
         """
         The paths within the repo that deployments should be filtered to.
         """
         return pulumi.get(self, "paths")
 
     @paths.setter
-    def paths(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]):
+    def paths(self, value: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]):
         pulumi.set(self, "paths", value)
 
     @_builtins.property
     @pulumi.getter(name="previewPullRequests")
-    def preview_pull_requests(self) -> Optional[pulumi.Input[_builtins.bool]]:
+    def preview_pull_requests(self) -> pulumi.Input[Optional[_builtins.bool]]:
         """
         Trigger a deployment running `pulumi preview` when a PR is opened.
         """
         return pulumi.get(self, "preview_pull_requests")
 
     @preview_pull_requests.setter
-    def preview_pull_requests(self, value: Optional[pulumi.Input[_builtins.bool]]):
+    def preview_pull_requests(self, value: pulumi.Input[Optional[_builtins.bool]]):
         pulumi.set(self, "preview_pull_requests", value)
 
     @_builtins.property
     @pulumi.getter(name="pullRequestTemplate")
-    def pull_request_template(self) -> Optional[pulumi.Input[_builtins.bool]]:
+    def pull_request_template(self) -> pulumi.Input[Optional[_builtins.bool]]:
         """
         Use this stack as a template for pull request review stacks.
         """
         return pulumi.get(self, "pull_request_template")
 
     @pull_request_template.setter
-    def pull_request_template(self, value: Optional[pulumi.Input[_builtins.bool]]):
+    def pull_request_template(self, value: pulumi.Input[Optional[_builtins.bool]]):
         pulumi.set(self, "pull_request_template", value)
 
     @_builtins.property
     @pulumi.getter
-    def repository(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def repository(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The GitHub repository in the format org/repo.
         """
         return pulumi.get(self, "repository")
 
     @repository.setter
-    def repository(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def repository(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "repository", value)
 
 
-if not MYPY:
-    class DeploymentSettingsOperationContextArgsDict(TypedDict):
-        """
-        Settings related to the Pulumi operation environment during the deployment.
-        """
-        environment_variables: NotRequired[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]
-        """
-        Environment variables to set for the deployment.
-        """
-        oidc: NotRequired[pulumi.Input['OperationContextOIDCArgsDict']]
-        """
-        OIDC configuration to use during the deployment.
-        """
-        options: NotRequired[pulumi.Input['OperationContextOptionsArgsDict']]
-        """
-        Options to override default behavior during the deployment.
-        """
-        pre_run_commands: NotRequired[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]
-        """
-        Shell commands to run before the Pulumi operation executes.
-        """
-elif False:
-    DeploymentSettingsOperationContextArgsDict: TypeAlias = Mapping[str, Any]
+class DeploymentSettingsOperationContextArgsDict(TypedDict):
+    """
+    Settings related to the Pulumi operation environment during the deployment.
+    """
+    environment_variables: NotRequired[pulumi.Input[Optional[Mapping[str, pulumi.Input[_builtins.str]]]]]
+    """
+    Environment variables to set for the deployment.
+    """
+    oidc: NotRequired[pulumi.Input[Optional['OperationContextOIDCArgs']]]
+    """
+    OIDC configuration to use during the deployment.
+    """
+    options: NotRequired[pulumi.Input[Optional['OperationContextOptionsArgs']]]
+    """
+    Options to override default behavior during the deployment.
+    """
+    pre_run_commands: NotRequired[pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]]
+    """
+    Shell commands to run before the Pulumi operation executes.
+    """
 
 @pulumi.input_type
 class DeploymentSettingsOperationContextArgs:
     def __init__(__self__, *,
-                 environment_variables: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
-                 oidc: Optional[pulumi.Input['OperationContextOIDCArgs']] = None,
-                 options: Optional[pulumi.Input['OperationContextOptionsArgs']] = None,
-                 pre_run_commands: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None):
+                 environment_variables: pulumi.Input[Optional[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
+                 oidc: pulumi.Input[Optional['OperationContextOIDCArgs']] = None,
+                 options: pulumi.Input[Optional['OperationContextOptionsArgs']] = None,
+                 pre_run_commands: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None):
         """
         Settings related to the Pulumi operation environment during the deployment.
+
         :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] environment_variables: Environment variables to set for the deployment.
         :param pulumi.Input['OperationContextOIDCArgs'] oidc: OIDC configuration to use during the deployment.
         :param pulumi.Input['OperationContextOptionsArgs'] options: Options to override default behavior during the deployment.
@@ -987,71 +957,69 @@ class DeploymentSettingsOperationContextArgs:
 
     @_builtins.property
     @pulumi.getter(name="environmentVariables")
-    def environment_variables(self) -> Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]:
+    def environment_variables(self) -> pulumi.Input[Optional[Mapping[str, pulumi.Input[_builtins.str]]]]:
         """
         Environment variables to set for the deployment.
         """
         return pulumi.get(self, "environment_variables")
 
     @environment_variables.setter
-    def environment_variables(self, value: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]):
+    def environment_variables(self, value: pulumi.Input[Optional[Mapping[str, pulumi.Input[_builtins.str]]]]):
         pulumi.set(self, "environment_variables", value)
 
     @_builtins.property
     @pulumi.getter
-    def oidc(self) -> Optional[pulumi.Input['OperationContextOIDCArgs']]:
+    def oidc(self) -> pulumi.Input[Optional['OperationContextOIDCArgs']]:
         """
         OIDC configuration to use during the deployment.
         """
         return pulumi.get(self, "oidc")
 
     @oidc.setter
-    def oidc(self, value: Optional[pulumi.Input['OperationContextOIDCArgs']]):
+    def oidc(self, value: pulumi.Input[Optional['OperationContextOIDCArgs']]):
         pulumi.set(self, "oidc", value)
 
     @_builtins.property
     @pulumi.getter
-    def options(self) -> Optional[pulumi.Input['OperationContextOptionsArgs']]:
+    def options(self) -> pulumi.Input[Optional['OperationContextOptionsArgs']]:
         """
         Options to override default behavior during the deployment.
         """
         return pulumi.get(self, "options")
 
     @options.setter
-    def options(self, value: Optional[pulumi.Input['OperationContextOptionsArgs']]):
+    def options(self, value: pulumi.Input[Optional['OperationContextOptionsArgs']]):
         pulumi.set(self, "options", value)
 
     @_builtins.property
     @pulumi.getter(name="preRunCommands")
-    def pre_run_commands(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]:
+    def pre_run_commands(self) -> pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]:
         """
         Shell commands to run before the Pulumi operation executes.
         """
         return pulumi.get(self, "pre_run_commands")
 
     @pre_run_commands.setter
-    def pre_run_commands(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]):
+    def pre_run_commands(self, value: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]):
         pulumi.set(self, "pre_run_commands", value)
 
 
-if not MYPY:
-    class DeploymentSettingsSourceContextArgsDict(TypedDict):
-        """
-        Settings related to the source of the deployment.
-        """
-        git: NotRequired[pulumi.Input['DeploymentSettingsGitSourceArgsDict']]
-        """
-        Git source settings for a deployment.
-        """
-elif False:
-    DeploymentSettingsSourceContextArgsDict: TypeAlias = Mapping[str, Any]
+class DeploymentSettingsSourceContextArgsDict(TypedDict):
+    """
+    Settings related to the source of the deployment.
+    """
+    git: NotRequired[pulumi.Input[Optional['DeploymentSettingsGitSourceArgs']]]
+    """
+    Git source settings for a deployment.
+    """
 
 @pulumi.input_type
 class DeploymentSettingsSourceContextArgs:
     def __init__(__self__, *,
-                 git: Optional[pulumi.Input['DeploymentSettingsGitSourceArgs']] = None):
+                 git: pulumi.Input[Optional['DeploymentSettingsGitSourceArgs']] = None):
         """
         Settings related to the source of the deployment.
+
         :param pulumi.Input['DeploymentSettingsGitSourceArgs'] git: Git source settings for a deployment.
         """
         if git is not None:
@@ -1059,68 +1027,72 @@ class DeploymentSettingsSourceContextArgs:
 
     @_builtins.property
     @pulumi.getter
-    def git(self) -> Optional[pulumi.Input['DeploymentSettingsGitSourceArgs']]:
+    def git(self) -> pulumi.Input[Optional['DeploymentSettingsGitSourceArgs']]:
         """
         Git source settings for a deployment.
         """
         return pulumi.get(self, "git")
 
     @git.setter
-    def git(self, value: Optional[pulumi.Input['DeploymentSettingsGitSourceArgs']]):
+    def git(self, value: pulumi.Input[Optional['DeploymentSettingsGitSourceArgs']]):
         pulumi.set(self, "git", value)
 
 
-if not MYPY:
-    class DeploymentSettingsVcsArgsDict(TypedDict):
-        """
-        VCS settings for the deployment, supporting multiple VCS providers.
-        """
-        provider: pulumi.Input[_builtins.str]
-        """
-        The VCS provider type.
-        """
-        deploy_commits: NotRequired[pulumi.Input[_builtins.bool]]
-        """
-        Trigger a deployment running `pulumi up` on commit.
-        """
-        deploy_pull_request: NotRequired[pulumi.Input[_builtins.int]]
-        """
-        Deploy a specific pull request number.
-        """
-        paths: NotRequired[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]
-        """
-        The paths within the repo that deployments should be filtered to.
-        """
-        preview_pull_requests: NotRequired[pulumi.Input[_builtins.bool]]
-        """
-        Trigger a deployment running `pulumi preview` when a PR is opened.
-        """
-        pull_request_template: NotRequired[pulumi.Input[_builtins.bool]]
-        """
-        Use this stack as a template for pull request review stacks.
-        """
-        repository: NotRequired[pulumi.Input[_builtins.str]]
-        """
-        The repository identifier (e.g., 'ProjectName/RepoName' for Azure DevOps, 'org/repo' for GitHub).
-        """
-elif False:
-    DeploymentSettingsVcsArgsDict: TypeAlias = Mapping[str, Any]
+class DeploymentSettingsVcsArgsDict(TypedDict):
+    """
+    VCS settings for the deployment, supporting multiple VCS providers.
+    """
+    provider: pulumi.Input[_builtins.str]
+    """
+    The VCS provider type.
+    """
+    deploy_commits: NotRequired[pulumi.Input[Optional[_builtins.bool]]]
+    """
+    Trigger a deployment running `pulumi up` on commit.
+    """
+    deploy_pull_request: NotRequired[pulumi.Input[Optional[_builtins.int]]]
+    """
+    Deploy a specific pull request number.
+    """
+    installation_id: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    """
+    The VCS integration installation ID. Use to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps). If omitted, the API resolves the integration automatically from `provider` and `repository`.
+    """
+    paths: NotRequired[pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]]
+    """
+    The paths within the repo that deployments should be filtered to.
+    """
+    preview_pull_requests: NotRequired[pulumi.Input[Optional[_builtins.bool]]]
+    """
+    Trigger a deployment running `pulumi preview` when a PR is opened.
+    """
+    pull_request_template: NotRequired[pulumi.Input[Optional[_builtins.bool]]]
+    """
+    Use this stack as a template for pull request review stacks.
+    """
+    repository: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    """
+    The repository identifier (e.g., 'ProjectName/RepoName' for Azure DevOps, 'org/repo' for GitHub).
+    """
 
 @pulumi.input_type
 class DeploymentSettingsVcsArgs:
     def __init__(__self__, *,
                  provider: pulumi.Input[_builtins.str],
-                 deploy_commits: Optional[pulumi.Input[_builtins.bool]] = None,
-                 deploy_pull_request: Optional[pulumi.Input[_builtins.int]] = None,
-                 paths: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
-                 preview_pull_requests: Optional[pulumi.Input[_builtins.bool]] = None,
-                 pull_request_template: Optional[pulumi.Input[_builtins.bool]] = None,
-                 repository: Optional[pulumi.Input[_builtins.str]] = None):
+                 deploy_commits: pulumi.Input[Optional[_builtins.bool]] = None,
+                 deploy_pull_request: pulumi.Input[Optional[_builtins.int]] = None,
+                 installation_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 paths: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 preview_pull_requests: pulumi.Input[Optional[_builtins.bool]] = None,
+                 pull_request_template: pulumi.Input[Optional[_builtins.bool]] = None,
+                 repository: pulumi.Input[Optional[_builtins.str]] = None):
         """
         VCS settings for the deployment, supporting multiple VCS providers.
+
         :param pulumi.Input[_builtins.str] provider: The VCS provider type.
         :param pulumi.Input[_builtins.bool] deploy_commits: Trigger a deployment running `pulumi up` on commit.
         :param pulumi.Input[_builtins.int] deploy_pull_request: Deploy a specific pull request number.
+        :param pulumi.Input[_builtins.str] installation_id: The VCS integration installation ID. Use to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps). If omitted, the API resolves the integration automatically from `provider` and `repository`.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] paths: The paths within the repo that deployments should be filtered to.
         :param pulumi.Input[_builtins.bool] preview_pull_requests: Trigger a deployment running `pulumi preview` when a PR is opened.
         :param pulumi.Input[_builtins.bool] pull_request_template: Use this stack as a template for pull request review stacks.
@@ -1133,6 +1105,8 @@ class DeploymentSettingsVcsArgs:
             pulumi.set(__self__, "deploy_commits", deploy_commits)
         if deploy_pull_request is not None:
             pulumi.set(__self__, "deploy_pull_request", deploy_pull_request)
+        if installation_id is not None:
+            pulumi.set(__self__, "installation_id", installation_id)
         if paths is not None:
             pulumi.set(__self__, "paths", paths)
         if preview_pull_requests is None:
@@ -1160,100 +1134,109 @@ class DeploymentSettingsVcsArgs:
 
     @_builtins.property
     @pulumi.getter(name="deployCommits")
-    def deploy_commits(self) -> Optional[pulumi.Input[_builtins.bool]]:
+    def deploy_commits(self) -> pulumi.Input[Optional[_builtins.bool]]:
         """
         Trigger a deployment running `pulumi up` on commit.
         """
         return pulumi.get(self, "deploy_commits")
 
     @deploy_commits.setter
-    def deploy_commits(self, value: Optional[pulumi.Input[_builtins.bool]]):
+    def deploy_commits(self, value: pulumi.Input[Optional[_builtins.bool]]):
         pulumi.set(self, "deploy_commits", value)
 
     @_builtins.property
     @pulumi.getter(name="deployPullRequest")
-    def deploy_pull_request(self) -> Optional[pulumi.Input[_builtins.int]]:
+    def deploy_pull_request(self) -> pulumi.Input[Optional[_builtins.int]]:
         """
         Deploy a specific pull request number.
         """
         return pulumi.get(self, "deploy_pull_request")
 
     @deploy_pull_request.setter
-    def deploy_pull_request(self, value: Optional[pulumi.Input[_builtins.int]]):
+    def deploy_pull_request(self, value: pulumi.Input[Optional[_builtins.int]]):
         pulumi.set(self, "deploy_pull_request", value)
 
     @_builtins.property
+    @pulumi.getter(name="installationId")
+    def installation_id(self) -> pulumi.Input[Optional[_builtins.str]]:
+        """
+        The VCS integration installation ID. Use to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps). If omitted, the API resolves the integration automatically from `provider` and `repository`.
+        """
+        return pulumi.get(self, "installation_id")
+
+    @installation_id.setter
+    def installation_id(self, value: pulumi.Input[Optional[_builtins.str]]):
+        pulumi.set(self, "installation_id", value)
+
+    @_builtins.property
     @pulumi.getter
-    def paths(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]:
+    def paths(self) -> pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]:
         """
         The paths within the repo that deployments should be filtered to.
         """
         return pulumi.get(self, "paths")
 
     @paths.setter
-    def paths(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]):
+    def paths(self, value: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]):
         pulumi.set(self, "paths", value)
 
     @_builtins.property
     @pulumi.getter(name="previewPullRequests")
-    def preview_pull_requests(self) -> Optional[pulumi.Input[_builtins.bool]]:
+    def preview_pull_requests(self) -> pulumi.Input[Optional[_builtins.bool]]:
         """
         Trigger a deployment running `pulumi preview` when a PR is opened.
         """
         return pulumi.get(self, "preview_pull_requests")
 
     @preview_pull_requests.setter
-    def preview_pull_requests(self, value: Optional[pulumi.Input[_builtins.bool]]):
+    def preview_pull_requests(self, value: pulumi.Input[Optional[_builtins.bool]]):
         pulumi.set(self, "preview_pull_requests", value)
 
     @_builtins.property
     @pulumi.getter(name="pullRequestTemplate")
-    def pull_request_template(self) -> Optional[pulumi.Input[_builtins.bool]]:
+    def pull_request_template(self) -> pulumi.Input[Optional[_builtins.bool]]:
         """
         Use this stack as a template for pull request review stacks.
         """
         return pulumi.get(self, "pull_request_template")
 
     @pull_request_template.setter
-    def pull_request_template(self, value: Optional[pulumi.Input[_builtins.bool]]):
+    def pull_request_template(self, value: pulumi.Input[Optional[_builtins.bool]]):
         pulumi.set(self, "pull_request_template", value)
 
     @_builtins.property
     @pulumi.getter
-    def repository(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def repository(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The repository identifier (e.g., 'ProjectName/RepoName' for Azure DevOps, 'org/repo' for GitHub).
         """
         return pulumi.get(self, "repository")
 
     @repository.setter
-    def repository(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def repository(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "repository", value)
 
 
-if not MYPY:
-    class EligibleApproverArgsDict(TypedDict):
-        rbac_permission: NotRequired[pulumi.Input['RbacPermission']]
-        """
-        RBAC permission that gives right to approve.
-        """
-        team_name: NotRequired[pulumi.Input[_builtins.str]]
-        """
-        Name of the team that can approve.
-        """
-        user: NotRequired[pulumi.Input[_builtins.str]]
-        """
-        Login of the user that can approve.
-        """
-elif False:
-    EligibleApproverArgsDict: TypeAlias = Mapping[str, Any]
+class EligibleApproverArgsDict(TypedDict):
+    rbac_permission: NotRequired[pulumi.Input[Optional['RbacPermission']]]
+    """
+    RBAC permission that gives right to approve.
+    """
+    team_name: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    """
+    Name of the team that can approve.
+    """
+    user: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    """
+    Login of the user that can approve.
+    """
 
 @pulumi.input_type
 class EligibleApproverArgs:
     def __init__(__self__, *,
-                 rbac_permission: Optional[pulumi.Input['RbacPermission']] = None,
-                 team_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 user: Optional[pulumi.Input[_builtins.str]] = None):
+                 rbac_permission: pulumi.Input[Optional['RbacPermission']] = None,
+                 team_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 user: pulumi.Input[Optional[_builtins.str]] = None):
         """
         :param pulumi.Input['RbacPermission'] rbac_permission: RBAC permission that gives right to approve.
         :param pulumi.Input[_builtins.str] team_name: Name of the team that can approve.
@@ -1268,57 +1251,54 @@ class EligibleApproverArgs:
 
     @_builtins.property
     @pulumi.getter(name="rbacPermission")
-    def rbac_permission(self) -> Optional[pulumi.Input['RbacPermission']]:
+    def rbac_permission(self) -> pulumi.Input[Optional['RbacPermission']]:
         """
         RBAC permission that gives right to approve.
         """
         return pulumi.get(self, "rbac_permission")
 
     @rbac_permission.setter
-    def rbac_permission(self, value: Optional[pulumi.Input['RbacPermission']]):
+    def rbac_permission(self, value: pulumi.Input[Optional['RbacPermission']]):
         pulumi.set(self, "rbac_permission", value)
 
     @_builtins.property
     @pulumi.getter(name="teamName")
-    def team_name(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def team_name(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         Name of the team that can approve.
         """
         return pulumi.get(self, "team_name")
 
     @team_name.setter
-    def team_name(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def team_name(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "team_name", value)
 
     @_builtins.property
     @pulumi.getter
-    def user(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def user(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         Login of the user that can approve.
         """
         return pulumi.get(self, "user")
 
     @user.setter
-    def user(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def user(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "user", value)
 
 
-if not MYPY:
-    class EnvironmentIdentifierArgsDict(TypedDict):
-        name: pulumi.Input[_builtins.str]
-        """
-        The environment name.
-        """
-        organization: pulumi.Input[_builtins.str]
-        """
-        The organization name.
-        """
-        project: pulumi.Input[_builtins.str]
-        """
-        The project name.
-        """
-elif False:
-    EnvironmentIdentifierArgsDict: TypeAlias = Mapping[str, Any]
+class EnvironmentIdentifierArgsDict(TypedDict):
+    name: pulumi.Input[_builtins.str]
+    """
+    The environment name.
+    """
+    organization: pulumi.Input[_builtins.str]
+    """
+    The organization name.
+    """
+    project: pulumi.Input[_builtins.str]
+    """
+    The project name.
+    """
 
 @pulumi.input_type
 class EnvironmentIdentifierArgs:
@@ -1372,34 +1352,31 @@ class EnvironmentIdentifierArgs:
         pulumi.set(self, "project", value)
 
 
-if not MYPY:
-    class GCPOIDCConfigurationArgsDict(TypedDict):
-        project_id: pulumi.Input[_builtins.str]
-        """
-        The numerical ID of the GCP project.
-        """
-        provider_id: pulumi.Input[_builtins.str]
-        """
-        The ID of the identity provider associated with the workload pool.
-        """
-        service_account: pulumi.Input[_builtins.str]
-        """
-        The email address of the service account to use.
-        """
-        workload_pool_id: pulumi.Input[_builtins.str]
-        """
-        The ID of the workload pool to use.
-        """
-        region: NotRequired[pulumi.Input[_builtins.str]]
-        """
-        The region of the GCP project.
-        """
-        token_lifetime: NotRequired[pulumi.Input[_builtins.str]]
-        """
-        The lifetime of the temporary credentials in “XhYmZs” format.
-        """
-elif False:
-    GCPOIDCConfigurationArgsDict: TypeAlias = Mapping[str, Any]
+class GCPOIDCConfigurationArgsDict(TypedDict):
+    project_id: pulumi.Input[_builtins.str]
+    """
+    The numerical ID of the GCP project.
+    """
+    provider_id: pulumi.Input[_builtins.str]
+    """
+    The ID of the identity provider associated with the workload pool.
+    """
+    service_account: pulumi.Input[_builtins.str]
+    """
+    The email address of the service account to use.
+    """
+    workload_pool_id: pulumi.Input[_builtins.str]
+    """
+    The ID of the workload pool to use.
+    """
+    region: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    """
+    The region of the GCP project.
+    """
+    token_lifetime: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    """
+    The lifetime of the temporary credentials in “XhYmZs” format.
+    """
 
 @pulumi.input_type
 class GCPOIDCConfigurationArgs:
@@ -1408,8 +1385,8 @@ class GCPOIDCConfigurationArgs:
                  provider_id: pulumi.Input[_builtins.str],
                  service_account: pulumi.Input[_builtins.str],
                  workload_pool_id: pulumi.Input[_builtins.str],
-                 region: Optional[pulumi.Input[_builtins.str]] = None,
-                 token_lifetime: Optional[pulumi.Input[_builtins.str]] = None):
+                 region: pulumi.Input[Optional[_builtins.str]] = None,
+                 token_lifetime: pulumi.Input[Optional[_builtins.str]] = None):
         """
         :param pulumi.Input[_builtins.str] project_id: The numerical ID of the GCP project.
         :param pulumi.Input[_builtins.str] provider_id: The ID of the identity provider associated with the workload pool.
@@ -1477,52 +1454,49 @@ class GCPOIDCConfigurationArgs:
 
     @_builtins.property
     @pulumi.getter
-    def region(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def region(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The region of the GCP project.
         """
         return pulumi.get(self, "region")
 
     @region.setter
-    def region(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def region(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "region", value)
 
     @_builtins.property
     @pulumi.getter(name="tokenLifetime")
-    def token_lifetime(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def token_lifetime(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The lifetime of the temporary credentials in “XhYmZs” format.
         """
         return pulumi.get(self, "token_lifetime")
 
     @token_lifetime.setter
-    def token_lifetime(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def token_lifetime(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "token_lifetime", value)
 
 
-if not MYPY:
-    class OperationContextOIDCArgsDict(TypedDict):
-        aws: NotRequired[pulumi.Input['AWSOIDCConfigurationArgsDict']]
-        """
-        AWS-specific OIDC configuration.
-        """
-        azure: NotRequired[pulumi.Input['AzureOIDCConfigurationArgsDict']]
-        """
-        Azure-specific OIDC configuration.
-        """
-        gcp: NotRequired[pulumi.Input['GCPOIDCConfigurationArgsDict']]
-        """
-        GCP-specific OIDC configuration.
-        """
-elif False:
-    OperationContextOIDCArgsDict: TypeAlias = Mapping[str, Any]
+class OperationContextOIDCArgsDict(TypedDict):
+    aws: NotRequired[pulumi.Input[Optional['AWSOIDCConfigurationArgs']]]
+    """
+    AWS-specific OIDC configuration.
+    """
+    azure: NotRequired[pulumi.Input[Optional['AzureOIDCConfigurationArgs']]]
+    """
+    Azure-specific OIDC configuration.
+    """
+    gcp: NotRequired[pulumi.Input[Optional['GCPOIDCConfigurationArgs']]]
+    """
+    GCP-specific OIDC configuration.
+    """
 
 @pulumi.input_type
 class OperationContextOIDCArgs:
     def __init__(__self__, *,
-                 aws: Optional[pulumi.Input['AWSOIDCConfigurationArgs']] = None,
-                 azure: Optional[pulumi.Input['AzureOIDCConfigurationArgs']] = None,
-                 gcp: Optional[pulumi.Input['GCPOIDCConfigurationArgs']] = None):
+                 aws: pulumi.Input[Optional['AWSOIDCConfigurationArgs']] = None,
+                 azure: pulumi.Input[Optional['AzureOIDCConfigurationArgs']] = None,
+                 gcp: pulumi.Input[Optional['GCPOIDCConfigurationArgs']] = None):
         """
         :param pulumi.Input['AWSOIDCConfigurationArgs'] aws: AWS-specific OIDC configuration.
         :param pulumi.Input['AzureOIDCConfigurationArgs'] azure: Azure-specific OIDC configuration.
@@ -1537,69 +1511,66 @@ class OperationContextOIDCArgs:
 
     @_builtins.property
     @pulumi.getter
-    def aws(self) -> Optional[pulumi.Input['AWSOIDCConfigurationArgs']]:
+    def aws(self) -> pulumi.Input[Optional['AWSOIDCConfigurationArgs']]:
         """
         AWS-specific OIDC configuration.
         """
         return pulumi.get(self, "aws")
 
     @aws.setter
-    def aws(self, value: Optional[pulumi.Input['AWSOIDCConfigurationArgs']]):
+    def aws(self, value: pulumi.Input[Optional['AWSOIDCConfigurationArgs']]):
         pulumi.set(self, "aws", value)
 
     @_builtins.property
     @pulumi.getter
-    def azure(self) -> Optional[pulumi.Input['AzureOIDCConfigurationArgs']]:
+    def azure(self) -> pulumi.Input[Optional['AzureOIDCConfigurationArgs']]:
         """
         Azure-specific OIDC configuration.
         """
         return pulumi.get(self, "azure")
 
     @azure.setter
-    def azure(self, value: Optional[pulumi.Input['AzureOIDCConfigurationArgs']]):
+    def azure(self, value: pulumi.Input[Optional['AzureOIDCConfigurationArgs']]):
         pulumi.set(self, "azure", value)
 
     @_builtins.property
     @pulumi.getter
-    def gcp(self) -> Optional[pulumi.Input['GCPOIDCConfigurationArgs']]:
+    def gcp(self) -> pulumi.Input[Optional['GCPOIDCConfigurationArgs']]:
         """
         GCP-specific OIDC configuration.
         """
         return pulumi.get(self, "gcp")
 
     @gcp.setter
-    def gcp(self, value: Optional[pulumi.Input['GCPOIDCConfigurationArgs']]):
+    def gcp(self, value: pulumi.Input[Optional['GCPOIDCConfigurationArgs']]):
         pulumi.set(self, "gcp", value)
 
 
-if not MYPY:
-    class OperationContextOptionsArgsDict(TypedDict):
-        delete_after_destroy: NotRequired[pulumi.Input[_builtins.bool]]
-        """
-        Whether the stack should be deleted after it is destroyed.
-        """
-        shell: NotRequired[pulumi.Input[_builtins.str]]
-        """
-        The shell to use to run commands during the deployment. Defaults to 'bash'.
-        """
-        skip_install_dependencies: NotRequired[pulumi.Input[_builtins.bool]]
-        """
-        Skip the default dependency installation step - use this to customize the dependency installation (e.g. if using yarn or poetry)
-        """
-        skip_intermediate_deployments: NotRequired[pulumi.Input[_builtins.bool]]
-        """
-        Skip intermediate deployments (Consolidate multiple deployments of the same type into one deployment)
-        """
-elif False:
-    OperationContextOptionsArgsDict: TypeAlias = Mapping[str, Any]
+class OperationContextOptionsArgsDict(TypedDict):
+    delete_after_destroy: NotRequired[pulumi.Input[Optional[_builtins.bool]]]
+    """
+    Whether the stack should be deleted after it is destroyed.
+    """
+    shell: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    """
+    The shell to use to run commands during the deployment. Defaults to 'bash'.
+    """
+    skip_install_dependencies: NotRequired[pulumi.Input[Optional[_builtins.bool]]]
+    """
+    Skip the default dependency installation step - use this to customize the dependency installation (e.g. if using yarn or poetry)
+    """
+    skip_intermediate_deployments: NotRequired[pulumi.Input[Optional[_builtins.bool]]]
+    """
+    Skip intermediate deployments (Consolidate multiple deployments of the same type into one deployment)
+    """
 
 @pulumi.input_type
 class OperationContextOptionsArgs:
     def __init__(__self__, *,
-                 delete_after_destroy: Optional[pulumi.Input[_builtins.bool]] = None,
-                 shell: Optional[pulumi.Input[_builtins.str]] = None,
-                 skip_install_dependencies: Optional[pulumi.Input[_builtins.bool]] = None,
-                 skip_intermediate_deployments: Optional[pulumi.Input[_builtins.bool]] = None):
+                 delete_after_destroy: pulumi.Input[Optional[_builtins.bool]] = None,
+                 shell: pulumi.Input[Optional[_builtins.str]] = None,
+                 skip_install_dependencies: pulumi.Input[Optional[_builtins.bool]] = None,
+                 skip_intermediate_deployments: pulumi.Input[Optional[_builtins.bool]] = None):
         """
         :param pulumi.Input[_builtins.bool] delete_after_destroy: Whether the stack should be deleted after it is destroyed.
         :param pulumi.Input[_builtins.str] shell: The shell to use to run commands during the deployment. Defaults to 'bash'.
@@ -1617,86 +1588,84 @@ class OperationContextOptionsArgs:
 
     @_builtins.property
     @pulumi.getter(name="deleteAfterDestroy")
-    def delete_after_destroy(self) -> Optional[pulumi.Input[_builtins.bool]]:
+    def delete_after_destroy(self) -> pulumi.Input[Optional[_builtins.bool]]:
         """
         Whether the stack should be deleted after it is destroyed.
         """
         return pulumi.get(self, "delete_after_destroy")
 
     @delete_after_destroy.setter
-    def delete_after_destroy(self, value: Optional[pulumi.Input[_builtins.bool]]):
+    def delete_after_destroy(self, value: pulumi.Input[Optional[_builtins.bool]]):
         pulumi.set(self, "delete_after_destroy", value)
 
     @_builtins.property
     @pulumi.getter
-    def shell(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def shell(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The shell to use to run commands during the deployment. Defaults to 'bash'.
         """
         return pulumi.get(self, "shell")
 
     @shell.setter
-    def shell(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def shell(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "shell", value)
 
     @_builtins.property
     @pulumi.getter(name="skipInstallDependencies")
-    def skip_install_dependencies(self) -> Optional[pulumi.Input[_builtins.bool]]:
+    def skip_install_dependencies(self) -> pulumi.Input[Optional[_builtins.bool]]:
         """
         Skip the default dependency installation step - use this to customize the dependency installation (e.g. if using yarn or poetry)
         """
         return pulumi.get(self, "skip_install_dependencies")
 
     @skip_install_dependencies.setter
-    def skip_install_dependencies(self, value: Optional[pulumi.Input[_builtins.bool]]):
+    def skip_install_dependencies(self, value: pulumi.Input[Optional[_builtins.bool]]):
         pulumi.set(self, "skip_install_dependencies", value)
 
     @_builtins.property
     @pulumi.getter(name="skipIntermediateDeployments")
-    def skip_intermediate_deployments(self) -> Optional[pulumi.Input[_builtins.bool]]:
+    def skip_intermediate_deployments(self) -> pulumi.Input[Optional[_builtins.bool]]:
         """
         Skip intermediate deployments (Consolidate multiple deployments of the same type into one deployment)
         """
         return pulumi.get(self, "skip_intermediate_deployments")
 
     @skip_intermediate_deployments.setter
-    def skip_intermediate_deployments(self, value: Optional[pulumi.Input[_builtins.bool]]):
+    def skip_intermediate_deployments(self, value: pulumi.Input[Optional[_builtins.bool]]):
         pulumi.set(self, "skip_intermediate_deployments", value)
 
 
-if not MYPY:
-    class PolicyGroupPolicyPackReferenceInputArgsDict(TypedDict):
-        """
-        A reference to a policy pack within a policy group (input).
-        """
-        name: pulumi.Input[_builtins.str]
-        """
-        The name of the policy pack.
-        """
-        config: NotRequired[pulumi.Input[Mapping[str, Any]]]
-        """
-        Optional configuration for the policy pack. The special key `all` sets the default enforcement level for every policy in the pack; per-policy entries override it.
-        """
-        display_name: NotRequired[pulumi.Input[_builtins.str]]
-        """
-        The display name of the policy pack.
-        """
-        version_tag: NotRequired[pulumi.Input[_builtins.str]]
-        """
-        The version tag of the policy pack.
-        """
-elif False:
-    PolicyGroupPolicyPackReferenceInputArgsDict: TypeAlias = Mapping[str, Any]
+class PolicyGroupPolicyPackReferenceInputArgsDict(TypedDict):
+    """
+    A reference to a policy pack within a policy group (input).
+    """
+    name: pulumi.Input[_builtins.str]
+    """
+    The name of the policy pack.
+    """
+    config: NotRequired[pulumi.Input[Optional[Mapping[str, Any]]]]
+    """
+    Optional configuration for the policy pack. The special key `all` sets the default enforcement level for every policy in the pack; per-policy entries override it.
+    """
+    display_name: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    """
+    The display name of the policy pack.
+    """
+    version_tag: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    """
+    The version tag of the policy pack.
+    """
 
 @pulumi.input_type
 class PolicyGroupPolicyPackReferenceInputArgs:
     def __init__(__self__, *,
                  name: pulumi.Input[_builtins.str],
-                 config: Optional[pulumi.Input[Mapping[str, Any]]] = None,
-                 display_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 version_tag: Optional[pulumi.Input[_builtins.str]] = None):
+                 config: pulumi.Input[Optional[Mapping[str, Any]]] = None,
+                 display_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 version_tag: pulumi.Input[Optional[_builtins.str]] = None):
         """
         A reference to a policy pack within a policy group (input).
+
         :param pulumi.Input[_builtins.str] name: The name of the policy pack.
         :param pulumi.Input[Mapping[str, Any]] config: Optional configuration for the policy pack. The special key `all` sets the default enforcement level for every policy in the pack; per-policy entries override it.
         :param pulumi.Input[_builtins.str] display_name: The display name of the policy pack.
@@ -1724,56 +1693,53 @@ class PolicyGroupPolicyPackReferenceInputArgs:
 
     @_builtins.property
     @pulumi.getter
-    def config(self) -> Optional[pulumi.Input[Mapping[str, Any]]]:
+    def config(self) -> pulumi.Input[Optional[Mapping[str, Any]]]:
         """
         Optional configuration for the policy pack. The special key `all` sets the default enforcement level for every policy in the pack; per-policy entries override it.
         """
         return pulumi.get(self, "config")
 
     @config.setter
-    def config(self, value: Optional[pulumi.Input[Mapping[str, Any]]]):
+    def config(self, value: pulumi.Input[Optional[Mapping[str, Any]]]):
         pulumi.set(self, "config", value)
 
     @_builtins.property
     @pulumi.getter(name="displayName")
-    def display_name(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def display_name(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The display name of the policy pack.
         """
         return pulumi.get(self, "display_name")
 
     @display_name.setter
-    def display_name(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def display_name(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "display_name", value)
 
     @_builtins.property
     @pulumi.getter(name="versionTag")
-    def version_tag(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def version_tag(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The version tag of the policy pack.
         """
         return pulumi.get(self, "version_tag")
 
     @version_tag.setter
-    def version_tag(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def version_tag(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "version_tag", value)
 
 
-if not MYPY:
-    class PolicyGroupStackReferenceArgsDict(TypedDict):
-        """
-        A reference to a stack within a policy group.
-        """
-        name: pulumi.Input[_builtins.str]
-        """
-        The name of the stack.
-        """
-        routing_project: pulumi.Input[_builtins.str]
-        """
-        The routing project name (also known as project name).
-        """
-elif False:
-    PolicyGroupStackReferenceArgsDict: TypeAlias = Mapping[str, Any]
+class PolicyGroupStackReferenceArgsDict(TypedDict):
+    """
+    A reference to a stack within a policy group.
+    """
+    name: pulumi.Input[_builtins.str]
+    """
+    The name of the stack.
+    """
+    routing_project: pulumi.Input[_builtins.str]
+    """
+    The routing project name (also known as project name).
+    """
 
 @pulumi.input_type
 class PolicyGroupStackReferenceArgs:
@@ -1782,6 +1748,7 @@ class PolicyGroupStackReferenceArgs:
                  routing_project: pulumi.Input[_builtins.str]):
         """
         A reference to a stack within a policy group.
+
         :param pulumi.Input[_builtins.str] name: The name of the stack.
         :param pulumi.Input[_builtins.str] routing_project: The routing project name (also known as project name).
         """
@@ -1813,39 +1780,37 @@ class PolicyGroupStackReferenceArgs:
         pulumi.set(self, "routing_project", value)
 
 
-if not MYPY:
-    class StackConfigEnvironmentArgsDict(TypedDict):
-        """
-        Service-Backed Configuration: links a Stack to an ESC environment that holds its config and secrets. Set exactly one of `auto` (Stack-managed) or `project`+`environment` (reference an existing env).
-        """
-        auto: NotRequired[pulumi.Input[_builtins.bool]]
-        """
-        When `true`, the Stack manages a dedicated ESC environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack. Mutually exclusive with `project`+`environment`.
-        """
-        environment: NotRequired[pulumi.Input[_builtins.str]]
-        """
-        The name of the ESC environment to link. Mutually exclusive with `auto`. Used together with `project` to reference an existing environment.
-        """
-        project: NotRequired[pulumi.Input[_builtins.str]]
-        """
-        The project of the ESC environment to link. Mutually exclusive with `auto`. Used together with `environment` to reference an existing environment. Defaults to the ESC `default` project when omitted.
-        """
-        version: NotRequired[pulumi.Input[_builtins.str]]
-        """
-        Optional. Pin an existing environment link to a specific revision. Accepts a numeric revision (e.g. `"3"`) or a revision tag (e.g. `"prod"`). Not valid with `auto`.
-        """
-elif False:
-    StackConfigEnvironmentArgsDict: TypeAlias = Mapping[str, Any]
+class StackConfigEnvironmentArgsDict(TypedDict):
+    """
+    Service-Backed Configuration: links a Stack to an ESC environment that holds its config and secrets. Set exactly one of `auto` (Stack-managed) or `project`+`environment` (reference an existing env).
+    """
+    auto: NotRequired[pulumi.Input[Optional[_builtins.bool]]]
+    """
+    When `true`, the Stack manages a dedicated ESC environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack. Mutually exclusive with `project`+`environment`.
+    """
+    environment: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    """
+    The name of the ESC environment to link. Mutually exclusive with `auto`. Used together with `project` to reference an existing environment.
+    """
+    project: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    """
+    The project of the ESC environment to link. Mutually exclusive with `auto`. Used together with `environment` to reference an existing environment. Defaults to the ESC `default` project when omitted.
+    """
+    version: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    """
+    Optional. Pin an existing environment link to a specific revision. Accepts a numeric revision (e.g. `"3"`) or a revision tag (e.g. `"prod"`). Not valid with `auto`.
+    """
 
 @pulumi.input_type
 class StackConfigEnvironmentArgs:
     def __init__(__self__, *,
-                 auto: Optional[pulumi.Input[_builtins.bool]] = None,
-                 environment: Optional[pulumi.Input[_builtins.str]] = None,
-                 project: Optional[pulumi.Input[_builtins.str]] = None,
-                 version: Optional[pulumi.Input[_builtins.str]] = None):
+                 auto: pulumi.Input[Optional[_builtins.bool]] = None,
+                 environment: pulumi.Input[Optional[_builtins.str]] = None,
+                 project: pulumi.Input[Optional[_builtins.str]] = None,
+                 version: pulumi.Input[Optional[_builtins.str]] = None):
         """
         Service-Backed Configuration: links a Stack to an ESC environment that holds its config and secrets. Set exactly one of `auto` (Stack-managed) or `project`+`environment` (reference an existing env).
+
         :param pulumi.Input[_builtins.bool] auto: When `true`, the Stack manages a dedicated ESC environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack. Mutually exclusive with `project`+`environment`.
         :param pulumi.Input[_builtins.str] environment: The name of the ESC environment to link. Mutually exclusive with `auto`. Used together with `project` to reference an existing environment.
         :param pulumi.Input[_builtins.str] project: The project of the ESC environment to link. Mutually exclusive with `auto`. Used together with `environment` to reference an existing environment. Defaults to the ESC `default` project when omitted.
@@ -1862,66 +1827,63 @@ class StackConfigEnvironmentArgs:
 
     @_builtins.property
     @pulumi.getter
-    def auto(self) -> Optional[pulumi.Input[_builtins.bool]]:
+    def auto(self) -> pulumi.Input[Optional[_builtins.bool]]:
         """
         When `true`, the Stack manages a dedicated ESC environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack. Mutually exclusive with `project`+`environment`.
         """
         return pulumi.get(self, "auto")
 
     @auto.setter
-    def auto(self, value: Optional[pulumi.Input[_builtins.bool]]):
+    def auto(self, value: pulumi.Input[Optional[_builtins.bool]]):
         pulumi.set(self, "auto", value)
 
     @_builtins.property
     @pulumi.getter
-    def environment(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def environment(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The name of the ESC environment to link. Mutually exclusive with `auto`. Used together with `project` to reference an existing environment.
         """
         return pulumi.get(self, "environment")
 
     @environment.setter
-    def environment(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def environment(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "environment", value)
 
     @_builtins.property
     @pulumi.getter
-    def project(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def project(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The project of the ESC environment to link. Mutually exclusive with `auto`. Used together with `environment` to reference an existing environment. Defaults to the ESC `default` project when omitted.
         """
         return pulumi.get(self, "project")
 
     @project.setter
-    def project(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def project(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "project", value)
 
     @_builtins.property
     @pulumi.getter
-    def version(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def version(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         Optional. Pin an existing environment link to a specific revision. Accepts a numeric revision (e.g. `"3"`) or a revision tag (e.g. `"prod"`). Not valid with `auto`.
         """
         return pulumi.get(self, "version")
 
     @version.setter
-    def version(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def version(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "version", value)
 
 
-if not MYPY:
-    class TemplateSourceDestinationArgsDict(TypedDict):
-        url: NotRequired[pulumi.Input[_builtins.str]]
-        """
-        Destination URL that gets filled in on new project creation.
-        """
-elif False:
-    TemplateSourceDestinationArgsDict: TypeAlias = Mapping[str, Any]
+class TemplateSourceDestinationArgsDict(TypedDict):
+    url: NotRequired[pulumi.Input[Optional[_builtins.str]]]
+    """
+    Destination URL that gets filled in on new project creation.
+    """
 
 @pulumi.input_type
 class TemplateSourceDestinationArgs:
     def __init__(__self__, *,
-                 url: Optional[pulumi.Input[_builtins.str]] = None):
+                 url: pulumi.Input[Optional[_builtins.str]] = None):
         """
         :param pulumi.Input[_builtins.str] url: Destination URL that gets filled in on new project creation.
         """
@@ -1930,14 +1892,14 @@ class TemplateSourceDestinationArgs:
 
     @_builtins.property
     @pulumi.getter
-    def url(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def url(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         Destination URL that gets filled in on new project creation.
         """
         return pulumi.get(self, "url")
 
     @url.setter
-    def url(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def url(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "url", value)
 
 

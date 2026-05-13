@@ -45,6 +45,7 @@ var (
 //
 // All client interfaces from [pulumiapi] should be added to this interface.
 type Client interface {
+	pulumiapi.AccessTokenClient
 	pulumiapi.AgentPoolClient
 	pulumiapi.ApprovalRuleClient
 	pulumiapi.DeploymentSettingsClient
@@ -53,10 +54,14 @@ type Client interface {
 	pulumiapi.InsightsAccountClient
 	pulumiapi.MemberClient
 	pulumiapi.OidcClient
+	pulumiapi.OrgAccessTokenClient
 	pulumiapi.RoleClient
+	pulumiapi.StackScheduleClient
 	pulumiapi.StackTagClient
+	pulumiapi.TeamAccessTokenClient
 	pulumiapi.TeamClient
 	pulumiapi.TeamRoleClient
+	pulumiapi.TemplateSourceClient
 	pulumiapi.UserClient
 	pulumiapi.WebhookClient
 }
@@ -91,6 +96,14 @@ func (c *Config) Configure(context.Context) error {
 
 	if c.AccessToken == "" {
 		return ErrAccessTokenNotFound
+	}
+
+	// `pulumi import` persists default-provider state with empty inputs;
+	// on subsequent destroy, Configure receives apiUrl="" and would fall
+	// through to NewClient's api.pulumi.com default. Symmetric fallback
+	// to the AccessToken one above.
+	if c.APIURL == "" {
+		c.APIURL = os.Getenv(EnvVarPulumiBackendURL)
 	}
 
 	var err error

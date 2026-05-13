@@ -14,7 +14,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 /**
- * Access tokens allow a user to authenticate against the Pulumi Cloud
+ * Access tokens allow a user to authenticate against the Pulumi Cloud.
  * 
  */
 @ResourceType(type="pulumiservice:index:AccessToken")
@@ -89,6 +89,9 @@ public class AccessToken extends com.pulumi.resources.CustomResource {
             .version(Utilities.getVersion())
             .additionalSecretOutputs(List.of(
                 "value"
+            ))
+            .replaceOnChanges(List.of(
+                "description"
             ))
             .build();
         return com.pulumi.resources.CustomResourceOptions.merge(defaultOptions, options, id);

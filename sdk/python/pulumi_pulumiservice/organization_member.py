@@ -21,10 +21,11 @@ class OrganizationMemberArgs:
     def __init__(__self__, *,
                  organization_name: pulumi.Input[_builtins.str],
                  username: pulumi.Input[_builtins.str],
-                 role: Optional[pulumi.Input[_builtins.str]] = None,
-                 role_id: Optional[pulumi.Input[_builtins.str]] = None):
+                 role: pulumi.Input[Optional[_builtins.str]] = None,
+                 role_id: pulumi.Input[Optional[_builtins.str]] = None):
         """
         The set of arguments for constructing a OrganizationMember resource.
+
         :param pulumi.Input[_builtins.str] organization_name: The Pulumi Cloud organization name.
         :param pulumi.Input[_builtins.str] username: The Pulumi Cloud username of the member.
         :param pulumi.Input[_builtins.str] role: The built-in organization role. One of `member`, `admin`, `billing-manager`. Defaults to `member` on create. Ignored when `roleId` is set.
@@ -63,26 +64,26 @@ class OrganizationMemberArgs:
 
     @_builtins.property
     @pulumi.getter
-    def role(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def role(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The built-in organization role. One of `member`, `admin`, `billing-manager`. Defaults to `member` on create. Ignored when `roleId` is set.
         """
         return pulumi.get(self, "role")
 
     @role.setter
-    def role(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def role(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "role", value)
 
     @_builtins.property
     @pulumi.getter(name="roleId")
-    def role_id(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def role_id(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The ID of a custom (fine-grained) organization role to assign. Takes precedence over `role`.
         """
         return pulumi.get(self, "role_id")
 
     @role_id.setter
-    def role_id(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def role_id(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "role_id", value)
 
 
@@ -92,13 +93,14 @@ class OrganizationMember(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 organization_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 role: Optional[pulumi.Input[_builtins.str]] = None,
-                 role_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 username: Optional[pulumi.Input[_builtins.str]] = None,
+                 organization_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 role: pulumi.Input[Optional[_builtins.str]] = None,
+                 role_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 username: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
         Manages a user's membership in a Pulumi Cloud organization and their assigned role. The user must already have a Pulumi Cloud account before they can be added. Custom (fine-grained) roles are assigned by setting `roleId`; built-in roles are assigned by setting `role`. When both are set, `roleId` takes precedence.
+
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
@@ -116,6 +118,7 @@ class OrganizationMember(pulumi.CustomResource):
         """
         Manages a user's membership in a Pulumi Cloud organization and their assigned role. The user must already have a Pulumi Cloud account before they can be added. Custom (fine-grained) roles are assigned by setting `roleId`; built-in roles are assigned by setting `role`. When both are set, `roleId` takes precedence.
 
+
         :param str resource_name: The name of the resource.
         :param OrganizationMemberArgs args: The arguments to use to populate this resource's properties.
         :param pulumi.ResourceOptions opts: Options for the resource.
@@ -131,10 +134,10 @@ class OrganizationMember(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 organization_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 role: Optional[pulumi.Input[_builtins.str]] = None,
-                 role_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 username: Optional[pulumi.Input[_builtins.str]] = None,
+                 organization_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 role: pulumi.Input[Optional[_builtins.str]] = None,
+                 role_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 username: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

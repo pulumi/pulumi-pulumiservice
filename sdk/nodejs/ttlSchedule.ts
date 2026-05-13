@@ -97,6 +97,8 @@ export class TtlSchedule extends pulumi.CustomResource {
             resourceInputs["timestamp"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["organization", "project", "stack", "timestamp"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(TtlSchedule.__pulumiType, name, resourceInputs, opts);
     }
 }
@@ -108,7 +110,7 @@ export interface TtlScheduleArgs {
     /**
      * True if the stack and all associated history and settings should be deleted.
      */
-    deleteAfterDestroy?: pulumi.Input<boolean>;
+    deleteAfterDestroy?: pulumi.Input<boolean | undefined>;
     /**
      * Organization name.
      */

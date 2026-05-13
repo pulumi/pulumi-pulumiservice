@@ -1,9 +1,11 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as service from "@pulumi/pulumiservice";
 
+const config = new pulumi.Config();
+
 const team = new service.Team("team", {
     description: "This was created with Pulumi",
-    name: "brand-new-ts-team",
+    name: "brand-new-ts-team-" + config.require("digits"),
     displayName: "PulumiUP Team",
     organizationName: process.env.PULUMI_TEST_OWNER || "service-provider-test-org",
     members: ["pulumi-bot", "service-provider-example-user"],

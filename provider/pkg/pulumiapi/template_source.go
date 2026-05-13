@@ -7,6 +7,19 @@ import (
 	"path"
 )
 
+type TemplateSourceClient interface {
+	CreateTemplateSource(
+		ctx context.Context, organizationName string, request CreateTemplateSourceRequest,
+	) (*TemplateSourceResponse, error)
+	UpdateTemplateSource(
+		ctx context.Context, organizationName, templateID string, request CreateTemplateSourceRequest,
+	) (*TemplateSourceResponse, error)
+	GetTemplateSource(
+		ctx context.Context, organizationName, templateID string,
+	) (*TemplateSourceResponse, error)
+	DeleteTemplateSource(ctx context.Context, organizationName, templateID string) error
+}
+
 type CreateTemplateSourceRequestDestination struct {
 	URL *string `json:"url"`
 }

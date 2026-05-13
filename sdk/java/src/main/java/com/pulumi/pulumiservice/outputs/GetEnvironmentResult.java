@@ -11,7 +11,7 @@ import java.util.Objects;
 @CustomType
 public final class GetEnvironmentResult {
     /**
-     * @return The environment&#39;s UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `literalEnvironment` expression.
+     * @return The environment&#39;s UUID. Pass it to `buildEnvironmentScopedPermissions` (preferred) or use it as the `identity` field of a hand-rolled `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`.
      * 
      */
     private String environmentId;
@@ -33,7 +33,7 @@ public final class GetEnvironmentResult {
 
     private GetEnvironmentResult() {}
     /**
-     * @return The environment&#39;s UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `literalEnvironment` expression.
+     * @return The environment&#39;s UUID. Pass it to `buildEnvironmentScopedPermissions` (preferred) or use it as the `identity` field of a hand-rolled `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`.
      * 
      */
     public String environmentId() {

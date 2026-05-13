@@ -90,24 +90,36 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 			version: version,
 		})).
 		WithResources(
+			infer.Resource(&resources.AccessToken{}),
+			infer.Resource(&resources.AgentPool{}),
+			infer.Resource(&resources.DeploymentSchedule{}),
+			infer.Resource(&resources.DriftSchedule{}),
+			infer.Resource(&resources.EnvironmentRotationSchedule{}),
 			infer.Resource(&resources.InsightsAccount{}),
+			infer.Resource(&resources.OrgAccessToken{}),
 			infer.Resource(&resources.OrganizationMember{}),
 			infer.Resource(&resources.OrganizationRole{}),
 			infer.Resource(&resources.StackTag{}),
+			infer.Resource(&resources.TTLSchedule{}),
 			infer.Resource(&resources.Team{}),
+			infer.Resource(&resources.TeamAccessToken{}),
+			infer.Resource(&resources.TeamEnvironmentPermission{}),
 			infer.Resource(&resources.TeamRoleAssignment{}),
+			infer.Resource(&resources.TeamStackPermission{}),
+			infer.Resource(&resources.TemplateSource{}),
 		).
 		WithFunctions(
+			infer.Function(&functions.BuildAllowPermissionsFunction{}),
+			infer.Function(&functions.BuildEnvironmentScopedPermissionsFunction{}),
+			infer.Function(&functions.BuildInsightsAccountScopedPermissionsFunction{}),
+			infer.Function(&functions.BuildStackScopedPermissionsFunction{}),
 			infer.Function(&functions.GetCurrentUserFunction{}),
 			infer.Function(&functions.GetEnvironmentFunction{}),
-			infer.Function(&functions.BuildEnvironmentScopedPermissionsFunction{}),
-			infer.Function(&functions.GetInsightsAccountsFunction{}),
 			infer.Function(&functions.GetInsightsAccountFunction{}),
-			infer.Function(&functions.BuildInsightsAccountScopedPermissionsFunction{}),
+			infer.Function(&functions.GetInsightsAccountsFunction{}),
 			infer.Function(&functions.GetOrganizationMemberFunction{}),
 			infer.Function(&functions.GetOrganizationMembersFunction{}),
 			infer.Function(&functions.GetOrganizationRoleScopesFunction{}),
-			infer.Function(&functions.BuildStackScopedPermissionsFunction{}),
 		).
 		WithModuleMap(map[tokens.ModuleName]tokens.ModuleName{
 			"resources": "index",
@@ -152,7 +164,12 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 			"python": map[string]any{
 				"packageName": "pulumi_pulumiservice",
 				"requires": map[string]any{
-					"pulumi": ">=3.0.0,<4.0.0",
+					// 3.235.0 is the first runtime that preserves
+					// `__`-prefixed input keys (pulumi/pulumi#22834),
+					// which OrganizationRole.permissions relies on for
+					// the `__type` discriminator at every level of the
+					// descriptor tree.
+					"pulumi": ">=3.235.0,<4.0.0",
 				},
 				"pyproject": map[string]any{
 					"enabled": true,
@@ -241,45 +258,18 @@ func (k *pulumiserviceProvider) Configure(
 	k.client = client
 
 	k.pulumiResources = []PulumiServiceResource{
-		&resources.PulumiServiceAccessTokenResource{
-			Client: client,
-		},
 		&resources.PulumiServiceWebhookResource{
 			Client: client,
 		},
 		&resources.PulumiServiceStackTagsResource{
 			Client: client,
 		},
-		&resources.TeamStackPermissionResource{
-			Client: client,
-		},
-		&resources.PulumiServiceTeamAccessTokenResource{
-			Client: client,
-		},
-		&resources.PulumiServiceOrgAccessTokenResource{
-			Client: client,
-		},
 		&resources.PulumiServiceDeploymentSettingsResource{
-			Client: client,
-		},
-		&resources.PulumiServiceAgentPoolResource{
-			Client: client,
-		},
-		&resources.PulumiServiceDeploymentScheduleResource{
-			Client: client,
-		},
-		&resources.PulumiServiceDriftScheduleResource{
-			Client: client,
-		},
-		&resources.PulumiServiceTTLScheduleResource{
 			Client: client,
 		},
 		&resources.PulumiServiceEnvironmentResource{
 			Client:         escClient,
 			MetadataClient: client,
-		},
-		&resources.PulumiServiceTeamEnvironmentPermissionResource{
-			Client: client,
 		},
 		&resources.PulumiServiceEnvironmentVersionTagResource{
 			Client: escClient,
@@ -287,13 +277,7 @@ func (k *pulumiserviceProvider) Configure(
 		&resources.PulumiServiceStackResource{
 			Client: client,
 		},
-		&resources.PulumiServiceTemplateSourceResource{
-			Client: client,
-		},
 		&resources.PulumiServiceOidcIssuerResource{
-			Client: client,
-		},
-		&resources.PulumiServiceEnvironmentRotationScheduleResource{
 			Client: client,
 		},
 		&resources.PulumiServiceApprovalRuleResource{

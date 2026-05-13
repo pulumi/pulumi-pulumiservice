@@ -11,6 +11,7 @@ import com.pulumi.pulumiservice.TeamEnvironmentPermissionArgs;
 import com.pulumi.pulumiservice.Utilities;
 import com.pulumi.pulumiservice.enums.EnvironmentPermission;
 import java.lang.String;
+import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
 
@@ -25,14 +26,14 @@ public class TeamEnvironmentPermission extends com.pulumi.resources.CustomResour
      * 
      */
     @Export(name="environment", refs={String.class}, tree="[0]")
-    private Output</* @Nullable */ String> environment;
+    private Output<String> environment;
 
     /**
      * @return Environment name.
      * 
      */
-    public Output<Optional<String>> environment() {
-        return Codegen.optional(this.environment);
+    public Output<String> environment() {
+        return this.environment;
     }
     /**
      * The maximum duration for which members of this team may open the environment.
@@ -53,28 +54,28 @@ public class TeamEnvironmentPermission extends com.pulumi.resources.CustomResour
      * 
      */
     @Export(name="organization", refs={String.class}, tree="[0]")
-    private Output</* @Nullable */ String> organization;
+    private Output<String> organization;
 
     /**
      * @return Organization name.
      * 
      */
-    public Output<Optional<String>> organization() {
-        return Codegen.optional(this.organization);
+    public Output<String> organization() {
+        return this.organization;
     }
     /**
      * Which permission level to grant to the specified team.
      * 
      */
     @Export(name="permission", refs={EnvironmentPermission.class}, tree="[0]")
-    private Output</* @Nullable */ EnvironmentPermission> permission;
+    private Output<EnvironmentPermission> permission;
 
     /**
      * @return Which permission level to grant to the specified team.
      * 
      */
-    public Output<Optional<EnvironmentPermission>> permission() {
-        return Codegen.optional(this.permission);
+    public Output<EnvironmentPermission> permission() {
+        return this.permission;
     }
     /**
      * Project name.
@@ -95,14 +96,14 @@ public class TeamEnvironmentPermission extends com.pulumi.resources.CustomResour
      * 
      */
     @Export(name="team", refs={String.class}, tree="[0]")
-    private Output</* @Nullable */ String> team;
+    private Output<String> team;
 
     /**
      * @return Team name.
      * 
      */
-    public Output<Optional<String>> team() {
-        return Codegen.optional(this.team);
+    public Output<String> team() {
+        return this.team;
     }
 
     /**
@@ -144,6 +145,14 @@ public class TeamEnvironmentPermission extends com.pulumi.resources.CustomResour
     private static com.pulumi.resources.CustomResourceOptions makeResourceOptions(@Nullable com.pulumi.resources.CustomResourceOptions options, @Nullable Output<java.lang.String> id) {
         var defaultOptions = com.pulumi.resources.CustomResourceOptions.builder()
             .version(Utilities.getVersion())
+            .replaceOnChanges(List.of(
+                "environment",
+                "maxOpenDuration",
+                "organization",
+                "permission",
+                "project",
+                "team"
+            ))
             .build();
         return com.pulumi.resources.CustomResourceOptions.merge(defaultOptions, options, id);
     }

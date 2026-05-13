@@ -133,6 +133,12 @@ public class TeamAccessToken extends com.pulumi.resources.CustomResource {
             .additionalSecretOutputs(List.of(
                 "value"
             ))
+            .replaceOnChanges(List.of(
+                "description",
+                "name",
+                "organizationName",
+                "teamName"
+            ))
             .build();
         return com.pulumi.resources.CustomResourceOptions.merge(defaultOptions, options, id);
     }

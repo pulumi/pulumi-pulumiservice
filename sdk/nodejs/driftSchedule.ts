@@ -97,6 +97,8 @@ export class DriftSchedule extends pulumi.CustomResource {
             resourceInputs["stack"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["organization", "project", "stack"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(DriftSchedule.__pulumiType, name, resourceInputs, opts);
     }
 }
@@ -108,7 +110,7 @@ export interface DriftScheduleArgs {
     /**
      * Whether any drift detected should be remediated after a drift run.
      */
-    autoRemediate?: pulumi.Input<boolean>;
+    autoRemediate?: pulumi.Input<boolean | undefined>;
     /**
      * Organization name.
      */

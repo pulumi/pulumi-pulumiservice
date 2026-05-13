@@ -5,7 +5,7 @@ import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "./utilities";
 
 /**
- * Access tokens allow a user to authenticate against the Pulumi Cloud
+ * Access tokens allow a user to authenticate against the Pulumi Cloud.
  */
 export class AccessToken extends pulumi.CustomResource {
     /**
@@ -66,6 +66,8 @@ export class AccessToken extends pulumi.CustomResource {
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         const secretOpts = { additionalSecretOutputs: ["value"] };
         opts = pulumi.mergeOptions(opts, secretOpts);
+        const replaceOnChanges = { replaceOnChanges: ["description"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(AccessToken.__pulumiType, name, resourceInputs, opts);
     }
 }

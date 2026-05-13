@@ -21,10 +21,11 @@ class AgentPoolArgs:
     def __init__(__self__, *,
                  name: pulumi.Input[_builtins.str],
                  organization_name: pulumi.Input[_builtins.str],
-                 description: Optional[pulumi.Input[_builtins.str]] = None,
-                 force_destroy: Optional[pulumi.Input[_builtins.bool]] = None):
+                 description: pulumi.Input[Optional[_builtins.str]] = None,
+                 force_destroy: pulumi.Input[Optional[_builtins.bool]] = None):
         """
         The set of arguments for constructing a AgentPool resource.
+
         :param pulumi.Input[_builtins.str] name: Name of the agent pool.
         :param pulumi.Input[_builtins.str] organization_name: The organization's name.
         :param pulumi.Input[_builtins.str] description: Description of the agent pool.
@@ -63,26 +64,26 @@ class AgentPoolArgs:
 
     @_builtins.property
     @pulumi.getter
-    def description(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def description(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         Description of the agent pool.
         """
         return pulumi.get(self, "description")
 
     @description.setter
-    def description(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def description(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "description", value)
 
     @_builtins.property
     @pulumi.getter(name="forceDestroy")
-    def force_destroy(self) -> Optional[pulumi.Input[_builtins.bool]]:
+    def force_destroy(self) -> pulumi.Input[Optional[_builtins.bool]]:
         """
         Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.
         """
         return pulumi.get(self, "force_destroy")
 
     @force_destroy.setter
-    def force_destroy(self, value: Optional[pulumi.Input[_builtins.bool]]):
+    def force_destroy(self, value: pulumi.Input[Optional[_builtins.bool]]):
         pulumi.set(self, "force_destroy", value)
 
 
@@ -92,13 +93,14 @@ class AgentPool(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 description: Optional[pulumi.Input[_builtins.str]] = None,
-                 force_destroy: Optional[pulumi.Input[_builtins.bool]] = None,
-                 name: Optional[pulumi.Input[_builtins.str]] = None,
-                 organization_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 description: pulumi.Input[Optional[_builtins.str]] = None,
+                 force_destroy: pulumi.Input[Optional[_builtins.bool]] = None,
+                 name: pulumi.Input[Optional[_builtins.str]] = None,
+                 organization_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
-        Agent Pool for customer managed deployments
+        Agent Pool for customer managed deployments.
+
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
@@ -114,7 +116,8 @@ class AgentPool(pulumi.CustomResource):
                  args: AgentPoolArgs,
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
-        Agent Pool for customer managed deployments
+        Agent Pool for customer managed deployments.
+
 
         :param str resource_name: The name of the resource.
         :param AgentPoolArgs args: The arguments to use to populate this resource's properties.
@@ -131,10 +134,10 @@ class AgentPool(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 description: Optional[pulumi.Input[_builtins.str]] = None,
-                 force_destroy: Optional[pulumi.Input[_builtins.bool]] = None,
-                 name: Optional[pulumi.Input[_builtins.str]] = None,
-                 organization_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 description: pulumi.Input[Optional[_builtins.str]] = None,
+                 force_destroy: pulumi.Input[Optional[_builtins.bool]] = None,
+                 name: pulumi.Input[Optional[_builtins.str]] = None,
+                 organization_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
@@ -156,6 +159,8 @@ class AgentPool(pulumi.CustomResource):
             __props__.__dict__["token_value"] = None
         secret_opts = pulumi.ResourceOptions(additional_secret_outputs=["tokenValue"])
         opts = pulumi.ResourceOptions.merge(opts, secret_opts)
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["organizationName"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(AgentPool, __self__).__init__(
             'pulumiservice:index:AgentPool',
             resource_name,
@@ -214,7 +219,7 @@ class AgentPool(pulumi.CustomResource):
     @pulumi.getter
     def name(self) -> pulumi.Output[_builtins.str]:
         """
-        The name of the agent pool.
+        Name of the agent pool.
         """
         return pulumi.get(self, "name")
 

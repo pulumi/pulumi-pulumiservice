@@ -22,10 +22,11 @@ class EnvironmentRotationScheduleArgs:
                  environment: pulumi.Input[_builtins.str],
                  organization: pulumi.Input[_builtins.str],
                  project: pulumi.Input[_builtins.str],
-                 schedule_cron: Optional[pulumi.Input[_builtins.str]] = None,
-                 timestamp: Optional[pulumi.Input[_builtins.str]] = None):
+                 schedule_cron: pulumi.Input[Optional[_builtins.str]] = None,
+                 timestamp: pulumi.Input[Optional[_builtins.str]] = None):
         """
         The set of arguments for constructing a EnvironmentRotationSchedule resource.
+
         :param pulumi.Input[_builtins.str] environment: Environment name.
         :param pulumi.Input[_builtins.str] organization: Organization name.
         :param pulumi.Input[_builtins.str] project: Project name.
@@ -78,26 +79,26 @@ class EnvironmentRotationScheduleArgs:
 
     @_builtins.property
     @pulumi.getter(name="scheduleCron")
-    def schedule_cron(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def schedule_cron(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         Cron expression for recurring scheduled rotations. If you are supplying this, do not supply timestamp.
         """
         return pulumi.get(self, "schedule_cron")
 
     @schedule_cron.setter
-    def schedule_cron(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def schedule_cron(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "schedule_cron", value)
 
     @_builtins.property
     @pulumi.getter
-    def timestamp(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def timestamp(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The time at which the rotation should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are supplying this, do not supply scheduleCron.
         """
         return pulumi.get(self, "timestamp")
 
     @timestamp.setter
-    def timestamp(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def timestamp(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "timestamp", value)
 
 
@@ -107,14 +108,15 @@ class EnvironmentRotationSchedule(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 environment: Optional[pulumi.Input[_builtins.str]] = None,
-                 organization: Optional[pulumi.Input[_builtins.str]] = None,
-                 project: Optional[pulumi.Input[_builtins.str]] = None,
-                 schedule_cron: Optional[pulumi.Input[_builtins.str]] = None,
-                 timestamp: Optional[pulumi.Input[_builtins.str]] = None,
+                 environment: pulumi.Input[Optional[_builtins.str]] = None,
+                 organization: pulumi.Input[Optional[_builtins.str]] = None,
+                 project: pulumi.Input[Optional[_builtins.str]] = None,
+                 schedule_cron: pulumi.Input[Optional[_builtins.str]] = None,
+                 timestamp: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
         A scheduled recurring or single time environment rotation.
+
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
@@ -133,6 +135,7 @@ class EnvironmentRotationSchedule(pulumi.CustomResource):
         """
         A scheduled recurring or single time environment rotation.
 
+
         :param str resource_name: The name of the resource.
         :param EnvironmentRotationScheduleArgs args: The arguments to use to populate this resource's properties.
         :param pulumi.ResourceOptions opts: Options for the resource.
@@ -148,11 +151,11 @@ class EnvironmentRotationSchedule(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 environment: Optional[pulumi.Input[_builtins.str]] = None,
-                 organization: Optional[pulumi.Input[_builtins.str]] = None,
-                 project: Optional[pulumi.Input[_builtins.str]] = None,
-                 schedule_cron: Optional[pulumi.Input[_builtins.str]] = None,
-                 timestamp: Optional[pulumi.Input[_builtins.str]] = None,
+                 environment: pulumi.Input[Optional[_builtins.str]] = None,
+                 organization: pulumi.Input[Optional[_builtins.str]] = None,
+                 project: pulumi.Input[Optional[_builtins.str]] = None,
+                 schedule_cron: pulumi.Input[Optional[_builtins.str]] = None,
+                 timestamp: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
@@ -174,6 +177,8 @@ class EnvironmentRotationSchedule(pulumi.CustomResource):
             __props__.__dict__["schedule_cron"] = schedule_cron
             __props__.__dict__["timestamp"] = timestamp
             __props__.__dict__["schedule_id"] = None
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["environment", "organization", "project", "timestamp"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(EnvironmentRotationSchedule, __self__).__init__(
             'pulumiservice:index:EnvironmentRotationSchedule',
             resource_name,

@@ -48,6 +48,13 @@ func NewTeamAccessToken(ctx *pulumi.Context,
 		"value",
 	})
 	opts = append(opts, secrets)
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"description",
+		"name",
+		"organizationName",
+		"teamName",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource TeamAccessToken
 	err := ctx.RegisterResource("pulumiservice:index:TeamAccessToken", name, args, &resource, opts...)
@@ -81,7 +88,7 @@ func (TeamAccessTokenState) ElementType() reflect.Type {
 }
 
 type teamAccessTokenArgs struct {
-	// Optional. Team description.
+	// Optional. Description for the token.
 	Description *string `pulumi:"description"`
 	// The name for the token. This must be unique amongst all machine tokens within your organization.
 	Name string `pulumi:"name"`
@@ -93,7 +100,7 @@ type teamAccessTokenArgs struct {
 
 // The set of arguments for constructing a TeamAccessToken resource.
 type TeamAccessTokenArgs struct {
-	// Optional. Team description.
+	// Optional. Description for the token.
 	Description pulumi.StringPtrInput
 	// The name for the token. This must be unique amongst all machine tokens within your organization.
 	Name pulumi.StringInput

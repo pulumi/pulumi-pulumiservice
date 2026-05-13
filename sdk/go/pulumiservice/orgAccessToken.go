@@ -48,6 +48,13 @@ func NewOrgAccessToken(ctx *pulumi.Context,
 		"value",
 	})
 	opts = append(opts, secrets)
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"admin",
+		"description",
+		"name",
+		"organizationName",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource OrgAccessToken
 	err := ctx.RegisterResource("pulumiservice:index:OrgAccessToken", name, args, &resource, opts...)
@@ -83,7 +90,7 @@ func (OrgAccessTokenState) ElementType() reflect.Type {
 type orgAccessTokenArgs struct {
 	// Optional. True if this is an admin token.
 	Admin *bool `pulumi:"admin"`
-	// Optional. Team description.
+	// Optional. Description for the token.
 	Description *string `pulumi:"description"`
 	// The name for the token.
 	Name string `pulumi:"name"`
@@ -95,7 +102,7 @@ type orgAccessTokenArgs struct {
 type OrgAccessTokenArgs struct {
 	// Optional. True if this is an admin token.
 	Admin pulumi.BoolPtrInput
-	// Optional. Team description.
+	// Optional. Description for the token.
 	Description pulumi.StringPtrInput
 	// The name for the token.
 	Name pulumi.StringInput

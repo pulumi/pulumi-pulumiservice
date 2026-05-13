@@ -1,3 +1,17 @@
+// Copyright 2026, Pulumi Corporation.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//	http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package resources
 
 import (
@@ -5,75 +19,127 @@ import (
 	"fmt"
 	"strings"
 
-	pbempty "google.golang.org/protobuf/types/known/emptypb"
+	"github.com/pulumi/pulumi-go-provider/infer"
 
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
-
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
-type TeamStackPermissionResource struct {
-	Client pulumiapi.TeamClient
+type TeamStackPermissionScope int
+
+const (
+	TeamStackPermissionRead  TeamStackPermissionScope = 101
+	TeamStackPermissionEdit  TeamStackPermissionScope = 102
+	TeamStackPermissionAdmin TeamStackPermissionScope = 103
+)
+
+func (TeamStackPermissionScope) Values() []infer.EnumValue[TeamStackPermissionScope] {
+	return []infer.EnumValue[TeamStackPermissionScope]{
+		{Name: "read", Value: TeamStackPermissionRead, Description: "Grants read permissions to stack."},
+		{Name: "edit", Value: TeamStackPermissionEdit, Description: "Grants edit permissions to stack."},
+		{Name: "admin", Value: TeamStackPermissionAdmin, Description: "Grants admin permissions to stack."},
+	}
+}
+
+type TeamStackPermission struct{}
+
+var (
+	_ infer.CustomCreate[TeamStackPermissionInput, TeamStackPermissionState] = &TeamStackPermission{}
+	_ infer.CustomDelete[TeamStackPermissionState]                           = &TeamStackPermission{}
+	_ infer.CustomRead[TeamStackPermissionInput, TeamStackPermissionState]   = &TeamStackPermission{}
+)
+
+func (*TeamStackPermission) Annotate(a infer.Annotator) {
+	a.Describe(&TeamStackPermission{}, "Grants a team permissions to the specified stack.")
+	a.SetToken("index", "TeamStackPermission")
 }
 
 type TeamStackPermissionInput struct {
-	Organization string `pulumi:"organization"`
-	Project      string `pulumi:"project"`
-	Stack        string `pulumi:"stack"`
-	Team         string `pulumi:"team"`
-	Permission   int    `pulumi:"permission"`
+	Organization string                   `pulumi:"organization" provider:"replaceOnChanges"`
+	Project      string                   `pulumi:"project"      provider:"replaceOnChanges"`
+	Stack        string                   `pulumi:"stack"        provider:"replaceOnChanges"`
+	Team         string                   `pulumi:"team"         provider:"replaceOnChanges"`
+	Permission   TeamStackPermissionScope `pulumi:"permission"   provider:"replaceOnChanges"`
 }
 
-func (i *TeamStackPermissionInput) ToPropertyMap() resource.PropertyMap {
-	return util.ToPropertyMap(*i)
+func (i *TeamStackPermissionInput) Annotate(a infer.Annotator) {
+	a.Describe(&i.Organization, "The organization or the personal account name of the stack.")
+	a.Describe(&i.Project, "The project name for this stack.")
+	a.Describe(&i.Stack, "The name of the stack that the team will be granted permissions to.")
+	a.Describe(&i.Team, "The name of the team to grant this stack permissions to. This is not the display name.")
+	a.Describe(&i.Permission, "Sets the permission level that this team will be granted to the stack.")
 }
 
-func (tp *TeamStackPermissionResource) ToPulumiServiceTeamInput(
-	inputMap resource.PropertyMap,
-) (*TeamStackPermissionInput, error) {
-	input := TeamStackPermissionInput{}
-	return &input, util.FromPropertyMap(inputMap, &input)
+type TeamStackPermissionState struct {
+	TeamStackPermissionInput
 }
 
-func (tp *TeamStackPermissionResource) Name() string {
-	return "pulumiservice:index:TeamStackPermission"
-}
-
-func (tp *TeamStackPermissionResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	return &pulumirpc.CheckResponse{
-		Inputs: req.GetNews(),
+func (*TeamStackPermission) Create(
+	ctx context.Context,
+	req infer.CreateRequest[TeamStackPermissionInput],
+) (infer.CreateResponse[TeamStackPermissionState], error) {
+	if req.DryRun {
+		return infer.CreateResponse[TeamStackPermissionState]{
+			Output: TeamStackPermissionState{TeamStackPermissionInput: req.Inputs},
+		}, nil
+	}
+	stack := pulumiapi.StackIdentifier{
+		OrgName:     req.Inputs.Organization,
+		ProjectName: req.Inputs.Project,
+		StackName:   req.Inputs.Stack,
+	}
+	err := config.GetClient(ctx).AddStackPermission(ctx, stack, req.Inputs.Team, int(req.Inputs.Permission))
+	if err != nil {
+		return infer.CreateResponse[TeamStackPermissionState]{}, fmt.Errorf(
+			"error granting team stack permission: %w", err,
+		)
+	}
+	return infer.CreateResponse[TeamStackPermissionState]{
+		ID:     teamStackPermissionResourceID(stack, req.Inputs.Team),
+		Output: TeamStackPermissionState{TeamStackPermissionInput: req.Inputs},
 	}, nil
 }
 
-func (tp *TeamStackPermissionResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	ctx := context.Background()
-	id := req.GetId()
+func (*TeamStackPermission) Delete(
+	ctx context.Context,
+	req infer.DeleteRequest[TeamStackPermissionState],
+) (infer.DeleteResponse, error) {
+	stack := pulumiapi.StackIdentifier{
+		OrgName:     req.State.Organization,
+		ProjectName: req.State.Project,
+		StackName:   req.State.Stack,
+	}
+	return infer.DeleteResponse{}, config.GetClient(ctx).RemoveStackPermission(ctx, stack, req.State.Team)
+}
 
-	permID, err := splitTeamStackPermissionID(id)
+func (*TeamStackPermission) Read(
+	ctx context.Context,
+	req infer.ReadRequest[TeamStackPermissionInput, TeamStackPermissionState],
+) (infer.ReadResponse[TeamStackPermissionInput, TeamStackPermissionState], error) {
+	permID, err := splitTeamStackPermissionID(req.ID)
 	if err != nil {
 		if strings.Contains(err.Error(), "expected 4 parts") {
-			// Return an error if attempting to refresh stack permissions created before this change.
-			// We return a warning and an empty response, which will cause the resource to be deleted on refresh,
-			// forcing the user to recreate it with the updated version.
-			return nil, fmt.Errorf("TeamStackPermission resources created before v0.17.0 do not support refresh. " +
-				"You will need to destroy and recreate this resource with >v0.17.0 to successfully refresh")
+			return infer.ReadResponse[TeamStackPermissionInput, TeamStackPermissionState]{}, fmt.Errorf(
+				"TeamStackPermission resources created before v0.17.0 do not support refresh. " +
+					"You will need to destroy and recreate this resource with >v0.17.0 to successfully refresh",
+			)
 		}
-		return nil, err
+		return infer.ReadResponse[TeamStackPermissionInput, TeamStackPermissionState]{}, err
 	}
 
-	permission, err := tp.Client.GetTeamStackPermission(ctx, pulumiapi.StackIdentifier{
+	stack := pulumiapi.StackIdentifier{
 		OrgName:     permID.Organization,
 		ProjectName: permID.Project,
 		StackName:   permID.Stack,
-	}, permID.Team)
+	}
+	permission, err := config.GetClient(ctx).GetTeamStackPermission(ctx, stack, permID.Team)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get team stack permission: %w", err)
+		return infer.ReadResponse[TeamStackPermissionInput, TeamStackPermissionState]{}, fmt.Errorf(
+			"failed to get team stack permission: %w", err,
+		)
 	}
 	if permission == nil {
-		return &pulumirpc.ReadResponse{}, nil
+		return infer.ReadResponse[TeamStackPermissionInput, TeamStackPermissionState]{}, nil
 	}
 
 	inputs := TeamStackPermissionInput{
@@ -81,83 +147,17 @@ func (tp *TeamStackPermissionResource) Read(req *pulumirpc.ReadRequest) (*pulumi
 		Project:      permID.Project,
 		Stack:        permID.Stack,
 		Team:         permID.Team,
-		Permission:   *permission,
+		Permission:   TeamStackPermissionScope(*permission),
 	}
-
-	properties, err := plugin.MarshalProperties(inputs.ToPropertyMap(), plugin.MarshalOptions{})
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal inputs to properties: %w", err)
-	}
-	return &pulumirpc.ReadResponse{
-		Id:         req.Id,
-		Properties: properties,
-		Inputs:     properties,
+	return infer.ReadResponse[TeamStackPermissionInput, TeamStackPermissionState]{
+		ID:     req.ID,
+		Inputs: inputs,
+		State:  TeamStackPermissionState{TeamStackPermissionInput: inputs},
 	}, nil
 }
 
-func (tp *TeamStackPermissionResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
-	ctx := context.Background()
-	var input TeamStackPermissionInput
-	err := util.FromProperties(req.GetProperties(), &input)
-	if err != nil {
-		return nil, err
-	}
-	stackName := pulumiapi.StackIdentifier{
-		OrgName:     input.Organization,
-		ProjectName: input.Project,
-		StackName:   input.Stack,
-	}
-
-	err = tp.Client.AddStackPermission(ctx, stackName, input.Team, input.Permission)
-	if err != nil {
-		return nil, err
-	}
-
-	stackPermissionID := fmt.Sprintf("%s/%s", stackName.String(), input.Team)
-
-	return &pulumirpc.CreateResponse{
-		Id:         stackPermissionID,
-		Properties: req.GetProperties(),
-	}, nil
-}
-
-func (tp *TeamStackPermissionResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	ctx := context.Background()
-	var input TeamStackPermissionInput
-	err := util.FromProperties(req.GetProperties(), &input)
-	if err != nil {
-		return nil, err
-	}
-	stackName := pulumiapi.StackIdentifier{
-		OrgName:     input.Organization,
-		ProjectName: input.Project,
-		StackName:   input.Stack,
-	}
-	err = tp.Client.RemoveStackPermission(ctx, stackName, input.Team)
-	if err != nil {
-		return nil, err
-	}
-	return &pbempty.Empty{}, nil
-}
-
-func (tp *TeamStackPermissionResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	changedKeys, err := util.DiffOldsAndNews(req)
-	if err != nil {
-		return nil, err
-	}
-	changes := pulumirpc.DiffResponse_DIFF_NONE
-	if len(changedKeys) > 0 {
-		changes = pulumirpc.DiffResponse_DIFF_SOME
-	}
-	return &pulumirpc.DiffResponse{
-		Changes:  changes,
-		Replaces: changedKeys,
-	}, nil
-}
-
-// Update does nothing because we always replace on changes, never an update
-func (tp *TeamStackPermissionResource) Update(_ *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	return nil, fmt.Errorf("unexpected call to update, expected create to be called instead")
+func teamStackPermissionResourceID(stack pulumiapi.StackIdentifier, team string) string {
+	return fmt.Sprintf("%s/%s/%s/%s", stack.OrgName, stack.ProjectName, stack.StackName, team)
 }
 
 type teamStackPermissionID struct {

@@ -143,42 +143,98 @@ func (c *Client) UpdateOrgMemberRole(
 	return nil
 }
 
-// ListOrgMembers returns every member of the organization, following
-// continuationToken pagination. `?type=backend` is required: it switches the
-// endpoint from the "frontend" seat-count roster (Pulumi DB; no pagination,
-// ≤50 members; SAML-only visibility) to the backend identity-provider roster
-// (GitHub/GitLab/Bitbucket/SAML; paginated; includes users who have not yet
-// logged into Pulumi, surfaced with KnownToPulumi=false). Dropping the filter
-// makes adoption and import flows silently lose any member who hasn't created
-// a Pulumi account.
+// ListOrgMembers returns every visible member of the organization by
+// merging the two rosters Pulumi Cloud exposes and deduping by username:
+//
+//   - `?type=backend`: identity-provider roster
+//     (GitHub/GitLab/Bitbucket/SAML; paginated; includes users who haven't
+//     logged into Pulumi yet, with KnownToPulumi=false).
+//   - `?type=frontend`: Pulumi DB seat-count roster (no pagination, ≤50).
+//
+// Either roster alone can miss members for orgs whose IdP and DB
+// memberships have drifted (commonly: SAML-provisioned orgs with legacy
+// non-SAML accounts that the IdP no longer enumerates). Calling both is
+// the closest the API exposes to "every member regardless of provenance".
+//
+// Backend wins on dedup conflict (it carries the IdP-of-record fields
+// like KnownToPulumi). A frontend failure is non-fatal: the backend
+// result is returned with a logged warning so a transient frontend
+// error doesn't gate the more-inclusive backend path.
 func (c *Client) ListOrgMembers(ctx context.Context, orgName string) (*Members, error) {
 	if len(orgName) == 0 {
 		return nil, errors.New("empty orgName")
 	}
 
-	apiPath := path.Join("orgs", orgName, "members")
-	all := Members{Members: []Member{}}
+	backend, err := c.listOrgMembersByType(ctx, orgName, "backend")
+	if err != nil {
+		return nil, fmt.Errorf("failed to list organization members: %w", err)
+	}
+	frontend, frontendErr := c.listOrgMembersByType(ctx, orgName, "frontend")
+	if frontendErr != nil {
+		// Non-fatal: backend is the more-inclusive roster, return it
+		// alone rather than failing the whole call.
+		frontend = nil
+	}
 
+	seen := make(map[string]bool, len(backend))
+	out := make([]Member, 0, len(backend)+len(frontend))
+	add := func(m Member) {
+		key := memberKey(m)
+		// Skip the synthetic org-as-user entry the backend roster emits
+		// for some orgs (key matching orgName, epoch-zero `created`,
+		// empty fgaRole). Not a real member; should never appear in
+		// `getOrganizationMembers` output.
+		if key == orgName {
+			return
+		}
+		if seen[key] {
+			return
+		}
+		seen[key] = true
+		out = append(out, m)
+	}
+	for _, m := range backend {
+		add(m)
+	}
+	for _, m := range frontend {
+		add(m)
+	}
+
+	return &Members{Members: out}, nil
+}
+
+// memberKey is the dedup key for merging the two rosters. Prefer the
+// canonical Pulumi username; fall back to GithubLogin for IdP-only users
+// who haven't signed in yet (Name can be empty for them).
+func memberKey(m Member) string {
+	if m.User.Name != "" {
+		return m.User.Name
+	}
+	return m.User.GithubLogin
+}
+
+func (c *Client) listOrgMembersByType(
+	ctx context.Context, orgName, rosterType string,
+) ([]Member, error) {
+	apiPath := path.Join("orgs", orgName, "members")
+	var all []Member
 	token := ""
 	for {
-		q := url.Values{"type": []string{"backend"}}
+		q := url.Values{"type": []string{rosterType}}
 		if token != "" {
 			q.Set("continuationToken", token)
 		}
-
 		var page Members
 		if _, err := c.doWithQuery(ctx, http.MethodGet, apiPath, q, nil, &page); err != nil {
-			return nil, fmt.Errorf("failed to list organization members: %w", err)
+			return nil, err
 		}
-		all.Members = append(all.Members, page.Members...)
-
+		all = append(all, page.Members...)
 		if page.ContinuationToken == nil || *page.ContinuationToken == "" {
 			break
 		}
 		token = *page.ContinuationToken
 	}
-
-	return &all, nil
+	return all, nil
 }
 
 // GetOrgMember looks up a single member by username using the list endpoint.

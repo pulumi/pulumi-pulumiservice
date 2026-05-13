@@ -94,6 +94,8 @@ export class EnvironmentRotationSchedule extends pulumi.CustomResource {
             resourceInputs["timestamp"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["environment", "organization", "project", "timestamp"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(EnvironmentRotationSchedule.__pulumiType, name, resourceInputs, opts);
     }
 }
@@ -117,9 +119,9 @@ export interface EnvironmentRotationScheduleArgs {
     /**
      * Cron expression for recurring scheduled rotations. If you are supplying this, do not supply timestamp.
      */
-    scheduleCron?: pulumi.Input<string>;
+    scheduleCron?: pulumi.Input<string | undefined>;
     /**
      * The time at which the rotation should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are supplying this, do not supply scheduleCron.
      */
-    timestamp?: pulumi.Input<string>;
+    timestamp?: pulumi.Input<string | undefined>;
 }

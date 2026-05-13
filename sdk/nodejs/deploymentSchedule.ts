@@ -46,7 +46,7 @@ export class DeploymentSchedule extends pulumi.CustomResource {
      */
     declare public readonly project: pulumi.Output<string>;
     /**
-     * Which operation to run.
+     * Which command to run.
      */
     declare public readonly pulumiOperation: pulumi.Output<enums.PulumiOperation>;
     /**
@@ -106,6 +106,8 @@ export class DeploymentSchedule extends pulumi.CustomResource {
             resourceInputs["timestamp"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["organization", "project", "stack", "timestamp"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(DeploymentSchedule.__pulumiType, name, resourceInputs, opts);
     }
 }
@@ -129,7 +131,7 @@ export interface DeploymentScheduleArgs {
     /**
      * Cron expression for recurring scheduled runs. If you are supplying this, do not supply timestamp.
      */
-    scheduleCron?: pulumi.Input<string>;
+    scheduleCron?: pulumi.Input<string | undefined>;
     /**
      * Stack name.
      */
@@ -137,5 +139,5 @@ export interface DeploymentScheduleArgs {
     /**
      * The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are supplying this, do not supply scheduleCron.
      */
-    timestamp?: pulumi.Input<string>;
+    timestamp?: pulumi.Input<string | undefined>;
 }

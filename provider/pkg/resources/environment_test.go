@@ -343,6 +343,36 @@ func (c *EscClientMock) RetractEnvironmentRevision(
 	return nil
 }
 
+func (c *EscClientMock) CreateEnvironmentOpenRequest(
+	context.Context,
+	string,
+	string,
+	string,
+	int,
+	int,
+) (*client.CreateEnvironmentOpenRequestResponse, error) {
+	return nil, nil
+}
+
+func (c *EscClientMock) GetEnvironmentSettings(
+	context.Context,
+	string,
+	string,
+	string,
+) (*client.EnvironmentSettings, error) {
+	return nil, nil
+}
+
+func (c *EscClientMock) PatchEnvironmentSettings(
+	context.Context,
+	string,
+	string,
+	string,
+	client.PatchEnvironmentSettingsRequest,
+) error {
+	return nil
+}
+
 func (c *EscClientMock) Insecure() bool {
 	return false
 }

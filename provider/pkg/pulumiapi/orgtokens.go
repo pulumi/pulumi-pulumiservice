@@ -21,6 +21,12 @@ import (
 	"path"
 )
 
+type OrgAccessTokenClient interface {
+	CreateOrgAccessToken(ctx context.Context, name, orgName, description string, admin bool) (*AccessToken, error)
+	DeleteOrgAccessToken(ctx context.Context, tokenID, orgName string) error
+	GetOrgAccessToken(ctx context.Context, tokenID, orgName string) (*AccessToken, error)
+}
+
 type createOrgTokenResponse struct {
 	ID         string `json:"id"`
 	TokenValue string `json:"tokenValue"`

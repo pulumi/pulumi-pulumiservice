@@ -27,6 +27,12 @@ namespace Pulumi.PulumiService.Inputs
         [Input("deployPullRequest")]
         public Input<int>? DeployPullRequest { get; set; }
 
+        /// <summary>
+        /// The VCS integration installation ID. Use to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps). If omitted, the API resolves the integration automatically from `provider` and `repository`.
+        /// </summary>
+        [Input("installationId")]
+        public Input<string>? InstallationId { get; set; }
+
         [Input("paths")]
         private InputList<string>? _paths;
 

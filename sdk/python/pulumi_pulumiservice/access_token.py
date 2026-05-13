@@ -22,6 +22,7 @@ class AccessTokenArgs:
                  description: pulumi.Input[_builtins.str]):
         """
         The set of arguments for constructing a AccessToken resource.
+
         :param pulumi.Input[_builtins.str] description: Description of the access token.
         """
         pulumi.set(__self__, "description", description)
@@ -45,10 +46,11 @@ class AccessToken(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 description: Optional[pulumi.Input[_builtins.str]] = None,
+                 description: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
-        Access tokens allow a user to authenticate against the Pulumi Cloud
+        Access tokens allow a user to authenticate against the Pulumi Cloud.
+
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
@@ -61,7 +63,8 @@ class AccessToken(pulumi.CustomResource):
                  args: AccessTokenArgs,
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
-        Access tokens allow a user to authenticate against the Pulumi Cloud
+        Access tokens allow a user to authenticate against the Pulumi Cloud.
+
 
         :param str resource_name: The name of the resource.
         :param AccessTokenArgs args: The arguments to use to populate this resource's properties.
@@ -78,7 +81,7 @@ class AccessToken(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 description: Optional[pulumi.Input[_builtins.str]] = None,
+                 description: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
@@ -94,6 +97,8 @@ class AccessToken(pulumi.CustomResource):
             __props__.__dict__["value"] = None
         secret_opts = pulumi.ResourceOptions(additional_secret_outputs=["value"])
         opts = pulumi.ResourceOptions.merge(opts, secret_opts)
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["description"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(AccessToken, __self__).__init__(
             'pulumiservice:index:AccessToken',
             resource_name,

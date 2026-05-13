@@ -21,6 +21,12 @@ import (
 	"path"
 )
 
+type TeamAccessTokenClient interface {
+	CreateTeamAccessToken(ctx context.Context, name, orgName, teamName, description string) (*AccessToken, error)
+	DeleteTeamAccessToken(ctx context.Context, tokenID, orgName, teamName string) error
+	GetTeamAccessToken(ctx context.Context, tokenID, orgName, teamName string) (*AccessToken, error)
+}
+
 type createTeamTokenResponse struct {
 	ID         string `json:"id"`
 	TokenValue string `json:"tokenValue"`

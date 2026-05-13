@@ -2206,6 +2206,8 @@ type DeploymentSettingsVcs struct {
 	DeployCommits *bool `pulumi:"deployCommits"`
 	// Deploy a specific pull request number.
 	DeployPullRequest *int `pulumi:"deployPullRequest"`
+	// The VCS integration installation ID. Use to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps). If omitted, the API resolves the integration automatically from `provider` and `repository`.
+	InstallationId *string `pulumi:"installationId"`
 	// The paths within the repo that deployments should be filtered to.
 	Paths []string `pulumi:"paths"`
 	// Trigger a deployment running `pulumi preview` when a PR is opened.
@@ -2256,6 +2258,8 @@ type DeploymentSettingsVcsArgs struct {
 	DeployCommits pulumi.BoolPtrInput `pulumi:"deployCommits"`
 	// Deploy a specific pull request number.
 	DeployPullRequest pulumi.IntPtrInput `pulumi:"deployPullRequest"`
+	// The VCS integration installation ID. Use to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps). If omitted, the API resolves the integration automatically from `provider` and `repository`.
+	InstallationId pulumi.StringPtrInput `pulumi:"installationId"`
 	// The paths within the repo that deployments should be filtered to.
 	Paths pulumi.StringArrayInput `pulumi:"paths"`
 	// Trigger a deployment running `pulumi preview` when a PR is opened.
@@ -2373,6 +2377,11 @@ func (o DeploymentSettingsVcsOutput) DeployPullRequest() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v DeploymentSettingsVcs) *int { return v.DeployPullRequest }).(pulumi.IntPtrOutput)
 }
 
+// The VCS integration installation ID. Use to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps). If omitted, the API resolves the integration automatically from `provider` and `repository`.
+func (o DeploymentSettingsVcsOutput) InstallationId() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v DeploymentSettingsVcs) *string { return v.InstallationId }).(pulumi.StringPtrOutput)
+}
+
 // The paths within the repo that deployments should be filtered to.
 func (o DeploymentSettingsVcsOutput) Paths() pulumi.StringArrayOutput {
 	return o.ApplyT(func(v DeploymentSettingsVcs) []string { return v.Paths }).(pulumi.StringArrayOutput)
@@ -2440,6 +2449,16 @@ func (o DeploymentSettingsVcsPtrOutput) DeployPullRequest() pulumi.IntPtrOutput 
 		}
 		return v.DeployPullRequest
 	}).(pulumi.IntPtrOutput)
+}
+
+// The VCS integration installation ID. Use to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps). If omitted, the API resolves the integration automatically from `provider` and `repository`.
+func (o DeploymentSettingsVcsPtrOutput) InstallationId() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *DeploymentSettingsVcs) *string {
+		if v == nil {
+			return nil
+		}
+		return v.InstallationId
+	}).(pulumi.StringPtrOutput)
 }
 
 // The paths within the repo that deployments should be filtered to.

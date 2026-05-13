@@ -102,11 +102,11 @@ export interface StackArgs {
     /**
      * Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set either `project`+`environment` to reference an existing environment, or `auto: true` to have the stack manage a dedicated environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack.
      */
-    configEnvironment?: pulumi.Input<inputs.StackConfigEnvironmentArgs>;
+    configEnvironment?: pulumi.Input<inputs.StackConfigEnvironmentArgs | undefined>;
     /**
      * Optional. Flag indicating whether to delete the stack even if it still contains resources.
      */
-    forceDestroy?: pulumi.Input<boolean>;
+    forceDestroy?: pulumi.Input<boolean | undefined>;
     /**
      * The name of the organization.
      */
