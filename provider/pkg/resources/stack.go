@@ -166,9 +166,9 @@ func (s *PulumiServiceStackResource) Name() string {
 }
 
 // configEnvDiffKind classifies how a change to configEnvironment should be
-// applied: replace (any auto-mode change, or env identity change), update
-// (toggle on/off in explicit-env mode, or a version-pin change), or none.
-// The bool reports whether a change occurred so callers can suppress no-ops.
+// applied: replace (any auto-mode transition) or update (every explicit-env
+// change — toggle on/off, version-pin change, or env-identity swap). The
+// bool reports whether a change occurred so callers can suppress no-ops.
 //
 // Auto mode requires replace on every transition because (a) the server only
 // proves Stack ownership of a managed env when it creates the env inline as
@@ -176,6 +176,10 @@ func (s *PulumiServiceStackResource) Name() string {
 // Toggling Auto in place would either silently adopt a pre-existing env we
 // don't own (unsafe to clean up later with preserveEnvironment=false), or fail
 // because the env doesn't exist yet.
+//
+// Explicit-env identity swaps stay in-place: the server rejects re-linking on
+// a single PUT /config, but DELETE+PUT against the stack's config row leaves
+// the parent stack untouched, so Update handles it without a replace.
 func configEnvDiffKind(oldEnv, newEnv *StackConfigEnvironment) (kind plugin.DiffKind, changed bool) {
 	oldAuto := oldEnv.IsSet() && oldEnv.Auto
 	newAuto := newEnv.IsSet() && newEnv.Auto
@@ -194,16 +198,24 @@ func configEnvDiffKind(oldEnv, newEnv *StackConfigEnvironment) (kind plugin.Diff
 		return plugin.DiffUpdate, true
 	}
 
-	// Both sides set with matching auto flag: env identity is replace-only
-	// because UpdateStackConfigHandler rejects re-linking to a different env.
-	if oldEnv.resolveEnvProject() != newEnv.resolveEnvProject() ||
-		oldEnv.Environment != newEnv.Environment {
-		return plugin.DiffUpdateReplace, true
+	// Both sides set with matching auto flag. Auto-auto can't reach this branch
+	// with a real diff (project/env are empty in auto mode); only explicit-env
+	// vs explicit-env lands here.
+	if !sameEnvIdentity(oldEnv, newEnv) {
+		return plugin.DiffUpdate, true
 	}
 	if oldEnv.Version != newEnv.Version {
 		return plugin.DiffUpdate, true
 	}
 	return 0, false
+}
+
+// sameEnvIdentity reports whether two explicit-env references point at the
+// same ESC env (ignoring version). Used by both Diff and Update to decide
+// whether a config change can be applied as a single PUT or needs DELETE+PUT.
+func sameEnvIdentity(oldEnv, newEnv *StackConfigEnvironment) bool {
+	return oldEnv.resolveEnvProject() == newEnv.resolveEnvProject() &&
+		oldEnv.Environment == newEnv.Environment
 }
 
 func (s *PulumiServiceStackResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
@@ -537,9 +549,22 @@ func (s *PulumiServiceStackResource) Update(req *pulumirpc.UpdateRequest) (*pulu
 		if err := s.Client.DeleteStackConfig(ctx, stack.StackIdentifier); err != nil {
 			return nil, err
 		}
+	case oldEnv.IsSet() && newEnv.IsSet() && !sameEnvIdentity(oldEnv, newEnv):
+		// Server rejects re-linking to a different env on a single PUT, so
+		// clear the existing link first and then PUT the new one. Non-atomic:
+		// if the second call fails the stack is left config-less until the
+		// next pulumi up retries both steps.
+		if err := s.Client.DeleteStackConfig(ctx, stack.StackIdentifier); err != nil {
+			return nil, err
+		}
+		if err := s.Client.SetStackConfig(ctx, stack.StackIdentifier, pulumiapi.StackConfig{
+			Environment: newEnv.envRefForCreate(stack.StackIdentifier),
+		}); err != nil {
+			return nil, err
+		}
 	case newEnv.IsSet():
-		// Either toggling an explicit-env link on (old=nil, new=env) or a
-		// version-pin change in either mode. The server PUT accepts both.
+		// Toggling an explicit-env link on (old=nil, new=env), or a same-env
+		// version-pin change. The server PUT accepts both.
 		if err := s.Client.SetStackConfig(ctx, stack.StackIdentifier, pulumiapi.StackConfig{
 			Environment: newEnv.envRefForCreate(stack.StackIdentifier),
 		}); err != nil {

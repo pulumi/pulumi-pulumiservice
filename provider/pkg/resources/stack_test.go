@@ -125,16 +125,16 @@ func TestConfigEnvDiffKind(t *testing.T) {
 			true, plugin.DiffUpdate,
 		},
 		{
-			"env name change",
+			"env name change is in-place update (DELETE+PUT in Update)",
 			&StackConfigEnvironment{Project: "default", Environment: "a"},
 			&StackConfigEnvironment{Project: "default", Environment: "b"},
-			true, plugin.DiffUpdateReplace,
+			true, plugin.DiffUpdate,
 		},
 		{
-			"env project change",
+			"env project change is in-place update (DELETE+PUT in Update)",
 			&StackConfigEnvironment{Project: "p1", Environment: "x"},
 			&StackConfigEnvironment{Project: "p2", Environment: "x"},
-			true, plugin.DiffUpdateReplace,
+			true, plugin.DiffUpdate,
 		},
 		{
 			"version only change is in-place update",
@@ -374,6 +374,27 @@ func TestStackResourceDiff(t *testing.T) {
 		require.Equal(t, pulumirpc.DiffResponse_DIFF_SOME, resp.Changes)
 		got := resp.DetailedDiff["configEnvironment"]
 		assert.True(t, plugin.DiffKind(got.Kind).IsReplace()) //nolint:gosec
+	})
+
+	t.Run("env identity change is update, not replace", func(t *testing.T) {
+		olds := base()
+		olds["configEnvironment"] = resource.NewObjectProperty(resource.PropertyMap{
+			"project":     resource.NewStringProperty("default"),
+			"environment": resource.NewStringProperty("old-cfg"),
+		})
+		news := base()
+		news["configEnvironment"] = resource.NewObjectProperty(resource.PropertyMap{
+			"project":     resource.NewStringProperty("default"),
+			"environment": resource.NewStringProperty("new-cfg"),
+		})
+		resp := diff(olds, news)
+		require.Equal(t, pulumirpc.DiffResponse_DIFF_SOME, resp.Changes)
+		got := resp.DetailedDiff["configEnvironment"]
+		require.NotNil(t, got)
+		assert.False(t, plugin.DiffKind(got.Kind).IsReplace(), //nolint:gosec
+			"env-identity swap is handled in-place via DELETE+PUT")
+		assert.False(t, resp.DeleteBeforeReplace,
+			"in-place env swap must not request stack delete-before-replace")
 	})
 
 	t.Run("version-only change is update, not replace", func(t *testing.T) {
@@ -672,6 +693,50 @@ func TestStackResourceUpdate(t *testing.T) {
 		var sentCfg pulumiapi.StackConfig
 		require.NoError(t, json.Unmarshal([]byte((*calls)[0].body), &sentCfg))
 		assert.Equal(t, "shared/prod-cfg@3", sentCfg.Environment)
+	})
+
+	t.Run("env identity change clears then re-links via DELETE+PUT", func(t *testing.T) {
+		t.Parallel()
+		client, calls := startStackUpdateServer(t)
+		olds := withConfigEnv(resource.PropertyMap{
+			"project":     resource.NewStringProperty("default"),
+			"environment": resource.NewStringProperty("old-cfg"),
+		})
+		news := withConfigEnv(resource.PropertyMap{
+			"project":     resource.NewStringProperty("default"),
+			"environment": resource.NewStringProperty("new-cfg"),
+		})
+		_, err := update(t, client, olds, news)
+		require.NoError(t, err)
+		require.Len(t, *calls, 2, "must DELETE the old link before PUTting the new one")
+		assert.Equal(t, http.MethodDelete, (*calls)[0].method)
+		assert.Equal(t, configPath, (*calls)[0].path)
+		assert.Equal(t, http.MethodPut, (*calls)[1].method)
+		assert.Equal(t, configPath, (*calls)[1].path)
+		var sentCfg pulumiapi.StackConfig
+		require.NoError(t, json.Unmarshal([]byte((*calls)[1].body), &sentCfg))
+		assert.Equal(t, "default/new-cfg", sentCfg.Environment)
+	})
+
+	t.Run("project-only swap (same env name) also routes through DELETE+PUT", func(t *testing.T) {
+		t.Parallel()
+		client, calls := startStackUpdateServer(t)
+		olds := withConfigEnv(resource.PropertyMap{
+			"project":     resource.NewStringProperty("p1"),
+			"environment": resource.NewStringProperty("shared-cfg"),
+		})
+		news := withConfigEnv(resource.PropertyMap{
+			"project":     resource.NewStringProperty("p2"),
+			"environment": resource.NewStringProperty("shared-cfg"),
+		})
+		_, err := update(t, client, olds, news)
+		require.NoError(t, err)
+		require.Len(t, *calls, 2)
+		assert.Equal(t, http.MethodDelete, (*calls)[0].method)
+		assert.Equal(t, http.MethodPut, (*calls)[1].method)
+		var sentCfg pulumiapi.StackConfig
+		require.NoError(t, json.Unmarshal([]byte((*calls)[1].body), &sentCfg))
+		assert.Equal(t, "p2/shared-cfg", sentCfg.Environment)
 	})
 
 	t.Run("removing configEnvironment calls DeleteStackConfig", func(t *testing.T) {
