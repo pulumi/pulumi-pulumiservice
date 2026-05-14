@@ -1055,66 +1055,6 @@
         "tags"
       ]
     },
-    "pulumiservice:index:Environment": {
-      "description": "An ESC Environment.",
-      "properties": {
-        "organization": {
-          "description": "Organization name.",
-          "type": "string"
-        },
-        "name": {
-          "description": "Environment name.",
-          "type": "string"
-        },
-        "project": {
-          "description": "Project name.",
-          "type": "string"
-        },
-        "yaml": {
-          "description": "Environment's yaml file.",
-          "$ref": "pulumi.json#/Asset"
-        },
-        "revision": {
-          "description": "Revision number of the latest version.",
-          "type": "integer"
-        },
-        "environmentId": {
-          "description": "The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this environment via a `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`, or pass it directly to the `buildEnvironmentScopedPermissions` helper.",
-          "type": "string"
-        }
-      },
-      "required": [
-        "organization",
-        "project",
-        "name",
-        "yaml",
-        "revision"
-      ],
-      "inputProperties": {
-        "organization": {
-          "description": "Organization name.",
-          "type": "string"
-        },
-        "project": {
-          "description": "Project name.",
-          "default": "default",
-          "type": "string"
-        },
-        "name": {
-          "description": "Environment name.",
-          "type": "string"
-        },
-        "yaml": {
-          "description": "Environment's yaml file.",
-          "$ref": "pulumi.json#/Asset"
-        }
-      },
-      "requiredInputs": [
-        "organization",
-        "name",
-        "yaml"
-      ]
-    },
     "pulumiservice:index:ApprovalRule": {
       "description": "An approval rule for environment deployments.",
       "properties": {

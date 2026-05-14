@@ -1,3 +1,17 @@
+// Copyright 2026, Pulumi Corporation.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//	http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package resources
 
 import (
@@ -7,264 +21,319 @@ import (
 	"path"
 	"strings"
 
-	pbempty "google.golang.org/protobuf/types/known/emptypb"
-	"google.golang.org/protobuf/types/known/structpb"
-
 	esc_client "github.com/pulumi/esc/cmd/esc/cli/client"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
+	p "github.com/pulumi/pulumi-go-provider"
+	"github.com/pulumi/pulumi-go-provider/infer"
+	"github.com/pulumi/pulumi-go-provider/infer/types"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/asset"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 )
 
+// defaultProject mirrors the ESC default project name used when an
+// Environment's `project` is omitted; preserved from the legacy resource.
 const defaultProject = "default"
 
-type PulumiServiceEnvironmentResource struct {
-	Client         esc_client.Client
-	MetadataClient pulumiapi.EnvironmentMetadataClient
+type Environment struct{}
+
+var (
+	_ infer.CustomCreate[EnvironmentInput, EnvironmentState] = &Environment{}
+	_ infer.CustomUpdate[EnvironmentInput, EnvironmentState] = &Environment{}
+	_ infer.CustomDelete[EnvironmentState]                   = &Environment{}
+	_ infer.CustomRead[EnvironmentInput, EnvironmentState]   = &Environment{}
+	_ infer.CustomCheck[EnvironmentInput]                    = &Environment{}
+)
+
+func (*Environment) Annotate(a infer.Annotator) {
+	a.Describe(&Environment{}, "An ESC Environment.")
+	a.SetToken("index", "Environment")
 }
 
-type PulumiServiceEnvironmentInput struct {
-	OrgName     string
-	ProjectName string
-	EnvName     string
-	Yaml        string
+type EnvironmentInput struct {
+	Organization string               `pulumi:"organization"     provider:"replaceOnChanges"`
+	Project      string               `pulumi:"project,optional" provider:"replaceOnChanges"`
+	Name         string               `pulumi:"name"             provider:"replaceOnChanges"`
+	Yaml         types.AssetOrArchive `pulumi:"yaml"`
 }
 
-type PulumiServiceEnvironmentOutput struct {
-	input         PulumiServiceEnvironmentInput
-	revision      int
-	environmentID string
+func (i *EnvironmentInput) Annotate(a infer.Annotator) {
+	a.Describe(&i.Organization, "Organization name.")
+	a.Describe(&i.Project, "Project name.")
+	a.SetDefault(&i.Project, defaultProject)
+	a.Describe(&i.Name, "Environment name.")
+	a.Describe(&i.Yaml, "Environment's yaml file.")
 }
 
-func (i *PulumiServiceEnvironmentInput) ToPropertyMap() (resource.PropertyMap, error) {
-	propertyMap := resource.PropertyMap{}
-	propertyMap["organization"] = resource.NewPropertyValue(i.OrgName)
-	propertyMap["project"] = resource.NewPropertyValue(i.ProjectName)
-	propertyMap["name"] = resource.NewPropertyValue(i.EnvName)
-	propertyMap["yaml"] = resource.MakeSecret(resource.NewStringProperty(i.Yaml))
-
-	return propertyMap, nil
+// EnvironmentState matches the legacy schema's output shape: `project` is
+// required in state (with a default of "default") so existing SDK consumers
+// still see a non-nullable `Project` output even though it is optional on
+// input. We can't reuse [EnvironmentInput] verbatim because the optional
+// input tag would propagate to the output schema.
+type EnvironmentState struct {
+	Organization  string               `pulumi:"organization"`
+	Project       string               `pulumi:"project"`
+	Name          string               `pulumi:"name"`
+	Yaml          types.AssetOrArchive `pulumi:"yaml"`
+	Revision      int                  `pulumi:"revision"`
+	EnvironmentID string               `pulumi:"environmentId,optional"`
 }
 
-func (i *PulumiServiceEnvironmentOutput) ToPropertyMap() (resource.PropertyMap, error) {
-	propertyMap, err := i.input.ToPropertyMap()
-	if err != nil {
-		return nil, err
-	}
-
-	propertyMap["revision"] = resource.NewPropertyValue(i.revision)
-	if i.environmentID != "" {
-		propertyMap["environmentId"] = resource.NewPropertyValue(i.environmentID)
-	}
-
-	return propertyMap, nil
-}
-
-func ToPulumiServiceEnvironmentInput(properties *structpb.Struct) (*PulumiServiceEnvironmentInput, error) {
-	inputMap, err := plugin.UnmarshalProperties(properties, plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
-
-	input := PulumiServiceEnvironmentInput{}
-	input.OrgName = inputMap["organization"].StringValue()
-	input.EnvName = inputMap["name"].StringValue()
-
-	inputYaml := inputMap["yaml"]
-	if inputYaml.IsAsset() {
-		input.Yaml = inputYaml.AssetValue().Text
-	} else {
-		input.Yaml = inputYaml.StringValue()
-	}
-
-	// Set project to "default" if not in input
-	input.ProjectName = defaultProject
-
-	inputProject := inputMap["project"]
-	if inputProject.HasValue() && inputProject.IsString() {
-		input.ProjectName = inputProject.StringValue()
-	}
-
-	return &input, nil
-}
-
-func getBytesFromAsset(asset *asset.Asset) ([]byte, error) {
-	reader, err := asset.Read()
-	if err != nil {
-		return nil, err
-	}
-	defer func() {
-		err = reader.Close()
-		if err != nil {
-			fmt.Println("failed to close reading asset: %w", err)
-		}
-	}()
-	return io.ReadAll(reader)
-}
-
-func (st *PulumiServiceEnvironmentResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(
-		req.GetOldInputs(),
-		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
+func (s *EnvironmentState) Annotate(a infer.Annotator) {
+	a.Describe(&s.Organization, "Organization name.")
+	a.Describe(&s.Project, "Project name.")
+	a.Describe(&s.Name, "Environment name.")
+	a.Describe(&s.Yaml, "Environment's yaml file.")
+	a.Describe(&s.Revision, "Revision number of the latest version.")
+	a.Describe(
+		&s.EnvironmentID,
+		"The environment's UUID. Use this as the `identity` value when pinning a custom RBAC role to this "+
+			"environment via a `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`, or pass "+
+			"it directly to the `buildEnvironmentScopedPermissions` helper.",
 	)
+}
+
+// stateFromInputs builds an EnvironmentState carrying the same field values
+// as the given inputs, with `project` defaulted to "default" if unset.
+func stateFromInputs(in EnvironmentInput) EnvironmentState {
+	return EnvironmentState{
+		Organization: in.Organization,
+		Project:      projectOrDefault(in.Project),
+		Name:         in.Name,
+		Yaml:         in.Yaml,
+	}
+}
+
+// Check validates required fields and rejects identifiers containing `/`.
+// Identical semantics to the legacy resource's Check.
+func (*Environment) Check(
+	ctx context.Context, req infer.CheckRequest,
+) (infer.CheckResponse[EnvironmentInput], error) {
+	inputs, failures, err := infer.DefaultCheck[EnvironmentInput](ctx, req.NewInputs)
 	if err != nil {
-		return nil, err
+		return infer.CheckResponse[EnvironmentInput]{Inputs: inputs, Failures: failures}, err
 	}
 
-	// Backfill project for state from pre-0.25.0 which didn't have this field.
-	if !olds["project"].HasValue() {
-		olds["project"] = resource.NewPropertyValue(defaultProject)
+	// `/` is the ID separator. Reject it in identifier fields so we don't
+	// have to disambiguate later. yaml is intentionally excluded — slashes
+	// in environment bodies are common.
+	type idField struct {
+		name string
+		val  string
+	}
+	for _, f := range []idField{
+		{"organization", inputs.Organization},
+		{"project", inputs.Project},
+		{"name", inputs.Name},
+	} {
+		if strings.Contains(f.val, "/") {
+			failures = append(failures, p.CheckFailure{
+				Property: f.name,
+				Reason:   fmt.Sprintf("'%s' property contains `/` illegal character", f.name),
+			})
+		}
 	}
 
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
+	return infer.CheckResponse[EnvironmentInput]{Inputs: inputs, Failures: failures}, nil
+}
 
-	diffs := olds.Diff(news)
-	if diffs == nil {
-		return &pulumirpc.DiffResponse{
-			Changes: pulumirpc.DiffResponse_DIFF_NONE,
+func (*Environment) Create(
+	ctx context.Context,
+	req infer.CreateRequest[EnvironmentInput],
+) (infer.CreateResponse[EnvironmentState], error) {
+	inputs := req.Inputs
+	projectName := projectOrDefault(inputs.Project)
+
+	if req.DryRun {
+		return infer.CreateResponse[EnvironmentState]{
+			Output: stateFromInputs(inputs),
 		}, nil
 	}
 
-	dd := plugin.NewDetailedDiffFromObjectDiff(diffs, false)
-
-	detailedDiffs := map[string]*pulumirpc.PropertyDiff{}
-	replaces := []string(nil)
-	replaceProperties := map[string]bool{
-		"organization": true,
-		"project":      true,
-		"name":         true,
-	}
-	for k, v := range dd {
-		if _, ok := replaceProperties[k]; ok {
-			v.Kind = v.Kind.AsReplace()
-			replaces = append(replaces, k)
-		}
-		detailedDiffs[k] = &pulumirpc.PropertyDiff{
-			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind), //nolint:gosec // safe conversion from plugin.DiffKind
-			InputDiff: v.InputDiff,
-		}
-	}
-
-	changes := pulumirpc.DiffResponse_DIFF_NONE
-	if len(detailedDiffs) > 0 {
-		changes = pulumirpc.DiffResponse_DIFF_SOME
-	}
-	return &pulumirpc.DiffResponse{
-		Changes:             changes,
-		Replaces:            replaces,
-		DetailedDiff:        detailedDiffs,
-		HasDetailedDiff:     true,
-		DeleteBeforeReplace: len(replaces) > 0,
-	}, nil
-}
-
-func (st *PulumiServiceEnvironmentResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	input, err := ToPulumiServiceEnvironmentInput(req.GetProperties())
+	yamlBytes, err := extractYAMLBytes(inputs.Yaml)
 	if err != nil {
-		return nil, err
+		return infer.CreateResponse[EnvironmentState]{}, fmt.Errorf("reading environment yaml: %w", err)
 	}
 
-	err = st.Client.DeleteEnvironment(context.Background(), input.OrgName, input.ProjectName, input.EnvName)
-	if err != nil {
-		return nil, err
-	}
-	return &pbempty.Empty{}, nil
-}
+	escClient := config.GetEscClient(ctx)
 
-func (st *PulumiServiceEnvironmentResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
-	input, err := ToPulumiServiceEnvironmentInput(req.GetProperties())
-	if err != nil {
-		return nil, err
-	}
-
-	// First check if yaml is valid
-	_, diagnostics, err := st.Client.CheckYAMLEnvironment(
-		context.Background(),
-		input.OrgName,
-		[]byte(input.Yaml),
-		esc_client.CheckYAMLOption{},
+	// Pre-flight check before committing to creation. Mirrors legacy behaviour:
+	// if the YAML is broken we surface diagnostics rather than leaving an
+	// empty environment behind.
+	_, diagnostics, err := escClient.CheckYAMLEnvironment(
+		ctx, inputs.Organization, yamlBytes, esc_client.CheckYAMLOption{},
 	)
 	if diagnostics != nil {
-		return nil, fmt.Errorf("failed to check environment, yaml code failed following checks: %+v", diagnostics)
+		return infer.CreateResponse[EnvironmentState]{}, fmt.Errorf(
+			"failed to check environment, yaml code failed following checks: %+v", diagnostics,
+		)
 	}
 	if err != nil {
-		return nil, fmt.Errorf("failed to check environment due to error: %+v", err)
+		return infer.CreateResponse[EnvironmentState]{}, fmt.Errorf("failed to check environment due to error: %w", err)
 	}
 
-	// Then create environment, and update it with yaml provided. ESC API architecture doesn't let you do it in one call
-	err = st.Client.CreateEnvironmentWithProject(context.Background(), input.OrgName, input.ProjectName, input.EnvName)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create new environment due to error: %+v", err)
+	// ESC requires a two-step create (env, then push YAML).
+	if err := escClient.CreateEnvironmentWithProject(ctx, inputs.Organization, projectName, inputs.Name); err != nil {
+		return infer.CreateResponse[EnvironmentState]{}, fmt.Errorf("failed to create new environment due to error: %w", err)
 	}
-	diagnostics, revision, err := st.Client.UpdateEnvironmentWithRevision(
-		context.Background(),
-		input.OrgName,
-		input.ProjectName,
-		input.EnvName,
-		[]byte(input.Yaml),
-		"",
+	diagnostics, revision, err := escClient.UpdateEnvironmentWithRevision(
+		ctx, inputs.Organization, projectName, inputs.Name, yamlBytes, "",
 	)
 	if diagnostics != nil {
-		return nil, fmt.Errorf(
-			"failed to update brand new environment with pre-checked yaml, due to failing the following checks: %+v \n"+
+		return infer.CreateResponse[EnvironmentState]{}, fmt.Errorf(
+			"failed to update brand new environment with pre-checked yaml, due to failing the following checks: %+v\n"+
 				"This should never happen, if you're seeing this message there's likely a bug in ESC APIs",
 			diagnostics,
 		)
 	}
 	if err != nil {
-		return nil, fmt.Errorf("failed to push yaml into environment due to error: %+v", err)
+		return infer.CreateResponse[EnvironmentState]{}, fmt.Errorf(
+			"failed to push yaml into environment due to error: %w", err,
+		)
 	}
 
-	envID, err := st.fetchEnvironmentID(context.Background(), input.OrgName, input.ProjectName, input.EnvName)
+	envID, err := fetchEnvironmentID(ctx, inputs.Organization, projectName, inputs.Name)
 	if err != nil {
-		return nil, fmt.Errorf("failed to resolve new environment's id: %w", err)
+		return infer.CreateResponse[EnvironmentState]{}, fmt.Errorf("failed to resolve new environment's id: %w", err)
 	}
 
-	output := PulumiServiceEnvironmentOutput{
-		input:         *input,
-		revision:      revision,
-		environmentID: envID,
-	}
-
-	propertyMap, err := output.ToPropertyMap()
-	if err != nil {
-		return nil, err
-	}
-	outputProperties, err := plugin.MarshalProperties(
-		propertyMap,
-		plugin.MarshalOptions{
-			KeepSecrets: true,
-		},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.CreateResponse{
-		Id:         path.Join(input.OrgName, input.ProjectName, input.EnvName),
-		Properties: outputProperties,
+	out := stateFromInputs(inputs)
+	out.Revision = revision
+	out.EnvironmentID = envID
+	return infer.CreateResponse[EnvironmentState]{
+		ID:     environmentResourceID(inputs.Organization, projectName, inputs.Name),
+		Output: out,
 	}, nil
 }
 
-// fetchEnvironmentID resolves an environment's UUID via the metadata endpoint.
-// Returns "" with no error when the metadata client is not configured, so
-// tests that omit it behave as before — the resource simply skips emitting
-// `environmentId` rather than crashing.
-func (st *PulumiServiceEnvironmentResource) fetchEnvironmentID(
+func (*Environment) Update(
 	ctx context.Context,
-	orgName, projectName, envName string,
-) (string, error) {
-	if st.MetadataClient == nil {
-		return "", nil
+	req infer.UpdateRequest[EnvironmentInput, EnvironmentState],
+) (infer.UpdateResponse[EnvironmentState], error) {
+	inputs := req.Inputs
+	projectName := projectOrDefault(inputs.Project)
+
+	if req.DryRun {
+		out := stateFromInputs(inputs)
+		out.Revision = req.State.Revision
+		out.EnvironmentID = req.State.EnvironmentID
+		return infer.UpdateResponse[EnvironmentState]{Output: out}, nil
 	}
-	meta, err := st.MetadataClient.GetEnvironmentMetadata(ctx, orgName, projectName, envName)
+
+	yamlBytes, err := extractYAMLBytes(inputs.Yaml)
+	if err != nil {
+		return infer.UpdateResponse[EnvironmentState]{}, fmt.Errorf("reading environment yaml: %w", err)
+	}
+
+	escClient := config.GetEscClient(ctx)
+	diagnostics, revision, err := escClient.UpdateEnvironmentWithRevision(
+		ctx, inputs.Organization, projectName, inputs.Name, yamlBytes, "",
+	)
+	if diagnostics != nil {
+		return infer.UpdateResponse[EnvironmentState]{}, fmt.Errorf(
+			"failed to update environment, yaml code failed following checks: %+v", diagnostics,
+		)
+	}
+	if err != nil {
+		return infer.UpdateResponse[EnvironmentState]{}, fmt.Errorf("failed to update environment due to error: %w", err)
+	}
+
+	envID, err := fetchEnvironmentID(ctx, inputs.Organization, projectName, inputs.Name)
+	if err != nil {
+		return infer.UpdateResponse[EnvironmentState]{}, fmt.Errorf("failed to resolve environment's id: %w", err)
+	}
+
+	out := stateFromInputs(inputs)
+	out.Revision = revision
+	out.EnvironmentID = envID
+	return infer.UpdateResponse[EnvironmentState]{Output: out}, nil
+}
+
+func (*Environment) Delete(
+	ctx context.Context, req infer.DeleteRequest[EnvironmentState],
+) (infer.DeleteResponse, error) {
+	projectName := projectOrDefault(req.State.Project)
+	return infer.DeleteResponse{}, config.GetEscClient(ctx).DeleteEnvironment(
+		ctx, req.State.Organization, projectName, req.State.Name,
+	)
+}
+
+func (*Environment) Read(
+	ctx context.Context,
+	req infer.ReadRequest[EnvironmentInput, EnvironmentState],
+) (infer.ReadResponse[EnvironmentInput, EnvironmentState], error) {
+	orgName, projectName, envName, err := splitEnvironmentID(req.ID)
+	if err != nil {
+		return infer.ReadResponse[EnvironmentInput, EnvironmentState]{}, err
+	}
+
+	escClient := config.GetEscClient(ctx)
+	retrievedYaml, _, revision, err := escClient.GetEnvironment(ctx, orgName, projectName, envName, "", false)
+	if err != nil {
+		// Match legacy semantics: treat any error as "not found" so refresh
+		// drops the resource from state rather than failing the operation.
+		return infer.ReadResponse[EnvironmentInput, EnvironmentState]{}, nil
+	}
+
+	trimmedYaml := strings.TrimSpace(string(retrievedYaml))
+	yamlAsset, err := asset.FromText(trimmedYaml)
+	if err != nil {
+		return infer.ReadResponse[EnvironmentInput, EnvironmentState]{}, fmt.Errorf(
+			"failed to wrap yaml in asset: %w", err,
+		)
+	}
+
+	inputs := EnvironmentInput{
+		Organization: orgName,
+		Project:      projectName,
+		Name:         envName,
+		Yaml:         types.AssetOrArchive{Asset: yamlAsset},
+	}
+
+	// Best-effort: legacy state (pre-environmentId) refreshed against an
+	// older provider build can still be missing this field. Don't fail
+	// refresh just because the metadata fetch errored.
+	envID, err := fetchEnvironmentID(ctx, orgName, projectName, envName)
+	if err != nil {
+		envID = ""
+	}
+
+	state := stateFromInputs(inputs)
+	state.Revision = revision
+	state.EnvironmentID = envID
+	return infer.ReadResponse[EnvironmentInput, EnvironmentState]{
+		ID:     environmentResourceID(orgName, projectName, envName),
+		Inputs: inputs,
+		State:  state,
+	}, nil
+}
+
+// extractYAMLBytes pulls the YAML body out of an `AssetOrArchive` input,
+// trimming surrounding whitespace to match legacy Check semantics. Returns
+// an error if the input is an archive rather than an asset.
+func extractYAMLBytes(aoa types.AssetOrArchive) ([]byte, error) {
+	if aoa.Archive != nil {
+		return nil, fmt.Errorf("yaml must be an asset, not an archive")
+	}
+	if aoa.Asset == nil {
+		return nil, nil
+	}
+	if aoa.Asset.Text != "" {
+		return []byte(strings.TrimSpace(aoa.Asset.Text)), nil
+	}
+	reader, err := aoa.Asset.Read()
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = reader.Close() }()
+	body, err := io.ReadAll(reader)
+	if err != nil {
+		return nil, err
+	}
+	return []byte(strings.TrimSpace(string(body))), nil
+}
+
+func fetchEnvironmentID(ctx context.Context, orgName, projectName, envName string) (string, error) {
+	meta, err := config.GetClient(ctx).GetEnvironmentMetadata(ctx, orgName, projectName, envName)
 	if err != nil {
 		return "", err
 	}
@@ -274,208 +343,27 @@ func (st *PulumiServiceEnvironmentResource) fetchEnvironmentID(
 	return meta.ID, nil
 }
 
-func (st *PulumiServiceEnvironmentResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	inputMap, err := plugin.UnmarshalProperties(
-		req.GetNews(),
-		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true},
-	)
-	if err != nil {
-		return nil, err
+func projectOrDefault(p string) string {
+	if p == "" {
+		return defaultProject
 	}
-
-	var failures []*pulumirpc.CheckFailure
-	for _, p := range []resource.PropertyKey{"organization", "project", "name", "yaml"} {
-		input := inputMap[(p)]
-
-		if !input.HasValue() {
-			failures = append(failures, &pulumirpc.CheckFailure{
-				Reason:   fmt.Sprintf("missing required property '%s'", p),
-				Property: string(p),
-			})
-		} else if p != "yaml" && !input.IsComputed() && strings.Contains(util.GetSecretOrStringValue(input), "/") {
-			failures = append(failures, &pulumirpc.CheckFailure{
-				Reason:   fmt.Sprintf("'%s' property contains `/` illegal character", p),
-				Property: string(p),
-			})
-		}
-	}
-
-	var stringYaml string
-	inputYaml := inputMap["yaml"]
-	if !inputYaml.IsComputed() {
-		if inputYaml.IsSecret() {
-			inputYaml = inputYaml.SecretValue().Element
-		}
-
-		// After unwrapping secret, check again if the inner value is computed
-		if !inputYaml.IsComputed() {
-			if inputYaml.IsAsset() {
-				yamlBytes, err := getBytesFromAsset(inputYaml.AssetValue())
-				if err != nil {
-					return nil, err
-				}
-				stringYaml = string(yamlBytes)
-			} else {
-				stringYaml = inputYaml.StringValue()
-			}
-		}
-	}
-
-	trimmedYaml := strings.TrimSpace(stringYaml)
-	inputMap["yaml"] = resource.MakeSecret(resource.NewStringProperty(trimmedYaml))
-
-	inputs, err := plugin.MarshalProperties(
-		inputMap,
-		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.CheckResponse{Inputs: inputs, Failures: failures}, nil
+	return p
 }
 
-func (st *PulumiServiceEnvironmentResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	input, err := ToPulumiServiceEnvironmentInput(req.GetNews())
-	if err != nil {
-		return nil, err
-	}
-
-	diagnostics, revision, _ := st.Client.UpdateEnvironmentWithRevision(
-		context.Background(),
-		input.OrgName,
-		input.ProjectName,
-		input.EnvName,
-		[]byte(input.Yaml),
-		"",
-	)
-	if diagnostics != nil {
-		return nil, fmt.Errorf("failed to update environment, yaml code failed following checks: %+v", diagnostics)
-	}
-
-	envID, err := st.fetchEnvironmentID(context.Background(), input.OrgName, input.ProjectName, input.EnvName)
-	if err != nil {
-		return nil, fmt.Errorf("failed to resolve environment's id: %w", err)
-	}
-
-	output := PulumiServiceEnvironmentOutput{
-		input:         *input,
-		revision:      revision,
-		environmentID: envID,
-	}
-
-	propertyMap, err := output.ToPropertyMap()
-	if err != nil {
-		return nil, err
-	}
-	outputProperties, err := plugin.MarshalProperties(
-		propertyMap,
-		plugin.MarshalOptions{
-			KeepSecrets: true,
-		},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.UpdateResponse{
-		Properties: outputProperties,
-	}, nil
+func environmentResourceID(orgName, projectName, envName string) string {
+	return path.Join(orgName, projectName, envName)
 }
 
-func (st *PulumiServiceEnvironmentResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	// Split Id into either:
-	//   <org>/<project>/<env> or
-	//   <org>/<env> (legacy pattern)
-	var orgName, projectName, envName string
-
-	splitID := strings.Split(req.Id, "/")
-	switch len(splitID) {
+// splitEnvironmentID accepts either the canonical `<org>/<project>/<env>`
+// form or the legacy `<org>/<env>` form (pre-0.25.0) used by older imports.
+func splitEnvironmentID(id string) (orgName, projectName, envName string, err error) {
+	parts := strings.Split(id, "/")
+	switch len(parts) {
 	case 3:
-		orgName = splitID[0]
-		projectName = splitID[1]
-		envName = splitID[2]
+		return parts[0], parts[1], parts[2], nil
 	case 2:
-		// Legacy pattern. Assume "default" project
-		orgName = splitID[0]
-		projectName = defaultProject
-		envName = splitID[1]
+		return parts[0], defaultProject, parts[1], nil
 	default:
-		return nil, fmt.Errorf("invalid environment id: %s", req.Id)
+		return "", "", "", fmt.Errorf("invalid environment id: %s", id)
 	}
-
-	retrievedYaml, _, revision, err := st.Client.GetEnvironment(
-		context.Background(),
-		orgName,
-		projectName,
-		envName,
-		"",
-		false,
-	)
-	if err != nil {
-		return &pulumirpc.ReadResponse{Id: "", Properties: nil}, nil
-	}
-
-	stringYaml := string(retrievedYaml)
-	trimmedYaml := strings.TrimSpace(stringYaml)
-
-	input := PulumiServiceEnvironmentInput{
-		OrgName:     orgName,
-		ProjectName: projectName,
-		EnvName:     envName,
-		Yaml:        trimmedYaml,
-	}
-
-	// Best-effort: legacy state (pre-environmentId) refreshed against an
-	// older provider build can still be missing this field. Don't fail
-	// refresh just because the metadata fetch errored — if it returns
-	// empty, ToPropertyMap simply omits `environmentId`.
-	envID, err := st.fetchEnvironmentID(context.Background(), orgName, projectName, envName)
-	if err != nil {
-		envID = ""
-	}
-
-	result := PulumiServiceEnvironmentOutput{
-		input:         input,
-		revision:      revision,
-		environmentID: envID,
-	}
-
-	inputMap, err := input.ToPropertyMap()
-	if err != nil {
-		return nil, err
-	}
-	inputs, err := plugin.MarshalProperties(
-		inputMap,
-		plugin.MarshalOptions{
-			KeepSecrets: true,
-		},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	propertyMap, err := result.ToPropertyMap()
-	if err != nil {
-		return nil, err
-	}
-	properties, err := plugin.MarshalProperties(
-		propertyMap,
-		plugin.MarshalOptions{
-			KeepSecrets: true,
-		},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.ReadResponse{
-		Id:         req.Id,
-		Properties: properties,
-		Inputs:     inputs,
-	}, nil
-}
-
-func (st *PulumiServiceEnvironmentResource) Name() string {
-	return "pulumiservice:index:Environment"
 }
