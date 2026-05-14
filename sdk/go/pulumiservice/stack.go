@@ -42,6 +42,13 @@ func NewStack(ctx *pulumi.Context,
 	if args.StackName == nil {
 		return nil, errors.New("invalid value for required argument 'StackName'")
 	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"forceDestroy",
+		"organizationName",
+		"projectName",
+		"stackName",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Stack
 	err := ctx.RegisterResource("pulumiservice:index:Stack", name, args, &resource, opts...)

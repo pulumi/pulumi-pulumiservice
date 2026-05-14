@@ -2293,19 +2293,23 @@
       "properties": {
         "forceDestroy": {
           "type": "boolean",
-          "description": "Optional. Flag indicating whether to delete the stack even if it still contains resources."
+          "description": "Optional. Flag indicating whether to delete the stack even if it still contains resources.",
+          "replaceOnChanges": true
         },
         "organizationName": {
           "type": "string",
-          "description": "The name of the organization."
+          "description": "The name of the organization.",
+          "replaceOnChanges": true
         },
         "projectName": {
           "type": "string",
-          "description": "The name of the project."
+          "description": "The name of the project.",
+          "replaceOnChanges": true
         },
         "stackName": {
           "type": "string",
-          "description": "The name of the stack."
+          "description": "The name of the stack.",
+          "replaceOnChanges": true
         }
       },
       "required": [
@@ -2316,22 +2320,23 @@
       "inputProperties": {
         "forceDestroy": {
           "type": "boolean",
-          "description": "Optional. Flag indicating whether to delete the stack even if it still contains resources."
+          "description": "Optional. Flag indicating whether to delete the stack even if it still contains resources.",
+          "replaceOnChanges": true
         },
         "organizationName": {
           "type": "string",
           "description": "The name of the organization.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         },
         "projectName": {
           "type": "string",
           "description": "The name of the project.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         },
         "stackName": {
           "type": "string",
           "description": "The name of the stack.",
-          "willReplaceOnChanges": true
+          "replaceOnChanges": true
         }
       },
       "requiredInputs": [

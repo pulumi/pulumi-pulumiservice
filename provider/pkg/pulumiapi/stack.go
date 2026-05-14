@@ -8,6 +8,12 @@ import (
 	"path"
 )
 
+type StackClient interface {
+	CreateStack(ctx context.Context, stack StackIdentifier) error
+	StackExists(ctx context.Context, stack StackIdentifier) (bool, error)
+	DeleteStack(ctx context.Context, stack StackIdentifier, forceDestroy bool) error
+}
+
 type CreateStackRequest struct {
 	StackName string `json:"stackName"`
 }
