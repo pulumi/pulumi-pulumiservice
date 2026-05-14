@@ -21,7 +21,7 @@ type EnvironmentVersionTag struct {
 	// Organization name.
 	Organization pulumi.StringOutput `pulumi:"organization"`
 	// Project name.
-	Project pulumi.StringOutput `pulumi:"project"`
+	Project pulumi.StringPtrOutput `pulumi:"project"`
 	// Revision number.
 	Revision pulumi.IntOutput `pulumi:"revision"`
 	// Tag name.
@@ -50,6 +50,13 @@ func NewEnvironmentVersionTag(ctx *pulumi.Context,
 	if args.Project == nil {
 		args.Project = pulumi.StringPtr("default")
 	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"environment",
+		"organization",
+		"project",
+		"tagName",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource EnvironmentVersionTag
 	err := ctx.RegisterResource("pulumiservice:index:EnvironmentVersionTag", name, args, &resource, opts...)
@@ -207,8 +214,8 @@ func (o EnvironmentVersionTagOutput) Organization() pulumi.StringOutput {
 }
 
 // Project name.
-func (o EnvironmentVersionTagOutput) Project() pulumi.StringOutput {
-	return o.ApplyT(func(v *EnvironmentVersionTag) pulumi.StringOutput { return v.Project }).(pulumi.StringOutput)
+func (o EnvironmentVersionTagOutput) Project() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *EnvironmentVersionTag) pulumi.StringPtrOutput { return v.Project }).(pulumi.StringPtrOutput)
 }
 
 // Revision number.
