@@ -83,14 +83,14 @@ public final class WebhookArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
-     * Format of the webhook payload. Can be either `raw` or `slack`. Defaults to `raw`.
+     * Format of the webhook payload. Can be either `raw`, `slack`, `ms_teams` or `pulumi_deployments`. Defaults to `raw`.
      * 
      */
     @Import(name="format")
     private @Nullable Output<WebhookFormat> format;
 
     /**
-     * @return Format of the webhook payload. Can be either `raw` or `slack`. Defaults to `raw`.
+     * @return Format of the webhook payload. Can be either `raw`, `slack`, `ms_teams` or `pulumi_deployments`. Defaults to `raw`.
      * 
      */
     public Optional<Output<WebhookFormat>> format() {
@@ -316,7 +316,7 @@ public final class WebhookArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param format Format of the webhook payload. Can be either `raw` or `slack`. Defaults to `raw`.
+         * @param format Format of the webhook payload. Can be either `raw`, `slack`, `ms_teams` or `pulumi_deployments`. Defaults to `raw`.
          * 
          * @return builder
          * 
@@ -327,7 +327,7 @@ public final class WebhookArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param format Format of the webhook payload. Can be either `raw` or `slack`. Defaults to `raw`.
+         * @param format Format of the webhook payload. Can be either `raw`, `slack`, `ms_teams` or `pulumi_deployments`. Defaults to `raw`.
          * 
          * @return builder
          * 

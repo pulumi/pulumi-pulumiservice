@@ -187,14 +187,14 @@ public class Webhook extends com.pulumi.resources.CustomResource {
         return Codegen.optional(this.secret);
     }
     /**
-     * Name of the stack. Only specified if this is a stack webhook.
+     * Name of the stack. Only needed if this is a stack webhook.
      * 
      */
     @Export(name="stackName", refs={String.class}, tree="[0]")
     private Output</* @Nullable */ String> stackName;
 
     /**
-     * @return Name of the stack. Only specified if this is a stack webhook.
+     * @return Name of the stack. Only needed if this is a stack webhook.
      * 
      */
     public Output<Optional<String>> stackName() {
@@ -242,6 +242,12 @@ public class Webhook extends com.pulumi.resources.CustomResource {
             .version(Utilities.getVersion())
             .additionalSecretOutputs(List.of(
                 "secret"
+            ))
+            .replaceOnChanges(List.of(
+                "environmentName",
+                "organizationName",
+                "projectName",
+                "stackName"
             ))
             .build();
         return com.pulumi.resources.CustomResourceOptions.merge(defaultOptions, options, id);

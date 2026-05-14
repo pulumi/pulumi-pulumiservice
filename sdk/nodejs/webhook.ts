@@ -90,7 +90,7 @@ export class Webhook extends pulumi.CustomResource {
      */
     declare public readonly secret: pulumi.Output<string | undefined>;
     /**
-     * Name of the stack. Only specified if this is a stack webhook.
+     * Name of the stack. Only needed if this is a stack webhook.
      */
     declare public readonly stackName: pulumi.Output<string | undefined>;
 
@@ -146,6 +146,8 @@ export class Webhook extends pulumi.CustomResource {
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         const secretOpts = { additionalSecretOutputs: ["secret"] };
         opts = pulumi.mergeOptions(opts, secretOpts);
+        const replaceOnChanges = { replaceOnChanges: ["environmentName", "organizationName", "projectName", "stackName"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(Webhook.__pulumiType, name, resourceInputs, opts);
     }
 }
@@ -171,7 +173,7 @@ export interface WebhookArgs {
      */
     filters?: pulumi.Input<pulumi.Input<enums.WebhookFilters>[] | undefined>;
     /**
-     * Format of the webhook payload. Can be either `raw` or `slack`. Defaults to `raw`.
+     * Format of the webhook payload. Can be either `raw`, `slack`, `ms_teams` or `pulumi_deployments`. Defaults to `raw`.
      */
     format?: pulumi.Input<enums.WebhookFormat | undefined>;
     /**

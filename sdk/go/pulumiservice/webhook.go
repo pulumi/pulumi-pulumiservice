@@ -48,7 +48,7 @@ type Webhook struct {
 	ProjectName pulumi.StringPtrOutput `pulumi:"projectName"`
 	// Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.
 	Secret pulumi.StringPtrOutput `pulumi:"secret"`
-	// Name of the stack. Only specified if this is a stack webhook.
+	// Name of the stack. Only needed if this is a stack webhook.
 	StackName pulumi.StringPtrOutput `pulumi:"stackName"`
 }
 
@@ -81,6 +81,13 @@ func NewWebhook(ctx *pulumi.Context,
 		"secret",
 	})
 	opts = append(opts, secrets)
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"environmentName",
+		"organizationName",
+		"projectName",
+		"stackName",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Webhook
 	err := ctx.RegisterResource("pulumiservice:index:Webhook", name, args, &resource, opts...)
@@ -122,7 +129,7 @@ type webhookArgs struct {
 	EnvironmentName *string `pulumi:"environmentName"`
 	// Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.
 	Filters []WebhookFilters `pulumi:"filters"`
-	// Format of the webhook payload. Can be either `raw` or `slack`. Defaults to `raw`.
+	// Format of the webhook payload. Can be either `raw`, `slack`, `ms_teams` or `pulumi_deployments`. Defaults to `raw`.
 	Format *WebhookFormat `pulumi:"format"`
 	// Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#groups) for more information.
 	Groups []WebhookGroup `pulumi:"groups"`
@@ -148,7 +155,7 @@ type WebhookArgs struct {
 	EnvironmentName pulumi.StringPtrInput
 	// Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.
 	Filters WebhookFiltersArrayInput
-	// Format of the webhook payload. Can be either `raw` or `slack`. Defaults to `raw`.
+	// Format of the webhook payload. Can be either `raw`, `slack`, `ms_teams` or `pulumi_deployments`. Defaults to `raw`.
 	Format WebhookFormatPtrInput
 	// Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#groups) for more information.
 	Groups WebhookGroupArrayInput
@@ -306,7 +313,7 @@ func (o WebhookOutput) Secret() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *Webhook) pulumi.StringPtrOutput { return v.Secret }).(pulumi.StringPtrOutput)
 }
 
-// Name of the stack. Only specified if this is a stack webhook.
+// Name of the stack. Only needed if this is a stack webhook.
 func (o WebhookOutput) StackName() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *Webhook) pulumi.StringPtrOutput { return v.StackName }).(pulumi.StringPtrOutput)
 }

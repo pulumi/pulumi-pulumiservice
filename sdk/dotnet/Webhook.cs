@@ -90,7 +90,7 @@ namespace Pulumi.PulumiService
         public Output<string?> Secret { get; private set; } = null!;
 
         /// <summary>
-        /// Name of the stack. Only specified if this is a stack webhook.
+        /// Name of the stack. Only needed if this is a stack webhook.
         /// </summary>
         [Output("stackName")]
         public Output<string?> StackName { get; private set; } = null!;
@@ -121,6 +121,13 @@ namespace Pulumi.PulumiService
                 AdditionalSecretOutputs =
                 {
                     "secret",
+                },
+                ReplaceOnChanges =
+                {
+                    "environmentName",
+                    "organizationName",
+                    "projectName",
+                    "stackName",
                 },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
@@ -175,7 +182,7 @@ namespace Pulumi.PulumiService
         }
 
         /// <summary>
-        /// Format of the webhook payload. Can be either `raw` or `slack`. Defaults to `raw`.
+        /// Format of the webhook payload. Can be either `raw`, `slack`, `ms_teams` or `pulumi_deployments`. Defaults to `raw`.
         /// </summary>
         [Input("format")]
         public Input<Pulumi.PulumiService.WebhookFormat>? Format { get; set; }

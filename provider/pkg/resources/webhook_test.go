@@ -1,114 +1,110 @@
+// Copyright 2026, Pulumi Corporation.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//	http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package resources
 
 import (
-	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
-
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
+	"github.com/stretchr/testify/require"
 )
 
-type getWebhookFunc func() (*pulumiapi.Webhook, error)
+func ptr[T any](v T) *T { return &v }
 
-type WebhookClientMock struct {
-	getWebhookFunc getWebhookFunc
-}
-
-func (c *WebhookClientMock) GetWebhook(
-	_ context.Context,
-	_ string,
-	_, _, _ *string,
-	_ string,
-) (*pulumiapi.Webhook, error) {
-	return c.getWebhookFunc()
-}
-
-func (c *WebhookClientMock) CreateWebhook(
-	_ context.Context,
-	_ pulumiapi.WebhookRequest,
-) (*pulumiapi.Webhook, error) {
-	return nil, nil
-}
-
-func (c *WebhookClientMock) ListWebhooks(
-	_ context.Context,
-	_ string,
-	_, _, _ *string,
-) ([]pulumiapi.Webhook, error) {
-	return nil, nil
-}
-
-func (c *WebhookClientMock) UpdateWebhook(
-	_ context.Context,
-	_ pulumiapi.UpdateWebhookRequest,
-) (*pulumiapi.Webhook, error) {
-	return nil, nil
-}
-
-func (c *WebhookClientMock) DeleteWebhook(
-	_ context.Context,
-	_ string,
-	_, _, _ *string,
-	_ string,
-) error {
-	return nil
-}
-
-func buildWebhookClientMock(getWebhookFunc getWebhookFunc) *WebhookClientMock {
-	return &WebhookClientMock{
-		getWebhookFunc,
-	}
-}
-
-func TestWebhook(t *testing.T) {
-	t.Run("Read when the resource is not found", func(t *testing.T) {
-		mockedClient := buildWebhookClientMock(
-			func() (*pulumiapi.Webhook, error) { return nil, nil },
-		)
-
-		provider := PulumiServiceWebhookResource{
-			Client: mockedClient,
-		}
-
-		req := pulumirpc.ReadRequest{
-			Id:  "abc/def/ghi/123",
-			Urn: "urn:123",
-		}
-
-		resp, err := provider.Read(&req)
-
-		assert.NoError(t, err)
-		assert.Equal(t, resp.Id, "")
-		assert.Nil(t, resp.Properties)
+func TestGenerateWebhookID(t *testing.T) {
+	t.Run("organization scope", func(t *testing.T) {
+		id := generateWebhookID(WebhookInput{OrganizationName: "my-org"}, "hook-1")
+		assert.Equal(t, "my-org/hook-1", id)
 	})
 
-	t.Run("Read when the resource is found", func(t *testing.T) {
-		mockedClient := buildWebhookClientMock(
-			func() (*pulumiapi.Webhook, error) {
-				return &pulumiapi.Webhook{
-					Active:      true,
-					DisplayName: "test webhook",
-					PayloadURL:  "https://example.com/webhook",
-					Name:        "test-webhook",
-				}, nil
-			},
-		)
+	t.Run("stack scope", func(t *testing.T) {
+		id := generateWebhookID(WebhookInput{
+			OrganizationName: "my-org",
+			ProjectName:      ptr("my-project"),
+			StackName:        ptr("my-stack"),
+		}, "hook-2")
+		assert.Equal(t, "my-org/my-project/my-stack/hook-2", id)
+	})
 
-		provider := PulumiServiceWebhookResource{
-			Client: mockedClient,
+	t.Run("environment scope", func(t *testing.T) {
+		id := generateWebhookID(WebhookInput{
+			OrganizationName: "my-org",
+			ProjectName:      ptr("my-project"),
+			EnvironmentName:  ptr("dev"),
+		}, "hook-3")
+		assert.Equal(t, "my-org/environment/my-project/dev/hook-3", id)
+	})
+}
+
+func TestSplitWebhookID(t *testing.T) {
+	t.Run("organization scope", func(t *testing.T) {
+		got, err := splitWebhookID("my-org/hook-1")
+		require.NoError(t, err)
+		assert.Equal(t, &webhookID{
+			organizationName: "my-org",
+			webhookName:      "hook-1",
+		}, got)
+	})
+
+	t.Run("stack scope", func(t *testing.T) {
+		got, err := splitWebhookID("my-org/my-project/my-stack/hook-2")
+		require.NoError(t, err)
+		assert.Equal(t, &webhookID{
+			organizationName: "my-org",
+			projectName:      ptr("my-project"),
+			stackName:        ptr("my-stack"),
+			webhookName:      "hook-2",
+		}, got)
+	})
+
+	t.Run("environment scope", func(t *testing.T) {
+		got, err := splitWebhookID("my-org/environment/my-project/dev/hook-3")
+		require.NoError(t, err)
+		assert.Equal(t, &webhookID{
+			organizationName: "my-org",
+			projectName:      ptr("my-project"),
+			environmentName:  ptr("dev"),
+			webhookName:      "hook-3",
+		}, got)
+	})
+
+	t.Run("malformed", func(t *testing.T) {
+		_, err := splitWebhookID("only-one")
+		require.Error(t, err)
+		_, err = splitWebhookID("a/b/c")
+		require.Error(t, err)
+		_, err = splitWebhookID("a/b/c/d/e/f")
+		require.Error(t, err)
+	})
+
+	t.Run("round-trip", func(t *testing.T) {
+		// All round-trip cases must produce the same scope-shape on parse.
+		cases := []WebhookInput{
+			{OrganizationName: "org"},
+			{OrganizationName: "org", ProjectName: ptr("proj"), StackName: ptr("stk")},
+			{OrganizationName: "org", ProjectName: ptr("proj"), EnvironmentName: ptr("env")},
 		}
-
-		req := pulumirpc.ReadRequest{
-			Id:  "abc/def/ghi/123",
-			Urn: "urn:123",
+		for _, in := range cases {
+			id := generateWebhookID(in, "hook")
+			parsed, err := splitWebhookID(id)
+			require.NoError(t, err)
+			assert.Equal(t, "hook", parsed.webhookName)
+			assert.Equal(t, in.OrganizationName, parsed.organizationName)
+			assert.Equal(t, in.ProjectName, parsed.projectName)
+			assert.Equal(t, in.StackName, parsed.stackName)
+			assert.Equal(t, in.EnvironmentName, parsed.environmentName)
 		}
-
-		resp, err := provider.Read(&req)
-
-		assert.NoError(t, err)
-		assert.Equal(t, resp.Id, "abc/def/ghi/123")
 	})
 }
