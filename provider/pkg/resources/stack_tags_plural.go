@@ -1,3 +1,17 @@
+// Copyright 2026, Pulumi Corporation.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//	http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package resources
 
 import (
@@ -5,311 +19,62 @@ import (
 	"fmt"
 	"maps"
 	"path"
+	"slices"
 	"sort"
 	"strings"
 
-	"google.golang.org/grpc/codes"
-	pbempty "google.golang.org/protobuf/types/known/emptypb"
-	"google.golang.org/protobuf/types/known/structpb"
+	"github.com/pulumi/pulumi-go-provider/infer"
 
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/util/rpcutil/rpcerror"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
-
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
-type PulumiServiceStackTagsResource struct {
-	Client *pulumiapi.Client
+type StackTags struct{}
+
+var (
+	_ infer.CustomCreate[StackTagsInput, StackTagsState] = &StackTags{}
+	_ infer.CustomUpdate[StackTagsInput, StackTagsState] = &StackTags{}
+	_ infer.CustomDelete[StackTagsState]                 = &StackTags{}
+	_ infer.CustomRead[StackTagsInput, StackTagsState]   = &StackTags{}
+)
+
+func (*StackTags) Annotate(a infer.Annotator) {
+	a.Describe(&StackTags{},
+		"Manages a set of stack tags as a single resource via a `tags` map, instead of one `StackTag` per key — "+
+			"useful for YAML programs.\n\n"+
+			"Only tags declared in `tags` are managed; tags added out-of-band (CLI, pulumibot, a singular `StackTag` "+
+			"resource) are left alone. Tag values are immutable in Pulumi Cloud, so a value change is implemented as "+
+			"delete-and-recreate.\n\n"+
+			"Importing with ID `{organization}/{project}/{stack}/tags` adopts every tag currently on the stack; "+
+			"declare `tags` explicitly after import so subsequent updates match your intent. See the "+
+			"[registry docs](https://www.pulumi.com/registry/packages/pulumiservice/api-docs/stacktags/) for full "+
+			"usage and examples.\n",
+	)
+	a.SetToken("index", "StackTags")
 }
 
-type PulumiServiceStackTagsInput struct {
-	Organization string            `pulumi:"organization"`
-	Project      string            `pulumi:"project"`
-	Stack        string            `pulumi:"stack"`
+type StackTagsInput struct {
+	Organization string            `pulumi:"organization" provider:"replaceOnChanges"`
+	Project      string            `pulumi:"project"      provider:"replaceOnChanges"`
+	Stack        string            `pulumi:"stack"        provider:"replaceOnChanges"`
 	Tags         map[string]string `pulumi:"tags"`
 }
 
-func (i *PulumiServiceStackTagsInput) ToPropertyMap() resource.PropertyMap {
-	return util.ToPropertyMap(*i)
+func (i *StackTagsInput) Annotate(a infer.Annotator) {
+	a.Describe(&i.Organization, "Organization name.")
+	a.Describe(&i.Project, "Project name.")
+	a.Describe(&i.Stack, "Stack name.")
+	a.Describe(&i.Tags, "Map of tag names to values. Each entry represents a stack tag.")
 }
 
-func (i *PulumiServiceStackTagsInput) ToRPC() (*structpb.Struct, error) {
-	return plugin.MarshalProperties(i.ToPropertyMap(), plugin.MarshalOptions{
-		KeepOutputValues: true,
-	})
+type StackTagsState = StackTagsInput
+
+func stackTagsResourceID(organization, project, stack string) string {
+	return path.Join(organization, project, stack, "tags")
 }
 
-func (st *PulumiServiceStackTagsResource) Name() string {
-	return "pulumiservice:index:StackTags"
-}
-
-func (st *PulumiServiceStackTagsResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: nil}, nil
-}
-
-func (st *PulumiServiceStackTagsResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(
-		req.GetOldInputs(), plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
-
-	news, err := plugin.UnmarshalProperties(
-		req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
-	if err != nil {
-		return nil, err
-	}
-
-	diffs := olds.Diff(news)
-	if diffs == nil {
-		return &pulumirpc.DiffResponse{
-			Changes: pulumirpc.DiffResponse_DIFF_NONE,
-		}, nil
-	}
-
-	dd := plugin.NewDetailedDiffFromObjectDiff(diffs, false)
-
-	detailedDiffs := map[string]*pulumirpc.PropertyDiff{}
-	replaces := []string{}
-
-	for k, v := range dd {
-		if k == "organization" || k == "project" || k == "stack" {
-			v.Kind = v.Kind.AsReplace()
-			replaces = append(replaces, k)
-		}
-		detailedDiffs[k] = &pulumirpc.PropertyDiff{
-			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind), //nolint:gosec // safe conversion from plugin.DiffKind
-			InputDiff: v.InputDiff,
-		}
-	}
-
-	changes := pulumirpc.DiffResponse_DIFF_SOME
-	if len(detailedDiffs) == 0 {
-		changes = pulumirpc.DiffResponse_DIFF_NONE
-	}
-
-	return &pulumirpc.DiffResponse{
-		Changes:             changes,
-		Replaces:            replaces,
-		DetailedDiff:        detailedDiffs,
-		DeleteBeforeReplace: len(replaces) > 0,
-		HasDetailedDiff:     true,
-	}, nil
-}
-
-func (st *PulumiServiceStackTagsResource) Create(req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
-	ctx := context.Background()
-	var input PulumiServiceStackTagsInput
-	err := util.FromProperties(req.GetProperties(), &input)
-	if err != nil {
-		return nil, err
-	}
-
-	stackName := pulumiapi.StackIdentifier{
-		OrgName:     input.Organization,
-		ProjectName: input.Project,
-		StackName:   input.Stack,
-	}
-	id := path.Join(input.Organization, input.Project, input.Stack, "tags")
-
-	// Create tags in sorted order so partial failures are deterministic.
-	created := map[string]string{}
-	tagNames := sortedKeys(input.Tags)
-	for _, name := range tagNames {
-		err := st.Client.CreateStackTag(ctx, stackName, pulumiapi.StackTag{Name: name, Value: input.Tags[name]})
-		if err != nil {
-			// Record the subset of tags that were successfully created so Pulumi
-			// can track them in state and the next `up` resumes from the right place.
-			// partial := input copies the value struct, then partial.Tags = created
-			// swaps in the subset without mutating the caller's input.
-			partial := input
-			partial.Tags = created
-			return nil, partialErrorStackTags(id, fmt.Errorf("failed to create tag %q: %w", name, err), partial, input)
-		}
-		created[name] = input.Tags[name]
-	}
-
-	return &pulumirpc.CreateResponse{
-		Id:         id,
-		Properties: req.GetProperties(),
-	}, nil
-}
-
-func (st *PulumiServiceStackTagsResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	ctx := context.Background()
-
-	organization, project, stack, err := parseStackTagsID(req.Id)
-	if err != nil {
-		return nil, err
-	}
-
-	stackName := pulumiapi.StackIdentifier{
-		OrgName:     organization,
-		ProjectName: project,
-		StackName:   stack,
-	}
-
-	allTags, err := st.Client.GetStackTags(ctx, stackName)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read stack tags (%q): %w", req.Id, err)
-	}
-
-	// Parse current inputs to know which tags we manage.
-	var currentInput PulumiServiceStackTagsInput
-	if req.Inputs != nil {
-		inputMap, err := plugin.UnmarshalProperties(req.Inputs, plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
-		if err != nil {
-			return nil, fmt.Errorf("failed to unmarshal inputs: %w", err)
-		}
-		if err := util.FromPropertyMap(inputMap, &currentInput); err != nil {
-			// If we can't decode the previous inputs, don't silently fall into
-			// the import/adopt-all-tags path — that would let us take ownership
-			// of (and later delete) tags we never managed.
-			return nil, fmt.Errorf("failed to decode stored inputs for %q: %w", req.Id, err)
-		}
-	}
-
-	managedTags := make(map[string]string)
-	if len(currentInput.Tags) > 0 {
-		// We have previous state, only return tags we previously managed.
-		for tagName := range currentInput.Tags {
-			if value, exists := allTags[tagName]; exists {
-				managedTags[tagName] = value
-			}
-		}
-	} else {
-		// No previous state (import scenario): adopt every tag currently on the stack.
-		// The user is expected to declare the `tags` map explicitly after import so
-		// subsequent updates match their intent — see the schema description.
-		// Clone so we don't alias the API-client-owned map.
-		managedTags = maps.Clone(allTags)
-	}
-
-	state := PulumiServiceStackTagsInput{
-		Organization: organization,
-		Project:      project,
-		Stack:        stack,
-		Tags:         managedTags,
-	}
-
-	props, err := util.ToProperties(state)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal inputs to properties: %w", err)
-	}
-
-	return &pulumirpc.ReadResponse{
-		Id:         req.Id,
-		Properties: props,
-		Inputs:     props,
-	}, nil
-}
-
-func (st *PulumiServiceStackTagsResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	ctx := context.Background()
-
-	var oldInput PulumiServiceStackTagsInput
-	err := util.FromProperties(req.GetOlds(), &oldInput)
-	if err != nil {
-		return nil, err
-	}
-
-	var newInput PulumiServiceStackTagsInput
-	err = util.FromProperties(req.GetNews(), &newInput)
-	if err != nil {
-		return nil, err
-	}
-
-	stackName := pulumiapi.StackIdentifier{
-		OrgName:     newInput.Organization,
-		ProjectName: newInput.Project,
-		StackName:   newInput.Stack,
-	}
-	id := path.Join(newInput.Organization, newInput.Project, newInput.Stack, "tags")
-
-	// Compute the add/remove/modify sets. Pulumi Cloud tags are immutable per
-	// key, so a value change is a delete + create.
-	tagsToDelete := []string{}
-	tagsToCreate := map[string]string{}
-
-	for oldName, oldValue := range oldInput.Tags {
-		if newValue, exists := newInput.Tags[oldName]; !exists {
-			tagsToDelete = append(tagsToDelete, oldName)
-		} else if newValue != oldValue {
-			tagsToDelete = append(tagsToDelete, oldName)
-			tagsToCreate[oldName] = newValue
-		}
-	}
-	for newName, newValue := range newInput.Tags {
-		if _, exists := oldInput.Tags[newName]; !exists {
-			tagsToCreate[newName] = newValue
-		}
-	}
-
-	// Track the live tag set as we mutate it. If any API call fails we return
-	// this as the resource state so Pulumi knows exactly which tags exist.
-	currentTags := map[string]string{}
-	for k, v := range oldInput.Tags {
-		currentTags[k] = v
-	}
-
-	sort.Strings(tagsToDelete)
-	for _, tagName := range tagsToDelete {
-		err := st.Client.DeleteStackTag(ctx, stackName, tagName)
-		if err != nil {
-			state := newInput
-			state.Tags = currentTags
-			return nil, partialErrorStackTags(id, fmt.Errorf("failed to delete tag %q: %w", tagName, err), state, newInput)
-		}
-		delete(currentTags, tagName)
-	}
-
-	createNames := sortedKeys(tagsToCreate)
-	for _, name := range createNames {
-		value := tagsToCreate[name]
-		err := st.Client.CreateStackTag(ctx, stackName, pulumiapi.StackTag{Name: name, Value: value})
-		if err != nil {
-			state := newInput
-			state.Tags = currentTags
-			return nil, partialErrorStackTags(id, fmt.Errorf("failed to create tag %q: %w", name, err), state, newInput)
-		}
-		currentTags[name] = value
-	}
-
-	return &pulumirpc.UpdateResponse{
-		Properties: req.GetNews(),
-	}, nil
-}
-
-func (st *PulumiServiceStackTagsResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	ctx := context.Background()
-	var input PulumiServiceStackTagsInput
-	err := util.FromProperties(req.GetProperties(), &input)
-	if err != nil {
-		return nil, err
-	}
-
-	stackName := pulumiapi.StackIdentifier{
-		OrgName:     input.Organization,
-		ProjectName: input.Project,
-		StackName:   input.Stack,
-	}
-
-	tagNames := sortedKeys(input.Tags)
-	for _, tagName := range tagNames {
-		err = st.Client.DeleteStackTag(ctx, stackName, tagName)
-		if err != nil {
-			return nil, fmt.Errorf("failed to delete tag %q: %w", tagName, err)
-		}
-	}
-
-	return &pbempty.Empty{}, nil
-}
-
-// parseStackTagsID parses an ID of the form `organization/project/stack/tags`.
-func parseStackTagsID(id string) (organization, project, stack string, err error) {
+// parseStackTagsResourceID parses an ID of the form `organization/project/stack/tags`.
+func parseStackTagsResourceID(id string) (organization, project, stack string, err error) {
 	parts := strings.Split(id, "/")
 	if len(parts) != 4 || parts[3] != "tags" {
 		return "", "", "", fmt.Errorf("%q is invalid, must be in organization/project/stack/tags format", id)
@@ -317,32 +82,188 @@ func parseStackTagsID(id string) (organization, project, stack string, err error
 	return parts[0], parts[1], parts[2], nil
 }
 
-func sortedKeys(m map[string]string) []string {
-	keys := make([]string, 0, len(m))
-	for k := range m {
-		keys = append(keys, k)
+func (*StackTags) Create(
+	ctx context.Context,
+	req infer.CreateRequest[StackTagsInput],
+) (infer.CreateResponse[StackTagsState], error) {
+	id := stackTagsResourceID(req.Inputs.Organization, req.Inputs.Project, req.Inputs.Stack)
+
+	if req.DryRun {
+		return infer.CreateResponse[StackTagsState]{
+			ID:     id,
+			Output: req.Inputs,
+		}, nil
 	}
-	sort.Strings(keys)
-	return keys
+
+	client := config.GetClient(ctx)
+	stackIdentifier := pulumiapi.StackIdentifier{
+		OrgName:     req.Inputs.Organization,
+		ProjectName: req.Inputs.Project,
+		StackName:   req.Inputs.Stack,
+	}
+
+	// Create tags in sorted order so partial failures are deterministic.
+	created := map[string]string{}
+	for _, name := range slices.Sorted(maps.Keys(req.Inputs.Tags)) {
+		value := req.Inputs.Tags[name]
+		if err := client.CreateStackTag(ctx, stackIdentifier, pulumiapi.StackTag{Name: name, Value: value}); err != nil {
+			partial := req.Inputs
+			partial.Tags = created
+			return infer.CreateResponse[StackTagsState]{
+					ID:     id,
+					Output: partial,
+				}, infer.ResourceInitFailedError{
+					Reasons: []string{fmt.Sprintf("failed to create tag %q: %s", name, err.Error())},
+				}
+		}
+		created[name] = value
+	}
+
+	return infer.CreateResponse[StackTagsState]{
+		ID:     id,
+		Output: req.Inputs,
+	}, nil
 }
 
-// partialErrorStackTags wraps err so Pulumi records `state` as the resource's
-// last known state before failure. Without this, a Create that creates 2 of 5
-// tags and then fails would leave those 2 untracked and re-create them on retry.
-func partialErrorStackTags(id string, err error, state, inputs PulumiServiceStackTagsInput) error {
-	stateRPC, stateSerErr := state.ToRPC()
-	inputRPC, inputSerErr := inputs.ToRPC()
-	if stateSerErr != nil {
-		err = fmt.Errorf("err serializing state: %v (src error: %v)", stateSerErr, err)
+func (*StackTags) Update(
+	ctx context.Context,
+	req infer.UpdateRequest[StackTagsInput, StackTagsState],
+) (infer.UpdateResponse[StackTagsState], error) {
+	if req.DryRun {
+		return infer.UpdateResponse[StackTagsState]{Output: req.Inputs}, nil
 	}
-	if inputSerErr != nil {
-		err = fmt.Errorf("err serializing inputs: %v (src error: %v)", inputSerErr, err)
+
+	client := config.GetClient(ctx)
+	stackIdentifier := pulumiapi.StackIdentifier{
+		OrgName:     req.Inputs.Organization,
+		ProjectName: req.Inputs.Project,
+		StackName:   req.Inputs.Stack,
 	}
-	detail := pulumirpc.ErrorResourceInitFailed{
-		Id:         id,
-		Properties: stateRPC,
-		Reasons:    []string{err.Error()},
-		Inputs:     inputRPC,
+
+	// Compute the add/remove/modify sets. Pulumi Cloud tags are immutable per
+	// key, so a value change is a delete + create.
+	tagsToDelete := []string{}
+	tagsToCreate := map[string]string{}
+
+	for oldName, oldValue := range req.State.Tags {
+		if newValue, exists := req.Inputs.Tags[oldName]; !exists {
+			tagsToDelete = append(tagsToDelete, oldName)
+		} else if newValue != oldValue {
+			tagsToDelete = append(tagsToDelete, oldName)
+			tagsToCreate[oldName] = newValue
+		}
 	}
-	return rpcerror.WithDetails(rpcerror.New(codes.Unknown, err.Error()), &detail)
+	for newName, newValue := range req.Inputs.Tags {
+		if _, exists := req.State.Tags[newName]; !exists {
+			tagsToCreate[newName] = newValue
+		}
+	}
+
+	// Track the live tag set as we mutate it. If any API call fails we return
+	// this as the resource state so Pulumi knows exactly which tags exist.
+	currentTags := maps.Clone(req.State.Tags)
+	if currentTags == nil {
+		currentTags = map[string]string{}
+	}
+
+	partialOutput := func() StackTagsState {
+		state := req.Inputs
+		state.Tags = maps.Clone(currentTags)
+		return state
+	}
+
+	sort.Strings(tagsToDelete)
+	for _, tagName := range tagsToDelete {
+		if err := client.DeleteStackTag(ctx, stackIdentifier, tagName); err != nil {
+			return infer.UpdateResponse[StackTagsState]{Output: partialOutput()},
+				infer.ResourceInitFailedError{
+					Reasons: []string{fmt.Sprintf("failed to delete tag %q: %s", tagName, err.Error())},
+				}
+		}
+		delete(currentTags, tagName)
+	}
+
+	for _, name := range slices.Sorted(maps.Keys(tagsToCreate)) {
+		value := tagsToCreate[name]
+		if err := client.CreateStackTag(ctx, stackIdentifier, pulumiapi.StackTag{Name: name, Value: value}); err != nil {
+			return infer.UpdateResponse[StackTagsState]{Output: partialOutput()},
+				infer.ResourceInitFailedError{
+					Reasons: []string{fmt.Sprintf("failed to create tag %q: %s", name, err.Error())},
+				}
+		}
+		currentTags[name] = value
+	}
+
+	return infer.UpdateResponse[StackTagsState]{Output: req.Inputs}, nil
+}
+
+func (*StackTags) Delete(
+	ctx context.Context,
+	req infer.DeleteRequest[StackTagsState],
+) (infer.DeleteResponse, error) {
+	client := config.GetClient(ctx)
+	stackIdentifier := pulumiapi.StackIdentifier{
+		OrgName:     req.State.Organization,
+		ProjectName: req.State.Project,
+		StackName:   req.State.Stack,
+	}
+
+	for _, tagName := range slices.Sorted(maps.Keys(req.State.Tags)) {
+		if err := client.DeleteStackTag(ctx, stackIdentifier, tagName); err != nil {
+			return infer.DeleteResponse{}, fmt.Errorf("failed to delete tag %q: %w", tagName, err)
+		}
+	}
+	return infer.DeleteResponse{}, nil
+}
+
+func (*StackTags) Read(
+	ctx context.Context,
+	req infer.ReadRequest[StackTagsInput, StackTagsState],
+) (infer.ReadResponse[StackTagsInput, StackTagsState], error) {
+	organization, project, stack, err := parseStackTagsResourceID(req.ID)
+	if err != nil {
+		return infer.ReadResponse[StackTagsInput, StackTagsState]{}, err
+	}
+
+	client := config.GetClient(ctx)
+	allTags, err := client.GetStackTags(ctx, pulumiapi.StackIdentifier{
+		OrgName:     organization,
+		ProjectName: project,
+		StackName:   stack,
+	})
+	if err != nil {
+		return infer.ReadResponse[StackTagsInput, StackTagsState]{},
+			fmt.Errorf("failed to read stack tags (%q): %w", req.ID, err)
+	}
+
+	managedTags := map[string]string{}
+	if len(req.Inputs.Tags) > 0 {
+		// We have previous state; only return tags we previously managed.
+		for tagName := range req.Inputs.Tags {
+			if value, exists := allTags[tagName]; exists {
+				managedTags[tagName] = value
+			}
+		}
+	} else {
+		// No previous state (import scenario): adopt every tag currently on
+		// the stack. The user is expected to declare the `tags` map explicitly
+		// after import so subsequent updates match their intent.
+		managedTags = maps.Clone(allTags)
+		if managedTags == nil {
+			managedTags = map[string]string{}
+		}
+	}
+
+	state := StackTagsState{
+		Organization: organization,
+		Project:      project,
+		Stack:        stack,
+		Tags:         managedTags,
+	}
+
+	return infer.ReadResponse[StackTagsInput, StackTagsState]{
+		ID:     req.ID,
+		Inputs: state,
+		State:  state,
+	}, nil
 }

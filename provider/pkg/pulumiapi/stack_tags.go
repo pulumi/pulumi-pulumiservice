@@ -33,6 +33,7 @@ func NewStackIdentifier(id string) (StackIdentifier, error) {
 type StackTagClient interface {
 	CreateStackTag(ctx context.Context, stack StackIdentifier, tag StackTag) error
 	GetStackTag(ctx context.Context, stackName StackIdentifier, tagName string) (*StackTag, error)
+	GetStackTags(ctx context.Context, stackName StackIdentifier) (map[string]string, error)
 	DeleteStackTag(ctx context.Context, stackName StackIdentifier, tagName string) error
 }
 

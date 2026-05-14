@@ -150,6 +150,7 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 			infer.Resource(&resources.PolicyPack{}),
 			infer.Resource(&resources.Stack{}),
 			infer.Resource(&resources.StackTag{}),
+			infer.Resource(&resources.StackTags{}),
 			infer.Resource(&resources.TTLSchedule{}),
 			infer.Resource(&resources.Team{}),
 			infer.Resource(&resources.TeamAccessToken{}),
@@ -406,9 +407,6 @@ func (k *pulumiserviceProvider) Configure(
 
 	k.pulumiResources = []PulumiServiceResource{
 		&resources.PulumiServiceWebhookResource{
-			Client: client,
-		},
-		&resources.PulumiServiceStackTagsResource{
 			Client: client,
 		},
 		&resources.PulumiServiceDeploymentSettingsResource{

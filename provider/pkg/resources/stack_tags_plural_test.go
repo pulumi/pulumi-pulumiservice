@@ -1,719 +1,415 @@
+// Copyright 2026, Pulumi Corporation.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//	http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package resources
 
 import (
-	"encoding/json"
-	"net/http"
-	"net/http/httptest"
-	"path"
+	"context"
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/util/rpcutil/rpcerror"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
+	"github.com/pulumi/pulumi-go-provider/infer"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
-const (
-	testStackPath     = "/api/stacks/org/project/stack"
-	testStackTagsPath = "/api/stacks/org/project/stack/tags"
-)
-
-// extractTagNameFromPath extracts the tag name from a URL path like /api/stacks/org/project/stack/tags/tagname
-func extractTagNameFromPath(urlPath string) string {
-	return path.Base(urlPath)
+// stackTagsClientMock implements the slice of config.Client that StackTags uses.
+type stackTagsClientMock struct {
+	config.Client
+	createStackTagFunc func(ctx context.Context, stack pulumiapi.StackIdentifier, tag pulumiapi.StackTag) error
+	deleteStackTagFunc func(ctx context.Context, stack pulumiapi.StackIdentifier, tagName string) error
+	getStackTagsFunc   func(ctx context.Context, stack pulumiapi.StackIdentifier) (map[string]string, error)
 }
 
-func TestStackTagsPluralCreate(t *testing.T) {
-	t.Run("Creates all tags in the map", func(t *testing.T) {
-		var createdTags []pulumiapi.StackTag
-		var requestCount int
+func (m *stackTagsClientMock) CreateStackTag(
+	ctx context.Context, stack pulumiapi.StackIdentifier, tag pulumiapi.StackTag,
+) error {
+	return m.createStackTagFunc(ctx, stack, tag)
+}
 
-		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			requestCount++
-			if r.Method == http.MethodPost && r.URL.Path == testStackTagsPath {
-				var tag pulumiapi.StackTag
-				err := json.NewDecoder(r.Body).Decode(&tag)
-				if err != nil {
-					w.WriteHeader(http.StatusBadRequest)
-					return
-				}
-				createdTags = append(createdTags, tag)
-				w.WriteHeader(http.StatusOK)
-			} else {
-				w.WriteHeader(http.StatusNotFound)
-			}
-		}))
-		defer server.Close()
+func (m *stackTagsClientMock) DeleteStackTag(
+	ctx context.Context, stack pulumiapi.StackIdentifier, tagName string,
+) error {
+	return m.deleteStackTagFunc(ctx, stack, tagName)
+}
 
-		apiClient, err := pulumiapi.NewClient(server.Client(), "", server.URL)
-		require.NoError(t, err)
+func (m *stackTagsClientMock) GetStackTags(
+	ctx context.Context, stack pulumiapi.StackIdentifier,
+) (map[string]string, error) {
+	return m.getStackTagsFunc(ctx, stack)
+}
 
-		st := &PulumiServiceStackTagsResource{
-			Client: apiClient,
-		}
-
-		input := PulumiServiceStackTagsInput{
-			Organization: "org",
-			Project:      "project",
-			Stack:        "stack",
-			Tags: map[string]string{
-				"tag1": "value1",
-				"tag2": "value2",
-				"tag3": "value3",
-			},
-		}
-
-		properties, err := util.ToProperties(input)
-		require.NoError(t, err)
-
-		createReq := pulumirpc.CreateRequest{
-			Properties: properties,
-		}
-
-		resp, err := st.Create(&createReq)
-		require.NoError(t, err)
-		assert.Equal(t, "org/project/stack/tags", resp.Id)
-		assert.Equal(t, 3, len(createdTags))
-
-		// Verify all tags were created
-		tagMap := make(map[string]string)
-		for _, tag := range createdTags {
-			tagMap[tag.Name] = tag.Value
-		}
-		assert.Equal(t, "value1", tagMap["tag1"])
-		assert.Equal(t, "value2", tagMap["tag2"])
-		assert.Equal(t, "value3", tagMap["tag3"])
+func TestStackTagsResourceID(t *testing.T) {
+	t.Run("formats id", func(t *testing.T) {
+		assert.Equal(t, "org/proj/stk/tags", stackTagsResourceID("org", "proj", "stk"))
 	})
 }
 
-func TestStackTagsPluralCreatePartialFailure(t *testing.T) {
-	t.Run("Returns partial state when a tag creation fails mid-way", func(t *testing.T) {
-		// Fail the third tag (tags are created in sorted order: tag1, tag2, tag3).
-		var created []string
-		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.Method != http.MethodPost {
-				w.WriteHeader(http.StatusNotFound)
-				return
-			}
-			var tag pulumiapi.StackTag
-			if err := json.NewDecoder(r.Body).Decode(&tag); err != nil {
-				w.WriteHeader(http.StatusBadRequest)
-				return
-			}
-			if tag.Name == "tag3" {
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-			created = append(created, tag.Name)
-			w.WriteHeader(http.StatusOK)
-		}))
-		defer server.Close()
-
-		apiClient, err := pulumiapi.NewClient(server.Client(), "", server.URL)
+func TestParseStackTagsResourceID(t *testing.T) {
+	t.Run("valid", func(t *testing.T) {
+		org, proj, stk, err := parseStackTagsResourceID("org/proj/stk/tags")
 		require.NoError(t, err)
+		assert.Equal(t, "org", org)
+		assert.Equal(t, "proj", proj)
+		assert.Equal(t, "stk", stk)
+	})
 
-		st := &PulumiServiceStackTagsResource{Client: apiClient}
-
-		input := PulumiServiceStackTagsInput{
-			Organization: "org",
-			Project:      "project",
-			Stack:        "stack",
-			Tags: map[string]string{
-				"tag1": "value1",
-				"tag2": "value2",
-				"tag3": "value3",
-			},
-		}
-		properties, err := util.ToProperties(input)
-		require.NoError(t, err)
-
-		_, err = st.Create(&pulumirpc.CreateRequest{Properties: properties})
+	t.Run("missing tags suffix", func(t *testing.T) {
+		_, _, _, err := parseStackTagsResourceID("org/proj/stk")
 		require.Error(t, err)
-		assert.ElementsMatch(t, []string{"tag1", "tag2"}, created)
-
-		// The error must carry ErrorResourceInitFailed with the successfully-created
-		// subset so Pulumi records them in state and doesn't recreate them on retry.
-		rpcErr, ok := rpcerror.FromError(err)
-		require.True(t, ok, "expected a pulumi rpcerror")
-
-		var initFailed *pulumirpc.ErrorResourceInitFailed
-		for _, d := range rpcErr.Details() {
-			if f, ok := d.(*pulumirpc.ErrorResourceInitFailed); ok {
-				initFailed = f
-				break
-			}
-		}
-		require.NotNil(t, initFailed, "expected ErrorResourceInitFailed detail")
-		assert.Equal(t, "org/project/stack/tags", initFailed.Id)
-
-		partialProps, err := plugin.UnmarshalProperties(
-			initFailed.Properties, plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
-		require.NoError(t, err)
-		var partial PulumiServiceStackTagsInput
-		require.NoError(t, util.FromPropertyMap(partialProps, &partial))
-		assert.Equal(t, map[string]string{"tag1": "value1", "tag2": "value2"}, partial.Tags)
-	})
-}
-
-func TestStackTagsPluralRead(t *testing.T) {
-	t.Run("Reads managed tags from stack", func(t *testing.T) {
-		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.Method == http.MethodGet && r.URL.Path == testStackPath {
-				response := map[string]interface{}{
-					"tags": map[string]string{
-						"tag1":      "value1",
-						"tag2":      "value2",
-						"other-tag": "other-value",
-					},
-				}
-				w.Header().Set("Content-Type", "application/json")
-				_ = json.NewEncoder(w).Encode(response)
-			} else {
-				w.WriteHeader(http.StatusNotFound)
-			}
-		}))
-		defer server.Close()
-
-		apiClient, err := pulumiapi.NewClient(server.Client(), "", server.URL)
-		require.NoError(t, err)
-
-		st := &PulumiServiceStackTagsResource{
-			Client: apiClient,
-		}
-
-		// Simulate previous state with tag1 and tag2 managed
-		previousInput := PulumiServiceStackTagsInput{
-			Organization: "org",
-			Project:      "project",
-			Stack:        "stack",
-			Tags: map[string]string{
-				"tag1": "value1",
-				"tag2": "value2",
-			},
-		}
-		previousProps, err := util.ToProperties(previousInput)
-		require.NoError(t, err)
-
-		readReq := pulumirpc.ReadRequest{
-			Id:     "org/project/stack/tags",
-			Inputs: previousProps,
-		}
-
-		resp, err := st.Read(&readReq)
-		require.NoError(t, err)
-		assert.Equal(t, "org/project/stack/tags", resp.Id)
-
-		// Verify only managed tags are returned (not other-tag)
-		var output PulumiServiceStackTagsInput
-		props, err := plugin.UnmarshalProperties(resp.Properties, plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
-		require.NoError(t, err)
-		err = util.FromPropertyMap(props, &output)
-		require.NoError(t, err)
-
-		assert.Equal(t, 2, len(output.Tags))
-		assert.Equal(t, "value1", output.Tags["tag1"])
-		assert.Equal(t, "value2", output.Tags["tag2"])
-		assert.NotContains(t, output.Tags, "other-tag")
 	})
 
-	t.Run("Import adopts every tag on the stack when there is no prior state", func(t *testing.T) {
-		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.Method == http.MethodGet && r.URL.Path == testStackPath {
-				_ = json.NewEncoder(w).Encode(map[string]interface{}{
-					"tags": map[string]string{
-						"env":    "prod",
-						"team":   "platform",
-						"region": "us-east-1",
-					},
-				})
-				return
-			}
-			w.WriteHeader(http.StatusNotFound)
-		}))
-		defer server.Close()
-
-		apiClient, err := pulumiapi.NewClient(server.Client(), "", server.URL)
-		require.NoError(t, err)
-		st := &PulumiServiceStackTagsResource{Client: apiClient}
-
-		// req.Inputs is nil — the pulumi import path.
-		resp, err := st.Read(&pulumirpc.ReadRequest{Id: "org/project/stack/tags"})
-		require.NoError(t, err)
-		assert.Equal(t, "org/project/stack/tags", resp.Id)
-
-		props, err := plugin.UnmarshalProperties(
-			resp.Properties, plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
-		require.NoError(t, err)
-		var output PulumiServiceStackTagsInput
-		require.NoError(t, util.FromPropertyMap(props, &output))
-
-		assert.Equal(t, map[string]string{
-			"env":    "prod",
-			"team":   "platform",
-			"region": "us-east-1",
-		}, output.Tags)
-	})
-
-	t.Run("Returns an error when stored inputs can't be decoded", func(t *testing.T) {
-		// No HTTP call should reach the server — Read must fail before talking to the API.
-		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// Still satisfy the GET since Read calls GetStackTags before decoding inputs.
-			if r.Method == http.MethodGet && r.URL.Path == testStackPath {
-				_ = json.NewEncoder(w).Encode(map[string]interface{}{"tags": map[string]string{}})
-				return
-			}
-			w.WriteHeader(http.StatusNotFound)
-		}))
-		defer server.Close()
-
-		apiClient, err := pulumiapi.NewClient(server.Client(), "", server.URL)
-		require.NoError(t, err)
-		st := &PulumiServiceStackTagsResource{Client: apiClient}
-
-		// Hand-craft inputs whose `tags` field is a string rather than a map.
-		// FromPropertyMap should reject the type mismatch.
-		malformed := resource.PropertyMap{
-			"organization": resource.NewStringProperty("org"),
-			"project":      resource.NewStringProperty("project"),
-			"stack":        resource.NewStringProperty("stack"),
-			"tags":         resource.NewStringProperty("not-a-map"),
-		}
-		props, err := plugin.MarshalProperties(malformed, plugin.MarshalOptions{})
-		require.NoError(t, err)
-
-		_, err = st.Read(&pulumirpc.ReadRequest{Id: "org/project/stack/tags", Inputs: props})
+	t.Run("wrong suffix", func(t *testing.T) {
+		_, _, _, err := parseStackTagsResourceID("org/proj/stk/notags")
 		require.Error(t, err)
-		assert.Contains(t, err.Error(), "failed to decode stored inputs")
+	})
+
+	t.Run("too many parts", func(t *testing.T) {
+		_, _, _, err := parseStackTagsResourceID("org/proj/stk/tags/extra")
+		require.Error(t, err)
 	})
 }
 
-func TestStackTagsPluralUpdate(t *testing.T) {
-	t.Run("Adds, removes, and modifies tags", func(t *testing.T) {
-		var createdTags []pulumiapi.StackTag
-		var deletedTags []string
-
-		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.Method == http.MethodPost && r.URL.Path == testStackTagsPath {
-				var tag pulumiapi.StackTag
-				err := json.NewDecoder(r.Body).Decode(&tag)
-				if err != nil {
-					w.WriteHeader(http.StatusBadRequest)
-					return
-				}
-				createdTags = append(createdTags, tag)
-				w.WriteHeader(http.StatusOK)
-			} else if r.Method == http.MethodDelete {
-				tagName := extractTagNameFromPath(r.URL.Path)
-				if tagName != "" {
-					deletedTags = append(deletedTags, tagName)
-				}
-				w.WriteHeader(http.StatusOK)
-			} else {
-				w.WriteHeader(http.StatusNotFound)
-			}
-		}))
-		defer server.Close()
-
-		apiClient, err := pulumiapi.NewClient(server.Client(), "", server.URL)
-		require.NoError(t, err)
-
-		st := &PulumiServiceStackTagsResource{
-			Client: apiClient,
+func TestStackTagsCreate(t *testing.T) {
+	t.Run("creates all tags in sorted order", func(t *testing.T) {
+		var created []pulumiapi.StackTag
+		mock := &stackTagsClientMock{
+			createStackTagFunc: func(_ context.Context, _ pulumiapi.StackIdentifier, tag pulumiapi.StackTag) error {
+				created = append(created, tag)
+				return nil
+			},
 		}
+		ctx := config.WithMockClient(context.Background(), mock)
 
-		oldInput := PulumiServiceStackTagsInput{
+		resp, err := (&StackTags{}).Create(ctx, infer.CreateRequest[StackTagsInput]{
+			Inputs: StackTagsInput{
+				Organization: "org",
+				Project:      "project",
+				Stack:        "stack",
+				Tags:         map[string]string{"b": "2", "a": "1", "c": "3"},
+			},
+		})
+		require.NoError(t, err)
+		assert.Equal(t, "org/project/stack/tags", resp.ID)
+		assert.Equal(t, []pulumiapi.StackTag{
+			{Name: "a", Value: "1"},
+			{Name: "b", Value: "2"},
+			{Name: "c", Value: "3"},
+		}, created)
+	})
+
+	t.Run("dry-run returns inputs and skips API calls", func(t *testing.T) {
+		mock := &stackTagsClientMock{
+			createStackTagFunc: func(context.Context, pulumiapi.StackIdentifier, pulumiapi.StackTag) error {
+				t.Fatal("Create should not call API during dry run")
+				return nil
+			},
+		}
+		ctx := config.WithMockClient(context.Background(), mock)
+
+		resp, err := (&StackTags{}).Create(ctx, infer.CreateRequest[StackTagsInput]{
+			DryRun: true,
+			Inputs: StackTagsInput{
+				Organization: "org",
+				Project:      "project",
+				Stack:        "stack",
+				Tags:         map[string]string{"a": "1"},
+			},
+		})
+		require.NoError(t, err)
+		assert.Equal(t, "org/project/stack/tags", resp.ID)
+		assert.Equal(t, StackTagsState{
 			Organization: "org",
 			Project:      "project",
 			Stack:        "stack",
-			Tags: map[string]string{
-				"tag1": "value1",
-				"tag2": "value2",
-				"tag3": "value3",
+			Tags:         map[string]string{"a": "1"},
+		}, resp.Output)
+	})
+
+	t.Run("partial failure returns ResourceInitFailedError with successful tags", func(t *testing.T) {
+		mock := &stackTagsClientMock{
+			createStackTagFunc: func(_ context.Context, _ pulumiapi.StackIdentifier, tag pulumiapi.StackTag) error {
+				if tag.Name == "tag3" {
+					return errors.New("boom")
+				}
+				return nil
 			},
 		}
+		ctx := config.WithMockClient(context.Background(), mock)
 
-		newInput := PulumiServiceStackTagsInput{
+		resp, err := (&StackTags{}).Create(ctx, infer.CreateRequest[StackTagsInput]{
+			Inputs: StackTagsInput{
+				Organization: "org",
+				Project:      "project",
+				Stack:        "stack",
+				Tags:         map[string]string{"tag1": "v1", "tag2": "v2", "tag3": "v3"},
+			},
+		})
+		require.Error(t, err)
+
+		var initFailed infer.ResourceInitFailedError
+		require.True(t, errors.As(err, &initFailed))
+		require.Len(t, initFailed.Reasons, 1)
+		assert.Contains(t, initFailed.Reasons[0], "tag3")
+		assert.Equal(t, "org/project/stack/tags", resp.ID)
+		assert.Equal(t, StackTagsState{
 			Organization: "org",
 			Project:      "project",
 			Stack:        "stack",
-			Tags: map[string]string{
-				"tag1": "new-value1", // Modified
-				"tag2": "value2",     // Unchanged
-				"tag4": "value4",     // Added
-				// tag3 removed
-			},
-		}
-
-		oldProps, err := util.ToProperties(oldInput)
-		require.NoError(t, err)
-		newProps, err := util.ToProperties(newInput)
-		require.NoError(t, err)
-
-		updateReq := pulumirpc.UpdateRequest{
-			Olds: oldProps,
-			News: newProps,
-		}
-
-		resp, err := st.Update(&updateReq)
-		require.NoError(t, err)
-		assert.NotNil(t, resp)
-
-		// Verify tag3 was deleted
-		assert.Contains(t, deletedTags, "tag3")
-
-		// Verify tag1 was deleted (for update) and recreated with new value
-		assert.Contains(t, deletedTags, "tag1")
-
-		// Verify new tags were created
-		createdMap := make(map[string]string)
-		for _, tag := range createdTags {
-			createdMap[tag.Name] = tag.Value
-		}
-		assert.Equal(t, "new-value1", createdMap["tag1"])
-		assert.Equal(t, "value4", createdMap["tag4"])
+			Tags:         map[string]string{"tag1": "v1", "tag2": "v2"},
+		}, resp.Output)
 	})
 }
 
-func TestStackTagsPluralUpdatePartialFailure(t *testing.T) {
-	// Helper: build a server that fails when a specific tag is created or deleted.
-	// Tags are processed in sorted order by the resource, so the failure point is
-	// predictable.
-	newServer := func(failDelete, failCreate string) *httptest.Server {
-		return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			switch {
-			case r.Method == http.MethodPost && r.URL.Path == testStackTagsPath:
-				var tag pulumiapi.StackTag
-				if err := json.NewDecoder(r.Body).Decode(&tag); err != nil {
-					w.WriteHeader(http.StatusBadRequest)
-					return
-				}
-				if tag.Name == failCreate {
-					w.WriteHeader(http.StatusInternalServerError)
-					return
-				}
-				w.WriteHeader(http.StatusOK)
-			case r.Method == http.MethodDelete:
-				if extractTagNameFromPath(r.URL.Path) == failDelete {
-					w.WriteHeader(http.StatusInternalServerError)
-					return
-				}
-				w.WriteHeader(http.StatusOK)
-			default:
-				w.WriteHeader(http.StatusNotFound)
-			}
-		}))
-	}
-
-	extractPartialState := func(t *testing.T, err error) PulumiServiceStackTagsInput {
-		t.Helper()
-		rpcErr, ok := rpcerror.FromError(err)
-		require.True(t, ok, "expected a pulumi rpcerror")
-		var initFailed *pulumirpc.ErrorResourceInitFailed
-		for _, d := range rpcErr.Details() {
-			if f, ok := d.(*pulumirpc.ErrorResourceInitFailed); ok {
-				initFailed = f
-				break
-			}
-		}
-		require.NotNil(t, initFailed, "expected ErrorResourceInitFailed detail")
-		partialProps, err := plugin.UnmarshalProperties(
-			initFailed.Properties, plugin.MarshalOptions{KeepUnknowns: false, SkipNulls: true})
-		require.NoError(t, err)
-		var partial PulumiServiceStackTagsInput
-		require.NoError(t, util.FromPropertyMap(partialProps, &partial))
-		return partial
-	}
-
-	oldInput := PulumiServiceStackTagsInput{
+func TestStackTagsUpdate(t *testing.T) {
+	oldState := StackTagsState{
 		Organization: "org",
 		Project:      "project",
 		Stack:        "stack",
-		Tags: map[string]string{
-			"tag1": "v1",
-			"tag2": "v2",
-			"tag3": "v3",
-		},
+		Tags:         map[string]string{"tag1": "v1", "tag2": "v2", "tag3": "v3"},
 	}
-	// Remove tag1, change tag2, add tag4. Sorted deletes: [tag1, tag2]; sorted
-	// creates: [tag2, tag4].
-	newInput := PulumiServiceStackTagsInput{
+	// Remove tag1, change tag2, add tag4.
+	newInputs := StackTagsInput{
 		Organization: "org",
 		Project:      "project",
 		Stack:        "stack",
-		Tags: map[string]string{
-			"tag2": "v2-new",
-			"tag3": "v3",
-			"tag4": "v4",
-		},
+		Tags:         map[string]string{"tag2": "v2-new", "tag3": "v3", "tag4": "v4"},
 	}
 
-	t.Run("fails mid-delete: state reflects tags still on the server", func(t *testing.T) {
-		// Fail on delete of tag2 (second in sorted order). tag1 was already deleted.
-		server := newServer("tag2", "")
-		defer server.Close()
+	t.Run("applies add/delete/modify operations", func(t *testing.T) {
+		var deletes []string
+		var creates []pulumiapi.StackTag
+		mock := &stackTagsClientMock{
+			createStackTagFunc: func(_ context.Context, _ pulumiapi.StackIdentifier, tag pulumiapi.StackTag) error {
+				creates = append(creates, tag)
+				return nil
+			},
+			deleteStackTagFunc: func(_ context.Context, _ pulumiapi.StackIdentifier, tagName string) error {
+				deletes = append(deletes, tagName)
+				return nil
+			},
+		}
+		ctx := config.WithMockClient(context.Background(), mock)
 
-		apiClient, err := pulumiapi.NewClient(server.Client(), "", server.URL)
+		resp, err := (&StackTags{}).Update(ctx, infer.UpdateRequest[StackTagsInput, StackTagsState]{
+			State:  oldState,
+			Inputs: newInputs,
+		})
 		require.NoError(t, err)
-		st := &PulumiServiceStackTagsResource{Client: apiClient}
-
-		oldProps, err := util.ToProperties(oldInput)
-		require.NoError(t, err)
-		newProps, err := util.ToProperties(newInput)
-		require.NoError(t, err)
-
-		_, err = st.Update(&pulumirpc.UpdateRequest{Olds: oldProps, News: newProps})
-		require.Error(t, err)
-
-		partial := extractPartialState(t, err)
-		// tag1 was deleted; tag2 delete failed, so tag2 is still live; tag3 was
-		// untouched. No creates happened yet.
-		assert.Equal(t, map[string]string{"tag2": "v2", "tag3": "v3"}, partial.Tags)
+		// Deletes are sorted: tag1 (removed), tag2 (modified).
+		assert.Equal(t, []string{"tag1", "tag2"}, deletes)
+		// Creates are sorted: tag2 (modified), tag4 (added).
+		assert.Equal(t, []pulumiapi.StackTag{
+			{Name: "tag2", Value: "v2-new"},
+			{Name: "tag4", Value: "v4"},
+		}, creates)
+		assert.Equal(t, newInputs, resp.Output)
 	})
 
-	t.Run("fails mid-create: state reflects deletes plus successful creates", func(t *testing.T) {
-		// Fail on create of tag4 (second in sorted creates). By that point:
-		// deletes tag1, tag2 succeeded; create tag2="v2-new" succeeded.
-		server := newServer("", "tag4")
-		defer server.Close()
+	t.Run("dry-run skips API and returns inputs", func(t *testing.T) {
+		mock := &stackTagsClientMock{
+			createStackTagFunc: func(context.Context, pulumiapi.StackIdentifier, pulumiapi.StackTag) error {
+				t.Fatal("Update should not call API during dry run")
+				return nil
+			},
+			deleteStackTagFunc: func(context.Context, pulumiapi.StackIdentifier, string) error {
+				t.Fatal("Update should not call API during dry run")
+				return nil
+			},
+		}
+		ctx := config.WithMockClient(context.Background(), mock)
 
-		apiClient, err := pulumiapi.NewClient(server.Client(), "", server.URL)
+		resp, err := (&StackTags{}).Update(ctx, infer.UpdateRequest[StackTagsInput, StackTagsState]{
+			DryRun: true,
+			State:  oldState,
+			Inputs: newInputs,
+		})
 		require.NoError(t, err)
-		st := &PulumiServiceStackTagsResource{Client: apiClient}
-
-		oldProps, err := util.ToProperties(oldInput)
-		require.NoError(t, err)
-		newProps, err := util.ToProperties(newInput)
-		require.NoError(t, err)
-
-		_, err = st.Update(&pulumirpc.UpdateRequest{Olds: oldProps, News: newProps})
-		require.Error(t, err)
-
-		partial := extractPartialState(t, err)
-		assert.Equal(t, map[string]string{"tag2": "v2-new", "tag3": "v3"}, partial.Tags)
+		assert.Equal(t, newInputs, resp.Output)
 	})
-}
 
-func TestStackTagsPluralDelete(t *testing.T) {
-	t.Run("Deletes all managed tags", func(t *testing.T) {
-		var deletedTags []string
-
-		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.Method == http.MethodDelete {
-				tagName := extractTagNameFromPath(r.URL.Path)
-				if tagName != "" {
-					deletedTags = append(deletedTags, tagName)
+	t.Run("delete failure mid-update returns partial state with surviving tags", func(t *testing.T) {
+		mock := &stackTagsClientMock{
+			deleteStackTagFunc: func(_ context.Context, _ pulumiapi.StackIdentifier, tagName string) error {
+				if tagName == "tag2" {
+					return errors.New("delete boom")
 				}
-				w.WriteHeader(http.StatusOK)
-			} else {
-				w.WriteHeader(http.StatusNotFound)
-			}
-		}))
-		defer server.Close()
-
-		apiClient, err := pulumiapi.NewClient(server.Client(), "", server.URL)
-		require.NoError(t, err)
-
-		st := &PulumiServiceStackTagsResource{
-			Client: apiClient,
+				return nil
+			},
+			createStackTagFunc: func(context.Context, pulumiapi.StackIdentifier, pulumiapi.StackTag) error {
+				t.Fatal("creates should not run after a delete failure")
+				return nil
+			},
 		}
+		ctx := config.WithMockClient(context.Background(), mock)
 
-		input := PulumiServiceStackTagsInput{
+		resp, err := (&StackTags{}).Update(ctx, infer.UpdateRequest[StackTagsInput, StackTagsState]{
+			State:  oldState,
+			Inputs: newInputs,
+		})
+		require.Error(t, err)
+		var initFailed infer.ResourceInitFailedError
+		require.True(t, errors.As(err, &initFailed))
+		// tag1 was successfully deleted; tag2 failed and is still live; tag3
+		// has not been touched yet.
+		assert.Equal(t, StackTagsState{
 			Organization: "org",
 			Project:      "project",
 			Stack:        "stack",
-			Tags: map[string]string{
-				"tag1": "value1",
-				"tag2": "value2",
-				"tag3": "value3",
+			Tags:         map[string]string{"tag2": "v2", "tag3": "v3"},
+		}, resp.Output)
+	})
+
+	t.Run("create failure mid-update returns partial state with deletes plus successful creates", func(t *testing.T) {
+		mock := &stackTagsClientMock{
+			deleteStackTagFunc: func(context.Context, pulumiapi.StackIdentifier, string) error {
+				return nil
+			},
+			createStackTagFunc: func(_ context.Context, _ pulumiapi.StackIdentifier, tag pulumiapi.StackTag) error {
+				if tag.Name == "tag4" {
+					return errors.New("create boom")
+				}
+				return nil
 			},
 		}
+		ctx := config.WithMockClient(context.Background(), mock)
 
-		properties, err := util.ToProperties(input)
-		require.NoError(t, err)
-
-		deleteReq := pulumirpc.DeleteRequest{
-			Properties: properties,
-		}
-
-		_, err = st.Delete(&deleteReq)
-		require.NoError(t, err)
-
-		// Verify all tags were deleted
-		assert.Equal(t, 3, len(deletedTags))
-		assert.Contains(t, deletedTags, "tag1")
-		assert.Contains(t, deletedTags, "tag2")
-		assert.Contains(t, deletedTags, "tag3")
+		resp, err := (&StackTags{}).Update(ctx, infer.UpdateRequest[StackTagsInput, StackTagsState]{
+			State:  oldState,
+			Inputs: newInputs,
+		})
+		require.Error(t, err)
+		var initFailed infer.ResourceInitFailedError
+		require.True(t, errors.As(err, &initFailed))
+		// tag1, tag2 deletes succeeded; tag2 was recreated with the new value;
+		// tag3 is untouched; tag4 create failed.
+		assert.Equal(t, StackTagsState{
+			Organization: "org",
+			Project:      "project",
+			Stack:        "stack",
+			Tags:         map[string]string{"tag2": "v2-new", "tag3": "v3"},
+		}, resp.Output)
 	})
 }
 
-func TestStackTagsPluralDiff(t *testing.T) {
-	t.Run("Detects no changes when tags are identical", func(t *testing.T) {
-		st := &PulumiServiceStackTagsResource{}
-
-		input := PulumiServiceStackTagsInput{
-			Organization: "org",
-			Project:      "project",
-			Stack:        "stack",
-			Tags: map[string]string{
-				"tag1": "value1",
-				"tag2": "value2",
+func TestStackTagsDelete(t *testing.T) {
+	t.Run("deletes all managed tags", func(t *testing.T) {
+		var deletes []string
+		mock := &stackTagsClientMock{
+			deleteStackTagFunc: func(_ context.Context, _ pulumiapi.StackIdentifier, tagName string) error {
+				deletes = append(deletes, tagName)
+				return nil
 			},
 		}
+		ctx := config.WithMockClient(context.Background(), mock)
 
-		props, err := util.ToProperties(input)
+		_, err := (&StackTags{}).Delete(ctx, infer.DeleteRequest[StackTagsState]{
+			State: StackTagsState{
+				Organization: "org",
+				Project:      "project",
+				Stack:        "stack",
+				Tags:         map[string]string{"a": "1", "b": "2"},
+			},
+		})
 		require.NoError(t, err)
-
-		diffReq := pulumirpc.DiffRequest{
-			OldInputs: props,
-			News:      props,
-		}
-
-		resp, err := st.Diff(&diffReq)
-		require.NoError(t, err)
-		assert.Equal(t, pulumirpc.DiffResponse_DIFF_NONE, resp.Changes)
+		assert.Equal(t, []string{"a", "b"}, deletes)
 	})
 
-	t.Run("Detects changes when tags are modified", func(t *testing.T) {
-		st := &PulumiServiceStackTagsResource{}
-
-		oldInput := PulumiServiceStackTagsInput{
-			Organization: "org",
-			Project:      "project",
-			Stack:        "stack",
-			Tags: map[string]string{
-				"tag1": "value1",
+	t.Run("returns error if delete fails", func(t *testing.T) {
+		mock := &stackTagsClientMock{
+			deleteStackTagFunc: func(context.Context, pulumiapi.StackIdentifier, string) error {
+				return errors.New("boom")
 			},
 		}
+		ctx := config.WithMockClient(context.Background(), mock)
 
-		newInput := PulumiServiceStackTagsInput{
-			Organization: "org",
-			Project:      "project",
-			Stack:        "stack",
-			Tags: map[string]string{
-				"tag1": "new-value1",
+		_, err := (&StackTags{}).Delete(ctx, infer.DeleteRequest[StackTagsState]{
+			State: StackTagsState{
+				Organization: "org",
+				Project:      "project",
+				Stack:        "stack",
+				Tags:         map[string]string{"a": "1"},
 			},
-		}
-
-		oldProps, err := util.ToProperties(oldInput)
-		require.NoError(t, err)
-		newProps, err := util.ToProperties(newInput)
-		require.NoError(t, err)
-
-		diffReq := pulumirpc.DiffRequest{
-			OldInputs: oldProps,
-			News:      newProps,
-		}
-
-		resp, err := st.Diff(&diffReq)
-		require.NoError(t, err)
-		assert.Equal(t, pulumirpc.DiffResponse_DIFF_SOME, resp.Changes)
-		assert.NotNil(t, resp.DetailedDiff)
-	})
-
-	t.Run("Requires replacement when organization changes", func(t *testing.T) {
-		st := &PulumiServiceStackTagsResource{}
-
-		oldInput := PulumiServiceStackTagsInput{
-			Organization: "org1",
-			Project:      "project",
-			Stack:        "stack",
-			Tags: map[string]string{
-				"tag1": "value1",
-			},
-		}
-
-		newInput := PulumiServiceStackTagsInput{
-			Organization: "org2",
-			Project:      "project",
-			Stack:        "stack",
-			Tags: map[string]string{
-				"tag1": "value1",
-			},
-		}
-
-		oldProps, err := util.ToProperties(oldInput)
-		require.NoError(t, err)
-		newProps, err := util.ToProperties(newInput)
-		require.NoError(t, err)
-
-		diffReq := pulumirpc.DiffRequest{
-			OldInputs: oldProps,
-			News:      newProps,
-		}
-
-		resp, err := st.Diff(&diffReq)
-		require.NoError(t, err)
-		assert.Equal(t, pulumirpc.DiffResponse_DIFF_SOME, resp.Changes)
-		assert.True(t, resp.DeleteBeforeReplace)
-		assert.Contains(t, resp.Replaces, "organization")
+		})
+		require.Error(t, err)
 	})
 }
 
-func TestStackTagsPluralCheck(t *testing.T) {
-	t.Run("Returns inputs without failures", func(t *testing.T) {
-		st := &PulumiServiceStackTagsResource{}
+func TestStackTagsRead(t *testing.T) {
+	t.Run("returns only managed tags when prior inputs exist", func(t *testing.T) {
+		mock := &stackTagsClientMock{
+			getStackTagsFunc: func(context.Context, pulumiapi.StackIdentifier) (map[string]string, error) {
+				return map[string]string{"tag1": "v1", "tag2": "v2", "extra": "x"}, nil
+			},
+		}
+		ctx := config.WithMockClient(context.Background(), mock)
 
-		input := PulumiServiceStackTagsInput{
+		resp, err := (&StackTags{}).Read(ctx, infer.ReadRequest[StackTagsInput, StackTagsState]{
+			ID: "org/project/stack/tags",
+			Inputs: StackTagsInput{
+				Organization: "org",
+				Project:      "project",
+				Stack:        "stack",
+				Tags:         map[string]string{"tag1": "old1", "tag2": "old2"},
+			},
+		})
+		require.NoError(t, err)
+		expected := StackTagsState{
 			Organization: "org",
 			Project:      "project",
 			Stack:        "stack",
-			Tags: map[string]string{
-				"tag1": "value1",
+			Tags:         map[string]string{"tag1": "v1", "tag2": "v2"},
+		}
+		assert.Equal(t, infer.ReadResponse[StackTagsInput, StackTagsState]{
+			ID:     "org/project/stack/tags",
+			Inputs: expected,
+			State:  expected,
+		}, resp)
+	})
+
+	t.Run("import adopts every tag when there are no prior inputs", func(t *testing.T) {
+		mock := &stackTagsClientMock{
+			getStackTagsFunc: func(context.Context, pulumiapi.StackIdentifier) (map[string]string, error) {
+				return map[string]string{"a": "1", "b": "2"}, nil
 			},
 		}
+		ctx := config.WithMockClient(context.Background(), mock)
 
-		props, err := util.ToProperties(input)
+		resp, err := (&StackTags{}).Read(ctx, infer.ReadRequest[StackTagsInput, StackTagsState]{
+			ID: "org/project/stack/tags",
+		})
 		require.NoError(t, err)
-
-		checkReq := pulumirpc.CheckRequest{
-			News: props,
-		}
-
-		resp, err := st.Check(&checkReq)
-		require.NoError(t, err)
-		assert.NotNil(t, resp)
-		assert.Nil(t, resp.Failures)
-		assert.Equal(t, props, resp.Inputs)
-	})
-}
-
-func TestStackTagsPluralName(t *testing.T) {
-	t.Run("Returns correct resource name", func(t *testing.T) {
-		st := &PulumiServiceStackTagsResource{}
-		assert.Equal(t, "pulumiservice:index:StackTags", st.Name())
-	})
-}
-
-func TestStackTagsPluralPropertyMapConversion(t *testing.T) {
-	t.Run("Converts to and from PropertyMap correctly", func(t *testing.T) {
-		input := PulumiServiceStackTagsInput{
+		expected := StackTagsState{
 			Organization: "org",
 			Project:      "project",
 			Stack:        "stack",
-			Tags: map[string]string{
-				"tag1": "value1",
-				"tag2": "value2",
-			},
+			Tags:         map[string]string{"a": "1", "b": "2"},
 		}
+		assert.Equal(t, infer.ReadResponse[StackTagsInput, StackTagsState]{
+			ID:     "org/project/stack/tags",
+			Inputs: expected,
+			State:  expected,
+		}, resp)
+	})
 
-		// Convert to PropertyMap
-		propMap := input.ToPropertyMap()
-		assert.NotNil(t, propMap)
-		assert.True(t, propMap["organization"].IsString())
-		assert.Equal(t, "org", propMap["organization"].StringValue())
-
-		// Convert back from PropertyMap via the shared util helper.
-		var output PulumiServiceStackTagsInput
-		require.NoError(t, util.FromPropertyMap(propMap, &output))
-		assert.Equal(t, input.Organization, output.Organization)
-		assert.Equal(t, input.Project, output.Project)
-		assert.Equal(t, input.Stack, output.Stack)
-		assert.Equal(t, input.Tags, output.Tags)
+	t.Run("invalid id returns error", func(t *testing.T) {
+		_, err := (&StackTags{}).Read(context.Background(),
+			infer.ReadRequest[StackTagsInput, StackTagsState]{ID: "bogus"})
+		require.Error(t, err)
 	})
 }

@@ -89,6 +89,8 @@ export class StackTags extends pulumi.CustomResource {
             resourceInputs["tags"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["organization", "project", "stack"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(StackTags.__pulumiType, name, resourceInputs, opts);
     }
 }
