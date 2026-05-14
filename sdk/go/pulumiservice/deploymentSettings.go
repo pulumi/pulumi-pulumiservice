@@ -75,6 +75,12 @@ func NewDeploymentSettings(ctx *pulumi.Context,
 	if args.Vcs != nil {
 		args.Vcs = args.Vcs.ToDeploymentSettingsVcsPtrOutput().ApplyT(func(v *DeploymentSettingsVcs) *DeploymentSettingsVcs { return v.Defaults() }).(DeploymentSettingsVcsPtrOutput)
 	}
+	replaceOnChanges := pulumi.ReplaceOnChanges([]string{
+		"organization",
+		"project",
+		"stack",
+	})
+	opts = append(opts, replaceOnChanges)
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource DeploymentSettings
 	err := ctx.RegisterResource("pulumiservice:index:DeploymentSettings", name, args, &resource, opts...)

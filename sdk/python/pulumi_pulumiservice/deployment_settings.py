@@ -298,6 +298,8 @@ class DeploymentSettings(pulumi.CustomResource):
                 raise TypeError("Missing required property 'stack'")
             __props__.__dict__["stack"] = stack
             __props__.__dict__["vcs"] = vcs
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["organization", "project", "stack"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(DeploymentSettings, __self__).__init__(
             'pulumiservice:index:DeploymentSettings',
             resource_name,

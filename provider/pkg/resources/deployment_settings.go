@@ -1,3 +1,17 @@
+// Copyright 2026, Pulumi Corporation.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//	http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package resources
 
 import (
@@ -6,961 +20,811 @@ import (
 	"path"
 	"time"
 
-	pbempty "google.golang.org/protobuf/types/known/emptypb"
+	p "github.com/pulumi/pulumi-go-provider"
+	"github.com/pulumi/pulumi-go-provider/infer"
 
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
-	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
-
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
-	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/util"
 )
 
-type PulumiServiceDeploymentSettingsInput struct {
-	pulumiapi.DeploymentSettings
-	Stack pulumiapi.StackIdentifier
+type DeploymentSettings struct{}
+
+var (
+	_ infer.CustomCheck[DeploymentSettingsInput]                           = &DeploymentSettings{}
+	_ infer.CustomCreate[DeploymentSettingsInput, DeploymentSettingsState] = &DeploymentSettings{}
+	_ infer.CustomUpdate[DeploymentSettingsInput, DeploymentSettingsState] = &DeploymentSettings{}
+	_ infer.CustomDelete[DeploymentSettingsState]                          = &DeploymentSettings{}
+	_ infer.CustomRead[DeploymentSettingsInput, DeploymentSettingsState]   = &DeploymentSettings{}
+)
+
+func (*DeploymentSettings) Annotate(a infer.Annotator) {
+	a.Describe(&DeploymentSettings{}, "Deployment settings configure Pulumi Deployments for a stack.\n\n"+
+		"### Import\n\n"+
+		"Deployment settings can be imported using the `id`, which for deployment settings is "+
+		"`{org}/{project}/{stack}` e.g.,\n\n"+
+		"```sh\n $ pulumi import pulumiservice:index:DeploymentSettings my_settings my-org/my-project/my-stack\n```\n\n")
+	a.SetToken("index", "DeploymentSettings")
 }
 
-// plaintextInputSettings are the latest inputs of the resource, containing
-// plaintext values wrapped in Secrets currentStateCipherSettings are the
-// latest outputs/properties of the resource, containing ciphertext strings of
-// secret values isInput is a flag that selects whether to generating an input
-// PropertyMap that contains plaintext (true) or an output PropertyMap that
-// contains ciphertext (false)
-func (ds *PulumiServiceDeploymentSettingsInput) ToPropertyMap(
-	plaintextInputSettings *pulumiapi.DeploymentSettings,
-	currentStateCipherSettings *pulumiapi.DeploymentSettings,
-	isInput bool,
-) resource.PropertyMap {
-	// Below flags are used throughout this method and direct the serialization
-	// of twin value secrets Twin value secrets are values whose plaintext
-	// cannot be retrieved from the API, thus forcing the development of this
-	// fairly complex system When plaintextInputSettings is passed in, but
-	// currentStateCipherSettings is not, that means the resource is being
-	// created or updated
-	createMode := plaintextInputSettings != nil && currentStateCipherSettings == nil
-	// When both plaintextInputSettings and currentStateCipherSettings are
-	// passed in, that means an existing resource is being refreshed, and it's
-	// necessary to merge values In case we are merging, but some of the
-	// properties don't previously exist, we will merge with empty value,
-	// setting plaintext to be empty string
-	mergeMode := plaintextInputSettings != nil && currentStateCipherSettings != nil
-	// If neither one is passed in, we are importing an existing resource into
-	// the state
-
-	pm := resource.PropertyMap{}
-	pm["organization"] = resource.NewPropertyValue(ds.Stack.OrgName)
-	pm["project"] = resource.NewPropertyValue(ds.Stack.ProjectName)
-	pm["stack"] = resource.NewPropertyValue(ds.Stack.StackName)
-
-	if ds.AgentPoolID != nil {
-		pm["agentPoolId"] = resource.NewPropertyValue(*ds.AgentPoolID)
-	}
-
-	if ds.SourceContext != nil {
-		scMap := resource.PropertyMap{}
-		if ds.SourceContext.Git != nil {
-			gitPropertyMap := resource.PropertyMap{}
-			if ds.SourceContext.Git.RepoURL != "" {
-				gitPropertyMap["repoUrl"] = resource.NewPropertyValue(ds.SourceContext.Git.RepoURL)
-			}
-			if ds.SourceContext.Git.Commit != "" {
-				gitPropertyMap["commit"] = resource.NewPropertyValue(ds.SourceContext.Git.Commit)
-			}
-			if ds.SourceContext.Git.Branch != "" {
-				gitPropertyMap["branch"] = resource.NewPropertyValue(ds.SourceContext.Git.Branch)
-			}
-			if ds.SourceContext.Git.RepoDir != "" {
-				gitPropertyMap["repoDir"] = resource.NewPropertyValue(ds.SourceContext.Git.RepoDir)
-			}
-			if ds.SourceContext.Git.GitAuth != nil {
-				gitAuthPropertyMap := resource.PropertyMap{}
-				if ds.SourceContext.Git.GitAuth.SSHAuth != nil {
-					sshAuthPropertyMap := resource.PropertyMap{}
-					if ds.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey.Value != "" {
-						if mergeMode {
-							var plaintextValue *pulumiapi.SecretValue
-							var currentCipherValue *pulumiapi.SecretValue
-							if currentStateCipherSettings.SourceContext != nil &&
-								currentStateCipherSettings.SourceContext.Git != nil &&
-								currentStateCipherSettings.SourceContext.Git.GitAuth != nil &&
-								currentStateCipherSettings.SourceContext.Git.GitAuth.SSHAuth != nil {
-								plaintextValue = &plaintextInputSettings.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey
-								currentCipherValue = &currentStateCipherSettings.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey
-							}
-							util.MergeSecretValue(
-								sshAuthPropertyMap,
-								"sshPrivateKey",
-								ds.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey,
-								plaintextValue,
-								currentCipherValue,
-								isInput,
-							)
-						} else if createMode {
-							util.CreateSecretValue(sshAuthPropertyMap, "sshPrivateKey", ds.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey,
-								plaintextInputSettings.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey, isInput)
-						} else {
-							util.ImportSecretValue(
-								sshAuthPropertyMap, "sshPrivateKey", ds.SourceContext.Git.GitAuth.SSHAuth.SSHPrivateKey, isInput,
-							)
-						}
-					}
-					if ds.SourceContext.Git.GitAuth.SSHAuth.Password != nil &&
-						ds.SourceContext.Git.GitAuth.SSHAuth.Password.Value != "" {
-						if mergeMode {
-							var plaintextValue *pulumiapi.SecretValue
-							var currentCipherValue *pulumiapi.SecretValue
-							if currentStateCipherSettings.SourceContext != nil &&
-								currentStateCipherSettings.SourceContext.Git != nil &&
-								currentStateCipherSettings.SourceContext.Git.GitAuth != nil &&
-								currentStateCipherSettings.SourceContext.Git.GitAuth.SSHAuth != nil &&
-								currentStateCipherSettings.SourceContext.Git.GitAuth.SSHAuth.Password != nil {
-								plaintextValue = plaintextInputSettings.SourceContext.Git.GitAuth.SSHAuth.Password
-								currentCipherValue = currentStateCipherSettings.SourceContext.Git.GitAuth.SSHAuth.Password
-							}
-							util.MergeSecretValue(
-								sshAuthPropertyMap,
-								"password",
-								*ds.SourceContext.Git.GitAuth.SSHAuth.Password,
-								plaintextValue,
-								currentCipherValue,
-								isInput,
-							)
-						} else if createMode {
-							util.CreateSecretValue(sshAuthPropertyMap, "password", *ds.SourceContext.Git.GitAuth.SSHAuth.Password,
-								*plaintextInputSettings.SourceContext.Git.GitAuth.SSHAuth.Password, isInput)
-						} else {
-							util.ImportSecretValue(sshAuthPropertyMap, "password", *ds.SourceContext.Git.GitAuth.SSHAuth.Password, isInput)
-						}
-					}
-					gitAuthPropertyMap["sshAuth"] = resource.PropertyValue{V: sshAuthPropertyMap}
-				}
-				if ds.SourceContext.Git.GitAuth.BasicAuth != nil {
-					basicAuthPropertyMap := resource.PropertyMap{}
-					if ds.SourceContext.Git.GitAuth.BasicAuth.UserName.Value != "" {
-						basicAuthPropertyMap["username"] = resource.NewPropertyValue(
-							ds.SourceContext.Git.GitAuth.BasicAuth.UserName.Value,
-						)
-					}
-					if ds.SourceContext.Git.GitAuth.BasicAuth.Password.Value != "" {
-						if mergeMode {
-							var plaintextValue *pulumiapi.SecretValue
-							var currentCipherValue *pulumiapi.SecretValue
-							if currentStateCipherSettings.SourceContext != nil &&
-								currentStateCipherSettings.SourceContext.Git != nil &&
-								currentStateCipherSettings.SourceContext.Git.GitAuth != nil &&
-								currentStateCipherSettings.SourceContext.Git.GitAuth.BasicAuth != nil {
-								plaintextValue = &plaintextInputSettings.SourceContext.Git.GitAuth.BasicAuth.Password
-								currentCipherValue = &currentStateCipherSettings.SourceContext.Git.GitAuth.BasicAuth.Password
-							}
-							util.MergeSecretValue(
-								basicAuthPropertyMap,
-								"password",
-								ds.SourceContext.Git.GitAuth.BasicAuth.Password,
-								plaintextValue,
-								currentCipherValue,
-								isInput,
-							)
-						} else if createMode {
-							util.CreateSecretValue(basicAuthPropertyMap, "password", ds.SourceContext.Git.GitAuth.BasicAuth.Password,
-								plaintextInputSettings.SourceContext.Git.GitAuth.BasicAuth.Password, isInput)
-						} else {
-							util.ImportSecretValue(
-								basicAuthPropertyMap, "password", ds.SourceContext.Git.GitAuth.BasicAuth.Password, isInput,
-							)
-						}
-					}
-					gitAuthPropertyMap["basicAuth"] = resource.PropertyValue{V: basicAuthPropertyMap}
-				}
-				gitPropertyMap["gitAuth"] = resource.PropertyValue{V: gitAuthPropertyMap}
-			}
-			scMap["git"] = resource.PropertyValue{V: gitPropertyMap}
-		}
-		pm["sourceContext"] = resource.PropertyValue{V: scMap}
-	}
-
-	if ds.Operation != nil {
-		ocMap := resource.PropertyMap{}
-		if ds.Operation.PreRunCommands != nil {
-			ocMap["preRunCommands"] = resource.NewPropertyValue(ds.Operation.PreRunCommands)
-		}
-		if ds.Operation.EnvironmentVariables != nil {
-			evMap := resource.PropertyMap{}
-			for k, v := range ds.Operation.EnvironmentVariables {
-				if v.Secret {
-					if mergeMode {
-						var plaintextValue pulumiapi.SecretValue
-						var currentCipherValue pulumiapi.SecretValue
-						if currentStateCipherSettings.Operation != nil {
-							plaintextValue = plaintextInputSettings.Operation.EnvironmentVariables[k]
-							currentCipherValue = currentStateCipherSettings.Operation.EnvironmentVariables[k]
-						}
-						util.MergeSecretValue(evMap, k, v, &plaintextValue, &currentCipherValue, isInput)
-					} else if createMode {
-						util.CreateSecretValue(evMap, k, v,
-							plaintextInputSettings.Operation.EnvironmentVariables[k], isInput)
-					} else {
-						util.ImportSecretValue(evMap, k, v, isInput)
-					}
-				} else {
-					evMap[resource.PropertyKey(k)] = resource.NewPropertyValue(v.Value)
-				}
-			}
-			ocMap["environmentVariables"] = resource.PropertyValue{V: evMap}
-		}
-		if ds.Operation.Options != nil {
-			optionsMap := resource.PropertyMap{}
-			if ds.Operation.Options.Shell != "" {
-				optionsMap["shell"] = resource.NewPropertyValue(ds.Operation.Options.Shell)
-			}
-			if ds.Operation.Options.SkipInstallDependencies {
-				optionsMap["skipInstallDependencies"] = resource.NewPropertyValue(true)
-			}
-			if ds.Operation.Options.SkipIntermediateDeployments {
-				optionsMap["skipIntermediateDeployments"] = resource.NewPropertyValue(true)
-			}
-			if ds.Operation.Options.DeleteAfterDestroy {
-				optionsMap["deleteAfterDestroy"] = resource.NewPropertyValue(true)
-			}
-			ocMap["options"] = resource.PropertyValue{V: optionsMap}
-		}
-		if ds.Operation.OIDC != nil {
-			if ds.Operation.OIDC.AWS != nil || ds.Operation.OIDC.GCP != nil ||
-				ds.Operation.OIDC.Azure != nil {
-				oidcMap := resource.PropertyMap{}
-				if ds.Operation.OIDC.AWS != nil {
-					awsMap := resource.PropertyMap{}
-					if ds.Operation.OIDC.AWS.RoleARN != "" {
-						awsMap["roleARN"] = resource.NewPropertyValue(ds.Operation.OIDC.AWS.RoleARN)
-					}
-					if ds.Operation.OIDC.AWS.SessionName != "" {
-						awsMap["sessionName"] = resource.NewPropertyValue(ds.Operation.OIDC.AWS.SessionName)
-					}
-					if ds.Operation.OIDC.AWS.PolicyARNs != nil {
-						awsMap["policyARNs"] = resource.NewPropertyValue(ds.Operation.OIDC.AWS.PolicyARNs)
-					}
-					if ds.Operation.OIDC.AWS.Duration != "" {
-						awsMap["duration"] = resource.NewPropertyValue(ds.Operation.OIDC.AWS.Duration)
-					}
-					oidcMap["aws"] = resource.PropertyValue{V: awsMap}
-				}
-				if ds.Operation.OIDC.GCP != nil {
-					gcpMap := resource.PropertyMap{}
-					if ds.Operation.OIDC.GCP.ProviderID != "" {
-						gcpMap["providerId"] = resource.NewPropertyValue(ds.Operation.OIDC.GCP.ProviderID)
-					}
-					if ds.Operation.OIDC.GCP.ServiceAccount != "" {
-						gcpMap["serviceAccount"] = resource.NewPropertyValue(
-							ds.Operation.OIDC.GCP.ServiceAccount,
-						)
-					}
-					if ds.Operation.OIDC.GCP.Region != "" {
-						gcpMap["region"] = resource.NewPropertyValue(ds.Operation.OIDC.GCP.Region)
-					}
-					if ds.Operation.OIDC.GCP.WorkloadPoolID != "" {
-						gcpMap["workloadPoolId"] = resource.NewPropertyValue(
-							ds.Operation.OIDC.GCP.WorkloadPoolID,
-						)
-					}
-					if ds.Operation.OIDC.GCP.ProjectID != "" {
-						gcpMap["projectId"] = resource.NewPropertyValue(ds.Operation.OIDC.GCP.ProjectID)
-					}
-					if ds.Operation.OIDC.GCP.TokenLifetime != "" {
-						gcpMap["tokenLifetime"] = resource.NewPropertyValue(ds.Operation.OIDC.GCP.TokenLifetime)
-					}
-					oidcMap["gcp"] = resource.PropertyValue{V: gcpMap}
-				}
-				if ds.Operation.OIDC.Azure != nil {
-					azureMap := resource.PropertyMap{}
-					if ds.Operation.OIDC.Azure.TenantID != "" {
-						azureMap["tenantId"] = resource.NewPropertyValue(ds.Operation.OIDC.Azure.TenantID)
-					}
-					if ds.Operation.OIDC.Azure.ClientID != "" {
-						azureMap["clientId"] = resource.NewPropertyValue(ds.Operation.OIDC.Azure.ClientID)
-					}
-					if ds.Operation.OIDC.Azure.SubscriptionID != "" {
-						azureMap["subscriptionId"] = resource.NewPropertyValue(
-							ds.Operation.OIDC.Azure.SubscriptionID,
-						)
-					}
-					oidcMap["azure"] = resource.PropertyValue{V: azureMap}
-				}
-				ocMap["oidc"] = resource.PropertyValue{V: oidcMap}
-			}
-		}
-		pm["operationContext"] = resource.PropertyValue{V: ocMap}
-	}
-
-	if ds.GitHub != nil {
-		githubMap := resource.PropertyMap{}
-		githubMap["previewPullRequests"] = resource.NewPropertyValue(ds.GitHub.PreviewPullRequests)
-		githubMap["deployCommits"] = resource.NewPropertyValue(ds.GitHub.DeployCommits)
-		githubMap["pullRequestTemplate"] = resource.NewPropertyValue(ds.GitHub.PullRequestTemplate)
-		if ds.GitHub.Repository != "" {
-			githubMap["repository"] = resource.NewPropertyValue(ds.GitHub.Repository)
-		}
-		if len(ds.GitHub.Paths) > 0 {
-			githubMap["paths"] = resource.NewPropertyValue(ds.GitHub.Paths)
-		}
-		pm["github"] = resource.PropertyValue{V: githubMap}
-	}
-
-	if ds.Vcs != nil {
-		vcsMap := resource.PropertyMap{}
-		provider, _ := ds.Vcs.GetDiscriminatorValue()
-		vcsMap["provider"] = resource.NewPropertyValue(provider)
-		vcsMap["deployCommits"] = resource.NewPropertyValue(ds.Vcs.DeployCommits())
-		vcsMap["previewPullRequests"] = resource.NewPropertyValue(ds.Vcs.PreviewPullRequests())
-		vcsMap["pullRequestTemplate"] = resource.NewPropertyValue(ds.Vcs.PullRequestTemplate())
-		if ds.Vcs.Repository() != "" {
-			vcsMap["repository"] = resource.NewPropertyValue(ds.Vcs.Repository())
-		}
-		if ds.Vcs.InstallationID() != "" {
-			vcsMap["installationId"] = resource.NewPropertyValue(ds.Vcs.InstallationID())
-		}
-		if len(ds.Vcs.Paths()) > 0 {
-			vcsMap["paths"] = resource.NewPropertyValue(ds.Vcs.Paths())
-		}
-		if ds.Vcs.DeployPullRequest() != nil {
-			vcsMap["deployPullRequest"] = resource.NewPropertyValue(float64(*ds.Vcs.DeployPullRequest()))
-		}
-		pm["vcs"] = resource.PropertyValue{V: vcsMap}
-	}
-
-	if ds.Executor != nil && ds.Executor.ExecutorImage != nil &&
-		ds.Executor.ExecutorImage.Reference != "" {
-		ecMap := resource.PropertyMap{}
-		ecMap["executorImage"] = resource.NewPropertyValue(ds.Executor.ExecutorImage.Reference)
-		pm["executorContext"] = resource.PropertyValue{V: ecMap}
-	}
-
-	if ds.CacheOptions != nil {
-		coMap := resource.PropertyMap{}
-		coMap["enable"] = resource.NewPropertyValue(ds.CacheOptions.Enable)
-		pm["cacheOptions"] = resource.PropertyValue{V: coMap}
-	}
-
-	return pm
+// DeploymentSettingsInput models the user-facing inputs for a DeploymentSettings resource.
+type DeploymentSettingsInput struct {
+	Organization     string                              `pulumi:"organization" provider:"replaceOnChanges"`
+	Project          string                              `pulumi:"project"      provider:"replaceOnChanges"`
+	Stack            string                              `pulumi:"stack"        provider:"replaceOnChanges"`
+	AgentPoolID      *string                             `pulumi:"agentPoolId,optional"`
+	ExecutorContext  *DeploymentSettingsExecutorContext  `pulumi:"executorContext,optional"`
+	SourceContext    *DeploymentSettingsSourceContext    `pulumi:"sourceContext,optional"`
+	GitHub           *DeploymentSettingsGitHubBlock      `pulumi:"github,optional"`
+	Vcs              *DeploymentSettingsVcsBlock         `pulumi:"vcs,optional"`
+	OperationContext *DeploymentSettingsOperationContext `pulumi:"operationContext,optional"`
+	CacheOptions     *DeploymentSettingsCacheOptions     `pulumi:"cacheOptions,optional"`
 }
 
-type PulumiServiceDeploymentSettingsResource struct {
-	Client pulumiapi.DeploymentSettingsClient
+func (i *DeploymentSettingsInput) Annotate(a infer.Annotator) {
+	a.Describe(&i.Organization, "Organization name.")
+	a.Describe(&i.Project, "Project name.")
+	a.Describe(&i.Stack, "Stack name.")
+	a.Describe(&i.AgentPoolID, "The agent pool identifier to use for the deployment.")
+	a.Describe(&i.ExecutorContext, "Settings related to the deployment executor.")
+	a.Describe(&i.SourceContext, "Settings related to the source of the deployment.")
+	a.Describe(&i.GitHub, "GitHub settings for the deployment.")
+	a.Deprecate(&i.GitHub, "Use the 'vcs' property instead, which supports both GitHub and Azure DevOps.")
+	a.Describe(&i.Vcs, "VCS settings for the deployment. Supports Azure DevOps and GitHub via "+
+		"the 'provider' discriminator field.")
+	a.Describe(&i.OperationContext, "Settings related to the Pulumi operation environment during the deployment.")
+	a.Describe(&i.CacheOptions, "Dependency cache settings for the deployment")
 }
 
-func (ds *PulumiServiceDeploymentSettingsResource) ToPulumiServiceDeploymentSettingsInput(
-	inputMap resource.PropertyMap,
-) PulumiServiceDeploymentSettingsInput {
-	input := PulumiServiceDeploymentSettingsInput{}
-
-	input.Stack.OrgName = util.GetSecretOrStringValue(inputMap["organization"])
-	input.Stack.ProjectName = util.GetSecretOrStringValue(inputMap["project"])
-	input.Stack.StackName = util.GetSecretOrStringValue(inputMap["stack"])
-
-	if inputMap["agentPoolId"].HasValue() {
-		value := util.GetSecretOrStringValue(inputMap["agentPoolId"])
-		input.AgentPoolID = &value
-	}
-
-	input.Executor = toExecutorContext(inputMap)
-	input.GitHub = toGitHubConfig(inputMap)
-	input.SourceContext = toSourceContext(inputMap)
-	input.Operation = toOperationContext(inputMap)
-	input.CacheOptions = toCacheOptions(inputMap)
-	input.Vcs = toVCSConfig(inputMap)
-
-	return input
+// DeploymentSettingsState is the persisted state of a DeploymentSettings resource. It mirrors the input
+// fields exactly so that refresh and update operate symmetrically.
+type DeploymentSettingsState struct {
+	DeploymentSettingsInput
 }
 
-func toExecutorContext(inputMap resource.PropertyMap) *pulumiapi.ExecutorContext {
-	if !inputMap["executorContext"].HasValue() {
-		return nil
-	}
-
-	ecInput := util.GetSecretOrObjectValue(inputMap["executorContext"])
-	var ec pulumiapi.ExecutorContext
-
-	if ecInput["executorImage"].HasValue() {
-		ec.ExecutorImage = &pulumiapi.DockerImage{
-			Reference: util.GetSecretOrStringValue(ecInput["executorImage"]),
-		}
-	}
-
-	return &ec
+// DeploymentSettingsExecutorContext defines the executor environment for the deployment.
+type DeploymentSettingsExecutorContext struct {
+	ExecutorImage string `pulumi:"executorImage"`
 }
 
-func toGitHubConfig(inputMap resource.PropertyMap) *pulumiapi.DeploymentSettingsGitHub {
-	if !inputMap["github"].HasValue() {
-		return nil
-	}
-
-	githubInput := util.GetSecretOrObjectValue(inputMap["github"])
-	var github pulumiapi.DeploymentSettingsGitHub
-
-	if githubInput["repository"].HasValue() {
-		github.Repository = util.GetSecretOrStringValue(githubInput["repository"])
-	}
-
-	if githubInput["deployCommits"].HasValue() {
-		github.DeployCommits = util.GetSecretOrBoolValue(githubInput["deployCommits"])
-	}
-	if githubInput["previewPullRequests"].HasValue() {
-		github.PreviewPullRequests = util.GetSecretOrBoolValue(githubInput["previewPullRequests"])
-	}
-	if githubInput["pullRequestTemplate"].HasValue() {
-		github.PullRequestTemplate = util.GetSecretOrBoolValue(githubInput["pullRequestTemplate"])
-	}
-	if githubInput["paths"].HasValue() {
-		pathsInput := util.GetSecretOrArrayValue(githubInput["paths"])
-		paths := make([]string, len(pathsInput))
-
-		for i, v := range pathsInput {
-			paths[i] = util.GetSecretOrStringValue(v)
-		}
-
-		github.Paths = paths
-	}
-
-	return &github
+func (c *DeploymentSettingsExecutorContext) Annotate(a infer.Annotator) {
+	a.Describe(c, "The executor context defines information about the executor where the deployment is executed. "+
+		"If unspecified, the default 'pulumi/pulumi' image is used.")
+	a.Describe(&c.ExecutorImage, "Allows overriding the default executor image with a custom image. "+
+		"E.g. 'pulumi/pulumi-nodejs:latest'")
 }
 
-func toVCSConfig(inputMap resource.PropertyMap) pulumiapi.DeploymentSettingsVCS {
-	if !inputMap["vcs"].HasValue() {
-		return nil
-	}
-
-	vcsInput := util.GetSecretOrObjectValue(inputMap["vcs"])
-	var vcs pulumiapi.DeploymentSettingsVCS
-
-	if !vcsInput["provider"].HasValue() {
-		return nil
-	}
-	switch util.GetSecretOrStringValue(vcsInput["provider"]) {
-	case "azure_devops":
-		vcs = pulumiapi.DeploymentSettingsVCSAzureDevOpsBuilder{}.Build()
-
-	case "bitbucket":
-		vcs = pulumiapi.DeploymentSettingsVCSBitbucketBuilder{}.Build()
-
-	case "custom":
-		vcs = pulumiapi.DeploymentSettingsVCSCustomBuilder{}.Build()
-
-	case "github":
-		vcs = pulumiapi.DeploymentSettingsVCSGitHubBuilder{}.Build()
-
-	case "gitlab":
-		vcs = pulumiapi.DeploymentSettingsVCSGitLabBuilder{}.Build()
-
-	default:
-		return nil
-	}
-
-	if vcsInput["repository"].HasValue() {
-		_ = vcs.SetRepository(util.GetSecretOrStringValue(vcsInput["repository"]))
-	}
-	if vcsInput["installationId"].HasValue() {
-		_ = vcs.SetInstallationID(util.GetSecretOrStringValue(vcsInput["installationId"]))
-	}
-	if vcsInput["deployCommits"].HasValue() {
-		_ = vcs.SetDeployCommits(util.GetSecretOrBoolValue(vcsInput["deployCommits"]))
-	}
-	if vcsInput["previewPullRequests"].HasValue() {
-		_ = vcs.SetPreviewPullRequests(util.GetSecretOrBoolValue(vcsInput["previewPullRequests"]))
-	}
-	if vcsInput["pullRequestTemplate"].HasValue() {
-		_ = vcs.SetPullRequestTemplate(util.GetSecretOrBoolValue(vcsInput["pullRequestTemplate"]))
-	}
-	if vcsInput["paths"].HasValue() {
-		pathsInput := util.GetSecretOrArrayValue(vcsInput["paths"])
-		paths := make([]string, len(pathsInput))
-		for i, v := range pathsInput {
-			paths[i] = util.GetSecretOrStringValue(v)
-		}
-		_ = vcs.SetPaths(paths)
-	}
-	if vcsInput["deployPullRequest"].HasValue() {
-		val := int64(util.GetSecretOrNumberValue(vcsInput["deployPullRequest"]))
-		_ = vcs.SetDeployPullRequest(&val)
-	}
-
-	return vcs
+// DeploymentSettingsSourceContext is the source-of-truth for the deployment's source code.
+type DeploymentSettingsSourceContext struct {
+	Git *DeploymentSettingsGitSource `pulumi:"git,optional"`
 }
 
-func toSourceContext(inputMap resource.PropertyMap) *pulumiapi.SourceContext {
-	if !inputMap["sourceContext"].HasValue() {
-		return nil
-	}
-
-	scInput := util.GetSecretOrObjectValue(inputMap["sourceContext"])
-	cascadeSecret := inputMap["sourceContext"].IsSecret()
-	var sc pulumiapi.SourceContext
-
-	if scInput["git"].HasValue() {
-		gitInput := util.GetSecretOrObjectValue(scInput["git"])
-		cascadeSecret = cascadeSecret || scInput["git"].IsSecret()
-		var g pulumiapi.SourceContextGit
-
-		if gitInput["repoUrl"].HasValue() {
-			g.RepoURL = util.GetSecretOrStringValue(gitInput["repoUrl"])
-		}
-		if gitInput["branch"].HasValue() {
-			g.Branch = util.GetSecretOrStringValue(gitInput["branch"])
-		}
-		if gitInput["commit"].HasValue() {
-			g.Commit = util.GetSecretOrStringValue(gitInput["commit"])
-		}
-		if gitInput["repoDir"].HasValue() {
-			g.RepoDir = util.GetSecretOrStringValue(gitInput["repoDir"])
-		}
-
-		if gitInput["gitAuth"].HasValue() {
-			authInput := util.GetSecretOrObjectValue(gitInput["gitAuth"])
-			cascadeSecret = cascadeSecret || gitInput["gitAuth"].IsSecret()
-			var a pulumiapi.GitAuthConfig
-
-			if authInput["sshAuth"].HasValue() {
-				sshInput := util.GetSecretOrObjectValue(authInput["sshAuth"])
-				var s pulumiapi.SSHAuth
-
-				if sshInput["sshPrivateKey"].HasValue() || sshInput["sshPrivateKeyCipher"].HasValue() {
-					s.SSHPrivateKey = pulumiapi.SecretValue{
-						Secret: true,
-						Value:  util.GetSecretOrStringValue(sshInput["sshPrivateKey"]),
-					}
-				}
-				if sshInput["password"].HasValue() || sshInput["passwordCipher"].HasValue() {
-					s.Password = &pulumiapi.SecretValue{
-						Secret: true,
-						Value:  util.GetSecretOrStringValue(sshInput["password"]),
-					}
-				}
-
-				a.SSHAuth = &s
-			}
-
-			if authInput["basicAuth"].HasValue() {
-				basicInput := util.GetSecretOrObjectValue(authInput["basicAuth"])
-				cascadeSecret = cascadeSecret || authInput["basicAuth"].IsSecret()
-				var b pulumiapi.BasicAuth
-
-				if basicInput["username"].HasValue() {
-					b.UserName = pulumiapi.SecretValue{
-						Value:  util.GetSecretOrStringValue(basicInput["username"]),
-						Secret: cascadeSecret || basicInput["username"].IsSecret(),
-					}
-				}
-				if basicInput["password"].HasValue() || basicInput["passwordCipher"].HasValue() {
-					b.Password = pulumiapi.SecretValue{
-						Value:  util.GetSecretOrStringValue(basicInput["password"]),
-						Secret: true,
-					}
-				}
-
-				a.BasicAuth = &b
-			}
-
-			g.GitAuth = &a
-		}
-
-		sc.Git = &g
-	}
-
-	return &sc
+func (s *DeploymentSettingsSourceContext) Annotate(a infer.Annotator) {
+	a.Describe(s, "Settings related to the source of the deployment.")
+	a.Describe(&s.Git, "Git source settings for a deployment.")
 }
 
-func toOperationContext(inputMap resource.PropertyMap) *pulumiapi.OperationContext {
-	if !inputMap["operationContext"].HasValue() {
-		return nil
-	}
-
-	ocInput := util.GetSecretOrObjectValue(inputMap["operationContext"])
-	cascadeSecret := inputMap["operationContext"].IsSecret()
-	var oc pulumiapi.OperationContext
-
-	if ocInput["environmentVariables"].HasValue() {
-		ev := map[string]pulumiapi.SecretValue{}
-		evInput := util.GetSecretOrObjectValue(ocInput["environmentVariables"])
-		cascadeSecret = cascadeSecret || ocInput["environmentVariables"].IsSecret()
-
-		for k, v := range evInput {
-			value := util.GetSecretOrStringValue(v)
-			ev[string(k)] = pulumiapi.SecretValue{Secret: v.IsSecret() || cascadeSecret, Value: value}
-		}
-
-		oc.EnvironmentVariables = ev
-	}
-
-	if ocInput["preRunCommands"].HasValue() {
-		pcInput := util.GetSecretOrArrayValue(ocInput["preRunCommands"])
-		pc := make([]string, len(pcInput))
-
-		for i, v := range pcInput {
-			pc[i] = util.GetSecretOrStringValue(v)
-		}
-
-		oc.PreRunCommands = pc
-	}
-
-	if ocInput["options"].HasValue() {
-		oInput := util.GetSecretOrObjectValue(ocInput["options"])
-		var o pulumiapi.OperationContextOptions
-
-		if oInput["skipInstallDependencies"].HasValue() {
-			o.SkipInstallDependencies = util.GetSecretOrBoolValue(oInput["skipInstallDependencies"])
-		}
-
-		if oInput["skipIntermediateDeployments"].HasValue() {
-			o.SkipIntermediateDeployments = util.GetSecretOrBoolValue(oInput["skipIntermediateDeployments"])
-		}
-
-		if oInput["Shell"].HasValue() {
-			o.Shell = util.GetSecretOrStringValue(oInput["Shell"])
-		}
-
-		if oInput["deleteAfterDestroy"].HasValue() {
-			o.DeleteAfterDestroy = util.GetSecretOrBoolValue(oInput["deleteAfterDestroy"])
-		}
-
-		oc.Options = &o
-	}
-
-	if ocInput["oidc"].HasValue() {
-		oidcInput := util.GetSecretOrObjectValue(ocInput["oidc"])
-		var oidc pulumiapi.OperationContextOIDCConfiguration
-
-		if oidcInput["aws"].HasValue() {
-			awsInput := util.GetSecretOrObjectValue(oidcInput["aws"])
-			var aws pulumiapi.OperationContextAWSOIDCConfiguration
-
-			if awsInput["roleARN"].HasValue() {
-				aws.RoleARN = util.GetSecretOrStringValue(awsInput["roleARN"])
-			}
-			if awsInput["duration"].HasValue() {
-				aws.Duration = util.GetSecretOrStringValue(awsInput["duration"])
-			}
-			if awsInput["sessionName"].HasValue() {
-				aws.SessionName = util.GetSecretOrStringValue(awsInput["sessionName"])
-			}
-			if awsInput["policyARNs"].HasValue() {
-				policyARNsInput := util.GetSecretOrArrayValue(awsInput["policyARNs"])
-				policyARNs := make([]string, len(policyARNsInput))
-
-				for i, v := range policyARNsInput {
-					policyARNs[i] = util.GetSecretOrStringValue(v)
-				}
-
-				aws.PolicyARNs = policyARNs
-			}
-
-			oidc.AWS = &aws
-		}
-
-		if oidcInput["gcp"].HasValue() {
-			gcpInput := util.GetSecretOrObjectValue(oidcInput["gcp"])
-			var gcp pulumiapi.OperationContextGCPOIDCConfiguration
-
-			if gcpInput["projectId"].HasValue() {
-				gcp.ProjectID = util.GetSecretOrStringValue(gcpInput["projectId"])
-			}
-			if gcpInput["region"].HasValue() {
-				gcp.Region = util.GetSecretOrStringValue(gcpInput["region"])
-			}
-			if gcpInput["workloadPoolId"].HasValue() {
-				gcp.WorkloadPoolID = util.GetSecretOrStringValue(gcpInput["workloadPoolId"])
-			}
-			if gcpInput["providerId"].HasValue() {
-				gcp.ProviderID = util.GetSecretOrStringValue(gcpInput["providerId"])
-			}
-			if gcpInput["serviceAccount"].HasValue() {
-				gcp.ServiceAccount = util.GetSecretOrStringValue(gcpInput["serviceAccount"])
-			}
-			if gcpInput["tokenLifetime"].HasValue() {
-				gcp.TokenLifetime = util.GetSecretOrStringValue(gcpInput["tokenLifetime"])
-			}
-
-			oidc.GCP = &gcp
-		}
-
-		if oidcInput["azure"].HasValue() {
-			azureInput := util.GetSecretOrObjectValue(oidcInput["azure"])
-			var azure pulumiapi.OperationContextAzureOIDCConfiguration
-
-			if azureInput["tenantId"].HasValue() {
-				azure.TenantID = util.GetSecretOrStringValue(azureInput["tenantId"])
-			}
-			if azureInput["clientId"].HasValue() {
-				azure.ClientID = util.GetSecretOrStringValue(azureInput["clientId"])
-			}
-			if azureInput["subscriptionId"].HasValue() {
-				azure.SubscriptionID = util.GetSecretOrStringValue(azureInput["subscriptionId"])
-			}
-
-			oidc.Azure = &azure
-		}
-
-		oc.OIDC = &oidc
-	}
-
-	return &oc
+// DeploymentSettingsGitSource describes git settings for the deployment.
+type DeploymentSettingsGitSource struct {
+	RepoURL string                              `pulumi:"repoUrl,optional"`
+	Branch  string                              `pulumi:"branch,optional"`
+	Commit  string                              `pulumi:"commit,optional"`
+	RepoDir string                              `pulumi:"repoDir,optional"`
+	GitAuth *DeploymentSettingsGitSourceGitAuth `pulumi:"gitAuth,optional"`
 }
 
-func toCacheOptions(inputMap resource.PropertyMap) *pulumiapi.CacheOptions {
-	if !inputMap["cacheOptions"].HasValue() {
-		return nil
-	}
-
-	coInput := util.GetSecretOrObjectValue(inputMap["cacheOptions"])
-	var co pulumiapi.CacheOptions
-
-	if coInput["enable"].HasValue() {
-		co.Enable = util.GetSecretOrBoolValue(coInput["enable"])
-	}
-
-	return &co
+func (g *DeploymentSettingsGitSource) Annotate(a infer.Annotator) {
+	a.Describe(g, "Git source settings for a deployment.")
+	a.Describe(&g.RepoURL, "The repository URL to use for git settings. "+
+		"Should not be specified if there are `gitHub` settings for this deployment.")
+	a.Describe(&g.Branch, "The branch to deploy. One of either `branch` or `commit` must be specified.")
+	a.Describe(&g.Commit, "The commit to deploy. One of either `branch` or `commit` must be specified.")
+	a.Describe(&g.RepoDir, "The directory within the repository where the Pulumi.yaml is located.")
+	a.Describe(&g.GitAuth, "Git authentication configuration for this deployment. "+
+		"Should not be specified if there are `gitHub` settings for this deployment.")
 }
 
-func (ds *PulumiServiceDeploymentSettingsResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	olds, err := plugin.UnmarshalProperties(req.GetOldInputs(), util.StandardUnmarshal)
+// DeploymentSettingsGitSourceGitAuth holds either SSH or basic-auth credentials for git access.
+type DeploymentSettingsGitSourceGitAuth struct {
+	SSHAuth   *DeploymentSettingsGitAuthSSHAuth   `pulumi:"sshAuth,optional"`
+	BasicAuth *DeploymentSettingsGitAuthBasicAuth `pulumi:"basicAuth,optional"`
+}
+
+func (g *DeploymentSettingsGitSourceGitAuth) Annotate(a infer.Annotator) {
+	a.Describe(g, "Git source settings for a deployment.")
+	a.Describe(&g.SSHAuth, "SSH auth for git authentication. "+
+		"Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.")
+	a.Describe(&g.BasicAuth, "Basic auth for git authentication. "+
+		"Only one of `personalAccessToken`, `sshAuth`, or `basicAuth` must be defined.")
+}
+
+// DeploymentSettingsGitAuthSSHAuth holds SSH authentication credentials.
+type DeploymentSettingsGitAuthSSHAuth struct {
+	SSHPrivateKey string  `pulumi:"sshPrivateKey" provider:"secret"`
+	Password      *string `pulumi:"password,optional" provider:"secret"`
+}
+
+func (s *DeploymentSettingsGitAuthSSHAuth) Annotate(a infer.Annotator) {
+	a.Describe(s, "Git source settings for a deployment.")
+	a.Describe(&s.SSHPrivateKey, "SSH private key.")
+	a.Describe(&s.Password, "Optional password for SSH authentication.")
+}
+
+// DeploymentSettingsGitAuthBasicAuth holds basic-auth credentials.
+type DeploymentSettingsGitAuthBasicAuth struct {
+	UserName string `pulumi:"username" provider:"secret"`
+	Password string `pulumi:"password" provider:"secret"`
+}
+
+func (b *DeploymentSettingsGitAuthBasicAuth) Annotate(a infer.Annotator) {
+	a.Describe(b, "Git source settings for a deployment.")
+	a.Describe(&b.UserName, "User name for git basic authentication.")
+	a.Describe(&b.Password, "Password for git basic authentication.")
+}
+
+// DeploymentSettingsGitHubBlock is the deprecated GitHub-specific deployment settings.
+type DeploymentSettingsGitHubBlock struct {
+	Repository          string   `pulumi:"repository,optional"`
+	DeployCommits       bool     `pulumi:"deployCommits,optional"`
+	PreviewPullRequests bool     `pulumi:"previewPullRequests,optional"`
+	PullRequestTemplate bool     `pulumi:"pullRequestTemplate,optional"`
+	Paths               []string `pulumi:"paths,optional"`
+}
+
+func (g *DeploymentSettingsGitHubBlock) Annotate(a infer.Annotator) {
+	a.Describe(g, "GitHub settings for the deployment.")
+	a.Describe(&g.Repository, "The GitHub repository in the format org/repo.")
+	a.Describe(&g.DeployCommits, "Trigger a deployment running `pulumi up` on commit.")
+	a.Describe(&g.PreviewPullRequests, "Trigger a deployment running `pulumi preview` when a PR is opened.")
+	a.Describe(&g.PullRequestTemplate, "Use this stack as a template for pull request review stacks.")
+	a.Describe(&g.Paths, "The paths within the repo that deployments should be filtered to.")
+	a.SetDefault(&g.DeployCommits, true)
+	a.SetDefault(&g.PreviewPullRequests, true)
+	a.SetDefault(&g.PullRequestTemplate, false)
+	a.SetToken("index", "DeploymentSettingsGithub")
+}
+
+// DeploymentSettingsVcsBlock is the VCS-provider-agnostic settings, discriminated by `Provider`.
+type DeploymentSettingsVcsBlock struct {
+	Provider            string   `pulumi:"provider"`
+	Repository          string   `pulumi:"repository,optional"`
+	InstallationID      string   `pulumi:"installationId,optional"`
+	DeployCommits       bool     `pulumi:"deployCommits,optional"`
+	PreviewPullRequests bool     `pulumi:"previewPullRequests,optional"`
+	PullRequestTemplate bool     `pulumi:"pullRequestTemplate,optional"`
+	Paths               []string `pulumi:"paths,optional"`
+	DeployPullRequest   *int     `pulumi:"deployPullRequest,optional"`
+}
+
+func (v *DeploymentSettingsVcsBlock) Annotate(a infer.Annotator) {
+	a.Describe(v, "VCS settings for the deployment, supporting multiple VCS providers.")
+	a.Describe(&v.Provider, "The VCS provider type.")
+	a.Describe(&v.Repository, "The repository identifier (e.g., 'ProjectName/RepoName' for Azure DevOps, "+
+		"'org/repo' for GitHub).")
+	a.Describe(&v.InstallationID, "The VCS integration installation ID. Use to disambiguate when an "+
+		"organization has multiple integrations of the same provider type (e.g., two GitHub Apps). "+
+		"If omitted, the API resolves the integration automatically from `provider` and `repository`.")
+	a.Describe(&v.DeployCommits, "Trigger a deployment running `pulumi up` on commit.")
+	a.Describe(&v.PreviewPullRequests, "Trigger a deployment running `pulumi preview` when a PR is opened.")
+	a.Describe(&v.PullRequestTemplate, "Use this stack as a template for pull request review stacks.")
+	a.Describe(&v.Paths, "The paths within the repo that deployments should be filtered to.")
+	a.Describe(&v.DeployPullRequest, "Deploy a specific pull request number.")
+	a.SetDefault(&v.DeployCommits, true)
+	a.SetDefault(&v.PreviewPullRequests, true)
+	a.SetDefault(&v.PullRequestTemplate, false)
+	a.SetToken("index", "DeploymentSettingsVcs")
+}
+
+// DeploymentSettingsOperationContext describes the operation environment for the deployment.
+type DeploymentSettingsOperationContext struct {
+	PreRunCommands       []string                    `pulumi:"preRunCommands,optional"`
+	EnvironmentVariables map[string]string           `pulumi:"environmentVariables,optional"`
+	Options              *DeploymentOperationOptions `pulumi:"options,optional"`
+	Oidc                 *DeploymentOperationOIDC    `pulumi:"oidc,optional"`
+}
+
+func (o *DeploymentSettingsOperationContext) Annotate(a infer.Annotator) {
+	a.Describe(o, "Settings related to the Pulumi operation environment during the deployment.")
+	a.Describe(&o.PreRunCommands, "Shell commands to run before the Pulumi operation executes.")
+	a.Describe(&o.EnvironmentVariables, "Environment variables to set for the deployment.")
+	a.Describe(&o.Options, "Options to override default behavior during the deployment.")
+	a.Describe(&o.Oidc, "OIDC configuration to use during the deployment.")
+}
+
+// DeploymentOperationOptions is the schema's OperationContextOptions type.
+type DeploymentOperationOptions struct {
+	SkipInstallDependencies     bool   `pulumi:"skipInstallDependencies,optional"`
+	SkipIntermediateDeployments bool   `pulumi:"skipIntermediateDeployments,optional"`
+	Shell                       string `pulumi:"shell,optional"`
+	DeleteAfterDestroy          bool   `pulumi:"deleteAfterDestroy,optional"`
+}
+
+func (o *DeploymentOperationOptions) Annotate(a infer.Annotator) {
+	a.Describe(&o.SkipInstallDependencies, "Skip the default dependency installation step - use this to "+
+		"customize the dependency installation (e.g. if using yarn or poetry)")
+	a.Describe(&o.SkipIntermediateDeployments, "Skip intermediate deployments (Consolidate multiple deployments "+
+		"of the same type into one deployment)")
+	a.Describe(&o.Shell, "The shell to use to run commands during the deployment. Defaults to 'bash'.")
+	a.Describe(&o.DeleteAfterDestroy, "Whether the stack should be deleted after it is destroyed.")
+	a.SetToken("index", "OperationContextOptions")
+}
+
+// DeploymentOperationOIDC is the schema's OperationContextOIDC type.
+type DeploymentOperationOIDC struct {
+	AWS   *DeploymentAWSOIDCConfiguration   `pulumi:"aws,optional"`
+	GCP   *DeploymentGCPOIDCConfiguration   `pulumi:"gcp,optional"`
+	Azure *DeploymentAzureOIDCConfiguration `pulumi:"azure,optional"`
+}
+
+func (o *DeploymentOperationOIDC) Annotate(a infer.Annotator) {
+	a.Describe(&o.AWS, "AWS-specific OIDC configuration.")
+	a.Describe(&o.GCP, "GCP-specific OIDC configuration.")
+	a.Describe(&o.Azure, "Azure-specific OIDC configuration.")
+	a.SetToken("index", "OperationContextOIDC")
+}
+
+// DeploymentAWSOIDCConfiguration is the schema's AWSOIDCConfiguration type.
+type DeploymentAWSOIDCConfiguration struct {
+	Duration    string   `pulumi:"duration,optional"`
+	PolicyARNs  []string `pulumi:"policyARNs,optional"`
+	RoleARN     string   `pulumi:"roleARN"`
+	SessionName string   `pulumi:"sessionName"`
+}
+
+func (o *DeploymentAWSOIDCConfiguration) Annotate(a infer.Annotator) {
+	a.Describe(&o.Duration, "Duration of the assume-role session in “XhYmZs” format")
+	a.Describe(&o.PolicyARNs, "Optional set of IAM policy ARNs that further restrict the assume-role session")
+	a.Describe(&o.RoleARN, "The ARN of the role to assume using the OIDC token.")
+	a.Describe(&o.SessionName, "The name of the assume-role session.")
+	a.SetToken("index", "AWSOIDCConfiguration")
+}
+
+// DeploymentGCPOIDCConfiguration is the schema's GCPOIDCConfiguration type.
+type DeploymentGCPOIDCConfiguration struct {
+	ProjectID      string `pulumi:"projectId"`
+	Region         string `pulumi:"region,optional"`
+	WorkloadPoolID string `pulumi:"workloadPoolId"`
+	ProviderID     string `pulumi:"providerId"`
+	ServiceAccount string `pulumi:"serviceAccount"`
+	TokenLifetime  string `pulumi:"tokenLifetime,optional"`
+}
+
+func (o *DeploymentGCPOIDCConfiguration) Annotate(a infer.Annotator) {
+	a.Describe(&o.ProjectID, "The numerical ID of the GCP project.")
+	a.Describe(&o.Region, "The region of the GCP project.")
+	a.Describe(&o.WorkloadPoolID, "The ID of the workload pool to use.")
+	a.Describe(&o.ProviderID, "The ID of the identity provider associated with the workload pool.")
+	a.Describe(&o.ServiceAccount, "The email address of the service account to use.")
+	a.Describe(&o.TokenLifetime, "The lifetime of the temporary credentials in “XhYmZs” format.")
+	a.SetToken("index", "GCPOIDCConfiguration")
+}
+
+// DeploymentAzureOIDCConfiguration is the schema's AzureOIDCConfiguration type.
+type DeploymentAzureOIDCConfiguration struct {
+	ClientID       string `pulumi:"clientId"`
+	TenantID       string `pulumi:"tenantId"`
+	SubscriptionID string `pulumi:"subscriptionId"`
+}
+
+func (o *DeploymentAzureOIDCConfiguration) Annotate(a infer.Annotator) {
+	a.Describe(&o.ClientID, "The client ID of the federated workload identity.")
+	a.Describe(&o.TenantID, "The tenant ID of the federated workload identity.")
+	a.Describe(&o.SubscriptionID, "The subscription ID of the federated workload identity.")
+	a.SetToken("index", "AzureOIDCConfiguration")
+}
+
+// DeploymentSettingsCacheOptions is the schema's DeploymentSettingsCacheOptions type.
+type DeploymentSettingsCacheOptions struct {
+	Enable bool `pulumi:"enable,optional"`
+}
+
+func (c *DeploymentSettingsCacheOptions) Annotate(a infer.Annotator) {
+	a.Describe(c, "Dependency cache settings for the deployment")
+	a.Describe(&c.Enable, "Enable dependency caching")
+	a.SetDefault(&c.Enable, false)
+}
+
+// --- CRUD implementation ---
+
+// Check normalizes user input. In particular, the AWS OIDC `duration` field accepts shorthand
+// like "1h" but the Pulumi Cloud API requires the canonical "1h0m0s" form, so we normalize here.
+func (*DeploymentSettings) Check(
+	ctx context.Context, req infer.CheckRequest,
+) (infer.CheckResponse[DeploymentSettingsInput], error) {
+	inputs, failures, err := infer.DefaultCheck[DeploymentSettingsInput](ctx, req.NewInputs)
 	if err != nil {
-		return nil, err
+		return infer.CheckResponse[DeploymentSettingsInput]{}, err
 	}
-
-	news, err := plugin.UnmarshalProperties(req.GetNews(), util.StandardUnmarshal)
-	if err != nil {
-		return nil, err
+	if inputs.OperationContext != nil &&
+		inputs.OperationContext.Oidc != nil &&
+		inputs.OperationContext.Oidc.AWS != nil &&
+		inputs.OperationContext.Oidc.AWS.Duration != "" {
+		normalized, normErr := normalizeDurationString(inputs.OperationContext.Oidc.AWS.Duration)
+		if normErr != nil {
+			failures = append(failures, p.CheckFailure{
+				Property: "operationContext.oidc.aws.duration",
+				Reason: fmt.Sprintf(
+					"Failed to normalize duration string due to error: %s", normErr.Error()),
+			})
+		} else {
+			inputs.OperationContext.Oidc.AWS.Duration = *normalized
+		}
 	}
+	return infer.CheckResponse[DeploymentSettingsInput]{Inputs: inputs, Failures: failures}, nil
+}
 
-	diffs := olds.Diff(news)
-	if diffs == nil {
-		return &pulumirpc.DiffResponse{
-			Changes: pulumirpc.DiffResponse_DIFF_NONE,
+func (*DeploymentSettings) Create(
+	ctx context.Context, req infer.CreateRequest[DeploymentSettingsInput],
+) (infer.CreateResponse[DeploymentSettingsState], error) {
+	id := deploymentSettingsResourceID(req.Inputs.Organization, req.Inputs.Project, req.Inputs.Stack)
+	if req.DryRun {
+		return infer.CreateResponse[DeploymentSettingsState]{
+			ID:     id,
+			Output: DeploymentSettingsState{DeploymentSettingsInput: req.Inputs},
 		}, nil
 	}
-
-	dd := plugin.NewDetailedDiffFromObjectDiff(diffs, false)
-
-	detailedDiffs := map[string]*pulumirpc.PropertyDiff{}
-	replaces := []string(nil)
-	replaceProperties := map[string]bool{
-		"organization": true,
-		"project":      true,
-		"stack":        true,
+	settings, err := req.Inputs.toAPIDeploymentSettings()
+	if err != nil {
+		return infer.CreateResponse[DeploymentSettingsState]{}, err
 	}
-	for k, v := range dd {
-		if _, ok := replaceProperties[k]; ok {
-			v.Kind = v.Kind.AsReplace()
-			replaces = append(replaces, k)
-		}
-		detailedDiffs[k] = &pulumirpc.PropertyDiff{
-			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind), //nolint:gosec // safe conversion from plugin.DiffKind
-			InputDiff: v.InputDiff,
-		}
+	stack := pulumiapi.StackIdentifier{
+		OrgName:     req.Inputs.Organization,
+		ProjectName: req.Inputs.Project,
+		StackName:   req.Inputs.Stack,
 	}
-
-	return &pulumirpc.DiffResponse{
-		Changes:             pulumirpc.DiffResponse_DIFF_SOME,
-		Replaces:            replaces,
-		DetailedDiff:        detailedDiffs,
-		HasDetailedDiff:     true,
-		DeleteBeforeReplace: true,
+	if _, err := config.GetClient(ctx).CreateDeploymentSettings(ctx, stack, settings); err != nil {
+		return infer.CreateResponse[DeploymentSettingsState]{}, err
+	}
+	return infer.CreateResponse[DeploymentSettingsState]{
+		ID:     id,
+		Output: DeploymentSettingsState{DeploymentSettingsInput: req.Inputs},
 	}, nil
 }
 
-func (ds *PulumiServiceDeploymentSettingsResource) Check(
-	req *pulumirpc.CheckRequest,
-) (*pulumirpc.CheckResponse, error) {
-	news, err := plugin.UnmarshalProperties(req.GetNews(), util.KeepSecretsUnmarshal)
-	if err != nil {
-		return nil, err
+func (*DeploymentSettings) Update(
+	ctx context.Context, req infer.UpdateRequest[DeploymentSettingsInput, DeploymentSettingsState],
+) (infer.UpdateResponse[DeploymentSettingsState], error) {
+	if req.DryRun {
+		return infer.UpdateResponse[DeploymentSettingsState]{
+			Output: DeploymentSettingsState{DeploymentSettingsInput: req.Inputs},
+		}, nil
 	}
+	settings, err := req.Inputs.toAPIDeploymentSettings()
+	if err != nil {
+		return infer.UpdateResponse[DeploymentSettingsState]{}, err
+	}
+	stack := pulumiapi.StackIdentifier{
+		OrgName:     req.Inputs.Organization,
+		ProjectName: req.Inputs.Project,
+		StackName:   req.Inputs.Stack,
+	}
+	if _, err := config.GetClient(ctx).UpdateDeploymentSettings(ctx, stack, settings); err != nil {
+		return infer.UpdateResponse[DeploymentSettingsState]{}, err
+	}
+	return infer.UpdateResponse[DeploymentSettingsState]{
+		Output: DeploymentSettingsState{DeploymentSettingsInput: req.Inputs},
+	}, nil
+}
 
-	var failures []*pulumirpc.CheckFailure
-	for _, p := range []resource.PropertyKey{"organization", "project", "stack"} {
-		if !news[(p)].HasValue() {
-			failures = append(failures, &pulumirpc.CheckFailure{
-				Reason:   fmt.Sprintf("missing required property '%s'", p),
-				Property: string(p),
-			})
+func (*DeploymentSettings) Delete(
+	ctx context.Context, req infer.DeleteRequest[DeploymentSettingsState],
+) (infer.DeleteResponse, error) {
+	stack := pulumiapi.StackIdentifier{
+		OrgName:     req.State.Organization,
+		ProjectName: req.State.Project,
+		StackName:   req.State.Stack,
+	}
+	return infer.DeleteResponse{}, config.GetClient(ctx).DeleteDeploymentSettings(ctx, stack)
+}
+
+func (*DeploymentSettings) Read(
+	ctx context.Context, req infer.ReadRequest[DeploymentSettingsInput, DeploymentSettingsState],
+) (infer.ReadResponse[DeploymentSettingsInput, DeploymentSettingsState], error) {
+	stack, err := pulumiapi.NewStackIdentifier(req.ID)
+	if err != nil {
+		return infer.ReadResponse[DeploymentSettingsInput, DeploymentSettingsState]{}, err
+	}
+	settings, err := config.GetClient(ctx).GetDeploymentSettings(ctx, stack)
+	if err != nil {
+		return infer.ReadResponse[DeploymentSettingsInput, DeploymentSettingsState]{}, err
+	}
+	if settings == nil {
+		return infer.ReadResponse[DeploymentSettingsInput, DeploymentSettingsState]{}, nil
+	}
+	inputs := deploymentSettingsInputFromAPI(stack, settings, req.Inputs)
+	return infer.ReadResponse[DeploymentSettingsInput, DeploymentSettingsState]{
+		ID:     req.ID,
+		Inputs: inputs,
+		State:  DeploymentSettingsState{DeploymentSettingsInput: inputs},
+	}, nil
+}
+
+// --- Conversion helpers ---
+
+func (i *DeploymentSettingsInput) toAPIDeploymentSettings() (pulumiapi.DeploymentSettings, error) {
+	out := pulumiapi.DeploymentSettings{
+		AgentPoolID: i.AgentPoolID,
+	}
+	if i.ExecutorContext != nil {
+		out.Executor = &pulumiapi.ExecutorContext{
+			ExecutorImage: &pulumiapi.DockerImage{Reference: i.ExecutorContext.ExecutorImage},
 		}
 	}
+	if i.SourceContext != nil {
+		out.SourceContext = i.SourceContext.toAPI()
+	}
+	if i.GitHub != nil {
+		gh := pulumiapi.DeploymentSettingsGitHub{
+			Repository:          i.GitHub.Repository,
+			DeployCommits:       i.GitHub.DeployCommits,
+			PreviewPullRequests: i.GitHub.PreviewPullRequests,
+			PullRequestTemplate: i.GitHub.PullRequestTemplate,
+			Paths:               i.GitHub.Paths,
+		}
+		out.GitHub = &gh
+	}
+	if i.Vcs != nil {
+		vcs, err := i.Vcs.toAPI()
+		if err != nil {
+			return pulumiapi.DeploymentSettings{}, err
+		}
+		out.Vcs = vcs
+	}
+	if i.OperationContext != nil {
+		out.Operation = i.OperationContext.toAPI()
+	}
+	if i.CacheOptions != nil {
+		out.CacheOptions = &pulumiapi.CacheOptions{Enable: i.CacheOptions.Enable}
+	}
+	return out, nil
+}
 
-	// Normalizing duration input
-	if news["operationContext"].HasValue() {
-		operationContext := util.GetSecretOrObjectValue(news["operationContext"])
-		if operationContext["oidc"].HasValue() {
-			oidc := util.GetSecretOrObjectValue(operationContext["oidc"])
-			if oidc["aws"].HasValue() {
-				aws := util.GetSecretOrObjectValue(oidc["aws"])
-				if aws["duration"].HasValue() {
-					durationString := util.GetSecretOrStringValue(aws["duration"])
-					normalized, err := normalizeDurationString(durationString)
-					if err != nil {
-						failures = append(failures, &pulumirpc.CheckFailure{
-							Reason:   fmt.Sprintf("Failed to normalize duration string due to error: %s", err.Error()),
-							Property: string("operationContext.oidc.aws.duration"),
-						})
-					} else {
-						if aws["duration"].IsSecret() {
-							aws["duration"] = resource.MakeSecret(resource.NewStringProperty(*normalized))
-						} else {
-							aws["duration"] = resource.NewStringProperty(*normalized)
-						}
+func (s *DeploymentSettingsSourceContext) toAPI() *pulumiapi.SourceContext {
+	api := &pulumiapi.SourceContext{}
+	if s.Git != nil {
+		g := &pulumiapi.SourceContextGit{
+			RepoURL: s.Git.RepoURL,
+			Branch:  s.Git.Branch,
+			Commit:  s.Git.Commit,
+			RepoDir: s.Git.RepoDir,
+		}
+		if s.Git.GitAuth != nil {
+			gauth := &pulumiapi.GitAuthConfig{}
+			if s.Git.GitAuth.SSHAuth != nil {
+				ssh := &pulumiapi.SSHAuth{
+					SSHPrivateKey: pulumiapi.SecretValue{
+						Value:  s.Git.GitAuth.SSHAuth.SSHPrivateKey,
+						Secret: true,
+					},
+				}
+				if s.Git.GitAuth.SSHAuth.Password != nil {
+					ssh.Password = &pulumiapi.SecretValue{
+						Value:  *s.Git.GitAuth.SSHAuth.Password,
+						Secret: true,
 					}
 				}
+				gauth.SSHAuth = ssh
 			}
+			if s.Git.GitAuth.BasicAuth != nil {
+				gauth.BasicAuth = &pulumiapi.BasicAuth{
+					UserName: pulumiapi.SecretValue{
+						Value:  s.Git.GitAuth.BasicAuth.UserName,
+						Secret: true,
+					},
+					Password: pulumiapi.SecretValue{
+						Value:  s.Git.GitAuth.BasicAuth.Password,
+						Secret: true,
+					},
+				}
+			}
+			g.GitAuth = gauth
+		}
+		api.Git = g
+	}
+	return api
+}
+
+func (v *DeploymentSettingsVcsBlock) toAPI() (pulumiapi.DeploymentSettingsVCS, error) {
+	var vcs pulumiapi.DeploymentSettingsVCS
+	switch v.Provider {
+	case "azure_devops":
+		vcs = pulumiapi.DeploymentSettingsVCSAzureDevOpsBuilder{}.Build()
+	case "bitbucket":
+		vcs = pulumiapi.DeploymentSettingsVCSBitbucketBuilder{}.Build()
+	case "custom":
+		vcs = pulumiapi.DeploymentSettingsVCSCustomBuilder{}.Build()
+	case "github":
+		vcs = pulumiapi.DeploymentSettingsVCSGitHubBuilder{}.Build()
+	case "gitlab":
+		vcs = pulumiapi.DeploymentSettingsVCSGitLabBuilder{}.Build()
+	default:
+		return nil, fmt.Errorf("unsupported VCS provider %q", v.Provider)
+	}
+	if v.Repository != "" {
+		_ = vcs.SetRepository(v.Repository)
+	}
+	if v.InstallationID != "" {
+		_ = vcs.SetInstallationID(v.InstallationID)
+	}
+	_ = vcs.SetDeployCommits(v.DeployCommits)
+	_ = vcs.SetPreviewPullRequests(v.PreviewPullRequests)
+	_ = vcs.SetPullRequestTemplate(v.PullRequestTemplate)
+	if len(v.Paths) > 0 {
+		_ = vcs.SetPaths(v.Paths)
+	}
+	if v.DeployPullRequest != nil {
+		dpr := int64(*v.DeployPullRequest)
+		_ = vcs.SetDeployPullRequest(&dpr)
+	}
+	return vcs, nil
+}
+
+func (o *DeploymentSettingsOperationContext) toAPI() *pulumiapi.OperationContext {
+	api := &pulumiapi.OperationContext{
+		PreRunCommands: o.PreRunCommands,
+	}
+	if len(o.EnvironmentVariables) > 0 {
+		ev := make(map[string]pulumiapi.SecretValue, len(o.EnvironmentVariables))
+		for k, val := range o.EnvironmentVariables {
+			ev[k] = pulumiapi.SecretValue{Value: val}
+		}
+		api.EnvironmentVariables = ev
+	}
+	if o.Options != nil {
+		api.Options = &pulumiapi.OperationContextOptions{
+			SkipInstallDependencies:     o.Options.SkipInstallDependencies,
+			SkipIntermediateDeployments: o.Options.SkipIntermediateDeployments,
+			Shell:                       o.Options.Shell,
+			DeleteAfterDestroy:          o.Options.DeleteAfterDestroy,
 		}
 	}
-
-	checkedNews, err := plugin.MarshalProperties(news, util.StandardMarshal)
-	if err != nil {
-		return nil, err
+	if o.Oidc != nil {
+		oidc := &pulumiapi.OperationContextOIDCConfiguration{}
+		if o.Oidc.AWS != nil {
+			oidc.AWS = &pulumiapi.OperationContextAWSOIDCConfiguration{
+				Duration:    o.Oidc.AWS.Duration,
+				PolicyARNs:  o.Oidc.AWS.PolicyARNs,
+				RoleARN:     o.Oidc.AWS.RoleARN,
+				SessionName: o.Oidc.AWS.SessionName,
+			}
+		}
+		if o.Oidc.GCP != nil {
+			oidc.GCP = &pulumiapi.OperationContextGCPOIDCConfiguration{
+				ProjectID:      o.Oidc.GCP.ProjectID,
+				Region:         o.Oidc.GCP.Region,
+				WorkloadPoolID: o.Oidc.GCP.WorkloadPoolID,
+				ProviderID:     o.Oidc.GCP.ProviderID,
+				ServiceAccount: o.Oidc.GCP.ServiceAccount,
+				TokenLifetime:  o.Oidc.GCP.TokenLifetime,
+			}
+		}
+		if o.Oidc.Azure != nil {
+			oidc.Azure = &pulumiapi.OperationContextAzureOIDCConfiguration{
+				TenantID:       o.Oidc.Azure.TenantID,
+				ClientID:       o.Oidc.Azure.ClientID,
+				SubscriptionID: o.Oidc.Azure.SubscriptionID,
+			}
+		}
+		api.OIDC = oidc
 	}
-
-	return &pulumirpc.CheckResponse{Inputs: checkedNews, Failures: failures}, nil
+	return api
 }
 
-func (ds *PulumiServiceDeploymentSettingsResource) Read(req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	ctx := context.Background()
-
-	stack, err := pulumiapi.NewStackIdentifier(req.GetId())
-	if err != nil {
-		return nil, err
+// deploymentSettingsInputFromAPI rebuilds the input struct from the API response.
+// Secret values returned by the API are ciphertext — the legacy implementation surfaced these
+// directly. We preserve the previously-known plaintext from `previousInputs` when the API
+// returns no plaintext, so a refresh on an unchanged secret does not appear to drift.
+func deploymentSettingsInputFromAPI(
+	stack pulumiapi.StackIdentifier,
+	settings *pulumiapi.DeploymentSettings,
+	previousInputs DeploymentSettingsInput,
+) DeploymentSettingsInput {
+	out := DeploymentSettingsInput{
+		Organization: stack.OrgName,
+		Project:      stack.ProjectName,
+		Stack:        stack.StackName,
+		AgentPoolID:  settings.AgentPoolID,
 	}
-	settings, err := ds.Client.GetDeploymentSettings(ctx, stack)
-	if err != nil {
-		return nil, err
+	if settings.Executor != nil && settings.Executor.ExecutorImage != nil &&
+		settings.Executor.ExecutorImage.Reference != "" {
+		out.ExecutorContext = &DeploymentSettingsExecutorContext{
+			ExecutorImage: settings.Executor.ExecutorImage.Reference,
+		}
 	}
-
-	if settings == nil {
-		// Empty response causes the resource to be deleted from the state.
-		return &pulumirpc.ReadResponse{Id: "", Properties: nil}, nil
+	if settings.SourceContext != nil {
+		out.SourceContext = sourceContextFromAPI(settings.SourceContext, previousInputs.SourceContext)
 	}
-
-	dsInput := PulumiServiceDeploymentSettingsInput{
-		Stack:              stack,
-		DeploymentSettings: *settings,
+	if settings.GitHub != nil {
+		out.GitHub = &DeploymentSettingsGitHubBlock{
+			Repository:          settings.GitHub.Repository,
+			DeployCommits:       settings.GitHub.DeployCommits,
+			PreviewPullRequests: settings.GitHub.PreviewPullRequests,
+			PullRequestTemplate: settings.GitHub.PullRequestTemplate,
+			Paths:               settings.GitHub.Paths,
+		}
 	}
-
-	var plaintextSettings *pulumiapi.DeploymentSettings
-	var ciphertextSettings *pulumiapi.DeploymentSettings
-	propertyMap, err := plugin.UnmarshalProperties(req.GetProperties(), util.KeepSecretsUnmarshal)
-	if err != nil {
-		return nil, err
+	if settings.Vcs != nil {
+		provider, _ := settings.Vcs.GetDiscriminatorValue()
+		vcs := &DeploymentSettingsVcsBlock{
+			Provider:            provider,
+			Repository:          settings.Vcs.Repository(),
+			InstallationID:      settings.Vcs.InstallationID(),
+			DeployCommits:       settings.Vcs.DeployCommits(),
+			PreviewPullRequests: settings.Vcs.PreviewPullRequests(),
+			PullRequestTemplate: settings.Vcs.PullRequestTemplate(),
+			Paths:               settings.Vcs.Paths(),
+		}
+		if dpr := settings.Vcs.DeployPullRequest(); dpr != nil {
+			dprInt := int(*dpr)
+			vcs.DeployPullRequest = &dprInt
+		}
+		out.Vcs = vcs
 	}
-	inputMap, err := plugin.UnmarshalProperties(req.GetInputs(), util.KeepSecretsUnmarshal)
-	if err != nil {
-		return nil, err
+	if settings.Operation != nil {
+		out.OperationContext = operationContextFromAPI(settings.Operation, previousInputs.OperationContext)
 	}
-	if propertyMap["stack"].HasValue() {
-		tempPlain := ds.ToPulumiServiceDeploymentSettingsInput(inputMap)
-		plaintextSettings = &tempPlain.DeploymentSettings
-		tempCipher := ds.ToPulumiServiceDeploymentSettingsInput(propertyMap)
-		ciphertextSettings = &tempCipher.DeploymentSettings
+	if settings.CacheOptions != nil {
+		out.CacheOptions = &DeploymentSettingsCacheOptions{Enable: settings.CacheOptions.Enable}
 	}
-
-	properties, err := plugin.MarshalProperties(
-		dsInput.ToPropertyMap(plaintextSettings, ciphertextSettings, false), util.StandardMarshal,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	inputs, err := plugin.MarshalProperties(
-		dsInput.ToPropertyMap(plaintextSettings, ciphertextSettings, true), util.StandardMarshal,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.ReadResponse{
-		Id:         req.Id,
-		Properties: properties,
-		Inputs:     inputs,
-	}, nil
+	return out
 }
 
-func (ds *PulumiServiceDeploymentSettingsResource) Delete(req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
-	ctx := context.Background()
-	stack, err := pulumiapi.NewStackIdentifier(req.GetId())
-	if err != nil {
-		return nil, err
+func sourceContextFromAPI(
+	api *pulumiapi.SourceContext, prev *DeploymentSettingsSourceContext,
+) *DeploymentSettingsSourceContext {
+	if api.Git == nil {
+		return &DeploymentSettingsSourceContext{}
 	}
-
-	err = ds.Client.DeleteDeploymentSettings(ctx, stack)
-	if err != nil {
-		return nil, err
+	g := &DeploymentSettingsGitSource{
+		RepoURL: api.Git.RepoURL,
+		Branch:  api.Git.Branch,
+		Commit:  api.Git.Commit,
+		RepoDir: api.Git.RepoDir,
 	}
-	return &pbempty.Empty{}, nil
+	var prevAuth *DeploymentSettingsGitSourceGitAuth
+	if prev != nil && prev.Git != nil {
+		prevAuth = prev.Git.GitAuth
+	}
+	switch {
+	case prevAuth != nil:
+		// Git auth is write-only secret material: Pulumi Cloud stores it but does
+		// not faithfully echo it on read (omitting it, or returning only
+		// ciphertext). The previously-declared value is therefore authoritative —
+		// preferring it keeps refresh from reporting a spurious `sourceContext`
+		// diff. Genuine credential changes still flow through Create/Update.
+		g.GitAuth = prevAuth
+	case api.Git.GitAuth != nil:
+		// Import: no prior state to fall back on, so reconstruct from the API.
+		g.GitAuth = gitAuthFromAPI(api.Git.GitAuth, nil)
+	}
+	return &DeploymentSettingsSourceContext{Git: g}
 }
 
-func (ds *PulumiServiceDeploymentSettingsResource) Create(
-	req *pulumirpc.CreateRequest,
-) (*pulumirpc.CreateResponse, error) {
-	ctx := context.Background()
-	inputsMap, err := plugin.UnmarshalProperties(req.GetProperties(), util.KeepSecretsUnmarshal)
-	if err != nil {
-		return nil, err
+func gitAuthFromAPI(
+	api *pulumiapi.GitAuthConfig, prev *DeploymentSettingsGitSourceGitAuth,
+) *DeploymentSettingsGitSourceGitAuth {
+	out := &DeploymentSettingsGitSourceGitAuth{}
+	if api.SSHAuth != nil {
+		ssh := &DeploymentSettingsGitAuthSSHAuth{
+			SSHPrivateKey: secretValueOrPrev(api.SSHAuth.SSHPrivateKey, prevSSHPrivateKey(prev)),
+		}
+		if api.SSHAuth.Password != nil {
+			pw := secretValueOrPrev(*api.SSHAuth.Password, prevSSHPassword(prev))
+			ssh.Password = &pw
+		}
+		out.SSHAuth = ssh
 	}
-
-	input := ds.ToPulumiServiceDeploymentSettingsInput(inputsMap)
-	settings := input.DeploymentSettings
-	response, err := ds.Client.CreateDeploymentSettings(ctx, input.Stack, settings)
-	if err != nil {
-		return nil, err
+	if api.BasicAuth != nil {
+		out.BasicAuth = &DeploymentSettingsGitAuthBasicAuth{
+			UserName: secretValueOrPrev(api.BasicAuth.UserName, prevBasicAuthUserName(prev)),
+			Password: secretValueOrPrev(api.BasicAuth.Password, prevBasicAuthPassword(prev)),
+		}
 	}
-
-	responseInput := PulumiServiceDeploymentSettingsInput{
-		DeploymentSettings: *response,
-		Stack:              input.Stack,
-	}
-
-	outputProperties, err := plugin.MarshalProperties(
-		responseInput.ToPropertyMap(&input.DeploymentSettings, nil, false), util.StandardMarshal,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.CreateResponse{
-		Id:         path.Join(input.Stack.OrgName, input.Stack.ProjectName, input.Stack.StackName),
-		Properties: outputProperties,
-	}, nil
+	return out
 }
 
-func (ds *PulumiServiceDeploymentSettingsResource) Update(
-	req *pulumirpc.UpdateRequest,
-) (*pulumirpc.UpdateResponse, error) {
-	ctx := context.Background()
-	inputsMap, err := plugin.UnmarshalProperties(req.GetNews(), util.KeepSecretsUnmarshal)
-	if err != nil {
-		return nil, err
+// secretValueOrPrev prefers a plaintext value (from create/update flow) but otherwise falls back
+// to the previously-recorded plaintext from state, so refresh on an unchanged secret does not
+// erase it. When neither is available, we return the ciphertext-as-string.
+func secretValueOrPrev(api pulumiapi.SecretValue, prev string) string {
+	if api.Value != "" && !api.Secret && prev != "" {
+		// Ciphertext value returned by Pulumi Cloud; prefer the known plaintext from state.
+		return prev
 	}
-
-	input := ds.ToPulumiServiceDeploymentSettingsInput(inputsMap)
-	settings := input.DeploymentSettings
-	response, err := ds.Client.UpdateDeploymentSettings(ctx, input.Stack, settings)
-	if err != nil {
-		return nil, err
+	if api.Value != "" {
+		return api.Value
 	}
-
-	responseInput := PulumiServiceDeploymentSettingsInput{
-		DeploymentSettings: *response,
-		Stack:              input.Stack,
-	}
-
-	outputProperties, err := plugin.MarshalProperties(
-		responseInput.ToPropertyMap(&input.DeploymentSettings, nil, false), util.StandardMarshal,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pulumirpc.UpdateResponse{
-		Properties: outputProperties,
-	}, nil
+	return prev
 }
 
-func (ds *PulumiServiceDeploymentSettingsResource) Name() string {
-	return "pulumiservice:index:DeploymentSettings"
+func prevSSHPrivateKey(prev *DeploymentSettingsGitSourceGitAuth) string {
+	if prev == nil || prev.SSHAuth == nil {
+		return ""
+	}
+	return prev.SSHAuth.SSHPrivateKey
+}
+
+func prevSSHPassword(prev *DeploymentSettingsGitSourceGitAuth) string {
+	if prev == nil || prev.SSHAuth == nil || prev.SSHAuth.Password == nil {
+		return ""
+	}
+	return *prev.SSHAuth.Password
+}
+
+func prevBasicAuthUserName(prev *DeploymentSettingsGitSourceGitAuth) string {
+	if prev == nil || prev.BasicAuth == nil {
+		return ""
+	}
+	return prev.BasicAuth.UserName
+}
+
+func prevBasicAuthPassword(prev *DeploymentSettingsGitSourceGitAuth) string {
+	if prev == nil || prev.BasicAuth == nil {
+		return ""
+	}
+	return prev.BasicAuth.Password
+}
+
+func operationContextFromAPI(
+	api *pulumiapi.OperationContext, prev *DeploymentSettingsOperationContext,
+) *DeploymentSettingsOperationContext {
+	out := &DeploymentSettingsOperationContext{
+		PreRunCommands: api.PreRunCommands,
+	}
+	if len(api.EnvironmentVariables) > 0 {
+		ev := make(map[string]string, len(api.EnvironmentVariables))
+		var prevEV map[string]string
+		if prev != nil {
+			prevEV = prev.EnvironmentVariables
+		}
+		for k, v := range api.EnvironmentVariables {
+			ev[k] = secretValueOrPrev(v, prevEV[k])
+		}
+		out.EnvironmentVariables = ev
+	}
+	if api.Options != nil {
+		out.Options = &DeploymentOperationOptions{
+			SkipInstallDependencies:     api.Options.SkipInstallDependencies,
+			SkipIntermediateDeployments: api.Options.SkipIntermediateDeployments,
+			Shell:                       api.Options.Shell,
+			DeleteAfterDestroy:          api.Options.DeleteAfterDestroy,
+		}
+	}
+	if api.OIDC != nil {
+		oidc := &DeploymentOperationOIDC{}
+		if api.OIDC.AWS != nil {
+			oidc.AWS = &DeploymentAWSOIDCConfiguration{
+				Duration:    api.OIDC.AWS.Duration,
+				PolicyARNs:  api.OIDC.AWS.PolicyARNs,
+				RoleARN:     api.OIDC.AWS.RoleARN,
+				SessionName: api.OIDC.AWS.SessionName,
+			}
+		}
+		if api.OIDC.GCP != nil {
+			oidc.GCP = &DeploymentGCPOIDCConfiguration{
+				ProjectID:      api.OIDC.GCP.ProjectID,
+				Region:         api.OIDC.GCP.Region,
+				WorkloadPoolID: api.OIDC.GCP.WorkloadPoolID,
+				ProviderID:     api.OIDC.GCP.ProviderID,
+				ServiceAccount: api.OIDC.GCP.ServiceAccount,
+				TokenLifetime:  api.OIDC.GCP.TokenLifetime,
+			}
+		}
+		if api.OIDC.Azure != nil {
+			oidc.Azure = &DeploymentAzureOIDCConfiguration{
+				TenantID:       api.OIDC.Azure.TenantID,
+				ClientID:       api.OIDC.Azure.ClientID,
+				SubscriptionID: api.OIDC.Azure.SubscriptionID,
+			}
+		}
+		out.Oidc = oidc
+	}
+	return out
+}
+
+// --- ID helpers ---
+
+func deploymentSettingsResourceID(org, project, stack string) string {
+	return path.Join(org, project, stack)
 }
 
 func normalizeDurationString(input string) (*string, error) {
@@ -972,6 +836,5 @@ func normalizeDurationString(input string) (*string, error) {
 		return nil, fmt.Errorf("failed to parse duration string `%s` due to error: %w", input, err)
 	}
 	result := duration.String()
-
 	return &result, nil
 }
