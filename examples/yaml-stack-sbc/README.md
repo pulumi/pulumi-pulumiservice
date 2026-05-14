@@ -1,8 +1,8 @@
 # Stack with Service-Backed Configuration (SBC) Example
 
-This example demonstrates linking a `pulumiservice:Stack` to an ESC environment
-that holds the stack's configuration and secrets, via the `configEnvironment`
-input.
+This example demonstrates linking a `pulumiservice:Stack` to a stack-managed
+ESC environment that holds the stack's configuration and secrets, via the
+`configEnvironment` input.
 
 ## Prerequisites
 
@@ -13,19 +13,9 @@ input.
 
 ## What This Example Does
 
-The example creates two stacks that demonstrate the two SBC modes:
-
-1. **Reference an existing env** (`refStack`): the program also creates a
-   sibling `pulumiservice:Environment` (`sharedCfg`) and links the stack to it
-   via `configEnvironment.project` + `configEnvironment.environment`. PSP does
-   not own the env's lifecycle — on stack delete the linked env is preserved.
-2. **Stack-managed env** (`autoStack`): with `configEnvironment.auto: true`,
-   the server creates a dedicated env named `<projectName>/<stackName>` at
-   stack creation time and deletes it when the stack is destroyed.
-
-`refStack` also pins to a specific revision via `configEnvironment.version:
-${sharedCfg.revision}`, so editing the env doesn't silently shift the stack's
-config until the program is re-applied.
+With `configEnvironment.managed: true`, the server creates a dedicated ESC
+environment named `<projectName>/<stackName>` at stack creation time and
+deletes it when the stack is destroyed.
 
 ## Running the Example
 

@@ -516,7 +516,7 @@ func TestYamlStackExample(t *testing.T) {
 	})
 }
 
-// TestYamlStackSbcExample exercises Stack.configEnvironment in both modes.
+// TestYamlStackSbcExample exercises Stack.configEnvironment in managed mode.
 // Skipped by default because Service-Backed Configuration is gated behind the
 // `39623-service-backed-config` LaunchDarkly flag and not yet enabled for the
 // shared test org. Enable manually once the flag is on.
