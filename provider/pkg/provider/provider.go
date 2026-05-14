@@ -138,6 +138,7 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 		WithResources(
 			infer.Resource(&resources.AccessToken{}),
 			infer.Resource(&resources.AgentPool{}),
+			infer.Resource(&resources.ApprovalRule{}),
 			infer.Resource(&resources.DeploymentSchedule{}),
 			infer.Resource(&resources.DriftSchedule{}),
 			infer.Resource(&resources.EnvironmentRotationSchedule{}),
@@ -417,9 +418,6 @@ func (k *pulumiserviceProvider) Configure(
 		&resources.PulumiServiceEnvironmentResource{
 			Client:         escClient,
 			MetadataClient: client,
-		},
-		&resources.PulumiServiceApprovalRuleResource{
-			Client: client,
 		},
 		&resources.PulumiServicePolicyGroupResource{
 			Client: client,

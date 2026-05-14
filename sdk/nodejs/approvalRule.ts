@@ -50,7 +50,7 @@ export class ApprovalRule extends pulumi.CustomResource {
      */
     declare public readonly environmentIdentifier: pulumi.Output<outputs.EnvironmentIdentifier>;
     /**
-     * Name of the approval rule.
+     * The name of the approval rule.
      */
     declare public readonly name: pulumi.Output<string>;
     /**
@@ -97,6 +97,8 @@ export class ApprovalRule extends pulumi.CustomResource {
             resourceInputs["targetActionTypes"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
+        const replaceOnChanges = { replaceOnChanges: ["name"] };
+        opts = pulumi.mergeOptions(opts, replaceOnChanges);
         super(ApprovalRule.__pulumiType, name, resourceInputs, opts);
     }
 }

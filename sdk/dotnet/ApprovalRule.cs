@@ -34,7 +34,7 @@ namespace Pulumi.PulumiService
         public Output<Outputs.EnvironmentIdentifier> EnvironmentIdentifier { get; private set; } = null!;
 
         /// <summary>
-        /// Name of the approval rule.
+        /// The name of the approval rule.
         /// </summary>
         [Output("name")]
         public Output<string> Name { get; private set; } = null!;
@@ -68,6 +68,10 @@ namespace Pulumi.PulumiService
             var defaultOptions = new CustomResourceOptions
             {
                 Version = Utilities.Version,
+                ReplaceOnChanges =
+                {
+                    "name",
+                },
             };
             var merged = CustomResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.
