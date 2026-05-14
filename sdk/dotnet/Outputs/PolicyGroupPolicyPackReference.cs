@@ -31,7 +31,7 @@ namespace Pulumi.PulumiService.Outputs
         /// <summary>
         /// The server-derived numeric version of the policy pack. This is output-only; use `versionTag` to pin a specific version.
         /// </summary>
-        public readonly double? Version;
+        public readonly int? Version;
         /// <summary>
         /// The version tag of the policy pack.
         /// </summary>
@@ -45,7 +45,7 @@ namespace Pulumi.PulumiService.Outputs
 
             string name,
 
-            double? version,
+            int? version,
 
             string? versionTag)
         {

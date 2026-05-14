@@ -147,6 +147,7 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 			infer.Resource(&resources.OrgAccessToken{}),
 			infer.Resource(&resources.OrganizationMember{}),
 			infer.Resource(&resources.OrganizationRole{}),
+			infer.Resource(&resources.PolicyGroup{}),
 			infer.Resource(&resources.PolicyPack{}),
 			infer.Resource(&resources.Stack{}),
 			infer.Resource(&resources.StackTag{}),
@@ -419,9 +420,6 @@ func (k *pulumiserviceProvider) Configure(
 			MetadataClient: client,
 		},
 		&resources.PulumiServiceApprovalRuleResource{
-			Client: client,
-		},
-		&resources.PulumiServicePolicyGroupResource{
 			Client: client,
 		},
 	}

@@ -5,7 +5,7 @@ package com.pulumi.pulumiservice.outputs;
 
 import com.pulumi.core.annotations.CustomType;
 import com.pulumi.exceptions.MissingRequiredPropertyException;
-import java.lang.Double;
+import java.lang.Integer;
 import java.lang.Object;
 import java.lang.String;
 import java.util.Map;
@@ -34,7 +34,7 @@ public final class PolicyGroupPolicyPackReference {
      * @return The server-derived numeric version of the policy pack. This is output-only; use `versionTag` to pin a specific version.
      * 
      */
-    private @Nullable Double version;
+    private @Nullable Integer version;
     /**
      * @return The version tag of the policy pack.
      * 
@@ -67,7 +67,7 @@ public final class PolicyGroupPolicyPackReference {
      * @return The server-derived numeric version of the policy pack. This is output-only; use `versionTag` to pin a specific version.
      * 
      */
-    public Optional<Double> version() {
+    public Optional<Integer> version() {
         return Optional.ofNullable(this.version);
     }
     /**
@@ -90,7 +90,7 @@ public final class PolicyGroupPolicyPackReference {
         private @Nullable Map<String,Object> config;
         private @Nullable String displayName;
         private String name;
-        private @Nullable Double version;
+        private @Nullable Integer version;
         private @Nullable String versionTag;
         public Builder() {}
         public Builder(PolicyGroupPolicyPackReference defaults) {
@@ -123,7 +123,7 @@ public final class PolicyGroupPolicyPackReference {
             return this;
         }
         @CustomType.Setter
-        public Builder version(@Nullable Double version) {
+        public Builder version(@Nullable Integer version) {
 
             this.version = version;
             return this;

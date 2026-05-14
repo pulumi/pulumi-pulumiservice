@@ -3490,7 +3490,7 @@ type PolicyGroupPolicyPackReference struct {
 	// The name of the policy pack.
 	Name string `pulumi:"name"`
 	// The server-derived numeric version of the policy pack. This is output-only; use `versionTag` to pin a specific version.
-	Version *float64 `pulumi:"version"`
+	Version *int `pulumi:"version"`
 	// The version tag of the policy pack.
 	VersionTag *string `pulumi:"versionTag"`
 }
@@ -3526,8 +3526,8 @@ func (o PolicyGroupPolicyPackReferenceOutput) Name() pulumi.StringOutput {
 }
 
 // The server-derived numeric version of the policy pack. This is output-only; use `versionTag` to pin a specific version.
-func (o PolicyGroupPolicyPackReferenceOutput) Version() pulumi.Float64PtrOutput {
-	return o.ApplyT(func(v PolicyGroupPolicyPackReference) *float64 { return v.Version }).(pulumi.Float64PtrOutput)
+func (o PolicyGroupPolicyPackReferenceOutput) Version() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v PolicyGroupPolicyPackReference) *int { return v.Version }).(pulumi.IntPtrOutput)
 }
 
 // The version tag of the policy pack.

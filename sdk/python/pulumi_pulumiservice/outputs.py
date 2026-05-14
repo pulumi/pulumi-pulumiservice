@@ -1532,7 +1532,7 @@ class PolicyGroupPolicyPackReference(dict):
                  name: _builtins.str,
                  config: Optional[Mapping[str, Any]] = None,
                  display_name: Optional[_builtins.str] = None,
-                 version: Optional[_builtins.float] = None,
+                 version: Optional[_builtins.int] = None,
                  version_tag: Optional[_builtins.str] = None):
         """
         A reference to a policy pack within a policy group.
@@ -1540,7 +1540,7 @@ class PolicyGroupPolicyPackReference(dict):
         :param _builtins.str name: The name of the policy pack.
         :param Mapping[str, Any] config: Optional configuration for the policy pack. The special key `all` sets the default enforcement level for every policy in the pack; per-policy entries override it.
         :param _builtins.str display_name: The display name of the policy pack.
-        :param _builtins.float version: The server-derived numeric version of the policy pack. This is output-only; use `versionTag` to pin a specific version.
+        :param _builtins.int version: The server-derived numeric version of the policy pack. This is output-only; use `versionTag` to pin a specific version.
         :param _builtins.str version_tag: The version tag of the policy pack.
         """
         pulumi.set(__self__, "name", name)
@@ -1579,7 +1579,7 @@ class PolicyGroupPolicyPackReference(dict):
 
     @_builtins.property
     @pulumi.getter
-    def version(self) -> Optional[_builtins.float]:
+    def version(self) -> Optional[_builtins.int]:
         """
         The server-derived numeric version of the policy pack. This is output-only; use `versionTag` to pin a specific version.
         """
