@@ -259,7 +259,7 @@ class OidcIssuer(pulumi.CustomResource):
     @pulumi.getter
     def policies(self) -> pulumi.Output[Sequence['outputs.AuthPolicyDefinition']]:
         """
-        The authorization policies for this Oidc Issuer.
+        The auth policies for this Oidc Issuer.
         """
         return pulumi.get(self, "policies")
 

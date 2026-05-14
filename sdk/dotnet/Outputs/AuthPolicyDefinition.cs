@@ -18,7 +18,7 @@ namespace Pulumi.PulumiService.Outputs
         /// </summary>
         public readonly ImmutableArray<Pulumi.PulumiService.AuthPolicyPermissionLevel> AuthorizedPermissions;
         /// <summary>
-        /// The rule type of this policy definition
+        /// The rule type of this policy definition.
         /// </summary>
         public readonly Pulumi.PulumiService.AuthPolicyDecision Decision;
         /// <summary>
@@ -34,7 +34,7 @@ namespace Pulumi.PulumiService.Outputs
         /// </summary>
         public readonly string? TeamName;
         /// <summary>
-        /// The token type for this policy definition
+        /// The token type for this policy definition.
         /// </summary>
         public readonly Pulumi.PulumiService.AuthPolicyTokenType TokenType;
         /// <summary>

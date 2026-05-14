@@ -65,14 +65,14 @@ public class OidcIssuer extends com.pulumi.resources.CustomResource {
         return this.organization;
     }
     /**
-     * The authorization policies for this Oidc Issuer.
+     * The auth policies for this Oidc Issuer.
      * 
      */
     @Export(name="policies", refs={List.class,AuthPolicyDefinition.class}, tree="[0,1]")
     private Output<List<AuthPolicyDefinition>> policies;
 
     /**
-     * @return The authorization policies for this Oidc Issuer.
+     * @return The auth policies for this Oidc Issuer.
      * 
      */
     public Output<List<AuthPolicyDefinition>> policies() {

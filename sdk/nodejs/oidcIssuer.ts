@@ -50,7 +50,7 @@ export class OidcIssuer extends pulumi.CustomResource {
      */
     declare public readonly organization: pulumi.Output<string>;
     /**
-     * The authorization policies for this Oidc Issuer.
+     * The auth policies for this Oidc Issuer.
      */
     declare public readonly policies: pulumi.Output<outputs.AuthPolicyDefinition[]>;
     /**

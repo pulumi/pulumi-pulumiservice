@@ -52,7 +52,7 @@ export interface AuthPolicyDefinitionArgs {
      */
     authorizedPermissions?: pulumi.Input<pulumi.Input<enums.AuthPolicyPermissionLevel>[] | undefined>;
     /**
-     * The rule type of this policy definition
+     * The rule type of this policy definition.
      */
     decision: pulumi.Input<enums.AuthPolicyDecision>;
     /**
@@ -68,7 +68,7 @@ export interface AuthPolicyDefinitionArgs {
      */
     teamName?: pulumi.Input<string | undefined>;
     /**
-     * The token type for this policy definition
+     * The token type for this policy definition.
      */
     tokenType: pulumi.Input<enums.AuthPolicyTokenType>;
     /**

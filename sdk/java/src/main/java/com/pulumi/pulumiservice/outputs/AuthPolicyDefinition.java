@@ -23,7 +23,7 @@ public final class AuthPolicyDefinition {
      */
     private @Nullable List<AuthPolicyPermissionLevel> authorizedPermissions;
     /**
-     * @return The rule type of this policy definition
+     * @return The rule type of this policy definition.
      * 
      */
     private AuthPolicyDecision decision;
@@ -43,7 +43,7 @@ public final class AuthPolicyDefinition {
      */
     private @Nullable String teamName;
     /**
-     * @return The token type for this policy definition
+     * @return The token type for this policy definition.
      * 
      */
     private AuthPolicyTokenType tokenType;
@@ -62,7 +62,7 @@ public final class AuthPolicyDefinition {
         return this.authorizedPermissions == null ? List.of() : this.authorizedPermissions;
     }
     /**
-     * @return The rule type of this policy definition
+     * @return The rule type of this policy definition.
      * 
      */
     public AuthPolicyDecision decision() {
@@ -90,7 +90,7 @@ public final class AuthPolicyDefinition {
         return Optional.ofNullable(this.teamName);
     }
     /**
-     * @return The token type for this policy definition
+     * @return The token type for this policy definition.
      * 
      */
     public AuthPolicyTokenType tokenType() {

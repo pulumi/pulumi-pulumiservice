@@ -34,7 +34,7 @@ namespace Pulumi.PulumiService
         public Output<string> Organization { get; private set; } = null!;
 
         /// <summary>
-        /// The authorization policies for this Oidc Issuer.
+        /// The auth policies for this Oidc Issuer.
         /// </summary>
         [Output("policies")]
         public Output<ImmutableArray<Outputs.AuthPolicyDefinition>> Policies { get; private set; } = null!;

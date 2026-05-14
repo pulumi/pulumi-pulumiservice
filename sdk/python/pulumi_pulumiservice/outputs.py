@@ -230,9 +230,9 @@ class AuthPolicyDefinition(dict):
                  team_name: Optional[_builtins.str] = None,
                  user_login: Optional[_builtins.str] = None):
         """
-        :param 'AuthPolicyDecision' decision: The rule type of this policy definition
+        :param 'AuthPolicyDecision' decision: The rule type of this policy definition.
         :param Mapping[str, _builtins.str] rules: OIDC rules to set for this policy.
-        :param 'AuthPolicyTokenType' token_type: The token type for this policy definition
+        :param 'AuthPolicyTokenType' token_type: The token type for this policy definition.
         :param Sequence['AuthPolicyPermissionLevel'] authorized_permissions: The permission level for organization tokens.
         :param _builtins.str runner_id: The runner ID for deployment runner tokens.
         :param _builtins.str team_name: The team name for team tokens.
@@ -254,7 +254,7 @@ class AuthPolicyDefinition(dict):
     @pulumi.getter
     def decision(self) -> 'AuthPolicyDecision':
         """
-        The rule type of this policy definition
+        The rule type of this policy definition.
         """
         return pulumi.get(self, "decision")
 
@@ -270,7 +270,7 @@ class AuthPolicyDefinition(dict):
     @pulumi.getter(name="tokenType")
     def token_type(self) -> 'AuthPolicyTokenType':
         """
-        The token type for this policy definition
+        The token type for this policy definition.
         """
         return pulumi.get(self, "token_type")
 

@@ -52,7 +52,7 @@ export interface AuthPolicyDefinition {
      */
     authorizedPermissions?: enums.AuthPolicyPermissionLevel[];
     /**
-     * The rule type of this policy definition
+     * The rule type of this policy definition.
      */
     decision: enums.AuthPolicyDecision;
     /**
@@ -68,7 +68,7 @@ export interface AuthPolicyDefinition {
      */
     teamName?: string;
     /**
-     * The token type for this policy definition
+     * The token type for this policy definition.
      */
     tokenType: enums.AuthPolicyTokenType;
     /**
