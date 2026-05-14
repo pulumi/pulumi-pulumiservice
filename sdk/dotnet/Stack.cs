@@ -16,7 +16,7 @@ namespace Pulumi.PulumiService
     public partial class Stack : global::Pulumi.CustomResource
     {
         /// <summary>
-        /// Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set either `project`+`environment` to reference an existing environment, or `auto: true` to have the stack manage a dedicated environment (named `&lt;projectName&gt;/&lt;stackName&gt;`) that is created and destroyed alongside the stack.
+        /// (Preview) Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set `managed: true` to have the stack manage a dedicated environment (named `&lt;projectName&gt;/&lt;stackName&gt;`) that is created and destroyed alongside the stack.
         /// </summary>
         [Output("configEnvironment")]
         public Output<Outputs.StackConfigEnvironment?> ConfigEnvironment { get; private set; } = null!;
@@ -91,7 +91,7 @@ namespace Pulumi.PulumiService
     public sealed class StackArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
-        /// Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set either `project`+`environment` to reference an existing environment, or `auto: true` to have the stack manage a dedicated environment (named `&lt;projectName&gt;/&lt;stackName&gt;`) that is created and destroyed alongside the stack.
+        /// (Preview) Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set `managed: true` to have the stack manage a dedicated environment (named `&lt;projectName&gt;/&lt;stackName&gt;`) that is created and destroyed alongside the stack.
         /// </summary>
         [Input("configEnvironment")]
         public Input<Inputs.StackConfigEnvironmentArgs>? ConfigEnvironment { get; set; }

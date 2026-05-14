@@ -22,14 +22,14 @@ import javax.annotation.Nullable;
 @ResourceType(type="pulumiservice:index:Stack")
 public class Stack extends com.pulumi.resources.CustomResource {
     /**
-     * Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set either `project`+`environment` to reference an existing environment, or `auto: true` to have the stack manage a dedicated environment (named `&lt;projectName&gt;/&lt;stackName&gt;`) that is created and destroyed alongside the stack.
+     * (Preview) Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set `managed: true` to have the stack manage a dedicated environment (named `&lt;projectName&gt;/&lt;stackName&gt;`) that is created and destroyed alongside the stack.
      * 
      */
     @Export(name="configEnvironment", refs={StackConfigEnvironment.class}, tree="[0]")
     private Output</* @Nullable */ StackConfigEnvironment> configEnvironment;
 
     /**
-     * @return Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set either `project`+`environment` to reference an existing environment, or `auto: true` to have the stack manage a dedicated environment (named `&lt;projectName&gt;/&lt;stackName&gt;`) that is created and destroyed alongside the stack.
+     * @return (Preview) Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set `managed: true` to have the stack manage a dedicated environment (named `&lt;projectName&gt;/&lt;stackName&gt;`) that is created and destroyed alongside the stack.
      * 
      */
     public Output<Optional<StackConfigEnvironment>> configEnvironment() {

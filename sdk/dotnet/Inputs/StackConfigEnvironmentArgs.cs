@@ -11,33 +11,15 @@ namespace Pulumi.PulumiService.Inputs
 {
 
     /// <summary>
-    /// Service-Backed Configuration: links a Stack to an ESC environment that holds its config and secrets. Set exactly one of `auto` (Stack-managed) or `project`+`environment` (reference an existing env).
+    /// (Preview) Service-Backed Configuration: links a Stack to an ESC environment that holds its config and secrets.
     /// </summary>
     public sealed class StackConfigEnvironmentArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
-        /// When `true`, the Stack manages a dedicated ESC environment (named `&lt;projectName&gt;/&lt;stackName&gt;`) that is created and destroyed alongside the stack. Mutually exclusive with `project`+`environment`.
+        /// (Preview) When `true`, the Stack manages a dedicated ESC environment (named `&lt;projectName&gt;/&lt;stackName&gt;`) that is created and destroyed alongside the stack.
         /// </summary>
-        [Input("auto")]
-        public Input<bool>? Auto { get; set; }
-
-        /// <summary>
-        /// The name of the ESC environment to link. Mutually exclusive with `auto`. Used together with `project` to reference an existing environment.
-        /// </summary>
-        [Input("environment")]
-        public Input<string>? Environment { get; set; }
-
-        /// <summary>
-        /// The project of the ESC environment to link. Mutually exclusive with `auto`. Used together with `environment` to reference an existing environment. Defaults to the ESC `default` project when omitted.
-        /// </summary>
-        [Input("project")]
-        public Input<string>? Project { get; set; }
-
-        /// <summary>
-        /// Optional. Pin an existing environment link to a specific revision. Accepts a numeric revision (e.g. `"3"`) or a revision tag (e.g. `"prod"`). Not valid with `auto`.
-        /// </summary>
-        [Input("version")]
-        public Input<string>? Version { get; set; }
+        [Input("managed")]
+        public Input<bool>? Managed { get; set; }
 
         public StackConfigEnvironmentArgs()
         {

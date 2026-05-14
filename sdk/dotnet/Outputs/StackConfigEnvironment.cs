@@ -11,42 +11,20 @@ namespace Pulumi.PulumiService.Outputs
 {
 
     /// <summary>
-    /// Service-Backed Configuration: links a Stack to an ESC environment that holds its config and secrets. Set exactly one of `auto` (Stack-managed) or `project`+`environment` (reference an existing env).
+    /// (Preview) Service-Backed Configuration: links a Stack to an ESC environment that holds its config and secrets.
     /// </summary>
     [OutputType]
     public sealed class StackConfigEnvironment
     {
         /// <summary>
-        /// When `true`, the Stack manages a dedicated ESC environment (named `&lt;projectName&gt;/&lt;stackName&gt;`) that is created and destroyed alongside the stack. Mutually exclusive with `project`+`environment`.
+        /// (Preview) When `true`, the Stack manages a dedicated ESC environment (named `&lt;projectName&gt;/&lt;stackName&gt;`) that is created and destroyed alongside the stack.
         /// </summary>
-        public readonly bool? Auto;
-        /// <summary>
-        /// The name of the ESC environment to link. Mutually exclusive with `auto`. Used together with `project` to reference an existing environment.
-        /// </summary>
-        public readonly string? Environment;
-        /// <summary>
-        /// The project of the ESC environment to link. Mutually exclusive with `auto`. Used together with `environment` to reference an existing environment. Defaults to the ESC `default` project when omitted.
-        /// </summary>
-        public readonly string? Project;
-        /// <summary>
-        /// Optional. Pin an existing environment link to a specific revision. Accepts a numeric revision (e.g. `"3"`) or a revision tag (e.g. `"prod"`). Not valid with `auto`.
-        /// </summary>
-        public readonly string? Version;
+        public readonly bool? Managed;
 
         [OutputConstructor]
-        private StackConfigEnvironment(
-            bool? auto,
-
-            string? environment,
-
-            string? project,
-
-            string? version)
+        private StackConfigEnvironment(bool? managed)
         {
-            Auto = auto;
-            Environment = environment;
-            Project = project;
-            Version = version;
+            Managed = managed;
         }
     }
 }

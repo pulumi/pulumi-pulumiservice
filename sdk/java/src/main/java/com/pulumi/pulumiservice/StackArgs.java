@@ -19,14 +19,14 @@ public final class StackArgs extends com.pulumi.resources.ResourceArgs {
     public static final StackArgs Empty = new StackArgs();
 
     /**
-     * Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set either `project`+`environment` to reference an existing environment, or `auto: true` to have the stack manage a dedicated environment (named `&lt;projectName&gt;/&lt;stackName&gt;`) that is created and destroyed alongside the stack.
+     * (Preview) Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set `managed: true` to have the stack manage a dedicated environment (named `&lt;projectName&gt;/&lt;stackName&gt;`) that is created and destroyed alongside the stack.
      * 
      */
     @Import(name="configEnvironment")
     private @Nullable Output<StackConfigEnvironmentArgs> configEnvironment;
 
     /**
-     * @return Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set either `project`+`environment` to reference an existing environment, or `auto: true` to have the stack manage a dedicated environment (named `&lt;projectName&gt;/&lt;stackName&gt;`) that is created and destroyed alongside the stack.
+     * @return (Preview) Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set `managed: true` to have the stack manage a dedicated environment (named `&lt;projectName&gt;/&lt;stackName&gt;`) that is created and destroyed alongside the stack.
      * 
      */
     public Optional<Output<StackConfigEnvironmentArgs>> configEnvironment() {
@@ -122,7 +122,7 @@ public final class StackArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param configEnvironment Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set either `project`+`environment` to reference an existing environment, or `auto: true` to have the stack manage a dedicated environment (named `&lt;projectName&gt;/&lt;stackName&gt;`) that is created and destroyed alongside the stack.
+         * @param configEnvironment (Preview) Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set `managed: true` to have the stack manage a dedicated environment (named `&lt;projectName&gt;/&lt;stackName&gt;`) that is created and destroyed alongside the stack.
          * 
          * @return builder
          * 
@@ -133,7 +133,7 @@ public final class StackArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         /**
-         * @param configEnvironment Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set either `project`+`environment` to reference an existing environment, or `auto: true` to have the stack manage a dedicated environment (named `&lt;projectName&gt;/&lt;stackName&gt;`) that is created and destroyed alongside the stack.
+         * @param configEnvironment (Preview) Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set `managed: true` to have the stack manage a dedicated environment (named `&lt;projectName&gt;/&lt;stackName&gt;`) that is created and destroyed alongside the stack.
          * 
          * @return builder
          * 

@@ -529,25 +529,13 @@ export interface RoleScopeInfo {
 }
 
 /**
- * Service-Backed Configuration: links a Stack to an ESC environment that holds its config and secrets. Set exactly one of `auto` (Stack-managed) or `project`+`environment` (reference an existing env).
+ * (Preview) Service-Backed Configuration: links a Stack to an ESC environment that holds its config and secrets.
  */
 export interface StackConfigEnvironment {
     /**
-     * When `true`, the Stack manages a dedicated ESC environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack. Mutually exclusive with `project`+`environment`.
+     * (Preview) When `true`, the Stack manages a dedicated ESC environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack.
      */
-    auto?: boolean;
-    /**
-     * The name of the ESC environment to link. Mutually exclusive with `auto`. Used together with `project` to reference an existing environment.
-     */
-    environment?: string;
-    /**
-     * The project of the ESC environment to link. Mutually exclusive with `auto`. Used together with `environment` to reference an existing environment. Defaults to the ESC `default` project when omitted.
-     */
-    project?: string;
-    /**
-     * Optional. Pin an existing environment link to a specific revision. Accepts a numeric revision (e.g. `"3"`) or a revision tag (e.g. `"prod"`). Not valid with `auto`.
-     */
-    version?: string;
+    managed?: boolean;
 }
 
 export interface TemplateSourceDestination {

@@ -16,7 +16,7 @@ import (
 type Stack struct {
 	pulumi.CustomResourceState
 
-	// Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set either `project`+`environment` to reference an existing environment, or `auto: true` to have the stack manage a dedicated environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack.
+	// (Preview) Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set `managed: true` to have the stack manage a dedicated environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack.
 	ConfigEnvironment StackConfigEnvironmentPtrOutput `pulumi:"configEnvironment"`
 	// Optional. Flag indicating whether to delete the stack even if it still contains resources.
 	ForceDestroy pulumi.BoolPtrOutput `pulumi:"forceDestroy"`
@@ -77,7 +77,7 @@ func (StackState) ElementType() reflect.Type {
 }
 
 type stackArgs struct {
-	// Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set either `project`+`environment` to reference an existing environment, or `auto: true` to have the stack manage a dedicated environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack.
+	// (Preview) Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set `managed: true` to have the stack manage a dedicated environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack.
 	ConfigEnvironment *StackConfigEnvironment `pulumi:"configEnvironment"`
 	// Optional. Flag indicating whether to delete the stack even if it still contains resources.
 	ForceDestroy *bool `pulumi:"forceDestroy"`
@@ -91,7 +91,7 @@ type stackArgs struct {
 
 // The set of arguments for constructing a Stack resource.
 type StackArgs struct {
-	// Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set either `project`+`environment` to reference an existing environment, or `auto: true` to have the stack manage a dedicated environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack.
+	// (Preview) Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set `managed: true` to have the stack manage a dedicated environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack.
 	ConfigEnvironment StackConfigEnvironmentPtrInput
 	// Optional. Flag indicating whether to delete the stack even if it still contains resources.
 	ForceDestroy pulumi.BoolPtrInput
@@ -190,7 +190,7 @@ func (o StackOutput) ToStackOutputWithContext(ctx context.Context) StackOutput {
 	return o
 }
 
-// Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set either `project`+`environment` to reference an existing environment, or `auto: true` to have the stack manage a dedicated environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack.
+// (Preview) Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set `managed: true` to have the stack manage a dedicated environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack.
 func (o StackOutput) ConfigEnvironment() StackConfigEnvironmentPtrOutput {
 	return o.ApplyT(func(v *Stack) StackConfigEnvironmentPtrOutput { return v.ConfigEnvironment }).(StackConfigEnvironmentPtrOutput)
 }

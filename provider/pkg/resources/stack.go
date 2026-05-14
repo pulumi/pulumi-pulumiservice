@@ -21,25 +21,15 @@ type PulumiServiceStackResource struct {
 }
 
 // StackConfigEnvironment mirrors the schema type
-// `pulumiservice:index:StackConfigEnvironment`. Either Project+Environment is
-// set (link to an existing ESC env) or Auto is true (Stack manages a dedicated
-// env named `<projectName>/<stackName>`); the two modes are mutually exclusive.
-// Version pins a numeric revision or revision tag and is only valid with an
-// existing env reference; the stack-create API rejects versioned auto refs.
+// `pulumiservice:index:StackConfigEnvironment`. Managed=true opts the stack
+// into a dedicated ESC environment that the server creates inline at stack
+// creation and deletes alongside the stack.
 type StackConfigEnvironment struct {
-	Project     string
-	Environment string
-	Auto        bool
-	Version     string
+	Managed bool
 }
 
-// IsSet reports whether the user provided any of the fields. The Stack-level
-// optional input is treated as "absent" when none of the inner fields are set.
 func (e *StackConfigEnvironment) IsSet() bool {
-	if e == nil {
-		return false
-	}
-	return e.Auto || e.Project != "" || e.Environment != "" || e.Version != ""
+	return e != nil && e.Managed
 }
 
 type PulumiServiceStack struct {
@@ -64,37 +54,23 @@ func (i *PulumiServiceStack) ToPropertyMap() resource.PropertyMap {
 
 func (e *StackConfigEnvironment) toPropertyMap() resource.PropertyMap {
 	pm := resource.PropertyMap{}
-	if e.Project != "" {
-		pm["project"] = resource.NewPropertyValue(e.Project)
-	}
-	if e.Environment != "" {
-		pm["environment"] = resource.NewPropertyValue(e.Environment)
-	}
-	if e.Auto {
-		pm["auto"] = resource.NewPropertyValue(true)
-	}
-	if e.Version != "" {
-		pm["version"] = resource.NewPropertyValue(e.Version)
+	if e.Managed {
+		pm["managed"] = resource.NewPropertyValue(true)
 	}
 	return pm
 }
 
-// hasComputedIdentityField reports whether any field that determines the
-// SBC env identity or mode (project, environment, auto) is unknown at preview
-// time. Diff uses this to fall back to a conservative replace classification
-// because parseStackConfigEnvironment skips computed values and would
-// otherwise silently report no change.
-func hasComputedIdentityField(v resource.PropertyValue) bool {
+// hasComputedManaged reports whether configEnvironment.managed is unknown at
+// preview. Diff falls back to a conservative replace when it is, because the
+// resolved value determines whether the server must create an env inline (a
+// destructive transition that an in-place plan would hide).
+func hasComputedManaged(v resource.PropertyValue) bool {
 	if !v.HasValue() || !v.IsObject() {
 		return false
 	}
 	obj := v.ObjectValue()
-	for _, k := range []resource.PropertyKey{"project", "environment", "auto"} {
-		if x, ok := obj[k]; ok && x.IsComputed() {
-			return true
-		}
-	}
-	return false
+	x, ok := obj["managed"]
+	return ok && x.IsComputed()
 }
 
 func parseStackConfigEnvironment(v resource.PropertyValue) *StackConfigEnvironment {
@@ -103,42 +79,17 @@ func parseStackConfigEnvironment(v resource.PropertyValue) *StackConfigEnvironme
 	}
 	obj := v.ObjectValue()
 	out := &StackConfigEnvironment{}
-	if p, ok := obj["project"]; ok && p.IsString() {
-		out.Project = p.StringValue()
-	}
-	if e, ok := obj["environment"]; ok && e.IsString() {
-		out.Environment = e.StringValue()
-	}
-	if a, ok := obj["auto"]; ok && a.IsBool() {
-		out.Auto = a.BoolValue()
-	}
-	if vv, ok := obj["version"]; ok && vv.IsString() {
-		out.Version = vv.StringValue()
+	if a, ok := obj["managed"]; ok && a.IsBool() {
+		out.Managed = a.BoolValue()
 	}
 	return out
 }
 
-// resolveEnvProject returns the ESC project name that should be persisted on
-// the wire, defaulting to ESC's `default` project when the user omits it.
-func (e *StackConfigEnvironment) resolveEnvProject() string {
-	if e.Project != "" {
-		return e.Project
-	}
-	return defaultProject
-}
-
-// envRefForCreate computes the wire-format env reference to send to the server
-// at Create time. In auto mode, the server names the env `<projectName>/<stackName>`.
-func (e *StackConfigEnvironment) envRefForCreate(stack pulumiapi.StackIdentifier) string {
-	var project, name string
-	if e.Auto {
-		project = stack.ProjectName
-		name = stack.StackName
-	} else {
-		project = e.resolveEnvProject()
-		name = e.Environment
-	}
-	return pulumiapi.FormatEnvRef(project, name, e.Version)
+// envRefForCreate computes the wire-format env reference for the inline POST
+// that creates both the stack and its managed env. The server names the env
+// `<projectName>/<stackName>`.
+func envRefForCreate(stack pulumiapi.StackIdentifier) string {
+	return pulumiapi.FormatEnvRef(stack.ProjectName, stack.StackName, "")
 }
 
 func (s *PulumiServiceStackResource) ToPulumiServiceStackTagInput(
@@ -165,59 +116,6 @@ func (s *PulumiServiceStackResource) Name() string {
 	return "pulumiservice:index:Stack"
 }
 
-// configEnvDiffKind classifies how a change to configEnvironment should be
-// applied: replace (any auto-mode transition) or update (every explicit-env
-// change — toggle on/off, version-pin change, or env-identity swap). The
-// bool reports whether a change occurred so callers can suppress no-ops.
-//
-// Auto mode requires replace on every transition because (a) the server only
-// proves Stack ownership of a managed env when it creates the env inline as
-// part of POST /stacks, and (b) Delete uses Auto to decide preserveEnvironment.
-// Toggling Auto in place would either silently adopt a pre-existing env we
-// don't own (unsafe to clean up later with preserveEnvironment=false), or fail
-// because the env doesn't exist yet.
-//
-// Explicit-env identity swaps stay in-place: the server rejects re-linking on
-// a single PUT /config, but DELETE+PUT against the stack's config row leaves
-// the parent stack untouched, so Update handles it without a replace.
-func configEnvDiffKind(oldEnv, newEnv *StackConfigEnvironment) (kind plugin.DiffKind, changed bool) {
-	oldAuto := oldEnv.IsSet() && oldEnv.Auto
-	newAuto := newEnv.IsSet() && newEnv.Auto
-	if oldAuto != newAuto {
-		return plugin.DiffUpdateReplace, true
-	}
-
-	oldSet := oldEnv.IsSet()
-	newSet := newEnv.IsSet()
-	switch {
-	case !oldSet && !newSet:
-		return 0, false
-	case !oldSet || !newSet:
-		// Toggling explicit-env SBC on or off — link or unlink an env we don't
-		// own — is a non-destructive PUT/DELETE on /config.
-		return plugin.DiffUpdate, true
-	}
-
-	// Both sides set with matching auto flag. Auto-auto can't reach this branch
-	// with a real diff (project/env are empty in auto mode); only explicit-env
-	// vs explicit-env lands here.
-	if !sameEnvIdentity(oldEnv, newEnv) {
-		return plugin.DiffUpdate, true
-	}
-	if oldEnv.Version != newEnv.Version {
-		return plugin.DiffUpdate, true
-	}
-	return 0, false
-}
-
-// sameEnvIdentity reports whether two explicit-env references point at the
-// same ESC env (ignoring version). Used by both Diff and Update to decide
-// whether a config change can be applied as a single PUT or needs DELETE+PUT.
-func sameEnvIdentity(oldEnv, newEnv *StackConfigEnvironment) bool {
-	return oldEnv.resolveEnvProject() == newEnv.resolveEnvProject() &&
-		oldEnv.Environment == newEnv.Environment
-}
-
 func (s *PulumiServiceStackResource) Diff(req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
 	olds, err := plugin.UnmarshalProperties(
 		req.GetOldInputs(),
@@ -239,9 +137,8 @@ func (s *PulumiServiceStackResource) Diff(req *pulumirpc.DiffRequest) (*pulumirp
 		}, nil
 	}
 
-	// configEnvironment has subtree-aware semantics that the generic detailed
-	// diff can't express, so we strip its raw entries and re-emit a single
-	// configEnvironment-level diff with the right kind.
+	// Strip configEnvironment's raw entries and re-emit a single
+	// configEnvironment-level diff. Every other input forces replacement.
 	dd := plugin.NewDetailedDiffFromObjectDiff(diffs, false)
 	detailedDiffs := map[string]*pulumirpc.PropertyDiff{}
 	deleteBeforeReplace := false
@@ -250,11 +147,9 @@ func (s *PulumiServiceStackResource) Diff(req *pulumirpc.DiffRequest) (*pulumirp
 		if k == "configEnvironment" || strings.HasPrefix(k, cfgPrefix) {
 			continue
 		}
-		// Existing behavior: every other input (org/project/stack/forceDestroy)
-		// forces a replacement.
 		v.Kind = v.Kind.AsReplace()
 		detailedDiffs[k] = &pulumirpc.PropertyDiff{
-			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind), //nolint:gosec // safe conversion from plugin.DiffKind
+			Kind:      pulumirpc.PropertyDiff_Kind(v.Kind), //nolint:gosec
 			InputDiff: v.InputDiff,
 		}
 		deleteBeforeReplace = true
@@ -262,28 +157,17 @@ func (s *PulumiServiceStackResource) Diff(req *pulumirpc.DiffRequest) (*pulumirp
 
 	oldEnv := parseStackConfigEnvironment(olds["configEnvironment"])
 	newEnv := parseStackConfigEnvironment(news["configEnvironment"])
-	switch {
-	case hasComputedIdentityField(news["configEnvironment"]):
-		// Any of `project`, `environment`, `auto` arrived as an Output and won't
-		// resolve until apply. parseStackConfigEnvironment can't see the value,
-		// so a non-conservative classification here would let the user approve
-		// a plan that says "in-place update" while the apply actually requires
-		// a destructive replace (e.g. the env name resolves to a different
-		// env, or auto resolves to a flipped mode). Surface the worst case at
-		// preview so the plan reflects what apply may need to do.
+	// Any managed transition (on or off, or unknown at preview) is a replace:
+	// the server only proves stack ownership of a managed env when it creates
+	// the env inline as part of POST /stacks, and Delete uses Managed to
+	// decide preserveEnvironment. Toggling in place would either silently
+	// adopt a pre-existing env we don't own or fail because the env doesn't
+	// exist yet.
+	if hasComputedManaged(news["configEnvironment"]) || oldEnv.IsSet() != newEnv.IsSet() {
 		detailedDiffs["configEnvironment"] = &pulumirpc.PropertyDiff{
 			Kind: pulumirpc.PropertyDiff_Kind(plugin.DiffUpdateReplace), //nolint:gosec
 		}
 		deleteBeforeReplace = true
-	default:
-		if kind, changed := configEnvDiffKind(oldEnv, newEnv); changed {
-			detailedDiffs["configEnvironment"] = &pulumirpc.PropertyDiff{
-				Kind: pulumirpc.PropertyDiff_Kind(kind), //nolint:gosec // safe conversion from plugin.DiffKind
-			}
-			if kind == plugin.DiffAddReplace || kind == plugin.DiffDeleteReplace || kind == plugin.DiffUpdateReplace {
-				deleteBeforeReplace = true
-			}
-		}
 	}
 
 	if len(detailedDiffs) == 0 {
@@ -312,10 +196,9 @@ func (s *PulumiServiceStackResource) Delete(req *pulumirpc.DeleteRequest) (*pbem
 	if err != nil {
 		return nil, err
 	}
-	// preserveEnvironment defaults to true (PSP doesn't own the env's
-	// lifecycle), and flips to false only when this stack created the env in
-	// `auto` mode — we then want the server to clean it up alongside us.
-	preserveEnvironment := !stack.ConfigEnvironment.IsSet() || !stack.ConfigEnvironment.Auto
+	// Tell the server to clean up the env alongside the stack only when this
+	// stack owns it (managed mode).
+	preserveEnvironment := !stack.ConfigEnvironment.IsSet()
 	err = s.Client.DeleteStack(ctx, stack.StackIdentifier, stack.ForceDestroy, preserveEnvironment)
 	if err != nil {
 		return nil, err
@@ -339,47 +222,14 @@ func (s *PulumiServiceStackResource) Create(req *pulumirpc.CreateRequest) (*pulu
 	}
 
 	var createConfig *pulumiapi.StackConfig
-	if stack.ConfigEnvironment.IsSet() && stack.ConfigEnvironment.Auto {
-		// Auto mode: the server creates the env (and optionally pre-populates
-		// template YAML) inline as part of stack creation, so we send the env
-		// ref in the same POST.
+	if stack.ConfigEnvironment.IsSet() {
 		createConfig = &pulumiapi.StackConfig{
-			Environment: stack.ConfigEnvironment.envRefForCreate(stack.StackIdentifier),
+			Environment: envRefForCreate(stack.StackIdentifier),
 		}
 	}
 
 	if err := s.Client.CreateStack(ctx, stack.StackIdentifier, createConfig); err != nil {
 		return nil, err
-	}
-
-	if stack.ConfigEnvironment.IsSet() && !stack.ConfigEnvironment.Auto {
-		// Reference-existing-env mode: link via PUT /config after the stack
-		// exists. Done as a separate call because the inline POST flow tries
-		// to *create* the env and would 409 against an env we don't own.
-		//
-		// Two-call create is non-atomic, so on link failure we best-effort
-		// roll back the just-created stack with preserveEnvironment=true (we
-		// never own the env in this mode). Without rollback a retry would
-		// fail with already-exists, leaving an unmanaged stack behind.
-		envRef := stack.ConfigEnvironment.envRefForCreate(stack.StackIdentifier)
-		linkErr := s.Client.SetStackConfig(ctx, stack.StackIdentifier, pulumiapi.StackConfig{
-			Environment: envRef,
-		})
-		if linkErr != nil {
-			rollbackErr := s.Client.DeleteStack(ctx, stack.StackIdentifier, false /*forceDestroy*/, true /*preserveEnvironment*/)
-			if rollbackErr != nil {
-				return nil, fmt.Errorf(
-					"failed to link stack %s to ESC environment %q: %w; "+
-						"rollback (delete stack) also failed: %v. Manual cleanup may be required "+
-						"in Pulumi Cloud before retrying",
-					stack.StackIdentifier, envRef, linkErr, rollbackErr,
-				)
-			}
-			return nil, fmt.Errorf(
-				"failed to link stack %s to ESC environment %q (rolled back): %w",
-				stack.StackIdentifier, envRef, linkErr,
-			)
-		}
 	}
 
 	outputProperties, err := plugin.MarshalProperties(
@@ -401,104 +251,12 @@ func (s *PulumiServiceStackResource) Create(req *pulumirpc.CreateRequest) (*pulu
 }
 
 func (s *PulumiServiceStackResource) Check(req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	news, err := plugin.UnmarshalProperties(
-		req.GetNews(),
-		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	// Validate configEnvironment shape, but only on concrete inputs. At preview
-	// time fields can arrive as computed Output<T>; firing on those would
-	// reject any program that wires `environment: env.name` or similar. We
-	// flag known-bad shapes and otherwise defer until apply, when computed
-	// values resolve.
-	var failures []*pulumirpc.CheckFailure
-	if v, ok := news["configEnvironment"]; ok && v.HasValue() && v.IsObject() {
-		obj := v.ObjectValue()
-
-		// known-true / known-false / unknown — collapse computed and missing
-		// values into "unknown" so validation defers in either case.
-		type tri int
-		const (
-			triUnknown tri = iota
-			triFalse
-			triTrue
-		)
-		// Missing keys default to false/empty (not unknown). Only an explicit
-		// computed value defers the check — that's the case where the user
-		// wired the field to another resource's Output<T>.
-		boolField := func(key resource.PropertyKey) tri {
-			x, ok := obj[key]
-			if !ok || !x.HasValue() {
-				return triFalse
-			}
-			if x.IsComputed() {
-				return triUnknown
-			}
-			if x.IsBool() && x.BoolValue() {
-				return triTrue
-			}
-			return triFalse
-		}
-		stringSet := func(key resource.PropertyKey) tri {
-			x, ok := obj[key]
-			if !ok || !x.HasValue() {
-				return triFalse
-			}
-			if x.IsComputed() {
-				return triUnknown
-			}
-			if x.IsString() && x.StringValue() != "" {
-				return triTrue
-			}
-			return triFalse
-		}
-
-		auto := boolField("auto")
-		env := stringSet("environment")
-		project := stringSet("project")
-		version := stringSet("version")
-
-		// Mutex check: only fire when we know both sides positively.
-		if auto == triTrue && (env == triTrue || project == triTrue) {
-			failures = append(failures, &pulumirpc.CheckFailure{
-				Property: "configEnvironment",
-				Reason: "configEnvironment.auto cannot be combined with configEnvironment.environment " +
-					"or configEnvironment.project; choose either auto-managed env or an existing env reference",
-			})
-		}
-		if auto == triTrue && version == triTrue {
-			failures = append(failures, &pulumirpc.CheckFailure{
-				Property: "configEnvironment",
-				Reason: "configEnvironment.version cannot be combined with configEnvironment.auto; " +
-					"pin a version only when linking an existing environment",
-			})
-		}
-		// Required check: only fire when we know auto is false AND we know
-		// environment is empty/missing. If either is unknown, defer.
-		if auto == triFalse && env == triFalse {
-			failures = append(failures, &pulumirpc.CheckFailure{
-				Property: "configEnvironment",
-				Reason: "configEnvironment requires either configEnvironment.auto=true (Stack-managed env) " +
-					"or configEnvironment.environment (existing env name)",
-			})
-		}
-	}
-
-	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: failures}, nil
+	return &pulumirpc.CheckResponse{Inputs: req.News}, nil
 }
 
 func (s *PulumiServiceStackResource) Update(req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	ctx := context.Background()
-	olds, err := plugin.UnmarshalProperties(
-		req.GetOlds(),
-		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
-	)
-	if err != nil {
-		return nil, err
-	}
+	// Every stack input is replace-on-change, so Update is never asked to
+	// reconcile anything. Re-emit the new inputs as outputs.
 	news, err := plugin.UnmarshalProperties(
 		req.GetNews(),
 		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
@@ -506,72 +264,10 @@ func (s *PulumiServiceStackResource) Update(req *pulumirpc.UpdateRequest) (*pulu
 	if err != nil {
 		return nil, err
 	}
-
 	stack, err := s.ToPulumiServiceStackTagInput(news)
 	if err != nil {
 		return nil, err
 	}
-	oldStack, err := s.ToPulumiServiceStackTagInput(olds)
-	if err != nil {
-		return nil, err
-	}
-
-	// Update only handles configEnvironment changes that don't force a
-	// replacement; Diff is responsible for funneling everything else through
-	// Replace, so any other observed delta here is a programmer error.
-	if stack.OrgName != oldStack.OrgName ||
-		stack.ProjectName != oldStack.ProjectName ||
-		stack.StackName != oldStack.StackName ||
-		stack.ForceDestroy != oldStack.ForceDestroy {
-		return nil, fmt.Errorf("unexpected stack identity change in update; expected replace")
-	}
-
-	oldEnv := oldStack.ConfigEnvironment
-	newEnv := stack.ConfigEnvironment
-	// Diff funnels every change involving Auto through Replace, so seeing it
-	// here means the diff classification drifted from the create/delete logic.
-	// Refusing the update is safer than silently adopting an env we don't own.
-	if (oldEnv.IsSet() && oldEnv.Auto) != (newEnv.IsSet() && newEnv.Auto) {
-		return nil, fmt.Errorf("unexpected configEnvironment.auto toggle in update; expected replace")
-	}
-	// Check rejects auto+version on the way in, but state migrations and
-	// imports can bypass Check. The server's stack-create API rejects versioned
-	// auto refs and SetStackConfig would either fail noisily or silently pin a
-	// version on an env Pulumi expects to be unversioned-current — neither is
-	// a state we want to reach.
-	if newEnv.IsSet() && newEnv.Auto && newEnv.Version != "" {
-		return nil, fmt.Errorf(
-			"configEnvironment.version is not allowed with configEnvironment.auto=true; " +
-				"remove the version pin or switch to an explicit env reference")
-	}
-	switch {
-	case oldEnv.IsSet() && !newEnv.IsSet():
-		if err := s.Client.DeleteStackConfig(ctx, stack.StackIdentifier); err != nil {
-			return nil, err
-		}
-	case oldEnv.IsSet() && newEnv.IsSet() && !sameEnvIdentity(oldEnv, newEnv):
-		// Server rejects re-linking to a different env on a single PUT, so
-		// clear the existing link first and then PUT the new one. Non-atomic:
-		// if the second call fails the stack is left config-less until the
-		// next pulumi up retries both steps.
-		if err := s.Client.DeleteStackConfig(ctx, stack.StackIdentifier); err != nil {
-			return nil, err
-		}
-		if err := s.Client.SetStackConfig(ctx, stack.StackIdentifier, pulumiapi.StackConfig{
-			Environment: newEnv.envRefForCreate(stack.StackIdentifier),
-		}); err != nil {
-			return nil, err
-		}
-	case newEnv.IsSet():
-		// Toggling an explicit-env link on (old=nil, new=env), or a same-env
-		// version-pin change. The server PUT accepts both.
-		if err := s.Client.SetStackConfig(ctx, stack.StackIdentifier, pulumiapi.StackConfig{
-			Environment: newEnv.envRefForCreate(stack.StackIdentifier),
-		}); err != nil {
-			return nil, err
-		}
-	}
-
 	outputProperties, err := plugin.MarshalProperties(
 		stack.ToPropertyMap(),
 		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true, KeepSecrets: true},
@@ -600,11 +296,8 @@ func (s *PulumiServiceStackResource) Read(req *pulumirpc.ReadRequest) (*pulumirp
 		StackIdentifier: stack,
 	}
 
-	// Surface old inputs so we can preserve user intent that the server
-	// doesn't store: specifically `auto` vs. an explicit env reference.
-	var oldInputs resource.PropertyMap
 	if req.GetInputs() != nil {
-		oldInputs, err = plugin.UnmarshalProperties(
+		oldInputs, err := plugin.UnmarshalProperties(
 			req.GetInputs(),
 			plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
 		)
@@ -621,10 +314,13 @@ func (s *PulumiServiceStackResource) Read(req *pulumirpc.ReadRequest) (*pulumirp
 		return nil, fmt.Errorf("failure while getting stack config %q: %w", req.Id, err)
 	}
 	if cfg != nil && cfg.Environment != "" {
-		envProj, envName, envVer := pulumiapi.ParseEnvRef(cfg.Environment)
-		props.ConfigEnvironment = stackConfigEnvironmentFromServer(
-			envProj, envName, envVer, stack, parseStackConfigEnvironment(oldInputs["configEnvironment"]),
-		)
+		envProj, envName, _ := pulumiapi.ParseEnvRef(cfg.Environment)
+		// Only managed envs are first-class in the schema; an env linked to
+		// this stack whose name doesn't match the managed form was created
+		// outside Pulumi (or under a prior schema) and isn't representable.
+		if envProj == stack.ProjectName && envName == stack.StackName {
+			props.ConfigEnvironment = &StackConfigEnvironment{Managed: true}
+		}
 	}
 
 	pm := props.ToPropertyMap()
@@ -638,21 +334,4 @@ func (s *PulumiServiceStackResource) Read(req *pulumirpc.ReadRequest) (*pulumirp
 		Properties: outputs,
 		Inputs:     outputs,
 	}, nil
-}
-
-// stackConfigEnvironmentFromServer reconstructs the input shape from the
-// server's env ref. When the prior input declared `auto: true` and the server
-// still reports the auto-form name (`<project>/<stack>`), we keep the input as
-// `auto: true`; otherwise we fall back to the explicit project/environment
-// form so refresh/import paths produce a stable shape.
-func stackConfigEnvironmentFromServer(
-	envProj, envName, envVer string,
-	stack pulumiapi.StackIdentifier,
-	prior *StackConfigEnvironment,
-) *StackConfigEnvironment {
-	autoForm := envProj == stack.ProjectName && envName == stack.StackName
-	if prior.IsSet() && prior.Auto && autoForm {
-		return &StackConfigEnvironment{Auto: true, Version: envVer}
-	}
-	return &StackConfigEnvironment{Project: envProj, Environment: envName, Version: envVer}
 }

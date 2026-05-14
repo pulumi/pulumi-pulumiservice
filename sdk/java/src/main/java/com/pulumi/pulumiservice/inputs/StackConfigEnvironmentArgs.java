@@ -6,14 +6,13 @@ package com.pulumi.pulumiservice.inputs;
 import com.pulumi.core.Output;
 import com.pulumi.core.annotations.Import;
 import java.lang.Boolean;
-import java.lang.String;
 import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
 
 
 /**
- * Service-Backed Configuration: links a Stack to an ESC environment that holds its config and secrets. Set exactly one of `auto` (Stack-managed) or `project`+`environment` (reference an existing env).
+ * (Preview) Service-Backed Configuration: links a Stack to an ESC environment that holds its config and secrets.
  * 
  */
 public final class StackConfigEnvironmentArgs extends com.pulumi.resources.ResourceArgs {
@@ -21,72 +20,24 @@ public final class StackConfigEnvironmentArgs extends com.pulumi.resources.Resou
     public static final StackConfigEnvironmentArgs Empty = new StackConfigEnvironmentArgs();
 
     /**
-     * When `true`, the Stack manages a dedicated ESC environment (named `&lt;projectName&gt;/&lt;stackName&gt;`) that is created and destroyed alongside the stack. Mutually exclusive with `project`+`environment`.
+     * (Preview) When `true`, the Stack manages a dedicated ESC environment (named `&lt;projectName&gt;/&lt;stackName&gt;`) that is created and destroyed alongside the stack.
      * 
      */
-    @Import(name="auto")
-    private @Nullable Output<Boolean> auto;
+    @Import(name="managed")
+    private @Nullable Output<Boolean> managed;
 
     /**
-     * @return When `true`, the Stack manages a dedicated ESC environment (named `&lt;projectName&gt;/&lt;stackName&gt;`) that is created and destroyed alongside the stack. Mutually exclusive with `project`+`environment`.
+     * @return (Preview) When `true`, the Stack manages a dedicated ESC environment (named `&lt;projectName&gt;/&lt;stackName&gt;`) that is created and destroyed alongside the stack.
      * 
      */
-    public Optional<Output<Boolean>> auto() {
-        return Optional.ofNullable(this.auto);
-    }
-
-    /**
-     * The name of the ESC environment to link. Mutually exclusive with `auto`. Used together with `project` to reference an existing environment.
-     * 
-     */
-    @Import(name="environment")
-    private @Nullable Output<String> environment;
-
-    /**
-     * @return The name of the ESC environment to link. Mutually exclusive with `auto`. Used together with `project` to reference an existing environment.
-     * 
-     */
-    public Optional<Output<String>> environment() {
-        return Optional.ofNullable(this.environment);
-    }
-
-    /**
-     * The project of the ESC environment to link. Mutually exclusive with `auto`. Used together with `environment` to reference an existing environment. Defaults to the ESC `default` project when omitted.
-     * 
-     */
-    @Import(name="project")
-    private @Nullable Output<String> project;
-
-    /**
-     * @return The project of the ESC environment to link. Mutually exclusive with `auto`. Used together with `environment` to reference an existing environment. Defaults to the ESC `default` project when omitted.
-     * 
-     */
-    public Optional<Output<String>> project() {
-        return Optional.ofNullable(this.project);
-    }
-
-    /**
-     * Optional. Pin an existing environment link to a specific revision. Accepts a numeric revision (e.g. `&#34;3&#34;`) or a revision tag (e.g. `&#34;prod&#34;`). Not valid with `auto`.
-     * 
-     */
-    @Import(name="version")
-    private @Nullable Output<String> version;
-
-    /**
-     * @return Optional. Pin an existing environment link to a specific revision. Accepts a numeric revision (e.g. `&#34;3&#34;`) or a revision tag (e.g. `&#34;prod&#34;`). Not valid with `auto`.
-     * 
-     */
-    public Optional<Output<String>> version() {
-        return Optional.ofNullable(this.version);
+    public Optional<Output<Boolean>> managed() {
+        return Optional.ofNullable(this.managed);
     }
 
     private StackConfigEnvironmentArgs() {}
 
     private StackConfigEnvironmentArgs(StackConfigEnvironmentArgs $) {
-        this.auto = $.auto;
-        this.environment = $.environment;
-        this.project = $.project;
-        this.version = $.version;
+        this.managed = $.managed;
     }
 
     public static Builder builder() {
@@ -108,87 +59,24 @@ public final class StackConfigEnvironmentArgs extends com.pulumi.resources.Resou
         }
 
         /**
-         * @param auto When `true`, the Stack manages a dedicated ESC environment (named `&lt;projectName&gt;/&lt;stackName&gt;`) that is created and destroyed alongside the stack. Mutually exclusive with `project`+`environment`.
+         * @param managed (Preview) When `true`, the Stack manages a dedicated ESC environment (named `&lt;projectName&gt;/&lt;stackName&gt;`) that is created and destroyed alongside the stack.
          * 
          * @return builder
          * 
          */
-        public Builder auto(@Nullable Output<Boolean> auto) {
-            $.auto = auto;
+        public Builder managed(@Nullable Output<Boolean> managed) {
+            $.managed = managed;
             return this;
         }
 
         /**
-         * @param auto When `true`, the Stack manages a dedicated ESC environment (named `&lt;projectName&gt;/&lt;stackName&gt;`) that is created and destroyed alongside the stack. Mutually exclusive with `project`+`environment`.
+         * @param managed (Preview) When `true`, the Stack manages a dedicated ESC environment (named `&lt;projectName&gt;/&lt;stackName&gt;`) that is created and destroyed alongside the stack.
          * 
          * @return builder
          * 
          */
-        public Builder auto(Boolean auto) {
-            return auto(Output.of(auto));
-        }
-
-        /**
-         * @param environment The name of the ESC environment to link. Mutually exclusive with `auto`. Used together with `project` to reference an existing environment.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder environment(@Nullable Output<String> environment) {
-            $.environment = environment;
-            return this;
-        }
-
-        /**
-         * @param environment The name of the ESC environment to link. Mutually exclusive with `auto`. Used together with `project` to reference an existing environment.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder environment(String environment) {
-            return environment(Output.of(environment));
-        }
-
-        /**
-         * @param project The project of the ESC environment to link. Mutually exclusive with `auto`. Used together with `environment` to reference an existing environment. Defaults to the ESC `default` project when omitted.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder project(@Nullable Output<String> project) {
-            $.project = project;
-            return this;
-        }
-
-        /**
-         * @param project The project of the ESC environment to link. Mutually exclusive with `auto`. Used together with `environment` to reference an existing environment. Defaults to the ESC `default` project when omitted.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder project(String project) {
-            return project(Output.of(project));
-        }
-
-        /**
-         * @param version Optional. Pin an existing environment link to a specific revision. Accepts a numeric revision (e.g. `&#34;3&#34;`) or a revision tag (e.g. `&#34;prod&#34;`). Not valid with `auto`.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder version(@Nullable Output<String> version) {
-            $.version = version;
-            return this;
-        }
-
-        /**
-         * @param version Optional. Pin an existing environment link to a specific revision. Accepts a numeric revision (e.g. `&#34;3&#34;`) or a revision tag (e.g. `&#34;prod&#34;`). Not valid with `auto`.
-         * 
-         * @return builder
-         * 
-         */
-        public Builder version(String version) {
-            return version(Output.of(version));
+        public Builder managed(Boolean managed) {
+            return managed(Output.of(managed));
         }
 
         public StackConfigEnvironmentArgs build() {

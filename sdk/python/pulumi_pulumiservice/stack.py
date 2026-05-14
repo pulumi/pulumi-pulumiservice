@@ -32,7 +32,7 @@ class StackArgs:
         :param pulumi.Input[_builtins.str] organization_name: The name of the organization.
         :param pulumi.Input[_builtins.str] project_name: The name of the project.
         :param pulumi.Input[_builtins.str] stack_name: The name of the stack.
-        :param pulumi.Input['StackConfigEnvironmentArgs'] config_environment: Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set either `project`+`environment` to reference an existing environment, or `auto: true` to have the stack manage a dedicated environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack.
+        :param pulumi.Input['StackConfigEnvironmentArgs'] config_environment: (Preview) Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set `managed: true` to have the stack manage a dedicated environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack.
         :param pulumi.Input[_builtins.bool] force_destroy: Optional. Flag indicating whether to delete the stack even if it still contains resources.
         """
         pulumi.set(__self__, "organization_name", organization_name)
@@ -83,7 +83,7 @@ class StackArgs:
     @pulumi.getter(name="configEnvironment")
     def config_environment(self) -> pulumi.Input[Optional['StackConfigEnvironmentArgs']]:
         """
-        Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set either `project`+`environment` to reference an existing environment, or `auto: true` to have the stack manage a dedicated environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack.
+        (Preview) Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set `managed: true` to have the stack manage a dedicated environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack.
         """
         return pulumi.get(self, "config_environment")
 
@@ -122,7 +122,7 @@ class Stack(pulumi.CustomResource):
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
-        :param pulumi.Input[Union['StackConfigEnvironmentArgs', 'StackConfigEnvironmentArgsDict']] config_environment: Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set either `project`+`environment` to reference an existing environment, or `auto: true` to have the stack manage a dedicated environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack.
+        :param pulumi.Input[Union['StackConfigEnvironmentArgs', 'StackConfigEnvironmentArgsDict']] config_environment: (Preview) Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set `managed: true` to have the stack manage a dedicated environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack.
         :param pulumi.Input[_builtins.bool] force_destroy: Optional. Flag indicating whether to delete the stack even if it still contains resources.
         :param pulumi.Input[_builtins.str] organization_name: The name of the organization.
         :param pulumi.Input[_builtins.str] project_name: The name of the project.
@@ -211,7 +211,7 @@ class Stack(pulumi.CustomResource):
     @pulumi.getter(name="configEnvironment")
     def config_environment(self) -> pulumi.Output[Optional['outputs.StackConfigEnvironment']]:
         """
-        Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set either `project`+`environment` to reference an existing environment, or `auto: true` to have the stack manage a dedicated environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack.
+        (Preview) Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set `managed: true` to have the stack manage a dedicated environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack.
         """
         return pulumi.get(self, "config_environment")
 

@@ -38,7 +38,7 @@ export class Stack extends pulumi.CustomResource {
     }
 
     /**
-     * Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set either `project`+`environment` to reference an existing environment, or `auto: true` to have the stack manage a dedicated environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack.
+     * (Preview) Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set `managed: true` to have the stack manage a dedicated environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack.
      */
     declare public readonly configEnvironment: pulumi.Output<outputs.StackConfigEnvironment | undefined>;
     /**
@@ -100,7 +100,7 @@ export class Stack extends pulumi.CustomResource {
  */
 export interface StackArgs {
     /**
-     * Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set either `project`+`environment` to reference an existing environment, or `auto: true` to have the stack manage a dedicated environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack.
+     * (Preview) Optional. Service-Backed Configuration: link this stack to an ESC environment that holds its config and secrets. Set `managed: true` to have the stack manage a dedicated environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack.
      */
     configEnvironment?: pulumi.Input<inputs.StackConfigEnvironmentArgs | undefined>;
     /**

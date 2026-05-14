@@ -3856,16 +3856,10 @@ func (o RoleScopeInfoArrayOutput) Index(i pulumi.IntInput) RoleScopeInfoOutput {
 	}).(RoleScopeInfoOutput)
 }
 
-// Service-Backed Configuration: links a Stack to an ESC environment that holds its config and secrets. Set exactly one of `auto` (Stack-managed) or `project`+`environment` (reference an existing env).
+// (Preview) Service-Backed Configuration: links a Stack to an ESC environment that holds its config and secrets.
 type StackConfigEnvironment struct {
-	// When `true`, the Stack manages a dedicated ESC environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack. Mutually exclusive with `project`+`environment`.
-	Auto *bool `pulumi:"auto"`
-	// The name of the ESC environment to link. Mutually exclusive with `auto`. Used together with `project` to reference an existing environment.
-	Environment *string `pulumi:"environment"`
-	// The project of the ESC environment to link. Mutually exclusive with `auto`. Used together with `environment` to reference an existing environment. Defaults to the ESC `default` project when omitted.
-	Project *string `pulumi:"project"`
-	// Optional. Pin an existing environment link to a specific revision. Accepts a numeric revision (e.g. `"3"`) or a revision tag (e.g. `"prod"`). Not valid with `auto`.
-	Version *string `pulumi:"version"`
+	// (Preview) When `true`, the Stack manages a dedicated ESC environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack.
+	Managed *bool `pulumi:"managed"`
 }
 
 // StackConfigEnvironmentInput is an input type that accepts StackConfigEnvironmentArgs and StackConfigEnvironmentOutput values.
@@ -3879,16 +3873,10 @@ type StackConfigEnvironmentInput interface {
 	ToStackConfigEnvironmentOutputWithContext(context.Context) StackConfigEnvironmentOutput
 }
 
-// Service-Backed Configuration: links a Stack to an ESC environment that holds its config and secrets. Set exactly one of `auto` (Stack-managed) or `project`+`environment` (reference an existing env).
+// (Preview) Service-Backed Configuration: links a Stack to an ESC environment that holds its config and secrets.
 type StackConfigEnvironmentArgs struct {
-	// When `true`, the Stack manages a dedicated ESC environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack. Mutually exclusive with `project`+`environment`.
-	Auto pulumi.BoolPtrInput `pulumi:"auto"`
-	// The name of the ESC environment to link. Mutually exclusive with `auto`. Used together with `project` to reference an existing environment.
-	Environment pulumi.StringPtrInput `pulumi:"environment"`
-	// The project of the ESC environment to link. Mutually exclusive with `auto`. Used together with `environment` to reference an existing environment. Defaults to the ESC `default` project when omitted.
-	Project pulumi.StringPtrInput `pulumi:"project"`
-	// Optional. Pin an existing environment link to a specific revision. Accepts a numeric revision (e.g. `"3"`) or a revision tag (e.g. `"prod"`). Not valid with `auto`.
-	Version pulumi.StringPtrInput `pulumi:"version"`
+	// (Preview) When `true`, the Stack manages a dedicated ESC environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack.
+	Managed pulumi.BoolPtrInput `pulumi:"managed"`
 }
 
 func (StackConfigEnvironmentArgs) ElementType() reflect.Type {
@@ -3944,7 +3932,7 @@ func (i *stackConfigEnvironmentPtrType) ToStackConfigEnvironmentPtrOutputWithCon
 	return pulumi.ToOutputWithContext(ctx, i).(StackConfigEnvironmentPtrOutput)
 }
 
-// Service-Backed Configuration: links a Stack to an ESC environment that holds its config and secrets. Set exactly one of `auto` (Stack-managed) or `project`+`environment` (reference an existing env).
+// (Preview) Service-Backed Configuration: links a Stack to an ESC environment that holds its config and secrets.
 type StackConfigEnvironmentOutput struct{ *pulumi.OutputState }
 
 func (StackConfigEnvironmentOutput) ElementType() reflect.Type {
@@ -3969,24 +3957,9 @@ func (o StackConfigEnvironmentOutput) ToStackConfigEnvironmentPtrOutputWithConte
 	}).(StackConfigEnvironmentPtrOutput)
 }
 
-// When `true`, the Stack manages a dedicated ESC environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack. Mutually exclusive with `project`+`environment`.
-func (o StackConfigEnvironmentOutput) Auto() pulumi.BoolPtrOutput {
-	return o.ApplyT(func(v StackConfigEnvironment) *bool { return v.Auto }).(pulumi.BoolPtrOutput)
-}
-
-// The name of the ESC environment to link. Mutually exclusive with `auto`. Used together with `project` to reference an existing environment.
-func (o StackConfigEnvironmentOutput) Environment() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v StackConfigEnvironment) *string { return v.Environment }).(pulumi.StringPtrOutput)
-}
-
-// The project of the ESC environment to link. Mutually exclusive with `auto`. Used together with `environment` to reference an existing environment. Defaults to the ESC `default` project when omitted.
-func (o StackConfigEnvironmentOutput) Project() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v StackConfigEnvironment) *string { return v.Project }).(pulumi.StringPtrOutput)
-}
-
-// Optional. Pin an existing environment link to a specific revision. Accepts a numeric revision (e.g. `"3"`) or a revision tag (e.g. `"prod"`). Not valid with `auto`.
-func (o StackConfigEnvironmentOutput) Version() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v StackConfigEnvironment) *string { return v.Version }).(pulumi.StringPtrOutput)
+// (Preview) When `true`, the Stack manages a dedicated ESC environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack.
+func (o StackConfigEnvironmentOutput) Managed() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v StackConfigEnvironment) *bool { return v.Managed }).(pulumi.BoolPtrOutput)
 }
 
 type StackConfigEnvironmentPtrOutput struct{ *pulumi.OutputState }
@@ -4013,44 +3986,14 @@ func (o StackConfigEnvironmentPtrOutput) Elem() StackConfigEnvironmentOutput {
 	}).(StackConfigEnvironmentOutput)
 }
 
-// When `true`, the Stack manages a dedicated ESC environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack. Mutually exclusive with `project`+`environment`.
-func (o StackConfigEnvironmentPtrOutput) Auto() pulumi.BoolPtrOutput {
+// (Preview) When `true`, the Stack manages a dedicated ESC environment (named `<projectName>/<stackName>`) that is created and destroyed alongside the stack.
+func (o StackConfigEnvironmentPtrOutput) Managed() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v *StackConfigEnvironment) *bool {
 		if v == nil {
 			return nil
 		}
-		return v.Auto
+		return v.Managed
 	}).(pulumi.BoolPtrOutput)
-}
-
-// The name of the ESC environment to link. Mutually exclusive with `auto`. Used together with `project` to reference an existing environment.
-func (o StackConfigEnvironmentPtrOutput) Environment() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *StackConfigEnvironment) *string {
-		if v == nil {
-			return nil
-		}
-		return v.Environment
-	}).(pulumi.StringPtrOutput)
-}
-
-// The project of the ESC environment to link. Mutually exclusive with `auto`. Used together with `environment` to reference an existing environment. Defaults to the ESC `default` project when omitted.
-func (o StackConfigEnvironmentPtrOutput) Project() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *StackConfigEnvironment) *string {
-		if v == nil {
-			return nil
-		}
-		return v.Project
-	}).(pulumi.StringPtrOutput)
-}
-
-// Optional. Pin an existing environment link to a specific revision. Accepts a numeric revision (e.g. `"3"`) or a revision tag (e.g. `"prod"`). Not valid with `auto`.
-func (o StackConfigEnvironmentPtrOutput) Version() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *StackConfigEnvironment) *string {
-		if v == nil {
-			return nil
-		}
-		return v.Version
-	}).(pulumi.StringPtrOutput)
 }
 
 type TemplateSourceDestination struct {
