@@ -517,12 +517,9 @@ func TestYamlStackExample(t *testing.T) {
 }
 
 // TestYamlStackSbcExample exercises Stack.configEnvironment in managed mode.
-// Skipped by default because Service-Backed Configuration is gated behind the
-// `39623-service-backed-config` LaunchDarkly flag and not yet enabled for the
-// shared test org. Enable manually once the flag is on.
+// Requires the `39623-service-backed-config` LaunchDarkly flag, which is on
+// for all orgs in the testing and staging environments where CI runs.
 func TestYamlStackSbcExample(t *testing.T) {
-	t.Skip("requires the Service-Backed Configuration feature flag to be enabled on the test org")
-
 	cwd := getCwd(t)
 	digits := generateRandomFiveDigits()
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
