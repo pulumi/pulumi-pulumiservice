@@ -25,9 +25,9 @@ class OidcIssuerArgs:
                  name: pulumi.Input[_builtins.str],
                  organization: pulumi.Input[_builtins.str],
                  url: pulumi.Input[_builtins.str],
-                 max_expiration_seconds: Optional[pulumi.Input[_builtins.int]] = None,
-                 policies: Optional[pulumi.Input[Sequence[pulumi.Input['AuthPolicyDefinitionArgs']]]] = None,
-                 thumbprints: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None):
+                 max_expiration_seconds: pulumi.Input[Optional[_builtins.int]] = None,
+                 policies: pulumi.Input[Optional[Sequence[pulumi.Input['AuthPolicyDefinitionArgs']]]] = None,
+                 thumbprints: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None):
         """
         The set of arguments for constructing a OidcIssuer resource.
 
@@ -86,38 +86,38 @@ class OidcIssuerArgs:
 
     @_builtins.property
     @pulumi.getter(name="maxExpirationSeconds")
-    def max_expiration_seconds(self) -> Optional[pulumi.Input[_builtins.int]]:
+    def max_expiration_seconds(self) -> pulumi.Input[Optional[_builtins.int]]:
         """
         The maximum duration of the Pulumi access token working after an exchange, specified in seconds.
         """
         return pulumi.get(self, "max_expiration_seconds")
 
     @max_expiration_seconds.setter
-    def max_expiration_seconds(self, value: Optional[pulumi.Input[_builtins.int]]):
+    def max_expiration_seconds(self, value: pulumi.Input[Optional[_builtins.int]]):
         pulumi.set(self, "max_expiration_seconds", value)
 
     @_builtins.property
     @pulumi.getter
-    def policies(self) -> Optional[pulumi.Input[Sequence[pulumi.Input['AuthPolicyDefinitionArgs']]]]:
+    def policies(self) -> pulumi.Input[Optional[Sequence[pulumi.Input['AuthPolicyDefinitionArgs']]]]:
         """
         The auth policies for this Oidc Issuer.
         """
         return pulumi.get(self, "policies")
 
     @policies.setter
-    def policies(self, value: Optional[pulumi.Input[Sequence[pulumi.Input['AuthPolicyDefinitionArgs']]]]):
+    def policies(self, value: pulumi.Input[Optional[Sequence[pulumi.Input['AuthPolicyDefinitionArgs']]]]):
         pulumi.set(self, "policies", value)
 
     @_builtins.property
     @pulumi.getter
-    def thumbprints(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]:
+    def thumbprints(self) -> pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]:
         """
         The thumbprints of issuer's TLS certificates. By default, Pulumi will store the thumbprint of the certificate used to serve the OpenID configuration. If the provider uses multiple certificates to serve content, it is required to manually configure these.
         """
         return pulumi.get(self, "thumbprints")
 
     @thumbprints.setter
-    def thumbprints(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]):
+    def thumbprints(self, value: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]):
         pulumi.set(self, "thumbprints", value)
 
 
@@ -127,12 +127,12 @@ class OidcIssuer(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 max_expiration_seconds: Optional[pulumi.Input[_builtins.int]] = None,
-                 name: Optional[pulumi.Input[_builtins.str]] = None,
-                 organization: Optional[pulumi.Input[_builtins.str]] = None,
-                 policies: Optional[pulumi.Input[Sequence[pulumi.Input[Union['AuthPolicyDefinitionArgs', 'AuthPolicyDefinitionArgsDict']]]]] = None,
-                 thumbprints: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
-                 url: Optional[pulumi.Input[_builtins.str]] = None,
+                 max_expiration_seconds: pulumi.Input[Optional[_builtins.int]] = None,
+                 name: pulumi.Input[Optional[_builtins.str]] = None,
+                 organization: pulumi.Input[Optional[_builtins.str]] = None,
+                 policies: pulumi.Input[Optional[Sequence[pulumi.Input[Union['AuthPolicyDefinitionArgs', 'AuthPolicyDefinitionArgsDict']]]]] = None,
+                 thumbprints: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 url: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
         Register an OIDC Provider to establish a trust relationship between third-party systems like GitHub Actions and Pulumi Cloud, obviating the need to store a hard-coded Pulumi Cloud token in systems that need to run Pulumi commands or consume Pulumi Cloud APIs. Instead of a hard-coded, static token that must be manually rotated, trusted systems are granted temporary Pulumi Cloud tokens on an as-needed basis, which is more secure than static tokens.
@@ -172,12 +172,12 @@ class OidcIssuer(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 max_expiration_seconds: Optional[pulumi.Input[_builtins.int]] = None,
-                 name: Optional[pulumi.Input[_builtins.str]] = None,
-                 organization: Optional[pulumi.Input[_builtins.str]] = None,
-                 policies: Optional[pulumi.Input[Sequence[pulumi.Input[Union['AuthPolicyDefinitionArgs', 'AuthPolicyDefinitionArgsDict']]]]] = None,
-                 thumbprints: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
-                 url: Optional[pulumi.Input[_builtins.str]] = None,
+                 max_expiration_seconds: pulumi.Input[Optional[_builtins.int]] = None,
+                 name: pulumi.Input[Optional[_builtins.str]] = None,
+                 organization: pulumi.Input[Optional[_builtins.str]] = None,
+                 policies: pulumi.Input[Optional[Sequence[pulumi.Input[Union['AuthPolicyDefinitionArgs', 'AuthPolicyDefinitionArgsDict']]]]] = None,
+                 thumbprints: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 url: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

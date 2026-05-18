@@ -132,23 +132,23 @@ export interface SettingsArgs {
     /**
      * The identifier of the agent pool to use for deployments.
      */
-    agentPoolID?: pulumi.Input<string>;
+    agentPoolID?: pulumi.Input<string | undefined>;
     /**
      * Cache options for the deployment.
      */
-    cacheOptions?: any;
+    cacheOptions?: any | undefined;
     /**
      * The executor context defining the execution environment.
      */
-    executorContext?: any;
+    executorContext?: any | undefined;
     /**
      * GitHub-specific deployment settings
      */
-    gitHub?: any;
+    gitHub?: any | undefined;
     /**
      * The operation context defining pre-run and post-run commands and environment variables.
      */
-    operationContext?: any;
+    operationContext?: any | undefined;
     /**
      * The organization name
      */
@@ -160,7 +160,7 @@ export interface SettingsArgs {
     /**
      * The source context defining where the source code is located.
      */
-    sourceContext?: any;
+    sourceContext?: any | undefined;
     /**
      * The stack name
      */
@@ -168,9 +168,9 @@ export interface SettingsArgs {
     /**
      * A tag to identify the deployment settings configuration.
      */
-    tag?: pulumi.Input<string>;
+    tag?: pulumi.Input<string | undefined>;
     /**
      * VCS provider settings
      */
-    vcs?: any;
+    vcs?: any | undefined;
 }

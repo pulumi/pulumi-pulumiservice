@@ -142,15 +142,15 @@ export interface GitLabIntegrationArgs {
     /**
      * Whether detailed property-level diffs are disabled for PR comments.
      */
-    disableDetailedDiff?: pulumi.Input<boolean>;
+    disableDetailedDiff?: pulumi.Input<boolean | undefined>;
     /**
      * Whether Neo AI summaries are disabled for this integration.
      */
-    disableNeoSummaries?: pulumi.Input<boolean>;
+    disableNeoSummaries?: pulumi.Input<boolean | undefined>;
     /**
      * Whether PR comments are disabled for this integration.
      */
-    disablePRComments?: pulumi.Input<boolean>;
+    disablePRComments?: pulumi.Input<boolean | undefined>;
     /**
      * The GitLab integration identifier
      */

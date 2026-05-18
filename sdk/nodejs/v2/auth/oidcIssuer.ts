@@ -130,15 +130,15 @@ export interface OidcIssuerArgs {
     /**
      * The OIDC issuer identifier
      */
-    issuerId?: pulumi.Input<string>;
+    issuerId?: pulumi.Input<string | undefined>;
     /**
      * The JSON Web Key Set for the OIDC issuer.
      */
-    jwks?: any;
+    jwks?: any | undefined;
     /**
      * The maximum token expiration time in seconds.
      */
-    maxExpiration?: pulumi.Input<number>;
+    maxExpiration?: pulumi.Input<number | undefined>;
     /**
      * The display name of the OIDC issuer.
      */
@@ -150,7 +150,7 @@ export interface OidcIssuerArgs {
     /**
      * SHA-1 certificate thumbprints used to verify the OIDC issuer's TLS certificate.
      */
-    thumbprints?: pulumi.Input<pulumi.Input<string>[]>;
+    thumbprints?: pulumi.Input<pulumi.Input<string>[] | undefined>;
     /**
      * The URL of the OIDC issuer.
      */

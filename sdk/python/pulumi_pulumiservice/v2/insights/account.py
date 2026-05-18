@@ -23,10 +23,10 @@ class AccountArgs:
                  environment: pulumi.Input[_builtins.str],
                  org_name: pulumi.Input[_builtins.str],
                  provider: pulumi.Input[_builtins.str],
-                 agent_pool_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 cron: Optional[pulumi.Input[_builtins.str]] = None,
-                 provider_config: Optional[pulumi.Input[Mapping[str, Any]]] = None,
-                 scan_schedule: Optional[pulumi.Input[_builtins.str]] = None):
+                 agent_pool_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 cron: pulumi.Input[Optional[_builtins.str]] = None,
+                 provider_config: pulumi.Input[Optional[Mapping[str, Any]]] = None,
+                 scan_schedule: pulumi.Input[Optional[_builtins.str]] = None):
         """
         The set of arguments for constructing a Account resource.
 
@@ -105,7 +105,7 @@ class AccountArgs:
 
     @_builtins.property
     @pulumi.getter(name="agentPoolID")
-    def agent_pool_id(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def agent_pool_id(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The ID of the agent pool to run account discovery workflows.
         If not specified, discovery will use the default agent pool.
@@ -113,43 +113,43 @@ class AccountArgs:
         return pulumi.get(self, "agent_pool_id")
 
     @agent_pool_id.setter
-    def agent_pool_id(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def agent_pool_id(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "agent_pool_id", value)
 
     @_builtins.property
     @pulumi.getter
-    def cron(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def cron(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         Deprecated: Use scanSchedule instead. Cron expression for scheduling scans.
         """
         return pulumi.get(self, "cron")
 
     @cron.setter
-    def cron(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def cron(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "cron", value)
 
     @_builtins.property
     @pulumi.getter(name="providerConfig")
-    def provider_config(self) -> Optional[pulumi.Input[Mapping[str, Any]]]:
+    def provider_config(self) -> pulumi.Input[Optional[Mapping[str, Any]]]:
         """
         Provider-specific configuration for the account.
         """
         return pulumi.get(self, "provider_config")
 
     @provider_config.setter
-    def provider_config(self, value: Optional[pulumi.Input[Mapping[str, Any]]]):
+    def provider_config(self, value: pulumi.Input[Optional[Mapping[str, Any]]]):
         pulumi.set(self, "provider_config", value)
 
     @_builtins.property
     @pulumi.getter(name="scanSchedule")
-    def scan_schedule(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def scan_schedule(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         Schedule for automated discovery scans (e.g., 'none', 'daily').
         """
         return pulumi.get(self, "scan_schedule")
 
     @scan_schedule.setter
-    def scan_schedule(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def scan_schedule(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "scan_schedule", value)
 
 
@@ -159,14 +159,14 @@ class Account(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 account_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 agent_pool_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 cron: Optional[pulumi.Input[_builtins.str]] = None,
-                 environment: Optional[pulumi.Input[_builtins.str]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 provider: Optional[pulumi.Input[_builtins.str]] = None,
-                 provider_config: Optional[pulumi.Input[Mapping[str, Any]]] = None,
-                 scan_schedule: Optional[pulumi.Input[_builtins.str]] = None,
+                 account_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 agent_pool_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 cron: pulumi.Input[Optional[_builtins.str]] = None,
+                 environment: pulumi.Input[Optional[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 provider: pulumi.Input[Optional[_builtins.str]] = None,
+                 provider_config: pulumi.Input[Optional[Mapping[str, Any]]] = None,
+                 scan_schedule: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
         Creates a new Insights account. An Insights account represents a cloud provider account (e.g., AWS, Azure, OCI) configured for resource discovery.
@@ -210,14 +210,14 @@ class Account(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 account_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 agent_pool_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 cron: Optional[pulumi.Input[_builtins.str]] = None,
-                 environment: Optional[pulumi.Input[_builtins.str]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 provider: Optional[pulumi.Input[_builtins.str]] = None,
-                 provider_config: Optional[pulumi.Input[Mapping[str, Any]]] = None,
-                 scan_schedule: Optional[pulumi.Input[_builtins.str]] = None,
+                 account_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 agent_pool_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 cron: pulumi.Input[Optional[_builtins.str]] = None,
+                 environment: pulumi.Input[Optional[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 provider: pulumi.Input[Optional[_builtins.str]] = None,
+                 provider_config: pulumi.Input[Optional[Mapping[str, Any]]] = None,
+                 scan_schedule: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

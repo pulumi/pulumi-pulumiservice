@@ -136,13 +136,13 @@ class Service(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 description: Optional[pulumi.Input[_builtins.str]] = None,
-                 items: Optional[pulumi.Input[Sequence[Any]]] = None,
-                 name: Optional[pulumi.Input[_builtins.str]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 owner_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 owner_type: Optional[pulumi.Input[_builtins.str]] = None,
-                 properties: Optional[pulumi.Input[Sequence[Any]]] = None,
+                 description: pulumi.Input[Optional[_builtins.str]] = None,
+                 items: pulumi.Input[Optional[Sequence[Any]]] = None,
+                 name: pulumi.Input[Optional[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 owner_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 owner_type: pulumi.Input[Optional[_builtins.str]] = None,
+                 properties: pulumi.Input[Optional[Sequence[Any]]] = None,
                  __props__=None):
         """
         Creates a new service account in an organization. Service accounts provide programmatic, non-human identities for accessing Pulumi Cloud resources. They are scoped to an organization and can hold access tokens, belong to teams, and have stack permissions. The service name must be unique within the organization.
@@ -183,13 +183,13 @@ class Service(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 description: Optional[pulumi.Input[_builtins.str]] = None,
-                 items: Optional[pulumi.Input[Sequence[Any]]] = None,
-                 name: Optional[pulumi.Input[_builtins.str]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 owner_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 owner_type: Optional[pulumi.Input[_builtins.str]] = None,
-                 properties: Optional[pulumi.Input[Sequence[Any]]] = None,
+                 description: pulumi.Input[Optional[_builtins.str]] = None,
+                 items: pulumi.Input[Optional[Sequence[Any]]] = None,
+                 name: pulumi.Input[Optional[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 owner_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 owner_type: pulumi.Input[Optional[_builtins.str]] = None,
+                 properties: pulumi.Input[Optional[Sequence[Any]]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

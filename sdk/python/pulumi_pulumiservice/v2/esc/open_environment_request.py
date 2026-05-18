@@ -24,7 +24,7 @@ class OpenEnvironmentRequestArgs:
                  grant_expiration_seconds: pulumi.Input[_builtins.int],
                  org_name: pulumi.Input[_builtins.str],
                  project_name: pulumi.Input[_builtins.str],
-                 change_request_id: Optional[pulumi.Input[_builtins.str]] = None):
+                 change_request_id: pulumi.Input[Optional[_builtins.str]] = None):
         """
         The set of arguments for constructing a OpenEnvironmentRequest resource.
 
@@ -105,14 +105,14 @@ class OpenEnvironmentRequestArgs:
 
     @_builtins.property
     @pulumi.getter(name="changeRequestId")
-    def change_request_id(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def change_request_id(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The change request ID
         """
         return pulumi.get(self, "change_request_id")
 
     @change_request_id.setter
-    def change_request_id(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def change_request_id(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "change_request_id", value)
 
 
@@ -122,12 +122,12 @@ class OpenEnvironmentRequest(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 access_duration_seconds: Optional[pulumi.Input[_builtins.int]] = None,
-                 change_request_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 env_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 grant_expiration_seconds: Optional[pulumi.Input[_builtins.int]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 project_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 access_duration_seconds: pulumi.Input[Optional[_builtins.int]] = None,
+                 change_request_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 env_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 grant_expiration_seconds: pulumi.Input[Optional[_builtins.int]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 project_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
         Creates an open request for a Pulumi ESC environment that has gated opens enabled. When an environment has open gates configured, opening the environment requires an approval workflow. This endpoint initiates that process by creating an open request, and also creates corresponding open requests for each imported environment that has open gates. Requires the Approvals feature to be enabled for the organization. Returns 400 if the environment does not have gated opens.
@@ -167,12 +167,12 @@ class OpenEnvironmentRequest(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 access_duration_seconds: Optional[pulumi.Input[_builtins.int]] = None,
-                 change_request_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 env_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 grant_expiration_seconds: Optional[pulumi.Input[_builtins.int]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 project_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 access_duration_seconds: pulumi.Input[Optional[_builtins.int]] = None,
+                 change_request_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 env_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 grant_expiration_seconds: pulumi.Input[Optional[_builtins.int]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 project_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

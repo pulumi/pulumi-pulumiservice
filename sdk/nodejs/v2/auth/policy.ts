@@ -112,7 +112,7 @@ export interface PolicyArgs {
     /**
      * The OIDC issuer identifier
      */
-    issuerId?: pulumi.Input<string>;
+    issuerId?: pulumi.Input<string | undefined>;
     /**
      * The organization name
      */

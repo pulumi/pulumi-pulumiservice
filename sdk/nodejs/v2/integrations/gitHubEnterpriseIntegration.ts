@@ -158,19 +158,19 @@ export interface GitHubEnterpriseIntegrationArgs {
     /**
      * Whether to disable code access for AI reviews
      */
-    disableCodeAccessForReviews?: pulumi.Input<boolean>;
+    disableCodeAccessForReviews?: pulumi.Input<boolean | undefined>;
     /**
      * Whether to disable detailed property-level diffs in PR comments
      */
-    disableDetailedDiff?: pulumi.Input<boolean>;
+    disableDetailedDiff?: pulumi.Input<boolean | undefined>;
     /**
      * Whether to disable Neo AI summaries on PRs
      */
-    disableNeoSummaries?: pulumi.Input<boolean>;
+    disableNeoSummaries?: pulumi.Input<boolean | undefined>;
     /**
      * Whether to disable PR comments from the Pulumi GitHub App
      */
-    disablePRComments?: pulumi.Input<boolean>;
+    disablePRComments?: pulumi.Input<boolean | undefined>;
     /**
      * The GitHub Enterprise integration identifier
      */

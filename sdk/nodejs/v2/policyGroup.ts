@@ -118,7 +118,7 @@ export interface PolicyGroupArgs {
     /**
      * Agent pool ID for policy evaluation. Defaults to Pulumi hosted pool if not specified.
      */
-    agentPoolId?: pulumi.Input<string>;
+    agentPoolId?: pulumi.Input<string | undefined>;
     /**
      * The type of entities this policy group applies to (stacks or accounts).
      */
@@ -126,7 +126,7 @@ export interface PolicyGroupArgs {
     /**
      * The enforcement mode for the policy group (audit or preventative). Defaults to 'audit' for account policy groups, 'preventative' for stack policy groups.
      */
-    mode?: pulumi.Input<string>;
+    mode?: pulumi.Input<string | undefined>;
     /**
      * The name of the new policy group.
      */

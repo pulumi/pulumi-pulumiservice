@@ -11,6 +11,7 @@ import com.pulumi.pulumiservice.TeamEnvironmentPermissionArgs;
 import com.pulumi.pulumiservice.Utilities;
 import com.pulumi.pulumiservice.enums.EnvironmentPermission;
 import java.lang.String;
+import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
 
@@ -144,6 +145,14 @@ public class TeamEnvironmentPermission extends com.pulumi.resources.CustomResour
     private static com.pulumi.resources.CustomResourceOptions makeResourceOptions(@Nullable com.pulumi.resources.CustomResourceOptions options, @Nullable Output<java.lang.String> id) {
         var defaultOptions = com.pulumi.resources.CustomResourceOptions.builder()
             .version(Utilities.getVersion())
+            .replaceOnChanges(List.of(
+                "environment",
+                "maxOpenDuration",
+                "organization",
+                "permission",
+                "project",
+                "team"
+            ))
             .build();
         return com.pulumi.resources.CustomResourceOptions.merge(defaultOptions, options, id);
     }

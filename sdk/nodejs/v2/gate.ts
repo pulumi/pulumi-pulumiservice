@@ -110,7 +110,7 @@ export interface GateArgs {
     /**
      * The change gate identifier
      */
-    gateID?: pulumi.Input<string>;
+    gateID?: pulumi.Input<string | undefined>;
     /**
      * Name of the change gate
      */

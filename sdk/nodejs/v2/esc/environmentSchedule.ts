@@ -151,17 +151,17 @@ export interface EnvironmentScheduleArgs {
     /**
      * The schedule cron
      */
-    scheduleCron?: pulumi.Input<string>;
+    scheduleCron?: pulumi.Input<string | undefined>;
     /**
      * The schedule ID
      */
-    scheduleID?: pulumi.Input<string>;
+    scheduleID?: pulumi.Input<string | undefined>;
     /**
      * The schedule once
      */
-    scheduleOnce?: pulumi.Input<string>;
+    scheduleOnce?: pulumi.Input<string | undefined>;
     /**
      * The secret rotation request
      */
-    secretRotationRequest?: any;
+    secretRotationRequest?: any | undefined;
 }

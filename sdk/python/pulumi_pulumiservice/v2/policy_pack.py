@@ -23,14 +23,14 @@ class PolicyPackArgs:
                  name: pulumi.Input[_builtins.str],
                  org_name: pulumi.Input[_builtins.str],
                  policies: pulumi.Input[Sequence[Any]],
-                 description: Optional[pulumi.Input[_builtins.str]] = None,
-                 metadata: Optional[pulumi.Input[Mapping[str, Any]]] = None,
-                 provider: Optional[pulumi.Input[_builtins.str]] = None,
-                 readme: Optional[pulumi.Input[_builtins.str]] = None,
-                 repository: Optional[pulumi.Input[_builtins.str]] = None,
-                 tags: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
-                 version: Optional[pulumi.Input[_builtins.str]] = None,
-                 version_tag: Optional[pulumi.Input[_builtins.str]] = None):
+                 description: pulumi.Input[Optional[_builtins.str]] = None,
+                 metadata: pulumi.Input[Optional[Mapping[str, Any]]] = None,
+                 provider: pulumi.Input[Optional[_builtins.str]] = None,
+                 readme: pulumi.Input[Optional[_builtins.str]] = None,
+                 repository: pulumi.Input[Optional[_builtins.str]] = None,
+                 tags: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 version: pulumi.Input[Optional[_builtins.str]] = None,
+                 version_tag: pulumi.Input[Optional[_builtins.str]] = None):
         """
         The set of arguments for constructing a PolicyPack resource.
 
@@ -128,19 +128,19 @@ class PolicyPackArgs:
 
     @_builtins.property
     @pulumi.getter
-    def description(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def description(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         A brief description of the policy pack.
         """
         return pulumi.get(self, "description")
 
     @description.setter
-    def description(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def description(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "description", value)
 
     @_builtins.property
     @pulumi.getter
-    def metadata(self) -> Optional[pulumi.Input[Mapping[str, Any]]]:
+    def metadata(self) -> pulumi.Input[Optional[Mapping[str, Any]]]:
         """
         Metadata contains optional data about the environment performing the publish operation,
         e.g. the current source code control commit information.
@@ -148,72 +148,72 @@ class PolicyPackArgs:
         return pulumi.get(self, "metadata")
 
     @metadata.setter
-    def metadata(self, value: Optional[pulumi.Input[Mapping[str, Any]]]):
+    def metadata(self, value: pulumi.Input[Optional[Mapping[str, Any]]]):
         pulumi.set(self, "metadata", value)
 
     @_builtins.property
     @pulumi.getter
-    def provider(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def provider(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The cloud provider/platform this policy pack is associated with, e.g. AWS, Azure, etc.
         """
         return pulumi.get(self, "provider")
 
     @provider.setter
-    def provider(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def provider(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "provider", value)
 
     @_builtins.property
     @pulumi.getter
-    def readme(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def readme(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         README text about the policy pack.
         """
         return pulumi.get(self, "readme")
 
     @readme.setter
-    def readme(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def readme(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "readme", value)
 
     @_builtins.property
     @pulumi.getter
-    def repository(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def repository(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         A URL to the repository where the policy pack is defined.
         """
         return pulumi.get(self, "repository")
 
     @repository.setter
-    def repository(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def repository(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "repository", value)
 
     @_builtins.property
     @pulumi.getter
-    def tags(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]:
+    def tags(self) -> pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]:
         """
         Tags for this policy pack.
         """
         return pulumi.get(self, "tags")
 
     @tags.setter
-    def tags(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]):
+    def tags(self, value: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]):
         pulumi.set(self, "tags", value)
 
     @_builtins.property
     @pulumi.getter
-    def version(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def version(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The version number
         """
         return pulumi.get(self, "version")
 
     @version.setter
-    def version(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def version(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "version", value)
 
     @_builtins.property
     @pulumi.getter(name="versionTag")
-    def version_tag(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def version_tag(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         VersionTag is the semantic version of the Policy Pack. One a version is published, it
         cannot never be republished. Older clients will not have a version tag.
@@ -221,7 +221,7 @@ class PolicyPackArgs:
         return pulumi.get(self, "version_tag")
 
     @version_tag.setter
-    def version_tag(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def version_tag(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "version_tag", value)
 
 
@@ -231,18 +231,18 @@ class PolicyPack(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 description: Optional[pulumi.Input[_builtins.str]] = None,
-                 display_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 metadata: Optional[pulumi.Input[Mapping[str, Any]]] = None,
-                 name: Optional[pulumi.Input[_builtins.str]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 policies: Optional[pulumi.Input[Sequence[Any]]] = None,
-                 provider: Optional[pulumi.Input[_builtins.str]] = None,
-                 readme: Optional[pulumi.Input[_builtins.str]] = None,
-                 repository: Optional[pulumi.Input[_builtins.str]] = None,
-                 tags: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
-                 version: Optional[pulumi.Input[_builtins.str]] = None,
-                 version_tag: Optional[pulumi.Input[_builtins.str]] = None,
+                 description: pulumi.Input[Optional[_builtins.str]] = None,
+                 display_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 metadata: pulumi.Input[Optional[Mapping[str, Any]]] = None,
+                 name: pulumi.Input[Optional[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 policies: pulumi.Input[Optional[Sequence[Any]]] = None,
+                 provider: pulumi.Input[Optional[_builtins.str]] = None,
+                 readme: pulumi.Input[Optional[_builtins.str]] = None,
+                 repository: pulumi.Input[Optional[_builtins.str]] = None,
+                 tags: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 version: pulumi.Input[Optional[_builtins.str]] = None,
+                 version_tag: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
         Creates a new Policy Pack for an organization. A Policy Pack is a versioned collection of related policies that validate infrastructure configuration during deployments. Policies can enforce rules such as requiring encryption on storage buckets or prohibiting public access to databases. The pack must contain at least one policy. Once created, the pack can be applied to Policy Groups to enforce rules on specific stacks with configurable enforcement levels (advisory, mandatory, or disabled).
@@ -294,18 +294,18 @@ class PolicyPack(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 description: Optional[pulumi.Input[_builtins.str]] = None,
-                 display_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 metadata: Optional[pulumi.Input[Mapping[str, Any]]] = None,
-                 name: Optional[pulumi.Input[_builtins.str]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 policies: Optional[pulumi.Input[Sequence[Any]]] = None,
-                 provider: Optional[pulumi.Input[_builtins.str]] = None,
-                 readme: Optional[pulumi.Input[_builtins.str]] = None,
-                 repository: Optional[pulumi.Input[_builtins.str]] = None,
-                 tags: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
-                 version: Optional[pulumi.Input[_builtins.str]] = None,
-                 version_tag: Optional[pulumi.Input[_builtins.str]] = None,
+                 description: pulumi.Input[Optional[_builtins.str]] = None,
+                 display_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 metadata: pulumi.Input[Optional[Mapping[str, Any]]] = None,
+                 name: pulumi.Input[Optional[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 policies: pulumi.Input[Optional[Sequence[Any]]] = None,
+                 provider: pulumi.Input[Optional[_builtins.str]] = None,
+                 readme: pulumi.Input[Optional[_builtins.str]] = None,
+                 repository: pulumi.Input[Optional[_builtins.str]] = None,
+                 tags: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 version: pulumi.Input[Optional[_builtins.str]] = None,
+                 version_tag: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

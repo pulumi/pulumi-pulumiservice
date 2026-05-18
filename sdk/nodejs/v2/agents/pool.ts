@@ -120,5 +120,5 @@ export interface PoolArgs {
     /**
      * The agent pool identifier
      */
-    poolId?: pulumi.Input<string>;
+    poolId?: pulumi.Input<string | undefined>;
 }

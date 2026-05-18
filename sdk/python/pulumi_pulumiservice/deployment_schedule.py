@@ -24,8 +24,8 @@ class DeploymentScheduleArgs:
                  project: pulumi.Input[_builtins.str],
                  pulumi_operation: pulumi.Input['PulumiOperation'],
                  stack: pulumi.Input[_builtins.str],
-                 schedule_cron: Optional[pulumi.Input[_builtins.str]] = None,
-                 timestamp: Optional[pulumi.Input[_builtins.str]] = None):
+                 schedule_cron: pulumi.Input[Optional[_builtins.str]] = None,
+                 timestamp: pulumi.Input[Optional[_builtins.str]] = None):
         """
         The set of arguments for constructing a DeploymentSchedule resource.
 
@@ -95,26 +95,26 @@ class DeploymentScheduleArgs:
 
     @_builtins.property
     @pulumi.getter(name="scheduleCron")
-    def schedule_cron(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def schedule_cron(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         Cron expression for recurring scheduled runs. If you are supplying this, do not supply timestamp.
         """
         return pulumi.get(self, "schedule_cron")
 
     @schedule_cron.setter
-    def schedule_cron(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def schedule_cron(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "schedule_cron", value)
 
     @_builtins.property
     @pulumi.getter
-    def timestamp(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def timestamp(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The time at which the schedule should run, in ISO 8601 format. Eg: 2020-01-01T00:00:00Z. If you are supplying this, do not supply scheduleCron.
         """
         return pulumi.get(self, "timestamp")
 
     @timestamp.setter
-    def timestamp(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def timestamp(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "timestamp", value)
 
 
@@ -124,12 +124,12 @@ class DeploymentSchedule(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 organization: Optional[pulumi.Input[_builtins.str]] = None,
-                 project: Optional[pulumi.Input[_builtins.str]] = None,
-                 pulumi_operation: Optional[pulumi.Input['PulumiOperation']] = None,
-                 schedule_cron: Optional[pulumi.Input[_builtins.str]] = None,
-                 stack: Optional[pulumi.Input[_builtins.str]] = None,
-                 timestamp: Optional[pulumi.Input[_builtins.str]] = None,
+                 organization: pulumi.Input[Optional[_builtins.str]] = None,
+                 project: pulumi.Input[Optional[_builtins.str]] = None,
+                 pulumi_operation: pulumi.Input[Optional['PulumiOperation']] = None,
+                 schedule_cron: pulumi.Input[Optional[_builtins.str]] = None,
+                 stack: pulumi.Input[Optional[_builtins.str]] = None,
+                 timestamp: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
         A scheduled recurring or single time run of a pulumi command.
@@ -169,12 +169,12 @@ class DeploymentSchedule(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 organization: Optional[pulumi.Input[_builtins.str]] = None,
-                 project: Optional[pulumi.Input[_builtins.str]] = None,
-                 pulumi_operation: Optional[pulumi.Input['PulumiOperation']] = None,
-                 schedule_cron: Optional[pulumi.Input[_builtins.str]] = None,
-                 stack: Optional[pulumi.Input[_builtins.str]] = None,
-                 timestamp: Optional[pulumi.Input[_builtins.str]] = None,
+                 organization: pulumi.Input[Optional[_builtins.str]] = None,
+                 project: pulumi.Input[Optional[_builtins.str]] = None,
+                 pulumi_operation: pulumi.Input[Optional['PulumiOperation']] = None,
+                 schedule_cron: pulumi.Input[Optional[_builtins.str]] = None,
+                 stack: pulumi.Input[Optional[_builtins.str]] = None,
+                 timestamp: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

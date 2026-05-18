@@ -22,7 +22,7 @@ class PolicyArgs:
                  org_name: pulumi.Input[_builtins.str],
                  policies: pulumi.Input[Sequence[Any]],
                  policy_id: pulumi.Input[_builtins.str],
-                 issuer_id: Optional[pulumi.Input[_builtins.str]] = None):
+                 issuer_id: pulumi.Input[Optional[_builtins.str]] = None):
         """
         The set of arguments for constructing a Policy resource.
 
@@ -75,14 +75,14 @@ class PolicyArgs:
 
     @_builtins.property
     @pulumi.getter(name="issuerId")
-    def issuer_id(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def issuer_id(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The OIDC issuer identifier
         """
         return pulumi.get(self, "issuer_id")
 
     @issuer_id.setter
-    def issuer_id(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def issuer_id(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "issuer_id", value)
 
 
@@ -92,10 +92,10 @@ class Policy(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 issuer_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 policies: Optional[pulumi.Input[Sequence[Any]]] = None,
-                 policy_id: Optional[pulumi.Input[_builtins.str]] = None,
+                 issuer_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 policies: pulumi.Input[Optional[Sequence[Any]]] = None,
+                 policy_id: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
         Updates an authentication policy for an organization. Authentication policies define rules for how OIDC tokens are validated and what access they grant, including claim mappings, trust conditions, and role assignments. The policy definition cannot be empty.
@@ -155,10 +155,10 @@ class Policy(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 issuer_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 policies: Optional[pulumi.Input[Sequence[Any]]] = None,
-                 policy_id: Optional[pulumi.Input[_builtins.str]] = None,
+                 issuer_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 policies: pulumi.Input[Optional[Sequence[Any]]] = None,
+                 policy_id: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

@@ -20,7 +20,7 @@ __all__ = ['SAMLArgs', 'SAML']
 class SAMLArgs:
     def __init__(__self__, *,
                  org_name: pulumi.Input[_builtins.str],
-                 new_idp_sso_descriptor: Optional[pulumi.Input[_builtins.str]] = None):
+                 new_idp_sso_descriptor: pulumi.Input[Optional[_builtins.str]] = None):
         """
         The set of arguments for constructing a SAML resource.
 
@@ -45,14 +45,14 @@ class SAMLArgs:
 
     @_builtins.property
     @pulumi.getter(name="newIdpSsoDescriptor")
-    def new_idp_sso_descriptor(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def new_idp_sso_descriptor(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The new IDP SSO descriptor XML for the SAML configuration.
         """
         return pulumi.get(self, "new_idp_sso_descriptor")
 
     @new_idp_sso_descriptor.setter
-    def new_idp_sso_descriptor(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def new_idp_sso_descriptor(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "new_idp_sso_descriptor", value)
 
 
@@ -62,8 +62,8 @@ class SAML(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 new_idp_sso_descriptor: Optional[pulumi.Input[_builtins.str]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 new_idp_sso_descriptor: pulumi.Input[Optional[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
         Updates the SAML configuration for a SAML-backed organization, including the identity provider SSO descriptor, attribute mappings, and other SAML settings. The new IDP SSO descriptor is required in the update request.
@@ -99,8 +99,8 @@ class SAML(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 new_idp_sso_descriptor: Optional[pulumi.Input[_builtins.str]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 new_idp_sso_descriptor: pulumi.Input[Optional[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

@@ -20,13 +20,13 @@ __all__ = ['RoleArgs', 'Role']
 class RoleArgs:
     def __init__(__self__, *,
                  org_name: pulumi.Input[_builtins.str],
-                 create_policy_and_role: Optional[pulumi.Input[_builtins.bool]] = None,
-                 description: Optional[pulumi.Input[_builtins.str]] = None,
+                 create_policy_and_role: pulumi.Input[Optional[_builtins.bool]] = None,
+                 description: pulumi.Input[Optional[_builtins.str]] = None,
                  details: Optional[Any] = None,
-                 name: Optional[pulumi.Input[_builtins.str]] = None,
-                 resource_type: Optional[pulumi.Input[_builtins.str]] = None,
-                 role_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 ux_purpose: Optional[pulumi.Input[_builtins.str]] = None):
+                 name: pulumi.Input[Optional[_builtins.str]] = None,
+                 resource_type: pulumi.Input[Optional[_builtins.str]] = None,
+                 role_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 ux_purpose: pulumi.Input[Optional[_builtins.str]] = None):
         """
         The set of arguments for constructing a Role resource.
 
@@ -69,26 +69,26 @@ class RoleArgs:
 
     @_builtins.property
     @pulumi.getter(name="createPolicyAndRole")
-    def create_policy_and_role(self) -> Optional[pulumi.Input[_builtins.bool]]:
+    def create_policy_and_role(self) -> pulumi.Input[Optional[_builtins.bool]]:
         """
         Also create an associated policy and role binding alongside the role
         """
         return pulumi.get(self, "create_policy_and_role")
 
     @create_policy_and_role.setter
-    def create_policy_and_role(self, value: Optional[pulumi.Input[_builtins.bool]]):
+    def create_policy_and_role(self, value: pulumi.Input[Optional[_builtins.bool]]):
         pulumi.set(self, "create_policy_and_role", value)
 
     @_builtins.property
     @pulumi.getter
-    def description(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def description(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         A human-readable description of the permission descriptor.
         """
         return pulumi.get(self, "description")
 
     @description.setter
-    def description(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def description(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "description", value)
 
     @_builtins.property
@@ -105,50 +105,50 @@ class RoleArgs:
 
     @_builtins.property
     @pulumi.getter
-    def name(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def name(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The name of the permission descriptor.
         """
         return pulumi.get(self, "name")
 
     @name.setter
-    def name(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def name(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "name", value)
 
     @_builtins.property
     @pulumi.getter(name="resourceType")
-    def resource_type(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def resource_type(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The resource type this permission descriptor applies to.
         """
         return pulumi.get(self, "resource_type")
 
     @resource_type.setter
-    def resource_type(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def resource_type(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "resource_type", value)
 
     @_builtins.property
     @pulumi.getter(name="roleID")
-    def role_id(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def role_id(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The role identifier
         """
         return pulumi.get(self, "role_id")
 
     @role_id.setter
-    def role_id(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def role_id(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "role_id", value)
 
     @_builtins.property
     @pulumi.getter(name="uxPurpose")
-    def ux_purpose(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def ux_purpose(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The UX purpose of this permission descriptor (e.g. role, policy, set).
         """
         return pulumi.get(self, "ux_purpose")
 
     @ux_purpose.setter
-    def ux_purpose(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def ux_purpose(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "ux_purpose", value)
 
 
@@ -158,14 +158,14 @@ class Role(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 create_policy_and_role: Optional[pulumi.Input[_builtins.bool]] = None,
-                 description: Optional[pulumi.Input[_builtins.str]] = None,
+                 create_policy_and_role: pulumi.Input[Optional[_builtins.bool]] = None,
+                 description: pulumi.Input[Optional[_builtins.str]] = None,
                  details: Optional[Any] = None,
-                 name: Optional[pulumi.Input[_builtins.str]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 resource_type: Optional[pulumi.Input[_builtins.str]] = None,
-                 role_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 ux_purpose: Optional[pulumi.Input[_builtins.str]] = None,
+                 name: pulumi.Input[Optional[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 resource_type: pulumi.Input[Optional[_builtins.str]] = None,
+                 role_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 ux_purpose: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
         Creates a new custom role for an organization. Custom roles define fine-grained permission sets that can be assigned to organization members and teams, enabling precise access control beyond the built-in admin and member roles. Optionally, an associated policy and role binding can be created alongside the role.
@@ -207,14 +207,14 @@ class Role(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 create_policy_and_role: Optional[pulumi.Input[_builtins.bool]] = None,
-                 description: Optional[pulumi.Input[_builtins.str]] = None,
+                 create_policy_and_role: pulumi.Input[Optional[_builtins.bool]] = None,
+                 description: pulumi.Input[Optional[_builtins.str]] = None,
                  details: Optional[Any] = None,
-                 name: Optional[pulumi.Input[_builtins.str]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 resource_type: Optional[pulumi.Input[_builtins.str]] = None,
-                 role_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 ux_purpose: Optional[pulumi.Input[_builtins.str]] = None,
+                 name: pulumi.Input[Optional[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 resource_type: pulumi.Input[Optional[_builtins.str]] = None,
+                 role_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 ux_purpose: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

@@ -22,11 +22,11 @@ class ScheduledScanSettingsArgs:
                  account_name: pulumi.Input[_builtins.str],
                  org_name: pulumi.Input[_builtins.str],
                  paused: pulumi.Input[_builtins.bool],
-                 batch_size: Optional[pulumi.Input[_builtins.int]] = None,
-                 list_concurrency: Optional[pulumi.Input[_builtins.int]] = None,
-                 read_concurrency: Optional[pulumi.Input[_builtins.int]] = None,
-                 read_timeout: Optional[pulumi.Input[_builtins.str]] = None,
-                 schedule_cron: Optional[pulumi.Input[_builtins.str]] = None):
+                 batch_size: pulumi.Input[Optional[_builtins.int]] = None,
+                 list_concurrency: pulumi.Input[Optional[_builtins.int]] = None,
+                 read_concurrency: pulumi.Input[Optional[_builtins.int]] = None,
+                 read_timeout: pulumi.Input[Optional[_builtins.str]] = None,
+                 schedule_cron: pulumi.Input[Optional[_builtins.str]] = None):
         """
         The set of arguments for constructing a ScheduledScanSettings resource.
 
@@ -91,62 +91,62 @@ class ScheduledScanSettingsArgs:
 
     @_builtins.property
     @pulumi.getter(name="batchSize")
-    def batch_size(self) -> Optional[pulumi.Input[_builtins.int]]:
+    def batch_size(self) -> pulumi.Input[Optional[_builtins.int]]:
         """
         The batch size for processing resources during the scan.
         """
         return pulumi.get(self, "batch_size")
 
     @batch_size.setter
-    def batch_size(self, value: Optional[pulumi.Input[_builtins.int]]):
+    def batch_size(self, value: pulumi.Input[Optional[_builtins.int]]):
         pulumi.set(self, "batch_size", value)
 
     @_builtins.property
     @pulumi.getter(name="listConcurrency")
-    def list_concurrency(self) -> Optional[pulumi.Input[_builtins.int]]:
+    def list_concurrency(self) -> pulumi.Input[Optional[_builtins.int]]:
         """
         The concurrency level for list operations during the scan.
         """
         return pulumi.get(self, "list_concurrency")
 
     @list_concurrency.setter
-    def list_concurrency(self, value: Optional[pulumi.Input[_builtins.int]]):
+    def list_concurrency(self, value: pulumi.Input[Optional[_builtins.int]]):
         pulumi.set(self, "list_concurrency", value)
 
     @_builtins.property
     @pulumi.getter(name="readConcurrency")
-    def read_concurrency(self) -> Optional[pulumi.Input[_builtins.int]]:
+    def read_concurrency(self) -> pulumi.Input[Optional[_builtins.int]]:
         """
         The concurrency level for read operations during the scan.
         """
         return pulumi.get(self, "read_concurrency")
 
     @read_concurrency.setter
-    def read_concurrency(self, value: Optional[pulumi.Input[_builtins.int]]):
+    def read_concurrency(self, value: pulumi.Input[Optional[_builtins.int]]):
         pulumi.set(self, "read_concurrency", value)
 
     @_builtins.property
     @pulumi.getter(name="readTimeout")
-    def read_timeout(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def read_timeout(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The timeout duration for read operations, as a Go duration string (e.g., '30s', '5m').
         """
         return pulumi.get(self, "read_timeout")
 
     @read_timeout.setter
-    def read_timeout(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def read_timeout(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "read_timeout", value)
 
     @_builtins.property
     @pulumi.getter(name="scheduleCron")
-    def schedule_cron(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def schedule_cron(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The cron expression defining the scan schedule.
         """
         return pulumi.get(self, "schedule_cron")
 
     @schedule_cron.setter
-    def schedule_cron(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def schedule_cron(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "schedule_cron", value)
 
 
@@ -156,14 +156,14 @@ class ScheduledScanSettings(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 account_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 batch_size: Optional[pulumi.Input[_builtins.int]] = None,
-                 list_concurrency: Optional[pulumi.Input[_builtins.int]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 paused: Optional[pulumi.Input[_builtins.bool]] = None,
-                 read_concurrency: Optional[pulumi.Input[_builtins.int]] = None,
-                 read_timeout: Optional[pulumi.Input[_builtins.str]] = None,
-                 schedule_cron: Optional[pulumi.Input[_builtins.str]] = None,
+                 account_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 batch_size: pulumi.Input[Optional[_builtins.int]] = None,
+                 list_concurrency: pulumi.Input[Optional[_builtins.int]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 paused: pulumi.Input[Optional[_builtins.bool]] = None,
+                 read_concurrency: pulumi.Input[Optional[_builtins.int]] = None,
+                 read_timeout: pulumi.Input[Optional[_builtins.str]] = None,
+                 schedule_cron: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
         Updates the scheduled scan configuration for an Insights account, such as scan frequency and schedule.
@@ -205,14 +205,14 @@ class ScheduledScanSettings(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 account_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 batch_size: Optional[pulumi.Input[_builtins.int]] = None,
-                 list_concurrency: Optional[pulumi.Input[_builtins.int]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 paused: Optional[pulumi.Input[_builtins.bool]] = None,
-                 read_concurrency: Optional[pulumi.Input[_builtins.int]] = None,
-                 read_timeout: Optional[pulumi.Input[_builtins.str]] = None,
-                 schedule_cron: Optional[pulumi.Input[_builtins.str]] = None,
+                 account_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 batch_size: pulumi.Input[Optional[_builtins.int]] = None,
+                 list_concurrency: pulumi.Input[Optional[_builtins.int]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 paused: pulumi.Input[Optional[_builtins.bool]] = None,
+                 read_concurrency: pulumi.Input[Optional[_builtins.int]] = None,
+                 read_timeout: pulumi.Input[Optional[_builtins.str]] = None,
+                 schedule_cron: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

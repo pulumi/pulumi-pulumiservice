@@ -87,7 +87,7 @@ export interface PolicyIssueArgs {
     /**
      * The user to assign the policy issue to.
      */
-    assignedTo?: pulumi.Input<string>;
+    assignedTo?: pulumi.Input<string | undefined>;
     /**
      * The issue identifier
      */
@@ -99,9 +99,9 @@ export interface PolicyIssueArgs {
     /**
      * The new priority for the policy issue.
      */
-    priority?: pulumi.Input<string>;
+    priority?: pulumi.Input<string | undefined>;
     /**
      * The new status for the policy issue. Valid values: open, in_progress, by_design, ignored. Note: fixed cannot be set manually.
      */
-    status?: pulumi.Input<string>;
+    status?: pulumi.Input<string | undefined>;
 }

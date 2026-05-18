@@ -56,9 +56,9 @@ export interface ProviderArgs {
     /**
      * Access Token to authenticate with Pulumi Cloud.
      */
-    accessToken?: pulumi.Input<string>;
+    accessToken?: pulumi.Input<string | undefined>;
     /**
      * Optional override of Pulumi Cloud API endpoint.
      */
-    apiUrl?: pulumi.Input<string>;
+    apiUrl?: pulumi.Input<string | undefined>;
 }

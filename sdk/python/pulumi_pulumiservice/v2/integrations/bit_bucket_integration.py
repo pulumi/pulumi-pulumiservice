@@ -21,9 +21,9 @@ class BitBucketIntegrationArgs:
     def __init__(__self__, *,
                  integration_id: pulumi.Input[_builtins.str],
                  org_name: pulumi.Input[_builtins.str],
-                 disable_detailed_diff: Optional[pulumi.Input[_builtins.bool]] = None,
-                 disable_neo_summaries: Optional[pulumi.Input[_builtins.bool]] = None,
-                 disable_pr_comments: Optional[pulumi.Input[_builtins.bool]] = None):
+                 disable_detailed_diff: pulumi.Input[Optional[_builtins.bool]] = None,
+                 disable_neo_summaries: pulumi.Input[Optional[_builtins.bool]] = None,
+                 disable_pr_comments: pulumi.Input[Optional[_builtins.bool]] = None):
         """
         The set of arguments for constructing a BitBucketIntegration resource.
 
@@ -68,38 +68,38 @@ class BitBucketIntegrationArgs:
 
     @_builtins.property
     @pulumi.getter(name="disableDetailedDiff")
-    def disable_detailed_diff(self) -> Optional[pulumi.Input[_builtins.bool]]:
+    def disable_detailed_diff(self) -> pulumi.Input[Optional[_builtins.bool]]:
         """
         If true, disable detailed property-level diffs in PR comments.
         """
         return pulumi.get(self, "disable_detailed_diff")
 
     @disable_detailed_diff.setter
-    def disable_detailed_diff(self, value: Optional[pulumi.Input[_builtins.bool]]):
+    def disable_detailed_diff(self, value: pulumi.Input[Optional[_builtins.bool]]):
         pulumi.set(self, "disable_detailed_diff", value)
 
     @_builtins.property
     @pulumi.getter(name="disableNeoSummaries")
-    def disable_neo_summaries(self) -> Optional[pulumi.Input[_builtins.bool]]:
+    def disable_neo_summaries(self) -> pulumi.Input[Optional[_builtins.bool]]:
         """
         If true, disable Neo AI-generated deployment summaries in PR comments.
         """
         return pulumi.get(self, "disable_neo_summaries")
 
     @disable_neo_summaries.setter
-    def disable_neo_summaries(self, value: Optional[pulumi.Input[_builtins.bool]]):
+    def disable_neo_summaries(self, value: pulumi.Input[Optional[_builtins.bool]]):
         pulumi.set(self, "disable_neo_summaries", value)
 
     @_builtins.property
     @pulumi.getter(name="disablePRComments")
-    def disable_pr_comments(self) -> Optional[pulumi.Input[_builtins.bool]]:
+    def disable_pr_comments(self) -> pulumi.Input[Optional[_builtins.bool]]:
         """
         If true, disable automatic PR comments on deployments.
         """
         return pulumi.get(self, "disable_pr_comments")
 
     @disable_pr_comments.setter
-    def disable_pr_comments(self, value: Optional[pulumi.Input[_builtins.bool]]):
+    def disable_pr_comments(self, value: pulumi.Input[Optional[_builtins.bool]]):
         pulumi.set(self, "disable_pr_comments", value)
 
 
@@ -109,11 +109,11 @@ class BitBucketIntegration(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 disable_detailed_diff: Optional[pulumi.Input[_builtins.bool]] = None,
-                 disable_neo_summaries: Optional[pulumi.Input[_builtins.bool]] = None,
-                 disable_pr_comments: Optional[pulumi.Input[_builtins.bool]] = None,
-                 integration_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 disable_detailed_diff: pulumi.Input[Optional[_builtins.bool]] = None,
+                 disable_neo_summaries: pulumi.Input[Optional[_builtins.bool]] = None,
+                 disable_pr_comments: pulumi.Input[Optional[_builtins.bool]] = None,
+                 integration_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
         Updates an existing BitBucket integration's settings, such as PR comment preferences and AI summary options.
@@ -152,11 +152,11 @@ class BitBucketIntegration(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 disable_detailed_diff: Optional[pulumi.Input[_builtins.bool]] = None,
-                 disable_neo_summaries: Optional[pulumi.Input[_builtins.bool]] = None,
-                 disable_pr_comments: Optional[pulumi.Input[_builtins.bool]] = None,
-                 integration_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 disable_detailed_diff: pulumi.Input[Optional[_builtins.bool]] = None,
+                 disable_neo_summaries: pulumi.Input[Optional[_builtins.bool]] = None,
+                 disable_pr_comments: pulumi.Input[Optional[_builtins.bool]] = None,
+                 integration_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

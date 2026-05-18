@@ -22,9 +22,9 @@ class EnvironmentScheduleArgs:
                  env_name: pulumi.Input[_builtins.str],
                  org_name: pulumi.Input[_builtins.str],
                  project_name: pulumi.Input[_builtins.str],
-                 schedule_cron: Optional[pulumi.Input[_builtins.str]] = None,
-                 schedule_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 schedule_once: Optional[pulumi.Input[_builtins.str]] = None,
+                 schedule_cron: pulumi.Input[Optional[_builtins.str]] = None,
+                 schedule_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 schedule_once: pulumi.Input[Optional[_builtins.str]] = None,
                  secret_rotation_request: Optional[Any] = None):
         """
         The set of arguments for constructing a EnvironmentSchedule resource.
@@ -87,38 +87,38 @@ class EnvironmentScheduleArgs:
 
     @_builtins.property
     @pulumi.getter(name="scheduleCron")
-    def schedule_cron(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def schedule_cron(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The schedule cron
         """
         return pulumi.get(self, "schedule_cron")
 
     @schedule_cron.setter
-    def schedule_cron(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def schedule_cron(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "schedule_cron", value)
 
     @_builtins.property
     @pulumi.getter(name="scheduleID")
-    def schedule_id(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def schedule_id(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The schedule ID
         """
         return pulumi.get(self, "schedule_id")
 
     @schedule_id.setter
-    def schedule_id(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def schedule_id(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "schedule_id", value)
 
     @_builtins.property
     @pulumi.getter(name="scheduleOnce")
-    def schedule_once(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def schedule_once(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The schedule once
         """
         return pulumi.get(self, "schedule_once")
 
     @schedule_once.setter
-    def schedule_once(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def schedule_once(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "schedule_once", value)
 
     @_builtins.property
@@ -140,12 +140,12 @@ class EnvironmentSchedule(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 env_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 project_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 schedule_cron: Optional[pulumi.Input[_builtins.str]] = None,
-                 schedule_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 schedule_once: Optional[pulumi.Input[_builtins.str]] = None,
+                 env_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 project_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 schedule_cron: pulumi.Input[Optional[_builtins.str]] = None,
+                 schedule_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 schedule_once: pulumi.Input[Optional[_builtins.str]] = None,
                  secret_rotation_request: Optional[Any] = None,
                  __props__=None):
         """
@@ -187,12 +187,12 @@ class EnvironmentSchedule(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 env_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 project_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 schedule_cron: Optional[pulumi.Input[_builtins.str]] = None,
-                 schedule_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 schedule_once: Optional[pulumi.Input[_builtins.str]] = None,
+                 env_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 project_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 schedule_cron: pulumi.Input[Optional[_builtins.str]] = None,
+                 schedule_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 schedule_once: pulumi.Input[Optional[_builtins.str]] = None,
                  secret_rotation_request: Optional[Any] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)

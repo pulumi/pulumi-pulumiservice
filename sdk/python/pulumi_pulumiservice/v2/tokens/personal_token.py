@@ -21,7 +21,7 @@ class PersonalTokenArgs:
     def __init__(__self__, *,
                  description: pulumi.Input[_builtins.str],
                  expires: pulumi.Input[_builtins.int],
-                 reason: Optional[pulumi.Input[_builtins.str]] = None):
+                 reason: pulumi.Input[Optional[_builtins.str]] = None):
         """
         The set of arguments for constructing a PersonalToken resource.
 
@@ -60,14 +60,14 @@ class PersonalTokenArgs:
 
     @_builtins.property
     @pulumi.getter
-    def reason(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def reason(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         Tracks the context that triggered token creation (e.g., redirect URL or referral source)
         """
         return pulumi.get(self, "reason")
 
     @reason.setter
-    def reason(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def reason(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "reason", value)
 
 
@@ -77,9 +77,9 @@ class PersonalToken(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 description: Optional[pulumi.Input[_builtins.str]] = None,
-                 expires: Optional[pulumi.Input[_builtins.int]] = None,
-                 reason: Optional[pulumi.Input[_builtins.str]] = None,
+                 description: pulumi.Input[Optional[_builtins.str]] = None,
+                 expires: pulumi.Input[Optional[_builtins.int]] = None,
+                 reason: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
         Creates a new personal access token for the authenticated user. The request body includes a description for the token and an optional expiration time. The response includes the token ID and the tokenValue (prefixed with 'pul-'). The token value is only returned once at creation time and cannot be retrieved later.
@@ -116,9 +116,9 @@ class PersonalToken(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 description: Optional[pulumi.Input[_builtins.str]] = None,
-                 expires: Optional[pulumi.Input[_builtins.int]] = None,
-                 reason: Optional[pulumi.Input[_builtins.str]] = None,
+                 description: pulumi.Input[Optional[_builtins.str]] = None,
+                 expires: pulumi.Input[Optional[_builtins.int]] = None,
+                 reason: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

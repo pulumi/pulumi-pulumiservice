@@ -20,14 +20,14 @@ __all__ = ['TaskArgs', 'Task']
 class TaskArgs:
     def __init__(__self__, *,
                  org_name: pulumi.Input[_builtins.str],
-                 approval_mode: Optional[pulumi.Input[_builtins.str]] = None,
-                 enabled_integrations: Optional[pulumi.Input[Sequence[Any]]] = None,
+                 approval_mode: pulumi.Input[Optional[_builtins.str]] = None,
+                 enabled_integrations: pulumi.Input[Optional[Sequence[Any]]] = None,
                  message: Optional[Any] = None,
-                 permission_mode: Optional[pulumi.Input[_builtins.str]] = None,
-                 plan_mode: Optional[pulumi.Input[_builtins.bool]] = None,
-                 source: Optional[pulumi.Input[_builtins.str]] = None,
-                 task_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 tool_execution_mode: Optional[pulumi.Input[_builtins.str]] = None):
+                 permission_mode: pulumi.Input[Optional[_builtins.str]] = None,
+                 plan_mode: pulumi.Input[Optional[_builtins.bool]] = None,
+                 source: pulumi.Input[Optional[_builtins.str]] = None,
+                 task_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 tool_execution_mode: pulumi.Input[Optional[_builtins.str]] = None):
         """
         The set of arguments for constructing a Task resource.
 
@@ -73,26 +73,26 @@ class TaskArgs:
 
     @_builtins.property
     @pulumi.getter(name="approvalMode")
-    def approval_mode(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def approval_mode(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         Optional approval mode override for this task. If omitted, org default is used.
         """
         return pulumi.get(self, "approval_mode")
 
     @approval_mode.setter
-    def approval_mode(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def approval_mode(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "approval_mode", value)
 
     @_builtins.property
     @pulumi.getter(name="enabledIntegrations")
-    def enabled_integrations(self) -> Optional[pulumi.Input[Sequence[Any]]]:
+    def enabled_integrations(self) -> pulumi.Input[Optional[Sequence[Any]]]:
         """
         Optional list of integrations to enable for this task. Semantics: omitted/null → inherit all org-enabled integrations; empty list → explicit opt-out (no integration credentials for this task); populated list → whitelist of specific integrations by ID. Modeled as an object array rather than a bare string array so multi-instance support (instance_name, scope, etc.) can be added later without a wire break.
         """
         return pulumi.get(self, "enabled_integrations")
 
     @enabled_integrations.setter
-    def enabled_integrations(self, value: Optional[pulumi.Input[Sequence[Any]]]):
+    def enabled_integrations(self, value: pulumi.Input[Optional[Sequence[Any]]]):
         pulumi.set(self, "enabled_integrations", value)
 
     @_builtins.property
@@ -109,62 +109,62 @@ class TaskArgs:
 
     @_builtins.property
     @pulumi.getter(name="permissionMode")
-    def permission_mode(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def permission_mode(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         Controls the permission scope for the task. When omitted, defaults to 'default' (the agent uses the creating user's full permissions).
         """
         return pulumi.get(self, "permission_mode")
 
     @permission_mode.setter
-    def permission_mode(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def permission_mode(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "permission_mode", value)
 
     @_builtins.property
     @pulumi.getter(name="planMode")
-    def plan_mode(self) -> Optional[pulumi.Input[_builtins.bool]]:
+    def plan_mode(self) -> pulumi.Input[Optional[_builtins.bool]]:
         """
         Whether to enable plan mode for this task.
         """
         return pulumi.get(self, "plan_mode")
 
     @plan_mode.setter
-    def plan_mode(self, value: Optional[pulumi.Input[_builtins.bool]]):
+    def plan_mode(self, value: pulumi.Input[Optional[_builtins.bool]]):
         pulumi.set(self, "plan_mode", value)
 
     @_builtins.property
     @pulumi.getter
-    def source(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def source(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The origin that triggered this task. Defaults to 'api' if omitted.
         """
         return pulumi.get(self, "source")
 
     @source.setter
-    def source(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def source(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "source", value)
 
     @_builtins.property
     @pulumi.getter(name="taskID")
-    def task_id(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def task_id(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The agent task identifier
         """
         return pulumi.get(self, "task_id")
 
     @task_id.setter
-    def task_id(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def task_id(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "task_id", value)
 
     @_builtins.property
     @pulumi.getter(name="toolExecutionMode")
-    def tool_execution_mode(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def tool_execution_mode(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         Where tools should be executed. Defaults to 'cloud' if omitted.
         """
         return pulumi.get(self, "tool_execution_mode")
 
     @tool_execution_mode.setter
-    def tool_execution_mode(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def tool_execution_mode(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "tool_execution_mode", value)
 
 
@@ -174,15 +174,15 @@ class Task(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 approval_mode: Optional[pulumi.Input[_builtins.str]] = None,
-                 enabled_integrations: Optional[pulumi.Input[Sequence[Any]]] = None,
+                 approval_mode: pulumi.Input[Optional[_builtins.str]] = None,
+                 enabled_integrations: pulumi.Input[Optional[Sequence[Any]]] = None,
                  message: Optional[Any] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 permission_mode: Optional[pulumi.Input[_builtins.str]] = None,
-                 plan_mode: Optional[pulumi.Input[_builtins.bool]] = None,
-                 source: Optional[pulumi.Input[_builtins.str]] = None,
-                 task_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 tool_execution_mode: Optional[pulumi.Input[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 permission_mode: pulumi.Input[Optional[_builtins.str]] = None,
+                 plan_mode: pulumi.Input[Optional[_builtins.bool]] = None,
+                 source: pulumi.Input[Optional[_builtins.str]] = None,
+                 task_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 tool_execution_mode: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
         Creates a new agent task for the specified organization. The request must include a prompt (the user event message) that initiates the task. Set the 'permissionMode' field in the request body to restrict the agent to read-only operations. Returns the created task details including task ID, name, status, and timestamp.
@@ -225,15 +225,15 @@ class Task(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 approval_mode: Optional[pulumi.Input[_builtins.str]] = None,
-                 enabled_integrations: Optional[pulumi.Input[Sequence[Any]]] = None,
+                 approval_mode: pulumi.Input[Optional[_builtins.str]] = None,
+                 enabled_integrations: pulumi.Input[Optional[Sequence[Any]]] = None,
                  message: Optional[Any] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 permission_mode: Optional[pulumi.Input[_builtins.str]] = None,
-                 plan_mode: Optional[pulumi.Input[_builtins.bool]] = None,
-                 source: Optional[pulumi.Input[_builtins.str]] = None,
-                 task_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 tool_execution_mode: Optional[pulumi.Input[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 permission_mode: pulumi.Input[Optional[_builtins.str]] = None,
+                 plan_mode: pulumi.Input[Optional[_builtins.bool]] = None,
+                 source: pulumi.Input[Optional[_builtins.str]] = None,
+                 task_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 tool_execution_mode: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

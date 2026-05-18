@@ -137,19 +137,19 @@ export interface RoleArgs {
     /**
      * Also create an associated policy and role binding alongside the role
      */
-    createPolicyAndRole?: pulumi.Input<boolean>;
+    createPolicyAndRole?: pulumi.Input<boolean | undefined>;
     /**
      * A human-readable description of the permission descriptor.
      */
-    description?: pulumi.Input<string>;
+    description?: pulumi.Input<string | undefined>;
     /**
      * The detailed permission descriptor tree.
      */
-    details?: any;
+    details?: any | undefined;
     /**
      * The name of the permission descriptor.
      */
-    name?: pulumi.Input<string>;
+    name?: pulumi.Input<string | undefined>;
     /**
      * The organization name
      */
@@ -157,13 +157,13 @@ export interface RoleArgs {
     /**
      * The resource type this permission descriptor applies to.
      */
-    resourceType?: pulumi.Input<string>;
+    resourceType?: pulumi.Input<string | undefined>;
     /**
      * The role identifier
      */
-    roleID?: pulumi.Input<string>;
+    roleID?: pulumi.Input<string | undefined>;
     /**
      * The UX purpose of this permission descriptor (e.g. role, policy, set).
      */
-    uxPurpose?: pulumi.Input<string>;
+    uxPurpose?: pulumi.Input<string | undefined>;
 }

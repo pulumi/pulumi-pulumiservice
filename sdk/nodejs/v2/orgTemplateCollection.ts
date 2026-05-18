@@ -112,11 +112,11 @@ export interface OrgTemplateCollectionArgs {
     /**
      * deprecated - use DestinationURL instead
      */
-    destination?: any;
+    destination?: any | undefined;
     /**
      * The destination URL for the template source.
      */
-    destinationURL?: pulumi.Input<string>;
+    destinationURL?: pulumi.Input<string | undefined>;
     /**
      * The name of the template source.
      */

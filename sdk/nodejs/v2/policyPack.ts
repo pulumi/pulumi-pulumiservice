@@ -115,7 +115,7 @@ export interface PolicyPackArgs {
     /**
      * A brief description of the policy pack.
      */
-    description?: pulumi.Input<string>;
+    description?: pulumi.Input<string | undefined>;
     /**
      * A pretty name for the Policy Pack that is supplied by the package.
      */
@@ -124,7 +124,7 @@ export interface PolicyPackArgs {
      * Metadata contains optional data about the environment performing the publish operation,
      * e.g. the current source code control commit information.
      */
-    metadata?: pulumi.Input<{[key: string]: any}>;
+    metadata?: pulumi.Input<{[key: string]: any} | undefined>;
     /**
      * Name is a unique URL-safe identifier (at the org level) for the package.
      * If the name has already been used by the organization, then the request will
@@ -144,26 +144,26 @@ export interface PolicyPackArgs {
     /**
      * The cloud provider/platform this policy pack is associated with, e.g. AWS, Azure, etc.
      */
-    provider?: pulumi.Input<string>;
+    provider?: pulumi.Input<string | undefined>;
     /**
      * README text about the policy pack.
      */
-    readme?: pulumi.Input<string>;
+    readme?: pulumi.Input<string | undefined>;
     /**
      * A URL to the repository where the policy pack is defined.
      */
-    repository?: pulumi.Input<string>;
+    repository?: pulumi.Input<string | undefined>;
     /**
      * Tags for this policy pack.
      */
-    tags?: pulumi.Input<pulumi.Input<string>[]>;
+    tags?: pulumi.Input<pulumi.Input<string>[] | undefined>;
     /**
      * The version number
      */
-    version?: pulumi.Input<string>;
+    version?: pulumi.Input<string | undefined>;
     /**
      * VersionTag is the semantic version of the Policy Pack. One a version is published, it
      * cannot never be republished. Older clients will not have a version tag.
      */
-    versionTag?: pulumi.Input<string>;
+    versionTag?: pulumi.Input<string | undefined>;
 }

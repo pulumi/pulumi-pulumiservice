@@ -22,7 +22,7 @@ class EnvironmentSettingsArgs:
                  env_name: pulumi.Input[_builtins.str],
                  org_name: pulumi.Input[_builtins.str],
                  project_name: pulumi.Input[_builtins.str],
-                 deletion_protected: Optional[pulumi.Input[_builtins.bool]] = None):
+                 deletion_protected: pulumi.Input[Optional[_builtins.bool]] = None):
         """
         The set of arguments for constructing a EnvironmentSettings resource.
 
@@ -75,14 +75,14 @@ class EnvironmentSettingsArgs:
 
     @_builtins.property
     @pulumi.getter(name="deletionProtected")
-    def deletion_protected(self) -> Optional[pulumi.Input[_builtins.bool]]:
+    def deletion_protected(self) -> pulumi.Input[Optional[_builtins.bool]]:
         """
         DeletionProtected indicates whether deletion protection should be enabled for this environment. Null means no change.
         """
         return pulumi.get(self, "deletion_protected")
 
     @deletion_protected.setter
-    def deletion_protected(self, value: Optional[pulumi.Input[_builtins.bool]]):
+    def deletion_protected(self, value: pulumi.Input[Optional[_builtins.bool]]):
         pulumi.set(self, "deletion_protected", value)
 
 
@@ -92,10 +92,10 @@ class EnvironmentSettings(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 deletion_protected: Optional[pulumi.Input[_builtins.bool]] = None,
-                 env_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 project_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 deletion_protected: pulumi.Input[Optional[_builtins.bool]] = None,
+                 env_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 project_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
         Updates settings for a Pulumi ESC environment using a partial update (patch) approach. Currently supports toggling deletion protection via the deletionProtected field. When deletionProtected is set to true, the environment cannot be deleted until the setting is explicitly disabled. Only the fields included in the request body are modified; omitted fields retain their current values.
@@ -133,10 +133,10 @@ class EnvironmentSettings(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 deletion_protected: Optional[pulumi.Input[_builtins.bool]] = None,
-                 env_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 project_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 deletion_protected: pulumi.Input[Optional[_builtins.bool]] = None,
+                 env_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 project_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

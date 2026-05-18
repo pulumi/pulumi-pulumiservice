@@ -73,7 +73,7 @@ export interface CustomVCSRepositoryArgs {
     /**
      * Human-readable display name for the repository. If not provided, the name is used for display purposes.
      */
-    displayName?: pulumi.Input<string>;
+    displayName?: pulumi.Input<string | undefined>;
     /**
      * The custom VCS integration identifier
      */

@@ -22,7 +22,7 @@ class PoolArgs:
                  description: pulumi.Input[_builtins.str],
                  name: pulumi.Input[_builtins.str],
                  org_name: pulumi.Input[_builtins.str],
-                 pool_id: Optional[pulumi.Input[_builtins.str]] = None):
+                 pool_id: pulumi.Input[Optional[_builtins.str]] = None):
         """
         The set of arguments for constructing a Pool resource.
 
@@ -75,14 +75,14 @@ class PoolArgs:
 
     @_builtins.property
     @pulumi.getter(name="poolId")
-    def pool_id(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def pool_id(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The agent pool identifier
         """
         return pulumi.get(self, "pool_id")
 
     @pool_id.setter
-    def pool_id(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def pool_id(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "pool_id", value)
 
 
@@ -92,10 +92,10 @@ class Pool(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 description: Optional[pulumi.Input[_builtins.str]] = None,
-                 name: Optional[pulumi.Input[_builtins.str]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 pool_id: Optional[pulumi.Input[_builtins.str]] = None,
+                 description: pulumi.Input[Optional[_builtins.str]] = None,
+                 name: pulumi.Input[Optional[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 pool_id: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
         Creates a new agent pool for an organization. Agent pools enable self-hosted deployment agents, allowing organizations to run Pulumi Deployments on their own infrastructure rather than Pulumi-managed infrastructure. This is useful for accessing private networks, meeting compliance requirements, or using custom execution environments. The response includes an access token (agent pool secret) that self-hosted agents use to authenticate when polling for deployment work. This token is only returned once at creation time and cannot be retrieved later.
@@ -133,10 +133,10 @@ class Pool(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 description: Optional[pulumi.Input[_builtins.str]] = None,
-                 name: Optional[pulumi.Input[_builtins.str]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 pool_id: Optional[pulumi.Input[_builtins.str]] = None,
+                 description: pulumi.Input[Optional[_builtins.str]] = None,
+                 name: pulumi.Input[Optional[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 pool_id: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

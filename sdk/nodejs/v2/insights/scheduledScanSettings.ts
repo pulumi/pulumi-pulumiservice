@@ -111,11 +111,11 @@ export interface ScheduledScanSettingsArgs {
     /**
      * The batch size for processing resources during the scan.
      */
-    batchSize?: pulumi.Input<number>;
+    batchSize?: pulumi.Input<number | undefined>;
     /**
      * The concurrency level for list operations during the scan.
      */
-    listConcurrency?: pulumi.Input<number>;
+    listConcurrency?: pulumi.Input<number | undefined>;
     /**
      * The organization name
      */
@@ -127,13 +127,13 @@ export interface ScheduledScanSettingsArgs {
     /**
      * The concurrency level for read operations during the scan.
      */
-    readConcurrency?: pulumi.Input<number>;
+    readConcurrency?: pulumi.Input<number | undefined>;
     /**
      * The timeout duration for read operations, as a Go duration string (e.g., '30s', '5m').
      */
-    readTimeout?: pulumi.Input<string>;
+    readTimeout?: pulumi.Input<string | undefined>;
     /**
      * The cron expression defining the scan schedule.
      */
-    scheduleCron?: pulumi.Input<string>;
+    scheduleCron?: pulumi.Input<string | undefined>;
 }

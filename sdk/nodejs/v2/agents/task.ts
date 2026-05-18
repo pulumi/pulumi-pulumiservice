@@ -181,15 +181,15 @@ export interface TaskArgs {
     /**
      * Optional approval mode override for this task. If omitted, org default is used.
      */
-    approvalMode?: pulumi.Input<string>;
+    approvalMode?: pulumi.Input<string | undefined>;
     /**
      * Optional list of integrations to enable for this task. Semantics: omitted/null → inherit all org-enabled integrations; empty list → explicit opt-out (no integration credentials for this task); populated list → whitelist of specific integrations by ID. Modeled as an object array rather than a bare string array so multi-instance support (instance_name, scope, etc.) can be added later without a wire break.
      */
-    enabledIntegrations?: pulumi.Input<any[]>;
+    enabledIntegrations?: pulumi.Input<any[] | undefined>;
     /**
      * The message content
      */
-    message?: any;
+    message?: any | undefined;
     /**
      * The organization name
      */
@@ -197,21 +197,21 @@ export interface TaskArgs {
     /**
      * Controls the permission scope for the task. When omitted, defaults to 'default' (the agent uses the creating user's full permissions).
      */
-    permissionMode?: pulumi.Input<string>;
+    permissionMode?: pulumi.Input<string | undefined>;
     /**
      * Whether to enable plan mode for this task.
      */
-    planMode?: pulumi.Input<boolean>;
+    planMode?: pulumi.Input<boolean | undefined>;
     /**
      * The origin that triggered this task. Defaults to 'api' if omitted.
      */
-    source?: pulumi.Input<string>;
+    source?: pulumi.Input<string | undefined>;
     /**
      * The agent task identifier
      */
-    taskID?: pulumi.Input<string>;
+    taskID?: pulumi.Input<string | undefined>;
     /**
      * Where tools should be executed. Defaults to 'cloud' if omitted.
      */
-    toolExecutionMode?: pulumi.Input<string>;
+    toolExecutionMode?: pulumi.Input<string | undefined>;
 }

@@ -110,7 +110,7 @@ export interface EnvironmentVersionTagArgs {
     /**
      * Project name.
      */
-    project?: pulumi.Input<string>;
+    project?: pulumi.Input<string | undefined>;
     /**
      * Revision number.
      */

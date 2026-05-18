@@ -24,13 +24,13 @@ class DeploymentSettingsArgs:
                  organization: pulumi.Input[_builtins.str],
                  project: pulumi.Input[_builtins.str],
                  stack: pulumi.Input[_builtins.str],
-                 agent_pool_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 cache_options: Optional[pulumi.Input['DeploymentSettingsCacheOptionsArgs']] = None,
-                 executor_context: Optional[pulumi.Input['DeploymentSettingsExecutorContextArgs']] = None,
-                 github: Optional[pulumi.Input['DeploymentSettingsGithubArgs']] = None,
-                 operation_context: Optional[pulumi.Input['DeploymentSettingsOperationContextArgs']] = None,
-                 source_context: Optional[pulumi.Input['DeploymentSettingsSourceContextArgs']] = None,
-                 vcs: Optional[pulumi.Input['DeploymentSettingsVcsArgs']] = None):
+                 agent_pool_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 cache_options: pulumi.Input[Optional['DeploymentSettingsCacheOptionsArgs']] = None,
+                 executor_context: pulumi.Input[Optional['DeploymentSettingsExecutorContextArgs']] = None,
+                 github: pulumi.Input[Optional['DeploymentSettingsGithubArgs']] = None,
+                 operation_context: pulumi.Input[Optional['DeploymentSettingsOperationContextArgs']] = None,
+                 source_context: pulumi.Input[Optional['DeploymentSettingsSourceContextArgs']] = None,
+                 vcs: pulumi.Input[Optional['DeploymentSettingsVcsArgs']] = None):
         """
         The set of arguments for constructing a DeploymentSettings resource.
 
@@ -104,87 +104,87 @@ class DeploymentSettingsArgs:
 
     @_builtins.property
     @pulumi.getter(name="agentPoolId")
-    def agent_pool_id(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def agent_pool_id(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The agent pool identifier to use for the deployment.
         """
         return pulumi.get(self, "agent_pool_id")
 
     @agent_pool_id.setter
-    def agent_pool_id(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def agent_pool_id(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "agent_pool_id", value)
 
     @_builtins.property
     @pulumi.getter(name="cacheOptions")
-    def cache_options(self) -> Optional[pulumi.Input['DeploymentSettingsCacheOptionsArgs']]:
+    def cache_options(self) -> pulumi.Input[Optional['DeploymentSettingsCacheOptionsArgs']]:
         """
         Dependency cache settings for the deployment
         """
         return pulumi.get(self, "cache_options")
 
     @cache_options.setter
-    def cache_options(self, value: Optional[pulumi.Input['DeploymentSettingsCacheOptionsArgs']]):
+    def cache_options(self, value: pulumi.Input[Optional['DeploymentSettingsCacheOptionsArgs']]):
         pulumi.set(self, "cache_options", value)
 
     @_builtins.property
     @pulumi.getter(name="executorContext")
-    def executor_context(self) -> Optional[pulumi.Input['DeploymentSettingsExecutorContextArgs']]:
+    def executor_context(self) -> pulumi.Input[Optional['DeploymentSettingsExecutorContextArgs']]:
         """
         Settings related to the deployment executor.
         """
         return pulumi.get(self, "executor_context")
 
     @executor_context.setter
-    def executor_context(self, value: Optional[pulumi.Input['DeploymentSettingsExecutorContextArgs']]):
+    def executor_context(self, value: pulumi.Input[Optional['DeploymentSettingsExecutorContextArgs']]):
         pulumi.set(self, "executor_context", value)
 
     @_builtins.property
     @pulumi.getter
     @_utilities.deprecated("""Use the 'vcs' property instead, which supports both GitHub and Azure DevOps.""")
-    def github(self) -> Optional[pulumi.Input['DeploymentSettingsGithubArgs']]:
+    def github(self) -> pulumi.Input[Optional['DeploymentSettingsGithubArgs']]:
         """
         GitHub settings for the deployment.
         """
         return pulumi.get(self, "github")
 
     @github.setter
-    def github(self, value: Optional[pulumi.Input['DeploymentSettingsGithubArgs']]):
+    def github(self, value: pulumi.Input[Optional['DeploymentSettingsGithubArgs']]):
         pulumi.set(self, "github", value)
 
     @_builtins.property
     @pulumi.getter(name="operationContext")
-    def operation_context(self) -> Optional[pulumi.Input['DeploymentSettingsOperationContextArgs']]:
+    def operation_context(self) -> pulumi.Input[Optional['DeploymentSettingsOperationContextArgs']]:
         """
         Settings related to the Pulumi operation environment during the deployment.
         """
         return pulumi.get(self, "operation_context")
 
     @operation_context.setter
-    def operation_context(self, value: Optional[pulumi.Input['DeploymentSettingsOperationContextArgs']]):
+    def operation_context(self, value: pulumi.Input[Optional['DeploymentSettingsOperationContextArgs']]):
         pulumi.set(self, "operation_context", value)
 
     @_builtins.property
     @pulumi.getter(name="sourceContext")
-    def source_context(self) -> Optional[pulumi.Input['DeploymentSettingsSourceContextArgs']]:
+    def source_context(self) -> pulumi.Input[Optional['DeploymentSettingsSourceContextArgs']]:
         """
         Settings related to the source of the deployment.
         """
         return pulumi.get(self, "source_context")
 
     @source_context.setter
-    def source_context(self, value: Optional[pulumi.Input['DeploymentSettingsSourceContextArgs']]):
+    def source_context(self, value: pulumi.Input[Optional['DeploymentSettingsSourceContextArgs']]):
         pulumi.set(self, "source_context", value)
 
     @_builtins.property
     @pulumi.getter
-    def vcs(self) -> Optional[pulumi.Input['DeploymentSettingsVcsArgs']]:
+    def vcs(self) -> pulumi.Input[Optional['DeploymentSettingsVcsArgs']]:
         """
         VCS settings for the deployment. Supports Azure DevOps and GitHub via the 'provider' discriminator field.
         """
         return pulumi.get(self, "vcs")
 
     @vcs.setter
-    def vcs(self, value: Optional[pulumi.Input['DeploymentSettingsVcsArgs']]):
+    def vcs(self, value: pulumi.Input[Optional['DeploymentSettingsVcsArgs']]):
         pulumi.set(self, "vcs", value)
 
 
@@ -194,16 +194,16 @@ class DeploymentSettings(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 agent_pool_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 cache_options: Optional[pulumi.Input[Union['DeploymentSettingsCacheOptionsArgs', 'DeploymentSettingsCacheOptionsArgsDict']]] = None,
-                 executor_context: Optional[pulumi.Input[Union['DeploymentSettingsExecutorContextArgs', 'DeploymentSettingsExecutorContextArgsDict']]] = None,
-                 github: Optional[pulumi.Input[Union['DeploymentSettingsGithubArgs', 'DeploymentSettingsGithubArgsDict']]] = None,
-                 operation_context: Optional[pulumi.Input[Union['DeploymentSettingsOperationContextArgs', 'DeploymentSettingsOperationContextArgsDict']]] = None,
-                 organization: Optional[pulumi.Input[_builtins.str]] = None,
-                 project: Optional[pulumi.Input[_builtins.str]] = None,
-                 source_context: Optional[pulumi.Input[Union['DeploymentSettingsSourceContextArgs', 'DeploymentSettingsSourceContextArgsDict']]] = None,
-                 stack: Optional[pulumi.Input[_builtins.str]] = None,
-                 vcs: Optional[pulumi.Input[Union['DeploymentSettingsVcsArgs', 'DeploymentSettingsVcsArgsDict']]] = None,
+                 agent_pool_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 cache_options: pulumi.Input[Optional[Union['DeploymentSettingsCacheOptionsArgs', 'DeploymentSettingsCacheOptionsArgsDict']]] = None,
+                 executor_context: pulumi.Input[Optional[Union['DeploymentSettingsExecutorContextArgs', 'DeploymentSettingsExecutorContextArgsDict']]] = None,
+                 github: pulumi.Input[Optional[Union['DeploymentSettingsGithubArgs', 'DeploymentSettingsGithubArgsDict']]] = None,
+                 operation_context: pulumi.Input[Optional[Union['DeploymentSettingsOperationContextArgs', 'DeploymentSettingsOperationContextArgsDict']]] = None,
+                 organization: pulumi.Input[Optional[_builtins.str]] = None,
+                 project: pulumi.Input[Optional[_builtins.str]] = None,
+                 source_context: pulumi.Input[Optional[Union['DeploymentSettingsSourceContextArgs', 'DeploymentSettingsSourceContextArgsDict']]] = None,
+                 stack: pulumi.Input[Optional[_builtins.str]] = None,
+                 vcs: pulumi.Input[Optional[Union['DeploymentSettingsVcsArgs', 'DeploymentSettingsVcsArgsDict']]] = None,
                  __props__=None):
         """
         Deployment settings configure Pulumi Deployments for a stack.
@@ -263,16 +263,16 @@ class DeploymentSettings(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 agent_pool_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 cache_options: Optional[pulumi.Input[Union['DeploymentSettingsCacheOptionsArgs', 'DeploymentSettingsCacheOptionsArgsDict']]] = None,
-                 executor_context: Optional[pulumi.Input[Union['DeploymentSettingsExecutorContextArgs', 'DeploymentSettingsExecutorContextArgsDict']]] = None,
-                 github: Optional[pulumi.Input[Union['DeploymentSettingsGithubArgs', 'DeploymentSettingsGithubArgsDict']]] = None,
-                 operation_context: Optional[pulumi.Input[Union['DeploymentSettingsOperationContextArgs', 'DeploymentSettingsOperationContextArgsDict']]] = None,
-                 organization: Optional[pulumi.Input[_builtins.str]] = None,
-                 project: Optional[pulumi.Input[_builtins.str]] = None,
-                 source_context: Optional[pulumi.Input[Union['DeploymentSettingsSourceContextArgs', 'DeploymentSettingsSourceContextArgsDict']]] = None,
-                 stack: Optional[pulumi.Input[_builtins.str]] = None,
-                 vcs: Optional[pulumi.Input[Union['DeploymentSettingsVcsArgs', 'DeploymentSettingsVcsArgsDict']]] = None,
+                 agent_pool_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 cache_options: pulumi.Input[Optional[Union['DeploymentSettingsCacheOptionsArgs', 'DeploymentSettingsCacheOptionsArgsDict']]] = None,
+                 executor_context: pulumi.Input[Optional[Union['DeploymentSettingsExecutorContextArgs', 'DeploymentSettingsExecutorContextArgsDict']]] = None,
+                 github: pulumi.Input[Optional[Union['DeploymentSettingsGithubArgs', 'DeploymentSettingsGithubArgsDict']]] = None,
+                 operation_context: pulumi.Input[Optional[Union['DeploymentSettingsOperationContextArgs', 'DeploymentSettingsOperationContextArgsDict']]] = None,
+                 organization: pulumi.Input[Optional[_builtins.str]] = None,
+                 project: pulumi.Input[Optional[_builtins.str]] = None,
+                 source_context: pulumi.Input[Optional[Union['DeploymentSettingsSourceContextArgs', 'DeploymentSettingsSourceContextArgsDict']]] = None,
+                 stack: pulumi.Input[Optional[_builtins.str]] = None,
+                 vcs: pulumi.Input[Optional[Union['DeploymentSettingsVcsArgs', 'DeploymentSettingsVcsArgsDict']]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

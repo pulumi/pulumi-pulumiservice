@@ -147,19 +147,19 @@ export interface ScheduledDeploymentArgs {
     /**
      * Deployment request payload to execute when the schedule fires. This has the same shape and semantics as CreateDeploymentRequest used for immediate deployments.
      */
-    request?: any;
+    request?: any | undefined;
     /**
      * Cron expression defining a recurring schedule for this deployment. When set, scheduleOnce must be null. Uses standard 5-field cron syntax (MIN HOUR DOM MON DOW) and is evaluated in UTC.
      */
-    scheduleCron?: pulumi.Input<string>;
+    scheduleCron?: pulumi.Input<string | undefined>;
     /**
      * The schedule identifier
      */
-    scheduleID?: pulumi.Input<string>;
+    scheduleID?: pulumi.Input<string | undefined>;
     /**
      * Single point-in-time schedule for this deployment. When set, scheduleCron must be null. The value must be an ISO 8601 timestamp with timezone.
      */
-    scheduleOnce?: pulumi.Input<string>;
+    scheduleOnce?: pulumi.Input<string | undefined>;
     /**
      * The stack name
      */

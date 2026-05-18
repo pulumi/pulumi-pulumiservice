@@ -95,7 +95,7 @@ export interface OpenEnvironmentRequestArgs {
     /**
      * The change request ID
      */
-    changeRequestId?: pulumi.Input<string>;
+    changeRequestId?: pulumi.Input<string | undefined>;
     /**
      * The environment name
      */

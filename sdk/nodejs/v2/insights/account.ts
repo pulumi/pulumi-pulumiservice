@@ -138,11 +138,11 @@ export interface AccountArgs {
      * The ID of the agent pool to run account discovery workflows.
      * If not specified, discovery will use the default agent pool.
      */
-    agentPoolID?: pulumi.Input<string>;
+    agentPoolID?: pulumi.Input<string | undefined>;
     /**
      * Deprecated: Use scanSchedule instead. Cron expression for scheduling scans.
      */
-    cron?: pulumi.Input<string>;
+    cron?: pulumi.Input<string | undefined>;
     /**
      * Reference to an ESC environment containing provider credentials,
      * in the format 'project/environment' with an optional @version suffix.
@@ -159,9 +159,9 @@ export interface AccountArgs {
     /**
      * Provider-specific configuration for the account.
      */
-    providerConfig?: pulumi.Input<{[key: string]: any}>;
+    providerConfig?: pulumi.Input<{[key: string]: any} | undefined>;
     /**
      * Schedule for automated discovery scans (e.g., 'none', 'daily').
      */
-    scanSchedule?: pulumi.Input<string>;
+    scanSchedule?: pulumi.Input<string | undefined>;
 }

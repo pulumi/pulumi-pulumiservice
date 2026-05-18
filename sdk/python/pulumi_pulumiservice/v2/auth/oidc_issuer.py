@@ -22,10 +22,10 @@ class OidcIssuerArgs:
                  name: pulumi.Input[_builtins.str],
                  org_name: pulumi.Input[_builtins.str],
                  url: pulumi.Input[_builtins.str],
-                 issuer_id: Optional[pulumi.Input[_builtins.str]] = None,
+                 issuer_id: pulumi.Input[Optional[_builtins.str]] = None,
                  jwks: Optional[Any] = None,
-                 max_expiration: Optional[pulumi.Input[_builtins.int]] = None,
-                 thumbprints: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None):
+                 max_expiration: pulumi.Input[Optional[_builtins.int]] = None,
+                 thumbprints: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None):
         """
         The set of arguments for constructing a OidcIssuer resource.
 
@@ -87,14 +87,14 @@ class OidcIssuerArgs:
 
     @_builtins.property
     @pulumi.getter(name="issuerId")
-    def issuer_id(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def issuer_id(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The OIDC issuer identifier
         """
         return pulumi.get(self, "issuer_id")
 
     @issuer_id.setter
-    def issuer_id(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def issuer_id(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "issuer_id", value)
 
     @_builtins.property
@@ -111,26 +111,26 @@ class OidcIssuerArgs:
 
     @_builtins.property
     @pulumi.getter(name="maxExpiration")
-    def max_expiration(self) -> Optional[pulumi.Input[_builtins.int]]:
+    def max_expiration(self) -> pulumi.Input[Optional[_builtins.int]]:
         """
         The maximum token expiration time in seconds.
         """
         return pulumi.get(self, "max_expiration")
 
     @max_expiration.setter
-    def max_expiration(self, value: Optional[pulumi.Input[_builtins.int]]):
+    def max_expiration(self, value: pulumi.Input[Optional[_builtins.int]]):
         pulumi.set(self, "max_expiration", value)
 
     @_builtins.property
     @pulumi.getter
-    def thumbprints(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]:
+    def thumbprints(self) -> pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]:
         """
         SHA-1 certificate thumbprints used to verify the OIDC issuer's TLS certificate.
         """
         return pulumi.get(self, "thumbprints")
 
     @thumbprints.setter
-    def thumbprints(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]):
+    def thumbprints(self, value: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]):
         pulumi.set(self, "thumbprints", value)
 
 
@@ -140,13 +140,13 @@ class OidcIssuer(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 issuer_id: Optional[pulumi.Input[_builtins.str]] = None,
+                 issuer_id: pulumi.Input[Optional[_builtins.str]] = None,
                  jwks: Optional[Any] = None,
-                 max_expiration: Optional[pulumi.Input[_builtins.int]] = None,
-                 name: Optional[pulumi.Input[_builtins.str]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 thumbprints: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
-                 url: Optional[pulumi.Input[_builtins.str]] = None,
+                 max_expiration: pulumi.Input[Optional[_builtins.int]] = None,
+                 name: pulumi.Input[Optional[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 thumbprints: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 url: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
         Registers a new OIDC issuer for an organization, establishing a trust relationship with an external identity provider. Once registered, the identity provider can issue signed, short-lived tokens that are exchanged for temporary Pulumi Cloud credentials during deployments. This eliminates the need to store long-lived access tokens. Supported providers include AWS, Azure, Google Cloud, GitHub Actions, and any OIDC-compliant identity provider. The request must include the issuer URL, and the service will fetch the provider's public signing keys to verify token authenticity.
@@ -187,13 +187,13 @@ class OidcIssuer(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 issuer_id: Optional[pulumi.Input[_builtins.str]] = None,
+                 issuer_id: pulumi.Input[Optional[_builtins.str]] = None,
                  jwks: Optional[Any] = None,
-                 max_expiration: Optional[pulumi.Input[_builtins.int]] = None,
-                 name: Optional[pulumi.Input[_builtins.str]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 thumbprints: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
-                 url: Optional[pulumi.Input[_builtins.str]] = None,
+                 max_expiration: pulumi.Input[Optional[_builtins.int]] = None,
+                 name: pulumi.Input[Optional[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 thumbprints: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 url: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

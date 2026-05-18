@@ -23,9 +23,9 @@ class ConfigArgs:
                  org_name: pulumi.Input[_builtins.str],
                  project_name: pulumi.Input[_builtins.str],
                  stack_name: pulumi.Input[_builtins.str],
-                 encrypted_key: Optional[pulumi.Input[_builtins.str]] = None,
-                 encryption_salt: Optional[pulumi.Input[_builtins.str]] = None,
-                 secrets_provider: Optional[pulumi.Input[_builtins.str]] = None):
+                 encrypted_key: pulumi.Input[Optional[_builtins.str]] = None,
+                 encryption_salt: pulumi.Input[Optional[_builtins.str]] = None,
+                 secrets_provider: pulumi.Input[Optional[_builtins.str]] = None):
         """
         The set of arguments for constructing a Config resource.
 
@@ -98,38 +98,38 @@ class ConfigArgs:
 
     @_builtins.property
     @pulumi.getter(name="encryptedKey")
-    def encrypted_key(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def encrypted_key(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The KMS-encrypted ciphertext for the data key used for secrets encryption. Only used for cloud-based secrets providers.
         """
         return pulumi.get(self, "encrypted_key")
 
     @encrypted_key.setter
-    def encrypted_key(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def encrypted_key(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "encrypted_key", value)
 
     @_builtins.property
     @pulumi.getter(name="encryptionSalt")
-    def encryption_salt(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def encryption_salt(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The stack's base64-encoded encryption salt. Only used for passphrase-based secrets providers.
         """
         return pulumi.get(self, "encryption_salt")
 
     @encryption_salt.setter
-    def encryption_salt(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def encryption_salt(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "encryption_salt", value)
 
     @_builtins.property
     @pulumi.getter(name="secretsProvider")
-    def secrets_provider(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def secrets_provider(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The stack's secrets provider.
         """
         return pulumi.get(self, "secrets_provider")
 
     @secrets_provider.setter
-    def secrets_provider(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def secrets_provider(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "secrets_provider", value)
 
 
@@ -139,13 +139,13 @@ class Config(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 encrypted_key: Optional[pulumi.Input[_builtins.str]] = None,
-                 encryption_salt: Optional[pulumi.Input[_builtins.str]] = None,
-                 environment: Optional[pulumi.Input[_builtins.str]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 project_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 secrets_provider: Optional[pulumi.Input[_builtins.str]] = None,
-                 stack_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 encrypted_key: pulumi.Input[Optional[_builtins.str]] = None,
+                 encryption_salt: pulumi.Input[Optional[_builtins.str]] = None,
+                 environment: pulumi.Input[Optional[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 project_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 secrets_provider: pulumi.Input[Optional[_builtins.str]] = None,
+                 stack_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
         Updates the service-managed configuration for a stack. The request body may include the ESC environment reference, secrets provider type, encrypted key, and encryption salt. If stack configuration is returned by the API, it is used in place of the local stack config file (e.g. Pulumi.[stack].yaml). Returns the updated configuration object. Returns 400 if the environment reference is invalid or not found.
@@ -186,13 +186,13 @@ class Config(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 encrypted_key: Optional[pulumi.Input[_builtins.str]] = None,
-                 encryption_salt: Optional[pulumi.Input[_builtins.str]] = None,
-                 environment: Optional[pulumi.Input[_builtins.str]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 project_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 secrets_provider: Optional[pulumi.Input[_builtins.str]] = None,
-                 stack_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 encrypted_key: pulumi.Input[Optional[_builtins.str]] = None,
+                 encryption_salt: pulumi.Input[Optional[_builtins.str]] = None,
+                 environment: pulumi.Input[Optional[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 project_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 secrets_provider: pulumi.Input[Optional[_builtins.str]] = None,
+                 stack_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

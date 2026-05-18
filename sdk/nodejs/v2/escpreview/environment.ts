@@ -102,5 +102,5 @@ export interface EnvironmentArgs {
     /**
      * Raw YAML body content.
      */
-    yaml?: pulumi.Input<string>;
+    yaml?: pulumi.Input<string | undefined>;
 }

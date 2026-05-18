@@ -46,7 +46,7 @@ class DefaultOrganization(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
         UpdateDefaultOrganization sets the default organization for the current user.
@@ -81,7 +81,7 @@ class DefaultOrganization(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

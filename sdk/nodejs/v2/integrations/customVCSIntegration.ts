@@ -143,7 +143,7 @@ export interface CustomVCSIntegrationArgs {
     /**
      * The custom VCS integration identifier
      */
-    integrationId?: pulumi.Input<string>;
+    integrationId?: pulumi.Input<string | undefined>;
     /**
      * Human-readable name for the integration, unique within the organization (e.g. 'Gitea Production')
      */
@@ -155,5 +155,5 @@ export interface CustomVCSIntegrationArgs {
     /**
      * Version control system type. Defaults to 'git' if not specified.
      */
-    vcsType?: pulumi.Input<string>;
+    vcsType?: pulumi.Input<string | undefined>;
 }

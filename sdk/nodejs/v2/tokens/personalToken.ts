@@ -91,5 +91,5 @@ export interface PersonalTokenArgs {
     /**
      * Tracks the context that triggered token creation (e.g., redirect URL or referral source)
      */
-    reason?: pulumi.Input<string>;
+    reason?: pulumi.Input<string | undefined>;
 }

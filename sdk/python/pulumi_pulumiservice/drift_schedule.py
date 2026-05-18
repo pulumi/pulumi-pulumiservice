@@ -23,7 +23,7 @@ class DriftScheduleArgs:
                  project: pulumi.Input[_builtins.str],
                  schedule_cron: pulumi.Input[_builtins.str],
                  stack: pulumi.Input[_builtins.str],
-                 auto_remediate: Optional[pulumi.Input[_builtins.bool]] = None):
+                 auto_remediate: pulumi.Input[Optional[_builtins.bool]] = None):
         """
         The set of arguments for constructing a DriftSchedule resource.
 
@@ -92,14 +92,14 @@ class DriftScheduleArgs:
 
     @_builtins.property
     @pulumi.getter(name="autoRemediate")
-    def auto_remediate(self) -> Optional[pulumi.Input[_builtins.bool]]:
+    def auto_remediate(self) -> pulumi.Input[Optional[_builtins.bool]]:
         """
         Whether any drift detected should be remediated after a drift run.
         """
         return pulumi.get(self, "auto_remediate")
 
     @auto_remediate.setter
-    def auto_remediate(self, value: Optional[pulumi.Input[_builtins.bool]]):
+    def auto_remediate(self, value: pulumi.Input[Optional[_builtins.bool]]):
         pulumi.set(self, "auto_remediate", value)
 
 
@@ -109,11 +109,11 @@ class DriftSchedule(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 auto_remediate: Optional[pulumi.Input[_builtins.bool]] = None,
-                 organization: Optional[pulumi.Input[_builtins.str]] = None,
-                 project: Optional[pulumi.Input[_builtins.str]] = None,
-                 schedule_cron: Optional[pulumi.Input[_builtins.str]] = None,
-                 stack: Optional[pulumi.Input[_builtins.str]] = None,
+                 auto_remediate: pulumi.Input[Optional[_builtins.bool]] = None,
+                 organization: pulumi.Input[Optional[_builtins.str]] = None,
+                 project: pulumi.Input[Optional[_builtins.str]] = None,
+                 schedule_cron: pulumi.Input[Optional[_builtins.str]] = None,
+                 stack: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
         A cron schedule to run drift detection.
@@ -152,11 +152,11 @@ class DriftSchedule(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 auto_remediate: Optional[pulumi.Input[_builtins.bool]] = None,
-                 organization: Optional[pulumi.Input[_builtins.str]] = None,
-                 project: Optional[pulumi.Input[_builtins.str]] = None,
-                 schedule_cron: Optional[pulumi.Input[_builtins.str]] = None,
-                 stack: Optional[pulumi.Input[_builtins.str]] = None,
+                 auto_remediate: pulumi.Input[Optional[_builtins.bool]] = None,
+                 organization: pulumi.Input[Optional[_builtins.str]] = None,
+                 project: pulumi.Input[Optional[_builtins.str]] = None,
+                 schedule_cron: pulumi.Input[Optional[_builtins.str]] = None,
+                 stack: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

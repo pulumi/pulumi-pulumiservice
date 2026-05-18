@@ -21,9 +21,9 @@ class PolicyIssueArgs:
     def __init__(__self__, *,
                  issue_id: pulumi.Input[_builtins.str],
                  org_name: pulumi.Input[_builtins.str],
-                 assigned_to: Optional[pulumi.Input[_builtins.str]] = None,
-                 priority: Optional[pulumi.Input[_builtins.str]] = None,
-                 status: Optional[pulumi.Input[_builtins.str]] = None):
+                 assigned_to: pulumi.Input[Optional[_builtins.str]] = None,
+                 priority: pulumi.Input[Optional[_builtins.str]] = None,
+                 status: pulumi.Input[Optional[_builtins.str]] = None):
         """
         The set of arguments for constructing a PolicyIssue resource.
 
@@ -68,38 +68,38 @@ class PolicyIssueArgs:
 
     @_builtins.property
     @pulumi.getter(name="assignedTo")
-    def assigned_to(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def assigned_to(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The user to assign the policy issue to.
         """
         return pulumi.get(self, "assigned_to")
 
     @assigned_to.setter
-    def assigned_to(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def assigned_to(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "assigned_to", value)
 
     @_builtins.property
     @pulumi.getter
-    def priority(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def priority(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The new priority for the policy issue.
         """
         return pulumi.get(self, "priority")
 
     @priority.setter
-    def priority(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def priority(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "priority", value)
 
     @_builtins.property
     @pulumi.getter
-    def status(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def status(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The new status for the policy issue. Valid values: open, in_progress, by_design, ignored. Note: fixed cannot be set manually.
         """
         return pulumi.get(self, "status")
 
     @status.setter
-    def status(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def status(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "status", value)
 
 
@@ -109,11 +109,11 @@ class PolicyIssue(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 assigned_to: Optional[pulumi.Input[_builtins.str]] = None,
-                 issue_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 priority: Optional[pulumi.Input[_builtins.str]] = None,
-                 status: Optional[pulumi.Input[_builtins.str]] = None,
+                 assigned_to: pulumi.Input[Optional[_builtins.str]] = None,
+                 issue_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 priority: pulumi.Input[Optional[_builtins.str]] = None,
+                 status: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
         Updates a policy issue's triage status and other mutable fields. All body fields are optional — only provide the fields you want to update.
@@ -160,11 +160,11 @@ class PolicyIssue(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 assigned_to: Optional[pulumi.Input[_builtins.str]] = None,
-                 issue_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 priority: Optional[pulumi.Input[_builtins.str]] = None,
-                 status: Optional[pulumi.Input[_builtins.str]] = None,
+                 assigned_to: pulumi.Input[Optional[_builtins.str]] = None,
+                 issue_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 priority: pulumi.Input[Optional[_builtins.str]] = None,
+                 status: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

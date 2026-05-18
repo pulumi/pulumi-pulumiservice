@@ -22,8 +22,8 @@ class PolicyGroupArgs:
                  entity_type: pulumi.Input[_builtins.str],
                  name: pulumi.Input[_builtins.str],
                  org_name: pulumi.Input[_builtins.str],
-                 agent_pool_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 mode: Optional[pulumi.Input[_builtins.str]] = None):
+                 agent_pool_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 mode: pulumi.Input[Optional[_builtins.str]] = None):
         """
         The set of arguments for constructing a PolicyGroup resource.
 
@@ -79,26 +79,26 @@ class PolicyGroupArgs:
 
     @_builtins.property
     @pulumi.getter(name="agentPoolId")
-    def agent_pool_id(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def agent_pool_id(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         Agent pool ID for policy evaluation. Defaults to Pulumi hosted pool if not specified.
         """
         return pulumi.get(self, "agent_pool_id")
 
     @agent_pool_id.setter
-    def agent_pool_id(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def agent_pool_id(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "agent_pool_id", value)
 
     @_builtins.property
     @pulumi.getter
-    def mode(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def mode(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The enforcement mode for the policy group (audit or preventative). Defaults to 'audit' for account policy groups, 'preventative' for stack policy groups.
         """
         return pulumi.get(self, "mode")
 
     @mode.setter
-    def mode(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def mode(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "mode", value)
 
 
@@ -108,11 +108,11 @@ class PolicyGroup(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 agent_pool_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 entity_type: Optional[pulumi.Input[_builtins.str]] = None,
-                 mode: Optional[pulumi.Input[_builtins.str]] = None,
-                 name: Optional[pulumi.Input[_builtins.str]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 agent_pool_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 entity_type: pulumi.Input[Optional[_builtins.str]] = None,
+                 mode: pulumi.Input[Optional[_builtins.str]] = None,
+                 name: pulumi.Input[Optional[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
         Creates a new Policy Group for an organization. Policy Groups define which Policy Packs are enforced on which stacks or cloud accounts, with configurable enforcement levels (advisory, mandatory, or disabled) per pack. This allows different policy strictness for different environments, such as advisory-only in development and mandatory in production.
@@ -151,11 +151,11 @@ class PolicyGroup(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 agent_pool_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 entity_type: Optional[pulumi.Input[_builtins.str]] = None,
-                 mode: Optional[pulumi.Input[_builtins.str]] = None,
-                 name: Optional[pulumi.Input[_builtins.str]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 agent_pool_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 entity_type: pulumi.Input[Optional[_builtins.str]] = None,
+                 mode: pulumi.Input[Optional[_builtins.str]] = None,
+                 name: pulumi.Input[Optional[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

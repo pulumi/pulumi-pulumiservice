@@ -24,8 +24,8 @@ class StackArgs:
                  stack_name: pulumi.Input[_builtins.str],
                  config: Optional[Any] = None,
                  state: Optional[Any] = None,
-                 tags: Optional[pulumi.Input[Mapping[str, Any]]] = None,
-                 teams: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None):
+                 tags: pulumi.Input[Optional[Mapping[str, Any]]] = None,
+                 teams: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None):
         """
         The set of arguments for constructing a Stack resource.
 
@@ -111,26 +111,26 @@ class StackArgs:
 
     @_builtins.property
     @pulumi.getter
-    def tags(self) -> Optional[pulumi.Input[Mapping[str, Any]]]:
+    def tags(self) -> pulumi.Input[Optional[Mapping[str, Any]]]:
         """
         An optional set of tags to apply to the stack.
         """
         return pulumi.get(self, "tags")
 
     @tags.setter
-    def tags(self, value: Optional[pulumi.Input[Mapping[str, Any]]]):
+    def tags(self, value: pulumi.Input[Optional[Mapping[str, Any]]]):
         pulumi.set(self, "tags", value)
 
     @_builtins.property
     @pulumi.getter
-    def teams(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]:
+    def teams(self) -> pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]:
         """
         An optional set of teams to assign to the stack.
         """
         return pulumi.get(self, "teams")
 
     @teams.setter
-    def teams(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]):
+    def teams(self, value: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]):
         pulumi.set(self, "teams", value)
 
 
@@ -141,12 +141,12 @@ class Stack(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  config: Optional[Any] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 project_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 stack_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 project_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 stack_name: pulumi.Input[Optional[_builtins.str]] = None,
                  state: Optional[Any] = None,
-                 tags: Optional[pulumi.Input[Mapping[str, Any]]] = None,
-                 teams: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 tags: pulumi.Input[Optional[Mapping[str, Any]]] = None,
+                 teams: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  __props__=None):
         """
         Creates a new stack within a project in the organization. If the project does not exist, it will be created. A stack is an isolated, independently configurable instance of a Pulumi program, typically representing a deployment environment (e.g., development, staging, production). The stack name must be unique within the project.
@@ -200,12 +200,12 @@ class Stack(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  config: Optional[Any] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 project_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 stack_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 project_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 stack_name: pulumi.Input[Optional[_builtins.str]] = None,
                  state: Optional[Any] = None,
-                 tags: Optional[pulumi.Input[Mapping[str, Any]]] = None,
-                 teams: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 tags: pulumi.Input[Optional[Mapping[str, Any]]] = None,
+                 teams: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

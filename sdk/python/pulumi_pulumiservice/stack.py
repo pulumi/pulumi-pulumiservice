@@ -22,7 +22,7 @@ class StackArgs:
                  organization_name: pulumi.Input[_builtins.str],
                  project_name: pulumi.Input[_builtins.str],
                  stack_name: pulumi.Input[_builtins.str],
-                 force_destroy: Optional[pulumi.Input[_builtins.bool]] = None):
+                 force_destroy: pulumi.Input[Optional[_builtins.bool]] = None):
         """
         The set of arguments for constructing a Stack resource.
 
@@ -75,14 +75,14 @@ class StackArgs:
 
     @_builtins.property
     @pulumi.getter(name="forceDestroy")
-    def force_destroy(self) -> Optional[pulumi.Input[_builtins.bool]]:
+    def force_destroy(self) -> pulumi.Input[Optional[_builtins.bool]]:
         """
         Optional. Flag indicating whether to delete the stack even if it still contains resources.
         """
         return pulumi.get(self, "force_destroy")
 
     @force_destroy.setter
-    def force_destroy(self, value: Optional[pulumi.Input[_builtins.bool]]):
+    def force_destroy(self, value: pulumi.Input[Optional[_builtins.bool]]):
         pulumi.set(self, "force_destroy", value)
 
 
@@ -92,10 +92,10 @@ class Stack(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 force_destroy: Optional[pulumi.Input[_builtins.bool]] = None,
-                 organization_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 project_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 stack_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 force_destroy: pulumi.Input[Optional[_builtins.bool]] = None,
+                 organization_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 project_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 stack_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
         A stack is a collection of resources that share a common lifecycle. Stacks are uniquely identified by their name and the project they belong to.
@@ -133,10 +133,10 @@ class Stack(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 force_destroy: Optional[pulumi.Input[_builtins.bool]] = None,
-                 organization_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 project_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 stack_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 force_destroy: pulumi.Input[Optional[_builtins.bool]] = None,
+                 organization_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 project_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 stack_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

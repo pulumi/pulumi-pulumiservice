@@ -24,7 +24,7 @@ class GateArgs:
                  org_name: pulumi.Input[_builtins.str],
                  rule: Any,
                  target: Any,
-                 gate_id: Optional[pulumi.Input[_builtins.str]] = None):
+                 gate_id: pulumi.Input[Optional[_builtins.str]] = None):
         """
         The set of arguments for constructing a Gate resource.
 
@@ -105,14 +105,14 @@ class GateArgs:
 
     @_builtins.property
     @pulumi.getter(name="gateID")
-    def gate_id(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def gate_id(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The change gate identifier
         """
         return pulumi.get(self, "gate_id")
 
     @gate_id.setter
-    def gate_id(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def gate_id(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "gate_id", value)
 
 
@@ -122,10 +122,10 @@ class Gate(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 enabled: Optional[pulumi.Input[_builtins.bool]] = None,
-                 gate_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 name: Optional[pulumi.Input[_builtins.str]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 enabled: pulumi.Input[Optional[_builtins.bool]] = None,
+                 gate_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 name: pulumi.Input[Optional[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  rule: Optional[Any] = None,
                  target: Optional[Any] = None,
                  __props__=None):
@@ -167,10 +167,10 @@ class Gate(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 enabled: Optional[pulumi.Input[_builtins.bool]] = None,
-                 gate_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 name: Optional[pulumi.Input[_builtins.str]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 enabled: pulumi.Input[Optional[_builtins.bool]] = None,
+                 gate_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 name: pulumi.Input[Optional[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  rule: Optional[Any] = None,
                  target: Optional[Any] = None,
                  __props__=None):

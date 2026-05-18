@@ -125,7 +125,7 @@ export interface RevisionTagArgs {
     /**
      * The revision
      */
-    revision?: pulumi.Input<number>;
+    revision?: pulumi.Input<number | undefined>;
     /**
      * The revision tag name
      */

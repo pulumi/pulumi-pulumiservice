@@ -185,19 +185,19 @@ export interface WebhookArgs {
     /**
      * The environment name. Set when the webhook is scoped to a specific environment.
      */
-    envName?: pulumi.Input<string>;
+    envName?: pulumi.Input<string | undefined>;
     /**
      * Specific event types this webhook subscribes to. If empty, all events are delivered.
      */
-    filters?: pulumi.Input<pulumi.Input<string>[]>;
+    filters?: pulumi.Input<pulumi.Input<string>[] | undefined>;
     /**
      * The format of the webhook payload (e.g., 'raw', 'slack', 'ms_teams').
      */
-    format?: pulumi.Input<string>;
+    format?: pulumi.Input<string | undefined>;
     /**
      * Event groups this webhook subscribes to (e.g., 'stacks', 'deployments').
      */
-    groups?: pulumi.Input<pulumi.Input<string>[]>;
+    groups?: pulumi.Input<pulumi.Input<string>[] | undefined>;
     /**
      * The unique identifier name for the webhook within its scope.
      */
@@ -217,7 +217,7 @@ export interface WebhookArgs {
     /**
      * Secret will be omitted when returned from the service.
      */
-    secret?: pulumi.Input<string>;
+    secret?: pulumi.Input<string | undefined>;
     /**
      * The stack name. Set when the webhook is scoped to a specific stack.
      */

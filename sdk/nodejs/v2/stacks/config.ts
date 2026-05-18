@@ -101,11 +101,11 @@ export interface ConfigArgs {
     /**
      * The KMS-encrypted ciphertext for the data key used for secrets encryption. Only used for cloud-based secrets providers.
      */
-    encryptedKey?: pulumi.Input<string>;
+    encryptedKey?: pulumi.Input<string | undefined>;
     /**
      * The stack's base64-encoded encryption salt. Only used for passphrase-based secrets providers.
      */
-    encryptionSalt?: pulumi.Input<string>;
+    encryptionSalt?: pulumi.Input<string | undefined>;
     /**
      * Reference to ESC environment to use as stack configuration.
      */
@@ -121,7 +121,7 @@ export interface ConfigArgs {
     /**
      * The stack's secrets provider.
      */
-    secretsProvider?: pulumi.Input<string>;
+    secretsProvider?: pulumi.Input<string | undefined>;
     /**
      * The stack name
      */

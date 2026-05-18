@@ -126,7 +126,7 @@ export interface StackArgs {
     /**
      * The configuration for the new stack.
      */
-    config?: any;
+    config?: any | undefined;
     /**
      * The organization name
      */
@@ -142,13 +142,13 @@ export interface StackArgs {
     /**
      * An optional state to initialize the stack with.
      */
-    state?: any;
+    state?: any | undefined;
     /**
      * An optional set of tags to apply to the stack.
      */
-    tags?: pulumi.Input<{[key: string]: any}>;
+    tags?: pulumi.Input<{[key: string]: any} | undefined>;
     /**
      * An optional set of teams to assign to the stack.
      */
-    teams?: pulumi.Input<pulumi.Input<string>[]>;
+    teams?: pulumi.Input<pulumi.Input<string>[] | undefined>;
 }

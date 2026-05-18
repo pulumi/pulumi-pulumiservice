@@ -61,7 +61,7 @@ def build_allow_permissions(permissions: Optional[Sequence[_builtins.str]] = Non
 
     return AwaitableBuildAllowPermissionsResult(
         permissions=pulumi.get(__ret__, 'permissions'))
-def build_allow_permissions_output(permissions: Optional[pulumi.Input[Sequence[_builtins.str]]] = None,
+def build_allow_permissions_output(permissions: pulumi.Input[Optional[Sequence[_builtins.str]]] = None,
                                    opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[BuildAllowPermissionsResult]:
     """
     Builds an `OrganizationRole.permissions` descriptor that grants the supplied scopes globally — i.e. on every entity of the matching resource type. This is the simplest descriptor: a flat `PermissionDescriptorAllow`. Use this helper instead of hand-authoring the descriptor literal so the wire-format `__type` discriminator stays an implementation detail. For grants scoped to a specific entity, see `buildEnvironmentScopedPermissions`, `buildStackScopedPermissions`, or `buildInsightsAccountScopedPermissions`. The result is directly assignable to `OrganizationRole.permissions`. To grant scopes on more than one entity in a single role, hand-roll a `PermissionDescriptorGroup` whose `entries` list pulls the output of each helper.

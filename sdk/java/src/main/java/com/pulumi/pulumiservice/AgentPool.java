@@ -148,6 +148,9 @@ public class AgentPool extends com.pulumi.resources.CustomResource {
             .additionalSecretOutputs(List.of(
                 "tokenValue"
             ))
+            .replaceOnChanges(List.of(
+                "organizationName"
+            ))
             .build();
         return com.pulumi.resources.CustomResourceOptions.merge(defaultOptions, options, id);
     }

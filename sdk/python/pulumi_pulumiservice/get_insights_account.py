@@ -165,8 +165,8 @@ def get_insights_account(account_name: Optional[_builtins.str] = None,
         scan_schedule=pulumi.get(__ret__, 'scan_schedule'),
         scheduled_scan_enabled=pulumi.get(__ret__, 'scheduled_scan_enabled'),
         tags=pulumi.get(__ret__, 'tags'))
-def get_insights_account_output(account_name: Optional[pulumi.Input[_builtins.str]] = None,
-                                organization_name: Optional[pulumi.Input[_builtins.str]] = None,
+def get_insights_account_output(account_name: pulumi.Input[Optional[_builtins.str]] = None,
+                                organization_name: pulumi.Input[Optional[_builtins.str]] = None,
                                 opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[GetInsightsAccountResult]:
     """
     Get details about a specific Insights account.

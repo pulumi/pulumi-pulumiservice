@@ -115,7 +115,7 @@ export interface TeamTokenArgs {
     /**
      * Audit log reason for creating this token
      */
-    reason?: pulumi.Input<string>;
+    reason?: pulumi.Input<string | undefined>;
     /**
      * The team name
      */

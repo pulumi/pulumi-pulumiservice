@@ -23,9 +23,9 @@ class ScheduledDeploymentArgs:
                  project_name: pulumi.Input[_builtins.str],
                  stack_name: pulumi.Input[_builtins.str],
                  request: Optional[Any] = None,
-                 schedule_cron: Optional[pulumi.Input[_builtins.str]] = None,
-                 schedule_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 schedule_once: Optional[pulumi.Input[_builtins.str]] = None):
+                 schedule_cron: pulumi.Input[Optional[_builtins.str]] = None,
+                 schedule_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 schedule_once: pulumi.Input[Optional[_builtins.str]] = None):
         """
         The set of arguments for constructing a ScheduledDeployment resource.
 
@@ -99,38 +99,38 @@ class ScheduledDeploymentArgs:
 
     @_builtins.property
     @pulumi.getter(name="scheduleCron")
-    def schedule_cron(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def schedule_cron(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         Cron expression defining a recurring schedule for this deployment. When set, scheduleOnce must be null. Uses standard 5-field cron syntax (MIN HOUR DOM MON DOW) and is evaluated in UTC.
         """
         return pulumi.get(self, "schedule_cron")
 
     @schedule_cron.setter
-    def schedule_cron(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def schedule_cron(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "schedule_cron", value)
 
     @_builtins.property
     @pulumi.getter(name="scheduleID")
-    def schedule_id(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def schedule_id(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The schedule identifier
         """
         return pulumi.get(self, "schedule_id")
 
     @schedule_id.setter
-    def schedule_id(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def schedule_id(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "schedule_id", value)
 
     @_builtins.property
     @pulumi.getter(name="scheduleOnce")
-    def schedule_once(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def schedule_once(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         Single point-in-time schedule for this deployment. When set, scheduleCron must be null. The value must be an ISO 8601 timestamp with timezone.
         """
         return pulumi.get(self, "schedule_once")
 
     @schedule_once.setter
-    def schedule_once(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def schedule_once(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "schedule_once", value)
 
 
@@ -140,13 +140,13 @@ class ScheduledDeployment(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 project_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 project_name: pulumi.Input[Optional[_builtins.str]] = None,
                  request: Optional[Any] = None,
-                 schedule_cron: Optional[pulumi.Input[_builtins.str]] = None,
-                 schedule_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 schedule_once: Optional[pulumi.Input[_builtins.str]] = None,
-                 stack_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 schedule_cron: pulumi.Input[Optional[_builtins.str]] = None,
+                 schedule_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 schedule_once: pulumi.Input[Optional[_builtins.str]] = None,
+                 stack_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
         Creates a custom deployment schedule for a stack using Pulumi Deployments. Custom schedules allow you to automate recurring or one-time Pulumi operations on a stack. The request must include exactly one of 'scheduleCron' (a cron expression for recurring executions, e.g. '0 */4 * * *' for every 4 hours) or 'scheduleOnce' (an ISO 8601 timestamp for a one-time execution). The 'request' field contains the deployment configuration that will be executed on each scheduled run, including the Pulumi operation type and any settings overrides. The stack must have deployment settings configured before a schedule can be created.
@@ -187,13 +187,13 @@ class ScheduledDeployment(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 project_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 project_name: pulumi.Input[Optional[_builtins.str]] = None,
                  request: Optional[Any] = None,
-                 schedule_cron: Optional[pulumi.Input[_builtins.str]] = None,
-                 schedule_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 schedule_once: Optional[pulumi.Input[_builtins.str]] = None,
-                 stack_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 schedule_cron: pulumi.Input[Optional[_builtins.str]] = None,
+                 schedule_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 schedule_once: pulumi.Input[Optional[_builtins.str]] = None,
+                 stack_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

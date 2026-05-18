@@ -23,11 +23,11 @@ class PolicyGroupArgs:
     def __init__(__self__, *,
                  name: pulumi.Input[_builtins.str],
                  organization_name: pulumi.Input[_builtins.str],
-                 accounts: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
-                 entity_type: Optional[pulumi.Input[_builtins.str]] = None,
-                 mode: Optional[pulumi.Input[_builtins.str]] = None,
-                 policy_packs: Optional[pulumi.Input[Sequence[pulumi.Input['PolicyGroupPolicyPackReferenceInputArgs']]]] = None,
-                 stacks: Optional[pulumi.Input[Sequence[pulumi.Input['PolicyGroupStackReferenceArgs']]]] = None):
+                 accounts: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 entity_type: pulumi.Input[Optional[_builtins.str]] = None,
+                 mode: pulumi.Input[Optional[_builtins.str]] = None,
+                 policy_packs: pulumi.Input[Optional[Sequence[pulumi.Input['PolicyGroupPolicyPackReferenceInputArgs']]]] = None,
+                 stacks: pulumi.Input[Optional[Sequence[pulumi.Input['PolicyGroupStackReferenceArgs']]]] = None):
         """
         The set of arguments for constructing a PolicyGroup resource.
 
@@ -82,62 +82,62 @@ class PolicyGroupArgs:
 
     @_builtins.property
     @pulumi.getter
-    def accounts(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]:
+    def accounts(self) -> pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]:
         """
         List of accounts that belong to this policy group.
         """
         return pulumi.get(self, "accounts")
 
     @accounts.setter
-    def accounts(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]):
+    def accounts(self, value: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]]):
         pulumi.set(self, "accounts", value)
 
     @_builtins.property
     @pulumi.getter(name="entityType")
-    def entity_type(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def entity_type(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The entity type for the policy group. Valid values are 'stacks' or 'accounts'. Defaults to 'stacks'.
         """
         return pulumi.get(self, "entity_type")
 
     @entity_type.setter
-    def entity_type(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def entity_type(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "entity_type", value)
 
     @_builtins.property
     @pulumi.getter
-    def mode(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def mode(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The mode for the policy group. Valid values are 'audit' (reports violations) or 'preventative' (blocks operations). Defaults to 'audit'.
         """
         return pulumi.get(self, "mode")
 
     @mode.setter
-    def mode(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def mode(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "mode", value)
 
     @_builtins.property
     @pulumi.getter(name="policyPacks")
-    def policy_packs(self) -> Optional[pulumi.Input[Sequence[pulumi.Input['PolicyGroupPolicyPackReferenceInputArgs']]]]:
+    def policy_packs(self) -> pulumi.Input[Optional[Sequence[pulumi.Input['PolicyGroupPolicyPackReferenceInputArgs']]]]:
         """
         List of policy packs applied to this policy group.
         """
         return pulumi.get(self, "policy_packs")
 
     @policy_packs.setter
-    def policy_packs(self, value: Optional[pulumi.Input[Sequence[pulumi.Input['PolicyGroupPolicyPackReferenceInputArgs']]]]):
+    def policy_packs(self, value: pulumi.Input[Optional[Sequence[pulumi.Input['PolicyGroupPolicyPackReferenceInputArgs']]]]):
         pulumi.set(self, "policy_packs", value)
 
     @_builtins.property
     @pulumi.getter
-    def stacks(self) -> Optional[pulumi.Input[Sequence[pulumi.Input['PolicyGroupStackReferenceArgs']]]]:
+    def stacks(self) -> pulumi.Input[Optional[Sequence[pulumi.Input['PolicyGroupStackReferenceArgs']]]]:
         """
         List of stack references that belong to this policy group.
         """
         return pulumi.get(self, "stacks")
 
     @stacks.setter
-    def stacks(self, value: Optional[pulumi.Input[Sequence[pulumi.Input['PolicyGroupStackReferenceArgs']]]]):
+    def stacks(self, value: pulumi.Input[Optional[Sequence[pulumi.Input['PolicyGroupStackReferenceArgs']]]]):
         pulumi.set(self, "stacks", value)
 
 
@@ -147,13 +147,13 @@ class PolicyGroup(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 accounts: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
-                 entity_type: Optional[pulumi.Input[_builtins.str]] = None,
-                 mode: Optional[pulumi.Input[_builtins.str]] = None,
-                 name: Optional[pulumi.Input[_builtins.str]] = None,
-                 organization_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 policy_packs: Optional[pulumi.Input[Sequence[pulumi.Input[Union['PolicyGroupPolicyPackReferenceInputArgs', 'PolicyGroupPolicyPackReferenceInputArgsDict']]]]] = None,
-                 stacks: Optional[pulumi.Input[Sequence[pulumi.Input[Union['PolicyGroupStackReferenceArgs', 'PolicyGroupStackReferenceArgsDict']]]]] = None,
+                 accounts: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 entity_type: pulumi.Input[Optional[_builtins.str]] = None,
+                 mode: pulumi.Input[Optional[_builtins.str]] = None,
+                 name: pulumi.Input[Optional[_builtins.str]] = None,
+                 organization_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 policy_packs: pulumi.Input[Optional[Sequence[pulumi.Input[Union['PolicyGroupPolicyPackReferenceInputArgs', 'PolicyGroupPolicyPackReferenceInputArgsDict']]]]] = None,
+                 stacks: pulumi.Input[Optional[Sequence[pulumi.Input[Union['PolicyGroupStackReferenceArgs', 'PolicyGroupStackReferenceArgsDict']]]]] = None,
                  __props__=None):
         """
         A Policy Group allows you to apply policy packs to a set of stacks in your organization.
@@ -194,13 +194,13 @@ class PolicyGroup(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 accounts: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
-                 entity_type: Optional[pulumi.Input[_builtins.str]] = None,
-                 mode: Optional[pulumi.Input[_builtins.str]] = None,
-                 name: Optional[pulumi.Input[_builtins.str]] = None,
-                 organization_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 policy_packs: Optional[pulumi.Input[Sequence[pulumi.Input[Union['PolicyGroupPolicyPackReferenceInputArgs', 'PolicyGroupPolicyPackReferenceInputArgsDict']]]]] = None,
-                 stacks: Optional[pulumi.Input[Sequence[pulumi.Input[Union['PolicyGroupStackReferenceArgs', 'PolicyGroupStackReferenceArgsDict']]]]] = None,
+                 accounts: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 entity_type: pulumi.Input[Optional[_builtins.str]] = None,
+                 mode: pulumi.Input[Optional[_builtins.str]] = None,
+                 name: pulumi.Input[Optional[_builtins.str]] = None,
+                 organization_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 policy_packs: pulumi.Input[Optional[Sequence[pulumi.Input[Union['PolicyGroupPolicyPackReferenceInputArgs', 'PolicyGroupPolicyPackReferenceInputArgsDict']]]]] = None,
+                 stacks: pulumi.Input[Optional[Sequence[pulumi.Input[Union['PolicyGroupStackReferenceArgs', 'PolicyGroupStackReferenceArgsDict']]]]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

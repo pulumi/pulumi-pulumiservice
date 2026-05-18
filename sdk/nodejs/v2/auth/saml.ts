@@ -109,7 +109,7 @@ export interface SAMLArgs {
     /**
      * The new IDP SSO descriptor XML for the SAML configuration.
      */
-    newIdpSsoDescriptor?: pulumi.Input<string>;
+    newIdpSsoDescriptor?: pulumi.Input<string | undefined>;
     /**
      * The organization name
      */

@@ -78,7 +78,7 @@ export interface EnvironmentSettingsArgs {
     /**
      * DeletionProtected indicates whether deletion protection should be enabled for this environment. Null means no change.
      */
-    deletionProtected?: pulumi.Input<boolean>;
+    deletionProtected?: pulumi.Input<boolean | undefined>;
     /**
      * The environment name
      */

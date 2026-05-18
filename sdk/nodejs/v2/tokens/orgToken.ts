@@ -120,9 +120,9 @@ export interface OrgTokenArgs {
     /**
      * Audit log reason for creating this token
      */
-    reason?: pulumi.Input<string>;
+    reason?: pulumi.Input<string | undefined>;
     /**
      * The role identifier
      */
-    roleID?: pulumi.Input<string>;
+    roleID?: pulumi.Input<string | undefined>;
 }

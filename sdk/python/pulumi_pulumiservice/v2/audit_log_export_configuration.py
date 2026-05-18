@@ -76,9 +76,9 @@ class AuditLogExportConfiguration(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 new_enabled: Optional[pulumi.Input[_builtins.bool]] = None,
+                 new_enabled: pulumi.Input[Optional[_builtins.bool]] = None,
                  new_s3_configuration: Optional[Any] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
         Creates or updates the organization's automated audit log export configuration. Audit log export enables automatic delivery of audit events to an S3 bucket for long-term retention and SIEM integration. The configuration includes the S3 bucket details and IAM role for authentication. This feature is available on Business Critical edition.
@@ -115,9 +115,9 @@ class AuditLogExportConfiguration(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 new_enabled: Optional[pulumi.Input[_builtins.bool]] = None,
+                 new_enabled: pulumi.Input[Optional[_builtins.bool]] = None,
                  new_s3_configuration: Optional[Any] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

@@ -24,13 +24,13 @@ class WebhookArgs:
                  display_name: pulumi.Input[_builtins.str],
                  organization_name: pulumi.Input[_builtins.str],
                  payload_url: pulumi.Input[_builtins.str],
-                 environment_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 filters: Optional[pulumi.Input[Sequence[pulumi.Input['WebhookFilters']]]] = None,
-                 format: Optional[pulumi.Input['WebhookFormat']] = None,
-                 groups: Optional[pulumi.Input[Sequence[pulumi.Input['WebhookGroup']]]] = None,
-                 project_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 secret: Optional[pulumi.Input[_builtins.str]] = None,
-                 stack_name: Optional[pulumi.Input[_builtins.str]] = None):
+                 environment_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 filters: pulumi.Input[Optional[Sequence[pulumi.Input['WebhookFilters']]]] = None,
+                 format: pulumi.Input[Optional['WebhookFormat']] = None,
+                 groups: pulumi.Input[Optional[Sequence[pulumi.Input['WebhookGroup']]]] = None,
+                 project_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 secret: pulumi.Input[Optional[_builtins.str]] = None,
+                 stack_name: pulumi.Input[Optional[_builtins.str]] = None):
         """
         The set of arguments for constructing a Webhook resource.
 
@@ -117,86 +117,86 @@ class WebhookArgs:
 
     @_builtins.property
     @pulumi.getter(name="environmentName")
-    def environment_name(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def environment_name(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         Name of the environment. Only specified if this is an environment webhook.
         """
         return pulumi.get(self, "environment_name")
 
     @environment_name.setter
-    def environment_name(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def environment_name(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "environment_name", value)
 
     @_builtins.property
     @pulumi.getter
-    def filters(self) -> Optional[pulumi.Input[Sequence[pulumi.Input['WebhookFilters']]]]:
+    def filters(self) -> pulumi.Input[Optional[Sequence[pulumi.Input['WebhookFilters']]]]:
         """
         Optional set of filters to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#filters) for more information.
         """
         return pulumi.get(self, "filters")
 
     @filters.setter
-    def filters(self, value: Optional[pulumi.Input[Sequence[pulumi.Input['WebhookFilters']]]]):
+    def filters(self, value: pulumi.Input[Optional[Sequence[pulumi.Input['WebhookFilters']]]]):
         pulumi.set(self, "filters", value)
 
     @_builtins.property
     @pulumi.getter
-    def format(self) -> Optional[pulumi.Input['WebhookFormat']]:
+    def format(self) -> pulumi.Input[Optional['WebhookFormat']]:
         """
         Format of the webhook payload. Can be either `raw` or `slack`. Defaults to `raw`.
         """
         return pulumi.get(self, "format")
 
     @format.setter
-    def format(self, value: Optional[pulumi.Input['WebhookFormat']]):
+    def format(self, value: pulumi.Input[Optional['WebhookFormat']]):
         pulumi.set(self, "format", value)
 
     @_builtins.property
     @pulumi.getter
-    def groups(self) -> Optional[pulumi.Input[Sequence[pulumi.Input['WebhookGroup']]]]:
+    def groups(self) -> pulumi.Input[Optional[Sequence[pulumi.Input['WebhookGroup']]]]:
         """
         Optional set of filter groups to apply to the webhook. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#groups) for more information.
         """
         return pulumi.get(self, "groups")
 
     @groups.setter
-    def groups(self, value: Optional[pulumi.Input[Sequence[pulumi.Input['WebhookGroup']]]]):
+    def groups(self, value: pulumi.Input[Optional[Sequence[pulumi.Input['WebhookGroup']]]]):
         pulumi.set(self, "groups", value)
 
     @_builtins.property
     @pulumi.getter(name="projectName")
-    def project_name(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def project_name(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         Name of the project. Only specified if this is a stack or environment webhook.
         """
         return pulumi.get(self, "project_name")
 
     @project_name.setter
-    def project_name(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def project_name(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "project_name", value)
 
     @_builtins.property
     @pulumi.getter
-    def secret(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def secret(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         Optional. secret used as the HMAC key. See [webhook docs](https://www.pulumi.com/docs/intro/pulumi-service/webhooks/#headers) for more information.
         """
         return pulumi.get(self, "secret")
 
     @secret.setter
-    def secret(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def secret(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "secret", value)
 
     @_builtins.property
     @pulumi.getter(name="stackName")
-    def stack_name(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def stack_name(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         Name of the stack. Only needed if this is a stack webhook.
         """
         return pulumi.get(self, "stack_name")
 
     @stack_name.setter
-    def stack_name(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def stack_name(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "stack_name", value)
 
 
@@ -206,17 +206,17 @@ class Webhook(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 active: Optional[pulumi.Input[_builtins.bool]] = None,
-                 display_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 environment_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 filters: Optional[pulumi.Input[Sequence[pulumi.Input['WebhookFilters']]]] = None,
-                 format: Optional[pulumi.Input['WebhookFormat']] = None,
-                 groups: Optional[pulumi.Input[Sequence[pulumi.Input['WebhookGroup']]]] = None,
-                 organization_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 payload_url: Optional[pulumi.Input[_builtins.str]] = None,
-                 project_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 secret: Optional[pulumi.Input[_builtins.str]] = None,
-                 stack_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 active: pulumi.Input[Optional[_builtins.bool]] = None,
+                 display_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 environment_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 filters: pulumi.Input[Optional[Sequence[pulumi.Input['WebhookFilters']]]] = None,
+                 format: pulumi.Input[Optional['WebhookFormat']] = None,
+                 groups: pulumi.Input[Optional[Sequence[pulumi.Input['WebhookGroup']]]] = None,
+                 organization_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 payload_url: pulumi.Input[Optional[_builtins.str]] = None,
+                 project_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 secret: pulumi.Input[Optional[_builtins.str]] = None,
+                 stack_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
         Pulumi Webhooks allow you to notify external services of events happening within your Pulumi organization or stack. For example, you can trigger a notification whenever a stack is updated. Whenever an event occurs, Pulumi will send an HTTP POST request to all registered webhooks. The webhook can then be used to emit some notification, start running integration tests, or even update additional stacks.
@@ -277,17 +277,17 @@ class Webhook(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 active: Optional[pulumi.Input[_builtins.bool]] = None,
-                 display_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 environment_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 filters: Optional[pulumi.Input[Sequence[pulumi.Input['WebhookFilters']]]] = None,
-                 format: Optional[pulumi.Input['WebhookFormat']] = None,
-                 groups: Optional[pulumi.Input[Sequence[pulumi.Input['WebhookGroup']]]] = None,
-                 organization_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 payload_url: Optional[pulumi.Input[_builtins.str]] = None,
-                 project_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 secret: Optional[pulumi.Input[_builtins.str]] = None,
-                 stack_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 active: pulumi.Input[Optional[_builtins.bool]] = None,
+                 display_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 environment_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 filters: pulumi.Input[Optional[Sequence[pulumi.Input['WebhookFilters']]]] = None,
+                 format: pulumi.Input[Optional['WebhookFormat']] = None,
+                 groups: pulumi.Input[Optional[Sequence[pulumi.Input['WebhookGroup']]]] = None,
+                 organization_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 payload_url: pulumi.Input[Optional[_builtins.str]] = None,
+                 project_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 secret: pulumi.Input[Optional[_builtins.str]] = None,
+                 stack_name: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

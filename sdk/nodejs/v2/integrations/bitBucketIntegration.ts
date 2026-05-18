@@ -134,15 +134,15 @@ export interface BitBucketIntegrationArgs {
     /**
      * If true, disable detailed property-level diffs in PR comments.
      */
-    disableDetailedDiff?: pulumi.Input<boolean>;
+    disableDetailedDiff?: pulumi.Input<boolean | undefined>;
     /**
      * If true, disable Neo AI-generated deployment summaries in PR comments.
      */
-    disableNeoSummaries?: pulumi.Input<boolean>;
+    disableNeoSummaries?: pulumi.Input<boolean | undefined>;
     /**
      * If true, disable automatic PR comments on deployments.
      */
-    disablePRComments?: pulumi.Input<boolean>;
+    disablePRComments?: pulumi.Input<boolean | undefined>;
     /**
      * The BitBucket integration identifier
      */

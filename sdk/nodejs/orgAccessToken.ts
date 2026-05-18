@@ -100,11 +100,11 @@ export interface OrgAccessTokenArgs {
     /**
      * Optional. True if this is an admin token.
      */
-    admin?: pulumi.Input<boolean>;
+    admin?: pulumi.Input<boolean | undefined>;
     /**
      * Optional. Description for the token.
      */
-    description?: pulumi.Input<string>;
+    description?: pulumi.Input<string | undefined>;
     /**
      * The name for the token.
      */

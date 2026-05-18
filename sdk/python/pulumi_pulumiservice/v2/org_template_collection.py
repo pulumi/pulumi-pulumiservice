@@ -23,7 +23,7 @@ class OrgTemplateCollectionArgs:
                  org_name: pulumi.Input[_builtins.str],
                  source_url: pulumi.Input[_builtins.str],
                  destination: Optional[Any] = None,
-                 destination_url: Optional[pulumi.Input[_builtins.str]] = None):
+                 destination_url: pulumi.Input[Optional[_builtins.str]] = None):
         """
         The set of arguments for constructing a OrgTemplateCollection resource.
 
@@ -91,14 +91,14 @@ class OrgTemplateCollectionArgs:
 
     @_builtins.property
     @pulumi.getter(name="destinationURL")
-    def destination_url(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def destination_url(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The destination URL for the template source.
         """
         return pulumi.get(self, "destination_url")
 
     @destination_url.setter
-    def destination_url(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def destination_url(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "destination_url", value)
 
 
@@ -109,10 +109,10 @@ class OrgTemplateCollection(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  destination: Optional[Any] = None,
-                 destination_url: Optional[pulumi.Input[_builtins.str]] = None,
-                 name: Optional[pulumi.Input[_builtins.str]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 source_url: Optional[pulumi.Input[_builtins.str]] = None,
+                 destination_url: pulumi.Input[Optional[_builtins.str]] = None,
+                 name: pulumi.Input[Optional[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 source_url: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
         Creates a new template collection (source) for an organization. Template collections define where project templates are sourced from, such as a Git repository. Organization members can use these templates to create new stacks with pre-configured infrastructure code.
@@ -152,10 +152,10 @@ class OrgTemplateCollection(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  destination: Optional[Any] = None,
-                 destination_url: Optional[pulumi.Input[_builtins.str]] = None,
-                 name: Optional[pulumi.Input[_builtins.str]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 source_url: Optional[pulumi.Input[_builtins.str]] = None,
+                 destination_url: pulumi.Input[Optional[_builtins.str]] = None,
+                 name: pulumi.Input[Optional[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 source_url: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

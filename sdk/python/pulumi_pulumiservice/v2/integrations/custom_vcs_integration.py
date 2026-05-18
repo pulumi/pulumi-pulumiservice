@@ -23,8 +23,8 @@ class CustomVCSIntegrationArgs:
                  environment: pulumi.Input[_builtins.str],
                  name: pulumi.Input[_builtins.str],
                  org_name: pulumi.Input[_builtins.str],
-                 integration_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 vcs_type: Optional[pulumi.Input[_builtins.str]] = None):
+                 integration_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 vcs_type: pulumi.Input[Optional[_builtins.str]] = None):
         """
         The set of arguments for constructing a CustomVCSIntegration resource.
 
@@ -94,26 +94,26 @@ class CustomVCSIntegrationArgs:
 
     @_builtins.property
     @pulumi.getter(name="integrationId")
-    def integration_id(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def integration_id(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The custom VCS integration identifier
         """
         return pulumi.get(self, "integration_id")
 
     @integration_id.setter
-    def integration_id(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def integration_id(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "integration_id", value)
 
     @_builtins.property
     @pulumi.getter(name="vcsType")
-    def vcs_type(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def vcs_type(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         Version control system type. Defaults to 'git' if not specified.
         """
         return pulumi.get(self, "vcs_type")
 
     @vcs_type.setter
-    def vcs_type(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def vcs_type(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "vcs_type", value)
 
 
@@ -123,12 +123,12 @@ class CustomVCSIntegration(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 base_url: Optional[pulumi.Input[_builtins.str]] = None,
-                 environment: Optional[pulumi.Input[_builtins.str]] = None,
-                 integration_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 name: Optional[pulumi.Input[_builtins.str]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 vcs_type: Optional[pulumi.Input[_builtins.str]] = None,
+                 base_url: pulumi.Input[Optional[_builtins.str]] = None,
+                 environment: pulumi.Input[Optional[_builtins.str]] = None,
+                 integration_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 name: pulumi.Input[Optional[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 vcs_type: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         """
         Creates a new custom VCS integration for an organization. Custom VCS integrations allow connecting self-hosted or third-party version control systems (e.g. Gitea, Forgejo, Bitbucket Server) to Pulumi Deployments. Credentials are managed via ESC environments, and deployments are triggered by inbound webhooks. Returns the created integration including its webhook URL and HMAC secret for signature verification.
@@ -168,12 +168,12 @@ class CustomVCSIntegration(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 base_url: Optional[pulumi.Input[_builtins.str]] = None,
-                 environment: Optional[pulumi.Input[_builtins.str]] = None,
-                 integration_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 name: Optional[pulumi.Input[_builtins.str]] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 vcs_type: Optional[pulumi.Input[_builtins.str]] = None,
+                 base_url: pulumi.Input[Optional[_builtins.str]] = None,
+                 environment: pulumi.Input[Optional[_builtins.str]] = None,
+                 integration_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 name: pulumi.Input[Optional[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 vcs_type: pulumi.Input[Optional[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

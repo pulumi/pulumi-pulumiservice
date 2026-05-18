@@ -22,13 +22,13 @@ class SettingsArgs:
                  org_name: pulumi.Input[_builtins.str],
                  project_name: pulumi.Input[_builtins.str],
                  stack_name: pulumi.Input[_builtins.str],
-                 agent_pool_id: Optional[pulumi.Input[_builtins.str]] = None,
+                 agent_pool_id: pulumi.Input[Optional[_builtins.str]] = None,
                  cache_options: Optional[Any] = None,
                  executor_context: Optional[Any] = None,
                  git_hub: Optional[Any] = None,
                  operation_context: Optional[Any] = None,
                  source_context: Optional[Any] = None,
-                 tag: Optional[pulumi.Input[_builtins.str]] = None,
+                 tag: pulumi.Input[Optional[_builtins.str]] = None,
                  vcs: Optional[Any] = None):
         """
         The set of arguments for constructing a Settings resource.
@@ -103,14 +103,14 @@ class SettingsArgs:
 
     @_builtins.property
     @pulumi.getter(name="agentPoolID")
-    def agent_pool_id(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def agent_pool_id(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The identifier of the agent pool to use for deployments.
         """
         return pulumi.get(self, "agent_pool_id")
 
     @agent_pool_id.setter
-    def agent_pool_id(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def agent_pool_id(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "agent_pool_id", value)
 
     @_builtins.property
@@ -175,14 +175,14 @@ class SettingsArgs:
 
     @_builtins.property
     @pulumi.getter
-    def tag(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def tag(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         A tag to identify the deployment settings configuration.
         """
         return pulumi.get(self, "tag")
 
     @tag.setter
-    def tag(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def tag(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "tag", value)
 
     @_builtins.property
@@ -204,16 +204,16 @@ class Settings(pulumi.CustomResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 agent_pool_id: Optional[pulumi.Input[_builtins.str]] = None,
+                 agent_pool_id: pulumi.Input[Optional[_builtins.str]] = None,
                  cache_options: Optional[Any] = None,
                  executor_context: Optional[Any] = None,
                  git_hub: Optional[Any] = None,
                  operation_context: Optional[Any] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 project_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 project_name: pulumi.Input[Optional[_builtins.str]] = None,
                  source_context: Optional[Any] = None,
-                 stack_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 tag: Optional[pulumi.Input[_builtins.str]] = None,
+                 stack_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 tag: pulumi.Input[Optional[_builtins.str]] = None,
                  vcs: Optional[Any] = None,
                  __props__=None):
         """
@@ -259,16 +259,16 @@ class Settings(pulumi.CustomResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 agent_pool_id: Optional[pulumi.Input[_builtins.str]] = None,
+                 agent_pool_id: pulumi.Input[Optional[_builtins.str]] = None,
                  cache_options: Optional[Any] = None,
                  executor_context: Optional[Any] = None,
                  git_hub: Optional[Any] = None,
                  operation_context: Optional[Any] = None,
-                 org_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 project_name: Optional[pulumi.Input[_builtins.str]] = None,
+                 org_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 project_name: pulumi.Input[Optional[_builtins.str]] = None,
                  source_context: Optional[Any] = None,
-                 stack_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 tag: Optional[pulumi.Input[_builtins.str]] = None,
+                 stack_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 tag: pulumi.Input[Optional[_builtins.str]] = None,
                  vcs: Optional[Any] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
