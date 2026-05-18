@@ -69,6 +69,12 @@ jobs:
           curl -LsSf https://astral.sh/uv/install.sh | sh
           echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
 
+      - name: Set up Java 17 (v2 example poms target release 17)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
       - name: Install maven (java toolchain)
         run: sudo apt-get update && sudo apt-get install -y maven
 
@@ -77,6 +83,9 @@ jobs:
 
       - name: Build SDKs
         run: make build_sdks
+
+      - name: Put locally-built provider on PATH
+        run: echo "${GITHUB_WORKSPACE}/bin" >> "$GITHUB_PATH"
 
       - name: Register local nodejs SDK with yarn
         run: cd sdk/nodejs/bin && yarn link
