@@ -66,6 +66,7 @@ jobs:
       - prerequisites
       - build_provider
       - test
+      - v2_tests
       - license_check
     uses: ./.github/workflows/publish.yml
     secrets: inherit
@@ -86,6 +87,14 @@ jobs:
     secrets: inherit
     with:
       version: ${{ needs.prerequisites.outputs.version }}
+
+  v2_tests:
+    name: v2_tests
+    uses: ./.github/workflows/v2-tests.yml
+    permissions:
+      contents: read
+      id-token: write
+    secrets: inherit
 
 name: prerelease
 on:
