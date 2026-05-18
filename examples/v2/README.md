@@ -1,5 +1,9 @@
 # v2 examples (hand-maintained per language)
 
+> **Preview.** The `pulumiservice:v2:*` resource surface is in preview. Resource
+> shape and module layout may change before GA; not yet recommended for
+> production.
+
 End-to-end tests of the `pulumiservice:v2:*` resource surface. Each example
 ships its own per-language program in:
 
