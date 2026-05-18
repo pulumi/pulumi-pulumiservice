@@ -530,8 +530,8 @@ func TestCreateReadsAfterCreate(t *testing.T) {
 		},
 	}
 	mock := &mockTransport{responses: map[string]mockResponse{
-		"POST /things/acme":           {status: 200, body: `{"id":"thing-1"}`},
-		"GET /things/acme/thing-1":    {status: 200, body: `{"id":"thing-1","name":"foo","lastUpdate":"2026-05-05T00:00:00Z","status":"ready"}`},
+		"POST /things/acme":        {status: 200, body: `{"id":"thing-1"}`},
+		"GET /things/acme/thing-1": {status: 200, body: `{"id":"thing-1","name":"foo","lastUpdate":"2026-05-05T00:00:00Z","status":"ready"}`},
 	}}
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 
@@ -737,3 +737,227 @@ func TestCreateMissingPathParam(t *testing.T) {
 	}
 }
 
+// TestUpdateReadsAfterUpdate: PATCH endpoints that echo back only the
+// mutated fields would otherwise shrink state to that sparse response and
+// leak as `+id` drift on the next refresh. The read-after-update merge
+// re-pulls the canonical record so state stays whole.
+func TestUpdateReadsAfterUpdate(t *testing.T) {
+	const specJSON = `{
+	  "openapi": "3.0.0",
+	  "components": {"schemas": {
+	    "Patch":   {"type": "object", "properties": {"name": {"type": "string"}, "description": {"type": "string"}}},
+	    "Sparse":  {"type": "object", "properties": {"name": {"type": "string"}, "description": {"type": "string"}}},
+	    "Full":    {"type": "object", "properties": {
+	      "id":          {"type": "string"},
+	      "name":        {"type": "string"},
+	      "description": {"type": "string"},
+	      "created":     {"type": "string"}
+	    }}
+	  }},
+	  "paths": {
+	    "/things/{org}/{id}": {
+	      "get": {
+	        "operationId": "GetThing",
+	        "parameters": [
+	          {"name": "org", "in": "path", "required": true, "schema": {"type": "string"}},
+	          {"name": "id",  "in": "path", "required": true, "schema": {"type": "string"}}
+	        ],
+	        "responses": {"200": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Full"}}}}}
+	      },
+	      "patch": {
+	        "operationId": "PatchThing",
+	        "parameters": [
+	          {"name": "org", "in": "path", "required": true, "schema": {"type": "string"}},
+	          {"name": "id",  "in": "path", "required": true, "schema": {"type": "string"}}
+	        ],
+	        "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Patch"}}}},
+	        "responses": {"200": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Sparse"}}}}}
+	      }
+	    }
+	  }
+	}`
+	spec, err := ParseSpec([]byte(specJSON))
+	if err != nil {
+		t.Fatalf("parse synthetic spec: %v", err)
+	}
+	r := &Resource{
+		spec: spec,
+		meta: ResourceMeta{
+			Operations: Operations{Read: "GetThing", Update: "PatchThing"},
+			IDFormat:   "{org}/{id}",
+		},
+	}
+	mock := &mockTransport{responses: map[string]mockResponse{
+		"PATCH /things/acme/thing-1": {status: 200, body: `{"name":"foo-renamed","description":"rotated"}`},
+		"GET /things/acme/thing-1":   {status: 200, body: `{"id":"thing-1","name":"foo-renamed","description":"rotated","created":"2026-05-05T00:00:00Z"}`},
+	}}
+	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+
+	resp, err := r.Update(context.Background(), p.UpdateRequest{
+		Inputs:    propMap(map[string]any{"org": "acme", "name": "foo-renamed", "description": "rotated"}),
+		OldInputs: propMap(map[string]any{"org": "acme", "name": "foo", "description": "original"}),
+		State:     propMap(map[string]any{"id": "thing-1", "name": "foo", "description": "original", "created": "2026-05-05T00:00:00Z"}),
+	})
+	if err != nil {
+		t.Fatalf("update: %v\n  calls: %v", err, mock.calls)
+	}
+	if len(mock.calls) != 2 || mock.calls[0] != "PATCH /things/acme/thing-1" || mock.calls[1] != "GET /things/acme/thing-1" {
+		t.Errorf("expected PATCH then GET, got: %v", mock.calls)
+	}
+	for _, key := range []string{"id", "created", "name", "description"} {
+		if _, ok := resp.Properties.GetOk(key); !ok {
+			t.Errorf("state missing %q after read-after-update", key)
+		}
+	}
+}
+
+// TestUpdateMergesPriorStateWithoutReadOp: without a read op, the update
+// path still has to preserve fields the update response doesn't echo —
+// otherwise refresh sees a synthetic diff.
+func TestUpdateMergesPriorStateWithoutReadOp(t *testing.T) {
+	const specJSON = `{
+	  "openapi": "3.0.0",
+	  "components": {"schemas": {
+	    "Patch":  {"type": "object", "properties": {"description": {"type": "string"}}},
+	    "Sparse": {"type": "object", "properties": {"name": {"type": "string"}, "description": {"type": "string"}}}
+	  }},
+	  "paths": {
+	    "/things/{org}/{id}": {
+	      "patch": {
+	        "operationId": "PatchThing",
+	        "parameters": [
+	          {"name": "org", "in": "path", "required": true, "schema": {"type": "string"}},
+	          {"name": "id",  "in": "path", "required": true, "schema": {"type": "string"}}
+	        ],
+	        "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Patch"}}}},
+	        "responses": {"200": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Sparse"}}}}}
+	      }
+	    }
+	  }
+	}`
+	spec, err := ParseSpec([]byte(specJSON))
+	if err != nil {
+		t.Fatalf("parse synthetic spec: %v", err)
+	}
+	r := &Resource{
+		spec: spec,
+		meta: ResourceMeta{
+			Operations: Operations{Update: "PatchThing"},
+			IDFormat:   "{org}/{id}",
+		},
+	}
+	mock := &mockTransport{responses: map[string]mockResponse{
+		"PATCH /things/acme/thing-1": {status: 200, body: `{"name":"foo","description":"rotated"}`},
+	}}
+	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+
+	resp, err := r.Update(context.Background(), p.UpdateRequest{
+		Inputs:    propMap(map[string]any{"org": "acme", "description": "rotated"}),
+		OldInputs: propMap(map[string]any{"org": "acme", "description": "original"}),
+		State:     propMap(map[string]any{"id": "thing-1", "name": "foo", "description": "original", "created": "2026-05-05T00:00:00Z"}),
+	})
+	if err != nil {
+		t.Fatalf("update: %v\n  calls: %v", err, mock.calls)
+	}
+	if v, ok := resp.Properties.GetOk("id"); !ok || v.AsString() != "thing-1" {
+		t.Errorf("state missing or wrong `id` after update-with-no-read-op: %v (ok=%v)", v, ok)
+	}
+	if v, ok := resp.Properties.GetOk("created"); !ok || v.AsString() != "2026-05-05T00:00:00Z" {
+		t.Errorf("state missing prior `created` after update-with-no-read-op: %v (ok=%v)", v, ok)
+	}
+	if v, ok := resp.Properties.GetOk("description"); !ok || v.AsString() != "rotated" {
+		t.Errorf("state has stale description, want %q got %v (ok=%v)", "rotated", v, ok)
+	}
+}
+
+// TestBuildRequestBodyExcludesParamsAndAppliesRenames: the body shouldn't
+// duplicate path/query parameters, and renames should only translate keys
+// that actually appear in the body schema (renames that exist purely to
+// expose a path-param wire name under a Pulumi synonym must not rewrite a
+// body field that happens to share the Pulumi name).
+func TestBuildRequestBodyExcludesParamsAndAppliesRenames(t *testing.T) {
+	const specJSON = `{
+	  "openapi": "3.0.0",
+	  "components": {"schemas": {
+	    "TeamBody":  {"type": "object", "properties": {
+	      "name":        {"type": "string"},
+	      "description": {"type": "string"}
+	    }},
+	    "WidgetBody": {"type": "object", "properties": {
+	      "widgetID":    {"type": "string"},
+	      "description": {"type": "string"}
+	    }}
+	  }},
+	  "paths": {
+	    "/teams/{org}/pulumi": {
+	      "post": {
+	        "operationId": "CreateTeam",
+	        "parameters": [{"name": "org", "in": "path", "required": true, "schema": {"type": "string"}}],
+	        "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/TeamBody"}}}},
+	        "responses": {"200": {"description": "OK"}}
+	      }
+	    },
+	    "/widgets/{org}": {
+	      "post": {
+	        "operationId": "CreateWidget",
+	        "parameters": [{"name": "org", "in": "path", "required": true, "schema": {"type": "string"}}],
+	        "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/WidgetBody"}}}},
+	        "responses": {"200": {"description": "OK"}}
+	      }
+	    }
+	  }
+	}`
+	spec, err := ParseSpec([]byte(specJSON))
+	if err != nil {
+		t.Fatalf("parse synthetic spec: %v", err)
+	}
+
+	cases := []struct {
+		name    string
+		op      string
+		renames map[string]string
+		inputs  map[string]any
+		want    map[string]any
+	}{
+		{
+			name:    "path param dropped",
+			op:      "CreateTeam",
+			renames: nil,
+			inputs:  map[string]any{"org": "acme", "name": "infra", "description": "infra team"},
+			want:    map[string]any{"name": "infra", "description": "infra team"},
+		},
+		{
+			name:    "rename for path-param does not rewrite body field of same Pulumi name",
+			op:      "CreateTeam",
+			renames: map[string]string{"name": "teamName"}, // path-only rename
+			inputs:  map[string]any{"org": "acme", "name": "infra", "description": "infra team"},
+			want:    map[string]any{"name": "infra", "description": "infra team"},
+		},
+		{
+			name:    "rename that targets a body field is applied",
+			op:      "CreateWidget",
+			renames: map[string]string{"id": "widgetID"}, // body field rename
+			inputs:  map[string]any{"org": "acme", "id": "w-1", "description": "wodget"},
+			want:    map[string]any{"widgetID": "w-1", "description": "wodget"},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			op, ok := spec.Op(tc.op)
+			if !ok {
+				t.Fatalf("op %q not in spec", tc.op)
+			}
+			r := &Resource{spec: spec, meta: ResourceMeta{Renames: tc.renames}}
+			got := r.buildRequestBody(op, propMap(tc.inputs))
+			if len(got) != len(tc.want) {
+				t.Errorf("len mismatch: got %v, want %v", got, tc.want)
+			}
+			for k, want := range tc.want {
+				if got[k] != want {
+					t.Errorf("body[%q]: got %v, want %v\n  full got: %v", k, got[k], want, got)
+				}
+			}
+		})
+	}
+}

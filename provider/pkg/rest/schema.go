@@ -252,6 +252,9 @@ func operationInputs(spec *Spec, op *Operation, rm ResourceMeta) (map[string]sch
 			name := pulumiName(k, rm.Renames)
 			ps := openAPIToProperty(p)
 			applyFieldMeta(&ps, rm.Fields[name], false)
+			if looksSecret(name) {
+				ps.Secret = true
+			}
 			props[name] = ps
 		}
 		for _, r := range bodyRequired {

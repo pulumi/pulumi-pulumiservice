@@ -558,7 +558,12 @@ func (r *Resource) preserveEmitOnCreate(newState, oldState property.Map) propert
 	return property.NewMap(out)
 }
 
-// Update fires the update op (if declared).
+// Update fires the update op (if declared), then mirrors Create's
+// read-after-create: PATCH/PUT endpoints often return sparse bodies
+// (sometimes just the mutated fields), so re-read when a read op is
+// declared to pick up server-side fields preserved across the update.
+// Without a read op, fall back to merging prior state under the update
+// response so fields the update endpoint didn't echo aren't dropped.
 func (r *Resource) Update(ctx context.Context, req p.UpdateRequest) (p.UpdateResponse, error) {
 	op, err := r.resolveOp("update", r.meta.Operations.Update)
 	if err != nil {
@@ -574,6 +579,14 @@ func (r *Resource) Update(ctx context.Context, req p.UpdateRequest) (p.UpdateRes
 	_, state, err := r.execAndDecode(ctx, op, src)
 	if err != nil {
 		return p.UpdateResponse{}, err
+	}
+	source := mergeMaps(req.Inputs, req.OldInputs, req.State, state)
+	if fetched, ok, err := r.fetchState(ctx, source, req.State); err != nil {
+		return p.UpdateResponse{}, fmt.Errorf("update: read-after-update: %w", err)
+	} else if ok {
+		state = fetched
+	} else {
+		state = mergeMaps(state, req.State)
 	}
 	return p.UpdateResponse{Properties: state}, nil
 }
@@ -630,7 +643,7 @@ func (r *Resource) execAndDecode(ctx context.Context, op *Operation, inputs prop
 				contentType = "application/x-yaml"
 			}
 		default:
-			bodyJSON, err := json.Marshal(propertyMapToAny(inputs))
+			bodyJSON, err := json.Marshal(r.buildRequestBody(op, inputs))
 			if err != nil {
 				return nil, property.Map{}, fmt.Errorf("rest: marshal request body for %s: %w", op.ID, err)
 			}
@@ -760,6 +773,44 @@ func propertyMapToAny(m property.Map) map[string]any {
 	out := make(map[string]any, m.Len())
 	for k, v := range m.AllStable {
 		out[k] = propertyValueToAny(v)
+	}
+	return out
+}
+
+// buildRequestBody assembles the JSON body for a request: it drops any
+// field that's also a path or query parameter (those are already routed
+// through the URL or query string, and some servers reject the duplicate)
+// and translates Pulumi-side keys back to wire-side names — but only when
+// the wire name actually appears in the request body schema. The renames
+// map can mix two purposes: exposing a wire-side path-param name under a
+// Pulumi-friendly synonym (e.g. teamName→name), and renaming a body
+// field. Without the schema check we'd rewrite the body's "name" key into
+// "teamName" and the server would reject it.
+func (r *Resource) buildRequestBody(op *Operation, inputs property.Map) map[string]any {
+	skip := make(map[string]bool, len(op.Parameters))
+	for _, p := range op.Parameters {
+		if p.In == "path" || p.In == "query" {
+			skip[pulumiName(p.Name, r.meta.Renames)] = true
+		}
+	}
+	bodyKeys := map[string]bool{}
+	if op.RequestRef != "" {
+		if bodyProps, _, err := flattenObjectSchema(r.spec, op.RequestRef); err == nil {
+			for k := range bodyProps {
+				bodyKeys[k] = true
+			}
+		}
+	}
+	out := make(map[string]any, inputs.Len())
+	for k, v := range inputs.AllStable {
+		if skip[k] {
+			continue
+		}
+		wire := wireSideName(k, r.meta.Renames)
+		if wire != k && !bodyKeys[wire] && bodyKeys[k] {
+			wire = k
+		}
+		out[wire] = propertyValueToAny(v)
 	}
 	return out
 }

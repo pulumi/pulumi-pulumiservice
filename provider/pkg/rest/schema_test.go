@@ -101,7 +101,7 @@ func TestIDIsSkippedFromOutputs(t *testing.T) {
 }
 
 // TestSecretFieldsAreMarkedSecret pins the looksSecret heuristic against
-// representative resources.
+// representative resources, on both outputs and inputs.
 func TestSecretFieldsAreMarkedSecret(t *testing.T) {
 	spec, meta := loadFixtures(t)
 	pkg, err := BuildSchema(spec, meta, "pulumiservice")
@@ -109,12 +109,14 @@ func TestSecretFieldsAreMarkedSecret(t *testing.T) {
 		t.Fatalf("BuildSchema: %v", err)
 	}
 	cases := []struct {
-		token string
-		field string
+		token   string
+		field   string
+		surface string // "output" or "input"
 	}{
-		{"pulumiservice:v2:OrgToken", "tokenValue"},
-		{"pulumiservice:v2:TeamToken", "tokenValue"},
-		{"pulumiservice:v2:PersonalToken", "tokenValue"},
+		{"pulumiservice:v2:OrgToken", "tokenValue", "output"},
+		{"pulumiservice:v2:TeamToken", "tokenValue", "output"},
+		{"pulumiservice:v2:PersonalToken", "tokenValue", "output"},
+		{"pulumiservice:v2:OrganizationWebhook", "secret", "input"},
 	}
 	for _, tc := range cases {
 		rm := meta.Resources[tc.token]
@@ -127,13 +129,17 @@ func TestSecretFieldsAreMarkedSecret(t *testing.T) {
 			t.Errorf("%s: resource missing from package", tc.token)
 			continue
 		}
-		ps, ok := rs.Properties[tc.field]
+		props := rs.Properties
+		if tc.surface == "input" {
+			props = rs.InputProperties
+		}
+		ps, ok := props[tc.field]
 		if !ok {
-			t.Errorf("%s: output %q missing", tc.token, tc.field)
+			t.Errorf("%s: %s %q missing", tc.token, tc.surface, tc.field)
 			continue
 		}
 		if !ps.Secret {
-			t.Errorf("%s.%s: Secret = false (expected true via looksSecret heuristic)", tc.token, tc.field)
+			t.Errorf("%s.%s (%s): Secret = false (expected true via looksSecret heuristic)", tc.token, tc.field, tc.surface)
 		}
 	}
 }
@@ -274,8 +280,8 @@ func TestPulumiNameRoundTrip(t *testing.T) {
 		"organizationName": "orgName",
 	}
 	cases := map[string]string{
-		"name":     "hookName",
-		"orgName":  "organizationName",
+		"name":      "hookName",
+		"orgName":   "organizationName",
 		"untouched": "untouched",
 	}
 	for wire, wantPulumi := range cases {
