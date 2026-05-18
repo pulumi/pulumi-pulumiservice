@@ -30,6 +30,7 @@ import (
 	"flag"
 	"fmt"
 	"maps"
+	"net/http"
 	"os"
 	"regexp"
 	"slices"
@@ -341,7 +342,7 @@ func inferRequireImport(spec *rest.Spec, ops derivedOps) bool {
 		return false
 	}
 	switch createOp.Method {
-	case "PUT", "PATCH":
+	case http.MethodPut, http.MethodPatch:
 		return true
 	}
 	return false
@@ -353,7 +354,7 @@ func inferRequireImport(spec *rest.Spec, ops derivedOps) bool {
 // singletons) skip this because they're idempotent by design.
 func inferDeleteBeforeReplace(spec *rest.Spec, ops derivedOps, renames map[string]string) bool {
 	createOp := opOrNil(spec, ops.Create)
-	if createOp == nil || createOp.Method != "POST" {
+	if createOp == nil || createOp.Method != http.MethodPost {
 		return false
 	}
 	if createOp.RequestRef != "" {

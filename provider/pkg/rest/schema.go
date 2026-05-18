@@ -200,11 +200,11 @@ func buildResource(spec *Spec, _ *Metadata, _ string, rm ResourceMeta) (*schema.
 }
 
 func hasYamlBody(op *Operation) bool {
-	return op != nil && op.RequestContentType == "application/x-yaml"
+	return op != nil && op.RequestContentType == contentYAML
 }
 
 func hasYamlResponse(op *Operation) bool {
-	return op != nil && op.ResponseContentType == "application/x-yaml"
+	return op != nil && op.ResponseContentType == contentYAML
 }
 
 // opOrNil resolves an operationId, returning nil when id is empty or absent.
@@ -224,7 +224,7 @@ func operationInputs(spec *Spec, op *Operation, rm ResourceMeta) (map[string]sch
 
 	// Path/query params first; path params are forceNew (URL identity).
 	for _, p := range op.Parameters {
-		if p.In != "path" && p.In != "query" {
+		if p.In != inPath && p.In != inQuery {
 			continue
 		}
 		name := pulumiName(p.Name, rm.Renames)
@@ -232,12 +232,12 @@ func operationInputs(spec *Spec, op *Operation, rm ResourceMeta) (map[string]sch
 			TypeSpec:    schema.TypeSpec{Type: defaultParamType(p.SchemaType)},
 			Description: p.Description,
 		}
-		if p.In == "path" {
+		if p.In == inPath {
 			ps.WillReplaceOnChanges = true
 		}
 		applyFieldMeta(&ps, rm.Fields[name], true)
 		props[name] = ps
-		if p.Required || p.In == "path" {
+		if p.Required || p.In == inPath {
 			required[name] = true
 		}
 	}
@@ -271,7 +271,7 @@ func operationInputs(spec *Spec, op *Operation, rm ResourceMeta) (map[string]sch
 // mutating them triggers a replace instead of a 404-ing in-place update.
 func mergePathParamsAsInputs(inputs map[string]schema.PropertySpec, required *[]string, op *Operation, rm ResourceMeta) error {
 	for _, pp := range op.Parameters {
-		if pp.In != "path" {
+		if pp.In != inPath {
 			continue
 		}
 		name := pulumiName(pp.Name, rm.Renames)

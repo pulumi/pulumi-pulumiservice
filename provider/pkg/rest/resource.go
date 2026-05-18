@@ -277,7 +277,7 @@ func (r *Resource) replaceTriggeringFields() map[string]bool {
 			continue
 		}
 		for _, pp := range op.Parameters {
-			if pp.In == "path" {
+			if pp.In == inPath {
 				out[pulumiName(pp.Name, r.meta.Renames)] = true
 			}
 		}
@@ -336,8 +336,8 @@ func (r *Resource) Create(ctx context.Context, req p.CreateRequest) (p.CreateRes
 		return p.CreateResponse{}, err
 	}
 	if updOp, _ := r.resolveOp("update", r.meta.Operations.Update); updOp != nil &&
-		updOp.RequestContentType == "application/x-yaml" &&
-		op.RequestContentType != "application/x-yaml" {
+		updOp.RequestContentType == contentYAML &&
+		op.RequestContentType != contentYAML {
 		if v, ok := req.Properties.GetOk("yaml"); ok && v.IsString() && v.AsString() != "" {
 			_, updState, err := r.execAndDecode(ctx, updOp, req.Properties)
 			if err != nil {
@@ -414,7 +414,7 @@ func (r *Resource) synthesizeID(state, inputs property.Map) (string, error) {
 	}
 	var parts []string
 	for _, pp := range op.Parameters {
-		if pp.In != "path" {
+		if pp.In != inPath {
 			continue
 		}
 		pulName := pulumiName(pp.Name, r.meta.Renames)
@@ -507,7 +507,7 @@ func compileIDFormatRegex(format string) (*regexp.Regexp, []string, error) {
 
 func hasPathParams(op *Operation) bool {
 	for _, p := range op.Parameters {
-		if p.In == "path" {
+		if p.In == inPath {
 			return true
 		}
 	}
@@ -649,11 +649,11 @@ func (r *Resource) execAndDecode(
 	contentType := ""
 	if needsBody(op.Method) {
 		switch op.RequestContentType {
-		case "application/x-yaml":
+		case contentYAML:
 			// Raw-string body from the "yaml" input; absent leaves the body empty.
 			if v, ok := inputs.GetOk("yaml"); ok && v.IsString() {
 				body = strings.NewReader(v.AsString())
-				contentType = "application/x-yaml"
+				contentType = contentYAML
 			}
 		default:
 			bodyJSON, err := json.Marshal(r.buildRequestBody(op, inputs))
@@ -661,7 +661,7 @@ func (r *Resource) execAndDecode(
 				return nil, property.Map{}, fmt.Errorf("rest: marshal request body for %s: %w", op.ID, err)
 			}
 			body = bytes.NewReader(bodyJSON)
-			contentType = "application/json"
+			contentType = contentJSON
 		}
 	}
 
@@ -672,7 +672,7 @@ func (r *Resource) execAndDecode(
 	if body != nil && contentType != "" {
 		httpReq.Header.Set("Content-Type", contentType)
 	}
-	httpReq.Header.Set("Accept", "application/json")
+	httpReq.Header.Set("Accept", contentJSON)
 
 	resp, err := transport.Do(ctx, httpReq)
 	if err != nil {
@@ -697,7 +697,7 @@ func (r *Resource) execAndDecode(
 		return respBody, property.NewMap(nil), nil
 	}
 	// Yaml response → bind raw body to state["yaml"].
-	if op.ResponseContentType == "application/x-yaml" {
+	if op.ResponseContentType == contentYAML {
 		state := property.NewMap(map[string]property.Value{
 			"yaml": property.New(string(respBody)),
 		})
@@ -802,7 +802,7 @@ func propertyMapToAny(m property.Map) map[string]any {
 func (r *Resource) buildRequestBody(op *Operation, inputs property.Map) map[string]any {
 	skip := make(map[string]bool, len(op.Parameters))
 	for _, p := range op.Parameters {
-		if p.In == "path" || p.In == "query" {
+		if p.In == inPath || p.In == inQuery {
 			skip[pulumiName(p.Name, r.meta.Renames)] = true
 		}
 	}

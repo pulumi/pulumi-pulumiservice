@@ -64,7 +64,7 @@ func TestRealSpecRecognizesEnvironmentYamlBody(t *testing.T) {
 	if !ok {
 		t.Fatal("UpdateEnvironment_esc_environments missing from real spec")
 	}
-	if op.RequestContentType != "application/x-yaml" {
+	if op.RequestContentType != contentYAML {
 		t.Errorf("UpdateEnvironment_esc_environments RequestContentType: got %q, want application/x-yaml",
 			op.RequestContentType)
 	}
@@ -72,7 +72,7 @@ func TestRealSpecRecognizesEnvironmentYamlBody(t *testing.T) {
 	if !ok {
 		t.Fatal("CreateEnvironment_esc_environments missing from real spec")
 	}
-	if create.RequestContentType != "application/json" {
+	if create.RequestContentType != contentJSON {
 		t.Errorf("CreateEnvironment_esc_environments RequestContentType: got %q, want application/json",
 			create.RequestContentType)
 	}
@@ -92,13 +92,13 @@ func TestParseSpecRecognizesContentTypes(t *testing.T) {
 		if op.RequestRef != synthCreateBodyRef {
 			t.Errorf("RequestRef: got %q, want CreateBody $ref", op.RequestRef)
 		}
-		if op.RequestContentType != "application/json" {
+		if op.RequestContentType != contentJSON {
 			t.Errorf("RequestContentType: got %q, want application/json", op.RequestContentType)
 		}
 		if op.ResponseRef != synthCreateBodyRef {
 			t.Errorf("ResponseRef: got %q, want CreateBody $ref", op.ResponseRef)
 		}
-		if op.ResponseContentType != "application/json" {
+		if op.ResponseContentType != contentJSON {
 			t.Errorf("ResponseContentType: got %q, want application/json", op.ResponseContentType)
 		}
 	})
@@ -111,7 +111,7 @@ func TestParseSpecRecognizesContentTypes(t *testing.T) {
 		if op.RequestRef != "" {
 			t.Errorf("RequestRef: got %q, want empty (yaml has no $ref)", op.RequestRef)
 		}
-		if op.RequestContentType != "application/x-yaml" {
+		if op.RequestContentType != contentYAML {
 			t.Errorf("RequestContentType: got %q, want application/x-yaml", op.RequestContentType)
 		}
 	})
@@ -124,7 +124,7 @@ func TestParseSpecRecognizesContentTypes(t *testing.T) {
 		if op.ResponseRef != "" {
 			t.Errorf("ResponseRef: got %q, want empty", op.ResponseRef)
 		}
-		if op.ResponseContentType != "application/x-yaml" {
+		if op.ResponseContentType != contentYAML {
 			t.Errorf("ResponseContentType: got %q, want application/x-yaml", op.ResponseContentType)
 		}
 	})
@@ -134,7 +134,7 @@ func TestParseSpecRecognizesContentTypes(t *testing.T) {
 		if !ok {
 			t.Fatal("op JsonPreferred not found")
 		}
-		if op.ResponseContentType != "application/json" {
+		if op.ResponseContentType != contentJSON {
 			t.Errorf("ResponseContentType: got %q, want application/json "+
 				"(JSON should win even at later code)", op.ResponseContentType)
 		}

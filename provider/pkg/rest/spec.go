@@ -17,14 +17,18 @@ package rest
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"strings"
 )
 
-// contentJSON / methodGET centralize the two string literals goconst
-// flagged across spec.go, resource.go, and the test files.
+// Centralized wire literals so goconst doesn't keep flagging the same
+// strings as new call sites appear. HTTP methods come from net/http.
+// Use these in place of the bare strings everywhere in this package.
 const (
 	contentJSON = "application/json"
-	methodGET   = "GET"
+	contentYAML = "application/x-yaml"
+	inPath      = "path"  // Parameter.In value for path parameters
+	inQuery     = "query" // Parameter.In value for query parameters
 )
 
 // Operation is the subset of an OpenAPI operation needed at runtime.
@@ -177,8 +181,8 @@ func parseOperation(id, path, method string, raw map[string]any) *Operation {
 		if ref := jsonContentRef(rb); ref != "" {
 			op.RequestRef = ref
 			op.RequestContentType = contentJSON
-		} else if bodySchema(rb, "application/x-yaml") != nil {
-			op.RequestContentType = "application/x-yaml"
+		} else if bodySchema(rb, contentYAML) != nil {
+			op.RequestContentType = contentYAML
 		}
 	}
 	if resps, ok := raw["responses"].(map[string]any); ok {
@@ -196,8 +200,8 @@ func parseOperation(id, path, method string, raw map[string]any) *Operation {
 		if op.ResponseContentType == "" {
 			for _, code := range []string{"200", "201", "202", "204"} {
 				if r, ok := resps[code].(map[string]any); ok {
-					if bodySchema(r, "application/x-yaml") != nil {
-						op.ResponseContentType = "application/x-yaml"
+					if bodySchema(r, contentYAML) != nil {
+						op.ResponseContentType = contentYAML
 						break
 					}
 				}
@@ -233,7 +237,8 @@ func bodySchema(o map[string]any, contentType string) map[string]any {
 
 func isHTTPMethod(m string) bool {
 	switch m {
-	case methodGET, "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS":
+	case http.MethodGet, http.MethodPost, http.MethodPut, http.MethodPatch,
+		http.MethodDelete, http.MethodHead, http.MethodOptions:
 		return true
 	}
 	return false

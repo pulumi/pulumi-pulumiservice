@@ -31,7 +31,7 @@ import (
 
 // Repeated test-only literals — extracted so goconst stops flagging them.
 const (
-	teamToken      = "pulumiservice:v2:Team"
+	teamToken      = "pulumiservice:v2:Team" //nolint:gosec // resource token, not a credential
 	getThingPath   = "GET /things/acme/thing-1"
 	patchThingPath = "PATCH /things/acme/thing-1"
 )
@@ -181,9 +181,9 @@ func TestCreateSynthesizesID(t *testing.T) {
 				written := false
 				return func(req *http.Request) mockResponse {
 					switch {
-					case req.Method == methodGET && !written:
+					case req.Method == http.MethodGet && !written:
 						return mockResponse{status: 404, body: `{"error":"not found"}`}
-					case req.Method == methodGET:
+					case req.Method == http.MethodGet:
 						return mockResponse{status: 200, body: `{"orgName":"test-org"}`}
 					case req.URL.Path == "/api/user/organizations/test-org/default":
 						written = true
@@ -205,11 +205,11 @@ func TestCreateSynthesizesID(t *testing.T) {
 				written := false
 				return func(req *http.Request) mockResponse {
 					switch {
-					case req.Method == methodGET && !written:
+					case req.Method == http.MethodGet && !written:
 						return mockResponse{status: 404, body: `{"error":"not found"}`}
-					case req.Method == methodGET:
+					case req.Method == http.MethodGet:
 						return mockResponse{status: 200, body: `{}`}
-					case req.Method == "POST":
+					case req.Method == http.MethodPost:
 						written = true
 						return mockResponse{status: 200, body: `{}`}
 					}
@@ -359,13 +359,13 @@ func TestCreateFusesYamlUpdateAfterJsonCreate(t *testing.T) {
 	if len(seen) != 2 {
 		t.Fatalf("expected 2 HTTP calls (create + yaml apply), got %d: %#v", len(seen), seen)
 	}
-	if seen[0].method != "POST" || seen[0].path != "/envs/acme" {
+	if seen[0].method != http.MethodPost || seen[0].path != "/envs/acme" {
 		t.Errorf("first call: got %s %s, want POST /envs/acme", seen[0].method, seen[0].path)
 	}
-	if seen[0].contentType != "application/json" {
+	if seen[0].contentType != contentJSON {
 		t.Errorf("first call content-type: got %q, want application/json", seen[0].contentType)
 	}
-	if seen[1].method != "PATCH" || seen[1].path != "/envs/acme/default/platform-bootstrap" {
+	if seen[1].method != http.MethodPatch || seen[1].path != "/envs/acme/default/platform-bootstrap" {
 		t.Errorf("second call: got %s %s, want PATCH /envs/acme/default/platform-bootstrap", seen[1].method, seen[1].path)
 	}
 	if seen[1].contentType != "application/x-yaml" {
@@ -473,8 +473,8 @@ func TestCreateReadAfterCreateSourcesFromInputs(t *testing.T) {
 		},
 	}
 	mock := &mockTransport{responses: map[string]mockResponse{
-		"POST /things/acme":        {status: 200, body: `{"id":"thing-1"}`},
-		getThingPath: {status: 200, body: `{"id":"thing-1","name":"foo","status":"ready"}`},
+		"POST /things/acme": {status: 200, body: `{"id":"thing-1"}`},
+		getThingPath:        {status: 200, body: `{"id":"thing-1","name":"foo","status":"ready"}`},
 	}}
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 
@@ -621,10 +621,10 @@ func TestCreateRequireImport_ProceedsOn404(t *testing.T) {
 	var putCalled bool
 	mock := &mockTransport{responseFn: func(req *http.Request) mockResponse {
 		switch req.Method {
-		case "PUT":
+		case http.MethodPut:
 			putCalled = true
 			return mockResponse{status: 200, body: `{"org":"acme","value":"new"}`}
-		case methodGET:
+		case http.MethodGet:
 			if putCalled {
 				return mockResponse{status: 200, body: `{"org":"acme","value":"new"}`}
 			}
