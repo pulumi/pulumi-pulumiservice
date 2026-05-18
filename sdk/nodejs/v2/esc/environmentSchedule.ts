@@ -105,7 +105,7 @@ export class EnvironmentSchedule extends pulumi.CustomResource {
             resourceInputs["scheduleCron"] = args?.scheduleCron;
             resourceInputs["scheduleID"] = args?.scheduleID;
             resourceInputs["scheduleOnce"] = args?.scheduleOnce;
-            resourceInputs["secretRotationRequest"] = args?.secretRotationRequest;
+            resourceInputs["secretRotationRequest"] = args?.secretRotationRequest ? pulumi.secret(args.secretRotationRequest) : undefined;
             resourceInputs["created"] = undefined /*out*/;
             resourceInputs["definition"] = undefined /*out*/;
             resourceInputs["kind"] = undefined /*out*/;

@@ -45,6 +45,9 @@ func NewConfig(ctx *pulumi.Context,
 	if args.StackName == nil {
 		return nil, errors.New("invalid value for required argument 'StackName'")
 	}
+	if args.SecretsProvider != nil {
+		args.SecretsProvider = pulumi.ToSecret(args.SecretsProvider).(pulumi.StringPtrInput)
+	}
 	secrets := pulumi.AdditionalSecretOutputs([]string{
 		"secretsProvider",
 	})

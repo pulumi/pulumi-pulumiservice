@@ -90,9 +90,6 @@ public class AccessToken extends com.pulumi.resources.CustomResource {
             .additionalSecretOutputs(List.of(
                 "value"
             ))
-            .replaceOnChanges(List.of(
-                "description"
-            ))
             .build();
         return com.pulumi.resources.CustomResourceOptions.merge(defaultOptions, options, id);
     }

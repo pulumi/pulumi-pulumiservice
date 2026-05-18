@@ -120,11 +120,11 @@ export interface OrganizationMemberArgs {
     /**
      * The built-in organization role. One of `member`, `admin`, `billing-manager`. Defaults to `member` on create. Ignored when `roleId` is set.
      */
-    role?: pulumi.Input<string | undefined>;
+    role?: pulumi.Input<string>;
     /**
      * The ID of a custom (fine-grained) organization role to assign. Takes precedence over `role`.
      */
-    roleId?: pulumi.Input<string | undefined>;
+    roleId?: pulumi.Input<string>;
     /**
      * The Pulumi Cloud username of the member.
      */

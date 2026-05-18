@@ -132,7 +132,7 @@ export class Webhook extends pulumi.CustomResource {
             resourceInputs["organizationName"] = args?.organizationName;
             resourceInputs["payloadUrl"] = args?.payloadUrl;
             resourceInputs["projectName"] = args?.projectName;
-            resourceInputs["secret"] = args?.secret;
+            resourceInputs["secret"] = args?.secret ? pulumi.secret(args.secret) : undefined;
             resourceInputs["stackName"] = args?.stackName;
             resourceInputs["hasSecret"] = undefined /*out*/;
             resourceInputs["secretCiphertext"] = undefined /*out*/;

@@ -134,12 +134,6 @@ public class OrgAccessToken extends com.pulumi.resources.CustomResource {
             .additionalSecretOutputs(List.of(
                 "value"
             ))
-            .replaceOnChanges(List.of(
-                "admin",
-                "description",
-                "name",
-                "organizationName"
-            ))
             .build();
         return com.pulumi.resources.CustomResourceOptions.merge(defaultOptions, options, id);
     }

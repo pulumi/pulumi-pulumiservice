@@ -332,7 +332,7 @@ class Webhook(pulumi.CustomResource):
             if project_name is None and not opts.urn:
                 raise TypeError("Missing required property 'project_name'")
             __props__.__dict__["project_name"] = project_name
-            __props__.__dict__["secret"] = secret
+            __props__.__dict__["secret"] = None if secret is None else pulumi.Output.secret(secret)
             if stack_name is None and not opts.urn:
                 raise TypeError("Missing required property 'stack_name'")
             __props__.__dict__["stack_name"] = stack_name

@@ -228,11 +228,21 @@ namespace Pulumi.PulumiService.V2.EscPreview
         [Input("projectName")]
         public Input<string>? ProjectName { get; set; }
 
+        [Input("secret")]
+        private Input<string>? _secret;
+
         /// <summary>
         /// Secret will be omitted when returned from the service.
         /// </summary>
-        [Input("secret")]
-        public Input<string>? Secret { get; set; }
+        public Input<string>? Secret
+        {
+            get => _secret;
+            set
+            {
+                var emptySecret = Output.CreateSecret(0);
+                _secret = Output.Tuple<Input<string>?, int>(value, emptySecret).Apply(t => t.Item1);
+            }
+        }
 
         /// <summary>
         /// The stack name. Set when the webhook is scoped to a specific stack.

@@ -127,7 +127,7 @@ export interface OrganizationRoleArgs {
     /**
      * Human-readable description of what the role grants.
      */
-    description?: pulumi.Input<string | undefined>;
+    description?: pulumi.Input<string>;
     /**
      * The role's display name. Must be unique within the organization.
      */
@@ -155,5 +155,5 @@ export interface OrganizationRoleArgs {
     /**
      * The resource type the role's permissions apply to. Defaults to `global` (the org-wide role that can be assigned to members and teams). Other valid values: `stack`, `environment`, `insights-account`.
      */
-    resourceType?: pulumi.Input<string | undefined>;
+    resourceType?: pulumi.Input<string>;
 }

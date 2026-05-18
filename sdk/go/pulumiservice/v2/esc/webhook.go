@@ -76,6 +76,9 @@ func NewWebhook(ctx *pulumi.Context,
 	if args.ProjectName == nil {
 		return nil, errors.New("invalid value for required argument 'ProjectName'")
 	}
+	if args.Secret != nil {
+		args.Secret = pulumi.ToSecret(args.Secret).(pulumi.StringPtrInput)
+	}
 	secrets := pulumi.AdditionalSecretOutputs([]string{
 		"hasSecret",
 		"secret",

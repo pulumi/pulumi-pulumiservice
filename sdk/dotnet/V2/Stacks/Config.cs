@@ -118,11 +118,21 @@ namespace Pulumi.PulumiService.V2.Stacks
         [Input("projectName", required: true)]
         public Input<string> ProjectName { get; set; } = null!;
 
+        [Input("secretsProvider")]
+        private Input<string>? _secretsProvider;
+
         /// <summary>
         /// The stack's secrets provider.
         /// </summary>
-        [Input("secretsProvider")]
-        public Input<string>? SecretsProvider { get; set; }
+        public Input<string>? SecretsProvider
+        {
+            get => _secretsProvider;
+            set
+            {
+                var emptySecret = Output.CreateSecret(0);
+                _secretsProvider = Output.Tuple<Input<string>?, int>(value, emptySecret).Apply(t => t.Item1);
+            }
+        }
 
         /// <summary>
         /// The stack name

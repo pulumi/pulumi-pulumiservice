@@ -103,7 +103,7 @@ export interface TeamAccessTokenArgs {
     /**
      * Optional. Description for the token.
      */
-    description?: pulumi.Input<string | undefined>;
+    description?: pulumi.Input<string>;
     /**
      * The name for the token. This must be unique amongst all machine tokens within your organization.
      */

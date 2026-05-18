@@ -215,7 +215,7 @@ class EnvironmentSchedule(pulumi.CustomResource):
             __props__.__dict__["schedule_cron"] = schedule_cron
             __props__.__dict__["schedule_id"] = schedule_id
             __props__.__dict__["schedule_once"] = schedule_once
-            __props__.__dict__["secret_rotation_request"] = secret_rotation_request
+            __props__.__dict__["secret_rotation_request"] = None if secret_rotation_request is None else pulumi.Output.secret(secret_rotation_request)
             __props__.__dict__["created"] = None
             __props__.__dict__["definition"] = None
             __props__.__dict__["kind"] = None

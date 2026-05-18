@@ -84,6 +84,9 @@ func NewWebhook(ctx *pulumi.Context,
 	if args.StackName == nil {
 		return nil, errors.New("invalid value for required argument 'StackName'")
 	}
+	if args.Secret != nil {
+		args.Secret = pulumi.ToSecret(args.Secret).(pulumi.StringPtrInput)
+	}
 	secrets := pulumi.AdditionalSecretOutputs([]string{
 		"hasSecret",
 		"secret",

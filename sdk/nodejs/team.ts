@@ -110,23 +110,23 @@ export interface TeamArgs {
     /**
      * Optional. Team description.
      */
-    description?: pulumi.Input<string | undefined>;
+    description?: pulumi.Input<string>;
     /**
      * Optional. Team display name.
      */
-    displayName?: pulumi.Input<string | undefined>;
+    displayName?: pulumi.Input<string>;
     /**
      * The GitHub ID of the team to mirror. Must be in the same GitHub organization that the Pulumi org is backed by. Required for "github" teams.
      */
-    githubTeamId?: pulumi.Input<number | undefined>;
+    githubTeamId?: pulumi.Input<number>;
     /**
      * List of Pulumi Cloud usernames of team members.
      */
-    members?: pulumi.Input<pulumi.Input<string>[] | undefined>;
+    members?: pulumi.Input<pulumi.Input<string>[]>;
     /**
      * The team's name. Required for "pulumi" teams.
      */
-    name?: pulumi.Input<string | undefined>;
+    name?: pulumi.Input<string>;
     /**
      * The name of the Pulumi organization the team belongs to.
      */

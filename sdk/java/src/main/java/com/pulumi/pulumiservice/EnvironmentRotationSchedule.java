@@ -10,7 +10,6 @@ import com.pulumi.core.internal.Codegen;
 import com.pulumi.pulumiservice.EnvironmentRotationScheduleArgs;
 import com.pulumi.pulumiservice.Utilities;
 import java.lang.String;
-import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
 
@@ -144,12 +143,6 @@ public class EnvironmentRotationSchedule extends com.pulumi.resources.CustomReso
     private static com.pulumi.resources.CustomResourceOptions makeResourceOptions(@Nullable com.pulumi.resources.CustomResourceOptions options, @Nullable Output<java.lang.String> id) {
         var defaultOptions = com.pulumi.resources.CustomResourceOptions.builder()
             .version(Utilities.getVersion())
-            .replaceOnChanges(List.of(
-                "environment",
-                "organization",
-                "project",
-                "timestamp"
-            ))
             .build();
         return com.pulumi.resources.CustomResourceOptions.merge(defaultOptions, options, id);
     }

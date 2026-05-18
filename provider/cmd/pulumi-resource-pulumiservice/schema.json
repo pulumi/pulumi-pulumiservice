@@ -3904,7 +3904,8 @@
         },
         "secretRotationRequest": {
           "$ref": "pulumi.json#/Any",
-          "description": "The secret rotation request"
+          "description": "The secret rotation request",
+          "secret": true
         }
       },
       "requiredInputs": [
@@ -4297,7 +4298,8 @@
         },
         "secret": {
           "type": "string",
-          "description": "Secret will be omitted when returned from the service."
+          "description": "Secret will be omitted when returned from the service.",
+          "secret": true
         },
         "stackName": {
           "type": "string",
@@ -4645,7 +4647,8 @@
         },
         "secret": {
           "type": "string",
-          "description": "Secret will be omitted when returned from the service."
+          "description": "Secret will be omitted when returned from the service.",
+          "secret": true
         },
         "stackName": {
           "type": "string",
@@ -5639,7 +5642,8 @@
         },
         "secretsProvider": {
           "type": "string",
-          "description": "The stack's secrets provider."
+          "description": "The stack's secrets provider.",
+          "secret": true
         },
         "stackName": {
           "type": "string",
@@ -5923,7 +5927,8 @@
         },
         "secret": {
           "type": "string",
-          "description": "Secret will be omitted when returned from the service."
+          "description": "Secret will be omitted when returned from the service.",
+          "secret": true
         },
         "stackName": {
           "type": "string",
@@ -6639,7 +6644,8 @@
         },
         "secret": {
           "type": "string",
-          "description": "Secret will be omitted when returned from the service."
+          "description": "Secret will be omitted when returned from the service.",
+          "secret": true
         },
         "stackName": {
           "type": "string",

@@ -11,7 +11,6 @@ import com.pulumi.pulumiservice.TeamStackPermissionArgs;
 import com.pulumi.pulumiservice.Utilities;
 import com.pulumi.pulumiservice.enums.TeamStackPermissionScope;
 import java.lang.String;
-import java.util.List;
 import javax.annotation.Nullable;
 
 /**
@@ -130,13 +129,6 @@ public class TeamStackPermission extends com.pulumi.resources.CustomResource {
     private static com.pulumi.resources.CustomResourceOptions makeResourceOptions(@Nullable com.pulumi.resources.CustomResourceOptions options, @Nullable Output<java.lang.String> id) {
         var defaultOptions = com.pulumi.resources.CustomResourceOptions.builder()
             .version(Utilities.getVersion())
-            .replaceOnChanges(List.of(
-                "organization",
-                "permission",
-                "project",
-                "stack",
-                "team"
-            ))
             .build();
         return com.pulumi.resources.CustomResourceOptions.merge(defaultOptions, options, id);
     }

@@ -106,9 +106,9 @@ def get_environment(name: Optional[_builtins.str] = None,
         name=pulumi.get(__ret__, 'name'),
         organization_name=pulumi.get(__ret__, 'organization_name'),
         project_name=pulumi.get(__ret__, 'project_name'))
-def get_environment_output(name: pulumi.Input[Optional[_builtins.str]] = None,
-                           organization_name: pulumi.Input[Optional[_builtins.str]] = None,
-                           project_name: pulumi.Input[Optional[Optional[_builtins.str]]] = None,
+def get_environment_output(name: Optional[pulumi.Input[_builtins.str]] = None,
+                           organization_name: Optional[pulumi.Input[_builtins.str]] = None,
+                           project_name: Optional[pulumi.Input[Optional[_builtins.str]]] = None,
                            opts: Optional[Union[pulumi.InvokeOptions, pulumi.InvokeOutputOptions]] = None) -> pulumi.Output[GetEnvironmentResult]:
     """
     Looks up an existing ESC environment by name and returns its UUID. Use this to scope a custom RBAC role to a specific environment — pass the returned UUID into `buildEnvironmentScopedPermissions`, or use it as the `identity` field of a hand-rolled `PermissionLiteralExpressionEnvironment` in `OrganizationRole.permissions`. Errors when the environment is not found.

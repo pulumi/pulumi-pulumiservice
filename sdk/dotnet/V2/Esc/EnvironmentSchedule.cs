@@ -162,11 +162,21 @@ namespace Pulumi.PulumiService.V2.Esc
         [Input("scheduleOnce")]
         public Input<string>? ScheduleOnce { get; set; }
 
+        [Input("secretRotationRequest")]
+        private Input<object>? _secretRotationRequest;
+
         /// <summary>
         /// The secret rotation request
         /// </summary>
-        [Input("secretRotationRequest")]
-        public Input<object>? SecretRotationRequest { get; set; }
+        public Input<object>? SecretRotationRequest
+        {
+            get => _secretRotationRequest;
+            set
+            {
+                var emptySecret = Output.CreateSecret(0);
+                _secretRotationRequest = Output.Tuple<Input<object>?, int>(value, emptySecret).Apply(t => t.Item1);
+            }
+        }
 
         public EnvironmentScheduleArgs()
         {

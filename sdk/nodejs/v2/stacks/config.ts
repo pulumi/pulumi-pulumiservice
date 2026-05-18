@@ -79,7 +79,7 @@ export class Config extends pulumi.CustomResource {
             resourceInputs["environment"] = args?.environment;
             resourceInputs["orgName"] = args?.orgName;
             resourceInputs["projectName"] = args?.projectName;
-            resourceInputs["secretsProvider"] = args?.secretsProvider;
+            resourceInputs["secretsProvider"] = args?.secretsProvider ? pulumi.secret(args.secretsProvider) : undefined;
             resourceInputs["stackName"] = args?.stackName;
         } else {
             resourceInputs["encryptedKey"] = undefined /*out*/;

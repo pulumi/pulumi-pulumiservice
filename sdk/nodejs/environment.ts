@@ -113,7 +113,7 @@ export interface EnvironmentArgs {
     /**
      * Project name.
      */
-    project?: pulumi.Input<string | undefined>;
+    project?: pulumi.Input<string>;
     /**
      * Environment's yaml file.
      */

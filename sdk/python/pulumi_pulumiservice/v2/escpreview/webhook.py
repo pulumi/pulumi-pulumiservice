@@ -317,7 +317,7 @@ class Webhook(pulumi.CustomResource):
                 raise TypeError("Missing required property 'payload_url'")
             __props__.__dict__["payload_url"] = payload_url
             __props__.__dict__["project_name"] = project_name
-            __props__.__dict__["secret"] = secret
+            __props__.__dict__["secret"] = None if secret is None else pulumi.Output.secret(secret)
             __props__.__dict__["stack_name"] = stack_name
             __props__.__dict__["has_secret"] = None
             __props__.__dict__["secret_ciphertext"] = None

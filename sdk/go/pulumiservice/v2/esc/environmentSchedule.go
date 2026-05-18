@@ -56,6 +56,9 @@ func NewEnvironmentSchedule(ctx *pulumi.Context,
 	if args.ProjectName == nil {
 		return nil, errors.New("invalid value for required argument 'ProjectName'")
 	}
+	if args.SecretRotationRequest != nil {
+		args.SecretRotationRequest = pulumi.ToSecret(args.SecretRotationRequest).(pulumi.Input)
+	}
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource EnvironmentSchedule
 	err := ctx.RegisterResource("pulumiservice:v2/esc:EnvironmentSchedule", name, args, &resource, opts...)

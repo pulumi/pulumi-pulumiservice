@@ -106,11 +106,11 @@ export interface AgentPoolArgs {
     /**
      * Description of the agent pool.
      */
-    description?: pulumi.Input<string | undefined>;
+    description?: pulumi.Input<string>;
     /**
      * Optional. Flag indicating whether to delete the agent pool even if stacks are configured to use it.
      */
-    forceDestroy?: pulumi.Input<boolean | undefined>;
+    forceDestroy?: pulumi.Input<boolean>;
     /**
      * Name of the agent pool.
      */
