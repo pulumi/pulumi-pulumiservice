@@ -55,6 +55,21 @@ public final class DeploymentSettingsVcsArgs extends com.pulumi.resources.Resour
     }
 
     /**
+     * The VCS integration installation ID. Use to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps). If omitted, the API resolves the integration automatically from `provider` and `repository`.
+     * 
+     */
+    @Import(name="installationId")
+    private @Nullable Output<String> installationId;
+
+    /**
+     * @return The VCS integration installation ID. Use to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps). If omitted, the API resolves the integration automatically from `provider` and `repository`.
+     * 
+     */
+    public Optional<Output<String>> installationId() {
+        return Optional.ofNullable(this.installationId);
+    }
+
+    /**
      * The paths within the repo that deployments should be filtered to.
      * 
      */
@@ -134,6 +149,7 @@ public final class DeploymentSettingsVcsArgs extends com.pulumi.resources.Resour
     private DeploymentSettingsVcsArgs(DeploymentSettingsVcsArgs $) {
         this.deployCommits = $.deployCommits;
         this.deployPullRequest = $.deployPullRequest;
+        this.installationId = $.installationId;
         this.paths = $.paths;
         this.previewPullRequests = $.previewPullRequests;
         this.provider = $.provider;
@@ -199,6 +215,27 @@ public final class DeploymentSettingsVcsArgs extends com.pulumi.resources.Resour
          */
         public Builder deployPullRequest(Integer deployPullRequest) {
             return deployPullRequest(Output.of(deployPullRequest));
+        }
+
+        /**
+         * @param installationId The VCS integration installation ID. Use to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps). If omitted, the API resolves the integration automatically from `provider` and `repository`.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder installationId(@Nullable Output<String> installationId) {
+            $.installationId = installationId;
+            return this;
+        }
+
+        /**
+         * @param installationId The VCS integration installation ID. Use to disambiguate when an organization has multiple integrations of the same provider type (e.g., two GitHub Apps). If omitted, the API resolves the integration automatically from `provider` and `repository`.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder installationId(String installationId) {
+            return installationId(Output.of(installationId));
         }
 
         /**
