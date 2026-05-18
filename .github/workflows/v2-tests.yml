@@ -28,6 +28,10 @@ env:
   PULUMI_TEST_USE_SERVICE: "true"
   PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
+  # Override mise.toml's java=corretto-11 — v2 example poms target
+  # release 17 (the SDK gradle build uses JavaLanguageVersion.of(17))
+  # and corretto-11's javac rejects --release 17.
+  MISE_JAVA_VERSION: temurin-17
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -68,15 +72,6 @@ jobs:
         run: |
           curl -LsSf https://astral.sh/uv/install.sh | sh
           echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
-
-      - name: Set up Java 17 (v2 example poms target release 17)
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-
-      - name: Force Java 17 ahead of mise's corretto-11 on PATH
-        run: echo "${JAVA_HOME}/bin" >> "$GITHUB_PATH"
 
       - name: Install maven (java toolchain)
         run: sudo apt-get update && sudo apt-get install -y maven
