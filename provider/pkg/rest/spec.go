@@ -20,6 +20,13 @@ import (
 	"strings"
 )
 
+// contentJSON / methodGET centralize the two string literals goconst
+// flagged across spec.go, resource.go, and the test files.
+const (
+	contentJSON = "application/json"
+	methodGET   = "GET"
+)
+
 // Operation is the subset of an OpenAPI operation needed at runtime.
 type Operation struct {
 	ID                  string
@@ -46,9 +53,9 @@ type Parameter struct {
 
 // Spec is a parsed OpenAPI 3 document indexed by operationId.
 type Spec struct {
-	Servers   []string
-	ops       map[string]*Operation
-	schemas   map[string]map[string]any // components/schemas by name
+	Servers []string
+	ops     map[string]*Operation
+	schemas map[string]map[string]any // components/schemas by name
 }
 
 // ParseSpec parses an OpenAPI 3 JSON document.
@@ -169,7 +176,7 @@ func parseOperation(id, path, method string, raw map[string]any) *Operation {
 	if rb, ok := raw["requestBody"].(map[string]any); ok {
 		if ref := jsonContentRef(rb); ref != "" {
 			op.RequestRef = ref
-			op.RequestContentType = "application/json"
+			op.RequestContentType = contentJSON
 		} else if bodySchema(rb, "application/x-yaml") != nil {
 			op.RequestContentType = "application/x-yaml"
 		}
@@ -181,7 +188,7 @@ func parseOperation(id, path, method string, raw map[string]any) *Operation {
 			if r, ok := resps[code].(map[string]any); ok {
 				if ref := jsonContentRef(r); ref != "" {
 					op.ResponseRef = ref
-					op.ResponseContentType = "application/json"
+					op.ResponseContentType = contentJSON
 					break
 				}
 			}
@@ -200,9 +207,9 @@ func parseOperation(id, path, method string, raw map[string]any) *Operation {
 	return op
 }
 
-// jsonContentRef returns content["application/json"].schema.$ref, or "".
+// jsonContentRef returns content[contentJSON].schema.$ref, or "".
 func jsonContentRef(o map[string]any) string {
-	sch := bodySchema(o, "application/json")
+	sch := bodySchema(o, contentJSON)
 	if sch == nil {
 		return ""
 	}
@@ -226,7 +233,7 @@ func bodySchema(o map[string]any, contentType string) map[string]any {
 
 func isHTTPMethod(m string) bool {
 	switch m {
-	case "GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS":
+	case methodGET, "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS":
 		return true
 	}
 	return false

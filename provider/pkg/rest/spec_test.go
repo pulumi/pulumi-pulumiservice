@@ -16,6 +16,8 @@ package rest
 
 import "testing"
 
+const synthCreateBodyRef = "#/components/schemas/CreateBody"
+
 const yamlBodySpec = `{
   "openapi": "3.0.0",
   "components": {"schemas": {
@@ -63,14 +65,16 @@ func TestRealSpecRecognizesEnvironmentYamlBody(t *testing.T) {
 		t.Fatal("UpdateEnvironment_esc_environments missing from real spec")
 	}
 	if op.RequestContentType != "application/x-yaml" {
-		t.Errorf("UpdateEnvironment_esc_environments RequestContentType: got %q, want application/x-yaml", op.RequestContentType)
+		t.Errorf("UpdateEnvironment_esc_environments RequestContentType: got %q, want application/x-yaml",
+			op.RequestContentType)
 	}
 	create, ok := spec.Op("CreateEnvironment_esc_environments")
 	if !ok {
 		t.Fatal("CreateEnvironment_esc_environments missing from real spec")
 	}
 	if create.RequestContentType != "application/json" {
-		t.Errorf("CreateEnvironment_esc_environments RequestContentType: got %q, want application/json", create.RequestContentType)
+		t.Errorf("CreateEnvironment_esc_environments RequestContentType: got %q, want application/json",
+			create.RequestContentType)
 	}
 }
 
@@ -85,13 +89,13 @@ func TestParseSpecRecognizesContentTypes(t *testing.T) {
 		if !ok {
 			t.Fatal("op JsonOnly not found")
 		}
-		if op.RequestRef != "#/components/schemas/CreateBody" {
+		if op.RequestRef != synthCreateBodyRef {
 			t.Errorf("RequestRef: got %q, want CreateBody $ref", op.RequestRef)
 		}
 		if op.RequestContentType != "application/json" {
 			t.Errorf("RequestContentType: got %q, want application/json", op.RequestContentType)
 		}
-		if op.ResponseRef != "#/components/schemas/CreateBody" {
+		if op.ResponseRef != synthCreateBodyRef {
 			t.Errorf("ResponseRef: got %q, want CreateBody $ref", op.ResponseRef)
 		}
 		if op.ResponseContentType != "application/json" {
@@ -131,9 +135,10 @@ func TestParseSpecRecognizesContentTypes(t *testing.T) {
 			t.Fatal("op JsonPreferred not found")
 		}
 		if op.ResponseContentType != "application/json" {
-			t.Errorf("ResponseContentType: got %q, want application/json (JSON should win even at later code)", op.ResponseContentType)
+			t.Errorf("ResponseContentType: got %q, want application/json "+
+				"(JSON should win even at later code)", op.ResponseContentType)
 		}
-		if op.ResponseRef != "#/components/schemas/CreateBody" {
+		if op.ResponseRef != synthCreateBodyRef {
 			t.Errorf("ResponseRef: got %q, want CreateBody $ref", op.ResponseRef)
 		}
 	})

@@ -29,6 +29,13 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/property"
 )
 
+// Repeated test-only literals — extracted so goconst stops flagging them.
+const (
+	teamToken      = "pulumiservice:v2:Team"
+	getThingPath   = "GET /things/acme/thing-1"
+	patchThingPath = "PATCH /things/acme/thing-1"
+)
+
 // mockTransport serves canned responses keyed by "<METHOD> <path>". Set
 // responseFn for stateful behavior; it overrides responses if non-nil.
 type mockTransport struct {
@@ -148,7 +155,7 @@ func TestCreateSynthesizesID(t *testing.T) {
 		},
 		{
 			// Team: composite identity from path.
-			token: "pulumiservice:v2:Team",
+			token: teamToken,
 			responses: map[string]mockResponse{
 				"POST /api/orgs/test-org/teams/pulumi": {
 					status: 200,
@@ -174,9 +181,9 @@ func TestCreateSynthesizesID(t *testing.T) {
 				written := false
 				return func(req *http.Request) mockResponse {
 					switch {
-					case req.Method == "GET" && !written:
+					case req.Method == methodGET && !written:
 						return mockResponse{status: 404, body: `{"error":"not found"}`}
-					case req.Method == "GET":
+					case req.Method == methodGET:
 						return mockResponse{status: 200, body: `{"orgName":"test-org"}`}
 					case req.URL.Path == "/api/user/organizations/test-org/default":
 						written = true
@@ -198,9 +205,9 @@ func TestCreateSynthesizesID(t *testing.T) {
 				written := false
 				return func(req *http.Request) mockResponse {
 					switch {
-					case req.Method == "GET" && !written:
+					case req.Method == methodGET && !written:
 						return mockResponse{status: 404, body: `{"error":"not found"}`}
-					case req.Method == "GET":
+					case req.Method == methodGET:
 						return mockResponse{status: 200, body: `{}`}
 					case req.Method == "POST":
 						written = true
@@ -399,7 +406,7 @@ func TestReadDecodesYamlResponseBody(t *testing.T) {
 
 	yamlBody := "values:\n  bootstrap:\n    appVersion: 1.0.0\n"
 	mock := &mockTransport{
-		responseFn: func(req *http.Request) mockResponse {
+		responseFn: func(_ *http.Request) mockResponse {
 			return mockResponse{status: 200, body: yamlBody}
 		},
 	}
@@ -440,7 +447,9 @@ func TestCreateReadAfterCreateSourcesFromInputs(t *testing.T) {
 	        "operationId": "CreateThing",
 	        "parameters": [{"name": "org", "in": "path", "required": true, "schema": {"type": "string"}}],
 	        "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Body"}}}},
-	        "responses": {"200": {"content": {"application/json": {"schema": {"type": "object", "properties": {"id": {"type": "string"}}}}}}}
+	        "responses": {"200": {"content": {"application/json": {
+	          "schema": {"type": "object", "properties": {"id": {"type": "string"}}}
+	        }}}}
 	      }
 	    },
 	    "/things/{org}/{id}": {
@@ -465,7 +474,7 @@ func TestCreateReadAfterCreateSourcesFromInputs(t *testing.T) {
 	}
 	mock := &mockTransport{responses: map[string]mockResponse{
 		"POST /things/acme":        {status: 200, body: `{"id":"thing-1"}`},
-		"GET /things/acme/thing-1": {status: 200, body: `{"id":"thing-1","name":"foo","status":"ready"}`},
+		getThingPath: {status: 200, body: `{"id":"thing-1","name":"foo","status":"ready"}`},
 	}}
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 
@@ -475,7 +484,7 @@ func TestCreateReadAfterCreateSourcesFromInputs(t *testing.T) {
 	if err != nil {
 		t.Fatalf("create: %v\n  calls: %v", err, mock.calls)
 	}
-	if len(mock.calls) != 2 || mock.calls[1] != "GET /things/acme/thing-1" {
+	if len(mock.calls) != 2 || mock.calls[1] != getThingPath {
 		t.Errorf("expected POST then GET /things/acme/thing-1, got: %v", mock.calls)
 	}
 	if v, ok := resp.Properties.GetOk("status"); !ok || v.AsString() != "ready" {
@@ -503,7 +512,9 @@ func TestCreateReadsAfterCreate(t *testing.T) {
 	        "operationId": "CreateThing",
 	        "parameters": [{"name": "org", "in": "path", "required": true, "schema": {"type": "string"}}],
 	        "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Body"}}}},
-	        "responses": {"200": {"content": {"application/json": {"schema": {"type": "object", "properties": {"id": {"type": "string"}}}}}}}
+	        "responses": {"200": {"content": {"application/json": {
+	          "schema": {"type": "object", "properties": {"id": {"type": "string"}}}
+	        }}}}
 	      }
 	    },
 	    "/things/{org}/{id}": {
@@ -529,9 +540,10 @@ func TestCreateReadsAfterCreate(t *testing.T) {
 			IDFormat:   "{org}/{id}",
 		},
 	}
+	readBody := `{"id":"thing-1","name":"foo","lastUpdate":"2026-05-05T00:00:00Z","status":"ready"}`
 	mock := &mockTransport{responses: map[string]mockResponse{
-		"POST /things/acme":        {status: 200, body: `{"id":"thing-1"}`},
-		"GET /things/acme/thing-1": {status: 200, body: `{"id":"thing-1","name":"foo","lastUpdate":"2026-05-05T00:00:00Z","status":"ready"}`},
+		"POST /things/acme": {status: 200, body: `{"id":"thing-1"}`},
+		getThingPath:        {status: 200, body: readBody},
 	}}
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 
@@ -542,7 +554,7 @@ func TestCreateReadsAfterCreate(t *testing.T) {
 		t.Fatalf("create: %v\n  calls: %v", err, mock.calls)
 	}
 
-	if len(mock.calls) != 2 || mock.calls[0] != "POST /things/acme" || mock.calls[1] != "GET /things/acme/thing-1" {
+	if len(mock.calls) != 2 || mock.calls[0] != "POST /things/acme" || mock.calls[1] != getThingPath {
 		t.Errorf("expected POST then GET, got: %v", mock.calls)
 	}
 	for _, key := range []string{"lastUpdate", "status"} {
@@ -612,7 +624,7 @@ func TestCreateRequireImport_ProceedsOn404(t *testing.T) {
 		case "PUT":
 			putCalled = true
 			return mockResponse{status: 200, body: `{"org":"acme","value":"new"}`}
-		case "GET":
+		case methodGET:
 			if putCalled {
 				return mockResponse{status: 200, body: `{"org":"acme","value":"new"}`}
 			}
@@ -707,10 +719,10 @@ func requireImportSpec(t *testing.T) *Spec {
 func TestCreateMissingPathParam(t *testing.T) {
 	spec, meta := loadFixtures(t)
 	resources := Resources(spec, meta)
-	rm := meta.Resources["pulumiservice:v2:Team"]
+	rm := meta.Resources[teamToken]
 	tok := rm.Token
 	if tok == "" {
-		tok = "pulumiservice:v2:Team"
+		tok = teamToken
 	}
 	r := resources[tok]
 	if r == nil {
@@ -787,21 +799,27 @@ func TestUpdateReadsAfterUpdate(t *testing.T) {
 			IDFormat:   "{org}/{id}",
 		},
 	}
+	patchBody := `{"name":"foo-renamed","description":"rotated"}`
+	readBody := `{"id":"thing-1","name":"foo-renamed","description":"rotated","created":"2026-05-05T00:00:00Z"}`
+	priorState := map[string]any{
+		"id": "thing-1", "name": "foo", "description": "original",
+		"created": "2026-05-05T00:00:00Z",
+	}
 	mock := &mockTransport{responses: map[string]mockResponse{
-		"PATCH /things/acme/thing-1": {status: 200, body: `{"name":"foo-renamed","description":"rotated"}`},
-		"GET /things/acme/thing-1":   {status: 200, body: `{"id":"thing-1","name":"foo-renamed","description":"rotated","created":"2026-05-05T00:00:00Z"}`},
+		patchThingPath: {status: 200, body: patchBody},
+		getThingPath:   {status: 200, body: readBody},
 	}}
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 
 	resp, err := r.Update(context.Background(), p.UpdateRequest{
 		Inputs:    propMap(map[string]any{"org": "acme", "name": "foo-renamed", "description": "rotated"}),
 		OldInputs: propMap(map[string]any{"org": "acme", "name": "foo", "description": "original"}),
-		State:     propMap(map[string]any{"id": "thing-1", "name": "foo", "description": "original", "created": "2026-05-05T00:00:00Z"}),
+		State:     propMap(priorState),
 	})
 	if err != nil {
 		t.Fatalf("update: %v\n  calls: %v", err, mock.calls)
 	}
-	if len(mock.calls) != 2 || mock.calls[0] != "PATCH /things/acme/thing-1" || mock.calls[1] != "GET /things/acme/thing-1" {
+	if len(mock.calls) != 2 || mock.calls[0] != patchThingPath || mock.calls[1] != getThingPath {
 		t.Errorf("expected PATCH then GET, got: %v", mock.calls)
 	}
 	for _, key := range []string{"id", "created", "name", "description"} {
@@ -847,14 +865,18 @@ func TestUpdateMergesPriorStateWithoutReadOp(t *testing.T) {
 		},
 	}
 	mock := &mockTransport{responses: map[string]mockResponse{
-		"PATCH /things/acme/thing-1": {status: 200, body: `{"name":"foo","description":"rotated"}`},
+		patchThingPath: {status: 200, body: `{"name":"foo","description":"rotated"}`},
 	}}
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 
+	priorState := map[string]any{
+		"id": "thing-1", "name": "foo", "description": "original",
+		"created": "2026-05-05T00:00:00Z",
+	}
 	resp, err := r.Update(context.Background(), p.UpdateRequest{
 		Inputs:    propMap(map[string]any{"org": "acme", "description": "rotated"}),
 		OldInputs: propMap(map[string]any{"org": "acme", "description": "original"}),
-		State:     propMap(map[string]any{"id": "thing-1", "name": "foo", "description": "original", "created": "2026-05-05T00:00:00Z"}),
+		State:     propMap(priorState),
 	})
 	if err != nil {
 		t.Fatalf("update: %v\n  calls: %v", err, mock.calls)

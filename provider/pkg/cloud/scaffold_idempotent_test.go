@@ -35,7 +35,7 @@ func TestScaffoldMetadataIdempotent(t *testing.T) {
 
 	tmpDir := t.TempDir()
 	tmpMeta := filepath.Join(tmpDir, "metadata.json")
-	if err := os.WriteFile(tmpMeta, committed, 0o644); err != nil {
+	if err := os.WriteFile(tmpMeta, committed, 0o600); err != nil {
 		t.Fatalf("seed temp metadata: %v", err)
 	}
 

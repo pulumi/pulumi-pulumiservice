@@ -21,8 +21,9 @@
 package cloud
 
 import (
-	_ "embed"
 	"fmt"
+
+	_ "embed" // embed directives below pull in spec/metadata JSON
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/rest"
 )

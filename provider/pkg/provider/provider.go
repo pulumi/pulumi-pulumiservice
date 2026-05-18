@@ -349,7 +349,7 @@ func (k *pulumiserviceProvider) Configure(
 	}
 	client, err := pulumiapi.NewClient(&httpClient, *token, *url)
 
-	rest.SetTransportResolver(func(ctx context.Context) (rest.Transport, error) {
+	rest.SetTransportResolver(func(_ context.Context) (rest.Transport, error) {
 		return &authedTransport{
 			baseURL: *url,
 			token:   *token,

@@ -69,7 +69,9 @@ func Resources(spec *Spec, metadata *Metadata) map[string]*Resource {
 			token = rm.Token
 		}
 		if rm.Operations.Create != "" && rm.Operations.Create == rm.Operations.Update && !rm.RequireImport {
-			fmt.Fprintf(os.Stderr, "rest: %s has create==update operationId %q but requireImport is unset; re-run scaffold-metadata\n", token, rm.Operations.Create)
+			fmt.Fprintf(os.Stderr,
+				"rest: %s has create==update operationId %q but requireImport is unset; re-run scaffold-metadata\n",
+				token, rm.Operations.Create)
 		}
 		out[token] = &Resource{meta: rm, spec: spec}
 	}
@@ -265,7 +267,11 @@ func (r *Resource) Diff(_ context.Context, req p.DiffRequest) (p.DiffResponse, e
 // every op's path params plus any FieldMeta.ForceNew fields.
 func (r *Resource) replaceTriggeringFields() map[string]bool {
 	out := map[string]bool{}
-	for _, opID := range []string{r.meta.Operations.Create, r.meta.Operations.Read, r.meta.Operations.Update, r.meta.Operations.Delete} {
+	ops := []string{
+		r.meta.Operations.Create, r.meta.Operations.Read,
+		r.meta.Operations.Update, r.meta.Operations.Delete,
+	}
+	for _, opID := range ops {
 		op, ok := r.spec.Op(opID)
 		if !ok {
 			continue
@@ -368,7 +374,8 @@ func (r *Resource) checkAlreadyExists(ctx context.Context, inputs property.Map) 
 	}
 	_, _, err = r.execAndDecode(ctx, readOp, inputs)
 	if err == nil {
-		return fmt.Errorf("resource already exists; use the `import` resource option to bring it under Pulumi management instead of creating a new one")
+		return fmt.Errorf("resource already exists; use the `import` resource option " +
+			"to bring it under Pulumi management instead of creating a new one")
 	}
 	if IsNotFound(err) {
 		return nil
@@ -385,7 +392,11 @@ func (r *Resource) synthesizeID(state, inputs property.Map) (string, error) {
 		return synthesizeIDFromFormat(r.meta.IDFormat, state, inputs)
 	}
 	var op *Operation
-	for _, opID := range []string{r.meta.Operations.Read, r.meta.Operations.Update, r.meta.Operations.Delete, r.meta.Operations.Create} {
+	ops := []string{
+		r.meta.Operations.Read, r.meta.Operations.Update,
+		r.meta.Operations.Delete, r.meta.Operations.Create,
+	}
+	for _, opID := range ops {
 		if opID == "" {
 			continue
 		}
@@ -621,7 +632,9 @@ func mergeMaps(maps ...property.Map) property.Map {
 
 // execAndDecode performs the HTTP round-trip and returns the raw body and
 // its decoded property.Map.
-func (r *Resource) execAndDecode(ctx context.Context, op *Operation, inputs property.Map) ([]byte, property.Map, error) {
+func (r *Resource) execAndDecode(
+	ctx context.Context, op *Operation, inputs property.Map,
+) ([]byte, property.Map, error) {
 	transport, err := resolveTransport(ctx)
 	if err != nil {
 		return nil, property.Map{}, err

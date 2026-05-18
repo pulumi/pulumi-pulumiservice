@@ -304,7 +304,8 @@ func TestCheckEnumCasePreservedForUnknownValue(t *testing.T) {
 	spec := syntheticSpec(t)
 	r := fooResource(spec, nil, "", false)
 	for _, in := range []string{"sideways", "Up "} { // not in enum, even after fold
-		out := normalizeValue(property.New(in), "mode", flattenedRequestProperties(spec, mustOp(t, spec, "CreateFoo")), r.meta)
+		bodyProps := flattenedRequestProperties(spec, mustOp(t, spec, "CreateFoo"))
+		out := normalizeValue(property.New(in), "mode", bodyProps, r.meta)
 		if !out.IsString() || out.AsString() != in {
 			t.Errorf("normalizeValue(%q) = %v; expected unchanged passthrough", in, out)
 		}
@@ -475,7 +476,9 @@ func TestBuildResourceAcceptsResourceWithoutPathParams(t *testing.T) {
 	      "post": {
 	        "operationId": "CreateThing",
 	        "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Body"}}}},
-	        "responses": {"200": {"content": {"application/json": {"schema": {"type": "object", "properties": {"id": {"type": "string"}}}}}}}
+	        "responses": {"200": {"content": {"application/json": {
+	          "schema": {"type": "object", "properties": {"id": {"type": "string"}}}
+	        }}}}
 	      }
 	    }
 	  }

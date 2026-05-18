@@ -46,7 +46,8 @@ func main() {
 }
 
 func run() error {
-	urlFlag := flag.String("url", "", "OpenAPI spec URL (overrides $PULUMI_CLOUD_OPENAPI_URL; falls back to the public default)")
+	urlFlag := flag.String("url", "",
+		"OpenAPI spec URL (overrides $PULUMI_CLOUD_OPENAPI_URL; falls back to the public default)")
 	outFlag := flag.String("out", "spec.json", "Output file path")
 	flag.Parse()
 
@@ -68,7 +69,7 @@ func run() error {
 		return err
 	}
 
-	if err := os.WriteFile(*outFlag, pretty, 0o644); err != nil {
+	if err := os.WriteFile(*outFlag, pretty, 0o600); err != nil {
 		return fmt.Errorf("openapi-fetch: write %s: %w", *outFlag, err)
 	}
 	return nil

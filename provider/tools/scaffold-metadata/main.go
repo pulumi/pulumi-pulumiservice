@@ -184,7 +184,11 @@ func main() {
 			continue
 		}
 		entry, exists := doc.Resources[tok]
-		renames := inferRenames(parsedSpec, opOrNil(parsedSpec, ops.Create), opOrNil(parsedSpec, ops.Read), opOrNil(parsedSpec, ops.Update), opOrNil(parsedSpec, ops.Delete))
+		renames := inferRenames(parsedSpec,
+			opOrNil(parsedSpec, ops.Create),
+			opOrNil(parsedSpec, ops.Read),
+			opOrNil(parsedSpec, ops.Update),
+			opOrNil(parsedSpec, ops.Delete))
 		d := derivations{
 			Renames:             renames,
 			OutputsExclude:      inferOutputsExclude(parsedSpec, tok, ops),
@@ -243,7 +247,9 @@ func main() {
 		}
 	}
 	if len(autoNameRecommendations) > 0 {
-		fmt.Fprintf(os.Stderr, "  autoName candidates (maxLength from spec; opt in by hand-setting fields[<name>].autoName): %d\n", len(autoNameRecommendations))
+		fmt.Fprintf(os.Stderr,
+			"  autoName candidates (maxLength from spec; opt in by hand-setting fields[<name>].autoName): %d\n",
+			len(autoNameRecommendations))
 		toks := make([]string, 0, len(autoNameRecommendations))
 		for k := range autoNameRecommendations {
 			toks = append(toks, k)
@@ -540,7 +546,9 @@ func mergeOperations(existing json.RawMessage, ops derivedOps, d derivations) (j
 	if d.Token != "" {
 		if existing, has := entry["token"].(string); has {
 			if existing != d.Token {
-				fmt.Fprintf(os.Stderr, "  INFO: token pinned at %q; heuristic now suggests %q (preserving pin)\n", existing, d.Token)
+				fmt.Fprintf(os.Stderr,
+					"  INFO: token pinned at %q; heuristic now suggests %q (preserving pin)\n",
+					existing, d.Token)
 			}
 		} else {
 			entry["token"] = d.Token
@@ -957,7 +965,7 @@ func writeMetadata(path string, doc *metadataDoc) error {
 	}
 	b.WriteString("}\n}\n")
 
-	return os.WriteFile(path, []byte(b.String()), 0o644)
+	return os.WriteFile(path, []byte(b.String()), 0o600)
 }
 
 func indentJSON(raw json.RawMessage, prefix string) ([]byte, error) {
@@ -1242,12 +1250,12 @@ func stripModulePrefix(typ, module string) string {
 		if c == "" {
 			continue
 		}
-		cap := strings.ToUpper(c[:1]) + c[1:]
-		if !strings.HasPrefix(typ, cap) || len(typ) <= len(cap) {
+		capped := strings.ToUpper(c[:1]) + c[1:]
+		if !strings.HasPrefix(typ, capped) || len(typ) <= len(capped) {
 			continue
 		}
-		if r := rune(typ[len(cap)]); r >= 'A' && r <= 'Z' {
-			return typ[len(cap):]
+		if r := rune(typ[len(capped)]); r >= 'A' && r <= 'Z' {
+			return typ[len(capped):]
 		}
 	}
 	return typ
