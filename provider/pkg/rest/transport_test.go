@@ -70,4 +70,3 @@ func TestResolveTransport_NoTransportReturnsError(t *testing.T) {
 		t.Fatalf("expected error with no transport configured")
 	}
 }
-
