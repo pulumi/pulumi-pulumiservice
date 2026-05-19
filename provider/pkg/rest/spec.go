@@ -18,6 +18,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"sort"
 	"strings"
 )
 
@@ -85,8 +86,22 @@ func ParseSpec(data []byte) (*Spec, error) {
 		s.Servers = append(s.Servers, srv.URL)
 	}
 
-	for path, pathItem := range doc.Paths {
-		for method, raw := range pathItem {
+	// Iterate paths in sorted order so duplicate-operationId errors name
+	// the same (existing, conflicting) pair every run.
+	paths := make([]string, 0, len(doc.Paths))
+	for path := range doc.Paths {
+		paths = append(paths, path)
+	}
+	sort.Strings(paths)
+	for _, path := range paths {
+		pathItem := doc.Paths[path]
+		methods := make([]string, 0, len(pathItem))
+		for method := range pathItem {
+			methods = append(methods, method)
+		}
+		sort.Strings(methods)
+		for _, method := range methods {
+			raw := pathItem[method]
 			um := strings.ToUpper(method)
 			if !isHTTPMethod(um) {
 				continue

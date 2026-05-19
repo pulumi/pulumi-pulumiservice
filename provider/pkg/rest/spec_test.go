@@ -14,7 +14,10 @@
 
 package rest
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 const synthCreateBodyRef = "#/components/schemas/CreateBody"
 
@@ -75,6 +78,30 @@ func TestRealSpecRecognizesEnvironmentYamlBody(t *testing.T) {
 	if create.RequestContentType != contentJSON {
 		t.Errorf("CreateEnvironment_esc_environments RequestContentType: got %q, want application/json",
 			create.RequestContentType)
+	}
+}
+
+// TestParseSpecDuplicateOpIDDeterministic pins the duplicate-operationId
+// error to a stable (lexicographically first) "existing" path so the
+// message doesn't shuffle on map-iteration order.
+func TestParseSpecDuplicateOpIDDeterministic(t *testing.T) {
+	const dup = `{
+	  "openapi": "3.0.0",
+	  "paths": {
+	    "/api/zeta": {"get": {"operationId": "Dup", "responses": {"200": {"description": "ok"}}}},
+	    "/api/alpha": {"get": {"operationId": "Dup", "responses": {"200": {"description": "ok"}}}}
+	  }
+	}`
+	// Run repeatedly to defeat any one-shot map-order coincidence.
+	for range 32 {
+		_, err := ParseSpec([]byte(dup))
+		if err == nil {
+			t.Fatalf("ParseSpec: expected duplicate-operationId error, got nil")
+		}
+		const want = `duplicate operationId "Dup" (paths /api/alpha and /api/zeta)`
+		if !strings.Contains(err.Error(), want) {
+			t.Fatalf("ParseSpec error: got %q, want substring %q", err.Error(), want)
+		}
 	}
 }
 
