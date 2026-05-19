@@ -515,20 +515,33 @@ func hasPathParams(op *Operation) bool {
 }
 
 // Read fetches current state. Imports arrive with empty inputs; when
-// IDFormat is declared, path params are recovered from the resource ID.
+// IDFormat is declared, path params are recovered from the resource ID
+// for URL construction.
+//
+// The returned Inputs differ between import and refresh: on import
+// (req.Inputs empty), we surface the parsed-ID values so the user gets
+// a usable program-input reconstruction; on refresh we preserve the
+// caller's existing Inputs verbatim. Otherwise the parsed-ID values —
+// which the user never wrote in their program — show up as a diff on
+// every refresh ("+issuerId" etc).
+//
 // EmitOnCreate fields are preserved from prior state.
 func (r *Resource) Read(ctx context.Context, req p.ReadRequest) (p.ReadResponse, error) {
-	inputs := r.parseIDIntoInputs(req.ID, req.Inputs)
-	source := mergeMaps(inputs, req.Properties)
+	parsed := r.parseIDIntoInputs(req.ID, req.Inputs)
+	source := mergeMaps(parsed, req.Properties)
+	returnedInputs := req.Inputs
+	if req.Inputs.Len() == 0 {
+		returnedInputs = parsed
+	}
 	state, ok, err := r.fetchState(ctx, source, req.Properties)
 	if err != nil {
 		return p.ReadResponse{}, err
 	}
 	if !ok {
 		// No read op declared: refresh is a no-op, return prior state.
-		return p.ReadResponse{ID: req.ID, Inputs: inputs, Properties: req.Properties}, nil
+		return p.ReadResponse{ID: req.ID, Inputs: returnedInputs, Properties: req.Properties}, nil
 	}
-	return p.ReadResponse{ID: req.ID, Properties: state, Inputs: inputs}, nil
+	return p.ReadResponse{ID: req.ID, Properties: state, Inputs: returnedInputs}, nil
 }
 
 // fetchState runs the read op and merges EmitOnCreate fields from prior.

@@ -455,7 +455,7 @@ func TestBuildResourceSurfacesYamlBody(t *testing.T) {
 		}
 		t.Fatalf("expected synthesized 'yaml' input field, got inputs: %v", got)
 	}
-	if yaml.Type != "string" {
+	if yaml.Type != "string" { //nolint:goconst // matches over JSON-literal-embedded "string" counts
 		t.Errorf("yaml input type: got %q, want string", yaml.Type)
 	}
 	if !yaml.Secret {
