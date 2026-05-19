@@ -152,9 +152,6 @@ build_java: .make/build_java
 	# Both patches are idempotent on subsequent regenerations.
 	sed -i.bak '/^include("lib")$$/d' sdk/java/settings.gradle && rm -f sdk/java/settings.gradle.bak
 	perl -i -0pe 's/description = "[^"]*"/description = "Pulumi Service Provider for Pulumi Cloud."/s' sdk/java/build.gradle
-	# pulumi-java-gen pins Java toolchain to 11; raise to 17 (LTS) to match what
-	# the repo's mise install provides on macOS.
-	perl -i -pe 's/JavaLanguageVersion\.of\(11\)/JavaLanguageVersion.of(17)/g' sdk/java/build.gradle
 	@touch $@
 .make/build_java: PACKAGE_VERSION := $(PROVIDER_VERSION)
 .make/build_java: .make/generate_java

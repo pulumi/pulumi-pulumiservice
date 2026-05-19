@@ -26,7 +26,7 @@ func TestDeleteOrgAccessToken(t *testing.T) {
 		assert.NoError(t, c.DeleteOrgAccessToken(teamCtx, tokenID, orgName))
 	})
 
-	t.Run("Error", func(t *testing.T) {
+	t.Run("404 is idempotent success", func(t *testing.T) {
 		c := startTestServer(t, testServerConfig{
 			ExpectedReqMethod: http.MethodDelete,
 			ExpectedReqPath:   "/api/orgs/anOrg/tokens/" + tokenID,
@@ -36,9 +36,24 @@ func TestDeleteOrgAccessToken(t *testing.T) {
 				Message:    "token not found",
 			},
 		})
+		// Delete tolerates 404 — the token is already gone, which is
+		// what the caller wanted.
+		assert.NoError(t, c.DeleteOrgAccessToken(teamCtx, tokenID, orgName))
+	})
+
+	t.Run("non-404 errors still surface", func(t *testing.T) {
+		c := startTestServer(t, testServerConfig{
+			ExpectedReqMethod: http.MethodDelete,
+			ExpectedReqPath:   "/api/orgs/anOrg/tokens/" + tokenID,
+			ResponseCode:      500,
+			ResponseBody: ErrorResponse{
+				StatusCode: 500,
+				Message:    "internal error",
+			},
+		})
 		assert.EqualError(t,
 			c.DeleteOrgAccessToken(teamCtx, tokenID, orgName),
-			fmt.Sprintf(`failed to delete access token "%s": 404 API error: token not found`, testOrgTokenID),
+			fmt.Sprintf(`failed to delete access token "%s": 500 API error: internal error`, testOrgTokenID),
 		)
 	})
 
