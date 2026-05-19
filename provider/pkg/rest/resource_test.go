@@ -1085,3 +1085,32 @@ func TestDeleteIsIdempotentOn404(t *testing.T) {
 		}
 	})
 }
+
+// TestPropertyValueToStringNumberFormatting pins decimal-not-scientific
+// formatting for numeric values. Path-param substitution and synthesized
+// IDs go through this — `1e+18` makes a useless URL segment.
+func TestPropertyValueToStringNumberFormatting(t *testing.T) {
+	cases := []struct {
+		name string
+		in   float64
+		want string
+	}{
+		{"small integer", 42, "42"},
+		{"large integer (scientific risk)", 1e18, "1000000000000000000"},
+		{"larger integer (scientific risk)", 1.234e15, "1234000000000000"},
+		{"fractional", 3.14, "3.14"},
+		{"zero", 0, "0"},
+		{"negative", -1234567, "-1234567"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			got := propertyValueToString(property.New(tc.in))
+			if got != tc.want {
+				t.Errorf("propertyValueToString(%v): got %q, want %q", tc.in, got, tc.want)
+			}
+			if strings.Contains(got, "e+") || strings.Contains(got, "e-") {
+				t.Errorf("propertyValueToString(%v) returned scientific notation %q", tc.in, got)
+			}
+		})
+	}
+}

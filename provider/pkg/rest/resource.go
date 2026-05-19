@@ -29,6 +29,7 @@ import (
 	"os"
 	"regexp"
 	"slices"
+	"strconv"
 	"strings"
 
 	p "github.com/pulumi/pulumi-go-provider"
@@ -785,14 +786,17 @@ func needsBody(method string) bool {
 }
 
 // propertyValueToString stringifies a Value for path/URL substitution.
+// Numbers go through strconv.FormatFloat with 'f' formatting so large
+// integer-valued floats (timestamps, integer IDs) don't render in
+// scientific notation — `1e+18` makes a useless URL path segment.
 func propertyValueToString(v property.Value) string {
 	switch {
 	case v.IsString():
 		return v.AsString()
 	case v.IsNumber():
-		return fmt.Sprintf("%v", v.AsNumber())
+		return strconv.FormatFloat(v.AsNumber(), 'f', -1, 64)
 	case v.IsBool():
-		return fmt.Sprintf("%v", v.AsBool())
+		return strconv.FormatBool(v.AsBool())
 	case v.IsNull():
 		return ""
 	default:
