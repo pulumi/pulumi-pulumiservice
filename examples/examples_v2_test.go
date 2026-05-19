@@ -99,11 +99,6 @@ var v2Cases = []v2Case{
 		FullE2E: true, // create=NewPolicyGroup, update=BatchUpdatePolicyGroup
 	},
 	{
-		Name:           "policy-packs",
-		Config:         orgOnlyConfig,
-		PreviewOnlyAll: true, // Create returns an upload URL; finishing the resource requires uploading a policy zip we don't have here.
-	},
-	{
 		Name:    "environments",
 		Config:  environmentsConfig,
 		FullE2E: true,
@@ -226,11 +221,6 @@ var v2Cases = []v2Case{
 		Name:           "environment-config",
 		Config:         environmentConfigConfig,
 		PreviewOnlyAll: true, // Targets an existing ESC environment we don't provision here.
-	},
-	{
-		Name:           "policy-issue",
-		Config:         policyIssueConfig,
-		PreviewOnlyAll: true, // issueId path-param refers to an existing policy violation.
 	},
 	{
 		Name:           "saml-organization",
@@ -851,13 +841,6 @@ func environmentConfigConfig() map[string]string {
 		"organizationName":  ServiceProviderTestOrg,
 		"projectName": "v2-envcfg-" + suffix,
 		"envName":     "v2-envcfg-env-" + suffix,
-	}
-}
-
-func policyIssueConfig() map[string]string {
-	return map[string]string{
-		"organizationName": ServiceProviderTestOrg,
-		"issueId":    "v2-issue-" + generateRandomFiveDigits(),
 	}
 }
 

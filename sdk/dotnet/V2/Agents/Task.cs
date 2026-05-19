@@ -28,6 +28,12 @@ namespace Pulumi.PulumiService.V2.Agents
         public Output<string?> AsyncTriggerType { get; private set; } = null!;
 
         /// <summary>
+        /// Percentage of the context window (1-100) at which the agent triggers conversation compaction. Populated alongside contextWindowTokens when token usage data is available; omitted otherwise.
+        /// </summary>
+        [Output("contextCompactionThresholdPercent")]
+        public Output<int?> ContextCompactionThresholdPercent { get; private set; } = null!;
+
+        /// <summary>
         /// Total input tokens consumed across all model invocations for this task. Approximate context window usage.
         /// </summary>
         [Output("contextUsedTokens")]
@@ -124,6 +130,12 @@ namespace Pulumi.PulumiService.V2.Agents
         public Output<string> TaskType { get; private set; } = null!;
 
         /// <summary>
+        /// Total Neo tokens consumed across all model invocations for this task. Neo tokens are the priced unit used for billing — distinct from the raw model input tokens surfaced in contextUsedTokens / contextWindowTokens.
+        /// </summary>
+        [Output("tokensUsed")]
+        public Output<int> TokensUsed { get; private set; } = null!;
+
+        /// <summary>
         /// Where tools are executed for this task. Valid values: 'cloud', 'cli'.
         /// </summary>
         [Output("toolExecutionMode")]
@@ -179,6 +191,18 @@ namespace Pulumi.PulumiService.V2.Agents
         /// </summary>
         [Input("approvalMode")]
         public Input<string>? ApprovalMode { get; set; }
+
+        [Input("cliIntegrations")]
+        private InputList<object>? _cliIntegrations;
+
+        /// <summary>
+        /// Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries that do not match any connected integration are silently skipped.
+        /// </summary>
+        public InputList<object> CliIntegrations
+        {
+            get => _cliIntegrations ?? (_cliIntegrations = new InputList<object>());
+            set => _cliIntegrations = value;
+        }
 
         [Input("enabledIntegrations")]
         private InputList<object>? _enabledIntegrations;

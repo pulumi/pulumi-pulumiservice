@@ -2,6 +2,10 @@
   "version": 1,
   "package": "pulumiservice",
   "_note": "Single source of truth for v2 resource metadata. operations/idFormat/renames/outputsExclude/token/requireImport are derived from spec.json by `go run ./tools/scaffold-metadata` (run via `go generate ./pkg/cloud/...`); module aliases live in the scaffolder source. Hand-curate examples/description/aliases/fields and they round-trip through regen. Add tokens to `_excluded` to keep the scaffolder from re-deriving them.",
+  "_excluded": [
+    "pulumiservice:v2:PolicyPack",
+    "pulumiservice:v2:PolicyIssue"
+  ],
   "resources": {
     "pulumiservice:v2:Account": {
       "deleteBeforeReplace": true,
@@ -388,36 +392,6 @@
         "name": "policyGroup"
       },
       "token": "pulumiservice:v2:PolicyGroup"
-    },
-    "pulumiservice:v2:PolicyIssue": {
-      "idFormat": "{orgName}/{issueId}",
-      "operations": {
-        "create": "UpdatePolicyIssue",
-        "read": "GetPolicyIssue",
-        "update": "UpdatePolicyIssue"
-      },
-      "outputsExclude": [
-        "policyIssue"
-      ],
-      "requireImport": true,
-      "token": "pulumiservice:v2:PolicyIssue"
-    },
-    "pulumiservice:v2:PolicyPack": {
-      "deleteBeforeReplace": true,
-      "fields": {
-        "tags": {
-          "unordered": true
-        }
-      },
-      "idFormat": "{orgName}/{name}/{version}",
-      "operations": {
-        "create": "CreatePolicyPack",
-        "read": "GetPolicyPack"
-      },
-      "renames": {
-        "name": "policyPackName"
-      },
-      "token": "pulumiservice:v2:PolicyPack"
     },
     "pulumiservice:v2:RevisionTag_esc_environments": {
       "deleteBeforeReplace": true,

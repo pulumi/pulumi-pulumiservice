@@ -109,8 +109,6 @@
         "v2/organizationMember.ts",
         "v2/organizationWebhook.ts",
         "v2/policyGroup.ts",
-        "v2/policyIssue.ts",
-        "v2/policyPack.ts",
         "v2/role.ts",
         "v2/services/index.ts",
         "v2/services/item.ts",

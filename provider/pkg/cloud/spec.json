@@ -464,6 +464,14 @@
                 "type": "boolean",
                 "x-order": 3
               },
+              "thinking_signatures": {
+                "description": "Opaque thinking-block signatures from the model's response, in order. Must be echoed back unchanged on subsequent API calls to preserve reasoning across tool-use turns when extended thinking is enabled. Empty/null for models or turns without extended thinking. With display:\"omitted\" (Opus 4.7 default) the thinking text itself is empty; only the signature carries load.",
+                "items": {
+                  "type": "string"
+                },
+                "type": "array",
+                "x-order": 5
+              },
               "token_usage": {
                 "additionalProperties": {
                   "$ref": "#/components/schemas/AgentBackendEventTokenUsage"
@@ -1403,6 +1411,12 @@
               "enumTypeName": "AgentAsyncTriggerType"
             }
           },
+          "contextCompactionThresholdPercent": {
+            "description": "Percentage of the context window (1-100) at which the agent triggers conversation compaction. Populated alongside contextWindowTokens when token usage data is available; omitted otherwise.",
+            "format": "int32",
+            "type": "integer",
+            "x-order": 18
+          },
           "contextUsedTokens": {
             "description": "Total input tokens consumed across all model invocations for this task. Approximate context window usage.",
             "format": "int32",
@@ -1508,7 +1522,7 @@
               "github"
             ],
             "type": "string",
-            "x-order": 20,
+            "x-order": 22,
             "x-pulumi-model-property": {
               "enumComments": "Identifies the origin that triggered a Neo agent task.",
               "enumFieldComments": [
@@ -1525,7 +1539,7 @@
           "sourceAutomationID": {
             "description": "The automation that spawned this task, if the task was created by an automation run.",
             "type": "string",
-            "x-order": 19
+            "x-order": 21
           },
           "status": {
             "description": "Current execution status of the task.",
@@ -1557,6 +1571,12 @@
               "enumTypeName": "AgentTaskType"
             }
           },
+          "tokensUsed": {
+            "description": "Total Neo tokens consumed across all model invocations for this task. Neo tokens are the priced unit used for billing — distinct from the raw model input tokens surfaced in contextUsedTokens / contextWindowTokens.",
+            "format": "int64",
+            "type": "integer",
+            "x-order": 19
+          },
           "toolExecutionMode": {
             "description": "Where tools are executed for this task. Valid values: 'cloud', 'cli'.",
             "enum": [
@@ -1564,7 +1584,7 @@
               "cli"
             ],
             "type": "string",
-            "x-order": 18,
+            "x-order": 20,
             "x-pulumi-model-property": {
               "enumComments": "Where tools are executed for an agent task.",
               "enumTypeName": "ToolExecutionMode"
@@ -1581,7 +1601,8 @@
           "name",
           "planMode",
           "status",
-          "taskType"
+          "taskType",
+          "tokensUsed"
         ],
         "type": "object"
       },
@@ -1616,6 +1637,11 @@
             "$ref": "#/components/schemas/AgentEntityDiff",
             "description": "Entities to add or remove from the agent.",
             "x-order": 1
+          },
+          "pageContext": {
+            "$ref": "#/components/schemas/PageContext",
+            "description": "Optional Pulumi Cloud page the user has the Neo pane open on at the moment they sent this event. Persisted with the event so cold-start replay can reproduce per-turn page context exactly. Omitted by clients with no concept of a current page (CLI, scheduled tasks, Slack, GitHub triggers, API consumers).",
+            "x-order": 2
           },
           "timestamp": {
             "description": "When the event occurred.",
@@ -2077,7 +2103,8 @@
               "copilot-explain-preview",
               "deployment-schema-version",
               "stack-policy-packs",
-              "api-version"
+              "api-version",
+              "neo-cli-mode"
             ],
             "type": "string",
             "x-order": 1,
@@ -2091,7 +2118,8 @@
                 "Indicates whether the service supports the Copilot explainer.",
                 "Indicates the maximum deployment schema version that the service supports.",
                 "Indicates whether the service supports retrieving a stack's required policy packs.",
-                "Advertises the REST API versions (the `Accept: application/vnd.pulumi+N` header) that the service supports. The configuration object carries `maxVersion`, `minVersion`, and `defaultVersion`."
+                "Advertises the REST API versions (the `Accept: application/vnd.pulumi+N` header) that the service supports. The configuration object carries `maxVersion`, `minVersion`, and `defaultVersion`.",
+                "Advertises that the service supports Neo CLI mode. The configuration object carries `minCliVersion`, the minimum `pulumi` CLI semver required to start a Neo CLI session."
               ],
               "enumFieldNames": [
                 "DeltaCheckpointUploads",
@@ -2101,7 +2129,8 @@
                 "CopilotExplainPreview",
                 "DeploymentSchemaVersion",
                 "StackPolicyPacks",
-                "APIVersion"
+                "APIVersion",
+                "NeoCLIMode"
               ],
               "enumTypeName": "AppAPICapability"
             }
@@ -5232,6 +5261,25 @@
             "description": "ResourceChanges contains the count for resource change by type.",
             "type": "object",
             "x-order": 3
+          },
+          "result": {
+            "description": "Result is the high-level outcome of the operation.",
+            "enum": [
+              "succeeded",
+              "failed",
+              "canceled"
+            ],
+            "type": "string",
+            "x-order": 6,
+            "x-pulumi-model-property": {
+              "enumComments": "OperationResult is the high-level outcome of an operation.",
+              "enumFieldComments": [
+                "OperationResultSucceeded indicates the operation completed without error.",
+                "OperationResultFailed indicates the operation returned an error.",
+                "OperationResultCanceled indicates the operation was canceled by the user."
+              ],
+              "enumTypeName": "AppOperationResult"
+            }
           }
         },
         "required": [
@@ -5239,7 +5287,8 @@
           "durationSeconds",
           "isPreview",
           "maybeCorrupt",
-          "resourceChanges"
+          "resourceChanges",
+          "result"
         ],
         "type": "object"
       },
@@ -7690,6 +7739,14 @@
             "type": "string",
             "x-order": 1
           },
+          "Tags": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Optional key-value tags associated with the usage record",
+            "type": "object",
+            "x-order": 6
+          },
           "Timestamp": {
             "description": "The usage timestamp",
             "format": "int64",
@@ -7758,6 +7815,54 @@
             "x-order": 1
           }
         },
+        "type": "object"
+      },
+      "BatchCreateOrganizationInviteRequest": {
+        "description": "Request body for batch create organization invite.",
+        "properties": {
+          "invites": {
+            "description": "List of invites",
+            "items": {
+              "$ref": "#/components/schemas/CreateOrganizationInviteRequest"
+            },
+            "type": "array",
+            "x-order": 1
+          },
+          "token": {
+            "description": "Turnstile token",
+            "type": "string",
+            "x-order": 2
+          }
+        },
+        "required": [
+          "invites"
+        ],
+        "type": "object"
+      },
+      "BatchCreateOrganizationInviteResponse": {
+        "description": "Response body for batch create organization invite.",
+        "properties": {
+          "failedInvites": {
+            "description": "List of failed invites",
+            "items": {
+              "$ref": "#/components/schemas/CreateOrganizationInviteRequest"
+            },
+            "type": "array",
+            "x-order": 2
+          },
+          "sentInvites": {
+            "description": "List of sent invites",
+            "items": {
+              "$ref": "#/components/schemas/CreateOrganizationInviteResponse"
+            },
+            "type": "array",
+            "x-order": 1
+          }
+        },
+        "required": [
+          "failedInvites",
+          "sentInvites"
+        ],
         "type": "object"
       },
       "BitBucketAccessStatusResponse": {
@@ -8090,6 +8195,26 @@
         "required": [
           "accounts",
           "failures"
+        ],
+        "type": "object"
+      },
+      "CLIIntegrationRef": {
+        "description": "Reference to a CLI integration instance, addressed by (catalogId, name) — the same scheme used by the connect/disconnect endpoints. Structured as an object rather than a bare 'catalogId/name' string so additional fields (e.g. scope) can be added later without a wire break, and so the encoding is unambiguous regardless of characters that may appear in the instance name.",
+        "properties": {
+          "catalogId": {
+            "description": "The CLI catalog entry ID (e.g. 'aws').",
+            "type": "string",
+            "x-order": 1
+          },
+          "name": {
+            "description": "The user-chosen instance name. Unique within the (org, catalogId) pair.",
+            "type": "string",
+            "x-order": 2
+          }
+        },
+        "required": [
+          "catalogId",
+          "name"
         ],
         "type": "object"
       },
@@ -9236,6 +9361,14 @@
               "enumTypeName": "NeoApprovalMode"
             }
           },
+          "cliIntegrations": {
+            "description": "Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries that do not match any connected integration are silently skipped.",
+            "items": {
+              "$ref": "#/components/schemas/CLIIntegrationRef"
+            },
+            "type": "array",
+            "x-order": 8
+          },
           "enabledIntegrations": {
             "description": "Optional list of integrations to enable for this task. Semantics: omitted/null → inherit all org-enabled integrations; empty list → explicit opt-out (no integration credentials for this task); populated list → whitelist of specific integrations by ID. Modeled as an object array rather than a bare string array so multi-instance support (instance_name, scope, etc.) can be added later without a wire break.",
             "items": {
@@ -9794,6 +9927,69 @@
         "required": [
           "description",
           "name"
+        ],
+        "type": "object"
+      },
+      "CreateOrganizationInviteRequest": {
+        "description": "CreateOrganizationInviteRequest is for sending out invites to join a Pulumi organization.",
+        "properties": {
+          "email": {
+            "description": "The email address. Required for email-based invites, omitted when creating shareable invite links.",
+            "type": "string",
+            "x-order": 1
+          },
+          "role": {
+            "description": "Built-in role to assign to the invited member. When 'roleId' is also supplied it takes precedence and this field is ignored; prefer 'roleId' for new integrations.",
+            "enum": [
+              "member",
+              "admin",
+              "billing-manager"
+            ],
+            "type": "string",
+            "x-order": 2,
+            "x-pulumi-model-property": {
+              "enumComments": "Built-in role assignable through an organization invite.",
+              "enumFieldComments": [
+                "Regular organization member.",
+                "Organization administrator.",
+                "Billing administrator."
+              ],
+              "enumFieldNames": [
+                "Member",
+                "Admin",
+                "BillingManager"
+              ],
+              "enumTypeName": "OrganizationInviteRole"
+            }
+          },
+          "roleId": {
+            "description": "UUID of a role (built-in or custom) to assign to the invited member. Takes precedence over 'role' when both are supplied.",
+            "type": "string",
+            "x-order": 3
+          }
+        },
+        "required": [
+          "role"
+        ],
+        "type": "object"
+      },
+      "CreateOrganizationInviteResponse": {
+        "description": "CreateOrganizationInviteResponse is the response type when creating a new invitation to join\na Pulumi organization.",
+        "properties": {
+          "acceptInviteUrl": {
+            "description": "The accept invite URL",
+            "type": "string",
+            "x-order": 2
+          },
+          "id": {
+            "description": "The unique identifier",
+            "type": "string",
+            "x-order": 1
+          }
+        },
+        "required": [
+          "acceptInviteUrl",
+          "id"
         ],
         "type": "object"
       },
@@ -11048,6 +11244,16 @@
           },
           {
             "description": "GitHub-specific VCS deployment settings.",
+            "properties": {
+              "reviewStackLabels": {
+                "description": "Gates review stack creation. When set, only pull requests carrying a matching label (exact, case-sensitive) create a review stack.",
+                "items": {
+                  "type": "string"
+                },
+                "type": "array",
+                "x-order": 1
+              }
+            },
             "type": "object"
           }
         ]
@@ -11216,12 +11422,17 @@
           "annotation": {
             "$ref": "#/components/schemas/ResourceMigrationAnnotation",
             "description": "User-created migration annotation, if any.",
-            "x-order": 8
+            "x-order": 9
+          },
+          "cloudProviderId": {
+            "description": "The cloud provider's physical identifier for this resource (e.g. an AWS ARN, S3 bucket name, or Azure resource path). For CloudFormation-discovered resources this is the CloudFormation PhysicalResourceID; for Terraform-backed stacks it is the Terraform-native resource ID.",
+            "type": "string",
+            "x-order": 4
           },
           "managedBy": {
             "description": "The orchestrator or tool that manages this resource (e.g. 'CloudFormation', 'ARM', 'Pulumi').",
             "type": "string",
-            "x-order": 4
+            "x-order": 5
           },
           "migrationStatus": {
             "description": "Migration status of the resource relative to the comparison stack.",
@@ -11234,7 +11445,7 @@
               "NotApplicable"
             ],
             "type": "string",
-            "x-order": 7,
+            "x-order": 8,
             "x-pulumi-model-property": {
               "enumComments": "Migration status of a discovered resource relative to a comparison Pulumi stack. Migrated and PulumiOnly are only possible when the compareTo parameter is provided.",
               "enumFieldComments": [
@@ -11261,7 +11472,7 @@
           "providerType": {
             "description": "The mapped Pulumi provider type token (e.g. 'aws:s3/bucket:Bucket'). Omitted when the resource has not been mapped to a Pulumi type.",
             "type": "string",
-            "x-order": 5
+            "x-order": 6
           },
           "resource": {
             "$ref": "#/components/schemas/Resource",
@@ -11274,7 +11485,7 @@
             },
             "description": "The Pulumi-compatible state, if available.",
             "type": "object",
-            "x-order": 6
+            "x-order": 7
           }
         },
         "required": [
@@ -13179,10 +13390,10 @@
         "type": "object"
       },
       "GetPackageDocsResponse": {
-        "description": "Structured API documentation for a single resource or function. Property names, types, and descriptions are keyed by language. When lang is provided, each map is guaranteed to contain exactly one entry matching the requested language. The description field is a content node array because it may contain structural elements like code choosers.",
+        "description": "API documentation for a single resource or function.",
         "properties": {
           "description": {
-            "description": "Structured description as an array of content nodes. When a language filter is applied, chooser nodes are resolved and the array contains only text nodes.",
+            "description": "Description as an array of content nodes. Chooser nodes are resolved.",
             "items": {
               "$ref": "#/components/schemas/RegistryContentNode"
             },
@@ -13190,7 +13401,7 @@
             "x-order": 7
           },
           "inputs": {
-            "description": "Input properties for the resource or function.",
+            "description": "Input properties.",
             "items": {
               "$ref": "#/components/schemas/RegistryDocsProperty"
             },
@@ -13203,7 +13414,7 @@
             "x-order": 4
           },
           "language": {
-            "description": "The language the content was filtered for.",
+            "description": "Rendering target for code snippets and resolved names. Individual content may fall back to another available language when the target is missing. Never null.",
             "type": "string",
             "x-order": 5
           },
@@ -13211,7 +13422,7 @@
             "additionalProperties": {
               "type": "string"
             },
-            "description": "The display name of the resource or function, keyed by language.",
+            "description": "Display name keyed by language.",
             "type": "object",
             "x-order": 6
           },
@@ -13221,7 +13432,7 @@
             "x-order": 2
           },
           "outputs": {
-            "description": "Output properties for the resource or function.",
+            "description": "Output properties.",
             "items": {
               "$ref": "#/components/schemas/RegistryDocsProperty"
             },
@@ -13229,7 +13440,7 @@
             "x-order": 9
           },
           "supportingTypes": {
-            "description": "Supporting types referenced by the input and output properties. These are inlined rather than referenced by index.",
+            "description": "Supporting types referenced by inputs and outputs (inlined, not referenced by index).",
             "items": {
               "$ref": "#/components/schemas/RegistryDocsSupportingType"
             },
@@ -13259,10 +13470,10 @@
         "type": "object"
       },
       "GetPackageExamplesResponse": {
-        "description": "Code examples aggregated from a registry package version. Examples are extracted from PulumiCodeChooser blocks in resource and function descriptions and carry per-example token and kind so the flat list is self-contained. Filtered by the optional 'q' search parameter and capped by 'limit'.",
+        "description": "Code examples aggregated across a package's resources and functions. Each example carries its own 'token' and 'kind', filtered by 'q' and capped by 'limit'.",
         "properties": {
           "examples": {
-            "description": "Examples in deterministic order: sorted by token (alphabetical), then by index within each token. Capped at 'limit'.",
+            "description": "Examples sorted by token, then by position within each token. Capped at 'limit'.",
             "items": {
               "$ref": "#/components/schemas/RegistryExample"
             },
@@ -13270,23 +13481,23 @@
             "x-order": 4
           },
           "language": {
-            "description": "The language all snippets are filtered to.",
+            "description": "Resolved snippet language.",
             "type": "string",
             "x-order": 3
           },
           "navUrl": {
-            "description": "Path to the package navigation endpoint for this version.",
+            "description": "Path to the package navigation endpoint.",
             "type": "string",
             "x-order": 2
           },
           "totalCount": {
-            "description": "Total number of examples matching the query before 'limit' was applied. When greater than the length of 'examples', more results exist that were not returned.",
+            "description": "Total examples matching the query before 'limit' was applied.",
             "format": "int64",
             "type": "integer",
             "x-order": 5
           },
           "version": {
-            "description": "The resolved semantic version of the package.",
+            "description": "Resolved semantic version.",
             "type": "string",
             "x-order": 1
           }
@@ -13360,100 +13571,118 @@
         "type": "object"
       },
       "GetPackageNavModule": {
-        "description": "A module within a package navigation tree, containing its resources and functions.",
+        "description": "A module within a package navigation. Modules are flat: names like 's3/bucket' are not split into nested children.",
         "properties": {
           "functions": {
-            "description": "Functions in this module.",
+            "description": "Functions in this module. Returned only when 'depth=full' is set.",
             "items": {
               "$ref": "#/components/schemas/GetPackageNavItem"
             },
             "type": "array",
             "x-order": 3
           },
+          "functionsTotal": {
+            "description": "Total functions in this module, independent of 'q'.",
+            "format": "int32",
+            "type": "integer",
+            "x-order": 5
+          },
           "name": {
-            "description": "The display name of the module, resolved for the requested language.",
+            "description": "Module display name, resolved for the requested language. May contain '/' (e.g. 's3/bucket').",
             "type": "string",
             "x-order": 1
           },
           "resources": {
-            "description": "Resources in this module.",
+            "description": "Resources in this module. Returned only when 'depth=full' is set.",
             "items": {
               "$ref": "#/components/schemas/GetPackageNavItem"
             },
             "type": "array",
             "x-order": 2
+          },
+          "resourcesTotal": {
+            "description": "Total resources in this module, independent of 'q'.",
+            "format": "int32",
+            "type": "integer",
+            "x-order": 4
           }
         },
         "required": [
-          "functions",
+          "functionsTotal",
           "name",
-          "resources"
+          "resourcesTotal"
         ],
         "type": "object"
       },
       "GetPackageNavResponse": {
-        "description": "Navigation structure for a registry package's modules, resources, and functions. Names are resolved for the requested language (defaulting to Go). When a search query is provided, the tree is filtered to matching nodes with ancestor paths preserved.",
+        "description": "Package navigation: a flat list of modules, each with resources and functions.",
         "properties": {
           "description": {
-            "description": "A short description of what the package provides.",
+            "description": "Short description of the package.",
             "type": "string",
             "x-order": 6
           },
           "docsUrlTemplate": {
-            "description": "URL template for the documentation endpoint. Replace '{percent-encoded-token}' with a percent-encoded Pulumi token from a navigation item.",
+            "description": "URL template for the docs endpoint. Substitute '{token}' with a URL-encoded Pulumi token from a navigation item.",
             "type": "string",
             "x-order": 11
           },
           "installationUrl": {
-            "description": "Path to the package installation configuration endpoint for this version. Absent when the package does not include installation configuration.",
+            "description": "Path to the installation configuration endpoint, if present.",
             "type": "string",
             "x-order": 10
           },
           "language": {
-            "description": "The language names were resolved for, if a language filter was applied.",
+            "description": "Rendering target for resolved names. Individual content may fall back to another available language when the target is missing.",
             "type": "string",
             "x-order": 7
           },
           "modules": {
-            "description": "The modules in this package, each containing resources and functions.",
+            "description": "Modules in this package.",
             "items": {
               "$ref": "#/components/schemas/GetPackageNavModule"
             },
             "type": "array",
             "x-order": 12
           },
+          "modulesTotal": {
+            "description": "Total number of modules in the package, independent of 'q'.",
+            "format": "int32",
+            "type": "integer",
+            "x-order": 13
+          },
           "name": {
-            "description": "The package name (e.g. 'aws').",
+            "description": "Package name (e.g. 'aws').",
             "type": "string",
             "x-order": 3
           },
           "packageVersionUrl": {
-            "description": "Path to the full package version metadata endpoint.",
+            "description": "Path to the package version metadata endpoint.",
             "type": "string",
             "x-order": 8
           },
           "publisher": {
-            "description": "The publisher of the package (e.g. 'pulumi').",
+            "description": "Package publisher (e.g. 'pulumi').",
             "type": "string",
             "x-order": 2
           },
           "readmeUrl": {
-            "description": "Path to the package README endpoint for this version.",
+            "description": "Path to the README endpoint.",
             "type": "string",
             "x-order": 9
           },
           "source": {
-            "description": "The source of the package (e.g. 'pulumi').",
+            "description": "Package source (e.g. 'pulumi').",
             "type": "string",
             "x-order": 1
           },
           "title": {
-            "description": "The display title of the package.",
+            "description": "Display title.",
             "type": "string",
             "x-order": 5
           },
           "version": {
-            "description": "The resolved semantic version of the package.",
+            "description": "Resolved semantic version.",
             "type": "string",
             "x-order": 4
           }
@@ -13461,6 +13690,7 @@
         "required": [
           "docsUrlTemplate",
           "modules",
+          "modulesTotal",
           "name",
           "packageVersionUrl",
           "publisher",
@@ -18191,17 +18421,17 @@
             "description": "AccountCount is the current number of Insights Accounts in the organization.\n(May be more than the requesting user has permission to see.)",
             "format": "int64",
             "type": "integer",
-            "x-order": 30
+            "x-order": 33
           },
           "aiEnablement": {
             "description": "The AI feature enablement status for the organization (e.g. enabled, disabled, opt-in).",
             "type": "string",
-            "x-order": 25
+            "x-order": 28
           },
           "auditLogsEnabled": {
             "description": "Deprecated. Access the AuditLogsEnabled feature from the Features property.",
             "type": "boolean",
-            "x-order": 27
+            "x-order": 30
           },
           "backingOrgLogin": {
             "description": "The login name of the backing organization on the identity provider.",
@@ -18245,7 +18475,7 @@
           "defaultDeploymentRoleId": {
             "description": "DefaultDeploymentRoleID is the ID of the default role used for deployments when no specific role is configured in the stack's deployment settings. If unset, deployments run using the triggering user's own permissions.",
             "type": "string",
-            "x-order": 38
+            "x-order": 41
           },
           "defaultEnvironmentPermission": {
             "description": "DefaultEnvironmentPermission is the default permission every member\nhas for accessing the organization's environments.",
@@ -18266,7 +18496,7 @@
           "defaultRoleId": {
             "description": "DefaultRoleID is the ID of the default role for new users added to the organization.\nIf unset, defaults to the \"Member\" role.",
             "type": "string",
-            "x-order": 37
+            "x-order": 40
           },
           "defaultStackPermission": {
             "description": "DefaultStackPermission is the default permission every member\nhas for accessing the organization's stacks.",
@@ -18303,12 +18533,12 @@
             "description": "EnvironmentCount is the current number of environments in the organization.\n(May be more than the requesting user has permission to see.)",
             "format": "int64",
             "type": "integer",
-            "x-order": 31
+            "x-order": 34
           },
           "features": {
             "$ref": "#/components/schemas/OrganizationFeatures",
             "description": "The feature flags enabled for this organization, controlling access to specific functionality.",
-            "x-order": 29
+            "x-order": 32
           },
           "id": {
             "description": "The unique identifier of the organization.",
@@ -18318,18 +18548,18 @@
           "insightsBillingAccepted": {
             "description": "true if accepted, false if denied, nil if no action taken",
             "type": "boolean",
-            "x-order": 23
+            "x-order": 26
           },
           "insightsTrialEnd": {
             "description": "The Unix timestamp when the Insights trial ends.",
             "format": "int64",
             "type": "integer",
-            "x-order": 22
+            "x-order": 25
           },
           "insightsTrialUsingPolicy": {
             "description": "true if org needs to be upgraded to business critical",
             "type": "boolean",
-            "x-order": 24
+            "x-order": 27
           },
           "kind": {
             "description": "The kind of backing identity provider for the organization.",
@@ -18374,7 +18604,7 @@
               "transfer-in-progress"
             ],
             "type": "string",
-            "x-order": 36,
+            "x-order": 39,
             "x-pulumi-model-property": {
               "enumComments": "OrganizationLockedStatus describes why an organization may be locked or restricted.",
               "enumFieldNames": [
@@ -18391,19 +18621,19 @@
             "description": "MaxMembers is the maximum number of members the organization can have\nbased on its subscription. (Only set for per-member billed orgs.)",
             "format": "int64",
             "type": "integer",
-            "x-order": 35
+            "x-order": 38
           },
           "maxStacks": {
             "description": "MaxStacks is the maximum number of stacks the organization can have\nbased on its subscription. Will be nil/omitted if there is no limit.",
             "format": "int64",
             "type": "integer",
-            "x-order": 33
+            "x-order": 36
           },
           "memberCount": {
             "description": "MemberCount is the number of members the organization has. Will be\nincorrect for organizations on the TeamPerStack subscription plan.",
             "format": "int64",
             "type": "integer",
-            "x-order": 34
+            "x-order": 37
           },
           "membersCanCreateAccounts": {
             "description": "Whether organization members can create Insights accounts.",
@@ -18430,6 +18660,16 @@
             "type": "boolean",
             "x-order": 16
           },
+          "naturalLanguageSearchDisabled": {
+            "description": "Whether natural-language resource search is disabled for the organization. Independent of neoEnabled; if neoEnabled is false, this flag has no additional effect.",
+            "type": "boolean",
+            "x-order": 23
+          },
+          "neoAgentDisabled": {
+            "description": "Whether the Neo agent is disabled for the organization. Independent of neoEnabled; if neoEnabled is false, this flag has no additional effect.",
+            "type": "boolean",
+            "x-order": 24
+          },
           "neoApprovalMode": {
             "description": "neoApprovalMode is the default approval mode for new Neo AI agent tasks.",
             "enum": [
@@ -18443,6 +18683,11 @@
               "enumComments": "NeoApprovalMode represents the default approval mode for Neo AI agent tasks in an organization",
               "enumTypeName": "NeoApprovalMode"
             }
+          },
+          "neoCLIExplanationsDisabled": {
+            "description": "Whether Neo CLI explanations (preview and update-failure explanations served to the CLI) are disabled for the organization. Independent of neoEnabled; if neoEnabled is false, this flag has no additional effect.",
+            "type": "boolean",
+            "x-order": 22
           },
           "neoEnabled": {
             "description": "Whether Neo AI agent features are enabled for the organization.",
@@ -18471,7 +18716,7 @@
               "gitlab"
             ],
             "type": "string",
-            "x-order": 26,
+            "x-order": 29,
             "x-pulumi-model-property": {
               "enumComments": "PreferredVCS represents an organization selected preferred VCS vendor",
               "enumFieldNames": [
@@ -18529,7 +18774,7 @@
             "description": "StackCount is the current number of stacks in the organization.\n(May be more than the requesting user has permission to see.)",
             "format": "int64",
             "type": "integer",
-            "x-order": 32
+            "x-order": 35
           },
           "subscriptionCancelAtPeriodEnd": {
             "description": "Whether the subscription will be canceled at the end of the current billing period.",
@@ -18589,7 +18834,7 @@
           "webhooksEnabled": {
             "description": "Deprecated. Access the WebhooksEnabled feature from the Features property.",
             "type": "boolean",
-            "x-order": 28
+            "x-order": 31
           }
         },
         "required": [
@@ -18611,7 +18856,10 @@
           "membersCanCreateTeams",
           "membersCanDeleteStacks",
           "membersCanTransferStacks",
+          "naturalLanguageSearchDisabled",
+          "neoAgentDisabled",
           "neoApprovalMode",
+          "neoCLIExplanationsDisabled",
           "neoEnabled",
           "neoTaskSharingMode",
           "preferredVCS",
@@ -18963,6 +19211,30 @@
             "format": "int32",
             "type": "integer",
             "x-order": 4
+          }
+        },
+        "type": "object"
+      },
+      "PageContext": {
+        "description": "Describes the Pulumi Cloud page the user has the Neo pane open on. Sent on every Neo prompt request (initial creation and follow-ups) so the agent's system prompt can reference the user's current location. The schema is intentionally generic: `path` is the raw URL, `params` carries route path parameters extracted by the client, and `kind` is an optional stable label set by the route definition (in console2 via `data: { pageContextKind: ... }`) for cases where the agent should special-case the page. New pages flow through automatically — only routes that need stable agent treatment must declare a `kind`.",
+        "properties": {
+          "kind": {
+            "description": "Optional stable label declared by the route, used by the agent to phrase the user's location in its system prompt or branch on well-known pages. Examples: 'stack-update', 'environment', 'neo-task'. Routes without a declared kind leave this null; the agent falls back to the path and params.",
+            "type": "string",
+            "x-order": 1
+          },
+          "params": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Route path parameters extracted from the matched Angular route, keyed by parameter name (e.g. {'organization': 'myorg', 'project': 'myapp', 'stack': 'prod', 'version': '47'}). Empty for routes with no path parameters.",
+            "type": "object",
+            "x-order": 3
+          },
+          "path": {
+            "description": "Raw URL path of the page the user is viewing (e.g. '/myorg/myapp/prod/updates/47'). Always populated.",
+            "type": "string",
+            "x-order": 2
           }
         },
         "type": "object"
@@ -19817,7 +20089,7 @@
             "type": "string",
             "x-order": 4,
             "x-pulumi-model-property": {
-              "enumComments": "Categorizes how a permission descriptor is presented in the UI. Valid values: role, role_private, policy, set.",
+              "enumComments": "Categorizes how a permission descriptor is presented in the UI.",
               "enumFieldNames": [
                 "Role",
                 "RolePrivate",
@@ -22204,6 +22476,7 @@
               "Roles",
               "Search",
               "Copilot",
+              "Neo",
               "Organization annotations",
               "OIDC",
               "Templates",
@@ -22245,6 +22518,7 @@
                 "Roles",
                 "Search",
                 "Copilot",
+                "Neo",
                 "Annotations",
                 "Oidc",
                 "Templates",
@@ -22296,20 +22570,20 @@
         ]
       },
       "RegistryContentNode": {
-        "description": "A structured content node in registry documentation. Every node has a 'kind' and a 'markdown' fallback string. Clients render 'markdown' for any 'kind' they do not recognize, ensuring forward compatibility as new node kinds are introduced.",
+        "description": "A content node. Clients render 'markdown' for any 'kind' they do not recognize.",
         "properties": {
           "kind": {
-            "description": "The semantic kind of this content node. Known kinds: 'text' (plain markdown), 'language-chooser' (switchable code blocks per language), 'os-chooser' (switchable content blocks per OS). Clients should render the 'markdown' fallback for unrecognized kinds.",
+            "description": "Node kind. Known kinds: 'text', 'language-chooser', 'os-chooser'. Render 'markdown' for unrecognized kinds.",
             "type": "string",
             "x-order": 1
           },
           "markdown": {
-            "description": "Markdown representation of this node's content. For 'text' nodes this is the content itself. For chooser nodes this is a concatenation of all options, suitable as a fallback.",
+            "description": "Markdown content. For 'text' nodes, the content itself. For chooser nodes, a concatenation of options for fallback rendering.",
             "type": "string",
             "x-order": 2
           },
           "options": {
-            "description": "Options for chooser nodes ('language-chooser' or 'os-chooser'). Each option represents one selectable tab or variant. Absent for 'text' nodes.",
+            "description": "Options for chooser nodes; absent for 'text'.",
             "items": {
               "$ref": "#/components/schemas/RegistryContentNodeOption"
             },
@@ -22354,7 +22628,7 @@
             "additionalProperties": {
               "type": "string"
             },
-            "description": "Description of this enum value, keyed by language.",
+            "description": "Description keyed by language.",
             "type": "object",
             "x-order": 3
           },
@@ -22362,12 +22636,12 @@
             "additionalProperties": {
               "type": "string"
             },
-            "description": "The enum value name, keyed by language.",
+            "description": "Enum value name keyed by language.",
             "type": "object",
             "x-order": 1
           },
           "value": {
-            "description": "The wire value of this enum variant.",
+            "description": "Wire value of this enum variant.",
             "type": "string",
             "x-order": 2
           }
@@ -22379,7 +22653,7 @@
         "type": "object"
       },
       "RegistryDocsProperty": {
-        "description": "A property of a Pulumi resource or function in the public API documentation. Name, type, and description are maps keyed by language. When a language filter is applied, each map contains exactly one entry matching the requested language.",
+        "description": "A property of a resource or function.",
         "properties": {
           "deprecated": {
             "description": "Whether this property is deprecated.",
@@ -22390,7 +22664,7 @@
             "additionalProperties": {
               "type": "string"
             },
-            "description": "The property description in markdown, keyed by language.",
+            "description": "Markdown description, keyed by language.",
             "type": "object",
             "x-order": 6
           },
@@ -22398,12 +22672,12 @@
             "additionalProperties": {
               "type": "string"
             },
-            "description": "The property name, keyed by language.",
+            "description": "Property name, keyed by language.",
             "type": "object",
             "x-order": 1
           },
           "replaceOnChanges": {
-            "description": "Whether changing this property forces resource replacement.",
+            "description": "Whether changing this property forces replacement.",
             "type": "boolean",
             "x-order": 4
           },
@@ -22416,13 +22690,13 @@
             "additionalProperties": {
               "type": "string"
             },
-            "description": "The display type of the property, keyed by language.",
+            "description": "Display type, keyed by language.",
             "type": "object",
             "x-order": 2
           },
           "typeRef": {
             "$ref": "#/components/schemas/RegistryDocsTypeRef",
-            "description": "Reference to the type this property links to, either a local supporting type token or a remote type in another package. Null for primitive types.",
+            "description": "Reference to a local supporting type or a remote type. Null for primitive types.",
             "x-order": 7
           }
         },
@@ -22436,10 +22710,10 @@
         "type": "object"
       },
       "RegistryDocsSupportingType": {
-        "description": "A supporting type (object or enum) referenced by resource or function properties. Inlined in the response rather than referenced by index.",
+        "description": "A supporting type (object or enum) referenced by properties. Inlined, not referenced by index.",
         "properties": {
           "kind": {
-            "description": "Whether this is an 'object' or 'enum' type.",
+            "description": "'object' or 'enum'.",
             "type": "string",
             "x-order": 3
           },
@@ -22447,12 +22721,12 @@
             "additionalProperties": {
               "type": "string"
             },
-            "description": "The display name of this type, keyed by language.",
+            "description": "Display name keyed by language.",
             "type": "object",
             "x-order": 2
           },
           "properties": {
-            "description": "Properties of this type (when kind is 'object').",
+            "description": "Properties (when kind is 'object').",
             "items": {
               "$ref": "#/components/schemas/RegistryDocsProperty"
             },
@@ -22460,7 +22734,7 @@
             "x-order": 4
           },
           "token": {
-            "description": "The Pulumi token of this type.",
+            "description": "Pulumi token of this type.",
             "type": "string",
             "x-order": 1
           },
@@ -22505,30 +22779,30 @@
         "type": "object"
       },
       "RegistryExample": {
-        "description": "A single code example extracted from a resource or function description. Composed of a stable identifier, a human-readable title derived from the surrounding documentation, and the code snippet in the requested language.",
+        "description": "A code example extracted from a resource or function description.",
         "properties": {
           "code": {
-            "description": "The example source code in the requested language.",
+            "description": "Example source code in the resolved language.",
             "type": "string",
             "x-order": 3
           },
           "id": {
-            "description": "Stable identifier for this example within the package version. Format: '<token>#<index>', e.g. 'aws:ec2/instance:Instance#0'. The index is the zero-based position of the example among siblings on the same token. Stable only within a single package version.",
+            "description": "Stable identifier within the package version. Format: '<token>#<slug>', where slug is the kebab-case title (e.g. 'aws:ec2/instance:Instance#account-analyzer'), falling back to 'example-<short-hash>' when there is no heading. Duplicates within the same token are suffixed '-2', '-3', etc.",
             "type": "string",
             "x-order": 1
           },
           "kind": {
-            "description": "Whether 'token' refers to a 'resource' or 'function'.",
+            "description": "Whether 'token' is a 'resource' or 'function'.",
             "type": "string",
             "x-order": 5
           },
           "title": {
-            "description": "Human-readable title derived from the schema's surrounding heading or preceding paragraph caption. Capped at 120 characters with word-boundary truncation. Empty when no heading or caption was available; consumers can render their own fallback (e.g. 'Example #' + index). May be the same for sibling examples when the schema does not differentiate them; rely on 'id' for addressability.",
+            "description": "Title derived from the surrounding heading or caption. Capped at 120 chars. Empty when none was available; rely on 'id' for addressability.",
             "type": "string",
             "x-order": 2
           },
           "token": {
-            "description": "The Pulumi token of the resource or function this example belongs to.",
+            "description": "Pulumi token this example belongs to.",
             "type": "string",
             "x-order": 4
           }
@@ -22688,6 +22962,17 @@
           "projectName",
           "stackName"
         ],
+        "type": "object"
+      },
+      "ResendOrganizationInviteRequest": {
+        "description": "ResendOrganizationInviteRequest is for re-sending out invites to join a Pulumi organization.",
+        "properties": {
+          "token": {
+            "description": "Turnstile token",
+            "type": "string",
+            "x-order": 1
+          }
+        },
         "type": "object"
       },
       "Resource": {
@@ -24044,7 +24329,7 @@
         "description": "Request to configure a git-based source context.",
         "properties": {
           "branch": {
-            "description": "The branch to use from the repository.",
+            "description": "The branch to use from the repository. Mutually exclusive with `commit`.",
             "type": "string",
             "x-order": 2
           },
@@ -25970,12 +26255,12 @@
           "setDefaultAgentPoolID": {
             "description": "The ID of the default agent pool for the organization. Set to empty string to revert to the Pulumi Hosted Pool.",
             "type": "string",
-            "x-order": 16
+            "x-order": 19
           },
           "setDefaultDeploymentRoleId": {
             "description": "The ID of the default deployment role. When set, this role is applied to all deployments that do not have a role explicitly configured in their stack deployment settings. Set to an empty string to clear the default.",
             "type": "string",
-            "x-order": 15
+            "x-order": 18
           },
           "setDefaultEnvironmentPermission": {
             "description": "The new default environment permission for the organization.",
@@ -26054,6 +26339,16 @@
             "type": "boolean",
             "x-order": 7
           },
+          "setNaturalLanguageSearchDisabled": {
+            "description": "Whether natural-language resource search is disabled for the organization. Independent of setNeoEnabled; if the master is disabled, this flag has no additional effect.",
+            "type": "boolean",
+            "x-order": 15
+          },
+          "setNeoAgentDisabled": {
+            "description": "Whether the Neo agent is disabled for the organization. Independent of setNeoEnabled; if the master is disabled, this flag has no additional effect.",
+            "type": "boolean",
+            "x-order": 16
+          },
           "setNeoApprovalMode": {
             "description": "The default approval mode for Neo tasks.",
             "enum": [
@@ -26067,6 +26362,11 @@
               "enumComments": "NeoApprovalMode represents the default approval mode for Neo AI agent tasks in an organization",
               "enumTypeName": "NeoApprovalMode"
             }
+          },
+          "setNeoCLIExplanationsDisabled": {
+            "description": "Whether Neo CLI explanations (preview and update-failure explanations served to the CLI) are disabled for the organization. Independent of setNeoEnabled; if the master is disabled, this flag has no additional effect.",
+            "type": "boolean",
+            "x-order": 14
           },
           "setNeoEnabled": {
             "description": "Whether Neo is enabled for the organization.",
@@ -26095,7 +26395,7 @@
               "gitlab"
             ],
             "type": "string",
-            "x-order": 14,
+            "x-order": 17,
             "x-pulumi-model-property": {
               "enumComments": "PreferredVCS represents an organization selected preferred VCS vendor",
               "enumFieldNames": [
@@ -26189,7 +26489,7 @@
         "type": "object"
       },
       "UpdateRoleRequest": {
-        "description": "Request to update a custom role.",
+        "description": "Request to update a custom role. All fields are optional; only fields present in the request are updated on the server.",
         "properties": {
           "description": {
             "description": "The new description for the role.",
@@ -26207,11 +26507,6 @@
             "x-order": 1
           }
         },
-        "required": [
-          "description",
-          "details",
-          "name"
-        ],
         "type": "object"
       },
       "UpdateSAMLOrganizationRequest": {
@@ -37753,15 +38048,34 @@
             }
           },
           {
-            "description": "Time granularity for the summary (e.g. 'daily', 'hourly')",
+            "description": "Time granularity for the summary. Hourly granularity is limited to a 2-day lookback.",
             "in": "query",
             "name": "granularity",
+            "required": true,
             "schema": {
-              "type": "string"
+              "enum": [
+                "yearly",
+                "monthly",
+                "weekly",
+                "daily",
+                "hourly"
+              ],
+              "type": "string",
+              "x-pulumi-model-property": {
+                "enumComments": "UsageSummaryTimeUnit represents the granularity of RUM summary data.",
+                "enumFieldComments": [
+                  "Aggregate yearly.",
+                  "Aggregate monthly.",
+                  "Aggregate weekly.",
+                  "Aggregate daily.",
+                  "Aggregate hourly."
+                ],
+                "enumTypeName": "UsageSummaryTimeUnit"
+              }
             }
           },
           {
-            "description": "Number of days to look back from the current date",
+            "description": "Number of days to look back from the current date. Must be positive; when granularity is 'hourly' the value must not exceed 2. Mutually exclusive with lookbackStart; exactly one must be provided.",
             "in": "query",
             "name": "lookbackDays",
             "schema": {
@@ -37770,7 +38084,7 @@
             }
           },
           {
-            "description": "Start of the lookback period (Unix timestamp)",
+            "description": "Start of the lookback period as a Unix timestamp (seconds since epoch). Must be positive, in the past, and within the last year. Mutually exclusive with lookbackDays; exactly one must be provided.",
             "in": "query",
             "name": "lookbackStart",
             "schema": {
@@ -37866,15 +38180,34 @@
             }
           },
           {
-            "description": "Time granularity for aggregation (e.g., 'hourly', 'daily', 'monthly')",
+            "description": "Time granularity for aggregation. Hourly granularity is limited to a 2-day lookback.",
             "in": "query",
             "name": "granularity",
+            "required": true,
             "schema": {
-              "type": "string"
+              "enum": [
+                "yearly",
+                "monthly",
+                "weekly",
+                "daily",
+                "hourly"
+              ],
+              "type": "string",
+              "x-pulumi-model-property": {
+                "enumComments": "UsageSummaryTimeUnit represents the granularity of RUM summary data.",
+                "enumFieldComments": [
+                  "Aggregate yearly.",
+                  "Aggregate monthly.",
+                  "Aggregate weekly.",
+                  "Aggregate daily.",
+                  "Aggregate hourly."
+                ],
+                "enumTypeName": "UsageSummaryTimeUnit"
+              }
             }
           },
           {
-            "description": "Number of days to look back from the current time or lookbackStart",
+            "description": "Number of days to look back from the current time. Must be positive; when granularity is 'hourly' the value must not exceed 2. Mutually exclusive with lookbackStart; exactly one must be provided.",
             "in": "query",
             "name": "lookbackDays",
             "schema": {
@@ -37883,7 +38216,7 @@
             }
           },
           {
-            "description": "Unix timestamp for the start of the lookback period (defaults to current time if omitted)",
+            "description": "Unix timestamp (seconds since epoch) for the start of the lookback period. Must be positive, in the past, and within the last year. Mutually exclusive with lookbackDays; exactly one must be provided.",
             "in": "query",
             "name": "lookbackStart",
             "schema": {
@@ -38298,11 +38631,30 @@
             }
           },
           {
-            "description": "Time granularity for grouping usage data. Valid values: 'hourly', 'daily', 'weekly', 'monthly', 'yearly'. Hourly granularity is limited to a 2-day lookback.",
+            "description": "Time granularity for grouping usage data. Hourly granularity is limited to a 2-day lookback.",
             "in": "query",
             "name": "granularity",
+            "required": true,
             "schema": {
-              "type": "string"
+              "enum": [
+                "yearly",
+                "monthly",
+                "weekly",
+                "daily",
+                "hourly"
+              ],
+              "type": "string",
+              "x-pulumi-model-property": {
+                "enumComments": "UsageSummaryTimeUnit represents the granularity of RUM summary data.",
+                "enumFieldComments": [
+                  "Aggregate yearly.",
+                  "Aggregate monthly.",
+                  "Aggregate weekly.",
+                  "Aggregate daily.",
+                  "Aggregate hourly."
+                ],
+                "enumTypeName": "UsageSummaryTimeUnit"
+              }
             }
           },
           {
@@ -38343,6 +38695,347 @@
         "tags": [
           "Insights",
           "InsightsAccounts"
+        ]
+      }
+    },
+    "/api/orgs/{orgName}/invites": {
+      "get": {
+        "description": "Lists all pending invitations for an organization. Pending invitations count toward the organization's seat limit, since they reserve capacity for the users who eventually accept. Each entry includes the invite ID, recipient email, role assignment, sender, and the timestamp when it was last sent.",
+        "operationId": "ListOrgInvites",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListOrganizationInvitesResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "ListOrgInvites",
+        "tags": [
+          "Organizations",
+          "Invites"
+        ]
+      }
+    },
+    "/api/orgs/{orgName}/invites/batch": {
+      "post": {
+        "description": "Creates multiple organization invitations in a single request and sends email notifications to each invitee. Each invitation includes a role assignment (admin or member) and optional team assignments. Pending invitations count toward the organization's seat limit. The request body size is limited to prevent abuse.",
+        "operationId": "BatchCreateOrgInviteEmail",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BatchCreateOrganizationInviteRequest"
+              }
+            }
+          },
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchCreateOrganizationInviteResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid email address."
+          }
+        },
+        "summary": "BatchCreateOrgInviteEmail",
+        "tags": [
+          "Organizations",
+          "Invites"
+        ]
+      }
+    },
+    "/api/orgs/{orgName}/invites/link": {
+      "post": {
+        "description": "Generates a new invite URL to join an organization, intended to be shared via copy/paste. Does not send out an email and does not require an email address in the request. Anyone with a Pulumi account who knows the resulting URL can accept the invitation, so share the link only with the intended recipient.",
+        "operationId": "CreateOrgInviteLink",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrganizationInviteRequest"
+              }
+            }
+          },
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateOrganizationInviteResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "CreateOrgInviteLink",
+        "tags": [
+          "Organizations",
+          "Invites"
+        ]
+      }
+    },
+    "/api/orgs/{orgName}/invites/unverified/batch": {
+      "post": {
+        "description": "Creates multiple organization invitations for email addresses that may not yet have Pulumi accounts. Unlike the standard batch invite, this does not require the invitees to have verified email addresses. The invitee will be prompted to create an account when they accept the invitation.",
+        "operationId": "BatchCreateOrgUnverifiedInviteEmail",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BatchCreateOrganizationInviteRequest"
+              }
+            }
+          },
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchCreateOrganizationInviteResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid email address."
+          }
+        },
+        "summary": "BatchCreateOrgUnverifiedInviteEmail",
+        "tags": [
+          "Organizations",
+          "Invites"
+        ]
+      }
+    },
+    "/api/orgs/{orgName}/invites/{inviteID}": {
+      "delete": {
+        "description": "Cancels a pending organization invitation, reclaiming the seat it reserves in the organization. Pending invitations count toward the organization's seat limit, so canceling frees up capacity for new invitations or members. Returns 404 if the invite does not exist.",
+        "operationId": "CancelOrgInvite",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The invite identifier",
+            "in": "path",
+            "name": "inviteID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Invite"
+          }
+        },
+        "summary": "CancelOrgInvite",
+        "tags": [
+          "Organizations",
+          "Invites"
+        ]
+      },
+      "get": {
+        "description": "Validates the organization name and invite ID from the URL and, if they correspond to an active invitation, returns basic organization metadata. This provides a reasonably secure way to share organization metadata with a non-member without making it available to everyone, since the caller must know both the organization login and the invite ID. Returns 404 if the invite has already been accepted or canceled.",
+        "operationId": "GetOrgInvite",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The invite identifier",
+            "in": "path",
+            "name": "inviteID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationSummaryWithRole"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Invite"
+          }
+        },
+        "summary": "GetOrgInvite",
+        "tags": [
+          "Organizations",
+          "Invites"
+        ]
+      },
+      "patch": {
+        "description": "Accepts an organization invitation. The authenticated user making the request will be added as a member of the organization. IMPORTANT: if the URL used to accept the invite is disclosed, anybody else with a Pulumi account can accept/claim it. Returns 409 if the invite is not in the 'invited' state (already accepted or canceled).",
+        "operationId": "AcceptOrgInvite",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The invite identifier",
+            "in": "path",
+            "name": "inviteID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "409": {
+            "description": "Invite is not in the 'invited' state"
+          }
+        },
+        "summary": "AcceptOrgInvite",
+        "tags": [
+          "Organizations",
+          "Invites"
+        ]
+      }
+    },
+    "/api/orgs/{orgName}/invites/{inviteID}/resend": {
+      "post": {
+        "description": "Resends an existing organization invitation. Sends another invitation email and updates the 'sent' timestamp to the current time. The sender of the resent invite may differ from the original sender. Returns 404 if the invite has already been accepted or canceled.",
+        "operationId": "ResendOrgInvite",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The invite identifier",
+            "in": "path",
+            "name": "inviteID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResendOrganizationInviteRequest"
+              }
+            }
+          },
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Invite"
+          }
+        },
+        "summary": "ResendOrgInvite",
+        "tags": [
+          "Organizations",
+          "Invites"
         ]
       }
     },
@@ -38616,6 +39309,87 @@
           }
         },
         "summary": "GetOrganizationMetadata",
+        "tags": [
+          "Organizations"
+        ]
+      }
+    },
+    "/api/orgs/{orgName}/neo/tokens/summary": {
+      "get": {
+        "description": "Returns the summary of Neo AI agent token usage for an organization, aggregated by the specified time granularity over a given lookback period.",
+        "operationId": "GetUsageSummaryNeoTokens",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Time granularity for aggregation",
+            "in": "query",
+            "name": "granularity",
+            "required": true,
+            "schema": {
+              "enum": [
+                "yearly",
+                "monthly",
+                "weekly",
+                "daily",
+                "hourly"
+              ],
+              "type": "string",
+              "x-pulumi-model-property": {
+                "enumComments": "UsageSummaryTimeUnit represents the granularity of RUM summary data.",
+                "enumFieldComments": [
+                  "Aggregate yearly.",
+                  "Aggregate monthly.",
+                  "Aggregate weekly.",
+                  "Aggregate daily.",
+                  "Aggregate hourly."
+                ],
+                "enumTypeName": "UsageSummaryTimeUnit"
+              }
+            }
+          },
+          {
+            "description": "Number of days to look back from the current time or lookbackStart",
+            "in": "query",
+            "name": "lookbackDays",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Unix timestamp for the start of the lookback period (defaults to current time if omitted)",
+            "in": "query",
+            "name": "lookbackStart",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetResourceCountSummaryResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "summary": "GetUsageSummaryNeoTokens",
         "tags": [
           "Organizations"
         ]
@@ -40123,15 +40897,34 @@
             }
           },
           {
-            "description": "Time granularity for aggregation (e.g., 'hourly', 'daily', 'monthly')",
+            "description": "Time granularity for aggregation. Hourly granularity is limited to a 2-day lookback.",
             "in": "query",
             "name": "granularity",
+            "required": true,
             "schema": {
-              "type": "string"
+              "enum": [
+                "yearly",
+                "monthly",
+                "weekly",
+                "daily",
+                "hourly"
+              ],
+              "type": "string",
+              "x-pulumi-model-property": {
+                "enumComments": "UsageSummaryTimeUnit represents the granularity of RUM summary data.",
+                "enumFieldComments": [
+                  "Aggregate yearly.",
+                  "Aggregate monthly.",
+                  "Aggregate weekly.",
+                  "Aggregate daily.",
+                  "Aggregate hourly."
+                ],
+                "enumTypeName": "UsageSummaryTimeUnit"
+              }
             }
           },
           {
-            "description": "Number of days to look back from the current time or lookbackStart",
+            "description": "Number of days to look back from the current time. Must be positive; when granularity is 'hourly' the value must not exceed 2. Mutually exclusive with lookbackStart; exactly one must be provided.",
             "in": "query",
             "name": "lookbackDays",
             "schema": {
@@ -40140,7 +40933,7 @@
             }
           },
           {
-            "description": "Unix timestamp for the start of the lookback period (defaults to current time if omitted)",
+            "description": "Unix timestamp (seconds since epoch) for the start of the lookback period. Must be positive, in the past, and within the last year. Mutually exclusive with lookbackDays; exactly one must be provided.",
             "in": "query",
             "name": "lookbackStart",
             "schema": {
@@ -40270,11 +41063,30 @@
             }
           },
           {
-            "description": "Filter roles by their UX purpose (e.g., 'organization', 'team', 'token')",
+            "description": "Filter roles by their UX purpose",
             "in": "query",
             "name": "uxPurpose",
+            "required": true,
             "schema": {
-              "type": "string"
+              "enum": [
+                "role",
+                "role_private",
+                "role_temporary",
+                "policy",
+                "set"
+              ],
+              "type": "string",
+              "x-pulumi-model-property": {
+                "enumComments": "Categorizes how a permission descriptor is presented in the UI.",
+                "enumFieldNames": [
+                  "Role",
+                  "RolePrivate",
+                  "RoleTemporary",
+                  "Policy",
+                  "Set"
+                ],
+                "enumTypeName": "PermissionDescriptorUXPurpose"
+              }
             }
           }
         ],
@@ -40299,7 +41111,7 @@
         ]
       },
       "post": {
-        "description": "Creates a new custom role for an organization. Custom roles define fine-grained permission sets that can be assigned to organization members and teams, enabling precise access control beyond the built-in admin and member roles. Optionally, an associated policy and role binding can be created alongside the role.",
+        "description": "Creates a new custom role for an organization. Custom roles define fine-grained permission sets that can be assigned to organization members and teams, enabling precise access control beyond the built-in admin and member roles. Optionally, an associated policy and role binding can be created alongside the role. Role definitions are subject to two limits: a permission descriptor group may contain at most 500 entries (each directly-specified entity counts as one entry), and the total serialized size of the role definition may not exceed 1 MB. Exceeding either limit returns a 400 error. If you need to grant access to more than 500 individually listed resources, use tag-based (ABAC) rules instead.",
         "operationId": "CreateRole",
         "parameters": [
           {
@@ -40342,7 +41154,7 @@
             "description": "OK"
           },
           "400": {
-            "description": "Invalid role references: referenced role or permission set ID does not exist or is empty"
+            "description": "Invalid request: referenced role or permission set does not exist, permission descriptor exceeds the 500-entry limit, or role definition exceeds the 1 MB size limit"
           },
           "409": {
             "description": "Role with this name already exists"
@@ -40482,7 +41294,7 @@
         ]
       },
       "patch": {
-        "description": "Updates an existing custom role's name, description, or permission scopes. Changes take effect immediately for all members and teams assigned to the role.",
+        "description": "Updates an existing custom role's name, description, or permission scopes. Changes take effect immediately for all members and teams assigned to the role. The same limits that apply to CreateRole apply here: a permission descriptor group may contain at most 500 entries, and the total serialized size of the role definition may not exceed 1 MB. Exceeding either limit returns a 400 error.",
         "operationId": "UpdateRole",
         "parameters": [
           {
@@ -40526,7 +41338,7 @@
             "description": "OK"
           },
           "400": {
-            "description": "Invalid role references: referenced role or permission set ID does not exist or is empty"
+            "description": "Invalid request: referenced role or permission set does not exist, permission descriptor exceeds the 500-entry limit, or role definition exceeds the 1 MB size limit"
           },
           "409": {
             "description": "Role with this name already exists"
@@ -41444,15 +42256,34 @@
             }
           },
           {
-            "description": "Time granularity for aggregation (e.g., 'hourly', 'daily', 'monthly')",
+            "description": "Time granularity for aggregation. Hourly granularity is limited to a 2-day lookback.",
             "in": "query",
             "name": "granularity",
+            "required": true,
             "schema": {
-              "type": "string"
+              "enum": [
+                "yearly",
+                "monthly",
+                "weekly",
+                "daily",
+                "hourly"
+              ],
+              "type": "string",
+              "x-pulumi-model-property": {
+                "enumComments": "UsageSummaryTimeUnit represents the granularity of RUM summary data.",
+                "enumFieldComments": [
+                  "Aggregate yearly.",
+                  "Aggregate monthly.",
+                  "Aggregate weekly.",
+                  "Aggregate daily.",
+                  "Aggregate hourly."
+                ],
+                "enumTypeName": "UsageSummaryTimeUnit"
+              }
             }
           },
           {
-            "description": "Number of days to look back from the current time or lookbackStart",
+            "description": "Number of days to look back from the current time. Must be positive; when granularity is 'hourly' the value must not exceed 2. Mutually exclusive with lookbackStart; exactly one must be provided.",
             "in": "query",
             "name": "lookbackDays",
             "schema": {
@@ -41461,7 +42292,7 @@
             }
           },
           {
-            "description": "Unix timestamp for the start of the lookback period (defaults to current time if omitted)",
+            "description": "Unix timestamp (seconds since epoch) for the start of the lookback period. Must be positive, in the past, and within the last year. Mutually exclusive with lookbackDays; exactly one must be provided.",
             "in": "query",
             "name": "lookbackStart",
             "schema": {
@@ -43480,7 +44311,8 @@
         },
         "summary": "CancelTask",
         "tags": [
-          "AI Agents"
+          "AI Agents",
+          "Neo"
         ],
         "x-pulumi-route-property": {
           "Visibility": "Preview"
@@ -47128,9 +47960,10 @@
             "description": "OK"
           }
         },
-        "summary": "ReassignStackOwnership",
+        "summary": "ReassignAccountOwnership",
         "tags": [
-          "Insights"
+          "Insights",
+          "InsightsAccounts"
         ],
         "x-pulumi-route-property": {
           "Visibility": "Preview"
@@ -49180,6 +50013,75 @@
         }
       }
     },
+    "/api/preview/insights/{orgName}/stacks/{projectName}/{stackName}/migration": {
+      "get": {
+        "description": "Returns the resources in a Terraform-backed Pulumi stack, each annotated with a migrationStatus relative to an optional comparison Pulumi stack. When compareTo is provided in project/stack format, resources matching the target stack are reported as Migrated. Returns 404 with a uniform response shape when the migration feature is not enabled for the organization, when the stack does not exist, or when the stack is not Terraform-backed (runtime tag is not 'terraform-cli'). The shared shape is intentional so callers cannot distinguish 'feature unavailable' from 'stack not found'. Returns 404 with a separate 'Comparison stack' body when compareTo names a stack the caller cannot read (StackRead required) or that does not exist; both return the same shape so existence cannot be probed.",
+        "operationId": "GetStackMigration",
+        "parameters": [
+          {
+            "description": "The organization name",
+            "in": "path",
+            "name": "orgName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The project name",
+            "in": "path",
+            "name": "projectName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The stack name",
+            "in": "path",
+            "name": "stackName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Pulumi stack to compare against in project/stack format. Must be in the same org.",
+            "in": "query",
+            "name": "compareTo",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListDiscoveredStackResourcesResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid compareTo parameter"
+          },
+          "404": {
+            "description": "Migration feature disabled, stack not found, or stack is not Terraform-backed"
+          }
+        },
+        "summary": "GetStackMigration",
+        "tags": [
+          "Insights",
+          "InsightsAccounts"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      }
+    },
     "/api/preview/registry/packages": {
       "get": {
         "deprecated": true,
@@ -50892,7 +51794,7 @@
     },
     "/api/registry/packages/{source}/{publisher}/{name}/versions/{version}/docs/{token}": {
       "get": {
-        "description": "Returns structured API documentation for a single resource or function identified by its Pulumi token. The token must be URL-encoded (e.g. 'random:index%2FrandomPassword:RandomPassword'). The 'lang' parameter is required and filters all property names, types, descriptions, and code examples to the specified language. Use the 'os' parameter to collapse OS choosers in descriptions. Supports content negotiation via the Accept header: send 'text/markdown' to receive a rendered markdown document with property tables instead of structured JSON. The version parameter accepts a specific semantic version string or 'latest'. Returns 404 if the package version or token does not exist.",
+        "description": "Returns API documentation for a single resource or function identified by its URL-encoded Pulumi token. Use 'lang' to filter content to a single language and 'os' to collapse OS choosers in descriptions. Supports JSON or markdown via Accept. Returns 404 if the package version or token does not exist.",
         "operationId": "GetPackageDocs",
         "parameters": [
           {
@@ -50932,7 +51834,7 @@
             }
           },
           {
-            "description": "URL-encoded Pulumi token identifying the resource or function",
+            "description": "URL-encoded Pulumi token (e.g. 'random:index%2FrandomPassword:RandomPassword')",
             "in": "path",
             "name": "token",
             "required": true,
@@ -50941,16 +51843,15 @@
             }
           },
           {
-            "description": "Language for filtering property names, types, descriptions, and code examples. Values: typescript, python, go, csharp, java, yaml",
+            "description": "Filter to a single language. Defaults to Go. Values: typescript, python, go, csharp, java, yaml, hcl",
             "in": "query",
             "name": "lang",
-            "required": true,
             "schema": {
               "type": "string"
             }
           },
           {
-            "description": "Filter OS choosers in descriptions to a single OS. Values: linux, macos, windows",
+            "description": "Collapse OS choosers in descriptions to a single OS. Values: linux, macos, windows",
             "in": "query",
             "name": "os",
             "schema": {
@@ -50984,15 +51885,12 @@
         "summary": "GetPackageDocs",
         "tags": [
           "Registry"
-        ],
-        "x-pulumi-route-property": {
-          "Visibility": "Preview"
-        }
+        ]
       }
     },
     "/api/registry/packages/{source}/{publisher}/{name}/versions/{version}/examples": {
       "get": {
-        "description": "Returns code examples aggregated from all resources and functions in a registry package version. Examples are extracted from PulumiCodeChooser blocks in each token's description; each example carries its 'token' and 'kind' so the flat list is self-contained. The 'lang' parameter is required and selects the snippet language. Use the 'q' parameter for case-insensitive substring search across each example's title and token; non-matching examples are omitted. The 'q' value must be URL-encoded (e.g. spaces as '%20', '/' as '%2F'). Results are sorted by token (alphabetical) then by index within token. Use 'limit' to cap the number of examples returned (default 20); the response reports 'totalCount' (after filter, before limit) so consumers can detect when more results exist. Supports content negotiation via the Accept header: send 'text/markdown' to receive a rendered listing instead of structured JSON. The version parameter accepts a specific semantic version string or 'latest'. Returns 404 if the package version does not exist.",
+        "description": "Returns code examples aggregated across the package's resources and functions. Each example carries its 'token' and 'kind'. Use 'q' for case-insensitive substring search on title and token. Results are sorted by token, then by example position within each token. Use 'limit' (default 20, max 100) to cap returned examples; 'totalCount' reports the unfiltered count. Supports JSON or markdown via Accept. Returns 404 if the package version does not exist.",
         "operationId": "GetPackageExamples",
         "parameters": [
           {
@@ -51032,16 +51930,15 @@
             }
           },
           {
-            "description": "Snippet language. Values: typescript, python, go, csharp, java, yaml",
+            "description": "Snippet language. Defaults to Go. Values: typescript, python, go, csharp, java, yaml, hcl",
             "in": "query",
             "name": "lang",
-            "required": true,
             "schema": {
               "type": "string"
             }
           },
           {
-            "description": "Maximum number of examples to return (default: 20)",
+            "description": "Maximum examples to return. Default 20; clamped to 100.",
             "in": "query",
             "name": "limit",
             "schema": {
@@ -51050,7 +51947,7 @@
             }
           },
           {
-            "description": "URL-encoded search query. Case-insensitive substring matching against each example's title and token",
+            "description": "URL-encoded case-insensitive substring filter on title and token",
             "in": "query",
             "name": "q",
             "schema": {
@@ -51084,15 +51981,12 @@
         "summary": "GetPackageExamples",
         "tags": [
           "Registry"
-        ],
-        "x-pulumi-route-property": {
-          "Visibility": "Preview"
-        }
+        ]
       }
     },
     "/api/registry/packages/{source}/{publisher}/{name}/versions/{version}/installation": {
       "get": {
-        "description": "Returns installation configuration content for a registry package version, structured as an ordered list of content nodes. Not all packages include installation configuration; this endpoint returns 404 when absent. Use the 'lang' parameter to filter language-specific content to a single language (fallback chain: requested language, then Go, then first available). Use the 'os' parameter to filter OS-specific content similarly (fallback: Linux). Supports content negotiation via the Accept header: send 'text/markdown' to receive a clean rendered markdown string instead of structured JSON. The version parameter accepts a specific semantic version string or 'latest'. Returns 404 if the specified package version does not exist or if the package does not include installation configuration.",
+        "description": "Returns installation configuration as an ordered list of content nodes. Not all packages have installation configuration; returns 404 when absent. Use 'lang' and 'os' to filter language- and OS-specific content. Supports JSON or markdown via Accept. Returns 404 if the package version does not exist or has no installation configuration.",
         "operationId": "GetPackageInstallation",
         "parameters": [
           {
@@ -51132,7 +52026,7 @@
             }
           },
           {
-            "description": "Filter language-specific content to a single language. Values: typescript, python, go, csharp, java, yaml",
+            "description": "Filter language-specific content to a single language. Values: typescript, python, go, csharp, java, yaml, hcl",
             "in": "query",
             "name": "lang",
             "schema": {
@@ -51174,15 +52068,12 @@
         "summary": "GetPackageInstallation",
         "tags": [
           "Registry"
-        ],
-        "x-pulumi-route-property": {
-          "Visibility": "Preview"
-        }
+        ]
       }
     },
     "/api/registry/packages/{source}/{publisher}/{name}/versions/{version}/nav": {
       "get": {
-        "description": "Returns the module, resource, and function navigation tree for a registry package version. Names are resolved for the requested language (defaulting to Go when omitted). Use the 'q' parameter for case-insensitive search: the tree is filtered to nodes whose name or token contains the query string, with ancestor module paths preserved. Modules with no matching children are omitted. Supports content negotiation via the Accept header: send 'text/markdown' to receive a plain-text listing instead of structured JSON. The version parameter accepts a specific semantic version string or 'latest'. Returns 404 if the specified package version does not exist.",
+        "description": "Returns the package navigation: a flat list of modules in schema-declaration order. By default returns a summary (module names and counts only) suitable for discovery. Pass 'depth=full' to include resources and functions; combine with 'q' to filter results by name or token. Module names like 's3/bucket' are flat strings, not nested. Supports JSON or markdown via Accept. Returns 404 if the package version does not exist.",
         "operationId": "GetPackageNav",
         "parameters": [
           {
@@ -51222,7 +52113,15 @@
             }
           },
           {
-            "description": "Language for name resolution. Names are resolved for this language with a fallback chain: requested language, then Go, then first available. Values: typescript, python, go, csharp, java, yaml",
+            "description": "'summary' (default) returns module names and counts only; 'full' includes resources and functions.",
+            "in": "query",
+            "name": "depth",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Language for name resolution. Defaults to Go. Values: typescript, python, go, csharp, java, yaml, hcl",
             "in": "query",
             "name": "lang",
             "schema": {
@@ -51230,7 +52129,7 @@
             }
           },
           {
-            "description": "Search query for filtering the navigation tree. Case-insensitive matching against resource/function names and tokens",
+            "description": "Case-insensitive substring filter on resource/function names and tokens. Modules with no matches are omitted. Combine with 'depth=full' to return matched items.",
             "in": "query",
             "name": "q",
             "schema": {
@@ -51264,15 +52163,12 @@
         "summary": "GetPackageNav",
         "tags": [
           "Registry"
-        ],
-        "x-pulumi-route-property": {
-          "Visibility": "Preview"
-        }
+        ]
       }
     },
     "/api/registry/packages/{source}/{publisher}/{name}/versions/{version}/readme": {
       "get": {
-        "description": "Returns README content for a registry package version, structured as an ordered list of content nodes. Each node has a 'kind' and a 'markdown' fallback for forward compatibility. Use the 'lang' parameter to filter language-specific content to a single language (fallback chain: requested language, then Go, then first available). Use the 'os' parameter to filter OS-specific content similarly (fallback: Linux). Supports content negotiation via the Accept header: send 'text/markdown' to receive a clean rendered markdown string instead of structured JSON. The version parameter accepts a specific semantic version string or 'latest'. Returns 404 if the specified package version does not exist.",
+        "description": "Returns the package README as an ordered list of content nodes. Each node has a 'kind' and a 'markdown' fallback for unknown kinds. Use 'lang' and 'os' to filter language- and OS-specific content. Supports JSON or markdown via Accept. Returns 404 if the package version does not exist.",
         "operationId": "GetPackageReadme",
         "parameters": [
           {
@@ -51312,7 +52208,7 @@
             }
           },
           {
-            "description": "Filter language-specific content to a single language. Values: typescript, python, go, csharp, java, yaml",
+            "description": "Filter language-specific content to a single language. Values: typescript, python, go, csharp, java, yaml, hcl",
             "in": "query",
             "name": "lang",
             "schema": {
@@ -51354,10 +52250,7 @@
         "summary": "GetPackageReadme",
         "tags": [
           "Registry"
-        ],
-        "x-pulumi-route-property": {
-          "Visibility": "Preview"
-        }
+        ]
       }
     },
     "/api/registry/templates": {
@@ -61752,6 +62645,9 @@
     },
     {
       "name": "InsightsAccounts"
+    },
+    {
+      "name": "Invites"
     },
     {
       "name": "Miscellaneous"

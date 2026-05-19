@@ -3156,6 +3156,10 @@
           "type": "string",
           "description": "The async trigger source for this task. Null for sync tasks."
         },
+        "contextCompactionThresholdPercent": {
+          "type": "integer",
+          "description": "Percentage of the context window (1-100) at which the agent triggers conversation compaction. Populated alongside contextWindowTokens when token usage data is available; omitted otherwise."
+        },
         "contextUsedTokens": {
           "type": "integer",
           "description": "Total input tokens consumed across all model invocations for this task. Approximate context window usage."
@@ -3223,6 +3227,10 @@
           "type": "string",
           "description": "Whether the task was started synchronously by a user or asynchronously by background automation."
         },
+        "tokensUsed": {
+          "type": "integer",
+          "description": "Total Neo tokens consumed across all model invocations for this task. Neo tokens are the priced unit used for billing — distinct from the raw model input tokens surfaced in contextUsedTokens / contextWindowTokens."
+        },
         "toolExecutionMode": {
           "type": "string",
           "description": "Where tools are executed for this task. Valid values: 'cloud', 'cli'."
@@ -3238,12 +3246,20 @@
         "name",
         "planMode",
         "status",
-        "taskType"
+        "taskType",
+        "tokensUsed"
       ],
       "inputProperties": {
         "approvalMode": {
           "type": "string",
           "description": "Optional approval mode override for this task. If omitted, org default is used."
+        },
+        "cliIntegrations": {
+          "type": "array",
+          "items": {
+            "$ref": "pulumi.json#/Any"
+          },
+          "description": "Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries that do not match any connected integration are silently skipped."
         },
         "enabledIntegrations": {
           "type": "array",
@@ -6747,164 +6763,8 @@
         "orgName"
       ]
     },
-    "pulumiservice:v2:PolicyIssue": {
-      "description": "Updates a policy issue's triage status and other mutable fields. All body fields are optional — only provide the fields you want to update.\n\n- `status`: `open`, `in_progress`, `by_design`, `fixed`, or `ignored`\n- `priority`: `p0`, `p1`, `p2`, `p3`, or `p4`\n- `assignedTo`: username to assign the issue to, or `null` to unassign",
-      "properties": {
-        "policy": {
-          "$ref": "pulumi.json#/Any",
-          "description": "The policy definition that caused this issue. May be null if the policy has been deleted or is unavailable."
-        },
-        "policyPack": {
-          "$ref": "pulumi.json#/Any",
-          "description": "The registry policy pack metadata. May be null if the policy pack is unavailable."
-        }
-      },
-      "type": "object",
-      "inputProperties": {
-        "assignedTo": {
-          "type": "string",
-          "description": "The user to assign the policy issue to."
-        },
-        "issueId": {
-          "type": "string",
-          "description": "The issue identifier",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "priority": {
-          "type": "string",
-          "description": "The new priority for the policy issue."
-        },
-        "status": {
-          "type": "string",
-          "description": "The new status for the policy issue. Valid values: open, in_progress, by_design, ignored. Note: fixed cannot be set manually."
-        }
-      },
-      "requiredInputs": [
-        "issueId",
-        "orgName"
-      ]
-    },
-    "pulumiservice:v2:PolicyPack": {
-      "description": "Creates a new Policy Pack for an organization. A Policy Pack is a versioned collection of related policies that validate infrastructure configuration during deployments. Policies can enforce rules such as requiring encryption on storage buckets or prohibiting public access to databases. The pack must contain at least one policy. Once created, the pack can be applied to Policy Groups to enforce rules on specific stacks with configurable enforcement levels (advisory, mandatory, or disabled).",
-      "properties": {
-        "applied": {
-          "type": "boolean",
-          "description": "Whether this policy pack version is currently applied to any policy group."
-        },
-        "displayName": {
-          "type": "string",
-          "description": "Human-readable display name of the policy pack."
-        },
-        "name": {
-          "type": "string",
-          "description": "The unique name of the policy pack."
-        },
-        "policies": {
-          "type": "array",
-          "items": {
-            "$ref": "pulumi.json#/Any"
-          },
-          "description": "The individual policies contained in this policy pack."
-        },
-        "version": {
-          "type": "integer",
-          "description": "Numeric version of the policy pack, auto-incremented on each publish."
-        },
-        "versionTag": {
-          "type": "string",
-          "description": "Semantic version tag for this policy pack version (e.g. '1.2.0')."
-        }
-      },
-      "type": "object",
-      "required": [
-        "applied",
-        "displayName",
-        "name",
-        "policies",
-        "version",
-        "versionTag"
-      ],
-      "inputProperties": {
-        "description": {
-          "type": "string",
-          "description": "A brief description of the policy pack."
-        },
-        "displayName": {
-          "type": "string",
-          "description": "A pretty name for the Policy Pack that is supplied by the package."
-        },
-        "metadata": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "pulumi.json#/Any"
-          },
-          "description": "Metadata contains optional data about the environment performing the publish operation,\ne.g. the current source code control commit information."
-        },
-        "name": {
-          "type": "string",
-          "description": "Name is a unique URL-safe identifier (at the org level) for the package.\nIf the name has already been used by the organization, then the request will\ncreate a new version of the Policy Pack (incremented by one). This is supplied\nby the CLI.",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "orgName": {
-          "type": "string",
-          "description": "The organization name",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "policies": {
-          "type": "array",
-          "items": {
-            "$ref": "pulumi.json#/Any"
-          },
-          "description": "The Policies outline the specific Policies in the package, and are derived\nfrom the package by the CLI."
-        },
-        "provider": {
-          "type": "string",
-          "description": "The cloud provider/platform this policy pack is associated with, e.g. AWS, Azure, etc."
-        },
-        "readme": {
-          "type": "string",
-          "description": "README text about the policy pack."
-        },
-        "repository": {
-          "type": "string",
-          "description": "A URL to the repository where the policy pack is defined."
-        },
-        "tags": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Tags for this policy pack."
-        },
-        "version": {
-          "type": "string",
-          "description": "The version number",
-          "replaceOnChanges": true,
-          "willReplaceOnChanges": true
-        },
-        "versionTag": {
-          "type": "string",
-          "description": "VersionTag is the semantic version of the Policy Pack. One a version is published, it\ncannot never be republished. Older clients will not have a version tag."
-        }
-      },
-      "requiredInputs": [
-        "displayName",
-        "name",
-        "orgName",
-        "policies"
-      ]
-    },
     "pulumiservice:v2:Role": {
-      "description": "Creates a new custom role for an organization. Custom roles define fine-grained permission sets that can be assigned to organization members and teams, enabling precise access control beyond the built-in admin and member roles. Optionally, an associated policy and role binding can be created alongside the role.",
+      "description": "Creates a new custom role for an organization. Custom roles define fine-grained permission sets that can be assigned to organization members and teams, enabling precise access control beyond the built-in admin and member roles. Optionally, an associated policy and role binding can be created alongside the role. Role definitions are subject to two limits: a permission descriptor group may contain at most 500 entries (each directly-specified entity counts as one entry), and the total serialized size of the role definition may not exceed 1 MB. Exceeding either limit returns a 400 error. If you need to grant access to more than 500 individually listed resources, use tag-based (ABAC) rules instead.",
       "properties": {
         "created": {
           "type": "string",

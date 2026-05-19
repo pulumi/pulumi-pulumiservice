@@ -43,6 +43,10 @@ export class Task extends pulumi.CustomResource {
      */
     declare public /*out*/ readonly asyncTriggerType: pulumi.Output<string | undefined>;
     /**
+     * Percentage of the context window (1-100) at which the agent triggers conversation compaction. Populated alongside contextWindowTokens when token usage data is available; omitted otherwise.
+     */
+    declare public /*out*/ readonly contextCompactionThresholdPercent: pulumi.Output<number | undefined>;
+    /**
      * Total input tokens consumed across all model invocations for this task. Approximate context window usage.
      */
     declare public /*out*/ readonly contextUsedTokens: pulumi.Output<number | undefined>;
@@ -107,6 +111,10 @@ export class Task extends pulumi.CustomResource {
      */
     declare public /*out*/ readonly taskType: pulumi.Output<string>;
     /**
+     * Total Neo tokens consumed across all model invocations for this task. Neo tokens are the priced unit used for billing — distinct from the raw model input tokens surfaced in contextUsedTokens / contextWindowTokens.
+     */
+    declare public /*out*/ readonly tokensUsed: pulumi.Output<number>;
+    /**
      * Where tools are executed for this task. Valid values: 'cloud', 'cli'.
      */
     declare public readonly toolExecutionMode: pulumi.Output<string | undefined>;
@@ -126,6 +134,7 @@ export class Task extends pulumi.CustomResource {
                 throw new Error("Missing required property 'orgName'");
             }
             resourceInputs["approvalMode"] = args?.approvalMode;
+            resourceInputs["cliIntegrations"] = args?.cliIntegrations;
             resourceInputs["enabledIntegrations"] = args?.enabledIntegrations;
             resourceInputs["message"] = args?.message;
             resourceInputs["orgName"] = args?.orgName;
@@ -135,6 +144,7 @@ export class Task extends pulumi.CustomResource {
             resourceInputs["taskID"] = args?.taskID;
             resourceInputs["toolExecutionMode"] = args?.toolExecutionMode;
             resourceInputs["asyncTriggerType"] = undefined /*out*/;
+            resourceInputs["contextCompactionThresholdPercent"] = undefined /*out*/;
             resourceInputs["contextUsedTokens"] = undefined /*out*/;
             resourceInputs["contextWindowTokens"] = undefined /*out*/;
             resourceInputs["createdAt"] = undefined /*out*/;
@@ -148,9 +158,11 @@ export class Task extends pulumi.CustomResource {
             resourceInputs["sourceAutomationID"] = undefined /*out*/;
             resourceInputs["status"] = undefined /*out*/;
             resourceInputs["taskType"] = undefined /*out*/;
+            resourceInputs["tokensUsed"] = undefined /*out*/;
         } else {
             resourceInputs["approvalMode"] = undefined /*out*/;
             resourceInputs["asyncTriggerType"] = undefined /*out*/;
+            resourceInputs["contextCompactionThresholdPercent"] = undefined /*out*/;
             resourceInputs["contextUsedTokens"] = undefined /*out*/;
             resourceInputs["contextWindowTokens"] = undefined /*out*/;
             resourceInputs["createdAt"] = undefined /*out*/;
@@ -167,6 +179,7 @@ export class Task extends pulumi.CustomResource {
             resourceInputs["sourceAutomationID"] = undefined /*out*/;
             resourceInputs["status"] = undefined /*out*/;
             resourceInputs["taskType"] = undefined /*out*/;
+            resourceInputs["tokensUsed"] = undefined /*out*/;
             resourceInputs["toolExecutionMode"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
@@ -182,6 +195,10 @@ export interface TaskArgs {
      * Optional approval mode override for this task. If omitted, org default is used.
      */
     approvalMode?: pulumi.Input<string | undefined>;
+    /**
+     * Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries that do not match any connected integration are silently skipped.
+     */
+    cliIntegrations?: pulumi.Input<any[] | undefined>;
     /**
      * Optional list of integrations to enable for this task. Semantics: omitted/null → inherit all org-enabled integrations; empty list → explicit opt-out (no integration credentials for this task); populated list → whitelist of specific integrations by ID. Modeled as an object array rather than a bare string array so multi-instance support (instance_name, scope, etc.) can be added later without a wire break.
      */

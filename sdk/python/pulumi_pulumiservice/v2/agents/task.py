@@ -21,6 +21,7 @@ class TaskArgs:
     def __init__(__self__, *,
                  org_name: pulumi.Input[_builtins.str],
                  approval_mode: pulumi.Input[Optional[_builtins.str]] = None,
+                 cli_integrations: pulumi.Input[Optional[Sequence[Any]]] = None,
                  enabled_integrations: pulumi.Input[Optional[Sequence[Any]]] = None,
                  message: Optional[Any] = None,
                  permission_mode: pulumi.Input[Optional[_builtins.str]] = None,
@@ -33,6 +34,7 @@ class TaskArgs:
 
         :param pulumi.Input[_builtins.str] org_name: The organization name
         :param pulumi.Input[_builtins.str] approval_mode: Optional approval mode override for this task. If omitted, org default is used.
+        :param pulumi.Input[Sequence[Any]] cli_integrations: Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries that do not match any connected integration are silently skipped.
         :param pulumi.Input[Sequence[Any]] enabled_integrations: Optional list of integrations to enable for this task. Semantics: omitted/null → inherit all org-enabled integrations; empty list → explicit opt-out (no integration credentials for this task); populated list → whitelist of specific integrations by ID. Modeled as an object array rather than a bare string array so multi-instance support (instance_name, scope, etc.) can be added later without a wire break.
         :param Any message: The message content
         :param pulumi.Input[_builtins.str] permission_mode: Controls the permission scope for the task. When omitted, defaults to 'default' (the agent uses the creating user's full permissions).
@@ -44,6 +46,8 @@ class TaskArgs:
         pulumi.set(__self__, "org_name", org_name)
         if approval_mode is not None:
             pulumi.set(__self__, "approval_mode", approval_mode)
+        if cli_integrations is not None:
+            pulumi.set(__self__, "cli_integrations", cli_integrations)
         if enabled_integrations is not None:
             pulumi.set(__self__, "enabled_integrations", enabled_integrations)
         if message is not None:
@@ -82,6 +86,18 @@ class TaskArgs:
     @approval_mode.setter
     def approval_mode(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "approval_mode", value)
+
+    @_builtins.property
+    @pulumi.getter(name="cliIntegrations")
+    def cli_integrations(self) -> pulumi.Input[Optional[Sequence[Any]]]:
+        """
+        Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries that do not match any connected integration are silently skipped.
+        """
+        return pulumi.get(self, "cli_integrations")
+
+    @cli_integrations.setter
+    def cli_integrations(self, value: pulumi.Input[Optional[Sequence[Any]]]):
+        pulumi.set(self, "cli_integrations", value)
 
     @_builtins.property
     @pulumi.getter(name="enabledIntegrations")
@@ -175,6 +191,7 @@ class Task(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  approval_mode: pulumi.Input[Optional[_builtins.str]] = None,
+                 cli_integrations: pulumi.Input[Optional[Sequence[Any]]] = None,
                  enabled_integrations: pulumi.Input[Optional[Sequence[Any]]] = None,
                  message: Optional[Any] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
@@ -191,6 +208,7 @@ class Task(pulumi.CustomResource):
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.str] approval_mode: Optional approval mode override for this task. If omitted, org default is used.
+        :param pulumi.Input[Sequence[Any]] cli_integrations: Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries that do not match any connected integration are silently skipped.
         :param pulumi.Input[Sequence[Any]] enabled_integrations: Optional list of integrations to enable for this task. Semantics: omitted/null → inherit all org-enabled integrations; empty list → explicit opt-out (no integration credentials for this task); populated list → whitelist of specific integrations by ID. Modeled as an object array rather than a bare string array so multi-instance support (instance_name, scope, etc.) can be added later without a wire break.
         :param Any message: The message content
         :param pulumi.Input[_builtins.str] org_name: The organization name
@@ -226,6 +244,7 @@ class Task(pulumi.CustomResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  approval_mode: pulumi.Input[Optional[_builtins.str]] = None,
+                 cli_integrations: pulumi.Input[Optional[Sequence[Any]]] = None,
                  enabled_integrations: pulumi.Input[Optional[Sequence[Any]]] = None,
                  message: Optional[Any] = None,
                  org_name: pulumi.Input[Optional[_builtins.str]] = None,
@@ -244,6 +263,7 @@ class Task(pulumi.CustomResource):
             __props__ = TaskArgs.__new__(TaskArgs)
 
             __props__.__dict__["approval_mode"] = approval_mode
+            __props__.__dict__["cli_integrations"] = cli_integrations
             __props__.__dict__["enabled_integrations"] = enabled_integrations
             __props__.__dict__["message"] = message
             if org_name is None and not opts.urn:
@@ -255,6 +275,7 @@ class Task(pulumi.CustomResource):
             __props__.__dict__["task_id"] = task_id
             __props__.__dict__["tool_execution_mode"] = tool_execution_mode
             __props__.__dict__["async_trigger_type"] = None
+            __props__.__dict__["context_compaction_threshold_percent"] = None
             __props__.__dict__["context_used_tokens"] = None
             __props__.__dict__["context_window_tokens"] = None
             __props__.__dict__["created_at"] = None
@@ -268,6 +289,7 @@ class Task(pulumi.CustomResource):
             __props__.__dict__["source_automation_id"] = None
             __props__.__dict__["status"] = None
             __props__.__dict__["task_type"] = None
+            __props__.__dict__["tokens_used"] = None
         super(Task, __self__).__init__(
             'pulumiservice:v2/agents:Task',
             resource_name,
@@ -292,6 +314,7 @@ class Task(pulumi.CustomResource):
 
         __props__.__dict__["approval_mode"] = None
         __props__.__dict__["async_trigger_type"] = None
+        __props__.__dict__["context_compaction_threshold_percent"] = None
         __props__.__dict__["context_used_tokens"] = None
         __props__.__dict__["context_window_tokens"] = None
         __props__.__dict__["created_at"] = None
@@ -308,6 +331,7 @@ class Task(pulumi.CustomResource):
         __props__.__dict__["source_automation_id"] = None
         __props__.__dict__["status"] = None
         __props__.__dict__["task_type"] = None
+        __props__.__dict__["tokens_used"] = None
         __props__.__dict__["tool_execution_mode"] = None
         return Task(resource_name, opts=opts, __props__=__props__)
 
@@ -326,6 +350,14 @@ class Task(pulumi.CustomResource):
         The async trigger source for this task. Null for sync tasks.
         """
         return pulumi.get(self, "async_trigger_type")
+
+    @_builtins.property
+    @pulumi.getter(name="contextCompactionThresholdPercent")
+    def context_compaction_threshold_percent(self) -> pulumi.Output[Optional[_builtins.int]]:
+        """
+        Percentage of the context window (1-100) at which the agent triggers conversation compaction. Populated alongside contextWindowTokens when token usage data is available; omitted otherwise.
+        """
+        return pulumi.get(self, "context_compaction_threshold_percent")
 
     @_builtins.property
     @pulumi.getter(name="contextUsedTokens")
@@ -454,6 +486,14 @@ class Task(pulumi.CustomResource):
         Whether the task was started synchronously by a user or asynchronously by background automation.
         """
         return pulumi.get(self, "task_type")
+
+    @_builtins.property
+    @pulumi.getter(name="tokensUsed")
+    def tokens_used(self) -> pulumi.Output[_builtins.int]:
+        """
+        Total Neo tokens consumed across all model invocations for this task. Neo tokens are the priced unit used for billing — distinct from the raw model input tokens surfaced in contextUsedTokens / contextWindowTokens.
+        """
+        return pulumi.get(self, "tokens_used")
 
     @_builtins.property
     @pulumi.getter(name="toolExecutionMode")

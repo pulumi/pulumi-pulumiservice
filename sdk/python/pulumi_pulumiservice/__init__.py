@@ -108,8 +108,6 @@ _utilities.register(
    "pulumiservice:v2:OrganizationMember": "OrganizationMember",
    "pulumiservice:v2:OrganizationWebhook": "OrganizationWebhook",
    "pulumiservice:v2:PolicyGroup": "PolicyGroup",
-   "pulumiservice:v2:PolicyIssue": "PolicyIssue",
-   "pulumiservice:v2:PolicyPack": "PolicyPack",
    "pulumiservice:v2:Role": "Role"
   }
  },

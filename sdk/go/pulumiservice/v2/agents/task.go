@@ -20,6 +20,8 @@ type Task struct {
 	ApprovalMode pulumi.StringOutput `pulumi:"approvalMode"`
 	// The async trigger source for this task. Null for sync tasks.
 	AsyncTriggerType pulumi.StringPtrOutput `pulumi:"asyncTriggerType"`
+	// Percentage of the context window (1-100) at which the agent triggers conversation compaction. Populated alongside contextWindowTokens when token usage data is available; omitted otherwise.
+	ContextCompactionThresholdPercent pulumi.IntPtrOutput `pulumi:"contextCompactionThresholdPercent"`
 	// Total input tokens consumed across all model invocations for this task. Approximate context window usage.
 	ContextUsedTokens pulumi.IntPtrOutput `pulumi:"contextUsedTokens"`
 	// Maximum context window size in tokens for the primary model used by this task.
@@ -52,6 +54,8 @@ type Task struct {
 	Status pulumi.StringOutput `pulumi:"status"`
 	// Whether the task was started synchronously by a user or asynchronously by background automation.
 	TaskType pulumi.StringOutput `pulumi:"taskType"`
+	// Total Neo tokens consumed across all model invocations for this task. Neo tokens are the priced unit used for billing — distinct from the raw model input tokens surfaced in contextUsedTokens / contextWindowTokens.
+	TokensUsed pulumi.IntOutput `pulumi:"tokensUsed"`
 	// Where tools are executed for this task. Valid values: 'cloud', 'cli'.
 	ToolExecutionMode pulumi.StringPtrOutput `pulumi:"toolExecutionMode"`
 }
@@ -101,6 +105,8 @@ func (TaskState) ElementType() reflect.Type {
 type taskArgs struct {
 	// Optional approval mode override for this task. If omitted, org default is used.
 	ApprovalMode *string `pulumi:"approvalMode"`
+	// Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries that do not match any connected integration are silently skipped.
+	CliIntegrations []interface{} `pulumi:"cliIntegrations"`
 	// Optional list of integrations to enable for this task. Semantics: omitted/null → inherit all org-enabled integrations; empty list → explicit opt-out (no integration credentials for this task); populated list → whitelist of specific integrations by ID. Modeled as an object array rather than a bare string array so multi-instance support (instance_name, scope, etc.) can be added later without a wire break.
 	EnabledIntegrations []interface{} `pulumi:"enabledIntegrations"`
 	// The message content
@@ -123,6 +129,8 @@ type taskArgs struct {
 type TaskArgs struct {
 	// Optional approval mode override for this task. If omitted, org default is used.
 	ApprovalMode pulumi.StringPtrInput
+	// Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries that do not match any connected integration are silently skipped.
+	CliIntegrations pulumi.ArrayInput
 	// Optional list of integrations to enable for this task. Semantics: omitted/null → inherit all org-enabled integrations; empty list → explicit opt-out (no integration credentials for this task); populated list → whitelist of specific integrations by ID. Modeled as an object array rather than a bare string array so multi-instance support (instance_name, scope, etc.) can be added later without a wire break.
 	EnabledIntegrations pulumi.ArrayInput
 	// The message content
@@ -238,6 +246,11 @@ func (o TaskOutput) AsyncTriggerType() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *Task) pulumi.StringPtrOutput { return v.AsyncTriggerType }).(pulumi.StringPtrOutput)
 }
 
+// Percentage of the context window (1-100) at which the agent triggers conversation compaction. Populated alongside contextWindowTokens when token usage data is available; omitted otherwise.
+func (o TaskOutput) ContextCompactionThresholdPercent() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *Task) pulumi.IntPtrOutput { return v.ContextCompactionThresholdPercent }).(pulumi.IntPtrOutput)
+}
+
 // Total input tokens consumed across all model invocations for this task. Approximate context window usage.
 func (o TaskOutput) ContextUsedTokens() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *Task) pulumi.IntPtrOutput { return v.ContextUsedTokens }).(pulumi.IntPtrOutput)
@@ -316,6 +329,11 @@ func (o TaskOutput) Status() pulumi.StringOutput {
 // Whether the task was started synchronously by a user or asynchronously by background automation.
 func (o TaskOutput) TaskType() pulumi.StringOutput {
 	return o.ApplyT(func(v *Task) pulumi.StringOutput { return v.TaskType }).(pulumi.StringOutput)
+}
+
+// Total Neo tokens consumed across all model invocations for this task. Neo tokens are the priced unit used for billing — distinct from the raw model input tokens surfaced in contextUsedTokens / contextWindowTokens.
+func (o TaskOutput) TokensUsed() pulumi.IntOutput {
+	return o.ApplyT(func(v *Task) pulumi.IntOutput { return v.TokensUsed }).(pulumi.IntOutput)
 }
 
 // Where tools are executed for this task. Valid values: 'cloud', 'cli'.

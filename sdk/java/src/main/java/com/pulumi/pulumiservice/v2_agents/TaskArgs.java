@@ -35,6 +35,21 @@ public final class TaskArgs extends com.pulumi.resources.ResourceArgs {
     }
 
     /**
+     * Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries that do not match any connected integration are silently skipped.
+     * 
+     */
+    @Import(name="cliIntegrations")
+    private @Nullable Output<List<Object>> cliIntegrations;
+
+    /**
+     * @return Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries that do not match any connected integration are silently skipped.
+     * 
+     */
+    public Optional<Output<List<Object>>> cliIntegrations() {
+        return Optional.ofNullable(this.cliIntegrations);
+    }
+
+    /**
      * Optional list of integrations to enable for this task. Semantics: omitted/null → inherit all org-enabled integrations; empty list → explicit opt-out (no integration credentials for this task); populated list → whitelist of specific integrations by ID. Modeled as an object array rather than a bare string array so multi-instance support (instance_name, scope, etc.) can be added later without a wire break.
      * 
      */
@@ -158,6 +173,7 @@ public final class TaskArgs extends com.pulumi.resources.ResourceArgs {
 
     private TaskArgs(TaskArgs $) {
         this.approvalMode = $.approvalMode;
+        this.cliIntegrations = $.cliIntegrations;
         this.enabledIntegrations = $.enabledIntegrations;
         this.message = $.message;
         this.orgName = $.orgName;
@@ -205,6 +221,37 @@ public final class TaskArgs extends com.pulumi.resources.ResourceArgs {
          */
         public Builder approvalMode(String approvalMode) {
             return approvalMode(Output.of(approvalMode));
+        }
+
+        /**
+         * @param cliIntegrations Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries that do not match any connected integration are silently skipped.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder cliIntegrations(@Nullable Output<List<Object>> cliIntegrations) {
+            $.cliIntegrations = cliIntegrations;
+            return this;
+        }
+
+        /**
+         * @param cliIntegrations Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries that do not match any connected integration are silently skipped.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder cliIntegrations(List<Object> cliIntegrations) {
+            return cliIntegrations(Output.of(cliIntegrations));
+        }
+
+        /**
+         * @param cliIntegrations Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries that do not match any connected integration are silently skipped.
+         * 
+         * @return builder
+         * 
+         */
+        public Builder cliIntegrations(Object... cliIntegrations) {
+            return cliIntegrations(List.of(cliIntegrations));
         }
 
         /**

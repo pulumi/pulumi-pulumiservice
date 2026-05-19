@@ -40,16 +40,6 @@ export type PolicyGroup = import("./policyGroup").PolicyGroup;
 export const PolicyGroup: typeof import("./policyGroup").PolicyGroup = null as any;
 utilities.lazyLoad(exports, ["PolicyGroup"], () => require("./policyGroup"));
 
-export { PolicyIssueArgs } from "./policyIssue";
-export type PolicyIssue = import("./policyIssue").PolicyIssue;
-export const PolicyIssue: typeof import("./policyIssue").PolicyIssue = null as any;
-utilities.lazyLoad(exports, ["PolicyIssue"], () => require("./policyIssue"));
-
-export { PolicyPackArgs } from "./policyPack";
-export type PolicyPack = import("./policyPack").PolicyPack;
-export const PolicyPack: typeof import("./policyPack").PolicyPack = null as any;
-utilities.lazyLoad(exports, ["PolicyPack"], () => require("./policyPack"));
-
 export { RoleArgs } from "./role";
 export type Role = import("./role").Role;
 export const Role: typeof import("./role").Role = null as any;
@@ -101,10 +91,6 @@ const _module = {
                 return new OrganizationWebhook(name, <any>undefined, { urn })
             case "pulumiservice:v2:PolicyGroup":
                 return new PolicyGroup(name, <any>undefined, { urn })
-            case "pulumiservice:v2:PolicyIssue":
-                return new PolicyIssue(name, <any>undefined, { urn })
-            case "pulumiservice:v2:PolicyPack":
-                return new PolicyPack(name, <any>undefined, { urn })
             case "pulumiservice:v2:Role":
                 return new Role(name, <any>undefined, { urn })
             default:

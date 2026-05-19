@@ -52,6 +52,20 @@ public class Task extends com.pulumi.resources.CustomResource {
         return Codegen.optional(this.asyncTriggerType);
     }
     /**
+     * Percentage of the context window (1-100) at which the agent triggers conversation compaction. Populated alongside contextWindowTokens when token usage data is available; omitted otherwise.
+     * 
+     */
+    @Export(name="contextCompactionThresholdPercent", refs={Integer.class}, tree="[0]")
+    private Output</* @Nullable */ Integer> contextCompactionThresholdPercent;
+
+    /**
+     * @return Percentage of the context window (1-100) at which the agent triggers conversation compaction. Populated alongside contextWindowTokens when token usage data is available; omitted otherwise.
+     * 
+     */
+    public Output<Optional<Integer>> contextCompactionThresholdPercent() {
+        return Codegen.optional(this.contextCompactionThresholdPercent);
+    }
+    /**
      * Total input tokens consumed across all model invocations for this task. Approximate context window usage.
      * 
      */
@@ -274,6 +288,20 @@ public class Task extends com.pulumi.resources.CustomResource {
      */
     public Output<String> taskType() {
         return this.taskType;
+    }
+    /**
+     * Total Neo tokens consumed across all model invocations for this task. Neo tokens are the priced unit used for billing — distinct from the raw model input tokens surfaced in contextUsedTokens / contextWindowTokens.
+     * 
+     */
+    @Export(name="tokensUsed", refs={Integer.class}, tree="[0]")
+    private Output<Integer> tokensUsed;
+
+    /**
+     * @return Total Neo tokens consumed across all model invocations for this task. Neo tokens are the priced unit used for billing — distinct from the raw model input tokens surfaced in contextUsedTokens / contextWindowTokens.
+     * 
+     */
+    public Output<Integer> tokensUsed() {
+        return this.tokensUsed;
     }
     /**
      * Where tools are executed for this task. Valid values: &#39;cloud&#39;, &#39;cli&#39;.
