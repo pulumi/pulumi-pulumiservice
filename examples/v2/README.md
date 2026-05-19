@@ -4,6 +4,63 @@
 > shape and module layout may change before GA; not yet recommended for
 > production.
 
+## Migrating from v1
+
+The v1 surface lives at `pulumiservice:index:*` (the package root) and remains
+the supported production interface. The v2 surface at `pulumiservice:v2:*`
+exists in the same plugin and runs side-by-side with v1.
+
+Switching an existing managed resource from a v1 token to a v2 token *without*
+a Pulumi `alias` will register the change as a delete-and-recreate. The v2
+metadata does **not** ship implicit v1↔v2 aliases — module layout and renames
+may still shift before GA, so any aliases need to come from the user program.
+
+To migrate one resource at a time, add the v1 type token as an `alias` on the
+v2 resource. Look up the v1↔v2 mapping in
+[`docs/v1-v2-coverage.md`](../../docs/v1-v2-coverage.md).
+
+```typescript
+import * as pulumiservice from "@pulumi/pulumiservice";
+
+new pulumiservice.v2.teams.Team("example", {
+    organizationName: "acme",
+    name: "platform",
+    teamType: "pulumi",
+}, {
+    aliases: [{ type: "pulumiservice:index:Team" }],
+});
+```
+
+```python
+import pulumi_pulumiservice as pulumiservice
+import pulumi
+
+pulumiservice.v2.teams.Team("example",
+    organization_name="acme",
+    name="platform",
+    team_type="pulumi",
+    opts=pulumi.ResourceOptions(aliases=[pulumi.Alias(type_="pulumiservice:index:Team")]))
+```
+
+```yaml
+resources:
+  example:
+    type: pulumiservice:v2/teams:Team
+    properties:
+      organizationName: acme
+      name: platform
+      teamType: pulumi
+    options:
+      aliases:
+        - type: pulumiservice:index:Team
+```
+
+Run `pulumi preview` against the migrated program. The plan should report a
+**rename** (no destroy/create) per migrated resource. Once the diff is clean,
+`pulumi up` rewrites state in place. The `aliases` entry can stay indefinitely;
+removing it after the migration only matters if you also intend to break the
+ability to roll back to the v1 token.
+
 End-to-end tests of the `pulumiservice:v2:*` resource surface. Each example
 ships its own per-language program in:
 
