@@ -14,12 +14,11 @@ import (
 // to the committed metadata.json. Catches "someone bumped the spec but
 // forgot to regenerate" and "scaffolder produces unstable output."
 //
-// Skipped under -short. Slow: shells out to `go run ./tools/scaffold-metadata`.
+// Runs under -short despite shelling out to `go run ./tools/scaffold-metadata` —
+// this is the most load-bearing invariant of the v2 layer, so it has to be on
+// the default CI path. The shell-out completes in a few seconds on a modern
+// dev box.
 func TestScaffoldMetadataIdempotent(t *testing.T) {
-	if testing.Short() {
-		t.Skip("scaffold-metadata invocation is too slow for -short")
-	}
-
 	pkgRoot, err := os.Getwd()
 	if err != nil {
 		t.Fatalf("getwd: %v", err)
