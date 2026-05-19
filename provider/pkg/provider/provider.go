@@ -22,6 +22,7 @@ import (
 	"net/url"
 	"runtime"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	_ "embed" // For manualSchema.
@@ -35,6 +36,7 @@ import (
 	p "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi-go-provider/infer"
 	mw "github.com/pulumi/pulumi-go-provider/middleware"
+	ctxmw "github.com/pulumi/pulumi-go-provider/middleware/context"
 	"github.com/pulumi/pulumi-go-provider/middleware/dispatch"
 	"github.com/pulumi/pulumi-go-provider/middleware/rpc"
 	"github.com/pulumi/pulumi/pkg/v3/codegen/schema"
@@ -75,6 +77,11 @@ type pulumiserviceProvider struct {
 	pulumiResources []PulumiServiceResource
 	AccessToken     string
 	client          *pulumiapi.Client
+	// transportRef is the per-provider v2 transport, populated during
+	// Configure and consumed by the ctxmw.Wrap layer to attach this
+	// provider's transport to every CRUD context — keeps multi-provider
+	// instances from racing on a package-global.
+	transportRef *atomic.Value
 }
 
 // embed manual-schema.json directly into resource binary so that we can properly serve the schema
@@ -98,11 +105,13 @@ var manualSchema string
 // resolve through layers 1 and 3; the new v2 resources at
 // pulumiservice:v2:* resolve through layer 2.
 func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.ResourceProviderServer, error) {
+	transportRef := &atomic.Value{}
 	legacyRaw := rpc.Provider(&pulumiserviceProvider{
-		host:    host,
-		name:    name,
-		schema:  mustSetSchemaVersion(manualSchema, version),
-		version: version,
+		host:         host,
+		name:         name,
+		schema:       mustSetSchemaVersion(manualSchema, version),
+		version:      version,
+		transportRef: transportRef,
 	})
 
 	customs := map[tokens.Type]mw.CustomResource{}
@@ -111,6 +120,14 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 	}
 	composed := dispatch.Wrap(legacyRaw, dispatch.Options{Customs: customs})
 	composed = withCloudV2Schema(composed, cloud.Spec(), cloud.Metadata(), name)
+	// Attach this provider's transport to every CRUD context. Pairs with
+	// pulumiserviceProvider.Configure storing into transportRef.
+	composed = ctxmw.Wrap(composed, func(ctx context.Context) context.Context {
+		if v := transportRef.Load(); v != nil {
+			return rest.WithTransport(ctx, v.(rest.Transport))
+		}
+		return ctx
+	})
 
 	provider, err := infer.NewProviderBuilder().
 		WithDisplayName("Pulumi Cloud").
@@ -352,12 +369,20 @@ func (k *pulumiserviceProvider) Configure(
 	}
 	client, err := pulumiapi.NewClient(&httpClient, *token, *url)
 
+	transport := rest.Transport(&authedTransport{
+		baseURL: *url,
+		token:   *token,
+		client:  &httpClient,
+	})
+	// Two paths: ctxmw.Wrap (set in MakeProvider) picks this up and attaches
+	// it to every CRUD context; SetTransportResolver remains as the legacy
+	// global so any code path that bypasses the middleware still resolves a
+	// transport.
+	if k.transportRef != nil {
+		k.transportRef.Store(transport)
+	}
 	rest.SetTransportResolver(func(_ context.Context) (rest.Transport, error) {
-		return &authedTransport{
-			baseURL: *url,
-			token:   *token,
-			client:  &httpClient,
-		}, nil
+		return transport, nil
 	})
 
 	escClient := esc_client.New(
