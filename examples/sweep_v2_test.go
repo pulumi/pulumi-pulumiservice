@@ -1,5 +1,5 @@
-//go:build v2
-// +build v2
+//go:build v2 || hammerv2
+// +build v2 hammerv2
 
 // Pre-test sweeper for the v2 test org. The TestV2 suite creates real
 // resources on the configured Pulumi backend; if a test panics or the
