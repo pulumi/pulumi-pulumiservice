@@ -1086,6 +1086,87 @@ func TestDeleteIsIdempotentOn404(t *testing.T) {
 	})
 }
 
+// TestDiffEmitsUpdateOnUnknownInput pins the contract: when an input
+// transitions from a known value to an unknown (computed) value — or
+// vice-versa — Diff must emit an entry, not silently skip the key.
+// Otherwise users recovering from a partial apply see misleading
+// "no changes" plans against still-unresolved values.
+//
+// AllStable in pulumi/property iterates every key (including computed
+// ones); the safety here comes from Value.Equals returning false when
+// comparing computed to non-computed by default.
+func TestDiffEmitsUpdateOnUnknownInput(t *testing.T) {
+	const specJSON = `{
+	  "openapi": "3.0.0",
+	  "paths": {
+	    "/things/{org}": {
+	      "post": {
+	        "operationId": "CreateThing",
+	        "parameters": [{"name": "org", "in": "path", "required": true, "schema": {"type": "string"}}],
+	        "requestBody": {"content": {"application/json": {"schema": {
+	          "type": "object", "properties": {"x": {"type": "string"}}
+	        }}}},
+	        "responses": {"200": {"description": "OK"}}
+	      }
+	    }
+	  }
+	}`
+	spec, err := ParseSpec([]byte(specJSON))
+	if err != nil {
+		t.Fatalf("parse synthetic spec: %v", err)
+	}
+	r := &Resource{
+		spec: spec,
+		meta: ResourceMeta{Operations: Operations{Create: "CreateThing"}, IDFormat: "{org}"},
+	}
+
+	cases := []struct {
+		name string
+		old  map[string]any
+		new  map[string]any
+		want string // expected DetailedDiff key
+	}{
+		{
+			name: "known → unknown emits a diff",
+			old:  map[string]any{"org": "acme", "x": "old"},
+			new:  map[string]any{"org": "acme", "x": property.Computed},
+			want: "x",
+		},
+		{
+			name: "unknown → known emits a diff",
+			old:  map[string]any{"org": "acme", "x": property.Computed},
+			new:  map[string]any{"org": "acme", "x": "new"},
+			want: "x",
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			resp, err := r.Diff(context.Background(), p.DiffRequest{
+				ID:        "acme",
+				OldInputs: propMap(tc.old),
+				Inputs:    propMap(tc.new),
+			})
+			if err != nil {
+				t.Fatalf("Diff: %v", err)
+			}
+			if !resp.HasChanges {
+				t.Fatalf("expected HasChanges=true, got false (DetailedDiff=%v)", resp.DetailedDiff)
+			}
+			if _, ok := resp.DetailedDiff[tc.want]; !ok {
+				t.Errorf("DetailedDiff missing %q; got keys: %v", tc.want, mapKeys(resp.DetailedDiff))
+			}
+		})
+	}
+}
+
+func mapKeys[V any](m map[string]V) []string {
+	out := make([]string, 0, len(m))
+	for k := range m {
+		out = append(out, k)
+	}
+	return out
+}
+
 // TestErrorURLIsPostTransportRewrite pins the user-facing error path: the
 // real backend host shows up in error messages, not the transport.invalid
 // sentinel that buildURL uses by default when the spec lacks servers.
