@@ -6,13 +6,13 @@ using Ps = Pulumi.PulumiService;
 return await Deployment.RunAsync(() =>
 {
     var config = new Config();
-    var serviceOrg = config.Get("serviceOrg") ?? "service-provider-test-org";
+    var organizationName = config.Get("organizationName") ?? "service-provider-test-org";
     var bucketName = config.Get("bucketName") ?? "pulumi-audit-log-archive";
     var region = config.Get("region") ?? "us-west-2";
 
     var exportConfig = new Ps.V2.AuditLogExportConfiguration("exportConfig", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         NewEnabled = true,
         NewS3Configuration = new Dictionary<string, object?>
         {

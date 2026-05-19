@@ -14,21 +14,21 @@ public class App {
     public static void main(String[] args) {
         Pulumi.run(ctx -> {
             var config = ctx.config();
-            var serviceOrg = config.get("serviceOrg").orElse("service-provider-test-org");
+            var organizationName = config.get("organizationName").orElse("service-provider-test-org");
             var projectName = config.get("projectName").orElse("my-new-project");
             var stackName = config.get("stackName").orElse("dev");
             var executorImage = config.get("executorImage").orElse("pulumi-cli");
 
             var parentStack = new Stack("parentStack",
                 StackArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .projectName(projectName)
                     .stackName(stackName)
                     .build());
 
             var settings = new Settings("settings",
                 SettingsArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .projectName(projectName)
                     .stackName(stackName)
                     .executorContext(Map.of("executorImage", executorImage))
@@ -43,7 +43,7 @@ public class App {
                     .build(),
                 CustomResourceOptions.builder().dependsOn(List.of(parentStack)).build());
 
-            ctx.export("stackId", com.pulumi.core.Output.of(serviceOrg + "/" + projectName + "/" + stackName));
+            ctx.export("stackId", com.pulumi.core.Output.of(organizationName + "/" + projectName + "/" + stackName));
         });
     }
 }

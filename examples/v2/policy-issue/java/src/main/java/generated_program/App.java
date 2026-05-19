@@ -8,12 +8,12 @@ public class App {
     public static void main(String[] args) {
         Pulumi.run(ctx -> {
             var config = ctx.config();
-            var serviceOrg = config.get("serviceOrg").orElse("service-provider-test-org");
+            var organizationName = config.get("organizationName").orElse("service-provider-test-org");
             var issueId = config.get("issueId").orElse("example-issue-id");
 
             new PolicyIssue("issue",
                 PolicyIssueArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .issueId(issueId)
                     .priority("high")
                     .status("in_progress")

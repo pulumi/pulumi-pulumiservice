@@ -2,21 +2,21 @@ import pulumi
 import pulumi_pulumiservice.v2 as ps_v2
 
 config = pulumi.Config()
-service_org = config.get("serviceOrg") or "service-provider-test-org"
+organization_name = config.get("organizationName") or "service-provider-test-org"
 project_name = config.get("projectName") or "my-new-project"
 stack_name = config.get("stackName") or "dev"
 executor_image = config.get("executorImage") or "pulumi-cli"
 
 parent_stack = ps_v2.stacks.Stack(
     "parentStack",
-    org_name=service_org,
+    org_name=organization_name,
     project_name=project_name,
     stack_name=stack_name,
 )
 
 settings = ps_v2.deployments.Settings(
     "settings",
-    org_name=service_org,
+    org_name=organization_name,
     project_name=project_name,
     stack_name=stack_name,
     executor_context={"executorImage": executor_image},
@@ -34,4 +34,4 @@ settings = ps_v2.deployments.Settings(
     opts=pulumi.ResourceOptions(depends_on=[parent_stack]),
 )
 
-pulumi.export("stackId", f"{service_org}/{project_name}/{stack_name}")
+pulumi.export("stackId", f"{organization_name}/{project_name}/{stack_name}")

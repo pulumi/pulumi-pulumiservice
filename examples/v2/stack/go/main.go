@@ -9,9 +9,9 @@ import (
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
 		cfg := config.New(ctx, "")
-		serviceOrg := cfg.Get("serviceOrg")
-		if serviceOrg == "" {
-			serviceOrg = "service-provider-test-org"
+		organizationName := cfg.Get("organizationName")
+		if organizationName == "" {
+			organizationName = "service-provider-test-org"
 		}
 		projectName := cfg.Get("projectName")
 		if projectName == "" {
@@ -27,7 +27,7 @@ func main() {
 		}
 
 		exampleStack, err := stacks.NewStack(ctx, "exampleStack", &stacks.StackArgs{
-			OrgName:     pulumi.String(serviceOrg),
+			OrgName:     pulumi.String(organizationName),
 			ProjectName: pulumi.String(projectName),
 			StackName:   pulumi.String(stackName),
 			Tags: pulumi.Map{

@@ -2,7 +2,7 @@ resources:
   approvers:
     type: pulumiservice:v2:PolicyGroup
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       name: v2-approvers
       entityType: stacks
 outputs:

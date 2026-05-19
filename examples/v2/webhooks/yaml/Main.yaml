@@ -2,7 +2,7 @@ resources:
   orgWebhookAll:
     type: pulumiservice:v2:OrganizationWebhook
     properties:
-      organizationName: ${serviceOrg}
+      organizationName: ${organizationName}
       name: org-webhook-all-${hookSuffix}
       displayName: webhook-from-provider
       payloadUrl: https://google.com
@@ -11,7 +11,7 @@ resources:
   orgWebhookGroups:
     type: pulumiservice:v2:OrganizationWebhook
     properties:
-      organizationName: ${serviceOrg}
+      organizationName: ${organizationName}
       name: org-webhook-groups-${hookSuffix}
       displayName: webhook-from-provider
       payloadUrl: https://google.com

@@ -2,12 +2,12 @@ import * as pulumi from "@pulumi/pulumi";
 import * as ps from "@pulumi/pulumiservice";
 
 const config = new pulumi.Config();
-const serviceOrg = config.get("serviceOrg") ?? "service-provider-test-org";
+const organizationName = config.get("organizationName") ?? "service-provider-test-org";
 const bucketName = config.get("bucketName") ?? "pulumi-audit-log-archive";
 const region = config.get("region") ?? "us-west-2";
 
 const exportConfig = new ps.v2.AuditLogExportConfiguration("exportConfig", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     newEnabled: true,
     newS3Configuration: {
         bucketName: bucketName,

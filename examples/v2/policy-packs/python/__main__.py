@@ -2,11 +2,11 @@ import pulumi
 import pulumi_pulumiservice.v2 as ps_v2
 
 config = pulumi.Config()
-service_org = config.get("serviceOrg") or "service-provider-test-org"
+organization_name = config.get("organizationName") or "service-provider-test-org"
 
 pack = ps_v2.PolicyPack(
     "pack",
-    org_name=service_org,
+    org_name=organization_name,
     name="v2-example-policy-pack",
     display_name="v2 example policy pack",
     description="Demo policy pack created via v2 metadata-driven provider.",

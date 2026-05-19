@@ -8,11 +8,11 @@ public class App {
     public static void main(String[] args) {
         Pulumi.run(ctx -> {
             var config = ctx.config();
-            var serviceOrg = config.get("serviceOrg").orElse("service-provider-test-org");
+            var organizationName = config.get("organizationName").orElse("service-provider-test-org");
 
             var approvers = new PolicyGroup("approvers",
                 PolicyGroupArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .name("v2-approvers")
                     .entityType("stacks")
                     .build());

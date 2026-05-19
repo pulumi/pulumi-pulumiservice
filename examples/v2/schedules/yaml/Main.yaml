@@ -4,13 +4,13 @@ resources:
   parentStack:
     type: pulumiservice:v2/stacks:Stack
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       projectName: ${projectName}
       stackName: ${stackName}
   parentSettings:
     type: pulumiservice:v2/deployments:Settings
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       projectName: ${projectName}
       stackName: ${stackName}
       sourceContext:
@@ -23,7 +23,7 @@ resources:
   nightlyDeploy:
     type: pulumiservice:v2/deployments:ScheduledDeployment
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       projectName: ${projectName}
       stackName: ${stackName}
       scheduleCron: ${scheduleCron}

@@ -2,7 +2,7 @@ resources:
   pool:
     type: pulumiservice:v2/agents:Pool
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       name: v2-agent-pool-${poolSuffix}
       description: ${poolDescription}
 outputs:

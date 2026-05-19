@@ -8,7 +8,7 @@ public class App {
     public static void main(String[] args) {
         Pulumi.run(ctx -> {
             var config = ctx.config();
-            var serviceOrg = config.get("serviceOrg").orElse("service-provider-test-org");
+            var organizationName = config.get("organizationName").orElse("service-provider-test-org");
 
             String idpDescriptor =
                 "<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n" +
@@ -18,7 +18,7 @@ public class App {
 
             new SAML("saml",
                 SAMLArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .newIdpSsoDescriptor(idpDescriptor)
                     .build());
         });

@@ -7,7 +7,7 @@ resources:
   github:
     type: pulumiservice:v2/integrations:GitHubIntegration
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       integrationId: ${githubIntegrationId}
       disablePRComments: false
       disableDetailedDiff: false
@@ -16,7 +16,7 @@ resources:
   githubEnterprise:
     type: pulumiservice:v2/integrations:GitHubEnterpriseIntegration
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       integrationId: ${githubEnterpriseIntegrationId}
       disablePRComments: true
       disableDetailedDiff: false
@@ -25,7 +25,7 @@ resources:
   gitlab:
     type: pulumiservice:v2/integrations:GitLabIntegration
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       integrationId: ${gitlabIntegrationId}
       disablePRComments: false
       disableDetailedDiff: false
@@ -33,7 +33,7 @@ resources:
   bitbucket:
     type: pulumiservice:v2/integrations:BitBucketIntegration
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       integrationId: ${bitbucketIntegrationId}
       disablePRComments: false
       disableDetailedDiff: false
@@ -41,7 +41,7 @@ resources:
   azureDevOps:
     type: pulumiservice:v2/integrations:AzureDevOpsIntegration
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       integrationId: ${azureDevOpsIntegrationId}
       disablePRComments: true
       disableDetailedDiff: true

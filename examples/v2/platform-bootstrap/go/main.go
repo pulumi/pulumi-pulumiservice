@@ -16,9 +16,9 @@ import (
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
 		cfg := config.New(ctx, "")
-		serviceOrg := cfg.Get("serviceOrg")
-		if serviceOrg == "" {
-			serviceOrg = "service-provider-test-org"
+		organizationName := cfg.Get("organizationName")
+		if organizationName == "" {
+			organizationName = "service-provider-test-org"
 		}
 		suffix := cfg.Get("suffix")
 		if suffix == "" {
@@ -38,13 +38,13 @@ func main() {
 		}
 
 		if _, err := v2.NewDefaultOrganization(ctx, "defaultOrg", &v2.DefaultOrganizationArgs{
-			OrgName: pulumi.String(serviceOrg),
+			OrgName: pulumi.String(organizationName),
 		}); err != nil {
 			return err
 		}
 
 		if _, err := auth.NewOidcIssuer(ctx, "githubIssuer", &auth.OidcIssuerArgs{
-			OrgName:       pulumi.String(serviceOrg),
+			OrgName:       pulumi.String(organizationName),
 			Name:          pulumi.String("github_issuer_" + suffix),
 			Url:           pulumi.String("https://token.actions.githubusercontent.com"),
 			Thumbprints:   pulumi.StringArray{pulumi.String("b41ae0832808ebc94951437bf7e92b93ccb6479364daf894d46d6001bee7a486")},
@@ -53,7 +53,7 @@ func main() {
 			return err
 		}
 		if _, err := auth.NewOidcIssuer(ctx, "pulumiSelfIssuer", &auth.OidcIssuerArgs{
-			OrgName:     pulumi.String(serviceOrg),
+			OrgName:     pulumi.String(organizationName),
 			Name:        pulumi.String("pulumi_issuer_" + suffix),
 			Url:         pulumi.String("https://api.pulumi.com/oidc"),
 			Thumbprints: pulumi.StringArray{pulumi.String("57d3e89f6b25dde3c174dc558e2b2623306a9d81f88a12e8ae7090a86c12f1da")},
@@ -62,7 +62,7 @@ func main() {
 		}
 
 		platformTeam, err := teams.NewTeam(ctx, "platformTeam", &teams.TeamArgs{
-			OrgName:     pulumi.String(serviceOrg),
+			OrgName:     pulumi.String(organizationName),
 			Name:        pulumi.String("platform-team-" + suffix),
 			DisplayName: pulumi.String("Platform Team " + suffix),
 			Description: pulumi.String("Owns shared infra, runs the deployments engine."),
@@ -72,7 +72,7 @@ func main() {
 		}
 
 		if _, err := v2.NewRole(ctx, "stackReadonlyRole", &v2.RoleArgs{
-			OrgName:     pulumi.String(serviceOrg),
+			OrgName:     pulumi.String(organizationName),
 			Name:        pulumi.String("stack-readonly-" + suffix),
 			Description: pulumi.String("Read-only access to stacks, scoped via the platform team."),
 			UxPurpose:   pulumi.String("role"),
@@ -85,7 +85,7 @@ func main() {
 		}
 
 		ciToken, err := tokens.NewOrgToken(ctx, "ciToken", &tokens.OrgTokenArgs{
-			OrgName:     pulumi.String(serviceOrg),
+			OrgName:     pulumi.String(organizationName),
 			Name:        pulumi.String("ci-" + suffix),
 			Description: pulumi.String("Used by CI/CD to deploy non-prod stacks."),
 			Admin:       pulumi.Bool(false),
@@ -95,7 +95,7 @@ func main() {
 			return err
 		}
 		if _, err := tokens.NewTeamToken(ctx, "teamToken", &tokens.TeamTokenArgs{
-			OrgName:     pulumi.String(serviceOrg),
+			OrgName:     pulumi.String(organizationName),
 			TeamName:    platformTeam.Name,
 			Name:        pulumi.String("platform-team-token-" + suffix),
 			Description: pulumi.String("Platform-team-scoped token for shared automation."),
@@ -105,7 +105,7 @@ func main() {
 		}
 
 		runnersPool, err := agents.NewPool(ctx, "runnersPool", &agents.PoolArgs{
-			OrgName:     pulumi.String(serviceOrg),
+			OrgName:     pulumi.String(organizationName),
 			Name:        pulumi.String("platform-runners-" + suffix),
 			Description: pulumi.String("Self-hosted deployment runner pool."),
 		})
@@ -114,7 +114,7 @@ func main() {
 		}
 
 		templates, err := v2.NewOrgTemplateCollection(ctx, "templates", &v2.OrgTemplateCollectionArgs{
-			OrgName:   pulumi.String(serviceOrg),
+			OrgName:   pulumi.String(organizationName),
 			Name:      pulumi.String("platform-templates-" + suffix),
 			SourceURL: pulumi.String("https://github.com/pulumi/examples"),
 		})
@@ -123,7 +123,7 @@ func main() {
 		}
 
 		sharedCredentials, err := esc.NewEnvironment(ctx, "sharedCredentials", &esc.EnvironmentArgs{
-			OrgName: pulumi.String(serviceOrg),
+			OrgName: pulumi.String(organizationName),
 			Project: pulumi.String("shared"),
 			Name:    pulumi.String("credentials-" + suffix),
 		})
@@ -131,7 +131,7 @@ func main() {
 			return err
 		}
 		if _, err := esc.NewEnvironmentTag(ctx, "stableTag", &esc.EnvironmentTagArgs{
-			OrgName:     pulumi.String(serviceOrg),
+			OrgName:     pulumi.String(organizationName),
 			ProjectName: sharedCredentials.Project,
 			EnvName:     sharedCredentials.Name,
 			Name:        pulumi.String("stable"),
@@ -141,7 +141,7 @@ func main() {
 		}
 
 		stagingStack, err := stacks.NewStack(ctx, "stagingStack", &stacks.StackArgs{
-			OrgName:     pulumi.String(serviceOrg),
+			OrgName:     pulumi.String(organizationName),
 			ProjectName: pulumi.String("platform-app-" + suffix),
 			StackName:   pulumi.String("staging"),
 		})
@@ -149,7 +149,7 @@ func main() {
 			return err
 		}
 		prodStack, err := stacks.NewStack(ctx, "prodStack", &stacks.StackArgs{
-			OrgName:     pulumi.String(serviceOrg),
+			OrgName:     pulumi.String(organizationName),
 			ProjectName: pulumi.String("platform-app-" + suffix),
 			StackName:   pulumi.String("prod"),
 		})
@@ -160,7 +160,7 @@ func main() {
 		sharedEnvRef := pulumi.Sprintf("%s/%s", sharedCredentials.Project, sharedCredentials.Name)
 
 		if _, err := stacks.NewConfig(ctx, "stagingConfig", &stacks.ConfigArgs{
-			OrgName:     pulumi.String(serviceOrg),
+			OrgName:     pulumi.String(organizationName),
 			ProjectName: stagingStack.ProjectName,
 			StackName:   stagingStack.StackName,
 			Environment: sharedEnvRef,
@@ -168,7 +168,7 @@ func main() {
 			return err
 		}
 		if _, err := stacks.NewConfig(ctx, "prodConfig", &stacks.ConfigArgs{
-			OrgName:     pulumi.String(serviceOrg),
+			OrgName:     pulumi.String(organizationName),
 			ProjectName: prodStack.ProjectName,
 			StackName:   prodStack.StackName,
 			Environment: sharedEnvRef,
@@ -182,7 +182,7 @@ func main() {
 			{"cost-center", "platform"},
 		} {
 			if _, err := stacks.NewTag(ctx, "prodTag-"+kv.k, &stacks.TagArgs{
-				OrgName:     pulumi.String(serviceOrg),
+				OrgName:     pulumi.String(organizationName),
 				ProjectName: prodStack.ProjectName,
 				StackName:   prodStack.StackName,
 				Name:        pulumi.String(kv.k),
@@ -193,7 +193,7 @@ func main() {
 		}
 
 		if _, err := stacks.NewWebhook(ctx, "prodPagerDuty", &stacks.WebhookArgs{
-			OrganizationName: pulumi.String(serviceOrg),
+			OrganizationName: pulumi.String(organizationName),
 			ProjectName:      prodStack.ProjectName,
 			StackName:        prodStack.StackName,
 			Name:             pulumi.String("prod-pagerduty"),
@@ -206,7 +206,7 @@ func main() {
 		}
 
 		if _, err := deployments.NewSettings(ctx, "stagingDeploySettings", &deployments.SettingsArgs{
-			OrgName:     pulumi.String(serviceOrg),
+			OrgName:     pulumi.String(organizationName),
 			ProjectName: stagingStack.ProjectName,
 			StackName:   stagingStack.StackName,
 			ExecutorContext: pulumi.Map{
@@ -216,7 +216,7 @@ func main() {
 			return err
 		}
 		prodDeploySettings, err := deployments.NewSettings(ctx, "prodDeploySettings", &deployments.SettingsArgs{
-			OrgName:     pulumi.String(serviceOrg),
+			OrgName:     pulumi.String(organizationName),
 			ProjectName: prodStack.ProjectName,
 			StackName:   prodStack.StackName,
 			ExecutorContext: pulumi.Map{
@@ -228,7 +228,7 @@ func main() {
 		}
 
 		if _, err := v2.NewGate(ctx, "credsApprovalGate", &v2.GateArgs{
-			OrgName: pulumi.String(serviceOrg),
+			OrgName: pulumi.String(organizationName),
 			Name:    pulumi.String("creds-approval-" + suffix),
 			Enabled: pulumi.Bool(prodApprovalEnabled),
 			Rule: pulumi.Map{
@@ -253,7 +253,7 @@ func main() {
 		}
 
 		if _, err := deployments.NewScheduledDeployment(ctx, "prodNightlyDeploy", &deployments.ScheduledDeploymentArgs{
-			OrgName:      pulumi.String(serviceOrg),
+			OrgName:      pulumi.String(organizationName),
 			ProjectName:  prodStack.ProjectName,
 			StackName:    prodStack.StackName,
 			ScheduleCron: pulumi.String("0 7 * * *"),
@@ -266,7 +266,7 @@ func main() {
 		}
 
 		if _, err := v2.NewOrganizationWebhook(ctx, "slack", &v2.OrganizationWebhookArgs{
-			OrganizationName: pulumi.String(serviceOrg),
+			OrganizationName: pulumi.String(organizationName),
 			Name:             pulumi.String("org-slack-" + suffix),
 			DisplayName:      pulumi.String("Org Slack notifications"),
 			PayloadUrl:       pulumi.String(slackWebhookUrl),
@@ -277,7 +277,7 @@ func main() {
 		}
 
 		if _, err := v2.NewPolicyGroup(ctx, "starterPolicyGroup", &v2.PolicyGroupArgs{
-			OrgName:    pulumi.String(serviceOrg),
+			OrgName:    pulumi.String(organizationName),
 			Name:       pulumi.String("platform-policies-" + suffix),
 			EntityType: pulumi.String("stacks"),
 		}); err != nil {

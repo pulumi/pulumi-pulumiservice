@@ -6,7 +6,7 @@ using Ps = Pulumi.PulumiService;
 return await Deployment.RunAsync(() =>
 {
     var config = new Config();
-    var serviceOrg = config.Get("serviceOrg") ?? "service-provider-test-org";
+    var organizationName = config.Get("organizationName") ?? "service-provider-test-org";
     var suffix = config.Get("suffix") ?? "dev";
     var prodApprovalEnabled = config.GetBoolean("prodApprovalEnabled") ?? true;
     var slackWebhookUrl = config.Get("slackWebhookUrl") ??
@@ -14,11 +14,11 @@ return await Deployment.RunAsync(() =>
     var pagerDutyWebhookUrl = config.Get("pagerDutyWebhookUrl") ??
         "https://events.pagerduty.com/v2/enqueue";
 
-    new Ps.V2.DefaultOrganization("defaultOrg", new() { OrgName = serviceOrg });
+    new Ps.V2.DefaultOrganization("defaultOrg", new() { OrgName = organizationName });
 
     new Ps.V2.Auth.OidcIssuer("githubIssuer", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         Name = $"github_issuer_{suffix}",
         Url = "https://token.actions.githubusercontent.com",
         Thumbprints = new[] { "b41ae0832808ebc94951437bf7e92b93ccb6479364daf894d46d6001bee7a486" },
@@ -26,7 +26,7 @@ return await Deployment.RunAsync(() =>
     });
     new Ps.V2.Auth.OidcIssuer("pulumiSelfIssuer", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         Name = $"pulumi_issuer_{suffix}",
         Url = "https://api.pulumi.com/oidc",
         Thumbprints = new[] { "57d3e89f6b25dde3c174dc558e2b2623306a9d81f88a12e8ae7090a86c12f1da" },
@@ -34,7 +34,7 @@ return await Deployment.RunAsync(() =>
 
     var platformTeam = new Ps.V2.Teams.Team("platformTeam", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         Name = $"platform-team-{suffix}",
         DisplayName = $"Platform Team {suffix}",
         Description = "Owns shared infra, runs the deployments engine.",
@@ -45,7 +45,7 @@ return await Deployment.RunAsync(() =>
         .Add("permissions", new[] { "stack:read" });
     new Ps.V2.Role("stackReadonlyRole", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         Name = $"stack-readonly-{suffix}",
         Description = "Read-only access to stacks, scoped via the platform team.",
         UxPurpose = "role",
@@ -54,7 +54,7 @@ return await Deployment.RunAsync(() =>
 
     var ciToken = new Ps.V2.Tokens.OrgToken("ciToken", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         Name = $"ci-{suffix}",
         Description = "Used by CI/CD to deploy non-prod stacks.",
         Admin = false,
@@ -62,7 +62,7 @@ return await Deployment.RunAsync(() =>
     });
     new Ps.V2.Tokens.TeamToken("teamToken", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         TeamName = platformTeam.Name,
         Name = $"platform-team-token-{suffix}",
         Description = "Platform-team-scoped token for shared automation.",
@@ -71,27 +71,27 @@ return await Deployment.RunAsync(() =>
 
     var runnersPool = new Ps.V2.Agents.Pool("runnersPool", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         Name = $"platform-runners-{suffix}",
         Description = "Self-hosted deployment runner pool.",
     });
 
     var templates = new Ps.V2.OrgTemplateCollection("templates", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         Name = $"platform-templates-{suffix}",
         SourceURL = "https://github.com/pulumi/examples",
     });
 
     var sharedCredentials = new Ps.V2.Esc.Environment("sharedCredentials", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         Project = "shared",
         Name = $"credentials-{suffix}",
     });
     new Ps.V2.Esc.EnvironmentTag("stableTag", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         ProjectName = sharedCredentials.Project,
         EnvName = sharedCredentials.Name,
         Name = "stable",
@@ -100,13 +100,13 @@ return await Deployment.RunAsync(() =>
 
     var stagingStack = new Ps.V2.Stacks.Stack("stagingStack", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         ProjectName = $"platform-app-{suffix}",
         StackName = "staging",
     });
     var prodStack = new Ps.V2.Stacks.Stack("prodStack", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         ProjectName = $"platform-app-{suffix}",
         StackName = "prod",
     });
@@ -115,14 +115,14 @@ return await Deployment.RunAsync(() =>
 
     new Ps.V2.Stacks.Config("stagingConfig", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         ProjectName = stagingStack.ProjectName,
         StackName = stagingStack.StackName,
         Environment = sharedEnvRef,
     });
     new Ps.V2.Stacks.Config("prodConfig", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         ProjectName = prodStack.ProjectName,
         StackName = prodStack.StackName,
         Environment = sharedEnvRef,
@@ -134,7 +134,7 @@ return await Deployment.RunAsync(() =>
     {
         new Ps.V2.Stacks.Tag($"prodTag-{k}", new()
         {
-            OrgName = serviceOrg,
+            OrgName = organizationName,
             ProjectName = prodStack.ProjectName,
             StackName = prodStack.StackName,
             Name = k,
@@ -144,7 +144,7 @@ return await Deployment.RunAsync(() =>
 
     new Ps.V2.Stacks.Webhook("prodPagerDuty", new()
     {
-        OrganizationName = serviceOrg,
+        OrganizationName = organizationName,
         ProjectName = prodStack.ProjectName,
         StackName = prodStack.StackName,
         Name = "prod-pagerduty",
@@ -158,7 +158,7 @@ return await Deployment.RunAsync(() =>
         .Add("executorImage", ImmutableDictionary<string, object>.Empty.Add("reference", "pulumi/pulumi:latest"));
     new Ps.V2.Deployments.Settings("stagingDeploySettings", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         ProjectName = stagingStack.ProjectName,
         StackName = stagingStack.StackName,
         ExecutorContext = stagingExecutor,
@@ -167,7 +167,7 @@ return await Deployment.RunAsync(() =>
         .Add("executorImage", ImmutableDictionary<string, object>.Empty.Add("reference", "pulumi/pulumi:3-nonroot"));
     var prodDeploySettings = new Ps.V2.Deployments.Settings("prodDeploySettings", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         ProjectName = prodStack.ProjectName,
         StackName = prodStack.StackName,
         ExecutorContext = prodExecutor,
@@ -189,7 +189,7 @@ return await Deployment.RunAsync(() =>
         .Add("qualifiedName", sharedEnvRef);
     new Ps.V2.Gate("credsApprovalGate", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         Name = $"creds-approval-{suffix}",
         Enabled = prodApprovalEnabled,
         Rule = gateRule,
@@ -201,7 +201,7 @@ return await Deployment.RunAsync(() =>
         .Add("inheritSettings", true);
     new Ps.V2.Deployments.ScheduledDeployment("prodNightlyDeploy", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         ProjectName = prodStack.ProjectName,
         StackName = prodStack.StackName,
         ScheduleCron = "0 7 * * *",
@@ -210,7 +210,7 @@ return await Deployment.RunAsync(() =>
 
     new Ps.V2.OrganizationWebhook("slack", new()
     {
-        OrganizationName = serviceOrg,
+        OrganizationName = organizationName,
         Name = $"org-slack-{suffix}",
         DisplayName = "Org Slack notifications",
         PayloadUrl = slackWebhookUrl,
@@ -220,7 +220,7 @@ return await Deployment.RunAsync(() =>
 
     new Ps.V2.PolicyGroup("starterPolicyGroup", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         Name = $"platform-policies-{suffix}",
         EntityType = "stacks",
     });

@@ -2,7 +2,7 @@ import pulumi
 import pulumi_pulumiservice.v2 as ps_v2
 
 config = pulumi.Config()
-service_org = config.get("serviceOrg") or "service-provider-test-org"
+organization_name = config.get("organizationName") or "service-provider-test-org"
 github_id = config.get("githubIntegrationId") or "gh-org-integration"
 github_enterprise_id = config.get("githubEnterpriseIntegrationId") or "ghe-org-integration"
 gitlab_id = config.get("gitlabIntegrationId") or "gl-org-integration"
@@ -11,7 +11,7 @@ azure_devops_id = config.get("azureDevOpsIntegrationId") or "ado-org-integration
 
 ps_v2.integrations.GitHubIntegration(
     "github",
-    org_name=service_org,
+    org_name=organization_name,
     integration_id=github_id,
     disable_pr_comments=False,
     disable_detailed_diff=False,
@@ -21,7 +21,7 @@ ps_v2.integrations.GitHubIntegration(
 
 ps_v2.integrations.GitHubEnterpriseIntegration(
     "githubEnterprise",
-    org_name=service_org,
+    org_name=organization_name,
     integration_id=github_enterprise_id,
     disable_pr_comments=True,
     disable_detailed_diff=False,
@@ -31,7 +31,7 @@ ps_v2.integrations.GitHubEnterpriseIntegration(
 
 ps_v2.integrations.GitLabIntegration(
     "gitlab",
-    org_name=service_org,
+    org_name=organization_name,
     integration_id=gitlab_id,
     disable_pr_comments=False,
     disable_detailed_diff=False,
@@ -40,7 +40,7 @@ ps_v2.integrations.GitLabIntegration(
 
 ps_v2.integrations.BitBucketIntegration(
     "bitbucket",
-    org_name=service_org,
+    org_name=organization_name,
     integration_id=bitbucket_id,
     disable_pr_comments=False,
     disable_detailed_diff=False,
@@ -49,7 +49,7 @@ ps_v2.integrations.BitBucketIntegration(
 
 ps_v2.integrations.AzureDevOpsIntegration(
     "azureDevOps",
-    org_name=service_org,
+    org_name=organization_name,
     integration_id=azure_devops_id,
     disable_pr_comments=True,
     disable_detailed_diff=True,

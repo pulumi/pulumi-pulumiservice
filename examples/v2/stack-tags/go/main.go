@@ -9,9 +9,9 @@ import (
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
 		cfg := config.New(ctx, "")
-		serviceOrg := cfg.Get("serviceOrg")
-		if serviceOrg == "" {
-			serviceOrg = "service-provider-test-org"
+		organizationName := cfg.Get("organizationName")
+		if organizationName == "" {
+			organizationName = "service-provider-test-org"
 		}
 		projectName := cfg.Get("projectName")
 		if projectName == "" {
@@ -27,7 +27,7 @@ func main() {
 		}
 
 		parentStack, err := stacks.NewStack(ctx, "parentStack", &stacks.StackArgs{
-			OrgName:     pulumi.String(serviceOrg),
+			OrgName:     pulumi.String(organizationName),
 			ProjectName: pulumi.String(projectName),
 			StackName:   pulumi.String(stackName),
 		})
@@ -36,7 +36,7 @@ func main() {
 		}
 
 		if _, err := stacks.NewTag(ctx, "ownerTag", &stacks.TagArgs{
-			OrgName:     pulumi.String(serviceOrg),
+			OrgName:     pulumi.String(organizationName),
 			ProjectName: parentStack.ProjectName,
 			StackName:   parentStack.StackName,
 			Name:        pulumi.String("owner"),
@@ -46,7 +46,7 @@ func main() {
 		}
 
 		if _, err := stacks.NewTag(ctx, "customTag", &stacks.TagArgs{
-			OrgName:     pulumi.String(serviceOrg),
+			OrgName:     pulumi.String(organizationName),
 			ProjectName: parentStack.ProjectName,
 			StackName:   parentStack.StackName,
 			Name:        pulumi.String("purpose"),

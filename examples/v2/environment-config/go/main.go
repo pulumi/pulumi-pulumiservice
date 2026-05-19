@@ -9,9 +9,9 @@ import (
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
 		cfg := config.New(ctx, "")
-		serviceOrg := cfg.Get("serviceOrg")
-		if serviceOrg == "" {
-			serviceOrg = "service-provider-test-org"
+		organizationName := cfg.Get("organizationName")
+		if organizationName == "" {
+			organizationName = "service-provider-test-org"
 		}
 		projectName := cfg.Get("projectName")
 		if projectName == "" {
@@ -23,7 +23,7 @@ func main() {
 		}
 
 		draft, err := esc.NewEnvironmentDraft(ctx, "draft", &esc.EnvironmentDraftArgs{
-			OrgName:     pulumi.String(serviceOrg),
+			OrgName:     pulumi.String(organizationName),
 			ProjectName: pulumi.String(projectName),
 			EnvName:     pulumi.String(envName),
 		})
@@ -32,7 +32,7 @@ func main() {
 		}
 
 		settings, err := esc.NewEnvironmentSettings(ctx, "settings", &esc.EnvironmentSettingsArgs{
-			OrgName:           pulumi.String(serviceOrg),
+			OrgName:           pulumi.String(organizationName),
 			ProjectName:       pulumi.String(projectName),
 			EnvName:           pulumi.String(envName),
 			DeletionProtected: pulumi.Bool(true),

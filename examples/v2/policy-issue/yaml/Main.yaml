@@ -6,7 +6,7 @@ resources:
   issue:
     type: pulumiservice:v2:PolicyIssue
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       issueId: ${issueId}
       priority: high
       status: in_progress

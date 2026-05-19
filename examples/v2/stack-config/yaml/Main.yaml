@@ -5,20 +5,20 @@ resources:
   parentStack:
     type: pulumiservice:v2/stacks:Stack
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       projectName: ${projectName}
       stackName: ${stackName}
   config:
     type: pulumiservice:v2/stacks:Config
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       projectName: ${parentStack.projectName}
       stackName: ${parentStack.stackName}
       environment: ${envRef}
   hook:
     type: pulumiservice:v2/stacks:Webhook
     properties:
-      organizationName: ${serviceOrg}
+      organizationName: ${organizationName}
       projectName: ${parentStack.projectName}
       stackName: ${parentStack.stackName}
       name: v2-stackhook

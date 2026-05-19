@@ -2,13 +2,13 @@ import pulumi
 import pulumi_pulumiservice.v2 as ps_v2
 
 config = pulumi.Config()
-service_org = config.get("serviceOrg") or "service-provider-test-org"
+organization_name = config.get("organizationName") or "service-provider-test-org"
 bucket_name = config.get("bucketName") or "pulumi-audit-log-archive"
 region = config.get("region") or "us-west-2"
 
 export_config = ps_v2.AuditLogExportConfiguration(
     "exportConfig",
-    org_name=service_org,
+    org_name=organization_name,
     new_enabled=True,
     new_s3_configuration={
         "bucketName": bucket_name,

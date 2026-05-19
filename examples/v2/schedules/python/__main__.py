@@ -2,21 +2,21 @@ import pulumi
 import pulumi_pulumiservice.v2 as ps_v2
 
 config = pulumi.Config()
-service_org = config.get("serviceOrg") or "service-provider-test-org"
+organization_name = config.get("organizationName") or "service-provider-test-org"
 project_name = config.get("projectName") or "pulumi-service-schedules-example"
 stack_name = config.get("stackName") or "dev"
 schedule_cron = config.get("scheduleCron") or "0 7 * * *"
 
 parent_stack = ps_v2.stacks.Stack(
     "parentStack",
-    org_name=service_org,
+    org_name=organization_name,
     project_name=project_name,
     stack_name=stack_name,
 )
 
 parent_settings = ps_v2.deployments.Settings(
     "parentSettings",
-    org_name=service_org,
+    org_name=organization_name,
     project_name=project_name,
     stack_name=stack_name,
     source_context={"git": {"repoUrl": "https://github.com/example/example.git", "branch": "refs/heads/main"}},
@@ -25,7 +25,7 @@ parent_settings = ps_v2.deployments.Settings(
 
 nightly_deploy = ps_v2.deployments.ScheduledDeployment(
     "nightlyDeploy",
-    org_name=service_org,
+    org_name=organization_name,
     project_name=project_name,
     stack_name=stack_name,
     schedule_cron=schedule_cron,

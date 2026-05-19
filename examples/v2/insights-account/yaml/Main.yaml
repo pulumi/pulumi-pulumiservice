@@ -6,7 +6,7 @@ resources:
   account:
     type: pulumiservice:v2/insights:Account
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       accountName: v2-insights-${accountSuffix}
       provider: aws
       environment: ${insightsEnvironment}
@@ -14,7 +14,7 @@ resources:
   scanSettings:
     type: pulumiservice:v2/insights:ScheduledScanSettings
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       # accountName is an input (program-owned); reference the source
       # value rather than the resource. The Account state surfaces the
       # account under `name` on the cloud-owned side.

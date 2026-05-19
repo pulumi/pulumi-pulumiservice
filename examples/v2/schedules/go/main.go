@@ -10,9 +10,9 @@ import (
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
 		cfg := config.New(ctx, "")
-		serviceOrg := cfg.Get("serviceOrg")
-		if serviceOrg == "" {
-			serviceOrg = "service-provider-test-org"
+		organizationName := cfg.Get("organizationName")
+		if organizationName == "" {
+			organizationName = "service-provider-test-org"
 		}
 		projectName := cfg.Get("projectName")
 		if projectName == "" {
@@ -28,7 +28,7 @@ func main() {
 		}
 
 		parentStack, err := stacks.NewStack(ctx, "parentStack", &stacks.StackArgs{
-			OrgName:     pulumi.String(serviceOrg),
+			OrgName:     pulumi.String(organizationName),
 			ProjectName: pulumi.String(projectName),
 			StackName:   pulumi.String(stackName),
 		})
@@ -37,7 +37,7 @@ func main() {
 		}
 
 		parentSettings, err := deployments.NewSettings(ctx, "parentSettings", &deployments.SettingsArgs{
-			OrgName:     pulumi.String(serviceOrg),
+			OrgName:     pulumi.String(organizationName),
 			ProjectName: pulumi.String(projectName),
 			StackName:   pulumi.String(stackName),
 			SourceContext: pulumi.Map{
@@ -52,7 +52,7 @@ func main() {
 		}
 
 		nightlyDeploy, err := deployments.NewScheduledDeployment(ctx, "nightlyDeploy", &deployments.ScheduledDeploymentArgs{
-			OrgName:      pulumi.String(serviceOrg),
+			OrgName:      pulumi.String(organizationName),
 			ProjectName:  pulumi.String(projectName),
 			StackName:    pulumi.String(stackName),
 			ScheduleCron: pulumi.String(scheduleCron),

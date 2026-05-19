@@ -5,7 +5,7 @@ resources:
   exportConfig:
     type: pulumiservice:v2:AuditLogExportConfiguration
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       newEnabled: true
       newS3Configuration:
         bucketName: ${bucketName}

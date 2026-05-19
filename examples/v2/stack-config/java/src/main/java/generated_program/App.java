@@ -12,7 +12,7 @@ public class App {
     public static void main(String[] args) {
         Pulumi.run(ctx -> {
             var config = ctx.config();
-            var serviceOrg = config.get("serviceOrg").orElse("service-provider-test-org");
+            var organizationName = config.get("organizationName").orElse("service-provider-test-org");
             var projectName = config.get("projectName").orElse("v2-stack-config-example");
             var stackName = config.get("stackName").orElse("dev");
             var hookUrl = config.get("hookUrl").orElse("https://example.invalid/hooks/example");
@@ -20,14 +20,14 @@ public class App {
 
             var parentStack = new Stack("parentStack",
                 StackArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .projectName(projectName)
                     .stackName(stackName)
                     .build());
 
             new Config("config",
                 ConfigArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .projectName(parentStack.projectName())
                     .stackName(parentStack.stackName())
                     .environment(envRef)
@@ -35,7 +35,7 @@ public class App {
 
             new Webhook("hook",
                 WebhookArgs.builder()
-                    .organizationName(serviceOrg)
+                    .organizationName(organizationName)
                     .projectName(parentStack.projectName())
                     .stackName(parentStack.stackName())
                     .name("v2-stackhook")

@@ -8,14 +8,14 @@ public class App {
     public static void main(String[] args) {
         Pulumi.run(ctx -> {
             var config = ctx.config();
-            var serviceOrg = config.get("serviceOrg").orElse("service-provider-test-org");
+            var organizationName = config.get("organizationName").orElse("service-provider-test-org");
 
             var def = new DefaultOrganization("default",
                 DefaultOrganizationArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .build());
 
-            ctx.export("defaultOrg", com.pulumi.core.Output.of(serviceOrg));
+            ctx.export("defaultOrg", com.pulumi.core.Output.of(organizationName));
             ctx.export("defaultOrgGitHubLogin", def.GitHubLogin());
         });
     }

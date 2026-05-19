@@ -9,13 +9,13 @@ import (
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
 		cfg := config.New(ctx, "")
-		serviceOrg := cfg.Get("serviceOrg")
-		if serviceOrg == "" {
-			serviceOrg = "service-provider-test-org"
+		organizationName := cfg.Get("organizationName")
+		if organizationName == "" {
+			organizationName = "service-provider-test-org"
 		}
 
 		approvers, err := v2.NewPolicyGroup(ctx, "approvers", &v2.PolicyGroupArgs{
-			OrgName:    pulumi.String(serviceOrg),
+			OrgName:    pulumi.String(organizationName),
 			Name:       pulumi.String("v2-approvers"),
 			EntityType: pulumi.String("stacks"),
 		})

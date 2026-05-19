@@ -14,13 +14,13 @@ const idpDescriptor = `<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
 		cfg := config.New(ctx, "")
-		serviceOrg := cfg.Get("serviceOrg")
-		if serviceOrg == "" {
-			serviceOrg = "service-provider-test-org"
+		organizationName := cfg.Get("organizationName")
+		if organizationName == "" {
+			organizationName = "service-provider-test-org"
 		}
 
 		_, err := auth.NewSAML(ctx, "saml", &auth.SAMLArgs{
-			OrgName:             pulumi.String(serviceOrg),
+			OrgName:             pulumi.String(organizationName),
 			NewIdpSsoDescriptor: pulumi.String(idpDescriptor),
 		})
 		return err

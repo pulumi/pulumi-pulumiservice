@@ -16,21 +16,21 @@ public class App {
     public static void main(String[] args) {
         Pulumi.run(ctx -> {
             var config = ctx.config();
-            var serviceOrg = config.get("serviceOrg").orElse("service-provider-test-org");
+            var organizationName = config.get("organizationName").orElse("service-provider-test-org");
             var projectName = config.get("projectName").orElse("pulumi-service-schedules-example");
             var stackName = config.get("stackName").orElse("dev");
             var scheduleCron = config.get("scheduleCron").orElse("0 7 * * *");
 
             var parentStack = new Stack("parentStack",
                 StackArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .projectName(projectName)
                     .stackName(stackName)
                     .build());
 
             var parentSettings = new Settings("parentSettings",
                 SettingsArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .projectName(projectName)
                     .stackName(stackName)
                     .sourceContext(Map.of("git", Map.of(
@@ -41,7 +41,7 @@ public class App {
 
             var nightlyDeploy = new ScheduledDeployment("nightlyDeploy",
                 ScheduledDeploymentArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .projectName(projectName)
                     .stackName(stackName)
                     .scheduleCron(scheduleCron)

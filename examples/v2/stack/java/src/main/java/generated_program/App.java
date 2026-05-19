@@ -10,14 +10,14 @@ public class App {
     public static void main(String[] args) {
         Pulumi.run(ctx -> {
             var config = ctx.config();
-            var serviceOrg = config.get("serviceOrg").orElse("service-provider-test-org");
+            var organizationName = config.get("organizationName").orElse("service-provider-test-org");
             var projectName = config.get("projectName").orElse("pulumi-service-stack-example");
             var stackName = config.get("stackName").orElse("dev");
             var stackPurpose = config.get("stackPurpose").orElse("demo");
 
             var exampleStack = new Stack("exampleStack",
                 StackArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .projectName(projectName)
                     .stackName(stackName)
                     .tags(Map.of(

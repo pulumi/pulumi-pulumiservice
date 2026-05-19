@@ -5,7 +5,7 @@ using Ps = Pulumi.PulumiService;
 return await Deployment.RunAsync(() =>
 {
     var config = new Config();
-    var serviceOrg = config.Get("serviceOrg") ?? "service-provider-test-org";
+    var organizationName = config.Get("organizationName") ?? "service-provider-test-org";
     var serviceSuffix = config.Get("serviceSuffix") ?? "dev";
 
     var stackItem = ImmutableDictionary<string, object>.Empty
@@ -20,7 +20,7 @@ return await Deployment.RunAsync(() =>
 
     new Ps.V2.Services.Service("catalogService", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         Name = $"v2-service-{serviceSuffix}",
         Description = "An example v2 service catalog entry.",
         OwnerType = "team",

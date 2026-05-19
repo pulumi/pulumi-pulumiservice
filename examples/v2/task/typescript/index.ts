@@ -2,18 +2,18 @@ import * as pulumi from "@pulumi/pulumi";
 import * as ps from "@pulumi/pulumiservice";
 
 const config = new pulumi.Config();
-const serviceOrg = config.get("serviceOrg") ?? "service-provider-test-org";
+const organizationName = config.get("organizationName") ?? "service-provider-test-org";
 const taskSuffix = config.get("taskSuffix") ?? "dev";
 const taskID = config.get("taskID") ?? "example-task-id";
 
 const pool = new ps.v2.agents.Pool("pool", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     name: `v2-task-pool-${taskSuffix}`,
     description: "Pool used by the v2 task example",
 });
 
 new ps.v2.agents.Task("task", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     taskID: taskID,
     approvalMode: "manual",
     permissionMode: "default",

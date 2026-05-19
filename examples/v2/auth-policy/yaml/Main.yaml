@@ -6,7 +6,7 @@ resources:
   policy:
     type: pulumiservice:v2/auth:Policy
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       policyId: ${policyId}
       policies:
         - decision: allow

@@ -2,12 +2,12 @@ import pulumi
 import pulumi_pulumiservice.v2 as ps_v2
 
 config = pulumi.Config()
-service_org = config.get("serviceOrg") or "service-provider-test-org"
+organization_name = config.get("organizationName") or "service-provider-test-org"
 policy_id = config.get("policyId") or "org"
 
 ps_v2.auth.Policy(
     "policy",
-    org_name=service_org,
+    org_name=organization_name,
     policy_id=policy_id,
     policies=[
         {"decision": "allow", "permission": "read", "tokenType": "organization"},

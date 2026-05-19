@@ -2,13 +2,13 @@ import * as pulumi from "@pulumi/pulumi";
 import * as ps from "@pulumi/pulumiservice";
 
 const config = new pulumi.Config();
-const serviceOrg = config.get("serviceOrg") ?? "service-provider-test-org";
+const organizationName = config.get("organizationName") ?? "service-provider-test-org";
 const vcsSuffix = config.get("vcsSuffix") ?? "dev";
 const baseUrl = config.get("baseUrl") ?? "https://git.example.invalid";
 const envRef = config.get("envRef") ?? "organization/vcs-credentials";
 
 const integration = new ps.v2.integrations.CustomVCSIntegration("integration", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     name: `v2-custom-vcs-${vcsSuffix}`,
     baseUrl: baseUrl,
     vcsType: "gitea",
@@ -16,7 +16,7 @@ const integration = new ps.v2.integrations.CustomVCSIntegration("integration", {
 });
 
 const repository = new ps.v2.integrations.CustomVCSRepository("repository", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     integrationId: integration.integrationId,
     name: `example-repo-${vcsSuffix}`,
     displayName: "Example Repository",

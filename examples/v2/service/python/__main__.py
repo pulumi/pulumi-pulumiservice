@@ -2,12 +2,12 @@ import pulumi
 import pulumi_pulumiservice.v2 as ps_v2
 
 config = pulumi.Config()
-service_org = config.get("serviceOrg") or "service-provider-test-org"
+organization_name = config.get("organizationName") or "service-provider-test-org"
 service_suffix = config.get("serviceSuffix") or "dev"
 
 ps_v2.services.Service(
     "catalogService",
-    org_name=service_org,
+    org_name=organization_name,
     name=f"v2-service-{service_suffix}",
     description="An example v2 service catalog entry.",
     owner_type="team",

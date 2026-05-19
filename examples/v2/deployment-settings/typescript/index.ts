@@ -2,20 +2,20 @@ import * as pulumi from "@pulumi/pulumi";
 import * as ps from "@pulumi/pulumiservice";
 
 const config = new pulumi.Config();
-const serviceOrg = config.get("serviceOrg") ?? "service-provider-test-org";
+const organizationName = config.get("organizationName") ?? "service-provider-test-org";
 const projectName = config.get("projectName") ?? "my-new-project";
 const stackName = config.get("stackName") ?? "dev";
 const executorImage = config.get("executorImage") ?? "pulumi-cli";
 
 // DeploymentSettings is a singleton-per-stack — ensure the stack exists first.
 const parentStack = new ps.v2.stacks.Stack("parentStack", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     projectName: projectName,
     stackName: stackName,
 });
 
 const settings = new ps.v2.deployments.Settings("settings", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     projectName: projectName,
     stackName: stackName,
     executorContext: { executorImage: executorImage },
@@ -34,4 +34,4 @@ const settings = new ps.v2.deployments.Settings("settings", {
 
 // stackName is a path-param input; reference the source value rather than
 // the resource (deployments:Settings doesn't surface stackName on state).
-export const stackId = pulumi.interpolate`${serviceOrg}/${projectName}/${stackName}`;
+export const stackId = pulumi.interpolate`${organizationName}/${projectName}/${stackName}`;

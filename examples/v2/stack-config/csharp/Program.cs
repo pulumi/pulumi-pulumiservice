@@ -5,7 +5,7 @@ using Ps = Pulumi.PulumiService;
 return await Deployment.RunAsync(() =>
 {
     var config = new Config();
-    var serviceOrg = config.Get("serviceOrg") ?? "service-provider-test-org";
+    var organizationName = config.Get("organizationName") ?? "service-provider-test-org";
     var projectName = config.Get("projectName") ?? "v2-stack-config-example";
     var stackName = config.Get("stackName") ?? "dev";
     var hookUrl = config.Get("hookUrl") ?? "https://example.invalid/hooks/example";
@@ -13,14 +13,14 @@ return await Deployment.RunAsync(() =>
 
     var parentStack = new Ps.V2.Stacks.Stack("parentStack", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         ProjectName = projectName,
         StackName = stackName,
     });
 
     new Ps.V2.Stacks.Config("config", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         ProjectName = parentStack.ProjectName,
         StackName = parentStack.StackName,
         Environment = envRef,
@@ -28,7 +28,7 @@ return await Deployment.RunAsync(() =>
 
     new Ps.V2.Stacks.Webhook("hook", new()
     {
-        OrganizationName = serviceOrg,
+        OrganizationName = organizationName,
         ProjectName = parentStack.ProjectName,
         StackName = parentStack.StackName,
         Name = "v2-stackhook",

@@ -2,7 +2,7 @@ name: pulumicloud-v2-platform-bootstrap
 runtime: yaml
 description: Day-1 platform bootstrap for a fresh Pulumi Cloud org.
 config:
-  serviceOrg:
+  organizationName:
     type: string
     default: service-provider-test-org
   suffix:

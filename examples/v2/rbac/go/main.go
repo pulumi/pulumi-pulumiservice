@@ -10,9 +10,9 @@ import (
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
 		cfg := config.New(ctx, "")
-		serviceOrg := cfg.Get("serviceOrg")
-		if serviceOrg == "" {
-			serviceOrg = "service-provider-test-org"
+		organizationName := cfg.Get("organizationName")
+		if organizationName == "" {
+			organizationName = "service-provider-test-org"
 		}
 		nameSuffix := cfg.Get("nameSuffix")
 		if nameSuffix == "" {
@@ -24,7 +24,7 @@ func main() {
 		}
 
 		readOnlyRole, err := v2.NewRole(ctx, "readOnlyRole", &v2.RoleArgs{
-			OrgName:     pulumi.String(serviceOrg),
+			OrgName:     pulumi.String(organizationName),
 			Name:        pulumi.String("v2-rbac-read-only-" + nameSuffix),
 			Description: pulumi.String(roleDescription),
 			UxPurpose:   pulumi.String("role"),
@@ -38,7 +38,7 @@ func main() {
 		}
 
 		rbacTeam, err := teams.NewTeam(ctx, "rbacTeam", &teams.TeamArgs{
-			OrgName:     pulumi.String(serviceOrg),
+			OrgName:     pulumi.String(organizationName),
 			Name:        pulumi.String("v2-rbac-team-" + nameSuffix),
 			DisplayName: pulumi.String("v2 RBAC Team " + nameSuffix),
 			Description: pulumi.String("Team scaffold used by the v2 rbac example."),

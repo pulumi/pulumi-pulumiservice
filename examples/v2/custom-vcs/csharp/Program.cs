@@ -5,14 +5,14 @@ using Ps = Pulumi.PulumiService;
 return await Deployment.RunAsync(() =>
 {
     var config = new Config();
-    var serviceOrg = config.Get("serviceOrg") ?? "service-provider-test-org";
+    var organizationName = config.Get("organizationName") ?? "service-provider-test-org";
     var vcsSuffix = config.Get("vcsSuffix") ?? "dev";
     var baseUrl = config.Get("baseUrl") ?? "https://git.example.invalid";
     var envRef = config.Get("envRef") ?? "organization/vcs-credentials";
 
     var integration = new Ps.V2.Integrations.CustomVCSIntegration("integration", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         Name = $"v2-custom-vcs-{vcsSuffix}",
         BaseUrl = baseUrl,
         VcsType = "gitea",
@@ -21,7 +21,7 @@ return await Deployment.RunAsync(() =>
 
     var repository = new Ps.V2.Integrations.CustomVCSRepository("repository", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         IntegrationId = integration.IntegrationId,
         Name = $"example-repo-{vcsSuffix}",
         DisplayName = "Example Repository",

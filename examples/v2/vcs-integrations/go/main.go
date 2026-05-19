@@ -9,9 +9,9 @@ import (
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
 		cfg := config.New(ctx, "")
-		serviceOrg := cfg.Get("serviceOrg")
-		if serviceOrg == "" {
-			serviceOrg = "service-provider-test-org"
+		organizationName := cfg.Get("organizationName")
+		if organizationName == "" {
+			organizationName = "service-provider-test-org"
 		}
 		githubID := cfg.Get("githubIntegrationId")
 		if githubID == "" {
@@ -35,7 +35,7 @@ func main() {
 		}
 
 		if _, err := integrations.NewGitHubIntegration(ctx, "github", &integrations.GitHubIntegrationArgs{
-			OrgName:                     pulumi.String(serviceOrg),
+			OrgName:                     pulumi.String(organizationName),
 			IntegrationId:               pulumi.String(githubID),
 			DisablePRComments:           pulumi.Bool(false),
 			DisableDetailedDiff:         pulumi.Bool(false),
@@ -46,7 +46,7 @@ func main() {
 		}
 
 		if _, err := integrations.NewGitHubEnterpriseIntegration(ctx, "githubEnterprise", &integrations.GitHubEnterpriseIntegrationArgs{
-			OrgName:                     pulumi.String(serviceOrg),
+			OrgName:                     pulumi.String(organizationName),
 			IntegrationId:               pulumi.String(githubEnterpriseID),
 			DisablePRComments:           pulumi.Bool(true),
 			DisableDetailedDiff:         pulumi.Bool(false),
@@ -57,7 +57,7 @@ func main() {
 		}
 
 		if _, err := integrations.NewGitLabIntegration(ctx, "gitlab", &integrations.GitLabIntegrationArgs{
-			OrgName:             pulumi.String(serviceOrg),
+			OrgName:             pulumi.String(organizationName),
 			IntegrationId:       pulumi.String(gitlabID),
 			DisablePRComments:   pulumi.Bool(false),
 			DisableDetailedDiff: pulumi.Bool(false),
@@ -67,7 +67,7 @@ func main() {
 		}
 
 		if _, err := integrations.NewBitBucketIntegration(ctx, "bitbucket", &integrations.BitBucketIntegrationArgs{
-			OrgName:             pulumi.String(serviceOrg),
+			OrgName:             pulumi.String(organizationName),
 			IntegrationId:       pulumi.String(bitbucketID),
 			DisablePRComments:   pulumi.Bool(false),
 			DisableDetailedDiff: pulumi.Bool(false),
@@ -77,7 +77,7 @@ func main() {
 		}
 
 		if _, err := integrations.NewAzureDevOpsIntegration(ctx, "azureDevOps", &integrations.AzureDevOpsIntegrationArgs{
-			OrgName:             pulumi.String(serviceOrg),
+			OrgName:             pulumi.String(organizationName),
 			IntegrationId:       pulumi.String(azureDevOpsID),
 			DisablePRComments:   pulumi.Bool(true),
 			DisableDetailedDiff: pulumi.Bool(true),

@@ -2,13 +2,13 @@ resources:
   environment:
     type: pulumiservice:v2/esc:Environment
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       project: ${projectName}
       name: ${envName}
   hook:
     type: pulumiservice:v2/esc:Webhook
     properties:
-      organizationName: ${serviceOrg}
+      organizationName: ${organizationName}
       # esc:Environment treats project/name as program-owned inputs and
       # doesn't surface them on the resource state, so we feed config
       # values straight in and use dependsOn for the implicit ordering.

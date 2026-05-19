@@ -10,9 +10,9 @@ import (
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
 		cfg := config.New(ctx, "")
-		serviceOrg := cfg.Get("serviceOrg")
-		if serviceOrg == "" {
-			serviceOrg = "service-provider-test-org"
+		organizationName := cfg.Get("organizationName")
+		if organizationName == "" {
+			organizationName = "service-provider-test-org"
 		}
 		tokenSuffix := cfg.Get("tokenSuffix")
 		if tokenSuffix == "" {
@@ -24,7 +24,7 @@ func main() {
 		}
 
 		team, err := teams.NewTeam(ctx, "team", &teams.TeamArgs{
-			OrgName:     pulumi.String(serviceOrg),
+			OrgName:     pulumi.String(organizationName),
 			Name:        pulumi.String("v2-tokens-team-" + tokenSuffix),
 			DisplayName: pulumi.String("v2 Tokens Team " + tokenSuffix),
 			Description: pulumi.String("Owner team for the v2 access-tokens example"),
@@ -34,7 +34,7 @@ func main() {
 		}
 
 		orgToken, err := tokens.NewOrgToken(ctx, "orgToken", &tokens.OrgTokenArgs{
-			OrgName:     pulumi.String(serviceOrg),
+			OrgName:     pulumi.String(organizationName),
 			Name:        pulumi.String("v2-org-token-" + tokenSuffix),
 			Description: pulumi.String(tokenDescription),
 			Admin:       pulumi.Bool(false),
@@ -45,7 +45,7 @@ func main() {
 		}
 
 		teamToken, err := tokens.NewTeamToken(ctx, "teamToken", &tokens.TeamTokenArgs{
-			OrgName:     pulumi.String(serviceOrg),
+			OrgName:     pulumi.String(organizationName),
 			TeamName:    team.Name,
 			Name:        pulumi.String("v2-team-token-" + tokenSuffix),
 			Description: pulumi.String(tokenDescription),

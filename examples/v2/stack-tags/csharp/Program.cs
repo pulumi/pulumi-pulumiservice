@@ -5,21 +5,21 @@ using Ps = Pulumi.PulumiService;
 return await Deployment.RunAsync(() =>
 {
     var config = new Config();
-    var serviceOrg = config.Get("serviceOrg") ?? "service-provider-test-org";
+    var organizationName = config.Get("organizationName") ?? "service-provider-test-org";
     var projectName = config.Get("projectName") ?? "v2-stack-tags-example";
     var stackName = config.Get("stackName") ?? "dev";
     var tagValue = config.Get("tagValue") ?? "v2-tag-value";
 
     var parentStack = new Ps.V2.Stacks.Stack("parentStack", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         ProjectName = projectName,
         StackName = stackName,
     });
 
     new Ps.V2.Stacks.Tag("ownerTag", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         ProjectName = parentStack.ProjectName,
         StackName = parentStack.StackName,
         Name = "owner",
@@ -28,7 +28,7 @@ return await Deployment.RunAsync(() =>
 
     new Ps.V2.Stacks.Tag("customTag", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         ProjectName = parentStack.ProjectName,
         StackName = parentStack.StackName,
         Name = "purpose",

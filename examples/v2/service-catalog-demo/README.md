@@ -32,7 +32,7 @@ pulumi stack init demo
 pulumi up
 ```
 
-Override `serviceOrg` / `nameSuffix` via `pulumi config set` to retarget
+Override `organizationName` / `nameSuffix` via `pulumi config set` to retarget
 the org or namespace the demo's resource names.
 
 ## Demo runbook (≈5 min)

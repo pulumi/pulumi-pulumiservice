@@ -2,19 +2,19 @@ import * as pulumi from "@pulumi/pulumi";
 import * as ps from "@pulumi/pulumiservice";
 
 const config = new pulumi.Config();
-const serviceOrg = config.get("serviceOrg") ?? "service-provider-test-org";
+const organizationName = config.get("organizationName") ?? "service-provider-test-org";
 const projectName = config.get("projectName") ?? "v2-stack-tags-example";
 const stackName = config.get("stackName") ?? "dev";
 const tagValue = config.get("tagValue") ?? "v2-tag-value";
 
 const parentStack = new ps.v2.stacks.Stack("parentStack", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     projectName: projectName,
     stackName: stackName,
 });
 
 new ps.v2.stacks.Tag("ownerTag", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     projectName: parentStack.projectName,
     stackName: parentStack.stackName,
     name: "owner",
@@ -22,7 +22,7 @@ new ps.v2.stacks.Tag("ownerTag", {
 });
 
 new ps.v2.stacks.Tag("customTag", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     projectName: parentStack.projectName,
     stackName: parentStack.stackName,
     name: "purpose",

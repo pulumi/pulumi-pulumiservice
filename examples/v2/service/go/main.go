@@ -9,9 +9,9 @@ import (
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
 		cfg := config.New(ctx, "")
-		serviceOrg := cfg.Get("serviceOrg")
-		if serviceOrg == "" {
-			serviceOrg = "service-provider-test-org"
+		organizationName := cfg.Get("organizationName")
+		if organizationName == "" {
+			organizationName = "service-provider-test-org"
 		}
 		serviceSuffix := cfg.Get("serviceSuffix")
 		if serviceSuffix == "" {
@@ -19,7 +19,7 @@ func main() {
 		}
 
 		_, err := services.NewService(ctx, "catalogService", &services.ServiceArgs{
-			OrgName:     pulumi.String(serviceOrg),
+			OrgName:     pulumi.String(organizationName),
 			Name:        pulumi.String("v2-service-" + serviceSuffix),
 			Description: pulumi.String("An example v2 service catalog entry."),
 			OwnerType:   pulumi.String("team"),

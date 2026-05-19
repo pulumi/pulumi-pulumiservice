@@ -13,28 +13,28 @@ resources:
   catalogService:
     type: pulumiservice:v2/services:Service
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       name: ${serviceNameValue}
       description: Service for the service-items example.
       ownerType: ${ownerType}
       ownerName: ${ownerName}
       items:
         - kind: stack
-          ref: ${serviceOrg}/example-app/dev
+          ref: ${organizationName}/example-app/dev
       properties:
         - key: tier
           value: gold
   extraItem:
     type: pulumiservice:v2/services:Item
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       ownerType: ${ownerType}
       ownerName: ${ownerName}
       # serviceName is an input (program-owned); reuse the source value.
       serviceName: ${serviceNameValue}
       items:
         - kind: stack
-          ref: ${serviceOrg}/example-app/staging
+          ref: ${organizationName}/example-app/staging
     options:
       dependsOn:
         - ${catalogService}

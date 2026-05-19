@@ -9,9 +9,9 @@ import (
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
 		cfg := config.New(ctx, "")
-		serviceOrg := cfg.Get("serviceOrg")
-		if serviceOrg == "" {
-			serviceOrg = "service-provider-test-org"
+		organizationName := cfg.Get("organizationName")
+		if organizationName == "" {
+			organizationName = "service-provider-test-org"
 		}
 		policyId := cfg.Get("policyId")
 		if policyId == "" {
@@ -19,7 +19,7 @@ func main() {
 		}
 
 		_, err := auth.NewPolicy(ctx, "policy", &auth.PolicyArgs{
-			OrgName:  pulumi.String(serviceOrg),
+			OrgName:  pulumi.String(organizationName),
 			PolicyId: pulumi.String(policyId),
 			Policies: pulumi.Array{
 				pulumi.Map{

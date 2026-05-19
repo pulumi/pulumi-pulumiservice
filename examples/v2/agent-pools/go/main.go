@@ -9,9 +9,9 @@ import (
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
 		cfg := config.New(ctx, "")
-		serviceOrg := cfg.Get("serviceOrg")
-		if serviceOrg == "" {
-			serviceOrg = "service-provider-test-org"
+		organizationName := cfg.Get("organizationName")
+		if organizationName == "" {
+			organizationName = "service-provider-test-org"
 		}
 		poolSuffix := cfg.Get("poolSuffix")
 		if poolSuffix == "" {
@@ -23,7 +23,7 @@ func main() {
 		}
 
 		pool, err := agents.NewPool(ctx, "pool", &agents.PoolArgs{
-			OrgName:     pulumi.String(serviceOrg),
+			OrgName:     pulumi.String(organizationName),
 			Name:        pulumi.String("v2-agent-pool-" + poolSuffix),
 			Description: pulumi.String(poolDescription),
 		})

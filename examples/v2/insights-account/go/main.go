@@ -9,9 +9,9 @@ import (
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
 		cfg := config.New(ctx, "")
-		serviceOrg := cfg.Get("serviceOrg")
-		if serviceOrg == "" {
-			serviceOrg = "service-provider-test-org"
+		organizationName := cfg.Get("organizationName")
+		if organizationName == "" {
+			organizationName = "service-provider-test-org"
 		}
 		accountSuffix := cfg.Get("accountSuffix")
 		if accountSuffix == "" {
@@ -24,7 +24,7 @@ func main() {
 
 		accountNameValue := "v2-insights-" + accountSuffix
 		account, err := insights.NewAccount(ctx, "account", &insights.AccountArgs{
-			OrgName:      pulumi.String(serviceOrg),
+			OrgName:      pulumi.String(organizationName),
 			AccountName:  pulumi.String(accountNameValue),
 			Provider:     pulumi.String("aws"),
 			Environment:  pulumi.String(insightsEnv),
@@ -35,7 +35,7 @@ func main() {
 		}
 
 		if _, err := insights.NewScheduledScanSettings(ctx, "scanSettings", &insights.ScheduledScanSettingsArgs{
-			OrgName:      pulumi.String(serviceOrg),
+			OrgName:      pulumi.String(organizationName),
 			AccountName:  pulumi.String(accountNameValue),
 			Paused:       pulumi.Bool(true),
 			ScheduleCron: pulumi.String("0 6 * * *"),

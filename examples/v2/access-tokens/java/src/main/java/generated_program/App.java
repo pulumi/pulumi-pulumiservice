@@ -14,13 +14,13 @@ public class App {
     public static void main(String[] args) {
         Pulumi.run(ctx -> {
             var config = ctx.config();
-            var serviceOrg = config.get("serviceOrg").orElse("service-provider-test-org");
+            var organizationName = config.get("organizationName").orElse("service-provider-test-org");
             var tokenSuffix = config.get("tokenSuffix").orElse("dev");
             var tokenDescription = config.get("tokenDescription").orElse("example v2 access token");
 
             var team = new Team("team",
                 TeamArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .name("v2-tokens-team-" + tokenSuffix)
                     .displayName("v2 Tokens Team " + tokenSuffix)
                     .description("Owner team for the v2 access-tokens example")
@@ -28,7 +28,7 @@ public class App {
 
             var orgToken = new OrgToken("orgToken",
                 OrgTokenArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .name("v2-org-token-" + tokenSuffix)
                     .description(tokenDescription)
                     .admin(false)
@@ -37,7 +37,7 @@ public class App {
 
             var teamToken = new TeamToken("teamToken",
                 TeamTokenArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .teamName(team.name())
                     .name("v2-team-token-" + tokenSuffix)
                     .description(tokenDescription)

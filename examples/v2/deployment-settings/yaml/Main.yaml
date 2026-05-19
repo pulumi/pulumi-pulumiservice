@@ -4,13 +4,13 @@ resources:
   parentStack:
     type: pulumiservice:v2/stacks:Stack
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       projectName: ${projectName}
       stackName: ${stackName}
   settings:
     type: pulumiservice:v2/deployments:Settings
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       projectName: ${projectName}
       stackName: ${stackName}
       executorContext:

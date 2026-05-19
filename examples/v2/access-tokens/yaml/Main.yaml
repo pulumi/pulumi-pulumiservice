@@ -2,14 +2,14 @@ resources:
   team:
     type: pulumiservice:v2/teams:Team
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       name: v2-tokens-team-${tokenSuffix}
       displayName: v2 Tokens Team ${tokenSuffix}
       description: Owner team for the v2 access-tokens example
   orgToken:
     type: pulumiservice:v2/tokens:OrgToken
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       name: v2-org-token-${tokenSuffix}
       description: ${tokenDescription}
       admin: false
@@ -17,7 +17,7 @@ resources:
   teamToken:
     type: pulumiservice:v2/tokens:TeamToken
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       teamName: ${team.name}
       name: v2-team-token-${tokenSuffix}
       description: ${tokenDescription}

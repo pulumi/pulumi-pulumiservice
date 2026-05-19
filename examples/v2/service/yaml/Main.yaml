@@ -5,7 +5,7 @@ resources:
   catalogService:
     type: pulumiservice:v2/services:Service
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       name: v2-service-${serviceSuffix}
       description: An example v2 service catalog entry.
       ownerType: team

@@ -2,7 +2,7 @@ import * as pulumi from "@pulumi/pulumi";
 import * as ps from "@pulumi/pulumiservice";
 
 const config = new pulumi.Config();
-const serviceOrg = config.get("serviceOrg") ?? "service-provider-test-org";
+const organizationName = config.get("organizationName") ?? "service-provider-test-org";
 const nameSuffix = config.get("nameSuffix") ?? "demo";
 
 const projectName = `catalog-demo-${nameSuffix}`;
@@ -11,7 +11,7 @@ const envName = `platform-bootstrap-${nameSuffix}`;
 
 // === Owner team (re-impl of v1 Team in v2 namespace) ===
 const ownerTeam = new ps.v2.teams.Team("ownerTeam", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     name: `catalog-owner-${nameSuffix}`,
     displayName: "Catalog Demo Owner",
     description: "Owner team for the service catalog demo.",
@@ -19,24 +19,24 @@ const ownerTeam = new ps.v2.teams.Team("ownerTeam", {
 
 const stacks = {
     checkout: new ps.v2.stacks.Stack("checkoutStack", {
-        orgName: serviceOrg,
+        orgName: organizationName,
         projectName,
         stackName: "checkout-prod",
     }),
     search: new ps.v2.stacks.Stack("searchStack", {
-        orgName: serviceOrg,
+        orgName: organizationName,
         projectName,
         stackName: "search-prod",
     }),
     notification: new ps.v2.stacks.Stack("notificationStack", {
-        orgName: serviceOrg,
+        orgName: organizationName,
         projectName,
         stackName: "notification-prod",
     }),
 };
 
 new ps.v2.services.Service("checkoutService", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     name: `checkout-api-${nameSuffix}`,
     description: "Customer-facing checkout REST API. Handles cart submission, payment authorization, and order placement. SLO 99.95% / p99 250ms.",
     ownerType: "team",
@@ -53,7 +53,7 @@ new ps.v2.services.Service("checkoutService", {
 });
 
 new ps.v2.services.Service("searchService", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     name: `search-frontend-${nameSuffix}`,
     description: "Search results UI surface. Owns the search experience across web and mobile clients.",
     ownerType: "team",
@@ -70,7 +70,7 @@ new ps.v2.services.Service("searchService", {
 });
 
 new ps.v2.services.Service("notificationService", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     name: `notification-worker-${nameSuffix}`,
     description: "Async fan-out worker for email, SMS, and push notifications. Consumes events from the platform event bus.",
     ownerType: "team",
@@ -86,13 +86,13 @@ new ps.v2.services.Service("notificationService", {
 });
 
 const templates = new ps.v2.OrgTemplateCollection("templates", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     name: `platform-templates-${nameSuffix}`,
     sourceURL: "https://github.com/pulumi/templates.git",
 });
 
 const webhook = new ps.v2.OrganizationWebhook("webhook", {
-    organizationName: serviceOrg,
+    organizationName: organizationName,
     name: `bootstrap-webhook-${nameSuffix}`,
     displayName: "Platform bootstrap webhook",
     payloadUrl: "https://example.com/pulumi-webhook",
@@ -101,7 +101,7 @@ const webhook = new ps.v2.OrganizationWebhook("webhook", {
 });
 
 const env = new ps.v2.esc.Environment("bootstrapEnv", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     project: envProject,
     name: envName,
     yaml: [
@@ -113,7 +113,7 @@ const env = new ps.v2.esc.Environment("bootstrapEnv", {
 });
 
 const envSchedule = new ps.v2.esc.EnvironmentSchedule("envSchedule", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     projectName: envProject,
     envName: envName,
     scheduleCron: "0 9 * * *",
@@ -123,16 +123,16 @@ const envSchedule = new ps.v2.esc.EnvironmentSchedule("envSchedule", {
 // const customRoleID = "";
 
 // const customRole = new ps.v2.Role("customRole", {
-//     orgName: serviceOrg,
+//     orgName: organizationName,
 //     roleID: customRoleID,
-// }, { import: `${serviceOrg}/${customRoleID}` });
+// }, { import: `${organizationName}/${customRoleID}` });
 
 // new ps.v2.teams.Role("customRoleAssignment", {
-//     orgName: serviceOrg,
+//     orgName: organizationName,
 //     teamName: ownerTeam.name,
 //     roleID: customRoleID,
 // }, {
-//     import: `${serviceOrg}/catalog-owner-${nameSuffix}/${customRoleID}`,
+//     import: `${organizationName}/catalog-owner-${nameSuffix}/${customRoleID}`,
 //     dependsOn: [customRole],
 // });
 

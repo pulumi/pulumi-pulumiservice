@@ -9,13 +9,13 @@ import (
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
 		cfg := config.New(ctx, "")
-		serviceOrg := cfg.Get("serviceOrg")
-		if serviceOrg == "" {
-			serviceOrg = "service-provider-test-org"
+		organizationName := cfg.Get("organizationName")
+		if organizationName == "" {
+			organizationName = "service-provider-test-org"
 		}
 
 		pack, err := v2.NewPolicyPack(ctx, "pack", &v2.PolicyPackArgs{
-			OrgName:     pulumi.String(serviceOrg),
+			OrgName:     pulumi.String(organizationName),
 			Name:        pulumi.String("v2-example-policy-pack"),
 			DisplayName: pulumi.String("v2 example policy pack"),
 			Description: pulumi.String("Demo policy pack created via v2 metadata-driven provider."),

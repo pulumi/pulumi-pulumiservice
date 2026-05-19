@@ -2,12 +2,12 @@ import * as pulumi from "@pulumi/pulumi";
 import * as ps from "@pulumi/pulumiservice";
 
 const config = new pulumi.Config();
-const serviceOrg = config.get("serviceOrg") ?? "service-provider-test-org";
+const organizationName = config.get("organizationName") ?? "service-provider-test-org";
 const secretValue = config.get("secretValue") ?? "shhh";
 const hookSuffix = config.get("hookSuffix") ?? "dev";
 
 const orgWebhookAll = new ps.v2.OrganizationWebhook("orgWebhookAll", {
-    organizationName: serviceOrg,
+    organizationName: organizationName,
     name: `org-webhook-all-${hookSuffix}`,
     displayName: "webhook-from-provider",
     payloadUrl: "https://google.com",
@@ -16,7 +16,7 @@ const orgWebhookAll = new ps.v2.OrganizationWebhook("orgWebhookAll", {
 });
 
 const orgWebhookGroups = new ps.v2.OrganizationWebhook("orgWebhookGroups", {
-    organizationName: serviceOrg,
+    organizationName: organizationName,
     name: `org-webhook-groups-${hookSuffix}`,
     displayName: "webhook-from-provider",
     payloadUrl: "https://google.com",

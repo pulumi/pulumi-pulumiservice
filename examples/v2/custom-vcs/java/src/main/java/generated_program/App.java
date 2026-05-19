@@ -10,14 +10,14 @@ public class App {
     public static void main(String[] args) {
         Pulumi.run(ctx -> {
             var config = ctx.config();
-            var serviceOrg = config.get("serviceOrg").orElse("service-provider-test-org");
+            var organizationName = config.get("organizationName").orElse("service-provider-test-org");
             var vcsSuffix = config.get("vcsSuffix").orElse("dev");
             var baseUrl = config.get("baseUrl").orElse("https://git.example.invalid");
             var envRef = config.get("envRef").orElse("organization/vcs-credentials");
 
             var integration = new CustomVCSIntegration("integration",
                 CustomVCSIntegrationArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .name("v2-custom-vcs-" + vcsSuffix)
                     .baseUrl(baseUrl)
                     .vcsType("gitea")
@@ -26,7 +26,7 @@ public class App {
 
             var repository = new CustomVCSRepository("repository",
                 CustomVCSRepositoryArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .integrationId(integration.integrationId())
                     .name("example-repo-" + vcsSuffix)
                     .displayName("Example Repository")

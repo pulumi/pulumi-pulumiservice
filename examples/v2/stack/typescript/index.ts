@@ -2,13 +2,13 @@ import * as pulumi from "@pulumi/pulumi";
 import * as ps from "@pulumi/pulumiservice";
 
 const config = new pulumi.Config();
-const serviceOrg = config.get("serviceOrg") ?? "service-provider-test-org";
+const organizationName = config.get("organizationName") ?? "service-provider-test-org";
 const projectName = config.get("projectName") ?? "pulumi-service-stack-example";
 const stackName = config.get("stackName") ?? "dev";
 const stackPurpose = config.get("stackPurpose") ?? "demo";
 
 const exampleStack = new ps.v2.stacks.Stack("exampleStack", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     projectName: projectName,
     stackName: stackName,
     tags: {

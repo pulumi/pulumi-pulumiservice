@@ -5,7 +5,7 @@ using Ps = Pulumi.PulumiService;
 return await Deployment.RunAsync(() =>
 {
     var config = new Config();
-    var serviceOrg = config.Get("serviceOrg") ?? "service-provider-test-org";
+    var organizationName = config.Get("organizationName") ?? "service-provider-test-org";
     var policyId = config.Get("policyId") ?? "org";
 
     var allowPolicy = ImmutableDictionary<string, object>.Empty
@@ -19,7 +19,7 @@ return await Deployment.RunAsync(() =>
 
     new Ps.V2.Auth.Policy("policy", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         PolicyId = policyId,
         Policies = new object[] { allowPolicy, denyPolicy },
     });

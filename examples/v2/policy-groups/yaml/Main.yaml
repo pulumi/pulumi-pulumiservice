@@ -2,7 +2,7 @@ resources:
   group:
     type: pulumiservice:v2:PolicyGroup
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       name: ${groupName}
       entityType: stacks
 outputs:

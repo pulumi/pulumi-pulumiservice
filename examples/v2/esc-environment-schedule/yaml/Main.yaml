@@ -2,13 +2,13 @@ resources:
   environment:
     type: pulumiservice:v2/esc:Environment
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       project: ${projectName}
       name: ${envName}
   schedule:
     type: pulumiservice:v2/esc:EnvironmentSchedule
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       projectName: ${projectName}
       envName: ${envName}
       scheduleCron: ${scheduleCron}

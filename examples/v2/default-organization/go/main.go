@@ -9,19 +9,19 @@ import (
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
 		cfg := config.New(ctx, "")
-		serviceOrg := cfg.Get("serviceOrg")
-		if serviceOrg == "" {
-			serviceOrg = "service-provider-test-org"
+		organizationName := cfg.Get("organizationName")
+		if organizationName == "" {
+			organizationName = "service-provider-test-org"
 		}
 
 		def, err := v2.NewDefaultOrganization(ctx, "default", &v2.DefaultOrganizationArgs{
-			OrgName: pulumi.String(serviceOrg),
+			OrgName: pulumi.String(organizationName),
 		})
 		if err != nil {
 			return err
 		}
 
-		ctx.Export("defaultOrg", pulumi.String(serviceOrg))
+		ctx.Export("defaultOrg", pulumi.String(organizationName))
 		ctx.Export("defaultOrgGitHubLogin", def.GitHubLogin)
 		return nil
 	})

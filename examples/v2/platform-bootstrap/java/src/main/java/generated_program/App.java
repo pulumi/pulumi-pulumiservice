@@ -33,7 +33,7 @@ public class App {
     public static void main(String[] args) {
         Pulumi.run(ctx -> {
             var config = ctx.config();
-            var serviceOrg = config.get("serviceOrg").orElse("service-provider-test-org");
+            var organizationName = config.get("organizationName").orElse("service-provider-test-org");
             var suffix = config.get("suffix").orElse("dev");
             var prodApprovalEnabled = config.getBoolean("prodApprovalEnabled").orElse(true);
             var slackWebhookUrl = config.get("slackWebhookUrl")
@@ -42,11 +42,11 @@ public class App {
                 .orElse("https://events.pagerduty.com/v2/enqueue");
 
             new DefaultOrganization("defaultOrg",
-                DefaultOrganizationArgs.builder().orgName(serviceOrg).build());
+                DefaultOrganizationArgs.builder().orgName(organizationName).build());
 
             new OidcIssuer("githubIssuer",
                 OidcIssuerArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .name("github_issuer_" + suffix)
                     .url("https://token.actions.githubusercontent.com")
                     .thumbprints(List.of("b41ae0832808ebc94951437bf7e92b93ccb6479364daf894d46d6001bee7a486"))
@@ -54,7 +54,7 @@ public class App {
                     .build());
             new OidcIssuer("pulumiSelfIssuer",
                 OidcIssuerArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .name("pulumi_issuer_" + suffix)
                     .url("https://api.pulumi.com/oidc")
                     .thumbprints(List.of("57d3e89f6b25dde3c174dc558e2b2623306a9d81f88a12e8ae7090a86c12f1da"))
@@ -62,7 +62,7 @@ public class App {
 
             var platformTeam = new Team("platformTeam",
                 TeamArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .name("platform-team-" + suffix)
                     .displayName("Platform Team " + suffix)
                     .description("Owns shared infra, runs the deployments engine.")
@@ -70,7 +70,7 @@ public class App {
 
             new Role("stackReadonlyRole",
                 RoleArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .name("stack-readonly-" + suffix)
                     .description("Read-only access to stacks, scoped via the platform team.")
                     .uxPurpose("role")
@@ -81,7 +81,7 @@ public class App {
 
             var ciToken = new OrgToken("ciToken",
                 OrgTokenArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .name("ci-" + suffix)
                     .description("Used by CI/CD to deploy non-prod stacks.")
                     .admin(false)
@@ -89,7 +89,7 @@ public class App {
                     .build());
             new TeamToken("teamToken",
                 TeamTokenArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .teamName(platformTeam.name())
                     .name("platform-team-token-" + suffix)
                     .description("Platform-team-scoped token for shared automation.")
@@ -98,27 +98,27 @@ public class App {
 
             var runnersPool = new Pool("runnersPool",
                 PoolArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .name("platform-runners-" + suffix)
                     .description("Self-hosted deployment runner pool.")
                     .build());
 
             var templates = new OrgTemplateCollection("templates",
                 OrgTemplateCollectionArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .name("platform-templates-" + suffix)
                     .sourceURL("https://github.com/pulumi/examples")
                     .build());
 
             var sharedCredentials = new Environment("sharedCredentials",
                 EnvironmentArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .project("shared")
                     .name("credentials-" + suffix)
                     .build());
             new EnvironmentTag("stableTag",
                 EnvironmentTagArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .projectName(sharedCredentials.project())
                     .envName(sharedCredentials.name())
                     .name("stable")
@@ -127,13 +127,13 @@ public class App {
 
             var stagingStack = new Stack("stagingStack",
                 StackArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .projectName("platform-app-" + suffix)
                     .stackName("staging")
                     .build());
             var prodStack = new Stack("prodStack",
                 StackArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .projectName("platform-app-" + suffix)
                     .stackName("prod")
                     .build());
@@ -143,14 +143,14 @@ public class App {
 
             new Config("stagingConfig",
                 ConfigArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .projectName(stagingStack.projectName())
                     .stackName(stagingStack.stackName())
                     .environment(sharedEnvRef)
                     .build());
             new Config("prodConfig",
                 ConfigArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .projectName(prodStack.projectName())
                     .stackName(prodStack.stackName())
                     .environment(sharedEnvRef)
@@ -159,7 +159,7 @@ public class App {
             for (var entry : Map.of("owner", "platform-team", "tier", "gold", "cost-center", "platform").entrySet()) {
                 new Tag("prodTag-" + entry.getKey(),
                     TagArgs.builder()
-                        .orgName(serviceOrg)
+                        .orgName(organizationName)
                         .projectName(prodStack.projectName())
                         .stackName(prodStack.stackName())
                         .name(entry.getKey())
@@ -169,7 +169,7 @@ public class App {
 
             new Webhook("prodPagerDuty",
                 WebhookArgs.builder()
-                    .organizationName(serviceOrg)
+                    .organizationName(organizationName)
                     .projectName(prodStack.projectName())
                     .stackName(prodStack.stackName())
                     .name("prod-pagerduty")
@@ -181,14 +181,14 @@ public class App {
 
             new Settings("stagingDeploySettings",
                 SettingsArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .projectName(stagingStack.projectName())
                     .stackName(stagingStack.stackName())
                     .executorContext(Map.of("executorImage", Map.of("reference", "pulumi/pulumi:latest")))
                     .build());
             var prodDeploySettings = new Settings("prodDeploySettings",
                 SettingsArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .projectName(prodStack.projectName())
                     .stackName(prodStack.stackName())
                     .executorContext(Map.of("executorImage", Map.of("reference", "pulumi/pulumi:3-nonroot")))
@@ -196,7 +196,7 @@ public class App {
 
             new Gate("credsApprovalGate",
                 GateArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .name("creds-approval-" + suffix)
                     .enabled(prodApprovalEnabled)
                     .rule(Map.of(
@@ -214,7 +214,7 @@ public class App {
 
             new ScheduledDeployment("prodNightlyDeploy",
                 ScheduledDeploymentArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .projectName(prodStack.projectName())
                     .stackName(prodStack.stackName())
                     .scheduleCron("0 7 * * *")
@@ -224,7 +224,7 @@ public class App {
 
             new OrganizationWebhook("slack",
                 OrganizationWebhookArgs.builder()
-                    .organizationName(serviceOrg)
+                    .organizationName(organizationName)
                     .name("org-slack-" + suffix)
                     .displayName("Org Slack notifications")
                     .payloadUrl(slackWebhookUrl)
@@ -234,7 +234,7 @@ public class App {
 
             new PolicyGroup("starterPolicyGroup",
                 PolicyGroupArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .name("platform-policies-" + suffix)
                     .entityType("stacks")
                     .build());

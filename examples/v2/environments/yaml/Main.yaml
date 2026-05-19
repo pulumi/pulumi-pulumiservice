@@ -2,7 +2,7 @@ resources:
   environment:
     type: pulumiservice:v2/esc:Environment
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       project: ${projectName}
       name: testing-environment-${envSuffix}
 # Note: pulumiservice:v2/esc:RevisionTag isn't covered here because tagging

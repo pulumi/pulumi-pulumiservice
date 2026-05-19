@@ -2,7 +2,7 @@ resources:
   exampleStack:
     type: pulumiservice:v2/stacks:Stack
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       projectName: ${projectName}
       stackName: ${stackName}
       tags:

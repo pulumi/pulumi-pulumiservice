@@ -2,7 +2,7 @@ resources:
   team:
     type: pulumiservice:v2/teams:Team
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       name: v2-team-${teamSuffix}
       displayName: v2 Team ${teamSuffix}
       description: ${teamDescription}

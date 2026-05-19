@@ -2,7 +2,7 @@ resources:
   pulumiIssuer:
     type: pulumiservice:v2/auth:OidcIssuer
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       name: pulumi_issuer_${issuerSuffix}
       url: https://api.pulumi.com/oidc
       thumbprints:
@@ -10,7 +10,7 @@ resources:
   githubIssuer:
     type: pulumiservice:v2/auth:OidcIssuer
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       name: github_issuer_${issuerSuffix}
       url: https://token.actions.githubusercontent.com
       thumbprints:

@@ -9,9 +9,9 @@ import (
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
 		cfg := config.New(ctx, "")
-		serviceOrg := cfg.Get("serviceOrg")
-		if serviceOrg == "" {
-			serviceOrg = "service-provider-test-org"
+		organizationName := cfg.Get("organizationName")
+		if organizationName == "" {
+			organizationName = "service-provider-test-org"
 		}
 		bucketName := cfg.Get("bucketName")
 		if bucketName == "" {
@@ -23,7 +23,7 @@ func main() {
 		}
 
 		exportConfig, err := v2.NewAuditLogExportConfiguration(ctx, "exportConfig", &v2.AuditLogExportConfigurationArgs{
-			OrgName:    pulumi.String(serviceOrg),
+			OrgName:    pulumi.String(organizationName),
 			NewEnabled: pulumi.Bool(true),
 			NewS3Configuration: pulumi.Map{
 				"bucketName": pulumi.String(bucketName),

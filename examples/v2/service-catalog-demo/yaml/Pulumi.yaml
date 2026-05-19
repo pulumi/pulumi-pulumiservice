@@ -7,7 +7,7 @@ description: |
   oncall metadata. The catalog is a v2-only resource surface; no v1
   pulumiservice resource models org-wide service catalog entries.
 config:
-  serviceOrg:
+  organizationName:
     type: string
     default: service-provider-test-org
   nameSuffix:

@@ -2,10 +2,10 @@ import * as pulumi from "@pulumi/pulumi";
 import * as ps from "@pulumi/pulumiservice";
 
 const config = new pulumi.Config();
-const serviceOrg = config.get("serviceOrg") ?? "service-provider-test-org";
+const organizationName = config.get("organizationName") ?? "service-provider-test-org";
 
 const pack = new ps.v2.PolicyPack("pack", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     name: "v2-example-policy-pack",
     displayName: "v2 example policy pack",
     description: "Demo policy pack created via v2 metadata-driven provider.",

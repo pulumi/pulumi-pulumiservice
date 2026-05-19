@@ -2,12 +2,12 @@ import * as pulumi from "@pulumi/pulumi";
 import * as ps from "@pulumi/pulumiservice";
 
 const config = new pulumi.Config();
-const serviceOrg = config.get("serviceOrg") ?? "service-provider-test-org";
+const organizationName = config.get("organizationName") ?? "service-provider-test-org";
 const projectName = config.get("projectName") ?? "test-project";
 const envSuffix = config.get("envSuffix") ?? "dev";
 
 const environment = new ps.v2.esc.Environment("environment", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     project: projectName,
     name: `testing-environment-${envSuffix}`,
 });

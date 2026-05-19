@@ -2,27 +2,27 @@ import * as pulumi from "@pulumi/pulumi";
 import * as ps from "@pulumi/pulumiservice";
 
 const config = new pulumi.Config();
-const serviceOrg = config.get("serviceOrg") ?? "service-provider-test-org";
+const organizationName = config.get("organizationName") ?? "service-provider-test-org";
 const projectName = config.get("projectName") ?? "v2-stack-config-example";
 const stackName = config.get("stackName") ?? "dev";
 const hookUrl = config.get("hookUrl") ?? "https://example.invalid/hooks/example";
 const envRef = config.get("envRef") ?? "organization/credentials";
 
 const parentStack = new ps.v2.stacks.Stack("parentStack", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     projectName: projectName,
     stackName: stackName,
 });
 
 new ps.v2.stacks.Config("config", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     projectName: parentStack.projectName,
     stackName: parentStack.stackName,
     environment: envRef,
 });
 
 new ps.v2.stacks.Webhook("hook", {
-    organizationName: serviceOrg,
+    organizationName: organizationName,
     projectName: parentStack.projectName,
     stackName: parentStack.stackName,
     name: "v2-stackhook",

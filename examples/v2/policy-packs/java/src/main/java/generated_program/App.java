@@ -11,11 +11,11 @@ public class App {
     public static void main(String[] args) {
         Pulumi.run(ctx -> {
             var config = ctx.config();
-            var serviceOrg = config.get("serviceOrg").orElse("service-provider-test-org");
+            var organizationName = config.get("organizationName").orElse("service-provider-test-org");
 
             var pack = new PolicyPack("pack",
                 PolicyPackArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .name("v2-example-policy-pack")
                     .displayName("v2 example policy pack")
                     .description("Demo policy pack created via v2 metadata-driven provider.")

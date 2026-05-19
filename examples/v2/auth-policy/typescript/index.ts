@@ -2,11 +2,11 @@ import * as pulumi from "@pulumi/pulumi";
 import * as ps from "@pulumi/pulumiservice";
 
 const config = new pulumi.Config();
-const serviceOrg = config.get("serviceOrg") ?? "service-provider-test-org";
+const organizationName = config.get("organizationName") ?? "service-provider-test-org";
 const policyId = config.get("policyId") ?? "org";
 
 new ps.v2.auth.Policy("policy", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     policyId: policyId,
     policies: [
         { decision: "allow", permission: "read", tokenType: "organization" },

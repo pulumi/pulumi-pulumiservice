@@ -2,11 +2,11 @@ import * as pulumi from "@pulumi/pulumi";
 import * as ps from "@pulumi/pulumiservice";
 
 const config = new pulumi.Config();
-const serviceOrg = config.get("serviceOrg") ?? "service-provider-test-org";
+const organizationName = config.get("organizationName") ?? "service-provider-test-org";
 const serviceSuffix = config.get("serviceSuffix") ?? "dev";
 
 new ps.v2.services.Service("catalogService", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     name: `v2-service-${serviceSuffix}`,
     description: "An example v2 service catalog entry.",
     ownerType: "team",

@@ -4,7 +4,7 @@ using Ps = Pulumi.PulumiService;
 return await Deployment.RunAsync(() =>
 {
     var config = new Config();
-    var serviceOrg = config.Get("serviceOrg") ?? "service-provider-test-org";
+    var organizationName = config.Get("organizationName") ?? "service-provider-test-org";
     var githubId = config.Get("githubIntegrationId") ?? "gh-org-integration";
     var githubEnterpriseId = config.Get("githubEnterpriseIntegrationId") ?? "ghe-org-integration";
     var gitlabId = config.Get("gitlabIntegrationId") ?? "gl-org-integration";
@@ -13,7 +13,7 @@ return await Deployment.RunAsync(() =>
 
     new Ps.V2.Integrations.GitHubIntegration("github", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         IntegrationId = githubId,
         DisablePRComments = false,
         DisableDetailedDiff = false,
@@ -23,7 +23,7 @@ return await Deployment.RunAsync(() =>
 
     new Ps.V2.Integrations.GitHubEnterpriseIntegration("githubEnterprise", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         IntegrationId = githubEnterpriseId,
         DisablePRComments = true,
         DisableDetailedDiff = false,
@@ -33,7 +33,7 @@ return await Deployment.RunAsync(() =>
 
     new Ps.V2.Integrations.GitLabIntegration("gitlab", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         IntegrationId = gitlabId,
         DisablePRComments = false,
         DisableDetailedDiff = false,
@@ -42,7 +42,7 @@ return await Deployment.RunAsync(() =>
 
     new Ps.V2.Integrations.BitBucketIntegration("bitbucket", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         IntegrationId = bitbucketId,
         DisablePRComments = false,
         DisableDetailedDiff = false,
@@ -51,7 +51,7 @@ return await Deployment.RunAsync(() =>
 
     new Ps.V2.Integrations.AzureDevOpsIntegration("azureDevOps", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         IntegrationId = azureDevOpsId,
         DisablePRComments = true,
         DisableDetailedDiff = true,

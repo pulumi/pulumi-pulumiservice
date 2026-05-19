@@ -13,13 +13,13 @@ public class App {
     public static void main(String[] args) {
         Pulumi.run(ctx -> {
             var config = ctx.config();
-            var serviceOrg = config.get("serviceOrg").orElse("service-provider-test-org");
+            var organizationName = config.get("organizationName").orElse("service-provider-test-org");
             var nameSuffix = config.get("nameSuffix").orElse("manual");
             var roleDescription = config.get("roleDescription").orElse("Read-only access to stacks, created by the v2 rbac example.");
 
             var readOnlyRole = new Role("readOnlyRole",
                 RoleArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .name("v2-rbac-read-only-" + nameSuffix)
                     .description(roleDescription)
                     .uxPurpose("role")
@@ -30,7 +30,7 @@ public class App {
 
             var rbacTeam = new Team("rbacTeam",
                 TeamArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .name("v2-rbac-team-" + nameSuffix)
                     .displayName("v2 RBAC Team " + nameSuffix)
                     .description("Team scaffold used by the v2 rbac example.")

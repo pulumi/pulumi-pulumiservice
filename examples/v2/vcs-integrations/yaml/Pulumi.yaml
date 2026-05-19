@@ -1,7 +1,7 @@
 name: pulumicloud-v2-vcs-integrations
 runtime: yaml
 config:
-  serviceOrg:
+  organizationName:
     type: string
     default: service-provider-test-org
   githubIntegrationId:

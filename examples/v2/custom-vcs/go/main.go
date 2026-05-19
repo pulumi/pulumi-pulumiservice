@@ -9,9 +9,9 @@ import (
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
 		cfg := config.New(ctx, "")
-		serviceOrg := cfg.Get("serviceOrg")
-		if serviceOrg == "" {
-			serviceOrg = "service-provider-test-org"
+		organizationName := cfg.Get("organizationName")
+		if organizationName == "" {
+			organizationName = "service-provider-test-org"
 		}
 		vcsSuffix := cfg.Get("vcsSuffix")
 		if vcsSuffix == "" {
@@ -27,7 +27,7 @@ func main() {
 		}
 
 		integration, err := integrations.NewCustomVCSIntegration(ctx, "integration", &integrations.CustomVCSIntegrationArgs{
-			OrgName:     pulumi.String(serviceOrg),
+			OrgName:     pulumi.String(organizationName),
 			Name:        pulumi.String("v2-custom-vcs-" + vcsSuffix),
 			BaseUrl:     pulumi.String(baseUrl),
 			VcsType:     pulumi.String("gitea"),
@@ -38,7 +38,7 @@ func main() {
 		}
 
 		repository, err := integrations.NewCustomVCSRepository(ctx, "repository", &integrations.CustomVCSRepositoryArgs{
-			OrgName:       pulumi.String(serviceOrg),
+			OrgName:       pulumi.String(organizationName),
 			IntegrationId: integration.IntegrationId,
 			Name:          pulumi.String("example-repo-" + vcsSuffix),
 			DisplayName:   pulumi.String("Example Repository"),

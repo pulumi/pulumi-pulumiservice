@@ -6,21 +6,21 @@ using Ps = Pulumi.PulumiService;
 return await Deployment.RunAsync(() =>
 {
     var config = new Config();
-    var serviceOrg = config.Get("serviceOrg") ?? "service-provider-test-org";
+    var organizationName = config.Get("organizationName") ?? "service-provider-test-org";
     var projectName = config.Get("projectName") ?? "pulumi-service-schedules-example";
     var stackName = config.Get("stackName") ?? "dev";
     var scheduleCron = config.Get("scheduleCron") ?? "0 7 * * *";
 
     var parentStack = new Ps.V2.Stacks.Stack("parentStack", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         ProjectName = projectName,
         StackName = stackName,
     });
 
     var parentSettings = new Ps.V2.Deployments.Settings("parentSettings", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         ProjectName = projectName,
         StackName = stackName,
         SourceContext = ImmutableDictionary.CreateRange(new[]
@@ -35,7 +35,7 @@ return await Deployment.RunAsync(() =>
 
     var nightlyDeploy = new Ps.V2.Deployments.ScheduledDeployment("nightlyDeploy", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         ProjectName = projectName,
         StackName = stackName,
         ScheduleCron = scheduleCron,

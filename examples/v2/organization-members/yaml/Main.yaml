@@ -2,7 +2,7 @@ resources:
   member:
     type: pulumiservice:v2:OrganizationMember
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       userLogin: ${memberLogin}
       role: ${memberRole}
 outputs:

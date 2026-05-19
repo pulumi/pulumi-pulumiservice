@@ -10,20 +10,20 @@ public class App {
     public static void main(String[] args) {
         Pulumi.run(ctx -> {
             var config = ctx.config();
-            var serviceOrg = config.get("serviceOrg").orElse("service-provider-test-org");
+            var organizationName = config.get("organizationName").orElse("service-provider-test-org");
             var projectName = config.get("projectName").orElse("v2-envcfg-example");
             var envName = config.get("envName").orElse("v2-envcfg-env");
 
             var draft = new EnvironmentDraft("draft",
                 EnvironmentDraftArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .projectName(projectName)
                     .envName(envName)
                     .build());
 
             var settings = new EnvironmentSettings("settings",
                 EnvironmentSettingsArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .projectName(projectName)
                     .envName(envName)
                     .deletionProtected(true)

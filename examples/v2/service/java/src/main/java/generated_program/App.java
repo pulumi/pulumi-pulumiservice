@@ -11,12 +11,12 @@ public class App {
     public static void main(String[] args) {
         Pulumi.run(ctx -> {
             var config = ctx.config();
-            var serviceOrg = config.get("serviceOrg").orElse("service-provider-test-org");
+            var organizationName = config.get("organizationName").orElse("service-provider-test-org");
             var serviceSuffix = config.get("serviceSuffix").orElse("dev");
 
             new Service("catalogService",
                 ServiceArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .name("v2-service-" + serviceSuffix)
                     .description("An example v2 service catalog entry.")
                     .ownerType("team")

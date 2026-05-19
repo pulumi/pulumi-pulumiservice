@@ -6,21 +6,21 @@ using Ps = Pulumi.PulumiService;
 return await Deployment.RunAsync(() =>
 {
     var config = new Config();
-    var serviceOrg = config.Get("serviceOrg") ?? "service-provider-test-org";
+    var organizationName = config.Get("organizationName") ?? "service-provider-test-org";
     var projectName = config.Get("projectName") ?? "my-new-project";
     var stackName = config.Get("stackName") ?? "dev";
     var executorImage = config.Get("executorImage") ?? "pulumi-cli";
 
     var parentStack = new Ps.V2.Stacks.Stack("parentStack", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         ProjectName = projectName,
         StackName = stackName,
     });
 
     var settings = new Ps.V2.Deployments.Settings("settings", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         ProjectName = projectName,
         StackName = stackName,
         ExecutorContext = ImmutableDictionary.CreateRange(new[]
@@ -52,6 +52,6 @@ return await Deployment.RunAsync(() =>
     _ = settings;
     return new Dictionary<string, object?>
     {
-        ["stackId"] = $"{serviceOrg}/{projectName}/{stackName}",
+        ["stackId"] = $"{organizationName}/{projectName}/{stackName}",
     };
 });

@@ -10,14 +10,14 @@ public class App {
     public static void main(String[] args) {
         Pulumi.run(ctx -> {
             var config = ctx.config();
-            var serviceOrg = config.get("serviceOrg").orElse("service-provider-test-org");
+            var organizationName = config.get("organizationName").orElse("service-provider-test-org");
             var accountSuffix = config.get("accountSuffix").orElse("dev");
             var insightsEnv = config.get("insightsEnvironment").orElse("insights/credentials");
 
             var accountNameValue = "v2-insights-" + accountSuffix;
             var account = new Account("account",
                 AccountArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .accountName(accountNameValue)
                     .provider("aws")
                     .environment(insightsEnv)
@@ -26,7 +26,7 @@ public class App {
 
             new ScheduledScanSettings("scanSettings",
                 ScheduledScanSettingsArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .accountName(accountNameValue)
                     .paused(true)
                     .scheduleCron("0 6 * * *")

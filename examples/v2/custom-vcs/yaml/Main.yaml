@@ -6,7 +6,7 @@ resources:
   integration:
     type: pulumiservice:v2/integrations:CustomVCSIntegration
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       name: v2-custom-vcs-${vcsSuffix}
       baseUrl: ${baseUrl}
       vcsType: gitea
@@ -14,7 +14,7 @@ resources:
   repository:
     type: pulumiservice:v2/integrations:CustomVCSRepository
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       integrationId: ${integration.integrationId}
       name: example-repo-${vcsSuffix}
       displayName: Example Repository

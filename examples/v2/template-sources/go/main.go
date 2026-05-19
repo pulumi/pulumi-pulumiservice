@@ -9,9 +9,9 @@ import (
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
 		cfg := config.New(ctx, "")
-		serviceOrg := cfg.Get("serviceOrg")
-		if serviceOrg == "" {
-			serviceOrg = "service-provider-test-org"
+		organizationName := cfg.Get("organizationName")
+		if organizationName == "" {
+			organizationName = "service-provider-test-org"
 		}
 		templateSuffix := cfg.Get("templateSuffix")
 		if templateSuffix == "" {
@@ -23,7 +23,7 @@ func main() {
 		}
 
 		source, err := v2.NewOrgTemplateCollection(ctx, "source", &v2.OrgTemplateCollectionArgs{
-			OrgName:   pulumi.String(serviceOrg),
+			OrgName:   pulumi.String(organizationName),
 			Name:      pulumi.String("v2-templates-" + templateSuffix),
 			SourceURL: pulumi.String(sourceURL),
 		})

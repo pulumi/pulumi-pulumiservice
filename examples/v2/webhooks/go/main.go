@@ -9,9 +9,9 @@ import (
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
 		cfg := config.New(ctx, "")
-		serviceOrg := cfg.Get("serviceOrg")
-		if serviceOrg == "" {
-			serviceOrg = "service-provider-test-org"
+		organizationName := cfg.Get("organizationName")
+		if organizationName == "" {
+			organizationName = "service-provider-test-org"
 		}
 		secretValue := cfg.Get("secretValue")
 		if secretValue == "" {
@@ -23,7 +23,7 @@ func main() {
 		}
 
 		orgAll, err := v2.NewOrganizationWebhook(ctx, "orgWebhookAll", &v2.OrganizationWebhookArgs{
-			OrganizationName: pulumi.String(serviceOrg),
+			OrganizationName: pulumi.String(organizationName),
 			Name:             pulumi.String("org-webhook-all-" + hookSuffix),
 			DisplayName:      pulumi.String("webhook-from-provider"),
 			PayloadUrl:       pulumi.String("https://google.com"),
@@ -35,7 +35,7 @@ func main() {
 		}
 
 		orgGroups, err := v2.NewOrganizationWebhook(ctx, "orgWebhookGroups", &v2.OrganizationWebhookArgs{
-			OrganizationName: pulumi.String(serviceOrg),
+			OrganizationName: pulumi.String(organizationName),
 			Name:             pulumi.String("org-webhook-groups-" + hookSuffix),
 			DisplayName:      pulumi.String("webhook-from-provider"),
 			PayloadUrl:       pulumi.String("https://google.com"),

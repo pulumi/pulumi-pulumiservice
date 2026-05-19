@@ -6,13 +6,13 @@ resources:
   pool:
     type: pulumiservice:v2/agents:Pool
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       name: v2-task-pool-${taskSuffix}
       description: Pool used by the v2 task example
   task:
     type: pulumiservice:v2/agents:Task
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       taskID: ${taskID}
       approvalMode: manual
       permissionMode: default

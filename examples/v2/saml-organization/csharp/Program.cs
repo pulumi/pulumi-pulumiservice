@@ -4,7 +4,7 @@ using Ps = Pulumi.PulumiService;
 return await Deployment.RunAsync(() =>
 {
     var config = new Config();
-    var serviceOrg = config.Get("serviceOrg") ?? "service-provider-test-org";
+    var organizationName = config.Get("organizationName") ?? "service-provider-test-org";
 
     var idpDescriptor = @"<md:EntityDescriptor xmlns:md=""urn:oasis:names:tc:SAML:2.0:metadata""
                      entityID=""https://example-idp.invalid/metadata"">
@@ -13,7 +13,7 @@ return await Deployment.RunAsync(() =>
 
     new Ps.V2.Auth.SAML("saml", new()
     {
-        OrgName = serviceOrg,
+        OrgName = organizationName,
         NewIdpSsoDescriptor = idpDescriptor,
     });
 });

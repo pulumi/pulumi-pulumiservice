@@ -5,9 +5,9 @@ resources:
   default:
     type: pulumiservice:v2:DefaultOrganization
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
 outputs:
   # orgName is an input (program-owned), so reference the source value
   # rather than an output that doesn't exist on DefaultOrganization.
-  defaultOrg: ${serviceOrg}
+  defaultOrg: ${organizationName}
   defaultOrgGitHubLogin: ${default.GitHubLogin}

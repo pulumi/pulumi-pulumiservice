@@ -11,21 +11,21 @@ resources:
   legacyEnv:
     type: pulumiservice:v2/escPreview:Environment
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       envName: ${envName}
       project: default
       name: ${envName}
   legacyTag:
     type: pulumiservice:v2/escPreview:EnvironmentTag
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       envName: ${envName}
       name: ${tagName}
       value: ${tagValue}
   legacyRevisionTag:
     type: pulumiservice:v2/escPreview:RevisionTag
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       envName: ${envName}
       name: ${tagName}
       tagName: ${tagName}
@@ -33,7 +33,7 @@ resources:
   legacyHook:
     type: pulumiservice:v2/escPreview:Webhook
     properties:
-      organizationName: ${serviceOrg}
+      organizationName: ${organizationName}
       envName: ${envName}
       name: ${hookName}
       displayName: legacy preview webhook

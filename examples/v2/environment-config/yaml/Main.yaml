@@ -8,13 +8,13 @@ resources:
   draft:
     type: pulumiservice:v2/esc:EnvironmentDraft
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       projectName: ${projectName}
       envName: ${envName}
   settings:
     type: pulumiservice:v2/esc:EnvironmentSettings
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       projectName: ${projectName}
       envName: ${envName}
       deletionProtected: true

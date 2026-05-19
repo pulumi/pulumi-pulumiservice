@@ -9,9 +9,9 @@ import (
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
 		cfg := config.New(ctx, "")
-		serviceOrg := cfg.Get("serviceOrg")
-		if serviceOrg == "" {
-			serviceOrg = "service-provider-test-org"
+		organizationName := cfg.Get("organizationName")
+		if organizationName == "" {
+			organizationName = "service-provider-test-org"
 		}
 		memberLogin := cfg.Get("memberLogin")
 		if memberLogin == "" {
@@ -23,7 +23,7 @@ func main() {
 		}
 
 		member, err := v2.NewOrganizationMember(ctx, "member", &v2.OrganizationMemberArgs{
-			OrgName:   pulumi.String(serviceOrg),
+			OrgName:   pulumi.String(organizationName),
 			UserLogin: pulumi.String(memberLogin),
 			Role:      pulumi.String(memberRole),
 		})

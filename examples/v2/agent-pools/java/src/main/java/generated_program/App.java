@@ -8,13 +8,13 @@ public class App {
     public static void main(String[] args) {
         Pulumi.run(ctx -> {
             var config = ctx.config();
-            var serviceOrg = config.get("serviceOrg").orElse("service-provider-test-org");
+            var organizationName = config.get("organizationName").orElse("service-provider-test-org");
             var poolSuffix = config.get("poolSuffix").orElse("dev");
             var poolDescription = config.get("poolDescription").orElse("v2 example agent pool");
 
             var pool = new Pool("pool",
                 PoolArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .name("v2-agent-pool-" + poolSuffix)
                     .description(poolDescription)
                     .build());

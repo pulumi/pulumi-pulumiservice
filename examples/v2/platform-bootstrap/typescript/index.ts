@@ -2,7 +2,7 @@ import * as pulumi from "@pulumi/pulumi";
 import * as ps from "@pulumi/pulumiservice";
 
 const config = new pulumi.Config();
-const serviceOrg = config.get("serviceOrg") ?? "service-provider-test-org";
+const organizationName = config.get("organizationName") ?? "service-provider-test-org";
 const suffix = config.get("suffix") ?? "dev";
 const prodApprovalEnabled = config.getBoolean("prodApprovalEnabled") ?? true;
 const slackWebhookUrl = config.get("slackWebhookUrl") ??
@@ -11,18 +11,18 @@ const pagerDutyWebhookUrl = config.get("pagerDutyWebhookUrl") ??
     "https://events.pagerduty.com/v2/enqueue";
 
 // 1. Org-level user preference.
-new ps.v2.DefaultOrganization("defaultOrg", { orgName: serviceOrg });
+new ps.v2.DefaultOrganization("defaultOrg", { orgName: organizationName });
 
 // 2. OIDC issuers: GitHub Actions trust + Pulumi Cloud self-trust.
 new ps.v2.auth.OidcIssuer("githubIssuer", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     name: `github_issuer_${suffix}`,
     url: "https://token.actions.githubusercontent.com",
     thumbprints: ["b41ae0832808ebc94951437bf7e92b93ccb6479364daf894d46d6001bee7a486"],
     maxExpiration: 3600,
 });
 new ps.v2.auth.OidcIssuer("pulumiSelfIssuer", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     name: `pulumi_issuer_${suffix}`,
     url: "https://api.pulumi.com/oidc",
     thumbprints: ["57d3e89f6b25dde3c174dc558e2b2623306a9d81f88a12e8ae7090a86c12f1da"],
@@ -30,13 +30,13 @@ new ps.v2.auth.OidcIssuer("pulumiSelfIssuer", {
 
 // 3. Platform team + a stack-readonly role.
 const platformTeam = new ps.v2.teams.Team("platformTeam", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     name: `platform-team-${suffix}`,
     displayName: `Platform Team ${suffix}`,
     description: "Owns shared infra, runs the deployments engine.",
 });
 const stackReadonlyRole = new ps.v2.Role("stackReadonlyRole", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     name: `stack-readonly-${suffix}`,
     description: "Read-only access to stacks, scoped via the platform team.",
     uxPurpose: "role",
@@ -48,14 +48,14 @@ const stackReadonlyRole = new ps.v2.Role("stackReadonlyRole", {
 
 // 4. CI machine token + team-scoped token.
 const ciToken = new ps.v2.tokens.OrgToken("ciToken", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     name: `ci-${suffix}`,
     description: "Used by CI/CD to deploy non-prod stacks.",
     admin: false,
     expires: 0,
 });
 new ps.v2.tokens.TeamToken("teamToken", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     teamName: platformTeam.name,
     name: `platform-team-token-${suffix}`,
     description: "Platform-team-scoped token for shared automation.",
@@ -64,26 +64,26 @@ new ps.v2.tokens.TeamToken("teamToken", {
 
 // 5. Self-hosted deployment runner.
 const runnersPool = new ps.v2.agents.Pool("runnersPool", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     name: `platform-runners-${suffix}`,
     description: "Self-hosted deployment runner pool.",
 });
 
 // 6. New-project template seed.
 const templates = new ps.v2.OrgTemplateCollection("templates", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     name: `platform-templates-${suffix}`,
     sourceURL: "https://github.com/pulumi/examples",
 });
 
 // 7. Shared ESC credentials env + a "stable" tag on it.
 const sharedCredentials = new ps.v2.esc.Environment("sharedCredentials", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     project: "shared",
     name: `credentials-${suffix}`,
 });
 new ps.v2.esc.EnvironmentTag("stableTag", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     projectName: sharedCredentials.project,
     envName: sharedCredentials.name,
     name: "stable",
@@ -92,12 +92,12 @@ new ps.v2.esc.EnvironmentTag("stableTag", {
 
 // 8. Two stacks (staging + prod).
 const stagingStack = new ps.v2.stacks.Stack("stagingStack", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     projectName: `platform-app-${suffix}`,
     stackName: "staging",
 });
 const prodStack = new ps.v2.stacks.Stack("prodStack", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     projectName: `platform-app-${suffix}`,
     stackName: "prod",
 });
@@ -105,13 +105,13 @@ const prodStack = new ps.v2.stacks.Stack("prodStack", {
 // 9. StackConfig: bind each stack to the shared ESC env.
 const sharedEnvRef = pulumi.interpolate`${sharedCredentials.project}/${sharedCredentials.name}`;
 new ps.v2.stacks.Config("stagingConfig", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     projectName: stagingStack.projectName,
     stackName: stagingStack.stackName,
     environment: sharedEnvRef,
 });
 new ps.v2.stacks.Config("prodConfig", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     projectName: prodStack.projectName,
     stackName: prodStack.stackName,
     environment: sharedEnvRef,
@@ -124,7 +124,7 @@ for (const [k, v] of Object.entries({
     "cost-center": "platform",
 })) {
     new ps.v2.stacks.Tag(`prodTag-${k}`, {
-        orgName: serviceOrg,
+        orgName: organizationName,
         projectName: prodStack.projectName,
         stackName: prodStack.stackName,
         name: k,
@@ -134,7 +134,7 @@ for (const [k, v] of Object.entries({
 
 // 11. Per-stack PagerDuty webhook on prod.
 new ps.v2.stacks.Webhook("prodPagerDuty", {
-    organizationName: serviceOrg,
+    organizationName: organizationName,
     projectName: prodStack.projectName,
     stackName: prodStack.stackName,
     name: "prod-pagerduty",
@@ -146,13 +146,13 @@ new ps.v2.stacks.Webhook("prodPagerDuty", {
 
 // 12. DeploymentSettings: different executor per environment.
 new ps.v2.deployments.Settings("stagingDeploySettings", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     projectName: stagingStack.projectName,
     stackName: stagingStack.stackName,
     executorContext: { executorImage: { reference: "pulumi/pulumi:latest" } },
 });
 const prodDeploySettings = new ps.v2.deployments.Settings("prodDeploySettings", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     projectName: prodStack.projectName,
     stackName: prodStack.stackName,
     executorContext: { executorImage: { reference: "pulumi/pulumi:3-nonroot" } },
@@ -160,7 +160,7 @@ const prodDeploySettings = new ps.v2.deployments.Settings("prodDeploySettings", 
 
 // 13. Approval gate on the credentials env.
 new ps.v2.Gate("credsApprovalGate", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     name: `creds-approval-${suffix}`,
     enabled: prodApprovalEnabled,
     rule: {
@@ -181,7 +181,7 @@ new ps.v2.Gate("credsApprovalGate", {
 
 // 14. Nightly redeploy of prod (depends on prodDeploySettings).
 new ps.v2.deployments.ScheduledDeployment("prodNightlyDeploy", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     projectName: prodStack.projectName,
     stackName: prodStack.stackName,
     scheduleCron: "0 7 * * *",
@@ -190,7 +190,7 @@ new ps.v2.deployments.ScheduledDeployment("prodNightlyDeploy", {
 
 // 15. Org-level Slack webhook.
 new ps.v2.OrganizationWebhook("slack", {
-    organizationName: serviceOrg,
+    organizationName: organizationName,
     name: `org-slack-${suffix}`,
     displayName: "Org Slack notifications",
     payloadUrl: slackWebhookUrl,
@@ -200,14 +200,14 @@ new ps.v2.OrganizationWebhook("slack", {
 
 // 16. Starter PolicyGroup.
 new ps.v2.PolicyGroup("starterPolicyGroup", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     name: `platform-policies-${suffix}`,
     entityType: "stacks",
 });
 
 // 17. Bind the stack-readonly role to the platform team.
 new ps.v2.teams.Role("platformTeamRole", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     teamName: platformTeam.name,
     roleID: stackReadonlyRole.id,
 });

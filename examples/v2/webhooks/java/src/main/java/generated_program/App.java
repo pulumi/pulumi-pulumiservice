@@ -10,13 +10,13 @@ public class App {
     public static void main(String[] args) {
         Pulumi.run(ctx -> {
             var config = ctx.config();
-            var serviceOrg = config.get("serviceOrg").orElse("service-provider-test-org");
+            var organizationName = config.get("organizationName").orElse("service-provider-test-org");
             var secretValue = config.get("secretValue").orElse("shhh");
             var hookSuffix = config.get("hookSuffix").orElse("dev");
 
             var orgWebhookAll = new OrganizationWebhook("orgWebhookAll",
                 OrganizationWebhookArgs.builder()
-                    .organizationName(serviceOrg)
+                    .organizationName(organizationName)
                     .name("org-webhook-all-" + hookSuffix)
                     .displayName("webhook-from-provider")
                     .payloadUrl("https://google.com")
@@ -26,7 +26,7 @@ public class App {
 
             var orgWebhookGroups = new OrganizationWebhook("orgWebhookGroups",
                 OrganizationWebhookArgs.builder()
-                    .organizationName(serviceOrg)
+                    .organizationName(organizationName)
                     .name("org-webhook-groups-" + hookSuffix)
                     .displayName("webhook-from-provider")
                     .payloadUrl("https://google.com")

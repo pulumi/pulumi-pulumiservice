@@ -9,9 +9,9 @@ import (
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
 		cfg := config.New(ctx, "")
-		serviceOrg := cfg.Get("serviceOrg")
-		if serviceOrg == "" {
-			serviceOrg = "service-provider-test-org"
+		organizationName := cfg.Get("organizationName")
+		if organizationName == "" {
+			organizationName = "service-provider-test-org"
 		}
 		projectName := cfg.Get("projectName")
 		if projectName == "" {
@@ -23,7 +23,7 @@ func main() {
 		}
 
 		environment, err := esc.NewEnvironment(ctx, "environment", &esc.EnvironmentArgs{
-			OrgName: pulumi.String(serviceOrg),
+			OrgName: pulumi.String(organizationName),
 			Project: pulumi.String(projectName),
 			Name:    pulumi.String("testing-environment-" + envSuffix),
 		})

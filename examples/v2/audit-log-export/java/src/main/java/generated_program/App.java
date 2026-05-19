@@ -10,13 +10,13 @@ public class App {
     public static void main(String[] args) {
         Pulumi.run(ctx -> {
             var config = ctx.config();
-            var serviceOrg = config.get("serviceOrg").orElse("service-provider-test-org");
+            var organizationName = config.get("organizationName").orElse("service-provider-test-org");
             var bucketName = config.get("bucketName").orElse("pulumi-audit-log-archive");
             var region = config.get("region").orElse("us-west-2");
 
             var exportConfig = new AuditLogExportConfiguration("exportConfig",
                 AuditLogExportConfigurationArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .newEnabled(true)
                     .newS3Configuration(Map.of(
                         "bucketName", bucketName,

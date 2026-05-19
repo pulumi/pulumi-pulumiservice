@@ -2,7 +2,7 @@ import * as pulumi from "@pulumi/pulumi";
 import * as ps from "@pulumi/pulumiservice";
 
 const config = new pulumi.Config();
-const serviceOrg = config.get("serviceOrg") ?? "service-provider-test-org";
+const organizationName = config.get("organizationName") ?? "service-provider-test-org";
 
 const idpDescriptor = `<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
                      entityID="https://example-idp.invalid/metadata">
@@ -10,6 +10,6 @@ const idpDescriptor = `<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.
 </md:EntityDescriptor>`;
 
 new ps.v2.auth.SAML("saml", {
-    orgName: serviceOrg,
+    orgName: organizationName,
     newIdpSsoDescriptor: idpDescriptor,
 });

@@ -9,9 +9,9 @@ import (
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
 		cfg := config.New(ctx, "")
-		serviceOrg := cfg.Get("serviceOrg")
-		if serviceOrg == "" {
-			serviceOrg = "service-provider-test-org"
+		organizationName := cfg.Get("organizationName")
+		if organizationName == "" {
+			organizationName = "service-provider-test-org"
 		}
 		issuerSuffix := cfg.Get("issuerSuffix")
 		if issuerSuffix == "" {
@@ -23,7 +23,7 @@ func main() {
 		}
 
 		pulumiIssuer, err := auth.NewOidcIssuer(ctx, "pulumiIssuer", &auth.OidcIssuerArgs{
-			OrgName:     pulumi.String(serviceOrg),
+			OrgName:     pulumi.String(organizationName),
 			Name:        pulumi.String("pulumi_issuer_" + issuerSuffix),
 			Url:         pulumi.String("https://api.pulumi.com/oidc"),
 			Thumbprints: pulumi.StringArray{pulumi.String("57d3e89f6b25dde3c174dc558e2b2623306a9d81f88a12e8ae7090a86c12f1da")},
@@ -33,7 +33,7 @@ func main() {
 		}
 
 		githubIssuer, err := auth.NewOidcIssuer(ctx, "githubIssuer", &auth.OidcIssuerArgs{
-			OrgName:       pulumi.String(serviceOrg),
+			OrgName:       pulumi.String(organizationName),
 			Name:          pulumi.String("github_issuer_" + issuerSuffix),
 			Url:           pulumi.String("https://token.actions.githubusercontent.com"),
 			Thumbprints:   pulumi.StringArray{pulumi.String("b41ae0832808ebc94951437bf7e92b93ccb6479364daf894d46d6001bee7a486")},

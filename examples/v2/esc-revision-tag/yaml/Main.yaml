@@ -7,13 +7,13 @@ resources:
   environment:
     type: pulumiservice:v2/esc:Environment
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       project: ${projectName}
       name: ${envName}
   revisionTag:
     type: pulumiservice:v2/esc:RevisionTag
     properties:
-      orgName: ${serviceOrg}
+      orgName: ${organizationName}
       projectName: ${projectName}
       envName: ${envName}
       name: ${tagName}

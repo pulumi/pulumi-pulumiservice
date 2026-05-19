@@ -2,20 +2,20 @@ import pulumi
 import pulumi_pulumiservice.v2 as ps_v2
 
 config = pulumi.Config()
-service_org = config.get("serviceOrg") or "service-provider-test-org"
+organization_name = config.get("organizationName") or "service-provider-test-org"
 project_name = config.get("projectName") or "v2-envcfg-example"
 env_name = config.get("envName") or "v2-envcfg-env"
 
 draft = ps_v2.esc.EnvironmentDraft(
     "draft",
-    org_name=service_org,
+    org_name=organization_name,
     project_name=project_name,
     env_name=env_name,
 )
 
 settings = ps_v2.esc.EnvironmentSettings(
     "settings",
-    org_name=service_org,
+    org_name=organization_name,
     project_name=project_name,
     env_name=env_name,
     deletion_protected=True,

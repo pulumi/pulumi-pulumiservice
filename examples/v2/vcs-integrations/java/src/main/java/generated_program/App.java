@@ -16,7 +16,7 @@ public class App {
     public static void main(String[] args) {
         Pulumi.run(ctx -> {
             var config = ctx.config();
-            var serviceOrg = config.get("serviceOrg").orElse("service-provider-test-org");
+            var organizationName = config.get("organizationName").orElse("service-provider-test-org");
             var githubId = config.get("githubIntegrationId").orElse("gh-org-integration");
             var githubEnterpriseId = config.get("githubEnterpriseIntegrationId").orElse("ghe-org-integration");
             var gitlabId = config.get("gitlabIntegrationId").orElse("gl-org-integration");
@@ -25,7 +25,7 @@ public class App {
 
             new GitHubIntegration("github",
                 GitHubIntegrationArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .integrationId(githubId)
                     .disablePRComments(false)
                     .disableDetailedDiff(false)
@@ -35,7 +35,7 @@ public class App {
 
             new GitHubEnterpriseIntegration("githubEnterprise",
                 GitHubEnterpriseIntegrationArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .integrationId(githubEnterpriseId)
                     .disablePRComments(true)
                     .disableDetailedDiff(false)
@@ -45,7 +45,7 @@ public class App {
 
             new GitLabIntegration("gitlab",
                 GitLabIntegrationArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .integrationId(gitlabId)
                     .disablePRComments(false)
                     .disableDetailedDiff(false)
@@ -54,7 +54,7 @@ public class App {
 
             new BitBucketIntegration("bitbucket",
                 BitBucketIntegrationArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .integrationId(bitbucketId)
                     .disablePRComments(false)
                     .disableDetailedDiff(false)
@@ -63,7 +63,7 @@ public class App {
 
             new AzureDevOpsIntegration("azureDevOps",
                 AzureDevOpsIntegrationArgs.builder()
-                    .orgName(serviceOrg)
+                    .orgName(organizationName)
                     .integrationId(azureDevOpsId)
                     .disablePRComments(true)
                     .disableDetailedDiff(true)
