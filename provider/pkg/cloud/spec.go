@@ -34,7 +34,7 @@ import (
 //  1. openapi-fetch     — refresh spec.json from the upstream URL
 //  2. scaffold-metadata — refresh per-resource operations in metadata.json.
 //     The scaffolder writes only the auto-derived `operations` block on
-//     each entry; idField, renames, fields, outputs, and other hand-curated
+//     each entry; idFormat, renames, fields, outputs, and other hand-curated
 //     fields round-trip untouched. New tokens get an empty entry the human
 //     can decorate with overrides; tokens listed under top-level
 //     `_excluded` are skipped.

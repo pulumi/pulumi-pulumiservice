@@ -16,7 +16,7 @@
 // embedded OpenAPI spec and merges them into metadata.json in place.
 //
 // metadata.json is the single source of truth at runtime. It is BOTH
-// auto-generated (operations, idField, renames, outputsExclude, token)
+// auto-generated (operations, idFormat, renames, outputsExclude, token)
 // AND hand-curated (examples, descriptions, aliases, _excluded). The
 // scaffolder rewrites the auto-generated fields on every regen and
 // preserves the hand-curated ones via json.RawMessage round-tripping.
@@ -878,7 +878,7 @@ func sameOps(prev map[string]any, next map[string]string) bool {
 // encodeStable marshals a map with deterministic key ordering: a preferred
 // order for known fields, then alphabetical for the rest.
 func encodeStable(entry map[string]any) (json.RawMessage, error) {
-	preferred := []string{"operations", "idField", "idFormat",
+	preferred := []string{"operations", "idFormat",
 		"deleteBeforeReplace", "requireImport", "token",
 		"aliases", "renames", "fields", "outputs",
 		"outputsExclude", "description", "examples"}

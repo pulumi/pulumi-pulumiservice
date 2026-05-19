@@ -229,6 +229,9 @@ func (t *authedTransport) Do(_ context.Context, req *http.Request) (*http.Respon
 	req.Host = base.Host
 
 	req.Header.Set("Authorization", "token "+t.token)
+	// v1 callers leave Accept unset and want the Pulumi-versioned media type;
+	// v2 (rest.Resource) sets Accept: application/json explicitly because its
+	// OpenAPI-described endpoints return standard JSON.
 	if req.Header.Get("Accept") == "" {
 		req.Header.Set("Accept", "application/vnd.pulumi+8")
 	}
