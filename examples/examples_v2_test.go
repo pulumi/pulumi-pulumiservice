@@ -1,5 +1,5 @@
-//go:build v2 || all
-// +build v2 all
+//go:build v2
+// +build v2
 
 // V2 integration tests over hand-maintained per-language examples under
 // examples/v2/<name>/{yaml,typescript,python,go,csharp,java}/.
