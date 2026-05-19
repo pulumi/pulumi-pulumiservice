@@ -618,6 +618,11 @@ func (r *Resource) Update(ctx context.Context, req p.UpdateRequest) (p.UpdateRes
 // Delete fires the delete op (if declared). Without one the engine drops
 // state silently. Path params come from req.OldInputs with req.Properties
 // as a fallback.
+//
+// 404 is treated as success — the resource is already gone, which is what
+// Delete is trying to achieve. Centralizing this here means every v2
+// resource benefits without per-resource metadata or scaffolder support;
+// the underlying Pulumi Cloud endpoints are uniformly idempotent on this.
 func (r *Resource) Delete(ctx context.Context, req p.DeleteRequest) error {
 	op, err := r.resolveOp("delete", r.meta.Operations.Delete)
 	if err != nil {
@@ -627,8 +632,10 @@ func (r *Resource) Delete(ctx context.Context, req p.DeleteRequest) error {
 		return nil
 	}
 	src := mergeMaps(req.Properties, req.OldInputs)
-	_, _, err = r.execAndDecode(ctx, op, src)
-	return err
+	if _, _, err := r.execAndDecode(ctx, op, src); err != nil && !IsNotFound(err) {
+		return err
+	}
+	return nil
 }
 
 // mergeMaps unions every key. Earlier maps take precedence on conflict.

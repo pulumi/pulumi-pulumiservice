@@ -1011,3 +1011,77 @@ func TestBuildRequestBody(t *testing.T) {
 		})
 	}
 }
+
+// TestDeleteIsIdempotentOn404 pins the runtime behavior: 404 on Delete is
+// treated as success. Centralizing this means every v2 resource is
+// uniformly idempotent without per-resource metadata or scaffolder hints.
+func TestDeleteIsIdempotentOn404(t *testing.T) {
+	const specJSON = `{
+	  "openapi": "3.0.0",
+	  "paths": {
+	    "/things/{org}/{id}": {
+	      "delete": {
+	        "operationId": "DeleteThing",
+	        "parameters": [
+	          {"name": "org", "in": "path", "required": true, "schema": {"type": "string"}},
+	          {"name": "id",  "in": "path", "required": true, "schema": {"type": "string"}}
+	        ],
+	        "responses": {"204": {"description": "no content"}}
+	      }
+	    }
+	  }
+	}`
+	spec, err := ParseSpec([]byte(specJSON))
+	if err != nil {
+		t.Fatalf("parse synthetic spec: %v", err)
+	}
+	r := &Resource{
+		spec: spec,
+		meta: ResourceMeta{
+			Operations: Operations{Delete: "DeleteThing"},
+			IDFormat:   "{org}/{id}",
+		},
+	}
+
+	t.Run("204 is success", func(t *testing.T) {
+		mock := &mockTransport{responses: map[string]mockResponse{
+			"DELETE /things/acme/gone": {status: 204},
+		}}
+		SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+		err := r.Delete(context.Background(), p.DeleteRequest{
+			ID:         "acme/gone",
+			Properties: propMap(map[string]any{"org": "acme", "id": "gone"}),
+		})
+		if err != nil {
+			t.Errorf("204 should be nil, got: %v", err)
+		}
+	})
+
+	t.Run("404 is also success — already gone is what Delete wants", func(t *testing.T) {
+		mock := &mockTransport{responses: map[string]mockResponse{
+			"DELETE /things/acme/gone": {status: 404, body: `{"code":404,"message":"not found"}`},
+		}}
+		SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+		err := r.Delete(context.Background(), p.DeleteRequest{
+			ID:         "acme/gone",
+			Properties: propMap(map[string]any{"org": "acme", "id": "gone"}),
+		})
+		if err != nil {
+			t.Errorf("404 should be nil, got: %v", err)
+		}
+	})
+
+	t.Run("non-404 errors still surface", func(t *testing.T) {
+		mock := &mockTransport{responses: map[string]mockResponse{
+			"DELETE /things/acme/gone": {status: 500, body: `oops`},
+		}}
+		SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+		err := r.Delete(context.Background(), p.DeleteRequest{
+			ID:         "acme/gone",
+			Properties: propMap(map[string]any{"org": "acme", "id": "gone"}),
+		})
+		if err == nil {
+			t.Error("500 should propagate")
+		}
+	})
+}
