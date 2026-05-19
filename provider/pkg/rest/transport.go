@@ -66,7 +66,8 @@ func resolveTransport(ctx context.Context) (Transport, error) {
 	r := resolver
 	resolverMu.RUnlock()
 	if r == nil {
-		return nil, errors.New("rest: no transport in context and no global resolver (set via rest.WithTransport or rest.SetTransportResolver during Configure)")
+		return nil, errors.New("rest: no transport in context and no global resolver " +
+			"(set via rest.WithTransport or rest.SetTransportResolver during Configure)")
 	}
 	return r(ctx)
 }

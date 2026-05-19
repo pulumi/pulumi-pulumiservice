@@ -36,8 +36,8 @@ import (
 
 const (
 	v1Prefix       = "pulumiservice:index:"
-	v2Prefix       = "pulumiservice:v2:"  // root-level v2 (no module)
-	v2ModulePrefix = "pulumiservice:v2/"  // module-namespaced v2
+	v2Prefix       = "pulumiservice:v2:" // root-level v2 (no module)
+	v2ModulePrefix = "pulumiservice:v2/" // module-namespaced v2
 )
 
 type mapping struct {
@@ -73,11 +73,17 @@ var mappings = []mapping{
 	{V1: "TeamStackPermission", V2: []string{"pulumiservice:v2/auth:Policy"}},
 	{V1: "TemplateSource", V2: []string{"pulumiservice:v2:OrgTemplateCollection"}},
 	{V1: "TtlSchedule", V2: []string{"pulumiservice:v2/deployments:ScheduledDeployment"}, Note: "partial"},
-	{V1: "Webhook", V2: []string{"pulumiservice:v2:OrganizationWebhook", "pulumiservice:v2/stacks:Webhook", "pulumiservice:v2/esc:Webhook"}},
+	{V1: "Webhook", V2: []string{
+		"pulumiservice:v2:OrganizationWebhook",
+		"pulumiservice:v2/stacks:Webhook",
+		"pulumiservice:v2/esc:Webhook",
+	}},
 }
 
 func main() {
-	schemaPath := flag.String("schema", "provider/cmd/pulumi-resource-pulumiservice/schema.json", "Path to compiled schema.json")
+	schemaPath := flag.String("schema",
+		"provider/cmd/pulumi-resource-pulumiservice/schema.json",
+		"Path to compiled schema.json")
 	outPath := flag.String("out", "docs/v1-v2-coverage.md", "Path to write the coverage doc")
 	flag.Parse()
 
@@ -91,7 +97,7 @@ func main() {
 	}
 
 	out := render(v2Tokens)
-	if err := os.WriteFile(*outPath, []byte(out), 0o644); err != nil {
+	if err := os.WriteFile(*outPath, []byte(out), 0o600); err != nil {
 		fail("write %s: %v", *outPath, err)
 	}
 	fmt.Fprintf(os.Stderr, "v1-v2-coverage: wrote %s (%d v1, %d v2)\n", *outPath, len(v1Tokens), len(v2Tokens))
@@ -157,7 +163,9 @@ func render(v2Schema map[string]bool) string {
 	b.WriteString("# v1 / v2 Resource Coverage\n\n")
 	b.WriteString("> Regenerate after `make provider`:\n>\n")
 	b.WriteString("> ```sh\n> go run ./provider/tools/v1-v2-coverage\n> ```\n>\n")
-	b.WriteString("> The v1→v2 mapping is hand-curated in [provider/tools/v1-v2-coverage/main.go](../provider/tools/v1-v2-coverage/main.go); the v2-only rows come from `schema.json`.\n\n")
+	b.WriteString("> The v1→v2 mapping is hand-curated in " +
+		"[provider/tools/v1-v2-coverage/main.go](../provider/tools/v1-v2-coverage/main.go); " +
+		"the v2-only rows come from `schema.json`.\n\n")
 	b.WriteString("| v1 (`pulumiservice:index:`) | v2 (`pulumiservice:v2/`) |\n")
 	b.WriteString("|---|---|\n")
 
