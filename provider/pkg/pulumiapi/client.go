@@ -104,7 +104,7 @@ func (c *Client) createRequest(
 
 	// add default headers
 	req.Header.Add("X-Pulumi-Source", "provider")
-	req.Header.Add("Accept", "application/vnd.pulumi+8")
+	req.Header.Add("Accept", apiclient.AcceptMediaType)
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Authorization", "token "+c.token)
 

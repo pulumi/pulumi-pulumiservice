@@ -16,6 +16,10 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/common/util/contract"
 )
 
+// AcceptMediaType is the media type sent on the Accept header for Pulumi
+// Cloud API requests; the +N suffix is the wire-protocol version.
+const AcceptMediaType = "application/vnd.pulumi+8"
+
 type CloudClientExecutor func(*http.Request) (*http.Response, error)
 
 type CloudClientInterceptor func(ctx context.Context, parameters any) (any, bool, error)
@@ -147,7 +151,7 @@ func (p *CloudClient) invokeRaw(req *http.Request, headers []http.Header) (*http
 	}
 
 	if req.Header.Get("Accept") == "" {
-		req.Header.Set("Accept", "application/vnd.pulumi+8")
+		req.Header.Set("Accept", AcceptMediaType)
 	}
 	if strings.Contains(p.BaseURL, "ngrok") {
 		// ngrok is used for local development, so we need to allow a bypass header
