@@ -1086,6 +1086,106 @@ func TestDeleteIsIdempotentOn404(t *testing.T) {
 	})
 }
 
+// TestUpdateUsesStateForPathParamsAndInputsForBody pins the split-source
+// semantics from Bug 6: path params come from State (server-resolved IDs
+// must win over any stale/imported Inputs value), body fields come from
+// Inputs (the user's new values). A common shape: Read returns `id`
+// which Pulumi renames to `widgetID`; if a user-supplied Inputs.widgetID
+// existed it shouldn't redirect the PATCH URL.
+func TestUpdateUsesStateForPathParamsAndInputsForBody(t *testing.T) {
+	const specJSON = `{
+	  "openapi": "3.0.0",
+	  "components": {"schemas": {
+	    "WidgetPatch": {"type": "object", "properties": {
+	      "name": {"type": "string"}
+	    }},
+	    "WidgetRead": {"type": "object", "properties": {
+	      "id":   {"type": "string"},
+	      "name": {"type": "string"}
+	    }}
+	  }},
+	  "paths": {
+	    "/widgets/{org}/{widgetID}": {
+	      "patch": {
+	        "operationId": "PatchWidget",
+	        "parameters": [
+	          {"name": "org",      "in": "path", "required": true, "schema": {"type": "string"}},
+	          {"name": "widgetID", "in": "path", "required": true, "schema": {"type": "string"}}
+	        ],
+	        "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/WidgetPatch"}}}},
+	        "responses": {"200": {"content": {"application/json": {
+	          "schema": {"$ref": "#/components/schemas/WidgetRead"}
+	        }}}}
+	      },
+	      "get": {
+	        "operationId": "GetWidget",
+	        "parameters": [
+	          {"name": "org",      "in": "path", "required": true, "schema": {"type": "string"}},
+	          {"name": "widgetID", "in": "path", "required": true, "schema": {"type": "string"}}
+	        ],
+	        "responses": {"200": {"content": {"application/json": {
+	          "schema": {"$ref": "#/components/schemas/WidgetRead"}
+	        }}}}
+	      }
+	    }
+	  }
+	}`
+	spec, err := ParseSpec([]byte(specJSON))
+	if err != nil {
+		t.Fatalf("parse synthetic spec: %v", err)
+	}
+	r := &Resource{
+		spec: spec,
+		meta: ResourceMeta{
+			Operations: Operations{Update: "PatchWidget", Read: "GetWidget"},
+			IDFormat:   "{org}/{widgetID}",
+		},
+	}
+
+	// State has the real server-resolved widgetID; Inputs has a stale
+	// value the user shouldn't be able to redirect the PATCH with.
+	state := propMap(map[string]any{
+		"org":      "acme",
+		"widgetID": "real-7",
+		"name":     "old-name",
+	})
+	inputs := propMap(map[string]any{
+		"org":      "acme",
+		"widgetID": "stale-from-user", // should be ignored for the URL
+		"name":     "new-name",
+	})
+	oldInputs := propMap(map[string]any{
+		"org":      "acme",
+		"widgetID": "stale-from-user",
+		"name":     "old-name",
+	})
+
+	mock := &mockTransport{responses: map[string]mockResponse{
+		"PATCH /widgets/acme/real-7": {status: 200, body: `{"id":"real-7","name":"new-name"}`},
+		"GET /widgets/acme/real-7":   {status: 200, body: `{"id":"real-7","name":"new-name"}`},
+	}}
+	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+
+	_, err = r.Update(context.Background(), p.UpdateRequest{
+		ID:        "acme/real-7",
+		Inputs:    inputs,
+		OldInputs: oldInputs,
+		State:     state,
+	})
+	if err != nil {
+		t.Fatalf("Update: %v\n  calls: %v", err, mock.calls)
+	}
+	// Confirm the PATCH used the State-side widgetID and the GET (read-
+	// after-update) did too. Without the split, the URL would be
+	// /widgets/acme/stale-from-user.
+	if len(mock.calls) < 1 || mock.calls[0] != "PATCH /widgets/acme/real-7" {
+		t.Errorf("expected PATCH to State-side path; calls: %v", mock.calls)
+	}
+	if len(mock.calls) < 2 || mock.calls[1] != "GET /widgets/acme/real-7" {
+		t.Errorf("expected read-after-update GET on State-side path; calls: %v", mock.calls)
+	}
+}
+
 // TestDiffEmitsUpdateOnUnknownInput pins the contract: when an input
 // transitions from a known value to an unknown (computed) value — or
 // vice-versa — Diff must emit an entry, not silently skip the key.

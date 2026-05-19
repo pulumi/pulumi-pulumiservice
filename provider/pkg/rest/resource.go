@@ -600,13 +600,16 @@ func (r *Resource) Update(ctx context.Context, req p.UpdateRequest) (p.UpdateRes
 	if req.DryRun {
 		return p.UpdateResponse{Properties: req.Inputs}, nil
 	}
-	src := mergeMaps(req.Inputs, req.OldInputs, req.State)
-	_, state, err := r.execAndDecode(ctx, op, src)
+
+	urlSrc := mergeMaps(req.State, req.OldInputs, req.Inputs)
+	bodySrc := mergeMaps(req.Inputs, req.OldInputs, req.State)
+	_, state, err := r.execAndDecodeSplit(ctx, op, urlSrc, bodySrc)
 	if err != nil {
 		return p.UpdateResponse{}, err
 	}
-	source := mergeMaps(req.Inputs, req.OldInputs, req.State, state)
-	if fetched, ok, err := r.fetchState(ctx, source, req.State); err != nil {
+
+	readURLSrc := mergeMaps(req.State, state, req.OldInputs, req.Inputs)
+	if fetched, ok, err := r.fetchState(ctx, readURLSrc, req.State); err != nil {
 		return p.UpdateResponse{}, fmt.Errorf("update: read-after-update: %w", err)
 	} else if ok {
 		state = fetched
@@ -656,12 +659,18 @@ func mergeMaps(maps ...property.Map) property.Map {
 func (r *Resource) execAndDecode(
 	ctx context.Context, op *Operation, inputs property.Map,
 ) ([]byte, property.Map, error) {
+	return r.execAndDecodeSplit(ctx, op, inputs, inputs)
+}
+
+func (r *Resource) execAndDecodeSplit(
+	ctx context.Context, op *Operation, urlSrc, bodySrc property.Map,
+) ([]byte, property.Map, error) {
 	transport, err := resolveTransport(ctx)
 	if err != nil {
 		return nil, property.Map{}, err
 	}
 
-	url, err := r.buildURL(op, inputs)
+	url, err := r.buildURL(op, urlSrc)
 	if err != nil {
 		return nil, property.Map{}, err
 	}
@@ -672,12 +681,12 @@ func (r *Resource) execAndDecode(
 		switch op.RequestContentType {
 		case contentYAML:
 			// Raw-string body from the "yaml" input; absent leaves the body empty.
-			if v, ok := inputs.GetOk("yaml"); ok && v.IsString() {
+			if v, ok := bodySrc.GetOk("yaml"); ok && v.IsString() {
 				body = strings.NewReader(v.AsString())
 				contentType = contentYAML
 			}
 		default:
-			bodyJSON, err := json.Marshal(r.buildRequestBody(op, inputs))
+			bodyJSON, err := json.Marshal(r.buildRequestBody(op, bodySrc))
 			if err != nil {
 				return nil, property.Map{}, fmt.Errorf("rest: marshal request body for %s: %w", op.ID, err)
 			}
