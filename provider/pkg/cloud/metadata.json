@@ -1,5 +1,4 @@
 {
-  "version": 1,
   "package": "pulumiservice",
   "_note": "Single source of truth for v2 resource metadata. operations/idFormat/renames/outputsExclude/token/requireImport are derived from spec.json by `go run ./tools/scaffold-metadata` (run via `go generate ./pkg/cloud/...`); module aliases live in the scaffolder source. Hand-curate examples/description/aliases/fields and they round-trip through regen. Add tokens to `_excluded` to keep the scaffolder from re-deriving them.",
   "_excluded": [

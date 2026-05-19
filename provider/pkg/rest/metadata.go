@@ -23,9 +23,6 @@ import (
 // (operationId → resource mapping, forceNew, secret, aliases, etc.) layered
 // over the OpenAPI spec.
 type Metadata struct {
-	// Version pins the schema version of this file. Currently 1.
-	Version int `json:"version"`
-
 	// Package is the default package name when a token lacks a prefix.
 	Package string `json:"package,omitempty"`
 
@@ -83,6 +80,7 @@ type ResourceMeta struct {
 	// falls back to the create op's description.
 	Description string `json:"description,omitempty"`
 
+	// TODO
 	// Examples are PCL snippets rendered as `## Example Usage` blocks.
 	// SDK codegen runs `pulumi convert` per target language at gen time.
 	Examples []string `json:"examples,omitempty"`
@@ -119,9 +117,6 @@ func ParseMetadata(data []byte) (*Metadata, error) {
 	var m Metadata
 	if err := json.Unmarshal(data, &m); err != nil {
 		return nil, fmt.Errorf("rest: parse metadata: %w", err)
-	}
-	if m.Version != 1 {
-		return nil, fmt.Errorf("rest: unsupported metadata version %d (expected 1)", m.Version)
 	}
 	return &m, nil
 }

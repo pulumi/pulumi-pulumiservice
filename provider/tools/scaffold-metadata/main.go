@@ -143,7 +143,6 @@ var moduleAliases = map[string]string{
 // metadataDoc mirrors metadata.json. Resources serialize via RawMessage so
 // the scaffolder doesn't drop fields it doesn't recognize.
 type metadataDoc struct {
-	Version   int                        `json:"version"`
 	Package   string                     `json:"package,omitempty"`
 	Note      string                     `json:"_note,omitempty"`
 	Excluded  []string                   `json:"_excluded,omitempty"`
@@ -467,7 +466,6 @@ func fail(format string, args ...any) {
 
 func loadMetadata(path string) *metadataDoc {
 	doc := &metadataDoc{
-		Version:   1,
 		Package:   "pulumiservice",
 		Resources: map[string]json.RawMessage{},
 	}
@@ -900,7 +898,6 @@ func encodeStable(entry map[string]any) (json.RawMessage, error) {
 func writeMetadata(path string, doc *metadataDoc) error {
 	var b strings.Builder
 	b.WriteString("{\n")
-	fmt.Fprintf(&b, "  \"version\": %d,\n", doc.Version)
 	if doc.Package != "" {
 		fmt.Fprintf(&b, "  \"package\": %q,\n", doc.Package)
 	}

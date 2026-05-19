@@ -31,7 +31,7 @@ import (
 // Spec source: https://api.pulumi.com/api/openapi/pulumi-spec.json
 //
 // `go generate` runs two steps in order:
-//  1. openapi-fetch     — refresh spec.json from the upstream URL
+//  1. curl | jq         — refresh spec.json from the upstream URL
 //  2. scaffold-metadata — refresh per-resource operations in metadata.json.
 //     The scaffolder writes only the auto-derived `operations` block on
 //     each entry; idFormat, renames, fields, outputs, and other hand-curated
@@ -39,7 +39,7 @@ import (
 //     can decorate with overrides; tokens listed under top-level
 //     `_excluded` are skipped.
 //
-//go:generate go run ../../tools/openapi-fetch -out spec.json
+//go:generate sh -c "curl -sf --max-time 60 https://api.pulumi.com/api/openapi/pulumi-spec.json | jq --sort-keys . > spec.json"
 //go:generate go run ../../tools/scaffold-metadata -in spec.json -out metadata.json
 
 //go:embed spec.json

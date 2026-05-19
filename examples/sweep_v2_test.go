@@ -94,7 +94,7 @@ func (s *sweeper) shouldSweep(name string) bool {
 func (s *sweeper) get(path string, out any) error {
 	req, _ := http.NewRequestWithContext(context.Background(), "GET", s.apiURL+path, nil)
 	req.Header.Set("Authorization", "token "+s.token)
-	req.Header.Set("Accept", "application/vnd.pulumi+8")
+	req.Header.Set("Accept", "application/vnd.pulumi+9")
 	resp, err := s.http.Do(req)
 	if err != nil {
 		return err
@@ -109,7 +109,7 @@ func (s *sweeper) get(path string, out any) error {
 func (s *sweeper) del(path string) error {
 	req, _ := http.NewRequestWithContext(context.Background(), "DELETE", s.apiURL+path, nil)
 	req.Header.Set("Authorization", "token "+s.token)
-	req.Header.Set("Accept", "application/vnd.pulumi+8")
+	req.Header.Set("Accept", "application/vnd.pulumi+9")
 	resp, err := s.http.Do(req)
 	if err != nil {
 		return err

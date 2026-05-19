@@ -943,17 +943,5 @@ func anyToPropertyValue(v any) property.Value {
 
 // mapEqual is a structural comparison helper for Diff.
 func mapEqual(a, b property.Map) bool {
-	if a.Len() != b.Len() {
-		return false
-	}
-	for k, v := range a.AllStable {
-		bv, ok := b.GetOk(k)
-		if !ok {
-			return false
-		}
-		if !v.Equals(bv) {
-			return false
-		}
-	}
-	return true
+	return property.New(a).Equals(property.New(b))
 }

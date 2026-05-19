@@ -51,7 +51,7 @@ func NewClient(client *http.Client, token, URL string) (*Client, error) {
 
 	sendRequest := func(req *http.Request) (*http.Response, error) {
 		// Match the headers the hand-rolled c.do() flow attaches in
-		// createRequest below — Accept defaults to vnd.pulumi+8 (let the
+		// createRequest below — Accept defaults to vnd.pulumi+9 (let the
 		// SDK's invokeRaw default win; do not override here),
 		// X-Pulumi-Source attributes provider writes for Cloud audit, and
 		// Content-Type is set unconditionally to mirror the legacy path.

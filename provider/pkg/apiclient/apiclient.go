@@ -18,7 +18,7 @@ import (
 
 // AcceptMediaType is the media type sent on the Accept header for Pulumi
 // Cloud API requests; the +N suffix is the wire-protocol version.
-const AcceptMediaType = "application/vnd.pulumi+8"
+const AcceptMediaType = "application/vnd.pulumi+9"
 
 type CloudClientExecutor func(*http.Request) (*http.Response, error)
 

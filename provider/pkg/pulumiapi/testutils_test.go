@@ -38,7 +38,7 @@ func startTestServer(t *testing.T, config testServerConfig) *Client {
 		// these should always be set, so always test for them
 		assert.Equal(t, "token "+token, r.Header.Get("Authorization"))
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-		assert.Equal(t, "application/vnd.pulumi+8", r.Header.Get("Accept"))
+		assert.Equal(t, "application/vnd.pulumi+9", r.Header.Get("Accept"))
 		assert.Equal(t, "provider", r.Header.Get("X-Pulumi-Source"))
 
 		// if we expected a request body, unmarshal the body and
@@ -70,7 +70,7 @@ func startTestServerMulti(t *testing.T, handler func(r *http.Request) (int, any)
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "token "+token, r.Header.Get("Authorization"))
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-		assert.Equal(t, "application/vnd.pulumi+8", r.Header.Get("Accept"))
+		assert.Equal(t, "application/vnd.pulumi+9", r.Header.Get("Accept"))
 		assert.Equal(t, "provider", r.Header.Get("X-Pulumi-Source"))
 
 		code, body := handler(r)
