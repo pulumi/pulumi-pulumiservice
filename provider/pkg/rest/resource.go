@@ -696,8 +696,12 @@ func (r *Resource) execAndDecode(
 	httpReq.Header.Set("Accept", contentJSON)
 
 	resp, err := transport.Do(ctx, httpReq)
+	// Transports (authedTransport.Do) rewrite scheme+host on the request
+	// in place. Use the post-rewrite URL in user-facing error messages so
+	// nobody has to debug the "transport.invalid" sentinel.
+	resolvedURL := httpReq.URL.String()
 	if err != nil {
-		return nil, property.Map{}, fmt.Errorf("rest: %s %s: %w", op.Method, url, err)
+		return nil, property.Map{}, fmt.Errorf("rest: %s %s: %w", op.Method, resolvedURL, err)
 	}
 	defer resp.Body.Close()
 
@@ -708,7 +712,7 @@ func (r *Resource) execAndDecode(
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		return respBody, property.Map{}, &HTTPError{
 			Method:     op.Method,
-			URL:        url,
+			URL:        resolvedURL,
 			StatusCode: resp.StatusCode,
 			Body:       respBody,
 		}

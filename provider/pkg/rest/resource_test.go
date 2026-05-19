@@ -1086,6 +1086,64 @@ func TestDeleteIsIdempotentOn404(t *testing.T) {
 	})
 }
 
+// TestErrorURLIsPostTransportRewrite pins the user-facing error path: the
+// real backend host shows up in error messages, not the transport.invalid
+// sentinel that buildURL uses by default when the spec lacks servers.
+// authedTransport in production rewrites scheme+host on the request in
+// place; this test simulates that with a tiny shim transport.
+func TestErrorURLIsPostTransportRewrite(t *testing.T) {
+	const specJSON = `{
+	  "openapi": "3.0.0",
+	  "paths": {
+	    "/things/{org}": {
+	      "post": {
+	        "operationId": "CreateThing",
+	        "parameters": [{"name": "org", "in": "path", "required": true, "schema": {"type": "string"}}],
+	        "responses": {"500": {"description": "boom"}}
+	      }
+	    }
+	  }
+	}`
+	spec, err := ParseSpec([]byte(specJSON))
+	if err != nil {
+		t.Fatalf("parse synthetic spec: %v", err)
+	}
+	r := &Resource{
+		spec: spec,
+		meta: ResourceMeta{Operations: Operations{Create: "CreateThing"}, IDFormat: "{org}"},
+	}
+	// Rewriting shim: mimics authedTransport.Do — overwrites scheme+host
+	// and returns a 500 so execAndDecode constructs an HTTPError.
+	SetTransportResolver(func(_ context.Context) (Transport, error) {
+		return rewriteTransport{scheme: "https", host: "api.real-backend.example"}, nil
+	})
+
+	_, err = r.Create(context.Background(), p.CreateRequest{
+		Properties: propMap(map[string]any{"org": "acme"}),
+	})
+	if err == nil {
+		t.Fatal("expected error from 500 response")
+	}
+	if strings.Contains(err.Error(), "transport.invalid") {
+		t.Errorf("error leaks transport.invalid sentinel: %v", err)
+	}
+	if !strings.Contains(err.Error(), "api.real-backend.example") {
+		t.Errorf("error should reference rewritten host; got: %v", err)
+	}
+}
+
+type rewriteTransport struct{ scheme, host string }
+
+func (t rewriteTransport) Do(_ context.Context, req *http.Request) (*http.Response, error) {
+	req.URL.Scheme = t.scheme
+	req.URL.Host = t.host
+	req.Host = t.host
+	return &http.Response{
+		StatusCode: 500,
+		Body:       io.NopCloser(strings.NewReader(`{"code":500,"message":"boom"}`)),
+	}, nil
+}
+
 // TestPropertyValueToStringNumberFormatting pins decimal-not-scientific
 // formatting for numeric values. Path-param substitution and synthesized
 // IDs go through this — `1e+18` makes a useless URL segment.
