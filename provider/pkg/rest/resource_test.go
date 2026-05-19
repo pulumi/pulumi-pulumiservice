@@ -654,6 +654,66 @@ func TestCreateRequireImport_ProceedsOn404(t *testing.T) {
 	}
 }
 
+// TestCreateRequireImport_ServerIDReadURL_MetadataError: if requireImport is
+// enabled but the read URL needs a path param the user can't supply pre-create
+// (typically a server-generated ID), surface a metadata-error message instead
+// of the generic "requireImport probe" wrap so the operator knows what to fix.
+func TestCreateRequireImport_ServerIDReadURL_MetadataError(t *testing.T) {
+	const specJSON = `{
+	  "openapi": "3.0.0",
+	  "components": {"schemas": {
+	    "Body": {"type": "object", "properties": {"value": {"type": "string"}}},
+	    "Read": {"type": "object", "properties": {"id": {"type": "string"}, "value": {"type": "string"}}}
+	  }},
+	  "paths": {
+	    "/things": {
+	      "post": {
+	        "operationId": "CreateThing",
+	        "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Body"}}}},
+	        "responses": {"200": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Read"}}}}}
+	      }
+	    },
+	    "/things/{id}": {
+	      "get": {
+	        "operationId": "ReadThing",
+	        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}],
+	        "responses": {"200": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Read"}}}}}
+	      }
+	    }
+	  }
+	}`
+	spec, err := ParseSpec([]byte(specJSON))
+	if err != nil {
+		t.Fatalf("ParseSpec: %v", err)
+	}
+	r := &Resource{
+		spec: spec,
+		meta: ResourceMeta{
+			Operations:    Operations{Create: "CreateThing", Read: "ReadThing"},
+			Token:         "pulumiservice:v2:Thing",
+			RequireImport: true,
+		},
+	}
+	mock := &mockTransport{}
+	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
+
+	_, err = r.Create(context.Background(), p.CreateRequest{
+		Properties: propMap(map[string]any{"value": "new"}),
+	})
+	if err == nil {
+		t.Fatalf("expected metadata-error, got nil")
+	}
+	if !strings.Contains(err.Error(), "metadata error") {
+		t.Errorf("error must signal a metadata issue: %v", err)
+	}
+	if !strings.Contains(err.Error(), "pulumiservice:v2:Thing") {
+		t.Errorf("error must name the resource token: %v", err)
+	}
+	if len(mock.calls) != 0 {
+		t.Errorf("no HTTP calls should fire when path param missing, got: %v", mock.calls)
+	}
+}
+
 // TestCreateRequireImport_NoReadOp_OptsOut: RequireImport is a no-op
 // without a read op (the dispatch can't probe what it can't read).
 func TestCreateRequireImport_NoReadOp_OptsOut(t *testing.T) {

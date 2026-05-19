@@ -58,6 +58,18 @@ func IsNotFound(err error) bool {
 	return errors.As(err, &herr) && herr.StatusCode == http.StatusNotFound
 }
 
+// MissingPathParamError signals that buildURL couldn't substitute a {path}
+// placeholder because the named input was absent. Surfaced as its own type so
+// callers like checkAlreadyExists can distinguish "user typo / unresolvable
+// reference" from "the Read URL needs a server-generated ID we don't have yet."
+type MissingPathParamError struct {
+	WireName, PulumiName string
+}
+
+func (e *MissingPathParamError) Error() string {
+	return fmt.Sprintf("rest: path parameter %q (Pulumi name %q) missing from inputs", e.WireName, e.PulumiName)
+}
+
 // Resources builds one handler per metadata.resources entry. Operation IDs
 // resolve lazily at call time, so a half-broken metadata document doesn't
 // fail the running provider — broken mappings surface via BuildSchema or
@@ -380,6 +392,20 @@ func (r *Resource) checkAlreadyExists(ctx context.Context, inputs property.Map) 
 	}
 	if IsNotFound(err) {
 		return nil
+	}
+	// Read URL needs a path param we can't supply pre-create (typically a
+	// server-generated ID). The probe can't run, so surface a metadata-error
+	// message instead of the generic "requireImport probe" wrap.
+	var mpErr *MissingPathParamError
+	if errors.As(err, &mpErr) {
+		token := r.meta.Token
+		if token == "" {
+			token = "this resource"
+		}
+		return fmt.Errorf("rest: metadata error: %s has requireImport set but its read URL needs "+
+			"path parameter %q (Pulumi name %q), which isn't in user-supplied inputs "+
+			"(likely server-generated). Remove requireImport from metadata for this resource",
+			token, mpErr.WireName, mpErr.PulumiName)
 	}
 	return fmt.Errorf("requireImport probe: %w", err)
 }
@@ -777,7 +803,7 @@ func (r *Resource) buildURL(op *Operation, inputs property.Map) (string, error) 
 		pulName := pulumiName(wireName, r.meta.Renames)
 		v, ok := inputs.GetOk(pulName)
 		if !ok {
-			return "", fmt.Errorf("rest: path parameter %q (Pulumi name %q) missing from inputs", wireName, pulName)
+			return "", &MissingPathParamError{WireName: wireName, PulumiName: pulName}
 		}
 		b.WriteString(url.PathEscape(propertyValueToString(v)))
 		last = m[1]
