@@ -790,40 +790,34 @@ func propertyMapToAny(m property.Map) map[string]any {
 	return out
 }
 
-// buildRequestBody assembles the JSON body for a request: it drops any
-// field that's also a path or query parameter (those are already routed
-// through the URL or query string, and some servers reject the duplicate)
-// and translates Pulumi-side keys back to wire-side names — but only when
-// the wire name actually appears in the request body schema. The renames
-// map can mix two purposes: exposing a wire-side path-param name under a
-// Pulumi-friendly synonym (e.g. teamName→name), and renaming a body
-// field. Without the schema check we'd rewrite the body's "name" key into
-// "teamName" and the server would reject it.
+// buildRequestBody assembles the JSON body for a request from the
+// operation's body schema (op.RequestRef): for every wire-side field the
+// schema declares, pull the value from inputs using the Pulumi-side name
+// (i.e. apply renames in reverse). Inputs that don't correspond to a body
+// field aren't sent — that filters out path/query params naturally.
+//
+// Some Pulumi Cloud endpoints (e.g. CreateOrganizationWebhook) accept the
+// same field in both the URL and the body and validate they match, so we
+// can't blanket-strip path-param-named fields from the body. Driving the
+// shape from the schema gives the API exactly what it expects regardless.
+//
+// Without a RequestRef (e.g. action-style POSTs with empty bodies, or
+// operations the parser couldn't classify) fall back to serializing the
+// pulumi inputs as-is.
 func (r *Resource) buildRequestBody(op *Operation, inputs property.Map) map[string]any {
-	skip := make(map[string]bool, len(op.Parameters))
-	for _, p := range op.Parameters {
-		if p.In == inPath || p.In == inQuery {
-			skip[pulumiName(p.Name, r.meta.Renames)] = true
-		}
+	if op.RequestRef == "" {
+		return propertyMapToAny(inputs)
 	}
-	bodyKeys := map[string]bool{}
-	if op.RequestRef != "" {
-		if bodyProps, _, err := flattenObjectSchema(r.spec, op.RequestRef); err == nil {
-			for k := range bodyProps {
-				bodyKeys[k] = true
-			}
-		}
+	bodyProps, _, err := flattenObjectSchema(r.spec, op.RequestRef)
+	if err != nil {
+		return propertyMapToAny(inputs)
 	}
-	out := make(map[string]any, inputs.Len())
-	for k, v := range inputs.AllStable {
-		if skip[k] {
-			continue
+	out := make(map[string]any, len(bodyProps))
+	for wireKey := range bodyProps {
+		pulKey := pulumiName(wireKey, r.meta.Renames)
+		if v, ok := inputs.GetOk(pulKey); ok {
+			out[wireKey] = propertyValueToAny(v)
 		}
-		wire := wireSideName(k, r.meta.Renames)
-		if wire != k && !bodyKeys[wire] && bodyKeys[k] {
-			wire = k
-		}
-		out[wire] = propertyValueToAny(v)
 	}
 	return out
 }

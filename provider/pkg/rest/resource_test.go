@@ -892,12 +892,13 @@ func TestUpdateMergesPriorStateWithoutReadOp(t *testing.T) {
 	}
 }
 
-// TestBuildRequestBodyExcludesParamsAndAppliesRenames: the body shouldn't
-// duplicate path/query parameters, and renames should only translate keys
-// that actually appear in the body schema (renames that exist purely to
-// expose a path-param wire name under a Pulumi synonym must not rewrite a
-// body field that happens to share the Pulumi name).
-func TestBuildRequestBodyExcludesParamsAndAppliesRenames(t *testing.T) {
+// TestBuildRequestBody: the body is driven by the request schema, not by
+// the inputs map — fields the schema doesn't declare get filtered out,
+// fields the schema does declare get pulled from inputs via the reverse
+// rename. This means a path-param wire name that also shows up in the
+// body (e.g. OrganizationWebhook's organizationName) survives in the
+// body, since the API validates the two copies match.
+func TestBuildRequestBody(t *testing.T) {
 	const specJSON = `{
 	  "openapi": "3.0.0",
 	  "components": {"schemas": {
@@ -908,6 +909,11 @@ func TestBuildRequestBodyExcludesParamsAndAppliesRenames(t *testing.T) {
 	    "WidgetBody": {"type": "object", "properties": {
 	      "widgetID":    {"type": "string"},
 	      "description": {"type": "string"}
+	    }},
+	    "WebhookBody": {"type": "object", "properties": {
+	      "organizationName": {"type": "string"},
+	      "name":             {"type": "string"},
+	      "payloadUrl":       {"type": "string"}
 	    }}
 	  }},
 	  "paths": {
@@ -926,6 +932,14 @@ func TestBuildRequestBodyExcludesParamsAndAppliesRenames(t *testing.T) {
 	        "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/WidgetBody"}}}},
 	        "responses": {"200": {"description": "OK"}}
 	      }
+	    },
+	    "/orgs/{orgName}/hooks": {
+	      "post": {
+	        "operationId": "CreateOrgHook",
+	        "parameters": [{"name": "orgName", "in": "path", "required": true, "schema": {"type": "string"}}],
+	        "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/WebhookBody"}}}},
+	        "responses": {"200": {"description": "OK"}}
+	      }
 	    }
 	  }
 	}`
@@ -942,7 +956,7 @@ func TestBuildRequestBodyExcludesParamsAndAppliesRenames(t *testing.T) {
 		want    map[string]any
 	}{
 		{
-			name:    "path param dropped",
+			name:    "path param not declared in body schema is dropped",
 			op:      "CreateTeam",
 			renames: nil,
 			inputs:  map[string]any{"org": "acme", "name": "infra", "description": "infra team"},
@@ -961,6 +975,20 @@ func TestBuildRequestBodyExcludesParamsAndAppliesRenames(t *testing.T) {
 			renames: map[string]string{"id": "widgetID"}, // body field rename
 			inputs:  map[string]any{"org": "acme", "id": "w-1", "description": "wodget"},
 			want:    map[string]any{"widgetID": "w-1", "description": "wodget"},
+		},
+		{
+			name: "path param ALSO declared in body schema is kept (server validates match)",
+			op:   "CreateOrgHook",
+			// OrganizationWebhook-style: Pulumi-side `organizationName` maps to
+			// wire path-param `orgName`, but the body schema also declares a
+			// wire-side `organizationName`. The body must carry it.
+			renames: map[string]string{"organizationName": "orgName"},
+			inputs: map[string]any{
+				"organizationName": "acme", "name": "alerts", "payloadUrl": "https://x",
+			},
+			want: map[string]any{
+				"organizationName": "acme", "name": "alerts", "payloadUrl": "https://x",
+			},
 		},
 	}
 
