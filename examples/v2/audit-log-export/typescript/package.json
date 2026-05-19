@@ -1,7 +1,7 @@
 {
 	"name": "pulumicloud-v2-audit-log-export",
 	"devDependencies": {
-		"@types/node": "^18"
+		"@types/node": "^22"
 	},
 	"dependencies": {
 		"typescript": "^4.0.0",
