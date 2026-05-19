@@ -18,7 +18,7 @@ new ps.v2.auth.OidcIssuer("githubIssuer", {
     orgName: serviceOrg,
     name: `github_issuer_${suffix}`,
     url: "https://token.actions.githubusercontent.com",
-    thumbprints: ["caef08400c87bedb0db28f1a0dc0b49e658c8e90a985b8c3e6a6e7f51a2d09d7"],
+    thumbprints: ["b41ae0832808ebc94951437bf7e92b93ccb6479364daf894d46d6001bee7a486"],
     maxExpiration: 3600,
 });
 new ps.v2.auth.OidcIssuer("pulumiSelfIssuer", {
