@@ -69,8 +69,23 @@ func run() error {
 		return err
 	}
 
-	if err := os.WriteFile(*outFlag, pretty, 0o600); err != nil {
+	if err := atomicWriteFile(*outFlag, pretty, 0o600); err != nil {
 		return fmt.Errorf("openapi-fetch: write %s: %w", *outFlag, err)
+	}
+	return nil
+}
+
+// atomicWriteFile writes via "<path>.tmp" + os.Rename so an interrupted
+// invocation can't leave a half-written spec.json on disk (which would
+// break //go:embed until git checkout).
+func atomicWriteFile(path string, data []byte, perm os.FileMode) error {
+	tmp := path + ".tmp"
+	if err := os.WriteFile(tmp, data, perm); err != nil {
+		return err
+	}
+	if err := os.Rename(tmp, path); err != nil {
+		_ = os.Remove(tmp)
+		return err
 	}
 	return nil
 }

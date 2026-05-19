@@ -115,6 +115,15 @@ var scopePrefixes = []string{
 	"Organization", "Org", "Pulumi", "Team", "Project", "Stack", "User",
 }
 
+// verboseBodyAliases pairs the lower-cased stem of a path-param prefix with
+// every body-field prefix that's recognized as a verbose alias of it (rule 4
+// in inferRenames). Strict allowlist — a HasPrefix match would also pair
+// "organizationalUnitName" against "{orgName}", inventing a rename out of
+// thin air.
+var verboseBodyAliases = map[string][]string{
+	"org": {"organization"},
+}
+
 // moduleAliases maps URL-derived module paths to the user-facing Pulumi
 // module name. Lives here rather than in metadata.json since it's a
 // scaffolder-internal mapping driven by service URL conventions.
@@ -795,6 +804,8 @@ func inferRenames(spec *rest.Spec, createOp, readOp, updateOp, deleteOp *rest.Op
 	}
 
 	// Rule (4): body field that duplicates a path param under a verbose alias.
+	// Pairs must come from verboseBodyAliases — a HasPrefix relation alone
+	// would also map "organizationalUnitName" → "orgName", which is wrong.
 	if createOp != nil {
 		bodyProps := flattenedProps(spec, createOp.RequestRef)
 		for _, p := range pathParamsOf(createOp) {
@@ -802,7 +813,10 @@ func inferRenames(spec *rest.Spec, createOp, readOp, updateOp, deleteOp *rest.Op
 			if !pOK || pPrefix == "" {
 				continue
 			}
-			pPrefixLower := strings.ToLower(pPrefix)
+			allowed := verboseBodyAliases[strings.ToLower(pPrefix)]
+			if len(allowed) == 0 {
+				continue
+			}
 			for body := range bodyProps {
 				if body == p {
 					continue
@@ -811,7 +825,7 @@ func inferRenames(spec *rest.Spec, createOp, readOp, updateOp, deleteOp *rest.Op
 				if !bOK || bSuffix != pSuffix {
 					continue
 				}
-				if !strings.HasPrefix(strings.ToLower(bPrefix), pPrefixLower) {
+				if !slices.Contains(allowed, strings.ToLower(bPrefix)) {
 					continue
 				}
 				if _, exists := out[body]; !exists {
@@ -875,50 +889,12 @@ func sameOps(prev map[string]any, next map[string]string) bool {
 	return true
 }
 
-// encodeStable marshals a map with deterministic key ordering: a preferred
-// order for known fields, then alphabetical for the rest.
+// encodeStable marshals an entry to JSON. Key order is json.Marshal's
+// default (alphabetical), matching what indentJSON's downstream
+// MarshalIndent re-parses-then-emits anyway — making this single source
+// of order produce the same result as the file on disk.
 func encodeStable(entry map[string]any) (json.RawMessage, error) {
-	preferred := []string{"operations", "idFormat",
-		"deleteBeforeReplace", "requireImport", "token",
-		"aliases", "renames", "fields", "outputs",
-		"outputsExclude", "description", "examples"}
-	var keys []string
-	seen := map[string]bool{}
-	for _, k := range preferred {
-		if _, ok := entry[k]; ok {
-			keys = append(keys, k)
-			seen[k] = true
-		}
-	}
-	var rest []string
-	for k := range entry {
-		if !seen[k] {
-			rest = append(rest, k)
-		}
-	}
-	sort.Strings(rest)
-	keys = append(keys, rest...)
-
-	var b strings.Builder
-	b.WriteByte('{')
-	for i, k := range keys {
-		if i > 0 {
-			b.WriteByte(',')
-		}
-		kEnc, err := json.Marshal(k)
-		if err != nil {
-			return nil, err
-		}
-		b.Write(kEnc)
-		b.WriteByte(':')
-		vEnc, err := json.Marshal(entry[k])
-		if err != nil {
-			return nil, err
-		}
-		b.Write(vEnc)
-	}
-	b.WriteByte('}')
-	return json.RawMessage(b.String()), nil
+	return json.Marshal(entry)
 }
 
 func writeMetadata(path string, doc *metadataDoc) error {
@@ -966,7 +942,22 @@ func writeMetadata(path string, doc *metadataDoc) error {
 	}
 	b.WriteString("}\n}\n")
 
-	return os.WriteFile(path, []byte(b.String()), 0o600)
+	return atomicWriteFile(path, []byte(b.String()), 0o600)
+}
+
+// atomicWriteFile writes via "<path>.tmp" + os.Rename so a Ctrl-C, OOM, or
+// disk-full mid-write can't leave a truncated metadata.json on disk
+// (which would break //go:embed until git checkout).
+func atomicWriteFile(path string, data []byte, perm os.FileMode) error {
+	tmp := path + ".tmp"
+	if err := os.WriteFile(tmp, data, perm); err != nil {
+		return err
+	}
+	if err := os.Rename(tmp, path); err != nil {
+		_ = os.Remove(tmp)
+		return err
+	}
+	return nil
 }
 
 func indentJSON(raw json.RawMessage, prefix string) ([]byte, error) {
