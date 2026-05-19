@@ -102,6 +102,19 @@ func (c *Config) Configure(context.Context) error {
 		return ErrAccessTokenNotFound
 	}
 
+	// SetDefault on APIURL applies during CheckConfig, not Configure;
+	// `pulumi import` persists default-provider state with empty inputs,
+	// and on subsequent destroy the engine calls Configure with apiUrl=""
+	// without re-running Check. Without this fallback NewClient would
+	// default to api.pulumi.com and 401 against a non-prod token
+	// (regression caught by TestYamlRbacComposeImport).
+	if c.APIURL == "" {
+		c.APIURL = os.Getenv(EnvVarPulumiBackendURL)
+	}
+	if c.APIURL == "" {
+		c.APIURL = os.Getenv(EnvVarPulumiAPI)
+	}
+
 	var err error
 	c.client, err = pulumiapi.NewClient(&http.Client{
 		Timeout: 60 * time.Second,

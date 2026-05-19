@@ -22,34 +22,75 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// AccessToken is read from PULUMI_ACCESS_TOKEN when the explicit input
-// is empty. APIURL fallback (PULUMI_BACKEND_URL / PULUMI_API) is handled
-// by infer's SetDefault before Configure runs, so it isn't exercised here.
-func TestConfigure_AccessTokenFallsBackToEnvVar(t *testing.T) {
+// `pulumi import` persists default-provider inputs as `{}`. On later
+// operations, Configure receives empty AccessToken and empty APIURL.
+// Both must fall back to env vars; otherwise destroy against a non-prod
+// backend dials api.pulumi.com and 401s.
+func TestConfigure_FallsBackToEnvVarsWhenInputsAreEmpty(t *testing.T) {
 	t.Setenv(EnvVarPulumiAccessToken, "pul-test-token")
+	t.Setenv(EnvVarPulumiBackendURL, "https://test-backend.example/")
 
-	c := &Config{}
+	c := &Config{} // Empty inputs — what `pulumi import` persists.
 	require.NoError(t, c.Configure(context.Background()))
 
 	assert.Equal(t, "pul-test-token", c.AccessToken,
 		"AccessToken must fall back to PULUMI_ACCESS_TOKEN when input is empty")
+	assert.Equal(t, "https://test-backend.example/", c.APIURL,
+		"APIURL must fall back to PULUMI_BACKEND_URL when input is empty — "+
+			"otherwise NewClient defaults to api.pulumi.com and a non-prod "+
+			"token will 401 on destroy of imported resources")
 }
 
-// Explicit AccessToken wins over the env-var fallback.
-func TestConfigure_ExplicitAccessTokenBeatsEnvVar(t *testing.T) {
+// Explicit config (from stack config or RPC) wins over env-var fallback.
+func TestConfigure_ExplicitConfigBeatsEnvVar(t *testing.T) {
 	t.Setenv(EnvVarPulumiAccessToken, "pul-env-token")
+	t.Setenv(EnvVarPulumiBackendURL, "https://env-backend.example/")
 
-	c := &Config{AccessToken: "pul-explicit-token"}
+	c := &Config{
+		AccessToken: "pul-explicit-token",
+		APIURL:      "https://explicit-backend.example/",
+	}
 	require.NoError(t, c.Configure(context.Background()))
 
 	assert.Equal(t, "pul-explicit-token", c.AccessToken,
 		"explicit AccessToken must not be overridden by env var fallback")
+	assert.Equal(t, "https://explicit-backend.example/", c.APIURL,
+		"explicit APIURL must not be overridden by env var fallback")
+}
+
+// PULUMI_API is a fallback when PULUMI_BACKEND_URL is unset. `pl login devstack`
+// (and friends) export PULUMI_API but not PULUMI_BACKEND_URL — without this
+// fallback the provider would silently dial api.pulumi.com and 401.
+func TestConfigure_FallsBackToPulumiAPIWhenBackendURLUnset(t *testing.T) {
+	t.Setenv(EnvVarPulumiAccessToken, "pul-test-token")
+	t.Setenv(EnvVarPulumiBackendURL, "")
+	t.Setenv(EnvVarPulumiAPI, "https://api.devstack.example/")
+
+	c := &Config{}
+	require.NoError(t, c.Configure(context.Background()))
+
+	assert.Equal(t, "https://api.devstack.example/", c.APIURL,
+		"APIURL must fall back to PULUMI_API when PULUMI_BACKEND_URL is unset")
+}
+
+// When both env vars are set, PULUMI_BACKEND_URL wins (canonical name).
+func TestConfigure_BackendURLBeatsPulumiAPI(t *testing.T) {
+	t.Setenv(EnvVarPulumiAccessToken, "pul-test-token")
+	t.Setenv(EnvVarPulumiBackendURL, "https://backend.example/")
+	t.Setenv(EnvVarPulumiAPI, "https://api.example/")
+
+	c := &Config{}
+	require.NoError(t, c.Configure(context.Background()))
+
+	assert.Equal(t, "https://backend.example/", c.APIURL,
+		"PULUMI_BACKEND_URL must win over PULUMI_API when both are set")
 }
 
 // No config, no env, no stored credentials → ErrAccessTokenNotFound.
 // Skips when ~/.pulumi/credentials.json is populated (dev machines).
 func TestConfigure_EmptyInputsAndNoEnvVarsErrors(t *testing.T) {
 	t.Setenv(EnvVarPulumiAccessToken, "")
+	t.Setenv(EnvVarPulumiBackendURL, "")
 	c := &Config{}
 	err := c.Configure(context.Background())
 	if err == nil {
