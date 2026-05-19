@@ -42,7 +42,7 @@ namespace Pulumi.PulumiService
             set => _accessToken.Set(value);
         }
 
-        private static readonly __Value<string?> _apiUrl = new __Value<string?>(() => __config.Get("apiUrl") ?? Utilities.GetEnv("PULUMI_BACKEND_URL") ?? "https://api.pulumi.com");
+        private static readonly __Value<string?> _apiUrl = new __Value<string?>(() => __config.Get("apiUrl") ?? Utilities.GetEnv("PULUMI_BACKEND_URL", "PULUMI_API") ?? "https://api.pulumi.com");
         /// <summary>
         /// Optional override of Pulumi Cloud API endpoint.
         /// </summary>

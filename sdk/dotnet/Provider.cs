@@ -80,7 +80,7 @@ namespace Pulumi.PulumiService
 
         public ProviderArgs()
         {
-            ApiUrl = Utilities.GetEnv("PULUMI_BACKEND_URL") ?? "https://api.pulumi.com";
+            ApiUrl = Utilities.GetEnv("PULUMI_BACKEND_URL", "PULUMI_API") ?? "https://api.pulumi.com";
         }
         public static new ProviderArgs Empty => new ProviderArgs();
     }

@@ -24,7 +24,7 @@ Object.defineProperty(exports, "accessToken", {
 export declare const apiUrl: string;
 Object.defineProperty(exports, "apiUrl", {
     get() {
-        return __config.get("apiUrl") ?? (utilities.getEnv("PULUMI_BACKEND_URL") || "https://api.pulumi.com");
+        return __config.get("apiUrl") ?? (utilities.getEnv("PULUMI_BACKEND_URL", "PULUMI_API") || "https://api.pulumi.com");
     },
     enumerable: true,
 });

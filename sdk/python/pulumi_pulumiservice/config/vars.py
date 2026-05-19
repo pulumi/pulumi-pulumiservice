@@ -32,5 +32,5 @@ class _ExportableConfig(types.ModuleType):
         """
         Optional override of Pulumi Cloud API endpoint.
         """
-        return __config__.get('apiUrl') or (_utilities.get_env('PULUMI_BACKEND_URL') or 'https://api.pulumi.com')
+        return __config__.get('apiUrl') or (_utilities.get_env('PULUMI_BACKEND_URL', 'PULUMI_API') or 'https://api.pulumi.com')
 
