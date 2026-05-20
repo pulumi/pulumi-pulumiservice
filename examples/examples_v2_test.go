@@ -282,12 +282,6 @@ var v2Cases = []v2Case{
 		SkipLang:       yamlOnlyLangs("esc-revision-tag example is yaml-only"),
 	},
 	{
-		Name:           "escpreview-mirror",
-		Config:         escPreviewMirrorConfig,
-		PreviewOnlyAll: true, // Legacy /api/preview/environments mirror; alias path validation only — exercising real API requires pre-existing preview state.
-		SkipLang:       yamlOnlyLangs("escpreview-mirror example is yaml-only"),
-	},
-	{
 		Name:           "service-items",
 		Config:         serviceItemsConfig,
 		PreviewOnlyAll: true, // services:Item attaches stacks to a Service; the referenced stacks aren't provisioned in this example.
@@ -931,18 +925,6 @@ func escRevisionTagConfig() map[string]string {
 		"envName":     "env-with-revtag-" + suffix,
 		"tagName":     "stable-" + suffix,
 		"tagRevision": "1",
-	}
-}
-
-func escPreviewMirrorConfig() map[string]string {
-	suffix := generateRandomFiveDigits()
-	return map[string]string{
-		"organizationName": ServiceProviderTestOrg,
-		"envName":    "legacy-preview-env-" + suffix,
-		"tagName":    "legacy-tag-" + suffix,
-		"tagValue":   "legacy-value-" + suffix,
-		"hookName":   "legacy-hook-" + suffix,
-		"payloadUrl": "https://example.invalid/preview-hook/" + suffix,
 	}
 }
 

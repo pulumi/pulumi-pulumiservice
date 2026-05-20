@@ -2,8 +2,12 @@
   "package": "pulumiservice",
   "_note": "Single source of truth for v2 resource metadata. operations/idFormat/renames/outputsExclude/token/requireImport are derived from spec.json by `go run ./tools/scaffold-metadata` (run via `go generate ./pkg/cloud/...`); module aliases live in the scaffolder source. Hand-curate examples/description/aliases/fields and they round-trip through regen. Add tokens to `_excluded` to keep the scaffolder from re-deriving them.",
   "_excluded": [
+    "pulumiservice:v2:Environment_preview_environments",
+    "pulumiservice:v2:EnvironmentTag_preview_environments",
+    "pulumiservice:v2:PolicyIssue",
     "pulumiservice:v2:PolicyPack",
-    "pulumiservice:v2:PolicyIssue"
+    "pulumiservice:v2:RevisionTag_preview_environments",
+    "pulumiservice:v2:Webhook_preview_environments"
   ],
   "resources": {
     "pulumiservice:v2:Account": {
@@ -178,23 +182,6 @@
       },
       "token": "pulumiservice:v2/esc:EnvironmentTag"
     },
-    "pulumiservice:v2:EnvironmentTag_preview_environments": {
-      "aliases": [
-        "pulumiservice:v2/preview:EnvironmentTag"
-      ],
-      "deleteBeforeReplace": true,
-      "idFormat": "{orgName}/{envName}/{name}",
-      "operations": {
-        "create": "CreateEnvironmentTag_preview_environments",
-        "delete": "DeleteEnvironmentTag_preview_environments",
-        "read": "GetEnvironmentTag_preview_environments",
-        "update": "UpdateEnvironmentTag_preview_environments"
-      },
-      "renames": {
-        "name": "tagName"
-      },
-      "token": "pulumiservice:v2/escPreview:EnvironmentTag"
-    },
     "pulumiservice:v2:Environment_esc_environments": {
       "deleteBeforeReplace": true,
       "idFormat": "{orgName}/{project}/{name}",
@@ -209,20 +196,6 @@
         "project": "projectName"
       },
       "token": "pulumiservice:v2/esc:Environment"
-    },
-    "pulumiservice:v2:Environment_preview_environments": {
-      "aliases": [
-        "pulumiservice:v2/preview:Environment"
-      ],
-      "deleteBeforeReplace": true,
-      "idFormat": "{orgName}/{envName}",
-      "operations": {
-        "create": "CreateEnvironment_preview_environments",
-        "delete": "DeleteEnvironment_preview_environments",
-        "read": "ReadEnvironment_preview_environments",
-        "update": "UpdateEnvironment_preview_environments"
-      },
-      "token": "pulumiservice:v2/escPreview:Environment"
     },
     "pulumiservice:v2:Gate": {
       "deleteBeforeReplace": true,
@@ -405,20 +378,6 @@
         "name": "tagName"
       },
       "token": "pulumiservice:v2/esc:RevisionTag"
-    },
-    "pulumiservice:v2:RevisionTag_preview_environments": {
-      "aliases": [
-        "pulumiservice:v2/preview:RevisionTag"
-      ],
-      "deleteBeforeReplace": true,
-      "idFormat": "{orgName}/{envName}/{tagName}",
-      "operations": {
-        "create": "CreateRevisionTag_preview_environments_versions_tags",
-        "delete": "DeleteRevisionTag_preview_environments",
-        "read": "ReadRevisionTag_preview_environments",
-        "update": "UpdateRevisionTag_preview_environments"
-      },
-      "token": "pulumiservice:v2/escPreview:RevisionTag"
     },
     "pulumiservice:v2:Role": {
       "deleteBeforeReplace": true,
@@ -618,29 +577,6 @@
         "organizationName": "orgName"
       },
       "token": "pulumiservice:v2/esc:Webhook"
-    },
-    "pulumiservice:v2:Webhook_preview_environments": {
-      "aliases": [
-        "pulumiservice:v2/preview:Webhook"
-      ],
-      "deleteBeforeReplace": true,
-      "fields": {
-        "groups": {
-          "unordered": true
-        }
-      },
-      "idFormat": "{organizationName}/{envName}/{name}",
-      "operations": {
-        "create": "CreateWebhook_preview_environments",
-        "delete": "DeleteWebhook_preview_environments",
-        "read": "GetWebhook_preview_environments",
-        "update": "UpdateWebhook_preview_environments"
-      },
-      "renames": {
-        "name": "hookName",
-        "organizationName": "orgName"
-      },
-      "token": "pulumiservice:v2/escPreview:Webhook"
     }
   }
 }

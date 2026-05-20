@@ -43,10 +43,6 @@
 | — | `esc:EnvironmentSettings` |
 | — | `esc:EnvironmentTag` |
 | — | `esc:OpenEnvironmentRequest` |
-| — | `escPreview:Environment` |
-| — | `escPreview:EnvironmentTag` |
-| — | `escPreview:RevisionTag` |
-| — | `escPreview:Webhook` |
 | — | `insights:ScheduledScanSettings` |
 | — | `integrations:AzureDevOpsIntegration` |
 | — | `integrations:BitBucketIntegration` |
