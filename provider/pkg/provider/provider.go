@@ -369,6 +369,9 @@ func (k *pulumiserviceProvider) Configure(
 		return nil, err
 	}
 	client, err := pulumiapi.NewClient(&httpClient, *token, *url)
+	if err != nil {
+		return nil, err
+	}
 
 	transport := rest.Transport(&authedTransport{
 		baseURL: *url,
@@ -392,10 +395,6 @@ func (k *pulumiserviceProvider) Configure(
 		*token,
 		false,
 	)
-
-	if err != nil {
-		return nil, err
-	}
 
 	// Store the client for use in Invoke functions
 	k.client = client
