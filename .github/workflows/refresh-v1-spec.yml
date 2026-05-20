@@ -23,6 +23,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  id-token: write # For ESC secrets.
 
 concurrency:
   group: refresh-v1-spec
@@ -52,12 +53,33 @@ jobs:
             exit 1
           fi
 
+      # Auth via GitHub App token (not GITHUB_TOKEN) so the eventual push to
+      # auto/refresh-v1-spec and the gh-CLI PR open emit events that trigger
+      # downstream pull_request workflows. Pushes/PRs from GITHUB_TOKEN are
+      # silently suppressed from triggering other workflows.
+      - env:
+          ESC_ACTION_ENVIRONMENT: github-secrets/${{ github.repository_owner }}-${{ github.event.repository.name }}
+          ESC_ACTION_EXPORT_ENVIRONMENT_VARIABLES: "false"
+          ESC_ACTION_OIDC_AUTH: "true"
+          ESC_ACTION_OIDC_ORGANIZATION: pulumi
+          ESC_ACTION_OIDC_REQUESTED_TOKEN_TYPE: urn:pulumi:token-type:access_token:organization
+        id: esc-secrets
+        name: Fetch secrets from ESC
+        uses: pulumi/esc-action@9eb774255b1a4afb7855678ae8d4a77359da0d9b
+
+      - uses: actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3 # v3.1.1
+        id: app-auth
+        with:
+          app-id: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_APP_ID }}
+          private-key: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
       - name: Checkout main
         uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ steps.app-auth.outputs.token }}
 
       - name: Install mise
         uses: jdx/mise-action@590bfd78fa3e93efd2e7ea21d65d397118ac1430
@@ -132,7 +154,7 @@ jobs:
       - name: Ensure auto-release label exists
         if: steps.diff.outputs.changed == 'true'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.app-auth.outputs.token }}
         run: |
           gh label create auto-release \
             --color FF6F00 \
@@ -171,7 +193,7 @@ jobs:
       - name: Open or update PR
         if: steps.diff.outputs.changed == 'true'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.app-auth.outputs.token }}
           VERSION: ${{ inputs.version }}
         run: |
           set -euo pipefail
