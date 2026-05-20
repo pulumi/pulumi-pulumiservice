@@ -3,7 +3,7 @@ module github.com/pulumi/pulumi-pulumiservice/examples/go-approval-rules
 go 1.25.0
 
 require (
-	github.com/pulumi/pulumi-pulumiservice/sdk v0.40.0
+	github.com/pulumi/pulumi-pulumiservice/sdk v1.0.0
 	github.com/pulumi/pulumi/sdk/v3 v3.209.0
 )
 
