@@ -96,7 +96,7 @@ jobs:
 
   v2_tests:
     name: v2_tests
-    uses: ./.github/workflows/v2-tests.yml
+    uses: ./.github/workflows/v1-tests.yml
     permissions:
       contents: read
       id-token: write
