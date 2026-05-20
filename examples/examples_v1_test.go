@@ -707,63 +707,63 @@ func orgOnlyConfig() map[string]string {
 func webhookConfig() map[string]string {
 	suffix := generateRandomFiveDigits()
 	return map[string]string{
-		"organizationName":  ServiceProviderTestOrg,
-		"secretValue": "shhh-" + suffix,
-		"hookSuffix":  suffix,
+		"organizationName": ServiceProviderTestOrg,
+		"secretValue":      "shhh-" + suffix,
+		"hookSuffix":       suffix,
 	}
 }
 
 func policyGroupsConfig() map[string]string {
 	return map[string]string{
 		"organizationName": ServiceProviderTestOrg,
-		"groupName":  "v1-pg-" + generateRandomFiveDigits(),
+		"groupName":        "v1-pg-" + generateRandomFiveDigits(),
 	}
 }
 
 func environmentsConfig() map[string]string {
 	suffix := generateRandomFiveDigits()
 	return map[string]string{
-		"organizationName":  ServiceProviderTestOrg,
-		"projectName": "v1-envs-" + suffix,
-		"envSuffix":   suffix,
+		"organizationName": ServiceProviderTestOrg,
+		"projectName":      "v1-envs-" + suffix,
+		"envSuffix":        suffix,
 	}
 }
 
 func rbacConfig() map[string]string {
 	return map[string]string{
-		"organizationName":      ServiceProviderTestOrg,
-		"nameSuffix":      generateRandomFiveDigits(),
-		"roleDescription": "Read-only access to stacks, created by the v1 rbac example.",
+		"organizationName": ServiceProviderTestOrg,
+		"nameSuffix":       generateRandomFiveDigits(),
+		"roleDescription":  "Read-only access to stacks, created by the v1 rbac example.",
 	}
 }
 
 func schedulesConfig() map[string]string {
 	suffix := generateRandomFiveDigits()
 	return map[string]string{
-		"organizationName":   ServiceProviderTestOrg,
-		"projectName":  "v1-schedules-" + suffix,
-		"stackName":    "dev-" + suffix,
-		"envName":      "v1-sched-env-" + suffix,
-		"scheduleCron": "0 7 * * *",
+		"organizationName": ServiceProviderTestOrg,
+		"projectName":      "v1-schedules-" + suffix,
+		"stackName":        "dev-" + suffix,
+		"envName":          "v1-sched-env-" + suffix,
+		"scheduleCron":     "0 7 * * *",
 	}
 }
 
 func stackConfig() map[string]string {
 	suffix := generateRandomFiveDigits()
 	return map[string]string{
-		"organizationName":     ServiceProviderTestOrg,
-		"projectName":    "v1-stack-" + suffix,
-		"stackName":      "dev-" + suffix,
-		"stackPurpose":   "demo",
-		"executorImage":  "pulumi-cli",
+		"organizationName": ServiceProviderTestOrg,
+		"projectName":      "v1-stack-" + suffix,
+		"stackName":        "dev-" + suffix,
+		"stackPurpose":     "demo",
+		"executorImage":    "pulumi-cli",
 	}
 }
 
 func teamsConfig() map[string]string {
 	return map[string]string{
-		"organizationName":      ServiceProviderTestOrg,
-		"teamSuffix":      generateRandomFiveDigits(),
-		"teamDescription": "A team created by the v1 example.",
+		"organizationName": ServiceProviderTestOrg,
+		"teamSuffix":       generateRandomFiveDigits(),
+		"teamDescription":  "A team created by the v1 example.",
 	}
 }
 
@@ -773,15 +773,15 @@ func oidcIssuerConfig() map[string]string {
 	// before the run, so the URLs are reusable. issuerSuffix kept for
 	// per-test name uniqueness.
 	return map[string]string{
-		"organizationName":    ServiceProviderTestOrg,
-		"issuerSuffix":  generateRandomFiveDigits(),
-		"maxExpiration": "3600",
+		"organizationName": ServiceProviderTestOrg,
+		"issuerSuffix":     generateRandomFiveDigits(),
+		"maxExpiration":    "3600",
 	}
 }
 
 func accessTokensConfig() map[string]string {
 	return map[string]string{
-		"organizationName":       ServiceProviderTestOrg,
+		"organizationName": ServiceProviderTestOrg,
 		"tokenSuffix":      generateRandomFiveDigits(),
 		"tokenDescription": "v1 access-tokens example",
 	}
@@ -789,15 +789,15 @@ func accessTokensConfig() map[string]string {
 
 func agentPoolsConfig() map[string]string {
 	return map[string]string{
-		"organizationName":      ServiceProviderTestOrg,
-		"poolSuffix":      generateRandomFiveDigits(),
-		"poolDescription": "v1 example agent pool",
+		"organizationName": ServiceProviderTestOrg,
+		"poolSuffix":       generateRandomFiveDigits(),
+		"poolDescription":  "v1 example agent pool",
 	}
 }
 
 func insightsAccountConfig() map[string]string {
 	return map[string]string{
-		"organizationName":          ServiceProviderTestOrg,
+		"organizationName":    ServiceProviderTestOrg,
 		"accountSuffix":       generateRandomFiveDigits(),
 		"insightsEnvironment": "insights/credentials",
 	}
@@ -806,68 +806,68 @@ func insightsAccountConfig() map[string]string {
 func stackTagsConfig() map[string]string {
 	suffix := generateRandomFiveDigits()
 	return map[string]string{
-		"organizationName":  ServiceProviderTestOrg,
-		"projectName": "v1-stack-tags-" + suffix,
-		"stackName":   "dev-" + suffix,
-		"tagValue":    "v1-tag-" + suffix,
+		"organizationName": ServiceProviderTestOrg,
+		"projectName":      "v1-stack-tags-" + suffix,
+		"stackName":        "dev-" + suffix,
+		"tagValue":         "v1-tag-" + suffix,
 	}
 }
 
 func templateSourcesConfig() map[string]string {
 	return map[string]string{
-		"organizationName":     ServiceProviderTestOrg,
-		"templateSuffix": generateRandomFiveDigits(),
-		"sourceUrl":      "https://github.com/pulumi/examples",
+		"organizationName": ServiceProviderTestOrg,
+		"templateSuffix":   generateRandomFiveDigits(),
+		"sourceUrl":        "https://github.com/pulumi/examples",
 	}
 }
 
 func organizationMembersConfig() map[string]string {
 	return map[string]string{
-		"organizationName":   ServiceProviderTestOrg,
-		"memberLogin":  "pulumi-bot",
-		"memberRole":   "member",
+		"organizationName": ServiceProviderTestOrg,
+		"memberLogin":      "pulumi-bot",
+		"memberRole":       "member",
 	}
 }
 
 func environmentConfigConfig() map[string]string {
 	suffix := generateRandomFiveDigits()
 	return map[string]string{
-		"organizationName":  ServiceProviderTestOrg,
-		"projectName": "v1-envcfg-" + suffix,
-		"envName":     "v1-envcfg-env-" + suffix,
+		"organizationName": ServiceProviderTestOrg,
+		"projectName":      "v1-envcfg-" + suffix,
+		"envName":          "v1-envcfg-env-" + suffix,
 	}
 }
 
 func serviceCatalogConfig() map[string]string {
 	return map[string]string{
-		"organizationName":    ServiceProviderTestOrg,
-		"serviceSuffix": generateRandomFiveDigits(),
+		"organizationName": ServiceProviderTestOrg,
+		"serviceSuffix":    generateRandomFiveDigits(),
 	}
 }
 
 func stackConfigCatalogConfig() map[string]string {
 	suffix := generateRandomFiveDigits()
 	return map[string]string{
-		"organizationName":  ServiceProviderTestOrg,
-		"projectName": "v1-stack-config-" + suffix,
-		"stackName":   "dev-" + suffix,
-		"hookUrl":     "https://example.invalid/hooks/" + suffix,
-		"envRef":      "organization/credentials",
+		"organizationName": ServiceProviderTestOrg,
+		"projectName":      "v1-stack-config-" + suffix,
+		"stackName":        "dev-" + suffix,
+		"hookUrl":          "https://example.invalid/hooks/" + suffix,
+		"envRef":           "organization/credentials",
 	}
 }
 
 func taskConfig() map[string]string {
 	return map[string]string{
 		"organizationName": ServiceProviderTestOrg,
-		"taskSuffix": generateRandomFiveDigits(),
-		"taskID":     "v1-task-" + generateRandomFiveDigits(),
+		"taskSuffix":       generateRandomFiveDigits(),
+		"taskID":           "v1-task-" + generateRandomFiveDigits(),
 	}
 }
 
 func vcsIntegrationsConfig() map[string]string {
 	suffix := generateRandomFiveDigits()
 	return map[string]string{
-		"organizationName":                    ServiceProviderTestOrg,
+		"organizationName":              ServiceProviderTestOrg,
 		"githubIntegrationId":           "gh-" + suffix,
 		"githubEnterpriseIntegrationId": "ghe-" + suffix,
 		"gitlabIntegrationId":           "gl-" + suffix,
@@ -879,15 +879,15 @@ func vcsIntegrationsConfig() map[string]string {
 func customVcsConfig() map[string]string {
 	return map[string]string{
 		"organizationName": ServiceProviderTestOrg,
-		"vcsSuffix":  generateRandomFiveDigits(),
-		"baseUrl":    "https://git.example.invalid",
-		"envRef":     "organization/vcs-credentials",
+		"vcsSuffix":        generateRandomFiveDigits(),
+		"baseUrl":          "https://git.example.invalid",
+		"envRef":           "organization/vcs-credentials",
 	}
 }
 
 func platformBootstrapConfig() map[string]string {
 	return map[string]string{
-		"organizationName":          ServiceProviderTestOrg,
+		"organizationName":    ServiceProviderTestOrg,
 		"suffix":              generateRandomFiveDigits(),
 		"prodApprovalEnabled": "true",
 		"slackWebhookUrl":     "https://hooks.slack.com/services/T00000000/B00000000/v2platformbootstrap",
@@ -898,41 +898,41 @@ func platformBootstrapConfig() map[string]string {
 func escWebhookConfig() map[string]string {
 	suffix := generateRandomFiveDigits()
 	return map[string]string{
-		"organizationName":  ServiceProviderTestOrg,
-		"projectName": "v1-esc-hook-" + suffix,
-		"envName":     "env-with-hook-" + suffix,
-		"hookName":    "hook-" + suffix,
-		"payloadUrl":  "https://example.invalid/hook/" + suffix,
-		"secretValue": "shhh-" + suffix,
+		"organizationName": ServiceProviderTestOrg,
+		"projectName":      "v1-esc-hook-" + suffix,
+		"envName":          "env-with-hook-" + suffix,
+		"hookName":         "hook-" + suffix,
+		"payloadUrl":       "https://example.invalid/hook/" + suffix,
+		"secretValue":      "shhh-" + suffix,
 	}
 }
 
 func escEnvironmentScheduleConfig() map[string]string {
 	suffix := generateRandomFiveDigits()
 	return map[string]string{
-		"organizationName":   ServiceProviderTestOrg,
-		"projectName":  "v1-esc-sched-" + suffix,
-		"envName":      "env-with-schedule-" + suffix,
-		"scheduleCron": "0 7 * * *",
+		"organizationName": ServiceProviderTestOrg,
+		"projectName":      "v1-esc-sched-" + suffix,
+		"envName":          "env-with-schedule-" + suffix,
+		"scheduleCron":     "0 7 * * *",
 	}
 }
 
 func escRevisionTagConfig() map[string]string {
 	suffix := generateRandomFiveDigits()
 	return map[string]string{
-		"organizationName":  ServiceProviderTestOrg,
-		"projectName": "v1-esc-revtag-" + suffix,
-		"envName":     "env-with-revtag-" + suffix,
-		"tagName":     "stable-" + suffix,
-		"tagRevision": "1",
+		"organizationName": ServiceProviderTestOrg,
+		"projectName":      "v1-esc-revtag-" + suffix,
+		"envName":          "env-with-revtag-" + suffix,
+		"tagName":          "stable-" + suffix,
+		"tagRevision":      "1",
 	}
 }
 
 func serviceItemsConfig() map[string]string {
 	return map[string]string{
-		"organizationName":    ServiceProviderTestOrg,
-		"serviceSuffix": generateRandomFiveDigits(),
-		"ownerType":     "team",
-		"ownerName":     "platform",
+		"organizationName": ServiceProviderTestOrg,
+		"serviceSuffix":    generateRandomFiveDigits(),
+		"ownerType":        "team",
+		"ownerName":        "platform",
 	}
 }

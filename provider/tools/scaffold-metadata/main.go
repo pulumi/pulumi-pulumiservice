@@ -128,15 +128,15 @@ var verboseBodyAliases = map[string][]string{
 // module name. Lives here rather than in metadata.json since it's a
 // scaffolder-internal mapping driven by service URL conventions.
 var moduleAliases = map[string]string{
-	"agent-pools":          "agents",
-	"auth/policies":        "auth",
-	"esc/environments":     "esc",
-	"oidc/issuers":         "auth",
-	"preview/agents":   "agents",
-	"preview/insights": "insights",
-	"saml":                 "auth",
-	"stacks/deployments":   "deployments",
-	"teams/tokens":         "tokens",
+	"agent-pools":        "agents",
+	"auth/policies":      "auth",
+	"esc/environments":   "esc",
+	"oidc/issuers":       "auth",
+	"preview/agents":     "agents",
+	"preview/insights":   "insights",
+	"saml":               "auth",
+	"stacks/deployments": "deployments",
+	"teams/tokens":       "tokens",
 }
 
 // metadataDoc mirrors metadata.json. Resources serialize via RawMessage so
