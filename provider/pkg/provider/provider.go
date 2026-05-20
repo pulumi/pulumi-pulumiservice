@@ -78,7 +78,7 @@ type pulumiserviceProvider struct {
 	pulumiResources []PulumiServiceResource
 	AccessToken     string
 	client          *pulumiapi.Client
-	// transportRef is the per-provider v2 transport, populated during
+	// transportRef is the per-provider v1 transport, populated during
 	// Configure and consumed by the ctxmw.Wrap layer to attach this
 	// provider's transport to every CRUD context — keeps multi-provider
 	// instances from racing on a package-global.
@@ -95,16 +95,16 @@ var manualSchema string
 //
 //  1. legacyRaw — the existing custom gRPC server (pulumiserviceProvider)
 //     handling resources defined in manual-schema.json.
-//  2. dispatch.Wrap — overlays metadata-driven v2 resources from
+//  2. dispatch.Wrap — overlays metadata-driven v1 resources from
 //     provider/pkg/cloud/metadata.json. Schema for these is spliced into
-//     GetSchema responses by withCloudV2Schema.
+//     GetSchema responses by withCloudV1Schema.
 //  3. infer.NewProviderBuilder — adds modern infer-style resources
 //     (Team, OrganizationRole, etc.) at pulumiservice:index:* and stamps
 //     in package-level metadata (display name, language map, config schema).
 //
 // Existing user code keeps working unchanged: pulumiservice:index:* tokens
-// resolve through layers 1 and 3; the new v2 resources at
-// pulumiservice:v2:* resolve through layer 2.
+// resolve through layers 1 and 3; the new v1 resources at
+// pulumiservice:v1:* resolve through layer 2.
 func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.ResourceProviderServer, error) {
 	transportRef := &atomic.Value{}
 	legacyRaw := rpc.Provider(&pulumiserviceProvider{
@@ -120,7 +120,7 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 		customs[tokens.Type(tok)] = h
 	}
 	composed := dispatch.Wrap(legacyRaw, dispatch.Options{Customs: customs})
-	composed = withCloudV2Schema(composed, cloud.Spec(), cloud.Metadata(), name)
+	composed = withCloudV1Schema(composed, cloud.Spec(), cloud.Metadata(), name)
 	// Attach this provider's transport to every CRUD context. Pairs with
 	// pulumiserviceProvider.Configure storing into transportRef.
 	composed = ctxmw.Wrap(composed, func(ctx context.Context) context.Context {
@@ -175,7 +175,7 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 			"csharp": map[string]any{
 				"namespaces": map[string]any{
 					"pulumiservice": "PulumiService",
-					"v2":            "V2",
+					"v1":            "V1",
 				},
 				"packageReferences": map[string]any{
 					"Pulumi": "3.*",
@@ -247,9 +247,9 @@ func (t *authedTransport) Do(_ context.Context, req *http.Request) (*http.Respon
 	req.Host = base.Host
 
 	req.Header.Set("Authorization", "token "+t.token)
-	// v1 callers leave Accept unset and want the Pulumi-versioned media type;
-	// v2 (rest.Resource) sets Accept: application/json explicitly because its
-	// OpenAPI-described endpoints return standard JSON.
+	// v0 (legacy) callers leave Accept unset and want the Pulumi-versioned
+	// media type; v1 (rest.Resource) sets Accept: application/json explicitly
+	// because its OpenAPI-described endpoints return standard JSON.
 	if req.Header.Get("Accept") == "" {
 		req.Header.Set("Accept", apiclient.AcceptMediaType)
 	}
@@ -258,7 +258,7 @@ func (t *authedTransport) Do(_ context.Context, req *http.Request) (*http.Respon
 	return t.client.Do(req)
 }
 
-func withCloudV2Schema(prov p.Provider, spec *rest.Spec, metadata *rest.Metadata, pkg string) p.Provider {
+func withCloudV1Schema(prov p.Provider, spec *rest.Spec, metadata *rest.Metadata, pkg string) p.Provider {
 	inner := prov.GetSchema
 	prov.GetSchema = func(ctx context.Context, req p.GetSchemaRequest) (p.GetSchemaResponse, error) {
 		resp, err := inner(ctx, req)
@@ -267,16 +267,16 @@ func withCloudV2Schema(prov p.Provider, spec *rest.Spec, metadata *rest.Metadata
 		}
 		var base schema.PackageSpec
 		if err := json.Unmarshal([]byte(resp.Schema), &base); err != nil {
-			return resp, fmt.Errorf("withCloudV2Schema: parse base schema: %w", err)
+			return resp, fmt.Errorf("withCloudV1Schema: parse base schema: %w", err)
 		}
 		fragment, err := rest.BuildSchema(spec, metadata, pkg)
 		if err != nil {
-			return resp, fmt.Errorf("withCloudV2Schema: %w", err)
+			return resp, fmt.Errorf("withCloudV1Schema: %w", err)
 		}
 		mergeSpec(&base, fragment)
 		out, err := json.Marshal(base)
 		if err != nil {
-			return resp, fmt.Errorf("withCloudV2Schema: re-encode schema: %w", err)
+			return resp, fmt.Errorf("withCloudV1Schema: re-encode schema: %w", err)
 		}
 		resp.Schema = string(out)
 		return resp, nil

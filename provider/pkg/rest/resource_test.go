@@ -31,7 +31,7 @@ import (
 
 // Repeated test-only literals — extracted so goconst stops flagging them.
 const (
-	teamToken      = "pulumiservice:v2:Team" //nolint:gosec // resource token, not a credential
+	teamToken      = "pulumiservice:v1:Team" //nolint:gosec // resource token, not a credential
 	getThingPath   = "GET /things/acme/thing-1"
 	patchThingPath = "PATCH /things/acme/thing-1"
 )
@@ -120,7 +120,7 @@ func TestCreateSynthesizesID(t *testing.T) {
 	}{
 		{
 			// AgentPool: server-generated id, ID = {orgName}/{uuid}.
-			token: "pulumiservice:v2:AgentPool",
+			token: "pulumiservice:v1:AgentPool",
 			responses: map[string]mockResponse{
 				"POST /api/orgs/test-org/agent-pools": {
 					status: 200,
@@ -140,7 +140,7 @@ func TestCreateSynthesizesID(t *testing.T) {
 		},
 		{
 			// StackTag: 204 No Content, identity entirely from inputs.
-			token: "pulumiservice:v2:StackTag",
+			token: "pulumiservice:v1:StackTag",
 			responses: map[string]mockResponse{
 				"POST /api/stacks/test-org/myproj/mystack/tags": {status: 204, body: ""},
 			},
@@ -176,7 +176,7 @@ func TestCreateSynthesizesID(t *testing.T) {
 		{
 			// DefaultOrganization: requireImport singleton; GET returns 404
 			// for the probe, 200 after the mutating call writes it.
-			token: "pulumiservice:v2:DefaultOrganization",
+			token: "pulumiservice:v1:DefaultOrganization",
 			responseFn: func() func(req *http.Request) mockResponse {
 				written := false
 				return func(req *http.Request) mockResponse {
@@ -200,7 +200,7 @@ func TestCreateSynthesizesID(t *testing.T) {
 		{
 			// AuditLogExportConfiguration: requireImport singleton, same
 			// staging pattern as DefaultOrganization.
-			token: "pulumiservice:v2:AuditLogExportConfiguration",
+			token: "pulumiservice:v1:AuditLogExportConfiguration",
 			responseFn: func() func(req *http.Request) mockResponse {
 				written := false
 				return func(req *http.Request) mockResponse {
@@ -223,7 +223,7 @@ func TestCreateSynthesizesID(t *testing.T) {
 		},
 		{
 			// Role: server-generated id, response rename id→roleID.
-			token: "pulumiservice:v2:Role",
+			token: "pulumiservice:v1:Role",
 			responses: map[string]mockResponse{
 				"POST /api/orgs/test-org/roles": {
 					status: 200,
@@ -690,7 +690,7 @@ func TestCreateRequireImport_ServerIDReadURL_MetadataError(t *testing.T) {
 		spec: spec,
 		meta: ResourceMeta{
 			Operations:    Operations{Create: "CreateThing", Read: "ReadThing"},
-			Token:         "pulumiservice:v2:Thing",
+			Token:         "pulumiservice:v1:Thing",
 			RequireImport: true,
 		},
 	}
@@ -706,7 +706,7 @@ func TestCreateRequireImport_ServerIDReadURL_MetadataError(t *testing.T) {
 	if !strings.Contains(err.Error(), "metadata error") {
 		t.Errorf("error must signal a metadata issue: %v", err)
 	}
-	if !strings.Contains(err.Error(), "pulumiservice:v2:Thing") {
+	if !strings.Contains(err.Error(), "pulumiservice:v1:Thing") {
 		t.Errorf("error must name the resource token: %v", err)
 	}
 	if len(mock.calls) != 0 {
@@ -1073,7 +1073,7 @@ func TestBuildRequestBody(t *testing.T) {
 }
 
 // TestDeleteIsIdempotentOn404 pins the runtime behavior: 404 on Delete is
-// treated as success. Centralizing this means every v2 resource is
+// treated as success. Centralizing this means every v1 resource is
 // uniformly idempotent without per-resource metadata or scaffolder hints.
 func TestDeleteIsIdempotentOn404(t *testing.T) {
 	const specJSON = `{

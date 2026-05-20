@@ -1,0 +1,12 @@
+name: pulumicloud-v1-organization-members
+runtime: yaml
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  memberLogin:
+    type: string
+    default: pulumi-bot
+  memberRole:
+    type: string
+    default: member

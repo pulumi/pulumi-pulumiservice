@@ -149,7 +149,7 @@ func TestCheckGeneratesAutoName(t *testing.T) {
 		"name": {AutoName: 24},
 	}, "", false)
 	resp, err := r.Check(context.Background(), p.CheckRequest{
-		Urn:        presource.URN("urn:pulumi:dev::demo::pulumiservice:v2:Foo::myresource"),
+		Urn:        presource.URN("urn:pulumi:dev::demo::pulumiservice:v1:Foo::myresource"),
 		RandomSeed: []byte("deterministic-seed"),
 		Inputs:     property.NewMap(map[string]property.Value{}),
 	})
@@ -169,7 +169,7 @@ func TestCheckGeneratesAutoName(t *testing.T) {
 	}
 	// Determinism: same seed → same name.
 	resp2, _ := r.Check(context.Background(), p.CheckRequest{
-		Urn:        presource.URN("urn:pulumi:dev::demo::pulumiservice:v2:Foo::myresource"),
+		Urn:        presource.URN("urn:pulumi:dev::demo::pulumiservice:v1:Foo::myresource"),
 		RandomSeed: []byte("deterministic-seed"),
 	})
 	got2, _ := resp2.Inputs.GetOk("name")
@@ -184,7 +184,7 @@ func TestCheckPreservesUserSuppliedName(t *testing.T) {
 		"name": {AutoName: 24},
 	}, "", false)
 	resp, _ := r.Check(context.Background(), p.CheckRequest{
-		Urn:        presource.URN("urn:pulumi:dev::demo::pulumiservice:v2:Foo::myresource"),
+		Urn:        presource.URN("urn:pulumi:dev::demo::pulumiservice:v1:Foo::myresource"),
 		RandomSeed: []byte("seed"),
 		Inputs: property.NewMap(map[string]property.Value{
 			"name": property.New("explicit-name"),

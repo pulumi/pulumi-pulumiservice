@@ -43,10 +43,10 @@ func TestPathParamsAreInputOnly(t *testing.T) {
 	if err != nil {
 		t.Fatalf("BuildSchema: %v", err)
 	}
-	rm := meta.Resources["pulumiservice:v2:Team"]
+	rm := meta.Resources["pulumiservice:v1:Team"]
 	tok := rm.Token
 	if tok == "" {
-		tok = "pulumiservice:v2:Team"
+		tok = "pulumiservice:v1:Team"
 	}
 	rs, ok := pkg.Resources[tok]
 	if !ok {
@@ -68,10 +68,10 @@ func TestPathParamInputsAreReplaceOnChanges(t *testing.T) {
 	if err != nil {
 		t.Fatalf("BuildSchema: %v", err)
 	}
-	rm := meta.Resources["pulumiservice:v2:Team"]
+	rm := meta.Resources["pulumiservice:v1:Team"]
 	tok := rm.Token
 	if tok == "" {
-		tok = "pulumiservice:v2:Team"
+		tok = "pulumiservice:v1:Team"
 	}
 	rs := pkg.Resources[tok]
 	for _, name := range []string{"orgName", "name"} {
@@ -113,10 +113,10 @@ func TestSecretFieldsAreMarkedSecret(t *testing.T) {
 		field   string
 		surface string // "output" or "input"
 	}{
-		{"pulumiservice:v2:OrgToken", "tokenValue", "output"},
-		{"pulumiservice:v2:TeamToken", "tokenValue", "output"},
-		{"pulumiservice:v2:PersonalToken", "tokenValue", "output"},
-		{"pulumiservice:v2:OrganizationWebhook", "secret", "input"},
+		{"pulumiservice:v1:OrgToken", "tokenValue", "output"},
+		{"pulumiservice:v1:TeamToken", "tokenValue", "output"},
+		{"pulumiservice:v1:PersonalToken", "tokenValue", "output"},
+		{"pulumiservice:v1:OrganizationWebhook", "secret", "input"},
 	}
 	for _, tc := range cases {
 		rm := meta.Resources[tc.token]
@@ -150,7 +150,7 @@ func TestIDFormatRoundTrip(t *testing.T) {
 	_, meta := loadFixtures(t)
 	for tok, rm := range meta.Resources {
 		if rm.IDFormat == "" {
-			t.Errorf("%s: idFormat is empty (every v2 resource should declare one)", tok)
+			t.Errorf("%s: idFormat is empty (every v1 resource should declare one)", tok)
 			continue
 		}
 		re, names, err := compileIDFormatRegex(rm.IDFormat)
@@ -493,7 +493,7 @@ func TestBuildResourceAcceptsResourceWithoutPathParams(t *testing.T) {
 // TestExamplesAppendedToDescription pins the format SDK codegen relies on
 // for auto-translating PCL examples per language.
 func TestExamplesAppendedToDescription(t *testing.T) {
-	got := appendExamples("Manages a Foo.", []string{`resource "foo" "pulumiservice:v2:Foo" {}`})
+	got := appendExamples("Manages a Foo.", []string{`resource "foo" "pulumiservice:v1:Foo" {}`})
 	if !strings.Contains(got, "## Example Usage") {
 		t.Errorf("missing `## Example Usage` heading:\n%s", got)
 	}

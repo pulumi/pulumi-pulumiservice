@@ -212,12 +212,12 @@ export * from "./types/enums";
 // Export sub-modules:
 import * as config from "./config";
 import * as types from "./types";
-import * as v2 from "./v2";
+import * as v1 from "./v1";
 
 export {
     config,
     types,
-    v2,
+    v1,
 };
 
 const _module = {

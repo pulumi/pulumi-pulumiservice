@@ -16,7 +16,7 @@
     "csharp": {
       "namespaces": {
         "pulumiservice": "PulumiService",
-        "v2": "V2"
+        "v1": "V1"
       },
       "packageReferences": {
         "Pulumi": "3.*"
@@ -3080,7 +3080,7 @@
         "payloadUrl"
       ]
     },
-    "pulumiservice:v2/agents:Pool": {
+    "pulumiservice:v1/agents:Pool": {
       "description": "Creates a new agent pool for an organization. Agent pools enable self-hosted deployment agents, allowing organizations to run Pulumi Deployments on their own infrastructure rather than Pulumi-managed infrastructure. This is useful for accessing private networks, meeting compliance requirements, or using custom execution environments. The response includes an access token (agent pool secret) that self-hosted agents use to authenticate when polling for deployment work. This token is only returned once at creation time and cannot be retrieved later.",
       "properties": {
         "agents": {
@@ -3148,7 +3148,7 @@
         "orgName"
       ]
     },
-    "pulumiservice:v2/agents:Task": {
+    "pulumiservice:v1/agents:Task": {
       "description": "Creates a new agent task for the specified organization. The request must include a prompt (the user event message) that initiates the task. Set the 'permissionMode' field in the request body to restrict the agent to read-only operations. Returns the created task details including task ID, name, status, and timestamp.",
       "properties": {
         "approvalMode": {
@@ -3308,7 +3308,7 @@
         "orgName"
       ]
     },
-    "pulumiservice:v2/auth:OidcIssuer": {
+    "pulumiservice:v1/auth:OidcIssuer": {
       "description": "Registers a new OIDC issuer for an organization, establishing a trust relationship with an external identity provider. Once registered, the identity provider can issue signed, short-lived tokens that are exchanged for temporary Pulumi Cloud credentials during deployments. This eliminates the need to store long-lived access tokens. Supported providers include AWS, Azure, Google Cloud, GitHub Actions, and any OIDC-compliant identity provider. The request must include the issuer URL, and the service will fetch the provider's public signing keys to verify token authenticity.",
       "properties": {
         "created": {
@@ -3405,7 +3405,7 @@
         "url"
       ]
     },
-    "pulumiservice:v2/auth:Policy": {
+    "pulumiservice:v1/auth:Policy": {
       "description": "Updates an authentication policy for an organization. Authentication policies define rules for how OIDC tokens are validated and what access they grant, including claim mappings, trust conditions, and role assignments. The policy definition cannot be empty.\n\nThe request body contains a `policies` array where each policy object includes:\n- `decision`: `allow` or `deny`\n- `tokenType`: `organization`, `team`, `personal`, or `runner`\n- `teamName`: required when tokenType is `team`\n- `userLogin`: required when tokenType is `personal`\n- `runnerID`: required when tokenType is `runner`\n- `authorizedPermissions`: array of permissions (only `admin` is supported for organization tokens)\n- `rules`: object defining claim-matching rules for the token\n\nFor more information about authorization rules, refer to the [OIDC authorization policies documentation](https://www.pulumi.com/docs/pulumi-cloud/access-management/oidc/client/#configure-the-authorization-policies).",
       "properties": {
         "created": {
@@ -3471,7 +3471,7 @@
         "policyId"
       ]
     },
-    "pulumiservice:v2/auth:SAML": {
+    "pulumiservice:v1/auth:SAML": {
       "description": "Updates the SAML configuration for a SAML-backed organization, including the identity provider SSO descriptor, attribute mappings, and other SAML settings. The new IDP SSO descriptor is required in the update request.",
       "properties": {
         "entityId": {
@@ -3524,7 +3524,7 @@
         "orgName"
       ]
     },
-    "pulumiservice:v2/deployments:ScheduledDeployment": {
+    "pulumiservice:v1/deployments:ScheduledDeployment": {
       "description": "Creates a custom deployment schedule for a stack using Pulumi Deployments. Custom schedules allow you to automate recurring or one-time Pulumi operations on a stack. The request must include exactly one of 'scheduleCron' (a cron expression for recurring executions, e.g. '0 */4 * * *' for every 4 hours) or 'scheduleOnce' (an ISO 8601 timestamp for a one-time execution). The 'request' field contains the deployment configuration that will be executed on each scheduled run, including the Pulumi operation type and any settings overrides. The stack must have deployment settings configured before a schedule can be created.",
       "properties": {
         "created": {
@@ -3631,7 +3631,7 @@
         "stackName"
       ]
     },
-    "pulumiservice:v2/deployments:Settings": {
+    "pulumiservice:v1/deployments:Settings": {
       "description": "Creates or updates Pulumi Deployments settings for a stack using a merge operation. If no settings exist, they are created. If settings already exist, the request body is merged with the current settings using the following logic: for each property, start with the current value, remove it if the patch specifies null, or merge the new non-null value with the existing one. Non-object properties (strings, numbers, booleans) are replaced entirely. Settings include source context (git repository URL, branch, directory), operation context (environment variables, pre-run commands, OIDC configuration), executor context, GitHub integration settings, and cache options. Requires a Team Growth or higher subscription. Cannot be used to configure Pulumi Deployments for Terraform stacks.",
       "properties": {
         "agentPoolID": {
@@ -3734,7 +3734,7 @@
         "stackName"
       ]
     },
-    "pulumiservice:v2/esc:Environment": {
+    "pulumiservice:v1/esc:Environment": {
       "description": "Creates a new Pulumi ESC (Environments, Secrets, and Configuration) environment within the specified organization. The request body must include the project name and the environment name. Environment names must be unique within a project and may only contain alphanumeric characters, hyphens, underscores, and periods. The newly created environment starts with an empty YAML definition that can be updated via the UpdateEnvironment endpoint.",
       "properties": {
         "yaml": {
@@ -3775,7 +3775,7 @@
         "project"
       ]
     },
-    "pulumiservice:v2/esc:EnvironmentDraft": {
+    "pulumiservice:v1/esc:EnvironmentDraft": {
       "description": "Creates a new draft change request for a Pulumi ESC environment. Drafts allow proposing changes to an environment definition that can be reviewed and approved before being applied. This is part of the approvals workflow for environments. Returns a ChangeRequestRef containing the draft identifier. Requires the Approvals feature to be enabled for the organization.",
       "properties": {
         "changeRequestId": {
@@ -3825,7 +3825,7 @@
         "projectName"
       ]
     },
-    "pulumiservice:v2/esc:EnvironmentSchedule": {
+    "pulumiservice:v1/esc:EnvironmentSchedule": {
       "description": "Creates a new scheduled action for a Pulumi ESC environment. Schedules can be used to automate recurring operations on environments, such as secret rotation. The request body specifies the schedule timing and the action to perform. Returns the created ScheduledAction on success. Requires the secret rotation feature to be enabled for the organization.",
       "properties": {
         "created": {
@@ -3933,7 +3933,7 @@
         "projectName"
       ]
     },
-    "pulumiservice:v2/esc:EnvironmentSettings": {
+    "pulumiservice:v1/esc:EnvironmentSettings": {
       "description": "Updates settings for a Pulumi ESC environment using a partial update (patch) approach. Currently supports toggling deletion protection via the deletionProtected field. When deletionProtected is set to true, the environment cannot be deleted until the setting is explicitly disabled. Only the fields included in the request body are modified; omitted fields retain their current values.",
       "properties": {
         "deletionProtected": {
@@ -3975,7 +3975,7 @@
         "projectName"
       ]
     },
-    "pulumiservice:v2/esc:EnvironmentTag": {
+    "pulumiservice:v1/esc:EnvironmentTag": {
       "description": "Adds a new user-defined tag to a Pulumi ESC environment. Tags are key-value pairs that provide contextual metadata for organizing and searching environments (e.g., region=us-east-1, team=platform). The tag name and value are provided in the request body. Returns the created EnvironmentTag on success. Returns 409 if a tag with the same name already exists on the environment.",
       "properties": {
         "created": {
@@ -4050,7 +4050,7 @@
         "value"
       ]
     },
-    "pulumiservice:v2/esc:OpenEnvironmentRequest": {
+    "pulumiservice:v1/esc:OpenEnvironmentRequest": {
       "description": "Creates an open request for a Pulumi ESC environment that has gated opens enabled. When an environment has open gates configured, opening the environment requires an approval workflow. This endpoint initiates that process by creating an open request, and also creates corresponding open requests for each imported environment that has open gates. Requires the Approvals feature to be enabled for the organization. Returns 400 if the environment does not have gated opens.",
       "properties": {
         "accessDurationSeconds": {
@@ -4109,7 +4109,7 @@
         "projectName"
       ]
     },
-    "pulumiservice:v2/esc:RevisionTag": {
+    "pulumiservice:v1/esc:RevisionTag": {
       "description": "Creates a new revision tag for a Pulumi ESC environment. Revision tags are named references that point to specific revision numbers, similar to Git tags. They allow pinning a stable reference to a known-good version of an environment. Tagged versions can be used in imports and Pulumi stack configuration (e.g., myproject/env@prod) to ensure stable references unaffected by subsequent changes. The built-in 'latest' tag always points to the most recent revision.",
       "properties": {
         "created": {
@@ -4181,7 +4181,7 @@
         "projectName"
       ]
     },
-    "pulumiservice:v2/esc:Webhook": {
+    "pulumiservice:v1/esc:Webhook": {
       "description": "Creates a new webhook for a Pulumi ESC environment. Webhooks allow external services to be notified when environment events occur, such as updates or opens. The request body specifies the webhook configuration including the destination URL, event filters, and format. Returns 400 if the organization name in the request body does not match the URL path parameter. Returns 409 if a webhook with the same name already exists.",
       "properties": {
         "active": {
@@ -4335,7 +4335,7 @@
         "projectName"
       ]
     },
-    "pulumiservice:v2/insights:Account": {
+    "pulumiservice:v1/insights:Account": {
       "description": "Creates a new Insights account. An Insights account represents a cloud provider account (e.g., AWS, Azure, OCI) configured for resource discovery.",
       "properties": {
         "agentPoolID": {
@@ -4433,7 +4433,7 @@
         "provider"
       ]
     },
-    "pulumiservice:v2/insights:ScheduledScanSettings": {
+    "pulumiservice:v1/insights:ScheduledScanSettings": {
       "description": "Updates the scheduled scan configuration for an Insights account, such as scan frequency and schedule.",
       "properties": {
         "batchSize": {
@@ -4510,7 +4510,7 @@
         "paused"
       ]
     },
-    "pulumiservice:v2/integrations:AzureDevOpsIntegration": {
+    "pulumiservice:v1/integrations:AzureDevOpsIntegration": {
       "description": "Updates an existing Azure DevOps integration's settings. Can modify the Azure DevOps organization, project, or authentication configuration.",
       "properties": {
         "authUser": {
@@ -4582,7 +4582,7 @@
         "orgName"
       ]
     },
-    "pulumiservice:v2/integrations:BitBucketIntegration": {
+    "pulumiservice:v1/integrations:BitBucketIntegration": {
       "description": "Updates an existing BitBucket integration's settings, such as PR comment preferences and AI summary options.",
       "properties": {
         "authType": {
@@ -4671,7 +4671,7 @@
         "orgName"
       ]
     },
-    "pulumiservice:v2/integrations:CustomVCSIntegration": {
+    "pulumiservice:v1/integrations:CustomVCSIntegration": {
       "description": "Creates a new custom VCS integration for an organization. Custom VCS integrations allow connecting self-hosted or third-party version control systems (e.g. Gitea, Forgejo, Bitbucket Server) to Pulumi Deployments. Credentials are managed via ESC environments, and deployments are triggered by inbound webhooks. Returns the created integration including its webhook URL and HMAC secret for signature verification.",
       "properties": {
         "baseUrl": {
@@ -4766,7 +4766,7 @@
         "orgName"
       ]
     },
-    "pulumiservice:v2/integrations:CustomVCSRepository": {
+    "pulumiservice:v1/integrations:CustomVCSRepository": {
       "description": "Adds a repository to a custom VCS integration. The repository name must be unique within the integration. Returns 409 Conflict if a repository with the same name is already configured.",
       "type": "object",
       "inputProperties": {
@@ -4797,7 +4797,7 @@
         "orgName"
       ]
     },
-    "pulumiservice:v2/integrations:GitHubEnterpriseIntegration": {
+    "pulumiservice:v1/integrations:GitHubEnterpriseIntegration": {
       "description": "Updates GitHub Enterprise Server integration settings.",
       "properties": {
         "accountID": {
@@ -4911,7 +4911,7 @@
         "orgName"
       ]
     },
-    "pulumiservice:v2/integrations:GitHubIntegration": {
+    "pulumiservice:v1/integrations:GitHubIntegration": {
       "description": "Updates GitHub App integration settings.",
       "properties": {
         "accountID": {
@@ -5025,7 +5025,7 @@
         "orgName"
       ]
     },
-    "pulumiservice:v2/integrations:GitLabIntegration": {
+    "pulumiservice:v1/integrations:GitLabIntegration": {
       "description": "Updates an existing GitLab integration's settings, such as PR comment preferences and AI summary options.",
       "properties": {
         "authUser": {
@@ -5118,7 +5118,7 @@
         "orgName"
       ]
     },
-    "pulumiservice:v2/services:Item": {
+    "pulumiservice:v1/services:Item": {
       "description": "Adds items (such as access tokens, team memberships, or stack permissions) to an existing service account. Service accounts provide programmatic, non-human access to Pulumi Cloud resources and are scoped to an organization. Items define what the service account can access and what credentials it holds. Returns the updated service details.",
       "properties": {
         "continuationToken": {
@@ -5183,7 +5183,7 @@
         "serviceName"
       ]
     },
-    "pulumiservice:v2/services:Service": {
+    "pulumiservice:v1/services:Service": {
       "description": "Creates a new service account in an organization. Service accounts provide programmatic, non-human identities for accessing Pulumi Cloud resources. They are scoped to an organization and can hold access tokens, belong to teams, and have stack permissions. The service name must be unique within the organization.",
       "properties": {
         "continuationToken": {
@@ -5256,7 +5256,7 @@
         "properties"
       ]
     },
-    "pulumiservice:v2/stacks:Config": {
+    "pulumiservice:v1/stacks:Config": {
       "description": "Updates the service-managed configuration for a stack. The request body may include the ESC environment reference, secrets provider type, encrypted key, and encryption salt. If stack configuration is returned by the API, it is used in place of the local stack config file (e.g. Pulumi.[stack].yaml). Returns the updated configuration object. Returns 400 if the environment reference is invalid or not found.",
       "properties": {
         "encryptedKey": {
@@ -5325,7 +5325,7 @@
         "stackName"
       ]
     },
-    "pulumiservice:v2/stacks:Stack": {
+    "pulumiservice:v1/stacks:Stack": {
       "description": "Creates a new stack within a project in the organization. If the project does not exist, it will be created. A stack is an isolated, independently configurable instance of a Pulumi program, typically representing a deployment environment (e.g., development, staging, production). The stack name must be unique within the project.\n\nThe optional `config` object supports:\n- `environment`: reference to an ESC environment for storing stack configuration (must not already exist)\n- `secretsProvider`: the secrets provider for the stack\n- `encryptedKey`: KMS-encrypted ciphertext for the data key (cloud-based secrets providers only)\n- `encryptionSalt`: base64-encoded encryption salt (passphrase-based secrets providers only)",
       "properties": {
         "activeUpdate": {
@@ -5420,7 +5420,7 @@
         "stackName"
       ]
     },
-    "pulumiservice:v2/stacks:Tag": {
+    "pulumiservice:v1/stacks:Tag": {
       "description": "Creates a new tag on the specified stack. Tags are key-value metadata pairs that can be used for organization, filtering, and storing additional information about stacks. The request body must include both a tag name and value. Returns 400 if the tag name is invalid or the tag already exists. Built-in tags (such as those automatically set by the Pulumi CLI) follow specific naming conventions.",
       "type": "object",
       "inputProperties": {
@@ -5459,7 +5459,7 @@
         "value"
       ]
     },
-    "pulumiservice:v2/stacks:Webhook": {
+    "pulumiservice:v1/stacks:Webhook": {
       "description": "Creates a new webhook for the specified stack. The request body must include the webhook name, payload URL, and format.\n\nThe `format` field accepts: `raw` (default), `slack`, `ms_teams`, or `pulumi_deployments`.\n\nThe `filters` field accepts a list of event types to subscribe to. See the [webhook event filtering documentation](https://www.pulumi.com/docs/pulumi-cloud/webhooks/#event-filtering) for available filters.\n\nThe optional `secret` field sets the HMAC key for signature verification. See the [webhook headers documentation](https://www.pulumi.com/docs/pulumi-cloud/webhooks/#headers) for details.\n\nReturns 409 if a webhook with the same name already exists. Returns 400 if the organization or stack name in the request body does not match the URL path parameters.",
       "properties": {
         "active": {
@@ -5613,7 +5613,7 @@
         "stackName"
       ]
     },
-    "pulumiservice:v2/teams:Role": {
+    "pulumiservice:v1/teams:Role": {
       "description": "UpdateTeamRoles upserts the role assigned to a team since we currently only support\na 1:1 mapping of teams to roles.",
       "type": "object",
       "inputProperties": {
@@ -5642,7 +5642,7 @@
         "teamName"
       ]
     },
-    "pulumiservice:v2/teams:Team": {
+    "pulumiservice:v1/teams:Team": {
       "description": "CreatePulumiTeam creates a \"Pulumi\" team, i.e. one whose membership is managed by Pulumi.\n(As opposed to a GitHub or GitLab-based team.)",
       "properties": {
         "accounts": {
@@ -5741,7 +5741,7 @@
         "orgName"
       ]
     },
-    "pulumiservice:v2/tokens:OrgToken": {
+    "pulumiservice:v1/tokens:OrgToken": {
       "description": "Generates a new access token scoped to the organization for use in CI/CD pipelines and automated workflows. Organization tokens belong to the organization rather than individual users, ensuring that access is not disrupted when team members leave.\n\nThe `name` field must be unique across the organization (including deleted tokens) and cannot exceed 40 characters. The `expires` field accepts a unix epoch timestamp up to two years from the present, or `0` for no expiry (default).\n\n**Important:** The token value in the response is only returned once at creation time and cannot be retrieved later. Audit logs for actions performed with organization tokens are attributed to the organization rather than an individual user.",
       "properties": {
         "tokenId": {
@@ -5801,7 +5801,7 @@
         "orgName"
       ]
     },
-    "pulumiservice:v2/tokens:PersonalToken": {
+    "pulumiservice:v1/tokens:PersonalToken": {
       "description": "Creates a new personal access token for the authenticated user. The request body includes a description for the token and an optional expiration time. The response includes the token ID and the tokenValue (prefixed with 'pul-'). The token value is only returned once at creation time and cannot be retrieved later.",
       "properties": {
         "tokenId": {
@@ -5840,7 +5840,7 @@
         "expires"
       ]
     },
-    "pulumiservice:v2/tokens:TeamToken": {
+    "pulumiservice:v1/tokens:TeamToken": {
       "description": "Generates a new access token scoped to a specific team within an organization. Team tokens inherit the stack permissions assigned to the team, making them suitable for CI/CD pipelines that need access limited to a specific set of stacks.\n\nThe `name` field must be unique across the organization (including deleted tokens) and cannot exceed 40 characters. The `expires` field accepts a unix epoch timestamp up to two years from the present, or `0` for no expiry (default).\n\n**Important:** The token value in the response is only returned once at creation time and cannot be retrieved later.",
       "properties": {
         "tokenId": {
@@ -5898,7 +5898,7 @@
         "teamName"
       ]
     },
-    "pulumiservice:v2:AuditLogExportConfiguration": {
+    "pulumiservice:v1:AuditLogExportConfiguration": {
       "description": "Creates or updates the organization's automated audit log export configuration. Audit log export enables automatic delivery of audit events to an S3 bucket for long-term retention and SIEM integration. The configuration includes the S3 bucket details and IAM role for authentication. This feature is available on Business Critical edition.",
       "properties": {
         "enabled": {
@@ -5942,7 +5942,7 @@
         "orgName"
       ]
     },
-    "pulumiservice:v2:DefaultOrganization": {
+    "pulumiservice:v1:DefaultOrganization": {
       "description": "UpdateDefaultOrganization sets the default organization for the current user.",
       "properties": {
         "GitHubLogin": {
@@ -5974,7 +5974,7 @@
         "orgName"
       ]
     },
-    "pulumiservice:v2:Gate": {
+    "pulumiservice:v1:Gate": {
       "description": "Creates a new change gate for an entity in the organization. Change gates enforce approval workflows by requiring one or more approvals before infrastructure changes can be applied to the protected resource.",
       "properties": {
         "enabled": {
@@ -6044,7 +6044,7 @@
         "target"
       ]
     },
-    "pulumiservice:v2:OrgTemplateCollection": {
+    "pulumiservice:v1:OrgTemplateCollection": {
       "description": "Creates a new template collection (source) for an organization. Template collections define where project templates are sourced from, such as a Git repository. Organization members can use these templates to create new stacks with pre-configured infrastructure code.",
       "properties": {
         "destination": {
@@ -6113,7 +6113,7 @@
         "sourceURL"
       ]
     },
-    "pulumiservice:v2:OrganizationMember": {
+    "pulumiservice:v1:OrganizationMember": {
       "description": "Adds an existing Pulumi user to an organization with a built-in role. **Important:** The user must have already signed up for a Pulumi account before they can be added to an organization.\n\nThis endpoint only assigns built-in roles. To onboard a user with a custom role, use the organization invite flow (`BatchCreateOrgInviteEmail`) and set `roleId` on the invite — the custom role is applied when the user accepts. Alternatively, add the user here with a built-in role and then call `UpdateOrganizationMember` with `fgaRoleId` to reassign.\n\nReturns the newly created organization member record. Returns 409 if the user is already a member of the organization.",
       "properties": {
         "created": {
@@ -6178,7 +6178,7 @@
         "userLogin"
       ]
     },
-    "pulumiservice:v2:OrganizationWebhook": {
+    "pulumiservice:v1:OrganizationWebhook": {
       "description": "Creates a new webhook for an organization to notify external services when events occur. Webhooks can be configured to fire on stack events (created, deleted, update succeeded/failed), deployment events (queued, started, succeeded, failed), drift detection events, and policy violation events (mandatory, advisory).\n\nThe `format` field accepts: `raw` (default), `slack`, `ms_teams`, or `pulumi_deployments`.\n\nThe `filters` field accepts a list of event types to subscribe to. See the [webhook event filtering documentation](https://www.pulumi.com/docs/pulumi-cloud/webhooks/#event-filtering) for available filters.\n\nThe optional `secret` field sets the HMAC key for signature verification via the `Pulumi-Webhook-Signature` header. See the [webhook headers documentation](https://www.pulumi.com/docs/pulumi-cloud/webhooks/#headers) for details.",
       "properties": {
         "active": {
@@ -6326,7 +6326,7 @@
         "payloadUrl"
       ]
     },
-    "pulumiservice:v2:PolicyGroup": {
+    "pulumiservice:v1:PolicyGroup": {
       "description": "Creates a new Policy Group for an organization. Policy Groups define which Policy Packs are enforced on which stacks or cloud accounts, with configurable enforcement levels (advisory, mandatory, or disabled) per pack. This allows different policy strictness for different environments, such as advisory-only in development and mandatory in production.",
       "properties": {
         "accounts": {
@@ -6413,7 +6413,7 @@
         "orgName"
       ]
     },
-    "pulumiservice:v2:Role": {
+    "pulumiservice:v1:Role": {
       "description": "Creates a new custom role for an organization. Custom roles define fine-grained permission sets that can be assigned to organization members and teams, enabling precise access control beyond the built-in admin and member roles. Optionally, an associated policy and role binding can be created alongside the role. Role definitions are subject to two limits: a permission descriptor group may contain at most 500 entries (each directly-specified entity counts as one entry), and the total serialized size of the role definition may not exceed 1 MB. Exceeding either limit returns a 400 error. If you need to grant access to more than 500 individually listed resources, use tag-based (ABAC) rules instead.",
       "properties": {
         "created": {

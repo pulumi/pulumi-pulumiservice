@@ -1,0 +1,9 @@
+resources:
+  approvers:
+    type: pulumiservice:v1:PolicyGroup
+    properties:
+      orgName: ${organizationName}
+      name: v1-approvers
+      entityType: stacks
+outputs:
+  policyGroupName: ${approvers.name}
