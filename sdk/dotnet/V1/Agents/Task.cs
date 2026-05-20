@@ -196,7 +196,7 @@ namespace Pulumi.PulumiService.V1.Agents
         private InputList<object>? _cliIntegrations;
 
         /// <summary>
-        /// Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries that do not match any connected integration are silently skipped.
+        /// Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries with missing or unknown catalogId, missing name, or referencing a (catalogId, name) pair that is not connected for the organization are rejected with a 400 response. catalogId matching is case-insensitive.
         /// </summary>
         public InputList<object> CliIntegrations
         {
