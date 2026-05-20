@@ -563,7 +563,15 @@ func mergeOperations(existing json.RawMessage, ops derivedOps, d derivations) (j
 	}
 
 	if d.IDFormat != "" {
-		entry["idFormat"] = d.IDFormat
+		if existing, has := entry["idFormat"].(string); has {
+			if existing != d.IDFormat {
+				fmt.Fprintf(os.Stderr,
+					"  INFO: idFormat pinned at %q; heuristic now suggests %q (preserving pin)\n",
+					existing, d.IDFormat)
+			}
+		} else {
+			entry["idFormat"] = d.IDFormat
+		}
 	}
 	if d.DeleteBeforeReplace {
 		if _, has := entry["deleteBeforeReplace"]; !has {

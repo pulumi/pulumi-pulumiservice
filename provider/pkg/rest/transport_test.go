@@ -31,7 +31,7 @@ func TestWithTransport_BeatsGlobalResolver(t *testing.T) {
 	})
 	defer SetTransportResolver(nil)
 
-	ctx := WithTransport(context.Background(), ctxOnly)
+	ctx := WithTransport(t.Context(), ctxOnly)
 	got, err := resolveTransport(ctx)
 	if err != nil {
 		t.Fatalf("resolveTransport: %v", err)
@@ -53,7 +53,7 @@ func TestResolveTransport_FallsBackToGlobal(t *testing.T) {
 	})
 	defer SetTransportResolver(nil)
 
-	got, err := resolveTransport(context.Background())
+	got, err := resolveTransport(t.Context())
 	if err != nil {
 		t.Fatalf("resolveTransport: %v", err)
 	}
@@ -65,7 +65,7 @@ func TestResolveTransport_FallsBackToGlobal(t *testing.T) {
 // TestResolveTransport_NoTransportReturnsError: neither path set → clear error.
 func TestResolveTransport_NoTransportReturnsError(t *testing.T) {
 	SetTransportResolver(nil)
-	_, err := resolveTransport(context.Background())
+	_, err := resolveTransport(t.Context())
 	if err == nil {
 		t.Fatalf("expected error with no transport configured")
 	}

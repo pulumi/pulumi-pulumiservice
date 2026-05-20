@@ -269,7 +269,7 @@ func TestCreateSynthesizesID(t *testing.T) {
 			})
 
 			req := p.CreateRequest{Properties: propMap(tc.inputs)}
-			resp, err := r.Create(context.Background(), req)
+			resp, err := r.Create(t.Context(), req)
 			if err != nil {
 				t.Fatalf("create: %v\n  calls made: %v", err, mock.calls)
 			}
@@ -351,7 +351,7 @@ func TestCreateFusesYamlUpdateAfterJsonCreate(t *testing.T) {
 		"name":    property.New("platform-bootstrap"),
 		"yaml":    yamlVal,
 	})
-	_, err := r.Create(context.Background(), p.CreateRequest{Properties: inputs})
+	_, err := r.Create(t.Context(), p.CreateRequest{Properties: inputs})
 	if err != nil {
 		t.Fatalf("create: %v\n  calls: %v", err, mock.calls)
 	}
@@ -412,7 +412,7 @@ func TestReadDecodesYamlResponseBody(t *testing.T) {
 	}
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 
-	resp, err := r.Read(context.Background(), p.ReadRequest{
+	resp, err := r.Read(t.Context(), p.ReadRequest{
 		ID:         "acme/default/platform-bootstrap",
 		Properties: property.NewMap(map[string]property.Value{}),
 	})
@@ -478,7 +478,7 @@ func TestCreateReadAfterCreateSourcesFromInputs(t *testing.T) {
 	}}
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 
-	resp, err := r.Create(context.Background(), p.CreateRequest{
+	resp, err := r.Create(t.Context(), p.CreateRequest{
 		Properties: propMap(map[string]any{"org": "acme", "name": "foo"}),
 	})
 	if err != nil {
@@ -547,7 +547,7 @@ func TestCreateReadsAfterCreate(t *testing.T) {
 	}}
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 
-	resp, err := r.Create(context.Background(), p.CreateRequest{
+	resp, err := r.Create(t.Context(), p.CreateRequest{
 		Properties: propMap(map[string]any{"org": "acme", "name": "foo"}),
 	})
 	if err != nil {
@@ -593,7 +593,7 @@ func TestCreateRequireImport_BlocksWhenExists(t *testing.T) {
 	}}
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 
-	_, err := r.Create(context.Background(), p.CreateRequest{
+	_, err := r.Create(t.Context(), p.CreateRequest{
 		Properties: propMap(map[string]any{"org": "acme", "value": "new"}),
 	})
 	if err == nil {
@@ -634,7 +634,7 @@ func TestCreateRequireImport_ProceedsOn404(t *testing.T) {
 	}}
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 
-	resp, err := r.Create(context.Background(), p.CreateRequest{
+	resp, err := r.Create(t.Context(), p.CreateRequest{
 		Properties: propMap(map[string]any{"org": "acme", "value": "new"}),
 	})
 	if err != nil {
@@ -697,7 +697,7 @@ func TestCreateRequireImport_ServerIDReadURL_MetadataError(t *testing.T) {
 	mock := &mockTransport{}
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 
-	_, err = r.Create(context.Background(), p.CreateRequest{
+	_, err = r.Create(t.Context(), p.CreateRequest{
 		Properties: propMap(map[string]any{"value": "new"}),
 	})
 	if err == nil {
@@ -731,7 +731,7 @@ func TestCreateRequireImport_NoReadOp_OptsOut(t *testing.T) {
 	}}
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 
-	_, err := r.Create(context.Background(), p.CreateRequest{
+	_, err := r.Create(t.Context(), p.CreateRequest{
 		Properties: propMap(map[string]any{"org": "acme", "value": "new"}),
 	})
 	if err != nil {
@@ -800,7 +800,7 @@ func TestCreateMissingPathParam(t *testing.T) {
 	req := p.CreateRequest{Properties: propMap(map[string]any{
 		"orgName": "test-org",
 	})}
-	_, err := r.Create(context.Background(), req)
+	_, err := r.Create(t.Context(), req)
 	if err == nil {
 		t.Fatalf("expected error on missing path param, got nil")
 	}
@@ -871,7 +871,7 @@ func TestUpdateReadsAfterUpdate(t *testing.T) {
 	}}
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 
-	resp, err := r.Update(context.Background(), p.UpdateRequest{
+	resp, err := r.Update(t.Context(), p.UpdateRequest{
 		Inputs:    propMap(map[string]any{"org": "acme", "name": "foo-renamed", "description": "rotated"}),
 		OldInputs: propMap(map[string]any{"org": "acme", "name": "foo", "description": "original"}),
 		State:     propMap(priorState),
@@ -933,7 +933,7 @@ func TestUpdateMergesPriorStateWithoutReadOp(t *testing.T) {
 		"id": "thing-1", "name": "foo", "description": "original",
 		"created": "2026-05-05T00:00:00Z",
 	}
-	resp, err := r.Update(context.Background(), p.UpdateRequest{
+	resp, err := r.Update(t.Context(), p.UpdateRequest{
 		Inputs:    propMap(map[string]any{"org": "acme", "description": "rotated"}),
 		OldInputs: propMap(map[string]any{"org": "acme", "description": "original"}),
 		State:     propMap(priorState),
@@ -1108,7 +1108,7 @@ func TestDeleteIsIdempotentOn404(t *testing.T) {
 			"DELETE /things/acme/gone": {status: 204},
 		}}
 		SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
-		err := r.Delete(context.Background(), p.DeleteRequest{
+		err := r.Delete(t.Context(), p.DeleteRequest{
 			ID:         "acme/gone",
 			Properties: propMap(map[string]any{"org": "acme", "id": "gone"}),
 		})
@@ -1122,7 +1122,7 @@ func TestDeleteIsIdempotentOn404(t *testing.T) {
 			"DELETE /things/acme/gone": {status: 404, body: `{"code":404,"message":"not found"}`},
 		}}
 		SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
-		err := r.Delete(context.Background(), p.DeleteRequest{
+		err := r.Delete(t.Context(), p.DeleteRequest{
 			ID:         "acme/gone",
 			Properties: propMap(map[string]any{"org": "acme", "id": "gone"}),
 		})
@@ -1136,7 +1136,7 @@ func TestDeleteIsIdempotentOn404(t *testing.T) {
 			"DELETE /things/acme/gone": {status: 500, body: `oops`},
 		}}
 		SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
-		err := r.Delete(context.Background(), p.DeleteRequest{
+		err := r.Delete(t.Context(), p.DeleteRequest{
 			ID:         "acme/gone",
 			Properties: propMap(map[string]any{"org": "acme", "id": "gone"}),
 		})
@@ -1226,7 +1226,7 @@ func TestUpdateUsesStateForPathParamsAndInputsForBody(t *testing.T) {
 	}}
 	SetTransportResolver(func(_ context.Context) (Transport, error) { return mock, nil })
 
-	_, err = r.Update(context.Background(), p.UpdateRequest{
+	_, err = r.Update(t.Context(), p.UpdateRequest{
 		ID:        "acme/real-7",
 		Inputs:    inputs,
 		OldInputs: oldInputs,
@@ -1301,7 +1301,7 @@ func TestDiffEmitsUpdateOnUnknownInput(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			resp, err := r.Diff(context.Background(), p.DiffRequest{
+			resp, err := r.Diff(t.Context(), p.DiffRequest{
 				ID:        "acme",
 				OldInputs: propMap(tc.old),
 				Inputs:    propMap(tc.new),
@@ -1359,7 +1359,7 @@ func TestErrorURLIsPostTransportRewrite(t *testing.T) {
 		return rewriteTransport{scheme: "https", host: "api.real-backend.example"}, nil
 	})
 
-	_, err = r.Create(context.Background(), p.CreateRequest{
+	_, err = r.Create(t.Context(), p.CreateRequest{
 		Properties: propMap(map[string]any{"org": "acme"}),
 	})
 	if err == nil {

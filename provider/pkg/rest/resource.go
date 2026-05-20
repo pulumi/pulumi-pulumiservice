@@ -646,7 +646,7 @@ func (r *Resource) Update(ctx context.Context, req p.UpdateRequest) (p.UpdateRes
 }
 
 // Delete fires the delete op (if declared). Without one the engine drops
-// state silently. Path params come from req.OldInputs with req.Properties
+// state silently. Path params come from req.Properties with req.OldInputs
 // as a fallback.
 //
 // 404 is treated as success — the resource is already gone, which is what

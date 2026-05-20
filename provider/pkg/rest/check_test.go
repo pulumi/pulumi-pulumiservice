@@ -15,7 +15,6 @@
 package rest
 
 import (
-	"context"
 	"strings"
 	"testing"
 
@@ -102,7 +101,7 @@ func fooResource(spec *Spec, fields map[string]FieldMeta, idFormat string, dbr b
 func TestCheckNormalizesEnumCase(t *testing.T) {
 	spec := syntheticSpec(t)
 	r := fooResource(spec, nil, "", false)
-	resp, err := r.Check(context.Background(), p.CheckRequest{
+	resp, err := r.Check(t.Context(), p.CheckRequest{
 		Inputs: property.NewMap(map[string]property.Value{
 			"mode": property.New("up"),
 		}),
@@ -121,7 +120,7 @@ func TestCheckSortsUnorderedArray(t *testing.T) {
 	r := fooResource(spec, map[string]FieldMeta{
 		"scopes": {Unordered: true},
 	}, "", false)
-	resp, err := r.Check(context.Background(), p.CheckRequest{
+	resp, err := r.Check(t.Context(), p.CheckRequest{
 		Inputs: property.NewMap(map[string]property.Value{
 			"scopes": property.New(property.NewArray([]property.Value{
 				property.New("write"),
@@ -148,7 +147,7 @@ func TestCheckGeneratesAutoName(t *testing.T) {
 	r := fooResource(spec, map[string]FieldMeta{
 		"name": {AutoName: 24},
 	}, "", false)
-	resp, err := r.Check(context.Background(), p.CheckRequest{
+	resp, err := r.Check(t.Context(), p.CheckRequest{
 		Urn:        presource.URN("urn:pulumi:dev::demo::pulumiservice:v1:Foo::myresource"),
 		RandomSeed: []byte("deterministic-seed"),
 		Inputs:     property.NewMap(map[string]property.Value{}),
@@ -168,7 +167,7 @@ func TestCheckGeneratesAutoName(t *testing.T) {
 		t.Errorf("name: length %d exceeds maxLen 24 (%q)", len(name), name)
 	}
 	// Determinism: same seed → same name.
-	resp2, _ := r.Check(context.Background(), p.CheckRequest{
+	resp2, _ := r.Check(t.Context(), p.CheckRequest{
 		Urn:        presource.URN("urn:pulumi:dev::demo::pulumiservice:v1:Foo::myresource"),
 		RandomSeed: []byte("deterministic-seed"),
 	})
@@ -183,7 +182,7 @@ func TestCheckPreservesUserSuppliedName(t *testing.T) {
 	r := fooResource(spec, map[string]FieldMeta{
 		"name": {AutoName: 24},
 	}, "", false)
-	resp, _ := r.Check(context.Background(), p.CheckRequest{
+	resp, _ := r.Check(t.Context(), p.CheckRequest{
 		Urn:        presource.URN("urn:pulumi:dev::demo::pulumiservice:v1:Foo::myresource"),
 		RandomSeed: []byte("seed"),
 		Inputs: property.NewMap(map[string]property.Value{
@@ -287,7 +286,7 @@ func TestPreserveEmitOnCreate(t *testing.T) {
 func TestDiffSetsDeleteBeforeReplaceWhenMarked(t *testing.T) {
 	spec := syntheticSpec(t)
 	r := fooResource(spec, nil, "", true)
-	resp, err := r.Diff(context.Background(), p.DiffRequest{
+	resp, err := r.Diff(t.Context(), p.DiffRequest{
 		OldInputs: property.NewMap(map[string]property.Value{"name": property.New("a")}),
 		Inputs:    property.NewMap(map[string]property.Value{"name": property.New("b")}),
 	})
@@ -305,7 +304,7 @@ func TestDiffSetsDeleteBeforeReplaceWhenMarked(t *testing.T) {
 func TestDiffOmitsDeleteBeforeReplaceWhenUnmarked(t *testing.T) {
 	spec := syntheticSpec(t)
 	r := fooResource(spec, nil, "", false)
-	resp, _ := r.Diff(context.Background(), p.DiffRequest{
+	resp, _ := r.Diff(t.Context(), p.DiffRequest{
 		OldInputs: property.NewMap(map[string]property.Value{"name": property.New("a")}),
 		Inputs:    property.NewMap(map[string]property.Value{"name": property.New("b")}),
 	})
