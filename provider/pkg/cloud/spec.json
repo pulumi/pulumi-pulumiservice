@@ -1328,6 +1328,86 @@
         },
         "type": "object"
       },
+      "AgentSignupChallenge": {
+        "description": "Returned from GET /api/agents/signup/challenge. Carries the input data the caller computes the proof of work over, plus an opaque ID identifying this challenge for the subsequent POST /api/agents/signup call.",
+        "properties": {
+          "challengeData": {
+            "description": "Input data for the proof-of-work computation. Compute the proof over this and submit the result to POST /api/agents/signup as challengeResult.",
+            "type": "string",
+            "x-order": 2
+          },
+          "challengeID": {
+            "description": "An ID identifying this challenge. Pass back to POST /api/agents/signup as challengeID.",
+            "type": "string",
+            "x-order": 1
+          }
+        },
+        "required": [
+          "challengeData",
+          "challengeID"
+        ],
+        "type": "object"
+      },
+      "AgentSignupRequest": {
+        "description": "POST /api/agents/signup request body. Both fields come from the prior call to GET /api/agents/signup/challenge (which returned the challengeID and challengeData); the caller computes the proof of work over the challengeData and submits the result here.",
+        "properties": {
+          "challengeID": {
+            "description": "An ID identifying the challenge issued by GET /api/agents/signup/challenge.",
+            "type": "string",
+            "x-order": 1
+          },
+          "challengeResult": {
+            "description": "Output of the proof-of-work computation over the challengeData returned by GET /api/agents/signup/challenge.",
+            "type": "string",
+            "x-order": 2
+          }
+        },
+        "required": [
+          "challengeID",
+          "challengeResult"
+        ],
+        "type": "object"
+      },
+      "AgentSignupResponse": {
+        "description": "Returned from POST /api/agents/signup. Contains the newly-created agent user's profile, an access token the CLI persists for future API calls, and an opaque claim token the human submits to take ownership of the account.",
+        "properties": {
+          "accessToken": {
+            "description": "The Pulumi access token to use for authenticating future API requests as the new user.",
+            "type": "string",
+            "x-order": 1
+          },
+          "accessTokenValidUntil": {
+            "description": "When the temporary access token expires.",
+            "format": "date-time",
+            "type": "string",
+            "x-order": 2
+          },
+          "claimToken": {
+            "description": "An opaque single-use token the human submits to claim ownership of the account. The CLI surfaces a claim URL embedding this token to the human; the path is a CLI/UI concern.",
+            "type": "string",
+            "x-order": 3
+          },
+          "claimTokenValidUntil": {
+            "description": "When the claim token expires.",
+            "format": "date-time",
+            "type": "string",
+            "x-order": 4
+          },
+          "userInfo": {
+            "$ref": "#/components/schemas/User",
+            "description": "The newly-created user's profile information.",
+            "x-order": 5
+          }
+        },
+        "required": [
+          "accessToken",
+          "accessTokenValidUntil",
+          "claimToken",
+          "claimTokenValidUntil",
+          "userInfo"
+        ],
+        "type": "object"
+      },
       "AgentSlashCommand": {
         "description": "An agent slash command.",
         "properties": {
@@ -9362,7 +9442,7 @@
             }
           },
           "cliIntegrations": {
-            "description": "Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries that do not match any connected integration are silently skipped.",
+            "description": "Optional filter for CLI integrations to enable for this task. Semantics: omitted/null → enable all CLI integrations connected for the org; empty list → explicit opt-out (no CLI integrations for this task); populated list → whitelist by (catalogId, name) of the configured instances to enable. Entries with missing or unknown catalogId, missing name, or referencing a (catalogId, name) pair that is not connected for the organization are rejected with a 400 response. catalogId matching is case-insensitive.",
             "items": {
               "$ref": "#/components/schemas/CLIIntegrationRef"
             },
@@ -13880,6 +13960,14 @@
             },
             "type": "array",
             "x-order": 1
+          },
+          "tagKeys": {
+            "description": "The list of tag keys present in the breakdown entries. Only present when a tag breakdown is requested.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "x-order": 2
           }
         },
         "required": [
@@ -18092,6 +18180,11 @@
             "type": "boolean",
             "x-order": 20
           },
+          "driftRemediationEnabled": {
+            "description": "Whether drift remediation (auto-remediate via pulumi up --refresh) is enabled.",
+            "type": "boolean",
+            "x-order": 59
+          },
           "environmentRevisionTagsEnabled": {
             "description": "Whether environment revision tags are enabled.",
             "type": "boolean",
@@ -18137,6 +18230,11 @@
             "type": "boolean",
             "x-order": 34
           },
+          "expandedPolicyEnforcementLevelsEnabled": {
+            "description": "Whether expanded policy enforcement levels (including the Remediate level) are enabled.",
+            "type": "boolean",
+            "x-order": 60
+          },
           "fixDriftWithNeoEnabled": {
             "description": "Whether fixing drift with Neo is enabled.",
             "type": "boolean",
@@ -18181,6 +18279,11 @@
             "description": "Whether the organization uses a legacy org token for deployments.",
             "type": "boolean",
             "x-order": 16
+          },
+          "machineTokensEnabled": {
+            "description": "Whether machine tokens (organization access tokens) are enabled.",
+            "type": "boolean",
+            "x-order": 61
           },
           "neoPlanModeEnabled": {
             "description": "Whether Neo plan mode is enabled.",
@@ -18242,6 +18345,11 @@
             "type": "boolean",
             "x-order": 13
           },
+          "samlSsoEnabled": {
+            "description": "Whether SAML SSO configuration is enabled.",
+            "type": "boolean",
+            "x-order": 62
+          },
           "scimEnabled": {
             "description": "Whether SCIM provisioning is enabled.",
             "type": "boolean",
@@ -18261,6 +18369,11 @@
             "description": "Whether service-backed stack config is enabled.",
             "type": "boolean",
             "x-order": 58
+          },
+          "teamMemberRoleManagementEnabled": {
+            "description": "Whether team member role management (assigning custom roles per team member) is enabled.",
+            "type": "boolean",
+            "x-order": 63
           },
           "themingEnabled": {
             "description": "Whether UI theming is enabled.",
@@ -23127,6 +23240,14 @@
             "type": "integer",
             "x-order": 6
           },
+          "tags": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Tag key/value pairs for this usage breakdown entry. Only present when a tag breakdown is requested. Keys correspond to the tagKeys field in the response.",
+            "type": "object",
+            "x-order": 8
+          },
           "weekNumber": {
             "description": "The week number in the year with Sunday marking the start of the week. Ranges from 0-53.",
             "format": "int64",
@@ -27047,6 +27168,11 @@
             "type": "array",
             "x-order": 8
           },
+          "isAgent": {
+            "description": "Whether the user is a synthetic agent account. Agent accounts cannot be authenticated except via their issued access token until a human claims the account via the claim URL.",
+            "type": "boolean",
+            "x-order": 15
+          },
           "isManagedByMultiOrg": {
             "description": "Whether the user's account is managed by multiple organizations.",
             "type": "boolean",
@@ -28135,6 +28261,67 @@
   },
   "openapi": "3.0.3",
   "paths": {
+    "/api/agents/signup": {
+      "get": {
+        "description": "Issues a proof-of-work challenge for the agent signup flow. The caller computes the proof over the returned challengeData and submits the result to POST /api/agents/signup along with the returned challengeID. The challenge expires after a short window if not consumed.",
+        "operationId": "SignupChallenge",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentSignupChallenge"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "SignupChallenge",
+        "tags": [
+          "AI Agents"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      },
+      "post": {
+        "description": "Creates a new Pulumi Cloud account programmatically, without human intervention, and returns an access token plus a claim URL. The caller must first obtain a challenge from GET /api/agents/signup/challenge and submit the computed proof of work here. Intended for agent contexts: a CLI that detects it is running on behalf of an agent and finds no local credentials issues the challenge call, solves it, then calls this endpoint, writes the returned access token to its credentials file, and surfaces the claim URL to its human so the human can take ownership of the account later. The account is a Pulumi Individual Account in a pre-claim state; operations that require a verified email (such as creating agent tasks) are unavailable until the account is claimed.",
+        "operationId": "Signup",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgentSignupRequest"
+              }
+            }
+          },
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentSignupResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "description": "Missing or invalid challengeID / challengeResult, or proof-of-work verification failed."
+          }
+        },
+        "summary": "Signup",
+        "tags": [
+          "AI Agents"
+        ],
+        "x-pulumi-route-property": {
+          "Visibility": "Preview"
+        }
+      }
+    },
     "/api/ai/template": {
       "post": {
         "deprecated": true,
@@ -39356,6 +39543,14 @@
             }
           },
           {
+            "description": "When true, returns usage broken down by tag keys (TaskID, Feature) from the tag-keyed aggregation table. Days with no usage are filled with zero-value entries. The response includes tagKeys listing the available breakdown keys.",
+            "in": "query",
+            "name": "includeTagBreakdown",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
             "description": "Number of days to look back from the current time or lookbackStart",
             "in": "query",
             "name": "lookbackDays",
@@ -43967,7 +44162,8 @@
                 "lastEvent",
                 "created",
                 "status",
-                "name"
+                "name",
+                "tokensUsed"
               ],
               "type": "string",
               "x-pulumi-model-property": {
@@ -43976,7 +44172,8 @@
                   "Sort by the time of the most recent event on the task.",
                   "Sort by when the task was created.",
                   "Sort by task status, with running ordered before idle when ascending.",
-                  "Sort by task name."
+                  "Sort by task name.",
+                  "Sort by total Neo tokens consumed by the task. Tasks with no reported usage are treated as zero."
                 ],
                 "enumTypeName": "AgentTaskSortField"
               }
