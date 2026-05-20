@@ -9,11 +9,12 @@ from pulumi_pulumiservice import (
 )
 
 config = pulumi.Config()
+digits = config.require("digits")
 
 agent_pool = AgentPool(
     "my-agent-pool",
     organization_name="service-provider-test-org",
-    name="my-test-pool",
+    name=f"my-test-pool-{digits}",
 )
 
 settings = DeploymentSettings(

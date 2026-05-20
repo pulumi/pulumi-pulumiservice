@@ -1,0 +1,25 @@
+resources:
+  orgWebhookAll:
+    type: pulumiservice:v1:OrganizationWebhook
+    properties:
+      organizationName: ${organizationName}
+      name: org-webhook-all-${hookSuffix}
+      displayName: webhook-from-provider
+      payloadUrl: https://google.com
+      active: true
+      secret: ${secretValue}
+  orgWebhookGroups:
+    type: pulumiservice:v1:OrganizationWebhook
+    properties:
+      organizationName: ${organizationName}
+      name: org-webhook-groups-${hookSuffix}
+      displayName: webhook-from-provider
+      payloadUrl: https://google.com
+      active: true
+      groups:
+        - environments
+        - stacks
+      secret: ${secretValue}
+outputs:
+  orgWebhookId: ${orgWebhookAll.id}
+  orgWebhookGroupsId: ${orgWebhookGroups.id}

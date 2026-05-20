@@ -27,6 +27,7 @@ func TestPythonDeploymentSettingsExample(t *testing.T) {
 		Dir: path.Join(getCwd(t), "py-deployment-settings"),
 		Config: map[string]string{
 			"my-secret": "my-secret-value",
+			"digits":    generateRandomFiveDigits(),
 		},
 		Dependencies: []string{
 			filepath.Join("..", "sdk", "python", "bin"),

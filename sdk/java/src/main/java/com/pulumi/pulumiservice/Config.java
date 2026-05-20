@@ -22,6 +22,6 @@ public final class Config {
  * 
  */
     public Optional<String> apiUrl() {
-        return Codegen.stringProp("apiUrl").config(config).env("PULUMI_BACKEND_URL").def("https://api.pulumi.com").get();
+        return Codegen.stringProp("apiUrl").config(config).env("PULUMI_BACKEND_URL", "PULUMI_API").def("https://api.pulumi.com").get();
     }
 }

@@ -54,8 +54,11 @@ from . import outputs
 if typing.TYPE_CHECKING:
     import pulumi_pulumiservice.config as __config
     config = __config
+    import pulumi_pulumiservice.v1 as __v1
+    v1 = __v1
 else:
     config = _utilities.lazy_import('pulumi_pulumiservice.config')
+    v1 = _utilities.lazy_import('pulumi_pulumiservice.v1')
 
 _utilities.register(
     resource_modules="""
@@ -91,6 +94,126 @@ _utilities.register(
    "pulumiservice:index:TemplateSource": "TemplateSource",
    "pulumiservice:index:TtlSchedule": "TtlSchedule",
    "pulumiservice:index:Webhook": "Webhook"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "v1",
+  "fqn": "pulumi_pulumiservice.v1",
+  "classes": {
+   "pulumiservice:v1:AuditLogExportConfiguration": "AuditLogExportConfiguration",
+   "pulumiservice:v1:DefaultOrganization": "DefaultOrganization",
+   "pulumiservice:v1:Gate": "Gate",
+   "pulumiservice:v1:OrgTemplateCollection": "OrgTemplateCollection",
+   "pulumiservice:v1:OrganizationMember": "OrganizationMember",
+   "pulumiservice:v1:OrganizationWebhook": "OrganizationWebhook",
+   "pulumiservice:v1:PolicyGroup": "PolicyGroup",
+   "pulumiservice:v1:Role": "Role"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "v1/agents",
+  "fqn": "pulumi_pulumiservice.v1.agents",
+  "classes": {
+   "pulumiservice:v1/agents:Pool": "Pool",
+   "pulumiservice:v1/agents:Task": "Task"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "v1/auth",
+  "fqn": "pulumi_pulumiservice.v1.auth",
+  "classes": {
+   "pulumiservice:v1/auth:OidcIssuer": "OidcIssuer",
+   "pulumiservice:v1/auth:Policy": "Policy",
+   "pulumiservice:v1/auth:SAML": "SAML"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "v1/deployments",
+  "fqn": "pulumi_pulumiservice.v1.deployments",
+  "classes": {
+   "pulumiservice:v1/deployments:ScheduledDeployment": "ScheduledDeployment",
+   "pulumiservice:v1/deployments:Settings": "Settings"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "v1/esc",
+  "fqn": "pulumi_pulumiservice.v1.esc",
+  "classes": {
+   "pulumiservice:v1/esc:Environment": "Environment",
+   "pulumiservice:v1/esc:EnvironmentDraft": "EnvironmentDraft",
+   "pulumiservice:v1/esc:EnvironmentSchedule": "EnvironmentSchedule",
+   "pulumiservice:v1/esc:EnvironmentSettings": "EnvironmentSettings",
+   "pulumiservice:v1/esc:EnvironmentTag": "EnvironmentTag",
+   "pulumiservice:v1/esc:OpenEnvironmentRequest": "OpenEnvironmentRequest",
+   "pulumiservice:v1/esc:RevisionTag": "RevisionTag",
+   "pulumiservice:v1/esc:Webhook": "Webhook"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "v1/insights",
+  "fqn": "pulumi_pulumiservice.v1.insights",
+  "classes": {
+   "pulumiservice:v1/insights:Account": "Account",
+   "pulumiservice:v1/insights:ScheduledScanSettings": "ScheduledScanSettings"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "v1/integrations",
+  "fqn": "pulumi_pulumiservice.v1.integrations",
+  "classes": {
+   "pulumiservice:v1/integrations:AzureDevOpsIntegration": "AzureDevOpsIntegration",
+   "pulumiservice:v1/integrations:BitBucketIntegration": "BitBucketIntegration",
+   "pulumiservice:v1/integrations:CustomVCSIntegration": "CustomVCSIntegration",
+   "pulumiservice:v1/integrations:CustomVCSRepository": "CustomVCSRepository",
+   "pulumiservice:v1/integrations:GitHubEnterpriseIntegration": "GitHubEnterpriseIntegration",
+   "pulumiservice:v1/integrations:GitHubIntegration": "GitHubIntegration",
+   "pulumiservice:v1/integrations:GitLabIntegration": "GitLabIntegration"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "v1/services",
+  "fqn": "pulumi_pulumiservice.v1.services",
+  "classes": {
+   "pulumiservice:v1/services:Item": "Item",
+   "pulumiservice:v1/services:Service": "Service"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "v1/stacks",
+  "fqn": "pulumi_pulumiservice.v1.stacks",
+  "classes": {
+   "pulumiservice:v1/stacks:Config": "Config",
+   "pulumiservice:v1/stacks:Stack": "Stack",
+   "pulumiservice:v1/stacks:Tag": "Tag",
+   "pulumiservice:v1/stacks:Webhook": "Webhook"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "v1/teams",
+  "fqn": "pulumi_pulumiservice.v1.teams",
+  "classes": {
+   "pulumiservice:v1/teams:Role": "Role",
+   "pulumiservice:v1/teams:Team": "Team"
+  }
+ },
+ {
+  "pkg": "pulumiservice",
+  "mod": "v1/tokens",
+  "fqn": "pulumi_pulumiservice.v1.tokens",
+  "classes": {
+   "pulumiservice:v1/tokens:OrgToken": "OrgToken",
+   "pulumiservice:v1/tokens:PersonalToken": "PersonalToken",
+   "pulumiservice:v1/tokens:TeamToken": "TeamToken"
   }
  }
 ]

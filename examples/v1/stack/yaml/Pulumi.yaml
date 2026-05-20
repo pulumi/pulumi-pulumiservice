@@ -1,0 +1,15 @@
+name: pulumicloud-v1-stack
+runtime: yaml
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  projectName:
+    type: string
+    default: pulumi-service-stack-example
+  stackName:
+    type: string
+    default: dev
+  stackPurpose:
+    type: string
+    default: demo

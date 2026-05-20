@@ -1,0 +1,13 @@
+# DefaultOrganization sets the calling user's default organization. The
+# resource has only one input (orgName), and the value is a per-user
+# preference — running this in CI changes only the test runner's account.
+resources:
+  default:
+    type: pulumiservice:v1:DefaultOrganization
+    properties:
+      orgName: ${organizationName}
+outputs:
+  # orgName is an input (program-owned), so reference the source value
+  # rather than an output that doesn't exist on DefaultOrganization.
+  defaultOrg: ${organizationName}
+  defaultOrgGitHubLogin: ${default.GitHubLogin}

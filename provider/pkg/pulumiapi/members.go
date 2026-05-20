@@ -158,8 +158,8 @@ func (c *Client) UpdateOrgMemberRole(
 //
 // Backend wins on dedup conflict (it carries the IdP-of-record fields
 // like KnownToPulumi). A frontend failure is non-fatal: the backend
-// result is returned with a logged warning so a transient frontend
-// error doesn't gate the more-inclusive backend path.
+// result is returned alone so a transient frontend error doesn't gate
+// the more-inclusive backend path.
 func (c *Client) ListOrgMembers(ctx context.Context, orgName string) (*Members, error) {
 	if len(orgName) == 0 {
 		return nil, errors.New("empty orgName")

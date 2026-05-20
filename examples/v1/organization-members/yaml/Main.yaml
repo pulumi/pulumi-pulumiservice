@@ -1,0 +1,9 @@
+resources:
+  member:
+    type: pulumiservice:v1:OrganizationMember
+    properties:
+      orgName: ${organizationName}
+      userLogin: ${memberLogin}
+      role: ${memberRole}
+outputs:
+  memberId: ${member.id}

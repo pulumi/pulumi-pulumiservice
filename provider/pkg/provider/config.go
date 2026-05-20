@@ -10,6 +10,10 @@ import (
 const (
 	EnvVarPulumiAccessToken = "PULUMI_ACCESS_TOKEN"
 	EnvVarPulumiBackendURL  = "PULUMI_BACKEND_URL"
+	// EnvVarPulumiAPI is an internal alias the Pulumi CLI sets on certain login
+	// flows (e.g. `pl login devstack`). We honor it as a fallback so a token
+	// scoped to a non-prod backend doesn't silently route to api.pulumi.com.
+	EnvVarPulumiAPI = "PULUMI_API"
 )
 
 var ErrAccessTokenNotFound = fmt.Errorf("pulumi access token not found")
@@ -47,11 +51,11 @@ func (pc *PulumiServiceConfig) getPulumiAccessToken() (*string, error) {
 
 func (pc *PulumiServiceConfig) getPulumiServiceURL() (*string, error) {
 	url := pc.getConfig("apiUrl", EnvVarPulumiBackendURL)
-	baseurl := "https://api.pulumi.com"
-
-	if len(url) == 0 {
-		url = baseurl
+	if url == "" {
+		url = os.Getenv(EnvVarPulumiAPI)
 	}
-
+	if url == "" {
+		url = "https://api.pulumi.com"
+	}
 	return &url, nil
 }

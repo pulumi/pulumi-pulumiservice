@@ -114,7 +114,7 @@ public final class ProviderArgs extends com.pulumi.resources.ResourceArgs {
         }
 
         public ProviderArgs build() {
-            $.apiUrl = Codegen.stringProp("apiUrl").output().arg($.apiUrl).env("PULUMI_BACKEND_URL").def("https://api.pulumi.com").getNullable();
+            $.apiUrl = Codegen.stringProp("apiUrl").output().arg($.apiUrl).env("PULUMI_BACKEND_URL", "PULUMI_API").def("https://api.pulumi.com").getNullable();
             return $;
         }
     }

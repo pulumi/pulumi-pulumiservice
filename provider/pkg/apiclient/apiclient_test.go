@@ -94,7 +94,7 @@ func TestCloudClient_Invoke_SetsDefaultAcceptHeader(t *testing.T) {
 	req, err := c.createRequest(context.Background(), http.MethodGet, "/x", nil, nil)
 	require.NoError(t, err)
 	require.NoError(t, c.invoke(req, nil))
-	assert.Equal(t, "application/vnd.pulumi+8", seen)
+	assert.Equal(t, "application/vnd.pulumi+9", seen)
 }
 
 func TestCloudClient_Invoke_AppliesCustomHeaders(t *testing.T) {

@@ -17,6 +17,10 @@ import (
 const (
 	EnvVarPulumiAccessToken = "PULUMI_ACCESS_TOKEN"
 	EnvVarPulumiBackendURL  = "PULUMI_BACKEND_URL"
+	// EnvVarPulumiAPI is an internal alias the Pulumi CLI sets on certain login
+	// flows (e.g. `pl login devstack`). We honor it as a fallback so a token
+	// scoped to a non-prod backend doesn't silently route to api.pulumi.com.
+	EnvVarPulumiAPI = "PULUMI_API"
 )
 
 func GetClient(ctx context.Context) Client {
@@ -76,7 +80,7 @@ type Config struct {
 func (c *Config) Annotate(a infer.Annotator) {
 	a.Describe(&c.AccessToken, "Access Token to authenticate with Pulumi Cloud.")
 	a.Describe(&c.APIURL, "Optional override of Pulumi Cloud API endpoint.")
-	a.SetDefault(&c.APIURL, "https://api.pulumi.com", EnvVarPulumiBackendURL)
+	a.SetDefault(&c.APIURL, "https://api.pulumi.com", EnvVarPulumiBackendURL, EnvVarPulumiAPI)
 }
 
 func (c *Config) Configure(context.Context) error {
@@ -98,12 +102,17 @@ func (c *Config) Configure(context.Context) error {
 		return ErrAccessTokenNotFound
 	}
 
-	// `pulumi import` persists default-provider state with empty inputs;
-	// on subsequent destroy, Configure receives apiUrl="" and would fall
-	// through to NewClient's api.pulumi.com default. Symmetric fallback
-	// to the AccessToken one above.
+	// SetDefault on APIURL applies during CheckConfig, not Configure;
+	// `pulumi import` persists default-provider state with empty inputs,
+	// and on subsequent destroy the engine calls Configure with apiUrl=""
+	// without re-running Check. Without this fallback NewClient would
+	// default to api.pulumi.com and 401 against a non-prod token
+	// (regression caught by TestYamlRbacComposeImport).
 	if c.APIURL == "" {
 		c.APIURL = os.Getenv(EnvVarPulumiBackendURL)
+	}
+	if c.APIURL == "" {
+		c.APIURL = os.Getenv(EnvVarPulumiAPI)
 	}
 
 	var err error

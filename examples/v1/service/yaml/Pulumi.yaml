@@ -1,0 +1,9 @@
+name: pulumicloud-v1-service
+runtime: yaml
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  serviceSuffix:
+    type: string
+    default: dev

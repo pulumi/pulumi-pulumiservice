@@ -23,7 +23,7 @@ func GetApiUrl(ctx *pulumi.Context) string {
 		return v
 	}
 	var value string
-	if d := internal.GetEnvOrDefault("https://api.pulumi.com", nil, "PULUMI_BACKEND_URL"); d != nil {
+	if d := internal.GetEnvOrDefault("https://api.pulumi.com", nil, "PULUMI_BACKEND_URL", "PULUMI_API"); d != nil {
 		value = d.(string)
 	}
 	return value

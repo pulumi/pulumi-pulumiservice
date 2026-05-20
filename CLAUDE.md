@@ -270,7 +270,7 @@ The `pulumiapi` package provides HTTP client wrappers for the Pulumi Cloud REST 
 
 - `Client` - Base HTTP client with authentication and standard headers
 - Individual files for each resource type (e.g., `teams.go`, `stack.go`, `webhooks.go`)
-- All API calls use the standard headers: `X-Pulumi-Source: provider`, `Accept: application/vnd.pulumi+8`
+- All API calls use the standard headers: `X-Pulumi-Source: provider`, `Accept: application/vnd.pulumi+9`
 - Authentication via Bearer token in `Authorization` header
 
 ## Release Process

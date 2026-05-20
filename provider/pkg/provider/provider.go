@@ -19,8 +19,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"runtime"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	_ "embed" // For manualSchema.
@@ -33,6 +35,9 @@ import (
 	"github.com/pulumi/esc/cmd/esc/cli/version"
 	p "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi-go-provider/infer"
+	mw "github.com/pulumi/pulumi-go-provider/middleware"
+	ctxmw "github.com/pulumi/pulumi-go-provider/middleware/context"
+	"github.com/pulumi/pulumi-go-provider/middleware/dispatch"
 	"github.com/pulumi/pulumi-go-provider/middleware/rpc"
 	"github.com/pulumi/pulumi/pkg/v3/codegen/schema"
 	"github.com/pulumi/pulumi/pkg/v3/resource/provider"
@@ -41,10 +46,13 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/common/tokens"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/apiclient"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/cloud"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/functions"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/resources"
+	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/rest"
 )
 
 //go:embed README.md
@@ -70,6 +78,11 @@ type pulumiserviceProvider struct {
 	pulumiResources []PulumiServiceResource
 	AccessToken     string
 	client          *pulumiapi.Client
+	// transportRef is the per-provider v1 transport, populated during
+	// Configure and consumed by the ctxmw.Wrap layer to attach this
+	// provider's transport to every CRUD context — keeps multi-provider
+	// instances from racing on a package-global.
+	transportRef *atomic.Value
 }
 
 // embed manual-schema.json directly into resource binary so that we can properly serve the schema
@@ -78,17 +91,49 @@ type pulumiserviceProvider struct {
 //go:embed manual-schema.json
 var manualSchema string
 
+// MakeProvider builds the unified Pulumi Cloud Provider. Three layers:
+//
+//  1. legacyRaw — the existing custom gRPC server (pulumiserviceProvider)
+//     handling resources defined in manual-schema.json.
+//  2. dispatch.Wrap — overlays metadata-driven v1 resources from
+//     provider/pkg/cloud/metadata.json. Schema for these is spliced into
+//     GetSchema responses by withCloudV1Schema.
+//  3. infer.NewProviderBuilder — adds modern infer-style resources
+//     (Team, OrganizationRole, etc.) at pulumiservice:index:* and stamps
+//     in package-level metadata (display name, language map, config schema).
+//
+// Existing user code keeps working unchanged: pulumiservice:index:* tokens
+// resolve through layers 1 and 3; the new v1 resources at
+// pulumiservice:v1:* resolve through layer 2.
 func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.ResourceProviderServer, error) {
-	// Return the new provider
+	transportRef := &atomic.Value{}
+	legacyRaw := rpc.Provider(&pulumiserviceProvider{
+		host:         host,
+		name:         name,
+		schema:       mustSetSchemaVersion(manualSchema, version),
+		version:      version,
+		transportRef: transportRef,
+	})
+
+	customs := map[tokens.Type]mw.CustomResource{}
+	for tok, h := range rest.Resources(cloud.Spec(), cloud.Metadata()) {
+		customs[tokens.Type(tok)] = h
+	}
+	composed := dispatch.Wrap(legacyRaw, dispatch.Options{Customs: customs})
+	composed = withCloudV1Schema(composed, cloud.Spec(), cloud.Metadata(), name)
+	// Attach this provider's transport to every CRUD context. Pairs with
+	// pulumiserviceProvider.Configure storing into transportRef.
+	composed = ctxmw.Wrap(composed, func(ctx context.Context) context.Context {
+		if v := transportRef.Load(); v != nil {
+			return rest.WithTransport(ctx, v.(rest.Transport))
+		}
+		return ctx
+	})
+
 	provider, err := infer.NewProviderBuilder().
 		WithDisplayName("Pulumi Cloud").
 		WithNamespace("pulumi").
-		WithWrapped(rpc.Provider(&pulumiserviceProvider{
-			host:    host,
-			name:    name,
-			schema:  mustSetSchemaVersion(manualSchema, version),
-			version: version,
-		})).
+		WithWrapped(composed).
 		WithResources(
 			infer.Resource(&resources.AccessToken{}),
 			infer.Resource(&resources.AgentPool{}),
@@ -130,6 +175,7 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 			"csharp": map[string]any{
 				"namespaces": map[string]any{
 					"pulumiservice": "PulumiService",
+					"v1":            "V1",
 				},
 				"packageReferences": map[string]any{
 					"Pulumi": "3.*",
@@ -182,6 +228,87 @@ func MakeProvider(host *provider.HostClient, name, version string) (pulumirpc.Re
 		return nil, err
 	}
 	return p.RawServer(name, version, provider)(host)
+}
+
+type authedTransport struct {
+	baseURL string
+	token   string
+	client  *http.Client
+}
+
+func (t *authedTransport) Do(_ context.Context, req *http.Request) (*http.Response, error) {
+	base, err := url.Parse(t.baseURL)
+	if err != nil {
+		return nil, fmt.Errorf("authedTransport: parse base URL %q: %w", t.baseURL, err)
+	}
+
+	req.URL.Scheme = base.Scheme
+	req.URL.Host = base.Host
+	req.Host = base.Host
+
+	req.Header.Set("Authorization", "token "+t.token)
+	// v0 (legacy) callers leave Accept unset and want the Pulumi-versioned
+	// media type; v1 (rest.Resource) sets Accept: application/json explicitly
+	// because its OpenAPI-described endpoints return standard JSON.
+	if req.Header.Get("Accept") == "" {
+		req.Header.Set("Accept", apiclient.AcceptMediaType)
+	}
+	req.Header.Set("X-Pulumi-Source", "provider")
+
+	return t.client.Do(req)
+}
+
+func withCloudV1Schema(prov p.Provider, spec *rest.Spec, metadata *rest.Metadata, pkg string) p.Provider {
+	inner := prov.GetSchema
+	prov.GetSchema = func(ctx context.Context, req p.GetSchemaRequest) (p.GetSchemaResponse, error) {
+		resp, err := inner(ctx, req)
+		if err != nil {
+			return resp, err
+		}
+		var base schema.PackageSpec
+		if err := json.Unmarshal([]byte(resp.Schema), &base); err != nil {
+			return resp, fmt.Errorf("withCloudV1Schema: parse base schema: %w", err)
+		}
+		fragment, err := rest.BuildSchema(spec, metadata, pkg)
+		if err != nil {
+			return resp, fmt.Errorf("withCloudV1Schema: %w", err)
+		}
+		mergeSpec(&base, fragment)
+		out, err := json.Marshal(base)
+		if err != nil {
+			return resp, fmt.Errorf("withCloudV1Schema: re-encode schema: %w", err)
+		}
+		resp.Schema = string(out)
+		return resp, nil
+	}
+	return prov
+}
+
+func mergeSpec(dst, src *schema.PackageSpec) {
+	if dst.Resources == nil {
+		dst.Resources = map[string]schema.ResourceSpec{}
+	}
+	for k, v := range src.Resources {
+		if _, ok := dst.Resources[k]; !ok {
+			dst.Resources[k] = v
+		}
+	}
+	if dst.Types == nil {
+		dst.Types = map[string]schema.ComplexTypeSpec{}
+	}
+	for k, v := range src.Types {
+		if _, ok := dst.Types[k]; !ok {
+			dst.Types[k] = v
+		}
+	}
+	if dst.Functions == nil {
+		dst.Functions = map[string]schema.FunctionSpec{}
+	}
+	for k, v := range src.Functions {
+		if _, ok := dst.Functions[k]; !ok {
+			dst.Functions[k] = v
+		}
+	}
 }
 
 // Attach implements pulumirpc.ResourceProviderServer
@@ -242,6 +369,25 @@ func (k *pulumiserviceProvider) Configure(
 		return nil, err
 	}
 	client, err := pulumiapi.NewClient(&httpClient, *token, *url)
+	if err != nil {
+		return nil, err
+	}
+
+	transport := rest.Transport(&authedTransport{
+		baseURL: *url,
+		token:   *token,
+		client:  &httpClient,
+	})
+	// Two paths: ctxmw.Wrap (set in MakeProvider) picks this up and attaches
+	// it to every CRUD context; SetTransportResolver remains as the legacy
+	// global so any code path that bypasses the middleware still resolves a
+	// transport.
+	if k.transportRef != nil {
+		k.transportRef.Store(transport)
+	}
+	rest.SetTransportResolver(func(_ context.Context) (rest.Transport, error) {
+		return transport, nil
+	})
 
 	escClient := esc_client.New(
 		fmt.Sprintf("provider-pulumiservice/1 (%s; %s)", version.Version, runtime.GOOS),
@@ -249,10 +395,6 @@ func (k *pulumiserviceProvider) Configure(
 		*token,
 		false,
 	)
-
-	if err != nil {
-		return nil, err
-	}
 
 	// Store the client for use in Invoke functions
 	k.client = client

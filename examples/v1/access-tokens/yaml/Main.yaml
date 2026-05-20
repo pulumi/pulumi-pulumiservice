@@ -1,0 +1,32 @@
+resources:
+  team:
+    type: pulumiservice:v1/teams:Team
+    properties:
+      orgName: ${organizationName}
+      name: v1-tokens-team-${tokenSuffix}
+      displayName: v1 Tokens Team ${tokenSuffix}
+      description: Owner team for the v1 access-tokens example
+  orgToken:
+    type: pulumiservice:v1/tokens:OrgToken
+    properties:
+      orgName: ${organizationName}
+      name: v1-org-token-${tokenSuffix}
+      description: ${tokenDescription}
+      admin: false
+      expires: 0
+  teamToken:
+    type: pulumiservice:v1/tokens:TeamToken
+    properties:
+      orgName: ${organizationName}
+      teamName: ${team.name}
+      name: v1-team-token-${tokenSuffix}
+      description: ${tokenDescription}
+      expires: 0
+  personalToken:
+    type: pulumiservice:v1/tokens:PersonalToken
+    properties:
+      description: ${tokenDescription}
+      expires: 0
+outputs:
+  orgTokenId: ${orgToken.tokenId}
+  teamTokenId: ${teamToken.tokenId}

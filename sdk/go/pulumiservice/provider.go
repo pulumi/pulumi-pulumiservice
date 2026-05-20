@@ -28,7 +28,7 @@ func NewProvider(ctx *pulumi.Context,
 	}
 
 	if args.ApiUrl == nil {
-		if d := internal.GetEnvOrDefault("https://api.pulumi.com", nil, "PULUMI_BACKEND_URL"); d != nil {
+		if d := internal.GetEnvOrDefault("https://api.pulumi.com", nil, "PULUMI_BACKEND_URL", "PULUMI_API"); d != nil {
 			args.ApiUrl = pulumi.StringPtr(d.(string))
 		}
 	}

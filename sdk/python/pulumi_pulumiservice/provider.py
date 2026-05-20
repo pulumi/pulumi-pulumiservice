@@ -30,7 +30,7 @@ class ProviderArgs:
         if access_token is not None:
             pulumi.set(__self__, "access_token", access_token)
         if api_url is None:
-            api_url = (_utilities.get_env('PULUMI_BACKEND_URL') or 'https://api.pulumi.com')
+            api_url = (_utilities.get_env('PULUMI_BACKEND_URL', 'PULUMI_API') or 'https://api.pulumi.com')
         if api_url is not None:
             pulumi.set(__self__, "api_url", api_url)
 
@@ -113,7 +113,7 @@ class Provider(pulumi.ProviderResource):
 
             __props__.__dict__["access_token"] = None if access_token is None else pulumi.Output.secret(access_token)
             if api_url is None:
-                api_url = (_utilities.get_env('PULUMI_BACKEND_URL') or 'https://api.pulumi.com')
+                api_url = (_utilities.get_env('PULUMI_BACKEND_URL', 'PULUMI_API') or 'https://api.pulumi.com')
             __props__.__dict__["api_url"] = api_url
         secret_opts = pulumi.ResourceOptions(additional_secret_outputs=["accessToken"])
         opts = pulumi.ResourceOptions.merge(opts, secret_opts)

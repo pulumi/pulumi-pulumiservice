@@ -80,7 +80,7 @@ func (i *PulumiServiceWebhookInput) ToPropertyMap(
 
 	if i.Secret != nil {
 		if mergeMode {
-			util.MergeSecretValue(pm, "secret", *i.Secret, plaintextSecret, cipherSecret, isInput)
+			util.MergeSecretValueStrict(pm, "secret", *i.Secret, plaintextSecret, cipherSecret, isInput)
 		} else if createMode {
 			util.CreateSecretValue(pm, "secret", *i.Secret, *plaintextSecret, isInput)
 		} else {

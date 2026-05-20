@@ -1,0 +1,5 @@
+name: pulumicloud-v1-service-catalog-demo
+runtime: nodejs
+description: |
+  Service Catalog v1 demo — TypeScript variant. See ../README.md for the
+  runbook.

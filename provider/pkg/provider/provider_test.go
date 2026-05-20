@@ -16,12 +16,14 @@ package provider
 
 import (
 	"context"
+	"encoding/json"
 	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/pulumi/pulumi/pkg/v3/codegen/schema"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
@@ -156,4 +158,43 @@ func TestConfigure_SetsAccessToken(t *testing.T) {
 		t.Skip("Provider is wrapped, cannot directly access AccessToken field")
 	}
 	assert.NotNil(t, concreteProvider.client, "client should be initialized after Configure")
+}
+
+// TestProvider_LayeredSchema verifies the unified provider serves three
+// resource sources under one pulumiservice schema:
+//
+//  1. legacy raw gRPC server (manual-schema.json) — e.g. Stack
+//  2. modern infer (WithResources)              — e.g. Team
+//  3. metadata-driven v1 layer (rest.BuildSchema spliced via withCloudV1Schema)
+//     — e.g. OrganizationWebhook at pulumiservice:v1:*
+//
+// All three share the pulumiservice package name; v0 surface is implicit
+// at the package root (pulumiservice:index:*), v1 is an explicit module.
+// Existing user code using pulumiservice:index:* keeps working unchanged.
+func TestProvider_LayeredSchema(t *testing.T) {
+	provider, err := MakeProvider(nil, "pulumiservice", "1.0.0")
+	require.NoError(t, err)
+
+	resp, err := provider.GetSchema(context.Background(), &pulumirpc.GetSchemaRequest{})
+	require.NoError(t, err)
+	require.NotEmpty(t, resp.Schema)
+
+	var spec schema.PackageSpec
+	require.NoError(t, json.Unmarshal([]byte(resp.Schema), &spec))
+
+	assert.Equal(t, "pulumiservice", spec.Name)
+
+	mustHave := []struct {
+		token  string
+		source string
+	}{
+		{"pulumiservice:index:Stack", "v0: legacy raw (manual-schema.json)"},
+		{"pulumiservice:index:Team", "v0: modern infer (WithResources)"},
+		{"pulumiservice:v1:OrganizationWebhook", "v1: metadata-driven (withCloudV1Schema)"},
+	}
+	for _, c := range mustHave {
+		_, ok := spec.Resources[c.token]
+		assert.Truef(t, ok, "missing %s — expected from %s", c.token, c.source)
+	}
+
 }
