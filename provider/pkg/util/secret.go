@@ -1,8 +1,6 @@
 package util
 
 import (
-	"bytes"
-
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 
@@ -139,9 +137,7 @@ func MergeSecretValue(
 	isInput bool,
 ) {
 	if isInput {
-		if oldCipherValue != nil &&
-			cipherValue.Value == oldCipherValue.Value &&
-			bytes.Equal(cipherValue.Ciphertext, oldCipherValue.Ciphertext) {
+		if oldCipherValue != nil && cipherValue.Value == oldCipherValue.Value {
 			propertyMap[resource.PropertyKey(propertyName)] = resource.MakeSecret(
 				resource.NewPropertyValue(plaintextValue.Value),
 			)
