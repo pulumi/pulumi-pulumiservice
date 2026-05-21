@@ -114,6 +114,11 @@ jobs:
       - name: Run API tests
         env:
           PULUMI_ACCESS_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_ACCESS_TOKEN_STAGING }}
+          # Only the yaml lane creates real resources (FullE2E up/refresh/destroy).
+          # Other lanes are preview-only and must skip the sweeper, otherwise a
+          # parallel shard's sweep can delete the team/webhook the yaml lane just
+          # created and the follow-up PATCH 404s. See sweep_api_test.go.
+          PULUMITEST_SKIP_SWEEP: ${{ matrix.language != 'yaml' && '1' || '' }}
         run: |
           cd examples
           go test -tags api -run "TestApi/.*/${{ matrix.language }}" -v -timeout 25m ./... \
