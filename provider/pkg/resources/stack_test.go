@@ -20,8 +20,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/pulumi/pulumi/sdk/v3/go/property"
-
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
 )
 
@@ -51,76 +49,5 @@ func TestSplitStackResourceID(t *testing.T) {
 	t.Run("too many parts", func(t *testing.T) {
 		_, _, _, err := splitStackResourceID("a/b/c/d")
 		require.Error(t, err)
-	})
-}
-
-func TestStackLegacyStateMigration(t *testing.T) {
-	t.Run("migrates legacy state with __inputs", func(t *testing.T) {
-		legacy := property.NewMap(map[string]property.Value{
-			"__inputs": property.New(property.NewMap(map[string]property.Value{
-				"organizationName": property.New("my-org"),
-				"projectName":      property.New("my-project"),
-				"stackName":        property.New("my-stack"),
-				"forceDestroy":     property.New(true),
-			})),
-			"organizationName": property.New("my-org"),
-			"projectName":      property.New("my-project"),
-			"stackName":        property.New("my-stack"),
-			"forceDestroy":     property.New(true),
-		})
-
-		got, err := migrateStackLegacyState(t.Context(), legacy)
-		require.NoError(t, err)
-		assert.Equal(t, &StackState{
-			StackInput: StackInput{
-				OrganizationName: "my-org",
-				ProjectName:      "my-project",
-				StackName:        "my-stack",
-				ForceDestroy:     true,
-			},
-		}, got.Result)
-	})
-
-	t.Run("migrates legacy state without forceDestroy", func(t *testing.T) {
-		// The legacy code only wrote forceDestroy when it was true; absent
-		// values should migrate to the Go zero value (false).
-		legacy := property.NewMap(map[string]property.Value{
-			"__inputs": property.New(property.NewMap(map[string]property.Value{
-				"organizationName": property.New("my-org"),
-				"projectName":      property.New("my-project"),
-				"stackName":        property.New("my-stack"),
-			})),
-			"organizationName": property.New("my-org"),
-			"projectName":      property.New("my-project"),
-			"stackName":        property.New("my-stack"),
-		})
-
-		got, err := migrateStackLegacyState(t.Context(), legacy)
-		require.NoError(t, err)
-		assert.Equal(t, &StackState{
-			StackInput: StackInput{
-				OrganizationName: "my-org",
-				ProjectName:      "my-project",
-				StackName:        "my-stack",
-				ForceDestroy:     false,
-			},
-		}, got.Result)
-	})
-
-	t.Run("no-op for already-migrated state", func(t *testing.T) {
-		current := property.NewMap(map[string]property.Value{
-			"organizationName": property.New("my-org"),
-			"projectName":      property.New("my-project"),
-			"stackName":        property.New("my-stack"),
-		})
-
-		got, err := migrateStackLegacyState(t.Context(), current)
-		require.NoError(t, err)
-		assert.Nil(t, got.Result)
-	})
-
-	t.Run("registered on the resource", func(t *testing.T) {
-		migrations := (&Stack{}).StateMigrations(t.Context())
-		assert.Len(t, migrations, 1)
 	})
 }

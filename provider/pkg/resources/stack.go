@@ -20,7 +20,6 @@ import (
 	"strings"
 
 	"github.com/pulumi/pulumi-go-provider/infer"
-	"github.com/pulumi/pulumi/sdk/v3/go/property"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/pulumiapi"
@@ -32,7 +31,6 @@ var (
 	_ infer.CustomCreate[StackInput, StackState] = &Stack{}
 	_ infer.CustomDelete[StackState]             = &Stack{}
 	_ infer.CustomRead[StackInput, StackState]   = &Stack{}
-	_ infer.CustomStateMigrations[StackState]    = &Stack{}
 )
 
 func (*Stack) Annotate(a infer.Annotator) {
@@ -137,38 +135,6 @@ func (*Stack) Read(
 		Inputs: inputs,
 		State:  StackState{StackInput: inputs},
 	}, nil
-}
-
-// StateMigrations strips the legacy `__inputs` field that the pre-infer Stack
-// resource embedded in state. infer rejects unknown fields when decoding state,
-// so without this migration a refresh against an existing stack errors with
-// "Unrecognized field '__inputs'".
-func (*Stack) StateMigrations(context.Context) []infer.StateMigrationFunc[StackState] {
-	return []infer.StateMigrationFunc[StackState]{
-		infer.StateMigration(migrateStackLegacyState),
-	}
-}
-
-func migrateStackLegacyState(
-	_ context.Context, old property.Map,
-) (infer.MigrationResult[StackState], error) {
-	if _, ok := old.GetOk("__inputs"); !ok {
-		return infer.MigrationResult[StackState]{}, nil
-	}
-	state := StackState{}
-	if v, ok := old.GetOk("organizationName"); ok && v.IsString() {
-		state.OrganizationName = v.AsString()
-	}
-	if v, ok := old.GetOk("projectName"); ok && v.IsString() {
-		state.ProjectName = v.AsString()
-	}
-	if v, ok := old.GetOk("stackName"); ok && v.IsString() {
-		state.StackName = v.AsString()
-	}
-	if v, ok := old.GetOk("forceDestroy"); ok && v.IsBool() {
-		state.ForceDestroy = v.AsBool()
-	}
-	return infer.MigrationResult[StackState]{Result: &state}, nil
 }
 
 func stackResourceID(stack pulumiapi.StackIdentifier) string {
