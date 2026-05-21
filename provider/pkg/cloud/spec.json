@@ -13527,8 +13527,8 @@
             "type": "array",
             "x-order": 10
           },
-          "token": {
-            "description": "The Pulumi token identifying this resource or function.",
+          "typeToken": {
+            "description": "The Pulumi type token identifying this resource or function (e.g. 'random:index/randomPassword:RandomPassword').",
             "type": "string",
             "x-order": 3
           },
@@ -13544,16 +13544,16 @@
           "language",
           "name",
           "navUrl",
-          "token",
+          "typeToken",
           "version"
         ],
         "type": "object"
       },
       "GetPackageExamplesResponse": {
-        "description": "Code examples aggregated across a package's resources and functions. Each example carries its own 'token' and 'kind', filtered by 'q' and capped by 'limit'.",
+        "description": "Code examples aggregated across a package's resources and functions. Each example carries its own 'typeToken' and 'kind', filtered by 'q' and capped by 'limit'.",
         "properties": {
           "examples": {
-            "description": "Examples sorted by token, then by position within each token. Capped at 'limit'.",
+            "description": "Examples sorted by type token, then by position within each type token. Capped at 'limit'.",
             "items": {
               "$ref": "#/components/schemas/RegistryExample"
             },
@@ -13638,15 +13638,15 @@
             "type": "string",
             "x-order": 2
           },
-          "token": {
-            "description": "The Pulumi token identifying this resource or function (e.g. 'random:index/randomPassword:RandomPassword').",
+          "typeToken": {
+            "description": "The Pulumi type token identifying this resource or function (e.g. 'random:index/randomPassword:RandomPassword').",
             "type": "string",
             "x-order": 1
           }
         },
         "required": [
           "name",
-          "token"
+          "typeToken"
         ],
         "type": "object"
       },
@@ -13703,7 +13703,7 @@
             "x-order": 6
           },
           "docsUrlTemplate": {
-            "description": "URL template for the docs endpoint. Substitute '{token}' with a URL-encoded Pulumi token from a navigation item.",
+            "description": "URL template for the docs endpoint. Substitute '{typeToken}' with a URL-encoded Pulumi type token from a navigation item.",
             "type": "string",
             "x-order": 11
           },
@@ -22846,8 +22846,8 @@
             "type": "array",
             "x-order": 4
           },
-          "token": {
-            "description": "Pulumi token of this type.",
+          "typeToken": {
+            "description": "Pulumi type token of this type.",
             "type": "string",
             "x-order": 1
           },
@@ -22863,20 +22863,20 @@
         "required": [
           "kind",
           "name",
-          "token"
+          "typeToken"
         ],
         "type": "object"
       },
       "RegistryDocsTypeRef": {
-        "description": "A reference to a type, either local (within the same package) or remote (in another package). For local types the token matches a supportingTypes entry. For remote types, package and version identify the external package.",
+        "description": "A reference to a type, either local (within the same package) or remote (in another package). For local types the type token matches a supportingTypes entry. For remote types, package and version identify the external package.",
         "properties": {
           "package": {
             "description": "The package identifier for remote types (e.g. 'pulumi/pulumi/aws'). Absent for local types within the same package.",
             "type": "string",
             "x-order": 2
           },
-          "token": {
-            "description": "The Pulumi token of the referenced type.",
+          "typeToken": {
+            "description": "The Pulumi type token of the referenced type.",
             "type": "string",
             "x-order": 1
           },
@@ -22887,7 +22887,7 @@
           }
         },
         "required": [
-          "token"
+          "typeToken"
         ],
         "type": "object"
       },
@@ -22900,12 +22900,12 @@
             "x-order": 3
           },
           "id": {
-            "description": "Stable identifier within the package version. Format: '<token>#<slug>', where slug is the kebab-case title (e.g. 'aws:ec2/instance:Instance#account-analyzer'), falling back to 'example-<short-hash>' when there is no heading. Duplicates within the same token are suffixed '-2', '-3', etc.",
+            "description": "Stable identifier within the package version. Format: '<typeToken>#<slug>', where slug is the kebab-case title (e.g. 'aws:ec2/instance:Instance#account-analyzer'), falling back to 'example-<short-hash>' when there is no heading. Duplicates within the same type token are suffixed '-2', '-3', etc.",
             "type": "string",
             "x-order": 1
           },
           "kind": {
-            "description": "Whether 'token' is a 'resource' or 'function'.",
+            "description": "Whether 'typeToken' is a 'resource' or 'function'.",
             "type": "string",
             "x-order": 5
           },
@@ -22914,8 +22914,8 @@
             "type": "string",
             "x-order": 2
           },
-          "token": {
-            "description": "Pulumi token this example belongs to.",
+          "typeToken": {
+            "description": "Pulumi type token this example belongs to.",
             "type": "string",
             "x-order": 4
           }
@@ -22925,7 +22925,7 @@
           "id",
           "kind",
           "title",
-          "token"
+          "typeToken"
         ],
         "type": "object"
       },
@@ -51989,9 +51989,9 @@
         ]
       }
     },
-    "/api/registry/packages/{source}/{publisher}/{name}/versions/{version}/docs/{token}": {
+    "/api/registry/packages/{source}/{publisher}/{name}/versions/{version}/docs/{typeToken}": {
       "get": {
-        "description": "Returns API documentation for a single resource or function identified by its URL-encoded Pulumi token. Use 'lang' to filter content to a single language and 'os' to collapse OS choosers in descriptions. Supports JSON or markdown via Accept. Returns 404 if the package version or token does not exist.",
+        "description": "Returns API documentation for a single resource or function identified by its URL-encoded Pulumi type token. Use 'lang' to filter content to a single language and 'os' to collapse OS choosers in descriptions. Supports JSON or markdown via Accept. Returns 404 if the package version or type token does not exist.",
         "operationId": "GetPackageDocs",
         "parameters": [
           {
@@ -52031,9 +52031,9 @@
             }
           },
           {
-            "description": "URL-encoded Pulumi token (e.g. 'random:index%2FrandomPassword:RandomPassword')",
+            "description": "URL-encoded Pulumi type token. Encode with JavaScript's encodeURIComponent or an equivalent that percent-encodes reserved characters; e.g. the type token 'random:index/randomPassword:RandomPassword' becomes 'random%3Aindex%2FrandomPassword%3ARandomPassword'.",
             "in": "path",
-            "name": "token",
+            "name": "typeToken",
             "required": true,
             "schema": {
               "type": "string"
@@ -52076,7 +52076,7 @@
             "description": "invalid query parameter"
           },
           "404": {
-            "description": "package version or token"
+            "description": "package version or type token"
           }
         },
         "summary": "GetPackageDocs",
@@ -52087,7 +52087,7 @@
     },
     "/api/registry/packages/{source}/{publisher}/{name}/versions/{version}/examples": {
       "get": {
-        "description": "Returns code examples aggregated across the package's resources and functions. Each example carries its 'token' and 'kind'. Use 'q' for case-insensitive substring search on title and token. Results are sorted by token, then by example position within each token. Use 'limit' (default 20, max 100) to cap returned examples; 'totalCount' reports the unfiltered count. Supports JSON or markdown via Accept. Returns 404 if the package version does not exist.",
+        "description": "Returns code examples aggregated across the package's resources and functions. Each example carries its 'typeToken' and 'kind'. Use 'q' for case-insensitive substring search on title and type token. Results are sorted by type token, then by example position within each type token. Use 'limit' (default 20, max 100) to cap returned examples; 'totalCount' reports the unfiltered count. Supports JSON or markdown via Accept. Returns 404 if the package version does not exist.",
         "operationId": "GetPackageExamples",
         "parameters": [
           {
@@ -52144,7 +52144,7 @@
             }
           },
           {
-            "description": "URL-encoded case-insensitive substring filter on title and token",
+            "description": "URL-encoded case-insensitive substring filter on title and type token",
             "in": "query",
             "name": "q",
             "schema": {
@@ -52270,7 +52270,7 @@
     },
     "/api/registry/packages/{source}/{publisher}/{name}/versions/{version}/nav": {
       "get": {
-        "description": "Returns the package navigation: a flat list of modules in schema-declaration order. By default returns a summary (module names and counts only) suitable for discovery. Pass 'depth=full' to include resources and functions; combine with 'q' to filter results by name or token. Module names like 's3/bucket' are flat strings, not nested. Supports JSON or markdown via Accept. Returns 404 if the package version does not exist.",
+        "description": "Returns the package navigation: a flat list of modules in schema-declaration order. By default returns a summary (module names and counts only) suitable for discovery. Pass 'depth=full' to include resources and functions; combine with 'q' to filter results by name or type token. Module names like 's3/bucket' are flat strings, not nested. Supports JSON or markdown via Accept. Returns 404 if the package version does not exist.",
         "operationId": "GetPackageNav",
         "parameters": [
           {
@@ -52326,7 +52326,7 @@
             }
           },
           {
-            "description": "Case-insensitive substring filter on resource/function names and tokens. Modules with no matches are omitted. Combine with 'depth=full' to return matched items.",
+            "description": "Case-insensitive substring filter on resource/function names and type tokens. Modules with no matches are omitted. Combine with 'depth=full' to return matched items.",
             "in": "query",
             "name": "q",
             "schema": {
