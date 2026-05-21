@@ -156,6 +156,8 @@ class Stack(pulumi.CustomResource):
             if stack_name is None and not opts.urn:
                 raise TypeError("Missing required property 'stack_name'")
             __props__.__dict__["stack_name"] = stack_name
+        replace_on_changes = pulumi.ResourceOptions(replace_on_changes=["forceDestroy", "organizationName", "projectName", "stackName"])
+        opts = pulumi.ResourceOptions.merge(opts, replace_on_changes)
         super(Stack, __self__).__init__(
             'pulumiservice:index:Stack',
             resource_name,

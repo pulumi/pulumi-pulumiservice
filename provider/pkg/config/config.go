@@ -60,6 +60,7 @@ type Client interface {
 	pulumiapi.OidcClient
 	pulumiapi.OrgAccessTokenClient
 	pulumiapi.RoleClient
+	pulumiapi.StackClient
 	pulumiapi.StackScheduleClient
 	pulumiapi.StackTagClient
 	pulumiapi.TeamAccessTokenClient

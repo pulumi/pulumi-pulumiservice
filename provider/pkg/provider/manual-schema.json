@@ -855,58 +855,6 @@
     }
   },
   "resources": {
-    "pulumiservice:index:Stack": {
-      "description": "A stack is a collection of resources that share a common lifecycle. Stacks are uniquely identified by their name and the project they belong to.",
-      "properties": {
-        "organizationName": {
-          "description": "The name of the organization.",
-          "type": "string"
-        },
-        "projectName": {
-          "description": "The name of the project.",
-          "type": "string"
-        },
-        "stackName": {
-          "description": "The name of the stack.",
-          "type": "string"
-        },
-        "forceDestroy": {
-          "description": "Optional. Flag indicating whether to delete the stack even if it still contains resources.",
-          "type": "boolean"
-        }
-      },
-      "required": [
-        "organizationName",
-        "projectName",
-        "stackName"
-      ],
-      "inputProperties": {
-        "organizationName": {
-          "description": "The name of the organization.",
-          "type": "string",
-          "willReplaceOnChanges": true
-        },
-        "projectName": {
-          "description": "The name of the project.",
-          "type": "string",
-          "willReplaceOnChanges": true
-        },
-        "stackName": {
-          "description": "The name of the stack.",
-          "type": "string",
-          "willReplaceOnChanges": true
-        },
-        "forceDestroy": {
-          "description": "Optional. Flag indicating whether to delete the stack even if it still contains resources.",
-          "type": "boolean"
-        }
-      },
-      "requiredInputs": [
-        "organizationName",
-        "projectName",
-        "stackName"
-      ]
-    },
     "pulumiservice:index:Webhook": {
       "description": "Pulumi Webhooks allow you to notify external services of events happening within your Pulumi organization or stack. For example, you can trigger a notification whenever a stack is updated. Whenever an event occurs, Pulumi will send an HTTP POST request to all registered webhooks. The webhook can then be used to emit some notification, start running integration tests, or even update additional stacks.\n\n### Import\n\nPulumi webhooks can be imported using the `id`, which for webhooks is `{org}/{project}/{stack}/{webhook-name}` e.g.,\n\n```sh\n $ pulumi import pulumiservice:index:Webhook my_webhook my-org/my-project/my-stack/4b0d0671\n```\n\n",
       "properties": {
