@@ -19,8 +19,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"github.com/pulumi/pulumi/sdk/v3/go/property"
 )
 
 func TestEnvironmentVersionTagID(t *testing.T) {
@@ -59,79 +57,5 @@ func TestSplitEnvironmentVersionTagID(t *testing.T) {
 	t.Run("too many parts", func(t *testing.T) {
 		_, _, _, _, err := splitEnvironmentVersionTagID("a/b/c/d/e")
 		require.Error(t, err)
-	})
-}
-
-func TestEnvironmentVersionTagLegacyStateMigration(t *testing.T) {
-	t.Run("migrates legacy state with __inputs", func(t *testing.T) {
-		legacy := property.NewMap(map[string]property.Value{
-			"__inputs": property.New(property.NewMap(map[string]property.Value{
-				"organization": property.New("my-org"),
-				"project":      property.New("my-proj"),
-				"environment":  property.New("my-env"),
-				"tagName":      property.New("my-tag"),
-				"revision":     property.New(float64(7)),
-			})),
-			"organization": property.New("my-org"),
-			"project":      property.New("my-proj"),
-			"environment":  property.New("my-env"),
-			"tagName":      property.New("my-tag"),
-			"revision":     property.New(float64(7)),
-		})
-
-		got, err := migrateEnvironmentVersionTagLegacyState(t.Context(), legacy)
-		require.NoError(t, err)
-		assert.Equal(t, &EnvironmentVersionTagState{
-			EnvironmentVersionTagInput: EnvironmentVersionTagInput{
-				Organization: "my-org",
-				Project:      "my-proj",
-				Environment:  "my-env",
-				TagName:      "my-tag",
-				Revision:     7,
-			},
-		}, got.Result)
-	})
-
-	t.Run("migrates legacy state without project (defaults to 'default')", func(t *testing.T) {
-		// Pre-infer code permitted state without an explicit project; the
-		// schema default of "default" had to be applied during decode.
-		legacy := property.NewMap(map[string]property.Value{
-			"__inputs":     property.New(property.NewMap(map[string]property.Value{})),
-			"organization": property.New("my-org"),
-			"environment":  property.New("my-env"),
-			"tagName":      property.New("my-tag"),
-			"revision":     property.New(float64(3)),
-		})
-
-		got, err := migrateEnvironmentVersionTagLegacyState(t.Context(), legacy)
-		require.NoError(t, err)
-		assert.Equal(t, &EnvironmentVersionTagState{
-			EnvironmentVersionTagInput: EnvironmentVersionTagInput{
-				Organization: "my-org",
-				Project:      defaultProject,
-				Environment:  "my-env",
-				TagName:      "my-tag",
-				Revision:     3,
-			},
-		}, got.Result)
-	})
-
-	t.Run("no-op for already-migrated state", func(t *testing.T) {
-		current := property.NewMap(map[string]property.Value{
-			"organization": property.New("my-org"),
-			"project":      property.New("my-proj"),
-			"environment":  property.New("my-env"),
-			"tagName":      property.New("my-tag"),
-			"revision":     property.New(float64(1)),
-		})
-
-		got, err := migrateEnvironmentVersionTagLegacyState(t.Context(), current)
-		require.NoError(t, err)
-		assert.Nil(t, got.Result)
-	})
-
-	t.Run("registered on the resource", func(t *testing.T) {
-		migrations := (&EnvironmentVersionTag{}).StateMigrations(t.Context())
-		assert.Len(t, migrations, 1)
 	})
 }

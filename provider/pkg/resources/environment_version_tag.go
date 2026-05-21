@@ -21,7 +21,6 @@ import (
 	"strings"
 
 	"github.com/pulumi/pulumi-go-provider/infer"
-	"github.com/pulumi/pulumi/sdk/v3/go/property"
 
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/config"
 )
@@ -33,7 +32,6 @@ var (
 	_ infer.CustomUpdate[EnvironmentVersionTagInput, EnvironmentVersionTagState] = &EnvironmentVersionTag{}
 	_ infer.CustomDelete[EnvironmentVersionTagState]                             = &EnvironmentVersionTag{}
 	_ infer.CustomRead[EnvironmentVersionTagInput, EnvironmentVersionTagState]   = &EnvironmentVersionTag{}
-	_ infer.CustomStateMigrations[EnvironmentVersionTagState]                    = &EnvironmentVersionTag{}
 )
 
 func (*EnvironmentVersionTag) Annotate(a infer.Annotator) {
@@ -169,46 +167,6 @@ func (*EnvironmentVersionTag) Read(
 		Inputs: inputs,
 		State:  EnvironmentVersionTagState{EnvironmentVersionTagInput: inputs},
 	}, nil
-}
-
-// StateMigrations strips the legacy `__inputs` outputs property that the
-// pre-infer EnvironmentVersionTag resource embedded in state. infer rejects
-// unknown fields when decoding state, so without this migration a refresh
-// against an existing stack errors with "Unrecognized field '__inputs'".
-func (*EnvironmentVersionTag) StateMigrations(
-	context.Context,
-) []infer.StateMigrationFunc[EnvironmentVersionTagState] {
-	return []infer.StateMigrationFunc[EnvironmentVersionTagState]{
-		infer.StateMigration(migrateEnvironmentVersionTagLegacyState),
-	}
-}
-
-func migrateEnvironmentVersionTagLegacyState(
-	_ context.Context, old property.Map,
-) (infer.MigrationResult[EnvironmentVersionTagState], error) {
-	if _, ok := old.GetOk("__inputs"); !ok {
-		return infer.MigrationResult[EnvironmentVersionTagState]{}, nil
-	}
-	state := EnvironmentVersionTagState{}
-	if v, ok := old.GetOk("organization"); ok && v.IsString() {
-		state.Organization = v.AsString()
-	}
-	if v, ok := old.GetOk("project"); ok && v.IsString() {
-		state.Project = v.AsString()
-	}
-	if state.Project == "" {
-		state.Project = defaultProject
-	}
-	if v, ok := old.GetOk("environment"); ok && v.IsString() {
-		state.Environment = v.AsString()
-	}
-	if v, ok := old.GetOk("tagName"); ok && v.IsString() {
-		state.TagName = v.AsString()
-	}
-	if v, ok := old.GetOk("revision"); ok && v.IsNumber() {
-		state.Revision = int(v.AsNumber())
-	}
-	return infer.MigrationResult[EnvironmentVersionTagState]{Result: &state}, nil
 }
 
 func environmentVersionTagID(organization, project, environment, tagName string) string {
