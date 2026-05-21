@@ -31,9 +31,13 @@ jobs:
   tag:
     if: |
       github.event.pull_request.merged == true &&
-      contains(github.event.pull_request.labels.*.name, 'auto-release')
+      contains(github.event.pull_request.labels.*.name, 'auto-release') &&
+      github.event.pull_request.base.ref == github.event.repository.default_branch
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    outputs:
+      version: ${{ steps.ver.outputs.version }}
+      is_prerelease: ${{ steps.ver.outputs.is_prerelease }}
     steps:
       - name: Extract Release-Version from PR body
         id: ver
@@ -52,6 +56,11 @@ jobs:
             exit 1
           fi
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          if [[ "$VERSION" == *-* ]]; then
+            echo "is_prerelease=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_prerelease=false" >> "$GITHUB_OUTPUT"
+          fi
           echo "::notice::Will push tag $VERSION at merge commit ${{ github.event.pull_request.merge_commit_sha }}"
 
       - env:
@@ -98,3 +107,61 @@ jobs:
           git tag -a "$VERSION" -m "Release $VERSION"
           git push origin "$VERSION"
           echo "::notice::Pushed tag $VERSION. release.yml will take over."
+
+  finalize:
+    # release.yml's setLatestRelease expression relies on github.event.base_ref, which is
+    # null for tag pushes and so always evaluates to false. That skips both `make_latest`
+    # on the GitHub release and the `create_docs_build` registry dispatch in publish.yml.
+    # This job waits for publish.yml to create the release, then patches both.
+    # Backport safety: the tag job's `if:` already requires base.ref == default_branch,
+    # so this job only runs for tags created from the default branch.
+    needs: tag
+    if: needs.tag.outputs.is_prerelease == 'false'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - env:
+          ESC_ACTION_ENVIRONMENT: github-secrets/${{ github.repository_owner }}-${{ github.event.repository.name }}
+          ESC_ACTION_EXPORT_ENVIRONMENT_VARIABLES: "false"
+          ESC_ACTION_OIDC_AUTH: "true"
+          ESC_ACTION_OIDC_ORGANIZATION: pulumi
+          ESC_ACTION_OIDC_REQUESTED_TOKEN_TYPE: urn:pulumi:token-type:access_token:organization
+        id: esc-secrets
+        name: Fetch secrets from ESC
+        uses: pulumi/esc-action@9eb774255b1a4afb7855678ae8d4a77359da0d9b
+
+      - name: Wait for GitHub release to be created
+        env:
+          VERSION: ${{ needs.tag.outputs.version }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          DEADLINE=$(( $(date +%s) + 4800 ))  # 80 minutes
+          while (( $(date +%s) < DEADLINE )); do
+            if gh release view "$VERSION" --repo "$GITHUB_REPOSITORY" --json tagName -q .tagName >/dev/null 2>&1; then
+              echo "::notice::Release $VERSION exists; proceeding."
+              exit 0
+            fi
+            sleep 30
+          done
+          echo "::error::Timed out waiting for release $VERSION to be created by release.yml."
+          exit 1
+
+      - name: Mark release as latest
+        env:
+          VERSION: ${{ needs.tag.outputs.version }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release edit "$VERSION" --repo "$GITHUB_REPOSITORY" --latest
+
+      - name: Dispatch docs rebuild to pulumi/registry
+        uses: peter-evans/repository-dispatch@28959ce8df70de7be546dd1250a005dd32156697 # v4
+        with:
+          token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
+          repository: pulumi/registry
+          event-type: resource-provider
+          client-payload: |-
+            {
+              "project": "${{ github.repository }}",
+              "project-shortname": "pulumiservice",
+              "ref": "${{ needs.tag.outputs.version }}"
+            }
