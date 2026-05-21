@@ -1,0 +1,22 @@
+resources:
+  readOnlyRole:
+    type: pulumiservice:api:Role
+    properties:
+      orgName: ${organizationName}
+      name: api-rbac-read-only-${nameSuffix}
+      description: ${roleDescription}
+      uxPurpose: role
+      details:
+        __type: PermissionDescriptorAllow
+        permissions:
+          - stack:read
+  rbacTeam:
+    type: pulumiservice:api/teams:Team
+    properties:
+      orgName: ${organizationName}
+      name: api-rbac-team-${nameSuffix}
+      displayName: api RBAC Team ${nameSuffix}
+      description: Team scaffold used by the api rbac example.
+outputs:
+  roleName: ${readOnlyRole.name}
+  teamName: ${rbacTeam.name}

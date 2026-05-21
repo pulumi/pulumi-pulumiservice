@@ -12,25 +12,25 @@ import (
 	"github.com/pulumi/pulumi-pulumiservice/provider/pkg/cloud"
 )
 
-// resourceExampleWaivers lists v1 tokens deliberately not covered by any
+// resourceExampleWaivers lists api tokens deliberately not covered by any
 // yaml example, with the reason. Add an entry only when the resource genuinely
 // can't be exercised end-to-end from a yaml program (function-shaped APIs,
 // internal session resources, etc.). Each entry signals to a future
 // maintainer that the gap is intentional rather than forgotten.
 var resourceExampleWaivers = map[string]string{
-	"pulumiservice:v1/esc:OpenEnvironmentRequest": "Function-shaped resource: create/read/update only, no delete. " +
+	"pulumiservice:api/esc:OpenEnvironmentRequest": "Function-shaped resource: create/read/update only, no delete. " +
 		"Models an internal ESC env-editing session, not a user-managed IaC resource.",
 }
 
-// TestEveryV1ResourceHasExample asserts that every v1 token declared in
+// TestEveryApiResourceHasExample asserts that every api token declared in
 // cloud.Metadata() appears as a `type: <token>` declaration in at least one
-// yaml example under examples/v1/<name>/yaml/. Tokens may opt out via
+// yaml example under examples/api/<name>/yaml/. Tokens may opt out via
 // resourceExampleWaivers with a written reason.
 //
 // Why yaml-only: yaml is the canonical lane (in-process provider, no SDK
 // build dependency); covering yaml is sufficient evidence the resource is
 // exercised end-to-end somewhere.
-func TestEveryV1ResourceHasExample(t *testing.T) {
+func TestEveryApiResourceHasExample(t *testing.T) {
 	md := cloud.Metadata()
 
 	tokens := make([]string, 0, len(md.Resources))
@@ -46,10 +46,10 @@ func TestEveryV1ResourceHasExample(t *testing.T) {
 	if err != nil {
 		t.Fatalf("getwd: %v", err)
 	}
-	examplesV1 := filepath.Join(pkgRoot, "..", "..", "..", "examples", "v1")
+	examplesAPI := filepath.Join(pkgRoot, "..", "..", "..", "examples", "api")
 
 	var corpus []byte
-	err = filepath.Walk(examplesV1, func(path string, info os.FileInfo, err error) error {
+	err = filepath.Walk(examplesAPI, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -71,7 +71,7 @@ func TestEveryV1ResourceHasExample(t *testing.T) {
 		return nil
 	})
 	if err != nil {
-		t.Fatalf("walk examples/v1: %v", err)
+		t.Fatalf("walk examples/api: %v", err)
 	}
 
 	var missing []string
@@ -81,7 +81,7 @@ func TestEveryV1ResourceHasExample(t *testing.T) {
 		}
 		// Match `type: <token>` as a YAML resource declaration. The
 		// type-line anchor rules out comment mentions of the token
-		// (e.g. "# Note: pulumiservice:v1/... isn't covered here").
+		// (e.g. "# Note: pulumiservice:api/... isn't covered here").
 		re := regexp.MustCompile(`(?m)^\s+type:\s*["']?` + regexp.QuoteMeta(tok) + `["']?\s*$`)
 		if !re.Match(corpus) {
 			missing = append(missing, tok)
@@ -91,9 +91,9 @@ func TestEveryV1ResourceHasExample(t *testing.T) {
 	if len(missing) > 0 {
 		sort.Strings(missing)
 		t.Fatalf(
-			"v1 tokens with no yaml example coverage:\n  %s\n\n"+
+			"api tokens with no yaml example coverage:\n  %s\n\n"+
 				"Add a yaml example exercising the resource "+
-				"(examples/v1/<name>/yaml/Main.yaml) or add a waiver entry "+
+				"(examples/api/<name>/yaml/Main.yaml) or add a waiver entry "+
 				"to resourceExampleWaivers in this file with a clear reason.",
 			strings.Join(missing, "\n  "))
 	}

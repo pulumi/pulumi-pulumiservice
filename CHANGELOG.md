@@ -3,8 +3,9 @@
 ## Unreleased
 
 ### Breaking Changes
+
 - Removed the numeric `version` field from `PolicyGroup.policyPacks` inputs; it is now output-only, since the value is server-derived from `versionTag`. Use `versionTag` to pin pack versions. [#737](https://github.com/pulumi/pulumi-pulumiservice/issues/737)
-- `OrganizationRole.permissions` discriminator field is now the wire-format `__type` at every level. Programs that adopted the unreleased intermediate names (`kind:` from [#778](https://github.com/pulumi/pulumi-pulumiservice/pull/778), then `discriminator:`) need to rename to `__type:` everywhere in the descriptor tree. The discriminator *values* (`PermissionDescriptorAllow`, `PermissionDescriptorCompose`, etc.) are unchanged. Migration:
+- `OrganizationRole.permissions` discriminator field is now the wire-format `__type` at every level. Programs that adopted the unreleased intermediate names (`kind:` from [#778](https://github.com/pulumi/pulumi-pulumiservice/pull/778), then `discriminator:`) need to rename to `__type:` everywhere in the descriptor tree. The discriminator _values_ (`PermissionDescriptorAllow`, `PermissionDescriptorCompose`, etc.) are unchanged. Migration:
   ```yaml
   permissions:
   -   discriminator: PermissionDescriptorAllow
@@ -15,19 +16,20 @@
   The wire format and SDK boundary now use `__type` directly, made possible by two upstream pulumi fixes: [pulumi/pulumi#22834](https://github.com/pulumi/pulumi/pull/22834) preserves `__`-prefixed keys across Python SDK RPC deserialization (released in 3.235.0; the Python SDK pins `pulumi>=3.235.0,<4.0.0` to lock it in), and [pulumi/pulumi#22856](https://github.com/pulumi/pulumi/pull/22856) preserves `__`-prefixed keys through the `pulumi import` codegen path (released in 3.237.0; this provider's go.mod pins `pulumi/pulumi/pkg/v3 v3.237.0`). Earlier pulumi runtimes silently strip `__`-prefixed input keys; the pins prevent that footgun. The `buildAllowPermissions` / `build*ScopedPermissions` helper data sources continue to hide the discriminator entirely — prefer those over hand-authored descriptors. The RBAC feature is unreleased so impact is limited to early adopters.
 - `TeamStackPermission.permission` is no longer marked `plain` in the schema. The output is now an `Output<TeamStackPermissionScope>` rather than a plain value; consumers reading `myPerm.permission` need `.apply(...)` to access the underlying value. The input side is strictly more permissive — callers may now wire `permission` to another resource's output. The Go SDK type also changes from `float64` to `int` to match the wire format.
 - `TeamEnvironmentPermission` outputs (`organization`, `team`, `environment`, `permission`) are now typed as definitely-present (`Output<string>`, `Output<EnvironmentPermission>`) rather than optional (`Output<string | undefined>`). The values were always populated; the schema previously misrepresented them.
-- `pulumiservice:v1:*` resources whose underlying API is upsert-shaped (PUT/PATCH or `create == update` operationId) now error on `pulumi up` if the resource already exists out-of-band, instead of silently overwriting. To adopt an existing resource, use the `import` ResourceOption with the resource's ID. Affects: `AuditLogExportConfiguration`, `auth.Policy`, `auth.SAML`, `DefaultOrganization`, `deployments.Settings`, `esc.EnvironmentSettings`, `insights.ScheduledScanSettings`, `integrations.AzureDevOpsIntegration`, `integrations.BitBucketIntegration`, `integrations.GitHubEnterpriseIntegration`, `integrations.GitHubIntegration`, `integrations.GitLabIntegration`, `PolicyIssue`, `stacks.Config`, `teams.Role` (all under `pulumiservice.v1.*`).
-- v0 → v1 migration is opt-in: `pulumiservice:index:*` resources continue to work unchanged, so there is no forced migration. To move a resource to v1, change its type to the v1 form and add an explicit `aliases: [{ type: "pulumiservice:index:<Name>" }]` ResourceOption on the v1 declaration so state rebinds in place. v1 resources are organized into modules, so most tokens change shape (e.g. `pulumiservice.Stack` → `pulumiservice.v1.stacks.Stack`, `pulumiservice.Team` → `pulumiservice.v1.teams.Team`, `pulumiservice.DeploymentSettings` → `pulumiservice.v1.deployments.Settings`, `pulumiservice.OidcIssuer` → `pulumiservice.v1.auth.OidcIssuer`, `pulumiservice.InsightsAccount` → `pulumiservice.v1.insights.Account`). The schedule resources unify: `DeploymentSchedule`, `DriftSchedule`, and `TtlSchedule` all migrate to `pulumiservice.v1.deployments.ScheduledDeployment` — pick the schedule kind (`request.operation`) appropriate to your use. `EnvironmentRotationSchedule` migrates to `pulumiservice.v1.esc.EnvironmentSchedule`.
+- `pulumiservice:api:*` resources whose underlying API is upsert-shaped (PUT/PATCH or `create == update` operationId) now error on `pulumi up` if the resource already exists out-of-band, instead of silently overwriting. To adopt an existing resource, use the `import` ResourceOption with the resource's ID. Affects: `AuditLogExportConfiguration`, `auth.Policy`, `auth.SAML`, `DefaultOrganization`, `deployments.Settings`, `esc.EnvironmentSettings`, `insights.ScheduledScanSettings`, `integrations.AzureDevOpsIntegration`, `integrations.BitBucketIntegration`, `integrations.GitHubEnterpriseIntegration`, `integrations.GitHubIntegration`, `integrations.GitLabIntegration`, `PolicyIssue`, `stacks.Config`, `teams.Role` (all under `pulumiservice.api.*`).
+- v0 → api migration is opt-in: `pulumiservice:index:*` resources continue to work unchanged, so there is no forced migration. To move a resource to the api surface, change its type to the api form and add an explicit `aliases: [{ type: "pulumiservice:index:<Name>" }]` ResourceOption on the api declaration so state rebinds in place. api resources are organized into modules, so most tokens change shape (e.g. `pulumiservice.Stack` → `pulumiservice.api.stacks.Stack`, `pulumiservice.Team` → `pulumiservice.api.teams.Team`, `pulumiservice.DeploymentSettings` → `pulumiservice.api.deployments.Settings`, `pulumiservice.OidcIssuer` → `pulumiservice.api.auth.OidcIssuer`, `pulumiservice.InsightsAccount` → `pulumiservice.api.insights.Account`). The schedule resources unify: `DeploymentSchedule`, `DriftSchedule`, and `TtlSchedule` all migrate to `pulumiservice.api.deployments.ScheduledDeployment` — pick the schedule kind (`request.operation`) appropriate to your use. `EnvironmentRotationSchedule` migrates to `pulumiservice.api.esc.EnvironmentSchedule`.
 
   The following migrations require additional decisions:
-  - `pulumiservice.Webhook` is split into three v1 resources by scope. Pick the matching one and alias it to `pulumiservice:index:Webhook`: `pulumiservice.v1.OrganizationWebhook` (org-scope), `pulumiservice.v1.stacks.Webhook` (stack-scope), or `pulumiservice.v1.esc.Webhook` (ESC environment-scope).
-  - `pulumiservice.StackTags` (manages multiple tags as one resource) doesn't have a v1 counterpart with matching semantics. Migrate to one `pulumiservice.v1.stacks.Tag` per tag.
+  - `pulumiservice.Webhook` is split into three api resources by scope. Pick the matching one and alias it to `pulumiservice:index:Webhook`: `pulumiservice.api.OrganizationWebhook` (org-scope), `pulumiservice.api.stacks.Webhook` (stack-scope), or `pulumiservice.api.esc.Webhook` (ESC environment-scope).
+  - `pulumiservice.StackTags` (manages multiple tags as one resource) doesn't have a api counterpart with matching semantics. Migrate to one `pulumiservice.api.stacks.Tag` per tag.
 
-  `TeamEnvironmentPermission` and `TeamStackPermission` stay at `pulumiservice:index:*`. They're superseded by the role-based RBAC shipped in v1 — use `OrganizationRole` + `TeamRoleAssignment` with `buildStackScopedPermissions` / `buildEnvironmentScopedPermissions` to assign team permissions on individual stacks or environments. The v0 resources remain available for backwards compatibility but new code should use roles.
+  `TeamEnvironmentPermission` and `TeamStackPermission` stay at `pulumiservice:index:*`. They're superseded by the role-based RBAC shipped on the api surface — use `OrganizationRole` + `TeamRoleAssignment` with `buildStackScopedPermissions` / `buildEnvironmentScopedPermissions` to assign team permissions on individual stacks or environments. The v0 resources remain available for backwards compatibility but new code should use roles.
 
 ### Improvements
+
 - The provider now honors `PULUMI_API` as a fallback when `PULUMI_BACKEND_URL` is unset. Without this fallback, a workflow that sets only `PULUMI_API` (e.g. logging into a non-prod backend) would silently dial `api.pulumi.com` and the non-prod token would 401. `PULUMI_BACKEND_URL` still wins when both are set.
-- `pulumiservice:v1:*` resources: path parameters are now input-only and recovered from the resource ID, removing the redundant echo in resource state outputs. Program-owned identity fields no longer occupy the cloud-owned output namespace.
-- Added the `pulumiservice:v1:*` resource namespace **(Preview)**, an OpenAPI-driven layer covering Stacks, Teams, Tokens, Webhooks, ESC Environments, Deployment Settings, OIDC Issuers, Roles, Policy Groups/Packs, VCS Integrations, and related Pulumi Cloud resources. Existing `pulumiservice:index:*` resources continue to work unchanged; v1 resources are accessed under `pulumiservice.v1.*` in user code. Resource shape and module layout may change before GA.
+- `pulumiservice:api:*` resources: path parameters are now input-only and recovered from the resource ID, removing the redundant echo in resource state outputs. Program-owned identity fields no longer occupy the cloud-owned output namespace.
+- Added the `pulumiservice:api:*` resource namespace **(Preview)**, an OpenAPI-driven layer covering Stacks, Teams, Tokens, Webhooks, ESC Environments, Deployment Settings, OIDC Issuers, Roles, Policy Groups/Packs, VCS Integrations, and related Pulumi Cloud resources. Existing `pulumiservice:index:*` resources continue to work unchanged; api resources are accessed under `pulumiservice.api.*` in user code. Resource shape and module layout may change before GA.
 - Added `StackTags` resource for managing multiple stack tags as a single resource, with a `tags` map input. [#61](https://github.com/pulumi/pulumi-pulumiservice/issues/61)
 - Added `TwelveHours` (12h) scan schedule option for `InsightsAccount` resources. [#731](https://github.com/pulumi/pulumi-pulumiservice/pull/731)
 - Documented the `all` enforcement-level wildcard on `PolicyGroupPolicyPackReference.config`, enabling a single entry to set the enforcement level for every policy in a pack with optional per-policy overrides. [#756](https://github.com/pulumi/pulumi-pulumiservice/pull/756)
@@ -42,6 +44,7 @@
 - `OrganizationRole.permissions` now exposes Pulumi Cloud's wire-format permission descriptor grammar verbatim. Every descriptor variant Pulumi Cloud accepts — `PermissionDescriptorAllow`, `PermissionDescriptorGroup`, `PermissionDescriptorCondition`, `PermissionDescriptorCompose`, `PermissionDescriptorIfThenElse`, `PermissionDescriptorSelect`, the `PermissionExpression*` and `PermissionLiteralExpression*` boolean operators, and any future Cloud addition — passes through the provider untouched, addressing the previous translator's hard-coded variant allowlist that rejected `pulumi import` of complex roles authored in the Pulumi Cloud UI (e.g. `PermissionDescriptorCompose`). The provider's only intervention is a structural validity check (top-level `__type` is required); the rest of the tree is opaque. Pre-release polish on the unreleased RBAC API. (See Breaking Changes for the `__type` discriminator field name.)
 
 ### Bug Fixes
+
 - Fixed `AgentPool.agentPoolId` output never being populated. The provider previously wrote the value under a state key that did not match the schema, so `pool.agentPoolId` was always undefined. Existing stacks pick up the correct value on the next `pulumi refresh`.
 - Fixed TeamEnvironmentPermission spurious replacement on upgrade from 0.29.2 caused by the optional `maxOpenDuration` field being serialized as an empty string in Check and Read [#751](https://github.com/pulumi/pulumi-pulumiservice/issues/751)
 - Fixed TeamEnvironmentPermission panic when `maxOpenDuration` was supplied as a non-string value; `Check` now returns a `CheckFailure` at preview instead of crashing during apply [#751](https://github.com/pulumi/pulumi-pulumiservice/issues/751)
@@ -59,24 +62,29 @@
 ## 0.36.0
 
 ### Bug Fixes
+
 - Fixed TeamEnvironmentPermission refresh returning wrong permission when the same environment name exists in multiple projects [#674](https://github.com/pulumi/pulumi-pulumiservice/issues/674)
 
 ## 0.35.0
 
 ### Improvements
+
 - Added `vcs` property to DeploymentSettings for polymorphic VCS support (Azure DevOps and GitHub) [#671](https://github.com/pulumi/pulumi-pulumiservice/pull/671)
 
 ### Bug Fixes
+
 - Fixed Environment resource spurious replace on provider upgrade from pre-0.25.0 due to missing `project` field in old state [#673](https://github.com/pulumi/pulumi-pulumiservice/pull/673)
 
 ## 0.34.0
 
 ### Improvements
+
 - Manage pulumi service provider with ci-mgmt
 
 ## 0.33.0
 
 ### Improvements
+
 - Added InsightsAccount resource and getInsightsAccount/getInsightsAccounts for cloud resource scanning and analysis across AWS, Azure, and GCP, OCI and Kubernetes.
 - Added `accounts` field to PolicyGroup resource for managing cloud accounts in policy groups
 - Updated PolicyGroup to use batch API for more efficient updates when adding/removing stacks, accounts, or policy packs
@@ -84,6 +92,7 @@
 - Upgraded Pulumi SDK to v3.204.0 with latest codegen improvements
 
 ### Bug Fixes
+
 - Fixed Environment resource crash when yaml property contains computed values from Outputs (e.g., template execution results) [#606](https://github.com/pulumi/pulumi-pulumiservice/issues/606)
 - Fixed PolicyGroup schema syntax error preventing proper nested object definitions in policyPacks field [#595](https://github.com/pulumi/pulumi-pulumiservice/pull/595)
 - Fixed PolicyGroup creation to include required entityType and mode fields [#563](https://github.com/pulumi/pulumi-pulumiservice/issues/563)

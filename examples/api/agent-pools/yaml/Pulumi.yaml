@@ -1,0 +1,12 @@
+name: pulumicloud-api-agent-pools
+runtime: yaml
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  poolSuffix:
+    type: string
+    default: dev
+  poolDescription:
+    type: string
+    default: api example agent pool

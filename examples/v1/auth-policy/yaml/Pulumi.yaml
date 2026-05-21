@@ -1,9 +1,0 @@
-name: pulumicloud-v1-auth-policy
-runtime: yaml
-config:
-  organizationName:
-    type: string
-    default: service-provider-test-org
-  policyId:
-    type: string
-    default: org

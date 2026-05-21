@@ -1,0 +1,15 @@
+name: pulumicloud-api-esc-environment-schedule
+runtime: yaml
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  projectName:
+    type: string
+    default: test-project
+  envName:
+    type: string
+    default: env-with-schedule
+  scheduleCron:
+    type: string
+    default: 0 7 * * *

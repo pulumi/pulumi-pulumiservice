@@ -1,0 +1,12 @@
+name: pulumicloud-api-environment-config
+runtime: yaml
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  projectName:
+    type: string
+    default: api-envcfg-example
+  envName:
+    type: string
+    default: api-envcfg-env

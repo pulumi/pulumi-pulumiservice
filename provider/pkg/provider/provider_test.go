@@ -165,11 +165,11 @@ func TestConfigure_SetsAccessToken(t *testing.T) {
 //
 //  1. legacy raw gRPC server (manual-schema.json) — e.g. Stack
 //  2. modern infer (WithResources)              — e.g. Team
-//  3. metadata-driven v1 layer (rest.BuildSchema spliced via withCloudV1Schema)
-//     — e.g. OrganizationWebhook at pulumiservice:v1:*
+//  3. metadata-driven api layer (rest.BuildSchema spliced via withCloudApiSchema)
+//     — e.g. OrganizationWebhook at pulumiservice:api:*
 //
 // All three share the pulumiservice package name; v0 surface is implicit
-// at the package root (pulumiservice:index:*), v1 is an explicit module.
+// at the package root (pulumiservice:index:*), api is an explicit module.
 // Existing user code using pulumiservice:index:* keeps working unchanged.
 func TestProvider_LayeredSchema(t *testing.T) {
 	provider, err := MakeProvider(nil, "pulumiservice", "1.0.0")
@@ -190,7 +190,7 @@ func TestProvider_LayeredSchema(t *testing.T) {
 	}{
 		{"pulumiservice:index:Stack", "v0: legacy raw (manual-schema.json)"},
 		{"pulumiservice:index:Team", "v0: modern infer (WithResources)"},
-		{"pulumiservice:v1:OrganizationWebhook", "v1: metadata-driven (withCloudV1Schema)"},
+		{"pulumiservice:api:OrganizationWebhook", "api: metadata-driven (withCloudApiSchema)"},
 	}
 	for _, c := range mustHave {
 		_, ok := spec.Resources[c.token]

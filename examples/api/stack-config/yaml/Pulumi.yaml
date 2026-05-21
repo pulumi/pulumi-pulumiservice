@@ -1,0 +1,18 @@
+name: pulumicloud-api-stack-config
+runtime: yaml
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  projectName:
+    type: string
+    default: api-stack-config-example
+  stackName:
+    type: string
+    default: dev
+  hookUrl:
+    type: string
+    default: https://example.invalid/hooks/example
+  envRef:
+    type: string
+    default: organization/credentials

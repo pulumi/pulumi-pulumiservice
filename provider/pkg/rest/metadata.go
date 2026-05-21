@@ -41,7 +41,7 @@ type ResourceMeta struct {
 
 	// Token overrides the user-facing Pulumi token. Keeps the map key as
 	// the canonical OpenAPI-derived identifier for scaffolding while
-	// exposing a clean module path (e.g. "pulumiservice:v1/esc:Environment").
+	// exposing a clean module path (e.g. "pulumiservice:api/esc:Environment").
 	Token string `json:"token,omitempty"`
 
 	// Aliases are tokens the engine treats as equivalent (for renames).

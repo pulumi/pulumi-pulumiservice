@@ -1,0 +1,27 @@
+resources:
+  environment:
+    type: pulumiservice:api/esc:Environment
+    properties:
+      orgName: ${organizationName}
+      project: ${projectName}
+      name: ${envName}
+  hook:
+    type: pulumiservice:api/esc:Webhook
+    properties:
+      organizationName: ${organizationName}
+      # esc:Environment treats project/name as program-owned inputs and
+      # doesn't surface them on the resource state, so we feed config
+      # values straight in and use dependsOn for the implicit ordering.
+      projectName: ${projectName}
+      envName: ${envName}
+      name: ${hookName}
+      displayName: ESC env webhook
+      payloadUrl: ${payloadUrl}
+      active: true
+      secret: ${secretValue}
+    options:
+      dependsOn:
+        - ${environment}
+outputs:
+  environmentId: ${environment.id}
+  webhookName: ${hook.name}
