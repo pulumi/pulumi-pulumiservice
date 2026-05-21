@@ -1,0 +1,17 @@
+resources:
+  environment:
+    type: pulumiservice:api/esc:Environment
+    properties:
+      orgName: ${organizationName}
+      project: ${projectName}
+      name: testing-environment-${envSuffix}
+# Note: pulumiservice:api/esc:RevisionTag isn't covered here because tagging
+# requires an existing revision, and a freshly-created environment has
+# no definition (and therefore no revisions). To exercise tags we'd
+# first need to push a definition via the Open/Update flow, which is
+# out of scope for these api examples.
+outputs:
+  # esc:Environment exposes only id/urn — path-param inputs (orgName,
+  # project, name) follow the program-owns-inputs / cloud-owns-outputs
+  # disjointness; recover them from the slash-joined id if needed.
+  environmentId: ${environment.id}

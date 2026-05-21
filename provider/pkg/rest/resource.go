@@ -650,7 +650,7 @@ func (r *Resource) Update(ctx context.Context, req p.UpdateRequest) (p.UpdateRes
 // as a fallback.
 //
 // 404 is treated as success — the resource is already gone, which is what
-// Delete is trying to achieve. Centralizing this here means every v1
+// Delete is trying to achieve. Centralizing this here means every api
 // resource benefits without per-resource metadata or scaffolder support;
 // the underlying Pulumi Cloud endpoints are uniformly idempotent on this.
 func (r *Resource) Delete(ctx context.Context, req p.DeleteRequest) error {

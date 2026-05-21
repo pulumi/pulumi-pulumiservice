@@ -13,9 +13,9 @@
 // limitations under the License.
 
 // Package cloud holds the embedded OpenAPI spec and metadata document used
-// to derive the v1 resource surface at runtime.
+// to derive the api resource surface at runtime.
 //
-// The schema served by GetSchema and the v1 CRUD dispatch both flow from
+// The schema served by GetSchema and the api CRUD dispatch both flow from
 // these two files; nothing is generated at build time. Refresh the spec
 // with `go generate ./provider/pkg/cloud/...`.
 package cloud

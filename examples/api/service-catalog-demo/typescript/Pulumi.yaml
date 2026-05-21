@@ -1,0 +1,5 @@
+name: pulumicloud-api-service-catalog-demo
+runtime: nodejs
+description: |
+  Service Catalog api demo — TypeScript variant. See ../README.md for the
+  runbook.

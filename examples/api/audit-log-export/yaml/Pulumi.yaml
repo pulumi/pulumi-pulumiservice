@@ -1,0 +1,12 @@
+name: pulumicloud-api-audit-log-export
+runtime: yaml
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  bucketName:
+    type: string
+    default: pulumi-audit-log-archive
+  region:
+    type: string
+    default: us-west-2

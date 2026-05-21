@@ -1,0 +1,9 @@
+resources:
+  group:
+    type: pulumiservice:api:PolicyGroup
+    properties:
+      orgName: ${organizationName}
+      name: ${groupName}
+      entityType: stacks
+outputs:
+  groupName: ${group.name}

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Command scaffold-metadata derives v1 resource operations from the
+// Command scaffold-metadata derives api resource operations from the
 // embedded OpenAPI spec and merges them into metadata.json in place.
 //
 // metadata.json is the single source of truth at runtime. It is BOTH
@@ -1122,7 +1122,7 @@ func derive(paths map[string]map[string]any) (map[string]derivedOps, deriveStats
 			stats.skipped = append(stats.skipped, fmt.Sprintf("%s [%s]", noun, strings.Join(slots, ",")))
 			continue
 		}
-		candidates["pulumiservice:v1:"+noun] = derivedOps{
+		candidates["pulumiservice:api:"+noun] = derivedOps{
 			Create: final["create"],
 			Read:   final["read"],
 			Update: final["update"],
@@ -1136,7 +1136,7 @@ func derive(paths map[string]map[string]any) (map[string]derivedOps, deriveStats
 // isDeprecated returns true when an operation is marked deprecated, either via
 // the OpenAPI standard `deprecated: true` boolean or the legacy Pulumi-custom
 // `x-pulumi-route-property.Visibility = "Deprecated"` extension. Used for
-// reporting only — deprecated ops still scaffold as v1 resources.
+// reporting only — deprecated ops still scaffold as api resources.
 func isDeprecated(op map[string]any) bool {
 	if dep, _ := op["deprecated"].(bool); dep {
 		return true
@@ -1151,7 +1151,7 @@ func isDeprecated(op map[string]any) bool {
 
 // deriveModules assigns each candidate a (module, originalPrefix) pair when
 // at least two candidates share the same first-or-aliased URL segment. The
-// module ends up in the user-facing token (pulumiservice:v1/<module>:Type).
+// module ends up in the user-facing token (pulumiservice:api/<module>:Type).
 func deriveModules(candidates map[string]derivedOps, spec *rest.Spec) map[string]moduleAssignment {
 	type pair struct{ canonical, original string }
 	prefixes := map[string]pair{}
@@ -1223,7 +1223,7 @@ func deriveToken(pkg, key string, ma moduleAssignment) string {
 	}
 	typ = stripRouteSuffix(typ, ma.OriginalPrefix)
 	typ = stripModulePrefix(typ, ma.Module)
-	return fmt.Sprintf("%s:v1/%s:%s", pkg, ma.Module, typ)
+	return fmt.Sprintf("%s:api/%s:%s", pkg, ma.Module, typ)
 }
 
 func stripRouteSuffix(typ, originalPrefix string) string {

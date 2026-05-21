@@ -1,0 +1,30 @@
+# A Stack plus per-stack configuration and webhook. StackConfig links the
+# stack to an ESC environment for secret/config provider state. StackWebhook
+# delivers events from this specific stack to an external endpoint.
+resources:
+  parentStack:
+    type: pulumiservice:api/stacks:Stack
+    properties:
+      orgName: ${organizationName}
+      projectName: ${projectName}
+      stackName: ${stackName}
+  config:
+    type: pulumiservice:api/stacks:Config
+    properties:
+      orgName: ${organizationName}
+      projectName: ${parentStack.projectName}
+      stackName: ${parentStack.stackName}
+      environment: ${envRef}
+  hook:
+    type: pulumiservice:api/stacks:Webhook
+    properties:
+      organizationName: ${organizationName}
+      projectName: ${parentStack.projectName}
+      stackName: ${parentStack.stackName}
+      name: api-stackhook
+      displayName: Stack hook example
+      payloadUrl: ${hookUrl}
+      active: true
+      format: pulumi
+outputs:
+  stack: ${parentStack.id}

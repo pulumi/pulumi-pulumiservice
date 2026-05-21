@@ -1,0 +1,12 @@
+name: pulumicloud-api-teams
+runtime: yaml
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  teamSuffix:
+    type: string
+    default: dev
+  teamDescription:
+    type: string
+    default: A team created by the api example.

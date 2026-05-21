@@ -1,0 +1,15 @@
+name: pulumicloud-api-stack-tags
+runtime: yaml
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  projectName:
+    type: string
+    default: api-stack-tags-example
+  stackName:
+    type: string
+    default: dev
+  tagValue:
+    type: string
+    default: api-tag-value

@@ -1,0 +1,12 @@
+name: pulumicloud-api-rbac
+runtime: yaml
+config:
+  organizationName:
+    type: string
+    default: service-provider-test-org
+  nameSuffix:
+    type: string
+    default: manual
+  roleDescription:
+    type: string
+    default: Read-only access to stacks, created by the api rbac example.

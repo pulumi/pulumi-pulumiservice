@@ -1,0 +1,10 @@
+resources:
+  team:
+    type: pulumiservice:api/teams:Team
+    properties:
+      orgName: ${organizationName}
+      name: api-team-${teamSuffix}
+      displayName: api Team ${teamSuffix}
+      description: ${teamDescription}
+outputs:
+  teamName: ${team.name}
